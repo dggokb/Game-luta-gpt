@@ -8,6 +8,6 @@ android {
         minSdk 24
         targetSdk 35
         versionCode 10
-        versionName '1.0'
+        versionName '0.10'
     }
 }
