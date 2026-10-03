@@ -38,9 +38,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean crouching;
     private boolean grounded = true;
     private boolean superJumping = false;
+    private boolean forwardDashing = false;
+    private float backDashTimer = 0f;
     private float walkTime = 0f;
 
     private final float moveSpeed = 300f;
+    private final float forwardDashSpeed = 620f;
+    private final float backDashSpeed = 760f;
+    private final float backDashDuration = 0.20f;
     private final float jumpSpeed = 660f;
     private final float superJumpSpeed = 1450f;
     private final float gravity = 1650f;
@@ -55,6 +60,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int dpadDirection = 0;
     private int dpadPointer = -1;
     private long lastDownInputMs = -1000L;
+    private long lastForwardTapMs = -1000L;
+    private long lastBackTapMs = -1000L;
+    private static final long DASH_DOUBLE_TAP_MS = 300L;
 
     public GameView(Context context) {
         super(context);
@@ -118,9 +126,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (movingLeft && !movingRight) direction = -1f;
         if (movingRight && !movingLeft) direction = 1f;
 
-        if (direction != 0f && !crouching) {
-            playerX += direction * moveSpeed * dt;
-            walkTime += dt * 8f;
+        if (backDashTimer > 0f && grounded) {
+            playerX -= backDashSpeed * dt;
+            backDashTimer = Math.max(0f, backDashTimer - dt);
+            walkTime += dt * 13f;
+        } else if (direction != 0f && !crouching) {
+            float speed = (forwardDashing && direction > 0f && grounded) ? forwardDashSpeed : moveSpeed;
+            playerX += direction * speed * dt;
+            walkTime += dt * (forwardDashing ? 14f : 8f);
         } else {
             walkTime = 0f;
         }
@@ -268,7 +281,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText("DPAD 8-WAY • v0.2", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
-        String state = superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO")));
+        String state = backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO")))));
         c.drawText("Estado: " + state, 975, 88, paint);
     }
 
@@ -399,6 +412,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         movingRight = next == 1 || next == 2 || next == 8;
         crouching = grounded && isDownDirection(next);
 
+        if (next == 1 && previous != 1) {
+            if (grounded && nowMs - lastForwardTapMs <= DASH_DOUBLE_TAP_MS) {
+                forwardDashing = true;
+                backDashTimer = 0f;
+            }
+            lastForwardTapMs = nowMs;
+        }
+
+        if (next != 1) {
+            forwardDashing = false;
+        }
+
+        if (next == 5 && previous != 5) {
+            if (grounded && nowMs - lastBackTapMs <= DASH_DOUBLE_TAP_MS) {
+                backDashTimer = backDashDuration;
+                forwardDashing = false;
+            }
+            lastBackTapMs = nowMs;
+        }
+
         if (isDownDirection(next) && !isDownDirection(previous)) {
             lastDownInputMs = nowMs;
         }
@@ -415,6 +448,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         movingLeft = false;
         movingRight = false;
         crouching = false;
+        forwardDashing = false;
     }
 
     @Override
