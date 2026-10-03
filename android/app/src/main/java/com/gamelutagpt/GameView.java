@@ -326,7 +326,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private long lastDownInputMs = -1000L;
     private long lastForwardTapMs = -1000L;
     private long lastBackTapMs = -1000L;
+    private long launcherChaseUntilMs = -1L;
     private static final long DASH_DOUBLE_TAP_MS = 300L;
+    private static final long LAUNCHER_CHASE_WINDOW_MS = 900L;
 
     private int lightPointer = -1;
     private int mediumPointer = -1;
@@ -703,6 +705,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         superDarkAlpha = 0;
         superFlashAlpha = 0;
         superStoredVelocityY = velocityY;
+        launcherChaseUntilMs = -1L;
 
         attackType = "";
         attackTimer = 0f;
@@ -952,6 +955,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void startTagAnimation() {
         if (!canStartTag()) return;
 
+        launcherChaseUntilMs = -1L;
         tagPhase = TAG_EXIT;
         tagPhaseTimer = 0f;
         tagVisualOffsetX = 0f;
@@ -1062,6 +1066,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         applyDummyDamage(damage, facingDirection);
         if ("2H".equals(attackType)) {
             launchDummy();
+            launcherChaseUntilMs =
+                System.currentTimeMillis() + LAUNCHER_CHASE_WINDOW_MS;
         }
         attackHitApplied = true;
     }
@@ -1472,7 +1478,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SUPER JUMP LAUNCHER • v0.28", 975, 59, paint);
+        c.drawText("LAUNCHER CHASE • v0.29", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2338,7 +2344,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (isUpDirection(next) && !isUpDirection(previous) && grounded) {
-            boolean superJump = nowMs - lastDownInputMs <= 360L;
+            boolean launcherChase = nowMs <= launcherChaseUntilMs;
+            boolean superJump =
+                launcherChase ||
+                nowMs - lastDownInputMs <= 360L;
+
+            if (launcherChase) {
+                // Jump-cancel do 2H confirmado: sobe direto atrás do adversário.
+                attackType = "";
+                attackTimer = 0f;
+                attackDuration = 0f;
+                attackHitApplied = false;
+                launcherChaseUntilMs = -1L;
+                lastDownInputMs = -1000L;
+            }
+
             startJump(superJump);
         }
     }
