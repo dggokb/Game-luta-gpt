@@ -363,9 +363,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         attackTimer = attackDuration;
     }
 
+    private boolean hasActiveEnergyProjectile(int ownerIndex) {
+        for (EnergyProjectile projectile : energyProjectiles) {
+            if (projectile.ownerIndex == ownerIndex) return true;
+        }
+        return false;
+    }
+
     private void fireEnergyAttack(String strength) {
         FighterProfile profile = activeFighter().profile;
         if (!profile.hasEnergyAttack) return;
+        if (hasActiveEnergyProjectile(activeFighterIndex)) return;
 
         float speedMultiplier;
         float damageMultiplier;
@@ -406,7 +414,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean tryFirePendingEnergy(String attackButton, long nowMs) {
         FighterProfile profile = activeFighter().profile;
 
-        if (!profile.hasEnergyAttack || pendingEnergyUntilMs < nowMs) {
+        if (
+            !profile.hasEnergyAttack ||
+            hasActiveEnergyProjectile(activeFighterIndex) ||
+            pendingEnergyUntilMs < nowMs
+        ) {
             pendingEnergyUntilMs = -1L;
             return false;
         }
@@ -457,7 +469,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void tryEnergyCommand(long nowMs) {
         FighterProfile profile = activeFighter().profile;
-        if (!profile.hasEnergyAttack || profile.energyCommand.length == 0) return;
+        if (
+            !profile.hasEnergyAttack ||
+            profile.energyCommand.length == 0 ||
+            hasActiveEnergyProjectile(activeFighterIndex)
+        ) {
+            pendingEnergyUntilMs = -1L;
+            return;
+        }
         if (attackTimer > 0f) return;
         if (commandCount < profile.energyCommand.length) return;
 
@@ -692,7 +711,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("ENERGY LOCK • v0.14", 975, 59, paint);
+        c.drawText("PROJECTILE LIMIT • v0.15", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
