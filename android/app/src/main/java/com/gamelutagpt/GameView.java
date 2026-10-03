@@ -15,8 +15,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float VW = 1280f;
     private static final float VH = 720f;
     private static final float GROUND_Y = 565f;
-    private static final float LEFT_BOUND = 70f;
-    private static final float RIGHT_BOUND = 1210f;
+    private static final float WORLD_WIDTH = 2600f;
+    private static final float LEFT_BOUND = 90f;
+    private static final float RIGHT_BOUND = WORLD_WIDTH - 90f;
+    private static final float CAMERA_ZOOM = 1.12f;
+    private static final float CAMERA_TOP = 72f;
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -24,8 +27,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private Thread gameThread;
     private volatile boolean running;
 
-    private float playerX = 300f;
+    private float playerX = 420f;
     private float playerY = GROUND_Y;
+    private float cameraX = 420f;
     private float velocityY = 0f;
     private boolean movingLeft;
     private boolean movingRight;
@@ -126,6 +130,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         playerX = clamp(playerX, LEFT_BOUND, RIGHT_BOUND);
+
+        float visibleWorldWidth = VW / CAMERA_ZOOM;
+        float halfVisible = visibleWorldWidth / 2f;
+        float targetCameraX = clamp(playerX, halfVisible, WORLD_WIDTH - halfVisible);
+        float follow = 1f - (float)Math.pow(0.001f, dt);
+        cameraX += (targetCameraX - cameraX) * follow;
     }
 
     private void jump() {
@@ -148,9 +158,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.save();
             canvas.scale(sx, sy);
 
+            float visibleWorldWidth = VW / CAMERA_ZOOM;
+            float cameraLeft = clamp(cameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+
+            canvas.save();
+            canvas.scale(CAMERA_ZOOM, CAMERA_ZOOM);
+            canvas.translate(-cameraLeft, -CAMERA_TOP);
             drawScenario(canvas);
-            drawHud(canvas);
             drawPlayer(canvas);
+            canvas.restore();
+
+            drawHud(canvas);
             drawControls(canvas);
 
             canvas.restore();
@@ -161,29 +179,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawScenario(Canvas c) {
         paint.setShader(new LinearGradient(0, 0, 0, VH, Color.rgb(43, 97, 148), Color.rgb(240, 171, 99), Shader.TileMode.CLAMP));
-        c.drawRect(0, 0, VW, VH, paint);
+        c.drawRect(0, 0, WORLD_WIDTH, VH, paint);
         paint.setShader(null);
 
         paint.setColor(Color.argb(130, 255, 244, 201));
-        c.drawCircle(1030, 120, 58, paint);
+        c.drawCircle(2050, 120, 58, paint);
 
         paint.setColor(Color.rgb(53, 73, 88));
-        float[] mountainXs = {-60, 120, 320, 530, 760, 980, 1170};
-        float[] mountainHs = {120, 175, 110, 195, 135, 185, 125};
-        for (int i = 0; i < mountainXs.length; i++) {
+        for (int i = 0; i < 15; i++) {
+            float x = -100f + i * 190f;
+            float h = 105f + (i % 5) * 24f;
             android.graphics.Path p = new android.graphics.Path();
-            p.moveTo(mountainXs[i], GROUND_Y);
-            p.lineTo(mountainXs[i] + 110, GROUND_Y - mountainHs[i]);
-            p.lineTo(mountainXs[i] + 235, GROUND_Y);
+            p.moveTo(x, GROUND_Y);
+            p.lineTo(x + 115, GROUND_Y - h);
+            p.lineTo(x + 245, GROUND_Y);
             p.close();
             c.drawPath(p, paint);
         }
 
         paint.setColor(Color.rgb(116, 81, 50));
-        c.drawRect(0, GROUND_Y, VW, VH, paint);
+        c.drawRect(0, GROUND_Y, WORLD_WIDTH, VH, paint);
         paint.setColor(Color.rgb(148, 108, 67));
-        for (int i = 0; i < 20; i++) {
-            float x = (i * 83f) % VW;
+        for (int i = 0; i < 38; i++) {
+            float x = (i * 83f) % WORLD_WIDTH;
             c.drawRoundRect(x, GROUND_Y + 35 + (i % 3) * 38, x + 55, GROUND_Y + 40 + (i % 3) * 38, 3, 3, paint);
         }
 
