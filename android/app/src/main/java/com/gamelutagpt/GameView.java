@@ -577,17 +577,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateEnergyProjectiles(dt);
         updateSuperProjectiles(dt);
 
-        int relativeHeldDirection = relativeDirection(dpadDirection);
-        boolean holdingGuardDirection =
-            grounded &&
-            (
-                relativeHeldDirection == 5 ||
-                relativeHeldDirection == 4
-            );
-
         float direction = 0f;
         if (
-            !holdingGuardDirection &&
             !playerMovementLocked &&
             !isEnergyAttackActive() &&
             !isTagAnimationActive()
@@ -2066,6 +2057,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         playerKnockbackVelocityX *= 0.55f;
     }
 
+    private void restoreHeldDirectionAfterBlock() {
+        movingLeft =
+            dpadDirection == 4 ||
+            dpadDirection == 5 ||
+            dpadDirection == 6;
+        movingRight =
+            dpadDirection == 1 ||
+            dpadDirection == 2 ||
+            dpadDirection == 8;
+        crouching = grounded && isDownDirection(dpadDirection);
+        forwardDashing = false;
+    }
+
     private void updatePlayerReceivedState(float dt) {
         if (playerBlockFlashTimer > 0f) {
             playerBlockFlashTimer = Math.max(
@@ -2086,6 +2090,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 playerMovementLocked = false;
                 playerKnockbackVelocityX = 0f;
                 playerLastGuardState = GUARD_NONE;
+                restoreHeldDirectionAfterBlock();
             }
         }
 
@@ -2291,7 +2296,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("GUARD STANCE FIX • v0.35", 975, 59, paint);
+        c.drawText("WALK BACK GUARD • v0.36", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -3351,18 +3356,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         movingLeft = next == 4 || next == 5 || next == 6;
         movingRight = next == 1 || next == 2 || next == 8;
         crouching = grounded && isDownDirection(next);
-
-        int relativeNext = relativeDirection(next);
-        boolean holdingGroundGuard =
-            grounded &&
-            (relativeNext == 5 || relativeNext == 4);
-
-        if (holdingGroundGuard) {
-            // Segurar defesa prepara o bloqueio, mas não faz o personagem recuar.
-            movingLeft = false;
-            movingRight = false;
-            forwardDashing = false;
-        }
 
         if (next != 0 && next != previous) {
             recordCommandDirection(relativeDirection(next), nowMs);
