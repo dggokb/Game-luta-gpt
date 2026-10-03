@@ -28,6 +28,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final float superRange;
         final float superSpeed;
         final int superDamage;
+        final String reserveHudLabel;
 
         FighterProfile(
             String name,
@@ -57,6 +58,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.superRange = superRange;
             this.superSpeed = superSpeed;
             this.superDamage = superDamage;
+            this.reserveHudLabel = "RESERVA: " + name;
         }
     }
 
@@ -64,11 +66,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final FighterProfile profile;
         int life;
         float superMeter;
+        String lifeHudLabel;
+        String superHudLabel;
+        String superLevelHudLabel;
 
         FighterState(FighterProfile profile) {
             this.profile = profile;
             this.life = profile.maxLife;
             this.superMeter = 0f;
+            refreshHudLabels();
+        }
+
+        void refreshHudLabels() {
+            int level = (int)Math.floor(superMeter);
+            lifeHudLabel = "HP " + life + " / " + profile.maxLife;
+            superHudLabel = String.format(
+                java.util.Locale.US,
+                "SUPER %.2f / 5  •  LV %d",
+                superMeter,
+                level
+            );
+            superLevelHudLabel = "LV " + level;
         }
     }
 
@@ -306,6 +324,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float tagPhaseTimer = 0f;
     private float tagVisualOffsetX = 0f;
     private float tagCooldownRemaining = 0f;
+    private String tagCooldownHudLabel = "TROCA: PRONTA";
+    private String tagCooldownButtonLabel = "";
+    private int tagCooldownDisplayedTenths = -1;
+    private int tagCooldownDisplayedSeconds = -1;
 
     private int autoComboIndex = 0;
     private long lastAutoComboTapMs = -1000L;
@@ -511,6 +533,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             0f,
             activeFighter().superMeter - SUPER_COST
         );
+        activeFighter().refreshHudLabels();
 
         superPhase = SUPER_DARKEN;
         superPhaseTimer = 0f;
@@ -650,10 +673,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             tagCooldownRemaining <= 0f;
     }
 
+    private void updateTagCooldownLabels() {
+        if (isTagAnimationActive()) {
+            tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
+            tagCooldownButtonLabel = "...";
+            tagCooldownDisplayedTenths = -1;
+            tagCooldownDisplayedSeconds = -1;
+            return;
+        }
+
+        if (tagCooldownRemaining <= 0f) {
+            tagCooldownHudLabel = "TROCA: PRONTA";
+            tagCooldownButtonLabel = "";
+            tagCooldownDisplayedTenths = -1;
+            tagCooldownDisplayedSeconds = -1;
+            return;
+        }
+
+        int tenths = (int)Math.ceil(tagCooldownRemaining * 10f);
+        if (tenths != tagCooldownDisplayedTenths) {
+            tagCooldownDisplayedTenths = tenths;
+            tagCooldownHudLabel = String.format(
+                java.util.Locale.US,
+                "TROCA: %.1fs",
+                tenths / 10f
+            );
+        }
+
+        int seconds = (int)Math.ceil(tagCooldownRemaining);
+        if (seconds != tagCooldownDisplayedSeconds) {
+            tagCooldownDisplayedSeconds = seconds;
+            tagCooldownButtonLabel = Integer.toString(seconds);
+        }
+    }
+
     private void updateTagState(float dt) {
         if (tagCooldownRemaining > 0f) {
             tagCooldownRemaining = Math.max(0f, tagCooldownRemaining - dt);
         }
+
+        updateTagCooldownLabels();
 
         if (tagPhase == TAG_IDLE) return;
 
@@ -720,6 +779,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         tagPhase = TAG_EXIT;
         tagPhaseTimer = 0f;
         tagVisualOffsetX = 0f;
+        updateTagCooldownLabels();
 
         attackType = "";
         attackTimer = 0f;
@@ -759,6 +819,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             0f,
             MAX_SUPER_METER
         );
+        fighter.refreshHudLabels();
     }
 
     private float superGainForAttack(String type) {
@@ -978,6 +1039,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (damage <= 0) return;
         FighterState fighter = activeFighter();
         fighter.life = Math.max(0, fighter.life - damage);
+        fighter.refreshHudLabels();
     }
 
     private float attackPhase() {
@@ -1116,7 +1178,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(14);
         paint.setFakeBoldText(true);
-        c.drawText("RESERVA: " + reserve.profile.name, 105, 184, paint);
+        c.drawText(reserve.profile.reserveHudLabel, 105, 184, paint);
         paint.setFakeBoldText(false);
 
         drawLifeBar(c, reserve, 105f, 193f, 525f, 206f, false);
@@ -1131,12 +1193,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
-        c.drawText("Estado: " + currentStateLabel(), 975, 88, paint);
+        c.drawText("Estado:", 975, 88, paint);
+        c.drawText(currentStateLabel(), 1032, 88, paint);
     }
 
     private String currentStateLabel() {
         if (isSuperCinematicActive()) return "SUPER";
-        if (attackTimer > 0f) return "ATAQUE " + attackType;
+        if (attackTimer > 0f) {
+            if ("L".equals(attackType)) return "ATAQUE L";
+            if ("M".equals(attackType)) return "ATAQUE M";
+            if ("H".equals(attackType)) return "ATAQUE H";
+            if ("S".equals(attackType)) return "ATAQUE S";
+            if ("2L".equals(attackType)) return "ATAQUE 2L";
+            if ("2M".equals(attackType)) return "ATAQUE 2M";
+            if ("2H".equals(attackType)) return "ATAQUE 2H";
+            return "ATAQUE";
+        }
         if (backDashTimer > 0f) return "BACKDASH";
         if (forwardDashing) return "DASH";
         if (superJumping) return "SUPER JUMP";
@@ -1204,36 +1276,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (showText) {
-            int level = (int)Math.floor(fighter.superMeter);
             paint.setColor(Color.WHITE);
             paint.setTextSize(12f);
-            c.drawText(
-                String.format(
-                    java.util.Locale.US,
-                    "SUPER %.2f / 5  •  LV %d",
-                    fighter.superMeter,
-                    level
-                ),
-                left,
-                bottom + 13f,
-                paint
-            );
+            c.drawText(fighter.superHudLabel, left, bottom + 13f, paint);
         }
     }
 
     private void drawTagCooldown(Canvas c, float left, float top, float right, float bottom) {
         float ratio;
-        String label;
 
         if (isTagAnimationActive()) {
             ratio = 0f;
-            label = "TROCA: EM ANDAMENTO";
         } else if (tagCooldownRemaining > 0f) {
             ratio = 1f - (tagCooldownRemaining / TAG_COOLDOWN_SECONDS);
-            label = String.format(java.util.Locale.US, "TROCA: %.1fs", tagCooldownRemaining);
         } else {
             ratio = 1f;
-            label = "TROCA: PRONTA";
         }
 
         paint.setColor(Color.rgb(45, 53, 62));
@@ -1252,7 +1309,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(12f);
-        c.drawText(label, left, bottom + 13f, paint);
+        c.drawText(tagCooldownHudLabel, left, bottom + 13f, paint);
     }
 
     private void drawLifeBar(
@@ -1290,7 +1347,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             paint.setColor(Color.WHITE);
             paint.setTextSize(15);
             c.drawText(
-                "HP " + fighter.life + " / " + fighter.profile.maxLife,
+                fighter.lifeHudLabel,
                 left + 6,
                 bottom - 7,
                 paint
@@ -1642,9 +1699,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float textY = TAG_Y - (paint.ascent() + paint.descent()) / 2f;
         String label = enabled
             ? "TROCA"
-            : (isTagAnimationActive()
-                ? "..."
-                : Integer.toString((int)Math.ceil(tagCooldownRemaining)));
+            : tagCooldownButtonLabel;
         c.drawText(label, TAG_X, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
@@ -1680,7 +1735,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText("SUPER", SUPER_X, SUPER_Y - 4f, paint);
         paint.setTextSize(11f);
         c.drawText(
-            "LV " + (int)Math.floor(activeFighter().superMeter),
+            activeFighter().superLevelHudLabel,
             SUPER_X,
             SUPER_Y + 14f,
             paint
