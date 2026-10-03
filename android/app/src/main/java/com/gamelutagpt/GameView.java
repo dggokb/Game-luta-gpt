@@ -196,6 +196,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int comboPointer = -1;
     private int tagPointer = -1;
 
+    private static final int TAG_IDLE = 0;
+    private static final int TAG_EXIT = 1;
+    private static final int TAG_ENTER = 2;
+    private static final int TAG_POSE = 3;
+    private static final float TAG_EXIT_DURATION = 0.34f;
+    private static final float TAG_ENTER_DURATION = 0.38f;
+    private static final float TAG_POSE_DURATION = 0.45f;
+    private static final float TAG_TRAVEL_DISTANCE = 760f;
+    private static final float TAG_COOLDOWN_SECONDS = 10f;
+    private int tagPhase = TAG_IDLE;
+    private float tagPhaseTimer = 0f;
+    private float tagVisualOffsetX = 0f;
+    private float tagCooldownRemaining = 0f;
+
     private int autoComboIndex = 0;
     private long lastAutoComboTapMs = -1000L;
     private static final long AUTO_COMBO_RESET_MS = 700L;
@@ -274,6 +288,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void update(float dt) {
+        updateTagState(dt);
+
         if (attackTimer > 0f) {
             attackTimer = Math.max(0f, attackTimer - dt);
             if (attackTimer <= 0f) attackType = "";
@@ -282,12 +298,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateEnergyProjectiles(dt);
 
         float direction = 0f;
-        if (!isEnergyAttackActive()) {
+        if (!isEnergyAttackActive() && !isTagAnimationActive()) {
             if (movingLeft && !movingRight) direction = -1f;
             if (movingRight && !movingLeft) direction = 1f;
         }
 
-        if (attackTimer > 0f && grounded) {
+        if (isTagAnimationActive()) {
+            walkTime = 0f;
+        } else if (attackTimer > 0f && grounded) {
             // No chão, ataques travam o deslocamento horizontal.
             walkTime = 0f;
         } else if (backDashTimer > 0f && grounded) {
@@ -346,8 +364,83 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
     }
 
+    private boolean isTagAnimationActive() {
+        return tagPhase != TAG_IDLE;
+    }
+
+    private boolean isTagPoseActive() {
+        return tagPhase == TAG_POSE;
+    }
+
+    private boolean canStartTag() {
+        return !isTagAnimationActive() && tagCooldownRemaining <= 0f;
+    }
+
+    private void updateTagState(float dt) {
+        if (tagCooldownRemaining > 0f) {
+            tagCooldownRemaining = Math.max(0f, tagCooldownRemaining - dt);
+        }
+
+        if (tagPhase == TAG_IDLE) return;
+
+        tagPhaseTimer += dt;
+
+        if (tagPhase == TAG_EXIT) {
+            float t = clamp(tagPhaseTimer / TAG_EXIT_DURATION, 0f, 1f);
+            float eased = t * t;
+            tagVisualOffsetX = -TAG_TRAVEL_DISTANCE * eased;
+
+            if (t >= 1f) {
+                activeFighterIndex = (activeFighterIndex + 1) % team.length;
+                tagPhase = TAG_ENTER;
+                tagPhaseTimer = 0f;
+                tagVisualOffsetX = -TAG_TRAVEL_DISTANCE;
+            }
+        } else if (tagPhase == TAG_ENTER) {
+            float t = clamp(tagPhaseTimer / TAG_ENTER_DURATION, 0f, 1f);
+            float eased = 1f - (1f - t) * (1f - t);
+            tagVisualOffsetX = -TAG_TRAVEL_DISTANCE * (1f - eased);
+
+            if (t >= 1f) {
+                tagPhase = TAG_POSE;
+                tagPhaseTimer = 0f;
+                tagVisualOffsetX = 0f;
+            }
+        } else if (tagPhase == TAG_POSE) {
+            tagVisualOffsetX = 0f;
+
+            if (tagPhaseTimer >= TAG_POSE_DURATION) {
+                tagPhase = TAG_IDLE;
+                tagPhaseTimer = 0f;
+                tagVisualOffsetX = 0f;
+                tagCooldownRemaining = TAG_COOLDOWN_SECONDS;
+            }
+        }
+    }
+
+    private void startTagAnimation() {
+        if (!canStartTag()) return;
+
+        tagPhase = TAG_EXIT;
+        tagPhaseTimer = 0f;
+        tagVisualOffsetX = 0f;
+
+        attackType = "";
+        attackTimer = 0f;
+        attackDuration = 0f;
+        forwardDashing = false;
+        backDashTimer = 0f;
+        movingLeft = false;
+        movingRight = false;
+        crouching = false;
+        clearDpad();
+        resetAutoCombo();
+        resetCommandBuffer();
+        pendingEnergyUntilMs = -1L;
+    }
+
     private void startJump(boolean superJump) {
-        if (!grounded || isEnergyAttackActive()) return;
+        if (!grounded || isEnergyAttackActive() || isTagAnimationActive()) return;
 
         grounded = false;
         crouching = false;
@@ -553,19 +646,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void switchFighter() {
-        activeFighterIndex = (activeFighterIndex + 1) % team.length;
-
-        attackType = "";
-        attackTimer = 0f;
-        attackDuration = 0f;
-        forwardDashing = false;
-        backDashTimer = 0f;
-        resetAutoCombo();
-        resetCommandBuffer();
-        pendingEnergyUntilMs = -1L;
-
-        // Posição, altura, velocidade vertical e câmera são compartilhadas.
-        // Assim a troca mantém exatamente o mesmo estado de movimento.
+        startTagAnimation();
     }
 
     private void applyDamage(int damage) {
@@ -602,7 +683,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.translate(-cameraLeft, -cameraTop);
             drawScenario(canvas);
             drawEnergyProjectiles(canvas);
+            canvas.save();
+            canvas.translate(tagVisualOffsetX, 0f);
             drawPlayer(canvas);
+            canvas.restore();
             canvas.restore();
 
             drawHud(canvas);
@@ -682,7 +766,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         FighterState reserve = reserveFighter();
 
         paint.setColor(Color.argb(185, 10, 15, 27));
-        c.drawRoundRect(32, 28, 560, 154, 18, 18, paint);
+        c.drawRoundRect(32, 28, 560, 184, 18, 18, paint);
 
         paint.setColor(active.profile.color);
         c.drawCircle(78, 74, 29, paint);
@@ -700,25 +784,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(false);
 
         drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
+        drawTagCooldown(c, 122f, 106f, 525f, 116f);
 
         // Reserva: indicador menor com vida própria.
         paint.setColor(reserve.profile.color);
-        c.drawCircle(78, 127, 14, paint);
+        c.drawCircle(78, 154, 14, paint);
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(14);
         paint.setFakeBoldText(true);
-        c.drawText("RESERVA: " + reserve.profile.name, 105, 124, paint);
+        c.drawText("RESERVA: " + reserve.profile.name, 105, 151, paint);
         paint.setFakeBoldText(false);
 
-        drawLifeBar(c, reserve, 105f, 132f, 525f, 145f, false);
+        drawLifeBar(c, reserve, 105f, 160f, 525f, 173f, false);
 
         paint.setColor(Color.argb(180, 10, 15, 27));
         c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("CROUCH ATTACKS • v0.18", 975, 59, paint);
+        c.drawText("TAG ANIMATION • v0.19", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -737,6 +822,40 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                                 : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
 
         c.drawText("Estado: " + state, 975, 88, paint);
+    }
+
+    private void drawTagCooldown(Canvas c, float left, float top, float right, float bottom) {
+        float ratio;
+        String label;
+
+        if (isTagAnimationActive()) {
+            ratio = 0f;
+            label = "TROCA: EM ANDAMENTO";
+        } else if (tagCooldownRemaining > 0f) {
+            ratio = 1f - (tagCooldownRemaining / TAG_COOLDOWN_SECONDS);
+            label = String.format(java.util.Locale.US, "TROCA: %.1fs", tagCooldownRemaining);
+        } else {
+            ratio = 1f;
+            label = "TROCA: PRONTA";
+        }
+
+        paint.setColor(Color.rgb(45, 53, 62));
+        c.drawRoundRect(left, top, right, bottom, 5f, 5f, paint);
+
+        if (ratio > 0f) {
+            paint.setColor(reserveFighter().profile.color);
+            c.drawRoundRect(left, top, left + (right - left) * ratio, bottom, 5f, 5f, paint);
+        }
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(1.5f);
+        paint.setColor(Color.argb(210, 255, 255, 255));
+        c.drawRoundRect(left, top, right, bottom, 5f, 5f, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(12f);
+        c.drawText(label, left, bottom + 13f, paint);
     }
 
     private void drawLifeBar(
@@ -870,7 +989,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else {
             float phase = attackPhase();
 
-            if ("L".equals(attackType) && attackTimer > 0f) {
+            if (isTagPoseActive()) {
+                // Pose curta de prontidão ao terminar a entrada.
+                float poseWave = (float)Math.sin(tagPhaseTimer * 16f) * 4f;
+                c.drawLine(playerX - 3, top + 58, playerX - 42, top + 88 - poseWave, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 48, top + 72 + poseWave, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 34, baseY, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 32, baseY - 4, paint);
+            } else if ("L".equals(attackType) && attackTimer > 0f) {
                 c.drawLine(playerX - 3, top + 58, playerX - 30, top + 96, paint);
                 c.drawLine(playerX + 3, top + 58, playerX + 34 + 72f * phase, top + 66, paint);
                 c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
@@ -1022,26 +1148,40 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawTagButton(Canvas c) {
         boolean pressed = tagPointer != -1;
+        boolean enabled = canStartTag();
 
-        paint.setColor(
-            pressed
-                ? reserveFighter().profile.color
-                : Color.argb(145, 7, 13, 26)
-        );
+        if (!enabled) {
+            paint.setColor(Color.argb(95, 55, 60, 68));
+        } else {
+            paint.setColor(
+                pressed
+                    ? reserveFighter().profile.color
+                    : Color.argb(145, 7, 13, 26)
+            );
+        }
         c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
 
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(3f);
-        paint.setColor(reserveFighter().profile.color);
+        paint.setColor(
+            enabled
+                ? reserveFighter().profile.color
+                : Color.argb(120, 180, 180, 180)
+        );
         c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
         paint.setStyle(Paint.Style.FILL);
 
-        paint.setColor(Color.WHITE);
+        paint.setColor(enabled ? Color.WHITE : Color.argb(155, 220, 220, 220));
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(17f);
+        paint.setTextSize(enabled ? 17f : 14f);
         paint.setFakeBoldText(true);
         float textY = TAG_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText("TROCA", TAG_X, textY, paint);
+        String label = enabled
+            ? "TROCA"
+            : (isTagAnimationActive()
+                ? "..."
+                : Integer.toString((int)Math.ceil(tagCooldownRemaining)));
+        c.drawText(label, TAG_X, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
@@ -1081,7 +1221,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateDpad(float x, float y, long nowMs) {
-        if (isEnergyAttackActive()) return;
+        if (isEnergyAttackActive() || isTagAnimationActive()) return;
 
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
@@ -1171,7 +1311,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
-            if (isEnergyAttackActive()) {
+            if (isEnergyAttackActive() || isTagAnimationActive()) {
                 return true;
             }
 
@@ -1203,11 +1343,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 comboPointer = pointerId;
                 triggerAutoCombo(nowMs);
             } else if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) {
-                tagPointer = pointerId;
-                switchFighter();
+                if (canStartTag()) {
+                    tagPointer = pointerId;
+                    switchFighter();
+                }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            if (!isEnergyAttackActive() && dpadPointer != -1) {
+            if (!isEnergyAttackActive() && !isTagAnimationActive() && dpadPointer != -1) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);
                 if (pointerIndex >= 0) {
                     float x = event.getX(pointerIndex) / sx;
