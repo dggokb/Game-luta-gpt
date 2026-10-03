@@ -108,6 +108,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final int damage;
         final int color;
         final int ownerIndex;
+        final int direction;
 
         EnergyProjectile(
             float x,
@@ -116,7 +117,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float speed,
             int damage,
             int color,
-            int ownerIndex
+            int ownerIndex,
+            int direction
         ) {
             this.x = x;
             this.y = y;
@@ -126,6 +128,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.damage = damage;
             this.color = color;
             this.ownerIndex = ownerIndex;
+            this.direction = direction;
         }
     }
 
@@ -138,6 +141,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final int damage;
         final int color;
         final int ownerIndex;
+        final int direction;
 
         SuperProjectile(
             float x,
@@ -146,7 +150,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float speed,
             int damage,
             int color,
-            int ownerIndex
+            int ownerIndex,
+            int direction
         ) {
             this.x = x;
             this.y = y;
@@ -156,6 +161,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.damage = damage;
             this.color = color;
             this.ownerIndex = ownerIndex;
+            this.direction = direction;
         }
     }
 
@@ -235,6 +241,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float cameraX = 420f;
     private float cameraTop = GROUND_CAMERA_TOP;
     private float velocityY = 0f;
+    private int facingDirection = 1;
+    private static final float FACING_SWITCH_EPSILON = 6f;
 
     private boolean movingLeft;
     private boolean movingRight;
@@ -348,6 +356,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int tagPhase = TAG_IDLE;
     private float tagPhaseTimer = 0f;
     private float tagVisualOffsetX = 0f;
+    private int tagExitDirection = -1;
     private float tagCooldownRemaining = 0f;
     private String tagCooldownHudLabel = "TROCA: PRONTA";
     private String tagCooldownButtonLabel = "";
@@ -499,11 +508,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // No chão, ataques travam o deslocamento horizontal.
             walkTime = 0f;
         } else if (backDashTimer > 0f && grounded) {
-            playerX -= backDashSpeed * dt;
+            playerX -= facingDirection * backDashSpeed * dt;
             backDashTimer = Math.max(0f, backDashTimer - dt);
             walkTime += dt * 13f;
         } else if (direction != 0f && !crouching) {
-            float speed = (forwardDashing && direction > 0f && grounded) ? forwardDashSpeed : moveSpeed;
+            boolean movingForward = direction == facingDirection;
+            float speed = (
+                forwardDashing &&
+                movingForward &&
+                grounded
+            ) ? forwardDashSpeed : moveSpeed;
             playerX += direction * speed * dt;
             walkTime += dt * (forwardDashing ? 14f : 8f);
         } else {
@@ -526,11 +540,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
         }
 
-        playerX = clamp(
-            playerX,
-            LEFT_BOUND,
-            Math.min(RIGHT_BOUND, DUMMY_X - DUMMY_HALF_WIDTH - 42f)
-        );
+        playerX = clamp(playerX, LEFT_BOUND, RIGHT_BOUND);
+        updateFacing();
 
         float visibleWorldWidth = VW / CAMERA_ZOOM;
         float halfVisible = visibleWorldWidth / 2f;
@@ -544,6 +555,55 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         float verticalFollow = 1f - (float)Math.pow(0.00035f, dt);
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
+    }
+
+    private void updateFacing() {
+        int nextFacing = facingDirection;
+
+        if (playerX < DUMMY_X - FACING_SWITCH_EPSILON) {
+            nextFacing = 1;
+        } else if (playerX > DUMMY_X + FACING_SWITCH_EPSILON) {
+            nextFacing = -1;
+        }
+
+        if (nextFacing == facingDirection) return;
+
+        facingDirection = nextFacing;
+
+        // Evita que um comando iniciado de um lado termine do outro lado.
+        resetCommandBuffer();
+        pendingEnergyUntilMs = -1L;
+        forwardDashing = false;
+        backDashTimer = 0f;
+        lastForwardTapMs = -1000L;
+        lastBackTapMs = -1000L;
+        lastDownInputMs = -1000L;
+    }
+
+    private int relativeDirection(int screenDirection) {
+        if (facingDirection > 0) return screenDirection;
+
+        switch (screenDirection) {
+            case 1: return 5;
+            case 2: return 4;
+            case 4: return 2;
+            case 5: return 1;
+            case 6: return 8;
+            case 8: return 6;
+            default: return screenDirection;
+        }
+    }
+
+    private boolean isForwardHorizontalDirection(int screenDirection) {
+        return facingDirection > 0
+            ? screenDirection == 1
+            : screenDirection == 5;
+    }
+
+    private boolean isBackHorizontalDirection(int screenDirection) {
+        return facingDirection > 0
+            ? screenDirection == 5
+            : screenDirection == 1;
     }
 
     private boolean isSuperCinematicActive() {
@@ -658,13 +718,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         float spawnY = playerY - (grounded ? 86f : 82f);
         superProjectiles.add(new SuperProjectile(
-            playerX + 78f,
+            playerX + facingDirection * 78f,
             spawnY,
             profile.superRange,
             profile.superSpeed,
             profile.superDamage,
             profile.color,
-            activeFighterIndex
+            activeFighterIndex,
+            facingDirection
         ));
     }
 
@@ -673,7 +734,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         while (iterator.hasNext()) {
             SuperProjectile projectile = iterator.next();
             float previousX = projectile.x;
-            projectile.x += projectile.speed * dt;
+            projectile.x += projectile.speed * projectile.direction * dt;
 
             if (
                 projectileHitsDummy(previousX, projectile.x, projectile.y, 58f)
@@ -684,8 +745,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
 
             if (
-                projectile.x - projectile.startX >= projectile.range ||
-                projectile.x > RIGHT_BOUND + 180f
+                Math.abs(projectile.x - projectile.startX) >= projectile.range ||
+                projectile.x > RIGHT_BOUND + 180f ||
+                projectile.x < LEFT_BOUND - 180f
             ) {
                 iterator.remove();
             }
@@ -768,18 +830,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (tagPhase == TAG_EXIT) {
             float t = clamp(tagPhaseTimer / TAG_EXIT_DURATION, 0f, 1f);
             float eased = t * t;
-            tagVisualOffsetX = -TAG_TRAVEL_DISTANCE * eased;
+            tagVisualOffsetX =
+                tagExitDirection * TAG_TRAVEL_DISTANCE * eased;
 
             if (t >= 1f) {
                 activeFighterIndex = (activeFighterIndex + 1) % team.length;
                 tagPhase = TAG_ENTER;
                 tagPhaseTimer = 0f;
-                tagVisualOffsetX = -TAG_TRAVEL_DISTANCE;
+                tagVisualOffsetX =
+                    tagExitDirection * TAG_TRAVEL_DISTANCE;
             }
         } else if (tagPhase == TAG_ENTER) {
             float t = clamp(tagPhaseTimer / TAG_ENTER_DURATION, 0f, 1f);
             float eased = 1f - (1f - t) * (1f - t);
-            tagVisualOffsetX = -TAG_TRAVEL_DISTANCE * (1f - eased);
+            tagVisualOffsetX =
+                tagExitDirection * TAG_TRAVEL_DISTANCE * (1f - eased);
 
             if (t >= 1f) {
                 tagPhase = TAG_POSE;
@@ -826,6 +891,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         tagPhase = TAG_EXIT;
         tagPhaseTimer = 0f;
         tagVisualOffsetX = 0f;
+        tagExitDirection = -facingDirection;
         updateTagCooldownLabels();
 
         attackType = "";
@@ -919,7 +985,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (damage <= 0 || reach <= 0f) return;
         if (attackPhase() < 0.72f) return;
 
-        float horizontalDistance = DUMMY_X - playerX;
+        float horizontalDistance =
+            (DUMMY_X - playerX) * facingDirection;
         if (horizontalDistance < 18f || horizontalDistance > reach) return;
 
         float playerAttackCenterY = (crouching || isCrouchAttackActive())
@@ -1003,13 +1070,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         float spawnY = playerY - (crouching ? 65f : 82f);
         energyProjectiles.add(new EnergyProjectile(
-            playerX + 62f,
+            playerX + facingDirection * 62f,
             spawnY,
             profile.energyRange,
             profile.energySpeed * speedMultiplier,
             Math.round(profile.energyDamage * damageMultiplier),
             profile.color,
-            activeFighterIndex
+            activeFighterIndex,
+            facingDirection
         ));
 
         addSuperMeter(activeFighter(), SUPER_GAIN_ENERGY);
@@ -1038,7 +1106,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         while (iterator.hasNext()) {
             EnergyProjectile projectile = iterator.next();
             float previousX = projectile.x;
-            projectile.x += projectile.speed * dt;
+            projectile.x += projectile.speed * projectile.direction * dt;
 
             if (
                 projectileHitsDummy(previousX, projectile.x, projectile.y, 24f)
@@ -1049,8 +1117,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
 
             if (
-                projectile.x - projectile.startX >= projectile.range ||
-                projectile.x > RIGHT_BOUND + 120f
+                Math.abs(projectile.x - projectile.startX) >= projectile.range ||
+                projectile.x > RIGHT_BOUND + 120f ||
+                projectile.x < LEFT_BOUND - 120f
             ) {
                 iterator.remove();
             }
@@ -1201,9 +1270,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             drawEnergyProjectiles(canvas);
             drawSuperProjectiles(canvas);
             drawSuperDarkening(canvas);
+
+            canvas.save();
+            if (facingDirection < 0) {
+                canvas.scale(-1f, 1f, playerX, 0f);
+            }
             drawSuperChargeEffects(canvas);
+            canvas.restore();
+
             canvas.save();
             canvas.translate(tagVisualOffsetX, 0f);
+            if (facingDirection < 0) {
+                canvas.scale(-1f, 1f, playerX, 0f);
+            }
             drawPlayer(canvas);
             canvas.restore();
             drawSuperFlash(canvas);
@@ -1317,12 +1396,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("DAMAGE DUMMY • v0.24", 975, 59, paint);
+        c.drawText("FACING & SIDES • v0.25", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
         c.drawText("Estado:", 975, 88, paint);
         c.drawText(currentStateLabel(), 1032, 88, paint);
+
+        paint.setTextSize(14f);
+        c.drawText(
+            facingDirection > 0 ? "FACING: →" : "FACING: ←",
+            975,
+            106,
+            paint
+        );
     }
 
     private String currentStateLabel() {
@@ -1500,6 +1587,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             ? Color.rgb(215, 82, 92)
             : Color.rgb(95, 95, 105);
 
+        c.save();
+        if (facingDirection > 0) {
+            // Jogador à esquerda: dummy olha para a esquerda.
+            c.scale(-1f, 1f, DUMMY_X, 0f);
+        }
+
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setColor(dummyColor);
         c.drawCircle(DUMMY_X, top + 20f, 25f, paint);
@@ -1512,6 +1605,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawLine(DUMMY_X + 3f, top + 58f, DUMMY_X + 34f, top + 100f, paint);
         c.drawLine(DUMMY_X - 4f, baseY - 45f, DUMMY_X - 28f, baseY, paint);
         c.drawLine(DUMMY_X + 4f, baseY - 45f, DUMMY_X + 28f, baseY, paint);
+
+        // Marca frontal para ficar visualmente claro quando o dummy vira.
+        paint.setColor(Color.rgb(24, 35, 48));
+        paint.setStrokeWidth(4f);
+        c.drawLine(
+            DUMMY_X + 5f,
+            top + 15f,
+            DUMMY_X + 13f,
+            top + 15f,
+            paint
+        );
+        c.restore();
         paint.setStrokeCap(Paint.Cap.BUTT);
 
         float barLeft = DUMMY_X - 125f;
@@ -1590,6 +1695,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawEnergyProjectiles(Canvas c) {
         for (EnergyProjectile projectile : energyProjectiles) {
+            c.save();
+            if (projectile.direction < 0) {
+                c.scale(-1f, 1f, projectile.x, projectile.y);
+            }
+
             paint.setColor(Color.argb(75, 255, 255, 255));
             c.drawCircle(projectile.x, projectile.y, 29f, paint);
 
@@ -1598,11 +1708,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             paint.setColor(Color.WHITE);
             c.drawCircle(projectile.x + 5f, projectile.y - 5f, 8f, paint);
+            c.restore();
         }
     }
 
     private void drawSuperProjectiles(Canvas c) {
         for (SuperProjectile projectile : superProjectiles) {
+            c.save();
+            if (projectile.direction < 0) {
+                c.scale(-1f, 1f, projectile.x, projectile.y);
+            }
+
             paint.setColor(Color.argb(70, 255, 255, 255));
             c.drawCircle(projectile.x, projectile.y, 62f, paint);
 
@@ -1622,7 +1738,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.drawCircle(projectile.x + 12f, projectile.y - 10f, 17f, paint);
 
             paint.setColor(Color.argb(100, 255, 255, 255));
-            c.drawRect(projectile.x - 135f, projectile.y - 9f, projectile.x - 38f, projectile.y + 9f, paint);
+            c.drawRect(
+                projectile.x - 135f,
+                projectile.y - 9f,
+                projectile.x - 38f,
+                projectile.y + 9f,
+                paint
+            );
+            c.restore();
         }
     }
 
@@ -1794,8 +1917,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         paint.setColor(Color.rgb(24, 35, 48));
         paint.setStrokeWidth(4);
-        c.drawLine(playerX - 10, top + 15, playerX - 4, top + 15, paint);
-        c.drawLine(playerX + 4, top + 15, playerX + 10, top + 15, paint);
+        c.drawLine(playerX + 4, top + 15, playerX + 12, top + 15, paint);
     }
 
     private void drawControls(Canvas c) {
@@ -2032,10 +2154,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         crouching = grounded && isDownDirection(next);
 
         if (next != 0 && next != previous) {
-            recordCommandDirection(next, nowMs);
+            recordCommandDirection(relativeDirection(next), nowMs);
         }
 
-        if (next == 1 && previous != 1) {
+        boolean nextForward = isForwardHorizontalDirection(next);
+        boolean previousForward = isForwardHorizontalDirection(previous);
+        if (nextForward && !previousForward) {
             if (
                 !"S".equals(attackType) &&
                 pendingEnergyUntilMs < nowMs &&
@@ -2048,11 +2172,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             lastForwardTapMs = nowMs;
         }
 
-        if (next != 1) {
+        if (!nextForward) {
             forwardDashing = false;
         }
 
-        if (next == 5 && previous != 5) {
+        boolean nextBack = isBackHorizontalDirection(next);
+        boolean previousBack = isBackHorizontalDirection(previous);
+        if (nextBack && !previousBack) {
             if (
                 !"S".equals(attackType) &&
                 grounded &&
