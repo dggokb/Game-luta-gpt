@@ -1052,23 +1052,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
-        String state = isSuperCinematicActive()
-            ? "SUPER"
-            : (attackTimer > 0f
-            ? "ATAQUE " + attackType
-            : (backDashTimer > 0f
-                ? "BACKDASH"
-                : (forwardDashing
-                    ? "DASH"
-                    : (superJumping
-                        ? "SUPER JUMP"
-                        : (crouching
-                            ? "AGACHADO"
-                            : (!grounded
-                                ? "NO AR"
-                                : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))))));
+        c.drawText("Estado: " + currentStateLabel(), 975, 88, paint);
+    }
 
-        c.drawText("Estado: " + state, 975, 88, paint);
+    private String currentStateLabel() {
+        if (isSuperCinematicActive()) return "SUPER";
+        if (attackTimer > 0f) return "ATAQUE " + attackType;
+        if (backDashTimer > 0f) return "BACKDASH";
+        if (forwardDashing) return "DASH";
+        if (superJumping) return "SUPER JUMP";
+        if (crouching) return "AGACHADO";
+        if (!grounded) return "NO AR";
+        if (movingLeft || movingRight) return "ANDANDO";
+        return "PARADO";
     }
 
     private void drawTagCooldown(Canvas c, float left, float top, float right, float bottom) {
