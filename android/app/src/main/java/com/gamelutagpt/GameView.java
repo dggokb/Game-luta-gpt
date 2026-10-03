@@ -22,6 +22,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final boolean hasEnergyAttack;
         final float energyRange;
         final float energySpeed;
+        final int lightDamage;
+        final int mediumDamage;
+        final int heavyDamage;
         final int energyDamage;
         final int[] energyCommand;
         final boolean hasSuperAttack;
@@ -38,6 +41,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             boolean hasEnergyAttack,
             float energyRange,
             float energySpeed,
+            int lightDamage,
+            int mediumDamage,
+            int heavyDamage,
             int energyDamage,
             int[] energyCommand,
             boolean hasSuperAttack,
@@ -52,6 +58,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.hasEnergyAttack = hasEnergyAttack;
             this.energyRange = energyRange;
             this.energySpeed = energySpeed;
+            this.lightDamage = lightDamage;
+            this.mediumDamage = mediumDamage;
+            this.heavyDamage = heavyDamage;
             this.energyDamage = energyDamage;
             this.energyCommand = energyCommand;
             this.hasSuperAttack = hasSuperAttack;
@@ -159,6 +168,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             true,
             720f,
             760f,
+            300,
+            500,
+            800,
             850,
             new int[]{3, 1},
             true,
@@ -174,6 +186,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             true,
             560f,
             980f,
+            300,
+            500,
+            800,
             650,
             new int[]{5, 1},
             true,
@@ -196,6 +211,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float CAMERA_ZOOM = 1.12f;
     private static final float GROUND_CAMERA_TOP = 72f;
     private static final float WORLD_TOP = -520f;
+
+    private static final float DUMMY_X = 980f;
+    private static final float DUMMY_HALF_WIDTH = 34f;
+    private static final float DUMMY_TOP = GROUND_Y - 145f;
+    private static final int DUMMY_MAX_LIFE = 10000;
+    private int dummyLife = DUMMY_MAX_LIFE;
+    private String dummyLifeHudLabel = "10000 / 10000";
+    private String dummyDamageLabel = "";
+    private float dummyDamageLabelTimer = 0f;
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -224,6 +248,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float attackTimer = 0f;
     private float attackDuration = 0f;
     private float walkTime = 0f;
+    private boolean attackHitApplied = false;
 
     private final float moveSpeed = 300f;
     private final float forwardDashSpeed = 620f;
@@ -440,6 +465,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateSuperState(dt);
         updateTagState(dt);
 
+        if (dummyDamageLabelTimer > 0f) {
+            dummyDamageLabelTimer = Math.max(0f, dummyDamageLabelTimer - dt);
+        }
+
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
             return;
@@ -447,7 +476,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         if (attackTimer > 0f) {
             attackTimer = Math.max(0f, attackTimer - dt);
-            if (attackTimer <= 0f) attackType = "";
+            tryApplyMeleeDamage();
+
+            if (attackTimer <= 0f) {
+                attackType = "";
+                attackHitApplied = false;
+            }
         }
 
         updateEnergyProjectiles(dt);
@@ -492,7 +526,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
         }
 
-        playerX = clamp(playerX, LEFT_BOUND, RIGHT_BOUND);
+        playerX = clamp(
+            playerX,
+            LEFT_BOUND,
+            Math.min(RIGHT_BOUND, DUMMY_X - DUMMY_HALF_WIDTH - 42f)
+        );
 
         float visibleWorldWidth = VW / CAMERA_ZOOM;
         float halfVisible = visibleWorldWidth / 2f;
@@ -634,7 +672,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         Iterator<SuperProjectile> iterator = superProjectiles.iterator();
         while (iterator.hasNext()) {
             SuperProjectile projectile = iterator.next();
+            float previousX = projectile.x;
             projectile.x += projectile.speed * dt;
+
+            if (
+                projectileHitsDummy(previousX, projectile.x, projectile.y, 58f)
+            ) {
+                applyDummyDamage(projectile.damage);
+                iterator.remove();
+                continue;
+            }
 
             if (
                 projectile.x - projectile.startX >= projectile.range ||
@@ -831,6 +878,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void startAttack(String type) {
         attackType = type;
+        attackHitApplied = false;
         forwardDashing = false;
         backDashTimer = 0f;
 
@@ -845,6 +893,76 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (superGain > 0f) {
             addSuperMeter(activeFighter(), superGain);
         }
+    }
+
+    private int damageForAttack(String type) {
+        FighterProfile profile = activeFighter().profile;
+        if ("L".equals(type) || "2L".equals(type)) return profile.lightDamage;
+        if ("M".equals(type) || "2M".equals(type)) return profile.mediumDamage;
+        if ("H".equals(type) || "2H".equals(type)) return profile.heavyDamage;
+        return 0;
+    }
+
+    private float reachForAttack(String type) {
+        if ("L".equals(type) || "2L".equals(type)) return 118f;
+        if ("M".equals(type) || "2M".equals(type)) return 150f;
+        if ("H".equals(type) || "2H".equals(type)) return 182f;
+        return 0f;
+    }
+
+    private void tryApplyMeleeDamage() {
+        if (attackHitApplied || attackTimer <= 0f || dummyLife <= 0) return;
+        if ("S".equals(attackType)) return;
+
+        int damage = damageForAttack(attackType);
+        float reach = reachForAttack(attackType);
+        if (damage <= 0 || reach <= 0f) return;
+        if (attackPhase() < 0.72f) return;
+
+        float horizontalDistance = DUMMY_X - playerX;
+        if (horizontalDistance < 18f || horizontalDistance > reach) return;
+
+        float playerAttackCenterY = (crouching || isCrouchAttackActive())
+            ? playerY - 42f
+            : playerY - 78f;
+        float dummyCenterY = (DUMMY_TOP + GROUND_Y) * 0.5f;
+        if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
+
+        applyDummyDamage(damage);
+        attackHitApplied = true;
+    }
+
+    private void applyDummyDamage(int damage) {
+        if (damage <= 0 || dummyLife <= 0) return;
+
+        int applied = Math.min(damage, dummyLife);
+        dummyLife -= applied;
+        dummyLifeHudLabel = dummyLife + " / " + DUMMY_MAX_LIFE;
+        dummyDamageLabel = "-" + applied;
+        dummyDamageLabelTimer = 0.72f;
+    }
+
+    private boolean projectileHitsDummy(
+        float previousX,
+        float nextX,
+        float y,
+        float radius
+    ) {
+        if (dummyLife <= 0) return false;
+
+        float dummyLeft = DUMMY_X - DUMMY_HALF_WIDTH;
+        float dummyRight = DUMMY_X + DUMMY_HALF_WIDTH;
+        float projectileLeft = Math.min(previousX, nextX) - radius;
+        float projectileRight = Math.max(previousX, nextX) + radius;
+
+        boolean horizontalHit =
+            projectileRight >= dummyLeft &&
+            projectileLeft <= dummyRight;
+        boolean verticalHit =
+            y + radius >= DUMMY_TOP &&
+            y - radius <= GROUND_Y;
+
+        return horizontalHit && verticalHit;
     }
 
     private boolean hasActiveEnergyProjectile(int ownerIndex) {
@@ -919,7 +1037,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         Iterator<EnergyProjectile> iterator = energyProjectiles.iterator();
         while (iterator.hasNext()) {
             EnergyProjectile projectile = iterator.next();
+            float previousX = projectile.x;
             projectile.x += projectile.speed * dt;
+
+            if (
+                projectileHitsDummy(previousX, projectile.x, projectile.y, 24f)
+            ) {
+                applyDummyDamage(projectile.damage);
+                iterator.remove();
+                continue;
+            }
 
             if (
                 projectile.x - projectile.startX >= projectile.range ||
@@ -1070,6 +1197,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -cameraTop);
             drawScenario(canvas);
+            drawDamageDummy(canvas);
             drawEnergyProjectiles(canvas);
             drawSuperProjectiles(canvas);
             drawSuperDarkening(canvas);
@@ -1189,7 +1317,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("CORE REFINEMENT • v0.23", 975, 59, paint);
+        c.drawText("DAMAGE DUMMY • v0.24", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1353,6 +1481,111 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 paint
             );
         }
+    }
+
+    private void drawDamageDummy(Canvas c) {
+        float top = DUMMY_TOP;
+        float baseY = GROUND_Y;
+
+        paint.setColor(Color.argb(70, 0, 0, 0));
+        c.drawOval(
+            DUMMY_X - 43f,
+            GROUND_Y - 10f,
+            DUMMY_X + 43f,
+            GROUND_Y + 10f,
+            paint
+        );
+
+        int dummyColor = dummyLife > 0
+            ? Color.rgb(215, 82, 92)
+            : Color.rgb(95, 95, 105);
+
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setColor(dummyColor);
+        c.drawCircle(DUMMY_X, top + 20f, 25f, paint);
+
+        paint.setStrokeWidth(25f);
+        c.drawLine(DUMMY_X, top + 48f, DUMMY_X, baseY - 45f, paint);
+
+        paint.setStrokeWidth(18f);
+        c.drawLine(DUMMY_X - 3f, top + 58f, DUMMY_X - 34f, top + 100f, paint);
+        c.drawLine(DUMMY_X + 3f, top + 58f, DUMMY_X + 34f, top + 100f, paint);
+        c.drawLine(DUMMY_X - 4f, baseY - 45f, DUMMY_X - 28f, baseY, paint);
+        c.drawLine(DUMMY_X + 4f, baseY - 45f, DUMMY_X + 28f, baseY, paint);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+
+        float barLeft = DUMMY_X - 125f;
+        float barRight = DUMMY_X + 125f;
+        float barTop = top - 54f;
+        float barBottom = barTop + 16f;
+        float lifeRatio = dummyLife / (float)DUMMY_MAX_LIFE;
+
+        paint.setColor(Color.argb(205, 12, 16, 28));
+        c.drawRoundRect(
+            barLeft - 8f,
+            barTop - 28f,
+            barRight + 8f,
+            barBottom + 23f,
+            10f,
+            10f,
+            paint
+        );
+
+        paint.setColor(Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(15f);
+        c.drawText("NPC TESTE", DUMMY_X, barTop - 9f, paint);
+        paint.setFakeBoldText(false);
+
+        paint.setColor(Color.rgb(45, 53, 62));
+        c.drawRoundRect(barLeft, barTop, barRight, barBottom, 6f, 6f, paint);
+
+        if (lifeRatio > 0f) {
+            int lifeColor;
+            if (lifeRatio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
+            else if (lifeRatio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
+            else lifeColor = Color.rgb(229, 82, 82);
+
+            paint.setColor(lifeColor);
+            c.drawRoundRect(
+                barLeft,
+                barTop,
+                barLeft + (barRight - barLeft) * lifeRatio,
+                barBottom,
+                6f,
+                6f,
+                paint
+            );
+        }
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(1.5f);
+        paint.setColor(Color.WHITE);
+        c.drawRoundRect(barLeft, barTop, barRight, barBottom, 6f, 6f, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(12f);
+        c.drawText(dummyLifeHudLabel, DUMMY_X, barBottom + 16f, paint);
+
+        if (dummyDamageLabelTimer > 0f) {
+            float progress = dummyDamageLabelTimer / 0.72f;
+            paint.setColor(Color.WHITE);
+            paint.setAlpha(Math.round(255f * progress));
+            paint.setFakeBoldText(true);
+            paint.setTextSize(24f);
+            c.drawText(
+                dummyDamageLabel,
+                DUMMY_X,
+                top - 72f - (1f - progress) * 28f,
+                paint
+            );
+            paint.setFakeBoldText(false);
+            paint.setAlpha(255);
+        }
+
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawEnergyProjectiles(Canvas c) {
