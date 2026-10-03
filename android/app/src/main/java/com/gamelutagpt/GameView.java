@@ -63,10 +63,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final class FighterState {
         final FighterProfile profile;
         int life;
+        float superMeter;
 
         FighterState(FighterProfile profile) {
             this.profile = profile;
             this.life = profile.maxLife;
+            this.superMeter = 0f;
         }
     }
 
@@ -235,6 +237,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float SUPER_X = 905f;
     private static final float SUPER_Y = 620f;
     private static final float SUPER_RADIUS = 46f;
+
+    private static final float MAX_SUPER_METER = 5f;
+    private static final float SUPER_COST = 1f;
+    private static final float SUPER_GAIN_LIGHT = 0.10f;
+    private static final float SUPER_GAIN_MEDIUM = 0.15f;
+    private static final float SUPER_GAIN_HEAVY = 0.20f;
+    private static final float SUPER_GAIN_ENERGY = 0.45f;
 
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
@@ -445,6 +454,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private boolean canStartSuper() {
         return activeFighter().profile.hasSuperAttack &&
+            activeFighter().superMeter >= SUPER_COST &&
             !isSuperCinematicActive() &&
             !isTagAnimationActive() &&
             attackTimer <= 0f;
@@ -452,6 +462,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void startSuperCinematic() {
         if (!canStartSuper()) return;
+
+        activeFighter().superMeter = Math.max(
+            0f,
+            activeFighter().superMeter - SUPER_COST
+        );
 
         superPhase = SUPER_DARKEN;
         superPhaseTimer = 0f;
@@ -689,6 +704,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         playerY -= 2f;
     }
 
+    private void addSuperMeter(FighterState fighter, float amount) {
+        if (amount <= 0f) return;
+        fighter.superMeter = clamp(
+            fighter.superMeter + amount,
+            0f,
+            MAX_SUPER_METER
+        );
+    }
+
+    private float superGainForAttack(String type) {
+        if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
+        if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;
+        if ("H".equals(type) || "2H".equals(type)) return SUPER_GAIN_HEAVY;
+        return 0f;
+    }
+
     private void startAttack(String type) {
         attackType = type;
         forwardDashing = false;
@@ -700,6 +731,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         else attackDuration = 0.40f;
 
         attackTimer = attackDuration;
+
+        float superGain = superGainForAttack(type);
+        if (superGain > 0f) {
+            addSuperMeter(activeFighter(), superGain);
+        }
     }
 
     private boolean hasActiveEnergyProjectile(int ownerIndex) {
@@ -749,6 +785,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             profile.color,
             activeFighterIndex
         ));
+
+        addSuperMeter(activeFighter(), SUPER_GAIN_ENERGY);
     }
 
     private boolean tryFirePendingEnergy(String attackButton, long nowMs) {
@@ -1011,7 +1049,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         FighterState reserve = reserveFighter();
 
         paint.setColor(Color.argb(185, 10, 15, 27));
-        c.drawRoundRect(32, 28, 560, 184, 18, 18, paint);
+        c.drawRoundRect(32, 28, 560, 234, 18, 18, paint);
 
         paint.setColor(active.profile.color);
         c.drawCircle(78, 74, 29, paint);
@@ -1029,26 +1067,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(false);
 
         drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
-        drawTagCooldown(c, 122f, 106f, 525f, 116f);
+        drawSuperMeter(c, active, 122f, 106f, 525f, 118f, true);
+        drawTagCooldown(c, 122f, 139f, 525f, 149f);
 
-        // Reserva: indicador menor com vida própria.
+        // Reserva: indicador menor com vida e Super próprios.
         paint.setColor(reserve.profile.color);
-        c.drawCircle(78, 154, 14, paint);
+        c.drawCircle(78, 187, 14, paint);
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(14);
         paint.setFakeBoldText(true);
-        c.drawText("RESERVA: " + reserve.profile.name, 105, 151, paint);
+        c.drawText("RESERVA: " + reserve.profile.name, 105, 184, paint);
         paint.setFakeBoldText(false);
 
-        drawLifeBar(c, reserve, 105f, 160f, 525f, 173f, false);
+        drawLifeBar(c, reserve, 105f, 193f, 525f, 206f, false);
+        drawSuperMeter(c, reserve, 105f, 213f, 525f, 223f, false);
 
         paint.setColor(Color.argb(180, 10, 15, 27));
         c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SUPER CINEMATIC • v0.21", 975, 59, paint);
+        c.drawText("SUPER METER • v0.22", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1065,6 +1105,81 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (!grounded) return "NO AR";
         if (movingLeft || movingRight) return "ANDANDO";
         return "PARADO";
+    }
+
+    private void drawSuperMeter(
+        Canvas c,
+        FighterState fighter,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        boolean showText
+    ) {
+        float gap = 4f;
+        float totalWidth = right - left;
+        float segmentWidth = (totalWidth - gap * 4f) / 5f;
+
+        for (int i = 0; i < 5; i++) {
+            float segmentLeft = left + i * (segmentWidth + gap);
+            float segmentRight = segmentLeft + segmentWidth;
+
+            paint.setColor(Color.rgb(45, 53, 62));
+            c.drawRoundRect(
+                segmentLeft,
+                top,
+                segmentRight,
+                bottom,
+                4f,
+                4f,
+                paint
+            );
+
+            float fill = clamp(fighter.superMeter - i, 0f, 1f);
+            if (fill > 0f) {
+                paint.setColor(fighter.profile.color);
+                c.drawRoundRect(
+                    segmentLeft,
+                    top,
+                    segmentLeft + segmentWidth * fill,
+                    bottom,
+                    4f,
+                    4f,
+                    paint
+                );
+            }
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(1.4f);
+            paint.setColor(Color.argb(210, 255, 255, 255));
+            c.drawRoundRect(
+                segmentLeft,
+                top,
+                segmentRight,
+                bottom,
+                4f,
+                4f,
+                paint
+            );
+            paint.setStyle(Paint.Style.FILL);
+        }
+
+        if (showText) {
+            int level = (int)Math.floor(fighter.superMeter);
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(12f);
+            c.drawText(
+                String.format(
+                    java.util.Locale.US,
+                    "SUPER %.2f / 5  •  LV %d",
+                    fighter.superMeter,
+                    level
+                ),
+                left,
+                bottom + 13f,
+                paint
+            );
+        }
     }
 
     private void drawTagCooldown(Canvas c, float left, float top, float right, float bottom) {
@@ -1526,8 +1641,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(15f);
         paint.setFakeBoldText(true);
-        float textY = SUPER_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText("SUPER", SUPER_X, textY, paint);
+        c.drawText("SUPER", SUPER_X, SUPER_Y - 4f, paint);
+        paint.setTextSize(11f);
+        c.drawText(
+            "LV " + (int)Math.floor(activeFighter().superMeter),
+            SUPER_X,
+            SUPER_Y + 14f,
+            paint
+        );
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
