@@ -223,12 +223,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final int DUMMY_MAX_LIFE = 10000;
     private static final float DUMMY_HIT_REACTION_DURATION = 0.22f;
     private static final float DUMMY_LAUNCH_SPEED = 1450f;
+    private static final float DUMMY_SLAM_SPEED = 1850f;
     private static final float DUMMY_GRAVITY = 1650f;
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
     private float dummyVelocityY = 0f;
     private boolean dummyAirborne = false;
     private boolean dummyMovementLocked = false;
+    private boolean dummyGroundSlam = false;
     private int dummyLife = DUMMY_MAX_LIFE;
     private String dummyLifeHudLabel = "10000 / 10000";
     private String dummyDamageLabel = "";
@@ -577,7 +579,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void launchDummy() {
         dummyAirborne = true;
         dummyMovementLocked = true;
+        dummyGroundSlam = false;
         dummyVelocityY = -DUMMY_LAUNCH_SPEED;
+    }
+
+    private void slamDummyToGround() {
+        if (!dummyAirborne) return;
+
+        dummyGroundSlam = true;
+        dummyMovementLocked = true;
+        dummyVelocityY = DUMMY_SLAM_SPEED;
+
+        // O H do Super Jump prioriza a queda vertical sobre o empurrão lateral.
+        dummyKnockbackVelocityX *= 0.35f;
     }
 
     private void updateDummyAirState(float dt) {
@@ -586,14 +600,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         dummyVelocityY += DUMMY_GRAVITY * dt;
         dummyY += dummyVelocityY * dt;
 
-        // Na subida perde o controle. A partir do topo, na descida, recupera.
-        dummyMovementLocked = dummyVelocityY < 0f;
+        // Launcher normal: sem controle na subida e recupera na descida.
+        // Ground Slam: queda forçada e sem controle até tocar o chão.
+        dummyMovementLocked =
+            dummyGroundSlam ||
+            dummyVelocityY < 0f;
 
         if (dummyY >= GROUND_Y) {
             dummyY = GROUND_Y;
             dummyVelocityY = 0f;
             dummyAirborne = false;
             dummyMovementLocked = false;
+            dummyGroundSlam = false;
         }
     }
 
@@ -1064,11 +1082,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
 
         applyDummyDamage(damage, facingDirection);
+
         if ("2H".equals(attackType)) {
             launchDummy();
             launcherChaseUntilMs =
                 System.currentTimeMillis() + LAUNCHER_CHASE_WINDOW_MS;
+        } else if (
+            "H".equals(attackType) &&
+            !grounded &&
+            superJumping &&
+            dummyAirborne
+        ) {
+            slamDummyToGround();
         }
+
         attackHitApplied = true;
     }
 
@@ -1478,7 +1505,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("LAUNCHER CHASE • v0.29", 975, 59, paint);
+        c.drawText("AIR HEAVY SLAM • v0.30", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1783,9 +1810,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(true);
         paint.setTextSize(15f);
         c.drawText(
-            dummyMovementLocked
-                ? "NPC TESTE • SEM CONTROLE"
-                : (dummyAirborne ? "NPC TESTE • DESCENDO" : "NPC TESTE"),
+            dummyGroundSlam
+                ? "NPC TESTE • QUEDA FORÇADA"
+                : (
+                    dummyMovementLocked
+                        ? "NPC TESTE • SEM CONTROLE"
+                        : (dummyAirborne ? "NPC TESTE • DESCENDO" : "NPC TESTE")
+                ),
             dummyX,
             barTop - 9f,
             paint
