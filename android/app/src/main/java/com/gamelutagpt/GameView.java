@@ -205,6 +205,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     };
 
     private int activeFighterIndex = 0;
+    private static final int AI_OWNER_INDEX = 99;
+    private final FighterState opponentFighter =
+        new FighterState(team[1].profile);
     private final List<EnergyProjectile> energyProjectiles = new ArrayList<>();
     private final List<SuperProjectile> superProjectiles = new ArrayList<>();
 
@@ -232,16 +235,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DUMMY_KD_FALL_DURATION = 0.22f;
     private static final float DUMMY_KD_DOWN_DURATION = 1.20f;
     private static final float DUMMY_KD_GETUP_DURATION = 0.35f;
-    private static final int DUMMY_LIGHT_DAMAGE = 300;
-    private static final float DUMMY_LIGHT_ATTACK_DURATION = 0.30f;
-    private static final float DUMMY_LIGHT_COOLDOWN = 1.10f;
-    private static final float DUMMY_LIGHT_TRIGGER_RANGE = 142f;
-    private static final float DUMMY_LIGHT_HIT_RANGE = 128f;
+    private static final float AI_BUTTON_LEFT = 1082f;
+    private static final float AI_BUTTON_TOP = 124f;
+    private static final float AI_BUTTON_RIGHT = 1248f;
+    private static final float AI_BUTTON_BOTTOM = 172f;
+    private static final float AI_DECISION_MIN = 0.12f;
+    private static final float AI_DECISION_MAX = 0.28f;
+    private static final float AI_WALK_SPEED = 300f;
+    private static final float AI_DASH_SPEED = 620f;
+    private static final float AI_BACKDASH_SPEED = 760f;
+    private static final float AI_BACKDASH_DURATION = 0.20f;
+    private static final float AI_ATTACK_COOLDOWN = 0.22f;
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
     private float dummyVelocityY = 0f;
     private boolean dummyAirborne = false;
     private boolean dummyMovementLocked = false;
+    private boolean dummyLaunchedByHit = false;
     private boolean dummyGroundSlam = false;
     private int dummyKnockdownState = DUMMY_KD_NONE;
     private float dummyKnockdownTimer = 0f;
@@ -251,9 +261,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float dummyDamageLabelTimer = 0f;
     private float dummyHitReactionTimer = 0f;
     private float dummyKnockbackVelocityX = 0f;
+
+    private boolean opponentAiEnabled = false;
+    private float aiDecisionTimer = 0f;
+    private float aiAttackCooldownRemaining = 0f;
+    private boolean aiMovingForward = false;
+    private boolean aiMovingBack = false;
+    private boolean aiForwardDashing = false;
+    private float aiBackDashTimer = 0f;
+    private boolean aiCrouching = false;
+    private boolean aiSuperJumping = false;
+    private float aiWalkTime = 0f;
+    private String dummyAttackType = "";
     private float dummyAttackTimer = 0f;
-    private float dummyAttackCooldownRemaining = 0f;
+    private float dummyAttackDuration = 0f;
     private boolean dummyAttackHitApplied = false;
+    private boolean aiChaseLauncher = false;
+    private float aiSuperTimer = 0f;
+    private String aiStatusLabel = "IA OFF";
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -286,6 +311,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float walkTime = 0f;
     private boolean attackHitApplied = false;
     private float playerDamageFlashTimer = 0f;
+    private float playerHitReactionTimer = 0f;
+    private float playerKnockbackVelocityX = 0f;
+    private boolean playerMovementLocked = false;
+    private boolean playerLaunchedByHit = false;
+    private boolean playerGroundSlam = false;
+    private int playerKnockdownState = DUMMY_KD_NONE;
+    private float playerKnockdownTimer = 0f;
 
     private final float moveSpeed = 300f;
     private final float forwardDashSpeed = 620f;
@@ -515,7 +547,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateDummyHitReaction(dt);
         updateDummyKnockdown(dt);
         updateDummyAirState(dt);
-        updateDummyAttack(dt);
+        updatePlayerReceivedState(dt);
+        updateOpponentAi(dt);
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
@@ -536,12 +569,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateSuperProjectiles(dt);
 
         float direction = 0f;
-        if (!isEnergyAttackActive() && !isTagAnimationActive()) {
+        if (
+            !playerMovementLocked &&
+            !isEnergyAttackActive() &&
+            !isTagAnimationActive()
+        ) {
             if (movingLeft && !movingRight) direction = -1f;
             if (movingRight && !movingLeft) direction = 1f;
         }
 
-        if (isTagAnimationActive()) {
+        if (playerHitReactionTimer > 0f && grounded) {
+            playerX += playerKnockbackVelocityX * dt;
+            playerKnockbackVelocityX *= (float)Math.pow(0.035f, dt);
+            walkTime = 0f;
+        } else if (isTagAnimationActive()) {
             walkTime = 0f;
         } else if (attackTimer > 0f && grounded) {
             // No chão, ataques travam o deslocamento horizontal.
@@ -576,6 +617,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 velocityY = 0f;
                 grounded = true;
                 superJumping = false;
+
+                if (playerGroundSlam) {
+                    playerGroundSlam = false;
+                    playerMovementLocked = false;
+                }
+                if (playerLaunchedByHit) {
+                    playerLaunchedByHit = false;
+                    playerMovementLocked = false;
+                }
+            } else if (playerLaunchedByHit && velocityY >= 0f) {
+                // Mesmo comportamento do launcher do dummy: recupera controle na descida.
+                playerMovementLocked = false;
             }
         }
 
@@ -596,82 +649,343 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
     }
 
-    private boolean canDummyAttack() {
+    private FighterProfile opponentProfile() {
+        return opponentFighter.profile;
+    }
+
+    private int opponentFacingDirection() {
+        return -facingDirection;
+    }
+
+    private float durationForAttack(String type) {
+        if ("L".equals(type) || "2L".equals(type)) return 0.16f;
+        if ("M".equals(type) || "2M".equals(type)) return 0.26f;
+        if ("S".equals(type)) return 0.30f;
+        return 0.40f;
+    }
+
+    private int damageForAttack(FighterProfile profile, String type) {
+        if ("L".equals(type) || "2L".equals(type)) return profile.lightDamage;
+        if ("M".equals(type) || "2M".equals(type)) return profile.mediumDamage;
+        if ("H".equals(type) || "2H".equals(type)) return profile.heavyDamage;
+        return 0;
+    }
+
+    private float aiAttackPhase() {
+        if (dummyAttackTimer <= 0f || dummyAttackDuration <= 0f) return 0f;
+        float t = 1f - dummyAttackTimer / dummyAttackDuration;
+        return t < 0.5f ? t * 2f : (1f - t) * 2f;
+    }
+
+    private boolean canOpponentAct() {
         return
+            opponentAiEnabled &&
             dummyLife > 0 &&
             activeFighter().life > 0 &&
             dummyKnockdownState == DUMMY_KD_NONE &&
-            !dummyAirborne &&
             !dummyMovementLocked &&
             dummyHitReactionTimer <= 0f &&
+            aiSuperTimer <= 0f &&
             !isTagAnimationActive() &&
             !isSuperCinematicActive();
     }
 
-    private void startDummyLightAttack() {
-        dummyAttackTimer = DUMMY_LIGHT_ATTACK_DURATION;
+    private void setOpponentAiEnabled(boolean enabled) {
+        opponentAiEnabled = enabled;
+        aiStatusLabel = enabled ? "IA ON" : "IA OFF";
+        aiDecisionTimer = 0f;
+        aiAttackCooldownRemaining = 0f;
+        aiMovingForward = false;
+        aiMovingBack = false;
+        aiForwardDashing = false;
+        aiBackDashTimer = 0f;
+        aiCrouching = false;
+        aiChaseLauncher = false;
+        dummyAttackType = "";
+        dummyAttackTimer = 0f;
+        dummyAttackDuration = 0f;
         dummyAttackHitApplied = false;
+        aiSuperTimer = 0f;
     }
 
-    private void updateDummyAttack(float dt) {
-        if (dummyAttackCooldownRemaining > 0f) {
-            dummyAttackCooldownRemaining = Math.max(
+    private void startOpponentAttack(String type) {
+        if (!canOpponentAct() || dummyAttackTimer > 0f) return;
+
+        dummyAttackType = type;
+        dummyAttackDuration = durationForAttack(type);
+        dummyAttackTimer = dummyAttackDuration;
+        dummyAttackHitApplied = false;
+        aiMovingForward = false;
+        aiMovingBack = false;
+        aiForwardDashing = false;
+        aiBackDashTimer = 0f;
+        aiCrouching = type.startsWith("2");
+
+        float gain = superGainForAttack(type);
+        if (gain > 0f) addSuperMeter(opponentFighter, gain);
+    }
+
+    private void startOpponentJump(boolean superJump) {
+        if (!canOpponentAct() || dummyAirborne) return;
+
+        dummyAirborne = true;
+        dummyLaunchedByHit = false;
+        dummyMovementLocked = false;
+        dummyGroundSlam = false;
+        aiSuperJumping = superJump;
+        dummyVelocityY = superJump ? -superJumpSpeed : -jumpSpeed;
+        dummyY -= 2f;
+        aiCrouching = false;
+    }
+
+    private void fireOpponentEnergy(String strength) {
+        FighterProfile profile = opponentProfile();
+        if (
+            !canOpponentAct() ||
+            !profile.hasEnergyAttack ||
+            hasActiveEnergyProjectile(AI_OWNER_INDEX)
+        ) return;
+
+        float speedMultiplier;
+        float damageMultiplier;
+        if ("L".equals(strength)) {
+            speedMultiplier = 0.65f;
+            damageMultiplier = 0.60f;
+        } else if ("H".equals(strength)) {
+            speedMultiplier = 1.35f;
+            damageMultiplier = 1.45f;
+        } else {
+            speedMultiplier = 1f;
+            damageMultiplier = 1f;
+        }
+
+        dummyAttackType = "S";
+        dummyAttackDuration = durationForAttack("S");
+        dummyAttackTimer = dummyAttackDuration;
+        dummyAttackHitApplied = true;
+
+        if (dummyAirborne) dummyVelocityY *= 0.32f;
+
+        int direction = opponentFacingDirection();
+        energyProjectiles.add(new EnergyProjectile(
+            dummyX + direction * 62f,
+            dummyY - (aiCrouching ? 65f : 82f),
+            profile.energyRange,
+            profile.energySpeed * speedMultiplier,
+            Math.round(profile.energyDamage * damageMultiplier),
+            profile.color,
+            AI_OWNER_INDEX,
+            direction
+        ));
+        addSuperMeter(opponentFighter, SUPER_GAIN_ENERGY);
+        aiAttackCooldownRemaining = 0.40f;
+    }
+
+    private void startOpponentSuper() {
+        FighterProfile profile = opponentProfile();
+        if (
+            !canOpponentAct() ||
+            !profile.hasSuperAttack ||
+            opponentFighter.superMeter < SUPER_COST
+        ) return;
+
+        opponentFighter.superMeter = Math.max(
+            0f,
+            opponentFighter.superMeter - SUPER_COST
+        );
+        opponentFighter.refreshHudLabels();
+        aiSuperTimer = 0.58f;
+        aiMovingForward = false;
+        aiMovingBack = false;
+        aiForwardDashing = false;
+        aiBackDashTimer = 0f;
+        dummyAttackType = "";
+        dummyAttackTimer = 0f;
+    }
+
+    private void spawnOpponentSuperProjectile() {
+        FighterProfile profile = opponentProfile();
+        int direction = opponentFacingDirection();
+        superProjectiles.add(new SuperProjectile(
+            dummyX + direction * 78f,
+            dummyY - 86f,
+            profile.superRange,
+            profile.superSpeed,
+            profile.superDamage,
+            profile.color,
+            AI_OWNER_INDEX,
+            direction
+        ));
+    }
+
+    private void updateOpponentAi(float dt) {
+        if (aiAttackCooldownRemaining > 0f) {
+            aiAttackCooldownRemaining = Math.max(
                 0f,
-                dummyAttackCooldownRemaining - dt
+                aiAttackCooldownRemaining - dt
             );
         }
 
-        if (!canDummyAttack()) {
-            if (
-                dummyLife <= 0 ||
-                activeFighter().life <= 0 ||
-                dummyKnockdownState != DUMMY_KD_NONE ||
-                dummyAirborne ||
-                dummyHitReactionTimer > 0f ||
-                isTagAnimationActive() ||
-                isSuperCinematicActive()
-            ) {
-                dummyAttackTimer = 0f;
+        if (!opponentAiEnabled) return;
+
+        if (aiSuperTimer > 0f) {
+            float previous = aiSuperTimer;
+            aiSuperTimer = Math.max(0f, aiSuperTimer - dt);
+            if (previous > 0f && aiSuperTimer <= 0f) {
+                spawnOpponentSuperProjectile();
+                aiAttackCooldownRemaining = 0.45f;
+            }
+            return;
+        }
+
+        if (!canOpponentAct()) {
+            aiMovingForward = false;
+            aiMovingBack = false;
+            aiForwardDashing = false;
+            return;
+        }
+
+        if (dummyAttackTimer > 0f) {
+            dummyAttackTimer = Math.max(0f, dummyAttackTimer - dt);
+            tryApplyOpponentMeleeDamage();
+
+            if (dummyAttackTimer <= 0f) {
+                dummyAttackType = "";
+                dummyAttackDuration = 0f;
                 dummyAttackHitApplied = false;
+                aiCrouching = false;
+                aiAttackCooldownRemaining = AI_ATTACK_COOLDOWN;
+
+                if (aiChaseLauncher && !dummyAirborne) {
+                    aiChaseLauncher = false;
+                    startOpponentJump(true);
+                }
             }
             return;
         }
 
-        if (dummyAttackTimer <= 0f) {
-            float distance = Math.abs(playerX - dummyX);
-            boolean playerInGroundLine =
-                grounded &&
-                Math.abs(playerY - GROUND_Y) < 4f;
+        float distance = Math.abs(playerX - dummyX);
+        float verticalDistance = Math.abs(playerY - dummyY);
 
-            if (
-                dummyAttackCooldownRemaining <= 0f &&
-                playerInGroundLine &&
-                distance <= DUMMY_LIGHT_TRIGGER_RANGE
-            ) {
-                startDummyLightAttack();
-            }
+        if (aiBackDashTimer > 0f && !dummyAirborne) {
+            dummyX -= opponentFacingDirection() * AI_BACKDASH_SPEED * dt;
+            aiBackDashTimer = Math.max(0f, aiBackDashTimer - dt);
+            aiWalkTime += dt * 13f;
             return;
         }
 
-        dummyAttackTimer = Math.max(0f, dummyAttackTimer - dt);
-        float progress =
-            1f - dummyAttackTimer / DUMMY_LIGHT_ATTACK_DURATION;
+        aiDecisionTimer -= dt;
+        if (aiDecisionTimer <= 0f) {
+            aiDecisionTimer = AI_DECISION_MIN +
+                (float)Math.random() * (AI_DECISION_MAX - AI_DECISION_MIN);
 
-        if (!dummyAttackHitApplied && progress >= 0.46f) {
-            float distance = Math.abs(playerX - dummyX);
+            aiMovingForward = false;
+            aiMovingBack = false;
+            aiForwardDashing = false;
+            aiCrouching = false;
 
-            if (
-                grounded &&
-                distance <= DUMMY_LIGHT_HIT_RANGE
+            if (dummyAirborne) {
+                if (verticalDistance <= 115f && distance <= 175f) {
+                    double r = Math.random();
+                    if (r < 0.30) startOpponentAttack("L");
+                    else if (r < 0.64) startOpponentAttack("M");
+                    else startOpponentAttack("H");
+                } else {
+                    aiMovingForward = distance > 95f;
+                }
+            } else if (activeFighter().life <= 0) {
+                // sem ação
+            } else if (
+                opponentFighter.superMeter >= SUPER_COST &&
+                distance >= 250f &&
+                distance <= 720f &&
+                Math.random() < 0.18
             ) {
-                applyDamage(DUMMY_LIGHT_DAMAGE);
-                dummyAttackHitApplied = true;
+                startOpponentSuper();
+            } else if (
+                distance >= 230f &&
+                distance <= 620f &&
+                !hasActiveEnergyProjectile(AI_OWNER_INDEX) &&
+                Math.random() < 0.24
+            ) {
+                double r = Math.random();
+                fireOpponentEnergy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
+            } else if (!grounded && distance <= 185f && Math.random() < 0.38) {
+                startOpponentAttack("2H");
+            } else if (distance <= 178f && aiAttackCooldownRemaining <= 0f) {
+                double r = Math.random();
+                if (r < 0.18) startOpponentAttack("2L");
+                else if (r < 0.36) startOpponentAttack("2M");
+                else if (r < 0.53) startOpponentAttack("2H");
+                else if (r < 0.70) startOpponentAttack("L");
+                else if (r < 0.86) startOpponentAttack("M");
+                else startOpponentAttack("H");
+            } else if (distance < 82f && Math.random() < 0.38) {
+                aiBackDashTimer = AI_BACKDASH_DURATION;
+            } else if (distance > 360f && Math.random() < 0.38) {
+                aiMovingForward = true;
+                aiForwardDashing = true;
+            } else if (distance > 145f) {
+                aiMovingForward = true;
+            } else if (Math.random() < 0.12) {
+                startOpponentJump(Math.random() < 0.32);
             }
         }
 
-        if (dummyAttackTimer <= 0f) {
-            dummyAttackCooldownRemaining = DUMMY_LIGHT_COOLDOWN;
-            dummyAttackHitApplied = false;
+        if (dummyAirborne) {
+            if (aiMovingForward) {
+                dummyX += opponentFacingDirection() * AI_WALK_SPEED * 0.70f * dt;
+                aiWalkTime += dt * 8f;
+            }
+        } else if (aiMovingForward) {
+            float speed = aiForwardDashing ? AI_DASH_SPEED : AI_WALK_SPEED;
+            dummyX += opponentFacingDirection() * speed * dt;
+            aiWalkTime += dt * (aiForwardDashing ? 14f : 8f);
+        } else if (aiMovingBack) {
+            dummyX -= opponentFacingDirection() * AI_WALK_SPEED * dt;
+            aiWalkTime += dt * 8f;
+        }
+
+        dummyX = clamp(dummyX, LEFT_BOUND, RIGHT_BOUND);
+    }
+
+    private void tryApplyOpponentMeleeDamage() {
+        if (
+            dummyAttackHitApplied ||
+            dummyAttackTimer <= 0f ||
+            activeFighter().life <= 0 ||
+            "S".equals(dummyAttackType)
+        ) return;
+
+        int damage = damageForAttack(opponentProfile(), dummyAttackType);
+        float reach = reachForAttack(dummyAttackType);
+        if (damage <= 0 || reach <= 0f) return;
+        if (aiAttackPhase() < 0.72f) return;
+
+        int direction = opponentFacingDirection();
+        float horizontalDistance = (playerX - dummyX) * direction;
+        if (horizontalDistance < 18f || horizontalDistance > reach) return;
+
+        float opponentCenterY =
+            (aiCrouching || dummyAttackType.startsWith("2"))
+                ? dummyY - 42f
+                : dummyY - 78f;
+        float playerCenterY =
+            (crouching || isCrouchAttackActive())
+                ? playerY - 42f
+                : playerY - 78f;
+        if (Math.abs(opponentCenterY - playerCenterY) > 92f) return;
+
+        applyPlayerHit(
+            damage,
+            direction,
+            dummyAttackType,
+            aiSuperJumping
+        );
+        dummyAttackHitApplied = true;
+
+        if ("2H".equals(dummyAttackType)) {
+            aiChaseLauncher = true;
         }
     }
 
@@ -684,7 +998,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         dummyKnockdownTimer = 0f;
         dummyAirborne = true;
         dummyMovementLocked = true;
+        dummyLaunchedByHit = true;
         dummyGroundSlam = false;
+        aiSuperJumping = false;
         dummyVelocityY = -DUMMY_LAUNCH_SPEED;
     }
 
@@ -701,6 +1017,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void knockDownDummy() {
         dummyAirborne = false;
+        dummyLaunchedByHit = false;
         dummyGroundSlam = false;
         dummyVelocityY = 0f;
         dummyY = GROUND_Y;
@@ -751,14 +1068,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         // Ground Slam: queda forçada e sem controle até tocar o chão.
         dummyMovementLocked =
             dummyGroundSlam ||
-            dummyVelocityY < 0f;
+            (dummyLaunchedByHit && dummyVelocityY < 0f);
 
         if (dummyY >= GROUND_Y) {
             dummyY = GROUND_Y;
             dummyVelocityY = 0f;
             dummyAirborne = false;
             dummyMovementLocked = false;
+            dummyLaunchedByHit = false;
             dummyGroundSlam = false;
+            aiSuperJumping = false;
         }
     }
 
@@ -848,7 +1167,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private boolean canStartSuper() {
-        return activeFighter().profile.hasSuperAttack &&
+        return !playerMovementLocked &&
+            activeFighter().profile.hasSuperAttack &&
             activeFighter().superMeter >= SUPER_COST &&
             !isSuperCinematicActive() &&
             !isTagAnimationActive() &&
@@ -968,10 +1288,35 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float previousX = projectile.x;
             projectile.x += projectile.speed * projectile.direction * dt;
 
-            if (
-                projectileHitsDummy(previousX, projectile.x, projectile.y, 58f)
+            boolean hit = false;
+            if (projectile.ownerIndex == AI_OWNER_INDEX) {
+                if (projectileHitsPlayer(
+                    previousX,
+                    projectile.x,
+                    projectile.y,
+                    58f
+                )) {
+                    applyPlayerHit(
+                        projectile.damage,
+                        projectile.direction,
+                        "SUPER",
+                        false
+                    );
+                    hit = true;
+                }
+            } else if (
+                projectileHitsDummy(
+                    previousX,
+                    projectile.x,
+                    projectile.y,
+                    58f
+                )
             ) {
                 applyDummyDamage(projectile.damage, projectile.direction);
+                hit = true;
+            }
+
+            if (hit) {
                 iterator.remove();
                 continue;
             }
@@ -1008,6 +1353,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private boolean canStartTag() {
         return
+            !playerMovementLocked &&
             !isTagAnimationActive() &&
             !isSuperCinematicActive() &&
             !isEnergyAttackActive() &&
@@ -1146,6 +1492,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void startJump(boolean superJump) {
         if (
             !grounded ||
+            playerMovementLocked ||
             isEnergyAttackActive() ||
             isTagAnimationActive() ||
             isSuperCinematicActive()
@@ -1176,6 +1523,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void startAttack(String type) {
+        if (playerMovementLocked) return;
+
         attackType = type;
         attackHitApplied = false;
         forwardDashing = false;
@@ -1195,11 +1544,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private int damageForAttack(String type) {
-        FighterProfile profile = activeFighter().profile;
-        if ("L".equals(type) || "2L".equals(type)) return profile.lightDamage;
-        if ("M".equals(type) || "2M".equals(type)) return profile.mediumDamage;
-        if ("H".equals(type) || "2H".equals(type)) return profile.heavyDamage;
-        return 0;
+        return damageForAttack(activeFighter().profile, type);
     }
 
     private float reachForAttack(String type) {
@@ -1252,14 +1597,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (damage <= 0 || dummyLife <= 0) return;
 
         dummyAttackTimer = 0f;
+        dummyAttackType = "";
         dummyAttackHitApplied = false;
-        dummyAttackCooldownRemaining = Math.max(
-            dummyAttackCooldownRemaining,
+        aiAttackCooldownRemaining = Math.max(
+            aiAttackCooldownRemaining,
             0.35f
         );
 
         int applied = Math.min(damage, dummyLife);
         dummyLife -= applied;
+        opponentFighter.life = dummyLife;
+        opponentFighter.refreshHudLabels();
         dummyLifeHudLabel = dummyLife + " / " + DUMMY_MAX_LIFE;
         dummyDamageLabel = "-" + applied;
         dummyDamageLabelTimer = 0.72f;
@@ -1272,6 +1620,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
         dummyKnockbackVelocityX = direction * knockbackSpeed;
         dummyHitReactionTimer = DUMMY_HIT_REACTION_DURATION;
+    }
+
+    private boolean projectileHitsPlayer(
+        float previousX,
+        float nextX,
+        float y,
+        float radius
+    ) {
+        if (activeFighter().life <= 0) return false;
+
+        float halfWidth = 34f;
+        float playerLeft = playerX - halfWidth;
+        float playerRight = playerX + halfWidth;
+        float projectileLeft = Math.min(previousX, nextX) - radius;
+        float projectileRight = Math.max(previousX, nextX) + radius;
+
+        boolean horizontalHit =
+            projectileRight >= playerLeft &&
+            projectileLeft <= playerRight;
+
+        float bodyHeight =
+            (crouching || isCrouchAttackActive()) ? 90f : 145f;
+        float playerTop = playerY - bodyHeight;
+        boolean verticalHit =
+            y + radius >= playerTop &&
+            y - radius <= playerY;
+
+        return horizontalHit && verticalHit;
     }
 
     private boolean projectileHitsDummy(
@@ -1352,6 +1728,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         FighterProfile profile = activeFighter().profile;
 
         if (
+            playerMovementLocked ||
             !profile.hasEnergyAttack ||
             hasActiveEnergyProjectile(activeFighterIndex) ||
             pendingEnergyUntilMs < nowMs
@@ -1373,10 +1750,35 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float previousX = projectile.x;
             projectile.x += projectile.speed * projectile.direction * dt;
 
-            if (
-                projectileHitsDummy(previousX, projectile.x, projectile.y, 24f)
+            boolean hit = false;
+            if (projectile.ownerIndex == AI_OWNER_INDEX) {
+                if (projectileHitsPlayer(
+                    previousX,
+                    projectile.x,
+                    projectile.y,
+                    24f
+                )) {
+                    applyPlayerHit(
+                        projectile.damage,
+                        projectile.direction,
+                        "S",
+                        false
+                    );
+                    hit = true;
+                }
+            } else if (
+                projectileHitsDummy(
+                    previousX,
+                    projectile.x,
+                    projectile.y,
+                    24f
+                )
             ) {
                 applyDummyDamage(projectile.damage, projectile.direction);
+                hit = true;
+            }
+
+            if (hit) {
                 iterator.remove();
                 continue;
             }
@@ -1504,6 +1906,117 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         fighter.life = Math.max(0, fighter.life - damage);
         fighter.refreshHudLabels();
         playerDamageFlashTimer = 0.14f;
+    }
+
+    private void applyPlayerHit(
+        int damage,
+        int hitDirection,
+        String type,
+        boolean attackerSuperJumping
+    ) {
+        applyDamage(damage);
+        if (activeFighter().life <= 0) {
+            playerMovementLocked = true;
+            return;
+        }
+
+        if ("2M".equals(type)) {
+            knockDownPlayer();
+        } else if ("2H".equals(type)) {
+            launchPlayer();
+        } else if (
+            "H".equals(type) &&
+            attackerSuperJumping &&
+            !grounded
+        ) {
+            slamPlayerToGround();
+        } else {
+            playerHitReactionTimer = DUMMY_HIT_REACTION_DURATION;
+            playerMovementLocked = true;
+            playerKnockbackVelocityX = hitDirection * 155f;
+        }
+
+        attackType = "";
+        attackTimer = 0f;
+        attackDuration = 0f;
+        attackHitApplied = false;
+        forwardDashing = false;
+        backDashTimer = 0f;
+    }
+
+    private void launchPlayer() {
+        playerKnockdownState = DUMMY_KD_NONE;
+        playerKnockdownTimer = 0f;
+        grounded = false;
+        playerLaunchedByHit = true;
+        playerGroundSlam = false;
+        playerMovementLocked = true;
+        velocityY = -DUMMY_LAUNCH_SPEED;
+        playerY -= 2f;
+    }
+
+    private void slamPlayerToGround() {
+        if (grounded) return;
+        playerGroundSlam = true;
+        playerMovementLocked = true;
+        velocityY = DUMMY_SLAM_SPEED;
+        playerKnockbackVelocityX *= 0.35f;
+    }
+
+    private void knockDownPlayer() {
+        grounded = true;
+        playerY = GROUND_Y;
+        velocityY = 0f;
+        playerLaunchedByHit = false;
+        playerGroundSlam = false;
+        playerMovementLocked = true;
+        playerKnockdownState = DUMMY_KD_FALL;
+        playerKnockdownTimer = 0f;
+        playerKnockbackVelocityX *= 0.55f;
+    }
+
+    private void updatePlayerReceivedState(float dt) {
+        if (playerHitReactionTimer > 0f) {
+            playerHitReactionTimer = Math.max(
+                0f,
+                playerHitReactionTimer - dt
+            );
+            if (
+                playerHitReactionTimer <= 0f &&
+                playerKnockdownState == DUMMY_KD_NONE &&
+                !playerLaunchedByHit &&
+                !playerGroundSlam
+            ) {
+                playerMovementLocked = false;
+                playerKnockbackVelocityX = 0f;
+            }
+        }
+
+        if (playerKnockdownState == DUMMY_KD_NONE) return;
+
+        playerMovementLocked = true;
+        playerKnockdownTimer += dt;
+
+        if (
+            playerKnockdownState == DUMMY_KD_FALL &&
+            playerKnockdownTimer >= DUMMY_KD_FALL_DURATION
+        ) {
+            playerKnockdownState = DUMMY_KD_DOWN;
+            playerKnockdownTimer = 0f;
+        } else if (
+            playerKnockdownState == DUMMY_KD_DOWN &&
+            playerKnockdownTimer >= DUMMY_KD_DOWN_DURATION
+        ) {
+            playerKnockdownState = DUMMY_KD_GETUP;
+            playerKnockdownTimer = 0f;
+        } else if (
+            playerKnockdownState == DUMMY_KD_GETUP &&
+            playerKnockdownTimer >= DUMMY_KD_GETUP_DURATION
+        ) {
+            playerKnockdownState = DUMMY_KD_NONE;
+            playerKnockdownTimer = 0f;
+            playerMovementLocked = false;
+        }
     }
 
     private float attackPhase() {
@@ -1664,7 +2177,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("DUMMY ATTACK • v0.32", 975, 59, paint);
+        c.drawText("AI OPPONENT • v0.33", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1678,9 +2191,64 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             106,
             paint
         );
+
+        drawAiToggle(c);
+    }
+
+    private void drawAiToggle(Canvas c) {
+        paint.setColor(
+            opponentAiEnabled
+                ? Color.rgb(74, 205, 232)
+                : Color.argb(180, 45, 53, 62)
+        );
+        c.drawRoundRect(
+            AI_BUTTON_LEFT,
+            AI_BUTTON_TOP,
+            AI_BUTTON_RIGHT,
+            AI_BUTTON_BOTTOM,
+            12f,
+            12f,
+            paint
+        );
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2.5f);
+        paint.setColor(Color.WHITE);
+        c.drawRoundRect(
+            AI_BUTTON_LEFT,
+            AI_BUTTON_TOP,
+            AI_BUTTON_RIGHT,
+            AI_BUTTON_BOTTOM,
+            12f,
+            12f,
+            paint
+        );
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(
+            opponentAiEnabled
+                ? Color.rgb(18, 35, 48)
+                : Color.WHITE
+        );
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(19f);
+        float cy = (AI_BUTTON_TOP + AI_BUTTON_BOTTOM) * 0.5f;
+        c.drawText(
+            opponentAiEnabled ? "IA ON" : "IA OFF",
+            (AI_BUTTON_LEFT + AI_BUTTON_RIGHT) * 0.5f,
+            cy - (paint.ascent() + paint.descent()) * 0.5f,
+            paint
+        );
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private String currentStateLabel() {
+        if (playerKnockdownState != DUMMY_KD_NONE) return "DERRUBADO";
+        if (playerGroundSlam) return "QUEDA FORÇADA";
+        if (playerLaunchedByHit) return "LANÇADO";
+        if (playerHitReactionTimer > 0f) return "HIT";
         if (isSuperCinematicActive()) return "SUPER";
         if (attackTimer > 0f) {
             if ("L".equals(attackType)) return "ATAQUE L";
@@ -1852,7 +2420,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
 
         int dummyColor = dummyLife > 0
-            ? Color.rgb(215, 82, 92)
+            ? opponentProfile().color
             : Color.rgb(95, 95, 105);
 
         c.save();
@@ -1923,43 +2491,58 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
 
         paint.setStrokeWidth(18f);
-        if (dummyAttackTimer > 0f) {
-            float attackProgress =
-                1f - dummyAttackTimer / DUMMY_LIGHT_ATTACK_DURATION;
-            float attackPhase =
-                attackProgress < 0.5f
-                    ? attackProgress * 2f
-                    : (1f - attackProgress) * 2f;
+        if (dummyAttackTimer > 0f || aiSuperTimer > 0f) {
+            float phase = aiAttackPhase();
 
-            // Braço da frente estende para o jogador.
-            c.drawLine(
-                shoulderX - 3f,
-                top + 58f,
-                dummyX - 30f,
-                top + 98f,
-                paint
-            );
-            c.drawLine(
-                shoulderX + 3f,
-                top + 58f,
-                dummyX + 36f + 78f * attackPhase,
-                top + 66f,
-                paint
-            );
-            c.drawLine(
-                hipX - 4f,
-                baseY - 45f,
-                dummyX - 28f,
-                baseY,
-                paint
-            );
-            c.drawLine(
-                hipX + 4f,
-                baseY - 45f,
-                dummyX + 28f,
-                baseY,
-                paint
-            );
+            if (aiSuperTimer > 0f) {
+                float pulse = 1f + 0.10f * (float)Math.sin(aiSuperTimer * 26f);
+                c.drawLine(
+                    shoulderX - 3f,
+                    top + 58f,
+                    dummyX - 54f * pulse,
+                    top + 38f,
+                    paint
+                );
+                c.drawLine(
+                    shoulderX + 3f,
+                    top + 58f,
+                    dummyX + 70f * pulse,
+                    top + 38f,
+                    paint
+                );
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 38f, baseY, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 38f, baseY, paint);
+            } else if ("2L".equals(dummyAttackType)) {
+                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
+                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 76f * phase, top + 90f, paint);
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 42f, baseY - 8f, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 39f, baseY - 8f, paint);
+            } else if ("2M".equals(dummyAttackType)) {
+                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
+                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 34f, top + 94f, paint);
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 36f, baseY - 8f, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 44f + 72f * phase, baseY - 12f, paint);
+            } else if ("2H".equals(dummyAttackType)) {
+                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 32f, top + 96f, paint);
+                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 42f + 82f * phase, top + 54f - 16f * phase, paint);
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 46f, baseY - 8f, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 44f, baseY - 8f, paint);
+            } else if ("M".equals(dummyAttackType)) {
+                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 28f, top + 97f, paint);
+                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 30f, top + 94f, paint);
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 25f, baseY, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 34f + 76f * phase, baseY - 48f * phase, paint);
+            } else if ("H".equals(dummyAttackType)) {
+                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 26f, top + 98f, paint);
+                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 28f + 92f * phase, top + 84f + 22f * phase, paint);
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 30f, baseY, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 30f, baseY, paint);
+            } else {
+                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
+                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 34f + 72f * phase, top + 66f, paint);
+                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 26f, baseY, paint);
+                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 26f, baseY, paint);
+            }
         } else if (dummyHitReactionTimer > 0f) {
             // Braços abrem e o tronco recua no impacto.
             c.drawLine(
@@ -2038,8 +2621,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             dummyStatusLabel = "NPC TESTE • NO CHÃO";
         } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
             dummyStatusLabel = "NPC TESTE • LEVANTANDO";
+        } else if (aiSuperTimer > 0f) {
+            dummyStatusLabel = "PLAYER 2 • SUPER";
         } else if (dummyAttackTimer > 0f) {
-            dummyStatusLabel = "NPC TESTE • ATAQUE L";
+            dummyStatusLabel = "PLAYER 2 • " + dummyAttackType;
         } else if (dummyGroundSlam) {
             dummyStatusLabel = "NPC TESTE • QUEDA FORÇADA";
         } else if (dummyMovementLocked) {
@@ -2047,7 +2632,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else if (dummyAirborne) {
             dummyStatusLabel = "NPC TESTE • DESCENDO";
         } else {
-            dummyStatusLabel = "NPC TESTE";
+            dummyStatusLabel =
+                opponentAiEnabled
+                    ? "PLAYER 2 • IA"
+                    : "PLAYER 2 • DUMMY";
         }
 
         c.drawText(
@@ -2088,6 +2676,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(12f);
         c.drawText(dummyLifeHudLabel, dummyX, barBottom + 16f, paint);
+        paint.setTextSize(11f);
+        c.drawText(
+            opponentFighter.superHudLabel,
+            dummyX,
+            barBottom + 30f,
+            paint
+        );
 
         if (dummyDamageLabelTimer > 0f) {
             float progress = dummyDamageLabelTimer / 0.72f;
@@ -2214,6 +2809,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         paint.setColor(Color.argb(70, 0, 0, 0));
         c.drawOval(playerX - 43, GROUND_Y - 10, playerX + 43, GROUND_Y + 10, paint);
+
+        float playerKnockdownAngle = 0f;
+        if (playerKnockdownState == DUMMY_KD_FALL) {
+            float t = clamp(
+                playerKnockdownTimer / DUMMY_KD_FALL_DURATION,
+                0f,
+                1f
+            );
+            playerKnockdownAngle = -88f * t;
+        } else if (playerKnockdownState == DUMMY_KD_DOWN) {
+            playerKnockdownAngle = -88f;
+        } else if (playerKnockdownState == DUMMY_KD_GETUP) {
+            float t = clamp(
+                playerKnockdownTimer / DUMMY_KD_GETUP_DURATION,
+                0f,
+                1f
+            );
+            playerKnockdownAngle = -88f * (1f - t);
+        }
+
+        if (playerKnockdownAngle != 0f) {
+            c.rotate(playerKnockdownAngle, playerX, GROUND_Y);
+        }
 
         paint.setStrokeCap(Paint.Cap.ROUND);
         int playerColor =
@@ -2518,6 +3136,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
+    private boolean insideRect(
+        float x,
+        float y,
+        float left,
+        float top,
+        float right,
+        float bottom
+    ) {
+        return x >= left && x <= right && y >= top && y <= bottom;
+    }
+
     private boolean insideCircle(
         float x,
         float y,
@@ -2556,6 +3185,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         dpadDirection = next;
+
+        if (playerMovementLocked) {
+            movingLeft = false;
+            movingRight = false;
+            crouching = false;
+            forwardDashing = false;
+            backDashTimer = 0f;
+            return;
+        }
 
         if (isTagAnimationActive()) {
             // Durante a animação só memorizamos a direção atualmente segurada.
@@ -2657,6 +3295,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
+
+            if (
+                insideRect(
+                    x,
+                    y,
+                    AI_BUTTON_LEFT,
+                    AI_BUTTON_TOP,
+                    AI_BUTTON_RIGHT,
+                    AI_BUTTON_BOTTOM
+                )
+            ) {
+                setOpponentAiEnabled(!opponentAiEnabled);
+                return true;
+            }
 
             if (isSuperCinematicActive() || isEnergyAttackActive()) {
                 return true;
