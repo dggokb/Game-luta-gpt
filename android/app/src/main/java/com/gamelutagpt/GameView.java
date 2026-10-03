@@ -40,6 +40,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean superJumping = false;
     private boolean forwardDashing = false;
     private float backDashTimer = 0f;
+    private String attackType = "";
+    private float attackTimer = 0f;
+    private float attackDuration = 0f;
     private float walkTime = 0f;
 
     private final float moveSpeed = 300f;
@@ -55,6 +58,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DPAD_RADIUS = 122f;
     private static final float DPAD_DEADZONE = 28f;
 
+    private static final float ATTACK_RADIUS = 54f;
+    private static final float LIGHT_X = 1005f;
+    private static final float LIGHT_Y = 598f;
+    private static final float MEDIUM_X = 1100f;
+    private static final float MEDIUM_Y = 515f;
+    private static final float HEAVY_X = 1195f;
+    private static final float HEAVY_Y = 598f;
+
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
     private int dpadDirection = 0;
@@ -63,6 +74,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private long lastForwardTapMs = -1000L;
     private long lastBackTapMs = -1000L;
     private static final long DASH_DOUBLE_TAP_MS = 300L;
+    private int lightPointer = -1;
+    private int mediumPointer = -1;
+    private int heavyPointer = -1;
 
     public GameView(Context context) {
         super(context);
@@ -122,6 +136,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void update(float dt) {
+        if (attackTimer > 0f) {
+            attackTimer = Math.max(0f, attackTimer - dt);
+            if (attackTimer <= 0f) attackType = "";
+        }
+
         float direction = 0f;
         if (movingLeft && !movingRight) direction = -1f;
         if (movingRight && !movingLeft) direction = 1f;
@@ -173,6 +192,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         superJumping = superJump;
         velocityY = superJump ? -superJumpSpeed : -jumpSpeed;
         playerY -= 2f;
+    }
+
+    private void startAttack(String type) {
+        attackType = type;
+        forwardDashing = false;
+        backDashTimer = 0f;
+
+        if ("L".equals(type)) attackDuration = 0.16f;
+        else if ("M".equals(type)) attackDuration = 0.26f;
+        else attackDuration = 0.40f;
+
+        attackTimer = attackDuration;
+    }
+
+    private float attackPhase() {
+        if (attackTimer <= 0f || attackDuration <= 0f) return 0f;
+        float t = 1f - attackTimer / attackDuration;
+        return t < 0.5f ? t * 2f : (1f - t) * 2f;
     }
 
     private void drawFrame() {
@@ -278,10 +315,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("DASH • v0.3", 975, 59, paint);
+        c.drawText("ATTACKS • v0.4", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
-        String state = backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO")))));
+        String state = attackTimer > 0f ? "ATAQUE " + attackType : (backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
         c.drawText("Estado: " + state, 975, 88, paint);
     }
 
@@ -312,10 +349,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
             c.drawLine(playerX + 5, baseY - 42, playerX + 42, baseY - 8, paint);
         } else {
-            c.drawLine(playerX - 3, top + 58, playerX - 34 + armSwing, top + 100, paint);
-            c.drawLine(playerX + 3, top + 58, playerX + 34 - armSwing, top + 100, paint);
-            c.drawLine(playerX - 4, baseY - 45, playerX - 28 + legSwing, baseY, paint);
-            c.drawLine(playerX + 4, baseY - 45, playerX + 28 - legSwing, baseY, paint);
+            float phase = attackPhase();
+
+            if ("L".equals(attackType) && attackTimer > 0f) {
+                c.drawLine(playerX - 3, top + 58, playerX - 30, top + 96, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 34 + 72f * phase, top + 66, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
+            } else if ("M".equals(attackType) && attackTimer > 0f) {
+                c.drawLine(playerX - 3, top + 58, playerX - 28, top + 97, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 30, top + 94, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 25, baseY, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 34 + 76f * phase, baseY - 48f * phase, paint);
+            } else if ("H".equals(attackType) && attackTimer > 0f) {
+                c.drawLine(playerX - 3, top + 58, playerX - 26, top + 98, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 28 + 92f * phase, top + 84 + 22f * phase, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 30, baseY, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 30, baseY, paint);
+            } else {
+                c.drawLine(playerX - 3, top + 58, playerX - 34 + armSwing, top + 100, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 34 - armSwing, top + 100, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 28 + legSwing, baseY, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 28 - legSwing, baseY, paint);
+            }
         }
 
         paint.setColor(Color.rgb(24, 35, 48));
@@ -367,6 +423,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+
+        drawAttackButton(c, LIGHT_X, LIGHT_Y, "L", lightPointer != -1);
+        drawAttackButton(c, MEDIUM_X, MEDIUM_Y, "M", mediumPointer != -1);
+        drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", heavyPointer != -1);
+    }
+
+    private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
+        paint.setColor(pressed ? Color.argb(195, 255, 255, 255) : Color.argb(120, 7, 13, 26));
+        c.drawCircle(x, y, ATTACK_RADIUS, paint);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        paint.setColor(Color.argb(220, 255, 255, 255));
+        c.drawCircle(x, y, ATTACK_RADIUS, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(31f);
+        paint.setFakeBoldText(true);
+        float textY = y - (paint.ascent() + paint.descent()) / 2f;
+        c.drawText(label, x, textY, paint);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private boolean insideCircle(float x, float y, float cx, float cy, float radius) {
+        float dx = x - cx;
+        float dy = y - cy;
+        return dx * dx + dy * dy <= radius * radius;
     }
 
     private double directionAngle(int direction) {
@@ -469,6 +555,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (dpadPointer == -1 && dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS) {
                 dpadPointer = pointerId;
                 updateDpad(x, y, nowMs);
+            } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
+                lightPointer = pointerId;
+                startAttack("L");
+            } else if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) {
+                mediumPointer = pointerId;
+                startAttack("M");
+            } else if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) {
+                heavyPointer = pointerId;
+                startAttack("H");
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (dpadPointer != -1) {
@@ -481,11 +576,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
         } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
             int pointerId = event.getPointerId(index);
-            if (pointerId == dpadPointer) {
-                clearDpad();
-            }
+            if (pointerId == dpadPointer) clearDpad();
+            if (pointerId == lightPointer) lightPointer = -1;
+            if (pointerId == mediumPointer) mediumPointer = -1;
+            if (pointerId == heavyPointer) heavyPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
             clearDpad();
+            lightPointer = mediumPointer = heavyPointer = -1;
         }
 
         return true;
