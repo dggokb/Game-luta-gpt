@@ -19,7 +19,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float LEFT_BOUND = 90f;
     private static final float RIGHT_BOUND = WORLD_WIDTH - 90f;
     private static final float CAMERA_ZOOM = 1.12f;
-    private static final float CAMERA_TOP = 72f;
+    private static final float GROUND_CAMERA_TOP = 72f;
+    private static final float WORLD_TOP = -520f;
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -30,15 +31,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float playerX = 420f;
     private float playerY = GROUND_Y;
     private float cameraX = 420f;
+    private float cameraTop = GROUND_CAMERA_TOP;
     private float velocityY = 0f;
     private boolean movingLeft;
     private boolean movingRight;
     private boolean crouching;
     private boolean grounded = true;
+    private boolean superJumping = false;
     private float walkTime = 0f;
 
     private final float moveSpeed = 300f;
     private final float jumpSpeed = 660f;
+    private final float superJumpSpeed = 1450f;
     private final float gravity = 1650f;
 
     private final RectF leftButton = new RectF(45, 575, 145, 675);
@@ -126,6 +130,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 playerY = GROUND_Y;
                 velocityY = 0f;
                 grounded = true;
+                superJumping = false;
             }
         }
 
@@ -136,14 +141,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float targetCameraX = clamp(playerX, halfVisible, WORLD_WIDTH - halfVisible);
         float follow = 1f - (float)Math.pow(0.001f, dt);
         cameraX += (targetCameraX - cameraX) * follow;
+
+        float targetCameraTop = GROUND_CAMERA_TOP;
+        if (!grounded && playerY < 250f) {
+            targetCameraTop = clamp(playerY - 185f, WORLD_TOP, GROUND_CAMERA_TOP);
+        }
+        float verticalFollow = 1f - (float)Math.pow(0.00035f, dt);
+        cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
     }
 
     private void jump() {
-        if (grounded && !crouching) {
-            grounded = false;
-            velocityY = -jumpSpeed;
-            playerY -= 2f;
-        }
+        if (!grounded) return;
+
+        boolean wantsSuperJump = downPointer != -1;
+        grounded = false;
+        crouching = false;
+        superJumping = wantsSuperJump;
+        velocityY = wantsSuperJump ? -superJumpSpeed : -jumpSpeed;
+        playerY -= 2f;
     }
 
     private void drawFrame() {
@@ -163,7 +178,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.save();
             canvas.scale(CAMERA_ZOOM, CAMERA_ZOOM);
-            canvas.translate(-cameraLeft, -CAMERA_TOP);
+            canvas.translate(-cameraLeft, -cameraTop);
             drawScenario(canvas);
             drawPlayer(canvas);
             canvas.restore();
@@ -178,12 +193,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawScenario(Canvas c) {
-        paint.setShader(new LinearGradient(0, 0, 0, VH, Color.rgb(43, 97, 148), Color.rgb(240, 171, 99), Shader.TileMode.CLAMP));
-        c.drawRect(0, 0, WORLD_WIDTH, VH, paint);
+        paint.setShader(new LinearGradient(0, WORLD_TOP, 0, VH, Color.rgb(21, 55, 103), Color.rgb(240, 171, 99), Shader.TileMode.CLAMP));
+        c.drawRect(0, WORLD_TOP, WORLD_WIDTH, VH, paint);
         paint.setShader(null);
 
         paint.setColor(Color.argb(130, 255, 244, 201));
-        c.drawCircle(2050, 120, 58, paint);
+        c.drawCircle(2050, -40, 58, paint);
+
+        paint.setColor(Color.argb(75, 255, 255, 255));
+        for (int i = 0; i < 12; i++) {
+            float cloudX = 110f + i * 215f;
+            float cloudY = -365f + (i % 4) * 92f;
+            c.drawOval(cloudX, cloudY, cloudX + 120f, cloudY + 38f, paint);
+        }
 
         paint.setColor(Color.rgb(53, 73, 88));
         for (int i = 0; i < 15; i++) {
@@ -245,7 +267,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText("MOVEMENT TEST", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
-        String state = crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO"));
+        String state = superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO")));
         c.drawText("Estado: " + state, 975, 88, paint);
     }
 
