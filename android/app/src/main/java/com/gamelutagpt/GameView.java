@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,16 +15,42 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final String name;
         final String[] baseCombo;
         final int maxLife;
+        final int color;
 
-        FighterProfile(String name, String[] baseCombo, int maxLife) {
+        FighterProfile(String name, String[] baseCombo, int maxLife, int color) {
             this.name = name;
             this.baseCombo = baseCombo;
             this.maxLife = maxLife;
+            this.color = color;
         }
     }
 
-    private final FighterProfile playerProfile =
-        new FighterProfile("PLAYER", new String[]{"L", "M", "H"}, 10000);
+    private static final class FighterState {
+        final FighterProfile profile;
+        int life;
+
+        FighterState(FighterProfile profile) {
+            this.profile = profile;
+            this.life = profile.maxLife;
+        }
+    }
+
+    private final FighterState[] team = new FighterState[] {
+        new FighterState(new FighterProfile(
+            "PLAYER 1",
+            new String[]{"L", "M", "H"},
+            10000,
+            Color.rgb(244, 183, 59)
+        )),
+        new FighterState(new FighterProfile(
+            "PLAYER 2",
+            new String[]{"L", "L", "H", "M"},
+            10000,
+            Color.rgb(74, 205, 232)
+        ))
+    };
+
+    private int activeFighterIndex = 0;
 
     private static final float VW = 1280f;
     private static final float VH = 720f;
@@ -43,13 +68,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private Thread gameThread;
     private volatile boolean running;
 
-    private int playerLife = playerProfile.maxLife;
-
     private float playerX = 420f;
     private float playerY = GROUND_Y;
     private float cameraX = 420f;
     private float cameraTop = GROUND_CAMERA_TOP;
     private float velocityY = 0f;
+
     private boolean movingLeft;
     private boolean movingRight;
     private boolean crouching;
@@ -57,6 +81,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean superJumping = false;
     private boolean forwardDashing = false;
     private float backDashTimer = 0f;
+
     private String attackType = "";
     private float attackTimer = 0f;
     private float attackDuration = 0f;
@@ -82,9 +107,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float MEDIUM_Y = 515f;
     private static final float HEAVY_X = 1195f;
     private static final float HEAVY_Y = 598f;
+
     private static final float COMBO_X = 1100f;
     private static final float COMBO_Y = 650f;
     private static final float COMBO_RADIUS = 43f;
+
+    private static final float TAG_X = 930f;
+    private static final float TAG_Y = 505f;
+    private static final float TAG_RADIUS = 43f;
 
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
@@ -94,10 +124,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private long lastForwardTapMs = -1000L;
     private long lastBackTapMs = -1000L;
     private static final long DASH_DOUBLE_TAP_MS = 300L;
+
     private int lightPointer = -1;
     private int mediumPointer = -1;
     private int heavyPointer = -1;
     private int comboPointer = -1;
+    private int tagPointer = -1;
+
     private int autoComboIndex = 0;
     private long lastAutoComboTapMs = -1000L;
     private static final long AUTO_COMBO_RESET_MS = 700L;
@@ -108,6 +141,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
+    }
+
+    private FighterState activeFighter() {
+        return team[activeFighterIndex];
+    }
+
+    private FighterState reserveFighter() {
+        return team[(activeFighterIndex + 1) % team.length];
     }
 
     @Override
@@ -150,7 +191,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (remaining > 0) {
                 try {
                     long ms = remaining / 1_000_000L;
-                    int ns = (int) (remaining % 1_000_000L);
+                    int ns = (int)(remaining % 1_000_000L);
                     Thread.sleep(ms, ns);
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
@@ -170,7 +211,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (movingRight && !movingLeft) direction = 1f;
 
         if (attackTimer > 0f) {
-            // Ataques travam o deslocamento horizontal durante toda a animação.
             walkTime = 0f;
         } else if (backDashTimer > 0f && grounded) {
             playerX -= backDashSpeed * dt;
@@ -239,26 +279,42 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void triggerAutoCombo(long nowMs) {
-        if (playerProfile.baseCombo.length == 0) return;
+        String[] combo = activeFighter().profile.baseCombo;
+        if (combo.length == 0) return;
 
         if (nowMs - lastAutoComboTapMs > AUTO_COMBO_RESET_MS) {
             autoComboIndex = 0;
         }
 
-        String nextAttack = playerProfile.baseCombo[autoComboIndex];
+        String nextAttack = combo[autoComboIndex];
         startAttack(nextAttack);
 
         autoComboIndex++;
-        if (autoComboIndex >= playerProfile.baseCombo.length) {
+        if (autoComboIndex >= combo.length) {
             autoComboIndex = 0;
         }
 
         lastAutoComboTapMs = nowMs;
     }
 
+    private void switchFighter() {
+        activeFighterIndex = (activeFighterIndex + 1) % team.length;
+
+        attackType = "";
+        attackTimer = 0f;
+        attackDuration = 0f;
+        forwardDashing = false;
+        backDashTimer = 0f;
+        resetAutoCombo();
+
+        // Posição, altura, velocidade vertical e câmera são compartilhadas.
+        // Assim a troca mantém exatamente o mesmo estado de movimento.
+    }
+
     private void applyDamage(int damage) {
         if (damage <= 0) return;
-        playerLife = Math.max(0, playerLife - damage);
+        FighterState fighter = activeFighter();
+        fighter.life = Math.max(0, fighter.life - damage);
     }
 
     private float attackPhase() {
@@ -299,7 +355,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawScenario(Canvas c) {
-        paint.setShader(new LinearGradient(0, WORLD_TOP, 0, VH, Color.rgb(21, 55, 103), Color.rgb(240, 171, 99), Shader.TileMode.CLAMP));
+        paint.setShader(new LinearGradient(
+            0, WORLD_TOP, 0, VH,
+            Color.rgb(21, 55, 103),
+            Color.rgb(240, 171, 99),
+            Shader.TileMode.CLAMP
+        ));
         c.drawRect(0, WORLD_TOP, WORLD_WIDTH, VH, paint);
         paint.setShader(null);
 
@@ -330,7 +391,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.rgb(148, 108, 67));
         for (int i = 0; i < 38; i++) {
             float x = (i * 83f) % WORLD_WIDTH;
-            c.drawRoundRect(x, GROUND_Y + 35 + (i % 3) * 38, x + 55, GROUND_Y + 40 + (i % 3) * 38, 3, 3, paint);
+            c.drawRoundRect(
+                x,
+                GROUND_Y + 35 + (i % 3) * 38,
+                x + 55,
+                GROUND_Y + 40 + (i % 3) * 38,
+                3,
+                3,
+                paint
+            );
         }
 
         paint.setColor(Color.argb(90, 255, 255, 255));
@@ -339,11 +408,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawHud(Canvas c) {
-        paint.setColor(Color.argb(185, 10, 15, 27));
-        c.drawRoundRect(32, 28, 540, 122, 18, 18, paint);
+        FighterState active = activeFighter();
+        FighterState reserve = reserveFighter();
 
-        paint.setColor(Color.rgb(244, 183, 59));
+        paint.setColor(Color.argb(185, 10, 15, 27));
+        c.drawRoundRect(32, 28, 560, 154, 18, 18, paint);
+
+        paint.setColor(active.profile.color);
         c.drawCircle(78, 74, 29, paint);
+
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
         paint.setColor(Color.WHITE);
@@ -353,54 +426,97 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(22);
         paint.setFakeBoldText(true);
-        c.drawText(playerProfile.name, 122, 58, paint);
+        c.drawText(active.profile.name, 122, 58, paint);
         paint.setFakeBoldText(false);
 
-        float lifeRatio = clamp(playerLife / (float)playerProfile.maxLife, 0f, 1f);
-        float lifeLeft = 122f;
-        float lifeTop = 70f;
-        float lifeRight = 505f;
-        float lifeBottom = 98f;
-        float lifeWidth = lifeRight - lifeLeft;
+        drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
 
-        paint.setColor(Color.rgb(45, 53, 62));
-        c.drawRoundRect(lifeLeft, lifeTop, lifeRight, lifeBottom, 8, 8, paint);
-
-        int lifeColor;
-        if (lifeRatio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
-        else if (lifeRatio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
-        else lifeColor = Color.rgb(229, 82, 82);
-
-        if (lifeRatio > 0f) {
-            float filledRight = lifeLeft + lifeWidth * lifeRatio;
-            paint.setColor(lifeColor);
-            c.drawRoundRect(lifeLeft, lifeTop, filledRight, lifeBottom, 8, 8, paint);
-        }
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2f);
-        paint.setColor(Color.argb(210, 255, 255, 255));
-        c.drawRoundRect(lifeLeft, lifeTop, lifeRight, lifeBottom, 8, 8, paint);
-        paint.setStyle(Paint.Style.FILL);
+        // Reserva: indicador menor com vida própria.
+        paint.setColor(reserve.profile.color);
+        c.drawCircle(78, 127, 14, paint);
 
         paint.setColor(Color.WHITE);
-        paint.setTextSize(15);
-        c.drawText("HP " + playerLife + " / " + playerProfile.maxLife, 128, 91, paint);
+        paint.setTextSize(14);
+        paint.setFakeBoldText(true);
+        c.drawText("RESERVA: " + reserve.profile.name, 105, 124, paint);
+        paint.setFakeBoldText(false);
+
+        drawLifeBar(c, reserve, 105f, 132f, 525f, 145f, false);
 
         paint.setColor(Color.argb(180, 10, 15, 27));
         c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("LIFE • v0.7", 975, 59, paint);
+        c.drawText("TAG • v0.8", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
-        String state = attackTimer > 0f ? "ATAQUE " + attackType : (backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
+
+        String state = attackTimer > 0f
+            ? "ATAQUE " + attackType
+            : (backDashTimer > 0f
+                ? "BACKDASH"
+                : (forwardDashing
+                    ? "DASH"
+                    : (superJumping
+                        ? "SUPER JUMP"
+                        : (crouching
+                            ? "AGACHADO"
+                            : (!grounded
+                                ? "NO AR"
+                                : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
+
         c.drawText("Estado: " + state, 975, 88, paint);
     }
 
+    private void drawLifeBar(
+        Canvas c,
+        FighterState fighter,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        boolean showText
+    ) {
+        float ratio = clamp(fighter.life / (float)fighter.profile.maxLife, 0f, 1f);
+        float width = right - left;
+
+        paint.setColor(Color.rgb(45, 53, 62));
+        c.drawRoundRect(left, top, right, bottom, 8, 8, paint);
+
+        int lifeColor;
+        if (ratio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
+        else if (ratio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
+        else lifeColor = Color.rgb(229, 82, 82);
+
+        if (ratio > 0f) {
+            paint.setColor(lifeColor);
+            c.drawRoundRect(left, top, left + width * ratio, bottom, 8, 8, paint);
+        }
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(showText ? 2f : 1.5f);
+        paint.setColor(Color.argb(210, 255, 255, 255));
+        c.drawRoundRect(left, top, right, bottom, 8, 8, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        if (showText) {
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(15);
+            c.drawText(
+                "HP " + fighter.life + " / " + fighter.profile.maxLife,
+                left + 6,
+                bottom - 7,
+                paint
+            );
+        }
+    }
+
     private void drawPlayer(Canvas c) {
-        float bob = (grounded && !crouching && (movingLeft || movingRight)) ? (float)Math.sin(walkTime) * 3f : 0f;
+        float bob = (grounded && !crouching && (movingLeft || movingRight))
+            ? (float)Math.sin(walkTime) * 3f
+            : 0f;
+
         float baseY = playerY + bob;
         float bodyHeight = crouching ? 90f : 145f;
         float top = baseY - bodyHeight;
@@ -409,14 +525,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawOval(playerX - 43, GROUND_Y - 10, playerX + 43, GROUND_Y + 10, paint);
 
         paint.setStrokeCap(Paint.Cap.ROUND);
-
-        paint.setColor(Color.rgb(244, 183, 59));
+        paint.setColor(activeFighter().profile.color);
         c.drawCircle(playerX, top + 20, 25, paint);
 
         paint.setStrokeWidth(crouching ? 22 : 25);
         c.drawLine(playerX, top + 48, playerX, baseY - 45, paint);
 
-        float legSwing = (grounded && !crouching && (movingLeft || movingRight)) ? (float)Math.sin(walkTime) * 18f : 0f;
+        float legSwing = (grounded && !crouching && (movingLeft || movingRight))
+            ? (float)Math.sin(walkTime) * 18f
+            : 0f;
+
         float armSwing = -legSwing * 0.75f;
 
         paint.setStrokeWidth(18);
@@ -437,10 +555,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 c.drawLine(playerX - 3, top + 58, playerX - 28, top + 97, paint);
                 c.drawLine(playerX + 3, top + 58, playerX + 30, top + 94, paint);
                 c.drawLine(playerX - 4, baseY - 45, playerX - 25, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 34 + 76f * phase, baseY - 48f * phase, paint);
+                c.drawLine(
+                    playerX + 4,
+                    baseY - 45,
+                    playerX + 34 + 76f * phase,
+                    baseY - 48f * phase,
+                    paint
+                );
             } else if ("H".equals(attackType) && attackTimer > 0f) {
                 c.drawLine(playerX - 3, top + 58, playerX - 26, top + 98, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 28 + 92f * phase, top + 84 + 22f * phase, paint);
+                c.drawLine(
+                    playerX + 3,
+                    top + 58,
+                    playerX + 28 + 92f * phase,
+                    top + 84 + 22f * phase,
+                    paint
+                );
                 c.drawLine(playerX - 4, baseY - 45, playerX - 30, baseY, paint);
                 c.drawLine(playerX + 4, baseY - 45, playerX + 30, baseY, paint);
             } else {
@@ -491,13 +621,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
         paint.setTextSize(27f);
-        String[] labels = {"→","↘","↓","↙","←","↖","↑","↗"};
+
+        String[] labels = {"→", "↘", "↓", "↙", "←", "↖", "↑", "↗"};
         for (int i = 0; i < 8; i++) {
             double a = Math.toRadians(i * 45.0);
             float tx = DPAD_X + (float)Math.cos(a) * 78f;
-            float ty = DPAD_Y + (float)Math.sin(a) * 78f - (paint.ascent() + paint.descent()) / 2f;
+            float ty = DPAD_Y + (float)Math.sin(a) * 78f
+                - (paint.ascent() + paint.descent()) / 2f;
             c.drawText(labels[i], tx, ty, paint);
         }
+
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
 
@@ -505,10 +638,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         drawAttackButton(c, MEDIUM_X, MEDIUM_Y, "M", mediumPointer != -1);
         drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", heavyPointer != -1);
         drawComboButton(c);
+        drawTagButton(c);
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
-        paint.setColor(pressed ? Color.argb(195, 255, 255, 255) : Color.argb(120, 7, 13, 26));
+        paint.setColor(
+            pressed
+                ? Color.argb(195, 255, 255, 255)
+                : Color.argb(120, 7, 13, 26)
+        );
         c.drawCircle(x, y, ATTACK_RADIUS, paint);
 
         paint.setStyle(Paint.Style.STROKE);
@@ -529,7 +667,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawComboButton(Canvas c) {
         boolean pressed = comboPointer != -1;
-        paint.setColor(pressed ? Color.argb(205, 255, 255, 255) : Color.argb(135, 7, 13, 26));
+
+        paint.setColor(
+            pressed
+                ? Color.argb(205, 255, 255, 255)
+                : Color.argb(135, 7, 13, 26)
+        );
         c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
 
         paint.setStyle(Paint.Style.STROKE);
@@ -548,7 +691,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    private boolean insideCircle(float x, float y, float cx, float cy, float radius) {
+    private void drawTagButton(Canvas c) {
+        boolean pressed = tagPointer != -1;
+
+        paint.setColor(
+            pressed
+                ? reserveFighter().profile.color
+                : Color.argb(145, 7, 13, 26)
+        );
+        c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        paint.setColor(reserveFighter().profile.color);
+        c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(17f);
+        paint.setFakeBoldText(true);
+        float textY = TAG_Y - (paint.ascent() + paint.descent()) / 2f;
+        c.drawText("TROCA", TAG_X, textY, paint);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private boolean insideCircle(
+        float x,
+        float y,
+        float cx,
+        float cy,
+        float radius
+    ) {
         float dx = x - cx;
         float dy = y - cy;
         return dx * dx + dy * dy <= radius * radius;
@@ -648,10 +823,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             int pointerId = event.getPointerId(index);
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
+
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
-            if (dpadPointer == -1 && dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS) {
+            if (
+                dpadPointer == -1 &&
+                dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS
+            ) {
                 dpadPointer = pointerId;
                 updateDpad(x, y, nowMs);
             } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
@@ -669,6 +848,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             } else if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) {
                 comboPointer = pointerId;
                 triggerAutoCombo(nowMs);
+            } else if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) {
+                tagPointer = pointerId;
+                switchFighter();
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (dpadPointer != -1) {
@@ -679,16 +861,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     updateDpad(x, y, nowMs);
                 }
             }
-        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
+        } else if (
+            action == MotionEvent.ACTION_UP ||
+            action == MotionEvent.ACTION_POINTER_UP
+        ) {
             int pointerId = event.getPointerId(index);
+
             if (pointerId == dpadPointer) clearDpad();
             if (pointerId == lightPointer) lightPointer = -1;
             if (pointerId == mediumPointer) mediumPointer = -1;
             if (pointerId == heavyPointer) heavyPointer = -1;
             if (pointerId == comboPointer) comboPointer = -1;
+            if (pointerId == tagPointer) tagPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
             clearDpad();
-            lightPointer = mediumPointer = heavyPointer = comboPointer = -1;
+            lightPointer = -1;
+            mediumPointer = -1;
+            heavyPointer = -1;
+            comboPointer = -1;
+            tagPointer = -1;
         }
 
         return true;
