@@ -414,8 +414,30 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 tagPhaseTimer = 0f;
                 tagVisualOffsetX = 0f;
                 tagCooldownRemaining = TAG_COOLDOWN_SECONDS;
+                restoreHeldDpadAfterTag();
             }
         }
+    }
+
+    private void restoreHeldDpadAfterTag() {
+        if (dpadPointer == -1 || dpadDirection == 0) {
+            movingLeft = false;
+            movingRight = false;
+            crouching = false;
+            forwardDashing = false;
+            return;
+        }
+
+        movingLeft =
+            dpadDirection == 4 ||
+            dpadDirection == 5 ||
+            dpadDirection == 6;
+        movingRight =
+            dpadDirection == 1 ||
+            dpadDirection == 2 ||
+            dpadDirection == 8;
+        crouching = grounded && isDownDirection(dpadDirection);
+        forwardDashing = false;
     }
 
     private void startTagAnimation() {
@@ -430,10 +452,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         attackDuration = 0f;
         forwardDashing = false;
         backDashTimer = 0f;
+        // Congela a ação durante a troca, mas preserva ponteiro/direção do D-pad.
+        // Assim, se o jogador continuar segurando, o novo personagem retoma ao final.
         movingLeft = false;
         movingRight = false;
         crouching = false;
-        clearDpad();
+        forwardDashing = false;
         resetAutoCombo();
         resetCommandBuffer();
         pendingEnergyUntilMs = -1L;
@@ -803,7 +827,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("TAG ANIMATION • v0.19", 975, 59, paint);
+        c.drawText("HELD TAG INPUT • v0.20", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1221,7 +1245,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateDpad(float x, float y, long nowMs) {
-        if (isEnergyAttackActive() || isTagAnimationActive()) return;
+        if (isEnergyAttackActive()) return;
 
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
@@ -1238,6 +1262,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         dpadDirection = next;
+
+        if (isTagAnimationActive()) {
+            // Durante a animação só memorizamos a direção atualmente segurada.
+            // Nenhum movimento, dash, pulo ou comando é executado até o fim da pose.
+            movingLeft = false;
+            movingRight = false;
+            crouching = false;
+            forwardDashing = false;
+            backDashTimer = 0f;
+            return;
+        }
 
         movingLeft = next == 4 || next == 5 || next == 6;
         movingRight = next == 1 || next == 2 || next == 8;
@@ -1311,7 +1346,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
-            if (isEnergyAttackActive() || isTagAnimationActive()) {
+            if (isEnergyAttackActive()) {
                 return true;
             }
 
@@ -1321,6 +1356,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             ) {
                 dpadPointer = pointerId;
                 updateDpad(x, y, nowMs);
+            } else if (isTagAnimationActive()) {
+                return true;
             } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
                 lightPointer = pointerId;
                 if (!tryFirePendingEnergy("L", nowMs)) {
@@ -1349,7 +1386,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            if (!isEnergyAttackActive() && !isTagAnimationActive() && dpadPointer != -1) {
+            if (!isEnergyAttackActive() && dpadPointer != -1) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);
                 if (pointerIndex >= 0) {
                     float x = event.getX(pointerIndex) / sx;
