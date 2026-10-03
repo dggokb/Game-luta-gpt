@@ -45,14 +45,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final float superJumpSpeed = 1450f;
     private final float gravity = 1650f;
 
-    private final RectF leftButton = new RectF(45, 575, 145, 675);
-    private final RectF rightButton = new RectF(165, 575, 265, 675);
-    private final RectF downButton = new RectF(105, 465, 205, 555);
-    private final RectF jumpButton = new RectF(1090, 555, 1230, 685);
+    private static final float DPAD_X = 175f;
+    private static final float DPAD_Y = 555f;
+    private static final float DPAD_RADIUS = 122f;
+    private static final float DPAD_DEADZONE = 28f;
 
-    private int leftPointer = -1;
-    private int rightPointer = -1;
-    private int downPointer = -1;
+    // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
+    // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
+    private int dpadDirection = 0;
+    private int dpadPointer = -1;
+    private long lastDownInputMs = -1000L;
 
     public GameView(Context context) {
         super(context);
@@ -150,14 +152,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
     }
 
-    private void jump() {
+    private void startJump(boolean superJump) {
         if (!grounded) return;
 
-        boolean wantsSuperJump = downPointer != -1;
         grounded = false;
         crouching = false;
-        superJumping = wantsSuperJump;
-        velocityY = wantsSuperJump ? -superJumpSpeed : -jumpSpeed;
+        superJumping = superJump;
+        velocityY = superJump ? -superJumpSpeed : -jumpSpeed;
         playerY -= 2f;
     }
 
@@ -311,28 +312,109 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawControls(Canvas c) {
-        drawControl(c, leftButton, "◀", movingLeft);
-        drawControl(c, rightButton, "▶", movingRight);
-        drawControl(c, downButton, "▼", crouching);
-        drawControl(c, jumpButton, "PULAR", false);
-    }
+        paint.setColor(Color.argb(105, 7, 13, 26));
+        c.drawCircle(DPAD_X, DPAD_Y, DPAD_RADIUS, paint);
 
-    private void drawControl(Canvas c, RectF rect, String label, boolean active) {
-        paint.setColor(active ? Color.argb(175, 255, 255, 255) : Color.argb(110, 7, 13, 26));
-        c.drawRoundRect(rect, 18, 18, paint);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3);
-        paint.setColor(Color.argb(205, 255, 255, 255));
-        c.drawRoundRect(rect, 18, 18, paint);
+        paint.setStrokeWidth(4f);
+        paint.setColor(Color.argb(215, 255, 255, 255));
+        c.drawCircle(DPAD_X, DPAD_Y, DPAD_RADIUS, paint);
+
+        paint.setStrokeWidth(2f);
+        paint.setColor(Color.argb(90, 255, 255, 255));
+        for (int i = 0; i < 8; i++) {
+            double a = Math.toRadians(i * 45.0);
+            float x = DPAD_X + (float)Math.cos(a) * DPAD_RADIUS;
+            float y = DPAD_Y + (float)Math.sin(a) * DPAD_RADIUS;
+            c.drawLine(DPAD_X, DPAD_Y, x, y, paint);
+        }
         paint.setStyle(Paint.Style.FILL);
+
+        if (dpadDirection != 0) {
+            double angle = directionAngle(dpadDirection);
+            float hx = DPAD_X + (float)Math.cos(angle) * 72f;
+            float hy = DPAD_Y + (float)Math.sin(angle) * 72f;
+            paint.setColor(Color.argb(165, 255, 255, 255));
+            c.drawCircle(hx, hy, 31f, paint);
+        }
+
+        paint.setColor(Color.argb(175, 10, 18, 32));
+        c.drawCircle(DPAD_X, DPAD_Y, DPAD_DEADZONE, paint);
+
         paint.setColor(Color.WHITE);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(label.length() > 2 ? 22 : 38);
         paint.setFakeBoldText(true);
-        float y = rect.centerY() - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(label, rect.centerX(), y, paint);
+        paint.setTextSize(27f);
+        String[] labels = {"→","↘","↓","↙","←","↖","↑","↗"};
+        for (int i = 0; i < 8; i++) {
+            double a = Math.toRadians(i * 45.0);
+            float tx = DPAD_X + (float)Math.cos(a) * 78f;
+            float ty = DPAD_Y + (float)Math.sin(a) * 78f - (paint.ascent() + paint.descent()) / 2f;
+            c.drawText(labels[i], tx, ty, paint);
+        }
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private double directionAngle(int direction) {
+        switch (direction) {
+            case 1: return Math.toRadians(0);
+            case 2: return Math.toRadians(45);
+            case 3: return Math.toRadians(90);
+            case 4: return Math.toRadians(135);
+            case 5: return Math.toRadians(180);
+            case 6: return Math.toRadians(225);
+            case 7: return Math.toRadians(270);
+            case 8: return Math.toRadians(315);
+            default: return 0;
+        }
+    }
+
+    private boolean isDownDirection(int direction) {
+        return direction == 2 || direction == 3 || direction == 4;
+    }
+
+    private boolean isUpDirection(int direction) {
+        return direction == 6 || direction == 7 || direction == 8;
+    }
+
+    private void updateDpad(float x, float y, long nowMs) {
+        float dx = x - DPAD_X;
+        float dy = y - DPAD_Y;
+        float distance = (float)Math.sqrt(dx * dx + dy * dy);
+
+        int previous = dpadDirection;
+        int next = 0;
+
+        if (distance >= DPAD_DEADZONE) {
+            double degrees = Math.toDegrees(Math.atan2(dy, dx));
+            if (degrees < 0) degrees += 360.0;
+            int sector = ((int)Math.floor((degrees + 22.5) / 45.0)) % 8;
+            next = sector + 1;
+        }
+
+        dpadDirection = next;
+
+        movingLeft = next == 4 || next == 5 || next == 6;
+        movingRight = next == 1 || next == 2 || next == 8;
+        crouching = grounded && isDownDirection(next);
+
+        if (isDownDirection(next) && !isDownDirection(previous)) {
+            lastDownInputMs = nowMs;
+        }
+
+        if (isUpDirection(next) && !isUpDirection(previous) && grounded) {
+            boolean superJump = nowMs - lastDownInputMs <= 360L;
+            startJump(superJump);
+        }
+    }
+
+    private void clearDpad() {
+        dpadDirection = 0;
+        dpadPointer = -1;
+        movingLeft = false;
+        movingRight = false;
+        crouching = false;
     }
 
     @Override
@@ -341,43 +423,35 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float sy = getHeight() / VH;
         int action = event.getActionMasked();
         int index = event.getActionIndex();
-        int pointerId = event.getPointerId(index);
-        float x = event.getX(index) / sx;
-        float y = event.getY(index) / sy;
+        long nowMs = System.currentTimeMillis();
 
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-            if (leftButton.contains(x, y)) {
-                leftPointer = pointerId;
-                movingLeft = true;
-            } else if (rightButton.contains(x, y)) {
-                rightPointer = pointerId;
-                movingRight = true;
-            } else if (downButton.contains(x, y)) {
-                downPointer = pointerId;
-                crouching = grounded;
-            } else if (jumpButton.contains(x, y)) {
-                jump();
-            }
-        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_CANCEL) {
-            if (pointerId == leftPointer) {
-                movingLeft = false;
-                leftPointer = -1;
-            }
-            if (pointerId == rightPointer) {
-                movingRight = false;
-                rightPointer = -1;
-            }
-            if (pointerId == downPointer) {
-                crouching = false;
-                downPointer = -1;
-            }
+            int pointerId = event.getPointerId(index);
+            float x = event.getX(index) / sx;
+            float y = event.getY(index) / sy;
+            float dx = x - DPAD_X;
+            float dy = y - DPAD_Y;
 
-            if (action == MotionEvent.ACTION_CANCEL) {
-                movingLeft = false;
-                movingRight = false;
-                crouching = false;
-                leftPointer = rightPointer = downPointer = -1;
+            if (dpadPointer == -1 && dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS) {
+                dpadPointer = pointerId;
+                updateDpad(x, y, nowMs);
             }
+        } else if (action == MotionEvent.ACTION_MOVE) {
+            if (dpadPointer != -1) {
+                int pointerIndex = event.findPointerIndex(dpadPointer);
+                if (pointerIndex >= 0) {
+                    float x = event.getX(pointerIndex) / sx;
+                    float y = event.getY(pointerIndex) / sy;
+                    updateDpad(x, y, nowMs);
+                }
+            }
+        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
+            int pointerId = event.getPointerId(index);
+            if (pointerId == dpadPointer) {
+                clearDpad();
+            }
+        } else if (action == MotionEvent.ACTION_CANCEL) {
+            clearDpad();
         }
 
         return true;
