@@ -265,7 +265,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("MOVEMENT TEST", 975, 59, paint);
+        c.drawText("DPAD 8-WAY • v0.2", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
         String state = superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO")));
