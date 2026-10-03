@@ -338,6 +338,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return "S".equals(attackType) && attackTimer > 0f;
     }
 
+    private boolean isCrouchAttackActive() {
+        return attackTimer > 0f && (
+            "2L".equals(attackType) ||
+            "2M".equals(attackType) ||
+            "2H".equals(attackType)
+        );
+    }
+
     private void startJump(boolean superJump) {
         if (!grounded || isEnergyAttackActive()) return;
 
@@ -353,8 +361,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         forwardDashing = false;
         backDashTimer = 0f;
 
-        if ("L".equals(type)) attackDuration = 0.16f;
-        else if ("M".equals(type)) attackDuration = 0.26f;
+        if ("L".equals(type) || "2L".equals(type)) attackDuration = 0.16f;
+        else if ("M".equals(type) || "2M".equals(type)) attackDuration = 0.26f;
         else if ("S".equals(type)) attackDuration = 0.30f;
         else attackDuration = 0.40f;
 
@@ -710,7 +718,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("AIR ENERGY LOCK • v0.17", 975, 59, paint);
+        c.drawText("CROUCH ATTACKS • v0.18", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -793,7 +801,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             : 0f;
 
         float baseY = playerY + bob;
-        float bodyHeight = crouching ? 90f : 145f;
+        boolean crouchPose = crouching || isCrouchAttackActive();
+        float bodyHeight = crouchPose ? 90f : 145f;
         float top = baseY - bodyHeight;
 
         paint.setColor(Color.argb(70, 0, 0, 0));
@@ -803,7 +812,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(activeFighter().profile.color);
         c.drawCircle(playerX, top + 20, 25, paint);
 
-        paint.setStrokeWidth(crouching ? 22 : 25);
+        paint.setStrokeWidth(crouchPose ? 22 : 25);
         c.drawLine(playerX, top + 48, playerX, baseY - 45, paint);
 
         float legSwing = (grounded && !crouching && (movingLeft || movingRight))
@@ -813,11 +822,51 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float armSwing = -legSwing * 0.75f;
 
         paint.setStrokeWidth(18);
-        if (crouching) {
-            c.drawLine(playerX - 4, baseY - 70, playerX - 35, baseY - 38, paint);
-            c.drawLine(playerX + 4, baseY - 70, playerX + 38, baseY - 43, paint);
-            c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-            c.drawLine(playerX + 5, baseY - 42, playerX + 42, baseY - 8, paint);
+        if (crouchPose) {
+            float phase = attackPhase();
+
+            if ("2L".equals(attackType) && attackTimer > 0f) {
+                // Fraco agachado: golpe curto e rápido na linha baixa.
+                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
+                c.drawLine(
+                    playerX + 4,
+                    baseY - 70,
+                    playerX + 34 + 52f * phase,
+                    baseY - 48,
+                    paint
+                );
+                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
+                c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
+            } else if ("2M".equals(attackType) && attackTimer > 0f) {
+                // Médio agachado: chute baixo com alcance maior.
+                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
+                c.drawLine(playerX + 4, baseY - 70, playerX + 34, baseY - 43, paint);
+                c.drawLine(playerX - 5, baseY - 42, playerX - 36, baseY - 8, paint);
+                c.drawLine(
+                    playerX + 5,
+                    baseY - 42,
+                    playerX + 44 + 72f * phase,
+                    baseY - 12,
+                    paint
+                );
+            } else if ("2H".equals(attackType) && attackTimer > 0f) {
+                // Forte agachado: golpe mais amplo e pesado.
+                c.drawLine(playerX - 4, baseY - 70, playerX - 32, baseY - 38, paint);
+                c.drawLine(
+                    playerX + 4,
+                    baseY - 70,
+                    playerX + 42 + 82f * phase,
+                    baseY - 34 - 16f * phase,
+                    paint
+                );
+                c.drawLine(playerX - 5, baseY - 42, playerX - 46, baseY - 8, paint);
+                c.drawLine(playerX + 5, baseY - 42, playerX + 44, baseY - 8, paint);
+            } else {
+                c.drawLine(playerX - 4, baseY - 70, playerX - 35, baseY - 38, paint);
+                c.drawLine(playerX + 4, baseY - 70, playerX + 38, baseY - 43, paint);
+                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
+                c.drawLine(playerX + 5, baseY - 42, playerX + 42, baseY - 8, paint);
+            }
         } else {
             float phase = attackPhase();
 
@@ -1136,19 +1185,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 lightPointer = pointerId;
                 if (!tryFirePendingEnergy("L", nowMs)) {
                     resetAutoCombo();
-                    startAttack("L");
+                    startAttack(grounded && crouching ? "2L" : "L");
                 }
             } else if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) {
                 mediumPointer = pointerId;
                 if (!tryFirePendingEnergy("M", nowMs)) {
                     resetAutoCombo();
-                    startAttack("M");
+                    startAttack(grounded && crouching ? "2M" : "M");
                 }
             } else if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) {
                 heavyPointer = pointerId;
                 if (!tryFirePendingEnergy("H", nowMs)) {
                     resetAutoCombo();
-                    startAttack("H");
+                    startAttack(grounded && crouching ? "2H" : "H");
                 }
             } else if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) {
                 comboPointer = pointerId;
