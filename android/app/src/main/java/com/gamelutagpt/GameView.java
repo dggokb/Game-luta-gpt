@@ -311,6 +311,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float walkTime = 0f;
     private boolean attackHitApplied = false;
     private float playerDamageFlashTimer = 0f;
+    private float playerBlockFlashTimer = 0f;
+    private float playerBlockstunTimer = 0f;
+    private int playerLastGuardState = GUARD_NONE;
     private float playerHitReactionTimer = 0f;
     private float playerKnockbackVelocityX = 0f;
     private boolean playerMovementLocked = false;
@@ -326,6 +329,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final float jumpSpeed = 660f;
     private final float superJumpSpeed = 1450f;
     private final float gravity = 1650f;
+
+    private static final int GUARD_NONE = 0;
+    private static final int GUARD_HIGH = 1;
+    private static final int GUARD_LOW = 2;
+    private static final float BLOCKSTUN_DURATION = 0.18f;
+    private static final float BLOCK_PUSH_SPEED = 72f;
 
     private static final float DPAD_X = 175f;
     private static final float DPAD_Y = 555f;
@@ -980,6 +989,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             damage,
             direction,
             dummyAttackType,
+            dummyAirborne,
             aiSuperJumping
         );
         dummyAttackHitApplied = true;
@@ -1300,6 +1310,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                         projectile.damage,
                         projectile.direction,
                         "SUPER",
+                        false,
                         false
                     );
                     hit = true;
@@ -1762,6 +1773,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                         projectile.damage,
                         projectile.direction,
                         "S",
+                        false,
                         false
                     );
                     hit = true;
@@ -1908,12 +1920,82 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         playerDamageFlashTimer = 0.14f;
     }
 
+    private int currentPlayerGuardState() {
+        if (
+            !grounded ||
+            playerKnockdownState != DUMMY_KD_NONE ||
+            playerLaunchedByHit ||
+            playerGroundSlam ||
+            isTagAnimationActive() ||
+            isSuperCinematicActive() ||
+            attackTimer > 0f
+        ) {
+            return GUARD_NONE;
+        }
+
+        int relative = relativeDirection(dpadDirection);
+        if (relative == 5) return GUARD_HIGH;
+        if (relative == 4) return GUARD_LOW;
+        return GUARD_NONE;
+    }
+
+    private boolean isLowAttack(String type) {
+        return "2L".equals(type) || "2M".equals(type);
+    }
+
+    private boolean isProjectileOrSuper(String type) {
+        return "S".equals(type) || "SUPER".equals(type);
+    }
+
+    private boolean playerBlocksAttack(
+        String type,
+        boolean attackerAirborne
+    ) {
+        int guard = currentPlayerGuardState();
+        if (guard == GUARD_NONE) return false;
+
+        if (isProjectileOrSuper(type)) {
+            return true;
+        }
+
+        if (guard == GUARD_HIGH) {
+            return !isLowAttack(type);
+        }
+
+        if (guard == GUARD_LOW) {
+            return !attackerAirborne;
+        }
+
+        return false;
+    }
+
+    private void applyPlayerBlock(int hitDirection) {
+        int guard = currentPlayerGuardState();
+        playerLastGuardState = guard;
+        playerBlockFlashTimer = 0.12f;
+        playerBlockstunTimer = BLOCKSTUN_DURATION;
+        playerMovementLocked = true;
+        playerKnockbackVelocityX = hitDirection * BLOCK_PUSH_SPEED;
+
+        attackType = "";
+        attackTimer = 0f;
+        attackDuration = 0f;
+        attackHitApplied = false;
+        forwardDashing = false;
+        backDashTimer = 0f;
+    }
+
     private void applyPlayerHit(
         int damage,
         int hitDirection,
         String type,
+        boolean attackerAirborne,
         boolean attackerSuperJumping
     ) {
+        if (playerBlocksAttack(type, attackerAirborne)) {
+            applyPlayerBlock(hitDirection);
+            return;
+        }
         applyDamage(damage);
         if (activeFighter().life <= 0) {
             playerMovementLocked = true;
@@ -1976,6 +2058,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updatePlayerReceivedState(float dt) {
+        if (playerBlockFlashTimer > 0f) {
+            playerBlockFlashTimer = Math.max(
+                0f,
+                playerBlockFlashTimer - dt
+            );
+        }
+
+        if (playerBlockstunTimer > 0f) {
+            playerBlockstunTimer = Math.max(
+                0f,
+                playerBlockstunTimer - dt
+            );
+            playerX += playerKnockbackVelocityX * dt;
+            playerKnockbackVelocityX *= (float)Math.pow(0.018f, dt);
+
+            if (playerBlockstunTimer <= 0f) {
+                playerMovementLocked = false;
+                playerKnockbackVelocityX = 0f;
+                playerLastGuardState = GUARD_NONE;
+            }
+        }
+
         if (playerHitReactionTimer > 0f) {
             playerHitReactionTimer = Math.max(
                 0f,
@@ -1983,6 +2087,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             );
             if (
                 playerHitReactionTimer <= 0f &&
+                playerBlockstunTimer <= 0f &&
                 playerKnockdownState == DUMMY_KD_NONE &&
                 !playerLaunchedByHit &&
                 !playerGroundSlam
@@ -2177,7 +2282,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("AI OPPONENT • v0.33", 975, 59, paint);
+        c.drawText("HIGH/LOW GUARD • v0.34", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2246,6 +2351,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private String currentStateLabel() {
         if (playerKnockdownState != DUMMY_KD_NONE) return "DERRUBADO";
+        if (playerBlockstunTimer > 0f) {
+            return playerLastGuardState == GUARD_LOW
+                ? "BLOQUEIO BAIXO"
+                : "BLOQUEIO ALTO";
+        }
+        int guard = currentPlayerGuardState();
+        if (guard == GUARD_LOW) return "DEFESA BAIXA";
+        if (guard == GUARD_HIGH) return "DEFESA ALTA";
         if (playerGroundSlam) return "QUEDA FORÇADA";
         if (playerLaunchedByHit) return "LANÇADO";
         if (playerHitReactionTimer > 0f) return "HIT";
@@ -2834,10 +2947,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         paint.setStrokeCap(Paint.Cap.ROUND);
-        int playerColor =
-            playerDamageFlashTimer > 0f
-                ? Color.WHITE
-                : activeFighter().profile.color;
+        int playerColor;
+        if (playerBlockFlashTimer > 0f) {
+            playerColor = Color.rgb(205, 240, 255);
+        } else if (playerDamageFlashTimer > 0f) {
+            playerColor = Color.WHITE;
+        } else {
+            playerColor = activeFighter().profile.color;
+        }
         paint.setColor(playerColor);
         c.drawCircle(playerX, top + 20, 25, paint);
 
@@ -2851,7 +2968,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float armSwing = -legSwing * 0.75f;
 
         paint.setStrokeWidth(18);
-        if (crouchPose) {
+        int guardPose = playerBlockstunTimer > 0f
+            ? playerLastGuardState
+            : currentPlayerGuardState();
+
+        if (guardPose == GUARD_HIGH) {
+            // Defesa alta: braços protegem cabeça/torso.
+            c.drawLine(playerX - 3, top + 58, playerX - 25, top + 34, paint);
+            c.drawLine(playerX + 3, top + 58, playerX + 28, top + 33, paint);
+            c.drawLine(playerX - 4, baseY - 45, playerX - 29, baseY, paint);
+            c.drawLine(playerX + 4, baseY - 45, playerX + 31, baseY, paint);
+        } else if (guardPose == GUARD_LOW) {
+            // Defesa baixa: postura agachada protegendo linha inferior.
+            c.drawLine(playerX - 4, baseY - 70, playerX - 31, baseY - 47, paint);
+            c.drawLine(playerX + 4, baseY - 70, playerX + 35, baseY - 50, paint);
+            c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
+            c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
+        } else if (crouchPose) {
             float phase = attackPhase();
 
             if ("2L".equals(attackType) && attackTimer > 0f) {
