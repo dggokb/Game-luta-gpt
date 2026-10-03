@@ -412,22 +412,37 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void tryEnergyCommand(long nowMs) {
         FighterProfile profile = activeFighter().profile;
         if (!profile.hasEnergyAttack || profile.energyCommand.length == 0) return;
+        if (attackTimer > 0f) return;
         if (commandCount < profile.energyCommand.length) return;
 
-        int start = commandCount - profile.energyCommand.length;
+        int commandIndex = profile.energyCommand.length - 1;
+        int bufferIndex = commandCount - 1;
+        long lastMatchedTime = -1L;
+        long firstMatchedTime = -1L;
 
-        for (int i = 0; i < profile.energyCommand.length; i++) {
-            if (commandDirections[start + i] != profile.energyCommand[i]) return;
+        // Procura a sequência de trás para frente e permite diagonais/intermediários.
+        // Ex.: ↓ ↘ → continua reconhecendo o comando configurado ↓ →.
+        while (commandIndex >= 0 && bufferIndex >= 0) {
+            if (commandDirections[bufferIndex] == profile.energyCommand[commandIndex]) {
+                long matchedTime = commandTimes[bufferIndex];
 
-            if (
-                i > 0 &&
-                commandTimes[start + i] - commandTimes[start + i - 1] > ENERGY_COMMAND_STEP_MS
-            ) {
-                return;
+                if (
+                    lastMatchedTime > 0L &&
+                    lastMatchedTime - matchedTime > ENERGY_COMMAND_STEP_MS
+                ) {
+                    return;
+                }
+
+                lastMatchedTime = matchedTime;
+                firstMatchedTime = matchedTime;
+                commandIndex--;
             }
+            bufferIndex--;
         }
 
+        if (commandIndex >= 0) return;
         if (nowMs - commandTimes[commandCount - 1] > ENERGY_COMMAND_STEP_MS) return;
+        if (nowMs - firstMatchedTime > ENERGY_COMMAND_STEP_MS * profile.energyCommand.length) return;
 
         fireEnergyAttack();
 
@@ -977,7 +992,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (next == 1 && previous != 1) {
-            if (grounded && nowMs - lastForwardTapMs <= DASH_DOUBLE_TAP_MS) {
+            if (
+                !"S".equals(attackType) &&
+                grounded &&
+                nowMs - lastForwardTapMs <= DASH_DOUBLE_TAP_MS
+            ) {
                 forwardDashing = true;
                 backDashTimer = 0f;
             }
@@ -989,7 +1008,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (next == 5 && previous != 5) {
-            if (grounded && nowMs - lastBackTapMs <= DASH_DOUBLE_TAP_MS) {
+            if (
+                !"S".equals(attackType) &&
+                grounded &&
+                nowMs - lastBackTapMs <= DASH_DOUBLE_TAP_MS
+            ) {
                 backDashTimer = backDashDuration;
                 forwardDashing = false;
             }
