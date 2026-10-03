@@ -551,7 +551,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("ENERGY • v1.0", 975, 59, paint);
+        c.drawText("ENERGY • v0.10", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
