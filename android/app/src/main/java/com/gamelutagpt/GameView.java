@@ -232,6 +232,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DUMMY_KD_FALL_DURATION = 0.22f;
     private static final float DUMMY_KD_DOWN_DURATION = 1.20f;
     private static final float DUMMY_KD_GETUP_DURATION = 0.35f;
+    private static final int DUMMY_LIGHT_DAMAGE = 300;
+    private static final float DUMMY_LIGHT_ATTACK_DURATION = 0.30f;
+    private static final float DUMMY_LIGHT_COOLDOWN = 1.10f;
+    private static final float DUMMY_LIGHT_TRIGGER_RANGE = 142f;
+    private static final float DUMMY_LIGHT_HIT_RANGE = 128f;
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
     private float dummyVelocityY = 0f;
@@ -246,6 +251,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float dummyDamageLabelTimer = 0f;
     private float dummyHitReactionTimer = 0f;
     private float dummyKnockbackVelocityX = 0f;
+    private float dummyAttackTimer = 0f;
+    private float dummyAttackCooldownRemaining = 0f;
+    private boolean dummyAttackHitApplied = false;
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -277,6 +285,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float attackDuration = 0f;
     private float walkTime = 0f;
     private boolean attackHitApplied = false;
+    private float playerDamageFlashTimer = 0f;
 
     private final float moveSpeed = 300f;
     private final float forwardDashSpeed = 620f;
@@ -499,9 +508,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (dummyDamageLabelTimer > 0f) {
             dummyDamageLabelTimer = Math.max(0f, dummyDamageLabelTimer - dt);
         }
+        if (playerDamageFlashTimer > 0f) {
+            playerDamageFlashTimer = Math.max(0f, playerDamageFlashTimer - dt);
+        }
+
         updateDummyHitReaction(dt);
         updateDummyKnockdown(dt);
         updateDummyAirState(dt);
+        updateDummyAttack(dt);
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
@@ -580,6 +594,85 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         float verticalFollow = 1f - (float)Math.pow(0.00035f, dt);
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
+    }
+
+    private boolean canDummyAttack() {
+        return
+            dummyLife > 0 &&
+            activeFighter().life > 0 &&
+            dummyKnockdownState == DUMMY_KD_NONE &&
+            !dummyAirborne &&
+            !dummyMovementLocked &&
+            dummyHitReactionTimer <= 0f &&
+            !isTagAnimationActive() &&
+            !isSuperCinematicActive();
+    }
+
+    private void startDummyLightAttack() {
+        dummyAttackTimer = DUMMY_LIGHT_ATTACK_DURATION;
+        dummyAttackHitApplied = false;
+    }
+
+    private void updateDummyAttack(float dt) {
+        if (dummyAttackCooldownRemaining > 0f) {
+            dummyAttackCooldownRemaining = Math.max(
+                0f,
+                dummyAttackCooldownRemaining - dt
+            );
+        }
+
+        if (!canDummyAttack()) {
+            if (
+                dummyLife <= 0 ||
+                activeFighter().life <= 0 ||
+                dummyKnockdownState != DUMMY_KD_NONE ||
+                dummyAirborne ||
+                dummyHitReactionTimer > 0f ||
+                isTagAnimationActive() ||
+                isSuperCinematicActive()
+            ) {
+                dummyAttackTimer = 0f;
+                dummyAttackHitApplied = false;
+            }
+            return;
+        }
+
+        if (dummyAttackTimer <= 0f) {
+            float distance = Math.abs(playerX - dummyX);
+            boolean playerInGroundLine =
+                grounded &&
+                Math.abs(playerY - GROUND_Y) < 4f;
+
+            if (
+                dummyAttackCooldownRemaining <= 0f &&
+                playerInGroundLine &&
+                distance <= DUMMY_LIGHT_TRIGGER_RANGE
+            ) {
+                startDummyLightAttack();
+            }
+            return;
+        }
+
+        dummyAttackTimer = Math.max(0f, dummyAttackTimer - dt);
+        float progress =
+            1f - dummyAttackTimer / DUMMY_LIGHT_ATTACK_DURATION;
+
+        if (!dummyAttackHitApplied && progress >= 0.46f) {
+            float distance = Math.abs(playerX - dummyX);
+
+            if (
+                grounded &&
+                distance <= DUMMY_LIGHT_HIT_RANGE
+            ) {
+                applyDamage(DUMMY_LIGHT_DAMAGE);
+                dummyAttackHitApplied = true;
+            }
+        }
+
+        if (dummyAttackTimer <= 0f) {
+            dummyAttackCooldownRemaining = DUMMY_LIGHT_COOLDOWN;
+            dummyAttackHitApplied = false;
+        }
     }
 
     private float dummyTop() {
@@ -1158,6 +1251,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void applyDummyDamage(int damage, int hitDirection) {
         if (damage <= 0 || dummyLife <= 0) return;
 
+        dummyAttackTimer = 0f;
+        dummyAttackHitApplied = false;
+        dummyAttackCooldownRemaining = Math.max(
+            dummyAttackCooldownRemaining,
+            0.35f
+        );
+
         int applied = Math.min(damage, dummyLife);
         dummyLife -= applied;
         dummyLifeHudLabel = dummyLife + " / " + DUMMY_MAX_LIFE;
@@ -1399,8 +1499,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void applyDamage(int damage) {
         if (damage <= 0) return;
         FighterState fighter = activeFighter();
+        if (fighter.life <= 0) return;
+
         fighter.life = Math.max(0, fighter.life - damage);
         fighter.refreshHudLabels();
+        playerDamageFlashTimer = 0.14f;
     }
 
     private float attackPhase() {
@@ -1561,7 +1664,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SWEEP KNOCKDOWN • v0.31", 975, 59, paint);
+        c.drawText("DUMMY ATTACK • v0.32", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1820,7 +1923,44 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
 
         paint.setStrokeWidth(18f);
-        if (dummyHitReactionTimer > 0f) {
+        if (dummyAttackTimer > 0f) {
+            float attackProgress =
+                1f - dummyAttackTimer / DUMMY_LIGHT_ATTACK_DURATION;
+            float attackPhase =
+                attackProgress < 0.5f
+                    ? attackProgress * 2f
+                    : (1f - attackProgress) * 2f;
+
+            // Braço da frente estende para o jogador.
+            c.drawLine(
+                shoulderX - 3f,
+                top + 58f,
+                dummyX - 30f,
+                top + 98f,
+                paint
+            );
+            c.drawLine(
+                shoulderX + 3f,
+                top + 58f,
+                dummyX + 36f + 78f * attackPhase,
+                top + 66f,
+                paint
+            );
+            c.drawLine(
+                hipX - 4f,
+                baseY - 45f,
+                dummyX - 28f,
+                baseY,
+                paint
+            );
+            c.drawLine(
+                hipX + 4f,
+                baseY - 45f,
+                dummyX + 28f,
+                baseY,
+                paint
+            );
+        } else if (dummyHitReactionTimer > 0f) {
             // Braços abrem e o tronco recua no impacto.
             c.drawLine(
                 shoulderX - 3f,
@@ -1898,6 +2038,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             dummyStatusLabel = "NPC TESTE • NO CHÃO";
         } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
             dummyStatusLabel = "NPC TESTE • LEVANTANDO";
+        } else if (dummyAttackTimer > 0f) {
+            dummyStatusLabel = "NPC TESTE • ATAQUE L";
         } else if (dummyGroundSlam) {
             dummyStatusLabel = "NPC TESTE • QUEDA FORÇADA";
         } else if (dummyMovementLocked) {
@@ -2074,7 +2216,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawOval(playerX - 43, GROUND_Y - 10, playerX + 43, GROUND_Y + 10, paint);
 
         paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setColor(activeFighter().profile.color);
+        int playerColor =
+            playerDamageFlashTimer > 0f
+                ? Color.WHITE
+                : activeFighter().profile.color;
+        paint.setColor(playerColor);
         c.drawCircle(playerX, top + 20, 25, paint);
 
         paint.setStrokeWidth(crouchPose ? 22 : 25);
