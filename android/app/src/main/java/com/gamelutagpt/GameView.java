@@ -577,8 +577,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateEnergyProjectiles(dt);
         updateSuperProjectiles(dt);
 
+        int anticipatedGuard = anticipatedPlayerGuardPose();
+
         float direction = 0f;
         if (
+            anticipatedGuard == GUARD_NONE &&
             !playerMovementLocked &&
             !isEnergyAttackActive() &&
             !isTagAnimationActive()
@@ -1969,6 +1972,72 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return false;
     }
 
+    private boolean incomingAiProjectileThreat() {
+        int guard = currentPlayerGuardState();
+        if (guard == GUARD_NONE) return false;
+
+        for (EnergyProjectile projectile : energyProjectiles) {
+            if (projectile.ownerIndex != AI_OWNER_INDEX) continue;
+
+            float toPlayer = playerX - projectile.x;
+            if (toPlayer * projectile.direction >= -24f) {
+                return true;
+            }
+        }
+
+        for (SuperProjectile projectile : superProjectiles) {
+            if (projectile.ownerIndex != AI_OWNER_INDEX) continue;
+
+            float toPlayer = playerX - projectile.x;
+            if (toPlayer * projectile.direction >= -58f) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean incomingAiMeleeThreat() {
+        if (
+            dummyAttackTimer <= 0f ||
+            dummyAttackType.length() == 0 ||
+            "S".equals(dummyAttackType)
+        ) {
+            return false;
+        }
+
+        if (!playerBlocksAttack(dummyAttackType, dummyAirborne)) {
+            return false;
+        }
+
+        float reach = reachForAttack(dummyAttackType);
+        if (reach <= 0f) return false;
+
+        float phase = aiAttackPhase();
+        if (phase < 0.40f) return false;
+
+        int direction = opponentFacingDirection();
+        float horizontalDistance = (playerX - dummyX) * direction;
+
+        return
+            horizontalDistance >= 0f &&
+            horizontalDistance <= reach + 34f;
+    }
+
+    private int anticipatedPlayerGuardPose() {
+        int guard = currentPlayerGuardState();
+        if (guard == GUARD_NONE) return GUARD_NONE;
+
+        if (
+            incomingAiProjectileThreat() ||
+            incomingAiMeleeThreat()
+        ) {
+            return guard;
+        }
+
+        return GUARD_NONE;
+    }
+
     private void applyPlayerBlock(int hitDirection) {
         int guard = currentPlayerGuardState();
         playerLastGuardState = guard;
@@ -2296,7 +2365,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("WALK BACK GUARD • v0.36", 975, 59, paint);
+        c.drawText("GUARD ANTICIPATION • v0.37", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2370,9 +2439,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 ? "BLOQUEIO BAIXO"
                 : "BLOQUEIO ALTO";
         }
+        int anticipatedGuard = anticipatedPlayerGuardPose();
+        if (anticipatedGuard == GUARD_LOW) return "DEFENDENDO BAIXO";
+        if (anticipatedGuard == GUARD_HIGH) return "DEFENDENDO ALTO";
+
         int guard = currentPlayerGuardState();
-        if (guard == GUARD_LOW) return "DEFESA BAIXA";
-        if (guard == GUARD_HIGH) return "DEFESA ALTA";
+        if (guard == GUARD_LOW) return "PRONTO BAIXO";
+        if (guard == GUARD_HIGH) return "PRONTO ALTO";
         if (playerGroundSlam) return "QUEDA FORÇADA";
         if (playerLaunchedByHit) return "LANÇADO";
         if (playerHitReactionTimer > 0f) return "HIT";
@@ -2984,7 +3057,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setStrokeWidth(18);
         int guardPose = playerBlockstunTimer > 0f
             ? playerLastGuardState
-            : GUARD_NONE;
+            : anticipatedPlayerGuardPose();
 
         if (guardPose == GUARD_HIGH) {
             // Defesa alta: braços protegem cabeça/torso.
