@@ -150,6 +150,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float attackTimer = 0f;
     private float attackDuration = 0f;
     private float walkTime = 0f;
+    private float energyAirDirection = 0f;
 
     private final float moveSpeed = 300f;
     private final float forwardDashSpeed = 620f;
@@ -281,8 +282,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateEnergyProjectiles(dt);
 
         float direction = 0f;
-        if (movingLeft && !movingRight) direction = -1f;
-        if (movingRight && !movingLeft) direction = 1f;
+        if (isEnergyAttackActive() && !grounded) {
+            direction = energyAirDirection;
+        } else {
+            if (movingLeft && !movingRight) direction = -1f;
+            if (movingRight && !movingLeft) direction = 1f;
+        }
 
         if (attackTimer > 0f && grounded) {
             // No chão, ataques travam o deslocamento horizontal.
@@ -331,8 +336,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
     }
 
+    private boolean isEnergyAttackActive() {
+        return "S".equals(attackType) && attackTimer > 0f;
+    }
+
     private void startJump(boolean superJump) {
-        if (!grounded) return;
+        if (!grounded || isEnergyAttackActive()) return;
 
         grounded = false;
         crouching = false;
@@ -373,6 +382,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         resetAutoCombo();
+
+        energyAirDirection = 0f;
+        if (!grounded) {
+            if (movingLeft && !movingRight) energyAirDirection = -1f;
+            else if (movingRight && !movingLeft) energyAirDirection = 1f;
+        }
+
         startAttack("S");
 
         float spawnY = playerY - (crouching ? 65f : 82f);
@@ -676,7 +692,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("ENERGY STRENGTH • v0.13", 975, 59, paint);
+        c.drawText("ENERGY LOCK • v0.14", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -998,6 +1014,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateDpad(float x, float y, long nowMs) {
+        if (isEnergyAttackActive()) return;
+
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
         float distance = (float)Math.sqrt(dx * dx + dy * dy);
@@ -1086,6 +1104,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
+            if (isEnergyAttackActive()) {
+                return true;
+            }
+
             if (
                 dpadPointer == -1 &&
                 dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS
@@ -1118,7 +1140,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 switchFighter();
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            if (dpadPointer != -1) {
+            if (!isEnergyAttackActive() && dpadPointer != -1) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);
                 if (pointerIndex >= 0) {
                     float x = event.getX(pointerIndex) / sx;
@@ -1132,7 +1154,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         ) {
             int pointerId = event.getPointerId(index);
 
-            if (pointerId == dpadPointer) clearDpad();
+            if (pointerId == dpadPointer) {
+                if (isEnergyAttackActive()) {
+                    dpadPointer = -1;
+                    dpadDirection = 0;
+                    movingLeft = false;
+                    movingRight = false;
+                    crouching = false;
+                    forwardDashing = false;
+                } else {
+                    clearDpad();
+                }
+            }
             if (pointerId == lightPointer) lightPointer = -1;
             if (pointerId == mediumPointer) mediumPointer = -1;
             if (pointerId == heavyPointer) heavyPointer = -1;
