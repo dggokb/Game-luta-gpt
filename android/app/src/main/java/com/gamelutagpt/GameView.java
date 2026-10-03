@@ -23,6 +23,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final float energyRange;
         final float energySpeed;
         final int energyDamage;
+        final int[] energyCommand;
 
         FighterProfile(
             String name,
@@ -32,7 +33,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             boolean hasEnergyAttack,
             float energyRange,
             float energySpeed,
-            int energyDamage
+            int energyDamage,
+            int[] energyCommand
         ) {
             this.name = name;
             this.baseCombo = baseCombo;
@@ -42,6 +44,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.energyRange = energyRange;
             this.energySpeed = energySpeed;
             this.energyDamage = energyDamage;
+            this.energyCommand = energyCommand;
         }
     }
 
@@ -94,17 +97,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             true,
             720f,
             760f,
-            850
+            850,
+            new int[]{3, 1}
         )),
         new FighterState(new FighterProfile(
             "PLAYER 2",
             new String[]{"L", "L", "H", "M"},
             10000,
             Color.rgb(74, 205, 232),
-            false,
-            0f,
-            0f,
-            0
+            true,
+            560f,
+            980f,
+            650,
+            new int[]{5, 1}
         ))
     };
 
@@ -175,10 +180,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float TAG_Y = 505f;
     private static final float TAG_RADIUS = 43f;
 
-    private static final float ENERGY_X = 1205f;
-    private static final float ENERGY_Y = 475f;
-    private static final float ENERGY_RADIUS = 43f;
-
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
     private int dpadDirection = 0;
@@ -193,11 +194,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int heavyPointer = -1;
     private int comboPointer = -1;
     private int tagPointer = -1;
-    private int energyPointer = -1;
 
     private int autoComboIndex = 0;
     private long lastAutoComboTapMs = -1000L;
     private static final long AUTO_COMBO_RESET_MS = 700L;
+
+    private static final int COMMAND_BUFFER_SIZE = 8;
+    private static final long ENERGY_COMMAND_STEP_MS = 420L;
+    private final int[] commandDirections = new int[COMMAND_BUFFER_SIZE];
+    private final long[] commandTimes = new long[COMMAND_BUFFER_SIZE];
+    private int commandCount = 0;
 
     public GameView(Context context) {
         super(context);
@@ -292,7 +298,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (!grounded) {
-            velocityY += gravity * dt;
+            float activeGravity =
+                ("S".equals(attackType) && attackTimer > 0f)
+                    ? gravity * 0.28f
+                    : gravity;
+
+            velocityY += activeGravity * dt;
             playerY += velocityY * dt;
             if (playerY >= GROUND_Y) {
                 playerY = GROUND_Y;
@@ -375,6 +386,61 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
+    private void recordCommandDirection(int direction, long nowMs) {
+        if (direction == 0) return;
+
+        if (commandCount > 0 && commandDirections[commandCount - 1] == direction) {
+            commandTimes[commandCount - 1] = nowMs;
+            return;
+        }
+
+        if (commandCount >= COMMAND_BUFFER_SIZE) {
+            for (int i = 1; i < COMMAND_BUFFER_SIZE; i++) {
+                commandDirections[i - 1] = commandDirections[i];
+                commandTimes[i - 1] = commandTimes[i];
+            }
+            commandCount = COMMAND_BUFFER_SIZE - 1;
+        }
+
+        commandDirections[commandCount] = direction;
+        commandTimes[commandCount] = nowMs;
+        commandCount++;
+
+        tryEnergyCommand(nowMs);
+    }
+
+    private void tryEnergyCommand(long nowMs) {
+        FighterProfile profile = activeFighter().profile;
+        if (!profile.hasEnergyAttack || profile.energyCommand.length == 0) return;
+        if (commandCount < profile.energyCommand.length) return;
+
+        int start = commandCount - profile.energyCommand.length;
+
+        for (int i = 0; i < profile.energyCommand.length; i++) {
+            if (commandDirections[start + i] != profile.energyCommand[i]) return;
+
+            if (
+                i > 0 &&
+                commandTimes[start + i] - commandTimes[start + i - 1] > ENERGY_COMMAND_STEP_MS
+            ) {
+                return;
+            }
+        }
+
+        if (nowMs - commandTimes[commandCount - 1] > ENERGY_COMMAND_STEP_MS) return;
+
+        fireEnergyAttack();
+
+        // O comando foi consumido; evita disparos duplicados e conflitos com dash.
+        commandCount = 0;
+        forwardDashing = false;
+        backDashTimer = 0f;
+    }
+
+    private void resetCommandBuffer() {
+        commandCount = 0;
+    }
+
     private void resetAutoCombo() {
         autoComboIndex = 0;
         lastAutoComboTapMs = -1000L;
@@ -408,6 +474,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         forwardDashing = false;
         backDashTimer = 0f;
         resetAutoCombo();
+        resetCommandBuffer();
 
         // Posição, altura, velocidade vertical e câmera são compartilhadas.
         // Assim a troca mantém exatamente o mesmo estado de movimento.
@@ -563,7 +630,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("RENDER FIX • v0.11", 975, 59, paint);
+        c.drawText("COMMAND ENERGY • v0.12", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -772,7 +839,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", heavyPointer != -1);
         drawComboButton(c);
         drawTagButton(c);
-        drawEnergyButton(c);
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
@@ -851,41 +917,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    private void drawEnergyButton(Canvas c) {
-        FighterProfile profile = activeFighter().profile;
-        boolean enabled = profile.hasEnergyAttack;
-        boolean pressed = energyPointer != -1;
-
-        if (!enabled) {
-            paint.setColor(Color.argb(80, 55, 60, 68));
-        } else if (pressed) {
-            paint.setColor(profile.color);
-        } else {
-            paint.setColor(Color.argb(145, 7, 13, 26));
-        }
-        c.drawCircle(ENERGY_X, ENERGY_Y, ENERGY_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        paint.setColor(enabled ? profile.color : Color.argb(100, 180, 180, 180));
-        c.drawCircle(ENERGY_X, ENERGY_Y, ENERGY_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(enabled ? Color.WHITE : Color.argb(130, 200, 200, 200));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(16f);
-        paint.setFakeBoldText(true);
-        float textY = ENERGY_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(enabled ? "S / KI" : "SEM KI", ENERGY_X, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
-
-        // Não deixar alpha/estilo do estado desabilitado vazar para o próximo frame.
-        paint.setAlpha(255);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE);
-    }
-
     private boolean insideCircle(
         float x,
         float y,
@@ -940,6 +971,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         movingLeft = next == 4 || next == 5 || next == 6;
         movingRight = next == 1 || next == 2 || next == 8;
         crouching = grounded && isDownDirection(next);
+
+        if (next != 0 && next != previous) {
+            recordCommandDirection(next, nowMs);
+        }
 
         if (next == 1 && previous != 1) {
             if (grounded && nowMs - lastForwardTapMs <= DASH_DOUBLE_TAP_MS) {
@@ -1020,12 +1055,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             } else if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) {
                 tagPointer = pointerId;
                 switchFighter();
-            } else if (
-                insideCircle(x, y, ENERGY_X, ENERGY_Y, ENERGY_RADIUS) &&
-                activeFighter().profile.hasEnergyAttack
-            ) {
-                energyPointer = pointerId;
-                fireEnergyAttack();
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (dpadPointer != -1) {
@@ -1048,7 +1077,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == heavyPointer) heavyPointer = -1;
             if (pointerId == comboPointer) comboPointer = -1;
             if (pointerId == tagPointer) tagPointer = -1;
-            if (pointerId == energyPointer) energyPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
             clearDpad();
             lightPointer = -1;
@@ -1056,7 +1084,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             heavyPointer = -1;
             comboPointer = -1;
             tagPointer = -1;
-            energyPointer = -1;
         }
 
         return true;
