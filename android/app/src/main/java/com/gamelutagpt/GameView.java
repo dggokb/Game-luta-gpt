@@ -222,7 +222,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DUMMY_HALF_WIDTH = 34f;
     private static final int DUMMY_MAX_LIFE = 10000;
     private static final float DUMMY_HIT_REACTION_DURATION = 0.22f;
-    private static final float DUMMY_LAUNCH_SPEED = 820f;
+    private static final float DUMMY_LAUNCH_SPEED = 1450f;
     private static final float DUMMY_GRAVITY = 1650f;
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
@@ -1472,7 +1472,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("2H LAUNCHER • v0.27", 975, 59, paint);
+        c.drawText("SUPER JUMP LAUNCHER • v0.28", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
