@@ -256,6 +256,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         lastAutoComboTapMs = nowMs;
     }
 
+    private void applyDamage(int damage) {
+        if (damage <= 0) return;
+        playerLife = Math.max(0, playerLife - damage);
+    }
+
     private float attackPhase() {
         if (attackTimer <= 0f || attackDuration <= 0f) return 0f;
         float t = 1f - attackTimer / attackDuration;
@@ -368,6 +373,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         if (lifeRatio > 0f) {
             float filledRight = lifeLeft + lifeWidth * lifeRatio;
+            paint.setColor(lifeColor);
             c.drawRoundRect(lifeLeft, lifeTop, filledRight, lifeBottom, 8, 8, paint);
         }
 
