@@ -165,7 +165,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (movingLeft && !movingRight) direction = -1f;
         if (movingRight && !movingLeft) direction = 1f;
 
-        if (backDashTimer > 0f && grounded) {
+        if (attackTimer > 0f) {
+            // Ataques travam o deslocamento horizontal durante toda a animação.
+            walkTime = 0f;
+        } else if (backDashTimer > 0f && grounded) {
             playerX -= backDashSpeed * dt;
             backDashTimer = Math.max(0f, backDashTimer - dt);
             walkTime += dt * 13f;
@@ -358,7 +361,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("COMBO • v0.5", 975, 59, paint);
+        c.drawText("ATTACK LOCK • v0.6", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
         String state = attackTimer > 0f ? "ATAQUE " + attackType : (backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
