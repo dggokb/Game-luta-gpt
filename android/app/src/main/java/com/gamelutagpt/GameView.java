@@ -282,9 +282,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateEnergyProjectiles(dt);
 
         float direction = 0f;
-        if (isEnergyAttackActive() && !grounded) {
-            direction = energyAirDirection;
-        } else {
+        if (!isEnergyAttackActive()) {
             if (movingLeft && !movingRight) direction = -1f;
             if (movingRight && !movingLeft) direction = 1f;
         }
@@ -393,12 +391,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         energyAirDirection = 0f;
         if (!grounded) {
-            if (movingLeft && !movingRight) energyAirDirection = -1f;
-            else if (movingRight && !movingLeft) energyAirDirection = 1f;
-
-            // O Super Jump carrega muita velocidade vertical. Só reduzir a gravidade
-            // não era visualmente suficiente, então amortecemos a inércia vertical
-            // ao iniciar o especial aéreo para criar o efeito de "flutuação".
+            // Durante o especial aéreo o deslocamento horizontal trava.
+            // A componente vertical continua com inércia amortecida e gravidade reduzida.
             velocityY *= 0.32f;
         }
 
@@ -716,7 +710,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("AIR ENERGY FLOAT • v0.16", 975, 59, paint);
+        c.drawText("AIR ENERGY LOCK • v0.17", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
