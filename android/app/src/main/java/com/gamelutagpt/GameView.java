@@ -24,6 +24,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final float energySpeed;
         final int energyDamage;
         final int[] energyCommand;
+        final boolean hasSuperAttack;
+        final float superRange;
+        final float superSpeed;
+        final int superDamage;
 
         FighterProfile(
             String name,
@@ -34,7 +38,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float energyRange,
             float energySpeed,
             int energyDamage,
-            int[] energyCommand
+            int[] energyCommand,
+            boolean hasSuperAttack,
+            float superRange,
+            float superSpeed,
+            int superDamage
         ) {
             this.name = name;
             this.baseCombo = baseCombo;
@@ -45,6 +53,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.energySpeed = energySpeed;
             this.energyDamage = energyDamage;
             this.energyCommand = energyCommand;
+            this.hasSuperAttack = hasSuperAttack;
+            this.superRange = superRange;
+            this.superSpeed = superSpeed;
+            this.superDamage = superDamage;
         }
     }
 
@@ -88,6 +100,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
+    private static final class SuperProjectile {
+        float x;
+        final float y;
+        final float startX;
+        final float range;
+        final float speed;
+        final int damage;
+        final int color;
+        final int ownerIndex;
+
+        SuperProjectile(
+            float x,
+            float y,
+            float range,
+            float speed,
+            int damage,
+            int color,
+            int ownerIndex
+        ) {
+            this.x = x;
+            this.y = y;
+            this.startX = x;
+            this.range = range;
+            this.speed = speed;
+            this.damage = damage;
+            this.color = color;
+            this.ownerIndex = ownerIndex;
+        }
+    }
+
     private final FighterState[] team = new FighterState[] {
         new FighterState(new FighterProfile(
             "PLAYER 1",
@@ -98,7 +140,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             720f,
             760f,
             850,
-            new int[]{3, 1}
+            new int[]{3, 1},
+            true,
+            1450f,
+            1180f,
+            3200
         )),
         new FighterState(new FighterProfile(
             "PLAYER 2",
@@ -109,12 +155,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             560f,
             980f,
             650,
-            new int[]{5, 1}
+            new int[]{5, 1},
+            true,
+            1320f,
+            1280f,
+            2850
         ))
     };
 
     private int activeFighterIndex = 0;
     private final List<EnergyProjectile> energyProjectiles = new ArrayList<>();
+    private final List<SuperProjectile> superProjectiles = new ArrayList<>();
 
     private static final float VW = 1280f;
     private static final float VH = 720f;
@@ -181,6 +232,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float TAG_Y = 505f;
     private static final float TAG_RADIUS = 43f;
 
+    private static final float SUPER_X = 905f;
+    private static final float SUPER_Y = 620f;
+    private static final float SUPER_RADIUS = 46f;
+
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
     private int dpadDirection = 0;
@@ -195,6 +250,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int heavyPointer = -1;
     private int comboPointer = -1;
     private int tagPointer = -1;
+    private int superPointer = -1;
+
+    private static final int SUPER_IDLE = 0;
+    private static final int SUPER_DARKEN = 1;
+    private static final int SUPER_POSE = 2;
+    private static final int SUPER_FLASH = 3;
+    private static final int SUPER_RELEASE = 4;
+    private static final int SUPER_RECOVER = 5;
+    private static final float SUPER_DARKEN_DURATION = 0.16f;
+    private static final float SUPER_POSE_DURATION = 0.30f;
+    private static final float SUPER_FLASH_DURATION = 0.12f;
+    private static final float SUPER_RELEASE_DURATION = 0.20f;
+    private static final float SUPER_RECOVER_DURATION = 0.22f;
+    private int superPhase = SUPER_IDLE;
+    private float superPhaseTimer = 0f;
+    private float superCameraZoom = 1f;
+    private int superDarkAlpha = 0;
+    private int superFlashAlpha = 0;
+    private float superStoredVelocityY = 0f;
 
     private static final int TAG_IDLE = 0;
     private static final int TAG_EXIT = 1;
@@ -288,7 +362,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void update(float dt) {
+        updateSuperState(dt);
         updateTagState(dt);
+
+        if (isSuperCinematicActive()) {
+            updateSuperProjectiles(dt);
+            return;
+        }
 
         if (attackTimer > 0f) {
             attackTimer = Math.max(0f, attackTimer - dt);
@@ -296,6 +376,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         updateEnergyProjectiles(dt);
+        updateSuperProjectiles(dt);
 
         float direction = 0f;
         if (!isEnergyAttackActive() && !isTagAnimationActive()) {
@@ -350,6 +431,136 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         float verticalFollow = 1f - (float)Math.pow(0.00035f, dt);
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
+    }
+
+    private boolean isSuperCinematicActive() {
+        return superPhase != SUPER_IDLE;
+    }
+
+    private boolean isSuperPoseActive() {
+        return superPhase == SUPER_POSE ||
+            superPhase == SUPER_FLASH ||
+            superPhase == SUPER_RELEASE;
+    }
+
+    private boolean canStartSuper() {
+        return activeFighter().profile.hasSuperAttack &&
+            !isSuperCinematicActive() &&
+            !isTagAnimationActive() &&
+            attackTimer <= 0f;
+    }
+
+    private void startSuperCinematic() {
+        if (!canStartSuper()) return;
+
+        superPhase = SUPER_DARKEN;
+        superPhaseTimer = 0f;
+        superCameraZoom = 1f;
+        superDarkAlpha = 0;
+        superFlashAlpha = 0;
+        superStoredVelocityY = velocityY;
+
+        attackType = "";
+        attackTimer = 0f;
+        attackDuration = 0f;
+        forwardDashing = false;
+        backDashTimer = 0f;
+        resetAutoCombo();
+        resetCommandBuffer();
+        pendingEnergyUntilMs = -1L;
+    }
+
+    private void updateSuperState(float dt) {
+        if (superPhase == SUPER_IDLE) return;
+
+        superPhaseTimer += dt;
+
+        if (superPhase == SUPER_DARKEN) {
+            float t = clamp(superPhaseTimer / SUPER_DARKEN_DURATION, 0f, 1f);
+            superDarkAlpha = Math.round(190f * t);
+            superCameraZoom = 1f + 0.18f * t;
+
+            if (t >= 1f) {
+                superPhase = SUPER_POSE;
+                superPhaseTimer = 0f;
+            }
+        } else if (superPhase == SUPER_POSE) {
+            float t = clamp(superPhaseTimer / SUPER_POSE_DURATION, 0f, 1f);
+            superDarkAlpha = 190;
+            superCameraZoom = 1.18f + 0.18f * t;
+
+            if (t >= 1f) {
+                superPhase = SUPER_FLASH;
+                superPhaseTimer = 0f;
+            }
+        } else if (superPhase == SUPER_FLASH) {
+            float t = clamp(superPhaseTimer / SUPER_FLASH_DURATION, 0f, 1f);
+            superDarkAlpha = 190;
+            superCameraZoom = 1.36f;
+            superFlashAlpha = Math.round(235f * (1f - Math.abs(0.5f - t) * 2f));
+
+            if (t >= 1f) {
+                spawnSuperProjectile();
+                superPhase = SUPER_RELEASE;
+                superPhaseTimer = 0f;
+                superFlashAlpha = 255;
+            }
+        } else if (superPhase == SUPER_RELEASE) {
+            float t = clamp(superPhaseTimer / SUPER_RELEASE_DURATION, 0f, 1f);
+            superDarkAlpha = Math.round(190f * (1f - 0.40f * t));
+            superFlashAlpha = Math.round(255f * (1f - t));
+            superCameraZoom = 1.36f - 0.16f * t;
+
+            if (t >= 1f) {
+                superPhase = SUPER_RECOVER;
+                superPhaseTimer = 0f;
+                superFlashAlpha = 0;
+            }
+        } else if (superPhase == SUPER_RECOVER) {
+            float t = clamp(superPhaseTimer / SUPER_RECOVER_DURATION, 0f, 1f);
+            superDarkAlpha = Math.round(114f * (1f - t));
+            superCameraZoom = 1.20f - 0.20f * t;
+
+            if (t >= 1f) {
+                superPhase = SUPER_IDLE;
+                superPhaseTimer = 0f;
+                superCameraZoom = 1f;
+                superDarkAlpha = 0;
+                superFlashAlpha = 0;
+                velocityY = superStoredVelocityY;
+            }
+        }
+    }
+
+    private void spawnSuperProjectile() {
+        FighterProfile profile = activeFighter().profile;
+        if (!profile.hasSuperAttack) return;
+
+        float spawnY = playerY - (grounded ? 86f : 82f);
+        superProjectiles.add(new SuperProjectile(
+            playerX + 78f,
+            spawnY,
+            profile.superRange,
+            profile.superSpeed,
+            profile.superDamage,
+            profile.color,
+            activeFighterIndex
+        ));
+    }
+
+    private void updateSuperProjectiles(float dt) {
+        Iterator<SuperProjectile> iterator = superProjectiles.iterator();
+        while (iterator.hasNext()) {
+            SuperProjectile projectile = iterator.next();
+            projectile.x += projectile.speed * dt;
+
+            if (
+                projectile.x - projectile.startX >= projectile.range ||
+                projectile.x > RIGHT_BOUND + 180f
+            ) {
+                iterator.remove();
+            }
+        }
     }
 
     private boolean isEnergyAttackActive() {
@@ -464,7 +675,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void startJump(boolean superJump) {
-        if (!grounded || isEnergyAttackActive() || isTagAnimationActive()) return;
+        if (
+            !grounded ||
+            isEnergyAttackActive() ||
+            isTagAnimationActive() ||
+            isSuperCinematicActive()
+        ) return;
 
         grounded = false;
         crouching = false;
@@ -699,18 +915,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.save();
             canvas.scale(sx, sy);
 
-            float visibleWorldWidth = VW / CAMERA_ZOOM;
+            float renderZoom = CAMERA_ZOOM * superCameraZoom;
+            float visibleWorldWidth = VW / renderZoom;
             float cameraLeft = clamp(cameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
 
             canvas.save();
-            canvas.scale(CAMERA_ZOOM, CAMERA_ZOOM);
+            canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -cameraTop);
             drawScenario(canvas);
             drawEnergyProjectiles(canvas);
+            drawSuperProjectiles(canvas);
+            drawSuperDarkening(canvas);
+            drawSuperChargeEffects(canvas);
             canvas.save();
             canvas.translate(tagVisualOffsetX, 0f);
             drawPlayer(canvas);
             canvas.restore();
+            drawSuperFlash(canvas);
             canvas.restore();
 
             drawHud(canvas);
@@ -827,11 +1048,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("HELD TAG INPUT • v0.20", 975, 59, paint);
+        c.drawText("SUPER CINEMATIC • v0.21", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
-        String state = attackTimer > 0f
+        String state = isSuperCinematicActive()
+            ? "SUPER"
+            : (attackTimer > 0f
             ? "ATAQUE " + attackType
             : (backDashTimer > 0f
                 ? "BACKDASH"
@@ -843,7 +1066,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                             ? "AGACHADO"
                             : (!grounded
                                 ? "NO AR"
-                                : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
+                                : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))))));
 
         c.drawText("Estado: " + state, 975, 88, paint);
     }
@@ -938,6 +1161,69 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
+    private void drawSuperProjectiles(Canvas c) {
+        for (SuperProjectile projectile : superProjectiles) {
+            paint.setColor(Color.argb(70, 255, 255, 255));
+            c.drawCircle(projectile.x, projectile.y, 62f, paint);
+
+            paint.setColor(Color.argb(120, Color.red(projectile.color), Color.green(projectile.color), Color.blue(projectile.color)));
+            c.drawOval(
+                projectile.x - 72f,
+                projectile.y - 34f,
+                projectile.x + 34f,
+                projectile.y + 34f,
+                paint
+            );
+
+            paint.setColor(projectile.color);
+            c.drawCircle(projectile.x, projectile.y, 40f, paint);
+
+            paint.setColor(Color.WHITE);
+            c.drawCircle(projectile.x + 12f, projectile.y - 10f, 17f, paint);
+
+            paint.setColor(Color.argb(100, 255, 255, 255));
+            c.drawRect(projectile.x - 135f, projectile.y - 9f, projectile.x - 38f, projectile.y + 9f, paint);
+        }
+    }
+
+    private void drawSuperDarkening(Canvas c) {
+        if (!isSuperCinematicActive() || superDarkAlpha <= 0) return;
+        paint.setColor(Color.argb(superDarkAlpha, 0, 0, 8));
+        c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
+    }
+
+    private void drawSuperChargeEffects(Canvas c) {
+        if (!isSuperCinematicActive()) return;
+
+        float centerY = playerY - 78f;
+        float pulse = 1f + 0.16f * (float)Math.sin(superPhaseTimer * 28f);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(6f);
+        paint.setColor(Color.argb(185, 255, 255, 255));
+        c.drawCircle(playerX, centerY, 58f * pulse, paint);
+
+        paint.setStrokeWidth(3f);
+        paint.setColor(activeFighter().profile.color);
+        c.drawCircle(playerX, centerY, 82f * pulse, paint);
+
+        for (int i = 0; i < 7; i++) {
+            float y = centerY - 105f + i * 34f;
+            float length = 90f + (i % 3) * 42f;
+            paint.setStrokeWidth(4f);
+            paint.setColor(Color.argb(145, 255, 255, 255));
+            c.drawLine(playerX - 150f - length, y + 24f, playerX - 78f, y, paint);
+        }
+
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    private void drawSuperFlash(Canvas c) {
+        if (!isSuperCinematicActive() || superFlashAlpha <= 0) return;
+        paint.setColor(Color.argb(superFlashAlpha, 255, 255, 255));
+        c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
+    }
+
     private void drawPlayer(Canvas c) {
         float bob = (grounded && !crouching && (movingLeft || movingRight))
             ? (float)Math.sin(walkTime) * 3f
@@ -1013,7 +1299,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else {
             float phase = attackPhase();
 
-            if (isTagPoseActive()) {
+            if (isSuperPoseActive()) {
+                float power = 1f + 0.10f * (float)Math.sin(superPhaseTimer * 24f);
+                c.drawLine(playerX - 3, top + 58, playerX - 58f * power, top + 38, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 74f * power, top + 36, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 40, baseY, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 42, baseY - 5, paint);
+            } else if (isTagPoseActive()) {
                 // Pose curta de prontidão ao terminar a entrada.
                 float poseWave = (float)Math.sin(tagPhaseTimer * 16f) * 4f;
                 c.drawLine(playerX - 3, top + 58, playerX - 42, top + 88 - poseWave, paint);
@@ -1118,6 +1410,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", heavyPointer != -1);
         drawComboButton(c);
         drawTagButton(c);
+        drawSuperButton(c);
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
@@ -1206,6 +1499,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 ? "..."
                 : Integer.toString((int)Math.ceil(tagCooldownRemaining)));
         c.drawText(label, TAG_X, textY, paint);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private void drawSuperButton(Canvas c) {
+        boolean pressed = superPointer != -1;
+        boolean enabled = canStartSuper();
+
+        paint.setColor(
+            enabled
+                ? (pressed
+                    ? activeFighter().profile.color
+                    : Color.argb(170, 42, 16, 68))
+                : Color.argb(90, 55, 60, 68)
+        );
+        c.drawCircle(SUPER_X, SUPER_Y, SUPER_RADIUS, paint);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4f);
+        paint.setColor(
+            enabled
+                ? Color.argb(235, 255, 220, 90)
+                : Color.argb(120, 180, 180, 180)
+        );
+        c.drawCircle(SUPER_X, SUPER_Y, SUPER_RADIUS, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(enabled ? Color.WHITE : Color.argb(150, 220, 220, 220));
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(15f);
+        paint.setFakeBoldText(true);
+        float textY = SUPER_Y - (paint.ascent() + paint.descent()) / 2f;
+        c.drawText("SUPER", SUPER_X, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
@@ -1346,7 +1672,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
-            if (isEnergyAttackActive()) {
+            if (isSuperCinematicActive() || isEnergyAttackActive()) {
                 return true;
             }
 
@@ -1358,6 +1684,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 updateDpad(x, y, nowMs);
             } else if (isTagAnimationActive()) {
                 return true;
+            } else if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) {
+                if (canStartSuper()) {
+                    superPointer = pointerId;
+                    startSuperCinematic();
+                }
             } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
                 lightPointer = pointerId;
                 if (!tryFirePendingEnergy("L", nowMs)) {
@@ -1417,6 +1748,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == heavyPointer) heavyPointer = -1;
             if (pointerId == comboPointer) comboPointer = -1;
             if (pointerId == tagPointer) tagPointer = -1;
+            if (pointerId == superPointer) superPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
             clearDpad();
             lightPointer = -1;
@@ -1424,6 +1756,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             heavyPointer = -1;
             comboPointer = -1;
             tagPointer = -1;
+            superPointer = -1;
         }
 
         return true;
