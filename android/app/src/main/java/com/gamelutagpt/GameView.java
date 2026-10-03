@@ -1571,7 +1571,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateDpad(float x, float y, long nowMs) {
-        if (isEnergyAttackActive()) return;
+        if (isEnergyAttackActive() || isSuperCinematicActive()) return;
 
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
@@ -1717,7 +1717,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 }
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            if (!isEnergyAttackActive() && dpadPointer != -1) {
+            if (
+                !isEnergyAttackActive() &&
+                !isSuperCinematicActive() &&
+                dpadPointer != -1
+            ) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);
                 if (pointerIndex >= 0) {
                     float x = event.getX(pointerIndex) / sx;
