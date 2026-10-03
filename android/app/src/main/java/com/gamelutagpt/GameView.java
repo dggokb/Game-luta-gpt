@@ -15,15 +15,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final class FighterProfile {
         final String name;
         final String[] baseCombo;
+        final int maxLife;
 
-        FighterProfile(String name, String[] baseCombo) {
+        FighterProfile(String name, String[] baseCombo, int maxLife) {
             this.name = name;
             this.baseCombo = baseCombo;
+            this.maxLife = maxLife;
         }
     }
 
     private final FighterProfile playerProfile =
-        new FighterProfile("PLAYER", new String[]{"L", "M", "H"});
+        new FighterProfile("PLAYER", new String[]{"L", "M", "H"}, 10000);
 
     private static final float VW = 1280f;
     private static final float VH = 720f;
@@ -40,6 +42,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private Thread gameThread;
     private volatile boolean running;
+
+    private int playerLife = playerProfile.maxLife;
 
     private float playerX = 420f;
     private float playerY = GROUND_Y;
@@ -347,21 +351,42 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText(playerProfile.name, 122, 58, paint);
         paint.setFakeBoldText(false);
 
+        float lifeRatio = clamp(playerLife / (float)playerProfile.maxLife, 0f, 1f);
+        float lifeLeft = 122f;
+        float lifeTop = 70f;
+        float lifeRight = 505f;
+        float lifeBottom = 98f;
+        float lifeWidth = lifeRight - lifeLeft;
+
         paint.setColor(Color.rgb(45, 53, 62));
-        c.drawRoundRect(122, 70, 505, 98, 8, 8, paint);
-        paint.setColor(Color.rgb(111, 223, 105));
-        c.drawRoundRect(122, 70, 505, 98, 8, 8, paint);
+        c.drawRoundRect(lifeLeft, lifeTop, lifeRight, lifeBottom, 8, 8, paint);
+
+        int lifeColor;
+        if (lifeRatio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
+        else if (lifeRatio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
+        else lifeColor = Color.rgb(229, 82, 82);
+
+        if (lifeRatio > 0f) {
+            float filledRight = lifeLeft + lifeWidth * lifeRatio;
+            c.drawRoundRect(lifeLeft, lifeTop, filledRight, lifeBottom, 8, 8, paint);
+        }
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2f);
+        paint.setColor(Color.argb(210, 255, 255, 255));
+        c.drawRoundRect(lifeLeft, lifeTop, lifeRight, lifeBottom, 8, 8, paint);
+        paint.setStyle(Paint.Style.FILL);
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(15);
-        c.drawText("HP 10000 / 10000", 128, 91, paint);
+        c.drawText("HP " + playerLife + " / " + playerProfile.maxLife, 128, 91, paint);
 
         paint.setColor(Color.argb(180, 10, 15, 27));
         c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("ATTACK LOCK • v0.6", 975, 59, paint);
+        c.drawText("LIFE • v0.7", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
         String state = attackTimer > 0f ? "ATAQUE " + attackType : (backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
