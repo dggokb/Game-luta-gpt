@@ -1025,6 +1025,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (next == 1 && previous != 1) {
             if (
                 !"S".equals(attackType) &&
+                pendingEnergyUntilMs < nowMs &&
                 grounded &&
                 nowMs - lastForwardTapMs <= DASH_DOUBLE_TAP_MS
             ) {
