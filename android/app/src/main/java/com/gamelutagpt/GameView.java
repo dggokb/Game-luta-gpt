@@ -12,6 +12,19 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
+    private static final class FighterProfile {
+        final String name;
+        final String[] baseCombo;
+
+        FighterProfile(String name, String[] baseCombo) {
+            this.name = name;
+            this.baseCombo = baseCombo;
+        }
+    }
+
+    private final FighterProfile playerProfile =
+        new FighterProfile("PLAYER", new String[]{"L", "M", "H"});
+
     private static final float VW = 1280f;
     private static final float VH = 720f;
     private static final float GROUND_Y = 565f;
@@ -65,6 +78,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float MEDIUM_Y = 515f;
     private static final float HEAVY_X = 1195f;
     private static final float HEAVY_Y = 598f;
+    private static final float COMBO_X = 1100f;
+    private static final float COMBO_Y = 650f;
+    private static final float COMBO_RADIUS = 43f;
 
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
@@ -77,6 +93,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int lightPointer = -1;
     private int mediumPointer = -1;
     private int heavyPointer = -1;
+    private int comboPointer = -1;
+    private int autoComboIndex = 0;
+    private long lastAutoComboTapMs = -1000L;
+    private static final long AUTO_COMBO_RESET_MS = 700L;
 
     public GameView(Context context) {
         super(context);
@@ -206,6 +226,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         attackTimer = attackDuration;
     }
 
+    private void resetAutoCombo() {
+        autoComboIndex = 0;
+        lastAutoComboTapMs = -1000L;
+    }
+
+    private void triggerAutoCombo(long nowMs) {
+        if (playerProfile.baseCombo.length == 0) return;
+
+        if (nowMs - lastAutoComboTapMs > AUTO_COMBO_RESET_MS) {
+            autoComboIndex = 0;
+        }
+
+        String nextAttack = playerProfile.baseCombo[autoComboIndex];
+        startAttack(nextAttack);
+
+        autoComboIndex++;
+        if (autoComboIndex >= playerProfile.baseCombo.length) {
+            autoComboIndex = 0;
+        }
+
+        lastAutoComboTapMs = nowMs;
+    }
+
     private float attackPhase() {
         if (attackTimer <= 0f || attackDuration <= 0f) return 0f;
         float t = 1f - attackTimer / attackDuration;
@@ -298,7 +341,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(22);
         paint.setFakeBoldText(true);
-        c.drawText("PLAYER", 122, 58, paint);
+        c.drawText(playerProfile.name, 122, 58, paint);
         paint.setFakeBoldText(false);
 
         paint.setColor(Color.rgb(45, 53, 62));
@@ -315,7 +358,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("ATTACKS • v0.4", 975, 59, paint);
+        c.drawText("COMBO • v0.5", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
         String state = attackTimer > 0f ? "ATAQUE " + attackType : (backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO"))))));
@@ -427,6 +470,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         drawAttackButton(c, LIGHT_X, LIGHT_Y, "L", lightPointer != -1);
         drawAttackButton(c, MEDIUM_X, MEDIUM_Y, "M", mediumPointer != -1);
         drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", heavyPointer != -1);
+        drawComboButton(c);
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
@@ -445,6 +489,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(true);
         float textY = y - (paint.ascent() + paint.descent()) / 2f;
         c.drawText(label, x, textY, paint);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private void drawComboButton(Canvas c) {
+        boolean pressed = comboPointer != -1;
+        paint.setColor(pressed ? Color.argb(205, 255, 255, 255) : Color.argb(135, 7, 13, 26));
+        c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        paint.setColor(Color.argb(225, 255, 255, 255));
+        c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
+        paint.setStyle(Paint.Style.FILL);
+
+        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(18f);
+        paint.setFakeBoldText(true);
+        float textY = COMBO_Y - (paint.ascent() + paint.descent()) / 2f;
+        c.drawText("COMBO", COMBO_X, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
@@ -557,13 +622,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 updateDpad(x, y, nowMs);
             } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
                 lightPointer = pointerId;
+                resetAutoCombo();
                 startAttack("L");
             } else if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) {
                 mediumPointer = pointerId;
+                resetAutoCombo();
                 startAttack("M");
             } else if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) {
                 heavyPointer = pointerId;
+                resetAutoCombo();
                 startAttack("H");
+            } else if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) {
+                comboPointer = pointerId;
+                triggerAutoCombo(nowMs);
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (dpadPointer != -1) {
@@ -580,9 +651,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == lightPointer) lightPointer = -1;
             if (pointerId == mediumPointer) mediumPointer = -1;
             if (pointerId == heavyPointer) heavyPointer = -1;
+            if (pointerId == comboPointer) comboPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
             clearDpad();
-            lightPointer = mediumPointer = heavyPointer = -1;
+            lightPointer = mediumPointer = heavyPointer = comboPointer = -1;
         }
 
         return true;
