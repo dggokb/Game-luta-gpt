@@ -225,12 +225,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DUMMY_LAUNCH_SPEED = 1450f;
     private static final float DUMMY_SLAM_SPEED = 1850f;
     private static final float DUMMY_GRAVITY = 1650f;
+    private static final int DUMMY_KD_NONE = 0;
+    private static final int DUMMY_KD_FALL = 1;
+    private static final int DUMMY_KD_DOWN = 2;
+    private static final int DUMMY_KD_GETUP = 3;
+    private static final float DUMMY_KD_FALL_DURATION = 0.22f;
+    private static final float DUMMY_KD_DOWN_DURATION = 1.20f;
+    private static final float DUMMY_KD_GETUP_DURATION = 0.35f;
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
     private float dummyVelocityY = 0f;
     private boolean dummyAirborne = false;
     private boolean dummyMovementLocked = false;
     private boolean dummyGroundSlam = false;
+    private int dummyKnockdownState = DUMMY_KD_NONE;
+    private float dummyKnockdownTimer = 0f;
     private int dummyLife = DUMMY_MAX_LIFE;
     private String dummyLifeHudLabel = "10000 / 10000";
     private String dummyDamageLabel = "";
@@ -491,6 +500,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             dummyDamageLabelTimer = Math.max(0f, dummyDamageLabelTimer - dt);
         }
         updateDummyHitReaction(dt);
+        updateDummyKnockdown(dt);
         updateDummyAirState(dt);
 
         if (isSuperCinematicActive()) {
@@ -577,6 +587,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void launchDummy() {
+        dummyKnockdownState = DUMMY_KD_NONE;
+        dummyKnockdownTimer = 0f;
         dummyAirborne = true;
         dummyMovementLocked = true;
         dummyGroundSlam = false;
@@ -594,8 +606,50 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         dummyKnockbackVelocityX *= 0.35f;
     }
 
+    private void knockDownDummy() {
+        dummyAirborne = false;
+        dummyGroundSlam = false;
+        dummyVelocityY = 0f;
+        dummyY = GROUND_Y;
+        dummyMovementLocked = true;
+        dummyKnockdownState = DUMMY_KD_FALL;
+        dummyKnockdownTimer = 0f;
+        dummyKnockbackVelocityX *= 0.55f;
+    }
+
+    private void updateDummyKnockdown(float dt) {
+        if (dummyKnockdownState == DUMMY_KD_NONE) return;
+
+        dummyMovementLocked = true;
+        dummyKnockdownTimer += dt;
+
+        if (
+            dummyKnockdownState == DUMMY_KD_FALL &&
+            dummyKnockdownTimer >= DUMMY_KD_FALL_DURATION
+        ) {
+            dummyKnockdownState = DUMMY_KD_DOWN;
+            dummyKnockdownTimer = 0f;
+        } else if (
+            dummyKnockdownState == DUMMY_KD_DOWN &&
+            dummyKnockdownTimer >= DUMMY_KD_DOWN_DURATION
+        ) {
+            dummyKnockdownState = DUMMY_KD_GETUP;
+            dummyKnockdownTimer = 0f;
+        } else if (
+            dummyKnockdownState == DUMMY_KD_GETUP &&
+            dummyKnockdownTimer >= DUMMY_KD_GETUP_DURATION
+        ) {
+            dummyKnockdownState = DUMMY_KD_NONE;
+            dummyKnockdownTimer = 0f;
+            dummyMovementLocked = false;
+        }
+    }
+
     private void updateDummyAirState(float dt) {
-        if (!dummyAirborne) return;
+        if (
+            dummyKnockdownState != DUMMY_KD_NONE ||
+            !dummyAirborne
+        ) return;
 
         dummyVelocityY += DUMMY_GRAVITY * dt;
         dummyY += dummyVelocityY * dt;
@@ -1083,7 +1137,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         applyDummyDamage(damage, facingDirection);
 
-        if ("2H".equals(attackType)) {
+        if ("2M".equals(attackType)) {
+            knockDownDummy();
+        } else if ("2H".equals(attackType)) {
             launchDummy();
             launcherChaseUntilMs =
                 System.currentTimeMillis() + LAUNCHER_CHASE_WINDOW_MS;
@@ -1505,7 +1561,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("AIR HEAVY SLAM • v0.30", 975, 59, paint);
+        c.drawText("SWEEP KNOCKDOWN • v0.31", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1702,6 +1758,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.scale(-1f, 1f, dummyX, 0f);
         }
 
+        float knockdownAngle = 0f;
+        if (dummyKnockdownState == DUMMY_KD_FALL) {
+            float t = clamp(
+                dummyKnockdownTimer / DUMMY_KD_FALL_DURATION,
+                0f,
+                1f
+            );
+            knockdownAngle = 88f * t;
+        } else if (dummyKnockdownState == DUMMY_KD_DOWN) {
+            knockdownAngle = 88f;
+        } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
+            float t = clamp(
+                dummyKnockdownTimer / DUMMY_KD_GETUP_DURATION,
+                0f,
+                1f
+            );
+            knockdownAngle = 88f * (1f - t);
+        }
+
+        if (knockdownAngle > 0f) {
+            c.rotate(knockdownAngle, dummyX, GROUND_Y);
+        }
+
         float hitProgress = dummyHitReactionTimer > 0f
             ? 1f - dummyHitReactionTimer / DUMMY_HIT_REACTION_DURATION
             : 1f;
@@ -1709,7 +1788,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             ? (float)Math.sin(hitProgress * Math.PI)
             : 0f;
 
-        if (dummyAirborne) {
+        if (
+            dummyKnockdownState == DUMMY_KD_NONE &&
+            dummyAirborne
+        ) {
             float airTilt = dummyMovementLocked ? 1f : 0.55f;
             recoilPose = Math.max(recoilPose, airTilt);
         }
@@ -1809,14 +1891,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
         paint.setTextSize(15f);
+        String dummyStatusLabel;
+        if (dummyKnockdownState == DUMMY_KD_FALL) {
+            dummyStatusLabel = "NPC TESTE • CAINDO";
+        } else if (dummyKnockdownState == DUMMY_KD_DOWN) {
+            dummyStatusLabel = "NPC TESTE • NO CHÃO";
+        } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
+            dummyStatusLabel = "NPC TESTE • LEVANTANDO";
+        } else if (dummyGroundSlam) {
+            dummyStatusLabel = "NPC TESTE • QUEDA FORÇADA";
+        } else if (dummyMovementLocked) {
+            dummyStatusLabel = "NPC TESTE • SEM CONTROLE";
+        } else if (dummyAirborne) {
+            dummyStatusLabel = "NPC TESTE • DESCENDO";
+        } else {
+            dummyStatusLabel = "NPC TESTE";
+        }
+
         c.drawText(
-            dummyGroundSlam
-                ? "NPC TESTE • QUEDA FORÇADA"
-                : (
-                    dummyMovementLocked
-                        ? "NPC TESTE • SEM CONTROLE"
-                        : (dummyAirborne ? "NPC TESTE • DESCENDO" : "NPC TESTE")
-                ),
+            dummyStatusLabel,
             dummyX,
             barTop - 9f,
             paint
