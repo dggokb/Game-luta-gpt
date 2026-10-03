@@ -201,6 +201,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private static final int COMMAND_BUFFER_SIZE = 8;
     private static final long ENERGY_COMMAND_STEP_MS = 420L;
+    private static final long ENERGY_CONFIRM_WINDOW_MS = 550L;
+    private long pendingEnergyUntilMs = -1L;
     private final int[] commandDirections = new int[COMMAND_BUFFER_SIZE];
     private final long[] commandTimes = new long[COMMAND_BUFFER_SIZE];
     private int commandCount = 0;
@@ -352,9 +354,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         attackTimer = attackDuration;
     }
 
-    private void fireEnergyAttack() {
+    private void fireEnergyAttack(String strength) {
         FighterProfile profile = activeFighter().profile;
         if (!profile.hasEnergyAttack) return;
+
+        float speedMultiplier;
+        float damageMultiplier;
+
+        if ("L".equals(strength)) {
+            speedMultiplier = 0.65f;
+            damageMultiplier = 0.60f;
+        } else if ("H".equals(strength)) {
+            speedMultiplier = 1.35f;
+            damageMultiplier = 1.45f;
+        } else {
+            speedMultiplier = 1.00f;
+            damageMultiplier = 1.00f;
+        }
 
         resetAutoCombo();
         startAttack("S");
@@ -364,11 +380,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             playerX + 62f,
             spawnY,
             profile.energyRange,
-            profile.energySpeed,
-            profile.energyDamage,
+            profile.energySpeed * speedMultiplier,
+            Math.round(profile.energyDamage * damageMultiplier),
             profile.color,
             activeFighterIndex
         ));
+    }
+
+    private boolean tryFirePendingEnergy(String attackButton, long nowMs) {
+        FighterProfile profile = activeFighter().profile;
+
+        if (!profile.hasEnergyAttack || pendingEnergyUntilMs < nowMs) {
+            pendingEnergyUntilMs = -1L;
+            return false;
+        }
+
+        fireEnergyAttack(attackButton);
+        pendingEnergyUntilMs = -1L;
+        resetCommandBuffer();
+        return true;
     }
 
     private void updateEnergyProjectiles(float dt) {
@@ -444,9 +474,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (nowMs - commandTimes[commandCount - 1] > ENERGY_COMMAND_STEP_MS) return;
         if (nowMs - firstMatchedTime > ENERGY_COMMAND_STEP_MS * profile.energyCommand.length) return;
 
-        fireEnergyAttack();
+        // A sequência apenas arma o especial. L/M/H decide a força do projétil.
+        pendingEnergyUntilMs = nowMs + ENERGY_CONFIRM_WINDOW_MS;
 
-        // O comando foi consumido; evita disparos duplicados e conflitos com dash.
         commandCount = 0;
         forwardDashing = false;
         backDashTimer = 0f;
@@ -490,6 +520,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         backDashTimer = 0f;
         resetAutoCombo();
         resetCommandBuffer();
+        pendingEnergyUntilMs = -1L;
 
         // Posição, altura, velocidade vertical e câmera são compartilhadas.
         // Assim a troca mantém exatamente o mesmo estado de movimento.
@@ -645,7 +676,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("COMMAND ENERGY • v0.12", 975, 59, paint);
+        c.drawText("ENERGY STRENGTH • v0.13", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1062,16 +1093,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 updateDpad(x, y, nowMs);
             } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
                 lightPointer = pointerId;
-                resetAutoCombo();
-                startAttack("L");
+                if (!tryFirePendingEnergy("L", nowMs)) {
+                    resetAutoCombo();
+                    startAttack("L");
+                }
             } else if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) {
                 mediumPointer = pointerId;
-                resetAutoCombo();
-                startAttack("M");
+                if (!tryFirePendingEnergy("M", nowMs)) {
+                    resetAutoCombo();
+                    startAttack("M");
+                }
             } else if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) {
                 heavyPointer = pointerId;
-                resetAutoCombo();
-                startAttack("H");
+                if (!tryFirePendingEnergy("H", nowMs)) {
+                    resetAutoCombo();
+                    startAttack("H");
+                }
             } else if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) {
                 comboPointer = pointerId;
                 triggerAutoCombo(nowMs);
