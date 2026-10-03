@@ -218,14 +218,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float GROUND_CAMERA_TOP = 72f;
     private static final float WORLD_TOP = -520f;
 
-    private static final float DUMMY_X = 980f;
+    private static final float DUMMY_START_X = 980f;
     private static final float DUMMY_HALF_WIDTH = 34f;
     private static final float DUMMY_TOP = GROUND_Y - 145f;
     private static final int DUMMY_MAX_LIFE = 10000;
+    private static final float DUMMY_HIT_REACTION_DURATION = 0.22f;
+    private float dummyX = DUMMY_START_X;
     private int dummyLife = DUMMY_MAX_LIFE;
     private String dummyLifeHudLabel = "10000 / 10000";
     private String dummyDamageLabel = "";
     private float dummyDamageLabelTimer = 0f;
+    private float dummyHitReactionTimer = 0f;
+    private float dummyKnockbackVelocityX = 0f;
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -477,6 +481,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (dummyDamageLabelTimer > 0f) {
             dummyDamageLabelTimer = Math.max(0f, dummyDamageLabelTimer - dt);
         }
+        updateDummyHitReaction(dt);
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
@@ -557,12 +562,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
     }
 
+    private void updateDummyHitReaction(float dt) {
+        if (dummyHitReactionTimer <= 0f) {
+            dummyHitReactionTimer = 0f;
+            dummyKnockbackVelocityX = 0f;
+            return;
+        }
+
+        dummyHitReactionTimer = Math.max(
+            0f,
+            dummyHitReactionTimer - dt
+        );
+        dummyX += dummyKnockbackVelocityX * dt;
+
+        // Amortece rapidamente para o recuo ser curto e controlado.
+        dummyKnockbackVelocityX *= (float)Math.pow(0.035f, dt);
+        dummyX = clamp(
+            dummyX,
+            LEFT_BOUND + 130f,
+            RIGHT_BOUND - 130f
+        );
+
+        if (dummyHitReactionTimer <= 0f) {
+            dummyKnockbackVelocityX = 0f;
+        }
+    }
+
     private void updateFacing() {
         int nextFacing = facingDirection;
 
-        if (playerX < DUMMY_X - FACING_SWITCH_EPSILON) {
+        if (playerX < dummyX - FACING_SWITCH_EPSILON) {
             nextFacing = 1;
-        } else if (playerX > DUMMY_X + FACING_SWITCH_EPSILON) {
+        } else if (playerX > dummyX + FACING_SWITCH_EPSILON) {
             nextFacing = -1;
         }
 
@@ -739,7 +770,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (
                 projectileHitsDummy(previousX, projectile.x, projectile.y, 58f)
             ) {
-                applyDummyDamage(projectile.damage);
+                applyDummyDamage(projectile.damage, projectile.direction);
                 iterator.remove();
                 continue;
             }
@@ -986,7 +1017,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (attackPhase() < 0.72f) return;
 
         float horizontalDistance =
-            (DUMMY_X - playerX) * facingDirection;
+            (dummyX - playerX) * facingDirection;
         if (horizontalDistance < 18f || horizontalDistance > reach) return;
 
         float playerAttackCenterY = (crouching || isCrouchAttackActive())
@@ -995,11 +1026,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float dummyCenterY = (DUMMY_TOP + GROUND_Y) * 0.5f;
         if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
 
-        applyDummyDamage(damage);
+        applyDummyDamage(damage, facingDirection);
         attackHitApplied = true;
     }
 
-    private void applyDummyDamage(int damage) {
+    private void applyDummyDamage(int damage, int hitDirection) {
         if (damage <= 0 || dummyLife <= 0) return;
 
         int applied = Math.min(damage, dummyLife);
@@ -1007,6 +1038,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         dummyLifeHudLabel = dummyLife + " / " + DUMMY_MAX_LIFE;
         dummyDamageLabel = "-" + applied;
         dummyDamageLabelTimer = 0.72f;
+
+        int direction = hitDirection >= 0 ? 1 : -1;
+        float knockbackSpeed = clamp(
+            120f + applied * 0.025f,
+            135f,
+            210f
+        );
+        dummyKnockbackVelocityX = direction * knockbackSpeed;
+        dummyHitReactionTimer = DUMMY_HIT_REACTION_DURATION;
     }
 
     private boolean projectileHitsDummy(
@@ -1017,8 +1057,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     ) {
         if (dummyLife <= 0) return false;
 
-        float dummyLeft = DUMMY_X - DUMMY_HALF_WIDTH;
-        float dummyRight = DUMMY_X + DUMMY_HALF_WIDTH;
+        float dummyLeft = dummyX - DUMMY_HALF_WIDTH;
+        float dummyRight = dummyX + DUMMY_HALF_WIDTH;
         float projectileLeft = Math.min(previousX, nextX) - radius;
         float projectileRight = Math.max(previousX, nextX) + radius;
 
@@ -1111,7 +1151,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (
                 projectileHitsDummy(previousX, projectile.x, projectile.y, 24f)
             ) {
-                applyDummyDamage(projectile.damage);
+                applyDummyDamage(projectile.damage, projectile.direction);
                 iterator.remove();
                 continue;
             }
@@ -1396,7 +1436,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("FACING & SIDES • v0.25", 975, 59, paint);
+        c.drawText("HIT REACTION • v0.26", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1576,9 +1616,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         paint.setColor(Color.argb(70, 0, 0, 0));
         c.drawOval(
-            DUMMY_X - 43f,
+            dummyX - 43f,
             GROUND_Y - 10f,
-            DUMMY_X + 43f,
+            dummyX + 43f,
             GROUND_Y + 10f,
             paint
         );
@@ -1590,37 +1630,92 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.save();
         if (facingDirection > 0) {
             // Jogador à esquerda: dummy olha para a esquerda.
-            c.scale(-1f, 1f, DUMMY_X, 0f);
+            c.scale(-1f, 1f, dummyX, 0f);
         }
+
+        float hitProgress = dummyHitReactionTimer > 0f
+            ? 1f - dummyHitReactionTimer / DUMMY_HIT_REACTION_DURATION
+            : 1f;
+        float recoilPose = dummyHitReactionTimer > 0f
+            ? (float)Math.sin(hitProgress * Math.PI)
+            : 0f;
+        boolean hitFlash =
+            dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
+
+        if (hitFlash && dummyLife > 0) {
+            dummyColor = Color.rgb(255, 235, 235);
+        }
+
+        float headX = dummyX - 13f * recoilPose;
+        float shoulderX = dummyX - 9f * recoilPose;
+        float hipX = dummyX - 3f * recoilPose;
 
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setColor(dummyColor);
-        c.drawCircle(DUMMY_X, top + 20f, 25f, paint);
+        c.drawCircle(headX, top + 20f - 2f * recoilPose, 25f, paint);
 
         paint.setStrokeWidth(25f);
-        c.drawLine(DUMMY_X, top + 48f, DUMMY_X, baseY - 45f, paint);
+        c.drawLine(
+            shoulderX,
+            top + 48f,
+            hipX,
+            baseY - 45f,
+            paint
+        );
 
         paint.setStrokeWidth(18f);
-        c.drawLine(DUMMY_X - 3f, top + 58f, DUMMY_X - 34f, top + 100f, paint);
-        c.drawLine(DUMMY_X + 3f, top + 58f, DUMMY_X + 34f, top + 100f, paint);
-        c.drawLine(DUMMY_X - 4f, baseY - 45f, DUMMY_X - 28f, baseY, paint);
-        c.drawLine(DUMMY_X + 4f, baseY - 45f, DUMMY_X + 28f, baseY, paint);
+        if (dummyHitReactionTimer > 0f) {
+            // Braços abrem e o tronco recua no impacto.
+            c.drawLine(
+                shoulderX - 3f,
+                top + 58f,
+                dummyX - 52f - 18f * recoilPose,
+                top + 82f,
+                paint
+            );
+            c.drawLine(
+                shoulderX + 3f,
+                top + 58f,
+                dummyX - 15f - 28f * recoilPose,
+                top + 112f,
+                paint
+            );
+            c.drawLine(
+                hipX - 4f,
+                baseY - 45f,
+                dummyX - 34f,
+                baseY,
+                paint
+            );
+            c.drawLine(
+                hipX + 4f,
+                baseY - 45f,
+                dummyX + 31f,
+                baseY,
+                paint
+            );
+        } else {
+            c.drawLine(dummyX - 3f, top + 58f, dummyX - 34f, top + 100f, paint);
+            c.drawLine(dummyX + 3f, top + 58f, dummyX + 34f, top + 100f, paint);
+            c.drawLine(dummyX - 4f, baseY - 45f, dummyX - 28f, baseY, paint);
+            c.drawLine(dummyX + 4f, baseY - 45f, dummyX + 28f, baseY, paint);
+        }
 
         // Marca frontal para ficar visualmente claro quando o dummy vira.
         paint.setColor(Color.rgb(24, 35, 48));
         paint.setStrokeWidth(4f);
         c.drawLine(
-            DUMMY_X + 5f,
-            top + 15f,
-            DUMMY_X + 13f,
-            top + 15f,
+            headX + 5f,
+            top + 15f - 2f * recoilPose,
+            headX + 13f,
+            top + 15f - 2f * recoilPose,
             paint
         );
         c.restore();
         paint.setStrokeCap(Paint.Cap.BUTT);
 
-        float barLeft = DUMMY_X - 125f;
-        float barRight = DUMMY_X + 125f;
+        float barLeft = dummyX - 125f;
+        float barRight = dummyX + 125f;
         float barTop = top - 54f;
         float barBottom = barTop + 16f;
         float lifeRatio = dummyLife / (float)DUMMY_MAX_LIFE;
@@ -1640,7 +1735,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
         paint.setTextSize(15f);
-        c.drawText("NPC TESTE", DUMMY_X, barTop - 9f, paint);
+        c.drawText("NPC TESTE", dummyX, barTop - 9f, paint);
         paint.setFakeBoldText(false);
 
         paint.setColor(Color.rgb(45, 53, 62));
@@ -1672,7 +1767,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         paint.setColor(Color.WHITE);
         paint.setTextSize(12f);
-        c.drawText(dummyLifeHudLabel, DUMMY_X, barBottom + 16f, paint);
+        c.drawText(dummyLifeHudLabel, dummyX, barBottom + 16f, paint);
 
         if (dummyDamageLabelTimer > 0f) {
             float progress = dummyDamageLabelTimer / 0.72f;
@@ -1682,7 +1777,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             paint.setTextSize(24f);
             c.drawText(
                 dummyDamageLabel,
-                DUMMY_X,
+                dummyX,
                 top - 72f - (1f - progress) * 28f,
                 paint
             );
