@@ -220,10 +220,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private static final float DUMMY_START_X = 980f;
     private static final float DUMMY_HALF_WIDTH = 34f;
-    private static final float DUMMY_TOP = GROUND_Y - 145f;
     private static final int DUMMY_MAX_LIFE = 10000;
     private static final float DUMMY_HIT_REACTION_DURATION = 0.22f;
+    private static final float DUMMY_LAUNCH_SPEED = 820f;
+    private static final float DUMMY_GRAVITY = 1650f;
     private float dummyX = DUMMY_START_X;
+    private float dummyY = GROUND_Y;
+    private float dummyVelocityY = 0f;
+    private boolean dummyAirborne = false;
+    private boolean dummyMovementLocked = false;
     private int dummyLife = DUMMY_MAX_LIFE;
     private String dummyLifeHudLabel = "10000 / 10000";
     private String dummyDamageLabel = "";
@@ -482,6 +487,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             dummyDamageLabelTimer = Math.max(0f, dummyDamageLabelTimer - dt);
         }
         updateDummyHitReaction(dt);
+        updateDummyAirState(dt);
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
@@ -560,6 +566,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         float verticalFollow = 1f - (float)Math.pow(0.00035f, dt);
         cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
+    }
+
+    private float dummyTop() {
+        return dummyY - 145f;
+    }
+
+    private void launchDummy() {
+        dummyAirborne = true;
+        dummyMovementLocked = true;
+        dummyVelocityY = -DUMMY_LAUNCH_SPEED;
+    }
+
+    private void updateDummyAirState(float dt) {
+        if (!dummyAirborne) return;
+
+        dummyVelocityY += DUMMY_GRAVITY * dt;
+        dummyY += dummyVelocityY * dt;
+
+        // Na subida perde o controle. A partir do topo, na descida, recupera.
+        dummyMovementLocked = dummyVelocityY < 0f;
+
+        if (dummyY >= GROUND_Y) {
+            dummyY = GROUND_Y;
+            dummyVelocityY = 0f;
+            dummyAirborne = false;
+            dummyMovementLocked = false;
+        }
     }
 
     private void updateDummyHitReaction(float dt) {
@@ -1023,10 +1056,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float playerAttackCenterY = (crouching || isCrouchAttackActive())
             ? playerY - 42f
             : playerY - 78f;
-        float dummyCenterY = (DUMMY_TOP + GROUND_Y) * 0.5f;
+        float dummyCenterY = (dummyTop() + dummyY) * 0.5f;
         if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
 
         applyDummyDamage(damage, facingDirection);
+        if ("2H".equals(attackType)) {
+            launchDummy();
+        }
         attackHitApplied = true;
     }
 
@@ -1066,8 +1102,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             projectileRight >= dummyLeft &&
             projectileLeft <= dummyRight;
         boolean verticalHit =
-            y + radius >= DUMMY_TOP &&
-            y - radius <= GROUND_Y;
+            y + radius >= dummyTop() &&
+            y - radius <= dummyY;
 
         return horizontalHit && verticalHit;
     }
@@ -1436,7 +1472,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("HIT REACTION • v0.26", 975, 59, paint);
+        c.drawText("2H LAUNCHER • v0.27", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1611,8 +1647,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawDamageDummy(Canvas c) {
-        float top = DUMMY_TOP;
-        float baseY = GROUND_Y;
+        float top = dummyTop();
+        float baseY = dummyY;
 
         paint.setColor(Color.argb(70, 0, 0, 0));
         c.drawOval(
@@ -1639,6 +1675,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float recoilPose = dummyHitReactionTimer > 0f
             ? (float)Math.sin(hitProgress * Math.PI)
             : 0f;
+
+        if (dummyAirborne) {
+            float airTilt = dummyMovementLocked ? 1f : 0.55f;
+            recoilPose = Math.max(recoilPose, airTilt);
+        }
         boolean hitFlash =
             dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
 
@@ -1735,7 +1776,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
         paint.setTextSize(15f);
-        c.drawText("NPC TESTE", dummyX, barTop - 9f, paint);
+        c.drawText(
+            dummyMovementLocked
+                ? "NPC TESTE • SEM CONTROLE"
+                : (dummyAirborne ? "NPC TESTE • DESCENDO" : "NPC TESTE"),
+            dummyX,
+            barTop - 9f,
+            paint
+        );
         paint.setFakeBoldText(false);
 
         paint.setColor(Color.rgb(45, 53, 62));
