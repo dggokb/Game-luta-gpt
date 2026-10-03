@@ -181,6 +181,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final LinearGradient skyGradient;
+    private final android.graphics.Path[] mountainPaths =
+        new android.graphics.Path[15];
 
     private Thread gameThread;
     private volatile boolean running;
@@ -203,7 +206,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float attackTimer = 0f;
     private float attackDuration = 0f;
     private float walkTime = 0f;
-    private float energyAirDirection = 0f;
 
     private final float moveSpeed = 300f;
     private final float forwardDashSpeed = 620f;
@@ -217,6 +219,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DPAD_Y = 555f;
     private static final float DPAD_RADIUS = 122f;
     private static final float DPAD_DEADZONE = 28f;
+    private static final float DPAD_DIAGONAL = 0.70710677f;
+    private static final String[] DPAD_LABELS = {
+        "→", "↘", "↓", "↙", "←", "↖", "↑", "↗"
+    };
+    private static final float[] DPAD_UNIT_X = {
+        1f, DPAD_DIAGONAL, 0f, -DPAD_DIAGONAL,
+        -1f, -DPAD_DIAGONAL, 0f, DPAD_DIAGONAL
+    };
+    private static final float[] DPAD_UNIT_Y = {
+        0f, DPAD_DIAGONAL, 1f, DPAD_DIAGONAL,
+        0f, -DPAD_DIAGONAL, -1f, -DPAD_DIAGONAL
+    };
 
     private static final float ATTACK_RADIUS = 54f;
     private static final float LIGHT_X = 1005f;
@@ -311,6 +325,31 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
+
+        skyGradient = new LinearGradient(
+            0f,
+            WORLD_TOP,
+            0f,
+            VH,
+            Color.rgb(21, 55, 103),
+            Color.rgb(240, 171, 99),
+            Shader.TileMode.CLAMP
+        );
+        buildScenarioGeometry();
+    }
+
+    private void buildScenarioGeometry() {
+        for (int i = 0; i < mountainPaths.length; i++) {
+            float x = -100f + i * 190f;
+            float h = 105f + (i % 5) * 24f;
+
+            android.graphics.Path path = new android.graphics.Path();
+            path.moveTo(x, GROUND_Y);
+            path.lineTo(x + 115f, GROUND_Y - h);
+            path.lineTo(x + 245f, GROUND_Y);
+            path.close();
+            mountainPaths[i] = path;
+        }
     }
 
     private FighterState activeFighter() {
@@ -323,6 +362,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        if (running) return;
+
         running = true;
         gameThread = new Thread(this, "GameLoop");
         gameThread.start();
@@ -334,13 +375,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         running = false;
-        if (gameThread != null) {
+
+        Thread thread = gameThread;
+        if (thread != null) {
             try {
-                gameThread.join(800);
+                thread.join(800);
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             }
         }
+        gameThread = null;
     }
 
     @Override
@@ -599,7 +643,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private boolean canStartTag() {
-        return !isTagAnimationActive() && tagCooldownRemaining <= 0f;
+        return
+            !isTagAnimationActive() &&
+            !isSuperCinematicActive() &&
+            !isEnergyAttackActive() &&
+            tagCooldownRemaining <= 0f;
     }
 
     private void updateTagState(float dt) {
@@ -766,7 +814,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         resetAutoCombo();
 
-        energyAirDirection = 0f;
         if (!grounded) {
             // Durante o especial aéreo o deslocamento horizontal trava.
             // A componente vertical continua com inércia amortecida e gravidade reduzida.
@@ -987,17 +1034,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setAlpha(255);
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(1f);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStrokeJoin(Paint.Join.MITER);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTextScaleX(1f);
+        paint.setTextSkewX(0f);
     }
 
     private void drawScenario(Canvas c) {
-        paint.setShader(new LinearGradient(
-            0, WORLD_TOP, 0, VH,
-            Color.rgb(21, 55, 103),
-            Color.rgb(240, 171, 99),
-            Shader.TileMode.CLAMP
-        ));
+        paint.setShader(skyGradient);
         c.drawRect(0, WORLD_TOP, WORLD_WIDTH, VH, paint);
         paint.setShader(null);
 
@@ -1012,15 +1058,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         paint.setColor(Color.rgb(53, 73, 88));
-        for (int i = 0; i < 15; i++) {
-            float x = -100f + i * 190f;
-            float h = 105f + (i % 5) * 24f;
-            android.graphics.Path p = new android.graphics.Path();
-            p.moveTo(x, GROUND_Y);
-            p.lineTo(x + 115, GROUND_Y - h);
-            p.lineTo(x + 245, GROUND_Y);
-            p.close();
-            c.drawPath(p, paint);
+        for (android.graphics.Path mountainPath : mountainPaths) {
+            c.drawPath(mountainPath, paint);
         }
 
         paint.setColor(Color.rgb(116, 81, 50));
@@ -1088,7 +1127,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SUPER METER • v0.22", 975, 59, paint);
+        c.drawText("CORE REFINEMENT • v0.23", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -1480,18 +1519,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         paint.setStrokeWidth(2f);
         paint.setColor(Color.argb(90, 255, 255, 255));
-        for (int i = 0; i < 8; i++) {
-            double a = Math.toRadians(i * 45.0);
-            float x = DPAD_X + (float)Math.cos(a) * DPAD_RADIUS;
-            float y = DPAD_Y + (float)Math.sin(a) * DPAD_RADIUS;
+        for (int i = 0; i < DPAD_LABELS.length; i++) {
+            float x = DPAD_X + DPAD_UNIT_X[i] * DPAD_RADIUS;
+            float y = DPAD_Y + DPAD_UNIT_Y[i] * DPAD_RADIUS;
             c.drawLine(DPAD_X, DPAD_Y, x, y, paint);
         }
         paint.setStyle(Paint.Style.FILL);
 
         if (dpadDirection != 0) {
-            double angle = directionAngle(dpadDirection);
-            float hx = DPAD_X + (float)Math.cos(angle) * 72f;
-            float hy = DPAD_Y + (float)Math.sin(angle) * 72f;
+            int directionIndex = dpadDirection - 1;
+            float hx = DPAD_X + DPAD_UNIT_X[directionIndex] * 72f;
+            float hy = DPAD_Y + DPAD_UNIT_Y[directionIndex] * 72f;
             paint.setColor(Color.argb(165, 255, 255, 255));
             c.drawCircle(hx, hy, 31f, paint);
         }
@@ -1504,13 +1542,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(true);
         paint.setTextSize(27f);
 
-        String[] labels = {"→", "↘", "↓", "↙", "←", "↖", "↑", "↗"};
-        for (int i = 0; i < 8; i++) {
-            double a = Math.toRadians(i * 45.0);
-            float tx = DPAD_X + (float)Math.cos(a) * 78f;
-            float ty = DPAD_Y + (float)Math.sin(a) * 78f
-                - (paint.ascent() + paint.descent()) / 2f;
-            c.drawText(labels[i], tx, ty, paint);
+        float textCenterOffset = -(paint.ascent() + paint.descent()) / 2f;
+        for (int i = 0; i < DPAD_LABELS.length; i++) {
+            float tx = DPAD_X + DPAD_UNIT_X[i] * 78f;
+            float ty = DPAD_Y + DPAD_UNIT_Y[i] * 78f + textCenterOffset;
+            c.drawText(DPAD_LABELS[i], tx, ty, paint);
         }
 
         paint.setFakeBoldText(false);
@@ -1665,20 +1701,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return dx * dx + dy * dy <= radius * radius;
     }
 
-    private double directionAngle(int direction) {
-        switch (direction) {
-            case 1: return Math.toRadians(0);
-            case 2: return Math.toRadians(45);
-            case 3: return Math.toRadians(90);
-            case 4: return Math.toRadians(135);
-            case 5: return Math.toRadians(180);
-            case 6: return Math.toRadians(225);
-            case 7: return Math.toRadians(270);
-            case 8: return Math.toRadians(315);
-            default: return 0;
-        }
-    }
-
     private boolean isDownDirection(int direction) {
         return direction == 2 || direction == 3 || direction == 4;
     }
@@ -1692,12 +1714,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
-        float distance = (float)Math.sqrt(dx * dx + dy * dy);
+        float distanceSquared = dx * dx + dy * dy;
 
         int previous = dpadDirection;
         int next = 0;
 
-        if (distance >= DPAD_DEADZONE) {
+        if (distanceSquared >= DPAD_DEADZONE * DPAD_DEADZONE) {
             double degrees = Math.toDegrees(Math.atan2(dy, dx));
             if (degrees < 0) degrees += 360.0;
             int sector = ((int)Math.floor((degrees + 22.5) / 45.0)) % 8;
