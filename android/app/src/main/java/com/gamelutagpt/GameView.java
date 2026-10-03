@@ -210,7 +210,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (movingLeft && !movingRight) direction = -1f;
         if (movingRight && !movingLeft) direction = 1f;
 
-        if (attackTimer > 0f) {
+        if (attackTimer > 0f && grounded) {
+            // No chão, ataques travam o deslocamento horizontal.
             walkTime = 0f;
         } else if (backDashTimer > 0f && grounded) {
             playerX -= backDashSpeed * dt;
@@ -448,7 +449,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("TAG • v0.8", 975, 59, paint);
+        c.drawText("AIR ATTACK • v0.9", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
