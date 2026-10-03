@@ -2282,7 +2282,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("HIGH/LOW GUARD • v0.34", 975, 59, paint);
+        c.drawText("GUARD STANCE FIX • v0.35", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2970,7 +2970,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setStrokeWidth(18);
         int guardPose = playerBlockstunTimer > 0f
             ? playerLastGuardState
-            : currentPlayerGuardState();
+            : GUARD_NONE;
 
         if (guardPose == GUARD_HIGH) {
             // Defesa alta: braços protegem cabeça/torso.
@@ -3342,6 +3342,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         movingLeft = next == 4 || next == 5 || next == 6;
         movingRight = next == 1 || next == 2 || next == 8;
         crouching = grounded && isDownDirection(next);
+
+        int relativeNext = relativeDirection(next);
+        boolean holdingGroundGuard =
+            grounded &&
+            (relativeNext == 5 || relativeNext == 4);
+
+        if (holdingGroundGuard) {
+            // Segurar defesa prepara o bloqueio, mas não faz o personagem recuar.
+            movingLeft = false;
+            movingRight = false;
+            forwardDashing = false;
+        }
 
         if (next != 0 && next != previous) {
             recordCommandDirection(relativeDirection(next), nowMs);
