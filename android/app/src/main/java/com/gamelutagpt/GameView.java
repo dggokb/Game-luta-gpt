@@ -431,6 +431,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (canvas == null) return;
 
         try {
+            resetPaintForFrame();
+
             float sx = canvas.getWidth() / VW;
             float sy = canvas.getHeight() / VH;
 
@@ -455,6 +457,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } finally {
             holder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    private void resetPaintForFrame() {
+        paint.setShader(null);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(255);
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(1f);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawScenario(Canvas c) {
@@ -551,7 +563,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("ENERGY • v0.10", 975, 59, paint);
+        c.drawText("RENDER FIX • v0.11", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -867,6 +879,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText(enabled ? "S / KI" : "SEM KI", ENERGY_X, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+
+        // Não deixar alpha/estilo do estado desabilitado vazar para o próximo frame.
+        paint.setAlpha(255);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
     }
 
     private boolean insideCircle(
