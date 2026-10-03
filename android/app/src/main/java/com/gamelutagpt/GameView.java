@@ -278,7 +278,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("DPAD 8-WAY • v0.2", 975, 59, paint);
+        c.drawText("DASH • v0.3", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
         String state = backDashTimer > 0f ? "BACKDASH" : (forwardDashing ? "DASH" : (superJumping ? "SUPER JUMP" : (crouching ? "AGACHADO" : (!grounded ? "NO AR" : (movingLeft || movingRight ? "ANDANDO" : "PARADO")))));
