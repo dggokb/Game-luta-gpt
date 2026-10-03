@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - game-luta-astra
   workflow_dispatch:
 
 jobs:
@@ -29,10 +30,18 @@ jobs:
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Build debug APK
         working-directory: android
-        run: gradle assembleDebug --stacktrace
+        run: gradle testDebugUnitTest assembleDebug --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: GameLutaGPT-APK
+          name: GameLutaGPT-${{ github.ref_name }}-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      - name: Upload test reports and motion previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-${{ github.ref_name }}-validation
+          path: |
+            android/app/build/reports/tests/
+            android/app/build/astra-previews/

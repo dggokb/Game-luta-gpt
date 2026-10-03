@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Shader;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -129,6 +130,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    private final Object stateLock = new Object();
+    private final LinearGradient skyGradient = new LinearGradient(
+        0, WORLD_TOP, 0, VH, Color.rgb(21, 55, 103), Color.rgb(240, 171, 99), Shader.TileMode.CLAMP);
+    private final Path mountainPath = new Path();
+    private static final String[] DIRECTION_LABELS = {"→", "↘", "↓", "↙", "←", "↖", "↑", "↗"};
+    private static final float FIXED_STEP = 1f / 120f;
+    private float accumulatedTime;
+    private boolean surfaceReady;
+    private boolean activityActive = true;
     private Thread gameThread;
     private volatile boolean running;
 
@@ -150,7 +160,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float attackTimer = 0f;
     private float attackDuration = 0f;
     private float walkTime = 0f;
-    private float energyAirDirection = 0f;
+    private boolean attackCrouched;
+    private String bufferedAttack;
+    private boolean bufferedAutoCombo;
+    private long bufferedAttackTime;
+    private static final float ATTACK_BUFFER_SECONDS = 0.10f;
+    private float crouchBlend;
+    private float locomotionBlend;
+    private float landingTimer;
+    private final float[] pose = new float[22];
 
     private final float moveSpeed = 300f;
     private final float forwardDashSpeed = 620f;
@@ -226,9 +244,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        running = true;
-        gameThread = new Thread(this, "GameLoop");
-        gameThread.start();
+        surfaceReady = true;
+        startLoopIfReady();
     }
 
     @Override
@@ -236,13 +253,47 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+        surfaceReady = false;
+        stopLoop();
+    }
+
+    public void resumeGame() {
+        activityActive = true;
+        startLoopIfReady();
+    }
+
+    public void pauseGame() {
+        activityActive = false;
+        stopLoop();
+    }
+
+    private void startLoopIfReady() {
+        if (!surfaceReady || !activityActive || running) return;
+        accumulatedTime = 0f;
+        running = true;
+        gameThread = new Thread(this, "GameLoop");
+        gameThread.start();
+    }
+
+    private void stopLoop() {
         running = false;
-        if (gameThread != null) {
-            try {
-                gameThread.join(800);
-            } catch (InterruptedException ignored) {
-                Thread.currentThread().interrupt();
+        Thread stopped = gameThread;
+        if (stopped != null) {
+            stopped.interrupt();
+            boolean interrupted = false;
+            while (stopped.isAlive()) {
+                try {
+                    stopped.join();
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                }
             }
+            if (interrupted) Thread.currentThread().interrupt();
+            gameThread = null;
+        }
+        synchronized (stateLock) {
+            clearInput();
+            accumulatedTime = 0f;
         }
     }
 
@@ -250,34 +301,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     public void run() {
         long previous = System.nanoTime();
         final long targetFrame = 16_666_667L;
-
         while (running) {
             long frameStart = System.nanoTime();
-            float dt = Math.min(0.033f, (frameStart - previous) / 1_000_000_000f);
+            float elapsedSeconds = (frameStart - previous) / 1_000_000_000f;
             previous = frameStart;
-
-            update(dt);
+              synchronized (stateLock) {
+                advanceSimulation(elapsedSeconds);
+            }
+            if (!running) break;
             drawFrame();
-
-            long elapsed = System.nanoTime() - frameStart;
-            long remaining = targetFrame - elapsed;
+            long remaining = targetFrame - (System.nanoTime() - frameStart);
             if (remaining > 0) {
                 try {
-                    long ms = remaining / 1_000_000L;
-                    int ns = (int)(remaining % 1_000_000L);
-                    Thread.sleep(ms, ns);
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
+                    Thread.sleep(remaining / 1_000_000L, (int)(remaining % 1_000_000L));
+                } catch (InterruptedException e) {
+                    break;
                 }
             }
         }
     }
 
-    private void update(float dt) {
-        if (attackTimer > 0f) {
-            attackTimer = Math.max(0f, attackTimer - dt);
-            if (attackTimer <= 0f) attackType = "";
+    // Render cadence can vary; movement and attack timing always use the same steps.
+    private void advanceSimulation(float elapsedSeconds) {
+        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f);
+        while (accumulatedTime + 0.000001f >= FIXED_STEP) {
+            update(FIXED_STEP);
+            accumulatedTime = Math.max(0f, accumulatedTime - FIXED_STEP);
         }
+    }
+
+    private void update(float dt) {
+        // Split at recovery boundaries so neither movement nor queued attacks start early.
+        if (attackTimer > 0f && attackTimer < dt) {
+            float recovery = attackTimer;
+            update(recovery);
+            update(dt - recovery);
+            return;
+        }
+        float previousX = playerX;
+        crouching = grounded && isDownDirection(dpadDirection);
+        landingTimer = Math.max(0f, landingTimer - dt);
 
         updateEnergyProjectiles(dt);
 
@@ -291,10 +354,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // No chão, ataques travam o deslocamento horizontal.
             walkTime = 0f;
         } else if (backDashTimer > 0f && grounded) {
-            playerX -= backDashSpeed * dt;
+            playerX -= backDashSpeed * Math.min(dt, backDashTimer);
             backDashTimer = Math.max(0f, backDashTimer - dt);
             walkTime += dt * 13f;
-        } else if (direction != 0f && !crouching) {
+        } else if (direction != 0f && (!grounded || !crouching)) {
             float speed = (forwardDashing && direction > 0f && grounded) ? forwardDashSpeed : moveSpeed;
             playerX += direction * speed * dt;
             walkTime += dt * (forwardDashing ? 14f : 8f);
@@ -308,17 +371,37 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     ? gravity * 0.12f
                     : gravity;
 
+            playerY += velocityY * dt + 0.5f * activeGravity * dt * dt;
             velocityY += activeGravity * dt;
-            playerY += velocityY * dt;
             if (playerY >= GROUND_Y) {
                 playerY = GROUND_Y;
                 velocityY = 0f;
                 grounded = true;
                 superJumping = false;
+                crouching = isDownDirection(dpadDirection);
+                landingTimer = 0.14f;
             }
         }
 
         playerX = clamp(playerX, LEFT_BOUND, RIGHT_BOUND);
+        float movement = Math.abs(playerX - previousX) / Math.max(dt, 0.00001f);
+        locomotionBlend += ((grounded ? Math.min(1f, movement / moveSpeed) : 0f)
+            - locomotionBlend) * (1f - (float)Math.exp(-25f * dt));
+        float crouchTarget = (attackTimer > 0f ? attackCrouched : crouching) ? 1f : 0f;
+        crouchBlend += (crouchTarget - crouchBlend) * (1f - (float)Math.exp(-30f * dt));
+        if (attackTimer > 0f) {
+            attackTimer = Math.max(0f, attackTimer - dt);
+            if (attackTimer <= 0f) {
+                attackType = "";
+                if (bufferedAttack != null) {
+                    String next = bufferedAttack;
+                    boolean auto = bufferedAutoCombo;
+                    long time = bufferedAttackTime;
+                    bufferedAttack = null;
+                    requestAttack(next, auto, time);
+                }
+            }
+        }
 
         float visibleWorldWidth = VW / CAMERA_ZOOM;
         float halfVisible = visibleWorldWidth / 2f;
@@ -338,19 +421,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return "S".equals(attackType) && attackTimer > 0f;
     }
 
-    private boolean isCrouchAttackActive() {
-        return attackTimer > 0f && (
-            "2L".equals(attackType) ||
-            "2M".equals(attackType) ||
-            "2H".equals(attackType)
-        );
-    }
-
     private void startJump(boolean superJump) {
-        if (!grounded || isEnergyAttackActive()) return;
+        if (!grounded || attackTimer > 0f) return;
 
         grounded = false;
         crouching = false;
+        forwardDashing = false;
+        backDashTimer = 0f;
         superJumping = superJump;
         velocityY = superJump ? -superJumpSpeed : -jumpSpeed;
         playerY -= 2f;
@@ -358,6 +435,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void startAttack(String type) {
         attackType = type;
+        attackCrouched = grounded && (type.startsWith("2") || ("S".equals(type) && crouching));
         forwardDashing = false;
         backDashTimer = 0f;
 
@@ -379,7 +457,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void fireEnergyAttack(String strength) {
         FighterProfile profile = activeFighter().profile;
         if (!profile.hasEnergyAttack) return;
-        if (hasActiveEnergyProjectile(activeFighterIndex)) return;
+        if (attackTimer > 0f || hasActiveEnergyProjectile(activeFighterIndex)) return;
 
         float speedMultiplier;
         float damageMultiplier;
@@ -397,7 +475,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         resetAutoCombo();
 
-        energyAirDirection = 0f;
         if (!grounded) {
             // Durante o especial aéreo o deslocamento horizontal trava.
             // A componente vertical continua com inércia amortecida e gravidade reduzida.
@@ -486,6 +563,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         if (attackTimer > 0f) return;
         if (commandCount < profile.energyCommand.length) return;
+        // A new unrelated direction must not re-arm an old motion.
+        if (commandDirections[commandCount - 1] != profile.energyCommand[profile.energyCommand.length - 1]) return;
 
         int commandIndex = profile.energyCommand.length - 1;
         int bufferIndex = commandCount - 1;
@@ -533,28 +612,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         lastAutoComboTapMs = -1000L;
     }
 
-    private void triggerAutoCombo(long nowMs) {
-        String[] combo = activeFighter().profile.baseCombo;
-        if (combo.length == 0) return;
-
-        if (nowMs - lastAutoComboTapMs > AUTO_COMBO_RESET_MS) {
-            autoComboIndex = 0;
+    private void requestAttack(String button, boolean auto, long nowMs) {
+        if (isEnergyAttackActive()) return;
+        if (attackTimer > 0f) {
+            // One short recovery buffer: mashing cannot restart or skip animations.
+            if (attackTimer <= ATTACK_BUFFER_SECONDS && bufferedAttack == null) {
+                bufferedAttack = button;
+                bufferedAutoCombo = auto;
+                bufferedAttackTime = nowMs;
+            }
+            return;
         }
-
-        String nextAttack = combo[autoComboIndex];
-        startAttack(nextAttack);
-
-        autoComboIndex++;
-        if (autoComboIndex >= combo.length) {
-            autoComboIndex = 0;
+        if (!auto && tryFirePendingEnergy(button, nowMs)) return;
+        String type = button;
+        if (auto) {
+            String[] combo = activeFighter().profile.baseCombo;
+            if (combo.length == 0) return;
+            if (nowMs - lastAutoComboTapMs > AUTO_COMBO_RESET_MS) autoComboIndex = 0;
+            type = combo[autoComboIndex];
+            autoComboIndex = (autoComboIndex + 1) % combo.length;
+            lastAutoComboTapMs = nowMs;
+        } else {
+            resetAutoCombo();
         }
-
-        lastAutoComboTapMs = nowMs;
+        startAttack(grounded && crouching ? "2" + type : type);
     }
 
     private void switchFighter() {
         activeFighterIndex = (activeFighterIndex + 1) % team.length;
 
+        bufferedAttack = null;
         attackType = "";
         attackTimer = 0f;
         attackDuration = 0f;
@@ -577,7 +664,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float attackPhase() {
         if (attackTimer <= 0f || attackDuration <= 0f) return 0f;
         float t = 1f - attackTimer / attackDuration;
-        return t < 0.5f ? t * 2f : (1f - t) * 2f;
+        // Anticipation, fast extension, brief contact pose, controlled recovery.
+        if (t < 0.18f) return -0.14f * (float)Math.sin(Math.PI * t / 0.18f);
+        if (t < 0.38f) return smoothStep((t - 0.18f) / 0.20f);
+        if (t < 0.48f) return 1f;
+        return 1f - smoothStep((t - 0.48f) / 0.52f);
     }
 
     private void drawFrame() {
@@ -586,6 +677,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (canvas == null) return;
 
         try {
+            synchronized (stateLock) {
             resetPaintForFrame();
 
             float sx = canvas.getWidth() / VW;
@@ -609,6 +701,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             drawControls(canvas);
 
             canvas.restore();
+            }
         } finally {
             holder.unlockCanvasAndPost(canvas);
         }
@@ -625,12 +718,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawScenario(Canvas c) {
-        paint.setShader(new LinearGradient(
-            0, WORLD_TOP, 0, VH,
-            Color.rgb(21, 55, 103),
-            Color.rgb(240, 171, 99),
-            Shader.TileMode.CLAMP
-        ));
+        paint.setShader(skyGradient);
         c.drawRect(0, WORLD_TOP, WORLD_WIDTH, VH, paint);
         paint.setShader(null);
 
@@ -648,7 +736,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         for (int i = 0; i < 15; i++) {
             float x = -100f + i * 190f;
             float h = 105f + (i % 5) * 24f;
-            android.graphics.Path p = new android.graphics.Path();
+            Path p = mountainPath;
+            p.rewind();
             p.moveTo(x, GROUND_Y);
             p.lineTo(x + 115, GROUND_Y - h);
             p.lineTo(x + 245, GROUND_Y);
@@ -718,7 +807,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("CROUCH ATTACKS • v0.18", 975, 59, paint);
+        c.drawText("ASTRA • v0.18.1", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -784,6 +873,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawEnergyProjectiles(Canvas c) {
         for (EnergyProjectile projectile : energyProjectiles) {
+            paint.setColor(Color.argb(90, Color.red(projectile.color), Color.green(projectile.color), Color.blue(projectile.color)));
+            float tail = clamp(projectile.speed * 0.065f, 25f, 80f);
+            c.drawOval(projectile.x - tail, projectile.y - 12f, projectile.x + 8f, projectile.y + 12f, paint);
             paint.setColor(Color.argb(75, 255, 255, 255));
             c.drawCircle(projectile.x, projectile.y, 29f, paint);
 
@@ -796,124 +888,110 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawPlayer(Canvas c) {
-        float bob = (grounded && !crouching && (movingLeft || movingRight))
-            ? (float)Math.sin(walkTime) * 3f
-            : 0f;
+        float height = Math.max(0f, GROUND_Y - playerY);
+        float shadowScale = 1f / (1f + height / 450f);
+        paint.setColor(Color.argb((int)(70 * shadowScale), 0, 0, 0));
+        c.drawOval(playerX - 43 * shadowScale, GROUND_Y - 9 * shadowScale,
+            playerX + 43 * shadowScale, GROUND_Y + 9 * shadowScale, paint);
 
-        float baseY = playerY + bob;
-        boolean crouchPose = crouching || isCrouchAttackActive();
-        float bodyHeight = crouchPose ? 90f : 145f;
-        float top = baseY - bodyHeight;
-
-        paint.setColor(Color.argb(70, 0, 0, 0));
-        c.drawOval(playerX - 43, GROUND_Y - 10, playerX + 43, GROUND_Y + 10, paint);
-
+        buildPose();
+        c.save();
+        c.translate(playerX, playerY);
         paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeJoin(Paint.Join.ROUND);
         paint.setColor(activeFighter().profile.color);
-        c.drawCircle(playerX, top + 20, 25, paint);
-
-        paint.setStrokeWidth(crouchPose ? 22 : 25);
-        c.drawLine(playerX, top + 48, playerX, baseY - 45, paint);
-
-        float legSwing = (grounded && !crouching && (movingLeft || movingRight))
-            ? (float)Math.sin(walkTime) * 18f
-            : 0f;
-
-        float armSwing = -legSwing * 0.75f;
-
-        paint.setStrokeWidth(18);
-        if (crouchPose) {
-            float phase = attackPhase();
-
-            if ("2L".equals(attackType) && attackTimer > 0f) {
-                // Fraco agachado: golpe curto e rápido na linha baixa.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 70,
-                    playerX + 34 + 52f * phase,
-                    baseY - 48,
-                    paint
-                );
-                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
-            } else if ("2M".equals(attackType) && attackTimer > 0f) {
-                // Médio agachado: chute baixo com alcance maior.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
-                c.drawLine(playerX + 4, baseY - 70, playerX + 34, baseY - 43, paint);
-                c.drawLine(playerX - 5, baseY - 42, playerX - 36, baseY - 8, paint);
-                c.drawLine(
-                    playerX + 5,
-                    baseY - 42,
-                    playerX + 44 + 72f * phase,
-                    baseY - 12,
-                    paint
-                );
-            } else if ("2H".equals(attackType) && attackTimer > 0f) {
-                // Forte agachado: golpe mais amplo e pesado.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 32, baseY - 38, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 70,
-                    playerX + 42 + 82f * phase,
-                    baseY - 34 - 16f * phase,
-                    paint
-                );
-                c.drawLine(playerX - 5, baseY - 42, playerX - 46, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 44, baseY - 8, paint);
-            } else {
-                c.drawLine(playerX - 4, baseY - 70, playerX - 35, baseY - 38, paint);
-                c.drawLine(playerX + 4, baseY - 70, playerX + 38, baseY - 43, paint);
-                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 42, baseY - 8, paint);
-            }
-        } else {
-            float phase = attackPhase();
-
-            if ("L".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 30, top + 96, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 34 + 72f * phase, top + 66, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
-            } else if ("M".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 28, top + 97, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 30, top + 94, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 25, baseY, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 45,
-                    playerX + 34 + 76f * phase,
-                    baseY - 48f * phase,
-                    paint
-                );
-            } else if ("S".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX + 28, top + 76, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 58 + 34f * phase, top + 76, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
-            } else if ("H".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 26, top + 98, paint);
-                c.drawLine(
-                    playerX + 3,
-                    top + 58,
-                    playerX + 28 + 92f * phase,
-                    top + 84 + 22f * phase,
-                    paint
-                );
-                c.drawLine(playerX - 4, baseY - 45, playerX - 30, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 30, baseY, paint);
-            } else {
-                c.drawLine(playerX - 3, top + 58, playerX - 34 + armSwing, top + 100, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 34 - armSwing, top + 100, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 28 + legSwing, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 28 - legSwing, baseY, paint);
-            }
-        }
-
+        // Rear limbs are dimmed to keep overlapping poses readable.
+        paint.setAlpha(170);
+        drawLimb(c, 1, 3, 4, 15f);
+        drawLimb(c, 2, 7, 8, 18f);
+        paint.setAlpha(255);
+        paint.setStrokeWidth(24f);
+        c.drawLine(pose[2], pose[3], pose[4], pose[5], paint);
+        drawLimb(c, 2, 9, 10, 19f);
+        drawLimb(c, 1, 5, 6, 17f);
+        c.drawCircle(pose[12], pose[13], 11f, paint);
+        c.drawCircle(pose[0], pose[1], 24f, paint);
         paint.setColor(Color.rgb(24, 35, 48));
-        paint.setStrokeWidth(4);
-        c.drawLine(playerX - 10, top + 15, playerX - 4, top + 15, paint);
-        c.drawLine(playerX + 4, top + 15, playerX + 10, top + 15, paint);
+        paint.setStrokeWidth(4f);
+        c.drawLine(pose[0] + 3, pose[1] - 3, pose[0] + 12, pose[1] - 3, paint);
+        paint.setStrokeWidth(8f);
+        c.drawLine(pose[16] - 8, pose[17], pose[16] + 9, pose[17], paint);
+        c.drawLine(pose[20] - 8, pose[21], pose[20] + 11, pose[21], paint);
+        c.restore();
+    }
+
+    // Head, shoulder, hip, rear elbow/fist, front elbow/fist, rear knee/foot,
+    // front knee/foot. Reused storage avoids allocating skeletons every frame.
+    private void buildPose() {
+        float crouch = crouchBlend;
+        float stride = (float)Math.sin(walkTime) * locomotionBlend * (1f - crouch);
+        float travel = movingLeft && !movingRight ? -1f : 1f;
+        float lean = forwardDashing && grounded ? 13f : (backDashTimer > 0f ? -10f : 0f);
+        float landing = landingTimer > 0f ? (float)Math.sin(Math.PI * landingTimer / 0.14f) * 9f : 0f;
+        float bob = Math.abs(stride) * 3f + landing;
+        float hipY = -49f + crouch * 16f + bob;
+        float shoulderY = -96f + crouch * 36f + bob;
+        point(0, lean, -126f + crouch * 45f + bob);
+        point(1, lean, shoulderY);
+        point(2, 0f, hipY);
+        point(3, -27f - stride * 10f, shoulderY + 22f);
+        point(4, -14f - stride * 15f, shoulderY - 4f);
+        point(5, 26f + stride * 9f, shoulderY + 20f);
+        point(6, 38f + stride * 14f, shoulderY - 7f);
+        point(7, -19f - crouch * 13f + stride * 17f * travel, hipY + 21f);
+        point(8, -25f - crouch * 15f + stride * 27f * travel, -3f - Math.max(0f, stride) * 9f);
+        point(9, 20f + crouch * 16f - stride * 17f * travel, hipY + 21f);
+        point(10, 27f + crouch * 16f - stride * 27f * travel, -3f - Math.max(0f, -stride) * 9f);
+        if (!grounded) {
+            float tuck = velocityY < 0f ? 18f : 7f;
+            point(7, -22f, hipY + 14f);
+            point(8, -33f, -12f - tuck * 0.4f);
+            point(9, 27f, hipY + 10f - tuck);
+            point(10, 36f, -12f - tuck);
+        }
+        float extension = attackPhase();
+        if (attackTimer <= 0f) return;
+        char kind = attackType.charAt(attackType.length() - 1);
+        boolean low = attackCrouched;
+        if (kind == 'L') {
+            blendPoint(5, 49f, shoulderY + 4f, extension);
+            blendPoint(6, low ? 91f : 104f, shoulderY + (low ? 16f : 2f), extension);
+            blendPoint(0, 7f, pose[1], extension);
+            blendPoint(1, 8f, shoulderY, extension);
+        } else if (kind == 'M') {
+            blendPoint(9, 61f, low ? -19f : -61f, extension);
+            blendPoint(10, low ? 122f : 115f, low ? -8f : -65f, extension);
+            blendPoint(0, -13f, pose[1] - 4f, extension);
+            blendPoint(1, -10f, shoulderY, extension);
+        } else if (kind == 'H') {
+            blendPoint(0, 15f, pose[1] - (low ? 20f : 2f), extension);
+            blendPoint(1, 13f, shoulderY - (low ? 14f : 0f), extension);
+            blendPoint(5, 54f, low ? -103f : shoulderY + 17f, extension);
+            blendPoint(6, low ? 65f : 124f, low ? -153f : shoulderY + 25f, extension);
+            blendPoint(8, -39f, pose[17], extension);
+        } else if (kind == 'S') {
+            blendPoint(3, 26f, shoulderY + 23f, extension);
+            blendPoint(4, 61f, shoulderY + 12f, extension);
+            blendPoint(5, 42f, shoulderY + 12f, extension);
+            blendPoint(6, 81f, shoulderY + 8f, extension);
+        }
+    }
+
+    private void point(int joint, float x, float y) {
+        pose[joint * 2] = x;
+        pose[joint * 2 + 1] = y;
+    }
+
+    private void blendPoint(int joint, float x, float y, float amount) {
+        int i = joint * 2;
+        pose[i] += (x - pose[i]) * amount;
+        pose[i + 1] += (y - pose[i + 1]) * amount;
+    }
+
+    private void drawLimb(Canvas c, int root, int middle, int end, float width) {
+        paint.setStrokeWidth(width);
+        c.drawLine(pose[root * 2], pose[root * 2 + 1], pose[middle * 2], pose[middle * 2 + 1], paint);
+        c.drawLine(pose[middle * 2], pose[middle * 2 + 1], pose[end * 2], pose[end * 2 + 1], paint);
     }
 
     private void drawControls(Canvas c) {
@@ -951,13 +1029,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setFakeBoldText(true);
         paint.setTextSize(27f);
 
-        String[] labels = {"→", "↘", "↓", "↙", "←", "↖", "↑", "↗"};
+
         for (int i = 0; i < 8; i++) {
             double a = Math.toRadians(i * 45.0);
             float tx = DPAD_X + (float)Math.cos(a) * 78f;
             float ty = DPAD_Y + (float)Math.sin(a) * 78f
                 - (paint.ascent() + paint.descent()) / 2f;
-            c.drawText(labels[i], tx, ty, paint);
+            c.drawText(DIRECTION_LABELS[i], tx, ty, paint);
         }
 
         paint.setFakeBoldText(false);
@@ -1081,8 +1159,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateDpad(float x, float y, long nowMs) {
-        if (isEnergyAttackActive()) return;
-
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
         float distance = (float)Math.sqrt(dx * dx + dy * dy);
@@ -1103,13 +1179,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         movingRight = next == 1 || next == 2 || next == 8;
         crouching = grounded && isDownDirection(next);
 
+        // Track the thumb even while energy locks movement. Suppress actions, not input.
+        if (isEnergyAttackActive()) return;
         if (next != 0 && next != previous) {
             recordCommandDirection(next, nowMs);
         }
 
         if (next == 1 && previous != 1) {
             if (
-                !"S".equals(attackType) &&
+                attackTimer <= 0f &&
                 pendingEnergyUntilMs < nowMs &&
                 grounded &&
                 nowMs - lastForwardTapMs <= DASH_DOUBLE_TAP_MS
@@ -1126,7 +1204,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         if (next == 5 && previous != 5) {
             if (
-                !"S".equals(attackType) &&
+                attackTimer <= 0f &&
                 grounded &&
                 nowMs - lastBackTapMs <= DASH_DOUBLE_TAP_MS
             ) {
@@ -1136,11 +1214,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             lastBackTapMs = nowMs;
         }
 
-        if (isDownDirection(next) && !isDownDirection(previous)) {
+        if (isDownDirection(previous) && !isDownDirection(next)) {
             lastDownInputMs = nowMs;
         }
 
-        if (isUpDirection(next) && !isUpDirection(previous) && grounded) {
+        if (isUpDirection(next) && !isUpDirection(previous) && grounded && attackTimer <= 0f) {
             boolean superJump = nowMs - lastDownInputMs <= 360L;
             startJump(superJump);
         }
@@ -1157,11 +1235,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        synchronized (stateLock) {
+            return handleTouch(event);
+        }
+    }
+
+    private boolean handleTouch(MotionEvent event) {
+        if (getWidth() <= 0 || getHeight() <= 0) return true;
         float sx = getWidth() / VW;
         float sy = getHeight() / VH;
         int action = event.getActionMasked();
         int index = event.getActionIndex();
-        long nowMs = System.currentTimeMillis();
+        long nowMs = event.getEventTime();
 
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             int pointerId = event.getPointerId(index);
@@ -1171,10 +1256,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
-            if (isEnergyAttackActive()) {
-                return true;
-            }
-
             if (
                 dpadPointer == -1 &&
                 dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS
@@ -1183,31 +1264,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 updateDpad(x, y, nowMs);
             } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
                 lightPointer = pointerId;
-                if (!tryFirePendingEnergy("L", nowMs)) {
-                    resetAutoCombo();
-                    startAttack(grounded && crouching ? "2L" : "L");
-                }
+                requestAttack("L", false, nowMs);
             } else if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) {
                 mediumPointer = pointerId;
-                if (!tryFirePendingEnergy("M", nowMs)) {
-                    resetAutoCombo();
-                    startAttack(grounded && crouching ? "2M" : "M");
-                }
+                requestAttack("M", false, nowMs);
             } else if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) {
                 heavyPointer = pointerId;
-                if (!tryFirePendingEnergy("H", nowMs)) {
-                    resetAutoCombo();
-                    startAttack(grounded && crouching ? "2H" : "H");
-                }
+                requestAttack("H", false, nowMs);
             } else if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) {
                 comboPointer = pointerId;
-                triggerAutoCombo(nowMs);
+                requestAttack("", true, nowMs);
             } else if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) {
                 tagPointer = pointerId;
                 switchFighter();
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
-            if (!isEnergyAttackActive() && dpadPointer != -1) {
+            if (dpadPointer != -1) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);
                 if (pointerIndex >= 0) {
                     float x = event.getX(pointerIndex) / sx;
@@ -1222,16 +1294,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             int pointerId = event.getPointerId(index);
 
             if (pointerId == dpadPointer) {
-                if (isEnergyAttackActive()) {
-                    dpadPointer = -1;
-                    dpadDirection = 0;
-                    movingLeft = false;
-                    movingRight = false;
-                    crouching = false;
-                    forwardDashing = false;
-                } else {
-                    clearDpad();
-                }
+                if (isDownDirection(dpadDirection)) lastDownInputMs = nowMs;
+                clearDpad();
             }
             if (pointerId == lightPointer) lightPointer = -1;
             if (pointerId == mediumPointer) mediumPointer = -1;
@@ -1239,15 +1303,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == comboPointer) comboPointer = -1;
             if (pointerId == tagPointer) tagPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
-            clearDpad();
-            lightPointer = -1;
-            mediumPointer = -1;
-            heavyPointer = -1;
-            comboPointer = -1;
-            tagPointer = -1;
+            clearInput();
         }
 
         return true;
+    }
+
+    private void clearInput() {
+        clearDpad();
+        lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = -1;
+        lastDownInputMs = lastForwardTapMs = lastBackTapMs = -1000L;
+        backDashTimer = 0f;
+        bufferedAttack = null;
+        pendingEnergyUntilMs = -1L;
+        resetCommandBuffer();
+        resetAutoCombo();
+    }
+
+    private static float smoothStep(float t) {
+        t = clamp(t, 0f, 1f);
+        return t * t * (3f - 2f * t);
     }
 
     private static float clamp(float value, float min, float max) {
