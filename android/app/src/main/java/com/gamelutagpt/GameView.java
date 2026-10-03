@@ -577,8 +577,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateEnergyProjectiles(dt);
         updateSuperProjectiles(dt);
 
+        int relativeHeldDirection = relativeDirection(dpadDirection);
+        boolean holdingGuardDirection =
+            grounded &&
+            (
+                relativeHeldDirection == 5 ||
+                relativeHeldDirection == 4
+            );
+
         float direction = 0f;
         if (
+            !holdingGuardDirection &&
             !playerMovementLocked &&
             !isEnergyAttackActive() &&
             !isTagAnimationActive()
