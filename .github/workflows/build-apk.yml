@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - game-luta-sprite-gpt
   workflow_dispatch:
 
 jobs:
