@@ -389,6 +389,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float SUPER_GAIN_MEDIUM = 0.15f;
     private static final float SUPER_GAIN_HEAVY = 0.20f;
     private static final float SUPER_GAIN_ENERGY = 0.45f;
+    // KOF-style Power Gauge: defender also builds meter by guarding.
+    // Values are adapted to this game's 0..5 stock scale.
+    private static final float SUPER_GUARD_GAIN_LIGHT = 0.05f;
+    private static final float SUPER_GUARD_GAIN_MEDIUM = 0.075f;
+    private static final float SUPER_GUARD_GAIN_HEAVY = 0.10f;
+    private static final float SUPER_GUARD_GAIN_ENERGY = 0.20f;
+    private static final float SUPER_GUARD_GAIN_SUPER = 0.25f;
 
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
@@ -732,8 +739,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         aiBackDashTimer = 0f;
         aiCrouching = type.startsWith("2");
 
-        float gain = superGainForAttack(type);
-        if (gain > 0f) addSuperMeter(opponentFighter, gain);
     }
 
     private void startOpponentJump(boolean superJump) {
@@ -788,7 +793,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             AI_OWNER_INDEX,
             direction
         ));
-        addSuperMeter(opponentFighter, SUPER_GAIN_ENERGY);
         aiAttackCooldownRemaining = 0.40f;
     }
 
@@ -1325,6 +1329,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     58f
                 )
             ) {
+                if (
+                    projectile.ownerIndex >= 0 &&
+                    projectile.ownerIndex < team.length
+                ) {
+                    addSuperMeter(
+                        team[projectile.ownerIndex],
+                        superGainForAttack("S")
+                    );
+                }
                 applyDummyDamage(projectile.damage, projectile.direction);
                 hit = true;
             }
@@ -1532,6 +1545,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
         if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;
         if ("H".equals(type) || "2H".equals(type)) return SUPER_GAIN_HEAVY;
+        if ("S".equals(type)) return SUPER_GAIN_ENERGY;
+        // Supers spend meter and never refill themselves.
+        return 0f;
+    }
+
+    private float superGainForGuard(String type) {
+        if ("L".equals(type) || "2L".equals(type)) return SUPER_GUARD_GAIN_LIGHT;
+        if ("M".equals(type) || "2M".equals(type)) return SUPER_GUARD_GAIN_MEDIUM;
+        if ("H".equals(type) || "2H".equals(type)) return SUPER_GUARD_GAIN_HEAVY;
+        if ("S".equals(type)) return SUPER_GUARD_GAIN_ENERGY;
+        if ("SUPER".equals(type)) return SUPER_GUARD_GAIN_SUPER;
         return 0f;
     }
 
@@ -1550,10 +1574,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         attackTimer = attackDuration;
 
-        float superGain = superGainForAttack(type);
-        if (superGain > 0f) {
-            addSuperMeter(activeFighter(), superGain);
-        }
     }
 
     private int damageForAttack(String type) {
@@ -1586,6 +1606,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float dummyCenterY = (dummyTop() + dummyY) * 0.5f;
         if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
 
+        // KOF XV-style: whiffs give nothing; a confirmed hit builds Power Gauge.
+        addSuperMeter(activeFighter(), superGainForAttack(attackType));
         applyDummyDamage(damage, facingDirection);
 
         if ("2M".equals(attackType)) {
@@ -1734,7 +1756,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             facingDirection
         ));
 
-        addSuperMeter(activeFighter(), SUPER_GAIN_ENERGY);
     }
 
     private boolean tryFirePendingEnergy(String attackButton, long nowMs) {
@@ -2037,13 +2058,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return GUARD_NONE;
     }
 
-    private void applyPlayerBlock(int hitDirection) {
+    private void applyPlayerBlock(int hitDirection, String type) {
         int guard = currentPlayerGuardState();
         playerLastGuardState = guard;
         playerBlockFlashTimer = 0.12f;
         playerBlockstunTimer = BLOCKSTUN_DURATION;
         playerMovementLocked = true;
         playerKnockbackVelocityX = hitDirection * BLOCK_PUSH_SPEED;
+
+        // KOF XV-style: guarding builds the defender's Power Gauge.
+        addSuperMeter(activeFighter(), superGainForGuard(type));
 
         attackType = "";
         attackTimer = 0f;
@@ -2061,9 +2085,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         boolean attackerSuperJumping
     ) {
         if (playerBlocksAttack(type, attackerAirborne)) {
-            applyPlayerBlock(hitDirection);
+            applyPlayerBlock(hitDirection, type);
             return;
         }
+
+        // Successful AI hit builds the attacker's gauge. Supers return zero.
+        addSuperMeter(opponentFighter, superGainForAttack(type));
         applyDamage(damage);
         if (activeFighter().life <= 0) {
             playerMovementLocked = true;
