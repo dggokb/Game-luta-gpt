@@ -23,6 +23,7 @@ final class Fighter3DState {
 
     volatile boolean crouching = false;
     volatile boolean airborne = false;
+    volatile boolean superJumping = false;
     volatile boolean superPose = false;
     volatile boolean hitFlash = false;
     volatile boolean visible = true;
