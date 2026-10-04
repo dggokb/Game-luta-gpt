@@ -90,12 +90,28 @@ public class SpriteIntegrationTest {
     }
     @Test public void mediumKickUsesWideCanvasWithoutShrinkingCharacter() {
         Bitmap kick=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_medium_kick);
-        assertNotNull(kick);assertEquals(1152,kick.getWidth());assertEquals(256,kick.getHeight());
-        for(int i=0;i<3;i++) {
-            int count=0;
-            for(int y=0;y<256;y++)for(int x=i*384;x<(i+1)*384;x++)
-                if(Color.alpha(kick.getPixel(x,y))>10)count++;
+        assertNotNull(kick);
+        int fw=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH;
+        int fh=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT;
+        int countFrames=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_COUNT;
+        assertEquals(fw*countFrames,kick.getWidth());
+        assertEquals(fh,kick.getHeight());
+        assertEquals(128,GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X);
+        assertEquals(238,GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y);
+        for(int i=0;i<countFrames;i++) {
+            int count=0,minX=fw,minY=fh,maxX=-1,maxY=-1;
+            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
+                if(Color.alpha(kick.getPixel(i*fw+x,y))>10) {
+                    count++;
+                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+                }
+            }
             assertTrue("Empty medium kick frame "+i,count>10000);
+            assertTrue("Kick clipped left "+i,minX>=8);
+            assertTrue("Kick clipped right "+i,fw-1-maxX>=8);
+            assertTrue("Kick clipped top "+i,minY>=8);
+            assertTrue("Kick clipped bottom "+i,fh-1-maxY>=8);
         }
     }
     @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
