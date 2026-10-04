@@ -287,6 +287,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final SpriteFighterRenderer spriteFighterRenderer =
+        new SpriteFighterRenderer();
     private final LinearGradient skyGradient;
     private final android.graphics.Path[] mountainPaths =
         new android.graphics.Path[15];
@@ -2458,7 +2460,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("FIGHT CAMERA • v0.38", 975, 59, paint);
+        c.drawText("SPRITE 2D • v0.40", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -3091,17 +3093,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawPlayer(Canvas c) {
-        float bob = (grounded && !crouching && (movingLeft || movingRight))
-            ? (float)Math.sin(walkTime) * 3f
-            : 0f;
-
-        float baseY = playerY + bob;
-        boolean crouchPose = crouching || isCrouchAttackActive();
-        float bodyHeight = crouchPose ? 90f : 145f;
-        float top = baseY - bodyHeight;
-
-        paint.setColor(Color.argb(70, 0, 0, 0));
-        c.drawOval(playerX - 43, GROUND_Y - 10, playerX + 43, GROUND_Y + 10, paint);
+        float baseY = playerY;
 
         float playerKnockdownAngle = 0f;
         if (playerKnockdownState == DUMMY_KD_FALL) {
@@ -3123,151 +3115,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (playerKnockdownAngle != 0f) {
-            c.rotate(playerKnockdownAngle, playerX, GROUND_Y);
+            c.rotate(
+                playerKnockdownAngle,
+                playerX,
+                GROUND_Y
+            );
         }
 
-        paint.setStrokeCap(Paint.Cap.ROUND);
-        int playerColor;
-        if (playerBlockFlashTimer > 0f) {
-            playerColor = Color.rgb(205, 240, 255);
-        } else if (playerDamageFlashTimer > 0f) {
-            playerColor = Color.WHITE;
-        } else {
-            playerColor = activeFighter().profile.color;
-        }
-        paint.setColor(playerColor);
-        c.drawCircle(playerX, top + 20, 25, paint);
-
-        paint.setStrokeWidth(crouchPose ? 22 : 25);
-        c.drawLine(playerX, top + 48, playerX, baseY - 45, paint);
-
-        float legSwing = (grounded && !crouching && (movingLeft || movingRight))
-            ? (float)Math.sin(walkTime) * 18f
-            : 0f;
-
-        float armSwing = -legSwing * 0.75f;
-
-        paint.setStrokeWidth(18);
         int guardPose = playerBlockstunTimer > 0f
             ? playerLastGuardState
             : anticipatedPlayerGuardPose();
 
-        if (guardPose == GUARD_HIGH) {
-            // Defesa alta: braços protegem cabeça/torso.
-            c.drawLine(playerX - 3, top + 58, playerX - 25, top + 34, paint);
-            c.drawLine(playerX + 3, top + 58, playerX + 28, top + 33, paint);
-            c.drawLine(playerX - 4, baseY - 45, playerX - 29, baseY, paint);
-            c.drawLine(playerX + 4, baseY - 45, playerX + 31, baseY, paint);
-        } else if (guardPose == GUARD_LOW) {
-            // Defesa baixa: postura agachada protegendo linha inferior.
-            c.drawLine(playerX - 4, baseY - 70, playerX - 31, baseY - 47, paint);
-            c.drawLine(playerX + 4, baseY - 70, playerX + 35, baseY - 50, paint);
-            c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-            c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
-        } else if (crouchPose) {
-            float phase = attackPhase();
+        boolean moving =
+            grounded &&
+            !crouching &&
+            (movingLeft || movingRight);
 
-            if ("2L".equals(attackType) && attackTimer > 0f) {
-                // Fraco agachado: golpe curto e rápido na linha baixa.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 70,
-                    playerX + 34 + 52f * phase,
-                    baseY - 48,
-                    paint
-                );
-                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
-            } else if ("2M".equals(attackType) && attackTimer > 0f) {
-                // Médio agachado: chute baixo com alcance maior.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
-                c.drawLine(playerX + 4, baseY - 70, playerX + 34, baseY - 43, paint);
-                c.drawLine(playerX - 5, baseY - 42, playerX - 36, baseY - 8, paint);
-                c.drawLine(
-                    playerX + 5,
-                    baseY - 42,
-                    playerX + 44 + 72f * phase,
-                    baseY - 12,
-                    paint
-                );
-            } else if ("2H".equals(attackType) && attackTimer > 0f) {
-                // Forte agachado: golpe mais amplo e pesado.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 32, baseY - 38, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 70,
-                    playerX + 42 + 82f * phase,
-                    baseY - 34 - 16f * phase,
-                    paint
-                );
-                c.drawLine(playerX - 5, baseY - 42, playerX - 46, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 44, baseY - 8, paint);
-            } else {
-                c.drawLine(playerX - 4, baseY - 70, playerX - 35, baseY - 38, paint);
-                c.drawLine(playerX + 4, baseY - 70, playerX + 38, baseY - 43, paint);
-                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 42, baseY - 8, paint);
-            }
-        } else {
-            float phase = attackPhase();
-
-            if (isSuperPoseActive()) {
-                float power = 1f + 0.10f * (float)Math.sin(superPhaseTimer * 24f);
-                c.drawLine(playerX - 3, top + 58, playerX - 58f * power, top + 38, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 74f * power, top + 36, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 40, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 42, baseY - 5, paint);
-            } else if (isTagPoseActive()) {
-                // Pose curta de prontidão ao terminar a entrada.
-                float poseWave = (float)Math.sin(tagPhaseTimer * 16f) * 4f;
-                c.drawLine(playerX - 3, top + 58, playerX - 42, top + 88 - poseWave, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 48, top + 72 + poseWave, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 34, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 32, baseY - 4, paint);
-            } else if ("L".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 30, top + 96, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 34 + 72f * phase, top + 66, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
-            } else if ("M".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 28, top + 97, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 30, top + 94, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 25, baseY, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 45,
-                    playerX + 34 + 76f * phase,
-                    baseY - 48f * phase,
-                    paint
-                );
-            } else if ("S".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX + 28, top + 76, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 58 + 34f * phase, top + 76, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
-            } else if ("H".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 26, top + 98, paint);
-                c.drawLine(
-                    playerX + 3,
-                    top + 58,
-                    playerX + 28 + 92f * phase,
-                    top + 84 + 22f * phase,
-                    paint
-                );
-                c.drawLine(playerX - 4, baseY - 45, playerX - 30, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 30, baseY, paint);
-            } else {
-                c.drawLine(playerX - 3, top + 58, playerX - 34 + armSwing, top + 100, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 34 - armSwing, top + 100, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 28 + legSwing, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 28 - legSwing, baseY, paint);
-            }
-        }
-
-        paint.setColor(Color.rgb(24, 35, 48));
-        paint.setStrokeWidth(4);
-        c.drawLine(playerX + 4, top + 15, playerX + 12, top + 15, paint);
+        spriteFighterRenderer.draw(
+            c,
+            paint,
+            playerX,
+            baseY,
+            grounded,
+            crouching || isCrouchAttackActive(),
+            moving,
+            walkTime,
+            attackType,
+            attackTimer,
+            guardPose,
+            isSuperPoseActive() || isTagPoseActive(),
+            playerDamageFlashTimer > 0f,
+            playerBlockFlashTimer > 0f
+        );
     }
 
     private void drawControls(Canvas c) {
