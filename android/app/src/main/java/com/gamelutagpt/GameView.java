@@ -291,6 +291,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         new CelShadedFighter3D();
     private final FighterPrototype01Renderer prototype01Renderer =
         new FighterPrototype01Renderer();
+    private final FighterAnimationController playerAnimation =
+        new FighterAnimationController();
     private final CelShadedStage3D cel3dStage =
         new CelShadedStage3D();
     private final LinearGradient skyGradient;
@@ -580,6 +582,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
+            updatePlayerAnimation(dt);
             return;
         }
 
@@ -667,6 +670,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateFacing();
 
         updateFightCamera(dt);
+        updatePlayerAnimation(dt);
     }
 
     private FighterProfile opponentProfile() {
@@ -2465,16 +2469,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("FIGHTER PROTOTYPE 01 • v0.43", 975, 59, paint);
+        c.drawText("FIGHTER PROTOTYPE 01 • v0.44", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
         c.drawText("Estado:", 975, 88, paint);
         c.drawText(currentStateLabel(), 1032, 88, paint);
 
-        paint.setTextSize(14f);
+        paint.setTextSize(12f);
+        String facingLabel =
+            facingDirection > 0 ? "FACING →" : "FACING ←";
         c.drawText(
-            facingDirection > 0 ? "FACING: →" : "FACING: ←",
+            facingLabel + "  •  ANIM " + playerAnimation.debugLabel(),
             975,
             106,
             paint
@@ -2530,6 +2536,157 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private void updatePlayerAnimation(float dt) {
+        FighterAnimationState next = resolvePlayerAnimationState();
+        playerAnimation.update(next, dt, playerAnimationPhase(next));
+    }
+
+    private FighterAnimationState resolvePlayerAnimationState() {
+        if (playerKnockdownState == DUMMY_KD_FALL) {
+            return FighterAnimationState.KNOCKDOWN_FALL;
+        }
+        if (playerKnockdownState == DUMMY_KD_DOWN) {
+            return FighterAnimationState.KNOCKDOWN_DOWN;
+        }
+        if (playerKnockdownState == DUMMY_KD_GETUP) {
+            return FighterAnimationState.GET_UP;
+        }
+
+        if (playerHitReactionTimer > 0f) {
+            return FighterAnimationState.HIT;
+        }
+
+        if (playerBlockstunTimer > 0f) {
+            return playerLastGuardState == GUARD_LOW
+                ? FighterAnimationState.GUARD_LOW
+                : FighterAnimationState.GUARD_HIGH;
+        }
+
+        int anticipatedGuard = anticipatedPlayerGuardPose();
+        if (anticipatedGuard == GUARD_LOW) {
+            return FighterAnimationState.GUARD_LOW;
+        }
+        if (anticipatedGuard == GUARD_HIGH) {
+            return FighterAnimationState.GUARD_HIGH;
+        }
+
+        if (isSuperCinematicActive()) {
+            return FighterAnimationState.SUPER;
+        }
+
+        if (isTagAnimationActive()) {
+            return FighterAnimationState.TAG;
+        }
+
+        if (attackTimer > 0f) {
+            boolean air = !grounded;
+
+            if ("L".equals(attackType)) {
+                return air
+                    ? FighterAnimationState.AIR_ATTACK_L
+                    : FighterAnimationState.ATTACK_L;
+            }
+            if ("M".equals(attackType)) {
+                return air
+                    ? FighterAnimationState.AIR_ATTACK_M
+                    : FighterAnimationState.ATTACK_M;
+            }
+            if ("H".equals(attackType)) {
+                return air
+                    ? FighterAnimationState.AIR_ATTACK_H
+                    : FighterAnimationState.ATTACK_H;
+            }
+            if ("2L".equals(attackType)) {
+                return FighterAnimationState.ATTACK_2L;
+            }
+            if ("2M".equals(attackType)) {
+                return FighterAnimationState.ATTACK_2M;
+            }
+            if ("2H".equals(attackType)) {
+                return FighterAnimationState.ATTACK_2H;
+            }
+            if ("S".equals(attackType)) {
+                return air
+                    ? FighterAnimationState.AIR_SPECIAL
+                    : FighterAnimationState.SPECIAL;
+            }
+        }
+
+        if (!grounded) {
+            if (superJumping) {
+                return velocityY < 0f
+                    ? FighterAnimationState.SUPER_JUMP_RISE
+                    : FighterAnimationState.SUPER_JUMP_FALL;
+            }
+
+            return velocityY < 0f
+                ? FighterAnimationState.JUMP_RISE
+                : FighterAnimationState.JUMP_FALL;
+        }
+
+        if (backDashTimer > 0f) {
+            return FighterAnimationState.BACKDASH;
+        }
+
+        if (forwardDashing) {
+            return FighterAnimationState.DASH_FORWARD;
+        }
+
+        if (crouching) {
+            return FighterAnimationState.CROUCH;
+        }
+
+        if (movingLeft || movingRight) {
+            int movementDirection = movingRight ? 1 : -1;
+            return movementDirection == facingDirection
+                ? FighterAnimationState.WALK_FORWARD
+                : FighterAnimationState.WALK_BACKWARD;
+        }
+
+        return FighterAnimationState.IDLE;
+    }
+
+    private float playerAnimationPhase(FighterAnimationState state) {
+        switch (state) {
+            case ATTACK_L:
+            case ATTACK_M:
+            case ATTACK_H:
+            case ATTACK_2L:
+            case ATTACK_2M:
+            case ATTACK_2H:
+            case AIR_ATTACK_L:
+            case AIR_ATTACK_M:
+            case AIR_ATTACK_H:
+            case SPECIAL:
+            case AIR_SPECIAL:
+                return attackPhase();
+
+            case KNOCKDOWN_FALL:
+                return clamp(
+                    playerKnockdownTimer / DUMMY_KD_FALL_DURATION,
+                    0f,
+                    1f
+                );
+
+            case KNOCKDOWN_DOWN:
+                return clamp(
+                    playerKnockdownTimer / DUMMY_KD_DOWN_DURATION,
+                    0f,
+                    1f
+                );
+
+            case GET_UP:
+                return clamp(
+                    playerKnockdownTimer / DUMMY_KD_GETUP_DURATION,
+                    0f,
+                    1f
+                );
+
+            default:
+                return 0f;
+        }
     }
 
     private String currentStateLabel() {
@@ -2887,18 +3044,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawPlayer(Canvas c) {
-        float bob = (grounded && !crouching && (movingLeft || movingRight))
-            ? (float)Math.sin(walkTime) * 3f
-            : 0f;
-
-        float baseY = playerY + bob;
-        boolean crouchPose = crouching || isCrouchAttackActive();
+        float baseY = playerY;
 
         paint.setColor(Color.argb(70, 0, 0, 0));
         c.drawOval(
-            playerX - 47f,
+            playerX - 54f,
             GROUND_Y - 11f,
-            playerX + 47f,
+            playerX + 54f,
             GROUND_Y + 11f,
             paint
         );
@@ -2926,39 +3078,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.rotate(playerKnockdownAngle, playerX, GROUND_Y);
         }
 
-        int playerColor;
-        if (playerBlockFlashTimer > 0f) {
-            playerColor = Color.rgb(205, 240, 255);
-        } else if (playerDamageFlashTimer > 0f) {
-            playerColor = Color.WHITE;
-        } else {
-            playerColor = activeFighter().profile.color;
-        }
-
-        int guardPose = playerBlockstunTimer > 0f
-            ? playerLastGuardState
-            : anticipatedPlayerGuardPose();
-
-        int celGuard = CelShadedFighter3D.GUARD_NONE;
-        if (guardPose == GUARD_HIGH) {
-            celGuard = CelShadedFighter3D.GUARD_HIGH;
-        } else if (guardPose == GUARD_LOW) {
-            celGuard = CelShadedFighter3D.GUARD_LOW;
-        }
-
         prototype01Renderer.draw(
             c,
             paint,
             playerX,
             baseY,
-            playerColor,
-            crouchPose,
-            !grounded,
-            walkTime,
-            attackType,
-            attackPhase(),
-            celGuard,
-            isSuperPoseActive() || isTagPoseActive(),
+            playerAnimation.state(),
+            playerAnimation.stateTime(),
+            playerAnimation.actionPhase(),
             playerDamageFlashTimer > 0f
         );
     }
