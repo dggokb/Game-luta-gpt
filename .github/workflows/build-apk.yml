@@ -31,6 +31,43 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: gradle assembleDebug --stacktrace
+
+      - name: Runtime smoke test on Android emulator
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb logcat -c
+            adb shell am force-stop com.gamelutagpt
+            adb shell am start -W -n com.gamelutagpt/.MainActivity
+            sleep 5
+            PID="$(adb shell pidof com.gamelutagpt | tr -d '\r')"
+            if [ -z "$PID" ]; then
+              echo "Game process is not running after launch."
+              adb logcat -d -v time
+              exit 1
+            fi
+            if adb logcat -d -v brief | grep -E "FATAL EXCEPTION|Process: com\.gamelutagpt"; then
+              echo "Runtime crash detected."
+              adb logcat -d -v time
+              exit 1
+            fi
+            adb exec-out screencap -p > game-smoke.png
+            test -s game-smoke.png
+
+      - name: Upload runtime screenshot
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-Smoke-Screenshot
+          path: game-smoke.png
+          if-no-files-found: error
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
