@@ -38,8 +38,10 @@ jobs:
           python3 tools/sprites/import_sprites.py
           git diff --exit-code -- \
             android/app/src/main/res/drawable-nodpi/player_base_medium_kick.png \
+            android/app/src/main/res/drawable-nodpi/player_base_heavy_straight.png \
             android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java \
-            tools/sprites/reports/player_base_medium_kick.report.json
+            tools/sprites/reports/player_base_medium_kick.report.json \
+            tools/sprites/reports/player_base_heavy_straight.report.json
 
       - name: Build debug APK
         working-directory: android
