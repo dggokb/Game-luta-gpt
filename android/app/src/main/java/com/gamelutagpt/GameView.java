@@ -286,6 +286,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private String aiStatusLabel = "IA OFF";
 
     private final SurfaceHolder holder;
+    private final Fighter3DState fighter3DState;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final CelShadedFighter3D cel3dRenderer =
         new CelShadedFighter3D();
@@ -469,7 +470,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int commandCount = 0;
 
     public GameView(Context context) {
+        this(context, null);
+    }
+
+    public GameView(
+        Context context,
+        Fighter3DState fighter3DState
+    ) {
         super(context);
+        this.fighter3DState = fighter3DState;
+
         holder = getHolder();
         holder.addCallback(this);
         setFocusable(true);
@@ -2345,7 +2355,69 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             (targetCameraTop - cameraTop) * verticalFollow;
     }
 
+    private void syncFighter3DState() {
+        if (fighter3DState == null) return;
+
+        fighter3DState.playerX = playerX;
+        fighter3DState.playerY = playerY;
+        fighter3DState.visualOffsetX = tagVisualOffsetX;
+
+        fighter3DState.cameraX = cameraX;
+        fighter3DState.cameraTop = cameraTop;
+        fighter3DState.renderZoom =
+            cameraZoom * superCameraZoom;
+
+        fighter3DState.facingDirection = facingDirection;
+        fighter3DState.crouching =
+            crouching || isCrouchAttackActive();
+        fighter3DState.airborne = !grounded;
+        fighter3DState.superJumping = superJumping;
+
+        fighter3DState.walkTime = walkTime;
+        fighter3DState.attackType = attackType;
+        fighter3DState.attackPhase = attackPhase();
+
+        fighter3DState.guardPose =
+            playerBlockstunTimer > 0f
+                ? playerLastGuardState
+                : anticipatedPlayerGuardPose();
+
+        fighter3DState.superPose =
+            isSuperPoseActive() || isTagPoseActive();
+        fighter3DState.hitFlash =
+            playerDamageFlashTimer > 0f;
+
+        float angle = 0f;
+        if (playerKnockdownState == DUMMY_KD_FALL) {
+            float t = clamp(
+                playerKnockdownTimer /
+                    DUMMY_KD_FALL_DURATION,
+                0f,
+                1f
+            );
+            angle = -88f * t;
+        } else if (
+            playerKnockdownState == DUMMY_KD_DOWN
+        ) {
+            angle = -88f;
+        } else if (
+            playerKnockdownState == DUMMY_KD_GETUP
+        ) {
+            float t = clamp(
+                playerKnockdownTimer /
+                    DUMMY_KD_GETUP_DURATION,
+                0f,
+                1f
+            );
+            angle = -88f * (1f - t);
+        }
+
+        fighter3DState.knockdownAngle = angle;
+        fighter3DState.visible = true;
+    }
+
     private void drawFrame() {
+        syncFighter3DState();
         if (!holder.getSurface().isValid()) return;
         Canvas canvas = holder.lockCanvas();
         if (canvas == null) return;
@@ -2379,13 +2451,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             drawSuperChargeEffects(canvas);
             canvas.restore();
 
-            canvas.save();
-            canvas.translate(tagVisualOffsetX, 0f);
-            if (facingDirection < 0) {
-                canvas.scale(-1f, 1f, playerX, 0f);
+            if (fighter3DState == null) {
+                canvas.save();
+                canvas.translate(tagVisualOffsetX, 0f);
+                if (facingDirection < 0) {
+                    canvas.scale(-1f, 1f, playerX, 0f);
+                }
+                drawPlayer(canvas);
+                canvas.restore();
             }
-            drawPlayer(canvas);
-            canvas.restore();
             drawSuperFlash(canvas);
             canvas.restore();
 
