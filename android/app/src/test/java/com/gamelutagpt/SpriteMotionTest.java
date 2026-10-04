@@ -61,7 +61,7 @@ public class SpriteMotionTest {
         assertEquals(1,m.frame());
         m.update(.110f,true,false,0,0,true,false,false,false,true,false,true,false);
         assertEquals(2,m.frame());
-        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false);
+        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
     @Test public void heavyStraightUsesNineOrderedFramesAndRecoversToIdle() {
