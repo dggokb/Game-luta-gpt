@@ -289,6 +289,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final CelShadedFighter3D cel3dRenderer =
         new CelShadedFighter3D();
+    private final CelShadedStage3D cel3dStage =
+        new CelShadedStage3D();
     private final LinearGradient skyGradient;
     private final android.graphics.Path[] mountainPaths =
         new android.graphics.Path[15];
@@ -2376,44 +2378,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawScenario(Canvas c) {
-        paint.setShader(skyGradient);
-        c.drawRect(0, WORLD_TOP, WORLD_WIDTH, VH, paint);
-        paint.setShader(null);
-
-        paint.setColor(Color.argb(130, 255, 244, 201));
-        c.drawCircle(2050, -40, 58, paint);
-
-        paint.setColor(Color.argb(75, 255, 255, 255));
-        for (int i = 0; i < 12; i++) {
-            float cloudX = 110f + i * 215f;
-            float cloudY = -365f + (i % 4) * 92f;
-            c.drawOval(cloudX, cloudY, cloudX + 120f, cloudY + 38f, paint);
-        }
-
-        paint.setColor(Color.rgb(53, 73, 88));
-        for (android.graphics.Path mountainPath : mountainPaths) {
-            c.drawPath(mountainPath, paint);
-        }
-
-        paint.setColor(Color.rgb(116, 81, 50));
-        c.drawRect(0, GROUND_Y, WORLD_WIDTH, VH, paint);
-        paint.setColor(Color.rgb(148, 108, 67));
-        for (int i = 0; i < 38; i++) {
-            float x = (i * 83f) % WORLD_WIDTH;
-            c.drawRoundRect(
-                x,
-                GROUND_Y + 35 + (i % 3) * 38,
-                x + 55,
-                GROUND_Y + 40 + (i % 3) * 38,
-                3,
-                3,
-                paint
-            );
-        }
-
-        paint.setColor(Color.argb(90, 255, 255, 255));
-        c.drawRect(LEFT_BOUND, 190, LEFT_BOUND + 3, GROUND_Y, paint);
-        c.drawRect(RIGHT_BOUND - 3, 190, RIGHT_BOUND, GROUND_Y, paint);
+        cel3dStage.draw(
+            c,
+            paint,
+            WORLD_WIDTH,
+            WORLD_TOP,
+            GROUND_Y,
+            cameraX,
+            LEFT_BOUND,
+            RIGHT_BOUND
+        );
     }
 
     private void drawHud(Canvas c) {
@@ -2460,7 +2434,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("FIGHT CAMERA • v0.38", 975, 59, paint);
+        c.drawText("3D CEL STAGE • v0.41", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
