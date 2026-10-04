@@ -7,8 +7,8 @@ android {
         applicationId 'com.gamelutagpt'
         minSdk 24
         targetSdk 35
-        versionCode 45
-        versionName '0.45-sprite-gpt-scale-standard'
+        versionCode 46
+        versionName '0.46-sprite-gpt-idle-calibrated'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }

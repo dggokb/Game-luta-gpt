@@ -100,10 +100,10 @@ public class SpriteIntegrationTest {
         float time,
         float distance
     ) {
-        Bitmap out=Bitmap.createBitmap(420,300,Bitmap.Config.ARGB_8888);
+        Bitmap out=Bitmap.createBitmap(420,320,Bitmap.Config.ARGB_8888);
         SpriteMotion m=renderer.motion;
         m.clip=clip;m.time=time;m.distance=distance;
-        renderer.draw(new Canvas(out),new Paint(),210,250,false,false);
+        renderer.draw(new Canvas(out),new Paint(),210,270,false,false);
         int minX=out.getWidth(),minY=out.getHeight(),maxX=-1,maxY=-1;
         for(int y=0;y<out.getHeight();y++)for(int x=0;x<out.getWidth();x++) {
             if(Color.alpha(out.getPixel(x,y))>10) {
@@ -114,22 +114,56 @@ public class SpriteIntegrationTest {
         assertTrue("Rendered sprite is empty",maxX>=minX && maxY>=minY);
         return new Rect(minX,minY,maxX+1,maxY+1);
     }
-    @Test public void standingClipsShareCanonicalVisualScaleAndGroundPivot() {
+
+    private int upperBodyWidth(
+        SpriteFighterRenderer renderer,
+        SpriteMotion.Clip clip,
+        float time,
+        float distance
+    ) {
+        Bitmap out=Bitmap.createBitmap(420,320,Bitmap.Config.ARGB_8888);
+        SpriteMotion m=renderer.motion;
+        m.clip=clip;m.time=time;m.distance=distance;
+        renderer.draw(new Canvas(out),new Paint(),210,270,false,false);
+
+        Rect b=renderedBounds(renderer,clip,time,distance);
+        int bandBottom=b.top + Math.max(1,Math.round(b.height()*0.22f));
+        int minX=out.getWidth(),maxX=-1;
+        for(int y=b.top;y<=bandBottom && y<out.getHeight();y++) {
+            for(int x=0;x<out.getWidth();x++) {
+                if(Color.alpha(out.getPixel(x,y))>10) {
+                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+                }
+            }
+        }
+        assertTrue("Upper body band empty",maxX>=minX);
+        return maxX-minX+1;
+    }
+
+    @Test public void idleMatchesMovementPerceivedBodyScaleAndGroundPivot() {
         SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
-        java.util.ArrayList<Rect> standing=new java.util.ArrayList<>();
 
-        for(int i=0;i<8;i++) standing.add(renderedBounds(renderer,SpriteMotion.Clip.IDLE,i*.12f,0));
-        for(int i=0;i<4;i++) standing.add(renderedBounds(renderer,SpriteMotion.Clip.WALK_FORWARD,0,i*36f+1));
-        for(int i=0;i<4;i++) standing.add(renderedBounds(renderer,SpriteMotion.Clip.WALK_BACK,0,i*32f+1));
-        standing.add(renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,.016f,0));
-        standing.add(renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,.060f,0));
-        standing.add(renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,.130f,0));
+        int idleUpper=upperBodyWidth(renderer,SpriteMotion.Clip.IDLE,0f,0f);
+        int walkUpper=upperBodyWidth(renderer,SpriteMotion.Clip.WALK_FORWARD,0f,1f);
+        float ratio=idleUpper/(float)walkUpper;
+        assertTrue("Idle still looks smaller; upper-body ratio="+ratio,ratio>=.95f);
+        assertTrue("Idle became too large; upper-body ratio="+ratio,ratio<=1.08f);
 
-        for(Rect r:standing) {
-            int h=r.height();
-            assertTrue("Standing sprite too small: "+h,h>=204);
-            assertTrue("Standing sprite too large: "+h,h<=214);
-            assertTrue("Ground pivot drift: "+r.bottom,r.bottom>=247 && r.bottom<=253);
+        for(int i=0;i<8;i++) {
+            Rect r=renderedBounds(renderer,SpriteMotion.Clip.IDLE,i*.12f,0f);
+            assertTrue("Idle ground pivot drift "+i+": "+r.bottom,r.bottom>=267 && r.bottom<=273);
+        }
+        for(int i=0;i<4;i++) {
+            Rect r=renderedBounds(renderer,SpriteMotion.Clip.WALK_FORWARD,0f,i*36f+1);
+            assertTrue("Walk ground pivot drift "+i+": "+r.bottom,r.bottom>=267 && r.bottom<=273);
+        }
+        for(int i=0;i<4;i++) {
+            Rect r=renderedBounds(renderer,SpriteMotion.Clip.WALK_BACK,0f,i*32f+1);
+            assertTrue("Walk back ground pivot drift "+i+": "+r.bottom,r.bottom>=267 && r.bottom<=273);
+        }
+        for(float t:new float[]{.016f,.060f,.130f}) {
+            Rect r=renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,t,0f);
+            assertTrue("Jab ground pivot drift: "+r.bottom,r.bottom>=267 && r.bottom<=273);
         }
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {

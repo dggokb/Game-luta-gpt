@@ -27,7 +27,7 @@ final class SpriteFighterRenderer {
     private final ColorFilter blockFlash = new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
 
     // Canonical visual scale. WALK_FORWARD is the reference authored at ~210 px body height.
-    static final float IDLE_SCALE = 210f / 147f;
+    static final float IDLE_SCALE = 1.55f;
     static final float MOVE_REFERENCE_SCALE = 1.00f;
     static final float MOVE_SECONDARY_SCALE = 1.07f;
     static final float JAB_SCALE = 0.90f;
