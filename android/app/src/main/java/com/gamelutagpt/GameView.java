@@ -454,6 +454,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final long[] commandTimes = new long[COMMAND_BUFFER_SIZE];
     private int commandCount = 0;
 
+    private final Object stateLock = new Object();
+    private boolean surfaceReady;
+    private boolean activityActive = true;
+    private float accumulatedTime;
+    private static final float FIXED_STEP = 1f/120f;
+    private void clearInput() {
+        clearDpad();
+        lightPointer=mediumPointer=heavyPointer=comboPointer=tagPointer=superPointer=-1;
+        pendingEnergyUntilMs=-1L;
+        backDashTimer=0;
+        lastDownInputMs=lastForwardTapMs=lastBackTapMs=-1000L;
+        resetCommandBuffer();
+        resetAutoCombo();
+    }
+
     public GameView(Context context) {
         super(context);
         spriteFighterRenderer = new SpriteFighterRenderer(context);
@@ -498,11 +513,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if (running) return;
-
-        running = true;
-        gameThread = new Thread(this, "GameLoop");
-        gameThread.start();
+        surfaceReady = true;
+        startLoopIfReady();
     }
 
     @Override
@@ -510,47 +522,85 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        running = false;
+        surfaceReady = false;
+        stopLoop();
+    }
 
-        Thread thread = gameThread;
-        if (thread != null) {
-            try {
-                thread.join(800);
-            } catch (InterruptedException ignored) {
-                Thread.currentThread().interrupt();
+    public void resumeGame() {
+        activityActive = true;
+        startLoopIfReady();
+    }
+
+    public void pauseGame() {
+        activityActive = false;
+        stopLoop();
+    }
+
+    private void startLoopIfReady() {
+        if (!surfaceReady || !activityActive || running) return;
+        accumulatedTime = 0f;
+        running = true;
+        gameThread = new Thread(this, "GameLoop");
+        gameThread.start();
+    }
+
+    private void stopLoop() {
+        running = false;
+        Thread stopped = gameThread;
+        if (stopped != null) {
+            stopped.interrupt();
+            boolean interrupted = false;
+            while (stopped.isAlive()) {
+                try {
+                    stopped.join();
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                }
             }
+            if (interrupted) Thread.currentThread().interrupt();
+            gameThread = null;
         }
-        gameThread = null;
+        synchronized (stateLock) {
+            clearInput();
+            accumulatedTime = 0f;
+        }
     }
 
     @Override
     public void run() {
         long previous = System.nanoTime();
         final long targetFrame = 16_666_667L;
-
         while (running) {
             long frameStart = System.nanoTime();
-            float dt = Math.min(0.033f, (frameStart - previous) / 1_000_000_000f);
+            float elapsedSeconds = (frameStart - previous) / 1_000_000_000f;
             previous = frameStart;
-
-            update(dt);
+              synchronized (stateLock) {
+                advanceSimulation(elapsedSeconds);
+            }
+            if (!running) break;
             drawFrame();
-
-            long elapsed = System.nanoTime() - frameStart;
-            long remaining = targetFrame - elapsed;
+            long remaining = targetFrame - (System.nanoTime() - frameStart);
             if (remaining > 0) {
                 try {
-                    long ms = remaining / 1_000_000L;
-                    int ns = (int)(remaining % 1_000_000L);
-                    Thread.sleep(ms, ns);
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
+                    Thread.sleep(remaining / 1_000_000L, (int)(remaining % 1_000_000L));
+                } catch (InterruptedException e) {
+                    break;
                 }
             }
         }
     }
 
+    // Render cadence can vary; movement and attack timing always use the same steps.
+    private void advanceSimulation(float elapsedSeconds) {
+        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f);
+        while (accumulatedTime + 0.000001f >= FIXED_STEP) {
+            update(FIXED_STEP);
+            accumulatedTime = Math.max(0f, accumulatedTime - FIXED_STEP);
+        }
+    }
+
     private void update(float dt) {
+        float previousX = playerX;
         updateSuperState(dt);
         updateTagState(dt);
 
@@ -569,6 +619,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
+            updateSpriteMotion(dt,0f);
             return;
         }
 
@@ -637,6 +688,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 velocityY = 0f;
                 grounded = true;
                 superJumping = false;
+                crouching = isDownDirection(dpadDirection);
 
                 if (playerGroundSlam) {
                     playerGroundSlam = false;
@@ -656,6 +708,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateFacing();
 
         updateFightCamera(dt);
+        updateSpriteMotion(dt,playerX-previousX);
     }
 
     private FighterProfile opponentProfile() {
@@ -2309,6 +2362,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawFrame() {
+        synchronized (stateLock) { drawLockedFrame(); }
+    }
+
+    private void drawLockedFrame() {
         if (!holder.getSurface().isValid()) return;
         Canvas canvas = holder.lockCanvas();
         if (canvas == null) return;
@@ -2460,7 +2517,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE IDLE • v0.41", 975, 59, paint);
+        c.drawText("SPRITE ASTRA • v0.42", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -3092,6 +3149,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
     }
 
+    private void updateSpriteMotion(float dt, float travel) {
+        int guard = playerBlockstunTimer > 0f ? playerLastGuardState : anticipatedPlayerGuardPose();
+        spriteFighterRenderer.update(dt,grounded,crouching || isCrouchAttackActive() || guard == GUARD_LOW,
+            velocityY,travel,travel*facingDirection > 0,forwardDashing,backDashTimer>0,
+            attackTimer>0 || guard!=GUARD_NONE || isSuperPoseActive() || isTagAnimationActive(),playerMovementLocked);
+    }
+
     private void drawPlayer(Canvas c) {
         float baseY = playerY;
 
@@ -3126,37 +3190,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             ? playerLastGuardState
             : anticipatedPlayerGuardPose();
 
-        boolean moving =
-            grounded &&
-            !crouching &&
-            (movingLeft || movingRight);
-
-        boolean walkingForward =
-            moving &&
-            !forwardDashing &&
-            backDashTimer <= 0f &&
-            (
-                (facingDirection > 0 && movingRight && !movingLeft) ||
-                (facingDirection < 0 && movingLeft && !movingRight)
-            );
-
-        spriteFighterRenderer.draw(
-            c,
-            paint,
-            playerX,
-            baseY,
-            grounded,
-            crouching || isCrouchAttackActive(),
-            moving,
-            walkingForward,
-            walkTime,
-            attackType,
-            attackTimer,
-            guardPose,
-            isSuperPoseActive() || isTagPoseActive(),
-            playerDamageFlashTimer > 0f,
-            playerBlockFlashTimer > 0f
-        );
+        spriteFighterRenderer.draw(c,paint,playerX,baseY,
+            playerDamageFlashTimer>0,playerBlockFlashTimer>0);
     }
 
     private void drawControls(Canvas c) {
@@ -3484,6 +3519,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        synchronized (stateLock) { return handleTouch(event); }
+    }
+
+    private boolean handleTouch(MotionEvent event) {
+        if (getWidth()==0 || getHeight()==0) return true;
         float sx = getWidth() / VW;
         float sy = getHeight() / VH;
         int action = event.getActionMasked();

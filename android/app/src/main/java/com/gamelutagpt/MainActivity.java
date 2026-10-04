@@ -7,6 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class MainActivity extends Activity {
+    private GameView gameView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,13 +19,20 @@ public class MainActivity extends Activity {
         );
 
         hideSystemUi();
-        setContentView(new GameView(this));
+        gameView=new GameView(this);
+        setContentView(gameView);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (gameView!=null) gameView.resumeGame();
         hideSystemUi();
+    }
+
+    @Override protected void onPause() {
+        if (gameView!=null) gameView.pauseGame();
+        super.onPause();
     }
 
     private void hideSystemUi() {
