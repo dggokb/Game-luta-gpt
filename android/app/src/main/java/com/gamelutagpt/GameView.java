@@ -1329,15 +1329,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     58f
                 )
             ) {
-                if (
-                    projectile.ownerIndex >= 0 &&
-                    projectile.ownerIndex < team.length
-                ) {
-                    addSuperMeter(
-                        team[projectile.ownerIndex],
-                        superGainForAttack("S")
-                    );
-                }
+                // Super already consumed Power Gauge and cannot refill itself.
                 applyDummyDamage(projectile.damage, projectile.direction);
                 hit = true;
             }
@@ -1809,6 +1801,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     24f
                 )
             ) {
+                // Special projectile builds Power Gauge only on confirmed hit.
+                if (
+                    projectile.ownerIndex >= 0 &&
+                    projectile.ownerIndex < team.length
+                ) {
+                    addSuperMeter(
+                        team[projectile.ownerIndex],
+                        superGainForAttack("S")
+                    );
+                }
                 applyDummyDamage(projectile.damage, projectile.direction);
                 hit = true;
             }
