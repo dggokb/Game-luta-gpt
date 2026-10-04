@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 public class SpriteMotionTest {
     private void tick(SpriteMotion m,float dt,boolean ground,boolean crouch,float vy,float dx,boolean front,boolean dash,boolean back,boolean combat,boolean lock) {
-        m.update(dt,ground,crouch,vy,dx,front,dash,back,false,false,combat,lock);
+        m.update(dt,ground,crouch,vy,dx,front,dash,back,false,false,false,combat,lock);
     }
     @Test public void allFourStepsAdvanceWithDistanceRatherThanDrawCalls() {
         SpriteMotion m=new SpriteMotion();
@@ -44,24 +44,38 @@ public class SpriteMotionTest {
     }
     @Test public void lightJabUsesThreeOrderedFramesAndRecoversToIdle() {
         SpriteMotion m=new SpriteMotion();
-        m.update(.016f,true,false,0,0,true,false,false,true,false,true,false);
+        m.update(.016f,true,false,0,0,true,false,false,true,false,false,true,false);
         assertEquals(SpriteMotion.Clip.LIGHT_JAB,m.clip);assertEquals(0,m.frame());
-        m.update(.040f,true,false,0,0,true,false,false,true,false,true,false);
+        m.update(.040f,true,false,0,0,true,false,false,true,false,false,true,false);
         assertEquals(1,m.frame());
-        m.update(.060f,true,false,0,0,true,false,false,true,false,true,false);
+        m.update(.060f,true,false,0,0,true,false,false,true,false,false,true,false);
         assertEquals(2,m.frame());
-        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false);
+        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
     @Test public void mediumKickUsesThreeOrderedFramesAndRecoversToIdle() {
         SpriteMotion m=new SpriteMotion();
-        m.update(.016f,true,false,0,0,true,false,false,false,true,true,false);
+        m.update(.016f,true,false,0,0,true,false,false,false,true,false,true,false);
         assertEquals(SpriteMotion.Clip.MEDIUM_KICK,m.clip);assertEquals(0,m.frame());
-        m.update(.070f,true,false,0,0,true,false,false,false,true,true,false);
+        m.update(.070f,true,false,0,0,true,false,false,false,true,false,true,false);
         assertEquals(1,m.frame());
-        m.update(.110f,true,false,0,0,true,false,false,false,true,true,false);
+        m.update(.110f,true,false,0,0,true,false,false,false,true,false,true,false);
         assertEquals(2,m.frame());
         m.update(.016f,true,false,0,0,true,false,false,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+    }
+    @Test public void heavyStraightUsesNineOrderedFramesAndRecoversToIdle() {
+        SpriteMotion m=new SpriteMotion();
+        float[] steps={.016f,.034f,.040f,.040f,.040f,.050f,.050f,.050f,.050f};
+        for(int i=0;i<9;i++) {
+            m.update(
+                steps[i],true,false,0,0,true,false,false,
+                false,false,true,true,false
+            );
+            assertEquals(SpriteMotion.Clip.HEAVY_STRAIGHT,m.clip);
+            assertEquals(i,m.frame());
+        }
+        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
     @Test public void collisionGuardAndAttackCannotPlayWalking() {
