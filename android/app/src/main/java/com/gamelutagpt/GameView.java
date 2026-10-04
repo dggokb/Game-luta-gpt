@@ -218,6 +218,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float LEFT_BOUND = 90f;
     private static final float RIGHT_BOUND = WORLD_WIDTH - 90f;
     private static final float CAMERA_ZOOM = 1.12f;
+    private static final float CAMERA_MIN_ZOOM = 0.78f;
+    private static final float CAMERA_FIGHTER_MARGIN_X = 520f;
+    private static final float CAMERA_GROUND_SCREEN_Y = 552f;
+    private static final float CAMERA_TOP_MARGIN_SCREEN = 64f;
+    private static final float CAMERA_BOTTOM_MARGIN_SCREEN = 45f;
     private static final float GROUND_CAMERA_TOP = 72f;
     private static final float WORLD_TOP = -520f;
 
@@ -291,8 +296,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private float playerX = 420f;
     private float playerY = GROUND_Y;
-    private float cameraX = 420f;
+    private float cameraX = 700f;
     private float cameraTop = GROUND_CAMERA_TOP;
+    private float cameraZoom = CAMERA_ZOOM;
     private float velocityY = 0f;
     private int facingDirection = 1;
     private static final float FACING_SWITCH_EPSILON = 6f;
@@ -647,18 +653,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         playerX = clamp(playerX, LEFT_BOUND, RIGHT_BOUND);
         updateFacing();
 
-        float visibleWorldWidth = VW / CAMERA_ZOOM;
-        float halfVisible = visibleWorldWidth / 2f;
-        float targetCameraX = clamp(playerX, halfVisible, WORLD_WIDTH - halfVisible);
-        float follow = 1f - (float)Math.pow(0.001f, dt);
-        cameraX += (targetCameraX - cameraX) * follow;
-
-        float targetCameraTop = GROUND_CAMERA_TOP;
-        if (!grounded && playerY < 250f) {
-            targetCameraTop = clamp(playerY - 185f, WORLD_TOP, GROUND_CAMERA_TOP);
-        }
-        float verticalFollow = 1f - (float)Math.pow(0.00035f, dt);
-        cameraTop += (targetCameraTop - cameraTop) * verticalFollow;
+        updateFightCamera(dt);
     }
 
     private FighterProfile opponentProfile() {
@@ -2213,6 +2208,92 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return t < 0.5f ? t * 2f : (1f - t) * 2f;
     }
 
+    private void updateFightCamera(float dt) {
+        float separationX = Math.abs(playerX - dummyX);
+        float requiredWorldWidth =
+            separationX + CAMERA_FIGHTER_MARGIN_X;
+
+        float targetZoomX =
+            VW / Math.max(VW / CAMERA_ZOOM, requiredWorldWidth);
+
+        float playerTop =
+            playerY - (
+                (crouching || isCrouchAttackActive())
+                    ? 90f
+                    : 145f
+            );
+        float opponentTop = dummyTop();
+        float highestFighterTop = Math.min(playerTop, opponentTop);
+        float heightAboveGround =
+            Math.max(1f, GROUND_Y - highestFighterTop);
+
+        // Tenta reservar margem visual acima do lutador mais alto.
+        float usableVerticalScreen =
+            CAMERA_GROUND_SCREEN_Y - CAMERA_TOP_MARGIN_SCREEN;
+        float targetZoomY =
+            usableVerticalScreen / heightAboveGround;
+
+        float targetZoom = clamp(
+            Math.min(targetZoomX, targetZoomY),
+            CAMERA_MIN_ZOOM,
+            CAMERA_ZOOM
+        );
+
+        float zoomFollow =
+            1f - (float)Math.pow(0.0025f, dt);
+        cameraZoom +=
+            (targetZoom - cameraZoom) * zoomFollow;
+
+        float visibleWorldWidth = VW / cameraZoom;
+        float halfVisible = visibleWorldWidth * 0.5f;
+
+        float fightCenterX = (playerX + dummyX) * 0.5f;
+        float targetCameraX = clamp(
+            fightCenterX,
+            halfVisible,
+            WORLD_WIDTH - halfVisible
+        );
+
+        float horizontalFollow =
+            1f - (float)Math.pow(0.0015f, dt);
+        cameraX +=
+            (targetCameraX - cameraX) * horizontalFollow;
+
+        // Mantém o chão praticamente na mesma altura da tela enquanto possível.
+        float baseTop =
+            GROUND_Y - CAMERA_GROUND_SCREEN_Y / cameraZoom;
+        float topMarginWorld =
+            CAMERA_TOP_MARGIN_SCREEN / cameraZoom;
+
+        float targetCameraTop = baseTop;
+        if (
+            highestFighterTop <
+            targetCameraTop + topMarginWorld
+        ) {
+            targetCameraTop =
+                highestFighterTop - topMarginWorld;
+        }
+
+        // Mesmo acompanhando alguém muito alto, o chão não pode sumir.
+        float lowestAllowedTop =
+            GROUND_Y -
+            (VH - CAMERA_BOTTOM_MARGIN_SCREEN) / cameraZoom;
+        targetCameraTop = Math.max(
+            targetCameraTop,
+            lowestAllowedTop
+        );
+        targetCameraTop = clamp(
+            targetCameraTop,
+            WORLD_TOP,
+            GROUND_CAMERA_TOP
+        );
+
+        float verticalFollow =
+            1f - (float)Math.pow(0.0007f, dt);
+        cameraTop +=
+            (targetCameraTop - cameraTop) * verticalFollow;
+    }
+
     private void drawFrame() {
         if (!holder.getSurface().isValid()) return;
         Canvas canvas = holder.lockCanvas();
@@ -2227,7 +2308,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.save();
             canvas.scale(sx, sy);
 
-            float renderZoom = CAMERA_ZOOM * superCameraZoom;
+            float renderZoom = cameraZoom * superCameraZoom;
             float visibleWorldWidth = VW / renderZoom;
             float cameraLeft = clamp(cameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
 
@@ -2365,7 +2446,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("GUARD ANTICIPATION • v0.37", 975, 59, paint);
+        c.drawText("FIGHT CAMERA • v0.38", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
