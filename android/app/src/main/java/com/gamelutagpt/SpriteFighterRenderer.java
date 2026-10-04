@@ -26,10 +26,12 @@ final class SpriteFighterRenderer {
     private final Bitmap movementSheet;
     private final Bitmap jabSheet;
     private final Bitmap mediumKickSheet;
+    private final Bitmap heavyStraightSheet;
     private final Rect[] idleFrames = new Rect[8];
     private final Rect[] movementFrames = new Rect[16];
     private final Rect[] jabFrames = new Rect[3];
     private final Rect[] mediumKickFrames = new Rect[3];
+    private final Rect[] heavyStraightFrames = new Rect[9];
     private final RectF destination = new RectF();
     private final Paint spritePaint =
         new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
@@ -76,8 +78,13 @@ final class SpriteFighterRenderer {
             R.drawable.player_base_medium_kick,
             options
         );
+        heavyStraightSheet=BitmapFactory.decodeResource(
+            context.getResources(),
+            R.drawable.player_base_heavy_straight,
+            options
+        );
 
-        if (idleSheet==null || movementSheet==null || jabSheet==null || mediumKickSheet==null) {
+        if (idleSheet==null || movementSheet==null || jabSheet==null || mediumKickSheet==null || heavyStraightSheet==null) {
             throw new IllegalStateException("Missing normalized fighter atlas");
         }
 
@@ -85,6 +92,7 @@ final class SpriteFighterRenderer {
         movementSheet.setDensity(Bitmap.DENSITY_NONE);
         jabSheet.setDensity(Bitmap.DENSITY_NONE);
         mediumKickSheet.setDensity(Bitmap.DENSITY_NONE);
+        heavyStraightSheet.setDensity(Bitmap.DENSITY_NONE);
 
         requireSheet(idleSheet,4,2,"idle");
         requireSheet(movementSheet,4,4,"movement");
@@ -98,6 +106,15 @@ final class SpriteFighterRenderer {
         ) {
             throw new IllegalStateException("Invalid medium kick atlas");
         }
+        if (
+            heavyStraightSheet.getWidth()!=
+                GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_WIDTH *
+                GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_COUNT ||
+            heavyStraightSheet.getHeight()!=
+                GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_HEIGHT
+        ) {
+            throw new IllegalStateException("Invalid heavy straight atlas");
+        }
 
         slice(idleFrames,4);
         slice(movementFrames,4);
@@ -106,6 +123,11 @@ final class SpriteFighterRenderer {
             int w=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH;
             int h=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT;
             mediumKickFrames[i]=new Rect(i*w,0,(i+1)*w,h);
+        }
+        for(int i=0;i<heavyStraightFrames.length;i++) {
+            int w=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_WIDTH;
+            int h=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_HEIGHT;
+            heavyStraightFrames[i]=new Rect(i*w,0,(i+1)*w,h);
         }
     }
 
@@ -153,12 +175,13 @@ final class SpriteFighterRenderer {
         boolean backdash,
         boolean lightJab,
         boolean mediumKick,
+        boolean heavyStraight,
         boolean combat,
         boolean locked
     ) {
         motion.update(
             dt,grounded,crouching,velocityY,travel,forward,dash,
-            backdash,lightJab,mediumKick,combat,locked
+            backdash,lightJab,mediumKick,heavyStraight,combat,locked
         );
     }
 
@@ -180,6 +203,9 @@ final class SpriteFighterRenderer {
         } else if (motion.clip==SpriteMotion.Clip.MEDIUM_KICK) {
             sheet=mediumKickSheet;
             source=mediumKickFrames[index];
+        } else if (motion.clip==SpriteMotion.Clip.HEAVY_STRAIGHT) {
+            sheet=heavyStraightSheet;
+            source=heavyStraightFrames[index];
         } else if (motion.usesIdleSheet()) {
             sheet=idleSheet;
             source=idleFrames[index];
@@ -193,6 +219,12 @@ final class SpriteFighterRenderer {
                 x-GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X*profile.worldScale;
             float top=
                 baseY-GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y*profile.worldScale;
+            destination.set(left,top,left+source.width()*profile.worldScale,top+source.height()*profile.worldScale);
+        } else if (motion.clip==SpriteMotion.Clip.HEAVY_STRAIGHT) {
+            float left=
+                x-GeneratedSpriteLayouts.HEAVY_STRAIGHT_ROOT_X*profile.worldScale;
+            float top=
+                baseY-GeneratedSpriteLayouts.HEAVY_STRAIGHT_ROOT_Y*profile.worldScale;
             destination.set(left,top,left+source.width()*profile.worldScale,top+source.height()*profile.worldScale);
         } else {
             profile.place(destination,x,baseY);
