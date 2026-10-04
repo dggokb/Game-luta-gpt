@@ -289,6 +289,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final CelShadedFighter3D cel3dRenderer =
         new CelShadedFighter3D();
+    private final FighterPrototype01Renderer prototype01Renderer =
+        new FighterPrototype01Renderer();
     private final CelShadedStage3D cel3dStage =
         new CelShadedStage3D();
     private final LinearGradient skyGradient;
@@ -2463,7 +2465,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("3D CEL STAGE • v0.42", 975, 59, paint);
+        c.drawText("FIGHTER PROTOTYPE 01 • v0.43", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2944,7 +2946,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             celGuard = CelShadedFighter3D.GUARD_LOW;
         }
 
-        cel3dRenderer.draw(
+        prototype01Renderer.draw(
             c,
             paint,
             playerX,
