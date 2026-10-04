@@ -114,6 +114,57 @@ public class SpriteIntegrationTest {
             assertTrue("Kick clipped bottom "+i,fh-1-maxY>=8);
         }
     }
+    @Test public void productionRendererKeepsMediumKickInsideGeneratedCanvas()throws Exception {
+        SpriteFighterRenderer renderer=
+            new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
+        int fw=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH;
+        int fh=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT;
+        int rx=GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X;
+        int ry=GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y;
+
+        Bitmap review=Bitmap.createBitmap(
+            fw*GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_COUNT,
+            fh,
+            Bitmap.Config.ARGB_8888
+        );
+        Canvas canvas=new Canvas(review);
+        canvas.drawColor(Color.rgb(32,36,44));
+        float[] times={.016f,.090f,.220f};
+
+        for(int i=0;i<times.length;i++) {
+            renderer.motion.clip=SpriteMotion.Clip.MEDIUM_KICK;
+            renderer.motion.time=times[i];
+            assertEquals(i,renderer.motion.frame());
+            canvas.save();
+            canvas.translate(i*fw,0);
+            renderer.draw(canvas,new Paint(),rx,ry,false,false);
+            canvas.restore();
+        }
+
+        for(int i=0;i<times.length;i++) {
+            int minX=fw,minY=fh,maxX=-1,maxY=-1;
+            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
+                int pixel=review.getPixel(i*fw+x,y);
+                if(pixel!=Color.rgb(32,36,44)) {
+                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+                }
+            }
+            assertTrue("Rendered kick clipped left "+i,minX>=8);
+            assertTrue("Rendered kick clipped right "+i,fw-1-maxX>=8);
+            assertTrue("Rendered kick clipped top "+i,minY>=8);
+            assertTrue("Rendered kick clipped bottom "+i,fh-1-maxY>=8);
+        }
+
+        File dir=new File("build/sprite-review");
+        dir.mkdirs();
+        try(FileOutputStream out=new FileOutputStream(
+            new File(dir,"medium-kick-render.png")
+        )) {
+            assertTrue(review.compress(Bitmap.CompressFormat.PNG,100,out));
+        }
+    }
+
     @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
         CharacterVisualProfile p=CharacterVisualProfile.PLAYER_BASE;
         assertEquals(256,p.frameWidth);
