@@ -165,6 +165,99 @@ public class SpriteIntegrationTest {
         }
     }
 
+    @Test public void standingHeavyAttackUsesNineFrameStraightAtScaleOne()throws Exception {
+        invoke("startAttack",new Class<?>[]{String.class},"H");
+        frames(1);
+        assertEquals(SpriteMotion.Clip.HEAVY_STRAIGHT,motion().clip);
+        assertEquals(0,motion().frame());
+        frames(23);
+        assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
+        assertEquals(
+            1f,
+            ((SpriteFighterRenderer)get("spriteFighterRenderer"))
+                .visualProfile().worldScale,
+            .001f
+        );
+    }
+
+    @Test public void heavyStraightUsesGeneratedCanvasWithoutClipping() {
+        Bitmap heavy=BitmapFactory.decodeResource(
+            RuntimeEnvironment.getApplication().getResources(),
+            R.drawable.player_base_heavy_straight
+        );
+        assertNotNull(heavy);
+        int fw=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_WIDTH;
+        int fh=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_HEIGHT;
+        int countFrames=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_COUNT;
+        assertEquals(9,countFrames);
+        assertEquals(fw*countFrames,heavy.getWidth());
+        assertEquals(fh,heavy.getHeight());
+
+        for(int i=0;i<countFrames;i++) {
+            int count=0,minX=fw,minY=fh,maxX=-1,maxY=-1;
+            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
+                if(Color.alpha(heavy.getPixel(i*fw+x,y))>10) {
+                    count++;
+                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+                }
+            }
+            assertTrue("Empty heavy straight frame "+i,count>10000);
+            assertTrue("Heavy clipped left "+i,minX>=8);
+            assertTrue("Heavy clipped right "+i,fw-1-maxX>=8);
+            assertTrue("Heavy clipped top "+i,minY>=8);
+            assertTrue("Heavy clipped bottom "+i,fh-1-maxY>=8);
+        }
+    }
+
+    @Test public void productionRendererKeepsHeavyStraightInsideGeneratedCanvas()throws Exception {
+        SpriteFighterRenderer renderer=
+            new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
+        int fw=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_WIDTH;
+        int fh=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_HEIGHT;
+        int rx=GeneratedSpriteLayouts.HEAVY_STRAIGHT_ROOT_X;
+        int ry=GeneratedSpriteLayouts.HEAVY_STRAIGHT_ROOT_Y;
+        int count=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_COUNT;
+
+        Bitmap review=Bitmap.createBitmap(fw*count,fh,Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(review);
+        canvas.drawColor(Color.rgb(32,36,44));
+        float[] times={.016f,.050f,.090f,.130f,.170f,.220f,.270f,.320f,.370f};
+
+        for(int i=0;i<count;i++) {
+            renderer.motion.clip=SpriteMotion.Clip.HEAVY_STRAIGHT;
+            renderer.motion.time=times[i];
+            assertEquals(i,renderer.motion.frame());
+            canvas.save();
+            canvas.translate(i*fw,0);
+            renderer.draw(canvas,new Paint(),rx,ry,false,false);
+            canvas.restore();
+        }
+
+        int background=Color.rgb(32,36,44);
+        for(int i=0;i<count;i++) {
+            int minX=fw,minY=fh,maxX=-1,maxY=-1;
+            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
+                if(review.getPixel(i*fw+x,y)!=background) {
+                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
+                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+                }
+            }
+            assertTrue("Rendered heavy clipped left "+i,minX>=8);
+            assertTrue("Rendered heavy clipped right "+i,fw-1-maxX>=8);
+            assertTrue("Rendered heavy clipped top "+i,minY>=8);
+            assertTrue("Rendered heavy clipped bottom "+i,fh-1-maxY>=8);
+        }
+
+        File dir=new File("build/sprite-review");
+        dir.mkdirs();
+        try(FileOutputStream out=new FileOutputStream(
+            new File(dir,"heavy-straight-render.png")
+        )) {
+            assertTrue(review.compress(Bitmap.CompressFormat.PNG,100,out));
+        }
+    }
+
     @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
         CharacterVisualProfile p=CharacterVisualProfile.PLAYER_BASE;
         assertEquals(256,p.frameWidth);
