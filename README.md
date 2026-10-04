@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.49-sprite-gpt-medium-kick`.
+Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.50-sprite-gpt-import-pipeline`.
 
 ## Correção dos movimentos
 
@@ -15,13 +15,15 @@ A folha anterior repetia quase a mesma pose nos oito quadros de caminhada. O có
 
 A escala agora pertence ao personagem, não à animação. Os assets atuais foram pré-normalizados uma única vez para o perfil visual do personagem base. Idle, movimentos e Jab usam a mesma transformação em runtime. Outro lutador pode ter frame, root e escala próprios sem ser forçado ao tamanho do personagem base.
 
-O golpe fraco em pé agora usa um jab próprio de 3 quadros (preparo, extensão e recuperação), normalizado no mesmo canvas/pivô de 256×256 dos movimentos. O golpe médio em pé agora usa um chute próprio de 3 quadros. A perna estendida usa canvas 384×256, mas mantém o mesmo root e worldScale 1.0 do personagem; o espaço extra é transparente e não reduz o lutador. Os demais ataques, defesa e Super continuam usando as poses de suporte existentes. Da branch `game-luta-3D-gpt` foi portada a regra da barra de Super: golpe no vazio não carrega, acerto confirmado carrega, projétil carrega quando acerta e a defesa também ganha barra.
+O golpe fraco em pé agora usa um jab próprio de 3 quadros (preparo, extensão e recuperação), normalizado no mesmo canvas/pivô de 256×256 dos movimentos. O golpe médio em pé usa um chute próprio de 3 quadros e agora é o primeiro asset processado pelo importador automático. O pipeline detecta os frames pela transparência, encontra o root nos pés, calcula o canvas necessário, garante margens e gera o layout usado pelo renderer. O resultado continua em worldScale 1.0 e ficou em 384×256 por frame sem recorte. Os demais ataques, defesa e Super continuam usando as poses de suporte existentes. Da branch `game-luta-3D-gpt` foi portada a regra da barra de Super: golpe no vazio não carrega, acerto confirmado carrega, projétil carrega quando acerta e a defesa também ganha barra.
 
 ## Build e testes
 
-Requer JDK 17, Gradle 8.7 e SDK Android 35:
+Requer Python 3 + Pillow para o pipeline de sprites, JDK 17, Gradle 8.7 e SDK Android 35:
 
 ```bash
+python3 -m pip install pillow
+python3 tools/sprites/import_sprites.py
 cd android
 gradle testDebugUnitTest assembleDebug
 ```
@@ -34,4 +36,4 @@ O loop usa passos fixos de 120 Hz e alvo de desenho de 60 FPS. Os eventos de toq
 
 ## Arte
 
-Assets normalizados: `player_base_idle.png`, `player_base_movement.png` e `player_base_jab.png`. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.
+Assets normalizados: `player_base_idle.png`, `player_base_movement.png`, `player_base_jab.png` e `player_base_medium_kick.png`. O chute médio é regenerado e validado pelo pipeline antes do build. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.
