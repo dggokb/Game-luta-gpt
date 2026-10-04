@@ -1,67 +1,57 @@
-# Game Luta GPT — protótipo Android nativo
+# Game Luta Astra — Prototype 01 em 3D
 
-Protótipo incremental de jogo de luta, com `SurfaceView`, loop próprio e desenho em `Canvas` Android. A base atual tem dois lutadores genéricos, caminhada, agachamento, pulo/Super Jump, dash/backdash, L/M/H em pé e agachado, ataques aéreos, autocombo por personagem, projéteis de energia, troca e vida individual. Não há adversário, colisão de golpes, dano de combate ou sistemas avançados implementados.
+Protótipo Android nativo de luta. A versão `0.46-astra-prototype01-3d` integra a branch `game-luta-3D-gpt` em `c9edf2f44d7f92eece2f9bb32facea0e999fa961` à `game-luta-astra`, preservando o histórico das duas branches.
 
-## Branch game-luta-astra
+A base v0.45 fornece adversário com IA opcional, dano, defesa alta/baixa, launcher, knockdown, energia, Super, barra de poder, troca animada com cooldown e câmera de luta. A Astra mantém passos de física de 120 Hz, tratamento de pausa/multitouch e reserva de um golpe nos últimos 100 ms de recuperação. O launcher confirmado continua permitindo jump-cancel.
 
-Parte da v0.18 (`44269c632faa2304e40820520ba1f5b061161857`). O escopo é refinar o que já existe, sem adicionar mecânicas de combate, personagens ou botões. Versão: `0.18.1-astra`.
+## Personagem padrão
 
-- Física com passos fixos de 120 Hz e renderização com alvo de 60 FPS. Quedas moderadas de FPS não alteram a velocidade da luta; pausas acima de 100 ms têm recuperação limitada para evitar saltos de posição.
-- Golpes preservam a duração original (L 160 ms, M 260 ms, H 400 ms, energia 300 ms). Um toque nos últimos 100 ms pode reservar apenas o próximo golpe; toques antecipados não cortam o golpe atual e não avançam o autocombo.
-- Animação com preparação, extensão e recuperação, braços/pernas articulados, poses de subida/queda, transição de agachamento e amortecimento visual ao pousar.
-- Ataques normais terrestres travam deslocamento/pulo até recuperar; normais aéreos preservam direção e gravidade. O poder aéreo mantém o travamento horizontal, a redução inicial da velocidade vertical e a gravidade reduzida da v0.18.
-- O direcional acompanha o dedo durante a energia para retomar a direção correta quando a animação acabar.
-- Super Jump considera a saída de baixo, inclusive após segurar agachado; pousar segurando baixo atualiza a postura sem exigir outro evento de movimento.
-- Troca preserva posição, altura, velocidade vertical e vida individual. Cancela ataque, dash e entrada de ataque reservada. Continua havendo no máximo um projétil por personagem.
-- Estado de jogo protegido entre touch e renderização; pausa/cancelamento limpam entradas pendentes. Recursos de cenário são reutilizados por frame.
+O jogador usa uma malha **3D real em OpenGL ES 2**, baseada no concept Fighter Prototype 01: cabelo escuro, colete azul-marinho com painéis brancos e gola vermelha, camiseta preta, calça branca larga, faixa, luvas sem dedos e tênis. Ambos os integrantes da equipe usam esse modelo padrão; os perfis de golpes e vidas continuam separados.
 
-## Comandos existentes
+São malhas procedurais low-poly, vinculadas a um esqueleto de 18 articulações, com profundidade, iluminação em três faixas e contorno. É uma primeira interpretação estilizada do concept, não um modelo esculpido de produção nem uma imagem colada no cenário. O adversário/cenário mantêm seus renderizadores existentes da branch 3D.
+
+- Silhueta modelada por seções: ombros/cintura, músculos, calça larga e punhos estreitos.
+- Rosto com olhos, sobrancelhas e nariz, cabelo com mechas assimétricas, gola, faixa, dedos e cadarços.
+- Respiração parada, caminhada/dash, agachamento, salto/queda, defesa, L/M/H, 2L/2M/2H, energia/Super e reação a dano.
+- Transições suavizadas, apoio dos pés no chão e orientação espelhada sem mostrar a nuca ao trocar de lado.
+- Estado publicado de forma coerente para a thread OpenGL. HUD e controles ficam acima do personagem.
+
+## Controles
 
 | Ação | Entrada |
 | --- | --- |
-| Caminhar / agachar / pular | Direcional de oito vias |
-| Super Jump | Baixo, depois cima ou diagonal superior em até 360 ms |
-| Dash | Dois toques para a direita em até 300 ms; segurar o segundo |
-| Backdash | Dois toques para a esquerda em até 300 ms |
-| Ataques | L, M, H; com baixo no chão executam 2L, 2M, 2H |
-| Autocombo | COMBO: P1 L → M → H; P2 L → L → H → M |
-| Poder P1 | Baixo → direita, depois L/M/H |
-| Poder P2 | Esquerda → direita, depois L/M/H |
-| Troca | TROCA |
+| Caminhar, agachar, pular | Direcional de oito vias |
+| Super Jump | Baixo → cima/diagonal superior em até 360 ms |
+| Dash / backdash | Dois toques para frente / trás |
+| Normais | L, M, H; baixo no chão: 2L, 2M, 2H |
+| Autocombo | COMBO; sequência conforme o perfil ativo |
+| Energia P1 / P2 | Baixo → frente / trás → frente, confirmar com L/M/H |
+| Super | SUPER quando houver barra suficiente |
+| Troca | TROCA; aguardar animação e cooldown |
+| Adversário | IA ON/OFF |
 
-Os poderes aceitam diagonais intermediárias e confirmação em até 550 ms. L/M/H preservam os multiplicadores existentes de velocidade/dano. O personagem ainda olha para a direita, como na base; não existe adversário para definir orientação relativa.
+Frente e trás são relativos ao adversário. Energia aceita diagonais intermediárias e confirmação em até 550 ms. O direcional continua registrando o dedo durante a recuperação da energia; pousar segurando baixo atualiza o agachamento. Pausa e cancelamento limpam comandos pendentes.
 
-## Fontes de contexto
+## Contexto
 
-Lidos os dois arquivos da pasta `game-luta-gpt` no Google Drive:
+Foram lidos os arquivos **Game Luta GPT — Implementação até v0.9** e **DBZ FighterZ — Jogabilidade Base** na pasta `game-luta-gpt` do Drive. O código e o histórico da branch 3D são a referência para os avanços posteriores. O concept enviado pelo usuário define o visual do Prototype 01.
 
-- **Game Luta GPT — Implementação até v0.9**: regras da base incremental.
-- **DBZ FighterZ — Jogabilidade Base**: referência e escopo futuro, não uma lista de funcionalidades já disponíveis.
+## Build e validação
 
-As implementações posteriores à v0.9 foram verificadas no código e no histórico da v0.18.
-
-## Build e testes
-
-Requer JDK 17, Gradle 8.7 e Android SDK 35. Não há Gradle Wrapper neste repositório.
+JDK 17, Gradle 8.7, Android SDK 35. Não há Gradle Wrapper.
 
 ```bash
 cd android
 gradle testDebugUnitTest assembleDebug
 ```
 
-- APK: `android/app/build/outputs/apk/debug/app-debug.apk`
-- Relatório: `android/app/build/reports/tests/testDebugUnitTest/index.html`
-- Prancha de poses desenhada pelo Canvas Android: `android/app/build/astra-previews/moves.png`
+APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Aplicativo **Game Luta Astra 3D**, pacote `com.gamelutagpt.astra`, Android 7.0+ e OpenGL ES 2. O identificador separado permite instalar ao lado da outra branch. É um APK de debug para teste, não uma versão de loja.
 
-Os testes Robolectric exercitam o `GameView` real com eventos `MotionEvent`, inclusive multitouch, e avanço determinístico da simulação. Cobrem taxas de renderização diferentes, ataque terrestre/aéreo, recuperação, energia, agachamento, troca, cancelamento, limites e renderização. Eles não substituem avaliar latência, fluidez e ergonomia num celular físico.
+Testes Robolectric exercitam o GameView real com MotionEvent, taxas de renderização diferentes, multitouch, golpes, recuperação, energia no ar, troca, launcher, dano e pausa. A malha exportada pelos testes usa os mesmos vértices, matrizes e shaders de produção. Para revisar as poses com Mesa EGL:
 
-O workflow de APK roda em `main` e `game-luta-astra`, executa os testes antes do build e disponibiliza APK, relatório e prancha como artefatos.
+```bash
+python -m pip install moderngl pillow numpy
+python tools/render_mesh_review.py
+```
 
-## Conferência no celular
-
-1. Caminhar/dash/backdash; soltar o dedo; testar os cantos do cenário.
-2. Segurar baixo por um segundo, deslizar rapidamente para cima; pousar mantendo baixo/diagonal inferior.
-3. L/M/H no chão e no ar; tocar rapidamente durante o começo e o fim do golpe; observar a recuperação e o próximo golpe.
-4. Usar COMBO com os dois personagens, em pé e agachado; alternar com ataque manual e TROCA.
-5. Soltar poder no Super Jump, mudar a direção enquanto a animação trava X e confirmar a retomada correta. Tentar outro poder enquanto o primeiro ainda existe.
-6. Alternar de aplicativo com o direcional pressionado; retornar e verificar que não há movimento preso ou salto de simulação.
+Saídas em `android/app/build/astra-previews/`; relatórios em `android/app/build/reports/tests/`. O workflow executa testes antes do APK. A revisão em EGL valida a geometria e o shader; fluidez, composição das superfícies e ergonomia ainda precisam ser verificadas num Android físico.

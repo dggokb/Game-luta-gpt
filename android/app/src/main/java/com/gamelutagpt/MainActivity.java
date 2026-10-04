@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 public class MainActivity extends Activity {
+    private Fighter3DView fighter3DView;
     private GameView gameView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,20 +22,59 @@ public class MainActivity extends Activity {
         );
 
         hideSystemUi();
-        gameView = new GameView(this);
-        setContentView(gameView);
+
+        Fighter3DState fighter3DState = new Fighter3DState();
+        gameView = new GameView(this, fighter3DState);
+        fighter3DView = new Fighter3DView(this, fighter3DState);
+
+        // Forward multitouch from the GL media overlay to the gameplay surface.
+        // The normal View overlay keeps HUD and controls above both surfaces.
+        fighter3DView.setOnTouchListener(
+            (view, event) -> gameView.onTouchEvent(event)
+        );
+
+        FrameLayout root = new FrameLayout(this);
+        root.addView(
+            gameView,
+            new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        );
+        root.addView(
+            fighter3DView,
+            new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        );
+
+        View hud = new View(this) {
+            @Override protected void onDraw(android.graphics.Canvas canvas) {
+                gameView.drawOverlay(canvas);
+            }
+        };
+        gameView.setOverlay(hud);
+        root.addView(hud, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(root);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        hideSystemUi();
+        if (fighter3DView != null) {
+            fighter3DView.onResume();
+        }
         if (gameView != null) gameView.resumeGame();
+        hideSystemUi();
     }
 
     @Override
     protected void onPause() {
         if (gameView != null) gameView.pauseGame();
+        if (fighter3DView != null) {
+            fighter3DView.onPause();
+        }
         super.onPause();
     }
 

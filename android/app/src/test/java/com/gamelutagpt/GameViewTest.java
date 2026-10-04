@@ -1,12 +1,6 @@
 package com.gamelutagpt;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.MotionEvent;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -16,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-import org.robolectric.annotation.GraphicsMode;
 import static org.junit.Assert.*;
 
 @RunWith(RobolectricTestRunner.class)
@@ -129,13 +122,15 @@ public class GameViewTest {
                 button(175, 645, 1100, 650); assertEquals("2" + type, get("attackType"));
                 frames(25, 1f/60);
             }
-            up(175, 645); tap(930, 505);
+            up(175, 645); tap(930, 505); frames(120, 1f/60);
         }
     }
     @Test public void crouchAttackKeepsPoseWhenThumbReleased() throws Exception {
         down(175, 645); button(175, 645, 1100, 515); up(175, 645); frames(8, 1f/60);
-        assertEquals("2M", get("attackType")); assertTrue((Boolean)get("attackCrouched"));
-        assertTrue(number("crouchBlend") > .95f);
+        assertEquals("2M", get("attackType")); Fighter3DState state = new Fighter3DState();
+        // The render contract must keep a crouching normal even after releasing the pad.
+        Method m=GameView.class.getDeclaredMethod("isCrouchAttackActive");m.setAccessible(true);
+        state.crouching=(Boolean)m.invoke(game);assertTrue(state.crouching);
     }
     @Test public void normalAirAttackPreservesSteeringAndGravity() throws Exception {
         down(245, 485); button(245, 485, 1195, 598);
@@ -201,34 +196,28 @@ public class GameViewTest {
         touch(MotionEvent.ACTION_UP, new int[]{7}, 1005, 598);
         assertEquals(-1, ((Number)get("lightPointer")).intValue());
     }
-    @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
-    public void renderAllExistingMovesForVisualReview() throws Exception {
-        String[] names = {"PARADO", "ANDANDO", "DASH", "SUBINDO", "CAINDO", "AGACHADO", "L", "M", "H", "2L", "2M", "2H", "S", "S NO AR"};
-        Bitmap sheet = Bitmap.createBitmap(1820, 820, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(sheet); canvas.drawColor(Color.rgb(27, 39, 59));
-        Paint label = new Paint(Paint.ANTI_ALIAS_FLAG); label.setColor(Color.WHITE); label.setTextSize(17);
-        for (int i = 0; i < names.length; i++) {
-            setup(); set("playerX", 100f); set("playerY", 195f);
-            if (i == 1 || i == 2) { set("movingRight", true); set("locomotionBlend", 1f); set("walkTime", 1.1f); }
-            if (i == 2) set("forwardDashing", true);
-            if (i == 3 || i == 4 || i == 13) { set("grounded", false); set("velocityY", i == 4 ? 300f : -400f); }
-            if (i == 5 || (i >= 9 && i <= 11)) set("crouchBlend", 1f);
-            if (i >= 6) {
-                String attack = i >= 12 ? "S" : names[i];
-                call("startAttack", new Class<?>[]{String.class}, attack);
-                set("attackTimer", number("attackDuration") * .58f);
-            }
-            canvas.save(); canvas.translate((i % 7) * 260, (i / 7) * 410);
-            canvas.drawText(names[i], 12, 28, label);
-            call("drawPlayer", new Class<?>[]{Canvas.class}, canvas);
-            // Recovery/anticipation pose below the extension pose.
-            canvas.translate(0, 190); set("playerY", 195f);
-            if (i >= 6) set("attackTimer", number("attackDuration") * .9f);
-            call("drawPlayer", new Class<?>[]{Canvas.class}, canvas);
-            canvas.restore();
-        }
-        File output = new File("build/astra-previews/moves.png"); output.getParentFile().mkdirs();
-        try (FileOutputStream stream = new FileOutputStream(output)) { sheet.compress(Bitmap.CompressFormat.PNG, 100, stream); }
-        assertTrue(output.length() > 10000);
+    @Test public void tagCompletesThenRespectsCooldownAndHeldDirection() throws Exception {
+        down(265,555); button(265,555,930,505);
+        assertTrue(number("tagPhase") != 0);
+        frames(120,1f/60);
+        assertEquals(1,((Number)get("activeFighterIndex")).intValue());
+        assertEquals(0,number("tagPhase"),0);
+        assertTrue(number("tagCooldownRemaining")>0);
+        float x=number("playerX");frames(10,1f/60);assertTrue(number("playerX")>x);
+        button(265,555,930,505);assertEquals(0,number("tagPhase"),0);
+    }
+
+    @Test public void confirmedLauncherStillAllowsJumpCancel() throws Exception {
+        tap(1195,598);
+        set("attackType","2H");set("launcherChaseUntilMs",time+500);
+        down(175,465);
+        assertFalse((Boolean)get("grounded"));assertTrue((Boolean)get("superJumping"));
+        assertEquals("",get("attackType"));
+    }
+
+    @Test public void damageAndGuardFrom3dBranchRemainActive() throws Exception {
+        set("dummyX",480f);tap(1005,598);frames(12,1f/60);
+        assertTrue(number("dummyLife")<10000);
+        assertTrue((Boolean)get("attackHitApplied") || number("attackTimer")==0);
     }
 }

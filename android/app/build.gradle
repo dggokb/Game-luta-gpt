@@ -3,14 +3,14 @@ plugins { id 'com.android.application' }
 android {
     namespace 'com.gamelutagpt'
     compileSdk 35
-    testOptions { unitTests.includeAndroidResources = true }
     defaultConfig {
-        applicationId 'com.gamelutagpt'
+        applicationId 'com.gamelutagpt.astra'
         minSdk 24
         targetSdk 35
-        versionCode 19
-        versionName '0.18.1-astra'
+        versionCode 46
+        versionName '0.46-astra-prototype01-3d'
     }
+    testOptions { unitTests.includeAndroidResources = true }
 }
 
 dependencies {
