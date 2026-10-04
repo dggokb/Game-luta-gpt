@@ -80,6 +80,24 @@ public class SpriteIntegrationTest {
         frames(4);assertEquals(2,motion().frame());
         frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
+    @Test public void standingMediumAttackUsesThreeFrameKickAtScaleOne()throws Exception {
+        invoke("startAttack",new Class<?>[]{String.class},"M");
+        frames(1);assertEquals(SpriteMotion.Clip.MEDIUM_KICK,motion().clip);assertEquals(0,motion().frame());
+        frames(4);assertEquals(1,motion().frame());
+        frames(7);assertEquals(2,motion().frame());
+        frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
+        assertEquals(1f,((SpriteFighterRenderer)get("spriteFighterRenderer")).visualProfile().worldScale,.001f);
+    }
+    @Test public void mediumKickUsesWideCanvasWithoutShrinkingCharacter() {
+        Bitmap kick=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_medium_kick);
+        assertNotNull(kick);assertEquals(1152,kick.getWidth());assertEquals(256,kick.getHeight());
+        for(int i=0;i<3;i++) {
+            int count=0;
+            for(int y=0;y<256;y++)for(int x=i*384;x<(i+1)*384;x++)
+                if(Color.alpha(kick.getPixel(x,y))>10)count++;
+            assertTrue("Empty medium kick frame "+i,count>10000);
+        }
+    }
     @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
         CharacterVisualProfile p=CharacterVisualProfile.PLAYER_BASE;
         assertEquals(256,p.frameWidth);
