@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 public class SpriteMotionTest {
     private void tick(SpriteMotion m,float dt,boolean ground,boolean crouch,float vy,float dx,boolean front,boolean dash,boolean back,boolean combat,boolean lock) {
-        m.update(dt,ground,crouch,vy,dx,front,dash,back,combat,lock);
+        m.update(dt,ground,crouch,vy,dx,front,dash,back,false,combat,lock);
     }
     @Test public void allFourStepsAdvanceWithDistanceRatherThanDrawCalls() {
         SpriteMotion m=new SpriteMotion();
@@ -40,6 +40,17 @@ public class SpriteMotionTest {
         tick(m,.016f,false,false,200,0,true,false,false,false,false);assertEquals(11,m.frame());
         tick(m,.016f,true,false,0,0,true,false,false,false,false);assertEquals(15,m.frame());
         for(int i=0;i<10;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+    }
+    @Test public void lightJabUsesThreeOrderedFramesAndRecoversToIdle() {
+        SpriteMotion m=new SpriteMotion();
+        m.update(.016f,true,false,0,0,true,false,false,true,true,false);
+        assertEquals(SpriteMotion.Clip.LIGHT_JAB,m.clip);assertEquals(0,m.frame());
+        m.update(.040f,true,false,0,0,true,false,false,true,true,false);
+        assertEquals(1,m.frame());
+        m.update(.060f,true,false,0,0,true,false,false,true,true,false);
+        assertEquals(2,m.frame());
+        m.update(.016f,true,false,0,0,true,false,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
     @Test public void collisionGuardAndAttackCannotPlayWalking() {

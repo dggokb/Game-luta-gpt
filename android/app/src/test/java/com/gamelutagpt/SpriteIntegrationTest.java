@@ -73,6 +73,27 @@ public class SpriteIntegrationTest {
         invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},500,-1,"M",false,false);
         assertEquals(.15f,meter(get("opponentFighter")),.001f);
     }
+    @Test public void standingLightAttackPlaysJabStartupActiveRecoveryThenReturnsIdle()throws Exception {
+        invoke("startAttack",new Class<?>[]{String.class},"L");
+        frames(1);assertEquals(SpriteMotion.Clip.LIGHT_JAB,motion().clip);assertEquals(0,motion().frame());
+        frames(2);assertEquals(1,motion().frame());
+        frames(4);assertEquals(2,motion().frame());
+        frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
+    }
+    @Test public void jabAtlasKeepsAllFramesOnTheSameGroundLine() {
+        Bitmap jab=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.jab_light);
+        assertNotNull(jab);assertTrue(jab.hasAlpha());
+        assertEquals(768,jab.getWidth());assertEquals(256,jab.getHeight());
+        for(int frame=0;frame<3;frame++) {
+            int left=frame*256,minY=256,maxY=-1,count=0;
+            for(int y=0;y<256;y++)for(int x=left;x<left+256;x++) {
+                if(Color.alpha(jab.getPixel(x,y))>10) {count++;minY=Math.min(minY,y);maxY=Math.max(maxY,y);}
+            }
+            assertTrue("Jab frame empty "+frame,count>9000);
+            assertTrue("Unexpected fighter height "+frame,minY<=8);
+            assertTrue("Ground pivot drift "+frame,maxY>=234 && maxY<=236);
+        }
+    }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.movement_astra);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());

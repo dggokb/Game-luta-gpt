@@ -7,8 +7,8 @@ android {
         applicationId 'com.gamelutagpt'
         minSdk 24
         targetSdk 35
-        versionCode 43
-        versionName '0.43-sprite-gpt-responsive'
+        versionCode 44
+        versionName '0.44-sprite-gpt-jab'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }

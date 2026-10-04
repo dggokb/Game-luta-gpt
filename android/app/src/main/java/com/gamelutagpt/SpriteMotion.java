@@ -2,7 +2,7 @@ package com.gamelutagpt;
 
 /** Simulation-owned animation clock. Drawing never advances an animation. */
 final class SpriteMotion {
-    enum Clip { IDLE, WALK_FORWARD, WALK_BACK, DASH, BACKDASH, CROUCH, RISE, JUMP, FALL, LAND, COMBAT }
+    enum Clip { IDLE, WALK_FORWARD, WALK_BACK, DASH, BACKDASH, CROUCH, RISE, JUMP, FALL, LAND, LIGHT_JAB, COMBAT }
     Clip clip = Clip.IDLE;
     float time;
     float distance;
@@ -10,11 +10,12 @@ final class SpriteMotion {
 
     void update(float dt, boolean grounded, boolean crouching, float velocityY,
                 float travel, boolean forward, boolean dash, boolean backdash,
-                boolean combat, boolean locked) {
+                boolean lightJab, boolean combat, boolean locked) {
         dt = Math.max(0, Math.min(.1f, dt));
         Clip next;
         if (!grounded) next = velocityY < -35 ? Clip.JUMP : Clip.FALL;
         else if (crouching) next = Clip.CROUCH;
+        else if (lightJab) next = Clip.LIGHT_JAB;
         else if (combat || locked) next = Clip.COMBAT;
         else if (!wasGrounded || (clip == Clip.LAND && time < .10f)) next = Clip.LAND;
         else if (backdash && Math.abs(travel) > .001f) next = Clip.BACKDASH;
@@ -39,6 +40,10 @@ final class SpriteMotion {
             case DASH: return 12 + ((int)(time / .10f) % 2);
             case BACKDASH: return 14;
             case LAND: return 15;
+            case LIGHT_JAB:
+                if (time < .040f) return 0;
+                if (time < .100f) return 1;
+                return 2;
             case IDLE: return ((int)(time / .12f)) % 8;
             default: return 0;
         }

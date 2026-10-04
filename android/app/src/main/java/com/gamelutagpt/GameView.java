@@ -2533,7 +2533,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE GPT • v0.43", 975, 59, paint);
+        c.drawText("SPRITE GPT • v0.44", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -3167,9 +3167,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void updateSpriteMotion(float dt, float travel) {
         int guard = playerBlockstunTimer > 0f ? playerLastGuardState : anticipatedPlayerGuardPose();
+        boolean lightJab =
+            grounded &&
+            !crouching &&
+            "L".equals(attackType) &&
+            attackTimer > 0f;
+        boolean combatPose =
+            (attackTimer > 0f && !lightJab) ||
+            guard != GUARD_NONE ||
+            isSuperPoseActive() ||
+            isTagAnimationActive();
         spriteFighterRenderer.update(dt,grounded,crouching || isCrouchAttackActive() || guard == GUARD_LOW,
             velocityY,travel,travel*facingDirection > 0,forwardDashing,backDashTimer>0,
-            attackTimer>0 || guard!=GUARD_NONE || isSuperPoseActive() || isTagAnimationActive(),playerMovementLocked);
+            lightJab,combatPose,playerMovementLocked);
     }
 
     private void drawPlayer(Canvas c) {
