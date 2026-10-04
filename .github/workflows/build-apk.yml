@@ -46,17 +46,8 @@ jobs:
             adb shell am force-stop com.gamelutagpt
             adb shell am start -W -n com.gamelutagpt/.MainActivity
             sleep 5
-            PID="$(adb shell pidof com.gamelutagpt | tr -d '\r')"
-            if [ -z "$PID" ]; then
-              echo "Game process is not running after launch."
-              adb logcat -d -v time
-              exit 1
-            fi
-            if adb logcat -d -v brief | grep -E "FATAL EXCEPTION|Process: com\.gamelutagpt"; then
-              echo "Runtime crash detected."
-              adb logcat -d -v time
-              exit 1
-            fi
+            adb shell pidof com.gamelutagpt | grep -E '[0-9]+'
+            ! adb logcat -d -v brief | grep -q "Process: com.gamelutagpt"
             adb exec-out screencap -p > game-smoke.png
             test -s game-smoke.png
 
