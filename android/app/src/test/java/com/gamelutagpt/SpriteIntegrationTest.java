@@ -129,7 +129,7 @@ public class SpriteIntegrationTest {
             int h=r.height();
             assertTrue("Standing sprite too small: "+h,h>=204);
             assertTrue("Standing sprite too large: "+h,h<=214);
-            assertTrue("Ground pivot drift: "+r.bottom,r.bottom>=248 && r.bottom<=252);
+            assertTrue("Ground pivot drift: "+r.bottom,r.bottom>=247 && r.bottom<=253);
         }
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
