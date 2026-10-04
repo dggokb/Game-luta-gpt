@@ -103,20 +103,36 @@ def process_clip(config_path):
     mask = threshold_alpha(source, threshold)
 
     segmentation = cfg.get("segmentation", "horizontal-alpha-components")
-    if segmentation != "horizontal-alpha-components":
+    expected = int(cfg["expectedFrames"])
+
+    if segmentation == "horizontal-alpha-components":
+        x_intervals = occupied_intervals(mask, "x")
+        regions = [
+            (left, 0, right, source.height)
+            for left, right in x_intervals
+        ]
+    elif segmentation == "grid-alpha-components":
+        x_intervals = occupied_intervals(mask, "x")
+        y_intervals = occupied_intervals(mask, "y")
+        regions = []
+        for top, bottom in y_intervals:
+            for left, right in x_intervals:
+                region_mask = mask.crop((left, top, right, bottom))
+                if region_mask.getbbox() is not None:
+                    regions.append((left, top, right, bottom))
+    else:
         raise ValueError(f"unsupported segmentation mode: {segmentation}")
 
-    intervals = occupied_intervals(mask, "x")
-    expected = int(cfg["expectedFrames"])
-    if len(intervals) != expected:
+    if len(regions) != expected:
         raise ValueError(
-            f"{cfg['id']}: detected {len(intervals)} horizontal components, expected {expected}. "
-            f"Intervals={intervals}"
+            f"{cfg['id']}: detected {len(regions)} frame regions, expected {expected}. "
+            f"Regions={regions}"
         )
 
+    intervals = [(left, right) for left, _, right, _ in regions]
     frames = []
-    for index, (left, right) in enumerate(intervals):
-        frame = source.crop((left, 0, right, source.height))
+    for index, (left, top, right, bottom) in enumerate(regions):
+        frame = source.crop((left, top, right, bottom))
         bbox = bbox_for(frame, threshold)
         root_mode = cfg.get("rootMode", "ground-feet")
         if root_mode != "ground-feet":
@@ -129,6 +145,7 @@ def process_clip(config_path):
             "image": frame,
             "bbox": bbox,
             "sourceInterval": [left, right],
+            "sourceRect": [left, top, right, bottom],
             "sourceRoot": [root_x, root_y],
             "footIntervals": foot_intervals,
         })
@@ -245,6 +262,7 @@ def process_clip(config_path):
         frame_reports.append({
             "index": index,
             "sourceInterval": frame["sourceInterval"],
+            "sourceRect": frame["sourceRect"],
             "sourceBbox": list(frame["bbox"]),
             "sourceRoot": frame["sourceRoot"],
             "sourceFootIntervals": frame["footIntervals"],
