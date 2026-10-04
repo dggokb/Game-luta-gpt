@@ -4,6 +4,12 @@ package com.gamelutagpt;
 final class GeneratedSpriteLayouts {
     private GeneratedSpriteLayouts() {}
 
+    static final int HEAVY_STRAIGHT_FRAME_WIDTH = 320;
+    static final int HEAVY_STRAIGHT_FRAME_HEIGHT = 256;
+    static final int HEAVY_STRAIGHT_ROOT_X = 136;
+    static final int HEAVY_STRAIGHT_ROOT_Y = 244;
+    static final int HEAVY_STRAIGHT_FRAME_COUNT = 9;
+
     static final int MEDIUM_KICK_FRAME_WIDTH = 384;
     static final int MEDIUM_KICK_FRAME_HEIGHT = 256;
     static final int MEDIUM_KICK_ROOT_X = 128;
