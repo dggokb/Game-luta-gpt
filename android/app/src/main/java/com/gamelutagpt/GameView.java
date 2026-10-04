@@ -287,6 +287,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final CelShadedFighter3D cel3dRenderer =
+        new CelShadedFighter3D();
     private final LinearGradient skyGradient;
     private final android.graphics.Path[] mountainPaths =
         new android.graphics.Path[15];
@@ -2700,15 +2702,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawDamageDummy(Canvas c) {
-        float top = dummyTop();
-        float baseY = dummyY;
-
         paint.setColor(Color.argb(70, 0, 0, 0));
         c.drawOval(
-            dummyX - 43f,
-            GROUND_Y - 10f,
-            dummyX + 43f,
-            GROUND_Y + 10f,
+            dummyX - 47f,
+            GROUND_Y - 11f,
+            dummyX + 47f,
+            GROUND_Y + 11f,
             paint
         );
 
@@ -2716,9 +2715,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             ? opponentProfile().color
             : Color.rgb(95, 95, 105);
 
+        boolean hitFlash =
+            dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
+
         c.save();
         if (facingDirection > 0) {
-            // Jogador à esquerda: dummy olha para a esquerda.
+            // Jogador à esquerda: oponente olha para a esquerda.
             c.scale(-1f, 1f, dummyX, 0f);
         }
 
@@ -2745,255 +2747,44 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.rotate(knockdownAngle, dummyX, GROUND_Y);
         }
 
-        float hitProgress = dummyHitReactionTimer > 0f
-            ? 1f - dummyHitReactionTimer / DUMMY_HIT_REACTION_DURATION
-            : 1f;
-        float recoilPose = dummyHitReactionTimer > 0f
-            ? (float)Math.sin(hitProgress * Math.PI)
-            : 0f;
+        boolean crouchPose =
+            aiCrouching ||
+            "2L".equals(dummyAttackType) ||
+            "2M".equals(dummyAttackType) ||
+            "2H".equals(dummyAttackType);
 
-        if (
-            dummyKnockdownState == DUMMY_KD_NONE &&
-            dummyAirborne
-        ) {
-            float airTilt = dummyMovementLocked ? 1f : 0.55f;
-            recoilPose = Math.max(recoilPose, airTilt);
-        }
-        boolean hitFlash =
-            dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
-
-        if (hitFlash && dummyLife > 0) {
-            dummyColor = Color.rgb(255, 235, 235);
-        }
-
-        float headX = dummyX - 13f * recoilPose;
-        float shoulderX = dummyX - 9f * recoilPose;
-        float hipX = dummyX - 3f * recoilPose;
-
-        paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setColor(dummyColor);
-        c.drawCircle(headX, top + 20f - 2f * recoilPose, 25f, paint);
-
-        paint.setStrokeWidth(25f);
-        c.drawLine(
-            shoulderX,
-            top + 48f,
-            hipX,
-            baseY - 45f,
-            paint
+        cel3dRenderer.draw(
+            c,
+            paint,
+            dummyX,
+            dummyY,
+            dummyColor,
+            crouchPose,
+            dummyAirborne,
+            aiWalkTime,
+            dummyAttackType,
+            aiAttackPhase(),
+            CelShadedFighter3D.GUARD_NONE,
+            aiSuperTimer > 0f,
+            hitFlash && dummyLife > 0
         );
 
-        paint.setStrokeWidth(18f);
-        if (dummyAttackTimer > 0f || aiSuperTimer > 0f) {
-            float phase = aiAttackPhase();
-
-            if (aiSuperTimer > 0f) {
-                float pulse = 1f + 0.10f * (float)Math.sin(aiSuperTimer * 26f);
-                c.drawLine(
-                    shoulderX - 3f,
-                    top + 58f,
-                    dummyX - 54f * pulse,
-                    top + 38f,
-                    paint
-                );
-                c.drawLine(
-                    shoulderX + 3f,
-                    top + 58f,
-                    dummyX + 70f * pulse,
-                    top + 38f,
-                    paint
-                );
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 38f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 38f, baseY, paint);
-            } else if ("2L".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 76f * phase, top + 90f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 42f, baseY - 8f, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 39f, baseY - 8f, paint);
-            } else if ("2M".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 34f, top + 94f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 36f, baseY - 8f, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 44f + 72f * phase, baseY - 12f, paint);
-            } else if ("2H".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 32f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 42f + 82f * phase, top + 54f - 16f * phase, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 46f, baseY - 8f, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 44f, baseY - 8f, paint);
-            } else if ("M".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 28f, top + 97f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 30f, top + 94f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 25f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 34f + 76f * phase, baseY - 48f * phase, paint);
-            } else if ("H".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 26f, top + 98f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 28f + 92f * phase, top + 84f + 22f * phase, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 30f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 30f, baseY, paint);
-            } else {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 34f + 72f * phase, top + 66f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 26f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 26f, baseY, paint);
-            }
-        } else if (dummyHitReactionTimer > 0f) {
-            // Braços abrem e o tronco recua no impacto.
-            c.drawLine(
-                shoulderX - 3f,
-                top + 58f,
-                dummyX - 52f - 18f * recoilPose,
-                top + 82f,
-                paint
-            );
-            c.drawLine(
-                shoulderX + 3f,
-                top + 58f,
-                dummyX - 15f - 28f * recoilPose,
-                top + 112f,
-                paint
-            );
-            c.drawLine(
-                hipX - 4f,
-                baseY - 45f,
-                dummyX - 34f,
-                baseY,
-                paint
-            );
-            c.drawLine(
-                hipX + 4f,
-                baseY - 45f,
-                dummyX + 31f,
-                baseY,
-                paint
-            );
-        } else {
-            c.drawLine(dummyX - 3f, top + 58f, dummyX - 34f, top + 100f, paint);
-            c.drawLine(dummyX + 3f, top + 58f, dummyX + 34f, top + 100f, paint);
-            c.drawLine(dummyX - 4f, baseY - 45f, dummyX - 28f, baseY, paint);
-            c.drawLine(dummyX + 4f, baseY - 45f, dummyX + 28f, baseY, paint);
-        }
-
-        // Marca frontal para ficar visualmente claro quando o dummy vira.
-        paint.setColor(Color.rgb(24, 35, 48));
-        paint.setStrokeWidth(4f);
-        c.drawLine(
-            headX + 5f,
-            top + 15f - 2f * recoilPose,
-            headX + 13f,
-            top + 15f - 2f * recoilPose,
-            paint
-        );
         c.restore();
-        paint.setStrokeCap(Paint.Cap.BUTT);
 
-        float barLeft = dummyX - 125f;
-        float barRight = dummyX + 125f;
-        float barTop = top - 54f;
-        float barBottom = barTop + 16f;
-        float lifeRatio = dummyLife / (float)DUMMY_MAX_LIFE;
-
-        paint.setColor(Color.argb(205, 12, 16, 28));
-        c.drawRoundRect(
-            barLeft - 8f,
-            barTop - 28f,
-            barRight + 8f,
-            barBottom + 23f,
-            10f,
-            10f,
-            paint
-        );
-
-        paint.setColor(Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(15f);
-        String dummyStatusLabel;
-        if (dummyKnockdownState == DUMMY_KD_FALL) {
-            dummyStatusLabel = "NPC TESTE • CAINDO";
-        } else if (dummyKnockdownState == DUMMY_KD_DOWN) {
-            dummyStatusLabel = "NPC TESTE • NO CHÃO";
-        } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
-            dummyStatusLabel = "NPC TESTE • LEVANTANDO";
-        } else if (aiSuperTimer > 0f) {
-            dummyStatusLabel = "PLAYER 2 • SUPER";
-        } else if (dummyAttackTimer > 0f) {
-            dummyStatusLabel = "PLAYER 2 • " + dummyAttackType;
-        } else if (dummyGroundSlam) {
-            dummyStatusLabel = "NPC TESTE • QUEDA FORÇADA";
-        } else if (dummyMovementLocked) {
-            dummyStatusLabel = "NPC TESTE • SEM CONTROLE";
-        } else if (dummyAirborne) {
-            dummyStatusLabel = "NPC TESTE • DESCENDO";
-        } else {
-            dummyStatusLabel =
-                opponentAiEnabled
-                    ? "PLAYER 2 • IA"
-                    : "PLAYER 2 • DUMMY";
-        }
-
-        c.drawText(
-            dummyStatusLabel,
-            dummyX,
-            barTop - 9f,
-            paint
-        );
-        paint.setFakeBoldText(false);
-
-        paint.setColor(Color.rgb(45, 53, 62));
-        c.drawRoundRect(barLeft, barTop, barRight, barBottom, 6f, 6f, paint);
-
-        if (lifeRatio > 0f) {
-            int lifeColor;
-            if (lifeRatio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
-            else if (lifeRatio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
-            else lifeColor = Color.rgb(229, 82, 82);
-
-            paint.setColor(lifeColor);
-            c.drawRoundRect(
-                barLeft,
-                barTop,
-                barLeft + (barRight - barLeft) * lifeRatio,
-                barBottom,
-                6f,
-                6f,
-                paint
-            );
-        }
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1.5f);
-        paint.setColor(Color.WHITE);
-        c.drawRoundRect(barLeft, barTop, barRight, barBottom, 6f, 6f, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(12f);
-        c.drawText(dummyLifeHudLabel, dummyX, barBottom + 16f, paint);
-        paint.setTextSize(11f);
-        c.drawText(
-            opponentFighter.superHudLabel,
-            dummyX,
-            barBottom + 30f,
-            paint
-        );
-
-        if (dummyDamageLabelTimer > 0f) {
-            float progress = dummyDamageLabelTimer / 0.72f;
-            paint.setColor(Color.WHITE);
-            paint.setAlpha(Math.round(255f * progress));
+        if (dummyDamageLabelTimer > 0f && !dummyDamageLabel.isEmpty()) {
+            paint.setTextAlign(Paint.Align.CENTER);
             paint.setFakeBoldText(true);
-            paint.setTextSize(24f);
+            paint.setTextSize(18f);
+            paint.setColor(Color.WHITE);
             c.drawText(
                 dummyDamageLabel,
                 dummyX,
-                top - 72f - (1f - progress) * 28f,
+                dummyY - 188f,
                 paint
             );
             paint.setFakeBoldText(false);
-            paint.setAlpha(255);
+            paint.setTextAlign(Paint.Align.LEFT);
         }
-
-        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawEnergyProjectiles(Canvas c) {
@@ -3097,11 +2888,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         float baseY = playerY + bob;
         boolean crouchPose = crouching || isCrouchAttackActive();
-        float bodyHeight = crouchPose ? 90f : 145f;
-        float top = baseY - bodyHeight;
 
         paint.setColor(Color.argb(70, 0, 0, 0));
-        c.drawOval(playerX - 43, GROUND_Y - 10, playerX + 43, GROUND_Y + 10, paint);
+        c.drawOval(
+            playerX - 47f,
+            GROUND_Y - 11f,
+            playerX + 47f,
+            GROUND_Y + 11f,
+            paint
+        );
 
         float playerKnockdownAngle = 0f;
         if (playerKnockdownState == DUMMY_KD_FALL) {
@@ -3126,7 +2921,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.rotate(playerKnockdownAngle, playerX, GROUND_Y);
         }
 
-        paint.setStrokeCap(Paint.Cap.ROUND);
         int playerColor;
         if (playerBlockFlashTimer > 0f) {
             playerColor = Color.rgb(205, 240, 255);
@@ -3135,139 +2929,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else {
             playerColor = activeFighter().profile.color;
         }
-        paint.setColor(playerColor);
-        c.drawCircle(playerX, top + 20, 25, paint);
 
-        paint.setStrokeWidth(crouchPose ? 22 : 25);
-        c.drawLine(playerX, top + 48, playerX, baseY - 45, paint);
-
-        float legSwing = (grounded && !crouching && (movingLeft || movingRight))
-            ? (float)Math.sin(walkTime) * 18f
-            : 0f;
-
-        float armSwing = -legSwing * 0.75f;
-
-        paint.setStrokeWidth(18);
         int guardPose = playerBlockstunTimer > 0f
             ? playerLastGuardState
             : anticipatedPlayerGuardPose();
 
+        int celGuard = CelShadedFighter3D.GUARD_NONE;
         if (guardPose == GUARD_HIGH) {
-            // Defesa alta: braços protegem cabeça/torso.
-            c.drawLine(playerX - 3, top + 58, playerX - 25, top + 34, paint);
-            c.drawLine(playerX + 3, top + 58, playerX + 28, top + 33, paint);
-            c.drawLine(playerX - 4, baseY - 45, playerX - 29, baseY, paint);
-            c.drawLine(playerX + 4, baseY - 45, playerX + 31, baseY, paint);
+            celGuard = CelShadedFighter3D.GUARD_HIGH;
         } else if (guardPose == GUARD_LOW) {
-            // Defesa baixa: postura agachada protegendo linha inferior.
-            c.drawLine(playerX - 4, baseY - 70, playerX - 31, baseY - 47, paint);
-            c.drawLine(playerX + 4, baseY - 70, playerX + 35, baseY - 50, paint);
-            c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-            c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
-        } else if (crouchPose) {
-            float phase = attackPhase();
-
-            if ("2L".equals(attackType) && attackTimer > 0f) {
-                // Fraco agachado: golpe curto e rápido na linha baixa.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 70,
-                    playerX + 34 + 52f * phase,
-                    baseY - 48,
-                    paint
-                );
-                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 39, baseY - 8, paint);
-            } else if ("2M".equals(attackType) && attackTimer > 0f) {
-                // Médio agachado: chute baixo com alcance maior.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 30, baseY - 39, paint);
-                c.drawLine(playerX + 4, baseY - 70, playerX + 34, baseY - 43, paint);
-                c.drawLine(playerX - 5, baseY - 42, playerX - 36, baseY - 8, paint);
-                c.drawLine(
-                    playerX + 5,
-                    baseY - 42,
-                    playerX + 44 + 72f * phase,
-                    baseY - 12,
-                    paint
-                );
-            } else if ("2H".equals(attackType) && attackTimer > 0f) {
-                // Forte agachado: golpe mais amplo e pesado.
-                c.drawLine(playerX - 4, baseY - 70, playerX - 32, baseY - 38, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 70,
-                    playerX + 42 + 82f * phase,
-                    baseY - 34 - 16f * phase,
-                    paint
-                );
-                c.drawLine(playerX - 5, baseY - 42, playerX - 46, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 44, baseY - 8, paint);
-            } else {
-                c.drawLine(playerX - 4, baseY - 70, playerX - 35, baseY - 38, paint);
-                c.drawLine(playerX + 4, baseY - 70, playerX + 38, baseY - 43, paint);
-                c.drawLine(playerX - 5, baseY - 42, playerX - 42, baseY - 8, paint);
-                c.drawLine(playerX + 5, baseY - 42, playerX + 42, baseY - 8, paint);
-            }
-        } else {
-            float phase = attackPhase();
-
-            if (isSuperPoseActive()) {
-                float power = 1f + 0.10f * (float)Math.sin(superPhaseTimer * 24f);
-                c.drawLine(playerX - 3, top + 58, playerX - 58f * power, top + 38, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 74f * power, top + 36, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 40, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 42, baseY - 5, paint);
-            } else if (isTagPoseActive()) {
-                // Pose curta de prontidão ao terminar a entrada.
-                float poseWave = (float)Math.sin(tagPhaseTimer * 16f) * 4f;
-                c.drawLine(playerX - 3, top + 58, playerX - 42, top + 88 - poseWave, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 48, top + 72 + poseWave, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 34, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 32, baseY - 4, paint);
-            } else if ("L".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 30, top + 96, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 34 + 72f * phase, top + 66, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
-            } else if ("M".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 28, top + 97, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 30, top + 94, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 25, baseY, paint);
-                c.drawLine(
-                    playerX + 4,
-                    baseY - 45,
-                    playerX + 34 + 76f * phase,
-                    baseY - 48f * phase,
-                    paint
-                );
-            } else if ("S".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX + 28, top + 76, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 58 + 34f * phase, top + 76, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 26, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 26, baseY, paint);
-            } else if ("H".equals(attackType) && attackTimer > 0f) {
-                c.drawLine(playerX - 3, top + 58, playerX - 26, top + 98, paint);
-                c.drawLine(
-                    playerX + 3,
-                    top + 58,
-                    playerX + 28 + 92f * phase,
-                    top + 84 + 22f * phase,
-                    paint
-                );
-                c.drawLine(playerX - 4, baseY - 45, playerX - 30, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 30, baseY, paint);
-            } else {
-                c.drawLine(playerX - 3, top + 58, playerX - 34 + armSwing, top + 100, paint);
-                c.drawLine(playerX + 3, top + 58, playerX + 34 - armSwing, top + 100, paint);
-                c.drawLine(playerX - 4, baseY - 45, playerX - 28 + legSwing, baseY, paint);
-                c.drawLine(playerX + 4, baseY - 45, playerX + 28 - legSwing, baseY, paint);
-            }
+            celGuard = CelShadedFighter3D.GUARD_LOW;
         }
 
-        paint.setColor(Color.rgb(24, 35, 48));
-        paint.setStrokeWidth(4);
-        c.drawLine(playerX + 4, top + 15, playerX + 12, top + 15, paint);
+        cel3dRenderer.draw(
+            c,
+            paint,
+            playerX,
+            baseY,
+            playerColor,
+            crouchPose,
+            !grounded,
+            walkTime,
+            attackType,
+            attackPhase(),
+            celGuard,
+            isSuperPoseActive() || isTagPoseActive(),
+            playerDamageFlashTimer > 0f
+        );
     }
 
     private void drawControls(Canvas c) {
