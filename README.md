@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.47-sprite-gpt-character-profile`.
+Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.48-sprite-gpt-idle-hq`.
 
 ## Correção dos movimentos
 
@@ -34,4 +34,4 @@ O loop usa passos fixos de 120 Hz e alvo de desenho de 60 FPS. Os eventos de toq
 
 ## Arte
 
-Assets normalizados: `player_base_idle.png`, `player_base_movement.png` e `player_base_jab.png`. Padrão de produção: `docs/sprite-standard.md`.
+Assets normalizados: `player_base_idle.png`, `player_base_movement.png` e `player_base_jab.png`. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.
