@@ -140,15 +140,17 @@ def process_clip(config_path):
         root_x, root_y, foot_intervals = detect_ground_root(
             frame, bbox, threshold, foot_band_ratio, min_foot_width
         )
-        frames.append({
+        frame_info = {
             "index": index,
             "image": frame,
             "bbox": bbox,
             "sourceInterval": [left, right],
-            "sourceRect": [left, top, right, bottom],
             "sourceRoot": [root_x, root_y],
             "footIntervals": foot_intervals,
-        })
+        }
+        if segmentation == "grid-alpha-components":
+            frame_info["sourceRect"] = [left, top, right, bottom]
+        frames.append(frame_info)
 
     reference_frames = cfg.get("scaleReferenceFrames")
     if reference_frames is None:
@@ -259,10 +261,9 @@ def process_clip(config_path):
         }
         frame_passed = all(checks.values())
         passed = passed and frame_passed
-        frame_reports.append({
+        frame_report = {
             "index": index,
             "sourceInterval": frame["sourceInterval"],
-            "sourceRect": frame["sourceRect"],
             "sourceBbox": list(frame["bbox"]),
             "sourceRoot": frame["sourceRoot"],
             "sourceFootIntervals": frame["footIntervals"],
@@ -273,7 +274,10 @@ def process_clip(config_path):
             "opaquePixels": opaque_pixels,
             "checks": checks,
             "passed": frame_passed,
-        })
+        }
+        if "sourceRect" in frame:
+            frame_report["sourceRect"] = frame["sourceRect"]
+        frame_reports.append(frame_report)
 
     report = {
         "id": cfg["id"],
