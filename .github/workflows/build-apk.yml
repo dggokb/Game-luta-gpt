@@ -32,6 +32,13 @@ jobs:
         working-directory: android
         run: gradle assembleDebug --stacktrace
 
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
       - name: Runtime smoke test on Android emulator
         if: github.ref == 'refs/heads/game-luta-sprite-gpt'
         uses: reactivecircus/android-emulator-runner@v2
