@@ -63,9 +63,9 @@ final class FighterPrototype01Animator {
             applyAirPose(p, state.superJumping);
         }
 
-        if (state.guardPose == FighterPrototype01Renderer.GUARD_HIGH) {
+        if (state.guardPose == Fighter3DState.GUARD_HIGH) {
             applyHighGuard(p);
-        } else if (state.guardPose == FighterPrototype01Renderer.GUARD_LOW) {
+        } else if (state.guardPose == Fighter3DState.GUARD_LOW) {
             applyLowGuard(p);
         }
 
