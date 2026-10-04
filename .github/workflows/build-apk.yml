@@ -41,7 +41,7 @@ jobs:
           if-no-files-found: error
 
       - name: Runtime smoke test on Android emulator
-        if: github.ref == 'refs/heads/game-luta-sprite-astra'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -51,19 +51,19 @@ jobs:
           script: |
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb logcat -c
-            adb shell am force-stop com.gamelutagpt.spriteastra
-            adb shell am start -W -n com.gamelutagpt.spriteastra/com.gamelutagpt.MainActivity
+            adb shell am force-stop com.gamelutagpt
+            adb shell am start -W -n com.gamelutagpt/.MainActivity
             sleep 5
             adb shell input keyevent KEYCODE_HOME
-            adb shell am start -W -n com.gamelutagpt.spriteastra/com.gamelutagpt.MainActivity
+            adb shell am start -W -n com.gamelutagpt/.MainActivity
             sleep 2
-            adb shell pidof com.gamelutagpt.spriteastra | grep -E '[0-9]+'
-            ! adb logcat -d -v brief | grep -q "Process: com.gamelutagpt.spriteastra"
+            adb shell pidof com.gamelutagpt | grep -E '[0-9]+'
+            ! adb logcat -d -v brief | grep -q "Process: com.gamelutagpt"
             adb exec-out screencap -p > game-smoke.png
             test -s game-smoke.png
 
       - name: Upload runtime screenshot
-        if: github.ref == 'refs/heads/game-luta-sprite-astra'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
         uses: actions/upload-artifact@v4
         with:
           name: GameLutaGPT-Smoke-Screenshot
@@ -75,7 +75,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Sprite-Astra-Validation
+          name: Sprite-GPT-Validation
           path: |
             android/app/build/sprite-review/
             android/app/build/reports/tests/

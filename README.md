@@ -1,6 +1,6 @@
-# Game Luta Sprite Astra
+# Game Luta Sprite GPT
 
-Branch `game-luta-sprite-astra`, criada diretamente de `game-luta-sprite-gpt` em `3b60bb182b31f91e95364d25490c3c7be3a7866f`. Versão Android nativa Java/Canvas `0.43-sprite-astra-responsive`.
+Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.43-sprite-gpt-responsive`.
 
 ## Correção dos movimentos
 
@@ -26,7 +26,7 @@ cd android
 gradle testDebugUnitTest assembleDebug
 ```
 
-APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Aplicativo **Game Luta Sprite Astra**, pacote `com.gamelutagpt.spriteastra`, Android 7.0+. Pode ser instalado ao lado da outra branch.
+APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Aplicativo **Game Luta Sprite GPT**, pacote `com.gamelutagpt`, Android 7.0+.
 
 Os testes verificam os estados e seu tempo, ciclos com diferentes taxas de atualização, os comandos de movimento no GameView, salto/pouso, troca de orientação, pausa e decodificação dos recursos empacotados. A revisão em Canvas Android nativo gera `android/app/build/sprite-review/movement-frames.png` e `gameplay.png`. O workflow também instala e abre o APK em um emulador Android 34 e exercita retorno do segundo plano.
 
