@@ -29,6 +29,18 @@ jobs:
           gradle-version: '8.7'
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Install sprite pipeline dependency
+        run: python3 -m pip install --disable-pip-version-check pillow
+
+      - name: Normalize and validate sprite assets
+        run: |
+          python3 tools/sprites/import_sprites.py
+          git diff --exit-code -- \
+            android/app/src/main/res/drawable-nodpi/player_base_medium_kick.png \
+            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java \
+            tools/sprites/reports/player_base_medium_kick.report.json
+
       - name: Build debug APK
         working-directory: android
         run: gradle testDebugUnitTest assembleDebug --stacktrace
