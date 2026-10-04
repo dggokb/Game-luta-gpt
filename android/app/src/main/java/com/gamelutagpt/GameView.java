@@ -2460,7 +2460,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE 2D • v0.40", 975, 59, paint);
+        c.drawText("SPRITE IDLE • v0.41", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
