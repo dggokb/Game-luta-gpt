@@ -504,11 +504,16 @@ final class FighterPrototype01Renderer {
         int fill,
         int outline
     ) {
+        float l = Math.min(left, right);
+        float r = Math.max(left, right);
+        float t = Math.min(top, bottom);
+        float b = Math.max(top, bottom);
+
         p.setStyle(Paint.Style.FILL);
         p.setColor(outline);
-        c.drawRoundRect(left - 3f, top - 3f, right + 3f, bottom + 3f, 7f, 7f, p);
+        c.drawRoundRect(l - 3f, t - 3f, r + 3f, b + 3f, 7f, 7f, p);
         p.setColor(fill);
-        c.drawRoundRect(left, top, right, bottom, 6f, 6f, p);
+        c.drawRoundRect(l, t, r, b, 6f, 6f, p);
     }
 
     private void fillOutline(
