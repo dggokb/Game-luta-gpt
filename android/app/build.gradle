@@ -4,11 +4,11 @@ android {
     namespace 'com.gamelutagpt'
     compileSdk 35
     defaultConfig {
-        applicationId 'com.gamelutagpt'
+        applicationId 'com.gamelutagpt.spriteastra'
         minSdk 24
         targetSdk 35
-        versionCode 51
-        versionName '0.51-sprite-gpt-heavy-straight'
+        versionCode 52
+        versionName '0.52-sprite-astra-sync'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }

@@ -1,6 +1,6 @@
-# Game Luta Sprite GPT
+# Game Luta Sprite Astra
 
-Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.51-sprite-gpt-heavy-straight`.
+Branch `game-luta-sprite-astra`, sincronizada com `game-luta-sprite-gpt` em `ef3416d8d216a2c7cc54d823e95882ce0bad7c72` (v0.51). Versão Android nativa Java/Canvas `0.52-sprite-astra-sync`.
 
 ## Correção dos movimentos
 
@@ -28,12 +28,12 @@ cd android
 gradle testDebugUnitTest assembleDebug
 ```
 
-APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Aplicativo **Game Luta Sprite GPT**, pacote `com.gamelutagpt`, Android 7.0+.
+APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Aplicativo **Game Luta Sprite Astra**, pacote `com.gamelutagpt.spriteastra`, Android 7.0+.
 
 Os testes verificam os estados e seu tempo, ciclos com diferentes taxas de atualização, os comandos de movimento no GameView, salto/pouso, troca de orientação, pausa e decodificação dos recursos empacotados. A revisão em Canvas Android nativo gera `android/app/build/sprite-review/movement-frames.png` e `gameplay.png`. O workflow também instala e abre o APK em um emulador Android 34 e exercita retorno do segundo plano.
 
-O loop usa passos fixos de 120 Hz e alvo de desenho de 60 FPS. Os eventos de toque entram numa fila sem bloquear a interface; a simulação consome a fila antes do próximo passo e compacta eventos consecutivos de arraste. Assim, o toque deixa de esperar o `Canvas` terminar de desenhar e a latência fica limitada ao próximo passo da simulação.
+O loop usa passos fixos de 120 Hz e alvo de desenho de 60 FPS. Os eventos de toque entram numa fila sem bloquear a interface; a simulação consome a fila antes do próximo passo e compacta eventos consecutivos de arraste. Assim, o toque deixa de esperar o `Canvas` terminar de desenhar e os comandos são processados na próxima iteração do loop. Os passos de física a 120 Hz não garantem latência de entrada de 8,3 ms: desenho e consumo da fila ainda compartilham o loop com alvo de 60 FPS.
 
 ## Arte
 
-Assets normalizados: `player_base_idle.png`, `player_base_movement.png`, `player_base_jab.png`, `player_base_medium_kick.png` e `player_base_heavy_straight.png`. O chute médio é regenerado e validado pelo pipeline antes do build. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.
+Assets normalizados: `player_base_idle.png`, `player_base_movement.png`, `player_base_jab.png`, `player_base_medium_kick.png` e `player_base_heavy_straight.png`. O chute médio e o soco forte são regenerados e validados pelo pipeline antes do build. Idle, movimento e Jab estão normalizados, mas ainda não possuem configuração de importação reproduzível. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.

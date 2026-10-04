@@ -2533,7 +2533,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE GPT • v0.51", 975, 59, paint);
+        c.drawText("SPRITE ASTRA • v0.52", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
