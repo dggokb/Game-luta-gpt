@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.44-sprite-gpt-jab`.
+Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.45-sprite-gpt-scale-standard`.
 
 ## Correção dos movimentos
 
@@ -13,7 +13,7 @@ A folha anterior repetia quase a mesma pose nos oito quadros de caminhada. O có
 
 `SpriteMotion` escolhe as animações a partir da física real. O ciclo de passos avança com a distância percorrida; parado contra um limite não fica andando no lugar. O relógio do idle vem da simulação e pausa junto com o jogo. Recorte, escala e pivô são definidos por quadro; o agachamento mantém a escala do corpo, em vez de ser esticado até a altura de um personagem em pé.
 
-A folha de movimento foi empacotada em 16 células de 256×256 já na escala de jogo. O Canvas não precisa mais redimensionar recortes grandes da imagem original a cada quadro. São dois bitmaps decodificados uma vez, sem alocar bitmaps durante o jogo. O idle original foi preservado byte a byte e movido de Base64 Java para um recurso WebP.
+Os sprites agora usam uma escala anatômica canônica no renderer. O Walk Forward é a referência (~210 px de altura visual); Idle, recuo/demais movimentos e Jab recebem fatores de escala calibrados sem reamostrar os arquivos-fonte. Todos são posicionados por pivot de pé explícito, evitando crescer/encolher e reduzindo drift vertical entre estados.
 
 O golpe fraco em pé agora usa um jab próprio de 3 quadros (preparo, extensão e recuperação), normalizado no mesmo canvas/pivô de 256×256 dos movimentos. Os demais ataques, defesa e Super continuam usando as poses de suporte existentes. Da branch `game-luta-3D-gpt` foi portada a regra da barra de Super: golpe no vazio não carrega, acerto confirmado carrega, projétil carrega quando acerta e a defesa também ganha barra.
 

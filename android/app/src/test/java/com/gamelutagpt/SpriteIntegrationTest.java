@@ -94,6 +94,44 @@ public class SpriteIntegrationTest {
             assertTrue("Ground pivot drift "+frame,maxY>=234 && maxY<=236);
         }
     }
+    private Rect renderedBounds(
+        SpriteFighterRenderer renderer,
+        SpriteMotion.Clip clip,
+        float time,
+        float distance
+    ) {
+        Bitmap out=Bitmap.createBitmap(420,300,Bitmap.Config.ARGB_8888);
+        SpriteMotion m=renderer.motion;
+        m.clip=clip;m.time=time;m.distance=distance;
+        renderer.draw(new Canvas(out),new Paint(),210,250,false,false);
+        int minX=out.getWidth(),minY=out.getHeight(),maxX=-1,maxY=-1;
+        for(int y=0;y<out.getHeight();y++)for(int x=0;x<out.getWidth();x++) {
+            if(Color.alpha(out.getPixel(x,y))>10) {
+                minX=Math.min(minX,x);minY=Math.min(minY,y);
+                maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
+            }
+        }
+        assertTrue("Rendered sprite is empty",maxX>=minX && maxY>=minY);
+        return new Rect(minX,minY,maxX+1,maxY+1);
+    }
+    @Test public void standingClipsShareCanonicalVisualScaleAndGroundPivot() {
+        SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
+        java.util.ArrayList<Rect> standing=new java.util.ArrayList<>();
+
+        for(int i=0;i<8;i++) standing.add(renderedBounds(renderer,SpriteMotion.Clip.IDLE,i*.12f,0));
+        for(int i=0;i<4;i++) standing.add(renderedBounds(renderer,SpriteMotion.Clip.WALK_FORWARD,0,i*36f+1));
+        for(int i=0;i<4;i++) standing.add(renderedBounds(renderer,SpriteMotion.Clip.WALK_BACK,0,i*32f+1));
+        standing.add(renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,.016f,0));
+        standing.add(renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,.060f,0));
+        standing.add(renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,.130f,0));
+
+        for(Rect r:standing) {
+            int h=r.height();
+            assertTrue("Standing sprite too small: "+h,h>=204);
+            assertTrue("Standing sprite too large: "+h,h<=214);
+            assertTrue("Ground pivot drift: "+r.bottom,r.bottom>=248 && r.bottom<=252);
+        }
+    }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.movement_astra);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());

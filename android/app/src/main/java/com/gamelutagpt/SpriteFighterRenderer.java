@@ -12,7 +12,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-/** Prepacked atlases: each movement frame already matches its runtime scale. */
+/** Runtime-calibrated atlases: all clips share one anatomical scale and foot pivot. */
 final class SpriteFighterRenderer {
     final SpriteMotion motion = new SpriteMotion();
     private final Bitmap idleSheet;
@@ -25,6 +25,18 @@ final class SpriteFighterRenderer {
     private final Paint spritePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final ColorFilter hitFlash = new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
     private final ColorFilter blockFlash = new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
+
+    // Canonical visual scale. WALK_FORWARD is the reference authored at ~210 px body height.
+    static final float IDLE_SCALE = 210f / 147f;
+    static final float MOVE_REFERENCE_SCALE = 1.00f;
+    static final float MOVE_SECONDARY_SCALE = 1.07f;
+    static final float JAB_SCALE = 0.90f;
+
+    private static final float IDLE_PIVOT_X = 60f;
+    private static final float IDLE_PIVOT_Y = 150f;
+    private static final float CELL_PIVOT_X = 128f;
+    private static final float MOVE_PIVOT_Y = 238f;
+    private static final float JAB_PIVOT_Y = 237f;
 
     SpriteFighterRenderer(Context context) {
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -66,20 +78,48 @@ final class SpriteFighterRenderer {
         Bitmap sheet;
         if (motion.clip == SpriteMotion.Clip.LIGHT_JAB) {
             sheet=jabSheet;source=jabFrames[index];
-            destination.set(x-128f,baseY-235f,x+128f,baseY+21f);
+            setDestinationFromPivot(
+                x,baseY,source.width(),source.height(),
+                CELL_PIVOT_X,JAB_PIVOT_Y,JAB_SCALE
+            );
         } else if (motion.usesIdleSheet()) {
             sheet=idleSheet;source=idleFrames[index];
-            float scale=205f / 151f;
-            destination.set(x-source.width()*.5f*scale,baseY-153*scale,
-                x+source.width()*.5f*scale,baseY+(source.height()-153)*scale);
+            setDestinationFromPivot(
+                x,baseY,source.width(),source.height(),
+                IDLE_PIVOT_X,IDLE_PIVOT_Y,IDLE_SCALE
+            );
         } else {
             sheet=movementSheet;source=movementFrames[index];
-            destination.set(x-128f,baseY-235f,x+128f,baseY+21f);
+            float scale = index < 4
+                ? MOVE_REFERENCE_SCALE
+                : MOVE_SECONDARY_SCALE;
+            setDestinationFromPivot(
+                x,baseY,source.width(),source.height(),
+                CELL_PIVOT_X,MOVE_PIVOT_Y,scale
+            );
         }
         // Scene/HUD share a Paint and may leave alpha or a shader set. Sprite
         // opacity and sampling are independent from whichever layer drew last.
         spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:null);
         canvas.drawBitmap(sheet,source,destination,spritePaint);
+    }
 
+    private void setDestinationFromPivot(
+        float x,
+        float baseY,
+        float width,
+        float height,
+        float pivotX,
+        float pivotY,
+        float scale
+    ) {
+        float left = x - pivotX * scale;
+        float top = baseY - pivotY * scale;
+        destination.set(
+            left,
+            top,
+            left + width * scale,
+            top + height * scale
+        );
     }
 }
