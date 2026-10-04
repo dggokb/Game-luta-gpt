@@ -7,8 +7,8 @@ android {
         applicationId 'com.gamelutagpt'
         minSdk 24
         targetSdk 35
-        versionCode 50
-        versionName '0.50-sprite-gpt-import-pipeline'
+        versionCode 51
+        versionName '0.51-sprite-gpt-heavy-straight'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }
