@@ -2233,8 +2233,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float targetZoomY =
             usableVerticalScreen / heightAboveGround;
 
+        boolean superJumpCameraActive =
+            superJumping || aiSuperJumping;
+
+        // No Super Jump, a altura nao abre o enquadramento:
+        // a camera sobe/desce junto com o lutador e o zoom continua
+        // respondendo somente a separacao horizontal.
         float targetZoom = clamp(
-            Math.min(targetZoomX, targetZoomY),
+            superJumpCameraActive
+                ? targetZoomX
+                : Math.min(targetZoomX, targetZoomY),
             CAMERA_MIN_ZOOM,
             CAMERA_ZOOM
         );
@@ -2274,14 +2282,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 highestFighterTop - topMarginWorld;
         }
 
-        // Mesmo acompanhando alguém muito alto, o chão não pode sumir.
-        float lowestAllowedTop =
-            GROUND_Y -
-            (VH - CAMERA_BOTTOM_MARGIN_SCREEN) / cameraZoom;
-        targetCameraTop = Math.max(
-            targetCameraTop,
-            lowestAllowedTop
-        );
+        // Fora do Super Jump, preserva uma faixa do chao na tela.
+        // Durante o Super Jump essa trava e removida para a camera poder
+        // acompanhar verticalmente sem precisar afastar o zoom.
+        if (!superJumpCameraActive) {
+            float lowestAllowedTop =
+                GROUND_Y -
+                (VH - CAMERA_BOTTOM_MARGIN_SCREEN) / cameraZoom;
+            targetCameraTop = Math.max(
+                targetCameraTop,
+                lowestAllowedTop
+            );
+        }
         targetCameraTop = clamp(
             targetCameraTop,
             WORLD_TOP,
