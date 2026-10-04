@@ -89,14 +89,24 @@ final class SpriteFighterRenderer {
         requireSheet(idleSheet,4,2,"idle");
         requireSheet(movementSheet,4,4,"movement");
         requireSheet(jabSheet,3,1,"jab");
-        if (mediumKickSheet.getWidth()!=1152 || mediumKickSheet.getHeight()!=256) {
+        if (
+            mediumKickSheet.getWidth()!=
+                GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH *
+                GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_COUNT ||
+            mediumKickSheet.getHeight()!=
+                GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT
+        ) {
             throw new IllegalStateException("Invalid medium kick atlas");
         }
 
         slice(idleFrames,4);
         slice(movementFrames,4);
         slice(jabFrames,3);
-        for(int i=0;i<3;i++) mediumKickFrames[i]=new Rect(i*384,0,(i+1)*384,256);
+        for(int i=0;i<mediumKickFrames.length;i++) {
+            int w=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH;
+            int h=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT;
+            mediumKickFrames[i]=new Rect(i*w,0,(i+1)*w,h);
+        }
     }
 
     private void requireSheet(
@@ -179,8 +189,10 @@ final class SpriteFighterRenderer {
         }
 
         if (motion.clip==SpriteMotion.Clip.MEDIUM_KICK) {
-            float left=x-profile.rootX*profile.worldScale;
-            float top=baseY-profile.rootY*profile.worldScale;
+            float left=
+                x-GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X*profile.worldScale;
+            float top=
+                baseY-GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y*profile.worldScale;
             destination.set(left,top,left+source.width()*profile.worldScale,top+source.height()*profile.worldScale);
         } else {
             profile.place(destination,x,baseY);
