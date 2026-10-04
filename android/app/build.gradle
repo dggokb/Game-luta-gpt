@@ -7,7 +7,7 @@ android {
         applicationId 'com.gamelutagpt'
         minSdk 24
         targetSdk 35
-        versionCode 44
-        versionName '0.44-character-states'
+        versionCode 45
+        versionName '0.45-prototype01-real3d'
     }
 }
