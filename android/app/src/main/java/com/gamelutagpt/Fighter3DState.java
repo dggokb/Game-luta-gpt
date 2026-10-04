@@ -6,6 +6,10 @@ package com.gamelutagpt;
  * thread.
  */
 final class Fighter3DState {
+    static final int GUARD_NONE = 0;
+    static final int GUARD_HIGH = 1;
+    static final int GUARD_LOW = 2;
+
     volatile float playerX = 420f;
     volatile float playerY = 565f;
     volatile float visualOffsetX = 0f;
