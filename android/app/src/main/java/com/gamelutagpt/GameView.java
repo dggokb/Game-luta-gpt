@@ -287,8 +287,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final SpriteFighterRenderer spriteFighterRenderer =
-        new SpriteFighterRenderer();
+    private final SpriteFighterRenderer spriteFighterRenderer;
     private final LinearGradient skyGradient;
     private final android.graphics.Path[] mountainPaths =
         new android.graphics.Path[15];
@@ -457,6 +456,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
+        spriteFighterRenderer = new SpriteFighterRenderer(context);
         holder = getHolder();
         holder.addCallback(this);
         setFocusable(true);
@@ -3131,6 +3131,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             !crouching &&
             (movingLeft || movingRight);
 
+        boolean walkingForward =
+            moving &&
+            !forwardDashing &&
+            backDashTimer <= 0f &&
+            (
+                (facingDirection > 0 && movingRight && !movingLeft) ||
+                (facingDirection < 0 && movingLeft && !movingRight)
+            );
+
         spriteFighterRenderer.draw(
             c,
             paint,
@@ -3139,6 +3148,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             grounded,
             crouching || isCrouchAttackActive(),
             moving,
+            walkingForward,
             walkTime,
             attackType,
             attackTimer,
