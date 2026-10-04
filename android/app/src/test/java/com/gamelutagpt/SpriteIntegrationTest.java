@@ -170,7 +170,7 @@ public class SpriteIntegrationTest {
         frames(1);
         assertEquals(SpriteMotion.Clip.HEAVY_STRAIGHT,motion().clip);
         assertEquals(0,motion().frame());
-        frames(23);
+        frames(25);
         assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
         assertEquals(
             1f,
