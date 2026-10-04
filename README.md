@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.46-sprite-gpt-idle-calibrated`.
+Branch `game-luta-sprite-gpt`, incorporando as melhorias desenvolvidas em `game-luta-sprite-astra`. Versão Android nativa Java/Canvas `0.47-sprite-gpt-character-profile`.
 
 ## Correção dos movimentos
 
@@ -13,7 +13,7 @@ A folha anterior repetia quase a mesma pose nos oito quadros de caminhada. O có
 
 `SpriteMotion` escolhe as animações a partir da física real. O ciclo de passos avança com a distância percorrida; parado contra um limite não fica andando no lugar. O relógio do idle vem da simulação e pausa junto com o jogo. Recorte, escala e pivô são definidos por quadro; o agachamento mantém a escala do corpo, em vez de ser esticado até a altura de um personagem em pé.
 
-Os sprites usam escala anatômica canônica e pivot de pé explícito. O Walk Forward continua sendo a referência. O Idle recebeu calibração perceptual específica (1.55x) porque sua arte original tem cabeça/tronco visualmente menores mesmo quando a altura total do bounding box é semelhante. O teste agora compara a largura da região superior do corpo, além do pivot de chão, evitando falsos positivos de 'mesma altura' com personagem visualmente menor.
+A escala agora pertence ao personagem, não à animação. Os assets atuais foram pré-normalizados uma única vez para o perfil visual do personagem base. Idle, movimentos e Jab usam a mesma transformação em runtime. Outro lutador pode ter frame, root e escala próprios sem ser forçado ao tamanho do personagem base.
 
 O golpe fraco em pé agora usa um jab próprio de 3 quadros (preparo, extensão e recuperação), normalizado no mesmo canvas/pivô de 256×256 dos movimentos. Os demais ataques, defesa e Super continuam usando as poses de suporte existentes. Da branch `game-luta-3D-gpt` foi portada a regra da barra de Super: golpe no vazio não carrega, acerto confirmado carrega, projétil carrega quando acerta e a defesa também ganha barra.
 
@@ -34,4 +34,4 @@ O loop usa passos fixos de 120 Hz e alvo de desenho de 60 FPS. Os eventos de toq
 
 ## Arte
 
-Imagem criada com a ferramenta integrada de geração de imagens, usando as folhas originais como referência de identidade. Fonte final: `android/app/src/main/res/drawable-nodpi/movement_astra.png`. Especificação/prompt em `docs/movement-sprites.md`.
+Assets normalizados: `player_base_idle.png`, `player_base_movement.png` e `player_base_jab.png`. Padrão de produção: `docs/sprite-standard.md`.

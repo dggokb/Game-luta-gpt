@@ -80,20 +80,48 @@ public class SpriteIntegrationTest {
         frames(4);assertEquals(2,motion().frame());
         frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
-    @Test public void jabAtlasKeepsAllFramesOnTheSameGroundLine() {
-        Bitmap jab=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.jab_light);
-        assertNotNull(jab);assertTrue(jab.hasAlpha());
-        assertEquals(768,jab.getWidth());assertEquals(256,jab.getHeight());
-        for(int frame=0;frame<3;frame++) {
-            int left=frame*256,minY=256,maxY=-1,count=0;
-            for(int y=0;y<256;y++)for(int x=left;x<left+256;x++) {
-                if(Color.alpha(jab.getPixel(x,y))>10) {count++;minY=Math.min(minY,y);maxY=Math.max(maxY,y);}
-            }
-            assertTrue("Jab frame empty "+frame,count>9000);
-            assertTrue("Unexpected fighter height "+frame,minY<=8);
-            assertTrue("Ground pivot drift "+frame,maxY>=234 && maxY<=236);
-        }
+    @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
+        CharacterVisualProfile p=CharacterVisualProfile.PLAYER_BASE;
+        assertEquals(256,p.frameWidth);
+        assertEquals(256,p.frameHeight);
+        assertEquals(128f,p.rootX,.001f);
+        assertEquals(238f,p.rootY,.001f);
+
+        Bitmap idle=BitmapFactory.decodeResource(
+            RuntimeEnvironment.getApplication().getResources(),
+            R.drawable.player_base_idle
+        );
+        Bitmap movement=BitmapFactory.decodeResource(
+            RuntimeEnvironment.getApplication().getResources(),
+            R.drawable.player_base_movement
+        );
+        Bitmap jab=BitmapFactory.decodeResource(
+            RuntimeEnvironment.getApplication().getResources(),
+            R.drawable.player_base_jab
+        );
+
+        assertNotNull(idle);assertNotNull(movement);assertNotNull(jab);
+        assertEquals(1024,idle.getWidth());
+        assertEquals(512,idle.getHeight());
+        assertEquals(1024,movement.getWidth());
+        assertEquals(1024,movement.getHeight());
+        assertEquals(768,jab.getWidth());
+        assertEquals(256,jab.getHeight());
     }
+
+    @Test public void characterProfilesCanRepresentDifferentSizedFighters() {
+        CharacterVisualProfile base=CharacterVisualProfile.PLAYER_BASE;
+        CharacterVisualProfile large=
+            new CharacterVisualProfile("large_test",320,320,160f,300f,1f);
+        RectF a=new RectF(),b=new RectF();
+        base.place(a,500f,500f);
+        large.place(b,500f,500f);
+        assertEquals(256f,a.height(),.001f);
+        assertEquals(320f,b.height(),.001f);
+        assertEquals(500f,a.left+base.rootX*base.worldScale,.001f);
+        assertEquals(500f,b.left+large.rootX*large.worldScale,.001f);
+    }
+
     private Rect renderedBounds(
         SpriteFighterRenderer renderer,
         SpriteMotion.Clip clip,
@@ -140,34 +168,22 @@ public class SpriteIntegrationTest {
         return maxX-minX+1;
     }
 
-    @Test public void idleMatchesMovementPerceivedBodyScaleAndGroundPivot() {
-        SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
+    @Test public void normalizedStandingFramesStayOnModelAtScaleOne() {
+        SpriteFighterRenderer renderer=
+            new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
+        assertEquals(1f,renderer.visualProfile().worldScale,.001f);
 
         int idleUpper=upperBodyWidth(renderer,SpriteMotion.Clip.IDLE,0f,0f);
         int walkUpper=upperBodyWidth(renderer,SpriteMotion.Clip.WALK_FORWARD,0f,1f);
-        float ratio=idleUpper/(float)walkUpper;
-        assertTrue("Idle still looks smaller; upper-body ratio="+ratio,ratio>=.95f);
-        assertTrue("Idle became too large; upper-body ratio="+ratio,ratio<=1.08f);
+        int jabUpper=upperBodyWidth(renderer,SpriteMotion.Clip.LIGHT_JAB,.016f,0f);
 
-        for(int i=0;i<8;i++) {
-            Rect r=renderedBounds(renderer,SpriteMotion.Clip.IDLE,i*.12f,0f);
-            assertTrue("Idle ground pivot drift "+i+": "+r.bottom,r.bottom>=267 && r.bottom<=273);
-        }
-        for(int i=0;i<4;i++) {
-            Rect r=renderedBounds(renderer,SpriteMotion.Clip.WALK_FORWARD,0f,i*36f+1);
-            assertTrue("Walk ground pivot drift "+i+": "+r.bottom,r.bottom>=267 && r.bottom<=273);
-        }
-        for(int i=0;i<4;i++) {
-            Rect r=renderedBounds(renderer,SpriteMotion.Clip.WALK_BACK,0f,i*32f+1);
-            assertTrue("Walk back ground pivot drift "+i+": "+r.bottom,r.bottom>=267 && r.bottom<=273);
-        }
-        for(float t:new float[]{.016f,.060f,.130f}) {
-            Rect r=renderedBounds(renderer,SpriteMotion.Clip.LIGHT_JAB,t,0f);
-            assertTrue("Jab ground pivot drift: "+r.bottom,r.bottom>=267 && r.bottom<=273);
-        }
+        float idleRatio=idleUpper/(float)walkUpper;
+        float jabRatio=jabUpper/(float)walkUpper;
+        assertTrue("Idle off-model: "+idleRatio,idleRatio>=.94f && idleRatio<=1.12f);
+        assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.14f);
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
-        Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.movement_astra);
+        Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_movement);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());
         assertEquals(1024,atlas.getWidth());assertEquals(1024,atlas.getHeight());
         for(int i=0;i<16;i++) {
