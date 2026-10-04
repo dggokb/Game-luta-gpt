@@ -23,7 +23,7 @@ New generated sprite sheets are not sliced by equal-width guesses.
 
 `tools/sprites/import_sprites.py`:
 
-1. detects each frame from transparent separation in the source sheet;
+1. detects each frame from transparent separation in the source sheet, including horizontal strips and multi-row grids;
 2. verifies the expected frame count;
 3. detects the grounded registration point from the supporting foot/feet;
 4. applies one character-relative normalization scale to the whole clip;
@@ -99,3 +99,24 @@ profile, the importer must reject it before integration.
 
 Hitboxes and hurtboxes remain separate gameplay data and must never be inferred from
 opaque pixels.
+
+
+## Multi-row sprite sheets
+
+For larger animations the importer also supports `grid-alpha-components`.
+It detects occupied X and Y regions from alpha, combines them in row-major order
+and validates the resulting frame count before normalization.
+
+The standing Heavy straight punch is the first 9-frame case:
+
+- source layout: 3 x 3;
+- detected frames: 9;
+- generated runtime sheet: 9 frames in a horizontal strip;
+- generated frame: 320 x 256;
+- generated local root: X=136, Y=244;
+- worldScale remains 1.0;
+- minimum required transparent margin: 8 px;
+- no runtime per-animation scale correction.
+
+This proves that source-sheet arrangement is an import concern only. Runtime clips
+consume generated frame geometry and do not depend on how the source art was laid out.
