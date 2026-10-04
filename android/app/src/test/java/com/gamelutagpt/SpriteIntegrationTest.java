@@ -20,6 +20,9 @@ public class SpriteIntegrationTest {
     private void frames(int n)throws Exception {Method m=GameView.class.getDeclaredMethod("advanceSimulation",float.class);m.setAccessible(true);for(int i=0;i<n;i++)m.invoke(game,1f/60);}
     private SpriteMotion motion()throws Exception {return ((SpriteFighterRenderer)get("spriteFighterRenderer")).motion;}
     private void touch(int action,float x,float y){MotionEvent e=MotionEvent.obtain(0,10000,action,x,y,0);game.onTouchEvent(e);e.recycle();}
+    private void invoke(String name,Class<?>[] types,Object... args)throws Exception {Method m=GameView.class.getDeclaredMethod(name,types);m.setAccessible(true);m.invoke(game,args);}
+    private float meter(Object fighter)throws Exception {Field f=fighter.getClass().getDeclaredField("superMeter");f.setAccessible(true);return f.getFloat(fighter);}
+    private Object activeFighter()throws Exception {return ((Object[])get("team"))[0];}
     @Test public void actualPadDrivesForwardBackAndStopsAtRelease()throws Exception {
         touch(MotionEvent.ACTION_DOWN,265,555);frames(10);assertEquals(SpriteMotion.Clip.WALK_FORWARD,motion().clip);
         touch(MotionEvent.ACTION_MOVE,85,555);frames(10);assertEquals(SpriteMotion.Clip.WALK_BACK,motion().clip);
@@ -37,12 +40,47 @@ public class SpriteIntegrationTest {
         touch(MotionEvent.ACTION_DOWN,265,555);frames(5);game.pauseGame();assertFalse((Boolean)get("movingRight"));
         game.resumeGame();assertFalse((Boolean)get("running"));frames(1);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
+    @Test public void touchIsQueuedAndLatestMoveWinsWithoutBuildingBacklog()throws Exception {
+        touch(MotionEvent.ACTION_DOWN,265,555);
+        assertFalse((Boolean)get("movingRight"));
+        for(int i=0;i<80;i++)touch(MotionEvent.ACTION_MOVE,265-i*2.25f,555);
+        frames(1);
+        assertTrue((Boolean)get("movingLeft"));
+        assertFalse((Boolean)get("movingRight"));
+        touch(MotionEvent.ACTION_UP,85,555);frames(1);
+        assertFalse((Boolean)get("movingLeft"));
+    }
+    @Test public void powerGaugeRequiresAConfirmedHitAndGuardBuildsMeter()throws Exception {
+        set("dummyX",1000f);
+        invoke("startAttack",new Class<?>[]{String.class},"L");frames(40);
+        assertEquals(0f,meter(activeFighter()),.001f);
+
+        set("dummyX",520f);
+        invoke("startAttack",new Class<?>[]{String.class},"L");frames(20);
+        assertEquals(.10f,meter(activeFighter()),.001f);
+
+        invoke("fireEnergyAttack",new Class<?>[]{String.class},"M");
+        assertEquals(.10f,meter(activeFighter()),.001f);
+        frames(1);assertEquals(.55f,meter(activeFighter()),.001f);
+        frames(30);
+
+        set("dpadDirection",5);
+        invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},300,-1,"L",false,false);
+        assertEquals(.60f,meter(activeFighter()),.001f);
+        assertEquals(0f,meter(get("opponentFighter")),.001f);
+
+        set("dpadDirection",0);set("playerMovementLocked",false);set("playerBlockstunTimer",0f);
+        invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},500,-1,"M",false,false);
+        assertEquals(.15f,meter(get("opponentFighter")),.001f);
+    }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.movement_astra);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());
-        for(int[] r:SpriteFighterRenderer.REGIONS) {
-            int count=0;for(int y=r[1];y<r[3];y++)for(int x=r[0];x<r[2];x++)if(Color.alpha(atlas.getPixel(x,y))>128)count++;
-            assertTrue("Empty sprite",count>15000);assertTrue("Opaque background",count<(r[2]-r[0])*(r[3]-r[1])*.85f);
+        assertEquals(1024,atlas.getWidth());assertEquals(1024,atlas.getHeight());
+        for(int i=0;i<16;i++) {
+            int left=(i%4)*256,top=(i/4)*256,count=0;
+            for(int y=top;y<top+256;y++)for(int x=left;x<left+256;x++)if(Color.alpha(atlas.getPixel(x,y))>128)count++;
+            assertTrue("Empty sprite "+i,count>4500);assertTrue("Opaque background "+i,count<256*256*.70f);
         }
     }
     @Test public void scenePaintCannotMakeTheFighterTransparent() {

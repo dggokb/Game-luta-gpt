@@ -7,8 +7,8 @@ android {
         applicationId 'com.gamelutagpt.spriteastra'
         minSdk 24
         targetSdk 35
-        versionCode 42
-        versionName '0.42-sprite-astra'
+        versionCode 43
+        versionName '0.43-sprite-astra-responsive'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }

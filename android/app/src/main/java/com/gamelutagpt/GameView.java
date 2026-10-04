@@ -6,12 +6,14 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     private static final class FighterProfile {
@@ -386,6 +388,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float SUPER_GAIN_MEDIUM = 0.15f;
     private static final float SUPER_GAIN_HEAVY = 0.20f;
     private static final float SUPER_GAIN_ENERGY = 0.45f;
+    private static final float SUPER_GUARD_GAIN_LIGHT = 0.05f;
+    private static final float SUPER_GUARD_GAIN_MEDIUM = 0.075f;
+    private static final float SUPER_GUARD_GAIN_HEAVY = 0.10f;
+    private static final float SUPER_GUARD_GAIN_ENERGY = 0.20f;
+    private static final float SUPER_GUARD_GAIN_SUPER = 0.25f;
 
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
@@ -454,12 +461,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final long[] commandTimes = new long[COMMAND_BUFFER_SIZE];
     private int commandCount = 0;
 
-    private final Object stateLock = new Object();
-    private boolean surfaceReady;
-    private boolean activityActive = true;
+    private final ConcurrentLinkedQueue<MotionEvent> pendingInput =
+        new ConcurrentLinkedQueue<>();
+    private volatile boolean surfaceReady;
+    private volatile boolean activityActive = true;
     private float accumulatedTime;
     private static final float FIXED_STEP = 1f/120f;
     private void clearInput() {
+        clearPendingInput();
         clearDpad();
         lightPointer=mediumPointer=heavyPointer=comboPointer=tagPointer=superPointer=-1;
         pendingEnergyUntilMs=-1L;
@@ -560,10 +569,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (interrupted) Thread.currentThread().interrupt();
             gameThread = null;
         }
-        synchronized (stateLock) {
-            clearInput();
-            accumulatedTime = 0f;
-        }
+        clearInput();
+        accumulatedTime = 0f;
     }
 
     @Override
@@ -574,9 +581,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             long frameStart = System.nanoTime();
             float elapsedSeconds = (frameStart - previous) / 1_000_000_000f;
             previous = frameStart;
-              synchronized (stateLock) {
-                advanceSimulation(elapsedSeconds);
-            }
+            advanceSimulation(elapsedSeconds);
             if (!running) break;
             drawFrame();
             long remaining = targetFrame - (System.nanoTime() - frameStart);
@@ -592,6 +597,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     // Render cadence can vary; movement and attack timing always use the same steps.
     private void advanceSimulation(float elapsedSeconds) {
+        processPendingInput();
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f);
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
             update(FIXED_STEP);
@@ -783,8 +789,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         aiBackDashTimer = 0f;
         aiCrouching = type.startsWith("2");
 
-        float gain = superGainForAttack(type);
-        if (gain > 0f) addSuperMeter(opponentFighter, gain);
     }
 
     private void startOpponentJump(boolean superJump) {
@@ -839,7 +843,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             AI_OWNER_INDEX,
             direction
         ));
-        addSuperMeter(opponentFighter, SUPER_GAIN_ENERGY);
         aiAttackCooldownRemaining = 0.40f;
     }
 
@@ -1583,6 +1586,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
         if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;
         if ("H".equals(type) || "2H".equals(type)) return SUPER_GAIN_HEAVY;
+        if ("S".equals(type)) return SUPER_GAIN_ENERGY;
+        return 0f;
+    }
+
+    private float superGainForGuard(String type) {
+        if ("L".equals(type) || "2L".equals(type)) return SUPER_GUARD_GAIN_LIGHT;
+        if ("M".equals(type) || "2M".equals(type)) return SUPER_GUARD_GAIN_MEDIUM;
+        if ("H".equals(type) || "2H".equals(type)) return SUPER_GUARD_GAIN_HEAVY;
+        if ("S".equals(type)) return SUPER_GUARD_GAIN_ENERGY;
+        if ("SUPER".equals(type)) return SUPER_GUARD_GAIN_SUPER;
         return 0f;
     }
 
@@ -1601,10 +1614,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         attackTimer = attackDuration;
 
-        float superGain = superGainForAttack(type);
-        if (superGain > 0f) {
-            addSuperMeter(activeFighter(), superGain);
-        }
     }
 
     private int damageForAttack(String type) {
@@ -1637,6 +1646,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float dummyCenterY = (dummyTop() + dummyY) * 0.5f;
         if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
 
+        addSuperMeter(activeFighter(), superGainForAttack(attackType));
         applyDummyDamage(damage, facingDirection);
 
         if ("2M".equals(attackType)) {
@@ -1644,7 +1654,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else if ("2H".equals(attackType)) {
             launchDummy();
             launcherChaseUntilMs =
-                System.currentTimeMillis() + LAUNCHER_CHASE_WINDOW_MS;
+                SystemClock.uptimeMillis() + LAUNCHER_CHASE_WINDOW_MS;
         } else if (
             "H".equals(attackType) &&
             !grounded &&
@@ -1785,7 +1795,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             facingDirection
         ));
 
-        addSuperMeter(activeFighter(), SUPER_GAIN_ENERGY);
     }
 
     private boolean tryFirePendingEnergy(String attackButton, long nowMs) {
@@ -1839,6 +1848,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     24f
                 )
             ) {
+                if (
+                    projectile.ownerIndex >= 0 &&
+                    projectile.ownerIndex < team.length
+                ) {
+                    addSuperMeter(
+                        team[projectile.ownerIndex],
+                        superGainForAttack("S")
+                    );
+                }
                 applyDummyDamage(projectile.damage, projectile.direction);
                 hit = true;
             }
@@ -2088,13 +2106,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return GUARD_NONE;
     }
 
-    private void applyPlayerBlock(int hitDirection) {
+    private void applyPlayerBlock(int hitDirection, String type) {
         int guard = currentPlayerGuardState();
         playerLastGuardState = guard;
         playerBlockFlashTimer = 0.12f;
         playerBlockstunTimer = BLOCKSTUN_DURATION;
         playerMovementLocked = true;
         playerKnockbackVelocityX = hitDirection * BLOCK_PUSH_SPEED;
+        addSuperMeter(activeFighter(), superGainForGuard(type));
 
         attackType = "";
         attackTimer = 0f;
@@ -2112,9 +2131,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         boolean attackerSuperJumping
     ) {
         if (playerBlocksAttack(type, attackerAirborne)) {
-            applyPlayerBlock(hitDirection);
+            applyPlayerBlock(hitDirection, type);
             return;
         }
+        addSuperMeter(opponentFighter, superGainForAttack(type));
         applyDamage(damage);
         if (activeFighter().life <= 0) {
             playerMovementLocked = true;
@@ -2362,10 +2382,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawFrame() {
-        synchronized (stateLock) { drawLockedFrame(); }
-    }
-
-    private void drawLockedFrame() {
         if (!holder.getSurface().isValid()) return;
         Canvas canvas = holder.lockCanvas();
         if (canvas == null) return;
@@ -2517,7 +2533,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE ASTRA • v0.42", 975, 59, paint);
+        c.drawText("SPRITE ASTRA • v0.43", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -3519,7 +3535,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        synchronized (stateLock) { return handleTouch(event); }
+        if (!activityActive) return true;
+        pendingInput.offer(MotionEvent.obtain(event));
+        return true;
+    }
+
+    private void processPendingInput() {
+        MotionEvent latestMove = null;
+        MotionEvent event;
+        while ((event = pendingInput.poll()) != null) {
+            if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                if (latestMove != null) latestMove.recycle();
+                latestMove = event;
+                continue;
+            }
+
+            if (latestMove != null) {
+                handleTouch(latestMove);
+                latestMove.recycle();
+                latestMove = null;
+            }
+            handleTouch(event);
+            event.recycle();
+        }
+
+        if (latestMove != null) {
+            handleTouch(latestMove);
+            latestMove.recycle();
+        }
+    }
+
+    private void clearPendingInput() {
+        MotionEvent event;
+        while ((event = pendingInput.poll()) != null) event.recycle();
     }
 
     private boolean handleTouch(MotionEvent event) {
@@ -3528,7 +3576,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float sy = getHeight() / VH;
         int action = event.getActionMasked();
         int index = event.getActionIndex();
-        long nowMs = System.currentTimeMillis();
+        long nowMs = event.getEventTime();
 
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             int pointerId = event.getPointerId(index);
