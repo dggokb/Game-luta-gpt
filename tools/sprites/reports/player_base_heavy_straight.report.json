@@ -40,13 +40,13 @@
       1495
     ]
   ],
-  "scale": 0.7169811320754716,
+  "scale": 0.635367231638418,
   "worldScale": 1.0,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
-    "rootX": 136,
-    "rootY": 244,
+    "rootX": 128,
+    "rootY": 238,
     "frameCount": 9
   },
   "validation": {
@@ -61,6 +61,37 @@
     "maxUpscale": 1.0,
     "maxFrameWidth": 768,
     "maxFrameHeight": 512
+  },
+  "anatomy": {
+    "mode": "canonical-anatomy",
+    "clipReferenceFrame": 0,
+    "referenceSource": "art/sprites/source/player_base_idle_normalized.png",
+    "referenceFrame": 0,
+    "canonicalSignature": {
+      "height": 228,
+      "bands": [
+        47.0,
+        57.0,
+        97.0
+      ]
+    },
+    "sourceSignature": {
+      "height": 329,
+      "bands": [
+        75.0,
+        88.5,
+        159.0
+      ]
+    },
+    "scaleCandidates": [
+      0.6930091185410334,
+      0.6266666666666667,
+      0.6440677966101694,
+      0.610062893081761
+    ],
+    "scaleSpreadRatio": 0.13054847862610014,
+    "maxScaleSpreadRatio": 0.15,
+    "passed": true
   },
   "frames": [
     {
@@ -90,32 +121,32 @@
         ]
       ],
       "outputBbox": [
-        44,
-        9,
-        243,
-        245
+        46,
+        30,
+        222,
+        239
       ],
       "outputMargins": {
-        "left": 44,
-        "right": 77,
-        "top": 9,
-        "bottom": 11
+        "left": 46,
+        "right": 98,
+        "top": 30,
+        "bottom": 17
       },
       "detectedOutputRoot": [
-        136.25,
-        244.0
+        127.5,
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
-          44,
-          79
+          46,
+          77
         ],
         [
-          181,
-          243
+          167,
+          222
         ]
       ],
-      "opaquePixels": 21511,
+      "opaquePixels": 16881,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -157,32 +188,32 @@
         ]
       ],
       "outputBbox": [
-        41,
-        15,
-        245,
-        244
+        44,
+        35,
+        225,
+        238
       ],
       "outputMargins": {
-        "left": 41,
-        "right": 75,
-        "top": 15,
-        "bottom": 12
+        "left": 44,
+        "right": 95,
+        "top": 35,
+        "bottom": 18
       },
       "detectedOutputRoot": [
-        136.0,
-        243.0
+        128.0,
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
-          41,
-          78
+          44,
+          76
         ],
         [
-          182,
-          245
+          169,
+          225
         ]
       ],
-      "opaquePixels": 21955,
+      "opaquePixels": 17305,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -224,32 +255,32 @@
         ]
       ],
       "outputBbox": [
-        31,
-        22,
-        254,
-        245
+        35,
+        41,
+        233,
+        239
       ],
       "outputMargins": {
-        "left": 31,
-        "right": 66,
-        "top": 22,
-        "bottom": 11
+        "left": 35,
+        "right": 87,
+        "top": 41,
+        "bottom": 17
       },
       "detectedOutputRoot": [
-        136.0,
-        244.0
+        128.25,
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
-          31,
+          35,
           70
         ],
         [
-          191,
-          254
+          177,
+          233
         ]
       ],
-      "opaquePixels": 23934,
+      "opaquePixels": 18909,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -291,32 +322,32 @@
         ]
       ],
       "outputBbox": [
-        20,
-        17,
-        263,
-        244
+        26,
+        37,
+        241,
+        238
       ],
       "outputMargins": {
-        "left": 20,
-        "right": 57,
-        "top": 17,
-        "bottom": 12
+        "left": 26,
+        "right": 79,
+        "top": 37,
+        "bottom": 18
       },
       "detectedOutputRoot": [
-        135.5,
-        243.0
+        128.0,
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
-          23,
-          60
+          28,
+          62
         ],
         [
-          198,
-          263
+          183,
+          241
         ]
       ],
-      "opaquePixels": 24179,
+      "opaquePixels": 18979,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -358,32 +389,32 @@
         ]
       ],
       "outputBbox": [
-        22,
-        19,
-        276,
-        245
+        27,
+        38,
+        252,
+        238
       ],
       "outputMargins": {
-        "left": 22,
-        "right": 44,
-        "top": 19,
-        "bottom": 11
+        "left": 27,
+        "right": 68,
+        "top": 38,
+        "bottom": 18
       },
       "detectedOutputRoot": [
-        135.5,
-        244.0
+        127.75,
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
-          22,
-          59
+          27,
+          60
         ],
         [
-          199,
-          264
+          184,
+          242
         ]
       ],
-      "opaquePixels": 24105,
+      "opaquePixels": 18930,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -425,32 +456,32 @@
         ]
       ],
       "outputBbox": [
-        9,
-        17,
-        309,
-        245
+        16,
+        37,
+        282,
+        239
       ],
       "outputMargins": {
-        "left": 9,
-        "right": 11,
-        "top": 17,
-        "bottom": 11
+        "left": 16,
+        "right": 38,
+        "top": 37,
+        "bottom": 17
       },
       "detectedOutputRoot": [
-        135.25,
-        244.0
+        128.0,
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
-          9,
-          48
+          16,
+          51
         ],
         [
-          208,
-          278
+          192,
+          255
         ]
       ],
-      "opaquePixels": 26177,
+      "opaquePixels": 20599,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -492,32 +523,32 @@
         ]
       ],
       "outputBbox": [
-        28,
-        21,
-        259,
-        245
+        32,
+        40,
+        237,
+        238
       ],
       "outputMargins": {
-        "left": 28,
-        "right": 61,
-        "top": 21,
-        "bottom": 11
+        "left": 32,
+        "right": 83,
+        "top": 40,
+        "bottom": 18
       },
       "detectedOutputRoot": [
-        136.0,
-        244.0
+        127.75,
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
-          28,
+          32,
           65
         ],
         [
-          195,
-          258
+          180,
+          236
         ]
       ],
-      "opaquePixels": 23124,
+      "opaquePixels": 18164,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -559,32 +590,32 @@
         ]
       ],
       "outputBbox": [
-        39,
-        14,
-        248,
-        245
+        42,
+        34,
+        228,
+        239
       ],
       "outputMargins": {
-        "left": 39,
-        "right": 72,
-        "top": 14,
-        "bottom": 11
+        "left": 42,
+        "right": 92,
+        "top": 34,
+        "bottom": 17
       },
       "detectedOutputRoot": [
-        136.0,
-        244.0
+        128.25,
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
-          39,
-          75
+          42,
+          74
         ],
         [
-          184,
-          248
+          171,
+          228
         ]
       ],
-      "opaquePixels": 21960,
+      "opaquePixels": 17371,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -626,32 +657,32 @@
         ]
       ],
       "outputBbox": [
-        38,
-        15,
-        247,
-        245
+        42,
+        35,
+        228,
+        239
       ],
       "outputMargins": {
-        "left": 38,
-        "right": 73,
-        "top": 15,
-        "bottom": 11
+        "left": 42,
+        "right": 92,
+        "top": 35,
+        "bottom": 17
       },
       "detectedOutputRoot": [
-        135.25,
-        244.0
+        128.25,
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
-          38,
+          42,
           74
         ],
         [
-          184,
-          247
+          171,
+          228
         ]
       ],
-      "opaquePixels": 21592,
+      "opaquePixels": 17082,
       "checks": {
         "noClipping": true,
         "rootXWithinTolerance": true,
@@ -669,11 +700,11 @@
   ],
   "passed": true,
   "provenance": {
-    "pipelineVersion": 1,
+    "pipelineVersion": 2,
     "sha256": {
       "source": "50756f4be431819f11de1652b98289a445e9e82e2c8e8a3182a1700fa5f34d82",
-      "config": "752bfef4e32d02bca2831941b672c0966f8a5a38b18e1850cb8591cb56e80945",
-      "profile": "4bdcc42a695c5a0b26ad9a1d65d9a82736432434089ea2538c9a92fa1cfa22c1"
+      "config": "0d23908a7f81666a649a49deb6186d2f8d09cdd94f14746d81098a712541ac9c",
+      "profile": "2776e22c327931e7205ba506030877da30ce9063d87da27ebe3882837c3d20c7"
     }
   }
 }

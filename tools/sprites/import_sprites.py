@@ -80,6 +80,56 @@ def ceil_step(value, step):
 def sanitize_java_name(value):
     return re.sub(r"[^A-Z0-9_]", "_", value.upper())
 
+def anatomy_signature(image, bbox, threshold, bands):
+    """Measure a compact silhouette signature for one comparable standing pose."""
+    mask = threshold_alpha(image, threshold)
+    px = mask.load()
+    x0, y0, x1, y1 = bbox
+    height = y1 - y0
+    values = []
+    for pair in bands:
+        if not isinstance(pair, list) or len(pair) != 2:
+            raise ValueError("anatomy bands must be [start,end] pairs")
+        start, end = float(pair[0]), float(pair[1])
+        if not 0.0 <= start < end <= 1.0:
+            raise ValueError("anatomy bands must stay inside 0..1")
+        top = max(y0, int(math.floor(y0 + start * height)))
+        bottom = min(y1, int(math.ceil(y0 + end * height)))
+        widths = []
+        for y in range(top, bottom):
+            xs = [x for x in range(image.width) if px[x, y]]
+            if xs:
+                widths.append(max(xs) - min(xs) + 1)
+        if not widths:
+            raise ValueError("anatomy band contains no visible pixels")
+        values.append(float(statistics.median(widths)))
+    return {"height": height, "bands": values}
+
+def canonical_anatomy_reference(profile, threshold):
+    anatomy = profile.get("anatomyReference")
+    if not isinstance(anatomy, dict):
+        raise ValueError(f"{profile['id']}: canonical-anatomy requires anatomyReference")
+    path = (ROOT / anatomy["source"]).resolve()
+    if not path.is_relative_to(ROOT.resolve()):
+        raise ValueError("anatomy reference path escapes project")
+    sheet = Image.open(path).convert("RGBA")
+    width = int(profile["baseFrameWidth"])
+    height = int(profile["baseFrameHeight"])
+    columns = int(anatomy["columns"])
+    frame = int(anatomy["frame"])
+    if columns <= 0 or sheet.width % width or sheet.height % height:
+        raise ValueError(f"{profile['id']}: invalid anatomy reference grid")
+    actual_columns = sheet.width // width
+    rows = sheet.height // height
+    if columns != actual_columns or frame < 0 or frame >= columns * rows:
+        raise ValueError(f"{profile['id']}: anatomy reference frame is outside the grid")
+    x = frame % columns * width
+    y = frame // columns * height
+    cell = sheet.crop((x, y, x + width, y + height))
+    bbox = bbox_for(cell, threshold)
+    bands = anatomy.get("bands", [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]])
+    return anatomy, anatomy_signature(cell, bbox, threshold, bands)
+
 def process_clip(config_path):
     cfg = load_json(config_path)
     profile = load_json(PROFILES_DIR / cfg["profile"])
@@ -155,16 +205,69 @@ def process_clip(config_path):
             frame_info["sourceRect"] = [left, top, right, bottom]
         frames.append(frame_info)
 
-    reference_frames = cfg.get("scaleReferenceFrames")
-    if reference_frames is None:
-        reference_frames = list(range(expected))
-    heights = []
-    for index in reference_frames:
-        x0, y0, x1, y1 = frames[int(index)]["bbox"]
-        heights.append(y1 - y0)
-    source_reference_height = statistics.median(heights)
-    target_height = float(profile["standingVisualHeight"])
-    scale = target_height / source_reference_height
+    scale_mode = cfg.get("scaleMode", "median-standing-height")
+    anatomy_report = None
+    if scale_mode == "canonical-anatomy":
+        reference_index = int(cfg.get("anatomyReferenceFrame", -1))
+        if reference_index < 0 or reference_index >= expected:
+            raise ValueError(f"{cfg['id']}: invalid anatomyReferenceFrame")
+        anatomy_cfg, canonical_signature = canonical_anatomy_reference(
+            profile, threshold
+        )
+        bands = anatomy_cfg.get(
+            "bands", [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]]
+        )
+        source_signature = anatomy_signature(
+            frames[reference_index]["image"],
+            frames[reference_index]["bbox"],
+            threshold,
+            bands,
+        )
+        candidates = [
+            canonical_signature["height"] / source_signature["height"]
+        ] + [
+            canonical / source
+            for canonical, source in zip(
+                canonical_signature["bands"], source_signature["bands"]
+            )
+        ]
+        scale = float(statistics.median(candidates))
+        spread = (max(candidates) - min(candidates)) / scale
+        max_spread = float(anatomy_cfg.get("maxScaleSpreadRatio", 0.15))
+        if spread > max_spread:
+            raise ValueError(
+                f"{cfg['id']}: anatomy reference frame {reference_index} is not "
+                f"comparable to the canonical pose (spread={spread:.4f}, "
+                f"limit={max_spread:.4f})"
+            )
+        anatomy_report = {
+            "mode": "canonical-anatomy",
+            "clipReferenceFrame": reference_index,
+            "referenceSource": anatomy_cfg["source"],
+            "referenceFrame": int(anatomy_cfg["frame"]),
+            "canonicalSignature": canonical_signature,
+            "sourceSignature": source_signature,
+            "scaleCandidates": candidates,
+            "scaleSpreadRatio": spread,
+            "maxScaleSpreadRatio": max_spread,
+            "passed": True,
+        }
+    elif scale_mode == "median-standing-height":
+        reference_frames = cfg.get("scaleReferenceFrames")
+        if reference_frames is None:
+            reference_frames = list(range(expected))
+        heights = []
+        for index in reference_frames:
+            index = int(index)
+            if index < 0 or index >= expected:
+                raise ValueError(f"{cfg['id']}: invalid scaleReferenceFrames")
+            x0, y0, x1, y1 = frames[index]["bbox"]
+            heights.append(y1 - y0)
+        source_reference_height = statistics.median(heights)
+        target_height = float(profile["standingVisualHeight"])
+        scale = target_height / source_reference_height
+    else:
+        raise ValueError(f"{cfg['id']}: unsupported scaleMode {scale_mode}")
     if scale > max_upscale:
         raise ValueError(
             f"{cfg['id']}: source would require upscaling {scale:.3f}x; "
@@ -295,6 +398,7 @@ def process_clip(config_path):
             "frameCount": expected,
         },
         "validation": validation,
+        **({"anatomy": anatomy_report} if anatomy_report is not None else {}),
         "frames": frame_reports,
         "passed": passed,
     }

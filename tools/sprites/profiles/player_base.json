@@ -6,6 +6,26 @@
   "preferredRootY": 238,
   "worldScale": 1.0,
   "standingVisualHeight": 228,
+  "anatomyReference": {
+    "source": "art/sprites/source/player_base_idle_normalized.png",
+    "frame": 0,
+    "columns": 4,
+    "bands": [
+      [
+        0.0,
+        0.12
+      ],
+      [
+        0.05,
+        0.2
+      ],
+      [
+        0.25,
+        0.4
+      ]
+    ],
+    "maxScaleSpreadRatio": 0.15
+  },
   "validation": {
     "alphaThreshold": 10,
     "minMargin": 8,

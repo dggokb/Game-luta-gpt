@@ -6,8 +6,8 @@ final class GeneratedSpriteLayouts {
 
     static final int HEAVY_STRAIGHT_FRAME_WIDTH = 320;
     static final int HEAVY_STRAIGHT_FRAME_HEIGHT = 256;
-    static final int HEAVY_STRAIGHT_ROOT_X = 136;
-    static final int HEAVY_STRAIGHT_ROOT_Y = 244;
+    static final int HEAVY_STRAIGHT_ROOT_X = 128;
+    static final int HEAVY_STRAIGHT_ROOT_Y = 238;
     static final int HEAVY_STRAIGHT_FRAME_COUNT = 9;
 
     static final int IDLE_FRAME_WIDTH = 256;

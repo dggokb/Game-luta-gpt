@@ -393,11 +393,14 @@ public class SpriteIntegrationTest {
         int idleUpper=upperBodyWidth(renderer,SpriteMotion.Clip.IDLE,0f,0f);
         int walkUpper=upperBodyWidth(renderer,SpriteMotion.Clip.WALK_FORWARD,0f,1f);
         int jabUpper=upperBodyWidth(renderer,"LIGHT_JAB",.016f,0f);
+        int heavyUpper=upperBodyWidth(renderer,"HEAVY_STRAIGHT",.016f,0f);
 
         float idleRatio=idleUpper/(float)walkUpper;
         float jabRatio=jabUpper/(float)walkUpper;
+        float heavyRatio=heavyUpper/(float)idleUpper;
         assertTrue("Idle off-model: "+idleRatio,idleRatio>=.94f && idleRatio<=1.12f);
         assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.14f);
+        assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_movement);

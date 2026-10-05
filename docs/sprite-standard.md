@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — Astra v0.53
+# Padrão de personagens e sprites — GPT v0.54
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -113,8 +113,24 @@ colisão já existente, em unidades do mundo; não é a largura do PNG.
 Personagem base: célula 256×256, raiz preferida X=128/Y=238, worldScale=1.0,
 referência em pé de 228 px, fundo transparente e margem mínima de 8 px.
 Golpes largos recebem mais espaço transparente, sem encolher o corpo. O chute
-médio usa 384×256; o forte usa 320×256 e raiz local X=136/Y=244. Essas diferenças
-são metadados de canvas, sem correção de escala por golpe em runtime.
+médio usa 384×256. O forte usa 320×256 e, após a validação anatômica da v0.54,
+raiz local X=128/Y=238. Essas diferenças são metadados de canvas, sem correção
+de escala por golpe em runtime.
+
+### Escala anatômica canônica
+
+Para fontes novas que contenham ao menos uma pose comparável à guarda canônica,
+use `scaleMode: canonical-anatomy` e `anatomyReferenceFrame`. O perfil aponta para
+um mestre revisado do personagem e define bandas normalizadas de silhueta. O
+importador mede altura e largura nessas bandas, calcula candidatos de escala e usa
+a mediana. Se a dispersão ultrapassar `maxScaleSpreadRatio`, o frame escolhido não
+é confiável e o import é rejeitado.
+
+Isso impede a regressão em que `worldScale=1.0` era mantido, mas um golpe desenhado
+maior aparecia maior no jogo. O Heavy de 9 frames é o teste de regressão oficial:
+o quadro 0 precisa permanecer visualmente compatível com o Idle. Clips sem uma
+pose comparável devem usar um mestre `prepared-grid` revisado em vez de forçar a
+detecção automática.
 
 Três modos de importação estão disponíveis:
 
@@ -174,3 +190,16 @@ não devem ser inferidas automaticamente de pixels opacos.
 Abertura no emulador não comprova qualidade final ou latência no celular. Movimento,
 multitoque e fluidez ainda devem ser testados no aparelho. Física a 120 Hz não
 promete entrada em 8,3 ms; consumo da fila e desenho compartilham o loop de 60 FPS.
+
+
+## Atualização GPT v0.54
+
+A branch GPT incorporou o Character Pack Engine da Astra v0.53 e adicionou a
+validação `canonical-anatomy`. O Heavy atual produz 320×256, root 128/238 e
+`worldScale=1.0`; a escala da fonte é calculada pela assinatura anatômica, não pela
+mediana dos nove bounding boxes. O relatório grava assinatura canônica, assinatura
+da fonte, candidatos de escala e dispersão.
+
+O teste Python rejeita um frame de referência incompatível. O teste Android mede
+o tamanho visual do início do Heavy contra o Idle e falha se o golpe voltar a
+crescer.

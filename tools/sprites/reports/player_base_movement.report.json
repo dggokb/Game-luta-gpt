@@ -5,7 +5,7 @@
   "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1,
   "layout": {
     "frameWidth": 256,
     "frameHeight": 256,
@@ -194,11 +194,11 @@
   ],
   "passed": true,
   "provenance": {
-    "pipelineVersion": 1,
+    "pipelineVersion": 2,
     "sha256": {
       "source": "edd8a51e243b26ddbd72cee6a1b0a9b0d3cd4263c5d1ac17ebfada55420fed67",
       "config": "de91bfb38a55051d2aa0dcc52ef33c8b224c20400105e962004e692be5b75810",
-      "profile": "4bdcc42a695c5a0b26ad9a1d65d9a82736432434089ea2538c9a92fa1cfa22c1"
+      "profile": "2776e22c327931e7205ba506030877da30ce9063d87da27ebe3882837c3d20c7"
     }
   }
 }

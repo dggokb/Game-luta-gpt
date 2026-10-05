@@ -72,7 +72,7 @@ jobs:
             test -s game-smoke.png
 
       - name: Upload runtime screenshot
-        if: github.ref == 'refs/heads/game-luta-sprite-astra'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
         uses: actions/upload-artifact@v4
         with:
           name: GameLutaGPT-Smoke-Screenshot

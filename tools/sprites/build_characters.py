@@ -135,7 +135,7 @@ def build(root=ROOT, check=False):
                     if not target.startswith(expected) or target in outputs: raise ValueError(f'Invalid or duplicate output {target}')
                     outputs.add(target)
                 cfg,report=importer.process_clip(path)
-                report['provenance']={'pipelineVersion':1,'sha256':{
+                report['provenance']={'pipelineVersion':2,'sha256':{
                     'source':hashlib.sha256((stage/cfg['source']).read_bytes()).hexdigest(),
                     'config':hashlib.sha256(path.read_bytes()).hexdigest(),
                     'profile':hashlib.sha256((importer.PROFILES_DIR/cfg['profile']).read_bytes()).hexdigest()}}

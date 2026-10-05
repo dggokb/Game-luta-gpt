@@ -24,7 +24,7 @@ final class GeneratedCharacters {
  a.put("LAND",new CharacterDefinition.Animation("LAND",new CharacterDefinition.Atlas("player_base_movement",256,256,128,238,4,16),new int[]{15},new float[]{0.10000000f},false,0.00000000f));
  a.put("LIGHT_JAB",new CharacterDefinition.Animation("LIGHT_JAB",new CharacterDefinition.Atlas("player_base_jab",256,256,128,238,3,3),new int[]{0,1,2},new float[]{0.04000000f,0.06000000f,0.06000000f},false,0.00000000f));
  a.put("MEDIUM_KICK",new CharacterDefinition.Animation("MEDIUM_KICK",new CharacterDefinition.Atlas("player_base_medium_kick",384,256,128,238,3,3),new int[]{0,1,2},new float[]{0.07000000f,0.10000000f,0.09000000f},false,0.00000000f));
- a.put("HEAVY_STRAIGHT",new CharacterDefinition.Animation("HEAVY_STRAIGHT",new CharacterDefinition.Atlas("player_base_heavy_straight",320,256,136,244,9,9),new int[]{0,1,2,3,4,5,6,7,8},new float[]{0.04000000f,0.04000000f,0.04000000f,0.04000000f,0.04000000f,0.05000000f,0.05000000f,0.05000000f,0.05000000f},false,0.00000000f));
+ a.put("HEAVY_STRAIGHT",new CharacterDefinition.Animation("HEAVY_STRAIGHT",new CharacterDefinition.Atlas("player_base_heavy_straight",320,256,128,238,9,9),new int[]{0,1,2,3,4,5,6,7,8},new float[]{0.04000000f,0.04000000f,0.04000000f,0.04000000f,0.04000000f,0.05000000f,0.05000000f,0.05000000f,0.05000000f},false,0.00000000f));
  m.put("L",new CharacterDefinition.Move(a.get("LIGHT_JAB"),300,0.04000000f,0.10000000f,118.00000000f));
  m.put("M",new CharacterDefinition.Move(a.get("MEDIUM_KICK"),500,0.07000000f,0.17000000f,150.00000000f));
  m.put("H",new CharacterDefinition.Move(a.get("HEAVY_STRAIGHT"),800,0.16000000f,0.25000000f,182.00000000f));

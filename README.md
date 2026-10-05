@@ -1,13 +1,31 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Esta versão incorpora o Character Pack Engine
-desenvolvido na Astra v0.53 preservando o aplicativo GPT.
+Branch `game-luta-sprite-gpt`. Versão `0.54-sprite-gpt-character-packs-anatomy`.
 
-Cada personagem é definido em `characters/<id>/character.json`; o time em
-`characters/roster.json`. Animações e golpes L/M/H em pé são declarativos,
-o renderer é genérico, e o build valida os pacotes antes de gerar o APK.
+## Character Pack Engine
 
-Build:
+A v0.54 incorpora o motor de pacotes da Astra v0.53 preservando a identidade GPT.
+Cada personagem possui `characters/<id>/character.json`; o roster fica em
+`characters/roster.json`. Animações e golpes L/M/H em pé são declarativos, e
+novos IDs de animação não exigem condições novas no renderer.
+
+O pipeline trabalha em staging, descobre todos os clips/pacotes, gera atlas,
+metadados Java e relatórios, e só publica se tudo passar. Startup, janela ativa e
+recovery compartilham o relógio definido no manifesto do golpe.
+
+## Canonical Anatomy
+
+`worldScale=1.0` não é suficiente para provar que duas artes foram desenhadas no
+mesmo tamanho. A v0.54 adiciona `scaleMode: canonical-anatomy`: um frame comparável
+do golpe é medido contra a pose canônica revisada do personagem usando altura e
+bandas de silhueta. A mediana dos candidatos define a escala; dispersão excessiva
+reprova a importação.
+
+O Heavy de 9 frames é a regressão oficial. Ele agora usa canvas 320×256 e root
+128/238. Um teste Android compara o tamanho visual do início do Heavy com o Idle e
+falha se o golpe voltar a crescer.
+
+## Build
 
 ```bash
 python3 -m pip install -r tools/sprites/requirements.txt
@@ -19,4 +37,4 @@ gradle testDebugUnitTest assembleDebug --stacktrace
 ```
 
 Aplicativo **Game Luta Sprite GPT**, pacote `com.gamelutagpt`.
-A próxima etapa desta branch é a validação anatômica canônica dos sprites.
+Preview técnico: `android/app/build/sprite-review/index.html`.

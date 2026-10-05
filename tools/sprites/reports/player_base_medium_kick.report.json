@@ -17,7 +17,7 @@
     ]
   ],
   "scale": 0.3584905660377358,
-  "worldScale": 1.0,
+  "worldScale": 1,
   "layout": {
     "frameWidth": 384,
     "frameHeight": 256,
@@ -34,7 +34,7 @@
     "footBandRatio": 0.025,
     "minFootWidth": 4,
     "minOpaquePixels": 10000,
-    "maxUpscale": 1.0,
+    "maxUpscale": 1,
     "maxFrameWidth": 768,
     "maxFrameHeight": 512
   },
@@ -53,7 +53,7 @@
       ],
       "sourceRoot": [
         85.5,
-        672.0
+        672
       ],
       "sourceFootIntervals": [
         [
@@ -75,7 +75,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        238.0
+        238
       ],
       "detectedOutputFootIntervals": [
         [
@@ -105,8 +105,8 @@
         673
       ],
       "sourceRoot": [
-        87.0,
-        672.0
+        87,
+        672
       ],
       "sourceFootIntervals": [
         [
@@ -128,7 +128,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        237.0
+        237
       ],
       "detectedOutputFootIntervals": [
         [
@@ -158,8 +158,8 @@
         672
       ],
       "sourceRoot": [
-        239.0,
-        671.0
+        239,
+        671
       ],
       "sourceFootIntervals": [
         [
@@ -185,7 +185,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        237.0
+        237
       ],
       "detectedOutputFootIntervals": [
         [
@@ -209,11 +209,11 @@
   ],
   "passed": true,
   "provenance": {
-    "pipelineVersion": 1,
+    "pipelineVersion": 2,
     "sha256": {
       "source": "a17cc4aa62d8473bcf90146fa46d802caff4af92a1c58685736f520f057bcab2",
       "config": "d3c347301e79f64ed5bdc4cea7d37fc66228db06a5cafee2b2053020bb84afc1",
-      "profile": "4bdcc42a695c5a0b26ad9a1d65d9a82736432434089ea2538c9a92fa1cfa22c1"
+      "profile": "2776e22c327931e7205ba506030877da30ce9063d87da27ebe3882837c3d20c7"
     }
   }
 }
