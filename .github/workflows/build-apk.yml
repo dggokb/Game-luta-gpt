@@ -1,5 +1,8 @@
 name: Build Game Luta APK
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -53,6 +56,20 @@ jobs:
             android/app/src/main/res/drawable-nodpi/player_two_*.png
             tools/sprites/reports/player_two_*.report.json
           if-no-files-found: warn
+
+      - name: Commit generated sprite outputs
+        if: failure() && github.ref == 'refs/heads/game-luta-sprite-gpt'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add android/app/src/main/res/drawable-nodpi/player_two_*.png
+          git add tools/sprites/reports/player_two_*.report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate Player Two sprite outputs"
+            git push origin HEAD:game-luta-sprite-gpt
+          fi
 
       - name: Build debug APK
         working-directory: android
