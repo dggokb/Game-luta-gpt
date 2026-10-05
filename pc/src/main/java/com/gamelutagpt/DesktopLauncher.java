@@ -18,7 +18,7 @@ public final class DesktopLauncher {
 
             JFrame frame = new JFrame("Game Luta Sprite GPT - PC");
             frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-            frame.setContentPane(gameView);
+            frame.getContentPane().add(gameView);
             frame.pack();
             frame.setMinimumSize(new Dimension(960, 540));
             frame.setLocationRelativeTo(null);
