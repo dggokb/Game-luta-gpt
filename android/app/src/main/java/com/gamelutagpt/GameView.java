@@ -1106,6 +1106,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return dummyY - profile.rootY * profile.worldScale;
     }
 
+    private float dummyGameplayTop() {
+        // Visual scale/registration must never change gameplay collision.
+        return dummyY - 145f;
+    }
+
     private void launchDummy() {
         dummyKnockdownState = DUMMY_KD_NONE;
         dummyKnockdownTimer = 0f;
@@ -1697,7 +1702,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float playerAttackCenterY = (crouching || isCrouchAttackActive())
             ? playerY - 42f
             : playerY - 78f;
-        float dummyCenterY = (dummyTop() + dummyY) * 0.5f;
+        float dummyCenterY = (dummyGameplayTop() + dummyY) * 0.5f;
         if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
 
         addSuperMeter(activeFighter(), superGainForAttack(attackType));
@@ -1795,7 +1800,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             projectileRight >= dummyLeft &&
             projectileLeft <= dummyRight;
         boolean verticalHit =
-            y + radius >= dummyTop() &&
+            y + radius >= dummyGameplayTop() &&
             y - radius <= dummyY;
 
         return horizontalHit && verticalHit;
