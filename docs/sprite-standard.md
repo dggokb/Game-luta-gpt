@@ -230,4 +230,4 @@ O workflow de regeneração passou a versionar saídas de qualquer pack novo, re
 
 ## Brutamonte com arte final de teste — GPT v0.58
 
-O pack temporário 32×32 foi substituído pela arte detalhada aprovada do Brutamonte. O NPC passa a usar células 192×192 com escala de mundo própria, atlas de idle/movimento e atlas separado para postura ofensiva e L/M/H. O renderer e a IA continuam genéricos; esta alteração troca apenas assets e metadados do pack.
+O pack temporário 32×32 foi substituído pela arte detalhada aprovada do Brutamonte. O NPC passa a usar células 160×160 com escala de mundo própria, atlas de idle/movimento e atlas separado para postura ofensiva e L/M/H. O renderer e a IA continuam genéricos; esta alteração troca apenas assets e metadados do pack.

@@ -1,11 +1,11 @@
 {
   "id": "monster_npc",
-  "baseFrameWidth": 192,
-  "baseFrameHeight": 192,
-  "preferredRootX": 96,
-  "preferredRootY": 187,
-  "worldScale": 1.55,
-  "standingVisualHeight": 180,
+  "baseFrameWidth": 160,
+  "baseFrameHeight": 160,
+  "preferredRootX": 80,
+  "preferredRootY": 158,
+  "worldScale": 1.9,
+  "standingVisualHeight": 155,
   "validation": {
     "alphaThreshold": 10,
     "minMargin": 0,
