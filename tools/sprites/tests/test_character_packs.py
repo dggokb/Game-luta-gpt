@@ -79,7 +79,7 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual('monster_npc',roster['opponentCharacter'])
         monster=json.loads((self.root/'characters/monster_npc/character.json').read_text())
         self.assertEqual('monster_npc.json',monster['profile'])
-        self.assertEqual({'monster_npc_pack','monster_npc_action'},{a['atlas'] for a in monster['animations'].values()})
+        self.assertEqual({'monster_npc_pack'},{a['atlas'] for a in monster['animations'].values()})
         first=json.loads((self.root/'characters/player_base/character.json').read_text())
         second=json.loads((self.root/'characters/player_two/character.json').read_text())
         self.assertNotEqual(first['id'],second['id'])
