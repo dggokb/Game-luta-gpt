@@ -1,0 +1,86 @@
+name: Build PC Jar Fallback
+
+on:
+  push:
+    branches:
+      - game-luta-pc-export-engine-gpt
+    paths:
+      - '.github/workflows/export-pc-jar.yml'
+      - 'tools/pc-export/export-request.json'
+      - 'tools/pc-export/export.ps1'
+      - 'pc/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build-pc-jar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout export engine
+        uses: actions/checkout@v4
+        with:
+          ref: game-luta-pc-export-engine-gpt
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve source request
+        id: request
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          with open('tools/pc-export/export-request.json', encoding='utf-8') as f:
+              req = json.load(f)
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+              out.write(f"source_branch={req['source_branch']}\n")
+              out.write(f"source_ref={req.get('source_sha') or req['source_branch']}\n")
+          PY
+
+      - name: Checkout mobile source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.request.outputs.source_ref }}
+          path: mobile-source
+
+      - name: Validate sprite packs
+        shell: bash
+        run: |
+          cd mobile-source
+          python -m pip install -r tools/sprites/requirements.txt
+          python tools/sprites/build_characters.py --write
+          python -m unittest discover -s tools/sprites/tests -v
+          python tools/sprites/build_characters.py --check
+
+      - name: Build portable PC jar
+        shell: bash
+        run: |
+          export GAME_LUTA_SOURCE_ROOT="$GITHUB_WORKSPACE/mobile-source"
+          gradle -p pc clean jar --stacktrace
+          cp pc/build/libs/game-luta-sprite-pc.jar pc/build/GameLutaSpriteGPT-current.jar
+          git -C mobile-source rev-parse HEAD > pc/build/SOURCE_SHA.txt
+
+      - name: Upload PC jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaSpriteGPT-PC-JAR
+          path: |
+            pc/build/GameLutaSpriteGPT-current.jar
+            pc/build/SOURCE_SHA.txt
+          if-no-files-found: error
+          retention-days: 7
