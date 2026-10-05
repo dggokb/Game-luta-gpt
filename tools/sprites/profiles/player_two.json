@@ -12,19 +12,19 @@
     "columns": 4,
     "bands": [
       [
-        0,
-        0.12
+        0.275,
+        0.325
       ],
       [
-        0.05,
-        0.2
+        0.3,
+        0.35
       ],
       [
-        0.25,
-        0.4
+        0.325,
+        0.375
       ]
     ],
-    "maxScaleSpreadRatio": 0.19
+    "maxScaleSpreadRatio": 0.12
   },
   "validation": {
     "alphaThreshold": 10,
