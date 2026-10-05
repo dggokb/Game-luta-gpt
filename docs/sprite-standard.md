@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — GPT v0.54
+# Padrão de personagens e sprites — GPT v0.55
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -203,3 +203,10 @@ da fonte, candidatos de escala e dispersão.
 O teste Python rejeita um frame de referência incompatível. O teste Android mede
 o tamanho visual do início do Heavy contra o Idle e falha se o golpe voltar a
 crescer.
+
+
+## Validação com segundo personagem — GPT v0.55
+
+O roster de produção contém `player_base` e `player_two`. Neste teste, `player_two` compartilha intencionalmente perfil, atlas, estados e L/M/H com o personagem base para testar somente cadastro, geração, preload, troca em runtime e seleção declarativa dos golpes.
+
+O HUD mostra o `displayName` do pack ativo. O teste Android executa a animação completa de troca, confirma que o renderer passou de `player_base` para `player_two` e executa L, M e H pelo manifesto do segundo personagem. O teste Python confirma o roster versionado e a equivalência de movimentos. Workflow 37293247005: PASS completo.
