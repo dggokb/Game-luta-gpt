@@ -207,5 +207,13 @@
       "passed": true
     }
   ],
-  "passed": true
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 1,
+    "sha256": {
+      "source": "a17cc4aa62d8473bcf90146fa46d802caff4af92a1c58685736f520f057bcab2",
+      "config": "d3c347301e79f64ed5bdc4cea7d37fc66228db06a5cafee2b2053020bb84afc1",
+      "profile": "4bdcc42a695c5a0b26ad9a1d65d9a82736432434089ea2538c9a92fa1cfa22c1"
+    }
+  }
 }

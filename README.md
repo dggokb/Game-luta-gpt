@@ -1,6 +1,6 @@
 # Game Luta Sprite Astra
 
-Branch `game-luta-sprite-astra`, sincronizada com `game-luta-sprite-gpt` em `ef3416d8d216a2c7cc54d823e95882ce0bad7c72` (v0.51). Versão Android nativa Java/Canvas `0.52-sprite-astra-sync`.
+Branch `game-luta-sprite-astra`, sincronizada com `game-luta-sprite-gpt` em `ef3416d8d216a2c7cc54d823e95882ce0bad7c72` (v0.51). Versão Android nativa Java/Canvas `0.53-sprite-astra-packs`.
 
 ## Correção dos movimentos
 
@@ -22,8 +22,9 @@ O golpe fraco em pé usa um jab próprio de 3 quadros. O golpe médio usa um chu
 Requer Python 3 + Pillow para o pipeline de sprites, JDK 17, Gradle 8.7 e SDK Android 35:
 
 ```bash
-python3 -m pip install pillow
-python3 tools/sprites/import_sprites.py
+python3 -m pip install -r tools/sprites/requirements.txt
+python3 tools/sprites/build_characters.py --write
+python3 -m unittest discover -s tools/sprites/tests -v
 cd android
 gradle testDebugUnitTest assembleDebug
 ```
@@ -36,4 +37,17 @@ O loop usa passos fixos de 120 Hz e alvo de desenho de 60 FPS. Os eventos de toq
 
 ## Arte
 
-Assets normalizados: `player_base_idle.png`, `player_base_movement.png`, `player_base_jab.png`, `player_base_medium_kick.png` e `player_base_heavy_straight.png`. O chute médio e o soco forte são regenerados e validados pelo pipeline antes do build. Idle, movimento e Jab estão normalizados, mas ainda não possuem configuração de importação reproduzível. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.
+Assets normalizados: `player_base_idle.png`, `player_base_movement.png`, `player_base_jab.png`, `player_base_medium_kick.png` e `player_base_heavy_straight.png`. Os cinco atlas passam pelo pipeline antes do build. Chute médio e soco forte são normalizados das fontes; idle, movimento e Jab preservam os mestres normalizados revisados, sem reamostragem ou alteração do chão dos saltos. O Idle foi reconstruído a partir da folha original em alta resolução, mantendo exatamente o mesmo perfil 256×256, root e animação, sem gerar uma nova arte. Padrão de produção: `docs/sprite-standard.md`.
+
+## Personagens e golpes por configuração (v0.53)
+
+`characters/<id>/character.json` define animações, frames, tempos e golpes L/M/H em pé.
+`characters/roster.json` seleciona o personagem visual de cada um dos dois slots do time.
+O build descobre os pacotes, valida as referências e gera `GeneratedCharacters.java`.
+O renderer não contém uma condição para cada golpe; dano e animação compartilham
+os tempos do manifesto. Os atlas do time são decodificados antes da partida.
+
+Depois de importar, abra `android/app/build/sprite-review/index.html` para escolher
+personagem/animação, pausar, avançar um frame, espelhar e revisar raiz/escala.
+O guia completo, com exemplo de cadastro e limites atuais, está em
+[docs/sprite-standard.md](docs/sprite-standard.md).

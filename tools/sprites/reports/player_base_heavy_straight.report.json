@@ -667,5 +667,13 @@
       ]
     }
   ],
-  "passed": true
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 1,
+    "sha256": {
+      "source": "50756f4be431819f11de1652b98289a445e9e82e2c8e8a3182a1700fa5f34d82",
+      "config": "752bfef4e32d02bca2831941b672c0966f8a5a38b18e1850cb8591cb56e80945",
+      "profile": "4bdcc42a695c5a0b26ad9a1d65d9a82736432434089ea2538c9a92fa1cfa22c1"
+    }
+  }
 }

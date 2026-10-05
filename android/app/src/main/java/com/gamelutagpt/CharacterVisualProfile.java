@@ -10,9 +10,6 @@ import android.graphics.RectF;
  * Individual clips never change scale at runtime.
  */
 final class CharacterVisualProfile {
-    static final CharacterVisualProfile PLAYER_BASE =
-        new CharacterVisualProfile("player_base",256,256,128f,238f,1f);
-
     final String id;
     final int frameWidth;
     final int frameHeight;

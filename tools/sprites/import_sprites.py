@@ -99,6 +99,9 @@ def process_clip(config_path):
     report_path = ROOT / cfg["report"]
     preview_path = ROOT / cfg["preview"]
 
+    if cfg.get("segmentation") == "prepared-grid":
+        return process_prepared(cfg, profile)
+
     source = Image.open(source_path).convert("RGBA")
     mask = threshold_alpha(source, threshold)
 
@@ -244,9 +247,7 @@ def process_clip(config_path):
         out_root_x, out_root_y, out_feet = detect_ground_root(
             cell, out_bbox, threshold, foot_band_ratio, min_foot_width
         )
-        opaque_pixels = sum(
-            1 for value in threshold_alpha(cell, threshold).getdata() if value
-        )
+        opaque_pixels = sum(threshold_alpha(cell, threshold).histogram()[1:])
         margins = {
             "left": out_bbox[0],
             "right": frame_width - out_bbox[2],
@@ -341,6 +342,43 @@ def process_clip(config_path):
         )
     preview.save(preview_path, optimize=True)
 
+    return cfg, report
+
+def process_prepared(cfg, profile):
+    """Validate reviewed masters without resampling or re-grounding airborne poses."""
+    import shutil
+    source = Image.open(ROOT / cfg["source"]).convert("RGBA")
+    width, height = profile["baseFrameWidth"], profile["baseFrameHeight"]
+    count, columns = cfg["expectedFrames"], cfg["columns"]
+    if count <= 0 or columns <= 0 or source.size != (width * columns, height * math.ceil(count / columns)):
+        raise ValueError(f"{cfg['id']}: prepared-grid dimensions do not match frame count")
+    if cfg.get("rootMode") != "authored":
+        raise ValueError("Prepared masters require an explicitly authored root")
+    frames = []
+    for i in range(count):
+        x, y = i % columns * width, i // columns * height
+        cell = source.crop((x, y, x + width, y + height))
+        bbox = bbox_for(cell, profile["validation"]["alphaThreshold"])
+        margins = [bbox[0], bbox[1], width - bbox[2], height - bbox[3]]
+        if min(margins) < profile["validation"]["minMargin"]:
+            raise ValueError(f"{cfg['id']}: frame {i} clips the safety margin")
+        opaque = sum(threshold_alpha(cell, profile["validation"]["alphaThreshold"]).histogram()[1:])
+        if opaque < profile["validation"]["minOpaquePixels"]:
+            raise ValueError(f"{cfg['id']}: frame {i} has insufficient visible pixels")
+        frames.append({"index": i, "outputBbox": list(bbox), "minimumMargin": min(margins), "opaquePixels": opaque})
+    report = {"id": cfg["id"], "characterProfile": profile["id"], "source": cfg["source"],
+              "sourceNote": cfg.get("sourceNote", "Reviewed normalized master"),
+              "rootMode": "authored", "scale": 1, "worldScale": profile["worldScale"],
+              "layout": {"frameWidth": width, "frameHeight": height,
+                         "rootX": profile["preferredRootX"], "rootY": profile["preferredRootY"],
+                         "columns": columns, "frameCount": count}, "frames": frames, "passed": True}
+    for key in ("output", "report", "preview"):
+        (ROOT / cfg[key]).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ROOT / cfg["source"], ROOT / cfg["output"])
+    (ROOT / cfg["report"]).write_text(json.dumps(report, indent=2) + "\n")
+    preview = Image.new("RGBA", source.size, (32, 36, 44, 255))
+    preview.alpha_composite(source)
+    preview.save(ROOT / cfg["preview"])
     return cfg, report
 
 def write_generated_java(results):

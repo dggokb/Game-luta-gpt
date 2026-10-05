@@ -1,191 +1,176 @@
-# Sprite production standard
+# Padrão de personagens e sprites — Astra v0.53
 
-Scale belongs to the **character**, never to an individual animation.
+A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
+metadados são preparados antes do APK; não há JSON, recorte automático ou
+normalização de imagens durante a partida.
 
-Each fighter owns a visual profile with its own base frame, preferred registration
-root, world scale and standing reference height. Large and small fighters therefore
-keep their intended size differences.
+## Arquivos que o autor edita
 
-## Player base
+| Arquivo/pasta | Responsabilidade |
+| --- | --- |
+| `characters/<id>/character.json` | Identidade visual, animações e golpes |
+| `characters/roster.json` | Personagem visual dos dois slots do time |
+| `tools/sprites/profiles/<id>.json` | Tamanho, raiz, escala e exigências de qualidade |
+| `tools/sprites/clips/*.json` | Fonte, segmentação, quantidade de frames e destinos |
+| `art/sprites/source/` | Fontes de arte, preservadas sem sobrescrever |
 
-- base frame: 256 x 256
-- preferred root: X=128, Y=238
-- worldScale: 1.0
-- standing visual reference height: 228 px
-- transparent background
+O build descobre todos os `character.json` e todos os clips. Não existe uma lista
+manual de personagens no renderer. `GeneratedCharacters.java`,
+`GeneratedSpriteLayouts.java`, os atlas em `drawable-nodpi` e os relatórios em
+`tools/sprites/reports` são saídas geradas e versionadas. Não editar à mão.
 
-The base frame is not a hard maximum canvas size. A long kick, weapon or effect may
-need a wider clip canvas. The fighter is never shrunk just to fit a fixed rectangle.
+## Fluxo de trabalho
 
-## Import pipeline
+```bash
+python3 -m pip install -r tools/sprites/requirements.txt
+python3 tools/sprites/build_characters.py --write
+python3 -m unittest discover -s tools/sprites/tests -v
+python3 tools/sprites/build_characters.py --check
+cd android
+gradle testDebugUnitTest assembleDebug
+```
 
-New generated sprite sheets are not sliced by equal-width guesses.
+O `preBuild` do Gradle também executa a geração. Python 3.9+ e a versão de Pillow
+fixada no requirements são pré-requisitos do ambiente de desenvolvimento, além de
+Java 17, Gradle 8.7 e Android SDK 35. O APK não precisa de Python.
 
-`tools/sprites/import_sprites.py`:
+O importador trabalha em uma pasta temporária. Somente depois de validar todos os
+pacotes publica as saídas; um erro de configuração não deixa metade dos atlas
+atualizada. `--check` compara todas as saídas declaradas, sem modificar os arquivos
+versionados. A CI rejeita saídas desatualizadas antes do build. Ao remover um clip,
+remova também seu PNG e relatório antigos do repositório.
 
-1. detects each frame from transparent separation in the source sheet, including horizontal strips and multi-row grids;
-2. verifies the expected frame count;
-3. detects the grounded registration point from the supporting foot/feet;
-4. applies one character-relative normalization scale to the whole clip;
-5. calculates the required transparent canvas from the actual pose extents;
-6. preserves the preferred character root whenever it fits;
-7. rounds canvas size to predictable allocation steps;
-8. validates minimum margins on all four sides;
-9. validates root drift after resampling;
-10. refuses low-resolution sources that would require forbidden upscaling;
-11. generates the normalized PNG, machine-readable report, debug preview and Java
-    layout constants consumed by the renderer.
+## Novo personagem
 
-A failure in any required check exits non-zero and blocks CI.
+1. Crie um perfil visual em `tools/sprites/profiles/`, usando `player_base.json`
+   como referência. Defina as dimensões, a raiz e a escala próprias do lutador.
+2. Adicione as fontes e os clips correspondentes, com IDs e saídas únicos.
+3. Copie `characters/player_base/character.json` para
+   `characters/<novo_id>/character.json`. O campo `id` deve coincidir com a pasta.
+   Ajuste nome, perfil, atlas, animações e golpes.
+4. Substitua um dos IDs de `characters/roster.json` para testar no time. O primeiro
+   slot deve ser igual a `defaultCharacter`. O cadastro é gerado automaticamente.
+5. Gere, revise a prévia, execute os testes e confira o APK no Android.
 
-The GitHub workflow runs the importer before the Android tests and checks the
-medium-kick and heavy-straight PNGs, their reports and the generated Java layout
-against committed outputs. These are the two clips currently covered by regeneration.
-Idle, movement and Jab use normalized assets but do not yet have source/config/report
-coverage in this importer. Do not describe all sprites as reproducibly imported.
+O pacote é uma definição visual e dos ataques normais em pé. Vida, velocidade,
+combos, projéteis, Super e IA continuam no `FighterProfile`/`GameView`; criar uma
+mecânica de personagem inédita ainda exige programação. O oponente mantém seu
+renderer anterior. Não confundir registro visual automático com um editor completo
+de todos os sistemas do jogo.
 
-## Clip geometry
+## Estados e animações
 
-Runtime scale is still the character's single `worldScale`.
+Estados semânticos obrigatórios: `IDLE`, `COMBAT`, `WALK_FORWARD`, `WALK_BACK`,
+`CROUCH`, `RISE`, `JUMP`, `FALL`, `DASH`, `BACKDASH` e `LAND`.
 
-A clip can have its own **canvas geometry**:
+Cada animação contém `atlas`, `frames` (índices a partir de zero), `loop` e uma das
+formas de avanço:
 
-- frameWidth / frameHeight
-- local rootX / rootY
+- `durationsMs`: um tempo positivo por frame;
+- `distancePerFrame`: distância percorrida para avançar, com `loop: true`.
 
-Those values describe transparent space and registration only. They do not resize
-the fighter.
+Caminhada acompanha deslocamento físico, inclusive ao virar para o outro lado.
+Colisão com a borda não deve produzir passos no lugar. Ataques usam o relógio de
+combate; reiniciar o mesmo golpe reinicia o frame, sem herdar a recuperação anterior.
+Os IDs de animação de ataque são livres: não é necessário alterar um enum Java.
 
-The medium kick is the first asset using the importer. Its source sheet visually
-looked like three equal cells, but the extended kick crossed the naive cell boundary.
-The importer detected the three actual opaque components instead, registered their
-feet independently and produced:
+## Novo golpe usando um comando existente
 
-- 3 frames
-- 384 x 256 per frame
-- root X=128, Y=238
-- worldScale=1.0
-- at least 8 px transparent safety margin on every side
-- no clipping
+Adicione o atlas/clip e uma animação ao manifesto. Vincule-a a L, M ou H em `moves`.
+Exemplo de animação de quatro frames e vínculo L:
 
-## Source/config/generated separation
+```json
+"CUSTOM_PUNCH": {
+  "atlas": "novo_personagem_soco",
+  "frames": [0, 1, 2, 3],
+  "durationsMs": [40, 30, 30, 60],
+  "loop": false
+}
+```
 
-Source art:
-`art/sprites/source/`
+```json
+"L": {
+  "animation": "CUSTOM_PUNCH",
+  "damage": 300,
+  "activeStartMs": 40,
+  "activeEndMs": 100,
+  "reach": 118
+}
+```
 
-Character profiles:
-`tools/sprites/profiles/`
+O tempo total vem da soma dos frames. Dano só é permitido em
+`activeStartMs <= tempo < activeEndMs`, uma vez por execução. Startup e recovery
+não acertam. O autor define dano, alcance e janela ativa; o importador valida,
+mas não tenta adivinhar balanceamento pela arte.
 
-Clip configurations:
-`tools/sprites/clips/`
+A v0.53 conecta L/M/H em pé. Golpes agachados, aéreos, projéteis e Super continuam
+com o comportamento anterior. Ainda não há comandos extras declarativos, cancel
+windows ou hitboxes/hurtboxes arbitrárias por frame. `reach` usa a regra de
+colisão já existente, em unidades do mundo; não é a largura do PNG.
 
-Validation reports:
-`tools/sprites/reports/`
+## Geometria, qualidade e raízes
 
-Generated Android assets:
-`android/app/src/main/res/drawable-nodpi/`
+Personagem base: célula 256×256, raiz preferida X=128/Y=238, worldScale=1.0,
+referência em pé de 228 px, fundo transparente e margem mínima de 8 px.
+Golpes largos recebem mais espaço transparente, sem encolher o corpo. O chute
+médio usa 384×256; o forte usa 320×256 e raiz local X=136/Y=244. Essas diferenças
+são metadados de canvas, sem correção de escala por golpe em runtime.
 
-Generated runtime layout metadata:
-`GeneratedSpriteLayouts.java`
+Três modos de importação estão disponíveis:
 
-## Rule for future sprites
+- `horizontal-alpha-components`: separação horizontal por transparência;
+- `grid-alpha-components`: projeções X/Y e ordem por linha;
+- `prepared-grid`: mestre previamente normalizado, com colunas explícitas e raiz
+  `authored`; valida dimensões, quantidade, pixels visíveis e margens, e copia sem
+  reamostrar ou reposicionar poses aéreas.
 
-The production flow is:
+Médio e forte são normalizados das fontes de alta resolução com `ground-feet`.
+Idle, movimentos e jab preservam os mestres normalizados revisados da v0.51. Seus
+originais não normalizados não foram reconstruídos. Todos os cinco agora têm
+configuração, relatório e validação no build. O idle mantém 1024×512, oito células
+256×256; não retorna ao atlas legado de baixa resolução.
 
-source art -> importer -> automatic geometry/root calculation -> validation ->
-debug preview -> generated asset/layout -> Android tests -> APK.
+Os relatórios registram layout, validações e hashes SHA-256 de fonte/config/perfil.
+Dados duplicados de perfil foram removidos do Java manual. Atlas do time são
+carregados antes da partida; a troca de personagem não decodifica os mesmos bitmaps
+novamente.
 
-Do not manually choose a crop width, resize one animation in the renderer, or make
-a pose fit by changing its scale. If an asset does not satisfy the character
-profile, the importer must reject it before integration.
+## Prévia e validação
 
-Hitboxes and hurtboxes remain separate gameplay data and must never be inferred from
-opaque pixels.
+Abra `android/app/build/sprite-review/index.html` após importar. A página funciona
+offline, incorpora as imagens e permite selecionar personagem/animação, reproduzir,
+pausar, avançar frame, espelhar e ajustar zoom. Exibe raiz, chão e indicação da
+janela ativa. Caminhada na prévia usa tempo simulado; no jogo usa distância real.
 
-## Review baseline and idle quality
+O build rejeita, entre outros: ID duplicado, saída duplicada, fonte/atlas ausente,
+frame inexistente, estado obrigatório ausente, duração inválida, janela ativa fora
+da animação, perfil incompatível e roster inválido. Testes incluem cadastrar um
+segundo personagem e um golpe com ID novo, regeneração determinística, saídas
+obsoletas e falhas sem publicação parcial.
 
-Reviewed against Sprite GPT v0.51, commit
-`ef3416d8d216a2c7cc54d823e95882ce0bad7c72`, integrated into Sprite Astra v0.52.
-The v0.48 high-resolution idle restoration is included: `player_base_idle.png`
-is a 1024×512 atlas with eight 256×256 cells. Runtime uses the same character
-transform as movement, rather than enlarging the old 120×155 idle frames.
-Keep the high-resolution master; never recover detail by enlarging the legacy
-compressed idle. The normalized idle was visually reviewed alongside movement.
+Testes Android exercitam comandos, liberação do direcional, salto/pouso, orientação,
+pausa, escala, recortes e renderização de animação personalizada. Os testes de
+combate verificam startup sem dano, janela ativa com dano único e recovery sem
+acerto tardio, nos dois sentidos. A CI instala o APK no emulador e testa abertura e
+retorno do segundo plano.
 
+## Limites que ainda exigem revisão
 
-## Multi-row sprite sheets
+A segmentação alpha usa projeções, não reconhecimento de poses. A grade ainda usa
+intervalos X globais: linhas desalinhadas, efeitos separados, sombras ou poses que
+se encostam podem gerar agrupamento incorreto. Uma contagem correta não garante
+anatomia ou agrupamento corretos.
 
-For larger animations the importer also supports `grid-alpha-components`.
-It detects occupied X and Y regions from alpha, combines them in row-major order
-and validates the resulting frame count before normalization.
+`ground-feet` estima o apoio pela faixa inferior de pixels e usa o centro do
+bounding box se não detectar pés. Não usar esse modo para saltos, tecido/efeito
+abaixo dos pés ou deslocamento intencional da raiz. Nesses casos, usar mestre
+normalizado com raiz authored e revisar a imagem. Referências de escala devem ser
+poses comparáveis em pé; não normalizar um agachamento à altura de um lutador em pé.
 
-The standing Heavy straight punch is the first 9-frame case:
+Margens são avaliadas acima do alpha 10: pixels mais fracos exigem inspeção visual.
+`maxUpscale` impede ampliação proibida, mas não detecta blur já presente. Hitboxes
+não devem ser inferidas automaticamente de pixels opacos.
 
-- source layout: 3 x 3;
-- detected frames: 9;
-- generated runtime sheet: 9 frames in a horizontal strip;
-- generated frame: 320 x 256;
-- generated local root: X=136, Y=244;
-- worldScale remains 1.0;
-- minimum required transparent margin: 8 px;
-- no runtime per-animation scale correction.
-
-This proves that source-sheet arrangement is an import concern only. Runtime clips
-consume generated frame geometry and do not depend on how the source art was laid out.
-
-## Actual limits of the current importer
-
-The two segmentation modes find occupied projections separated by fully transparent
-gaps, not arbitrary two-dimensional connected components. Grid segmentation uses
-global X intervals shared by all rows. Staggered rows, detached effects, shadows or
-touching poses can merge or split candidates; a correct frame count alone does not
-prove correct grouping. Inspect the source rectangles in the technical preview.
-
-Only `ground-feet` is implemented. It estimates the root from the lowest alpha band,
-and silently falls back to the bounding-box center when no valid foot interval is
-found. Root tolerance proves consistency of that heuristic after resampling, not
-anatomical correctness. It must not be used as an automatic root for airborne
-poses, cloth/effects below the feet, or intentional world-space root motion.
-
-One import scale is calculated from median bounding-box height of
-`scaleReferenceFrames`. This is safe only for comparable standing reference poses
-without effects changing their height. Normalizing crouch/jump/extended-arm poses
-to standing height would change anatomy even though runtime worldScale stays 1.0.
-
-Alpha threshold is 10: margin checks ignore alpha ≤10. A PASS therefore does not
-prove that every faint pixel or translucent effect was preserved. `maxUpscale=1.0`
-rejects insufficient dimensions, but does not detect blur or compression already
-present in a large source. Review the final rendered image at gameplay scale.
-
-## Recommended next improvements (not implemented in v0.52)
-
-1. Migrate idle, movement and Jab masters into `art/sprites/source/`, with configs,
-   reports and generated layouts. Then generate the CI output list from all clip
-   configs so new clips cannot be omitted from a hard-coded comparison list.
-2. Detect X intervals per row; add explicit expected row counts/order and reject
-   ambiguous grouping. Allow reviewed source landmark metadata for unusual poses,
-   while keeping crop/root/scale corrections out of the renderer.
-3. Use an authored standing reference or anatomical landmarks for scale. Add root
-   confidence checks and fail when feet are missing; support a distinct reviewed
-   root mode for airborne clips. Do not shift sprites to erase intentional motion.
-4. Reject source silhouettes cut off at the image boundary before normalization.
-   Check cell containment before compositing, and report faint alpha outside the
-   validated silhouette separately so thresholding cannot hide clipped effects.
-5. Pin Pillow and record source/config/profile hashes and importer version in the
-   report. Generate character profile values from one source; they are currently
-   duplicated between JSON and `CharacterVisualProfile.java`. Validate reference
-   indices, frame counts, unique IDs/Java names and finite positive profile values.
-6. Add negative importer cases: staggered rows, detached effects, wrong count,
-   missing feet, invalid references, transparent source, upscale and canvas limits.
-   Keep production-renderer tests for both facing directions, zoom and transitions.
-7. Synchronize attack visual timing and active hit windows from gameplay metadata.
-   Current melee damage begins at 72% of attack duration, while L/M visual recovery
-   starts at 0.100/0.170 seconds (damage starts at 0.1152/0.1872 seconds). Test a real
-   hit at each phase instead of only checking ordered animation frames.
-8. Treat emulator startup/resume as a lifecycle smoke test. Approval of visual
-   quality and input latency also needs moving footage, multi-touch/release tests,
-   frame-time measurements and a physical Android run. A 120 Hz fixed physics step
-   does not guarantee 8.3 ms input latency; input and drawing share a 60 FPS loop.
-
-These recommendations are documentation of remaining work, not claims of new
-runtime behavior. Keep hitboxes/hurtboxes independent from sprite alpha.
+Abertura no emulador não comprova qualidade final ou latência no celular. Movimento,
+multitoque e fluidez ainda devem ser testados no aparelho. Física a 120 Hz não
+promete entrada em 8,3 ms; consumo da fila e desenho compartilham o loop de 60 FPS.

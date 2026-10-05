@@ -1,0 +1,14 @@
+{
+  "id": "player_base_movement",
+  "javaName": "MOVEMENT",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_movement_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_movement.png",
+  "report": "tools/sprites/reports/player_base_movement.report.json",
+  "preview": "android/app/build/sprite-review/movement-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed."
+}

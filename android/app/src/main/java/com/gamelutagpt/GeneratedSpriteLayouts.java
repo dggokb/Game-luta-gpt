@@ -10,10 +10,28 @@ final class GeneratedSpriteLayouts {
     static final int HEAVY_STRAIGHT_ROOT_Y = 244;
     static final int HEAVY_STRAIGHT_FRAME_COUNT = 9;
 
+    static final int IDLE_FRAME_WIDTH = 256;
+    static final int IDLE_FRAME_HEIGHT = 256;
+    static final int IDLE_ROOT_X = 128;
+    static final int IDLE_ROOT_Y = 238;
+    static final int IDLE_FRAME_COUNT = 8;
+
+    static final int JAB_FRAME_WIDTH = 256;
+    static final int JAB_FRAME_HEIGHT = 256;
+    static final int JAB_ROOT_X = 128;
+    static final int JAB_ROOT_Y = 238;
+    static final int JAB_FRAME_COUNT = 3;
+
     static final int MEDIUM_KICK_FRAME_WIDTH = 384;
     static final int MEDIUM_KICK_FRAME_HEIGHT = 256;
     static final int MEDIUM_KICK_ROOT_X = 128;
     static final int MEDIUM_KICK_ROOT_Y = 238;
     static final int MEDIUM_KICK_FRAME_COUNT = 3;
+
+    static final int MOVEMENT_FRAME_WIDTH = 256;
+    static final int MOVEMENT_FRAME_HEIGHT = 256;
+    static final int MOVEMENT_ROOT_X = 128;
+    static final int MOVEMENT_ROOT_Y = 238;
+    static final int MOVEMENT_FRAME_COUNT = 16;
 
 }

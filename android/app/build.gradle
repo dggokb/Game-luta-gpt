@@ -7,8 +7,8 @@ android {
         applicationId 'com.gamelutagpt.spriteastra'
         minSdk 24
         targetSdk 35
-        versionCode 52
-        versionName '0.52-sprite-astra-sync'
+        versionCode 53
+        versionName '0.53-sprite-astra-packs'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }
@@ -17,3 +17,17 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
 }
+
+// All sprite authoring happens before resource compilation, never during play.
+def spriteRoot = rootProject.projectDir.parentFile
+tasks.register('compileSpritePacks', Exec) {
+    workingDir spriteRoot
+    commandLine 'python3', 'tools/sprites/build_characters.py', '--write'
+    inputs.files(fileTree(new File(spriteRoot, 'characters')),
+        fileTree(new File(spriteRoot, 'art/sprites/source')),
+        fileTree(new File(spriteRoot, 'tools/sprites')) { exclude '__pycache__/**', 'reports/**', 'tests/**' })
+    outputs.files(fileTree('src/main/res/drawable-nodpi'),
+        file('src/main/java/com/gamelutagpt/GeneratedCharacters.java'),
+        file('src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java'))
+}
+tasks.named('preBuild').configure { dependsOn 'compileSpritePacks' }
