@@ -1,0 +1,14 @@
+{
+  "id": "player_two_medium_kick",
+  "javaName": "PLAYER_TWO_MEDIUM_KICK",
+  "profile": "player_two.json",
+  "source": "art/sprites/source/player_two_medium_kick_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_medium_kick.png",
+  "report": "tools/sprites/reports/player_two_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/player-two-medium-kick-import.png",
+  "expectedFrames": 3,
+  "segmentation": "horizontal-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 2
+}

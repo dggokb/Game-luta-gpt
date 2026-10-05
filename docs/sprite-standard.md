@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — GPT v0.55
+# Padrão de personagens e sprites — GPT v0.56
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -210,3 +210,10 @@ crescer.
 O roster de produção contém `player_base` e `player_two`. Neste teste, `player_two` compartilha intencionalmente perfil, atlas, estados e L/M/H com o personagem base para testar somente cadastro, geração, preload, troca em runtime e seleção declarativa dos golpes.
 
 O HUD mostra o `displayName` do pack ativo. O teste Android executa a animação completa de troca, confirma que o renderer passou de `player_base` para `player_two` e executa L, M e H pelo manifesto do segundo personagem. O teste Python confirma o roster versionado e a equivalência de movimentos. Workflow 37293247005: PASS completo.
+
+
+## Player Two com arte própria — GPT v0.56
+
+`player_two` passou a usar um perfil independente: célula-base 384×256, root 192/246 e worldScale 1.0. O Idle (8 frames) é a referência anatômica canônica do personagem. O Movement (16 frames) foi preparado como master authored porque mistura caminhada, crouch, salto e dash; isso evita re-grounding automático de poses aéreas. Jab (3), Medium Kick (3) e Heavy Straight (9) usam as fontes geradas em alta resolução e `canonical-anatomy` do Player Two.
+
+Este é o teste de independência do Character Pack Engine: o roster continua `player_base` + `player_two`, mas o segundo personagem agora carrega perfil e atlas próprios sem adicionar condição especial ao renderer. O teste de runtime continua fazendo a troca real e executando L/M/H após a entrada do segundo pack.

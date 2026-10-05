@@ -7,8 +7,8 @@ android {
         applicationId 'com.gamelutagpt'
         minSdk 24
         targetSdk 35
-        versionCode 55
-        versionName '0.55-sprite-gpt-second-character-pack'
+        versionCode 56
+        versionName '0.56-sprite-gpt-player-two-art'
     }
     testOptions { unitTests.includeAndroidResources = true }
 }

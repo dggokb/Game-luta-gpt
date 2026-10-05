@@ -79,8 +79,29 @@ class CharacterPackTests(unittest.TestCase):
         first=json.loads((self.root/'characters/player_base/character.json').read_text())
         second=json.loads((self.root/'characters/player_two/character.json').read_text())
         self.assertNotEqual(first['id'],second['id'])
-        self.assertEqual(first['profile'],second['profile'])
-        self.assertEqual(first['animations'],second['animations'])
+        self.assertEqual('player_two.json',second['profile'])
+        self.assertNotEqual(first['profile'],second['profile'])
+        self.assertEqual(set(first['animations']),set(second['animations']))
+        self.assertTrue(all(a['atlas'].startswith('player_two_') for a in second['animations'].values()))
         self.assertEqual(first['moves'],second['moves'])
+
+
+    def test_player_two_generated_art_passes_own_profile(self):
+        pipeline.build(self.root)
+        idle=json.loads((self.root/'tools/sprites/reports/player_two_idle.report.json').read_text())
+        movement=json.loads((self.root/'tools/sprites/reports/player_two_movement.report.json').read_text())
+        jab=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
+        medium=json.loads((self.root/'tools/sprites/reports/player_two_medium_kick.report.json').read_text())
+        heavy=json.loads((self.root/'tools/sprites/reports/player_two_heavy_straight.report.json').read_text())
+        self.assertEqual([384,256,192,246],[idle['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual(16,movement['layout']['frameCount'])
+        for report in (jab,medium,heavy):
+            self.assertEqual('player_two',report['characterProfile'])
+            self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
+            self.assertTrue(report['anatomy']['passed'])
+            self.assertEqual(246,report['layout']['rootY'])
+        self.assertEqual(3,jab['layout']['frameCount'])
+        self.assertEqual(3,medium['layout']['frameCount'])
+        self.assertEqual(9,heavy['layout']['frameCount'])
 
 if __name__=='__main__':unittest.main()

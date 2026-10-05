@@ -1,0 +1,14 @@
+{
+  "id": "player_two_movement",
+  "javaName": "PLAYER_TWO_MOVEMENT",
+  "profile": "player_two.json",
+  "source": "art/sprites/source/player_two_movement_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_movement.png",
+  "report": "tools/sprites/reports/player_two_movement.report.json",
+  "preview": "android/app/build/sprite-review/player-two-movement-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Reviewed Player Two movement master; airborne poses keep authored registration."
+}

@@ -1,0 +1,14 @@
+{
+  "id": "player_two_jab",
+  "javaName": "PLAYER_TWO_JAB",
+  "profile": "player_two.json",
+  "source": "art/sprites/source/player_two_jab_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_jab.png",
+  "report": "tools/sprites/reports/player_two_jab.report.json",
+  "preview": "android/app/build/sprite-review/player-two-jab-import.png",
+  "expectedFrames": 3,
+  "segmentation": "horizontal-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 2
+}

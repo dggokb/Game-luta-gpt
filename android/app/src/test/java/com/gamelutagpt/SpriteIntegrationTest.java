@@ -37,8 +37,19 @@ public class SpriteIntegrationTest {
         CharacterDefinition second=GeneratedCharacters.get("player_two");
         assertNotSame(first,second);
         assertEquals("Lutador Teste 2",second.displayName);
+        assertEquals("player_two",second.profile.id);
+        assertEquals(384,second.profile.frameWidth);
+        assertEquals(256,second.profile.frameHeight);
+        assertEquals(192f,second.profile.rootX,.001f);
+        assertEquals(246f,second.profile.rootY,.001f);
         assertEquals(first.animations.keySet(),second.animations.keySet());
         assertEquals(first.moves.keySet(),second.moves.keySet());
+        assertNotEquals(first.animation("IDLE").atlas.resource,second.animation("IDLE").atlas.resource);
+        assertEquals("player_two_idle",second.animation("IDLE").atlas.resource);
+        assertEquals("player_two_movement",second.animation("WALK_FORWARD").atlas.resource);
+        assertEquals("player_two_jab",second.animation("LIGHT_JAB").atlas.resource);
+        assertEquals("player_two_medium_kick",second.animation("MEDIUM_KICK").atlas.resource);
+        assertEquals("player_two_heavy_straight",second.animation("HEAVY_STRAIGHT").atlas.resource);
         for(String binding:new String[]{"L","M","H"}) {
             CharacterDefinition.Move a=first.moves.get(binding);
             CharacterDefinition.Move b=second.moves.get(binding);

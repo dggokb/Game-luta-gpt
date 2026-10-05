@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "player_two",
   "displayName": "Lutador Teste 2",
-  "profile": "player_base.json",
+  "profile": "player_two.json",
   "animations": {
     "IDLE": {
-      "atlas": "player_base_idle",
+      "atlas": "player_two_idle",
       "frames": [
         0,
         1,
@@ -29,7 +29,7 @@
       ]
     },
     "COMBAT": {
-      "atlas": "player_base_idle",
+      "atlas": "player_two_idle",
       "frames": [
         0
       ],
@@ -39,7 +39,7 @@
       ]
     },
     "WALK_FORWARD": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
         0,
         1,
@@ -50,7 +50,7 @@
       "distancePerFrame": 36
     },
     "WALK_BACK": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
         4,
         5,
@@ -61,7 +61,7 @@
       "distancePerFrame": 32
     },
     "CROUCH": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
         8,
         9
@@ -73,7 +73,7 @@
       ]
     },
     "RISE": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
         8
       ],
@@ -83,19 +83,23 @@
       ]
     },
     "JUMP": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
-        10
+        10,
+        11,
+        12
       ],
       "loop": false,
       "durationsMs": [
+        80,
+        80,
         100
       ]
     },
     "FALL": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
-        11
+        13
       ],
       "loop": false,
       "durationsMs": [
@@ -103,21 +107,17 @@
       ]
     },
     "DASH": {
-      "atlas": "player_base_movement",
-      "frames": [
-        12,
-        13
-      ],
-      "loop": true,
-      "durationsMs": [
-        100,
-        100
-      ]
-    },
-    "BACKDASH": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
         14
+      ],
+      "loop": true,
+      "distancePerFrame": 36
+    },
+    "BACKDASH": {
+      "atlas": "player_two_movement",
+      "frames": [
+        15
       ],
       "loop": false,
       "durationsMs": [
@@ -125,9 +125,9 @@
       ]
     },
     "LAND": {
-      "atlas": "player_base_movement",
+      "atlas": "player_two_movement",
       "frames": [
-        15
+        8
       ],
       "loop": false,
       "durationsMs": [
@@ -135,7 +135,7 @@
       ]
     },
     "LIGHT_JAB": {
-      "atlas": "player_base_jab",
+      "atlas": "player_two_jab",
       "frames": [
         0,
         1,
@@ -149,7 +149,7 @@
       ]
     },
     "MEDIUM_KICK": {
-      "atlas": "player_base_medium_kick",
+      "atlas": "player_two_medium_kick",
       "frames": [
         0,
         1,
@@ -163,7 +163,7 @@
       ]
     },
     "HEAVY_STRAIGHT": {
-      "atlas": "player_base_heavy_straight",
+      "atlas": "player_two_heavy_straight",
       "frames": [
         0,
         1,
