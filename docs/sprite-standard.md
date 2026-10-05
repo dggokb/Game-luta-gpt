@@ -226,3 +226,8 @@ O roster agora declara `opponentCharacter`. O oponente deixa de depender do bone
 A IA continua responsável apenas por decisão, física e dano; o renderer do NPC converte deslocamento, direção, salto, crouch, dash/backdash e L/M/H em estados do pack. Não há condição de desenho específica para o monstro. Trocar o NPC visual exige somente alterar `characters/roster.json -> opponentCharacter` para outro pack válido.
 
 O workflow de regeneração passou a versionar saídas de qualquer pack novo, removendo o antigo filtro exclusivo de `player_two_*`.
+
+
+## Brutamonte com arte final de teste — GPT v0.58
+
+O pack temporário 32×32 foi substituído pela arte detalhada aprovada do Brutamonte. O NPC passa a usar células 192×192 com escala de mundo própria, atlas de idle/movimento e atlas separado para postura ofensiva e L/M/H. O renderer e a IA continuam genéricos; esta alteração troca apenas assets e metadados do pack.

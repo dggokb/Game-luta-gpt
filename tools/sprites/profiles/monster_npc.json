@@ -1,22 +1,22 @@
 {
   "id": "monster_npc",
-  "baseFrameWidth": 32,
-  "baseFrameHeight": 32,
-  "preferredRootX": 16,
-  "preferredRootY": 31,
-  "worldScale": 8.2,
-  "standingVisualHeight": 29,
+  "baseFrameWidth": 192,
+  "baseFrameHeight": 192,
+  "preferredRootX": 96,
+  "preferredRootY": 187,
+  "worldScale": 1.55,
+  "standingVisualHeight": 180,
   "validation": {
     "alphaThreshold": 10,
     "minMargin": 0,
-    "rootTolerance": 2,
+    "rootTolerance": 3,
     "widthStep": 1,
     "heightStep": 1,
-    "footBandRatio": 0.08,
-    "minFootWidth": 1,
-    "minOpaquePixels": 80,
+    "footBandRatio": 0.04,
+    "minFootWidth": 2,
+    "minOpaquePixels": 5000,
     "maxUpscale": 1,
-    "maxFrameWidth": 64,
-    "maxFrameHeight": 64
+    "maxFrameWidth": 256,
+    "maxFrameHeight": 256
   }
 }

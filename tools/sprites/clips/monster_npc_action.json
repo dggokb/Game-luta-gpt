@@ -1,0 +1,14 @@
+{
+  "id": "monster_npc_action",
+  "javaName": "MONSTER_NPC_ACTION",
+  "profile": "monster_npc.json",
+  "source": "art/sprites/source/monster_npc_action.png",
+  "output": "android/app/src/main/res/drawable-nodpi/monster_npc_action.png",
+  "report": "tools/sprites/reports/monster_npc_action.report.json",
+  "preview": "android/app/build/sprite-review/monster-npc-action-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Brutamonte high-detail crouched attack master derived from the approved monster concept."
+}
