@@ -5,7 +5,7 @@
   "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1,
+  "worldScale": 1.0,
   "layout": {
     "frameWidth": 256,
     "frameHeight": 256,

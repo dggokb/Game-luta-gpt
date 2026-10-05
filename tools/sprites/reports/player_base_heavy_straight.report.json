@@ -41,7 +41,7 @@
     ]
   ],
   "scale": 0.635367231638418,
-  "worldScale": 1,
+  "worldScale": 1.0,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -58,7 +58,7 @@
     "footBandRatio": 0.025,
     "minFootWidth": 4,
     "minOpaquePixels": 10000,
-    "maxUpscale": 1,
+    "maxUpscale": 1.0,
     "maxFrameWidth": 768,
     "maxFrameHeight": 512
   },
@@ -70,17 +70,17 @@
     "canonicalSignature": {
       "height": 228,
       "bands": [
-        47,
-        57,
-        97
+        47.0,
+        57.0,
+        97.0
       ]
     },
     "sourceSignature": {
       "height": 329,
       "bands": [
-        75,
+        75.0,
         88.5,
-        159
+        159.0
       ]
     },
     "scaleCandidates": [
@@ -108,7 +108,7 @@
       ],
       "sourceRoot": [
         142.5,
-        328
+        328.0
       ],
       "sourceFootIntervals": [
         [
@@ -134,7 +134,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        238
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -175,7 +175,7 @@
       ],
       "sourceRoot": [
         166.75,
-        328
+        328.0
       ],
       "sourceFootIntervals": [
         [
@@ -200,8 +200,8 @@
         "bottom": 18
       },
       "detectedOutputRoot": [
-        128,
-        237
+        128.0,
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -242,7 +242,7 @@
       ],
       "sourceRoot": [
         190.75,
-        327
+        327.0
       ],
       "sourceFootIntervals": [
         [
@@ -268,7 +268,7 @@
       },
       "detectedOutputRoot": [
         128.25,
-        238
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -309,7 +309,7 @@
       ],
       "sourceRoot": [
         173.25,
-        317
+        317.0
       ],
       "sourceFootIntervals": [
         [
@@ -334,8 +334,8 @@
         "bottom": 18
       },
       "detectedOutputRoot": [
-        128,
-        237
+        128.0,
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -376,7 +376,7 @@
       ],
       "sourceRoot": [
         158.5,
-        317
+        317.0
       ],
       "sourceFootIntervals": [
         [
@@ -402,7 +402,7 @@
       },
       "detectedOutputRoot": [
         127.75,
-        237
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -442,8 +442,8 @@
         318
       ],
       "sourceRoot": [
-        177,
-        317
+        177.0,
+        317.0
       ],
       "sourceFootIntervals": [
         [
@@ -468,8 +468,8 @@
         "bottom": 17
       },
       "detectedOutputRoot": [
-        128,
-        238
+        128.0,
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -510,7 +510,7 @@
       ],
       "sourceRoot": [
         150.75,
-        322
+        322.0
       ],
       "sourceFootIntervals": [
         [
@@ -536,7 +536,7 @@
       },
       "detectedOutputRoot": [
         127.75,
-        237
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -577,7 +577,7 @@
       ],
       "sourceRoot": [
         167.5,
-        321
+        321.0
       ],
       "sourceFootIntervals": [
         [
@@ -603,7 +603,7 @@
       },
       "detectedOutputRoot": [
         128.25,
-        238
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -643,8 +643,8 @@
         321
       ],
       "sourceRoot": [
-        178,
-        320
+        178.0,
+        320.0
       ],
       "sourceFootIntervals": [
         [
@@ -670,7 +670,7 @@
       },
       "detectedOutputRoot": [
         128.25,
-        238
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [

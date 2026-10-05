@@ -17,7 +17,7 @@
     ]
   ],
   "scale": 0.3584905660377358,
-  "worldScale": 1,
+  "worldScale": 1.0,
   "layout": {
     "frameWidth": 384,
     "frameHeight": 256,
@@ -34,7 +34,7 @@
     "footBandRatio": 0.025,
     "minFootWidth": 4,
     "minOpaquePixels": 10000,
-    "maxUpscale": 1,
+    "maxUpscale": 1.0,
     "maxFrameWidth": 768,
     "maxFrameHeight": 512
   },
@@ -53,7 +53,7 @@
       ],
       "sourceRoot": [
         85.5,
-        672
+        672.0
       ],
       "sourceFootIntervals": [
         [
@@ -75,7 +75,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        238
+        238.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -105,8 +105,8 @@
         673
       ],
       "sourceRoot": [
-        87,
-        672
+        87.0,
+        672.0
       ],
       "sourceFootIntervals": [
         [
@@ -128,7 +128,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        237
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
@@ -158,8 +158,8 @@
         672
       ],
       "sourceRoot": [
-        239,
-        671
+        239.0,
+        671.0
       ],
       "sourceFootIntervals": [
         [
@@ -185,7 +185,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        237
+        237.0
       ],
       "detectedOutputFootIntervals": [
         [
