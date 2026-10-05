@@ -1,0 +1,98 @@
+name: Export Mobile Branch to PC
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: Mobile branch to export
+        required: true
+        default: game-luta-sprite-gpt
+        type: string
+  push:
+    branches:
+      - game-luta-pc-export-engine-gpt
+    paths:
+      - 'tools/pc-export/export-request.json'
+      - 'tools/pc-export/export.ps1'
+      - 'pc/**'
+      - '.github/workflows/export-pc.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout export engine
+        uses: actions/checkout@v4
+        with:
+          ref: game-luta-pc-export-engine-gpt
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve mobile source
+        id: request
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_SOURCE_BRANCH: ${{ inputs.source_branch }}
+        run: |
+          if ($env:EVENT_NAME -eq 'workflow_dispatch') {
+            $branch = $env:MANUAL_SOURCE_BRANCH
+            $ref = $branch
+          } else {
+            $request = Get-Content 'tools/pc-export/export-request.json' -Raw | ConvertFrom-Json
+            $branch = [string]$request.source_branch
+            $ref = if ($request.source_sha) { [string]$request.source_sha } else { $branch }
+          }
+          if ([string]::IsNullOrWhiteSpace($branch)) { throw 'source_branch nao informado.' }
+          if ([string]::IsNullOrWhiteSpace($ref)) { throw 'source_ref nao informado.' }
+          "source_branch=$branch" >> $env:GITHUB_OUTPUT
+          "source_ref=$ref" >> $env:GITHUB_OUTPUT
+
+      - name: Checkout mobile source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.request.outputs.source_ref }}
+          path: mobile-source
+
+      - name: Capture source metadata
+        id: meta
+        shell: pwsh
+        env:
+          SOURCE_BRANCH: ${{ steps.request.outputs.source_branch }}
+        run: |
+          $sha = (git -C mobile-source rev-parse HEAD).Trim()
+          $short = $sha.Substring(0, 8)
+          $safeBranch = [regex]::Replace($env:SOURCE_BRANCH, '[^A-Za-z0-9._-]', '-')
+          "source_sha=$sha" >> $env:GITHUB_OUTPUT
+          "artifact_name=GameLutaSpriteGPT-PC-$safeBranch-$short" >> $env:GITHUB_OUTPUT
+
+      - name: Convert mobile branch to Windows
+        shell: pwsh
+        run: |
+          ./tools/pc-export/export.ps1 -SourceRoot ./mobile-source -SourceBranch '${{ steps.request.outputs.source_branch }}' -SourceSha '${{ steps.meta.outputs.source_sha }}'
+
+      - name: Upload Windows executable package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: pc/build/GameLutaSpriteGPT-Windows.zip
+          if-no-files-found: error
+          retention-days: 30
