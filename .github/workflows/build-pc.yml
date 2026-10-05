@@ -1,0 +1,64 @@
+name: Build Game Luta PC
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - game-luta-sprite-pc-gpt
+    paths:
+      - 'pc/**'
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/drawable-nodpi/**'
+      - 'characters/**'
+      - 'tools/sprites/**'
+      - '.github/workflows/build-pc.yml'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate sprite packs
+        shell: pwsh
+        run: |
+          python -m pip install -r tools/sprites/requirements.txt
+          python tools/sprites/build_characters.py --write
+          python -m unittest discover -s tools/sprites/tests -v
+          python tools/sprites/build_characters.py --check
+
+      - name: Compile desktop port
+        shell: pwsh
+        run: gradle -p pc clean jar --stacktrace
+
+      - name: Package portable Windows app
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path pc/build/package | Out-Null
+          jpackage --type app-image --name GameLutaSpriteGPT --input pc/build/libs --main-jar game-luta-sprite-pc.jar --main-class com.gamelutagpt.DesktopLauncher --dest pc/build/package
+          Compress-Archive -Path pc/build/package/GameLutaSpriteGPT -DestinationPath pc/build/GameLutaSpriteGPT-Windows.zip -Force
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaSpriteGPT-Windows
+          path: pc/build/GameLutaSpriteGPT-Windows.zip
+          if-no-files-found: error
