@@ -72,4 +72,15 @@ class CharacterPackTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'anatomy reference frame'):
             pipeline.build(self.root)
 
+
+    def test_checked_in_roster_contains_real_second_character(self):
+        roster=json.loads((self.root/'characters/roster.json').read_text())
+        self.assertEqual(['player_base','player_two'],roster['team'])
+        first=json.loads((self.root/'characters/player_base/character.json').read_text())
+        second=json.loads((self.root/'characters/player_two/character.json').read_text())
+        self.assertNotEqual(first['id'],second['id'])
+        self.assertEqual(first['profile'],second['profile'])
+        self.assertEqual(first['animations'],second['animations'])
+        self.assertEqual(first['moves'],second['moves'])
+
 if __name__=='__main__':unittest.main()
