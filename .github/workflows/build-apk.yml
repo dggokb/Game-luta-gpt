@@ -53,8 +53,8 @@ jobs:
           path: |
             android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
             android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
-            android/app/src/main/res/drawable-nodpi/player_two_*.png
-            tools/sprites/reports/player_two_*.report.json
+            android/app/src/main/res/drawable-nodpi/*.png
+            tools/sprites/reports/*.report.json
           if-no-files-found: warn
 
       - name: Commit generated sprite outputs
@@ -64,10 +64,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
           git add android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
-          git add android/app/src/main/res/drawable-nodpi/player_two_*.png
-          git add tools/sprites/reports/player_two_*.report.json
+          git add android/app/src/main/res/drawable-nodpi/*.png
+          git add tools/sprites/reports/*.report.json
           if ! git diff --cached --quiet; then
-            git commit -m "Regenerate Player Two sprite outputs"
+            git commit -m "Regenerate sprite pack outputs"
             git push origin HEAD:game-luta-sprite-gpt
           fi
 

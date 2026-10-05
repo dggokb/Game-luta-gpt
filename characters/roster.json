@@ -4,5 +4,6 @@
   "team": [
     "player_base",
     "player_two"
-  ]
+  ],
+  "opponentCharacter": "monster_npc"
 }

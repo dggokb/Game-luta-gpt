@@ -217,3 +217,12 @@ O HUD mostra o `displayName` do pack ativo. O teste Android executa a animação
 `player_two` passou a usar um perfil independente: célula-base 384×256, root 192/246 e worldScale 1.0. O Idle (8 frames) é a referência anatômica canônica do personagem. O Movement (16 frames) foi preparado como master authored porque mistura caminhada, crouch, salto e dash; isso evita re-grounding automático de poses aéreas. Jab (3), Medium Kick (3) e Heavy Straight (9) usam as fontes geradas em alta resolução e `canonical-anatomy` do Player Two.
 
 Este é o teste de independência do Character Pack Engine: o roster continua `player_base` + `player_two`, mas o segundo personagem agora carrega perfil e atlas próprios sem adicionar condição especial ao renderer. O teste de runtime continua fazendo a troca real e executando L/M/H após a entrada do segundo pack.
+
+
+## NPC pelo mesmo Character Pack Engine — GPT v0.57
+
+O roster agora declara `opponentCharacter`. O oponente deixa de depender do boneco vetorial provisório e recebe um `SpriteFighterRenderer` próprio, alimentado pelos mesmos `character.json`, perfil, atlas e estados semânticos usados pelos lutadores do time. O pack de validação `monster_npc`/“Brutamonte” usa geometria própria e é maior que os jogadores para validar escala independente.
+
+A IA continua responsável apenas por decisão, física e dano; o renderer do NPC converte deslocamento, direção, salto, crouch, dash/backdash e L/M/H em estados do pack. Não há condição de desenho específica para o monstro. Trocar o NPC visual exige somente alterar `characters/roster.json -> opponentCharacter` para outro pack válido.
+
+O workflow de regeneração passou a versionar saídas de qualquer pack novo, removendo o antigo filtro exclusivo de `player_two_*`.

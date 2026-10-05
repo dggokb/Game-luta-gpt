@@ -33,6 +33,11 @@ public class SpriteIntegrationTest {
 
     @Test public void productionRosterUsesRealSecondCharacterPack()throws Exception {
         assertArrayEquals(new String[]{"player_base","player_two"},GeneratedCharacters.TEAM);
+        assertEquals("monster_npc",GeneratedCharacters.OPPONENT);
+        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
+        assertEquals("monster_npc",npc.id);
+        assertEquals("Brutamonte",npc.displayName);
+        assertEquals("monster_npc_pack",npc.animation("IDLE").atlas.resource);
         CharacterDefinition first=GeneratedCharacters.get("player_base");
         CharacterDefinition second=GeneratedCharacters.get("player_two");
         assertNotSame(first,second);
@@ -59,6 +64,15 @@ public class SpriteIntegrationTest {
             assertEquals(a.reach,b.reach,.0001f);
             assertEquals(a.animation.id,b.animation.id);
         }
+    }
+
+    @Test public void opponentIsRenderedByTheGenericSpriteEngine()throws Exception {
+        SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");
+        Field field=SpriteFighterRenderer.class.getDeclaredField("character");
+        field.setAccessible(true);
+        assertEquals("monster_npc",((CharacterDefinition)field.get(opponent)).id);
+        frames(2);
+        assertEquals(SpriteMotion.Clip.IDLE,opponent.motion.clip);
     }
 
     @Test public void realTagSwitchLoadsSecondPackAndAllStandingAttacks()throws Exception {

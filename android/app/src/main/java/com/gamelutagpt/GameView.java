@@ -290,6 +290,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final SpriteFighterRenderer spriteFighterRenderer;
+    private final SpriteFighterRenderer opponentSpriteRenderer;
     private final LinearGradient skyGradient;
     private final android.graphics.Path[] mountainPaths =
         new android.graphics.Path[15];
@@ -482,6 +483,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     public GameView(Context context) {
         super(context);
         spriteFighterRenderer = new SpriteFighterRenderer(context);
+        opponentSpriteRenderer = new SpriteFighterRenderer(
+            context,
+            GeneratedCharacters.opponentCharacter()
+        );
         holder = getHolder();
         holder.addCallback(this);
         setFocusable(true);
@@ -608,6 +613,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void update(float dt) {
         float previousX = playerX;
+        float previousDummyX = dummyX;
         updateSuperState(dt);
         updateTagState(dt);
 
@@ -623,6 +629,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateDummyAirState(dt);
         updatePlayerReceivedState(dt);
         updateOpponentAi(dt);
+        updateOpponentSpriteMotion(dt, dummyX - previousDummyX);
 
         if (isSuperCinematicActive()) {
             updateSuperProjectiles(dt);
@@ -720,6 +727,44 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private FighterProfile opponentProfile() {
         return opponentFighter.profile;
+    }
+
+    private void updateOpponentSpriteMotion(float dt, float travel) {
+        CharacterDefinition opponent = GeneratedCharacters.opponentCharacter();
+        String attackAnimation = null;
+        if (dummyAttackTimer > 0f && dummyAttackType != null) {
+            String binding = dummyAttackType.startsWith("2")
+                ? dummyAttackType.substring(1)
+                : dummyAttackType;
+            CharacterDefinition.Move move = opponent.moves.get(binding);
+            if (move != null) attackAnimation = move.animation.id;
+        }
+
+        boolean forward = Math.abs(travel) > 0.001f &&
+            travel * opponentFacingDirection() > 0f;
+        float attackElapsed = Math.max(
+            0f,
+            dummyAttackDuration - dummyAttackTimer
+        );
+        boolean combat =
+            dummyHitReactionTimer > 0f ||
+            aiSuperTimer > 0f ||
+            dummyKnockdownState != DUMMY_KD_NONE;
+
+        opponentSpriteRenderer.update(
+            dt,
+            !dummyAirborne,
+            aiCrouching,
+            dummyVelocityY,
+            travel,
+            forward,
+            aiForwardDashing,
+            aiBackDashTimer > 0f,
+            attackAnimation,
+            attackElapsed,
+            combat,
+            dummyMovementLocked
+        );
     }
 
     private int opponentFacingDirection() {
@@ -1057,7 +1102,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private float dummyTop() {
-        return dummyY - 145f;
+        CharacterVisualProfile profile = opponentSpriteRenderer.visualProfile();
+        return dummyY - profile.rootY * profile.worldScale;
     }
 
     private void launchDummy() {
@@ -2541,7 +2587,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE GPT • v0.56", 975, 59, paint);
+        c.drawText("SPRITE GPT • v0.57", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2797,13 +2843,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             paint
         );
 
-        int dummyColor = dummyLife > 0
-            ? opponentProfile().color
-            : Color.rgb(95, 95, 105);
+        boolean hitFlash =
+            dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
 
         c.save();
         if (facingDirection > 0) {
-            // Jogador à esquerda: dummy olha para a esquerda.
+            // Jogador à esquerda: o NPC olha para a esquerda.
             c.scale(-1f, 1f, dummyX, 0f);
         }
 
@@ -2830,146 +2875,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             c.rotate(knockdownAngle, dummyX, GROUND_Y);
         }
 
-        float hitProgress = dummyHitReactionTimer > 0f
-            ? 1f - dummyHitReactionTimer / DUMMY_HIT_REACTION_DURATION
-            : 1f;
-        float recoilPose = dummyHitReactionTimer > 0f
-            ? (float)Math.sin(hitProgress * Math.PI)
-            : 0f;
-
-        if (
-            dummyKnockdownState == DUMMY_KD_NONE &&
-            dummyAirborne
-        ) {
-            float airTilt = dummyMovementLocked ? 1f : 0.55f;
-            recoilPose = Math.max(recoilPose, airTilt);
-        }
-        boolean hitFlash =
-            dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
-
-        if (hitFlash && dummyLife > 0) {
-            dummyColor = Color.rgb(255, 235, 235);
-        }
-
-        float headX = dummyX - 13f * recoilPose;
-        float shoulderX = dummyX - 9f * recoilPose;
-        float hipX = dummyX - 3f * recoilPose;
-
-        paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setColor(dummyColor);
-        c.drawCircle(headX, top + 20f - 2f * recoilPose, 25f, paint);
-
-        paint.setStrokeWidth(25f);
-        c.drawLine(
-            shoulderX,
-            top + 48f,
-            hipX,
-            baseY - 45f,
-            paint
-        );
-
-        paint.setStrokeWidth(18f);
-        if (dummyAttackTimer > 0f || aiSuperTimer > 0f) {
-            float phase = aiAttackPhase();
-
-            if (aiSuperTimer > 0f) {
-                float pulse = 1f + 0.10f * (float)Math.sin(aiSuperTimer * 26f);
-                c.drawLine(
-                    shoulderX - 3f,
-                    top + 58f,
-                    dummyX - 54f * pulse,
-                    top + 38f,
-                    paint
-                );
-                c.drawLine(
-                    shoulderX + 3f,
-                    top + 58f,
-                    dummyX + 70f * pulse,
-                    top + 38f,
-                    paint
-                );
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 38f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 38f, baseY, paint);
-            } else if ("2L".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 76f * phase, top + 90f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 42f, baseY - 8f, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 39f, baseY - 8f, paint);
-            } else if ("2M".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 34f, top + 94f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 36f, baseY - 8f, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 44f + 72f * phase, baseY - 12f, paint);
-            } else if ("2H".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 32f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 42f + 82f * phase, top + 54f - 16f * phase, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 46f, baseY - 8f, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 44f, baseY - 8f, paint);
-            } else if ("M".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 28f, top + 97f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 30f, top + 94f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 25f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 34f + 76f * phase, baseY - 48f * phase, paint);
-            } else if ("H".equals(dummyAttackType)) {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 26f, top + 98f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 28f + 92f * phase, top + 84f + 22f * phase, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 30f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 30f, baseY, paint);
-            } else {
-                c.drawLine(shoulderX - 3f, top + 58f, dummyX - 30f, top + 96f, paint);
-                c.drawLine(shoulderX + 3f, top + 58f, dummyX + 34f + 72f * phase, top + 66f, paint);
-                c.drawLine(hipX - 4f, baseY - 45f, dummyX - 26f, baseY, paint);
-                c.drawLine(hipX + 4f, baseY - 45f, dummyX + 26f, baseY, paint);
-            }
-        } else if (dummyHitReactionTimer > 0f) {
-            // Braços abrem e o tronco recua no impacto.
-            c.drawLine(
-                shoulderX - 3f,
-                top + 58f,
-                dummyX - 52f - 18f * recoilPose,
-                top + 82f,
-                paint
-            );
-            c.drawLine(
-                shoulderX + 3f,
-                top + 58f,
-                dummyX - 15f - 28f * recoilPose,
-                top + 112f,
-                paint
-            );
-            c.drawLine(
-                hipX - 4f,
-                baseY - 45f,
-                dummyX - 34f,
-                baseY,
-                paint
-            );
-            c.drawLine(
-                hipX + 4f,
-                baseY - 45f,
-                dummyX + 31f,
-                baseY,
-                paint
-            );
-        } else {
-            c.drawLine(dummyX - 3f, top + 58f, dummyX - 34f, top + 100f, paint);
-            c.drawLine(dummyX + 3f, top + 58f, dummyX + 34f, top + 100f, paint);
-            c.drawLine(dummyX - 4f, baseY - 45f, dummyX - 28f, baseY, paint);
-            c.drawLine(dummyX + 4f, baseY - 45f, dummyX + 28f, baseY, paint);
-        }
-
-        // Marca frontal para ficar visualmente claro quando o dummy vira.
-        paint.setColor(Color.rgb(24, 35, 48));
-        paint.setStrokeWidth(4f);
-        c.drawLine(
-            headX + 5f,
-            top + 15f - 2f * recoilPose,
-            headX + 13f,
-            top + 15f - 2f * recoilPose,
-            paint
+        opponentSpriteRenderer.draw(
+            c,
+            paint,
+            dummyX,
+            baseY,
+            hitFlash && dummyLife > 0,
+            false
         );
         c.restore();
-        paint.setStrokeCap(Paint.Cap.BUTT);
+
 
         float barLeft = dummyX - 125f;
         float barRight = dummyX + 125f;
