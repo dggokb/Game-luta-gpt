@@ -23,6 +23,52 @@ public class SpriteIntegrationTest {
     private void invoke(String name,Class<?>[] types,Object... args)throws Exception {Method m=GameView.class.getDeclaredMethod(name,types);m.setAccessible(true);m.invoke(game,args);}
     private float meter(Object fighter)throws Exception {Field f=fighter.getClass().getDeclaredField("superMeter");f.setAccessible(true);return f.getFloat(fighter);}
     private Object activeFighter()throws Exception {return ((Object[])get("team"))[0];}
+
+    private String rendererCharacterId()throws Exception {
+        SpriteFighterRenderer renderer=(SpriteFighterRenderer)get("spriteFighterRenderer");
+        Field field=SpriteFighterRenderer.class.getDeclaredField("character");
+        field.setAccessible(true);
+        return ((CharacterDefinition)field.get(renderer)).id;
+    }
+
+    @Test public void productionRosterUsesRealSecondCharacterPack()throws Exception {
+        assertArrayEquals(new String[]{"player_base","player_two"},GeneratedCharacters.TEAM);
+        CharacterDefinition first=GeneratedCharacters.get("player_base");
+        CharacterDefinition second=GeneratedCharacters.get("player_two");
+        assertNotSame(first,second);
+        assertEquals("Lutador Teste 2",second.displayName);
+        assertEquals(first.animations.keySet(),second.animations.keySet());
+        assertEquals(first.moves.keySet(),second.moves.keySet());
+        for(String binding:new String[]{"L","M","H"}) {
+            CharacterDefinition.Move a=first.moves.get(binding);
+            CharacterDefinition.Move b=second.moves.get(binding);
+            assertEquals(a.damage,b.damage);
+            assertEquals(a.activeStart,b.activeStart,.0001f);
+            assertEquals(a.activeEnd,b.activeEnd,.0001f);
+            assertEquals(a.reach,b.reach,.0001f);
+            assertEquals(a.animation.id,b.animation.id);
+        }
+    }
+
+    @Test public void realTagSwitchLoadsSecondPackAndAllStandingAttacks()throws Exception {
+        assertEquals("player_base",rendererCharacterId());
+        invoke("switchFighter",new Class<?>[]{});
+        frames(72);
+        assertEquals(1,(int)get("activeFighterIndex"));
+        assertEquals("player_two",rendererCharacterId());
+
+        String[] bindings={"L","M","H"};
+        int[] recoveryFrames={12,18,26};
+        CharacterDefinition second=GeneratedCharacters.get("player_two");
+        for(int i=0;i<bindings.length;i++) {
+            invoke("startAttack",new Class<?>[]{String.class},bindings[i]);
+            frames(1);
+            assertEquals(second.moves.get(bindings[i]).animation.id,motion().clip);
+            frames(recoveryFrames[i]);
+            assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
+        }
+    }
+
     @Test public void actualPadDrivesForwardBackAndStopsAtRelease()throws Exception {
         touch(MotionEvent.ACTION_DOWN,265,555);frames(10);assertEquals(SpriteMotion.Clip.WALK_FORWARD,motion().clip);
         touch(MotionEvent.ACTION_MOVE,85,555);frames(10);assertEquals(SpriteMotion.Clip.WALK_BACK,motion().clip);
