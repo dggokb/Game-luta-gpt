@@ -41,7 +41,7 @@
     ]
   ],
   "scale": 0.635367231638418,
-  "worldScale": 1.0,
+  "worldScale": 1,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -58,7 +58,7 @@
     "footBandRatio": 0.025,
     "minFootWidth": 4,
     "minOpaquePixels": 10000,
-    "maxUpscale": 1.0,
+    "maxUpscale": 1,
     "maxFrameWidth": 768,
     "maxFrameHeight": 512
   },
@@ -70,17 +70,17 @@
     "canonicalSignature": {
       "height": 228,
       "bands": [
-        47.0,
-        57.0,
-        97.0
+        47,
+        57,
+        97
       ]
     },
     "sourceSignature": {
       "height": 329,
       "bands": [
-        75.0,
+        75,
         88.5,
-        159.0
+        159
       ]
     },
     "scaleCandidates": [
@@ -108,7 +108,7 @@
       ],
       "sourceRoot": [
         142.5,
-        328.0
+        328
       ],
       "sourceFootIntervals": [
         [
@@ -134,7 +134,7 @@
       },
       "detectedOutputRoot": [
         127.5,
-        238.0
+        238
       ],
       "detectedOutputFootIntervals": [
         [
@@ -175,7 +175,7 @@
       ],
       "sourceRoot": [
         166.75,
-        328.0
+        328
       ],
       "sourceFootIntervals": [
         [
@@ -200,8 +200,8 @@
         "bottom": 18
       },
       "detectedOutputRoot": [
-        128.0,
-        237.0
+        128,
+        237
       ],
       "detectedOutputFootIntervals": [
         [
@@ -242,7 +242,7 @@
       ],
       "sourceRoot": [
         190.75,
-        327.0
+        327
       ],
       "sourceFootIntervals": [
         [
@@ -268,7 +268,7 @@
       },
       "detectedOutputRoot": [
         128.25,
-        238.0
+        238
       ],
       "detectedOutputFootIntervals": [
         [
@@ -309,7 +309,7 @@
       ],
       "sourceRoot": [
         173.25,
-        317.0
+        317
       ],
       "sourceFootIntervals": [
         [
@@ -334,8 +334,8 @@
         "bottom": 18
       },
       "detectedOutputRoot": [
-        128.0,
-        237.0
+        128,
+        237
       ],
       "detectedOutputFootIntervals": [
         [
@@ -376,7 +376,7 @@
       ],
       "sourceRoot": [
         158.5,
-        317.0
+        317
       ],
       "sourceFootIntervals": [
         [
@@ -402,7 +402,7 @@
       },
       "detectedOutputRoot": [
         127.75,
-        237.0
+        237
       ],
       "detectedOutputFootIntervals": [
         [
@@ -442,8 +442,8 @@
         318
       ],
       "sourceRoot": [
-        177.0,
-        317.0
+        177,
+        317
       ],
       "sourceFootIntervals": [
         [
@@ -468,8 +468,8 @@
         "bottom": 17
       },
       "detectedOutputRoot": [
-        128.0,
-        238.0
+        128,
+        238
       ],
       "detectedOutputFootIntervals": [
         [
@@ -510,7 +510,7 @@
       ],
       "sourceRoot": [
         150.75,
-        322.0
+        322
       ],
       "sourceFootIntervals": [
         [
@@ -536,7 +536,7 @@
       },
       "detectedOutputRoot": [
         127.75,
-        237.0
+        237
       ],
       "detectedOutputFootIntervals": [
         [
@@ -577,7 +577,7 @@
       ],
       "sourceRoot": [
         167.5,
-        321.0
+        321
       ],
       "sourceFootIntervals": [
         [
@@ -603,7 +603,7 @@
       },
       "detectedOutputRoot": [
         128.25,
-        238.0
+        238
       ],
       "detectedOutputFootIntervals": [
         [
@@ -643,8 +643,8 @@
         321
       ],
       "sourceRoot": [
-        178.0,
-        320.0
+        178,
+        320
       ],
       "sourceFootIntervals": [
         [
@@ -670,7 +670,7 @@
       },
       "detectedOutputRoot": [
         128.25,
-        238.0
+        238
       ],
       "detectedOutputFootIntervals": [
         [
@@ -703,8 +703,8 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "50756f4be431819f11de1652b98289a445e9e82e2c8e8a3182a1700fa5f34d82",
-      "config": "0d23908a7f81666a649a49deb6186d2f8d09cdd94f14746d81098a712541ac9c",
-      "profile": "2776e22c327931e7205ba506030877da30ce9063d87da27ebe3882837c3d20c7"
+      "config": "878f2f44e4a7aa6679ccfc8080c801cef6ed7745cd0312c19283a8a282467338",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
     }
   }
 }
