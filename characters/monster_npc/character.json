@@ -33,10 +33,10 @@
     "WALK_FORWARD": {
       "atlas": "monster_npc_pack",
       "frames": [
-        0,
-        1,
-        2,
-        3
+        4,
+        5,
+        6,
+        7
       ],
       "loop": true,
       "distancePerFrame": 34
@@ -44,18 +44,18 @@
     "WALK_BACK": {
       "atlas": "monster_npc_pack",
       "frames": [
-        3,
-        2,
-        1,
-        0
+        7,
+        6,
+        5,
+        4
       ],
       "loop": true,
       "distancePerFrame": 32
     },
     "CROUCH": {
-      "atlas": "monster_npc_action",
+      "atlas": "monster_npc_pack",
       "frames": [
-        0
+        8
       ],
       "loop": false,
       "durationsMs": [
@@ -65,19 +65,21 @@
     "RISE": {
       "atlas": "monster_npc_pack",
       "frames": [
+        15,
         0
       ],
       "loop": false,
       "durationsMs": [
+        70,
         90
       ]
     },
     "JUMP": {
       "atlas": "monster_npc_pack",
       "frames": [
-        1,
-        2,
-        3
+        4,
+        5,
+        6
       ],
       "loop": false,
       "durationsMs": [
@@ -89,7 +91,7 @@
     "FALL": {
       "atlas": "monster_npc_pack",
       "frames": [
-        2
+        11
       ],
       "loop": false,
       "durationsMs": [
@@ -97,12 +99,11 @@
       ]
     },
     "DASH": {
-      "atlas": "monster_npc_action",
+      "atlas": "monster_npc_pack",
       "frames": [
-        0,
-        1,
-        2,
-        3
+        5,
+        6,
+        7
       ],
       "loop": true,
       "distancePerFrame": 38
@@ -110,60 +111,66 @@
     "BACKDASH": {
       "atlas": "monster_npc_pack",
       "frames": [
-        3
+        7,
+        6,
+        5
       ],
       "loop": false,
       "durationsMs": [
-        200
+        70,
+        70,
+        80
       ]
     },
     "LAND": {
       "atlas": "monster_npc_pack",
       "frames": [
-        0
+        8,
+        15
       ],
       "loop": false,
       "durationsMs": [
-        100
+        70,
+        90
       ]
     },
     "LIGHT_CLAW": {
-      "atlas": "monster_npc_action",
+      "atlas": "monster_npc_pack",
       "frames": [
-        0,
-        1,
-        2
+        8,
+        9,
+        8
       ],
       "loop": false,
       "durationsMs": [
         40,
-        55,
-        65
+        60,
+        60
       ]
     },
     "MEDIUM_SWIPE": {
-      "atlas": "monster_npc_action",
+      "atlas": "monster_npc_pack",
       "frames": [
-        0,
-        1,
-        2,
-        3
+        8,
+        10,
+        9,
+        8
       ],
       "loop": false,
       "durationsMs": [
-        60,
-        65,
+        50,
         70,
-        65
+        70,
+        70
       ]
     },
     "HEAVY_SMASH": {
-      "atlas": "monster_npc_action",
+      "atlas": "monster_npc_pack",
       "frames": [
-        0,
-        1,
-        2,
-        3
+        8,
+        10,
+        11,
+        12
       ],
       "loop": false,
       "durationsMs": [
@@ -171,6 +178,22 @@
         100,
         100,
         120
+      ]
+    },
+    "ROAR": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        13,
+        14,
+        13,
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        140,
+        120,
+        100
       ]
     }
   },

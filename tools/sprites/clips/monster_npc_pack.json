@@ -2,13 +2,13 @@
   "id": "monster_npc_pack",
   "javaName": "MONSTER_NPC_PACK",
   "profile": "monster_npc.json",
-  "source": "art/sprites/source/monster_npc_pack.png",
+  "source": "art/sprites/source/brutamonte_atlas_16.png",
   "output": "android/app/src/main/res/drawable-nodpi/monster_npc_pack.png",
   "report": "tools/sprites/reports/monster_npc_pack.report.json",
   "preview": "android/app/build/sprite-review/monster-npc-pack-import.png",
-  "expectedFrames": 4,
+  "expectedFrames": 16,
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "Brutamonte high-detail idle master derived from the approved monster concept."
+  "sourceNote": "Brutamonte 16-frame NPC atlas normalized from the approved sprite sheet."
 }
