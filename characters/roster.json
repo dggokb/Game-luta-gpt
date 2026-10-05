@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "defaultCharacter": "player_base",
+  "team": [
+    "player_base",
+    "player_base"
+  ]
+}

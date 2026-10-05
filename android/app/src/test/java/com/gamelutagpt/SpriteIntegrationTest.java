@@ -73,16 +73,55 @@ public class SpriteIntegrationTest {
         invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},500,-1,"M",false,false);
         assertEquals(.15f,meter(get("opponentFighter")),.001f);
     }
+    @Test public void standingMoveDamageMatchesActiveWindowOnceInBothDirections()throws Exception {
+        for(String binding:new String[]{"L","M","H"})for(int direction:new int[]{1,-1}) {
+            setup();set("facingDirection",direction);set("dummyX",420f+100f*direction);
+            invoke("startAttack",new Class<?>[]{String.class},binding);
+            CharacterDefinition.Move move=GeneratedCharacters.defaultCharacter().moves.get(binding);
+            int life=(Integer)get("dummyLife");
+            set("attackTimer",move.animation.duration-(move.activeStart-.002f));
+            invoke("tryApplyMeleeDamage",new Class<?>[]{});
+            assertEquals(life,(int)get("dummyLife"));
+            set("attackTimer",move.animation.duration-(move.activeStart+.002f));
+            invoke("tryApplyMeleeDamage",new Class<?>[]{});
+            assertEquals(life-move.damage,(int)get("dummyLife"));
+            invoke("tryApplyMeleeDamage",new Class<?>[]{});
+            assertEquals(life-move.damage,(int)get("dummyLife"));
+        }
+    }
+    @Test public void missedMoveCannotHitWhenOpponentArrivesDuringRecovery()throws Exception {
+        for(String binding:new String[]{"L","M","H"}) {
+            setup();set("dummyX",1500f);
+            invoke("startAttack",new Class<?>[]{String.class},binding);
+            CharacterDefinition.Move move=GeneratedCharacters.defaultCharacter().moves.get(binding);
+            int life=(Integer)get("dummyLife");
+            set("attackTimer",move.animation.duration-(move.activeStart+.002f));
+            invoke("tryApplyMeleeDamage",new Class<?>[]{});
+            set("dummyX",520f);set("attackTimer",move.animation.duration-(move.activeEnd+.002f));
+            invoke("tryApplyMeleeDamage",new Class<?>[]{});
+            assertEquals(life,(int)get("dummyLife"));
+        }
+    }
+    @Test public void customCharacterAnimationRendersWithSameGenericRenderer() {
+        CharacterDefinition base=GeneratedCharacters.defaultCharacter();
+        java.util.Map<String,CharacterDefinition.Animation> animations=new java.util.LinkedHashMap<>(base.animations);
+        animations.put("CUSTOM_PUNCH",new CharacterDefinition.Animation("CUSTOM_PUNCH",base.animation("LIGHT_JAB").atlas,
+            new int[]{0,1,2},new float[]{.04f,.06f,.06f},false,0));
+        CharacterDefinition custom=new CharacterDefinition("custom","Custom",base.profile,animations,base.moves);
+        SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication(),custom);
+        Rect bounds=renderedBounds(renderer,"CUSTOM_PUNCH",.07f,0);
+        assertTrue(bounds.width()>60);assertTrue(bounds.height()>150);
+    }
     @Test public void standingLightAttackPlaysJabStartupActiveRecoveryThenReturnsIdle()throws Exception {
         invoke("startAttack",new Class<?>[]{String.class},"L");
-        frames(1);assertEquals(SpriteMotion.Clip.LIGHT_JAB,motion().clip);assertEquals(0,motion().frame());
+        frames(1);assertEquals("LIGHT_JAB",motion().clip);assertEquals(0,motion().frame());
         frames(2);assertEquals(1,motion().frame());
         frames(4);assertEquals(2,motion().frame());
         frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
     @Test public void standingMediumAttackUsesThreeFrameKickAtScaleOne()throws Exception {
         invoke("startAttack",new Class<?>[]{String.class},"M");
-        frames(1);assertEquals(SpriteMotion.Clip.MEDIUM_KICK,motion().clip);assertEquals(0,motion().frame());
+        frames(1);assertEquals("MEDIUM_KICK",motion().clip);assertEquals(0,motion().frame());
         frames(4);assertEquals(1,motion().frame());
         frames(7);assertEquals(2,motion().frame());
         frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
@@ -132,7 +171,7 @@ public class SpriteIntegrationTest {
         float[] times={.016f,.090f,.220f};
 
         for(int i=0;i<times.length;i++) {
-            renderer.motion.clip=SpriteMotion.Clip.MEDIUM_KICK;
+            renderer.motion.clip="MEDIUM_KICK";
             renderer.motion.time=times[i];
             assertEquals(i,renderer.motion.frame());
             canvas.save();
@@ -168,7 +207,7 @@ public class SpriteIntegrationTest {
     @Test public void standingHeavyAttackUsesNineFrameStraightAtScaleOne()throws Exception {
         invoke("startAttack",new Class<?>[]{String.class},"H");
         frames(1);
-        assertEquals(SpriteMotion.Clip.HEAVY_STRAIGHT,motion().clip);
+        assertEquals("HEAVY_STRAIGHT",motion().clip);
         assertEquals(0,motion().frame());
         frames(25);
         assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
@@ -225,7 +264,7 @@ public class SpriteIntegrationTest {
         float[] times={.016f,.050f,.090f,.130f,.170f,.220f,.270f,.320f,.370f};
 
         for(int i=0;i<count;i++) {
-            renderer.motion.clip=SpriteMotion.Clip.HEAVY_STRAIGHT;
+            renderer.motion.clip="HEAVY_STRAIGHT";
             renderer.motion.time=times[i];
             assertEquals(i,renderer.motion.frame());
             canvas.save();
@@ -259,7 +298,7 @@ public class SpriteIntegrationTest {
     }
 
     @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
-        CharacterVisualProfile p=CharacterVisualProfile.PLAYER_BASE;
+        CharacterVisualProfile p=GeneratedCharacters.defaultCharacter().profile;
         assertEquals(256,p.frameWidth);
         assertEquals(256,p.frameHeight);
         assertEquals(128f,p.rootX,.001f);
@@ -288,7 +327,7 @@ public class SpriteIntegrationTest {
     }
 
     @Test public void characterProfilesCanRepresentDifferentSizedFighters() {
-        CharacterVisualProfile base=CharacterVisualProfile.PLAYER_BASE;
+        CharacterVisualProfile base=GeneratedCharacters.defaultCharacter().profile;
         CharacterVisualProfile large=
             new CharacterVisualProfile("large_test",320,320,160f,300f,1f);
         RectF a=new RectF(),b=new RectF();
@@ -302,7 +341,7 @@ public class SpriteIntegrationTest {
 
     private Rect renderedBounds(
         SpriteFighterRenderer renderer,
-        SpriteMotion.Clip clip,
+        String clip,
         float time,
         float distance
     ) {
@@ -323,7 +362,7 @@ public class SpriteIntegrationTest {
 
     private int upperBodyWidth(
         SpriteFighterRenderer renderer,
-        SpriteMotion.Clip clip,
+        String clip,
         float time,
         float distance
     ) {
@@ -353,7 +392,7 @@ public class SpriteIntegrationTest {
 
         int idleUpper=upperBodyWidth(renderer,SpriteMotion.Clip.IDLE,0f,0f);
         int walkUpper=upperBodyWidth(renderer,SpriteMotion.Clip.WALK_FORWARD,0f,1f);
-        int jabUpper=upperBodyWidth(renderer,SpriteMotion.Clip.LIGHT_JAB,.016f,0f);
+        int jabUpper=upperBodyWidth(renderer,"LIGHT_JAB",.016f,0f);
 
         float idleRatio=idleUpper/(float)walkUpper;
         float jabRatio=jabUpper/(float)walkUpper;
@@ -383,7 +422,7 @@ public class SpriteIntegrationTest {
         SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
         Bitmap sheet=Bitmap.createBitmap(1200,1040,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(sheet);c.drawColor(Color.rgb(43,52,65));
         Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setTextSize(15);p.setColor(Color.WHITE);
-        SpriteMotion.Clip[] clips={SpriteMotion.Clip.WALK_FORWARD,SpriteMotion.Clip.WALK_BACK,SpriteMotion.Clip.CROUCH,SpriteMotion.Clip.CROUCH,SpriteMotion.Clip.JUMP,SpriteMotion.Clip.FALL,SpriteMotion.Clip.DASH,SpriteMotion.Clip.DASH,SpriteMotion.Clip.BACKDASH,SpriteMotion.Clip.LAND};
+        String[] clips={SpriteMotion.Clip.WALK_FORWARD,SpriteMotion.Clip.WALK_BACK,SpriteMotion.Clip.CROUCH,SpriteMotion.Clip.CROUCH,SpriteMotion.Clip.JUMP,SpriteMotion.Clip.FALL,SpriteMotion.Clip.DASH,SpriteMotion.Clip.DASH,SpriteMotion.Clip.BACKDASH,SpriteMotion.Clip.LAND};
         for(int i=0;i<16;i++) {
             SpriteMotion m=renderer.motion;m.time=0;m.distance=0;
             if(i<8){m.clip=i<4?clips[0]:clips[1];m.distance=(i%4)*(i<4?36:32)+1;}

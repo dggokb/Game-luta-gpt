@@ -317,6 +317,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private String attackType = "";
     private float attackTimer = 0f;
     private float attackDuration = 0f;
+    private CharacterDefinition.Move activeSpriteMove;
     private float walkTime = 0f;
     private boolean attackHitApplied = false;
     private float playerDamageFlashTimer = 0f;
@@ -1480,6 +1481,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             if (t >= 1f) {
                 activeFighterIndex = (activeFighterIndex + 1) % team.length;
+                spriteFighterRenderer.setCharacter(GeneratedCharacters.TEAM[activeFighterIndex]);
                 tagPhase = TAG_ENTER;
                 tagPhaseTimer = 0f;
                 tagVisualOffsetX =
@@ -1612,6 +1614,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         else if ("S".equals(type)) attackDuration = 0.30f;
         else attackDuration = 0.40f;
 
+        activeSpriteMove = grounded && !crouching
+            ? GeneratedCharacters.get(GeneratedCharacters.TEAM[activeFighterIndex]).moves.get(type)
+            : null;
+        if (activeSpriteMove != null) attackDuration = activeSpriteMove.animation.duration;
         attackTimer = attackDuration;
 
     }
@@ -1631,10 +1637,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (attackHitApplied || attackTimer <= 0f || dummyLife <= 0) return;
         if ("S".equals(attackType)) return;
 
-        int damage = damageForAttack(attackType);
-        float reach = reachForAttack(attackType);
+        int damage = activeSpriteMove != null ? activeSpriteMove.damage : damageForAttack(attackType);
+        float reach = activeSpriteMove != null ? activeSpriteMove.reach : reachForAttack(attackType);
         if (damage <= 0 || reach <= 0f) return;
-        if (attackPhase() < 0.72f) return;
+        if (activeSpriteMove != null) {
+            if (!activeSpriteMove.active(attackDuration - attackTimer)) return;
+        } else if (attackPhase() < 0.72f) return;
 
         float horizontalDistance =
             (dummyX - playerX) * facingDirection;
@@ -2533,7 +2541,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE GPT • v0.51", 975, 59, paint);
+        c.drawText("SPRITE ASTRA • v0.53", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -3167,29 +3175,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void updateSpriteMotion(float dt, float travel) {
         int guard = playerBlockstunTimer > 0f ? playerLastGuardState : anticipatedPlayerGuardPose();
-        boolean lightJab =
-            grounded &&
-            !crouching &&
-            "L".equals(attackType) &&
-            attackTimer > 0f;
-        boolean mediumKick =
-            grounded &&
-            !crouching &&
-            "M".equals(attackType) &&
-            attackTimer > 0f;
-        boolean heavyStraight =
-            grounded &&
-            !crouching &&
-            "H".equals(attackType) &&
-            attackTimer > 0f;
+        String attackAnimation = attackTimer > 0f && activeSpriteMove != null
+            ? activeSpriteMove.animation.id : null;
         boolean combatPose =
-            (attackTimer > 0f && !lightJab && !mediumKick && !heavyStraight) ||
-            guard != GUARD_NONE ||
-            isSuperPoseActive() ||
-            isTagAnimationActive();
+            (attackTimer > 0f && attackAnimation == null) ||
+            guard != GUARD_NONE || isSuperPoseActive() || isTagAnimationActive();
         spriteFighterRenderer.update(dt,grounded,crouching || isCrouchAttackActive() || guard == GUARD_LOW,
             velocityY,travel,travel*facingDirection > 0,forwardDashing,backDashTimer>0,
-            lightJab,mediumKick,heavyStraight,combatPose,playerMovementLocked);
+            attackAnimation,attackDuration-attackTimer,combatPose,playerMovementLocked);
     }
 
     private void drawPlayer(Canvas c) {

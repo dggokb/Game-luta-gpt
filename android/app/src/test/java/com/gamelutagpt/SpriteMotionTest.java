@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 public class SpriteMotionTest {
     private void tick(SpriteMotion m,float dt,boolean ground,boolean crouch,float vy,float dx,boolean front,boolean dash,boolean back,boolean combat,boolean lock) {
-        m.update(dt,ground,crouch,vy,dx,front,dash,back,false,false,false,combat,lock);
+        m.update(dt,ground,crouch,vy,dx,front,dash,back,null,0,combat,lock);
     }
     @Test public void allFourStepsAdvanceWithDistanceRatherThanDrawCalls() {
         SpriteMotion m=new SpriteMotion();
@@ -42,41 +42,29 @@ public class SpriteMotionTest {
         for(int i=0;i<10;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
-    @Test public void lightJabUsesThreeOrderedFramesAndRecoversToIdle() {
+    @Test public void attacksUseTheCombatClockAndSameAttackCanRestart() {
         SpriteMotion m=new SpriteMotion();
-        m.update(.016f,true,false,0,0,true,false,false,true,false,false,true,false);
-        assertEquals(SpriteMotion.Clip.LIGHT_JAB,m.clip);assertEquals(0,m.frame());
-        m.update(.040f,true,false,0,0,true,false,false,true,false,false,true,false);
-        assertEquals(1,m.frame());
-        m.update(.060f,true,false,0,0,true,false,false,true,false,false,true,false);
-        assertEquals(2,m.frame());
-        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false,false);
-        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
-    }
-    @Test public void mediumKickUsesThreeOrderedFramesAndRecoversToIdle() {
-        SpriteMotion m=new SpriteMotion();
-        m.update(.016f,true,false,0,0,true,false,false,false,true,false,true,false);
-        assertEquals(SpriteMotion.Clip.MEDIUM_KICK,m.clip);assertEquals(0,m.frame());
-        m.update(.070f,true,false,0,0,true,false,false,false,true,false,true,false);
-        assertEquals(1,m.frame());
-        m.update(.110f,true,false,0,0,true,false,false,false,true,false,true,false);
-        assertEquals(2,m.frame());
-        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false,false);
-        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
-    }
-    @Test public void heavyStraightUsesNineOrderedFramesAndRecoversToIdle() {
-        SpriteMotion m=new SpriteMotion();
-        float[] steps={.016f,.034f,.040f,.040f,.040f,.050f,.050f,.050f,.050f};
-        for(int i=0;i<9;i++) {
-            m.update(
-                steps[i],true,false,0,0,true,false,false,
-                false,false,true,true,false
-            );
-            assertEquals(SpriteMotion.Clip.HEAVY_STRAIGHT,m.clip);
-            assertEquals(i,m.frame());
+        for(CharacterDefinition.Move move:GeneratedCharacters.defaultCharacter().moves.values()) {
+            String animation=move.animation.id;
+            m.update(.016f,true,false,0,0,true,false,false,animation,0f,true,false);
+            assertEquals(animation,m.clip);assertEquals(0,m.frame());
+            m.update(.016f,true,false,0,0,true,false,false,animation,move.animation.duration-.001f,true,false);
+            assertEquals(move.animation.atlas.count-1,m.frame());
+            // A repeated L/M/H must not inherit the preceding attack's recovery clock.
+            m.update(.016f,true,false,0,0,true,false,false,animation,0f,true,false);
+            assertEquals(0,m.frame());
         }
-        m.update(.016f,true,false,0,0,true,false,false,false,false,false,false,false);
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+    }
+    @Test public void customAnimationIdUsesGenericMotionWithoutNewBranches() {
+        CharacterDefinition base=GeneratedCharacters.defaultCharacter();
+        java.util.Map<String,CharacterDefinition.Animation> a=new java.util.LinkedHashMap<>(base.animations);
+        a.put("CUSTOM_PUNCH",new CharacterDefinition.Animation("CUSTOM_PUNCH",base.animation("LIGHT_JAB").atlas,
+            new int[]{2,0,1,2},new float[]{.03f,.04f,.05f,.06f},false,0));
+        SpriteMotion m=new SpriteMotion(new CharacterDefinition("test","Test",base.profile,a,base.moves));
+        m.update(.01f,true,false,0,0,true,false,false,"CUSTOM_PUNCH",.08f,true,false);
+        assertEquals("CUSTOM_PUNCH",m.clip);assertEquals(1,m.frame());
     }
     @Test public void collisionGuardAndAttackCannotPlayWalking() {
         SpriteMotion m=new SpriteMotion();
