@@ -4,6 +4,12 @@ package com.gamelutagpt;
 final class GeneratedSpriteLayouts {
     private GeneratedSpriteLayouts() {}
 
+    static final int MONSTER_NPC_PACK_FRAME_WIDTH = 32;
+    static final int MONSTER_NPC_PACK_FRAME_HEIGHT = 32;
+    static final int MONSTER_NPC_PACK_ROOT_X = 16;
+    static final int MONSTER_NPC_PACK_ROOT_Y = 31;
+    static final int MONSTER_NPC_PACK_FRAME_COUNT = 8;
+
     static final int HEAVY_STRAIGHT_FRAME_WIDTH = 320;
     static final int HEAVY_STRAIGHT_FRAME_HEIGHT = 256;
     static final int HEAVY_STRAIGHT_ROOT_X = 128;
