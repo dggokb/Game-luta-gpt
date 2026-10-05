@@ -13,24 +13,24 @@ final class GeneratedCharacters {
  {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
- a.put("IDLE",new CharacterDefinition.Animation("IDLE",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{0,1,2,3},new float[]{0.12000000f,0.12000000f,0.12000000f,0.12000000f},true,0.00000000f));
- a.put("COMBAT",new CharacterDefinition.Animation("COMBAT",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{0},new float[]{0.10000000f},false,0.00000000f));
- a.put("WALK_FORWARD",new CharacterDefinition.Animation("WALK_FORWARD",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{0,1,2,3},new float[]{},true,24.00000000f));
- a.put("WALK_BACK",new CharacterDefinition.Animation("WALK_BACK",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{3,2,1,0},new float[]{},true,22.00000000f));
- a.put("CROUCH",new CharacterDefinition.Animation("CROUCH",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{4},new float[]{0.10000000f},false,0.00000000f));
- a.put("RISE",new CharacterDefinition.Animation("RISE",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{0},new float[]{0.08000000f},false,0.00000000f));
- a.put("JUMP",new CharacterDefinition.Animation("JUMP",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{1,2,3},new float[]{0.08000000f,0.08000000f,0.10000000f},false,0.00000000f));
- a.put("FALL",new CharacterDefinition.Animation("FALL",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{2},new float[]{0.10000000f},false,0.00000000f));
- a.put("DASH",new CharacterDefinition.Animation("DASH",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{1,2,3},new float[]{},true,28.00000000f));
- a.put("BACKDASH",new CharacterDefinition.Animation("BACKDASH",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{3},new float[]{0.20000000f},false,0.00000000f));
- a.put("LAND",new CharacterDefinition.Animation("LAND",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{0},new float[]{0.10000000f},false,0.00000000f));
- a.put("LIGHT_CLAW",new CharacterDefinition.Animation("LIGHT_CLAW",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{4,5,6,7},new float[]{0.04000000f,0.04000000f,0.04000000f,0.04000000f},false,0.00000000f));
- a.put("MEDIUM_SWIPE",new CharacterDefinition.Animation("MEDIUM_SWIPE",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{4,5,6,7},new float[]{0.06000000f,0.07000000f,0.07000000f,0.06000000f},false,0.00000000f));
- a.put("HEAVY_SMASH",new CharacterDefinition.Animation("HEAVY_SMASH",new CharacterDefinition.Atlas("monster_npc_pack",32,32,16,31,4,8),new int[]{4,5,6,7},new float[]{0.08000000f,0.10000000f,0.10000000f,0.12000000f},false,0.00000000f));
- m.put("L",new CharacterDefinition.Move(a.get("LIGHT_CLAW"),300,0.04000000f,0.10000000f,145.00000000f));
- m.put("M",new CharacterDefinition.Move(a.get("MEDIUM_SWIPE"),500,0.07000000f,0.17000000f,165.00000000f));
+ a.put("IDLE",new CharacterDefinition.Animation("IDLE",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{0,1,2,3},new float[]{0.13000000f,0.13000000f,0.13000000f,0.13000000f},true,0.00000000f));
+ a.put("COMBAT",new CharacterDefinition.Animation("COMBAT",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{0},new float[]{0.10000000f},false,0.00000000f));
+ a.put("WALK_FORWARD",new CharacterDefinition.Animation("WALK_FORWARD",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{0,1,2,3},new float[]{},true,34.00000000f));
+ a.put("WALK_BACK",new CharacterDefinition.Animation("WALK_BACK",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{3,2,1,0},new float[]{},true,32.00000000f));
+ a.put("CROUCH",new CharacterDefinition.Animation("CROUCH",new CharacterDefinition.Atlas("monster_npc_action",160,160,80,158,4,4),new int[]{0},new float[]{0.10000000f},false,0.00000000f));
+ a.put("RISE",new CharacterDefinition.Animation("RISE",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{0},new float[]{0.09000000f},false,0.00000000f));
+ a.put("JUMP",new CharacterDefinition.Animation("JUMP",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{1,2,3},new float[]{0.08500000f,0.08500000f,0.11000000f},false,0.00000000f));
+ a.put("FALL",new CharacterDefinition.Animation("FALL",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{2},new float[]{0.10000000f},false,0.00000000f));
+ a.put("DASH",new CharacterDefinition.Animation("DASH",new CharacterDefinition.Atlas("monster_npc_action",160,160,80,158,4,4),new int[]{0,1,2,3},new float[]{},true,38.00000000f));
+ a.put("BACKDASH",new CharacterDefinition.Animation("BACKDASH",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{3},new float[]{0.20000000f},false,0.00000000f));
+ a.put("LAND",new CharacterDefinition.Animation("LAND",new CharacterDefinition.Atlas("monster_npc_pack",160,160,80,158,4,4),new int[]{0},new float[]{0.10000000f},false,0.00000000f));
+ a.put("LIGHT_CLAW",new CharacterDefinition.Animation("LIGHT_CLAW",new CharacterDefinition.Atlas("monster_npc_action",160,160,80,158,4,4),new int[]{0,1,2},new float[]{0.04000000f,0.05500000f,0.06500000f},false,0.00000000f));
+ a.put("MEDIUM_SWIPE",new CharacterDefinition.Animation("MEDIUM_SWIPE",new CharacterDefinition.Atlas("monster_npc_action",160,160,80,158,4,4),new int[]{0,1,2,3},new float[]{0.06000000f,0.06500000f,0.07000000f,0.06500000f},false,0.00000000f));
+ a.put("HEAVY_SMASH",new CharacterDefinition.Animation("HEAVY_SMASH",new CharacterDefinition.Atlas("monster_npc_action",160,160,80,158,4,4),new int[]{0,1,2,3},new float[]{0.08000000f,0.10000000f,0.10000000f,0.12000000f},false,0.00000000f));
+ m.put("L",new CharacterDefinition.Move(a.get("LIGHT_CLAW"),300,0.04000000f,0.09500000f,145.00000000f));
+ m.put("M",new CharacterDefinition.Move(a.get("MEDIUM_SWIPE"),500,0.07000000f,0.18000000f,165.00000000f));
  m.put("H",new CharacterDefinition.Move(a.get("HEAVY_SMASH"),800,0.16000000f,0.28000000f,195.00000000f));
- all.put("monster_npc",new CharacterDefinition("monster_npc","Brutamonte",new CharacterVisualProfile("monster_npc",32,32,16.00000000f,31.00000000f,8.20000000f),a,m));
+ all.put("monster_npc",new CharacterDefinition("monster_npc","Brutamonte",new CharacterVisualProfile("monster_npc",160,160,80.00000000f,158.00000000f,2.30000000f),a,m));
  }
  {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();

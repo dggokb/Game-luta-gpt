@@ -2,115 +2,71 @@
   "id": "monster_npc_pack",
   "characterProfile": "monster_npc",
   "source": "art/sprites/source/monster_npc_pack.png",
-  "sourceNote": "Monster NPC validation pack: four idle frames plus four attack frames, authored for the generic opponent sprite renderer.",
+  "sourceNote": "Brutamonte high-detail idle master derived from the approved monster concept.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 8.2,
+  "worldScale": 2.3,
   "layout": {
-    "frameWidth": 32,
-    "frameHeight": 32,
-    "rootX": 16,
-    "rootY": 31,
+    "frameWidth": 160,
+    "frameHeight": 160,
+    "rootX": 80,
+    "rootY": 158,
     "columns": 4,
-    "frameCount": 8
+    "frameCount": 4
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        1,
-        1,
-        32,
-        32
+        37,
+        44,
+        124,
+        155
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 524
+      "minimumMargin": 5,
+      "opaquePixels": 6761
     },
     {
       "index": 1,
       "outputBbox": [
-        1,
-        1,
-        32,
-        32
+        36,
+        43,
+        124,
+        155
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 524
+      "minimumMargin": 5,
+      "opaquePixels": 6898
     },
     {
       "index": 2,
       "outputBbox": [
-        1,
-        2,
-        32,
-        32
+        36,
+        41,
+        125,
+        155
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 517
+      "minimumMargin": 5,
+      "opaquePixels": 7058
     },
     {
       "index": 3,
       "outputBbox": [
-        1,
-        1,
-        32,
-        32
+        36,
+        43,
+        124,
+        155
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 524
-    },
-    {
-      "index": 4,
-      "outputBbox": [
-        3,
-        1,
-        32,
-        32
-      ],
-      "minimumMargin": 0,
-      "opaquePixels": 497
-    },
-    {
-      "index": 5,
-      "outputBbox": [
-        3,
-        1,
-        32,
-        32
-      ],
-      "minimumMargin": 0,
-      "opaquePixels": 509
-    },
-    {
-      "index": 6,
-      "outputBbox": [
-        3,
-        2,
-        32,
-        32
-      ],
-      "minimumMargin": 0,
-      "opaquePixels": 505
-    },
-    {
-      "index": 7,
-      "outputBbox": [
-        3,
-        1,
-        32,
-        32
-      ],
-      "minimumMargin": 0,
-      "opaquePixels": 503
+      "minimumMargin": 5,
+      "opaquePixels": 6898
     }
   ],
   "passed": true,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2c81af31c22fb3e3bde2e56a2ae3f3ba812a5b150d204e4f5a9716887f128242",
-      "config": "c0c4ff7a9c44b5bad244bc4ccbf9db48f96259aa4d2d2ce95b1a5b3477c367ec",
-      "profile": "546f9bf0bdec2c78d12f1d7a8f6deb0b371161bf44f43ccc294093afc524c08a"
+      "source": "50754cce9523464dce7341afb2a452dd5d0a596e9cbcd74c298c042a28f82107",
+      "config": "bde71e3094e78de424e55a0b8094303a1fd0ef05b4b406f8503417b08fdf2164",
+      "profile": "3b289f27c0ef575e06e4c5a07c1f6ad567785e43864bebd1175cca595c5d1506"
     }
   }
 }
