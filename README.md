@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.54-sprite-gpt-character-packs-anatomy`.
+Branch `game-luta-sprite-gpt`. Versão `0.55-sprite-gpt-second-character-pack`.
 
 ## Character Pack Engine
 
@@ -38,3 +38,9 @@ gradle testDebugUnitTest assembleDebug --stacktrace
 
 Aplicativo **Game Luta Sprite GPT**, pacote `com.gamelutagpt`.
 Preview técnico: `android/app/build/sprite-review/index.html`.
+
+## Segundo personagem de validação — v0.55
+
+O roster de produção usa `player_base` e `player_two`. O segundo pack reutiliza deliberadamente o mesmo perfil, os mesmos atlases e os mesmos movimentos para isolar o teste da arquitetura. O botão TROCA muda o renderer para `player_two`, e o HUD exibe o `displayName` do Character Pack ativo.
+
+A suíte valida a troca real e executa L, M e H no segundo pack. O workflow da implementação v0.55 passou pipeline, testes Python, testes Java/Canvas, build, instalação e smoke test no emulador Android.
