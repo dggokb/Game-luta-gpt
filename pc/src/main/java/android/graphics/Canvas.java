@@ -49,6 +49,7 @@ public final class Canvas {
         graphics.translate(px,py);graphics.scale(sx,sy);graphics.translate(-px,-py);
     }
     public void translate(float dx,float dy){graphics.translate(dx,dy);}
+    public void rotate(float degrees,float px,float py){graphics.rotate(Math.toRadians(degrees),px,py);}
 
     public void drawRect(float left,float top,float right,float bottom,Paint paint){
         paint.apply(graphics);
