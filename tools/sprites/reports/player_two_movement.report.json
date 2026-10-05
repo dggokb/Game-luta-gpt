@@ -1,0 +1,204 @@
+{
+  "id": "player_two_movement",
+  "characterProfile": "player_two",
+  "source": "art/sprites/source/player_two_movement_normalized.png",
+  "sourceNote": "Reviewed Player Two movement master; airborne poses keep authored registration.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 192,
+    "rootY": 246,
+    "columns": 4,
+    "frameCount": 16
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        123,
+        19,
+        258,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 17162
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        112,
+        19,
+        270,
+        245
+      ],
+      "minimumMargin": 11,
+      "opaquePixels": 17300
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        105,
+        23,
+        275,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 18152
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        58,
+        19,
+        221,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 18180
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        127,
+        28,
+        258,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 17622
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        116,
+        31,
+        274,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 16712
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        122,
+        33,
+        273,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 16373
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        163,
+        36,
+        324,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 16579
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        169,
+        95,
+        315,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 14206
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        160,
+        98,
+        304,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 13404
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        102,
+        110,
+        255,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 14072
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        152,
+        33,
+        290,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 14951
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        120,
+        85,
+        276,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 13606
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        48,
+        57,
+        208,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 15263
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        173,
+        80,
+        363,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 17313
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        20,
+        76,
+        210,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 14564
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d5e7317d1aa44191d2fbf417de2d9df9b6a511125551b2b764c5cbd0f076ec55",
+      "config": "eb82a13c04adbb21a419a5e8fd2c95559ff2c7944602a7095dd52207abd10a83",
+      "profile": "ad11e030e89b7b5a8b15b59727af9d4735fbaf583f8ae6d9c2c580f96412ee2b"
+    }
+  }
+}

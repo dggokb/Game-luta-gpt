@@ -1,0 +1,116 @@
+{
+  "id": "player_two_idle",
+  "characterProfile": "player_two",
+  "source": "art/sprites/source/player_two_idle_normalized.png",
+  "sourceNote": "Reviewed Player Two idle master built from the generated concept test art.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 192,
+    "rootY": 246,
+    "columns": 4,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        122,
+        19,
+        262,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 16114
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        119,
+        30,
+        265,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 15228
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        119,
+        20,
+        265,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 15981
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        115,
+        22,
+        268,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 16115
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        120,
+        36,
+        264,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 15133
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        117,
+        39,
+        269,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 15268
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        120,
+        33,
+        264,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 15445
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        117,
+        38,
+        267,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 15429
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "340f7a97dc290b7873c6709e639dde0b22e0a0be90f44fa7c815a52ec77acaf1",
+      "config": "de6f9eee350fb6e69cb33388ade0ba6e8e58883d0df8177ab2b41d48cf39f3bf",
+      "profile": "ad11e030e89b7b5a8b15b59727af9d4735fbaf583f8ae6d9c2c580f96412ee2b"
+    }
+  }
+}
