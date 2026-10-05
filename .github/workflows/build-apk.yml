@@ -38,6 +38,22 @@ jobs:
           python3 -m unittest discover -s tools/sprites/tests -v
           python3 tools/sprites/build_characters.py --check
 
+      - name: Materialize generated sprite outputs after stale check
+        if: failure()
+        run: python3 tools/sprites/build_characters.py --write
+
+      - name: Upload generated sprite outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sprite-GPT-Generated-Outputs
+          path: |
+            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+            android/app/src/main/res/drawable-nodpi/player_two_*.png
+            tools/sprites/reports/player_two_*.report.json
+          if-no-files-found: warn
+
       - name: Build debug APK
         working-directory: android
         run: gradle testDebugUnitTest assembleDebug --stacktrace
