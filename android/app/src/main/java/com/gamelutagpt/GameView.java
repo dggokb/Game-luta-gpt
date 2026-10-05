@@ -2541,7 +2541,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE ASTRA • v0.53", 975, 59, paint);
+        c.drawText("SPRITE GPT • v0.55", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2549,8 +2549,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText(currentStateLabel(), 1032, 88, paint);
 
         paint.setTextSize(14f);
+        CharacterDefinition visualCharacter =
+            GeneratedCharacters.get(GeneratedCharacters.TEAM[activeFighterIndex]);
         c.drawText(
-            facingDirection > 0 ? "FACING: →" : "FACING: ←",
+            "CHAR: " + visualCharacter.displayName,
             975,
             106,
             paint
