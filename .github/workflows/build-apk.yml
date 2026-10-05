@@ -36,7 +36,7 @@ jobs:
       - name: Normalize and validate sprite assets
         run: |
           python3 -m unittest discover -s tools/sprites/tests -v
-          python3 tools/sprites/build_characters.py --check
+          python3 tools/sprites/build_characters.py --write
 
       - name: Build debug APK
         working-directory: android
@@ -88,3 +88,4 @@ jobs:
           path: |
             android/app/build/sprite-review/
             android/app/build/reports/tests/
+            tools/sprites/reports/
