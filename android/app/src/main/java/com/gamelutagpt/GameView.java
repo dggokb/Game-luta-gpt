@@ -16,202 +16,18 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
-    private static final class FighterProfile {
-        final String name;
-        final String[] baseCombo;
-        final int maxLife;
-        final int color;
-        final boolean hasEnergyAttack;
-        final float energyRange;
-        final float energySpeed;
-        final int lightDamage;
-        final int mediumDamage;
-        final int heavyDamage;
-        final int energyDamage;
-        final int[] energyCommand;
-        final boolean hasSuperAttack;
-        final float superRange;
-        final float superSpeed;
-        final int superDamage;
-        final String reserveHudLabel;
-
-        FighterProfile(
-            String name,
-            String[] baseCombo,
-            int maxLife,
-            int color,
-            boolean hasEnergyAttack,
-            float energyRange,
-            float energySpeed,
-            int lightDamage,
-            int mediumDamage,
-            int heavyDamage,
-            int energyDamage,
-            int[] energyCommand,
-            boolean hasSuperAttack,
-            float superRange,
-            float superSpeed,
-            int superDamage
-        ) {
-            this.name = name;
-            this.baseCombo = baseCombo;
-            this.maxLife = maxLife;
-            this.color = color;
-            this.hasEnergyAttack = hasEnergyAttack;
-            this.energyRange = energyRange;
-            this.energySpeed = energySpeed;
-            this.lightDamage = lightDamage;
-            this.mediumDamage = mediumDamage;
-            this.heavyDamage = heavyDamage;
-            this.energyDamage = energyDamage;
-            this.energyCommand = energyCommand;
-            this.hasSuperAttack = hasSuperAttack;
-            this.superRange = superRange;
-            this.superSpeed = superSpeed;
-            this.superDamage = superDamage;
-            this.reserveHudLabel = "RESERVA: " + name;
-        }
-    }
-
-    private static final class FighterState {
-        final FighterProfile profile;
-        int life;
-        float superMeter;
-        String lifeHudLabel;
-        String superHudLabel;
-        String superLevelHudLabel;
-
-        FighterState(FighterProfile profile) {
-            this.profile = profile;
-            this.life = profile.maxLife;
-            this.superMeter = 0f;
-            refreshHudLabels();
-        }
-
-        void refreshHudLabels() {
-            int level = (int)Math.floor(superMeter);
-            lifeHudLabel = "HP " + life + " / " + profile.maxLife;
-            superHudLabel = String.format(
-                java.util.Locale.US,
-                "SUPER %.2f / 5  •  LV %d",
-                superMeter,
-                level
-            );
-            superLevelHudLabel = "LV " + level;
-        }
-    }
-
-    private static final class EnergyProjectile {
-        float x;
-        final float y;
-        final float startX;
-        final float range;
-        final float speed;
-        final int damage;
-        final int color;
-        final int ownerIndex;
-        final int direction;
-
-        EnergyProjectile(
-            float x,
-            float y,
-            float range,
-            float speed,
-            int damage,
-            int color,
-            int ownerIndex,
-            int direction
-        ) {
-            this.x = x;
-            this.y = y;
-            this.startX = x;
-            this.range = range;
-            this.speed = speed;
-            this.damage = damage;
-            this.color = color;
-            this.ownerIndex = ownerIndex;
-            this.direction = direction;
-        }
-    }
-
-    private static final class SuperProjectile {
-        float x;
-        final float y;
-        final float startX;
-        final float range;
-        final float speed;
-        final int damage;
-        final int color;
-        final int ownerIndex;
-        final int direction;
-
-        SuperProjectile(
-            float x,
-            float y,
-            float range,
-            float speed,
-            int damage,
-            int color,
-            int ownerIndex,
-            int direction
-        ) {
-            this.x = x;
-            this.y = y;
-            this.startX = x;
-            this.range = range;
-            this.speed = speed;
-            this.damage = damage;
-            this.color = color;
-            this.ownerIndex = ownerIndex;
-            this.direction = direction;
-        }
-    }
-
+    // Team and opponent rules come from the generated character packs.
     private final FighterState[] team = new FighterState[] {
-        new FighterState(new FighterProfile(
-            "PLAYER 1",
-            new String[]{"L", "M", "H"},
-            10000,
-            Color.rgb(244, 183, 59),
-            true,
-            720f,
-            760f,
-            300,
-            500,
-            800,
-            850,
-            new int[]{3, 1},
-            true,
-            1450f,
-            1180f,
-            3200
-        )),
-        new FighterState(new FighterProfile(
-            "PLAYER 2",
-            new String[]{"L", "L", "H", "M"},
-            10000,
-            Color.rgb(74, 205, 232),
-            true,
-            560f,
-            980f,
-            300,
-            500,
-            800,
-            650,
-            new int[]{5, 1},
-            true,
-            1320f,
-            1280f,
-            2850
-        ))
+        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[0])),
+        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[1]))
     };
 
     private int activeFighterIndex = 0;
     private static final int AI_OWNER_INDEX = 99;
     private final FighterState opponentFighter =
-        new FighterState(team[1].profile);
-    private final List<EnergyProjectile> energyProjectiles = new ArrayList<>();
-    private final List<SuperProjectile> superProjectiles = new ArrayList<>();
+        new FighterState(GeneratedCharacters.opponentCharacter());
+    private final List<Projectile> energyProjectiles = new ArrayList<>();
+    private final List<Projectile> superProjectiles = new ArrayList<>();
 
     private static final float VW = 1280f;
     private static final float VH = 720f;
@@ -229,8 +45,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float WORLD_TOP = -520f;
 
     private static final float DUMMY_START_X = 980f;
-    private static final float DUMMY_HALF_WIDTH = 34f;
-    private static final int DUMMY_MAX_LIFE = 10000;
     private static final float DUMMY_HIT_REACTION_DURATION = 0.22f;
     private static final float DUMMY_LAUNCH_SPEED = 1450f;
     private static final float DUMMY_SLAM_SPEED = 1850f;
@@ -262,8 +76,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean dummyGroundSlam = false;
     private int dummyKnockdownState = DUMMY_KD_NONE;
     private float dummyKnockdownTimer = 0f;
-    private int dummyLife = DUMMY_MAX_LIFE;
-    private String dummyLifeHudLabel = "10000 / 10000";
+    private int dummyLife = opponentFighter.profile.maxLife;
+    private String dummyLifeHudLabel = dummyLife + " / " + dummyLife;
     private String dummyDamageLabel = "";
     private float dummyDamageLabelTimer = 0f;
     private float dummyHitReactionTimer = 0f;
@@ -278,10 +92,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float aiBackDashTimer = 0f;
     private boolean aiCrouching = false;
     private boolean aiSuperJumping = false;
-    private float aiWalkTime = 0f;
     private String dummyAttackType = "";
     private float dummyAttackTimer = 0f;
     private float dummyAttackDuration = 0f;
+    private CharacterDefinition.Move opponentMove;
     private boolean dummyAttackHitApplied = false;
     private boolean aiChaseLauncher = false;
     private float aiSuperTimer = 0f;
@@ -318,8 +132,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private String attackType = "";
     private float attackTimer = 0f;
     private float attackDuration = 0f;
-    private CharacterDefinition.Move activeSpriteMove;
-    private float walkTime = 0f;
+    // Frame data of the attack in progress; null only for the energy special.
+    private CharacterDefinition.Move activeMove;
     private boolean attackHitApplied = false;
     private float playerDamageFlashTimer = 0f;
     private float playerBlockFlashTimer = 0f;
@@ -386,15 +200,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private static final float MAX_SUPER_METER = 5f;
     private static final float SUPER_COST = 1f;
-    private static final float SUPER_GAIN_LIGHT = 0.10f;
-    private static final float SUPER_GAIN_MEDIUM = 0.15f;
-    private static final float SUPER_GAIN_HEAVY = 0.20f;
-    private static final float SUPER_GAIN_ENERGY = 0.45f;
-    private static final float SUPER_GUARD_GAIN_LIGHT = 0.05f;
-    private static final float SUPER_GUARD_GAIN_MEDIUM = 0.075f;
-    private static final float SUPER_GUARD_GAIN_HEAVY = 0.10f;
-    private static final float SUPER_GUARD_GAIN_ENERGY = 0.20f;
-    private static final float SUPER_GUARD_GAIN_SUPER = 0.25f;
+    // Single version source: versionName in app/build.gradle.
+    private static final String VERSION_HUD_LABEL =
+        "SPRITE GPT • v" + BuildConfig.VERSION_NAME.split("-")[0];
+    private static final float ENERGY_ATTACK_DURATION = 0.30f;
+    private static final float AI_SUPER_WINDUP = 0.58f;
 
     // 0 neutro, 1 direita, 2 baixo-direita, 3 baixo, 4 baixo-esquerda,
     // 5 esquerda, 6 cima-esquerda, 7 cima, 8 cima-direita.
@@ -482,10 +292,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
-        spriteFighterRenderer = new SpriteFighterRenderer(context);
+        // One decode per atlas for the whole match: team packs (tag never decodes
+        // mid-fight) and the opponent share the same cache.
+        SpriteAtlasCache atlases = new SpriteAtlasCache(context);
+        for (FighterState fighter : team) atlases.preload(fighter.character);
+        spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(
-            context,
-            GeneratedCharacters.opponentCharacter()
+            atlases,
+            opponentFighter.character
         );
         holder = getHolder();
         holder.addCallback(this);
@@ -666,16 +480,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (playerHitReactionTimer > 0f && grounded) {
             playerX += playerKnockbackVelocityX * dt;
             playerKnockbackVelocityX *= (float)Math.pow(0.035f, dt);
-            walkTime = 0f;
-        } else if (isTagAnimationActive()) {
-            walkTime = 0f;
-        } else if (attackTimer > 0f && grounded) {
-            // No chão, ataques travam o deslocamento horizontal.
-            walkTime = 0f;
+        } else if (isTagAnimationActive() || (attackTimer > 0f && grounded)) {
+            // Troca e ataques no chão travam o deslocamento horizontal.
         } else if (backDashTimer > 0f && grounded) {
             playerX -= facingDirection * backDashSpeed * dt;
             backDashTimer = Math.max(0f, backDashTimer - dt);
-            walkTime += dt * 13f;
         } else if (direction != 0f && !crouching) {
             boolean movingForward = direction == facingDirection;
             float speed = (
@@ -684,9 +493,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 grounded
             ) ? forwardDashSpeed : moveSpeed;
             playerX += direction * speed * dt;
-            walkTime += dt * (forwardDashing ? 14f : 8f);
-        } else {
-            walkTime = 0f;
         }
 
         if (!grounded) {
@@ -725,27 +531,60 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateSpriteMotion(dt,playerX-previousX);
     }
 
-    private FighterProfile opponentProfile() {
+    private CharacterDefinition.Fighter opponentProfile() {
         return opponentFighter.profile;
     }
 
+    private CharacterDefinition opponentCharacter() {
+        return opponentFighter.character;
+    }
+
+    private CharacterDefinition activeCharacter() {
+        return activeFighter().character;
+    }
+
+    private boolean isOpponentCrouching() {
+        return aiCrouching || dummyAttackType.startsWith("2");
+    }
+
     private void updateOpponentSpriteMotion(float dt, float travel) {
-        CharacterDefinition opponent = GeneratedCharacters.opponentCharacter();
+        CharacterDefinition opponent = opponentCharacter();
         String attackAnimation = null;
-        if (dummyAttackTimer > 0f && dummyAttackType != null) {
-            String binding = dummyAttackType.startsWith("2")
-                ? dummyAttackType.substring(1)
-                : dummyAttackType;
-            CharacterDefinition.Move move = opponent.moves.get(binding);
-            if (move != null) attackAnimation = move.animation.id;
+        float attackElapsed = 0f;
+        float elapsed = Math.max(0f, dummyAttackDuration - dummyAttackTimer);
+        String reaction = reactionState(
+            opponentSpriteRenderer,
+            dummyKnockdownState,
+            dummyKnockdownTimer,
+            dummyLaunchedByHit || dummyGroundSlam,
+            dummyHitReactionTimer,
+            dummyAirborne,
+            isOpponentCrouching()
+        );
+        if (reaction != null) {
+            attackAnimation = reaction;
+            attackElapsed = reactionElapsed;
+        } else if (aiSuperTimer > 0f) {
+            CharacterDefinition.Animation roar = opponent.specialAnimations.get("SUPER");
+            if (roar != null) {
+                attackAnimation = roar.id;
+                attackElapsed = roar.timeFor(AI_SUPER_WINDUP - aiSuperTimer, AI_SUPER_WINDUP);
+            }
+        } else if (dummyAttackTimer > 0f && "S".equals(dummyAttackType)) {
+            CharacterDefinition.Animation special = opponent.specialAnimations.get("S");
+            if (special != null) {
+                attackAnimation = special.id;
+                attackElapsed = special.timeFor(elapsed, dummyAttackDuration);
+            }
+        } else if (dummyAttackTimer > 0f && opponentMove != null && opponentMove.animation != null) {
+            // Each input resolves to its own declared move; a move without art keeps
+            // its declared pose (crouch flag or airborne physics) instead of borrowing L/M/H.
+            attackAnimation = opponentMove.animation.id;
+            attackElapsed = opponentMove.animationTime(elapsed);
         }
 
         boolean forward = Math.abs(travel) > 0.001f &&
             travel * opponentFacingDirection() > 0f;
-        float attackElapsed = Math.max(
-            0f,
-            dummyAttackDuration - dummyAttackTimer
-        );
         boolean combat =
             dummyHitReactionTimer > 0f ||
             aiSuperTimer > 0f ||
@@ -754,7 +593,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         opponentSpriteRenderer.update(
             dt,
             !dummyAirborne,
-            aiCrouching,
+            isOpponentCrouching(),
             dummyVelocityY,
             travel,
             forward,
@@ -769,26 +608,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private int opponentFacingDirection() {
         return -facingDirection;
-    }
-
-    private float durationForAttack(String type) {
-        if ("L".equals(type) || "2L".equals(type)) return 0.16f;
-        if ("M".equals(type) || "2M".equals(type)) return 0.26f;
-        if ("S".equals(type)) return 0.30f;
-        return 0.40f;
-    }
-
-    private int damageForAttack(FighterProfile profile, String type) {
-        if ("L".equals(type) || "2L".equals(type)) return profile.lightDamage;
-        if ("M".equals(type) || "2M".equals(type)) return profile.mediumDamage;
-        if ("H".equals(type) || "2H".equals(type)) return profile.heavyDamage;
-        return 0;
-    }
-
-    private float aiAttackPhase() {
-        if (dummyAttackTimer <= 0f || dummyAttackDuration <= 0f) return 0f;
-        float t = 1f - dummyAttackTimer / dummyAttackDuration;
-        return t < 0.5f ? t * 2f : (1f - t) * 2f;
     }
 
     private boolean canOpponentAct() {
@@ -818,6 +637,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         dummyAttackType = "";
         dummyAttackTimer = 0f;
         dummyAttackDuration = 0f;
+        opponentMove = null;
         dummyAttackHitApplied = false;
         aiSuperTimer = 0f;
     }
@@ -825,8 +645,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void startOpponentAttack(String type) {
         if (!canOpponentAct() || dummyAttackTimer > 0f) return;
 
+        opponentMove = opponentCharacter().move(type, dummyAirborne);
         dummyAttackType = type;
-        dummyAttackDuration = durationForAttack(type);
+        dummyAttackDuration = opponentMove.totalTime;
         dummyAttackTimer = dummyAttackDuration;
         dummyAttackHitApplied = false;
         aiMovingForward = false;
@@ -851,10 +672,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void fireOpponentEnergy(String strength) {
-        FighterProfile profile = opponentProfile();
+        CharacterDefinition.Fighter profile = opponentProfile();
         if (
             !canOpponentAct() ||
-            !profile.hasEnergyAttack ||
+            !profile.hasEnergyAttack() ||
             hasActiveEnergyProjectile(AI_OWNER_INDEX)
         ) return;
 
@@ -871,20 +692,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             damageMultiplier = 1f;
         }
 
+        opponentMove = null;
         dummyAttackType = "S";
-        dummyAttackDuration = durationForAttack("S");
+        dummyAttackDuration = ENERGY_ATTACK_DURATION;
         dummyAttackTimer = dummyAttackDuration;
         dummyAttackHitApplied = true;
 
         if (dummyAirborne) dummyVelocityY *= 0.32f;
 
         int direction = opponentFacingDirection();
-        energyProjectiles.add(new EnergyProjectile(
+        energyProjectiles.add(new Projectile(
             dummyX + direction * 62f,
             dummyY - (aiCrouching ? 65f : 82f),
-            profile.energyRange,
-            profile.energySpeed * speedMultiplier,
-            Math.round(profile.energyDamage * damageMultiplier),
+            profile.energy.range,
+            profile.energy.speed * speedMultiplier,
+            Math.round(profile.energy.damage * damageMultiplier),
             profile.color,
             AI_OWNER_INDEX,
             direction
@@ -893,10 +715,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void startOpponentSuper() {
-        FighterProfile profile = opponentProfile();
+        CharacterDefinition.Fighter profile = opponentProfile();
         if (
             !canOpponentAct() ||
-            !profile.hasSuperAttack ||
+            !profile.hasSuperAttack() ||
             opponentFighter.superMeter < SUPER_COST
         ) return;
 
@@ -905,24 +727,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             opponentFighter.superMeter - SUPER_COST
         );
         opponentFighter.refreshHudLabels();
-        aiSuperTimer = 0.58f;
+        aiSuperTimer = AI_SUPER_WINDUP;
         aiMovingForward = false;
         aiMovingBack = false;
         aiForwardDashing = false;
         aiBackDashTimer = 0f;
         dummyAttackType = "";
         dummyAttackTimer = 0f;
+        opponentMove = null;
     }
 
     private void spawnOpponentSuperProjectile() {
-        FighterProfile profile = opponentProfile();
+        CharacterDefinition.Fighter profile = opponentProfile();
         int direction = opponentFacingDirection();
-        superProjectiles.add(new SuperProjectile(
+        superProjectiles.add(new Projectile(
             dummyX + direction * 78f,
             dummyY - 86f,
-            profile.superRange,
-            profile.superSpeed,
-            profile.superDamage,
+            profile.superAttack.range,
+            profile.superAttack.speed,
+            profile.superAttack.damage,
             profile.color,
             AI_OWNER_INDEX,
             direction
@@ -963,6 +786,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (dummyAttackTimer <= 0f) {
                 dummyAttackType = "";
                 dummyAttackDuration = 0f;
+                opponentMove = null;
                 dummyAttackHitApplied = false;
                 aiCrouching = false;
                 aiAttackCooldownRemaining = AI_ATTACK_COOLDOWN;
@@ -981,7 +805,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (aiBackDashTimer > 0f && !dummyAirborne) {
             dummyX -= opponentFacingDirection() * AI_BACKDASH_SPEED * dt;
             aiBackDashTimer = Math.max(0f, aiBackDashTimer - dt);
-            aiWalkTime += dt * 13f;
             return;
         }
 
@@ -1046,15 +869,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (dummyAirborne) {
             if (aiMovingForward) {
                 dummyX += opponentFacingDirection() * AI_WALK_SPEED * 0.70f * dt;
-                aiWalkTime += dt * 8f;
             }
         } else if (aiMovingForward) {
             float speed = aiForwardDashing ? AI_DASH_SPEED : AI_WALK_SPEED;
             dummyX += opponentFacingDirection() * speed * dt;
-            aiWalkTime += dt * (aiForwardDashing ? 14f : 8f);
         } else if (aiMovingBack) {
             dummyX -= opponentFacingDirection() * AI_WALK_SPEED * dt;
-            aiWalkTime += dt * 8f;
         }
 
         dummyX = clamp(dummyX, LEFT_BOUND, RIGHT_BOUND);
@@ -1068,25 +888,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             "S".equals(dummyAttackType)
         ) return;
 
-        int damage = damageForAttack(opponentProfile(), dummyAttackType);
-        float reach = reachForAttack(dummyAttackType);
-        if (damage <= 0 || reach <= 0f) return;
-        if (aiAttackPhase() < 0.72f) return;
+        CharacterDefinition.Move move = opponentMove;
+        if (move == null) return;
+        if (!move.active(dummyAttackDuration - dummyAttackTimer)) return;
 
         int direction = opponentFacingDirection();
-        float horizontalDistance = (playerX - dummyX) * direction;
-        if (horizontalDistance < 18f || horizontalDistance > reach) return;
+        if (!CombatRules.meleeConnects(
+            dummyX, dummyY, direction, move,
+            playerX, playerY, activeCharacter().fighter.body, isPlayerCrouching()
+        )) return;
 
-        float opponentCenterY =
-            (aiCrouching || dummyAttackType.startsWith("2"))
-                ? dummyY - 42f
-                : dummyY - 78f;
-        float playerCenterY =
-            (crouching || isCrouchAttackActive())
-                ? playerY - 42f
-                : playerY - 78f;
-        if (Math.abs(opponentCenterY - playerCenterY) > 92f) return;
-
+        int damage = move.damage;
         applyPlayerHit(
             damage,
             direction,
@@ -1101,14 +913,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
-    private float dummyTop() {
-        CharacterVisualProfile profile = opponentSpriteRenderer.visualProfile();
-        return dummyY - profile.rootY * profile.worldScale;
-    }
-
-    private float dummyGameplayTop() {
-        // Visual scale/registration must never change gameplay collision.
-        return dummyY - 145f;
+    /** Highest opaque pixel of the opponent, for camera framing and its HUD. */
+    private float opponentVisualTop() {
+        CharacterDefinition opponent = opponentCharacter();
+        return dummyY - (isOpponentCrouching()
+            ? opponent.visualCrouchHeight
+            : opponent.visualStandHeight);
     }
 
     private void launchDummy() {
@@ -1286,7 +1096,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private boolean canStartSuper() {
         return !playerMovementLocked &&
-            activeFighter().profile.hasSuperAttack &&
+            activeFighter().profile.hasSuperAttack() &&
             activeFighter().superMeter >= SUPER_COST &&
             !isSuperCinematicActive() &&
             !isTagAnimationActive() &&
@@ -1383,16 +1193,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void spawnSuperProjectile() {
-        FighterProfile profile = activeFighter().profile;
-        if (!profile.hasSuperAttack) return;
+        CharacterDefinition.Fighter profile = activeFighter().profile;
+        if (!profile.hasSuperAttack()) return;
 
         float spawnY = playerY - (grounded ? 86f : 82f);
-        superProjectiles.add(new SuperProjectile(
+        superProjectiles.add(new Projectile(
             playerX + facingDirection * 78f,
             spawnY,
-            profile.superRange,
-            profile.superSpeed,
-            profile.superDamage,
+            profile.superAttack.range,
+            profile.superAttack.speed,
+            profile.superAttack.damage,
             profile.color,
             activeFighterIndex,
             facingDirection
@@ -1400,9 +1210,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateSuperProjectiles(float dt) {
-        Iterator<SuperProjectile> iterator = superProjectiles.iterator();
+        Iterator<Projectile> iterator = superProjectiles.iterator();
         while (iterator.hasNext()) {
-            SuperProjectile projectile = iterator.next();
+            Projectile projectile = iterator.next();
             float previousX = projectile.x;
             projectile.x += projectile.speed * projectile.direction * dt;
 
@@ -1532,7 +1342,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             if (t >= 1f) {
                 activeFighterIndex = (activeFighterIndex + 1) % team.length;
-                spriteFighterRenderer.setCharacter(GeneratedCharacters.TEAM[activeFighterIndex]);
+                spriteFighterRenderer.setCharacter(activeCharacter().id);
                 tagPhase = TAG_ENTER;
                 tagPhaseTimer = 0f;
                 tagVisualOffsetX =
@@ -1635,23 +1445,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         fighter.refreshHudLabels();
     }
 
-    private float superGainForAttack(String type) {
-        if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
-        if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;
-        if ("H".equals(type) || "2H".equals(type)) return SUPER_GAIN_HEAVY;
-        if ("S".equals(type)) return SUPER_GAIN_ENERGY;
-        return 0f;
-    }
-
-    private float superGainForGuard(String type) {
-        if ("L".equals(type) || "2L".equals(type)) return SUPER_GUARD_GAIN_LIGHT;
-        if ("M".equals(type) || "2M".equals(type)) return SUPER_GUARD_GAIN_MEDIUM;
-        if ("H".equals(type) || "2H".equals(type)) return SUPER_GUARD_GAIN_HEAVY;
-        if ("S".equals(type)) return SUPER_GUARD_GAIN_ENERGY;
-        if ("SUPER".equals(type)) return SUPER_GUARD_GAIN_SUPER;
-        return 0f;
-    }
-
     private void startAttack(String type) {
         if (playerMovementLocked) return;
 
@@ -1660,52 +1453,35 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         forwardDashing = false;
         backDashTimer = 0f;
 
-        if ("L".equals(type) || "2L".equals(type)) attackDuration = 0.16f;
-        else if ("M".equals(type) || "2M".equals(type)) attackDuration = 0.26f;
-        else if ("S".equals(type)) attackDuration = 0.30f;
-        else attackDuration = 0.40f;
-
-        activeSpriteMove = grounded
-            ? GeneratedCharacters.get(GeneratedCharacters.TEAM[activeFighterIndex]).moves.get(type)
-            : null;
-        if (activeSpriteMove != null) attackDuration = activeSpriteMove.animation.duration;
+        if ("S".equals(type)) {
+            activeMove = null;
+            attackDuration = ENERGY_ATTACK_DURATION;
+        } else {
+            // Gameplay timing comes from the pack's frame data, not from the art.
+            activeMove = activeCharacter().move(type, !grounded);
+            attackDuration = activeMove.totalTime;
+        }
         attackTimer = attackDuration;
-
     }
 
-    private int damageForAttack(String type) {
-        return damageForAttack(activeFighter().profile, type);
-    }
-
-    private float reachForAttack(String type) {
-        if ("L".equals(type) || "2L".equals(type)) return 118f;
-        if ("M".equals(type) || "2M".equals(type)) return 150f;
-        if ("H".equals(type) || "2H".equals(type)) return 182f;
-        return 0f;
+    private boolean isPlayerCrouching() {
+        return crouching || isCrouchAttackActive();
     }
 
     private void tryApplyMeleeDamage() {
         if (attackHitApplied || attackTimer <= 0f || dummyLife <= 0) return;
         if ("S".equals(attackType)) return;
 
-        int damage = activeSpriteMove != null ? activeSpriteMove.damage : damageForAttack(attackType);
-        float reach = activeSpriteMove != null ? activeSpriteMove.reach : reachForAttack(attackType);
-        if (damage <= 0 || reach <= 0f) return;
-        if (activeSpriteMove != null) {
-            if (!activeSpriteMove.active(attackDuration - attackTimer)) return;
-        } else if (attackPhase() < 0.72f) return;
+        CharacterDefinition.Move move = activeMove;
+        if (move == null) return;
+        if (!move.active(attackDuration - attackTimer)) return;
+        if (!CombatRules.meleeConnects(
+            playerX, playerY, facingDirection, move,
+            dummyX, dummyY, opponentProfile().body, isOpponentCrouching()
+        )) return;
+        int damage = move.damage;
 
-        float horizontalDistance =
-            (dummyX - playerX) * facingDirection;
-        if (horizontalDistance < 18f || horizontalDistance > reach) return;
-
-        float playerAttackCenterY = (crouching || isCrouchAttackActive())
-            ? playerY - 42f
-            : playerY - 78f;
-        float dummyCenterY = (dummyGameplayTop() + dummyY) * 0.5f;
-        if (Math.abs(playerAttackCenterY - dummyCenterY) > 92f) return;
-
-        addSuperMeter(activeFighter(), superGainForAttack(attackType));
+        addSuperMeter(activeFighter(), CombatRules.superGainForAttack(attackType));
         applyDummyDamage(damage, facingDirection);
 
         if ("2M".equals(attackType)) {
@@ -1731,6 +1507,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         dummyAttackTimer = 0f;
         dummyAttackType = "";
+        opponentMove = null;
         dummyAttackHitApplied = false;
         aiAttackCooldownRemaining = Math.max(
             aiAttackCooldownRemaining,
@@ -1741,7 +1518,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         dummyLife -= applied;
         opponentFighter.life = dummyLife;
         opponentFighter.refreshHudLabels();
-        dummyLifeHudLabel = dummyLife + " / " + DUMMY_MAX_LIFE;
+        dummyLifeHudLabel = dummyLife + " / " + opponentProfile().maxLife;
         dummyDamageLabel = "-" + applied;
         dummyDamageLabelTimer = 0.72f;
 
@@ -1762,25 +1539,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float radius
     ) {
         if (activeFighter().life <= 0) return false;
-
-        float halfWidth = 34f;
-        float playerLeft = playerX - halfWidth;
-        float playerRight = playerX + halfWidth;
-        float projectileLeft = Math.min(previousX, nextX) - radius;
-        float projectileRight = Math.max(previousX, nextX) + radius;
-
-        boolean horizontalHit =
-            projectileRight >= playerLeft &&
-            projectileLeft <= playerRight;
-
-        float bodyHeight =
-            (crouching || isCrouchAttackActive()) ? 90f : 145f;
-        float playerTop = playerY - bodyHeight;
-        boolean verticalHit =
-            y + radius >= playerTop &&
-            y - radius <= playerY;
-
-        return horizontalHit && verticalHit;
+        return CombatRules.projectileHits(
+            previousX, nextX, y, radius,
+            playerX, playerY, activeFighter().profile.body, isPlayerCrouching()
+        );
     }
 
     private boolean projectileHitsDummy(
@@ -1790,32 +1552,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float radius
     ) {
         if (dummyLife <= 0) return false;
-
-        float dummyLeft = dummyX - DUMMY_HALF_WIDTH;
-        float dummyRight = dummyX + DUMMY_HALF_WIDTH;
-        float projectileLeft = Math.min(previousX, nextX) - radius;
-        float projectileRight = Math.max(previousX, nextX) + radius;
-
-        boolean horizontalHit =
-            projectileRight >= dummyLeft &&
-            projectileLeft <= dummyRight;
-        boolean verticalHit =
-            y + radius >= dummyGameplayTop() &&
-            y - radius <= dummyY;
-
-        return horizontalHit && verticalHit;
+        return CombatRules.projectileHits(
+            previousX, nextX, y, radius,
+            dummyX, dummyY, opponentProfile().body, isOpponentCrouching()
+        );
     }
 
     private boolean hasActiveEnergyProjectile(int ownerIndex) {
-        for (EnergyProjectile projectile : energyProjectiles) {
+        for (Projectile projectile : energyProjectiles) {
             if (projectile.ownerIndex == ownerIndex) return true;
         }
         return false;
     }
 
     private void fireEnergyAttack(String strength) {
-        FighterProfile profile = activeFighter().profile;
-        if (!profile.hasEnergyAttack) return;
+        CharacterDefinition.Fighter profile = activeFighter().profile;
+        if (!profile.hasEnergyAttack()) return;
         if (hasActiveEnergyProjectile(activeFighterIndex)) return;
 
         float speedMultiplier;
@@ -1843,12 +1595,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         startAttack("S");
 
         float spawnY = playerY - (crouching ? 65f : 82f);
-        energyProjectiles.add(new EnergyProjectile(
+        energyProjectiles.add(new Projectile(
             playerX + facingDirection * 62f,
             spawnY,
-            profile.energyRange,
-            profile.energySpeed * speedMultiplier,
-            Math.round(profile.energyDamage * damageMultiplier),
+            profile.energy.range,
+            profile.energy.speed * speedMultiplier,
+            Math.round(profile.energy.damage * damageMultiplier),
             profile.color,
             activeFighterIndex,
             facingDirection
@@ -1857,11 +1609,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private boolean tryFirePendingEnergy(String attackButton, long nowMs) {
-        FighterProfile profile = activeFighter().profile;
+        CharacterDefinition.Fighter profile = activeFighter().profile;
 
         if (
             playerMovementLocked ||
-            !profile.hasEnergyAttack ||
+            !profile.hasEnergyAttack() ||
             hasActiveEnergyProjectile(activeFighterIndex) ||
             pendingEnergyUntilMs < nowMs
         ) {
@@ -1876,9 +1628,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateEnergyProjectiles(float dt) {
-        Iterator<EnergyProjectile> iterator = energyProjectiles.iterator();
+        Iterator<Projectile> iterator = energyProjectiles.iterator();
         while (iterator.hasNext()) {
-            EnergyProjectile projectile = iterator.next();
+            Projectile projectile = iterator.next();
             float previousX = projectile.x;
             projectile.x += projectile.speed * projectile.direction * dt;
 
@@ -1913,7 +1665,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 ) {
                     addSuperMeter(
                         team[projectile.ownerIndex],
-                        superGainForAttack("S")
+                        CombatRules.superGainForAttack("S")
                     );
                 }
                 applyDummyDamage(projectile.damage, projectile.direction);
@@ -1959,9 +1711,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void tryEnergyCommand(long nowMs) {
-        FighterProfile profile = activeFighter().profile;
+        CharacterDefinition.Fighter profile = activeFighter().profile;
         if (
-            !profile.hasEnergyAttack ||
+            !profile.hasEnergyAttack() ||
             profile.energyCommand.length == 0 ||
             hasActiveEnergyProjectile(activeFighterIndex)
         ) {
@@ -2018,7 +1770,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void triggerAutoCombo(long nowMs) {
-        String[] combo = activeFighter().profile.baseCombo;
+        String[] combo = activeFighter().profile.autoCombo;
         if (combo.length == 0) return;
 
         if (nowMs - lastAutoComboTapMs > AUTO_COMBO_RESET_MS) {
@@ -2069,10 +1821,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return GUARD_NONE;
     }
 
-    private boolean isLowAttack(String type) {
-        return "2L".equals(type) || "2M".equals(type);
-    }
-
     private boolean isProjectileOrSuper(String type) {
         return "S".equals(type) || "SUPER".equals(type);
     }
@@ -2089,7 +1837,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         if (guard == GUARD_HIGH) {
-            return !isLowAttack(type);
+            return !CombatRules.isLowAttack(type);
         }
 
         if (guard == GUARD_LOW) {
@@ -2103,7 +1851,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int guard = currentPlayerGuardState();
         if (guard == GUARD_NONE) return false;
 
-        for (EnergyProjectile projectile : energyProjectiles) {
+        for (Projectile projectile : energyProjectiles) {
             if (projectile.ownerIndex != AI_OWNER_INDEX) continue;
 
             float toPlayer = playerX - projectile.x;
@@ -2112,7 +1860,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
         }
 
-        for (SuperProjectile projectile : superProjectiles) {
+        for (Projectile projectile : superProjectiles) {
             if (projectile.ownerIndex != AI_OWNER_INDEX) continue;
 
             float toPlayer = playerX - projectile.x;
@@ -2137,18 +1885,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             return false;
         }
 
-        float reach = reachForAttack(dummyAttackType);
-        if (reach <= 0f) return false;
-
-        float phase = aiAttackPhase();
-        if (phase < 0.40f) return false;
-
-        int direction = opponentFacingDirection();
-        float horizontalDistance = (playerX - dummyX) * direction;
-
-        return
-            horizontalDistance >= 0f &&
-            horizontalDistance <= reach + 34f;
+        if (opponentMove == null) return false;
+        return CombatRules.meleeThreatens(
+            dummyX,
+            opponentFacingDirection(),
+            opponentMove,
+            dummyAttackDuration - dummyAttackTimer,
+            playerX,
+            activeCharacter().fighter.body
+        );
     }
 
     private int anticipatedPlayerGuardPose() {
@@ -2172,7 +1917,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         playerBlockstunTimer = BLOCKSTUN_DURATION;
         playerMovementLocked = true;
         playerKnockbackVelocityX = hitDirection * BLOCK_PUSH_SPEED;
-        addSuperMeter(activeFighter(), superGainForGuard(type));
+        addSuperMeter(activeFighter(), CombatRules.superGainForGuard(type));
 
         attackType = "";
         attackTimer = 0f;
@@ -2193,7 +1938,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             applyPlayerBlock(hitDirection, type);
             return;
         }
-        addSuperMeter(opponentFighter, superGainForAttack(type));
+        addSuperMeter(opponentFighter, CombatRules.superGainForAttack(type));
         applyDamage(damage);
         if (activeFighter().life <= 0) {
             playerMovementLocked = true;
@@ -2336,12 +2081,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
-    private float attackPhase() {
-        if (attackTimer <= 0f || attackDuration <= 0f) return 0f;
-        float t = 1f - attackTimer / attackDuration;
-        return t < 0.5f ? t * 2f : (1f - t) * 2f;
-    }
-
     private void updateFightCamera(float dt) {
         float separationX = Math.abs(playerX - dummyX);
         float requiredWorldWidth =
@@ -2350,13 +2089,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float targetZoomX =
             VW / Math.max(VW / CAMERA_ZOOM, requiredWorldWidth);
 
-        float playerTop =
-            playerY - (
-                (crouching || isCrouchAttackActive())
-                    ? 90f
-                    : 145f
-            );
-        float opponentTop = dummyTop();
+        // Frame what is actually drawn: opaque sprite height measured at import time.
+        float playerTop = playerY - (isPlayerCrouching()
+            ? activeCharacter().visualCrouchHeight
+            : activeCharacter().visualStandHeight);
+        float opponentTop = opponentVisualTop();
         float highestFighterTop = Math.min(playerTop, opponentTop);
         float heightAboveGround =
             Math.max(1f, GROUND_Y - highestFighterTop);
@@ -2476,9 +2213,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.save();
             canvas.translate(tagVisualOffsetX, 0f);
-            if (facingDirection < 0) {
-                canvas.scale(-1f, 1f, playerX, 0f);
-            }
             drawPlayer(canvas);
             canvas.restore();
             drawSuperFlash(canvas);
@@ -2567,7 +2301,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(22);
         paint.setFakeBoldText(true);
-        c.drawText(active.profile.name, 122, 58, paint);
+        c.drawText(active.profile.hudName, 122, 58, paint);
         paint.setFakeBoldText(false);
 
         drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
@@ -2592,7 +2326,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("SPRITE GPT • v0.58", 975, 59, paint);
+        c.drawText(VERSION_HUD_LABEL, 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2600,8 +2334,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText(currentStateLabel(), 1032, 88, paint);
 
         paint.setTextSize(14f);
-        CharacterDefinition visualCharacter =
-            GeneratedCharacters.get(GeneratedCharacters.TEAM[activeFighterIndex]);
+        CharacterDefinition visualCharacter = activeCharacter();
         c.drawText(
             "CHAR: " + visualCharacter.displayName,
             975,
@@ -2836,7 +2569,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawDamageDummy(Canvas c) {
-        float top = dummyTop();
+        float top = opponentVisualTop();
         float baseY = dummyY;
 
         paint.setColor(Color.argb(70, 0, 0, 0));
@@ -2851,51 +2584,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         boolean hitFlash =
             dummyHitReactionTimer > DUMMY_HIT_REACTION_DURATION - 0.065f;
 
+        float angle = knockdownAngle(
+            opponentSpriteRenderer,
+            dummyKnockdownState,
+            dummyKnockdownTimer,
+            opponentFacingDirection()
+        );
         c.save();
-        if (facingDirection > 0) {
-            // Jogador à esquerda: o NPC olha para a esquerda.
-            c.scale(-1f, 1f, dummyX, 0f);
-        }
-
-        float knockdownAngle = 0f;
-        if (dummyKnockdownState == DUMMY_KD_FALL) {
-            float t = clamp(
-                dummyKnockdownTimer / DUMMY_KD_FALL_DURATION,
-                0f,
-                1f
-            );
-            knockdownAngle = 88f * t;
-        } else if (dummyKnockdownState == DUMMY_KD_DOWN) {
-            knockdownAngle = 88f;
-        } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
-            float t = clamp(
-                dummyKnockdownTimer / DUMMY_KD_GETUP_DURATION,
-                0f,
-                1f
-            );
-            knockdownAngle = 88f * (1f - t);
-        }
-
-        if (knockdownAngle > 0f) {
-            c.rotate(knockdownAngle, dummyX, GROUND_Y);
-        }
-
+        if (angle != 0f) c.rotate(angle, dummyX, GROUND_Y);
         opponentSpriteRenderer.draw(
             c,
-            paint,
             dummyX,
             baseY,
+            opponentFacingDirection(),
             hitFlash && dummyLife > 0,
             false
         );
         c.restore();
 
-
         float barLeft = dummyX - 125f;
         float barRight = dummyX + 125f;
         float barTop = top - 54f;
         float barBottom = barTop + 16f;
-        float lifeRatio = dummyLife / (float)DUMMY_MAX_LIFE;
+        float lifeRatio = dummyLife / (float)opponentProfile().maxLife;
 
         paint.setColor(Color.argb(205, 12, 16, 28));
         c.drawRoundRect(
@@ -3002,7 +2713,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawEnergyProjectiles(Canvas c) {
-        for (EnergyProjectile projectile : energyProjectiles) {
+        for (Projectile projectile : energyProjectiles) {
             c.save();
             if (projectile.direction < 0) {
                 c.scale(-1f, 1f, projectile.x, projectile.y);
@@ -3021,7 +2732,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawSuperProjectiles(Canvas c) {
-        for (SuperProjectile projectile : superProjectiles) {
+        for (Projectile projectile : superProjectiles) {
             c.save();
             if (projectile.direction < 0) {
                 c.scale(-1f, 1f, projectile.x, projectile.y);
@@ -3095,56 +2806,106 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
     }
 
+    private float reactionElapsed;
+
+    /**
+     * Reaction states shared by every fighter: knockdown, launch and hit stun. Returns
+     * null when the pack has no art for the current reaction (the caller keeps its pose).
+     */
+    private String reactionState(
+        SpriteFighterRenderer renderer,
+        int knockdownState,
+        float knockdownTimer,
+        boolean launched,
+        float hitTimer,
+        boolean airborne,
+        boolean crouch
+    ) {
+        String state = null;
+        reactionElapsed = knockdownTimer;
+        if (knockdownState == DUMMY_KD_FALL) state = SpriteStates.KNOCKDOWN;
+        else if (knockdownState == DUMMY_KD_DOWN) state = SpriteStates.GROUNDED;
+        else if (knockdownState == DUMMY_KD_GETUP) state = SpriteStates.GETUP;
+        else if (launched) {
+            state = SpriteStates.HIT_AIR;
+            reactionElapsed = 0f;
+        } else if (hitTimer > 0f) {
+            state = airborne
+                ? SpriteStates.HIT_AIR
+                : (crouch ? SpriteStates.HIT_CROUCH : SpriteStates.HIT_STAND);
+            reactionElapsed = DUMMY_HIT_REACTION_DURATION - hitTimer;
+        }
+        return state != null && renderer.hasAnimation(state) ? state : null;
+    }
+
+    /** Vector fallback for packs without KNOCKDOWN/GROUNDED/GETUP: fall backwards. */
+    private float knockdownAngle(
+        SpriteFighterRenderer renderer,
+        int knockdownState,
+        float knockdownTimer,
+        int fighterFacing
+    ) {
+        if (renderer.hasAnimation(SpriteStates.KNOCKDOWN)) return 0f;
+        float lean;
+        if (knockdownState == DUMMY_KD_FALL) {
+            lean = clamp(knockdownTimer / DUMMY_KD_FALL_DURATION, 0f, 1f);
+        } else if (knockdownState == DUMMY_KD_DOWN) {
+            lean = 1f;
+        } else if (knockdownState == DUMMY_KD_GETUP) {
+            lean = 1f - clamp(knockdownTimer / DUMMY_KD_GETUP_DURATION, 0f, 1f);
+        } else {
+            return 0f;
+        }
+        return -88f * lean * fighterFacing;
+    }
+
     private void updateSpriteMotion(float dt, float travel) {
         int guard = playerBlockstunTimer > 0f
             ? playerLastGuardState
             : anticipatedPlayerGuardPose();
+        CharacterDefinition character = activeCharacter();
 
-        String animation = null;
-        float animationElapsed = 0f;
+        String animation = reactionState(
+            spriteFighterRenderer,
+            playerKnockdownState,
+            playerKnockdownTimer,
+            playerLaunchedByHit || playerGroundSlam,
+            playerHitReactionTimer,
+            !grounded,
+            crouching
+        );
+        float animationElapsed = reactionElapsed;
 
-        if (playerKnockdownState == DUMMY_KD_FALL &&
-            spriteFighterRenderer.hasAnimation("KNOCKDOWN")) {
-            animation = "KNOCKDOWN";
-            animationElapsed = playerKnockdownTimer;
-        } else if (playerKnockdownState == DUMMY_KD_DOWN &&
-            spriteFighterRenderer.hasAnimation("GROUNDED")) {
-            animation = "GROUNDED";
-            animationElapsed = playerKnockdownTimer;
-        } else if (playerKnockdownState == DUMMY_KD_GETUP &&
-            spriteFighterRenderer.hasAnimation("GETUP")) {
-            animation = "GETUP";
-            animationElapsed = playerKnockdownTimer;
-        } else if ((playerLaunchedByHit || playerGroundSlam) &&
-            spriteFighterRenderer.hasAnimation("HIT_AIR")) {
-            animation = "HIT_AIR";
-        } else if (playerHitReactionTimer > 0f) {
-            String hit = !grounded
-                ? "HIT_AIR"
-                : (crouching ? "HIT_CROUCH" : "HIT_STAND");
-            if (spriteFighterRenderer.hasAnimation(hit)) {
-                animation = hit;
-                animationElapsed =
-                    DUMMY_HIT_REACTION_DURATION - playerHitReactionTimer;
-            }
-        } else if (guard != GUARD_NONE) {
+        if (animation == null && guard != GUARD_NONE) {
             String defense = guard == GUARD_LOW
-                ? "DEFENSE_CROUCH"
-                : "DEFENSE_STAND";
+                ? SpriteStates.DEFENSE_CROUCH
+                : SpriteStates.DEFENSE_STAND;
             if (spriteFighterRenderer.hasAnimation(defense)) {
                 animation = defense;
                 animationElapsed = playerBlockstunTimer > 0f
                     ? BLOCKSTUN_DURATION - playerBlockstunTimer
                     : 0f;
             }
-        } else if (attackTimer > 0f) {
-            // Standing L/M/H keep their authored move animation.
-            // Crouching and aerial attacks intentionally use the pre-v0.59
-            // fallback until dedicated reviewed sprites exist for each move.
-            if (activeSpriteMove != null) {
-                animation = activeSpriteMove.animation.id;
+        }
+        if (animation == null && isSuperPoseActive()) {
+            CharacterDefinition.Animation special = character.specialAnimations.get("SUPER");
+            if (special != null) {
+                animation = special.id;
+                animationElapsed = special.timeFor(superPoseElapsed(), SUPER_POSE_TOTAL);
             }
-            animationElapsed = attackDuration - attackTimer;
+        } else if (animation == null && attackTimer > 0f) {
+            float elapsed = attackDuration - attackTimer;
+            if (activeMove != null && activeMove.animation != null) {
+                animation = activeMove.animation.id;
+                animationElapsed = activeMove.animationTime(elapsed);
+            } else if (activeMove == null) {
+                CharacterDefinition.Animation special = character.specialAnimations.get("S");
+                if (special != null) {
+                    animation = special.id;
+                    animationElapsed = special.timeFor(elapsed, attackDuration);
+                }
+            }
+            // Otherwise the move declared a pose: crouch flag or airborne physics below.
         }
 
         boolean combatPose =
@@ -3158,7 +2919,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         spriteFighterRenderer.update(
             dt,
             grounded,
-            crouching || isCrouchAttackActive() || guard == GUARD_LOW,
+            isPlayerCrouching() || guard == GUARD_LOW,
             velocityY,
             travel,
             travel * facingDirection > 0,
@@ -3171,48 +2932,36 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
     }
 
+    private static final float SUPER_POSE_TOTAL =
+        SUPER_POSE_DURATION + SUPER_FLASH_DURATION + SUPER_RELEASE_DURATION;
+
+    private float superPoseElapsed() {
+        if (superPhase == SUPER_POSE) return superPhaseTimer;
+        if (superPhase == SUPER_FLASH) return SUPER_POSE_DURATION + superPhaseTimer;
+        if (superPhase == SUPER_RELEASE) {
+            return SUPER_POSE_DURATION + SUPER_FLASH_DURATION + superPhaseTimer;
+        }
+        return 0f;
+    }
+
     private void drawPlayer(Canvas c) {
-        float baseY = playerY;
-
-        float playerKnockdownAngle = 0f;
-        boolean hasKnockdownSprites =
-            spriteFighterRenderer.hasAnimation("KNOCKDOWN") &&
-            spriteFighterRenderer.hasAnimation("GROUNDED") &&
-            spriteFighterRenderer.hasAnimation("GETUP");
-        if (!hasKnockdownSprites) {
-            if (playerKnockdownState == DUMMY_KD_FALL) {
-                float t = clamp(
-                    playerKnockdownTimer / DUMMY_KD_FALL_DURATION,
-                    0f,
-                    1f
-                );
-                playerKnockdownAngle = -88f * t;
-            } else if (playerKnockdownState == DUMMY_KD_DOWN) {
-                playerKnockdownAngle = -88f;
-            } else if (playerKnockdownState == DUMMY_KD_GETUP) {
-                float t = clamp(
-                    playerKnockdownTimer / DUMMY_KD_GETUP_DURATION,
-                    0f,
-                    1f
-                );
-                playerKnockdownAngle = -88f * (1f - t);
-            }
-        }
-
-        if (playerKnockdownAngle != 0f) {
-            c.rotate(
-                playerKnockdownAngle,
-                playerX,
-                GROUND_Y
-            );
-        }
-
-        int guardPose = playerBlockstunTimer > 0f
-            ? playerLastGuardState
-            : anticipatedPlayerGuardPose();
-
-        spriteFighterRenderer.draw(c,paint,playerX,baseY,
-            playerDamageFlashTimer>0,playerBlockFlashTimer>0);
+        float angle = knockdownAngle(
+            spriteFighterRenderer,
+            playerKnockdownState,
+            playerKnockdownTimer,
+            facingDirection
+        );
+        c.save();
+        if (angle != 0f) c.rotate(angle, playerX, GROUND_Y);
+        spriteFighterRenderer.draw(
+            c,
+            playerX,
+            playerY,
+            facingDirection,
+            playerDamageFlashTimer > 0,
+            playerBlockFlashTimer > 0
+        );
+        c.restore();
     }
 
     private void drawControls(Canvas c) {

@@ -33,29 +33,103 @@ final class CharacterDefinition {
             for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return frames[i];t-=durations[i]; }
             return frames[frames.length-1];
         }
+        /** Maps a gameplay clock of the given length onto this clip, keeping frame proportions. */
+        float timeFor(float elapsed,float gameplayDuration) {
+            if(gameplayDuration<=0f)return elapsed;
+            return Math.max(0f,elapsed)*duration/gameplayDuration;
+        }
     }
+    /**
+     * Frame data of one input. Gameplay timing (totalTime/active window) belongs to the
+     * move; the animation, when present, is stretched to fit it. A move without art keeps
+     * a declared body pose instead.
+     */
     static final class Move {
+        final String binding;
         final Animation animation;
+        final String pose;
         final int damage;
-        final float activeStart,activeEnd,reach;
-        Move(Animation animation,int damage,float activeStart,float activeEnd,float reach) {
-            this.animation=animation;this.damage=damage;this.activeStart=activeStart;this.activeEnd=activeEnd;this.reach=reach;
+        final float totalTime,activeStart,activeEnd,reach,hitHeight;
+        Move(String binding,Animation animation,String pose,int damage,float totalTime,
+             float activeStart,float activeEnd,float reach,float hitHeight) {
+            this.binding=binding;this.animation=animation;this.pose=pose;this.damage=damage;
+            this.totalTime=totalTime;this.activeStart=activeStart;this.activeEnd=activeEnd;
+            this.reach=reach;this.hitHeight=hitHeight;
         }
         boolean active(float elapsed) { return elapsed+0.000001f>=activeStart && elapsed<activeEnd; }
+        /** Window where a defender sees the strike coming (used by anticipated guard). */
+        boolean threatening(float elapsed) {
+            float lead=0.16f*totalTime;
+            return elapsed>=activeStart-lead && elapsed<=activeEnd+lead;
+        }
+        float animationTime(float elapsed) { return animation==null?0f:animation.timeFor(elapsed,totalTime); }
+    }
+    static final class Projectile {
+        final int damage;
+        final float range,speed;
+        Projectile(int damage,float range,float speed) { this.damage=damage;this.range=range;this.speed=speed; }
+    }
+    /** Gameplay hurtbox in world units, independent of the PNG canvas. */
+    static final class Body {
+        final float halfWidth,standHeight,crouchHeight;
+        Body(float halfWidth,float standHeight,float crouchHeight) {
+            this.halfWidth=halfWidth;this.standHeight=standHeight;this.crouchHeight=crouchHeight;
+        }
+        float height(boolean crouching) { return crouching?crouchHeight:standHeight; }
+    }
+    /** Fighter rules that used to live in GameView.FighterProfile. */
+    static final class Fighter {
+        final String hudName,reserveHudLabel;
+        final int color,maxLife;
+        final String[] autoCombo;
+        final Projectile energy,superAttack;
+        final int[] energyCommand;
+        final Body body;
+        Fighter(String hudName,int color,int maxLife,String[] autoCombo,Projectile energy,
+                int[] energyCommand,Projectile superAttack,Body body) {
+            this.hudName=hudName;this.reserveHudLabel="RESERVA: "+hudName;this.color=color;this.maxLife=maxLife;
+            this.autoCombo=autoCombo.clone();this.energy=energy;this.energyCommand=energyCommand.clone();
+            this.superAttack=superAttack;this.body=body;
+        }
+        boolean hasEnergyAttack() { return energy!=null; }
+        boolean hasSuperAttack() { return superAttack!=null; }
     }
     final String id,displayName;
     final CharacterVisualProfile profile;
+    /** +1 when the art faces right, -1 when it faces left. */
+    final int artFacing;
+    /** Opaque height above the root in world units, measured by the importer. */
+    final float visualStandHeight,visualCrouchHeight;
+    final Fighter fighter;
     final Map<String,Animation> animations;
     final Map<String,Move> moves;
-    CharacterDefinition(String id,String displayName,CharacterVisualProfile profile,
-                        Map<String,Animation> animations,Map<String,Move> moves) {
-        this.id=id;this.displayName=displayName;this.profile=profile;
+    final Map<String,Animation> specialAnimations;
+    CharacterDefinition(String id,String displayName,CharacterVisualProfile profile,int artFacing,
+                        float visualStandHeight,float visualCrouchHeight,Fighter fighter,
+                        Map<String,Animation> animations,Map<String,Move> moves,
+                        Map<String,Animation> specialAnimations) {
+        this.id=id;this.displayName=displayName;this.profile=profile;this.artFacing=artFacing;
+        this.visualStandHeight=visualStandHeight;this.visualCrouchHeight=visualCrouchHeight;this.fighter=fighter;
         this.animations=Collections.unmodifiableMap(new LinkedHashMap<>(animations));
         this.moves=Collections.unmodifiableMap(new LinkedHashMap<>(moves));
+        this.specialAnimations=Collections.unmodifiableMap(new LinkedHashMap<>(specialAnimations));
+    }
+    /** Copy with different animations; used by tests and tooling. */
+    CharacterDefinition withAnimations(String id,Map<String,Animation> animations) {
+        return new CharacterDefinition(id,id,profile,artFacing,visualStandHeight,visualCrouchHeight,
+            fighter,animations,moves,specialAnimations);
     }
     Animation animation(String id) {
         Animation value=animations.get(id);
         if(value==null)throw new IllegalArgumentException("Unknown animation "+this.id+"/"+id);
         return value;
+    }
+    /**
+     * Resolves the move for an input. Airborne attacks use the jL/jM/jH bindings; every
+     * binding is mandatory in the pack, so this never falls back silently.
+     */
+    Move move(String type,boolean airborne) {
+        String binding=airborne ? "j"+(type.startsWith("2")?type.substring(1):type) : type;
+        return moves.get(binding);
     }
 }

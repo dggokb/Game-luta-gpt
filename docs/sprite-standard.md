@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — GPT v0.62
+# Padrão de personagens e sprites — GPT v0.63
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -8,7 +8,7 @@ normalização de imagens durante a partida.
 
 | Arquivo/pasta | Responsabilidade |
 | --- | --- |
-| `characters/<id>/character.json` | Identidade visual, animações e golpes |
+| `characters/<id>/character.json` | Identidade visual, regras do lutador, animações e golpes (schema 2) |
 | `characters/roster.json` | Personagem visual dos dois slots do time |
 | `tools/sprites/profiles/<id>.json` | Tamanho, raiz, escala e exigências de qualidade |
 | `tools/sprites/clips/*.json` | Fonte, segmentação, quantidade de frames e destinos |
@@ -16,8 +16,8 @@ normalização de imagens durante a partida.
 
 O build descobre todos os `character.json` e todos os clips. Não existe uma lista
 manual de personagens no renderer. `GeneratedCharacters.java`,
-`GeneratedSpriteLayouts.java`, os atlas em `drawable-nodpi` e os relatórios em
-`tools/sprites/reports` são saídas geradas e versionadas. Não editar à mão.
+`GeneratedSpriteLayouts.java`, `SpriteStates.java`, os atlas em `drawable-nodpi` e os
+relatórios em `tools/sprites/reports` são saídas geradas e versionadas. Não editar à mão.
 
 ## Fluxo de trabalho
 
@@ -30,15 +30,18 @@ cd android
 gradle testDebugUnitTest assembleDebug
 ```
 
-O `preBuild` do Gradle também executa a geração. Python 3.9+ e a versão de Pillow
-fixada no requirements são pré-requisitos do ambiente de desenvolvimento, além de
-Java 17, Gradle 8.7 e Android SDK 35. O APK não precisa de Python.
+O `preBuild` do Gradle apenas **verifica** (`--check`) as saídas versionadas; ele nunca
+reescreve arquivos rastreados. Sem Python 3.9+/Pillow o build local emite um aviso e
+continua (as saídas já estão no repositório); a CI usa `-PrequireSpriteCheck=true` e
+falha se a verificação não puder rodar. Java 17, Gradle 8.7 e Android SDK 35 continuam
+pré-requisitos. O APK não precisa de Python.
 
 O importador trabalha em uma pasta temporária. Somente depois de validar todos os
 pacotes publica as saídas; um erro de configuração não deixa metade dos atlas
 atualizada. `--check` compara todas as saídas declaradas, sem modificar os arquivos
-versionados. A CI rejeita saídas desatualizadas antes do build. Ao remover um clip,
-remova também seu PNG e relatório antigos do repositório.
+versionados. A CI rejeita saídas desatualizadas antes do build e nunca faz commit.
+Saídas órfãs (PNG/relatório sem clip) reprovam o `--check`; o `--write` as remove.
+Arte em `art/sprites/source/` que nenhum clip ou perfil referencia reprova os dois modos.
 
 ## Novo personagem
 
@@ -47,21 +50,47 @@ remova também seu PNG e relatório antigos do repositório.
 2. Adicione as fontes e os clips correspondentes, com IDs e saídas únicos.
 3. Copie `characters/player_base/character.json` para
    `characters/<novo_id>/character.json`. O campo `id` deve coincidir com a pasta.
-   Ajuste nome, perfil, atlas, animações e golpes.
+   Ajuste nome, perfil, `artFacing`, o bloco `fighter`, atlas, animações e os nove golpes.
 4. Substitua um dos IDs de `characters/roster.json` para testar no time. O primeiro
    slot deve ser igual a `defaultCharacter`. O cadastro é gerado automaticamente.
 5. Gere, revise a prévia, execute os testes e confira o APK no Android.
 
-O pacote é uma definição visual e dos ataques normais em pé. Vida, velocidade,
-combos, projéteis, Super e IA continuam no `FighterProfile`/`GameView`; criar uma
-mecânica de personagem inédita ainda exige programação. O oponente mantém seu
-renderer anterior. Não confundir registro visual automático com um editor completo
-de todos os sistemas do jogo.
+O pacote é a fonte única do lutador: visual, vida, cor do HUD, auto-combo, projétil de
+energia (dano, alcance, velocidade, comando), Super, hurtbox e o frame data de todos os
+golpes normais. Física geral (velocidade de andar, pulo, gravidade), regras de medidor,
+estados de knockdown e a IA continuam no código; uma mecânica inédita ainda exige
+programação.
+
+### Bloco `fighter`
+
+```json
+"artFacing": "right",
+"fighter": {
+  "hudName": "PLAYER 1",
+  "color": "#F4B73B",
+  "maxLife": 10000,
+  "autoCombo": ["L", "M", "H"],
+  "body": {"halfWidth": 34, "standHeight": 145, "crouchHeight": 90},
+  "energy": {"damage": 850, "range": 720, "speed": 760, "command": [3, 1]},
+  "super": {"damage": 3200, "range": 1450, "speed": 1180}
+}
+```
+
+`body` é a hurtbox de gameplay em unidades do mundo, independente do PNG. `energy` e
+`super` são opcionais (sem eles o lutador não usa o recurso). `artFacing` diz para onde
+a arte olha; o renderer espelha a partir dele, sem flips no `GameView`.
 
 ## Estados e animações
 
 Estados semânticos obrigatórios: `IDLE`, `COMBAT`, `WALK_FORWARD`, `WALK_BACK`,
 `CROUCH`, `RISE`, `JUMP`, `FALL`, `DASH`, `BACKDASH` e `LAND`.
+
+Estados opcionais conhecidos: `DEFENSE_STAND`, `DEFENSE_CROUCH`, `HIT_STAND`,
+`HIT_CROUCH`, `HIT_AIR`, `KNOCKDOWN`, `GROUNDED` e `GETUP` (os três últimos só em
+conjunto). O vocabulário vive em `build_characters.py` e é gerado em
+`SpriteStates.java`. Qualquer outra animação precisa ser usada por um golpe ou por
+`specialAnimations`; um nome fora do vocabulário e sem uso (ex.: `HIT_STAN`) reprova o
+build em vez de cair silenciosamente no fallback.
 
 Cada animação contém `atlas`, `frames` (índices a partir de zero), `loop` e uma das
 formas de avanço:
@@ -73,6 +102,8 @@ Caminhada acompanha deslocamento físico, inclusive ao virar para o outro lado.
 Colisão com a borda não deve produzir passos no lugar. Ataques usam o relógio de
 combate; reiniciar o mesmo golpe reinicia o frame, sem herdar a recuperação anterior.
 Os IDs de animação de ataque são livres: não é necessário alterar um enum Java.
+`specialAnimations` pode ligar `S` (energia) e `SUPER` a animações one-shot; o tempo do
+especial é esticado sobre a animação.
 
 ## Novo golpe usando um comando existente
 
@@ -92,21 +123,29 @@ Exemplo de animação de quatro frames e vínculo L:
 "L": {
   "animation": "CUSTOM_PUNCH",
   "damage": 300,
+  "totalMs": 160,
   "activeStartMs": 40,
   "activeEndMs": 100,
-  "reach": 118
+  "reach": 84
 }
 ```
 
-O tempo total vem da soma dos frames. Dano só é permitido em
-`activeStartMs <= tempo < activeEndMs`, uma vez por execução. Startup e recovery
-não acertam. O autor define dano, alcance e janela ativa; o importador valida,
-mas não tenta adivinhar balanceamento pela arte.
+O pack declara **todos** os nove inputs: `L`, `M`, `H`, `2L`, `2M`, `2H`, `jL`, `jM`,
+`jH`. Cada golpe tem `animation` **ou** `pose` (nunca os dois). Sem arte própria, o
+golpe declara a postura mantida: `"pose": "CROUCH"` para 2X e `"pose": "AIR"` para jX.
+Não há empréstimo implícito de L/M/H.
 
-A v0.53 conecta L/M/H em pé. Golpes agachados, aéreos, projéteis e Super continuam
-com o comportamento anterior. Ainda não há comandos extras declarativos, cancel
-windows ou hitboxes/hurtboxes arbitrárias por frame. `reach` usa a regra de
-colisão já existente, em unidades do mundo; não é a largura do PNG.
+O tempo de gameplay vem de `totalMs`, não da arte: a animação é esticada para caber
+nele, mantendo a proporção entre frames. Retocar durações de frame muda só o visual.
+Dano só é permitido em `activeStartMs <= tempo < activeEndMs`, uma vez por execução.
+Startup e recovery não acertam.
+
+`reach` é a distância da raiz do atacante até a ponta do golpe; a meia-largura da
+hurtbox do alvo é somada na colisão, então um lutador largo é atingido mais cedo.
+(Valores antigos centro-a-centro = `reach` + 34.) `hitHeight` (opcional) é a altura
+do golpe acima do chão: padrão 42 para 2X e 78 para o resto.
+
+Ainda não há comandos extras declarativos, cancel windows ou hitboxes por frame.
 
 ## Geometria, qualidade e raízes
 
@@ -223,14 +262,15 @@ Este é o teste de independência do Character Pack Engine: o roster continua `p
 
 O roster agora declara `opponentCharacter`. O oponente deixa de depender do boneco vetorial provisório e recebe um `SpriteFighterRenderer` próprio, alimentado pelos mesmos `character.json`, perfil, atlas e estados semânticos usados pelos lutadores do time. O pack de validação `monster_npc`/“Brutamonte” usa geometria própria e é maior que os jogadores para validar escala independente.
 
-A IA continua responsável apenas por decisão, física e dano; o renderer do NPC converte deslocamento, direção, salto, crouch, dash/backdash e L/M/H em estados do pack. Não há condição de desenho específica para o monstro. Trocar o NPC visual exige somente alterar `characters/roster.json -> opponentCharacter` para outro pack válido.
+A IA continua responsável por decisão e física; desde a v0.63 dano, alcance e frame data
+do NPC também vêm do pack. O renderer do NPC converte deslocamento, direção, salto, crouch, dash/backdash e L/M/H em estados do pack. Não há condição de desenho específica para o monstro. Trocar o NPC visual exige somente alterar `characters/roster.json -> opponentCharacter` para outro pack válido.
 
-O workflow de regeneração passou a versionar saídas de qualquer pack novo, removendo o antigo filtro exclusivo de `player_two_*`.
+(Histórico: o commit automático de saídas pela CI foi removido na v0.63.)
 
 
 ## Brutamonte com arte final de teste — GPT v0.58
 
-O pack temporário 32×32 foi substituído pela arte detalhada aprovada do Brutamonte. O NPC passa a usar células 160×160 com escala de mundo própria, atlas de idle/movimento e atlas separado para postura ofensiva e L/M/H. O renderer e a IA continuam genéricos; esta alteração troca apenas assets e metadados do pack.
+O pack temporário 32×32 foi substituído pela arte detalhada aprovada do Brutamonte. (Correção: o estado final usa um único atlas `monster_npc_pack` de 16 células 256×256 com `worldScale` 1.4; o atlas separado de ações e as células 160×160 foram descartados e removidos na v0.63.) O renderer e a IA continuam genéricos; esta alteração troca apenas assets e metadados do pack.
 
 
 ## Player Base — conjunto de combate completo — GPT v0.59
@@ -292,3 +332,33 @@ O modo `prepared-grid` passa a aceitar opcionalmente `frameWidth`,
 perfil. Sem esses campos, o comportamento anterior continua usando a célula e a
 raiz base do personagem. O 2M mantém dano 500, alcance 150 e a regra existente de
 knockdown; apenas sua animação/timing visual passa a vir do Character Pack Engine.
+
+
+## Pack schema 2, fonte única e hurtbox — GPT v0.63
+
+- **Fonte única do lutador.** `FighterProfile` saiu do `GameView`. Vida, cor, nome do
+  HUD, auto-combo, energia, Super e hurtbox vêm do bloco `fighter`. O oponente usa as
+  regras do próprio pack (antes herdava as do Player 2).
+- **Frame data independente da arte.** Todo golpe tem `totalMs`; a animação é esticada
+  para caber. Os nove inputs são obrigatórios; inputs sem arte declaram `pose`. Os
+  valores que antes estavam fixos no código foram migrados sem mudança de gameplay
+  para o jogador (janela legada = 36%–64% do `totalMs`).
+- **NPC pelo pack.** Dano, janela ativa, alcance e duração dos golpes do Brutamonte
+  agora valem. 2L/2M/2H têm animações próprias (`LOW_CLAW`, `LOW_LUNGE`,
+  `RISING_SMASH`) em vez de reaproveitar L/M/H em pé, e o Super/energia tocam `ROAR`.
+  Reações (hit/knockdown) usam os estados opcionais quando o pack os tiver.
+- **Hurtbox e câmera.** Colisão usa `fighter.body` (Brutamonte: 78 × 290/240). A câmera
+  enquadra a altura opaca real medida nos relatórios (`visualStandHeight` /
+  `visualCrouchHeight`), não a célula do PNG.
+- **Memória.** Um único `SpriteAtlasCache` por partida; os atlas do time e do NPC são
+  decodificados uma vez (antes os da equipe eram decodificados duas vezes).
+- **Espelhamento.** `artFacing` + renderer; knockdown vetorial cai para trás para
+  ambos os lados.
+- **Pipeline.** Gradle só verifica; CI sem commit automático e com `contents: read`;
+  órfãos e fontes não referenciadas reprovam o build. Versão única em
+  `versionName`, exibida no HUD via `BuildConfig`.
+
+Limites conhecidos: os frames 9–11 do atlas do Brutamonte encostam na borda da célula
+(o perfil usa `minMargin: 0`), então garras/tecido aparecem cortados; corrigir exige
+reexportar a arte com células maiores. O NPC ainda reaproveita frames entre estados
+(ex.: o frame 8 serve de agachar, pouso e início de ataque).

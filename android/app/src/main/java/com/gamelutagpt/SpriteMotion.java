@@ -2,11 +2,12 @@ package com.gamelutagpt;
 
 /** Simulation selects semantic states; character data owns every frame/timing. */
 final class SpriteMotion {
-    // Stable movement vocabulary. Attack animation IDs are arbitrary manifest keys.
+    // Stable movement vocabulary (generated from the pack validator). Attack animation IDs are arbitrary manifest keys.
     static final class Clip {
-        static final String IDLE="IDLE", WALK_FORWARD="WALK_FORWARD", WALK_BACK="WALK_BACK",
-            DASH="DASH", BACKDASH="BACKDASH", CROUCH="CROUCH", RISE="RISE", JUMP="JUMP",
-            FALL="FALL", LAND="LAND", COMBAT="COMBAT";
+        static final String IDLE=SpriteStates.IDLE, WALK_FORWARD=SpriteStates.WALK_FORWARD,
+            WALK_BACK=SpriteStates.WALK_BACK, DASH=SpriteStates.DASH, BACKDASH=SpriteStates.BACKDASH,
+            CROUCH=SpriteStates.CROUCH, RISE=SpriteStates.RISE, JUMP=SpriteStates.JUMP,
+            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT;
     }
     String clip=Clip.IDLE;
     float time,distance;

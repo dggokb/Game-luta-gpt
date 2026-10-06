@@ -1,8 +1,39 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "player_two",
   "displayName": "Lutador Teste 2",
   "profile": "player_two.json",
+  "artFacing": "right",
+  "fighter": {
+    "hudName": "PLAYER 2",
+    "color": "#4ACDE8",
+    "maxLife": 10000,
+    "autoCombo": [
+      "L",
+      "L",
+      "H",
+      "M"
+    ],
+    "body": {
+      "halfWidth": 34,
+      "standHeight": 145,
+      "crouchHeight": 90
+    },
+    "energy": {
+      "damage": 650,
+      "range": 560,
+      "speed": 980,
+      "command": [
+        5,
+        1
+      ]
+    },
+    "super": {
+      "damage": 2850,
+      "range": 1320,
+      "speed": 1280
+    }
+  },
   "animations": {
     "IDLE": {
       "atlas": "player_two_idle",
@@ -193,23 +224,74 @@
     "L": {
       "animation": "LIGHT_JAB",
       "damage": 300,
+      "totalMs": 160,
       "activeStartMs": 40,
       "activeEndMs": 100,
-      "reach": 118
+      "reach": 84
     },
     "M": {
       "animation": "MEDIUM_KICK",
       "damage": 500,
+      "totalMs": 260,
       "activeStartMs": 70,
       "activeEndMs": 170,
-      "reach": 150
+      "reach": 116
     },
     "H": {
       "animation": "HEAVY_STRAIGHT",
       "damage": 800,
+      "totalMs": 400,
       "activeStartMs": 160,
       "activeEndMs": 250,
-      "reach": 182
+      "reach": 148
+    },
+    "2L": {
+      "pose": "CROUCH",
+      "damage": 300,
+      "totalMs": 160,
+      "activeStartMs": 58,
+      "activeEndMs": 102,
+      "reach": 84
+    },
+    "2M": {
+      "pose": "CROUCH",
+      "damage": 500,
+      "totalMs": 260,
+      "activeStartMs": 94,
+      "activeEndMs": 166,
+      "reach": 116
+    },
+    "2H": {
+      "pose": "CROUCH",
+      "damage": 800,
+      "totalMs": 400,
+      "activeStartMs": 144,
+      "activeEndMs": 256,
+      "reach": 148
+    },
+    "jL": {
+      "pose": "AIR",
+      "damage": 300,
+      "totalMs": 160,
+      "activeStartMs": 58,
+      "activeEndMs": 102,
+      "reach": 84
+    },
+    "jM": {
+      "pose": "AIR",
+      "damage": 500,
+      "totalMs": 260,
+      "activeStartMs": 94,
+      "activeEndMs": 166,
+      "reach": 116
+    },
+    "jH": {
+      "pose": "AIR",
+      "damage": 800,
+      "totalMs": 400,
+      "activeStartMs": 144,
+      "activeEndMs": 256,
+      "reach": 148
     }
   }
 }

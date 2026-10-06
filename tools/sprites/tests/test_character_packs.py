@@ -24,6 +24,7 @@ class CharacterPackTests(unittest.TestCase):
         data['animations']['CUSTOM_PUNCH']['frames']=[0,1,1,2]
         data['animations']['CUSTOM_PUNCH']['durationsMs']=[40,30,30,60]
         data['moves']['L']['animation']='CUSTOM_PUNCH'
+        del data['animations']['LIGHT_JAB']  # replaced; unused clips are rejected
         second=self.root/'characters/second_fighter';second.mkdir();(second/'character.json').write_text(json.dumps(data))
         roster=self.root/'characters/roster.json';r=json.loads(roster.read_text());r['team'][1]='second_fighter';roster.write_text(json.dumps(r))
         pipeline.build(self.root)
@@ -42,7 +43,7 @@ class CharacterPackTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'missing states'):pipeline.build(self.root)
     def test_active_window_outside_animation_is_rejected(self):
         self.edit(lambda d:d['moves']['L'].update(activeEndMs=900))
-        with self.assertRaisesRegex(ValueError,'active window'):pipeline.build(self.root)
+        with self.assertRaisesRegex(ValueError,'active window outside totalMs'):pipeline.build(self.root)
     def test_unknown_atlas_is_rejected(self):
         self.edit(lambda d:d['animations']['IDLE'].update(atlas='missing'))
         with self.assertRaisesRegex(ValueError,'unknown atlas'):pipeline.build(self.root)
@@ -89,10 +90,55 @@ class CharacterPackTests(unittest.TestCase):
         self.assertTrue(all(a['atlas'].startswith('player_two_') for a in second['animations'].values()))
         for binding in ('L','M','H'):
             self.assertEqual(first['moves'][binding],second['moves'][binding])
-        self.assertIn('2L',first['moves'])
-        self.assertIn('2M',first['moves'])
-        self.assertNotIn('2L',second['moves'])
-        self.assertNotIn('2M',second['moves'])
+        self.assertEqual(set(pipeline.BINDINGS),set(first['moves']))
+        self.assertEqual(set(pipeline.BINDINGS),set(second['moves']))
+        self.assertIn('animation',first['moves']['2L'])
+        self.assertEqual('CROUCH',second['moves']['2L']['pose'])
+
+    def test_typo_in_state_name_is_rejected(self):
+        self.edit(lambda d:d['animations'].__setitem__('HIT_STAN',d['animations'].pop('HIT_STAND')))
+        with self.assertRaisesRegex(ValueError,'HIT_STAN.*not a known state'):pipeline.build(self.root)
+
+    def test_every_input_must_be_declared(self):
+        self.edit(lambda d:d['moves'].pop('jH'))
+        with self.assertRaisesRegex(ValueError,'missing moves'):pipeline.build(self.root)
+
+    def test_pose_must_match_input(self):
+        self.edit(lambda d:d['moves'].__setitem__('L',{**d['moves']['jL']}))
+        with self.assertRaisesRegex(ValueError,'pose AIR is not valid'):pipeline.build(self.root)
+
+    def test_move_needs_exactly_one_of_animation_or_pose(self):
+        self.edit(lambda d:d['moves']['2H'].update(animation='CROUCH_LIGHT'))
+        with self.assertRaisesRegex(ValueError,'exactly one'):pipeline.build(self.root)
+
+    def test_partial_knockdown_set_is_rejected(self):
+        self.edit(lambda d:d['animations'].pop('GETUP'))
+        with self.assertRaisesRegex(ValueError,'declared together'):pipeline.build(self.root)
+
+    def test_fighter_rules_are_validated(self):
+        self.edit(lambda d:d['fighter']['body'].update(crouchHeight=999))
+        with self.assertRaisesRegex(ValueError,'crouchHeight'):pipeline.build(self.root)
+
+    def test_unreferenced_source_art_is_rejected(self):
+        (self.root/'art/sprites/source/forgotten.png').write_bytes(b'x')
+        with self.assertRaisesRegex(ValueError,'forgotten.png'):pipeline.build(self.root)
+
+    def test_orphan_outputs_fail_check_and_are_removed_by_write(self):
+        pipeline.build(self.root)
+        orphan=self.root/'android/app/src/main/res/drawable-nodpi/removed_clip.png';orphan.write_bytes(b'x')
+        with self.assertRaisesRegex(ValueError,'orphan'):pipeline.build(self.root,check=True)
+        self.assertTrue(orphan.exists())
+        pipeline.build(self.root)
+        self.assertFalse(orphan.exists())
+        pipeline.build(self.root,check=True)
+
+    def test_visual_heights_and_stats_are_generated(self):
+        pipeline.build(self.root)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('new CharacterDefinition.Fighter("BRUTAMONTE",0xFFD9485F',java)
+        self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",null,"AIR"',java)
+        states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
+        self.assertIn('static final String HIT_AIR = "HIT_AIR";',states)
 
 
     def test_player_base_crouch_light_is_a_real_declarative_move(self):

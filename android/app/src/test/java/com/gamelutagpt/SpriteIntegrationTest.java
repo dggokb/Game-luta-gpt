@@ -49,10 +49,13 @@ public class SpriteIntegrationTest {
         assertEquals(246f,second.profile.rootY,.001f);
         assertTrue(first.animations.keySet().containsAll(second.animations.keySet()));
         assertTrue(first.moves.keySet().containsAll(second.moves.keySet()));
-        assertTrue(first.moves.containsKey("2L"));
-        assertTrue(first.moves.containsKey("2M"));
-        assertFalse(second.moves.containsKey("2L"));
-        assertFalse(second.moves.containsKey("2M"));
+        assertEquals(first.moves.keySet(),second.moves.keySet());
+        assertNotNull(first.moves.get("2L").animation);
+        assertNotNull(first.moves.get("2M").animation);
+        // Inputs without dedicated art declare their pose explicitly.
+        assertNull(second.moves.get("2L").animation);
+        assertEquals(SpriteStates.POSE_CROUCH,second.moves.get("2L").pose);
+        assertEquals(SpriteStates.POSE_AIR,second.moves.get("jH").pose);
         assertNotEquals(first.animation("IDLE").atlas.resource,second.animation("IDLE").atlas.resource);
         assertEquals("player_two_idle",second.animation("IDLE").atlas.resource);
         assertEquals("player_two_movement",second.animation("WALK_FORWARD").atlas.resource);
@@ -65,6 +68,7 @@ public class SpriteIntegrationTest {
             assertEquals(a.damage,b.damage);
             assertEquals(a.activeStart,b.activeStart,.0001f);
             assertEquals(a.activeEnd,b.activeEnd,.0001f);
+            assertEquals(a.totalTime,b.totalTime,.0001f);
             assertEquals(a.reach,b.reach,.0001f);
             assertEquals(a.animation.id,b.animation.id);
         }
@@ -200,10 +204,10 @@ public class SpriteIntegrationTest {
             invoke("startAttack",new Class<?>[]{String.class},binding);
             CharacterDefinition.Move move=GeneratedCharacters.defaultCharacter().moves.get(binding);
             int life=(Integer)get("dummyLife");
-            set("attackTimer",move.animation.duration-(move.activeStart-.002f));
+            set("attackTimer",move.totalTime-(move.activeStart-.002f));
             invoke("tryApplyMeleeDamage",new Class<?>[]{});
             assertEquals(life,(int)get("dummyLife"));
-            set("attackTimer",move.animation.duration-(move.activeStart+.002f));
+            set("attackTimer",move.totalTime-(move.activeStart+.002f));
             invoke("tryApplyMeleeDamage",new Class<?>[]{});
             assertEquals(life-move.damage,(int)get("dummyLife"));
             invoke("tryApplyMeleeDamage",new Class<?>[]{});
@@ -216,9 +220,9 @@ public class SpriteIntegrationTest {
             invoke("startAttack",new Class<?>[]{String.class},binding);
             CharacterDefinition.Move move=GeneratedCharacters.defaultCharacter().moves.get(binding);
             int life=(Integer)get("dummyLife");
-            set("attackTimer",move.animation.duration-(move.activeStart+.002f));
+            set("attackTimer",move.totalTime-(move.activeStart+.002f));
             invoke("tryApplyMeleeDamage",new Class<?>[]{});
-            set("dummyX",520f);set("attackTimer",move.animation.duration-(move.activeEnd+.002f));
+            set("dummyX",520f);set("attackTimer",move.totalTime-(move.activeEnd+.002f));
             invoke("tryApplyMeleeDamage",new Class<?>[]{});
             assertEquals(life,(int)get("dummyLife"));
         }
@@ -228,7 +232,7 @@ public class SpriteIntegrationTest {
         java.util.Map<String,CharacterDefinition.Animation> animations=new java.util.LinkedHashMap<>(base.animations);
         animations.put("CUSTOM_PUNCH",new CharacterDefinition.Animation("CUSTOM_PUNCH",base.animation("LIGHT_JAB").atlas,
             new int[]{0,1,2},new float[]{.04f,.06f,.06f},false,0));
-        CharacterDefinition custom=new CharacterDefinition("custom","Custom",base.profile,animations,base.moves);
+        CharacterDefinition custom=base.withAnimations("custom",animations);
         SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication(),custom);
         Rect bounds=renderedBounds(renderer,"CUSTOM_PUNCH",.07f,0);
         assertTrue(bounds.width()>60);assertTrue(bounds.height()>150);
@@ -297,7 +301,7 @@ public class SpriteIntegrationTest {
             assertEquals(i,renderer.motion.frame());
             canvas.save();
             canvas.translate(i*fw,0);
-            renderer.draw(canvas,new Paint(),rx,ry,false,false);
+            renderer.draw(canvas,rx,ry,1,false,false);
             canvas.restore();
         }
 
@@ -390,7 +394,7 @@ public class SpriteIntegrationTest {
             assertEquals(i,renderer.motion.frame());
             canvas.save();
             canvas.translate(i*fw,0);
-            renderer.draw(canvas,new Paint(),rx,ry,false,false);
+            renderer.draw(canvas,rx,ry,1,false,false);
             canvas.restore();
         }
 
@@ -469,7 +473,7 @@ public class SpriteIntegrationTest {
         Bitmap out=Bitmap.createBitmap(420,320,Bitmap.Config.ARGB_8888);
         SpriteMotion m=renderer.motion;
         m.clip=clip;m.time=time;m.distance=distance;
-        renderer.draw(new Canvas(out),new Paint(),210,270,false,false);
+        renderer.draw(new Canvas(out),210,270,1,false,false);
         int minX=out.getWidth(),minY=out.getHeight(),maxX=-1,maxY=-1;
         for(int y=0;y<out.getHeight();y++)for(int x=0;x<out.getWidth();x++) {
             if(Color.alpha(out.getPixel(x,y))>10) {
@@ -490,7 +494,7 @@ public class SpriteIntegrationTest {
         Bitmap out=Bitmap.createBitmap(420,320,Bitmap.Config.ARGB_8888);
         SpriteMotion m=renderer.motion;
         m.clip=clip;m.time=time;m.distance=distance;
-        renderer.draw(new Canvas(out),new Paint(),210,270,false,false);
+        renderer.draw(new Canvas(out),210,270,1,false,false);
 
         Rect b=renderedBounds(renderer,clip,time,distance);
         int bandBottom=b.top + Math.max(1,Math.round(b.height()*0.22f));
@@ -533,14 +537,27 @@ public class SpriteIntegrationTest {
             assertTrue("Empty sprite "+i,count>4500);assertTrue("Opaque background "+i,count<256*256*.70f);
         }
     }
-    @Test public void scenePaintCannotMakeTheFighterTransparent() {
+    @Test public void matchRenderersShareOneDecodedAtlasCache()throws Exception {
+        SpriteFighterRenderer player=(SpriteFighterRenderer)get("spriteFighterRenderer");
+        SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");
+        Field field=SpriteFighterRenderer.class.getDeclaredField("atlases");field.setAccessible(true);
+        SpriteAtlasCache cache=(SpriteAtlasCache)field.get(player);
+        assertSame(cache,field.get(opponent));
+        java.util.Set<String> expected=new java.util.HashSet<>();
+        for(String id:GeneratedCharacters.TEAM)for(CharacterDefinition.Animation a:GeneratedCharacters.get(id).animations.values())expected.add(a.atlas.resource);
+        for(CharacterDefinition.Animation a:GeneratedCharacters.opponentCharacter().animations.values())expected.add(a.atlas.resource);
+        assertEquals(expected.size(),cache.size());
+        invoke("switchFighter",new Class<?>[]{});frames(72);
+        assertEquals("Tag must not decode new atlases",expected.size(),cache.size());
+    }
+    @Test public void rendererMirrorsFromDeclaredArtFacing() {
         SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
-        Bitmap a=Bitmap.createBitmap(300,260,Bitmap.Config.ARGB_8888),b=Bitmap.createBitmap(300,260,Bitmap.Config.ARGB_8888);
-        Paint clean=new Paint(),dirty=new Paint();dirty.setAlpha(30);
-        dirty.setShader(new LinearGradient(0,0,100,100,Color.RED,Color.BLUE,Shader.TileMode.CLAMP));
-        renderer.draw(new Canvas(a),clean,150,235,false,false);
-        renderer.draw(new Canvas(b),dirty,150,235,false,false);
-        assertTrue(a.sameAs(b));assertEquals(30,dirty.getAlpha());assertNotNull(dirty.getShader());
+        Bitmap right=Bitmap.createBitmap(420,320,Bitmap.Config.ARGB_8888),left=Bitmap.createBitmap(420,320,Bitmap.Config.ARGB_8888);
+        renderer.motion.clip="LIGHT_JAB";renderer.motion.time=.07f;
+        renderer.draw(new Canvas(right),210,270,1,false,false);
+        renderer.draw(new Canvas(left),210,270,-1,false,false);
+        for(int y=0;y<320;y+=4)for(int x=0;x<420;x+=4)
+            assertEquals(Color.alpha(right.getPixel(x,y)),Color.alpha(left.getPixel(419-x,y)),2);
     }
     @Test public void renderAllFramesUsingRealCanvasAndPackagedAssets()throws Exception {
         SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
@@ -554,7 +571,7 @@ public class SpriteIntegrationTest {
             assertEquals(i,m.frame());
             c.save();c.translate((i%4)*300,(i/4)*260);
             p.setColor(Color.rgb(90,105,115));c.drawLine(0,235,300,235,p);
-            renderer.draw(c,p,150,235,false,false);p.setColor(Color.WHITE);c.drawText(i+" "+m.clip,10,20,p);c.restore();
+            renderer.draw(c,150,235,1,false,false);p.setColor(Color.WHITE);c.drawText(i+" "+m.clip,10,20,p);c.restore();
         }
         File dir=new File("build/sprite-review");dir.mkdirs();
         try(FileOutputStream out=new FileOutputStream(new File(dir,"movement-frames.png"))){assertTrue(sheet.compress(Bitmap.CompressFormat.PNG,100,out));}

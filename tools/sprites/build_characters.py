@@ -13,7 +13,16 @@ import import_sprites as importer
 
 ROOT = Path(__file__).resolve().parents[2]
 JAVA = 'android/app/src/main/java/com/gamelutagpt/'
-REQUIRED = {'IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND'}
+# Semantic vocabulary. The runtime (generated SpriteStates.java) and this validator share it.
+REQUIRED = ('IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND')
+OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP')
+KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
+# Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
+BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
+# A move without its own animation must say which posture the body keeps.
+POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH')}
+SPECIALS = ('S','SUPER')
+FACINGS = {'right':1,'left':-1}
 
 def read(path):
     return json.loads(path.read_text())
@@ -22,27 +31,89 @@ def positive(value, name):
     if isinstance(value, bool) or not isinstance(value, (int,float)) or not math.isfinite(value) or value <= 0:
         raise ValueError(f'{name}: expected a positive finite number')
 
+def positive_int(value, name):
+    if type(value) is not int or value <= 0:
+        raise ValueError(f'{name}: expected a positive integer')
+
 def safe(root, value):
     p = (root / value).resolve()
     if not p.is_relative_to(root.resolve()):
         raise ValueError(f'Path escapes project: {value}')
     return p
 
+def validate_projectile(data, name):
+    positive_int(data['damage'], name+'.damage')
+    positive(data['range'], name+'.range');positive(data['speed'], name+'.speed')
+
+def validate_fighter(pack):
+    f = pack['fighter'];name = pack['id']+'.fighter'
+    if not isinstance(f.get('hudName'),str) or not f['hudName'].strip():
+        raise ValueError(f'{name}: hudName is required')
+    if not re.fullmatch('#[0-9A-Fa-f]{6}', f.get('color','')):
+        raise ValueError(f'{name}: color must be #RRGGBB')
+    positive_int(f['maxLife'], name+'.maxLife')
+    if not isinstance(f['autoCombo'],list) or any(b not in ('L','M','H') for b in f['autoCombo']):
+        raise ValueError(f'{name}: autoCombo accepts only L, M and H')
+    body = f['body']
+    for key in ('halfWidth','standHeight','crouchHeight'): positive(body[key], f'{name}.body.{key}')
+    if body['crouchHeight'] > body['standHeight']:
+        raise ValueError(f'{name}: crouchHeight cannot exceed standHeight')
+    if 'energy' in f:
+        validate_projectile(f['energy'], name+'.energy')
+        command = f['energy']['command']
+        if not command or any(type(d) is not int or not 1 <= d <= 8 for d in command):
+            raise ValueError(f'{name}.energy: command uses D-pad directions 1..8')
+    if 'super' in f: validate_projectile(f['super'], name+'.super')
+
+def validate_move(pack, binding, m):
+    animations = pack['animations']
+    if ('animation' in m) == ('pose' in m):
+        raise ValueError(f'{binding}: declare exactly one of animation or pose')
+    if 'animation' in m:
+        if m['animation'] not in animations:
+            raise ValueError(f'{binding}: unknown animation')
+        a = animations[m['animation']]
+        if a['loop'] or 'durationsMs' not in a:
+            raise ValueError(f'{binding}: attack must be a timed one-shot')
+    elif binding not in POSES.get(m['pose'],()):
+        raise ValueError(f'{binding}: pose {m["pose"]} is not valid for this input')
+    positive(m['totalMs'], binding)
+    if not 0 <= m['activeStartMs'] < m['activeEndMs'] <= m['totalMs']:
+        raise ValueError(f'{binding}: active window outside totalMs')
+    positive(m['reach'], binding)
+    if 'hitHeight' in m: positive(m['hitHeight'], binding)
+    if type(m['damage']) is not int or m['damage'] <= 0:
+        raise ValueError(f'{binding}: damage must be a positive integer')
+
+def visual_heights(pack, atlases):
+    """World-space visual height (opaque pixels) measured from import reports."""
+    def height(state):
+        a = pack['animations'][state];cfg,report = atlases[a['atlas']]
+        frames = {f['index']:f for f in report['frames']}
+        top = min(frames[i]['outputBbox'][1] for i in a['frames'])
+        return (report['layout']['rootY'] - top) * pack['_profile']['worldScale']
+    return height('IDLE'), height('CROUCH')
+
 def compile_packs(root, results):
     atlases = {cfg['id']:(cfg,report) for cfg,report in results}
     packs = []
     for path in sorted((root / 'characters').glob('*/character.json')):
         pack = read(path)
-        if pack.get('schemaVersion') != 1 or not re.fullmatch('[a-z][a-z0-9_]*', pack['id']):
-            raise ValueError(f'{path}: unsupported version or invalid id')
+        if pack.get('schemaVersion') != 2 or not re.fullmatch('[a-z][a-z0-9_]*', pack['id']):
+            raise ValueError(f'{path}: unsupported version (expected schemaVersion 2) or invalid id')
         if pack['id'] != path.parent.name or any(p['id'] == pack['id'] for p in packs):
             raise ValueError(f'{path}: id must be unique and match folder')
+        if pack.get('artFacing') not in FACINGS:
+            raise ValueError(f'{pack["id"]}: artFacing must be "right" or "left"')
         profile = read(safe(root / 'tools/sprites/profiles', pack['profile']))
         for key in ('baseFrameWidth','baseFrameHeight','worldScale','standingVisualHeight'):
             positive(profile[key], key)
         animations = pack['animations']
-        if REQUIRED - animations.keys():
-            raise ValueError(f"{pack['id']}: missing states {sorted(REQUIRED - animations.keys())}")
+        if set(REQUIRED) - animations.keys():
+            raise ValueError(f"{pack['id']}: missing states {sorted(set(REQUIRED) - animations.keys())}")
+        present = KNOCKDOWN_SET & animations.keys()
+        if present and present != KNOCKDOWN_SET:
+            raise ValueError(f"{pack['id']}: KNOCKDOWN, GROUNDED and GETUP must be declared together")
         for key,a in animations.items():
             if a['atlas'] not in atlases:
                 raise ValueError(f'{key}: unknown atlas {a["atlas"]}')
@@ -62,22 +133,27 @@ def compile_packs(root, results):
                 if len(a['durationsMs']) != len(frames):
                     raise ValueError(f'{key}: one duration per frame is required')
                 for d in a['durationsMs']: positive(d, key)
-        for binding,m in pack['moves'].items():
-            if binding not in ('L','M','H','2L','2M','2H'):
-                raise ValueError(f'{binding}: supported inputs are L, M, H, 2L, 2M, 2H')
-            if m['animation'] not in animations:
-                raise ValueError(f'{binding}: unknown animation')
-            a = animations[m['animation']]
-            if a['loop'] or 'durationsMs' not in a:
-                raise ValueError(f'{binding}: attack must be a timed one-shot')
-            if not 0 <= m['activeStartMs'] < m['activeEndMs'] <= sum(a['durationsMs']):
-                raise ValueError(f'{binding}: active window outside animation')
-            positive(m['reach'], binding)
-            if type(m['damage']) is not int or m['damage'] <= 0:
-                raise ValueError(f'{binding}: damage must be a positive integer')
-        if not {'L','M','H'}.issubset(set(pack['moves'])):
-            raise ValueError(f'{pack["id"]}: L, M, H bindings are required')
+        moves = pack['moves']
+        unknown = set(moves) - set(BINDINGS)
+        if unknown:
+            raise ValueError(f'{sorted(unknown)}: supported inputs are {", ".join(BINDINGS)}')
+        missing = set(BINDINGS) - set(moves)
+        if missing:
+            raise ValueError(f'{pack["id"]}: missing moves {sorted(missing)}; use "pose" for inputs without art')
+        for binding in BINDINGS: validate_move(pack, binding, moves[binding])
+        specials = pack.get('specialAnimations', {})
+        for key,animation in specials.items():
+            if key not in SPECIALS or animation not in animations or animations[animation]['loop'] or 'durationsMs' not in animations[animation]:
+                raise ValueError(f'{key}: special animation must be S/SUPER bound to a timed one-shot')
+        # Free-form names are allowed only for clips something actually plays; this
+        # turns a typo such as "HIT_STAN" into a build error instead of a silent fallback.
+        used = {m['animation'] for m in moves.values() if 'animation' in m} | set(specials.values())
+        orphan = set(animations) - set(REQUIRED) - set(OPTIONAL) - used
+        if orphan:
+            raise ValueError(f'{pack["id"]}: animations {sorted(orphan)} are not a known state nor used by a move')
+        validate_fighter(pack)
         pack['_profile'] = profile
+        pack['_visual'] = visual_heights(pack, atlases)
         packs.append(pack)
     roster = read(root / 'characters/roster.json')
     ids = {p['id'] for p in packs}
@@ -86,8 +162,11 @@ def compile_packs(root, results):
         raise ValueError('Roster requires a known default, two known team slots and a known opponentCharacter')
     if roster['defaultCharacter'] != roster['team'][0]:
         raise ValueError('Default character must match initial team slot')
+    write_states(root)
     q = json.dumps
     f = lambda v: f'{float(v):.8f}f'
+    def projectile(data):
+        return 'null' if data is None else 'new CharacterDefinition.Projectile('+str(data['damage'])+','+f(data['range'])+','+f(data['speed'])+')'
     lines = ['package com.gamelutagpt;', 'import java.util.*;',
              '/** Generated by build_characters.py. Edit character packs, not this file. */',
              'final class GeneratedCharacters {',
@@ -101,19 +180,54 @@ def compile_packs(root, results):
              ' Map<String,CharacterDefinition> all=new LinkedHashMap<>();']
     for pack in packs:
         lines += [' {', ' Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();',
-                  ' Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();']
+                  ' Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();',
+                  ' Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();']
         for key,a in pack['animations'].items():
             cfg,report = atlases[a['atlas']]; l = report['layout']
             atlas = 'new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]+[str(l.get('columns',l['frameCount'])),str(l['frameCount'])])+')'
             lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
-        for key,m in pack['moves'].items():
-            lines += [' m.put('+q(key)+',new CharacterDefinition.Move(a.get('+q(m['animation'])+'),'+str(m['damage'])+','+f(m['activeStartMs']/1000)+','+f(m['activeEndMs']/1000)+','+f(m['reach'])+'));']
-        p=pack['_profile']
-        profile='new CharacterVisualProfile('+','.join([q(p['id']),str(p['baseFrameWidth']),str(p['baseFrameHeight']),f(p['preferredRootX']),f(p['preferredRootY']),f(p['worldScale'])])+')'
-        lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+',a,m));',' }']
+        for key in BINDINGS:
+            m = pack['moves'][key]
+            animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
+            pose = q(m['pose']) if 'pose' in m else 'null'
+            height = m.get('hitHeight', 42 if key.startswith('2') else 78)
+            lines += [' m.put('+q(key)+',new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+str(m['damage'])+','+f(m['totalMs']/1000)+','+f(m['activeStartMs']/1000)+','+f(m['activeEndMs']/1000)+','+f(m['reach'])+','+f(height)+'));']
+        for key,animation in pack.get('specialAnimations',{}).items():
+            lines += [' s.put('+q(key)+',a.get('+q(animation)+'));']
+        p = pack['_profile'];fi = pack['fighter'];body = fi['body']
+        profile = 'new CharacterVisualProfile('+','.join([q(p['id']),str(p['baseFrameWidth']),str(p['baseFrameHeight']),f(p['preferredRootX']),f(p['preferredRootY']),f(p['worldScale'])])+')'
+        energy = fi.get('energy')
+        fighter = ('new CharacterDefinition.Fighter('+q(fi['hudName'])+',0xFF'+fi['color'][1:].upper()+','+str(fi['maxLife'])
+                   +',new String[]{'+','.join(q(b) for b in fi['autoCombo'])+'},'+projectile(energy)
+                   +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'))
+                   +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight'))+'))')
+        stand,crouch = pack['_visual']
+        lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']
     (root / JAVA / 'GeneratedCharacters.java').write_text('\n'.join(lines))
     return packs
+
+def write_states(root):
+    q = json.dumps
+    lines = ['package com.gamelutagpt;',
+             '/** Generated by build_characters.py from its state vocabulary. Do not edit. */',
+             'final class SpriteStates {',' private SpriteStates() {}']
+    lines += [f' static final String {s} = {q(s)};' for s in REQUIRED + OPTIONAL]
+    lines += [f' static final String POSE_{p} = {q(p)};' for p in POSES]
+    lines += ['}','']
+    (root / JAVA / 'SpriteStates.java').write_text('\n'.join(lines))
+
+def orphans(root, outputs, results):
+    """Files in generated/authored folders that no clip produces or reads."""
+    found = []
+    for folder,patterns in (('android/app/src/main/res/drawable-nodpi',('*.png','*.webp')),('tools/sprites/reports',('*.json',))):
+        for pattern in patterns:
+            found += [p.relative_to(root).as_posix() for p in sorted((root/folder).glob(pattern))]
+    stale = [rel for rel in found if rel not in outputs]
+    sources = {cfg['source'] for cfg,_ in results}
+    sources |= {read(p).get('anatomyReference',{}).get('source') for p in (root/'tools/sprites/profiles').glob('*.json')}
+    unused = [p.relative_to(root).as_posix() for p in sorted((root/'art/sprites/source').iterdir()) if p.is_file() and p.relative_to(root).as_posix() not in sources]
+    return stale, unused
 
 def build(root=ROOT, check=False):
     # Isolated staging: no partial assets/Java are published if any pack fails.
@@ -146,12 +260,18 @@ def build(root=ROOT, check=False):
                 results.append((cfg,report))
             importer.write_generated_java(results)
             packs=compile_packs(stage,results)
-            outputs.update((JAVA+'GeneratedSpriteLayouts.java',JAVA+'GeneratedCharacters.java'))
+            outputs.update((JAVA+'GeneratedSpriteLayouts.java',JAVA+'GeneratedCharacters.java',JAVA+'SpriteStates.java'))
             # Preview embeds atlases; it works offline and never gets packaged in APK.
             payload={'characters':packs,'atlases':{c['id']:{**r['layout'],'image':'data:image/png;base64,'+base64.b64encode((stage/c['output']).read_bytes()).decode()} for c,r in results}}
             preview='android/app/build/sprite-review/index.html'
             (stage/preview).write_text((root/'tools/sprites/preview.html').read_text().replace('__SPRITE_DATA__',json.dumps(payload).replace('<','\\u003c')))
             outputs.add(preview)
+            # Removing a clip must not leave its old atlas packaged in the APK.
+            orphan_outputs,unused_sources=orphans(root,outputs,results)
+            if unused_sources:
+                raise ValueError('Source art not referenced by any clip or profile; remove or reference it:\n'+'\n'.join(unused_sources))
+            if orphan_outputs and check:
+                raise ValueError('Generated files are stale (orphan outputs); run build_characters.py --write:\n'+'\n'.join(orphan_outputs))
             stale=[]
             for rel in sorted(outputs):
                 generated=stage/rel; target=root/rel
@@ -160,6 +280,8 @@ def build(root=ROOT, check=False):
                 else:
                     target.parent.mkdir(parents=True,exist_ok=True)
                     shutil.copyfile(generated,target)
+            if not check:
+                for rel in orphan_outputs: (root/rel).unlink()
             if stale: raise ValueError('Generated files are stale; run build_characters.py --write:\n'+'\n'.join(stale))
             print(f'Sprite packs PASS: {len(packs)} characters, {len(results)} atlases; preview: {preview}')
         finally:

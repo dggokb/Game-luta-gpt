@@ -45,6 +45,7 @@ public class SpriteMotionTest {
     @Test public void attacksUseTheCombatClockAndSameAttackCanRestart() {
         SpriteMotion m=new SpriteMotion();
         for(CharacterDefinition.Move move:GeneratedCharacters.defaultCharacter().moves.values()) {
+            if(move.animation==null)continue;
             String animation=move.animation.id;
             m.update(.016f,true,false,0,0,true,false,false,animation,0f,true,false);
             assertEquals(animation,m.clip);assertEquals(0,m.frame());
@@ -62,7 +63,7 @@ public class SpriteMotionTest {
         java.util.Map<String,CharacterDefinition.Animation> a=new java.util.LinkedHashMap<>(base.animations);
         a.put("CUSTOM_PUNCH",new CharacterDefinition.Animation("CUSTOM_PUNCH",base.animation("LIGHT_JAB").atlas,
             new int[]{2,0,1,2},new float[]{.03f,.04f,.05f,.06f},false,0));
-        SpriteMotion m=new SpriteMotion(new CharacterDefinition("test","Test",base.profile,a,base.moves));
+        SpriteMotion m=new SpriteMotion(base.withAnimations("test",a));
         m.update(.01f,true,false,0,0,true,false,false,"CUSTOM_PUNCH",.08f,true,false);
         assertEquals("CUSTOM_PUNCH",m.clip);assertEquals(1,m.frame());
     }

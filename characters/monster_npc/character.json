@@ -1,8 +1,34 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "monster_npc",
   "displayName": "Brutamonte",
   "profile": "monster_npc.json",
+  "artFacing": "right",
+  "fighter": {
+    "hudName": "BRUTAMONTE",
+    "color": "#D9485F",
+    "maxLife": 10000,
+    "autoCombo": [],
+    "body": {
+      "halfWidth": 78,
+      "standHeight": 290,
+      "crouchHeight": 240
+    },
+    "energy": {
+      "damage": 650,
+      "range": 560,
+      "speed": 980,
+      "command": [
+        5,
+        1
+      ]
+    },
+    "super": {
+      "damage": 2850,
+      "range": 1320,
+      "speed": 1280
+    }
+  },
   "animations": {
     "IDLE": {
       "atlas": "monster_npc_pack",
@@ -195,29 +221,128 @@
         120,
         100
       ]
+    },
+    "LOW_CLAW": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        11,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        70,
+        40
+      ]
+    },
+    "LOW_LUNGE": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        11,
+        12
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        100,
+        90
+      ]
+    },
+    "RISING_SMASH": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        10,
+        9,
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ]
     }
   },
   "moves": {
     "L": {
       "animation": "LIGHT_CLAW",
       "damage": 300,
+      "totalMs": 160,
       "activeStartMs": 40,
       "activeEndMs": 95,
-      "reach": 145
+      "reach": 111
     },
     "M": {
       "animation": "MEDIUM_SWIPE",
       "damage": 500,
+      "totalMs": 260,
       "activeStartMs": 70,
       "activeEndMs": 180,
-      "reach": 165
+      "reach": 131
     },
     "H": {
       "animation": "HEAVY_SMASH",
       "damage": 800,
+      "totalMs": 400,
       "activeStartMs": 160,
       "activeEndMs": 280,
-      "reach": 195
+      "reach": 161
+    },
+    "2L": {
+      "animation": "LOW_CLAW",
+      "damage": 300,
+      "totalMs": 160,
+      "activeStartMs": 58,
+      "activeEndMs": 102,
+      "reach": 84
+    },
+    "2M": {
+      "animation": "LOW_LUNGE",
+      "damage": 500,
+      "totalMs": 260,
+      "activeStartMs": 94,
+      "activeEndMs": 166,
+      "reach": 116
+    },
+    "2H": {
+      "animation": "RISING_SMASH",
+      "damage": 800,
+      "totalMs": 400,
+      "activeStartMs": 144,
+      "activeEndMs": 256,
+      "reach": 148
+    },
+    "jL": {
+      "pose": "AIR",
+      "damage": 300,
+      "totalMs": 160,
+      "activeStartMs": 58,
+      "activeEndMs": 102,
+      "reach": 84
+    },
+    "jM": {
+      "pose": "AIR",
+      "damage": 500,
+      "totalMs": 260,
+      "activeStartMs": 94,
+      "activeEndMs": 166,
+      "reach": 116
+    },
+    "jH": {
+      "pose": "AIR",
+      "damage": 800,
+      "totalMs": 400,
+      "activeStartMs": 144,
+      "activeEndMs": 256,
+      "reach": 148
     }
+  },
+  "specialAnimations": {
+    "S": "ROAR",
+    "SUPER": "ROAR"
   }
 }
