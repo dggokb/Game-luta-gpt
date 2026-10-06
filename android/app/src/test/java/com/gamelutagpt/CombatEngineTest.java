@@ -848,4 +848,40 @@ public class CombatEngineTest {
         assertTrue("The rush travels forward", s.f(0).x > start + 400f);
         assertEquals("The bars stay spent", 0, s.f(0).state.superMeter);
     }
+
+    /** Nunca "atacando sem golpe": a regressão que derrubava o app quando o ultra pegava a CPU atacando. */
+    private static void assertAttackInvariant(Sim s) {
+        for (int i = 0; i < 2; i++) {
+            if (s.f(i).attacking()) assertNotNull("fighter " + i + " in ATTACK without attack", s.f(i).attack);
+        }
+    }
+
+    @Test public void ultraConnectingDuringAnOpponentAttackLeavesNoAttackWithoutMove() {
+        CombatConfig config = new CombatConfig();
+        int connectedWhileAttacking = 0;
+        // The CPU presses a strike on every frame from the activation to the end of the rush.
+        for (int press = 0; press < config.ultraStartupFrames + config.ultraRushFrames + 2; press++) {
+            Sim s = new Sim(BASE, NPC, 500f, 760f);
+            s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+            pressUltra(s);
+            for (int frame = 0; frame < 120; frame++) {
+                if (frame == press) {
+                    s.in[1].light = true;
+                    s.in[1].medium = true;
+                }
+                boolean wasAttacking = s.f(1).attacking();
+                s.step();
+                s.in[0].direction = 0;
+                assertAttackInvariant(s);
+                if (s.engine.inUltraCinematic(0)) {
+                    if (wasAttacking) connectedWhileAttacking++;
+                    assertFalse(s.f(1).attacking());
+                    s.engine.applyUltraHit(0, 500);
+                    s.engine.finishUltra(0);
+                    assertAttackInvariant(s);
+                }
+            }
+        }
+        assertTrue("o caso do crash (CPU atacando no acerto) foi exercitado", connectedWhileAttacking > 0);
+    }
 }
