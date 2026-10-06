@@ -8,14 +8,15 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 74
-        versionName '0.74-sprite-gpt-pack-v2'
+        versionCode 75
+        versionName '0.75-sprite-gpt-ultra'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
 }
 
 dependencies {
+    implementation project(':ultra-core')
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
 }
