@@ -17,8 +17,7 @@ do pacote `openai`):
         --cor "#F4B73B" --gerar --descricao "lutador de cabelo espetado preto, \\
         kimono laranja e faixa azul" --referencia ficha_player1.png
 
-O script recorta cada imagem no formato do painel, aplica o filtro de mangá
-(que deixa todas as imagens com o mesmo acabamento) e grava tudo em
+O script recorta cada imagem no formato do painel e grava tudo em
 android/app/src/main/assets/ultras/<id>/, junto com o ultra.json.
 """
 
@@ -166,7 +165,10 @@ def main():
     parser.add_argument("--cor-secundaria", help="cor do brilho, ex.: #FFE7A3")
     parser.add_argument("--entrada", type=Path, help="pasta com olhos/carga/golpe/atingido/final")
     parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO, help="pasta ultras/ dos assets")
-    parser.add_argument("--estilo", choices=["manga", "nenhum"], default="manga")
+    parser.add_argument(
+        "--estilo", choices=["manga", "nenhum"], default="nenhum",
+        help="manga aplica contraste, tinta e retícula; só ajuda quando as imagens saem com estilos diferentes",
+    )
     parser.add_argument(
         "--intensidade", type=float, default=1.0,
         help="força do filtro de mangá (0.5 = suave, 1 = padrão, 1.5 = pesado)",

@@ -14,7 +14,7 @@ import java.util.Map;
  *   "paineis": {
  *     "olhos":    { "imagem": "olhos.png" },
  *     "carga":    { "imagem": "carga.png", "onomatopeia": "VRUUUM" },
- *     "golpe":    { "imagem": "golpe.png", "som": "soco" },
+ *     "golpe":    { "imagem": "golpe.png", "som": "soco", "posicaoOnomatopeia": [0.6, 0.9] },
  *     "atingido": { "imagem": "atingido.png" },
  *     "final":    { "imagem": "final.png", "onomatopeia": "KABUUUM!" }
  *   }
@@ -30,11 +30,18 @@ public final class UltraDefinition {
         public final String imagePath;
         public final String onomatopoeia;
         public final String soundId;
+        /**
+         * Onde a onomatopeia aparece, como fração {x, y} da caixa do painel
+         * (0,0 = canto de cima à esquerda; y é a linha de base do texto), ou
+         * null para a posição padrão. Serve para não cobrir o rosto na arte.
+         */
+        public final float[] onomatopoeiaPosition;
 
-        Panel(String imagePath, String onomatopoeia, String soundId) {
+        Panel(String imagePath, String onomatopoeia, String soundId, float[] onomatopoeiaPosition) {
             this.imagePath = imagePath;
             this.onomatopoeia = onomatopoeia;
             this.soundId = soundId;
+            this.onomatopoeiaPosition = onomatopoeiaPosition;
         }
     }
 
@@ -61,7 +68,7 @@ public final class UltraDefinition {
     public static UltraDefinition placeholder(String name, int color) {
         Panel[] panels = new Panel[UltraSlot.values().length];
         for (UltraSlot slot : UltraSlot.values()) {
-            panels[slot.ordinal()] = new Panel(null, slot.defaultOnomatopoeia, slot.defaultSound);
+            panels[slot.ordinal()] = new Panel(null, slot.defaultOnomatopoeia, slot.defaultSound, null);
         }
         return new UltraDefinition(name, color, brighten(color), panels);
     }
@@ -98,9 +105,27 @@ public final class UltraDefinition {
             String sound = entry != null
                 ? stringField(entry, "som", slot.defaultSound)
                 : slot.defaultSound;
-            panels[slot.ordinal()] = new Panel(image, sfx, sound);
+            float[] position = entry != null ? positionField(entry, "posicaoOnomatopeia") : null;
+            panels[slot.ordinal()] = new Panel(image, sfx, sound, position);
         }
         return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, panels);
+    }
+
+    private static float[] positionField(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        if (value == null) return null;
+        if (!(value instanceof java.util.List) || ((java.util.List<?>)value).size() != 2) {
+            throw new IllegalArgumentException("\"" + key + "\" deve ser [x, y] com frações de 0 a 1");
+        }
+        java.util.List<?> list = (java.util.List<?>)value;
+        float[] position = new float[2];
+        for (int i = 0; i < 2; i++) {
+            if (!(list.get(i) instanceof Number)) {
+                throw new IllegalArgumentException("\"" + key + "\" deve ter dois números");
+            }
+            position[i] = Math.max(0f, Math.min(1f, ((Number)list.get(i)).floatValue()));
+        }
+        return position;
     }
 
     private static String stringField(Map<String, Object> map, String key, String fallback) {

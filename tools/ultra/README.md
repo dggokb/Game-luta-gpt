@@ -33,7 +33,7 @@ As imagens devem mostrar o atacante **virado para a direita**. Quando ele luta v
        --cor "#F4B73B" --entrada pasta/com/as/imagens
    ```
 
-   O script recorta cada imagem no formato do painel e aplica o **filtro de mangá**. O filtro dá o mesmo acabamento a imagens diferentes da IA, com contraste, tinta nas bordas e retícula nas sombras. Ele grava tudo em `android/app/src/main/assets/ultras/player1/`.
+   O script recorta cada imagem no formato do painel e grava tudo em `android/app/src/main/assets/ultras/player1/`. Se as imagens saírem com estilos muito diferentes entre si, use `--estilo manga`: ele aplica um filtro de contraste, tinta e retícula que unifica o acabamento. Com imagens já consistentes, o filtro piora o resultado, por isso vem desligado.
 
 ### Ou gere direto pela API
 
@@ -50,7 +50,7 @@ Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
 ### Ajustes úteis
 
 - `--foco olhos=0.4`: move o recorte para cima (0) ou para baixo (1) quando a parte importante ficou fora.
-- `--intensidade 0.6`: filtro mais suave. Use `1.5` para um filtro mais pesado, ou `--estilo nenhum` para desligar.
+- `--estilo manga --intensidade 0.6`: liga o filtro de mangá numa versão suave (`1.5` deixa pesado).
 - `--cor-secundaria "#FFE7A3"`: cor do brilho (centro do raio, onomatopeia final).
 
 ## ultra.json
@@ -63,14 +63,16 @@ Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
   "paineis": {
     "olhos":    { "imagem": "olhos.jpg" },
     "carga":    { "imagem": "carga.jpg", "onomatopeia": "VRUUUUM" },
-    "golpe":    { "imagem": "golpe.jpg", "onomatopeia": "KRAAK!", "som": "soco" },
+    "golpe":    { "imagem": "golpe.jpg", "onomatopeia": "KRAAK!", "som": "soco", "posicaoOnomatopeia": [0.6, 0.92] },
     "atingido": { "imagem": "atingido.jpg", "onomatopeia": "TUMM!" },
     "final":    { "imagem": "final.jpg", "onomatopeia": "KABUUUM!" }
   }
 }
 ```
 
-Tudo é opcional, menos `nome`. O script preserva as onomatopeias e os sons que você editou à mão.
+Tudo é opcional, menos `nome`. O script preserva as onomatopeias, sons e posições que você editou à mão.
+
+`posicaoOnomatopeia` move a onomatopeia dentro do painel, para ela não cobrir o rosto do personagem. Os valores são frações da caixa do painel: `[0, 0]` é o canto de cima à esquerda e `[1, 1]` é o canto de baixo à direita.
 
 ## Sons
 

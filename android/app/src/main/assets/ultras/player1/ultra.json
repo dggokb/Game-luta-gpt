@@ -3,10 +3,28 @@
   "cor": "#F4B73B",
   "corSecundaria": "#FFE7A3",
   "paineis": {
-    "olhos":    {},
-    "carga":    { "onomatopeia": "VRUUUUM" },
-    "golpe":    { "onomatopeia": "KRAAK!" },
-    "atingido": { "onomatopeia": "TUMM!" },
-    "final":    { "onomatopeia": "KABUUUM!" }
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "onomatopeia": "VRUUUUM",
+      "imagem": "carga.jpg"
+    },
+    "golpe": {
+      "onomatopeia": "KRAAK!",
+      "imagem": "golpe.jpg",
+      "posicaoOnomatopeia": [
+        0.6,
+        0.92
+      ]
+    },
+    "atingido": {
+      "onomatopeia": "TUMM!",
+      "imagem": "atingido.jpg"
+    },
+    "final": {
+      "onomatopeia": "KABUUUM!",
+      "imagem": "final.jpg"
+    }
   }
 }

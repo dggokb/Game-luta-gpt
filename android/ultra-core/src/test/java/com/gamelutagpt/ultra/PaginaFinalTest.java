@@ -131,14 +131,23 @@ public class PaginaFinalTest {
     public void definitionReadsJsonWithDefaults() {
         UltraDefinition def = UltraDefinition.fromJson(
             "{\"nome\": \"Explosão Solar\", \"cor\": \"#102030\","
-                + " \"paineis\": {\"golpe\": {\"imagem\": \"golpe.png\", \"onomatopeia\": \"POW\"}}}"
+                + " \"paineis\": {\"golpe\": {\"imagem\": \"golpe.png\", \"onomatopeia\": \"POW\","
+                + " \"posicaoOnomatopeia\": [0.25, 1.5]}}}"
         );
         assertEquals("EXPLOSÃO SOLAR", def.name);
         assertEquals(0xFF102030, def.color);
         assertEquals("golpe.png", def.panel(UltraSlot.GOLPE).imagePath);
         assertEquals("POW", def.panel(UltraSlot.GOLPE).onomatopoeia);
+        assertEquals(0.25f, def.panel(UltraSlot.GOLPE).onomatopoeiaPosition[0], 1e-6f);
+        assertEquals(1f, def.panel(UltraSlot.GOLPE).onomatopoeiaPosition[1], 1e-6f);
+        assertNull(def.panel(UltraSlot.FINAL).onomatopoeiaPosition);
         assertNull(def.panel(UltraSlot.FINAL).imagePath);
         assertEquals(UltraSlot.FINAL.defaultOnomatopoeia, def.panel(UltraSlot.FINAL).onomatopoeia);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void definitionRejectsBadPosition() {
+        UltraDefinition.fromJson("{\"nome\": \"X\", \"paineis\": {\"golpe\": {\"posicaoOnomatopeia\": [0.5]}}}");
     }
 
     @Test(expected = IllegalArgumentException.class)

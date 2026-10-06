@@ -60,7 +60,7 @@ public final class PaginaFinal {
     /** Onde cada onomatopeia aparece (x, y, rotação, tamanho). */
     private static final float[][] SFX_SPOT = {
         {0f, 0f, 0f, 0f},
-        {250f, 360f, -12f, 64f},
+        {250f, 650f, -10f, 64f},
         {960f, 395f, -8f, 104f},
         {1010f, 610f, 7f, 86f},
         {640f, 210f, -6f, 150f}
@@ -444,23 +444,23 @@ public final class PaginaFinal {
 
         // A faixa atravessa a borda de baixo do primeiro painel, como nos mangás.
         float[] strip = {
-            650f + offset, 194f,
-            1266f + offset, 176f,
-            1266f + offset, 250f,
-            616f + offset, 268f
+            650f + offset, 206f,
+            1266f + offset, 188f,
+            1266f + offset, 262f,
+            616f + offset, 280f
         };
         c.fillPolygon(strip, INK);
         c.drawText(
             pack.definition.name,
             945f + offset,
-            243f,
+            255f,
             fitTextSize(pack.definition.name, 58f, 580f),
             pack.definition.color,
             WHITE,
             5f,
             true
         );
-        c.drawText("ULTRA", 708f + offset, 192f, 26f, WHITE, INK, 8f, true);
+        c.drawText("ULTRA", 708f + offset, 204f, 26f, WHITE, INK, 8f, true);
     }
 
     private static float fitTextSize(String text, float max, float width) {
@@ -477,6 +477,18 @@ public final class PaginaFinal {
         float age = time - at;
         if (slot != UltraSlot.FINAL && time >= SLAM_AT[4] + FINAL_EXPAND) return;
         float[] spot = SFX_SPOT[slot.ordinal()];
+        float x = spot[0];
+        float y = spot[1];
+        float[] custom = pack.definition.panel(slot).onomatopoeiaPosition;
+        if (custom != null) {
+            float[] poly = PANELS[slot.ordinal()];
+            float l = Math.max(0f, Math.min(Math.min(poly[0], poly[2]), Math.min(poly[4], poly[6])));
+            float r = Math.min(VW, Math.max(Math.max(poly[0], poly[2]), Math.max(poly[4], poly[6])));
+            float t = Math.max(0f, Math.min(Math.min(poly[1], poly[3]), Math.min(poly[5], poly[7])));
+            float b = Math.min(VH, Math.max(Math.max(poly[1], poly[3]), Math.max(poly[5], poly[7])));
+            x = l + (r - l) * custom[0];
+            y = t + (b - t) * custom[1];
+        }
         float pop = ArteProvisoria.clamp01(age / 0.10f);
         float scale = 1.7f - 0.7f * ArteProvisoria.easeOutCubic(pop);
         rand.reset(frame * 13L + slot.ordinal());
@@ -484,10 +496,10 @@ public final class PaginaFinal {
 
         c.save();
         c.translate(rand.range(-jitter, jitter), rand.range(-jitter, jitter));
-        c.rotate(spot[2], spot[0], spot[1]);
-        c.scale(scale, scale, spot[0], spot[1]);
+        c.rotate(spot[2], x, y);
+        c.scale(scale, scale, x, y);
         int fill = slot == UltraSlot.FINAL ? pack.definition.accentColor : WHITE;
-        c.drawText(text, spot[0], spot[1], spot[3], fill, INK, spot[3] * 0.16f, true);
+        c.drawText(text, x, y, spot[3], fill, INK, spot[3] * 0.16f, true);
         c.restore();
     }
 
