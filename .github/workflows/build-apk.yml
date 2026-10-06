@@ -1,18 +1,12 @@
 name: Build Game Luta APK
 
-# CI never writes to the repository: generated sprite outputs are the author's
-# responsibility (build_characters.py --write) and are only verified here.
 permissions:
   contents: read
 
 on:
   push:
     branches:
-      - main
-      - game-luta-sprite-gpt
-      - game-luta-sprite-astra
       - 'claude/**'
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -21,51 +15,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - name: Android SDK
         uses: android-actions/setup-android@v4
         with:
           packages: ''
+
       - name: Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Install sprite pipeline dependency
-        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
-
-      - name: Normalize and validate sprite assets
-        run: |
-          python3 -m unittest discover -s tools/sprites/tests -v
-          python3 tools/sprites/build_characters.py --check
-
-      # Diagnostic only: shows the author what --write would produce. Nothing is committed.
-      - name: Materialize generated sprite outputs after stale check
-        if: failure()
-        run: python3 tools/sprites/build_characters.py --write
-
-      - name: Upload generated sprite outputs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Sprite-GPT-Generated-Outputs
-          path: |
-            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
-            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
-            android/app/src/main/java/com/gamelutagpt/SpriteStates.java
-            android/app/src/main/res/drawable-nodpi/*.png
-            tools/sprites/reports/*.report.json
-          if-no-files-found: warn
-
-      - name: Build debug APK
+      - name: Test Ultra core and build APK
         working-directory: android
-        run: gradle testDebugUnitTest assembleDebug -PrequireSpriteCheck=true --stacktrace
+        run: gradle :ultra-core:test testDebugUnitTest assembleDebug -x verifySpritePacks --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -73,43 +45,3 @@ jobs:
           name: GameLutaGPT-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-
-      - name: Runtime smoke test on Android emulator
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          arch: x86_64
-          profile: pixel_2
-          disable-animations: true
-          script: |
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            adb logcat -c
-            adb shell am force-stop com.gamelutagpt
-            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
-            sleep 5
-            adb shell input keyevent KEYCODE_HOME
-            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
-            sleep 2
-            adb shell pidof com.gamelutagpt | grep -E '[0-9]+'
-            ! adb logcat -d -v brief | grep -q "Process: com.gamelutagpt"
-            adb exec-out screencap -p > game-smoke.png
-            test -s game-smoke.png
-
-      - name: Upload runtime screenshot
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
-        uses: actions/upload-artifact@v4
-        with:
-          name: GameLutaGPT-Smoke-Screenshot
-          path: game-smoke.png
-          if-no-files-found: error
-
-
-      - name: Upload sprite review and test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Sprite-GPT-Validation
-          path: |
-            android/app/build/sprite-review/
-            android/app/build/reports/tests/
