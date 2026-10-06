@@ -34,6 +34,12 @@ final class GeneratedSpriteLayouts {
     static final int MEDIUM_KICK_ROOT_Y = 238;
     static final int MEDIUM_KICK_FRAME_COUNT = 3;
 
+    static final int PLAYER_BASE_MISSING_FRAME_WIDTH = 256;
+    static final int PLAYER_BASE_MISSING_FRAME_HEIGHT = 256;
+    static final int PLAYER_BASE_MISSING_ROOT_X = 128;
+    static final int PLAYER_BASE_MISSING_ROOT_Y = 238;
+    static final int PLAYER_BASE_MISSING_FRAME_COUNT = 14;
+
     static final int MOVEMENT_FRAME_WIDTH = 256;
     static final int MOVEMENT_FRAME_HEIGHT = 256;
     static final int MOVEMENT_ROOT_X = 128;
