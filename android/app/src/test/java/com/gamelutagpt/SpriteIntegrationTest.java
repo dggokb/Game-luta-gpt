@@ -66,27 +66,31 @@ public class SpriteIntegrationTest {
         }
     }
 
-    @Test public void playerBaseHasNewDefenseHitKnockdownAndDirectionalAttackSprites()throws Exception {
+    @Test public void playerBaseKeepsReactiveSpritesButDirectionalAttacksUseSafeFallback()throws Exception {
         CharacterDefinition first=GeneratedCharacters.get("player_base");
-        String[] extra={
+        String[] reactive={
             "DEFENSE_STAND","DEFENSE_CROUCH","HIT_STAND","HIT_CROUCH","HIT_AIR",
-            "KNOCKDOWN","GROUNDED","GETUP",
-            "CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY",
-            "AIR_LIGHT","AIR_MEDIUM","AIR_HEAVY"
+            "KNOCKDOWN","GROUNDED","GETUP"
         };
-        for(String id:extra) {
+        for(String id:reactive) {
             assertTrue("Missing "+id,first.animations.containsKey(id));
             assertEquals("player_base_missing",first.animation(id).atlas.resource);
         }
-        assertFalse(GeneratedCharacters.get("player_two").animations.containsKey("DEFENSE_STAND"));
+        for(String id:new String[]{
+            "CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY",
+            "AIR_LIGHT","AIR_MEDIUM","AIR_HEAVY"
+        }) {
+            assertFalse("Directional placeholder must stay disabled: "+id,
+                first.animations.containsKey(id));
+        }
 
         set("grounded",true);set("crouching",true);
         invoke("startAttack",new Class<?>[]{String.class},"2L");frames(1);
-        assertEquals("CROUCH_LIGHT",motion().clip);
+        assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
 
-        setup();set("grounded",false);set("playerY",430f);
+        setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);
         invoke("startAttack",new Class<?>[]{String.class},"H");frames(1);
-        assertEquals("AIR_HEAVY",motion().clip);
+        assertEquals(SpriteMotion.Clip.JUMP,motion().clip);
 
         setup();set("playerBlockstunTimer",.12f);set("playerLastGuardState",2);
         set("playerMovementLocked",true);frames(1);

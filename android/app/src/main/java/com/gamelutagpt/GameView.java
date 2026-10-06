@@ -3138,26 +3138,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     : 0f;
             }
         } else if (attackTimer > 0f) {
+            // Standing L/M/H keep their authored move animation.
+            // Crouching and aerial attacks intentionally use the pre-v0.59
+            // fallback until dedicated reviewed sprites exist for each move.
             if (activeSpriteMove != null) {
                 animation = activeSpriteMove.animation.id;
-            } else if (isCrouchAttackActive()) {
-                String crouchAttack =
-                    "2L".equals(attackType) ? "CROUCH_LIGHT" :
-                    "2M".equals(attackType) ? "CROUCH_MEDIUM" :
-                    "2H".equals(attackType) ? "CROUCH_HEAVY" : null;
-                if (crouchAttack != null &&
-                    spriteFighterRenderer.hasAnimation(crouchAttack)) {
-                    animation = crouchAttack;
-                }
-            } else if (!grounded) {
-                String airAttack =
-                    "L".equals(attackType) ? "AIR_LIGHT" :
-                    "M".equals(attackType) ? "AIR_MEDIUM" :
-                    "H".equals(attackType) ? "AIR_HEAVY" : null;
-                if (airAttack != null &&
-                    spriteFighterRenderer.hasAnimation(airAttack)) {
-                    animation = airAttack;
-                }
             }
             animationElapsed = attackDuration - attackTimer;
         }

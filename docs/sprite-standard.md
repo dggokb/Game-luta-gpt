@@ -250,3 +250,16 @@ A rotação vetorial antiga de knockdown também fica desativada quando
 Este atlas é um primeiro passe de teste visual. As regras de dano, launcher,
 ground slam, blockstun e ataques 2L/2M/2H permanecem as já existentes; a v0.59
 conecta os sprites a esses estados sem alterar a física do combate.
+
+
+## Correção do mapeamento dos golpes direcionais — GPT v0.60
+
+A v0.59 conectou prematuramente os frames 8–13 do atlas `player_base_missing`
+aos ataques 2L/2M/2H e L/M/H aéreos. Visualmente esses frames não representam
+corretamente cada golpe e, por isso, o mapeamento foi removido.
+
+A v0.60 mantém somente os oito estados reativos aprovados desse atlas:
+defesa em pé/agachado, hit em pé/agachado/aéreo, knockdown, derrubado e levantar.
+Os ataques agachados voltam ao fallback de agachamento e os ataques aéreos ao
+fallback de salto/queda, exatamente como antes da v0.59, até existirem sprites
+dedicados e revisados para cada golpe.

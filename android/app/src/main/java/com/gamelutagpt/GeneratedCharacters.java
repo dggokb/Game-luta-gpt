@@ -58,12 +58,6 @@ final class GeneratedCharacters {
  a.put("KNOCKDOWN",new CharacterDefinition.Animation("KNOCKDOWN",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{5},new float[]{0.22000000f},false,0.00000000f));
  a.put("GROUNDED",new CharacterDefinition.Animation("GROUNDED",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{6},new float[]{1.20000000f},false,0.00000000f));
  a.put("GETUP",new CharacterDefinition.Animation("GETUP",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{7},new float[]{0.35000000f},false,0.00000000f));
- a.put("CROUCH_LIGHT",new CharacterDefinition.Animation("CROUCH_LIGHT",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{8},new float[]{0.16000000f},false,0.00000000f));
- a.put("CROUCH_MEDIUM",new CharacterDefinition.Animation("CROUCH_MEDIUM",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{9},new float[]{0.26000000f},false,0.00000000f));
- a.put("CROUCH_HEAVY",new CharacterDefinition.Animation("CROUCH_HEAVY",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{10},new float[]{0.40000000f},false,0.00000000f));
- a.put("AIR_LIGHT",new CharacterDefinition.Animation("AIR_LIGHT",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{11},new float[]{0.16000000f},false,0.00000000f));
- a.put("AIR_MEDIUM",new CharacterDefinition.Animation("AIR_MEDIUM",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{12},new float[]{0.26000000f},false,0.00000000f));
- a.put("AIR_HEAVY",new CharacterDefinition.Animation("AIR_HEAVY",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{13},new float[]{0.40000000f},false,0.00000000f));
  m.put("L",new CharacterDefinition.Move(a.get("LIGHT_JAB"),300,0.04000000f,0.10000000f,118.00000000f));
  m.put("M",new CharacterDefinition.Move(a.get("MEDIUM_KICK"),500,0.07000000f,0.17000000f,150.00000000f));
  m.put("H",new CharacterDefinition.Move(a.get("HEAVY_STRAIGHT"),800,0.16000000f,0.25000000f,182.00000000f));

@@ -267,66 +267,6 @@
       "durationsMs": [
         350
       ]
-    },
-    "CROUCH_LIGHT": {
-      "atlas": "player_base_missing",
-      "frames": [
-        8
-      ],
-      "loop": false,
-      "durationsMs": [
-        160
-      ]
-    },
-    "CROUCH_MEDIUM": {
-      "atlas": "player_base_missing",
-      "frames": [
-        9
-      ],
-      "loop": false,
-      "durationsMs": [
-        260
-      ]
-    },
-    "CROUCH_HEAVY": {
-      "atlas": "player_base_missing",
-      "frames": [
-        10
-      ],
-      "loop": false,
-      "durationsMs": [
-        400
-      ]
-    },
-    "AIR_LIGHT": {
-      "atlas": "player_base_missing",
-      "frames": [
-        11
-      ],
-      "loop": false,
-      "durationsMs": [
-        160
-      ]
-    },
-    "AIR_MEDIUM": {
-      "atlas": "player_base_missing",
-      "frames": [
-        12
-      ],
-      "loop": false,
-      "durationsMs": [
-        260
-      ]
-    },
-    "AIR_HEAVY": {
-      "atlas": "player_base_missing",
-      "frames": [
-        13
-      ],
-      "loop": false,
-      "durationsMs": [
-        400
-      ]
     }
   },
   "moves": {
