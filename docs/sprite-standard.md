@@ -69,7 +69,8 @@ programação.
   "color": "#F4B73B",
   "maxLife": 10000,
   "autoCombo": ["L", "M", "H"],
-  "body": {"halfWidth": 34, "standHeight": 145, "crouchHeight": 90},
+  "body": {"halfWidth": 34, "standHeight": 145, "crouchHeight": 90,
+           "pushHalfWidth": 30, "pushHeight": 120},
   "energy": {"damage": 850, "range": 720, "speed": 760, "command": [3, 1],
              "spawnX": 62, "spawnY": 82, "crouchSpawnY": 65},
   "super": {"damage": 3200, "range": 1450, "speed": 1180,
@@ -83,7 +84,11 @@ As alturas precisam ficar dentro da hurtbox. O nome exibido é sempre `displayNa
 HUD mostra o slot do time (`PLAYER 1`, `PLAYER 2`, `CPU`) + `displayName`. `hudName`
 foi removido e reprova o build.
 
-`body` é a hurtbox de gameplay em unidades do mundo, independente do PNG. `energy` e
+`body` é a hurtbox de gameplay em unidades do mundo, independente do PNG.
+`pushHalfWidth`/`pushHeight` formam a caixa de empurrão: os corpos não se sobrepõem,
+andar contra o oponente empurra os dois (metade para cada; contra a parede o outro
+cede tudo) e quem passa acima de `pushHeight` atravessa (super pulo sobre o
+Brutamonte). A caixa de empurrão fica dentro da hurtbox, então nunca bloqueia golpe. `energy` e
 `super` são opcionais (sem eles o lutador não usa o recurso). `artFacing` diz para onde
 a arte olha; o renderer espelha a partir dele, sem flips no `GameView`.
 
@@ -387,5 +392,25 @@ reexportar a arte com células maiores. O NPC ainda reaproveita frames entre est
 - Projéteis saem do ponto declarado em `energy`/`super` (o Brutamonte lança mais alto).
 - Atlas empacotados (ver "Geometria") e `standingVisualHeight` validado contra o Idle.
 - Nomes unificados: `displayName` + slot do time; `hudName` removido.
-- Ainda fora: área de empurrão entre corpos (lutadores podem se sobrepor) e divisão
-  restante do `GameView` (IA, HUD e input).
+
+## Empurrão entre corpos e arquitetura — GPT v0.65
+
+- **Caixa de empurrão** por personagem (`body.pushHalfWidth`, `body.pushHeight`),
+  resolvida a cada passo de física por `CombatRules.resolvePush`.
+- **`GameView` dividido** (3.705 → ~2.600 linhas). Ele mantém a simulação (estado
+  dos lutadores, golpes, defesa, Super, troca, projéteis) e o loop; o resto saiu:
+
+| Classe | Papel | Testável na JVM |
+| --- | --- | --- |
+| `OpponentAi` | Decisões da CPU; executa por `Actions`, lê um `Situation` | sim |
+| `CombatRules` | Colisão de golpes/projéteis, empurrão, alcance, medidor | sim |
+| `CommandBuffer` | Reconhecimento de comandos (↓→ etc.) | sim |
+| `CameraRig` | Enquadramento, zoom e Super Jump | sim |
+| `ControlsLayout` | Geometria dos controles e hit-test do toque | sim |
+| `Arena` | Dimensões do mundo e da tela virtual | sim |
+| `HudRenderer` | HUD, painel sobre o oponente, D-pad e botões (lê `State`) | Robolectric |
+| `StageRenderer` / `EffectsRenderer` | Cenário; projéteis e overlays do Super | Robolectric |
+| `SpriteFighterRenderer` / `SpriteAtlasCache` | Sprites e atlas compartilhados | Robolectric |
+
+O painel sobre o oponente passou a mostrar o `displayName` do pack (antes dizia
+"NPC TESTE"/"PLAYER 2").

@@ -15,7 +15,9 @@
     "body": {
       "halfWidth": 34,
       "standHeight": 145,
-      "crouchHeight": 90
+      "crouchHeight": 90,
+      "pushHalfWidth": 30,
+      "pushHeight": 120
     },
     "energy": {
       "damage": 850,

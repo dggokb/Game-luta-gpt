@@ -573,7 +573,7 @@ public class SpriteIntegrationTest {
         assertTrue("Visual height is the opaque art, not the PNG cell",
             npc.visualStandHeight<npc.profile.rootY*npc.profile.worldScale);
         frames(240);
-        assertTrue("Opponent head must stay on screen",(Float)get("cameraTop")<=visualTop);
+        assertTrue("Opponent head must stay on screen",((CameraRig)get("camera")).top<=visualTop);
     }
     @Test public void opponentAiOnlyStartsAttacksThatCanReach()throws Exception {
         CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
@@ -593,6 +593,17 @@ public class SpriteIntegrationTest {
             previous=type;
         }
         assertTrue("AI should attack once in range",started>0);
+    }
+    @Test public void walkingIntoTheOpponentPushesInsteadOfOverlapping()throws Exception {
+        CharacterDefinition.Body p=GeneratedCharacters.defaultCharacter().fighter.body;
+        CharacterDefinition.Body n=GeneratedCharacters.opponentCharacter().fighter.body;
+        float gap=p.pushHalfWidth+n.pushHalfWidth;
+        set("dummyX",520f);
+        touch(MotionEvent.ACTION_DOWN,265,555);frames(60);
+        float px=(Float)get("playerX"),dx=(Float)get("dummyX");
+        assertTrue("Bodies overlap: "+(dx-px),dx-px>=gap-0.01f);
+        assertTrue("Opponent should be pushed",dx>520f);
+        assertEquals(1,(int)get("facingDirection"));
     }
     @Test public void matchRenderersShareOneDecodedAtlasCache()throws Exception {
         SpriteFighterRenderer player=(SpriteFighterRenderer)get("spriteFighterRenderer");

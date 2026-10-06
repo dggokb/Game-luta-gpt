@@ -43,7 +43,7 @@ final class GeneratedCharacters {
  m.put("jH",new CharacterDefinition.Move("jH",null,"AIR",800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,78.00000000f));
  s.put("S",a.get("ROAR"));
  s.put("SUPER",a.get("ROAR"));
- all.put("monster_npc",new CharacterDefinition("monster_npc","Brutamonte",new CharacterVisualProfile("monster_npc",256,256,128.00000000f,248.00000000f,1.40000000f),1,295.40000000f,247.80000000f,new CharacterDefinition.Fighter(0xFFD9485F,10000,new String[]{},new CharacterDefinition.Projectile(650,560.00000000f,980.00000000f,100.00000000f,110.00000000f,90.00000000f,110.00000000f),new int[]{5,1},new CharacterDefinition.Projectile(2850,1320.00000000f,1280.00000000f,120.00000000f,115.00000000f,115.00000000f,115.00000000f),new CharacterDefinition.Body(78.00000000f,290.00000000f,240.00000000f)),a,m,s));
+ all.put("monster_npc",new CharacterDefinition("monster_npc","Brutamonte",new CharacterVisualProfile("monster_npc",256,256,128.00000000f,248.00000000f,1.40000000f),1,295.40000000f,247.80000000f,new CharacterDefinition.Fighter(0xFFD9485F,10000,new String[]{},new CharacterDefinition.Projectile(650,560.00000000f,980.00000000f,100.00000000f,110.00000000f,90.00000000f,110.00000000f),new int[]{5,1},new CharacterDefinition.Projectile(2850,1320.00000000f,1280.00000000f,120.00000000f,115.00000000f,115.00000000f,115.00000000f),new CharacterDefinition.Body(78.00000000f,290.00000000f,240.00000000f,64.00000000f,130.00000000f)),a,m,s));
  }
  {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
@@ -82,7 +82,7 @@ final class GeneratedCharacters {
  m.put("jL",new CharacterDefinition.Move("jL",null,"AIR",300,0.16000000f,0.05800000f,0.10200000f,84.00000000f,78.00000000f));
  m.put("jM",new CharacterDefinition.Move("jM",null,"AIR",500,0.26000000f,0.09400000f,0.16600000f,116.00000000f,78.00000000f));
  m.put("jH",new CharacterDefinition.Move("jH",null,"AIR",800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,78.00000000f));
- all.put("player_base",new CharacterDefinition("player_base","Lutador base",new CharacterVisualProfile("player_base",256,256,128.00000000f,238.00000000f,1.00000000f),1,226.00000000f,168.00000000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(850,720.00000000f,760.00000000f,62.00000000f,82.00000000f,65.00000000f,82.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(3200,1450.00000000f,1180.00000000f,78.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(34.00000000f,145.00000000f,90.00000000f)),a,m,s));
+ all.put("player_base",new CharacterDefinition("player_base","Lutador base",new CharacterVisualProfile("player_base",256,256,128.00000000f,238.00000000f,1.00000000f),1,226.00000000f,168.00000000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(850,720.00000000f,760.00000000f,62.00000000f,82.00000000f,65.00000000f,82.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(3200,1450.00000000f,1180.00000000f,78.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(34.00000000f,145.00000000f,90.00000000f,30.00000000f,120.00000000f)),a,m,s));
  }
  {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
@@ -111,7 +111,7 @@ final class GeneratedCharacters {
  m.put("jL",new CharacterDefinition.Move("jL",null,"AIR",300,0.16000000f,0.05800000f,0.10200000f,84.00000000f,78.00000000f));
  m.put("jM",new CharacterDefinition.Move("jM",null,"AIR",500,0.26000000f,0.09400000f,0.16600000f,116.00000000f,78.00000000f));
  m.put("jH",new CharacterDefinition.Move("jH",null,"AIR",800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,78.00000000f));
- all.put("player_two",new CharacterDefinition("player_two","Lutador Teste 2",new CharacterVisualProfile("player_two",384,256,192.00000000f,246.00000000f,1.00000000f),1,227.00000000f,151.00000000f,new CharacterDefinition.Fighter(0xFF4ACDE8,10000,new String[]{"L","L","H","M"},new CharacterDefinition.Projectile(650,560.00000000f,980.00000000f,62.00000000f,82.00000000f,65.00000000f,82.00000000f),new int[]{5,1},new CharacterDefinition.Projectile(2850,1320.00000000f,1280.00000000f,78.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(34.00000000f,145.00000000f,90.00000000f)),a,m,s));
+ all.put("player_two",new CharacterDefinition("player_two","Lutador Teste 2",new CharacterVisualProfile("player_two",384,256,192.00000000f,246.00000000f,1.00000000f),1,227.00000000f,151.00000000f,new CharacterDefinition.Fighter(0xFF4ACDE8,10000,new String[]{"L","L","H","M"},new CharacterDefinition.Projectile(650,560.00000000f,980.00000000f,62.00000000f,82.00000000f,65.00000000f,82.00000000f),new int[]{5,1},new CharacterDefinition.Projectile(2850,1320.00000000f,1280.00000000f,78.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(34.00000000f,145.00000000f,90.00000000f,30.00000000f,120.00000000f)),a,m,s));
  }
  return Collections.unmodifiableMap(all);
  }

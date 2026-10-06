@@ -80,8 +80,11 @@ final class CharacterDefinition {
     /** Gameplay hurtbox in world units, independent of the PNG canvas. */
     static final class Body {
         final float halfWidth,standHeight,crouchHeight;
-        Body(float halfWidth,float standHeight,float crouchHeight) {
+        /** Pushbox: keeps two bodies from overlapping; low enough to be jumped over. */
+        final float pushHalfWidth,pushHeight;
+        Body(float halfWidth,float standHeight,float crouchHeight,float pushHalfWidth,float pushHeight) {
             this.halfWidth=halfWidth;this.standHeight=standHeight;this.crouchHeight=crouchHeight;
+            this.pushHalfWidth=pushHalfWidth;this.pushHeight=pushHeight;
         }
         float height(boolean crouching) { return crouching?crouchHeight:standHeight; }
     }

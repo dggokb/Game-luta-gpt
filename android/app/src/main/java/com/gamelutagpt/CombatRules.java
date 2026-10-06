@@ -125,6 +125,40 @@ final class CombatRules {
             distance <= maxCenterDistance(attacker.move(type, airborne), target);
     }
 
+    /**
+     * Separates two overlapping pushboxes. Each body yields half of the overlap; when one
+     * is pinned against an arena bound the other takes the rest. Bodies whose pushboxes do
+     * not overlap vertically (one jumped over the other) are left alone. Writes the new
+     * positions into {@code out} and returns whether anything moved.
+     *
+     * @param tieDirection side where {@code b} goes when both share the same x
+     */
+    static boolean resolvePush(
+        float ax, float aBaseY, CharacterDefinition.Body a,
+        float bx, float bBaseY, CharacterDefinition.Body b,
+        float minX, float maxX, int tieDirection, float[] out
+    ) {
+        out[0] = ax;
+        out[1] = bx;
+        boolean vertical = aBaseY - a.pushHeight < bBaseY && bBaseY - b.pushHeight < aBaseY;
+        if (!vertical) return false;
+        float minDistance = a.pushHalfWidth + b.pushHalfWidth;
+        float dx = bx - ax;
+        float overlap = minDistance - Math.abs(dx);
+        if (overlap <= 0f) return false;
+        int side = dx > 0f ? 1 : dx < 0f ? -1 : (tieDirection >= 0 ? 1 : -1);
+        float nb = clamp(bx + side * overlap * 0.5f, minX, maxX);
+        float na = clamp(nb - side * minDistance, minX, maxX);
+        nb = clamp(na + side * minDistance, minX, maxX);
+        out[0] = na;
+        out[1] = nb;
+        return true;
+    }
+
+    private static float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
     static float superGainForAttack(String type) {
         if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
         if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;

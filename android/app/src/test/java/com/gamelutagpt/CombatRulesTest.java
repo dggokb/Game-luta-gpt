@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 public class CombatRulesTest {
     private static final CharacterDefinition BASE=GeneratedCharacters.get("player_base");
     private static final CharacterDefinition NPC=GeneratedCharacters.opponentCharacter();
-    private static final CharacterDefinition.Body LEGACY=new CharacterDefinition.Body(34,145,90);
+    private static final CharacterDefinition.Body LEGACY=new CharacterDefinition.Body(34,145,90,30,120);
 
     @Test public void reachIsMeasuredToTheTargetHurtboxEdge() {
         CharacterDefinition.Move jab=BASE.moves.get("L");
@@ -92,5 +92,34 @@ public class CombatRulesTest {
         assertTrue("A big fighter launches from higher up",
             NPC.fighter.energy.spawnHeight(false,false)>energy.spawnHeight(false,false));
         assertTrue(NPC.fighter.energy.spawnHeight(true,false)<=NPC.fighter.body.crouchHeight);
+    }
+    @Test public void pushboxesSeparateBodiesAndRespectWalls() {
+        CharacterDefinition.Body p=BASE.fighter.body,n=NPC.fighter.body;
+        float min=p.pushHalfWidth+n.pushHalfWidth;
+        float[] out=new float[2];
+        // Overlap split in half.
+        assertTrue(CombatRules.resolvePush(500,565,p,540,565,n,90,2510,1,out));
+        assertEquals(min,out[1]-out[0],1e-3f);
+        assertEquals(520-min/2,out[0],1e-3f);
+        // Pinned against the right wall: the other body takes all of it.
+        assertTrue(CombatRules.resolvePush(2500,565,p,2510,565,n,90,2510,1,out));
+        assertEquals(2510,out[1],1e-3f);assertEquals(2510-min,out[0],1e-3f);
+        // Same x: tie direction decides the side.
+        assertTrue(CombatRules.resolvePush(800,565,p,800,565,n,90,2510,-1,out));
+        assertTrue(out[1]<out[0]);
+        // Apart, or one high above the other's pushbox: untouched.
+        assertFalse(CombatRules.resolvePush(500,565,p,500+min+1,565,n,90,2510,1,out));
+        assertFalse(CombatRules.resolvePush(500,565-n.pushHeight-1,p,520,565,n,90,2510,1,out));
+        assertEquals(500,out[0],0);assertEquals(520,out[1],0);
+    }
+    @Test public void pushboxIsSmallerThanHurtboxSoItNeverBlocksAHit() {
+        for(String id:new String[]{"player_base","player_two","monster_npc"}) {
+            CharacterDefinition.Body b=GeneratedCharacters.get(id).fighter.body;
+            assertTrue(b.pushHalfWidth<=b.halfWidth);
+            // Melee reach of every move is measured past the hurtbox edge, beyond the push gap.
+            for(CharacterDefinition.Move m:GeneratedCharacters.get(id).moves.values())
+                assertTrue(id+"/"+m.binding,
+                    CombatRules.maxCenterDistance(m,NPC.fighter.body)>b.pushHalfWidth+NPC.fighter.body.pushHalfWidth);
+        }
     }
 }

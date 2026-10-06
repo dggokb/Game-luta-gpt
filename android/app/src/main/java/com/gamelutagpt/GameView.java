@@ -3,9 +3,7 @@ package com.gamelutagpt;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -29,20 +27,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final List<Projectile> energyProjectiles = new ArrayList<>();
     private final List<Projectile> superProjectiles = new ArrayList<>();
 
-    private static final float VW = 1280f;
-    private static final float VH = 720f;
-    private static final float GROUND_Y = 565f;
-    private static final float WORLD_WIDTH = 2600f;
-    private static final float LEFT_BOUND = 90f;
-    private static final float RIGHT_BOUND = WORLD_WIDTH - 90f;
-    private static final float CAMERA_ZOOM = 1.12f;
-    private static final float CAMERA_MIN_ZOOM = 0.78f;
-    private static final float CAMERA_FIGHTER_MARGIN_X = 520f;
-    private static final float CAMERA_GROUND_SCREEN_Y = 552f;
-    private static final float CAMERA_TOP_MARGIN_SCREEN = 64f;
-    private static final float CAMERA_BOTTOM_MARGIN_SCREEN = 45f;
-    private static final float GROUND_CAMERA_TOP = 72f;
-    private static final float WORLD_TOP = -520f;
+    private static final float VW = Arena.VW;
+    private static final float VH = Arena.VH;
+    private static final float GROUND_Y = Arena.GROUND_Y;
+    private static final float WORLD_WIDTH = Arena.WORLD_WIDTH;
+    private static final float LEFT_BOUND = Arena.LEFT_BOUND;
+    private static final float RIGHT_BOUND = Arena.RIGHT_BOUND;
+    private static final float WORLD_TOP = Arena.WORLD_TOP;
 
     private static final float DUMMY_START_X = 980f;
     private static final float DUMMY_HIT_REACTION_DURATION = 0.22f;
@@ -56,22 +47,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float DUMMY_KD_FALL_DURATION = 0.22f;
     private static final float DUMMY_KD_DOWN_DURATION = 1.20f;
     private static final float DUMMY_KD_GETUP_DURATION = 0.35f;
-    private static final float AI_BUTTON_LEFT = 1082f;
-    private static final float AI_BUTTON_TOP = 124f;
-    private static final float AI_BUTTON_RIGHT = 1248f;
-    private static final float AI_BUTTON_BOTTOM = 172f;
-    private static final float AI_DECISION_MIN = 0.12f;
-    private static final float AI_DECISION_MAX = 0.28f;
     private static final float AI_WALK_SPEED = 300f;
     private static final float AI_DASH_SPEED = 620f;
     private static final float AI_BACKDASH_SPEED = 760f;
     private static final float AI_BACKDASH_DURATION = 0.20f;
     private static final float AI_ATTACK_COOLDOWN = 0.22f;
-    // Attack preferences; the pack decides which of them can reach.
-    private static final String[] AI_GROUND_ATTACKS = {"2L", "2M", "2H", "L", "M", "H"};
-    private static final double[] AI_GROUND_WEIGHTS = {0.18, 0.18, 0.17, 0.17, 0.16, 0.14};
-    private static final String[] AI_AIR_ATTACKS = {"L", "M", "H"};
-    private static final double[] AI_AIR_WEIGHTS = {0.30, 0.34, 0.36};
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
     private float dummyVelocityY = 0f;
@@ -89,7 +69,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float dummyKnockbackVelocityX = 0f;
 
     private boolean opponentAiEnabled = false;
-    private float aiDecisionTimer = 0f;
     private float aiAttackCooldownRemaining = 0f;
     private boolean aiMovingForward = false;
     private boolean aiMovingBack = false;
@@ -110,18 +89,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final SpriteFighterRenderer spriteFighterRenderer;
     private final SpriteFighterRenderer opponentSpriteRenderer;
-    private final LinearGradient skyGradient;
-    private final android.graphics.Path[] mountainPaths =
-        new android.graphics.Path[15];
+    private final StageRenderer stage = new StageRenderer();
+    private final EffectsRenderer effects = new EffectsRenderer();
+    private final HudRenderer hud = new HudRenderer();
+    private final HudRenderer.OpponentPanel opponentPanel = new HudRenderer.OpponentPanel();
+    private final OpponentAi opponentAi = new OpponentAi(new java.util.Random());
+    private final OpponentAi.Situation aiSituation = new OpponentAi.Situation();
 
     private Thread gameThread;
     private volatile boolean running;
 
     private float playerX = 420f;
     private float playerY = GROUND_Y;
-    private float cameraX = 700f;
-    private float cameraTop = GROUND_CAMERA_TOP;
-    private float cameraZoom = CAMERA_ZOOM;
+    private final CameraRig camera = new CameraRig();
     private float velocityY = 0f;
     private int facingDirection = 1;
     private static final float FACING_SWITCH_EPSILON = 6f;
@@ -165,43 +145,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final int GUARD_LOW = 2;
     private static final float BLOCKSTUN_DURATION = 0.18f;
     private static final float BLOCK_PUSH_SPEED = 72f;
-
-    private static final float DPAD_X = 175f;
-    private static final float DPAD_Y = 555f;
-    private static final float DPAD_RADIUS = 122f;
-    private static final float DPAD_DEADZONE = 28f;
-    private static final float DPAD_DIAGONAL = 0.70710677f;
-    private static final String[] DPAD_LABELS = {
-        "→", "↘", "↓", "↙", "←", "↖", "↑", "↗"
-    };
-    private static final float[] DPAD_UNIT_X = {
-        1f, DPAD_DIAGONAL, 0f, -DPAD_DIAGONAL,
-        -1f, -DPAD_DIAGONAL, 0f, DPAD_DIAGONAL
-    };
-    private static final float[] DPAD_UNIT_Y = {
-        0f, DPAD_DIAGONAL, 1f, DPAD_DIAGONAL,
-        0f, -DPAD_DIAGONAL, -1f, -DPAD_DIAGONAL
-    };
-
-    private static final float ATTACK_RADIUS = 54f;
-    private static final float LIGHT_X = 1005f;
-    private static final float LIGHT_Y = 598f;
-    private static final float MEDIUM_X = 1100f;
-    private static final float MEDIUM_Y = 515f;
-    private static final float HEAVY_X = 1195f;
-    private static final float HEAVY_Y = 598f;
-
-    private static final float COMBO_X = 1100f;
-    private static final float COMBO_Y = 650f;
-    private static final float COMBO_RADIUS = 43f;
-
-    private static final float TAG_X = 930f;
-    private static final float TAG_Y = 505f;
-    private static final float TAG_RADIUS = 43f;
-
-    private static final float SUPER_X = 905f;
-    private static final float SUPER_Y = 620f;
-    private static final float SUPER_RADIUS = 46f;
 
     private static final float MAX_SUPER_METER = 5f;
     private static final float SUPER_COST = 1f;
@@ -270,13 +213,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private long lastAutoComboTapMs = -1000L;
     private static final long AUTO_COMBO_RESET_MS = 700L;
 
-    private static final int COMMAND_BUFFER_SIZE = 8;
-    private static final long ENERGY_COMMAND_STEP_MS = 420L;
     private static final long ENERGY_CONFIRM_WINDOW_MS = 550L;
     private long pendingEnergyUntilMs = -1L;
-    private final int[] commandDirections = new int[COMMAND_BUFFER_SIZE];
-    private final long[] commandTimes = new long[COMMAND_BUFFER_SIZE];
-    private int commandCount = 0;
+    private final CommandBuffer commandBuffer = new CommandBuffer();
 
     private final ConcurrentLinkedQueue<MotionEvent> pendingInput =
         new ConcurrentLinkedQueue<>();
@@ -310,31 +249,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
-
-        skyGradient = new LinearGradient(
-            0f,
-            WORLD_TOP,
-            0f,
-            VH,
-            Color.rgb(21, 55, 103),
-            Color.rgb(240, 171, 99),
-            Shader.TileMode.CLAMP
-        );
-        buildScenarioGeometry();
-    }
-
-    private void buildScenarioGeometry() {
-        for (int i = 0; i < mountainPaths.length; i++) {
-            float x = -100f + i * 190f;
-            float h = 105f + (i % 5) * 24f;
-
-            android.graphics.Path path = new android.graphics.Path();
-            path.moveTo(x, GROUND_Y);
-            path.lineTo(x + 115f, GROUND_Y - h);
-            path.lineTo(x + 245f, GROUND_Y);
-            path.close();
-            mountainPaths[i] = path;
-        }
     }
 
     private FighterState activeFighter() {
@@ -530,10 +444,75 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         playerX = clamp(playerX, LEFT_BOUND, RIGHT_BOUND);
+        resolveBodyPush();
         updateFacing();
 
         updateFightCamera(dt);
         updateSpriteMotion(dt,playerX-previousX);
+    }
+
+    /** Executes the AI's choices with the same rules a human-driven fighter uses. */
+    private final OpponentAi.Actions aiActions = new OpponentAi.Actions() {
+        @Override public void stop() {
+            aiMovingForward = false;
+            aiMovingBack = false;
+            aiForwardDashing = false;
+            aiCrouching = false;
+        }
+        @Override public void attack(String type) { startOpponentAttack(type); }
+        @Override public void superAttack() { startOpponentSuper(); }
+        @Override public void energy(String strength) { fireOpponentEnergy(strength); }
+        @Override public void backdash() { aiBackDashTimer = AI_BACKDASH_DURATION; }
+        @Override public void moveForward(boolean dash) {
+            aiMovingForward = true;
+            aiForwardDashing = dash;
+        }
+        @Override public void jump(boolean superJump) { startOpponentJump(superJump); }
+    };
+
+    private final HudRenderer.State hudState = new HudRenderer.State() {
+        @Override public FighterState active() { return activeFighter(); }
+        @Override public FighterState reserve() { return reserveFighter(); }
+        @Override public String versionLabel() { return VERSION_HUD_LABEL; }
+        @Override public String stateLabel() { return currentStateLabel(); }
+        @Override public int facing() { return facingDirection; }
+        @Override public boolean aiEnabled() { return opponentAiEnabled; }
+        @Override public float tagReadyRatio() {
+            if (isTagAnimationActive()) return 0f;
+            if (tagCooldownRemaining > 0f) return 1f - tagCooldownRemaining / TAG_COOLDOWN_SECONDS;
+            return 1f;
+        }
+        @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
+        @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
+        @Override public boolean canTag() { return canStartTag(); }
+        @Override public boolean canSuper() { return canStartSuper(); }
+        @Override public int dpadDirection() { return dpadDirection; }
+        @Override public boolean pressed(ControlsLayout.Control control) {
+            switch (control) {
+                case LIGHT: return lightPointer != -1;
+                case MEDIUM: return mediumPointer != -1;
+                case HEAVY: return heavyPointer != -1;
+                case COMBO: return comboPointer != -1;
+                case TAG: return tagPointer != -1;
+                case SUPER: return superPointer != -1;
+                default: return false;
+            }
+        }
+    };
+
+    private final float[] pushResult = new float[2];
+
+    /** Bodies never overlap: walking into the opponent pushes both (pushbox from the pack). */
+    private void resolveBodyPush() {
+        if (activeFighter().life <= 0 && dummyLife <= 0) return;
+        if (CombatRules.resolvePush(
+            playerX, playerY, activeFighter().profile.body,
+            dummyX, dummyY, opponentProfile().body,
+            LEFT_BOUND, RIGHT_BOUND, facingDirection, pushResult
+        )) {
+            playerX = pushResult[0];
+            dummyX = pushResult[1];
+        }
     }
 
     private CharacterDefinition.Fighter opponentProfile() {
@@ -631,7 +610,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void setOpponentAiEnabled(boolean enabled) {
         opponentAiEnabled = enabled;
         aiStatusLabel = enabled ? "IA ON" : "IA OFF";
-        aiDecisionTimer = 0f;
+        opponentAi.reset();
         aiAttackCooldownRemaining = 0f;
         aiMovingForward = false;
         aiMovingBack = false;
@@ -813,67 +792,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             return;
         }
 
-        aiDecisionTimer -= dt;
-        if (aiDecisionTimer <= 0f) {
-            aiDecisionTimer = AI_DECISION_MIN +
-                (float)Math.random() * (AI_DECISION_MAX - AI_DECISION_MIN);
-
-            aiMovingForward = false;
-            aiMovingBack = false;
-            aiForwardDashing = false;
-            aiCrouching = false;
-
-            CharacterDefinition.Body target = activeCharacter().fighter.body;
-            String airAttack = verticalDistance <= 115f
-                ? CombatRules.pickInRange(AI_AIR_ATTACKS, AI_AIR_WEIGHTS,
-                    opponentCharacter(), true, distance, target, Math.random())
-                : null;
-            String groundAttack = CombatRules.pickInRange(AI_GROUND_ATTACKS, AI_GROUND_WEIGHTS,
-                opponentCharacter(), false, distance, target, Math.random());
-
-            if (dummyAirborne) {
-                if (airAttack != null) {
-                    startOpponentAttack(airAttack);
-                } else {
-                    aiMovingForward = distance > 95f;
-                }
-            } else if (activeFighter().life <= 0) {
-                // sem ação
-            } else if (
-                opponentFighter.superMeter >= SUPER_COST &&
-                distance >= 250f &&
-                distance <= 720f &&
-                Math.random() < 0.18
-            ) {
-                startOpponentSuper();
-            } else if (
-                distance >= 230f &&
-                distance <= 620f &&
-                !hasActiveEnergyProjectile(AI_OWNER_INDEX) &&
-                Math.random() < 0.24
-            ) {
-                double r = Math.random();
-                fireOpponentEnergy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
-            } else if (
-                !grounded &&
-                CombatRules.reaches(opponentCharacter(), "2H", false, distance, target) &&
-                Math.random() < 0.38
-            ) {
-                startOpponentAttack("2H");
-            } else if (groundAttack != null && aiAttackCooldownRemaining <= 0f) {
-                startOpponentAttack(groundAttack);
-            } else if (distance < 82f && Math.random() < 0.38) {
-                aiBackDashTimer = AI_BACKDASH_DURATION;
-            } else if (distance > 360f && Math.random() < 0.38) {
-                aiMovingForward = true;
-                aiForwardDashing = true;
-            } else if (groundAttack == null && distance > CombatRules.MIN_MELEE_DISTANCE) {
-                // Approach until at least one ground move can reach the player.
-                aiMovingForward = true;
-            } else if (Math.random() < 0.12) {
-                startOpponentJump(Math.random() < 0.32);
-            }
-        }
+        aiSituation.self = opponentCharacter();
+        aiSituation.target = activeCharacter().fighter.body;
+        aiSituation.distance = distance;
+        aiSituation.verticalDistance = verticalDistance;
+        aiSituation.selfAirborne = dummyAirborne;
+        aiSituation.targetGrounded = grounded;
+        aiSituation.targetAlive = activeFighter().life > 0;
+        aiSituation.superReady = opponentFighter.superMeter >= SUPER_COST;
+        aiSituation.projectileActive = hasActiveEnergyProjectile(AI_OWNER_INDEX);
+        aiSituation.attackReady = aiAttackCooldownRemaining <= 0f;
+        opponentAi.think(dt, aiSituation, aiActions);
 
         if (dummyAirborne) {
             if (aiMovingForward) {
@@ -1698,24 +1627,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void recordCommandDirection(int direction, long nowMs) {
         if (direction == 0) return;
-
-        if (commandCount > 0 && commandDirections[commandCount - 1] == direction) {
-            commandTimes[commandCount - 1] = nowMs;
-            return;
-        }
-
-        if (commandCount >= COMMAND_BUFFER_SIZE) {
-            for (int i = 1; i < COMMAND_BUFFER_SIZE; i++) {
-                commandDirections[i - 1] = commandDirections[i];
-                commandTimes[i - 1] = commandTimes[i];
-            }
-            commandCount = COMMAND_BUFFER_SIZE - 1;
-        }
-
-        commandDirections[commandCount] = direction;
-        commandTimes[commandCount] = nowMs;
-        commandCount++;
-
+        commandBuffer.record(direction, nowMs);
         tryEnergyCommand(nowMs);
     }
 
@@ -1730,47 +1642,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             return;
         }
         if (attackTimer > 0f) return;
-        if (commandCount < profile.energyCommand.length) return;
-
-        int commandIndex = profile.energyCommand.length - 1;
-        int bufferIndex = commandCount - 1;
-        long lastMatchedTime = -1L;
-        long firstMatchedTime = -1L;
-
-        // Procura a sequência de trás para frente e permite diagonais/intermediários.
-        // Ex.: ↓ ↘ → continua reconhecendo o comando configurado ↓ →.
-        while (commandIndex >= 0 && bufferIndex >= 0) {
-            if (commandDirections[bufferIndex] == profile.energyCommand[commandIndex]) {
-                long matchedTime = commandTimes[bufferIndex];
-
-                if (
-                    lastMatchedTime > 0L &&
-                    lastMatchedTime - matchedTime > ENERGY_COMMAND_STEP_MS
-                ) {
-                    return;
-                }
-
-                lastMatchedTime = matchedTime;
-                firstMatchedTime = matchedTime;
-                commandIndex--;
-            }
-            bufferIndex--;
-        }
-
-        if (commandIndex >= 0) return;
-        if (nowMs - commandTimes[commandCount - 1] > ENERGY_COMMAND_STEP_MS) return;
-        if (nowMs - firstMatchedTime > ENERGY_COMMAND_STEP_MS * profile.energyCommand.length) return;
+        if (!commandBuffer.consume(profile.energyCommand, nowMs)) return;
 
         // A sequência apenas arma o especial. L/M/H decide a força do projétil.
         pendingEnergyUntilMs = nowMs + ENERGY_CONFIRM_WINDOW_MS;
-
-        commandCount = 0;
         forwardDashing = false;
         backDashTimer = 0f;
     }
 
     private void resetCommandBuffer() {
-        commandCount = 0;
+        commandBuffer.reset();
     }
 
     private void resetAutoCombo() {
@@ -2091,99 +1972,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateFightCamera(float dt) {
-        float separationX = Math.abs(playerX - dummyX);
-        float requiredWorldWidth =
-            separationX + CAMERA_FIGHTER_MARGIN_X;
-
-        float targetZoomX =
-            VW / Math.max(VW / CAMERA_ZOOM, requiredWorldWidth);
-
         // Frame what is actually drawn: opaque sprite height measured at import time.
         float playerTop = playerY - (isPlayerCrouching()
             ? activeCharacter().visualCrouchHeight
             : activeCharacter().visualStandHeight);
-        float opponentTop = opponentVisualTop();
-        float highestFighterTop = Math.min(playerTop, opponentTop);
-        float heightAboveGround =
-            Math.max(1f, GROUND_Y - highestFighterTop);
-
-        // Tenta reservar margem visual acima do lutador mais alto.
-        float usableVerticalScreen =
-            CAMERA_GROUND_SCREEN_Y - CAMERA_TOP_MARGIN_SCREEN;
-        float targetZoomY =
-            usableVerticalScreen / heightAboveGround;
-
-        boolean superJumpCameraActive =
-            superJumping || aiSuperJumping;
-
-        // No Super Jump, a altura nao abre o enquadramento:
-        // a camera sobe/desce junto com o lutador e o zoom continua
-        // respondendo somente a separacao horizontal.
-        float targetZoom = clamp(
-            superJumpCameraActive
-                ? targetZoomX
-                : Math.min(targetZoomX, targetZoomY),
-            CAMERA_MIN_ZOOM,
-            CAMERA_ZOOM
-        );
-
-        float zoomFollow =
-            1f - (float)Math.pow(0.0025f, dt);
-        cameraZoom +=
-            (targetZoom - cameraZoom) * zoomFollow;
-
-        float visibleWorldWidth = VW / cameraZoom;
-        float halfVisible = visibleWorldWidth * 0.5f;
-
-        float fightCenterX = (playerX + dummyX) * 0.5f;
-        float targetCameraX = clamp(
-            fightCenterX,
-            halfVisible,
-            WORLD_WIDTH - halfVisible
-        );
-
-        float horizontalFollow =
-            1f - (float)Math.pow(0.0015f, dt);
-        cameraX +=
-            (targetCameraX - cameraX) * horizontalFollow;
-
-        // Mantém o chão praticamente na mesma altura da tela enquanto possível.
-        float baseTop =
-            GROUND_Y - CAMERA_GROUND_SCREEN_Y / cameraZoom;
-        float topMarginWorld =
-            CAMERA_TOP_MARGIN_SCREEN / cameraZoom;
-
-        float targetCameraTop = baseTop;
-        if (
-            highestFighterTop <
-            targetCameraTop + topMarginWorld
-        ) {
-            targetCameraTop =
-                highestFighterTop - topMarginWorld;
-        }
-
-        // Fora do Super Jump, preserva uma faixa do chao na tela.
-        // Durante o Super Jump essa trava e removida para a camera poder
-        // acompanhar verticalmente sem precisar afastar o zoom.
-        if (!superJumpCameraActive) {
-            float lowestAllowedTop =
-                GROUND_Y -
-                (VH - CAMERA_BOTTOM_MARGIN_SCREEN) / cameraZoom;
-            targetCameraTop = Math.max(
-                targetCameraTop,
-                lowestAllowedTop
-            );
-        }
-        targetCameraTop = clamp(
-            targetCameraTop,
-            WORLD_TOP,
-            GROUND_CAMERA_TOP
-        );
-
-        float verticalFollow =
-            1f - (float)Math.pow(0.0007f, dt);
-        cameraTop +=
-            (targetCameraTop - cameraTop) * verticalFollow;
+        float highestFighterTop = Math.min(playerTop, opponentVisualTop());
+        camera.update(dt, playerX, dummyX, highestFighterTop, superJumping || aiSuperJumping);
     }
 
     private void drawFrame() {
@@ -2200,31 +1994,37 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.save();
             canvas.scale(sx, sy);
 
-            float renderZoom = cameraZoom * superCameraZoom;
+            float renderZoom = camera.zoom * superCameraZoom;
             float visibleWorldWidth = VW / renderZoom;
-            float cameraLeft = clamp(cameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+            float cameraLeft = clamp(camera.x - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
 
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
-            canvas.translate(-cameraLeft, -cameraTop);
+            canvas.translate(-cameraLeft, -camera.top);
             drawScenario(canvas);
             drawDamageDummy(canvas);
-            drawEnergyProjectiles(canvas);
-            drawSuperProjectiles(canvas);
-            drawSuperDarkening(canvas);
-
-            canvas.save();
-            if (facingDirection < 0) {
-                canvas.scale(-1f, 1f, playerX, 0f);
+            effects.drawEnergyProjectiles(canvas, paint, energyProjectiles);
+            effects.drawSuperProjectiles(canvas, paint, superProjectiles);
+            if (isSuperCinematicActive()) {
+                effects.drawWorldOverlay(canvas, paint, superDarkAlpha, 0, 0, 8);
+                canvas.save();
+                if (facingDirection < 0) {
+                    canvas.scale(-1f, 1f, playerX, 0f);
+                }
+                effects.drawSuperCharge(
+                    canvas, paint, playerX, playerY, superPhaseTimer,
+                    activeFighter().profile.color
+                );
+                canvas.restore();
             }
-            drawSuperChargeEffects(canvas);
-            canvas.restore();
 
             canvas.save();
             canvas.translate(tagVisualOffsetX, 0f);
             drawPlayer(canvas);
             canvas.restore();
-            drawSuperFlash(canvas);
+            if (isSuperCinematicActive()) {
+                effects.drawWorldOverlay(canvas, paint, superFlashAlpha, 255, 255, 255);
+            }
             canvas.restore();
 
             drawHud(canvas);
@@ -2251,156 +2051,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawScenario(Canvas c) {
-        paint.setShader(skyGradient);
-        c.drawRect(0, WORLD_TOP, WORLD_WIDTH, VH, paint);
-        paint.setShader(null);
-
-        paint.setColor(Color.argb(130, 255, 244, 201));
-        c.drawCircle(2050, -40, 58, paint);
-
-        paint.setColor(Color.argb(75, 255, 255, 255));
-        for (int i = 0; i < 12; i++) {
-            float cloudX = 110f + i * 215f;
-            float cloudY = -365f + (i % 4) * 92f;
-            c.drawOval(cloudX, cloudY, cloudX + 120f, cloudY + 38f, paint);
-        }
-
-        paint.setColor(Color.rgb(53, 73, 88));
-        for (android.graphics.Path mountainPath : mountainPaths) {
-            c.drawPath(mountainPath, paint);
-        }
-
-        paint.setColor(Color.rgb(116, 81, 50));
-        c.drawRect(0, GROUND_Y, WORLD_WIDTH, VH, paint);
-        paint.setColor(Color.rgb(148, 108, 67));
-        for (int i = 0; i < 38; i++) {
-            float x = (i * 83f) % WORLD_WIDTH;
-            c.drawRoundRect(
-                x,
-                GROUND_Y + 35 + (i % 3) * 38,
-                x + 55,
-                GROUND_Y + 40 + (i % 3) * 38,
-                3,
-                3,
-                paint
-            );
-        }
-
-        paint.setColor(Color.argb(90, 255, 255, 255));
-        c.drawRect(LEFT_BOUND, 190, LEFT_BOUND + 3, GROUND_Y, paint);
-        c.drawRect(RIGHT_BOUND - 3, 190, RIGHT_BOUND, GROUND_Y, paint);
+        stage.draw(c, paint);
     }
 
     private void drawHud(Canvas c) {
-        FighterState active = activeFighter();
-        FighterState reserve = reserveFighter();
-
-        paint.setColor(Color.argb(185, 10, 15, 27));
-        c.drawRoundRect(32, 28, 560, 234, 18, 18, paint);
-
-        paint.setColor(active.profile.color);
-        c.drawCircle(78, 74, 29, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4);
-        paint.setColor(Color.WHITE);
-        c.drawCircle(78, 74, 29, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(22);
-        paint.setFakeBoldText(true);
-        c.drawText(active.hudTitle, 122, 58, paint);
-        paint.setFakeBoldText(false);
-
-        drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
-        drawSuperMeter(c, active, 122f, 106f, 525f, 118f, true);
-        drawTagCooldown(c, 122f, 139f, 525f, 149f);
-
-        // Reserva: indicador menor com vida e Super próprios.
-        paint.setColor(reserve.profile.color);
-        c.drawCircle(78, 187, 14, paint);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(14);
-        paint.setFakeBoldText(true);
-        c.drawText(reserve.reserveHudLabel, 105, 184, paint);
-        paint.setFakeBoldText(false);
-
-        drawLifeBar(c, reserve, 105f, 193f, 525f, 206f, false);
-        drawSuperMeter(c, reserve, 105f, 213f, 525f, 223f, false);
-
-        paint.setColor(Color.argb(180, 10, 15, 27));
-        c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(20);
-        paint.setFakeBoldText(true);
-        c.drawText(VERSION_HUD_LABEL, 975, 59, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextSize(16);
-
-        c.drawText("Estado:", 975, 88, paint);
-        c.drawText(currentStateLabel(), 1032, 88, paint);
-
-        paint.setTextSize(14f);
-        // The character name is in the HUD title; this line keeps the facing readout.
-        c.drawText(
-            facingDirection > 0 ? "FACING: →" : "FACING: ←",
-            975,
-            106,
-            paint
-        );
-
-        drawAiToggle(c);
-    }
-
-    private void drawAiToggle(Canvas c) {
-        paint.setColor(
-            opponentAiEnabled
-                ? Color.rgb(74, 205, 232)
-                : Color.argb(180, 45, 53, 62)
-        );
-        c.drawRoundRect(
-            AI_BUTTON_LEFT,
-            AI_BUTTON_TOP,
-            AI_BUTTON_RIGHT,
-            AI_BUTTON_BOTTOM,
-            12f,
-            12f,
-            paint
-        );
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2.5f);
-        paint.setColor(Color.WHITE);
-        c.drawRoundRect(
-            AI_BUTTON_LEFT,
-            AI_BUTTON_TOP,
-            AI_BUTTON_RIGHT,
-            AI_BUTTON_BOTTOM,
-            12f,
-            12f,
-            paint
-        );
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(
-            opponentAiEnabled
-                ? Color.rgb(18, 35, 48)
-                : Color.WHITE
-        );
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(19f);
-        float cy = (AI_BUTTON_TOP + AI_BUTTON_BOTTOM) * 0.5f;
-        c.drawText(
-            opponentAiEnabled ? "IA ON" : "IA OFF",
-            (AI_BUTTON_LEFT + AI_BUTTON_RIGHT) * 0.5f,
-            cy - (paint.ascent() + paint.descent()) * 0.5f,
-            paint
-        );
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
+        hud.drawHud(c, hudState);
     }
 
     private String currentStateLabel() {
@@ -2440,143 +2095,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return "PARADO";
     }
 
-    private void drawSuperMeter(
-        Canvas c,
-        FighterState fighter,
-        float left,
-        float top,
-        float right,
-        float bottom,
-        boolean showText
-    ) {
-        float gap = 4f;
-        float totalWidth = right - left;
-        float segmentWidth = (totalWidth - gap * 4f) / 5f;
-
-        for (int i = 0; i < 5; i++) {
-            float segmentLeft = left + i * (segmentWidth + gap);
-            float segmentRight = segmentLeft + segmentWidth;
-
-            paint.setColor(Color.rgb(45, 53, 62));
-            c.drawRoundRect(
-                segmentLeft,
-                top,
-                segmentRight,
-                bottom,
-                4f,
-                4f,
-                paint
-            );
-
-            float fill = clamp(fighter.superMeter - i, 0f, 1f);
-            if (fill > 0f) {
-                paint.setColor(fighter.profile.color);
-                c.drawRoundRect(
-                    segmentLeft,
-                    top,
-                    segmentLeft + segmentWidth * fill,
-                    bottom,
-                    4f,
-                    4f,
-                    paint
-                );
-            }
-
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(1.4f);
-            paint.setColor(Color.argb(210, 255, 255, 255));
-            c.drawRoundRect(
-                segmentLeft,
-                top,
-                segmentRight,
-                bottom,
-                4f,
-                4f,
-                paint
-            );
-            paint.setStyle(Paint.Style.FILL);
-        }
-
-        if (showText) {
-            paint.setColor(Color.WHITE);
-            paint.setTextSize(12f);
-            c.drawText(fighter.superHudLabel, left, bottom + 13f, paint);
-        }
-    }
-
-    private void drawTagCooldown(Canvas c, float left, float top, float right, float bottom) {
-        float ratio;
-
-        if (isTagAnimationActive()) {
-            ratio = 0f;
-        } else if (tagCooldownRemaining > 0f) {
-            ratio = 1f - (tagCooldownRemaining / TAG_COOLDOWN_SECONDS);
-        } else {
-            ratio = 1f;
-        }
-
-        paint.setColor(Color.rgb(45, 53, 62));
-        c.drawRoundRect(left, top, right, bottom, 5f, 5f, paint);
-
-        if (ratio > 0f) {
-            paint.setColor(reserveFighter().profile.color);
-            c.drawRoundRect(left, top, left + (right - left) * ratio, bottom, 5f, 5f, paint);
-        }
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1.5f);
-        paint.setColor(Color.argb(210, 255, 255, 255));
-        c.drawRoundRect(left, top, right, bottom, 5f, 5f, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(12f);
-        c.drawText(tagCooldownHudLabel, left, bottom + 13f, paint);
-    }
-
-    private void drawLifeBar(
-        Canvas c,
-        FighterState fighter,
-        float left,
-        float top,
-        float right,
-        float bottom,
-        boolean showText
-    ) {
-        float ratio = clamp(fighter.life / (float)fighter.profile.maxLife, 0f, 1f);
-        float width = right - left;
-
-        paint.setColor(Color.rgb(45, 53, 62));
-        c.drawRoundRect(left, top, right, bottom, 8, 8, paint);
-
-        int lifeColor;
-        if (ratio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
-        else if (ratio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
-        else lifeColor = Color.rgb(229, 82, 82);
-
-        if (ratio > 0f) {
-            paint.setColor(lifeColor);
-            c.drawRoundRect(left, top, left + width * ratio, bottom, 8, 8, paint);
-        }
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(showText ? 2f : 1.5f);
-        paint.setColor(Color.argb(210, 255, 255, 255));
-        c.drawRoundRect(left, top, right, bottom, 8, 8, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        if (showText) {
-            paint.setColor(Color.WHITE);
-            paint.setTextSize(15);
-            c.drawText(
-                fighter.lifeHudLabel,
-                left + 6,
-                bottom - 7,
-                paint
-            );
-        }
-    }
-
     private void drawDamageDummy(Canvas c) {
         float top = opponentVisualTop();
         float baseY = dummyY;
@@ -2611,208 +2129,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         );
         c.restore();
 
-        float barLeft = dummyX - 125f;
-        float barRight = dummyX + 125f;
-        float barTop = top - 54f;
-        float barBottom = barTop + 16f;
-        float lifeRatio = dummyLife / (float)opponentProfile().maxLife;
-
-        paint.setColor(Color.argb(205, 12, 16, 28));
-        c.drawRoundRect(
-            barLeft - 8f,
-            barTop - 28f,
-            barRight + 8f,
-            barBottom + 23f,
-            10f,
-            10f,
-            paint
-        );
-
-        paint.setColor(Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(15f);
-        String dummyStatusLabel;
-        if (dummyKnockdownState == DUMMY_KD_FALL) {
-            dummyStatusLabel = "NPC TESTE • CAINDO";
-        } else if (dummyKnockdownState == DUMMY_KD_DOWN) {
-            dummyStatusLabel = "NPC TESTE • NO CHÃO";
-        } else if (dummyKnockdownState == DUMMY_KD_GETUP) {
-            dummyStatusLabel = "NPC TESTE • LEVANTANDO";
-        } else if (aiSuperTimer > 0f) {
-            dummyStatusLabel = "PLAYER 2 • SUPER";
-        } else if (dummyAttackTimer > 0f) {
-            dummyStatusLabel = "PLAYER 2 • " + dummyAttackType;
-        } else if (dummyGroundSlam) {
-            dummyStatusLabel = "NPC TESTE • QUEDA FORÇADA";
-        } else if (dummyMovementLocked) {
-            dummyStatusLabel = "NPC TESTE • SEM CONTROLE";
-        } else if (dummyAirborne) {
-            dummyStatusLabel = "NPC TESTE • DESCENDO";
-        } else {
-            dummyStatusLabel =
-                opponentAiEnabled
-                    ? "PLAYER 2 • IA"
-                    : "PLAYER 2 • DUMMY";
-        }
-
-        c.drawText(
-            dummyStatusLabel,
-            dummyX,
-            barTop - 9f,
-            paint
-        );
-        paint.setFakeBoldText(false);
-
-        paint.setColor(Color.rgb(45, 53, 62));
-        c.drawRoundRect(barLeft, barTop, barRight, barBottom, 6f, 6f, paint);
-
-        if (lifeRatio > 0f) {
-            int lifeColor;
-            if (lifeRatio > 0.55f) lifeColor = Color.rgb(111, 223, 105);
-            else if (lifeRatio > 0.25f) lifeColor = Color.rgb(240, 190, 72);
-            else lifeColor = Color.rgb(229, 82, 82);
-
-            paint.setColor(lifeColor);
-            c.drawRoundRect(
-                barLeft,
-                barTop,
-                barLeft + (barRight - barLeft) * lifeRatio,
-                barBottom,
-                6f,
-                6f,
-                paint
-            );
-        }
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(1.5f);
-        paint.setColor(Color.WHITE);
-        c.drawRoundRect(barLeft, barTop, barRight, barBottom, 6f, 6f, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(12f);
-        c.drawText(dummyLifeHudLabel, dummyX, barBottom + 16f, paint);
-        paint.setTextSize(11f);
-        c.drawText(
-            opponentFighter.superHudLabel,
-            dummyX,
-            barBottom + 30f,
-            paint
-        );
-
-        if (dummyDamageLabelTimer > 0f) {
-            float progress = dummyDamageLabelTimer / 0.72f;
-            paint.setColor(Color.WHITE);
-            paint.setAlpha(Math.round(255f * progress));
-            paint.setFakeBoldText(true);
-            paint.setTextSize(24f);
-            c.drawText(
-                dummyDamageLabel,
-                dummyX,
-                top - 72f - (1f - progress) * 28f,
-                paint
-            );
-            paint.setFakeBoldText(false);
-            paint.setAlpha(255);
-        }
-
-        paint.setTextAlign(Paint.Align.LEFT);
+        opponentPanel.x = dummyX;
+        opponentPanel.visualTop = top;
+        opponentPanel.lifeRatio = dummyLife / (float)opponentProfile().maxLife;
+        opponentPanel.status = opponentStatusLabel();
+        opponentPanel.lifeLabel = dummyLifeHudLabel;
+        opponentPanel.superLabel = opponentFighter.superHudLabel;
+        opponentPanel.damageLabel = dummyDamageLabel;
+        opponentPanel.damageProgress = dummyDamageLabelTimer > 0f
+            ? dummyDamageLabelTimer / 0.72f
+            : 0f;
+        hud.drawOpponentPanel(c, opponentPanel);
     }
 
-    private void drawEnergyProjectiles(Canvas c) {
-        for (Projectile projectile : energyProjectiles) {
-            c.save();
-            if (projectile.direction < 0) {
-                c.scale(-1f, 1f, projectile.x, projectile.y);
-            }
-
-            paint.setColor(Color.argb(75, 255, 255, 255));
-            c.drawCircle(projectile.x, projectile.y, 29f, paint);
-
-            paint.setColor(projectile.color);
-            c.drawCircle(projectile.x, projectile.y, 20f, paint);
-
-            paint.setColor(Color.WHITE);
-            c.drawCircle(projectile.x + 5f, projectile.y - 5f, 8f, paint);
-            c.restore();
-        }
-    }
-
-    private void drawSuperProjectiles(Canvas c) {
-        for (Projectile projectile : superProjectiles) {
-            c.save();
-            if (projectile.direction < 0) {
-                c.scale(-1f, 1f, projectile.x, projectile.y);
-            }
-
-            paint.setColor(Color.argb(70, 255, 255, 255));
-            c.drawCircle(projectile.x, projectile.y, 62f, paint);
-
-            paint.setColor(Color.argb(120, Color.red(projectile.color), Color.green(projectile.color), Color.blue(projectile.color)));
-            c.drawOval(
-                projectile.x - 72f,
-                projectile.y - 34f,
-                projectile.x + 34f,
-                projectile.y + 34f,
-                paint
-            );
-
-            paint.setColor(projectile.color);
-            c.drawCircle(projectile.x, projectile.y, 40f, paint);
-
-            paint.setColor(Color.WHITE);
-            c.drawCircle(projectile.x + 12f, projectile.y - 10f, 17f, paint);
-
-            paint.setColor(Color.argb(100, 255, 255, 255));
-            c.drawRect(
-                projectile.x - 135f,
-                projectile.y - 9f,
-                projectile.x - 38f,
-                projectile.y + 9f,
-                paint
-            );
-            c.restore();
-        }
-    }
-
-    private void drawSuperDarkening(Canvas c) {
-        if (!isSuperCinematicActive() || superDarkAlpha <= 0) return;
-        paint.setColor(Color.argb(superDarkAlpha, 0, 0, 8));
-        c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
-    }
-
-    private void drawSuperChargeEffects(Canvas c) {
-        if (!isSuperCinematicActive()) return;
-
-        float centerY = playerY - 78f;
-        float pulse = 1f + 0.16f * (float)Math.sin(superPhaseTimer * 28f);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(6f);
-        paint.setColor(Color.argb(185, 255, 255, 255));
-        c.drawCircle(playerX, centerY, 58f * pulse, paint);
-
-        paint.setStrokeWidth(3f);
-        paint.setColor(activeFighter().profile.color);
-        c.drawCircle(playerX, centerY, 82f * pulse, paint);
-
-        for (int i = 0; i < 7; i++) {
-            float y = centerY - 105f + i * 34f;
-            float length = 90f + (i % 3) * 42f;
-            paint.setStrokeWidth(4f);
-            paint.setColor(Color.argb(145, 255, 255, 255));
-            c.drawLine(playerX - 150f - length, y + 24f, playerX - 78f, y, paint);
-        }
-
-        paint.setStyle(Paint.Style.FILL);
-    }
-
-    private void drawSuperFlash(Canvas c) {
-        if (!isSuperCinematicActive() || superFlashAlpha <= 0) return;
-        paint.setColor(Color.argb(superFlashAlpha, 255, 255, 255));
-        c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
+    private String opponentStatusLabel() {
+        String name = opponentCharacter().displayName.toUpperCase(java.util.Locale.ROOT);
+        String state;
+        if (dummyKnockdownState == DUMMY_KD_FALL) state = "CAINDO";
+        else if (dummyKnockdownState == DUMMY_KD_DOWN) state = "NO CHÃO";
+        else if (dummyKnockdownState == DUMMY_KD_GETUP) state = "LEVANTANDO";
+        else if (aiSuperTimer > 0f) state = "SUPER";
+        else if (dummyAttackTimer > 0f) state = dummyAttackType;
+        else if (dummyGroundSlam) state = "QUEDA FORÇADA";
+        else if (dummyMovementLocked) state = "SEM CONTROLE";
+        else if (dummyAirborne) state = "NO AR";
+        else state = opponentAiEnabled ? "IA" : "PARADO";
+        return name + " • " + state;
     }
 
     private float reactionElapsed;
@@ -2974,231 +2316,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawControls(Canvas c) {
-        paint.setColor(Color.argb(105, 7, 13, 26));
-        c.drawCircle(DPAD_X, DPAD_Y, DPAD_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4f);
-        paint.setColor(Color.argb(215, 255, 255, 255));
-        c.drawCircle(DPAD_X, DPAD_Y, DPAD_RADIUS, paint);
-
-        paint.setStrokeWidth(2f);
-        paint.setColor(Color.argb(90, 255, 255, 255));
-        for (int i = 0; i < DPAD_LABELS.length; i++) {
-            float x = DPAD_X + DPAD_UNIT_X[i] * DPAD_RADIUS;
-            float y = DPAD_Y + DPAD_UNIT_Y[i] * DPAD_RADIUS;
-            c.drawLine(DPAD_X, DPAD_Y, x, y, paint);
-        }
-        paint.setStyle(Paint.Style.FILL);
-
-        if (dpadDirection != 0) {
-            int directionIndex = dpadDirection - 1;
-            float hx = DPAD_X + DPAD_UNIT_X[directionIndex] * 72f;
-            float hy = DPAD_Y + DPAD_UNIT_Y[directionIndex] * 72f;
-            paint.setColor(Color.argb(165, 255, 255, 255));
-            c.drawCircle(hx, hy, 31f, paint);
-        }
-
-        paint.setColor(Color.argb(175, 10, 18, 32));
-        c.drawCircle(DPAD_X, DPAD_Y, DPAD_DEADZONE, paint);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(27f);
-
-        float textCenterOffset = -(paint.ascent() + paint.descent()) / 2f;
-        for (int i = 0; i < DPAD_LABELS.length; i++) {
-            float tx = DPAD_X + DPAD_UNIT_X[i] * 78f;
-            float ty = DPAD_Y + DPAD_UNIT_Y[i] * 78f + textCenterOffset;
-            c.drawText(DPAD_LABELS[i], tx, ty, paint);
-        }
-
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
-
-        drawAttackButton(c, LIGHT_X, LIGHT_Y, "L", lightPointer != -1);
-        drawAttackButton(c, MEDIUM_X, MEDIUM_Y, "M", mediumPointer != -1);
-        drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", heavyPointer != -1);
-        drawComboButton(c);
-        drawTagButton(c);
-        drawSuperButton(c);
-    }
-
-    private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
-        paint.setColor(
-            pressed
-                ? Color.argb(195, 255, 255, 255)
-                : Color.argb(120, 7, 13, 26)
-        );
-        c.drawCircle(x, y, ATTACK_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        paint.setColor(Color.argb(220, 255, 255, 255));
-        c.drawCircle(x, y, ATTACK_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(31f);
-        paint.setFakeBoldText(true);
-        float textY = y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(label, x, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
-    }
-
-    private void drawComboButton(Canvas c) {
-        boolean pressed = comboPointer != -1;
-
-        paint.setColor(
-            pressed
-                ? Color.argb(205, 255, 255, 255)
-                : Color.argb(135, 7, 13, 26)
-        );
-        c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        paint.setColor(Color.argb(225, 255, 255, 255));
-        c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(18f);
-        paint.setFakeBoldText(true);
-        float textY = COMBO_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText("COMBO", COMBO_X, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
-    }
-
-    private void drawTagButton(Canvas c) {
-        boolean pressed = tagPointer != -1;
-        boolean enabled = canStartTag();
-
-        if (!enabled) {
-            paint.setColor(Color.argb(95, 55, 60, 68));
-        } else {
-            paint.setColor(
-                pressed
-                    ? reserveFighter().profile.color
-                    : Color.argb(145, 7, 13, 26)
-            );
-        }
-        c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        paint.setColor(
-            enabled
-                ? reserveFighter().profile.color
-                : Color.argb(120, 180, 180, 180)
-        );
-        c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(enabled ? Color.WHITE : Color.argb(155, 220, 220, 220));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(enabled ? 17f : 14f);
-        paint.setFakeBoldText(true);
-        float textY = TAG_Y - (paint.ascent() + paint.descent()) / 2f;
-        String label = enabled
-            ? "TROCA"
-            : tagCooldownButtonLabel;
-        c.drawText(label, TAG_X, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
-    }
-
-    private void drawSuperButton(Canvas c) {
-        boolean pressed = superPointer != -1;
-        boolean enabled = canStartSuper();
-
-        paint.setColor(
-            enabled
-                ? (pressed
-                    ? activeFighter().profile.color
-                    : Color.argb(170, 42, 16, 68))
-                : Color.argb(90, 55, 60, 68)
-        );
-        c.drawCircle(SUPER_X, SUPER_Y, SUPER_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4f);
-        paint.setColor(
-            enabled
-                ? Color.argb(235, 255, 220, 90)
-                : Color.argb(120, 180, 180, 180)
-        );
-        c.drawCircle(SUPER_X, SUPER_Y, SUPER_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(enabled ? Color.WHITE : Color.argb(150, 220, 220, 220));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(15f);
-        paint.setFakeBoldText(true);
-        c.drawText("SUPER", SUPER_X, SUPER_Y - 4f, paint);
-        paint.setTextSize(11f);
-        c.drawText(
-            activeFighter().superLevelHudLabel,
-            SUPER_X,
-            SUPER_Y + 14f,
-            paint
-        );
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
-    }
-
-    private boolean insideRect(
-        float x,
-        float y,
-        float left,
-        float top,
-        float right,
-        float bottom
-    ) {
-        return x >= left && x <= right && y >= top && y <= bottom;
-    }
-
-    private boolean insideCircle(
-        float x,
-        float y,
-        float cx,
-        float cy,
-        float radius
-    ) {
-        float dx = x - cx;
-        float dy = y - cy;
-        return dx * dx + dy * dy <= radius * radius;
+        hud.drawControls(c, hudState);
     }
 
     private boolean isDownDirection(int direction) {
-        return direction == 2 || direction == 3 || direction == 4;
+        return ControlsLayout.isDownDirection(direction);
     }
 
     private boolean isUpDirection(int direction) {
-        return direction == 6 || direction == 7 || direction == 8;
+        return ControlsLayout.isUpDirection(direction);
     }
 
     private void updateDpad(float x, float y, long nowMs) {
         if (isEnergyAttackActive() || isSuperCinematicActive()) return;
 
-        float dx = x - DPAD_X;
-        float dy = y - DPAD_Y;
-        float distanceSquared = dx * dx + dy * dy;
-
         int previous = dpadDirection;
-        int next = 0;
-
-        if (distanceSquared >= DPAD_DEADZONE * DPAD_DEADZONE) {
-            double degrees = Math.toDegrees(Math.atan2(dy, dx));
-            if (degrees < 0) degrees += 360.0;
-            int sector = ((int)Math.floor((degrees + 22.5) / 45.0)) % 8;
-            next = sector + 1;
-        }
+        int next = ControlsLayout.dpadDirectionAt(x, y);
 
         dpadDirection = next;
 
@@ -3333,6 +2466,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         while ((event = pendingInput.poll()) != null) event.recycle();
     }
 
+    /** L/M/H confirm a pending energy command, otherwise start the (crouching) normal. */
+    private void pressAttack(String button, long nowMs) {
+        if (tryFirePendingEnergy(button, nowMs)) return;
+        resetAutoCombo();
+        startAttack(grounded && crouching ? "2" + button : button);
+    }
+
     private boolean handleTouch(MotionEvent event) {
         if (getWidth()==0 || getHeight()==0) return true;
         float sx = getWidth() / VW;
@@ -3346,19 +2486,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
 
-            float dx = x - DPAD_X;
-            float dy = y - DPAD_Y;
+            ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
 
-            if (
-                insideRect(
-                    x,
-                    y,
-                    AI_BUTTON_LEFT,
-                    AI_BUTTON_TOP,
-                    AI_BUTTON_RIGHT,
-                    AI_BUTTON_BOTTOM
-                )
-            ) {
+            if (control == ControlsLayout.Control.AI_TOGGLE) {
                 setOpponentAiEnabled(!opponentAiEnabled);
                 return true;
             }
@@ -3367,45 +2497,47 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 return true;
             }
 
-            if (
-                dpadPointer == -1 &&
-                dx * dx + dy * dy <= DPAD_RADIUS * DPAD_RADIUS
-            ) {
-                dpadPointer = pointerId;
-                updateDpad(x, y, nowMs);
-            } else if (isTagAnimationActive()) {
+            if (control == ControlsLayout.Control.DPAD) {
+                // A second finger on the D-pad is ignored; the first one owns it.
+                if (dpadPointer == -1) {
+                    dpadPointer = pointerId;
+                    updateDpad(x, y, nowMs);
+                }
                 return true;
-            } else if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) {
-                if (canStartSuper()) {
-                    superPointer = pointerId;
-                    startSuperCinematic();
-                }
-            } else if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) {
-                lightPointer = pointerId;
-                if (!tryFirePendingEnergy("L", nowMs)) {
-                    resetAutoCombo();
-                    startAttack(grounded && crouching ? "2L" : "L");
-                }
-            } else if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) {
-                mediumPointer = pointerId;
-                if (!tryFirePendingEnergy("M", nowMs)) {
-                    resetAutoCombo();
-                    startAttack(grounded && crouching ? "2M" : "M");
-                }
-            } else if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) {
-                heavyPointer = pointerId;
-                if (!tryFirePendingEnergy("H", nowMs)) {
-                    resetAutoCombo();
-                    startAttack(grounded && crouching ? "2H" : "H");
-                }
-            } else if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) {
-                comboPointer = pointerId;
-                triggerAutoCombo(nowMs);
-            } else if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) {
-                if (canStartTag()) {
-                    tagPointer = pointerId;
-                    switchFighter();
-                }
+            }
+            if (isTagAnimationActive()) return true;
+
+            switch (control) {
+                case SUPER:
+                    if (canStartSuper()) {
+                        superPointer = pointerId;
+                        startSuperCinematic();
+                    }
+                    break;
+                case LIGHT:
+                    lightPointer = pointerId;
+                    pressAttack("L", nowMs);
+                    break;
+                case MEDIUM:
+                    mediumPointer = pointerId;
+                    pressAttack("M", nowMs);
+                    break;
+                case HEAVY:
+                    heavyPointer = pointerId;
+                    pressAttack("H", nowMs);
+                    break;
+                case COMBO:
+                    comboPointer = pointerId;
+                    triggerAutoCombo(nowMs);
+                    break;
+                case TAG:
+                    if (canStartTag()) {
+                        tagPointer = pointerId;
+                        switchFighter();
+                    }
+                    break;
+                default:
+                    break;
             }
         } else if (action == MotionEvent.ACTION_MOVE) {
             if (
@@ -3458,6 +2590,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private static float clamp(float value, float min, float max) {
-        return Math.max(min, Math.min(max, value));
+        return Arena.clamp(value, min, max);
     }
 }

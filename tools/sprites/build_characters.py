@@ -65,9 +65,12 @@ def validate_fighter(pack):
     if not isinstance(f['autoCombo'],list) or any(b not in ('L','M','H') for b in f['autoCombo']):
         raise ValueError(f'{name}: autoCombo accepts only L, M and H')
     body = f['body']
-    for key in ('halfWidth','standHeight','crouchHeight'): positive(body[key], f'{name}.body.{key}')
+    for key in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'): positive(body[key], f'{name}.body.{key}')
     if body['crouchHeight'] > body['standHeight']:
         raise ValueError(f'{name}: crouchHeight cannot exceed standHeight')
+    # The pushbox keeps bodies apart; it sits inside the hurtbox so it never blocks a hit.
+    if body['pushHalfWidth'] > body['halfWidth'] or body['pushHeight'] > body['crouchHeight'] + 60:
+        raise ValueError(f'{name}: pushbox must stay inside the hurtbox (width) and near crouch height')
     if 'energy' in f:
         validate_projectile(f['energy'], name+'.energy', body)
         command = f['energy']['command']
@@ -216,7 +219,7 @@ def compile_packs(root, results):
         fighter = ('new CharacterDefinition.Fighter(0xFF'+fi['color'][1:].upper()+','+str(fi['maxLife'])
                    +',new String[]{'+','.join(q(b) for b in fi['autoCombo'])+'},'+projectile(energy)
                    +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'))
-                   +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight'))+'))')
+                   +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+'))')
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']

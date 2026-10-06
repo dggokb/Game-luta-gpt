@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.64-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.65-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -60,4 +60,11 @@ Cada `character.json` agora é a fonte única do lutador (bloco `fighter`: vida,
 auto-combo, energia, Super e hurtbox) e declara os nove inputs com `totalMs`, janela
 ativa e alcance. O NPC usa o próprio pack para dano e frame data, a câmera enquadra a
 altura real da arte e um único cache de atlas é compartilhado na partida. Detalhes em
+`docs/sprite-standard.md`.
+
+## Empurrão e arquitetura — v0.65
+
+Os corpos não se sobrepõem mais (caixa de empurrão no pack) e o `GameView` foi
+dividido em sistemas menores (IA, regras de combate, comandos, câmera, controles,
+HUD, cenário e efeitos), a maioria testável sem Android. Tabela em
 `docs/sprite-standard.md`.

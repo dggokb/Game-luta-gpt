@@ -170,6 +170,10 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['fighter']['energy'].update(crouchSpawnY=400))
         with self.assertRaisesRegex(ValueError,'inside the body'):pipeline.build(self.root)
 
+    def test_pushbox_must_fit_inside_hurtbox(self):
+        self.edit(lambda d:d['fighter']['body'].update(pushHalfWidth=80))
+        with self.assertRaisesRegex(ValueError,'pushbox'):pipeline.build(self.root)
+
     def test_visual_heights_and_stats_are_generated(self):
         pipeline.build(self.root)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
