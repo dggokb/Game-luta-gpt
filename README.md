@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.73-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.74-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -115,3 +115,8 @@ vantagem de cada golpe. Detalhes, rotas e critérios de aceite em `docs/combat-e
 
 Abaixo de DEBUG: **VIDA P1** enche a vida dos dois lutadores do time (um KO volta a
 lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app.
+
+## Recuo mais lento — v0.74
+
+Andar para trás (220) é mais lento que andar para frente (300), no chão e no ar, para que
+recuar não seja uma fuga igual ao avanço do adversário.

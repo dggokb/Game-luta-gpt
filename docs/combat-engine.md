@@ -138,6 +138,9 @@ frames.
 - Lutador derrubado é invulnerável; o slam do jH termina em queda; aterrissar encerra
   golpes aéreos; o Super congela o oponente durante o startup.
 - A troca de personagem só começa em NEUTRAL.
+- (v0.74) Andar para trás é mais lento que para frente: 220 contra 300 unidades/s,
+  também no ar (`CombatConfig.walkBackSpeed`). Recuar andando não foge de quem avança;
+  o backdash continua rápido, mas é curto e comprometido.
 - O comando de especial ficou mais estrito (antes ~420 ms por passo e 550 ms para
   confirmar; agora 15 + 15 frames). Ajustável em `CombatConfig`.
 

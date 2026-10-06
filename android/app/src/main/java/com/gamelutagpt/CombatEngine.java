@@ -355,20 +355,21 @@ final class CombatEngine {
             : direction == 1 || direction == 2 || direction == 8 ? 1 : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         if (!holdingForward) f.forwardDashing = false;
+        float walk = holdingForward ? config.walkSpeed : config.walkBackSpeed;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
             if (!f.grounded) {
-                f.x += horizontal * config.walkSpeed * CombatConfig.DT;
+                f.x += horizontal * walk * CombatConfig.DT;
             } else if (f.backdashFrames > 0) {
                 f.x -= f.facing * config.backdashSpeed * CombatConfig.DT;
                 f.backdashFrames--;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed : config.walkSpeed;
+                float speed = f.forwardDashing && holdingForward ? config.dashSpeed : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
         } else if (f.attacking() && !f.grounded && f.attack.kind == AttackDefinition.Kind.NORMAL) {
             // Air normals keep the jump's steering; ground attacks and specials lock it.
-            f.x += horizontal * config.walkSpeed * CombatConfig.DT;
+            f.x += horizontal * walk * CombatConfig.DT;
         }
     }
 

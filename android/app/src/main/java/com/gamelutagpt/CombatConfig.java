@@ -56,6 +56,8 @@ final class CombatConfig {
 
     // Physics (world units per second, world units per second squared).
     float walkSpeed = 300f;
+    /** Walking (or drifting in the air) away is slower, so retreating cannot outrun a chase. */
+    float walkBackSpeed = 220f;
     float dashSpeed = 620f;
     float backdashSpeed = 760f;
     int backdashFrames = 12;

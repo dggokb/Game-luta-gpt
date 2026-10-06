@@ -628,6 +628,21 @@ public class CombatEngineTest {
         assertEquals(CombatFighter.GUARD_AIR, air.f(1).lastGuard);
     }
 
+    @Test public void walkingBackIsSlowerThanWalkingForward() {
+        CombatConfig config = new CombatConfig();
+        Sim forward = new Sim(BASE, NPC, 500f, 1500f);
+        forward.in[0].direction = 1;
+        forward.steps(30);
+        Sim back = new Sim(BASE, NPC, 1000f, 1500f);
+        back.in[0].direction = 5;
+        back.steps(30);
+        float advanced = forward.f(0).x - 500f;
+        float retreated = 1000f - back.f(0).x;
+        assertEquals(config.walkSpeed * 30 * CombatConfig.DT, advanced, 0.5f);
+        assertEquals(config.walkBackSpeed * 30 * CombatConfig.DT, retreated, 0.5f);
+        assertTrue("A retreating fighter is caught by a walking one", retreated < advanced);
+    }
+
     // ------------------------------------------------------------ specials, super, tag
 
     @Test public void motionCommandTurnsTheButtonIntoTheSpecial() {
