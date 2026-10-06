@@ -84,6 +84,10 @@
         167.5,
         605.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           0,
@@ -144,6 +148,10 @@
       "sourceRoot": [
         164.75,
         605.0
+      ],
+      "frameShift": [
+        0,
+        0
       ],
       "sourceFootIntervals": [
         [
@@ -206,6 +214,10 @@
         193.5,
         606.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           0,
@@ -266,6 +278,10 @@
       "sourceRoot": [
         176.25,
         605.0
+      ],
+      "frameShift": [
+        0,
+        0
       ],
       "sourceFootIntervals": [
         [

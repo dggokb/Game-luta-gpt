@@ -284,6 +284,16 @@ def process_clip(config_path):
             f"maximum is {max_upscale:.3f}x"
         )
 
+    # Declarative re-registration of single frames whose foot detection picked one foot:
+    # frameShift {"7": [dx, dy]} moves that frame's body by dx/dy output pixels.
+    shifts = {int(k): v for k, v in cfg.get("frameShift", {}).items()}
+    for index, (dx, dy) in shifts.items():
+        if index < 0 or index >= expected:
+            raise ValueError(f"{cfg['id']}: invalid frameShift index {index}")
+        root_x, root_y = frames[index]["sourceRoot"]
+        frames[index]["sourceRoot"] = [root_x - dx / scale, root_y - dy / scale]
+        frames[index]["frameShift"] = [dx, dy]
+
     max_left = max_right = max_top = max_bottom = 0.0
     for frame in frames:
         x0, y0, x1, y1 = frame["bbox"]
@@ -367,10 +377,12 @@ def process_clip(config_path):
             "top": out_bbox[1],
             "bottom": frame_height - out_bbox[3],
         }
+        shift_x, shift_y = frame.get("frameShift", (0, 0))
         checks = {
             "noClipping": min(margins.values()) >= min_margin,
-            "rootXWithinTolerance": abs(out_root_x - root_x) <= root_tolerance,
-            "rootYWithinTolerance": abs(out_root_y - root_y) <= root_tolerance,
+            # A declared frameShift moves the detected feet by exactly that amount.
+            "rootXWithinTolerance": abs(out_root_x - (root_x + shift_x)) <= root_tolerance,
+            "rootYWithinTolerance": abs(out_root_y - (root_y + shift_y)) <= root_tolerance,
             "enoughOpaquePixels": opaque_pixels >= min_opaque,
         }
         frame_passed = all(checks.values())
@@ -380,6 +392,7 @@ def process_clip(config_path):
             "sourceInterval": frame["sourceInterval"],
             "sourceBbox": list(frame["bbox"]),
             "sourceRoot": frame["sourceRoot"],
+            "frameShift": list(frame.get("frameShift", (0, 0))),
             "sourceFootIntervals": frame["footIntervals"],
             "outputBbox": list(out_bbox),
             "outputMargins": margins,
@@ -478,10 +491,26 @@ def process_prepared(cfg, profile):
         raise ValueError(f"{cfg['id']}: prepared-grid dimensions do not match frame count")
     if cfg.get("rootMode") != "authored":
         raise ValueError("Prepared masters require an explicitly authored root")
+    source_cells = [
+        source.crop((i % columns * width, i // columns * height,
+                     i % columns * width + width, i // columns * height + height))
+        for i in range(count)
+    ]
+    transform = cfg.get("transform")
+    transform_report = None
+    regroup_report = None
+    if transform is not None and "regroupComponents" in transform:
+        source_cells, width, height, root_x, root_y, regroup_report = regroup_components(
+            cfg, source, count, columns, width, height, root_x, root_y, transform["regroupComponents"]
+        )
+    if transform is not None:
+        source_cells, width, height, root_x, root_y, columns, transform_report = apply_transform(
+            cfg, profile, source_cells, width, height, root_x, root_y, columns, transform
+        )
+        count = len(source_cells)
     frames = []
     for i in range(count):
-        x, y = i % columns * width, i // columns * height
-        cell = source.crop((x, y, x + width, y + height))
+        cell = source_cells[i]
         bbox = bbox_for(cell, profile["validation"]["alphaThreshold"])
         margins = [bbox[0], bbox[1], width - bbox[2], height - bbox[3]]
         if min(margins) < profile["validation"]["minMargin"]:
@@ -499,12 +528,188 @@ def process_prepared(cfg, profile):
                          "columns": columns, "frameCount": count}, "frames": frames, "passed": True}
     for key in ("output", "report", "preview"):
         (ROOT / cfg[key]).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ROOT / cfg["source"], ROOT / cfg["output"])
+    if transform_report is None:
+        shutil.copyfile(ROOT / cfg["source"], ROOT / cfg["output"])
+        output = source
+    else:
+        report["transform"] = transform_report
+        if regroup_report is not None:
+            report["transform"]["regroup"] = regroup_report
+        rows = math.ceil(count / columns)
+        output = Image.new("RGBA", (width * columns, height * rows))
+        for i, cell in enumerate(source_cells):
+            output.paste(cell, (i % columns * width, i // columns * height))
+        output.save(ROOT / cfg["output"], format="PNG")
     (ROOT / cfg["report"]).write_text(json.dumps(report, indent=2) + "\n")
-    preview = Image.new("RGBA", source.size, (32, 36, 44, 255))
-    preview.alpha_composite(source)
+    preview = Image.new("RGBA", output.size, (32, 36, 44, 255))
+    preview.alpha_composite(output)
     preview.save(ROOT / cfg["preview"])
     return cfg, report
+
+def regroup_components(cfg, sheet, count, columns, width, height, root_x, root_y, options):
+    """Gives every connected piece of art back to the frame that owns it.
+
+    Masters drawn on a tight grid sometimes let a limb cross into the neighbouring cell:
+    the owner looks clipped and the neighbour shows floating fragments. Pieces are
+    labelled on the whole sheet (8-connectivity) and assigned to the cell holding most
+    of their pixels; isolated specks below dropSmallerThan pixels are removed. Each frame
+    is rebuilt on a cell padded by `pad` pixels on every side.
+    """
+    pad = int(options.get("pad", 32))
+    drop = int(options.get("dropSmallerThan", 0))
+    alpha = sheet.getchannel("A")
+    w, h = sheet.size
+    px = alpha.load()
+    label = [0] * (w * h)
+    frames = [Image.new("RGBA", (width + 2 * pad, height + 2 * pad)) for _ in range(count)]
+    moved, dropped, current = [], 0, 0
+    src = sheet.load()
+    for y in range(h):
+        for x in range(w):
+            if px[x, y] <= 8 or label[y * w + x]:
+                continue
+            current += 1
+            stack = [(x, y)]
+            label[y * w + x] = current
+            points = []
+            while stack:
+                cx, cy = stack.pop()
+                points.append((cx, cy))
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        nx, ny = cx + dx, cy + dy
+                        if 0 <= nx < w and 0 <= ny < h and px[nx, ny] > 8 and not label[ny * w + nx]:
+                            label[ny * w + nx] = current
+                            stack.append((nx, ny))
+            if len(points) < drop:
+                dropped += len(points)
+                continue
+            votes = {}
+            for cx, cy in points:
+                cell = cx // width + (cy // height) * columns
+                votes[cell] = votes.get(cell, 0) + 1
+            owner = max(votes, key=votes.get)
+            if owner >= count:
+                continue
+            ox, oy = owner % columns * width, owner // columns * height
+            stray = sum(n for cell, n in votes.items() if cell != owner)
+            if stray:
+                moved.append({"frame": owner, "pixelsRecovered": stray})
+            target = frames[owner].load()
+            for cx, cy in points:
+                tx, ty = cx - ox + pad, cy - oy + pad
+                if 0 <= tx < width + 2 * pad and 0 <= ty < height + 2 * pad:
+                    target[tx, ty] = src[cx, cy]
+    # Faint anti-aliasing (alpha <= 8) next to each piece follows its nearest owner cell.
+    for i in range(count):
+        ox, oy = i % columns * width, i // columns * height
+        target = frames[i].load()
+        for y in range(height):
+            for x in range(width):
+                if 0 < px[ox + x, oy + y] <= 8:
+                    target[x + pad, y + pad] = src[ox + x, oy + y]
+    report = {"pad": pad, "dropSmallerThan": drop, "droppedPixels": dropped, "recovered": moved}
+    return frames, width + 2 * pad, height + 2 * pad, root_x + pad, root_y + pad, report
+
+def remove_magenta(cell, box):
+    """Repaints magenta artefact pixels inside box with the mean of their clean neighbours."""
+    cell = cell.copy()
+    px = cell.load()
+    x0, y0, x1, y1 = box
+
+    def magenta(p):
+        # Pink/magenta: blue well above green. Skin, red cloth and shoes keep blue <= green.
+        r, g, b, a = p
+        return a > 10 and r > g + 30 and b > g + 18 and b > 0.40 * r
+
+    core = {(x, y) for y in range(y0, y1) for x in range(x0, x1) if magenta(px[x, y])}
+    # One-pixel dilation catches the anti-aliased halo around the glow.
+    bad = {(x + dx, y + dy) for x, y in core for dx in (-1, 0, 1) for dy in (-1, 0, 1)
+           if x0 <= x + dx < x1 and y0 <= y + dy < y1 and px[x + dx, y + dy][3] > 10}
+    total = len(bad)
+    while bad:
+        filled = {}
+        for x, y in bad:
+            near = [px[nx, ny] for nx in range(x - 2, x + 3) for ny in range(y - 2, y + 3)
+                    if 0 <= nx < cell.width and 0 <= ny < cell.height
+                    and (nx, ny) not in bad and px[nx, ny][3] > 10]
+            if near:
+                filled[(x, y)] = tuple(round(sum(c[k] for c in near) / len(near)) for k in range(3)) + (px[x, y][3],)
+        if not filled:
+            break
+        for xy, colour in filled.items():
+            px[xy] = colour
+        bad -= set(filled)
+    return cell, total
+
+def apply_transform(cfg, profile, cells, width, height, root_x, root_y, columns, t):
+    """Declarative fix-ups of a reviewed master, recorded in the report.
+
+    Order: keep a subset of frames, scale about the root (premultiplied Lanczos), place
+    in the output cell at the output root, shift per frame, then snap chosen frames so
+    their lowest visible row sits on the root (feet on the ground). The source art is
+    never modified; every number lives in the clip config.
+    """
+    threshold = int(profile["validation"]["alphaThreshold"])
+    keep = [int(i) for i in t.get("keepFrames", range(len(cells)))]
+    if any(i < 0 or i >= len(cells) for i in keep) or len(set(keep)) != len(keep):
+        raise ValueError(f"{cfg['id']}: invalid keepFrames")
+    scale = float(t.get("scale", 1.0))
+    if scale <= 0:
+        raise ValueError(f"{cfg['id']}: transform scale must be positive")
+    max_upscale = float(profile["validation"]["maxUpscale"])
+    if scale > max_upscale and not (t.get("allowUpscale") is True and t.get("reason")):
+        raise ValueError(f"{cfg['id']}: upscaling {scale:.3f}x requires allowUpscale and a reason")
+    out_w = int(t.get("outputFrameWidth", width))
+    out_h = int(t.get("outputFrameHeight", height))
+    out_rx = int(t.get("outputRootX", root_x))
+    out_ry = int(t.get("outputRootY", root_y))
+    v = profile["validation"]
+    if out_w > int(v["maxFrameWidth"]) or out_h > int(v["maxFrameHeight"]):
+        raise ValueError(f"{cfg['id']}: transform output cell exceeds profile limits")
+    if not 0 <= out_rx < out_w or not 0 <= out_ry < out_h:
+        raise ValueError(f"{cfg['id']}: transform output root is outside the cell")
+    offsets = {int(k): v for k, v in t.get("offsets", {}).items()}
+    ground = {int(i) for i in t.get("groundFrames", [])}
+    if not set(offsets) <= set(keep) or not ground <= set(keep):
+        raise ValueError(f"{cfg['id']}: offsets/groundFrames must refer to kept frames")
+    cleanups = {}
+    for item in t.get("cleanup", []):
+        frame, box = int(item["frame"]), [int(n) for n in item["box"]]
+        if frame not in keep or not (0 <= box[0] < box[2] <= width and 0 <= box[1] < box[3] <= height):
+            raise ValueError(f"{cfg['id']}: invalid cleanup entry {item}")
+        cleanups.setdefault(frame, []).append(box)
+    result, details = [], []
+    for i in keep:
+        cell = cells[i]
+        cleaned = 0
+        for box in cleanups.get(i, []):
+            cell, n = remove_magenta(cell, box)
+            cleaned += n
+        if scale != 1.0:
+            scaled = cell.convert("RGBa").resize(
+                (round(width * scale), round(height * scale)), Image.LANCZOS
+            ).convert("RGBA")
+        else:
+            scaled = cell
+        dx, dy = (int(n) for n in offsets.get(i, (0, 0)))
+        placed = Image.new("RGBA", (out_w, out_h))
+        left = round(out_rx - root_x * scale) + dx
+        top = round(out_ry - root_y * scale) + dy
+        placed.paste(scaled, (left, top))
+        snap = 0
+        if i in ground:
+            bbox = bbox_for(placed, threshold)
+            snap = out_ry - (bbox[3] - 1)
+            if snap:
+                moved = Image.new("RGBA", (out_w, out_h))
+                moved.paste(placed, (0, snap))
+                placed = moved
+        result.append(placed)
+        details.append({"sourceFrame": i, "offset": [dx, dy], "groundSnap": snap, "cleanedPixels": cleaned})
+    report = {"scale": scale, "upscaled": scale > 1.0, "reason": t.get("reason", ""),
+              "sourceCell": [width, height, root_x, root_y], "frames": details}
+    return result, out_w, out_h, out_rx, out_ry, int(t.get("columns", columns)), report
 
 def write_generated_java(results):
     lines = [

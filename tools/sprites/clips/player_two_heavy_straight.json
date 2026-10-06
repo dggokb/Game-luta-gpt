@@ -10,5 +10,11 @@
   "segmentation": "grid-alpha-components",
   "rootMode": "ground-feet",
   "scaleMode": "canonical-anatomy",
-  "anatomyReferenceFrame": 0
+  "anatomyReferenceFrame": 0,
+  "frameShift": {
+    "7": [
+      -67,
+      0
+    ]
+  }
 }

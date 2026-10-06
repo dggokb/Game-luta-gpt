@@ -8,7 +8,7 @@
   "standingVisualHeight": 218,
   "validation": {
     "alphaThreshold": 10,
-    "minMargin": 0,
+    "minMargin": 8,
     "rootTolerance": 4,
     "widthStep": 1,
     "heightStep": 1,
@@ -16,7 +16,7 @@
     "minFootWidth": 2,
     "minOpaquePixels": 5000,
     "maxUpscale": 1,
-    "maxFrameWidth": 256,
-    "maxFrameHeight": 256
+    "maxFrameWidth": 336,
+    "maxFrameHeight": 296
   }
 }

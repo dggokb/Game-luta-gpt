@@ -10,5 +10,16 @@
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "Brutamonte 16-frame NPC atlas normalized from the approved sprite sheet."
+  "sourceNote": "Brutamonte 16-frame atlas; limbs that crossed cell borders are regrouped into their own frame.",
+  "transform": {
+    "regroupComponents": {
+      "pad": 40,
+      "dropSmallerThan": 16
+    },
+    "outputFrameWidth": 336,
+    "outputFrameHeight": 296,
+    "outputRootX": 168,
+    "outputRootY": 288,
+    "reason": "Frame 10's claws crossed into cells 9 and 11 (floating fragments there, clipped claws on 10); pieces are returned to their owner frame and specks removed."
+  }
 }

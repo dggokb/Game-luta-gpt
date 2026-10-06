@@ -437,3 +437,36 @@ carga, gancho para cima, guarda de recuperação), importados da folha original 
 Observações: `hitHeight` continua o padrão de golpe agachado (42) e a hurtbox durante o
 golpe é a de agachado, como antes; se o gancho deve acertar mais alto (anti-aéreo) ou o
 corpo deve ficar vulnerável em pé no frame 3, isso é um ajuste de balanceamento no pack.
+
+## Auditoria de harmonia — GPT v0.67
+
+`tools/sprites/harmony.py` mede todos os frames de todos os packs (rode o script para o
+relatório) e `tests/test_harmony.py` reprova o build se voltar a acontecer:
+
+- **Registro:** em poses que não são golpe, o tronco fica a até 20 px do tronco do Idle
+  (sem "teleporte" lateral ao trocar de estado).
+- **Chão:** poses no chão encostam no chão (±4 px).
+- **Picos em golpes:** um frame que sai e volta mais de 40 px enquanto os vizinhos
+  concordam é tranco.
+- **Escala:** a defesa em pé tem ao menos 85% da altura do Idle.
+
+Na v0.66 a auditoria encontrava 15 problemas; todos foram corrigidos por
+transformações declarativas no clip (a arte-fonte não é editada):
+
+| Pack | Problema | Correção (clip) |
+| --- | --- | --- |
+| `player_base` reações | desenhadas a ~70% do corpo; defesa agachada, caído e levantar flutuando 6–22 px | `transform.scale` 1,425 (anatomia vs Idle), `groundFrames`, célula 384×256, frames 8–13 sem uso removidos |
+| `player_two` movimento | tronco a 42–106 px da raiz em passada, agachar, pulo, queda, dash e backdash | `transform.offsets` por frame |
+| `player_two` agachar 9 | brilho magenta (artefato) no punho | `transform.cleanup` (repinta com os vizinhos) |
+| `player_two` Heavy | frame 7 saltava +67 px e voltava | `frameShift` |
+| `player_two` Idle | respiração fora de ordem (227→216→226…) | frames em vai-e-volta |
+| Brutamonte | garras do frame 10 vazavam para as células 9 e 11 (pedaços soltos; garra cortada) e ciscos | `transform.regroupComponents` (cada pedaço volta ao dono; ciscos < 16 px removidos); margem mínima volta a 8 px |
+| Brutamonte pulo/queda | passos de caminhada no ar e bote do golpe como queda | JUMP 8→13, FALL 12; Idle em vai-e-volta |
+
+Operações do `transform` (clips `prepared-grid`): `keepFrames`, `scale` (ampliar exige
+`allowUpscale` + `reason`), `outputFrameWidth/Height/RootX/RootY`, `columns`,
+`offsets`, `groundFrames`, `cleanup`, `regroupComponents`. Clips importados por
+componentes aceitam `frameShift`. Tudo fica registrado no relatório do atlas.
+
+Limite: as reações do `player_base` foram ampliadas a partir de arte pequena e ficam
+mais suaves que o resto; o ideal é redesenhá-las na resolução do Idle.

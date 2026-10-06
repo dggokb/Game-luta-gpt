@@ -2,196 +2,215 @@
   "id": "player_base_missing",
   "characterProfile": "player_base",
   "source": "art/sprites/source/player_base_missing_normalized.png",
-  "sourceNote": "First-pass reviewed transparent atlas for defense, hit, knockdown, crouching and aerial combat states.",
+  "sourceNote": "Reaction poses (defense, hit, knockdown, grounded, get-up) rescaled to the canonical body and grounded; unused frames 8-13 dropped.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.0,
   "layout": {
-    "frameWidth": 256,
+    "frameWidth": 384,
     "frameHeight": 256,
-    "rootX": 128,
+    "rootX": 192,
     "rootY": 238,
-    "columns": 14,
-    "frameCount": 14
+    "columns": 8,
+    "frameCount": 8
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        83,
-        84,
-        173,
-        237
+        128,
+        21,
+        257,
+        239
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 7616
+      "minimumMargin": 17,
+      "opaquePixels": 15306
     },
     {
       "index": 1,
       "outputBbox": [
-        78,
-        98,
-        178,
-        231
+        121,
+        50,
+        263,
+        239
       ],
-      "minimumMargin": 25,
-      "opaquePixels": 7238
+      "minimumMargin": 17,
+      "opaquePixels": 14235
     },
     {
       "index": 2,
       "outputBbox": [
-        68,
-        91,
-        184,
-        235
+        107,
+        34,
+        272,
+        239
       ],
-      "minimumMargin": 21,
-      "opaquePixels": 8897
+      "minimumMargin": 17,
+      "opaquePixels": 17253
     },
     {
       "index": 3,
       "outputBbox": [
-        71,
-        114,
-        184,
-        236
+        111,
+        66,
+        270,
+        239
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 7545
+      "minimumMargin": 17,
+      "opaquePixels": 14972
     },
     {
       "index": 4,
       "outputBbox": [
-        53,
-        125,
-        203,
-        235
+        85,
+        79,
+        300,
+        234
       ],
-      "minimumMargin": 21,
-      "opaquePixels": 7576
+      "minimumMargin": 22,
+      "opaquePixels": 14790
     },
     {
       "index": 5,
       "outputBbox": [
-        18,
-        185,
-        238,
-        238
+        35,
+        165,
+        348,
+        239
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 5954
+      "minimumMargin": 17,
+      "opaquePixels": 11960
     },
     {
       "index": 6,
       "outputBbox": [
-        30,
-        154,
-        225,
-        217
+        52,
+        149,
+        331,
+        239
       ],
-      "minimumMargin": 30,
-      "opaquePixels": 7726
+      "minimumMargin": 17,
+      "opaquePixels": 15456
     },
     {
       "index": 7,
       "outputBbox": [
-        68,
-        122,
-        186,
-        233
+        106,
+        81,
+        275,
+        239
       ],
-      "minimumMargin": 23,
-      "opaquePixels": 7393
-    },
-    {
-      "index": 8,
-      "outputBbox": [
-        75,
-        125,
-        180,
-        234
-      ],
-      "minimumMargin": 22,
-      "opaquePixels": 5998
-    },
-    {
-      "index": 9,
-      "outputBbox": [
-        63,
-        107,
-        193,
-        236
-      ],
-      "minimumMargin": 20,
-      "opaquePixels": 7855
-    },
-    {
-      "index": 10,
-      "outputBbox": [
-        68,
-        125,
-        188,
-        236
-      ],
-      "minimumMargin": 20,
-      "opaquePixels": 6892
-    },
-    {
-      "index": 11,
-      "outputBbox": [
-        65,
-        110,
-        190,
-        236
-      ],
-      "minimumMargin": 20,
-      "opaquePixels": 6344
-    },
-    {
-      "index": 12,
-      "outputBbox": [
-        55,
-        93,
-        200,
-        234
-      ],
-      "minimumMargin": 22,
-      "opaquePixels": 10323
-    },
-    {
-      "index": 13,
-      "outputBbox": [
-        59,
-        92,
-        203,
-        236
-      ],
-      "minimumMargin": 20,
-      "opaquePixels": 9073
+      "minimumMargin": 17,
+      "opaquePixels": 14461
     }
   ],
   "passed": true,
+  "transform": {
+    "scale": 1.425,
+    "upscaled": true,
+    "reason": "The reaction master was drawn at ~70% of the canonical body (anatomy vs Idle: 1.49/1.42/1.37/1.43). Interim upscale until full-resolution art exists.",
+    "sourceCell": [
+      256,
+      256,
+      128,
+      238
+    ],
+    "frames": [
+      {
+        "sourceFrame": 0,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 2,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 1,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 11,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 2,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 5,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 3,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 4,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 4,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 5,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 2,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 6,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 31,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 7,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 8,
+        "cleanedPixels": 0
+      }
+    ]
+  },
   "packed": {
-    "frameWidth": 236,
-    "frameHeight": 170,
-    "rootX": 118,
-    "rootY": 162,
-    "columns": 14,
-    "frameCount": 14,
+    "frameWidth": 335,
+    "frameHeight": 237,
+    "rootX": 168,
+    "rootY": 226,
+    "columns": 8,
+    "frameCount": 8,
     "cropOffset": [
-      10,
-      76
+      24,
+      12
     ],
     "decodedBytes": {
-      "canonical": 3670016,
-      "packed": 2246720
+      "canonical": 3145728,
+      "packed": 2540640
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
       "source": "ae2b3dac328c822953eba238e10ef831258ca2289c39fbb9ce986430ed49f69f",
-      "config": "cf9e1288871696f56a03cfa4917623ebe692ffd3d1b92f8001ddaead5c757a66",
+      "config": "e96181b7091492984e6dbe38513f9c640e3434155b5f1242a02a2089b9235a27",
       "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
     }
   }

@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.66-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.67-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -73,3 +73,10 @@ HUD, cenário e efeitos), a maioria testável sem Android. Tabela em
 
 O lançador agachado (2H) do `player_base` usa a nova folha de 4 frames pelo motor de
 sprites, com o gancho sincronizado à janela de acerto. Comportamento de lançador mantido.
+
+## Harmonia dos sprites — v0.67
+
+Auditoria automática (`tools/sprites/harmony.py` + teste) de alinhamento, contato com o
+chão, picos em golpes e escala. Corrigidos: tamanho e chão das reações do lutador base,
+alinhamento do movimento e do Heavy do Player Two, artefato magenta, respiração do idle
+e garras vazadas do Brutamonte.

@@ -110,6 +110,10 @@
         142.5,
         328.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           14,
@@ -176,6 +180,10 @@
       "sourceRoot": [
         166.75,
         328.0
+      ],
+      "frameShift": [
+        0,
+        0
       ],
       "sourceFootIntervals": [
         [
@@ -244,6 +252,10 @@
         190.75,
         327.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           44,
@@ -310,6 +322,10 @@
       "sourceRoot": [
         173.25,
         317.0
+      ],
+      "frameShift": [
+        0,
+        0
       ],
       "sourceFootIntervals": [
         [
@@ -378,6 +394,10 @@
         158.5,
         317.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           0,
@@ -444,6 +464,10 @@
       "sourceRoot": [
         177.0,
         317.0
+      ],
+      "frameShift": [
+        0,
+        0
       ],
       "sourceFootIntervals": [
         [
@@ -512,6 +536,10 @@
         150.75,
         322.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           0,
@@ -579,6 +607,10 @@
         167.5,
         321.0
       ],
+      "frameShift": [
+        0,
+        0
+      ],
       "sourceFootIntervals": [
         [
           32,
@@ -645,6 +677,10 @@
       "sourceRoot": [
         178.0,
         320.0
+      ],
+      "frameShift": [
+        0,
+        0
       ],
       "sourceFootIntervals": [
         [

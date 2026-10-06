@@ -2,7 +2,7 @@
   "id": "player_two_movement",
   "characterProfile": "player_two",
   "source": "art/sprites/source/player_two_movement_normalized.png",
-  "sourceNote": "Reviewed Player Two movement master; airborne poses keep authored registration.",
+  "sourceNote": "Reviewed Player Two movement master; per-frame offsets re-centre the torso on the root so state changes do not jump sideways.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1,
@@ -51,9 +51,9 @@
     {
       "index": 3,
       "outputBbox": [
-        58,
+        109,
         19,
-        221,
+        272,
         247
       ],
       "minimumMargin": 9,
@@ -95,9 +95,9 @@
     {
       "index": 7,
       "outputBbox": [
-        163,
+        99,
         36,
-        324,
+        260,
         247
       ],
       "minimumMargin": 9,
@@ -106,9 +106,9 @@
     {
       "index": 8,
       "outputBbox": [
-        169,
+        107,
         95,
-        315,
+        253,
         246
       ],
       "minimumMargin": 10,
@@ -117,9 +117,9 @@
     {
       "index": 9,
       "outputBbox": [
-        160,
+        110,
         98,
-        304,
+        254,
         246
       ],
       "minimumMargin": 10,
@@ -139,9 +139,9 @@
     {
       "index": 11,
       "outputBbox": [
-        152,
+        110,
         33,
-        290,
+        248,
         247
       ],
       "minimumMargin": 9,
@@ -161,9 +161,9 @@
     {
       "index": 13,
       "outputBbox": [
-        48,
+        110,
         57,
-        208,
+        270,
         247
       ],
       "minimumMargin": 9,
@@ -172,9 +172,9 @@
     {
       "index": 14,
       "outputBbox": [
-        173,
+        81,
         80,
-        363,
+        271,
         247
       ],
       "minimumMargin": 9,
@@ -183,9 +183,9 @@
     {
       "index": 15,
       "outputBbox": [
-        20,
+        118,
         76,
-        210,
+        308,
         246
       ],
       "minimumMargin": 10,
@@ -193,27 +193,184 @@
     }
   ],
   "passed": true,
+  "transform": {
+    "scale": 1.0,
+    "upscaled": false,
+    "reason": "Re-register frames whose torso was drawn 20-110 px away from the authored root (walk passing, crouch, jump, fall, dash, backdash); target is the Idle torso offset.",
+    "sourceCell": [
+      384,
+      256,
+      192,
+      246
+    ],
+    "frames": [
+      {
+        "sourceFrame": 0,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 1,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 2,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 3,
+        "offset": [
+          51,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 4,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 5,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 6,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 7,
+        "offset": [
+          -64,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 8,
+        "offset": [
+          -62,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 9,
+        "offset": [
+          -50,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 120
+      },
+      {
+        "sourceFrame": 10,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 11,
+        "offset": [
+          -42,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 12,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 13,
+        "offset": [
+          62,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 14,
+        "offset": [
+          -92,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 15,
+        "offset": [
+          98,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      }
+    ]
+  },
   "packed": {
-    "frameWidth": 359,
+    "frameWidth": 244,
     "frameHeight": 244,
-    "rootX": 180,
+    "rootX": 120,
     "rootY": 235,
     "columns": 4,
     "frameCount": 16,
     "cropOffset": [
-      12,
+      72,
       11
     ],
     "decodedBytes": {
       "canonical": 6291456,
-      "packed": 5606144
+      "packed": 3810304
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
       "source": "d5e7317d1aa44191d2fbf417de2d9df9b6a511125551b2b764c5cbd0f076ec55",
-      "config": "eb82a13c04adbb21a419a5e8fd2c95559ff2c7944602a7095dd52207abd10a83",
+      "config": "ec5a25b183d6ee6da68cdf5091b48470febfc93b9e05b36b5ae21ae4402df7fa",
       "profile": "ad11e030e89b7b5a8b15b59727af9d4735fbaf583f8ae6d9c2c580f96412ee2b"
     }
   }

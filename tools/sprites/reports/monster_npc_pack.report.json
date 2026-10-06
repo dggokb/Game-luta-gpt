@@ -2,15 +2,15 @@
   "id": "monster_npc_pack",
   "characterProfile": "monster_npc",
   "source": "art/sprites/source/brutamonte_atlas_16.png",
-  "sourceNote": "Brutamonte 16-frame NPC atlas normalized from the approved sprite sheet.",
+  "sourceNote": "Brutamonte 16-frame atlas; limbs that crossed cell borders are regrouped into their own frame.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.4,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 128,
-    "rootY": 248,
+    "frameWidth": 336,
+    "frameHeight": 296,
+    "rootX": 168,
+    "rootY": 288,
     "columns": 4,
     "frameCount": 16
   },
@@ -18,10 +18,10 @@
     {
       "index": 0,
       "outputBbox": [
-        22,
-        37,
-        233,
-        248
+        62,
+        77,
+        273,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 32538
@@ -29,10 +29,10 @@
     {
       "index": 1,
       "outputBbox": [
-        26,
-        37,
-        230,
-        248
+        66,
+        77,
+        270,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 31763
@@ -40,10 +40,10 @@
     {
       "index": 2,
       "outputBbox": [
-        23,
-        37,
-        232,
-        248
+        63,
+        77,
+        272,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 31459
@@ -51,10 +51,10 @@
     {
       "index": 3,
       "outputBbox": [
-        23,
-        40,
-        233,
-        248
+        63,
+        80,
+        273,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 31517
@@ -62,10 +62,10 @@
     {
       "index": 4,
       "outputBbox": [
-        20,
-        33,
-        236,
-        248
+        60,
+        73,
+        276,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 31003
@@ -73,21 +73,21 @@
     {
       "index": 5,
       "outputBbox": [
-        21,
-        39,
-        235,
-        248
+        61,
+        79,
+        275,
+        288
       ],
       "minimumMargin": 8,
-      "opaquePixels": 29089
+      "opaquePixels": 29087
     },
     {
       "index": 6,
       "outputBbox": [
-        22,
-        34,
-        234,
-        248
+        62,
+        74,
+        274,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 29753
@@ -95,10 +95,10 @@
     {
       "index": 7,
       "outputBbox": [
-        19,
-        42,
-        236,
-        248
+        59,
+        82,
+        276,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 29136
@@ -106,10 +106,10 @@
     {
       "index": 8,
       "outputBbox": [
-        14,
-        71,
-        241,
-        248
+        54,
+        111,
+        281,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 28435
@@ -117,43 +117,43 @@
     {
       "index": 9,
       "outputBbox": [
-        6,
-        53,
-        256,
-        248
+        46,
+        93,
+        289,
+        288
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 30655
+      "minimumMargin": 8,
+      "opaquePixels": 30345
     },
     {
       "index": 10,
       "outputBbox": [
-        0,
-        46,
-        256,
-        248
+        27,
+        86,
+        309,
+        288
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 33155
+      "minimumMargin": 8,
+      "opaquePixels": 33721
     },
     {
       "index": 11,
       "outputBbox": [
-        0,
-        79,
-        225,
-        248
+        71,
+        119,
+        265,
+        288
       ],
-      "minimumMargin": 0,
-      "opaquePixels": 22341
+      "minimumMargin": 8,
+      "opaquePixels": 22075
     },
     {
       "index": 12,
       "outputBbox": [
-        32,
-        73,
-        224,
-        248
+        72,
+        113,
+        264,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 24445
@@ -161,21 +161,21 @@
     {
       "index": 13,
       "outputBbox": [
-        5,
         45,
-        249,
-        248
+        85,
+        289,
+        288
       ],
-      "minimumMargin": 5,
+      "minimumMargin": 8,
       "opaquePixels": 30942
     },
     {
       "index": 14,
       "outputBbox": [
-        12,
-        49,
-        244,
-        248
+        52,
+        89,
+        284,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 29427
@@ -183,38 +183,206 @@
     {
       "index": 15,
       "outputBbox": [
-        25,
-        68,
-        231,
-        248
+        65,
+        108,
+        271,
+        288
       ],
       "minimumMargin": 8,
       "opaquePixels": 27394
     }
   ],
   "passed": true,
+  "transform": {
+    "scale": 1.0,
+    "upscaled": false,
+    "reason": "Frame 10's claws crossed into cells 9 and 11 (floating fragments there, clipped claws on 10); pieces are returned to their owner frame and specks removed.",
+    "sourceCell": [
+      336,
+      336,
+      168,
+      288
+    ],
+    "frames": [
+      {
+        "sourceFrame": 0,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 1,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 2,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 3,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 4,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 5,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 6,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 7,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 8,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 9,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 10,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 11,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 12,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 13,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 14,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 15,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      }
+    ],
+    "regroup": {
+      "pad": 40,
+      "dropSmallerThan": 16,
+      "droppedPixels": 21,
+      "recovered": [
+        {
+          "frame": 10,
+          "pixelsRecovered": 570
+        }
+      ]
+    }
+  },
   "packed": {
-    "frameWidth": 256,
+    "frameWidth": 298,
     "frameHeight": 231,
-    "rootX": 128,
+    "rootX": 149,
     "rootY": 223,
     "columns": 4,
     "frameCount": 16,
     "cropOffset": [
-      0,
-      25
+      19,
+      65
     ],
     "decodedBytes": {
-      "canonical": 4194304,
-      "packed": 3784704
+      "canonical": 6365184,
+      "packed": 4405632
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
       "source": "32c27d2d6d9f5a7edbafd16778fe9f5e9bdc6f9e77a2443580437af70e2d2d32",
-      "config": "b417dc8aa0207efc89a3c3527e39a8449cbed496e077874ddae372eb458ea29e",
-      "profile": "a107acc7a6c166eee10752d3a8f0879a7103a6b137905010cc269d48d7b2ce78"
+      "config": "007b8617cd9ce33ddac6d727b0dc64ff6ac97d1833d170b4c83d8ba9964b5472",
+      "profile": "d1c3f6d0a72d74b97b62c1c46fe55f77cdb34db0770c4248c8203cf654339b0b"
     }
   }
 }

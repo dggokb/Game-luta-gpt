@@ -217,6 +217,35 @@ class CharacterPackTests(unittest.TestCase):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('m.put("2H",new CharacterDefinition.Move("2H",a.get("CROUCH_HEAVY")',java)
 
+    def test_regroup_returns_limbs_that_cross_into_a_neighbour_cell(self):
+        import import_sprites as imp
+        from PIL import Image
+        sheet=Image.new('RGBA',(200,100))
+        for x in range(20,115):sheet.putpixel((x,50),(255,0,0,255))   # frame 0 arm crossing x=100
+        for y in range(40,60):sheet.putpixel((150,y),(0,255,0,255))   # frame 1 body
+        sheet.putpixel((170,10),(0,0,255,255))                          # speck
+        frames,w,h,rx,ry,rep=imp.regroup_components({'id':'t'},sheet,2,2,100,100,50,90,{'pad':20,'dropSmallerThan':4})
+        self.assertEqual((140,140,70,110),(w,h,rx,ry))
+        self.assertEqual((255,0,0,255),frames[0].getpixel((114+20,70)))   # tip kept by its owner
+        self.assertEqual(0,frames[1].getpixel((14+20,70))[3])            # no fragment in the neighbour
+        self.assertEqual(1,rep['droppedPixels'])
+        self.assertEqual([{'frame':0,'pixelsRecovered':15}],rep['recovered'])
+
+    def test_magenta_cleanup_repaints_only_the_artefact(self):
+        import import_sprites as imp
+        from PIL import Image
+        cell=Image.new('RGBA',(20,20),(120,80,60,255))
+        cell.putpixel((10,10),(255,40,220,255))
+        out,n=imp.remove_magenta(cell,[5,5,15,15])
+        r,g,b,a=out.getpixel((10,10))
+        self.assertLess(b,g+18);self.assertGreater(n,0)
+        self.assertEqual((120,80,60,255),out.getpixel((0,0)))
+
+    def test_upscaling_a_master_requires_an_explicit_reason(self):
+        path=self.root/'tools/sprites/clips/player_base_missing.json';d=json.loads(path.read_text())
+        d['transform'].pop('allowUpscale');path.write_text(json.dumps(d))
+        with self.assertRaisesRegex(ValueError,'requires allowUpscale'):pipeline.build(self.root)
+
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)
         idle=json.loads((self.root/'tools/sprites/reports/player_two_idle.report.json').read_text())

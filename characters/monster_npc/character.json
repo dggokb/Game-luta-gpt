@@ -42,10 +42,14 @@
         0,
         1,
         2,
-        3
+        3,
+        2,
+        1
       ],
       "loop": true,
       "durationsMs": [
+        130,
+        130,
         130,
         130,
         130,
@@ -109,21 +113,19 @@
     "JUMP": {
       "atlas": "monster_npc_pack",
       "frames": [
-        4,
-        5,
-        6
+        8,
+        13
       ],
       "loop": false,
       "durationsMs": [
-        85,
-        85,
-        110
+        90,
+        140
       ]
     },
     "FALL": {
       "atlas": "monster_npc_pack",
       "frames": [
-        11
+        12
       ],
       "loop": false,
       "durationsMs": [

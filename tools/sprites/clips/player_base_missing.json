@@ -11,5 +11,34 @@
   "columns": 14,
   "rootMode": "authored",
   "minOpaquePixels": 5000,
-  "sourceNote": "First-pass reviewed transparent atlas for defense, hit, knockdown, crouching and aerial combat states."
+  "sourceNote": "Reaction poses (defense, hit, knockdown, grounded, get-up) rescaled to the canonical body and grounded; unused frames 8-13 dropped.",
+  "transform": {
+    "keepFrames": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "scale": 1.425,
+    "allowUpscale": true,
+    "reason": "The reaction master was drawn at ~70% of the canonical body (anatomy vs Idle: 1.49/1.42/1.37/1.43). Interim upscale until full-resolution art exists.",
+    "outputFrameWidth": 384,
+    "outputFrameHeight": 256,
+    "outputRootX": 192,
+    "outputRootY": 238,
+    "columns": 8,
+    "groundFrames": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7
+    ]
+  }
 }

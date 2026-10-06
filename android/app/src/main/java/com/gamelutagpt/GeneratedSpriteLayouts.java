@@ -4,9 +4,9 @@ package com.gamelutagpt;
 final class GeneratedSpriteLayouts {
     private GeneratedSpriteLayouts() {}
 
-    static final int MONSTER_NPC_PACK_FRAME_WIDTH = 256;
+    static final int MONSTER_NPC_PACK_FRAME_WIDTH = 298;
     static final int MONSTER_NPC_PACK_FRAME_HEIGHT = 231;
-    static final int MONSTER_NPC_PACK_ROOT_X = 128;
+    static final int MONSTER_NPC_PACK_ROOT_X = 149;
     static final int MONSTER_NPC_PACK_ROOT_Y = 223;
     static final int MONSTER_NPC_PACK_FRAME_COUNT = 16;
 
@@ -52,11 +52,11 @@ final class GeneratedSpriteLayouts {
     static final int MEDIUM_KICK_ROOT_Y = 236;
     static final int MEDIUM_KICK_FRAME_COUNT = 3;
 
-    static final int PLAYER_BASE_MISSING_FRAME_WIDTH = 236;
-    static final int PLAYER_BASE_MISSING_FRAME_HEIGHT = 170;
-    static final int PLAYER_BASE_MISSING_ROOT_X = 118;
-    static final int PLAYER_BASE_MISSING_ROOT_Y = 162;
-    static final int PLAYER_BASE_MISSING_FRAME_COUNT = 14;
+    static final int PLAYER_BASE_MISSING_FRAME_WIDTH = 335;
+    static final int PLAYER_BASE_MISSING_FRAME_HEIGHT = 237;
+    static final int PLAYER_BASE_MISSING_ROOT_X = 168;
+    static final int PLAYER_BASE_MISSING_ROOT_Y = 226;
+    static final int PLAYER_BASE_MISSING_FRAME_COUNT = 8;
 
     static final int MOVEMENT_FRAME_WIDTH = 253;
     static final int MOVEMENT_FRAME_HEIGHT = 229;
@@ -64,7 +64,7 @@ final class GeneratedSpriteLayouts {
     static final int MOVEMENT_ROOT_Y = 220;
     static final int MOVEMENT_FRAME_COUNT = 16;
 
-    static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_WIDTH = 283;
+    static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_WIDTH = 232;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_HEIGHT = 239;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_ROOT_X = 105;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_ROOT_Y = 230;
@@ -88,9 +88,9 @@ final class GeneratedSpriteLayouts {
     static final int PLAYER_TWO_MEDIUM_KICK_ROOT_Y = 237;
     static final int PLAYER_TWO_MEDIUM_KICK_FRAME_COUNT = 3;
 
-    static final int PLAYER_TWO_MOVEMENT_FRAME_WIDTH = 359;
+    static final int PLAYER_TWO_MOVEMENT_FRAME_WIDTH = 244;
     static final int PLAYER_TWO_MOVEMENT_FRAME_HEIGHT = 244;
-    static final int PLAYER_TWO_MOVEMENT_ROOT_X = 180;
+    static final int PLAYER_TWO_MOVEMENT_ROOT_X = 120;
     static final int PLAYER_TWO_MOVEMENT_ROOT_Y = 235;
     static final int PLAYER_TWO_MOVEMENT_FRAME_COUNT = 16;
 
