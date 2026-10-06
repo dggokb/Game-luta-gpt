@@ -1,0 +1,9 @@
+{
+  "estilo": "Ilustração no estilo de anime de luta dos anos 90, traço de tinta grosso e preto, cores chapadas e vibrantes, sombras duras, iluminação dramática, muito contraste. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água.",
+  "ficha": "Folha de referência de personagem: {descricao}. Corpo inteiro, de frente, pose neutra em pé, fundo branco liso, iluminação uniforme.",
+  "olhos": "Close extremo nos olhos de {descricao}, olhar furioso e determinado. Os dois olhos ocupam uma faixa horizontal fina no centro exato da imagem; acima e abaixo só sombra. Reflexo de energia {cor} na íris. Fundo escuro.",
+  "carga": "{descricao} carregando energia, corpo inteiro, de frente para a câmera, punhos fechados ao lado do corpo, músculos tensos. Aura de energia {cor} explodindo em volta como labaredas, pedras flutuando, chão rachando. Câmera de baixo para cima.",
+  "golpe": "Soco de {descricao} vindo direto na direção da câmera. Punho gigante em primeiro plano com escorço exagerado, rosto ao fundo gritando. Onda de choque {cor}, linhas de velocidade radiais. Composição horizontal com o punho no centro.",
+  "atingido": "Um lutador genérico de roupa escura sendo atingido por um golpe e arremessado para a direita, corpo dobrado para trás, saliva e suor voando, estrela de impacto branca no peito, linhas de velocidade horizontais. Composição horizontal com o corpo no centro.",
+  "final": "{descricao} de perfil olhando para a direita, disparando um raio de energia {cor} gigante com as duas mãos para frente. O raio atravessa a imagem da esquerda para a direita e explode no horizonte. Céu escuro, detritos voando, câmera dramática."
+}
