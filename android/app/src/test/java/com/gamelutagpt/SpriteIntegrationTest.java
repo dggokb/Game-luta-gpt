@@ -120,7 +120,7 @@ public class SpriteIntegrationTest {
 
         setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);
         invoke("startAttack",new Class<?>[]{String.class},"H");frames(1);
-        assertEquals(SpriteMotion.Clip.JUMP,motion().clip);
+        assertEquals("JUMP_HEAVY",motion().clip);
 
         setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);
         invoke("startAttack",new Class<?>[]{String.class},"L");frames(1);

@@ -485,3 +485,22 @@ raiz) com os frames JUMP/FALL aprovados, então trocar de pulo para golpe não d
 Frame data do jL inalterado (160 ms, ativo 58–102 ms, dano 300); durações 50/30/30/50
 mantêm os dois frames de soco esticado durante toda a janela ativa (testado). jM e jH
 continuam com `pose: "AIR"`.
+
+## Aéreos completos — jM e jH — GPT v0.69
+
+O `player_base` agora tem arte própria para os três golpes aéreos:
+
+| Input | Atlas | Frames | Escala | Frame data (inalterado) | Durações |
+| --- | --- | --- | --- | --- | --- |
+| jM | `player_base_jump_medium` | guarda, carga, soco esticado, recolhe | 0,399 | 260 ms, ativo 94–166 | 50/40/90/80 |
+| jH | `player_base_jump_heavy` | guarda, braços erguidos, martelada, recolhe | 0,402 | 400 ms, ativo 144–256 | 70/70/130/130 |
+
+Em ambos o frame do golpe fica na tela durante toda a janela ativa (testado). Mesmo
+registro aéreo do jL (tronco −13 px, pés 12 px acima da raiz) e escala pela cabeça
+contra o Idle. O jH continua sendo a martelada que, no super pulo, derruba o oponente.
+
+**Novo modo de separação `alpha-components`:** na folha do jM o punho esticado passa por
+cima da pose seguinte (sem encostar), então a projeção por colunas juntava os dois
+frames. O modo rotula corpos conectados (8-vizinhança), ordena da esquerda para a
+direita e recorta cada frame só com os próprios pixels; pedaços pequenos juntam-se ao
+corpo que os contém e ciscos são descartados.

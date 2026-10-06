@@ -179,6 +179,8 @@ def process_clip(config_path):
                 region_mask = mask.crop((left, top, right, bottom))
                 if region_mask.getbbox() is not None:
                     regions.append((left, top, right, bottom))
+    elif segmentation == "alpha-components":
+        regions, component_images = connected_frames(source, threshold)
     else:
         raise ValueError(f"unsupported segmentation mode: {segmentation}")
 
@@ -191,7 +193,12 @@ def process_clip(config_path):
     intervals = [(left, right) for left, _, right, _ in regions]
     frames = []
     for index, (left, top, right, bottom) in enumerate(regions):
-        frame = source.crop((left, top, right, bottom))
+        if segmentation == "alpha-components":
+            # Bounding boxes may overlap (a fist passing over the next pose); each
+            # frame keeps only its own pixels.
+            frame = component_images[index]
+        else:
+            frame = source.crop((left, top, right, bottom))
         bbox = bbox_for(frame, threshold)
         root_mode = cfg.get("rootMode", "ground-feet")
         if root_mode != "ground-feet":
@@ -545,6 +552,74 @@ def process_prepared(cfg, profile):
     preview.alpha_composite(output)
     preview.save(ROOT / cfg["preview"])
     return cfg, report
+
+def connected_frames(source, threshold, min_ratio=0.02, attach_distance=6):
+    """One frame per connected body (8-connectivity), ordered left to right.
+
+    Used when poses overlap in x so column projection would merge them. Pieces smaller
+    than min_ratio of the largest body join the body whose box (grown by
+    attach_distance) contains them; anything else is dropped as a speck.
+    """
+    alpha = source.getchannel("A")
+    w, h = alpha.size
+    px = alpha.load()
+    seen = bytearray(w * h)
+    comps = []
+    for y in range(h):
+        for x in range(w):
+            if px[x, y] <= threshold or seen[y * w + x]:
+                continue
+            seen[y * w + x] = 1
+            stack, points = [(x, y)], []
+            while stack:
+                cx, cy = stack.pop()
+                points.append((cx, cy))
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        nx, ny = cx + dx, cy + dy
+                        if 0 <= nx < w and 0 <= ny < h and px[nx, ny] > threshold and not seen[ny * w + nx]:
+                            seen[ny * w + nx] = 1
+                            stack.append((nx, ny))
+            xs = [p[0] for p in points]
+            ys = [p[1] for p in points]
+            comps.append({"points": points, "box": [min(xs), min(ys), max(xs) + 1, max(ys) + 1]})
+    if not comps:
+        return [], []
+    largest = max(len(c["points"]) for c in comps)
+    bodies = [c for c in comps if len(c["points"]) >= largest * min_ratio]
+    for c in comps:
+        if c in bodies:
+            continue
+        x0, y0, x1, y1 = c["box"]
+        for body in bodies:
+            bx0, by0, bx1, by1 = body["box"]
+            if (x0 >= bx0 - attach_distance and x1 <= bx1 + attach_distance
+                    and y0 >= by0 - attach_distance and y1 <= by1 + attach_distance):
+                body["points"].extend(c["points"])
+                break
+    bodies.sort(key=lambda c: c["box"][0])
+    regions, images = [], []
+    src = source.load()
+    for body in bodies:
+        x0, y0, x1, y1 = body["box"]
+        image = Image.new("RGBA", (x1 - x0, y1 - y0))
+        out = image.load()
+        for x, y in body["points"]:
+            if x0 <= x < x1 and y0 <= y < y1:
+                out[x - x0, y - y0] = src[x, y]
+        # Anti-aliased fringe (alpha <= threshold) next to the body's own pixels.
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                a = src[x, y][3]
+                if 0 < a <= threshold and out[x - x0, y - y0][3] == 0:
+                    near = any(out[nx - x0, ny - y0][3] > threshold
+                               for nx in (x - 1, x, x + 1) for ny in (y - 1, y, y + 1)
+                               if x0 <= nx < x1 and y0 <= ny < y1)
+                    if near:
+                        out[x - x0, y - y0] = src[x, y]
+        regions.append((x0, y0, x1, y1))
+        images.append(image)
+    return regions, images
 
 def regroup_components(cfg, sheet, count, columns, width, height, root_x, root_y, options):
     """Gives every connected piece of art back to the frame that owns it.

@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.68-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.69-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -85,3 +85,8 @@ e garras vazadas do Brutamonte.
 
 O soco fraco aéreo do `player_base` usa a nova folha de 4 frames, com escala pela cabeça
 e registro alinhado ao pulo.
+
+## Aéreos completos — v0.69
+
+jM e jH do `player_base` com arte própria, alinhados ao pulo e ao jL. Novo modo de
+separação por componente para folhas em que as poses se sobrepõem na horizontal.

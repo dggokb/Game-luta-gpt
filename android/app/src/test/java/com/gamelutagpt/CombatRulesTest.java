@@ -139,6 +139,16 @@ public class CombatRulesTest {
             int frame=jab.animation.frame(jab.animationTime(t),0);
             assertTrue("t="+t+" frame="+frame,frame==1||frame==2);
         }
-        assertEquals(SpriteStates.POSE_AIR,BASE.move("M",true).pose);
+    }
+    @Test public void airMediumAndHeavyStrikeFramesCoverTheirActiveWindows() {
+        String[][] cases={{"M","JUMP_MEDIUM","2"},{"H","JUMP_HEAVY","2"}};
+        for(String[] c:cases) {
+            CharacterDefinition.Move move=BASE.move(c[0],true);
+            assertEquals(c[1],move.animation.id);
+            for(float t=move.activeStart;t<move.activeEnd;t+=.002f)
+                assertEquals(c[1]+" t="+t,Integer.parseInt(c[2]),move.animation.frame(move.animationTime(t),0));
+        }
+        // player_two still keeps the airborne pose fallback.
+        assertEquals(SpriteStates.POSE_AIR,GeneratedCharacters.get("player_two").move("M",true).pose);
     }
 }

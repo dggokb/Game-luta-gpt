@@ -104,7 +104,7 @@ class CharacterPackTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'missing moves'):pipeline.build(self.root)
 
     def test_pose_must_match_input(self):
-        self.edit(lambda d:d['moves'].__setitem__('L',{**d['moves']['jM']}))
+        self.edit(lambda d:d['moves'].__setitem__('L',{k:v for k,v in d['moves']['jM'].items() if k!='animation'}|{'pose':'AIR'}))
         with self.assertRaisesRegex(ValueError,'pose AIR is not valid'):pipeline.build(self.root)
 
     def test_move_needs_exactly_one_of_animation_or_pose(self):
@@ -178,7 +178,8 @@ class CharacterPackTests(unittest.TestCase):
         pipeline.build(self.root)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('new CharacterDefinition.Fighter(0xFFD9485F',java)
-        self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",null,"AIR"',java)
+        self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",a.get("JUMP_HEAVY"),null',java)
+        self.assertIn('m.put("2L",new CharacterDefinition.Move("2L",null,"CROUCH"',java.split('all.put("player_base"')[1])
         states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
         self.assertIn('static final String HIT_AIR = "HIT_AIR";',states)
 
@@ -254,7 +255,24 @@ class CharacterPackTests(unittest.TestCase):
         self.assertTrue(all(f['frameShift'][1]<0 for f in report['frames']))  # feet lifted off the ground
         pack=json.loads(self.path.read_text())
         self.assertEqual('JUMP_LIGHT',pack['moves']['jL']['animation'])
-        self.assertEqual('AIR',pack['moves']['jM']['pose'])
+        self.assertEqual('JUMP_MEDIUM',pack['moves']['jM']['animation'])
+        self.assertEqual('JUMP_HEAVY',pack['moves']['jH']['animation'])
+
+    def test_component_segmentation_separates_poses_that_overlap_in_x(self):
+        import import_sprites as imp
+        from PIL import Image
+        sheet=Image.new('RGBA',(120,60))
+        for x in range(10,70):sheet.putpixel((x,20),(255,0,0,255))   # pose A: long arm over B
+        for y in range(30,50):sheet.putpixel((60,y),(0,0,255,255))   # pose B, inside A's x range
+        regions,images=imp.connected_frames(sheet,10)
+        self.assertEqual([(10,20,70,21),(60,30,61,50)],regions)
+        self.assertEqual(0,images[0].getpixel((50,0))[3] if images[0].height>10 else 0)
+        self.assertEqual((0,0,255,255),images[1].getpixel((0,0)))
+        pipeline.build(self.root)
+        for key in ('medium','heavy'):
+            report=json.loads((self.root/f'tools/sprites/reports/player_base_jump_{key}.report.json').read_text())
+            self.assertEqual(4,report['layout']['frameCount'])
+            self.assertTrue(report['passed'])
 
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)

@@ -75,6 +75,8 @@ final class GeneratedCharacters {
  a.put("CROUCH_MEDIUM",new CharacterDefinition.Animation("CROUCH_MEDIUM",new CharacterDefinition.Atlas("player_base_crouch_medium",330,187,126,178,4,4),new int[]{0,1,2,3},new float[]{0.05000000f,0.05000000f,0.07000000f,0.09000000f},false,0.00000000f));
  a.put("CROUCH_HEAVY",new CharacterDefinition.Animation("CROUCH_HEAVY",new CharacterDefinition.Atlas("player_base_crouch_heavy",219,282,106,273,4,4),new int[]{0,1,2,3},new float[]{0.07000000f,0.07000000f,0.13000000f,0.13000000f},false,0.00000000f));
  a.put("JUMP_LIGHT",new CharacterDefinition.Animation("JUMP_LIGHT",new CharacterDefinition.Atlas("player_base_jump_light",232,252,98,251,4,4),new int[]{0,1,2,3},new float[]{0.05000000f,0.03000000f,0.03000000f,0.05000000f},false,0.00000000f));
+ a.put("JUMP_MEDIUM",new CharacterDefinition.Animation("JUMP_MEDIUM",new CharacterDefinition.Atlas("player_base_jump_medium",303,247,140,246,4,4),new int[]{0,1,2,3},new float[]{0.05000000f,0.04000000f,0.09000000f,0.08000000f},false,0.00000000f));
+ a.put("JUMP_HEAVY",new CharacterDefinition.Animation("JUMP_HEAVY",new CharacterDefinition.Atlas("player_base_jump_heavy",233,283,116,282,4,4),new int[]{0,1,2,3},new float[]{0.07000000f,0.07000000f,0.13000000f,0.13000000f},false,0.00000000f));
  m.put("L",new CharacterDefinition.Move("L",a.get("LIGHT_JAB"),null,300,0.16000000f,0.04000000f,0.10000000f,84.00000000f,78.00000000f));
  m.put("M",new CharacterDefinition.Move("M",a.get("MEDIUM_KICK"),null,500,0.26000000f,0.07000000f,0.17000000f,116.00000000f,78.00000000f));
  m.put("H",new CharacterDefinition.Move("H",a.get("HEAVY_STRAIGHT"),null,800,0.40000000f,0.16000000f,0.25000000f,148.00000000f,78.00000000f));
@@ -82,8 +84,8 @@ final class GeneratedCharacters {
  m.put("2M",new CharacterDefinition.Move("2M",a.get("CROUCH_MEDIUM"),null,500,0.26000000f,0.10000000f,0.17000000f,116.00000000f,42.00000000f));
  m.put("2H",new CharacterDefinition.Move("2H",a.get("CROUCH_HEAVY"),null,800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,42.00000000f));
  m.put("jL",new CharacterDefinition.Move("jL",a.get("JUMP_LIGHT"),null,300,0.16000000f,0.05800000f,0.10200000f,84.00000000f,78.00000000f));
- m.put("jM",new CharacterDefinition.Move("jM",null,"AIR",500,0.26000000f,0.09400000f,0.16600000f,116.00000000f,78.00000000f));
- m.put("jH",new CharacterDefinition.Move("jH",null,"AIR",800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,78.00000000f));
+ m.put("jM",new CharacterDefinition.Move("jM",a.get("JUMP_MEDIUM"),null,500,0.26000000f,0.09400000f,0.16600000f,116.00000000f,78.00000000f));
+ m.put("jH",new CharacterDefinition.Move("jH",a.get("JUMP_HEAVY"),null,800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,78.00000000f));
  all.put("player_base",new CharacterDefinition("player_base","Lutador base",new CharacterVisualProfile("player_base",256,256,128.00000000f,238.00000000f,1.00000000f),1,226.00000000f,168.00000000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(850,720.00000000f,760.00000000f,62.00000000f,82.00000000f,65.00000000f,82.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(3200,1450.00000000f,1180.00000000f,78.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(34.00000000f,145.00000000f,90.00000000f,30.00000000f,120.00000000f)),a,m,s));
  }
  {

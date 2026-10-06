@@ -368,6 +368,38 @@
         30,
         50
       ]
+    },
+    "JUMP_MEDIUM": {
+      "atlas": "player_base_jump_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        40,
+        90,
+        80
+      ]
+    },
+    "JUMP_HEAVY": {
+      "atlas": "player_base_jump_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        70,
+        130,
+        130
+      ]
     }
   },
   "moves": {
@@ -428,7 +460,7 @@
       "reach": 84
     },
     "jM": {
-      "pose": "AIR",
+      "animation": "JUMP_MEDIUM",
       "damage": 500,
       "totalMs": 260,
       "activeStartMs": 94,
@@ -436,7 +468,7 @@
       "reach": 116
     },
     "jH": {
-      "pose": "AIR",
+      "animation": "JUMP_HEAVY",
       "damage": 800,
       "totalMs": 400,
       "activeStartMs": 144,
