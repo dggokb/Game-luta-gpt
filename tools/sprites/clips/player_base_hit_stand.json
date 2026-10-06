@@ -1,0 +1,15 @@
+{
+  "id": "player_base_hit_stand",
+  "javaName": "HIT_STAND",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_hit_stand_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_stand.png",
+  "report": "tools/sprites/reports/player_base_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/hit-stand-import.png",
+  "expectedFrames": 4,
+  "segmentation": "alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 0,
+  "sourceNote": "Standing hit: guard, flinch, recoil, recover. Scaled against the canonical Idle guard."
+}

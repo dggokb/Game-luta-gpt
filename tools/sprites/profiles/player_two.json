@@ -1,0 +1,42 @@
+{
+  "id": "player_two",
+  "baseFrameWidth": 384,
+  "baseFrameHeight": 256,
+  "preferredRootX": 192,
+  "preferredRootY": 246,
+  "worldScale": 1,
+  "standingVisualHeight": 228,
+  "anatomyReference": {
+    "source": "art/sprites/source/player_two_idle_normalized.png",
+    "frame": 0,
+    "columns": 4,
+    "bands": [
+      [
+        0.275,
+        0.325
+      ],
+      [
+        0.3,
+        0.35
+      ],
+      [
+        0.325,
+        0.375
+      ]
+    ],
+    "maxScaleSpreadRatio": 0.12
+  },
+  "validation": {
+    "alphaThreshold": 10,
+    "minMargin": 8,
+    "rootTolerance": 6,
+    "widthStep": 64,
+    "heightStep": 64,
+    "footBandRatio": 0.025,
+    "minFootWidth": 4,
+    "minOpaquePixels": 10000,
+    "maxUpscale": 1,
+    "maxFrameWidth": 768,
+    "maxFrameHeight": 512
+  }
+}

@@ -1,0 +1,377 @@
+{
+  "id": "player_two_movement",
+  "characterProfile": "player_two",
+  "source": "art/sprites/source/player_two_movement_normalized.png",
+  "sourceNote": "Reviewed Player Two movement master; per-frame offsets re-centre the torso on the root so state changes do not jump sideways.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 192,
+    "rootY": 246,
+    "columns": 4,
+    "frameCount": 16
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        123,
+        19,
+        258,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 17162
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        112,
+        19,
+        270,
+        245
+      ],
+      "minimumMargin": 11,
+      "opaquePixels": 17300
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        105,
+        23,
+        275,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 18152
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        109,
+        19,
+        272,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 18180
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        127,
+        28,
+        258,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 17622
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        116,
+        31,
+        274,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 16712
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        122,
+        33,
+        273,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 16373
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        99,
+        36,
+        260,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 16579
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        107,
+        95,
+        253,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 14206
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        110,
+        98,
+        254,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 13404
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        102,
+        110,
+        255,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 14072
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        110,
+        33,
+        248,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 14951
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        120,
+        85,
+        276,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 13606
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        110,
+        57,
+        270,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 15263
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        81,
+        80,
+        271,
+        247
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 17313
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        118,
+        76,
+        308,
+        246
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 14564
+    }
+  ],
+  "passed": true,
+  "transform": {
+    "scale": 1.0,
+    "upscaled": false,
+    "reason": "Re-register frames whose torso was drawn 20-110 px away from the authored root (walk passing, crouch, jump, fall, dash, backdash); target is the Idle torso offset.",
+    "sourceCell": [
+      384,
+      256,
+      192,
+      246
+    ],
+    "frames": [
+      {
+        "sourceFrame": 0,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 1,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 2,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 3,
+        "offset": [
+          51,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 4,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 5,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 6,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 7,
+        "offset": [
+          -64,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 8,
+        "offset": [
+          -62,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 9,
+        "offset": [
+          -50,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 120
+      },
+      {
+        "sourceFrame": 10,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 11,
+        "offset": [
+          -42,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 12,
+        "offset": [
+          0,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 13,
+        "offset": [
+          62,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 14,
+        "offset": [
+          -92,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      },
+      {
+        "sourceFrame": 15,
+        "offset": [
+          98,
+          0
+        ],
+        "groundSnap": 0,
+        "cleanedPixels": 0
+      }
+    ]
+  },
+  "packed": {
+    "frameWidth": 244,
+    "frameHeight": 244,
+    "rootX": 120,
+    "rootY": 235,
+    "columns": 4,
+    "frameCount": 16,
+    "cropOffset": [
+      72,
+      11
+    ],
+    "decodedBytes": {
+      "canonical": 6291456,
+      "packed": 3810304
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d5e7317d1aa44191d2fbf417de2d9df9b6a511125551b2b764c5cbd0f076ec55",
+      "config": "ec5a25b183d6ee6da68cdf5091b48470febfc93b9e05b36b5ae21ae4402df7fa",
+      "profile": "ad11e030e89b7b5a8b15b59727af9d4735fbaf583f8ae6d9c2c580f96412ee2b"
+    }
+  }
+}

@@ -11,6 +11,7 @@ import java.util.Map;
  *   "nome": "EXPLOSÃO SOLAR",
  *   "cor": "#F4B73B",
  *   "corSecundaria": "#FF5A1F",
+ *   "dano": 4200,
  *   "paineis": {
  *     "olhos":    { "imagem": "olhos.png" },
  *     "carga":    { "imagem": "carga.png", "onomatopeia": "VRUUUM" },
@@ -48,15 +49,21 @@ public final class UltraDefinition {
     public final String name;
     public final int color;
     public final int accentColor;
+    /** Dano total do ultra antes da escala de combo, dividido entre os acertos da cinemática. */
+    public final int damage;
     private final Panel[] panels;
 
-    public UltraDefinition(String name, int color, int accentColor, Panel[] panels) {
+    public static final int DEFAULT_DAMAGE = 4000;
+
+    public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels) {
         if (panels.length != UltraSlot.values().length) {
             throw new IllegalArgumentException("um ultra tem exatamente 5 painéis");
         }
         this.name = name;
         this.color = color;
         this.accentColor = accentColor;
+        if (damage < 0) throw new IllegalArgumentException("o dano do ultra não pode ser negativo");
+        this.damage = damage;
         this.panels = panels.clone();
     }
 
@@ -70,7 +77,7 @@ public final class UltraDefinition {
         for (UltraSlot slot : UltraSlot.values()) {
             panels[slot.ordinal()] = new Panel(null, slot.defaultOnomatopoeia, slot.defaultSound, null);
         }
-        return new UltraDefinition(name, color, brighten(color), panels);
+        return new UltraDefinition(name, color, brighten(color), DEFAULT_DAMAGE, panels);
     }
 
     @SuppressWarnings("unchecked")
@@ -86,6 +93,11 @@ public final class UltraDefinition {
         int color = parseColor(stringField(map, "cor", "#F4B73B"));
         String accent = stringField(map, "corSecundaria", null);
         int accentColor = accent != null ? parseColor(accent) : brighten(color);
+        Object damageField = map.get("dano");
+        if (damageField != null && !(damageField instanceof Number)) {
+            throw new IllegalArgumentException("\"dano\" deve ser um número");
+        }
+        int damage = damageField != null ? ((Number)damageField).intValue() : DEFAULT_DAMAGE;
 
         Object panelsField = map.get("paineis");
         Map<String, Object> panelsMap = panelsField instanceof Map
@@ -108,7 +120,7 @@ public final class UltraDefinition {
             float[] position = entry != null ? positionField(entry, "posicaoOnomatopeia") : null;
             panels[slot.ordinal()] = new Panel(image, sfx, sound, position);
         }
-        return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, panels);
+        return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels);
     }
 
     private static float[] positionField(Map<String, Object> map, String key) {

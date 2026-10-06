@@ -7,11 +7,66 @@ android {
         applicationId 'com.gamelutagpt'
         minSdk 24
         targetSdk 35
-        versionCode 40
-        versionName '0.40'
+        // Single version source: the HUD reads BuildConfig.VERSION_NAME.
+        versionCode 75
+        versionName '0.75-sprite-gpt-pack-v2'
     }
+    buildFeatures { buildConfig true }
+    testOptions { unitTests.includeAndroidResources = true }
 }
 
 dependencies {
+    // Ultra "Página Final": pure Java engine shared with the PC preview.
     implementation project(':ultra-core')
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
 }
+
+// Sprite packs are compiled by the author (build_characters.py --write) and the
+// generated files are versioned. The build only verifies them; it never rewrites
+// tracked files. Without Python/Pillow the local build warns and continues, while
+// CI passes -PrequireSpriteCheck=true to make a missing toolchain an error.
+def spriteRoot = rootProject.projectDir.parentFile
+tasks.register('verifySpritePacks') {
+    description = 'Fails when generated sprite outputs are stale or orphaned.'
+    inputs.files(fileTree(new File(spriteRoot, 'characters')),
+        fileTree(new File(spriteRoot, 'art/sprites/source')),
+        fileTree(new File(spriteRoot, 'tools/sprites')) { exclude '__pycache__/**', 'tests/**' },
+        fileTree('src/main/res/drawable-nodpi'),
+        fileTree('src/main/java/com/gamelutagpt') { include 'Generated*.java', 'SpriteStates.java' })
+    def stamp = layout.buildDirectory.file('sprite-review/verified.stamp')
+    outputs.file(stamp)
+    def strict = providers.gradleProperty('requireSpriteCheck').map { it.toBoolean() }.orElse(false)
+    doLast {
+        def run = { List<String> command ->
+            def exec = providers.exec {
+                workingDir spriteRoot
+                commandLine command
+                ignoreExitValue = true
+            }
+            [exec.result.get().exitValue,
+             exec.standardOutput.asText.get() + exec.standardError.asText.get()]
+        }
+        def toolchain
+        try {
+            toolchain = run(['python3', '-c', 'import PIL'])
+        } catch (Exception ignored) {
+            toolchain = [127, 'python3 not found']
+        }
+        if (toolchain[0] != 0) {
+            def reason = toolchain[1].trim() ?: "exit ${toolchain[0]}"
+            def message = "Sprite pack check skipped: Python 3 + Pillow unavailable (${reason}). " +
+                'Install tools/sprites/requirements.txt to verify generated sprites locally.'
+            if (strict.get()) throw new GradleException(message)
+            logger.warn(message)
+            return
+        }
+        def check = run(['python3', 'tools/sprites/build_characters.py', '--check'])
+        if (check[0] != 0) throw new GradleException(check[1].trim())
+        logger.lifecycle(check[1].trim())
+        def file = stamp.get().asFile
+        file.parentFile.mkdirs()
+        file.text = check[1]
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'verifySpritePacks' }

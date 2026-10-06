@@ -1,0 +1,20 @@
+{
+  "id": "player_two_heavy_straight",
+  "javaName": "PLAYER_TWO_HEAVY_STRAIGHT",
+  "profile": "player_two.json",
+  "source": "art/sprites/source/player_two_heavy_straight_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_heavy_straight.png",
+  "report": "tools/sprites/reports/player_two_heavy_straight.report.json",
+  "preview": "android/app/build/sprite-review/player-two-heavy-straight-import.png",
+  "expectedFrames": 9,
+  "segmentation": "grid-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 0,
+  "frameShift": {
+    "7": [
+      -67,
+      0
+    ]
+  }
+}

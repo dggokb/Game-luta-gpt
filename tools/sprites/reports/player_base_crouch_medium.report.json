@@ -1,0 +1,88 @@
+{
+  "id": "player_base_crouch_medium",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_crouch_medium_normalized.png",
+  "sourceNote": "Reviewed 2M master with wide authored cells; player scale matches the approved 2L and root stays 128/238.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        51,
+        68,
+        213,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 14882
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        10,
+        89,
+        217,
+        238
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 15543
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        47,
+        89,
+        324,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16589
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        56,
+        70,
+        213,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14919
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 330,
+    "frameHeight": 187,
+    "rootX": 126,
+    "rootY": 178,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      2,
+      60
+    ],
+    "decodedBytes": {
+      "canonical": 1572864,
+      "packed": 987360
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "765ddbeecda6e6603dce07fa80459c5fc112cb4e62732db7ebf1c387a52a895d",
+      "config": "6599703d84dbadab1cf2f91ae38ab70a97cc0ec45539fb807301a5d04b4b55d1",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}

@@ -3,8 +3,8 @@
 
 Uso básico, com imagens que você já gerou:
 
-    python tools/ultra/preparar_ultra.py --id player1 --nome "Explosão Solar" \\
-        --cor "#F4B73B" --entrada minhas_imagens/player1
+    python tools/ultra/preparar_ultra.py --id player_base --nome "Explosão Solar" \\
+        --cor "#F4B73B" --entrada minhas_imagens/player_base
 
 A pasta de entrada deve ter arquivos com o nome do painel (qualquer extensão
 de imagem): olhos, carga, golpe, atingido, final. Painel sem imagem continua
@@ -13,9 +13,9 @@ com a arte provisória do jogo.
 Gerando as 5 imagens direto pela API da OpenAI (precisa de OPENAI_API_KEY e
 do pacote `openai`):
 
-    python tools/ultra/preparar_ultra.py --id player1 --nome "Explosão Solar" \\
+    python tools/ultra/preparar_ultra.py --id player_base --nome "Explosão Solar" \\
         --cor "#F4B73B" --gerar --descricao "lutador de cabelo espetado preto, \\
-        kimono laranja e faixa azul" --referencia ficha_player1.png
+        kimono laranja e faixa azul" --referencia ficha_player_base.png
 
 O script recorta cada imagem no formato do painel e grava tudo em
 android/app/src/main/assets/ultras/<id>/, junto com o ultra.json.
@@ -159,7 +159,7 @@ def ler_foco(valores):
 
 def main():
     parser = argparse.ArgumentParser(description="Prepara as imagens de um ultra da Página Final.")
-    parser.add_argument("--id", required=True, help="pasta do ultra, ex.: player1")
+    parser.add_argument("--id", required=True, help="pasta do ultra, ex.: player_base (id do personagem)")
     parser.add_argument("--nome", required=True, help="nome do golpe, ex.: \"Explosão Solar\"")
     parser.add_argument("--cor", required=True, help="cor principal, ex.: #F4B73B")
     parser.add_argument("--cor-secundaria", help="cor do brilho, ex.: #FFE7A3")

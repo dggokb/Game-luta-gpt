@@ -1,0 +1,22 @@
+{
+  "id": "monster_npc",
+  "baseFrameWidth": 256,
+  "baseFrameHeight": 256,
+  "preferredRootX": 128,
+  "preferredRootY": 248,
+  "worldScale": 1.4,
+  "standingVisualHeight": 218,
+  "validation": {
+    "alphaThreshold": 10,
+    "minMargin": 8,
+    "rootTolerance": 4,
+    "widthStep": 1,
+    "heightStep": 1,
+    "footBandRatio": 0.04,
+    "minFootWidth": 2,
+    "minOpaquePixels": 5000,
+    "maxUpscale": 1,
+    "maxFrameWidth": 336,
+    "maxFrameHeight": 296
+  }
+}

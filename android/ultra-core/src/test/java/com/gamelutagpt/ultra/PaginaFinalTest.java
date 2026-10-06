@@ -135,6 +135,7 @@ public class PaginaFinalTest {
                 + " \"posicaoOnomatopeia\": [0.25, 1.5]}}}"
         );
         assertEquals("EXPLOSÃO SOLAR", def.name);
+        assertEquals(UltraDefinition.DEFAULT_DAMAGE, def.damage);
         assertEquals(0xFF102030, def.color);
         assertEquals("golpe.png", def.panel(UltraSlot.GOLPE).imagePath);
         assertEquals("POW", def.panel(UltraSlot.GOLPE).onomatopoeia);
@@ -148,6 +149,11 @@ public class PaginaFinalTest {
     @Test(expected = IllegalArgumentException.class)
     public void definitionRejectsBadPosition() {
         UltraDefinition.fromJson("{\"nome\": \"X\", \"paineis\": {\"golpe\": {\"posicaoOnomatopeia\": [0.5]}}}");
+    }
+
+    @Test
+    public void definitionReadsDamage() {
+        assertEquals(4200, UltraDefinition.fromJson("{\"nome\": \"X\", \"dano\": 4200}").damage);
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -1,0 +1,14 @@
+{
+  "id": "player_base_heavy_straight",
+  "javaName": "HEAVY_STRAIGHT",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_heavy_straight_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_heavy_straight.png",
+  "report": "tools/sprites/reports/player_base_heavy_straight.report.json",
+  "preview": "android/app/build/sprite-review/heavy-straight-import.png",
+  "expectedFrames": 9,
+  "segmentation": "grid-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 0
+}

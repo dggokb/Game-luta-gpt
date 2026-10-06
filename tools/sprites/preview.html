@@ -1,0 +1,28 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>Revisão de sprites</title>
+<style>body{background:#151b25;color:#eee;font:16px system-ui;max-width:1000px;margin:24px auto}button,select,input{font:inherit;margin:8px;padding:8px}canvas{background:#252e3c;width:100%;max-width:960px}p{color:#bdcbdc}</style>
+<h1>Revisão de personagens</h1><p>Prévia visual dos dados usados pelo jogo. Linha verde: chão. Cruz azul: raiz. Retângulo amarelo: hurtbox de gameplay. Linha vermelha: alcance do golpe (forte na janela ativa). A arte é esticada para a duração do golpe em frames (startup + active + recovery, 60 fps).</p>
+<label>Personagem <select id="character"></select></label><label>Animação <select id="animation"></select></label>
+<div><button id="play">Pausar</button><button id="step">Próximo frame</button><label><input id="flip" type="checkbox">Espelhar</label><label>Zoom <input id="zoom" type="range" min="0.5" max="2" step="0.1" value="1"></label></div>
+<canvas id="canvas" width="960" height="600"></canvas><p id="status"></p>
+<script>
+const DATA=__SPRITE_DATA__;
+const $=id=>document.getElementById(id),ctx=$('canvas').getContext('2d'),images={};
+let time=0,playing=true,last=0;
+for(const [id,a] of Object.entries(DATA.atlases)){images[id]=new Image;images[id].src=a.image}
+for(const p of DATA.characters)$('character').add(new Option(p.displayName,p.id));
+function pack(){return DATA.characters.find(p=>p.id===$('character').value)}
+function reset(){time=0}
+function select(){ $('animation').replaceChildren();for(const id of Object.keys(pack().animations))$('animation').add(new Option(id,id));reset() }
+$('character').onchange=select;$('animation').onchange=reset;select();
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir'};
+function durations(a){return a.durationsMs||a.frames.map(()=>120)}
+function position(a){let d=durations(a),total=d.reduce((x,y)=>x+y),t=a.loop?time%total:Math.min(time,total-0.001),i=0;while(i<d.length-1&&t>=d[i]){t-=d[i++]}return i}
+$('step').onclick=()=>{playing=false;$('play').textContent='Reproduzir';let a=pack().animations[$('animation').value],i=(position(a)+1)%a.frames.length;time=durations(a).slice(0,i).reduce((x,y)=>x+y,0)+0.001};
+function draw(now){if(playing&&last)time+=Math.min(now-last,100);last=now;const p=pack(),id=$('animation').value,a=p.animations[id],l=DATA.atlases[a.atlas],index=position(a),frame=a.frames[index],columns=l.columns||l.frameCount,scale=+$('zoom').value*p._profile.worldScale;
+ctx.clearRect(0,0,960,600);ctx.strokeStyle='#66db95';ctx.beginPath();ctx.moveTo(0,490);ctx.lineTo(960,490);ctx.stroke();ctx.save();ctx.translate(480,490);ctx.scale(($('flip').checked?-1:1)*scale,scale);if(images[a.atlas].complete)ctx.drawImage(images[a.atlas],frame%columns*l.frameWidth,Math.floor(frame/columns)*l.frameHeight,l.frameWidth,l.frameHeight,-l.rootX,-l.rootY,l.frameWidth,l.frameHeight);ctx.restore();ctx.strokeStyle='#60dbff';ctx.beginPath();ctx.moveTo(470,490);ctx.lineTo(490,490);ctx.moveTo(480,480);ctx.lineTo(480,500);ctx.stroke();const z=+$('zoom').value,dir=$('flip').checked?-1:1,body=p.fighter.body,move=Object.values(p.moves).find(m=>m.animation===id),
+total=durations(a).reduce((x,y)=>x+y),FRAME=1000/60,moveFrames=move?move.startupFrames+move.activeFrames+move.recoveryFrames:0,gameplay=move?Math.min(time,total)*moveFrames*FRAME/total:0,gameFrame=Math.floor(gameplay/FRAME),active=move&&gameFrame>=move.startupFrames&&gameFrame<move.startupFrames+move.activeFrames,
+crouch=/CROUCH/.test(id),h=(crouch?body.crouchHeight:body.standHeight)*z;
+ctx.strokeStyle='#ffd166';ctx.setLineDash([6,4]);ctx.strokeRect(480-body.halfWidth*z,490-h,body.halfWidth*2*z,h);ctx.setLineDash([]);
+if(move){const hy=490-(move.hitHeight??(id.startsWith('CROUCH')?42:78))*z;ctx.strokeStyle=active?'#ff5c7a':'#8a6f7a';ctx.lineWidth=active?4:2;ctx.beginPath();ctx.moveTo(480,hy);ctx.lineTo(480+dir*move.reach*z,hy);ctx.stroke();ctx.lineWidth=1}
+$('status').textContent=`${id} · frame ${index+1}/${a.frames.length} · atlas ${frame} · ${Math.floor(time)} ms${move?` · gameplay frame ${Math.min(gameFrame,moveFrames-1)}/${moveFrames} (60 fps)`:''}${active?' · ACERTO ATIVO':''}${a.distancePerFrame?' · caminhada simulada; no jogo avança pela distância percorrida':''}`;requestAnimationFrame(draw)}requestAnimationFrame(draw);
+</script></html>

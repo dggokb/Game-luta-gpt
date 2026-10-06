@@ -1,0 +1,260 @@
+{
+  "id": "player_base_hit_air",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_hit_air_source.png",
+  "detectedSourceIntervals": [
+    [
+      45,
+      618
+    ],
+    [
+      614,
+      1089
+    ],
+    [
+      1140,
+      1662
+    ],
+    [
+      1752,
+      2104
+    ]
+  ],
+  "scale": 0.353,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "frameCount": 4
+  },
+  "validation": {
+    "alphaThreshold": 10,
+    "minMargin": 8,
+    "rootTolerance": 1.5,
+    "widthStep": 64,
+    "heightStep": 64,
+    "footBandRatio": 0.025,
+    "minFootWidth": 4,
+    "minOpaquePixels": 10000,
+    "maxUpscale": 1.0,
+    "maxFrameWidth": 768,
+    "maxFrameHeight": 512
+  },
+  "frames": [
+    {
+      "index": 0,
+      "sourceInterval": [
+        45,
+        618
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        573,
+        530
+      ],
+      "sourceRoot": [
+        286.5,
+        562.9943342776204
+      ],
+      "frameShift": [
+        0,
+        -12
+      ],
+      "sourceFootIntervals": [],
+      "outputBbox": [
+        27,
+        39,
+        229,
+        226
+      ],
+      "outputMargins": {
+        "left": 27,
+        "right": 27,
+        "top": 39,
+        "bottom": 30
+      },
+      "detectedOutputRoot": [
+        128.0,
+        225
+      ],
+      "detectedOutputFootIntervals": [],
+      "opaquePixels": 15976,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 1,
+      "sourceInterval": [
+        614,
+        1089
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        475,
+        555
+      ],
+      "sourceRoot": [
+        237.5,
+        587.9943342776204
+      ],
+      "frameShift": [
+        0,
+        -12
+      ],
+      "sourceFootIntervals": [],
+      "outputBbox": [
+        44,
+        30,
+        212,
+        226
+      ],
+      "outputMargins": {
+        "left": 44,
+        "right": 44,
+        "top": 30,
+        "bottom": 30
+      },
+      "detectedOutputRoot": [
+        128.0,
+        225
+      ],
+      "detectedOutputFootIntervals": [],
+      "opaquePixels": 16213,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 2,
+      "sourceInterval": [
+        1140,
+        1662
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        522,
+        546
+      ],
+      "sourceRoot": [
+        261.0,
+        578.9943342776204
+      ],
+      "frameShift": [
+        0,
+        -12
+      ],
+      "sourceFootIntervals": [],
+      "outputBbox": [
+        36,
+        34,
+        220,
+        227
+      ],
+      "outputMargins": {
+        "left": 36,
+        "right": 36,
+        "top": 34,
+        "bottom": 29
+      },
+      "detectedOutputRoot": [
+        128.0,
+        226
+      ],
+      "detectedOutputFootIntervals": [],
+      "opaquePixels": 16173,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 3,
+      "sourceInterval": [
+        1752,
+        2104
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        352,
+        509
+      ],
+      "sourceRoot": [
+        176.0,
+        541.9943342776204
+      ],
+      "frameShift": [
+        0,
+        -12
+      ],
+      "sourceFootIntervals": [],
+      "outputBbox": [
+        66,
+        47,
+        190,
+        227
+      ],
+      "outputMargins": {
+        "left": 66,
+        "right": 66,
+        "top": 47,
+        "bottom": 29
+      },
+      "detectedOutputRoot": [
+        128.0,
+        226
+      ],
+      "detectedOutputFootIntervals": [],
+      "opaquePixels": 13640,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 218,
+    "frameHeight": 217,
+    "rootX": 109,
+    "rootY": 216,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      19,
+      22
+    ],
+    "decodedBytes": {
+      "canonical": 1048576,
+      "packed": 756896
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "4066d3b42b898b643a16d16d688c87951fe3a52c8930d278c2b16133b3a5bd5a",
+      "config": "fe5876a8d361b32063d64045b59ce452191439c8003d7e9d8da9d92602707a20",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}

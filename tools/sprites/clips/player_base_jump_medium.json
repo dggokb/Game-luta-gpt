@@ -1,0 +1,41 @@
+{
+  "id": "player_base_jump_medium",
+  "javaName": "JUMP_MEDIUM",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_jump_medium_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_medium.png",
+  "report": "tools/sprites/reports/player_base_jump_medium.report.json",
+  "preview": "android/app/build/sprite-review/jump-medium-import.png",
+  "expectedFrames": 4,
+  "segmentation": "alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 0,
+  "anatomyReference": {
+    "bands": [
+      [
+        0.0,
+        0.12
+      ]
+    ]
+  },
+  "sourceNote": "jM air straight: guard, wind-up, extended punch, recovery. Separated by connected components (poses overlap in x). Scaled by head width against the canonical Idle. Airborne registration: torso and feet height aligned with the approved JUMP/FALL frames (torso -13 px, feet 12 px above the root).",
+  "frameShift": {
+    "0": [
+      -74,
+      -11
+    ],
+    "1": [
+      -114,
+      -11
+    ],
+    "2": [
+      -121,
+      -12
+    ],
+    "3": [
+      -75,
+      -11
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "player_two_movement",
+  "javaName": "PLAYER_TWO_MOVEMENT",
+  "profile": "player_two.json",
+  "source": "art/sprites/source/player_two_movement_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_movement.png",
+  "report": "tools/sprites/reports/player_two_movement.report.json",
+  "preview": "android/app/build/sprite-review/player-two-movement-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Reviewed Player Two movement master; per-frame offsets re-centre the torso on the root so state changes do not jump sideways.",
+  "transform": {
+    "offsets": {
+      "3": [
+        51,
+        0
+      ],
+      "7": [
+        -64,
+        0
+      ],
+      "8": [
+        -62,
+        0
+      ],
+      "9": [
+        -50,
+        0
+      ],
+      "11": [
+        -42,
+        0
+      ],
+      "13": [
+        62,
+        0
+      ],
+      "14": [
+        -92,
+        0
+      ],
+      "15": [
+        98,
+        0
+      ]
+    },
+    "reason": "Re-register frames whose torso was drawn 20-110 px away from the authored root (walk passing, crouch, jump, fall, dash, backdash); target is the Idle torso offset.",
+    "cleanup": [
+      {
+        "frame": 9,
+        "box": [
+          244,
+          132,
+          278,
+          158
+        ],
+        "reason": "magenta glow artefact near the fist"
+      }
+    ]
+  }
+}

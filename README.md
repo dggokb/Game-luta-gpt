@@ -1,26 +1,140 @@
-# Game Luta GPT — protótipo Android
+# Game Luta Sprite GPT
 
-Projeto separado de protótipo de luta 3v3 baseado em sistemas universais: movimentação, L/M/H/S, defesa, Super Dash, Dragon Rush, Reflect, Vanish, Ki, assistência, troca, vida recuperável, Sparking, Limit Break, HUD e CPU simples.
+Branch `game-luta-sprite-gpt`. Versão `0.75-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
-O protótipo usa lutadores genéricos e não contém assets ou golpes de personagens licenciados.
+## Character Pack Engine
 
-## Estrutura
-- `android/app/` — app Android (`GameView.java` desenha a luta com Canvas)
-- `android/ultra-core/` — motor do ultra "Página Final", em Java puro (roda no Android e no PC)
-- `android/ultra-preview/` — visualizador do ultra no PC
-- `android/app/src/main/assets/ultras/` — ultras de cada lutador (ultra.json, imagens, sons)
-- `tools/ultra/` — script e prompts para preparar a arte dos ultras ([guia](tools/ultra/README.md))
-- `.github/workflows/build-apk.yml` — build do APK
+A v0.54 incorpora o motor de pacotes da Astra v0.53 preservando a identidade GPT.
+Cada personagem possui `characters/<id>/character.json`; o roster fica em
+`characters/roster.json`. Animações e golpes L/M/H em pé são declarativos, e
+novos IDs de animação não exigem condições novas no renderer.
 
-## Ultra: Página Final
-**Baixo + SUPER** com 3 barras. Se a investida acertar, a luta vira uma página de mangá montada em 5 painéis. Toque quando o anel fechar para ganhar bônus de dano. Para criar ou trocar a arte de um ultra, veja [tools/ultra/README.md](tools/ultra/README.md).
+O pipeline trabalha em staging, descobre todos os clips/pacotes, gera atlas,
+metadados Java e relatórios, e só publica se tudo passar. Startup, janela ativa e
+recovery compartilham o relógio definido no manifesto do golpe.
 
-## Build local
+## Canonical Anatomy
+
+`worldScale=1.0` não é suficiente para provar que duas artes foram desenhadas no
+mesmo tamanho. A v0.54 adiciona `scaleMode: canonical-anatomy`: um frame comparável
+do golpe é medido contra a pose canônica revisada do personagem usando altura e
+bandas de silhueta. A mediana dos candidatos define a escala; dispersão excessiva
+reprova a importação.
+
+O Heavy de 9 frames é a regressão oficial. Ele agora usa canvas 320×256 e root
+128/238. Um teste Android compara o tamanho visual do início do Heavy com o Idle e
+falha se o golpe voltar a crescer.
+
+## Build
+
 ```bash
+python3 -m pip install -r tools/sprites/requirements.txt
+python3 tools/sprites/build_characters.py --write
+python3 -m unittest discover -s tools/sprites/tests -v
+python3 tools/sprites/build_characters.py --check
 cd android
-gradle assembleDebug
+gradle testDebugUnitTest assembleDebug --stacktrace
 ```
 
-APK: `android/app/build/outputs/apk/debug/app-debug.apk`
+`--write` é o único passo que altera saídas versionadas. O Gradle só roda `--check`
+(aviso se faltar Python localmente; erro na CI com `-PrequireSpriteCheck=true`).
 
-Testes do motor do ultra: `gradle :ultra-core:test` (dentro de `android/`).
+Aplicativo **Game Luta Sprite GPT**, pacote `com.gamelutagpt`.
+Preview técnico: `android/app/build/sprite-review/index.html`.
+
+## Segundo personagem de validação — v0.55
+
+O roster de produção usa `player_base` e `player_two`. O segundo pack reutiliza deliberadamente o mesmo perfil, os mesmos atlases e os mesmos movimentos para isolar o teste da arquitetura. O botão TROCA muda o renderer para `player_two`, e o HUD exibe o `displayName` do Character Pack ativo.
+
+A suíte valida a troca real e executa L, M e H no segundo pack. O workflow da implementação v0.55 passou pipeline, testes Python, testes Java/Canvas, build, instalação e smoke test no emulador Android.
+
+## Player Two com arte própria — v0.56
+
+O segundo Character Pack deixou de reutilizar os atlas do personagem base. `player_two` agora possui perfil próprio (384×256, root 192/246, worldScale 1.0), Idle de 8 frames, Movement de 16 frames, Jab de 3, Medium Kick de 3 e Heavy Straight de 9. Idle e Movement usam masters revisados em `prepared-grid`; Jab, Medium e Heavy entram pelo `canonical-anatomy` do próprio personagem. O renderer e a lógica de troca não recebem condições específicas para o novo lutador.
+
+Validação final da v0.56 deve rodar sobre os outputs `player_two_*` já materializados na branch, sem depender do auto-commit de regeneração do CI.
+
+## Pack schema 2 — v0.63
+
+Cada `character.json` agora é a fonte única do lutador (bloco `fighter`: vida, cor,
+auto-combo, energia, Super e hurtbox) e declara os nove inputs com `totalMs`, janela
+ativa e alcance. O NPC usa o próprio pack para dano e frame data, a câmera enquadra a
+altura real da arte e um único cache de atlas é compartilhado na partida. Detalhes em
+`docs/sprite-standard.md`.
+
+## Empurrão e arquitetura — v0.65
+
+Os corpos não se sobrepõem mais (caixa de empurrão no pack) e o `GameView` foi
+dividido em sistemas menores (IA, regras de combate, comandos, câmera, controles,
+HUD, cenário e efeitos), a maioria testável sem Android. Tabela em
+`docs/sprite-standard.md`.
+
+## 2H com arte própria — v0.66
+
+O lançador agachado (2H) do `player_base` usa a nova folha de 4 frames pelo motor de
+sprites, com o gancho sincronizado à janela de acerto. Comportamento de lançador mantido.
+
+## Harmonia dos sprites — v0.67
+
+Auditoria automática (`tools/sprites/harmony.py` + teste) de alinhamento, contato com o
+chão, picos em golpes e escala. Corrigidos: tamanho e chão das reações do lutador base,
+alinhamento do movimento e do Heavy do Player Two, artefato magenta, respiração do idle
+e garras vazadas do Brutamonte.
+
+## jL com arte própria — v0.68
+
+O soco fraco aéreo do `player_base` usa a nova folha de 4 frames, com escala pela cabeça
+e registro alinhado ao pulo.
+
+## Aéreos completos — v0.69
+
+jM e jH do `player_base` com arte própria, alinhados ao pulo e ao jL. Novo modo de
+separação por componente para folhas em que as poses se sobrepõem na horizontal.
+
+## Defesas e queda — v0.70
+
+Defesa em pé, agachado e **no ar** (regra nova: segurar para trás pulando) e sequência de
+queda do `player_base` com arte própria, todas na mesma escala do corpo.
+
+## Dano e levantar — v0.71
+
+Dano em pé, agachado e no ar (frame escolhido pela física do lançamento) e o levantar do
+`player_base` com arte própria; o levantar começa espelhado para sair do mesmo lado em que
+o lutador caiu. O atlas ampliado `player_base_missing` foi removido.
+
+## Motor de Dano e Combos V2 — v0.72
+
+O combate saiu do `GameView` para um motor Java puro em passo fixo de 60 fps: buffer de
+input, máquina de estados (startup/active/recovery), cancelamentos declarados por golpe
+(hit/block/whiff), hitstun/blockstun/hitstop reais, sessão de combo com escala de dano,
+hitstun decay, juggle points e pushback. O frame data vive nos Character Packs (schema 3)
+e é validado no build e no carregamento. Botão DEBUG mostra caixas, estados e a tabela de
+vantagem de cada golpe. Detalhes, rotas e critérios de aceite em `docs/combat-engine.md`.
+
+## Botões de teste de vida — v0.73
+
+Abaixo de DEBUG: **VIDA P1** enche a vida dos dois lutadores do time (um KO volta a
+lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app.
+
+## Recuo mais lento — v0.74
+
+Andar para trás (220) é mais lento que andar para frente (300), no chão e no ar, para que
+recuar não seja uma fuga igual ao avanço do adversário.
+
+## Ultra "Página Final" — v0.75
+
+**↓ + SUPER** com 3 barras. A regra fica no motor: ativação que congela o oponente
+(como o Super), investida e confirmação. A investida pode ser defendida (blockstun e
+recuperação punível) e erra se o oponente estiver longe. Quando acerta, o motor espera e
+o `GameView` toca a cinemática: uma página de mangá montada em 5 painéis com a arte do
+personagem. Tocar quando o anel fecha dá bônus no golpe final (PERFEITO +25%, BOM +10%).
+O dano entra pelo motor com a escala da sessão de combo e, no fim, o oponente é arremessado
+e cai derrubado.
+
+- `android/ultra-core/`: motor da cinemática em Java puro (roda no Android e no PC), com
+  testes em `gradle :ultra-core:test`.
+- `android/ultra-preview/`: visualizador no PC, `gradle :ultra-preview:run`.
+- `android/app/src/main/assets/ultras/<id do personagem>/`: `ultra.json` (nome, cores,
+  dano, onomatopeias), as 5 imagens e os sons opcionais.
+- `tools/ultra/`: prompts fixos e o script que prepara a arte gerada por IA. O guia
+  completo está em [tools/ultra/README.md](tools/ultra/README.md).

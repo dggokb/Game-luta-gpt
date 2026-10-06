@@ -1,0 +1,578 @@
+{
+  "schemaVersion": 3,
+  "id": "monster_npc",
+  "displayName": "Brutamonte",
+  "profile": "monster_npc.json",
+  "artFacing": "right",
+  "fighter": {
+    "color": "#D9485F",
+    "maxLife": 10000,
+    "autoCombo": [],
+    "body": {
+      "halfWidth": 78,
+      "standHeight": 290,
+      "crouchHeight": 240,
+      "pushHalfWidth": 64,
+      "pushHeight": 130
+    },
+    "energy": {
+      "damage": 650,
+      "range": 560,
+      "speed": 980,
+      "command": [
+        5,
+        1
+      ],
+      "spawnX": 100,
+      "spawnY": 110,
+      "crouchSpawnY": 90,
+      "attack": {
+        "startupFrames": 6,
+        "activeFrames": 1,
+        "recoveryFrames": 11,
+        "hitstunFrames": 20,
+        "blockstunFrames": 14,
+        "hitstopFrames": 6,
+        "cancelWindows": {
+          "hit": [
+            6,
+            17
+          ],
+          "block": [
+            6,
+            17
+          ],
+          "whiff": null
+        },
+        "cancelInto": [
+          "SUPER"
+        ],
+        "maxUsesPerCombo": 2,
+        "pushbackOnHit": 40,
+        "pushbackOnBlock": 50
+      }
+    },
+    "super": {
+      "damage": 2850,
+      "range": 1320,
+      "speed": 1280,
+      "spawnX": 120,
+      "spawnY": 115,
+      "attack": {
+        "startupFrames": 35,
+        "activeFrames": 1,
+        "recoveryFrames": 25,
+        "hitstunFrames": 30,
+        "blockstunFrames": 20,
+        "hitstopFrames": 12,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "pushbackOnHit": 60,
+        "pushbackOnBlock": 60
+      }
+    }
+  },
+  "animations": {
+    "IDLE": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "loop": true,
+      "durationsMs": [
+        130,
+        130,
+        130,
+        130,
+        130,
+        130
+      ]
+    },
+    "COMBAT": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "WALK_FORWARD": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": true,
+      "distancePerFrame": 34
+    },
+    "WALK_BACK": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        7,
+        6,
+        5,
+        4
+      ],
+      "loop": true,
+      "distancePerFrame": 32
+    },
+    "CROUCH": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "RISE": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        15,
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        90
+      ]
+    },
+    "JUMP": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        13
+      ],
+      "loop": false,
+      "durationsMs": [
+        90,
+        140
+      ]
+    },
+    "FALL": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        12
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "DASH": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        5,
+        6,
+        7
+      ],
+      "loop": true,
+      "distancePerFrame": 38
+    },
+    "BACKDASH": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        7,
+        6,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        70,
+        80
+      ]
+    },
+    "LAND": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        90
+      ]
+    },
+    "LIGHT_CLAW": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        9,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        40,
+        60,
+        60
+      ]
+    },
+    "MEDIUM_SWIPE": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        10,
+        9,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        70,
+        70,
+        70
+      ]
+    },
+    "HEAVY_SMASH": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        10,
+        11,
+        12
+      ],
+      "loop": false,
+      "durationsMs": [
+        80,
+        100,
+        100,
+        120
+      ]
+    },
+    "ROAR": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        13,
+        14,
+        13,
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        140,
+        120,
+        100
+      ]
+    },
+    "LOW_CLAW": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        11,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        70,
+        40
+      ]
+    },
+    "LOW_LUNGE": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        11,
+        12
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        100,
+        90
+      ]
+    },
+    "RISING_SMASH": {
+      "atlas": "monster_npc_pack",
+      "frames": [
+        8,
+        10,
+        9,
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ]
+    }
+  },
+  "moves": {
+    "L": {
+      "animation": "LIGHT_CLAW",
+      "damage": 300,
+      "reach": 111,
+      "startupFrames": 2,
+      "activeFrames": 4,
+      "recoveryFrames": 4,
+      "hitstunFrames": 12,
+      "blockstunFrames": 9,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          2,
+          8
+        ],
+        "block": [
+          2,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "L",
+        "M",
+        "2L"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 24,
+      "pushbackOnBlock": 30,
+      "maxUsesPerCombo": 3
+    },
+    "M": {
+      "animation": "MEDIUM_SWIPE",
+      "damage": 500,
+      "reach": 131,
+      "startupFrames": 4,
+      "activeFrames": 7,
+      "recoveryFrames": 5,
+      "hitstunFrames": 15,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          4,
+          13
+        ],
+        "block": [
+          4,
+          13
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H",
+        "2M",
+        "S"
+      ],
+      "pushbackOnHit": 32,
+      "pushbackOnBlock": 38
+    },
+    "H": {
+      "animation": "HEAVY_SMASH",
+      "damage": 800,
+      "reach": 161,
+      "startupFrames": 10,
+      "activeFrames": 7,
+      "recoveryFrames": 7,
+      "hitstunFrames": 18,
+      "blockstunFrames": 11,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          10,
+          19
+        ],
+        "block": [
+          10,
+          19
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "S",
+        "SUPER"
+      ],
+      "pushbackOnHit": 44,
+      "pushbackOnBlock": 50
+    },
+    "2L": {
+      "animation": "LOW_CLAW",
+      "damage": 300,
+      "reach": 84,
+      "low": true,
+      "startupFrames": 3,
+      "activeFrames": 3,
+      "recoveryFrames": 4,
+      "hitstunFrames": 11,
+      "blockstunFrames": 8,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          3,
+          8
+        ],
+        "block": [
+          3,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "M",
+        "2M"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 22,
+      "pushbackOnBlock": 28
+    },
+    "2M": {
+      "animation": "LOW_LUNGE",
+      "damage": 500,
+      "reach": 116,
+      "low": true,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 20,
+      "blockstunFrames": 10,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H"
+      ],
+      "launchType": "knockdown",
+      "knockback": 40,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 36
+    },
+    "2H": {
+      "animation": "RISING_SMASH",
+      "damage": 800,
+      "reach": 148,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 44,
+      "blockstunFrames": 10,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          9,
+          17
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "JUMP"
+      ],
+      "launchType": "launch",
+      "knockback": 20,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 48,
+      "juggleCost": 2
+    },
+    "jL": {
+      "pose": "AIR",
+      "damage": 300,
+      "reach": 84,
+      "startupFrames": 4,
+      "activeFrames": 2,
+      "recoveryFrames": 4,
+      "hitstunFrames": 14,
+      "blockstunFrames": 10,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          4,
+          8
+        ],
+        "block": [
+          4,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jM",
+        "jH"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 14,
+      "pushbackOnBlock": 20
+    },
+    "jM": {
+      "pose": "AIR",
+      "damage": 500,
+      "reach": 116,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 16,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jH"
+      ],
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 26
+    },
+    "jH": {
+      "pose": "AIR",
+      "damage": 800,
+      "reach": 148,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": null,
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [],
+      "launchType": "slam",
+      "knockback": 30,
+      "pushbackOnHit": 28,
+      "pushbackOnBlock": 34,
+      "juggleCost": 2
+    }
+  },
+  "specialAnimations": {
+    "S": "ROAR",
+    "SUPER": "ROAR"
+  }
+}

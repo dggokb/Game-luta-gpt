@@ -1,0 +1,16 @@
+{
+  "id": "player_base_defense_crouch",
+  "javaName": "DEFENSE_CROUCH",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_defense_crouch_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_defense_crouch.png",
+  "report": "tools/sprites/reports/player_base_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/defense-crouch-import.png",
+  "expectedFrames": 4,
+  "segmentation": "alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "fixed",
+  "sourceNote": "Crouching guard: relaxed, raised, impact, recovery. Scaled against the approved 2M crouching guard (height + head).",
+  "scale": 0.368,
+  "scaleReason": "Same art set as player_base_defense_stand, whose standing guard matches the canonical Idle at 0.368 (own measures: crouch 0.349, air 0.376); one scale keeps the whole set the same size."
+}

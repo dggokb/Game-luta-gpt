@@ -1,0 +1,42 @@
+{
+  "id": "player_base",
+  "baseFrameWidth": 256,
+  "baseFrameHeight": 256,
+  "preferredRootX": 128,
+  "preferredRootY": 238,
+  "worldScale": 1.0,
+  "standingVisualHeight": 228,
+  "anatomyReference": {
+    "source": "art/sprites/source/player_base_idle_normalized.png",
+    "frame": 0,
+    "columns": 4,
+    "bands": [
+      [
+        0.0,
+        0.12
+      ],
+      [
+        0.05,
+        0.2
+      ],
+      [
+        0.25,
+        0.4
+      ]
+    ],
+    "maxScaleSpreadRatio": 0.15
+  },
+  "validation": {
+    "alphaThreshold": 10,
+    "minMargin": 8,
+    "rootTolerance": 1.5,
+    "widthStep": 64,
+    "heightStep": 64,
+    "footBandRatio": 0.025,
+    "minFootWidth": 4,
+    "minOpaquePixels": 10000,
+    "maxUpscale": 1.0,
+    "maxFrameWidth": 768,
+    "maxFrameHeight": 512
+  }
+}

@@ -1,8 +1,9 @@
 # Página Final: como criar um ultra
 
-O ultra é ativado com **baixo + SUPER** e custa **3 barras**. O lutador faz uma investida:
+O ultra é ativado com **baixo + SUPER** e custa **3 barras**. A regra fica no `CombatEngine` (veja `docs/combat-engine.md`). O lutador faz uma investida:
 
 - se **errar**, as barras são gastas e o lutador fica 0,5 s vulnerável;
+- se o oponente **defender**, ele toma blockstun e o atacante fica vulnerável do mesmo jeito;
 - se **acertar**, começa a cinemática "Página Final": uma página de mangá se monta em 5 painéis e um anel vai fechando no centro da tela. **Tocar quando o anel fecha** dá bônus de dano: PERFEITO dá +25% e BOM dá +10% no golpe final. Depois a página estilhaça e a luta volta com o oponente voando.
 
 ## Os 5 painéis
@@ -29,20 +30,20 @@ As imagens devem mostrar o atacante **virado para a direita**. Quando ele luta v
 
    ```bash
    pip install pillow
-   python tools/ultra/preparar_ultra.py --id player1 --nome "Explosão Solar" \
+   python tools/ultra/preparar_ultra.py --id player_base --nome "Explosão Solar" \
        --cor "#F4B73B" --entrada pasta/com/as/imagens
    ```
 
-   O script recorta cada imagem no formato do painel e grava tudo em `android/app/src/main/assets/ultras/player1/`. Se as imagens saírem com estilos muito diferentes entre si, use `--estilo manga`: ele aplica um filtro de contraste, tinta e retícula que unifica o acabamento. Com imagens já consistentes, o filtro piora o resultado, por isso vem desligado.
+   O script recorta cada imagem no formato do painel e grava tudo em `android/app/src/main/assets/ultras/player_base/`. Se as imagens saírem com estilos muito diferentes entre si, use `--estilo manga`: ele aplica um filtro de contraste, tinta e retícula que unifica o acabamento. Com imagens já consistentes, o filtro piora o resultado, por isso vem desligado.
 
 ### Ou gere direto pela API
 
 ```bash
 pip install pillow openai
 export OPENAI_API_KEY=...
-python tools/ultra/preparar_ultra.py --id player1 --nome "Explosão Solar" --cor "#F4B73B" \
+python tools/ultra/preparar_ultra.py --id player_base --nome "Explosão Solar" --cor "#F4B73B" \
     --gerar --descricao "lutador de cabelo espetado preto, kimono laranja" --cor-nome dourada \
-    --referencia ficha_player1.png
+    --referencia ficha_player_base.png
 ```
 
 Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
@@ -60,6 +61,7 @@ Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
   "nome": "Explosão Solar",
   "cor": "#F4B73B",
   "corSecundaria": "#FFE7A3",
+  "dano": 4200,
   "paineis": {
     "olhos":    { "imagem": "olhos.jpg" },
     "carga":    { "imagem": "carga.jpg", "onomatopeia": "VRUUUUM" },
@@ -69,6 +71,8 @@ Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
   }
 }
 ```
+
+Cada ultra fica na pasta com o **id do personagem** (`player_base`, `player_two`...). `dano` é o dano total antes da escala de combo, dividido entre os 3 acertos da cinemática (padrão 4000).
 
 Tudo é opcional, menos `nome`. O script preserva as onomatopeias, sons e posições que você editou à mão.
 
@@ -98,7 +102,7 @@ O motor (`android/ultra-core`) é Java puro e roda igual no Android e no PC. O v
 ```bash
 cd android
 gradle :ultra-preview:run                                             # ultra provisório
-gradle :ultra-preview:run --args="app/src/main/assets/ultras/player1" # ultra de verdade
+gradle :ultra-preview:run --args="app/src/main/assets/ultras/player_base" # ultra de verdade
 ```
 
 Na janela, **clique ou espaço** é o toque e **R** repete. Com `--quadros saida/` o visualizador grava os quadros em PNG em vez de abrir a janela.

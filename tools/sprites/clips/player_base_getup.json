@@ -1,0 +1,21 @@
+{
+  "id": "player_base_getup",
+  "javaName": "GETUP_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_getup_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_getup.png",
+  "report": "tools/sprites/reports/player_base_getup.report.json",
+  "preview": "android/app/build/sprite-review/getup-import.png",
+  "expectedFrames": 4,
+  "segmentation": "alpha-components",
+  "rootMode": "bbox-bottom-center",
+  "scaleMode": "fixed",
+  "scale": 0.353,
+  "scaleReason": "Same art set as player_base_hit_stand, whose guard matches the canonical Idle at 0.353 (canonical-anatomy); one scale keeps the set the same size.",
+  "mirrorFrames": [
+    0,
+    1
+  ],
+  "minOpaquePixels": 5000,
+  "sourceNote": "Get-up: lying face down, push up, kneel, rise to guard. Frames 0-1 are mirrored so the head lies behind, matching the backward fall."
+}

@@ -2,6 +2,7 @@
   "nome": "Explosão Solar",
   "cor": "#F4B73B",
   "corSecundaria": "#FFE7A3",
+  "dano": 4200,
   "paineis": {
     "olhos": {
       "imagem": "olhos.jpg"

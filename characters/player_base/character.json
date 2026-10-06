@@ -1,0 +1,753 @@
+{
+  "schemaVersion": 3,
+  "id": "player_base",
+  "displayName": "Lutador base",
+  "profile": "player_base.json",
+  "artFacing": "right",
+  "fighter": {
+    "color": "#F4B73B",
+    "maxLife": 10000,
+    "autoCombo": [
+      "L",
+      "M",
+      "H"
+    ],
+    "body": {
+      "halfWidth": 34,
+      "standHeight": 145,
+      "crouchHeight": 90,
+      "pushHalfWidth": 30,
+      "pushHeight": 120
+    },
+    "energy": {
+      "damage": 850,
+      "range": 720,
+      "speed": 760,
+      "command": [
+        3,
+        1
+      ],
+      "spawnX": 62,
+      "spawnY": 82,
+      "crouchSpawnY": 65,
+      "attack": {
+        "startupFrames": 6,
+        "activeFrames": 1,
+        "recoveryFrames": 11,
+        "hitstunFrames": 20,
+        "blockstunFrames": 14,
+        "hitstopFrames": 6,
+        "cancelWindows": {
+          "hit": [
+            6,
+            17
+          ],
+          "block": [
+            6,
+            17
+          ],
+          "whiff": null
+        },
+        "cancelInto": [
+          "SUPER"
+        ],
+        "maxUsesPerCombo": 2,
+        "pushbackOnHit": 40,
+        "pushbackOnBlock": 50
+      }
+    },
+    "super": {
+      "damage": 3200,
+      "range": 1450,
+      "speed": 1180,
+      "spawnX": 78,
+      "spawnY": 86,
+      "airSpawnY": 82,
+      "attack": {
+        "startupFrames": 35,
+        "activeFrames": 1,
+        "recoveryFrames": 25,
+        "hitstunFrames": 30,
+        "blockstunFrames": 20,
+        "hitstopFrames": 12,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "pushbackOnHit": 60,
+        "pushbackOnBlock": 60
+      }
+    }
+  },
+  "animations": {
+    "IDLE": {
+      "atlas": "player_base_idle",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": true,
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ]
+    },
+    "COMBAT": {
+      "atlas": "player_base_idle",
+      "frames": [
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "WALK_FORWARD": {
+      "atlas": "player_base_movement",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": true,
+      "distancePerFrame": 36
+    },
+    "WALK_BACK": {
+      "atlas": "player_base_movement",
+      "frames": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": true,
+      "distancePerFrame": 32
+    },
+    "CROUCH": {
+      "atlas": "player_base_movement",
+      "frames": [
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        75,
+        100
+      ]
+    },
+    "RISE": {
+      "atlas": "player_base_movement",
+      "frames": [
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        75
+      ]
+    },
+    "JUMP": {
+      "atlas": "player_base_movement",
+      "frames": [
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "FALL": {
+      "atlas": "player_base_movement",
+      "frames": [
+        11
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "DASH": {
+      "atlas": "player_base_movement",
+      "frames": [
+        12,
+        13
+      ],
+      "loop": true,
+      "durationsMs": [
+        100,
+        100
+      ]
+    },
+    "BACKDASH": {
+      "atlas": "player_base_movement",
+      "frames": [
+        14
+      ],
+      "loop": false,
+      "durationsMs": [
+        200
+      ]
+    },
+    "LAND": {
+      "atlas": "player_base_movement",
+      "frames": [
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "LIGHT_JAB": {
+      "atlas": "player_base_jab",
+      "frames": [
+        0,
+        1,
+        2
+      ],
+      "loop": false,
+      "durationsMs": [
+        40,
+        60,
+        60
+      ]
+    },
+    "MEDIUM_KICK": {
+      "atlas": "player_base_medium_kick",
+      "frames": [
+        0,
+        1,
+        2
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        100,
+        90
+      ]
+    },
+    "HEAVY_STRAIGHT": {
+      "atlas": "player_base_heavy_straight",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        50,
+        50,
+        50,
+        50
+      ]
+    },
+    "DEFENSE_STAND": {
+      "atlas": "player_base_defense_stand",
+      "frames": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        90,
+        50,
+        40
+      ]
+    },
+    "DEFENSE_CROUCH": {
+      "atlas": "player_base_defense_crouch",
+      "frames": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        90,
+        50,
+        40
+      ]
+    },
+    "HIT_STAND": {
+      "atlas": "player_base_hit_stand",
+      "frames": [
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        100,
+        70
+      ]
+    },
+    "HIT_CROUCH": {
+      "atlas": "player_base_hit_crouch",
+      "frames": [
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        100,
+        70
+      ]
+    },
+    "HIT_AIR": {
+      "atlas": "player_base_hit_air",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        55,
+        55,
+        55,
+        55
+      ]
+    },
+    "KNOCKDOWN": {
+      "atlas": "player_base_fall",
+      "frames": [
+        0,
+        1
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        120
+      ]
+    },
+    "GROUNDED": {
+      "atlas": "player_base_fall",
+      "frames": [
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        180,
+        1020
+      ]
+    },
+    "GETUP": {
+      "atlas": "player_base_getup",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        60,
+        90,
+        100,
+        100
+      ]
+    },
+    "CROUCH_LIGHT": {
+      "atlas": "player_base_crouch_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        40,
+        40,
+        50
+      ]
+    },
+    "CROUCH_MEDIUM": {
+      "atlas": "player_base_crouch_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        50,
+        70,
+        90
+      ]
+    },
+    "CROUCH_HEAVY": {
+      "atlas": "player_base_crouch_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        70,
+        130,
+        130
+      ]
+    },
+    "JUMP_LIGHT": {
+      "atlas": "player_base_jump_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        30,
+        30,
+        50
+      ]
+    },
+    "JUMP_MEDIUM": {
+      "atlas": "player_base_jump_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        40,
+        90,
+        80
+      ]
+    },
+    "JUMP_HEAVY": {
+      "atlas": "player_base_jump_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        70,
+        130,
+        130
+      ]
+    },
+    "DEFENSE_AIR": {
+      "atlas": "player_base_defense_air",
+      "frames": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        90,
+        50,
+        40
+      ]
+    }
+  },
+  "moves": {
+    "L": {
+      "animation": "LIGHT_JAB",
+      "damage": 300,
+      "reach": 84,
+      "startupFrames": 2,
+      "activeFrames": 4,
+      "recoveryFrames": 4,
+      "hitstunFrames": 12,
+      "blockstunFrames": 9,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          2,
+          8
+        ],
+        "block": [
+          2,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "L",
+        "M",
+        "2L"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 24,
+      "pushbackOnBlock": 30,
+      "maxUsesPerCombo": 3
+    },
+    "M": {
+      "animation": "MEDIUM_KICK",
+      "damage": 500,
+      "reach": 116,
+      "startupFrames": 4,
+      "activeFrames": 6,
+      "recoveryFrames": 6,
+      "hitstunFrames": 15,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          4,
+          12
+        ],
+        "block": [
+          4,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H",
+        "2M",
+        "S"
+      ],
+      "pushbackOnHit": 32,
+      "pushbackOnBlock": 38
+    },
+    "H": {
+      "animation": "HEAVY_STRAIGHT",
+      "damage": 800,
+      "reach": 148,
+      "startupFrames": 10,
+      "activeFrames": 5,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 11,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          10,
+          17
+        ],
+        "block": [
+          10,
+          17
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "S",
+        "SUPER"
+      ],
+      "pushbackOnHit": 44,
+      "pushbackOnBlock": 50
+    },
+    "2L": {
+      "animation": "CROUCH_LIGHT",
+      "damage": 300,
+      "reach": 84,
+      "low": true,
+      "startupFrames": 2,
+      "activeFrames": 4,
+      "recoveryFrames": 4,
+      "hitstunFrames": 12,
+      "blockstunFrames": 9,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          2,
+          8
+        ],
+        "block": [
+          2,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "M",
+        "2M"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 22,
+      "pushbackOnBlock": 28
+    },
+    "2M": {
+      "animation": "CROUCH_MEDIUM",
+      "damage": 500,
+      "reach": 116,
+      "low": true,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 20,
+      "blockstunFrames": 10,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H"
+      ],
+      "launchType": "knockdown",
+      "knockback": 40,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 36
+    },
+    "2H": {
+      "animation": "CROUCH_HEAVY",
+      "damage": 800,
+      "reach": 148,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 44,
+      "blockstunFrames": 10,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          9,
+          17
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "JUMP"
+      ],
+      "launchType": "launch",
+      "knockback": 20,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 48,
+      "juggleCost": 2
+    },
+    "jL": {
+      "animation": "JUMP_LIGHT",
+      "damage": 300,
+      "reach": 84,
+      "startupFrames": 4,
+      "activeFrames": 2,
+      "recoveryFrames": 4,
+      "hitstunFrames": 14,
+      "blockstunFrames": 10,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          4,
+          8
+        ],
+        "block": [
+          4,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jM",
+        "jH"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 14,
+      "pushbackOnBlock": 20
+    },
+    "jM": {
+      "animation": "JUMP_MEDIUM",
+      "damage": 500,
+      "reach": 116,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 16,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jH"
+      ],
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 26
+    },
+    "jH": {
+      "animation": "JUMP_HEAVY",
+      "damage": 800,
+      "reach": 148,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": null,
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [],
+      "launchType": "slam",
+      "knockback": 30,
+      "pushbackOnHit": 28,
+      "pushbackOnBlock": 34,
+      "juggleCost": 2
+    }
+  }
+}

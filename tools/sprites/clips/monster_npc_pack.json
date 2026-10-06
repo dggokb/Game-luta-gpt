@@ -1,0 +1,25 @@
+{
+  "id": "monster_npc_pack",
+  "javaName": "MONSTER_NPC_PACK",
+  "profile": "monster_npc.json",
+  "source": "art/sprites/source/brutamonte_atlas_16.png",
+  "output": "android/app/src/main/res/drawable-nodpi/monster_npc_pack.png",
+  "report": "tools/sprites/reports/monster_npc_pack.report.json",
+  "preview": "android/app/build/sprite-review/monster-npc-pack-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Brutamonte 16-frame atlas; limbs that crossed cell borders are regrouped into their own frame.",
+  "transform": {
+    "regroupComponents": {
+      "pad": 40,
+      "dropSmallerThan": 16
+    },
+    "outputFrameWidth": 336,
+    "outputFrameHeight": 296,
+    "outputRootX": 168,
+    "outputRootY": 288,
+    "reason": "Frame 10's claws crossed into cells 9 and 11 (floating fragments there, clipped claws on 10); pieces are returned to their owner frame and specks removed."
+  }
+}

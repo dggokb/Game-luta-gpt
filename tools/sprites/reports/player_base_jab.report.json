@@ -1,0 +1,77 @@
+{
+  "id": "player_base_jab",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_jab_normalized.png",
+  "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "columns": 3,
+    "frameCount": 3
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        41,
+        31,
+        214,
+        237
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 15643
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        27,
+        31,
+        230,
+        237
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 16771
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        40,
+        31,
+        214,
+        237
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 15471
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 224,
+    "frameHeight": 227,
+    "rootX": 112,
+    "rootY": 218,
+    "columns": 3,
+    "frameCount": 3,
+    "cropOffset": [
+      16,
+      20
+    ],
+    "decodedBytes": {
+      "canonical": 786432,
+      "packed": 610176
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "8e03a36a5367f1cf14da1a18b7b04a5f20d329d503b047c5f6f6564625561c0f",
+      "config": "65124bbe2ba29855472050037df71032f246171da291413679f4b18c6197b923",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}
