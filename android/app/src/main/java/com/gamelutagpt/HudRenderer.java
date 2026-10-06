@@ -26,6 +26,7 @@ final class HudRenderer {
         String tagButtonLabel();
         boolean canTag();
         boolean canSuper();
+        String superButtonLabel();
         int dpadDirection();
         boolean pressed(Control control);
     }
@@ -470,7 +471,7 @@ final class HudRenderer {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(15f);
         paint.setFakeBoldText(true);
-        c.drawText("SUPER", SUPER_X, SUPER_Y - 4f, paint);
+        c.drawText(s.superButtonLabel(), SUPER_X, SUPER_Y - 4f, paint);
         paint.setTextSize(11f);
         c.drawText(s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 14f, paint);
         paint.setFakeBoldText(false);
