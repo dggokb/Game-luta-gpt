@@ -54,7 +54,8 @@ public class CombatRulesTest {
         assertEquals(jab.duration/2,slow.animationTime(slow.totalTime/2),1e-5f);
     }
     @Test public void threatWindowMatchesLegacyPhaseForPoseMoves() {
-        CharacterDefinition.Move m=BASE.moves.get("2H");
+        CharacterDefinition.Move m=GeneratedCharacters.get("player_two").moves.get("2H");
+        assertNull("player_two keeps the pose fallback",m.animation);
         // Legacy anticipated guard: 20%..80% of the attack.
         assertFalse(m.threatening(.19f*m.totalTime));
         assertTrue(m.threatening(.21f*m.totalTime));
@@ -121,5 +122,13 @@ public class CombatRulesTest {
                 assertTrue(id+"/"+m.binding,
                     CombatRules.maxCenterDistance(m,NPC.fighter.body)>b.pushHalfWidth+NPC.fighter.body.pushHalfWidth);
         }
+    }
+    @Test public void launcherUppercutFrameCoversTheWholeActiveWindow() {
+        CharacterDefinition.Move launcher=BASE.moves.get("2H");
+        assertEquals("CROUCH_HEAVY",launcher.animation.id);
+        for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.002f)
+            assertEquals("t="+t,2,launcher.animation.frame(launcher.animationTime(t),0));
+        assertEquals(0,launcher.animation.frame(launcher.animationTime(0),0));
+        assertEquals(3,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
     }
 }

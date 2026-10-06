@@ -108,7 +108,7 @@ class CharacterPackTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'pose AIR is not valid'):pipeline.build(self.root)
 
     def test_move_needs_exactly_one_of_animation_or_pose(self):
-        self.edit(lambda d:d['moves']['2H'].update(animation='CROUCH_LIGHT'))
+        self.edit(lambda d:d['moves']['2H'].update(pose='CROUCH'))
         with self.assertRaisesRegex(ValueError,'exactly one'):pipeline.build(self.root)
 
     def test_partial_knockdown_set_is_rejected(self):
@@ -203,6 +203,19 @@ class CharacterPackTests(unittest.TestCase):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('m.put("2M"',java)
         self.assertIn('a.get("CROUCH_MEDIUM")',java)
+
+    def test_player_base_crouch_heavy_launcher_uses_reviewed_crouch_scale(self):
+        pipeline.build(self.root)
+        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_heavy.report.json').read_text())
+        self.assertEqual(4,report['layout']['frameCount'])
+        self.assertTrue(report['anatomy']['passed'])
+        self.assertIn('crouch_medium',report['anatomy']['referenceSource'])
+        self.assertAlmostEqual(0.507,report['scale'],delta=0.02)
+        self.assertTrue(all(f['opaquePixels']>=10000 for f in report['frames']))
+        pack=json.loads(self.path.read_text())
+        self.assertEqual('CROUCH_HEAVY',pack['moves']['2H']['animation'])
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('m.put("2H",new CharacterDefinition.Move("2H",a.get("CROUCH_HEAVY")',java)
 
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)

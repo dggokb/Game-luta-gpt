@@ -105,16 +105,22 @@ def anatomy_signature(image, bbox, threshold, bands):
         values.append(float(statistics.median(widths)))
     return {"height": height, "bands": values}
 
-def canonical_anatomy_reference(profile, threshold):
-    anatomy = profile.get("anatomyReference")
+def canonical_anatomy_reference(profile, threshold, override=None):
+    """Reviewed pose the clip is scaled against.
+
+    The profile's reference is the canonical Idle guard. A clip whose comparable pose is
+    not standing (e.g. a crouching attack) may point to another reviewed master of the
+    same character instead, with its own cell size; scale stays tied to approved art.
+    """
+    anatomy = override if override is not None else profile.get("anatomyReference")
     if not isinstance(anatomy, dict):
         raise ValueError(f"{profile['id']}: canonical-anatomy requires anatomyReference")
     path = (ROOT / anatomy["source"]).resolve()
     if not path.is_relative_to(ROOT.resolve()):
         raise ValueError("anatomy reference path escapes project")
     sheet = Image.open(path).convert("RGBA")
-    width = int(profile["baseFrameWidth"])
-    height = int(profile["baseFrameHeight"])
+    width = int(anatomy.get("frameWidth", profile["baseFrameWidth"]))
+    height = int(anatomy.get("frameHeight", profile["baseFrameHeight"]))
     columns = int(anatomy["columns"])
     frame = int(anatomy["frame"])
     if columns <= 0 or sheet.width % width or sheet.height % height:
@@ -211,8 +217,12 @@ def process_clip(config_path):
         reference_index = int(cfg.get("anatomyReferenceFrame", -1))
         if reference_index < 0 or reference_index >= expected:
             raise ValueError(f"{cfg['id']}: invalid anatomyReferenceFrame")
+        override = cfg.get("anatomyReference")
+        if override is not None:
+            # Inherit bands/tolerance from the profile unless the clip overrides them.
+            override = {**profile.get("anatomyReference", {}), **override}
         anatomy_cfg, canonical_signature = canonical_anatomy_reference(
-            profile, threshold
+            profile, threshold, override
         )
         bands = anatomy_cfg.get(
             "bands", [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]]

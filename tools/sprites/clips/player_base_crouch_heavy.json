@@ -1,0 +1,28 @@
+{
+  "id": "player_base_crouch_heavy",
+  "javaName": "CROUCH_HEAVY",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_crouch_heavy_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_heavy.png",
+  "report": "tools/sprites/reports/player_base_crouch_heavy.report.json",
+  "preview": "android/app/build/sprite-review/crouch-heavy-import.png",
+  "expectedFrames": 4,
+  "segmentation": "horizontal-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 0,
+  "sourceNote": "2H launcher: crouch, wind-up, rising uppercut, guard recovery. Scaled from frame 0 (crouching guard) against the approved 2M crouching guard using height and head width; the chest band is excluded because the fists cover the face.",
+  "anatomyReference": {
+    "source": "art/sprites/source/player_base_crouch_medium_normalized.png",
+    "frame": 0,
+    "columns": 4,
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "bands": [
+      [
+        0.0,
+        0.12
+      ]
+    ]
+  }
+}

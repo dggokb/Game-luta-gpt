@@ -109,6 +109,13 @@ public class SpriteIntegrationTest {
 
         setup();set("grounded",true);set("crouching",true);
         invoke("startAttack",new Class<?>[]{String.class},"2H");frames(1);
+        assertEquals("CROUCH_HEAVY",motion().clip);
+        assertEquals(0,motion().frame());
+        CharacterDefinition.Move launcher=first.moves.get("2H");
+        // The uppercut frame is on screen for the whole active window of the launcher.
+        for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.01f)
+            assertEquals(2,launcher.animation.frame(launcher.animationTime(t),0));
+        frames(24);
         assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
 
         setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);

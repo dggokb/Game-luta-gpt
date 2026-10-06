@@ -414,3 +414,26 @@ reexportar a arte com células maiores. O NPC ainda reaproveita frames entre est
 
 O painel sobre o oponente passou a mostrar o `displayName` do pack (antes dizia
 "NPC TESTE"/"PLAYER 2").
+
+## Terceiro golpe direcional pelo motor — 2H (lançador) — GPT v0.66
+
+O `player_base` ganhou o atlas `player_base_crouch_heavy`: 4 frames (agachado em guarda,
+carga, gancho para cima, guarda de recuperação), importados da folha original por
+`horizontal-alpha-components` + `ground-feet` + `canonical-anatomy`.
+
+- **Referência de escala por clip.** O clip pode declarar `anatomyReference` próprio
+  (fonte, frame, colunas, `frameWidth`/`frameHeight`, `bands`), herdando o resto do
+  perfil. O 2H compara seu frame 0 (agachado) com o frame 0 do 2M aprovado, usando altura
+  e largura da cabeça; a faixa do peito fica de fora porque os punhos cobrem o rosto.
+  Escala 0,507 (candidatos 0,526/0,488; dispersão 7,6%), coerente com idle × guarda final
+  (0,511). Comparar com o Idle em pé foi rejeitado pelo próprio validador.
+- **Frame data inalterado.** `totalMs` 400, ativo 144–256 ms, dano 800, alcance 148 e a
+  regra de lançador (sobe o oponente e abre o super pulo de perseguição) continuam.
+  Durações 70/70/130/130 ms: o frame do gancho fica na tela durante toda a janela ativa
+  (testado).
+- O uppercut precisa de célula canônica 256×320 (raiz 128/273); o atlas empacotado fica
+  219×282.
+
+Observações: `hitHeight` continua o padrão de golpe agachado (42) e a hurtbox durante o
+golpe é a de agachado, como antes; se o gancho deve acertar mais alto (anti-aéreo) ou o
+corpo deve ficar vulnerável em pé no frame 3, isso é um ajuste de balanceamento no pack.

@@ -73,12 +73,13 @@ final class GeneratedCharacters {
  a.put("GETUP",new CharacterDefinition.Animation("GETUP",new CharacterDefinition.Atlas("player_base_missing",236,170,118,162,14,14),new int[]{7},new float[]{0.35000000f},false,0.00000000f));
  a.put("CROUCH_LIGHT",new CharacterDefinition.Animation("CROUCH_LIGHT",new CharacterDefinition.Atlas("player_base_crouch_light",215,186,88,177,4,4),new int[]{0,1,2,3},new float[]{0.03000000f,0.04000000f,0.04000000f,0.05000000f},false,0.00000000f));
  a.put("CROUCH_MEDIUM",new CharacterDefinition.Animation("CROUCH_MEDIUM",new CharacterDefinition.Atlas("player_base_crouch_medium",330,187,126,178,4,4),new int[]{0,1,2,3},new float[]{0.05000000f,0.05000000f,0.07000000f,0.09000000f},false,0.00000000f));
+ a.put("CROUCH_HEAVY",new CharacterDefinition.Animation("CROUCH_HEAVY",new CharacterDefinition.Atlas("player_base_crouch_heavy",219,282,106,273,4,4),new int[]{0,1,2,3},new float[]{0.07000000f,0.07000000f,0.13000000f,0.13000000f},false,0.00000000f));
  m.put("L",new CharacterDefinition.Move("L",a.get("LIGHT_JAB"),null,300,0.16000000f,0.04000000f,0.10000000f,84.00000000f,78.00000000f));
  m.put("M",new CharacterDefinition.Move("M",a.get("MEDIUM_KICK"),null,500,0.26000000f,0.07000000f,0.17000000f,116.00000000f,78.00000000f));
  m.put("H",new CharacterDefinition.Move("H",a.get("HEAVY_STRAIGHT"),null,800,0.40000000f,0.16000000f,0.25000000f,148.00000000f,78.00000000f));
  m.put("2L",new CharacterDefinition.Move("2L",a.get("CROUCH_LIGHT"),null,300,0.16000000f,0.04000000f,0.10000000f,84.00000000f,42.00000000f));
  m.put("2M",new CharacterDefinition.Move("2M",a.get("CROUCH_MEDIUM"),null,500,0.26000000f,0.10000000f,0.17000000f,116.00000000f,42.00000000f));
- m.put("2H",new CharacterDefinition.Move("2H",null,"CROUCH",800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,42.00000000f));
+ m.put("2H",new CharacterDefinition.Move("2H",a.get("CROUCH_HEAVY"),null,800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,42.00000000f));
  m.put("jL",new CharacterDefinition.Move("jL",null,"AIR",300,0.16000000f,0.05800000f,0.10200000f,84.00000000f,78.00000000f));
  m.put("jM",new CharacterDefinition.Move("jM",null,"AIR",500,0.26000000f,0.09400000f,0.16600000f,116.00000000f,78.00000000f));
  m.put("jH",new CharacterDefinition.Move("jH",null,"AIR",800,0.40000000f,0.14400000f,0.25600000f,148.00000000f,78.00000000f));

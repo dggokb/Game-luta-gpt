@@ -336,6 +336,22 @@
         70,
         90
       ]
+    },
+    "CROUCH_HEAVY": {
+      "atlas": "player_base_crouch_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        70,
+        70,
+        130,
+        130
+      ]
     }
   },
   "moves": {
@@ -380,7 +396,7 @@
       "reach": 116
     },
     "2H": {
-      "pose": "CROUCH",
+      "animation": "CROUCH_HEAVY",
       "damage": 800,
       "totalMs": 400,
       "activeStartMs": 144,

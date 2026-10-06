@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.65-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.66-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -68,3 +68,8 @@ Os corpos não se sobrepõem mais (caixa de empurrão no pack) e o `GameView` fo
 dividido em sistemas menores (IA, regras de combate, comandos, câmera, controles,
 HUD, cenário e efeitos), a maioria testável sem Android. Tabela em
 `docs/sprite-standard.md`.
+
+## 2H com arte própria — v0.66
+
+O lançador agachado (2H) do `player_base` usa a nova folha de 4 frames pelo motor de
+sprites, com o gancho sincronizado à janela de acerto. Comportamento de lançador mantido.
