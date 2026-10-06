@@ -1,0 +1,14 @@
+{
+  "id": "player_base_jab",
+  "javaName": "JAB",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_jab_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_jab.png",
+  "report": "tools/sprites/reports/player_base_jab.report.json",
+  "preview": "android/app/build/sprite-review/jab-import.png",
+  "expectedFrames": 3,
+  "segmentation": "prepared-grid",
+  "columns": 3,
+  "rootMode": "authored",
+  "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed."
+}

@@ -1,0 +1,116 @@
+{
+  "id": "player_base_idle",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_idle_normalized.png",
+  "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "columns": 4,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        42,
+        12,
+        214,
+        240
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 16382
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        41,
+        12,
+        215,
+        240
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 16529
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        41,
+        13,
+        215,
+        240
+      ],
+      "minimumMargin": 13,
+      "opaquePixels": 16428
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        41,
+        12,
+        215,
+        240
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 16501
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        41,
+        12,
+        214,
+        240
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 16727
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        41,
+        12,
+        215,
+        240
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 16887
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        41,
+        12,
+        214,
+        240
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 17066
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        41,
+        13,
+        215,
+        240
+      ],
+      "minimumMargin": 13,
+      "opaquePixels": 16733
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "9eccdb95b064db18aed2973dc02ce7b931926259f10a6d3d4357f0021e8f4e73",
+      "config": "bbfee4b8c61d0075aa598a16114647728e84dfac80af7e7b9ffc6b8c57ef1fa3",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}

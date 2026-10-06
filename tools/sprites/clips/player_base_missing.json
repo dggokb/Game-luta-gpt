@@ -1,0 +1,15 @@
+{
+  "id": "player_base_missing",
+  "javaName": "PLAYER_BASE_MISSING",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_missing_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_missing.png",
+  "report": "tools/sprites/reports/player_base_missing.report.json",
+  "preview": "android/app/build/sprite-review/player-base-missing-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 14,
+  "rootMode": "authored",
+  "minOpaquePixels": 5000,
+  "sourceNote": "First-pass reviewed transparent atlas for defense, hit, knockdown, crouching and aerial combat states."
+}

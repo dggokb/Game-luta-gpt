@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "defaultCharacter": "player_base",
+  "team": [
+    "player_base",
+    "player_two"
+  ],
+  "opponentCharacter": "monster_npc"
+}

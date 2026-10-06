@@ -1,0 +1,14 @@
+{
+  "id": "player_base_crouch_light",
+  "javaName": "CROUCH_LIGHT",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_crouch_light_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_light.png",
+  "report": "tools/sprites/reports/player_base_crouch_light.report.json",
+  "preview": "android/app/build/sprite-review/crouch-light-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Reviewed 2L master normalized to player_base 256x256 cells and root 128/238."
+}

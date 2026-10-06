@@ -1,0 +1,14 @@
+{
+  "id": "player_two_idle",
+  "javaName": "PLAYER_TWO_IDLE",
+  "profile": "player_two.json",
+  "source": "art/sprites/source/player_two_idle_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_idle.png",
+  "report": "tools/sprites/reports/player_two_idle.report.json",
+  "preview": "android/app/build/sprite-review/player-two-idle-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "Reviewed Player Two idle master built from the generated concept test art."
+}

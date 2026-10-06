@@ -1,9 +1,14 @@
 name: Build Game Luta APK
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
       - main
+      - game-luta-sprite-gpt
+      - game-luta-sprite-astra
   workflow_dispatch:
 
 jobs:
@@ -27,12 +32,92 @@ jobs:
           gradle-version: '8.7'
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Install sprite pipeline dependency
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+
+      - name: Normalize and validate sprite assets
+        run: |
+          python3 -m unittest discover -s tools/sprites/tests -v
+          python3 tools/sprites/build_characters.py --check
+
+      - name: Materialize generated sprite outputs after stale check
+        if: failure()
+        run: python3 tools/sprites/build_characters.py --write
+
+      - name: Upload generated sprite outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sprite-GPT-Generated-Outputs
+          path: |
+            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+            android/app/src/main/res/drawable-nodpi/*.png
+            tools/sprites/reports/*.report.json
+          if-no-files-found: warn
+
+      - name: Commit generated sprite outputs
+        if: failure() && github.ref == 'refs/heads/game-luta-sprite-gpt'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add android/app/src/main/res/drawable-nodpi/*.png
+          git add tools/sprites/reports/*.report.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate sprite pack outputs"
+            git push origin HEAD:game-luta-sprite-gpt
+          fi
+
       - name: Build debug APK
         working-directory: android
-        run: gradle assembleDebug --stacktrace
+        run: gradle testDebugUnitTest assembleDebug --stacktrace
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: GameLutaGPT-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Runtime smoke test on Android emulator
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb logcat -c
+            adb shell am force-stop com.gamelutagpt
+            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
+            sleep 5
+            adb shell input keyevent KEYCODE_HOME
+            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
+            sleep 2
+            adb shell pidof com.gamelutagpt | grep -E '[0-9]+'
+            ! adb logcat -d -v brief | grep -q "Process: com.gamelutagpt"
+            adb exec-out screencap -p > game-smoke.png
+            test -s game-smoke.png
+
+      - name: Upload runtime screenshot
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-Smoke-Screenshot
+          path: game-smoke.png
+          if-no-files-found: error
+
+
+      - name: Upload sprite review and test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sprite-GPT-Validation
+          path: |
+            android/app/build/sprite-review/
+            android/app/build/reports/tests/

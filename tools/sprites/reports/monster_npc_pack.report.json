@@ -1,0 +1,204 @@
+{
+  "id": "monster_npc_pack",
+  "characterProfile": "monster_npc",
+  "source": "art/sprites/source/brutamonte_atlas_16.png",
+  "sourceNote": "Brutamonte 16-frame NPC atlas normalized from the approved sprite sheet.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.4,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 248,
+    "columns": 4,
+    "frameCount": 16
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        22,
+        37,
+        233,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 32538
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        26,
+        37,
+        230,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 31763
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        23,
+        37,
+        232,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 31459
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        23,
+        40,
+        233,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 31517
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        20,
+        33,
+        236,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 31003
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        21,
+        39,
+        235,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 29089
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        22,
+        34,
+        234,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 29753
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        19,
+        42,
+        236,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 29136
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        14,
+        71,
+        241,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 28435
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        6,
+        53,
+        256,
+        248
+      ],
+      "minimumMargin": 0,
+      "opaquePixels": 30655
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        0,
+        46,
+        256,
+        248
+      ],
+      "minimumMargin": 0,
+      "opaquePixels": 33155
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        0,
+        79,
+        225,
+        248
+      ],
+      "minimumMargin": 0,
+      "opaquePixels": 22341
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        32,
+        73,
+        224,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 24445
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        5,
+        45,
+        249,
+        248
+      ],
+      "minimumMargin": 5,
+      "opaquePixels": 30942
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        12,
+        49,
+        244,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 29427
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        25,
+        68,
+        231,
+        248
+      ],
+      "minimumMargin": 8,
+      "opaquePixels": 27394
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "32c27d2d6d9f5a7edbafd16778fe9f5e9bdc6f9e77a2443580437af70e2d2d32",
+      "config": "b417dc8aa0207efc89a3c3527e39a8449cbed496e077874ddae372eb458ea29e",
+      "profile": "a107acc7a6c166eee10752d3a8f0879a7103a6b137905010cc269d48d7b2ce78"
+    }
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "id": "player_base_missing",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_missing_normalized.png",
+  "sourceNote": "First-pass reviewed transparent atlas for defense, hit, knockdown, crouching and aerial combat states.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "columns": 14,
+    "frameCount": 14
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        83,
+        84,
+        173,
+        237
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 7616
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        78,
+        98,
+        178,
+        231
+      ],
+      "minimumMargin": 25,
+      "opaquePixels": 7238
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        68,
+        91,
+        184,
+        235
+      ],
+      "minimumMargin": 21,
+      "opaquePixels": 8897
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        71,
+        114,
+        184,
+        236
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 7545
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        53,
+        125,
+        203,
+        235
+      ],
+      "minimumMargin": 21,
+      "opaquePixels": 7576
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        18,
+        185,
+        238,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 5954
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        30,
+        154,
+        225,
+        217
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 7726
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        68,
+        122,
+        186,
+        233
+      ],
+      "minimumMargin": 23,
+      "opaquePixels": 7393
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        75,
+        125,
+        180,
+        234
+      ],
+      "minimumMargin": 22,
+      "opaquePixels": 5998
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        63,
+        107,
+        193,
+        236
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 7855
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        68,
+        125,
+        188,
+        236
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 6892
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        65,
+        110,
+        190,
+        236
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 6344
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        55,
+        93,
+        200,
+        234
+      ],
+      "minimumMargin": 22,
+      "opaquePixels": 10323
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        59,
+        92,
+        203,
+        236
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 9073
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "ae2b3dac328c822953eba238e10ef831258ca2289c39fbb9ce986430ed49f69f",
+      "config": "cf9e1288871696f56a03cfa4917623ebe692ffd3d1b92f8001ddaead5c757a66",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}

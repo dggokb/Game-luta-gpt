@@ -1,0 +1,219 @@
+{
+  "id": "player_base_medium_kick",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_medium_kick_source.png",
+  "detectedSourceIntervals": [
+    [
+      108,
+      502
+    ],
+    [
+      739,
+      1452
+    ],
+    [
+      1593,
+      2106
+    ]
+  ],
+  "scale": 0.3584905660377358,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "frameCount": 3
+  },
+  "validation": {
+    "alphaThreshold": 10,
+    "minMargin": 8,
+    "rootTolerance": 1.5,
+    "widthStep": 64,
+    "heightStep": 64,
+    "footBandRatio": 0.025,
+    "minFootWidth": 4,
+    "minOpaquePixels": 10000,
+    "maxUpscale": 1.0,
+    "maxFrameWidth": 768,
+    "maxFrameHeight": 512
+  },
+  "frames": [
+    {
+      "index": 0,
+      "sourceInterval": [
+        108,
+        502
+      ],
+      "sourceBbox": [
+        0,
+        35,
+        394,
+        673
+      ],
+      "sourceRoot": [
+        85.5,
+        672.0
+      ],
+      "sourceFootIntervals": [
+        [
+          37,
+          135
+        ]
+      ],
+      "outputBbox": [
+        97,
+        10,
+        238,
+        239
+      ],
+      "outputMargins": {
+        "left": 97,
+        "right": 146,
+        "top": 10,
+        "bottom": 17
+      },
+      "detectedOutputRoot": [
+        127.5,
+        238.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          110,
+          146
+        ]
+      ],
+      "opaquePixels": 17072,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 1,
+      "sourceInterval": [
+        739,
+        1452
+      ],
+      "sourceBbox": [
+        0,
+        42,
+        713,
+        673
+      ],
+      "sourceRoot": [
+        87.0,
+        672.0
+      ],
+      "sourceFootIntervals": [
+        [
+          41,
+          134
+        ]
+      ],
+      "outputBbox": [
+        97,
+        12,
+        353,
+        238
+      ],
+      "outputMargins": {
+        "left": 97,
+        "right": 31,
+        "top": 12,
+        "bottom": 18
+      },
+      "detectedOutputRoot": [
+        127.5,
+        237.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          111,
+          145
+        ]
+      ],
+      "opaquePixels": 19570,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 2,
+      "sourceInterval": [
+        1593,
+        2106
+      ],
+      "sourceBbox": [
+        0,
+        36,
+        513,
+        672
+      ],
+      "sourceRoot": [
+        239.0,
+        671.0
+      ],
+      "sourceFootIntervals": [
+        [
+          0,
+          94
+        ],
+        [
+          351,
+          513
+        ]
+      ],
+      "outputBbox": [
+        42,
+        10,
+        226,
+        238
+      ],
+      "outputMargins": {
+        "left": 42,
+        "right": 158,
+        "top": 10,
+        "bottom": 18
+      },
+      "detectedOutputRoot": [
+        127.5,
+        237.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          42,
+          76
+        ],
+        [
+          168,
+          226
+        ]
+      ],
+      "opaquePixels": 18650,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "a17cc4aa62d8473bcf90146fa46d802caff4af92a1c58685736f520f057bcab2",
+      "config": "d3c347301e79f64ed5bdc4cea7d37fc66228db06a5cafee2b2053020bb84afc1",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}
