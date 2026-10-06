@@ -26,6 +26,8 @@ final class HudRenderer {
         String tagButtonLabel();
         boolean canTag();
         boolean canSuper();
+        /** ↓ held with three bars: the SUPER button would start the ultra. */
+        boolean ultraReady();
         int dpadDirection();
         boolean pressed(Control control);
     }
@@ -451,7 +453,8 @@ final class HudRenderer {
 
     private void drawSuperButton(Canvas c, State s) {
         boolean pressed = s.pressed(Control.SUPER);
-        boolean enabled = s.canSuper();
+        boolean ultra = s.ultraReady();
+        boolean enabled = ultra || s.canSuper();
 
         paint.setColor(
             enabled
@@ -470,7 +473,7 @@ final class HudRenderer {
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(15f);
         paint.setFakeBoldText(true);
-        c.drawText("SUPER", SUPER_X, SUPER_Y - 4f, paint);
+        c.drawText(ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 4f, paint);
         paint.setTextSize(11f);
         c.drawText(s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 14f, paint);
         paint.setFakeBoldText(false);

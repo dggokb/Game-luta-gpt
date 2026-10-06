@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.74-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.75-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -120,3 +120,21 @@ lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app.
 
 Andar para trás (220) é mais lento que andar para frente (300), no chão e no ar, para que
 recuar não seja uma fuga igual ao avanço do adversário.
+
+## Ultra "Página Final" — v0.75
+
+**↓ + SUPER** com 3 barras. A regra fica no motor: ativação que congela o oponente
+(como o Super), investida e confirmação. A investida pode ser defendida (blockstun e
+recuperação punível) e erra se o oponente estiver longe. Quando acerta, o motor espera e
+o `GameView` toca a cinemática: uma página de mangá montada em 5 painéis com a arte do
+personagem. Tocar quando o anel fecha dá bônus no golpe final (PERFEITO +25%, BOM +10%).
+O dano entra pelo motor com a escala da sessão de combo e, no fim, o oponente é arremessado
+e cai derrubado.
+
+- `android/ultra-core/`: motor da cinemática em Java puro (roda no Android e no PC), com
+  testes em `gradle :ultra-core:test`.
+- `android/ultra-preview/`: visualizador no PC, `gradle :ultra-preview:run`.
+- `android/app/src/main/assets/ultras/<id do personagem>/`: `ultra.json` (nome, cores,
+  dano, onomatopeias), as 5 imagens e os sons opcionais.
+- `tools/ultra/`: prompts fixos e o script que prepara a arte gerada por IA. O guia
+  completo está em [tools/ultra/README.md](tools/ultra/README.md).

@@ -70,6 +70,22 @@ final class EffectsRenderer {
         c.drawRect(0f, Arena.WORLD_TOP, Arena.WORLD_WIDTH, Arena.VH + 120f, paint);
     }
 
+    /** Ultra rush trail behind the fighter; canvas is already mirrored to its facing. */
+    void drawUltraRush(Canvas c, Paint paint, float x, float baseY, int color) {
+        float centerY = baseY - 78f;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        for (int i = 0; i < 7; i++) {
+            float y = centerY - 72f + i * 24f;
+            float length = 130f + (i % 3) * 70f;
+            paint.setStrokeWidth(i % 2 == 0 ? 6f : 3f);
+            paint.setColor(i % 2 == 0 ? color : Color.argb(200, 255, 255, 255));
+            c.drawLine(x - 40f - length, y, x - 40f, y, paint);
+        }
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
     /** Charge rings and speed lines around the fighter; canvas is already mirrored to its facing. */
     void drawSuperCharge(Canvas c, Paint paint, float x, float baseY, float phaseTimer, int color) {
         float centerY = baseY - 78f;
