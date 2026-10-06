@@ -1,0 +1,11 @@
+plugins { id 'java-library' }
+
+// Java puro e sem dependências, para rodar igual no Android e no PC.
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+}
