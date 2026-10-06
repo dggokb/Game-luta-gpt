@@ -2,3 +2,6 @@ pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal()
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name = 'GameLutaGPT'
 include ':app'
+// Ultra Página Final: motor Java puro e preview desktop.
+include ':ultra-core'
+include ':ultra-preview'
