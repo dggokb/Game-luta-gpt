@@ -12,15 +12,27 @@ final class CombatRules {
     /** Vertical tolerance beyond the target's half height. */
     static final float VERTICAL_SLACK = 19.5f;
 
-    static final float SUPER_GAIN_LIGHT = 0.10f;
-    static final float SUPER_GAIN_MEDIUM = 0.15f;
-    static final float SUPER_GAIN_HEAVY = 0.20f;
-    static final float SUPER_GAIN_ENERGY = 0.45f;
-    static final float SUPER_GUARD_GAIN_LIGHT = 0.05f;
-    static final float SUPER_GUARD_GAIN_MEDIUM = 0.075f;
-    static final float SUPER_GUARD_GAIN_HEAVY = 0.10f;
-    static final float SUPER_GUARD_GAIN_ENERGY = 0.20f;
-    static final float SUPER_GUARD_GAIN_SUPER = 0.25f;
+    /** Super meter gained by the attacker on a confirmed hit, thousandths of a bar. */
+    static int superGainOnHit(AttackDefinition.Strength strength) {
+        switch (strength) {
+            case LIGHT: return 100;
+            case MEDIUM: return 150;
+            case HEAVY: return 200;
+            case SPECIAL: return 450;
+            default: return 0;
+        }
+    }
+
+    /** Super meter gained by a defender that guards the attack. */
+    static int superGainOnGuard(AttackDefinition.Strength strength) {
+        switch (strength) {
+            case LIGHT: return 50;
+            case MEDIUM: return 75;
+            case HEAVY: return 100;
+            case SPECIAL: return 200;
+            default: return 250;
+        }
+    }
 
     /**
      * {@code move.reach} is the distance from the attacker's root to the tip of the strike;
@@ -36,13 +48,40 @@ final class CombatRules {
         CharacterDefinition.Body target,
         boolean targetCrouching
     ) {
+        AttackDefinition attack = move.attack;
+        for (int i = 0; i < attack.hitboxCount(); i++) {
+            if (hitboxTouches(attackerX, attackerBaseY, facing, attack.hitbox(i),
+                targetX, targetBaseY, target, targetCrouching)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Hitbox against the target's body hurtbox. Bodies that overlap more than
+     * {@link #MIN_MELEE_DISTANCE} never connect (legacy rule). With the default hitbox
+     * (root to reach, hitHeight ± slack) this is the reach rule of earlier versions.
+     */
+    static boolean hitboxTouches(
+        float attackerX, float attackerBaseY, int facing, AttackDefinition.Box box,
+        float targetX, float targetBaseY, CharacterDefinition.Body target, boolean targetCrouching
+    ) {
         float horizontal = (targetX - attackerX) * facing;
         if (horizontal < MIN_MELEE_DISTANCE) return false;
-        if (horizontal - target.halfWidth > move.reach) return false;
-        float halfHeight = target.height(targetCrouching) * 0.5f;
-        float targetCenterY = targetBaseY - halfHeight;
-        float strikeY = attackerBaseY - move.hitHeight;
-        return Math.abs(strikeY - targetCenterY) <= halfHeight + VERTICAL_SLACK;
+        return overlaps(attackerX, attackerBaseY, facing, box,
+            targetX - target.halfWidth, targetBaseY - target.height(targetCrouching),
+            targetX + target.halfWidth, targetBaseY);
+    }
+
+    /** Box of a fighter (root at x, baseY, looking towards facing) against a world rectangle. */
+    static boolean overlaps(
+        float x, float baseY, int facing, AttackDefinition.Box box,
+        float left, float top, float right, float bottom
+    ) {
+        float boxLeft = facing > 0 ? x + box.x0 : x - box.x1;
+        float boxRight = facing > 0 ? x + box.x1 : x - box.x0;
+        float boxTop = baseY - box.y1;
+        float boxBottom = baseY - box.y0;
+        return boxRight >= left && boxLeft <= right && boxBottom >= top && boxTop <= bottom;
     }
 
     /** Whether a defender standing in range should already raise the guard. */
@@ -159,24 +198,4 @@ final class CombatRules {
         return Math.max(min, Math.min(max, value));
     }
 
-    static float superGainForAttack(String type) {
-        if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
-        if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;
-        if ("H".equals(type) || "2H".equals(type)) return SUPER_GAIN_HEAVY;
-        if ("S".equals(type)) return SUPER_GAIN_ENERGY;
-        return 0f;
-    }
-
-    static float superGainForGuard(String type) {
-        if ("L".equals(type) || "2L".equals(type)) return SUPER_GUARD_GAIN_LIGHT;
-        if ("M".equals(type) || "2M".equals(type)) return SUPER_GUARD_GAIN_MEDIUM;
-        if ("H".equals(type) || "2H".equals(type)) return SUPER_GUARD_GAIN_HEAVY;
-        if ("S".equals(type)) return SUPER_GUARD_GAIN_ENERGY;
-        if ("SUPER".equals(type)) return SUPER_GUARD_GAIN_SUPER;
-        return 0f;
-    }
-
-    static boolean isLowAttack(String type) {
-        return "2L".equals(type) || "2M".equals(type);
-    }
 }

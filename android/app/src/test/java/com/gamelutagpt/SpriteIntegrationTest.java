@@ -23,6 +23,10 @@ public class SpriteIntegrationTest {
     private void invoke(String name,Class<?>[] types,Object... args)throws Exception {Method m=GameView.class.getDeclaredMethod(name,types);m.setAccessible(true);m.invoke(game,args);}
     private float meter(Object fighter)throws Exception {Field f=fighter.getClass().getDeclaredField("superMeter");f.setAccessible(true);return f.getFloat(fighter);}
     private Object activeFighter()throws Exception {return ((Object[])get("team"))[0];}
+    private CombatFighter player(){return game.engine.fighter(0);}
+    private CombatFighter npc(){return game.engine.fighter(1);}
+    /** Presses a button through the real pad (the engine decides whether it starts). */
+    private void press(PadInput.Button button,int direction){game.pad.setDirection(direction);game.pad.press(button);}
 
     private String rendererCharacterId()throws Exception {
         SpriteFighterRenderer renderer=(SpriteFighterRenderer)get("spriteFighterRenderer");
@@ -82,8 +86,7 @@ public class SpriteIntegrationTest {
         assertTrue(first.moves.containsKey("2L"));
         assertEquals("CROUCH_LIGHT",first.moves.get("2L").animation.id);
 
-        set("grounded",true);set("crouching",true);
-        invoke("startAttack",new Class<?>[]{String.class},"2L");frames(1);
+        press(PadInput.Button.LIGHT,3);frames(1);
         assertEquals("CROUCH_LIGHT",motion().clip);
         assertEquals(0,motion().frame());
         frames(3);
@@ -100,15 +103,13 @@ public class SpriteIntegrationTest {
         assertTrue("2M keeps room for the extended leg",
             first.animation("CROUCH_MEDIUM").atlas.width>first.animation("CROUCH_LIGHT").atlas.width);
 
-        setup();set("grounded",true);set("crouching",true);
-        invoke("startAttack",new Class<?>[]{String.class},"2M");frames(1);
+        setup();press(PadInput.Button.MEDIUM,3);frames(1);
         assertEquals("CROUCH_MEDIUM",motion().clip);
         assertEquals(0,motion().frame());
         frames(5);
         assertTrue("2M must advance through authored frames",motion().frame() >= 1);
 
-        setup();set("grounded",true);set("crouching",true);
-        invoke("startAttack",new Class<?>[]{String.class},"2H");frames(1);
+        setup();press(PadInput.Button.HEAVY,3);frames(1);
         assertEquals("CROUCH_HEAVY",motion().clip);
         assertEquals(0,motion().frame());
         CharacterDefinition.Move launcher=first.moves.get("2H");
@@ -118,20 +119,24 @@ public class SpriteIntegrationTest {
         frames(24);
         assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
 
-        setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);
-        invoke("startAttack",new Class<?>[]{String.class},"H");frames(1);
+        setup();player().grounded=false;player().y=430f;player().vy=-300f;
+        press(PadInput.Button.HEAVY,0);frames(1);
         assertEquals("JUMP_HEAVY",motion().clip);
 
-        setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);
-        invoke("startAttack",new Class<?>[]{String.class},"L");frames(1);
+        setup();player().grounded=false;player().y=430f;player().vy=-300f;
+        press(PadInput.Button.LIGHT,0);frames(1);
         assertEquals("JUMP_LIGHT",motion().clip);
 
-        setup();set("playerBlockstunTimer",.12f);set("playerLastGuardState",2);
-        set("playerMovementLocked",true);frames(1);
+        setup();blockstun(CombatFighter.GUARD_LOW);frames(1);
         assertEquals("DEFENSE_CROUCH",motion().clip);
 
-        setup();set("playerKnockdownState",1);set("playerMovementLocked",true);frames(1);
+        setup();player().status=CombatFighter.Status.KNOCKDOWN;player().knockdownFrame=0;frames(1);
         assertEquals("KNOCKDOWN",motion().clip);
+    }
+
+    private void blockstun(int guard){
+        CombatFighter p=player();
+        p.status=CombatFighter.Status.BLOCKSTUN;p.lastGuard=guard;p.stunLeft=p.stunTotal=14;p.stunElapsed=0;
     }
 
     @Test public void opponentIsRenderedByTheGenericSpriteEngine()throws Exception {
@@ -151,13 +156,15 @@ public class SpriteIntegrationTest {
         assertEquals("player_two",rendererCharacterId());
 
         String[] bindings={"L","M","H"};
-        int[] recoveryFrames={12,18,26};
+        PadInput.Button[] buttons={PadInput.Button.LIGHT,PadInput.Button.MEDIUM,PadInput.Button.HEAVY};
         CharacterDefinition second=GeneratedCharacters.get("player_two");
+        assertSame("The engine plays the tagged-in pack",second,player().character());
         for(int i=0;i<bindings.length;i++) {
-            invoke("startAttack",new Class<?>[]{String.class},bindings[i]);
+            int total=second.attack(bindings[i]).totalFrames;
+            press(buttons[i],0);
             frames(1);
             assertEquals(second.moves.get(bindings[i]).animation.id,motion().clip);
-            frames(recoveryFrames[i]);
+            frames(total);
             assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
         }
     }
@@ -172,75 +179,40 @@ public class SpriteIntegrationTest {
         touch(MotionEvent.ACTION_MOVE,175,645);frames(60);assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);assertEquals(9,motion().frame());
     }
     @Test public void facingChangesSelectForwardInBothDirections()throws Exception {
-        set("playerX",1400f);set("dummyX",1000f);set("facingDirection",-1);
+        player().x=1400f;npc().x=1000f;player().facing=-1;npc().facing=1;
         touch(MotionEvent.ACTION_DOWN,85,555);frames(6);assertEquals(SpriteMotion.Clip.WALK_FORWARD,motion().clip);
     }
     @Test public void pauseClearsHeldInputWithoutStartingAnotherLoop()throws Exception {
-        touch(MotionEvent.ACTION_DOWN,265,555);frames(5);game.pauseGame();assertFalse((Boolean)get("movingRight"));
+        touch(MotionEvent.ACTION_DOWN,265,555);frames(5);game.pauseGame();assertEquals(0,game.pad.direction());
         game.resumeGame();assertFalse((Boolean)get("running"));frames(1);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
     @Test public void touchIsQueuedAndLatestMoveWinsWithoutBuildingBacklog()throws Exception {
         touch(MotionEvent.ACTION_DOWN,265,555);
-        assertFalse((Boolean)get("movingRight"));
+        assertEquals("Touch waits for the game thread",0,game.pad.direction());
         for(int i=0;i<80;i++)touch(MotionEvent.ACTION_MOVE,265-i*2.25f,555);
         frames(1);
-        assertTrue((Boolean)get("movingLeft"));
-        assertFalse((Boolean)get("movingRight"));
+        assertEquals("Latest move wins",5,game.pad.direction());
+        assertTrue("Walked left",player().x<420f);
         touch(MotionEvent.ACTION_UP,85,555);frames(1);
-        assertFalse((Boolean)get("movingLeft"));
+        assertEquals(0,game.pad.direction());
     }
-    @Test public void powerGaugeRequiresAConfirmedHitAndGuardBuildsMeter()throws Exception {
-        set("dummyX",1000f);
-        invoke("startAttack",new Class<?>[]{String.class},"L");frames(40);
-        assertEquals(0f,meter(activeFighter()),.001f);
+    @Test public void powerGaugeRequiresAConfirmedHitThroughTheRealPad()throws Exception {
+        npc().x=1000f;
+        press(PadInput.Button.LIGHT,0);frames(40);
+        assertEquals("A whiff builds no meter",0,player().state.superMeter);
 
-        set("dummyX",520f);
-        invoke("startAttack",new Class<?>[]{String.class},"L");frames(20);
-        assertEquals(.10f,meter(activeFighter()),.001f);
+        npc().x=520f;
+        press(PadInput.Button.LIGHT,0);frames(30);
+        assertEquals(100,player().state.superMeter);
 
-        invoke("fireEnergyAttack",new Class<?>[]{String.class},"M");
-        assertEquals(.10f,meter(activeFighter()),.001f);
-        frames(1);assertEquals(.55f,meter(activeFighter()),.001f);
+        // ↓ ↘ → + M: the motion parser turns the button into the energy special.
+        game.pad.setDirection(3);frames(1);game.pad.setDirection(2);frames(1);game.pad.setDirection(1);frames(1);
+        game.pad.press(PadInput.Button.MEDIUM);frames(1);
+        assertEquals("S",player().attack.id);
         frames(30);
+        assertEquals(550,player().state.superMeter);
+    }
 
-        set("dpadDirection",5);
-        invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},300,-1,"L",false,false);
-        assertEquals(.60f,meter(activeFighter()),.001f);
-        assertEquals(0f,meter(get("opponentFighter")),.001f);
-
-        set("dpadDirection",0);set("playerMovementLocked",false);set("playerBlockstunTimer",0f);
-        invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},500,-1,"M",false,false);
-        assertEquals(.15f,meter(get("opponentFighter")),.001f);
-    }
-    @Test public void standingMoveDamageMatchesActiveWindowOnceInBothDirections()throws Exception {
-        for(String binding:new String[]{"L","M","H"})for(int direction:new int[]{1,-1}) {
-            setup();set("facingDirection",direction);set("dummyX",420f+100f*direction);
-            invoke("startAttack",new Class<?>[]{String.class},binding);
-            CharacterDefinition.Move move=GeneratedCharacters.defaultCharacter().moves.get(binding);
-            int life=(Integer)get("dummyLife");
-            set("attackTimer",move.totalTime-(move.activeStart-.002f));
-            invoke("tryApplyMeleeDamage",new Class<?>[]{});
-            assertEquals(life,(int)get("dummyLife"));
-            set("attackTimer",move.totalTime-(move.activeStart+.002f));
-            invoke("tryApplyMeleeDamage",new Class<?>[]{});
-            assertEquals(life-move.damage,(int)get("dummyLife"));
-            invoke("tryApplyMeleeDamage",new Class<?>[]{});
-            assertEquals(life-move.damage,(int)get("dummyLife"));
-        }
-    }
-    @Test public void missedMoveCannotHitWhenOpponentArrivesDuringRecovery()throws Exception {
-        for(String binding:new String[]{"L","M","H"}) {
-            setup();set("dummyX",1500f);
-            invoke("startAttack",new Class<?>[]{String.class},binding);
-            CharacterDefinition.Move move=GeneratedCharacters.defaultCharacter().moves.get(binding);
-            int life=(Integer)get("dummyLife");
-            set("attackTimer",move.totalTime-(move.activeStart+.002f));
-            invoke("tryApplyMeleeDamage",new Class<?>[]{});
-            set("dummyX",520f);set("attackTimer",move.totalTime-(move.activeEnd+.002f));
-            invoke("tryApplyMeleeDamage",new Class<?>[]{});
-            assertEquals(life,(int)get("dummyLife"));
-        }
-    }
     @Test public void customCharacterAnimationRendersWithSameGenericRenderer() {
         CharacterDefinition base=GeneratedCharacters.defaultCharacter();
         java.util.Map<String,CharacterDefinition.Animation> animations=new java.util.LinkedHashMap<>(base.animations);
@@ -252,14 +224,14 @@ public class SpriteIntegrationTest {
         assertTrue(bounds.width()>60);assertTrue(bounds.height()>150);
     }
     @Test public void standingLightAttackPlaysJabStartupActiveRecoveryThenReturnsIdle()throws Exception {
-        invoke("startAttack",new Class<?>[]{String.class},"L");
+        press(PadInput.Button.LIGHT,0);
         frames(1);assertEquals("LIGHT_JAB",motion().clip);assertEquals(0,motion().frame());
         frames(2);assertEquals(1,motion().frame());
         frames(4);assertEquals(2,motion().frame());
         frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
     @Test public void standingMediumAttackUsesThreeFrameKickAtScaleOne()throws Exception {
-        invoke("startAttack",new Class<?>[]{String.class},"M");
+        press(PadInput.Button.MEDIUM,0);
         frames(1);assertEquals("MEDIUM_KICK",motion().clip);assertEquals(0,motion().frame());
         frames(4);assertEquals(1,motion().frame());
         frames(7);assertEquals(2,motion().frame());
@@ -344,7 +316,7 @@ public class SpriteIntegrationTest {
     }
 
     @Test public void standingHeavyAttackUsesNineFrameStraightAtScaleOne()throws Exception {
-        invoke("startAttack",new Class<?>[]{String.class},"H");
+        press(PadInput.Button.HEAVY,0);
         frames(1);
         assertEquals("HEAVY_STRAIGHT",motion().clip);
         assertEquals(0,motion().frame());
@@ -556,22 +528,12 @@ public class SpriteIntegrationTest {
     }
     private int activeLife()throws Exception {Field f=activeFighter().getClass().getDeclaredField("life");f.setAccessible(true);return f.getInt(activeFighter());}
 
-    @Test public void opponentMoveUsesItsPackActiveWindowAndOwnLowAttackClip()throws Exception {
+    @Test public void opponentLowAttackPlaysItsOwnClip()throws Exception {
         CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
-        CharacterDefinition.Move move=npc.moves.get("L");
-        set("dummyX",520f);set("opponentAiEnabled",true);
-        invoke("startOpponentAttack",new Class<?>[]{String.class},"L");
-        int life=activeLife();
-        set("dummyAttackTimer",move.totalTime-(move.activeStart-.002f));
-        invoke("tryApplyOpponentMeleeDamage",new Class<?>[]{});
-        assertEquals("Startup must not hit",life,activeLife());
-        set("dummyAttackTimer",move.totalTime-(move.activeStart+.002f));
-        invoke("tryApplyOpponentMeleeDamage",new Class<?>[]{});
-        assertEquals(life-move.damage,activeLife());
-
-        setup();set("dummyX",520f);set("opponentAiEnabled",true);
-        invoke("startOpponentAttack",new Class<?>[]{String.class},"2M");
-        invoke("updateOpponentSpriteMotion",new Class<?>[]{float.class,float.class},.016f,0f);
+        // The CPU presses buttons like a player: crouching M through its buffer.
+        npc().buffer.push(InputBuffer.Button.MEDIUM,null,true);
+        frames(1);
+        assertEquals("2M",npc().attack.id);
         SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");
         assertEquals(npc.moves.get("2M").animation.id,opponent.motion.clip);
         assertNotEquals(npc.moves.get("M").animation.id,opponent.motion.clip);
@@ -580,28 +542,26 @@ public class SpriteIntegrationTest {
         CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
         Method top=GameView.class.getDeclaredMethod("opponentVisualTop");top.setAccessible(true);
         float visualTop=(Float)top.invoke(game);
-        assertEquals((Float)get("dummyY")-npc.visualStandHeight,visualTop,.01f);
+        assertEquals(npc().y-npc.visualStandHeight,visualTop,.01f);
         assertTrue("Visual height is the opaque art, not the PNG cell",
             npc.visualStandHeight<npc.profile.rootY*npc.profile.worldScale);
         frames(240);
         assertTrue("Opponent head must stay on screen",((CameraRig)get("camera")).top<=visualTop);
     }
     @Test public void opponentAiOnlyStartsAttacksThatCanReach()throws Exception {
-        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
         CharacterDefinition.Body target=GeneratedCharacters.defaultCharacter().fighter.body;
-        set("dummyX",590f);set("opponentAiEnabled",true);
-        int started=0;String previous="";
+        npc().x=590f;
+        invoke("setOpponentAiEnabled",new Class<?>[]{boolean.class},true);
+        int started=0;
         for(int i=0;i<900;i++) {
             frames(1);
-            String type=(String)get("dummyAttackType");
-            if(!type.isEmpty() && !type.equals(previous) && !"S".equals(type)) {
+            CombatFighter cpu=npc();
+            if(cpu.attacking() && cpu.attackFrame==0 && cpu.move!=null) {
                 started++;
-                CharacterDefinition.Move move=(CharacterDefinition.Move)get("opponentMove");
-                float distance=Math.abs((Float)get("playerX")-(Float)get("dummyX"));
-                assertTrue(type+" started out of reach at "+distance,
-                    distance<=CombatRules.maxCenterDistance(move,target)+0.5f);
+                float distance=Math.abs(player().x-cpu.x);
+                assertTrue(cpu.attack.id+" started out of reach at "+distance,
+                    distance<=CombatRules.maxCenterDistance(cpu.move,target)+0.5f);
             }
-            previous=type;
         }
         assertTrue("AI should attack once in range",started>0);
     }
@@ -609,42 +569,41 @@ public class SpriteIntegrationTest {
         CharacterDefinition.Body p=GeneratedCharacters.defaultCharacter().fighter.body;
         CharacterDefinition.Body n=GeneratedCharacters.opponentCharacter().fighter.body;
         float gap=p.pushHalfWidth+n.pushHalfWidth;
-        set("dummyX",520f);
+        npc().x=520f;
         touch(MotionEvent.ACTION_DOWN,265,555);frames(60);
-        float px=(Float)get("playerX"),dx=(Float)get("dummyX");
+        float px=player().x,dx=npc().x;
         assertTrue("Bodies overlap: "+(dx-px),dx-px>=gap-0.01f);
         assertTrue("Opponent should be pushed",dx>520f);
-        assertEquals(1,(int)get("facingDirection"));
+        assertEquals(1,player().facing);
     }
-    @Test public void holdingBackInTheAirBlocksAndShowsTheAirGuard()throws Exception {
-        int life=activeLife();
-        set("grounded",false);set("playerY",420f);set("velocityY",-200f);
-        set("facingDirection",1);set("dpadDirection",5);
-        invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},500,-1,"M",false,false);
-        assertEquals("Air guard must block",life,activeLife());
-        assertEquals(3,(int)get("playerLastGuardState"));
-        assertTrue((Float)get("playerBlockstunTimer")>0f);
+    @Test public void airBlockstunShowsTheAirGuardImpact()throws Exception {
+        player().grounded=false;player().y=420f;player().vy=-200f;
+        blockstun(CombatFighter.GUARD_AIR);
         frames(1);
         assertEquals("DEFENSE_AIR",motion().clip);
-        assertEquals("Impact frame while in blockstun",2,motion().frame());
+        CharacterDefinition.Animation guard=GeneratedCharacters.defaultCharacter().animation("DEFENSE_AIR");
+        assertEquals("Impact frame while in blockstun",
+            guard.frame(guard.guardTime(true,player().stunElapsed/(float)player().stunTotal),0),motion().frame());
+        assertNotEquals("Not the held guard frame",guard.frame(guard.guardTime(false,0f),0),motion().frame());
     }
     @Test public void knockdownPlaysTheNewFallSequenceOnTheGround()throws Exception {
-        set("playerKnockdownState",1);set("playerMovementLocked",true);frames(1);
+        player().status=CombatFighter.Status.KNOCKDOWN;player().knockdownFrame=0;frames(1);
         assertEquals("KNOCKDOWN",motion().clip);
         assertEquals("player_base_fall",GeneratedCharacters.defaultCharacter().animation("KNOCKDOWN").atlas.resource);
-        set("playerKnockdownState",2);set("playerKnockdownTimer",0f);frames(1);
+        player().knockdownFrame=game.engine.config.knockdownFallFrames;frames(1);
         assertEquals("GROUNDED",motion().clip);
     }
     @Test public void launchPoseFollowsThePhysicsAndHitsUseTheNewSheets()throws Exception {
-        set("grounded",false);set("playerY",380f);set("playerLaunchedByHit",true);set("playerMovementLocked",true);
-        set("velocityY",-1200f);frames(1);
+        CombatFighter p=player();
+        p.grounded=false;p.y=380f;p.status=CombatFighter.Status.AIR_HITSTUN;p.launched=true;p.stunLeft=p.stunTotal=40;
+        p.vy=-1200f;frames(1);
         assertEquals("HIT_AIR",motion().clip);assertEquals("Thrown up",0,motion().frame());
-        set("velocityY",300f);frames(1);
+        p.vy=300f;frames(1);
         assertEquals("Recovery tuck on the way down",3,motion().frame());
-        setup();set("playerHitReactionTimer",.21f);set("playerMovementLocked",true);frames(1);
+        setup();player().status=CombatFighter.Status.HITSTUN;player().stunLeft=player().stunTotal=12;frames(1);
         assertEquals("HIT_STAND",motion().clip);
         assertEquals("player_base_hit_stand",GeneratedCharacters.defaultCharacter().animation("HIT_STAND").atlas.resource);
-        setup();set("playerKnockdownState",3);set("playerKnockdownTimer",0f);set("playerMovementLocked",true);frames(1);
+        setup();player().status=CombatFighter.Status.WAKEUP;player().knockdownFrame=0;frames(1);
         assertEquals("GETUP",motion().clip);
         assertEquals("player_base_getup",GeneratedCharacters.defaultCharacter().animation("GETUP").atlas.resource);
     }

@@ -55,6 +55,7 @@ public class ExtractedSystemsTest {
     }
     @Test public void controlsHitTestFollowsInputPriority() {
         assertEquals(ControlsLayout.Control.AI_TOGGLE,ControlsLayout.controlAt(1100,150));
+        assertEquals(ControlsLayout.Control.DEBUG_TOGGLE,ControlsLayout.controlAt(1100,200));
         assertEquals(ControlsLayout.Control.DPAD,ControlsLayout.controlAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y));
         assertEquals(ControlsLayout.Control.LIGHT,ControlsLayout.controlAt(ControlsLayout.LIGHT_X,ControlsLayout.LIGHT_Y));
         assertEquals(ControlsLayout.Control.TAG,ControlsLayout.controlAt(ControlsLayout.TAG_X,ControlsLayout.TAG_Y));
@@ -65,18 +66,23 @@ public class ExtractedSystemsTest {
         assertEquals(5,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X-90,ControlsLayout.DPAD_Y));
         assertEquals(7,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y-90));
     }
-    @Test public void commandBufferAcceptsDiagonalsAndRejectsSlowInput() {
+    @Test public void motionParserAcceptsDiagonalsAndRejectsSlowInput() {
         int[] quarterCircle={3,1};
-        CommandBuffer b=new CommandBuffer();
-        b.record(3,1000);b.record(2,1100);b.record(1,1200);
-        assertTrue(b.consume(quarterCircle,1250));
-        assertEquals("A match consumes the buffer",0,b.size());
-        b.record(3,1000);b.record(1,1000+CommandBuffer.STEP_MS+1);
-        assertFalse(b.consume(quarterCircle,1000+CommandBuffer.STEP_MS+2));
-        b.reset();b.record(3,2000);b.record(1,2100);
-        assertFalse("Too late to confirm",b.consume(quarterCircle,2100+CommandBuffer.STEP_MS+1));
-        for(int i=0;i<20;i++)b.record(i%2==0?5:1,3000+i);
-        assertEquals(CommandBuffer.SIZE,b.size());
+        MotionParser m=new MotionParser();
+        m.record(3,100);m.record(2,102);m.record(1,104);
+        assertTrue(m.matchCommand(quarterCircle,106,15,15));
+        assertFalse("A match consumes the history",m.matchCommand(quarterCircle,106,15,15));
+        m.record(3,200);m.record(1,200+16);
+        assertFalse("Steps too far apart",m.matchCommand(quarterCircle,200+17,15,15));
+        m.clear();m.record(3,300);m.record(1,302);
+        assertFalse("Too late to press",m.matchCommand(quarterCircle,302+16,15,15));
+        m.clear();m.record(1,400);m.record(0,402);m.record(1,410);
+        assertTrue("Double tap",m.doubleTap(1,410,18));
+        m.clear();m.record(2,500);m.record(7,510);
+        assertTrue("Down then up",m.downThenUp(510,22));
+        assertEquals("Facing left mirrors the pad",1,MotionParser.relative(5,-1));
+        for(int i=0;i<40;i++)m.record(i%2==0?5:1,600+i);
+        assertFalse(m.matchCommand(quarterCircle,640,15,15));
     }
     @Test public void cameraZoomsOutForDistantFightersAndKeepsTallOnesInFrame() {
         CameraRig near=new CameraRig(),far=new CameraRig();

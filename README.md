@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.71-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.72-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -101,3 +101,12 @@ queda do `player_base` com arte própria, todas na mesma escala do corpo.
 Dano em pé, agachado e no ar (frame escolhido pela física do lançamento) e o levantar do
 `player_base` com arte própria; o levantar começa espelhado para sair do mesmo lado em que
 o lutador caiu. O atlas ampliado `player_base_missing` foi removido.
+
+## Motor de Dano e Combos V2 — v0.72
+
+O combate saiu do `GameView` para um motor Java puro em passo fixo de 60 fps: buffer de
+input, máquina de estados (startup/active/recovery), cancelamentos declarados por golpe
+(hit/block/whiff), hitstun/blockstun/hitstop reais, sessão de combo com escala de dano,
+hitstun decay, juggle points e pushback. O frame data vive nos Character Packs (schema 3)
+e é validado no build e no carregamento. Botão DEBUG mostra caixas, estados e a tabela de
+vantagem de cada golpe. Detalhes, rotas e critérios de aceite em `docs/combat-engine.md`.

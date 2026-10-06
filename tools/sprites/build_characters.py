@@ -23,6 +23,12 @@ BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH')}
 SPECIALS = ('S','SUPER')
+# Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
+JUMP = 'JUMP'
+LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM'}
+STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
+REQUIRED_ATTACK = ('startupFrames','activeFrames','recoveryFrames','hitstunFrames','blockstunFrames','hitstopFrames',
+                   'cancelWindows','cancelInto','pushbackOnHit','pushbackOnBlock')
 FACINGS = {'right':1,'left':-1}
 
 def read(path):
@@ -77,6 +83,89 @@ def validate_fighter(pack):
         if not command or any(type(d) is not int or not 1 <= d <= 8 for d in command):
             raise ValueError(f'{name}.energy: command uses D-pad directions 1..8')
     if 'super' in f: validate_projectile(f['super'], name+'.super', body)
+    for key in ('energy','super'):
+        if key in f:
+            if 'attack' not in f[key]: raise ValueError(f'{name}.{key}: attack frame data is required')
+            validate_attack(f'{name}.{key}.attack', f[key]['attack'], True)
+    if 'inputPriority' in f and sorted(f['inputPriority']) != sorted(STRENGTHS):
+        raise ValueError(f'{name}.inputPriority: order all of {", ".join(STRENGTHS)}')
+
+def non_negative_int(value, name):
+    if type(value) is not int or value < 0:
+        raise ValueError(f'{name}: expected an integer >= 0')
+
+def validate_attack(name, m, projectile):
+    """Frame data of one move or projectile throw; mirrors AttackDefinition.Builder.build()."""
+    missing = [k for k in REQUIRED_ATTACK if k not in m]
+    if missing:
+        raise ValueError(f'{name}: missing frame data {missing}')
+    for key in ('startupFrames','recoveryFrames','hitstopFrames'): non_negative_int(m[key], f'{name}.{key}')
+    for key in ('activeFrames','hitstunFrames','blockstunFrames'): positive_int(m[key], f'{name}.{key}')
+    total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+    last_active = m['startupFrames'] + m['activeFrames'] - 1
+    windows = m['cancelWindows']
+    if not isinstance(windows, dict) or set(windows) != {'hit','block','whiff'}:
+        raise ValueError(f'{name}.cancelWindows: declare hit, block and whiff (null when closed)')
+    for key,w in windows.items():
+        if w is None: continue
+        earliest = 0 if key == 'whiff' else m['startupFrames']
+        if not (isinstance(w,list) and len(w) == 2 and all(type(v) is int for v in w) and earliest <= w[0] <= w[1] < total):
+            raise ValueError(f'{name}.cancelWindows.{key}: window {w} is outside the move ({earliest}..{total-1})')
+    if not isinstance(m['cancelInto'], list) or any(not isinstance(t,str) for t in m['cancelInto']):
+        raise ValueError(f'{name}.cancelInto: expected a list of move ids')
+    for key in ('pushbackOnHit','pushbackOnBlock','knockback'):
+        if key in m and (isinstance(m[key],bool) or not isinstance(m[key],(int,float)) or m[key] < 0):
+            raise ValueError(f'{name}.{key}: expected a number >= 0')
+    if 'damageProration' in m and not (isinstance(m['damageProration'],(int,float)) and 0 < m['damageProration'] <= 1):
+        raise ValueError(f'{name}.damageProration: expected a value in (0, 1]')
+    if m.get('launchType','none') not in LAUNCHES:
+        raise ValueError(f'{name}.launchType: expected one of {sorted(LAUNCHES)}')
+    for key in ('juggleCost','maxUsesPerCombo'):
+        if key in m: non_negative_int(m[key], f'{name}.{key}')
+    if 'low' in m and type(m['low']) is not bool:
+        raise ValueError(f'{name}.low: expected true or false')
+    for key,first,last in (('hitboxes',m['startupFrames'],last_active),('hurtboxes',0,total-1)):
+        for box in m.get(key, []):
+            frames,x,y = box.get('frames'),box.get('x'),box.get('y')
+            if not (isinstance(frames,list) and len(frames) == 2 and all(type(v) is int for v in frames) and first <= frames[0] <= frames[1] <= last):
+                raise ValueError(f'{name}.{key}: frames {frames} must stay inside {first}..{last}')
+            if not all(isinstance(r,list) and len(r) == 2 and r[0] <= r[1] for r in (x,y)):
+                raise ValueError(f'{name}.{key}: x and y are ordered [min, max] ranges')
+    if projectile:
+        if m['activeFrames'] != 1 or m.get('hitboxes'):
+            raise ValueError(f'{name}: projectile throws spawn on one active frame and have no hitboxes')
+        if 'maxHits' in m: raise ValueError(f'{name}: maxHits does not apply to projectile throws')
+    else:
+        boxes = len(m.get('hitboxes', [])) or 1
+        if 'maxHits' in m and not (type(m['maxHits']) is int and 1 <= m['maxHits'] <= boxes):
+            raise ValueError(f'{name}.maxHits: between 1 and the number of hitboxes ({boxes})')
+
+def attack_ids(pack):
+    ids = set(BINDINGS)
+    if 'energy' in pack['fighter']: ids.add('S')
+    if 'super' in pack['fighter']: ids.add('SUPER')
+    return ids
+
+def validate_routes(pack):
+    """Load fails when a cancel route points nowhere or crosses ground/air."""
+    ids = attack_ids(pack)
+    attacks = {b:pack['moves'][b] for b in BINDINGS}
+    if 'energy' in pack['fighter']: attacks['S'] = pack['fighter']['energy']['attack']
+    if 'super' in pack['fighter']: attacks['SUPER'] = pack['fighter']['super']['attack']
+    for source,m in attacks.items():
+        air = source.startswith('j')
+        for target in m['cancelInto']:
+            if target == JUMP:
+                if air: raise ValueError(f'{pack["id"]}/{source}: an air move cannot jump-cancel')
+                continue
+            if target not in ids:
+                raise ValueError(f'{pack["id"]}/{source}: cancelInto {target} does not exist')
+            if target not in SPECIALS and target.startswith('j') != air:
+                raise ValueError(f'{pack["id"]}/{source}: cancelInto {target} changes ground/air')
+    combo = pack['fighter']['autoCombo']
+    for a,b in zip(combo, combo[1:]):
+        if b not in attacks[a]['cancelInto']:
+            raise ValueError(f'{pack["id"]}: autoCombo {a} -> {b} is not a declared cancel route')
 
 def validate_move(pack, binding, m):
     animations = pack['animations']
@@ -90,9 +179,9 @@ def validate_move(pack, binding, m):
             raise ValueError(f'{binding}: attack must be a timed one-shot')
     elif binding not in POSES.get(m['pose'],()):
         raise ValueError(f'{binding}: pose {m["pose"]} is not valid for this input')
-    positive(m['totalMs'], binding)
-    if not 0 <= m['activeStartMs'] < m['activeEndMs'] <= m['totalMs']:
-        raise ValueError(f'{binding}: active window outside totalMs')
+    if any(k in m for k in ('totalMs','activeStartMs','activeEndMs')):
+        raise ValueError(f'{binding}: totalMs/activeStartMs/activeEndMs were replaced by frame data (schema 3)')
+    validate_attack(binding, m, False)
     positive(m['reach'], binding)
     if 'hitHeight' in m: positive(m['hitHeight'], binding)
     if type(m['damage']) is not int or m['damage'] <= 0:
@@ -112,8 +201,8 @@ def compile_packs(root, results):
     packs = []
     for path in sorted((root / 'characters').glob('*/character.json')):
         pack = read(path)
-        if pack.get('schemaVersion') != 2 or not re.fullmatch('[a-z][a-z0-9_]*', pack['id']):
-            raise ValueError(f'{path}: unsupported version (expected schemaVersion 2) or invalid id')
+        if pack.get('schemaVersion') != 3 or not re.fullmatch('[a-z][a-z0-9_]*', pack['id']):
+            raise ValueError(f'{path}: unsupported version (expected schemaVersion 3) or invalid id')
         if pack['id'] != path.parent.name or any(p['id'] == pack['id'] for p in packs):
             raise ValueError(f'{path}: id must be unique and match folder')
         if pack.get('artFacing') not in FACINGS:
@@ -165,6 +254,7 @@ def compile_packs(root, results):
         if orphan:
             raise ValueError(f'{pack["id"]}: animations {sorted(orphan)} are not a known state nor used by a move')
         validate_fighter(pack)
+        validate_routes(pack)
         pack['_profile'] = profile
         pack['_visual'] = visual_heights(pack, atlases)
         # standingVisualHeight drives bbox normalization; it must describe the shipped Idle.
@@ -182,9 +272,29 @@ def compile_packs(root, results):
     write_states(root)
     q = json.dumps
     f = lambda v: f'{float(v):.8f}f'
-    def projectile(data):
+    def attack(binding, m, kind, damage, reach=None, height=None):
+        code = 'new AttackDefinition.Builder('+q(binding)+',AttackDefinition.Kind.'+kind+').damage('+str(damage)+')'
+        code += '.frames('+','.join(str(m[k]) for k in ('startupFrames','activeFrames','recoveryFrames'))+')'
+        code += '.stun('+','.join(str(m[k]) for k in ('hitstunFrames','blockstunFrames','hitstopFrames'))+')'
+        w = m['cancelWindows']
+        code += '.windows('+','.join('null' if w[k] is None else 'AttackDefinition.window('+str(w[k][0])+','+str(w[k][1])+')' for k in ('hit','block','whiff'))+')'
+        if m['cancelInto']: code += '.cancelInto('+','.join(q(t) for t in m['cancelInto'])+')'
+        if 'damageProration' in m: code += '.proration('+str(round(m['damageProration']*1000))+')'
+        if m.get('launchType','none') != 'none': code += '.launch(AttackDefinition.Launch.'+LAUNCHES[m['launchType']]+')'
+        if 'knockback' in m: code += '.knockback('+f(m['knockback'])+')'
+        code += '.pushback('+f(m['pushbackOnHit'])+','+f(m['pushbackOnBlock'])+')'
+        if 'juggleCost' in m: code += '.juggleCost('+str(m['juggleCost'])+')'
+        if 'maxHits' in m: code += '.maxHits('+str(m['maxHits'])+')'
+        if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
+        if m.get('low'): code += '.low(true)'
+        if reach is not None: code += '.reach('+f(reach)+','+f(height)+')'
+        for key in ('hitboxes','hurtboxes'):
+            for box in m.get(key, []):
+                code += '.'+key[:-2]+'('+','.join([str(box['frames'][0]),str(box['frames'][1])]+[f(v) for v in box['x']+box['y']])+')'
+        return code+'.build()'
+    def projectile(data, binding):
         if data is None: return 'null'
-        return ('new CharacterDefinition.Projectile('+str(data['damage'])+','+f(data['range'])+','+f(data['speed'])+','+f(data['spawnX'])
+        return ('new CharacterDefinition.Projectile('+attack(binding,data['attack'],'PROJECTILE' if binding=='S' else 'SUPER',data['damage'])+','+f(data['range'])+','+f(data['speed'])+','+f(data['spawnX'])
                 +','+f(data['spawnY'])+','+f(data.get('crouchSpawnY',data['spawnY']))+','+f(data.get('airSpawnY',data['spawnY']))+')')
     lines = ['package com.gamelutagpt;', 'import java.util.*;',
              '/** Generated by build_characters.py. Edit character packs, not this file. */',
@@ -210,16 +320,17 @@ def compile_packs(root, results):
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
             pose = q(m['pose']) if 'pose' in m else 'null'
             height = m.get('hitHeight', 42 if key.startswith('2') else 78)
-            lines += [' m.put('+q(key)+',new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+str(m['damage'])+','+f(m['totalMs']/1000)+','+f(m['activeStartMs']/1000)+','+f(m['activeEndMs']/1000)+','+f(m['reach'])+','+f(height)+'));']
+            lines += [' m.put('+q(key)+',new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+attack(key,m,'NORMAL',m['damage'],m['reach'],height)+'));']
         for key,animation in pack.get('specialAnimations',{}).items():
             lines += [' s.put('+q(key)+',a.get('+q(animation)+'));']
         p = pack['_profile'];fi = pack['fighter'];body = fi['body']
         profile = 'new CharacterVisualProfile('+','.join([q(p['id']),str(p['baseFrameWidth']),str(p['baseFrameHeight']),f(p['preferredRootX']),f(p['preferredRootY']),f(p['worldScale'])])+')'
         energy = fi.get('energy')
         fighter = ('new CharacterDefinition.Fighter(0xFF'+fi['color'][1:].upper()+','+str(fi['maxLife'])
-                   +',new String[]{'+','.join(q(b) for b in fi['autoCombo'])+'},'+projectile(energy)
-                   +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'))
-                   +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+'))')
+                   +',new String[]{'+','.join(q(b) for b in fi['autoCombo'])+'},'+projectile(energy,'S')
+                   +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'),'SUPER')
+                   +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+')'
+                   +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')+')')
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']

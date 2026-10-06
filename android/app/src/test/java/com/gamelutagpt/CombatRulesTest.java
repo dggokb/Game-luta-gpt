@@ -49,18 +49,29 @@ public class CombatRulesTest {
     }
     @Test public void animationIsStretchedToGameplayDurationNotTheOtherWayAround() {
         CharacterDefinition.Animation jab=BASE.animation("LIGHT_JAB");
-        CharacterDefinition.Move slow=new CharacterDefinition.Move("L",jab,null,300,jab.duration*2,.1f,.2f,84,78);
+        // 20 frames: twice the art's 160 ms.
+        AttackDefinition attack=new AttackDefinition.Builder("L",AttackDefinition.Kind.NORMAL).damage(300)
+            .frames(6,6,8).stun(12,8,5).windows(null,null,null).pushback(0f,0f).reach(84f,78f).build();
+        CharacterDefinition.Move slow=new CharacterDefinition.Move("L",jab,null,attack);
+        assertEquals(20f/60f,slow.totalTime,1e-6f);
         assertEquals(jab.duration,slow.animationTime(slow.totalTime),1e-5f);
         assertEquals(jab.duration/2,slow.animationTime(slow.totalTime/2),1e-5f);
     }
-    @Test public void threatWindowMatchesLegacyPhaseForPoseMoves() {
+    @Test public void threatWindowLeadsAndTrailsTheActiveFramesForPoseMoves() {
         CharacterDefinition.Move m=GeneratedCharacters.get("player_two").moves.get("2H");
         assertNull("player_two keeps the pose fallback",m.animation);
-        // Legacy anticipated guard: 20%..80% of the attack.
-        assertFalse(m.threatening(.19f*m.totalTime));
-        assertTrue(m.threatening(.21f*m.totalTime));
-        assertTrue(m.threatening(.79f*m.totalTime));
-        assertFalse(m.threatening(.81f*m.totalTime));
+        // Anticipated guard: 16% of the move before the first and after the last active frame.
+        float lead=.16f*m.totalTime;
+        assertFalse(m.threatening(m.activeStart-lead-.002f));
+        assertTrue(m.threatening(m.activeStart-lead+.002f));
+        assertTrue(m.threatening(m.activeEnd+lead-.002f));
+        assertFalse(m.threatening(m.activeEnd+lead+.002f));
+        AttackDefinition a=m.attack;
+        int frames=Math.round(.16f*a.totalFrames);
+        assertFalse(a.threatening(a.startupFrames-frames-1));
+        assertTrue(a.threatening(a.startupFrames-frames));
+        assertTrue(a.threatening(a.lastActiveFrame()+1+frames));
+        assertFalse(a.threatening(a.lastActiveFrame()+2+frames));
     }
     @Test public void opponentUsesItsOwnFighterRules() {
         assertEquals("Brutamonte",NPC.displayName);

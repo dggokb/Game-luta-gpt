@@ -49,21 +49,25 @@ final class CharacterDefinition {
         }
     }
     /**
-     * Frame data of one input. Gameplay timing (totalTime/active window) belongs to the
-     * move; the animation, when present, is stretched to fit it. A move without art keeps
-     * a declared body pose instead.
+     * One input: its combat definition plus what the body shows. Gameplay timing comes
+     * from the attack's frames; the animation, when present, is stretched to fit it. A move
+     * without art keeps a declared body pose instead.
      */
     static final class Move {
         final String binding;
         final Animation animation;
         final String pose;
+        final AttackDefinition attack;
         final int damage;
+        /** Seconds, derived from the attack frames (animation stretch, AI, legacy checks). */
         final float totalTime,activeStart,activeEnd,reach,hitHeight;
-        Move(String binding,Animation animation,String pose,int damage,float totalTime,
-             float activeStart,float activeEnd,float reach,float hitHeight) {
-            this.binding=binding;this.animation=animation;this.pose=pose;this.damage=damage;
-            this.totalTime=totalTime;this.activeStart=activeStart;this.activeEnd=activeEnd;
-            this.reach=reach;this.hitHeight=hitHeight;
+        Move(String binding,Animation animation,String pose,AttackDefinition attack) {
+            this.binding=binding;this.animation=animation;this.pose=pose;this.attack=attack;
+            this.damage=attack.damage;
+            this.totalTime=attack.totalFrames/(float)CombatConfig.FPS;
+            this.activeStart=attack.startupFrames/(float)CombatConfig.FPS;
+            this.activeEnd=(attack.startupFrames+attack.activeFrames)/(float)CombatConfig.FPS;
+            this.reach=attack.reach;this.hitHeight=attack.hitHeight;
         }
         boolean active(float elapsed) { return elapsed+0.000001f>=activeStart && elapsed<activeEnd; }
         /** Window where a defender sees the strike coming (used by anticipated guard). */
@@ -78,8 +82,10 @@ final class CharacterDefinition {
         final float range,speed;
         /** Launch point: forward offset from the root and heights above the ground. */
         final float spawnX,spawnY,crouchSpawnY,airSpawnY;
-        Projectile(int damage,float range,float speed,float spawnX,float spawnY,float crouchSpawnY,float airSpawnY) {
-            this.damage=damage;this.range=range;this.speed=speed;
+        /** The S/SUPER move that throws it; its stun data applies when the projectile hits. */
+        final AttackDefinition attack;
+        Projectile(AttackDefinition attack,float range,float speed,float spawnX,float spawnY,float crouchSpawnY,float airSpawnY) {
+            this.attack=attack;this.damage=attack.damage;this.range=range;this.speed=speed;
             this.spawnX=spawnX;this.spawnY=spawnY;this.crouchSpawnY=crouchSpawnY;this.airSpawnY=airSpawnY;
         }
         float spawnHeight(boolean crouching,boolean airborne) {
@@ -104,11 +110,14 @@ final class CharacterDefinition {
         final Projectile energy,superAttack;
         final int[] energyCommand;
         final Body body;
+        /** Which buffered press wins when several are valid (most important first). */
+        final AttackDefinition.Strength[] inputPriority;
         Fighter(int color,int maxLife,String[] autoCombo,Projectile energy,
-                int[] energyCommand,Projectile superAttack,Body body) {
+                int[] energyCommand,Projectile superAttack,Body body,AttackDefinition.Strength[] inputPriority) {
             this.color=color;this.maxLife=maxLife;
             this.autoCombo=autoCombo.clone();this.energy=energy;this.energyCommand=energyCommand.clone();
             this.superAttack=superAttack;this.body=body;
+            this.inputPriority=inputPriority==null?CombatConfig.DEFAULT_PRIORITY.clone():inputPriority.clone();
         }
         boolean hasEnergyAttack() { return energy!=null; }
         boolean hasSuperAttack() { return superAttack!=null; }
@@ -132,11 +141,49 @@ final class CharacterDefinition {
         this.animations=Collections.unmodifiableMap(new LinkedHashMap<>(animations));
         this.moves=Collections.unmodifiableMap(new LinkedHashMap<>(moves));
         this.specialAnimations=Collections.unmodifiableMap(new LinkedHashMap<>(specialAnimations));
+        validateCombat();
     }
     /** Copy with different animations; used by tests and tooling. */
     CharacterDefinition withAnimations(String id,Map<String,Animation> animations) {
         return new CharacterDefinition(id,id,profile,artFacing,visualStandHeight,visualCrouchHeight,
             fighter,animations,moves,specialAnimations);
+    }
+    /** Combat definition of a binding, S or SUPER; null when the character lacks it. */
+    AttackDefinition attack(String id) {
+        if("S".equals(id))return fighter.energy==null?null:fighter.energy.attack;
+        if("SUPER".equals(id))return fighter.superAttack==null?null:fighter.superAttack.attack;
+        Move move=moves.get(id);
+        return move==null?null:move.attack;
+    }
+    /**
+     * Load-time validation of the combat data: every cancel route points to an existing
+     * move of the same height (ground/air) and the auto-combo is a declared route.
+     */
+    private void validateCombat() {
+        java.util.List<String> ids=new java.util.ArrayList<>(moves.keySet());
+        if(fighter.energy!=null)ids.add("S");
+        if(fighter.superAttack!=null)ids.add("SUPER");
+        for(String id:ids) {
+            AttackDefinition a=attack(id);
+            if(!a.id.equals(id))throw new IllegalArgumentException(this.id+"/"+id+": attack id mismatch "+a.id);
+            boolean air=id.startsWith("j");
+            for(String target:a.cancelInto()) {
+                if(AttackDefinition.JUMP.equals(target)) {
+                    if(air)throw new IllegalArgumentException(this.id+"/"+id+": an air move cannot jump-cancel");
+                    continue;
+                }
+                if(attack(target)==null)
+                    throw new IllegalArgumentException(this.id+"/"+id+": cancelInto "+target+" does not exist");
+                boolean special="S".equals(target)||"SUPER".equals(target);
+                if(!special && target.startsWith("j")!=air)
+                    throw new IllegalArgumentException(this.id+"/"+id+": cancelInto "+target+" changes ground/air");
+            }
+        }
+        for(int i=0;i+1<fighter.autoCombo.length;i++) {
+            if(!attack(fighter.autoCombo[i]).cancelsInto(fighter.autoCombo[i+1]))
+                throw new IllegalArgumentException(this.id+": autoCombo "+fighter.autoCombo[i]+" -> "
+                    +fighter.autoCombo[i+1]+" is not a declared cancel route");
+        }
     }
     Animation animation(String id) {
         Animation value=animations.get(id);

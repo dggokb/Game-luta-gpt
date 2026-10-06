@@ -19,6 +19,7 @@ final class HudRenderer {
         String stateLabel();
         int facing();
         boolean aiEnabled();
+        boolean debugEnabled();
         /** 0 while tagging, rising to 1 when the tag is ready. */
         float tagReadyRatio();
         String tagCooldownLabel();
@@ -109,33 +110,66 @@ final class HudRenderer {
         paint.setTextSize(14f);
         c.drawText(s.facing() > 0 ? "FACING: →" : "FACING: ←", 975, 106, paint);
 
-        drawAiToggle(c, s.aiEnabled());
+        drawToggle(c, s.aiEnabled(), s.aiEnabled() ? "IA ON" : "IA OFF",
+            AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 19f);
+        drawToggle(c, s.debugEnabled(), s.debugEnabled() ? "DEBUG ON" : "DEBUG OFF",
+            DEBUG_BUTTON_LEFT, DEBUG_BUTTON_TOP, DEBUG_BUTTON_RIGHT, DEBUG_BUTTON_BOTTOM, 16f);
     }
 
-    private void drawAiToggle(Canvas c, boolean enabled) {
+    private void drawToggle(Canvas c, boolean enabled, String label,
+                            float left, float top, float right, float bottom, float textSize) {
         paint.setColor(enabled ? Color.rgb(74, 205, 232) : Color.argb(180, 45, 53, 62));
-        c.drawRoundRect(AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 12f, 12f, paint);
+        c.drawRoundRect(left, top, right, bottom, 12f, 12f, paint);
 
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2.5f);
         paint.setColor(Color.WHITE);
-        c.drawRoundRect(AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 12f, 12f, paint);
+        c.drawRoundRect(left, top, right, bottom, 12f, 12f, paint);
         paint.setStyle(Paint.Style.FILL);
 
         paint.setColor(enabled ? Color.rgb(18, 35, 48) : Color.WHITE);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
-        paint.setTextSize(19f);
-        float cy = (AI_BUTTON_TOP + AI_BUTTON_BOTTOM) * 0.5f;
-        c.drawText(
-            enabled ? "IA ON" : "IA OFF",
-            (AI_BUTTON_LEFT + AI_BUTTON_RIGHT) * 0.5f,
-            cy - (paint.ascent() + paint.descent()) * 0.5f,
-            paint
-        );
+        paint.setTextSize(textSize);
+        float cy = (top + bottom) * 0.5f;
+        c.drawText(label, (left + right) * 0.5f, cy - (paint.ascent() + paint.descent()) * 0.5f, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
+
+    /** Frames the result of a finished combo stays on screen. */
+    static final int COMBO_LINGER_FRAMES = 60;
+
+    /**
+     * Combo counter of one ComboSession: hits, damage and current scaling. The left side
+     * shows the player's combos, the right side the CPU's. Single hits are not combos.
+     */
+    void drawCombo(Canvas c, ComboSession active, ComboSession last, int framesSinceEnd, boolean leftSide) {
+        ComboSession combo = active;
+        int alpha = 255;
+        if (combo == null && last != null && framesSinceEnd < COMBO_LINGER_FRAMES) {
+            combo = last;
+            alpha = Math.round(255f * (1f - framesSinceEnd / (float)COMBO_LINGER_FRAMES));
+        }
+        if (combo == null || combo.hitCount < 2) return;
+        reset();
+        float x = leftSide ? 40f : VW_RIGHT;
+        paint.setTextAlign(leftSide ? Paint.Align.LEFT : Paint.Align.RIGHT);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(46f);
+        paint.setColor(Color.argb(alpha, 255, 214, 92));
+        c.drawText(combo.hitCount + " HITS", x, 300f, paint);
+        paint.setTextSize(18f);
+        paint.setColor(Color.argb(alpha, 255, 255, 255));
+        c.drawText("DANO " + combo.comboDamage + "  •  ESCALA " + combo.damageScale / 10 + "%", x, 326f, paint);
+        if (combo.airCombo) {
+            c.drawText("JUGGLE " + combo.juggleCount, x, 348f, paint);
+        }
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private static final float VW_RIGHT = Arena.VW - 40f;
 
     private void drawSuperMeter(
         Canvas c,
@@ -157,7 +191,7 @@ final class HudRenderer {
             paint.setColor(Color.rgb(45, 53, 62));
             c.drawRoundRect(segmentLeft, top, segmentRight, bottom, 4f, 4f, paint);
 
-            float fill = Arena.clamp(fighter.superMeter - i, 0f, 1f);
+            float fill = Arena.clamp(fighter.superBars() - i, 0f, 1f);
             if (fill > 0f) {
                 paint.setColor(fighter.profile.color);
                 c.drawRoundRect(segmentLeft, top, segmentLeft + segmentWidth * fill, bottom, 4f, 4f, paint);

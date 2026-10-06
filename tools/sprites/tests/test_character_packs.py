@@ -41,9 +41,30 @@ class CharacterPackTests(unittest.TestCase):
     def test_missing_movement_state_is_rejected(self):
         self.edit(lambda d:d['animations'].pop('JUMP'))
         with self.assertRaisesRegex(ValueError,'missing states'):pipeline.build(self.root)
-    def test_active_window_outside_animation_is_rejected(self):
-        self.edit(lambda d:d['moves']['L'].update(activeEndMs=900))
-        with self.assertRaisesRegex(ValueError,'active window outside totalMs'):pipeline.build(self.root)
+    def test_cancel_window_outside_the_move_is_rejected(self):
+        self.edit(lambda d:d['moves']['L']['cancelWindows'].update(hit=[2,90]))
+        with self.assertRaisesRegex(ValueError,'L.cancelWindows.hit.*outside the move'):pipeline.build(self.root)
+    def test_hit_window_cannot_open_before_contact(self):
+        self.edit(lambda d:d['moves']['H']['cancelWindows'].update(block=[0,12]))
+        with self.assertRaisesRegex(ValueError,'H.cancelWindows.block'):pipeline.build(self.root)
+    def test_millisecond_timing_of_schema_2_is_rejected(self):
+        self.edit(lambda d:d['moves']['L'].update(totalMs=160))
+        with self.assertRaisesRegex(ValueError,'replaced by frame data'):pipeline.build(self.root)
+    def test_cancel_route_must_point_to_an_existing_move(self):
+        self.edit(lambda d:d['moves']['M']['cancelInto'].append('LIGHT_2'))
+        with self.assertRaisesRegex(ValueError,'cancelInto LIGHT_2 does not exist'):pipeline.build(self.root)
+    def test_cancel_route_cannot_cross_ground_and_air(self):
+        self.edit(lambda d:d['moves']['jL']['cancelInto'].append('M'))
+        with self.assertRaisesRegex(ValueError,'changes ground/air'):pipeline.build(self.root)
+    def test_auto_combo_must_be_a_declared_route(self):
+        self.edit(lambda d:d['fighter'].update(autoCombo=['H','L']))
+        with self.assertRaisesRegex(ValueError,'autoCombo H -> L is not a declared cancel route'):pipeline.build(self.root)
+    def test_frame_data_is_compiled_into_attack_definitions(self):
+        pipeline.build(self.root)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('new AttackDefinition.Builder("2H",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9)',java)
+        self.assertIn('.launch(AttackDefinition.Launch.LAUNCH)',java)
+        self.assertIn('new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER)',java)
     def test_unknown_atlas_is_rejected(self):
         self.edit(lambda d:d['animations']['IDLE'].update(atlas='missing'))
         with self.assertRaisesRegex(ValueError,'unknown atlas'):pipeline.build(self.root)

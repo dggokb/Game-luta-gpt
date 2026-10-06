@@ -8,7 +8,8 @@ final class FighterState {
     final String hudTitle;
     final String reserveHudLabel;
     int life;
-    float superMeter;
+    /** Super meter in thousandths of a bar (0..CombatConfig.MAX_METER); integer for determinism. */
+    int superMeter;
     String lifeHudLabel;
     String superHudLabel;
     String superLevelHudLabel;
@@ -19,17 +20,27 @@ final class FighterState {
         this.hudTitle = slotLabel + " · " + character.displayName;
         this.reserveHudLabel = "RESERVA: " + character.displayName;
         this.life = profile.maxLife;
-        this.superMeter = 0f;
+        this.superMeter = 0;
+        refreshHudLabels();
+    }
+
+    float superBars() {
+        return superMeter / (float)CombatConfig.METER_PER_BAR;
+    }
+
+    void addSuperMeter(int amount) {
+        if (amount <= 0) return;
+        superMeter = Math.min(CombatConfig.MAX_METER, superMeter + amount);
         refreshHudLabels();
     }
 
     void refreshHudLabels() {
-        int level = (int)Math.floor(superMeter);
+        int level = superMeter / CombatConfig.METER_PER_BAR;
         lifeHudLabel = "HP " + life + " / " + profile.maxLife;
         superHudLabel = String.format(
             java.util.Locale.US,
             "SUPER %.2f / 5  •  LV %d",
-            superMeter,
+            superBars(),
             level
         );
         superLevelHudLabel = "LV " + level;

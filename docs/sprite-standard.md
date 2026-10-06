@@ -135,10 +135,17 @@ Exemplo de animação de quatro frames e vínculo L:
 "L": {
   "animation": "CUSTOM_PUNCH",
   "damage": 300,
-  "totalMs": 160,
-  "activeStartMs": 40,
-  "activeEndMs": 100,
-  "reach": 84
+  "reach": 84,
+  "startupFrames": 2,
+  "activeFrames": 4,
+  "recoveryFrames": 4,
+  "hitstunFrames": 12,
+  "blockstunFrames": 9,
+  "hitstopFrames": 5,
+  "cancelWindows": {"hit": [2, 8], "block": [2, 8], "whiff": null},
+  "cancelInto": ["L", "M", "2L"],
+  "pushbackOnHit": 24,
+  "pushbackOnBlock": 30
 }
 ```
 
@@ -147,17 +154,19 @@ O pack declara **todos** os nove inputs: `L`, `M`, `H`, `2L`, `2M`, `2H`, `jL`, 
 golpe declara a postura mantida: `"pose": "CROUCH"` para 2X e `"pose": "AIR"` para jX.
 Não há empréstimo implícito de L/M/H.
 
-O tempo de gameplay vem de `totalMs`, não da arte: a animação é esticada para caber
-nele, mantendo a proporção entre frames. Retocar durações de frame muda só o visual.
-Dano só é permitido em `activeStartMs <= tempo < activeEndMs`, uma vez por execução.
-Startup e recovery não acertam.
+Desde o schema 3 (v0.72) o tempo de gameplay vem do frame data a 60 fps
+(`startupFrames + activeFrames + recoveryFrames`), não da arte: a animação é esticada
+para caber, mantendo a proporção entre frames. Retocar durações de frame muda só o
+visual. `totalMs`/`activeStartMs`/`activeEndMs` foram removidos e reprovam o build.
+Dano só acontece nos frames ativos, no máximo `maxHits` vezes por execução. Os demais
+campos (hitstun, cancelamentos, pushback, juggle, lançamento, hitboxes por frame) estão
+descritos em `docs/combat-engine.md`.
 
 `reach` é a distância da raiz do atacante até a ponta do golpe; a meia-largura da
 hurtbox do alvo é somada na colisão, então um lutador largo é atingido mais cedo.
 (Valores antigos centro-a-centro = `reach` + 34.) `hitHeight` (opcional) é a altura
-do golpe acima do chão: padrão 42 para 2X e 78 para o resto.
-
-Ainda não há comandos extras declarativos, cancel windows ou hitboxes por frame.
+do golpe acima do chão: padrão 42 para 2X e 78 para o resto. Sem `hitboxes`, o golpe usa
+uma caixa da raiz até `reach`, em `hitHeight` ± 19,5, em todos os frames ativos.
 
 ## Geometria, qualidade e raízes
 
