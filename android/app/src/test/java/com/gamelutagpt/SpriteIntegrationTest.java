@@ -90,7 +90,7 @@ public class SpriteIntegrationTest {
             first.animation("CROUCH_MEDIUM").atlas.resource);
         assertTrue(first.moves.containsKey("2M"));
         assertEquals("CROUCH_MEDIUM",first.moves.get("2M").animation.id);
-        assertEquals(384,first.animation("CROUCH_MEDIUM").atlas.frameWidth);
+        assertEquals(384,first.animation("CROUCH_MEDIUM").atlas.width);
         assertEquals(128,first.animation("CROUCH_MEDIUM").atlas.rootX);
 
         setup();set("grounded",true);set("crouching",true);
