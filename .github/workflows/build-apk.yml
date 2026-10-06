@@ -65,7 +65,7 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
-        run: gradle testDebugUnitTest :ultra-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+        run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

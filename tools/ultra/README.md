@@ -97,12 +97,12 @@ Som que não existe é ignorado. O jogo funciona mudo até os sons chegarem.
 
 ## Ver no PC
 
-O motor (`android/ultra-core`) é Java puro e roda igual no Android e no PC. O visualizador mostra a cinemática numa janela:
+O motor (`android/ultra-core`) é Java puro e roda igual no Android e no PC. Como ele funciona por dentro (linha do tempo, camadas do desenho, como portar): `docs/ultra-pagina-final.md`. O visualizador mostra a cinemática numa janela:
 
 ```bash
 cd android
-gradle :ultra-preview:run                                             # ultra provisório
-gradle :ultra-preview:run --args="app/src/main/assets/ultras/player_base" # ultra de verdade
+gradle :pc-preview:run                                                # ultra provisório
+gradle :pc-preview:run --args="app/src/main/assets/ultras/player_base" # ultra de verdade
 ```
 
 Na janela, **clique ou espaço** é o toque e **R** repete. Com `--quadros saida/` o visualizador grava os quadros em PNG em vez de abrir a janela.

@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.75-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.76-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -133,8 +133,25 @@ e cai derrubado.
 
 - `android/ultra-core/`: motor da cinemática em Java puro (roda no Android e no PC), com
   testes em `gradle :ultra-core:test`.
-- `android/ultra-preview/`: visualizador no PC, `gradle :ultra-preview:run`.
+- `android/pc-preview/`: visualizador no PC, `gradle :pc-preview:run`.
 - `android/app/src/main/assets/ultras/<id do personagem>/`: `ultra.json` (nome, cores,
   dano, onomatopeias), as 5 imagens e os sons opcionais.
 - `tools/ultra/`: prompts fixos e o script que prepara a arte gerada por IA. O guia
   completo está em [tools/ultra/README.md](tools/ultra/README.md).
+
+## Cenário com falso 3D — v0.76
+
+O fundo virou **camadas com profundidade** projetadas pela câmera da luta: o que está longe
+anda e cresce menos, o piso é desenhado em perspectiva ("line scroll") e luzes, fogo,
+água, neblina, pétalas em 3D e o reflexo dos lutadores no chão molhado são animados pelo
+jogo. A luta continua 2D. Primeiro cenário: **Templo da Lua**, com arte provisória
+esperando a arte do GPT.
+
+- `android/stage-core/`: motor de cenário em Java puro, com testes (`gradle :stage-core:test`).
+- `android/render-core/`: base de desenho compartilhada pelo cenário e pelo ultra (é o que
+  cada plataforma implementa no port para PC).
+- `android/app/src/main/assets/stages/templo_lua/`: `stage.json` e as camadas.
+- Visualizador no PC com câmera de luta simulada: `gradle :pc-preview:runStage --args="app/src/main/assets/stages/templo_lua"`.
+- O jogo agora desenha pela GPU no Android 8+ (`lockHardwareCanvas`), com reserva por software.
+- Como criar um cenário e os prompts das camadas: [tools/stage/README.md](tools/stage/README.md).
+  Como funciona: `docs/stage-engine.md`. Cinemática do ultra por dentro: `docs/ultra-pagina-final.md`.
