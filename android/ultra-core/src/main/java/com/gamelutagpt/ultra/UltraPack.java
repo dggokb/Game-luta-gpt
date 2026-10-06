@@ -1,5 +1,7 @@
 package com.gamelutagpt.ultra;
 
+import com.gamelutagpt.render.RenderAssets;
+import com.gamelutagpt.render.RenderImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,25 +12,25 @@ public final class UltraPack {
     public static final String DEFINITION_FILE = "ultra.json";
 
     public final UltraDefinition definition;
-    private final UltraImage[] images;
+    private final RenderImage[] images;
     /** Problemas não fatais encontrados ao carregar (imagem faltando etc.). */
     public final List<String> warnings;
 
-    public UltraPack(UltraDefinition definition, UltraImage[] images, List<String> warnings) {
+    public UltraPack(UltraDefinition definition, RenderImage[] images, List<String> warnings) {
         this.definition = definition;
         this.images = images.clone();
         this.warnings = Collections.unmodifiableList(new ArrayList<>(warnings));
     }
 
     /** Imagem do painel, ou null quando ele usa a arte provisória. */
-    public UltraImage image(UltraSlot slot) {
+    public RenderImage image(UltraSlot slot) {
         return images[slot.ordinal()];
     }
 
     public static UltraPack placeholder(String name, int color) {
         return new UltraPack(
             UltraDefinition.placeholder(name, color),
-            new UltraImage[UltraSlot.values().length],
+            new RenderImage[UltraSlot.values().length],
             Collections.<String>emptyList()
         );
     }
@@ -37,12 +39,12 @@ public final class UltraPack {
      * Lê {@code pasta/ultra.json} e as imagens dos painéis. Imagem que não
      * carrega vira aviso e o painel cai na arte provisória.
      */
-    public static UltraPack load(UltraAssets assets, String folder) throws IOException {
+    public static UltraPack load(RenderAssets assets, String folder) throws IOException {
         String base = folder.endsWith("/") ? folder : folder + "/";
         UltraDefinition definition = UltraDefinition.fromJson(assets.readText(base + DEFINITION_FILE));
 
         List<String> warnings = new ArrayList<>();
-        UltraImage[] images = new UltraImage[UltraSlot.values().length];
+        RenderImage[] images = new RenderImage[UltraSlot.values().length];
         for (UltraSlot slot : UltraSlot.values()) {
             String path = definition.panel(slot).imagePath;
             if (path == null) continue;

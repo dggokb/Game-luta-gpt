@@ -2,7 +2,9 @@ pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal()
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name = 'GameLutaGPT'
 include ':app'
-// Motor do ultra em Java puro: o mesmo código roda no Android e no PC.
+// Motores visuais em Java puro: o mesmo código roda no Android e no PC.
+include ':render-core'
 include ':ultra-core'
-// Visualizador da cinemática no PC (gradle :ultra-preview:run).
-include ':ultra-preview'
+include ':stage-core'
+// Visualizador no PC (gradle :pc-preview:run, :pc-preview:runStage).
+include ':pc-preview'

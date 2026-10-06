@@ -1,5 +1,9 @@
 package com.gamelutagpt.ultra;
 
+import com.gamelutagpt.render.MiniJson;
+import com.gamelutagpt.render.RenderAssets;
+import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -37,7 +41,7 @@ public class PaginaFinalTest {
     }
 
     /** Canvas que não desenha nada, só valida que o render não quebra. */
-    private static final class NullCanvas implements UltraCanvas {
+    private static final class NullCanvas implements RenderCanvas {
         int depth;
         int layers;
 
@@ -53,7 +57,12 @@ public class PaginaFinalTest {
         @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
         @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
         @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) {}
-        @Override public void drawImage(UltraImage image, float l, float t, float r, float b, int alpha) {}
+        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {}
+        @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+            float l, float t, float r, float b, int alpha) {}
+        @Override public void fillRadialGlow(float cx, float cy, float radius, int argb) {}
+        @Override public void fillVerticalGradient(float l, float t, float r, float b, int top, int bottom) {}
+        @Override public void fillOval(float l, float t, float r, float b, int argb) {}
         @Override public void drawText(String text, float x, float y, float size, int fill, int stroke, float sw, boolean italic) {}
         @Override public void beginInvert() { layers++; }
         @Override public void endInvert() { layers--; }
@@ -170,7 +179,7 @@ public class PaginaFinalTest {
 
     @Test
     public void packLoadFallsBackWhenImageMissing() throws Exception {
-        UltraAssets assets = new UltraAssets() {
+        RenderAssets assets = new RenderAssets() {
             @Override
             public String readText(String path) {
                 assertEquals("ultras/p1/ultra.json", path);
@@ -178,7 +187,7 @@ public class PaginaFinalTest {
             }
 
             @Override
-            public UltraImage loadImage(String path) throws java.io.IOException {
+            public RenderImage loadImage(String path) throws java.io.IOException {
                 throw new java.io.IOException("não existe");
             }
         };

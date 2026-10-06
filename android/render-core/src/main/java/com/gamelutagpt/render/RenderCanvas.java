@@ -1,11 +1,11 @@
-package com.gamelutagpt.ultra;
+package com.gamelutagpt.render;
 
 /**
- * Tudo o que o motor precisa para desenhar. As coordenadas são sempre as
+ * Tudo o que os motores visuais (ultra, cenário) precisam para desenhar. As coordenadas são sempre as
  * virtuais do jogo (1280x720); cada plataforma converte para a tela real.
  * Cores são ARGB empacotadas em int.
  */
-public interface UltraCanvas {
+public interface RenderCanvas {
     void save();
 
     void restore();
@@ -32,7 +32,28 @@ public interface UltraCanvas {
     /** Linha com pontas arredondadas. */
     void drawLine(float x1, float y1, float x2, float y2, float width, int argb);
 
-    void drawImage(UltraImage image, float left, float top, float right, float bottom, int alpha);
+    void drawImage(RenderImage image, float left, float top, float right, float bottom, int alpha);
+
+    /** Desenha o recorte (em pixels da imagem) {@code src} esticado no retângulo de destino. */
+    void drawImageRegion(
+        RenderImage image,
+        float srcLeft,
+        float srcTop,
+        float srcRight,
+        float srcBottom,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        int alpha
+    );
+
+    /** Brilho circular: a cor no centro some até ficar transparente na borda. */
+    void fillRadialGlow(float cx, float cy, float radius, int argbCenter);
+
+    void fillVerticalGradient(float left, float top, float right, float bottom, int argbTop, int argbBottom);
+
+    void fillOval(float left, float top, float right, float bottom, int argb);
 
     /** Texto centralizado em (x, y), em negrito, com contorno opcional. */
     void drawText(

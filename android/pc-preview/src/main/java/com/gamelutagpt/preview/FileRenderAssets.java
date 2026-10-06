@@ -1,7 +1,7 @@
-package com.gamelutagpt.ultra.preview;
+package com.gamelutagpt.preview;
 
-import com.gamelutagpt.ultra.UltraAssets;
-import com.gamelutagpt.ultra.UltraImage;
+import com.gamelutagpt.render.RenderAssets;
+import com.gamelutagpt.render.RenderImage;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.nio.file.Files;
 import javax.imageio.ImageIO;
 
 /** Lê os arquivos do ultra direto do disco. */
-public final class FileUltraAssets implements UltraAssets {
+public final class FileRenderAssets implements RenderAssets {
     private final File root;
 
-    public FileUltraAssets(File root) {
+    public FileRenderAssets(File root) {
         this.root = root;
     }
 
@@ -23,7 +23,7 @@ public final class FileUltraAssets implements UltraAssets {
     }
 
     @Override
-    public UltraImage loadImage(String path) throws IOException {
+    public RenderImage loadImage(String path) throws IOException {
         BufferedImage image = ImageIO.read(new File(root, path));
         if (image == null) throw new IOException("formato de imagem não suportado");
         return new Java2DImage(image);

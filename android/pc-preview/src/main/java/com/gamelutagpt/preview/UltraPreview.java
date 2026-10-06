@@ -1,4 +1,4 @@
-package com.gamelutagpt.ultra.preview;
+package com.gamelutagpt.preview;
 
 import com.gamelutagpt.ultra.PaginaFinal;
 import com.gamelutagpt.ultra.UltraGrade;
@@ -8,8 +8,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -94,7 +94,7 @@ public final class UltraPreview {
     private void renderTo(Graphics2D g, int width, int height) {
         g.scale(width / VW, height / VH);
         drawFakeGame(g);
-        pagina.render(new Java2DUltraCanvas(g, width, height));
+        pagina.render(new Java2DRenderCanvas(g, width, height));
     }
 
     // ---------------------------------------------------------------- modos
@@ -192,7 +192,7 @@ public final class UltraPreview {
             pack = UltraPack.placeholder("EXPLOSÃO SOLAR", 0xFFF4B73B);
         } else {
             File dir = new File(folder).getAbsoluteFile();
-            pack = UltraPack.load(new FileUltraAssets(dir.getParentFile()), dir.getName());
+            pack = UltraPack.load(new FileRenderAssets(dir.getParentFile()), dir.getName());
             for (String warning : pack.warnings) System.out.println("aviso: " + warning);
         }
 

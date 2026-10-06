@@ -1,0 +1,8 @@
+plugins { id 'java-library' }
+
+// Base de desenho compartilhada (pincel, imagens, arquivos, JSON), sem dependências,
+// para os motores visuais rodarem igual no Android e no PC.
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

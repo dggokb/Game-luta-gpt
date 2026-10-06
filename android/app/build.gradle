@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 75
-        versionName '0.75-sprite-gpt-pack-v2'
+        versionCode 76
+        versionName '0.76-sprite-gpt-pack-v2'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
@@ -18,6 +18,8 @@ android {
 dependencies {
     // Ultra "Página Final": pure Java engine shared with the PC preview.
     implementation project(':ultra-core')
+    // Cenário com falso 3D, também Java puro.
+    implementation project(':stage-core')
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
 }

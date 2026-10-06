@@ -1,6 +1,6 @@
 plugins { id 'java-library' }
 
-// Java puro e sem Android, para rodar igual no Android e no PC.
+// Motor de cenário com falso 3D, em Java puro: roda igual no Android e no PC.
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8

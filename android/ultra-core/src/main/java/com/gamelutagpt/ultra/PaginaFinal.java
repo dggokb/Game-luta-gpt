@@ -1,5 +1,8 @@
 package com.gamelutagpt.ultra;
 
+import com.gamelutagpt.render.Rand;
+import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +12,7 @@ import java.util.List;
  * golpe final e a página estilhaça de volta para a luta.
  *
  * Não depende de plataforma: o jogo chama {@link #update(float)},
- * {@link #render(UltraCanvas)} e {@link #tap()}, e recebe os acertos e o
+ * {@link #render(RenderCanvas)} e {@link #tap()}, e recebe os acertos e o
  * fim pela {@link UltraListener}. Não é thread-safe: chame tudo da mesma
  * thread do loop do jogo.
  */
@@ -298,7 +301,7 @@ public final class PaginaFinal {
 
     // ------------------------------------------------------------ render
 
-    public void render(UltraCanvas c) {
+    public void render(RenderCanvas c) {
         if (!active) return;
 
         boolean invert = invertTimer > 0f;
@@ -327,7 +330,7 @@ public final class PaginaFinal {
         }
     }
 
-    private void drawPage(UltraCanvas c) {
+    private void drawPage(RenderCanvas c) {
         int paperAlpha = (int)(255f * ArteProvisoria.clamp01(time / PAGE_FADE));
         c.fillRect(-60f, -60f, VW + 60f, VH + 60f, ArteProvisoria.withAlpha(PAPER, paperAlpha));
 
@@ -355,7 +358,7 @@ public final class PaginaFinal {
         }
     }
 
-    private void drawPanel(UltraCanvas c, UltraSlot slot, float[] poly, float age) {
+    private void drawPanel(RenderCanvas c, UltraSlot slot, float[] poly, float age) {
         float t = ArteProvisoria.clamp01(age / SLAM_DURATION);
         float u = 1f - t;
         float cx = (poly[0] + poly[2] + poly[4] + poly[6]) * 0.25f;
@@ -381,7 +384,7 @@ public final class PaginaFinal {
         c.restore();
     }
 
-    private void drawPanelBody(UltraCanvas c, UltraSlot slot, float[] poly, float age) {
+    private void drawPanelBody(RenderCanvas c, UltraSlot slot, float[] poly, float age) {
         float l = Math.min(Math.min(poly[0], poly[2]), Math.min(poly[4], poly[6]));
         float r = Math.max(Math.max(poly[0], poly[2]), Math.max(poly[4], poly[6]));
         float t = Math.min(Math.min(poly[1], poly[3]), Math.min(poly[5], poly[7]));
@@ -395,7 +398,7 @@ public final class PaginaFinal {
     }
 
     /** Conteúdo do painel com movimento de câmera lento (zoom contínuo). */
-    private void drawSlotContent(UltraCanvas c, UltraSlot slot, float l, float t, float r, float b, float age) {
+    private void drawSlotContent(RenderCanvas c, UltraSlot slot, float l, float t, float r, float b, float age) {
         float cx = (l + r) * 0.5f;
         float cy = (t + b) * 0.5f;
         float zoom = slot == UltraSlot.FINAL
@@ -410,7 +413,7 @@ public final class PaginaFinal {
         c.scale(zoom, zoom, cx, cy);
         if (facing < 0) c.scale(-1f, 1f, cx, cy);
 
-        UltraImage image = pack.image(slot);
+        RenderImage image = pack.image(slot);
         if (image != null) {
             drawImageCover(c, image, l, t, r, b);
         } else {
@@ -426,7 +429,7 @@ public final class PaginaFinal {
         return -1f;
     }
 
-    private void drawImageCover(UltraCanvas c, UltraImage image, float l, float t, float r, float b) {
+    private void drawImageCover(RenderCanvas c, RenderImage image, float l, float t, float r, float b) {
         float boxW = r - l;
         float boxH = b - t;
         float scale = Math.max(boxW / image.width(), boxH / image.height());
@@ -437,7 +440,7 @@ public final class PaginaFinal {
         c.drawImage(image, x, y, x + w, y + h, 255);
     }
 
-    private void drawName(UltraCanvas c) {
+    private void drawName(RenderCanvas c) {
         if (time < NAME_AT) return;
         float t = ArteProvisoria.easeOutCubic(ArteProvisoria.clamp01((time - NAME_AT) / 0.18f));
         float offset = (1f - t) * 900f;
@@ -469,7 +472,7 @@ public final class PaginaFinal {
         return estimate <= width ? max : max * width / estimate;
     }
 
-    private void drawSfx(UltraCanvas c, UltraSlot slot, float at) {
+    private void drawSfx(RenderCanvas c, UltraSlot slot, float at) {
         if (at < 0f || time < at) return;
         String text = pack.definition.panel(slot).onomatopoeia;
         if (text == null || text.isEmpty()) return;
@@ -503,7 +506,7 @@ public final class PaginaFinal {
         c.restore();
     }
 
-    private void drawRing(UltraCanvas c) {
+    private void drawRing(RenderCanvas c) {
         if (detonateAt >= 0f || time < RING_START) return;
 
         float p = ArteProvisoria.clamp01((time - RING_START) / (TARGET_AT - RING_START));
@@ -525,7 +528,7 @@ public final class PaginaFinal {
         }
     }
 
-    private void drawCracks(UltraCanvas c) {
+    private void drawCracks(RenderCanvas c) {
         if (detonateAt < 0f) return;
         float grow = ArteProvisoria.clamp01((time - detonateAt) / 0.16f);
         rand.reset(9001);
@@ -548,7 +551,7 @@ public final class PaginaFinal {
         }
     }
 
-    private void drawShards(UltraCanvas c) {
+    private void drawShards(RenderCanvas c) {
         float age = time - shatterTime;
         float detonationAge = time - detonateAt;
         art.lite = true;
@@ -571,7 +574,7 @@ public final class PaginaFinal {
         art.lite = false;
     }
 
-    private void drawGrade(UltraCanvas c) {
+    private void drawGrade(RenderCanvas c) {
         if (gradeTimer <= 0f || grade == UltraGrade.NENHUM) return;
         float age = 1.0f - gradeTimer;
         float pop = ArteProvisoria.easeOutCubic(ArteProvisoria.clamp01(age / 0.12f));

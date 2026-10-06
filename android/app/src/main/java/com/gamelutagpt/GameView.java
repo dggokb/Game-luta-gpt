@@ -4,10 +4,14 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.stage.StagePack;
+import com.gamelutagpt.stage.StageScene;
+import com.gamelutagpt.stage.StageWorld;
 import com.gamelutagpt.ultra.PaginaFinal;
 import com.gamelutagpt.ultra.UltraDefinition;
 import com.gamelutagpt.ultra.UltraGrade;
@@ -89,7 +93,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float ULTRA_STARTUP_ZOOM = 0.30f;
     private final UltraPack[] ultraPacks = new UltraPack[team.length];
     private final PaginaFinal paginaFinal = new PaginaFinal(this);
-    private final AndroidUltraCanvas ultraCanvas = new AndroidUltraCanvas();
+    /** Pincel do Canvas do quadro atual para os motores visuais (cenário e ultra). */
+    private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
+
+    // Cenário com falso 3D (stage-core). Sem ele, o StageRenderer antigo desenha o fundo.
+    private static final String STAGE_FOLDER = "stages/templo_lua";
+    private final StageScene stageScene;
+    /** Desenho pela GPU (Android 8+); cai para o Canvas por software se falhar. */
+    private boolean hardwareCanvas = Build.VERSION.SDK_INT >= 26;
     private final UltraSounds ultraSounds;
     private int ultraAttacker = -1;
     private int ultraDamageDealt;
@@ -153,7 +164,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         ultraSounds = new UltraSounds(context.getAssets());
-        AndroidUltraAssets ultraAssets = new AndroidUltraAssets(context.getAssets());
+        AndroidRenderAssets ultraAssets = new AndroidRenderAssets(context.getAssets());
+        stageScene = loadStage(ultraAssets);
         for (int i = 0; i < team.length; i++) {
             ultraPacks[i] = loadUltraPack(ultraAssets, team[i]);
             ultraSounds.loadUltra(ultraFolder(team[i]));
@@ -169,7 +181,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return "ultras/" + fighter.character.id;
     }
 
-    private static UltraPack loadUltraPack(AndroidUltraAssets assets, FighterState fighter) {
+    private static StageScene loadStage(AndroidRenderAssets assets) {
+        try {
+            StagePack pack = StagePack.load(assets, STAGE_FOLDER);
+            for (String warning : pack.warnings) Log.w(LOG_TAG, STAGE_FOLDER + ": " + warning);
+            StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CameraRig.CAMERA_ZOOM,
+                (PLAYER_START_X + OPPONENT_START_X) * 0.5f, CameraRig.CAMERA_GROUND_SCREEN_Y);
+            return new StageScene(pack, world);
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "cenário " + STAGE_FOLDER + " indisponível, usando o fundo simples", ex);
+            return null;
+        }
+    }
+
+    private static UltraPack loadUltraPack(AndroidRenderAssets assets, FighterState fighter) {
         try {
             UltraPack pack = UltraPack.load(assets, ultraFolder(fighter));
             for (String warning : pack.warnings) Log.w(LOG_TAG, ultraFolder(fighter) + ": " + warning);
@@ -284,6 +309,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** One simulation frame: inputs, engine step, then presentation state. */
     private void update() {
+        if (stageScene != null) stageScene.update(FIXED_STEP);
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with finishUltra.
             paginaFinal.update(FIXED_STEP);
@@ -621,7 +647,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawFrame() {
         if (!holder.getSurface().isValid()) return;
-        Canvas canvas = holder.lockCanvas();
+        Canvas canvas = lockFrameCanvas();
         if (canvas == null) return;
 
         try {
@@ -650,10 +676,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
 
+            renderCanvas.begin(canvas);
+            if (stageScene != null) {
+                // The stage projects every layer with the same camera the fighters use.
+                stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
+                stageScene.drawBackground(renderCanvas);
+            }
+
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -renderCameraTop);
-            drawScenario(canvas);
+            if (stageScene == null) drawScenario(canvas);
+            drawFloorReflections(canvas);
             drawDamageDummy(canvas);
             effects.drawEnergyProjectiles(canvas, paint, engine.energyProjectiles);
             effects.drawSuperProjectiles(canvas, paint, engine.superProjectiles);
@@ -693,6 +727,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
+            if (stageScene != null) stageScene.drawForeground(renderCanvas);
 
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
@@ -700,14 +735,45 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 drawControls(canvas);
             }
             if (paginaFinal.isActive()) {
-                ultraCanvas.begin(canvas);
-                paginaFinal.render(ultraCanvas);
+                paginaFinal.render(renderCanvas);
             }
 
             canvas.restore();
         } finally {
             holder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    private Canvas lockFrameCanvas() {
+        if (hardwareCanvas && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                return holder.lockHardwareCanvas();
+            } catch (RuntimeException ex) {
+                Log.w(LOG_TAG, "Canvas pela GPU indisponível, usando software", ex);
+                hardwareCanvas = false;
+            }
+        }
+        return holder.lockCanvas();
+    }
+
+    /** Wet floor: each fighter mirrored around the ground line, faded. */
+    private void drawFloorReflections(Canvas c) {
+        float strength = stageScene != null ? stageScene.fighterReflection() : 0f;
+        if (strength <= 0f) return;
+        int alpha = Math.round(255f * strength);
+        CombatFighter npc = opponent();
+        drawReflection(c, opponentSpriteRenderer, npc, 0f, alpha);
+        drawReflection(c, spriteFighterRenderer, player(), tagVisualOffsetX, alpha);
+    }
+
+    private void drawReflection(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX, int alpha) {
+        c.save();
+        c.translate(offsetX, 0f);
+        c.scale(1f, -1f, 0f, GROUND_Y);
+        int layer = c.saveLayerAlpha(f.x - 280f, f.y - 520f, f.x + 280f, f.y + 30f, alpha);
+        drawFighter(c, renderer, f, false, false);
+        c.restoreToCount(layer);
+        c.restore();
     }
 
     private void resetPaintForFrame() {

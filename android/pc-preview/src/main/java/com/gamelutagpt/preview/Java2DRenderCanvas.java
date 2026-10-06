@@ -1,13 +1,15 @@
-package com.gamelutagpt.ultra.preview;
+package com.gamelutagpt.preview;
 
-import com.gamelutagpt.ultra.UltraCanvas;
-import com.gamelutagpt.ultra.UltraImage;
+import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.font.GlyphVector;
@@ -20,8 +22,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-/** Implementação do {@link UltraCanvas} para PC, com Java2D. */
-public final class Java2DUltraCanvas implements UltraCanvas {
+/** Implementação do {@link RenderCanvas} para PC, com Java2D. */
+public final class Java2DRenderCanvas implements RenderCanvas {
     private static final class State {
         final AffineTransform transform;
         final Shape clip;
@@ -53,7 +55,7 @@ public final class Java2DUltraCanvas implements UltraCanvas {
      * @param pixelWidth largura real em pixels do destino
      * @param pixelHeight altura real em pixels do destino
      */
-    public Java2DUltraCanvas(Graphics2D g, int pixelWidth, int pixelHeight) {
+    public Java2DRenderCanvas(Graphics2D g, int pixelWidth, int pixelHeight) {
         this.g = g;
         this.pixelWidth = pixelWidth;
         this.pixelHeight = pixelHeight;
@@ -141,7 +143,7 @@ public final class Java2DUltraCanvas implements UltraCanvas {
     }
 
     @Override
-    public void drawImage(UltraImage image, float left, float top, float right, float bottom, int alpha) {
+    public void drawImage(RenderImage image, float left, float top, float right, float bottom, int alpha) {
         BufferedImage source = ((Java2DImage)image).image;
         Composite previous = g.getComposite();
         if (alpha < 255) {
@@ -153,6 +155,56 @@ public final class Java2DUltraCanvas implements UltraCanvas {
         g.drawImage(source, 0, 0, null);
         g.setTransform(saved);
         g.setComposite(previous);
+    }
+
+    @Override
+    public void drawImageRegion(
+        RenderImage image,
+        float srcLeft,
+        float srcTop,
+        float srcRight,
+        float srcBottom,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        int alpha
+    ) {
+        BufferedImage source = ((Java2DImage)image).image;
+        int sx0 = Math.max(0, Math.round(srcLeft));
+        int sy0 = Math.max(0, Math.round(srcTop));
+        int sx1 = Math.min(source.getWidth(), Math.round(srcRight));
+        int sy1 = Math.min(source.getHeight(), Math.round(srcBottom));
+        if (sx1 <= sx0 || sy1 <= sy0) return;
+        Composite previous = g.getComposite();
+        if (alpha < 255) g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha / 255f));
+        AffineTransform saved = g.getTransform();
+        g.translate(left, top);
+        g.scale((right - left) / (sx1 - sx0), (bottom - top) / (sy1 - sy0));
+        g.drawImage(source, 0, 0, sx1 - sx0, sy1 - sy0, sx0, sy0, sx1, sy1, null);
+        g.setTransform(saved);
+        g.setComposite(previous);
+    }
+
+    @Override
+    public void fillRadialGlow(float cx, float cy, float radius, int argbCenter) {
+        if (radius <= 0f) return;
+        g.setPaint(new RadialGradientPaint(cx, cy, radius, new float[] {0f, 1f},
+            new Color[] {new Color(argbCenter, true), new Color(argbCenter & 0x00FFFFFF, true)}));
+        g.fill(new Ellipse2D.Float(cx - radius, cy - radius, radius * 2f, radius * 2f));
+    }
+
+    @Override
+    public void fillVerticalGradient(float left, float top, float right, float bottom, int argbTop, int argbBottom) {
+        if (bottom <= top) return;
+        g.setPaint(new GradientPaint(0f, top, new Color(argbTop, true), 0f, bottom, new Color(argbBottom, true)));
+        g.fill(new Rectangle2D.Float(left, top, right - left, bottom - top));
+    }
+
+    @Override
+    public void fillOval(float left, float top, float right, float bottom, int argb) {
+        g.setColor(new Color(argb, true));
+        g.fill(new Ellipse2D.Float(left, top, right - left, bottom - top));
     }
 
     @Override

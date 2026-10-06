@@ -1,5 +1,8 @@
 package com.gamelutagpt.ultra;
 
+import com.gamelutagpt.render.Rand;
+import com.gamelutagpt.render.RenderCanvas;
+
 /**
  * Arte desenhada por código para cada painel. Serve para testar o ritmo
  * da cinemática antes de existir imagem, e também desenha os efeitos que
@@ -23,7 +26,7 @@ final class ArteProvisoria {
     // ---------------------------------------------------------------- arte
 
     void drawContent(
-        UltraCanvas c,
+        RenderCanvas c,
         UltraSlot slot,
         float l, float t, float r, float b,
         float age,
@@ -44,7 +47,7 @@ final class ArteProvisoria {
 
     /** Efeitos por cima do conteúdo (imagem ou provisório). */
     void drawOverlay(
-        UltraCanvas c,
+        RenderCanvas c,
         UltraSlot slot,
         float l, float t, float r, float b,
         float age,
@@ -80,7 +83,7 @@ final class ArteProvisoria {
         }
     }
 
-    private void drawOlhos(UltraCanvas c, float l, float t, float r, float b, float age, int color, int accent) {
+    private void drawOlhos(RenderCanvas c, float l, float t, float r, float b, float age, int color, int accent) {
         c.fillRect(l, t, r, b, 0xFF11131C);
         horizontalSpeedLines(c, l, t, r, b, age, withAlpha(color, 60), 18);
 
@@ -91,7 +94,7 @@ final class ArteProvisoria {
         drawEye(c, cx + 250f * k, cy, k, 1, color, accent, age);
     }
 
-    private void drawEye(UltraCanvas c, float ex, float ey, float k, int side, int color, int accent, float age) {
+    private void drawEye(RenderCanvas c, float ex, float ey, float k, int side, int color, int accent, float age) {
         float s = side * k;
         float[] eye = {
             ex - 150f * s, ey + 8f * k,
@@ -119,7 +122,7 @@ final class ArteProvisoria {
         c.drawLine(ex - 175f * s, ey - 46f * k, ex + 130f * s, ey - 88f * k, 20f * k, BLACK);
     }
 
-    private void drawCarga(UltraCanvas c, float l, float t, float r, float b, float age, int color, int accent) {
+    private void drawCarga(RenderCanvas c, float l, float t, float r, float b, float age, int color, int accent) {
         c.fillRect(l, t, r, b, mix(color, BLACK, 0.78f));
         float cx = (l + r) * 0.5f;
         float k = (b - t) / 436f;
@@ -144,7 +147,7 @@ final class ArteProvisoria {
         humanoidPower(c, cx, cy, k);
     }
 
-    private void humanoidPower(UltraCanvas c, float x, float y, float k) {
+    private void humanoidPower(RenderCanvas c, float x, float y, float k) {
         float w = 22f * k;
         // Pernas abertas.
         limb(c, x, y - 20f * k, x - 42f * k, y + 50f * k, x - 64f * k, y + 122f * k, w * 1.15f);
@@ -163,7 +166,7 @@ final class ArteProvisoria {
         c.drawLine(x + 4f * k, y - 152f * k, x + 15f * k, y - 156f * k, 4f * k, WHITE);
     }
 
-    private void drawGolpe(UltraCanvas c, float l, float t, float r, float b, float age, float fx, int color, int accent) {
+    private void drawGolpe(RenderCanvas c, float l, float t, float r, float b, float age, float fx, int color, int accent) {
         c.fillRect(l, t, r, b, mix(color, WHITE, 0.25f));
         float cx = (l + r) * 0.5f;
         float cy = (t + b) * 0.5f;
@@ -182,7 +185,7 @@ final class ArteProvisoria {
         c.drawLine(cx - fist * 0.8f, cy + fist * 0.15f, cx + fist * 0.7f, cy + fist * 0.05f, 4f * k, 0xFF55555C);
     }
 
-    private void drawAtingido(UltraCanvas c, float l, float t, float r, float b, float age, int color) {
+    private void drawAtingido(RenderCanvas c, float l, float t, float r, float b, float age, int color) {
         c.fillRect(l, t, r, b, 0xFFE9E5DA);
         float cx = (l + r) * 0.5f;
         float cy = (t + b) * 0.5f;
@@ -211,7 +214,7 @@ final class ArteProvisoria {
         }
     }
 
-    private void drawFinal(UltraCanvas c, float l, float t, float r, float b, float age, float burst, int color, int accent) {
+    private void drawFinal(RenderCanvas c, float l, float t, float r, float b, float age, float burst, int color, int accent) {
         c.fillRect(l, t, r, b, mix(color, BLACK, 0.86f));
         float h = b - t;
         float k = h / 720f;
@@ -259,20 +262,20 @@ final class ArteProvisoria {
 
     // ------------------------------------------------------------ primitivas
 
-    private void limb(UltraCanvas c, float x1, float y1, float x2, float y2, float x3, float y3, float width) {
+    private void limb(RenderCanvas c, float x1, float y1, float x2, float y2, float x3, float y3, float width) {
         limb(c, x1, y1, x2, y2, x3, y3, width, INK);
     }
 
-    private void limb(UltraCanvas c, float x1, float y1, float x2, float y2, float x3, float y3, float width, int color) {
+    private void limb(RenderCanvas c, float x1, float y1, float x2, float y2, float x3, float y3, float width, int color) {
         c.drawLine(x1, y1, x2, y2, width, color);
         c.drawLine(x2, y2, x3, y3, width * 0.9f, color);
     }
 
-    private void beam(UltraCanvas c, float x1, float x2, float cy, float halfHeight, int color) {
+    private void beam(RenderCanvas c, float x1, float x2, float cy, float halfHeight, int color) {
         c.fillRect(x1, cy - halfHeight, x2, cy + halfHeight, color);
     }
 
-    void radialLines(UltraCanvas c, float cx, float cy, float reach, int count, int color, float innerFraction) {
+    void radialLines(RenderCanvas c, float cx, float cy, float reach, int count, int color, float innerFraction) {
         for (int i = 0; i < count; i++) {
             float a = (float)(Math.PI * 2 * (i + rand.next() * 0.8f) / count);
             float inner = reach * (innerFraction + rand.next() * 0.12f);
@@ -282,7 +285,7 @@ final class ArteProvisoria {
         }
     }
 
-    private void horizontalSpeedLines(UltraCanvas c, float l, float t, float r, float b, float age, int color, int count) {
+    private void horizontalSpeedLines(RenderCanvas c, float l, float t, float r, float b, float age, int color, int count) {
         float w = r - l;
         for (int i = 0; i < count; i++) {
             float y = t + (b - t) * rand.next();
@@ -293,7 +296,7 @@ final class ArteProvisoria {
         }
     }
 
-    private void risingParticles(UltraCanvas c, float l, float t, float r, float b, float age, int color, int count) {
+    private void risingParticles(RenderCanvas c, float l, float t, float r, float b, float age, int color, int count) {
         float h = b - t;
         for (int i = 0; i < count; i++) {
             float x = l + (r - l) * rand.next();
@@ -304,7 +307,7 @@ final class ArteProvisoria {
         }
     }
 
-    void impactBurst(UltraCanvas c, float cx, float cy, float age, float size, int accent) {
+    void impactBurst(RenderCanvas c, float cx, float cy, float age, float size, int accent) {
         if (age > 0.35f) return;
         float e = easeOutCubic(clamp01(age / 0.18f));
         float fade = 1f - clamp01((age - 0.15f) / 0.20f);
@@ -313,7 +316,7 @@ final class ArteProvisoria {
     }
 
     /** Estrela de pontas (labareda/estouro). Devolve o polígono desenhado. */
-    float[] spikyStar(UltraCanvas c, float cx, float cy, float outer, float inner, int points, float spin, int color) {
+    float[] spikyStar(RenderCanvas c, float cx, float cy, float outer, float inner, int points, float spin, int color) {
         float[] poly = new float[points * 4];
         for (int i = 0; i < points * 2; i++) {
             float a = spin + (float)(Math.PI * i / points);

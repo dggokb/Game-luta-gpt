@@ -1,9 +1,9 @@
-package com.gamelutagpt.ultra.preview;
+package com.gamelutagpt.preview;
 
-import com.gamelutagpt.ultra.UltraImage;
+import com.gamelutagpt.render.RenderImage;
 import java.awt.image.BufferedImage;
 
-final class Java2DImage implements UltraImage {
+final class Java2DImage implements RenderImage {
     final BufferedImage image;
 
     Java2DImage(BufferedImage image) {

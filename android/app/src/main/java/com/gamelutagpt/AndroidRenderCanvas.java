@@ -4,22 +4,28 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.LinearGradient;
 import android.graphics.Path;
+import android.graphics.RadialGradient;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.Typeface;
-import com.gamelutagpt.ultra.UltraCanvas;
-import com.gamelutagpt.ultra.UltraImage;
+import com.gamelutagpt.render.RenderCanvas;
+import com.gamelutagpt.render.RenderImage;
 
-/** Implementação do {@link UltraCanvas} em cima do Canvas do Android. */
-final class AndroidUltraCanvas implements UltraCanvas {
+/** Implementação do {@link RenderCanvas} em cima do Canvas do Android. */
+final class AndroidRenderCanvas implements RenderCanvas {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint imagePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final Paint invertPaint = new Paint();
     private final Path path = new Path();
     private final RectF rect = new RectF();
+    private final Rect srcRect = new Rect();
+    private final Paint gradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Canvas canvas;
 
-    AndroidUltraCanvas() {
+    AndroidRenderCanvas() {
         invertPaint.setColorFilter(new ColorMatrixColorFilter(new ColorMatrix(new float[]{
             -1f, 0f, 0f, 0f, 255f,
             0f, -1f, 0f, 0f, 255f,
@@ -102,10 +108,54 @@ final class AndroidUltraCanvas implements UltraCanvas {
     }
 
     @Override
-    public void drawImage(UltraImage image, float left, float top, float right, float bottom, int alpha) {
+    public void drawImage(RenderImage image, float left, float top, float right, float bottom, int alpha) {
         imagePaint.setAlpha(alpha);
         rect.set(left, top, right, bottom);
-        canvas.drawBitmap(((AndroidUltraAssets.AndroidUltraImage)image).bitmap, null, rect, imagePaint);
+        canvas.drawBitmap(((AndroidRenderAssets.AndroidRenderImage)image).bitmap, null, rect, imagePaint);
+    }
+
+    @Override
+    public void drawImageRegion(
+        RenderImage image,
+        float srcLeft,
+        float srcTop,
+        float srcRight,
+        float srcBottom,
+        float left,
+        float top,
+        float right,
+        float bottom,
+        int alpha
+    ) {
+        imagePaint.setAlpha(alpha);
+        srcRect.set(Math.round(srcLeft), Math.round(srcTop), Math.round(srcRight), Math.round(srcBottom));
+        if (srcRect.width() <= 0 || srcRect.height() <= 0) return;
+        rect.set(left, top, right, bottom);
+        canvas.drawBitmap(((AndroidRenderAssets.AndroidRenderImage)image).bitmap, srcRect, rect, imagePaint);
+    }
+
+    @Override
+    public void fillRadialGlow(float cx, float cy, float radius, int argbCenter) {
+        if (radius <= 0f) return;
+        gradientPaint.setShader(new RadialGradient(
+            cx, cy, radius, argbCenter, argbCenter & 0x00FFFFFF, Shader.TileMode.CLAMP));
+        canvas.drawCircle(cx, cy, radius, gradientPaint);
+        gradientPaint.setShader(null);
+    }
+
+    @Override
+    public void fillVerticalGradient(float left, float top, float right, float bottom, int argbTop, int argbBottom) {
+        if (bottom <= top) return;
+        gradientPaint.setShader(new LinearGradient(0f, top, 0f, bottom, argbTop, argbBottom, Shader.TileMode.CLAMP));
+        canvas.drawRect(left, top, right, bottom, gradientPaint);
+        gradientPaint.setShader(null);
+    }
+
+    @Override
+    public void fillOval(float left, float top, float right, float bottom, int argb) {
+        fill(argb);
+        rect.set(left, top, right, bottom);
+        canvas.drawOval(rect, paint);
     }
 
     @Override

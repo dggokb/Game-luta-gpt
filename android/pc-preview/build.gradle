@@ -1,0 +1,29 @@
+plugins { id 'application' }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    implementation project(':ultra-core')
+    implementation project(':stage-core')
+}
+
+application {
+    mainClass = 'com.gamelutagpt.preview.UltraPreview'
+}
+
+// Caminhos relativos nos argumentos (ex.: a pasta do ultra) partem da pasta android/.
+tasks.named('run') {
+    workingDir = rootProject.projectDir
+}
+
+// Cenário: gradle :pc-preview:runStage --args="app/src/main/assets/stages/templo_lua"
+tasks.register('runStage', JavaExec) {
+    group = 'application'
+    description = 'Abre o visualizador de cenário com a câmera de luta simulada.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.preview.StagePreview'
+    workingDir = rootProject.projectDir
+}

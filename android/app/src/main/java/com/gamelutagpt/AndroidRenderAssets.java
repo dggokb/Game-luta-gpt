@@ -3,22 +3,22 @@ package com.gamelutagpt;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import com.gamelutagpt.ultra.UltraAssets;
-import com.gamelutagpt.ultra.UltraImage;
+import com.gamelutagpt.render.RenderAssets;
+import com.gamelutagpt.render.RenderImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /** Lê os ultras de {@code app/src/main/assets}. */
-final class AndroidUltraAssets implements UltraAssets {
+final class AndroidRenderAssets implements RenderAssets {
     /** Imagens maiores que isso são reduzidas ao carregar, para poupar memória. */
     private static final int MAX_IMAGE_SIDE = 2048;
 
-    static final class AndroidUltraImage implements UltraImage {
+    static final class AndroidRenderImage implements RenderImage {
         final Bitmap bitmap;
 
-        AndroidUltraImage(Bitmap bitmap) {
+        AndroidRenderImage(Bitmap bitmap) {
             this.bitmap = bitmap;
         }
 
@@ -35,7 +35,7 @@ final class AndroidUltraAssets implements UltraAssets {
 
     private final AssetManager assets;
 
-    AndroidUltraAssets(AssetManager assets) {
+    AndroidRenderAssets(AssetManager assets) {
         this.assets = assets;
     }
 
@@ -51,7 +51,7 @@ final class AndroidUltraAssets implements UltraAssets {
     }
 
     @Override
-    public UltraImage loadImage(String path) throws IOException {
+    public RenderImage loadImage(String path) throws IOException {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         try (InputStream in = assets.open(path)) {
@@ -68,6 +68,6 @@ final class AndroidUltraAssets implements UltraAssets {
             bitmap = BitmapFactory.decodeStream(in, null, options);
         }
         if (bitmap == null) throw new IOException("formato de imagem não suportado");
-        return new AndroidUltraImage(bitmap);
+        return new AndroidRenderImage(bitmap);
     }
 }
