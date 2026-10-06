@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -57,6 +57,14 @@ final class ControlsLayout {
     static final float DEBUG_BUTTON_RIGHT = 1248f;
     static final float DEBUG_BUTTON_BOTTOM = 222f;
 
+    // Test helpers: refill the player's team and the CPU without restarting the app.
+    static final float HEAL_BUTTON_TOP = 232f;
+    static final float HEAL_BUTTON_BOTTOM = 272f;
+    static final float HEAL_PLAYER_LEFT = 1082f;
+    static final float HEAL_PLAYER_RIGHT = 1162f;
+    static final float HEAL_OPPONENT_LEFT = 1168f;
+    static final float HEAL_OPPONENT_RIGHT = 1248f;
+
     /** First control under the point, in the priority order the input handler uses. */
     static Control controlAt(float x, float y) {
         if (insideRect(x, y, AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM)) {
@@ -64,6 +72,12 @@ final class ControlsLayout {
         }
         if (insideRect(x, y, DEBUG_BUTTON_LEFT, DEBUG_BUTTON_TOP, DEBUG_BUTTON_RIGHT, DEBUG_BUTTON_BOTTOM)) {
             return Control.DEBUG_TOGGLE;
+        }
+        if (insideRect(x, y, HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM)) {
+            return Control.HEAL_PLAYER;
+        }
+        if (insideRect(x, y, HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM)) {
+            return Control.HEAL_OPPONENT;
         }
         if (insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_RADIUS)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;

@@ -24,6 +24,12 @@ final class FighterState {
         refreshHudLabels();
     }
 
+    /** Test helper: back to full life. */
+    void restoreLife() {
+        life = profile.maxLife;
+        refreshHudLabels();
+    }
+
     float superBars() {
         return superMeter / (float)CombatConfig.METER_PER_BAR;
     }

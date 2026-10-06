@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.72-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.73-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -110,3 +110,8 @@ input, máquina de estados (startup/active/recovery), cancelamentos declarados p
 hitstun decay, juggle points e pushback. O frame data vive nos Character Packs (schema 3)
 e é validado no build e no carregamento. Botão DEBUG mostra caixas, estados e a tabela de
 vantagem de cada golpe. Detalhes, rotas e critérios de aceite em `docs/combat-engine.md`.
+
+## Botões de teste de vida — v0.73
+
+Abaixo de DEBUG: **VIDA P1** enche a vida dos dois lutadores do time (um KO volta a
+lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app.

@@ -565,6 +565,17 @@ public class SpriteIntegrationTest {
         }
         assertTrue("AI should attack once in range",started>0);
     }
+    @Test public void lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting()throws Exception {
+        FighterState[] team=(FighterState[])get("team");
+        team[0].life=0;team[1].life=1234;npc().state.life=10;
+        touch(MotionEvent.ACTION_DOWN,1120,250);touch(MotionEvent.ACTION_UP,1120,250);frames(1);
+        assertEquals(team[0].profile.maxLife,team[0].life);
+        assertEquals(team[1].profile.maxLife,team[1].life);
+        assertFalse("A KO'd player fights again",player().ko());
+        assertEquals("CPU untouched",10,npc().state.life);
+        touch(MotionEvent.ACTION_DOWN,1210,250);touch(MotionEvent.ACTION_UP,1210,250);frames(1);
+        assertEquals(npc().state.profile.maxLife,npc().state.life);
+    }
     @Test public void walkingIntoTheOpponentPushesInsteadOfOverlapping()throws Exception {
         CharacterDefinition.Body p=GeneratedCharacters.defaultCharacter().fighter.body;
         CharacterDefinition.Body n=GeneratedCharacters.opponentCharacter().fighter.body;

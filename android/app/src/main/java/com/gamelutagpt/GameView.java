@@ -106,6 +106,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int comboPointer = -1;
     private int tagPointer = -1;
     private int superPointer = -1;
+    private int healPlayerPointer = -1;
+    private int healOpponentPointer = -1;
 
     private final ConcurrentLinkedQueue<MotionEvent> pendingInput =
         new ConcurrentLinkedQueue<>();
@@ -117,6 +119,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         clearPendingInput();
         pad.reset();
         dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = superPointer = -1;
+        healPlayerPointer = healOpponentPointer = -1;
     }
 
     public GameView(Context context) {
@@ -288,6 +291,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case COMBO: return comboPointer != -1;
                 case TAG: return tagPointer != -1;
                 case SUPER: return superPointer != -1;
+                case HEAL_PLAYER: return healPlayerPointer != -1;
+                case HEAL_OPPONENT: return healOpponentPointer != -1;
                 default: return false;
             }
         }
@@ -841,6 +846,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case DEBUG_TOGGLE:
                     debugOverlay = !debugOverlay;
                     break;
+                case HEAL_PLAYER:
+                    // Both team members, so the reserve is also ready after a tag.
+                    healPlayerPointer = pointerId;
+                    for (FighterState member : team) member.restoreLife();
+                    break;
+                case HEAL_OPPONENT:
+                    healOpponentPointer = pointerId;
+                    opponentFighter.restoreLife();
+                    break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it.
                     if (dpadPointer == -1) {
@@ -897,8 +911,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == comboPointer) comboPointer = -1;
             if (pointerId == tagPointer) tagPointer = -1;
             if (pointerId == superPointer) superPointer = -1;
+            if (pointerId == healPlayerPointer) healPlayerPointer = -1;
+            if (pointerId == healOpponentPointer) healOpponentPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
             dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = superPointer = -1;
+            healPlayerPointer = healOpponentPointer = -1;
             pad.setDirection(0);
         }
 

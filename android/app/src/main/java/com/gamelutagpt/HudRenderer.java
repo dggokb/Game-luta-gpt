@@ -114,6 +114,10 @@ final class HudRenderer {
             AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 19f);
         drawToggle(c, s.debugEnabled(), s.debugEnabled() ? "DEBUG ON" : "DEBUG OFF",
             DEBUG_BUTTON_LEFT, DEBUG_BUTTON_TOP, DEBUG_BUTTON_RIGHT, DEBUG_BUTTON_BOTTOM, 16f);
+        drawToggle(c, s.pressed(Control.HEAL_PLAYER), "VIDA P1",
+            HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
+        drawToggle(c, s.pressed(Control.HEAL_OPPONENT), "VIDA CPU",
+            HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
     }
 
     private void drawToggle(Canvas c, boolean enabled, String label,
