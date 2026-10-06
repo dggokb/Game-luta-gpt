@@ -66,15 +66,22 @@ programação.
 ```json
 "artFacing": "right",
 "fighter": {
-  "hudName": "PLAYER 1",
   "color": "#F4B73B",
   "maxLife": 10000,
   "autoCombo": ["L", "M", "H"],
   "body": {"halfWidth": 34, "standHeight": 145, "crouchHeight": 90},
-  "energy": {"damage": 850, "range": 720, "speed": 760, "command": [3, 1]},
-  "super": {"damage": 3200, "range": 1450, "speed": 1180}
+  "energy": {"damage": 850, "range": 720, "speed": 760, "command": [3, 1],
+             "spawnX": 62, "spawnY": 82, "crouchSpawnY": 65},
+  "super": {"damage": 3200, "range": 1450, "speed": 1180,
+            "spawnX": 78, "spawnY": 86, "airSpawnY": 82}
 }
 ```
+
+`spawnX`/`spawnY` são o ponto de lançamento do projétil (à frente da raiz e altura acima
+do chão); `crouchSpawnY` e `airSpawnY` são opcionais e valem `spawnY` quando omitidos.
+As alturas precisam ficar dentro da hurtbox. O nome exibido é sempre `displayName`; o
+HUD mostra o slot do time (`PLAYER 1`, `PLAYER 2`, `CPU`) + `displayName`. `hudName`
+foi removido e reprova o build.
 
 `body` é a hurtbox de gameplay em unidades do mundo, independente do PNG. `energy` e
 `super` são opcionais (sem eles o lutador não usa o recurso). `artFacing` diz para onde
@@ -148,6 +155,15 @@ do golpe acima do chão: padrão 42 para 2X e 78 para o resto.
 Ainda não há comandos extras declarativos, cancel windows ou hitboxes por frame.
 
 ## Geometria, qualidade e raízes
+
+Os valores abaixo descrevem a **célula canônica de autoria** (`report['layout']`). O
+atlas que vai no APK é **empacotado**: o pipeline recorta a borda transparente comum a
+todas as células, mantendo 8 px de margem em volta de qualquer pixel visível e a raiz
+dentro da célula, e grava a nova geometria em `report['packed']`. Os pixels não mudam de
+posição em relação à raiz; a memória decodificada cai de ~35.5 para ~26.4 MiB. O Java
+gerado e o renderer usam sempre a geometria empacotada.
+
+`standingVisualHeight` do perfil precisa coincidir (±5%) com a altura medida do Idle.
 
 Personagem base: célula 256×256, raiz preferida X=128/Y=238, worldScale=1.0,
 referência em pé de 228 px, fundo transparente e margem mínima de 8 px.
@@ -362,3 +378,14 @@ Limites conhecidos: os frames 9–11 do atlas do Brutamonte encostam na borda da
 (o perfil usa `minMargin: 0`), então garras/tecido aparecem cortados; corrigir exige
 reexportar a arte com células maiores. O NPC ainda reaproveita frames entre estados
 (ex.: o frame 8 serve de agachar, pouso e início de ataque).
+
+### Complementos — v0.64
+
+- A IA escolhe golpes só entre os que alcançam o jogador (`reach` do pack + meia-largura
+  do alvo), mantendo os pesos de sorteio; fora do alcance ela se aproxima em vez de
+  golpear o ar.
+- Projéteis saem do ponto declarado em `energy`/`super` (o Brutamonte lança mais alto).
+- Atlas empacotados (ver "Geometria") e `standingVisualHeight` validado contra o Idle.
+- Nomes unificados: `displayName` + slot do time; `hudName` removido.
+- Ainda fora: área de empurrão entre corpos (lutadores podem se sobrepor) e divisão
+  restante do `GameView` (IA, HUD e input).

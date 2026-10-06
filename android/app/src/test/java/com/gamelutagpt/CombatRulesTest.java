@@ -62,11 +62,35 @@ public class CombatRulesTest {
         assertFalse(m.threatening(.81f*m.totalTime));
     }
     @Test public void opponentUsesItsOwnFighterRules() {
-        assertEquals("BRUTAMONTE",NPC.fighter.hudName);
+        assertEquals("Brutamonte",NPC.displayName);
         assertTrue(NPC.fighter.body.standHeight>BASE.fighter.body.standHeight);
         assertTrue(NPC.visualStandHeight>NPC.fighter.body.standHeight*0.9f);
         assertNotNull(NPC.specialAnimations.get("SUPER"));
         assertEquals(1,BASE.artFacing);
         assertTrue(BASE.visualStandHeight>BASE.visualCrouchHeight);
+    }
+    @Test public void aiPicksOnlyMovesThatReachKeepingWeights() {
+        String[] types={"L","M","H"};double[] weights={1,1,1};
+        float lReach=CombatRules.maxCenterDistance(NPC.moves.get("L"),LEGACY);
+        float hReach=CombatRules.maxCenterDistance(NPC.moves.get("H"),LEGACY);
+        // Beyond L/M but inside H: only H can be chosen, whatever the roll.
+        float far=hReach-1;
+        assertTrue(far>CombatRules.maxCenterDistance(NPC.moves.get("M"),LEGACY));
+        for(double roll:new double[]{0,.3,.6,.99})
+            assertEquals("H",CombatRules.pickInRange(types,weights,NPC,false,far,LEGACY,roll));
+        assertNull(CombatRules.pickInRange(types,weights,NPC,false,hReach+1,LEGACY,.5));
+        assertNull("Overlapping bodies cannot attack",CombatRules.pickInRange(types,weights,NPC,false,5,LEGACY,.5));
+        assertEquals("L",CombatRules.pickInRange(types,weights,NPC,false,lReach-1,LEGACY,0));
+        assertEquals("H",CombatRules.pickInRange(types,weights,NPC,false,lReach-1,LEGACY,.99));
+    }
+    @Test public void projectilesSpawnFromThePackLaunchPoint() {
+        CharacterDefinition.Projectile energy=BASE.fighter.energy;
+        assertEquals(82f,energy.spawnHeight(false,false),0);
+        assertEquals(65f,energy.spawnHeight(true,false),0);
+        assertEquals(86f,BASE.fighter.superAttack.spawnHeight(false,false),0);
+        assertEquals(82f,BASE.fighter.superAttack.spawnHeight(false,true),0);
+        assertTrue("A big fighter launches from higher up",
+            NPC.fighter.energy.spawnHeight(false,false)>energy.spawnHeight(false,false));
+        assertTrue(NPC.fighter.energy.spawnHeight(true,false)<=NPC.fighter.body.crouchHeight);
     }
 }

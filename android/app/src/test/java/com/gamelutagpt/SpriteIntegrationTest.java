@@ -94,8 +94,11 @@ public class SpriteIntegrationTest {
             first.animation("CROUCH_MEDIUM").atlas.resource);
         assertTrue(first.moves.containsKey("2M"));
         assertEquals("CROUCH_MEDIUM",first.moves.get("2M").animation.id);
-        assertEquals(384,first.animation("CROUCH_MEDIUM").atlas.width);
-        assertEquals(128,first.animation("CROUCH_MEDIUM").atlas.rootX);
+        // Shipped atlases are packed (empty border cropped); geometry comes from generation.
+        assertEquals(GeneratedSpriteLayouts.CROUCH_MEDIUM_FRAME_WIDTH,first.animation("CROUCH_MEDIUM").atlas.width);
+        assertEquals(GeneratedSpriteLayouts.CROUCH_MEDIUM_ROOT_X,first.animation("CROUCH_MEDIUM").atlas.rootX);
+        assertTrue("2M keeps room for the extended leg",
+            first.animation("CROUCH_MEDIUM").atlas.width>first.animation("CROUCH_LIGHT").atlas.width);
 
         setup();set("grounded",true);set("crouching",true);
         invoke("startAttack",new Class<?>[]{String.class},"2M");frames(1);
@@ -260,8 +263,8 @@ public class SpriteIntegrationTest {
         int countFrames=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_COUNT;
         assertEquals(fw*countFrames,kick.getWidth());
         assertEquals(fh,kick.getHeight());
-        assertEquals(128,GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X);
-        assertEquals(238,GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y);
+        assertTrue(GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X>0 && GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X<fw);
+        assertTrue(GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y>0 && GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y<fh);
         for(int i=0;i<countFrames;i++) {
             int count=0,minX=fw,minY=fh,maxX=-1,maxY=-1;
             for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
@@ -443,12 +446,14 @@ public class SpriteIntegrationTest {
         );
 
         assertNotNull(idle);assertNotNull(movement);assertNotNull(jab);
-        assertEquals(1024,idle.getWidth());
-        assertEquals(512,idle.getHeight());
-        assertEquals(1024,movement.getWidth());
-        assertEquals(1024,movement.getHeight());
-        assertEquals(768,jab.getWidth());
-        assertEquals(256,jab.getHeight());
+        assertEquals(4*GeneratedSpriteLayouts.IDLE_FRAME_WIDTH,idle.getWidth());
+        assertEquals(2*GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT,idle.getHeight());
+        assertEquals(4*GeneratedSpriteLayouts.MOVEMENT_FRAME_WIDTH,movement.getWidth());
+        assertEquals(4*GeneratedSpriteLayouts.MOVEMENT_FRAME_HEIGHT,movement.getHeight());
+        assertEquals(3*GeneratedSpriteLayouts.JAB_FRAME_WIDTH,jab.getWidth());
+        assertEquals(GeneratedSpriteLayouts.JAB_FRAME_HEIGHT,jab.getHeight());
+        // Packing never grows past the canonical 256x256 authoring cell.
+        assertTrue(GeneratedSpriteLayouts.IDLE_FRAME_WIDTH<=256 && GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT<=256);
     }
 
     @Test public void characterProfilesCanRepresentDifferentSizedFighters() {
@@ -530,12 +535,64 @@ public class SpriteIntegrationTest {
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_movement);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());
-        assertEquals(1024,atlas.getWidth());assertEquals(1024,atlas.getHeight());
+        int fw=GeneratedSpriteLayouts.MOVEMENT_FRAME_WIDTH,fh=GeneratedSpriteLayouts.MOVEMENT_FRAME_HEIGHT;
+        assertEquals(4*fw,atlas.getWidth());assertEquals(4*fh,atlas.getHeight());
         for(int i=0;i<16;i++) {
-            int left=(i%4)*256,top=(i/4)*256,count=0;
-            for(int y=top;y<top+256;y++)for(int x=left;x<left+256;x++)if(Color.alpha(atlas.getPixel(x,y))>128)count++;
-            assertTrue("Empty sprite "+i,count>4500);assertTrue("Opaque background "+i,count<256*256*.70f);
+            int left=(i%4)*fw,top=(i/4)*fh,count=0;
+            for(int y=top;y<top+fh;y++)for(int x=left;x<left+fw;x++)if(Color.alpha(atlas.getPixel(x,y))>128)count++;
+            assertTrue("Empty sprite "+i,count>4500);assertTrue("Opaque background "+i,count<fw*fh*.70f);
         }
+    }
+    private int activeLife()throws Exception {Field f=activeFighter().getClass().getDeclaredField("life");f.setAccessible(true);return f.getInt(activeFighter());}
+
+    @Test public void opponentMoveUsesItsPackActiveWindowAndOwnLowAttackClip()throws Exception {
+        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
+        CharacterDefinition.Move move=npc.moves.get("L");
+        set("dummyX",520f);set("opponentAiEnabled",true);
+        invoke("startOpponentAttack",new Class<?>[]{String.class},"L");
+        int life=activeLife();
+        set("dummyAttackTimer",move.totalTime-(move.activeStart-.002f));
+        invoke("tryApplyOpponentMeleeDamage",new Class<?>[]{});
+        assertEquals("Startup must not hit",life,activeLife());
+        set("dummyAttackTimer",move.totalTime-(move.activeStart+.002f));
+        invoke("tryApplyOpponentMeleeDamage",new Class<?>[]{});
+        assertEquals(life-move.damage,activeLife());
+
+        setup();set("dummyX",520f);set("opponentAiEnabled",true);
+        invoke("startOpponentAttack",new Class<?>[]{String.class},"2M");
+        invoke("updateOpponentSpriteMotion",new Class<?>[]{float.class,float.class},.016f,0f);
+        SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");
+        assertEquals(npc.moves.get("2M").animation.id,opponent.motion.clip);
+        assertNotEquals(npc.moves.get("M").animation.id,opponent.motion.clip);
+    }
+    @Test public void cameraAndHudUseMeasuredSpriteHeight()throws Exception {
+        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
+        Method top=GameView.class.getDeclaredMethod("opponentVisualTop");top.setAccessible(true);
+        float visualTop=(Float)top.invoke(game);
+        assertEquals((Float)get("dummyY")-npc.visualStandHeight,visualTop,.01f);
+        assertTrue("Visual height is the opaque art, not the PNG cell",
+            npc.visualStandHeight<npc.profile.rootY*npc.profile.worldScale);
+        frames(240);
+        assertTrue("Opponent head must stay on screen",(Float)get("cameraTop")<=visualTop);
+    }
+    @Test public void opponentAiOnlyStartsAttacksThatCanReach()throws Exception {
+        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
+        CharacterDefinition.Body target=GeneratedCharacters.defaultCharacter().fighter.body;
+        set("dummyX",590f);set("opponentAiEnabled",true);
+        int started=0;String previous="";
+        for(int i=0;i<900;i++) {
+            frames(1);
+            String type=(String)get("dummyAttackType");
+            if(!type.isEmpty() && !type.equals(previous) && !"S".equals(type)) {
+                started++;
+                CharacterDefinition.Move move=(CharacterDefinition.Move)get("opponentMove");
+                float distance=Math.abs((Float)get("playerX")-(Float)get("dummyX"));
+                assertTrue(type+" started out of reach at "+distance,
+                    distance<=CombatRules.maxCenterDistance(move,target)+0.5f);
+            }
+            previous=type;
+        }
+        assertTrue("AI should attack once in range",started>0);
     }
     @Test public void matchRenderersShareOneDecodedAtlasCache()throws Exception {
         SpriteFighterRenderer player=(SpriteFighterRenderer)get("spriteFighterRenderer");

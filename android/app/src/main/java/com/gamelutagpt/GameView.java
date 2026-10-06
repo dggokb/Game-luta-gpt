@@ -18,14 +18,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     // Team and opponent rules come from the generated character packs.
     private final FighterState[] team = new FighterState[] {
-        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[0])),
-        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[1]))
+        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[0]), "PLAYER 1"),
+        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[1]), "PLAYER 2")
     };
 
     private int activeFighterIndex = 0;
     private static final int AI_OWNER_INDEX = 99;
     private final FighterState opponentFighter =
-        new FighterState(GeneratedCharacters.opponentCharacter());
+        new FighterState(GeneratedCharacters.opponentCharacter(), "CPU");
     private final List<Projectile> energyProjectiles = new ArrayList<>();
     private final List<Projectile> superProjectiles = new ArrayList<>();
 
@@ -67,6 +67,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final float AI_BACKDASH_SPEED = 760f;
     private static final float AI_BACKDASH_DURATION = 0.20f;
     private static final float AI_ATTACK_COOLDOWN = 0.22f;
+    // Attack preferences; the pack decides which of them can reach.
+    private static final String[] AI_GROUND_ATTACKS = {"2L", "2M", "2H", "L", "M", "H"};
+    private static final double[] AI_GROUND_WEIGHTS = {0.18, 0.18, 0.17, 0.17, 0.16, 0.14};
+    private static final String[] AI_AIR_ATTACKS = {"L", "M", "H"};
+    private static final double[] AI_AIR_WEIGHTS = {0.30, 0.34, 0.36};
     private float dummyX = DUMMY_START_X;
     private float dummyY = GROUND_Y;
     private float dummyVelocityY = 0f;
@@ -702,8 +707,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         int direction = opponentFacingDirection();
         energyProjectiles.add(new Projectile(
-            dummyX + direction * 62f,
-            dummyY - (aiCrouching ? 65f : 82f),
+            dummyX + direction * profile.energy.spawnX,
+            dummyY - profile.energy.spawnHeight(aiCrouching, dummyAirborne),
             profile.energy.range,
             profile.energy.speed * speedMultiplier,
             Math.round(profile.energy.damage * damageMultiplier),
@@ -741,8 +746,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         CharacterDefinition.Fighter profile = opponentProfile();
         int direction = opponentFacingDirection();
         superProjectiles.add(new Projectile(
-            dummyX + direction * 78f,
-            dummyY - 86f,
+            dummyX + direction * profile.superAttack.spawnX,
+            dummyY - profile.superAttack.spawnHeight(false, dummyAirborne),
             profile.superAttack.range,
             profile.superAttack.speed,
             profile.superAttack.damage,
@@ -818,12 +823,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             aiForwardDashing = false;
             aiCrouching = false;
 
+            CharacterDefinition.Body target = activeCharacter().fighter.body;
+            String airAttack = verticalDistance <= 115f
+                ? CombatRules.pickInRange(AI_AIR_ATTACKS, AI_AIR_WEIGHTS,
+                    opponentCharacter(), true, distance, target, Math.random())
+                : null;
+            String groundAttack = CombatRules.pickInRange(AI_GROUND_ATTACKS, AI_GROUND_WEIGHTS,
+                opponentCharacter(), false, distance, target, Math.random());
+
             if (dummyAirborne) {
-                if (verticalDistance <= 115f && distance <= 175f) {
-                    double r = Math.random();
-                    if (r < 0.30) startOpponentAttack("L");
-                    else if (r < 0.64) startOpponentAttack("M");
-                    else startOpponentAttack("H");
+                if (airAttack != null) {
+                    startOpponentAttack(airAttack);
                 } else {
                     aiMovingForward = distance > 95f;
                 }
@@ -844,22 +854,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             ) {
                 double r = Math.random();
                 fireOpponentEnergy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
-            } else if (!grounded && distance <= 185f && Math.random() < 0.38) {
+            } else if (
+                !grounded &&
+                CombatRules.reaches(opponentCharacter(), "2H", false, distance, target) &&
+                Math.random() < 0.38
+            ) {
                 startOpponentAttack("2H");
-            } else if (distance <= 178f && aiAttackCooldownRemaining <= 0f) {
-                double r = Math.random();
-                if (r < 0.18) startOpponentAttack("2L");
-                else if (r < 0.36) startOpponentAttack("2M");
-                else if (r < 0.53) startOpponentAttack("2H");
-                else if (r < 0.70) startOpponentAttack("L");
-                else if (r < 0.86) startOpponentAttack("M");
-                else startOpponentAttack("H");
+            } else if (groundAttack != null && aiAttackCooldownRemaining <= 0f) {
+                startOpponentAttack(groundAttack);
             } else if (distance < 82f && Math.random() < 0.38) {
                 aiBackDashTimer = AI_BACKDASH_DURATION;
             } else if (distance > 360f && Math.random() < 0.38) {
                 aiMovingForward = true;
                 aiForwardDashing = true;
-            } else if (distance > 145f) {
+            } else if (groundAttack == null && distance > CombatRules.MIN_MELEE_DISTANCE) {
+                // Approach until at least one ground move can reach the player.
                 aiMovingForward = true;
             } else if (Math.random() < 0.12) {
                 startOpponentJump(Math.random() < 0.32);
@@ -1196,9 +1205,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         CharacterDefinition.Fighter profile = activeFighter().profile;
         if (!profile.hasSuperAttack()) return;
 
-        float spawnY = playerY - (grounded ? 86f : 82f);
+        float spawnY = playerY - profile.superAttack.spawnHeight(false, !grounded);
         superProjectiles.add(new Projectile(
-            playerX + facingDirection * 78f,
+            playerX + facingDirection * profile.superAttack.spawnX,
             spawnY,
             profile.superAttack.range,
             profile.superAttack.speed,
@@ -1594,9 +1603,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         startAttack("S");
 
-        float spawnY = playerY - (crouching ? 65f : 82f);
+        float spawnY = playerY - profile.energy.spawnHeight(crouching, !grounded);
         energyProjectiles.add(new Projectile(
-            playerX + facingDirection * 62f,
+            playerX + facingDirection * profile.energy.spawnX,
             spawnY,
             profile.energy.range,
             profile.energy.speed * speedMultiplier,
@@ -2301,7 +2310,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(22);
         paint.setFakeBoldText(true);
-        c.drawText(active.profile.hudName, 122, 58, paint);
+        c.drawText(active.hudTitle, 122, 58, paint);
         paint.setFakeBoldText(false);
 
         drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
@@ -2315,7 +2324,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(14);
         paint.setFakeBoldText(true);
-        c.drawText(reserve.profile.reserveHudLabel, 105, 184, paint);
+        c.drawText(reserve.reserveHudLabel, 105, 184, paint);
         paint.setFakeBoldText(false);
 
         drawLifeBar(c, reserve, 105f, 193f, 525f, 206f, false);
@@ -2334,9 +2343,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.drawText(currentStateLabel(), 1032, 88, paint);
 
         paint.setTextSize(14f);
-        CharacterDefinition visualCharacter = activeCharacter();
+        // The character name is in the HUD title; this line keeps the facing readout.
         c.drawText(
-            "CHAR: " + visualCharacter.displayName,
+            facingDirection > 0 ? "FACING: →" : "FACING: ←",
             975,
             106,
             paint

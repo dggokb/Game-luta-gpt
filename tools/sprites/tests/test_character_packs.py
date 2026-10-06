@@ -132,10 +132,48 @@ class CharacterPackTests(unittest.TestCase):
         self.assertFalse(orphan.exists())
         pipeline.build(self.root,check=True)
 
+    def test_packing_crops_empty_border_without_moving_pixels(self):
+        from PIL import Image
+        stage=self.root/'stage';(stage/'out').mkdir(parents=True)
+        img=Image.new('RGBA',(200,100))
+        for i,(x,y) in enumerate(((40,30),(150,50))):img.putpixel((x,y),(255,0,0,255))
+        img.save(stage/'out/a.png')
+        report={'layout':{'frameWidth':100,'frameHeight':100,'rootX':50,'rootY':90,'columns':2,'frameCount':2}}
+        pipeline.pack_atlas(stage,{'output':'out/a.png'},report,)
+        packed=report['packed'];ox,oy=packed['cropOffset']
+        self.assertEqual([32,22],[ox,oy])
+        self.assertEqual((50-32,90-22),(packed['rootX'],packed['rootY']))
+        out=Image.open(stage/'out/a.png');pw,ph=packed['frameWidth'],packed['frameHeight']
+        self.assertEqual((2*pw,ph),out.size)
+        self.assertEqual((255,0,0,255),out.getpixel((40-ox,30-oy)))
+        self.assertEqual((255,0,0,255),out.getpixel((pw+50-ox,50-oy)))
+
+    def test_shipped_atlases_are_packed(self):
+        pipeline.build(self.root)
+        java=(self.root/pipeline.JAVA/'GeneratedSpriteLayouts.java').read_text()
+        report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
+        self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['canonical'])
+        self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
+        self.assertEqual(256,report['layout']['frameWidth'])
+
+    def test_hud_name_is_rejected_in_favor_of_display_name(self):
+        self.edit(lambda d:d['fighter'].update(hudName='P1'))
+        with self.assertRaisesRegex(ValueError,'hudName was removed'):pipeline.build(self.root)
+
+    def test_standing_visual_height_must_match_measured_idle(self):
+        path=self.root/'tools/sprites/profiles/player_base.json';d=json.loads(path.read_text())
+        d['standingVisualHeight']=300;path.write_text(json.dumps(d))
+        # bbox-normalized clips also read this value; only prepared/anatomy clips use player_base here.
+        with self.assertRaisesRegex(ValueError,'standingVisualHeight'):pipeline.build(self.root)
+
+    def test_projectile_spawn_must_be_inside_body(self):
+        self.edit(lambda d:d['fighter']['energy'].update(crouchSpawnY=400))
+        with self.assertRaisesRegex(ValueError,'inside the body'):pipeline.build(self.root)
+
     def test_visual_heights_and_stats_are_generated(self):
         pipeline.build(self.root)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn('new CharacterDefinition.Fighter("BRUTAMONTE",0xFFD9485F',java)
+        self.assertIn('new CharacterDefinition.Fighter(0xFFD9485F',java)
         self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",null,"AIR"',java)
         states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
         self.assertIn('static final String HIT_AIR = "HIT_AIR";',states)

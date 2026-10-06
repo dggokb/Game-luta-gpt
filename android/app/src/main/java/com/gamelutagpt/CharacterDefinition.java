@@ -67,7 +67,15 @@ final class CharacterDefinition {
     static final class Projectile {
         final int damage;
         final float range,speed;
-        Projectile(int damage,float range,float speed) { this.damage=damage;this.range=range;this.speed=speed; }
+        /** Launch point: forward offset from the root and heights above the ground. */
+        final float spawnX,spawnY,crouchSpawnY,airSpawnY;
+        Projectile(int damage,float range,float speed,float spawnX,float spawnY,float crouchSpawnY,float airSpawnY) {
+            this.damage=damage;this.range=range;this.speed=speed;
+            this.spawnX=spawnX;this.spawnY=spawnY;this.crouchSpawnY=crouchSpawnY;this.airSpawnY=airSpawnY;
+        }
+        float spawnHeight(boolean crouching,boolean airborne) {
+            return crouching ? crouchSpawnY : airborne ? airSpawnY : spawnY;
+        }
     }
     /** Gameplay hurtbox in world units, independent of the PNG canvas. */
     static final class Body {
@@ -79,15 +87,14 @@ final class CharacterDefinition {
     }
     /** Fighter rules that used to live in GameView.FighterProfile. */
     static final class Fighter {
-        final String hudName,reserveHudLabel;
         final int color,maxLife;
         final String[] autoCombo;
         final Projectile energy,superAttack;
         final int[] energyCommand;
         final Body body;
-        Fighter(String hudName,int color,int maxLife,String[] autoCombo,Projectile energy,
+        Fighter(int color,int maxLife,String[] autoCombo,Projectile energy,
                 int[] energyCommand,Projectile superAttack,Body body) {
-            this.hudName=hudName;this.reserveHudLabel="RESERVA: "+hudName;this.color=color;this.maxLife=maxLife;
+            this.color=color;this.maxLife=maxLife;
             this.autoCombo=autoCombo.clone();this.energy=energy;this.energyCommand=energyCommand.clone();
             this.superAttack=superAttack;this.body=body;
         }

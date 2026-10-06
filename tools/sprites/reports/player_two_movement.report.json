@@ -193,6 +193,22 @@
     }
   ],
   "passed": true,
+  "packed": {
+    "frameWidth": 359,
+    "frameHeight": 244,
+    "rootX": 180,
+    "rootY": 235,
+    "columns": 4,
+    "frameCount": 16,
+    "cropOffset": [
+      12,
+      11
+    ],
+    "decodedBytes": {
+      "canonical": 6291456,
+      "packed": 5606144
+    }
+  },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {

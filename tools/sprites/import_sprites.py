@@ -507,7 +507,8 @@ def write_generated_java(results):
     ]
     for cfg, report in results:
         name = sanitize_java_name(cfg["javaName"])
-        layout = report["layout"]
+        # Packed geometry is what the APK atlas actually contains.
+        layout = report.get("packed", report["layout"])
         lines += [
             f"    static final int {name}_FRAME_WIDTH = {layout['frameWidth']};",
             f"    static final int {name}_FRAME_HEIGHT = {layout['frameHeight']};",

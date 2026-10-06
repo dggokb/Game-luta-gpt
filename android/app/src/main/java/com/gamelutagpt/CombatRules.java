@@ -80,6 +80,51 @@ final class CombatRules {
         return horizontal && vertical;
     }
 
+    /** Largest center-to-center distance at which {@code move} can touch {@code target}. */
+    static float maxCenterDistance(CharacterDefinition.Move move, CharacterDefinition.Body target) {
+        return move.reach + target.halfWidth;
+    }
+
+    /**
+     * Weighted choice among the inputs whose move reaches the target from {@code distance}.
+     * {@code roll} is a uniform value in [0, 1). Returns null when nothing reaches.
+     */
+    static String pickInRange(
+        String[] types,
+        double[] weights,
+        CharacterDefinition attacker,
+        boolean airborne,
+        float distance,
+        CharacterDefinition.Body target,
+        double roll
+    ) {
+        double total = 0;
+        for (int i = 0; i < types.length; i++) {
+            if (reaches(attacker, types[i], airborne, distance, target)) total += weights[i];
+        }
+        if (total <= 0) return null;
+        double point = roll * total;
+        String last = null;
+        for (int i = 0; i < types.length; i++) {
+            if (!reaches(attacker, types[i], airborne, distance, target)) continue;
+            last = types[i];
+            point -= weights[i];
+            if (point < 0) return types[i];
+        }
+        return last;
+    }
+
+    static boolean reaches(
+        CharacterDefinition attacker,
+        String type,
+        boolean airborne,
+        float distance,
+        CharacterDefinition.Body target
+    ) {
+        return distance >= MIN_MELEE_DISTANCE &&
+            distance <= maxCenterDistance(attacker.move(type, airborne), target);
+    }
+
     static float superGainForAttack(String type) {
         if ("L".equals(type) || "2L".equals(type)) return SUPER_GAIN_LIGHT;
         if ("M".equals(type) || "2M".equals(type)) return SUPER_GAIN_MEDIUM;

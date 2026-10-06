@@ -5,7 +5,6 @@
   "profile": "monster_npc.json",
   "artFacing": "right",
   "fighter": {
-    "hudName": "BRUTAMONTE",
     "color": "#D9485F",
     "maxLife": 10000,
     "autoCombo": [],
@@ -21,12 +20,17 @@
       "command": [
         5,
         1
-      ]
+      ],
+      "spawnX": 100,
+      "spawnY": 110,
+      "crouchSpawnY": 90
     },
     "super": {
       "damage": 2850,
       "range": 1320,
-      "speed": 1280
+      "speed": 1280,
+      "spawnX": 120,
+      "spawnY": 115
     }
   },
   "animations": {

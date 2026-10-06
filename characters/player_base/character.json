@@ -5,7 +5,6 @@
   "profile": "player_base.json",
   "artFacing": "right",
   "fighter": {
-    "hudName": "PLAYER 1",
     "color": "#F4B73B",
     "maxLife": 10000,
     "autoCombo": [
@@ -25,12 +24,18 @@
       "command": [
         3,
         1
-      ]
+      ],
+      "spawnX": 62,
+      "spawnY": 82,
+      "crouchSpawnY": 65
     },
     "super": {
       "damage": 3200,
       "range": 1450,
-      "speed": 1180
+      "speed": 1180,
+      "spawnX": 78,
+      "spawnY": 86,
+      "airSpawnY": 82
     }
   },
   "animations": {

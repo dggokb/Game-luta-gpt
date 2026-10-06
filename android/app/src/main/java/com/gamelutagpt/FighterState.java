@@ -4,15 +4,20 @@ package com.gamelutagpt;
 final class FighterState {
     final CharacterDefinition character;
     final CharacterDefinition.Fighter profile;
+    /** HUD title: team slot plus the character's single display name. */
+    final String hudTitle;
+    final String reserveHudLabel;
     int life;
     float superMeter;
     String lifeHudLabel;
     String superHudLabel;
     String superLevelHudLabel;
 
-    FighterState(CharacterDefinition character) {
+    FighterState(CharacterDefinition character, String slotLabel) {
         this.character = character;
         this.profile = character.fighter;
+        this.hudTitle = slotLabel + " · " + character.displayName;
+        this.reserveHudLabel = "RESERVA: " + character.displayName;
         this.life = profile.maxLife;
         this.superMeter = 0f;
         refreshHudLabels();
