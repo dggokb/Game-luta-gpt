@@ -11,16 +11,11 @@
   "columns": 14,
   "rootMode": "authored",
   "minOpaquePixels": 5000,
-  "sourceNote": "Reaction poses (defense, hit, knockdown, grounded, get-up) rescaled to the canonical body and grounded; unused frames 8-13 dropped.",
+  "sourceNote": "Interim reaction poses still without new art (hit stand, hit crouch, get-up), rescaled to the canonical body and grounded.",
   "transform": {
     "keepFrames": [
-      0,
-      1,
       2,
       3,
-      4,
-      5,
-      6,
       7
     ],
     "scale": 1.425,
@@ -30,14 +25,10 @@
     "outputFrameHeight": 256,
     "outputRootX": 192,
     "outputRootY": 238,
-    "columns": 8,
+    "columns": 3,
     "groundFrames": [
-      0,
-      1,
       2,
       3,
-      5,
-      6,
       7
     ]
   }

@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # Poses that should keep the torso over the root. Attacks lunge on purpose.
 REGISTERED = ('IDLE', 'COMBAT', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH', 'RISE', 'LAND',
               'DASH', 'BACKDASH', 'JUMP', 'FALL', 'DEFENSE_STAND', 'DEFENSE_CROUCH',
-              'HIT_STAND', 'HIT_CROUCH', 'GETUP')
+              'DEFENSE_AIR', 'HIT_STAND', 'HIT_CROUCH', 'GETUP')
 GROUNDED = ('IDLE', 'COMBAT', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH', 'RISE', 'LAND',
             'DASH', 'BACKDASH', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'HIT_STAND',
             'HIT_CROUCH', 'KNOCKDOWN', 'GROUNDED', 'GETUP')

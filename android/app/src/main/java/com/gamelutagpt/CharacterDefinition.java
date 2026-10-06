@@ -33,6 +33,15 @@ final class CharacterDefinition {
             for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return frames[i];t-=durations[i]; }
             return frames[frames.length-1];
         }
+        /**
+         * Guard clips: the first frame is the held guard; the remaining frames are the
+         * block reaction, stretched over the blockstun. progress is 0..1 of the blockstun.
+         */
+        float guardTime(boolean blocking,float progress) {
+            if(!blocking||durations.length<2)return 0f;
+            float hold=durations[0];
+            return hold+Math.max(0f,Math.min(1f,progress))*(duration-hold-0.0001f);
+        }
         /** Maps a gameplay clock of the given length onto this clip, keeping frame proportions. */
         float timeFor(float elapsed,float gameplayDuration) {
             if(gameplayDuration<=0f)return elapsed;

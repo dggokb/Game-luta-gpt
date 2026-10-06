@@ -147,7 +147,7 @@ def process_clip(config_path):
     height_step = int(validation.get("heightStep", width_step))
     foot_band_ratio = float(validation["footBandRatio"])
     min_foot_width = int(validation["minFootWidth"])
-    min_opaque = int(validation["minOpaquePixels"])
+    min_opaque = int(cfg.get("minOpaquePixels", validation["minOpaquePixels"]))
     max_upscale = float(validation["maxUpscale"])
 
     source_path = ROOT / cfg["source"]
@@ -201,11 +201,16 @@ def process_clip(config_path):
             frame = source.crop((left, top, right, bottom))
         bbox = bbox_for(frame, threshold)
         root_mode = cfg.get("rootMode", "ground-feet")
-        if root_mode != "ground-feet":
+        if root_mode == "ground-feet":
+            root_x, root_y, foot_intervals = detect_ground_root(
+                frame, bbox, threshold, foot_band_ratio, min_foot_width
+            )
+        elif root_mode == "bbox-bottom-center":
+            # Bodies with no feet on the ground (lying, tumbling): centre of the body
+            # on its lowest row; refine per frame with frameShift when needed.
+            root_x, root_y, foot_intervals = (bbox[0] + bbox[2]) / 2, bbox[3] - 1, []
+        else:
             raise ValueError(f"unsupported root mode: {root_mode}")
-        root_x, root_y, foot_intervals = detect_ground_root(
-            frame, bbox, threshold, foot_band_ratio, min_foot_width
-        )
         frame_info = {
             "index": index,
             "image": frame,
@@ -283,6 +288,14 @@ def process_clip(config_path):
         source_reference_height = statistics.median(heights)
         target_height = float(profile["standingVisualHeight"])
         scale = target_height / source_reference_height
+    elif scale_mode == "fixed":
+        # For poses with no comparable reference (e.g. a body lying down): the scale is
+        # declared, justified and calibrated against sibling sheets of the same art set.
+        if not cfg.get("scaleReason"):
+            raise ValueError(f"{cfg['id']}: fixed scaleMode requires scaleReason")
+        scale = float(cfg["scale"])
+        if scale <= 0:
+            raise ValueError(f"{cfg['id']}: fixed scale must be positive")
     else:
         raise ValueError(f"{cfg['id']}: unsupported scaleMode {scale_mode}")
     if scale > max_upscale:
@@ -374,9 +387,12 @@ def process_clip(config_path):
             (index + 1) * frame_width, frame_height
         ))
         out_bbox = bbox_for(cell, threshold)
-        out_root_x, out_root_y, out_feet = detect_ground_root(
-            cell, out_bbox, threshold, foot_band_ratio, min_foot_width
-        )
+        if cfg.get("rootMode", "ground-feet") == "bbox-bottom-center":
+            out_root_x, out_root_y, out_feet = (out_bbox[0] + out_bbox[2]) / 2, out_bbox[3] - 1, []
+        else:
+            out_root_x, out_root_y, out_feet = detect_ground_root(
+                cell, out_bbox, threshold, foot_band_ratio, min_foot_width
+            )
         opaque_pixels = sum(threshold_alpha(cell, threshold).histogram()[1:])
         margins = {
             "left": out_bbox[0],

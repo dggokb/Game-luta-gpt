@@ -616,6 +616,25 @@ public class SpriteIntegrationTest {
         assertTrue("Opponent should be pushed",dx>520f);
         assertEquals(1,(int)get("facingDirection"));
     }
+    @Test public void holdingBackInTheAirBlocksAndShowsTheAirGuard()throws Exception {
+        int life=activeLife();
+        set("grounded",false);set("playerY",420f);set("velocityY",-200f);
+        set("facingDirection",1);set("dpadDirection",5);
+        invoke("applyPlayerHit",new Class<?>[]{int.class,int.class,String.class,boolean.class,boolean.class},500,-1,"M",false,false);
+        assertEquals("Air guard must block",life,activeLife());
+        assertEquals(3,(int)get("playerLastGuardState"));
+        assertTrue((Float)get("playerBlockstunTimer")>0f);
+        frames(1);
+        assertEquals("DEFENSE_AIR",motion().clip);
+        assertEquals("Impact frame while in blockstun",2,motion().frame());
+    }
+    @Test public void knockdownPlaysTheNewFallSequenceOnTheGround()throws Exception {
+        set("playerKnockdownState",1);set("playerMovementLocked",true);frames(1);
+        assertEquals("KNOCKDOWN",motion().clip);
+        assertEquals("player_base_fall",GeneratedCharacters.defaultCharacter().animation("KNOCKDOWN").atlas.resource);
+        set("playerKnockdownState",2);set("playerKnockdownTimer",0f);frames(1);
+        assertEquals("GROUNDED",motion().clip);
+    }
     @Test public void matchRenderersShareOneDecodedAtlasCache()throws Exception {
         SpriteFighterRenderer player=(SpriteFighterRenderer)get("spriteFighterRenderer");
         SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");

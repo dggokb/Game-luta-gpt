@@ -97,7 +97,7 @@ a arte olha; o renderer espelha a partir dele, sem flips no `GameView`.
 Estados semânticos obrigatórios: `IDLE`, `COMBAT`, `WALK_FORWARD`, `WALK_BACK`,
 `CROUCH`, `RISE`, `JUMP`, `FALL`, `DASH`, `BACKDASH` e `LAND`.
 
-Estados opcionais conhecidos: `DEFENSE_STAND`, `DEFENSE_CROUCH`, `HIT_STAND`,
+Estados opcionais conhecidos: `DEFENSE_STAND`, `DEFENSE_CROUCH`, `DEFENSE_AIR`, `HIT_STAND`,
 `HIT_CROUCH`, `HIT_AIR`, `KNOCKDOWN`, `GROUNDED` e `GETUP` (os três últimos só em
 conjunto). O vocabulário vive em `build_characters.py` e é gerado em
 `SpriteStates.java`. Qualquer outra animação precisa ser usada por um golpe ou por
@@ -504,3 +504,31 @@ cima da pose seguinte (sem encostar), então a projeção por colunas juntava os
 frames. O modo rotula corpos conectados (8-vizinhança), ordena da esquerda para a
 direita e recorta cada frame só com os próprios pixels; pedaços pequenos juntam-se ao
 corpo que os contém e ciscos são descartados.
+
+## Defesa em pé, agachado e no ar + queda — GPT v0.70
+
+Quatro folhas novas do `player_base`, todas na **mesma escala** (0,368, medida pela
+guarda em pé contra o Idle; agachado e ar usam `scaleMode: "fixed"` com justificativa
+para o conjunto não variar de tamanho):
+
+| Estado | Atlas | Frames usados |
+| --- | --- | --- |
+| `DEFENSE_STAND` | `player_base_defense_stand` | guarda erguida → impacto → recupera → guarda |
+| `DEFENSE_CROUCH` | `player_base_defense_crouch` | idem, agachado |
+| `DEFENSE_AIR` (novo) | `player_base_defense_air` | idem, no ar (registro aéreo dos golpes jX) |
+| `KNOCKDOWN` | `player_base_fall` | lançado para trás → bate no chão |
+| `GROUNDED` | `player_base_fall` | deitado → assentado |
+| `HIT_AIR` | `player_base_fall` | lançado para trás |
+
+**Clips de guarda:** o primeiro frame da animação é a guarda sustentada (enquanto o golpe
+se aproxima); os demais tocam esticados sobre o blockstun (`Animation.guardTime`).
+
+**Defesa no ar (regra nova):** no ar, segurar trás, trás-baixo ou trás-cima ativa
+`GUARD_AIR`. Bloqueia golpes, projéteis e Super (golpes baixos não alcançam um corpo no
+ar). Durante o bloqueio no ar o empurrão e a gravidade continuam; o HUD mostra
+"PRONTO/DEFENDENDO/BLOQUEIO NO AR".
+
+**Importador:** `scaleMode: "fixed"` (exige `scaleReason`), raiz `bbox-bottom-center`
+para corpos deitados e `minOpaquePixels` por clip. O atlas antigo `player_base_missing`
+agora só serve `HIT_STAND`, `HIT_CROUCH` e `GETUP` (frames 2, 3 e 7 da fonte), ainda
+ampliados de arte pequena — são os próximos a redesenhar.

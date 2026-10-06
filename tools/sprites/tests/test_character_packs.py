@@ -274,6 +274,24 @@ class CharacterPackTests(unittest.TestCase):
             self.assertEqual(4,report['layout']['frameCount'])
             self.assertTrue(report['passed'])
 
+    def test_player_base_defense_and_fall_share_one_scale_and_new_states(self):
+        pipeline.build(self.root)
+        scales={}
+        for key in ('defense_stand','defense_crouch','defense_air','fall'):
+            report=json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())
+            self.assertTrue(report['passed']);scales[key]=round(report['scale'],2)
+        self.assertEqual({0.37},set(scales.values()))
+        pack=json.loads(self.path.read_text())
+        self.assertEqual('player_base_defense_air',pack['animations']['DEFENSE_AIR']['atlas'])
+        self.assertEqual('player_base_fall',pack['animations']['GROUNDED']['atlas'])
+        states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
+        self.assertIn('DEFENSE_AIR = "DEFENSE_AIR"',states)
+
+    def test_fixed_scale_requires_a_reason(self):
+        path=self.root/'tools/sprites/clips/player_base_fall.json';d=json.loads(path.read_text())
+        d.pop('scaleReason');path.write_text(json.dumps(d))
+        with self.assertRaisesRegex(ValueError,'requires scaleReason'):pipeline.build(self.root)
+
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)
         idle=json.loads((self.root/'tools/sprites/reports/player_two_idle.report.json').read_text())

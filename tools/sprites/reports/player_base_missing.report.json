@@ -2,7 +2,7 @@
   "id": "player_base_missing",
   "characterProfile": "player_base",
   "source": "art/sprites/source/player_base_missing_normalized.png",
-  "sourceNote": "Reaction poses (defense, hit, knockdown, grounded, get-up) rescaled to the canonical body and grounded; unused frames 8-13 dropped.",
+  "sourceNote": "Interim reaction poses still without new art (hit stand, hit crouch, get-up), rescaled to the canonical body and grounded.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.0,
@@ -11,34 +11,12 @@
     "frameHeight": 256,
     "rootX": 192,
     "rootY": 238,
-    "columns": 8,
-    "frameCount": 8
+    "columns": 3,
+    "frameCount": 3
   },
   "frames": [
     {
       "index": 0,
-      "outputBbox": [
-        128,
-        21,
-        257,
-        239
-      ],
-      "minimumMargin": 17,
-      "opaquePixels": 15306
-    },
-    {
-      "index": 1,
-      "outputBbox": [
-        121,
-        50,
-        263,
-        239
-      ],
-      "minimumMargin": 17,
-      "opaquePixels": 14235
-    },
-    {
-      "index": 2,
       "outputBbox": [
         107,
         34,
@@ -49,7 +27,7 @@
       "opaquePixels": 17253
     },
     {
-      "index": 3,
+      "index": 1,
       "outputBbox": [
         111,
         66,
@@ -60,40 +38,7 @@
       "opaquePixels": 14972
     },
     {
-      "index": 4,
-      "outputBbox": [
-        85,
-        79,
-        300,
-        234
-      ],
-      "minimumMargin": 22,
-      "opaquePixels": 14790
-    },
-    {
-      "index": 5,
-      "outputBbox": [
-        35,
-        165,
-        348,
-        239
-      ],
-      "minimumMargin": 17,
-      "opaquePixels": 11960
-    },
-    {
-      "index": 6,
-      "outputBbox": [
-        52,
-        149,
-        331,
-        239
-      ],
-      "minimumMargin": 17,
-      "opaquePixels": 15456
-    },
-    {
-      "index": 7,
+      "index": 2,
       "outputBbox": [
         106,
         81,
@@ -117,24 +62,6 @@
     ],
     "frames": [
       {
-        "sourceFrame": 0,
-        "offset": [
-          0,
-          0
-        ],
-        "groundSnap": 2,
-        "cleanedPixels": 0
-      },
-      {
-        "sourceFrame": 1,
-        "offset": [
-          0,
-          0
-        ],
-        "groundSnap": 11,
-        "cleanedPixels": 0
-      },
-      {
         "sourceFrame": 2,
         "offset": [
           0,
@@ -153,33 +80,6 @@
         "cleanedPixels": 0
       },
       {
-        "sourceFrame": 4,
-        "offset": [
-          0,
-          0
-        ],
-        "groundSnap": 0,
-        "cleanedPixels": 0
-      },
-      {
-        "sourceFrame": 5,
-        "offset": [
-          0,
-          0
-        ],
-        "groundSnap": 2,
-        "cleanedPixels": 0
-      },
-      {
-        "sourceFrame": 6,
-        "offset": [
-          0,
-          0
-        ],
-        "groundSnap": 31,
-        "cleanedPixels": 0
-      },
-      {
         "sourceFrame": 7,
         "offset": [
           0,
@@ -191,26 +91,26 @@
     ]
   },
   "packed": {
-    "frameWidth": 335,
-    "frameHeight": 237,
-    "rootX": 168,
-    "rootY": 226,
-    "columns": 8,
-    "frameCount": 8,
+    "frameWidth": 188,
+    "frameHeight": 223,
+    "rootX": 96,
+    "rootY": 213,
+    "columns": 3,
+    "frameCount": 3,
     "cropOffset": [
-      24,
-      12
+      96,
+      25
     ],
     "decodedBytes": {
-      "canonical": 3145728,
-      "packed": 2540640
+      "canonical": 1179648,
+      "packed": 503088
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
       "source": "ae2b3dac328c822953eba238e10ef831258ca2289c39fbb9ce986430ed49f69f",
-      "config": "e96181b7091492984e6dbe38513f9c640e3434155b5f1242a02a2089b9235a27",
+      "config": "275b73a102af368a698150b46b01ccc1be20ddd798368599ccf55d56887ba671",
       "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
     }
   }

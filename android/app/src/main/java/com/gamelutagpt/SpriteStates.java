@@ -15,6 +15,7 @@ final class SpriteStates {
  static final String LAND = "LAND";
  static final String DEFENSE_STAND = "DEFENSE_STAND";
  static final String DEFENSE_CROUCH = "DEFENSE_CROUCH";
+ static final String DEFENSE_AIR = "DEFENSE_AIR";
  static final String HIT_STAND = "HIT_STAND";
  static final String HIT_CROUCH = "HIT_CROUCH";
  static final String HIT_AIR = "HIT_AIR";

@@ -28,6 +28,30 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_MEDIUM_ROOT_Y = 178;
     static final int CROUCH_MEDIUM_FRAME_COUNT = 4;
 
+    static final int DEFENSE_AIR_FRAME_WIDTH = 166;
+    static final int DEFENSE_AIR_FRAME_HEIGHT = 243;
+    static final int DEFENSE_AIR_ROOT_X = 103;
+    static final int DEFENSE_AIR_ROOT_Y = 242;
+    static final int DEFENSE_AIR_FRAME_COUNT = 4;
+
+    static final int DEFENSE_CROUCH_FRAME_WIDTH = 200;
+    static final int DEFENSE_CROUCH_FRAME_HEIGHT = 184;
+    static final int DEFENSE_CROUCH_ROOT_X = 93;
+    static final int DEFENSE_CROUCH_ROOT_Y = 176;
+    static final int DEFENSE_CROUCH_FRAME_COUNT = 4;
+
+    static final int DEFENSE_STAND_FRAME_WIDTH = 193;
+    static final int DEFENSE_STAND_FRAME_HEIGHT = 245;
+    static final int DEFENSE_STAND_ROOT_X = 91;
+    static final int DEFENSE_STAND_ROOT_Y = 236;
+    static final int DEFENSE_STAND_FRAME_COUNT = 4;
+
+    static final int FALL_DOWN_FRAME_WIDTH = 216;
+    static final int FALL_DOWN_FRAME_HEIGHT = 176;
+    static final int FALL_DOWN_ROOT_X = 108;
+    static final int FALL_DOWN_ROOT_Y = 167;
+    static final int FALL_DOWN_FRAME_COUNT = 4;
+
     static final int HEAVY_STRAIGHT_FRAME_WIDTH = 282;
     static final int HEAVY_STRAIGHT_FRAME_HEIGHT = 225;
     static final int HEAVY_STRAIGHT_ROOT_X = 120;
@@ -70,11 +94,11 @@ final class GeneratedSpriteLayouts {
     static final int MEDIUM_KICK_ROOT_Y = 236;
     static final int MEDIUM_KICK_FRAME_COUNT = 3;
 
-    static final int PLAYER_BASE_MISSING_FRAME_WIDTH = 335;
-    static final int PLAYER_BASE_MISSING_FRAME_HEIGHT = 237;
-    static final int PLAYER_BASE_MISSING_ROOT_X = 168;
-    static final int PLAYER_BASE_MISSING_ROOT_Y = 226;
-    static final int PLAYER_BASE_MISSING_FRAME_COUNT = 8;
+    static final int PLAYER_BASE_MISSING_FRAME_WIDTH = 188;
+    static final int PLAYER_BASE_MISSING_FRAME_HEIGHT = 223;
+    static final int PLAYER_BASE_MISSING_ROOT_X = 96;
+    static final int PLAYER_BASE_MISSING_ROOT_Y = 213;
+    static final int PLAYER_BASE_MISSING_FRAME_COUNT = 3;
 
     static final int MOVEMENT_FRAME_WIDTH = 253;
     static final int MOVEMENT_FRAME_HEIGHT = 229;

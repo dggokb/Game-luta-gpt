@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.69-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.70-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -90,3 +90,8 @@ e registro alinhado ao pulo.
 
 jM e jH do `player_base` com arte própria, alinhados ao pulo e ao jL. Novo modo de
 separação por componente para folhas em que as poses se sobrepõem na horizontal.
+
+## Defesas e queda — v0.70
+
+Defesa em pé, agachado e **no ar** (regra nova: segurar para trás pulando) e sequência de
+queda do `player_base` com arte própria, todas na mesma escala do corpo.

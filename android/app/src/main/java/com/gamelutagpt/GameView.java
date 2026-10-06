@@ -143,6 +143,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static final int GUARD_NONE = 0;
     private static final int GUARD_HIGH = 1;
     private static final int GUARD_LOW = 2;
+    /** Holding back while airborne: blocks everything that can reach a jumping body. */
+    private static final int GUARD_AIR = 3;
     private static final float BLOCKSTUN_DURATION = 0.18f;
     private static final float BLOCK_PUSH_SPEED = 72f;
 
@@ -1694,7 +1696,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private int currentPlayerGuardState() {
         if (
-            !grounded ||
             playerKnockdownState != DUMMY_KD_NONE ||
             playerLaunchedByHit ||
             playerGroundSlam ||
@@ -1706,6 +1707,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
 
         int relative = relativeDirection(dpadDirection);
+        if (!grounded) {
+            // Back, down-back or up-back in the air.
+            return relative == 4 || relative == 5 || relative == 6 ? GUARD_AIR : GUARD_NONE;
+        }
         if (relative == 5) return GUARD_HIGH;
         if (relative == 4) return GUARD_LOW;
         return GUARD_NONE;
@@ -1734,7 +1739,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             return !attackerAirborne;
         }
 
-        return false;
+        // Low attacks cannot reach a jumping body, so the air guard covers the rest.
+        return guard == GUARD_AIR;
     }
 
     private boolean incomingAiProjectileThreat() {
@@ -2061,6 +2067,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private String currentStateLabel() {
         if (playerKnockdownState != DUMMY_KD_NONE) return "DERRUBADO";
         if (playerBlockstunTimer > 0f) {
+            if (playerLastGuardState == GUARD_AIR) return "BLOQUEIO NO AR";
             return playerLastGuardState == GUARD_LOW
                 ? "BLOQUEIO BAIXO"
                 : "BLOQUEIO ALTO";
@@ -2068,10 +2075,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int anticipatedGuard = anticipatedPlayerGuardPose();
         if (anticipatedGuard == GUARD_LOW) return "DEFENDENDO BAIXO";
         if (anticipatedGuard == GUARD_HIGH) return "DEFENDENDO ALTO";
+        if (anticipatedGuard == GUARD_AIR) return "DEFENDENDO NO AR";
 
         int guard = currentPlayerGuardState();
         if (guard == GUARD_LOW) return "PRONTO BAIXO";
         if (guard == GUARD_HIGH) return "PRONTO ALTO";
+        if (guard == GUARD_AIR) return "PRONTO NO AR";
         if (playerGroundSlam) return "QUEDA FORÇADA";
         if (playerLaunchedByHit) return "LANÇADO";
         if (playerHitReactionTimer > 0f) return "HIT";
@@ -2230,12 +2239,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (animation == null && guard != GUARD_NONE) {
             String defense = guard == GUARD_LOW
                 ? SpriteStates.DEFENSE_CROUCH
-                : SpriteStates.DEFENSE_STAND;
+                : guard == GUARD_AIR
+                    ? SpriteStates.DEFENSE_AIR
+                    : SpriteStates.DEFENSE_STAND;
             if (spriteFighterRenderer.hasAnimation(defense)) {
                 animation = defense;
-                animationElapsed = playerBlockstunTimer > 0f
-                    ? BLOCKSTUN_DURATION - playerBlockstunTimer
-                    : 0f;
+                // Held guard while a threat approaches; impact and recovery during blockstun.
+                animationElapsed = character.animation(defense).guardTime(
+                    playerBlockstunTimer > 0f,
+                    1f - playerBlockstunTimer / BLOCKSTUN_DURATION
+                );
             }
         }
         if (animation == null && isSuperPoseActive()) {

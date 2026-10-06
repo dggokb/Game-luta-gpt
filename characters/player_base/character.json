@@ -226,29 +226,41 @@
       ]
     },
     "DEFENSE_STAND": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_defense_stand",
       "frames": [
+        1,
+        2,
+        3,
         0
       ],
       "loop": false,
       "durationsMs": [
-        180
+        100,
+        90,
+        50,
+        40
       ]
     },
     "DEFENSE_CROUCH": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_defense_crouch",
       "frames": [
-        1
+        1,
+        2,
+        3,
+        0
       ],
       "loop": false,
       "durationsMs": [
-        180
+        100,
+        90,
+        50,
+        40
       ]
     },
     "HIT_STAND": {
       "atlas": "player_base_missing",
       "frames": [
-        2
+        0
       ],
       "loop": false,
       "durationsMs": [
@@ -258,7 +270,7 @@
     "HIT_CROUCH": {
       "atlas": "player_base_missing",
       "frames": [
-        3
+        1
       ],
       "loop": false,
       "durationsMs": [
@@ -266,9 +278,9 @@
       ]
     },
     "HIT_AIR": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_fall",
       "frames": [
-        4
+        0
       ],
       "loop": false,
       "durationsMs": [
@@ -276,29 +288,33 @@
       ]
     },
     "KNOCKDOWN": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_fall",
       "frames": [
-        5
+        0,
+        1
       ],
       "loop": false,
       "durationsMs": [
-        220
+        100,
+        120
       ]
     },
     "GROUNDED": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_fall",
       "frames": [
-        6
+        2,
+        3
       ],
       "loop": false,
       "durationsMs": [
-        1200
+        180,
+        1020
       ]
     },
     "GETUP": {
       "atlas": "player_base_missing",
       "frames": [
-        7
+        2
       ],
       "loop": false,
       "durationsMs": [
@@ -399,6 +415,22 @@
         70,
         130,
         130
+      ]
+    },
+    "DEFENSE_AIR": {
+      "atlas": "player_base_defense_air",
+      "frames": [
+        1,
+        2,
+        3,
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        90,
+        50,
+        40
       ]
     }
   },
