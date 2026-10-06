@@ -5,3 +5,6 @@ local.properties
 
 __pycache__/
 *.pyc
+
+# Imagens brutas geradas antes do preparar_ultra.py
+tools/ultra/geradas/
