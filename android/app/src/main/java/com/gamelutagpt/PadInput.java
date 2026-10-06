@@ -39,6 +39,8 @@ final class PadInput {
         out.heavy = heavy;
         out.auto = auto;
         out.superAttack = superAttack;
+        // ↓ + SUPER asks for the ultra; the engine falls back to SUPER without three bars.
+        out.ultra = superAttack && ControlsLayout.isDownDirection(direction);
         light = medium = heavy = auto = superAttack = false;
     }
 

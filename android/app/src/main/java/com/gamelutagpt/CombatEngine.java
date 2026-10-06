@@ -58,11 +58,26 @@ final class CombatEngine {
     private final int[] autoStep = new int[1];
     private int frame;
     private int superFreeze;
+    /** Attacker whose ultra rush connected during the last step, or -1. */
+    private int ultraConnected = -1;
+
+    /**
+     * Combat data of the ultra. Its damage comes from the cinematic in parts
+     * ({@link #applyUltraHit}); this definition drives guard, scaling and blockstun.
+     */
+    private final AttackDefinition ultraAttack;
 
     CombatEngine(FighterState first, FighterState second, float firstX, float secondX, CombatConfig config) {
         this.config = config;
         fighters[0] = new CombatFighter(0, first, firstX, firstX <= secondX ? 1 : -1);
         fighters[1] = new CombatFighter(1, second, secondX, firstX <= secondX ? -1 : 1);
+        ultraAttack = new AttackDefinition.Builder("ULTRA", AttackDefinition.Kind.SUPER)
+            .damage(0)
+            .frames(config.ultraStartupFrames + config.ultraRushFrames, 1, config.ultraRecoveryFrames)
+            .stun(60, config.ultraBlockstunFrames, config.ultraHitstopFrames)
+            .windows(null, null, null)
+            .pushback(0f, config.ultraPushbackOnBlock)
+            .build();
     }
 
     CombatFighter fighter(int index) { return fighters[index]; }
@@ -76,6 +91,13 @@ final class CombatEngine {
         return sessionEndFrame[defender] < 0 ? Integer.MAX_VALUE : frame - sessionEndFrame[defender];
     }
     boolean superFreezeActive() { return superFreeze > 0; }
+    /** Attacker whose ultra connected in the last step (start the cinematic), or -1. */
+    int ultraConnected() { return ultraConnected; }
+    /** The fighter's ultra connected and waits for the cinematic to finish. */
+    boolean inUltraCinematic(int index) {
+        CombatFighter f = fighters[index];
+        return f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_CINEMATIC;
+    }
 
     /** Tag: the slot now plays another team member. Any action in progress is dropped. */
     void setFighterState(int index, FighterState state) {
@@ -90,6 +112,7 @@ final class CombatEngine {
     void step(FighterInput first, FighterInput second) {
         frame++;
         events.clear();
+        ultraConnected = -1;
         for (int i = 0; i < 2; i++) startX[i] = fighters[i].x;
 
         // 1. Inputs, buffer and motion parser.
@@ -115,6 +138,8 @@ final class CombatEngine {
 
         // 5. Reactions and pushback.
         for (Contact contact : contacts) applyContact(contact);
+        detectUltra(fighters[0], fighters[1]);
+        detectUltra(fighters[1], fighters[0]);
 
         // 6. Combo sessions.
         updateSessions();
@@ -130,6 +155,7 @@ final class CombatEngine {
             f.input.clear();
             f.buffer.clear();
             f.pendingJumpAge = -1;
+            f.ultraRequestAge = -1;
             return;
         }
         int relative = MotionParser.relative(in.direction, f.facing);
@@ -159,7 +185,11 @@ final class CombatEngine {
         }
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
-        if (in.superAttack) f.buffer.push(InputBuffer.Button.SUPER, null, false);
+        if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
+            f.ultraRequestAge = 0;
+        } else if (in.superAttack) {
+            f.buffer.push(InputBuffer.Button.SUPER, null, false);
+        }
     }
 
     private void requestJump(CombatFighter f, boolean superJump) {
@@ -173,6 +203,13 @@ final class CombatEngine {
         if (f.frozen()) return;
         endFinishedStates(f);
         if (f.locked || f.ko()) {
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
+
+        if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded &&
+            f.state.superMeter >= CombatConfig.ULTRA_COST) {
+            startUltra(f);
             f.dashRequest = f.backdashRequest = false;
             return;
         }
@@ -219,7 +256,7 @@ final class CombatEngine {
                 if (f.stunLeft == 0) f.status = CombatFighter.Status.NEUTRAL;
                 break;
             case AIR_HITSTUN:
-                if (f.stunLeft == 0 && !f.slammed) {
+                if (f.stunLeft == 0 && !f.slammed && !f.ultraFall) {
                     // Air recovery: control returns before landing.
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.launched = false;
@@ -233,6 +270,11 @@ final class CombatEngine {
                 break;
             case WAKEUP:
                 if (f.knockdownFrame >= config.wakeupFrames) f.status = CombatFighter.Status.NEUTRAL;
+                break;
+            case ULTRA:
+                if (f.ultraPhase == CombatFighter.ULTRA_RECOVERY && f.ultraFrame >= config.ultraRecoveryFrames) {
+                    f.status = CombatFighter.Status.NEUTRAL;
+                }
                 break;
             default:
                 break;
@@ -282,6 +324,25 @@ final class CombatEngine {
         }
     }
 
+    private void startUltra(CombatFighter f) {
+        f.status = CombatFighter.Status.ULTRA;
+        f.clearAttack();
+        f.ultraPhase = CombatFighter.ULTRA_STARTUP;
+        f.ultraFrame = 0;
+        f.ultraRequestAge = -1;
+        f.pendingJumpAge = -1;
+        f.buffer.clear();
+        f.forwardDashing = false;
+        f.backdashFrames = 0;
+        f.crouching = false;
+        f.state.superMeter -= CombatConfig.ULTRA_COST;
+        f.state.refreshHudLabels();
+        // Like the Super: the opponent and the projectiles wait for the rush.
+        CombatFighter other = fighters[1 - f.index];
+        other.hitstop = Math.max(other.hitstop, config.ultraStartupFrames);
+        superFreeze = Math.max(superFreeze, config.ultraStartupFrames);
+    }
+
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
         f.grounded = false;
@@ -303,6 +364,7 @@ final class CombatEngine {
         f.clock++;
         f.buffer.age(config.bufferFrames);
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
+        if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.launcherChase > 0) f.launcherChase--;
@@ -323,6 +385,13 @@ final class CombatEngine {
             case KNOCKDOWN:
             case WAKEUP:
                 f.knockdownFrame++;
+                break;
+            case ULTRA:
+                if (f.ultraPhase != CombatFighter.ULTRA_CINEMATIC) f.ultraFrame++;
+                if (f.ultraPhase == CombatFighter.ULTRA_STARTUP && f.ultraFrame >= config.ultraStartupFrames) {
+                    f.ultraPhase = CombatFighter.ULTRA_RUSH;
+                    f.ultraFrame = 0;
+                }
                 break;
             default:
                 break;
@@ -367,6 +436,8 @@ final class CombatEngine {
                 float speed = f.forwardDashing && holdingForward ? config.dashSpeed : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
+        } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
+            f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
         } else if (f.attacking() && !f.grounded && f.attack.kind == AttackDefinition.Kind.NORMAL) {
             // Air normals keep the jump's steering; ground attacks and specials lock it.
             f.x += horizontal * walk * CombatConfig.DT;
@@ -397,7 +468,7 @@ final class CombatEngine {
             f.clearAttack();
         }
         if (f.status == CombatFighter.Status.AIR_HITSTUN) {
-            if (f.slammed) {
+            if (f.slammed || f.ultraFall) {
                 knockDown(f);
             } else {
                 // Remaining hitstun is spent on the ground.
@@ -406,6 +477,7 @@ final class CombatEngine {
                 f.launched = false;
             }
         }
+        f.ultraFall = false;
         if (f.status == CombatFighter.Status.NEUTRAL) f.crouching = ControlsLayout.isDownDirection(f.input.direction);
     }
 
@@ -419,6 +491,7 @@ final class CombatEngine {
         f.vy = 0f;
         f.launched = false;
         f.slammed = false;
+        f.ultraFall = false;
         f.superJumping = false;
     }
 
@@ -594,6 +667,111 @@ final class CombatEngine {
         }
     }
 
+    /** Ultra rush: connects once the defender's body is within reach, else ends in recovery. */
+    private void detectUltra(CombatFighter a, CombatFighter d) {
+        if (a.status != CombatFighter.Status.ULTRA || a.ultraPhase != CombatFighter.ULTRA_RUSH || a.frozen()) return;
+        if (d.hittable() && ultraReaches(a, d)) {
+            connectUltra(a, d);
+        } else if (a.ultraFrame >= config.ultraRushFrames) {
+            a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+            a.ultraFrame = 0;
+        }
+    }
+
+    private boolean ultraReaches(CombatFighter a, CombatFighter d) {
+        float ahead = (d.x - a.x) * a.facing;
+        float halfWidth = d.body().halfWidth;
+        if (ahead < -halfWidth || ahead - halfWidth > config.ultraReach) return false;
+        float chest = a.y - a.body().height(false) * 0.55f;
+        return chest >= d.hurtTop() - 40f && chest <= d.y + 10f;
+    }
+
+    /** Guarded: blockstun and recovery. Hit: the attacker waits for the cinematic. */
+    private void connectUltra(CombatFighter a, CombatFighter d) {
+        int guard = effectiveGuard(d);
+        if (guardStops(guard, ultraAttack, !a.grounded, false)) {
+            d.status = CombatFighter.Status.BLOCKSTUN;
+            d.clearAttack();
+            d.stunLeft = d.stunTotal = ultraAttack.blockstunFrames;
+            d.stunElapsed = 0;
+            d.lastGuard = guard;
+            d.framesSinceBlock = 0;
+            d.forwardDashing = false;
+            d.backdashFrames = 0;
+            push(d, a, a.facing * ultraAttack.pushbackOnBlock);
+            d.state.addSuperMeter(CombatRules.superGainOnGuard(ultraAttack.strength));
+            freeze(a, d, ultraAttack.hitstopFrames, false);
+            a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
+            a.ultraFrame = 0;
+            events.add(new HitEvent(a.index, d.index, 0, true, false, ultraAttack.id));
+            return;
+        }
+
+        ComboSession session = sessions[d.index];
+        if (session == null || !d.inHitstun()) {
+            endSession(d.index);
+            session = new ComboSession(a.index, d.index);
+            sessions[d.index] = session;
+        }
+        a.ultraScale = session.scaleFor(ultraAttack, config);
+        a.ultraPhase = CombatFighter.ULTRA_CINEMATIC;
+        a.ultraFrame = 0;
+
+        boolean wasCrouching = d.crouchingBody();
+        d.clearAttack();
+        d.forwardDashing = false;
+        d.backdashFrames = 0;
+        d.framesSinceHit = 0;
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.hitCrouching = wasCrouching;
+        d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
+        d.stunElapsed = 0;
+        ultraConnected = a.index;
+    }
+
+    /**
+     * One hit of the ultra cinematic, called by the shell while the engine waits: part of
+     * the ultra's base damage, scaled by the combo it landed in. Returns the damage dealt.
+     */
+    int applyUltraHit(int attacker, int baseDamage) {
+        CombatFighter a = fighters[attacker];
+        CombatFighter d = fighters[1 - attacker];
+        if (!inUltraCinematic(attacker) || d.ko()) return 0;
+        int damage = ComboSession.DamageScaling.apply(baseDamage, a.ultraScale);
+        d.state.life = Math.max(0, d.state.life - damage);
+        d.state.refreshHudLabels();
+        d.framesSinceHit = 0;
+        ComboSession session = sessions[d.index];
+        if (session != null) session.addHit(damage);
+        events.add(new HitEvent(a.index, d.index, damage, false, false, ultraAttack.id));
+        return damage;
+    }
+
+    /** End of the cinematic: the attacker is free and the defender flies away, landing down. */
+    void finishUltra(int attacker) {
+        if (!inUltraCinematic(attacker)) return;
+        CombatFighter a = fighters[attacker];
+        CombatFighter d = fighters[1 - attacker];
+        a.status = CombatFighter.Status.NEUTRAL;
+        a.ultraFrame = 0;
+
+        d.status = CombatFighter.Status.AIR_HITSTUN;
+        d.grounded = false;
+        d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+        d.vy = -config.ultraLaunchSpeed;
+        d.launched = true;
+        d.slammed = false;
+        d.superJumping = false;
+        d.ultraFall = true;
+        d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
+        d.stunElapsed = 0;
+        push(d, a, a.facing * config.ultraKnockback);
+        ComboSession session = sessions[d.index];
+        if (session != null) session.airCombo = true;
+    }
+
     private void addContact(CombatFighter a, CombatFighter d, AttackDefinition attack, int hitbox, Projectile p) {
         Contact c = new Contact();
         c.attacker = a;
@@ -627,6 +805,7 @@ final class CombatEngine {
             d.stunLeft = 0;
             d.launched = false;
             d.slammed = false;
+            d.ultraFall = false;
             return;
         }
 

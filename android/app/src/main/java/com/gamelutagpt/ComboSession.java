@@ -63,6 +63,25 @@ final class ComboSession {
         return damage;
     }
 
+    /**
+     * Ultra: the scale is fixed when the rush connects and its damage then arrives in
+     * parts during the cinematic ({@link #addHit}). Counts as one use of the move.
+     */
+    int scaleFor(AttackDefinition attack, CombatConfig config) {
+        if (hitCount == 0) prorationPermille = attack.prorationPermille;
+        damageScale = DamageScaling.scale(attack, hitCount, hitCount == 0 ? 1000 : prorationPermille,
+            usesOf(attack.id), config);
+        lastMove = attack.id;
+        usedMoves.add(attack.id);
+        return damageScale;
+    }
+
+    /** One part of an already scaled hit (ultra cinematic). */
+    void addHit(int damage) {
+        hitCount++;
+        comboDamage += damage;
+    }
+
     /** Hitstun for the next hit of this combo after decay. */
     int decayedHitstun(int baseHitstun, CombatConfig config) {
         hitstunDecay = HitstunDecay.reduction(hitCount, comboDuration, config);

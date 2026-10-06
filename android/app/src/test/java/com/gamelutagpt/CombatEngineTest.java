@@ -754,4 +754,98 @@ public class CombatEngineTest {
         }
         assertTrue("CPU attacks once in range", started > 0);
     }
+
+    // ------------------------------------------------------------ ultra (↓ + SUPER)
+
+    /** ↓ + SUPER as the touch pad delivers it. */
+    private static void pressUltra(Sim s) {
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+    }
+
+    @Test public void ultraNeedsThreeBarsOtherwiseThePressIsASuper() {
+        Sim weak = close();
+        weak.f(0).state.superMeter = CombatConfig.SUPER_COST;
+        pressUltra(weak);
+        weak.step();
+        weak.until(() -> weak.f(0).attacking(), 6);
+        assertEquals("SUPER", weak.attackId(0));
+
+        Sim s = close();
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        pressUltra(s);
+        s.step();
+        assertEquals(CombatFighter.Status.ULTRA, s.f(0).status);
+        assertEquals(CombatFighter.ULTRA_STARTUP, s.f(0).ultraPhase);
+        assertEquals(0, s.f(0).state.superMeter);
+        assertTrue("The opponent freezes during the activation", s.f(1).frozen());
+    }
+
+    @Test public void ultraConnectsUpCloseAndTheCinematicDealsScaledDamage() {
+        Sim s = close();
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        pressUltra(s);
+        CombatConfig config = s.engine.config;
+        s.until(() -> s.engine.inUltraCinematic(0), config.ultraStartupFrames + config.ultraRushFrames + 4);
+        assertEquals(CombatFighter.Status.HITSTUN, s.f(1).status);
+        assertNotNull(s.engine.session(1));
+
+        int life = s.f(1).state.life;
+        int first = s.engine.applyUltraHit(0, 1000);
+        assertEquals("First hit of a combo is not scaled", 1000, first);
+        int second = s.engine.applyUltraHit(0, 1000);
+        assertEquals(first, second);
+        assertEquals(life - first - second, s.f(1).state.life);
+        assertEquals(2, s.engine.session(1).hitCount);
+
+        s.engine.finishUltra(0);
+        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
+        assertEquals(CombatFighter.Status.AIR_HITSTUN, s.f(1).status);
+        s.until(() -> s.f(1).status == CombatFighter.Status.KNOCKDOWN, 200);
+        assertNull("Landing knocked down ends the combo", s.engine.session(1));
+        assertEquals(2000, s.engine.lastSession(1).comboDamage);
+    }
+
+    @Test public void ultraAfterAComboIsScaled() {
+        Sim s = close();
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        ComboSession session = new ComboSession(0, 1);
+        session.hitCount = 4;
+        int scale = session.scaleFor(new AttackDefinition.Builder("ULTRA", AttackDefinition.Kind.SUPER)
+            .damage(0).frames(1, 1, 1).stun(1, 1, 0).windows(null, null, null).build(), s.engine.config);
+        assertEquals("4 hits in: 1000 - 4 x 50", 800, scale);
+    }
+
+    @Test public void guardedUltraIsBlockedWithoutCinematic() {
+        Sim s = close();
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        s.in[1].direction = 1; // the defender faces left: → is back, high guard
+        pressUltra(s);
+        CombatConfig config = s.engine.config;
+        s.until(() -> s.f(1).status == CombatFighter.Status.BLOCKSTUN,
+            config.ultraStartupFrames + config.ultraRushFrames + 4);
+        assertFalse(s.engine.inUltraCinematic(0));
+        assertEquals(CombatFighter.ULTRA_RECOVERY, s.f(0).ultraPhase);
+        s.in[1].direction = 0;
+        s.until(() -> s.f(0).status == CombatFighter.Status.NEUTRAL, config.ultraRecoveryFrames + 20);
+    }
+
+    @Test public void ultraWhiffsFromFarAndRecovers() {
+        Sim s = far();
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        float start = s.f(0).x;
+        pressUltra(s);
+        s.step();
+        s.in[0].direction = 0;
+        boolean connected = false;
+        for (int i = 0; i < 120 && s.f(0).status == CombatFighter.Status.ULTRA; i++) {
+            s.step();
+            connected |= s.engine.ultraConnected() >= 0;
+        }
+        assertFalse(connected);
+        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
+        assertTrue("The rush travels forward", s.f(0).x > start + 400f);
+        assertEquals("The bars stay spent", 0, s.f(0).state.superMeter);
+    }
 }

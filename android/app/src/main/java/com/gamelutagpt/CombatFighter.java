@@ -6,7 +6,14 @@ package com.gamelutagpt;
  */
 final class CombatFighter {
     /** Character state machine. Attack phases and hitstop are derived, see {@link #stateName}. */
-    enum Status { NEUTRAL, ATTACK, HITSTUN, BLOCKSTUN, AIR_HITSTUN, KNOCKDOWN, WAKEUP }
+    enum Status { NEUTRAL, ATTACK, HITSTUN, BLOCKSTUN, AIR_HITSTUN, KNOCKDOWN, WAKEUP, ULTRA }
+
+    /** Phases of {@link Status#ULTRA}. */
+    static final int ULTRA_STARTUP = 0;
+    static final int ULTRA_RUSH = 1;
+    static final int ULTRA_RECOVERY = 2;
+    /** Rush connected: the engine waits while the shell plays the cinematic. */
+    static final int ULTRA_CINEMATIC = 3;
 
     /** What the current attack has done so far; picks the hit/block/whiff cancel window. */
     enum Outcome { NONE, HIT, BLOCK }
@@ -69,6 +76,15 @@ final class CombatFighter {
     /** Set by the shell while a tag animation owns the fighter. */
     boolean locked;
 
+    // Ultra.
+    int ultraPhase;
+    /** Frames spent in the current ultra phase. */
+    int ultraFrame;
+    /** Damage scale of the ultra, fixed when the rush connects (permille). */
+    int ultraScale = 1000;
+    /** Thrown by an ultra: lands knocked down instead of recovering in the air. */
+    boolean ultraFall;
+
     // Input.
     final InputBuffer buffer = new InputBuffer();
     final MotionParser motion = new MotionParser();
@@ -77,6 +93,8 @@ final class CombatFighter {
     int clock;
     int pendingJumpAge = -1;
     boolean pendingSuperJump;
+    /** Frames since ↓ + SUPER asked for an ultra, or -1 (kept for the input buffer). */
+    int ultraRequestAge = -1;
     boolean dashRequest;
     boolean backdashRequest;
 
@@ -137,6 +155,11 @@ final class CombatFighter {
     String stateName() {
         if (hitstop > 0) return "HITSTOP";
         if (status == Status.ATTACK) return "ATTACK_" + attack.phase(Math.max(0, attackFrame));
+        if (status == Status.ULTRA) {
+            return ultraPhase == ULTRA_STARTUP ? "ULTRA_STARTUP"
+                : ultraPhase == ULTRA_RUSH ? "ULTRA_RUSH"
+                : ultraPhase == ULTRA_RECOVERY ? "ULTRA_RECOVERY" : "ULTRA_CINEMATIC";
+        }
         return status.name();
     }
 

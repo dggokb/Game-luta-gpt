@@ -159,7 +159,7 @@ final class AttackDefinition {
     }
 
     static Strength strengthOf(String binding) {
-        if ("SUPER".equals(binding)) return Strength.SUPER;
+        if ("SUPER".equals(binding) || "ULTRA".equals(binding)) return Strength.SUPER;
         if ("S".equals(binding)) return Strength.SPECIAL;
         char button = binding.charAt(binding.length() - 1);
         if (button == 'L') return Strength.LIGHT;

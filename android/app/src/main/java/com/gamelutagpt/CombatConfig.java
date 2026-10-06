@@ -75,6 +75,23 @@ final class CombatConfig {
     static final int METER_PER_BAR = 1000;
     static final int MAX_METER = 5 * METER_PER_BAR;
     static final int SUPER_COST = METER_PER_BAR;
+    /** Ultra (↓ + SUPER): three bars. */
+    static final int ULTRA_COST = 3 * METER_PER_BAR;
+
+    // Ultra: activation (the opponent freezes), rush, then either the cinematic (hit),
+    // blockstun for the defender (guarded) or a punishable recovery (whiff or block).
+    int ultraStartupFrames = 25;
+    int ultraRushFrames = 18;
+    int ultraRecoveryFrames = 30;
+    float ultraRushSpeed = 2000f;
+    /** Rush connects when the defender's body is this close in front of the attacker's root. */
+    float ultraReach = 96f;
+    int ultraBlockstunFrames = 24;
+    int ultraHitstopFrames = 8;
+    float ultraPushbackOnBlock = 120f;
+    /** End of the cinematic: the defender flies away and lands knocked down. */
+    float ultraLaunchSpeed = 1150f;
+    float ultraKnockback = 420f;
 
     static int hitstunDecay(int[] table, int index) {
         if (table.length == 0) return 0;

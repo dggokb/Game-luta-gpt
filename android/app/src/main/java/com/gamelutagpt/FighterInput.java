@@ -12,6 +12,11 @@ final class FighterInput {
     /** Auto-combo button: the next step of the character's declared autoCombo route. */
     boolean auto;
     boolean superAttack;
+    /**
+     * SUPER pressed while holding down. The engine starts an ultra when there are three
+     * bars; otherwise the press counts as a plain SUPER.
+     */
+    boolean ultra;
     /** CPU only: an already-resolved special of strength "L", "M" or "H". */
     String special;
     /** CPU only: requests that a human expresses through the direction history. */
@@ -23,7 +28,7 @@ final class FighterInput {
     }
 
     void clearPresses() {
-        light = medium = heavy = auto = superAttack = false;
+        light = medium = heavy = auto = superAttack = ultra = false;
         special = null;
         dash = backdash = jump = superJump = false;
     }
@@ -35,6 +40,7 @@ final class FighterInput {
         heavy = other.heavy;
         auto = other.auto;
         superAttack = other.superAttack;
+        ultra = other.ultra;
         special = other.special;
         dash = other.dash;
         backdash = other.backdash;
