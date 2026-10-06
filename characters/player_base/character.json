@@ -267,6 +267,22 @@
       "durationsMs": [
         350
       ]
+    },
+    "CROUCH_LIGHT": {
+      "atlas": "player_base_crouch_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        40,
+        40,
+        50
+      ]
     }
   },
   "moves": {
@@ -290,6 +306,13 @@
       "activeStartMs": 160,
       "activeEndMs": 250,
       "reach": 182
+    },
+    "2L": {
+      "animation": "CROUCH_LIGHT",
+      "damage": 300,
+      "activeStartMs": 40,
+      "activeEndMs": 100,
+      "reach": 118
     }
   }
 }

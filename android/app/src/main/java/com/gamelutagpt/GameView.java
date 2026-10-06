@@ -1665,7 +1665,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         else if ("S".equals(type)) attackDuration = 0.30f;
         else attackDuration = 0.40f;
 
-        activeSpriteMove = grounded && !crouching
+        activeSpriteMove = grounded
             ? GeneratedCharacters.get(GeneratedCharacters.TEAM[activeFighterIndex]).moves.get(type)
             : null;
         if (activeSpriteMove != null) attackDuration = activeSpriteMove.animation.duration;

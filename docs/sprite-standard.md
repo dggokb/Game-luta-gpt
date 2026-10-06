@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — GPT v0.59
+# Padrão de personagens e sprites — GPT v0.61
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -263,3 +263,18 @@ defesa em pé/agachado, hit em pé/agachado/aéreo, knockdown, derrubado e levan
 Os ataques agachados voltam ao fallback de agachamento e os ataques aéreos ao
 fallback de salto/queda, exatamente como antes da v0.59, até existirem sprites
 dedicados e revisados para cada golpe.
+
+
+## Primeiro golpe direcional pelo motor — 2L — GPT v0.61
+
+O `player_base` agora possui um atlas dedicado `player_base_crouch_light` para o
+2L. A fonte é um master revisado 4×256×256, transparente, com root authored
+128/238 e sem redução do limiar global de qualidade: cada frame supera os 10 mil
+pixels opacos exigidos pelo perfil do personagem.
+
+O Character Pack Engine passa a aceitar opcionalmente `2L`, `2M` e `2H` em
+`moves`, mantendo L/M/H obrigatórios. O runtime consulta o move declarativo para
+ataques no chão; assim o 2L usa diretamente a animação e a janela ativa definidas
+no `character.json`. 2M/2H continuam no fallback legado até receberem masters
+próprios. Ataques aéreos continuam fora desse vínculo e não reutilizam sprites em
+pé por engano.

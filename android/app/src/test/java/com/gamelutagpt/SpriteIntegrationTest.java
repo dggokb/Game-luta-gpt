@@ -48,7 +48,9 @@ public class SpriteIntegrationTest {
         assertEquals(192f,second.profile.rootX,.001f);
         assertEquals(246f,second.profile.rootY,.001f);
         assertTrue(first.animations.keySet().containsAll(second.animations.keySet()));
-        assertEquals(first.moves.keySet(),second.moves.keySet());
+        assertTrue(first.moves.keySet().containsAll(second.moves.keySet()));
+        assertTrue(first.moves.containsKey("2L"));
+        assertFalse(second.moves.containsKey("2L"));
         assertNotEquals(first.animation("IDLE").atlas.resource,second.animation("IDLE").atlas.resource);
         assertEquals("player_two_idle",second.animation("IDLE").atlas.resource);
         assertEquals("player_two_movement",second.animation("WALK_FORWARD").atlas.resource);
@@ -66,26 +68,23 @@ public class SpriteIntegrationTest {
         }
     }
 
-    @Test public void playerBaseKeepsReactiveSpritesButDirectionalAttacksUseSafeFallback()throws Exception {
+    @Test public void playerBaseUsesDedicated2LThroughCharacterPackEngine()throws Exception {
         CharacterDefinition first=GeneratedCharacters.get("player_base");
-        String[] reactive={
-            "DEFENSE_STAND","DEFENSE_CROUCH","HIT_STAND","HIT_CROUCH","HIT_AIR",
-            "KNOCKDOWN","GROUNDED","GETUP"
-        };
-        for(String id:reactive) {
-            assertTrue("Missing "+id,first.animations.containsKey(id));
-            assertEquals("player_base_missing",first.animation(id).atlas.resource);
-        }
-        for(String id:new String[]{
-            "CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY",
-            "AIR_LIGHT","AIR_MEDIUM","AIR_HEAVY"
-        }) {
-            assertFalse("Directional placeholder must stay disabled: "+id,
-                first.animations.containsKey(id));
-        }
+        assertTrue(first.animations.containsKey("CROUCH_LIGHT"));
+        assertEquals("player_base_crouch_light",
+            first.animation("CROUCH_LIGHT").atlas.resource);
+        assertTrue(first.moves.containsKey("2L"));
+        assertEquals("CROUCH_LIGHT",first.moves.get("2L").animation.id);
 
         set("grounded",true);set("crouching",true);
         invoke("startAttack",new Class<?>[]{String.class},"2L");frames(1);
+        assertEquals("CROUCH_LIGHT",motion().clip);
+        assertEquals(0,motion().frame());
+        frames(3);
+        assertTrue("2L must advance through authored frames",motion().frame() >= 1);
+
+        setup();set("grounded",true);set("crouching",true);
+        invoke("startAttack",new Class<?>[]{String.class},"2M");frames(1);
         assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
 
         setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);

@@ -63,8 +63,8 @@ def compile_packs(root, results):
                     raise ValueError(f'{key}: one duration per frame is required')
                 for d in a['durationsMs']: positive(d, key)
         for binding,m in pack['moves'].items():
-            if binding not in ('L','M','H'):
-                raise ValueError(f'{binding}: supported standing inputs are L, M, H')
+            if binding not in ('L','M','H','2L','2M','2H'):
+                raise ValueError(f'{binding}: supported inputs are L, M, H, 2L, 2M, 2H')
             if m['animation'] not in animations:
                 raise ValueError(f'{binding}: unknown animation')
             a = animations[m['animation']]
@@ -75,7 +75,7 @@ def compile_packs(root, results):
             positive(m['reach'], binding)
             if type(m['damage']) is not int or m['damage'] <= 0:
                 raise ValueError(f'{binding}: damage must be a positive integer')
-        if set(pack['moves']) != {'L','M','H'}:
+        if not {'L','M','H'}.issubset(set(pack['moves'])):
             raise ValueError(f'{pack["id"]}: L, M, H bindings are required')
         pack['_profile'] = profile
         packs.append(pack)
