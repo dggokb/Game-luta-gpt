@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.74-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.75-sprite-gpt-ultra` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -120,3 +120,17 @@ lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app.
 
 Andar para trás (220) é mais lento que andar para frente (300), no chão e no ar, para que
 recuar não seja uma fuga igual ao avanço do adversário.
+
+
+## Ultra Página Final — v0.75
+
+Port seguro da `claude/kind-hypatia-w5j169` sobre o CombatEngine V2 atual, sem
+regredir a arquitetura de sprites/combos. **Baixo + SUPER** com pelo menos 3 barras
+inicia a investida do Ultra. Se conectar, abre a cinemática **Página Final** em cinco
+painéis (olhos, carga, golpe, atingido e final), com timing de toque, bônus de dano,
+onomatopeias configuráveis por painel e quebra da página de volta para a luta.
+
+O motor visual fica em `android/ultra-core` (Java puro), com preview desktop em
+`android/ultra-preview`. As artes e definições ficam em
+`android/app/src/main/assets/ultras/<personagem>/`; o Player 1 já inclui as cinco
+artes da Explosão Solar trazidas da w5j169.
