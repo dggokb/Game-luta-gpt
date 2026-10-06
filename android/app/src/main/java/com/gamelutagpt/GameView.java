@@ -6,14 +6,20 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.ultra.PaginaFinal;
+import com.gamelutagpt.ultra.UltraGrade;
+import com.gamelutagpt.ultra.UltraListener;
+import com.gamelutagpt.ultra.UltraPack;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
+public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable, UltraListener {
     private static final class FighterProfile {
         final String name;
         final String[] baseCombo;
@@ -31,6 +37,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         final float superRange;
         final float superSpeed;
         final int superDamage;
+        /** Pasta do ultra em assets (ultra.json, imagens e sons). */
+        final String ultraFolder;
+        final int ultraDamage;
         final String reserveHudLabel;
 
         FighterProfile(
@@ -49,7 +58,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             boolean hasSuperAttack,
             float superRange,
             float superSpeed,
-            int superDamage
+            int superDamage,
+            String ultraFolder,
+            int ultraDamage
         ) {
             this.name = name;
             this.baseCombo = baseCombo;
@@ -67,6 +78,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.superRange = superRange;
             this.superSpeed = superSpeed;
             this.superDamage = superDamage;
+            this.ultraFolder = ultraFolder;
+            this.ultraDamage = ultraDamage;
             this.reserveHudLabel = "RESERVA: " + name;
         }
     }
@@ -182,7 +195,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             true,
             1450f,
             1180f,
-            3200
+            3200,
+            "ultras/player1",
+            4200
         )),
         new FighterState(new FighterProfile(
             "PLAYER 2",
@@ -200,7 +215,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             true,
             1320f,
             1280f,
-            2850
+            2850,
+            "ultras/player2",
+            3900
         ))
     };
 
@@ -422,6 +439,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int superFlashAlpha = 0;
     private float superStoredVelocityY = 0f;
 
+    // Ultra (baixo + SUPER com 3 barras): ativação, investida e, se acertar,
+    // a cinemática "Página Final" do módulo ultra-core.
+    private static final float ULTRA_COST = 3f;
+    private static final int ULTRA_IDLE = 0;
+    private static final int ULTRA_STARTUP = 1;
+    private static final int ULTRA_RUSH = 2;
+    private static final int ULTRA_WHIFF = 3;
+    private static final int ULTRA_CINEMATIC = 4;
+    private static final float ULTRA_STARTUP_DURATION = 0.42f;
+    private static final float ULTRA_RUSH_DURATION = 0.30f;
+    private static final float ULTRA_RUSH_SPEED = 2000f;
+    private static final float ULTRA_RUSH_REACH = 96f;
+    private static final float ULTRA_WHIFF_DURATION = 0.50f;
+    private static final float ULTRA_STARTUP_ZOOM = 0.30f;
+    private static final String LOG_TAG = "GameView";
+    private volatile int ultraPhase = ULTRA_IDLE;
+    private float ultraPhaseTimer = 0f;
+    private float ultraCameraZoom = 1f;
+    private int ultraDarkAlpha = 0;
+    private int ultraDamageDealt = 0;
+    private volatile boolean ultraStartRequested = false;
+    private volatile boolean ultraTapRequested = false;
+    private boolean dummyUltraKnockdown = false;
+    private final UltraPack[] ultraPacks = new UltraPack[team.length];
+    private final PaginaFinal paginaFinal = new PaginaFinal(this);
+    private final AndroidUltraCanvas ultraCanvas = new AndroidUltraCanvas();
+    private final UltraSounds ultraSounds;
+
     private static final int TAG_IDLE = 0;
     private static final int TAG_EXIT = 1;
     private static final int TAG_ENTER = 2;
@@ -470,6 +515,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             Shader.TileMode.CLAMP
         );
         buildScenarioGeometry();
+
+        ultraSounds = new UltraSounds(context.getAssets());
+        AndroidUltraAssets ultraAssets = new AndroidUltraAssets(context.getAssets());
+        for (int i = 0; i < team.length; i++) {
+            ultraPacks[i] = loadUltraPack(ultraAssets, team[i].profile);
+            ultraSounds.loadUltra(team[i].profile.ultraFolder);
+        }
+    }
+
+    private static UltraPack loadUltraPack(AndroidUltraAssets assets, FighterProfile profile) {
+        try {
+            UltraPack pack = UltraPack.load(assets, profile.ultraFolder);
+            for (String warning : pack.warnings) Log.w(LOG_TAG, profile.ultraFolder + ": " + warning);
+            return pack;
+        } catch (IOException | RuntimeException ex) {
+            // Sem ultra.json válido o ultra continua jogável, só com a arte provisória.
+            Log.w(LOG_TAG, "ultra de " + profile.name + " usando arte provisória", ex);
+            return UltraPack.placeholder("ULTRA " + profile.name, profile.color);
+        }
     }
 
     private void buildScenarioGeometry() {
@@ -549,6 +613,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void update(float dt) {
+        if (ultraStartRequested) {
+            ultraStartRequested = false;
+            startUltra();
+        }
+        if (ultraPhase != ULTRA_IDLE && ultraPhase != ULTRA_WHIFF) {
+            // Ativação, investida e cinemática congelam o resto da luta.
+            updateUltra(dt);
+            return;
+        }
+        if (ultraPhase == ULTRA_WHIFF) {
+            ultraPhaseTimer += dt;
+            if (ultraPhaseTimer >= ULTRA_WHIFF_DURATION) {
+                ultraPhase = ULTRA_IDLE;
+                ultraPhaseTimer = 0f;
+            }
+        }
+
         updateSuperState(dt);
         updateTagState(dt);
 
@@ -590,7 +671,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             anticipatedGuard == GUARD_NONE &&
             !playerMovementLocked &&
             !isEnergyAttackActive() &&
-            !isTagAnimationActive()
+            !isTagAnimationActive() &&
+            !isUltraActive()
         ) {
             if (movingLeft && !movingRight) direction = -1f;
             if (movingRight && !movingLeft) direction = 1f;
@@ -1086,6 +1168,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             dummyLaunchedByHit = false;
             dummyGroundSlam = false;
             aiSuperJumping = false;
+
+            if (dummyUltraKnockdown) {
+                dummyUltraKnockdown = false;
+                knockDownDummy();
+            }
         }
     }
 
@@ -1176,6 +1263,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private boolean canStartSuper() {
         return !playerMovementLocked &&
+            !isUltraActive() &&
             activeFighter().profile.hasSuperAttack &&
             activeFighter().superMeter >= SUPER_COST &&
             !isSuperCinematicActive() &&
@@ -1272,6 +1360,157 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
+    private boolean isUltraActive() {
+        return ultraPhase != ULTRA_IDLE;
+    }
+
+    private boolean canStartUltra() {
+        return !playerMovementLocked &&
+            grounded &&
+            dummyLife > 0 &&
+            activeFighter().superMeter >= ULTRA_COST &&
+            !isUltraActive() &&
+            !isSuperCinematicActive() &&
+            !isTagAnimationActive() &&
+            attackTimer <= 0f;
+    }
+
+    private void startUltra() {
+        if (!canStartUltra()) return;
+
+        FighterState fighter = activeFighter();
+        fighter.superMeter = Math.max(0f, fighter.superMeter - ULTRA_COST);
+        fighter.refreshHudLabels();
+
+        ultraPhase = ULTRA_STARTUP;
+        ultraPhaseTimer = 0f;
+        ultraDamageDealt = 0;
+        crouching = false;
+        ultraTapRequested = false;
+        launcherChaseUntilMs = -1L;
+
+        attackType = "";
+        attackTimer = 0f;
+        attackDuration = 0f;
+        forwardDashing = false;
+        backDashTimer = 0f;
+        resetAutoCombo();
+        resetCommandBuffer();
+        pendingEnergyUntilMs = -1L;
+
+        ultraSounds.play(fighter.profile.ultraFolder, "ativacao");
+    }
+
+    private void updateUltra(float dt) {
+        ultraPhaseTimer += dt;
+
+        if (ultraPhase == ULTRA_STARTUP) {
+            float t = clamp(ultraPhaseTimer / ULTRA_STARTUP_DURATION, 0f, 1f);
+            float eased = 1f - (1f - t) * (1f - t);
+            ultraDarkAlpha = Math.round(205f * Math.min(1f, t * 3f));
+            ultraCameraZoom = 1f + ULTRA_STARTUP_ZOOM * eased;
+
+            if (t >= 1f) {
+                ultraPhase = ULTRA_RUSH;
+                ultraPhaseTimer = 0f;
+                ultraSounds.play(activeFighter().profile.ultraFolder, "investida");
+            }
+        } else if (ultraPhase == ULTRA_RUSH) {
+            float t = clamp(ultraPhaseTimer / ULTRA_RUSH_DURATION, 0f, 1f);
+            ultraDarkAlpha = Math.round(205f * (1f - t));
+            ultraCameraZoom = 1f + ULTRA_STARTUP_ZOOM * (1f - t);
+
+            playerX = clamp(
+                playerX + facingDirection * ULTRA_RUSH_SPEED * dt,
+                LEFT_BOUND,
+                RIGHT_BOUND
+            );
+            walkTime += dt * 16f;
+
+            if (ultraRushConnects()) {
+                beginUltraCinematic();
+            } else if (t >= 1f) {
+                // Errou: barra gasta e uma recuperação punível.
+                ultraPhase = ULTRA_WHIFF;
+                ultraPhaseTimer = 0f;
+                ultraDarkAlpha = 0;
+                ultraCameraZoom = 1f;
+            }
+            updateFightCamera(dt);
+        } else if (ultraPhase == ULTRA_CINEMATIC) {
+            if (ultraTapRequested) {
+                ultraTapRequested = false;
+                paginaFinal.tap();
+            }
+            paginaFinal.update(dt);
+        }
+    }
+
+    private boolean ultraRushConnects() {
+        if (dummyLife <= 0) return false;
+
+        float horizontalDistance = (dummyX - playerX) * facingDirection;
+        if (horizontalDistance < -20f || horizontalDistance > ULTRA_RUSH_REACH) return false;
+
+        float playerCenterY = playerY - 78f;
+        float dummyCenterY = (dummyTop() + dummyY) * 0.5f;
+        return Math.abs(playerCenterY - dummyCenterY) <= 110f;
+    }
+
+    private void beginUltraCinematic() {
+        ultraPhase = ULTRA_CINEMATIC;
+        ultraPhaseTimer = 0f;
+        ultraDarkAlpha = 0;
+        ultraCameraZoom = 1f;
+        playerX = clamp(dummyX - facingDirection * 80f, LEFT_BOUND, RIGHT_BOUND);
+
+        // O oponente fica preso no golpe: cancela o que ele estava fazendo.
+        dummyAttackTimer = 0f;
+        dummyAttackType = "";
+        dummyAttackHitApplied = false;
+        aiSuperTimer = 0f;
+        energyProjectiles.clear();
+        superProjectiles.clear();
+
+        paginaFinal.start(ultraPacks[activeFighterIndex], facingDirection);
+    }
+
+    @Override
+    public void onUltraHit(int hitIndex, float damageFraction) {
+        int damage = Math.round(activeFighter().profile.ultraDamage * damageFraction);
+        int before = dummyLife;
+        applyDummyDamage(damage, facingDirection);
+        ultraDamageDealt += before - dummyLife;
+    }
+
+    @Override
+    public void onUltraSound(String soundId) {
+        ultraSounds.play(activeFighter().profile.ultraFolder, soundId);
+    }
+
+    @Override
+    public void onUltraFinished(UltraGrade grade) {
+        ultraPhase = ULTRA_IDLE;
+        ultraPhaseTimer = 0f;
+        ultraTapRequested = false;
+
+        dummyDamageLabel = "-" + ultraDamageDealt;
+        dummyDamageLabelTimer = 1.4f;
+
+        // A página quebra e o oponente sai voando para longe e cai derrubado.
+        dummyKnockdownState = DUMMY_KD_NONE;
+        dummyKnockdownTimer = 0f;
+        dummyAirborne = true;
+        dummyLaunchedByHit = true;
+        dummyGroundSlam = false;
+        dummyMovementLocked = true;
+        aiSuperJumping = false;
+        dummyVelocityY = -1150f;
+        dummyKnockbackVelocityX = facingDirection * 1100f;
+        dummyHitReactionTimer = 0.7f;
+        dummyUltraKnockdown = true;
+    }
+
     private void spawnSuperProjectile() {
         FighterProfile profile = activeFighter().profile;
         if (!profile.hasSuperAttack) return;
@@ -1365,6 +1604,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             !playerMovementLocked &&
             !isTagAnimationActive() &&
             !isSuperCinematicActive() &&
+            !isUltraActive() &&
             !isEnergyAttackActive() &&
             tagCooldownRemaining <= 0f;
     }
@@ -1504,7 +1744,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             playerMovementLocked ||
             isEnergyAttackActive() ||
             isTagAnimationActive() ||
-            isSuperCinematicActive()
+            isSuperCinematicActive() ||
+            isUltraActive()
         ) return;
 
         grounded = false;
@@ -1532,7 +1773,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void startAttack(String type) {
-        if (playerMovementLocked) return;
+        if (playerMovementLocked || isUltraActive()) return;
 
         attackType = type;
         attackHitApplied = false;
@@ -2320,24 +2561,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.save();
             canvas.scale(sx, sy);
 
-            float renderZoom = cameraZoom * superCameraZoom;
+            float baseZoom = cameraZoom * superCameraZoom;
+            float renderZoom = baseZoom * ultraCameraZoom;
             float visibleWorldWidth = VW / renderZoom;
-            float cameraLeft = clamp(cameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+            float renderCameraX = cameraX;
+            float renderCameraTop = cameraTop;
+            if (ultraCameraZoom != 1f) {
+                // Aproxima no lutador mantendo ele no mesmo ponto da tela.
+                float baseLeft = clamp(cameraX - VW / baseZoom / 2f, 0f, WORLD_WIDTH - VW / baseZoom);
+                float focusY = playerY - 80f;
+                float playerScreenX = (playerX - baseLeft) * baseZoom;
+                float playerScreenY = (focusY - cameraTop) * baseZoom;
+                renderCameraX = playerX - playerScreenX / renderZoom + visibleWorldWidth / 2f;
+                renderCameraTop = focusY - playerScreenY / renderZoom;
+            }
+            float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
 
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
-            canvas.translate(-cameraLeft, -cameraTop);
+            canvas.translate(-cameraLeft, -renderCameraTop);
             drawScenario(canvas);
             drawDamageDummy(canvas);
             drawEnergyProjectiles(canvas);
             drawSuperProjectiles(canvas);
             drawSuperDarkening(canvas);
+            drawUltraDarkening(canvas);
 
             canvas.save();
             if (facingDirection < 0) {
                 canvas.scale(-1f, 1f, playerX, 0f);
             }
             drawSuperChargeEffects(canvas);
+            drawUltraAura(canvas);
             canvas.restore();
 
             canvas.save();
@@ -2350,8 +2605,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             drawSuperFlash(canvas);
             canvas.restore();
 
-            drawHud(canvas);
-            drawControls(canvas);
+            boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
+            if (!pageCoversGame) {
+                drawHud(canvas);
+                drawControls(canvas);
+            }
+            if (paginaFinal.isActive()) {
+                ultraCanvas.begin(canvas);
+                paginaFinal.render(ultraCanvas);
+            }
 
             canvas.restore();
         } finally {
@@ -2458,7 +2720,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setColor(Color.WHITE);
         paint.setTextSize(20);
         paint.setFakeBoldText(true);
-        c.drawText("FIGHT CAMERA • v0.38", 975, 59, paint);
+        c.drawText("PÁGINA FINAL • v0.40", 975, 59, paint);
         paint.setFakeBoldText(false);
         paint.setTextSize(16);
 
@@ -2543,6 +2805,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (playerLaunchedByHit) return "LANÇADO";
         if (playerHitReactionTimer > 0f) return "HIT";
         if (isSuperCinematicActive()) return "SUPER";
+        if (ultraPhase == ULTRA_WHIFF) return "ULTRA ERROU";
+        if (isUltraActive()) return "ULTRA";
         if (attackTimer > 0f) {
             if ("L".equals(attackType)) return "ATAQUE L";
             if ("M".equals(attackType)) return "ATAQUE M";
@@ -3084,6 +3348,65 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setStyle(Paint.Style.FILL);
     }
 
+    private void drawUltraDarkening(Canvas c) {
+        if (ultraDarkAlpha <= 0) return;
+        paint.setColor(Color.argb(ultraDarkAlpha, 0, 0, 8));
+        c.drawRect(0f, WORLD_TOP, WORLD_WIDTH, VH + 120f, paint);
+    }
+
+    private void drawUltraAura(Canvas c) {
+        if (ultraPhase != ULTRA_STARTUP && ultraPhase != ULTRA_RUSH) return;
+
+        int color = activeFighter().profile.color;
+        float centerY = playerY - 78f;
+        paint.setStrokeCap(Paint.Cap.ROUND);
+
+        if (ultraPhase == ULTRA_STARTUP) {
+            float t = clamp(ultraPhaseTimer / ULTRA_STARTUP_DURATION, 0f, 1f);
+            float pulse = 1f + 0.18f * (float)Math.sin(ultraPhaseTimer * 40f);
+
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.argb(
+                Math.round(110f * t),
+                Color.red(color),
+                Color.green(color),
+                Color.blue(color)
+            ));
+            c.drawCircle(playerX, centerY, 125f * pulse, paint);
+
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(7f);
+            paint.setColor(Color.argb(220, 255, 255, 255));
+            c.drawCircle(playerX, centerY, 70f * pulse, paint);
+            paint.setStrokeWidth(4f);
+            paint.setColor(color);
+            c.drawCircle(playerX, centerY, 102f * pulse, paint);
+
+            // Energia subindo em volta do corpo.
+            paint.setStrokeWidth(4f);
+            paint.setColor(Color.argb(180, 255, 255, 255));
+            for (int i = 0; i < 10; i++) {
+                float x = playerX - 92f + i * 20f;
+                float length = 40f + (i % 3) * 28f;
+                float y = centerY + 90f - ((ultraPhaseTimer * 620f + i * 37f) % 230f);
+                c.drawLine(x, y, x, y - length, paint);
+            }
+        } else {
+            // Rastro da investida.
+            paint.setStyle(Paint.Style.STROKE);
+            for (int i = 0; i < 7; i++) {
+                float y = centerY - 72f + i * 24f;
+                float length = 130f + (i % 3) * 70f;
+                paint.setStrokeWidth(i % 2 == 0 ? 6f : 3f);
+                paint.setColor(i % 2 == 0 ? color : Color.argb(200, 255, 255, 255));
+                c.drawLine(playerX - 40f - length, y, playerX - 40f, y, paint);
+            }
+        }
+
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeCap(Paint.Cap.BUTT);
+    }
+
     private void drawSuperFlash(Canvas c) {
         if (!isSuperCinematicActive() || superFlashAlpha <= 0) return;
         paint.setColor(Color.argb(superFlashAlpha, 255, 255, 255));
@@ -3212,12 +3535,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else {
             float phase = attackPhase();
 
-            if (isSuperPoseActive()) {
+            if (isSuperPoseActive() || ultraPhase == ULTRA_STARTUP) {
                 float power = 1f + 0.10f * (float)Math.sin(superPhaseTimer * 24f);
                 c.drawLine(playerX - 3, top + 58, playerX - 58f * power, top + 38, paint);
                 c.drawLine(playerX + 3, top + 58, playerX + 74f * power, top + 36, paint);
                 c.drawLine(playerX - 4, baseY - 45, playerX - 40, baseY, paint);
                 c.drawLine(playerX + 4, baseY - 45, playerX + 42, baseY - 5, paint);
+            } else if (ultraPhase == ULTRA_RUSH) {
+                // Investida do ultra: corpo projetado e soco esticado.
+                c.drawLine(playerX - 3, top + 58, playerX - 42, top + 82, paint);
+                c.drawLine(playerX + 3, top + 58, playerX + 112, top + 52, paint);
+                c.drawLine(playerX - 4, baseY - 45, playerX - 54, baseY - 6, paint);
+                c.drawLine(playerX + 4, baseY - 45, playerX + 36, baseY, paint);
             } else if (isTagPoseActive()) {
                 // Pose curta de prontidão ao terminar a entrada.
                 float poseWave = (float)Math.sin(tagPhaseTimer * 16f) * 4f;
@@ -3412,7 +3741,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawSuperButton(Canvas c) {
         boolean pressed = superPointer != -1;
-        boolean enabled = canStartSuper();
+        boolean ultraReady = crouching && canStartUltra();
+        boolean enabled = ultraReady || canStartSuper();
 
         paint.setColor(
             enabled
@@ -3437,7 +3767,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(15f);
         paint.setFakeBoldText(true);
-        c.drawText("SUPER", SUPER_X, SUPER_Y - 4f, paint);
+        c.drawText(ultraReady ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 4f, paint);
         paint.setTextSize(11f);
         c.drawText(
             activeFighter().superLevelHudLabel,
@@ -3481,7 +3811,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateDpad(float x, float y, long nowMs) {
-        if (isEnergyAttackActive() || isSuperCinematicActive()) return;
+        if (isEnergyAttackActive() || isSuperCinematicActive() || isUltraActive()) return;
 
         float dx = x - DPAD_X;
         float dy = y - DPAD_Y;
@@ -3609,6 +3939,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float dx = x - DPAD_X;
             float dy = y - DPAD_Y;
 
+            if (ultraPhase == ULTRA_CINEMATIC) {
+                // Durante a Página Final qualquer toque conta para o tempo certo.
+                ultraTapRequested = true;
+                return true;
+            }
+
             if (
                 insideRect(
                     x,
@@ -3623,7 +3959,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 return true;
             }
 
-            if (isSuperCinematicActive() || isEnergyAttackActive()) {
+            if (isSuperCinematicActive() || isEnergyAttackActive() || isUltraActive()) {
                 return true;
             }
 
@@ -3636,7 +3972,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             } else if (isTagAnimationActive()) {
                 return true;
             } else if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) {
-                if (canStartSuper()) {
+                if (crouching && canStartUltra()) {
+                    superPointer = pointerId;
+                    ultraStartRequested = true;
+                } else if (canStartSuper()) {
                     superPointer = pointerId;
                     startSuperCinematic();
                 }
@@ -3671,6 +4010,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (
                 !isEnergyAttackActive() &&
                 !isSuperCinematicActive() &&
+                !isUltraActive() &&
                 dpadPointer != -1
             ) {
                 int pointerIndex = event.findPointerIndex(dpadPointer);

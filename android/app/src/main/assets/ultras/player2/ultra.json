@@ -1,0 +1,12 @@
+{
+  "nome": "Tempestade Azul",
+  "cor": "#4ACDE8",
+  "corSecundaria": "#C9F5FF",
+  "paineis": {
+    "olhos":    {},
+    "carga":    { "onomatopeia": "ZZZZAP" },
+    "golpe":    { "onomatopeia": "PÁÁÁ!" },
+    "atingido": { "onomatopeia": "VUPT!" },
+    "final":    { "onomatopeia": "TRÁÁÁÁ!" }
+  }
+}

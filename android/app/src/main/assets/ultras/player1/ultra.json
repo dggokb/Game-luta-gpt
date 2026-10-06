@@ -1,0 +1,12 @@
+{
+  "nome": "Explosão Solar",
+  "cor": "#F4B73B",
+  "corSecundaria": "#FFE7A3",
+  "paineis": {
+    "olhos":    {},
+    "carga":    { "onomatopeia": "VRUUUUM" },
+    "golpe":    { "onomatopeia": "KRAAK!" },
+    "atingido": { "onomatopeia": "TUMM!" },
+    "final":    { "onomatopeia": "KABUUUM!" }
+  }
+}
