@@ -1,0 +1,41 @@
+{
+  "id": "player_base_jump_light",
+  "javaName": "JUMP_LIGHT",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_jump_light_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_light.png",
+  "report": "tools/sprites/reports/player_base_jump_light.report.json",
+  "preview": "android/app/build/sprite-review/jump-light-import.png",
+  "expectedFrames": 4,
+  "segmentation": "horizontal-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 0,
+  "anatomyReference": {
+    "bands": [
+      [
+        0.0,
+        0.12
+      ]
+    ]
+  },
+  "sourceNote": "jL air jab: guard, extended jab (2 frames), recovery. Scaled by head width against the canonical Idle (airborne body height is not comparable). Airborne registration: torso and feet height aligned with the approved JUMP/FALL frames (torso -13 px, feet 12 px above the root).",
+  "frameShift": {
+    "0": [
+      -75,
+      -11
+    ],
+    "1": [
+      -68,
+      -12
+    ],
+    "2": [
+      -71,
+      -11
+    ],
+    "3": [
+      -71,
+      -12
+    ]
+  }
+}

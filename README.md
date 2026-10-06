@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.67-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.68-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -80,3 +80,8 @@ Auditoria automática (`tools/sprites/harmony.py` + teste) de alinhamento, conta
 chão, picos em golpes e escala. Corrigidos: tamanho e chão das reações do lutador base,
 alinhamento do movimento e do Heavy do Player Two, artefato magenta, respiração do idle
 e garras vazadas do Brutamonte.
+
+## jL com arte própria — v0.68
+
+O soco fraco aéreo do `player_base` usa a nova folha de 4 frames, com escala pela cabeça
+e registro alinhado ao pulo.

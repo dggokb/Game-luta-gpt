@@ -46,6 +46,12 @@ final class GeneratedSpriteLayouts {
     static final int JAB_ROOT_Y = 218;
     static final int JAB_FRAME_COUNT = 3;
 
+    static final int JUMP_LIGHT_FRAME_WIDTH = 232;
+    static final int JUMP_LIGHT_FRAME_HEIGHT = 252;
+    static final int JUMP_LIGHT_ROOT_X = 98;
+    static final int JUMP_LIGHT_ROOT_Y = 251;
+    static final int JUMP_LIGHT_FRAME_COUNT = 4;
+
     static final int MEDIUM_KICK_FRAME_WIDTH = 327;
     static final int MEDIUM_KICK_FRAME_HEIGHT = 245;
     static final int MEDIUM_KICK_ROOT_X = 94;

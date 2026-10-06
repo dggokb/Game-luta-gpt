@@ -104,7 +104,7 @@ class CharacterPackTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'missing moves'):pipeline.build(self.root)
 
     def test_pose_must_match_input(self):
-        self.edit(lambda d:d['moves'].__setitem__('L',{**d['moves']['jL']}))
+        self.edit(lambda d:d['moves'].__setitem__('L',{**d['moves']['jM']}))
         with self.assertRaisesRegex(ValueError,'pose AIR is not valid'):pipeline.build(self.root)
 
     def test_move_needs_exactly_one_of_animation_or_pose(self):
@@ -245,6 +245,16 @@ class CharacterPackTests(unittest.TestCase):
         path=self.root/'tools/sprites/clips/player_base_missing.json';d=json.loads(path.read_text())
         d['transform'].pop('allowUpscale');path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'requires allowUpscale'):pipeline.build(self.root)
+
+    def test_player_base_air_jab_is_scaled_by_head_and_registered_in_the_air(self):
+        pipeline.build(self.root)
+        report=json.loads((self.root/'tools/sprites/reports/player_base_jump_light.report.json').read_text())
+        self.assertTrue(report['anatomy']['passed'])
+        self.assertAlmostEqual(0.416,report['scale'],delta=0.02)
+        self.assertTrue(all(f['frameShift'][1]<0 for f in report['frames']))  # feet lifted off the ground
+        pack=json.loads(self.path.read_text())
+        self.assertEqual('JUMP_LIGHT',pack['moves']['jL']['animation'])
+        self.assertEqual('AIR',pack['moves']['jM']['pose'])
 
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)

@@ -352,6 +352,22 @@
         130,
         130
       ]
+    },
+    "JUMP_LIGHT": {
+      "atlas": "player_base_jump_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        30,
+        30,
+        50
+      ]
     }
   },
   "moves": {
@@ -404,7 +420,7 @@
       "reach": 148
     },
     "jL": {
-      "pose": "AIR",
+      "animation": "JUMP_LIGHT",
       "damage": 300,
       "totalMs": 160,
       "activeStartMs": 58,

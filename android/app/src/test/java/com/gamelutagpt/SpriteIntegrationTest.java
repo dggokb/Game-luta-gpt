@@ -122,6 +122,10 @@ public class SpriteIntegrationTest {
         invoke("startAttack",new Class<?>[]{String.class},"H");frames(1);
         assertEquals(SpriteMotion.Clip.JUMP,motion().clip);
 
+        setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);
+        invoke("startAttack",new Class<?>[]{String.class},"L");frames(1);
+        assertEquals("JUMP_LIGHT",motion().clip);
+
         setup();set("playerBlockstunTimer",.12f);set("playerLastGuardState",2);
         set("playerMovementLocked",true);frames(1);
         assertEquals("DEFENSE_CROUCH",motion().clip);

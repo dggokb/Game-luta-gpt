@@ -470,3 +470,18 @@ componentes aceitam `frameShift`. Tudo fica registrado no relatório do atlas.
 
 Limite: as reações do `player_base` foram ampliadas a partir de arte pequena e ficam
 mais suaves que o resto; o ideal é redesenhá-las na resolução do Idle.
+
+## Primeiro golpe aéreo pelo motor — jL — GPT v0.68
+
+O `player_base` ganhou o atlas `player_base_jump_light` (4 frames: guarda no ar, jab
+esticado ×2, recolhe). Importado por componentes com `canonical-anatomy` contra o Idle
+usando só a faixa da cabeça (`anatomyReference.bands: [[0, 0.12]]`): a altura de um corpo
+no ar não é comparável à de um corpo em pé. Escala 0,416 (candidatos 0,409/0,423).
+
+Registro aéreo: `ground-feet` prende a raiz no pé mais baixo, o que é errado no ar. O
+`frameShift` de cada frame alinha o tronco (−13 px) e a altura dos pés (12 px acima da
+raiz) com os frames JUMP/FALL aprovados, então trocar de pulo para golpe não dá salto.
+
+Frame data do jL inalterado (160 ms, ativo 58–102 ms, dano 300); durações 50/30/30/50
+mantêm os dois frames de soco esticado durante toda a janela ativa (testado). jM e jH
+continuam com `pose: "AIR"`.

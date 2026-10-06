@@ -131,4 +131,14 @@ public class CombatRulesTest {
         assertEquals(0,launcher.animation.frame(launcher.animationTime(0),0));
         assertEquals(3,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
     }
+    @Test public void airJabExtendedFramesCoverTheActiveWindow() {
+        CharacterDefinition.Move jab=BASE.move("L",true);
+        assertEquals("jL",jab.binding);
+        assertEquals("JUMP_LIGHT",jab.animation.id);
+        for(float t=jab.activeStart;t<jab.activeEnd;t+=.002f) {
+            int frame=jab.animation.frame(jab.animationTime(t),0);
+            assertTrue("t="+t+" frame="+frame,frame==1||frame==2);
+        }
+        assertEquals(SpriteStates.POSE_AIR,BASE.move("M",true).pose);
+    }
 }
