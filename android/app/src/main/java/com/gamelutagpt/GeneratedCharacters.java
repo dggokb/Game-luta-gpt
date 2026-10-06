@@ -59,10 +59,12 @@ final class GeneratedCharacters {
  a.put("GROUNDED",new CharacterDefinition.Animation("GROUNDED",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{6},new float[]{1.20000000f},false,0.00000000f));
  a.put("GETUP",new CharacterDefinition.Animation("GETUP",new CharacterDefinition.Atlas("player_base_missing",256,256,128,238,14,14),new int[]{7},new float[]{0.35000000f},false,0.00000000f));
  a.put("CROUCH_LIGHT",new CharacterDefinition.Animation("CROUCH_LIGHT",new CharacterDefinition.Atlas("player_base_crouch_light",256,256,128,238,4,4),new int[]{0,1,2,3},new float[]{0.03000000f,0.04000000f,0.04000000f,0.05000000f},false,0.00000000f));
+ a.put("CROUCH_MEDIUM",new CharacterDefinition.Animation("CROUCH_MEDIUM",new CharacterDefinition.Atlas("player_base_crouch_medium",384,256,128,238,4,4),new int[]{0,1,2,3},new float[]{0.05000000f,0.05000000f,0.07000000f,0.09000000f},false,0.00000000f));
  m.put("L",new CharacterDefinition.Move(a.get("LIGHT_JAB"),300,0.04000000f,0.10000000f,118.00000000f));
  m.put("M",new CharacterDefinition.Move(a.get("MEDIUM_KICK"),500,0.07000000f,0.17000000f,150.00000000f));
  m.put("H",new CharacterDefinition.Move(a.get("HEAVY_STRAIGHT"),800,0.16000000f,0.25000000f,182.00000000f));
  m.put("2L",new CharacterDefinition.Move(a.get("CROUCH_LIGHT"),300,0.04000000f,0.10000000f,118.00000000f));
+ m.put("2M",new CharacterDefinition.Move(a.get("CROUCH_MEDIUM"),500,0.10000000f,0.17000000f,150.00000000f));
  all.put("player_base",new CharacterDefinition("player_base","Lutador base",new CharacterVisualProfile("player_base",256,256,128.00000000f,238.00000000f,1.00000000f),a,m));
  }
  {
