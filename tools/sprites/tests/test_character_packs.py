@@ -90,7 +90,9 @@ class CharacterPackTests(unittest.TestCase):
         for binding in ('L','M','H'):
             self.assertEqual(first['moves'][binding],second['moves'][binding])
         self.assertIn('2L',first['moves'])
+        self.assertIn('2M',first['moves'])
         self.assertNotIn('2L',second['moves'])
+        self.assertNotIn('2M',second['moves'])
 
 
     def test_player_base_crouch_light_is_a_real_declarative_move(self):
@@ -102,6 +104,17 @@ class CharacterPackTests(unittest.TestCase):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('m.put("2L"',java)
         self.assertIn('a.get("CROUCH_LIGHT")',java)
+
+    def test_player_base_crouch_medium_uses_wide_authored_prepared_grid(self):
+        pipeline.build(self.root)
+        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_medium.report.json').read_text())
+        self.assertEqual([384,256,128,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual(4,report['layout']['frameCount'])
+        self.assertTrue(all(frame['minimumMargin'] >= 8 for frame in report['frames']))
+        self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('m.put("2M"',java)
+        self.assertIn('a.get("CROUCH_MEDIUM")',java)
 
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)

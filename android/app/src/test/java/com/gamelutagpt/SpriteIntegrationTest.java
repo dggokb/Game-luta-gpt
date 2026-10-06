@@ -50,7 +50,9 @@ public class SpriteIntegrationTest {
         assertTrue(first.animations.keySet().containsAll(second.animations.keySet()));
         assertTrue(first.moves.keySet().containsAll(second.moves.keySet()));
         assertTrue(first.moves.containsKey("2L"));
+        assertTrue(first.moves.containsKey("2M"));
         assertFalse(second.moves.containsKey("2L"));
+        assertFalse(second.moves.containsKey("2M"));
         assertNotEquals(first.animation("IDLE").atlas.resource,second.animation("IDLE").atlas.resource);
         assertEquals("player_two_idle",second.animation("IDLE").atlas.resource);
         assertEquals("player_two_movement",second.animation("WALK_FORWARD").atlas.resource);
@@ -83,8 +85,23 @@ public class SpriteIntegrationTest {
         frames(3);
         assertTrue("2L must advance through authored frames",motion().frame() >= 1);
 
+        assertTrue(first.animations.containsKey("CROUCH_MEDIUM"));
+        assertEquals("player_base_crouch_medium",
+            first.animation("CROUCH_MEDIUM").atlas.resource);
+        assertTrue(first.moves.containsKey("2M"));
+        assertEquals("CROUCH_MEDIUM",first.moves.get("2M").animation.id);
+        assertEquals(384,first.animation("CROUCH_MEDIUM").atlas.frameWidth);
+        assertEquals(128,first.animation("CROUCH_MEDIUM").atlas.rootX);
+
         setup();set("grounded",true);set("crouching",true);
         invoke("startAttack",new Class<?>[]{String.class},"2M");frames(1);
+        assertEquals("CROUCH_MEDIUM",motion().clip);
+        assertEquals(0,motion().frame());
+        frames(5);
+        assertTrue("2M must advance through authored frames",motion().frame() >= 1);
+
+        setup();set("grounded",true);set("crouching",true);
+        invoke("startAttack",new Class<?>[]{String.class},"2H");frames(1);
         assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
 
         setup();set("grounded",false);set("playerY",430f);set("velocityY",-300f);

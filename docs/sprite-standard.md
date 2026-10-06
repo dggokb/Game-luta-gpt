@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — GPT v0.61
+# Padrão de personagens e sprites — GPT v0.62
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -278,3 +278,17 @@ ataques no chão; assim o 2L usa diretamente a animação e a janela ativa defin
 no `character.json`. 2M/2H continuam no fallback legado até receberem masters
 próprios. Ataques aéreos continuam fora desse vínculo e não reutilizam sprites em
 pé por engano.
+
+
+## Segundo golpe direcional pelo motor — 2M — GPT v0.62
+
+O 2M do `player_base` usa o atlas dedicado `player_base_crouch_medium`, com
+quatro frames e célula 384×256. O root permanece 128/238 e o worldScale continua
+1.0, preservando o mesmo tamanho corporal do 2L enquanto a célula mais larga dá
+espaço para a perna estendida sem cortar nem encolher o personagem.
+
+O modo `prepared-grid` passa a aceitar opcionalmente `frameWidth`,
+`frameHeight`, `rootX` e `rootY` por clip, sempre respeitando os limites do
+perfil. Sem esses campos, o comportamento anterior continua usando a célula e a
+raiz base do personagem. O 2M mantém dano 500, alcance 150 e a regra existente de
+knockdown; apenas sua animação/timing visual passa a vir do Character Pack Engine.

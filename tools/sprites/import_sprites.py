@@ -452,8 +452,18 @@ def process_prepared(cfg, profile):
     """Validate reviewed masters without resampling or re-grounding airborne poses."""
     import shutil
     source = Image.open(ROOT / cfg["source"]).convert("RGBA")
-    width, height = profile["baseFrameWidth"], profile["baseFrameHeight"]
+    width = int(cfg.get("frameWidth", profile["baseFrameWidth"]))
+    height = int(cfg.get("frameHeight", profile["baseFrameHeight"]))
+    root_x = int(cfg.get("rootX", profile["preferredRootX"]))
+    root_y = int(cfg.get("rootY", profile["preferredRootY"]))
     count, columns = cfg["expectedFrames"], cfg["columns"]
+    validation = profile["validation"]
+    if width <= 0 or height <= 0:
+        raise ValueError(f"{cfg['id']}: prepared-grid cell must be positive")
+    if width > int(validation["maxFrameWidth"]) or height > int(validation["maxFrameHeight"]):
+        raise ValueError(f"{cfg['id']}: prepared-grid cell exceeds profile limits")
+    if not 0 <= root_x < width or not 0 <= root_y < height:
+        raise ValueError(f"{cfg['id']}: authored root is outside the prepared-grid cell")
     if count <= 0 or columns <= 0 or source.size != (width * columns, height * math.ceil(count / columns)):
         raise ValueError(f"{cfg['id']}: prepared-grid dimensions do not match frame count")
     if cfg.get("rootMode") != "authored":
@@ -475,7 +485,7 @@ def process_prepared(cfg, profile):
               "sourceNote": cfg.get("sourceNote", "Reviewed normalized master"),
               "rootMode": "authored", "scale": 1, "worldScale": profile["worldScale"],
               "layout": {"frameWidth": width, "frameHeight": height,
-                         "rootX": profile["preferredRootX"], "rootY": profile["preferredRootY"],
+                         "rootX": root_x, "rootY": root_y,
                          "columns": columns, "frameCount": count}, "frames": frames, "passed": True}
     for key in ("output", "report", "preview"):
         (ROOT / cfg[key]).parent.mkdir(parents=True, exist_ok=True)

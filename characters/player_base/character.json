@@ -283,6 +283,22 @@
         40,
         50
       ]
+    },
+    "CROUCH_MEDIUM": {
+      "atlas": "player_base_crouch_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        50,
+        70,
+        90
+      ]
     }
   },
   "moves": {
@@ -313,6 +329,13 @@
       "activeStartMs": 40,
       "activeEndMs": 100,
       "reach": 118
+    },
+    "2M": {
+      "animation": "CROUCH_MEDIUM",
+      "damage": 500,
+      "activeStartMs": 100,
+      "activeEndMs": 170,
+      "reach": 150
     }
   }
 }
