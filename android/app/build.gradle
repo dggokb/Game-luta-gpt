@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 70
-        versionName '0.70-sprite-gpt-pack-v2'
+        versionCode 71
+        versionName '0.71-sprite-gpt-pack-v2'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }

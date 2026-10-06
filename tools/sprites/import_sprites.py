@@ -199,6 +199,10 @@ def process_clip(config_path):
             frame = component_images[index]
         else:
             frame = source.crop((left, top, right, bottom))
+        if index in set(int(i) for i in cfg.get("mirrorFrames", [])):
+            # Poses drawn facing the other way (e.g. lying head-first toward the
+            # opponent) are flipped to match the frames they must connect with.
+            frame = frame.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
         bbox = bbox_for(frame, threshold)
         root_mode = cfg.get("rootMode", "ground-feet")
         if root_mode == "ground-feet":

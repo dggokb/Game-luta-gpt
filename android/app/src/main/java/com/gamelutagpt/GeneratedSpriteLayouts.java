@@ -52,11 +52,35 @@ final class GeneratedSpriteLayouts {
     static final int FALL_DOWN_ROOT_Y = 167;
     static final int FALL_DOWN_FRAME_COUNT = 4;
 
+    static final int GETUP_SET_FRAME_WIDTH = 246;
+    static final int GETUP_SET_FRAME_HEIGHT = 168;
+    static final int GETUP_SET_ROOT_X = 123;
+    static final int GETUP_SET_ROOT_Y = 159;
+    static final int GETUP_SET_FRAME_COUNT = 4;
+
     static final int HEAVY_STRAIGHT_FRAME_WIDTH = 282;
     static final int HEAVY_STRAIGHT_FRAME_HEIGHT = 225;
     static final int HEAVY_STRAIGHT_ROOT_X = 120;
     static final int HEAVY_STRAIGHT_ROOT_Y = 216;
     static final int HEAVY_STRAIGHT_FRAME_COUNT = 9;
+
+    static final int HIT_AIR_SET_FRAME_WIDTH = 218;
+    static final int HIT_AIR_SET_FRAME_HEIGHT = 217;
+    static final int HIT_AIR_SET_ROOT_X = 109;
+    static final int HIT_AIR_SET_ROOT_Y = 216;
+    static final int HIT_AIR_SET_FRAME_COUNT = 4;
+
+    static final int HIT_CROUCH_FRAME_WIDTH = 197;
+    static final int HIT_CROUCH_FRAME_HEIGHT = 184;
+    static final int HIT_CROUCH_ROOT_X = 91;
+    static final int HIT_CROUCH_ROOT_Y = 175;
+    static final int HIT_CROUCH_FRAME_COUNT = 4;
+
+    static final int HIT_STAND_FRAME_WIDTH = 191;
+    static final int HIT_STAND_FRAME_HEIGHT = 241;
+    static final int HIT_STAND_ROOT_X = 91;
+    static final int HIT_STAND_ROOT_Y = 232;
+    static final int HIT_STAND_FRAME_COUNT = 4;
 
     static final int IDLE_FRAME_WIDTH = 190;
     static final int IDLE_FRAME_HEIGHT = 244;
@@ -93,12 +117,6 @@ final class GeneratedSpriteLayouts {
     static final int MEDIUM_KICK_ROOT_X = 94;
     static final int MEDIUM_KICK_ROOT_Y = 236;
     static final int MEDIUM_KICK_FRAME_COUNT = 3;
-
-    static final int PLAYER_BASE_MISSING_FRAME_WIDTH = 188;
-    static final int PLAYER_BASE_MISSING_FRAME_HEIGHT = 223;
-    static final int PLAYER_BASE_MISSING_ROOT_X = 96;
-    static final int PLAYER_BASE_MISSING_ROOT_Y = 213;
-    static final int PLAYER_BASE_MISSING_FRAME_COUNT = 3;
 
     static final int MOVEMENT_FRAME_WIDTH = 253;
     static final int MOVEMENT_FRAME_HEIGHT = 229;

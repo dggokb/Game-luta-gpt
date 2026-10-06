@@ -635,6 +635,19 @@ public class SpriteIntegrationTest {
         set("playerKnockdownState",2);set("playerKnockdownTimer",0f);frames(1);
         assertEquals("GROUNDED",motion().clip);
     }
+    @Test public void launchPoseFollowsThePhysicsAndHitsUseTheNewSheets()throws Exception {
+        set("grounded",false);set("playerY",380f);set("playerLaunchedByHit",true);set("playerMovementLocked",true);
+        set("velocityY",-1200f);frames(1);
+        assertEquals("HIT_AIR",motion().clip);assertEquals("Thrown up",0,motion().frame());
+        set("velocityY",300f);frames(1);
+        assertEquals("Recovery tuck on the way down",3,motion().frame());
+        setup();set("playerHitReactionTimer",.21f);set("playerMovementLocked",true);frames(1);
+        assertEquals("HIT_STAND",motion().clip);
+        assertEquals("player_base_hit_stand",GeneratedCharacters.defaultCharacter().animation("HIT_STAND").atlas.resource);
+        setup();set("playerKnockdownState",3);set("playerKnockdownTimer",0f);set("playerMovementLocked",true);frames(1);
+        assertEquals("GETUP",motion().clip);
+        assertEquals("player_base_getup",GeneratedCharacters.defaultCharacter().animation("GETUP").atlas.resource);
+    }
     @Test public void matchRenderersShareOneDecodedAtlasCache()throws Exception {
         SpriteFighterRenderer player=(SpriteFighterRenderer)get("spriteFighterRenderer");
         SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");

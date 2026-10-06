@@ -23,6 +23,9 @@ GROUNDED = ('IDLE', 'COMBAT', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH', 'RISE', 'LA
             'HIT_CROUCH', 'KNOCKDOWN', 'GROUNDED', 'GETUP')
 TORSO_TOLERANCE = 20      # px, world units at worldScale 1
 SPIKE_TOLERANCE = 40      # one attack frame jumping out and back by more than this
+# Hit reactions recoil or fold on purpose (feet stay planted); they get a wider band.
+REACTION_TORSO_TOLERANCE = 28
+REACTIONS = ('HIT_STAND', 'HIT_CROUCH')
 GROUND_TOLERANCE = 4      # px above/below the root row
 REACTION_MIN_RATIO = 0.85 # standing defense height vs Idle height
 
@@ -76,7 +79,8 @@ def audit(root=ROOT):
                 row = {'character': pack['id'], 'state': name, 'frame': f, **m}
                 rows.append(row)
                 where = f"{pack['id']}/{name}[{f}]"
-                if name in REGISTERED and abs(m['torso'] - idle_torso) > TORSO_TOLERANCE:
+                limit = REACTION_TORSO_TOLERANCE if name in REACTIONS else TORSO_TOLERANCE
+                if name in REGISTERED and abs(m['torso'] - idle_torso) > limit:
                     problems.append(f"{where}: torso {m['torso'] - idle_torso:+.0f}px off the Idle registration")
                 if name in GROUNDED and abs(m['ground']) > GROUND_TOLERANCE:
                     problems.append(f"{where}: feet {m['ground']:+.0f}px from the ground")

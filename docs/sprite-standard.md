@@ -532,3 +532,33 @@ ar). Durante o bloqueio no ar o empurrão e a gravidade continuam; o HUD mostra
 para corpos deitados e `minOpaquePixels` por clip. O atlas antigo `player_base_missing`
 agora só serve `HIT_STAND`, `HIT_CROUCH` e `GETUP` (frames 2, 3 e 7 da fonte), ainda
 ampliados de arte pequena — são os próximos a redesenhar.
+
+## Dano em pé, agachado e no ar + levantar — GPT v0.71
+
+Quatro folhas novas do `player_base`, na mesma escala entre si (0,353: a guarda de
+`player_base_hit_stand` medida contra o Idle por `canonical-anatomy`; as outras três
+usam `scaleMode: "fixed"` com justificativa):
+
+| Estado | Atlas | Frames usados |
+| --- | --- | --- |
+| `HIT_STAND` | `player_base_hit_stand` | impacto → recuo máximo → recupera (frames 1–3) |
+| `HIT_CROUCH` | `player_base_hit_crouch` | idem, agachado (frames 1–3) |
+| `HIT_AIR` | `player_base_hit_air` | lançado subindo → topo → caindo (frames 0–3) |
+| `GETUP` | `player_base_getup` | deitado → apoia → ajoelha → de pé (frames 0–3) |
+
+**Levantar do lado certo:** na folha original o corpo deitado tem a cabeça para a frente,
+mas a queda (`player_base_fall`) termina com a cabeça para trás. Os frames 0 e 1 do
+levantar são espelhados (`mirrorFrames: [0, 1]`), então o lutador começa a levantar na
+mesma posição em que caiu e só vira de frente ao ajoelhar (frame 2). Um teste compara o
+lado da cabeça do último frame da queda com o primeiro do levantar.
+
+**`HIT_AIR` pela física:** o frame do lançamento sai da velocidade vertical, não do
+relógio (`GameView.launchPoseTime`): subindo rápido → frame 0, subindo → 1, caindo → 3;
+`groundSlam` usa o frame do topo.
+
+**Harmonia:** reações (`HIT_STAND`, `HIT_CROUCH`) têm tolerância de torso de ±28 px
+(o corpo dobrado é a pose; deslocar o frame faria o pé deslizar). Demais estados seguem
+±20.
+
+**Importador:** `mirrorFrames` (lista de índices espelhados na horizontal antes de medir
+raiz e escala). O atlas ampliado `player_base_missing` foi removido: nenhum estado o usa.

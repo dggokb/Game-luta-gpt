@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.70-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.71-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -95,3 +95,9 @@ separação por componente para folhas em que as poses se sobrepõem na horizont
 
 Defesa em pé, agachado e **no ar** (regra nova: segurar para trás pulando) e sequência de
 queda do `player_base` com arte própria, todas na mesma escala do corpo.
+
+## Dano e levantar — v0.71
+
+Dano em pé, agachado e no ar (frame escolhido pela física do lançamento) e o levantar do
+`player_base` com arte própria; o levantar começa espelhado para sair do mesmo lado em que
+o lutador caiu. O atlas ampliado `player_base_missing` foi removido.

@@ -542,7 +542,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             opponentSpriteRenderer,
             dummyKnockdownState,
             dummyKnockdownTimer,
-            dummyLaunchedByHit || dummyGroundSlam,
+            dummyLaunchedByHit,
+            dummyGroundSlam,
+            dummyVelocityY,
             dummyHitReactionTimer,
             dummyAirborne,
             isOpponentCrouching()
@@ -2177,6 +2179,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int knockdownState,
         float knockdownTimer,
         boolean launched,
+        boolean slam,
+        float verticalVelocity,
         float hitTimer,
         boolean airborne,
         boolean crouch
@@ -2186,9 +2190,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (knockdownState == DUMMY_KD_FALL) state = SpriteStates.KNOCKDOWN;
         else if (knockdownState == DUMMY_KD_DOWN) state = SpriteStates.GROUNDED;
         else if (knockdownState == DUMMY_KD_GETUP) state = SpriteStates.GETUP;
-        else if (launched) {
+        else if (launched || slam) {
             state = SpriteStates.HIT_AIR;
-            reactionElapsed = 0f;
+            reactionElapsed = launchPoseTime(verticalVelocity, slam);
         } else if (hitTimer > 0f) {
             state = airborne
                 ? SpriteStates.HIT_AIR
@@ -2196,6 +2200,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             reactionElapsed = DUMMY_HIT_REACTION_DURATION - hitTimer;
         }
         return state != null && renderer.hasAnimation(state) ? state : null;
+    }
+
+    /**
+     * Launch poses follow the physics instead of a clock: thrown up, apex, forced dive
+     * (ground slam), then the recovery tuck once control returns on the way down. The
+     * times index a HIT_AIR clip of up to four 55 ms frames; shorter clips clamp.
+     */
+    private static float launchPoseTime(float verticalVelocity, boolean slam) {
+        if (slam) return 0.13f;
+        if (verticalVelocity < -500f) return 0f;
+        if (verticalVelocity < 0f) return 0.07f;
+        return 0.19f;
     }
 
     /** Vector fallback for packs without KNOCKDOWN/GROUNDED/GETUP: fall backwards. */
@@ -2229,7 +2245,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             spriteFighterRenderer,
             playerKnockdownState,
             playerKnockdownTimer,
-            playerLaunchedByHit || playerGroundSlam,
+            playerLaunchedByHit,
+            playerGroundSlam,
+            velocityY,
             playerHitReactionTimer,
             !grounded,
             crouching

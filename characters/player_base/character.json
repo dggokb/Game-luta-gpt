@@ -258,33 +258,47 @@
       ]
     },
     "HIT_STAND": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_hit_stand",
       "frames": [
-        0
+        1,
+        2,
+        3
       ],
       "loop": false,
       "durationsMs": [
-        220
+        50,
+        100,
+        70
       ]
     },
     "HIT_CROUCH": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_hit_crouch",
       "frames": [
-        1
+        1,
+        2,
+        3
       ],
       "loop": false,
       "durationsMs": [
-        220
+        50,
+        100,
+        70
       ]
     },
     "HIT_AIR": {
-      "atlas": "player_base_fall",
+      "atlas": "player_base_hit_air",
       "frames": [
-        0
+        0,
+        1,
+        2,
+        3
       ],
       "loop": false,
       "durationsMs": [
-        220
+        55,
+        55,
+        55,
+        55
       ]
     },
     "KNOCKDOWN": {
@@ -312,13 +326,19 @@
       ]
     },
     "GETUP": {
-      "atlas": "player_base_missing",
+      "atlas": "player_base_getup",
       "frames": [
-        2
+        0,
+        1,
+        2,
+        3
       ],
       "loop": false,
       "durationsMs": [
-        350
+        60,
+        90,
+        100,
+        100
       ]
     },
     "CROUCH_LIGHT": {

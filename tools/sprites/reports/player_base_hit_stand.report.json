@@ -1,0 +1,363 @@
+{
+  "id": "player_base_hit_stand",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_hit_stand_source.png",
+  "detectedSourceIntervals": [
+    [
+      37,
+      511
+    ],
+    [
+      607,
+      1065
+    ],
+    [
+      1133,
+      1630
+    ],
+    [
+      1690,
+      2151
+    ]
+  ],
+  "scale": 0.3526415926123576,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "frameCount": 4
+  },
+  "validation": {
+    "alphaThreshold": 10,
+    "minMargin": 8,
+    "rootTolerance": 1.5,
+    "widthStep": 64,
+    "heightStep": 64,
+    "footBandRatio": 0.025,
+    "minFootWidth": 4,
+    "minOpaquePixels": 10000,
+    "maxUpscale": 1.0,
+    "maxFrameWidth": 768,
+    "maxFrameHeight": 512
+  },
+  "anatomy": {
+    "mode": "canonical-anatomy",
+    "clipReferenceFrame": 0,
+    "referenceSource": "art/sprites/source/player_base_idle_normalized.png",
+    "referenceFrame": 0,
+    "canonicalSignature": {
+      "height": 228,
+      "bands": [
+        47.0,
+        57.0,
+        97.0
+      ]
+    },
+    "sourceSignature": {
+      "height": 635,
+      "bands": [
+        131.0,
+        164.5,
+        296.5
+      ]
+    },
+    "scaleCandidates": [
+      0.3590551181102362,
+      0.35877862595419846,
+      0.3465045592705167,
+      0.327150084317032
+    ],
+    "scaleSpreadRatio": 0.09047439230537932,
+    "maxScaleSpreadRatio": 0.15,
+    "passed": true
+  },
+  "frames": [
+    {
+      "index": 0,
+      "sourceInterval": [
+        37,
+        511
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        474,
+        635
+      ],
+      "sourceRoot": [
+        221.25,
+        634.0
+      ],
+      "frameShift": [
+        0,
+        0
+      ],
+      "sourceFootIntervals": [
+        [
+          0,
+          87
+        ],
+        [
+          327,
+          473
+        ]
+      ],
+      "outputBbox": [
+        50,
+        14,
+        217,
+        238
+      ],
+      "outputMargins": {
+        "left": 50,
+        "right": 39,
+        "top": 14,
+        "bottom": 18
+      },
+      "detectedOutputRoot": [
+        127.75,
+        237.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          50,
+          81
+        ],
+        [
+          165,
+          217
+        ]
+      ],
+      "opaquePixels": 17089,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 1,
+      "sourceInterval": [
+        607,
+        1065
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        458,
+        609
+      ],
+      "sourceRoot": [
+        212.5,
+        608.0
+      ],
+      "frameShift": [
+        0,
+        0
+      ],
+      "sourceFootIntervals": [
+        [
+          0,
+          84
+        ],
+        [
+          310,
+          458
+        ]
+      ],
+      "outputBbox": [
+        53,
+        24,
+        215,
+        239
+      ],
+      "outputMargins": {
+        "left": 53,
+        "right": 41,
+        "top": 24,
+        "bottom": 17
+      },
+      "detectedOutputRoot": [
+        128.0,
+        238.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          53,
+          83
+        ],
+        [
+          163,
+          215
+        ]
+      ],
+      "opaquePixels": 16498,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 2,
+      "sourceInterval": [
+        1133,
+        1630
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        497,
+        605
+      ],
+      "sourceRoot": [
+        235.25,
+        604.0
+      ],
+      "frameShift": [
+        0,
+        0
+      ],
+      "sourceFootIntervals": [
+        [
+          5,
+          91
+        ],
+        [
+          351,
+          496
+        ]
+      ],
+      "outputBbox": [
+        45,
+        25,
+        220,
+        238
+      ],
+      "outputMargins": {
+        "left": 45,
+        "right": 36,
+        "top": 25,
+        "bottom": 18
+      },
+      "detectedOutputRoot": [
+        127.5,
+        237.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          46,
+          77
+        ],
+        [
+          169,
+          220
+        ]
+      ],
+      "opaquePixels": 18181,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    },
+    {
+      "index": 3,
+      "sourceInterval": [
+        1690,
+        2151
+      ],
+      "sourceBbox": [
+        0,
+        0,
+        461,
+        585
+      ],
+      "sourceRoot": [
+        215.0,
+        584.0
+      ],
+      "frameShift": [
+        0,
+        0
+      ],
+      "sourceFootIntervals": [
+        [
+          0,
+          85
+        ],
+        [
+          317,
+          460
+        ]
+      ],
+      "outputBbox": [
+        52,
+        32,
+        215,
+        238
+      ],
+      "outputMargins": {
+        "left": 52,
+        "right": 41,
+        "top": 32,
+        "bottom": 18
+      },
+      "detectedOutputRoot": [
+        127.75,
+        237.0
+      ],
+      "detectedOutputFootIntervals": [
+        [
+          52,
+          82
+        ],
+        [
+          164,
+          215
+        ]
+      ],
+      "opaquePixels": 15942,
+      "checks": {
+        "noClipping": true,
+        "rootXWithinTolerance": true,
+        "rootYWithinTolerance": true,
+        "enoughOpaquePixels": true
+      },
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 191,
+    "frameHeight": 241,
+    "rootX": 91,
+    "rootY": 232,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      37,
+      6
+    ],
+    "decodedBytes": {
+      "canonical": 1048576,
+      "packed": 736496
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "9cb9373cd7a01bfe534e797a4baa8a76e2b1a2a40fb40c6a5858144a4ee01799",
+      "config": "eeb73c677e596781145c07510b221e66f082a7ed6f4e886ce43f04f05bbf4e81",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}
