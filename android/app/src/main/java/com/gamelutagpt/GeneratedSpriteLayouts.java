@@ -10,6 +10,12 @@ final class GeneratedSpriteLayouts {
     static final int MONSTER_NPC_PACK_ROOT_Y = 248;
     static final int MONSTER_NPC_PACK_FRAME_COUNT = 16;
 
+    static final int CROUCH_LIGHT_FRAME_WIDTH = 256;
+    static final int CROUCH_LIGHT_FRAME_HEIGHT = 256;
+    static final int CROUCH_LIGHT_ROOT_X = 128;
+    static final int CROUCH_LIGHT_ROOT_Y = 238;
+    static final int CROUCH_LIGHT_FRAME_COUNT = 4;
+
     static final int HEAVY_STRAIGHT_FRAME_WIDTH = 320;
     static final int HEAVY_STRAIGHT_FRAME_HEIGHT = 256;
     static final int HEAVY_STRAIGHT_ROOT_X = 128;

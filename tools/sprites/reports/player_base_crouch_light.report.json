@@ -1,0 +1,72 @@
+{
+  "id": "player_base_crouch_light",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_crouch_light_normalized.png",
+  "sourceNote": "Reviewed 2L master normalized to player_base 256x256 cells and root 128/238.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        48,
+        69,
+        217,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14806
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        49,
+        75,
+        247,
+        239
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 15834
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        49,
+        76,
+        234,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15692
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        50,
+        69,
+        217,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14735
+    }
+  ],
+  "passed": true,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "952317f52417cbdf06ce42a7afe01a406613f5d3c122f1b07999a56cd5ebc5c9",
+      "config": "a6c0d5711fc4e8ec0e15456409d219e1a883aebb4de8c94bfa490cae5cb52140",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}
