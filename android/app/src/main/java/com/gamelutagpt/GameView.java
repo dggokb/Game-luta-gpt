@@ -3096,37 +3096,122 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void updateSpriteMotion(float dt, float travel) {
-        int guard = playerBlockstunTimer > 0f ? playerLastGuardState : anticipatedPlayerGuardPose();
-        String attackAnimation = attackTimer > 0f && activeSpriteMove != null
-            ? activeSpriteMove.animation.id : null;
+        int guard = playerBlockstunTimer > 0f
+            ? playerLastGuardState
+            : anticipatedPlayerGuardPose();
+
+        String animation = null;
+        float animationElapsed = 0f;
+
+        if (playerKnockdownState == DUMMY_KD_FALL &&
+            spriteFighterRenderer.hasAnimation("KNOCKDOWN")) {
+            animation = "KNOCKDOWN";
+            animationElapsed = playerKnockdownTimer;
+        } else if (playerKnockdownState == DUMMY_KD_DOWN &&
+            spriteFighterRenderer.hasAnimation("GROUNDED")) {
+            animation = "GROUNDED";
+            animationElapsed = playerKnockdownTimer;
+        } else if (playerKnockdownState == DUMMY_KD_GETUP &&
+            spriteFighterRenderer.hasAnimation("GETUP")) {
+            animation = "GETUP";
+            animationElapsed = playerKnockdownTimer;
+        } else if ((playerLaunchedByHit || playerGroundSlam) &&
+            spriteFighterRenderer.hasAnimation("HIT_AIR")) {
+            animation = "HIT_AIR";
+        } else if (playerHitReactionTimer > 0f) {
+            String hit = !grounded
+                ? "HIT_AIR"
+                : (crouching ? "HIT_CROUCH" : "HIT_STAND");
+            if (spriteFighterRenderer.hasAnimation(hit)) {
+                animation = hit;
+                animationElapsed =
+                    DUMMY_HIT_REACTION_DURATION - playerHitReactionTimer;
+            }
+        } else if (guard != GUARD_NONE) {
+            String defense = guard == GUARD_LOW
+                ? "DEFENSE_CROUCH"
+                : "DEFENSE_STAND";
+            if (spriteFighterRenderer.hasAnimation(defense)) {
+                animation = defense;
+                animationElapsed = playerBlockstunTimer > 0f
+                    ? BLOCKSTUN_DURATION - playerBlockstunTimer
+                    : 0f;
+            }
+        } else if (attackTimer > 0f) {
+            if (activeSpriteMove != null) {
+                animation = activeSpriteMove.animation.id;
+            } else if (isCrouchAttackActive()) {
+                String crouchAttack =
+                    "2L".equals(attackType) ? "CROUCH_LIGHT" :
+                    "2M".equals(attackType) ? "CROUCH_MEDIUM" :
+                    "2H".equals(attackType) ? "CROUCH_HEAVY" : null;
+                if (crouchAttack != null &&
+                    spriteFighterRenderer.hasAnimation(crouchAttack)) {
+                    animation = crouchAttack;
+                }
+            } else if (!grounded) {
+                String airAttack =
+                    "L".equals(attackType) ? "AIR_LIGHT" :
+                    "M".equals(attackType) ? "AIR_MEDIUM" :
+                    "H".equals(attackType) ? "AIR_HEAVY" : null;
+                if (airAttack != null &&
+                    spriteFighterRenderer.hasAnimation(airAttack)) {
+                    animation = airAttack;
+                }
+            }
+            animationElapsed = attackDuration - attackTimer;
+        }
+
         boolean combatPose =
-            (attackTimer > 0f && attackAnimation == null) ||
-            guard != GUARD_NONE || isSuperPoseActive() || isTagAnimationActive();
-        spriteFighterRenderer.update(dt,grounded,crouching || isCrouchAttackActive() || guard == GUARD_LOW,
-            velocityY,travel,travel*facingDirection > 0,forwardDashing,backDashTimer>0,
-            attackAnimation,attackDuration-attackTimer,combatPose,playerMovementLocked);
+            animation == null && (
+                attackTimer > 0f ||
+                guard != GUARD_NONE ||
+                isSuperPoseActive() ||
+                isTagAnimationActive()
+            );
+
+        spriteFighterRenderer.update(
+            dt,
+            grounded,
+            crouching || isCrouchAttackActive() || guard == GUARD_LOW,
+            velocityY,
+            travel,
+            travel * facingDirection > 0,
+            forwardDashing,
+            backDashTimer > 0,
+            animation,
+            animationElapsed,
+            combatPose,
+            playerMovementLocked
+        );
     }
 
     private void drawPlayer(Canvas c) {
         float baseY = playerY;
 
         float playerKnockdownAngle = 0f;
-        if (playerKnockdownState == DUMMY_KD_FALL) {
-            float t = clamp(
-                playerKnockdownTimer / DUMMY_KD_FALL_DURATION,
-                0f,
-                1f
-            );
-            playerKnockdownAngle = -88f * t;
-        } else if (playerKnockdownState == DUMMY_KD_DOWN) {
-            playerKnockdownAngle = -88f;
-        } else if (playerKnockdownState == DUMMY_KD_GETUP) {
-            float t = clamp(
-                playerKnockdownTimer / DUMMY_KD_GETUP_DURATION,
-                0f,
-                1f
-            );
-            playerKnockdownAngle = -88f * (1f - t);
+        boolean hasKnockdownSprites =
+            spriteFighterRenderer.hasAnimation("KNOCKDOWN") &&
+            spriteFighterRenderer.hasAnimation("GROUNDED") &&
+            spriteFighterRenderer.hasAnimation("GETUP");
+        if (!hasKnockdownSprites) {
+            if (playerKnockdownState == DUMMY_KD_FALL) {
+                float t = clamp(
+                    playerKnockdownTimer / DUMMY_KD_FALL_DURATION,
+                    0f,
+                    1f
+                );
+                playerKnockdownAngle = -88f * t;
+            } else if (playerKnockdownState == DUMMY_KD_DOWN) {
+                playerKnockdownAngle = -88f;
+            } else if (playerKnockdownState == DUMMY_KD_GETUP) {
+                float t = clamp(
+                    playerKnockdownTimer / DUMMY_KD_GETUP_DURATION,
+                    0f,
+                    1f
+                );
+                playerKnockdownAngle = -88f * (1f - t);
+            }
         }
 
         if (playerKnockdownAngle != 0f) {

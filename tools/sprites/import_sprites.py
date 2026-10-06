@@ -467,7 +467,8 @@ def process_prepared(cfg, profile):
         if min(margins) < profile["validation"]["minMargin"]:
             raise ValueError(f"{cfg['id']}: frame {i} clips the safety margin")
         opaque = sum(threshold_alpha(cell, profile["validation"]["alphaThreshold"]).histogram()[1:])
-        if opaque < profile["validation"]["minOpaquePixels"]:
+        min_opaque = int(cfg.get("minOpaquePixels", profile["validation"]["minOpaquePixels"]))
+        if opaque < min_opaque:
             raise ValueError(f"{cfg['id']}: frame {i} has insufficient visible pixels")
         frames.append({"index": i, "outputBbox": list(bbox), "minimumMargin": min(margins), "opaquePixels": opaque})
     report = {"id": cfg["id"], "characterProfile": profile["id"], "source": cfg["source"],

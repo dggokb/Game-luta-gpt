@@ -85,7 +85,7 @@ class CharacterPackTests(unittest.TestCase):
         self.assertNotEqual(first['id'],second['id'])
         self.assertEqual('player_two.json',second['profile'])
         self.assertNotEqual(first['profile'],second['profile'])
-        self.assertEqual(set(first['animations']),set(second['animations']))
+        self.assertTrue(set(second['animations']).issubset(set(first['animations'])))
         self.assertTrue(all(a['atlas'].startswith('player_two_') for a in second['animations'].values()))
         self.assertEqual(first['moves'],second['moves'])
 

@@ -187,6 +187,146 @@
         50,
         50
       ]
+    },
+    "DEFENSE_STAND": {
+      "atlas": "player_base_missing",
+      "frames": [
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        180
+      ]
+    },
+    "DEFENSE_CROUCH": {
+      "atlas": "player_base_missing",
+      "frames": [
+        1
+      ],
+      "loop": false,
+      "durationsMs": [
+        180
+      ]
+    },
+    "HIT_STAND": {
+      "atlas": "player_base_missing",
+      "frames": [
+        2
+      ],
+      "loop": false,
+      "durationsMs": [
+        220
+      ]
+    },
+    "HIT_CROUCH": {
+      "atlas": "player_base_missing",
+      "frames": [
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        220
+      ]
+    },
+    "HIT_AIR": {
+      "atlas": "player_base_missing",
+      "frames": [
+        4
+      ],
+      "loop": false,
+      "durationsMs": [
+        220
+      ]
+    },
+    "KNOCKDOWN": {
+      "atlas": "player_base_missing",
+      "frames": [
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        220
+      ]
+    },
+    "GROUNDED": {
+      "atlas": "player_base_missing",
+      "frames": [
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        1200
+      ]
+    },
+    "GETUP": {
+      "atlas": "player_base_missing",
+      "frames": [
+        7
+      ],
+      "loop": false,
+      "durationsMs": [
+        350
+      ]
+    },
+    "CROUCH_LIGHT": {
+      "atlas": "player_base_missing",
+      "frames": [
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        160
+      ]
+    },
+    "CROUCH_MEDIUM": {
+      "atlas": "player_base_missing",
+      "frames": [
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        260
+      ]
+    },
+    "CROUCH_HEAVY": {
+      "atlas": "player_base_missing",
+      "frames": [
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        400
+      ]
+    },
+    "AIR_LIGHT": {
+      "atlas": "player_base_missing",
+      "frames": [
+        11
+      ],
+      "loop": false,
+      "durationsMs": [
+        160
+      ]
+    },
+    "AIR_MEDIUM": {
+      "atlas": "player_base_missing",
+      "frames": [
+        12
+      ],
+      "loop": false,
+      "durationsMs": [
+        260
+      ]
+    },
+    "AIR_HEAVY": {
+      "atlas": "player_base_missing",
+      "frames": [
+        13
+      ],
+      "loop": false,
+      "durationsMs": [
+        400
+      ]
     }
   },
   "moves": {

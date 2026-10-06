@@ -47,7 +47,7 @@ public class SpriteIntegrationTest {
         assertEquals(256,second.profile.frameHeight);
         assertEquals(192f,second.profile.rootX,.001f);
         assertEquals(246f,second.profile.rootY,.001f);
-        assertEquals(first.animations.keySet(),second.animations.keySet());
+        assertTrue(first.animations.keySet().containsAll(second.animations.keySet()));
         assertEquals(first.moves.keySet(),second.moves.keySet());
         assertNotEquals(first.animation("IDLE").atlas.resource,second.animation("IDLE").atlas.resource);
         assertEquals("player_two_idle",second.animation("IDLE").atlas.resource);
@@ -64,6 +64,36 @@ public class SpriteIntegrationTest {
             assertEquals(a.reach,b.reach,.0001f);
             assertEquals(a.animation.id,b.animation.id);
         }
+    }
+
+    @Test public void playerBaseHasNewDefenseHitKnockdownAndDirectionalAttackSprites()throws Exception {
+        CharacterDefinition first=GeneratedCharacters.get("player_base");
+        String[] extra={
+            "DEFENSE_STAND","DEFENSE_CROUCH","HIT_STAND","HIT_CROUCH","HIT_AIR",
+            "KNOCKDOWN","GROUNDED","GETUP",
+            "CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY",
+            "AIR_LIGHT","AIR_MEDIUM","AIR_HEAVY"
+        };
+        for(String id:extra) {
+            assertTrue("Missing "+id,first.animations.containsKey(id));
+            assertEquals("player_base_missing",first.animation(id).atlas.resource);
+        }
+        assertFalse(GeneratedCharacters.get("player_two").animations.containsKey("DEFENSE_STAND"));
+
+        set("grounded",true);set("crouching",true);
+        invoke("startAttack",new Class<?>[]{String.class},"2L");frames(1);
+        assertEquals("CROUCH_LIGHT",motion().clip);
+
+        setup();set("grounded",false);set("playerY",430f);
+        invoke("startAttack",new Class<?>[]{String.class},"H");frames(1);
+        assertEquals("AIR_HEAVY",motion().clip);
+
+        setup();set("playerBlockstunTimer",.12f);set("playerLastGuardState",2);
+        set("playerMovementLocked",true);frames(1);
+        assertEquals("DEFENSE_CROUCH",motion().clip);
+
+        setup();set("playerKnockdownState",1);set("playerMovementLocked",true);frames(1);
+        assertEquals("KNOCKDOWN",motion().clip);
     }
 
     @Test public void opponentIsRenderedByTheGenericSpriteEngine()throws Exception {

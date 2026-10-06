@@ -62,5 +62,6 @@ final class SpriteFighterRenderer {
         spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:null);
         canvas.drawBitmap(sheets.get(a.resource),source,destination,spritePaint);
     }
+    boolean hasAnimation(String id){return character.animations.containsKey(id);}
     CharacterVisualProfile visualProfile(){return profile;}
 }
