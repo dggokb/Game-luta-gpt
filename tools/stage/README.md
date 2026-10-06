@@ -7,7 +7,8 @@ fogo, água, neblina e pétalas são animados pelo próprio jogo. Como funciona 
 
 Cada cenário fica em `android/app/src/main/assets/stages/<id>/`, com um `stage.json` e as
 imagens. O primeiro é o **Templo da Lua** (`templo_lua`), baseado no concept do templo à
-noite. Hoje ele usa arte provisória, gerada por `gerar_provisorio.py`.
+noite, com a arte gerada no GPT. `gerar_provisorio.py` gera uma arte provisória no mesmo
+formato (em `tools/stage/provisorio/`), útil para testar ou como modelo.
 
 ## Passo a passo
 
@@ -97,3 +98,16 @@ Dicas:
 - **Piso**: textura vista de cima. A borda de cima é a profundidade `longe` e a de baixo é
   `perto`. `centroX` é o x do mundo do centro da imagem (os lutadores começam em 420 e 980).
   `reflexoLutadores` é a opacidade do reflexo dos lutadores no chão (0 = sem reflexo).
+  `imagemLajotas` (opcional) é a mesma textura **sem o emblema**, usada nas repetições fora
+  do centro, para o emblema não aparecer duas vezes quando a câmera anda.
+
+## Notas do Templo da Lua
+
+- O `portal.png` veio com piso em perspectiva e pavilhões nas bordas. Ficou só o torii
+  com as cerejeiras (x 300 a 1370 da imagem original), sem o piso e com as bordas
+  esfumaçadas, para a cidade aparecer dos lados.
+- O `chao_lajotas.jpg` é provisório: é o canto do `chao.jpg` (fora do emblema) repetido
+  espelhado. Para uma versão melhor, gere no GPT o mesmo prompt do piso **sem o emblema**
+  ("só as lajotas, sem nenhum desenho no centro") e salve com esse nome.
+- A cidade já vem com o rio e os reflexos pintados, então a camada `rio` só acrescenta os
+  brilhos que piscam (`alfa` 0).

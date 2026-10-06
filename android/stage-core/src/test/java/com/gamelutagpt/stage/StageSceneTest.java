@@ -99,7 +99,7 @@ public class StageSceneTest {
             + " \"periodo\": 0.8, \"reflexo\": 0.3, \"luzes\": [{\"x\": 0.9, \"y\": 0.3}], \"fogos\": [{\"x\": 0.5}]},"
             + "{\"imagem\": \"frente.png\", \"profundidade\": -200, \"topo\": 0.8, \"base\": 1.1},"
             + "{\"imagem\": \"falta.png\", \"profundidade\": 50, \"topo\": 0.1, \"base\": 0.2}],"
-            + "\"chao\": {\"imagem\": \"chao.jpg\", \"reflexoLutadores\": 0.2},"
+            + "\"chao\": {\"imagem\": \"chao.jpg\", \"imagemLajotas\": \"lajotas.jpg\", \"reflexoLutadores\": 0.2},"
             + "\"petalas\": {\"quantidade\": 30}}";
         StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
         assertEquals("a imagem que falta vira aviso", 1, pack.warnings.size());
@@ -156,6 +156,7 @@ public class StageSceneTest {
         @Override
         public RenderImage loadImage(String path) throws IOException {
             if (path.endsWith("falta.png")) throw new IOException("não existe");
+            if (path.endsWith("lajotas.jpg")) return new FakeImage(512, 512);
             return path.endsWith("pilar.png") ? new FakeImage(700, 1400) : new FakeImage(1536, 1024);
         }
     }

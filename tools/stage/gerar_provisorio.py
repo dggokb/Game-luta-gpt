@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Gera a arte provisória do cenário "Templo da Lua".
+"""Gera uma arte provisória no formato do cenário "Templo da Lua".
 
-Cada arquivo tem o mesmo nome, formato e transparência que a arte final gerada
-pelo GPT vai ter, então dá para testar o motor de cenário antes da arte existir.
-Basta substituir os arquivos depois (veja tools/stage/README.md).
+Cada arquivo tem o mesmo nome, formato e transparência que a arte de verdade, então
+serve para testar o motor de cenário sem arte (ou como modelo de um cenário novo).
+Grava em tools/stage/provisorio/ por padrão, para não sobrescrever a arte final:
 
-    python tools/stage/gerar_provisorio.py
+    python tools/stage/gerar_provisorio.py [--saida pasta]
 """
 
+import argparse
 import math
 import random
 import sys
@@ -18,8 +19,7 @@ try:
 except ImportError:
     sys.exit("Instale o Pillow: pip install pillow")
 
-RAIZ = Path(__file__).resolve().parents[2]
-SAIDA = RAIZ / "android" / "app" / "src" / "main" / "assets" / "stages" / "templo_lua"
+SAIDA = Path(__file__).resolve().parent / "provisorio"
 
 
 def gradiente(w, h, topo, base):
@@ -251,16 +251,19 @@ def chao():
 
 
 def main():
-    SAIDA.mkdir(parents=True, exist_ok=True)
-    ceu().save(SAIDA / "ceu.jpg", quality=88)
-    montanhas().save(SAIDA / "montanhas.png")
-    cidade().save(SAIDA / "cidade.png")
-    portal().save(SAIDA / "portal.png")
-    grade().save(SAIDA / "grade.png")
-    pilar().save(SAIDA / "pilar.png")
-    braseiro().save(SAIDA / "braseiro.png")
-    chao().save(SAIDA / "chao.jpg", quality=88)
-    print(f"arte provisória em {SAIDA}")
+    parser = argparse.ArgumentParser(description="Gera arte provisória de cenário.")
+    parser.add_argument("--saida", type=Path, default=SAIDA)
+    saida = parser.parse_args().saida
+    saida.mkdir(parents=True, exist_ok=True)
+    ceu().save(saida / "ceu.jpg", quality=88)
+    montanhas().save(saida / "montanhas.png")
+    cidade().save(saida / "cidade.png")
+    portal().save(saida / "portal.png")
+    grade().save(saida / "grade.png")
+    pilar().save(saida / "pilar.png")
+    braseiro().save(saida / "braseiro.png")
+    chao().save(saida / "chao.jpg", quality=88)
+    print(f"arte provisória em {saida}")
 
 
 if __name__ == "__main__":

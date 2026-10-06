@@ -37,7 +37,11 @@ public final class StagePack {
         for (StageDefinition.Layer layer : definition.layers) {
             if (layer.image != null && !names.contains(layer.image)) names.add(layer.image);
         }
-        if (definition.floor != null && !names.contains(definition.floor.image)) names.add(definition.floor.image);
+        if (definition.floor != null) {
+            if (!names.contains(definition.floor.image)) names.add(definition.floor.image);
+            String plain = definition.floor.plainImage;
+            if (plain != null && !names.contains(plain)) names.add(plain);
+        }
 
         Map<String, RenderImage> images = new HashMap<>();
         List<String> warnings = new ArrayList<>();

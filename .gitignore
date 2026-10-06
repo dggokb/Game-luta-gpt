@@ -8,3 +8,4 @@ __pycache__/
 
 # Imagens brutas geradas pela IA antes do preparar_ultra.py
 tools/ultra/geradas/
+tools/stage/provisorio/

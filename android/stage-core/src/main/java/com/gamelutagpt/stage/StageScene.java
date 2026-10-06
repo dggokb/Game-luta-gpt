@@ -49,6 +49,8 @@ public final class StageScene {
     private final StageCamera camera;
     private final List<Placed> placed = new ArrayList<>();
     private final RenderImage floorImage;
+    /** Lajotas sem emblema para as cópias fora do centro (ou a própria imagem do piso). */
+    private final RenderImage floorPlainImage;
     private final float floorTileWidth;
     private final float floorCenterX;
     private final Rand rand = new Rand(7);
@@ -97,6 +99,8 @@ public final class StageScene {
 
         StageDefinition.Floor floor = def.floor;
         floorImage = floor != null ? pack.image(floor.image) : null;
+        RenderImage plain = floor != null ? pack.image(floor.plainImage) : null;
+        floorPlainImage = plain != null ? plain : floorImage;
         floorTileWidth = floorImage != null
             ? (floor.far - floor.near) * floorImage.width() / (float)floorImage.height()
             : 1f;
@@ -303,7 +307,11 @@ public final class StageScene {
                 float tileEnd = Math.min(uRight, (tile + 1) * imgW);
                 float sx0 = (u - uLeft) / (uRight - uLeft) * VW;
                 float sx1 = (tileEnd - uLeft) / (uRight - uLeft) * VW;
-                c.drawImageRegion(floorImage, u - tile * imgW, v0, tileEnd - tile * imgW, v1,
+                // A cópia do centro tem o emblema; as outras usam só lajotas, se houver.
+                RenderImage image = tile == 0 ? floorImage : floorPlainImage;
+                float kx = image.width() / imgW;
+                float ky = image.height() / imgH;
+                c.drawImageRegion(image, (u - tile * imgW) * kx, v0 * ky, (tileEnd - tile * imgW) * kx, v1 * ky,
                     sx0, y0, sx1 + 0.5f, y1, 255);
                 u = tileEnd;
                 tile++;

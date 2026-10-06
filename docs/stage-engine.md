@@ -71,7 +71,8 @@ não em unidades do mundo.
 A imagem do piso é uma **textura vista de cima**: a borda de cima da imagem é a
 profundidade `longe` e a de baixo, `perto`. A largura no mundo segue a proporção da
 imagem e ela se repete na horizontal, centrada em `centroX` (o emblema do Templo da Lua
-fica embaixo dos lutadores).
+fica embaixo dos lutadores). Com `imagemLajotas`, as repetições fora do centro usam essa
+textura sem emblema.
 
 O piso é desenhado em faixas horizontais de 3 px de tela. Para cada faixa, o motor
 descobre a profundidade (`floorDepthAt`), pega a linha certa da textura e o trecho de x

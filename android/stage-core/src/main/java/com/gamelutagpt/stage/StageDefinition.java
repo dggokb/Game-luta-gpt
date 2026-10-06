@@ -25,7 +25,8 @@ import java.util.Map;
  *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ] },
  *     { "tipo": "neblina", "profundidade": 2600, "topo": 0.45, "base": 0.62, "cor": "#3A2A66", "alfa": 0.5 }
  *   ],
- *   "chao": { "imagem": "chao.jpg", "perto": -420, "longe": 560, "centroX": 700, "reflexoLutadores": 0.25 },
+ *   "chao": { "imagem": "chao.jpg", "imagemLajotas": "chao_lajotas.jpg", "perto": -420, "longe": 560,
+ *             "centroX": 700, "reflexoLutadores": 0.25 },
  *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" }
  * }
  * </pre>
@@ -148,6 +149,11 @@ public final class StageDefinition {
 
     public static final class Floor {
         public final String image;
+        /**
+         * Imagem só de lajotas, sem o emblema, para as repetições fora do centro; null =
+         * repete a imagem principal (o emblema aparece de novo quando a câmera anda).
+         */
+        public final String plainImage;
         /** Profundidades da borda de baixo e da borda de cima da imagem do piso. */
         public final float near, far;
         /** X do mundo onde fica o centro da imagem (o emblema, por exemplo). */
@@ -157,8 +163,10 @@ public final class StageDefinition {
         /** Opacidade do reflexo das luzes no piso. */
         public final float lightReflection;
 
-        Floor(String image, float near, float far, float centerX, float fighterReflection, float lightReflection) {
+        Floor(String image, String plainImage, float near, float far, float centerX,
+              float fighterReflection, float lightReflection) {
             this.image = image;
+            this.plainImage = plainImage;
             this.near = near;
             this.far = far;
             this.centerX = centerX;
@@ -242,7 +250,8 @@ public final class StageDefinition {
             float near = number(floorMap, "perto", -400f);
             float far = number(floorMap, "longe", 550f);
             if (far <= near) throw new IllegalArgumentException("chao: \"longe\" deve ser maior que \"perto\"");
-            floor = new Floor(image, near, far, number(floorMap, "centroX", Float.NaN),
+            floor = new Floor(image, string(floorMap, "imagemLajotas", null), near, far,
+                number(floorMap, "centroX", Float.NaN),
                 number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f));
         }
 

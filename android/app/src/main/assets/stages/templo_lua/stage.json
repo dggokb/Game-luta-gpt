@@ -1,33 +1,142 @@
 {
   "nome": "Templo da Lua",
-  "camera": { "distancia": 1000, "horizonte": 0.40 },
-  "corFundo": "#070A1C",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#0B163F",
   "camadas": [
-    { "id": "ceu", "imagem": "ceu.jpg", "profundidade": 100000,
-      "topo": -0.12, "base": 0.62, "repetir": "espelhar", "corAcima": "#070A1C" },
-    { "id": "montanhas", "imagem": "montanhas.png", "profundidade": 9000,
-      "topo": 0.27, "base": 0.47, "repetir": "espelhar" },
-    { "id": "cidade", "imagem": "cidade.png", "profundidade": 4200,
-      "noChao": true, "altura": 0.40, "x": 0.45, "repetir": "espelhar", "reflexo": 0.35 },
-    { "id": "neblina-longe", "tipo": "neblina", "profundidade": 3000,
-      "topo": 0.30, "base": 0.47, "cor": "#4A3A8C", "alfa": 0.40 },
-    { "id": "rio", "tipo": "agua", "perto": 1450, "longe": 4200,
-      "corLonge": "#2A2860", "corPerto": "#0E1030", "alfa": 0.72, "brilhos": 50 },
-    { "id": "portal", "imagem": "portal.png", "profundidade": 1450,
-      "noChao": true, "altura": 0.27, "x": 0.5, "repetir": "espelhar", "periodo": 1.15 },
-    { "id": "neblina-perto", "tipo": "neblina", "profundidade": 900,
-      "topo": 0.50, "base": 0.62, "cor": "#2A1E50", "alfa": 0.45 },
-    { "id": "grade", "imagem": "grade.png", "profundidade": 560,
-      "noChao": true, "altura": 0.17, "repetir": "repetir" },
-    { "id": "pilares", "imagem": "pilar.png", "profundidade": 300,
-      "noChao": true, "altura": 1.05, "x": 0.11, "repetir": "espelhar", "periodo": 0.82,
-      "luzes": [ { "x": 0.89, "y": 0.28, "raio": 0.045, "cor": "#FFB45A", "pulsar": 0.10 } ] },
-    { "id": "braseiros", "imagem": "braseiro.png", "profundidade": 120,
-      "noChao": true, "altura": 0.20, "x": 0.11, "repetir": "espelhar", "periodo": 0.80,
-      "fogos": [ { "x": 0.5, "y": 0.11, "tamanho": 0.55 } ] }
+    {
+      "id": "ceu",
+      "imagem": "ceu.jpg",
+      "profundidade": 100000,
+      "topo": -0.08,
+      "base": 1.02,
+      "corAcima": "#0B163F"
+    },
+    {
+      "id": "montanhas",
+      "imagem": "montanhas.png",
+      "profundidade": 9000,
+      "topo": 0.3,
+      "base": 0.5,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "neblina-longe",
+      "tipo": "neblina",
+      "profundidade": 6000,
+      "topo": 0.36,
+      "base": 0.52,
+      "cor": "#5A4AA0",
+      "alfa": 0.35
+    },
+    {
+      "id": "cidade",
+      "imagem": "cidade.png",
+      "profundidade": 4200,
+      "topo": 0.13,
+      "base": 0.63,
+      "x": 0.62,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "rio",
+      "tipo": "agua",
+      "perto": 1500,
+      "longe": 4200,
+      "alfa": 0.0,
+      "brilhos": 40
+    },
+    {
+      "id": "neblina-perto",
+      "tipo": "neblina",
+      "profundidade": 2200,
+      "topo": 0.48,
+      "base": 0.62,
+      "cor": "#2A1E50",
+      "alfa": 0.35
+    },
+    {
+      "id": "portal",
+      "imagem": "portal.png",
+      "profundidade": 1000,
+      "noChao": true,
+      "altura": 0.34,
+      "x": 0.5,
+      "repetir": "nao"
+    },
+    {
+      "id": "grade",
+      "imagem": "grade.png",
+      "profundidade": 560,
+      "noChao": true,
+      "altura": 0.17,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "pilares",
+      "imagem": "pilar.png",
+      "profundidade": 300,
+      "noChao": true,
+      "altura": 1.05,
+      "x": 0.11,
+      "repetir": "espelhar",
+      "periodo": 0.82,
+      "luzes": [
+        {
+          "x": 0.68,
+          "y": 0.377,
+          "raio": 0.04,
+          "cor": "#FFB45A",
+          "pulsar": 0.1
+        }
+      ]
+    },
+    {
+      "id": "teto",
+      "imagem": "teto.png",
+      "profundidade": 250,
+      "topo": -0.01,
+      "base": 0.19,
+      "x": 0.52,
+      "repetir": "espelhar",
+      "periodo": 0.82
+    },
+    {
+      "id": "braseiros",
+      "imagem": "braseiro.png",
+      "profundidade": 120,
+      "noChao": true,
+      "altura": 0.24,
+      "x": 0.1,
+      "repetir": "espelhar",
+      "periodo": 0.8,
+      "fogos": [
+        {
+          "x": 0.5,
+          "y": 0.1,
+          "tamanho": 0.42
+        }
+      ]
+    }
   ],
-  "chao": { "imagem": "chao.jpg", "perto": -420, "longe": 560, "centroX": 700,
-            "reflexoLutadores": 0.22, "reflexoLuzes": 0.45 },
-  "petalas": { "quantidade": 70, "cor": "#FFB7D5", "perto": -350, "longe": 2600,
-               "vento": 45, "queda": 65, "tamanho": 7 }
+  "chao": {
+    "imagem": "chao.jpg",
+    "perto": -600,
+    "longe": 560,
+    "centroX": 700,
+    "reflexoLutadores": 0.22,
+    "reflexoLuzes": 0.45,
+    "imagemLajotas": "chao_lajotas.jpg"
+  },
+  "petalas": {
+    "quantidade": 70,
+    "cor": "#FFB7D5",
+    "perto": -350,
+    "longe": 2600,
+    "vento": 45,
+    "queda": 65,
+    "tamanho": 7
+  }
 }
