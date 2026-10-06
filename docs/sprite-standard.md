@@ -1,4 +1,4 @@
-# Padrão de personagens e sprites — GPT v0.56
+# Padrão de personagens e sprites — GPT v0.59
 
 A escala pertence ao **personagem**, nunca a um golpe isolado. As imagens e os
 metadados são preparados antes do APK; não há JSON, recorte automático ou
@@ -231,3 +231,22 @@ O workflow de regeneração passou a versionar saídas de qualquer pack novo, re
 ## Brutamonte com arte final de teste — GPT v0.58
 
 O pack temporário 32×32 foi substituído pela arte detalhada aprovada do Brutamonte. O NPC passa a usar células 160×160 com escala de mundo própria, atlas de idle/movimento e atlas separado para postura ofensiva e L/M/H. O renderer e a IA continuam genéricos; esta alteração troca apenas assets e metadados do pack.
+
+
+## Player Base — conjunto de combate completo — GPT v0.59
+
+O `player_base` recebeu o primeiro passe visual dos estados de combate que ainda
+usavam poses genéricas: defesa em pé/agachado, hit em pé/agachado/aéreo,
+knockdown, derrubado, levantar e L/M/H agachado e aéreo. Todos os 14 estados
+ficam no atlas transparente `player_base_missing`, com célula 256×256 e raiz
+canônica 128/238.
+
+O runtime prioriza essas animações quando o pack as oferece e mantém fallback
+para personagens que ainda não possuem os estados novos. Assim `player_two`
+e outros packs continuam válidos sem duplicar imediatamente o mesmo conjunto.
+A rotação vetorial antiga de knockdown também fica desativada quando
+`KNOCKDOWN`, `GROUNDED` e `GETUP` estão presentes no pack.
+
+Este atlas é um primeiro passe de teste visual. As regras de dano, launcher,
+ground slam, blockstun e ataques 2L/2M/2H permanecem as já existentes; a v0.59
+conecta os sprites a esses estados sem alterar a física do combate.
