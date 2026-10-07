@@ -203,6 +203,17 @@ final class CombatConfig {
     int recoverableLifePermille = 270;
     int recoverableLifePerFrame = 6;
 
+    // Overdrive (botão OD ou SUPER + TAG): once per round, about 8 seconds for the team.
+    int overdriveFrames = 480;
+    /** Both fighters freeze on activation; the opponent's stun waits too (combo extension). */
+    int overdriveFlashFrames = 20;
+    /** Walk, dash and air dash speed multiplier. */
+    float overdriveSpeed = 1.25f;
+    /** Meter gained in Overdrive, permille of the normal gain. */
+    int overdriveMeterPermille = 1500;
+    /** Recoverable life per frame in Overdrive, for every member (the point too). */
+    int overdriveRegenPerFrame = 12;
+
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;
     int tagEnterFrames = 23;

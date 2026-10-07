@@ -32,6 +32,11 @@ final class HudRenderer {
         boolean ultraReady();
         int dpadDirection();
         boolean pressed(Control control);
+        /** Overdrive left (1 just turned on, 0 when off). */
+        float overdriveRatio();
+        float overdriveSeconds();
+        /** The Overdrive of this round has not been used yet. */
+        boolean overdriveReady();
         /** Demo playing (index into DemoDirector.VERSIONS), or -1. */
         int demoPlaying();
         String demoTitle();
@@ -463,6 +468,38 @@ final class HudRenderer {
         drawComboButton(c, s.pressed(Control.COMBO));
         drawTagButton(c, s);
         drawSuperButton(c, s);
+        drawOverdriveButton(c, s);
+    }
+
+    /** OD: lit while unused this round, a draining ring while on, dim once spent. */
+    private void drawOverdriveButton(Canvas c, State s) {
+        float x = OVERDRIVE_X, y = OVERDRIVE_Y, r = OVERDRIVE_RADIUS;
+        float left = s.overdriveRatio();
+        boolean ready = s.overdriveReady();
+        boolean pressed = s.pressed(Control.OVERDRIVE);
+        paint.setColor(left > 0f ? Color.argb(210, 150, 30, 10)
+            : ready ? (pressed ? Color.rgb(255, 120, 40) : Color.argb(185, 90, 24, 12))
+            : Color.argb(90, 55, 60, 68));
+        c.drawCircle(x, y, r, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4f);
+        paint.setColor(ready || left > 0f ? Color.argb(235, 255, 140, 50) : Color.argb(120, 180, 180, 180));
+        if (left > 0f) {
+            c.drawArc(x - r, y - r, x + r, y + r, -90f, 360f * left, false, paint);
+        } else {
+            c.drawCircle(x, y, r, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(ready || left > 0f ? Color.WHITE : Color.argb(150, 220, 220, 220));
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(17f);
+        c.drawText("OD", x, y + (left > 0f || !ready ? -2f : 6f), paint);
+        paint.setTextSize(10f);
+        if (left > 0f) c.drawText(String.format(java.util.Locale.US, "%.1fs", s.overdriveSeconds()), x, y + 13f, paint);
+        else if (!ready) c.drawText("USADO", x, y + 13f, paint);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {

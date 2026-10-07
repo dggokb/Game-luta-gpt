@@ -25,6 +25,8 @@ final class FighterInput {
     boolean assist;
     /** ↓ + TAG: raw tag (the partner takes the point). */
     boolean tag;
+    /** OD button (or SUPER + TAG on one frame): Overdrive, once per round. */
+    boolean overdrive;
     /** CPU only: an already-resolved special of strength "L", "M" or "H". */
     String special;
     /** CPU only: requests that a human expresses through the direction history. */
@@ -36,7 +38,7 @@ final class FighterInput {
     }
 
     void clearPresses() {
-        light = medium = heavy = auto = superAttack = ultra = assist = tag = grab = pushblock = false;
+        light = medium = heavy = auto = superAttack = ultra = assist = tag = grab = pushblock = overdrive = false;
         special = null;
         dash = backdash = jump = superJump = false;
     }
@@ -53,6 +55,7 @@ final class FighterInput {
         grab = other.grab;
         pushblock = other.pushblock;
         tag = other.tag;
+        overdrive = other.overdrive;
         special = other.special;
         dash = other.dash;
         backdash = other.backdash;

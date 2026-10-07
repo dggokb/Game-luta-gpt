@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.86-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.87-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -261,7 +261,7 @@ Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/spr
 
 - O **CPU agora usa o nosso personagem** (mesmo corpo e golpes), desenhado **pálido e
   azulado** para não confundir com o jogador.
-- **Botões DEMO 80…85** no topo da tela: cada um faz os dois personagens demonstrarem
+- **Botões DEMO 80…85 (e 87)** no topo da tela: cada um faz os dois personagens demonstrarem
   sozinhos o que entrou naquela versão, passo a passo, com legenda (✓ quando o passo
   mostrou o que devia). Toque de novo no mesmo botão para parar; no fim a luta volta
   como estava (posições, vida, barra).
@@ -269,3 +269,16 @@ Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/spr
     **82** air dash para frente e para trás · **83** wall bounce, ground bounce ·
     **84** air tech, levantar rápido, rolamentos · **85** DHC, vida vermelha.
 - Detalhes: `docs/combat-engine.md` (seção Demos).
+
+## Overdrive — v0.87
+
+- Botão **OD** (à esquerda de SUPER e TAG) ou **SUPER + TAG juntos**: **1 vez por round**,
+  dura **8 segundos** para o time todo.
+- Ao ligar, os dois congelam por um instante (o hitstun do CPU espera): dá para ligar **no
+  meio do combo**, cancelando o próprio golpe, e continuar.
+- Durante o Overdrive: **25% mais rápido** (andar, dash, air dash), **50% mais barra**,
+  **cancels livres** (todo golpe que acertou ou foi defendido cancela em qualquer outro,
+  ex.: H > M > H) e a **vida vermelha volta até para quem está lutando**, mais rápido.
+- O botão mostra o tempo restante; depois fica "USADO". Os botões **VIDA P1 / VIDA CPU**
+  também recarregam o Overdrive (novo round no treino).
+- **DEMO 87** mostra tudo isso. A CPU ainda não usa o Overdrive.

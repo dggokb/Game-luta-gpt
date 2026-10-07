@@ -146,6 +146,8 @@ final class CombatFighter {
     int throwRequestAge = -1;
     /** Frames since M + H was pressed while blocking, or -1: pushblock. */
     int pushblockRequestAge = -1;
+    /** Frames since the Overdrive was asked for, or -1. */
+    int overdriveRequestAge = -1;
     /** Frames during which nothing hits this fighter (Guard Cancel entry). */
     int invulnFrames;
 

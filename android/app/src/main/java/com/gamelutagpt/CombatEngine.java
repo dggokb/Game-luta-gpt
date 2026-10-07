@@ -55,7 +55,8 @@ final class CombatEngine {
     private final List<HitEvent> events = new ArrayList<>();
     /**
      * System notices of the last step, for the shell's call-outs and screen shake: "TECH",
-     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE". Not hits (no damage).
+     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE", "OVERDRIVE", "OD_CANCEL".
+     * Not hits (no damage).
      */
     private final List<String> cues = new ArrayList<>();
     private final List<Contact> contacts = new ArrayList<>();
@@ -126,6 +127,11 @@ final class CombatEngine {
     }
 
     TeamSystem.Side team(int side) { return teams.sides[side]; }
+
+    /** New round for a side (training refills): its Overdrive can be used again. */
+    void refreshOverdrive(int side) {
+        teams.refreshOverdrive(side);
+    }
 
     /**
      * Demos and training: both fighters stand on the ground at these spots with nothing in
@@ -222,6 +228,7 @@ final class CombatEngine {
             f.ultraRequestAge = -1;
             f.throwRequestAge = -1;
             f.pushblockRequestAge = -1;
+            f.overdriveRequestAge = -1;
             return;
         }
         int relative = MotionParser.relative(in.direction, f.facing);
@@ -252,6 +259,7 @@ final class CombatEngine {
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
         if (in.grab) f.throwRequestAge = 0;
+        if (in.overdrive) f.overdriveRequestAge = 0;
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
         if (in.pushblock) {
             // Only blocking turns M + H into a pushblock; otherwise it is the heavy.
@@ -276,6 +284,12 @@ final class CombatEngine {
         if (f.frozen()) return;
         endFinishedStates(f);
         if (f.locked || f.ko()) {
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
+
+        if (f.overdriveRequestAge >= 0 && teams.canOverdrive(f)) {
+            overdrive(f);
             f.dashRequest = f.backdashRequest = false;
             return;
         }
@@ -327,9 +341,46 @@ final class CombatEngine {
 
         if (f.status == CombatFighter.Status.NEUTRAL) {
             startFromBuffer(f, false);
-        } else if (f.attacking() && CancelSystem.windowOpen(f)) {
+        } else if (f.attacking() && (CancelSystem.windowOpen(f) || overdriveCancelOpen(f))) {
             startFromBuffer(f, true);
         }
+    }
+
+    /**
+     * Overdrive: the team's clock starts and both fighters freeze for the flash (the
+     * opponent's stun waits, so a combo can go on). It cancels the fighter's own attack.
+     */
+    private void overdrive(CombatFighter f) {
+        TeamSystem.Side side = teams.sides[f.index];
+        side.overdriveUsed = true;
+        side.overdriveFrames = config.overdriveFrames;
+        f.overdriveRequestAge = -1;
+        if (f.attacking()) {
+            f.status = CombatFighter.Status.NEUTRAL;
+            f.clearAttack();
+        }
+        f.buffer.clear();
+        CombatFighter other = fighters[1 - f.index];
+        f.hitstop = Math.max(f.hitstop, config.overdriveFlashFrames);
+        other.hitstop = Math.max(other.hitstop, config.overdriveFlashFrames);
+        superFreeze = Math.max(superFreeze, config.overdriveFlashFrames);
+        cues.add("OVERDRIVE");
+    }
+
+    /** In Overdrive an attack that already hit or was blocked cancels into any other move. */
+    private boolean overdriveCancelOpen(CombatFighter f) {
+        return f.attacking() && teams.overdriveActive(f.index) && f.outcome != CombatFighter.Outcome.NONE &&
+            f.attack.kind != AttackDefinition.Kind.SUPER;
+    }
+
+    private boolean overdriveCancel(CombatFighter f, AttackDefinition next, ComboSession session) {
+        return overdriveCancelOpen(f) && !next.id.equals(f.attack.id) && (session == null || session.allows(next));
+    }
+
+    /** Meter for a hit or a block; more of it in Overdrive. */
+    private void gainMeter(CombatFighter f, int amount) {
+        if (teams.overdriveActive(f.index)) amount = amount * config.overdriveMeterPermille / 1000;
+        f.state.addSuperMeter(amount);
     }
 
     private void endFinishedStates(CombatFighter f) {
@@ -424,11 +475,14 @@ final class CombatEngine {
         InputBuffer.Entry entry = f.buffer.select(e -> {
             AttackDefinition next = CancelSystem.resolve(f, e, projectileAlive, null);
             if (next == null) return null;
-            if (cancel && !CancelSystem.canCancel(f, next.id, session)) return null;
+            if (cancel && !CancelSystem.canCancel(f, next.id, session) && !overdriveCancel(f, next, session)) {
+                return null;
+            }
             return next;
         }, f.state.profile.inputPriority, resolved);
         if (entry == null) return;
         AttackDefinition next = resolved[0];
+        if (cancel && !CancelSystem.canCancel(f, next.id, session)) cues.add("OD_CANCEL");
         CancelSystem.resolve(f, entry, projectileAlive, autoStep);
         f.buffer.consume(entry);
         startAttack(f, next, entry.strength, autoStep[0]);
@@ -566,6 +620,7 @@ final class CombatEngine {
         if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
         if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
         if (f.techRequestAge >= 0 && ++f.techRequestAge > config.bufferFrames) f.techRequestAge = -1;
+        if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
         if (f.invulnFrames > 0) f.invulnFrames--;
         if (f.throwProtect > 0) f.throwProtect--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
@@ -630,6 +685,8 @@ final class CombatEngine {
             f.rollFrames--;
             return;
         }
+        // Overdrive: the team moves faster.
+        float boost = teams.overdriveActive(f.index) ? config.overdriveSpeed : 1f;
         if (f.vx != 0f && f.status == CombatFighter.Status.AIR_HITSTUN) {
             f.x += f.vx * CombatConfig.DT;
             boolean reached = f.bounce == CombatFighter.BOUNCE_WALL &&
@@ -650,7 +707,7 @@ final class CombatEngine {
                 f.airDashFrames = 0;
             } else {
                 f.x += f.airDashDirection * (f.airDashBack ? config.backAirDashSpeed : config.airDashSpeed) *
-                    CombatConfig.DT;
+                    boost * CombatConfig.DT;
                 f.airDashFrames--;
                 return;
             }
@@ -660,16 +717,16 @@ final class CombatEngine {
             : direction == 1 || direction == 2 || direction == 8 ? 1 : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         if (!holdingForward) f.forwardDashing = false;
-        float walk = holdingForward ? config.walkSpeed : config.walkBackSpeed;
+        float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
             if (!f.grounded) {
                 f.x += horizontal * walk * CombatConfig.DT;
             } else if (f.backdashFrames > 0) {
-                f.x -= f.facing * config.backdashSpeed * CombatConfig.DT;
+                f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
                 f.backdashFrames--;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed : walk;
+                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
@@ -1186,7 +1243,7 @@ final class CombatEngine {
         sessions[d.index] = session;
         int damage = session.registerHit(throwAttack, throwAttack.damage, config);
         d.state.takeDamage(damage, config.recoverableLifePermille);
-        a.state.addSuperMeter(CombatRules.superGainOnHit(throwAttack.strength));
+        gainMeter(a, CombatRules.superGainOnHit(throwAttack.strength));
         d.framesSinceHit = 0;
         knockDown(d);
         push(d, a, a.facing * throwAttack.knockback);
@@ -1209,7 +1266,7 @@ final class CombatEngine {
             d.forwardDashing = false;
             d.backdashFrames = 0;
             push(d, a, a.facing * ultraAttack.pushbackOnBlock);
-            d.state.addSuperMeter(CombatRules.superGainOnGuard(ultraAttack.strength));
+            gainMeter(d, CombatRules.superGainOnGuard(ultraAttack.strength));
             freeze(a, d, ultraAttack.hitstopFrames, false);
             a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
             a.ultraFrame = 0;
@@ -1420,7 +1477,7 @@ final class CombatEngine {
             d.forwardDashing = false;
             d.backdashFrames = 0;
             push(d, a, direction * attack.pushbackOnBlock);
-            d.state.addSuperMeter(CombatRules.superGainOnGuard(attack.strength));
+            gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
             freeze(a, d, attack.hitstopFrames, projectile);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
             events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
@@ -1435,7 +1492,7 @@ final class CombatEngine {
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         int damage = session.registerHit(attack, projectile ? c.projectile.damage : attack.damage, config);
         d.state.takeDamage(damage, config.recoverableLifePermille);
-        a.state.addSuperMeter(CombatRules.superGainOnHit(attack.strength));
+        gainMeter(a, CombatRules.superGainOnHit(attack.strength));
 
         boolean wasCrouching = d.crouchingBody();
         d.clearAttack();

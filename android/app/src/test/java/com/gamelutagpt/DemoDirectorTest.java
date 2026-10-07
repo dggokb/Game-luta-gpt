@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-/** Every demo button (v0.80…v0.85) really shows its feature, and gives the match back. */
+/** Every demo button (v0.80…v0.85, v0.87) really shows its feature, and gives the match back. */
 public class DemoDirectorTest {
     private static final float HOME_P1 = 420f, HOME_CPU = 980f;
 
@@ -52,6 +52,7 @@ public class DemoDirectorTest {
     @Test public void v83WallAndGroundBounce() { assertEveryStepShown(3); }
     @Test public void v84AirTechAndWakeUps() { assertEveryStepShown(4); }
     @Test public void v85DhcAndRecoverableLife() { assertEveryStepShown(5); }
+    @Test public void v87Overdrive() { assertEveryStepShown(6); }
 
     @Test public void theMatchComesBackAsItWas() {
         Match m = new Match();

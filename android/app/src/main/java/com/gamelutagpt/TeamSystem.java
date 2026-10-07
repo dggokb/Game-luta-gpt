@@ -45,6 +45,10 @@ final class TeamSystem {
         int assistRequestAge = -1;
         int tagRequestAge = -1;
 
+        // Overdrive: frames left (0 when off) and whether this round's one use is gone.
+        int overdriveFrames;
+        boolean overdriveUsed;
+
         Side(int index, FighterState state) {
             this.index = index;
             members = new FighterState[]{state};
@@ -93,7 +97,24 @@ final class TeamSystem {
             s.leaving = null;
             s.leavingFrame = -1;
             s.assistRequestAge = s.tagRequestAge = -1;
+            s.overdriveFrames = 0;
         }
+    }
+
+    boolean overdriveActive(int side) { return sides[side].overdriveFrames > 0; }
+
+    /** The side can turn its Overdrive on now: unused this round, free or cancelling its own attack. */
+    boolean canOverdrive(CombatFighter f) {
+        Side s = sides[f.index];
+        if (s.overdriveUsed || s.overdriveFrames > 0 || s.tagging() || f.locked || f.ko() || f.frozen()) return false;
+        return f.status == CombatFighter.Status.NEUTRAL ||
+            (f.attacking() && f.attack.kind != AttackDefinition.Kind.SUPER);
+    }
+
+    /** New round for the side: its Overdrive can be used again. */
+    void refreshOverdrive(int side) {
+        sides[side].overdriveUsed = false;
+        sides[side].overdriveFrames = 0;
     }
 
     /** Horizontal offset of the point's sprite during a raw tag (it runs off and back in). */
@@ -253,11 +274,20 @@ final class TeamSystem {
         }
         advanceTag(engine, s, point);
         advanceAssist(engine, s, point);
+        // The clock waits through freezes (its own flash, Supers).
+        if (s.overdriveFrames > 0 && !engine.superFreezeActive()) s.overdriveFrames--;
         regenerate(s);
     }
 
-    /** Members waiting off screen get their recoverable life back, little by little. */
+    /**
+     * Members waiting off screen get their recoverable life back, little by little. In
+     * Overdrive every member does, the point too, and faster.
+     */
     private void regenerate(Side s) {
+        if (s.overdriveFrames > 0) {
+            for (FighterState m : s.members) m.regenerate(config.overdriveRegenPerFrame);
+            return;
+        }
         if (s.members.length < 2) return;
         for (FighterState m : s.members) {
             boolean onScreen = m == s.pointState() || (s.assist != null && s.assist.state == m) ||

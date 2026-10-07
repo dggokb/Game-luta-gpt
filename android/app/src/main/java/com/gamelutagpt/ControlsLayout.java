@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, DEMO, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, DEMO, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -55,6 +55,11 @@ final class ControlsLayout {
     static final float SUPER_Y = 620f;
     static final float SUPER_RADIUS = 46f;
 
+    // Overdrive (v0.87): its own button left of SUPER and TAG (SUPER + TAG together also works).
+    static final float OVERDRIVE_X = 820f;
+    static final float OVERDRIVE_Y = 560f;
+    static final float OVERDRIVE_RADIUS = 34f;
+
     static final float AI_BUTTON_LEFT = 1082f;
     static final float AI_BUTTON_TOP = 124f;
     static final float AI_BUTTON_RIGHT = 1248f;
@@ -73,12 +78,12 @@ final class ControlsLayout {
     static final float HEAL_OPPONENT_LEFT = 1168f;
     static final float HEAL_OPPONENT_RIGHT = 1248f;
 
-    // Demo buttons (v0.80…v0.85), a row at the top center; see DemoDirector.
-    static final float DEMO_LEFT = 600f;
+    // Demo buttons (v0.80…v0.85, v0.87), a row at the top center; see DemoDirector.
+    static final float DEMO_LEFT = 575f;
     static final float DEMO_TOP = 50f;
     static final float DEMO_BOTTOM = 90f;
-    static final float DEMO_WIDTH = 50f;
-    static final float DEMO_GAP = 6f;
+    static final float DEMO_WIDTH = 46f;
+    static final float DEMO_GAP = 5f;
 
     static float demoLeft(int index) {
         return DEMO_LEFT + index * (DEMO_WIDTH + DEMO_GAP);
@@ -110,6 +115,7 @@ final class ControlsLayout {
         if (demoAt(x, y) >= 0) return Control.DEMO;
         if (insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_RADIUS)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
+        if (insideCircle(x, y, OVERDRIVE_X, OVERDRIVE_Y, OVERDRIVE_RADIUS)) return Control.OVERDRIVE;
         if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;
         if (insideCircle(x, y, PUSHBLOCK_X, PUSHBLOCK_Y, THROW_RADIUS)) return Control.PUSHBLOCK;
         if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) return Control.LIGHT;

@@ -6,10 +6,10 @@ package com.gamelutagpt;
  * frames and is delivered exactly once.
  */
 final class PadInput {
-    enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG, THROW, PUSHBLOCK }
+    enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG, THROW, PUSHBLOCK, OVERDRIVE }
 
     private int direction;
-    private boolean light, medium, heavy, auto, superAttack, tag, grab, pushblock;
+    private boolean light, medium, heavy, auto, superAttack, tag, grab, pushblock, overdrive;
     /** Frames since L or M was delivered alone, or -1: two fingers rarely land on one frame. */
     private int lightAge = -1, mediumAge = -1;
     /** L and M pressed this many frames apart still make a throw. */
@@ -33,6 +33,7 @@ final class PadInput {
             case TAG: tag = true; break;
             case THROW: grab = true; break;
             case PUSHBLOCK: pushblock = true; break;
+            case OVERDRIVE: overdrive = true; break;
             default: break;
         }
     }
@@ -55,6 +56,9 @@ final class PadInput {
         // M + H on one frame or the spot between them: pushblock (a heavy outside blockstun).
         out.pushblock = pushblock || (medium && heavy);
         if (out.pushblock) medium = heavy = false;
+        // OD button, or SUPER + TAG on one frame: Overdrive (neither the Super nor the assist).
+        out.overdrive = overdrive || (superAttack && tag);
+        if (out.overdrive) superAttack = tag = false;
         out.light = light;
         out.medium = medium;
         out.heavy = heavy;
@@ -65,12 +69,12 @@ final class PadInput {
         // TAG calls the assist; ↓ + TAG is the raw tag (no hold to tell apart, so no delay).
         out.tag = tag && ControlsLayout.isDownDirection(direction);
         out.assist = tag && !out.tag;
-        light = medium = heavy = auto = superAttack = tag = grab = pushblock = false;
+        light = medium = heavy = auto = superAttack = tag = grab = pushblock = overdrive = false;
     }
 
     void reset() {
         direction = 0;
         lightAge = mediumAge = -1;
-        light = medium = heavy = auto = superAttack = tag = grab = pushblock = false;
+        light = medium = heavy = auto = superAttack = tag = grab = pushblock = overdrive = false;
     }
 }

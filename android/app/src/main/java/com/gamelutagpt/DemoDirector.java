@@ -1,7 +1,7 @@
 package com.gamelutagpt;
 
 /**
- * Scripted demos of the systems added in v0.80…v0.85. While one plays, this class writes
+ * Scripted demos of the systems added in v0.80…v0.85 and v0.87. While one plays, this class writes
  * both fighters' input every frame (the pad and the CPU brain are ignored), so the feature
  * plays out on its own. Each demo is a list of steps: the fight is restaged, both stand
  * still for {@link #LEAD_IN} frames under the caption, then the step's script runs.
@@ -9,7 +9,7 @@ package com.gamelutagpt;
  */
 final class DemoDirector {
     /** Version of each demo, in button order. */
-    static final String[] VERSIONS = {"80", "81", "82", "83", "84", "85"};
+    static final String[] VERSIONS = {"80", "81", "82", "83", "84", "85", "87"};
     /** Frames both fighters stand still at the start of a step, while the caption is read. */
     static final int LEAD_IN = 36;
 
@@ -52,6 +52,31 @@ final class DemoDirector {
             String id = attackId(f);
             if (id.equals("L")) in.medium = true;
             if (id.equals("M")) in.heavy = true;
+        }
+
+        /** Presses the button of a move id ("2M" holds ↓ too). */
+        static void press(FighterInput in, String move) {
+            if (move.startsWith("2")) in.direction = 3;
+            char button = move.charAt(move.length() - 1);
+            if (button == 'L') in.light = true;
+            if (button == 'M') in.medium = true;
+            if (button == 'H') in.heavy = true;
+        }
+
+        /**
+         * Plays {@code moves} in order: the first one now, each next one once the previous
+         * hit or was blocked. {@link #value} keeps how far it got.
+         */
+        void sequence(CombatFighter f, FighterInput in, String... moves) {
+            if (value >= moves.length) return;
+            String now = attackId(f);
+            if (now.equals(moves[value])) {
+                value++;
+                return;
+            }
+            if (value == 0 || (now.equals(moves[value - 1]) && f.outcome != CombatFighter.Outcome.NONE)) {
+                press(in, moves[value]);
+            }
         }
 
         /** Screen direction of "back" for a fighter (away from where it looks). */
@@ -222,6 +247,48 @@ final class DemoDirector {
                     },
                     c -> c.mark >= 0 && c.engine.team(0).pointState() != c.team[0] && c.team[0].life > c.value),
             };
+            case 6: return new Step[] {
+                new Step("OVERDRIVE", "botão OD (ou SUPER+TAG), 1 vez por round: 8 s mais rápido e com mais barra", 150,
+                    c -> c.engine.restage(X - 200f, X + 420f),
+                    (c, p1, cpu) -> {
+                        if (c.t == 0) p1.overdrive = true;
+                        if (c.t == 30) p1.dash = true;
+                        if (c.t >= 30 && c.t < 70) p1.direction = 1;
+                        if (c.t == 70) p1.light = true;
+                    },
+                    c -> c.cue("OVERDRIVE")),
+                new Step("CANCELS LIVRES", "no Overdrive todo golpe que acerta cancela em outro: H > M > H", 150,
+                    c -> c.placeApart(X, 12f),
+                    (c, p1, cpu) -> {
+                        if (c.t == 0) p1.overdrive = true;
+                        if (c.t >= 24) c.sequence(c.p1(), p1, "H", "M", "H");
+                    },
+                    c -> c.value >= 3 && c.engine.session(1) != null && c.engine.session(1).hitCount >= 3),
+                new Step("OVERDRIVE NO MEIO DO COMBO", "L > M acertou: OD congela o CPU e o combo segue com 2L > 2M", 150,
+                    c -> c.placeApart(X, 12f),
+                    (c, p1, cpu) -> {
+                        c.sequence(c.p1(), p1, "L", "M");
+                        if (c.value == 2 && c.p1().outcome == CombatFighter.Outcome.HIT && c.mark < 0) {
+                            c.mark = c.t;
+                            p1.overdrive = true;
+                        }
+                        // After the flash: a fresh route the M could not cancel into.
+                        if (c.mark >= 0 && c.t > c.mark + 2 && c.t < c.mark + 60) {
+                            String id = c.attackId(c.p1());
+                            if (id.isEmpty() && c.p1().canAct()) { p1.direction = 3; p1.light = true; }
+                            if (id.equals("2L") && c.p1().outcome != CombatFighter.Outcome.NONE) Ctx.press(p1, "2M");
+                        }
+                    },
+                    c -> c.mark >= 0 && c.hit(0, "2M")),
+                new Step("VIDA VERMELHA EM CAMPO", "no Overdrive a vida vermelha volta até para quem está lutando", 150,
+                    c -> {
+                        c.placeApart(X, 200f);
+                        c.team[0].takeDamage(3000, c.config().recoverableLifePermille);
+                        c.value = c.team[0].life;
+                    },
+                    (c, p1, cpu) -> { if (c.t == 0) p1.overdrive = true; },
+                    c -> c.engine.team(0).pointState() == c.team[0] && c.team[0].life > c.value),
+            };
             default: throw new IllegalArgumentException("demo " + demo);
         }
     }
@@ -249,6 +316,7 @@ final class DemoDirector {
     private FighterState[] saved = new FighterState[0];
     private int[] savedLife = new int[0], savedRecoverable = new int[0], savedMeter = new int[0];
     private int savedPoint;
+    private final boolean[] savedOverdriveUsed = new boolean[2];
 
     boolean active() { return demo >= 0; }
     /** Demo playing (index into {@link #VERSIONS}), or -1. */
@@ -292,6 +360,7 @@ final class DemoDirector {
             savedMeter[i] = saved[i].superMeter;
         }
         savedPoint = engine.team(0).point;
+        for (int side = 0; side < 2; side++) savedOverdriveUsed[side] = engine.team(side).overdriveUsed;
         demo = index;
         steps = steps(index);
         results = new boolean[steps.length];
@@ -306,6 +375,8 @@ final class DemoDirector {
         ctx.mark = -1;
         ctx.value = 0;
         ctx.engine.setTeam(0, ctx.team);
+        ctx.engine.refreshOverdrive(0);
+        ctx.engine.refreshOverdrive(1);
         for (FighterState f : saved) {
             f.restoreLife();
             f.superMeter = 0;
@@ -349,6 +420,7 @@ final class DemoDirector {
         }
         engine.setTeam(0, ctx.team);
         engine.restage(homeFirstX, homeSecondX);
+        for (int side = 0; side < 2; side++) engine.team(side).overdriveUsed = savedOverdriveUsed[side];
         if (savedPoint != 0) {
             engine.team(0).point = savedPoint;
             engine.setFighterState(0, ctx.team[savedPoint]);

@@ -153,6 +153,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int tagPointer = -1;
     private int throwPointer = -1;
     private int pushblockPointer = -1;
+    private int overdrivePointer = -1;
     /** "AGARRÃO!" / "TECH!" over the fight, and how many frames it still shows. */
     private String throwBanner;
     private int throwBannerFrames;
@@ -171,7 +172,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void clearInput() {
         clearPendingInput();
         pad.reset();
-        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = superPointer = -1;
+        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = overdrivePointer = superPointer = -1;
         healPlayerPointer = healOpponentPointer = -1;
     }
 
@@ -421,6 +422,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
         @Override public int dpadDirection() { return pad.direction(); }
+        @Override public float overdriveRatio() {
+            return engine.team(PLAYER).overdriveFrames / (float)engine.config.overdriveFrames;
+        }
+        @Override public float overdriveSeconds() { return engine.team(PLAYER).overdriveFrames * FIXED_STEP; }
+        @Override public boolean overdriveReady() { return !engine.team(PLAYER).overdriveUsed; }
         @Override public int demoPlaying() { return demo.demo(); }
         @Override public String demoTitle() { return demo.title(); }
         @Override public String demoCaption() { return demo.caption(); }
@@ -436,6 +442,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case HEAL_OPPONENT: return healOpponentPointer != -1;
                 case THROW: return throwPointer != -1;
                 case PUSHBLOCK: return pushblockPointer != -1;
+                case OVERDRIVE: return overdrivePointer != -1;
                 default: return false;
             }
         }
@@ -712,6 +719,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             case "PUSHBLOCK": return "PUSHBLOCK!";
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             case "DHC": return "TEAM SUPER!";
+            case "OVERDRIVE": return "OVERDRIVE!";
             default: return null;
         }
     }
@@ -881,6 +889,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 canvas.restore();
             }
 
+            drawOverdriveAura(canvas, opponent(), 0f);
+            drawOverdriveAura(canvas, player(), tagOffset());
             drawPartner(canvas);
             drawAirDashTrail(canvas, player());
             drawAirDashTrail(canvas, opponent());
@@ -1292,6 +1302,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.restore();
     }
 
+    /** Glow and sparks around a fighter whose team is in Overdrive. */
+    private void drawOverdriveAura(Canvas c, CombatFighter f, float offset) {
+        if (!engine.teams.overdriveActive(f.index)) return;
+        effects.drawOverdrive(c, paint, f.x + offset, f.y, engine.frame() * FIXED_STEP);
+    }
+
     /** Speed lines behind a fighter during its air dash. */
     private void drawAirDashTrail(Canvas c, CombatFighter f) {
         if (f.airDashFrames <= 0) return;
@@ -1403,10 +1419,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     // Both team members, so the reserve is also ready after a tag.
                     healPlayerPointer = pointerId;
                     for (FighterState member : team) member.restoreLife();
+                    engine.refreshOverdrive(PLAYER);
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
                     opponentFighter.restoreLife();
+                    engine.refreshOverdrive(OPPONENT);
                     break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it.
@@ -1443,6 +1461,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     pushblockPointer = pointerId;
                     pad.press(PadInput.Button.PUSHBLOCK);
                     break;
+                case OVERDRIVE:
+                    overdrivePointer = pointerId;
+                    pad.press(PadInput.Button.OVERDRIVE);
+                    break;
                 case TAG:
                     // TAG calls the assist (again: Assist -> Tag); with down it is the raw tag.
                     tagPointer = pointerId;
@@ -1472,11 +1494,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == tagPointer) tagPointer = -1;
             if (pointerId == throwPointer) throwPointer = -1;
             if (pointerId == pushblockPointer) pushblockPointer = -1;
+            if (pointerId == overdrivePointer) overdrivePointer = -1;
             if (pointerId == superPointer) superPointer = -1;
             if (pointerId == healPlayerPointer) healPlayerPointer = -1;
             if (pointerId == healOpponentPointer) healOpponentPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
-            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = superPointer = -1;
+            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = overdrivePointer = superPointer = -1;
             healPlayerPointer = healOpponentPointer = -1;
             pad.setDirection(0);
         }

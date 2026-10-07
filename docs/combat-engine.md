@@ -95,9 +95,31 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Overdrive — v0.87
+
+- Entrada: `FighterInput.overdrive` (botão OD em `ControlsLayout.OVERDRIVE_*`, ou SUPER + TAG
+  no mesmo quadro no `PadInput`, que então não manda nem o Super nem o assist). Fica no
+  buffer como os outros pedidos (`overdriveRequestAge`).
+- Estado por lado em `TeamSystem.Side` (`overdriveFrames`, `overdriveUsed`): **1 vez por
+  round**, `CombatConfig.overdriveFrames` = 480 (8 s). `refreshOverdrive(side)` começa um
+  round novo (os botões VIDA do treino chamam).
+- Liga em `NEUTRAL` ou **cancelando o próprio golpe** (não Super, não em stun, não no tag).
+  Os dois congelam `overdriveFlashFrames` (20) e o super freeze segura projéteis: o stun do
+  oponente espera, então o combo continua. Cue `OVERDRIVE`. O relógio não anda em freeze.
+- Efeitos enquanto dura (para o time):
+  - velocidade × `overdriveSpeed` (1.25): andar, dash, backdash, air dash;
+  - barra × `overdriveMeterPermille` (1500) no acerto e na defesa;
+  - **cancels livres**: golpe que acertou ou foi defendido cancela em qualquer outro golpe
+    diferente dele (normais, especiais, Super), respeitando os limites do combo
+    (`ComboSession.allows`, juggle). Cue `OD_CANCEL` quando só o Overdrive permitia;
+  - vida recuperável volta para **todos** os membros, inclusive o point, a
+    `overdriveRegenPerFrame` (12/quadro).
+- Tela: botão OD com anel do tempo restante, banner "OVERDRIVE!", aura vermelha
+  (`EffectsRenderer.drawOverdrive`). Testes: `OverdriveTest` e `DemoDirectorTest` (demo 87).
+
 ## Demos das versões e CPU de treino — v0.86
 
-- `DemoDirector` (Java puro): roteiros por versão (`VERSIONS` 80…85). Enquanto uma demo
+- `DemoDirector` (Java puro): roteiros por versão (`VERSIONS` 80…85 e 87). Enquanto uma demo
   roda ele escreve a entrada **dos dois lados** a cada quadro; o pad é drenado e
   descartado e o cérebro do CPU não é chamado. Cada passo: `CombatEngine.restage` (os dois
   no chão, nada em andamento: golpe, stun, projétil, combo, tag/assist), `LEAD_IN` de 36
