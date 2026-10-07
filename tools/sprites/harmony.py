@@ -18,8 +18,10 @@ ROOT = Path(__file__).resolve().parents[2]
 REGISTERED = ('IDLE', 'COMBAT', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH', 'RISE', 'LAND',
               'DASH', 'BACKDASH', 'JUMP', 'FALL', 'DEFENSE_STAND', 'DEFENSE_CROUCH',
               'DEFENSE_AIR', 'HIT_STAND', 'HIT_CROUCH', 'GETUP')
+# BACKDASH is not here: the backdash is drawn as a hop (the body leaves the ground in the
+# art while the engine slides the fighter), like the classic fighting-game backstep.
 GROUNDED = ('IDLE', 'COMBAT', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH', 'RISE', 'LAND',
-            'DASH', 'BACKDASH', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'HIT_STAND',
+            'DASH', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'HIT_STAND',
             'HIT_CROUCH', 'KNOCKDOWN', 'GROUNDED', 'GETUP')
 TORSO_TOLERANCE = 20      # px, world units at worldScale 1
 SPIKE_TOLERANCE = 40      # one attack frame jumping out and back by more than this

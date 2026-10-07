@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/player_base_walk_back.png",
   "report": "tools/sprites/reports/player_base_walk_back.report.json",
   "preview": "android/app/build/sprite-review/walk_back-import.png",
-  "expectedFrames": 33,
+  "expectedFrames": 17,
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",

@@ -277,27 +277,7 @@
         16,
         17,
         18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37,
-        38,
-        39
+        19
       ],
       "loop": true,
       "distancePerFrame": 12.5
@@ -321,47 +301,53 @@
         13,
         14,
         15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32
+        16
       ],
       "loop": true,
       "distancePerFrame": 9.2
     },
     "CROUCH": {
-      "atlas": "player_base_movement",
+      "atlas": "player_base_crouch",
       "frames": [
-        8,
-        9
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
       ],
       "loop": false,
       "durationsMs": [
-        75,
-        100
+        22,
+        22,
+        22,
+        22,
+        22,
+        22,
+        22,
+        22
       ]
     },
     "RISE": {
-      "atlas": "player_base_movement",
+      "atlas": "player_base_rise",
       "frames": [
-        8
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
       ],
       "loop": false,
       "durationsMs": [
-        75
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
       ]
     },
     "JUMP": {
@@ -392,38 +378,44 @@
         2,
         3,
         4,
+        5
+      ],
+      "loop": true,
+      "durationsMs": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ]
+    },
+    "BACKDASH": {
+      "atlas": "player_base_backdash",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
         5,
         6,
         7,
         8,
-        9,
-        10,
-        11
-      ],
-      "loop": true,
-      "durationsMs": [
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42
-      ]
-    },
-    "BACKDASH": {
-      "atlas": "player_base_movement",
-      "frames": [
-        14
+        9
       ],
       "loop": false,
       "durationsMs": [
-        200
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
       ]
     },
     "LAND": {

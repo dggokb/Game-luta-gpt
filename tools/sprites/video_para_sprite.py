@@ -86,6 +86,7 @@ def main():
     p.add_argument("--loop", help="A-B: escolhe o melhor loop dentro desse intervalo")
     p.add_argument("--min-loop", type=int, default=24)
     p.add_argument("--passo", type=int, default=1, help="usar 1 a cada N quadros")
+    p.add_argument("--quadros", help="lista exata de quadros do vídeo, ex.: 10,14,18,22")
     p.add_argument("--escala", default="auto",
                    help="auto: o 1º quadro do vídeo (guarda em pé) vira --altura px; ou um número")
     p.add_argument("--altura", type=int, default=224, help="altura do personagem em pé na célula")
@@ -96,6 +97,8 @@ def main():
     p.add_argument("--raiz", default="128,238")
     p.add_argument("--fixar", choices=["tronco", "video"], default="tronco",
                    help="tronco: anula o deslizamento lateral; video: mantém a posição do vídeo")
+    p.add_argument("--deslocar", default="0,0",
+                   help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
     args = p.parse_args()
 
@@ -106,7 +109,9 @@ def main():
         print(f"loop {start}-{end} (diferença {d:.2f})")
     else:
         start, end = args.inicio or 0, args.fim or len(frames)
-    keyed = [key(f, args.sem_poeira) for f in frames[start:end:args.passo]]
+    picked = ([int(v) for v in args.quadros.split(",")] if args.quadros
+              else list(range(start, end, args.passo)))
+    keyed = [key(frames[i], args.sem_poeira) for i in picked]
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
         # Remove só a tendência (o deslizamento); o balanço natural do corpo continua.
@@ -115,9 +120,14 @@ def main():
         offsets = -(trend - trend[0])
     else:
         offsets = np.zeros(len(xs))
-    foot_y = max(int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) for k in keyed)
-    ref_x = xs[0]
+    # Chão e posição de referência vêm do 1º quadro do vídeo (guarda em pé): poses no ar
+    # ficam acima do chão e todos os clipes do personagem se alinham entre si.
+    first = key(frames[0], args.sem_poeira)
+    foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
+    ref_x = torso_x(first) if args.fixar == "video" else xs[0]
     rx, ry = (int(v) for v in args.raiz.split(","))
+    dx, dy = (int(v) for v in args.deslocar.split(","))
+    rx, ry = rx + dx, ry + dy
     if args.escala == "auto":
         rows0 = np.nonzero((key(frames[0])[..., 3] > 128).any(1))[0]
         s = args.altura / float(rows0.max() - rows0.min())

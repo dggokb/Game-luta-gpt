@@ -1,0 +1,16 @@
+{
+  "id": "player_base_backdash",
+  "javaName": "BACKDASH_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_backdash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_backdash.png",
+  "report": "tools/sprites/reports/player_base_backdash.report.json",
+  "preview": "android/app/build/sprite-review/backdash-import.png",
+  "expectedFrames": 10,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "frameWidth": 512,
+  "rootX": 256,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+}

@@ -10,6 +10,18 @@ final class GeneratedSpriteLayouts {
     static final int MONSTER_NPC_PACK_ROOT_Y = 223;
     static final int MONSTER_NPC_PACK_FRAME_COUNT = 16;
 
+    static final int BACKDASH_SET_FRAME_WIDTH = 256;
+    static final int BACKDASH_SET_FRAME_HEIGHT = 248;
+    static final int BACKDASH_SET_ROOT_X = 106;
+    static final int BACKDASH_SET_ROOT_Y = 237;
+    static final int BACKDASH_SET_FRAME_COUNT = 10;
+
+    static final int CROUCH_SET_FRAME_WIDTH = 194;
+    static final int CROUCH_SET_FRAME_HEIGHT = 245;
+    static final int CROUCH_SET_ROOT_X = 101;
+    static final int CROUCH_SET_ROOT_Y = 234;
+    static final int CROUCH_SET_FRAME_COUNT = 8;
+
     static final int CROUCH_HEAVY_FRAME_WIDTH = 219;
     static final int CROUCH_HEAVY_FRAME_HEIGHT = 282;
     static final int CROUCH_HEAVY_ROOT_X = 106;
@@ -28,11 +40,11 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_MEDIUM_ROOT_Y = 178;
     static final int CROUCH_MEDIUM_FRAME_COUNT = 4;
 
-    static final int DASH_SET_FRAME_WIDTH = 287;
-    static final int DASH_SET_FRAME_HEIGHT = 156;
-    static final int DASH_SET_ROOT_X = 193;
+    static final int DASH_SET_FRAME_WIDTH = 290;
+    static final int DASH_SET_FRAME_HEIGHT = 157;
+    static final int DASH_SET_ROOT_X = 186;
     static final int DASH_SET_ROOT_Y = 145;
-    static final int DASH_SET_FRAME_COUNT = 12;
+    static final int DASH_SET_FRAME_COUNT = 6;
 
     static final int DEFENSE_AIR_FRAME_WIDTH = 166;
     static final int DEFENSE_AIR_FRAME_HEIGHT = 243;
@@ -130,23 +142,29 @@ final class GeneratedSpriteLayouts {
     static final int MOVEMENT_ROOT_Y = 220;
     static final int MOVEMENT_FRAME_COUNT = 16;
 
+    static final int RISE_SET_FRAME_WIDTH = 192;
+    static final int RISE_SET_FRAME_HEIGHT = 238;
+    static final int RISE_SET_ROOT_X = 100;
+    static final int RISE_SET_ROOT_Y = 228;
+    static final int RISE_SET_FRAME_COUNT = 6;
+
     static final int ULTRA_BEAM_FRAME_WIDTH = 276;
     static final int ULTRA_BEAM_FRAME_HEIGHT = 253;
     static final int ULTRA_BEAM_ROOT_X = 143;
     static final int ULTRA_BEAM_ROOT_Y = 244;
     static final int ULTRA_BEAM_FRAME_COUNT = 9;
 
-    static final int WALK_BACK_SET_FRAME_WIDTH = 170;
-    static final int WALK_BACK_SET_FRAME_HEIGHT = 243;
+    static final int WALK_BACK_SET_FRAME_WIDTH = 171;
+    static final int WALK_BACK_SET_FRAME_HEIGHT = 247;
     static final int WALK_BACK_SET_ROOT_X = 86;
-    static final int WALK_BACK_SET_ROOT_Y = 232;
-    static final int WALK_BACK_SET_FRAME_COUNT = 33;
+    static final int WALK_BACK_SET_ROOT_Y = 236;
+    static final int WALK_BACK_SET_FRAME_COUNT = 17;
 
-    static final int WALK_FORWARD_SET_FRAME_WIDTH = 180;
-    static final int WALK_FORWARD_SET_FRAME_HEIGHT = 245;
-    static final int WALK_FORWARD_SET_ROOT_X = 95;
-    static final int WALK_FORWARD_SET_ROOT_Y = 233;
-    static final int WALK_FORWARD_SET_FRAME_COUNT = 40;
+    static final int WALK_FORWARD_SET_FRAME_WIDTH = 182;
+    static final int WALK_FORWARD_SET_FRAME_HEIGHT = 248;
+    static final int WALK_FORWARD_SET_ROOT_X = 96;
+    static final int WALK_FORWARD_SET_ROOT_Y = 237;
+    static final int WALK_FORWARD_SET_FRAME_COUNT = 20;
 
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_WIDTH = 232;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_HEIGHT = 239;

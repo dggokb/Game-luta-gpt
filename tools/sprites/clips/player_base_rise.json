@@ -1,0 +1,14 @@
+{
+  "id": "player_base_rise",
+  "javaName": "RISE_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_rise_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_rise.png",
+  "report": "tools/sprites/reports/player_base_rise.report.json",
+  "preview": "android/app/build/sprite-review/rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+}
