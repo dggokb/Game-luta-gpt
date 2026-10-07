@@ -181,7 +181,10 @@ public class SpriteIntegrationTest {
     }
     @Test public void actualJumpUsesAirFramesThenHeldCrouchAtLanding()throws Exception {
         touch(MotionEvent.ACTION_DOWN,175,465);frames(8);assertEquals(SpriteMotion.Clip.JUMP,motion().clip);
-        touch(MotionEvent.ACTION_MOVE,175,645);frames(60);assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);assertEquals(9,motion().frame());
+        touch(MotionEvent.ACTION_MOVE,175,645);frames(60);assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
+        // Holding down after landing keeps the last (fully crouched) pose of the crouch clip.
+        CharacterDefinition.Animation crouch=GeneratedCharacters.defaultCharacter().animation(SpriteMotion.Clip.CROUCH);
+        assertEquals(crouch.frame(crouch.duration+1,0),motion().frame());
     }
     @Test public void facingChangesSelectForwardInBothDirections()throws Exception {
         player().x=1400f;npc().x=1000f;player().facing=-1;npc().facing=1;
