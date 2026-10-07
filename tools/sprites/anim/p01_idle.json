@@ -1,0 +1,17 @@
+{
+  "nome": "p01_idle",
+  "mestre": "art/keys/p01/idle_base.png",
+  "chaves": ["art/keys/p01/idle_chave1.png", "art/keys/p01/idle_chave2.png"],
+  "cabeca": {"formas": [[650, 190, 215, 205]], "amostra": [560, 300, 720, 380]},
+  "rigidas": [
+    {"nome": "punho_frente", "formas": [[835, 380, 105, 115], [850, 520, 135, 115]], "amostra": [800, 332, 880, 412]},
+    {"nome": "punho_peito", "formas": [[541, 470, 80, 75], [415, 545, 195, 95]], "amostra": [500, 450, 580, 525]}
+  ],
+  "pernas": {"cintura_y": 640, "joelho_y": 1150, "tornozelo_y": 1390, "dobra": 0.45, "balanco": 0.6,
+             "amostra_cintura": [350, 640, 850, 740]},
+  "passos": [0, 0.25, 0.5, 0.75, 1],
+  "tempo_ms": 90,
+  "tempo_extremo_ms": 200,
+  "saida": "build/anim/p01_idle",
+  "previa": "build/anim/p01_idle.gif"
+}

@@ -47,3 +47,23 @@ Fichas completas (golpes, lista de animações e prompts):
 
 - [p01](p01.md)
 - [p03](p03.md)
+
+## Método de animação (aprovado no idle do p01)
+
+Gerar folhas inteiras no ChatGPT não funciona: ele redesenha cada quadro e a animação
+treme. O método aprovado:
+
+1. **Desenho mestre:** uma imagem grande (1024×1536, fundo transparente) isolada direto
+   da pose do concept. Prompt: "Recorte e isole a pose de luta 3/4 deste model sheet. Não
+   redesenhe e não mude nada…".
+2. **Poses-chave:** edições do mestre com mudança pequena, dizendo o que NÃO pode mudar
+   (cabeça, pernas, pés) e o que muda (ex.: tronco e braços).
+3. **`tools/sprites/animar.py`:** mede o movimento entre o mestre e cada chave e aplica
+   no próprio mestre. Cabeça, punhos e antebraços andam rígidos; pernas dobram com o
+   quadril; o corpo balança acima dos joelhos; pés presos. Configuração por animação em
+   `tools/sprites/anim/<clip>.json`; imagens em `art/keys/<personagem>/`.
+
+```bash
+pip install -r tools/sprites/requirements-animar.txt
+python3 tools/sprites/animar.py tools/sprites/anim/p01_idle.json   # quadros e prévia em build/anim/
+```
