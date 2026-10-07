@@ -140,6 +140,8 @@ final class CombatEngine {
         for (Contact contact : contacts) applyContact(contact);
         detectUltra(fighters[0], fighters[1]);
         detectUltra(fighters[1], fighters[0]);
+        updateUltraBeam(fighters[0], fighters[1]);
+        updateUltraBeam(fighters[1], fighters[0]);
 
         // 6. Combo sessions.
         updateSessions();
@@ -273,6 +275,10 @@ final class CombatEngine {
                 break;
             case ULTRA:
                 if (f.ultraPhase == CombatFighter.ULTRA_RECOVERY && f.ultraFrame >= config.ultraRecoveryFrames) {
+                    f.status = CombatFighter.Status.NEUTRAL;
+                }
+                if (f.ultraPhase == CombatFighter.ULTRA_BEAM &&
+                    f.ultraFrame >= config.ultraBeamBlastFrame(f.beamHits) + config.ultraBeamFadeFrames) {
                     f.status = CombatFighter.Status.NEUTRAL;
                 }
                 break;
@@ -446,6 +452,11 @@ final class CombatEngine {
 
     private void moveVertically(CombatFighter f) {
         if (f.grounded) return;
+        if (heldByBeam(f)) {
+            // Caught in the beam: it stays at the height it was hit.
+            f.vy = 0f;
+            return;
+        }
         float scale = 1f;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
@@ -736,10 +747,14 @@ final class CombatEngine {
      * the ultra's base damage, scaled by the combo it landed in. Returns the damage dealt.
      */
     int applyUltraHit(int attacker, int baseDamage) {
+        if (!inUltraCinematic(attacker)) return 0;
         CombatFighter a = fighters[attacker];
-        CombatFighter d = fighters[1 - attacker];
-        if (!inUltraCinematic(attacker) || d.ko()) return 0;
-        int damage = ComboSession.DamageScaling.apply(baseDamage, a.ultraScale);
+        return dealUltraDamage(a, fighters[1 - attacker], ComboSession.DamageScaling.apply(baseDamage, a.ultraScale));
+    }
+
+    /** Damage already scaled; one more hit on the combo counter. */
+    private int dealUltraDamage(CombatFighter a, CombatFighter d, int damage) {
+        if (d.ko()) return 0;
         d.state.life = Math.max(0, d.state.life - damage);
         d.state.refreshHudLabels();
         d.framesSinceHit = 0;
@@ -749,14 +764,92 @@ final class CombatEngine {
         return damage;
     }
 
-    /** End of the cinematic: the attacker is free and the defender flies away, landing down. */
+    /** End of the cinematic without a beam: the attacker is free and the defender flies away. */
     void finishUltra(int attacker) {
         if (!inUltraCinematic(attacker)) return;
         CombatFighter a = fighters[attacker];
-        CombatFighter d = fighters[1 - attacker];
         a.status = CombatFighter.Status.NEUTRAL;
         a.ultraFrame = 0;
+        launchUltraVictim(a, fighters[1 - attacker]);
+    }
 
+    /**
+     * End of the cinematic with the final beam: the fight resumes with the attacker firing.
+     * The beam deals {@code baseDamage} (scaled by the combo) in {@code hits} small hits and
+     * a last blast that throws the defender like {@link #finishUltra}.
+     */
+    void startUltraBeam(int attacker, int baseDamage, int hits) {
+        if (!inUltraCinematic(attacker)) return;
+        CombatFighter a = fighters[attacker];
+        CombatFighter d = fighters[1 - attacker];
+        int total = ComboSession.DamageScaling.apply(Math.max(0, baseDamage), a.ultraScale);
+        a.ultraPhase = CombatFighter.ULTRA_BEAM;
+        a.ultraFrame = 0;
+        a.beamHits = Math.max(1, hits);
+        a.beamHitsDone = 0;
+        a.beamBlastDamage = total * config.ultraBeamBlastPermille / 1000;
+        a.beamDamageLeft = total - a.beamBlastDamage;
+        placeForUltraBeam(attacker);
+        keepInBeam(a, d);
+    }
+
+    /**
+     * Moves the fighters apart for the beam (the page breaking hides the cut). The defender
+     * goes back; against a wall, the attacker steps back instead.
+     */
+    void placeForUltraBeam(int attacker) {
+        CombatFighter a = fighters[attacker];
+        CombatFighter d = fighters[1 - attacker];
+        float wanted = a.x + a.facing * config.ultraBeamDistance;
+        d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        if (d.x != wanted) a.x = Arena.clamp(d.x - a.facing * config.ultraBeamDistance, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+    }
+
+    /** Frames the beam phase lasts for an ultra beam of this many hits. */
+    int ultraBeamFrames(int hits) {
+        return config.ultraBeamBlastFrame(Math.max(1, hits)) + config.ultraBeamFadeFrames;
+    }
+
+    /** The fighter is caught in the other's beam (before the blast throws it). */
+    boolean heldByBeam(CombatFighter f) {
+        CombatFighter a = fighters[1 - f.index];
+        return a.firingBeam() && a.beamHitsDone <= a.beamHits;
+    }
+
+    private void updateUltraBeam(CombatFighter a, CombatFighter d) {
+        if (!a.firingBeam() || a.frozen() || a.beamHitsDone > a.beamHits) return;
+        if (a.beamHitsDone < a.beamHits) {
+            int at = config.ultraBeamExtendFrames + config.ultraBeamHitInterval * a.beamHitsDone;
+            if (a.ultraFrame < at) return;
+            int damage = a.beamDamageLeft / (a.beamHits - a.beamHitsDone);
+            a.beamDamageLeft -= damage;
+            a.beamHitsDone++;
+            dealUltraDamage(a, d, damage);
+            keepInBeam(a, d);
+            push(d, a, a.facing * config.ultraBeamPushPerHit);
+        } else if (a.ultraFrame >= config.ultraBeamBlastFrame(a.beamHits)) {
+            a.beamHitsDone++;
+            dealUltraDamage(a, d, a.beamBlastDamage + a.beamDamageLeft);
+            a.beamDamageLeft = 0;
+            launchUltraVictim(a, d);
+            freeze(a, d, config.ultraBeamBlastHitstopFrames, false);
+        }
+    }
+
+    /** The defender stays in hitstun, at its height, while the beam lasts. */
+    private void keepInBeam(CombatFighter a, CombatFighter d) {
+        d.clearAttack();
+        d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.vy = 0f;
+        int untilBlast = config.ultraBeamBlastFrame(a.beamHits) - a.ultraFrame;
+        d.stunLeft = d.stunTotal = Math.max(d.stunLeft, untilBlast + config.ultraBeamHitInterval * 2);
+        d.stunElapsed = 0;
+    }
+
+    /** The defender flies away and lands knocked down. */
+    private void launchUltraVictim(CombatFighter a, CombatFighter d) {
         d.status = CombatFighter.Status.AIR_HITSTUN;
         d.grounded = false;
         d.y = Math.min(d.y, Arena.GROUND_Y - 2f);

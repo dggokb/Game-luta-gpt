@@ -7,7 +7,7 @@ public enum UltraGrade {
     BOM(0.10f, "BOM!"),
     PERFEITO(0.25f, "PERFEITO!");
 
-    /** Bônus aplicado sobre o dano da detonação final. */
+    /** Bônus aplicado sobre o dano da detonação final e do raio. */
     public final float finalBonus;
     public final String label;
 

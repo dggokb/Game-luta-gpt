@@ -67,6 +67,7 @@ Estado próprio `ULTRA` no `CombatFighter`, com quatro fases. Os valores ficam e
 | `ULTRA_RUSH` | até 18 | Avança a 2000 u/s. Conecta quando o corpo do alvo está a até `ultraReach` à frente. |
 | `ULTRA_RECOVERY` | 30 | Errou ou foi defendido. É punível. |
 | `ULTRA_CINEMATIC` | — | Acertou. O motor marca `ultraConnected()` e espera. |
+| `ULTRA_BEAM` | 8 + 4 × (hits − 1) + 6 + 18 | Raio final depois da cinemática: acertos pequenos, explosão e arremesso. Não pode ser atingido. |
 
 - O pedido vem de `FighterInput.ultra`, que o `PadInput` liga com ↓ + SUPER. Sem 3 barras,
   o aperto vira um SUPER comum. O pedido fica no buffer por `bufferFrames`, mas só começa
@@ -75,14 +76,22 @@ Estado próprio `ULTRA` no `CombatFighter`, com quatro fases. Os valores ficam e
   frames, hitstop e pushback, e não toca a cinemática.
 - No acerto, a escala de dano é fixada pela `ComboSession` (`scaleFor`, piso de SUPER) e
   conta como um uso de `ULTRA`. Durante a cinemática, o `GameView` chama `applyUltraHit` a
-  cada golpe (3 partes do dano do `ultra.json`) e `finishUltra` no fim.
-- `finishUltra` arremessa o defensor (`ultraFall`): ele não se recupera no ar e cai em
-  KNOCKDOWN, o que encerra a sessão de combo.
+  cada golpe (3 partes do dano do `ultra.json`) e `startUltraBeam` no fim.
+- `startUltraBeam(atacante, dano, hits)` afasta os lutadores (`placeForUltraBeam`, que o
+  `GameView` já chama enquanto a página quebra) e começa o raio. A cada
+  `ultraBeamHitInterval` frames um acerto pequeno soma 1 hit na `ComboSession` e empurra o
+  defensor; o defensor fica em hitstun e, se estava no ar, parado no ar (`heldByBeam`). A
+  contagem é por acertos dados, então uma pausa de impacto nunca repete um acerto.
+- A explosão final (e `finishUltra`, que encerra sem raio) arremessa o defensor
+  (`ultraFall`): ele não se recupera no ar e cai em KNOCKDOWN, o que encerra a sessão de
+  combo.
 - A CPU não usa ultra: ela nunca liga `FighterInput.ultra`.
 
 Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `ultraConnectsUpCloseAndTheCinematicDealsScaledDamage`, `ultraAfterAComboIsScaled`,
-`guardedUltraIsBlockedWithoutCinematic`, `ultraWhiffsFromFarAndRecovers`.
+`guardedUltraIsBlockedWithoutCinematic`, `ultraWhiffsFromFarAndRecovers`,
+`finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
+`finalBeamOnAKnockedOutDefenderStillEnds`.
 
 ## Frame data no Character Pack (schema 3)
 

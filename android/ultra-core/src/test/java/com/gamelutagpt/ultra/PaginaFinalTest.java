@@ -88,33 +88,39 @@ public class PaginaFinalTest {
         return recorder;
     }
 
+    /** Página + raio somam o dano total; o bônus vale para a detonação e para o raio. */
+    private static void assertTotal(Recorder r, UltraGrade grade) {
+        float bonusShare = PaginaFinal.HIT_FRACTION[2] + PaginaFinal.BEAM_FRACTION;
+        assertEquals(1f + bonusShare * grade.finalBonus, r.damage + PaginaFinal.beamFraction(grade), 1e-4f);
+    }
+
     @Test
     public void perfectTapGivesFullBonus() {
         Recorder r = run(PaginaFinal.TARGET_AT);
         assertEquals(UltraGrade.PERFEITO, r.finished);
         assertEquals(3, r.hits.size());
-        assertEquals(1f + 0.5f * UltraGrade.PERFEITO.finalBonus, r.damage, 1e-4f);
+        assertTotal(r, UltraGrade.PERFEITO);
     }
 
     @Test
     public void lateButInsideWindowIsGood() {
         Recorder r = run(PaginaFinal.TARGET_AT + 0.12f);
         assertEquals(UltraGrade.BOM, r.finished);
-        assertEquals(1f + 0.5f * UltraGrade.BOM.finalBonus, r.damage, 1e-4f);
+        assertTotal(r, UltraGrade.BOM);
     }
 
     @Test
     public void earlyTapLosesBonusButStillDetonates() {
         Recorder r = run(PaginaFinal.TARGET_AT - 0.5f);
         assertEquals(UltraGrade.ERROU, r.finished);
-        assertEquals(1f, r.damage, 1e-4f);
+        assertTotal(r, UltraGrade.ERROU);
     }
 
     @Test
     public void noTapStillFinishes() {
         Recorder r = run(null);
         assertEquals(UltraGrade.NENHUM, r.finished);
-        assertEquals(1f, r.damage, 1e-4f);
+        assertTotal(r, UltraGrade.NENHUM);
         assertTrue(r.sounds.contains("quebra"));
     }
 

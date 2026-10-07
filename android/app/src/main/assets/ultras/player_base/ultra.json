@@ -27,5 +27,17 @@
       "onomatopeia": "KABUUUM!",
       "imagem": "final.jpg"
     }
+  },
+  "raio": {
+    "corpo": "raio_corpo.png",
+    "ponta": "raio_ponta.png",
+    "inicio": "raio_inicio.png",
+    "centroInicio": [
+      0.443,
+      0.479
+    ],
+    "impacto": "raio_impacto.png",
+    "hits": 20,
+    "espessura": 150
   }
 }

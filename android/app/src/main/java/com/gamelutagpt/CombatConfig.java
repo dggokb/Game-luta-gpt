@@ -92,6 +92,30 @@ final class CombatConfig {
     /** End of the cinematic: the defender flies away and lands knocked down. */
     float ultraLaunchSpeed = 1150f;
     float ultraKnockback = 420f;
+    // Final beam (after the cinematic): it reaches the defender, hits every few frames
+    // (the combo counter climbs), then the blast throws the defender like the cinematic end.
+    int ultraBeamExtendFrames = 8;
+    int ultraBeamHitInterval = 4;
+    int ultraBeamDefaultHits = 20;
+    /** Frames between the last small hit and the blast. */
+    int ultraBeamBlastGap = 6;
+    /** Frames the beam fades after the blast before the attacker is free. */
+    int ultraBeamFadeFrames = 18;
+    int ultraBeamBlastHitstopFrames = 12;
+    /** Share of the beam's damage kept for the blast (permille); the rest is split by the hits. */
+    int ultraBeamBlastPermille = 300;
+    /** Each hit pushes the defender back a little (a cornered defender pushes the attacker). */
+    float ultraBeamPushPerHit = 7f;
+    /**
+     * The cinematic ends at contact range; the fight comes back with the fighters this far
+     * apart (root to root), so the beam is seen crossing the screen.
+     */
+    float ultraBeamDistance = 520f;
+
+    /** Frame of the beam phase when the blast lands. */
+    int ultraBeamBlastFrame(int hits) {
+        return ultraBeamExtendFrames + ultraBeamHitInterval * Math.max(0, hits - 1) + ultraBeamBlastGap;
+    }
 
     static int hitstunDecay(int[] table, int index) {
         if (table.length == 0) return 0;

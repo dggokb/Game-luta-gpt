@@ -27,7 +27,8 @@ implementar `RenderCanvas`, `RenderImage` e `RenderAssets` (o PC já tem a vers�
    - `onUltraHit(índice, fração)`: o `GameView` chama `engine.applyUltraHit` com
      `fração × dano do ultra.json`;
    - `onUltraSound(id)`: o som é tocado pelo `UltraSounds`;
-   - `onUltraFinished(nota)`: o `GameView` chama `engine.finishUltra` e a luta continua.
+   - `onUltraFinished(nota)`: o `GameView` chama `engine.startUltraBeam` com
+     `PaginaFinal.beamFraction(nota) × dano` e a luta volta com o **raio final** (abaixo).
 5. `PaginaFinal.render` desenha por cima de tudo, em coordenadas de tela 1280×720. Enquanto
    a página cobre a tela (antes de quebrar), o HUD não é desenhado.
 
@@ -44,16 +45,45 @@ essas pausas.
 | 0,10 | Painel `olhos` bate na página (`SLAM_AT[0]`) |
 | 0,26 | Faixa com o nome do golpe entra (`NAME_AT`) |
 | 0,66 | Painel `carga` |
-| 1,22 → 1,34 | Painel `golpe`; impacto 1: 25% do dano, quadro invertido, hitstop 0,07 s |
-| 1,80 → 1,88 | Painel `atingido`; impacto 2: 25% do dano |
+| 1,22 → 1,34 | Painel `golpe`; impacto 1: 15% do dano, quadro invertido, hitstop 0,07 s |
+| 1,80 → 1,88 | Painel `atingido`; impacto 2: 15% do dano |
 | 2,38 | Painel `final` se expande até cobrir a tela (0,20 s) |
 | 2,50 → 3,18 | O anel fecha até o alvo (`TARGET_AT`) |
-| toque | Detonação: 50% do dano + bônus (PERFEITO ±0,075 s = +25%, BOM ±0,17 s = +10%) |
-| detonação + 0,34 | A página quebra em 48 cacos |
-| + 0,62 | Fim: `onUltraFinished` |
+| toque | Detonação: 20% do dano + bônus (PERFEITO ±0,075 s = +25%, BOM ±0,17 s = +10%) |
+| detonação + 0,34 | A página quebra em 48 cacos; por trás, os lutadores já se afastam para o raio |
+| + 0,62 | Fim: `onUltraFinished`; o raio final dá os outros 50% do dano (com o mesmo bônus) |
 
 Um toque cedo demais (antes de `TARGET_AT − 0,17`) marca ERROU, sem bônus, e a detonação
 acontece no tempo normal. Sem toque, a detonação acontece no fim da janela BOM.
+
+## Raio final
+
+Quando a página quebra, a luta volta com o atacante disparando o raio amarelo, no estilo
+dos hipers de Marvel vs Capcom: o feixe atravessa a tela, acerta várias vezes seguidas e
+o contador de hits sobe a cada acerto, até a explosão final arremessar o oponente.
+
+**Regra (motor, `CombatEngine`)**: fase `ULTRA_BEAM`, valores em `CombatConfig.ultraBeam*`.
+
+| Frame da fase | O que acontece |
+| --- | --- |
+| 0 | `startUltraBeam(atacante, dano, hits)`: os lutadores ficam a `ultraBeamDistance` (520) um do outro; o defensor fica preso em hitstun, sem cair |
+| 0 → 8 | O feixe vai das mãos até o alvo |
+| 8, 12, 16... | Um acerto pequeno a cada 4 frames (`hits` do `ultra.json`, padrão 20): dano, +1 no combo, o defensor recua 7 px |
+| último + 6 | Explosão: o resto do dano (30% do raio), hitstop de 12 e o arremesso de sempre (cai derrubado) |
+| + 18 | O feixe some e o atacante fica livre |
+
+O dano do raio usa a escala fixada no acerto do ultra e é dividido sem sobra (a soma dos
+acertos é exatamente o dano do raio). O atacante não pode ser atingido durante o raio.
+
+**Desenho (`RaioFinal`, ultra-core)**: só desenha, no mundo da luta, a partir do estado do
+motor: a esfera nas mãos (`inicio`), o feixe repetido correndo para a frente (`corpo`), a
+frente do feixe (`ponta`), a explosão a cada acerto e a grande explosão final (`impacto`).
+Sem imagens, desenha um raio com as cores do ultra. O `GameView` ainda escurece o cenário,
+treme a tela a cada acerto e dá um clarão branco na explosão. O contador de hits do HUD
+pula a cada acerto novo.
+
+As mãos ficam no punho esticado do soco forte (medido no sprite: 0,68 e 0,67 da altura do
+personagem à frente e acima da base), e o lutador fica nessa pose enquanto dispara.
 
 ## Camadas do desenho
 
@@ -81,7 +111,9 @@ O tremor da tela é um `translate` aleatório que decai 70 px/s.
 | Quero... | Onde |
 | --- | --- |
 | Mudar o ritmo | Constantes no topo de `PaginaFinal` (`SLAM_AT`, `TARGET_AT`...) |
-| Mudar a divisão do dano | `PaginaFinal.HIT_FRACTION` |
+| Mudar a divisão do dano | `PaginaFinal.HIT_FRACTION` e `PaginaFinal.BEAM_FRACTION` |
+| Mudar o ritmo do raio | `CombatConfig.ultraBeam*`; quantidade de hits e espessura no `ultra.json` |
+| Ver o raio no PC | `gradle :pc-preview:runRaio` (grava quadros em PNG) |
 | Mudar o layout dos painéis | `PaginaFinal.PANELS` (polígonos em coordenadas de tela) |
 | Mudar a arte provisória | `ArteProvisoria` |
 | Testar | `gradle :ultra-core:test`; visual em `gradle :pc-preview:run` |

@@ -19,7 +19,9 @@ import java.util.Map;
  *     "golpe":    { "imagem": "golpe.png", "som": "soco", "posicaoOnomatopeia": [0.6, 0.9] },
  *     "atingido": { "imagem": "atingido.png" },
  *     "final":    { "imagem": "final.png", "onomatopeia": "KABUUUM!" }
- *   }
+ *   },
+ *   "raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
+ *             "centroInicio": [0.44, 0.48], "impacto": "raio_impacto.png", "hits": 20 }
  * }
  * </pre>
  *
@@ -47,16 +49,58 @@ public final class UltraDefinition {
         }
     }
 
+    /**
+     * O raio final, disparado quando a luta volta. Imagens com transparência (veja
+     * tools/ultra/preparar_raio.py); sem imagem, o motor desenha um raio com as cores do ultra.
+     */
+    public static final class Beam {
+        /** Feixe horizontal que se repete; centrado no núcleo. */
+        public final String bodyPath;
+        /** Frente do feixe (o feixe vai para a direita). */
+        public final String tipPath;
+        /** Esfera nas mãos; {@link #startCenter} é o centro dela na imagem (frações). */
+        public final String startPath;
+        public final float[] startCenter;
+        /** Explosão no alvo. */
+        public final String impactPath;
+        /** Acertos pequenos antes da explosão final. */
+        public final int hits;
+        /** Altura do feixe no mundo do jogo, em pixels (a imagem do corpo inteira). */
+        public final float thickness;
+
+        public static final int DEFAULT_HITS = 20;
+        public static final float DEFAULT_THICKNESS = 150f;
+        static final Beam DEFAULT = new Beam(null, null, null, null, null, DEFAULT_HITS, DEFAULT_THICKNESS);
+
+        Beam(String bodyPath, String tipPath, String startPath, float[] startCenter, String impactPath,
+             int hits, float thickness) {
+            if (hits < 1 || hits > 60) throw new IllegalArgumentException("\"hits\" do raio deve ser de 1 a 60");
+            if (thickness <= 0f) throw new IllegalArgumentException("\"espessura\" do raio deve ser positiva");
+            this.bodyPath = bodyPath;
+            this.tipPath = tipPath;
+            this.startPath = startPath;
+            this.startCenter = startCenter != null ? startCenter : new float[]{0.5f, 0.5f};
+            this.impactPath = impactPath;
+            this.hits = hits;
+            this.thickness = thickness;
+        }
+    }
+
     public final String name;
     public final int color;
     public final int accentColor;
     /** Dano total do ultra antes da escala de combo, dividido entre os acertos da cinemática. */
     public final int damage;
     private final Panel[] panels;
+    public final Beam beam;
 
     public static final int DEFAULT_DAMAGE = 4000;
 
     public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels) {
+        this(name, color, accentColor, damage, panels, Beam.DEFAULT);
+    }
+
+    public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels, Beam beam) {
         if (panels.length != UltraSlot.values().length) {
             throw new IllegalArgumentException("um ultra tem exatamente 5 painéis");
         }
@@ -66,6 +110,7 @@ public final class UltraDefinition {
         if (damage < 0) throw new IllegalArgumentException("o dano do ultra não pode ser negativo");
         this.damage = damage;
         this.panels = panels.clone();
+        this.beam = beam != null ? beam : Beam.DEFAULT;
     }
 
     public Panel panel(UltraSlot slot) {
@@ -121,7 +166,27 @@ public final class UltraDefinition {
             float[] position = entry != null ? positionField(entry, "posicaoOnomatopeia") : null;
             panels[slot.ordinal()] = new Panel(image, sfx, sound, position);
         }
-        return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels);
+        Beam beam = Beam.DEFAULT;
+        if (map.get("raio") instanceof Map) {
+            Map<String, Object> raio = (Map<String, Object>)map.get("raio");
+            beam = new Beam(
+                stringField(raio, "corpo", null),
+                stringField(raio, "ponta", null),
+                stringField(raio, "inicio", null),
+                positionField(raio, "centroInicio"),
+                stringField(raio, "impacto", null),
+                numberField(raio, "hits", Beam.DEFAULT_HITS).intValue(),
+                numberField(raio, "espessura", Beam.DEFAULT_THICKNESS).floatValue()
+            );
+        }
+        return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels, beam);
+    }
+
+    private static Number numberField(Map<String, Object> map, String key, Number fallback) {
+        Object value = map.get(key);
+        if (value == null) return fallback;
+        if (!(value instanceof Number)) throw new IllegalArgumentException("\"" + key + "\" deve ser um número");
+        return (Number)value;
     }
 
     private static float[] positionField(Map<String, Object> map, String key) {

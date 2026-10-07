@@ -27,3 +27,14 @@ tasks.register('runStage', JavaExec) {
     mainClass = 'com.gamelutagpt.preview.StagePreview'
     workingDir = rootProject.projectDir
 }
+
+// Raio final do ultra no cenário, gravado em PNG: gradle :pc-preview:runRaio
+tasks.register('runRaio', JavaExec) {
+    group = 'application'
+    description = 'Grava os quadros do raio final do ultra em build/raio/.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.preview.RaioPreview'
+    workingDir = rootProject.projectDir
+    args 'app/src/main/assets/ultras/player_base', 'app/src/main/assets/stages/templo_lua',
+        '--quadros', 'build/raio'
+}

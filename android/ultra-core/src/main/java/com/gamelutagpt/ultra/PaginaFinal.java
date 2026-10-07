@@ -43,8 +43,12 @@ public final class PaginaFinal {
     static final float INVERT_DURATION = 0.07f;
     static final float FLASH_DURATION = 0.32f;
 
-    /** Divisão do dano total do ultra entre os três acertos. */
-    static final float[] HIT_FRACTION = {0.25f, 0.25f, 0.50f};
+    /**
+     * Divisão do dano total do ultra: três acertos na página e o resto no raio final, que o
+     * jogo dispara quando a luta volta ({@link #beamFraction}).
+     */
+    static final float[] HIT_FRACTION = {0.15f, 0.15f, 0.20f};
+    public static final float BEAM_FRACTION = 0.50f;
 
     static final float RING_START_RADIUS = 300f;
     static final float RING_TARGET_RADIUS = 74f;
@@ -154,6 +158,11 @@ public final class PaginaFinal {
 
     public UltraGrade grade() {
         return grade;
+    }
+
+    /** Fração do dano total que o raio final causa, com o bônus do toque. */
+    public static float beamFraction(UltraGrade grade) {
+        return BEAM_FRACTION * (1f + grade.finalBonus);
     }
 
     /** Relógio da cinemática em segundos (para durante as pausas de impacto). */

@@ -155,3 +155,16 @@ esperando a arte do GPT.
 - O jogo agora desenha pela GPU no Android 8+ (`lockHardwareCanvas`), com reserva por software.
 - Como criar um cenário e os prompts das camadas: [tools/stage/README.md](tools/stage/README.md).
   Como funciona: `docs/stage-engine.md`. Cinemática do ultra por dentro: `docs/ultra-pagina-final.md`.
+
+## Raio final do ultra — v0.77
+
+Quando a página do ultra quebra, a luta volta com o personagem disparando o **raio amarelo**
+do painel final, no estilo Marvel vs Capcom: o feixe atravessa a tela, acerta 20 vezes
+seguidas com o contador de hits subindo e o dano entrando a cada acerto, e termina numa
+explosão que arremessa o oponente. O bônus do toque no tempo certo vale também para o raio.
+
+- Regra no motor (`CombatEngine`, fase `ULTRA_BEAM`) e desenho em Java puro (`RaioFinal`, no
+  `ultra-core`), com a arte gerada no GPT em `assets/ultras/player_base/raio_*.png`.
+- Prompts e o script que prepara as imagens (fundo preto vira transparência):
+  [tools/ultra/README.md](tools/ultra/README.md#raio-final). Por dentro: `docs/ultra-pagina-final.md`.
+- Ver no PC: `gradle :pc-preview:runRaio`.

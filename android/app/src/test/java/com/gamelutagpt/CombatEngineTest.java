@@ -884,4 +884,74 @@ public class CombatEngineTest {
         }
         assertTrue("o caso do crash (CPU atacando no acerto) foi exercitado", connectedWhileAttacking > 0);
     }
+
+    // ------------------------------------------------------------ final beam
+
+    /** Connects the ultra up close and returns the simulation waiting on the cinematic. */
+    private static Sim ultraConnected() {
+        Sim s = close();
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        pressUltra(s);
+        CombatConfig config = s.engine.config;
+        s.until(() -> s.engine.inUltraCinematic(0), config.ultraStartupFrames + config.ultraRushFrames + 4);
+        s.in[0].direction = 0;
+        return s;
+    }
+
+    @Test public void finalBeamCountsEveryHitAndDealsItsWholeDamage() {
+        Sim s = ultraConnected();
+        CombatConfig config = s.engine.config;
+        s.engine.applyUltraHit(0, 600);
+        s.engine.applyUltraHit(0, 600);
+        int life = s.f(1).state.life;
+        int hits = 12;
+        s.engine.startUltraBeam(0, 2000, hits);
+        assertTrue(s.f(0).firingBeam());
+        assertFalse("nothing interrupts the beam", s.f(0).hittable());
+
+        float defenderStart = s.f(1).x;
+        int counted = 2;
+        int frames = 0;
+        while (s.f(0).firingBeam() && frames++ < s.engine.ultraBeamFrames(hits) + 60) {
+            s.step();
+            if (s.f(0).beamHitsDone <= hits) {
+                assertTrue("held in hitstun during the beam", s.f(1).inHitstun());
+                ComboSession session = s.engine.session(1);
+                assertNotNull(session);
+                assertTrue("the counter only climbs", session.hitCount >= counted);
+                counted = session.hitCount;
+            }
+        }
+        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
+        assertEquals("every small hit plus the blast", 2 + hits + 1, counted + 1);
+        assertEquals("first hits are unscaled: the beam deals exactly its damage", life - 2000, s.f(1).state.life);
+        assertTrue("each hit pushes the defender back", (s.f(1).x - defenderStart) * s.f(0).facing > 0f);
+
+        s.until(() -> s.f(1).status == CombatFighter.Status.KNOCKDOWN, 240);
+        assertEquals(2 + hits + 1, s.engine.lastSession(1).hitCount);
+        assertEquals(1200 + 2000, s.engine.lastSession(1).comboDamage);
+        assertTrue(s.engine.ultraBeamFrames(hits) > config.ultraBeamBlastFrame(hits));
+    }
+
+    @Test public void finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast() {
+        Sim s = ultraConnected();
+        CombatConfig config = s.engine.config;
+        CombatFighter d = s.f(1);
+        d.grounded = false;
+        d.y = Arena.GROUND_Y - 120f;
+        s.engine.startUltraBeam(0, 1000, 8);
+        assertEquals(CombatFighter.Status.AIR_HITSTUN, d.status);
+        s.steps(config.ultraBeamBlastFrame(8) - 1);
+        assertEquals("caught in the beam it does not fall", Arena.GROUND_Y - 120f, d.y, 0.01f);
+        s.until(() -> d.ultraFall, 4);
+        s.until(() -> d.status == CombatFighter.Status.KNOCKDOWN, 240);
+    }
+
+    @Test public void finalBeamOnAKnockedOutDefenderStillEnds() {
+        Sim s = ultraConnected();
+        s.f(1).state.life = 300;
+        s.engine.startUltraBeam(0, 5000, 10);
+        s.until(() -> !s.f(0).firingBeam(), s.engine.ultraBeamFrames(10) + 30);
+        assertEquals(0, s.f(1).state.life);
+    }
 }

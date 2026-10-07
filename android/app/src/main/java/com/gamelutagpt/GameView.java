@@ -13,6 +13,7 @@ import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
 import com.gamelutagpt.stage.StageWorld;
 import com.gamelutagpt.ultra.PaginaFinal;
+import com.gamelutagpt.ultra.RaioFinal;
 import com.gamelutagpt.ultra.UltraDefinition;
 import com.gamelutagpt.ultra.UltraGrade;
 import com.gamelutagpt.ultra.UltraListener;
@@ -91,6 +92,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     // the "Página Final" cinematic (ultra-core) plays while the engine waits.
     private static final String LOG_TAG = "GameView";
     private static final float ULTRA_STARTUP_ZOOM = 0.30f;
+    /** Point of the heavy straight (fraction of the move) where the arm is fully extended. */
+    private static final float BEAM_POSE = 0.5625f;
     private final UltraPack[] ultraPacks = new UltraPack[team.length];
     private final PaginaFinal paginaFinal = new PaginaFinal(this);
     /** Pincel do Canvas do quadro atual para os motores visuais (cenário e ultra). */
@@ -108,6 +111,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int ultraDarkAlpha;
     private float ultraAuraTime;
     private int ultraPhaseSeen = -1;
+    /** Ultra playing now (cinematic, then the final beam). */
+    private UltraPack ultraPack;
+    // Final beam: drawn from the engine state, with its own clock (keeps flickering in hitstop).
+    private final RaioFinal raioFinal = new RaioFinal();
+    private final RaioFinal.Frame beamFrame = new RaioFinal.Frame();
+    private float beamClock;
+    private float beamLastHitClock = -1f;
+    private float beamBlastClock = -1f;
+    private int beamHitsSeen;
+    private float beamTargetX;
+    private float beamShake;
+    private final java.util.Random shakeRandom = new java.util.Random(3);
 
     private static final int TAG_IDLE = 0;
     private static final int TAG_EXIT = 1;
@@ -311,8 +326,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void update() {
         if (stageScene != null) stageScene.update(FIXED_STEP);
         if (paginaFinal.isActive()) {
-            // The engine waits: the cinematic deals the damage and ends with finishUltra.
+            // The engine waits: the cinematic deals the damage and ends with the final beam.
             paginaFinal.update(FIXED_STEP);
+            if (paginaFinal.isShattering() && ultraAttacker >= 0) {
+                // Through the breaking page the fight is already in place for the beam.
+                engine.placeForUltraBeam(ultraAttacker);
+                updateFightCamera(FIXED_STEP);
+            }
             return;
         }
         updateTagState(FIXED_STEP);
@@ -329,11 +349,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
         for (CombatEngine.HitEvent event : engine.events()) {
+            boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
+                "ULTRA".equals(event.moveId);
+            if (ultraHit) ultraDamageDealt += event.damage;
             if (event.defender == OPPONENT && !event.blocked) {
-                dummyDamageLabel = "-" + event.damage;
+                dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
             }
         }
+        updateUltraBeam();
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
 
         updateSuperVisuals();
@@ -439,25 +463,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         ultraDarkAlpha = 0;
         ultraCameraZoom = 1f;
         FighterState state = attacker == PLAYER ? activeFighter() : opponentFighter;
-        UltraPack pack = attacker == PLAYER
+        ultraPack = attacker == PLAYER
             ? ultraPacks[activeFighterIndex]
             : UltraPack.placeholder("ULTRA " + state.character.displayName, state.profile.color);
-        paginaFinal.start(pack, engine.fighter(attacker).facing);
+        paginaFinal.start(ultraPack, engine.fighter(attacker).facing);
     }
 
     private String ultraAttackerFolder() {
         return ultraAttacker == PLAYER ? ultraFolder(activeFighter()) : ultraFolder(opponentFighter);
     }
 
-    private UltraPack ultraAttackerPack() {
-        return ultraAttacker == PLAYER ? ultraPacks[activeFighterIndex] : null;
+    private int ultraTotalDamage() {
+        return ultraPack != null ? ultraPack.definition.damage : UltraDefinition.DEFAULT_DAMAGE;
     }
 
     @Override
     public void onUltraHit(int hitIndex, float damageFraction) {
-        UltraPack pack = ultraAttackerPack();
-        int total = pack != null ? pack.definition.damage : UltraDefinition.DEFAULT_DAMAGE;
-        ultraDamageDealt += engine.applyUltraHit(ultraAttacker, Math.round(total * damageFraction));
+        ultraDamageDealt += engine.applyUltraHit(ultraAttacker, Math.round(ultraTotalDamage() * damageFraction));
     }
 
     @Override
@@ -467,12 +489,88 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void onUltraFinished(UltraGrade grade) {
-        engine.finishUltra(ultraAttacker);
+        // The page breaks into the fight with the attacker firing the final beam.
+        int beamDamage = Math.round(ultraTotalDamage() * PaginaFinal.beamFraction(grade));
+        engine.startUltraBeam(ultraAttacker, beamDamage, ultraPack.definition.beam.hits);
+        beamClock = 0f;
+        beamLastHitClock = -1f;
+        beamBlastClock = -1f;
+        beamHitsSeen = 0;
+        beamShake = 10f;
+        CombatFighter target = engine.fighter(1 - ultraAttacker);
+        beamTargetX = target.x - engine.fighter(ultraAttacker).facing * target.body().halfWidth * 0.4f;
+        ultraSounds.play(ultraAttackerFolder(), "raio");
         if (ultraAttacker == PLAYER) {
             dummyDamageLabel = "-" + ultraDamageDealt;
             dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
         }
-        ultraAttacker = -1;
+    }
+
+    /** Follows the engine's beam: hit pulses, the blast, the shake and the end of the ultra. */
+    private void updateUltraBeam() {
+        beamShake = Math.max(0f, beamShake - FIXED_STEP * 60f);
+        if (ultraAttacker < 0 || paginaFinal.isActive()) return;
+        CombatFighter a = engine.fighter(ultraAttacker);
+        if (!a.firingBeam()) {
+            ultraAttacker = -1;
+            ultraPack = null;
+            return;
+        }
+        beamClock += FIXED_STEP;
+        if (a.beamHitsDone != beamHitsSeen) {
+            beamHitsSeen = a.beamHitsDone;
+            if (beamHitsSeen > a.beamHits) {
+                beamBlastClock = beamClock;
+                beamShake = 26f;
+                ultraSounds.play(ultraAttackerFolder(), "explosao");
+            } else {
+                beamLastHitClock = beamClock;
+                beamShake = Math.max(beamShake, 5f);
+            }
+        }
+        if (beamBlastClock < 0f) {
+            CombatFighter d = engine.fighter(1 - ultraAttacker);
+            beamTargetX = d.x - a.facing * d.body().halfWidth * 0.4f;
+        }
+    }
+
+    private boolean ultraBeamActive() {
+        return ultraAttacker >= 0 && !paginaFinal.isActive() && engine.fighter(ultraAttacker).firingBeam();
+    }
+
+    /** Beam in world coordinates, over the fighters. */
+    private void drawUltraBeam() {
+        CombatFighter a = engine.fighter(ultraAttacker);
+        CombatConfig config = engine.config;
+        float height = a.character().visualStandHeight;
+        RaioFinal.Frame f = beamFrame;
+        // The heavy straight's extended fist, measured on the sprite: from there the beam leaves.
+        f.originX = a.x + a.facing * height * 0.68f;
+        f.originY = a.y - height * 0.67f;
+        f.targetX = beamTargetX;
+        f.facing = a.facing;
+        f.time = beamClock;
+        float extend = clamp(a.ultraFrame / (float)config.ultraBeamExtendFrames, 0f, 1f);
+        f.reach = 1f - (1f - extend) * (1f - extend);
+        f.hits = beamHitsSeen;
+        f.sinceHit = beamLastHitClock >= 0f ? beamClock - beamLastHitClock : -1f;
+        f.sinceBlast = beamBlastClock >= 0f ? beamClock - beamBlastClock : -1f;
+        int afterBlast = a.ultraFrame - config.ultraBeamBlastFrame(a.beamHits);
+        f.strength = afterBlast <= 0 ? 1f : 1f - afterBlast / (float)config.ultraBeamFadeFrames;
+        raioFinal.draw(renderCanvas, ultraPack, f);
+    }
+
+    /** Darkens the world while the beam fires and flashes white on the blast. */
+    private void drawUltraBeamOverlay(Canvas canvas, boolean flash) {
+        CombatFighter a = engine.fighter(ultraAttacker);
+        int afterBlast = a.ultraFrame - engine.config.ultraBeamBlastFrame(a.beamHits);
+        float fade = afterBlast <= 0 ? 1f : clamp(1f - afterBlast / (float)engine.config.ultraBeamFadeFrames, 0f, 1f);
+        if (!flash) {
+            effects.drawWorldOverlay(canvas, paint, Math.round(110f * fade), 8, 6, 20);
+        } else if (beamBlastClock >= 0f) {
+            float since = beamClock - beamBlastClock;
+            effects.drawWorldOverlay(canvas, paint, Math.round(230f * clamp(1f - since / 0.22f, 0f, 1f)), 255, 250, 225);
+        }
     }
 
     private boolean isSuperCinematicActive() {
@@ -675,6 +773,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 renderCameraTop = focusY - playerScreenY / renderZoom;
             }
             float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+            if (beamShake > 0f) {
+                cameraLeft += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
+                renderCameraTop += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
+            }
+            boolean beam = ultraBeamActive();
 
             renderCanvas.begin(canvas);
             if (stageScene != null) {
@@ -688,6 +791,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.translate(-cameraLeft, -renderCameraTop);
             if (stageScene == null) drawScenario(canvas);
             drawFloorReflections(canvas);
+            if (beam) drawUltraBeamOverlay(canvas, false);
             drawDamageDummy(canvas);
             effects.drawEnergyProjectiles(canvas, paint, engine.energyProjectiles);
             effects.drawSuperProjectiles(canvas, paint, engine.superProjectiles);
@@ -722,6 +826,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.translate(tagVisualOffsetX, 0f);
             drawPlayer(canvas);
             canvas.restore();
+            if (beam) {
+                drawUltraBeam();
+                drawUltraBeamOverlay(canvas, true);
+            }
             if (isSuperCinematicActive()) {
                 effects.drawWorldOverlay(canvas, paint, superFlashAlpha, 255, 255, 255);
             }
@@ -997,6 +1105,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     : hit.startupFrames + 0.5f;
                 animation = strike.animation.id;
                 animationElapsed = strike.animationTime(Math.min(frames, hit.totalFrames - 0.5f) * FIXED_STEP);
+                if (f.firingBeam()) {
+                    // Arm fully extended while firing, then back to guard as the beam fades.
+                    int afterBlast = f.ultraFrame - config.ultraBeamBlastFrame(f.beamHits);
+                    float back = clamp(afterBlast / (float)config.ultraBeamFadeFrames, 0f, 1f);
+                    animationElapsed = strike.animationTime(strike.totalTime * (BEAM_POSE + (1f - BEAM_POSE) * back));
+                }
             }
         }
 

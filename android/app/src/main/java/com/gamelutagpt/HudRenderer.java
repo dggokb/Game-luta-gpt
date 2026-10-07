@@ -145,6 +145,9 @@ final class HudRenderer {
 
     /** Frames the result of a finished combo stays on screen. */
     static final int COMBO_LINGER_FRAMES = 60;
+    private static final long COMBO_BUMP_NANOS = 120_000_000L;
+    private final int[] comboHitsSeen = new int[2];
+    private final long[] comboBumpAt = new long[2];
 
     /**
      * Combo counter of one ComboSession: hits, damage and current scaling. The left side
@@ -158,12 +161,20 @@ final class HudRenderer {
             alpha = Math.round(255f * (1f - framesSinceEnd / (float)COMBO_LINGER_FRAMES));
         }
         if (combo == null || combo.hitCount < 2) return;
+        // Every new hit makes the counter jump, so a beam's fast hits read as a rising count.
+        int side = leftSide ? 0 : 1;
+        long now = System.nanoTime();
+        if (combo.hitCount != comboHitsSeen[side]) {
+            if (combo.hitCount > comboHitsSeen[side]) comboBumpAt[side] = now;
+            comboHitsSeen[side] = combo.hitCount;
+        }
+        float bump = Math.max(0f, 1f - (now - comboBumpAt[side]) / (float)COMBO_BUMP_NANOS);
         reset();
         float x = leftSide ? 40f : VW_RIGHT;
         paint.setTextAlign(leftSide ? Paint.Align.LEFT : Paint.Align.RIGHT);
         paint.setFakeBoldText(true);
-        paint.setTextSize(46f);
-        paint.setColor(Color.argb(alpha, 255, 214, 92));
+        paint.setTextSize(46f * (1f + 0.32f * bump));
+        paint.setColor(Color.argb(alpha, 255, 214 + Math.round(41f * bump), 92 + Math.round(163f * bump)));
         c.drawText(combo.hitCount + " HITS", x, 300f, paint);
         paint.setTextSize(18f);
         paint.setColor(Color.argb(alpha, 255, 255, 255));

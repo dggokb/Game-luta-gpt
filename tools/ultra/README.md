@@ -4,7 +4,7 @@ O ultra é ativado com **baixo + SUPER** e custa **3 barras**. A regra fica no `
 
 - se **errar**, as barras são gastas e o lutador fica 0,5 s vulnerável;
 - se o oponente **defender**, ele toma blockstun e o atacante fica vulnerável do mesmo jeito;
-- se **acertar**, começa a cinemática "Página Final": uma página de mangá se monta em 5 painéis e um anel vai fechando no centro da tela. **Tocar quando o anel fecha** dá bônus de dano: PERFEITO dá +25% e BOM dá +10% no golpe final. Depois a página estilhaça e a luta volta com o oponente voando.
+- se **acertar**, começa a cinemática "Página Final": uma página de mangá se monta em 5 painéis e um anel vai fechando no centro da tela. **Tocar quando o anel fecha** dá bônus de dano: PERFEITO dá +25% e BOM dá +10% no golpe final e no raio. Depois a página estilhaça e a luta volta com o personagem disparando o **raio final**: vários hits seguidos e uma explosão que arremessa o oponente.
 
 ## Os 5 painéis
 
@@ -72,11 +72,54 @@ Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
 }
 ```
 
-Cada ultra fica na pasta com o **id do personagem** (`player_base`, `player_two`...). `dano` é o dano total antes da escala de combo, dividido entre os 3 acertos da cinemática (padrão 4000).
+Cada ultra fica na pasta com o **id do personagem** (`player_base`, `player_two`...). `dano` é o dano total antes da escala de combo (padrão 4000): metade nos 3 acertos da cinemática (15%, 15% e 20%) e metade no raio final.
 
 Tudo é opcional, menos `nome`. O script preserva as onomatopeias, sons e posições que você editou à mão.
 
 `posicaoOnomatopeia` move a onomatopeia dentro do painel, para ela não cobrir o rosto do personagem. Os valores são frações da caixa do painel: `[0, 0]` é o canto de cima à esquerda e `[1, 1]` é o canto de baixo à direita.
+
+## Raio final
+
+Quando a página quebra, o personagem dispara um raio que acerta várias vezes (o contador de
+hits vai subindo) e termina numa explosão que arremessa o oponente. São 4 imagens com
+**fundo preto puro** (não transparente: brilho com fundo transparente sai com borda feia).
+Cole antes de cada prompt:
+
+```
+Efeito visual de energia para jogo de luta 2D em estilo anime, traço limpo, cores ricas,
+energia {cor-nome} com núcleo branco incandescente, igual a um super ataque de anime.
+Fundo preto puro (#000000), sem nada além do efeito. Sem personagens, sem mãos, sem texto,
+sem marca d'água, sem chão, sem cenário.
+```
+
+| Arquivo | Formato | Prompt |
+|---|---|---|
+| corpo | horizontal | Um feixe de energia horizontal reto e grosso atravessando a imagem inteira de ponta a ponta, centralizado na altura, núcleo branco no meio, camadas da cor por fora, raios elétricos e faíscas nas bordas. Ocupa metade da altura e é cortado reto nas bordas esquerda e direita, com a mesma espessura dos dois lados, para se repetir. |
+| ponta | horizontal | O mesmo feixe, mas com a frente do disparo: um leque de energia abrindo na ponta. (Pode vir apontando para qualquer lado: use `--espelhar-ponta` se a frente estiver à esquerda.) |
+| inicio | horizontal ou quadrado | A origem do disparo: esfera de energia branca muito brilhante com anéis de onda de choque em volta (elipses verticais), raios de luz e faíscas, com o feixe começando a sair para a direita. |
+| impacto | quadrado | Explosão de energia enorme no impacto: clarão branco no centro, bola de fogo, raios em estrela, anel de choque e fagulhas. Centralizada, com espaço preto em volta. |
+
+Prepare (o preto vira transparência, o corpo fica sem emenda e as bordas se fundem):
+
+```bash
+pip install pillow numpy
+python tools/ultra/preparar_raio.py --id player_base --corpo corpo.png \
+    --ponta ponta.png --espelhar-ponta --inicio inicio.png --impacto impacto.png
+```
+
+O script grava `raio_*.png` e o bloco `raio` do `ultra.json`:
+
+```json
+"raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
+          "centroInicio": [0.443, 0.479], "impacto": "raio_impacto.png", "hits": 20, "espessura": 150 }
+```
+
+- `hits`: acertos pequenos antes da explosão (1 a 60). Mais hits = raio mais longo.
+- `espessura`: altura do feixe no mundo do jogo, em pixels (o personagem tem uns 226).
+- `centroInicio`: onde está o centro da esfera na imagem `inicio` (o script acha sozinho).
+
+Sem o bloco `raio` ou sem imagens, o raio é desenhado pelo jogo com as cores do ultra.
+Para ver no PC: `gradle :pc-preview:runRaio` grava os quadros em `build/raio/`.
 
 ## Sons
 
@@ -90,8 +133,9 @@ Coloque arquivos `.ogg`, `.wav` ou `.mp3` em `assets/ultras/sons/` (valem para t
 | `painel` | cada painel bate na página |
 | `carga` | painel de carga (ou o `som` do painel) |
 | `impacto` | golpe e atingido (ou o `som` do painel) |
-| `explosao` | detonação final (ou o `som` do painel) |
+| `explosao` | detonação final (ou o `som` do painel) e explosão do raio |
 | `quebra` | a página estilhaça |
+| `raio` | o raio final é disparado |
 
 Som que não existe é ignorado. O jogo funciona mudo até os sons chegarem.
 

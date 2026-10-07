@@ -14,6 +14,8 @@ final class CombatFighter {
     static final int ULTRA_RECOVERY = 2;
     /** Rush connected: the engine waits while the shell plays the cinematic. */
     static final int ULTRA_CINEMATIC = 3;
+    /** After the cinematic: the final beam, many small hits and a last blast. */
+    static final int ULTRA_BEAM = 4;
 
     /** What the current attack has done so far; picks the hit/block/whiff cancel window. */
     enum Outcome { NONE, HIT, BLOCK }
@@ -84,6 +86,11 @@ final class CombatFighter {
     int ultraScale = 1000;
     /** Thrown by an ultra: lands knocked down instead of recovering in the air. */
     boolean ultraFall;
+    /** Beam: hits it deals, hits dealt so far, damage left for the hits and for the blast. */
+    int beamHits;
+    int beamHitsDone;
+    int beamDamageLeft;
+    int beamBlastDamage;
 
     // Input.
     final InputBuffer buffer = new InputBuffer();
@@ -136,7 +143,12 @@ final class CombatFighter {
 
     /** Knocked down, getting up or KO: no hit connects. */
     boolean hittable() {
-        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP;
+        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam();
+    }
+
+    /** Firing the ultra beam: nothing interrupts it. */
+    boolean firingBeam() {
+        return status == Status.ULTRA && ultraPhase == ULTRA_BEAM;
     }
 
     /** Crouching hurtbox: crouch stance, crouching attack or crouching hit reaction. */
@@ -158,7 +170,8 @@ final class CombatFighter {
         if (status == Status.ULTRA) {
             return ultraPhase == ULTRA_STARTUP ? "ULTRA_STARTUP"
                 : ultraPhase == ULTRA_RUSH ? "ULTRA_RUSH"
-                : ultraPhase == ULTRA_RECOVERY ? "ULTRA_RECOVERY" : "ULTRA_CINEMATIC";
+                : ultraPhase == ULTRA_RECOVERY ? "ULTRA_RECOVERY"
+                : ultraPhase == ULTRA_BEAM ? "ULTRA_BEAM" : "ULTRA_CINEMATIC";
         }
         return status.name();
     }
