@@ -2,13 +2,13 @@
   "id": "player_base_idle",
   "javaName": "IDLE",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_idle_normalized.png",
+  "source": "art/sprites/source/player_base_idle_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.png",
   "report": "tools/sprites/reports/player_base_idle.report.json",
   "preview": "android/app/build/sprite-review/idle-import.png",
-  "expectedFrames": 8,
+  "expectedFrames": 16,
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "Reviewed normalized master retained from v0.51; original unnormalized art is not reconstructed."
+  "sourceNote": "Teste: idle do p01 gerado em video (Veo), fundo verde recortado, cor igualada a Base, 16 quadros."
 }
