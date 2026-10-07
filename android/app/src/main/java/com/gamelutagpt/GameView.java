@@ -398,12 +398,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
             if (engine.teams.guardCancelReady(PLAYER, player())) return "CANCEL";
+            if (engine.teams.dhcReady(PLAYER, player())) return "DHC";
             return engine.team(PLAYER).conversionOpen() ? "TROCA" : "ASSIST";
         }
         @Override public boolean canTag() {
             TeamSystem.Side team = engine.team(PLAYER);
             return team.conversionOpen() || engine.teams.canAssist(PLAYER, player()) ||
-                engine.teams.guardCancelReady(PLAYER, player());
+                engine.teams.guardCancelReady(PLAYER, player()) || engine.teams.dhcReady(PLAYER, player());
         }
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
@@ -695,6 +696,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             case "AIR_TECH": return "AIR TECH!";
             case "PUSHBLOCK": return "PUSHBLOCK!";
             case "GUARD_CANCEL": return "GUARD CANCEL!";
+            case "DHC": return "TEAM SUPER!";
             default: return null;
         }
     }

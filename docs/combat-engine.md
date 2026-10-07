@@ -95,6 +95,29 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## DHC (Team Super) e vida recuperável — v0.85
+
+**DHC**: **TAG durante o seu Super, depois que ele disparou** (do frame de release até o
+fim do golpe) traz o parceiro com o Super dele.
+
+- Custa mais 1 barra (da barra do time) e precisa do parceiro pronto (assist livre, sem
+  troca nem assist em campo) e com Super no pack.
+- O parceiro assume o ponto onde o ponto está, começa o Super com o congelamento normal do
+  Super, e o antigo ponto sai correndo. O combo continua com a escala de sempre (piso de
+  Super).
+- Depois: 300 frames sem assist nem troca. O botão TAG mostra **DHC** quando dá, e a tela
+  mostra "TEAM SUPER!". O ultra não entra em DHC.
+
+**Vida recuperável**: 27% de todo dano (`recoverableLifePermille`) vira **vida vermelha**
+na barra, logo depois da vida. Ela volta aos poucos (6 por frame, ~360 por segundo) só
+enquanto o lutador espera **fora de campo** (não no ponto, nem como assist, nem saindo). KO
+zera a vermelha; nunca passa da vida máxima. É o motivo para trocar um personagem
+machucado. O boneco de treino (sem time) nunca recupera. Os botões de vida de teste zeram
+a vermelha.
+
+Todo dano passa por `FighterState.takeDamage` (golpes, agarrão, ultra). Testes em
+`TeamSuperTest`.
+
 ## Air tech e opções de levantar — v0.84
 
 A recuperação deixou de ser automática: quem apanha escolhe. Valores em

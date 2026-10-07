@@ -198,6 +198,11 @@ final class CombatConfig {
     /** Extra invulnerable frames of the incoming partner past its move's active frames. */
     int guardCancelInvulnPadding = 4;
 
+    // Recoverable life: part of every hit's damage (permille) can come back while the
+    // fighter waits off point, at this much life per frame.
+    int recoverableLifePermille = 270;
+    int recoverableLifePerFrame = 6;
+
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;
     int tagEnterFrames = 23;

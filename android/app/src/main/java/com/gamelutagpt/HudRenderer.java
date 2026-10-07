@@ -293,6 +293,12 @@ final class HudRenderer {
         paint.setColor(Color.rgb(45, 53, 62));
         c.drawRoundRect(left, top, right, bottom, 8, 8, paint);
 
+        // Recoverable life: the red stretch right after the life, which comes back off point.
+        float recoverable = Arena.clamp(fighter.recoverableLife / (float)fighter.profile.maxLife, 0f, 1f - ratio);
+        if (recoverable > 0f) {
+            paint.setColor(Color.argb(200, 214, 52, 62));
+            c.drawRoundRect(left + width * ratio - 8f, top, left + width * (ratio + recoverable), bottom, 8, 8, paint);
+        }
         if (ratio > 0f) {
             paint.setColor(lifeColor(ratio));
             c.drawRoundRect(left, top, left + width * ratio, bottom, 8, 8, paint);

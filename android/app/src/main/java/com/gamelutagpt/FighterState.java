@@ -8,6 +8,11 @@ final class FighterState {
     final String hudTitle;
     final String reserveHudLabel;
     int life;
+    /**
+     * Recoverable life (drawn red past the life bar): part of the damage taken, which comes
+     * back slowly while this fighter waits off point. life + recoverableLife ≤ maxLife.
+     */
+    int recoverableLife;
     /** Super meter in thousandths of a bar (0..CombatConfig.MAX_METER); integer for determinism. */
     int superMeter;
     String lifeHudLabel;
@@ -27,6 +32,29 @@ final class FighterState {
     /** Test helper: back to full life. */
     void restoreLife() {
         life = profile.maxLife;
+        recoverableLife = 0;
+        refreshHudLabels();
+    }
+
+    /**
+     * Takes damage: life goes down and {@code recoverablePermille} of it (at most what
+     * fits under the max) becomes recoverable life. A KO clears it.
+     */
+    void takeDamage(int damage, int recoverablePermille) {
+        if (damage <= 0) return;
+        life = Math.max(0, life - damage);
+        recoverableLife += damage * recoverablePermille / 1000;
+        if (life == 0) recoverableLife = 0;
+        recoverableLife = Math.min(recoverableLife, profile.maxLife - life);
+        refreshHudLabels();
+    }
+
+    /** Off point: up to {@code amount} of the recoverable life comes back. */
+    void regenerate(int amount) {
+        if (life <= 0 || recoverableLife <= 0 || amount <= 0) return;
+        int gain = Math.min(amount, recoverableLife);
+        life += gain;
+        recoverableLife -= gain;
         refreshHudLabels();
     }
 
@@ -42,7 +70,7 @@ final class FighterState {
 
     void refreshHudLabels() {
         int level = superMeter / CombatConfig.METER_PER_BAR;
-        lifeHudLabel = "HP " + life + " / " + profile.maxLife;
+        lifeHudLabel = "HP " + life + " / " + profile.maxLife + (recoverableLife > 0 ? "  (+" + recoverableLife + ")" : "");
         superHudLabel = String.format(
             java.util.Locale.US,
             "SUPER %.2f / 5  •  LV %d",

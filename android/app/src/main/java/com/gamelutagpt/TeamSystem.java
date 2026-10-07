@@ -133,6 +133,13 @@ final class TeamSystem {
                 s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
                 s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
             }
+        } else if (s.assistRequestAge >= 0 && inReleasedSuper(point)) {
+            // TAG during your own Super, once it fired: DHC, the partner comes in with its Super.
+            if (!point.frozen() && dhcReady(s, point) && engine.dhc(s, point)) {
+                s.assistRequestAge = -1;
+                s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
+                s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
+            }
         } else if (s.assistRequestAge >= 0) {
             if (s.conversionOpen()) {
                 s.convert = true;
@@ -176,6 +183,24 @@ final class TeamSystem {
             point.state.superMeter >= config.guardCancelCost;
     }
 
+    /** The point's own Super already released its attack (the DHC window). */
+    private static boolean inReleasedSuper(CombatFighter point) {
+        return point.attacking() && point.attack.kind == AttackDefinition.Kind.SUPER &&
+            point.attackFrame >= point.attack.startupFrames;
+    }
+
+    private static boolean dhcReady(Side s, CombatFighter point) {
+        FighterState partner = s.partner();
+        return canGuardCancel(s) && partner.profile.hasSuperAttack() && partner.life > 0 &&
+            point.state.superMeter >= CombatConfig.SUPER_COST;
+    }
+
+    /** TAG would DHC now (own Super released, partner ready with a Super, a bar left). */
+    boolean dhcReady(int side, CombatFighter point) {
+        Side s = sides[side];
+        return s.partner() != null && inReleasedSuper(point) && dhcReady(s, point);
+    }
+
     boolean canRawTag(int side, CombatFighter point) {
         return canRawTag(sides[side], point);
     }
@@ -213,6 +238,17 @@ final class TeamSystem {
         }
         advanceTag(engine, s, point);
         advanceAssist(engine, s, point);
+        regenerate(s);
+    }
+
+    /** Members waiting off screen get their recoverable life back, little by little. */
+    private void regenerate(Side s) {
+        if (s.members.length < 2) return;
+        for (FighterState m : s.members) {
+            boolean onScreen = m == s.pointState() || (s.assist != null && s.assist.state == m) ||
+                (s.leavingFrame >= 0 && s.leaving == m);
+            if (!onScreen) m.regenerate(config.recoverableLifePerFrame);
+        }
     }
 
     private void advanceTag(CombatEngine engine, Side s, CombatFighter point) {

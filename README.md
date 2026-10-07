@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.76-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.85-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -247,3 +247,12 @@ Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/spr
   oponente) ou **↓** para levantar atrasado.
 - A CPU também usa essas opções.
 - Detalhes: `docs/combat-engine.md` (seção Air tech e opções de levantar).
+
+## DHC (Team Super) e vida recuperável — v0.85
+
+- **TAG durante o seu Super** (depois que ele disparou): o parceiro entra com o **Super
+  dele** e o combo continua. Custa mais 1 barra; o botão mostra **DHC** quando dá.
+- **Vida vermelha**: parte do dano que você toma fica vermelha na barra e **volta aos
+  poucos enquanto o personagem está fora de campo**. Trocar um personagem machucado agora
+  vale a pena.
+- Detalhes: `docs/combat-engine.md` (seção DHC e vida recuperável).

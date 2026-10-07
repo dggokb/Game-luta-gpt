@@ -1019,6 +1019,27 @@ final class CombatEngine {
     }
 
     /**
+     * DHC (Team Super): during the point's released Super, the partner takes the point where
+     * it stands and starts its own Super (one more bar, its own freeze); the point runs off.
+     * The combo and its scaling go on.
+     */
+    boolean dhc(TeamSystem.Side side, CombatFighter point) {
+        FighterState partner = side.partner();
+        if (partner == null || !partner.profile.hasSuperAttack() || point.state.superMeter < CombatConfig.SUPER_COST) {
+            return false;
+        }
+        teams.leavePoint(side, point);
+        setFighterState(point.index, side.pointState());
+        point.locked = false;
+        point.pushRemaining = 0f;
+        point.pushFramesLeft = 0;
+        startAttack(point, partner.profile.superAttack.attack, null, -1);
+        startX[point.index] = point.x;
+        cues.add("DHC");
+        return true;
+    }
+
+    /**
      * Guard Cancel Tag: blocking on the ground, the partner comes in where the point stood,
      * invulnerable, doing its assist move; the point runs off and the opponent freezes for
      * a flash. Costs a bar; refused without the bar, a partner or the team busy.
@@ -1142,8 +1163,7 @@ final class CombatEngine {
         ComboSession session = new ComboSession(a.index, d.index);
         sessions[d.index] = session;
         int damage = session.registerHit(throwAttack, throwAttack.damage, config);
-        d.state.life = Math.max(0, d.state.life - damage);
-        d.state.refreshHudLabels();
+        d.state.takeDamage(damage, config.recoverableLifePermille);
         a.state.addSuperMeter(CombatRules.superGainOnHit(throwAttack.strength));
         d.framesSinceHit = 0;
         knockDown(d);
@@ -1214,8 +1234,7 @@ final class CombatEngine {
     /** Damage already scaled; one more hit on the combo counter. */
     private int dealUltraDamage(CombatFighter a, CombatFighter d, int damage) {
         if (d.ko()) return 0;
-        d.state.life = Math.max(0, d.state.life - damage);
-        d.state.refreshHudLabels();
+        d.state.takeDamage(damage, config.recoverableLifePermille);
         d.framesSinceHit = 0;
         ComboSession session = sessions[d.index];
         if (session != null) session.addHit(damage);
@@ -1393,8 +1412,7 @@ final class CombatEngine {
         }
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         int damage = session.registerHit(attack, projectile ? c.projectile.damage : attack.damage, config);
-        d.state.life = Math.max(0, d.state.life - damage);
-        d.state.refreshHudLabels();
+        d.state.takeDamage(damage, config.recoverableLifePermille);
         a.state.addSuperMeter(CombatRules.superGainOnHit(attack.strength));
 
         boolean wasCrouching = d.crouchingBody();
