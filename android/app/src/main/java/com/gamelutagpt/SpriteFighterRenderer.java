@@ -13,6 +13,8 @@ final class SpriteFighterRenderer {
     private final Paint spritePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final ColorFilter hitFlash=new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
     private final ColorFilter blockFlash=new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
+    /** Base color filter when no flash is showing (the washed-out training opponent), or null. */
+    private ColorFilter tint;
 
     /** Standalone renderer with its own cache (tools and tests). */
     SpriteFighterRenderer(Context context) { this(context,GeneratedCharacters.defaultCharacter()); }
@@ -44,11 +46,23 @@ final class SpriteFighterRenderer {
         source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
         float scale=character.profile.worldScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
         destination.set(left,top,left+a.width*scale,top+a.height*scale);
-        spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:null);
+        spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:tint);
         boolean mirror=facing*character.artFacing<0;
         if(mirror){canvas.save();canvas.scale(-1f,1f,x,0f);}
         canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
         if(mirror)canvas.restore();
+    }
+    void setTint(ColorFilter tint){this.tint=tint;}
+    /** Pale, cooler copy of the art: the same character as the opponent still reads apart. */
+    static ColorFilter washedOut() {
+        ColorMatrix m=new ColorMatrix();
+        m.setSaturation(0.35f);
+        m.postConcat(new ColorMatrix(new float[]{
+            0.70f,0f,0f,0f,64f,
+            0f,0.70f,0f,0f,70f,
+            0f,0f,0.70f,0f,84f,
+            0f,0f,0f,1f,0f}));
+        return new ColorMatrixColorFilter(m);
     }
     boolean hasAnimation(String id){return character.animations.containsKey(id);}
     CharacterDefinition character(){return character;}

@@ -32,6 +32,10 @@ final class HudRenderer {
         boolean ultraReady();
         int dpadDirection();
         boolean pressed(Control control);
+        /** Demo playing (index into DemoDirector.VERSIONS), or -1. */
+        int demoPlaying();
+        String demoTitle();
+        String demoCaption();
     }
 
     /** Values of the overhead panel above the opponent (world space). */
@@ -122,6 +126,43 @@ final class HudRenderer {
             HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.HEAL_OPPONENT), "VIDA CPU",
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
+        drawDemos(c, s);
+    }
+
+    /** One button per version demo, and the caption of the demo that plays. */
+    private void drawDemos(Canvas c, State s) {
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(13f);
+        paint.setFakeBoldText(true);
+        paint.setTextAlign(Paint.Align.CENTER);
+        float right = demoLeft(DemoDirector.VERSIONS.length - 1) + DEMO_WIDTH;
+        c.drawText("DEMOS (toque de novo para parar)", (DEMO_LEFT + right) * 0.5f, DEMO_TOP - 8f, paint);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+        for (int i = 0; i < DemoDirector.VERSIONS.length; i++) {
+            float left = demoLeft(i);
+            drawToggle(c, s.demoPlaying() == i, DemoDirector.VERSIONS[i], left, DEMO_TOP, left + DEMO_WIDTH, DEMO_BOTTOM, 18f);
+        }
+        if (s.demoPlaying() < 0) return;
+        float boxLeft = 250f, boxRight = 1030f, boxTop = 244f, boxBottom = 302f;
+        paint.setColor(Color.argb(200, 10, 15, 27));
+        c.drawRoundRect(boxLeft, boxTop, boxRight, boxBottom, 14f, 14f, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2f);
+        paint.setColor(Color.rgb(74, 205, 232));
+        c.drawRoundRect(boxLeft, boxTop, boxRight, boxBottom, 14f, 14f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextAlign(Paint.Align.CENTER);
+        float cx = (boxLeft + boxRight) * 0.5f;
+        paint.setColor(Color.rgb(255, 226, 120));
+        paint.setFakeBoldText(true);
+        paint.setTextSize(19f);
+        c.drawText(s.demoTitle(), cx, boxTop + 24f, paint);
+        paint.setFakeBoldText(false);
+        paint.setColor(Color.WHITE);
+        paint.setTextSize(16f);
+        c.drawText(s.demoCaption(), cx, boxTop + 47f, paint);
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawToggle(Canvas c, boolean enabled, String label,

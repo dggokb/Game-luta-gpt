@@ -145,7 +145,10 @@ public class SpriteIntegrationTest {
         SpriteFighterRenderer opponent=(SpriteFighterRenderer)get("opponentSpriteRenderer");
         Field field=SpriteFighterRenderer.class.getDeclaredField("character");
         field.setAccessible(true);
-        assertEquals("monster_npc",((CharacterDefinition)field.get(opponent)).id);
+        assertEquals("the training CPU uses the base character","player_base",((CharacterDefinition)field.get(opponent)).id);
+        Field tint=SpriteFighterRenderer.class.getDeclaredField("tint");
+        tint.setAccessible(true);
+        assertNotNull("drawn washed out",tint.get(opponent));
         frames(2);
         assertEquals(SpriteMotion.Clip.IDLE,opponent.motion.clip);
     }
@@ -531,7 +534,7 @@ public class SpriteIntegrationTest {
     private int activeLife()throws Exception {Field f=activeFighter().getClass().getDeclaredField("life");f.setAccessible(true);return f.getInt(activeFighter());}
 
     @Test public void opponentLowAttackPlaysItsOwnClip()throws Exception {
-        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
+        CharacterDefinition npc=npc().character();
         // The CPU presses buttons like a player: crouching M through its buffer.
         npc().buffer.push(InputBuffer.Button.MEDIUM,null,true);
         frames(1);
@@ -541,7 +544,7 @@ public class SpriteIntegrationTest {
         assertNotEquals(npc.moves.get("M").animation.id,opponent.motion.clip);
     }
     @Test public void cameraAndHudUseMeasuredSpriteHeight()throws Exception {
-        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
+        CharacterDefinition npc=npc().character();
         Method top=GameView.class.getDeclaredMethod("opponentVisualTop");top.setAccessible(true);
         float visualTop=(Float)top.invoke(game);
         assertEquals(npc().y-npc.visualStandHeight,visualTop,.01f);
@@ -580,7 +583,7 @@ public class SpriteIntegrationTest {
     }
     @Test public void walkingIntoTheOpponentPushesInsteadOfOverlapping()throws Exception {
         CharacterDefinition.Body p=GeneratedCharacters.defaultCharacter().fighter.body;
-        CharacterDefinition.Body n=GeneratedCharacters.opponentCharacter().fighter.body;
+        CharacterDefinition.Body n=npc().body();
         float gap=p.pushHalfWidth+n.pushHalfWidth;
         npc().x=520f;
         touch(MotionEvent.ACTION_DOWN,265,555);frames(60);
@@ -628,7 +631,6 @@ public class SpriteIntegrationTest {
         assertSame(cache,field.get(opponent));
         java.util.Set<String> expected=new java.util.HashSet<>();
         for(String id:GeneratedCharacters.TEAM)for(CharacterDefinition.Animation a:GeneratedCharacters.get(id).animations.values())expected.add(a.atlas.resource);
-        for(CharacterDefinition.Animation a:GeneratedCharacters.opponentCharacter().animations.values())expected.add(a.atlas.resource);
         assertEquals(expected.size(),cache.size());
         rawTag();frames(72);
         assertEquals("Tag must not decode new atlases",expected.size(),cache.size());

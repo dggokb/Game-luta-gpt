@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, DEMO, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -73,6 +73,26 @@ final class ControlsLayout {
     static final float HEAL_OPPONENT_LEFT = 1168f;
     static final float HEAL_OPPONENT_RIGHT = 1248f;
 
+    // Demo buttons (v0.80…v0.85), a row at the top center; see DemoDirector.
+    static final float DEMO_LEFT = 600f;
+    static final float DEMO_TOP = 50f;
+    static final float DEMO_BOTTOM = 90f;
+    static final float DEMO_WIDTH = 50f;
+    static final float DEMO_GAP = 6f;
+
+    static float demoLeft(int index) {
+        return DEMO_LEFT + index * (DEMO_WIDTH + DEMO_GAP);
+    }
+
+    /** Demo button under the point, or -1. */
+    static int demoAt(float x, float y) {
+        if (y < DEMO_TOP || y > DEMO_BOTTOM) return -1;
+        for (int i = 0; i < DemoDirector.VERSIONS.length; i++) {
+            if (x >= demoLeft(i) && x <= demoLeft(i) + DEMO_WIDTH) return i;
+        }
+        return -1;
+    }
+
     /** First control under the point, in the priority order the input handler uses. */
     static Control controlAt(float x, float y) {
         if (insideRect(x, y, AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM)) {
@@ -87,6 +107,7 @@ final class ControlsLayout {
         if (insideRect(x, y, HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM)) {
             return Control.HEAL_OPPONENT;
         }
+        if (demoAt(x, y) >= 0) return Control.DEMO;
         if (insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_RADIUS)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
         if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;

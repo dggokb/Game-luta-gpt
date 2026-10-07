@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.85-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.86-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
@@ -256,3 +256,16 @@ Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/spr
   poucos enquanto o personagem está fora de campo**. Trocar um personagem machucado agora
   vale a pena.
 - Detalhes: `docs/combat-engine.md` (seção DHC e vida recuperável).
+
+## Demos e CPU de treino — v0.86
+
+- O **CPU agora usa o nosso personagem** (mesmo corpo e golpes), desenhado **pálido e
+  azulado** para não confundir com o jogador.
+- **Botões DEMO 80…85** no topo da tela: cada um faz os dois personagens demonstrarem
+  sozinhos o que entrou naquela versão, passo a passo, com legenda (✓ quando o passo
+  mostrou o que devia). Toque de novo no mesmo botão para parar; no fim a luta volta
+  como estava (posições, vida, barra).
+  - **80** agarrão, tech, agarrão no vazio punido · **81** pushblock, Guard Cancel ·
+    **82** air dash para frente e para trás · **83** wall bounce, ground bounce ·
+    **84** air tech, levantar rápido, rolamentos · **85** DHC, vida vermelha.
+- Detalhes: `docs/combat-engine.md` (seção Demos).

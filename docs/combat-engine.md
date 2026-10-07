@@ -95,6 +95,23 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Demos das versões e CPU de treino — v0.86
+
+- `DemoDirector` (Java puro): roteiros por versão (`VERSIONS` 80…85). Enquanto uma demo
+  roda ele escreve a entrada **dos dois lados** a cada quadro; o pad é drenado e
+  descartado e o cérebro do CPU não é chamado. Cada passo: `CombatEngine.restage` (os dois
+  no chão, nada em andamento: golpe, stun, projétil, combo, tag/assist), `LEAD_IN` de 36
+  quadros parados sob a legenda, depois o roteiro. Um `Check` por passo marca ✓ no HUD.
+- No fim (ou tocando de novo no botão), vida, vida vermelha, barra e o point voltam como
+  estavam e os dois voltam às posições iniciais. Não inicia durante um ultra.
+- `DemoDirectorTest` roda todas as demos no motor real e exige que cada passo mostre o que
+  promete (cue/evento), e que a luta volte igual.
+- CPU de treino: `GameView` usa `TEAM[0]` (player_base) para o CPU, com
+  `SpriteFighterRenderer.washedOut()` (saturação 0.35, clareado e levemente azul).
+  `GeneratedCharacters.OPPONENT` (monster_npc) continua no pack para os testes.
+- Correção achada pela demo: o voo do **wall bounce** agora calcula a altura para chegar à
+  parede antes de pousar (com o defensor colado ele caía antes dela e não quicava).
+
 ## DHC (Team Super) e vida recuperável — v0.85
 
 **DHC**: **TAG durante o seu Super, depois que ele disparou** (do frame de release até o

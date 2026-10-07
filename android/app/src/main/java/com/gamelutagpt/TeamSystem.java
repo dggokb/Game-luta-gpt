@@ -81,6 +81,21 @@ final class TeamSystem {
         s.point = 0;
     }
 
+    /** Demos: no tag, assist or cooldown in progress on either side (members stay). */
+    void calm() {
+        for (Side s : sides) {
+            s.tagPhase = TAG_NONE;
+            s.tagFrame = s.tagCooldown = 0;
+            s.assistPhase = ASSIST_NONE;
+            s.assistFrame = s.assistCooldown = 0;
+            s.assist = null;
+            s.convert = false;
+            s.leaving = null;
+            s.leavingFrame = -1;
+            s.assistRequestAge = s.tagRequestAge = -1;
+        }
+    }
+
     /** Horizontal offset of the point's sprite during a raw tag (it runs off and back in). */
     float tagOffset(int side) {
         Side s = sides[side];

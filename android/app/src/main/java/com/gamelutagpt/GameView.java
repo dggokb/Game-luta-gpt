@@ -34,8 +34,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[1]), "PLAYER 2")
     };
 
+    // Training opponent: the base character (same body and moves as ours), drawn washed out.
     private final FighterState opponentFighter =
-        new FighterState(GeneratedCharacters.opponentCharacter(), "CPU");
+        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[0]), "CPU");
 
     private static final float VW = Arena.VW;
     private static final float VH = Arena.VH;
@@ -55,6 +56,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final FighterInput playerInput = new FighterInput();
     private final FighterInput opponentInput = new FighterInput();
     private final AiController ai = new AiController(new OpponentAi(new Random()));
+    /** Demo buttons: while one plays it drives both fighters (pad and CPU brain are ignored). */
+    private final DemoDirector demo = new DemoDirector();
+    private final FighterInput ignoredInput = new FighterInput();
     private boolean debugOverlay;
 
     private String dummyDamageLabel = "";
@@ -179,6 +183,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         for (FighterState fighter : team) atlases.preload(fighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
@@ -341,13 +346,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         boolean tagging = isTagAnimationActive();
 
-        pad.drainInto(playerInput);
-        if (tagging) {
-            opponentInput.clear();
+        if (demo.active()) {
+            // Touches never reach the fight during a demo.
+            pad.drainInto(ignoredInput);
+            demo.fill(playerInput, opponentInput);
         } else {
-            ai.fill(engine, OPPONENT, opponentInput);
+            pad.drainInto(playerInput);
+            if (tagging) {
+                opponentInput.clear();
+            } else {
+                ai.fill(engine, OPPONENT, opponentInput);
+            }
         }
         engine.step(playerInput, opponentInput);
+        demo.afterStep();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
         for (CombatEngine.HitEvent event : engine.events()) {
@@ -409,6 +421,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
         @Override public int dpadDirection() { return pad.direction(); }
+        @Override public int demoPlaying() { return demo.demo(); }
+        @Override public String demoTitle() { return demo.title(); }
+        @Override public String demoCaption() { return demo.caption(); }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -1339,6 +1354,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         while ((event = pendingInput.poll()) != null) event.recycle();
     }
 
+    /** Starts demo {@code index}, or stops it when it is the one playing. Not during an ultra. */
+    private void toggleDemo(int index) {
+        if (index < 0 || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (demo.demo() == index) {
+            demo.stop();
+        } else {
+            demo.start(index, engine, team, opponentFighter, PLAYER_START_X, OPPONENT_START_X);
+        }
+        throwBannerFrames = 0;
+        dummyDamageLabelFrames = 0;
+        beamShake = 0f;
+    }
+
     /**
      * Touch only records what the player holds and presses. Whether a press starts an
      * attack is decided by the engine (buffer, state machine and cancel windows).
@@ -1367,6 +1395,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     break;
                 case DEBUG_TOGGLE:
                     debugOverlay = !debugOverlay;
+                    break;
+                case DEMO:
+                    toggleDemo(ControlsLayout.demoAt(x, y));
                     break;
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.

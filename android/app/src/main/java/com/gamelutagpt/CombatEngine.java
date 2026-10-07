@@ -127,6 +127,28 @@ final class CombatEngine {
 
     TeamSystem.Side team(int side) { return teams.sides[side]; }
 
+    /**
+     * Demos and training: both fighters stand on the ground at these spots with nothing in
+     * progress (no attack, stun, projectile, combo or team action). Life and meter are kept.
+     */
+    void restage(float firstX, float secondX) {
+        float[] xs = {firstX, secondX};
+        for (int i = 0; i < 2; i++) {
+            int facing = xs[i] <= xs[1 - i] ? 1 : -1;
+            fighters[i] = new CombatFighter(i, fighters[i].state, xs[i], facing);
+            sessions[i] = null;
+            lastSessions[i] = null;
+            sessionEndFrame[i] = -1;
+        }
+        energyProjectiles.clear();
+        superProjectiles.clear();
+        events.clear();
+        cues.clear();
+        superFreeze = 0;
+        ultraConnected = -1;
+        teams.calm();
+    }
+
     /** Tag: the slot now plays another team member. Any action in progress is dropped. */
     void setFighterState(int index, FighterState state) {
         CombatFighter f = fighters[index];
@@ -1438,10 +1460,12 @@ final class CombatEngine {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.grounded = false;
             d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
-            d.vy = -config.wallBounceLift;
             d.vx = direction * config.wallBounceSpeed;
             d.bounce = CombatFighter.BOUNCE_WALL;
             d.bounceWallX = Arena.clamp(a.x + direction * config.wallBounceDistance, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            // High enough to reach the wall before landing, however close the defender was.
+            float flight = Math.abs(d.bounceWallX - d.x) / config.wallBounceSpeed;
+            d.vy = -Math.max(config.wallBounceLift, config.gravity * flight * 0.5f * 1.15f);
             d.launched = true;
             d.slammed = false;
             d.superJumping = false;
