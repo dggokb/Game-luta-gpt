@@ -64,6 +64,12 @@ final class GeneratedSpriteLayouts {
     static final int DEFENSE_STAND_ROOT_Y = 236;
     static final int DEFENSE_STAND_FRAME_COUNT = 4;
 
+    static final int ENERGY_SET_FRAME_WIDTH = 235;
+    static final int ENERGY_SET_FRAME_HEIGHT = 249;
+    static final int ENERGY_SET_ROOT_X = 98;
+    static final int ENERGY_SET_ROOT_Y = 238;
+    static final int ENERGY_SET_FRAME_COUNT = 11;
+
     static final int FALL_DOWN_FRAME_WIDTH = 216;
     static final int FALL_DOWN_FRAME_HEIGHT = 176;
     static final int FALL_DOWN_ROOT_X = 108;
@@ -165,6 +171,12 @@ final class GeneratedSpriteLayouts {
     static final int RISE_SET_ROOT_X = 100;
     static final int RISE_SET_ROOT_Y = 228;
     static final int RISE_SET_FRAME_COUNT = 6;
+
+    static final int THROW_SET_FRAME_WIDTH = 337;
+    static final int THROW_SET_FRAME_HEIGHT = 244;
+    static final int THROW_SET_ROOT_X = 135;
+    static final int THROW_SET_ROOT_Y = 233;
+    static final int THROW_SET_FRAME_COUNT = 9;
 
     static final int ULTRA_BEAM_FRAME_WIDTH = 276;
     static final int ULTRA_BEAM_FRAME_HEIGHT = 253;

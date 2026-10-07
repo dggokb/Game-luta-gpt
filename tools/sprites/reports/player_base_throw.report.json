@@ -1,0 +1,143 @@
+{
+  "id": "player_base_throw",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_throw_video_normalized.png",
+  "sourceNote": "Agarrao do p01 (video Seedance): guarda, alcance e pegada (0-3), arremesso e volta (3-8). Os quadros com o adversario no video foram pulados; o jogo desenha quem e arremessado.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 256,
+    "rootX": 150,
+    "rootY": 238,
+    "columns": 9,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        67,
+        15,
+        222,
+        239
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 16322
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        67,
+        18,
+        222,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16972
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        67,
+        21,
+        266,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 17766
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        90,
+        24,
+        342,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 17898
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        28,
+        62,
+        267,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 16603
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        28,
+        61,
+        267,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 16574
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        25,
+        67,
+        255,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15945
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        69,
+        33,
+        233,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15582
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        67,
+        17,
+        222,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16252
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 337,
+    "frameHeight": 244,
+    "rootX": 135,
+    "rootY": 233,
+    "columns": 9,
+    "frameCount": 9,
+    "cropOffset": [
+      15,
+      5
+    ],
+    "decodedBytes": {
+      "canonical": 4128768,
+      "packed": 2960208
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "a2fc787ab6cf3b5781b7c93a19022923892810cc598a859038de391b24d7de89",
+      "config": "0ecb85546d9c56a636598d019b36cf053dda44c2db85db8c214d003202e32b6e",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}

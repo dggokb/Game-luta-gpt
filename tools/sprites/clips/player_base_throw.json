@@ -1,0 +1,16 @@
+{
+  "id": "player_base_throw",
+  "javaName": "THROW_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_throw_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_throw.png",
+  "report": "tools/sprites/reports/player_base_throw.report.json",
+  "preview": "android/app/build/sprite-review/throw-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "frameWidth": 448,
+  "rootX": 150,
+  "sourceNote": "Agarrao do p01 (video Seedance): guarda, alcance e pegada (0-3), arremesso e volta (3-8). Os quadros com o adversario no video foram pulados; o jogo desenha quem e arremessado."
+}

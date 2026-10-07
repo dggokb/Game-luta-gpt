@@ -885,6 +885,72 @@
         100,
         100
       ]
+    },
+    "SPECIAL_ENERGY": {
+      "atlas": "player_base_energy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        30,
+        35,
+        20,
+        40,
+        40,
+        30,
+        20,
+        20,
+        20,
+        15
+      ]
+    },
+    "THROW_GRAB": {
+      "atlas": "player_base_throw",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        20,
+        25,
+        25,
+        30
+      ]
+    },
+    "THROW_TOSS": {
+      "atlas": "player_base_throw",
+      "frames": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        60,
+        50,
+        40,
+        40,
+        47
+      ]
     }
   },
   "moves": {
@@ -1144,6 +1210,7 @@
     }
   },
   "specialAnimations": {
-    "ULTRA": "ULTRA_BEAM"
+    "ULTRA": "ULTRA_BEAM",
+    "S": "SPECIAL_ENERGY"
   }
 }

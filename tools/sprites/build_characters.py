@@ -16,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 JAVA = 'android/app/src/main/java/com/gamelutagpt/'
 # Semantic vocabulary. The runtime (generated SpriteStates.java) and this validator share it.
 REQUIRED = ('IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND')
-OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP')
+OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP',
+            'THROW_GRAB','THROW_TOSS')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')

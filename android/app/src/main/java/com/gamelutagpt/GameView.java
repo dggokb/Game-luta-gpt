@@ -1262,8 +1262,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     /**
-     * Throw poses from the character's own moves (no dedicated art yet): the jab reaching
-     * out to grab and holding, the heavy straight for the toss, the guard when teched.
+     * Throw poses: the character's THROW_GRAB/THROW_TOSS clips when it has them, otherwise
+     * its own moves (the jab reaching out to grab and holding, the heavy straight for the
+     * toss); the guard when teched.
      * Returns the animation id (its clip time in {@link #throwPoseTime}), or null for the
      * combat pose.
      */
@@ -1276,6 +1277,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             return SpriteStates.DEFENSE_STAND;
         }
         boolean toss = f.throwPhase == CombatFighter.THROW_EXECUTE;
+        CharacterDefinition.Animation grab = character.animations.get(SpriteStates.THROW_GRAB);
+        CharacterDefinition.Animation thrown = character.animations.get(SpriteStates.THROW_TOSS);
+        if (grab != null && thrown != null) {
+            // Dedicated art: reach and hold on the grab clip, the toss on its own clip; a
+            // whiff reaches out and comes back.
+            if (f.throwPhase == CombatFighter.THROW_STARTUP) {
+                float k = clamp(f.throwFrame / (float)config.throwStartupFrames, 0f, 1f);
+                throwPoseTime = grab.duration * k * 0.999f;
+                return SpriteStates.THROW_GRAB;
+            }
+            if (f.throwPhase == CombatFighter.THROW_HOLD) {
+                throwPoseTime = grab.duration * 0.999f;
+                return SpriteStates.THROW_GRAB;
+            }
+            if (toss) {
+                float k = clamp(f.throwFrame / (float)config.throwExecuteFrames, 0f, 1f);
+                throwPoseTime = thrown.duration * k * 0.999f;
+                return SpriteStates.THROW_TOSS;
+            }
+            float k = clamp(f.throwFrame / (float)config.throwWhiffFrames, 0f, 1f);
+            throwPoseTime = grab.duration * (k < 0.5f ? 2f * k : 2f - 2f * k) * 0.999f;
+            return SpriteStates.THROW_GRAB;
+        }
         CharacterDefinition.Move move = character.moves.get(toss ? "H" : "L");
         if (move == null || move.animation == null) return null;
         AttackDefinition a = move.attack;
