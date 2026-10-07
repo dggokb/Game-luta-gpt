@@ -954,4 +954,19 @@ public class CombatEngineTest {
         s.until(() -> !s.f(0).firingBeam(), s.engine.ultraBeamFrames(10) + 30);
         assertEquals(0, s.f(1).state.life);
     }
+
+    @Test public void finalBeamChargesBeforeTheFirstHit() {
+        Sim s = ultraConnected();
+        CombatConfig config = s.engine.config;
+        int life = s.f(1).state.life;
+        float attackerX = s.f(0).x;
+        s.engine.startUltraBeam(0, 1000, 5);
+        s.steps(config.ultraBeamFireFrame() + config.ultraBeamExtendFrames - 1);
+        assertEquals("no damage while charging and reaching", life, s.f(1).state.life);
+        assertTrue(s.f(1).inHitstun());
+        s.step();
+        assertTrue("the first hit lands when the beam arrives", s.f(1).state.life < life);
+        s.until(() -> !s.f(0).firingBeam(), s.engine.ultraBeamFrames(5) + 30);
+        assertTrue("recoil slides the attacker back", (attackerX - s.f(0).x) * s.f(0).facing > 0f);
+    }
 }

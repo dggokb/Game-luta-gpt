@@ -22,7 +22,7 @@ KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH')}
-SPECIALS = ('S','SUPER')
+SPECIALS = ('S','SUPER','ULTRA')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM'}
@@ -246,7 +246,7 @@ def compile_packs(root, results):
         specials = pack.get('specialAnimations', {})
         for key,animation in specials.items():
             if key not in SPECIALS or animation not in animations or animations[animation]['loop'] or 'durationsMs' not in animations[animation]:
-                raise ValueError(f'{key}: special animation must be S/SUPER bound to a timed one-shot')
+                raise ValueError(f'{key}: special animation must be S/SUPER/ULTRA bound to a timed one-shot')
         # Free-form names are allowed only for clips something actually plays; this
         # turns a typo such as "HIT_STAN" into a build error instead of a silent fallback.
         used = {m['animation'] for m in moves.values() if 'animation' in m} | set(specials.values())

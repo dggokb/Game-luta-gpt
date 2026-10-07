@@ -1,0 +1,15 @@
+{
+  "id": "player_base_ultra_beam",
+  "javaName": "ULTRA_BEAM",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_ultra_beam_source.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_ultra_beam.png",
+  "report": "tools/sprites/reports/player_base_ultra_beam.report.json",
+  "preview": "android/app/build/sprite-review/ultra-beam-import.png",
+  "expectedFrames": 9,
+  "segmentation": "horizontal-alpha-components",
+  "rootMode": "ground-feet",
+  "scaleMode": "canonical-anatomy",
+  "anatomyReferenceFrame": 8,
+  "footBandRatio": 0.04
+}

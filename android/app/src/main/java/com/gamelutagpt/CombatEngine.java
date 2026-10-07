@@ -821,7 +821,8 @@ final class CombatEngine {
     private void updateUltraBeam(CombatFighter a, CombatFighter d) {
         if (!a.firingBeam() || a.frozen() || a.beamHitsDone > a.beamHits) return;
         if (a.beamHitsDone < a.beamHits) {
-            int at = config.ultraBeamExtendFrames + config.ultraBeamHitInterval * a.beamHitsDone;
+            int at = config.ultraBeamFireFrame() + config.ultraBeamExtendFrames +
+                config.ultraBeamHitInterval * a.beamHitsDone;
             if (a.ultraFrame < at) return;
             int damage = a.beamDamageLeft / (a.beamHits - a.beamHitsDone);
             a.beamDamageLeft -= damage;
@@ -829,6 +830,7 @@ final class CombatEngine {
             dealUltraDamage(a, d, damage);
             keepInBeam(a, d);
             push(d, a, a.facing * config.ultraBeamPushPerHit);
+            a.x = Arena.clamp(a.x - a.facing * config.ultraBeamRecoilPerHit, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
         } else if (a.ultraFrame >= config.ultraBeamBlastFrame(a.beamHits)) {
             a.beamHitsDone++;
             dealUltraDamage(a, d, a.beamBlastDamage + a.beamDamageLeft);

@@ -67,7 +67,7 @@ Estado próprio `ULTRA` no `CombatFighter`, com quatro fases. Os valores ficam e
 | `ULTRA_RUSH` | até 18 | Avança a 2000 u/s. Conecta quando o corpo do alvo está a até `ultraReach` à frente. |
 | `ULTRA_RECOVERY` | 30 | Errou ou foi defendido. É punível. |
 | `ULTRA_CINEMATIC` | — | Acertou. O motor marca `ultraConnected()` e espera. |
-| `ULTRA_BEAM` | 8 + 4 × (hits − 1) + 6 + 18 | Raio final depois da cinemática: acertos pequenos, explosão e arremesso. Não pode ser atingido. |
+| `ULTRA_BEAM` | 36 + 8 + 4 × (hits − 1) + 6 + 18 | Raio final depois da cinemática: carga, acertos pequenos (com recuo), explosão e arremesso. Não pode ser atingido. |
 
 - O pedido vem de `FighterInput.ultra`, que o `PadInput` liga com ↓ + SUPER. Sem 3 barras,
   o aperto vira um SUPER comum. O pedido fica no buffer por `bufferFrames`, mas só começa
@@ -91,7 +91,7 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `ultraConnectsUpCloseAndTheCinematicDealsScaledDamage`, `ultraAfterAComboIsScaled`,
 `guardedUltraIsBlockedWithoutCinematic`, `ultraWhiffsFromFarAndRecovers`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
-`finalBeamOnAKnockedOutDefenderStillEnds`.
+`finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
 ## Frame data no Character Pack (schema 3)
 

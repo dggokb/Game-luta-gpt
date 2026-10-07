@@ -58,17 +58,20 @@ acontece no tempo normal. Sem toque, a detonação acontece no fim da janela BOM
 
 ## Raio final
 
-Quando a página quebra, a luta volta com o atacante disparando o raio amarelo, no estilo
-dos hipers de Marvel vs Capcom: o feixe atravessa a tela, acerta várias vezes seguidas e
-o contador de hits sobe a cada acerto, até a explosão final arremessar o oponente.
+Quando a página quebra, a luta volta com o atacante carregando e disparando o raio amarelo,
+no estilo do Kamehameha dos hipers de Marvel vs Capcom: aura acesa, vento e poeira
+levantando, a esfera crescendo nas mãos, o disparo com onda de choque, o feixe atravessando
+a tela com o contador de hits subindo a cada acerto e a explosão final arremessando o
+oponente.
 
 **Regra (motor, `CombatEngine`)**: fase `ULTRA_BEAM`, valores em `CombatConfig.ultraBeam*`.
 
 | Frame da fase | O que acontece |
 | --- | --- |
 | 0 | `startUltraBeam(atacante, dano, hits)`: os lutadores ficam a `ultraBeamDistance` (520) um do outro; o defensor fica preso em hitstun, sem cair |
-| 0 → 8 | O feixe vai das mãos até o alvo |
-| 8, 12, 16... | Um acerto pequeno a cada 4 frames (`hits` do `ultra.json`, padrão 20): dano, +1 no combo, o defensor recua 7 px |
+| 0 → 36 | Carga (`ultraBeamChargeFrames`, o "KA-ME-HA-ME"): sem dano |
+| 36 → 44 | "HA!": o feixe vai das mãos até o alvo |
+| 44, 48, 52... | Um acerto pequeno a cada 4 frames (`hits` do `ultra.json`, padrão 20): dano, +1 no combo, o defensor recua 7 px e o atacante 1,5 px (recuo) |
 | último + 6 | Explosão: o resto do dano (30% do raio), hitstop de 12 e o arremesso de sempre (cai derrubado) |
 | + 18 | O feixe some e o atacante fica livre |
 
@@ -76,14 +79,29 @@ O dano do raio usa a escala fixada no acerto do ultra e é dividido sem sobra (a
 acertos é exatamente o dano do raio). O atacante não pode ser atingido durante o raio.
 
 **Desenho (`RaioFinal`, ultra-core)**: só desenha, no mundo da luta, a partir do estado do
-motor: a esfera nas mãos (`inicio`), o feixe repetido correndo para a frente (`corpo`), a
-frente do feixe (`ponta`), a explosão a cada acerto e a grande explosão final (`impacto`).
-Sem imagens, desenha um raio com as cores do ultra. O `GameView` ainda escurece o cenário,
-treme a tela a cada acerto e dá um clarão branco na explosão. O contador de hits do HUD
-pula a cada acerto novo.
+motor, em duas passadas:
 
-As mãos ficam no punho esticado do soco forte (medido no sprite: 0,68 e 0,67 da altura do
-personagem à frente e acima da base), e o lutador fica nessa pose enquanto dispara.
+- `drawBehind` (antes dos lutadores): a **aura** em chamas atrás do atacante (folha
+  animada), o chão iluminado, a **poeira** (levantando dos dois lados dos pés na carga,
+  explodindo atrás dos pés no disparo, arrastando para trás no recuo e rolando embaixo do
+  feixe) e as rajadas de **vento** soprando para trás em volta do corpo.
+- `drawFront` (depois): na carga, a esfera crescendo nas mãos com vento girando e faíscas
+  sendo sugadas; no disparo, a onda de choque; depois, o feixe (`corpo` repetido, correndo
+  para a frente e com a espessura ondulando em fatias), a `ponta`, anéis de energia
+  correndo pelo feixe, vento correndo nas bordas dele, a esfera `inicio` nas mãos, a
+  explosão e um anel de choque a cada acerto e a grande explosão final (com poeira).
+
+Sem imagens, cada parte tem um desenho simples com as cores do ultra. O `GameView` ainda
+aproxima a câmera durante a carga (e abre de novo no disparo), escurece o cenário, treme a
+tela e dá um clarão branco na explosão. O contador de hits do HUD pula a cada acerto novo.
+
+**Pose do personagem**: com a animação `ULTRA` em `specialAnimations` (folha de 9 poses:
+sai da guarda, carga, carga máxima, disparo, 3 de sustentação com a roupa no vento,
+recuperação, guarda), `RaioFinal.poseFrame` escolhe o quadro pelo frame da fase: carga
+alternando 1 e 2, disparo no 3, sustentação no ciclo 4-5-6-5 e a volta 7-8 depois da
+explosão. As mãos vêm de `raio.maos` no `ultra.json` (medidas no sprite). Sem a folha, o
+lutador usa o soco forte (braço recolhido na carga, esticado no disparo) e as mãos
+medidas nele.
 
 ## Camadas do desenho
 
@@ -113,6 +131,7 @@ O tremor da tela é um `translate` aleatório que decai 70 px/s.
 | Mudar o ritmo | Constantes no topo de `PaginaFinal` (`SLAM_AT`, `TARGET_AT`...) |
 | Mudar a divisão do dano | `PaginaFinal.HIT_FRACTION` e `PaginaFinal.BEAM_FRACTION` |
 | Mudar o ritmo do raio | `CombatConfig.ultraBeam*`; quantidade de hits e espessura no `ultra.json` |
+| Mudar a aura, o vento ou a poeira | `RaioFinal` (tamanhos, quantidades e velocidades); as folhas no `ultra.json` |
 | Ver o raio no PC | `gradle :pc-preview:runRaio` (grava quadros em PNG) |
 | Mudar o layout dos painéis | `PaginaFinal.PANELS` (polígonos em coordenadas de tela) |
 | Mudar a arte provisória | `ArteProvisoria` |

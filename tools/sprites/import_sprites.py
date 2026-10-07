@@ -145,7 +145,9 @@ def process_clip(config_path):
     root_tolerance = float(validation["rootTolerance"])
     width_step = int(validation["widthStep"])
     height_step = int(validation.get("heightStep", width_step))
-    foot_band_ratio = float(validation["footBandRatio"])
+    # A clip whose feet do not rest on exactly the same row (wide stances drawn by AI)
+    # may widen the band so both feet are measured the same way before and after scaling.
+    foot_band_ratio = float(cfg.get("footBandRatio", validation["footBandRatio"]))
     min_foot_width = int(validation["minFootWidth"])
     min_opaque = int(cfg.get("minOpaquePixels", validation["minOpaquePixels"]))
     max_upscale = float(validation["maxUpscale"])

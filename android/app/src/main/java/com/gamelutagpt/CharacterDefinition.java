@@ -42,6 +42,13 @@ final class CharacterDefinition {
             float hold=durations[0];
             return hold+Math.max(0f,Math.min(1f,progress))*(duration-hold-0.0001f);
         }
+        /** Clip time that shows the given frame of the clip (its middle). */
+        float timeOfFrame(int index) {
+            int i=Math.max(0,Math.min(durations.length-1,index));
+            float t=durations[i]*0.5f;
+            for(int k=0;k<i;k++)t+=durations[k];
+            return t;
+        }
         /** Maps a gameplay clock of the given length onto this clip, keeping frame proportions. */
         float timeFor(float elapsed,float gameplayDuration) {
             if(gameplayDuration<=0f)return elapsed;

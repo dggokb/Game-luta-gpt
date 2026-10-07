@@ -124,6 +124,12 @@ final class GeneratedSpriteLayouts {
     static final int MOVEMENT_ROOT_Y = 220;
     static final int MOVEMENT_FRAME_COUNT = 16;
 
+    static final int ULTRA_BEAM_FRAME_WIDTH = 276;
+    static final int ULTRA_BEAM_FRAME_HEIGHT = 253;
+    static final int ULTRA_BEAM_ROOT_X = 143;
+    static final int ULTRA_BEAM_ROOT_Y = 244;
+    static final int ULTRA_BEAM_FRAME_COUNT = 9;
+
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_WIDTH = 232;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_HEIGHT = 239;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_ROOT_X = 105;

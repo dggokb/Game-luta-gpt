@@ -38,6 +38,28 @@
     ],
     "impacto": "raio_impacto.png",
     "hits": 20,
-    "espessura": 150
+    "espessura": 150,
+    "aura": {
+      "imagem": "raio_aura.png",
+      "quadros": 4
+    },
+    "vento": {
+      "imagem": "raio_vento.png",
+      "quadros": 4
+    },
+    "poeira": {
+      "imagem": "raio_poeira.png",
+      "quadros": 4
+    },
+    "maos": {
+      "carga": [
+        -26,
+        124
+      ],
+      "disparo": [
+        112,
+        152
+      ]
+    }
   }
 }

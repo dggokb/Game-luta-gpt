@@ -80,10 +80,15 @@ Tudo é opcional, menos `nome`. O script preserva as onomatopeias, sons e posiç
 
 ## Raio final
 
-Quando a página quebra, o personagem dispara um raio que acerta várias vezes (o contador de
-hits vai subindo) e termina numa explosão que arremessa o oponente. São 4 imagens com
-**fundo preto puro** (não transparente: brilho com fundo transparente sai com borda feia).
-Cole antes de cada prompt:
+Quando a página quebra, o personagem carrega e dispara um raio estilo Kamehameha que acerta
+várias vezes (o contador de hits vai subindo) e termina numa explosão que arremessa o
+oponente. A arte tem três partes: o **raio** (4 imagens), os **efeitos animados** (aura,
+vento e poeira) e a **pose do personagem** (folha de 9 sprites).
+
+### O raio
+
+São 4 imagens com **fundo preto puro** (não transparente: brilho com fundo transparente sai
+com borda feia). Cole antes de cada prompt:
 
 ```
 Efeito visual de energia para jogo de luta 2D em estilo anime, traço limpo, cores ricas,
@@ -107,18 +112,73 @@ python tools/ultra/preparar_raio.py --id player_base --corpo corpo.png \
     --ponta ponta.png --espelhar-ponta --inicio inicio.png --impacto impacto.png
 ```
 
-O script grava `raio_*.png` e o bloco `raio` do `ultra.json`:
-
-```json
-"raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
-          "centroInicio": [0.443, 0.479], "impacto": "raio_impacto.png", "hits": 20, "espessura": 150 }
-```
+O script grava `raio_*.png` e o bloco `raio` do `ultra.json` (o que você não passar
+continua como estava):
 
 - `hits`: acertos pequenos antes da explosão (1 a 60). Mais hits = raio mais longo.
 - `espessura`: altura do feixe no mundo do jogo, em pixels (o personagem tem uns 226).
 - `centroInicio`: onde está o centro da esfera na imagem `inicio` (o script acha sozinho).
 
-Sem o bloco `raio` ou sem imagens, o raio é desenhado pelo jogo com as cores do ultra.
+### Efeitos animados
+
+Três folhas de 4 quadros lado a lado. Cole antes de cada prompt:
+
+```
+Efeito visual para jogo de luta 2D em estilo anime, traço limpo, desenhado à mão.
+4 quadros de animação lado a lado, mesmo tamanho e mesma posição em todos, espaço vazio
+entre eles. Sem personagens, sem texto, sem marca d'água, sem chão, sem cenário.
+```
+
+| Arquivo | Fundo | Prompt |
+|---|---|---|
+| aura | preto puro | Aura de energia {cor-nome} em forma de chamas subindo, como a de um guerreiro de anime se energizando: labaredas em volta de um espaço vazio do tamanho de uma pessoa em pé (o meio é preto, sem corpo), mais intensa embaixo, com faíscas. Os quadros mostram as labaredas tremulando, em loop. |
+| vento | preto puro | Rajada de vento de anime: feixes de linhas curvas brancas e amarelo-claras, com pequenos redemoinhos, horizontal e alongada. Os quadros mostram o vento em movimento, em loop. |
+| poeira | transparente | Nuvem de poeira e fumaça de anime rolando rente ao chão, bege-claro e cinza-claro, com pedrinhas soltas, base reta embaixo. Os quadros: nascendo pequena, crescendo, no máximo e se desfazendo. |
+
+```bash
+python tools/ultra/preparar_raio.py --id player_base --aura aura.png --vento vento.png --poeira poeira.png
+```
+
+O script separa os quadros pelos vãos vazios entre eles (o GPT não respeita colunas
+iguais), alinha a aura e a poeira pela base e o vento pelo centro, e limpa o véu quase
+invisível que o fundo "transparente" do GPT deixa (num cenário escuro ele vira uma caixa
+clara). Na folha, o vento sopra para a direita; o jogo espelha quando precisa.
+
+### Pose do personagem
+
+Folha de 9 poses do mesmo personagem (anexe uma folha dele como referência no ChatGPT),
+virado para a direita, **fundo transparente**, grade 3 × 3: 1. sai da guarda com as mãos
+em concha na cintura; 2. carga; 3. carga máxima, gritando, roupa e cabelo subindo no vento;
+4. disparo, as duas mãos empurradas para a frente, roupa jogada para trás; 5-7. sustentando
+o disparo com a roupa tremulando (7 inclinado pelo recuo); 8. recuperação; 9. guarda. Sem
+energia nas mãos (o jogo desenha). Para importar:
+
+```bash
+python3 tools/sprites/separar_folha.py folha.png --colunas 3 --linhas 3 \
+    art/sprites/source/<id>_ultra_beam_source.png
+python3 tools/sprites/build_characters.py --write
+```
+
+O clip fica em `tools/sprites/clips/<id>_ultra_beam.json` e o `character.json` liga a
+animação em `specialAnimations` como `"ULTRA"` (veja `player_base`). Depois meça onde ficam
+as mãos (pose 2 para a carga e 4 para o disparo, em pixels à frente e acima da raiz) e
+anote em `raio.maos`.
+
+### ultra.json
+
+```json
+"raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
+          "centroInicio": [0.443, 0.479], "impacto": "raio_impacto.png", "hits": 20, "espessura": 150,
+          "aura": {"imagem": "raio_aura.png", "quadros": 4},
+          "vento": {"imagem": "raio_vento.png", "quadros": 4},
+          "poeira": {"imagem": "raio_poeira.png", "quadros": 4},
+          "maos": {"carga": [-26, 124], "disparo": [112, 152]} }
+```
+
+- `maos`: mãos na pose de carga (onde a esfera cresce) e no disparo (de onde o raio sai).
+
+Sem o bloco `raio` ou sem alguma imagem, aquela parte é desenhada pelo jogo com as cores do
+ultra; sem a folha de pose, o personagem usa o soco forte.
 Para ver no PC: `gradle :pc-preview:runRaio` grava os quadros em `build/raio/`.
 
 ## Sons
@@ -131,11 +191,11 @@ Coloque arquivos `.ogg`, `.wav` ou `.mp3` em `assets/ultras/sons/` (valem para t
 | `investida` | começa a investida |
 | `pagina` | a cinemática começa |
 | `painel` | cada painel bate na página |
-| `carga` | painel de carga (ou o `som` do painel) |
+| `carga` | painel de carga (ou o `som` do painel) e a carga do raio final |
 | `impacto` | golpe e atingido (ou o `som` do painel) |
 | `explosao` | detonação final (ou o `som` do painel) e explosão do raio |
 | `quebra` | a página estilhaça |
-| `raio` | o raio final é disparado |
+| `raio` | o raio final sai das mãos ("HA!") |
 
 Som que não existe é ignorado. O jogo funciona mudo até os sons chegarem.
 

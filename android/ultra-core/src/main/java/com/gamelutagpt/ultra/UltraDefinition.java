@@ -67,13 +67,21 @@ public final class UltraDefinition {
         public final int hits;
         /** Altura do feixe no mundo do jogo, em pixels (a imagem do corpo inteira). */
         public final float thickness;
+        /** Folhas animadas (quadros lado a lado): aura atrás do corpo, rajadas de vento, poeira. */
+        public final Sheet aura, wind, dust;
+        /**
+         * Onde ficam as mãos na pose de carga e na de disparo: {à frente, acima} da raiz do
+         * lutador, em pixels do mundo. Null quando o sprite não tem pose própria.
+         */
+        public final float[] chargeHands, fireHands;
 
         public static final int DEFAULT_HITS = 20;
         public static final float DEFAULT_THICKNESS = 150f;
-        static final Beam DEFAULT = new Beam(null, null, null, null, null, DEFAULT_HITS, DEFAULT_THICKNESS);
+        static final Beam DEFAULT = new Beam(null, null, null, null, null, DEFAULT_HITS, DEFAULT_THICKNESS,
+            null, null, null, null, null);
 
         Beam(String bodyPath, String tipPath, String startPath, float[] startCenter, String impactPath,
-             int hits, float thickness) {
+             int hits, float thickness, Sheet aura, Sheet wind, Sheet dust, float[] chargeHands, float[] fireHands) {
             if (hits < 1 || hits > 60) throw new IllegalArgumentException("\"hits\" do raio deve ser de 1 a 60");
             if (thickness <= 0f) throw new IllegalArgumentException("\"espessura\" do raio deve ser positiva");
             this.bodyPath = bodyPath;
@@ -83,6 +91,23 @@ public final class UltraDefinition {
             this.impactPath = impactPath;
             this.hits = hits;
             this.thickness = thickness;
+            this.aura = aura;
+            this.wind = wind;
+            this.dust = dust;
+            this.chargeHands = chargeHands;
+            this.fireHands = fireHands;
+        }
+    }
+
+    /** Uma folha de animação: {@code frames} quadros do mesmo tamanho, lado a lado. */
+    public static final class Sheet {
+        public final String path;
+        public final int frames;
+
+        Sheet(String path, int frames) {
+            if (frames < 1) throw new IllegalArgumentException("\"quadros\" deve ser pelo menos 1");
+            this.path = path;
+            this.frames = frames;
         }
     }
 
@@ -176,10 +201,39 @@ public final class UltraDefinition {
                 positionField(raio, "centroInicio"),
                 stringField(raio, "impacto", null),
                 numberField(raio, "hits", Beam.DEFAULT_HITS).intValue(),
-                numberField(raio, "espessura", Beam.DEFAULT_THICKNESS).floatValue()
+                numberField(raio, "espessura", Beam.DEFAULT_THICKNESS).floatValue(),
+                sheetField(raio, "aura"),
+                sheetField(raio, "vento"),
+                sheetField(raio, "poeira"),
+                handsField(raio, "carga"),
+                handsField(raio, "disparo")
             );
         }
         return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels, beam);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Sheet sheetField(Map<String, Object> raio, String key) {
+        Object value = raio.get(key);
+        if (value == null) return null;
+        if (!(value instanceof Map)) throw new IllegalArgumentException("\"" + key + "\" deve ser {\"imagem\", \"quadros\"}");
+        Map<String, Object> map = (Map<String, Object>)value;
+        String path = stringField(map, "imagem", null);
+        if (path == null) throw new IllegalArgumentException("\"" + key + "\" precisa de \"imagem\"");
+        return new Sheet(path, numberField(map, "quadros", 1).intValue());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static float[] handsField(Map<String, Object> raio, String key) {
+        if (!(raio.get("maos") instanceof Map)) return null;
+        Object value = ((Map<String, Object>)raio.get("maos")).get(key);
+        if (value == null) return null;
+        if (!(value instanceof java.util.List) || ((java.util.List<?>)value).size() != 2
+            || !(((java.util.List<?>)value).get(0) instanceof Number) || !(((java.util.List<?>)value).get(1) instanceof Number)) {
+            throw new IllegalArgumentException("\"maos." + key + "\" deve ser [à frente, acima] em pixels");
+        }
+        java.util.List<?> list = (java.util.List<?>)value;
+        return new float[]{((Number)list.get(0)).floatValue(), ((Number)list.get(1)).floatValue()};
     }
 
     private static Number numberField(Map<String, Object> map, String key, Number fallback) {

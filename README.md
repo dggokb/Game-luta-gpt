@@ -168,3 +168,18 @@ explosão que arremessa o oponente. O bônus do toque no tempo certo vale també
 - Prompts e o script que prepara as imagens (fundo preto vira transparência):
   [tools/ultra/README.md](tools/ultra/README.md#raio-final). Por dentro: `docs/ultra-pagina-final.md`.
 - Ver no PC: `gradle :pc-preview:runRaio`.
+
+## Raio estilo Kamehameha — v0.78
+
+O raio final do ultra ganhou carga e animação de verdade, como um Kamehameha de Marvel vs
+Capcom: o personagem tem uma **folha de pose própria** (carga com as mãos na cintura,
+disparo, sustentação com a roupa batendo no vento e recuperação), a **aura** em chamas
+acende atrás dele, o **vento** gira para dentro da esfera que cresce nas mãos e a
+**poeira** levanta do chão; no "HA!" vem a onda de choque, a câmera abre, o raio ondula
+com anéis correndo por ele e vento nas bordas, o recuo arrasta o pé soltando poeira e
+nuvens rolam embaixo do feixe. Toda a arte é do GPT.
+
+- Pose do personagem pelo pipeline de sprites (`specialAnimations.ULTRA`), com
+  `tools/sprites/separar_folha.py` para folhas desenhadas em grade apertada.
+- Efeitos preparados por `tools/ultra/preparar_raio.py --aura --vento --poeira`.
+- Prompts e passo a passo: [tools/ultra/README.md](tools/ultra/README.md#raio-final).

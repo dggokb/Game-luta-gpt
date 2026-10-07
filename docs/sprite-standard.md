@@ -114,8 +114,15 @@ Caminhada acompanha deslocamento físico, inclusive ao virar para o outro lado.
 Colisão com a borda não deve produzir passos no lugar. Ataques usam o relógio de
 combate; reiniciar o mesmo golpe reinicia o frame, sem herdar a recuperação anterior.
 Os IDs de animação de ataque são livres: não é necessário alterar um enum Java.
-`specialAnimations` pode ligar `S` (energia) e `SUPER` a animações one-shot; o tempo do
-especial é esticado sobre a animação.
+`specialAnimations` pode ligar `S` (energia), `SUPER` e `ULTRA` a animações one-shot; o tempo
+do especial é esticado sobre a animação. `ULTRA` é a folha de 9 poses do raio final do
+ultra; o jogo escolhe o quadro pela fase do raio (veja `docs/ultra-pagina-final.md`).
+
+Folhas do GPT desenhadas numa grade apertada (uma mão ou tira entra na célula vizinha)
+passam antes por `tools/sprites/separar_folha.py`, que devolve cada pedaço ao quadro dono e
+monta uma faixa com espaço entre os quadros. Quando os pés de uma pose larga não ficam na
+mesma linha, o clip pode aumentar a faixa usada para achar os pés com `footBandRatio`
+(padrão do perfil: 0,025).
 
 ## Novo golpe usando um comando existente
 

@@ -18,14 +18,18 @@ public final class UltraPack {
     public final RenderImage beamTip;
     public final RenderImage beamStart;
     public final RenderImage beamImpact;
+    /** Folhas animadas do raio (podem ser null). */
+    public final RenderImage beamAura;
+    public final RenderImage beamWind;
+    public final RenderImage beamDust;
     /** Problemas não fatais encontrados ao carregar (imagem faltando etc.). */
     public final List<String> warnings;
 
     public UltraPack(UltraDefinition definition, RenderImage[] images, List<String> warnings) {
-        this(definition, images, new RenderImage[4], warnings);
+        this(definition, images, new RenderImage[7], warnings);
     }
 
-    /** @param beamImages corpo, ponta, início e impacto do raio, nessa ordem */
+    /** @param beamImages corpo, ponta, início, impacto, aura, vento e poeira do raio, nessa ordem */
     public UltraPack(UltraDefinition definition, RenderImage[] images, RenderImage[] beamImages,
                      List<String> warnings) {
         this.definition = definition;
@@ -34,6 +38,9 @@ public final class UltraPack {
         beamTip = beamImages[1];
         beamStart = beamImages[2];
         beamImpact = beamImages[3];
+        beamAura = beamImages.length > 4 ? beamImages[4] : null;
+        beamWind = beamImages.length > 5 ? beamImages[5] : null;
+        beamDust = beamImages.length > 6 ? beamImages[6] : null;
         this.warnings = Collections.unmodifiableList(new ArrayList<>(warnings));
     }
 
@@ -70,7 +77,9 @@ public final class UltraPack {
             }
         }
         UltraDefinition.Beam beam = definition.beam;
-        String[] beamPaths = {beam.bodyPath, beam.tipPath, beam.startPath, beam.impactPath};
+        String[] beamPaths = {beam.bodyPath, beam.tipPath, beam.startPath, beam.impactPath,
+            beam.aura != null ? beam.aura.path : null, beam.wind != null ? beam.wind.path : null,
+            beam.dust != null ? beam.dust.path : null};
         RenderImage[] beamImages = new RenderImage[beamPaths.length];
         for (int i = 0; i < beamPaths.length; i++) {
             if (beamPaths[i] == null) continue;
