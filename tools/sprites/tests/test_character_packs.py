@@ -262,12 +262,12 @@ class CharacterPackTests(unittest.TestCase):
         d['transform']['scale']=1.2;path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'requires allowUpscale'):pipeline.build(self.root)
 
-    def test_player_base_air_jab_is_scaled_by_head_and_registered_in_the_air(self):
+    def test_player_base_air_attacks_are_declared_with_video_art(self):
         pipeline.build(self.root)
         report=json.loads((self.root/'tools/sprites/reports/player_base_jump_light.report.json').read_text())
-        self.assertTrue(report['anatomy']['passed'])
-        self.assertAlmostEqual(0.416,report['scale'],delta=0.02)
-        self.assertTrue(all(f['frameShift'][1]<0 for f in report['frames']))  # feet lifted off the ground
+        self.assertTrue(report['passed'])
+        self.assertEqual(7,report['layout']['frameCount'])
+        self.assertTrue(all(f['minimumMargin']>=8 for f in report['frames']))
         pack=json.loads(self.path.read_text())
         self.assertEqual('JUMP_LIGHT',pack['moves']['jL']['animation'])
         self.assertEqual('JUMP_MEDIUM',pack['moves']['jM']['animation'])
@@ -286,7 +286,8 @@ class CharacterPackTests(unittest.TestCase):
         pipeline.build(self.root)
         for key in ('medium','heavy'):
             report=json.loads((self.root/f'tools/sprites/reports/player_base_jump_{key}.report.json').read_text())
-            self.assertEqual(4,report['layout']['frameCount'])
+            clip=json.loads((self.root/f'tools/sprites/clips/player_base_jump_{key}.json').read_text())
+            self.assertEqual(clip['expectedFrames'],report['layout']['frameCount'])
             self.assertTrue(report['passed'])
 
     def test_player_base_defense_and_fall_share_one_scale_and_new_states(self):

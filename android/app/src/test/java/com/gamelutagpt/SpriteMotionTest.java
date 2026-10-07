@@ -74,7 +74,7 @@ public class SpriteMotionTest {
             m.update(.016f,true,false,0,0,true,false,false,animation,0f,true,false);
             assertEquals(animation,m.clip);assertEquals(0,m.frame());
             m.update(.016f,true,false,0,0,true,false,false,animation,move.animation.duration-.001f,true,false);
-            assertEquals(move.animation.atlas.count-1,m.frame());
+            assertEquals(move.animation.frame(move.animation.duration-.001f,0),m.frame());
             // A repeated L/M/H must not inherit the preceding attack's recovery clock.
             m.update(.016f,true,false,0,0,true,false,false,animation,0f,true,false);
             assertEquals(0,m.frame());

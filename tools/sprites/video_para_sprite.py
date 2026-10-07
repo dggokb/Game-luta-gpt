@@ -81,6 +81,15 @@ def key(frame, dust=False, effects=False):
     if n > 1:
         keep = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
         alpha = np.where(labels == keep, alpha, 0).astype(np.uint8)
+    # Furinhos dentro do corpo (reflexo verde na roupa branca) voltam a ser opacos;
+    # vãos grandes, como entre as pernas, continuam transparentes.
+    holes = (alpha == 0).astype(np.uint8)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(holes)
+    h_, w_ = alpha.shape
+    for i in range(1, n):
+        x, y, w, h, area = stats[i]
+        if area < 600 and x > 0 and y > 0 and x + w < w_ and y + h < h_:
+            alpha[labels == i] = 255
     alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(int)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda

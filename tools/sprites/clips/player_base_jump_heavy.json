@@ -2,40 +2,15 @@
   "id": "player_base_jump_heavy",
   "javaName": "JUMP_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_jump_heavy_source.png",
+  "source": "art/sprites/source/player_base_jump_heavy_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_heavy.png",
   "report": "tools/sprites/reports/player_base_jump_heavy.report.json",
-  "preview": "android/app/build/sprite-review/jump-heavy-import.png",
-  "expectedFrames": 4,
-  "segmentation": "alpha-components",
-  "rootMode": "ground-feet",
-  "scaleMode": "canonical-anatomy",
-  "anatomyReferenceFrame": 0,
-  "anatomyReference": {
-    "bands": [
-      [
-        0.0,
-        0.12
-      ]
-    ]
-  },
-  "sourceNote": "jH air hammer: guard, both fists raised, downward hammer dive, recovery. Separated by connected components (poses overlap in x). Scaled by head width against the canonical Idle. Airborne registration: torso and feet height aligned with the approved JUMP/FALL frames (torso -13 px, feet 12 px above the root).",
-  "frameShift": {
-    "0": [
-      -79,
-      -11
-    ],
-    "1": [
-      -77,
-      -11
-    ],
-    "2": [
-      -81,
-      -12
-    ],
-    "3": [
-      -62,
-      -12
-    ]
-  }
+  "preview": "android/app/build/sprite-review/jump_heavy-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "rootX": 150,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador."
 }
