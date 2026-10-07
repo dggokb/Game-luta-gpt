@@ -289,6 +289,9 @@ final class CombatEngine {
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
             }
+        } else if (f.status == CombatFighter.Status.NEUTRAL && !f.grounded && !f.airDashUsed &&
+            Arena.GROUND_Y - f.y >= config.airDashMinHeight && (f.dashRequest || f.backdashRequest)) {
+            startAirDash(f, f.backdashRequest && !f.dashRequest);
         }
         f.dashRequest = f.backdashRequest = false;
 
@@ -434,6 +437,15 @@ final class CombatEngine {
         return ("L".equals(binding) || "M".equals(binding)) && f.attackFrame < f.attack.startupFrames;
     }
 
+    /** Air dash: a fixed burst forward (or back) that holds the height; one per jump. */
+    private void startAirDash(CombatFighter f, boolean back) {
+        f.airDashUsed = true;
+        f.airDashBack = back;
+        f.airDashDirection = back ? -f.facing : f.facing;
+        f.airDashFrames = back ? config.backAirDashFrames : config.airDashFrames;
+        f.vy = 0f;
+    }
+
     private void startThrow(CombatFighter f) {
         f.status = CombatFighter.Status.THROW;
         f.clearAttack();
@@ -529,6 +541,17 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        if (f.airDashFrames > 0) {
+            // The burst keeps going under the air normals started from it; a hit stops it.
+            if (f.grounded || !(f.status == CombatFighter.Status.NEUTRAL || f.attacking())) {
+                f.airDashFrames = 0;
+            } else {
+                f.x += f.airDashDirection * (f.airDashBack ? config.backAirDashSpeed : config.airDashSpeed) *
+                    CombatConfig.DT;
+                f.airDashFrames--;
+                return;
+            }
+        }
         int direction = f.input.direction;
         int horizontal = direction == 4 || direction == 5 || direction == 6 ? -1
             : direction == 1 || direction == 2 || direction == 8 ? 1 : 0;
@@ -556,6 +579,11 @@ final class CombatEngine {
 
     private void moveVertically(CombatFighter f) {
         if (f.grounded) return;
+        if (f.airDashFrames > 0 && f.status == CombatFighter.Status.NEUTRAL) {
+            // Air dash: the height holds until the burst ends (an attack lets gravity back in).
+            f.vy = 0f;
+            return;
+        }
         if (heldByBeam(f)) {
             // Caught in the beam: it stays at the height it was hit.
             f.vy = 0f;
@@ -576,6 +604,8 @@ final class CombatEngine {
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.grounded = true;
+        f.airDashFrames = 0;
+        f.airDashUsed = false;
         f.superJumping = false;
         if (f.attacking() && f.move != null && f.attack.id.startsWith("j")) {
             // Landing ends an air normal.
@@ -602,6 +632,8 @@ final class CombatEngine {
         f.knockdownFrame = 0;
         f.stunLeft = 0;
         f.grounded = true;
+        f.airDashFrames = 0;
+        f.airDashUsed = false;
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.launched = false;

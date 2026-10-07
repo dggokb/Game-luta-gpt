@@ -103,6 +103,15 @@ final class CombatFighter {
     int beamDamageLeft;
     int beamBlastDamage;
 
+    // Air dash.
+    /** Frames of air dash left (0 when not dashing). */
+    int airDashFrames;
+    /** World direction of the current air dash (+1 right, -1 left). */
+    int airDashDirection;
+    boolean airDashBack;
+    /** The air dash of this jump was spent; landing gives it back. */
+    boolean airDashUsed;
+
     // Throw.
     int throwPhase;
     int throwFrame;

@@ -86,6 +86,22 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
+    /** Air dash streaks behind the body; canvas is mirrored so the motion goes right. */
+    void drawAirDash(Canvas c, Paint paint, float x, float baseY, int color) {
+        float centerY = baseY - 90f;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        for (int i = 0; i < 4; i++) {
+            float y = centerY - 48f + i * 32f;
+            float length = 70f + (i % 2) * 45f;
+            paint.setStrokeWidth(i % 2 == 0 ? 4f : 2.5f);
+            paint.setColor(i % 2 == 0 ? Color.argb(170, 255, 255, 255) : (color & 0x00FFFFFF) | 0xB4000000);
+            c.drawLine(x - 30f - length, y, x - 30f, y, paint);
+        }
+        paint.setStrokeCap(Paint.Cap.BUTT);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
     /** Charge rings and speed lines around the fighter; canvas is already mirrored to its facing. */
     void drawSuperCharge(Canvas c, Paint paint, float x, float baseY, float phaseTimer, int color) {
         float centerY = baseY - 78f;

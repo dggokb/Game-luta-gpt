@@ -858,6 +858,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
 
             drawPartner(canvas);
+            drawAirDashTrail(canvas, player());
+            drawAirDashTrail(canvas, opponent());
             canvas.save();
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
@@ -993,6 +995,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (p.forwardDashing) return "DASH";
         if (p.superJumping) return "SUPER JUMP";
         if (p.crouching) return "AGACHADO";
+        if (p.airDashFrames > 0) return p.airDashBack ? "AIR BACKDASH" : "AIR DASH";
         if (!p.grounded) return "NO AR";
         if (Math.abs(p.travel) > 0.001f) return "ANDANDO";
         return "PARADO";
@@ -1146,6 +1149,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
         }
 
+        if (animation == null && f.airDashFrames > 0 && f.status == CombatFighter.Status.NEUTRAL) {
+            // Air dash: the ground dash clip (or backdash), played on the burst's clock.
+            String clip = f.airDashBack ? SpriteStates.BACKDASH : SpriteStates.DASH;
+            if (renderer.hasAnimation(clip)) {
+                int total = f.airDashBack ? engine.config.backAirDashFrames : engine.config.airDashFrames;
+                animation = clip;
+                animationElapsed = (total - f.airDashFrames) * FIXED_STEP;
+            }
+        }
         if (animation == null && f.status == CombatFighter.Status.THROW) {
             animation = throwPose(f, character);
             animationElapsed = throwPoseTime;
@@ -1251,6 +1263,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.save();
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
         renderer.draw(c, f.x, f.y, f.facing, damageFlash, guardFlash);
+        c.restore();
+    }
+
+    /** Speed lines behind a fighter during its air dash. */
+    private void drawAirDashTrail(Canvas c, CombatFighter f) {
+        if (f.airDashFrames <= 0) return;
+        c.save();
+        // The trail is drawn for a rightward motion; mirror it for a leftward dash.
+        if (f.airDashDirection < 0) c.scale(-1f, 1f, f.x, 0f);
+        effects.drawAirDash(c, paint, f.x, f.y, f.state.profile.color);
         c.restore();
     }
 

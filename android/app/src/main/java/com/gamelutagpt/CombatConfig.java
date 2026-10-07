@@ -146,6 +146,14 @@ final class CombatConfig {
     /** Throw invulnerability right after hitstun, blockstun or wake-up. */
     int throwProtectFrames = 6;
 
+    // Air dash (→ → / ← ← in the air): once per jump, the body holds its height while it lasts.
+    int airDashFrames = 14;
+    float airDashSpeed = 900f;
+    int backAirDashFrames = 12;
+    float backAirDashSpeed = 640f;
+    /** No air dash this close to the ground (it would be a ground dash). */
+    float airDashMinHeight = 36f;
+
     // Pushblock (M + H while blocking): pushes the attacker away and shortens the blockstun.
     int pushblockCost = METER_PER_BAR / 4;
     float pushblockDistance = 190f;

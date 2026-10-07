@@ -95,6 +95,24 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Air dash — v0.82
+
+**→ →** no ar faz o **air dash** e **← ←** o **back air dash** (o mesmo toque duplo do dash
+no chão). Valores em `CombatConfig.airDash*`.
+
+- Um por pulo (normal ou super pulo); tocar o chão (ou cair derrubado) devolve.
+- Avança 900 u/s por 14 frames (para trás: 640 u/s por 12) **mantendo a altura**.
+- Precisa de pelo menos `airDashMinHeight` (36) de altura: logo depois de sair do chão não
+  sai (e não gasta o air dash).
+- Golpes aéreos podem sair durante o air dash: o impulso horizontal continua e a gravidade
+  volta. Tomar um golpe corta o air dash.
+- Sem arte própria ainda: usa o clipe de dash (ou backdash) e linhas de velocidade.
+- Pursuit: a perseguição depois do launcher continua sendo o super pulo do 2H
+  (`launcherChase`); o air dash dá o resto da mobilidade, então não há um "Pursuit Dash"
+  separado.
+
+Testes em `AirDashTest`.
+
 ## Defesa ativa: pushblock e Guard Cancel Tag — v0.81
 
 Defender passa a ter decisões que gastam a barra do time. Valores em `CombatConfig.pushblock*`

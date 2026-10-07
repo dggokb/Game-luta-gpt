@@ -219,3 +219,9 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   seu lugar atacando, invulnerável, e o oponente congela no clarão. Custa 1 barra; o
   botão mostra "CANCEL" quando dá.
 - Regras e tempos: `docs/combat-engine.md` (seção Defesa ativa).
+
+## Air dash — v0.82
+
+- **→ →** no ar: **air dash** (mantém a altura); **← ←**: **back air dash**. Um por pulo.
+- Dá para soltar golpe aéreo no meio do dash: o impulso continua.
+- Detalhes: `docs/combat-engine.md` (seção Air dash).
