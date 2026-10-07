@@ -175,8 +175,8 @@ public class ThrowTest {
                 ai.fill(d.engine, 1, d.in[1]);
                 if (!d.thrown()) d.in[1].clear();
                 d.step();
+                if (d.engine.cues().contains("TECH")) { techs++; done = true; }
                 for (CombatEngine.HitEvent e : d.engine.events()) {
-                    if ("TECH".equals(e.moveId)) { techs++; done = true; }
                     if ("THROW".equals(e.moveId)) { landed++; done = true; }
                 }
             }

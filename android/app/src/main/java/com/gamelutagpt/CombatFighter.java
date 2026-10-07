@@ -97,6 +97,17 @@ final class CombatFighter {
     int ultraScale = 1000;
     /** Thrown by an ultra: lands knocked down instead of recovering in the air. */
     boolean ultraFall;
+
+    // Bounces.
+    static final int BOUNCE_NONE = 0, BOUNCE_WALL = 1, BOUNCE_GROUND = 2;
+    /** Bounce waiting to happen (flying to the wall or driven into the floor). */
+    int bounce;
+    /** Horizontal velocity of a wall-bounce flight (0 otherwise). */
+    float vx;
+    /** World x of the wall the defender is flying to. */
+    float bounceWallX;
+    /** Bounced: lands knocked down instead of recovering in the air. */
+    boolean hardFall;
     /** Beam: hits it deals, hits dealt so far, damage left for the hits and for the blast. */
     int beamHits;
     int beamHitsDone;

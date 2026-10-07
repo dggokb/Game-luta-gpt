@@ -39,8 +39,7 @@ public class ActiveDefenseTest {
         }
 
         boolean event(String id) {
-            for (CombatEngine.HitEvent e : engine.events()) if (id.equals(e.moveId)) return true;
-            return false;
+            return engine.cues().contains(id);
         }
     }
 

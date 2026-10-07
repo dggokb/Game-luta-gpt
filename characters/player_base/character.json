@@ -611,7 +611,8 @@
         "SUPER"
       ],
       "pushbackOnHit": 44,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "launchType": "wallBounce"
     },
     "2L": {
       "animation": "CROUCH_LIGHT",
@@ -772,7 +773,7 @@
         "whiff": null
       },
       "cancelInto": [],
-      "launchType": "slam",
+      "launchType": "groundBounce",
       "knockback": 30,
       "pushbackOnHit": 28,
       "pushbackOnBlock": 34,

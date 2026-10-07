@@ -225,3 +225,15 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **→ →** no ar: **air dash** (mantém a altura); **← ←**: **back air dash**. Um por pulo.
 - Dá para soltar golpe aéreo no meio do dash: o impulso continua.
 - Detalhes: `docs/combat-engine.md` (seção Air dash).
+
+## Wall bounce e ground bounce — v0.83
+
+- **H dentro de um combo** joga o oponente na parede (borda da tela ou da arena); ele
+  quica de volta e dá para continuar o combo. O H solto no neutro continua normal.
+- **jH num oponente no ar** crava ele no chão e ele quica para cima.
+- Um de cada por combo; depois de quicar, se ninguém continuar, ele cai derrubado.
+- Rota de exemplo: L → M → H (parede) → dash → M → 2H → super pulo → jL → jM → jH (chão) → Super.
+- Detalhes: `docs/combat-engine.md` (seção Wall bounce e ground bounce).
+
+**Arte que falta** (agarrão, pushblock, air dash, batida na parede, especial e Super, o
+Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/sprites-pendentes.md).

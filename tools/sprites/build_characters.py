@@ -27,7 +27,8 @@ SPECIALS = ('S','SUPER','ULTRA')
 ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
-LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM'}
+LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
+            'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
 STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
 REQUIRED_ATTACK = ('startupFrames','activeFrames','recoveryFrames','hitstunFrames','blockstunFrames','hitstopFrames',
                    'cancelWindows','cancelInto','pushbackOnHit','pushbackOnBlock')

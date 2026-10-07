@@ -146,6 +146,22 @@ final class CombatConfig {
     /** Throw invulnerability right after hitstun, blockstun or wake-up. */
     int throwProtectFrames = 6;
 
+    // Wall bounce and ground bounce: once each per combo (the next one is a plain hit).
+    int maxWallBounces = 1;
+    int maxGroundBounces = 1;
+    /** The defender flies toward the wall: the arena edge or this far from the attacker (screen edge). */
+    float wallBounceSpeed = 1500f;
+    float wallBounceDistance = 620f;
+    float wallBounceLift = 260f;
+    /** After hitting the wall: it comes back a little and pops up, open to a follow-up. */
+    float wallBounceReturnSpeed = 300f;
+    float wallBounceUp = 820f;
+    /** Ground bounce: driven into the floor, then it pops back up. */
+    float groundBounceDown = 1500f;
+    float groundBounceUp = 920f;
+    /** Hitstun after either bounce; landing afterwards is a knockdown (no air recovery). */
+    int bounceHitstunFrames = 48;
+
     // Air dash (→ → / ← ← in the air): once per jump, the body holds its height while it lasts.
     int airDashFrames = 14;
     float airDashSpeed = 900f;

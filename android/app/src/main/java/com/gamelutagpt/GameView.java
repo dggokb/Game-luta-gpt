@@ -354,15 +354,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
-            String banner = bannerFor(event.moveId);
-            if (banner != null) {
-                throwBanner = banner;
-                throwBannerFrames = THROW_BANNER_FRAMES;
-            }
+            if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
             }
+        }
+        for (String cue : engine.cues()) {
+            String banner = bannerFor(cue);
+            if (banner != null) showBanner(banner);
+            // Bounces shake the screen like the beam's hits.
+            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) beamShake = Math.max(beamShake, 14f);
         }
         updateUltraBeam();
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
@@ -681,11 +683,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
-    /** Call-out for the system events of the engine (throws, active defense), or null. */
-    private static String bannerFor(String moveId) {
-        switch (moveId) {
+    private void showBanner(String text) {
+        throwBanner = text;
+        throwBannerFrames = THROW_BANNER_FRAMES;
+    }
+
+    /** Call-out for a system notice of the engine (throw tech, active defense), or null. */
+    private static String bannerFor(String cue) {
+        switch (cue) {
             case "TECH": return "TECH!";
-            case "THROW": return "AGARRÃO!";
             case "PUSHBLOCK": return "PUSHBLOCK!";
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             default: return null;

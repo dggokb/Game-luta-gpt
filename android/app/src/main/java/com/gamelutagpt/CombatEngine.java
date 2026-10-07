@@ -53,6 +53,11 @@ final class CombatEngine {
     private final ComboSession[] lastSessions = new ComboSession[2];
     private final int[] sessionEndFrame = {-1, -1};
     private final List<HitEvent> events = new ArrayList<>();
+    /**
+     * System notices of the last step, for the shell's call-outs and screen shake: "TECH",
+     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE". Not hits (no damage).
+     */
+    private final List<String> cues = new ArrayList<>();
     private final List<Contact> contacts = new ArrayList<>();
     private final float[] pushResult = new float[2];
     private final float[] startX = new float[2];
@@ -97,6 +102,7 @@ final class CombatEngine {
     CombatFighter fighter(int index) { return fighters[index]; }
     int frame() { return frame; }
     List<HitEvent> events() { return events; }
+    List<String> cues() { return cues; }
     /** Active combo against {@code defender}, or null. */
     ComboSession session(int defender) { return sessions[defender]; }
     /** Last finished combo against {@code defender}, or null. */
@@ -134,6 +140,7 @@ final class CombatEngine {
     void step(FighterInput first, FighterInput second) {
         frame++;
         events.clear();
+        cues.clear();
         ultraConnected = -1;
         for (int i = 0; i < 2; i++) startX[i] = fighters[i].x;
 
@@ -333,7 +340,7 @@ final class CombatEngine {
                 break;
             }
             case AIR_HITSTUN:
-                if (f.stunLeft == 0 && !f.slammed && !f.ultraFall) {
+                if (f.stunLeft == 0 && !f.slammed && !f.ultraFall && !f.hardFall && f.bounce == CombatFighter.BOUNCE_NONE) {
                     // Air recovery: control returns before landing.
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.launched = false;
@@ -541,6 +548,20 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        if (f.vx != 0f && f.status == CombatFighter.Status.AIR_HITSTUN) {
+            f.x += f.vx * CombatConfig.DT;
+            boolean reached = f.bounce == CombatFighter.BOUNCE_WALL &&
+                ((f.vx > 0f && f.x >= f.bounceWallX) || (f.vx < 0f && f.x <= f.bounceWallX));
+            if (reached) {
+                // Wall bounce: it hits the wall, comes back a little and pops up.
+                f.x = f.bounceWallX;
+                f.vx = -Math.signum(f.vx) * config.wallBounceReturnSpeed;
+                f.vy = -config.wallBounceUp;
+                bounced(f);
+                cues.add("WALL_BOUNCE");
+            }
+            return;
+        }
         if (f.airDashFrames > 0) {
             // The burst keeps going under the air normals started from it; a hit stops it.
             if (f.grounded || !(f.status == CombatFighter.Status.NEUTRAL || f.attacking())) {
@@ -601,6 +622,14 @@ final class CombatEngine {
     }
 
     private void land(CombatFighter f) {
+        if (f.status == CombatFighter.Status.AIR_HITSTUN && f.bounce == CombatFighter.BOUNCE_GROUND) {
+            // Ground bounce: it hits the floor and pops back up.
+            f.y = Arena.GROUND_Y - 1f;
+            f.vy = -config.groundBounceUp;
+            bounced(f);
+            cues.add("GROUND_BOUNCE");
+            return;
+        }
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.grounded = true;
@@ -612,8 +641,9 @@ final class CombatEngine {
             f.status = CombatFighter.Status.NEUTRAL;
             f.clearAttack();
         }
+        f.vx = 0f;
         if (f.status == CombatFighter.Status.AIR_HITSTUN) {
-            if (f.slammed || f.ultraFall) {
+            if (f.slammed || f.ultraFall || f.hardFall) {
                 knockDown(f);
             } else {
                 // Remaining hitstun is spent on the ground.
@@ -623,6 +653,8 @@ final class CombatEngine {
             }
         }
         f.ultraFall = false;
+        f.hardFall = false;
+        f.bounce = CombatFighter.BOUNCE_NONE;
         if (f.status == CombatFighter.Status.NEUTRAL) f.crouching = ControlsLayout.isDownDirection(f.input.direction);
     }
 
@@ -639,7 +671,20 @@ final class CombatEngine {
         f.launched = false;
         f.slammed = false;
         f.ultraFall = false;
+        f.hardFall = false;
+        f.bounce = CombatFighter.BOUNCE_NONE;
+        f.vx = 0f;
         f.superJumping = false;
+    }
+
+    /** The bounce happened: fresh hitstun, juggle-able, and a knockdown when it lands. */
+    private void bounced(CombatFighter f) {
+        f.bounce = CombatFighter.BOUNCE_NONE;
+        f.launched = true;
+        f.slammed = false;
+        f.hardFall = true;
+        f.stunLeft = f.stunTotal = config.bounceHitstunFrames;
+        f.stunElapsed = 0;
     }
 
     private void resolveBodies() {
@@ -902,7 +947,7 @@ final class CombatEngine {
         // Push the attacker away from the defender, whatever side it is on.
         int away = a.x >= f.x ? 1 : -1;
         push(a, f, away * config.pushblockDistance);
-        events.add(new HitEvent(f.index, a.index, 0, true, false, "PUSHBLOCK"));
+        cues.add("PUSHBLOCK");
     }
 
     /**
@@ -928,7 +973,7 @@ final class CombatEngine {
         CombatFighter other = fighters[1 - point.index];
         other.hitstop = Math.max(other.hitstop, config.guardCancelFlashFrames);
         startX[point.index] = point.x;
-        events.add(new HitEvent(point.index, other.index, 0, false, false, "GUARD_CANCEL"));
+        cues.add("GUARD_CANCEL");
         return true;
     }
 
@@ -1020,7 +1065,7 @@ final class CombatEngine {
         }
         push(d, a, a.facing * config.throwTechPush);
         push(a, d, -a.facing * config.throwTechPush);
-        events.add(new HitEvent(a.index, d.index, 0, true, false, "TECH"));
+        cues.add("TECH");
     }
 
     /** No tech in time: damage, knockdown and the attacker's recovery (oki). */
@@ -1079,6 +1124,8 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.pushRemaining = 0f;
         d.pushFramesLeft = 0;
+        d.vx = 0f;
+        d.bounce = CombatFighter.BOUNCE_NONE;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
         d.hitCrouching = wasCrouching;
         d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
@@ -1187,6 +1234,8 @@ final class CombatEngine {
     /** The defender stays in hitstun, at its height, while the beam lasts. */
     private void keepInBeam(CombatFighter a, CombatFighter d) {
         d.clearAttack();
+        d.vx = 0f;
+        d.bounce = CombatFighter.BOUNCE_NONE;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
         d.vy = 0f;
         int untilBlast = config.ultraBeamBlastFrame(a.beamHits) - a.ultraFrame;
@@ -1245,6 +1294,9 @@ final class CombatEngine {
             d.launched = false;
             d.slammed = false;
             d.ultraFall = false;
+            d.hardFall = false;
+            d.bounce = CombatFighter.BOUNCE_NONE;
+            d.vx = 0f;
             return;
         }
 
@@ -1284,8 +1336,53 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
+        // A new hit takes over any flight in progress.
+        d.vx = 0f;
+        d.bounce = CombatFighter.BOUNCE_NONE;
+        // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
+        boolean wallBounce = attack.launch == AttackDefinition.Launch.WALL_BOUNCE && session.hitCount >= 2 &&
+            session.wallBounces < config.maxWallBounces;
+        boolean groundBounce = attack.launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
+            session.groundBounces < config.maxGroundBounces;
 
-        if (attack.launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
+        if (wallBounce) {
+            // Sent flying to the wall (arena edge or screen edge); it bounces in moveHorizontally.
+            session.wallBounces++;
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
+            d.vy = -config.wallBounceLift;
+            d.vx = direction * config.wallBounceSpeed;
+            d.bounce = CombatFighter.BOUNCE_WALL;
+            d.bounceWallX = Arena.clamp(a.x + direction * config.wallBounceDistance, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+            d.launched = true;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
+            d.pushRemaining = 0f;
+            d.pushFramesLeft = 0;
+            session.juggleCount += attack.juggleCost;
+        } else if (groundBounce) {
+            // Driven into the floor; it pops back up in land().
+            session.groundBounces++;
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.vy = config.groundBounceDown;
+            d.bounce = CombatFighter.BOUNCE_GROUND;
+            d.launched = false;
+            d.slammed = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
+            session.juggleCount += attack.juggleCost;
+        } else if (attack.launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded && a.superJumping) {
+            // Bounce already used: from a super jump it ends like the slam.
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.slammed = true;
+            d.launched = false;
+            d.vy = config.slamSpeed;
+            session.juggleCount += attack.juggleCost;
+            push(d, a, direction * attack.knockback * 0.35f);
+        } else if (attack.launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
             knockDown(d);
             push(d, a, direction * attack.knockback);
         } else if (attack.launch == AttackDefinition.Launch.LAUNCH) {

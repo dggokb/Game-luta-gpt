@@ -12,7 +12,7 @@ import java.util.List;
  */
 final class AttackDefinition {
     /** What the move does to a defender it hits. */
-    enum Launch { NONE, KNOCKDOWN, LAUNCH, SLAM }
+    enum Launch { NONE, KNOCKDOWN, LAUNCH, SLAM, WALL_BOUNCE, GROUND_BOUNCE }
 
     /** Button class; also the default buffer priority (SUPER first). */
     enum Strength { LIGHT, MEDIUM, HEAVY, SPECIAL, SUPER }

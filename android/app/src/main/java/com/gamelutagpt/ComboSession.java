@@ -24,6 +24,9 @@ final class ComboSession {
     boolean airCombo;
     boolean active = true;
     int juggleCount;
+    /** Bounces already used in this combo (each is limited by CombatConfig). */
+    int wallBounces;
+    int groundBounces;
     /** Proration declared by the move that started the combo. */
     int prorationPermille = 1000;
 

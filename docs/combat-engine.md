@@ -95,6 +95,30 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Wall bounce e ground bounce — v0.83
+
+Dois novos `launchType` no pack, controlados pela `ComboSession` (no máximo **1 de cada por
+combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
+`CombatConfig.wallBounce*`, `groundBounce*` e `bounceHitstunFrames`.
+
+| launchType | Onde (packs atuais) | O que faz |
+| --- | --- | --- |
+| `wallBounce` | **H** | Só **dentro de combo** (o H solto no neutro é um golpe normal). O defensor voa a 1500 u/s até a "parede" (a borda da arena ou 620 px à frente do atacante, a borda da tela) e quica: volta um pouco e sobe, aberto para continuar. Usado o do combo: hit normal. |
+| `groundBounce` | **jH** | Alvo no ar: é cravado no chão (1500 u/s) e quica para cima. Usado o do combo: no super pulo vira o slam de antes (queda forçada); fora dele, hit aéreo normal. |
+
+- Depois de um bounce o defensor tem `bounceHitstunFrames` (48) de hitstun, pode ser
+  juggleado e **cai derrubado** (não se recupera no ar: `hardFall`).
+- Qualquer golpe novo cancela o voo em andamento; o limite de juggle continua valendo.
+- O motor avisa `WALL_BOUNCE` e `GROUND_BOUNCE` em `cues()` e a tela treme.
+- Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH
+  (ground bounce) → ... ; com a barra, Super ou ultra no fim.
+
+Avisos do motor (v0.83): os avisos que não são dano (`TECH`, `PUSHBLOCK`, `GUARD_CANCEL`,
+`WALL_BOUNCE`, `GROUND_BOUNCE`) saíram dos `events()` (que agora só têm acertos e bloqueios)
+e vão para `cues()`.
+
+Testes em `BounceTest`.
+
 ## Air dash — v0.82
 
 **→ →** no ar faz o **air dash** e **← ←** o **back air dash** (o mesmo toque duplo do dash
@@ -200,7 +224,7 @@ Cada golpe em `moves` e o bloco `attack` de `fighter.energy` (S) e `fighter.supe
 | `cancelInto` | sim | Golpes alvo (`L`…`jH`, `S`, `SUPER`, `JUMP`) |
 | `pushbackOnHit`, `pushbackOnBlock` | sim | Distância empurrada (o restante vai para o atacante no canto) |
 | `damageProration` | não (1.0) | Escala aplicada ao resto de um combo que este golpe inicia |
-| `launchType` | não (`none`) | `knockdown`, `launch`, `slam` (slam exige super pulo e alvo no ar) |
+| `launchType` | não (`none`) | `knockdown`, `launch`, `slam` (slam exige super pulo e alvo no ar), `wallBounce`, `groundBounce` (v0.83) |
 | `knockback` | não (= pushbackOnHit) | Deslocamento quando o alvo fica no ar ou cai |
 | `juggleCost` | não (1) | Pontos de juggle gastos em alvo no ar |
 | `maxHits` | não (1) | Acertos por execução no mesmo alvo (≤ número de hitboxes) |
@@ -281,6 +305,6 @@ frames.
 - Fase 9 (calibração) só tem a primeira passada: valores escolhidos para os links
   L → L/M e H → L/M funcionarem e para a rota 2H → super pulo → jL → jM → jH caber nos
   6 pontos de juggle. Falta jogar e ajustar no aparelho.
-- Fase 10: wall bounce e ground bounce não existem.
+- (Fase 10 feita na v0.83: wall bounce e ground bounce.)
 - Os packs usam a hitbox padrão; nenhuma hitbox/hurtbox por frame foi desenhada ainda,
   embora o formato e o motor suportem.
