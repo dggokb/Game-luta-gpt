@@ -1,0 +1,16 @@
+{
+  "id": "player_base_dash",
+  "javaName": "DASH_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_dash.png",
+  "report": "tools/sprites/reports/player_base_dash.report.json",
+  "preview": "android/app/build/sprite-review/dash-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "frameWidth": 512,
+  "rootX": 300,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+}
