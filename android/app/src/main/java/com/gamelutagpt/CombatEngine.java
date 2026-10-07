@@ -192,6 +192,7 @@ final class CombatEngine {
             f.pendingJumpAge = -1;
             f.ultraRequestAge = -1;
             f.throwRequestAge = -1;
+            f.pushblockRequestAge = -1;
             return;
         }
         int relative = MotionParser.relative(in.direction, f.facing);
@@ -222,6 +223,11 @@ final class CombatEngine {
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
         if (in.grab) f.throwRequestAge = 0;
+        if (in.pushblock) {
+            // Only blocking turns M + H into a pushblock; otherwise it is the heavy.
+            if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
+            else f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+        }
         if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
@@ -248,6 +254,12 @@ final class CombatEngine {
             f.state.superMeter >= CombatConfig.ULTRA_COST) {
             startUltra(f);
             f.dashRequest = f.backdashRequest = false;
+            return;
+        }
+
+        if (f.pushblockRequestAge >= 0 && f.status == CombatFighter.Status.BLOCKSTUN &&
+            f.state.superMeter >= config.pushblockCost) {
+            pushblock(f);
             return;
         }
 
@@ -457,6 +469,8 @@ final class CombatEngine {
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
         if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
+        if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
+        if (f.invulnFrames > 0) f.invulnFrames--;
         if (f.throwProtect > 0) f.throwProtect--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
@@ -842,6 +856,48 @@ final class CombatEngine {
         if (ahead < -halfWidth || ahead - halfWidth > config.ultraReach) return false;
         float chest = a.y - a.body().height(false) * 0.55f;
         return chest >= d.hurtTop() - 40f && chest <= d.y + 10f;
+    }
+
+    // ---------------------------------------------------------------- active defense
+
+    /** Pushblock: the attacker is shoved away, the blockstun ends sooner; costs meter. */
+    private void pushblock(CombatFighter f) {
+        CombatFighter a = fighters[1 - f.index];
+        f.pushblockRequestAge = -1;
+        f.state.superMeter -= config.pushblockCost;
+        f.state.refreshHudLabels();
+        f.stunLeft = Math.min(f.stunLeft, config.pushblockStunFrames);
+        // Push the attacker away from the defender, whatever side it is on.
+        int away = a.x >= f.x ? 1 : -1;
+        push(a, f, away * config.pushblockDistance);
+        events.add(new HitEvent(f.index, a.index, 0, true, false, "PUSHBLOCK"));
+    }
+
+    /**
+     * Guard Cancel Tag: blocking on the ground, the partner comes in where the point stood,
+     * invulnerable, doing its assist move; the point runs off and the opponent freezes for
+     * a flash. Costs a bar; refused without the bar, a partner or the team busy.
+     */
+    boolean guardCancel(TeamSystem.Side side, CombatFighter point) {
+        if (point.status != CombatFighter.Status.BLOCKSTUN || !point.grounded ||
+            point.state.superMeter < config.guardCancelCost) {
+            return false;
+        }
+        point.state.superMeter -= config.guardCancelCost;
+        point.state.refreshHudLabels();
+        teams.leavePoint(side, point);
+        setFighterState(point.index, side.pointState());
+        point.stunLeft = 0;
+        point.pushRemaining = 0f;
+        point.pushFramesLeft = 0;
+        point.locked = false;
+        startAssistMove(point);
+        point.invulnFrames = point.attack.startupFrames + point.attack.activeFrames + config.guardCancelInvulnPadding;
+        CombatFighter other = fighters[1 - point.index];
+        other.hitstop = Math.max(other.hitstop, config.guardCancelFlashFrames);
+        startX[point.index] = point.x;
+        events.add(new HitEvent(point.index, other.index, 0, false, false, "GUARD_CANCEL"));
+        return true;
     }
 
     // ---------------------------------------------------------------- throw

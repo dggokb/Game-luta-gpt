@@ -126,7 +126,14 @@ final class TeamSystem {
     void resolve(CombatEngine engine, CombatFighter point, CombatFighter opponent) {
         Side s = sides[point.index];
         if (s.partner() == null) return;
-        if (s.assistRequestAge >= 0) {
+        if (s.assistRequestAge >= 0 && point.status == CombatFighter.Status.BLOCKSTUN) {
+            // TAG while blocking: Guard Cancel Tag, when the partner is ready and there is a bar.
+            if (!point.frozen() && canGuardCancel(s) && engine.guardCancel(s, point)) {
+                s.assistRequestAge = -1;
+                s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
+                s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
+            }
+        } else if (s.assistRequestAge >= 0) {
             if (s.conversionOpen()) {
                 s.convert = true;
                 s.assistRequestAge = -1;
@@ -158,6 +165,17 @@ final class TeamSystem {
             (point.attacking() && point.attack.kind != AttackDefinition.Kind.SUPER);
     }
 
+    /** The partner is free to come in (assist ready, no tag or assist going on). */
+    private static boolean canGuardCancel(Side s) {
+        return s.partner() != null && !s.tagging() && !s.assistOut() && s.assistCooldown == 0 && s.leavingFrame < 0;
+    }
+
+    /** TAG would Guard Cancel now (blocking on the ground with the partner ready and a bar). */
+    boolean guardCancelReady(int side, CombatFighter point) {
+        return canGuardCancel(sides[side]) && point.status == CombatFighter.Status.BLOCKSTUN && point.grounded &&
+            point.state.superMeter >= config.guardCancelCost;
+    }
+
     boolean canRawTag(int side, CombatFighter point) {
         return canRawTag(sides[side], point);
     }
@@ -185,7 +203,8 @@ final class TeamSystem {
     /** One frame of the side's team: tag phases, the assist's body and move, cooldowns. */
     void advance(CombatEngine engine, CombatFighter point) {
         Side s = sides[point.index];
-        ageRequests(s);
+        // A press during hitstop waits for it to end (the point cannot act yet).
+        if (!point.frozen()) ageRequests(s);
         if (s.tagCooldown > 0) s.tagCooldown--;
         if (s.assistCooldown > 0 && !s.assistOut()) s.assistCooldown--;
         if (s.leavingFrame >= 0 && ++s.leavingFrame > config.assistLeaveFrames) {
@@ -272,9 +291,8 @@ final class TeamSystem {
         handMeter(outgoing, s.pointState());
     }
 
-    /** Assist → Tag, called by the engine once the assist's move ended. */
-    void becomePoint(Side s, CombatFighter point) {
-        CombatFighter a = s.assist;
+    /** The point runs off (visual only) and the partner takes the point; the bars go along. */
+    void leavePoint(Side s, CombatFighter point) {
         s.leaving = s.pointState();
         s.leavingX = point.x;
         s.leavingY = point.y;
@@ -282,6 +300,12 @@ final class TeamSystem {
         s.leavingFrame = 0;
         s.point = (s.point + 1) % s.members.length;
         handMeter(s.leaving, s.pointState());
+    }
+
+    /** Assist → Tag, called by the engine once the assist's move ended. */
+    void becomePoint(Side s, CombatFighter point) {
+        CombatFighter a = s.assist;
+        leavePoint(s, point);
         s.assist = null;
         s.assistPhase = ASSIST_NONE;
         s.assistFrame = 0;

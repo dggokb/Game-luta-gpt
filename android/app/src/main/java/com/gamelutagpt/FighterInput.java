@@ -19,6 +19,8 @@ final class FighterInput {
     boolean ultra;
     /** L + M (or the spot between them): throw, or tech the opponent's throw. */
     boolean grab;
+    /** M + H (or the spot between them): pushblock while blocking, otherwise a heavy. */
+    boolean pushblock;
     /** TAG: calls the partner as an assist, or turns the assist on screen into a tag. */
     boolean assist;
     /** ↓ + TAG: raw tag (the partner takes the point). */
@@ -34,7 +36,7 @@ final class FighterInput {
     }
 
     void clearPresses() {
-        light = medium = heavy = auto = superAttack = ultra = assist = tag = grab = false;
+        light = medium = heavy = auto = superAttack = ultra = assist = tag = grab = pushblock = false;
         special = null;
         dash = backdash = jump = superJump = false;
     }
@@ -49,6 +51,7 @@ final class FighterInput {
         ultra = other.ultra;
         assist = other.assist;
         grab = other.grab;
+        pushblock = other.pushblock;
         tag = other.tag;
         special = other.special;
         dash = other.dash;

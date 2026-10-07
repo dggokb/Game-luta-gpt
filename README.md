@@ -210,3 +210,12 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   dá para ser agarrado (agarrão não vira combo).
 - A CPU também agarra quando está colada e faz tech em parte dos agarrões.
 - Regras e tempos: `docs/combat-engine.md` (seção Agarrão e tech).
+
+## Defesa ativa: pushblock e Guard Cancel Tag — v0.81
+
+- **M + H bloqueando** (ou o ponto **"M+H"** entre os botões M e H): **pushblock**. Empurra
+  o atacante para longe e encurta o bloqueio, por 1/4 de barra. Fora do bloqueio é o H.
+- **TAG bloqueando** (no chão, assist pronto): **Guard Cancel Tag**. O parceiro entra no
+  seu lugar atacando, invulnerável, e o oponente congela no clarão. Custa 1 barra; o
+  botão mostra "CANCEL" quando dá.
+- Regras e tempos: `docs/combat-engine.md` (seção Defesa ativa).

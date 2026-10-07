@@ -148,6 +148,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int comboPointer = -1;
     private int tagPointer = -1;
     private int throwPointer = -1;
+    private int pushblockPointer = -1;
     /** "AGARRÃO!" / "TECH!" over the fight, and how many frames it still shows. */
     private String throwBanner;
     private int throwBannerFrames;
@@ -166,7 +167,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void clearInput() {
         clearPendingInput();
         pad.reset();
-        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = superPointer = -1;
+        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = superPointer = -1;
         healPlayerPointer = healOpponentPointer = -1;
     }
 
@@ -353,8 +354,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
-            if ("TECH".equals(event.moveId) || "THROW".equals(event.moveId)) {
-                throwBanner = "TECH".equals(event.moveId) ? "TECH!" : "AGARRÃO!";
+            String banner = bannerFor(event.moveId);
+            if (banner != null) {
+                throwBanner = banner;
                 throwBannerFrames = THROW_BANNER_FRAMES;
             }
             if (event.defender == OPPONENT && !event.blocked) {
@@ -393,11 +395,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
+            if (engine.teams.guardCancelReady(PLAYER, player())) return "CANCEL";
             return engine.team(PLAYER).conversionOpen() ? "TROCA" : "ASSIST";
         }
         @Override public boolean canTag() {
             TeamSystem.Side team = engine.team(PLAYER);
-            return team.conversionOpen() || engine.teams.canAssist(PLAYER, player());
+            return team.conversionOpen() || engine.teams.canAssist(PLAYER, player()) ||
+                engine.teams.guardCancelReady(PLAYER, player());
         }
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
@@ -413,6 +417,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case HEAL_PLAYER: return healPlayerPointer != -1;
                 case HEAL_OPPONENT: return healOpponentPointer != -1;
                 case THROW: return throwPointer != -1;
+                case PUSHBLOCK: return pushblockPointer != -1;
                 default: return false;
             }
         }
@@ -673,6 +678,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             superDarkAlpha = Math.round(114f * (1f - k));
             superFlashAlpha = 0;
             superCameraZoom = 1.20f - 0.20f * k;
+        }
+    }
+
+    /** Call-out for the system events of the engine (throws, active defense), or null. */
+    private static String bannerFor(String moveId) {
+        switch (moveId) {
+            case "TECH": return "TECH!";
+            case "THROW": return "AGARRÃO!";
+            case "PUSHBLOCK": return "PUSHBLOCK!";
+            case "GUARD_CANCEL": return "GUARD CANCEL!";
+            default: return null;
         }
     }
 
@@ -949,7 +965,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             case WAKEUP:
                 return "DERRUBADO";
             case BLOCKSTUN:
-                return guardLabel(p.lastGuard, "BLOQUEIO");
+                return guardLabel(p.lastGuard, "BLOQUEIO") +
+                    (p.state.superMeter >= engine.config.pushblockCost ? "  •  M+H EMPURRA" : "");
             case AIR_HITSTUN:
                 return p.slammed ? "QUEDA FORÇADA" : p.launched ? "LANÇADO" : "HIT";
             case HITSTUN:
@@ -1358,6 +1375,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     throwPointer = pointerId;
                     pad.press(PadInput.Button.THROW);
                     break;
+                case PUSHBLOCK:
+                    pushblockPointer = pointerId;
+                    pad.press(PadInput.Button.PUSHBLOCK);
+                    break;
                 case TAG:
                     // TAG calls the assist (again: Assist -> Tag); with down it is the raw tag.
                     tagPointer = pointerId;
@@ -1386,11 +1407,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == comboPointer) comboPointer = -1;
             if (pointerId == tagPointer) tagPointer = -1;
             if (pointerId == throwPointer) throwPointer = -1;
+            if (pointerId == pushblockPointer) pushblockPointer = -1;
             if (pointerId == superPointer) superPointer = -1;
             if (pointerId == healPlayerPointer) healPlayerPointer = -1;
             if (pointerId == healOpponentPointer) healOpponentPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
-            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = superPointer = -1;
+            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = superPointer = -1;
             healPlayerPointer = healOpponentPointer = -1;
             pad.setDirection(0);
         }

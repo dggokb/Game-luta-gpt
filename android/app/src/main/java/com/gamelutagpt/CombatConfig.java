@@ -146,6 +146,18 @@ final class CombatConfig {
     /** Throw invulnerability right after hitstun, blockstun or wake-up. */
     int throwProtectFrames = 6;
 
+    // Pushblock (M + H while blocking): pushes the attacker away and shortens the blockstun.
+    int pushblockCost = METER_PER_BAR / 4;
+    float pushblockDistance = 190f;
+    /** Blockstun left after a pushblock (at most). */
+    int pushblockStunFrames = 8;
+    // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.
+    int guardCancelCost = METER_PER_BAR;
+    /** The opponent freezes for the cross-counter flash. */
+    int guardCancelFlashFrames = 12;
+    /** Extra invulnerable frames of the incoming partner past its move's active frames. */
+    int guardCancelInvulnPadding = 4;
+
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;
     int tagEnterFrames = 23;

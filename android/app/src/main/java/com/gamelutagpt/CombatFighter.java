@@ -110,6 +110,10 @@ final class CombatFighter {
     int throwProtect;
     /** Frames since L + M was pressed, or -1: starts a throw or techs one. */
     int throwRequestAge = -1;
+    /** Frames since M + H was pressed while blocking, or -1: pushblock. */
+    int pushblockRequestAge = -1;
+    /** Frames during which nothing hits this fighter (Guard Cancel entry). */
+    int invulnFrames;
 
     // Input.
     final InputBuffer buffer = new InputBuffer();
@@ -162,7 +166,8 @@ final class CombatFighter {
 
     /** Knocked down, getting up or KO: no hit connects. */
     boolean hittable() {
-        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam() && !inThrowExchange();
+        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam() && !inThrowExchange() &&
+            invulnFrames == 0;
     }
 
     /** Holding a throw, being thrown or teching: the exchange plays out untouched. */

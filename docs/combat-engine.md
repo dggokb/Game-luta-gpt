@@ -95,6 +95,24 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Defesa ativa: pushblock e Guard Cancel Tag — v0.81
+
+Defender passa a ter decisões que gastam a barra do time. Valores em `CombatConfig.pushblock*`
+e `CombatConfig.guardCancel*`.
+
+| Comando | Quando | O que faz | Custo |
+| --- | --- | --- | --- |
+| **M + H** (dois dedos ou o ponto "M+H" entre os botões) | em blockstun (chão ou ar) | **Pushblock**: o atacante é empurrado 190 px e o blockstun cai para no máximo 8 frames. Fora do blockstun, M + H é o H. | 1/4 de barra |
+| **TAG** | em blockstun, no chão, com o assist pronto | **Guard Cancel Tag**: o parceiro entra no lugar do ponto fazendo o golpe de assist dele, invulnerável até o fim dos frames ativos (+4); o ponto sai correndo e o oponente congela 12 frames (clarão). Depois: 300 frames sem assist nem troca. | 1 barra |
+
+- O pedido feito durante o hitstop do bloqueio espera o hitstop acabar (não expira).
+- Bloqueando, TAG nunca chama um assist comum: ou é Guard Cancel, ou nada.
+- O botão de TAG mostra **CANCEL** quando o Guard Cancel está disponível, e o HUD mostra
+  "M+H EMPURRA" no estado de bloqueio quando há barra para o pushblock.
+- Invulnerabilidade: `CombatFighter.invulnFrames` (nada acerta enquanto > 0).
+
+Testes em `ActiveDefenseTest`.
+
 ## Agarrão e tech — v0.80
 
 A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. Estado próprio

@@ -411,7 +411,8 @@ final class HudRenderer {
         drawAttackButton(c, LIGHT_X, LIGHT_Y, "L", s.pressed(Control.LIGHT));
         drawAttackButton(c, MEDIUM_X, MEDIUM_Y, "M", s.pressed(Control.MEDIUM));
         drawAttackButton(c, HEAVY_X, HEAVY_Y, "H", s.pressed(Control.HEAVY));
-        drawThrowSpot(c, s.pressed(Control.THROW));
+        drawPairSpot(c, THROW_X, THROW_Y, "L+M", s.pressed(Control.THROW));
+        drawPairSpot(c, PUSHBLOCK_X, PUSHBLOCK_Y, "M+H", s.pressed(Control.PUSHBLOCK));
         drawComboButton(c, s.pressed(Control.COMBO));
         drawTagButton(c, s);
         drawSuperButton(c, s);
@@ -437,21 +438,21 @@ final class HudRenderer {
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    /** The spot between L and M that presses both: throw (or tech). */
-    private void drawThrowSpot(Canvas c, boolean pressed) {
+    /** A spot between two buttons that presses both: L+M throw/tech, M+H pushblock. */
+    private void drawPairSpot(Canvas c, float x, float y, String label, boolean pressed) {
         paint.setColor(pressed ? Color.argb(220, 255, 255, 255) : Color.argb(170, 7, 13, 26));
-        c.drawCircle(THROW_X, THROW_Y, THROW_RADIUS, paint);
+        c.drawCircle(x, y, THROW_RADIUS, paint);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2f);
         paint.setColor(Color.argb(225, 255, 214, 92));
-        c.drawCircle(THROW_X, THROW_Y, THROW_RADIUS, paint);
+        c.drawCircle(x, y, THROW_RADIUS, paint);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(11f);
         paint.setFakeBoldText(true);
-        float textY = THROW_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText("L+M", THROW_X, textY, paint);
+        float textY = y - (paint.ascent() + paint.descent()) / 2f;
+        c.drawText(label, x, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }

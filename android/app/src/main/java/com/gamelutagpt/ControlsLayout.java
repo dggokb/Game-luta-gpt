@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -39,6 +39,9 @@ final class ControlsLayout {
     static final float THROW_X = (LIGHT_X + MEDIUM_X) * 0.5f;
     static final float THROW_Y = (LIGHT_Y + MEDIUM_Y) * 0.5f;
     static final float THROW_RADIUS = 22f;
+    // Pushblock: the spot between M and H (M + H).
+    static final float PUSHBLOCK_X = (MEDIUM_X + HEAVY_X) * 0.5f;
+    static final float PUSHBLOCK_Y = (MEDIUM_Y + HEAVY_Y) * 0.5f;
 
     static final float COMBO_X = 1100f;
     static final float COMBO_Y = 650f;
@@ -87,6 +90,7 @@ final class ControlsLayout {
         if (insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_RADIUS)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
         if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;
+        if (insideCircle(x, y, PUSHBLOCK_X, PUSHBLOCK_Y, THROW_RADIUS)) return Control.PUSHBLOCK;
         if (insideCircle(x, y, LIGHT_X, LIGHT_Y, ATTACK_RADIUS)) return Control.LIGHT;
         if (insideCircle(x, y, MEDIUM_X, MEDIUM_Y, ATTACK_RADIUS)) return Control.MEDIUM;
         if (insideCircle(x, y, HEAVY_X, HEAVY_Y, ATTACK_RADIUS)) return Control.HEAVY;
