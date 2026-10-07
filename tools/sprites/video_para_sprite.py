@@ -5,7 +5,8 @@ O vídeo vem do Seedance/Veo com o personagem de lado, câmera parada e fundo ve
 liso. Para cada quadro do trecho escolhido: recorta o verde (e a sombra/faixa de chão),
 mantém só o personagem (maior peça conectada; poeira e efeitos soltos saem), corrige o
 deslizamento lateral e escala tudo com a MESMA escala do personagem, para que todos os
-clipes fiquem do mesmo tamanho. A raiz (meio dos pés) cai em rootX/rootY da célula.
+clipes fiquem do mesmo tamanho: o 1º quadro do vídeo é sempre a guarda em pé (a imagem
+inicial), e a altura dele vira --altura px. A raiz (meio dos pés) cai em rootX/rootY da célula.
 
     python3 tools/sprites/video_para_sprite.py video.mp4 saida.png --inicio 29 --fim 105
     python3 tools/sprites/video_para_sprite.py video.mp4 saida.png --loop 20-110
@@ -17,9 +18,6 @@ import argparse
 import cv2
 import numpy as np
 from PIL import Image
-
-# Escala padrão: altura do personagem em pé no vídeo 1280×720 (~705 px) vira 224 px.
-DEFAULT_SCALE = 224 / 705
 
 
 def read_frames(path):
@@ -88,7 +86,9 @@ def main():
     p.add_argument("--loop", help="A-B: escolhe o melhor loop dentro desse intervalo")
     p.add_argument("--min-loop", type=int, default=24)
     p.add_argument("--passo", type=int, default=1, help="usar 1 a cada N quadros")
-    p.add_argument("--escala", type=float, default=DEFAULT_SCALE)
+    p.add_argument("--escala", default="auto",
+                   help="auto: o 1º quadro do vídeo (guarda em pé) vira --altura px; ou um número")
+    p.add_argument("--altura", type=int, default=224, help="altura do personagem em pé na célula")
     p.add_argument("--celula", type=int, default=256, help="altura da célula")
     p.add_argument("--largura", type=int, help="largura da célula (padrão: igual à altura)")
     p.add_argument("--sem-poeira", action="store_true", help="remove poeira bege do chão")
@@ -118,7 +118,13 @@ def main():
     foot_y = max(int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) for k in keyed)
     ref_x = xs[0]
     rx, ry = (int(v) for v in args.raiz.split(","))
-    cell, cols, s = args.celula, args.colunas, args.escala
+    if args.escala == "auto":
+        rows0 = np.nonzero((key(frames[0])[..., 3] > 128).any(1))[0]
+        s = args.altura / float(rows0.max() - rows0.min())
+        print(f"escala automática {s:.4f} (personagem em pé com {rows0.max() - rows0.min()} px no vídeo)")
+    else:
+        s = float(args.escala)
+    cell, cols = args.celula, args.colunas
     cw = args.largura or cell
     rows = (len(keyed) + cols - 1) // cols
     sheet = Image.new("RGBA", (cols * cw, rows * cell), (0, 0, 0, 0))
