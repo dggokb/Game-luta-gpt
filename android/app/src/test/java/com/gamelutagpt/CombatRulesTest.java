@@ -140,7 +140,8 @@ public class CombatRulesTest {
         for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.002f)
             assertEquals("t="+t,2,launcher.animation.frame(launcher.animationTime(t),0));
         assertEquals(0,launcher.animation.frame(launcher.animationTime(0),0));
-        assertEquals(3,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
+        // Recovery returns through the wind-up to the crouching guard.
+        assertEquals(0,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
     }
     @Test public void airJabExtendedFramesCoverTheActiveWindow() {
         CharacterDefinition.Move jab=BASE.move("L",true);

@@ -1,356 +1,76 @@
 {
   "id": "player_base_crouch_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_heavy_source.png",
-  "detectedSourceIntervals": [
-    [
-      45,
-      410
-    ],
-    [
-      554,
-      927
-    ],
-    [
-      1035,
-      1429
-    ],
-    [
-      1576,
-      1957
-    ]
-  ],
-  "scale": 0.46869100656950846,
+  "source": "art/sprites/source/player_base_crouch_heavy_keys.png",
+  "sourceNote": "2H lancador do p01 em poses-chave (o video nao faz o soco para cima): guarda agachada (video do 2M), carga e topo do uppercut (ChatGPT), alinhados pelo pe de tras na escala do idle.",
+  "rootMode": "authored",
+  "scale": 1,
   "worldScale": 1.0,
   "layout": {
-    "frameWidth": 256,
+    "frameWidth": 320,
     "frameHeight": 320,
-    "rootX": 128,
-    "rootY": 253,
-    "frameCount": 4
-  },
-  "validation": {
-    "alphaThreshold": 10,
-    "minMargin": 8,
-    "rootTolerance": 1.5,
-    "widthStep": 64,
-    "heightStep": 64,
-    "footBandRatio": 0.025,
-    "minFootWidth": 4,
-    "minOpaquePixels": 10000,
-    "maxUpscale": 1.0,
-    "maxFrameWidth": 768,
-    "maxFrameHeight": 512
-  },
-  "anatomy": {
-    "mode": "canonical-anatomy",
-    "clipReferenceFrame": 0,
-    "referenceSource": "art/sprites/source/player_base_crouch_medium_video_normalized.png",
-    "referenceFrame": 0,
-    "canonicalSignature": {
-      "height": 159,
-      "bands": [
-        36.5
-      ]
-    },
-    "sourceSignature": {
-      "height": 323,
-      "bands": [
-        82.0
-      ]
-    },
-    "scaleCandidates": [
-      0.49226006191950467,
-      0.4451219512195122
-    ],
-    "scaleSpreadRatio": 0.10057396032625116,
-    "maxScaleSpreadRatio": 0.15,
-    "passed": true
+    "rootX": 150,
+    "rootY": 300,
+    "columns": 3,
+    "frameCount": 3
   },
   "frames": [
     {
       "index": 0,
-      "sourceInterval": [
-        45,
-        410
-      ],
-      "sourceBbox": [
-        0,
-        283,
-        365,
-        606
-      ],
-      "sourceRoot": [
-        167.5,
-        605.0
-      ],
-      "frameShift": [
-        0,
-        0
-      ],
-      "sourceFootIntervals": [
-        [
-          0,
-          62
-        ],
-        [
-          248,
-          362
-        ]
-      ],
       "outputBbox": [
-        49,
-        102,
-        220,
-        253
+        80,
+        141,
+        232,
+        300
       ],
-      "outputMargins": {
-        "left": 49,
-        "right": 36,
-        "top": 102,
-        "bottom": 67
-      },
-      "detectedOutputRoot": [
-        127.25,
-        252.0
-      ],
-      "detectedOutputFootIntervals": [
-        [
-          49,
-          78
-        ],
-        [
-          165,
-          219
-        ]
-      ],
-      "opaquePixels": 13716,
-      "checks": {
-        "noClipping": true,
-        "rootXWithinTolerance": true,
-        "rootYWithinTolerance": true,
-        "enoughOpaquePixels": true
-      },
-      "passed": true
+      "minimumMargin": 20,
+      "opaquePixels": 15018
     },
     {
       "index": 1,
-      "sourceInterval": [
-        554,
-        927
-      ],
-      "sourceBbox": [
-        0,
-        272,
-        373,
-        606
-      ],
-      "sourceRoot": [
-        164.75,
-        605.0
-      ],
-      "frameShift": [
-        0,
-        0
-      ],
-      "sourceFootIntervals": [
-        [
-          0,
-          61
-        ],
-        [
-          245,
-          355
-        ]
-      ],
       "outputBbox": [
-        51,
-        97,
-        226,
-        254
+        80,
+        138,
+        205,
+        300
       ],
-      "outputMargins": {
-        "left": 51,
-        "right": 30,
-        "top": 97,
-        "bottom": 66
-      },
-      "detectedOutputRoot": [
-        128.25,
-        253.0
-      ],
-      "detectedOutputFootIntervals": [
-        [
-          51,
-          80
-        ],
-        [
-          166,
-          218
-        ]
-      ],
-      "opaquePixels": 15768,
-      "checks": {
-        "noClipping": true,
-        "rootXWithinTolerance": true,
-        "rootYWithinTolerance": true,
-        "enoughOpaquePixels": true
-      },
-      "passed": true
+      "minimumMargin": 20,
+      "opaquePixels": 11702
     },
     {
       "index": 2,
-      "sourceInterval": [
-        1035,
-        1429
-      ],
-      "sourceBbox": [
-        0,
-        84,
-        394,
-        607
-      ],
-      "sourceRoot": [
-        193.5,
-        606.0
-      ],
-      "frameShift": [
-        0,
-        0
-      ],
-      "sourceFootIntervals": [
-        [
-          0,
-          61
-        ],
-        [
-          322,
-          393
-        ]
-      ],
       "outputBbox": [
-        37,
-        8,
-        222,
-        253
+        80,
+        55,
+        244,
+        300
       ],
-      "outputMargins": {
-        "left": 37,
-        "right": 34,
-        "top": 8,
-        "bottom": 67
-      },
-      "detectedOutputRoot": [
-        128.0,
-        252.0
-      ],
-      "detectedOutputFootIntervals": [
-        [
-          37,
-          66
-        ],
-        [
-          189,
-          222
-        ]
-      ],
-      "opaquePixels": 18335,
-      "checks": {
-        "noClipping": true,
-        "rootXWithinTolerance": true,
-        "rootYWithinTolerance": true,
-        "enoughOpaquePixels": true
-      },
-      "passed": true
-    },
-    {
-      "index": 3,
-      "sourceInterval": [
-        1576,
-        1957
-      ],
-      "sourceBbox": [
-        0,
-        160,
-        381,
-        606
-      ],
-      "sourceRoot": [
-        176.25,
-        605.0
-      ],
-      "frameShift": [
-        0,
-        0
-      ],
-      "sourceFootIntervals": [
-        [
-          0,
-          61
-        ],
-        [
-          265,
-          381
-        ]
-      ],
-      "outputBbox": [
-        45,
-        44,
-        224,
-        253
-      ],
-      "outputMargins": {
-        "left": 45,
-        "right": 32,
-        "top": 44,
-        "bottom": 67
-      },
-      "detectedOutputRoot": [
-        127.75,
-        252.0
-      ],
-      "detectedOutputFootIntervals": [
-        [
-          45,
-          74
-        ],
-        [
-          170,
-          224
-        ]
-      ],
-      "opaquePixels": 17642,
-      "checks": {
-        "noClipping": true,
-        "rootXWithinTolerance": true,
-        "rootYWithinTolerance": true,
-        "enoughOpaquePixels": true
-      },
-      "passed": true
+      "minimumMargin": 20,
+      "opaquePixels": 16253
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 205,
-    "frameHeight": 262,
-    "rootX": 99,
+    "frameWidth": 180,
+    "frameHeight": 261,
+    "rootX": 78,
     "rootY": 253,
-    "columns": 4,
-    "frameCount": 4,
+    "columns": 3,
+    "frameCount": 3,
     "cropOffset": [
-      29,
-      0
+      72,
+      47
     ],
     "decodedBytes": {
-      "canonical": 1310720,
-      "packed": 859360
+      "canonical": 1228800,
+      "packed": 563760
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "96437fa5b290151a717313ed9039197df421f4d1d2e49f5305802a17b9cb7db0",
-      "config": "2d52098fbc52a2fe6d4b0eea5e6cb930ec604c13c07262665794e3def8abc7a6",
+      "source": "735ea2da621ca9df822426c9aa1185465a9f15acb1b59f9c7da7f28234e2f90a",
+      "config": "59fee94c0344c62c8ef8889fec06ad61399d764491f26ada634a1cae5d3722a1",
       "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
     }
   }

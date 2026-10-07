@@ -22,11 +22,11 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_SET_ROOT_Y = 234;
     static final int CROUCH_SET_FRAME_COUNT = 8;
 
-    static final int CROUCH_HEAVY_FRAME_WIDTH = 205;
-    static final int CROUCH_HEAVY_FRAME_HEIGHT = 262;
-    static final int CROUCH_HEAVY_ROOT_X = 99;
+    static final int CROUCH_HEAVY_FRAME_WIDTH = 180;
+    static final int CROUCH_HEAVY_FRAME_HEIGHT = 261;
+    static final int CROUCH_HEAVY_ROOT_X = 78;
     static final int CROUCH_HEAVY_ROOT_Y = 253;
-    static final int CROUCH_HEAVY_FRAME_COUNT = 4;
+    static final int CROUCH_HEAVY_FRAME_COUNT = 3;
 
     static final int CROUCH_LIGHT_FRAME_WIDTH = 241;
     static final int CROUCH_LIGHT_FRAME_HEIGHT = 195;

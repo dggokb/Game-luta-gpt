@@ -2,27 +2,17 @@
   "id": "player_base_crouch_heavy",
   "javaName": "CROUCH_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_crouch_heavy_source.png",
+  "source": "art/sprites/source/player_base_crouch_heavy_keys.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_heavy.png",
   "report": "tools/sprites/reports/player_base_crouch_heavy.report.json",
   "preview": "android/app/build/sprite-review/crouch-heavy-import.png",
-  "expectedFrames": 4,
-  "segmentation": "horizontal-alpha-components",
-  "rootMode": "ground-feet",
-  "scaleMode": "canonical-anatomy",
-  "anatomyReferenceFrame": 0,
-  "sourceNote": "2H launcher: crouch, wind-up, rising uppercut, guard recovery. Scaled from frame 0 (crouching guard) against the 2M crouching guard (p01 video art) using height and head width; the chest band is excluded because the fists cover the face.",
-  "anatomyReference": {
-    "source": "art/sprites/source/player_base_crouch_medium_video_normalized.png",
-    "frame": 0,
-    "columns": 8,
-    "frameWidth": 512,
-    "frameHeight": 256,
-    "bands": [
-      [
-        0.0,
-        0.12
-      ]
-    ]
-  }
+  "expectedFrames": 3,
+  "segmentation": "prepared-grid",
+  "columns": 3,
+  "rootMode": "authored",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 150,
+  "rootY": 300,
+  "sourceNote": "2H lancador do p01 em poses-chave (o video nao faz o soco para cima): guarda agachada (video do 2M), carga e topo do uppercut (ChatGPT), alinhados pelo pe de tras na escala do idle."
 }
