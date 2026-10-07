@@ -106,8 +106,10 @@ Dicas:
 - O `portal.png` veio com piso em perspectiva e pavilhões nas bordas. Ficou só o torii
   com as cerejeiras (x 300 a 1370 da imagem original), sem o piso e com as bordas
   esfumaçadas, para a cidade aparecer dos lados.
-- O `chao_lajotas.jpg` é provisório: é o canto do `chao.jpg` (fora do emblema) repetido
-  espelhado. Para uma versão melhor, gere no GPT o mesmo prompt do piso **sem o emblema**
-  ("só as lajotas, sem nenhum desenho no centro") e salve com esse nome.
+- O `chao_lajotas.jpg` veio do GPT (o prompt do piso **sem o emblema**). As lajotas dele
+  eram maiores que as do `chao.jpg`, então ele foi recortado nas juntas e reduzido para o
+  mesmo tamanho de lajota (3 lajotas ≈ 418 px), montado em 3×3 com recortes variados para
+  não parecer repetido. Ao trocar o piso, mantenha as lajotas das duas imagens do mesmo
+  tamanho.
 - A cidade já vem com o rio e os reflexos pintados, então a camada `rio` só acrescenta os
   brilhos que piscam (`alfa` 0).
