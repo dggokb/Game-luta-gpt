@@ -38,7 +38,7 @@
     ],
     "impacto": "raio_impacto.png",
     "hits": 20,
-    "espessura": 150,
+    "espessura": 210,
     "aura": {
       "imagem": "raio_aura.png",
       "quadros": 4

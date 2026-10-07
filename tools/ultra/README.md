@@ -116,7 +116,7 @@ O script grava `raio_*.png` e o bloco `raio` do `ultra.json` (o que você não p
 continua como estava):
 
 - `hits`: acertos pequenos antes da explosão (1 a 60). Mais hits = raio mais longo.
-- `espessura`: altura do feixe no mundo do jogo, em pixels (o personagem tem uns 226).
+- `espessura`: altura do feixe no mundo do jogo, em pixels (o personagem tem uns 226). A esfera nas mãos, os anéis e as explosões crescem junto. Só muda este número: não precisa gerar imagem de novo.
 - `centroInicio`: onde está o centro da esfera na imagem `inicio` (o script acha sozinho).
 
 ### Efeitos animados
@@ -168,7 +168,7 @@ anote em `raio.maos`.
 
 ```json
 "raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
-          "centroInicio": [0.443, 0.479], "impacto": "raio_impacto.png", "hits": 20, "espessura": 150,
+          "centroInicio": [0.443, 0.479], "impacto": "raio_impacto.png", "hits": 20, "espessura": 210,
           "aura": {"imagem": "raio_aura.png", "quadros": 4},
           "vento": {"imagem": "raio_vento.png", "quadros": 4},
           "poeira": {"imagem": "raio_poeira.png", "quadros": 4},
