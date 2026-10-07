@@ -228,96 +228,100 @@ public class SpriteIntegrationTest {
         Rect bounds=renderedBounds(renderer,"CUSTOM_PUNCH",.07f,0);
         assertTrue(bounds.width()>60);assertTrue(bounds.height()>150);
     }
-    @Test public void standingLightAttackPlaysJabStartupActiveRecoveryThenReturnsIdle()throws Exception {
-        press(PadInput.Button.LIGHT,0);
-        frames(1);assertEquals("LIGHT_JAB",motion().clip);assertEquals(0,motion().frame());
-        frames(2);assertEquals(1,motion().frame());
-        frames(4);assertEquals(2,motion().frame());
+    /** An attack plays its frames forward without stepping back, then hands over to Idle. */
+    private void assertAttackPlaysForwardThenIdles(PadInput.Button button,String clip,int steps)throws Exception {
+        press(button,0);
+        frames(1);assertEquals(clip,motion().clip);assertEquals(0,motion().frame());
+        int last=0;boolean advanced=false;
+        for(int i=0;i<steps && clip.equals(motion().clip);i++) {
+            frames(1);
+            if(!clip.equals(motion().clip))break;
+            int f=motion().frame();
+            assertTrue(clip+" never steps back: "+last+" -> "+f,f>=last);
+            advanced|=f>last;last=f;
+        }
+        assertTrue(clip+" animates",advanced);
         frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
     }
-    @Test public void standingMediumAttackUsesThreeFrameKickAtScaleOne()throws Exception {
-        press(PadInput.Button.MEDIUM,0);
-        frames(1);assertEquals("MEDIUM_KICK",motion().clip);assertEquals(0,motion().frame());
-        frames(4);assertEquals(1,motion().frame());
-        frames(7);assertEquals(2,motion().frame());
-        frames(5);assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
-        assertEquals(1f,((SpriteFighterRenderer)get("spriteFighterRenderer")).visualProfile().worldScale,.001f);
+    private Bitmap atlasBitmap(CharacterDefinition.Atlas a) {
+        android.content.res.Resources r=RuntimeEnvironment.getApplication().getResources();
+        int id=r.getIdentifier(a.resource,"drawable",RuntimeEnvironment.getApplication().getPackageName());
+        return BitmapFactory.decodeResource(r,id);
     }
-    @Test public void mediumKickUsesWideCanvasWithoutShrinkingCharacter() {
-        Bitmap kick=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_medium_kick);
-        assertNotNull(kick);
-        int fw=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH;
-        int fh=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT;
-        int countFrames=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_COUNT;
-        assertEquals(fw*countFrames,kick.getWidth());
-        assertEquals(fh,kick.getHeight());
-        assertTrue(GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X>0 && GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X<fw);
-        assertTrue(GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y>0 && GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y<fh);
-        for(int i=0;i<countFrames;i++) {
-            int count=0,minX=fw,minY=fh,maxX=-1,maxY=-1;
-            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
-                if(Color.alpha(kick.getPixel(i*fw+x,y))>10) {
+    /** Every packed cell of the attack atlas holds one whole pose with a safety margin. */
+    private void assertAttackAtlasCellsAreWhole(String animation) {
+        CharacterDefinition.Atlas a=GeneratedCharacters.defaultCharacter().animation(animation).atlas;
+        Bitmap atlas=atlasBitmap(a);
+        assertNotNull(atlas);
+        assertEquals(a.columns*a.width,atlas.getWidth());
+        assertEquals((a.count+a.columns-1)/a.columns*a.height,atlas.getHeight());
+        assertTrue(a.rootX>0 && a.rootX<a.width);
+        assertTrue(a.rootY>0 && a.rootY<a.height);
+        for(int i=0;i<a.count;i++) {
+            int left=(i%a.columns)*a.width,top=(i/a.columns)*a.height;
+            int count=0,minX=a.width,minY=a.height,maxX=-1,maxY=-1;
+            for(int y=0;y<a.height;y++)for(int x=0;x<a.width;x++) {
+                if(Color.alpha(atlas.getPixel(left+x,top+y))>10) {
                     count++;
                     minX=Math.min(minX,x);maxX=Math.max(maxX,x);
                     minY=Math.min(minY,y);maxY=Math.max(maxY,y);
                 }
             }
-            assertTrue("Empty medium kick frame "+i,count>10000);
-            assertTrue("Kick clipped left "+i,minX>=8);
-            assertTrue("Kick clipped right "+i,fw-1-maxX>=8);
-            assertTrue("Kick clipped top "+i,minY>=8);
-            assertTrue("Kick clipped bottom "+i,fh-1-maxY>=8);
+            assertTrue("Empty "+animation+" frame "+i,count>10000);
+            assertTrue(animation+" clipped left "+i,minX>=8);
+            assertTrue(animation+" clipped right "+i,a.width-1-maxX>=8);
+            assertTrue(animation+" clipped top "+i,minY>=8);
+            assertTrue(animation+" clipped bottom "+i,a.height-1-maxY>=8);
         }
     }
-    @Test public void productionRendererKeepsMediumKickInsideGeneratedCanvas()throws Exception {
-        SpriteFighterRenderer renderer=
-            new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
-        int fw=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_WIDTH;
-        int fh=GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_HEIGHT;
-        int rx=GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_X;
-        int ry=GeneratedSpriteLayouts.MEDIUM_KICK_ROOT_Y;
-
-        Bitmap review=Bitmap.createBitmap(
-            fw*GeneratedSpriteLayouts.MEDIUM_KICK_FRAME_COUNT,
-            fh,
-            Bitmap.Config.ARGB_8888
-        );
+    /** The production renderer draws every frame of the attack inside its own cell. */
+    private void assertRendererKeepsAttackInsideCanvas(String animation,String reviewFile)throws Exception {
+        SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
+        CharacterDefinition.Animation anim=GeneratedCharacters.defaultCharacter().animation(animation);
+        CharacterDefinition.Atlas a=anim.atlas;
+        int fw=a.width,fh=a.height,samples=a.count,background=Color.rgb(32,36,44);
+        Bitmap review=Bitmap.createBitmap(fw*samples,fh,Bitmap.Config.ARGB_8888);
         Canvas canvas=new Canvas(review);
-        canvas.drawColor(Color.rgb(32,36,44));
-        float[] times={.016f,.090f,.220f};
-
-        for(int i=0;i<times.length;i++) {
-            renderer.motion.clip="MEDIUM_KICK";
-            renderer.motion.time=times[i];
-            assertEquals(i,renderer.motion.frame());
-            canvas.save();
-            canvas.translate(i*fw,0);
-            renderer.draw(canvas,rx,ry,1,false,false);
+        canvas.drawColor(background);
+        for(int i=0;i<samples;i++) {
+            float t=anim.duration*(i+.5f)/samples;
+            renderer.motion.clip=animation;renderer.motion.time=t;
+            assertEquals(anim.frame(t,0),renderer.motion.frame());
+            canvas.save();canvas.translate(i*fw,0);
+            renderer.draw(canvas,a.rootX,a.rootY,1,false,false);
             canvas.restore();
         }
-
-        for(int i=0;i<times.length;i++) {
+        for(int i=0;i<samples;i++) {
             int minX=fw,minY=fh,maxX=-1,maxY=-1;
             for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
-                int pixel=review.getPixel(i*fw+x,y);
-                if(pixel!=Color.rgb(32,36,44)) {
+                if(review.getPixel(i*fw+x,y)!=background) {
                     minX=Math.min(minX,x);maxX=Math.max(maxX,x);
                     minY=Math.min(minY,y);maxY=Math.max(maxY,y);
                 }
             }
-            assertTrue("Rendered kick clipped left "+i,minX>=8);
-            assertTrue("Rendered kick clipped right "+i,fw-1-maxX>=8);
-            assertTrue("Rendered kick clipped top "+i,minY>=8);
-            assertTrue("Rendered kick clipped bottom "+i,fh-1-maxY>=8);
+            assertTrue("Rendered "+animation+" clipped left "+i,minX>=8);
+            assertTrue("Rendered "+animation+" clipped right "+i,fw-1-maxX>=8);
+            assertTrue("Rendered "+animation+" clipped top "+i,minY>=8);
+            assertTrue("Rendered "+animation+" clipped bottom "+i,fh-1-maxY>=8);
         }
-
         File dir=new File("build/sprite-review");
         dir.mkdirs();
-        try(FileOutputStream out=new FileOutputStream(
-            new File(dir,"medium-kick-render.png")
-        )) {
+        try(FileOutputStream out=new FileOutputStream(new File(dir,reviewFile))) {
             assertTrue(review.compress(Bitmap.CompressFormat.PNG,100,out));
         }
+    }
+    @Test public void standingLightAttackPlaysJabStartupActiveRecoveryThenReturnsIdle()throws Exception {
+        assertAttackPlaysForwardThenIdles(PadInput.Button.LIGHT,"LIGHT_JAB",6);
+    }
+    @Test public void standingMediumAttackPlaysForwardAtScaleOne()throws Exception {
+        assertAttackPlaysForwardThenIdles(PadInput.Button.MEDIUM,"MEDIUM_KICK",11);
+        assertEquals(1f,((SpriteFighterRenderer)get("spriteFighterRenderer")).visualProfile().worldScale,.001f);
+    }
+    @Test public void mediumAttackUsesWideCanvasWithoutShrinkingCharacter() {
+        assertAttackAtlasCellsAreWhole("MEDIUM_KICK");
+    }
+    @Test public void productionRendererKeepsMediumAttackInsideGeneratedCanvas()throws Exception {
+        assertRendererKeepsAttackInsideCanvas("MEDIUM_KICK","medium-kick-render.png");
     }
 
     @Test public void standingHeavyAttackUsesNineFrameStraightAtScaleOne()throws Exception {
@@ -335,82 +339,12 @@ public class SpriteIntegrationTest {
         );
     }
 
-    @Test public void heavyStraightUsesGeneratedCanvasWithoutClipping() {
-        Bitmap heavy=BitmapFactory.decodeResource(
-            RuntimeEnvironment.getApplication().getResources(),
-            R.drawable.player_base_heavy_straight
-        );
-        assertNotNull(heavy);
-        int fw=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_WIDTH;
-        int fh=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_HEIGHT;
-        int countFrames=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_COUNT;
-        assertEquals(9,countFrames);
-        assertEquals(fw*countFrames,heavy.getWidth());
-        assertEquals(fh,heavy.getHeight());
-
-        for(int i=0;i<countFrames;i++) {
-            int count=0,minX=fw,minY=fh,maxX=-1,maxY=-1;
-            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
-                if(Color.alpha(heavy.getPixel(i*fw+x,y))>10) {
-                    count++;
-                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
-                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
-                }
-            }
-            assertTrue("Empty heavy straight frame "+i,count>10000);
-            assertTrue("Heavy clipped left "+i,minX>=8);
-            assertTrue("Heavy clipped right "+i,fw-1-maxX>=8);
-            assertTrue("Heavy clipped top "+i,minY>=8);
-            assertTrue("Heavy clipped bottom "+i,fh-1-maxY>=8);
-        }
+    @Test public void heavyAttackUsesGeneratedCanvasWithoutClipping() {
+        assertAttackAtlasCellsAreWhole("HEAVY_STRAIGHT");
     }
 
-    @Test public void productionRendererKeepsHeavyStraightInsideGeneratedCanvas()throws Exception {
-        SpriteFighterRenderer renderer=
-            new SpriteFighterRenderer(RuntimeEnvironment.getApplication());
-        int fw=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_WIDTH;
-        int fh=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_HEIGHT;
-        int rx=GeneratedSpriteLayouts.HEAVY_STRAIGHT_ROOT_X;
-        int ry=GeneratedSpriteLayouts.HEAVY_STRAIGHT_ROOT_Y;
-        int count=GeneratedSpriteLayouts.HEAVY_STRAIGHT_FRAME_COUNT;
-
-        Bitmap review=Bitmap.createBitmap(fw*count,fh,Bitmap.Config.ARGB_8888);
-        Canvas canvas=new Canvas(review);
-        canvas.drawColor(Color.rgb(32,36,44));
-        float[] times={.016f,.050f,.090f,.130f,.170f,.220f,.270f,.320f,.370f};
-
-        for(int i=0;i<count;i++) {
-            renderer.motion.clip="HEAVY_STRAIGHT";
-            renderer.motion.time=times[i];
-            assertEquals(i,renderer.motion.frame());
-            canvas.save();
-            canvas.translate(i*fw,0);
-            renderer.draw(canvas,rx,ry,1,false,false);
-            canvas.restore();
-        }
-
-        int background=Color.rgb(32,36,44);
-        for(int i=0;i<count;i++) {
-            int minX=fw,minY=fh,maxX=-1,maxY=-1;
-            for(int y=0;y<fh;y++)for(int x=0;x<fw;x++) {
-                if(review.getPixel(i*fw+x,y)!=background) {
-                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
-                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
-                }
-            }
-            assertTrue("Rendered heavy clipped left "+i,minX>=8);
-            assertTrue("Rendered heavy clipped right "+i,fw-1-maxX>=8);
-            assertTrue("Rendered heavy clipped top "+i,minY>=8);
-            assertTrue("Rendered heavy clipped bottom "+i,fh-1-maxY>=8);
-        }
-
-        File dir=new File("build/sprite-review");
-        dir.mkdirs();
-        try(FileOutputStream out=new FileOutputStream(
-            new File(dir,"heavy-straight-render.png")
-        )) {
-            assertTrue(review.compress(Bitmap.CompressFormat.PNG,100,out));
-        }
+    @Test public void productionRendererKeepsHeavyAttackInsideGeneratedCanvas()throws Exception {
+        assertRendererKeepsAttackInsideCanvas("HEAVY_STRAIGHT","heavy-straight-render.png");
     }
 
     @Test public void normalizedAtlasesUsePlayerBaseCellGeometry() {
@@ -441,8 +375,8 @@ public class SpriteIntegrationTest {
             *(idle.getHeight()/GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT)>=GeneratedSpriteLayouts.IDLE_FRAME_COUNT);
         assertEquals(4*GeneratedSpriteLayouts.MOVEMENT_FRAME_WIDTH,movement.getWidth());
         assertEquals(4*GeneratedSpriteLayouts.MOVEMENT_FRAME_HEIGHT,movement.getHeight());
-        assertEquals(3*GeneratedSpriteLayouts.JAB_FRAME_WIDTH,jab.getWidth());
-        assertEquals(GeneratedSpriteLayouts.JAB_FRAME_HEIGHT,jab.getHeight());
+        assertEquals(0,jab.getWidth()%GeneratedSpriteLayouts.JAB_FRAME_WIDTH);
+        assertEquals(0,jab.getHeight()%GeneratedSpriteLayouts.JAB_FRAME_HEIGHT);
         // Packing never grows past the canonical 256x256 authoring cell.
         assertTrue(GeneratedSpriteLayouts.IDLE_FRAME_WIDTH<=256 && GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT<=256);
     }
@@ -516,15 +450,12 @@ public class SpriteIntegrationTest {
         int jabUpper=upperBodyWidth(renderer,"LIGHT_JAB",.016f,0f);
         int heavyUpper=upperBodyWidth(renderer,"HEAVY_STRAIGHT",.016f,0f);
 
-        // Idle and walk come from the same video set (p01): they must match each other.
         float idleRatio=idleUpper/(float)walkUpper;
-        assertTrue("Idle off-model: "+idleRatio,idleRatio>=.94f && idleRatio<=1.12f);
-        // The legacy jab/heavy art is being replaced by video clips; until then it is only
-        // kept from drifting further than its known gap to the new model.
         float jabRatio=jabUpper/(float)walkUpper;
         float heavyRatio=heavyUpper/(float)idleUpper;
-        assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.80f && jabRatio<=1.14f);
-        assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.80f && heavyRatio<=1.05f);
+        assertTrue("Idle off-model: "+idleRatio,idleRatio>=.94f && idleRatio<=1.12f);
+        assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.14f);
+        assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_movement);

@@ -1,0 +1,14 @@
+{
+  "id": "player_base_jump",
+  "javaName": "JUMP_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_jump_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_jump.png",
+  "report": "tools/sprites/reports/player_base_jump.report.json",
+  "preview": "android/app/build/sprite-review/jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+}

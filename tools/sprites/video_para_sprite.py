@@ -50,13 +50,32 @@ def best_loop(frames, lo, hi, min_len):
     return best
 
 
-def key(frame, dust=False):
+def key(frame, dust=False, effects=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45)
     if dust:  # poeira bege dos pés (o jogo desenha os efeitos)
         bg |= (h >= 8) & (h <= 34) & (s >= 18) & (s <= 70) & (v >= 120)
+    if effects:
+        # Clarão de impacto: amarelo claro (a pele é mais alaranjada e menos clara).
+        bg |= (h >= 22) & (h <= 40) & (v >= 200) & (s >= 40)
     alpha = np.where(bg, 0, 255).astype(np.uint8)
+    if effects:
+        # Rastro de golpe: faixa fina, clara e sem cor. Some na abertura morfológica,
+        # enquanto calça, cabelo e faixa (largos) ficam.
+        thick = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15)))
+        thick = cv2.dilate(thick, np.ones((5, 5), np.uint8))
+        pale = (s < 60) & (v > 150)
+        thin = (alpha > 0) & (thick == 0) & (pale | ((h >= 20) & (h <= 50)))
+        # Rastro largo: claro e longe de qualquer parte colorida do corpo (pele, azul,
+        # preto, vermelho). A calça branca fica perto da faixa azul, da faixa e do tênis.
+        colored = ((alpha > 0) & ~pale).astype(np.uint8)
+        body = cv2.dilate(colored, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (91, 91)))
+        alpha[thin | ((alpha > 0) & pale & (body == 0))] = 0
+        n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
+        if n > 1:
+            keep = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+            alpha[labels != keep] = 0
     alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     n, labels, stats, _ = cv2.connectedComponentsWithStats(alpha)
     if n > 1:
@@ -93,10 +112,13 @@ def main():
     p.add_argument("--celula", type=int, default=256, help="altura da célula")
     p.add_argument("--largura", type=int, help="largura da célula (padrão: igual à altura)")
     p.add_argument("--sem-poeira", action="store_true", help="remove poeira bege do chão")
+    p.add_argument("--sem-efeitos", action="store_true", help="remove clarão de impacto e rastro de golpe")
     p.add_argument("--colunas", type=int, default=8)
     p.add_argument("--raiz", default="128,238")
     p.add_argument("--fixar", choices=["tronco", "video"], default="tronco",
                    help="tronco: anula o deslizamento lateral; video: mantém a posição do vídeo")
+    p.add_argument("--pe-no-chao", action="store_true",
+                   help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -111,7 +133,7 @@ def main():
         start, end = args.inicio or 0, args.fim or len(frames)
     picked = ([int(v) for v in args.quadros.split(",")] if args.quadros
               else list(range(start, end, args.passo)))
-    keyed = [key(frames[i], args.sem_poeira) for i in picked]
+    keyed = [key(frames[i], args.sem_poeira, args.sem_efeitos) for i in picked]
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
         # Remove só a tendência (o deslizamento); o balanço natural do corpo continua.
@@ -142,7 +164,8 @@ def main():
         img = Image.fromarray(k, "RGBA")
         img = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
         x = (n % cols) * cw + rx - round((ref_x - off) * s)
-        y = (n // cols) * cell + ry - round(foot_y * s)
+        bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
+        y = (n // cols) * cell + ry - round(bottom * s)
         sheet.alpha_composite(img, (x, y))
     sheet.save(args.saida)
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")

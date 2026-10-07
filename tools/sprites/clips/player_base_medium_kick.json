@@ -2,16 +2,15 @@
   "id": "player_base_medium_kick",
   "javaName": "MEDIUM_KICK",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_medium_kick_source.png",
+  "source": "art/sprites/source/player_base_medium_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_medium_kick.png",
   "report": "tools/sprites/reports/player_base_medium_kick.report.json",
-  "preview": "android/app/build/sprite-review/medium-kick-import.png",
-  "expectedFrames": 3,
-  "segmentation": "horizontal-alpha-components",
-  "rootMode": "ground-feet",
-  "scaleReferenceFrames": [
-    0,
-    1,
-    2
-  ]
+  "preview": "android/app/build/sprite-review/medium_kick-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "rootX": 140,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
 }

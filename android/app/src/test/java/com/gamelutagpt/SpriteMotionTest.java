@@ -57,9 +57,12 @@ public class SpriteMotionTest {
     }
     @Test public void jumpFallAndLandingAreOneShotAndFollowPhysics() {
         SpriteMotion m=new SpriteMotion();
-        tick(m,.016f,false,false,-900,0,true,false,false,false,false);assertEquals(10,m.frame());
-        tick(m,.016f,false,false,200,0,true,false,false,false,false);assertEquals(11,m.frame());
-        tick(m,.016f,true,false,0,0,true,false,false,false,false);assertEquals(15,m.frame());
+        tick(m,.016f,false,false,-900,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.JUMP,m.clip);assertEquals(clip(SpriteMotion.Clip.JUMP).frame(m.time,0),m.frame());
+        tick(m,.016f,false,false,200,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.FALL,m.clip);assertEquals(clip(SpriteMotion.Clip.FALL).frame(m.time,0),m.frame());
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.LAND,m.clip);assertEquals(clip(SpriteMotion.Clip.LAND).frame(m.time,0),m.frame());
         for(int i=0;i<10;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }

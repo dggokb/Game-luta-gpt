@@ -72,15 +72,15 @@ class CharacterPackTests(unittest.TestCase):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['output']='android/app/src/main/res/drawable-nodpi/player_base_idle.png';path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'duplicate output'):pipeline.build(self.root)
     def test_missing_source_is_rejected(self):
-        (self.root/'art/sprites/source/player_base_jab_normalized.png').unlink()
+        (self.root/'art/sprites/source/player_base_jab_video_normalized.png').unlink()
         with self.assertRaises(FileNotFoundError):pipeline.build(self.root)
     def test_wrong_prepared_grid_geometry_is_rejected(self):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['columns']=2;path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'dimensions'):pipeline.build(self.root)
 
-    def test_heavy_uses_canonical_anatomy_scale(self):
+    def test_reaction_uses_canonical_anatomy_scale(self):
         pipeline.build(self.root)
-        report=json.loads((self.root/'tools/sprites/reports/player_base_heavy_straight.report.json').read_text())
+        report=json.loads((self.root/'tools/sprites/reports/player_base_hit_stand.report.json').read_text())
         self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
         self.assertTrue(report['anatomy']['passed'])
         self.assertLess(report['scale'],0.66)
@@ -88,7 +88,7 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual(238,report['layout']['rootY'])
 
     def test_non_comparable_anatomy_reference_is_rejected(self):
-        path=self.root/'tools/sprites/clips/player_base_heavy_straight.json'
+        path=self.root/'tools/sprites/clips/player_base_hit_stand.json'
         data=json.loads(path.read_text());data['anatomyReferenceFrame']=1
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(ValueError,'anatomy reference frame'):
