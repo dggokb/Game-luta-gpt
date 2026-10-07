@@ -30,6 +30,9 @@ final class AiController {
     private boolean grab;
     /** Frames left before teching the throw it is caught in; -1 no tech, -2 not decided. */
     private int techDelay = -2;
+    /** Recovery planned for the current air hitstun / knockdown (relative direction), or -2 undecided. */
+    private int airTechPlan = -2;
+    private int wakeupPlan = -2;
 
     private final OpponentAi.Actions actions = new OpponentAi.Actions() {
         @Override public void stop() {
@@ -81,6 +84,22 @@ final class AiController {
         }
         techDelay = -2;
         if (me.frozen()) return;
+        if (me.status == CombatFighter.Status.AIR_HITSTUN) {
+            // Air tech once the hitstun is over, sometimes, toward a random side.
+            if (airTechPlan == -2) airTechPlan = ai.airTechDirection();
+            if (airTechPlan >= 0 && me.stunLeft == 0) {
+                out.direction = MotionParser.relative(airTechPlan, me.facing);
+                out.light = true;
+            }
+            return;
+        }
+        airTechPlan = -2;
+        if (me.status == CombatFighter.Status.KNOCKDOWN) {
+            if (wakeupPlan == -2) wakeupPlan = ai.wakeupDirection();
+            if (wakeupPlan > 0) out.direction = MotionParser.relative(wakeupPlan, me.facing);
+            return;
+        }
+        wakeupPlan = -2;
 
         if (cooldown > 0) cooldown--;
         if (me.framesSinceHit == 0) cooldown = Math.max(cooldown, HIT_COOLDOWN);

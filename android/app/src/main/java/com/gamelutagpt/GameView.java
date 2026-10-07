@@ -692,6 +692,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private static String bannerFor(String cue) {
         switch (cue) {
             case "TECH": return "TECH!";
+            case "AIR_TECH": return "AIR TECH!";
             case "PUSHBLOCK": return "PUSHBLOCK!";
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             default: return null;
@@ -970,12 +971,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         CombatFighter p = player();
         switch (p.status) {
             case KNOCKDOWN:
+                return p.hardKnockdown ? "DERRUBADO" : "DERRUBADO  •  \u2191 RÁPIDO  \u2190\u2192 ROLA  \u2193 DEMORA";
             case WAKEUP:
-                return "DERRUBADO";
+                return p.rolling() ? "ROLAMENTO" : "LEVANTANDO";
             case BLOCKSTUN:
                 return guardLabel(p.lastGuard, "BLOQUEIO") +
                     (p.state.superMeter >= engine.config.pushblockCost ? "  •  M+H EMPURRA" : "");
             case AIR_HITSTUN:
+                if (p.stunLeft == 0 && !p.slammed && !p.hardFall && !p.ultraFall) return "CAINDO: L/M/H = AIR TECH";
                 return p.slammed ? "QUEDA FORÇADA" : p.launched ? "LANÇADO" : "HIT";
             case HITSTUN:
                 return "HIT";

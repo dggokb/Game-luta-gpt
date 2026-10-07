@@ -1,7 +1,7 @@
 # Sprites e efeitos que faltam
 
 Lista do que ainda usa pose emprestada ou desenho provisório, com o prompt para gerar no
-GPT. Atualizada na v0.83. Quando uma folha chegar, ela entra pelo pipeline normal
+GPT. Atualizada na v0.84. Quando uma folha chegar, ela entra pelo pipeline normal
 (`tools/sprites/`, veja `docs/sprite-standard.md`). Folhas desenhadas em grade apertada
 passam antes por `tools/sprites/separar_folha.py`.
 
@@ -35,6 +35,9 @@ fundo transparente.
 | 5 | **Batida na parede** (`<id>_wall_splat`) | reação no ar | 3 (3 × 1) | Atingido e jogado de costas contra uma parede invisível à esquerda: 1. costas batendo na parede, braços abertos; 2. quicando para longe dela; 3. caindo inclinado para a frente. |
 | 6 | **Especial (projétil)** (`specialAnimations.S`) | pose de combate | 5 (5 × 1) | Lançando uma bola de energia (sem desenhar a energia): 1. recua as mãos para a cintura; 2-3. carrega; 4. empurra as duas mãos para a frente; 5. volta para a guarda. |
 | 7 | **Super** (`specialAnimations.SUPER`) | pose de combate | 6 (3 × 2) | Pose de golpe especial forte: 1-2. concentração com os punhos fechados; 3-4. postura de poder, roupa esvoaçando; 5. disparo com as duas mãos; 6. recuperação. |
+
+| 8 | **Rolamento** (`<id>_roll`) | clipe de levantar | 4 (4 × 1) | Rolamento de chão no levantar: 1. de costas no chão encolhendo; 2-3. rolando de lado como uma bola; 4. saindo do rolamento já agachado em guarda. |
+| 9 | **Air tech** (`<id>_air_tech`) | pose de pulo | 3 (3 × 1) | Recuperação no ar: 1. corpo encolhido girando (cambalhota); 2. abrindo o corpo; 3. pronto para cair em guarda, pés para baixo. |
 
 Itens 1, 2 e 5 também servem para o Guard Cancel e o ground bounce (o ground bounce usa a
 reação no ar que já existe).

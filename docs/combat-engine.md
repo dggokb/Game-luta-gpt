@@ -95,6 +95,42 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Air tech e opções de levantar — v0.84
+
+A recuperação deixou de ser automática: quem apanha escolhe. Valores em
+`CombatConfig.airTech*`, `quickRiseDownFrames`, `roll*` e `delayWakeupFrames`.
+
+**No ar** (quando o hitstun aéreo acaba):
+
+| Entrada | Resultado |
+| --- | --- |
+| L/M/H + ← | **Air tech para trás**: controle na hora, 10 frames invulnerável, 160 px para longe |
+| L/M/H + → | Air tech para a frente (120 px) |
+| L/M/H sem direção | Air tech neutro: um pulinho para cima |
+| nada | **Cai solto** por até 12 frames (`airTechWindow`), ainda aberto a golpes (conta no combo, com o limite de juggle), e recupera sozinho, sem invulnerabilidade |
+
+O botão do tech não sai como golpe aéreo. Quedas forçadas (slam), bounces e o ultra não
+têm air tech (caem derrubados).
+
+**No chão** (direção segurada enquanto está deitado, relativa a quem olha):
+
+| Direção | Resultado |
+| --- | --- |
+| ↑ | **Levantar rápido**: fica só 14 frames no chão (em vez de 72) |
+| ← | **Rolar para trás**: 24 frames invulnerável, ~220 px para longe |
+| → | **Rolar para a frente**: passa por baixo do oponente (atravessa o corpo) |
+| ↓ | **Levantar atrasado**: +30 frames no chão (quebra o tempo do oki) |
+| nada | levanta no tempo normal |
+
+- Knockdown do ultra (`hardKnockdown`) não tem opções.
+- A proteção contra agarrão ao levantar (v0.80) vale para todas as opções.
+- O HUD mostra as opções quando você está no chão e "L/M/H = AIR TECH" quando está caindo.
+- **CPU**: faz air tech em ~70% das vezes (neutro, para trás ou para a frente) e escolhe
+  levantar rápido, rolar, atrasar ou normal ao acaso.
+- Sem arte própria ainda: o rolamento usa o clipe de levantar.
+
+Testes em `RecoveryTest`.
+
 ## Wall bounce e ground bounce — v0.83
 
 Dois novos `launchType` no pack, controlados pela `ComboSession` (no máximo **1 de cada por

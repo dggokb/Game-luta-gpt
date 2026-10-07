@@ -230,6 +230,7 @@ final class CombatEngine {
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
         if (in.grab) f.throwRequestAge = 0;
+        if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
         if (in.pushblock) {
             // Only blocking turns M + H into a pushblock; otherwise it is the heavy.
             if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
@@ -341,19 +342,39 @@ final class CombatEngine {
             }
             case AIR_HITSTUN:
                 if (f.stunLeft == 0 && !f.slammed && !f.ultraFall && !f.hardFall && f.bounce == CombatFighter.BOUNCE_NONE) {
-                    // Air recovery: control returns before landing.
-                    f.status = CombatFighter.Status.NEUTRAL;
-                    f.launched = false;
+                    if (f.techRequestAge >= 0) {
+                        airTech(f);
+                    } else if (++f.freeFallFrames >= config.airTechWindow) {
+                        // No tech: it recovers on its own a little later, without the escape.
+                        f.status = CombatFighter.Status.NEUTRAL;
+                        f.launched = false;
+                        f.freeFallFrames = 0;
+                    }
                 }
                 break;
-            case KNOCKDOWN:
-                if (f.knockdownFrame >= config.knockdownFallFrames + config.knockdownDownFrames) {
+            case KNOCKDOWN: {
+                if (f.knockdownFrame >= config.knockdownFallFrames && f.wakeup == CombatFighter.WAKE_NORMAL &&
+                    !f.hardKnockdown && !f.ko()) {
+                    chooseWakeup(f);
+                }
+                int down = config.knockdownDownFrames;
+                if (f.wakeup == CombatFighter.WAKE_QUICK) down = Math.min(down, config.quickRiseDownFrames);
+                if (f.wakeup == CombatFighter.WAKE_DELAY) down += config.delayWakeupFrames;
+                boolean roll = f.wakeup == CombatFighter.WAKE_BACK_ROLL || f.wakeup == CombatFighter.WAKE_FORWARD_ROLL;
+                if (roll || f.knockdownFrame >= config.knockdownFallFrames + down) {
                     f.status = CombatFighter.Status.WAKEUP;
                     f.knockdownFrame = 0;
+                    if (roll) {
+                        f.rollFrames = config.rollFrames;
+                        int away = f.x <= fighters[1 - f.index].x ? -1 : 1;
+                        f.rollDirection = f.wakeup == CombatFighter.WAKE_BACK_ROLL ? away : -away;
+                    }
                 }
                 break;
+            }
             case WAKEUP:
-                if (f.knockdownFrame >= config.wakeupFrames) {
+                if (f.knockdownFrame >= Math.max(config.wakeupFrames, f.rollFrames > 0 ? config.rollFrames : 0) &&
+                    f.rollFrames == 0) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.throwProtect = config.throwProtectFrames;
                 }
@@ -453,6 +474,39 @@ final class CombatEngine {
         f.vy = 0f;
     }
 
+    /** Air tech: control back at once, a short invulnerability and a hop where the stick points. */
+    private void airTech(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        int relative = MotionParser.relative(f.input.direction, f.facing);
+        f.status = CombatFighter.Status.NEUTRAL;
+        f.launched = false;
+        f.techRequestAge = -1;
+        f.freeFallFrames = 0;
+        f.invulnFrames = config.airTechInvulnFrames;
+        // The button that asked for the tech must not come out as an air normal.
+        f.buffer.clear();
+        int away = f.x <= other.x ? -1 : 1;
+        if (relative == 4 || relative == 5 || relative == 6) {
+            push(f, other, away * config.airTechBackDistance);
+        } else if (relative == 1 || relative == 2 || relative == 8) {
+            push(f, other, -away * config.airTechForwardDistance);
+        } else {
+            f.vy = -config.airTechNeutralPop;
+        }
+        cues.add("AIR_TECH");
+    }
+
+    /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
+    private void chooseWakeup(CombatFighter f) {
+        switch (MotionParser.relative(f.input.direction, f.facing)) {
+            case 6: case 7: case 8: f.wakeup = CombatFighter.WAKE_QUICK; break;
+            case 4: case 5: f.wakeup = CombatFighter.WAKE_BACK_ROLL; break;
+            case 1: case 2: f.wakeup = CombatFighter.WAKE_FORWARD_ROLL; break;
+            case 3: f.wakeup = CombatFighter.WAKE_DELAY; break;
+            default: break;
+        }
+    }
+
     private void startThrow(CombatFighter f) {
         f.status = CombatFighter.Status.THROW;
         f.clearAttack();
@@ -489,6 +543,7 @@ final class CombatEngine {
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
         if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
         if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
+        if (f.techRequestAge >= 0 && ++f.techRequestAge > config.bufferFrames) f.techRequestAge = -1;
         if (f.invulnFrames > 0) f.invulnFrames--;
         if (f.throwProtect > 0) f.throwProtect--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
@@ -548,6 +603,11 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        if (f.rolling()) {
+            f.x += f.rollDirection * config.rollSpeed * CombatConfig.DT;
+            f.rollFrames--;
+            return;
+        }
         if (f.vx != 0f && f.status == CombatFighter.Status.AIR_HITSTUN) {
             f.x += f.vx * CombatConfig.DT;
             boolean reached = f.bounce == CombatFighter.BOUNCE_WALL &&
@@ -642,6 +702,7 @@ final class CombatEngine {
             f.clearAttack();
         }
         f.vx = 0f;
+        f.freeFallFrames = 0;
         if (f.status == CombatFighter.Status.AIR_HITSTUN) {
             if (f.slammed || f.ultraFall || f.hardFall) {
                 knockDown(f);
@@ -659,6 +720,11 @@ final class CombatEngine {
     }
 
     private void knockDown(CombatFighter f) {
+        f.hardKnockdown = f.ultraFall;
+        f.wakeup = CombatFighter.WAKE_NORMAL;
+        f.rollFrames = 0;
+        f.techRequestAge = -1;
+        f.freeFallFrames = 0;
         f.status = CombatFighter.Status.KNOCKDOWN;
         f.clearAttack();
         f.knockdownFrame = 0;
@@ -689,6 +755,8 @@ final class CombatEngine {
 
     private void resolveBodies() {
         CombatFighter a = fighters[0], b = fighters[1];
+        // A wake-up roll passes through the other body.
+        if (a.rolling() || b.rolling()) return;
         if (CombatRules.resolvePush(a.x, a.y, a.body(), b.x, b.y, b.body(),
             Arena.LEFT_BOUND, Arena.RIGHT_BOUND, a.facing, pushResult)) {
             a.x = pushResult[0];
@@ -1336,7 +1404,8 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
-        // A new hit takes over any flight in progress.
+        // A new hit takes over any flight in progress (and any free fall after the hitstun).
+        d.freeFallFrames = 0;
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
         // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.

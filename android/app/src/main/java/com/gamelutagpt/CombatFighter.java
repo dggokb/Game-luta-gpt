@@ -98,6 +98,20 @@ final class CombatFighter {
     /** Thrown by an ultra: lands knocked down instead of recovering in the air. */
     boolean ultraFall;
 
+    // Recovery options.
+    static final int WAKE_NORMAL = 0, WAKE_QUICK = 1, WAKE_BACK_ROLL = 2, WAKE_FORWARD_ROLL = 3, WAKE_DELAY = 4;
+    /** Frames since an attack button asked for an air tech, or -1. */
+    int techRequestAge = -1;
+    /** Frames spent free-falling after the air hitstun ended without a tech. */
+    int freeFallFrames;
+    /** How this knockdown ends (chosen while lying down). */
+    int wakeup = WAKE_NORMAL;
+    /** Frames of roll left and its world direction. */
+    int rollFrames;
+    int rollDirection;
+    /** Knocked down by an ultra: no wake-up options. */
+    boolean hardKnockdown;
+
     // Bounces.
     static final int BOUNCE_NONE = 0, BOUNCE_WALL = 1, BOUNCE_GROUND = 2;
     /** Bounce waiting to happen (flying to the wall or driven into the floor). */
@@ -185,6 +199,11 @@ final class CombatFighter {
     }
 
     /** Knocked down, getting up or KO: no hit connects. */
+    /** Rolling on wake-up: invulnerable and passes through the other body. */
+    boolean rolling() {
+        return status == Status.WAKEUP && rollFrames > 0;
+    }
+
     boolean hittable() {
         return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam() && !inThrowExchange() &&
             invulnFrames == 0;

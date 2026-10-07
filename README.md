@@ -237,3 +237,13 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 
 **Arte que falta** (agarrão, pushblock, air dash, batida na parede, especial e Super, o
 Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/sprites-pendentes.md).
+
+## Air tech e opções de levantar — v0.84
+
+- **Caindo depois de um combo**: aperte **L/M/H** para o **air tech** (com ← foge para trás,
+  com → vai para a frente, sem direção dá um pulinho). Sem apertar, você cai solto um
+  instante e ainda pode apanhar.
+- **No chão**: segure **↑** para levantar rápido, **← / →** para rolar (o → passa por baixo do
+  oponente) ou **↓** para levantar atrasado.
+- A CPU também usa essas opções.
+- Detalhes: `docs/combat-engine.md` (seção Air tech e opções de levantar).

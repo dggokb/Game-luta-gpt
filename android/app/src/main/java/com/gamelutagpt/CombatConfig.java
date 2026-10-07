@@ -146,6 +146,22 @@ final class CombatConfig {
     /** Throw invulnerability right after hitstun, blockstun or wake-up. */
     int throwProtectFrames = 6;
 
+    // Air tech (attack button when the air hitstun ends; the direction picks where to go).
+    /** Without a tech the fighter free-falls this long, then recovers on its own (no invulnerability). */
+    int airTechWindow = 12;
+    int airTechInvulnFrames = 10;
+    float airTechBackDistance = 160f;
+    float airTechForwardDistance = 120f;
+    float airTechNeutralPop = 380f;
+    // Wake-up options, chosen with the direction while lying down (relative to facing).
+    /** ↑: quick rise, after at least this long on the ground. */
+    int quickRiseDownFrames = 14;
+    /** ← / →: roll (invulnerable, passes through the other body), then up. */
+    int rollFrames = 24;
+    float rollSpeed = 560f;
+    /** ↓: delayed wake-up, this much longer on the ground. */
+    int delayWakeupFrames = 30;
+
     // Wall bounce and ground bounce: once each per combo (the next one is a plain hit).
     int maxWallBounces = 1;
     int maxGroundBounces = 1;

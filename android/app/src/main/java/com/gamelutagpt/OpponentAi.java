@@ -46,6 +46,8 @@ final class OpponentAi {
     /** Chance of throwing when the target is right next to it, and of teching a throw. */
     static final double THROW_CHANCE = 0.16;
     static final double TECH_CHANCE = 0.40;
+    /** Chance of an air tech when the air hitstun ends. */
+    static final double AIR_TECH_CHANCE = 0.70;
     static final double[] AIR_WEIGHTS = {0.30, 0.34, 0.36};
 
     private final Random random;
@@ -123,5 +125,18 @@ final class OpponentAi {
      */
     int techDelay() {
         return random.nextDouble() < TECH_CHANCE ? 2 + random.nextInt(8) : -1;
+    }
+
+    /** Air tech when the hitstun ends: relative direction (0 neutral, 5 back, 1 forward), or -1 none. */
+    int airTechDirection() {
+        if (random.nextDouble() >= AIR_TECH_CHANCE) return -1;
+        double r = random.nextDouble();
+        return r < 0.40 ? 0 : r < 0.75 ? 5 : 1;
+    }
+
+    /** Wake-up: relative direction held while down (7 quick rise, 5/1 rolls, 3 late, 0 normal). */
+    int wakeupDirection() {
+        double r = random.nextDouble();
+        return r < 0.30 ? 7 : r < 0.50 ? 5 : r < 0.62 ? 1 : r < 0.72 ? 3 : 0;
     }
 }
