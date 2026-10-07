@@ -55,6 +55,18 @@ public class SpriteMotionTest {
         for(int i=0;i<10;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
+    @Test public void holdingDownAfterACrouchingAttackStaysCrouched() {
+        SpriteMotion m=new SpriteMotion();
+        CharacterDefinition.Animation crouch=GeneratedCharacters.defaultCharacter().animation(SpriteMotion.Clip.CROUCH);
+        tick(m,.5f,true,true,0,0,true,false,false,false,false);
+        String attack=GeneratedCharacters.defaultCharacter().moves.get("2L").animation.id;
+        m.update(.016f,true,true,0,0,true,false,false,attack,.05f,true,false);
+        assertEquals(attack,m.clip);
+        tick(m,.016f,true,true,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.CROUCH,m.clip);
+        assertEquals("No stand-up between the attack and the held crouch",
+            crouch.frame(crouch.duration+1,0),m.frame());
+    }
     @Test public void jumpFallAndLandingAreOneShotAndFollowPhysics() {
         SpriteMotion m=new SpriteMotion();
         tick(m,.016f,false,false,-900,0,true,false,false,false,false);

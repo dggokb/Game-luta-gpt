@@ -11,12 +11,12 @@ final class SpriteMotion {
     }
     String clip=Clip.IDLE;
     float time,distance;
-    private boolean wasGrounded=true;
+    private boolean wasGrounded=true,wasCrouching;
     private CharacterDefinition character;
     SpriteMotion() { this(GeneratedCharacters.defaultCharacter()); }
     SpriteMotion(CharacterDefinition character) { this.character=character; }
     void setCharacter(CharacterDefinition next) {
-        character=next;clip=Clip.IDLE;time=distance=0;wasGrounded=true;
+        character=next;clip=Clip.IDLE;time=distance=0;wasGrounded=true;wasCrouching=false;
     }
     void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
@@ -33,7 +33,13 @@ final class SpriteMotion {
         else if(clip.equals(Clip.CROUCH) || (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
         else next=Clip.IDLE;
         wasGrounded=grounded;
-        if(!next.equals(clip)){clip=next;time=distance=0;}
+        if(!next.equals(clip)){
+            clip=next;time=distance=0;
+            // Still holding down after a crouching attack (or block): stay crouched instead
+            // of standing up and crouching again.
+            if(next.equals(Clip.CROUCH) && wasCrouching) time=character.animation(Clip.CROUCH).duration;
+        }
+        wasCrouching=crouching;
         // Attacks use the combat clock, including a repeated attack of the same type.
         time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
         distance+=Math.abs(travel);
