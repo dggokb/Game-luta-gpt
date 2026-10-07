@@ -27,12 +27,14 @@ decisão da IA, dá um passo no motor e desenha.
 
 ### Ordem de update por frame (`CombatEngine.step`)
 
-1. ler inputs; alimentar InputBuffer e MotionParser;
-2. encerrar estados vencidos e resolver inícios/cancelamentos (CancelSystem);
-3. avançar máquinas de estado, movimento e projéteis;
-4. detectar colisões (simultâneas: trocas de golpe acontecem);
+1. ler inputs; alimentar InputBuffer e MotionParser (e os pedidos de TAG do time);
+2. encerrar estados vencidos e resolver inícios/cancelamentos (CancelSystem), depois
+   troca e assist (`TeamSystem.resolve`);
+3. avançar máquinas de estado, movimento, o time (troca, corpo e golpe do assist) e
+   projéteis;
+4. detectar colisões (simultâneas: trocas de golpe acontecem), inclusive do assist;
 5. aplicar reações, hitstop e pushback;
-6. atualizar as ComboSessions.
+6. atualizar as ComboSessions e juntar a barra do time.
 
 Contadores, dano, medidor (milésimos de barra), escala e juggle são inteiros. Posições
 são `float` (determinísticas na JVM). A mesma sequência de inputs a partir do mesmo
@@ -92,6 +94,33 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `guardedUltraIsBlockedWithoutCinematic`, `ultraWhiffsFromFarAndRecovers`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
+
+## Time: troca, assist e barra do time — v0.79
+
+A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e passo do
+`CombatEngine`), contando frames como o resto da luta. O `GameView` só desenha.
+
+| Comando | O que faz |
+| --- | --- |
+| **TAG** | Chama o parceiro como **assist**: ele entra correndo atrás do ponto (`assistBehind` 70 px, 8 frames), faz o golpe que o pack declara (`fighter.assist.move`) e sai (10 frames). Recarga de 240 frames (4 s). |
+| **TAG de novo** enquanto o assist entra ou golpeia | **Assist → Tag**: quando o golpe do assist termina, ele fica como o novo ponto onde está e o antigo sai correndo. O combo continua com o novo ponto. Recusado (o assist só sai) se o ponto estiver apanhando, defendendo, caído ou no ultra. Depois: 300 frames sem assist nem troca. |
+| **↓ + TAG** | **Troca direta**, igual à de antes: o ponto sai correndo (20 frames), o parceiro entra (23) e posa (27), sem poder agir. Só em NEUTRAL. Recarga de 600 frames (10 s). |
+
+- Os botões são lidos sem precisar segurar: tocar e segurar se confundiriam e atrasariam o
+  assist. O pedido fica no buffer por `bufferFrames`, então dá para chamar o assist
+  durante o hitstop de um golpe.
+- O assist pode ser chamado do neutro ou durante os golpes do ponto (não durante o Super,
+  o ultra, a troca, nem apanhando). Nesta versão ele não pode ser atingido.
+- O golpe do assist é um `CombatFighter` próprio do lado (mesmo índice do ponto): usa as
+  hitboxes, o frame data, o hitstop e a defesa normais; os acertos entram na
+  `ComboSession` do defensor com a escala de sempre. Assist de projétil (`"S"`) lança o
+  projétil do parceiro em nome do lado.
+- **Barra do time**: há uma barra só. O que o parceiro fora de campo ganha (os acertos do
+  assist) vai para o ponto a cada frame, e na troca a barra vai com quem entra. O HUD e
+  todos os custos leem a barra do ponto.
+- Um lado com um membro só (o boneco de treino) nunca troca nem chama assist.
+
+Valores em `CombatConfig.tag*` e `CombatConfig.assist*`. Testes em `TeamSystemTest`.
 
 ## Frame data no Character Pack (schema 3)
 
@@ -174,7 +203,8 @@ frames.
 - A CPU usa o mesmo motor: aperta botões, respeita buffer, estados e hitstun.
 - Lutador derrubado é invulnerável; o slam do jH termina em queda; aterrissar encerra
   golpes aéreos; o Super congela o oponente durante o startup.
-- A troca de personagem só começa em NEUTRAL.
+- A troca de personagem só começa em NEUTRAL. (v0.79) Ela agora é `↓ + TAG`; o TAG
+  sozinho chama o assist.
 - (v0.74) Andar para trás é mais lento que para frente: 220 contra 300 unidades/s,
   também no ar (`CombatConfig.walkBackSpeed`). Recuar andando não foge de quem avança;
   o backdash continua rápido, mas é curto e comprometido.

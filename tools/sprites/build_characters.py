@@ -23,6 +23,8 @@ BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH')}
 SPECIALS = ('S','SUPER','ULTRA')
+# Moves a partner can perform as an assist (ground normals or the energy projectile).
+ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM'}
@@ -89,6 +91,13 @@ def validate_fighter(pack):
             validate_attack(f'{name}.{key}.attack', f[key]['attack'], True)
     if 'inputPriority' in f and sorted(f['inputPriority']) != sorted(STRENGTHS):
         raise ValueError(f'{name}.inputPriority: order all of {", ".join(STRENGTHS)}')
+    if 'assist' in f:
+        # The partner called with TAG performs one of its own moves: a ground normal or S.
+        move = f['assist'].get('move') if isinstance(f['assist'], dict) else None
+        if move not in ASSIST_MOVES:
+            raise ValueError(f'{name}.assist.move must be one of {", ".join(ASSIST_MOVES)}')
+        if move == 'S' and 'energy' not in f:
+            raise ValueError(f'{name}.assist: S needs fighter.energy')
 
 def non_negative_int(value, name):
     if type(value) is not int or value < 0:
@@ -330,7 +339,8 @@ def compile_packs(root, results):
                    +',new String[]{'+','.join(q(b) for b in fi['autoCombo'])+'},'+projectile(energy,'S')
                    +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'),'SUPER')
                    +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+')'
-                   +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')+')')
+                   +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
+                   +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')')
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']

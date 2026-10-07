@@ -79,6 +79,9 @@
         "pushbackOnHit": 60,
         "pushbackOnBlock": 60
       }
+    },
+    "assist": {
+      "move": "S"
     }
   },
   "animations": {

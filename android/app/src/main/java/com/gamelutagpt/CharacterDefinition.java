@@ -119,8 +119,17 @@ final class CharacterDefinition {
         final Body body;
         /** Which buffered press wins when several are valid (most important first). */
         final AttackDefinition.Strength[] inputPriority;
+        /** Move this fighter performs when its partner calls it with TAG ("S" or a ground normal). */
+        final String assistMove;
         Fighter(int color,int maxLife,String[] autoCombo,Projectile energy,
                 int[] energyCommand,Projectile superAttack,Body body,AttackDefinition.Strength[] inputPriority) {
+            this(color,maxLife,autoCombo,energy,energyCommand,superAttack,body,inputPriority,null);
+        }
+        Fighter(int color,int maxLife,String[] autoCombo,Projectile energy,
+                int[] energyCommand,Projectile superAttack,Body body,AttackDefinition.Strength[] inputPriority,
+                String assistMove) {
+            // Without a declared assist: the projectile when there is one, else the heavy normal.
+            this.assistMove=assistMove!=null?assistMove:energy!=null?"S":"H";
             this.color=color;this.maxLife=maxLife;
             this.autoCombo=autoCombo.clone();this.energy=energy;this.energyCommand=energyCommand.clone();
             this.superAttack=superAttack;this.body=body;

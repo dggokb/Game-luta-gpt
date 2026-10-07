@@ -6,10 +6,10 @@ package com.gamelutagpt;
  * frames and is delivered exactly once.
  */
 final class PadInput {
-    enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER }
+    enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG }
 
     private int direction;
-    private boolean light, medium, heavy, auto, superAttack;
+    private boolean light, medium, heavy, auto, superAttack, tag;
 
     int direction() {
         return direction;
@@ -26,6 +26,7 @@ final class PadInput {
             case HEAVY: heavy = true; break;
             case AUTO: auto = true; break;
             case SUPER: superAttack = true; break;
+            case TAG: tag = true; break;
             default: break;
         }
     }
@@ -41,11 +42,14 @@ final class PadInput {
         out.superAttack = superAttack;
         // ↓ + SUPER asks for the ultra; the engine falls back to SUPER without three bars.
         out.ultra = superAttack && ControlsLayout.isDownDirection(direction);
-        light = medium = heavy = auto = superAttack = false;
+        // TAG calls the assist; ↓ + TAG is the raw tag (no hold to tell apart, so no delay).
+        out.tag = tag && ControlsLayout.isDownDirection(direction);
+        out.assist = tag && !out.tag;
+        light = medium = heavy = auto = superAttack = tag = false;
     }
 
     void reset() {
         direction = 0;
-        light = medium = heavy = auto = superAttack = false;
+        light = medium = heavy = auto = superAttack = tag = false;
     }
 }

@@ -34,7 +34,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[1]), "PLAYER 2")
     };
 
-    private int activeFighterIndex = 0;
     private final FighterState opponentFighter =
         new FighterState(GeneratedCharacters.opponentCharacter(), "CPU");
 
@@ -128,24 +127,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private float beamShake;
     private final java.util.Random shakeRandom = new java.util.Random(3);
 
-    private static final int TAG_IDLE = 0;
-    private static final int TAG_EXIT = 1;
-    private static final int TAG_ENTER = 2;
-    private static final int TAG_POSE = 3;
-    private static final float TAG_EXIT_DURATION = 0.34f;
-    private static final float TAG_ENTER_DURATION = 0.38f;
-    private static final float TAG_POSE_DURATION = 0.45f;
-    private static final float TAG_TRAVEL_DISTANCE = 760f;
-    private static final float TAG_COOLDOWN_SECONDS = 10f;
-    private int tagPhase = TAG_IDLE;
-    private float tagPhaseTimer = 0f;
-    private float tagVisualOffsetX = 0f;
-    private int tagExitDirection = -1;
-    private float tagCooldownRemaining = 0f;
-    private String tagCooldownHudLabel = "TROCA: PRONTA";
+    // Team HUD labels (the rules live in the engine's TeamSystem).
+    private String tagCooldownHudLabel = "ASSIST: PRONTO";
     private String tagCooldownButtonLabel = "";
-    private int tagCooldownDisplayedTenths = -1;
-    private int tagCooldownDisplayedSeconds = -1;
+    private int shownAssistTenths = -2;
+    private int shownTagSeconds = -2;
+    private int shownPoint = 0;
+    /** Partner on screen: the assist, or the former point running off after Assist → Tag. */
+    private final SpriteFighterRenderer partnerSpriteRenderer;
+    private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
 
     // Single version source: versionName in app/build.gradle.
     private static final String VERSION_HUD_LABEL =
@@ -182,6 +172,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         for (FighterState fighter : team) atlases.preload(fighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
+        engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         AndroidRenderAssets ultraAssets = new AndroidRenderAssets(context.getAssets());
         stageScene = loadStage(ultraAssets);
@@ -226,11 +218,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private FighterState activeFighter() {
-        return team[activeFighterIndex];
+        return engine.team(PLAYER).pointState();
     }
 
     private FighterState reserveFighter() {
-        return team[(activeFighterIndex + 1) % team.length];
+        FighterState partner = engine.team(PLAYER).partner();
+        return partner != null ? partner : activeFighter();
     }
 
     private CombatFighter player() {
@@ -339,9 +332,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return;
         }
-        updateTagState(FIXED_STEP);
         boolean tagging = isTagAnimationActive();
-        player().locked = tagging;
 
         pad.drainInto(playerInput);
         if (tagging) {
@@ -367,6 +358,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateSuperVisuals();
         updateUltraVisuals();
         updateFightCamera(FIXED_STEP);
+        updateTeamVisuals();
         updateFighterSprite(spriteFighterRenderer, player(), true);
         updateFighterSprite(opponentSpriteRenderer, opponent(), false);
     }
@@ -380,13 +372,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public boolean aiEnabled() { return ai.enabled(); }
         @Override public boolean debugEnabled() { return debugOverlay; }
         @Override public float tagReadyRatio() {
-            if (isTagAnimationActive()) return 0f;
-            if (tagCooldownRemaining > 0f) return 1f - tagCooldownRemaining / TAG_COOLDOWN_SECONDS;
+            TeamSystem.Side team = engine.team(PLAYER);
+            if (isTagAnimationActive() || team.assistOut()) return 0f;
+            if (team.assistCooldown > 0) {
+                return 1f - team.assistCooldown / (float)engine.config.assistCooldownFrames;
+            }
             return 1f;
         }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
-        @Override public boolean canTag() { return canStartTag(); }
+        @Override public String tagButtonTitle() {
+            return engine.team(PLAYER).conversionOpen() ? "TROCA" : "ASSIST";
+        }
+        @Override public boolean canTag() {
+            TeamSystem.Side team = engine.team(PLAYER);
+            return team.conversionOpen() || engine.teams.canAssist(PLAYER, player());
+        }
         @Override public boolean canSuper() { return superAvailable(); }
         @Override public boolean ultraReady() { return ultraAvailable(); }
         @Override public int dpadDirection() { return pad.direction(); }
@@ -476,7 +477,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         ultraCameraZoom = 1f;
         FighterState state = attacker == PLAYER ? activeFighter() : opponentFighter;
         ultraPack = attacker == PLAYER
-            ? ultraPacks[activeFighterIndex]
+            ? ultraPacks[engine.team(PLAYER).point]
             : UltraPack.placeholder("ULTRA " + state.character.displayName, state.profile.color);
         paginaFinal.start(ultraPack, engine.fighter(attacker).facing);
     }
@@ -664,100 +665,65 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private boolean isTagAnimationActive() {
-        return tagPhase != TAG_IDLE;
+        return engine.team(PLAYER).tagging();
     }
 
-    private boolean canStartTag() {
-        return player().canAct() &&
-            !isTagAnimationActive() &&
-            tagCooldownRemaining <= 0f;
+    /** Sprite offset of the point during a raw tag (it runs off screen and back). */
+    private float tagOffset() {
+        return engine.teams.tagOffset(PLAYER);
     }
 
-    private void updateTagCooldownLabels() {
+    /** After the engine's team step: point sprite, partner sprite and the HUD labels. */
+    private void updateTeamVisuals() {
+        TeamSystem.Side team = engine.team(PLAYER);
+        if (team.point != shownPoint) {
+            shownPoint = team.point;
+            spriteFighterRenderer.setCharacter(activeCharacter().id);
+        }
+        CombatFighter partner = partnerBody(team);
+        if (partner != null) {
+            if (!partnerSpriteRenderer.character().id.equals(partner.state.character.id)) {
+                partnerSpriteRenderer.setCharacter(partner.state.character.id);
+            }
+            updateFighterSprite(partnerSpriteRenderer, partner, false);
+        }
+        updateTagCooldownLabels(team);
+    }
+
+    /** The partner's body on screen (assist or the former point leaving), or null. */
+    private CombatFighter partnerBody(TeamSystem.Side team) {
+        if (team.assist != null) return team.assist;
+        if (team.leaving == null || team.leavingFrame < 0) return null;
+        CombatFighter f = leavingBody;
+        float x = engine.teams.leavingX(PLAYER);
+        f.travel = x - f.x;
+        f.state = team.leaving;
+        f.x = x;
+        f.y = team.leavingY;
+        f.facing = team.leavingFacing;
+        f.grounded = true;
+        f.status = CombatFighter.Status.NEUTRAL;
+        return f;
+    }
+
+    private void updateTagCooldownLabels(TeamSystem.Side team) {
+        int assistTenths = team.assistOut() ? -1 : (int)Math.ceil(team.assistCooldown / 6f);
+        int tagSeconds = (int)Math.ceil(team.tagCooldown / (float)CombatConfig.FPS);
         if (isTagAnimationActive()) {
             tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
             tagCooldownButtonLabel = "...";
-            tagCooldownDisplayedTenths = -1;
-            tagCooldownDisplayedSeconds = -1;
+            shownAssistTenths = shownTagSeconds = -2;
             return;
         }
-
-        if (tagCooldownRemaining <= 0f) {
-            tagCooldownHudLabel = "TROCA: PRONTA";
-            tagCooldownButtonLabel = "";
-            tagCooldownDisplayedTenths = -1;
-            tagCooldownDisplayedSeconds = -1;
-            return;
-        }
-
-        int tenths = (int)Math.ceil(tagCooldownRemaining * 10f);
-        if (tenths != tagCooldownDisplayedTenths) {
-            tagCooldownDisplayedTenths = tenths;
-            tagCooldownHudLabel = String.format(java.util.Locale.US, "TROCA: %.1fs", tenths / 10f);
-        }
-
-        int seconds = (int)Math.ceil(tagCooldownRemaining);
-        if (seconds != tagCooldownDisplayedSeconds) {
-            tagCooldownDisplayedSeconds = seconds;
-            tagCooldownButtonLabel = Integer.toString(seconds);
-        }
-    }
-
-    private void updateTagState(float dt) {
-        if (tagCooldownRemaining > 0f) {
-            tagCooldownRemaining = Math.max(0f, tagCooldownRemaining - dt);
-        }
-
-        updateTagCooldownLabels();
-
-        if (tagPhase == TAG_IDLE) return;
-
-        tagPhaseTimer += dt;
-
-        if (tagPhase == TAG_EXIT) {
-            float t = clamp(tagPhaseTimer / TAG_EXIT_DURATION, 0f, 1f);
-            tagVisualOffsetX = tagExitDirection * TAG_TRAVEL_DISTANCE * t * t;
-
-            if (t >= 1f) {
-                activeFighterIndex = (activeFighterIndex + 1) % team.length;
-                engine.setFighterState(PLAYER, activeFighter());
-                spriteFighterRenderer.setCharacter(activeCharacter().id);
-                tagPhase = TAG_ENTER;
-                tagPhaseTimer = 0f;
-                tagVisualOffsetX = tagExitDirection * TAG_TRAVEL_DISTANCE;
-            }
-        } else if (tagPhase == TAG_ENTER) {
-            float t = clamp(tagPhaseTimer / TAG_ENTER_DURATION, 0f, 1f);
-            float eased = 1f - (1f - t) * (1f - t);
-            tagVisualOffsetX = tagExitDirection * TAG_TRAVEL_DISTANCE * (1f - eased);
-
-            if (t >= 1f) {
-                tagPhase = TAG_POSE;
-                tagPhaseTimer = 0f;
-                tagVisualOffsetX = 0f;
-            }
-        } else if (tagPhase == TAG_POSE) {
-            tagVisualOffsetX = 0f;
-
-            if (tagPhaseTimer >= TAG_POSE_DURATION) {
-                tagPhase = TAG_IDLE;
-                tagPhaseTimer = 0f;
-                tagCooldownRemaining = TAG_COOLDOWN_SECONDS;
-            }
-        }
-    }
-
-    private void startTagAnimation() {
-        if (!canStartTag()) return;
-        tagPhase = TAG_EXIT;
-        tagPhaseTimer = 0f;
-        tagVisualOffsetX = 0f;
-        tagExitDirection = -player().facing;
-        updateTagCooldownLabels();
-    }
-
-    private void switchFighter() {
-        startTagAnimation();
+        if (assistTenths == shownAssistTenths && tagSeconds == shownTagSeconds) return;
+        shownAssistTenths = assistTenths;
+        shownTagSeconds = tagSeconds;
+        String assist = assistTenths < 0 ? (team.conversionOpen() ? "ASSIST: TAG p/ TROCAR" : "ASSIST: EM CAMPO")
+            : assistTenths == 0 ? "ASSIST: PRONTO"
+            : String.format(java.util.Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
+        String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
+        tagCooldownHudLabel = assist + tag;
+        tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
     }
 
     private void setOpponentAiEnabled(boolean enabled) {
@@ -863,8 +829,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 canvas.restore();
             }
 
+            drawPartner(canvas);
             canvas.save();
-            canvas.translate(tagVisualOffsetX, 0f);
+            canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
             if (beam) {
@@ -912,7 +879,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int alpha = Math.round(255f * strength);
         CombatFighter npc = opponent();
         drawReflection(c, opponentSpriteRenderer, npc, 0f, alpha);
-        drawReflection(c, spriteFighterRenderer, player(), tagVisualOffsetX, alpha);
+        CombatFighter partner = partnerBody(engine.team(PLAYER));
+        if (partner != null) drawReflection(c, partnerSpriteRenderer, partner, 0f, alpha);
+        drawReflection(c, spriteFighterRenderer, player(), tagOffset(), alpha);
     }
 
     private void drawReflection(Canvas c, SpriteFighterRenderer renderer, CombatFighter f, float offsetX, int alpha) {
@@ -1201,6 +1170,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         c.restore();
     }
 
+    /** The partner behind the point: the assist doing its move, or the former point leaving. */
+    private void drawPartner(Canvas c) {
+        CombatFighter partner = partnerBody(engine.team(PLAYER));
+        if (partner != null) drawFighter(c, partnerSpriteRenderer, partner, false, false);
+    }
+
     private void drawPlayer(Canvas c) {
         CombatFighter p = player();
         drawFighter(c, spriteFighterRenderer, p, p.framesSinceHit < 8, p.framesSinceBlock < 7);
@@ -1313,10 +1288,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     pad.press(PadInput.Button.AUTO);
                     break;
                 case TAG:
-                    if (canStartTag()) {
-                        tagPointer = pointerId;
-                        switchFighter();
-                    }
+                    // TAG calls the assist (again: Assist -> Tag); with down it is the raw tag.
+                    tagPointer = pointerId;
+                    pad.press(PadInput.Button.TAG);
                     break;
                 default:
                     break;

@@ -127,6 +127,21 @@ final class CombatConfig {
             ultraBeamBlastGap;
     }
 
+    // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
+    int tagExitFrames = 20;
+    int tagEnterFrames = 23;
+    int tagPoseFrames = 27;
+    float tagTravel = 760f;
+    int tagCooldownFrames = 600;
+    // Assist (TAG): the partner runs in behind the point, does its move and runs off.
+    int assistEnterFrames = 8;
+    int assistLeaveFrames = 10;
+    float assistBehind = 70f;
+    float assistEnterDistance = 320f;
+    int assistCooldownFrames = 240;
+    /** After Assist → Tag: neither another assist nor a raw tag for this long. */
+    int assistTagCooldownFrames = 300;
+
     static int hitstunDecay(int[] table, int index) {
         if (table.length == 0) return 0;
         return table[Math.min(Math.max(0, index), table.length - 1)];

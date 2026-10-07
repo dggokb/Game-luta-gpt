@@ -45,6 +45,8 @@ final class CombatEngine {
 
     final CombatConfig config;
     private final CombatFighter[] fighters = new CombatFighter[2];
+    /** Point/partner of each side, raw tag, assists and the team meter. */
+    final TeamSystem teams;
     final List<Projectile> energyProjectiles = new ArrayList<>();
     final List<Projectile> superProjectiles = new ArrayList<>();
     private final ComboSession[] sessions = new ComboSession[2];
@@ -71,6 +73,7 @@ final class CombatEngine {
         this.config = config;
         fighters[0] = new CombatFighter(0, first, firstX, firstX <= secondX ? 1 : -1);
         fighters[1] = new CombatFighter(1, second, secondX, firstX <= secondX ? -1 : 1);
+        teams = new TeamSystem(config, first, second);
         ultraAttack = new AttackDefinition.Builder("ULTRA", AttackDefinition.Kind.SUPER)
             .damage(0)
             .frames(config.ultraStartupFrames + config.ultraRushFrames, 1, config.ultraRecoveryFrames)
@@ -99,6 +102,14 @@ final class CombatEngine {
         return f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_CINEMATIC;
     }
 
+    /** The members of a side's team; the first one starts on point. */
+    void setTeam(int side, FighterState... members) {
+        teams.setMembers(side, members);
+        setFighterState(side, members[0]);
+    }
+
+    TeamSystem.Side team(int side) { return teams.sides[side]; }
+
     /** Tag: the slot now plays another team member. Any action in progress is dropped. */
     void setFighterState(int index, FighterState state) {
         CombatFighter f = fighters[index];
@@ -119,12 +130,16 @@ final class CombatEngine {
         readInput(fighters[0], first);
         readInput(fighters[1], second);
 
-        // 2. Ends of states, then starts and cancels.
+        // 2. Ends of states, then starts and cancels (the team's tag and assist too).
         for (CombatFighter f : fighters) resolve(f);
+        teams.resolve(this, fighters[0], fighters[1]);
+        teams.resolve(this, fighters[1], fighters[0]);
 
         // 3. State machines, movement, projectiles.
         for (CombatFighter f : fighters) f.anticipatedGuard = anticipatedGuard(f);
         for (CombatFighter f : fighters) advance(f);
+        teams.advance(this, fighters[0]);
+        teams.advance(this, fighters[1]);
         resolveBodies();
         for (CombatFighter f : fighters) updateFacing(f);
         advanceProjectiles();
@@ -133,6 +148,9 @@ final class CombatEngine {
         contacts.clear();
         detectMelee(fighters[0], fighters[1]);
         detectMelee(fighters[1], fighters[0]);
+        for (TeamSystem.Side side : teams.sides) {
+            if (side.assistPhase == TeamSystem.ASSIST_ATTACK) detectMelee(side.assist, fighters[1 - side.index]);
+        }
         detectProjectiles(energyProjectiles);
         detectProjectiles(superProjectiles);
 
@@ -143,8 +161,9 @@ final class CombatEngine {
         updateUltraBeam(fighters[0], fighters[1]);
         updateUltraBeam(fighters[1], fighters[0]);
 
-        // 6. Combo sessions.
+        // 6. Combo sessions and the team meter.
         updateSessions();
+        teams.poolMeter();
 
         for (int i = 0; i < 2; i++) fighters[i].travel = fighters[i].x - startX[i];
     }
@@ -153,6 +172,7 @@ final class CombatEngine {
 
     private void readInput(CombatFighter f, FighterInput in) {
         f.input.copyFrom(in);
+        teams.readInput(f, in);
         if (f.locked || f.ko()) {
             f.input.clear();
             f.buffer.clear();
@@ -579,6 +599,63 @@ final class CombatEngine {
             if (p.ownerIndex != f.index && (f.x - p.x) * p.direction >= -margin) return true;
         }
         return false;
+    }
+
+    // ---------------------------------------------------------------- team
+
+    /** The assist reached its spot: it starts the move its pack declares. */
+    void startAssistMove(CombatFighter a) {
+        CharacterDefinition.Fighter profile = a.state.profile;
+        String move = profile.assistMove;
+        a.clearAttack();
+        a.status = CombatFighter.Status.ATTACK;
+        if ("S".equals(move) && profile.energy != null) {
+            a.attack = profile.energy.attack;
+            a.specialStrength = "M";
+            return;
+        }
+        CharacterDefinition.Move m = a.character().moves.get(move);
+        if (m == null) m = a.character().moves.get("H");
+        a.move = m;
+        a.attack = m.attack;
+        a.crouching = move.startsWith("2");
+    }
+
+    void spawnAssistProjectile(CombatFighter a) {
+        spawnProjectile(a);
+    }
+
+    /**
+     * Assist → Tag: the assist stays as the new point where it stands and the former point
+     * runs off. Refused (the assist just leaves) when the point is being hit or is down.
+     */
+    boolean convertAssist(TeamSystem.Side side, CombatFighter point) {
+        CombatFighter.Status st = point.status;
+        if (point.ko() || point.inHitstun() || st == CombatFighter.Status.BLOCKSTUN ||
+            st == CombatFighter.Status.KNOCKDOWN || st == CombatFighter.Status.WAKEUP ||
+            st == CombatFighter.Status.ULTRA) {
+            return false;
+        }
+        CombatFighter a = side.assist;
+        teams.becomePoint(side, point);
+        setFighterState(point.index, side.pointState());
+        point.x = a.x;
+        point.y = Arena.GROUND_Y;
+        point.vy = 0f;
+        point.grounded = true;
+        point.superJumping = false;
+        point.crouching = false;
+        point.facing = a.facing;
+        point.forwardDashing = false;
+        point.backdashFrames = 0;
+        point.pushRemaining = 0f;
+        point.pushFramesLeft = 0;
+        point.hitstop = 0;
+        point.launcherChase = 0;
+        point.locked = false;
+        // The new point did not walk there: no walk animation from the jump in position.
+        startX[point.index] = point.x;
+        return true;
     }
 
     // ---------------------------------------------------------------- projectiles

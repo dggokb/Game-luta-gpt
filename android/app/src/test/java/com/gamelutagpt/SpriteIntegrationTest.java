@@ -27,6 +27,8 @@ public class SpriteIntegrationTest {
     private CombatFighter npc(){return game.engine.fighter(1);}
     /** Presses a button through the real pad (the engine decides whether it starts). */
     private void press(PadInput.Button button,int direction){game.pad.setDirection(direction);game.pad.press(button);}
+    /** ↓ + TAG through the real pad: the engine's raw tag (exit, enter and pose, 70 frames). */
+    private void rawTag()throws Exception {press(PadInput.Button.TAG,3);frames(1);game.pad.setDirection(0);}
 
     private String rendererCharacterId()throws Exception {
         SpriteFighterRenderer renderer=(SpriteFighterRenderer)get("spriteFighterRenderer");
@@ -150,9 +152,9 @@ public class SpriteIntegrationTest {
 
     @Test public void realTagSwitchLoadsSecondPackAndAllStandingAttacks()throws Exception {
         assertEquals("player_base",rendererCharacterId());
-        invoke("switchFighter",new Class<?>[]{});
+        rawTag();
         frames(72);
-        assertEquals(1,(int)get("activeFighterIndex"));
+        assertEquals(1,game.engine.team(0).point);
         assertEquals("player_two",rendererCharacterId());
 
         String[] bindings={"L","M","H"};
@@ -628,7 +630,7 @@ public class SpriteIntegrationTest {
         for(String id:GeneratedCharacters.TEAM)for(CharacterDefinition.Animation a:GeneratedCharacters.get(id).animations.values())expected.add(a.atlas.resource);
         for(CharacterDefinition.Animation a:GeneratedCharacters.opponentCharacter().animations.values())expected.add(a.atlas.resource);
         assertEquals(expected.size(),cache.size());
-        invoke("switchFighter",new Class<?>[]{});frames(72);
+        rawTag();frames(72);
         assertEquals("Tag must not decode new atlases",expected.size(),cache.size());
     }
     @Test public void rendererMirrorsFromDeclaredArtFacing() {

@@ -74,9 +74,15 @@ programação.
   "energy": {"damage": 850, "range": 720, "speed": 760, "command": [3, 1],
              "spawnX": 62, "spawnY": 82, "crouchSpawnY": 65},
   "super": {"damage": 3200, "range": 1450, "speed": 1180,
-            "spawnX": 78, "spawnY": 86, "airSpawnY": 82}
+            "spawnX": 78, "spawnY": 86, "airSpawnY": 82},
+  "assist": {"move": "S"}
 }
 ```
+
+`assist.move` é o golpe que o lutador faz quando o parceiro o chama com TAG: `"S"` (o
+projétil de `energy`) ou um normal de chão (`L`, `M`, `H`, `2L`, `2M`, `2H`), com o frame
+data e a animação do próprio golpe. Sem `assist`, vale `"S"` para quem tem projétil e
+`"H"` para quem não tem.
 
 `spawnX`/`spawnY` são o ponto de lançamento do projétil (à frente da raiz e altura acima
 do chão); `crouchSpawnY` e `airSpawnY` são opcionais e valem `spawnY` quando omitidos.

@@ -24,6 +24,8 @@ final class HudRenderer {
         float tagReadyRatio();
         String tagCooldownLabel();
         String tagButtonLabel();
+        /** Text of the TAG button while it can be used: ASSIST, or TROCA during Assist → Tag. */
+        String tagButtonTitle();
         boolean canTag();
         boolean canSuper();
         /** ↓ held with three bars: the SUPER button would start the ultra. */
@@ -457,7 +459,7 @@ final class HudRenderer {
         paint.setTextSize(enabled ? 17f : 14f);
         paint.setFakeBoldText(true);
         float textY = TAG_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(enabled ? "TROCA" : s.tagButtonLabel(), TAG_X, textY, paint);
+        c.drawText(enabled ? s.tagButtonTitle() : s.tagButtonLabel(), TAG_X, textY, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }

@@ -183,3 +183,19 @@ nuvens rolam embaixo do feixe. Toda a arte é do GPT.
   `tools/sprites/separar_folha.py` para folhas desenhadas em grade apertada.
 - Efeitos preparados por `tools/ultra/preparar_raio.py --aura --vento --poeira`.
 - Prompts e passo a passo: [tools/ultra/README.md](tools/ultra/README.md#raio-final).
+
+## Time no motor: Assist, Assist → Tag e barra do time — v0.79
+
+Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
+
+- **TAG** chama o parceiro como **assist**: ele entra atrás de você, faz o golpe dele (o
+  Lutador base lança o projétil; o Lutador Teste 2 dá o soco forte) e sai. Recarga de 4 s.
+- **TAG de novo** enquanto o assist está em campo: **Assist → Tag**. O assist fica como o
+  novo personagem e o anterior sai, sem interromper o combo.
+- **↓ + TAG**: a troca direta de antes.
+- **Barra do time**: uma barra só para a dupla; o que o assist ganha vai para ela e ela
+  acompanha quem está em campo.
+- A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`), em frames e
+  determinística, base para rollback e para as próximas mecânicas de equipe (guard
+  cancel, DHC). O golpe do assist é declarado no pack (`fighter.assist.move`).
+- Detalhes: `docs/combat-engine.md` (seção Time).

@@ -17,6 +17,10 @@ final class FighterInput {
      * bars; otherwise the press counts as a plain SUPER.
      */
     boolean ultra;
+    /** TAG: calls the partner as an assist, or turns the assist on screen into a tag. */
+    boolean assist;
+    /** ↓ + TAG: raw tag (the partner takes the point). */
+    boolean tag;
     /** CPU only: an already-resolved special of strength "L", "M" or "H". */
     String special;
     /** CPU only: requests that a human expresses through the direction history. */
@@ -28,7 +32,7 @@ final class FighterInput {
     }
 
     void clearPresses() {
-        light = medium = heavy = auto = superAttack = ultra = false;
+        light = medium = heavy = auto = superAttack = ultra = assist = tag = false;
         special = null;
         dash = backdash = jump = superJump = false;
     }
@@ -41,6 +45,8 @@ final class FighterInput {
         auto = other.auto;
         superAttack = other.superAttack;
         ultra = other.ultra;
+        assist = other.assist;
+        tag = other.tag;
         special = other.special;
         dash = other.dash;
         backdash = other.backdash;
