@@ -11,12 +11,12 @@
   "rootMode": "ground-feet",
   "scaleMode": "canonical-anatomy",
   "anatomyReferenceFrame": 0,
-  "sourceNote": "2H launcher: crouch, wind-up, rising uppercut, guard recovery. Scaled from frame 0 (crouching guard) against the approved 2M crouching guard using height and head width; the chest band is excluded because the fists cover the face.",
+  "sourceNote": "2H launcher: crouch, wind-up, rising uppercut, guard recovery. Scaled from frame 0 (crouching guard) against the 2M crouching guard (p01 video art) using height and head width; the chest band is excluded because the fists cover the face.",
   "anatomyReference": {
-    "source": "art/sprites/source/player_base_crouch_medium_normalized.png",
+    "source": "art/sprites/source/player_base_crouch_medium_video_normalized.png",
     "frame": 0,
-    "columns": 4,
-    "frameWidth": 384,
+    "columns": 8,
+    "frameWidth": 512,
     "frameHeight": 256,
     "bands": [
       [

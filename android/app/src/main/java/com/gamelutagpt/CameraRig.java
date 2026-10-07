@@ -5,7 +5,7 @@ package com.gamelutagpt;
  * same screen height and follows a Super Jump vertically. Pure math, unit-testable.
  */
 final class CameraRig {
-    static final float CAMERA_ZOOM = 1.12f;
+    static final float CAMERA_ZOOM = 1.24f;
     static final float CAMERA_MIN_ZOOM = 0.78f;
     static final float CAMERA_FIGHTER_MARGIN_X = 520f;
     static final float CAMERA_GROUND_SCREEN_Y = 552f;
