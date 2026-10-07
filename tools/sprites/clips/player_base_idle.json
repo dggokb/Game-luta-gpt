@@ -6,9 +6,9 @@
   "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.png",
   "report": "tools/sprites/reports/player_base_idle.report.json",
   "preview": "android/app/build/sprite-review/idle-import.png",
-  "expectedFrames": 16,
+  "expectedFrames": 76,
   "segmentation": "prepared-grid",
-  "columns": 4,
+  "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "Teste: idle do p01 gerado em video (Veo), fundo verde recortado, cor igualada a Base, 16 quadros."
+  "sourceNote": "Teste: idle do p01 gerado em video (Seedance), fundo verde recortado, loop de 76 quadros a ~24 fps."
 }
