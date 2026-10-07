@@ -95,6 +95,35 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Agarrão e tech — v0.80
+
+A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. Estado próprio
+`THROW` no atacante e `THROWN` no defensor; valores em `CombatConfig.throw*`.
+
+| Fase | Frames | O que acontece |
+| --- | --- | --- |
+| `THROW_STARTUP` | 5 + 3 ativos | Pega se o corpo do outro estiver colado à frente (vão de até `throwRange` = 28) e no chão. |
+| `THROW_HOLD` | 12 | O defensor é puxado e fica `THROWN`; é a janela de **tech**. Ninguém acerta os dois. |
+| `THROW_EXECUTE` | 16 | Sem tech: 1200 de dano (começo de combo, sem escala), knockdown e empurrão. O atacante se recupera antes de o defensor levantar (oki). |
+| `THROW_WHIFF` | 24 | Ninguém ao alcance: recuperação punível (pode ser atingido e agarrado). |
+| `THROW_TECH` | 16 (os dois) | L + M do defensor na janela (ou até `bufferFrames` antes): sem dano, os dois são empurrados 110 px e ficam sem agir. |
+
+- **Comando**: L + M (dois dedos) ou o **ponto entre L e M** na tela
+  (`ControlsLayout.THROW_*`, desenhado como "L+M"). Dois dedos quase nunca caem no mesmo
+  frame: até `PadInput.THROW_LENIENCY_FRAMES` (2) de diferença ainda é agarrão, e o jab que
+  o primeiro botão começou vira o agarrão (ainda nos primeiros frames, antes de acertar).
+- **Quem pode ser agarrado**: no chão, em NEUTRAL, num golpe próprio (não no Super nem no
+  ultra) ou num agarrão errado. Hitstun, blockstun e os `throwProtectFrames` (6) depois
+  deles ou de levantar são invulneráveis a agarrão, então agarrão não continua combo e
+  um agarrão começado durante o stun do outro erra.
+- **Os dois ao mesmo tempo**: tech automático.
+- **CPU**: agarra às vezes quando está colada (`OpponentAi.THROW_CHANCE`) e faz tech em
+  ~40% dos agarrões, alguns frames depois de ser pega (`TECH_CHANCE`).
+- O jogo mostra "AGARRÃO!" ou "TECH!" no centro da tela. Sem arte própria ainda: o
+  atacante usa o jab para pegar e o soco forte para jogar; o defensor, a reação de hit.
+
+Testes em `ThrowTest`.
+
 ## Time: troca, assist e barra do time — v0.79
 
 A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e passo do

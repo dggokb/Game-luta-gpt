@@ -127,6 +127,25 @@ final class CombatConfig {
             ultraBeamBlastGap;
     }
 
+    // Throw (L + M): universal grab. It cannot be blocked; the defender techs with L + M.
+    int throwStartupFrames = 5;
+    int throwActiveFrames = 3;
+    /** Gap between the two bodies within which the grab connects. */
+    float throwRange = 28f;
+    int throwWhiffFrames = 24;
+    /** Frames after the grab during which the defender can tech. */
+    int throwTechWindow = 12;
+    int throwDamage = 1200;
+    float throwKnockback = 170f;
+    int throwHitstopFrames = 10;
+    /** Attacker recovery after a landed throw (the defender is falling: oki). */
+    int throwExecuteFrames = 16;
+    /** Tech: both fighters pushed this far apart and frozen out of action for this long. */
+    float throwTechPush = 110f;
+    int throwTechFrames = 16;
+    /** Throw invulnerability right after hitstun, blockstun or wake-up. */
+    int throwProtectFrames = 6;
+
     // Team (TeamSystem). Raw tag (↓ + TAG): the point runs off, the partner runs in and poses.
     int tagExitFrames = 20;
     int tagEnterFrames = 23;

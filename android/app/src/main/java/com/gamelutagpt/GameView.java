@@ -147,6 +147,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int heavyPointer = -1;
     private int comboPointer = -1;
     private int tagPointer = -1;
+    private int throwPointer = -1;
+    /** "AGARRÃO!" / "TECH!" over the fight, and how many frames it still shows. */
+    private String throwBanner;
+    private int throwBannerFrames;
+    private static final int THROW_BANNER_FRAMES = 42;
+    private float throwPoseTime;
     private int superPointer = -1;
     private int healPlayerPointer = -1;
     private int healOpponentPointer = -1;
@@ -160,7 +166,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void clearInput() {
         clearPendingInput();
         pad.reset();
-        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = superPointer = -1;
+        dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = superPointer = -1;
         healPlayerPointer = healOpponentPointer = -1;
     }
 
@@ -347,6 +353,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
+            if ("TECH".equals(event.moveId) || "THROW".equals(event.moveId)) {
+                throwBanner = "TECH".equals(event.moveId) ? "TECH!" : "AGARRÃO!";
+                throwBannerFrames = THROW_BANNER_FRAMES;
+            }
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
@@ -354,6 +364,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         updateUltraBeam();
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
+        if (throwBannerFrames > 0) throwBannerFrames--;
 
         updateSuperVisuals();
         updateUltraVisuals();
@@ -401,6 +412,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case SUPER: return superPointer != -1;
                 case HEAL_PLAYER: return healPlayerPointer != -1;
                 case HEAL_OPPONENT: return healOpponentPointer != -1;
+                case THROW: return throwPointer != -1;
                 default: return false;
             }
         }
@@ -914,6 +926,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private void drawHud(Canvas c) {
         hud.drawHud(c, hudState);
+        if (throwBannerFrames > 0) {
+            float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
+            hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
+        }
         hud.drawCombo(c, engine.session(OPPONENT), engine.lastSession(OPPONENT),
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
@@ -938,6 +954,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 return p.slammed ? "QUEDA FORÇADA" : p.launched ? "LANÇADO" : "HIT";
             case HITSTUN:
                 return "HIT";
+            case THROW:
+                return p.throwPhase == CombatFighter.THROW_TECH ? "TECH"
+                    : p.throwPhase == CombatFighter.THROW_WHIFF ? "AGARRÃO ERROU" : "AGARRÃO";
+            case THROWN:
+                return "AGARRADO: L+M!";
             default:
                 break;
         }
@@ -986,6 +1007,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             state = npc.knockdownFrame < engine.config.knockdownFallFrames ? "CAINDO" : "NO CHÃO";
         } else if (npc.status == CombatFighter.Status.WAKEUP) state = "LEVANTANDO";
         else if (npc.attacking()) state = npc.attack.id;
+        else if (npc.status == CombatFighter.Status.THROWN) state = "AGARRADO";
+        else if (npc.status == CombatFighter.Status.THROW) {
+            state = npc.throwPhase == CombatFighter.THROW_TECH ? "TECH" : "AGARRÃO";
+        }
         else if (npc.slammed) state = "QUEDA FORÇADA";
         else if (npc.inHitstun() || npc.status == CombatFighter.Status.BLOCKSTUN) state = "SEM CONTROLE";
         else if (!npc.grounded) state = "NO AR";
@@ -1025,6 +1050,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             case HITSTUN:
                 state = f.hitCrouching ? SpriteStates.HIT_CROUCH : SpriteStates.HIT_STAND;
                 reactionElapsed = f.stunElapsed * FIXED_STEP;
+                break;
+            case THROWN:
+                // Held by the collar: the first frame of the hit reaction.
+                state = SpriteStates.HIT_STAND;
+                reactionElapsed = 0.02f;
                 break;
             default:
                 break;
@@ -1099,6 +1129,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
         }
 
+        if (animation == null && f.status == CombatFighter.Status.THROW) {
+            animation = throwPose(f, character);
+            animationElapsed = throwPoseTime;
+        }
         CharacterDefinition.Animation beamPose = character.specialAnimations.get("ULTRA");
         if (animation == null && f.firingBeam() && beamPose != null) {
             // Own beam sheet (9 poses): charge, shot, wind-blown hold, recovery.
@@ -1138,6 +1172,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
         boolean combatPose = animation == null && (
             f.status == CombatFighter.Status.ULTRA ||
+            f.status == CombatFighter.Status.THROW ||
             f.attacking() ||
             guard != CombatFighter.GUARD_NONE ||
             (isPlayer && isTagAnimationActive())
@@ -1159,6 +1194,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             combatPose,
             locked
         );
+    }
+
+    /**
+     * Throw poses from the character's own moves (no dedicated art yet): the jab reaching
+     * out to grab and holding, the heavy straight for the toss, the guard when teched.
+     * Returns the animation id (its clip time in {@link #throwPoseTime}), or null for the
+     * combat pose.
+     */
+    private String throwPose(CombatFighter f, CharacterDefinition character) {
+        CombatConfig config = engine.config;
+        if (f.throwPhase == CombatFighter.THROW_TECH) {
+            if (!character.animations.containsKey(SpriteStates.DEFENSE_STAND)) return null;
+            float progress = clamp(f.throwFrame / (float)config.throwTechFrames, 0f, 1f);
+            throwPoseTime = character.animation(SpriteStates.DEFENSE_STAND).guardTime(true, progress);
+            return SpriteStates.DEFENSE_STAND;
+        }
+        boolean toss = f.throwPhase == CombatFighter.THROW_EXECUTE;
+        CharacterDefinition.Move move = character.moves.get(toss ? "H" : "L");
+        if (move == null || move.animation == null) return null;
+        AttackDefinition a = move.attack;
+        float frames;
+        if (f.throwPhase == CombatFighter.THROW_STARTUP) {
+            frames = a.startupFrames * clamp(f.throwFrame / (float)config.throwStartupFrames, 0f, 1f);
+        } else if (f.throwPhase == CombatFighter.THROW_HOLD) {
+            frames = a.startupFrames + 0.5f;
+        } else {
+            int length = toss ? config.throwExecuteFrames : config.throwWhiffFrames;
+            float k = clamp(f.throwFrame / (float)length, 0f, 1f);
+            frames = a.startupFrames + (a.totalFrames - 0.5f - a.startupFrames) * k;
+        }
+        throwPoseTime = move.animationTime(frames * FIXED_STEP);
+        return move.animation.id;
     }
 
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
@@ -1287,6 +1354,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     comboPointer = pointerId;
                     pad.press(PadInput.Button.AUTO);
                     break;
+                case THROW:
+                    throwPointer = pointerId;
+                    pad.press(PadInput.Button.THROW);
+                    break;
                 case TAG:
                     // TAG calls the assist (again: Assist -> Tag); with down it is the raw tag.
                     tagPointer = pointerId;
@@ -1314,11 +1385,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == heavyPointer) heavyPointer = -1;
             if (pointerId == comboPointer) comboPointer = -1;
             if (pointerId == tagPointer) tagPointer = -1;
+            if (pointerId == throwPointer) throwPointer = -1;
             if (pointerId == superPointer) superPointer = -1;
             if (pointerId == healPlayerPointer) healPlayerPointer = -1;
             if (pointerId == healOpponentPointer) healOpponentPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
-            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = superPointer = -1;
+            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = superPointer = -1;
             healPlayerPointer = healOpponentPointer = -1;
             pad.setDirection(0);
         }

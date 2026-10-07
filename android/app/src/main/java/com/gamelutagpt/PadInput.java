@@ -6,10 +6,14 @@ package com.gamelutagpt;
  * frames and is delivered exactly once.
  */
 final class PadInput {
-    enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG }
+    enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG, THROW }
 
     private int direction;
-    private boolean light, medium, heavy, auto, superAttack, tag;
+    private boolean light, medium, heavy, auto, superAttack, tag, grab;
+    /** Frames since L or M was delivered alone, or -1: two fingers rarely land on one frame. */
+    private int lightAge = -1, mediumAge = -1;
+    /** L and M pressed this many frames apart still make a throw. */
+    static final int THROW_LENIENCY_FRAMES = 2;
 
     int direction() {
         return direction;
@@ -27,6 +31,7 @@ final class PadInput {
             case AUTO: auto = true; break;
             case SUPER: superAttack = true; break;
             case TAG: tag = true; break;
+            case THROW: grab = true; break;
             default: break;
         }
     }
@@ -35,6 +40,17 @@ final class PadInput {
     void drainInto(FighterInput out) {
         out.clear();
         out.direction = direction;
+        // L + M (two fingers, up to THROW_LENIENCY_FRAMES apart) or the spot between them:
+        // throw. When the first button already started a jab, the engine turns it into the throw.
+        boolean late = (light && mediumAge >= 0) || (medium && lightAge >= 0);
+        out.grab = grab || (light && medium) || late;
+        if (out.grab) {
+            light = medium = false;
+            lightAge = mediumAge = -1;
+        } else {
+            lightAge = light ? 0 : lightAge >= 0 && lightAge < THROW_LENIENCY_FRAMES ? lightAge + 1 : -1;
+            mediumAge = medium ? 0 : mediumAge >= 0 && mediumAge < THROW_LENIENCY_FRAMES ? mediumAge + 1 : -1;
+        }
         out.light = light;
         out.medium = medium;
         out.heavy = heavy;
@@ -45,11 +61,12 @@ final class PadInput {
         // TAG calls the assist; ↓ + TAG is the raw tag (no hold to tell apart, so no delay).
         out.tag = tag && ControlsLayout.isDownDirection(direction);
         out.assist = tag && !out.tag;
-        light = medium = heavy = auto = superAttack = tag = false;
+        light = medium = heavy = auto = superAttack = tag = grab = false;
     }
 
     void reset() {
         direction = 0;
-        light = medium = heavy = auto = superAttack = tag = false;
+        lightAge = mediumAge = -1;
+        light = medium = heavy = auto = superAttack = tag = grab = false;
     }
 }

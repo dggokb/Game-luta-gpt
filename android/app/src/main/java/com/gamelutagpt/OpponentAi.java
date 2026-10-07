@@ -17,6 +17,8 @@ final class OpponentAi {
         void backdash();
         void moveForward(boolean dash);
         void jump(boolean superJump);
+        /** L + M: throw. */
+        void grab();
     }
 
     /** Snapshot of what the AI may look at; filled by the caller every step. */
@@ -31,6 +33,8 @@ final class OpponentAi {
         boolean superReady;
         boolean projectileActive;
         boolean attackReady;
+        /** Center distance within which a throw reaches the target. */
+        float throwReach;
     }
 
     static final float DECISION_MIN = 0.12f;
@@ -39,6 +43,9 @@ final class OpponentAi {
     static final String[] GROUND_ATTACKS = {"2L", "2M", "2H", "L", "M", "H"};
     static final double[] GROUND_WEIGHTS = {0.18, 0.18, 0.17, 0.17, 0.16, 0.14};
     static final String[] AIR_ATTACKS = {"L", "M", "H"};
+    /** Chance of throwing when the target is right next to it, and of teching a throw. */
+    static final double THROW_CHANCE = 0.16;
+    static final double TECH_CHANCE = 0.40;
     static final double[] AIR_WEIGHTS = {0.30, 0.34, 0.36};
 
     private final Random random;
@@ -92,6 +99,9 @@ final class OpponentAi {
             random.nextDouble() < 0.38
         ) {
             actions.attack("2H");
+        } else if (s.targetGrounded && s.attackReady && s.distance <= s.throwReach &&
+            random.nextDouble() < THROW_CHANCE) {
+            actions.grab();
         } else if (groundAttack != null && s.attackReady) {
             actions.attack(groundAttack);
         } else if (s.distance < 82f && random.nextDouble() < 0.38) {
@@ -105,5 +115,13 @@ final class OpponentAi {
             actions.jump(random.nextDouble() < 0.32);
         }
         return true;
+    }
+
+    /**
+     * Grabbed: frames to wait before teching, or -1 to let the throw land. A human reacts
+     * to the grab, so the CPU techs only part of the time and not on the first frame.
+     */
+    int techDelay() {
+        return random.nextDouble() < TECH_CHANCE ? 2 + random.nextInt(8) : -1;
     }
 }

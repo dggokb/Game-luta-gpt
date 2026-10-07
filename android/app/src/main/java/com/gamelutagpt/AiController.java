@@ -27,6 +27,9 @@ final class AiController {
     private boolean backdash;
     private boolean jump;
     private boolean superJump;
+    private boolean grab;
+    /** Frames left before teching the throw it is caught in; -1 no tech, -2 not decided. */
+    private int techDelay = -2;
 
     private final OpponentAi.Actions actions = new OpponentAi.Actions() {
         @Override public void stop() {
@@ -41,6 +44,7 @@ final class AiController {
             movingForward = true;
             dashing = dash;
         }
+        @Override public void grab() { grab = true; }
         @Override public void jump(boolean superJumpRequest) {
             jump = true;
             superJump = superJumpRequest;
@@ -70,6 +74,12 @@ final class AiController {
         if (!enabled) return;
         CombatFighter me = engine.fighter(self);
         CombatFighter target = engine.fighter(1 - self);
+        if (me.status == CombatFighter.Status.THROWN) {
+            if (techDelay == -2) techDelay = ai.techDelay();
+            if (techDelay >= 0 && techDelay-- == 0) out.grab = true;
+            return;
+        }
+        techDelay = -2;
         if (me.frozen()) return;
 
         if (cooldown > 0) cooldown--;
@@ -104,6 +114,7 @@ final class AiController {
         situation.superReady = me.state.superMeter >= CombatConfig.SUPER_COST;
         situation.projectileActive = hasProjectile(engine, self);
         situation.attackReady = cooldown <= 0;
+        situation.throwReach = me.body().halfWidth + target.body().halfWidth + engine.config.throwRange - 4f;
         clearRequests();
         ai.think(CombatConfig.DT, situation, actions);
 
@@ -114,6 +125,7 @@ final class AiController {
         out.jump = jump && !superJump;
         out.superJump = jump && superJump;
         out.superAttack = superAttack;
+        out.grab = grab;
         if (special != null) out.special = special;
         if (attack != null) {
             if (attack.startsWith("2")) out.direction = 3;
@@ -127,7 +139,7 @@ final class AiController {
     private void clearRequests() {
         attack = null;
         special = null;
-        superAttack = backdash = jump = superJump = false;
+        superAttack = backdash = jump = superJump = grab = false;
     }
 
     private static boolean hasProjectile(CombatEngine engine, int owner) {

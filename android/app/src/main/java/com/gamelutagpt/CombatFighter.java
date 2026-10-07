@@ -6,7 +6,7 @@ package com.gamelutagpt;
  */
 final class CombatFighter {
     /** Character state machine. Attack phases and hitstop are derived, see {@link #stateName}. */
-    enum Status { NEUTRAL, ATTACK, HITSTUN, BLOCKSTUN, AIR_HITSTUN, KNOCKDOWN, WAKEUP, ULTRA }
+    enum Status { NEUTRAL, ATTACK, HITSTUN, BLOCKSTUN, AIR_HITSTUN, KNOCKDOWN, WAKEUP, ULTRA, THROW, THROWN }
 
     /** Phases of {@link Status#ULTRA}. */
     static final int ULTRA_STARTUP = 0;
@@ -16,6 +16,17 @@ final class CombatFighter {
     static final int ULTRA_CINEMATIC = 3;
     /** After the cinematic: the final beam, many small hits and a last blast. */
     static final int ULTRA_BEAM = 4;
+
+    /** Phases of {@link Status#THROW} (L + M). */
+    static final int THROW_STARTUP = 0;
+    /** Holding the defender: its tech window is open. */
+    static final int THROW_HOLD = 1;
+    /** The throw landed: the attacker recovers while the defender falls. */
+    static final int THROW_EXECUTE = 2;
+    /** Nobody in reach: a punishable recovery. */
+    static final int THROW_WHIFF = 3;
+    /** Teched (both fighters): pushed apart, neither acts for a moment. */
+    static final int THROW_TECH = 4;
 
     /** What the current attack has done so far; picks the hit/block/whiff cancel window. */
     enum Outcome { NONE, HIT, BLOCK }
@@ -92,6 +103,14 @@ final class CombatFighter {
     int beamDamageLeft;
     int beamBlastDamage;
 
+    // Throw.
+    int throwPhase;
+    int throwFrame;
+    /** Frames during which this fighter cannot be thrown (right after stun or wake-up). */
+    int throwProtect;
+    /** Frames since L + M was pressed, or -1: starts a throw or techs one. */
+    int throwRequestAge = -1;
+
     // Input.
     final InputBuffer buffer = new InputBuffer();
     final MotionParser motion = new MotionParser();
@@ -143,7 +162,13 @@ final class CombatFighter {
 
     /** Knocked down, getting up or KO: no hit connects. */
     boolean hittable() {
-        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam();
+        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam() && !inThrowExchange();
+    }
+
+    /** Holding a throw, being thrown or teching: the exchange plays out untouched. */
+    boolean inThrowExchange() {
+        return status == Status.THROWN ||
+            (status == Status.THROW && (throwPhase == THROW_HOLD || throwPhase == THROW_TECH));
     }
 
     /** Firing the ultra beam: nothing interrupts it. */
@@ -167,6 +192,12 @@ final class CombatFighter {
     String stateName() {
         if (hitstop > 0) return "HITSTOP";
         if (status == Status.ATTACK) return "ATTACK_" + attack.phase(Math.max(0, attackFrame));
+        if (status == Status.THROW) {
+            return throwPhase == THROW_STARTUP ? "THROW_STARTUP"
+                : throwPhase == THROW_HOLD ? "THROW_HOLD"
+                : throwPhase == THROW_EXECUTE ? "THROW_EXECUTE"
+                : throwPhase == THROW_WHIFF ? "THROW_WHIFF" : "THROW_TECH";
+        }
         if (status == Status.ULTRA) {
             return ultraPhase == ULTRA_STARTUP ? "ULTRA_STARTUP"
                 : ultraPhase == ULTRA_RUSH ? "ULTRA_RUSH"

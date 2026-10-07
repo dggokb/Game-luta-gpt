@@ -199,3 +199,14 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   determinística, base para rollback e para as próximas mecânicas de equipe (guard
   cancel, DHC). O golpe do assist é declarado no pack (`fighter.assist.move`).
 - Detalhes: `docs/combat-engine.md` (seção Time).
+
+## Agarrão e tech — v0.80
+
+- **L + M** agarra: não dá para bloquear, então quem só defende tem que reagir. Na tela, o
+  **ponto "L+M" entre os botões L e M** aperta os dois com um dedo só (ou use dois dedos).
+- Quem é agarrado tem uma janela curta para apertar **L + M** e fazer o **tech**: ninguém
+  toma dano e os dois se afastam.
+- Agarrão que erra deixa o atacante aberto; durante e logo depois de hitstun/blockstun não
+  dá para ser agarrado (agarrão não vira combo).
+- A CPU também agarra quando está colada e faz tech em parte dos agarrões.
+- Regras e tempos: `docs/combat-engine.md` (seção Agarrão e tech).

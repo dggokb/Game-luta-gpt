@@ -19,6 +19,7 @@ public class ExtractedSystemsTest {
         @Override public void backdash(){log.add("backdash");}
         @Override public void moveForward(boolean dash){log.add(dash?"dash":"walk");}
         @Override public void jump(boolean s){log.add(s?"superjump":"jump");}
+        @Override public void grab(){log.add("grab");}
     }
     private static OpponentAi.Situation situation(float distance) {
         OpponentAi.Situation s=new OpponentAi.Situation();

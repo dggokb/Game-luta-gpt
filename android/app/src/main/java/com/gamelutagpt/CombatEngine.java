@@ -68,6 +68,8 @@ final class CombatEngine {
      * ({@link #applyUltraHit}); this definition drives guard, scaling and blockstun.
      */
     private final AttackDefinition ultraAttack;
+    /** Combat data of the throw (damage, scaling, meter); its timing lives in CombatConfig.throw*. */
+    private final AttackDefinition throwAttack;
 
     CombatEngine(FighterState first, FighterState second, float firstX, float secondX, CombatConfig config) {
         this.config = config;
@@ -80,6 +82,15 @@ final class CombatEngine {
             .stun(60, config.ultraBlockstunFrames, config.ultraHitstopFrames)
             .windows(null, null, null)
             .pushback(0f, config.ultraPushbackOnBlock)
+            .build();
+        throwAttack = new AttackDefinition.Builder("THROW", AttackDefinition.Kind.NORMAL)
+            .damage(config.throwDamage)
+            .frames(config.throwStartupFrames, config.throwActiveFrames, config.throwWhiffFrames)
+            .stun(1, 1, config.throwHitstopFrames)
+            .windows(null, null, null)
+            .launch(AttackDefinition.Launch.KNOCKDOWN)
+            .knockback(config.throwKnockback)
+            .reach(config.throwRange, 78f)
             .build();
     }
 
@@ -158,6 +169,8 @@ final class CombatEngine {
         for (Contact contact : contacts) applyContact(contact);
         detectUltra(fighters[0], fighters[1]);
         detectUltra(fighters[1], fighters[0]);
+        updateThrow(fighters[0], fighters[1]);
+        updateThrow(fighters[1], fighters[0]);
         updateUltraBeam(fighters[0], fighters[1]);
         updateUltraBeam(fighters[1], fighters[0]);
 
@@ -178,6 +191,7 @@ final class CombatEngine {
             f.buffer.clear();
             f.pendingJumpAge = -1;
             f.ultraRequestAge = -1;
+            f.throwRequestAge = -1;
             return;
         }
         int relative = MotionParser.relative(in.direction, f.facing);
@@ -207,6 +221,7 @@ final class CombatEngine {
         }
         if (in.special != null) f.buffer.push(InputBuffer.Button.SPECIAL, in.special, false);
         if (in.auto) f.buffer.push(InputBuffer.Button.AUTO, null, crouch);
+        if (in.grab) f.throwRequestAge = 0;
         if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
@@ -232,6 +247,13 @@ final class CombatEngine {
         if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded &&
             f.state.superMeter >= CombatConfig.ULTRA_COST) {
             startUltra(f);
+            f.dashRequest = f.backdashRequest = false;
+            return;
+        }
+
+        if (f.throwRequestAge >= 0 && f.grounded &&
+            (f.status == CombatFighter.Status.NEUTRAL || throwOverridesJab(f))) {
+            startThrow(f);
             f.dashRequest = f.backdashRequest = false;
             return;
         }
@@ -275,8 +297,26 @@ final class CombatEngine {
                 break;
             case HITSTUN:
             case BLOCKSTUN:
-                if (f.stunLeft == 0) f.status = CombatFighter.Status.NEUTRAL;
+                if (f.stunLeft == 0) {
+                    f.status = CombatFighter.Status.NEUTRAL;
+                    f.throwProtect = config.throwProtectFrames;
+                }
                 break;
+            case THROW:
+                if ((f.throwPhase == CombatFighter.THROW_WHIFF && f.throwFrame >= config.throwWhiffFrames) ||
+                    (f.throwPhase == CombatFighter.THROW_EXECUTE && f.throwFrame >= config.throwExecuteFrames) ||
+                    (f.throwPhase == CombatFighter.THROW_TECH && f.throwFrame >= config.throwTechFrames)) {
+                    f.status = CombatFighter.Status.NEUTRAL;
+                }
+                break;
+            case THROWN: {
+                // Only an attacker holding it keeps a fighter thrown.
+                CombatFighter other = fighters[1 - f.index];
+                if (other.status != CombatFighter.Status.THROW || other.throwPhase != CombatFighter.THROW_HOLD) {
+                    f.status = CombatFighter.Status.NEUTRAL;
+                }
+                break;
+            }
             case AIR_HITSTUN:
                 if (f.stunLeft == 0 && !f.slammed && !f.ultraFall) {
                     // Air recovery: control returns before landing.
@@ -291,7 +331,10 @@ final class CombatEngine {
                 }
                 break;
             case WAKEUP:
-                if (f.knockdownFrame >= config.wakeupFrames) f.status = CombatFighter.Status.NEUTRAL;
+                if (f.knockdownFrame >= config.wakeupFrames) {
+                    f.status = CombatFighter.Status.NEUTRAL;
+                    f.throwProtect = config.throwProtectFrames;
+                }
                 break;
             case ULTRA:
                 if (f.ultraPhase == CombatFighter.ULTRA_RECOVERY && f.ultraFrame >= config.ultraRecoveryFrames) {
@@ -369,6 +412,28 @@ final class CombatEngine {
         superFreeze = Math.max(superFreeze, config.ultraStartupFrames);
     }
 
+    /**
+     * L + M pressed a couple of frames apart: the jab the first button started becomes the
+     * throw while it is still in its first frames (before it could hit).
+     */
+    private boolean throwOverridesJab(CombatFighter f) {
+        if (!f.attacking() || f.move == null || f.attackFrame > PadInput.THROW_LENIENCY_FRAMES) return false;
+        String binding = f.move.binding;
+        return ("L".equals(binding) || "M".equals(binding)) && f.attackFrame < f.attack.startupFrames;
+    }
+
+    private void startThrow(CombatFighter f) {
+        f.status = CombatFighter.Status.THROW;
+        f.clearAttack();
+        f.throwPhase = CombatFighter.THROW_STARTUP;
+        f.throwFrame = 0;
+        f.throwRequestAge = -1;
+        f.pendingJumpAge = -1;
+        f.forwardDashing = false;
+        f.backdashFrames = 0;
+        f.crouching = false;
+    }
+
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
         f.grounded = false;
@@ -391,6 +456,8 @@ final class CombatEngine {
         f.buffer.age(config.bufferFrames);
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
+        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
+        if (f.throwProtect > 0) f.throwProtect--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.launcherChase > 0) f.launcherChase--;
@@ -411,6 +478,9 @@ final class CombatEngine {
             case KNOCKDOWN:
             case WAKEUP:
                 f.knockdownFrame++;
+                break;
+            case THROW:
+                f.throwFrame++;
                 break;
             case ULTRA:
                 if (f.ultraPhase != CombatFighter.ULTRA_CINEMATIC) f.ultraFrame++;
@@ -772,6 +842,115 @@ final class CombatEngine {
         if (ahead < -halfWidth || ahead - halfWidth > config.ultraReach) return false;
         float chest = a.y - a.body().height(false) * 0.55f;
         return chest >= d.hurtTop() - 40f && chest <= d.y + 10f;
+    }
+
+    // ---------------------------------------------------------------- throw
+
+    /** Throw (L + M): grab in reach, the defender's tech window, then the throw itself. */
+    private void updateThrow(CombatFighter a, CombatFighter d) {
+        if (a.status != CombatFighter.Status.THROW || a.frozen()) return;
+        if (a.throwPhase == CombatFighter.THROW_STARTUP) {
+            if (a.throwFrame < config.throwStartupFrames) return;
+            if (throwReaches(a, d)) {
+                boolean clash = d.status == CombatFighter.Status.THROW &&
+                    d.throwPhase == CombatFighter.THROW_STARTUP &&
+                    d.throwFrame >= config.throwStartupFrames && throwReaches(d, a);
+                if (clash) {
+                    // Both grabbed on the same frame: an automatic tech.
+                    techThrow(a, d);
+                    return;
+                }
+                if (throwable(d)) {
+                    grab(a, d);
+                    return;
+                }
+            }
+            if (a.throwFrame >= config.throwStartupFrames + config.throwActiveFrames) {
+                a.throwPhase = CombatFighter.THROW_WHIFF;
+                a.throwFrame = 0;
+            }
+        } else if (a.throwPhase == CombatFighter.THROW_HOLD) {
+            if (d.throwRequestAge >= 0) {
+                techThrow(a, d);
+            } else if (a.throwFrame >= config.throwTechWindow) {
+                landThrow(a, d);
+            }
+        }
+    }
+
+    /** The defender's body is just in front, both on the ground. */
+    private boolean throwReaches(CombatFighter a, CombatFighter d) {
+        if (!a.grounded || !d.grounded) return false;
+        float ahead = (d.x - a.x) * a.facing;
+        float gap = Math.abs(d.x - a.x) - a.body().halfWidth - d.body().halfWidth;
+        return ahead >= 0f && gap <= config.throwRange;
+    }
+
+    /**
+     * Who can be grabbed: standing or crouching on the ground, free or in its own move
+     * (not a Super or the ultra). Hitstun, blockstun and the frames right after them or
+     * after waking up are throw-invulnerable, so a throw never continues a combo.
+     */
+    private static boolean throwable(CombatFighter d) {
+        if (!d.hittable() || !d.grounded || d.locked || d.throwProtect > 0) return false;
+        switch (d.status) {
+            case NEUTRAL:
+                return true;
+            case ATTACK:
+                return d.attack.kind != AttackDefinition.Kind.SUPER;
+            case THROW:
+                return d.throwPhase == CombatFighter.THROW_WHIFF || d.throwPhase == CombatFighter.THROW_EXECUTE;
+            default:
+                return false;
+        }
+    }
+
+    private void grab(CombatFighter a, CombatFighter d) {
+        d.clearAttack();
+        d.status = CombatFighter.Status.THROWN;
+        d.forwardDashing = false;
+        d.backdashFrames = 0;
+        d.crouching = false;
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        // Pulled in: the bodies touch while the tech window is open.
+        float wanted = a.x + a.facing * (a.body().halfWidth + d.body().halfWidth + 4f);
+        d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        if (d.x != wanted) a.x = Arena.clamp(d.x - (wanted - a.x), Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        a.throwPhase = CombatFighter.THROW_HOLD;
+        a.throwFrame = 0;
+    }
+
+    /** Tech: no damage, both pushed apart and briefly out of action. */
+    private void techThrow(CombatFighter a, CombatFighter d) {
+        for (CombatFighter f : new CombatFighter[]{a, d}) {
+            f.clearAttack();
+            f.status = CombatFighter.Status.THROW;
+            f.throwPhase = CombatFighter.THROW_TECH;
+            f.throwFrame = 0;
+            f.throwRequestAge = -1;
+        }
+        push(d, a, a.facing * config.throwTechPush);
+        push(a, d, -a.facing * config.throwTechPush);
+        events.add(new HitEvent(a.index, d.index, 0, true, false, "TECH"));
+    }
+
+    /** No tech in time: damage, knockdown and the attacker's recovery (oki). */
+    private void landThrow(CombatFighter a, CombatFighter d) {
+        endSession(d.index);
+        ComboSession session = new ComboSession(a.index, d.index);
+        sessions[d.index] = session;
+        int damage = session.registerHit(throwAttack, throwAttack.damage, config);
+        d.state.life = Math.max(0, d.state.life - damage);
+        d.state.refreshHudLabels();
+        a.state.addSuperMeter(CombatRules.superGainOnHit(throwAttack.strength));
+        d.framesSinceHit = 0;
+        knockDown(d);
+        push(d, a, a.facing * throwAttack.knockback);
+        freeze(a, d, throwAttack.hitstopFrames, false);
+        a.throwPhase = CombatFighter.THROW_EXECUTE;
+        a.throwFrame = 0;
+        events.add(new HitEvent(a.index, d.index, damage, false, false, throwAttack.id));
     }
 
     /** Guarded: blockstun and recovery. Hit: the attacker waits for the cinematic. */
