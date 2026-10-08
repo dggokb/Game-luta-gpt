@@ -26,24 +26,26 @@ Write-Host "Source branch: $SourceBranch"
 Write-Host "Source SHA:    $SourceSha"
 Write-Host "Source root:   $source"
 
-Push-Location $source
-try {
-    if (Test-Path 'tools/sprites/requirements.txt') {
-        python -m pip install -r tools/sprites/requirements.txt
-        if ($LASTEXITCODE -ne 0) { throw "Falha instalando dependencias de sprites." }
+if ($env:FULL_PC_EXPORT_VALIDATION -eq '1') {
+    Write-Host "Full sprite validation enabled."
+    Push-Location $source
+    try {
+        if (Test-Path 'tools/sprites/requirements.txt') {
+            python -m pip install -r tools/sprites/requirements.txt
+            if ($LASTEXITCODE -ne 0) { throw "Falha instalando dependencias de sprites." }
+        }
+        python tools/sprites/build_characters.py --write
+        if ($LASTEXITCODE -ne 0) { throw "Falha gerando Character Packs." }
+        python -m unittest discover -s tools/sprites/tests -v
+        if ($LASTEXITCODE -ne 0) { throw "Testes de sprites falharam." }
+        python tools/sprites/build_characters.py --check
+        if ($LASTEXITCODE -ne 0) { throw "Validacao final dos Character Packs falhou." }
     }
-
-    python tools/sprites/build_characters.py --write
-    if ($LASTEXITCODE -ne 0) { throw "Falha gerando Character Packs." }
-
-    python -m unittest discover -s tools/sprites/tests -v
-    if ($LASTEXITCODE -ne 0) { throw "Testes de sprites falharam." }
-
-    python tools/sprites/build_characters.py --check
-    if ($LASTEXITCODE -ne 0) { throw "Validacao final dos Character Packs falhou." }
-}
-finally {
-    Pop-Location
+    finally {
+        Pop-Location
+    }
+} else {
+    Write-Host "Skipping repeated sprite pipeline; using versioned generated outputs."
 }
 
 $env:GAME_LUTA_SOURCE_ROOT = $source
