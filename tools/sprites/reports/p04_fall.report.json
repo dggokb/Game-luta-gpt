@@ -1,0 +1,110 @@
+{
+  "id": "p04_fall",
+  "characterProfile": "p04",
+  "source": "art/sprites/source/p04_fall_video_normalized.png",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 256,
+    "rootX": 104,
+    "rootY": 238,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        36,
+        71,
+        167,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11501
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        28,
+        71,
+        168,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11670
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        24,
+        71,
+        170,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11706
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        23,
+        70,
+        171,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11837
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        23,
+        69,
+        172,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11904
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        19,
+        27,
+        173,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13286
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 174,
+    "frameHeight": 233,
+    "rootX": 95,
+    "rootY": 221,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      9,
+      17
+    ],
+    "decodedBytes": {
+      "canonical": 1179648,
+      "packed": 973008
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "338888eff1fce27a23c4aa345967469b2870d80fb01d2a943d70f05a6b3237dc",
+      "config": "1af53d903b8ce413e72d9c011f68dcaae144b56bacc7659b155feb99353b73d2",
+      "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    }
+  }
+}

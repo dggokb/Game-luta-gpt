@@ -1,0 +1,110 @@
+{
+  "id": "p04_dash",
+  "characterProfile": "p04",
+  "source": "art/sprites/source/p04_dash_video_normalized.png",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 102,
+    "rootY": 238,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        36,
+        23,
+        166,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12030
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        38,
+        23,
+        168,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12122
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        36,
+        24,
+        166,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12005
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        17,
+        74,
+        167,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12185
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        73,
+        126,
+        366,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14396
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        42,
+        28,
+        174,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12474
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 371,
+    "frameHeight": 237,
+    "rootX": 96,
+    "rootY": 226,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      6,
+      12
+    ],
+    "decodedBytes": {
+      "canonical": 2359296,
+      "packed": 2110248
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "196e74cf6a1682182975718c4e62b90a91001acc04289a5346549acdb784c57b",
+      "config": "73e961c7792e4c3670328265385aa5992660d2315133222d9d95aab2e183c173",
+      "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    }
+  }
+}

@@ -20,6 +20,8 @@ final class HudRenderer {
         int facing();
         boolean aiEnabled();
         boolean debugEnabled();
+        /** The pair on the player's side, as "p01+p03". */
+        String teamLabel();
         /** 0 while tagging, rising to 1 when the tag is ready. */
         float tagReadyRatio();
         String tagCooldownLabel();
@@ -131,6 +133,8 @@ final class HudRenderer {
             HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.HEAL_OPPONENT), "VIDA CPU",
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
+        drawToggle(c, s.pressed(Control.TEAM_SELECT), "DUPLA " + s.teamLabel(),
+            TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
         drawDemos(c, s);
     }
 

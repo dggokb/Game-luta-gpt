@@ -7,7 +7,9 @@ import android.media.SoundPool;
 import android.util.Log;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Sons dos ultras. Procura primeiro em {@code <pasta do ultra>/sons/} e
@@ -22,6 +24,7 @@ final class UltraSounds {
     private final AssetManager assets;
     private final SoundPool pool;
     private final Map<String, Integer> loaded = new HashMap<>();
+    private final Set<String> folders = new HashSet<>();
 
     UltraSounds(AssetManager assets) {
         this.assets = assets;
@@ -50,9 +53,11 @@ final class UltraSounds {
     void release() {
         pool.release();
         loaded.clear();
+        folders.clear();
     }
 
     private void loadFolder(String folder) {
+        if (!folders.add(folder)) return;  // a team change can bring the same ultra back
         String[] files;
         try {
             files = assets.list(folder);

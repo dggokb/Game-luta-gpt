@@ -1,0 +1,28 @@
+{
+  "id": "p02_getup",
+  "javaName": "P02_GETUP",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_getup_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_getup.png",
+  "report": "tools/sprites/reports/p02_getup.report.json",
+  "preview": "android/app/build/sprite-review/p02_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derrubado.mp4",
+    "personagem": "p02",
+    "escala": 0.525,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "61,63,64,66,68,70,71,73,75,77,78,80",
+    "largura": 320,
+    "raiz": "165,238",
+    "colunas": 11,
+    "fixar": "registro",
+    "pe_no_chao": true
+  },
+  "frameWidth": 320,
+  "rootX": 165
+}

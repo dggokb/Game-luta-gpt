@@ -42,13 +42,16 @@ personagem estão na ficha dele (`p01.md`, `p03.md`).
 
 ## Tamanho (padrão de inserção)
 
-O tamanho oficial de cada personagem é o da guarda da `inicio_centro.png` com **224 px** na
-célula (o jogo ainda aplica o `worldScale` do perfil). Ninguém escolhe escala à mão:
+As imagens iniciais de todos são geradas **na mesma escala do p01**, então a altura de cada
+um no jogo sai delas: a guarda do p01 tem **224 px** na célula e os outros ficam
+proporcionais (p02 203 px, p04 210 px). O p03 fica igual ao p01 (irmãos, decisão de
+história). O jogo ainda aplica o `worldScale` do perfil. Ninguém escolhe escala à mão:
 
 1. **Uma vez por personagem**, depois de criar as imagens iniciais:
-   `python3 tools/sprites/tamanho.py calibrar <id> <vídeo_de_agachar.mp4>` grava
-   `art/keys/<id>/tamanho.json` com a escala de cada imagem inicial (o agachado é achado
-   dentro do vídeo de onde foi tirado).
+   `python3 tools/sprites/tamanho.py calibrar <id> <vídeo_de_agachar.mp4> --escala-de p01`
+   grava `art/keys/<id>/tamanho.json` com a escala de cada imagem inicial e a altura (o
+   agachado é achado dentro do vídeo de onde foi tirado, mesmo reduzido). O perfil do
+   personagem (`tools/sprites/profiles/<id>.json`) leva a mesma proporção.
 2. **Cada vídeo:**
    `python3 tools/sprites/video_para_sprite.py video.mp4 --personagem <id> --clipe tools/sprites/clips/<clipe>.json --inicio A --fim B`
    A ferramenta acha a imagem inicial no 1º ou no último quadro (mesmo se o Seedance deu

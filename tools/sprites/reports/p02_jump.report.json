@@ -1,0 +1,110 @@
+{
+  "id": "p02_jump",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_jump_video_normalized.png",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 224,
+    "frameHeight": 320,
+    "rootX": 122,
+    "rootY": 302,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        48,
+        97,
+        196,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12901
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        47,
+        60,
+        196,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14784
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        73,
+        36,
+        169,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14163
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        44,
+        110,
+        179,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 13089
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        32,
+        110,
+        178,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13193
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        27,
+        112,
+        177,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13296
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 190,
+    "frameHeight": 288,
+    "rootX": 105,
+    "rootY": 276,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      17,
+      26
+    ],
+    "decodedBytes": {
+      "canonical": 1720320,
+      "packed": 1313280
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "1bbdec3f5ac5a7d2b03879bb357f2352da4f3e7f0296f590a0424b4be48034d6",
+      "config": "4c87f35ecee78fc1016770b53bddfd5ceff713e32709b965f6bc657a0840cbfd",
+      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    }
+  }
+}

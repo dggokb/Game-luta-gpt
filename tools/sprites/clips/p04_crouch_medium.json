@@ -1,0 +1,29 @@
+{
+  "id": "p04_crouch_medium",
+  "javaName": "P04_CROUCH_MEDIUM",
+  "profile": "p04.json",
+  "source": "art/sprites/source/p04_crouch_medium_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_crouch_medium.png",
+  "report": "tools/sprites/reports/p04_crouch_medium.report.json",
+  "preview": "android/app/build/sprite-review/p04_crouch_medium-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "rasteira.mp4",
+    "personagem": "p04",
+    "escala": 0.4372,
+    "medida": "último quadro = inicio_agachado (nota 0.86)",
+    "quadros": "41,42,44,45,46,50,50,51,53,55,57,58,60,62,64,66",
+    "celula": 224,
+    "largura": 320,
+    "raiz": "128,206",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 224,
+  "rootY": 206
+}

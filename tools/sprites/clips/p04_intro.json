@@ -1,0 +1,29 @@
+{
+  "id": "p04_intro",
+  "javaName": "P04_INTRO",
+  "profile": "p04.json",
+  "source": "art/sprites/source/p04_intro_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_intro.png",
+  "report": "tools/sprites/reports/p04_intro.report.json",
+  "preview": "android/app/build/sprite-review/p04_intro-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "intro.mp4",
+    "personagem": "p04",
+    "escala": 0.505,
+    "motivo": "intro não começa na imagem inicial; guarda do IDLE nos quadros 84, 90 e 96 concorda em 0,504-0,507 (nota 0,60)",
+    "quadros": "0,4,7,11,15,18,22,26,30,33,37,41,44,48,52,55,59,63,66,70,74,78,81,85,89,92,96",
+    "celula": 320,
+    "largura": 224,
+    "raiz": "115,302",
+    "colunas": 11
+  },
+  "frameWidth": 224,
+  "frameHeight": 320,
+  "rootX": 115,
+  "rootY": 302
+}

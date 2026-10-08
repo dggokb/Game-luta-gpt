@@ -1,0 +1,30 @@
+{
+  "id": "p02_jump_light",
+  "javaName": "P02_JUMP_LIGHT",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_jump_light_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_jump_light.png",
+  "report": "tools/sprites/reports/p02_jump_light.report.json",
+  "preview": "android/app/build/sprite-review/p02_jump_light-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jL.mp4",
+    "personagem": "p02",
+    "escala": 0.525,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "17,25,34,36,39,42,45",
+    "celula": 320,
+    "largura": 320,
+    "raiz": "106,302",
+    "colunas": 7,
+    "pe_no_chao": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 106,
+  "rootY": 302
+}

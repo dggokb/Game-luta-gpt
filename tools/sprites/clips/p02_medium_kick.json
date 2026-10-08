@@ -1,0 +1,27 @@
+{
+  "id": "p02_medium_kick",
+  "javaName": "P02_MEDIUM_KICK",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_medium_kick_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_medium_kick.png",
+  "report": "tools/sprites/reports/p02_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/p02_medium_kick-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p02",
+    "escala": 0.359,
+    "motivo": "M não começa na imagem inicial; guarda do IDLE nos quadros 0, 6 e 90 concorda em 0,359 (nota 0,54)",
+    "quadros": "18,21,23,26,30,35,39,44,48,52,57,61,66,70",
+    "largura": 416,
+    "raiz": "153,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 416,
+  "rootX": 153
+}

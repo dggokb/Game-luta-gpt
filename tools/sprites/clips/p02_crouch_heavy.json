@@ -1,0 +1,29 @@
+{
+  "id": "p02_crouch_heavy",
+  "javaName": "P02_CROUCH_HEAVY",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_crouch_heavy_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_crouch_heavy.png",
+  "report": "tools/sprites/reports/p02_crouch_heavy.report.json",
+  "preview": "android/app/build/sprite-review/p02_crouch_heavy-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2H.mp4",
+    "personagem": "p02",
+    "escala": 0.5127,
+    "medida": "1º quadro = inicio_agachado (nota 0.96)",
+    "quadros": "29,31,34,36,38,46,54,62,69,77,85,93",
+    "celula": 352,
+    "largura": 224,
+    "raiz": "127,334",
+    "colunas": 11
+  },
+  "frameWidth": 224,
+  "frameHeight": 352,
+  "rootX": 127,
+  "rootY": 334
+}

@@ -1,0 +1,28 @@
+{
+  "id": "p04_defense_stand",
+  "javaName": "P04_DEFENSE_STAND",
+  "profile": "p04.json",
+  "source": "art/sprites/source/p04_defense_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_defense_stand.png",
+  "report": "tools/sprites/reports/p04_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p04_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaEmPe.mp4",
+    "personagem": "p04",
+    "escala": 0.5122,
+    "medida": "1º quadro = inicio_centro (nota 0.86)",
+    "quadros": "19,25,31,37,44,50,56,62",
+    "largura": 224,
+    "raiz": "105,238",
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 105
+}

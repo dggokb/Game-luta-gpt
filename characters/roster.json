@@ -5,5 +5,19 @@
     "player_base",
     "p03"
   ],
-  "opponentCharacter": "monster_npc"
+  "opponentCharacter": "monster_npc",
+  "teams": [
+    [
+      "player_base",
+      "p03"
+    ],
+    [
+      "player_base",
+      "p02"
+    ],
+    [
+      "p03",
+      "p04"
+    ]
+  ]
 }

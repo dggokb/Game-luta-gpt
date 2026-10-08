@@ -1,0 +1,88 @@
+{
+  "id": "p02_land",
+  "characterProfile": "p02",
+  "source": "art/sprites/source/p02_land_video_normalized.png",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 224,
+    "frameHeight": 288,
+    "rootX": 103,
+    "rootY": 270,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        40,
+        21,
+        184,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15504
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        23,
+        67,
+        200,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14691
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        34,
+        70,
+        182,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13728
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        33,
+        68,
+        181,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13599
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 197,
+    "frameHeight": 270,
+    "rootX": 90,
+    "rootY": 259,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      13,
+      11
+    ],
+    "decodedBytes": {
+      "canonical": 1032192,
+      "packed": 851040
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "bad1937c83d1cd7ac5ac4eb328f3eab237c26b2af522f4e429ae1f826cbd0c5f",
+      "config": "3c4649e3b1860562998b12b680cefb7cf8b2ef269c91fbb91d5a19506bbcdd45",
+      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    }
+  }
+}

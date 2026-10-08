@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, DEMO, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, DEMO, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -78,6 +78,12 @@ final class ControlsLayout {
     static final float HEAL_OPPONENT_LEFT = 1168f;
     static final float HEAL_OPPONENT_RIGHT = 1248f;
 
+    // DUPLA: the next pair of the roster takes the fight (fresh round).
+    static final float TEAM_BUTTON_LEFT = 1082f;
+    static final float TEAM_BUTTON_TOP = 282f;
+    static final float TEAM_BUTTON_RIGHT = 1248f;
+    static final float TEAM_BUTTON_BOTTOM = 322f;
+
     // Demo buttons (v0.80…v0.85, v0.87), a row at the top center; see DemoDirector.
     static final float DEMO_LEFT = 575f;
     static final float DEMO_TOP = 50f;
@@ -111,6 +117,9 @@ final class ControlsLayout {
         }
         if (insideRect(x, y, HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM)) {
             return Control.HEAL_OPPONENT;
+        }
+        if (insideRect(x, y, TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM)) {
+            return Control.TEAM_SELECT;
         }
         if (demoAt(x, y) >= 0) return Control.DEMO;
         if (insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_RADIUS)) return Control.DPAD;

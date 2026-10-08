@@ -1,0 +1,29 @@
+{
+  "id": "p02_hit_stand",
+  "javaName": "P02_HIT_STAND",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_hit_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_hit_stand.png",
+  "report": "tools/sprites/reports/p02_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/p02_hit_stand-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "levarGolpeEmPe.mp4",
+    "personagem": "p02",
+    "escala": 0.3392,
+    "medida": "quadros 6, 0, 12 = guarda do IDLE (nota 0.80)",
+    "quadros": "19,26,34,41,48,56,63,71,78",
+    "largura": 352,
+    "raiz": "108,238",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "rootX": 108
+}

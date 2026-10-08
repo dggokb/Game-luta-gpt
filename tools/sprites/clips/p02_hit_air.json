@@ -1,0 +1,30 @@
+{
+  "id": "p02_hit_air",
+  "javaName": "P02_HIT_AIR",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_hit_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_hit_air.png",
+  "report": "tools/sprites/reports/p02_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p02_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "levarGolpeNoAr.mp4",
+    "personagem": "p02",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "10,19,27,36",
+    "celula": 320,
+    "largura": 512,
+    "raiz": "137,302",
+    "colunas": 4,
+    "pe_no_chao": true
+  },
+  "frameWidth": 512,
+  "frameHeight": 320,
+  "rootX": 137,
+  "rootY": 302
+}

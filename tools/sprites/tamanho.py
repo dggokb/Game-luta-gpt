@@ -85,19 +85,22 @@ def key_image(personagem, name, keyer):
 
 
 def pack_frames(pacote, state, picks):
-    """Quadros (RGBA, no tamanho oficial) de um estado do pacote do personagem."""
-    char = json.loads((ROOT / 'characters' / pacote / 'character.json').read_text(encoding='utf-8'))
-    atlas = char['animations'][state]['atlas']
+    """Quadros (RGBA, no tamanho oficial) de um estado do pacote do personagem. Sem pacote
+    ainda (personagem novo), lê o clipe <pacote>_<estado> direto: basta o IDLE convertido."""
+    path = ROOT / 'characters' / pacote / 'character.json'
+    char = json.loads(path.read_text(encoding='utf-8')) if path.exists() else None
+    atlas = char['animations'][state]['atlas'] if char else f'{pacote}_{state.lower()}'
     for clip in (ROOT / 'tools/sprites/clips').glob('*.json'):
         cfg = json.loads(clip.read_text(encoding='utf-8'))
         if Path(cfg['output']).stem == atlas:
             break
     else:
-        raise SystemExit(f'{pacote}/{state}: atlas {atlas} sem clipe')
-    layout = json.loads((ROOT / cfg['report']).read_text(encoding='utf-8'))['layout']
+        raise SystemExit(f'{pacote}/{state}: sem clipe {atlas}; converta primeiro o IDLE '
+                         f'(vídeo que começa no inicio_centro)')
     sheet = rgba_png(ROOT / cfg['source'])
-    w, h, cols, n = layout['frameWidth'], layout['frameHeight'], layout['columns'], layout['frameCount']
-    frames = char['animations'][state]['frames']
+    w, h = cfg.get('frameWidth', 256), cfg.get('frameHeight', 256)
+    cols, n = cfg['columns'], cfg['expectedFrames']
+    frames = char['animations'][state]['frames'] if char else list(range(n))
     idx = [frames[i] for i in picks(len(frames))]
     return [sheet[i // cols * h:(i // cols + 1) * h, i % cols * w:(i % cols + 1) * w] for i in idx if i < n]
 
@@ -141,16 +144,22 @@ def medir(frames, personagem, keyer):
         f"ou passe --escala N --motivo '...' (fica gravado no clipe).")
 
 
-def calibrar(personagem, videos=(), altura=224):
-    """Escala de cada imagem inicial. A do centro vem da altura da guarda; outra chave com a
-    mesma pose (esquerda/direita) é comparada com o centro; uma pose diferente (agachado) é
-    achada dentro do vídeo de onde saiu, que começa no centro."""
+def calibrar(personagem, videos=(), altura=224, escala_de=None):
+    """Escala de cada imagem inicial. A do centro vem da altura da guarda (ou, com
+    escala_de, é a mesma do outro personagem: imagens iniciais geradas na mesma escala, e a
+    altura sai proporcional); outra chave com a mesma pose (esquerda/direita) é comparada com
+    o centro; uma pose diferente (agachado) é achada dentro do vídeo de onde saiu, que começa
+    no centro (mesmo reduzida depois)."""
     from video_para_sprite import key as keyer, read_frames
     path = KEYS / personagem / 'tamanho.json'
     old = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     pacote = old.get('pacote') or ('player_base' if personagem == 'p01' else personagem)
     centro = key_image(personagem, 'inicio_centro', keyer)
-    base = altura / crop(centro).shape[0]
+    if escala_de:
+        base = config(escala_de)['chaves']['inicio_centro']
+        altura = round(crop(centro).shape[0] * base)
+    else:
+        base = altura / crop(centro).shape[0]
     chaves = {'inicio_centro': round(base, 4)}
     clips = [read_frames(v)[0] for v in videos]
     for f in sorted((KEYS / personagem).glob('inicio_*.png')):
@@ -164,18 +173,22 @@ def calibrar(personagem, videos=(), altura=224):
             print(f'{f.stem}: mesma pose do centro, escala {base / zoom:.4f} (nota {nota:.2f})')
             continue
         for frames in clips:
-            start_nota, start_zoom = match_zoom(centro, keyer(frames[0]), 0.8, 1.25)
-            if start_nota < MIN_SCORE:
+            # Escala do vídeo de onde a chave saiu: pelo inicio_centro ou, se não começa
+            # nele, pela medida normal (guarda do IDLE já convertido).
+            path.write_text(json.dumps({'pacote': pacote, 'altura': altura, 'chaves': chaves}), encoding='utf-8')
+            try:
+                video_scale = medir(frames, personagem, keyer)['escala']
+            except SystemExit as e:
+                print(f'{f.stem}: não deu para medir o vídeo ({e})')
                 continue
-            for i in range(len(frames)):
-                n, z = match_zoom(ref, keyer(frames[i]), 0.9, 1.1)
-                if n >= 0.97:
-                    escala = base / start_zoom / z
-                    chaves[f.stem] = round(escala, 4)
-                    print(f'{f.stem}: quadro {i} de um vídeo que começa no centro, escala {escala:.4f}')
-                    break
-            if f.stem in chaves:
+            # A chave é um quadro do vídeo (às vezes reduzido): o quadro que mais se parece.
+            n, z, i = max(match_zoom(ref, keyer(frames[i]), 0.5, 2.2) + (i,) for i in range(0, len(frames), 2))
+            if n >= 0.9:
+                escala = video_scale * z
+                chaves[f.stem] = round(escala, 4)
+                print(f'{f.stem}: quadro {i} do vídeo (nota {n:.2f}, zoom {z:.3f}), escala {escala:.4f}')
                 break
+            print(f'{f.stem}: não achei no vídeo (melhor nota {n:.2f}, quadro {i})')
         if f.stem not in chaves:
             if f.stem in old.get('chaves', {}):
                 chaves[f.stem] = old['chaves'][f.stem]
@@ -193,12 +206,13 @@ if __name__ == '__main__':
     c = sub.add_parser('calibrar', help='mede a escala de cada imagem inicial do personagem')
     c.add_argument('personagem')
     c.add_argument('videos', nargs='*', help='vídeo de onde saiu uma imagem inicial de outra pose')
+    c.add_argument('--escala-de', help='imagens iniciais na mesma escala deste personagem (altura proporcional)')
     m = sub.add_parser('medir', help='mostra a escala que um vídeo teria')
     m.add_argument('personagem')
     m.add_argument('videos', nargs='+')
     args = p.parse_args()
     if args.cmd == 'calibrar':
-        calibrar(args.personagem, args.videos)
+        calibrar(args.personagem, args.videos, escala_de=args.escala_de)
     else:
         from video_para_sprite import key as keyer, read_frames
         for v in args.videos:

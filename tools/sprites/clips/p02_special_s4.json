@@ -1,0 +1,29 @@
+{
+  "id": "p02_special_s4",
+  "javaName": "P02_SPECIAL_S4",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_special_s4_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_special_s4.png",
+  "report": "tools/sprites/reports/p02_special_s4.report.json",
+  "preview": "android/app/build/sprite-review/p02_special_s4-import.png",
+  "expectedFrames": 20,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "s4.mp4",
+    "personagem": "p02",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "17,26,34,43,52,53,55,56,57,59,60,61,63,64,65,67,68,69,71,72",
+    "celula": 352,
+    "largura": 416,
+    "raiz": "165,334",
+    "colunas": 11
+  },
+  "frameWidth": 416,
+  "frameHeight": 352,
+  "rootX": 165,
+  "rootY": 334
+}

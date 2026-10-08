@@ -1,0 +1,32 @@
+{
+  "id": "p04_defense_crouch",
+  "javaName": "P04_DEFENSE_CROUCH",
+  "profile": "p04.json",
+  "source": "art/sprites/source/p04_defense_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_defense_crouch.png",
+  "report": "tools/sprites/reports/p04_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p04_defense_crouch-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaAgaxado.mp4",
+    "personagem": "p04",
+    "escala": 0.2355,
+    "medida": "último quadro = inicio_agachado (nota 0.83)",
+    "quadros": "32,38,44,50,55,61,67",
+    "celula": 192,
+    "largura": 224,
+    "raiz": "107,174",
+    "colunas": 7,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 192,
+  "rootX": 107,
+  "rootY": 174
+}

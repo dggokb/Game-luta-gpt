@@ -139,11 +139,14 @@ public class CombatRulesTest {
     @Test public void launcherUppercutFrameCoversTheWholeActiveWindow() {
         CharacterDefinition.Move launcher=BASE.moves.get("2H");
         assertEquals("CROUCH_HEAVY",launcher.animation.id);
-        for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.002f)
-            assertEquals("t="+t,2,launcher.animation.frame(launcher.animationTime(t),0));
+        // Video art: frames 4-7 are the arm stretched up; they cover the active window.
+        for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.002f) {
+            int frame=launcher.animation.frame(launcher.animationTime(t),0);
+            assertTrue("t="+t+" frame "+frame,frame>=4&&frame<=7);
+        }
         assertEquals(0,launcher.animation.frame(launcher.animationTime(0),0));
-        // Recovery returns through the wind-up to the crouching guard.
-        assertEquals(0,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
+        // Recovery comes back down to the crouching guard (last frame).
+        assertEquals(11,launcher.animation.frame(launcher.animationTime(launcher.totalTime-.001f),0));
     }
     @Test public void airJabExtendedFramesCoverTheActiveWindow() {
         CharacterDefinition.Move jab=BASE.move("L",true);

@@ -1,0 +1,30 @@
+{
+  "id": "p02_fall",
+  "javaName": "P02_FALL",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_fall_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_fall.png",
+  "report": "tools/sprites/reports/p02_fall.report.json",
+  "preview": "android/app/build/sprite-review/p02_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p02",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "40,43,47,50,54,57",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "106,270",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameWidth": 192,
+  "frameHeight": 288,
+  "rootX": 106,
+  "rootY": 270
+}

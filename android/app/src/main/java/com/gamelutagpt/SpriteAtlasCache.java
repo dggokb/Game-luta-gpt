@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Single owner of decoded atlases. Every renderer of a match shares one cache, so an
@@ -28,6 +31,16 @@ final class SpriteAtlasCache {
     }
 
     int size() { return sheets.size(); }
+
+    /** Frees every atlas the given characters do not use (team change: ~135 MB each). */
+    void retainOnly(CharacterDefinition... characters) {
+        Set<String> used=new HashSet<>();
+        for(CharacterDefinition c:characters) for(CharacterDefinition.Animation a:c.animations.values()) used.add(a.atlas.resource);
+        for(Iterator<Map.Entry<String,Bitmap>> it=sheets.entrySet().iterator();it.hasNext();) {
+            Map.Entry<String,Bitmap> e=it.next();
+            if(!used.contains(e.getKey())) { e.getValue().recycle(); it.remove(); }
+        }
+    }
 
     private void load(CharacterDefinition.Atlas a) {
         Bitmap bitmap=sheets.get(a.resource);

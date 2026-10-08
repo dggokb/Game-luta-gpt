@@ -1,0 +1,121 @@
+{
+  "id": "p04_jump_heavy",
+  "characterProfile": "p04",
+  "source": "art/sprites/source/p04_jump_heavy_video_normalized.png",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 288,
+    "frameHeight": 288,
+    "rootX": 118,
+    "rootY": 270,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        62,
+        25,
+        162,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 14060
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        35,
+        93,
+        250,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14892
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        38,
+        100,
+        259,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14896
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        29,
+        100,
+        256,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14400
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        34,
+        99,
+        255,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14295
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        37,
+        99,
+        249,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14093
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        30,
+        27,
+        172,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14495
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 252,
+    "frameHeight": 266,
+    "rootX": 100,
+    "rootY": 255,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      18,
+      15
+    ],
+    "decodedBytes": {
+      "canonical": 2322432,
+      "packed": 1876896
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "17255810d763772099b0dfd6124b59e38f23b15a405ee487bae2cac914a77873",
+      "config": "076c940d5dc24e95cb402483dc28fb756f6c3b3999c058b5addaa66fe01fef61",
+      "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    }
+  }
+}

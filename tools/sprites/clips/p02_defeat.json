@@ -1,0 +1,25 @@
+{
+  "id": "p02_defeat",
+  "javaName": "P02_DEFEAT",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_defeat_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_defeat.png",
+  "report": "tools/sprites/reports/p02_defeat.report.json",
+  "preview": "android/app/build/sprite-review/p02_defeat-import.png",
+  "expectedFrames": 33,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derrota.mp4",
+    "personagem": "p02",
+    "escala": 0.3358,
+    "medida": "quadros 6, 0, 30 = guarda do IDLE (nota 0.75)",
+    "quadros": "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96",
+    "largura": 256,
+    "raiz": "148,238",
+    "colunas": 11
+  },
+  "rootX": 148
+}

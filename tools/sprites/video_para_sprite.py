@@ -72,7 +72,21 @@ def keep_largest(alpha):
     return alpha
 
 
-def key(frame, dust=False, effects=False):
+def floor_dust(alpha, h, s, v):
+    """Poeira levantada no chão: esverdeada (tingida pelo fundo) ou bege clara, só na faixa
+    dos pés, onde não há cabelo nem pele. Tênis branco e roupa escura (sem essas cores) ficam."""
+    rows = np.nonzero((alpha > 0).any(1))[0]
+    if len(rows) == 0:
+        return np.zeros_like(alpha, bool)
+    top, bottom = rows.min(), rows.max()
+    band = np.zeros_like(alpha, bool)
+    band[bottom - (bottom - top) * 12 // 100:] = True
+    tinted = (h > 35) & (h < 95) & (s >= 10) & (v >= 90)
+    beige = (h >= 10) & (h <= 34) & (s >= 10) & (s < 45) & (v >= 120) & (v < 230)
+    return band & (tinted | beige)
+
+
+def key(frame, dust=False, effects=False, floor=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45)
@@ -99,6 +113,9 @@ def key(frame, dust=False, effects=False):
         body = cv2.dilate(colored, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (91, 91)))
         alpha[thin | ((alpha > 0) & pale & (body == 0))] = 0
         keep_largest(alpha)
+    if floor:
+        alpha[floor_dust(alpha, h, s, v)] = 0
+        alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
     alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
     # Furinhos dentro do corpo (reflexo verde na roupa branca) voltam a ser opacos;
     # vãos grandes, como entre as pernas, continuam transparentes.
@@ -126,7 +143,7 @@ def torso_x(rgba):
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
-              sem_poeira=False, sem_efeitos=False)
+              sem_poeira=False, sem_efeitos=False, limpar_chao=False)
 
 
 def parser():
@@ -147,11 +164,14 @@ def parser():
     p.add_argument("--largura", type=int, help="largura da célula (padrão: igual à altura)")
     p.add_argument("--sem-poeira", action="store_true", help="remove poeira bege do chão")
     p.add_argument("--sem-efeitos", action="store_true", help="remove clarão de impacto e rastro de golpe")
+    p.add_argument("--limpar-chao", action="store_true",
+                   help="remove poeira cinza-esverdeada na faixa dos pés (seguro com cabelo claro e pele)")
     p.add_argument("--colunas", type=int, default=8)
     p.add_argument("--raiz", default="128,238")
-    p.add_argument("--fixar", choices=["tronco", "quadro", "video"], default="tronco",
+    p.add_argument("--fixar", choices=["tronco", "quadro", "registro", "video"], default="tronco",
                    help="tronco: anula o deslizamento lateral; quadro: cada quadro no próprio tronco "
-                        "(o jogo é que empurra, ex.: defesa); video: mantém a posição do vídeo")
+                        "(o jogo é que empurra, ex.: defesa); registro: idem, com o tronco medido como "
+                        "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo")
     p.add_argument("--pe-no-chao", action="store_true",
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
     p.add_argument("--deslocar", default="0,0",
@@ -206,6 +226,20 @@ def save_recipe(path, clip, args, start, end, measured, count, cw):
     print(f"receita gravada em {path}")
 
 
+def registration_x(rgba):
+    """Tronco como a auditoria de harmonia mede: mediana do meio de cada linha entre 30% e
+    55% da altura da silhueta."""
+    a = rgba[..., 3] > 10
+    rows = np.nonzero(a.any(1))[0]
+    top, h = rows.min(), rows.max() + 1 - rows.min()
+    mids = []
+    for y in range(top + int(h * 0.30), top + int(h * 0.55)):
+        xs = np.nonzero(a[y])[0]
+        if len(xs):
+            mids.append((xs.min() + xs.max()) / 2)
+    return float(np.median(mids))
+
+
 def main(argv=None):
     args, clip = parse_args(argv)
     frames, fps = read_frames(args.video)
@@ -219,10 +253,10 @@ def main(argv=None):
               else list(range(start, end, args.passo)))
     cache = {}
 
-    def keyed_frame(i, dust=False, effects=False):
-        if (i, dust, effects) not in cache:
-            cache[i, dust, effects] = key(frames[i], dust, effects)
-        return cache[i, dust, effects]
+    def keyed_frame(i, dust=False, effects=False, floor=False):
+        if (i, dust, effects, floor) not in cache:
+            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor)
+        return cache[i, dust, effects, floor]
 
     measured = None
     if args.escala is not None:
@@ -232,7 +266,7 @@ def main(argv=None):
         measured = tamanho.medir(frames, args.personagem, key)
         s = measured["escala"]
         print(f"escala {s:.4f} ({measured['medida']}, nota {measured['nota']:.2f}, zoom {measured['zoom']:.3f})")
-    keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos) for i in picked]
+    keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos, args.limpar_chao) for i in picked]
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
         # Remove só a tendência (o deslizamento); o balanço natural do corpo continua.
@@ -240,6 +274,9 @@ def main(argv=None):
         trend = np.polyval(np.polyfit(t, xs, 1), t)
         offsets = -(trend - trend[0])
     elif args.fixar == "quadro":
+        offsets = -(xs - xs[0])
+    elif args.fixar == "registro":
+        xs = np.array([registration_x(k) for k in keyed])
         offsets = -(xs - xs[0])
     else:
         offsets = np.zeros(len(xs))

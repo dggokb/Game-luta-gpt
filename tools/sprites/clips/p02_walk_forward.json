@@ -1,0 +1,27 @@
+{
+  "id": "p02_walk_forward",
+  "javaName": "P02_WALK_FORWARD",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_walk_forward_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_walk_forward.png",
+  "report": "tools/sprites/reports/p02_walk_forward.report.json",
+  "preview": "android/app/build/sprite-review/p02_walk_forward-import.png",
+  "expectedFrames": 20,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "frente.mp4",
+    "personagem": "p02",
+    "escala": 0.5122,
+    "medida": "1º quadro = inicio_centro (nota 0.86)",
+    "quadros": "19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57",
+    "largura": 224,
+    "raiz": "108,238",
+    "colunas": 11,
+    "pe_no_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 108
+}

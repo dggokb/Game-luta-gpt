@@ -1,0 +1,30 @@
+{
+  "id": "p02_throw",
+  "javaName": "P02_THROW",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_throw_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_throw.png",
+  "report": "tools/sprites/reports/p02_throw.report.json",
+  "preview": "android/app/build/sprite-review/p02_throw-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agarrao.mp4",
+    "personagem": "p02",
+    "escala": 0.525,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "16,22,28,35,41,47,54,60,66",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "110,270",
+    "colunas": 9,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 110,
+  "rootY": 270
+}

@@ -1,0 +1,27 @@
+{
+  "id": "p04_walk_back",
+  "javaName": "P04_WALK_BACK",
+  "profile": "p04.json",
+  "source": "art/sprites/source/p04_walk_back_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_walk_back.png",
+  "report": "tools/sprites/reports/p04_walk_back.report.json",
+  "preview": "android/app/build/sprite-review/p04_walk_back-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "back.mp4",
+    "personagem": "p04",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.94)",
+    "quadros": "18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70",
+    "largura": 192,
+    "raiz": "95,238",
+    "colunas": 11,
+    "pe_no_chao": true
+  },
+  "frameWidth": 192,
+  "rootX": 95
+}

@@ -125,8 +125,10 @@ public class SpriteIntegrationTest {
         assertEquals(0,motion().frame());
         CharacterDefinition.Move launcher=first.moves.get("2H");
         // The uppercut frame is on screen for the whole active window of the launcher.
-        for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.01f)
-            assertEquals(2,launcher.animation.frame(launcher.animationTime(t),0));
+        for(float t=launcher.activeStart;t<launcher.activeEnd;t+=.01f) {
+            int frame=launcher.animation.frame(launcher.animationTime(t),0);
+            assertTrue("frame "+frame,frame>=4&&frame<=7);
+        }
         frames(24);
         assertEquals(SpriteMotion.Clip.CROUCH,motion().clip);
 
@@ -539,6 +541,29 @@ public class SpriteIntegrationTest {
         assertTrue("Bodies overlap: "+(dx-px),dx-px>=gap-0.01f);
         assertTrue("Opponent should be pushed",dx>520f);
         assertEquals(1,player().facing);
+    }
+    @Test public void teamButtonSwapsThePairAndKeepsOnlyItsAtlases()throws Exception {
+        assertArrayEquals(GeneratedCharacters.TEAM,GeneratedCharacters.TEAMS[0]);
+        assertTrue("story pairs p01+p02 and p03+p04 are selectable",GeneratedCharacters.TEAMS.length>=3);
+        assertEquals(ControlsLayout.Control.TEAM_SELECT,ControlsLayout.controlAt(
+            (ControlsLayout.TEAM_BUTTON_LEFT+ControlsLayout.TEAM_BUTTON_RIGHT)/2,
+            (ControlsLayout.TEAM_BUTTON_TOP+ControlsLayout.TEAM_BUTTON_BOTTOM)/2));
+        for(int i=1;i<=GeneratedCharacters.TEAMS.length;i++) {
+            invoke("selectTeam",new Class<?>[]{int.class},i);
+            String[] pair=GeneratedCharacters.TEAMS[i%GeneratedCharacters.TEAMS.length];
+            FighterState[] team=(FighterState[])get("team");
+            assertEquals(pair[0],team[0].character.id);
+            assertEquals(pair[1],team[1].character.id);
+            assertEquals(pair[0],rendererCharacterId());
+            // Training CPU: the point character, washed out.
+            assertEquals(pair[0],npc().character().id);
+            frames(1);
+            assertEquals("INTRO",motion().clip);
+            // Only the pair stays decoded (~135 MB per character).
+            java.util.Set<String> used=new java.util.HashSet<>();
+            for(FighterState f:team) for(CharacterDefinition.Animation a:f.character.animations.values()) used.add(a.atlas.resource);
+            assertEquals(used.size(),((SpriteAtlasCache)get("atlases")).size());
+        }
     }
     @Test public void introPlaysBeforeTheFightAndHoldsTheControls()throws Exception {
         invoke("startIntro",new Class<?>[0]);

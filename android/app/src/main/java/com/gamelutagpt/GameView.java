@@ -29,15 +29,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * engine; this class only presents it (sprites, Super and ultra cinematics, tag, HUD, debug).
  */
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable, UltraListener {
-    // Team and opponent rules come from the generated character packs.
-    private final FighterState[] team = new FighterState[] {
-        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[0]), "PLAYER 1"),
-        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[1]), "PLAYER 2")
-    };
+    // Team and opponent rules come from the generated character packs; DUPLA cycles the pairs.
+    private int teamIndex;
+    private FighterState[] team = membersOf(0);
 
-    // Training opponent: the base character (same body and moves as ours), drawn washed out.
-    private final FighterState opponentFighter =
-        new FighterState(GeneratedCharacters.get(GeneratedCharacters.TEAM[0]), "CPU");
+    // Training opponent: our point character (same body and moves), drawn washed out.
+    private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
 
     private static final float VW = Arena.VW;
     private static final float VH = Arena.VH;
@@ -68,6 +65,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final SpriteAtlasCache atlases;
+    private final AndroidRenderAssets ultraAssets;
     private final SpriteFighterRenderer spriteFighterRenderer;
     private final SpriteFighterRenderer opponentSpriteRenderer;
     private final StageRenderer stage = new StageRenderer();
@@ -101,7 +100,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** Point of the heavy straight where the arm is pulled back (charge, without own art). */
     private static final float BEAM_CHARGE_POSE = 0.25f;
     private static final float BEAM_CHARGE_ZOOM = 0.18f;
-    private final UltraPack[] ultraPacks = new UltraPack[team.length];
+    private final UltraPack[] ultraPacks = new UltraPack[2];
     private final PaginaFinal paginaFinal = new PaginaFinal(this);
     /** Pincel do Canvas do quadro atual para os motores visuais (cenário e ultra). */
     private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
@@ -196,7 +195,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         super(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
-        SpriteAtlasCache atlases = new SpriteAtlasCache(context);
+        atlases = new SpriteAtlasCache(context);
         for (FighterState fighter : team) atlases.preload(fighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
@@ -204,16 +203,60 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
-        AndroidRenderAssets ultraAssets = new AndroidRenderAssets(context.getAssets());
+        ultraAssets = new AndroidRenderAssets(context.getAssets());
         stageScene = loadStage(ultraAssets);
-        for (int i = 0; i < team.length; i++) {
-            ultraPacks[i] = loadUltraPack(ultraAssets, team[i]);
-            ultraSounds.loadUltra(ultraFolder(team[i]));
-        }
+        loadTeamUltras();
         holder = getHolder();
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
+    }
+
+    private static FighterState[] membersOf(int index) {
+        String[] ids = GeneratedCharacters.TEAMS[index];
+        return new FighterState[] {
+            new FighterState(GeneratedCharacters.get(ids[0]), "PLAYER 1"),
+            new FighterState(GeneratedCharacters.get(ids[1]), "PLAYER 2")
+        };
+    }
+
+    private void loadTeamUltras() {
+        for (int i = 0; i < team.length; i++) {
+            ultraPacks[i] = loadUltraPack(ultraAssets, team[i]);
+            ultraSounds.loadUltra(ultraFolder(team[i]));
+        }
+    }
+
+    /**
+     * DUPLA: the next pair of the roster takes the fight. Fresh round with the intro; the
+     * training CPU becomes the new point character, and the atlases of whoever left are
+     * freed (each character is ~135 MB decoded).
+     */
+    private void selectTeam(int index) {
+        teamIndex = index % GeneratedCharacters.TEAMS.length;
+        team = membersOf(teamIndex);
+        opponentFighter = new FighterState(team[0].character, "CPU");
+        atlases.retainOnly(team[0].character, team[1].character);
+        spriteFighterRenderer.setCharacter(team[0].character.id);
+        partnerSpriteRenderer.setCharacter(team[1].character.id);
+        opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
+        engine.setTeam(PLAYER, team);
+        engine.setTeam(OPPONENT, opponentFighter);
+        engine.refreshOverdrive(PLAYER);
+        engine.refreshOverdrive(OPPONENT);
+        engine.restage(PLAYER_START_X, OPPONENT_START_X);
+        loadTeamUltras();
+        startIntro();
+    }
+
+    private String teamLabel() {
+        return displayId(team[0]) + "+" + displayId(team[1]);
+    }
+
+    /** p01 is the player_base pack. */
+    private static String displayId(FighterState fighter) {
+        String id = fighter.character.id;
+        return "player_base".equals(id) ? "p01" : id;
     }
 
     /** Each character's ultra lives in assets/ultras/&lt;character id&gt;/. */
@@ -437,6 +480,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public int facing() { return player().facing; }
         @Override public boolean aiEnabled() { return ai.enabled(); }
         @Override public boolean debugEnabled() { return debugOverlay; }
+        @Override public String teamLabel() { return GameView.this.teamLabel(); }
         @Override public float tagReadyRatio() {
             TeamSystem.Side team = engine.team(PLAYER);
             if (isTagAnimationActive() || team.assistOut()) return 0f;
@@ -1510,6 +1554,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     healPlayerPointer = pointerId;
                     for (FighterState member : team) member.restoreLife();
                     engine.refreshOverdrive(PLAYER);
+                    break;
+                case TEAM_SELECT:
+                    if (!demo.active()) selectTeam(teamIndex + 1);
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;

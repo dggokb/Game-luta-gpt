@@ -26,7 +26,7 @@ class CharacterPackTests(unittest.TestCase):
         data['moves']['L']['animation']='CUSTOM_PUNCH'
         del data['animations']['LIGHT_JAB']  # replaced; unused clips are rejected
         second=self.root/'characters/second_fighter';second.mkdir();(second/'character.json').write_text(json.dumps(data))
-        roster=self.root/'characters/roster.json';r=json.loads(roster.read_text());r['team'][1]='second_fighter';roster.write_text(json.dumps(r))
+        roster=self.root/'characters/roster.json';r=json.loads(roster.read_text());r['team'][1]='second_fighter';r['teams']=[r['team']];roster.write_text(json.dumps(r))
         pipeline.build(self.root)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('all.put("second_fighter"',java);self.assertIn('a.get("CUSTOM_PUNCH")',java)
@@ -243,7 +243,7 @@ class SizeAndTimingStandardTests(unittest.TestCase):
     """The playable cast follows the size and timing standard (no build needed)."""
     def test_playable_attacks_declare_their_impact_frame(self):
         roster=json.loads((pipeline.ROOT/'characters/roster.json').read_text())
-        for cid in roster['team']:
+        for cid in sorted({c for team in roster.get('teams',[roster['team']]) for c in team}):
             pack=json.loads((pipeline.ROOT/'characters'/cid/'character.json').read_text(encoding='utf-8'))
             for name,animation,_ in pipeline.attack_animations(pack):
                 self.assertIn('impactFrame',pack['animations'][animation],f'{cid}/{name} ({animation})')

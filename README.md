@@ -114,7 +114,10 @@ vantagem de cada golpe. Detalhes, rotas e critérios de aceite em `docs/combat-e
 ## Botões de teste de vida — v0.73
 
 Abaixo de DEBUG: **VIDA P1** enche a vida dos dois lutadores do time (um KO volta a
-lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app.
+lutar) e **VIDA CPU** enche a do oponente, sem precisar reiniciar o app. Embaixo, **DUPLA**
+troca a dupla do jogador (p01+p03, p01+p02 e p03+p04, da lista `teams` do
+`characters/roster.json`): começa um round novo com a intro, e o CPU de treino vira o
+lutador da frente da dupla, pálido.
 
 ## Recuo mais lento — v0.74
 

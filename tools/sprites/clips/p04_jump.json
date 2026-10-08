@@ -1,0 +1,30 @@
+{
+  "id": "p04_jump",
+  "javaName": "P04_JUMP",
+  "profile": "p04.json",
+  "source": "art/sprites/source/p04_jump_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_jump.png",
+  "report": "tools/sprites/reports/p04_jump.report.json",
+  "preview": "android/app/build/sprite-review/p04_jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p04",
+    "escala": 0.5191,
+    "medida": "último quadro = inicio_centro (nota 0.89)",
+    "quadros": "0,51,52,53,53,54",
+    "celula": 288,
+    "largura": 160,
+    "raiz": "80,270",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameWidth": 160,
+  "frameHeight": 288,
+  "rootX": 80,
+  "rootY": 270
+}

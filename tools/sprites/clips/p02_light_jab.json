@@ -1,0 +1,27 @@
+{
+  "id": "p02_light_jab",
+  "javaName": "P02_LIGHT_JAB",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_light_jab_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_light_jab.png",
+  "report": "tools/sprites/reports/p02_light_jab.report.json",
+  "preview": "android/app/build/sprite-review/p02_light_jab-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "L.mp4",
+    "personagem": "p02",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "29,31,31,36,41,42,46,49,52,55,58",
+    "largura": 352,
+    "raiz": "198,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "rootX": 198
+}

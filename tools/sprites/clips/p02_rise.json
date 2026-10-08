@@ -1,0 +1,26 @@
+{
+  "id": "p02_rise",
+  "javaName": "P02_RISE",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_rise_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_rise.png",
+  "report": "tools/sprites/reports/p02_rise.report.json",
+  "preview": "android/app/build/sprite-review/p02_rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p02",
+    "escala": 0.3347,
+    "medida": "quadros 0, 96, 90 = guarda do IDLE (nota 0.74)",
+    "quadros": "69,73,77,81,85,89",
+    "largura": 224,
+    "raiz": "115,238",
+    "colunas": 6
+  },
+  "frameWidth": 224,
+  "rootX": 115
+}

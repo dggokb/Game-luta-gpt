@@ -1,0 +1,32 @@
+{
+  "id": "p02_hit_crouch",
+  "javaName": "P02_HIT_CROUCH",
+  "profile": "p02.json",
+  "source": "art/sprites/source/p02_hit_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_hit_crouch.png",
+  "report": "tools/sprites/reports/p02_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p02_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "video": {
+    "arquivo": "levarGolpeAgachada.mp4",
+    "personagem": "p02",
+    "escala": 0.5093,
+    "medida": "1º quadro = inicio_agachado (nota 0.95)",
+    "quadros": "15,22,30,38,45,52,60,68,75",
+    "celula": 224,
+    "largura": 320,
+    "raiz": "145,206",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 224,
+  "rootX": 145,
+  "rootY": 206
+}
