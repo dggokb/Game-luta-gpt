@@ -1105,7 +1105,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 break;
             case HITSTUN:
                 state = f.hitCrouching ? SpriteStates.HIT_CROUCH : SpriteStates.HIT_STAND;
-                reactionElapsed = f.stunElapsed * FIXED_STEP;
+                // Stretched over the hitstun, like the guard reaction: the clip ends back in
+                // guard as control returns, whether the stun is short or long.
+                reactionElapsed = hitReactionTime(f.character().animations.get(state), f.stunElapsed, f.stunTotal);
                 break;
             case THROWN:
                 // Held by the collar: the first frame of the hit reaction.
@@ -1116,6 +1118,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 break;
         }
         return state != null && renderer.hasAnimation(state) ? state : null;
+    }
+
+    /** Clip time of a ground hit reaction: the whole clip spread over the hitstun. */
+    static float hitReactionTime(CharacterDefinition.Animation clip, int stunElapsed, int stunTotal) {
+        if (clip == null) return stunElapsed * FIXED_STEP;
+        return Math.min(clip.duration - 0.0001f, clip.timeFor(stunElapsed + 0.5f, Math.max(1, stunTotal)));
     }
 
     /**

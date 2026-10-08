@@ -87,17 +87,18 @@ class CharacterPackTests(unittest.TestCase):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['columns']=2;path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'dimensions'):pipeline.build(self.root)
 
-    def test_reaction_uses_canonical_anatomy_scale(self):
+    def test_drawn_sheet_uses_canonical_anatomy_scale(self):
+        # player_base now comes from video; player_two keeps the drawn sheets.
         pipeline.build(self.root)
-        report=json.loads((self.root/'tools/sprites/reports/player_base_hit_stand.report.json').read_text())
+        report=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
         self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
         self.assertTrue(report['anatomy']['passed'])
         self.assertLess(report['scale'],0.66)
-        self.assertEqual(128,report['layout']['rootX'])
-        self.assertEqual(238,report['layout']['rootY'])
+        self.assertEqual(192,report['layout']['rootX'])
+        self.assertEqual(246,report['layout']['rootY'])
 
     def test_non_comparable_anatomy_reference_is_rejected(self):
-        path=self.root/'tools/sprites/clips/player_base_hit_stand.json'
+        path=self.root/'tools/sprites/clips/player_two_jab.json'
         data=json.loads(path.read_text());data['anatomyReferenceFrame']=1
         path.write_text(json.dumps(data))
         with self.assertRaisesRegex(ValueError,'anatomy reference frame'):
@@ -308,12 +309,13 @@ class CharacterPackTests(unittest.TestCase):
     def test_player_base_defense_and_fall_share_one_scale_and_new_states(self):
         pipeline.build(self.root)
         scales={}
-        # DEFENSE_STAND comes from video (prepared grid); the drawn sheets share one scale.
-        for key in ('defense_crouch','defense_air','fall'):
+        # The guards come from video (prepared grid); the drawn fall keeps its fixed scale.
+        for key in ('fall',):
             report=json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())
             self.assertTrue(report['passed']);scales[key]=round(report['scale'],2)
         self.assertEqual({0.37},set(scales.values()))
-        self.assertTrue(json.loads((self.root/'tools/sprites/reports/player_base_defense_stand.report.json').read_text())['passed'])
+        for key in ('defense_stand','defense_crouch','defense_air'):
+            self.assertTrue(json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())['passed'])
         pack=json.loads(self.path.read_text())
         self.assertEqual('player_base_defense_air',pack['animations']['DEFENSE_AIR']['atlas'])
         self.assertEqual('player_base_fall',pack['animations']['GROUNDED']['atlas'])
@@ -342,7 +344,7 @@ class CharacterPackTests(unittest.TestCase):
         clip=json.loads((self.root/'tools/sprites/clips/player_base_getup.json').read_text())
         self.assertEqual([0,1],clip['mirrorFrames'])
         scales={round(json.loads((self.root/f'tools/sprites/reports/player_base_{k}.report.json').read_text())['scale'],3)
-                for k in ('hit_stand','hit_crouch','hit_air','getup')}
+                for k in ('hit_crouch','hit_air','getup')}
         self.assertEqual(1,len(scales))
 
     def test_player_two_generated_art_passes_own_profile(self):

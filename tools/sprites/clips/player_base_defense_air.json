@@ -2,33 +2,15 @@
   "id": "player_base_defense_air",
   "javaName": "DEFENSE_AIR",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_defense_air_source.png",
+  "source": "art/sprites/source/player_base_defense_air_video_normalized.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_defense_air.png",
   "report": "tools/sprites/reports/player_base_defense_air.report.json",
-  "preview": "android/app/build/sprite-review/defense-air-import.png",
-  "expectedFrames": 4,
-  "segmentation": "alpha-components",
-  "rootMode": "ground-feet",
-  "scaleMode": "fixed",
-  "sourceNote": "Air guard: relaxed, raised, impact, recovery. Scaled by head width against the Idle (airborne height is not comparable). Airborne registration like the aerial attacks (torso -13 px, feet 12 px above the root).",
-  "scale": 0.368,
-  "scaleReason": "Same art set as player_base_defense_stand, whose standing guard matches the canonical Idle at 0.368 (own measures: crouch 0.349, air 0.376); one scale keeps the whole set the same size.",
-  "frameShift": {
-    "0": [
-      -81,
-      -12
-    ],
-    "1": [
-      -77,
-      -12
-    ],
-    "2": [
-      -57,
-      -12
-    ],
-    "3": [
-      -75,
-      -12
-    ]
-  }
+  "preview": "android/app/build/sprite-review/defense_air-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "frameWidth": 320,
+  "rootX": 140,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda no ar (bracos cruzados, pernas encolhidas); pes na raiz, o jogo sobe e desce."
 }

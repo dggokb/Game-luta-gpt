@@ -559,6 +559,12 @@ public class SpriteIntegrationTest {
         setup();player().status=CombatFighter.Status.HITSTUN;player().stunLeft=player().stunTotal=12;frames(1);
         assertEquals("HIT_STAND",motion().clip);
         assertEquals("player_base_hit_stand",GeneratedCharacters.defaultCharacter().animation("HIT_STAND").atlas.resource);
+        // The reaction is spread over the hitstun: impact first, back in guard at the end.
+        CharacterDefinition.Animation hit=GeneratedCharacters.defaultCharacter().animation("HIT_STAND");
+        for(int total:new int[]{12,30}) {
+            assertEquals(hit.frame(0f,0),hit.frame(GameView.hitReactionTime(hit,0,total),0));
+            assertEquals(hit.frame(hit.duration-.0001f,0),hit.frame(GameView.hitReactionTime(hit,total-1,total),0));
+        }
         setup();player().status=CombatFighter.Status.WAKEUP;player().knockdownFrame=0;frames(1);
         assertEquals("GETUP",motion().clip);
         assertEquals("player_base_getup",GeneratedCharacters.defaultCharacter().animation("GETUP").atlas.resource);
