@@ -14,5 +14,20 @@
   "frameHeight": 320,
   "rootX": 256,
   "rootY": 300,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Derrubado: queda (0-6) e no chao (7-10); pes na raiz, cada quadro no proprio tronco."
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Derrubado: queda (0-6) e no chao (7-10); pes na raiz, cada quadro no proprio tronco; poeira recortada.",
+  "video": {
+    "arquivo": "caindo.mp4",
+    "personagem": "p03",
+    "escala": 0.5298,
+    "medida": "1º quadro = inicio_centro (nota 0.88)",
+    "quadros": "15,18,21,24,27,30,33,39,43,48,51",
+    "celula": 320,
+    "largura": 512,
+    "raiz": "256,300",
+    "colunas": 11,
+    "fixar": "quadro",
+    "pe_no_chao": true,
+    "sem_poeira": true,
+    "sem_efeitos": true
+  }
 }

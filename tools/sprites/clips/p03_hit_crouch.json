@@ -11,8 +11,17 @@
   "columns": 9,
   "rootMode": "authored",
   "frameWidth": 384,
-  "frameHeight": 256,
   "rootX": 170,
-  "rootY": 238,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe agachado; escala pelo agachado (0.48)."
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Levar golpe agachado.",
+  "video": {
+    "arquivo": "danoChao.mp4",
+    "personagem": "p03",
+    "escala": 0.4887,
+    "medida": "1º quadro = inicio_agachado (nota 0.88)",
+    "quadros": "91,20,22,27,33,42,50,60,66",
+    "largura": 384,
+    "raiz": "170,238",
+    "colunas": 9,
+    "fixar": "quadro"
+  }
 }

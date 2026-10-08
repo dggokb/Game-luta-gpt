@@ -227,12 +227,47 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual((255,0,0,255),images[0].getpixel((50,0)))
         self.assertEqual((0,0,255,255),images[1].getpixel((0,0)))
 
+    def test_impact_frame_must_land_in_the_active_window(self):
+        self.edit(lambda d:d['animations']['LIGHT_JAB'].update(impactFrame=9))
+        with self.assertRaisesRegex(ValueError,'L: impact frame 9 of LIGHT_JAB .* outside the active window'):pipeline.build(self.root)
+
     def test_fixed_scale_requires_a_reason(self):
         path=self.root/'tools/sprites/clips/player_base_hit_crouch.json';d=json.loads(path.read_text())
         # Drawn sheet with a fixed scale and no reason (no checked-in clip uses fixed now).
         d.update(segmentation='alpha-components',rootMode='ground-feet',scaleMode='fixed',scale=0.5)
         path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'requires scaleReason'):pipeline.build(self.root)
+
+
+class SizeAndTimingStandardTests(unittest.TestCase):
+    """The playable cast follows the size and timing standard (no build needed)."""
+    def test_playable_attacks_declare_their_impact_frame(self):
+        roster=json.loads((pipeline.ROOT/'characters/roster.json').read_text())
+        for cid in roster['team']:
+            pack=json.loads((pipeline.ROOT/'characters'/cid/'character.json').read_text(encoding='utf-8'))
+            for name,animation,_ in pipeline.attack_animations(pack):
+                self.assertIn('impactFrame',pack['animations'][animation],f'{cid}/{name} ({animation})')
+    def test_video_recipes_record_how_the_scale_was_found(self):
+        keys=pipeline.ROOT/'art/keys'
+        for path in sorted((pipeline.ROOT/'tools/sprites/clips').glob('*.json')):
+            recipe=json.loads(path.read_text(encoding='utf-8')).get('video')
+            if recipe is None: continue
+            with self.subTest(clip=path.name):
+                self.assertTrue(recipe['arquivo'].endswith('.mp4'))
+                self.assertGreater(recipe['escala'],0)
+                # Medida automática ou escala manual com motivo, nunca as duas nem nenhuma.
+                self.assertEqual(1,('medida' in recipe)+('motivo' in recipe))
+                if 'medida' in recipe:
+                    self.assertTrue((keys/recipe['personagem']/'tamanho.json').exists())
+    def test_key_images_have_their_measured_scale(self):
+        for path in sorted((pipeline.ROOT/'art/keys').glob('*/tamanho.json')):
+            data=json.loads(path.read_text(encoding='utf-8'))
+            with self.subTest(personagem=path.parent.name):
+                self.assertTrue((pipeline.ROOT/'characters'/data['pacote']/'character.json').exists())
+                self.assertIn('inicio_centro',data['chaves'])
+                for name,escala in data['chaves'].items():
+                    self.assertTrue((path.parent/f'{name}.png').exists(),name)
+                    self.assertTrue(0.2<escala<1.5,name)
 
 
 class BuiltPackTests(unittest.TestCase):

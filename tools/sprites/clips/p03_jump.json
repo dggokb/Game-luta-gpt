@@ -12,7 +12,18 @@
   "rootMode": "authored",
   "frameHeight": 320,
   "rootY": 300,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Subida do pulo; pes na raiz (o jogo sobe e desce).",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Subida do pulo a partir do impulso (o agachamento antes do pulo fica de fora); pes na raiz.",
   "frameWidth": 320,
-  "rootX": 128
+  "video": {
+    "arquivo": "jump.mp4",
+    "personagem": "p03",
+    "escala": 0.5394,
+    "medida": "1º quadro = inicio_centro (nota 0.94)",
+    "quadros": "17,26,28,29,30,32",
+    "celula": 320,
+    "largura": 320,
+    "raiz": "128,300",
+    "colunas": 6,
+    "pe_no_chao": true
+  }
 }

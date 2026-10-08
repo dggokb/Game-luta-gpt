@@ -226,6 +226,33 @@ def validate_special_moves(pack):
             if other != key:
                 raise ValueError(f'{pack["id"]}: {other} and {key} share command and button {b}')
 
+def attack_animations(pack):
+    """(nome, animação, frame data) de cada golpe que toca uma animação."""
+    out = [(k, m['animation'], m) for k, m in list(pack['moves'].items()) + list(pack.get('specialMoves', {}).items())
+           if 'animation' in m]
+    specials, fighter = pack.get('specialAnimations', {}), pack['fighter']
+    for key, data in (('S', fighter.get('energy')), ('SUPER', fighter.get('super'))):
+        if key in specials and data and 'attack' in data:
+            out.append((key, specials[key], data['attack']))
+    return out
+
+def validate_impacts(pack):
+    """impactFrame: o quadro em que o golpe encosta. A animação estica sobre o golpe, então
+    esse quadro tem de cair na janela ativa (com 1 quadro de folga antes)."""
+    for name, animation, m in attack_animations(pack):
+        a = pack['animations'][animation]
+        if 'impactFrame' not in a:
+            continue
+        i, d = a['impactFrame'], a['durationsMs']
+        if type(i) is not int or not 0 <= i < len(d):
+            raise ValueError(f'{pack["id"]}/{animation}: impactFrame must index the animation frames')
+        total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+        start, end = m['startupFrames'] / total, (m['startupFrames'] + m['activeFrames']) / total
+        t = sum(d[:i]) / sum(d)
+        if not start - 1 / total <= t <= end:
+            raise ValueError(f'{pack["id"]}/{name}: impact frame {i} of {animation} plays at {t:.0%} of the move, '
+                             f'outside the active window {start:.0%}-{end:.0%}; retime its durationsMs')
+
 def visual_heights(pack, atlases):
     """World-space visual height (opaque pixels) measured from import reports."""
     def height(state):
@@ -290,6 +317,7 @@ def compile_packs(root, results):
         # Free-form names are allowed only for clips something actually plays; this
         # turns a typo such as "HIT_STAN" into a build error instead of a silent fallback.
         validate_special_moves(pack)
+        validate_impacts(pack)
         used = {m['animation'] for m in list(moves.values()) + list(pack.get('specialMoves', {}).values()) if 'animation' in m} | set(specials.values())
         orphan = set(animations) - set(REQUIRED) - set(OPTIONAL) - used
         if orphan:

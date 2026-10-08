@@ -10,9 +10,22 @@
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "frameHeight": 384,
-  "rootX": 180,
-  "rootY": 364,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Intro: de costas, vira e entra na base larga; 1 a cada 3 quadros, escala da guarda (0.53)."
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 160,
+  "rootY": 300,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Intro: de costas, vira e entra na base larga; 1 a cada 3 quadros.",
+  "video": {
+    "arquivo": "intro.mp4",
+    "personagem": "p03",
+    "escala": 0.3603,
+    "medida": "quadros 42, 48, 36 = guarda do IDLE (nota 0.69)",
+    "inicio": 0,
+    "fim": 81,
+    "passo": 3,
+    "celula": 320,
+    "largura": 320,
+    "raiz": "160,300",
+    "colunas": 9
+  }
 }

@@ -1,25 +1,37 @@
 #!/usr/bin/env python3
 """Converte um vídeo de animação (fundo verde) em folha normalizada do pipeline.
 
-O vídeo vem do Seedance/Veo com o personagem de lado, câmera parada e fundo verde
-liso. Para cada quadro do trecho escolhido: recorta o verde (e a sombra/faixa de chão),
-mantém só o personagem (maior peça conectada; poeira e efeitos soltos saem), corrige o
-deslizamento lateral e escala tudo com a MESMA escala do personagem, para que todos os
-clipes fiquem do mesmo tamanho: o 1º quadro do vídeo é sempre a guarda em pé (a imagem
-inicial), e a altura dele vira --altura px. A raiz (meio dos pés) cai em rootX/rootY da célula.
+O vídeo vem do Seedance com o personagem de lado, câmera parada e fundo verde liso. Para
+cada quadro do trecho escolhido: recorta o verde (e a sombra/faixa de chão), mantém só o
+personagem (maior peça conectada; poeira e efeitos soltos saem), corrige o deslizamento
+lateral e escala tudo para o tamanho oficial do personagem. A raiz (meio dos pés) cai em
+rootX/rootY da célula.
 
-    python3 tools/sprites/video_para_sprite.py video.mp4 saida.png --inicio 29 --fim 105
-    python3 tools/sprites/video_para_sprite.py video.mp4 saida.png --loop 20-110
+O tamanho nunca é chutado: --personagem mede a escala comparando o vídeo com as imagens
+iniciais (art/keys/<id>/inicio_*.png, ver tools/sprites/tamanho.py). Só quando o vídeo não
+bate com nada é que se passa --escala, e aí --motivo é obrigatório.
 
+    python3 tools/sprites/video_para_sprite.py video.mp4 --personagem p03 \
+        --clipe tools/sprites/clips/p03_jab.json --inicio 16 --fim 37
+
+Com --clipe a folha vai para o `source` do clipe e a receita (vídeo, escala, quadros e
+opções) fica gravada no próprio clipe, em "video"; para refazer basta
+`video_para_sprite.py video.mp4 --clipe <clipe>` (opções da linha de comando mudam a receita).
 `--loop A-B` procura, dentro de A..B, o trecho que melhor fecha em loop.
 
 Precisa de opencv e numpy: pip install -r tools/sprites/requirements-animar.txt
 """
 import argparse
+import json
+from pathlib import Path
 
 import cv2
 import numpy as np
 from PIL import Image
+
+import tamanho
+
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def read_frames(path):
@@ -71,6 +83,8 @@ def key(frame, dust=False, effects=False):
         bg |= (h >= 22) & (h <= 40) & (v >= 200) & (s >= 40)
         # Anel de energia ciano-petróleo (o azul da roupa é mais anil, matiz >= 104).
         bg |= (h >= 85) & (h <= 102) & (s >= 120)
+        # Poeira de impacto, brilho e arco de golpe claros, tingidos de verde pelo fundo.
+        bg |= (h > 35) & (h < 95) & (s >= 14) & (v >= 140)
     alpha = np.where(bg, 0, 255).astype(np.uint8)
     if effects:
         # Rastro de golpe: faixa fina, clara e sem cor. Some na abertura morfológica,
@@ -109,19 +123,26 @@ def torso_x(rgba):
     return float(np.nonzero(band)[1].mean())
 
 
-def main():
+# Opções gravadas na receita do clipe (nome do argumento -> padrão).
+RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
+              raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
+              sem_poeira=False, sem_efeitos=False)
+
+
+def parser():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("video")
-    p.add_argument("saida")
+    p.add_argument("saida", nargs="?", help="folha de saída (padrão: o source do --clipe)")
+    p.add_argument("--clipe", help="clipe do pipeline: lê e grava a receita em \"video\"")
+    p.add_argument("--personagem", help="mede a escala pelas imagens iniciais (art/keys/<id>)")
+    p.add_argument("--escala", type=float, help="escala manual, só quando a medida falha (exige --motivo)")
+    p.add_argument("--motivo", help="por que a escala é manual")
     p.add_argument("--inicio", type=int)
     p.add_argument("--fim", type=int, help="quadro final, exclusivo")
     p.add_argument("--loop", help="A-B: escolhe o melhor loop dentro desse intervalo")
     p.add_argument("--min-loop", type=int, default=24)
     p.add_argument("--passo", type=int, default=1, help="usar 1 a cada N quadros")
     p.add_argument("--quadros", help="lista exata de quadros do vídeo, ex.: 10,14,18,22")
-    p.add_argument("--escala", default="auto",
-                   help="auto: o 1º quadro do vídeo (guarda em pé) vira --altura px; ou um número")
-    p.add_argument("--altura", type=int, default=224, help="altura do personagem em pé na célula")
     p.add_argument("--celula", type=int, default=256, help="altura da célula")
     p.add_argument("--largura", type=int, help="largura da célula (padrão: igual à altura)")
     p.add_argument("--sem-poeira", action="store_true", help="remove poeira bege do chão")
@@ -136,8 +157,57 @@ def main():
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
-    args = p.parse_args()
+    return p
 
+
+def parse_args(argv=None):
+    p = parser()
+    known, _ = p.parse_known_args(argv)
+    clip = None
+    if known.clipe:
+        clip = json.loads(Path(known.clipe).read_text(encoding="utf-8"))
+        recipe = clip.get("video", {})
+        keep = set(RECIPE) | {"personagem"} | ({"escala", "motivo"} if "motivo" in recipe else set())
+        p.set_defaults(**{k: v for k, v in recipe.items() if k in keep})  # escala medida é medida de novo
+    args = p.parse_args(argv)
+    if args.saida is None:
+        if clip is None:
+            p.error("informe a saída ou --clipe")
+        args.saida = str(ROOT / clip["source"])
+    if args.escala is not None and not args.motivo:
+        p.error("--escala manual exige --motivo (fica gravado no clipe)")
+    if args.escala is None and not args.personagem:
+        p.error("use --personagem <id> para medir a escala (ou --escala N --motivo '...')")
+    return args, clip
+
+
+def save_recipe(path, clip, args, start, end, measured, count, cw):
+    recipe = {"arquivo": Path(args.video).name}
+    if args.personagem:
+        recipe["personagem"] = args.personagem
+    recipe["escala"] = round(args.escala, 4) if args.escala is not None else round(measured["escala"], 4)
+    if args.escala is not None:
+        recipe["motivo"] = args.motivo
+    else:
+        recipe["medida"] = f"{measured['medida']} (nota {measured['nota']:.2f})"
+    resolved = dict(vars(args), inicio=start, fim=end)
+    if args.quadros:
+        resolved.update(inicio=None, fim=None)
+    recipe.update({k: resolved[k] for k, default in RECIPE.items() if resolved[k] != default})
+    rx, ry = (int(v) for v in args.raiz.split(","))
+    clip.update(expectedFrames=count, columns=args.colunas, video=recipe)
+    for name, value, default in (("frameWidth", cw, 256), ("frameHeight", args.celula, 256),
+                                 ("rootX", rx, 128), ("rootY", ry, 238)):
+        if value != default:
+            clip[name] = value
+        else:
+            clip.pop(name, None)
+    Path(path).write_text(json.dumps(clip, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"receita gravada em {path}")
+
+
+def main(argv=None):
+    args, clip = parse_args(argv)
     frames, fps = read_frames(args.video)
     if args.loop:
         lo, hi = (int(v) for v in args.loop.split("-"))
@@ -154,6 +224,14 @@ def main():
             cache[i, dust, effects] = key(frames[i], dust, effects)
         return cache[i, dust, effects]
 
+    measured = None
+    if args.escala is not None:
+        s = args.escala
+        print(f"escala manual {s:.4f}: {args.motivo}")
+    else:
+        measured = tamanho.medir(frames, args.personagem, key)
+        s = measured["escala"]
+        print(f"escala {s:.4f} ({measured['medida']}, nota {measured['nota']:.2f}, zoom {measured['zoom']:.3f})")
     keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos) for i in picked]
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
@@ -165,20 +243,14 @@ def main():
         offsets = -(xs - xs[0])
     else:
         offsets = np.zeros(len(xs))
-    # Chão e posição de referência vêm do 1º quadro do vídeo (guarda em pé): poses no ar
-    # ficam acima do chão e todos os clipes do personagem se alinham entre si.
+    # Chão e posição de referência vêm do 1º quadro do vídeo (a imagem inicial): poses no
+    # ar ficam acima do chão e todos os clipes do personagem se alinham entre si.
     first = keyed_frame(0, args.sem_poeira)
     foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
     ref_x = torso_x(first) if args.fixar == "video" else xs[0]
     rx, ry = (int(v) for v in args.raiz.split(","))
     dx, dy = (int(v) for v in args.deslocar.split(","))
     rx, ry = rx + dx, ry + dy
-    if args.escala == "auto":
-        rows0 = np.nonzero((keyed_frame(0)[..., 3] > 128).any(1))[0]
-        s = args.altura / float(rows0.max() - rows0.min())
-        print(f"escala automática {s:.4f} (personagem em pé com {rows0.max() - rows0.min()} px no vídeo)")
-    else:
-        s = float(args.escala)
     cell, cols = args.celula, args.colunas
     cw = args.largura or cell
     rows = (len(keyed) + cols - 1) // cols
@@ -192,6 +264,8 @@ def main():
         sheet.alpha_composite(img, (x, y))
     sheet.save(args.saida)
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")
+    if clip is not None:
+        save_recipe(args.clipe, clip, args, start, end, measured, len(keyed), cw)
     if args.previa:
         gif = []
         for n in range(len(keyed)):

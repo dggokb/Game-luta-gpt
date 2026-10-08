@@ -116,6 +116,11 @@ formas de avanço:
 - `durationsMs`: um tempo positivo por frame;
 - `distancePerFrame`: distância percorrida para avançar, com `loop: true`.
 
+Animação de golpe também marca `impactFrame`: o índice (em `frames`) do quadro em que o
+golpe encosta. A animação estica sobre o frame data, e o build recusa o pacote se esse
+quadro não cair na janela ativa (com 1 quadro de folga antes). Os lutadores do time são
+obrigados a marcar.
+
 Caminhada acompanha deslocamento físico, inclusive ao virar para o outro lado.
 Colisão com a borda não deve produzir passos no lugar. Ataques usam o relógio de
 combate; reiniciar o mesmo golpe reinicia o frame, sem herdar a recuperação anterior.

@@ -2,7 +2,7 @@
   "id": "p03_jump",
   "characterProfile": "player_base",
   "source": "art/sprites/source/p03_jump_video_normalized.png",
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Subida do pulo; pes na raiz (o jogo sobe e desce).",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Subida do pulo a partir do impulso (o agachamento antes do pulo fica de fora); pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -19,91 +19,91 @@
       "index": 0,
       "outputBbox": [
         60,
-        80,
-        198,
-        302
+        79,
+        197,
+        301
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 13969
+      "minimumMargin": 19,
+      "opaquePixels": 14020
     },
     {
       "index": 1,
       "outputBbox": [
-        55,
-        117,
-        196,
-        302
+        63,
+        61,
+        195,
+        301
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 13301
+      "minimumMargin": 19,
+      "opaquePixels": 15187
     },
     {
       "index": 2,
       "outputBbox": [
-        64,
-        122,
-        196,
-        302
+        80,
+        74,
+        179,
+        300
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 12645
+      "minimumMargin": 20,
+      "opaquePixels": 14325
     },
     {
       "index": 3,
       "outputBbox": [
-        65,
-        121,
-        197,
-        302
+        83,
+        109,
+        190,
+        301
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 12532
+      "minimumMargin": 19,
+      "opaquePixels": 12147
     },
     {
       "index": 4,
       "outputBbox": [
-        70,
-        41,
-        182,
-        302
+        80,
+        128,
+        190,
+        301
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15486
+      "minimumMargin": 19,
+      "opaquePixels": 11891
     },
     {
       "index": 5,
       "outputBbox": [
-        85,
-        113,
-        183,
+        80,
+        127,
+        191,
         301
       ],
       "minimumMargin": 19,
-      "opaquePixels": 11533
+      "opaquePixels": 11936
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 164,
-    "frameHeight": 281,
-    "rootX": 84,
-    "rootY": 269,
+    "frameWidth": 158,
+    "frameHeight": 260,
+    "rootX": 79,
+    "rootY": 249,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      44,
-      31
+      49,
+      51
     ],
     "decodedBytes": {
       "canonical": 2457600,
-      "packed": 1106016
+      "packed": 985920
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "aabd7d9771347e1747162c7ec7a3f75babd116df33da80c7347c040c83c6478e",
-      "config": "7c67d60d9b55cfc17ca089bec58074df79d489baf0c3dee5b4429b7c14fbf7ca",
+      "source": "e3c74a5102a2b9e8eb9c24a769a6c4c5b3492ccd3ed2cd40a198de745fe93867",
+      "config": "d13fbafbab821def4a176e83f8cfaa3398e6c471958864a10c6d7faba443a529",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

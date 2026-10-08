@@ -2,7 +2,7 @@
   "id": "p03_hit_crouch",
   "characterProfile": "player_base",
   "source": "art/sprites/source/p03_hit_crouch_video_normalized.png",
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe agachado; escala pelo agachado (0.48).",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Levar golpe agachado.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -18,125 +18,125 @@
     {
       "index": 0,
       "outputBbox": [
-        83,
-        61,
-        241,
-        240
+        78,
+        54,
+        244,
+        239
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15438
+      "minimumMargin": 17,
+      "opaquePixels": 16533
     },
     {
       "index": 1,
       "outputBbox": [
-        88,
-        29,
-        327,
-        239
+        85,
+        24,
+        330,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 23258
+      "minimumMargin": 18,
+      "opaquePixels": 24243
     },
     {
       "index": 2,
       "outputBbox": [
-        86,
-        27,
-        328,
-        239
+        85,
+        23,
+        331,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 23101
+      "minimumMargin": 18,
+      "opaquePixels": 24206
     },
     {
       "index": 3,
       "outputBbox": [
-        86,
-        27,
-        328,
-        239
+        85,
+        22,
+        332,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 22931
+      "minimumMargin": 18,
+      "opaquePixels": 23920
     },
     {
       "index": 4,
       "outputBbox": [
-        86,
-        25,
-        328,
-        239
+        84,
+        21,
+        331,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 22827
+      "minimumMargin": 18,
+      "opaquePixels": 23799
     },
     {
       "index": 5,
       "outputBbox": [
-        86,
-        24,
-        328,
-        239
+        84,
+        19,
+        330,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 22416
+      "minimumMargin": 18,
+      "opaquePixels": 23466
     },
     {
       "index": 6,
       "outputBbox": [
-        87,
-        22,
-        329,
-        238
+        84,
+        18,
+        331,
+        237
       ],
       "minimumMargin": 18,
-      "opaquePixels": 22373
+      "opaquePixels": 23411
     },
     {
       "index": 7,
       "outputBbox": [
-        85,
-        18,
-        316,
-        239
+        83,
+        13,
+        318,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 21520
+      "minimumMargin": 13,
+      "opaquePixels": 22539
     },
     {
       "index": 8,
       "outputBbox": [
-        67,
-        61,
-        244,
-        240
+        65,
+        57,
+        246,
+        239
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16773
+      "minimumMargin": 17,
+      "opaquePixels": 17572
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 282,
-    "frameHeight": 243,
-    "rootX": 113,
-    "rootY": 231,
+    "frameWidth": 287,
+    "frameHeight": 247,
+    "rootX": 115,
+    "rootY": 235,
     "columns": 9,
     "frameCount": 9,
     "cropOffset": [
-      57,
-      7
+      55,
+      3
     ],
     "decodedBytes": {
       "canonical": 3538944,
-      "packed": 2466936
+      "packed": 2552004
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ab38589ded66d491662c77c987ffffde0bbf7710fefbd2727d17615423200b36",
-      "config": "f0904cc8b9fbaada32fdaffeed71e3f6b918618815f422d0e8256ff5ea757df6",
+      "source": "e19ad0bd20aac0ac58782851d247c6c2583a01c2164388b74b5a2987d7ee1441",
+      "config": "20f5196b31b01af1471cb48c772562e3fa45894eaebd1764bf7860ae09abca35",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

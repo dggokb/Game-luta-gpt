@@ -14,5 +14,16 @@
   "frameHeight": 384,
   "rootX": 150,
   "rootY": 366,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2H uppercut a partir do agachado; escala pelo corpo agachado (0.512); quadros com clarao pulados."
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). 2H uppercut a partir do agachado; quadros com clarao pulados.",
+  "video": {
+    "arquivo": "upper.mp4",
+    "personagem": "p03",
+    "escala": 0.5204,
+    "medida": "1º quadro = inicio_agachado (nota 0.95)",
+    "quadros": "23,32,34,36,37,62,52,60,76,78,80,86",
+    "celula": 384,
+    "largura": 320,
+    "raiz": "150,366",
+    "colunas": 12
+  }
 }

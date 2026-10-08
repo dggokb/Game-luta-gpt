@@ -10,9 +10,21 @@
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 512,
+  "frameWidth": 640,
   "frameHeight": 320,
-  "rootX": 250,
+  "rootX": 320,
   "rootY": 280,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. 2M rasteira; escala pelo agachado (0.519)."
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). 2M rasteira; arco do pe recortado.",
+  "video": {
+    "arquivo": "rasteiraBaixo.mp4",
+    "personagem": "p03",
+    "escala": 0.5281,
+    "medida": "1º quadro = inicio_agachado (nota 0.97)",
+    "quadros": "3,9,12,14,16,18,20,22,24,41,31,33,36,39,42,45",
+    "celula": 320,
+    "largura": 640,
+    "raiz": "320,280",
+    "sem_poeira": true,
+    "sem_efeitos": true
+  }
 }

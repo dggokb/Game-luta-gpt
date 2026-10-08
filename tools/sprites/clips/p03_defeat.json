@@ -14,5 +14,18 @@
   "frameHeight": 320,
   "rootX": 160,
   "rootY": 300,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Derrota, 1 a cada 3 quadros."
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Derrota, 1 a cada 3 quadros.",
+  "video": {
+    "arquivo": "derrota.mp4",
+    "personagem": "p03",
+    "escala": 0.3639,
+    "medida": "quadros 6, 0, 24 = guarda do IDLE (nota 0.61)",
+    "inicio": 0,
+    "fim": 97,
+    "passo": 3,
+    "celula": 320,
+    "largura": 384,
+    "raiz": "160,300",
+    "colunas": 11
+  }
 }

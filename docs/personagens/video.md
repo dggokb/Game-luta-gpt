@@ -26,8 +26,9 @@ personagem estão na ficha dele (`p01.md`, `p03.md`).
 
 ## Regras de todo vídeo
 
-- **Formato 16:9**, imagem inicial indicada na tabela do golpe. Nunca trocar o tamanho
-  do personagem: a ferramenta mede a escala no 1º quadro.
+- **Formato 16:9**, imagem inicial indicada na tabela do golpe, sem cortar nem dar zoom.
+  O vídeo tem de **começar (ou terminar) exatamente na imagem inicial**: é por ela que a
+  ferramenta acha o tamanho (ver "Tamanho" abaixo).
 - **Um vídeo por animação.** Começa e termina na guarda da imagem inicial.
 - **O golpe acontece UMA vez e rápido** (velocidade de jogo de luta); depois ele fica em
   guarda respirando. A ferramenta corta o trecho certo.
@@ -38,6 +39,34 @@ personagem estão na ficha dele (`p01.md`, `p03.md`).
   **Gere de novo**, não dá para consertar depois.
 - **Não precisa de vídeo** para: virar de lado (o jogo espelha o sprite) e pulo para
   frente/trás (o jogo usa o mesmo pulo e move o personagem).
+
+## Tamanho (padrão de inserção)
+
+O tamanho oficial de cada personagem é o da guarda da `inicio_centro.png` com **224 px** na
+célula (o jogo ainda aplica o `worldScale` do perfil). Ninguém escolhe escala à mão:
+
+1. **Uma vez por personagem**, depois de criar as imagens iniciais:
+   `python3 tools/sprites/tamanho.py calibrar <id> <vídeo_de_agachar.mp4>` grava
+   `art/keys/<id>/tamanho.json` com a escala de cada imagem inicial (o agachado é achado
+   dentro do vídeo de onde foi tirado).
+2. **Cada vídeo:**
+   `python3 tools/sprites/video_para_sprite.py video.mp4 --personagem <id> --clipe tools/sprites/clips/<clipe>.json --inicio A --fim B`
+   A ferramenta acha a imagem inicial no 1º ou no último quadro (mesmo se o Seedance deu
+   zoom), calcula a escala e grava a receita no clipe (`"video"`: arquivo, escala, como foi
+   medida, quadros e opções). Para refazer: `video_para_sprite.py video.mp4 --clipe <clipe>`.
+3. Vídeo que não começa nem termina numa imagem inicial (intro, vitória...) é medido pela
+   guarda do IDLE no meio do vídeo, e só vale se 3 quadros concordarem. Se nada bater, a
+   ferramenta para com erro. A saída é gerar de novo a partir da imagem inicial; em último
+   caso `--escala N --motivo "..."`, que fica gravado.
+4. Se a câmera mudar o zoom no meio do vídeo, a ferramenta recusa: gere de novo.
+
+Os testes conferem que toda receita diz como a escala foi achada.
+
+## Tempo do golpe
+
+Cada animação de golpe marca o quadro do impacto (`"impactFrame"` no `character.json`).
+A animação estica sobre o frame data, e o build recusa o pacote se esse quadro não cair na
+janela ativa do golpe; aí é ajustar os `durationsMs` (mais tempo antes ou depois do impacto).
 
 ## Um vídeo pode virar vários clipes
 

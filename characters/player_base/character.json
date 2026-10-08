@@ -482,7 +482,8 @@
         13,
         14,
         14
-      ]
+      ],
+      "impactFrame": 2
     },
     "MEDIUM_KICK": {
       "atlas": "player_base_medium_kick",
@@ -518,7 +519,8 @@
         17,
         17,
         17
-      ]
+      ],
+      "impactFrame": 3
     },
     "HEAVY_STRAIGHT": {
       "atlas": "player_base_heavy_straight",
@@ -572,7 +574,8 @@
         16,
         17,
         16
-      ]
+      ],
+      "impactFrame": 10
     },
     "DEFENSE_STAND": {
       "atlas": "player_base_defense_stand",
@@ -786,7 +789,8 @@
         13,
         14,
         14
-      ]
+      ],
+      "impactFrame": 2
     },
     "CROUCH_MEDIUM": {
       "atlas": "player_base_crouch_medium",
@@ -826,7 +830,8 @@
         17,
         17,
         16
-      ]
+      ],
+      "impactFrame": 6
     },
     "CROUCH_HEAVY": {
       "atlas": "player_base_crouch_heavy",
@@ -846,19 +851,20 @@
       ],
       "loop": false,
       "durationsMs": [
-        30,
-        30,
-        30,
-        30,
-        30,
-        50,
-        50,
-        30,
-        30,
-        30,
-        30,
-        30
-      ]
+        42,
+        42,
+        42,
+        42,
+        25,
+        42,
+        42,
+        25,
+        25,
+        25,
+        25,
+        23
+      ],
+      "impactFrame": 4
     },
     "JUMP_LIGHT": {
       "atlas": "player_base_jump_light",
@@ -880,7 +886,8 @@
         15,
         15,
         15
-      ]
+      ],
+      "impactFrame": 2
     },
     "JUMP_MEDIUM": {
       "atlas": "player_base_jump_medium",
@@ -902,7 +909,8 @@
         25,
         22,
         20
-      ]
+      ],
+      "impactFrame": 2
     },
     "JUMP_HEAVY": {
       "atlas": "player_base_jump_heavy",
@@ -924,7 +932,8 @@
         35,
         35,
         35
-      ]
+      ],
+      "impactFrame": 2
     },
     "DEFENSE_AIR": {
       "atlas": "player_base_defense_air",
@@ -1002,7 +1011,8 @@
         20,
         20,
         15
-      ]
+      ],
+      "impactFrame": 4
     },
     "THROW_GRAB": {
       "atlas": "player_base_throw",
@@ -1086,7 +1096,8 @@
         35,
         40,
         35
-      ]
+      ],
+      "impactFrame": 5
     },
     "SPECIAL_S3": {
       "atlas": "player_base_special_s3",
@@ -1136,7 +1147,8 @@
         35,
         35,
         40
-      ]
+      ],
+      "impactFrame": 11
     },
     "SPECIAL_S4": {
       "atlas": "player_base_special_s4",
@@ -1184,7 +1196,8 @@
         45,
         45,
         48
-      ]
+      ],
+      "impactFrame": 4
     },
     "SUPER_WAVE": {
       "atlas": "player_base_super",
@@ -1236,7 +1249,8 @@
         35,
         34,
         34
-      ]
+      ],
+      "impactFrame": 10
     },
     "INTRO": {
       "atlas": "player_base_intro",
@@ -1320,7 +1334,8 @@
         35,
         35,
         35
-      ]
+      ],
+      "impactFrame": 2
     },
     "VICTORY": {
       "atlas": "player_base_victory",

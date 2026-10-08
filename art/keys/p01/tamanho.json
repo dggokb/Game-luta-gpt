@@ -1,0 +1,9 @@
+{
+  "pacote": "player_base",
+  "altura": 224,
+  "chaves": {
+    "inicio_centro": 0.5258,
+    "inicio_direita": 0.5258,
+    "inicio_esquerda": 0.5258
+  }
+}
