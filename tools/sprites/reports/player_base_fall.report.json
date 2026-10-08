@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 0-6 caindo para tras ate bater no chao; 7-10 caido; pes na raiz (o estado de queda e no chao).",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 384,
     "frameHeight": 320,
@@ -159,7 +159,7 @@
     "sha256": {
       "source": "d1f5b7aee8101e57dcce11e52ff16b5c0eb031b994e06cd5baa109a1ee7ba2fc",
       "config": "51d710fb0bfd5cc3144ce00de077ca437e184f67e088daf66dfd4ad161755ebb",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

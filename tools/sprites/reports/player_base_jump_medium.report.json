@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 512,
     "frameHeight": 320,
@@ -115,7 +115,7 @@
     "sha256": {
       "source": "30689ef93ec461e285d1cbebc098add7e846921261963565fb20890e122fc697",
       "config": "489408ca62810c1181239ecf827cde2fe526b3a341df68cb79ec28183b1ac434",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

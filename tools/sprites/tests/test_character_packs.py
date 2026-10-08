@@ -123,6 +123,8 @@ class CharacterPackTests(unittest.TestCase):
             # Cancels into the character's own command specials (S2...) are not shared data.
             m=copy.deepcopy(pack['moves'][binding])
             m['cancelInto']=[t for t in m['cancelInto'] if t not in pack.get('specialMoves',{})]
+            # Reach and hit height follow each character's art size (worldScale).
+            for k in ('reach','hitHeight'): m.pop(k,None)
             return m
         for binding in ('L','M','H'):
             self.assertEqual(shared(first,binding),shared(second,binding))

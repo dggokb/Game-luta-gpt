@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Sobe no proprio desenho (sem pe-no-chao): o lutador fica no chao no jogo.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 384,
@@ -258,7 +258,7 @@
     "sha256": {
       "source": "a84d807855d463c87ea8626e21ae933a63008015aa48bfa94f236539ff07d40f",
       "config": "e285e4e26ff63658f7ad414b85faf1a73fe7ec8ac3a3be88ca19dae6b78abb3c",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

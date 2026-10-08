@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Cabeca joga para tras, cambaleia e volta a guarda; quadros com rastro e de frente para a camera pulados.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 384,
     "frameHeight": 288,
@@ -137,7 +137,7 @@
     "sha256": {
       "source": "b3667a55e437bd7b0f4f55eb9fe010c885d2532cefd33fe0bf8f9e43b6cb72f6",
       "config": "7fdeae39a5b3ac059b23d24f4fae15e153eeeed7b94c5e6d9ea9ba2e1a25f018",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

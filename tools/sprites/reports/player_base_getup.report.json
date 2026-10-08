@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Do chao ate a guarda, mesmo video da queda.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 384,
     "frameHeight": 256,
@@ -170,7 +170,7 @@
     "sha256": {
       "source": "fc7a3a05a3875e2cf977c3a9478d078856f036c511f4d47a76481343ff199e4a",
       "config": "c6a5d12fc4406dc12509eb02d5ec5ec1af2d20032958ef45b71014df22cc81f4",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

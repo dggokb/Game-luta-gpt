@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 384,
     "frameHeight": 256,
@@ -192,7 +192,7 @@
     "sha256": {
       "source": "70fba7a3b5f1a479b2a9d2a2a03443d7778d411a8e21925e127ed76ceb11dfa2",
       "config": "81d42a812be248720b9fc7785060213b7abba89c32c99f0ba753e52823a5df67",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

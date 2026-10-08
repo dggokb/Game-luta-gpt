@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 9 poses do raio final: 0-2 carga (video do Super), 3 disparo, 4-6 sustentacao, 7 recuperacao, 8 guarda (video do Ultra).",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -137,7 +137,7 @@
     "sha256": {
       "source": "f6b4484d8fbdf57fb9c8a278ebcdb067b4fd30dd7e6bec9b3558528e60ab21e3",
       "config": "4de1412c1f35a29ce26cd4f87164775a5e1649f49c68f62bdd02cc4e5a6daa4f",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

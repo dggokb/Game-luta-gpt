@@ -21,7 +21,7 @@
     ]
   ],
   "scale": 0.353,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 256,
     "frameHeight": 256,
@@ -366,7 +366,7 @@
     "sha256": {
       "source": "5f669f0be11e1f71cd1282cb74af329955da7382a504a2e8accf56982f5c1d3b",
       "config": "219d5b69c8e005d26c4f1a7fb3e00a16a02f81d656b6e1bf152e399333f40a44",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

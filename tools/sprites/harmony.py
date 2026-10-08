@@ -82,10 +82,11 @@ def audit(root=ROOT):
                 row = {'character': pack['id'], 'state': name, 'frame': f, **m}
                 rows.append(row)
                 where = f"{pack['id']}/{name}[{f}]"
-                limit = REACTION_TORSO_TOLERANCE if name in REACTIONS else TORSO_TOLERANCE
+                # Tolerances are art pixels (worldScale 1); measures are world units.
+                limit = (REACTION_TORSO_TOLERANCE if name in REACTIONS else TORSO_TOLERANCE) * scale
                 if name in REGISTERED and abs(m['torso'] - idle_torso) > limit:
                     problems.append(f"{where}: torso {m['torso'] - idle_torso:+.0f}px off the Idle registration")
-                if name in GROUNDED and abs(m['ground']) > GROUND_TOLERANCE:
+                if name in GROUNDED and abs(m['ground']) > GROUND_TOLERANCE * scale:
                     problems.append(f"{where}: feet {m['ground']:+.0f}px from the ground")
             # Out-and-back spike inside a move: neighbours agree, the middle frame does not.
             # Frames drawn in the air (feet well above the root, e.g. a spinning kick) are
@@ -93,10 +94,10 @@ def audit(root=ROOT):
             torsos = [m['torso'] for m in frames]
             for i in range(1, len(torsos) - 1):
                 before, here, after = torsos[i - 1], torsos[i], torsos[i + 1]
-                if frames[i]['ground'] < -AIRBORNE_CLEARANCE:
+                if frames[i]['ground'] < -AIRBORNE_CLEARANCE * scale:
                     continue
-                if (abs(before - after) <= 15 and abs(here - before) > SPIKE_TOLERANCE
-                        and abs(here - after) > SPIKE_TOLERANCE):
+                if (abs(before - after) <= 15 * scale and abs(here - before) > SPIKE_TOLERANCE * scale
+                        and abs(here - after) > SPIKE_TOLERANCE * scale):
                     problems.append(f"{pack['id']}/{name}[{animation['frames'][i]}]: "
                                     f"torso spikes {here - before:+.0f}px and back")
         if 'DEFENSE_STAND' in metrics:

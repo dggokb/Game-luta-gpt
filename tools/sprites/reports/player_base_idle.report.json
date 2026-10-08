@@ -5,7 +5,7 @@
   "sourceNote": "Teste: idle do p01 gerado em video (Seedance), fundo verde recortado, loop de 76 quadros a ~24 fps.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 256,
     "frameHeight": 256,
@@ -874,7 +874,7 @@
     "sha256": {
       "source": "5ac3fbf26beec757b9ba3f644c3662ee8434cf263ae0a4ff8d6ecdd12916031c",
       "config": "61c08e141fe5164e8d1f7d0a8f731f0f3d1cbe46331184ade4de3f03d0a8f97f",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

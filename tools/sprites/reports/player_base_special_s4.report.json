@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Salto e giro no proprio desenho; anel de energia removido (--sem-efeitos).",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 352,
     "frameHeight": 352,
@@ -258,7 +258,7 @@
     "sha256": {
       "source": "b604695976b98a473f0d55f5a811e0861bf6bf144e0516da2eab993dd93ecd0c",
       "config": "7995a1650724281b3d2dd1a665446976f7023d31e0a445ce158124211e1647ea",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

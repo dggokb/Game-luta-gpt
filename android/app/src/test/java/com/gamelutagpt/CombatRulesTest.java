@@ -10,12 +10,13 @@ public class CombatRulesTest {
 
     @Test public void reachIsMeasuredToTheTargetHurtboxEdge() {
         CharacterDefinition.Move jab=BASE.moves.get("L");
-        // Legacy center-to-center reach 118 is preserved for a 34-wide target...
-        assertTrue(CombatRules.meleeConnects(0,565,1,jab,118,565,LEGACY,false));
-        assertFalse(CombatRules.meleeConnects(0,565,1,jab,119,565,LEGACY,false));
+        // Center-to-center reach is the jab reach plus the target half width...
+        float edge=jab.reach+LEGACY.halfWidth;
+        assertTrue(CombatRules.meleeConnects(0,565,1,jab,edge,565,LEGACY,false));
+        assertFalse(CombatRules.meleeConnects(0,565,1,jab,edge+1,565,LEGACY,false));
         // ...and a wider body is touched sooner, in both directions.
-        assertTrue(CombatRules.meleeConnects(0,565,1,jab,84+NPC.fighter.body.halfWidth,565,NPC.fighter.body,false));
-        assertTrue(CombatRules.meleeConnects(500,565,-1,jab,500-84-NPC.fighter.body.halfWidth,565,NPC.fighter.body,false));
+        assertTrue(CombatRules.meleeConnects(0,565,1,jab,jab.reach+NPC.fighter.body.halfWidth,565,NPC.fighter.body,false));
+        assertTrue(CombatRules.meleeConnects(500,565,-1,jab,500-jab.reach-NPC.fighter.body.halfWidth,565,NPC.fighter.body,false));
         assertFalse(CombatRules.meleeConnects(500,565,1,jab,400,565,NPC.fighter.body,false));
     }
     @Test public void overlappingBodiesAndFarVerticalTargetsDoNotConnect() {
@@ -97,10 +98,11 @@ public class CombatRulesTest {
     }
     @Test public void projectilesSpawnFromThePackLaunchPoint() {
         CharacterDefinition.Projectile energy=BASE.fighter.energy;
-        assertEquals(82f,energy.spawnHeight(false,false),0);
-        assertEquals(65f,energy.spawnHeight(true,false),0);
-        assertEquals(86f,BASE.fighter.superAttack.spawnHeight(false,false),0);
-        assertEquals(82f,BASE.fighter.superAttack.spawnHeight(false,true),0);
+        // Values of characters/player_base/character.json (scaled with the art, worldScale).
+        assertEquals(88f,energy.spawnHeight(false,false),0);
+        assertEquals(70f,energy.spawnHeight(true,false),0);
+        assertEquals(92f,BASE.fighter.superAttack.spawnHeight(false,false),0);
+        assertEquals(88f,BASE.fighter.superAttack.spawnHeight(false,true),0);
         assertTrue("A big fighter launches from higher up",
             NPC.fighter.energy.spawnHeight(false,false)>energy.spawnHeight(false,false));
         assertTrue(NPC.fighter.energy.spawnHeight(true,false)<=NPC.fighter.body.crouchHeight);

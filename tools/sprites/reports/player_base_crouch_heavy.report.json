@@ -5,7 +5,7 @@
   "sourceNote": "2H lancador do p01 em poses-chave (o video nao faz o soco para cima): guarda agachada (video do 2M), carga e topo do uppercut (ChatGPT), alinhados pelo pe de tras na escala do idle.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 320,
@@ -71,7 +71,7 @@
     "sha256": {
       "source": "735ea2da621ca9df822426c9aa1185465a9f15acb1b59f9c7da7f28234e2f90a",
       "config": "59fee94c0344c62c8ef8889fec06ad61399d764491f26ada634a1cae5d3722a1",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

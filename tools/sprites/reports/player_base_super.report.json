@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Carga com as maos na cintura e empurrao no fim do startup do Super.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -280,7 +280,7 @@
     "sha256": {
       "source": "c60e41ec25142a3f3412926c6e9fa198ac9aa2eeece06ed0b9acccdc5e82b2d7",
       "config": "f85bce52505cd2da52980101bc771a57b971177efb3a53757395cb2f7646e7de",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

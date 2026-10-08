@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Arqueado pelo golpe, topo, mergulho e descida; escala da guarda do fim do video (o 1o quadro e agachado); pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 320,
@@ -82,7 +82,7 @@
     "sha256": {
       "source": "68f03ad67a23c8b4a2f889ffe6a253123ff98e7d1a9c7b1bd2e0d7d5f32a3f2d",
       "config": "62a47438ad79f4c8664a2fb73334ebd12fab4568d389108e3853589af20eafc4",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

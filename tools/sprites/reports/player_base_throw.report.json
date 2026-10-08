@@ -5,7 +5,7 @@
   "sourceNote": "Agarrao do p01 (video Seedance): guarda, alcance e pegada (0-3), arremesso e volta (3-8). Os quadros com o adversario no video foram pulados; o jogo desenha quem e arremessado.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 448,
     "frameHeight": 256,
@@ -137,7 +137,7 @@
     "sha256": {
       "source": "a2fc787ab6cf3b5781b7c93a19022923892810cc598a859038de391b24d7de89",
       "config": "0ecb85546d9c56a636598d019b36cf053dda44c2db85db8c214d003202e32b6e",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

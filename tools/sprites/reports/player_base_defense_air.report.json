@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda no ar (bracos cruzados, pernas encolhidas); pes na raiz, o jogo sobe e desce.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -104,7 +104,7 @@
     "sha256": {
       "source": "cfe4084840e16b7eba278290bfd13c106911f25fee918002c2c9ed2ce015a34d",
       "config": "3869bcf41cafcb1432b0aec8216631acf2010ba1258231f5f95b631079fae761",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

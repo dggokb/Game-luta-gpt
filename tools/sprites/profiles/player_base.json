@@ -4,7 +4,7 @@
   "baseFrameHeight": 256,
   "preferredRootX": 128,
   "preferredRootY": 238,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "standingVisualHeight": 228,
   "anatomyReference": {
     "source": "art/sprites/source/player_base_idle_normalized.png",

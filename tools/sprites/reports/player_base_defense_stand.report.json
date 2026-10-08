@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda alta segurada e reacao ao impacto; cada quadro registrado no proprio tronco (--fixar quadro): o empurrao vem do jogo.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -126,7 +126,7 @@
     "sha256": {
       "source": "055f0fee484a75fd9888bc2c2cccff67ca994404a91f62a1bfece101e544d5e2",
       "config": "433120e16ccca1b7ddd316101a89d9d674f53474400dcdddd448c0c705f459f0",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }

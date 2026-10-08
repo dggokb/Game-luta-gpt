@@ -5,7 +5,7 @@
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda baixa segurada e reacao; quadro com clarao pulado; cada quadro no proprio tronco e pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
-  "worldScale": 1.0,
+  "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
     "frameHeight": 256,
@@ -104,7 +104,7 @@
     "sha256": {
       "source": "5f9c1e1e81e5a759b496bdc6e367ad859c98f1d08327fe8c6440cde17adee4a3",
       "config": "4425be1f267d5c094691cdb5ca4519c39c6d4cee2bb7b1438202bafe2ee6cbe9",
-      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }
 }
