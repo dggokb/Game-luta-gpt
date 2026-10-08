@@ -52,16 +52,26 @@ história). O jogo ainda aplica o `worldScale` do perfil. Ninguém escolhe escal
    grava `art/keys/<id>/tamanho.json` com a escala de cada imagem inicial e a altura (o
    agachado é achado dentro do vídeo de onde foi tirado, mesmo reduzido). O perfil do
    personagem (`tools/sprites/profiles/<id>.json`) leva a mesma proporção.
-2. **Cada vídeo:**
+2. **Personagem inteiro ou vídeo refeito** (o jeito normal):
+   `python3 tools/sprites/personagem.py <id> <pasta com os vídeos> [ESTADO ...]`
+   Sem estados, monta tudo; com estados (ex.: `CROUCH_LIGHT HIT_AIR`), refaz só esses. Ele
+   acha em cada vídeo o trecho da ação e o quadro do impacto, escolhe os quadros na contagem
+   do p01 (o tempo e o impacto do p01 servem direto), pula quadros com clarão, arco ou
+   poeira, converte e atualiza `characters/<id>/character.json`. Personagem novo nasce com
+   os dados do p01 na escala da altura dele; num personagem que já existe só muda a
+   animação refeita, e dano, frame data, poderes e tempos ajustados à mão continuam (o tempo
+   só volta ao do p01 se a contagem de quadros mudar). O nome do vídeo de cada estado fica
+   em `tools/sprites/videos/<id>.json`. Depois: `build_characters.py --write`.
+3. **Um clipe à mão** (casos especiais, como o S4 do p04):
    `python3 tools/sprites/video_para_sprite.py video.mp4 --personagem <id> --clipe tools/sprites/clips/<clipe>.json --inicio A --fim B`
    A ferramenta acha a imagem inicial no 1º ou no último quadro (mesmo se o Seedance deu
    zoom), calcula a escala e grava a receita no clipe (`"video"`: arquivo, escala, como foi
    medida, quadros e opções). Para refazer: `video_para_sprite.py video.mp4 --clipe <clipe>`.
-3. Vídeo que não começa nem termina numa imagem inicial (intro, vitória...) é medido pela
+4. Vídeo que não começa nem termina numa imagem inicial (intro, vitória...) é medido pela
    guarda do IDLE no meio do vídeo, e só vale se 3 quadros concordarem. Se nada bater, a
    ferramenta para com erro. A saída é gerar de novo a partir da imagem inicial; em último
    caso `--escala N --motivo "..."`, que fica gravado.
-4. Se a câmera mudar o zoom no meio do vídeo, a ferramenta recusa: gere de novo.
+5. Se a câmera mudar o zoom no meio do vídeo, a ferramenta recusa: gere de novo.
 
 Os testes conferem que toda receita diz como a escala foi achada.
 

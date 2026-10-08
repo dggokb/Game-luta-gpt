@@ -16,15 +16,15 @@
     "personagem": "p04",
     "escala": 0.5267,
     "medida": "último quadro = inicio_centro (nota 0.91)",
-    "quadros": "32,40,49,57",
-    "celula": 320,
-    "largura": 224,
-    "raiz": "100,302",
+    "quadros": "33,42,49,57",
+    "celula": 288,
+    "largura": 384,
+    "raiz": "263,270",
     "colunas": 4,
     "pe_no_chao": true
   },
-  "frameWidth": 224,
-  "frameHeight": 320,
-  "rootX": 100,
-  "rootY": 302
+  "frameWidth": 384,
+  "frameHeight": 288,
+  "rootX": 263,
+  "rootY": 270
 }
