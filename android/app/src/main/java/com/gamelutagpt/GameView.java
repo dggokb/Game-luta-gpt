@@ -122,6 +122,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int introFrame = -1;
     private int introTotalFrames;
     private boolean introPlayed;
+    /** Frames the winner has been celebrating (player, opponent); 0 while nobody is KO. */
+    private final int[] victoryFrames = new int[2];
     /** Ultra playing now (cinematic, then the final beam). */
     private UltraPack ultraPack;
     // Final beam: drawn from the engine state, with its own clock (keeps flickering in hitstop).
@@ -1248,6 +1250,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (animation == null && f.status == CombatFighter.Status.THROW) {
             animation = throwPose(f, character);
             animationElapsed = throwPoseTime;
+        }
+        CombatFighter rival = isPlayer ? opponent() : player();
+        int side = isPlayer ? 0 : 1;
+        boolean celebrating = animation == null && rival.ko() && !f.ko() && f.grounded &&
+            f.status == CombatFighter.Status.NEUTRAL && !f.attacking() && renderer.hasAnimation(SpriteStates.VICTORY);
+        if (celebrating) {
+            // Opponent KO: the winner plays VICTORY once and holds its last pose.
+            CharacterDefinition.Animation win = character.animations.get(SpriteStates.VICTORY);
+            animation = SpriteStates.VICTORY;
+            animationElapsed = Math.min(win.duration - 0.0001f, victoryFrames[side]++ * FIXED_STEP);
+        } else {
+            victoryFrames[side] = 0;
         }
         CharacterDefinition.Animation beamPose =
             animation == null && f.firingBeam() ? character.specialAnimations.get("ULTRA") : null;

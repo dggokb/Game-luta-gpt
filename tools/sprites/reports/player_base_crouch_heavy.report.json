@@ -1,76 +1,175 @@
 {
   "id": "player_base_crouch_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_heavy_keys.png",
-  "sourceNote": "2H lancador do p01 em poses-chave (o video nao faz o soco para cima): guarda agachada (video do 2M), carga e topo do uppercut (ChatGPT), alinhados pelo pe de tras na escala do idle.",
+  "source": "art/sprites/source/player_base_crouch_heavy_video_normalized.png",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2H com o braco esquerdo, a partir de inicio_agachado: guarda agachada, sobe, topo do uppercut, volta a guarda. Escala pelo corpo agachado (0.535, igual ao 2M); quadros com borrao pulados.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
-    "frameHeight": 320,
+    "frameHeight": 384,
     "rootX": 150,
-    "rootY": 300,
-    "columns": 3,
-    "frameCount": 3
+    "rootY": 366,
+    "columns": 12,
+    "frameCount": 12
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        80,
-        141,
-        232,
-        300
+        70,
+        219,
+        222,
+        367
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 15018
+      "minimumMargin": 17,
+      "opaquePixels": 13870
     },
     {
       "index": 1,
       "outputBbox": [
-        80,
-        138,
-        205,
-        300
+        71,
+        215,
+        225,
+        368
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 11702
+      "minimumMargin": 16,
+      "opaquePixels": 14146
     },
     {
       "index": 2,
       "outputBbox": [
-        80,
-        55,
-        244,
-        300
+        71,
+        120,
+        231,
+        372
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 16253
+      "minimumMargin": 12,
+      "opaquePixels": 19638
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        77,
+        98,
+        241,
+        374
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 19507
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        73,
+        42,
+        237,
+        375
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 20677
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        73,
+        43,
+        237,
+        375
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 20668
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        73,
+        44,
+        237,
+        375
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 20929
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        74,
+        51,
+        237,
+        375
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 20581
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        73,
+        71,
+        237,
+        375
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 20344
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        73,
+        99,
+        236,
+        374
+      ],
+      "minimumMargin": 10,
+      "opaquePixels": 19845
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        65,
+        210,
+        220,
+        368
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15048
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        67,
+        210,
+        220,
+        367
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14807
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 180,
-    "frameHeight": 261,
-    "rootX": 78,
-    "rootY": 253,
-    "columns": 3,
-    "frameCount": 3,
+    "frameWidth": 196,
+    "frameHeight": 352,
+    "rootX": 95,
+    "rootY": 334,
+    "columns": 12,
+    "frameCount": 12,
     "cropOffset": [
-      72,
-      47
+      55,
+      32
     ],
     "decodedBytes": {
-      "canonical": 1228800,
-      "packed": 563760
+      "canonical": 5898240,
+      "packed": 3311616
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "735ea2da621ca9df822426c9aa1185465a9f15acb1b59f9c7da7f28234e2f90a",
-      "config": "59fee94c0344c62c8ef8889fec06ad61399d764491f26ada634a1cae5d3722a1",
+      "source": "710d51a29b4d99a0849f951422550bd031680a686e623c075d4e0e8328696050",
+      "config": "12f50a0090028926bfd532c1293608ff0e2fcee00f5459fdf53f04916fc2ff85",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

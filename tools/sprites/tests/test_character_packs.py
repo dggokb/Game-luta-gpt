@@ -229,7 +229,9 @@ class CharacterPackTests(unittest.TestCase):
 
     def test_fixed_scale_requires_a_reason(self):
         path=self.root/'tools/sprites/clips/player_base_hit_crouch.json';d=json.loads(path.read_text())
-        d.pop('scaleReason');path.write_text(json.dumps(d))
+        # Drawn sheet with a fixed scale and no reason (no checked-in clip uses fixed now).
+        d.update(segmentation='alpha-components',rootMode='ground-feet',scaleMode='fixed',scale=0.5)
+        path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'requires scaleReason'):pipeline.build(self.root)
 
 
@@ -289,9 +291,9 @@ class BuiltPackTests(unittest.TestCase):
         self.assertIn('m.put("2M"',java)
         self.assertIn('a.get("CROUCH_MEDIUM")',java)
 
-    def test_player_base_crouch_heavy_launcher_uses_key_poses(self):
+    def test_player_base_crouch_heavy_launcher_has_video_art(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_heavy.report.json').read_text())
-        self.assertEqual(3,report['layout']['frameCount'])
+        self.assertEqual(12,report['layout']['frameCount'])
         self.assertTrue(report['passed'])
         self.assertTrue(all(f['opaquePixels']>=10000 for f in report['frames']))
 

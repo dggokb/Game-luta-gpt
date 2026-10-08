@@ -1,0 +1,18 @@
+{
+  "id": "player_base_defeat",
+  "javaName": "DEFEAT",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_defeat_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_defeat.png",
+  "report": "tools/sprites/reports/player_base_defeat.report.json",
+  "preview": "android/app/build/sprite-review/defeat-import.png",
+  "expectedFrames": 33,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 140,
+  "rootY": 300,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Derrota: cansado, curva o corpo com a mao no joelho. Um a cada 3 quadros."
+}

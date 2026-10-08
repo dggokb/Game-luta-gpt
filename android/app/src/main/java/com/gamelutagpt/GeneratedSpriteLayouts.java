@@ -22,11 +22,11 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_SET_ROOT_Y = 234;
     static final int CROUCH_SET_FRAME_COUNT = 8;
 
-    static final int CROUCH_HEAVY_FRAME_WIDTH = 180;
-    static final int CROUCH_HEAVY_FRAME_HEIGHT = 261;
-    static final int CROUCH_HEAVY_ROOT_X = 78;
-    static final int CROUCH_HEAVY_ROOT_Y = 253;
-    static final int CROUCH_HEAVY_FRAME_COUNT = 3;
+    static final int CROUCH_HEAVY_FRAME_WIDTH = 196;
+    static final int CROUCH_HEAVY_FRAME_HEIGHT = 352;
+    static final int CROUCH_HEAVY_ROOT_X = 95;
+    static final int CROUCH_HEAVY_ROOT_Y = 334;
+    static final int CROUCH_HEAVY_FRAME_COUNT = 12;
 
     static final int CROUCH_LIGHT_FRAME_WIDTH = 241;
     static final int CROUCH_LIGHT_FRAME_HEIGHT = 195;
@@ -45,6 +45,12 @@ final class GeneratedSpriteLayouts {
     static final int DASH_SET_ROOT_X = 186;
     static final int DASH_SET_ROOT_Y = 145;
     static final int DASH_SET_FRAME_COUNT = 6;
+
+    static final int DEFEAT_FRAME_WIDTH = 159;
+    static final int DEFEAT_FRAME_HEIGHT = 256;
+    static final int DEFEAT_ROOT_X = 85;
+    static final int DEFEAT_ROOT_Y = 242;
+    static final int DEFEAT_FRAME_COUNT = 33;
 
     static final int DEFENSE_AIR_FRAME_WIDTH = 172;
     static final int DEFENSE_AIR_FRAME_HEIGHT = 243;
@@ -100,11 +106,11 @@ final class GeneratedSpriteLayouts {
     static final int HIT_AIR_SET_ROOT_Y = 265;
     static final int HIT_AIR_SET_FRAME_COUNT = 4;
 
-    static final int HIT_CROUCH_FRAME_WIDTH = 197;
-    static final int HIT_CROUCH_FRAME_HEIGHT = 184;
-    static final int HIT_CROUCH_ROOT_X = 91;
-    static final int HIT_CROUCH_ROOT_Y = 175;
-    static final int HIT_CROUCH_FRAME_COUNT = 4;
+    static final int HIT_CROUCH_FRAME_WIDTH = 232;
+    static final int HIT_CROUCH_FRAME_HEIGHT = 206;
+    static final int HIT_CROUCH_ROOT_X = 95;
+    static final int HIT_CROUCH_ROOT_Y = 195;
+    static final int HIT_CROUCH_FRAME_COUNT = 9;
 
     static final int HIT_STAND_FRAME_WIDTH = 213;
     static final int HIT_STAND_FRAME_HEIGHT = 269;
@@ -202,6 +208,12 @@ final class GeneratedSpriteLayouts {
     static final int SUPER_SET_ROOT_Y = 235;
     static final int SUPER_SET_FRAME_COUNT = 22;
 
+    static final int TAUNT_FRAME_WIDTH = 234;
+    static final int TAUNT_FRAME_HEIGHT = 281;
+    static final int TAUNT_ROOT_X = 104;
+    static final int TAUNT_ROOT_Y = 268;
+    static final int TAUNT_FRAME_COUNT = 33;
+
     static final int THROW_SET_FRAME_WIDTH = 337;
     static final int THROW_SET_FRAME_HEIGHT = 244;
     static final int THROW_SET_ROOT_X = 135;
@@ -213,6 +225,12 @@ final class GeneratedSpriteLayouts {
     static final int ULTRA_BEAM_ROOT_X = 130;
     static final int ULTRA_BEAM_ROOT_Y = 236;
     static final int ULTRA_BEAM_FRAME_COUNT = 9;
+
+    static final int VICTORY_FRAME_WIDTH = 170;
+    static final int VICTORY_FRAME_HEIGHT = 296;
+    static final int VICTORY_ROOT_X = 89;
+    static final int VICTORY_ROOT_Y = 282;
+    static final int VICTORY_FRAME_COUNT = 33;
 
     static final int WALK_BACK_SET_FRAME_WIDTH = 171;
     static final int WALK_BACK_SET_FRAME_HEIGHT = 247;
