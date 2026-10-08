@@ -46,6 +46,7 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 Fichas completas (golpes, lista de animações e prompts):
 
 - [p01](p01.md)
+- [p02](p02.md)
 - [p03](p03.md)
 - [p04](p04.md)
 
