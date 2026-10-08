@@ -1,0 +1,110 @@
+{
+  "id": "p03_fall",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_fall_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Descida do pulo; pes na raiz.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "rootX": 128,
+    "rootY": 300,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        65,
+        127,
+        191,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 11924
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        63,
+        127,
+        192,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 11916
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        57,
+        114,
+        193,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 12852
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        54,
+        95,
+        196,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 13786
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        53,
+        68,
+        197,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15369
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        57,
+        42,
+        192,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 14541
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 165,
+    "frameHeight": 280,
+    "rootX": 85,
+    "rootY": 268,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      43,
+      32
+    ],
+    "decodedBytes": {
+      "canonical": 2457600,
+      "packed": 1108800
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "16ffb012a74cb642f627555b9b11e35bcc0b7cbd0ea91f0e6c390074fc3dbab0",
+      "config": "bbb8999e39bc250628ad6ffcf12ece001727f62e98ce8e1d897170ae057d4183",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

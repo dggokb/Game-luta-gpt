@@ -1,0 +1,110 @@
+{
+  "id": "p03_jump",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_jump_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Subida do pulo; pes na raiz (o jogo sobe e desce).",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "rootX": 128,
+    "rootY": 300,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        60,
+        80,
+        198,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 13969
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        55,
+        117,
+        196,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 13301
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        64,
+        122,
+        196,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 12645
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        65,
+        121,
+        197,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 12532
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        70,
+        41,
+        182,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15486
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        85,
+        113,
+        183,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 11533
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 164,
+    "frameHeight": 281,
+    "rootX": 84,
+    "rootY": 269,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      44,
+      31
+    ],
+    "decodedBytes": {
+      "canonical": 2457600,
+      "packed": 1106016
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "aabd7d9771347e1747162c7ec7a3f75babd116df33da80c7347c040c83c6478e",
+      "config": "7c67d60d9b55cfc17ca089bec58074df79d489baf0c3dee5b4429b7c14fbf7ca",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

@@ -293,7 +293,7 @@
       "distancePerFrame": 9.2
     },
     "CROUCH": {
-      "atlas": "player_base_crouch",
+      "atlas": "p03_crouch",
       "frames": [
         0,
         1,
@@ -317,7 +317,7 @@
       ]
     },
     "RISE": {
-      "atlas": "player_base_rise",
+      "atlas": "p03_rise",
       "frames": [
         0,
         1,
@@ -337,7 +337,7 @@
       ]
     },
     "JUMP": {
-      "atlas": "player_base_jump",
+      "atlas": "p03_jump",
       "frames": [
         0,
         1,
@@ -357,7 +357,7 @@
       ]
     },
     "FALL": {
-      "atlas": "player_base_fall_air",
+      "atlas": "p03_fall",
       "frames": [
         0,
         1,
@@ -425,7 +425,7 @@
       ]
     },
     "LAND": {
-      "atlas": "player_base_land",
+      "atlas": "p03_land",
       "frames": [
         0,
         1,
@@ -441,7 +441,7 @@
       ]
     },
     "LIGHT_JAB": {
-      "atlas": "player_base_jab",
+      "atlas": "p03_jab",
       "frames": [
         0,
         1,
@@ -471,7 +471,7 @@
       ]
     },
     "MEDIUM_KICK": {
-      "atlas": "player_base_medium_kick",
+      "atlas": "p03_medium",
       "frames": [
         0,
         1,
@@ -507,7 +507,7 @@
       ]
     },
     "HEAVY_STRAIGHT": {
-      "atlas": "player_base_heavy_straight",
+      "atlas": "p03_heavy",
       "frames": [
         0,
         1,

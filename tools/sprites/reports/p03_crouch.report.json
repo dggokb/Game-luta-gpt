@@ -1,0 +1,132 @@
+{
+  "id": "p03_crouch",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_crouch_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Abaixar.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 128,
+    "rootY": 238,
+    "columns": 8,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        54,
+        16,
+        201,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14983
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        50,
+        24,
+        201,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15460
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        45,
+        43,
+        202,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16077
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        45,
+        57,
+        202,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15881
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        44,
+        59,
+        201,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15737
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        43,
+        59,
+        200,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15373
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        42,
+        60,
+        198,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14898
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        41,
+        59,
+        197,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14939
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 181,
+    "frameHeight": 244,
+    "rootX": 97,
+    "rootY": 232,
+    "columns": 8,
+    "frameCount": 8,
+    "cropOffset": [
+      31,
+      6
+    ],
+    "decodedBytes": {
+      "canonical": 2097152,
+      "packed": 1413248
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d8f91cc056ba628eb5c8697adbb9ac60cca14cd29ff031a557f4b234ab9c5d9e",
+      "config": "7f6a57cce8fe944cbd4c47e754513ed2a83ccb22e4196ab4d5b29626cebaa8fb",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

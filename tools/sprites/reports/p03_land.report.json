@@ -1,0 +1,88 @@
+{
+  "id": "p03_land",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_land_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Aterrissagem.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "rootX": 128,
+    "rootY": 300,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        64,
+        66,
+        199,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15502
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        62,
+        90,
+        203,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 14337
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        60,
+        92,
+        198,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 14301
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        58,
+        92,
+        200,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 13924
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 165,
+    "frameHeight": 256,
+    "rootX": 80,
+    "rootY": 244,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      48,
+      56
+    ],
+    "decodedBytes": {
+      "canonical": 1638400,
+      "packed": 675840
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "410103022be403eae6b40e70d63ab26d90cd3b7b2271edeb6e38f2fce3b215f7",
+      "config": "8be6b2513b32168d77e505424c330fdccd8e4cee3fabb38c8c3e161a5b0f69e2",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

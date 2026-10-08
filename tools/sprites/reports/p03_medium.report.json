@@ -1,0 +1,198 @@
+{
+  "id": "p03_medium",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_medium_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Soco com avanco; quadro com rastro pulado, cada quadro no proprio tronco.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 140,
+    "rootY": 238,
+    "columns": 7,
+    "frameCount": 14
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        74,
+        13,
+        208,
+        240
+      ],
+      "minimumMargin": 13,
+      "opaquePixels": 13907
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        71,
+        17,
+        218,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14483
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        54,
+        23,
+        219,
+        242
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14839
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        51,
+        23,
+        196,
+        242
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 13839
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        44,
+        25,
+        238,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14770
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        49,
+        25,
+        239,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14720
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        47,
+        26,
+        240,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14665
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        47,
+        26,
+        240,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14641
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        46,
+        25,
+        239,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14520
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        47,
+        24,
+        219,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13637
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        60,
+        20,
+        196,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13335
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        62,
+        19,
+        198,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13591
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        67,
+        16,
+        202,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 13675
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        69,
+        15,
+        204,
+        240
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13923
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 217,
+    "frameHeight": 249,
+    "rootX": 107,
+    "rootY": 235,
+    "columns": 7,
+    "frameCount": 14,
+    "cropOffset": [
+      33,
+      3
+    ],
+    "decodedBytes": {
+      "canonical": 5505024,
+      "packed": 3025848
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "751fd179bef3d1dad1cca19d5620c4af721256fe4eb1abfe67092c0358916f49",
+      "config": "1f3e32a490e3238bf1bae566e943b409ae6553d2afed4c55671dfecccb052c9e",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

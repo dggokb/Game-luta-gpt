@@ -1,0 +1,18 @@
+{
+  "id": "p03_land",
+  "javaName": "P03_LAND",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_land_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_land.png",
+  "report": "tools/sprites/reports/p03_land.report.json",
+  "preview": "android/app/build/sprite-review/p03_land-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Aterrissagem.",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 128,
+  "rootY": 300
+}
