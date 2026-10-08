@@ -59,6 +59,8 @@ public final class SurfaceHolder {
         }
     }
 
+    public Canvas lockHardwareCanvas(){ return lockCanvas(); }
+
     public void unlockCanvasAndPost(Canvas canvas){
         if(canvas!=null)canvas.dispose();
         if(strategy==null)return;
