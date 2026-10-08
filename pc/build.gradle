@@ -9,23 +9,28 @@ application { mainClass = 'com.gamelutagpt.DesktopLauncher' }
 def configuredSourceRoot = System.getenv('GAME_LUTA_SOURCE_ROOT')
 def sourceRoot = configuredSourceRoot ? file(configuredSourceRoot) : file('..')
 def androidJavaDir = new File(sourceRoot, 'android/app/src/main/java')
+def renderCoreDir = new File(sourceRoot, 'android/render-core/src/main/java')
+def stageCoreDir = new File(sourceRoot, 'android/stage-core/src/main/java')
+def ultraCoreDir = new File(sourceRoot, 'android/ultra-core/src/main/java')
 def drawableDir = new File(sourceRoot, 'android/app/src/main/res/drawable-nodpi')
+def assetDir = new File(sourceRoot, 'android/app/src/main/assets')
 
-if (!androidJavaDir.exists()) {
-    throw new GradleException("Mobile source not found: " + androidJavaDir)
-}
-if (!drawableDir.exists()) {
-    throw new GradleException("Mobile drawable source not found: " + drawableDir)
+[androidJavaDir, renderCoreDir, stageCoreDir, ultraCoreDir, drawableDir].each { dir ->
+    if (!dir.exists()) throw new GradleException("Mobile source not found: " + dir)
 }
 
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/java', androidJavaDir]
+            srcDirs = ['src/main/java', androidJavaDir, renderCoreDir, stageCoreDir, ultraCoreDir]
             exclude 'com/gamelutagpt/MainActivity.java'
         }
         resources { srcDirs = ['src/main/resources'] }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 tasks.named('processResources') {
@@ -33,6 +38,9 @@ tasks.named('processResources') {
         into 'drawable'
         include '*.png'
         include '*.webp'
+    }
+    if (assetDir.exists()) {
+        from(assetDir) { into 'assets' }
     }
 }
 
