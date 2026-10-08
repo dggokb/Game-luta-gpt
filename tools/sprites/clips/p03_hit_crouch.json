@@ -1,0 +1,18 @@
+{
+  "id": "p03_hit_crouch",
+  "javaName": "P03_HIT_CROUCH",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_hit_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_hit_crouch.png",
+  "report": "tools/sprites/reports/p03_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p03_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "frameHeight": 256,
+  "rootX": 170,
+  "rootY": 238,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe agachado; escala pelo agachado (0.48)."
+}

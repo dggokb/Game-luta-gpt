@@ -1,0 +1,88 @@
+{
+  "id": "p03_hit_air",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_hit_air_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe no ar; pes na raiz.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "rootX": 150,
+    "rootY": 300,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        43,
+        70,
+        237,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 18238
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        47,
+        74,
+        237,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 18319
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        53,
+        77,
+        234,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 18035
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        63,
+        73,
+        234,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17855
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 215,
+    "frameHeight": 253,
+    "rootX": 118,
+    "rootY": 241,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      32,
+      59
+    ],
+    "decodedBytes": {
+      "canonical": 1638400,
+      "packed": 870320
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "e72ba62829e4898c1746b04d87f807667f6e150038481677aa6d61e8096ebf02",
+      "config": "504d80f0840abcbf05eb5eb929e94462c7ba4fdeaacb3f354a71c1d2a874de56",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

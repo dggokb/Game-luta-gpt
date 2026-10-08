@@ -1,0 +1,18 @@
+{
+  "id": "p03_defense_stand",
+  "javaName": "P03_DEFENSE_STAND",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_defense_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_defense_stand.png",
+  "report": "tools/sprites/reports/p03_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p03_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "frameWidth": 320,
+  "frameHeight": 256,
+  "rootX": 140,
+  "rootY": 238,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa em pe; quadro 7 e a guarda segurada."
+}

@@ -1,0 +1,110 @@
+{
+  "id": "p03_defense_air",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_defense_air_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa no ar; pes na raiz.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "rootX": 140,
+    "rootY": 300,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        64,
+        48,
+        206,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 15535
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        62,
+        48,
+        208,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 15615
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        60,
+        48,
+        211,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 15650
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        60,
+        48,
+        209,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15659
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        60,
+        47,
+        209,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15707
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        63,
+        46,
+        208,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 15783
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 171,
+    "frameHeight": 276,
+    "rootX": 90,
+    "rootY": 264,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      50,
+      36
+    ],
+    "decodedBytes": {
+      "canonical": 2457600,
+      "packed": 1132704
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "26e3123f26a9d5f09e6d16d0d3fc52265307bd71be950e069b3c44e11f1d047c",
+      "config": "0e6aa674f339d7cb3bf280fc5706836151ffae0e9ffa1cd86760ab2342f6e182",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

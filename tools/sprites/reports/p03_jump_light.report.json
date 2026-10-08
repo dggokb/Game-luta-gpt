@@ -1,0 +1,121 @@
+{
+  "id": "p03_jump_light",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_jump_light_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. jL chute fraco no ar; pes na raiz.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 320,
+    "rootX": 150,
+    "rootY": 300,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        88,
+        63,
+        218,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 14927
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        85,
+        71,
+        220,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 13966
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        70,
+        86,
+        338,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17664
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        69,
+        86,
+        337,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17733
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        68,
+        86,
+        334,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17489
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        71,
+        78,
+        244,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 14836
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        74,
+        72,
+        220,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15398
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 291,
+    "frameHeight": 259,
+    "rootX": 93,
+    "rootY": 247,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      57,
+      53
+    ],
+    "decodedBytes": {
+      "canonical": 3440640,
+      "packed": 2110332
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "2885d3a4679806e695c5eea67eeb47fc14d6ad24dc0b7a69a81266aa69126bb5",
+      "config": "528ca51a3f4bdb37eb790681bb632d62edf439aa3df44f8a10cebd1fcc28cb4b",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

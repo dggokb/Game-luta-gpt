@@ -1,0 +1,18 @@
+{
+  "id": "p03_ultra_beam",
+  "javaName": "P03_ULTRA_BEAM",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_ultra_beam_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_ultra_beam.png",
+  "report": "tools/sprites/reports/p03_ultra_beam.report.json",
+  "preview": "android/app/build/sprite-review/p03_ultra_beam-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "frameHeight": 256,
+  "rootX": 140,
+  "rootY": 238,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Ultra: 9 poses (carga, disparo, sustentacao, recuperacao, guarda)."
+}

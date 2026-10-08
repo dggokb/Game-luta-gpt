@@ -561,7 +561,7 @@
       ]
     },
     "DEFENSE_STAND": {
-      "atlas": "player_base_defense_stand",
+      "atlas": "p03_defense_stand",
       "frames": [
         7,
         1,
@@ -585,7 +585,7 @@
       ]
     },
     "DEFENSE_CROUCH": {
-      "atlas": "player_base_defense_crouch",
+      "atlas": "p03_defense_crouch",
       "frames": [
         0,
         1,
@@ -607,7 +607,7 @@
       ]
     },
     "HIT_STAND": {
-      "atlas": "player_base_hit_stand",
+      "atlas": "p03_hit_stand",
       "frames": [
         0,
         1,
@@ -633,7 +633,7 @@
       ]
     },
     "HIT_CROUCH": {
-      "atlas": "player_base_hit_crouch",
+      "atlas": "p03_hit_crouch",
       "frames": [
         0,
         1,
@@ -659,7 +659,7 @@
       ]
     },
     "HIT_AIR": {
-      "atlas": "player_base_hit_air",
+      "atlas": "p03_hit_air",
       "frames": [
         0,
         1,
@@ -775,7 +775,7 @@
       ]
     },
     "CROUCH_MEDIUM": {
-      "atlas": "player_base_crouch_medium",
+      "atlas": "p03_crouch_medium",
       "frames": [
         0,
         1,
@@ -847,7 +847,7 @@
       ]
     },
     "JUMP_LIGHT": {
-      "atlas": "player_base_jump_light",
+      "atlas": "p03_jump_light",
       "frames": [
         0,
         1,
@@ -913,7 +913,7 @@
       ]
     },
     "DEFENSE_AIR": {
-      "atlas": "player_base_defense_air",
+      "atlas": "p03_defense_air",
       "frames": [
         0,
         1,
@@ -935,7 +935,7 @@
       ]
     },
     "ULTRA_BEAM": {
-      "atlas": "player_base_ultra_beam",
+      "atlas": "p03_ultra_beam",
       "frames": [
         0,
         1,
@@ -961,7 +961,7 @@
       ]
     },
     "SPECIAL_ENERGY": {
-      "atlas": "player_base_energy",
+      "atlas": "p03_energy",
       "frames": [
         0,
         1,
@@ -1027,7 +1027,7 @@
       ]
     },
     "SPECIAL_S2": {
-      "atlas": "player_base_special_s2",
+      "atlas": "p03_special_s2",
       "frames": [
         0,
         1,
@@ -1075,7 +1075,7 @@
       ]
     },
     "SPECIAL_S3": {
-      "atlas": "player_base_special_s3",
+      "atlas": "p03_special_s3",
       "frames": [
         0,
         1,
@@ -1125,7 +1125,7 @@
       ]
     },
     "SPECIAL_S4": {
-      "atlas": "player_base_special_s4",
+      "atlas": "p03_special_s4",
       "frames": [
         0,
         1,
@@ -1173,7 +1173,7 @@
       ]
     },
     "SUPER_WAVE": {
-      "atlas": "player_base_super",
+      "atlas": "p03_super",
       "frames": [
         0,
         1,
@@ -1306,6 +1306,228 @@
         35,
         35,
         35
+      ]
+    },
+    "VICTORY": {
+      "atlas": "p03_victory",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "loop": false,
+      "durationsMs": [
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125
+      ]
+    },
+    "DEFEAT": {
+      "atlas": "p03_defeat",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "loop": false,
+      "durationsMs": [
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125
+      ]
+    },
+    "TAUNT": {
+      "atlas": "p03_taunt",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "loop": false,
+      "durationsMs": [
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125
       ]
     }
   },

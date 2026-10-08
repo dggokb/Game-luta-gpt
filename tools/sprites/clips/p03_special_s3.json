@@ -1,0 +1,18 @@
+{
+  "id": "p03_special_s3",
+  "javaName": "P03_SPECIAL_S3",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_special_s3_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_special_s3.png",
+  "report": "tools/sprites/reports/p03_special_s3.report.json",
+  "preview": "android/app/build/sprite-review/p03_special_s3-import.png",
+  "expectedFrames": 21,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "frameWidth": 448,
+  "frameHeight": 448,
+  "rootX": 180,
+  "rootY": 428,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S3 avanco em tres socos e golpe final."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "p03_hit_air",
+  "javaName": "P03_HIT_AIR",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_hit_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_hit_air.png",
+  "report": "tools/sprites/reports/p03_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p03_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 150,
+  "rootY": 300,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe no ar; pes na raiz."
+}

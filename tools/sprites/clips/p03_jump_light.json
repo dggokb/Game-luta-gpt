@@ -1,0 +1,18 @@
+{
+  "id": "p03_jump_light",
+  "javaName": "P03_JUMP_LIGHT",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_jump_light_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_jump_light.png",
+  "report": "tools/sprites/reports/p03_jump_light.report.json",
+  "preview": "android/app/build/sprite-review/p03_jump_light-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "rootX": 150,
+  "rootY": 300,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. jL chute fraco no ar; pes na raiz."
+}

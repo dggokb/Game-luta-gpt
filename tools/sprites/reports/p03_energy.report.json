@@ -1,0 +1,165 @@
+{
+  "id": "p03_energy",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_energy_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S1 soco que solta a onda curta; energia e do jogo.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 140,
+    "rootY": 238,
+    "columns": 6,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        72,
+        14,
+        208,
+        239
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14194
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        52,
+        39,
+        203,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13893
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        59,
+        38,
+        200,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13549
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        56,
+        37,
+        197,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13654
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        54,
+        36,
+        194,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 13884
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        43,
+        22,
+        196,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14866
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        39,
+        20,
+        251,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 15817
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        37,
+        20,
+        239,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 16047
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        33,
+        20,
+        236,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 15327
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        37,
+        18,
+        205,
+        241
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14176
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        41,
+        14,
+        179,
+        240
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14185
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 238,
+    "frameHeight": 247,
+    "rootX": 117,
+    "rootY": 234,
+    "columns": 6,
+    "frameCount": 11,
+    "cropOffset": [
+      23,
+      4
+    ],
+    "decodedBytes": {
+      "canonical": 4718592,
+      "packed": 2821728
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "6d90f901c2f211dea943998eed2206a1e0db866b135eb78ce381d20fa6c96ed8",
+      "config": "45749bbd3a9a6462abf02d9373e29aee9b94b0c0402c6206bcefd97d90b2f7cc",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}
