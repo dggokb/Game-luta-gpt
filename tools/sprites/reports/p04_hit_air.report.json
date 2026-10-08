@@ -7,10 +7,10 @@
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 224,
-    "frameHeight": 320,
-    "rootX": 100,
-    "rootY": 302,
+    "frameWidth": 384,
+    "frameHeight": 288,
+    "rootX": 263,
+    "rootY": 270,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,32 +18,32 @@
     {
       "index": 0,
       "outputBbox": [
-        48,
-        41,
-        171,
-        303
+        22,
+        53,
+        328,
+        271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 16232
+      "opaquePixels": 17180
     },
     {
       "index": 1,
       "outputBbox": [
-        21,
-        89,
-        187,
-        303
+        178,
+        57,
+        351,
+        271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 16565
+      "opaquePixels": 16839
     },
     {
       "index": 2,
       "outputBbox": [
-        22,
-        87,
-        202,
-        303
+        182,
+        55,
+        362,
+        271
       ],
       "minimumMargin": 17,
       "opaquePixels": 16764
@@ -51,10 +51,10 @@
     {
       "index": 3,
       "outputBbox": [
-        29,
-        75,
-        187,
-        303
+        190,
+        43,
+        348,
+        271
       ],
       "minimumMargin": 17,
       "opaquePixels": 16100
@@ -62,26 +62,26 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 201,
-    "frameHeight": 282,
-    "rootX": 89,
-    "rootY": 271,
+    "frameWidth": 361,
+    "frameHeight": 248,
+    "rootX": 252,
+    "rootY": 237,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
       11,
-      31
+      33
     ],
     "decodedBytes": {
-      "canonical": 1146880,
-      "packed": 906912
+      "canonical": 1769472,
+      "packed": 1432448
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "7546cac271777923a563e2f5f10f438b87c74c1b7778849feb3c40572003f5c4",
-      "config": "f39959b51927545212640e35ae892d983495a402fbac8aab9932a51cc22f7f2a",
+      "source": "af7b0635dae27a5705259ebfeba142bced793cf4b0e6cd824ee32c45da36d0c5",
+      "config": "cd1200c12cc1e1cc21637b157872b71380270e594ae8ac43e34f0f6c8d24bf74",
       "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
     }
   }
