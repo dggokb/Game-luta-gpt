@@ -19,6 +19,7 @@ import com.gamelutagpt.ultra.UltraGrade;
 import com.gamelutagpt.ultra.UltraListener;
 import com.gamelutagpt.ultra.UltraPack;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -133,7 +134,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private boolean beamFired;
     private float beamTargetX;
     private float beamShake;
-    private final java.util.Random shakeRandom = new java.util.Random(3);
+    private final Random shakeRandom = new Random(3);
 
     // Team HUD labels (the rules live in the engine's TeamSystem).
     private String tagCooldownHudLabel = "ASSIST: PRONTO";
@@ -176,8 +177,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void clearInput() {
         clearPendingInput();
         pad.reset();
+        releaseAllPointers();
+    }
+
+    private void releaseAllPointers() {
         dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = overdrivePointer = superPointer = -1;
         healPlayerPointer = healOpponentPointer = -1;
+    }
+
+    /** Frees the sound pool when the Activity is destroyed. */
+    public void release() {
+        ultraSounds.release();
     }
 
     public GameView(Context context) {
@@ -555,7 +565,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private int ultraTotalDamage() {
-        return ultraPack != null ? ultraPack.definition.damage : UltraDefinition.DEFAULT_DAMAGE;
+        // Only called during the cinematic, which always runs with its pack.
+        return ultraPack.definition.damage;
     }
 
     @Override
@@ -806,7 +817,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         shownTagSeconds = tagSeconds;
         String assist = assistTenths < 0 ? (team.conversionOpen() ? "ASSIST: TAG p/ TROCAR" : "ASSIST: EM CAMPO")
             : assistTenths == 0 ? "ASSIST: PRONTO"
-            : String.format(java.util.Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
+            : String.format(Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
         String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
         tagCooldownHudLabel = assist + tag;
         tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
@@ -1083,7 +1094,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private String opponentStatusLabel() {
         CombatFighter npc = opponent();
-        String name = opponentCharacter().displayName.toUpperCase(java.util.Locale.ROOT);
+        String name = opponentCharacter().displayName.toUpperCase(Locale.ROOT);
         String state;
         if (npc.status == CombatFighter.Status.KNOCKDOWN) {
             state = npc.knockdownFrame < engine.config.knockdownFallFrames ? "CAINDO" : "NO CHÃO";
@@ -1184,8 +1195,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         CharacterDefinition character = f.character();
         String animation = reactionState(renderer, f);
         float animationElapsed = reactionElapsed;
-        CharacterDefinition.Animation introClip = character.animations.get(SpriteStates.INTRO);
-        if (introFrame >= 0 && introClip != null) {
+        CharacterDefinition.Animation introClip = introFrame >= 0 ? character.animations.get(SpriteStates.INTRO) : null;
+        if (introClip != null) {
             // A shorter intro holds its last frame (the guard) until the longest one ends.
             animation = SpriteStates.INTRO;
             animationElapsed = Math.min(introClip.duration - 0.0001f, introFrame * FIXED_STEP);
@@ -1238,8 +1249,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             animation = throwPose(f, character);
             animationElapsed = throwPoseTime;
         }
-        CharacterDefinition.Animation beamPose = character.specialAnimations.get("ULTRA");
-        if (animation == null && f.firingBeam() && beamPose != null) {
+        CharacterDefinition.Animation beamPose =
+            animation == null && f.firingBeam() ? character.specialAnimations.get("ULTRA") : null;
+        if (beamPose != null) {
             // Own beam sheet (9 poses): charge, shot, wind-blown hold, recovery.
             CombatConfig config = engine.config;
             int pose = RaioFinal.poseFrame(f.ultraFrame, config.ultraBeamFireFrame(),
@@ -1451,8 +1463,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
      * Touch only records what the player holds and presses. Whether a press starts an
      * attack is decided by the engine (buffer, state machine and cancel windows).
      */
-    private boolean handleTouch(MotionEvent event) {
-        if (getWidth() == 0 || getHeight() == 0) return true;
+    private void handleTouch(MotionEvent event) {
+        if (getWidth() == 0 || getHeight() == 0) return;
         float sx = getWidth() / VW;
         float sy = getHeight() / VH;
         int action = event.getActionMasked();
@@ -1462,7 +1474,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing.
                 paginaFinal.tap();
-                return true;
+                return;
             }
             int pointerId = event.getPointerId(index);
             float x = event.getX(index) / sx;
@@ -1563,12 +1575,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (pointerId == healPlayerPointer) healPlayerPointer = -1;
             if (pointerId == healOpponentPointer) healOpponentPointer = -1;
         } else if (action == MotionEvent.ACTION_CANCEL) {
-            dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = overdrivePointer = superPointer = -1;
-            healPlayerPointer = healOpponentPointer = -1;
+            releaseAllPointers();
             pad.setDirection(0);
         }
-
-        return true;
     }
 
     private static float clamp(float value, float min, float max) {

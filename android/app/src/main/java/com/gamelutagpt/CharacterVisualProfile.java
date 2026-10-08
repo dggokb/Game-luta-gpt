@@ -3,11 +3,12 @@ package com.gamelutagpt;
 import android.graphics.RectF;
 
 /**
- * Visual registration for one fighter.
+ * Visual registration for one fighter: the canonical authoring cell (frame size and root)
+ * and the world scale every clip of the fighter is drawn at.
  *
- * All animation clips for the same fighter are authored into this geometry.
- * Different fighters may use different frame sizes, roots and world scales.
- * Individual clips never change scale at runtime.
+ * Each atlas keeps its own packed cell and root (wide attacks, tall jumps); the renderer
+ * places a frame by that atlas root, scaled by {@link #worldScale}. Clips never change
+ * scale at runtime.
  */
 final class CharacterVisualProfile {
     final String id;

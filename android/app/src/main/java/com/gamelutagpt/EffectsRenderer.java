@@ -86,7 +86,6 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
-    /** Air dash streaks behind the body; canvas is mirrored so the motion goes right. */
     /** Overdrive: a red glow around the body and sparks rising from the feet. */
     void drawOverdrive(Canvas c, Paint paint, float x, float baseY, float time) {
         float centerY = baseY - 100f;
@@ -108,6 +107,7 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
+    /** Air dash streaks behind the body; canvas is mirrored so the motion goes right. */
     void drawAirDash(Canvas c, Paint paint, float x, float baseY, int color) {
         float centerY = baseY - 90f;
         paint.setStyle(Paint.Style.STROKE);

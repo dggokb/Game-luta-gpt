@@ -102,7 +102,11 @@ public final class PaginaFinal {
     private final ArteProvisoria art = new ArteProvisoria();
     private final Rand rand = new Rand(42);
     private final List<Shard> shards = new ArrayList<>();
+    // Scratch polygons, reused every frame (RenderCanvas uses them right away and keeps nothing).
     private final float[] panelBuffer = new float[8];
+    private final float[] shadowBuffer = new float[8];
+    private final float[] stripBuffer = new float[8];
+    private static final UltraSlot[] SLOTS = UltraSlot.values();
 
     private UltraPack pack;
     private int facing = 1;
@@ -202,7 +206,7 @@ public final class PaginaFinal {
         float previous = time;
         time += dt;
 
-        for (UltraSlot slot : UltraSlot.values()) {
+        for (UltraSlot slot : SLOTS) {
             if (crossed(previous, SLAM_AT[slot.ordinal()])) onSlam(slot);
         }
         if (crossed(previous, HIT1_AT)) impact(0, UltraSlot.GOLPE);
@@ -346,7 +350,7 @@ public final class PaginaFinal {
         boolean finalCoversAll = time >= SLAM_AT[4] + FINAL_EXPAND;
         if (!finalCoversAll) {
             for (int i = 0; i < 4; i++) {
-                UltraSlot slot = UltraSlot.values()[i];
+                UltraSlot slot = SLOTS[i];
                 if (time >= SLAM_AT[i]) drawPanel(c, slot, PANELS[i], time - SLAM_AT[i]);
             }
             drawName(c);
@@ -361,7 +365,7 @@ public final class PaginaFinal {
             float[] from = PANELS[3];
             float[] to = PANELS[4];
             for (int i = 0; i < 8; i++) panelBuffer[i] = from[i] + (to[i] - from[i]) * e;
-            drawPanelBody(c, UltraSlot.FINAL, panelBuffer.clone(), age);
+            drawPanelBody(c, UltraSlot.FINAL, panelBuffer, age);
             drawRing(c);
             drawCracks(c);
         }
@@ -377,7 +381,7 @@ public final class PaginaFinal {
         c.scale(1f + 0.30f * u * u, 1f + 0.30f * u * u, cx, cy);
         c.rotate((slot.ordinal() % 2 == 0 ? 6f : -6f) * u * u, cx, cy);
 
-        float[] shadow = new float[8];
+        float[] shadow = shadowBuffer;
         for (int i = 0; i < 8; i += 2) {
             shadow[i] = poly[i] + 9f;
             shadow[i + 1] = poly[i + 1] + 11f;
@@ -455,12 +459,11 @@ public final class PaginaFinal {
         float offset = (1f - t) * 900f;
 
         // A faixa atravessa a borda de baixo do primeiro painel, como nos mangás.
-        float[] strip = {
-            650f + offset, 206f,
-            1266f + offset, 188f,
-            1266f + offset, 262f,
-            616f + offset, 280f
-        };
+        float[] strip = stripBuffer;
+        strip[0] = 650f + offset;  strip[1] = 206f;
+        strip[2] = 1266f + offset; strip[3] = 188f;
+        strip[4] = 1266f + offset; strip[5] = 262f;
+        strip[6] = 616f + offset;  strip[7] = 280f;
         c.fillPolygon(strip, INK);
         c.drawText(
             pack.definition.name,

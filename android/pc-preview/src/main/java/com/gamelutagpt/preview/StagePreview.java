@@ -31,7 +31,7 @@ public final class StagePreview {
     // Medidas da luta (Arena e CameraRig do jogo).
     private static final float GROUND_Y = 565f;
     private static final float WORLD_WIDTH = 2600f;
-    private static final float CAMERA_ZOOM = 1.12f;
+    private static final float CAMERA_ZOOM = 1.24f;
     private static final float CAMERA_MIN_ZOOM = 0.78f;
     private static final float GROUND_SCREEN_Y = 552f;
     private static final float VW = StageWorld.VW;

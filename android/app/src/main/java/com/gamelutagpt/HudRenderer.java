@@ -496,10 +496,23 @@ final class HudRenderer {
         paint.setTextSize(17f);
         c.drawText("OD", x, y + (left > 0f || !ready ? -2f : 6f), paint);
         paint.setTextSize(10f);
-        if (left > 0f) c.drawText(String.format(java.util.Locale.US, "%.1fs", s.overdriveSeconds()), x, y + 13f, paint);
+        if (left > 0f) c.drawText(overdriveLabel(s.overdriveSeconds()), x, y + 13f, paint);
         else if (!ready) c.drawText("USADO", x, y + 13f, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private int overdriveTenthsShown = -1;
+    private String overdriveText = "";
+
+    /** "3.4s": rebuilt only when the tenth changes, not every frame. */
+    private String overdriveLabel(float seconds) {
+        int tenths = Math.max(0, Math.round(seconds * 10f));
+        if (tenths != overdriveTenthsShown) {
+            overdriveTenthsShown = tenths;
+            overdriveText = tenths / 10 + "." + tenths % 10 + "s";
+        }
+        return overdriveText;
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {

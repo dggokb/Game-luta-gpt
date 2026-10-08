@@ -29,14 +29,15 @@ public final class RaioPreview {
     private static final float GROUND_Y = 565f;
     private static final float VW = StageWorld.VW;
     private static final float VH = StageWorld.VH;
-    private static final float ZOOM = 1.12f;
+    private static final float ZOOM = 1.24f;  // CameraRig.CAMERA_ZOOM
     // CombatConfig: ultraBeam*.
     private static final int CHARGE = 36, EXTEND = 8, INTERVAL = 4, GAP = 6, FADE = 18, BLAST_HITSTOP = 12;
-    private static final float PUSH_PER_HIT = 7f, RECOIL_PER_HIT = 1.5f, STAND_HEIGHT = 226f;
-    // Atlas gerados (GeneratedCharacters): largura, altura e raiz de cada quadro.
+    private static final float PUSH_PER_HIT = 7f, RECOIL_PER_HIT = 1.5f, STAND_HEIGHT = 240.8f;
+    // Atlas gerados (tools/sprites/reports/*.report.json, "packed"): largura, altura e raiz de
+    // cada quadro. Copie de novo quando a folha mudar.
     private static final String SPRITES = "app/src/main/res/drawable-nodpi/";
-    private static final int[] BEAM_ATLAS = {276, 253, 143, 244};
-    private static final int[] HIT_ATLAS = {191, 241, 91, 232};
+    private static final int[] BEAM_ATLAS = {274, 251, 130, 236};
+    private static final int[] HIT_ATLAS = {213, 269, 95, 254};
 
     public static void main(String[] args) throws IOException {
         if (args.length != 4 || !"--quadros".equals(args[2])) {
@@ -136,7 +137,7 @@ public final class RaioPreview {
             f.strength = strength;
 
             raio.drawBehind(canvas, pack, f);
-            sprite(g, hitSprite, HIT_ATLAS, 4, blast >= 0f ? 3 : 1 + (done % 2), dx, dy, -1);
+            sprite(g, hitSprite, HIT_ATLAS, 9, blast >= 0f ? 3 : 1 + (done % 2), dx, dy, -1);
             sprite(g, beamSprite, BEAM_ATLAS, 9, RaioFinal.poseFrame(beamFrame, fireFrame, blastFrame, FADE), ax, GROUND_Y, 1);
             raio.drawFront(canvas, pack, f);
             if (blast >= 0f && clock - blast < 0.22f) {

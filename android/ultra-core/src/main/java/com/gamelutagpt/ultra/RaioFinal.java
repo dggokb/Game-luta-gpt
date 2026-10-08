@@ -207,12 +207,6 @@ public final class RaioFinal {
         c.restore();
     }
 
-    /** Desenha o raio inteiro numa chamada (para quem não separa atrás/na frente). */
-    public void draw(RenderCanvas c, UltraPack pack, Frame f) {
-        drawBehind(c, pack, f);
-        drawFront(c, pack, f);
-    }
-
     // ------------------------------------------------------------ carga
 
     private void drawCharge(RenderCanvas c, UltraPack pack, Frame f) {

@@ -35,6 +35,11 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
+    @Override protected void onDestroy() {
+        if (gameView!=null) gameView.release();
+        super.onDestroy();
+    }
+
     private void hideSystemUi() {
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_FULLSCREEN |

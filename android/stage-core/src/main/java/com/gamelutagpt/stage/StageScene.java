@@ -127,10 +127,6 @@ public final class StageScene {
         return pack.definition;
     }
 
-    public StageCamera camera() {
-        return camera;
-    }
-
     /** Opacidade do reflexo dos lutadores no piso (0 = sem reflexo). */
     public float fighterReflection() {
         return pack.definition.floor != null && floorImage != null ? pack.definition.floor.fighterReflection : 0f;
@@ -462,7 +458,7 @@ public final class StageScene {
             flame[j * 2] = x + sway + width;
             flame[j * 2 + 1] = y;
         }
-        c.fillPolygon(flame.clone(), color);
+        c.fillPolygon(flame, color);
     }
 
     // --------------------------------------------------------------- util
