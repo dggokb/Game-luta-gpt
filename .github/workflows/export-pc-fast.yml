@@ -6,6 +6,7 @@ on:
       - game-luta-pc-export-engine-gpt
     paths:
       - '.github/workflows/export-pc-fast.yml'
+      - 'pc/**'
 
 permissions:
   contents: read
