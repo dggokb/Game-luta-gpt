@@ -675,7 +675,7 @@
       ]
     },
     "KNOCKDOWN": {
-      "atlas": "player_base_fall",
+      "atlas": "p03_fall_down",
       "frames": [
         0,
         1,
@@ -697,7 +697,7 @@
       ]
     },
     "GROUNDED": {
-      "atlas": "player_base_fall",
+      "atlas": "p03_fall_down",
       "frames": [
         7,
         8,
@@ -713,7 +713,7 @@
       ]
     },
     "GETUP": {
-      "atlas": "player_base_getup",
+      "atlas": "p03_getup",
       "frames": [
         0,
         1,
@@ -1225,7 +1225,7 @@
       ]
     },
     "INTRO": {
-      "atlas": "player_base_intro",
+      "atlas": "p03_intro",
       "frames": [
         0,
         1,

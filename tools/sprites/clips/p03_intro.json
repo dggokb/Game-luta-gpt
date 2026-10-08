@@ -1,0 +1,18 @@
+{
+  "id": "p03_intro",
+  "javaName": "P03_INTRO",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_intro_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_intro.png",
+  "report": "tools/sprites/reports/p03_intro.report.json",
+  "preview": "android/app/build/sprite-review/p03_intro-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "frameHeight": 384,
+  "rootX": 180,
+  "rootY": 364,
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Intro: de costas, vira e entra na base larga; 1 a cada 3 quadros, escala da guarda (0.53)."
+}
