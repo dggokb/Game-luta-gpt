@@ -2,7 +2,7 @@
   "id": "player_base_defense_crouch",
   "characterProfile": "player_base",
   "source": "art/sprites/source/player_base_defense_crouch_video_normalized.png",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda baixa segurada e reacao; quadro com clarao pulado; cada quadro no proprio tronco e pes na raiz.",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Escala pelo corpo (o video comeca em pe, mais reto e maior): 0.4256. Guarda baixa segurada e reacao; quadro com clarao pulado; cada quadro no proprio tronco e pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -18,92 +18,92 @@
     {
       "index": 0,
       "outputBbox": [
-        69,
-        77,
-        220,
+        62,
+        60,
+        228,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 12803
+      "opaquePixels": 15464
     },
     {
       "index": 1,
       "outputBbox": [
-        68,
-        77,
-        221,
-        239
+        61,
+        61,
+        229,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13221
+      "minimumMargin": 18,
+      "opaquePixels": 15937
     },
     {
       "index": 2,
       "outputBbox": [
-        69,
-        77,
-        220,
-        239
+        61,
+        60,
+        228,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13059
+      "minimumMargin": 18,
+      "opaquePixels": 15753
     },
     {
       "index": 3,
       "outputBbox": [
-        69,
-        78,
-        220,
+        62,
+        61,
+        228,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 12830
+      "opaquePixels": 15490
     },
     {
       "index": 4,
       "outputBbox": [
-        69,
-        78,
-        220,
+        62,
+        61,
+        228,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 12801
+      "opaquePixels": 15450
     },
     {
       "index": 5,
       "outputBbox": [
-        69,
-        77,
-        220,
+        62,
+        61,
+        228,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 12796
+      "opaquePixels": 15438
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 173,
-    "frameHeight": 183,
-    "rootX": 82,
-    "rootY": 171,
+    "frameWidth": 188,
+    "frameHeight": 199,
+    "rootX": 89,
+    "rootY": 188,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      58,
-      67
+      51,
+      50
     ],
     "decodedBytes": {
       "canonical": 1966080,
-      "packed": 759816
+      "packed": 897888
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5f9c1e1e81e5a759b496bdc6e367ad859c98f1d08327fe8c6440cde17adee4a3",
-      "config": "4425be1f267d5c094691cdb5ca4519c39c6d4cee2bb7b1438202bafe2ee6cbe9",
+      "source": "f283259f8c2518dd599a51cb2c0af8fb027faa2bc3046a9d0269f28818c00446",
+      "config": "457e45d4dd5896a6d7332a41201e07fe8e285b486f4b3c3ea5e93563c5093591",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

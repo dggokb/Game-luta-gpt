@@ -52,10 +52,10 @@ final class GeneratedSpriteLayouts {
     static final int DEFENSE_AIR_ROOT_Y = 232;
     static final int DEFENSE_AIR_FRAME_COUNT = 6;
 
-    static final int DEFENSE_CROUCH_FRAME_WIDTH = 173;
-    static final int DEFENSE_CROUCH_FRAME_HEIGHT = 183;
-    static final int DEFENSE_CROUCH_ROOT_X = 82;
-    static final int DEFENSE_CROUCH_ROOT_Y = 171;
+    static final int DEFENSE_CROUCH_FRAME_WIDTH = 188;
+    static final int DEFENSE_CROUCH_FRAME_HEIGHT = 199;
+    static final int DEFENSE_CROUCH_ROOT_X = 89;
+    static final int DEFENSE_CROUCH_ROOT_Y = 188;
     static final int DEFENSE_CROUCH_FRAME_COUNT = 6;
 
     static final int DEFENSE_STAND_FRAME_WIDTH = 194;
