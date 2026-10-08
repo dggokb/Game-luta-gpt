@@ -1,0 +1,18 @@
+{
+  "id": "player_base_intro",
+  "javaName": "INTRO_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_intro_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_intro.png",
+  "report": "tools/sprites/reports/player_base_intro.report.json",
+  "preview": "android/app/build/sprite-review/intro-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "frameWidth": 288,
+  "frameHeight": 320,
+  "rootX": 140,
+  "rootY": 300,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Respira, ajeita a faixa e entra na guarda; escala da guarda do fim do video (o personagem comeca em pe, mais alto)."
+}

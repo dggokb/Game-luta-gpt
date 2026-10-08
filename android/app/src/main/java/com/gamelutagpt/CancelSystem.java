@@ -65,9 +65,14 @@ final class CancelSystem {
         }
     }
 
-    /** Ground L/M/H, crouching 2X or airborne jX for the current stance. */
+    /**
+     * Ground L/M/H, crouching 2X or airborne jX for the current stance. In the air, down
+     * held picks j2X when the character has it (a second air version), else jX.
+     */
     static String binding(CombatFighter f, String button, boolean crouch) {
-        if (!f.grounded) return "j" + button;
+        if (!f.grounded) {
+            return crouch && f.character().moves.containsKey("j2" + button) ? "j2" + button : "j" + button;
+        }
         return crouch ? "2" + button : button;
     }
 }

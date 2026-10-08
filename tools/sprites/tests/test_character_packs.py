@@ -127,7 +127,8 @@ class CharacterPackTests(unittest.TestCase):
         for binding in ('L','M','H'):
             self.assertEqual(shared(first,binding),shared(second,binding))
         self.assertEqual({'S2','S3','S4'},set(first['specialMoves']))
-        self.assertEqual(set(pipeline.BINDINGS),set(first['moves']))
+        self.assertEqual(set(pipeline.BINDINGS),set(first['moves'])-set(pipeline.AIR_DOWN_BINDINGS))
+        self.assertIn('j2H',first['moves'])
         self.assertEqual(set(pipeline.BINDINGS),set(second['moves']))
         self.assertIn('animation',first['moves']['2L'])
         self.assertEqual('CROUCH',second['moves']['2L']['pose'])
@@ -306,15 +307,10 @@ class CharacterPackTests(unittest.TestCase):
             self.assertEqual(clip['expectedFrames'],report['layout']['frameCount'])
             self.assertTrue(report['passed'])
 
-    def test_player_base_defense_and_fall_share_one_scale_and_new_states(self):
+    def test_player_base_defense_and_fall_pass_and_new_states(self):
         pipeline.build(self.root)
-        scales={}
-        # The guards come from video (prepared grid); the drawn fall keeps its fixed scale.
-        for key in ('fall',):
-            report=json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())
-            self.assertTrue(report['passed']);scales[key]=round(report['scale'],2)
-        self.assertEqual({0.37},set(scales.values()))
-        for key in ('defense_stand','defense_crouch','defense_air'):
+        # Guards and the fall come from video (prepared grid, scaled by the video tool).
+        for key in ('defense_stand','defense_crouch','defense_air','fall'):
             self.assertTrue(json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())['passed'])
         pack=json.loads(self.path.read_text())
         self.assertEqual('player_base_defense_air',pack['animations']['DEFENSE_AIR']['atlas'])
@@ -323,7 +319,7 @@ class CharacterPackTests(unittest.TestCase):
         self.assertIn('DEFENSE_AIR = "DEFENSE_AIR"',states)
 
     def test_fixed_scale_requires_a_reason(self):
-        path=self.root/'tools/sprites/clips/player_base_fall.json';d=json.loads(path.read_text())
+        path=self.root/'tools/sprites/clips/player_base_hit_crouch.json';d=json.loads(path.read_text())
         d.pop('scaleReason');path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'requires scaleReason'):pipeline.build(self.root)
 
@@ -340,12 +336,9 @@ class CharacterPackTests(unittest.TestCase):
             px=a.load();cols=[min((y for y in range(y0,y1) if px[x,y]),default=y1) for x in range(x0,x1)]
             left=sum(cols[:len(cols)//3])/(len(cols)//3);right=sum(cols[-(len(cols)//3):])/(len(cols)//3)
             return 'left' if left<right else 'right'
-        self.assertEqual(lying_head_side('player_base_fall',3),lying_head_side('player_base_getup',0))
-        clip=json.loads((self.root/'tools/sprites/clips/player_base_getup.json').read_text())
-        self.assertEqual([0,1],clip['mirrorFrames'])
-        scales={round(json.loads((self.root/f'tools/sprites/reports/player_base_{k}.report.json').read_text())['scale'],3)
-                for k in ('hit_crouch','hit_air','getup')}
-        self.assertEqual(1,len(scales))
+        pack=json.loads(self.path.read_text())
+        last_lying=pack['animations']['GROUNDED']['frames'][-1]
+        self.assertEqual(lying_head_side('player_base_fall',last_lying),lying_head_side('player_base_getup',0))
 
     def test_player_two_generated_art_passes_own_profile(self):
         pipeline.build(self.root)

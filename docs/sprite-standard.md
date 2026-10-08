@@ -124,6 +124,10 @@ Os IDs de animação de ataque são livres: não é necessário alterar um enum 
 do especial é esticado sobre a animação. `ULTRA` é a folha de 9 poses do raio final do
 ultra; o jogo escolhe o quadro pela fase do raio (veja `docs/ultra-pagina-final.md`).
 
+Além dos 9 golpes obrigatórios, `moves` aceita `j2L`, `j2M` e `j2H`: a versão no ar com ↓
+segurado (ex.: o p01 tem jH que joga na parede e ↓ + jH que crava no chão). Sem eles, ↓ no
+ar usa o jX normal.
+
 `specialMoves` declara especiais de comando (`S2` a `S9`): os mesmos campos de um golpe de
 `moves` (animação, dano, frame data, cancelamentos) mais `command` (direções relativas,
 como a energia: 1 frente, 3 baixo, 5 trás) e `buttons` (opcional, padrão `["L","M","H"]`).

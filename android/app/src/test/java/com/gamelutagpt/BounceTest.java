@@ -45,7 +45,7 @@ public class BounceTest {
             fail("H never hit");
         }
 
-        /** Both in the air, the defender in air hitstun right in front; the attacker swings jH. */
+        /** Both in the air, the defender in air hitstun right in front; the attacker swings ↓ + jH (j2H). */
         void airHeavy() {
             for (int i = 0; i < 2; i++) {
                 f(i).grounded = false;
@@ -54,9 +54,10 @@ public class BounceTest {
             }
             f(1).status = CombatFighter.Status.AIR_HITSTUN;
             f(1).stunLeft = f(1).stunTotal = 60;
+            in[0].direction = 3;
             in[0].heavy = true;
             step();
-            assertEquals("jH", attackId(0));
+            assertEquals("j2H", attackId(0));
         }
     }
 

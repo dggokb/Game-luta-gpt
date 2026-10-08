@@ -55,7 +55,9 @@ public class SpriteIntegrationTest {
         assertEquals(246f,second.profile.rootY,.001f);
         assertTrue(first.animations.keySet().containsAll(second.animations.keySet()));
         assertTrue(first.moves.keySet().containsAll(second.moves.keySet()));
-        assertEquals(first.moves.keySet(),second.moves.keySet());
+        // Beyond the shared inputs a character may add air ↓ + button versions (j2X).
+        java.util.Set<String> extra=new java.util.HashSet<>(first.moves.keySet());extra.removeAll(second.moves.keySet());
+        for(String id:extra)assertTrue("Unexpected extra move "+id,id.startsWith("j2"));
         assertNotNull(first.moves.get("2L").animation);
         assertNotNull(first.moves.get("2M").animation);
         // Inputs without dedicated art declare their pose explicitly.
@@ -531,6 +533,19 @@ public class SpriteIntegrationTest {
         assertTrue("Bodies overlap: "+(dx-px),dx-px>=gap-0.01f);
         assertTrue("Opponent should be pushed",dx>520f);
         assertEquals(1,player().facing);
+    }
+    @Test public void introPlaysBeforeTheFightAndHoldsTheControls()throws Exception {
+        invoke("startIntro",new Class<?>[0]);
+        float x=player().x;
+        press(PadInput.Button.HEAVY,0);frames(1);
+        assertEquals("INTRO",motion().clip);
+        assertFalse("No attack during the intro",player().attacking());
+        int total=(Integer)get("introTotalFrames");
+        frames(total);
+        assertNotEquals("INTRO",motion().clip);
+        assertEquals(x,player().x,0.01f);
+        press(PadInput.Button.HEAVY,0);frames(1);
+        assertTrue("Fight is on after the intro",player().attacking());
     }
     @Test public void airBlockstunShowsTheAirGuardImpact()throws Exception {
         player().grounded=false;player().y=420f;player().vy=-200f;

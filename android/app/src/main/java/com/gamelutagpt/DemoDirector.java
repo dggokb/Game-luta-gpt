@@ -179,13 +179,16 @@ final class DemoDirector {
                     c -> c.placeApart(X - 200f, 12f),
                     (c, p1, cpu) -> c.chain(c.p1(), p1),
                     c -> c.cue("WALL_BOUNCE")),
-                new Step("GROUND BOUNCE", "pulam juntos; jM e jH: o jH crava o CPU no chão e ele quica", 150,
+                new Step("GROUND BOUNCE", "pulam juntos; jM e ↓+jH: o ↓+jH crava o CPU no chão e ele quica", 150,
                     c -> c.placeApart(X, 12f),
                     (c, p1, cpu) -> {
                         if (c.t == 0) { p1.jump = true; cpu.jump = true; }
                         String id = c.attackId(c.p1());
                         if (c.t == 9) p1.medium = true;
-                        if (id.equals("jM") && c.p1().outcome == CombatFighter.Outcome.HIT) p1.heavy = true;
+                        if (id.equals("jM") && c.p1().outcome == CombatFighter.Outcome.HIT) {
+                            p1.direction = 3;
+                            p1.heavy = true;
+                        }
                     },
                     c -> c.cue("GROUND_BOUNCE")),
             };

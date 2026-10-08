@@ -1,0 +1,121 @@
+{
+  "id": "player_base_jump_heavy_down",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/player_base_jump_heavy_down_video_normalized.png",
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador. Soco de cima para baixo (o 1o jH de video), usado no baixo + H no ar.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.0,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 256,
+    "rootX": 150,
+    "rootY": 238,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        73,
+        51,
+        250,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15490
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        77,
+        52,
+        248,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15550
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        56,
+        80,
+        223,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14985
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        56,
+        81,
+        223,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14963
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        56,
+        81,
+        222,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14925
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        56,
+        81,
+        223,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14923
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        56,
+        82,
+        222,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14864
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 214,
+    "frameHeight": 207,
+    "rootX": 104,
+    "rootY": 195,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      46,
+      43
+    ],
+    "decodedBytes": {
+      "canonical": 2752512,
+      "packed": 1240344
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "eca6c68e0cb9189ba15397b4e86580253fe4996297ccf3da18e9ca28c66a68d4",
+      "config": "d9c4251cb08f4e0e3e03766de85e2ecc12de664fc477d51d92a84803768a69cd",
+      "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
+    }
+  }
+}

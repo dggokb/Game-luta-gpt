@@ -201,8 +201,8 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 
 | launchType | Onde (packs atuais) | O que faz |
 | --- | --- | --- |
-| `wallBounce` | **H** | Só **dentro de combo** (o H solto no neutro é um golpe normal). O defensor voa a 1500 u/s até a "parede" (a borda da arena ou 620 px à frente do atacante, a borda da tela) e quica: volta um pouco e sobe, aberto para continuar. Usado o do combo: hit normal. |
-| `groundBounce` | **jH** | Alvo no ar: é cravado no chão (1500 u/s) e quica para cima. Usado o do combo: no super pulo vira o slam de antes (queda forçada); fora dele, hit aéreo normal. |
+| `wallBounce` | **H**, **jH** (p01) | Só **dentro de combo** (o H solto no neutro é um golpe normal). O defensor voa a 1500 u/s até a "parede" (a borda da arena ou 620 px à frente do atacante, a borda da tela) e quica: volta um pouco e sobe, aberto para continuar. Usado o do combo: hit normal. |
+| `groundBounce` | **↓ + jH** (`j2H`, p01) | Alvo no ar: é cravado no chão (1500 u/s) e quica para cima. Usado o do combo: no super pulo vira o slam de antes (queda forçada); fora dele, hit aéreo normal. |
 
 - Depois de um bounce o defensor tem `bounceHitstunFrames` (48) de hitstun, pode ser
   juggleado e **cai derrubado** (não se recupera no ar: `hardFall`).

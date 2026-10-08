@@ -117,6 +117,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int ultraDarkAlpha;
     private float ultraAuraTime;
     private int ultraPhaseSeen = -1;
+    /** Intro clock (frames) while both fighters play INTRO; -1 when the fight is on. */
+    private int introFrame = -1;
+    private int introTotalFrames;
+    private boolean introPlayed;
     /** Ultra playing now (cinematic, then the final beam). */
     private UltraPack ultraPack;
     // Final beam: drawn from the engine state, with its own clock (keeps flickering in hitstop).
@@ -249,6 +253,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        if (!introPlayed) {
+            introPlayed = true;
+            startIntro();
+        }
         surfaceReady = true;
         startLoopIfReady();
     }
@@ -347,7 +355,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         boolean tagging = isTagAnimationActive();
 
-        if (demo.active()) {
+        boolean intro = introFrame >= 0;
+        if (intro) {
+            // Both fighters play their INTRO; nobody moves until it ends.
+            pad.drainInto(ignoredInput);
+            playerInput.clear();
+            opponentInput.clear();
+        } else if (demo.active()) {
             // Touches never reach the fight during a demo.
             pad.drainInto(ignoredInput);
             demo.fill(playerInput, opponentInput);
@@ -389,6 +403,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateTeamVisuals();
         updateFighterSprite(spriteFighterRenderer, player(), true);
         updateFighterSprite(opponentSpriteRenderer, opponent(), false);
+        if (intro && ++introFrame >= introTotalFrames) introFrame = -1;
+    }
+
+    /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
+    void startIntro() {
+        float longest = 0f;
+        for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
+            CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
+            if (clip != null) longest = Math.max(longest, clip.duration);
+        }
+        introTotalFrames = (int)Math.ceil(longest / FIXED_STEP);
+        introFrame = introTotalFrames > 0 ? 0 : -1;
     }
 
     private final HudRenderer.State hudState = new HudRenderer.State() {
@@ -1158,6 +1184,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         CharacterDefinition character = f.character();
         String animation = reactionState(renderer, f);
         float animationElapsed = reactionElapsed;
+        CharacterDefinition.Animation introClip = character.animations.get(SpriteStates.INTRO);
+        if (introFrame >= 0 && introClip != null) {
+            // A shorter intro holds its last frame (the guard) until the longest one ends.
+            animation = SpriteStates.INTRO;
+            animationElapsed = Math.min(introClip.duration - 0.0001f, introFrame * FIXED_STEP);
+        }
 
         int guard = f.status == CombatFighter.Status.BLOCKSTUN ? f.lastGuard : f.anticipatedGuard;
         if (animation == null && guard != CombatFighter.GUARD_NONE) {

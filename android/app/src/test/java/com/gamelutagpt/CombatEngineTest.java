@@ -698,6 +698,21 @@ public class CombatEngineTest {
         assertFalse("Stands while it plays", s.f(0).crouching);
     }
 
+    @Test public void downPlusHeavyInTheAirIsTheSecondAirHeavy() {
+        for (boolean down : new boolean[] {false, true}) {
+            Sim s = far();
+            s.f(0).grounded = false;
+            s.f(0).y = Arena.GROUND_Y - 160f;
+            s.f(0).vy = -400f;
+            s.in[0].direction = down ? 3 : 0;
+            s.in[0].heavy = true;
+            s.step();
+            assertEquals(down ? "j2H" : "jH", s.attackId(0));
+        }
+        assertEquals(AttackDefinition.Launch.WALL_BOUNCE, BASE.attack("jH").launch);
+        assertEquals(AttackDefinition.Launch.GROUND_BOUNCE, BASE.attack("j2H").launch);
+    }
+
     @Test public void normalsCancelIntoCommandSpecialsOnHit() {
         Sim s = close();
         s.in[0].medium = true;
