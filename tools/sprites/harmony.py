@@ -38,13 +38,15 @@ def _read(path):
 
 
 def frame_cell(root, atlas_id, frame, cache):
-    clip = _read(root / f'tools/sprites/clips/{atlas_id}.json')
-    packed = _read(root / f'tools/sprites/reports/{atlas_id}.report.json')['packed']
+    """One packed frame of an atlas; `cache` keeps each atlas image and layout."""
     if atlas_id not in cache:
-        cache[atlas_id] = Image.open(root / clip['output']).convert('RGBA')
+        clip = _read(root / f'tools/sprites/clips/{atlas_id}.json')
+        packed = _read(root / f'tools/sprites/reports/{atlas_id}.report.json')['packed']
+        cache[atlas_id] = (Image.open(root / clip['output']).convert('RGBA'), packed)
+    image, packed = cache[atlas_id]
     col, row = frame % packed['columns'], frame // packed['columns']
     w, h = packed['frameWidth'], packed['frameHeight']
-    return cache[atlas_id].crop((col * w, row * h, col * w + w, row * h + h)), packed
+    return image.crop((col * w, row * h, col * w + w, row * h + h)), packed
 
 
 def measure(cell, packed, scale):

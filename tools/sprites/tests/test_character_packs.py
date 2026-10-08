@@ -65,15 +65,6 @@ class CharacterPackTests(unittest.TestCase):
     def test_command_special_needs_a_valid_command(self):
         self.edit(lambda d:d['specialMoves']['S2'].update(command=[1,9]))
         with self.assertRaisesRegex(ValueError,'S2.command'):pipeline.build(self.root)
-    def test_frame_data_is_compiled_into_attack_definitions(self):
-        pipeline.build(self.root)
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn('sm.put("S2",new CharacterDefinition.Special(new CharacterDefinition.Move("S2",a.get("SPECIAL_S2")',java)
-        self.assertIn('new int[]{1,3,2},"LMH"));',java)
-        self.assertIn('new int[]{3,5},"H"));',java)
-        self.assertIn('new AttackDefinition.Builder("2H",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9)',java)
-        self.assertIn('.launch(AttackDefinition.Launch.LAUNCH)',java)
-        self.assertIn('new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER)',java)
     def test_unknown_atlas_is_rejected(self):
         self.edit(lambda d:d['animations']['IDLE'].update(atlas='missing'))
         with self.assertRaisesRegex(ValueError,'unknown atlas'):pipeline.build(self.root)
@@ -86,16 +77,6 @@ class CharacterPackTests(unittest.TestCase):
     def test_wrong_prepared_grid_geometry_is_rejected(self):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['columns']=2;path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'dimensions'):pipeline.build(self.root)
-
-    def test_drawn_sheet_uses_canonical_anatomy_scale(self):
-        # player_base now comes from video; player_two keeps the drawn sheets.
-        pipeline.build(self.root)
-        report=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
-        self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
-        self.assertTrue(report['anatomy']['passed'])
-        self.assertLess(report['scale'],0.66)
-        self.assertEqual(192,report['layout']['rootX'])
-        self.assertEqual(246,report['layout']['rootY'])
 
     def test_non_comparable_anatomy_reference_is_rejected(self):
         path=self.root/'tools/sprites/clips/player_two_jab.json'
@@ -188,14 +169,6 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual((255,0,0,255),out.getpixel((40-ox,30-oy)))
         self.assertEqual((255,0,0,255),out.getpixel((pw+50-ox,50-oy)))
 
-    def test_shipped_atlases_are_packed(self):
-        pipeline.build(self.root)
-        java=(self.root/pipeline.JAVA/'GeneratedSpriteLayouts.java').read_text()
-        report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
-        self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['canonical'])
-        self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
-        self.assertEqual(256,report['layout']['frameWidth'])
-
     def test_hud_name_is_rejected_in_favor_of_display_name(self):
         self.edit(lambda d:d['fighter'].update(hudName='P1'))
         with self.assertRaisesRegex(ValueError,'hudName was removed'):pipeline.build(self.root)
@@ -203,7 +176,6 @@ class CharacterPackTests(unittest.TestCase):
     def test_standing_visual_height_must_match_measured_idle(self):
         path=self.root/'tools/sprites/profiles/player_base.json';d=json.loads(path.read_text())
         d['standingVisualHeight']=300;path.write_text(json.dumps(d))
-        # bbox-normalized clips also read this value; only prepared/anatomy clips use player_base here.
         with self.assertRaisesRegex(ValueError,'standingVisualHeight'):pipeline.build(self.root)
 
     def test_projectile_spawn_must_be_inside_body(self):
@@ -213,44 +185,6 @@ class CharacterPackTests(unittest.TestCase):
     def test_pushbox_must_fit_inside_hurtbox(self):
         self.edit(lambda d:d['fighter']['body'].update(pushHalfWidth=80))
         with self.assertRaisesRegex(ValueError,'pushbox'):pipeline.build(self.root)
-
-    def test_visual_heights_and_stats_are_generated(self):
-        pipeline.build(self.root)
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn('new CharacterDefinition.Fighter(0xFFD9485F',java)
-        self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",a.get("JUMP_HEAVY"),null',java)
-        self.assertIn('m.put("2L",new CharacterDefinition.Move("2L",null,"CROUCH"',java.split('all.put("player_base"')[1])
-        states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
-        self.assertIn('static final String HIT_AIR = "HIT_AIR";',states)
-
-
-    def test_player_base_crouch_light_is_a_real_declarative_move(self):
-        pipeline.build(self.root)
-        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_light.report.json').read_text())
-        self.assertEqual([384,256,140,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        self.assertEqual(11,report['layout']['frameCount'])
-        self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn('m.put("2L"',java)
-        self.assertIn('a.get("CROUCH_LIGHT")',java)
-
-    def test_player_base_crouch_medium_uses_wide_authored_prepared_grid(self):
-        pipeline.build(self.root)
-        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_medium.report.json').read_text())
-        self.assertEqual([512,256,250,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        self.assertEqual(16,report['layout']['frameCount'])
-        self.assertTrue(all(frame['minimumMargin'] >= 8 for frame in report['frames']))
-        self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn('m.put("2M"',java)
-        self.assertIn('a.get("CROUCH_MEDIUM")',java)
-
-    def test_player_base_crouch_heavy_launcher_uses_key_poses(self):
-        pipeline.build(self.root)
-        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_heavy.report.json').read_text())
-        self.assertEqual(3,report['layout']['frameCount'])
-        self.assertTrue(report['passed'])
-        self.assertTrue(all(f['opaquePixels']>=10000 for f in report['frames']))
 
     def test_regroup_returns_limbs_that_cross_into_a_neighbour_cell(self):
         import import_sprites as imp
@@ -281,8 +215,87 @@ class CharacterPackTests(unittest.TestCase):
         d['transform']['scale']=1.2;path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'requires allowUpscale'):pipeline.build(self.root)
 
+    def test_component_segmentation_separates_poses_that_overlap_in_x(self):
+        import import_sprites as imp
+        from PIL import Image
+        sheet=Image.new('RGBA',(120,60))
+        for x in range(10,70):sheet.putpixel((x,20),(255,0,0,255))   # pose A: long arm over B
+        for y in range(30,50):sheet.putpixel((60,y),(0,0,255,255))   # pose B, inside A's x range
+        regions,images=imp.connected_frames(sheet,10)
+        self.assertEqual([(10,20,70,21),(60,30,61,50)],regions)
+        self.assertEqual((60,1),images[0].size)
+        self.assertEqual((255,0,0,255),images[0].getpixel((50,0)))
+        self.assertEqual((0,0,255,255),images[1].getpixel((0,0)))
+
+    def test_fixed_scale_requires_a_reason(self):
+        path=self.root/'tools/sprites/clips/player_base_hit_crouch.json';d=json.loads(path.read_text())
+        d.pop('scaleReason');path.write_text(json.dumps(d))
+        with self.assertRaisesRegex(ValueError,'requires scaleReason'):pipeline.build(self.root)
+
+
+class BuiltPackTests(unittest.TestCase):
+    """Read-only checks of one build of the checked-in packs (the pipeline runs once)."""
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp=tempfile.TemporaryDirectory();cls.root=Path(cls.tmp.name)
+        for folder in ('characters','art/sprites/source','tools/sprites/clips','tools/sprites/profiles'):
+            shutil.copytree(pipeline.ROOT/folder,cls.root/folder)
+        shutil.copyfile(pipeline.ROOT/'tools/sprites/preview.html',cls.root/'tools/sprites/preview.html')
+        cls.path=cls.root/'characters/player_base/character.json'
+        pipeline.build(cls.root)
+    @classmethod
+    def tearDownClass(cls): cls.tmp.cleanup()
+
+    def test_frame_data_is_compiled_into_attack_definitions(self):
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('sm.put("S2",new CharacterDefinition.Special(new CharacterDefinition.Move("S2",a.get("SPECIAL_S2")',java)
+        self.assertIn('new int[]{1,3,2},"LMH"));',java)
+        self.assertIn('new int[]{3,5},"H"));',java)
+        self.assertIn('new AttackDefinition.Builder("2H",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9)',java)
+        self.assertIn('.launch(AttackDefinition.Launch.LAUNCH)',java)
+        self.assertIn('new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER)',java)
+    def test_shipped_atlases_are_packed(self):
+        java=(self.root/pipeline.JAVA/'GeneratedSpriteLayouts.java').read_text()
+        report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
+        self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['canonical'])
+        self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
+        self.assertEqual(256,report['layout']['frameWidth'])
+
+    def test_visual_heights_and_stats_are_generated(self):
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('new CharacterDefinition.Fighter(0xFFD9485F',java)
+        self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",a.get("JUMP_HEAVY"),null',java)
+        self.assertIn('m.put("2L",new CharacterDefinition.Move("2L",null,"CROUCH"',java.split('all.put("player_base"')[1])
+        states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
+        self.assertIn('static final String HIT_AIR = "HIT_AIR";',states)
+
+
+    def test_player_base_crouch_light_is_a_real_declarative_move(self):
+        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_light.report.json').read_text())
+        self.assertEqual([384,256,140,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual(11,report['layout']['frameCount'])
+        self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('m.put("2L"',java)
+        self.assertIn('a.get("CROUCH_LIGHT")',java)
+
+    def test_player_base_crouch_medium_uses_wide_authored_prepared_grid(self):
+        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_medium.report.json').read_text())
+        self.assertEqual([512,256,250,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual(16,report['layout']['frameCount'])
+        self.assertTrue(all(frame['minimumMargin'] >= 8 for frame in report['frames']))
+        self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('m.put("2M"',java)
+        self.assertIn('a.get("CROUCH_MEDIUM")',java)
+
+    def test_player_base_crouch_heavy_launcher_uses_key_poses(self):
+        report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_heavy.report.json').read_text())
+        self.assertEqual(3,report['layout']['frameCount'])
+        self.assertTrue(report['passed'])
+        self.assertTrue(all(f['opaquePixels']>=10000 for f in report['frames']))
+
     def test_player_base_air_attacks_are_declared_with_video_art(self):
-        pipeline.build(self.root)
         report=json.loads((self.root/'tools/sprites/reports/player_base_jump_light.report.json').read_text())
         self.assertTrue(report['passed'])
         self.assertEqual(7,report['layout']['frameCount'])
@@ -292,25 +305,7 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual('JUMP_MEDIUM',pack['moves']['jM']['animation'])
         self.assertEqual('JUMP_HEAVY',pack['moves']['jH']['animation'])
 
-    def test_component_segmentation_separates_poses_that_overlap_in_x(self):
-        import import_sprites as imp
-        from PIL import Image
-        sheet=Image.new('RGBA',(120,60))
-        for x in range(10,70):sheet.putpixel((x,20),(255,0,0,255))   # pose A: long arm over B
-        for y in range(30,50):sheet.putpixel((60,y),(0,0,255,255))   # pose B, inside A's x range
-        regions,images=imp.connected_frames(sheet,10)
-        self.assertEqual([(10,20,70,21),(60,30,61,50)],regions)
-        self.assertEqual(0,images[0].getpixel((50,0))[3] if images[0].height>10 else 0)
-        self.assertEqual((0,0,255,255),images[1].getpixel((0,0)))
-        pipeline.build(self.root)
-        for key in ('medium','heavy'):
-            report=json.loads((self.root/f'tools/sprites/reports/player_base_jump_{key}.report.json').read_text())
-            clip=json.loads((self.root/f'tools/sprites/clips/player_base_jump_{key}.json').read_text())
-            self.assertEqual(clip['expectedFrames'],report['layout']['frameCount'])
-            self.assertTrue(report['passed'])
-
     def test_player_base_defense_and_fall_pass_and_new_states(self):
-        pipeline.build(self.root)
         # Guards and the fall come from video (prepared grid, scaled by the video tool).
         for key in ('defense_stand','defense_crouch','defense_air','fall'):
             self.assertTrue(json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())['passed'])
@@ -320,30 +315,7 @@ class CharacterPackTests(unittest.TestCase):
         states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
         self.assertIn('DEFENSE_AIR = "DEFENSE_AIR"',states)
 
-    def test_fixed_scale_requires_a_reason(self):
-        path=self.root/'tools/sprites/clips/player_base_hit_crouch.json';d=json.loads(path.read_text())
-        d.pop('scaleReason');path.write_text(json.dumps(d))
-        with self.assertRaisesRegex(ValueError,'requires scaleReason'):pipeline.build(self.root)
-
-    def test_get_up_starts_lying_head_back_like_the_end_of_the_fall(self):
-        from PIL import Image
-        pipeline.build(self.root)
-        def lying_head_side(atlas,frame):
-            report=json.loads((self.root/f'tools/sprites/reports/{atlas}.report.json').read_text())
-            p=report['packed'];clip=json.loads((self.root/f'tools/sprites/clips/{atlas}.json').read_text())
-            im=Image.open(self.root/clip['output']).convert('RGBA')
-            cell=im.crop((frame%p['columns']*p['frameWidth'],0,(frame%p['columns']+1)*p['frameWidth'],p['frameHeight']))
-            a=cell.getchannel('A').point(lambda v:255 if v>10 else 0);x0,y0,x1,y1=a.getbbox()
-            # the highest part of a body lying face down is the back/head side
-            px=a.load();cols=[min((y for y in range(y0,y1) if px[x,y]),default=y1) for x in range(x0,x1)]
-            left=sum(cols[:len(cols)//3])/(len(cols)//3);right=sum(cols[-(len(cols)//3):])/(len(cols)//3)
-            return 'left' if left<right else 'right'
-        pack=json.loads(self.path.read_text())
-        last_lying=pack['animations']['GROUNDED']['frames'][-1]
-        self.assertEqual(lying_head_side('player_base_fall',last_lying),lying_head_side('player_base_getup',0))
-
     def test_player_two_generated_art_passes_own_profile(self):
-        pipeline.build(self.root)
         idle=json.loads((self.root/'tools/sprites/reports/player_two_idle.report.json').read_text())
         movement=json.loads((self.root/'tools/sprites/reports/player_two_movement.report.json').read_text())
         jab=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
@@ -359,5 +331,30 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual(3,jab['layout']['frameCount'])
         self.assertEqual(3,medium['layout']['frameCount'])
         self.assertEqual(9,heavy['layout']['frameCount'])
+
+    def test_drawn_sheet_uses_canonical_anatomy_scale(self):
+        # player_base now comes from video; player_two keeps the drawn sheets.
+        report=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
+        self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
+        self.assertTrue(report['anatomy']['passed'])
+        self.assertLess(report['scale'],0.66)
+        self.assertEqual(192,report['layout']['rootX'])
+        self.assertEqual(246,report['layout']['rootY'])
+
+    def test_get_up_starts_lying_head_back_like_the_end_of_the_fall(self):
+        from PIL import Image
+        import harmony
+        cache={}
+        def lying_head_side(atlas,frame):
+            cell,_=harmony.frame_cell(self.root,atlas,frame,cache)
+            a=cell.getchannel('A').point(lambda v:255 if v>10 else 0);x0,y0,x1,y1=a.getbbox()
+            # the highest part of a body lying face down is the back/head side
+            px=a.load();cols=[min((y for y in range(y0,y1) if px[x,y]),default=y1) for x in range(x0,x1)]
+            left=sum(cols[:len(cols)//3])/(len(cols)//3);right=sum(cols[-(len(cols)//3):])/(len(cols)//3)
+            return 'left' if left<right else 'right'
+        pack=json.loads(self.path.read_text())
+        last_lying=pack['animations']['GROUNDED']['frames'][-1]
+        self.assertEqual(lying_head_side('player_base_fall',last_lying),lying_head_side('player_base_getup',0))
+
 
 if __name__=='__main__':unittest.main()

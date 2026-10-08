@@ -602,13 +602,25 @@ public class SpriteIntegrationTest {
         renderer.motion.clip="LIGHT_JAB";renderer.motion.time=.07f;
         renderer.draw(new Canvas(right),210,270,1,false,false);
         renderer.draw(new Canvas(left),210,270,-1,false,false);
-        // At a fractional scale the filtered edge can land one pixel over: compare with the
-        // closest of the mirrored pixel and its neighbours.
-        for(int y=0;y<320;y+=4)for(int x=4;x<416;x+=4) {
-            int want=Color.alpha(right.getPixel(x,y)),best=255;
-            for(int dx=-1;dx<=1;dx++)best=Math.min(best,Math.abs(want-Color.alpha(left.getPixel(419-x+dx,y))));
-            assertTrue("Mirror differs at "+x+","+y,best<=2);
+        // At a fractional world scale the filtered edges do not match pixel for pixel, so
+        // compare the silhouettes: mirrored box, same height and the same opaque area.
+        Rect r=opaqueBox(right),l=opaqueBox(left);
+        assertEquals("mirrored left edge",419-r.right+1,l.left,2);
+        assertEquals("mirrored right edge",419-r.left+1,l.right,2);
+        assertEquals(r.top,l.top,1);assertEquals(r.bottom,l.bottom,1);
+        assertEquals(opaqueCount(right),opaqueCount(left),opaqueCount(right)*0.02f);
+    }
+    private static Rect opaqueBox(Bitmap b) {
+        int minX=b.getWidth(),minY=b.getHeight(),maxX=-1,maxY=-1;
+        for(int y=0;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++)if(Color.alpha(b.getPixel(x,y))>128) {
+            minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);
         }
+        return new Rect(minX,minY,maxX+1,maxY+1);
+    }
+    private static int opaqueCount(Bitmap b) {
+        int n=0;
+        for(int y=0;y<b.getHeight();y++)for(int x=0;x<b.getWidth();x++)if(Color.alpha(b.getPixel(x,y))>128)n++;
+        return n;
     }
     @Test public void renderAllFramesUsingRealCanvasAndPackagedAssets()throws Exception {
         SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication());

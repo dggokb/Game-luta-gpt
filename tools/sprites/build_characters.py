@@ -39,9 +39,12 @@ STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
 REQUIRED_ATTACK = ('startupFrames','activeFrames','recoveryFrames','hitstunFrames','blockstunFrames','hitstopFrames',
                    'cancelWindows','cancelInto','pushbackOnHit','pushbackOnBlock')
 FACINGS = {'right':1,'left':-1}
+# Where each clip output may be written.
+OUTPUT_FOLDERS = {'output':'android/app/src/main/res/drawable-nodpi/','report':'tools/sprites/reports/',
+                  'preview':'android/app/build/sprite-review/'}
 
 def read(path):
-    return json.loads(path.read_text())
+    return json.loads(path.read_text(encoding='utf-8'))
 
 def positive(value, name):
     if isinstance(value, bool) or not isinstance(value, (int,float)) or not math.isfinite(value) or value <= 0:
@@ -77,7 +80,7 @@ def validate_fighter(pack):
     if not re.fullmatch('#[0-9A-Fa-f]{6}', f.get('color','')):
         raise ValueError(f'{name}: color must be #RRGGBB')
     positive_int(f['maxLife'], name+'.maxLife')
-    if not isinstance(f['autoCombo'],list) or any(b not in ('L','M','H') for b in f['autoCombo']):
+    if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
         raise ValueError(f'{name}: autoCombo accepts only L, M and H')
     body = f['body']
     for key in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'): positive(body[key], f'{name}.body.{key}')
@@ -379,7 +382,7 @@ def compile_packs(root, results):
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']
-    (root / JAVA / 'GeneratedCharacters.java').write_text('\n'.join(lines))
+    (root / JAVA / 'GeneratedCharacters.java').write_text('\n'.join(lines), encoding='utf-8')
     return packs
 
 def write_states(root):
@@ -390,7 +393,7 @@ def write_states(root):
     lines += [f' static final String {s} = {q(s)};' for s in REQUIRED + OPTIONAL]
     lines += [f' static final String POSE_{p} = {q(p)};' for p in POSES]
     lines += ['}','']
-    (root / JAVA / 'SpriteStates.java').write_text('\n'.join(lines))
+    (root / JAVA / 'SpriteStates.java').write_text('\n'.join(lines), encoding='utf-8')
 
 PACK_MARGIN = 8
 
@@ -456,13 +459,13 @@ def build(root=ROOT, check=False):
             results=[];outputs=set();ids=set();names=set()
             for path in sorted((stage/'tools/sprites/clips').glob('*.json')):
                 cfg=read(path)
-                if not re.fullmatch('[a-z][a-z0-9_]*',cfg['id']) or not re.fullmatch('[A-Z][A-Z0-9_]*',cfg['javaName']): raise ValueError('Invalid atlas id/javaName')
-                if cfg['id'] in ids or cfg['javaName'] in names: raise ValueError('Duplicate atlas id/javaName')
+                if not re.fullmatch('[a-z][a-z0-9_]*',cfg['id']) or not re.fullmatch('[A-Z][A-Z0-9_]*',cfg['javaName']): raise ValueError(f'{path.name}: invalid atlas id/javaName')
+                if cfg['id'] in ids or cfg['javaName'] in names: raise ValueError(f'{path.name}: duplicate atlas id/javaName')
                 ids.add(cfg['id']);names.add(cfg['javaName'])
                 safe(stage,cfg['source']);safe(importer.PROFILES_DIR,cfg['profile'])
                 for key in ('output','report','preview'):
                     target=cfg[key];safe(stage,target)
-                    expected={'output':'android/app/src/main/res/drawable-nodpi/','report':'tools/sprites/reports/','preview':'android/app/build/sprite-review/'}[key]
+                    expected=OUTPUT_FOLDERS[key]
                     if not target.startswith(expected) or target in outputs: raise ValueError(f'Invalid or duplicate output {target}')
                     outputs.add(target)
                 cfg,report=importer.process_clip(path)
@@ -471,7 +474,7 @@ def build(root=ROOT, check=False):
                     'source':hashlib.sha256((stage/cfg['source']).read_bytes()).hexdigest(),
                     'config':hashlib.sha256(path.read_bytes()).hexdigest(),
                     'profile':hashlib.sha256((importer.PROFILES_DIR/cfg['profile']).read_bytes()).hexdigest()}}
-                (stage/cfg['report']).write_text(json.dumps(report,indent=2)+'\n')
+                (stage/cfg['report']).write_text(json.dumps(report,indent=2)+'\n', encoding='utf-8')
                 results.append((cfg,report))
             importer.write_generated_java(results)
             packs=compile_packs(stage,results)
@@ -479,7 +482,7 @@ def build(root=ROOT, check=False):
             # Preview embeds atlases; it works offline and never gets packaged in APK.
             payload={'characters':packs,'atlases':{c['id']:{**r['packed'],'image':'data:image/png;base64,'+base64.b64encode((stage/c['output']).read_bytes()).decode()} for c,r in results}}
             preview='android/app/build/sprite-review/index.html'
-            (stage/preview).write_text((root/'tools/sprites/preview.html').read_text().replace('__SPRITE_DATA__',json.dumps(payload).replace('<','\\u003c')))
+            (stage/preview).write_text((root/'tools/sprites/preview.html').read_text(encoding='utf-8').replace('__SPRITE_DATA__',json.dumps(payload).replace('<','\\u003c')), encoding='utf-8')
             outputs.add(preview)
             # Removing a clip must not leave its old atlas packaged in the APK.
             orphan_outputs,unused_sources=orphans(root,outputs,results)

@@ -8,7 +8,7 @@ out left to right, in reading order, with transparent space between them and the
 pixel of every frame on the same line.
 
     python3 tools/sprites/separar_folha.py folha_gpt.png --colunas 3 --linhas 3 \
-        art/sprites/source/player_base_ultra_beam_source.png
+        art/sprites/source/<id>_ultra_beam_source.png
 """
 import argparse
 

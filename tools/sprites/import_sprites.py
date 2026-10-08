@@ -2,15 +2,18 @@
 import json
 import math
 import re
+import shutil
 import statistics
-import sys
 from pathlib import Path
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
-CLIPS_DIR = ROOT / "tools" / "sprites" / "clips"
 PROFILES_DIR = ROOT / "tools" / "sprites" / "profiles"
 GENERATED_JAVA = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "gamelutagpt" / "GeneratedSpriteLayouts.java"
+
+# Anatomy bands (fractions of the body height) compared to set a drawn sheet's scale.
+DEFAULT_ANATOMY_BANDS = [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]]
+PREVIEW_BACKGROUND = (32, 36, 44, 255)
 
 def load_json(path):
     with open(path, "r", encoding="utf-8") as fh:
@@ -133,12 +136,14 @@ def canonical_anatomy_reference(profile, threshold, override=None):
     y = frame // columns * height
     cell = sheet.crop((x, y, x + width, y + height))
     bbox = bbox_for(cell, threshold)
-    bands = anatomy.get("bands", [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]])
+    bands = anatomy.get("bands", DEFAULT_ANATOMY_BANDS)
     return anatomy, anatomy_signature(cell, bbox, threshold, bands)
 
 def process_clip(config_path):
     cfg = load_json(config_path)
     profile = load_json(PROFILES_DIR / cfg["profile"])
+    if cfg.get("segmentation") == "prepared-grid":
+        return process_prepared(cfg, profile)
     validation = profile["validation"]
     threshold = int(validation["alphaThreshold"])
     min_margin = int(validation["minMargin"])
@@ -156,9 +161,6 @@ def process_clip(config_path):
     output_path = ROOT / cfg["output"]
     report_path = ROOT / cfg["report"]
     preview_path = ROOT / cfg["preview"]
-
-    if cfg.get("segmentation") == "prepared-grid":
-        return process_prepared(cfg, profile)
 
     source = Image.open(source_path).convert("RGBA")
     mask = threshold_alpha(source, threshold)
@@ -229,7 +231,7 @@ def process_clip(config_path):
             frame_info["sourceRect"] = [left, top, right, bottom]
         frames.append(frame_info)
 
-    scale_mode = cfg.get("scaleMode", "median-standing-height")
+    scale_mode = cfg.get("scaleMode")
     anatomy_report = None
     if scale_mode == "canonical-anatomy":
         reference_index = int(cfg.get("anatomyReferenceFrame", -1))
@@ -242,9 +244,7 @@ def process_clip(config_path):
         anatomy_cfg, canonical_signature = canonical_anatomy_reference(
             profile, threshold, override
         )
-        bands = anatomy_cfg.get(
-            "bands", [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]]
-        )
+        bands = anatomy_cfg.get("bands", DEFAULT_ANATOMY_BANDS)
         source_signature = anatomy_signature(
             frames[reference_index]["image"],
             frames[reference_index]["bbox"],
@@ -280,20 +280,6 @@ def process_clip(config_path):
             "maxScaleSpreadRatio": max_spread,
             "passed": True,
         }
-    elif scale_mode == "median-standing-height":
-        reference_frames = cfg.get("scaleReferenceFrames")
-        if reference_frames is None:
-            reference_frames = list(range(expected))
-        heights = []
-        for index in reference_frames:
-            index = int(index)
-            if index < 0 or index >= expected:
-                raise ValueError(f"{cfg['id']}: invalid scaleReferenceFrames")
-            x0, y0, x1, y1 = frames[index]["bbox"]
-            heights.append(y1 - y0)
-        source_reference_height = statistics.median(heights)
-        target_height = float(profile["standingVisualHeight"])
-        scale = target_height / source_reference_height
     elif scale_mode == "fixed":
         # For poses with no comparable reference (e.g. a body lying down): the scale is
         # declared, justified and calibrated against sibling sheets of the same art set.
@@ -303,7 +289,7 @@ def process_clip(config_path):
         if scale <= 0:
             raise ValueError(f"{cfg['id']}: fixed scale must be positive")
     else:
-        raise ValueError(f"{cfg['id']}: unsupported scaleMode {scale_mode}")
+        raise ValueError(f"{cfg['id']}: scaleMode must be canonical-anatomy or fixed (got {scale_mode})")
     if scale > max_upscale:
         raise ValueError(
             f"{cfg['id']}: source would require upscaling {scale:.3f}x; "
@@ -468,10 +454,7 @@ def process_clip(config_path):
     sheet.save(output_path, optimize=True)
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
-    preview = Image.new(
-        "RGBA", sheet.size,
-        tuple(cfg.get("previewBackground", [32, 36, 44, 255]))
-    )
+    preview = Image.new("RGBA", sheet.size, PREVIEW_BACKGROUND)
     preview.alpha_composite(sheet)
     draw = ImageDraw.Draw(preview)
     for item in frame_reports:
@@ -496,13 +479,17 @@ def process_clip(config_path):
             outline=(255, 0, 255, 255),
             width=1,
         )
-    preview.save(preview_path, optimize=True)
+    # Previews only go to the review page (android/app/build): fast compression is enough.
+    preview.save(preview_path, compress_level=1)
 
     return cfg, report
 
 def process_prepared(cfg, profile):
-    """Validate reviewed masters without resampling or re-grounding airborne poses."""
-    import shutil
+    """Validate reviewed masters (video sheets, separated sheets) cell by cell.
+
+    The cells are used as authored unless the clip declares a "transform" (regroup
+    pieces, scale, keep frames, snap to the ground).
+    """
     source = Image.open(ROOT / cfg["source"]).convert("RGBA")
     width = int(cfg.get("frameWidth", profile["baseFrameWidth"]))
     height = int(cfg.get("frameHeight", profile["baseFrameHeight"]))
@@ -519,7 +506,7 @@ def process_prepared(cfg, profile):
     if count <= 0 or columns <= 0 or source.size != (width * columns, height * math.ceil(count / columns)):
         raise ValueError(f"{cfg['id']}: prepared-grid dimensions do not match frame count")
     if cfg.get("rootMode") != "authored":
-        raise ValueError("Prepared masters require an explicitly authored root")
+        raise ValueError(f"{cfg['id']}: prepared masters require an explicitly authored root")
     source_cells = [
         source.crop((i % columns * width, i // columns * height,
                      i % columns * width + width, i // columns * height + height))
@@ -537,15 +524,17 @@ def process_prepared(cfg, profile):
             cfg, profile, source_cells, width, height, root_x, root_y, columns, transform
         )
         count = len(source_cells)
+    threshold = int(validation["alphaThreshold"])
+    min_margin = validation["minMargin"]
+    min_opaque = int(cfg.get("minOpaquePixels", validation["minOpaquePixels"]))
     frames = []
     for i in range(count):
         cell = source_cells[i]
-        bbox = bbox_for(cell, profile["validation"]["alphaThreshold"])
+        bbox = bbox_for(cell, threshold)
         margins = [bbox[0], bbox[1], width - bbox[2], height - bbox[3]]
-        if min(margins) < profile["validation"]["minMargin"]:
+        if min(margins) < min_margin:
             raise ValueError(f"{cfg['id']}: frame {i} clips the safety margin")
-        opaque = sum(threshold_alpha(cell, profile["validation"]["alphaThreshold"]).histogram()[1:])
-        min_opaque = int(cfg.get("minOpaquePixels", profile["validation"]["minOpaquePixels"]))
+        opaque = sum(threshold_alpha(cell, threshold).histogram()[1:])
         if opaque < min_opaque:
             raise ValueError(f"{cfg['id']}: frame {i} has insufficient visible pixels")
         frames.append({"index": i, "outputBbox": list(bbox), "minimumMargin": min(margins), "opaquePixels": opaque})
@@ -570,9 +559,9 @@ def process_prepared(cfg, profile):
             output.paste(cell, (i % columns * width, i // columns * height))
         output.save(ROOT / cfg["output"], format="PNG")
     (ROOT / cfg["report"]).write_text(json.dumps(report, indent=2) + "\n")
-    preview = Image.new("RGBA", output.size, (32, 36, 44, 255))
+    preview = Image.new("RGBA", output.size, PREVIEW_BACKGROUND)
     preview.alpha_composite(output)
-    preview.save(ROOT / cfg["preview"])
+    preview.save(ROOT / cfg["preview"], compress_level=1)
     return cfg, report
 
 def connected_frames(source, threshold, min_ratio=0.02, attach_distance=6):
@@ -834,23 +823,6 @@ def write_generated_java(results):
     GENERATED_JAVA.parent.mkdir(parents=True, exist_ok=True)
     GENERATED_JAVA.write_text("\n".join(lines), encoding="utf-8")
 
-def main():
-    config_paths = sorted(CLIPS_DIR.glob("*.json"))
-    if not config_paths:
-        raise SystemExit("No sprite clip configs found")
-    results = []
-    for path in config_paths:
-        cfg, report = process_clip(path)
-        results.append((cfg, report))
-        layout = report["layout"]
-        print(
-            f"[sprite] {cfg['id']}: PASS "
-            f"{layout['frameCount']} frames, "
-            f"{layout['frameWidth']}x{layout['frameHeight']}, "
-            f"root=({layout['rootX']},{layout['rootY']}), "
-            f"scale={report['scale']:.4f}, worldScale={report['worldScale']:.1f}"
-        )
-    write_generated_java(results)
-
 if __name__ == "__main__":
-    main()
+    raise SystemExit("Run tools/sprites/build_characters.py --write: it imports every clip, "
+                     "packs the atlases and writes the generated Java together.")

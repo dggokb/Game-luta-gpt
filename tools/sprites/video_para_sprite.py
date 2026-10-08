@@ -12,6 +12,8 @@ inicial), e a altura dele vira --altura px. A raiz (meio dos pés) cai em rootX/
     python3 tools/sprites/video_para_sprite.py video.mp4 saida.png --loop 20-110
 
 `--loop A-B` procura, dentro de A..B, o trecho que melhor fecha em loop.
+
+Precisa de opencv e numpy: pip install -r tools/sprites/requirements-animar.txt
 """
 import argparse
 
@@ -33,21 +35,29 @@ def read_frames(path):
 
 def best_loop(frames, lo, hi, min_len):
     """Compara os quadros recortados em volta do tronco, para funcionar mesmo se o
-    personagem desliza no vídeo."""
-    small = []
-    for f in frames:
-        k = key(f)
+    personagem desliza no vídeo. Só os quadros de lo a hi são recortados."""
+    small = {}
+    for i in range(lo, hi + 1):
+        k = key(frames[i])
         cx = int(torso_x(k))
         g = cv2.cvtColor(k[..., :3], cv2.COLOR_RGB2GRAY) * (k[..., 3] / 255)
         g = np.pad(g, ((0, 0), (400, 400)))[:, cx: cx + 800]
-        small.append(cv2.resize(g, (100, 90)).astype(np.float32))
+        small[i] = cv2.resize(g, (100, 90)).astype(np.float32)
     best = None
-    for a in range(lo, hi - min_len):
+    for a in range(lo, hi - min_len + 1):
         for b in range(a + min_len, hi + 1):
             d = float(np.abs(small[a] - small[b]).mean())
             if best is None or d < best[0]:
                 best = (d, a, b)
     return best
+
+
+def keep_largest(alpha):
+    """Zera tudo fora da maior peça conectada (poeira, efeitos e restos soltos)."""
+    n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
+    if n > 1:
+        alpha[labels != 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))] = 0
+    return alpha
 
 
 def key(frame, dust=False, effects=False):
@@ -74,24 +84,16 @@ def key(frame, dust=False, effects=False):
         colored = ((alpha > 0) & ~pale).astype(np.uint8)
         body = cv2.dilate(colored, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (91, 91)))
         alpha[thin | ((alpha > 0) & pale & (body == 0))] = 0
-        n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
-        if n > 1:
-            keep = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
-            alpha[labels != keep] = 0
-    alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
-    n, labels, stats, _ = cv2.connectedComponentsWithStats(alpha)
-    if n > 1:
-        keep = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
-        alpha = np.where(labels == keep, alpha, 0).astype(np.uint8)
+        keep_largest(alpha)
+    alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
     # Furinhos dentro do corpo (reflexo verde na roupa branca) voltam a ser opacos;
     # vãos grandes, como entre as pernas, continuam transparentes.
-    holes = (alpha == 0).astype(np.uint8)
-    n, labels, stats, _ = cv2.connectedComponentsWithStats(holes)
+    _, labels, stats, _ = cv2.connectedComponentsWithStats((alpha == 0).astype(np.uint8))
     h_, w_ = alpha.shape
-    for i in range(1, n):
-        x, y, w, h, area = stats[i]
-        if area < 600 and x > 0 and y > 0 and x + w < w_ and y + h < h_:
-            alpha[labels == i] = 255
+    x, y, w, h, area = stats.T
+    fill = (area < 600) & (x > 0) & (y > 0) & (x + w < w_) & (y + h < h_)
+    fill[0] = False
+    alpha[fill[labels]] = 255
     alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(int)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda
@@ -145,7 +147,14 @@ def main():
         start, end = args.inicio or 0, args.fim or len(frames)
     picked = ([int(v) for v in args.quadros.split(",")] if args.quadros
               else list(range(start, end, args.passo)))
-    keyed = [key(frames[i], args.sem_poeira, args.sem_efeitos) for i in picked]
+    cache = {}
+
+    def keyed_frame(i, dust=False, effects=False):
+        if (i, dust, effects) not in cache:
+            cache[i, dust, effects] = key(frames[i], dust, effects)
+        return cache[i, dust, effects]
+
+    keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos) for i in picked]
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
         # Remove só a tendência (o deslizamento); o balanço natural do corpo continua.
@@ -158,14 +167,14 @@ def main():
         offsets = np.zeros(len(xs))
     # Chão e posição de referência vêm do 1º quadro do vídeo (guarda em pé): poses no ar
     # ficam acima do chão e todos os clipes do personagem se alinham entre si.
-    first = key(frames[0], args.sem_poeira)
+    first = keyed_frame(0, args.sem_poeira)
     foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
     ref_x = torso_x(first) if args.fixar == "video" else xs[0]
     rx, ry = (int(v) for v in args.raiz.split(","))
     dx, dy = (int(v) for v in args.deslocar.split(","))
     rx, ry = rx + dx, ry + dy
     if args.escala == "auto":
-        rows0 = np.nonzero((key(frames[0])[..., 3] > 128).any(1))[0]
+        rows0 = np.nonzero((keyed_frame(0)[..., 3] > 128).any(1))[0]
         s = args.altura / float(rows0.max() - rows0.min())
         print(f"escala automática {s:.4f} (personagem em pé com {rows0.max() - rows0.min()} px no vídeo)")
     else:
