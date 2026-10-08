@@ -67,14 +67,14 @@ final class CharacterDefinition {
         final AttackDefinition attack;
         final int damage;
         /** Seconds, derived from the attack frames (animation stretch, AI, legacy checks). */
-        final float totalTime,activeStart,activeEnd,reach,hitHeight;
+        final float totalTime,activeStart,activeEnd,reach;
         Move(String binding,Animation animation,String pose,AttackDefinition attack) {
             this.binding=binding;this.animation=animation;this.pose=pose;this.attack=attack;
             this.damage=attack.damage;
             this.totalTime=attack.totalFrames/(float)CombatConfig.FPS;
             this.activeStart=attack.startupFrames/(float)CombatConfig.FPS;
             this.activeEnd=(attack.startupFrames+attack.activeFrames)/(float)CombatConfig.FPS;
-            this.reach=attack.reach;this.hitHeight=attack.hitHeight;
+            this.reach=attack.reach;
         }
         boolean active(float elapsed) { return elapsed+0.000001f>=activeStart && elapsed<activeEnd; }
         /** Window where a defender sees the strike coming (used by anticipated guard). */
@@ -96,7 +96,6 @@ final class CharacterDefinition {
         Special(Move move,int[] command,String buttons) {
             this.move=move;this.command=command.clone();this.buttons=buttons;
         }
-        int[] command() { return command.clone(); }
         int commandLength() { return command.length; }
         boolean acceptsButton(String button) { return buttons.contains(button); }
         boolean matches(MotionParser motion,int clock,int motionWindow,int pressWindow) {
@@ -129,7 +128,7 @@ final class CharacterDefinition {
         }
         float height(boolean crouching) { return crouching?crouchHeight:standHeight; }
     }
-    /** Fighter rules that used to live in GameView.FighterProfile. */
+    /** Fighter rules: life, auto-combo, projectiles, body and input priority. */
     static final class Fighter {
         final int color,maxLife;
         final String[] autoCombo;
@@ -154,7 +153,6 @@ final class CharacterDefinition {
             this.superAttack=superAttack;this.body=body;
             this.inputPriority=inputPriority==null?CombatConfig.DEFAULT_PRIORITY.clone():inputPriority.clone();
         }
-        boolean hasEnergyAttack() { return energy!=null; }
         boolean hasSuperAttack() { return superAttack!=null; }
     }
     final String id,displayName;
@@ -169,13 +167,6 @@ final class CharacterDefinition {
     final Map<String,Animation> specialAnimations;
     /** Command specials by binding (S2, S3...), longest command first. */
     final Map<String,Special> specials;
-    CharacterDefinition(String id,String displayName,CharacterVisualProfile profile,int artFacing,
-                        float visualStandHeight,float visualCrouchHeight,Fighter fighter,
-                        Map<String,Animation> animations,Map<String,Move> moves,
-                        Map<String,Animation> specialAnimations) {
-        this(id,displayName,profile,artFacing,visualStandHeight,visualCrouchHeight,fighter,
-            animations,moves,specialAnimations,Collections.<String,Special>emptyMap());
-    }
     CharacterDefinition(String id,String displayName,CharacterVisualProfile profile,int artFacing,
                         float visualStandHeight,float visualCrouchHeight,Fighter fighter,
                         Map<String,Animation> animations,Map<String,Move> moves,

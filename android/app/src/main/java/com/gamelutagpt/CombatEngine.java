@@ -452,8 +452,7 @@ final class CombatEngine {
                 break;
             }
             case WAKEUP:
-                if (f.knockdownFrame >= Math.max(config.wakeupFrames, f.rollFrames > 0 ? config.rollFrames : 0) &&
-                    f.rollFrames == 0) {
+                if (f.rollFrames == 0 && f.knockdownFrame >= config.wakeupFrames) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.throwProtect = config.throwProtectFrames;
                 }
@@ -476,6 +475,7 @@ final class CombatEngine {
     }
 
     private void startFromBuffer(final CombatFighter f, final boolean cancel) {
+        if (f.buffer.size() == 0) return;
         final boolean projectileAlive = hasProjectile(energyProjectiles, f.index);
         final ComboSession session = sessions[1 - f.index];
         InputBuffer.Entry entry = f.buffer.select(e -> {
@@ -508,8 +508,7 @@ final class CombatEngine {
             f.vy *= config.projectileAirVelocityScale;
         }
         if (attack.kind == AttackDefinition.Kind.SUPER) {
-            f.state.superMeter -= CombatConfig.SUPER_COST;
-            f.state.refreshHudLabels();
+            f.state.spendSuperMeter(CombatConfig.SUPER_COST);
             f.vy = 0f;
             // Super freeze: the opponent and the projectiles wait for the release.
             CombatFighter other = fighters[1 - f.index];
@@ -529,8 +528,7 @@ final class CombatEngine {
         f.forwardDashing = false;
         f.backdashFrames = 0;
         f.crouching = false;
-        f.state.superMeter -= CombatConfig.ULTRA_COST;
-        f.state.refreshHudLabels();
+        f.state.spendSuperMeter(CombatConfig.ULTRA_COST);
         // Like the Super: the opponent and the projectiles wait for the rush.
         CombatFighter other = fighters[1 - f.index];
         other.hitstop = Math.max(other.hitstop, config.ultraStartupFrames);
@@ -1018,6 +1016,11 @@ final class CombatEngine {
         }
     }
 
+    /** Whether {@code owner} still has an energy projectile on screen (one at a time). */
+    boolean energyProjectileAlive(int owner) {
+        return hasProjectile(energyProjectiles, owner);
+    }
+
     private static boolean hasProjectile(List<Projectile> projectiles, int owner) {
         for (Projectile p : projectiles) if (p.ownerIndex == owner) return true;
         return false;
@@ -1094,8 +1097,7 @@ final class CombatEngine {
     private void pushblock(CombatFighter f) {
         CombatFighter a = fighters[1 - f.index];
         f.pushblockRequestAge = -1;
-        f.state.superMeter -= config.pushblockCost;
-        f.state.refreshHudLabels();
+        f.state.spendSuperMeter(config.pushblockCost);
         f.stunLeft = Math.min(f.stunLeft, config.pushblockStunFrames);
         // Push the attacker away from the defender, whatever side it is on.
         int away = a.x >= f.x ? 1 : -1;
@@ -1134,8 +1136,7 @@ final class CombatEngine {
             point.state.superMeter < config.guardCancelCost) {
             return false;
         }
-        point.state.superMeter -= config.guardCancelCost;
-        point.state.refreshHudLabels();
+        point.state.spendSuperMeter(config.guardCancelCost);
         teams.leavePoint(side, point);
         setFighterState(point.index, side.pointState());
         point.stunLeft = 0;
@@ -1263,29 +1264,13 @@ final class CombatEngine {
     private void connectUltra(CombatFighter a, CombatFighter d) {
         int guard = effectiveGuard(d);
         if (guardStops(guard, ultraAttack, !a.grounded, false)) {
-            d.status = CombatFighter.Status.BLOCKSTUN;
-            d.clearAttack();
-            d.stunLeft = d.stunTotal = ultraAttack.blockstunFrames;
-            d.stunElapsed = 0;
-            d.lastGuard = guard;
-            d.framesSinceBlock = 0;
-            d.forwardDashing = false;
-            d.backdashFrames = 0;
-            push(d, a, a.facing * ultraAttack.pushbackOnBlock);
-            gainMeter(d, CombatRules.superGainOnGuard(ultraAttack.strength));
-            freeze(a, d, ultraAttack.hitstopFrames, false);
+            block(a, d, ultraAttack, guard, a.facing, false);
             a.ultraPhase = CombatFighter.ULTRA_RECOVERY;
             a.ultraFrame = 0;
-            events.add(new HitEvent(a.index, d.index, 0, true, false, ultraAttack.id));
             return;
         }
 
-        ComboSession session = sessions[d.index];
-        if (session == null || !d.inHitstun()) {
-            endSession(d.index);
-            session = new ComboSession(a.index, d.index);
-            sessions[d.index] = session;
-        }
+        ComboSession session = sessionFor(a, d);
         a.ultraScale = session.scaleFor(ultraAttack, config);
         a.ultraPhase = CombatFighter.ULTRA_CINEMATIC;
         a.ultraFrame = 0;
@@ -1474,27 +1459,12 @@ final class CombatEngine {
 
         int guard = effectiveGuard(d);
         if (guardStops(guard, attack, !a.grounded, projectile)) {
-            d.status = CombatFighter.Status.BLOCKSTUN;
-            d.clearAttack();
-            d.stunLeft = d.stunTotal = attack.blockstunFrames;
-            d.stunElapsed = 0;
-            d.lastGuard = guard;
-            d.framesSinceBlock = 0;
-            d.forwardDashing = false;
-            d.backdashFrames = 0;
-            push(d, a, direction * attack.pushbackOnBlock);
-            gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
-            freeze(a, d, attack.hitstopFrames, projectile);
+            block(a, d, attack, guard, direction, projectile);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
-            events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
             return;
         }
 
-        if (session == null || !d.inHitstun()) {
-            endSession(d.index);
-            session = new ComboSession(a.index, d.index);
-            sessions[d.index] = session;
-        }
+        session = sessionFor(a, d);
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         int damage = session.registerHit(attack, projectile ? c.projectile.damage : attack.damage, config);
         d.state.takeDamage(damage, config.recoverableLifePermille);
@@ -1536,7 +1506,6 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
             d.pushRemaining = 0f;
             d.pushFramesLeft = 0;
-            session.juggleCount += attack.juggleCost;
         } else if (groundBounce) {
             // Driven into the floor; it pops back up in land().
             session.groundBounces++;
@@ -1547,14 +1516,13 @@ final class CombatEngine {
             d.slammed = false;
             d.hardFall = true;
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
-            session.juggleCount += attack.juggleCost;
-        } else if (attack.launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded && a.superJumping) {
-            // Bounce already used: from a super jump it ends like the slam.
+        } else if ((attack.launch == AttackDefinition.Launch.SLAM ||
+                    attack.launch == AttackDefinition.Launch.GROUND_BOUNCE) && !d.grounded && a.superJumping) {
+            // Slam (also a ground bounce already used): from a super jump, a forced dive.
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.slammed = true;
             d.launched = false;
             d.vy = config.slamSpeed;
-            session.juggleCount += attack.juggleCost;
             push(d, a, direction * attack.knockback * 0.35f);
         } else if (attack.launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
             knockDown(d);
@@ -1568,28 +1536,49 @@ final class CombatEngine {
             d.slammed = false;
             d.superJumping = false;
             a.launcherChase = config.launcherChaseFrames;
-            session.juggleCount += attack.juggleCost;
             push(d, a, direction * attack.knockback);
-        } else if (attack.launch == AttackDefinition.Launch.SLAM && !d.grounded && a.superJumping) {
-            d.status = CombatFighter.Status.AIR_HITSTUN;
-            d.slammed = true;
-            d.launched = false;
-            d.vy = config.slamSpeed;
-            session.juggleCount += attack.juggleCost;
-            push(d, a, direction * attack.knockback * 0.35f);
         } else if (!d.grounded) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
-            session.juggleCount += attack.juggleCost;
             push(d, a, direction * attack.knockback);
         } else {
             d.status = CombatFighter.Status.HITSTUN;
             d.hitCrouching = wasCrouching;
             push(d, a, direction * attack.pushbackOnHit);
         }
+        // Every hit that leaves the defender juggled costs juggle points.
+        if (d.status == CombatFighter.Status.AIR_HITSTUN) session.juggleCount += attack.juggleCost;
         if (!d.grounded) session.airCombo = true;
         freeze(a, d, attack.hitstopFrames, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
+    }
+
+    /** Guarded contact: blockstun, pushback, guard meter and hitstop. */
+    private void block(CombatFighter a, CombatFighter d, AttackDefinition attack, int guard, int direction,
+                       boolean projectile) {
+        d.status = CombatFighter.Status.BLOCKSTUN;
+        d.clearAttack();
+        d.stunLeft = d.stunTotal = attack.blockstunFrames;
+        d.stunElapsed = 0;
+        d.lastGuard = guard;
+        d.framesSinceBlock = 0;
+        d.forwardDashing = false;
+        d.backdashFrames = 0;
+        push(d, a, direction * attack.pushbackOnBlock);
+        gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
+        freeze(a, d, attack.hitstopFrames, projectile);
+        events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
+    }
+
+    /** The defender's running combo, or a new one when it was able to act. */
+    private ComboSession sessionFor(CombatFighter a, CombatFighter d) {
+        ComboSession session = sessions[d.index];
+        if (session == null || !d.inHitstun()) {
+            endSession(d.index);
+            session = new ComboSession(a.index, d.index);
+            sessions[d.index] = session;
+        }
+        return session;
     }
 
     private void push(CombatFighter d, CombatFighter source, float distance) {

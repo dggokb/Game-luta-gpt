@@ -29,7 +29,7 @@ final class FighterState {
         refreshHudLabels();
     }
 
-    /** Test helper: back to full life. */
+    /** Back to full life (training refills, demo reset, tests). */
     void restoreLife() {
         life = profile.maxLife;
         recoverableLife = 0;
@@ -46,7 +46,7 @@ final class FighterState {
         recoverableLife += damage * recoverablePermille / 1000;
         if (life == 0) recoverableLife = 0;
         recoverableLife = Math.min(recoverableLife, profile.maxLife - life);
-        refreshHudLabels();
+        refreshLifeLabel();
     }
 
     /** Off point: up to {@code amount} of the recoverable life comes back. */
@@ -55,7 +55,7 @@ final class FighterState {
         int gain = Math.min(amount, recoverableLife);
         life += gain;
         recoverableLife -= gain;
-        refreshHudLabels();
+        refreshLifeLabel();
     }
 
     float superBars() {
@@ -65,12 +65,27 @@ final class FighterState {
     void addSuperMeter(int amount) {
         if (amount <= 0) return;
         superMeter = Math.min(CombatConfig.MAX_METER, superMeter + amount);
-        refreshHudLabels();
+        refreshSuperLabels();
+    }
+
+    /** Pays a cost already checked by the caller (Super, Ultra, pushblock, guard cancel). */
+    void spendSuperMeter(int amount) {
+        superMeter -= amount;
+        refreshSuperLabels();
     }
 
     void refreshHudLabels() {
-        int level = superMeter / CombatConfig.METER_PER_BAR;
+        refreshLifeLabel();
+        refreshSuperLabels();
+    }
+
+    // Each label is rebuilt only when its own value changes (regeneration runs every frame).
+    private void refreshLifeLabel() {
         lifeHudLabel = "HP " + life + " / " + profile.maxLife + (recoverableLife > 0 ? "  (+" + recoverableLife + ")" : "");
+    }
+
+    private void refreshSuperLabels() {
+        int level = superMeter / CombatConfig.METER_PER_BAR;
         superHudLabel = String.format(
             java.util.Locale.US,
             "SUPER %.2f / 5  •  LV %d",

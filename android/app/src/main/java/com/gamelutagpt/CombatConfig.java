@@ -98,7 +98,6 @@ final class CombatConfig {
     int ultraBeamChargeFrames = 36;
     int ultraBeamExtendFrames = 8;
     int ultraBeamHitInterval = 4;
-    int ultraBeamDefaultHits = 20;
     /** Frames between the last small hit and the blast. */
     int ultraBeamBlastGap = 6;
     /** Frames the beam fades after the blast before the attacker is free. */

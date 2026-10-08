@@ -17,7 +17,6 @@ final class DemoDirector {
     static final class Ctx {
         CombatEngine engine;
         FighterState[] team;
-        FighterState cpuState;
         /** Frames since the script started (after the lead-in). */
         int t;
         /** Free slots for the script: the frame something happened, a value to compare. */
@@ -325,9 +324,6 @@ final class DemoDirector {
     /** Demo playing (index into {@link #VERSIONS}), or -1. */
     int demo() { return demo; }
     int stepIndex() { return step; }
-    int stepCount() { return steps == null ? 0 : steps.length; }
-    /** The current step already showed what it is about. */
-    boolean stepMet() { return met; }
     /** Per step of the last demo started: did it show what it is about. */
     boolean[] results() { return results.clone(); }
 
@@ -348,7 +344,6 @@ final class DemoDirector {
         if (active()) stop();
         ctx.engine = engine;
         ctx.team = team;
-        ctx.cpuState = cpu;
         this.homeFirstX = homeFirstX;
         this.homeSecondX = homeSecondX;
         saved = new FighterState[team.length + 1];

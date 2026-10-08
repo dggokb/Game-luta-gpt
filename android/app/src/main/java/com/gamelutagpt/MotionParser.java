@@ -11,20 +11,14 @@ final class MotionParser {
     private final int[] directions = new int[SIZE];
     private final int[] frames = new int[SIZE];
     private int count;
-    private int current;
 
     void clear() {
         count = 0;
     }
 
-    int current() {
-        return current;
-    }
-
     /** Records the held direction; only changes enter the history. */
     void record(int relativeDirection, int clock) {
         if (count > 0 && directions[count - 1] == relativeDirection) return;
-        current = relativeDirection;
         if (count >= SIZE) {
             System.arraycopy(directions, 1, directions, 0, SIZE - 1);
             System.arraycopy(frames, 1, frames, 0, SIZE - 1);

@@ -3,8 +3,8 @@ package com.gamelutagpt;
 import java.util.Random;
 
 /**
- * Decision-making of the CPU opponent. It only chooses; GameView owns physics, timers
- * and damage and executes the choice through {@link Actions}. Pure Java, so decisions
+ * Decision-making of the CPU opponent. It only chooses; AiController turns the choice
+ * into pad input ({@link Actions}) and CombatEngine plays it like a player's. Pure Java, so decisions
  * can be tested with a seeded {@link Random}.
  */
 final class OpponentAi {

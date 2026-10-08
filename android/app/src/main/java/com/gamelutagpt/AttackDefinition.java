@@ -57,6 +57,8 @@ final class AttackDefinition {
     final Strength strength;
     final int damage;
     final int startupFrames, activeFrames, recoveryFrames, totalFrames;
+    /** Frames before and after the active window in which a defender already guards. */
+    private final int threatLead;
     final int hitstunFrames, blockstunFrames, hitstopFrames;
     /** Cancel windows per outcome of the move; null when that outcome cannot cancel. */
     final Window hitWindow, blockWindow, whiffWindow;
@@ -83,6 +85,7 @@ final class AttackDefinition {
         activeFrames = b.active;
         recoveryFrames = b.recovery;
         totalFrames = b.startup + b.active + b.recovery;
+        threatLead = Math.round(0.16f * totalFrames);
         hitstunFrames = b.hitstun;
         blockstunFrames = b.blockstun;
         hitstopFrames = b.hitstop;
@@ -114,7 +117,6 @@ final class AttackDefinition {
         hurtboxes = b.hurtboxes.toArray(new Box[0]);
     }
 
-    int firstActiveFrame() { return startupFrames; }
     int lastActiveFrame() { return startupFrames + activeFrames - 1; }
     boolean isActive(int frame) { return frame >= startupFrames && frame <= lastActiveFrame(); }
 
@@ -135,8 +137,7 @@ final class AttackDefinition {
 
     /** Window where a defender sees the strike coming (anticipated guard), legacy 16% lead. */
     boolean threatening(int frame) {
-        int lead = Math.round(0.16f * totalFrames);
-        return frame >= startupFrames - lead && frame <= lastActiveFrame() + 1 + lead;
+        return frame >= startupFrames - threatLead && frame <= lastActiveFrame() + 1 + threatLead;
     }
 
     /** Frames the attacker is still busy after a contact on the first active frame. */

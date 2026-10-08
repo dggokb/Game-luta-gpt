@@ -166,22 +166,20 @@ final class TeamSystem {
             // TAG while blocking: Guard Cancel Tag, when the partner is ready and there is a bar.
             if (!point.frozen() && canGuardCancel(s) && engine.guardCancel(s, point)) {
                 s.assistRequestAge = -1;
-                s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
-                s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
+                lockTeamActions(s);
             }
         } else if (s.assistRequestAge >= 0 && inReleasedSuper(point)) {
             // TAG during your own Super, once it fired: DHC, the partner comes in with its Super.
             if (!point.frozen() && dhcReady(s, point) && engine.dhc(s, point)) {
                 s.assistRequestAge = -1;
-                s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
-                s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
+                lockTeamActions(s);
             }
         } else if (s.assistRequestAge >= 0) {
             if (s.conversionOpen()) {
                 s.convert = true;
                 s.assistRequestAge = -1;
             } else if (canAssist(s, point)) {
-                startAssist(engine, s, point, opponent);
+                startAssist(s, point, opponent);
                 s.assistRequestAge = -1;
             }
         }
@@ -237,16 +235,12 @@ final class TeamSystem {
         return s.partner() != null && inReleasedSuper(point) && dhcReady(s, point);
     }
 
-    boolean canRawTag(int side, CombatFighter point) {
-        return canRawTag(sides[side], point);
-    }
-
     private boolean canRawTag(Side s, CombatFighter point) {
         return s.partner() != null && !s.tagging() && s.tagCooldown == 0 && !s.assistOut() &&
             s.leavingFrame < 0 && point.canAct();
     }
 
-    private void startAssist(CombatEngine engine, Side s, CombatFighter point, CombatFighter opponent) {
+    private void startAssist(Side s, CombatFighter point, CombatFighter opponent) {
         FighterState partner = s.partner();
         float to = Arena.clamp(point.x - point.facing * config.assistBehind, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
         int facing = opponent.x >= to ? 1 : -1;
@@ -391,8 +385,7 @@ final class TeamSystem {
         s.assistPhase = ASSIST_NONE;
         s.assistFrame = 0;
         s.convert = false;
-        s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
-        s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
+        lockTeamActions(s);
         if (a != null) a.travel = 0f;
     }
 
@@ -413,11 +406,16 @@ final class TeamSystem {
         }
     }
 
+    /** After a tag, guard cancel or DHC: neither assist nor tag for a moment. */
+    private void lockTeamActions(Side s) {
+        s.assistCooldown = Math.max(s.assistCooldown, config.assistTagCooldownFrames);
+        s.tagCooldown = Math.max(s.tagCooldown, config.assistTagCooldownFrames);
+    }
+
     private static void handMeter(FighterState from, FighterState to) {
         if (from == to || from.superMeter == 0) return;
         to.addSuperMeter(from.superMeter);
         from.superMeter = 0;
         from.refreshHudLabels();
-        to.refreshHudLabels();
     }
 }

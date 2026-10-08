@@ -84,20 +84,6 @@ final class CombatRules {
         return boxRight >= left && boxLeft <= right && boxBottom >= top && boxTop <= bottom;
     }
 
-    /** Whether a defender standing in range should already raise the guard. */
-    static boolean meleeThreatens(
-        float attackerX,
-        int facing,
-        CharacterDefinition.Move move,
-        float elapsed,
-        float targetX,
-        CharacterDefinition.Body target
-    ) {
-        if (!move.threatening(elapsed)) return false;
-        float horizontal = (targetX - attackerX) * facing;
-        return horizontal >= 0f && horizontal - target.halfWidth <= move.reach + 34f;
-    }
-
     /** Swept test of a projectile segment against a hurtbox. */
     static boolean projectileHits(
         float previousX,
@@ -186,16 +172,12 @@ final class CombatRules {
         float overlap = minDistance - Math.abs(dx);
         if (overlap <= 0f) return false;
         int side = dx > 0f ? 1 : dx < 0f ? -1 : (tieDirection >= 0 ? 1 : -1);
-        float nb = clamp(bx + side * overlap * 0.5f, minX, maxX);
-        float na = clamp(nb - side * minDistance, minX, maxX);
-        nb = clamp(na + side * minDistance, minX, maxX);
+        float nb = Arena.clamp(bx + side * overlap * 0.5f, minX, maxX);
+        float na = Arena.clamp(nb - side * minDistance, minX, maxX);
+        nb = Arena.clamp(na + side * minDistance, minX, maxX);
         out[0] = na;
         out[1] = nb;
         return true;
-    }
-
-    private static float clamp(float value, float min, float max) {
-        return Math.max(min, Math.min(max, value));
     }
 
 }

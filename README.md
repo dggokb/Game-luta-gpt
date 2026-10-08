@@ -230,13 +230,15 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 
 - **H dentro de um combo** joga o oponente na parede (borda da tela ou da arena); ele
   quica de volta e dá para continuar o combo. O H solto no neutro continua normal.
-- **jH num oponente no ar** crava ele no chão e ele quica para cima.
+- **↓ + jH num oponente no ar** crava ele no chão e ele quica para cima (no p01; o jH reto
+  joga na parede).
 - Um de cada por combo; depois de quicar, se ninguém continuar, ele cai derrubado.
-- Rota de exemplo: L → M → H (parede) → dash → M → 2H → super pulo → jL → jM → jH (chão) → Super.
+- Rota de exemplo: L → M → H (parede) → dash → M → 2H → super pulo → jL → jM → ↓+jH (chão) → Super.
 - Detalhes: `docs/combat-engine.md` (seção Wall bounce e ground bounce).
 
-**Arte que falta** (agarrão, pushblock, air dash, batida na parede, especial e Super, o
-Lutador Teste 2 e efeitos), com os prompts: [docs/sprites-pendentes.md](docs/sprites-pendentes.md).
+**Arte que falta** (pushblock, air dash, batida na parede, o Lutador Teste 2 e efeitos), com
+os prompts: [docs/sprites-pendentes.md](docs/sprites-pendentes.md). O p01 é feito em vídeo:
+o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 
 ## Air tech e opções de levantar — v0.84
 

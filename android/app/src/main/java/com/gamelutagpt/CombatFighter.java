@@ -200,7 +200,6 @@ final class CombatFighter {
         return status == Status.NEUTRAL && !locked && !ko() && !frozen();
     }
 
-    /** Knocked down, getting up or KO: no hit connects. */
     /** Rolling on wake-up: invulnerable and passes through the other body. */
     boolean rolling() {
         return status == Status.WAKEUP && rollFrames > 0;
@@ -234,7 +233,7 @@ final class CombatFighter {
         return y - body().height(crouchingBody());
     }
 
-    /** Name used by the debug overlay and the HUD: the states of the V2 specification. */
+    /** Name shown by the debug overlay (and checked by tests): the states of the V2 specification. */
     String stateName() {
         if (hitstop > 0) return "HITSTOP";
         if (status == Status.ATTACK) return "ATTACK_" + attack.phase(Math.max(0, attackFrame));

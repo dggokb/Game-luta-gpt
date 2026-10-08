@@ -1,7 +1,6 @@
 package com.gamelutagpt;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,7 +18,6 @@ final class ComboSession {
     int damageScale = 1000;
     /** Hitstun removed from the last hit, frames. */
     int hitstunDecay;
-    String lastMove = "";
     private final List<String> usedMoves = new ArrayList<>();
     boolean airCombo;
     boolean active = true;
@@ -33,10 +31,6 @@ final class ComboSession {
     ComboSession(int attacker, int defender) {
         this.attacker = attacker;
         this.defender = defender;
-    }
-
-    List<String> usedMoves() {
-        return Collections.unmodifiableList(usedMoves);
     }
 
     int usesOf(String moveId) {
@@ -55,14 +49,9 @@ final class ComboSession {
      * starter proration, repeated-move penalty, integer math rounded down, at least 1.
      */
     int registerHit(AttackDefinition attack, int baseDamage, CombatConfig config) {
-        if (hitCount == 0) prorationPermille = attack.prorationPermille;
-        damageScale = DamageScaling.scale(attack, hitCount, hitCount == 0 ? 1000 : prorationPermille,
-            usesOf(attack.id), config);
-        int damage = DamageScaling.apply(baseDamage, damageScale);
+        int damage = DamageScaling.apply(baseDamage, useMove(attack, config));
         hitCount++;
         comboDamage += damage;
-        lastMove = attack.id;
-        usedMoves.add(attack.id);
         return damage;
     }
 
@@ -71,10 +60,14 @@ final class ComboSession {
      * parts during the cinematic ({@link #addHit}). Counts as one use of the move.
      */
     int scaleFor(AttackDefinition attack, CombatConfig config) {
+        return useMove(attack, config);
+    }
+
+    /** Scale of the next hit of {@code attack} (starter proration, step, repeats); records the use. */
+    private int useMove(AttackDefinition attack, CombatConfig config) {
         if (hitCount == 0) prorationPermille = attack.prorationPermille;
         damageScale = DamageScaling.scale(attack, hitCount, hitCount == 0 ? 1000 : prorationPermille,
             usesOf(attack.id), config);
-        lastMove = attack.id;
         usedMoves.add(attack.id);
         return damageScale;
     }

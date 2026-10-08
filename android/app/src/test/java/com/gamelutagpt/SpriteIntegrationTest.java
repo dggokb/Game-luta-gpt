@@ -368,23 +368,17 @@ public class SpriteIntegrationTest {
             RuntimeEnvironment.getApplication().getResources(),
             R.drawable.player_base_idle
         );
-        Bitmap movement=BitmapFactory.decodeResource(
-            RuntimeEnvironment.getApplication().getResources(),
-            R.drawable.player_base_movement
-        );
         Bitmap jab=BitmapFactory.decodeResource(
             RuntimeEnvironment.getApplication().getResources(),
             R.drawable.player_base_jab
         );
 
-        assertNotNull(idle);assertNotNull(movement);assertNotNull(jab);
+        assertNotNull(idle);assertNotNull(jab);
         // The idle is a long video-derived loop: its grid follows the frame count.
         assertEquals(0,idle.getWidth()%GeneratedSpriteLayouts.IDLE_FRAME_WIDTH);
         assertEquals(0,idle.getHeight()%GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT);
         assertTrue(idle.getWidth()/GeneratedSpriteLayouts.IDLE_FRAME_WIDTH
             *(idle.getHeight()/GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT)>=GeneratedSpriteLayouts.IDLE_FRAME_COUNT);
-        assertEquals(4*GeneratedSpriteLayouts.MOVEMENT_FRAME_WIDTH,movement.getWidth());
-        assertEquals(4*GeneratedSpriteLayouts.MOVEMENT_FRAME_HEIGHT,movement.getHeight());
         assertEquals(0,jab.getWidth()%GeneratedSpriteLayouts.JAB_FRAME_WIDTH);
         assertEquals(0,jab.getHeight()%GeneratedSpriteLayouts.JAB_FRAME_HEIGHT);
         // Packing never grows past the canonical 256x256 authoring cell.
@@ -468,9 +462,10 @@ public class SpriteIntegrationTest {
         assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
-        Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_base_movement);
+        // The 4x4 movement grid of the drawn character (player_two); p01 uses one atlas per video clip.
+        Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_two_movement);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());
-        int fw=GeneratedSpriteLayouts.MOVEMENT_FRAME_WIDTH,fh=GeneratedSpriteLayouts.MOVEMENT_FRAME_HEIGHT;
+        int fw=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_WIDTH,fh=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_HEIGHT;
         assertEquals(4*fw,atlas.getWidth());assertEquals(4*fh,atlas.getHeight());
         for(int i=0;i<16;i++) {
             int left=(i%4)*fw,top=(i/4)*fh,count=0;

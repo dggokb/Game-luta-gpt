@@ -69,12 +69,16 @@ final class PadInput {
         // TAG calls the assist; ↓ + TAG is the raw tag (no hold to tell apart, so no delay).
         out.tag = tag && ControlsLayout.isDownDirection(direction);
         out.assist = tag && !out.tag;
-        light = medium = heavy = auto = superAttack = tag = grab = pushblock = overdrive = false;
+        clearPresses();
     }
 
     void reset() {
         direction = 0;
         lightAge = mediumAge = -1;
+        clearPresses();
+    }
+
+    private void clearPresses() {
         light = medium = heavy = auto = superAttack = tag = grab = pushblock = overdrive = false;
     }
 }

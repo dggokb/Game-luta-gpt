@@ -131,7 +131,7 @@ final class AiController {
         situation.targetGrounded = target.grounded;
         situation.targetAlive = !target.ko();
         situation.superReady = me.state.superMeter >= CombatConfig.SUPER_COST;
-        situation.projectileActive = hasProjectile(engine, self);
+        situation.projectileActive = engine.energyProjectileAlive(self);
         situation.attackReady = cooldown <= 0;
         situation.throwReach = me.body().halfWidth + target.body().halfWidth + engine.config.throwRange - 4f;
         clearRequests();
@@ -161,8 +161,4 @@ final class AiController {
         superAttack = backdash = jump = superJump = grab = false;
     }
 
-    private static boolean hasProjectile(CombatEngine engine, int owner) {
-        for (Projectile p : engine.energyProjectiles) if (p.ownerIndex == owner) return true;
-        return false;
-    }
 }

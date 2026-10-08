@@ -277,8 +277,9 @@ A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. 
 - **Os dois ao mesmo tempo**: tech automático.
 - **CPU**: agarra às vezes quando está colada (`OpponentAi.THROW_CHANCE`) e faz tech em
   ~40% dos agarrões, alguns frames depois de ser pega (`TECH_CHANCE`).
-- O jogo mostra "AGARRÃO!" ou "TECH!" no centro da tela. Sem arte própria ainda: o
-  atacante usa o jab para pegar e o soco forte para jogar; o defensor, a reação de hit.
+- O jogo mostra "AGARRÃO!" ou "TECH!" no centro da tela. Arte: `THROW_GRAB` (pegar e
+  segurar) e `THROW_TOSS` (jogar) quando o pacote tem (p01); sem elas o atacante usa o jab
+  para pegar e o soco forte para jogar. O defensor usa a reação de hit.
 
 Testes em `ThrowTest`.
 

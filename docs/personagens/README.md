@@ -22,8 +22,8 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
     a diferença é a forma de usar, não a cor. (Cor da energia: a definir junto com os efeitos.)
 - **Ordem de produção dos sprites definitivos:** p01 e p03 primeiro, depois os outros.
 - **Qualidade:** exatamente a do concept, sem readaptar traço ou proporção; animação de
-  anime viva, com muitos frames. Uma conversa do ChatGPT por personagem, sempre com o
-  concept anexado.
+  anime viva, com muitos frames. Base de cada personagem no ChatGPT (uma conversa por
+  personagem, com o concept anexado); animações em vídeo no Seedance (veja Método abaixo).
 - O ajudante (pai adotivo, gordão) e o pai ainda não têm concept: ficam para depois.
 
 ## Elenco

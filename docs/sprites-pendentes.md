@@ -1,15 +1,19 @@
 # Sprites e efeitos que faltam
 
-Lista do que ainda usa pose emprestada ou desenho provisório, com o prompt para gerar no
-GPT. Atualizada na v0.84. Quando uma folha chegar, ela entra pelo pipeline normal
-(`tools/sprites/`, veja `docs/sprite-standard.md`). Folhas desenhadas em grade apertada
-passam antes por `tools/sprites/separar_folha.py`.
+Lista do que ainda usa pose emprestada ou desenho provisório em qualquer personagem.
+
+**p01 e p03 (definitivos):** são feitos em vídeo no Seedance e convertidos por
+`tools/sprites/video_para_sprite.py`; o que falta de cada um, com o prompt de cada vídeo,
+fica na ficha do personagem: [personagens/p01.md](personagens/p01.md) e
+[personagens/p03.md](personagens/p03.md). As folhas abaixo são o caminho antigo (ChatGPT),
+que ainda serve para os outros pacotes. Folhas desenhadas em grade apertada passam antes
+por `tools/sprites/separar_folha.py`.
 
 ## Regras para todas as folhas de personagem
 
 - **Anexe no ChatGPT uma folha já aprovada do mesmo personagem** (ex.:
-  `art/sprites/source/player_base_heavy_straight_source.png` ou
-  `player_base_ultra_beam_source.png`), para sair o mesmo traço, roupa e tamanho.
+  `art/sprites/source/player_two_heavy_straight_source.png`), para sair o mesmo traço,
+  roupa e tamanho.
 - Virado para a **direita**, visto de lado, **fundo transparente**, sem chão, sem sombra,
   sem texto, sem marca d'água, sem efeitos de energia (o jogo desenha os efeitos).
 - Grade com espaço vazio entre os quadros e **os pés na mesma linha** em cada quadro.
@@ -28,18 +32,14 @@ fundo transparente.
 
 | # | Folha | Hoje usa | Quadros | Prompt (depois do começo comum) |
 |---|---|---|---|---|
-| 1 | **Agarrão** (`<id>_throw`) | jab para pegar, soco forte para jogar | 6 (3 × 2) | Golpe de agarrão: 1. avança a mão da frente aberta; 2. agarra a gola de alguém (sem desenhar a outra pessoa), braço esticado; 3. puxa para perto; 4. gira o tronco levantando o braço; 5. arremessa para a frente com as duas mãos; 6. volta para a guarda. |
 | 2 | **Sendo agarrado** (`<id>_thrown`) | 1º quadro de levar golpe | 3 (3 × 1) | O personagem sendo agarrado pela gola por alguém invisível à direita: 1. puxado para a frente, surpreso; 2. pés saindo do chão; 3. corpo arremessado na horizontal. |
 | 3 | **Pushblock** (`<id>_pushblock`) | guarda | 3 (3 × 1) | Defesa que empurra: 1. guarda fechada; 2. abre os braços com força para a frente, base firme; 3. volta para a guarda. |
 | 4 | **Air dash** (`<id>_air_dash`) | clipe de dash no chão | 4 (2 × 2) | No ar: 1-2. corpo inclinado para a frente, horizontal, voando rápido, roupa e cabelo para trás; 3-4. o mesmo indo para trás (back air dash), corpo inclinado para trás. Pés fora do chão. |
 | 5 | **Batida na parede** (`<id>_wall_splat`) | reação no ar | 3 (3 × 1) | Atingido e jogado de costas contra uma parede invisível à esquerda: 1. costas batendo na parede, braços abertos; 2. quicando para longe dela; 3. caindo inclinado para a frente. |
-| 6 | **Especial (projétil)** (`specialAnimations.S`) | pose de combate | 5 (5 × 1) | Lançando uma bola de energia (sem desenhar a energia): 1. recua as mãos para a cintura; 2-3. carrega; 4. empurra as duas mãos para a frente; 5. volta para a guarda. |
-| 7 | **Super** (`specialAnimations.SUPER`) | pose de combate | 6 (3 × 2) | Pose de golpe especial forte: 1-2. concentração com os punhos fechados; 3-4. postura de poder, roupa esvoaçando; 5. disparo com as duas mãos; 6. recuperação. |
-
 | 8 | **Rolamento** (`<id>_roll`) | clipe de levantar | 4 (4 × 1) | Rolamento de chão no levantar: 1. de costas no chão encolhendo; 2-3. rolando de lado como uma bola; 4. saindo do rolamento já agachado em guarda. |
 | 9 | **Air tech** (`<id>_air_tech`) | pose de pulo | 3 (3 × 1) | Recuperação no ar: 1. corpo encolhido girando (cambalhota); 2. abrindo o corpo; 3. pronto para cair em guarda, pés para baixo. |
 
-Itens 1, 2 e 5 também servem para o Guard Cancel e o ground bounce (o ground bounce usa a
+Agarrão, especial e Super já têm arte no p01 (vídeo). Itens 2 e 5 também servem para o Guard Cancel e o ground bounce (o ground bounce usa a
 reação no ar que já existe).
 
 ## Lutador Teste 2 (player_two)
