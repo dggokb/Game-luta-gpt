@@ -5,9 +5,14 @@ package com.gamelutagpt;
  * same screen height and follows a Super Jump vertically. Pure math, unit-testable.
  */
 final class CameraRig {
-    static final float CAMERA_ZOOM = 1.24f;
+    /**
+     * Closest framing. With the margin below, fighters at the starting distance (560) are
+     * drawn ~27% larger than before (zoom 1.18 -> 1.50): the size of the p01 intro.
+     */
+    static final float CAMERA_ZOOM = 1.55f;
     static final float CAMERA_MIN_ZOOM = 0.78f;
-    static final float CAMERA_FIGHTER_MARGIN_X = 520f;
+    /** World width kept around both roots; only the backs of the fighters face the edges. */
+    static final float CAMERA_FIGHTER_MARGIN_X = 290f;
     static final float CAMERA_GROUND_SCREEN_Y = 552f;
     static final float CAMERA_TOP_MARGIN_SCREEN = 64f;
     static final float CAMERA_BOTTOM_MARGIN_SCREEN = 45f;
