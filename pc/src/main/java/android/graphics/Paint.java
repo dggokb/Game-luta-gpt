@@ -39,6 +39,7 @@ public class Paint {
     public void setTextSize(float textSize){this.textSize=textSize;}
     public void setTextAlign(Align textAlign){this.textAlign=textAlign;}
     public void setFakeBoldText(boolean fakeBold){this.fakeBold=fakeBold;}
+    public void setTypeface(Typeface typeface){if(typeface!=null)this.fakeBold=typeface.bold;}
     public void setTextSkewX(float textSkewX){this.textSkewX=textSkewX;}
     public void setTextScaleX(float textScaleX){this.textScaleX=textScaleX;}
     public void setStrokeCap(Cap strokeCap){this.strokeCap=strokeCap;}
@@ -68,9 +69,15 @@ public class Paint {
         java.awt.Color awtColor=new java.awt.Color(Color.red(color),Color.green(color),Color.blue(color),actualAlpha);
 
         if(shader instanceof LinearGradient gradient){
-            java.awt.Color c0=new java.awt.Color(Color.red(gradient.color0),Color.green(gradient.color0),Color.blue(gradient.color0),Color.alpha(gradient.color0)*alpha/255);
-            java.awt.Color c1=new java.awt.Color(Color.red(gradient.color1),Color.green(gradient.color1),Color.blue(gradient.color1),Color.alpha(gradient.color1)*alpha/255);
+            java.awt.Color c0=awt(gradient.color0,alpha);
+            java.awt.Color c1=awt(gradient.color1,alpha);
             g.setPaint(new GradientPaint(gradient.x0,gradient.y0,c0,gradient.x1,gradient.y1,c1,false));
+        }else if(shader instanceof RadialGradient gradient){
+            java.awt.Color c0=awt(gradient.color0,alpha);
+            java.awt.Color c1=awt(gradient.color1,alpha);
+            g.setPaint(new java.awt.RadialGradientPaint(
+                gradient.cx,gradient.cy,Math.max(0.1f,gradient.radius),
+                new float[]{0f,1f},new java.awt.Color[]{c0,c1}));
         }else{
             g.setPaint(awtColor);
         }
@@ -87,5 +94,9 @@ public class Paint {
         };
         g.setStroke(new BasicStroke(Math.max(0.1f,strokeWidth),cap,join));
         g.setFont(font());
+    }
+
+    private static java.awt.Color awt(int value,int paintAlpha){
+        return new java.awt.Color(Color.red(value),Color.green(value),Color.blue(value),Color.alpha(value)*paintAlpha/255);
     }
 }
