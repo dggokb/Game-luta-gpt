@@ -1,0 +1,110 @@
+{
+  "id": "p03_dash",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_dash_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Corrida 20-35, 1 a cada 3; chao, poeira e linhas de velocidade recortados.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 256,
+    "rootX": 300,
+    "rootY": 238,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        142,
+        77,
+        387,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16678
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        189,
+        75,
+        374,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13808
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        130,
+        77,
+        387,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16659
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        197,
+        79,
+        380,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14044
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        144,
+        74,
+        386,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16651
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        155,
+        75,
+        384,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15622
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 278,
+    "frameHeight": 186,
+    "rootX": 180,
+    "rootY": 175,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      120,
+      63
+    ],
+    "decodedBytes": {
+      "canonical": 3145728,
+      "packed": 1240992
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "3aeaa33ce28631be8508d1117ec9a293aff5333d6be4b7eb562f0b4286954d31",
+      "config": "0b9b7c07fb2f1bfaf464700bcc519d974e917d064e0de8f2a1c8c1f7c076f324",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}

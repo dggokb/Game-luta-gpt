@@ -88,7 +88,7 @@ class CharacterPackTests(unittest.TestCase):
 
     def test_checked_in_roster_contains_real_second_character(self):
         roster=json.loads((self.root/'characters/roster.json').read_text())
-        self.assertEqual(['player_base','player_two'],roster['team'])
+        self.assertEqual(['player_base','p03'],roster['team'])
         self.assertEqual('monster_npc',roster['opponentCharacter'])
         monster=json.loads((self.root/'characters/monster_npc/character.json').read_text())
         self.assertEqual('monster_npc.json',monster['profile'])

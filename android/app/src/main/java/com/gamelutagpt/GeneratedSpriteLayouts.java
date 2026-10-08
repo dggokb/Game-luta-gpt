@@ -10,6 +10,36 @@ final class GeneratedSpriteLayouts {
     static final int MONSTER_NPC_PACK_ROOT_Y = 223;
     static final int MONSTER_NPC_PACK_FRAME_COUNT = 16;
 
+    static final int P03_BACKDASH_FRAME_WIDTH = 184;
+    static final int P03_BACKDASH_FRAME_HEIGHT = 249;
+    static final int P03_BACKDASH_ROOT_X = 97;
+    static final int P03_BACKDASH_ROOT_Y = 237;
+    static final int P03_BACKDASH_FRAME_COUNT = 10;
+
+    static final int P03_DASH_FRAME_WIDTH = 278;
+    static final int P03_DASH_FRAME_HEIGHT = 186;
+    static final int P03_DASH_ROOT_X = 180;
+    static final int P03_DASH_ROOT_Y = 175;
+    static final int P03_DASH_FRAME_COUNT = 6;
+
+    static final int P03_IDLE_FRAME_WIDTH = 191;
+    static final int P03_IDLE_FRAME_HEIGHT = 246;
+    static final int P03_IDLE_ROOT_X = 75;
+    static final int P03_IDLE_ROOT_Y = 235;
+    static final int P03_IDLE_FRAME_COUNT = 60;
+
+    static final int P03_WALK_BACK_FRAME_WIDTH = 176;
+    static final int P03_WALK_BACK_FRAME_HEIGHT = 247;
+    static final int P03_WALK_BACK_ROOT_X = 88;
+    static final int P03_WALK_BACK_ROOT_Y = 236;
+    static final int P03_WALK_BACK_FRAME_COUNT = 19;
+
+    static final int P03_WALK_FORWARD_FRAME_WIDTH = 168;
+    static final int P03_WALK_FORWARD_FRAME_HEIGHT = 247;
+    static final int P03_WALK_FORWARD_ROOT_X = 82;
+    static final int P03_WALK_FORWARD_ROOT_Y = 235;
+    static final int P03_WALK_FORWARD_FRAME_COUNT = 36;
+
     static final int BACKDASH_SET_FRAME_WIDTH = 256;
     static final int BACKDASH_SET_FRAME_HEIGHT = 248;
     static final int BACKDASH_SET_ROOT_X = 106;

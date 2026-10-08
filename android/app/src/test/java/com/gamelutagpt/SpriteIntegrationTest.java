@@ -38,7 +38,13 @@ public class SpriteIntegrationTest {
     }
 
     @Test public void productionRosterUsesRealSecondCharacterPack()throws Exception {
-        assertArrayEquals(new String[]{"player_base","player_two"},GeneratedCharacters.TEAM);
+        assertArrayEquals(new String[]{"player_base","p03"},GeneratedCharacters.TEAM);
+        // p03: same profile (scale) as p01, own idle/walk/dash art from video.
+        CharacterDefinition p03=GeneratedCharacters.get("p03");
+        assertEquals("player_base",p03.profile.id);
+        assertEquals("p03_idle",p03.animation("IDLE").atlas.resource);
+        assertEquals("p03_walk_forward",p03.animation("WALK_FORWARD").atlas.resource);
+        // The drawn test character stays available as a pack outside the team.
         assertEquals("monster_npc",GeneratedCharacters.OPPONENT);
         CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
         assertEquals("monster_npc",npc.id);
@@ -161,11 +167,11 @@ public class SpriteIntegrationTest {
         rawTag();
         frames(72);
         assertEquals(1,game.engine.team(0).point);
-        assertEquals("player_two",rendererCharacterId());
+        assertEquals("p03",rendererCharacterId());
 
         String[] bindings={"L","M","H"};
         PadInput.Button[] buttons={PadInput.Button.LIGHT,PadInput.Button.MEDIUM,PadInput.Button.HEAVY};
-        CharacterDefinition second=GeneratedCharacters.get("player_two");
+        CharacterDefinition second=GeneratedCharacters.get("p03");
         assertSame("The engine plays the tagged-in pack",second,player().character());
         for(int i=0;i<bindings.length;i++) {
             int total=second.attack(bindings[i]).totalFrames;

@@ -3,7 +3,7 @@
   "defaultCharacter": "player_base",
   "team": [
     "player_base",
-    "player_two"
+    "p03"
   ],
   "opponentCharacter": "monster_npc"
 }

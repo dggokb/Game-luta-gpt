@@ -1,0 +1,14 @@
+{
+  "id": "p03_idle",
+  "javaName": "P03_IDLE",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/p03_idle_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_idle.png",
+  "report": "tools/sprites/reports/p03_idle.report.json",
+  "preview": "android/app/build/sprite-review/p03_idle-import.png",
+  "expectedFrames": 60,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Loop 17-77."
+}
