@@ -244,12 +244,18 @@ final class CombatEngine {
 
         boolean crouch = ControlsLayout.isDownDirection(in.direction);
         if (in.light || in.medium || in.heavy) {
+            String button = in.heavy ? "H" : in.medium ? "M" : "L";
+            // Command specials first (longest motion wins), then the energy command.
+            String commandSpecial = f.character().matchSpecial(f.motion, button, clock,
+                config.motionWindowFrames, config.motionPressFrames);
             int[] command = f.state.profile.energyCommand;
-            boolean special = f.state.profile.energy != null &&
+            boolean special = commandSpecial == null && f.state.profile.energy != null &&
                 f.motion.matchCommand(command, clock, config.motionWindowFrames, config.motionPressFrames);
-            if (special) {
+            if (commandSpecial != null) {
+                f.buffer.push(InputBuffer.Button.SPECIAL, commandSpecial, false);
+            } else if (special) {
                 // The command only arms the special; the strongest button pressed picks its strength.
-                f.buffer.push(InputBuffer.Button.SPECIAL, in.heavy ? "H" : in.medium ? "M" : "L", false);
+                f.buffer.push(InputBuffer.Button.SPECIAL, button, false);
             } else {
                 if (in.light) f.buffer.push(InputBuffer.Button.LIGHT, null, crouch);
                 if (in.medium) f.buffer.push(InputBuffer.Button.MEDIUM, null, crouch);
@@ -492,7 +498,7 @@ final class CombatEngine {
         f.status = CombatFighter.Status.ATTACK;
         f.clearAttack();
         f.attack = attack;
-        f.move = attack.kind == AttackDefinition.Kind.NORMAL ? f.character().moves.get(attack.id) : null;
+        f.move = attack.kind == AttackDefinition.Kind.NORMAL ? f.character().moveFor(attack.id) : null;
         f.specialStrength = strength;
         f.autoStep = step;
         f.forwardDashing = false;

@@ -951,6 +951,152 @@
         40,
         47
       ]
+    },
+    "SPECIAL_S2": {
+      "atlas": "player_base_special_s2",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "loop": false,
+      "durationsMs": [
+        35,
+        35,
+        24,
+        23,
+        20,
+        25,
+        40,
+        40,
+        42,
+        60,
+        45,
+        30,
+        30,
+        30,
+        30,
+        30,
+        35,
+        35,
+        40,
+        35
+      ]
+    },
+    "SPECIAL_S3": {
+      "atlas": "player_base_special_s3",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "loop": false,
+      "durationsMs": [
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        16,
+        17,
+        17,
+        17,
+        40,
+        40,
+        40,
+        35,
+        35,
+        35,
+        35,
+        40
+      ]
+    },
+    "SPECIAL_S4": {
+      "atlas": "player_base_special_s4",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "loop": false,
+      "durationsMs": [
+        40,
+        40,
+        45,
+        42,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        31,
+        31,
+        31,
+        50,
+        45,
+        45,
+        45,
+        48
+      ]
     }
   },
   "moves": {
@@ -1009,7 +1155,10 @@
       "cancelInto": [
         "H",
         "2M",
-        "S"
+        "S",
+        "S2",
+        "S3",
+        "S4"
       ],
       "pushbackOnHit": 32,
       "pushbackOnBlock": 38
@@ -1037,7 +1186,10 @@
       },
       "cancelInto": [
         "S",
-        "SUPER"
+        "SUPER",
+        "S2",
+        "S3",
+        "S4"
       ],
       "pushbackOnHit": 44,
       "pushbackOnBlock": 50,
@@ -1212,5 +1364,106 @@
   "specialAnimations": {
     "ULTRA": "ULTRA_BEAM",
     "S": "SPECIAL_ENERGY"
+  },
+  "specialMoves": {
+    "S2": {
+      "command": [
+        1,
+        3,
+        2
+      ],
+      "animation": "SPECIAL_S2",
+      "damage": 1100,
+      "reach": 100,
+      "hitHeight": 130,
+      "startupFrames": 7,
+      "activeFrames": 10,
+      "recoveryFrames": 24,
+      "hitstunFrames": 30,
+      "blockstunFrames": 12,
+      "hitstopFrames": 10,
+      "cancelWindows": {
+        "hit": [
+          7,
+          22
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "launchType": "knockdown",
+      "knockback": 60,
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 50
+    },
+    "S3": {
+      "command": [
+        3,
+        5
+      ],
+      "buttons": [
+        "L",
+        "M"
+      ],
+      "animation": "SPECIAL_S3",
+      "damage": 900,
+      "reach": 110,
+      "hitHeight": 90,
+      "startupFrames": 20,
+      "activeFrames": 4,
+      "recoveryFrames": 18,
+      "hitstunFrames": 22,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          20,
+          29
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "pushbackOnHit": 40,
+      "pushbackOnBlock": 50
+    },
+    "S4": {
+      "command": [
+        3,
+        5
+      ],
+      "buttons": [
+        "H"
+      ],
+      "animation": "SPECIAL_S4",
+      "damage": 1000,
+      "reach": 140,
+      "hitHeight": 110,
+      "startupFrames": 10,
+      "activeFrames": 20,
+      "recoveryFrames": 14,
+      "hitstunFrames": 24,
+      "blockstunFrames": 14,
+      "hitstopFrames": 8,
+      "cancelWindows": {
+        "hit": [
+          10,
+          35
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "launchType": "knockdown",
+      "knockback": 70,
+      "pushbackOnHit": 30,
+      "pushbackOnBlock": 60
+    }
   }
 }

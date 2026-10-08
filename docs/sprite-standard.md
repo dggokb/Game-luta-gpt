@@ -124,6 +124,13 @@ Os IDs de animação de ataque são livres: não é necessário alterar um enum 
 do especial é esticado sobre a animação. `ULTRA` é a folha de 9 poses do raio final do
 ultra; o jogo escolhe o quadro pela fase do raio (veja `docs/ultra-pagina-final.md`).
 
+`specialMoves` declara especiais de comando (`S2` a `S9`): os mesmos campos de um golpe de
+`moves` (animação, dano, frame data, cancelamentos) mais `command` (direções relativas,
+como a energia: 1 frente, 3 baixo, 5 trás) e `buttons` (opcional, padrão `["L","M","H"]`).
+Ex.: `"S2": {"command": [1, 3, 2], ...}` é → ↓ ↘ + botão. São golpes de chão; o comando
+mais longo vence, e dois especiais não podem dividir comando e botão. Golpes normais
+cancelam neles quando o `cancelInto` os lista.
+
 Folhas do GPT desenhadas numa grade apertada (uma mão ou tira entra na célula vizinha)
 passam antes por `tools/sprites/separar_folha.py`, que devolve cada pedaço ao quadro dono e
 monta uma faixa com espaço entre os quadros. Quando os pés de uma pose larga não ficam na

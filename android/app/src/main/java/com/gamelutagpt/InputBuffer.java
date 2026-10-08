@@ -14,7 +14,7 @@ final class InputBuffer {
 
     static final class Entry {
         final Button button;
-        /** SPECIAL: strength "L", "M" or "H" that picked it. */
+        /** SPECIAL: strength "L", "M" or "H" of the energy, or the command special ("S2"...). */
         final String strength;
         /** Down was held when it was pressed (grounded presses become 2L/2M/2H). */
         final boolean crouch;
@@ -30,7 +30,8 @@ final class InputBuffer {
         }
 
         @Override public String toString() {
-            String name = button == Button.SPECIAL ? "S" + strength : button.name();
+            String name = button == Button.SPECIAL
+                ? (strength != null && strength.startsWith("S") ? strength : "S" + strength) : button.name();
             return (crouch ? "2" : "") + name + "(" + age + ")";
         }
     }

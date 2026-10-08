@@ -24,6 +24,9 @@ BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH')}
 SPECIALS = ('S','SUPER','ULTRA')
+# Command specials (S2, S3...): ground moves started by a motion plus a button.
+SPECIAL_MOVE = re.compile('S[2-9]')
+BUTTONS = ('L','M','H')
 # Moves a partner can perform as an assist (ground normals or the energy projectile).
 ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
@@ -155,7 +158,7 @@ def attack_ids(pack):
     ids = set(BINDINGS)
     if 'energy' in pack['fighter']: ids.add('S')
     if 'super' in pack['fighter']: ids.add('SUPER')
-    return ids
+    return ids | set(pack.get('specialMoves', {}))
 
 def validate_routes(pack):
     """Load fails when a cancel route points nowhere or crosses ground/air."""
@@ -163,6 +166,7 @@ def validate_routes(pack):
     attacks = {b:pack['moves'][b] for b in BINDINGS}
     if 'energy' in pack['fighter']: attacks['S'] = pack['fighter']['energy']['attack']
     if 'super' in pack['fighter']: attacks['SUPER'] = pack['fighter']['super']['attack']
+    attacks.update(pack.get('specialMoves', {}))
     for source,m in attacks.items():
         air = source.startswith('j')
         for target in m['cancelInto']:
@@ -171,7 +175,7 @@ def validate_routes(pack):
                 continue
             if target not in ids:
                 raise ValueError(f'{pack["id"]}/{source}: cancelInto {target} does not exist')
-            if target not in SPECIALS and target.startswith('j') != air:
+            if target not in SPECIALS and target not in pack.get('specialMoves', {}) and target.startswith('j') != air:
                 raise ValueError(f'{pack["id"]}/{source}: cancelInto {target} changes ground/air')
     combo = pack['fighter']['autoCombo']
     for a,b in zip(combo, combo[1:]):
@@ -197,6 +201,25 @@ def validate_move(pack, binding, m):
     if 'hitHeight' in m: positive(m['hitHeight'], binding)
     if type(m['damage']) is not int or m['damage'] <= 0:
         raise ValueError(f'{binding}: damage must be a positive integer')
+
+def validate_special_moves(pack):
+    """S2, S3...: a ground move (same data as a normal) plus its motion and buttons."""
+    for key,m in pack.get('specialMoves', {}).items():
+        if not SPECIAL_MOVE.fullmatch(key):
+            raise ValueError(f'{pack["id"]}/{key}: special moves are named S2..S9')
+        command = m.get('command')
+        if not (isinstance(command,list) and command and all(type(v) is int and 0 <= v <= 8 for v in command)):
+            raise ValueError(f'{pack["id"]}/{key}.command: expected relative directions 0..8 (1 forward, 5 back)')
+        buttons = m.get('buttons', list(BUTTONS))
+        if not (isinstance(buttons,list) and buttons and all(b in BUTTONS for b in buttons)):
+            raise ValueError(f'{pack["id"]}/{key}.buttons: expected a list of L, M, H')
+        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons')})
+    seen = {}
+    for key,m in pack.get('specialMoves', {}).items():
+        for b in m.get('buttons', BUTTONS):
+            other = seen.setdefault((tuple(m['command']), b), key)
+            if other != key:
+                raise ValueError(f'{pack["id"]}: {other} and {key} share command and button {b}')
 
 def visual_heights(pack, atlases):
     """World-space visual height (opaque pixels) measured from import reports."""
@@ -260,7 +283,8 @@ def compile_packs(root, results):
                 raise ValueError(f'{key}: special animation must be S/SUPER/ULTRA bound to a timed one-shot')
         # Free-form names are allowed only for clips something actually plays; this
         # turns a typo such as "HIT_STAN" into a build error instead of a silent fallback.
-        used = {m['animation'] for m in moves.values() if 'animation' in m} | set(specials.values())
+        validate_special_moves(pack)
+        used = {m['animation'] for m in list(moves.values()) + list(pack.get('specialMoves', {}).values()) if 'animation' in m} | set(specials.values())
         orphan = set(animations) - set(REQUIRED) - set(OPTIONAL) - used
         if orphan:
             raise ValueError(f'{pack["id"]}: animations {sorted(orphan)} are not a known state nor used by a move')
@@ -321,7 +345,8 @@ def compile_packs(root, results):
     for pack in packs:
         lines += [' {', ' Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();',
                   ' Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();',
-                  ' Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();']
+                  ' Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();',
+                  ' Map<String,CharacterDefinition.Special> sm=new LinkedHashMap<>();']
         for key,a in pack['animations'].items():
             cfg,report = atlases[a['atlas']]; l = report['packed']
             atlas = 'new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]+[str(l.get('columns',l['frameCount'])),str(l['frameCount'])])+')'
@@ -332,6 +357,11 @@ def compile_packs(root, results):
             pose = q(m['pose']) if 'pose' in m else 'null'
             height = m.get('hitHeight', 42 if key.startswith('2') else 78)
             lines += [' m.put('+q(key)+',new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+attack(key,m,'NORMAL',m['damage'],m['reach'],height)+'));']
+        for key,m in pack.get('specialMoves',{}).items():
+            animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
+            pose = q(m['pose']) if 'pose' in m else 'null'
+            move = 'new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+attack(key,m,'NORMAL',m['damage'],m['reach'],m.get('hitHeight',78))+')'
+            lines += [' sm.put('+q(key)+',new CharacterDefinition.Special('+move+',new int[]{'+','.join(map(str,m['command']))+'},'+q(''.join(m.get('buttons',BUTTONS)))+'));']
         for key,animation in pack.get('specialAnimations',{}).items():
             lines += [' s.put('+q(key)+',a.get('+q(animation)+'));']
         p = pack['_profile'];fi = pack['fighter'];body = fi['body']
@@ -344,7 +374,7 @@ def compile_packs(root, results):
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')')
         stand,crouch = pack['_visual']
-        lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s));',' }']
+        lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']
     (root / JAVA / 'GeneratedCharacters.java').write_text('\n'.join(lines))
     return packs

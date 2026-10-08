@@ -160,7 +160,7 @@ final class AttackDefinition {
 
     static Strength strengthOf(String binding) {
         if ("SUPER".equals(binding) || "ULTRA".equals(binding)) return Strength.SUPER;
-        if ("S".equals(binding)) return Strength.SPECIAL;
+        if ("S".equals(binding) || binding.matches("S[2-9]")) return Strength.SPECIAL;
         if ("THROW".equals(binding)) return Strength.HEAVY;
         char button = binding.charAt(binding.length() - 1);
         if (button == 'L') return Strength.LIGHT;

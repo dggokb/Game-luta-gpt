@@ -84,6 +84,25 @@ final class CharacterDefinition {
         }
         float animationTime(float elapsed) { return animation==null?0f:animation.timeFor(elapsed,totalTime); }
     }
+    /**
+     * Command special (S2, S3...): a ground move started by a motion plus one of its
+     * buttons. Relative directions, as the energy command: 1 forward, 3 down, 5 back.
+     */
+    static final class Special {
+        final Move move;
+        private final int[] command;
+        /** Buttons that fire it ("LMH" = any). */
+        final String buttons;
+        Special(Move move,int[] command,String buttons) {
+            this.move=move;this.command=command.clone();this.buttons=buttons;
+        }
+        int[] command() { return command.clone(); }
+        int commandLength() { return command.length; }
+        boolean acceptsButton(String button) { return buttons.contains(button); }
+        boolean matches(MotionParser motion,int clock,int motionWindow,int pressWindow) {
+            return motion.matchCommand(command,clock,motionWindow,pressWindow);
+        }
+    }
     static final class Projectile {
         final int damage;
         final float range,speed;
@@ -148,28 +167,58 @@ final class CharacterDefinition {
     final Map<String,Animation> animations;
     final Map<String,Move> moves;
     final Map<String,Animation> specialAnimations;
+    /** Command specials by binding (S2, S3...), longest command first. */
+    final Map<String,Special> specials;
     CharacterDefinition(String id,String displayName,CharacterVisualProfile profile,int artFacing,
                         float visualStandHeight,float visualCrouchHeight,Fighter fighter,
                         Map<String,Animation> animations,Map<String,Move> moves,
                         Map<String,Animation> specialAnimations) {
+        this(id,displayName,profile,artFacing,visualStandHeight,visualCrouchHeight,fighter,
+            animations,moves,specialAnimations,Collections.<String,Special>emptyMap());
+    }
+    CharacterDefinition(String id,String displayName,CharacterVisualProfile profile,int artFacing,
+                        float visualStandHeight,float visualCrouchHeight,Fighter fighter,
+                        Map<String,Animation> animations,Map<String,Move> moves,
+                        Map<String,Animation> specialAnimations,Map<String,Special> specials) {
         this.id=id;this.displayName=displayName;this.profile=profile;this.artFacing=artFacing;
         this.visualStandHeight=visualStandHeight;this.visualCrouchHeight=visualCrouchHeight;this.fighter=fighter;
         this.animations=Collections.unmodifiableMap(new LinkedHashMap<>(animations));
         this.moves=Collections.unmodifiableMap(new LinkedHashMap<>(moves));
         this.specialAnimations=Collections.unmodifiableMap(new LinkedHashMap<>(specialAnimations));
+        // Longest command first, so →↓↘ wins over a shorter motion it contains.
+        java.util.List<Map.Entry<String,Special>> sorted=new java.util.ArrayList<>(specials.entrySet());
+        java.util.Collections.sort(sorted,(x,y)->y.getValue().commandLength()-x.getValue().commandLength());
+        Map<String,Special> ordered=new LinkedHashMap<>();
+        for(Map.Entry<String,Special> e:sorted)ordered.put(e.getKey(),e.getValue());
+        this.specials=Collections.unmodifiableMap(ordered);
         validateCombat();
     }
     /** Copy with different animations; used by tests and tooling. */
     CharacterDefinition withAnimations(String id,Map<String,Animation> animations) {
         return new CharacterDefinition(id,id,profile,artFacing,visualStandHeight,visualCrouchHeight,
-            fighter,animations,moves,specialAnimations);
+            fighter,animations,moves,specialAnimations,specials);
     }
     /** Combat definition of a binding, S or SUPER; null when the character lacks it. */
     AttackDefinition attack(String id) {
         if("S".equals(id))return fighter.energy==null?null:fighter.energy.attack;
         if("SUPER".equals(id))return fighter.superAttack==null?null:fighter.superAttack.attack;
-        Move move=moves.get(id);
+        Move move=moveFor(id);
         return move==null?null:move.attack;
+    }
+    /** Move with art and hitboxes for a normal or command-special binding; null otherwise. */
+    Move moveFor(String id) {
+        Move move=moves.get(id);
+        if(move!=null)return move;
+        Special special=specials.get(id);
+        return special==null?null:special.move;
+    }
+    /** The command special this button press completes, consuming the motion; null when none. */
+    String matchSpecial(MotionParser motion,String button,int clock,int motionWindow,int pressWindow) {
+        for(Map.Entry<String,Special> e:specials.entrySet()) {
+            Special s=e.getValue();
+            if(s.acceptsButton(button)&&s.matches(motion,clock,motionWindow,pressWindow))return e.getKey();
+        }
+        return null;
     }
     /**
      * Load-time validation of the combat data: every cancel route points to an existing
@@ -177,6 +226,7 @@ final class CharacterDefinition {
      */
     private void validateCombat() {
         java.util.List<String> ids=new java.util.ArrayList<>(moves.keySet());
+        ids.addAll(specials.keySet());
         if(fighter.energy!=null)ids.add("S");
         if(fighter.superAttack!=null)ids.add("SUPER");
         for(String id:ids) {
@@ -190,7 +240,7 @@ final class CharacterDefinition {
                 }
                 if(attack(target)==null)
                     throw new IllegalArgumentException(this.id+"/"+id+": cancelInto "+target+" does not exist");
-                boolean special="S".equals(target)||"SUPER".equals(target);
+                boolean special="S".equals(target)||"SUPER".equals(target)||specials.containsKey(target);
                 if(!special && target.startsWith("j")!=air)
                     throw new IllegalArgumentException(this.id+"/"+id+": cancelInto "+target+" changes ground/air");
             }

@@ -46,6 +46,8 @@ final class CancelSystem {
             case MEDIUM: return c.attack(binding(f, "M", entry.crouch));
             case HEAVY: return c.attack(binding(f, "H", entry.crouch));
             case SPECIAL:
+                // Command specials (S2, S3...) are ground moves; the strength names them.
+                if (c.specials.containsKey(entry.strength)) return f.grounded ? c.attack(entry.strength) : null;
                 if (projectileAlive || f.state.profile.energy == null) return null;
                 return c.attack("S");
             case SUPER:

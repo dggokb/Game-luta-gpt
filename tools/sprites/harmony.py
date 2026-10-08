@@ -29,6 +29,7 @@ SPIKE_TOLERANCE = 40      # one attack frame jumping out and back by more than t
 REACTION_TORSO_TOLERANCE = 28
 REACTIONS = ('HIT_STAND', 'HIT_CROUCH')
 GROUND_TOLERANCE = 4      # px above/below the root row
+AIRBORNE_CLEARANCE = 30   # feet this far above the root: an airborne pose drawn in the art
 REACTION_MIN_RATIO = 0.85 # standing defense height vs Idle height
 
 
@@ -87,9 +88,13 @@ def audit(root=ROOT):
                 if name in GROUNDED and abs(m['ground']) > GROUND_TOLERANCE:
                     problems.append(f"{where}: feet {m['ground']:+.0f}px from the ground")
             # Out-and-back spike inside a move: neighbours agree, the middle frame does not.
+            # Frames drawn in the air (feet well above the root, e.g. a spinning kick) are
+            # skipped: a leg stretched across the torso band moves the measure, not the body.
             torsos = [m['torso'] for m in frames]
             for i in range(1, len(torsos) - 1):
                 before, here, after = torsos[i - 1], torsos[i], torsos[i + 1]
+                if frames[i]['ground'] < -AIRBORNE_CLEARANCE:
+                    continue
                 if (abs(before - after) <= 15 and abs(here - before) > SPIKE_TOLERANCE
                         and abs(here - after) > SPIKE_TOLERANCE):
                     problems.append(f"{pack['id']}/{name}[{animation['frames'][i]}]: "

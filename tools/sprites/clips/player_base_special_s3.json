@@ -1,0 +1,16 @@
+{
+  "id": "player_base_special_s3",
+  "javaName": "SPECIAL_S3_SET",
+  "profile": "player_base.json",
+  "source": "art/sprites/source/player_base_special_s3_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_special_s3.png",
+  "report": "tools/sprites/reports/player_base_special_s3.report.json",
+  "preview": "android/app/build/sprite-review/special_s3-import.png",
+  "expectedFrames": 21,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "frameWidth": 384,
+  "rootX": 140,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+}

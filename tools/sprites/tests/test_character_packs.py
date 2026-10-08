@@ -59,9 +59,18 @@ class CharacterPackTests(unittest.TestCase):
     def test_auto_combo_must_be_a_declared_route(self):
         self.edit(lambda d:d['fighter'].update(autoCombo=['H','L']))
         with self.assertRaisesRegex(ValueError,'autoCombo H -> L is not a declared cancel route'):pipeline.build(self.root)
+    def test_command_specials_must_not_share_command_and_button(self):
+        self.edit(lambda d:d['specialMoves']['S4'].update(buttons=['M','H']))
+        with self.assertRaisesRegex(ValueError,'S3 and S4 share command and button M'):pipeline.build(self.root)
+    def test_command_special_needs_a_valid_command(self):
+        self.edit(lambda d:d['specialMoves']['S2'].update(command=[1,9]))
+        with self.assertRaisesRegex(ValueError,'S2.command'):pipeline.build(self.root)
     def test_frame_data_is_compiled_into_attack_definitions(self):
         pipeline.build(self.root)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('sm.put("S2",new CharacterDefinition.Special(new CharacterDefinition.Move("S2",a.get("SPECIAL_S2")',java)
+        self.assertIn('new int[]{1,3,2},"LMH"));',java)
+        self.assertIn('new int[]{3,5},"H"));',java)
         self.assertIn('new AttackDefinition.Builder("2H",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9)',java)
         self.assertIn('.launch(AttackDefinition.Launch.LAUNCH)',java)
         self.assertIn('new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER)',java)
@@ -109,8 +118,14 @@ class CharacterPackTests(unittest.TestCase):
         self.assertNotEqual(first['profile'],second['profile'])
         self.assertTrue(set(second['animations']).issubset(set(first['animations'])))
         self.assertTrue(all(a['atlas'].startswith('player_two_') for a in second['animations'].values()))
+        def shared(pack,binding):
+            # Cancels into the character's own command specials (S2...) are not shared data.
+            m=copy.deepcopy(pack['moves'][binding])
+            m['cancelInto']=[t for t in m['cancelInto'] if t not in pack.get('specialMoves',{})]
+            return m
         for binding in ('L','M','H'):
-            self.assertEqual(first['moves'][binding],second['moves'][binding])
+            self.assertEqual(shared(first,binding),shared(second,binding))
+        self.assertEqual({'S2','S3','S4'},set(first['specialMoves']))
         self.assertEqual(set(pipeline.BINDINGS),set(first['moves']))
         self.assertEqual(set(pipeline.BINDINGS),set(second['moves']))
         self.assertIn('animation',first['moves']['2L'])

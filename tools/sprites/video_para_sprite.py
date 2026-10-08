@@ -59,6 +59,8 @@ def key(frame, dust=False, effects=False):
     if effects:
         # Clarão de impacto: amarelo claro (a pele é mais alaranjada e menos clara).
         bg |= (h >= 22) & (h <= 40) & (v >= 200) & (s >= 40)
+        # Anel de energia ciano-petróleo (o azul da roupa é mais anil, matiz >= 104).
+        bg |= (h >= 85) & (h <= 102) & (s >= 120)
     alpha = np.where(bg, 0, 255).astype(np.uint8)
     if effects:
         # Rastro de golpe: faixa fina, clara e sem cor. Some na abertura morfológica,

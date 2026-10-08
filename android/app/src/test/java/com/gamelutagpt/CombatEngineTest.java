@@ -63,7 +63,8 @@ public class CombatEngineTest {
             moves.put(a.id, new CharacterDefinition.Move(a.id, old.animation, old.pose, a));
         }
         return new CharacterDefinition(base.id + "_test", base.displayName, base.profile, base.artFacing,
-            base.visualStandHeight, base.visualCrouchHeight, fighter, base.animations, moves, base.specialAnimations);
+            base.visualStandHeight, base.visualCrouchHeight, fighter, base.animations, moves, base.specialAnimations,
+            base.specials);
     }
 
     private static AttackDefinition.Builder normal(String id, int startup, int active, int recovery) {
@@ -422,7 +423,8 @@ public class CombatEngineTest {
                 AttackDefinition.Strength.LIGHT, AttackDefinition.Strength.MEDIUM, AttackDefinition.Strength.HEAVY,
                 AttackDefinition.Strength.SPECIAL, AttackDefinition.Strength.SUPER});
         CharacterDefinition custom = new CharacterDefinition("light_first", "Light first", BASE.profile, BASE.artFacing,
-            BASE.visualStandHeight, BASE.visualCrouchHeight, lightFirst, BASE.animations, BASE.moves, BASE.specialAnimations);
+            BASE.visualStandHeight, BASE.visualCrouchHeight, lightFirst, BASE.animations, BASE.moves, BASE.specialAnimations,
+            BASE.specials);
         Sim s = new Sim(custom, NPC, 500f, 1500f);
         s.in[0].light = s.in[0].medium = s.in[0].heavy = true;
         s.step();
@@ -667,6 +669,46 @@ public class CombatEngineTest {
         slow.in[0].medium = true;
         slow.step();
         assertEquals("Late press is a plain M", "M", slow.attackId(0));
+    }
+
+    /** Holds each relative direction for one frame, then presses the button. */
+    private static Sim command(String button, int... directions) {
+        Sim s = far();
+        for (int d : directions) {
+            s.in[0].direction = d;
+            s.step();
+        }
+        if (button.equals("L")) s.in[0].light = true;
+        if (button.equals("M")) s.in[0].medium = true;
+        if (button.equals("H")) s.in[0].heavy = true;
+        s.step();
+        return s;
+    }
+
+    @Test public void commandSpecialsStartTheirOwnMoves() {
+        assertEquals("→↓↘ + button", "S2", command("M", 1, 3, 2).attackId(0));
+        assertEquals("↓↙← + L", "S3", command("L", 3, 4, 5).attackId(0));
+        assertEquals("↓↙← + M", "S3", command("M", 3, 4, 5).attackId(0));
+        assertEquals("↓↙← + H", "S4", command("H", 3, 4, 5).attackId(0));
+        assertEquals("↓↘→ is still the energy", "S", command("M", 3, 2, 1).attackId(0));
+        assertEquals("The longer motion wins: →↓↘→", "S2", command("H", 1, 3, 2, 1).attackId(0));
+        Sim s = command("M", 1, 3, 2);
+        assertNotNull("Command special plays its own art", s.f(0).move.animation);
+        assertEquals("SPECIAL_S2", s.f(0).move.animation.id);
+        assertFalse("Stands while it plays", s.f(0).crouching);
+    }
+
+    @Test public void normalsCancelIntoCommandSpecialsOnHit() {
+        Sim s = close();
+        s.in[0].medium = true;
+        s.step();
+        s.until(() -> s.f(0).outcome == CombatFighter.Outcome.HIT, 30);
+        for (int d : new int[] {1, 3, 2}) {
+            s.in[0].direction = d;
+            s.step();
+        }
+        s.in[0].heavy = true;
+        s.until(() -> s.attackId(0).equals("S2"), 20);
     }
 
     @Test public void heavyCancelsIntoSuperOnHitAndTheSuperFreezesTheOpponent() {
