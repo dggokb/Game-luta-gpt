@@ -81,6 +81,28 @@ Cada animação de golpe marca o quadro do impacto (`"impactFrame"` no `characte
 A animação estica sobre o frame data, e o build recusa o pacote se esse quadro não cair na
 janela ativa do golpe; aí é ajustar os `durationsMs` (mais tempo antes ou depois do impacto).
 
+## Auditoria (antes de revisar à mão)
+
+```
+python3 tools/sprites/auditoria.py p03 --folhas android/app/build/auditoria
+```
+
+Aponta, clipe por clipe, o que está fora do padrão, e grava uma folha de conferência (chão
+em verde, raiz em amarelo, quadros marcados em vermelho) só dos clipes com aviso:
+
+| Tipo | O que mede |
+|---|---|
+| tamanho | pontas do clipe em pose de guarda/agachado com altura diferente da referência; cabeça maior ou menor que a do idle (estimativa: confirmar na folha) |
+| pulo | golpe que começa ou termina em guarda com o pé de trás fora do lugar do idle |
+| deslize | pé de trás andando aos poucos durante o golpe (giro e rasteira não contam) |
+| pose | golpe/reação agachado que fica em pé |
+| efeito | cor fora da paleta do personagem num quadro (clarão, poeira, arco, rastro) |
+| quebrado | quadro de outro personagem, vazio, cortado na borda ou flutuando |
+| receita | clipe sem receita, com escala manual ou usando a arte de outro personagem |
+
+É triagem: o "erro" quase sempre é real, o "aviso" precisa de olho na folha. Leva uns 30 s
+por personagem. A lista de revisão de cada personagem sai dela (`docs/personagens/revisao.md`).
+
 ## Um vídeo pode virar vários clipes
 
 | Vídeo | Clipes do jogo |
