@@ -18,69 +18,69 @@
     {
       "index": 0,
       "outputBbox": [
-        44,
-        18,
-        201,
-        240
-      ],
-      "minimumMargin": 16,
-      "opaquePixels": 16805
-    },
-    {
-      "index": 1,
-      "outputBbox": [
-        45,
-        21,
-        201,
-        240
-      ],
-      "minimumMargin": 16,
-      "opaquePixels": 16532
-    },
-    {
-      "index": 2,
-      "outputBbox": [
         45,
         22,
         201,
         240
       ],
       "minimumMargin": 16,
-      "opaquePixels": 16517
+      "opaquePixels": 16610
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        45,
+        26,
+        200,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16345
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        45,
+        20,
+        200,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16222
     },
     {
       "index": 3,
       "outputBbox": [
-        45,
-        18,
+        46,
+        16,
         200,
-        238
+        239
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 16252
+      "minimumMargin": 16,
+      "opaquePixels": 16230
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 177,
-    "frameHeight": 241,
-    "rootX": 94,
-    "rootY": 230,
+    "frameWidth": 176,
+    "frameHeight": 244,
+    "rootX": 93,
+    "rootY": 232,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      34,
-      8
+      35,
+      6
     ],
     "decodedBytes": {
       "canonical": 1048576,
-      "packed": 682512
+      "packed": 687104
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "79cd683e7697c3a0db3a5ef29a9c6e0442f2c65d87721f2186e1090139f2770a",
+      "source": "23917f472756bdc6b697398d959fdc88707b030313f59dea1b0382bfcd8ef1a3",
       "config": "d7028f64f4a27d575acbe917de7f74b763079999ef66df7588cbfc4a39e052c3",
       "profile": "1c1418d74500afe0eff7fd53bd431aeaf64bd0f72ac3d29078cc7e87a929ea00"
     }
