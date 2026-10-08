@@ -577,16 +577,24 @@
     "DEFENSE_STAND": {
       "atlas": "player_base_defense_stand",
       "frames": [
+        7,
         1,
         2,
         3,
-        0
+        4,
+        5,
+        6,
+        7
       ],
       "loop": false,
       "durationsMs": [
         100,
-        90,
-        50,
+        40,
+        35,
+        35,
+        35,
+        35,
+        35,
         40
       ]
     },
@@ -1097,6 +1105,58 @@
         45,
         48
       ]
+    },
+    "SUPER_WAVE": {
+      "atlas": "player_base_super",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        50,
+        55,
+        60,
+        60,
+        60,
+        62,
+        62,
+        62,
+        62,
+        45,
+        40,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        34,
+        34
+      ]
     }
   },
   "moves": {
@@ -1363,7 +1423,8 @@
   },
   "specialAnimations": {
     "ULTRA": "ULTRA_BEAM",
-    "S": "SPECIAL_ENERGY"
+    "S": "SPECIAL_ENERGY",
+    "SUPER": "SUPER_WAVE"
   },
   "specialMoves": {
     "S2": {

@@ -166,9 +166,12 @@ public class CombatRulesTest {
     @Test public void guardClipsHoldTheFirstFrameAndPlayTheReactionOverBlockstun() {
         for(String id:new String[]{"DEFENSE_STAND","DEFENSE_CROUCH","DEFENSE_AIR"}) {
             CharacterDefinition.Animation guard=BASE.animation(id);
-            assertEquals(id+" held guard",1,guard.frame(guard.guardTime(false,0f),0));
-            assertEquals(id+" impact",2,guard.frame(guard.guardTime(true,0f),0));
-            assertEquals(id+" back to guard",0,guard.frame(guard.guardTime(true,1f),0));
+            int held=guard.frame(0f,0),impact=guard.frame(guard.timeOfFrame(1),0);
+            int last=guard.frame(guard.duration-.0001f,0);
+            assertEquals(id+" held guard",held,guard.frame(guard.guardTime(false,0f),0));
+            assertEquals(id+" impact",impact,guard.frame(guard.guardTime(true,0f),0));
+            assertEquals(id+" back to guard",last,guard.frame(guard.guardTime(true,1f),0));
+            assertNotEquals(id+" reaction differs from the held guard",held,impact);
         }
         assertEquals("player_base_defense_air",BASE.animation("DEFENSE_AIR").atlas.resource);
         assertEquals(BASE.animation("KNOCKDOWN").atlas.resource,BASE.animation("GROUNDED").atlas.resource);

@@ -308,10 +308,12 @@ class CharacterPackTests(unittest.TestCase):
     def test_player_base_defense_and_fall_share_one_scale_and_new_states(self):
         pipeline.build(self.root)
         scales={}
-        for key in ('defense_stand','defense_crouch','defense_air','fall'):
+        # DEFENSE_STAND comes from video (prepared grid); the drawn sheets share one scale.
+        for key in ('defense_crouch','defense_air','fall'):
             report=json.loads((self.root/f'tools/sprites/reports/player_base_{key}.report.json').read_text())
             self.assertTrue(report['passed']);scales[key]=round(report['scale'],2)
         self.assertEqual({0.37},set(scales.values()))
+        self.assertTrue(json.loads((self.root/'tools/sprites/reports/player_base_defense_stand.report.json').read_text())['passed'])
         pack=json.loads(self.path.read_text())
         self.assertEqual('player_base_defense_air',pack['animations']['DEFENSE_AIR']['atlas'])
         self.assertEqual('player_base_fall',pack['animations']['GROUNDED']['atlas'])

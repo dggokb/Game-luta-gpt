@@ -126,8 +126,9 @@ def main():
     p.add_argument("--sem-efeitos", action="store_true", help="remove clarão de impacto e rastro de golpe")
     p.add_argument("--colunas", type=int, default=8)
     p.add_argument("--raiz", default="128,238")
-    p.add_argument("--fixar", choices=["tronco", "video"], default="tronco",
-                   help="tronco: anula o deslizamento lateral; video: mantém a posição do vídeo")
+    p.add_argument("--fixar", choices=["tronco", "quadro", "video"], default="tronco",
+                   help="tronco: anula o deslizamento lateral; quadro: cada quadro no próprio tronco "
+                        "(o jogo é que empurra, ex.: defesa); video: mantém a posição do vídeo")
     p.add_argument("--pe-no-chao", action="store_true",
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
     p.add_argument("--deslocar", default="0,0",
@@ -151,6 +152,8 @@ def main():
         t = np.arange(len(xs))
         trend = np.polyval(np.polyfit(t, xs, 1), t)
         offsets = -(trend - trend[0])
+    elif args.fixar == "quadro":
+        offsets = -(xs - xs[0])
     else:
         offsets = np.zeros(len(xs))
     # Chão e posição de referência vêm do 1º quadro do vídeo (guarda em pé): poses no ar
