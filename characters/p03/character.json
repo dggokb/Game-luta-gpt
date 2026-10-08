@@ -745,7 +745,7 @@
       ]
     },
     "CROUCH_LIGHT": {
-      "atlas": "player_base_crouch_light",
+      "atlas": "p03_crouch_light",
       "frames": [
         0,
         1,
@@ -815,7 +815,7 @@
       ]
     },
     "CROUCH_HEAVY": {
-      "atlas": "player_base_crouch_heavy",
+      "atlas": "p03_crouch_heavy",
       "frames": [
         0,
         1,
@@ -891,7 +891,7 @@
       ]
     },
     "JUMP_HEAVY": {
-      "atlas": "player_base_jump_heavy",
+      "atlas": "p03_jump_heavy",
       "frames": [
         0,
         1,
@@ -1287,7 +1287,7 @@
       ]
     },
     "JUMP_HEAVY_DOWN": {
-      "atlas": "player_base_jump_heavy_down",
+      "atlas": "p03_jump_heavy_down",
       "frames": [
         0,
         1,

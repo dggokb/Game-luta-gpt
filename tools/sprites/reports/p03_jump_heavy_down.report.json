@@ -1,0 +1,121 @@
+{
+  "id": "p03_jump_heavy_down",
+  "characterProfile": "player_base",
+  "source": "art/sprites/source/p03_jump_heavy_down_video_normalized.png",
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Baixo + jH soco forte para baixo no ar; pes na raiz; quadros com clarao pulados.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 384,
+    "frameHeight": 320,
+    "rootX": 150,
+    "rootY": 300,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        67,
+        39,
+        246,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 18065
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        67,
+        40,
+        247,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17906
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        65,
+        39,
+        228,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 18144
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        39,
+        75,
+        245,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 17179
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        40,
+        76,
+        245,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 16973
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        41,
+        73,
+        242,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 16680
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        57,
+        57,
+        209,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 15539
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 228,
+    "frameHeight": 284,
+    "rootX": 121,
+    "rootY": 272,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      29,
+      28
+    ],
+    "decodedBytes": {
+      "canonical": 3440640,
+      "packed": 1813056
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "ac4b0cf8dd7fd9d951a81e287388bfdc60f6e78153da07f8b97e90399f8f0394",
+      "config": "b0ad0410efff352c3ca3810aba6ab742cf33fab68392c679ad14fc77d313784f",
+      "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    }
+  }
+}
