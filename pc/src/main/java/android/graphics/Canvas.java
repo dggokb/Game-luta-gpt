@@ -35,6 +35,7 @@ public final class Canvas {
     public int getHeight(){return height;}
 
     public int save(){states.push(new State(graphics));return states.size();}
+    public int saveLayer(RectF bounds,Paint paint){return save();}
 
     public void restore(){
         if(states.isEmpty())return;
@@ -50,6 +51,7 @@ public final class Canvas {
     }
     public void translate(float dx,float dy){graphics.translate(dx,dy);}
     public void rotate(float degrees,float px,float py){graphics.rotate(Math.toRadians(degrees),px,py);}
+    public void clipPath(Path path){ if(path!=null)graphics.clip(path.value); }
 
     public void drawRect(float left,float top,float right,float bottom,Paint paint){
         paint.apply(graphics);
@@ -67,6 +69,9 @@ public final class Canvas {
         paint.apply(graphics);
         Ellipse2D.Float shape=new Ellipse2D.Float(left,top,right-left,bottom-top);
         drawShape(shape,paint);
+    }
+    public void drawOval(RectF rect,Paint paint){
+        if(rect!=null)drawOval(rect.left,rect.top,rect.right,rect.bottom,paint);
     }
 
     public void drawCircle(float cx,float cy,float radius,Paint paint){
@@ -105,14 +110,16 @@ public final class Canvas {
     }
 
     public void drawBitmap(Bitmap bitmap,Rect source,RectF destination,Paint paint){
-        if(bitmap==null)return;
+        if(bitmap==null||destination==null)return;
         paint.apply(graphics);
         Composite previous=graphics.getComposite();
         graphics.setComposite(AlphaComposite.SrcOver);
+        int sl=0,st=0,sr=bitmap.getWidth(),sb=bitmap.getHeight();
+        if(source!=null){sl=source.left;st=source.top;sr=source.right;sb=source.bottom;}
         graphics.drawImage(bitmap.image,
             Math.round(destination.left),Math.round(destination.top),
             Math.round(destination.right),Math.round(destination.bottom),
-            source.left,source.top,source.right,source.bottom,null);
+            sl,st,sr,sb,null);
         graphics.setComposite(previous);
     }
 
