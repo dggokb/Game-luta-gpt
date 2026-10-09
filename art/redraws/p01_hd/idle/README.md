@@ -1,3 +1,18 @@
+# P01 — atualização da revisão v3
+
+**Disponível para teste visual do idle inteiro, sem APK ou integração ao jogo.** O pacote `P01-IDLE-Teste-Visual-v3.zip`, entregue na conversa, contém 76 PNGs HD, os frames originais, visualizador offline com reprodução/pausa/avanço/velocidade e uma comparação animada.
+
+Dois novos candidatos foram produzidos nesta retomada: frame 000 tentativa 04 e frame 026 tentativa 01. Os outros 74 candidatos são do lote anterior; não houve 76 novas gerações.
+
+Correção do diagnóstico anterior: a sobreposição de silhuetas na mesma tela misturava erros de enquadramento com anatomia. No lote anterior, alinhar caixas de silhueta apenas para medição elevou a média de 0,777584 para 0,940123. A revisão v3 tem média alinhada 0,940471 e mínimo 0,915531. A transformação atua somente na reprodução experimental, por metadados; os PNGs são copiados sem edição de bytes.
+
+Essas métricas não aprovam a pose exata nem a consistência temporal. Ainda podem existir oscilações de rosto, roupa, cor, anatomia e bordas. Portanto, a frase anterior de 0 aprovados descrevia uma checagem conservadora e incompleta; não é uma conclusão de que todas as poses estão erradas. A aprovação final para jogo permanece pendente.
+
+As tentativas anteriores, originais e character.json continuam preservados. Nenhuma referência de P02 foi usada.
+
+
+## Histórico do lote v1
+
 # P01 — IDLE HD, lote completo de revisão
 
 76/76 frames produzidos individualmente. Frame 000 reutiliza a segunda tentativa anterior; 001–075 foram gerados individualmente nesta execução. Zero falhas de geração. Zero frames aprovados para integração: o requisito de pose exata não foi atendido.
