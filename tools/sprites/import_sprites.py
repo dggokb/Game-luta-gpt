@@ -499,8 +499,11 @@ def process_prepared(cfg, profile):
     validation = profile["validation"]
     if width <= 0 or height <= 0:
         raise ValueError(f"{cfg['id']}: prepared-grid cell must be positive")
-    if width > int(validation["maxFrameWidth"]) or height > int(validation["maxFrameHeight"]):
-        raise ValueError(f"{cfg['id']}: prepared-grid cell exceeds profile limits")
+    # Authored super-resolution sources have larger physical pixels, not larger fighters.
+    # Validate the logical cell size, while preserving every original frame/root position.
+    density = float(cfg.get("pixelScale", 1))
+    if width / density > int(validation["maxFrameWidth"]) or height / density > int(validation["maxFrameHeight"]):
+        raise ValueError(f"{cfg['id']}: prepared-grid logical cell exceeds profile limits")
     if not 0 <= root_x < width or not 0 <= root_y < height:
         raise ValueError(f"{cfg['id']}: authored root is outside the prepared-grid cell")
     if count <= 0 or columns <= 0 or source.size != (width * columns, height * math.ceil(count / columns)):
