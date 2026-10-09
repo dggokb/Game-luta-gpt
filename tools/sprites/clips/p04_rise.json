@@ -2,7 +2,7 @@
   "id": "p04_rise",
   "javaName": "P04_RISE",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_rise_video_normalized.png",
+  "source": "art/sprites/source/p04_rise_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_rise.png",
   "report": "tools/sprites/reports/p04_rise.report.json",
   "preview": "android/app/build/sprite-review/p04_rise-import.png",
@@ -21,6 +21,12 @@
     "raiz": "104,238",
     "colunas": 6
   },
-  "frameWidth": 192,
-  "rootX": 104
+  "frameWidth": 384,
+  "rootX": 208,
+  "sourceReferences": [
+    "art/sprites/source/p04_rise_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

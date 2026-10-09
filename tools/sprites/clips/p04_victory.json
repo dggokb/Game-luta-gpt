@@ -2,7 +2,7 @@
   "id": "p04_victory",
   "javaName": "P04_VICTORY",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_victory_video_normalized.png",
+  "source": "art/sprites/source/p04_victory_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_victory.png",
   "report": "tools/sprites/reports/p04_victory.report.json",
   "preview": "android/app/build/sprite-review/p04_victory-import.png",
@@ -25,8 +25,12 @@
       11
     ]
   },
-  "frameWidth": 224,
-  "frameHeight": 384,
-  "rootX": 101,
-  "rootY": 362
+  "frameWidth": 448,
+  "frameHeight": 768,
+  "rootX": 202,
+  "rootY": 724,
+  "sourceReferences": [
+    "art/sprites/source/p04_victory_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

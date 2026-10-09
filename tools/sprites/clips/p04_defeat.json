@@ -2,13 +2,13 @@
   "id": "p04_defeat",
   "javaName": "P04_DEFEAT",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_defeat_video_normalized.png",
+  "source": "art/sprites/source/p04_defeat_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_defeat.png",
   "report": "tools/sprites/reports/p04_defeat.report.json",
   "preview": "android/app/build/sprite-review/p04_defeat-import.png",
   "expectedFrames": 33,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -21,5 +21,12 @@
     "raiz": "121,238",
     "colunas": 11
   },
-  "rootX": 121
+  "rootX": 242,
+  "sourceReferences": [
+    "art/sprites/source/p04_defeat_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

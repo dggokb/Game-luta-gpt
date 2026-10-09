@@ -2,13 +2,13 @@
   "id": "p04_dash",
   "javaName": "P04_DASH",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_dash_video_normalized.png",
+  "source": "art/sprites/source/p04_dash_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_dash.png",
   "report": "tools/sprites/reports/p04_dash.report.json",
   "preview": "android/app/build/sprite-review/p04_dash-import.png",
   "expectedFrames": 5,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -25,6 +25,12 @@
     "sem_poeira": true,
     "limpar_chao": true
   },
-  "frameWidth": 320,
-  "rootX": 160
+  "frameWidth": 640,
+  "rootX": 320,
+  "sourceReferences": [
+    "art/sprites/source/p04_dash_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

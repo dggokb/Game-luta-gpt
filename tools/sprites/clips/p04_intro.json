@@ -2,7 +2,7 @@
   "id": "p04_intro",
   "javaName": "P04_INTRO",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_intro_video_normalized.png",
+  "source": "art/sprites/source/p04_intro_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_intro.png",
   "report": "tools/sprites/reports/p04_intro.report.json",
   "preview": "android/app/build/sprite-review/p04_intro-import.png",
@@ -22,8 +22,12 @@
     "raiz": "115,302",
     "colunas": 11
   },
-  "frameWidth": 224,
-  "frameHeight": 320,
-  "rootX": 115,
-  "rootY": 302
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 230,
+  "rootY": 604,
+  "sourceReferences": [
+    "art/sprites/source/p04_intro_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

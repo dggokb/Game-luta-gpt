@@ -2,7 +2,7 @@
   "id": "p04_backdash",
   "javaName": "P04_BACKDASH",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_backdash_video_normalized.png",
+  "source": "art/sprites/source/p04_backdash_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_backdash.png",
   "report": "tools/sprites/reports/p04_backdash.report.json",
   "preview": "android/app/build/sprite-review/p04_backdash-import.png",
@@ -23,8 +23,12 @@
     "colunas": 10,
     "fixar": "quadro"
   },
-  "frameWidth": 192,
-  "frameHeight": 288,
-  "rootX": 91,
-  "rootY": 270
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 182,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p04_backdash_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
