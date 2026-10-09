@@ -1,0 +1,30 @@
+{
+  "id": "p07_walk_forward",
+  "javaName": "P07_WALK_FORWARD",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_walk_forward_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_walk_forward.png",
+  "report": "tools/sprites/reports/p07_walk_forward.report.json",
+  "preview": "android/app/build/sprite-review/p07_walk_forward-import.png",
+  "expectedFrames": 15,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "frente.mp4",
+    "personagem": "p07",
+    "escala": 0.4246,
+    "medida": "1º quadro = inicio_centro (nota 0.87)",
+    "quadros": "41,43,45,47,49,51,53,55,57,59,61,63,65,67,69",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "122,270",
+    "colunas": 11,
+    "pe_no_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 122,
+  "rootY": 270
+}

@@ -1,0 +1,27 @@
+{
+  "id": "p07_throw",
+  "javaName": "P07_THROW",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_throw_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_throw.png",
+  "report": "tools/sprites/reports/p07_throw.report.json",
+  "preview": "android/app/build/sprite-review/p07_throw-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agarrao.mp4",
+    "personagem": "p07",
+    "escala": 0.3146,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.76)",
+    "quadros": "7,16,25,34,42,51,60,69,78",
+    "largura": 320,
+    "raiz": "122,238",
+    "colunas": 9,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "rootX": 122
+}

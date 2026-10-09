@@ -1,0 +1,29 @@
+{
+  "id": "p07_dash",
+  "javaName": "P07_DASH",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_dash.png",
+  "report": "tools/sprites/reports/p07_dash.report.json",
+  "preview": "android/app/build/sprite-review/p07_dash-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p07",
+    "escala": 0.5173,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "30,37,45,52,60,67",
+    "largura": 352,
+    "raiz": "164,238",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "rootX": 164
+}

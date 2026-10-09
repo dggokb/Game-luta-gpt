@@ -1,0 +1,29 @@
+{
+  "id": "p07_fall",
+  "javaName": "P07_FALL",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_fall_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_fall.png",
+  "report": "tools/sprites/reports/p07_fall.report.json",
+  "preview": "android/app/build/sprite-review/p07_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p07",
+    "escala": 0.4542,
+    "medida": "1º quadro = inicio_centro (nota 0.90)",
+    "quadros": "47,49,51,53,55,57",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "127,270",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameHeight": 288,
+  "rootX": 127,
+  "rootY": 270
+}

@@ -1,0 +1,31 @@
+{
+  "id": "p07_hit_stand",
+  "javaName": "P07_HIT_STAND",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_hit_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_hit_stand.png",
+  "report": "tools/sprites/reports/p07_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/p07_hit_stand-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoEmPe.mp4",
+    "personagem": "p07",
+    "escala": 0.5013,
+    "medida": "1º quadro = inicio_centro (nota 0.92)",
+    "quadros": "13,23,34,44,54,65,75,86,96",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "126,270",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameHeight": 288,
+  "rootX": 126,
+  "rootY": 270
+}

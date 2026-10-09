@@ -1,0 +1,27 @@
+{
+  "id": "p07_medium_kick",
+  "javaName": "P07_MEDIUM_KICK",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_medium_kick_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_medium_kick.png",
+  "report": "tools/sprites/reports/p07_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/p07_medium_kick-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p07",
+    "escala": 0.3679,
+    "medida": "1º quadro = inicio_centro (nota 0.83)",
+    "quadros": "13,20,26,34,37,40,44,48,52,55,59,63,66,70",
+    "largura": 320,
+    "raiz": "146,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "rootX": 146
+}

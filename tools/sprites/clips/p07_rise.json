@@ -1,0 +1,27 @@
+{
+  "id": "p07_rise",
+  "javaName": "P07_RISE",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_rise_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_rise.png",
+  "report": "tools/sprites/reports/p07_rise.report.json",
+  "preview": "android/app/build/sprite-review/p07_rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachado.mp4",
+    "personagem": "p07",
+    "escala": 0.4176,
+    "medida": "último quadro = inicio_centro (nota 0.83)",
+    "quadros": "65,68,72,75,79,82",
+    "largura": 224,
+    "raiz": "137,238",
+    "colunas": 6,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 137
+}

@@ -1,0 +1,26 @@
+{
+  "id": "p07_land",
+  "javaName": "P07_LAND",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_land_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_land.png",
+  "report": "tools/sprites/reports/p07_land.report.json",
+  "preview": "android/app/build/sprite-review/p07_land-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p07",
+    "escala": 0.4542,
+    "medida": "1º quadro = inicio_centro (nota 0.90)",
+    "quadros": "58,60,62,64",
+    "largura": 256,
+    "raiz": "140,238",
+    "colunas": 4,
+    "limpar_chao": true
+  },
+  "rootX": 140
+}

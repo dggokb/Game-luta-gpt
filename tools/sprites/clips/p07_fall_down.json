@@ -1,0 +1,34 @@
+{
+  "id": "p07_fall_down",
+  "javaName": "P07_FALL_DOWN",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_fall_down_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_fall_down.png",
+  "report": "tools/sprites/reports/p07_fall_down.report.json",
+  "preview": "android/app/build/sprite-review/p07_fall_down-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruma_levanta.mp4",
+    "personagem": "p07",
+    "escala": 0.3284,
+    "medida": "1º quadro = inicio_centro (nota 0.82)",
+    "quadros": "13,16,20,27,27,30,33,33,40,47,54",
+    "celula": 224,
+    "largura": 416,
+    "raiz": "172,206",
+    "colunas": 11,
+    "fixar": "quadro",
+    "pe_no_chao": true,
+    "limpar_quadros": [
+      0
+    ]
+  },
+  "frameWidth": 416,
+  "frameHeight": 224,
+  "rootX": 172,
+  "rootY": 206
+}

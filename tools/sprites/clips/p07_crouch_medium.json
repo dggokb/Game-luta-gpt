@@ -1,0 +1,35 @@
+{
+  "id": "p07_crouch_medium",
+  "javaName": "P07_CROUCH_MEDIUM",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_crouch_medium_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_crouch_medium.png",
+  "report": "tools/sprites/reports/p07_crouch_medium.report.json",
+  "preview": "android/app/build/sprite-review/p07_crouch_medium-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2M.mp4",
+    "personagem": "p07",
+    "escala": 0.356,
+    "medida": "1º quadro = inicio_agachado (nota 0.94)",
+    "quadros": "11,13,16,18,19,19,25,30,33,37,41,46,50,54,58,62",
+    "celula": 224,
+    "largura": 448,
+    "raiz": "247,202",
+    "colunas": 11,
+    "limpar_chao": true,
+    "limpar_quadros": [
+      6,
+      7
+    ],
+    "ancorar_pe": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 224,
+  "rootX": 247,
+  "rootY": 202
+}

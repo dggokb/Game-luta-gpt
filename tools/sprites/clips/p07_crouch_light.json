@@ -1,0 +1,33 @@
+{
+  "id": "p07_crouch_light",
+  "javaName": "P07_CROUCH_LIGHT",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_crouch_light_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_crouch_light.png",
+  "report": "tools/sprites/reports/p07_crouch_light.report.json",
+  "preview": "android/app/build/sprite-review/p07_crouch_light-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2L.mp4",
+    "personagem": "p07",
+    "escala": 0.5139,
+    "medida": "1º quadro = inicio_agachado (nota 0.97)",
+    "quadros": "8,16,25,32,32,36,40,43,47,50,54",
+    "celula": 224,
+    "largura": 416,
+    "raiz": "277,206",
+    "colunas": 11,
+    "limpar_chao": true,
+    "limpar_quadros": [
+      2
+    ]
+  },
+  "frameWidth": 416,
+  "frameHeight": 224,
+  "rootX": 277,
+  "rootY": 206
+}

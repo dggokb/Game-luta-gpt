@@ -1,0 +1,30 @@
+{
+  "id": "p07_intro",
+  "javaName": "P07_INTRO",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_intro_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_intro.png",
+  "report": "tools/sprites/reports/p07_intro.report.json",
+  "preview": "android/app/build/sprite-review/p07_intro-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "intro.mp4",
+    "personagem": "p07",
+    "escala": 0.4009,
+    "medida": "cabeça do IDLE em 4 quadros (nota 0.71)",
+    "quadros": "0,4,7,11,15,18,22,26,30,33,37,41,44,48,52,55,59,63,66,70,74,78,81,85,89,92,96",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "139,270",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 139,
+  "rootY": 270
+}

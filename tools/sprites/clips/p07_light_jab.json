@@ -1,0 +1,26 @@
+{
+  "id": "p07_light_jab",
+  "javaName": "P07_LIGHT_JAB",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_light_jab_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_light_jab.png",
+  "report": "tools/sprites/reports/p07_light_jab.report.json",
+  "preview": "android/app/build/sprite-review/p07_light_jab-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p07 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "L.mp4",
+    "personagem": "p07",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "34,41,49,51,54,56,59,62,64,67,70",
+    "largura": 256,
+    "raiz": "132,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "rootX": 132
+}
