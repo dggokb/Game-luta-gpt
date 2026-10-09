@@ -1,0 +1,37 @@
+name: Sprite Quality PC P01
+on:
+  push:
+    branches: [teste-motor-sprite]
+    paths:
+      - 'tools/sprites/quality_guard.py'
+      - 'tools/sprites/tests/test_quality_guard.py'
+      - '.github/workflows/sprite-quality-pc.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sharpness-p01:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install image processing dependencies
+        run: python -m pip install -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
+      - name: Run fidelity and sharpness tests
+        run: python -m unittest discover -s tools/sprites/tests -p test_quality_guard.py -v
+      - name: Audit and conservatively improve P01 PC atlases
+        run: python tools/sprites/quality_guard.py --character player_base --enhance --strict
+      - name: Verify existing shipped sprite art unchanged
+        run: |
+          git diff --exit-code -- art/sprites/source/ android/app/src/main/res/drawable-nodpi/ characters/
+      - name: Upload P01 PC quality report and optional atlases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-PC-Quality-Report
+          path: android/app/build/quality-pc/player_base/
+          retention-days: 30
+          if-no-files-found: warn
