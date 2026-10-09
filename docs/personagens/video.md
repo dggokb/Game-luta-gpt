@@ -37,6 +37,16 @@ personagem estão na ficha dele (`p01.md`, `p03.md`).
 - **Sem adversário:** golpes acertam o ar; reações a golpes vêm de "alguém invisível".
 - Gerou estranho (virou de frente, a câmera andou, o cabelo mudou, saiu do quadro)?
   **Gere de novo**, não dá para consertar depois.
+- **Câmera parada de verdade:** escrever também "The camera never zooms in or out; the
+  character's size stays the same as in the first frame for the whole video". Intro,
+  vitória e ultra são os que mais dão zoom (aí o tamanho muda no meio e não há conserto).
+- **Golpe fraco é curto e compacto:** "short and compact: only the arm (or leg) moves, the
+  body and feet stay in place". Arte com muito movimento num golpe rápido fica acelerada no
+  jogo (ver "Ritmo").
+- **Andar e correr em loop:** "keeps walking (running) for three seconds as a continuous
+  cycle" — o jogo precisa de um ciclo de passada; uma arrancada só não vira loop.
+- **Pose do fim:** golpe agachado "ends crouched and holds the crouch for one second";
+  intro e vitória podem usar **último quadro = imagem inicial** quando não começam nela.
 - **Não precisa de vídeo** para: virar de lado (o jogo espelha o sprite) e pulo para
   frente/trás (o jogo usa o mesmo pulo e move o personagem).
 
