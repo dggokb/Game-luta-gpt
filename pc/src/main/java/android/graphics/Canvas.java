@@ -36,6 +36,16 @@ public final class Canvas {
 
     public int save(){states.push(new State(graphics));return states.size();}
 
+    public int saveLayer(RectF bounds,Paint paint){return save();}
+    public int saveLayerAlpha(float l,float t,float r,float b,int alpha){
+        int count=save();
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,Math.max(0f,Math.min(1f,alpha/255f))));
+        return count;
+    }
+    public void restoreToCount(int count){
+        while(states.size()>=count && !states.isEmpty()) restore();
+    }
+    public void clipPath(Path path){graphics.clip(path.value);}
     public void restore(){
         if(states.isEmpty())return;
         State state=states.pop();
@@ -69,6 +79,12 @@ public final class Canvas {
         drawShape(shape,paint);
     }
 
+    public void drawOval(RectF area,Paint paint){drawOval(area.left,area.top,area.right,area.bottom,paint);}
+    public void drawArc(float l,float t,float r,float b,float start,float sweep,boolean useCenter,Paint paint){
+        paint.apply(graphics);
+        java.awt.geom.Arc2D.Float a=new java.awt.geom.Arc2D.Float(l,t,r-l,b-t,-start,-sweep,useCenter?java.awt.geom.Arc2D.PIE:java.awt.geom.Arc2D.OPEN);
+        drawShape(a,paint);
+    }
     public void drawCircle(float cx,float cy,float radius,Paint paint){
         drawOval(cx-radius,cy-radius,cx+radius,cy+radius,paint);
     }
@@ -108,11 +124,12 @@ public final class Canvas {
         if(bitmap==null)return;
         paint.apply(graphics);
         Composite previous=graphics.getComposite();
-        graphics.setComposite(AlphaComposite.SrcOver);
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,Math.max(0f,Math.min(1f,paint.alpha()/255f))));
+        Rect resolved=source==null?new Rect(0,0,bitmap.getWidth(),bitmap.getHeight()):source;
         graphics.drawImage(bitmap.image,
             Math.round(destination.left),Math.round(destination.top),
             Math.round(destination.right),Math.round(destination.bottom),
-            source.left,source.top,source.right,source.bottom,null);
+            resolved.left,resolved.top,resolved.right,resolved.bottom,null);
         graphics.setComposite(previous);
     }
 

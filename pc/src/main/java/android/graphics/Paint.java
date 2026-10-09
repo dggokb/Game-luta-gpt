@@ -45,10 +45,12 @@ public class Paint {
     public void setStrokeJoin(Join strokeJoin){this.strokeJoin=strokeJoin;}
     public void setShader(Shader shader){this.shader=shader;}
     public void setColorFilter(ColorFilter colorFilter){this.colorFilter=colorFilter;}
+    public void setTypeface(Typeface value){setFakeBoldText(value==Typeface.DEFAULT_BOLD);}
 
     public float ascent(){return -0.80f*textSize;}
     public float descent(){return 0.20f*textSize;}
 
+    int alpha(){return alpha;}
     Style style(){return style;}
     Align textAlign(){return textAlign;}
     float textScaleX(){return textScaleX;}
@@ -71,6 +73,10 @@ public class Paint {
             java.awt.Color c0=new java.awt.Color(Color.red(gradient.color0),Color.green(gradient.color0),Color.blue(gradient.color0),Color.alpha(gradient.color0)*alpha/255);
             java.awt.Color c1=new java.awt.Color(Color.red(gradient.color1),Color.green(gradient.color1),Color.blue(gradient.color1),Color.alpha(gradient.color1)*alpha/255);
             g.setPaint(new GradientPaint(gradient.x0,gradient.y0,c0,gradient.x1,gradient.y1,c1,false));
+        }else if(shader instanceof RadialGradient radial) {
+            java.awt.Color center=new java.awt.Color(Color.red(radial.centerColor),Color.green(radial.centerColor),Color.blue(radial.centerColor),Color.alpha(radial.centerColor)*alpha/255);
+            java.awt.Color edge=new java.awt.Color(Color.red(radial.edgeColor),Color.green(radial.edgeColor),Color.blue(radial.edgeColor),Color.alpha(radial.edgeColor)*alpha/255);
+            g.setPaint(new java.awt.RadialGradientPaint(radial.cx,radial.cy,Math.max(1f,radial.radius),new float[]{0f,1f},new java.awt.Color[]{center,edge}));
         }else{
             g.setPaint(awtColor);
         }

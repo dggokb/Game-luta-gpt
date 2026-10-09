@@ -44,6 +44,8 @@ public final class SurfaceHolder {
         strategy=null;
     }
 
+    public Canvas lockHardwareCanvas(){return lockCanvas();}
+
     public Canvas lockCanvas(){
         ensureStrategy();
         if(strategy==null)return null;
