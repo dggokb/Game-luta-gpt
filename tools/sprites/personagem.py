@@ -54,18 +54,18 @@ STATES = ['IDLE', 'WALK_FORWARD', 'WALK_BACK', 'DASH', 'BACKDASH', 'CROUCH', 'JU
 # Nomes de arquivo já usados nos vídeos (sem .mp4, sem diferença de maiúsculas).
 ALIASES = {
     'IDLE': ['idle'], 'WALK_FORWARD': ['frente', 'andarfrente', 'andarparafrente'], 'WALK_BACK': ['tras', 'back', 'andartras', 'andarparatras'],
-    'DASH': ['dash'], 'BACKDASH': ['backdash'], 'CROUCH': ['agachar', 'abaixar', 'agachado'], 'JUMP': ['pulo', 'jump'],
+    'DASH': ['dash'], 'BACKDASH': ['backdash'], 'CROUCH': ['agachar', 'abaixar', 'agachado', 'agacha'], 'JUMP': ['pulo', 'jump'],
     'LIGHT_JAB': ['l', 'socofraco', 'll'], 'MEDIUM_KICK': ['m', 'socomedio'], 'HEAVY_STRAIGHT': ['h', 'socoforte'],
     'CROUCH_LIGHT': ['2l', 'socofracobaixo', 'chutebaixofraco'], 'CROUCH_MEDIUM': ['2m', 'rasteira', 'rasteirabaixo'],
     'CROUCH_HEAVY': ['2h', 'upper'], 'JUMP_LIGHT': ['jl', 'pulochute', 'pulochutefraco'],
     'JUMP_MEDIUM': ['jm', 'socopulo'], 'JUMP_HEAVY': ['jh', 'pulosocoforte', 'pulochuteforteparafrente'],
     'JUMP_HEAVY_DOWN': ['j2h', 'pulosocoparabaixo', 'pulosocoparabaixoforte'], 'SPECIAL_ENERGY': ['s1'],
     'SPECIAL_S2': ['s2'], 'SPECIAL_S3': ['s3'], 'SPECIAL_S4': ['s4'], 'SUPER_WAVE': ['super'], 'ULTRA_BEAM': ['ultra'],
-    'DEFENSE_STAND': ['defesaempe', 'defesacima'], 'DEFENSE_CROUCH': ['defesaagachado', 'defesaagaxado', 'defesabaixo', 'defesanochao', 'defesaembaixo', 'defesachao'],
-    'DEFENSE_AIR': ['defesanoar', 'defesapulo', 'defesapulando'], 'HIT_STAND': ['levargolpeempe', 'danoempe', 'damoempe'],
-    'HIT_CROUCH': ['levargolpeagachada', 'levargolpeagachado', 'danochao', 'danoagachado'],
-    'HIT_AIR': ['levargolpenoar', 'danopulando', 'danoar', 'golpenoar', 'danopulo', 'dano pulo'], 'KNOCKDOWN': ['derrubado', 'cair_levantar', 'caindo', 'queda_levanta', 'derrubar_levantar', 'derruma_levanta'],
-    'INTRO': ['intro'], 'VICTORY': ['vitoria'], 'DEFEAT': ['derrota'], 'TAUNT': ['provocacao', 'provocar', 'provoca'], 'THROW': ['agarrao'],
+    'DEFENSE_STAND': ['defesaempe', 'defesacima', 'defendecima'], 'DEFENSE_CROUCH': ['defesaagachado', 'defesaagaxado', 'defesabaixo', 'defesanochao', 'defesaembaixo', 'defesachao', 'defendebaixo'],
+    'DEFENSE_AIR': ['defesanoar', 'defesapulo', 'defesapulando'], 'HIT_STAND': ['levargolpeempe', 'danoempe', 'damoempe', 'danocima'],
+    'HIT_CROUCH': ['levargolpeagachada', 'levargolpeagachado', 'danochao', 'danoagachado', 'danobaixo'],
+    'HIT_AIR': ['levargolpenoar', 'danopulando', 'danoar', 'golpenoar', 'danopulo', 'dano pulo'], 'KNOCKDOWN': ['derrubado', 'cair_levantar', 'caindo', 'queda_levanta', 'derrubar_levantar', 'derruma_levanta', 'derrumba_levanta', 'derruba_levanta'],
+    'INTRO': ['intro'], 'VICTORY': ['vitoria'], 'DEFEAT': ['derrota'], 'TAUNT': ['provocacao', 'provocar', 'provoca'], 'THROW': ['agarrao', 'agarrar'],
 }
 UP = {'CROUCH_HEAVY', 'SPECIAL_S2'}  # impacto pela altura (golpe para cima)
 AIR = {'JUMP_LIGHT', 'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN', 'DEFENSE_AIR', 'HIT_AIR'}

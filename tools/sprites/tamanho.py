@@ -134,7 +134,13 @@ def medir(frames, personagem, keyer):
                     medida=f"1º e último quadro = {a['medida'].split(' = ')[1]}, mesmo zoom")
     # Não começa nem termina numa imagem inicial: procura a guarda do IDLE no vídeo. A nota
     # fica mais baixa (a pose nunca é idêntica), então 3 quadros diferentes têm de concordar.
-    guards = pack_frames(cfg['pacote'], 'IDLE', lambda n: [0, n // 3, 2 * n // 3])
+    try:
+        guards = pack_frames(cfg['pacote'], 'IDLE', lambda n: [0, n // 3, 2 * n // 3])
+    except FileNotFoundError:  # o próprio IDLE: ainda não há guarda convertida para procurar
+        raise SystemExit(
+            f"não achei a imagem inicial no vídeo (melhor: {best['medida']}, nota {best['nota']:.2f}) e o IDLE\n"
+            f"ainda não foi convertido. Gere o vídeo de novo a partir de art/keys/{personagem}/inicio_*.png,\n"
+            f"ou passe --escala N --motivo '...' (fica gravado no clipe).") from None
     step = max(1, len(frames) // 16)
     found = []
     for i in sorted(set(range(0, len(frames), step)) | {len(frames) - 1}):
