@@ -1,0 +1,60 @@
+name: P04 idle 4x super-resolution and 2x integration
+
+on:
+  push:
+    branches:
+      - art/p04-idle-sr-20261009
+    paths:
+      - .github/workflows/p04-idle-sr.yml
+      - tools/sprites/run_p04_idle_sr.py
+      - art/redraws/p04_hd/idle_sr_4x/upscale_p04_idle_sr.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  upscale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - name: Checkout art branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install CPU Real-ESRGAN and sprite dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install --disable-pip-version-check "Pillow==12.3.0" numpy scipy
+      - name: Retrieve official AnimeVideo-v3 weights
+        run: |
+          curl --retry 3 -fLsS "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth" -o /tmp/realesr-animevideov3.pth
+      - name: Rebuild P04 masters, runtime atlas and run regression tests
+        run: python tools/sprites/run_p04_idle_sr.py --weights /tmp/realesr-animevideov3.pth
+      - name: Check generated assets
+        run: python tools/sprites/build_characters.py --check
+      - name: Publish P04 assets only after all tests pass
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add art/redraws/p04_hd/idle_sr_4x/ art/sprites/source/p04_idle_sr_2x.png android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java android/app/src/main/res/drawable-nodpi/p04_idle.png tools/sprites/reports/p04_idle.report.json
+          if git diff --cached --quiet; then
+            echo "P04 assets already up to date"
+          else
+            git commit -m "Generate complete P04 idle SR masters and runtime 2x atlas [skip ci]"
+            git push origin HEAD:art/p04-idle-sr-20261009
+          fi
+      - name: Upload results for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p04-idle-sr-result
+          path: |
+            art/redraws/p04_hd/idle_sr_4x/manifest.json
+            art/redraws/p04_hd/idle_sr_4x/p04_idle_sr_2x.png
+            android/app/src/main/res/drawable-nodpi/p04_idle.png
+          if-no-files-found: warn
