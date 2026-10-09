@@ -6,7 +6,11 @@ Isto é interpolação determinística, não reconstrução por IA nem novo deta
 
 Os PNGs originais foram obtidos pelo navegador do Work diretamente do GitHub e permanecem intactos. As tentativas de redesenho também permanecem preservadas. Nenhuma referência de P02 foi usada.
 
-frames/: 76 PNGs separados RGBA 1536x1536.
+76/76 PNGs separados RGBA 1536x1536 concluídos e enviados. No repositório estão diretamente nesta pasta: frame_000.png a frame_075.png. No ZIP estão em frames/.
+
+Validação: todos decodificados, 76 hashes únicos, transparência 0–255, sequência completa. Após redução diagnóstica, o enquadramento da silhueta coincide em 76/76. IoU mínima do alpha: 0,998566; média: 0,999099.
+
+Houve truncamento temporário na sincronização de arquivos locais; os PNGs e o ZIP foram gravados atomicamente e revalidados antes do envio final. 0 falhas pendentes de processamento.
 manifest.json: hashes, transparência e conferência da silhueta após redução diagnóstica para 256x256.
 
 Branch de resultados: art/p01-hd-redraw-20261009.
