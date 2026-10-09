@@ -565,6 +565,37 @@ public class SpriteIntegrationTest {
             assertEquals(used.size(),((SpriteAtlasCache)get("atlases")).size());
         }
     }
+    private void tapCard(CharacterSelect s,String id)throws Exception {
+        int i=java.util.Arrays.asList(s.ids).indexOf(id);
+        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
+            s.cardLeft(i)+CharacterSelect.CARD_W/2,CharacterSelect.CARD_TOP+CharacterSelect.CARD_H/2);
+    }
+    @Test public void characterSelectPicksThePairAndPausesTheFight()throws Exception {
+        CharacterSelect s=(CharacterSelect)get("characterSelect");
+        assertTrue("p01 to p04 are selectable",s.ids.length>=4);
+        invoke("openCharacterSelect",new Class<?>[0]);
+        assertTrue(s.isOpen());
+        // Opens with the current pair; drop both, then pick p04 (point) and p02 (partner).
+        tapCard(s,"player_base");tapCard(s,"p03");
+        assertFalse(s.ready());
+        float x=player().x;
+        press(PadInput.Button.HEAVY,0);frames(5);
+        assertFalse("The fight waits behind the select screen",player().attacking());
+        assertEquals(x,player().x,0.01f);
+        tapCard(s,"p04");tapCard(s,"p02");
+        assertEquals(1,s.order("p04"));assertEquals(2,s.order("p02"));
+        tapCard(s,"p03");
+        assertEquals("Only two picks",0,s.order("p03"));
+        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
+            (CharacterSelect.FIGHT_LEFT+CharacterSelect.FIGHT_RIGHT)/2,(CharacterSelect.FIGHT_TOP+CharacterSelect.FIGHT_BOTTOM)/2);
+        assertFalse(s.isOpen());
+        FighterState[] team=(FighterState[])get("team");
+        assertEquals("p04",team[0].character.id);
+        assertEquals("p02",team[1].character.id);
+        assertEquals("p04",rendererCharacterId());
+        frames(1);
+        assertEquals("INTRO",motion().clip);
+    }
     @Test public void introPlaysBeforeTheFightAndHoldsTheControls()throws Exception {
         invoke("startIntro",new Class<?>[0]);
         float x=player().x;

@@ -19,5 +19,11 @@
       "p03",
       "p04"
     ]
+  ],
+  "selectable": [
+    "player_base",
+    "p02",
+    "p03",
+    "p04"
   ]
 }

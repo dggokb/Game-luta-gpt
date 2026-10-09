@@ -29,9 +29,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * engine; this class only presents it (sprites, Super and ultra cinematics, tag, HUD, debug).
  */
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable, UltraListener {
-    // Team and opponent rules come from the generated character packs; DUPLA cycles the pairs.
+    // Team and opponent rules come from the generated character packs; DUPLA opens the
+    // character select, where the player picks the pair.
     private int teamIndex;
     private FighterState[] team = membersOf(0);
+    private final CharacterSelect characterSelect = new CharacterSelect(GeneratedCharacters.SELECTABLE);
+    private CharacterSelectRenderer characterSelectRenderer;
 
     // Training opponent: our point character (same body and moves), drawn washed out.
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
@@ -205,6 +208,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
         stageScene = loadStage(ultraAssets);
+        characterSelectRenderer = new CharacterSelectRenderer(context);
         loadTeamUltras();
         holder = getHolder();
         holder.addCallback(this);
@@ -214,9 +218,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private static FighterState[] membersOf(int index) {
         String[] ids = GeneratedCharacters.TEAMS[index];
+        return membersOf(ids[0], ids[1]);
+    }
+
+    private static FighterState[] membersOf(String point, String partner) {
         return new FighterState[] {
-            new FighterState(GeneratedCharacters.get(ids[0]), "PLAYER 1"),
-            new FighterState(GeneratedCharacters.get(ids[1]), "PLAYER 2")
+            new FighterState(GeneratedCharacters.get(point), "PLAYER 1"),
+            new FighterState(GeneratedCharacters.get(partner), "PLAYER 2")
         };
     }
 
@@ -234,7 +242,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
      */
     private void selectTeam(int index) {
         teamIndex = index % GeneratedCharacters.TEAMS.length;
-        team = membersOf(teamIndex);
+        String[] ids = GeneratedCharacters.TEAMS[teamIndex];
+        selectPair(ids[0], ids[1]);
+    }
+
+    /** Character select: the picked pair takes the fight (first on point, second in reserve). */
+    private void selectPair(String point, String partner) {
+        team = membersOf(point, partner);
         opponentFighter = new FighterState(team[0].character, "CPU");
         atlases.retainOnly(team[0].character, team[1].character);
         spriteFighterRenderer.setCharacter(team[0].character.id);
@@ -247,6 +261,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         engine.restage(PLAYER_START_X, OPPONENT_START_X);
         loadTeamUltras();
         startIntro();
+    }
+
+    /** DUPLA (and the first launch): pause the fight and pick the pair. */
+    private void openCharacterSelect() {
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        characterSelect.open(team[0].character.id, team[1].character.id);
+        pad.reset();
+        releaseAllPointers();
+    }
+
+    private void handleCharacterSelectTap(float x, float y) {
+        switch (characterSelect.tap(x, y)) {
+            case CONFIRM:
+                characterSelect.close();
+                selectPair(characterSelect.point(), characterSelect.partner());
+                break;
+            case CANCEL:
+                characterSelect.close();
+                break;
+            default:
+                break;
+        }
     }
 
     private String teamLabel() {
@@ -311,6 +347,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (!introPlayed) {
             introPlayed = true;
             startIntro();
+            openCharacterSelect();
         }
         surfaceReady = true;
         startLoopIfReady();
@@ -398,6 +435,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** One simulation frame: inputs, engine step, then presentation state. */
     private void update() {
         if (stageScene != null) stageScene.update(FIXED_STEP);
+        if (characterSelect.isOpen()) {
+            // The fight waits behind the select screen.
+            pad.drainInto(ignoredInput);
+            return;
+        }
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
             paginaFinal.update(FIXED_STEP);
@@ -1000,6 +1042,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
+            if (characterSelect.isOpen()) characterSelectRenderer.draw(canvas, paint, characterSelect);
 
             canvas.restore();
         } finally {
@@ -1528,6 +1571,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int action = event.getActionMasked();
         int index = event.getActionIndex();
 
+        if (characterSelect.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                handleCharacterSelectTap(event.getX(index) / sx, event.getY(index) / sy);
+            }
+            return;
+        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing.
@@ -1556,7 +1605,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     engine.refreshOverdrive(PLAYER);
                     break;
                 case TEAM_SELECT:
-                    if (!demo.active()) selectTeam(teamIndex + 1);
+                    openCharacterSelect();
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;

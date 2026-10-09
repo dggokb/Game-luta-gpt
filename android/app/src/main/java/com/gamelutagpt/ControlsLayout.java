@@ -78,7 +78,7 @@ final class ControlsLayout {
     static final float HEAL_OPPONENT_LEFT = 1168f;
     static final float HEAL_OPPONENT_RIGHT = 1248f;
 
-    // DUPLA: the next pair of the roster takes the fight (fresh round).
+    // DUPLA: opens the character select (pick the pair; fresh round).
     static final float TEAM_BUTTON_LEFT = 1082f;
     static final float TEAM_BUTTON_TOP = 282f;
     static final float TEAM_BUTTON_RIGHT = 1248f;

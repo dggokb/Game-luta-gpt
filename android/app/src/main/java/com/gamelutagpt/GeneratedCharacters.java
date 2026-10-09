@@ -4,6 +4,7 @@ import java.util.*;
 final class GeneratedCharacters {
  static final String[] TEAM = new String[]{"player_base","p03"};
  static final String[][] TEAMS = new String[][]{{"player_base","p03"},{"player_base","p02"},{"p03","p04"}};
+ static final String[] SELECTABLE = new String[]{"player_base","p02","p03","p04"};
  static final String OPPONENT = "monster_npc";
  private static final Map<String,CharacterDefinition> ALL = build();
  static CharacterDefinition get(String id) { CharacterDefinition c=ALL.get(id); if(c==null)throw new IllegalArgumentException(id);return c; }

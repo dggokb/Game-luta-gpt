@@ -343,6 +343,10 @@ def compile_packs(root, results):
     teams = roster.get('teams', [roster['team']])
     if teams[0] != roster['team'] or any(len(t) != 2 or len(set(t)) != 2 or any(c not in ids for c in t) for t in teams):
         raise ValueError('Roster teams must start with the team and list pairs of two different known characters')
+    # Tela de seleção: quem pode ser escolhido (padrão: todos que aparecem nas duplas).
+    selectable = roster.get('selectable') or list(dict.fromkeys(c for t in teams for c in t))
+    if len(selectable) < 2 or len(set(selectable)) != len(selectable) or any(c not in ids for c in selectable):
+        raise ValueError('Roster selectable lists at least two different known characters')
     write_states(root)
     q = json.dumps
     f = lambda v: f'{float(v):.8f}f'
@@ -375,6 +379,7 @@ def compile_packs(root, results):
              'final class GeneratedCharacters {',
              ' static final String[] TEAM = new String[]{'+','.join(q(v) for v in roster['team'])+'};',
              ' static final String[][] TEAMS = new String[][]{'+','.join('{'+','.join(q(v) for v in t)+'}' for t in teams)+'};',
+             ' static final String[] SELECTABLE = new String[]{'+','.join(q(v) for v in selectable)+'};',
              ' static final String OPPONENT = '+q(opponent)+';',
              ' private static final Map<String,CharacterDefinition> ALL = build();',
              ' static CharacterDefinition get(String id) { CharacterDefinition c=ALL.get(id); if(c==null)throw new IllegalArgumentException(id);return c; }',
