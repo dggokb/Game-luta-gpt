@@ -10,8 +10,8 @@ Mede nas folhas normalizadas (o mesmo que vai para o jogo):
                    próprio personagem (silhueta parecida), têm de ter a mesma altura deles;
   * pulo         - golpe que começa ou termina em guarda tem o pé de trás onde o idle
                    deixa (senão o sprite "pula" ao trocar de animação);
-  * deslize      - durante golpes no chão o pé de trás não anda aos poucos (3-15 px por
-                   quadro); troca de pé num giro ou rasteira não conta;
+  * deslize      - durante golpes no chão o pé de apoio (o que menos se mexe) não anda aos
+                   poucos (3-15 px por quadro); alargar a base, giro e rasteira não contam;
   * pose         - golpe/reação agachado que fica em pé;
   * efeito       - quadro com cor fora da paleta do personagem a mais que os vizinhos
                    (clarão, arco, poeira, rastro, aura);
@@ -179,6 +179,18 @@ def palette(pack, clips):
     return count >= count.sum() * 0.0005
 
 
+def planted_steps(ms):
+    """Quanto o pé de apoio anda em cada troca de quadro. Pé de apoio é o que menos se mexe:
+    alargar a base (um pé só anda) não conta, deslize (os dois andam juntos) conta. Troca de
+    pé (mais de SLIDE_STEP px: giro, rasteira, passo) e quadro sem pé no chão dão 0."""
+    steps = [0.0]
+    for i in range(1, len(ms)):
+        a, b = ms[i - 1]['contact'], ms[i]['contact']
+        step = min((y - x for x in a for y in b), key=abs) if a and b else 0.0
+        steps.append(step if abs(step) <= SLIDE_STEP else 0.0)
+    return steps
+
+
 def attack_states(pack):
     names = {m['animation'] for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values())
              if 'animation' in m}
@@ -248,16 +260,11 @@ def audit(cid):
                         when = 'começa' if i == 0 else 'termina'
                         add(state, 'pulo', 'erro' if abs(jump) >= JUMP_ERROR else 'aviso',
                             f'{when} com o pé de trás {jump:+.0f} px do idle (o sprite pula ao trocar)', [i])
-        # Deslize do pé de apoio (o de trás): deslize é andar aos poucos, de 3 a 15 px por
-        # quadro. Salto maior é troca de pé de apoio (pivô, giro, rasteira), não deslize.
+        # Deslize do pé de apoio: anda aos poucos, de 3 a 15 px por quadro.
         if state in attacks and state not in MOVING and state not in AIR:
-            moved, net, worst = 0.0, 0.0, []
-            for i in range(1, len(ms)):
-                a, b = ms[i - 1]['back'], ms[i]['back']
-                if a is not None and b is not None and 3 <= abs(b - a) <= SLIDE_STEP:
-                    moved += abs(b - a)
-                    net += b - a
-                    worst.append(i)
+            steps = planted_steps(ms)
+            worst = [i for i, d in enumerate(steps) if abs(d) >= 3]
+            moved, net = sum(abs(steps[i]) for i in worst), sum(steps[i] for i in worst)
             if moved >= SLIDE_WARN:
                 where = f'termina {net:+.0f} px fora do lugar' if abs(net) >= JUMP_WARN else 'e volta'
                 add(state, 'deslize', 'erro' if moved >= SLIDE_ERROR or abs(net) >= JUMP_ERROR else 'aviso',

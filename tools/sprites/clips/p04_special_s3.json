@@ -17,11 +17,12 @@
     "escala": 0.3313,
     "medida": "quadros 84, 60, 6 = guarda do IDLE (nota 0.82)",
     "quadros": "13,15,16,18,20,21,23,24,26,28,29,30,30,39,39,39,41,43,45,47,49",
-    "largura": 288,
+    "largura": 314,
     "raiz": "137,238",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "ancorar_pe": true
   },
-  "frameWidth": 288,
+  "frameWidth": 314,
   "rootX": 137
 }

@@ -14,5 +14,6 @@
   "frameHeight": 256,
   "rootX": 140,
   "rootY": 238,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S1 soco que solta a onda curta; energia e do jogo."
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S1 soco que solta a onda curta; energia e do jogo.",
+  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py"
 }

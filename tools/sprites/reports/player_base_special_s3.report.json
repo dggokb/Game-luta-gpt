@@ -18,9 +18,9 @@
     {
       "index": 0,
       "outputBbox": [
-        57,
+        64,
         13,
-        212,
+        219,
         239
       ],
       "minimumMargin": 13,
@@ -29,9 +29,9 @@
     {
       "index": 1,
       "outputBbox": [
-        54,
+        62,
         11,
-        219,
+        227,
         239
       ],
       "minimumMargin": 11,
@@ -40,9 +40,9 @@
     {
       "index": 2,
       "outputBbox": [
-        53,
+        62,
         10,
-        220,
+        229,
         239
       ],
       "minimumMargin": 10,
@@ -51,9 +51,9 @@
     {
       "index": 3,
       "outputBbox": [
-        52,
+        62,
         11,
-        220,
+        230,
         239
       ],
       "minimumMargin": 11,
@@ -62,9 +62,9 @@
     {
       "index": 4,
       "outputBbox": [
-        49,
+        59,
         12,
-        230,
+        240,
         239
       ],
       "minimumMargin": 12,
@@ -73,9 +73,9 @@
     {
       "index": 5,
       "outputBbox": [
-        48,
+        59,
         13,
-        213,
+        224,
         239
       ],
       "minimumMargin": 13,
@@ -84,9 +84,9 @@
     {
       "index": 6,
       "outputBbox": [
-        47,
+        59,
         13,
-        212,
+        224,
         239
       ],
       "minimumMargin": 13,
@@ -95,9 +95,9 @@
     {
       "index": 7,
       "outputBbox": [
-        45,
+        59,
         13,
-        210,
+        224,
         239
       ],
       "minimumMargin": 13,
@@ -106,9 +106,9 @@
     {
       "index": 8,
       "outputBbox": [
-        44,
+        59,
         13,
-        228,
+        243,
         239
       ],
       "minimumMargin": 13,
@@ -117,9 +117,9 @@
     {
       "index": 9,
       "outputBbox": [
-        43,
+        59,
         14,
-        235,
+        251,
         239
       ],
       "minimumMargin": 14,
@@ -128,9 +128,9 @@
     {
       "index": 10,
       "outputBbox": [
-        43,
+        60,
         15,
-        252,
+        269,
         239
       ],
       "minimumMargin": 15,
@@ -139,9 +139,9 @@
     {
       "index": 11,
       "outputBbox": [
-        41,
+        59,
         18,
-        277,
+        295,
         240
       ],
       "minimumMargin": 16,
@@ -150,9 +150,9 @@
     {
       "index": 12,
       "outputBbox": [
-        40,
+        60,
         18,
-        265,
+        285,
         239
       ],
       "minimumMargin": 17,
@@ -161,9 +161,9 @@
     {
       "index": 13,
       "outputBbox": [
-        39,
+        60,
         18,
-        264,
+        285,
         239
       ],
       "minimumMargin": 17,
@@ -172,9 +172,9 @@
     {
       "index": 14,
       "outputBbox": [
-        37,
+        61,
         18,
-        261,
+        285,
         240
       ],
       "minimumMargin": 16,
@@ -183,9 +183,9 @@
     {
       "index": 15,
       "outputBbox": [
-        36,
+        61,
         18,
-        260,
+        285,
         240
       ],
       "minimumMargin": 16,
@@ -194,9 +194,9 @@
     {
       "index": 16,
       "outputBbox": [
-        36,
+        62,
         17,
-        249,
+        275,
         239
       ],
       "minimumMargin": 17,
@@ -205,9 +205,9 @@
     {
       "index": 17,
       "outputBbox": [
-        37,
+        64,
         16,
-        224,
+        251,
         239
       ],
       "minimumMargin": 16,
@@ -216,9 +216,9 @@
     {
       "index": 18,
       "outputBbox": [
-        36,
+        65,
         14,
-        192,
+        221,
         239
       ],
       "minimumMargin": 14,
@@ -227,9 +227,9 @@
     {
       "index": 19,
       "outputBbox": [
-        35,
+        64,
         13,
-        190,
+        219,
         239
       ],
       "minimumMargin": 13,
@@ -238,9 +238,9 @@
     {
       "index": 20,
       "outputBbox": [
-        33,
+        65,
         13,
-        188,
+        220,
         239
       ],
       "minimumMargin": 13,
@@ -249,26 +249,26 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 264,
+    "frameWidth": 257,
     "frameHeight": 250,
-    "rootX": 117,
+    "rootX": 92,
     "rootY": 238,
     "columns": 11,
     "frameCount": 21,
     "cropOffset": [
-      23,
+      48,
       0
     ],
     "decodedBytes": {
       "canonical": 8650752,
-      "packed": 5808000
+      "packed": 5654000
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ffdb7d99eef66172bd5dfb9119f7b9553c189109954d30facb4ae4a0bfdc9253",
-      "config": "fe197bf517e33822c0362b4ea1f04884e7534378426d3e8d565332d77022b547",
+      "source": "6c43012ec5883563c5977b067ada8a31168c5f535da8600ca71b18ececbeaa69",
+      "config": "9d48c6143193025d2e3ba617d07affbc59c81595a2773f7d990bd968273e88d1",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     }
   }

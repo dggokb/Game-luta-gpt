@@ -18,9 +18,9 @@
     {
       "index": 0,
       "outputBbox": [
-        49,
         36,
-        153,
+        36,
+        140,
         269
       ],
       "minimumMargin": 19,
@@ -29,9 +29,9 @@
     {
       "index": 1,
       "outputBbox": [
-        35,
+        29,
         36,
-        148,
+        142,
         270
       ],
       "minimumMargin": 18,
@@ -40,9 +40,9 @@
     {
       "index": 2,
       "outputBbox": [
-        49,
+        38,
         41,
-        153,
+        142,
         269
       ],
       "minimumMargin": 19,
@@ -51,9 +51,9 @@
     {
       "index": 3,
       "outputBbox": [
-        31,
+        33,
         73,
-        176,
+        178,
         273
       ],
       "minimumMargin": 15,
@@ -62,9 +62,9 @@
     {
       "index": 4,
       "outputBbox": [
-        30,
+        37,
         66,
-        177,
+        184,
         274
       ],
       "minimumMargin": 14,
@@ -73,9 +73,9 @@
     {
       "index": 5,
       "outputBbox": [
-        30,
+        36,
         65,
-        262,
+        268,
         274
       ],
       "minimumMargin": 14,
@@ -84,9 +84,9 @@
     {
       "index": 6,
       "outputBbox": [
-        29,
+        35,
         65,
-        261,
+        267,
         274
       ],
       "minimumMargin": 14,
@@ -95,9 +95,9 @@
     {
       "index": 7,
       "outputBbox": [
-        28,
+        35,
         65,
-        260,
+        267,
         274
       ],
       "minimumMargin": 14,
@@ -106,9 +106,9 @@
     {
       "index": 8,
       "outputBbox": [
-        28,
+        38,
         61,
-        159,
+        169,
         273
       ],
       "minimumMargin": 15,
@@ -117,9 +117,9 @@
     {
       "index": 9,
       "outputBbox": [
-        26,
+        38,
         62,
-        158,
+        170,
         273
       ],
       "minimumMargin": 15,
@@ -128,9 +128,9 @@
     {
       "index": 10,
       "outputBbox": [
-        26,
+        38,
         63,
-        156,
+        168,
         272
       ],
       "minimumMargin": 16,
@@ -139,26 +139,26 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 257,
+    "frameWidth": 260,
     "frameHeight": 260,
-    "rootX": 89,
+    "rootX": 86,
     "rootY": 243,
     "columns": 11,
     "frameCount": 11,
     "cropOffset": [
-      16,
+      19,
       25
     ],
     "decodedBytes": {
       "canonical": 3649536,
-      "packed": 2940080
+      "packed": 2974400
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c4368e59072fe696d72cf3dfc4da41f056612fdf9791b0ed7e4f73d065d7d614",
-      "config": "54dc3290d11f4fcf9e5d0c1c54ecff99423ce087ce9ffa9845ab6fdd28b22a16",
+      "source": "b6984b278bc04c4151644757a4e9b90c60826bde1c60758625f59dbdc679f077",
+      "config": "e30e44f949acaafc8a1cc0718ec702ed6c3f1b78d56ec8ca3e32744128e09e55",
       "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
     }
   }

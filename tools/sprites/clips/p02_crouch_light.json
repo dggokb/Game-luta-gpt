@@ -21,7 +21,8 @@
     "largura": 224,
     "raiz": "108,174",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "ancorar_pe": true
   },
   "frameWidth": 224,
   "frameHeight": 192,

@@ -20,7 +20,8 @@
     "celula": 352,
     "largura": 416,
     "raiz": "165,334",
-    "colunas": 11
+    "colunas": 11,
+    "ancorar_pe": true
   },
   "frameWidth": 416,
   "frameHeight": 352,

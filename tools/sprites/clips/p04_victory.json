@@ -20,7 +20,10 @@
     "celula": 384,
     "largura": 224,
     "raiz": "101,362",
-    "colunas": 11
+    "colunas": 11,
+    "limpar_quadros": [
+      11
+    ]
   },
   "frameWidth": 224,
   "frameHeight": 384,

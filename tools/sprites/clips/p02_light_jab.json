@@ -20,7 +20,12 @@
     "largura": 352,
     "raiz": "198,238",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "limpar_quadros": [
+      3,
+      4,
+      5
+    ]
   },
   "frameWidth": 352,
   "rootX": 198

@@ -17,11 +17,13 @@
     "escala": 0.3929,
     "medida": "último quadro = inicio_centro (nota 0.82)",
     "quadros": "1,7,12,18,23,29,35,40,46,51,53,62,64,67,70,73,76,80,83,86,90,93,96",
-    "largura": 256,
+    "largura": 257,
     "raiz": "99,235",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "ancorar_pe": true
   },
   "rootX": 99,
-  "rootY": 235
+  "rootY": 235,
+  "frameWidth": 257
 }

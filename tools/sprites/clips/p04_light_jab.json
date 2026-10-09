@@ -20,7 +20,11 @@
     "largura": 288,
     "raiz": "89,238",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "ancorar_pe": true,
+    "limpar_quadros": [
+      2
+    ]
   },
   "frameWidth": 288,
   "rootX": 89

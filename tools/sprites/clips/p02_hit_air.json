@@ -21,7 +21,10 @@
     "largura": 512,
     "raiz": "137,302",
     "colunas": 4,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "limpar_quadros": [
+      1
+    ]
   },
   "frameWidth": 512,
   "frameHeight": 320,

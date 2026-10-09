@@ -75,11 +75,11 @@
       "outputBbox": [
         14,
         44,
-        273,
+        236,
         272
       ],
       "minimumMargin": 14,
-      "opaquePixels": 16460
+      "opaquePixels": 15766
     },
     {
       "index": 6,
@@ -117,7 +117,7 @@
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 280,
+    "frameWidth": 258,
     "frameHeight": 273,
     "rootX": 107,
     "rootY": 260,
@@ -129,14 +129,14 @@
     ],
     "decodedBytes": {
       "canonical": 2985984,
-      "packed": 2751840
+      "packed": 2535624
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c1ce582d5b2230638de46822fcd98ba52714d07b0a65a7b61afcd88f23e7df8b",
-      "config": "874fda6c481ea9c8cc0b229bbe117f8ab45d9cc65143df537919b44690d6d7b1",
+      "source": "d22f56c36c75bf0dfe19c25a3222a269da6c330cc1261f84d9b58c1860326f47",
+      "config": "3267fc44fb5c5826a6c7dfb58a2bbf4a8d17c72b58edcde575ca147b03e3acde",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
     }
   }

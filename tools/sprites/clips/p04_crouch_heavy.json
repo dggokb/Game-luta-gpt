@@ -21,7 +21,10 @@
     "largura": 192,
     "raiz": "85,366",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "limpar_quadros": [
+      4
+    ]
   },
   "frameWidth": 192,
   "frameHeight": 384,

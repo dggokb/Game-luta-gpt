@@ -21,7 +21,10 @@
     "largura": 288,
     "raiz": "110,270",
     "colunas": 9,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "limpar_quadros": [
+      5
+    ]
   },
   "frameWidth": 288,
   "frameHeight": 288,

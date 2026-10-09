@@ -103,6 +103,18 @@ em verde, raiz em amarelo, quadros marcados em vermelho) só dos clipes com avis
 É triagem: o "erro" quase sempre é real, o "aviso" precisa de olho na folha. Leva uns 30 s
 por personagem. A lista de revisão de cada personagem sai dela (`docs/personagens/revisao.md`).
 
+Correções sem vídeo novo (editam a folha normalizada e gravam na receita, para a
+reconversão repetir; depois `build_characters.py --write`):
+
+| Problema | Ferramenta |
+|---|---|
+| deslize, pulo ao trocar de animação | `ancorar.py p04 HEAVY_STRAIGHT` fixa o pé de apoio no lugar do idle |
+| tamanho errado, zoom de câmera no meio | `reescalar.py p02 MEDIUM_KICK --ver` mede pela cabeça quadro a quadro; sem `--ver` aplica (`--fatores` à mão quando a medida erra) |
+| poeira, risco, arco, clarão | `limpar.py p02 LIGHT_JAB:3,4,5 --previa pasta` apaga manchas de cor fora da paleta |
+
+Não resolvem: efeito por cima do corpo (o arco cobre a perna), pose errada (agachado que
+levanta), tamanho em pose ereta (intro/vitória: a cabeça engana). Aí é gerar o vídeo de novo.
+
 ## Um vídeo pode virar vários clipes
 
 | Vídeo | Clipes do jogo |

@@ -12,5 +12,6 @@
   "rootMode": "authored",
   "frameWidth": 384,
   "rootX": 140,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Soco com avanco; quadro com rastro pulado, cada quadro no proprio tronco."
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Soco com avanco; quadro com rastro pulado, cada quadro no proprio tronco.",
+  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py"
 }

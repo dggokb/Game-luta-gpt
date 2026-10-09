@@ -21,7 +21,18 @@
     "largura": 384,
     "raiz": "115,277",
     "colunas": 9,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      1.0,
+      1.3,
+      1.3,
+      1.3,
+      1.3,
+      1.3,
+      1.3,
+      1.29,
+      1.0
+    ]
   },
   "frameWidth": 384,
   "frameHeight": 320,

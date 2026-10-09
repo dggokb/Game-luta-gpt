@@ -21,7 +21,8 @@
     "largura": 256,
     "raiz": "136,270",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "ancorar_pe": true
   },
   "frameHeight": 288,
   "rootX": 136,

@@ -143,7 +143,7 @@ def torso_x(rgba):
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
-              sem_poeira=False, sem_efeitos=False, limpar_chao=False)
+              sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None)
 
 
 def parser():
@@ -174,6 +174,12 @@ def parser():
                         "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo")
     p.add_argument("--pe-no-chao", action="store_true",
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
+    p.add_argument("--reescala", type=lambda v: [float(x) for x in v.split(",")],
+                   help="fator de tamanho por quadro (tools/sprites/reescalar.py): divide a escala")
+    p.add_argument("--limpar-quadros", type=lambda v: [int(x) for x in v.split(",")],
+                   help="células a limpar de efeito depois de converter (tools/sprites/limpar.py)")
+    p.add_argument("--ancorar-pe", action="store_true",
+                   help="depois de converter, fixa o pé de apoio no lugar do idle (tools/sprites/ancorar.py)")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -266,6 +272,7 @@ def main(argv=None):
         measured = tamanho.medir(frames, args.personagem, key)
         s = measured["escala"]
         print(f"escala {s:.4f} ({measured['medida']}, nota {measured['nota']:.2f}, zoom {measured['zoom']:.3f})")
+    scale = s
     keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos, args.limpar_chao) for i in picked]
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
@@ -292,7 +299,10 @@ def main(argv=None):
     cw = args.largura or cell
     rows = (len(keyed) + cols - 1) // cols
     sheet = Image.new("RGBA", (cols * cw, rows * cell), (0, 0, 0, 0))
+    if args.reescala and len(args.reescala) != len(keyed):
+        raise SystemExit(f"--reescala tem {len(args.reescala)} fatores para {len(keyed)} quadros")
     for n, (k, off) in enumerate(zip(keyed, offsets)):
+        s = scale / args.reescala[n] if args.reescala else scale
         img = Image.fromarray(k, "RGBA")
         img = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
         x = (n % cols) * cw + rx - round((ref_x - off) * s)
@@ -303,6 +313,18 @@ def main(argv=None):
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")
     if clip is not None:
         save_recipe(args.clipe, clip, args, start, end, measured, len(keyed), cw)
+        pack_id = "player_base" if args.personagem == "p01" else args.personagem
+        atlas = Path(clip["output"]).stem
+        in_place = Path(args.saida).resolve() == (ROOT / clip["source"]).resolve()
+        if args.ancorar_pe and in_place:
+            import ancorar
+            off = ancorar.anchor(pack_id, atlas)
+            print("pé de apoio fixado: " + " ".join(f"{d:+d}" for d in off))
+        if args.limpar_quadros and in_place:
+            import limpar
+            limpar.clean_atlas(pack_id, atlas, args.limpar_quadros)
+        sheet = Image.open(args.saida)
+        cw = json.loads(Path(args.clipe).read_text(encoding="utf-8")).get("frameWidth", cw)
     if args.previa:
         gif = []
         for n in range(len(keyed)):

@@ -4,15 +4,32 @@ Saída de `python3 tools/sprites/auditoria.py player_base p03 p02 p04`, conferid
 Cada item: **corrigir** (visto na folha, está errado), **conferir** (pode ser, olhar no jogo)
 ou **falso** (a auditoria errou; fica registrado para calibrar a ferramenta).
 
-Como corrigir cada tipo:
+Como corrigir cada tipo (ferramentas em `docs/personagens/video.md`, "Auditoria"):
 
 | Tipo | Correção |
 |---|---|
-| tamanho | reconverter com a escala medida pela imagem inicial; se o vídeo não começa nela, gerar de novo a partir dela |
-| pulo / deslize | reconverter fixando o pé de trás no lugar do idle; se o vídeo anda de verdade, cortar ou gerar de novo |
+| tamanho | `reescalar.py` (golpe); em pose ereta, gerar de novo a partir da imagem inicial |
+| pulo / deslize | `ancorar.py` |
 | pose agachado | gerar de novo (o vídeo levanta o personagem) |
-| efeito | `personagem.py` troca o quadro; se o efeito dura muitos quadros, gerar de novo |
+| efeito | `limpar.py`; efeito por cima do corpo, gerar de novo |
 | arte de outro personagem | falta o vídeo |
+
+## Situação (1ª rodada de correção)
+
+Corrigido sem vídeo novo:
+- pé de apoio fixado: p01 S3; p03 ULTRA, S1, M, H; p02 S4, S3, H, 2L, S1; p04 H, S1, S3, LL;
+- tamanho: p02 M e TAUNT (20% menores), ULTRA (zoom de câmera nos quadros 1-7);
+- efeitos apagados: p02 LL, M, S3, HIT_AIR, arremesso, rastro do 2M; p04 LL, 2H e vitória (clarão);
+- p04 DASH: quadro só de poeira trocado pelo anterior.
+
+Auditoria depois: p01 1 erro (falso), p03 3, p02 3, p04 2 (antes 2, 6, 8, 5).
+
+Falta vídeo novo (gerar a partir da imagem inicial):
+- p03: CROUCH_LIGHT e HIT_CROUCH (levantam), pulo médio e agarrão (usam a arte do p01);
+- p02: HIT_CROUCH (levanta), fim do 2M em pé, H (arco por cima da perna), INTRO e VICTORY
+  (zoom de câmera em pose ereta);
+- p04: fim do 2M em pé, INTRO (zoom de câmera), DASH (corrida pouco aproveitável);
+- p01: HIT_CROUCH, se o tamanho incomodar no jogo (a cabeça mede 8-18% menor).
 
 ## p01 (player_base)
 

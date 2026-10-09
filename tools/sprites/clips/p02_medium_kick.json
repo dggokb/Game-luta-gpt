@@ -20,7 +20,27 @@
     "largura": 416,
     "raiz": "153,238",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      1.209,
+      1.217,
+      1.215,
+      1.215,
+      1.213,
+      1.211,
+      1.209,
+      1.206,
+      1.204,
+      1.202,
+      1.202,
+      1.2,
+      1.2,
+      1.192
+    ],
+    "limpar_quadros": [
+      3,
+      4
+    ]
   },
   "frameWidth": 416,
   "rootX": 153

@@ -14,5 +14,6 @@
   "frameHeight": 320,
   "rootX": 220,
   "rootY": 300,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Chute giratorio alto; quadros com clarao e arco pulados."
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Chute giratorio alto; quadros com clarao e arco pulados.",
+  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py"
 }

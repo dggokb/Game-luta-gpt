@@ -21,7 +21,11 @@
     "largura": 480,
     "raiz": "241,195",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "limpar_quadros": [
+      5,
+      6
+    ]
   },
   "frameWidth": 480,
   "rootX": 241,
