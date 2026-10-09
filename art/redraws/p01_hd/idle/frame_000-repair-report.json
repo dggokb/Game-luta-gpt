@@ -1,0 +1,86 @@
+{
+  "frame": 0,
+  "attempts_generated": 3,
+  "approved": 0,
+  "best_attempt": "frame_000-attempt_01.png",
+  "checks": [
+    {
+      "path": "frame_000.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bbox_normalized256": [
+        51,
+        11,
+        210,
+        246
+      ],
+      "silhouette_iou": 0.8105872622001654,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "approved": false
+    },
+    {
+      "path": "frame_000-attempt_01.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bbox_normalized256": [
+        48,
+        12,
+        213,
+        245
+      ],
+      "silhouette_iou": 0.8571184704677365,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "approved": false
+    },
+    {
+      "path": "frame_000-attempt_02.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bbox_normalized256": [
+        56,
+        27,
+        204,
+        239
+      ],
+      "silhouette_iou": 0.7175105726368728,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "approved": false
+    },
+    {
+      "path": "frame_000-attempt_03.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bbox_normalized256": [
+        53,
+        12,
+        210,
+        245
+      ],
+      "silhouette_iou": 0.8151898734177215,
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "approved": false
+    }
+  ],
+  "blocker": "Gerador continua alterando limites e geometria; todas as tentativas têm franjas coloridas. Fidelidade exata e validação temporal não demonstradas. Não promover ao jogo.",
+  "temporal_check": "Não realizado nas correções: calibração geométrica do primeiro frame não passou. A comparação do lote anterior continua disponível."
+}
