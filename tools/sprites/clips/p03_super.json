@@ -2,17 +2,21 @@
   "id": "p03_super",
   "javaName": "P03_SUPER",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_super_video_normalized.png",
+  "source": "art/sprites/source/p03_super_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_super.png",
   "report": "tools/sprites/reports/p03_super.report.json",
   "preview": "android/app/build/sprite-review/p03_super-import.png",
   "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 448,
-  "frameHeight": 384,
-  "rootX": 180,
-  "rootY": 364,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Super rajada de chutes."
+  "frameWidth": 896,
+  "frameHeight": 768,
+  "rootX": 360,
+  "rootY": 728,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Super rajada de chutes.",
+  "sourceReferences": [
+    "art/sprites/source/p03_super_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

@@ -2,18 +2,22 @@
   "id": "p03_heavy",
   "javaName": "P03_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_heavy_video_normalized.png",
+  "source": "art/sprites/source/p03_heavy_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_heavy.png",
   "report": "tools/sprites/reports/p03_heavy.report.json",
   "preview": "android/app/build/sprite-review/p03_heavy-import.png",
   "expectedFrames": 23,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 512,
-  "frameHeight": 320,
-  "rootX": 220,
-  "rootY": 300,
+  "frameWidth": 1024,
+  "frameHeight": 640,
+  "rootX": 440,
+  "rootY": 600,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Chute giratorio alto; quadros com clarao e arco pulados.",
-  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py"
+  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py",
+  "sourceReferences": [
+    "art/sprites/source/p03_heavy_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

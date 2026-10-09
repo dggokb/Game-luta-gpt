@@ -2,7 +2,7 @@
   "id": "p03_crouch",
   "javaName": "P03_CROUCH",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_crouch_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_crouch.png",
   "report": "tools/sprites/reports/p03_crouch.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch-import.png",
@@ -10,5 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Abaixar."
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Abaixar.",
+  "sourceReferences": [
+    "art/sprites/source/p03_crouch_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

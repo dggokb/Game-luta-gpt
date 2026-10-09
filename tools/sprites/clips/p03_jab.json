@@ -2,7 +2,7 @@
   "id": "p03_jab",
   "javaName": "P03_JAB",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_jab_video_normalized.png",
+  "source": "art/sprites/source/p03_jab_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_jab.png",
   "report": "tools/sprites/reports/p03_jab.report.json",
   "preview": "android/app/build/sprite-review/p03_jab-import.png",
@@ -10,7 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "rootX": 140,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Jab duplo; quadros 16-36, claroes recortados."
+  "frameWidth": 768,
+  "rootX": 280,
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Jab duplo; quadros 16-36, claroes recortados.",
+  "sourceReferences": [
+    "art/sprites/source/p03_jab_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

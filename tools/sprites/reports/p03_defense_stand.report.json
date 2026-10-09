@@ -1,16 +1,16 @@
 {
   "id": "p03_defense_stand",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_defense_stand_video_normalized.png",
+  "source": "art/sprites/source/p03_defense_stand_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa em pe; quadro 7 e a guarda segurada.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 140,
-    "rootY": 238,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 280,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        73,
-        12,
-        209,
-        240
+        146,
+        25,
+        419,
+        479
       ],
-      "minimumMargin": 12,
-      "opaquePixels": 14105
+      "minimumMargin": 25,
+      "opaquePixels": 56820
     },
     {
       "index": 1,
       "outputBbox": [
-        67,
-        23,
-        237,
-        241
+        133,
+        46,
+        474,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15907
+      "minimumMargin": 30,
+      "opaquePixels": 63947
     },
     {
       "index": 2,
       "outputBbox": [
-        66,
-        24,
-        240,
-        241
+        133,
+        47,
+        481,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15335
+      "minimumMargin": 30,
+      "opaquePixels": 61803
     },
     {
       "index": 3,
       "outputBbox": [
-        64,
-        23,
-        238,
-        241
+        129,
+        46,
+        475,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15206
+      "minimumMargin": 30,
+      "opaquePixels": 61115
     },
     {
       "index": 4,
       "outputBbox": [
-        67,
-        22,
-        239,
-        241
+        133,
+        44,
+        477,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15060
+      "minimumMargin": 30,
+      "opaquePixels": 60567
     },
     {
       "index": 5,
       "outputBbox": [
-        65,
-        21,
-        239,
-        241
+        131,
+        42,
+        477,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15099
+      "minimumMargin": 30,
+      "opaquePixels": 60677
     },
     {
       "index": 6,
       "outputBbox": [
-        67,
-        22,
-        239,
-        241
+        133,
+        44,
+        477,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15107
+      "minimumMargin": 30,
+      "opaquePixels": 60711
     },
     {
       "index": 7,
       "outputBbox": [
-        65,
-        17,
-        203,
-        241
+        129,
+        33,
+        407,
+        482
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 14770
+      "minimumMargin": 30,
+      "opaquePixels": 59630
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 196,
-    "frameHeight": 249,
-    "rootX": 86,
-    "rootY": 236,
+    "frameWidth": 377,
+    "frameHeight": 483,
+    "rootX": 164,
+    "rootY": 464,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      54,
-      2
+      116,
+      12
     ],
     "decodedBytes": {
-      "canonical": 2621440,
-      "packed": 1561728
-    }
+      "canonical": 10485760,
+      "packed": 5826912
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1214a6b3355bcd465de3d8daf68e13b14c367155c9dcf54cd01fdcb3ba0e5b84",
-      "config": "6194f0014e4a94de3937051b4b90d5629d503629eb459b91094670a00e785c07",
+      "source": "2e0b538429fc86c3c467cb69d2610f4df6beaeea3299900f6636e419df7c7272",
+      "config": "0eb655b16293aaf8a48d59f4602ea049624370a14824aea2aaeca6056b4452c4",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_defense_stand_video_normalized.png": "1214a6b3355bcd465de3d8daf68e13b14c367155c9dcf54cd01fdcb3ba0e5b84"
     }
   }
 }

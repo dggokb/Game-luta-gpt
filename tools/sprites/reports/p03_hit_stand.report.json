@@ -1,16 +1,16 @@
 {
   "id": "p03_hit_stand",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_hit_stand_video_normalized.png",
+  "source": "art/sprites/source/p03_hit_stand_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe em pe; quadros com clarao pulados.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 384,
-    "frameHeight": 288,
-    "rootX": 180,
-    "rootY": 270,
+    "frameWidth": 768,
+    "frameHeight": 576,
+    "rootX": 360,
+    "rootY": 540,
     "columns": 9,
     "frameCount": 9
   },
@@ -18,126 +18,131 @@
     {
       "index": 0,
       "outputBbox": [
-        112,
-        45,
-        249,
-        271
+        225,
+        90,
+        499,
+        543
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14290
+      "minimumMargin": 33,
+      "opaquePixels": 57441
     },
     {
       "index": 1,
       "outputBbox": [
-        113,
-        42,
-        270,
-        272
+        226,
+        84,
+        539,
+        543
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18058
+      "minimumMargin": 33,
+      "opaquePixels": 72451
     },
     {
       "index": 2,
       "outputBbox": [
-        113,
-        41,
-        271,
-        272
+        226,
+        82,
+        541,
+        543
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18120
+      "minimumMargin": 33,
+      "opaquePixels": 72634
     },
     {
       "index": 3,
       "outputBbox": [
-        113,
-        41,
-        271,
-        272
+        225,
+        82,
+        543,
+        543
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18096
+      "minimumMargin": 33,
+      "opaquePixels": 72559
     },
     {
       "index": 4,
       "outputBbox": [
-        118,
-        65,
-        291,
-        272
+        235,
+        131,
+        583,
+        544
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17263
+      "minimumMargin": 32,
+      "opaquePixels": 69317
     },
     {
       "index": 5,
       "outputBbox": [
-        122,
-        64,
-        295,
-        272
+        243,
+        127,
+        591,
+        544
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17201
+      "minimumMargin": 32,
+      "opaquePixels": 69039
     },
     {
       "index": 6,
       "outputBbox": [
-        121,
-        61,
-        294,
-        272
+        241,
+        122,
+        589,
+        545
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17172
+      "minimumMargin": 31,
+      "opaquePixels": 69015
     },
     {
       "index": 7,
       "outputBbox": [
-        121,
-        60,
-        294,
-        272
+        241,
+        119,
+        589,
+        545
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17146
+      "minimumMargin": 31,
+      "opaquePixels": 68875
     },
     {
       "index": 8,
       "outputBbox": [
-        111,
-        45,
-        250,
-        271
+        222,
+        90,
+        500,
+        543
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14420
+      "minimumMargin": 33,
+      "opaquePixels": 58026
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 205,
-    "frameHeight": 251,
-    "rootX": 79,
-    "rootY": 239,
+    "frameWidth": 395,
+    "frameHeight": 488,
+    "rootX": 151,
+    "rootY": 471,
     "columns": 9,
     "frameCount": 9,
     "cropOffset": [
-      101,
-      31
+      209,
+      69
     ],
     "decodedBytes": {
-      "canonical": 3981312,
-      "packed": 1852380
-    }
+      "canonical": 15925248,
+      "packed": 6939360
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1ef550932d373d16b69f459c15dd04299a8f652128fcc65baddbb6cc1eab2e7d",
-      "config": "d83c019164e08969f145289a7ba5263f52d9db0440b9e6863fdae6ce4f697580",
+      "source": "e6f5a7992d9d7eff8ca8e800e752597f00650fed277af6512f91aef8b763e1be",
+      "config": "82c738563712fc414aff426176ca2701ff095f018f0fa3319d68415747a206b0",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_hit_stand_video_normalized.png": "1ef550932d373d16b69f459c15dd04299a8f652128fcc65baddbb6cc1eab2e7d"
     }
   }
 }

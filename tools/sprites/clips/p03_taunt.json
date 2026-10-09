@@ -2,7 +2,7 @@
   "id": "p03_taunt",
   "javaName": "P03_TAUNT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_taunt_video_normalized.png",
+  "source": "art/sprites/source/p03_taunt_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_taunt.png",
   "report": "tools/sprites/reports/p03_taunt.report.json",
   "preview": "android/app/build/sprite-review/p03_taunt-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 11,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "frameHeight": 320,
-  "rootX": 140,
-  "rootY": 300,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Provocacao, 1 a cada 3 quadros."
+  "frameWidth": 640,
+  "frameHeight": 640,
+  "rootX": 280,
+  "rootY": 600,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Provocacao, 1 a cada 3 quadros.",
+  "sourceReferences": [
+    "art/sprites/source/p03_taunt_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
