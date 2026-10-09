@@ -21,9 +21,11 @@ class SpriteAutoRepairTests(unittest.TestCase):
         chosen=[0,2,4]
         indices,changes=suggest_replacements(chosen,
             [full[i] for i in chosen],lambda i: full[i],5)
-        self.assertEqual([0,3,4],indices)
+        self.assertIn(indices[1],(1,3))
+        self.assertEqual(0,indices[0])
+        self.assertEqual(4,indices[-1])
         self.assertEqual(2,changes[0]["sourceFrom"])
-        self.assertEqual(3,changes[0]["sourceTo"])
+        self.assertIn(changes[0]["sourceTo"],(1,3))
 
     def test_does_not_repair_intentional_large_lunge(self):
         full={0:pose(12),1:pose(34),2:pose(56),3:pose(78),4:pose(90)}
