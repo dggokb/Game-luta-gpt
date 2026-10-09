@@ -31,6 +31,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 KEYS = ROOT / 'art/keys'
 MIN_SCORE = 0.8   # semelhança mínima (TM_CCOEFF_NORMED) para aceitar a medida
+ENDS_SCORE = 0.7    # as duas pontas batem com a imagem inicial um pouco abaixo de MIN_SCORE...
+ENDS_SPREAD = 1.01  # ... e concordam no zoom: vale (vídeo gerado maior, traço muda um pouco)
 GUARD_MIN_SCORE = 0.6   # guarda do IDLE achada no meio do vídeo (pose parecida, não igual)
 GUARD_SPREAD = 1.03     # ... e os 3 melhores quadros concordam na escala
 
@@ -121,6 +123,11 @@ def medir(frames, personagem, keyer):
     best = max(ends.values(), key=lambda e: e['nota'])
     if best['nota'] >= MIN_SCORE:
         return best
+    a, b = ends['1º quadro'], ends['último quadro']
+    if min(a['nota'], b['nota']) >= ENDS_SCORE and max(a['escala'], b['escala']) / min(a['escala'], b['escala']) <= ENDS_SPREAD \
+            and a['medida'].split(' = ')[1] == b['medida'].split(' = ')[1]:
+        return dict(best, escala=(a['escala'] + b['escala']) / 2,
+                    medida=f"1º e último quadro = {a['medida'].split(' = ')[1]}, mesmo zoom")
     # Não começa nem termina numa imagem inicial: procura a guarda do IDLE no vídeo. A nota
     # fica mais baixa (a pose nunca é idêntica), então 3 quadros diferentes têm de concordar.
     guards = pack_frames(cfg['pacote'], 'IDLE', lambda n: [0, n // 3, 2 * n // 3])
