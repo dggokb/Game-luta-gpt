@@ -54,7 +54,19 @@ final class SpriteMotion {
                 previousClip=null;
                 fadeDuration=fadeTime=0;
             }
+            String outgoing=clip;
+            int outgoingFrame=previousFrame;
             clip=next;time=distance=0;
+            // The offline algorithm matches the exact interrupted pose to
+            // the closest frame of a cyclic incoming animation. The engine
+            // position and attack clock remain untouched.
+            CharacterDefinition.Animation incoming=character.animation(next);
+            if(incoming.loop && previousClip!=null) {
+                int entry=GeneratedSpriteTransitions.entry(character.id,outgoing,
+                                                           outgoingFrame,next);
+                if(incoming.distancePerFrame>0) distance=entry*incoming.distancePerFrame;
+                else time=incoming.timeOfFrame(entry);
+            }
             if (next.equals(Clip.JUMP)) takeoffSpeed=Math.max(0f,-velocityY);
             if(next.equals(Clip.CROUCH) && wasCrouching) time=character.animation(Clip.CROUCH).duration;
         }
