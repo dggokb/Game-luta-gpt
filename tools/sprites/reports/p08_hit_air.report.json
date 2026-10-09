@@ -1,0 +1,88 @@
+{
+  "id": "p08_hit_air",
+  "characterProfile": "p08",
+  "source": "art/sprites/source/p08_hit_air_video_normalized.png",
+  "sourceNote": "p08 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 288,
+    "frameHeight": 288,
+    "rootX": 168,
+    "rootY": 270,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        34,
+        67,
+        244,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 20146
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        26,
+        66,
+        259,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 20444
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        21,
+        57,
+        262,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 20700
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        17,
+        46,
+        271,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 21017
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 274,
+    "frameHeight": 245,
+    "rootX": 161,
+    "rootY": 234,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      7,
+      36
+    ],
+    "decodedBytes": {
+      "canonical": 1327104,
+      "packed": 1074080
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "cc2dd720007056b35f0b317f0f12a55206ff32e5e05e0dd688c43f8742efae82",
+      "config": "b1108ea9ff6531a88c675a596cf2bc459cce18000cff7d62c0152e9c04213639",
+      "profile": "cf1cbdc18b7adbea62e1084aee5ce2b2f97f376a4dbe8529d1ae393128a9deb7"
+    }
+  }
+}

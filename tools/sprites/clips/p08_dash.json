@@ -1,0 +1,29 @@
+{
+  "id": "p08_dash",
+  "javaName": "P08_DASH",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_dash.png",
+  "report": "tools/sprites/reports/p08_dash.report.json",
+  "preview": "android/app/build/sprite-review/p08_dash-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p08",
+    "escala": 0.3267,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.68)",
+    "quadros": "15,25,36,46,57,67",
+    "largura": 352,
+    "raiz": "193,238",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "rootX": 193
+}

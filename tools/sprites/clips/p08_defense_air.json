@@ -1,0 +1,32 @@
+{
+  "id": "p08_defense_air",
+  "javaName": "P08_DEFENSE_AIR",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_defense_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_defense_air.png",
+  "report": "tools/sprites/reports/p08_defense_air.report.json",
+  "preview": "android/app/build/sprite-review/p08_defense_air-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaPulo.mp4",
+    "personagem": "p08",
+    "escala": 0.4049,
+    "medida": "cabeça do IDLE em 6 quadros (nota 0.87)",
+    "quadros": "3,18,34,50,65,80,96",
+    "celula": 288,
+    "largura": 352,
+    "raiz": "155,270",
+    "colunas": 7,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "frameHeight": 288,
+  "rootX": 155,
+  "rootY": 270
+}

@@ -1,0 +1,30 @@
+{
+  "id": "p08_defense_stand",
+  "javaName": "P08_DEFENSE_STAND",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_defense_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_defense_stand.png",
+  "report": "tools/sprites/reports/p08_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p08_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaEmPe.mp4",
+    "personagem": "p08",
+    "escala": 0.3366,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.80)",
+    "quadros": "8,16,24,32,41,49,57,65",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "133,270",
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameHeight": 288,
+  "rootX": 133,
+  "rootY": 270
+}

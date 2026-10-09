@@ -11,7 +11,7 @@ Run `python3 tools/sprites/harmony.py` for a per-frame report.
 import json
 import statistics
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[2]
 # Poses that should keep the torso over the root. Attacks lunge on purpose.
@@ -31,6 +31,7 @@ REACTIONS = ('HIT_STAND', 'HIT_CROUCH')
 GROUND_TOLERANCE = 4      # px above/below the root row
 AIRBORNE_CLEARANCE = 30   # feet this far above the root: an airborne pose drawn in the art
 REACTION_MIN_RATIO = 0.85 # standing defense height vs Idle height
+THIN = 9                  # px: lines thinner than this are props, not the body
 
 
 def _read(path):
@@ -52,15 +53,23 @@ def frame_cell(root, atlas_id, frame, cache):
 def measure(cell, packed, scale):
     alpha = cell.getchannel('A').point(lambda v: 255 if v > 10 else 0)
     x0, y0, x1, y1 = alpha.getbbox()
-    px = alpha.load()
-    mids = []
     height = y1 - y0
-    for y in range(y0 + int(height * 0.30), y0 + int(height * 0.55)):
-        row = [x for x in range(cell.width) if px[x, y]]
-        if row:
-            mids.append((min(row) + max(row)) / 2)
+
+    def torso(mask):
+        px, mids = mask.load(), []
+        for y in range(y0 + int(height * 0.30), y0 + int(height * 0.55)):
+            row = [x for x in range(cell.width) if px[x, y]]
+            if row:
+                mids.append((min(row) + max(row)) / 2)
+        return (statistics.median(mids) - packed['rootX']) * scale if mids else None
+    # Thin lines (a whip, a ribbon) swing across the torso band inside a move: the spike
+    # check uses the torso with them wiped out by an opening (the body survives it).
+    body = alpha.filter(ImageFilter.MinFilter(THIN)).filter(ImageFilter.MaxFilter(THIN))
+    whole = torso(alpha)
+    core = torso(body) if body.getbbox() else None
     return {
-        'torso': (statistics.median(mids) - packed['rootX']) * scale,
+        'torso': whole,
+        'core': whole if core is None else core,
         'height': (packed['rootY'] - y0) * scale,
         'ground': (y1 - 1 - packed['rootY']) * scale,
     }
@@ -93,7 +102,7 @@ def audit(root=ROOT):
             # Out-and-back spike inside a move: neighbours agree, the middle frame does not.
             # Frames drawn in the air (feet well above the root, e.g. a spinning kick) are
             # skipped: a leg stretched across the torso band moves the measure, not the body.
-            torsos = [m['torso'] for m in frames]
+            torsos = [m['core'] for m in frames]
             for i in range(1, len(torsos) - 1):
                 before, here, after = torsos[i - 1], torsos[i], torsos[i + 1]
                 if frames[i]['ground'] < -AIRBORNE_CLEARANCE * scale:

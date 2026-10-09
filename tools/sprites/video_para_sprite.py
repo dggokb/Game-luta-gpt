@@ -143,7 +143,8 @@ def torso_x(rgba):
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
-              sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None)
+              sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
+              aparar_borda=0)
 
 
 def parser():
@@ -180,6 +181,9 @@ def parser():
                    help="células a limpar de efeito depois de converter (tools/sprites/limpar.py)")
     p.add_argument("--ancorar-pe", action="store_true",
                    help="depois de converter, fixa o pé de apoio no lugar do idle (tools/sprites/ancorar.py)")
+    p.add_argument("--aparar-borda", type=int, default=0,
+                   help="apaga N px nas bordas de cima e dos lados de cada célula: o que passa da "
+                        "célula máxima (chicote, capa) sai cortado limpo em vez de colado na borda")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -305,10 +309,18 @@ def main(argv=None):
         s = scale / args.reescala[n] if args.reescala else scale
         img = Image.fromarray(k, "RGBA")
         img = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
-        x = (n % cols) * cw + rx - round((ref_x - off) * s)
+        x = rx - round((ref_x - off) * s)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
-        y = (n // cols) * cell + ry - round(bottom * s)
-        sheet.alpha_composite(img, (x, y))
+        y = ry - round(bottom * s)
+        # Cada quadro fica na própria célula: o que passa da borda é cortado, não invade a vizinha.
+        box = Image.new("RGBA", (cw, cell), (0, 0, 0, 0))
+        box.paste(img, (x, y))
+        if args.aparar_borda:
+            a = np.array(box)
+            b = args.aparar_borda
+            a[:b, :, 3] = a[:, :b, 3] = a[:, -b:, 3] = 0
+            box = Image.fromarray(a, "RGBA")
+        sheet.paste(box, ((n % cols) * cw, (n // cols) * cell))
     sheet.save(args.saida)
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")
     if clip is not None:

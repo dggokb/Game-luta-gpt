@@ -1,0 +1,27 @@
+{
+  "id": "p08_special_s3",
+  "javaName": "P08_SPECIAL_S3",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_special_s3_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_special_s3.png",
+  "report": "tools/sprites/reports/p08_special_s3.report.json",
+  "preview": "android/app/build/sprite-review/p08_special_s3-import.png",
+  "expectedFrames": 21,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "S3.mp4",
+    "personagem": "p08",
+    "escala": 0.3175,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.73)",
+    "quadros": "35,36,37,39,40,41,42,43,44,46,47,49,51,54,57,60,62,65,68,71,74",
+    "largura": 320,
+    "raiz": "176,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "rootX": 176
+}

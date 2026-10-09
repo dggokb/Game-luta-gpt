@@ -85,6 +85,11 @@ história). O jogo ainda aplica o `worldScale` do perfil. Ninguém escolhe escal
 
 Os testes conferem que toda receita diz como a escala foi achada.
 
+**Célula:** o `personagem.py` mede o alcance dos quadros e escolhe a célula justa (até
+768×512). Cada quadro fica na própria célula. O que passa da célula máxima (o chicote do
+p08 esticado no ultra) sai cortado limpo na borda (`aparar_borda` na receita) em vez de
+quebrar o build.
+
 ## Tempo do golpe
 
 Cada animação de golpe marca o quadro do impacto (`"impactFrame"` no `character.json`).
@@ -111,6 +116,11 @@ em verde, raiz em amarelo, quadros marcados em vermelho) só dos clipes com avis
 | receita | clipe sem receita, com escala manual ou usando a arte de outro personagem |
 | ritmo | o mesmo estado anima mais rápido/lento que o do p01 no mesmo tempo de jogo; intro, vitória, derrota, provocação e idle fora do tempo do vídeo |
 | ciclo | loop que não fecha; corrida com quadro parado em guarda |
+
+A harmonia (`harmony.py`, também nos testes) mede o tronco de cada quadro; no pico de golpe
+ela ignora linhas finas (chicote, fita), para um chicote cruzando o corpo não parecer o
+corpo pulando. Personagem com roupa ou arma que engana o alinhamento (vestido, capa) é
+convertido com `--fixar registro` nos clipes registrados (agachar, pulo, defesa no ar).
 
 É triagem: o "erro" quase sempre é real, o "aviso" precisa de olho na folha. Leva uns 30 s
 por personagem. A lista de revisão de cada personagem sai dela (`docs/personagens/revisao.md`).

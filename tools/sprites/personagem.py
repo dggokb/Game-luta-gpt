@@ -272,7 +272,7 @@ def convert(char, name, video, quadros, opts, manual):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:
         args += ['--escala', str(manual[0]), '--motivo', manual[1]]
-    run(args + ['--celula', '512', '--largura', '768', '--raiz', '384,470'])
+    run(args + ['--celula', '512', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
     sheet = Image.open(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
     boxes = [sheet.crop((i % cols * 768, i // cols * 512, i % cols * 768 + 768, i // cols * 512 + 512))
              .getchannel('A').point(lambda v: 255 if v > 10 else 0).getbbox() for i in range(len(quadros))]
@@ -283,6 +283,12 @@ def convert(char, name, video, quadros, opts, manual):
     left, right, up, down = 384 - x0 + m, x1 - 384 + m, 470 - y0 + m, max(18, y1 - 470 + m)
     w = min(768, -(-(left + right) // 32) * 32)
     h = min(512, -(-(up + down) // 32) * 32)
+    wide, tall = left + right > 768 or x0 <= 1 or x1 >= 767, up + down > 512 or y0 <= 1
+    if wide or tall:  # passa da célula máxima (chicote, capa): célula máxima e borda cortada limpa
+        args += ['--aparar-borda', '10']
+        w, h = (768 if wide else w), (512 if tall else h)
+        left, right = min(left, w // 2), min(right, w // 2)
+        up = min(up, h - down)
     out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
     return out.strip().splitlines()[0]
 

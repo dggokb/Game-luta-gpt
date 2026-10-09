@@ -387,8 +387,11 @@ def compile_packs(root, results):
              ' static CharacterDefinition opponentCharacter() { return get(OPPONENT); }',
              ' private static Map<String,CharacterDefinition> build() {',
              ' Map<String,CharacterDefinition> all=new LinkedHashMap<>();']
-    for pack in packs:
-        lines += [' {', ' Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();',
+    # One method per character: a single build() passes the JVM's 64 KB per-method limit.
+    lines += [f' add{i}(all);' for i in range(len(packs))]
+    lines += [' return Collections.unmodifiableMap(all);', ' }']
+    for i, pack in enumerate(packs):
+        lines += [f' private static void add{i}(Map<String,CharacterDefinition> all) {{', ' Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();',
                   ' Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();',
                   ' Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();',
                   ' Map<String,CharacterDefinition.Special> sm=new LinkedHashMap<>();']
@@ -421,7 +424,7 @@ def compile_packs(root, results):
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']
-    lines += [' return Collections.unmodifiableMap(all);',' }','}','']
+    lines += ['}','']
     (root / JAVA / 'GeneratedCharacters.java').write_text('\n'.join(lines), encoding='utf-8')
     return packs
 

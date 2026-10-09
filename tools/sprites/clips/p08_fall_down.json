@@ -1,0 +1,31 @@
+{
+  "id": "p08_fall_down",
+  "javaName": "P08_FALL_DOWN",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_fall_down_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_fall_down.png",
+  "report": "tools/sprites/reports/p08_fall_down.report.json",
+  "preview": "android/app/build/sprite-review/p08_fall_down-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derrubar_levantar.mp4",
+    "personagem": "p08",
+    "escala": 0.5232,
+    "medida": "1º quadro = inicio_centro (nota 0.93)",
+    "quadros": "25,26,31,31,31,32,33,33,41,49,57",
+    "celula": 224,
+    "largura": 480,
+    "raiz": "247,206",
+    "colunas": 11,
+    "fixar": "quadro",
+    "pe_no_chao": true
+  },
+  "frameWidth": 480,
+  "frameHeight": 224,
+  "rootX": 247,
+  "rootY": 206
+}

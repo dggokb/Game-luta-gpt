@@ -1,0 +1,33 @@
+{
+  "id": "p08_hit_air",
+  "javaName": "P08_HIT_AIR",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_hit_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_hit_air.png",
+  "report": "tools/sprites/reports/p08_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p08_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dano Pulo.mp4",
+    "personagem": "p08",
+    "escala": 0.384,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.78)",
+    "quadros": "18,25,32,40",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "168,270",
+    "colunas": 4,
+    "pe_no_chao": true,
+    "limpar_quadros": [
+      0
+    ]
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 168,
+  "rootY": 270
+}

@@ -1,0 +1,29 @@
+{
+  "id": "p08_victory",
+  "javaName": "P08_VICTORY",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_victory_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_victory.png",
+  "report": "tools/sprites/reports/p08_victory.report.json",
+  "preview": "android/app/build/sprite-review/p08_victory-import.png",
+  "expectedFrames": 33,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "vitoria.mp4",
+    "personagem": "p08",
+    "escala": 0.352,
+    "motivo": "não passa pela guarda: cabeça do idle no fim (em pé) contra a do andar (0,343 x 0,2995/0,2918 = 0,352); altura em pé 221 contra 226 do andar",
+    "quadros": "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "156,270",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameHeight": 288,
+  "rootX": 156,
+  "rootY": 270
+}

@@ -1,0 +1,30 @@
+{
+  "id": "p08_walk_forward",
+  "javaName": "P08_WALK_FORWARD",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_walk_forward_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_walk_forward.png",
+  "report": "tools/sprites/reports/p08_walk_forward.report.json",
+  "preview": "android/app/build/sprite-review/p08_walk_forward-import.png",
+  "expectedFrames": 18,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "frente.mp4",
+    "personagem": "p08",
+    "escala": 0.343,
+    "motivo": "andar sem guarda: altura mediana do andar contra a do andar para trás (0,503 x 449/658 = 0,343) e cabeça do idle corrigida pelo andar para trás (0,292 x 1,17 = 0,341) concordam",
+    "quadros": "50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "179,270",
+    "colunas": 11,
+    "pe_no_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 179,
+  "rootY": 270
+}

@@ -1,0 +1,30 @@
+{
+  "id": "p08_super_wave",
+  "javaName": "P08_SUPER_WAVE",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_super_wave_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_super_wave.png",
+  "report": "tools/sprites/reports/p08_super_wave.report.json",
+  "preview": "android/app/build/sprite-review/p08_super_wave-import.png",
+  "expectedFrames": 22,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "super.mp4",
+    "personagem": "p08",
+    "escala": 0.5064,
+    "medida": "1º quadro = inicio_centro (nota 0.88)",
+    "quadros": "1,6,12,17,22,28,33,38,43,49,55,56,59,61,64,66,69,71,74,76,79,81",
+    "celula": 320,
+    "largura": 640,
+    "raiz": "312,302",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 640,
+  "frameHeight": 320,
+  "rootX": 312,
+  "rootY": 302
+}

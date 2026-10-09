@@ -1,0 +1,28 @@
+{
+  "id": "p08_getup",
+  "javaName": "P08_GETUP",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_getup_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_getup.png",
+  "report": "tools/sprites/reports/p08_getup.report.json",
+  "preview": "android/app/build/sprite-review/p08_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derrubar_levantar.mp4",
+    "personagem": "p08",
+    "escala": 0.5232,
+    "medida": "1º quadro = inicio_centro (nota 0.93)",
+    "quadros": "57,59,61,62,64,66,68,70,72,73,75,77",
+    "largura": 416,
+    "raiz": "180,238",
+    "colunas": 11,
+    "fixar": "registro",
+    "pe_no_chao": true
+  },
+  "frameWidth": 416,
+  "rootX": 180
+}

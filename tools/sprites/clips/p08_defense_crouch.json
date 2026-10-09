@@ -1,0 +1,32 @@
+{
+  "id": "p08_defense_crouch",
+  "javaName": "P08_DEFENSE_CROUCH",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_defense_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_defense_crouch.png",
+  "report": "tools/sprites/reports/p08_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p08_defense_crouch-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaChao.mp4",
+    "personagem": "p08",
+    "escala": 0.3339,
+    "medida": "1º quadro = inicio_agachado (nota 0.95)",
+    "quadros": "21,34,46,58,71,84,96",
+    "celula": 224,
+    "largura": 352,
+    "raiz": "191,206",
+    "colunas": 7,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "frameHeight": 224,
+  "rootX": 191,
+  "rootY": 206
+}

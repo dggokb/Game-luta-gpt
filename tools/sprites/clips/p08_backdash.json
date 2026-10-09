@@ -1,0 +1,31 @@
+{
+  "id": "p08_backdash",
+  "javaName": "P08_BACKDASH",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_backdash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_backdash.png",
+  "report": "tools/sprites/reports/p08_backdash.report.json",
+  "preview": "android/app/build/sprite-review/p08_backdash-import.png",
+  "expectedFrames": 10,
+  "segmentation": "prepared-grid",
+  "columns": 10,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "backDash.mp4",
+    "personagem": "p08",
+    "escala": 0.3311,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.74)",
+    "quadros": "9,14,18,23,27,32,36,41,45,50",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "121,270",
+    "colunas": 10,
+    "fixar": "registro",
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 121,
+  "rootY": 270
+}

@@ -1,0 +1,31 @@
+{
+  "id": "p08_jump",
+  "javaName": "P08_JUMP",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_jump_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_jump.png",
+  "report": "tools/sprites/reports/p08_jump.report.json",
+  "preview": "android/app/build/sprite-review/p08_jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p08",
+    "escala": 0.5139,
+    "medida": "1º quadro = inicio_centro (nota 0.93)",
+    "quadros": "0,22,23,29,34,40",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "130,270",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameHeight": 288,
+  "rootX": 130,
+  "rootY": 270
+}

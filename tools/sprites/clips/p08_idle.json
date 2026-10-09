@@ -1,0 +1,27 @@
+{
+  "id": "p08_idle",
+  "javaName": "P08_IDLE",
+  "profile": "p08.json",
+  "source": "art/sprites/source/p08_idle_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_idle.png",
+  "report": "tools/sprites/reports/p08_idle.report.json",
+  "preview": "android/app/build/sprite-review/p08_idle-import.png",
+  "expectedFrames": 55,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p08 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "idle.mp4",
+    "personagem": "p08",
+    "escala": 0.5173,
+    "medida": "1º quadro = inicio_centro (nota 0.91)",
+    "quadros": "36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90",
+    "largura": 192,
+    "raiz": "107,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "rootX": 107
+}
