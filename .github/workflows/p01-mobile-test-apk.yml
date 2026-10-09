@@ -2,7 +2,10 @@ name: P01 Motor V2 - APK Instalavel
 on:
   push:
     branches: [teste-motor-sprite]
-    paths: ['.github/workflows/p01-mobile-test-apk.yml']
+    paths:
+      - '.github/workflows/p01-mobile-test-apk.yml'
+      - 'android/app/src/main/java/com/gamelutagpt/SpriteMotion.java'
+      - 'android/app/src/test/java/com/gamelutagpt/SpriteAnimationSyncTest.java'
   workflow_dispatch:
 permissions:
   contents: read

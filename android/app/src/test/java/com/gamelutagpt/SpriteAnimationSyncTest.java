@@ -14,12 +14,15 @@ public class SpriteAnimationSyncTest {
         m.update(.016f,false,false,200f,0,true,false,false,null,0,false,false);
         assertEquals(SpriteStates.FALL,m.clip);
     }
-    @Test public void noActualTravelMeansNoExtraStep() {
+    @Test public void noActualTravelStopsWalkingAndResetsStrideOnIdle() {
         SpriteMotion m=new SpriteMotion();
         m.update(.016f,true,false,0,14,true,false,false,null,0,false,false);
         float prior=m.distance;
+        assertEquals(SpriteStates.WALK_FORWARD,m.clip);
+        assertEquals(prior,SpriteAnimationSync.travelDistance(prior,0),.00001f);
         m.update(.016f,true,false,0,0,true,false,false,null,0,false,false);
-        assertEquals(prior,m.distance,.00001f);
+        assertEquals(SpriteStates.IDLE,m.clip);
+        assertEquals(0f,m.distance,.00001f);
     }
     @Test public void attackCannotBeRetimedByJumpPhysics() {
         SpriteMotion m=new SpriteMotion();
