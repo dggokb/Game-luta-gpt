@@ -1,4 +1,4 @@
-name: P09 pilot - character, audit and graphic SR
+name: P09 and P12 pilots - character, audit and graphic SR
 
 on:
   push:
@@ -44,35 +44,42 @@ jobs:
           curl -fLS --retry 3 --output /tmp/realesr-animevideov3.pth \
             https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth
           echo "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d  /tmp/realesr-animevideov3.pth" | sha256sum --check
-      - name: Create disposable P09 sprite pilot from real P09 concept
+      - name: Create disposable P09 and P12 pilots from their own concept art
         run: |
           python -u tools/sprites/p09_three_engines_pilot.py prepare \
             --weights /tmp/realesr-animevideov3.pth
-          python -m compileall -q tools/sprites/p09_three_engines_pilot.py
-      - name: Compile and validate all Character Packs including P09 fixture
+          python -u tools/sprites/p12_three_engines_pilot.py prepare \
+            --weights /tmp/realesr-animevideov3.pth
+          python -m compileall -q tools/sprites/p09_three_engines_pilot.py tools/sprites/p12_three_engines_pilot.py
+      - name: Compile and validate all Character Packs including P09 and P12 fixtures
         run: |
           python tools/sprites/build_characters.py --write
           python tools/sprites/build_characters.py --check
           python -m unittest discover -s tools/sprites/tests -v
-      - name: Audit P09 temporal harmony and collect all warnings
-        run: python -u tools/sprites/p09_three_engines_pilot.py audit
+      - name: Audit P09 and P12 temporal harmony and collect all warnings
+        run: |
+          python -u tools/sprites/p09_three_engines_pilot.py audit
+          python -u tools/sprites/p12_three_engines_pilot.py audit
       - name: Android unit tests and test APK
         working-directory: android
         run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
-      - name: Upload P09 APK for manual test
+      - name: Upload P09 and P12 APK for manual test
         uses: actions/upload-artifact@v4
         with:
-          name: P09-three-engines-test-APK
+          name: P09-P12-three-engines-test-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
       - name: Upload source, enhanced frames, quality and unit reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: P09-three-engines-review
+          name: P09-P12-three-engines-review
           path: |
             android/app/build/p09-pilot/
+            android/app/build/p12-pilot/
             android/app/build/sprite-review/p09_pilot_idle.png
+            android/app/build/sprite-review/p12_pilot_idle.png
             tools/sprites/reports/p09_pilot_idle.report.json
+            tools/sprites/reports/p12_pilot_idle.report.json
             android/app/build/reports/tests/
           if-no-files-found: warn
