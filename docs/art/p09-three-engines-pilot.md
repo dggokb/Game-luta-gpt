@@ -39,9 +39,11 @@ Não houve merge, cópia ou substituição desnecessária desses motores.
 O workflow `.github/workflows/p09-three-engines.yml` inicia automaticamente
 ao atualizar esta branch. Também aceita disparo manual via Actions.
 
-Arte, `character.json`, roster, atlas e recursos Java do P09 são gerados no
-**checkout descartável do GitHub Actions**. Nenhum script altera a branch
-`game-luta-sprite-gpt`. Nada é automaticamente publicado nela.
+Arte, `character.json`, roster, atlases e recursos Java de P09 e P12 são
+gerados inicialmente no **checkout do GitHub Actions**. Se e somente se os
+testes e APK passarem, os arquivos necessários são commitados automaticamente
+**na própria branch de teste**. Nenhum arquivo é publicado em
+`game-luta-sprite-gpt` ou `main`.
 
 Entregáveis do workflow:
 - `P09-P12-three-engines-test-APK`: APK de teste com P09 e P12 selecionáveis.
