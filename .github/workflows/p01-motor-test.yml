@@ -1,0 +1,36 @@
+name: P01 Motor Sprite V2 Trial
+on:
+  push:
+    branches: [teste-motor-sprite]
+    paths:
+      - 'tools/sprites/p01_motor_trial.py'
+      - 'tools/sprites/tests/test_p01_motor_trial.py'
+      - '.github/workflows/p01-motor-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p01:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Python dependencies
+        run: python -m pip install -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
+      - name: Run P01 motor on all sprite atlases
+        run: |
+          python tools/sprites/p01_motor_trial.py
+          python tools/sprites/motion_harmony.py --character player_base --suggest-visual-timing --output android/app/build/p01-motor-test/harmony.json
+          python tools/sprites/atlas_budget.py --team player_base --output android/app/build/p01-motor-test/atlas_budget.json
+      - name: P01 trial regression tests
+        run: python -m unittest discover -s tools/sprites/tests -p 'test_p01_motor_trial.py' -v
+      - name: Upload per-animation review and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-Motor-Sprite-V2-Relatorio
+          path: android/app/build/p01-motor-test/
+          if-no-files-found: error
+          retention-days: 30

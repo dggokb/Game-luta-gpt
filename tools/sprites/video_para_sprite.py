@@ -58,7 +58,13 @@ def best_loop(frames, lo, hi, min_len):
     best = None
     for a in range(lo, hi - min_len + 1):
         for b in range(a + min_len, hi + 1):
-            d = float(np.abs(small[a] - small[b]).mean())
+            # Seam must match both the pose and the motion entering/leaving the loop.
+            # Equal silhouettes with reversed velocity otherwise create a visible jerk.
+            pose_gap = float(np.abs(small[a] - small[b]).mean())
+            start_velocity = small[a + 1] - small[a]
+            end_velocity = small[b] - small[b - 1]
+            motion_gap = float(np.abs(start_velocity - end_velocity).mean())
+            d = pose_gap + .35 * motion_gap
             if best is None or d < best[0]:
                 best = (d, a, b)
     return best
@@ -69,6 +75,27 @@ def keep_largest(alpha):
     n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
     if n > 1:
         alpha[labels != 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))] = 0
+    return alpha
+
+
+def keep_nearby_components(alpha):
+    """Opt-in: preserve sizable detached accessories near main silhouette; discard dust."""
+    n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
+    if n <= 1:
+        return alpha
+    main = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+    x, y, w, h, area = map(int, stats[main])
+    margin = max(24, min(220, int(max(w,h) * .75)))
+    keep = labels == main
+    for i in range(1,n):
+        if i == main:
+            continue
+        xx,yy,ww,hh,aa = map(int, stats[i])
+        dx=max(0,x-(xx+ww),xx-(x+w))
+        dy=max(0,y-(yy+hh),yy-(y+h))
+        if aa >= max(25,int(area*.001)) and max(dx,dy) <= margin:
+            keep |= labels == i
+    alpha[~keep] = 0
     return alpha
 
 
@@ -86,7 +113,7 @@ def floor_dust(alpha, h, s, v):
     return band & (tinted | beige)
 
 
-def key(frame, dust=False, effects=False, floor=False):
+def key(frame, dust=False, effects=False, floor=False, preserve_parts=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45)
@@ -112,11 +139,12 @@ def key(frame, dust=False, effects=False, floor=False):
         colored = ((alpha > 0) & ~pale).astype(np.uint8)
         body = cv2.dilate(colored, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (91, 91)))
         alpha[thin | ((alpha > 0) & pale & (body == 0))] = 0
-        keep_largest(alpha)
+        (keep_nearby_components(alpha) if preserve_parts else keep_largest(alpha))
     if floor:
         alpha[floor_dust(alpha, h, s, v)] = 0
         alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
-    alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
+    alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+    alpha = keep_nearby_components(alpha) if preserve_parts else keep_largest(alpha)
     # Furinhos dentro do corpo (reflexo verde na roupa branca) voltam a ser opacos;
     # vãos grandes, como entre as pernas, continuam transparentes.
     _, labels, stats, _ = cv2.connectedComponentsWithStats((alpha == 0).astype(np.uint8))
@@ -183,6 +211,13 @@ def parser():
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
+    p.add_argument("--qa-output", help="prefixo do relatorio temporal JSON/PNG/HTML")
+    p.add_argument("--qa-strict", action="store_true", help="reprova quadros vazios")
+    p.add_argument("--qa-loop", action="store_true", help="revisa a continuidade do loop escolhido")
+    p.add_argument("--reparo-seguro", action="store_true",
+                   help="substitui quadros anormais apenas por quadros reais proximos do mesmo video")
+    p.add_argument("--preservar-partes", action="store_true",
+                   help="preserva acessorios soltos proximos (experimental)")
     return p
 
 
@@ -196,6 +231,10 @@ def parse_args(argv=None):
         keep = set(RECIPE) | {"personagem"} | ({"escala", "motivo"} if "motivo" in recipe else set())
         p.set_defaults(**{k: v for k, v in recipe.items() if k in keep})  # escala medida é medida de novo
     args = p.parse_args(argv)
+    if clip and clip.get("video", {}).get("preservar_partes"):
+        args.preservar_partes = True
+    if clip and clip.get("video", {}).get("reparo_seguro"):
+        args.reparo_seguro = True
     if args.saida is None:
         if clip is None:
             p.error("informe a saída ou --clipe")
@@ -219,6 +258,10 @@ def save_recipe(path, clip, args, start, end, measured, count, cw):
     resolved = dict(vars(args), inicio=start, fim=end)
     if args.quadros:
         resolved.update(inicio=None, fim=None)
+    if args.preservar_partes:
+        recipe["preservar_partes"] = True
+    if args.reparo_seguro:
+        recipe["reparo_seguro"] = True
     recipe.update({k: resolved[k] for k, default in RECIPE.items() if resolved[k] != default})
     rx, ry = (int(v) for v in args.raiz.split(","))
     clip.update(expectedFrames=count, columns=args.colunas, video=recipe)
@@ -261,7 +304,8 @@ def main(argv=None):
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
         if (i, dust, effects, floor) not in cache:
-            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor)
+            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor,
+                                                  preserve_parts=args.preservar_partes)
         return cache[i, dust, effects, floor]
 
     measured = None
@@ -274,6 +318,19 @@ def main(argv=None):
         print(f"escala {s:.4f} ({measured['medida']}, nota {measured['nota']:.2f}, zoom {measured['zoom']:.3f})")
     scale = s
     keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos, args.limpar_chao) for i in picked]
+    applied_fixes = []
+    if args.reparo_seguro and len(picked) > 2:
+        from sprite_auto_repair import suggest_replacements
+        new_picks, applied_fixes = suggest_replacements(
+            picked, keyed, lambda i: keyed_frame(
+                i, args.sem_poeira, args.sem_efeitos, args.limpar_chao),
+            len(frames))
+        if applied_fixes:
+            picked = new_picks
+            args.quadros = ",".join(str(i) for i in picked)
+            keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos,
+                                  args.limpar_chao) for i in picked]
+            print(f"reparo seguro: {len(applied_fixes)} quadros substituidos por fontes reais")
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
         # Remove só a tendência (o deslizamento); o balanço natural do corpo continua.
@@ -311,6 +368,15 @@ def main(argv=None):
         sheet.alpha_composite(img, (x, y))
     sheet.save(args.saida)
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")
+    if args.qa_output:
+        from video_quality import inspect, write_report
+        qa = inspect(keyed, fps / max(1,args.passo), loop=bool(args.loop or args.qa_loop), target=16)
+        qa["appliedFixes"] = applied_fixes
+        write_report(qa, keyed, args.qa_output,
+                     character=args.personagem or "character", clip=Path(args.saida).stem)
+        print(f"video QA: {len(qa['flags'])} achados -> {args.qa_output}.html")
+        if args.qa_strict and any(e['severity'] == 'error' for e in qa['flags']):
+            raise SystemExit("Video QA falhou; revise os quadros vazios")
     if clip is not None:
         save_recipe(args.clipe, clip, args, start, end, measured, len(keyed), cw)
         pack_id = "player_base" if args.personagem == "p01" else args.personagem

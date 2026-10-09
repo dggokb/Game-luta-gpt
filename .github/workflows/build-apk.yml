@@ -11,6 +11,7 @@ on:
       - main
       - game-luta-sprite-gpt
       - game-luta-sprite-astra
+      - teste-motor-sprite
       - 'claude/**'
   pull_request:
   workflow_dispatch:
@@ -38,8 +39,17 @@ jobs:
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install sprite pipeline dependency
-        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
 
+      - name: Fast V2 repair and timing regression tests
+        run: |
+          python3 -m unittest discover -s tools/sprites/tests -p 'test_sprite_auto_repair.py' -v
+          python3 -m unittest discover -s tools/sprites/tests -p 'test_video_quality.py' -v
+          python3 -m unittest discover -s tools/sprites/tests -p 'test_motion_harmony.py' -v
+      - name: Motion harmony and atlas memory audit
+        run: |
+          python3 tools/sprites/motion_harmony.py
+          python3 tools/sprites/atlas_budget.py
       - name: Normalize and validate sprite assets
         run: |
           python3 -m unittest discover -s tools/sprites/tests -v
@@ -75,7 +85,7 @@ jobs:
           if-no-files-found: error
 
       - name: Runtime smoke test on Android emulator
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt' || github.ref == 'refs/heads/teste-motor-sprite'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -97,7 +107,7 @@ jobs:
             test -s game-smoke.png
 
       - name: Upload runtime screenshot
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt' || github.ref == 'refs/heads/teste-motor-sprite'
         uses: actions/upload-artifact@v4
         with:
           name: GameLutaGPT-Smoke-Screenshot

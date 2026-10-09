@@ -31,6 +31,12 @@ final class SpriteAtlasCache {
     }
 
     int size() { return sheets.size(); }
+    /** Actual decoded memory including row strides, for profiling on device. */
+    long decodedBytes() {
+        long bytes=0L;
+        for (Bitmap bitmap:sheets.values()) bytes+=bitmap.getAllocationByteCount();
+        return bytes;
+    }
 
     /** Frees every atlas the given characters do not use (team change: ~135 MB each). */
     void retainOnly(CharacterDefinition... characters) {
@@ -52,7 +58,10 @@ final class SpriteAtlasCache {
             if(bitmap==null)throw new IllegalStateException("Cannot decode "+a.resource);
             bitmap.setDensity(Bitmap.DENSITY_NONE);sheets.put(a.resource,bitmap);
         }
-        if(bitmap.getWidth()!=a.columns*a.width || bitmap.getHeight()!=((a.count+a.columns-1)/a.columns)*a.height)
+        if(bitmap.getWidth()!=a.columns*a.width || bitmap.getHeight()!=((a.count+a.columns-1)/a.columns)*a.height) {
+            sheets.remove(a.resource);
+            bitmap.recycle();
             throw new IllegalStateException("Invalid atlas dimensions: "+a.resource);
+        }
     }
 }

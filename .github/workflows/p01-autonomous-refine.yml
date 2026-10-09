@@ -1,0 +1,70 @@
+name: P01 Autonomous Sprite Refinement
+on:
+  push:
+    branches: [teste-motor-sprite]
+    paths:
+      - 'tools/sprites/autonomous_transitions.py'
+      - 'android/app/src/main/java/com/gamelutagpt/SpriteMotion.java'
+      - '.github/workflows/p01-autonomous-refine.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sprite-auto-refine-p01-fast-v2
+  cancel-in-progress: true
+jobs:
+  refine-p01:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: python -m pip install -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
+      - name: Autonomously retime p01 within safe limits
+        run: |
+          python tools/sprites/motion_harmony.py --character player_base --apply-visual-timing --output android/app/build/autonomous-p01/timing.json
+          python tools/sprites/build_characters.py --check
+      - name: Generate every P01 loop entry mapping
+        run: |
+          python tools/sprites/autonomous_transitions.py --character player_base --report android/app/build/autonomous-p01/transition_graph.json
+          python tools/sprites/autonomous_transitions.py --character player_base --check --report android/app/build/autonomous-p01/transition_graph_check.json
+      - name: Focused image, transition and retiming regression tests
+        run: |
+          python -m unittest discover -s tools/sprites/tests -p 'test_autonomous_transitions.py' -v
+          python -m unittest discover -s tools/sprites/tests -p 'test_sprite_auto_repair.py' -v
+          python -m unittest discover -s tools/sprites/tests -p 'test_p01_motor_trial.py' -v
+          python -m unittest discover -s tools/sprites/tests -p 'test_motion_harmony.py' -v
+          python tools/sprites/build_characters.py --check
+      - name: Ensure only visual timing and generated sources changed
+        run: |
+          python - <<'PY'
+          import subprocess
+          changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines())
+          expected={
+              'characters/player_base/character.json',
+              'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java',
+              'android/app/src/main/java/com/gamelutagpt/GeneratedSpriteTransitions.java',
+          }
+          assert changed, 'Refinement did not write anything'
+          assert changed <= expected, 'Unexpected changed paths: {}'.format(changed-expected)
+          assert 'android/app/src/main/java/com/gamelutagpt/GeneratedSpriteTransitions.java' in changed
+          print('P01 safe autonomous changes:', sorted(changed))
+          PY
+      - name: Commit P01 refinements to test branch
+        run: |
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git add characters/player_base/character.json android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java android/app/src/main/java/com/gamelutagpt/GeneratedSpriteTransitions.java
+          git commit -m 'refine(p01): auto retime visual attacks and phase-align all neutral transition entries'
+          git push origin HEAD:teste-motor-sprite
+      - name: Upload transition graph and timing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-Autonomous-Transitions
+          path: android/app/build/autonomous-p01/
+          if-no-files-found: warn
