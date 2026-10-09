@@ -1,0 +1,24 @@
+{
+  "frames_present": 76,
+  "all_rgba_transparent": true,
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "unique_hashes": 76,
+  "new_candidates": [
+    0,
+    26
+  ],
+  "raw_iou_mean": 0.7798485378971118,
+  "aligned_iou_mean": 0.9404707332415118,
+  "aligned_iou_min": 0.9155306408459677,
+  "integration_approved": false,
+  "status": "ready_for_visual_test",
+  "limitations": [
+    "BBox alignment compensates global framing; it does not correct internal anatomy or details.",
+    "IoU is diagnostic, not proof of exact pose.",
+    "Temporal art/color variations remain possible.",
+    "No APK or game integration."
+  ]
+}
