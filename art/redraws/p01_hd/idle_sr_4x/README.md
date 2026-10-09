@@ -19,3 +19,10 @@ Documentação: https://github.com/xinntao/Real-ESRGAN/blob/master/docs/anime_vi
 Licença BSD 3-Clause; ver LICENSE-Real-ESRGAN.txt.
 
 Reprodução local (Python + torch CPU, Pillow, numpy e scipy): baixar os pesos oficiais acima e executar upscale_idle_sr.py com --input PASTA_DOS_76_ORIGINAIS --output PASTA_NOVA --weights realesr-animevideov3.pth. O modelo e o alpha usam a mesma transformação para todos os frames. Os scripts estão junto do pacote; os pesos não estão incluídos.
+
+
+## Resultado aprovado e integrado
+
+Em 09/10/2026 o usuário aprovou o idle no jogo: "deu muito certo". Os 76 masters estão preservados. Integração em game-luta-sprite-gpt, commit b884f6eeb20e687e9eab6473858ba6ef8a6a0af2: fonte 2×, pixelScale 2, sequência e 42 ms preservados. Aprovação registrada em c7a1409a9254c0b4cfb009132b09361ee30776b3; receita e limites em docs/art/p01-idle-sr-integration.md. O texto anterior descreve o estágio do pacote antes da integração.
+
+Próximo teste: WALK_FORWARD, 20 masters em ../walk_forward_sr_4x/, avanço de 12,5 unidades/frame. Branch de teste: test/p01-walk-forward-sr-20261009.
