@@ -44,3 +44,9 @@ os sentidos, inclusive a volta à densidade normal em um golpe.
 Esta integração autoriza o teste no jogo. Super-resolução pode reconstruir
 cores e linhas; não foi comprovada redução da tremulação do vídeo original.
 Não foi usada referência da P02. APK não é um entregável desta atualização.
+
+## Aprovação do teste visual
+
+Em 09/10/2026, o usuário aprovou o idle integrado após o teste no jogo: "deu muito certo". Este é o resultado aprovado para referência das próximas animações: Real-ESRGAN AnimeVideo-v3, masters 4×, runtime 2×, alpha original ampliado uniformemente, mesma raiz e ritmo. A aprovação visual do usuário é distinta da CI Android, que ainda estava em execução no momento do registro. Pipeline e 12 testes locais de sprites passaram.
+
+Próxima animação para teste: WALK_FORWARD, 20 frames. Sua progressão no jogo usa distância percorrida (12,5 unidades por frame), não 42 ms como o idle. Preservar essa diferença ao preparar o novo teste.
