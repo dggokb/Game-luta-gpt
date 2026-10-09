@@ -81,38 +81,7 @@ jobs:
           arch: x86_64
           profile: pixel_2
           disable-animations: true
-          script: |
-            set -eu
-            mkdir -p android/app/build/p01-test-mobile
-            capture() {
-              timeout 15s adb logcat -d -v time > android/app/build/p01-test-mobile/startup-logcat.txt || true
-              timeout 15s adb shell dumpsys activity activities > android/app/build/p01-test-mobile/activities.txt || true
-              timeout 15s adb exec-out screencap -p > p01-motor-v2-screen.png || true
-              timeout 15s adb shell uiautomator dump /sdcard/window.xml || true
-              timeout 15s adb shell cat /sdcard/window.xml > p01-motor-v2-ui.xml || true
-            }
-            trap capture EXIT
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            adb logcat -c
-            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
-            sleep 12
-            adb shell pidof com.gamelutagpt | grep -Eq '[0-9]+'
-            adb shell dumpsys window | grep -E 'mCurrentFocus|mFocusedApp' | grep -q com.gamelutagpt
-            ! adb logcat -d -v brief | grep -Eiq 'FATAL EXCEPTION|Process: com.gamelutagpt|ANR in com.gamelutagpt'
-            adb shell uiautomator dump /sdcard/window.xml || true
-            adb shell cat /sdcard/window.xml > p01-motor-v2-ui.xml || true
-            ! grep -Eiq "isn.t responding|has stopped|System UI" p01-motor-v2-ui.xml
-            adb exec-out screencap -p > p01-motor-v2-screen.png
-            test -s p01-motor-v2-screen.png
-            python3 - <<'PY'
-            from PIL import Image
-            import numpy as np
-            a=np.asarray(Image.open("p01-motor-v2-screen.png").convert("RGB"))
-            a=a[50:-50,50:-50,:]
-            fraction=float(np.mean(a.max(2)-a.min(2)>48))
-            print("Game screenshot colored-pixel fraction",round(fraction,3))
-            assert fraction>.06, "Screenshot seems blank or monochrome ANR dialog, not the fighting game"
-            PY
+          script: bash .github/scripts/p01_emulator_smoke.sh
       - name: Show on-failure logs if collected
         if: always()
         run: |
