@@ -1,3 +1,13 @@
+# P01 — idle ampliado sem redesenho
+
+Atendendo à mudança de abordagem após a tremulação dos redesenhos: [idle_upscale_6x](idle_upscale_6x/) contém os 76 frames originais ampliados uniformemente de 256×256 para 1536×1536, com transparência e tempo de 42 ms. Nenhuma regeneração de anatomia, rosto ou roupa, nenhum alinhamento independente por frame.
+
+76/76 concluídos; 0 falhas pendentes. PNGs e ZIP decodificados e revalidados após corrigir truncamento temporário na sincronização. Conferência diagnóstica: 76/76 enquadramentos da silhueta preservados; IoU de alpha mínima 0,998566 e média 0,999099. Isto é interpolação Lanczos, sem criação de detalhe real. Oscilações que já existam no original podem continuar presentes.
+
+Disponível para comparação visual na conversa. ZIP: P01-IDLE-Upscale-6x-sem-redesenho.zip. Ainda sem integração ao jogo ou APK. Originais, configuração e tentativas anteriores preservados na branch separada art/p01-hd-redraw-20261009. Nenhuma referência de P02 usada. As demais animações ainda não foram processadas.
+
+## Histórico anterior: redesenhos experimentais
+
 # P01 — atualização da revisão v3
 
 **Disponível para teste visual do idle inteiro, sem APK ou integração ao jogo.** O pacote `P01-IDLE-Teste-Visual-v3.zip`, entregue na conversa, contém 76 PNGs HD, os frames originais, visualizador offline com reprodução/pausa/avanço/velocidade e uma comparação animada.
