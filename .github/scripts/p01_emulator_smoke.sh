@@ -44,9 +44,16 @@ if ! grep -Fq "$PKG" <<< "$resumed"; then
 fi
 echo "Resumed game: $resumed"
 
-# Android emulator's one-time "Viewing full screen / GOT IT" OS overlay.
+# Dismiss one-time immersive-mode confirmation: Android 14 and Android 16
+# use different GOT IT button locations at the emulator's landscape resolution.
 adb shell input tap 1080 454 || true
+adb shell input tap 1250 430 || true
 sleep 4
+focused="$(timeout 20s adb shell dumpsys activity activities)"
+if grep -Eiq 'mCurrentFocus=.*ImmersiveModeConfirmation' <<< "$focused"; then
+  echo "FAIL: fullscreen system modal still covers gameplay"
+  exit 84
+fi
 
 logs="$(timeout 25s adb logcat -d -v brief)"
 if grep -Eiq 'FATAL EXCEPTION|OutOfMemoryError.*com.gamelutagpt|ANR in com.gamelutagpt' <<< "$logs"; then
