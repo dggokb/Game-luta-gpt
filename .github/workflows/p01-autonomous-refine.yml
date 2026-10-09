@@ -11,7 +11,7 @@ permissions:
   contents: write
 concurrency:
   group: sprite-auto-refine-p01
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   refine-p01:
     runs-on: ubuntu-latest
