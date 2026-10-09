@@ -1,0 +1,28 @@
+{
+  "id": "p06_defense_stand",
+  "javaName": "P06_DEFENSE_STAND",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_defense_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_defense_stand.png",
+  "report": "tools/sprites/reports/p06_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p06_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaEmPe.mp4",
+    "personagem": "p06",
+    "escala": 0.3366,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.72)",
+    "quadros": "12,20,27,35,43,51,58,66",
+    "largura": 224,
+    "raiz": "114,238",
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 114
+}

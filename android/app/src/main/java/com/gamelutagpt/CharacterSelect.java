@@ -11,7 +11,7 @@ import java.util.List;
 final class CharacterSelect {
     enum Result { NONE, CHANGED, CONFIRM, CANCEL }
 
-    static final float CARD_W = 190f, CARD_H = 300f, CARD_GAP = 26f, CARD_TOP = 150f;
+    static final float CARD_W = 190f, CARD_H = 300f, CARD_GAP = 26f, CARD_MIN_GAP = 12f, CARD_TOP = 150f;
     static final float FIGHT_LEFT = 530f, FIGHT_TOP = 560f, FIGHT_RIGHT = 750f, FIGHT_BOTTOM = 630f;
     static final float BACK_LEFT = 40f, BACK_TOP = 30f, BACK_RIGHT = 200f, BACK_BOTTOM = 80f;
 
@@ -57,16 +57,21 @@ final class CharacterSelect {
     int cardAt(float x, float y) {
         for (int i = 0; i < ids.length; i++) {
             float left = cardLeft(i);
-            if (inside(x, y, left, CARD_TOP, left + CARD_W, CARD_TOP + CARD_H)) return i;
+            if (inside(x, y, left, CARD_TOP, left + cardWidth(), CARD_TOP + CARD_H)) return i;
         }
         return -1;
     }
 
-    /** Cards in one centered row (they shrink the gap when many). */
+    /** Cards in one centered row: the gap shrinks first, then the cards get narrower. */
     float cardLeft(int i) {
-        float gap = Math.min(CARD_GAP, (Arena.VW - 40f - ids.length * CARD_W) / Math.max(1, ids.length - 1));
-        float row = ids.length * CARD_W + (ids.length - 1) * gap;
-        return (Arena.VW - row) / 2f + i * (CARD_W + gap);
+        float w = cardWidth(), gaps = Math.max(1, ids.length - 1);
+        float gap = Math.max(CARD_MIN_GAP, Math.min(CARD_GAP, (Arena.VW - 40f - ids.length * w) / gaps));
+        float row = ids.length * w + (ids.length - 1) * gap;
+        return (Arena.VW - row) / 2f + i * (w + gap);
+    }
+
+    float cardWidth() {
+        return Math.min(CARD_W, (Arena.VW - 40f - (ids.length - 1) * CARD_MIN_GAP) / ids.length);
     }
 
     private int indexOf(String id) {

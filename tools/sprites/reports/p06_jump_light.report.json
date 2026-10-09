@@ -1,0 +1,121 @@
+{
+  "id": "p06_jump_light",
+  "characterProfile": "p06",
+  "source": "art/sprites/source/p06_jump_light_video_normalized.png",
+  "sourceNote": "p06 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 448,
+    "frameHeight": 320,
+    "rootX": 122,
+    "rootY": 302,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        60,
+        35,
+        183,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 17160
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        54,
+        74,
+        198,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16381
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        46,
+        80,
+        261,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 17398
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        31,
+        77,
+        257,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16849
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        29,
+        75,
+        256,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 16961
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        30,
+        70,
+        253,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 17216
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        32,
+        33,
+        251,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 18078
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 253,
+    "frameHeight": 291,
+    "rootX": 104,
+    "rootY": 279,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      18,
+      23
+    ],
+    "decodedBytes": {
+      "canonical": 4014080,
+      "packed": 2061444
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "06244b9092585cfaa851311d25bb21827da73df4f2ef5d49c1da4d58d904ebff",
+      "config": "14e4ba7c3f8c0e01514b7f8900ef07e51a3cb6411bb1958dc01ca27fcc98103f",
+      "profile": "ed9db22060e90690715e9be1f7a9baa28a89d85737c20c432e40c3e9015911ca"
+    }
+  }
+}

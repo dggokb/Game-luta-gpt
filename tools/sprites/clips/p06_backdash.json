@@ -1,0 +1,30 @@
+{
+  "id": "p06_backdash",
+  "javaName": "P06_BACKDASH",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_backdash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_backdash.png",
+  "report": "tools/sprites/reports/p06_backdash.report.json",
+  "preview": "android/app/build/sprite-review/p06_backdash-import.png",
+  "expectedFrames": 10,
+  "segmentation": "prepared-grid",
+  "columns": 10,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "backDash.mp4",
+    "personagem": "p06",
+    "escala": 0.4712,
+    "medida": "quadros 78, 66, 84 = guarda do IDLE (nota 0.83)",
+    "quadros": "25,33,41,49,57,64,72,80,88,96",
+    "celula": 352,
+    "largura": 256,
+    "raiz": "152,334",
+    "colunas": 10,
+    "fixar": "registro",
+    "limpar_chao": true
+  },
+  "frameHeight": 352,
+  "rootX": 152,
+  "rootY": 334
+}

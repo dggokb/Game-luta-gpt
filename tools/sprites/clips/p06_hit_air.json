@@ -1,0 +1,30 @@
+{
+  "id": "p06_hit_air",
+  "javaName": "P06_HIT_AIR",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_hit_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_hit_air.png",
+  "report": "tools/sprites/reports/p06_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p06_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoPulo.mp4",
+    "personagem": "p06",
+    "escala": 0.5191,
+    "medida": "1º quadro = inicio_centro (nota 0.85)",
+    "quadros": "21,31,42,52",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "155,270",
+    "colunas": 4,
+    "pe_no_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 155,
+  "rootY": 270
+}

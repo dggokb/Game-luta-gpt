@@ -1,0 +1,253 @@
+{
+  "id": "p06_walk_back",
+  "characterProfile": "p06",
+  "source": "art/sprites/source/p06_walk_back_video_normalized.png",
+  "sourceNote": "p06 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 224,
+    "frameHeight": 256,
+    "rootX": 120,
+    "rootY": 238,
+    "columns": 11,
+    "frameCount": 19
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        31,
+        25,
+        194,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14414
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        32,
+        23,
+        195,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14555
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        33,
+        22,
+        195,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14539
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        39,
+        22,
+        188,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14390
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        42,
+        21,
+        187,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14313
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        40,
+        20,
+        188,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14453
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        39,
+        19,
+        189,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14583
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        40,
+        19,
+        190,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14656
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        40,
+        19,
+        191,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14676
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        50,
+        21,
+        192,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14608
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        43,
+        22,
+        191,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14658
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        47,
+        22,
+        191,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14577
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        47,
+        23,
+        191,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14470
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        47,
+        23,
+        190,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14387
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        46,
+        22,
+        190,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14402
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        34,
+        24,
+        188,
+        240
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 14446
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        31,
+        23,
+        188,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14492
+    },
+    {
+      "index": 17,
+      "outputBbox": [
+        29,
+        22,
+        191,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14482
+    },
+    {
+      "index": 18,
+      "outputBbox": [
+        29,
+        24,
+        192,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14454
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 187,
+    "frameHeight": 241,
+    "rootX": 102,
+    "rootY": 229,
+    "columns": 11,
+    "frameCount": 19,
+    "cropOffset": [
+      18,
+      9
+    ],
+    "decodedBytes": {
+      "canonical": 5046272,
+      "packed": 3965896
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f679efa0fe23f198710e8f7b239faab35d0c1d3dfa0e20a6c284139d450cf07f",
+      "config": "ed52858c7daf64dd2df8eba16a7a843a3be24ee2add0781d045be9eaec3ed150",
+      "profile": "ed9db22060e90690715e9be1f7a9baa28a89d85737c20c432e40c3e9015911ca"
+    }
+  }
+}

@@ -69,7 +69,7 @@ final class CharacterSelectRenderer {
         CharacterDefinition character = GeneratedCharacters.get(id);
         int order = s.order(id);
         float left = s.cardLeft(i), top = CharacterSelect.CARD_TOP;
-        rect.set(left, top, left + CharacterSelect.CARD_W, top + CharacterSelect.CARD_H);
+        rect.set(left, top, left + s.cardWidth(), top + CharacterSelect.CARD_H);
 
         p.setStyle(Paint.Style.FILL);
         p.setColor(Color.rgb(32, 35, 50));
@@ -77,7 +77,7 @@ final class CharacterSelectRenderer {
         Bitmap portrait = portrait(character);
         if (portrait != null) {
             // Feet near the bottom, the whole guard inside the card.
-            float scale = Math.min((CharacterSelect.CARD_W - 16f) / portrait.getWidth(),
+            float scale = Math.min((s.cardWidth() - 16f) / portrait.getWidth(),
                 (CharacterSelect.CARD_H - 70f) / portrait.getHeight());
             float w = portrait.getWidth() * scale, h = portrait.getHeight() * scale;
             float x = rect.centerX() - w / 2f, y = rect.bottom - 50f - h;

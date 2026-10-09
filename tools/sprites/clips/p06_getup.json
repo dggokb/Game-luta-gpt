@@ -1,0 +1,31 @@
+{
+  "id": "p06_getup",
+  "javaName": "P06_GETUP",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_getup_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_getup.png",
+  "report": "tools/sprites/reports/p06_getup.report.json",
+  "preview": "android/app/build/sprite-review/p06_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derrubar_levantar.mp4",
+    "personagem": "p06",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "64,66,69,71,73,75,78,80,82,84,87,89",
+    "celula": 320,
+    "largura": 384,
+    "raiz": "220,302",
+    "colunas": 11,
+    "fixar": "registro",
+    "pe_no_chao": true
+  },
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "rootX": 220,
+  "rootY": 302
+}

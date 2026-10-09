@@ -568,7 +568,7 @@ public class SpriteIntegrationTest {
     private void tapCard(CharacterSelect s,String id)throws Exception {
         int i=java.util.Arrays.asList(s.ids).indexOf(id);
         invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
-            s.cardLeft(i)+CharacterSelect.CARD_W/2,CharacterSelect.CARD_TOP+CharacterSelect.CARD_H/2);
+            s.cardLeft(i)+s.cardWidth()/2,CharacterSelect.CARD_TOP+CharacterSelect.CARD_H/2);
     }
     @Test public void characterSelectPicksThePairAndPausesTheFight()throws Exception {
         CharacterSelect s=(CharacterSelect)get("characterSelect");

@@ -1,0 +1,30 @@
+{
+  "id": "p06_jump",
+  "javaName": "P06_JUMP",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_jump_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_jump.png",
+  "report": "tools/sprites/reports/p06_jump.report.json",
+  "preview": "android/app/build/sprite-review/p06_jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jump.mp4",
+    "personagem": "p06",
+    "escala": 0.5285,
+    "medida": "1º quadro = inicio_centro (nota 0.94)",
+    "quadros": "0,24,25,30,35,40",
+    "celula": 320,
+    "largura": 192,
+    "raiz": "105,302",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameWidth": 192,
+  "frameHeight": 320,
+  "rootX": 105,
+  "rootY": 302
+}

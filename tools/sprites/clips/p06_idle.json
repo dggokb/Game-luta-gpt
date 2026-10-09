@@ -1,0 +1,30 @@
+{
+  "id": "p06_idle",
+  "javaName": "P06_IDLE",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_idle_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_idle.png",
+  "report": "tools/sprites/reports/p06_idle.report.json",
+  "preview": "android/app/build/sprite-review/p06_idle-import.png",
+  "expectedFrames": 40,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "idle.mp4",
+    "personagem": "p06",
+    "escala": 0.3536,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.63)",
+    "quadros": "46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "114,270",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 114,
+  "rootY": 270
+}

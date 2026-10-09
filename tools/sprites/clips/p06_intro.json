@@ -1,0 +1,30 @@
+{
+  "id": "p06_intro",
+  "javaName": "P06_INTRO",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_intro_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_intro.png",
+  "report": "tools/sprites/reports/p06_intro.report.json",
+  "preview": "android/app/build/sprite-review/p06_intro-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "intro.mp4",
+    "personagem": "p06",
+    "escala": 0.3825,
+    "motivo": "termina em base larga (não é a guarda): cabeça do idle nos quadros 80-96 (0,3825, nota 0,5) e tronco ombro-cinto 170/155 (0,388) concordam",
+    "quadros": "0,4,7,11,15,18,22,26,30,33,37,41,44,48,52,55,59,63,66,70,74,78,81,85,89,92,96",
+    "celula": 288,
+    "largura": 288,
+    "raiz": "125,270",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 288,
+  "rootX": 125,
+  "rootY": 270
+}

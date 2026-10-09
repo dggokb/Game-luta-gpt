@@ -1,0 +1,88 @@
+{
+  "id": "p06_land",
+  "characterProfile": "p06",
+  "source": "art/sprites/source/p06_land_video_normalized.png",
+  "sourceNote": "p06 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 320,
+    "rootX": 97,
+    "rootY": 302,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        16,
+        45,
+        166,
+        305
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 16263
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        15,
+        48,
+        170,
+        305
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 16347
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        15,
+        93,
+        176,
+        304
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14576
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        15,
+        92,
+        170,
+        304
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 14123
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 181,
+    "frameHeight": 280,
+    "rootX": 92,
+    "rootY": 267,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      5,
+      35
+    ],
+    "decodedBytes": {
+      "canonical": 983040,
+      "packed": 810880
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "504c27a8300ffe57d52c1cd3c2a63e6077570fdb6d9548b8b9f54ae2306cbc9a",
+      "config": "4ccbd096d98fb3684875d4fe6fe01e72a5925da9b19dc304bff56034fd48e54e",
+      "profile": "ed9db22060e90690715e9be1f7a9baa28a89d85737c20c432e40c3e9015911ca"
+    }
+  }
+}

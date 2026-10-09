@@ -1,0 +1,31 @@
+{
+  "id": "p06_ultra_beam",
+  "javaName": "P06_ULTRA_BEAM",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_ultra_beam_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_ultra_beam.png",
+  "report": "tools/sprites/reports/p06_ultra_beam.report.json",
+  "preview": "android/app/build/sprite-review/p06_ultra_beam-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "ultra.mp4",
+    "personagem": "p06",
+    "escala": 0.4451,
+    "medida": "quadros 6, 0, 12 = guarda do IDLE (nota 0.78)",
+    "quadros": "4,16,27,38,50,62,73,84,96",
+    "celula": 288,
+    "largura": 340,
+    "raiz": "175,270",
+    "colunas": 9,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameWidth": 340,
+  "frameHeight": 288,
+  "rootX": 175,
+  "rootY": 270
+}

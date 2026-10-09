@@ -1,0 +1,31 @@
+{
+  "id": "p06_heavy_straight",
+  "javaName": "P06_HEAVY_STRAIGHT",
+  "profile": "p06.json",
+  "source": "art/sprites/source/p06_heavy_straight_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p06_heavy_straight.png",
+  "report": "tools/sprites/reports/p06_heavy_straight.report.json",
+  "preview": "android/app/build/sprite-review/p06_heavy_straight-import.png",
+  "expectedFrames": 23,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p06 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "H.mp4",
+    "personagem": "p06",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "16,19,22,26,29,32,35,38,42,45,49,50,52,54,56,58,60,63,65,67,69,71,73",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "150,270",
+    "colunas": 11,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 288,
+  "rootX": 150,
+  "rootY": 270
+}
