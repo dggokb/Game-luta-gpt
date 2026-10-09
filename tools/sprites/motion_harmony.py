@@ -9,6 +9,7 @@ recommends review, never modifies hitstun, damage or the physics.
 import argparse
 import json
 from pathlib import Path
+from sprite_auto_repair import retime_character_pack
 
 ROOT=Path(__file__).resolve().parents[2]
 FPS=60
@@ -90,9 +91,35 @@ def main():
     parser.add_argument("--character",help="id do personagem; todos por padrao")
     parser.add_argument("--output",default="android/app/build/motion-harmony.json")
     parser.add_argument("--speeds",help="JSON {estado: unidades/segundo}")
+    parser.add_argument("--suggest-visual-timing",action="store_true",
+                        help="gera sugestoes de retiming visual sem alterar o personagem")
+    parser.add_argument("--apply-visual-timing",action="store_true",
+                        help="aplica apenas correcoes seguras de duracao visual ao personagem indicado")
     args=parser.parse_args()
     speeds=json.loads(args.speeds) if args.speeds else None
+    if args.apply_visual_timing and not args.character:
+        parser.error("--apply-visual-timing exige --character para evitar mudancas globais")
     results=audit(char=args.character,speeds=speeds)
+    if args.suggest_visual_timing or args.apply_visual_timing:
+        for item in results:
+            path=ROOT/"characters"/item["character"]/"character.json"
+            original=json.loads(path.read_text(encoding="utf-8"))
+            corrected,proposals=retime_character_pack(original)
+            item["visualTimingProposals"]=proposals
+            if args.apply_visual_timing and corrected!=original:
+                # Keep a backup in ignored build/ before touching authored JSON.
+                backup=ROOT/"android/app/build/timing-backups"/(item["character"]+".json")
+                backup.parent.mkdir(parents=True,exist_ok=True)
+                backup.write_text(json.dumps(original,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+                path.write_text(json.dumps(corrected,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+                import subprocess,sys
+                try:
+                    subprocess.run([sys.executable,str(ROOT/"tools/sprites/build_characters.py"),
+                                    "--write"],cwd=ROOT,check=True)
+                except Exception:
+                    path.write_text(json.dumps(original,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+                    raise
+                item["visualTimingApplied"]=True
     out=ROOT/args.output
     out.parent.mkdir(parents=True,exist_ok=True)
     out.write_text(json.dumps(results,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")

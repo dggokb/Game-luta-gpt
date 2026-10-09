@@ -174,7 +174,7 @@ def _contact_sheet(frames, report, width=190):
     return sheet
 
 
-def write_report(report, frames, output):
+def write_report(report, frames, output, character="character", clip="animation"):
     target=Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)
     target.with_suffix(".json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
@@ -196,6 +196,10 @@ def write_report(report, frames, output):
           "<th>Tipo</th><th>Codigo</th><th>Quadros</th><th>Descricao</th></tr>"+
           errors+"</table></html>")
     target.with_suffix(".html").write_text(page,encoding="utf-8")
+    # Geometry cannot faithfully invent a missing hand or complete clipped body.
+    from sprite_auto_repair import save_art_requests
+    save_art_requests(report, target.with_name(target.name + ".art_requests.json"),
+                      character=character, clip=clip)
 
 
 def read_video(path, max_frames=1800):

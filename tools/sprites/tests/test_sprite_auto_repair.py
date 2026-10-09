@@ -41,7 +41,7 @@ class SpriteAutoRepairTests(unittest.TestCase):
         self.assertEqual(chosen,indices)
 
     def test_retime_changes_only_display_durations_and_preserves_total(self):
-        original=[35,45,30,70,50]
+        original=[30,40,30,70,60]
         updated,reason=retime_visual(original,2,3,4,9,max_ratio=1.8)
         self.assertIsNotNone(updated,reason)
         self.assertEqual(len(original),len(updated))

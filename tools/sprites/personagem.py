@@ -285,7 +285,8 @@ def convert(char, name, video, quadros, opts, manual):
     qa_dir.mkdir(parents=True, exist_ok=True)
     out = run(args + ['--celula', str(h), '--largura', str(w),
                       '--raiz', f'{left + (w - left - right) // 2},{h - down}',
-                      '--qa-output', str(qa_dir / f'{char}_{name}')]
+                      '--qa-output', str(qa_dir / f'{char}_{name}'),
+                      '--reparo-seguro']
               + (['--qa-loop'] if name in ('idle','walk_forward','walk_back','dash') else []))
     return out.strip().splitlines()[0]
 

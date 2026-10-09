@@ -208,6 +208,8 @@ def parser():
     p.add_argument("--qa-output", help="prefixo do relatorio temporal JSON/PNG/HTML")
     p.add_argument("--qa-strict", action="store_true", help="reprova quadros vazios")
     p.add_argument("--qa-loop", action="store_true", help="revisa a continuidade do loop escolhido")
+    p.add_argument("--reparo-seguro", action="store_true",
+                   help="substitui quadros anormais apenas por quadros reais proximos do mesmo video")
     p.add_argument("--preservar-partes", action="store_true",
                    help="preserva acessorios soltos proximos (experimental)")
     return p
@@ -225,6 +227,8 @@ def parse_args(argv=None):
     args = p.parse_args(argv)
     if clip and clip.get("video", {}).get("preservar_partes"):
         args.preservar_partes = True
+    if clip and clip.get("video", {}).get("reparo_seguro"):
+        args.reparo_seguro = True
     if args.saida is None:
         if clip is None:
             p.error("informe a saída ou --clipe")
@@ -250,6 +254,8 @@ def save_recipe(path, clip, args, start, end, measured, count, cw):
         resolved.update(inicio=None, fim=None)
     if args.preservar_partes:
         recipe["preservar_partes"] = True
+    if args.reparo_seguro:
+        recipe["reparo_seguro"] = True
     recipe.update({k: resolved[k] for k, default in RECIPE.items() if resolved[k] != default})
     rx, ry = (int(v) for v in args.raiz.split(","))
     clip.update(expectedFrames=count, columns=args.colunas, video=recipe)
@@ -305,6 +311,19 @@ def main(argv=None):
         s = measured["escala"]
         print(f"escala {s:.4f} ({measured['medida']}, nota {measured['nota']:.2f}, zoom {measured['zoom']:.3f})")
     keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos, args.limpar_chao) for i in picked]
+    applied_fixes = []
+    if args.reparo_seguro and len(picked) > 2:
+        from sprite_auto_repair import suggest_replacements
+        new_picks, applied_fixes = suggest_replacements(
+            picked, keyed, lambda i: keyed_frame(
+                i, args.sem_poeira, args.sem_efeitos, args.limpar_chao),
+            len(frames))
+        if applied_fixes:
+            picked = new_picks
+            args.quadros = ",".join(str(i) for i in picked)
+            keyed = [keyed_frame(i, args.sem_poeira, args.sem_efeitos,
+                                  args.limpar_chao) for i in picked]
+            print(f"reparo seguro: {len(applied_fixes)} quadros substituidos por fontes reais")
     xs = np.array([torso_x(k) for k in keyed])
     if args.fixar == "tronco":
         # Remove só a tendência (o deslizamento); o balanço natural do corpo continua.
@@ -342,7 +361,9 @@ def main(argv=None):
     if args.qa_output:
         from video_quality import inspect, write_report
         qa = inspect(keyed, fps / max(1,args.passo), loop=bool(args.loop or args.qa_loop), target=16)
-        write_report(qa, keyed, args.qa_output)
+        qa["appliedFixes"] = applied_fixes
+        write_report(qa, keyed, args.qa_output,
+                     character=args.personagem or "character", clip=Path(args.saida).stem)
         print(f"video QA: {len(qa['flags'])} achados -> {args.qa_output}.html")
         if args.qa_strict and any(e['severity'] == 'error' for e in qa['flags']):
             raise SystemExit("Video QA falhou; revise os quadros vazios")

@@ -37,3 +37,18 @@ não muda as regras de golpe, hitbox, dano ou a arte original.
 
 Para eventual otimização de texturas por orçamento, comparar consumo e stutter
 em dispositivo antes de substituir o pré-carregamento atual.
+
+
+## Correção assistida de sprites e tempos
+
+- Tempo visual: motion_harmony.py --suggest-visual-timing gera plano de ajuste de durationsMs.
+- motion_harmony.py --character p03 --apply-visual-timing aplica apenas correções
+  dentro da margem segura (com backup e rebuild). Preserva startup/active/recovery,
+  damage, hitbox, física e a quantidade/ordem de quadros.
+- Imagens: video_para_sprite.py --reparo-seguro substitui um frame anormal somente
+  por outro frame real, próximo, do vídeo original. Não inventa poses.
+- personagem.py ativa o modo de reparo seguro ao converter novos vídeos.
+- Problemas irrecuperáveis produzem <prefixo>.art_requests.json com indicação
+  dos quadros e prompts de nova arte. Gerar um desenho novo depende de um serviço
+  de imagem conectado e de validação visual; o script local não fabrica anatomia.
+- O relatório separa o que foi executado (appliedFixes) do que depende de revisão.
