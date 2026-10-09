@@ -40,10 +40,10 @@ final class GeneratedSpriteLayouts {
     static final int P02_CROUCH_MEDIUM_ROOT_Y = 191;
     static final int P02_CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int P02_DASH_FRAME_WIDTH = 265;
-    static final int P02_DASH_FRAME_HEIGHT = 239;
-    static final int P02_DASH_ROOT_X = 132;
-    static final int P02_DASH_ROOT_Y = 228;
+    static final int P02_DASH_FRAME_WIDTH = 271;
+    static final int P02_DASH_FRAME_HEIGHT = 232;
+    static final int P02_DASH_ROOT_X = 143;
+    static final int P02_DASH_ROOT_Y = 220;
     static final int P02_DASH_FRAME_COUNT = 6;
 
     static final int P02_DEFEAT_FRAME_WIDTH = 224;
@@ -490,11 +490,11 @@ final class GeneratedSpriteLayouts {
     static final int P04_CROUCH_MEDIUM_ROOT_Y = 182;
     static final int P04_CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int P04_DASH_FRAME_WIDTH = 371;
-    static final int P04_DASH_FRAME_HEIGHT = 237;
-    static final int P04_DASH_ROOT_X = 96;
-    static final int P04_DASH_ROOT_Y = 226;
-    static final int P04_DASH_FRAME_COUNT = 6;
+    static final int P04_DASH_FRAME_WIDTH = 248;
+    static final int P04_DASH_FRAME_HEIGHT = 183;
+    static final int P04_DASH_ROOT_X = 147;
+    static final int P04_DASH_ROOT_Y = 171;
+    static final int P04_DASH_FRAME_COUNT = 5;
 
     static final int P04_DEFEAT_FRAME_WIDTH = 244;
     static final int P04_DEFEAT_FRAME_HEIGHT = 237;

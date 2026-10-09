@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p04_dash.png",
   "report": "tools/sprites/reports/p04_dash.report.json",
   "preview": "android/app/build/sprite-review/p04_dash-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 5,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
@@ -16,14 +16,15 @@
     "personagem": "p04",
     "escala": 0.5267,
     "medida": "1º quadro = inicio_centro (nota 0.94)",
-    "quadros": "3,13,22,31,41,51",
-    "largura": 384,
-    "raiz": "102,238",
+    "quadros": "35,37,39,41,43",
+    "largura": 320,
+    "raiz": "160,238",
     "colunas": 6,
     "fixar": "registro",
     "pe_no_chao": true,
+    "sem_poeira": true,
     "limpar_chao": true
   },
-  "frameWidth": 384,
-  "rootX": 102
+  "frameWidth": 320,
+  "rootX": 160
 }

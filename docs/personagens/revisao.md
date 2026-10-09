@@ -31,6 +31,30 @@ Falta vídeo novo (gerar a partir da imagem inicial):
 - p04: fim do 2M em pé, INTRO (zoom de câmera), DASH (corrida pouco aproveitável);
 - p01: HIT_CROUCH, se o tamanho incomodar no jogo (a cabeça mede 8-18% menor).
 
+## Ritmo (2ª rodada)
+
+Feito: dash da p02 virou um ciclo de corrida do vídeo (antes: largada, corrida e freada em
+240 ms) e o da p04 o trecho do avanço (antes: guarda, guarda, guarda, avanço); andar, dash,
+pulo, queda, aterrissagem, agachar e levantar de p02, p03 e p04 no ritmo do p01; intro no
+tempo do vídeo.
+
+Falta (tempo dado pelo motor; decidir no refino de golpes se o personagem ganha frame data
+próprio ou se a arte perde movimento):
+
+| Golpe | p03 | p02 | p04 |
+|---|---|---|---|
+| LIGHT_JAB | 2,1x | 2,8x | 2,5x |
+| CROUCH_LIGHT | 5,3x | 2,6x | 3,1x |
+| MEDIUM_KICK | - | 2,4x | 2,0x |
+| SUPER_WAVE | 4,8x | 3,3x | 2,4x |
+| ULTRA_BEAM | - | 3,2x | 2,3x |
+| SPECIAL_ENERGY | - | 2,1x | 1,9x |
+| SPECIAL_S3 / S4 | 3,1x (S3) | - | 2,1x mais lenta (S4) |
+| GETUP | 2,0x | 1,8x | 2,2x |
+| HIT_AIR | 1,6x mais lenta | 1,8x | - |
+
+(vezes mais rápida que a do p01 no mesmo tempo de jogo)
+
 ## p01 (player_base)
 
 | Clipe | Achado | Veredito |

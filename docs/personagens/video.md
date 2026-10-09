@@ -99,6 +99,8 @@ em verde, raiz em amarelo, quadros marcados em vermelho) só dos clipes com avis
 | efeito | cor fora da paleta do personagem num quadro (clarão, poeira, arco, rastro) |
 | quebrado | quadro de outro personagem, vazio, cortado na borda ou flutuando |
 | receita | clipe sem receita, com escala manual ou usando a arte de outro personagem |
+| ritmo | o mesmo estado anima mais rápido/lento que o do p01 no mesmo tempo de jogo; intro, vitória, derrota, provocação e idle fora do tempo do vídeo |
+| ciclo | loop que não fecha; corrida com quadro parado em guarda |
 
 É triagem: o "erro" quase sempre é real, o "aviso" precisa de olho na folha. Leva uns 30 s
 por personagem. A lista de revisão de cada personagem sai dela (`docs/personagens/revisao.md`).
@@ -114,6 +116,22 @@ reconversão repetir; depois `build_characters.py --write`):
 
 Não resolvem: efeito por cima do corpo (o arco cobre a perna), pose errada (agachado que
 levanta), tamanho em pose ereta (intro/vitória: a cabeça engana). Aí é gerar o vídeo de novo.
+
+## Ritmo: animação e movimento do jogo
+
+O motor dá o mesmo tempo a todos (frame data, velocidade de andar e dash, hitstun). A arte
+de cada um tem mais ou menos movimento; sem acerto, um dash com corrida de verdade fica
+"acelerado" e um andar de passo largo patina. A regra:
+
+| Tipo de animação | Quem manda no tempo | Acerto |
+|---|---|---|
+| andar, dash, pulo, queda, aterrissagem, agachar, levantar | a arte | `ritmo.py <id>`: mesmo ritmo visual do p01 (andar: distância por quadro; resto: tempo por quadro) |
+| idle, intro, vitória, derrota, provocação | o vídeo | `ritmo.py <id>`: tempo do próprio vídeo |
+| golpes, especiais, reações, defesa, chão/levantar, backdash | o motor | a auditoria aponta; acerto no frame data do personagem ou na arte (refino de golpes) |
+
+O loop (andar, corrida) tem de ser um ciclo do vídeo: começa e termina no mesmo ponto da
+passada, sem largada nem freada. Dash de vídeo que é só arrancada vira um loop curto do
+trecho do avanço.
 
 ## Um vídeo pode virar vários clipes
 

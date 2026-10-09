@@ -17,7 +17,10 @@ Mede nas folhas normalizadas (o mesmo que vai para o jogo):
                    (clarão, arco, poeira, rastro, aura);
   * quebrado     - quadro de outro personagem, quase vazio, cortado na borda da célula ou
                    flutuando no chão;
-  * receita      - clipe sem receita de vídeo ou com escala manual.
+  * receita      - clipe sem receita de vídeo, com escala manual ou de outro personagem;
+  * ritmo        - o mesmo estado anima mais rápido/lento que o do p01 no mesmo tempo de jogo
+                   (idle, intro, vitória...: tocam no tempo do vídeo);
+  * ciclo        - loop que não fecha; corrida (DASH) com quadro parado em guarda.
 Com --folhas grava uma folha de conferência só dos clipes com aviso.
 """
 import argparse
@@ -38,6 +41,12 @@ SLIDE_STEP = 15                         # px por quadro: acima disso é troca de
 CROUCH_TALL = 1.2                       # golpe/reação agachado não passa disso da altura agachada
 FX_PIXELS, FX_FACTOR = 300, 2.5            # efeito: px de cor estranha a mais que os vizinhos
 FOREIGN_FRAME = 0.15                    # fração de cor estranha: quadro de outro personagem
+PACE_WARN, PACE_ERROR = 1.6, 2.5         # ritmo: vezes mais rápido (ou 1/x mais lento) que o p01
+LOOP_JUMP = 2.5                         # loop: troca último→primeiro maior que isso x a troca típica
+REFERENCE = 'player_base'               # personagem de referência de ritmo (p01)
+FREE = {'IDLE', 'INTRO', 'VICTORY', 'DEFEAT', 'TAUNT'}   # tempo do vídeo, sem motor
+LOCOMOTION = {'WALK_FORWARD', 'WALK_BACK', 'DASH'}
+ENGINE = dict(walkSpeed=300, walkBackSpeed=220)   # CombatConfig (px/s)
 GROUND = 6                              # px: pé a até isso da raiz conta como no chão
 # Animações com deslocamento de propósito (o corpo anda, cai ou é empurrado na arte).
 MOVING = {'WALK_FORWARD', 'WALK_BACK', 'DASH', 'BACKDASH', 'JUMP', 'FALL', 'LAND', 'KNOCKDOWN',
@@ -191,6 +200,90 @@ def planted_steps(ms):
     return steps
 
 
+
+def attack_seconds(pack):
+    """Tempo de jogo dos clipes esticados pelo motor: golpe (frame data), especial, super;
+    reação ao golpe pelo hitstun típico e defesa pelo blockstun típico."""
+    total = {}
+    for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values()):
+        if 'animation' in m and 'attack' in m:
+            a = m['attack']
+            total[m['animation']] = (a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']) / 60
+    fighter = pack['fighter']
+    for key, anim in pack.get('specialAnimations', {}).items():
+        src = {'S': fighter.get('energy'), 'SUPER': fighter.get('super')}.get(key)
+        if src and 'attack' in src:
+            a = src['attack']
+            total[anim] = (a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']) / 60
+    attacks = [m['attack'] for m in pack['moves'].values() if 'attack' in m]
+    hit = float(np.median([a['hitstunFrames'] for a in attacks])) / 60
+    block = float(np.median([a['blockstunFrames'] for a in attacks])) / 60
+    return total, hit, block
+
+
+def game_seconds(pack, state, timing):
+    """Quanto cada quadro fica na tela no jogo."""
+    anim = pack['animations'][state]
+    n = len(anim['frames'])
+    if 'distancePerFrame' in anim:
+        speed = ENGINE['walkBackSpeed'] if state == 'WALK_BACK' else ENGINE['walkSpeed']
+        return np.full(n, anim['distancePerFrame'] / speed)
+    d = np.array(anim.get('durationsMs', [100] * n), float) / 1000
+    total, hit, block = timing
+    if state in total:
+        return d * total[state] / d.sum()
+    if state in ('HIT_STAND', 'HIT_CROUCH'):
+        return d * hit / d.sum()
+    if state.startswith('DEFENSE') and n > 1:  # 1º quadro é a guarda parada
+        return np.concatenate([[0.0], d[1:] * block / d[1:].sum()])
+    return d
+
+
+def changes(ms, loop):
+    """Quanto a silhueta muda em cada troca de quadro (1 - IoU, alinhado na raiz)."""
+    out = []
+    for i in range(1, len(ms) + (1 if loop else 0)):
+        a, b = ms[i - 1]['mask'], ms[i % len(ms)]['mask']
+        out.append(1 - (a & b).sum() / max(1, (a | b).sum()) if a.shape == b.shape else 0.0)
+    return np.array(out)
+
+
+_pace_cache = {}
+
+
+def pace(cid, state):
+    """Ritmo visual: mudança de silhueta por segundo de jogo."""
+    key = (cid, state)
+    if key not in _pace_cache:
+        pack, clips = load_pack(cid)
+        if state not in pack['animations']:
+            _pace_cache[key] = None
+        else:
+            ms, _ = frames_of(pack, clips, state)
+            anim = pack['animations'][state]
+            sec = game_seconds(pack, state, attack_seconds(pack))
+            ch = changes(ms, anim.get('loop', False))
+            t = sec[:len(ch)] if not anim.get('loop') else sec
+            _pace_cache[key] = float(ch.sum() / t.sum()) if t.sum() > 0 and None not in ms else None
+    return _pace_cache[key]
+
+
+def video_seconds(cfg, anim):
+    """Tempo que os quadros do clipe duram no vídeo (receita, 24 qps); None sem receita."""
+    r = cfg.get('video')
+    if not r:
+        return None
+    if r.get('quadros'):
+        q = [int(x) for x in str(r['quadros']).split(',')]
+    else:
+        start, step = r.get('inicio') or 0, r.get('passo', 1)
+        q = list(range(start, start + cfg['expectedFrames'] * step, step))
+    if len(q) != cfg['expectedFrames']:
+        return None
+    gaps = list(np.diff(q)) + [float(np.median(np.diff(q))) if len(q) > 1 else 1.0]
+    return np.array([gaps[i] for i in anim['frames']], float) / r.get('fps', 24)
+
+
 def attack_states(pack):
     names = {m['animation'] for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values())
              if 'animation' in m}
@@ -208,6 +301,7 @@ def audit(cid):
     crouch_tmpl = head_template(refs[-1][1], crouch_sheet.frame(crouch_anim['frames'][-1]))
     attacks = attack_states(pack)
     known = palette(pack, clips)
+    timing = attack_seconds(pack)
     found = []
 
     def add(state, kind, level, text, frames=()):
@@ -275,6 +369,36 @@ def audit(cid):
             tall = [i for i, m in enumerate(ms) if m['height'] > CROUCH_TALL * crouch_h]
             if tall:
                 add(state, 'pose', 'erro', f'fica em pé (agachado tem {crouch_h} px de altura)', tall)
+        # Ritmo: o mesmo estado anima no jogo no ritmo do p01 (o motor dá o mesmo tempo a
+        # todos; arte com mais movimento no mesmo tempo fica acelerada). Livres (idle,
+        # intro...) tocam no tempo do vídeo.
+        if state in FREE:
+            vs = video_seconds(cfg, anim)
+            gs = game_seconds(pack, state, timing)
+            if vs is not None and gs.sum() > 0:
+                f = vs.sum() / gs.sum()
+                if f >= PACE_WARN or f <= 1 / PACE_WARN:
+                    add(state, 'ritmo', 'erro' if f >= PACE_ERROR or f <= 1 / PACE_ERROR else 'aviso',
+                        f'toca {f:.1f}x a velocidade do vídeo ({vs.sum():.1f}s no vídeo, {gs.sum():.1f}s no jogo)')
+        elif cid != REFERENCE:
+            mine, ref = pace(cid, state), pace(REFERENCE, state)
+            if mine and ref:
+                f = mine / ref
+                if f >= PACE_WARN or f <= 1 / PACE_WARN:
+                    how = f'{f:.1f}x mais rápida' if f > 1 else f'{1 / f:.1f}x mais lenta'
+                    add(state, 'ritmo', 'erro' if f >= PACE_ERROR or f <= 1 / PACE_ERROR else 'aviso',
+                        f'anima {how} que a do p01 no mesmo tempo de jogo')
+        # Loop: o último quadro emenda no primeiro; corrida e andar não passam pela guarda.
+        if anim.get('loop') and len(ms) > 2:
+            ch = changes(ms, True)
+            if len(ch) > 2 and ch[-1] > LOOP_JUMP * max(np.median(ch[:-1]), 0.02):
+                add(state, 'ciclo', 'aviso', f'loop não fecha: o último quadro pula para o primeiro '
+                    f'({ch[-1]:.2f} contra {np.median(ch[:-1]):.2f} nas outras trocas)', [len(ms) - 1, 0])
+        if state == 'DASH':
+            still = [i for i, m in enumerate(ms)
+                     if max(iou(silhouette(m), rs) for n, _, rs in refs if n == 'guarda') >= POSE_MATCH]
+            if still:
+                add(state, 'ciclo', 'erro', 'quadro parado em guarda no meio do movimento', still)
         # Efeitos e quadros estranhos: cor fora da paleta, comparada aos vizinhos (efeito
         # dura 1-3 quadros); quadro com muita cor estranha é de outro personagem ou recolorido.
         areas = np.array([m['area'] for m in ms], float)
