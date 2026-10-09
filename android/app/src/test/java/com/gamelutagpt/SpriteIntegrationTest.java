@@ -37,6 +37,14 @@ public class SpriteIntegrationTest {
         return ((CharacterDefinition)field.get(renderer)).id;
     }
 
+    @Test public void gameViewStartupDoesNotEagerDecodeEntireRoster() throws Exception {
+        SpriteAtlasCache cache=(SpriteAtlasCache)get("atlases");
+        assertEquals("launch should not decode all 42 animations for each fighter",
+            0,cache.size());
+        assertEquals(0L,cache.decodedBytes());
+        assertTrue(cache.budgetBytes()>0L);
+    }
+
     @Test public void productionRosterUsesRealSecondCharacterPack()throws Exception {
         assertArrayEquals(new String[]{"player_base","p03"},GeneratedCharacters.TEAM);
         // p03: same profile (scale) as p01, own idle/walk/dash art from video.

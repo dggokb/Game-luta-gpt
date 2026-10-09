@@ -189,14 +189,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** Frees the sound pool when the Activity is destroyed. */
     public void release() {
         ultraSounds.release();
+        atlases.release();
     }
 
     public GameView(Context context) {
         super(context);
-        // One decode per atlas for the whole match: team packs (tag never decodes
-        // mid-fight) and the opponent share the same cache.
+        // Never decode the full roster in Activity.onCreate: that can exceed
+        // the Android memory limit before the window is visible. The cache
+        // loads only the poses actually rendered in each frame.
         atlases = new SpriteAtlasCache(context);
-        for (FighterState fighter : team) atlases.preload(fighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
@@ -1003,7 +1004,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.restore();
         } finally {
-            holder.unlockCanvasAndPost(canvas);
+            // Hardware Canvas can retain bitmap draw commands until the frame
+            // is posted. Recycle old textures only AFTER unlockCanvasAndPost.
+            try {
+                holder.unlockCanvasAndPost(canvas);
+            } finally {
+                atlases.trimAfterFrame();
+            }
         }
     }
 

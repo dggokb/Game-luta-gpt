@@ -58,11 +58,19 @@ final class SpriteFighterRenderer {
     private void drawFrame(Canvas canvas,CharacterDefinition.Atlas a,int frame,
                            float x,float baseY,float alpha) {
         int col=frame%a.columns,row=frame/a.columns;
-        source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
+        // Native on most phones. Only actual OOM invokes the reduced-size
+        // fallback; scale source coordinates, never the world hitbox/feet root.
+        Bitmap bitmap=atlases.get(a);
+        int rawW=a.columns*a.width;
+        int rawH=((a.count+a.columns-1)/a.columns)*a.height;
+        float ratioX=bitmap.getWidth()/(float)rawW;
+        float ratioY=bitmap.getHeight()/(float)rawH;
+        source.set(Math.round(col*a.width*ratioX),Math.round(row*a.height*ratioY),
+            Math.round((col+1)*a.width*ratioX),Math.round((row+1)*a.height*ratioY));
         float scale=character.profile.worldScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
         destination.set(left,top,left+a.width*scale,top+a.height*scale);
         spritePaint.setAlpha(Math.max(0,Math.min(255,Math.round(alpha*255f))));
-        canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
+        canvas.drawBitmap(bitmap,source,destination,spritePaint);
     }
 
     void setTint(ColorFilter tint){this.tint=tint;}
