@@ -10,7 +10,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: sprite-auto-refine-p01
+  group: sprite-auto-refine-p01-fast-v2
   cancel-in-progress: true
 jobs:
   refine-p01:
