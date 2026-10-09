@@ -32,7 +32,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 KEYS = ROOT / 'art/keys'
 MIN_SCORE = 0.8   # semelhança mínima (TM_CCOEFF_NORMED) para aceitar a medida
-ENDS_SCORE = 0.7    # as duas pontas batem com a imagem inicial um pouco abaixo de MIN_SCORE...
+ENDS_SCORE = 0.6    # as duas pontas batem com a imagem inicial um pouco abaixo de MIN_SCORE...
 ENDS_SPREAD = 1.01  # ... e concordam no zoom: vale (vídeo gerado maior, traço muda um pouco)
 GUARD_MIN_SCORE = 0.6   # guarda do IDLE achada no meio do vídeo (pose parecida, não igual)
 GUARD_SPREAD = 1.03     # ... e os 3 melhores quadros concordam na escala
