@@ -16,7 +16,8 @@ agachar, que começa no centro). Gerar ou refazer:
 Para um vídeo, `medir` acha a imagem inicial no 1º ou no último quadro (o Seedance começa
 na imagem dada) comparando a aparência em várias escalas, e devolve escala = escala da
 chave / zoom. Vídeo que não começa nem termina numa imagem inicial é comparado com a
-guarda do IDLE do pacote. Se nada bater, para com erro em vez de adivinhar.
+guarda do IDLE do pacote e, por último, com a cabeça do IDLE (a maioria dos quadros tem de
+concordar). Se nada bater, para com erro em vez de adivinhar.
 
 Precisa de opencv e numpy: pip install -r tools/sprites/requirements-animar.txt
 """
@@ -35,6 +36,9 @@ ENDS_SCORE = 0.7    # as duas pontas batem com a imagem inicial um pouco abaixo 
 ENDS_SPREAD = 1.01  # ... e concordam no zoom: vale (vídeo gerado maior, traço muda um pouco)
 GUARD_MIN_SCORE = 0.6   # guarda do IDLE achada no meio do vídeo (pose parecida, não igual)
 GUARD_SPREAD = 1.03     # ... e os 3 melhores quadros concordam na escala
+HEAD_SCORE = 0.7        # última tentativa: a cabeça do IDLE convertido achada no vídeo...
+HEAD_AGREE = 3          # ... em pelo menos 3 quadros...
+HEAD_SPREAD = 1.05      # ... que concordam na escala
 
 
 def flat(rgba):
@@ -145,10 +149,45 @@ def medir(frames, personagem, keyer):
     if top[0][0] > best['nota']:
         best = dict(nota=top[0][0], medida='guarda do IDLE sem concordância: ' + ', '.join(
             f'quadro {i} {e:.3f}' for _, e, i in top))
+    # Pose que não passa pela guarda (corrida, golpe do começo ao fim): a cabeça do IDLE já
+    # convertido (no tamanho do jogo) achada nos quadros do vídeo. Cabeça muda pouco com a pose.
+    heads = head_scales(pack_frames(cfg['pacote'], 'IDLE', lambda n: [0]), frames, keyer)
+    if len(heads) >= HEAD_AGREE:
+        heads.sort(key=lambda h: h[1])
+        for k in range(len(heads) - HEAD_AGREE + 1):
+            group = heads[k:k + HEAD_AGREE]
+            if group[-1][1] / group[0][1] <= HEAD_SPREAD:
+                more = [h for h in heads if group[0][1] / HEAD_SPREAD <= h[1] <= group[-1][1] * HEAD_SPREAD]
+                if len(more) * 2 >= len(heads):  # a maioria dos quadros com cabeça concorda
+                    escala = float(np.median([h[1] for h in more]))
+                    return dict(escala=escala, nota=float(np.median([h[0] for h in more])), zoom=1 / escala,
+                                medida=f'cabeça do IDLE em {len(more)} quadros')
+                break
     raise SystemExit(
         f"não achei o personagem no tamanho conhecido (melhor: {best['medida']}, nota {best['nota']:.2f}).\n"
         f"Gere o vídeo de novo a partir de art/keys/{personagem}/inicio_*.png, sem mudar o enquadramento,\n"
         f"ou passe --escala N --motivo '...' (fica gravado no clipe).")
+
+
+def head_scales(idle, frames, keyer):
+    """[(nota, escala)]: em quadros espalhados do vídeo, a escala em que a cabeça do IDLE
+    (20% de cima, já no tamanho do jogo) bate melhor; só os quadros com nota boa."""
+    ref = crop(idle[0])
+    h = max(8, int(ref.shape[0] * 0.2))
+    cx = int(np.nonzero(ref[3, :, 3] > 128)[0].mean()) if (ref[3, :, 3] > 128).any() else ref.shape[1] // 2
+    head = flat(ref[:h, max(0, cx - int(h * 0.6)):cx + int(h * 0.6)])
+    out = []
+    for i in range(0, len(frames), max(1, len(frames) // 12)):
+        img = flat(crop(keyer(frames[i]), 40))
+        best = (-1.0, 1.0)
+        for z in np.exp(np.linspace(np.log(1.0), np.log(4.0), 70)):
+            t = cv2.resize(head, None, fx=z, fy=z, interpolation=cv2.INTER_CUBIC)
+            if t.shape[0] > img.shape[0] or t.shape[1] > img.shape[1]:
+                break
+            best = max(best, (float(cv2.matchTemplate(img, t, cv2.TM_CCOEFF_NORMED).max()), float(z)))
+        if best[0] >= HEAD_SCORE:
+            out.append((best[0], 1 / best[1]))
+    return out
 
 
 def calibrar(personagem, videos=(), altura=224, escala_de=None):
