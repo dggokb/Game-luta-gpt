@@ -63,10 +63,10 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
           compression-level: 0
-      - name: Focused Java animation integration tests
+      - name: Focused Java animation and startup filter regression tests
         working-directory: android
         run: |
-          gradle :app:testDebugUnitTest --tests com.gamelutagpt.SpriteTransitionPolicyTest --tests com.gamelutagpt.SpriteTransitionAlignmentTest --tests com.gamelutagpt.SpriteAnimationSyncTest --no-daemon --stacktrace
+          gradle :app:testDebugUnitTest --tests com.gamelutagpt.SpriteStartupSmokeTest --tests com.gamelutagpt.SpriteTransitionPolicyTest --tests com.gamelutagpt.SpriteTransitionAlignmentTest --tests com.gamelutagpt.SpriteAnimationSyncTest --no-daemon --stacktrace
       - name: Enable emulator acceleration and reject unaccelerated boot
         run: |
           test -c /dev/kvm || { echo 'No /dev/kvm: emulator smoke cannot be trusted'; exit 1; }

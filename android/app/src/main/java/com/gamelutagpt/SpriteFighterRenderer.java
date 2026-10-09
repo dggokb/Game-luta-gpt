@@ -80,6 +80,7 @@ final class SpriteFighterRenderer {
         m.postConcat(new ColorMatrix(new float[]{
             0.70f,0f,0f,0f,64f,
             0f,0.70f,0f,0f,70f,
+            0f,0f,0.70f,0f,84f,
             0f,0f,0f,1f,0f}));
         return new ColorMatrixColorFilter(m);
     }
