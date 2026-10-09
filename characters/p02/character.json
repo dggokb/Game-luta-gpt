@@ -31,20 +31,20 @@
       "spawnY": 80,
       "crouchSpawnY": 63,
       "attack": {
-        "startupFrames": 6,
+        "startupFrames": 12,
         "activeFrames": 1,
-        "recoveryFrames": 11,
-        "hitstunFrames": 20,
-        "blockstunFrames": 14,
+        "recoveryFrames": 22,
+        "hitstunFrames": 31,
+        "blockstunFrames": 25,
         "hitstopFrames": 6,
         "cancelWindows": {
           "hit": [
-            6,
-            17
+            12,
+            34
           ],
           "block": [
-            6,
-            17
+            12,
+            34
           ],
           "whiff": null
         },
@@ -64,11 +64,11 @@
       "spawnY": 83,
       "airSpawnY": 80,
       "attack": {
-        "startupFrames": 35,
+        "startupFrames": 70,
         "activeFrames": 1,
-        "recoveryFrames": 25,
-        "hitstunFrames": 30,
-        "blockstunFrames": 20,
+        "recoveryFrames": 50,
+        "hitstunFrames": 55,
+        "blockstunFrames": 45,
         "hitstopFrames": 12,
         "cancelWindows": {
           "hit": null,
@@ -82,7 +82,8 @@
     },
     "assist": {
       "move": "S"
-    }
+    },
+    "wakeupFrames": 37
   },
   "animations": {
     "IDLE": {
@@ -705,18 +706,18 @@
       ],
       "loop": false,
       "durationsMs": [
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        25,
-        25
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        44,
+        44
       ]
     },
     "CROUCH_LIGHT": {
@@ -958,17 +959,17 @@
       ],
       "loop": false,
       "durationsMs": [
-        30,
-        30,
-        35,
-        20,
-        40,
-        40,
-        30,
-        20,
-        20,
-        20,
-        15
+        27,
+        27,
+        32,
+        18,
+        42,
+        42,
+        32,
+        21,
+        21,
+        21,
+        16
       ],
       "impactFrame": 4
     },
@@ -1523,20 +1524,20 @@
       "animation": "LIGHT_JAB",
       "damage": 300,
       "reach": 82,
-      "startupFrames": 2,
-      "activeFrames": 4,
-      "recoveryFrames": 4,
-      "hitstunFrames": 12,
-      "blockstunFrames": 9,
+      "startupFrames": 4,
+      "activeFrames": 8,
+      "recoveryFrames": 8,
+      "hitstunFrames": 20,
+      "blockstunFrames": 17,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
-          2,
-          8
+          4,
+          16
         ],
         "block": [
-          2,
-          8
+          4,
+          16
         ],
         "whiff": null
       },
@@ -1555,20 +1556,20 @@
       "animation": "MEDIUM_KICK",
       "damage": 500,
       "reach": 113,
-      "startupFrames": 4,
-      "activeFrames": 6,
-      "recoveryFrames": 6,
-      "hitstunFrames": 15,
-      "blockstunFrames": 12,
+      "startupFrames": 8,
+      "activeFrames": 12,
+      "recoveryFrames": 12,
+      "hitstunFrames": 27,
+      "blockstunFrames": 24,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
-          4,
-          12
+          8,
+          24
         ],
         "block": [
-          4,
-          12
+          8,
+          24
         ],
         "whiff": null
       },
@@ -1622,20 +1623,20 @@
       "damage": 300,
       "reach": 82,
       "low": true,
-      "startupFrames": 2,
-      "activeFrames": 4,
-      "recoveryFrames": 4,
-      "hitstunFrames": 12,
-      "blockstunFrames": 9,
+      "startupFrames": 4,
+      "activeFrames": 8,
+      "recoveryFrames": 8,
+      "hitstunFrames": 20,
+      "blockstunFrames": 17,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
-          2,
-          8
+          4,
+          16
         ],
         "block": [
-          2,
-          8
+          4,
+          16
         ],
         "whiff": null
       },
@@ -1653,20 +1654,20 @@
       "damage": 500,
       "reach": 113,
       "low": true,
-      "startupFrames": 6,
-      "activeFrames": 4,
-      "recoveryFrames": 6,
-      "hitstunFrames": 20,
-      "blockstunFrames": 10,
+      "startupFrames": 11,
+      "activeFrames": 7,
+      "recoveryFrames": 11,
+      "hitstunFrames": 28,
+      "blockstunFrames": 18,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
-          6,
-          12
+          11,
+          21
         ],
         "block": [
-          6,
-          12
+          11,
+          21
         ],
         "whiff": null
       },
@@ -1683,16 +1684,16 @@
       "animation": "CROUCH_HEAVY",
       "damage": 800,
       "reach": 144,
-      "startupFrames": 9,
-      "activeFrames": 6,
-      "recoveryFrames": 9,
-      "hitstunFrames": 44,
-      "blockstunFrames": 10,
+      "startupFrames": 14,
+      "activeFrames": 10,
+      "recoveryFrames": 14,
+      "hitstunFrames": 53,
+      "blockstunFrames": 19,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          9,
-          17
+          14,
+          27
         ],
         "block": null,
         "whiff": null
@@ -1711,20 +1712,20 @@
       "animation": "JUMP_LIGHT",
       "damage": 300,
       "reach": 82,
-      "startupFrames": 4,
-      "activeFrames": 2,
-      "recoveryFrames": 4,
-      "hitstunFrames": 14,
-      "blockstunFrames": 10,
+      "startupFrames": 6,
+      "activeFrames": 3,
+      "recoveryFrames": 6,
+      "hitstunFrames": 17,
+      "blockstunFrames": 13,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
-          4,
-          8
+          6,
+          13
         ],
         "block": [
-          4,
-          8
+          6,
+          13
         ],
         "whiff": null
       },
@@ -1794,11 +1795,11 @@
       "animation": "JUMP_HEAVY_DOWN",
       "damage": 800,
       "reach": 144,
-      "startupFrames": 9,
-      "activeFrames": 6,
-      "recoveryFrames": 9,
-      "hitstunFrames": 18,
-      "blockstunFrames": 14,
+      "startupFrames": 17,
+      "activeFrames": 11,
+      "recoveryFrames": 17,
+      "hitstunFrames": 31,
+      "blockstunFrames": 27,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,
@@ -1897,16 +1898,16 @@
       "damage": 1000,
       "reach": 136,
       "hitHeight": 107,
-      "startupFrames": 10,
-      "activeFrames": 20,
-      "recoveryFrames": 14,
-      "hitstunFrames": 24,
-      "blockstunFrames": 14,
+      "startupFrames": 7,
+      "activeFrames": 15,
+      "recoveryFrames": 10,
+      "hitstunFrames": 15,
+      "blockstunFrames": 5,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
-          10,
-          35
+          7,
+          26
         ],
         "block": null,
         "whiff": null

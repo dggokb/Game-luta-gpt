@@ -38,22 +38,14 @@ Feito: dash da p02 virou um ciclo de corrida do vídeo (antes: largada, corrida 
 pulo, queda, aterrissagem, agachar e levantar de p02, p03 e p04 no ritmo do p01; intro no
 tempo do vídeo.
 
-Falta (tempo dado pelo motor; decidir no refino de golpes se o personagem ganha frame data
-próprio ou se a arte perde movimento):
+Golpes (3ª rodada): cada personagem tem o próprio frame data, no ritmo da arte. Golpe com
+arte mais movimentada que a do p01 ficou mais longo (até 2x); com arte mais calma, mais curto
+(até 1,5x). A vantagem no acerto e na defesa continua a do p01. Levantar do chão:
+p03 37, p02 43, p04 47 quadros (p01: 21).
 
-| Golpe | p03 | p02 | p04 |
-|---|---|---|---|
-| LIGHT_JAB | 2,1x | 2,8x | 2,5x |
-| CROUCH_LIGHT | 5,3x | 2,6x | 3,1x |
-| MEDIUM_KICK | - | 2,4x | 2,0x |
-| SUPER_WAVE | 4,8x | 3,3x | 2,4x |
-| ULTRA_BEAM | - | 3,2x | 2,3x |
-| SPECIAL_ENERGY | - | 2,1x | 1,9x |
-| SPECIAL_S3 / S4 | 3,1x (S3) | - | 2,1x mais lenta (S4) |
-| GETUP | 2,0x | 1,8x | 2,2x |
-| HIT_AIR | 1,6x mais lenta | 1,8x | - |
-
-(vezes mais rápida que a do p01 no mesmo tempo de jogo)
+Com limite de 2x, ainda animam mais rápido que o p01: 2L do p03 (5,3x), S3 do p03 (3,1x),
+super do p03 (4,8x) e da p02 (3,3x), 2L da p04 (3,1x); esses pedem arte com menos movimento
+se incomodarem no jogo.
 
 ## p01 (player_base)
 

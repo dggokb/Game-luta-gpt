@@ -80,6 +80,7 @@ def validate_fighter(pack):
     if not re.fullmatch('#[0-9A-Fa-f]{6}', f.get('color','')):
         raise ValueError(f'{name}: color must be #RRGGBB')
     positive_int(f['maxLife'], name+'.maxLife')
+    if 'wakeupFrames' in f: positive_int(f['wakeupFrames'], name+'.wakeupFrames')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
         raise ValueError(f'{name}: autoCombo accepts only L, M and H')
     body = f['body']
@@ -411,7 +412,8 @@ def compile_packs(root, results):
                    +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'),'SUPER')
                    +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+')'
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
-                   +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')')
+                   +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
+                   +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']
     lines += [' return Collections.unmodifiableMap(all);',' }','}','']

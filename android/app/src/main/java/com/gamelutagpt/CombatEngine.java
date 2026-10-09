@@ -452,7 +452,7 @@ final class CombatEngine {
                 break;
             }
             case WAKEUP:
-                if (f.rollFrames == 0 && f.knockdownFrame >= config.wakeupFrames) {
+                if (f.rollFrames == 0 && f.knockdownFrame >= wakeupFrames(f)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.throwProtect = config.throwProtectFrames;
                 }
@@ -577,6 +577,13 @@ final class CombatEngine {
     }
 
     /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
+    /** Wake-up length of a fighter: its own (timed to its GETUP art) or the engine default. */
+    private int wakeupFrames(CombatFighter f) {
+        CharacterDefinition c = f.character();
+        int own = c == null ? 0 : c.fighter.wakeupFrames;
+        return own > 0 ? own : config.wakeupFrames;
+    }
+
     private void chooseWakeup(CombatFighter f) {
         switch (MotionParser.relative(f.input.direction, f.facing)) {
             case 6: case 7: case 8: f.wakeup = CombatFighter.WAKE_QUICK; break;

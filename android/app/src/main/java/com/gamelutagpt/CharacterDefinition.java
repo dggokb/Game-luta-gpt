@@ -154,6 +154,9 @@ final class CharacterDefinition {
             this.inputPriority=inputPriority==null?CombatConfig.DEFAULT_PRIORITY.clone():inputPriority.clone();
         }
         boolean hasSuperAttack() { return superAttack!=null; }
+        /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
+        int wakeupFrames;
+        Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
     }
     final String id,displayName;
     final CharacterVisualProfile profile;

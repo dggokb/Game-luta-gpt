@@ -205,17 +205,19 @@ def attack_seconds(pack):
     """Tempo de jogo dos clipes esticados pelo motor: golpe (frame data), especial, super;
     reação ao golpe pelo hitstun típico e defesa pelo blockstun típico."""
     total = {}
+
+    def frames(m):
+        a = m.get('attack', m)
+        return (a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']) / 60 if 'startupFrames' in a else None
     for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values()):
-        if 'animation' in m and 'attack' in m:
-            a = m['attack']
-            total[m['animation']] = (a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']) / 60
+        if 'animation' in m and frames(m):
+            total[m['animation']] = frames(m)
     fighter = pack['fighter']
     for key, anim in pack.get('specialAnimations', {}).items():
         src = {'S': fighter.get('energy'), 'SUPER': fighter.get('super')}.get(key)
-        if src and 'attack' in src:
-            a = src['attack']
-            total[anim] = (a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']) / 60
-    attacks = [m['attack'] for m in pack['moves'].values() if 'attack' in m]
+        if src and frames(src):
+            total[anim] = frames(src)
+    attacks = [m.get('attack', m) for m in pack['moves'].values() if 'hitstunFrames' in m.get('attack', m)]
     hit = float(np.median([a['hitstunFrames'] for a in attacks])) / 60
     block = float(np.median([a['blockstunFrames'] for a in attacks])) / 60
     return total, hit, block

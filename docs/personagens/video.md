@@ -127,7 +127,9 @@ de cada um tem mais ou menos movimento; sem acerto, um dash com corrida de verda
 |---|---|---|
 | andar, dash, pulo, queda, aterrissagem, agachar, levantar | a arte | `ritmo.py <id>`: mesmo ritmo visual do p01 (andar: distância por quadro; resto: tempo por quadro) |
 | idle, intro, vitória, derrota, provocação | o vídeo | `ritmo.py <id>`: tempo do próprio vídeo |
-| golpes, especiais, reações, defesa, chão/levantar, backdash | o motor | a auditoria aponta; acerto no frame data do personagem ou na arte (refino de golpes) |
+| golpes, especiais, super | o frame data do personagem | `ritmo.py <id>`: frame data esticado pelo ritmo da arte contra o p01 (até 2x mais lento, 1,5x mais rápido); hitstun/blockstun acompanham (vantagem igual), janelas de cancelamento e caixas também, e o quadro de impacto é reposicionado na janela ativa |
+| levantar do chão | `fighter.wakeupFrames` do personagem | `ritmo.py <id>`: clipe GETUP no ritmo do p01 e o motor espera o clipe |
+| reações ao golpe, defesa, backdash | o motor (hitstun de quem bate, blockstun) | só a auditoria aponta |
 
 O loop (andar, corrida) tem de ser um ciclo do vídeo: começa e termina no mesmo ponto da
 passada, sem largada nem freada. Dash de vídeo que é só arrancada vira um loop curto do
