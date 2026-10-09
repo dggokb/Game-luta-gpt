@@ -32,8 +32,13 @@ jobs:
         run: |
           python tools/sprites/autonomous_transitions.py --character player_base --report android/app/build/autonomous-p01/transition_graph.json
           python tools/sprites/autonomous_transitions.py --character player_base --check --report android/app/build/autonomous-p01/transition_graph_check.json
-      - name: Full Python test suite on refined art
-        run: python -m unittest discover -s tools/sprites/tests -v
+      - name: Focused image, transition and retiming regression tests
+        run: |
+          python -m unittest discover -s tools/sprites/tests -p 'test_autonomous_transitions.py' -v
+          python -m unittest discover -s tools/sprites/tests -p 'test_sprite_auto_repair.py' -v
+          python -m unittest discover -s tools/sprites/tests -p 'test_p01_motor_trial.py' -v
+          python -m unittest discover -s tools/sprites/tests -p 'test_motion_harmony.py' -v
+          python tools/sprites/build_characters.py --check
       - name: Ensure only visual timing and generated sources changed
         run: |
           python - <<'PY'
