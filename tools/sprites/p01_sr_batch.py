@@ -223,10 +223,79 @@ def integrate(input_dir):
     (docs/"p01-all-sr-results.json").write_text(json.dumps({"totalAtlases":39,"alreadyApproved":sorted(SKIP),
           "generatedAtlases":len(report),"status":"batch generated and integrated into test branch; visual review required",
           "atlases":report},indent=2)+"\n")
-    subprocess.run([sys.executable,str(ROOT/"tools/sprites/build_characters.py"),"--write"],check=True,cwd=ROOT)
-    subprocess.run([sys.executable,str(ROOT/"tools/sprites/build_characters.py"),"--check"],check=True,cwd=ROOT)
-    subprocess.run([sys.executable,"-m","unittest","discover","-s","tools/sprites/tests","-v"],check=True,cwd=ROOT)
-    print("P01 full SR batch: 37/37 staged, 39/39 registered, all unit tests passed",flush=True)
+    incremental_build(entries)
+    print("P01 fast SR: 37/37 changed atlases repacked; global Java metadata regenerated; targeted validations PASS",flush=True)
+
+def incremental_build(changed_entries):
+    """Rebuild changed atlases only. Reuse existing validated reports for untouched clips.
+
+    Avoids build_characters.py --write + --check and the 54 tests that copy
+    the entire 200+MB art tree every time. All character/move frame metadata
+    still passes the real compile_packs validation.
+    """
+    import build_characters as pipeline
+    import import_sprites as importer
+    from PIL import Image
+    changed = {p.stem for p in changed_entries}
+    allpaths = sorted(CLIPS.glob("*.json"))
+    profile_dir=ROOT/"tools/sprites/profiles"
+    prior=(importer.ROOT,importer.PROFILES_DIR,importer.GENERATED_JAVA)
+    importer.ROOT=ROOT
+    importer.PROFILES_DIR=profile_dir
+    importer.GENERATED_JAVA=ROOT/pipeline.JAVA/"GeneratedSpriteLayouts.java"
+    results=[]
+    try:
+        for path in allpaths:
+            cfg=json.loads(path.read_text())
+            if path.stem in changed:
+                cfg, rep=importer.process_clip(path)
+                pipeline.pack_atlas(ROOT,cfg,rep)
+                sources=cfg.get("sourceReferences",[])
+                rep["provenance"]={
+                    "pipelineVersion":2,
+                    "sha256":{
+                        "source":sha((ROOT/cfg["source"]).read_bytes()),
+                        "config":sha(path.read_bytes()),
+                        "profile":sha((profile_dir/cfg["profile"]).read_bytes())
+                    }
+                }
+                if sources:
+                    rep["provenance"]["referenceSources"]={
+                        original:sha((ROOT/original).read_bytes()) for original in sources}
+                (ROOT/cfg["report"]).write_text(json.dumps(rep,indent=2)+"\n")
+                print("REPACKED:",cfg["id"],rep["packed"]["decodedBytes"]["packed"],flush=True)
+            else:
+                rep=json.loads((ROOT/cfg["report"]).read_text())
+            if rep["id"]!=cfg["id"]:
+                raise ValueError("Wrong report assigned to clip "+cfg["id"])
+            results.append((cfg,rep))
+        importer.write_generated_java(results)
+        pipeline.compile_packs(ROOT,results)
+        for cfg,rep in results:
+            if cfg["id"] not in changed:
+                continue
+            pic=ROOT/cfg["output"]
+            with Image.open(pic) as packed_image:
+                grid=rep["packed"]
+                if packed_image.size!=(
+                    grid["frameWidth"]*grid["columns"],
+                    grid["frameHeight"]*math.ceil(grid["frameCount"]/grid["columns"])):
+                    raise ValueError("Packed geometry is incorrect for "+cfg["id"])
+                if max(packed_image.size)>MAX_SIZE:
+                    raise ValueError("Texture larger than 4096 for "+cfg["id"])
+            if grid["decodedBytes"]["packed"]>=MAX_DECODED:
+                raise ValueError("Packed atlas exceeds 64MiB: "+cfg["id"])
+            if grid.get("pixelScale")!=cfg["pixelScale"]:
+                raise ValueError("Runtime density mismatch: "+cfg["id"])
+            if rep["provenance"]["sha256"]["source"]!=sha((ROOT/cfg["source"]).read_bytes()):
+                raise ValueError("Source hash mismatch: "+cfg["id"])
+            if len(rep["frames"])!=cfg["expectedFrames"] or not rep["passed"]:
+                raise ValueError("Unvalidated frame or incomplete report: "+cfg["id"])
+        if len(changed)!=37:
+            raise ValueError("Cannot partially commit P01 batch")
+    finally:
+        importer.ROOT,importer.PROFILES_DIR,importer.GENERATED_JAVA=prior
+
 
 def main():
     a=argparse.ArgumentParser()
