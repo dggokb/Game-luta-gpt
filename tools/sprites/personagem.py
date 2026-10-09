@@ -270,6 +270,7 @@ def convert(char, name, video, quadros, opts, manual):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:
         args += ['--escala', str(manual[0]), '--motivo', manual[1]]
+    args.append('--reparo-seguro')  # same candidate frames in both geometry and final passes
     run(args + ['--celula', '512', '--largura', '768', '--raiz', '384,470'])
     sheet = Image.open(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
     boxes = [sheet.crop((i % cols * 768, i // cols * 512, i % cols * 768 + 768, i // cols * 512 + 512))
@@ -285,8 +286,7 @@ def convert(char, name, video, quadros, opts, manual):
     qa_dir.mkdir(parents=True, exist_ok=True)
     out = run(args + ['--celula', str(h), '--largura', str(w),
                       '--raiz', f'{left + (w - left - right) // 2},{h - down}',
-                      '--qa-output', str(qa_dir / f'{char}_{name}'),
-                      '--reparo-seguro']
+                      '--qa-output', str(qa_dir / f'{char}_{name}')]
               + (['--qa-loop'] if name in ('idle','walk_forward','walk_back','dash') else []))
     return out.strip().splitlines()[0]
 

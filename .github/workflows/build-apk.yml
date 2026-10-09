@@ -41,6 +41,11 @@ jobs:
       - name: Install sprite pipeline dependency
         run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
 
+      - name: Fast V2 repair and timing regression tests
+        run: |
+          python3 -m unittest discover -s tools/sprites/tests -p 'test_sprite_auto_repair.py' -v
+          python3 -m unittest discover -s tools/sprites/tests -p 'test_video_quality.py' -v
+          python3 -m unittest discover -s tools/sprites/tests -p 'test_motion_harmony.py' -v
       - name: Motion harmony and atlas memory audit
         run: |
           python3 tools/sprites/motion_harmony.py
