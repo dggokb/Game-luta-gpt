@@ -1,0 +1,78 @@
+name: P09 pilot - character, audit and graphic SR
+
+on:
+  push:
+    branches:
+      - test/p09-three-engines-20261009
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p09-three-engines
+  cancel-in-progress: true
+
+jobs:
+  p09-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install sprite validators and super-resolution dependencies
+        run: |
+          python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+          python -m pip install --disable-pip-version-check "numpy<3" scipy opencv-python-headless
+          python -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Obtain exact approved AnimeVideo-v3 model
+        run: |
+          curl -fLS --retry 3 --output /tmp/realesr-animevideov3.pth \
+            https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth
+          echo "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d  /tmp/realesr-animevideov3.pth" | sha256sum --check
+      - name: Create disposable P09 sprite pilot from real P09 concept
+        run: |
+          python -u tools/sprites/p09_three_engines_pilot.py prepare \
+            --weights /tmp/realesr-animevideov3.pth
+          python -m compileall -q tools/sprites/p09_three_engines_pilot.py
+      - name: Compile and validate all Character Packs including P09 fixture
+        run: |
+          python tools/sprites/build_characters.py --write
+          python tools/sprites/build_characters.py --check
+          python -m unittest discover -s tools/sprites/tests -v
+      - name: Audit P09 temporal harmony and collect all warnings
+        run: python -u tools/sprites/p09_three_engines_pilot.py audit
+      - name: Android unit tests and test APK
+        working-directory: android
+        run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+      - name: Upload P09 APK for manual test
+        uses: actions/upload-artifact@v4
+        with:
+          name: P09-three-engines-test-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload source, enhanced frames, quality and unit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P09-three-engines-review
+          path: |
+            android/app/build/p09-pilot/
+            android/app/build/sprite-review/p09_pilot_idle.png
+            tools/sprites/reports/p09_pilot_idle.report.json
+            android/app/build/reports/tests/
+          if-no-files-found: warn
