@@ -20,3 +20,11 @@ review/comparison.gif: original à esquerda e redesenho à direita, 42 ms solici
 progress.jsonl: registro de geração; frame 000 é reaproveitado.
 
 Próximo passo de produção: corrigir fidelidade geométrica e estabilidade temporal antes da integração. As outras animações não foram processadas nesta execução do idle.
+
+## Organização no GitHub e registro
+
+Nesta pasta do repositório, os PNGs e arquivos de revisão estão diretamente em `idle/`; os caminhos `frames/` e `review/` acima descrevem a organização do ZIP entregue na conversa.
+
+O registro incremental `progress.jsonl` começa no frame 002 e contém 74 eventos (002–075). Os frames 000 e 001 também existem e foram verificados; o inventário completo dos 76 arquivos está em `manifest.csv`. A referência ao frame 000 reaproveitado acima descreve sua origem, não uma entrada do log incremental.
+
+O primeiro envio em lote grande foi recusado pelo limite de tamanho do GitHub. O envio dos 76 PNGs e dos oito arquivos de revisão/registro foi concluído em quatro commits menores. O ZIP completo foi entregue separadamente.
