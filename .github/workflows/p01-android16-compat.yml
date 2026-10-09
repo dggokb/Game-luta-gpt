@@ -1,0 +1,58 @@
+name: P01 Android 16 Startup Compatibility
+on:
+  push:
+    branches: [teste-motor-sprite]
+    paths:
+      - '.github/workflows/p01-android16-compat.yml'
+      - '.github/scripts/p01_emulator_smoke.sh'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  android16:
+    runs-on: ubuntu-latest
+    timeout-minutes: 21
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download exact P01 debug APK from already verified build
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 37872273503
+          name: P01-Motor-Sprite-V2-Android-APK
+          path: android/app/build/outputs/apk/debug
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify APK exists
+        run: |
+          ls -lh android/app/build/outputs/apk/debug/
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Android 16 emulator acceleration
+        run: |
+          test -c /dev/kvm
+          sudo chmod a+rw /dev/kvm
+      - name: Test real launch on Android 16 API 36
+        timeout-minutes: 13
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: bash .github/scripts/p01_emulator_smoke.sh
+      - name: Print crash evidence
+        if: always()
+        run: |
+          if test -f android/app/build/p01-test-mobile/startup-logcat.txt; then
+            grep -E -A 26 -B 4 'FATAL EXCEPTION|OutOfMemoryError|am_crash|ANR in com.gamelutagpt' android/app/build/p01-test-mobile/startup-logcat.txt | tail -n 150 || true
+          fi
+      - name: Upload Android 16 crash diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-Android16-Startup-Diagnostics
+          path: |
+            android/app/build/p01-test-mobile/
+            p01-motor-v2-screen.png
+            p01-motor-v2-ui.xml
+          if-no-files-found: warn
+          retention-days: 30
