@@ -112,8 +112,11 @@ def prepare(weights, results):
     concept = ROOT / "art/concepts/p12.png"
     if not key.is_file() or not concept.is_file():
         raise FileNotFoundError("P12 concept or transparent idle_base missing")
-    if (ROOT / "characters/p12/character.json").exists():
-        raise RuntimeError("P12 is already officially registered; do not overwrite it")
+    existing = ROOT / "characters/p12/character.json"
+    if existing.exists():
+        registered = json.loads(existing.read_text())
+        if registered.get("displayName") != "P12 ZUMBI - PILOTO":
+            raise RuntimeError("P12 is already officially registered; refusing to overwrite a real fighter")
     master = build_master(key)
     frames = [breathing_frame(master, i) for i in range(FRAMES)]
     original = ROOT / "art/sprites/source/p12_pilot_idle_original.png"
@@ -161,7 +164,8 @@ def prepare(weights, results):
     roster = json.loads(roster_path.read_text())
     if "p12" not in roster["selectable"]:
         roster["selectable"].append("p12")
-    roster["teams"].append(["p12", "p02"])
+    if ["p12", "p02"] not in roster["teams"]:
+        roster["teams"].append(["p12", "p02"])
     dump(roster_path, roster)
 
     results.mkdir(parents=True, exist_ok=True)
