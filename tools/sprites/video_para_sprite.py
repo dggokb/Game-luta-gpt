@@ -58,7 +58,13 @@ def best_loop(frames, lo, hi, min_len):
     best = None
     for a in range(lo, hi - min_len + 1):
         for b in range(a + min_len, hi + 1):
-            d = float(np.abs(small[a] - small[b]).mean())
+            # Seam must match both the pose and the motion entering/leaving the loop.
+            # Equal silhouettes with reversed velocity otherwise create a visible jerk.
+            pose_gap = float(np.abs(small[a] - small[b]).mean())
+            start_velocity = small[a + 1] - small[a]
+            end_velocity = small[b] - small[b - 1]
+            motion_gap = float(np.abs(start_velocity - end_velocity).mean())
+            d = pose_gap + .35 * motion_gap
             if best is None or d < best[0]:
                 best = (d, a, b)
     return best
@@ -133,7 +139,7 @@ def key(frame, dust=False, effects=False, floor=False, preserve_parts=False):
         colored = ((alpha > 0) & ~pale).astype(np.uint8)
         body = cv2.dilate(colored, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (91, 91)))
         alpha[thin | ((alpha > 0) & pale & (body == 0))] = 0
-        keep_largest(alpha)
+        (keep_nearby_components(alpha) if preserve_parts else keep_largest(alpha))
     if floor:
         alpha[floor_dust(alpha, h, s, v)] = 0
         alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
@@ -201,6 +207,7 @@ def parser():
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
     p.add_argument("--qa-output", help="prefixo do relatorio temporal JSON/PNG/HTML")
     p.add_argument("--qa-strict", action="store_true", help="reprova quadros vazios")
+    p.add_argument("--qa-loop", action="store_true", help="revisa a continuidade do loop escolhido")
     p.add_argument("--preservar-partes", action="store_true",
                    help="preserva acessorios soltos proximos (experimental)")
     return p
@@ -334,7 +341,7 @@ def main(argv=None):
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")
     if args.qa_output:
         from video_quality import inspect, write_report
-        qa = inspect(keyed, fps / max(1,args.passo), loop=bool(args.loop), target=16)
+        qa = inspect(keyed, fps / max(1,args.passo), loop=bool(args.loop or args.qa_loop), target=16)
         write_report(qa, keyed, args.qa_output)
         print(f"video QA: {len(qa['flags'])} achados -> {args.qa_output}.html")
         if args.qa_strict and any(e['severity'] == 'error' for e in qa['flags']):

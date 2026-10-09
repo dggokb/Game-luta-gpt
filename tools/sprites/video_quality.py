@@ -43,7 +43,7 @@ def _features(frame):
     hy, hx = np.nonzero(a[top:hy1])
     head = float(np.ptp(hx) + 1) if len(hx) else 0.
     # Compare silhouettes at fixed resolution, not RGB: ignores harmless lighting changes.
-    miniature = cv2.resize(a.astype(np.uint8), (64, 36), interpolation=cv2.INTER_AREA)
+    miniature = cv2.resize(a.astype(np.float32), (64, 36), interpolation=cv2.INTER_AREA)
     edge = bool(a[0].any() or a[-1].any() or a[:, 0].any() or a[:, -1].any())
     return dict(box=[left, top, right + 1, bottom + 1], area=int(a.sum()), torso=torso,
                 height=h, width=w, head=head, bottom=bottom, edge=edge,
@@ -138,7 +138,10 @@ def inspect(frames, fps=24., loop=False, target=12, expected_impact=None):
             flag("warning", "loop_seam", [valid[0],valid[-1]], "Fim/inicio do loop nao fecham suavemente")
     if expected_impact is not None and not 0 <= expected_impact < len(frames):
         flag("error", "impact_out_of_range", [0], "Impacto fora dos quadros selecionados")
-    picks = choose_frames(metrics, target, [] if expected_impact is None else [expected_impact])
+    # Always put flagged abnormal frames on the human review sheet.
+    priority = [f for issue in flags if issue["severity"] != "info" for f in issue["frames"]]
+    required = list(dict.fromkeys(priority[:6] + ([] if expected_impact is None else [expected_impact])))
+    picks = choose_frames(metrics, target, required)
     public = []
     for i,m in enumerate(metrics):
         if not m:
@@ -150,7 +153,7 @@ def inspect(frames, fps=24., loop=False, target=12, expected_impact=None):
                 durationSeconds=round(len(frames)/float(fps),3),
                 inspectedFrames=public, flags=flags, loop=seam,
                 suggestedFrames=picks, probableDuplicateCount=len(duplicates),
-                status="review" if flags else "ok")
+                status="review" if any(x["severity"] != "info" for x in flags) else "ok")
 
 
 def _contact_sheet(frames, report, width=190):

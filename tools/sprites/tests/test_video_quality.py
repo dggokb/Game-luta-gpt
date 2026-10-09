@@ -5,6 +5,7 @@ import numpy as np
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from video_quality import inspect,choose_frames,write_report
+from video_para_sprite import keep_nearby_components
 
 
 def figure(x=18, head=6, width=70, height=60):
@@ -36,6 +37,15 @@ class VideoQualityTests(unittest.TestCase):
         self.assertEqual(0,picks[0])
         self.assertEqual(8,picks[-1])
         self.assertIn(5,picks)
+
+    def test_detached_accessory_can_be_preserved_when_explicitly_enabled(self):
+        mask=np.zeros((200,200),dtype=np.uint8)
+        mask[30:170,60:120]=255
+        mask[55:90,132:160]=255  # separated strap/whip, close to main silhouette
+        mask[0:3,0:3]=255  # isolated dust
+        cleaned=keep_nearby_components(mask.copy())
+        self.assertEqual(255,int(cleaned[65,140]))
+        self.assertEqual(0,int(cleaned[1,1]))
 
     def test_invalid_impact_is_error(self):
         rep=inspect([figure(),figure()],24,expected_impact=3)
