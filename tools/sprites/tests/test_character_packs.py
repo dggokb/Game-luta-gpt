@@ -296,7 +296,31 @@ class BuiltPackTests(unittest.TestCase):
         report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
         self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['canonical'])
         self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
-        self.assertEqual(256,report['layout']['frameWidth'])
+        self.assertEqual(512,report['layout']['frameWidth'])
+        self.assertEqual(2,report['packed']['pixelScale'])
+
+    def test_hd_idle_preserves_timing_registration_and_runtime_budget(self):
+        from PIL import Image
+        character=json.loads(self.path.read_text())
+        idle=character['animations']['IDLE']
+        self.assertEqual(list(range(76)),idle['frames'])
+        self.assertEqual([42]*76,idle['durationsMs'])
+        self.assertTrue(idle['loop'])
+        report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
+        self.assertEqual([512,512,256,476], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        packed=report['packed']
+        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
+        self.assertLessEqual(packed['frameHeight']*8,4096)
+        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
+        original=Image.open(self.root/'art/sprites/source/player_base_idle_video_normalized.png').convert('RGBA')
+        master=Image.open(self.root/'art/sprites/source/player_base_idle_sr_2x.png').convert('RGBA')
+        for i in range(76):
+            old=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
+            new=master.crop((i%10*512,i//10*512,(i%10+1)*512,(i//10+1)*512))
+            self.assertEqual(old.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),new.getchannel('A').tobytes(),i)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn(',10,76,2.00000000f)',java)
+        self.assertIn('art/sprites/source/player_base_idle_video_normalized.png',report['provenance']['referenceSources'])
 
     def test_visual_heights_and_stats_are_generated(self):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()

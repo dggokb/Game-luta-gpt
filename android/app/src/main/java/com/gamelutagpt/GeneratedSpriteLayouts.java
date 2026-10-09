@@ -1708,10 +1708,10 @@ final class GeneratedSpriteLayouts {
     static final int HIT_STAND_ROOT_Y = 254;
     static final int HIT_STAND_FRAME_COUNT = 9;
 
-    static final int IDLE_FRAME_WIDTH = 173;
-    static final int IDLE_FRAME_HEIGHT = 245;
-    static final int IDLE_ROOT_X = 86;
-    static final int IDLE_ROOT_Y = 235;
+    static final int IDLE_FRAME_WIDTH = 331;
+    static final int IDLE_FRAME_HEIGHT = 476;
+    static final int IDLE_ROOT_X = 165;
+    static final int IDLE_ROOT_Y = 462;
     static final int IDLE_FRAME_COUNT = 76;
 
     static final int INTRO_SET_FRAME_WIDTH = 181;

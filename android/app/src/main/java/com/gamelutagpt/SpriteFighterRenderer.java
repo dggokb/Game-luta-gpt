@@ -44,7 +44,7 @@ final class SpriteFighterRenderer {
         CharacterDefinition.Atlas a=character.animation(motion.clip).atlas;
         int frame=motion.frame(),col=frame%a.columns,row=frame/a.columns;
         source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
-        float scale=character.profile.worldScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
+        float scale=character.profile.worldScale/a.pixelScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
         destination.set(left,top,left+a.width*scale,top+a.height*scale);
         spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:tint);
         boolean mirror=facing*character.artFacing<0;

@@ -262,6 +262,34 @@ public class SpriteIntegrationTest {
         int id=r.getIdentifier(a.resource,"drawable",RuntimeEnvironment.getApplication().getPackageName());
         return BitmapFactory.decodeResource(r,id);
     }
+
+    @Test public void hdIdleDrawsAtCanonicalSizeAndKeepsRootInBothDirections()throws Exception {
+        SpriteFighterRenderer renderer=(SpriteFighterRenderer)get("spriteFighterRenderer");
+        CharacterDefinition character=renderer.character();
+        CharacterDefinition.Animation idle=character.animation("IDLE");
+        assertEquals(2f,idle.atlas.pixelScale,0f);
+        assertEquals(76,idle.atlas.count);
+        assertEquals(76*.042f,idle.duration,.00001f);
+        Field field=SpriteFighterRenderer.class.getDeclaredField("destination");field.setAccessible(true);
+        Bitmap screen=Bitmap.createBitmap(600,400,Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(screen);
+        for(int facing:new int[]{1,-1}) {
+            renderer.motion.clip="IDLE";renderer.motion.time=75*.042f+.01f;
+            renderer.draw(canvas,300f,300f,facing,false,false);
+            RectF destination=(RectF)field.get(renderer);
+            float scale=character.profile.worldScale/2f;
+            assertEquals(idle.atlas.width*scale,destination.width(),.001f);
+            assertEquals(300f,destination.left+idle.atlas.rootX*scale,.001f);
+            assertEquals(300f,destination.top+idle.atlas.rootY*scale,.001f);
+        }
+        renderer.motion.clip="LIGHT_JAB";renderer.motion.time=0f;
+        renderer.draw(canvas,300f,300f,1,false,false);
+        CharacterDefinition.Atlas jab=character.animation("LIGHT_JAB").atlas;
+        assertEquals(1f,jab.pixelScale,0f);
+        RectF destination=(RectF)field.get(renderer);
+        assertEquals(jab.width*character.profile.worldScale,destination.width(),.001f);
+        screen.recycle();
+    }
     /** Every packed cell of the attack atlas holds one whole pose with a safety margin. */
     private void assertAttackAtlasCellsAreWhole(String animation) {
         CharacterDefinition.Atlas a=GeneratedCharacters.defaultCharacter().animation(animation).atlas;
