@@ -64,11 +64,21 @@ def best_loop(frames, lo, hi, min_len):
     return best
 
 
+JOIN_GAP = 7       # px: peça grande a essa distância do corpo é do corpo (faixa verde da roupa)
+JOIN_AREA = 800
+
+
 def keep_largest(alpha):
-    """Zera tudo fora da maior peça conectada (poeira, efeitos e restos soltos)."""
+    """Zera tudo fora da maior peça conectada (poeira, efeitos e restos soltos). Peça grande
+    colada no corpo fica: roupa com faixa verde igual ao fundo (calça do p10) corta a perna,
+    e a bota viraria uma peça solta."""
     n, labels, stats, _ = cv2.connectedComponentsWithStats((alpha > 0).astype(np.uint8))
     if n > 1:
-        alpha[labels != 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))] = 0
+        main = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+        near = cv2.dilate((labels == main).astype(np.uint8), np.ones((2 * JOIN_GAP + 1,) * 2, np.uint8))
+        keep = {main} | {i for i in np.unique(labels[(near > 0) & (labels > 0)])
+                         if stats[i, cv2.CC_STAT_AREA] >= JOIN_AREA}
+        alpha[~np.isin(labels, list(keep))] = 0
     return alpha
 
 
