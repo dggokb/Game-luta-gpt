@@ -11,7 +11,7 @@ on:
       - 'android/app/src/main/res/drawable-nodpi/**'
       - 'characters/**'
       - 'tools/sprites/**'
-      - '.github/workflows/build-pc.yml'
+      - '.github/workflows/build-pc-v2.yml'
 
 jobs:
   build-windows:
