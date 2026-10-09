@@ -2,6 +2,7 @@ package android.graphics;
 
 public final class Color {
     public static final int WHITE = 0xffffffff;
+    public static final int BLACK = 0xff000000;
     private Color() {}
     public static int rgb(int r,int g,int b){return argb(255,r,g,b);}
     public static int argb(int a,int r,int g,int b){

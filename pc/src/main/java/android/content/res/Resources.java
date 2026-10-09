@@ -15,6 +15,11 @@ public final class Resources {
         return id;
     }
 
+    public InputStream openRawResource(int id) {
+        InputStream in=openDrawable(id);
+        if(in==null)throw new IllegalArgumentException("Missing image resource "+id);
+        return in;
+    }
     public InputStream openDrawable(int id) {
         String name = names.get(id);
         if (name == null) return null;

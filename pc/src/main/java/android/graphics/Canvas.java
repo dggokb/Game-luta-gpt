@@ -73,6 +73,9 @@ public final class Canvas {
         drawShape(shape,paint);
     }
 
+    public void drawRoundRect(RectF area,float rx,float ry,Paint paint){
+        drawRoundRect(area.left,area.top,area.right,area.bottom,rx,ry,paint);
+    }
     public void drawOval(float left,float top,float right,float bottom,Paint paint){
         paint.apply(graphics);
         Ellipse2D.Float shape=new Ellipse2D.Float(left,top,right-left,bottom-top);
