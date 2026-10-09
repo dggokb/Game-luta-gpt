@@ -36,11 +36,35 @@ if [[ ! "$pid" =~ ^[0-9]+ ]]; then
 fi
 echo "Game process still running: $pid"
 window="$(timeout 25s adb shell dumpsys window)"
-if ! grep -Eq 'mCurrentFocus.*${PKG}|mFocusedApp.*${PKG}' <<< "$window"; then
+activity="$(timeout 25s adb shell dumpsys activity activities)"
+if ! grep -Eq "mCurrentFocus.*${PKG}|mFocusedApp.*${PKG}|topResumedActivity.*${PKG}|ResumedActivity.*${PKG}" <<< "$window"
+logs="$(timeout 25s adb logcat -d -v brief)"
+if grep -Eiq 'FATAL EXCEPTION|Process: com.gamelutagpt.p01fix|ANR in com.gamelutagpt.p01fix' <<< "$logs"; then
+  echo "FAIL: game threw an exception or stopped responding."
+  exit 83
+fi
+# Screenshot is captured in trap, so only sample after it has settled.
+timeout 20s adb exec-out screencap -p > p01-motor-v2-screen.png
+python3 - <<'PY'
+from PIL import Image
+import numpy as np
+a=np.asarray(Image.open("p01-motor-v2-screen.png").convert("RGB"))
+if a.shape[0] > 110 and a.shape[1] > 110:
+    a=a[50:-50,50:-50,:]
+fraction=float(np.mean(a.max(2)-a.min(2)>48))
+print("Image non-gray pixel fraction",round(fraction,3))
+assert fraction>.06, "Likely frozen system screen; game not visible"
+PY
+echo "SMOKE PASS: process alive, game focused, scene visible."
+\n'"$activity"; then
   echo "FAIL: Android did not focus the game activity."
-  echo "$window" | grep -E 'mCurrentFocus|mFocusedApp' | tail -n 10 || true
+  echo "$activity" | grep -E 'ResumedActivity|topResumedActivity|mFocusedApp' | tail -n 10 || true
   exit 82
 fi
+# Dismiss the one-time Android immersive-mode confirmation overlay, if present.
+# Landscape Pixel_2 1920x1080: GOT IT button near (1080,450).
+adb shell input tap 1080 454
+sleep 4
 logs="$(timeout 25s adb logcat -d -v brief)"
 if grep -Eiq 'FATAL EXCEPTION|Process: com.gamelutagpt.p01fix|ANR in com.gamelutagpt.p01fix' <<< "$logs"; then
   echo "FAIL: game threw an exception or stopped responding."
