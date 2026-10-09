@@ -2,7 +2,7 @@
   "id": "p02_defense_crouch",
   "javaName": "P02_DEFENSE_CROUCH",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defense_crouch_video_normalized.png",
+  "source": "art/sprites/source/p02_defense_crouch_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defense_crouch.png",
   "report": "tools/sprites/reports/p02_defense_crouch.report.json",
   "preview": "android/app/build/sprite-review/p02_defense_crouch-import.png",
@@ -25,7 +25,12 @@
     "pe_no_chao": true,
     "limpar_chao": true
   },
-  "frameHeight": 192,
-  "rootX": 133,
-  "rootY": 174
+  "frameHeight": 384,
+  "rootX": 266,
+  "rootY": 348,
+  "sourceReferences": [
+    "art/sprites/source/p02_defense_crouch_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

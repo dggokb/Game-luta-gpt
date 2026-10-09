@@ -2,7 +2,7 @@
   "id": "p02_defense_air",
   "javaName": "P02_DEFENSE_AIR",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defense_air_video_normalized.png",
+  "source": "art/sprites/source/p02_defense_air_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defense_air.png",
   "report": "tools/sprites/reports/p02_defense_air.report.json",
   "preview": "android/app/build/sprite-review/p02_defense_air-import.png",
@@ -23,8 +23,12 @@
     "colunas": 7,
     "pe_no_chao": true
   },
-  "frameWidth": 224,
-  "frameHeight": 320,
-  "rootX": 99,
-  "rootY": 302
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 198,
+  "rootY": 604,
+  "sourceReferences": [
+    "art/sprites/source/p02_defense_air_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

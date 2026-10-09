@@ -2,7 +2,7 @@
   "id": "p02_land",
   "javaName": "P02_LAND",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_land_video_normalized.png",
+  "source": "art/sprites/source/p02_land_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_land.png",
   "report": "tools/sprites/reports/p02_land.report.json",
   "preview": "android/app/build/sprite-review/p02_land-import.png",
@@ -22,8 +22,12 @@
     "raiz": "103,270",
     "colunas": 4
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 103,
-  "rootY": 270
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 206,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p02_land_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
