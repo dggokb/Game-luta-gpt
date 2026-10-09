@@ -1,0 +1,137 @@
+name: P03 full sprite super-resolution with fast integration
+
+on:
+  push:
+    branches:
+      - test/p03-all-sr-20261009
+    paths:
+      - .github/workflows/p03-all-sr.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p03-idle-preserving-hd-batch
+  cancel-in-progress: false
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install inventory dependency
+        run: python -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - id: plan
+        name: Verify P03 inventory (36 pending, 1 already upgraded)
+        run: |
+          python -m py_compile tools/sprites/p03_sr_batch.py
+          python tools/sprites/p03_sr_batch.py plan
+
+  render:
+    needs: inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Real-ESRGAN PyTorch CPU runtime and sprite dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install --disable-pip-version-check "Pillow==12.3.0" numpy scipy
+      - name: Download approved official AnimeVideo-v3 model
+        run: |
+          curl --retry 3 -fLsS "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth" -o /tmp/realesr-animevideov3.pth
+      - name: Super-resolution with original alpha and fixed frame order
+        run: |
+          python -u tools/sprites/p03_sr_batch.py render --clip "${{ matrix.clip }}" --weights /tmp/realesr-animevideov3.pth --output-dir /tmp/p03-hd-outputs
+      - name: Retain verified P03 atlas and provenance metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: p03-${{ matrix.clip }}
+          path: /tmp/p03-hd-outputs/
+          if-no-files-found: error
+          retention-days: 30
+
+  integrate:
+    needs: [inventory, render]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow only for incremental import
+        run: python -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - name: Download 36 completed P03 HD atlases
+        uses: actions/download-artifact@v4
+        with:
+          pattern: p03-p03_*
+          merge-multiple: true
+          path: /tmp/p03-hd-outputs
+      - name: Verify all 36 result pairs exist
+        run: |
+          test "$(find /tmp/p03-hd-outputs -maxdepth 1 -type f -name '*.json' | wc -l)" -eq 36
+          test "$(find /tmp/p03-hd-outputs -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 36
+      - name: Fast validation and integration of changed P03 sprites only
+        run: |
+          python -u tools/sprites/p03_sr_batch.py integrate --input-dir /tmp/p03-hd-outputs
+          git diff --check
+      - name: Verify changes remain scoped to P03 sprite assets
+        run: |
+          python - <<'PY'
+          import subprocess
+          changed=subprocess.check_output(['git','status','--porcelain','-uall'],text=True).splitlines()
+          allow=('tools/sprites/clips/p03_',
+                 'art/sprites/source/p03_',
+                 'android/app/src/main/res/drawable-nodpi/p03_',
+                 'tools/sprites/reports/p03_',
+                 'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java',
+                 'android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java',
+                 'android/app/src/main/java/com/gamelutagpt/SpriteStates.java',
+                 'docs/art/p03-all-sr-results.json')
+          for item in changed:
+              if not item[3:].startswith(allow):
+                  raise SystemExit('Unexpected file outside P03 scope: '+item)
+          print('Only expected P03 sprites and generated Java changed:',len(changed))
+          PY
+      - name: Commit results to test branch only after validation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- 'tools/sprites/clips/p03_*.json'
+          git add -- 'art/sprites/source/p03_*_sr_hd.png'
+          git add -- 'android/app/src/main/res/drawable-nodpi/p03_*.png'
+          git add -- 'tools/sprites/reports/p03_*.report.json'
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add -- android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          git add -- docs/art/p03-all-sr-results.json
+          git diff --cached --check
+          git diff --cached --quiet && { echo "No P03 changed atlas to commit"; exit 1; }
+          git commit -m "Integrate 36 P03 super-resolution sprite atlases after scoped validation [skip ci]"
+          git push origin HEAD:test/p03-all-sr-20261009
+      - name: Archive P03 validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P03-HD-Integration-Validation
+          path: |
+            docs/art/p03-all-sr-results.json
+            tools/sprites/reports/p03_*.report.json
+          if-no-files-found: warn
