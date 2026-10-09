@@ -1,0 +1,94 @@
+name: P01 Motor V2 - APK Instalavel
+on:
+  push:
+    branches: [teste-motor-sprite]
+    paths: ['.github/workflows/p01-mobile-test-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p01-mobile-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install platform and build-tools
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Image and sprite check dependencies
+        run: python3 -m pip install -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
+      - name: Run P01 motor V2 checks on shipping assets
+        run: |
+          python3 -m unittest discover -s tools/sprites/tests -p test_sprite_auto_repair.py -v
+          python3 -m unittest discover -s tools/sprites/tests -p test_autonomous_transitions.py -v
+          python3 -m unittest discover -s tools/sprites/tests -p test_quality_guard.py -v
+          python3 tools/sprites/quality_guard.py --character player_base --strict
+          python3 tools/sprites/autonomous_transitions.py --character player_base --check --report android/app/build/p01-test-mobile/transitions.json
+          python3 tools/sprites/build_characters.py --check
+      - name: Compile P01 debug APK for physical Android phone
+        working-directory: android
+        run: gradle :app:assembleDebug -PrequireSpriteCheck=true --no-daemon --stacktrace
+      - name: Validate APK archive and manifest
+        run: |
+          set -eu
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -tqq "$APK"
+          APK_SIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$APK_SIGNER" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 5
+          du -h "$APK"
+          sha256sum "$APK"
+      - name: Upload directly installable P01 APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-Motor-Sprite-V2-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+      - name: Focused Java animation integration tests
+        working-directory: android
+        run: |
+          gradle :app:testDebugUnitTest --tests com.gamelutagpt.SpriteTransitionPolicyTest --tests com.gamelutagpt.SpriteTransitionAlignmentTest --tests com.gamelutagpt.SpriteAnimationSyncTest --no-daemon --stacktrace
+      - name: Emulator first-launch smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb logcat -c
+            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
+            sleep 5
+            adb shell pidof com.gamelutagpt | grep -Eq '[0-9]+'
+            ! adb logcat -d -v brief | grep -q 'Process: com.gamelutagpt'
+            adb exec-out screencap -p > p01-motor-v2-screen.png
+            test -s p01-motor-v2-screen.png
+      - name: Upload screenshot and quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P01-Motor-V2-QA
+          path: |
+            p01-motor-v2-screen.png
+            android/app/build/p01-test-mobile/
+            android/app/build/quality-pc/player_base/
+            android/app/build/test-results/testDebugUnitTest/
+          if-no-files-found: warn
+          retention-days: 30
