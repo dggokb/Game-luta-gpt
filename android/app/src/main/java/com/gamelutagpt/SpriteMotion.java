@@ -13,10 +13,11 @@ final class SpriteMotion {
     float time,distance;
     private boolean wasGrounded=true,wasCrouching;
     private CharacterDefinition character;
+    private float takeoffSpeed;
     SpriteMotion() { this(GeneratedCharacters.defaultCharacter()); }
     SpriteMotion(CharacterDefinition character) { this.character=character; }
     void setCharacter(CharacterDefinition next) {
-        character=next;clip=Clip.IDLE;time=distance=0;wasGrounded=true;wasCrouching=false;
+        character=next;clip=Clip.IDLE;time=distance=takeoffSpeed=0;wasGrounded=true;wasCrouching=false;
     }
     void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
@@ -35,6 +36,7 @@ final class SpriteMotion {
         wasGrounded=grounded;
         if(!next.equals(clip)){
             clip=next;time=distance=0;
+            if (next.equals(Clip.JUMP)) takeoffSpeed=Math.max(0f,-velocityY);
             // Still holding down after a crouching attack (or block): stay crouched instead
             // of standing up and crouching again.
             if(next.equals(Clip.CROUCH) && wasCrouching) time=character.animation(Clip.CROUCH).duration;
@@ -42,7 +44,13 @@ final class SpriteMotion {
         wasCrouching=crouching;
         // Attacks use the combat clock, including a repeated attack of the same type.
         time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
-        distance+=Math.abs(travel);
+        // Synchronize ascent pose with physical apex, not the source video's clock.
+        // Combat-driven animations still use the authoritative attack elapsed clock.
+        if (next.equals(Clip.JUMP) && attackAnimation==null)
+            time=SpriteAnimationSync.ascentClock(time,velocityY,takeoffSpeed,
+                                                 character.animation(Clip.JUMP).duration);
+        // The simulation's real translation controls footstep cadence.
+        distance=SpriteAnimationSync.travelDistance(distance,travel);
     }
     int frame(){return character.animation(clip).frame(time,distance);}
 }

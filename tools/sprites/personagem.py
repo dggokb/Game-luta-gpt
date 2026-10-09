@@ -281,7 +281,11 @@ def convert(char, name, video, quadros, opts, manual):
     left, right, up, down = 384 - x0 + m, x1 - 384 + m, 470 - y0 + m, max(18, y1 - 470 + m)
     w = min(768, -(-(left + right) // 32) * 32)
     h = min(512, -(-(up + down) // 32) * 32)
-    out = run(args + ['--celula', str(h), '--largura', str(w), '--raiz', f'{left + (w - left - right) // 2},{h - down}'])
+    qa_dir = ROOT / 'android/app/build/video-quality'
+    qa_dir.mkdir(parents=True, exist_ok=True)
+    out = run(args + ['--celula', str(h), '--largura', str(w),
+                      '--raiz', f'{left + (w - left - right) // 2},{h - down}',
+                      '--qa-output', str(qa_dir / f'{char}_{name}')])
     return out.strip().splitlines()[0]
 
 
