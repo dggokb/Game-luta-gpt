@@ -3,7 +3,7 @@ package com.gamelutagpt;
 import android.content.Context;
 import android.graphics.*;
 
-/** Generic atlas renderer. No attack IDs, resource IDs or per-clip branches. */
+/** Generic atlas renderer. Crossfade occurs only in graphics, never in physics. */
 final class SpriteFighterRenderer {
     final SpriteMotion motion;
     private final SpriteAtlasCache atlases;
@@ -13,14 +13,10 @@ final class SpriteFighterRenderer {
     private final Paint spritePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final ColorFilter hitFlash=new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
     private final ColorFilter blockFlash=new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
-    /** Base color filter when no flash is showing (the washed-out training opponent), or null. */
     private ColorFilter tint;
 
-    /** Standalone renderer with its own cache (tools and tests). */
     SpriteFighterRenderer(Context context) { this(context,GeneratedCharacters.defaultCharacter()); }
     SpriteFighterRenderer(Context context,CharacterDefinition character) { this(new SpriteAtlasCache(context),character); }
-
-    /** Match renderer: the owner preloads every pack it may show into the shared cache. */
     SpriteFighterRenderer(SpriteAtlasCache atlases,CharacterDefinition character) {
         this.atlases=atlases;this.character=character;
         atlases.preload(character);
@@ -37,30 +33,45 @@ final class SpriteFighterRenderer {
         motion.update(dt,grounded,crouching,velocityY,travel,forward,dash,backdash,attackAnimation,attackElapsed,combat,locked);
     }
     /**
-     * Draws the current frame with its root at (x, baseY). {@code facing} is the world
-     * direction the fighter looks at; mirroring follows the pack's declared art facing.
+     * Blend old pose at the same character root with the new pose for a few
+     * frames. The engine already picked the new combat state this tick; the
+     * blend does not affect attacks, hurtboxes, movement, hitstop or recovery.
+     *
+     * Alpha uses a complementary mix, never draws either pose twice opaque.
      */
     void draw(Canvas canvas,float x,float baseY,int facing,boolean damageFlash,boolean guardFlash) {
-        CharacterDefinition.Atlas a=character.animation(motion.clip).atlas;
-        int frame=motion.frame(),col=frame%a.columns,row=frame/a.columns;
-        source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
-        float scale=character.profile.worldScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
-        destination.set(left,top,left+a.width*scale,top+a.height*scale);
         spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:tint);
         boolean mirror=facing*character.artFacing<0;
         if(mirror){canvas.save();canvas.scale(-1f,1f,x,0f);}
-        canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
+        float outgoing=motion.outgoingAlpha();
+        if(outgoing>0f && motion.previousClip!=null) {
+            CharacterDefinition.Animation old=character.animations.get(motion.previousClip);
+            if(old!=null) drawFrame(canvas,old.atlas,motion.previousFrame,x,baseY,outgoing);
+            drawFrame(canvas,character.animation(motion.clip).atlas,motion.frame(),x,baseY,1f-outgoing);
+        } else {
+            drawFrame(canvas,character.animation(motion.clip).atlas,motion.frame(),x,baseY,1f);
+        }
+        spritePaint.setAlpha(255);
         if(mirror)canvas.restore();
     }
+
+    private void drawFrame(Canvas canvas,CharacterDefinition.Atlas a,int frame,
+                           float x,float baseY,float alpha) {
+        int col=frame%a.columns,row=frame/a.columns;
+        source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
+        float scale=character.profile.worldScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
+        destination.set(left,top,left+a.width*scale,top+a.height*scale);
+        spritePaint.setAlpha(Math.max(0,Math.min(255,Math.round(alpha*255f))));
+        canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
+    }
+
     void setTint(ColorFilter tint){this.tint=tint;}
-    /** Pale, cooler copy of the art: the same character as the opponent still reads apart. */
     static ColorFilter washedOut() {
         ColorMatrix m=new ColorMatrix();
         m.setSaturation(0.35f);
         m.postConcat(new ColorMatrix(new float[]{
             0.70f,0f,0f,0f,64f,
             0f,0.70f,0f,0f,70f,
-            0f,0f,0.70f,0f,84f,
             0f,0f,0f,1f,0f}));
         return new ColorMatrixColorFilter(m);
     }

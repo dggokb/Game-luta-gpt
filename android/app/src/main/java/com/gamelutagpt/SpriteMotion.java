@@ -1,8 +1,11 @@
 package com.gamelutagpt;
 
-/** Simulation selects semantic states; character data owns every frame/timing. */
+/**
+ * Simulation selects semantic states; character manifests own frames and timing.
+ * Every state transition has an optional visual-only outgoing pose. The prior
+ * sprite frame is frozen, never fed back into game logic.
+ */
 final class SpriteMotion {
-    // Stable movement vocabulary (generated from the pack validator). Attack animation IDs are arbitrary manifest keys.
     static final class Clip {
         static final String IDLE=SpriteStates.IDLE, WALK_FORWARD=SpriteStates.WALK_FORWARD,
             WALK_BACK=SpriteStates.WALK_BACK, DASH=SpriteStates.DASH, BACKDASH=SpriteStates.BACKDASH,
@@ -11,13 +14,19 @@ final class SpriteMotion {
     }
     String clip=Clip.IDLE;
     float time,distance;
+    /** Public-to-package so the renderer can draw the previously visible pose. */
+    String previousClip;
+    int previousFrame;
+    private float fadeTime,fadeDuration;
     private boolean wasGrounded=true,wasCrouching;
     private CharacterDefinition character;
     private float takeoffSpeed;
     SpriteMotion() { this(GeneratedCharacters.defaultCharacter()); }
     SpriteMotion(CharacterDefinition character) { this.character=character; }
     void setCharacter(CharacterDefinition next) {
-        character=next;clip=Clip.IDLE;time=distance=takeoffSpeed=0;wasGrounded=true;wasCrouching=false;
+        character=next;clip=Clip.IDLE;time=distance=takeoffSpeed=0;
+        wasGrounded=true;wasCrouching=false;
+        previousClip=null;fadeTime=fadeDuration=0;
     }
     void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
@@ -35,22 +44,35 @@ final class SpriteMotion {
         else next=Clip.IDLE;
         wasGrounded=grounded;
         if(!next.equals(clip)){
+            float duration=SpriteTransitionPolicy.duration(character,clip,next);
+            if(duration>0) {
+                previousClip=clip;
+                previousFrame=frame(); // last actual pose, including attack elapsed
+                fadeDuration=duration;
+                fadeTime=duration;
+            } else {
+                previousClip=null;
+                fadeDuration=fadeTime=0;
+            }
             clip=next;time=distance=0;
             if (next.equals(Clip.JUMP)) takeoffSpeed=Math.max(0f,-velocityY);
-            // Still holding down after a crouching attack (or block): stay crouched instead
-            // of standing up and crouching again.
             if(next.equals(Clip.CROUCH) && wasCrouching) time=character.animation(Clip.CROUCH).duration;
         }
         wasCrouching=crouching;
-        // Attacks use the combat clock, including a repeated attack of the same type.
         time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
-        // Synchronize ascent pose with physical apex, not the source video's clock.
-        // Combat-driven animations still use the authoritative attack elapsed clock.
         if (next.equals(Clip.JUMP) && attackAnimation==null)
             time=SpriteAnimationSync.ascentClock(time,velocityY,takeoffSpeed,
                                                  character.animation(Clip.JUMP).duration);
-        // The simulation's real translation controls footstep cadence.
         distance=SpriteAnimationSync.travelDistance(distance,travel);
+        if(fadeTime>0) {
+            fadeTime=Math.max(0,fadeTime-dt);
+            if(fadeTime<=0) previousClip=null;
+        }
     }
     int frame(){return character.animation(clip).frame(time,distance);}
+    float outgoingAlpha() {
+        if(previousClip==null || fadeDuration<=0) return 0f;
+        float x=Math.max(0f,Math.min(1f,fadeTime/fadeDuration));
+        return x*x; // smoothly accelerates into the new pose.
+    }
 }
