@@ -346,6 +346,32 @@ class BuiltPackTests(unittest.TestCase):
         self.assertIn(',8,20,2.00000000f)',java)
         self.assertIn('art/sprites/source/player_base_walk_forward_video_normalized.png',report['provenance']['referenceSources'])
 
+    def test_p02_hd_idle_preserves_proportions_root_timing_and_budget(self):
+        from PIL import Image
+        char=json.loads((self.root/'characters/p02/character.json').read_text())
+        idle=char['animations']['IDLE']
+        self.assertEqual(list(range(56)),idle['frames'])
+        self.assertEqual([41]*56,idle['durationsMs'])
+        self.assertTrue(idle['loop'])
+        report=json.loads((self.root/'tools/sprites/reports/p02_idle.report.json').read_text())
+        self.assertEqual([384,512,194,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        packed=report['packed']
+        self.assertEqual(2,packed['pixelScale'])
+        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
+        self.assertLessEqual(packed['frameHeight']*6,4096)
+        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
+        self.assertEqual(194,packed['rootX']+packed['cropOffset'][0])
+        self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
+        original=Image.open(self.root/'art/sprites/source/p02_idle_video_normalized.png').convert('RGBA')
+        hd=Image.open(self.root/'art/sprites/source/p02_idle_sr_2x.png').convert('RGBA')
+        for i in range(56):
+            src=original.crop((i%11*192,i//11*256,(i%11+1)*192,(i//11+1)*256))
+            cell=hd.crop((i%11*384,i//11*512,(i%11+1)*384,(i//11+1)*512))
+            self.assertEqual(src.getchannel('A').resize((384,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn(',11,56,2.00000000f)',java)
+        self.assertIn('art/sprites/source/p02_idle_video_normalized.png',report['provenance']['referenceSources'])
+
     def test_visual_heights_and_stats_are_generated(self):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('new CharacterDefinition.Fighter(0xFFD9485F',java)
