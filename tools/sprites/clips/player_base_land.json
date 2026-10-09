@@ -2,7 +2,7 @@
   "id": "player_base_land",
   "javaName": "LAND_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_land_video_normalized.png",
+  "source": "art/sprites/source/player_base_land_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_land.png",
   "report": "tools/sprites/reports/player_base_land.report.json",
   "preview": "android/app/build/sprite-review/land-import.png",
@@ -10,5 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_land_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

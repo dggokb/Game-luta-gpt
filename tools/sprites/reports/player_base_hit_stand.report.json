@@ -1,16 +1,16 @@
 {
   "id": "player_base_hit_stand",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_hit_stand_video_normalized.png",
+  "source": "art/sprites/source/player_base_hit_stand_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Cabeca joga para tras, cambaleia e volta a guarda; quadros com rastro e de frente para a camera pulados.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 384,
-    "frameHeight": 288,
-    "rootX": 180,
-    "rootY": 270,
+    "frameWidth": 768,
+    "frameHeight": 576,
+    "rootX": 360,
+    "rootY": 540,
     "columns": 9,
     "frameCount": 9
   },
@@ -18,126 +18,131 @@
     {
       "index": 0,
       "outputBbox": [
-        105,
-        31,
-        280,
-        274
+        209,
+        63,
+        561,
+        549
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 20212
+      "minimumMargin": 27,
+      "opaquePixels": 81095
     },
     {
       "index": 1,
       "outputBbox": [
-        103,
-        30,
-        284,
-        274
+        205,
+        61,
+        569,
+        549
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 20315
+      "minimumMargin": 27,
+      "opaquePixels": 81486
     },
     {
       "index": 2,
       "outputBbox": [
-        101,
-        30,
-        286,
-        274
+        201,
+        61,
+        573,
+        549
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 20415
+      "minimumMargin": 27,
+      "opaquePixels": 81967
     },
     {
       "index": 3,
       "outputBbox": [
-        100,
-        29,
-        288,
-        274
+        199,
+        59,
+        577,
+        549
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 20347
+      "minimumMargin": 27,
+      "opaquePixels": 81719
     },
     {
       "index": 4,
       "outputBbox": [
-        98,
-        28,
-        286,
-        273
+        195,
+        56,
+        572,
+        547
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 20352
+      "minimumMargin": 29,
+      "opaquePixels": 81795
     },
     {
       "index": 5,
       "outputBbox": [
-        98,
-        26,
-        287,
-        273
+        197,
+        52,
+        574,
+        547
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 19893
+      "minimumMargin": 29,
+      "opaquePixels": 80239
     },
     {
       "index": 6,
       "outputBbox": [
-        96,
-        29,
-        287,
-        274
+        192,
+        58,
+        573,
+        549
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 17647
+      "minimumMargin": 27,
+      "opaquePixels": 71105
     },
     {
       "index": 7,
       "outputBbox": [
-        100,
-        39,
-        286,
-        269
+        199,
+        79,
+        573,
+        539
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 18738
+      "minimumMargin": 37,
+      "opaquePixels": 75197
     },
     {
       "index": 8,
       "outputBbox": [
-        95,
-        45,
-        253,
-        270
+        189,
+        91,
+        506,
+        541
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 16758
+      "minimumMargin": 35,
+      "opaquePixels": 67536
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 213,
-    "frameHeight": 269,
-    "rootX": 95,
-    "rootY": 254,
+    "frameWidth": 412,
+    "frameHeight": 523,
+    "rootX": 183,
+    "rootY": 501,
     "columns": 9,
     "frameCount": 9,
     "cropOffset": [
-      85,
-      16
+      177,
+      39
     ],
     "decodedBytes": {
-      "canonical": 3981312,
-      "packed": 2062692
-    }
+      "canonical": 15925248,
+      "packed": 7757136
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "b3667a55e437bd7b0f4f55eb9fe010c885d2532cefd33fe0bf8f9e43b6cb72f6",
-      "config": "7fdeae39a5b3ac059b23d24f4fae15e153eeeed7b94c5e6d9ea9ba2e1a25f018",
+      "source": "e76d09ab55bbc57b0f1b558396be3985ab0a2a68a9d893841a1f1155b70f6ed7",
+      "config": "78e319d5e1ef8dd1cd5cbd7a90736865525d42158ecb91a42712974e3554b3ff",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_hit_stand_video_normalized.png": "b3667a55e437bd7b0f4f55eb9fe010c885d2532cefd33fe0bf8f9e43b6cb72f6"
     }
   }
 }

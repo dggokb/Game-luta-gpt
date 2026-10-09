@@ -2,16 +2,22 @@
   "id": "player_base_special_s3",
   "javaName": "SPECIAL_S3_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_special_s3_video_normalized.png",
+  "source": "art/sprites/source/player_base_special_s3_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_special_s3.png",
   "report": "tools/sprites/reports/player_base_special_s3.report.json",
   "preview": "android/app/build/sprite-review/special_s3-import.png",
   "expectedFrames": 21,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "rootX": 140,
+  "frameWidth": 768,
+  "rootX": 280,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
-  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py"
+  "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py",
+  "sourceReferences": [
+    "art/sprites/source/player_base_special_s3_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

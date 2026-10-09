@@ -1,16 +1,16 @@
 {
   "id": "player_base_hit_air",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_hit_air_video_normalized.png",
+  "source": "art/sprites/source/player_base_hit_air_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Arqueado pelo golpe, topo, mergulho e descida; escala da guarda do fim do video (o 1o quadro e agachado); pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 320,
-    "rootX": 150,
-    "rootY": 300,
+    "frameWidth": 640,
+    "frameHeight": 640,
+    "rootX": 300,
+    "rootY": 600,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,71 +18,76 @@
     {
       "index": 0,
       "outputBbox": [
-        43,
-        102,
-        247,
-        301
+        87,
+        205,
+        495,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 19129
+      "minimumMargin": 37,
+      "opaquePixels": 76965
     },
     {
       "index": 1,
       "outputBbox": [
-        42,
-        105,
-        248,
-        301
+        84,
+        210,
+        497,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 19076
+      "minimumMargin": 38,
+      "opaquePixels": 76759
     },
     {
       "index": 2,
       "outputBbox": [
-        43,
-        107,
-        249,
-        301
+        86,
+        214,
+        498,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 19093
+      "minimumMargin": 38,
+      "opaquePixels": 76497
     },
     {
       "index": 3,
       "outputBbox": [
-        62,
-        46,
-        244,
-        302
+        125,
+        91,
+        489,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 20742
+      "minimumMargin": 36,
+      "opaquePixels": 83293
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 227,
-    "frameHeight": 277,
-    "rootX": 118,
-    "rootY": 265,
+    "frameWidth": 440,
+    "frameHeight": 539,
+    "rootX": 229,
+    "rootY": 522,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      32,
-      35
+      71,
+      78
     ],
     "decodedBytes": {
-      "canonical": 1638400,
-      "packed": 1006064
-    }
+      "canonical": 6553600,
+      "packed": 3794560
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "68f03ad67a23c8b4a2f889ffe6a253123ff98e7d1a9c7b1bd2e0d7d5f32a3f2d",
-      "config": "62a47438ad79f4c8664a2fb73334ebd12fab4568d389108e3853589af20eafc4",
+      "source": "f19ffca8f25e2c8d4d64b29ea48aea9c2e268cc3f737c0cbc30788482f661860",
+      "config": "ff98c52b4f7b88f99f21b446b2a2b6425491b62c713a76aaca81492286ea3285",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_hit_air_video_normalized.png": "68f03ad67a23c8b4a2f889ffe6a253123ff98e7d1a9c7b1bd2e0d7d5f32a3f2d"
     }
   }
 }

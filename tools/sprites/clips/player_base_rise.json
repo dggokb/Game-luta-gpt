@@ -2,13 +2,21 @@
   "id": "player_base_rise",
   "javaName": "RISE_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_rise_video_normalized.png",
+  "source": "art/sprites/source/player_base_rise_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_rise.png",
   "report": "tools/sprites/reports/player_base_rise.report.json",
   "preview": "android/app/build/sprite-review/rise-import.png",
   "expectedFrames": 6,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 6,
   "rootMode": "authored",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_rise_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

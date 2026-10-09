@@ -1,16 +1,16 @@
 {
   "id": "player_base_defense_crouch",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_defense_crouch_video_normalized.png",
+  "source": "art/sprites/source/player_base_defense_crouch_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Escala pelo corpo (o video comeca em pe, mais reto e maior): 0.4256. Guarda baixa segurada e reacao; quadro com clarao pulado; cada quadro no proprio tronco e pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 140,
-    "rootY": 238,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 280,
+    "rootY": 476,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        62,
-        60,
-        228,
-        239
+        123,
+        121,
+        457,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15464
+      "minimumMargin": 35,
+      "opaquePixels": 62180
     },
     {
       "index": 1,
       "outputBbox": [
-        61,
-        61,
-        229,
-        238
+        121,
+        121,
+        459,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15937
+      "minimumMargin": 35,
+      "opaquePixels": 64115
     },
     {
       "index": 2,
       "outputBbox": [
-        61,
-        60,
-        228,
-        238
+        122,
+        120,
+        457,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15753
+      "minimumMargin": 35,
+      "opaquePixels": 63351
     },
     {
       "index": 3,
       "outputBbox": [
-        62,
-        61,
-        228,
-        239
+        123,
+        122,
+        457,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15490
+      "minimumMargin": 35,
+      "opaquePixels": 62268
     },
     {
       "index": 4,
       "outputBbox": [
-        62,
-        61,
-        228,
-        239
+        123,
+        122,
+        457,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15450
+      "minimumMargin": 35,
+      "opaquePixels": 62124
     },
     {
       "index": 5,
       "outputBbox": [
-        62,
-        61,
-        228,
-        239
+        123,
+        121,
+        457,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15438
+      "minimumMargin": 35,
+      "opaquePixels": 62048
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 188,
-    "frameHeight": 199,
-    "rootX": 89,
-    "rootY": 188,
+    "frameWidth": 362,
+    "frameHeight": 383,
+    "rootX": 171,
+    "rootY": 369,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      51,
-      50
+      109,
+      107
     ],
     "decodedBytes": {
-      "canonical": 1966080,
-      "packed": 897888
-    }
+      "canonical": 7864320,
+      "packed": 3327504
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f283259f8c2518dd599a51cb2c0af8fb027faa2bc3046a9d0269f28818c00446",
-      "config": "457e45d4dd5896a6d7332a41201e07fe8e285b486f4b3c3ea5e93563c5093591",
+      "source": "f838c10c4a0ec357fa5d79aa9678e3d773475a0aab008e25b6bc98d3dccde82f",
+      "config": "c869088048aaf9a2b22a2ae2c363e1949fcfd708e0582b87538a2c7b7298b8bf",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_defense_crouch_video_normalized.png": "f283259f8c2518dd599a51cb2c0af8fb027faa2bc3046a9d0269f28818c00446"
     }
   }
 }

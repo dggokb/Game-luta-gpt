@@ -2,15 +2,21 @@
   "id": "player_base_super",
   "javaName": "SUPER_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_super_video_normalized.png",
+  "source": "art/sprites/source/player_base_super_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_super.png",
   "report": "tools/sprites/reports/player_base_super.report.json",
   "preview": "android/app/build/sprite-review/super-import.png",
   "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "rootX": 140,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Carga com as maos na cintura e empurrao no fim do startup do Super."
+  "frameWidth": 640,
+  "rootX": 280,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Carga com as maos na cintura e empurrao no fim do startup do Super.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_super_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

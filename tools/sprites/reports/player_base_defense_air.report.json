@@ -1,16 +1,16 @@
 {
   "id": "player_base_defense_air",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_defense_air_video_normalized.png",
+  "source": "art/sprites/source/player_base_defense_air_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda no ar (bracos cruzados, pernas encolhidas); pes na raiz, o jogo sobe e desce.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 140,
-    "rootY": 238,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 280,
+    "rootY": 476,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        68,
-        17,
-        218,
-        239
+        135,
+        35,
+        435,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16523
+      "minimumMargin": 34,
+      "opaquePixels": 66264
     },
     {
       "index": 1,
       "outputBbox": [
-        66,
-        18,
-        217,
-        239
+        131,
+        37,
+        433,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16561
+      "minimumMargin": 34,
+      "opaquePixels": 66360
     },
     {
       "index": 2,
       "outputBbox": [
-        69,
-        18,
-        218,
-        239
+        137,
+        37,
+        435,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16577
+      "minimumMargin": 34,
+      "opaquePixels": 66370
     },
     {
       "index": 3,
       "outputBbox": [
-        74,
-        18,
-        218,
-        239
+        148,
+        37,
+        435,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16577
+      "minimumMargin": 34,
+      "opaquePixels": 66409
     },
     {
       "index": 4,
       "outputBbox": [
-        74,
-        18,
-        218,
-        239
+        148,
+        35,
+        435,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16583
+      "minimumMargin": 34,
+      "opaquePixels": 66406
     },
     {
       "index": 5,
       "outputBbox": [
-        66,
-        16,
-        218,
-        239
+        131,
+        32,
+        435,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16581
+      "minimumMargin": 32,
+      "opaquePixels": 66521
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 172,
-    "frameHeight": 243,
-    "rootX": 84,
-    "rootY": 232,
+    "frameWidth": 329,
+    "frameHeight": 472,
+    "rootX": 161,
+    "rootY": 457,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      56,
-      6
+      119,
+      19
     ],
     "decodedBytes": {
-      "canonical": 1966080,
-      "packed": 1003104
-    }
+      "canonical": 7864320,
+      "packed": 3726912
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "cfe4084840e16b7eba278290bfd13c106911f25fee918002c2c9ed2ce015a34d",
-      "config": "3869bcf41cafcb1432b0aec8216631acf2010ba1258231f5f95b631079fae761",
+      "source": "3cc10cd4c2884683ddf9caf5ea873385e8b6caa5498e640de0a9bdda4eb84b8f",
+      "config": "05c5242f994448a7c424cd06384d06cc5a8ac34319d02409e1b51971ad5e2b2a",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_defense_air_video_normalized.png": "cfe4084840e16b7eba278290bfd13c106911f25fee918002c2c9ed2ce015a34d"
     }
   }
 }

@@ -2,7 +2,7 @@
   "id": "player_base_defense_air",
   "javaName": "DEFENSE_AIR",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_defense_air_video_normalized.png",
+  "source": "art/sprites/source/player_base_defense_air_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_defense_air.png",
   "report": "tools/sprites/reports/player_base_defense_air.report.json",
   "preview": "android/app/build/sprite-review/defense_air-import.png",
@@ -10,7 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "rootX": 140,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda no ar (bracos cruzados, pernas encolhidas); pes na raiz, o jogo sobe e desce."
+  "frameWidth": 640,
+  "rootX": 280,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda no ar (bracos cruzados, pernas encolhidas); pes na raiz, o jogo sobe e desce.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_defense_air_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

@@ -1,143 +1,148 @@
 {
   "id": "player_base_ultra_beam",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/player_base_ultra_beam_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 9 poses do raio final: 0-2 carga (video do Super), 3 disparo, 4-6 sustentacao, 7 recuperacao, 8 guarda (video do Ultra).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 140,
-    "rootY": 238,
-    "columns": 9,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 280,
+    "rootY": 476,
+    "columns": 7,
     "frameCount": 9
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        58,
-        24,
-        212,
-        239
+        115,
+        47,
+        425,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16224
+      "minimumMargin": 34,
+      "opaquePixels": 65290
     },
     {
       "index": 1,
       "outputBbox": [
-        54,
-        25,
-        212,
-        240
+        107,
+        49,
+        425,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16215
+      "minimumMargin": 32,
+      "opaquePixels": 65290
     },
     {
       "index": 2,
       "outputBbox": [
-        50,
-        25,
-        212,
-        240
+        101,
+        51,
+        425,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16218
+      "minimumMargin": 32,
+      "opaquePixels": 65201
     },
     {
       "index": 3,
       "outputBbox": [
-        21,
-        23,
-        274,
-        242
+        41,
+        46,
+        547,
+        485
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 19066
+      "minimumMargin": 27,
+      "opaquePixels": 76482
     },
     {
       "index": 4,
       "outputBbox": [
-        21,
-        23,
-        274,
-        242
+        41,
+        45,
+        547,
+        485
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 18998
+      "minimumMargin": 27,
+      "opaquePixels": 76214
     },
     {
       "index": 5,
       "outputBbox": [
-        21,
-        23,
-        274,
-        242
+        41,
+        45,
+        547,
+        485
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 19004
+      "minimumMargin": 27,
+      "opaquePixels": 76298
     },
     {
       "index": 6,
       "outputBbox": [
-        21,
-        23,
-        274,
-        242
+        41,
+        46,
+        547,
+        485
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 18990
+      "minimumMargin": 27,
+      "opaquePixels": 76201
     },
     {
       "index": 7,
       "outputBbox": [
-        51,
-        17,
-        245,
-        243
+        102,
+        34,
+        491,
+        487
       ],
-      "minimumMargin": 13,
-      "opaquePixels": 17345
+      "minimumMargin": 25,
+      "opaquePixels": 69465
     },
     {
       "index": 8,
       "outputBbox": [
-        57,
-        12,
-        211,
-        241
+        114,
+        23,
+        421,
+        482
       ],
-      "minimumMargin": 12,
-      "opaquePixels": 16212
+      "minimumMargin": 23,
+      "opaquePixels": 65230
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 274,
-    "frameHeight": 251,
-    "rootX": 130,
-    "rootY": 236,
-    "columns": 9,
+    "frameWidth": 532,
+    "frameHeight": 488,
+    "rootX": 252,
+    "rootY": 465,
+    "columns": 7,
     "frameCount": 9,
     "cropOffset": [
-      10,
-      2
+      28,
+      11
     ],
     "decodedBytes": {
-      "canonical": 2949120,
-      "packed": 2475864
-    }
+      "canonical": 18350080,
+      "packed": 14538496
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f6b4484d8fbdf57fb9c8a278ebcdb067b4fd30dd7e6bec9b3558528e60ab21e3",
-      "config": "4de1412c1f35a29ce26cd4f87164775a5e1649f49c68f62bdd02cc4e5a6daa4f",
+      "source": "a91433a0fa72ceed9ba74d5fb0a0dd5533f2a7cd901086e366dcf82d3517868f",
+      "config": "180de5a42a9944abfbbf9298df850486e3713e5dfeca60a0940af64df2df1421",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_ultra_beam_video_normalized.png": "f6b4484d8fbdf57fb9c8a278ebcdb067b4fd30dd7e6bec9b3558528e60ab21e3"
     }
   }
 }

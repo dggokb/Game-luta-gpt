@@ -1,16 +1,16 @@
 {
   "id": "player_base_hit_crouch",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_hit_crouch_video_normalized.png",
+  "source": "art/sprites/source/player_base_hit_crouch_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Levar golpe agachado a partir de inicio_agachado; escala 0.535; quadros com clarao e faiscas pulados, cada quadro no proprio tronco.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 150,
-    "rootY": 238,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 300,
+    "rootY": 476,
     "columns": 9,
     "frameCount": 9
   },
@@ -18,126 +18,131 @@
     {
       "index": 0,
       "outputBbox": [
-        67,
-        78,
-        219,
-        239
+        133,
+        155,
+        439,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15193
+      "minimumMargin": 33,
+      "opaquePixels": 61085
     },
     {
       "index": 1,
       "outputBbox": [
-        75,
-        56,
-        270,
-        239
+        151,
+        112,
+        539,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17587
+      "minimumMargin": 33,
+      "opaquePixels": 70673
     },
     {
       "index": 2,
       "outputBbox": [
-        74,
-        56,
-        271,
-        239
+        149,
+        112,
+        541,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17576
+      "minimumMargin": 33,
+      "opaquePixels": 70605
     },
     {
       "index": 3,
       "outputBbox": [
-        74,
-        55,
-        273,
-        238
+        148,
+        109,
+        545,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17624
+      "minimumMargin": 35,
+      "opaquePixels": 70763
     },
     {
       "index": 4,
       "outputBbox": [
-        74,
-        55,
-        276,
-        238
+        148,
+        109,
+        551,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17748
+      "minimumMargin": 35,
+      "opaquePixels": 71356
     },
     {
       "index": 5,
       "outputBbox": [
-        74,
-        54,
-        277,
-        238
+        147,
+        107,
+        553,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17765
+      "minimumMargin": 35,
+      "opaquePixels": 71481
     },
     {
       "index": 6,
       "outputBbox": [
-        77,
-        53,
-        253,
-        239
+        155,
+        105,
+        507,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16873
+      "minimumMargin": 33,
+      "opaquePixels": 67847
     },
     {
       "index": 7,
       "outputBbox": [
-        68,
-        75,
-        223,
-        239
+        135,
+        150,
+        447,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15342
+      "minimumMargin": 33,
+      "opaquePixels": 61714
     },
     {
       "index": 8,
       "outputBbox": [
-        65,
-        82,
-        218,
-        239
+        129,
+        163,
+        437,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15117
+      "minimumMargin": 33,
+      "opaquePixels": 60803
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 232,
-    "frameHeight": 206,
-    "rootX": 95,
-    "rootY": 195,
+    "frameWidth": 449,
+    "frameHeight": 398,
+    "rootX": 183,
+    "rootY": 383,
     "columns": 9,
     "frameCount": 9,
     "cropOffset": [
-      55,
-      43
+      117,
+      93
     ],
     "decodedBytes": {
-      "canonical": 2949120,
-      "packed": 1720512
-    }
+      "canonical": 11796480,
+      "packed": 6433272
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "4162a1eeda4165a17dfea8c2d05b5f9ee9e1f7f87cb46c4eabd1c5d1afb5a501",
-      "config": "4a2176adee82a08a0a106356147cd14c2bfcec584fe4273808b8dfde28085041",
+      "source": "08ec796c113c18f5bca2ace031a0452a9eb8dee068f642caace65edc43085727",
+      "config": "c32f1010ced62671b5c251cd89fde25964286299e9ca001c72986c3032c50d9a",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_hit_crouch_video_normalized.png": "4162a1eeda4165a17dfea8c2d05b5f9ee9e1f7f87cb46c4eabd1c5d1afb5a501"
     }
   }
 }

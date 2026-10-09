@@ -1,16 +1,16 @@
 {
   "id": "player_base_jump_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_heavy_video_normalized.png",
+  "source": "art/sprites/source/player_base_jump_heavy_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 448,
-    "frameHeight": 320,
-    "rootX": 150,
-    "rootY": 300,
+    "frameWidth": 896,
+    "frameHeight": 640,
+    "rootX": 300,
+    "rootY": 600,
     "columns": 7,
     "frameCount": 7
   },
@@ -18,104 +18,109 @@
     {
       "index": 0,
       "outputBbox": [
-        69,
-        93,
-        220,
-        301
+        137,
+        186,
+        441,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17057
+      "minimumMargin": 38,
+      "opaquePixels": 68542
     },
     {
       "index": 1,
       "outputBbox": [
-        74,
-        89,
-        221,
-        301
+        148,
+        179,
+        443,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 16773
+      "minimumMargin": 37,
+      "opaquePixels": 67462
     },
     {
       "index": 2,
       "outputBbox": [
-        51,
-        80,
-        309,
-        301
+        102,
+        161,
+        617,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 18317
+      "minimumMargin": 38,
+      "opaquePixels": 73490
     },
     {
       "index": 3,
       "outputBbox": [
-        51,
-        82,
-        308,
-        301
+        102,
+        163,
+        615,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 18242
+      "minimumMargin": 38,
+      "opaquePixels": 73232
     },
     {
       "index": 4,
       "outputBbox": [
-        58,
-        74,
-        298,
-        300
+        117,
+        147,
+        597,
+        601
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 17831
+      "minimumMargin": 39,
+      "opaquePixels": 71839
     },
     {
       "index": 5,
       "outputBbox": [
-        71,
-        56,
-        272,
-        301
+        142,
+        112,
+        544,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17246
+      "minimumMargin": 38,
+      "opaquePixels": 69008
     },
     {
       "index": 6,
       "outputBbox": [
-        74,
-        51,
-        249,
-        301
+        148,
+        101,
+        497,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17534
+      "minimumMargin": 38,
+      "opaquePixels": 70487
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 278,
-    "frameHeight": 270,
-    "rootX": 109,
-    "rootY": 259,
+    "frameWidth": 542,
+    "frameHeight": 526,
+    "rootX": 211,
+    "rootY": 511,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      41,
-      41
+      89,
+      89
     ],
     "decodedBytes": {
-      "canonical": 4014080,
-      "packed": 2101680
-    }
+      "canonical": 16056320,
+      "packed": 7982576
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c649e43af0e3a51f3b6134b1966c50c00eef12c7f9cad69b69b12158672db69d",
-      "config": "63719770416f1fcbeb8533ef4f1a3a2a91bd95a1aa970c287b2719fa419887e1",
+      "source": "27f1abf673159d9cd6c78bdb446e62248404e9d1bb3b4e22171f83990311e434",
+      "config": "1b896eb33847d14375ddb64116fe851cc74d1daa7e84c7565b2690aeafd89e8f",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_jump_heavy_video_normalized.png": "c649e43af0e3a51f3b6134b1966c50c00eef12c7f9cad69b69b12158672db69d"
     }
   }
 }

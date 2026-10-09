@@ -2,17 +2,21 @@
   "id": "player_base_special_s2",
   "javaName": "SPECIAL_S2_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_special_s2_video_normalized.png",
+  "source": "art/sprites/source/player_base_special_s2_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_special_s2.png",
   "report": "tools/sprites/reports/player_base_special_s2.report.json",
   "preview": "android/app/build/sprite-review/special_s2-import.png",
   "expectedFrames": 20,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "rootX": 150,
+  "frameWidth": 640,
+  "rootX": 300,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Sobe no proprio desenho (sem pe-no-chao): o lutador fica no chao no jogo.",
-  "frameHeight": 384,
-  "rootY": 364
+  "frameHeight": 768,
+  "rootY": 728,
+  "sourceReferences": [
+    "art/sprites/source/player_base_special_s2_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

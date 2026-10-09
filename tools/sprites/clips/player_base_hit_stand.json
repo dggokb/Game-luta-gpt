@@ -2,7 +2,7 @@
   "id": "player_base_hit_stand",
   "javaName": "HIT_STAND",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_hit_stand_video_normalized.png",
+  "source": "art/sprites/source/player_base_hit_stand_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_stand.png",
   "report": "tools/sprites/reports/player_base_hit_stand.report.json",
   "preview": "android/app/build/sprite-review/hit_stand-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "rootX": 180,
+  "frameWidth": 768,
+  "rootX": 360,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Cabeca joga para tras, cambaleia e volta a guarda; quadros com rastro e de frente para a camera pulados.",
-  "frameHeight": 288,
-  "rootY": 270
+  "frameHeight": 576,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/player_base_hit_stand_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

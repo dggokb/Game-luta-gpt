@@ -2,7 +2,7 @@
   "id": "player_base_hit_crouch",
   "javaName": "HIT_CROUCH",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_hit_crouch_video_normalized.png",
+  "source": "art/sprites/source/player_base_hit_crouch_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_crouch.png",
   "report": "tools/sprites/reports/player_base_hit_crouch.report.json",
   "preview": "android/app/build/sprite-review/hit_crouch-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "frameHeight": 256,
-  "rootX": 150,
-  "rootY": 238,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Levar golpe agachado a partir de inicio_agachado; escala 0.535; quadros com clarao e faiscas pulados, cada quadro no proprio tronco."
+  "frameWidth": 640,
+  "frameHeight": 512,
+  "rootX": 300,
+  "rootY": 476,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Levar golpe agachado a partir de inicio_agachado; escala 0.535; quadros com clarao e faiscas pulados, cada quadro no proprio tronco.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_hit_crouch_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

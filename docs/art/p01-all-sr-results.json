@@ -1,0 +1,492 @@
+{
+  "totalAtlases": 39,
+  "alreadyApproved": [
+    "player_base_idle",
+    "player_base_walk_forward"
+  ],
+  "generatedAtlases": 37,
+  "status": "batch generated and integrated into test branch; visual review required",
+  "atlases": [
+    {
+      "id": "player_base_backdash",
+      "expectedFrames": 10,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 3,
+        "packedWidth": 497,
+        "packedHeight": 487,
+        "decodedBytes": 11617872
+      }
+    },
+    {
+      "id": "player_base_crouch",
+      "expectedFrames": 8,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 1,
+        "packedWidth": 373,
+        "packedHeight": 475,
+        "decodedBytes": 5669600
+      }
+    },
+    {
+      "id": "player_base_crouch_heavy",
+      "expectedFrames": 12,
+      "pixelScale": 2.0,
+      "columns": 10,
+      "packed": {
+        "columns": 10,
+        "rows": 2,
+        "packedWidth": 378,
+        "packedHeight": 692,
+        "decodedBytes": 20926080
+      }
+    },
+    {
+      "id": "player_base_crouch_light",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 467,
+        "packedHeight": 375,
+        "decodedBytes": 8406000
+      }
+    },
+    {
+      "id": "player_base_crouch_medium",
+      "expectedFrames": 16,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 3,
+        "packedWidth": 670,
+        "packedHeight": 350,
+        "decodedBytes": 16884000
+      }
+    },
+    {
+      "id": "player_base_dash",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 2,
+        "packedWidth": 566,
+        "packedHeight": 300,
+        "decodedBytes": 5433600
+      }
+    },
+    {
+      "id": "player_base_defeat",
+      "expectedFrames": 33,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 304,
+        "packedHeight": 498,
+        "decodedBytes": 19983744
+      }
+    },
+    {
+      "id": "player_base_defense_air",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 329,
+        "packedHeight": 472,
+        "decodedBytes": 3726912
+      }
+    },
+    {
+      "id": "player_base_defense_crouch",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 362,
+        "packedHeight": 383,
+        "decodedBytes": 3327504
+      }
+    },
+    {
+      "id": "player_base_defense_stand",
+      "expectedFrames": 8,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 1,
+        "packedWidth": 373,
+        "packedHeight": 469,
+        "decodedBytes": 5597984
+      }
+    },
+    {
+      "id": "player_base_energy",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 456,
+        "packedHeight": 489,
+        "decodedBytes": 10703232
+      }
+    },
+    {
+      "id": "player_base_fall",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 625,
+        "packedHeight": 421,
+        "decodedBytes": 12630000
+      }
+    },
+    {
+      "id": "player_base_fall_air",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 328,
+        "packedHeight": 533,
+        "decodedBytes": 4195776
+      }
+    },
+    {
+      "id": "player_base_getup",
+      "expectedFrames": 12,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 600,
+        "packedHeight": 477,
+        "decodedBytes": 13737600
+      }
+    },
+    {
+      "id": "player_base_heavy_straight",
+      "expectedFrames": 23,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 4,
+        "packedWidth": 570,
+        "packedHeight": 485,
+        "decodedBytes": 30962400
+      }
+    },
+    {
+      "id": "player_base_hit_air",
+      "expectedFrames": 4,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 1,
+        "packedWidth": 440,
+        "packedHeight": 539,
+        "decodedBytes": 3794560
+      }
+    },
+    {
+      "id": "player_base_hit_crouch",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 1,
+        "packedWidth": 449,
+        "packedHeight": 398,
+        "decodedBytes": 6433272
+      }
+    },
+    {
+      "id": "player_base_hit_stand",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 1,
+        "packedWidth": 412,
+        "packedHeight": 523,
+        "decodedBytes": 7757136
+      }
+    },
+    {
+      "id": "player_base_intro",
+      "expectedFrames": 27,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 3,
+        "packedWidth": 347,
+        "packedHeight": 569,
+        "decodedBytes": 21323844
+      }
+    },
+    {
+      "id": "player_base_jab",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 446,
+        "packedHeight": 473,
+        "decodedBytes": 10125984
+      }
+    },
+    {
+      "id": "player_base_jump",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 328,
+        "packedHeight": 533,
+        "decodedBytes": 4195776
+      }
+    },
+    {
+      "id": "player_base_jump_heavy",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 542,
+        "packedHeight": 526,
+        "decodedBytes": 7982576
+      }
+    },
+    {
+      "id": "player_base_jump_heavy_down",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 414,
+        "packedHeight": 404,
+        "decodedBytes": 4683168
+      }
+    },
+    {
+      "id": "player_base_jump_light",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 493,
+        "packedHeight": 399,
+        "decodedBytes": 5507796
+      }
+    },
+    {
+      "id": "player_base_jump_medium",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 550,
+        "packedHeight": 557,
+        "decodedBytes": 8577800
+      }
+    },
+    {
+      "id": "player_base_land",
+      "expectedFrames": 4,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 1,
+        "packedWidth": 338,
+        "packedHeight": 474,
+        "decodedBytes": 2563392
+      }
+    },
+    {
+      "id": "player_base_medium_kick",
+      "expectedFrames": 14,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 2,
+        "packedWidth": 460,
+        "packedHeight": 475,
+        "decodedBytes": 12236000
+      }
+    },
+    {
+      "id": "player_base_rise",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 370,
+        "packedHeight": 460,
+        "decodedBytes": 4084800
+      }
+    },
+    {
+      "id": "player_base_special_s2",
+      "expectedFrames": 20,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 3,
+        "packedWidth": 474,
+        "packedHeight": 710,
+        "decodedBytes": 32307840
+      }
+    },
+    {
+      "id": "player_base_special_s3",
+      "expectedFrames": 21,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 3,
+        "packedWidth": 499,
+        "packedHeight": 486,
+        "decodedBytes": 23281344
+      }
+    },
+    {
+      "id": "player_base_special_s4",
+      "expectedFrames": 20,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 3,
+        "packedWidth": 562,
+        "packedHeight": 580,
+        "decodedBytes": 27380640
+      }
+    },
+    {
+      "id": "player_base_super",
+      "expectedFrames": 22,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 3,
+        "packedWidth": 434,
+        "packedHeight": 486,
+        "decodedBytes": 22779792
+      }
+    },
+    {
+      "id": "player_base_taunt",
+      "expectedFrames": 33,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 4,
+        "packedWidth": 453,
+        "packedHeight": 547,
+        "decodedBytes": 35681904
+      }
+    },
+    {
+      "id": "player_base_throw",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 660,
+        "packedHeight": 476,
+        "decodedBytes": 15079680
+      }
+    },
+    {
+      "id": "player_base_ultra_beam",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 2,
+        "packedWidth": 532,
+        "packedHeight": 488,
+        "decodedBytes": 14538496
+      }
+    },
+    {
+      "id": "player_base_victory",
+      "expectedFrames": 33,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 326,
+        "packedHeight": 577,
+        "decodedBytes": 24829464
+      }
+    },
+    {
+      "id": "player_base_walk_back",
+      "expectedFrames": 17,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 3,
+        "packedWidth": 327,
+        "packedHeight": 480,
+        "decodedBytes": 15068160
+      }
+    }
+  ]
+}
