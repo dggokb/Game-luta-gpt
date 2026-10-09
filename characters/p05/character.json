@@ -1,0 +1,1910 @@
+{
+  "schemaVersion": 3,
+  "id": "p05",
+  "displayName": "p05",
+  "profile": "p05.json",
+  "artFacing": "right",
+  "fighter": {
+    "color": "#F4B73B",
+    "maxLife": 10000,
+    "autoCombo": [
+      "L",
+      "M",
+      "H"
+    ],
+    "body": {
+      "halfWidth": 33,
+      "standHeight": 140,
+      "crouchHeight": 87,
+      "pushHalfWidth": 29,
+      "pushHeight": 116
+    },
+    "energy": {
+      "damage": 850,
+      "range": 720,
+      "speed": 760,
+      "command": [
+        3,
+        1
+      ],
+      "spawnX": 60,
+      "spawnY": 79,
+      "crouchSpawnY": 63,
+      "attack": {
+        "startupFrames": 11,
+        "activeFrames": 1,
+        "recoveryFrames": 20,
+        "hitstunFrames": 29,
+        "blockstunFrames": 23,
+        "hitstopFrames": 6,
+        "cancelWindows": {
+          "hit": [
+            11,
+            31
+          ],
+          "block": [
+            11,
+            31
+          ],
+          "whiff": null
+        },
+        "cancelInto": [
+          "SUPER"
+        ],
+        "maxUsesPerCombo": 2,
+        "pushbackOnHit": 40,
+        "pushbackOnBlock": 50
+      }
+    },
+    "super": {
+      "damage": 3200,
+      "range": 1450,
+      "speed": 1180,
+      "spawnX": 75,
+      "spawnY": 83,
+      "airSpawnY": 79,
+      "attack": {
+        "startupFrames": 70,
+        "activeFrames": 1,
+        "recoveryFrames": 50,
+        "hitstunFrames": 55,
+        "blockstunFrames": 45,
+        "hitstopFrames": 12,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "pushbackOnHit": 60,
+        "pushbackOnBlock": 60
+      }
+    },
+    "assist": {
+      "move": "S"
+    }
+  },
+  "animations": {
+    "IDLE": {
+      "atlas": "p05_idle",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ],
+      "loop": true,
+      "durationsMs": [
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41
+      ]
+    },
+    "COMBAT": {
+      "atlas": "p05_idle",
+      "frames": [
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100
+      ]
+    },
+    "WALK_FORWARD": {
+      "atlas": "p05_walk_forward",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "loop": true,
+      "distancePerFrame": 17.4
+    },
+    "WALK_BACK": {
+      "atlas": "p05_walk_back",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "loop": true,
+      "distancePerFrame": 10.76
+    },
+    "CROUCH": {
+      "atlas": "p05_crouch",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false,
+      "durationsMs": [
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39,
+        39
+      ]
+    },
+    "RISE": {
+      "atlas": "p05_rise",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        39,
+        39,
+        39,
+        39,
+        39,
+        39
+      ]
+    },
+    "JUMP": {
+      "atlas": "p05_jump",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        62,
+        77,
+        92,
+        108,
+        108,
+        108
+      ]
+    },
+    "FALL": {
+      "atlas": "p05_fall",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        100,
+        70,
+        50,
+        40,
+        40
+      ]
+    },
+    "DASH": {
+      "atlas": "p05_dash",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": true,
+      "durationsMs": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ]
+    },
+    "BACKDASH": {
+      "atlas": "p05_backdash",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20,
+        20
+      ]
+    },
+    "LAND": {
+      "atlas": "p05_land",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        75,
+        75,
+        75,
+        75
+      ]
+    },
+    "LIGHT_JAB": {
+      "atlas": "p05_light_jab",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        13,
+        13,
+        13,
+        14,
+        14
+      ],
+      "impactFrame": 2
+    },
+    "MEDIUM_KICK": {
+      "atlas": "p05_medium_kick",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "loop": false,
+      "durationsMs": [
+        22,
+        22,
+        22,
+        20,
+        20,
+        20,
+        20,
+        20,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17
+      ],
+      "impactFrame": 3
+    },
+    "HEAVY_STRAIGHT": {
+      "atlas": "p05_heavy_straight",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        11,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "loop": false,
+      "durationsMs": [
+        19,
+        18,
+        19,
+        18,
+        19,
+        18,
+        19,
+        18,
+        19,
+        17,
+        17,
+        17,
+        16,
+        16,
+        17,
+        17,
+        17,
+        17,
+        16,
+        17,
+        16,
+        17,
+        16
+      ],
+      "impactFrame": 10
+    },
+    "DEFENSE_STAND": {
+      "atlas": "p05_defense_stand",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        40,
+        35,
+        35,
+        35,
+        35,
+        35,
+        40
+      ]
+    },
+    "DEFENSE_CROUCH": {
+      "atlas": "p05_defense_crouch",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ]
+    },
+    "HIT_STAND": {
+      "atlas": "p05_hit_stand",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        35,
+        40,
+        40,
+        45,
+        45,
+        45,
+        45,
+        60
+      ]
+    },
+    "HIT_CROUCH": {
+      "atlas": "p05_hit_crouch",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ]
+    },
+    "HIT_AIR": {
+      "atlas": "p05_hit_air",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        55,
+        55,
+        55,
+        55
+      ]
+    },
+    "KNOCKDOWN": {
+      "atlas": "p05_fall_down",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        31,
+        31,
+        31,
+        31,
+        31,
+        31,
+        31
+      ]
+    },
+    "GROUNDED": {
+      "atlas": "p05_fall_down",
+      "frames": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        60,
+        60,
+        60,
+        1020
+      ]
+    },
+    "GETUP": {
+      "atlas": "p05_getup",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        25,
+        25
+      ]
+    },
+    "CROUCH_LIGHT": {
+      "atlas": "p05_crouch_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        13,
+        13,
+        13,
+        14,
+        14
+      ],
+      "impactFrame": 2
+    },
+    "CROUCH_MEDIUM": {
+      "atlas": "p05_crouch_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "loop": false,
+      "durationsMs": [
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16,
+        17,
+        17,
+        17,
+        16,
+        17,
+        17,
+        16
+      ],
+      "impactFrame": 6
+    },
+    "CROUCH_HEAVY": {
+      "atlas": "p05_crouch_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "loop": false,
+      "durationsMs": [
+        36,
+        38,
+        38,
+        37,
+        29,
+        27,
+        27,
+        28,
+        35,
+        35,
+        35,
+        35
+      ],
+      "impactFrame": 4
+    },
+    "JUMP_LIGHT": {
+      "atlas": "p05_jump_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        35,
+        40,
+        17,
+        15,
+        15,
+        15
+      ],
+      "impactFrame": 2
+    },
+    "JUMP_MEDIUM": {
+      "atlas": "p05_jump_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        55,
+        40,
+        80,
+        25,
+        25,
+        22,
+        20
+      ],
+      "impactFrame": 2
+    },
+    "JUMP_HEAVY": {
+      "atlas": "p05_jump_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        80,
+        65,
+        110,
+        40,
+        35,
+        35,
+        35
+      ],
+      "impactFrame": 2
+    },
+    "DEFENSE_AIR": {
+      "atlas": "p05_defense_air",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+      ]
+    },
+    "ULTRA_BEAM": {
+      "atlas": "p05_ultra_beam",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ]
+    },
+    "SPECIAL_ENERGY": {
+      "atlas": "p05_special_energy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "loop": false,
+      "durationsMs": [
+        28,
+        28,
+        32,
+        18,
+        42,
+        42,
+        32,
+        21,
+        21,
+        21,
+        16
+      ],
+      "impactFrame": 4
+    },
+    "THROW_GRAB": {
+      "atlas": "p05_throw",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        20,
+        25,
+        25,
+        30
+      ]
+    },
+    "THROW_TOSS": {
+      "atlas": "p05_throw",
+      "frames": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        30,
+        60,
+        50,
+        40,
+        40,
+        47
+      ]
+    },
+    "SPECIAL_S2": {
+      "atlas": "p05_special_s2",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "loop": false,
+      "durationsMs": [
+        35,
+        35,
+        24,
+        23,
+        20,
+        25,
+        40,
+        40,
+        42,
+        60,
+        45,
+        30,
+        30,
+        30,
+        30,
+        30,
+        35,
+        35,
+        40,
+        35
+      ],
+      "impactFrame": 5
+    },
+    "SPECIAL_S3": {
+      "atlas": "p05_special_s3",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "loop": false,
+      "durationsMs": [
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        37,
+        16,
+        17,
+        17,
+        17,
+        40,
+        40,
+        40,
+        35,
+        35,
+        35,
+        35,
+        40
+      ],
+      "impactFrame": 11
+    },
+    "SPECIAL_S4": {
+      "atlas": "p05_special_s4",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "loop": false,
+      "durationsMs": [
+        40,
+        40,
+        45,
+        42,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        31,
+        31,
+        31,
+        50,
+        45,
+        45,
+        45,
+        48
+      ],
+      "impactFrame": 4
+    },
+    "SUPER_WAVE": {
+      "atlas": "p05_super_wave",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "loop": false,
+      "durationsMs": [
+        50,
+        50,
+        55,
+        60,
+        60,
+        60,
+        62,
+        62,
+        62,
+        62,
+        45,
+        40,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        35,
+        34,
+        34
+      ],
+      "impactFrame": 10
+    },
+    "INTRO": {
+      "atlas": "p05_intro",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "loop": false,
+      "durationsMs": [
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        156,
+        104,
+        104,
+        104,
+        104,
+        104,
+        104,
+        104,
+        234,
+        234,
+        234,
+        234
+      ]
+    },
+    "JUMP_HEAVY_DOWN": {
+      "atlas": "p05_jump_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        80,
+        65,
+        110,
+        40,
+        35,
+        35,
+        35
+      ],
+      "impactFrame": 2
+    },
+    "VICTORY": {
+      "atlas": "p05_victory",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "loop": false,
+      "durationsMs": [
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125
+      ]
+    },
+    "DEFEAT": {
+      "atlas": "p05_defeat",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "loop": false,
+      "durationsMs": [
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125
+      ]
+    },
+    "TAUNT": {
+      "atlas": "p05_taunt",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ],
+      "loop": false,
+      "durationsMs": [
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125,
+        125
+      ]
+    }
+  },
+  "moves": {
+    "L": {
+      "animation": "LIGHT_JAB",
+      "damage": 300,
+      "reach": 81,
+      "startupFrames": 4,
+      "activeFrames": 8,
+      "recoveryFrames": 8,
+      "hitstunFrames": 20,
+      "blockstunFrames": 17,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          4,
+          16
+        ],
+        "block": [
+          4,
+          16
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "L",
+        "M",
+        "2L"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 24,
+      "pushbackOnBlock": 30,
+      "maxUsesPerCombo": 3,
+      "hitHeight": 75
+    },
+    "M": {
+      "animation": "MEDIUM_KICK",
+      "damage": 500,
+      "reach": 112,
+      "startupFrames": 8,
+      "activeFrames": 12,
+      "recoveryFrames": 12,
+      "hitstunFrames": 27,
+      "blockstunFrames": 24,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          8,
+          24
+        ],
+        "block": [
+          8,
+          24
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H",
+        "2M",
+        "S",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "pushbackOnHit": 32,
+      "pushbackOnBlock": 38,
+      "hitHeight": 75
+    },
+    "H": {
+      "animation": "HEAVY_STRAIGHT",
+      "damage": 800,
+      "reach": 143,
+      "startupFrames": 10,
+      "activeFrames": 5,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 11,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          10,
+          17
+        ],
+        "block": [
+          10,
+          17
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "S",
+        "SUPER",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "pushbackOnHit": 44,
+      "pushbackOnBlock": 50,
+      "launchType": "wallBounce",
+      "hitHeight": 75
+    },
+    "2L": {
+      "animation": "CROUCH_LIGHT",
+      "damage": 300,
+      "reach": 81,
+      "low": true,
+      "startupFrames": 4,
+      "activeFrames": 8,
+      "recoveryFrames": 8,
+      "hitstunFrames": 20,
+      "blockstunFrames": 17,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          4,
+          16
+        ],
+        "block": [
+          4,
+          16
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "M",
+        "2M"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 22,
+      "pushbackOnBlock": 28,
+      "hitHeight": 40
+    },
+    "2M": {
+      "animation": "CROUCH_MEDIUM",
+      "damage": 500,
+      "reach": 112,
+      "low": true,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 20,
+      "blockstunFrames": 10,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H"
+      ],
+      "launchType": "knockdown",
+      "knockback": 40,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 36,
+      "hitHeight": 40
+    },
+    "2H": {
+      "animation": "CROUCH_HEAVY",
+      "damage": 800,
+      "reach": 143,
+      "startupFrames": 16,
+      "activeFrames": 10,
+      "recoveryFrames": 16,
+      "hitstunFrames": 55,
+      "blockstunFrames": 21,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          16,
+          30
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "JUMP"
+      ],
+      "launchType": "launch",
+      "knockback": 20,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 48,
+      "juggleCost": 2,
+      "hitHeight": 40
+    },
+    "jL": {
+      "animation": "JUMP_LIGHT",
+      "damage": 300,
+      "reach": 81,
+      "startupFrames": 6,
+      "activeFrames": 3,
+      "recoveryFrames": 6,
+      "hitstunFrames": 17,
+      "blockstunFrames": 13,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jM",
+        "jH",
+        "j2H"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 14,
+      "pushbackOnBlock": 20,
+      "hitHeight": 75
+    },
+    "jM": {
+      "animation": "JUMP_MEDIUM",
+      "damage": 500,
+      "reach": 112,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 16,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jH",
+        "j2H"
+      ],
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 26,
+      "hitHeight": 75
+    },
+    "jH": {
+      "animation": "JUMP_HEAVY",
+      "damage": 800,
+      "reach": 143,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": null,
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [],
+      "launchType": "wallBounce",
+      "knockback": 30,
+      "pushbackOnHit": 28,
+      "pushbackOnBlock": 34,
+      "juggleCost": 2,
+      "hitHeight": 75
+    },
+    "j2H": {
+      "animation": "JUMP_HEAVY_DOWN",
+      "damage": 800,
+      "reach": 143,
+      "startupFrames": 18,
+      "activeFrames": 12,
+      "recoveryFrames": 18,
+      "hitstunFrames": 33,
+      "blockstunFrames": 29,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": null,
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [],
+      "launchType": "groundBounce",
+      "knockback": 30,
+      "pushbackOnHit": 28,
+      "pushbackOnBlock": 34,
+      "juggleCost": 2,
+      "hitHeight": 75
+    }
+  },
+  "specialAnimations": {
+    "ULTRA": "ULTRA_BEAM",
+    "S": "SPECIAL_ENERGY",
+    "SUPER": "SUPER_WAVE"
+  },
+  "specialMoves": {
+    "S2": {
+      "command": [
+        1,
+        3,
+        2
+      ],
+      "animation": "SPECIAL_S2",
+      "damage": 1100,
+      "reach": 97,
+      "hitHeight": 126,
+      "startupFrames": 7,
+      "activeFrames": 10,
+      "recoveryFrames": 24,
+      "hitstunFrames": 30,
+      "blockstunFrames": 12,
+      "hitstopFrames": 10,
+      "cancelWindows": {
+        "hit": [
+          7,
+          22
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "launchType": "knockdown",
+      "knockback": 60,
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 50
+    },
+    "S3": {
+      "command": [
+        3,
+        5
+      ],
+      "buttons": [
+        "L",
+        "M"
+      ],
+      "animation": "SPECIAL_S3",
+      "damage": 900,
+      "reach": 106,
+      "hitHeight": 87,
+      "startupFrames": 40,
+      "activeFrames": 8,
+      "recoveryFrames": 36,
+      "hitstunFrames": 44,
+      "blockstunFrames": 36,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          40,
+          58
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "pushbackOnHit": 40,
+      "pushbackOnBlock": 50
+    },
+    "S4": {
+      "command": [
+        3,
+        5
+      ],
+      "buttons": [
+        "H"
+      ],
+      "animation": "SPECIAL_S4",
+      "damage": 1000,
+      "reach": 135,
+      "hitHeight": 106,
+      "startupFrames": 7,
+      "activeFrames": 13,
+      "recoveryFrames": 9,
+      "hitstunFrames": 12,
+      "blockstunFrames": 2,
+      "hitstopFrames": 8,
+      "cancelWindows": {
+        "hit": [
+          7,
+          23
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "launchType": "knockdown",
+      "knockback": 70,
+      "pushbackOnHit": 30,
+      "pushbackOnBlock": 60
+    }
+  }
+}

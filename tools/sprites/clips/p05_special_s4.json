@@ -1,0 +1,30 @@
+{
+  "id": "p05_special_s4",
+  "javaName": "P05_SPECIAL_S4",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_special_s4_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_special_s4.png",
+  "report": "tools/sprites/reports/p05_special_s4.report.json",
+  "preview": "android/app/build/sprite-review/p05_special_s4-import.png",
+  "expectedFrames": 20,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "S4.mp4",
+    "personagem": "p05",
+    "escala": 0.3118,
+    "medida": "cabeça do IDLE em 12 quadros (nota 0.83)",
+    "quadros": "1,6,10,14,17,17,22,24,26,28,33,33,33,35,36,38,40,42,43,45",
+    "celula": 224,
+    "largura": 352,
+    "raiz": "135,206",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "rootX": 135,
+  "frameHeight": 224,
+  "rootY": 206
+}

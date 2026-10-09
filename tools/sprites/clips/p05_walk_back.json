@@ -1,0 +1,27 @@
+{
+  "id": "p05_walk_back",
+  "javaName": "P05_WALK_BACK",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_walk_back_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_walk_back.png",
+  "report": "tools/sprites/reports/p05_walk_back.report.json",
+  "preview": "android/app/build/sprite-review/p05_walk_back-import.png",
+  "expectedFrames": 24,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "andarParaTras.mp4",
+    "personagem": "p05",
+    "escala": 0.5191,
+    "medida": "último quadro = inicio_centro (nota 0.84)",
+    "quadros": "11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57",
+    "largura": 224,
+    "raiz": "124,238",
+    "colunas": 11,
+    "pe_no_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 124
+}

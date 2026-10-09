@@ -1,0 +1,30 @@
+{
+  "id": "p05_defense_air",
+  "javaName": "P05_DEFENSE_AIR",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_defense_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_defense_air.png",
+  "report": "tools/sprites/reports/p05_defense_air.report.json",
+  "preview": "android/app/build/sprite-review/p05_defense_air-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaNoAr.mp4",
+    "personagem": "p05",
+    "escala": 0.525,
+    "medida": "1º quadro = inicio_centro (nota 0.90)",
+    "quadros": "17,22,26,31,36,40,45",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "126,270",
+    "colunas": 7,
+    "pe_no_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 126,
+  "rootY": 270
+}

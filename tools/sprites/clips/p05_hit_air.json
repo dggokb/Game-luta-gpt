@@ -1,0 +1,30 @@
+{
+  "id": "p05_hit_air",
+  "javaName": "P05_HIT_AIR",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_hit_air_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_hit_air.png",
+  "report": "tools/sprites/reports/p05_hit_air.report.json",
+  "preview": "android/app/build/sprite-review/p05_hit_air-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "golpeNoAr.mp4",
+    "personagem": "p05",
+    "escala": 0.5191,
+    "medida": "1º quadro = inicio_centro (nota 0.88)",
+    "quadros": "11,20,28,37",
+    "celula": 320,
+    "largura": 288,
+    "raiz": "154,302",
+    "colunas": 4,
+    "pe_no_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 320,
+  "rootX": 154,
+  "rootY": 302
+}

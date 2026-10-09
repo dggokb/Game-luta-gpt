@@ -1,0 +1,31 @@
+{
+  "id": "p05_fall_down",
+  "javaName": "P05_FALL_DOWN",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_fall_down_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_fall_down.png",
+  "report": "tools/sprites/reports/p05_fall_down.report.json",
+  "preview": "android/app/build/sprite-review/p05_fall_down-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "queda_levanta.mp4",
+    "personagem": "p05",
+    "escala": 0.5232,
+    "medida": "1º quadro = inicio_centro (nota 0.89)",
+    "quadros": "11,15,19,23,27,31,35,35,44,54,63",
+    "celula": 288,
+    "largura": 352,
+    "raiz": "138,270",
+    "colunas": 11,
+    "fixar": "quadro",
+    "pe_no_chao": true
+  },
+  "frameWidth": 352,
+  "frameHeight": 288,
+  "rootX": 138,
+  "rootY": 270
+}

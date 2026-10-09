@@ -1,0 +1,32 @@
+{
+  "id": "p05_dash",
+  "javaName": "P05_DASH",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_dash.png",
+  "report": "tools/sprites/reports/p05_dash.report.json",
+  "preview": "android/app/build/sprite-review/p05_dash-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p05",
+    "escala": 0.3265,
+    "motivo": "guarda do 1º quadro medida pela altura contra o agachar (zoom 1,575, nota 0,74): escala = 0,3338 x 626 / altura da guarda no vídeo (dash: sem guarda, mesmo zoom do idle)",
+    "quadros": "2,20,39,57,76,94",
+    "celula": 192,
+    "largura": 224,
+    "raiz": "117,174",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameHeight": 192,
+  "rootX": 117,
+  "rootY": 174,
+  "frameWidth": 224
+}

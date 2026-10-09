@@ -1,0 +1,27 @@
+{
+  "id": "p05_rise",
+  "javaName": "P05_RISE",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_rise_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_rise.png",
+  "report": "tools/sprites/reports/p05_rise.report.json",
+  "preview": "android/app/build/sprite-review/p05_rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p05",
+    "escala": 0.3336,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.74)",
+    "quadros": "72,73,74,76,77,78",
+    "largura": 256,
+    "raiz": "134,238",
+    "colunas": 6,
+    "fixar": "registro",
+    "limpar_chao": true
+  },
+  "rootX": 134
+}

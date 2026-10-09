@@ -1,0 +1,27 @@
+{
+  "id": "p05_crouch_light",
+  "javaName": "P05_CROUCH_LIGHT",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_crouch_light_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_crouch_light.png",
+  "report": "tools/sprites/reports/p05_crouch_light.report.json",
+  "preview": "android/app/build/sprite-review/p05_crouch_light-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2L.mp4",
+    "personagem": "p05",
+    "escala": 0.3414,
+    "medida": "cabeça do IDLE em 8 quadros (nota 0.77)",
+    "quadros": "6,12,19,30,35,43,52,60,68,77,85",
+    "largura": 288,
+    "raiz": "118,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "rootX": 118
+}

@@ -1,0 +1,110 @@
+{
+  "id": "p05_rise",
+  "characterProfile": "p05",
+  "source": "art/sprites/source/p05_rise_video_normalized.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 256,
+    "rootX": 134,
+    "rootY": 238,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        39,
+        91,
+        242,
+        238
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14378
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        30,
+        86,
+        230,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 14615
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        50,
+        67,
+        230,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14785
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        58,
+        47,
+        221,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15310
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        59,
+        37,
+        211,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15349
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        62,
+        30,
+        207,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 15510
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 232,
+    "frameHeight": 229,
+    "rootX": 114,
+    "rootY": 218,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      20,
+      20
+    ],
+    "decodedBytes": {
+      "canonical": 1572864,
+      "packed": 1275072
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "11f9eaedcb6892456f9a1cb30d74ab31d618b1728f5c7fc29f6e7f9b1e233946",
+      "config": "f18b17659ee09cc37c8f61a30beae65d07b6be1a07734e77bfd122959824ed2d",
+      "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    }
+  }
+}

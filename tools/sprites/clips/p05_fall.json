@@ -1,0 +1,30 @@
+{
+  "id": "p05_fall",
+  "javaName": "P05_FALL",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_fall_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_fall.png",
+  "report": "tools/sprites/reports/p05_fall.report.json",
+  "preview": "android/app/build/sprite-review/p05_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p05",
+    "escala": 0.5173,
+    "medida": "1º quadro = inicio_centro (nota 0.87)",
+    "quadros": "36,40,44,48,52,56",
+    "celula": 352,
+    "largura": 224,
+    "raiz": "125,334",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 352,
+  "rootX": 125,
+  "rootY": 334
+}

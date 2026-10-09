@@ -1,0 +1,88 @@
+{
+  "id": "p05_hit_air",
+  "characterProfile": "p05",
+  "source": "art/sprites/source/p05_hit_air_video_normalized.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 288,
+    "frameHeight": 320,
+    "rootX": 154,
+    "rootY": 302,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        88,
+        31,
+        226,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 19016
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        38,
+        62,
+        243,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 19900
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        25,
+        64,
+        251,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 20416
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        52,
+        53,
+        263,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 20079
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 258,
+    "frameHeight": 293,
+    "rootX": 139,
+    "rootY": 281,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      15,
+      21
+    ],
+    "decodedBytes": {
+      "canonical": 1474560,
+      "packed": 1209504
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "1498f4f6b5170add12d0955d267b05205cc84bd7c24993375ed9816945c38342",
+      "config": "09ba88cc7f997ab84e764cb4d2b7998f65eedb82496fb29fe1d1a9fd42443f55",
+      "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    }
+  }
+}

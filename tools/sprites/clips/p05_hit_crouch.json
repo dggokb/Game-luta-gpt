@@ -1,0 +1,35 @@
+{
+  "id": "p05_hit_crouch",
+  "javaName": "P05_HIT_CROUCH",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_hit_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_hit_crouch.png",
+  "report": "tools/sprites/reports/p05_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p05_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoAgachado.mp4",
+    "personagem": "p05",
+    "escala": 0.5203,
+    "medida": "último quadro = inicio_agachado (nota 0.95)",
+    "quadros": "33,38,42,46,51,56,60,64,69",
+    "celula": 224,
+    "largura": 320,
+    "raiz": "134,206",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "limpar_quadros": [
+      1
+    ]
+  },
+  "frameWidth": 320,
+  "frameHeight": 224,
+  "rootX": 134,
+  "rootY": 206
+}

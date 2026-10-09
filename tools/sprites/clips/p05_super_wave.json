@@ -1,0 +1,30 @@
+{
+  "id": "p05_super_wave",
+  "javaName": "P05_SUPER_WAVE",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_super_wave_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_super_wave.png",
+  "report": "tools/sprites/reports/p05_super_wave.report.json",
+  "preview": "android/app/build/sprite-review/p05_super_wave-import.png",
+  "expectedFrames": 22,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "Super.mp4",
+    "personagem": "p05",
+    "escala": 0.3448,
+    "medida": "cabeça do IDLE em 9 quadros (nota 0.81)",
+    "quadros": "5,10,14,19,23,28,33,37,42,46,50,54,57,59,62,65,68,71,74,76,79,82",
+    "celula": 288,
+    "largura": 352,
+    "raiz": "106,270",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "frameHeight": 288,
+  "rootX": 106,
+  "rootY": 270
+}

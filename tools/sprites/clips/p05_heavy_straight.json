@@ -1,0 +1,31 @@
+{
+  "id": "p05_heavy_straight",
+  "javaName": "P05_HEAVY_STRAIGHT",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_heavy_straight_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_heavy_straight.png",
+  "report": "tools/sprites/reports/p05_heavy_straight.report.json",
+  "preview": "android/app/build/sprite-review/p05_heavy_straight-import.png",
+  "expectedFrames": 23,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "H.mp4",
+    "personagem": "p05",
+    "escala": 0.2996,
+    "medida": "cabeça do IDLE em 9 quadros (nota 0.82)",
+    "quadros": "17,18,20,21,22,24,25,26,27,29,29,33,35,37,39,42,44,46,49,51,53,56,58",
+    "largura": 416,
+    "raiz": "207,238",
+    "colunas": 11,
+    "limpar_chao": true,
+    "ancorar_pe": true,
+    "limpar_quadros": [
+      11
+    ]
+  },
+  "frameWidth": 416,
+  "rootX": 207
+}

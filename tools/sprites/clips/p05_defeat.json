@@ -1,0 +1,27 @@
+{
+  "id": "p05_defeat",
+  "javaName": "P05_DEFEAT",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_defeat_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_defeat.png",
+  "report": "tools/sprites/reports/p05_defeat.report.json",
+  "preview": "android/app/build/sprite-review/p05_defeat-import.png",
+  "expectedFrames": 33,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derrota.mp4",
+    "personagem": "p05",
+    "escala": 0.316,
+    "motivo": "guarda do 1º quadro medida pela altura contra o agachar (zoom 1,575, nota 0,74): escala = 0,3338 x 626 / altura da guarda no vídeo (dash: sem guarda, mesmo zoom do idle)",
+    "quadros": "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96",
+    "largura": 320,
+    "raiz": "186,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "rootX": 186
+}

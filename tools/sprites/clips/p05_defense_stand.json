@@ -1,0 +1,27 @@
+{
+  "id": "p05_defense_stand",
+  "javaName": "P05_DEFENSE_STAND",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_defense_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_defense_stand.png",
+  "report": "tools/sprites/reports/p05_defense_stand.report.json",
+  "preview": "android/app/build/sprite-review/p05_defense_stand-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaEmPe.mp4",
+    "personagem": "p05",
+    "escala": 0.3448,
+    "medida": "cabeça do IDLE em 9 quadros (nota 0.85)",
+    "quadros": "23,29,35,41,48,54,60,66",
+    "largura": 256,
+    "raiz": "120,238",
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "rootX": 120
+}

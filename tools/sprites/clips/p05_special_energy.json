@@ -1,0 +1,27 @@
+{
+  "id": "p05_special_energy",
+  "javaName": "P05_SPECIAL_ENERGY",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_special_energy_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_special_energy.png",
+  "report": "tools/sprites/reports/p05_special_energy.report.json",
+  "preview": "android/app/build/sprite-review/p05_special_energy-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "S1.mp4",
+    "personagem": "p05",
+    "escala": 0.3312,
+    "medida": "cabeça do IDLE em 9 quadros (nota 0.83)",
+    "quadros": "5,10,14,19,25,33,42,51,60,69,78",
+    "largura": 288,
+    "raiz": "123,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "rootX": 123
+}

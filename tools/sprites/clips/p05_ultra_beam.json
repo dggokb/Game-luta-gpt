@@ -1,0 +1,42 @@
+{
+  "id": "p05_ultra_beam",
+  "javaName": "P05_ULTRA_BEAM",
+  "profile": "p05.json",
+  "source": "art/sprites/source/p05_ultra_beam_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_ultra_beam.png",
+  "report": "tools/sprites/reports/p05_ultra_beam.report.json",
+  "preview": "android/app/build/sprite-review/p05_ultra_beam-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "ultra.mp4",
+    "personagem": "p05",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.88)",
+    "quadros": "5,16,28,39,50,62,73,85,96",
+    "celula": 384,
+    "largura": 448,
+    "raiz": "209,345",
+    "colunas": 9,
+    "limpar_chao": true,
+    "reescala": [
+      1.0,
+      1.459,
+      1.459,
+      1.439,
+      1.459,
+      1.38,
+      1.439,
+      1.439,
+      1.0
+    ],
+    "ancorar_pe": true
+  },
+  "frameWidth": 448,
+  "frameHeight": 384,
+  "rootX": 209,
+  "rootY": 345
+}
