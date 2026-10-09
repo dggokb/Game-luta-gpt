@@ -11,11 +11,11 @@ capture() {
   timeout 25s adb logcat -d -v threadtime > "$DIR/startup-logcat.txt" 2>&1
   timeout 20s adb shell dumpsys activity activities > "$DIR/activity-state.txt" 2>&1
   timeout 20s adb shell dumpsys window windows > "$DIR/window-state.txt" 2>&1
-  timeout 20s adb shell dumpsys meminfo com.gamelutagpt > "$DIR/memory.txt" 2>&1
+  timeout 20s adb shell dumpsys meminfo com.gamelutagpt.p01fix > "$DIR/memory.txt" 2>&1
   timeout 20s adb exec-out screencap -p > p01-motor-v2-screen.png
   timeout 25s adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1
   timeout 20s adb shell cat /sdcard/window.xml > p01-motor-v2-ui.xml 2>/dev/null
-  grep -E -A 38 -B 4 'FATAL EXCEPTION|Process: com.gamelutagpt|OutOfMemoryError|ANR in com.gamelutagpt|am_crash' "$DIR/startup-logcat.txt" | tail -n 125 || true
+  grep -E -A 38 -B 4 'FATAL EXCEPTION|Process: com.gamelutagpt.p01fix|OutOfMemoryError|ANR in com.gamelutagpt.p01fix|am_crash' "$DIR/startup-logcat.txt" | tail -n 125 || true
   echo "=== Focused activity ==="
   grep -E 'mCurrentFocus|mFocusedApp|mResumedActivity|topResumedActivity|ResumedActivity' "$DIR/window-state.txt" "$DIR/activity-state.txt" | tail -n 12 || true
   return 0
@@ -24,24 +24,25 @@ trap capture EXIT
 
 APK="android/app/build/outputs/apk/debug/app-debug.apk"
 adb install -r "$APK"
+PKG="com.gamelutagpt.p01fix"
 adb logcat -c
 echo "Launching P01, waiting for onCreate and first game frames."
-timeout 60s adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
+timeout 60s adb shell am start -W -n ${PKG}/com.gamelutagpt.MainActivity
 sleep 12
-pid="$(timeout 20s adb shell pidof com.gamelutagpt | tr -d '\r' )"
+pid="$(timeout 20s adb shell pidof "$PKG" | tr -d '\r' )"
 if [[ ! "$pid" =~ ^[0-9]+ ]]; then
   echo "FAIL: game process disappeared after first launch"
   exit 81
 fi
 echo "Game process still running: $pid"
 window="$(timeout 25s adb shell dumpsys window)"
-if ! grep -Eq 'mCurrentFocus.*com.gamelutagpt|mFocusedApp.*com.gamelutagpt' <<< "$window"; then
+if ! grep -Eq 'mCurrentFocus.*${PKG}|mFocusedApp.*${PKG}' <<< "$window"; then
   echo "FAIL: Android did not focus the game activity."
   echo "$window" | grep -E 'mCurrentFocus|mFocusedApp' | tail -n 10 || true
   exit 82
 fi
 logs="$(timeout 25s adb logcat -d -v brief)"
-if grep -Eiq 'FATAL EXCEPTION|Process: com.gamelutagpt|ANR in com.gamelutagpt' <<< "$logs"; then
+if grep -Eiq 'FATAL EXCEPTION|Process: com.gamelutagpt.p01fix|ANR in com.gamelutagpt.p01fix' <<< "$logs"; then
   echo "FAIL: game threw an exception or stopped responding."
   exit 83
 fi

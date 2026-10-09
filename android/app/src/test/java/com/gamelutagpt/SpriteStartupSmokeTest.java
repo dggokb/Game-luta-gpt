@@ -15,6 +15,16 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=28)
 public class SpriteStartupSmokeTest {
+    @Test public void inverseCanvasFilterBuildsWithoutMissingMatrixRow() {
+        // AndroidRenderCanvas is instantiated as a GameView field, before
+        // Android's Activity can display the first frame.
+        assertNotNull(new AndroidRenderCanvas());
+    }
+
+    @Test public void entireGameViewCanBeCreatedWithoutAndroidColorMatrixCrash() {
+        assertNotNull(new GameView(org.robolectric.RuntimeEnvironment.getApplication()));
+    }
+
     @Test public void opponentColorFilterCanBeCreatedDuringActivityStartup() {
         ColorFilter filter=SpriteFighterRenderer.washedOut();
         assertNotNull(filter);

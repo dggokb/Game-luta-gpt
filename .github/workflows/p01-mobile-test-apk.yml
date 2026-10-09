@@ -1,4 +1,4 @@
-name: P01 Motor V2 - APK Instalavel
+name: P01 Motor V2 - Matriz Corrigida v0.88
 on:
   push:
     branches: [teste-motor-sprite]
@@ -6,6 +6,10 @@ on:
       - '.github/workflows/p01-mobile-test-apk.yml'
       - 'android/app/src/main/java/com/gamelutagpt/SpriteMotion.java'
       - 'android/app/src/main/java/com/gamelutagpt/SpriteFighterRenderer.java'
+      - 'android/app/src/main/java/com/gamelutagpt/AndroidRenderCanvas.java'
+      - 'android/app/build.gradle'
+      - 'android/app/src/main/AndroidManifest.xml'
+      - 'android/app/src/test/java/com/gamelutagpt/SpriteStartupSmokeTest.java'
       - 'android/app/src/test/java/com/gamelutagpt/SpriteAnimationSyncTest.java'
   workflow_dispatch:
 permissions:
