@@ -175,14 +175,28 @@ def audit(root=ROOT,character="player_base",output=None,enhance=False):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--character",default="player_base")
+    p.add_argument("--all",action="store_true",help="audit every available character manifest")
     p.add_argument("--output")
     p.add_argument("--enhance",action="store_true")
     p.add_argument("--strict",action="store_true")
     args=p.parse_args()
-    report=audit(character=args.character,
-                 output=ROOT/args.output if args.output else None,enhance=args.enhance)
-    if args.strict and any(not x["valid"] for x in report["perState"].values()):
-        raise SystemExit("Invalid sprite frame(s)")
+    if args.all and args.output:
+        p.error("--output and --all cannot be combined: each pack owns its report directory")
+    ids=([x.parent.name for x in sorted((ROOT/"characters").glob("*/character.json"))]
+         if args.all else [args.character])
+    summary=[]
+    for char in ids:
+        report=audit(character=char,
+                     output=ROOT/args.output if args.output else None,enhance=args.enhance)
+        summary.append(dict(character=char,states=report["statesAudited"],
+                            soft=len(report["suspectedSoft"])))
+        if args.strict and any(not x["valid"] for x in report["perState"].values()):
+            raise SystemExit("Invalid sprite frame(s) in "+char)
+    if args.all:
+        output=ROOT/"android/app/build/quality-pc/roster-summary.json"
+        output.parent.mkdir(parents=True,exist_ok=True)
+        output.write_text(json.dumps(summary,indent=2)+"\n",encoding="utf-8")
+        print("ROSTER_QUALITY "+json.dumps(summary))
 
 
 if __name__=="__main__":

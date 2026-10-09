@@ -11,3 +11,5 @@ O segundo comando cria atlas opcionais para PC na pasta ignorada android/app/bui
 O relatorio QUALITY.json informa nitidez relativa, estados suspeitos e risco de ampliacao em 1080p, 1440p e 4K. Filtros tipo nearest-neighbor deixam contornos mais duros mas podem pixelar; bilinear suaviza mais. Se a arte de origem nao contiver detalhe suficiente, exige-se video original com mais definicao; upscaling nao recria informacao real.
 
 O port real game-luta-sprite-pc-gpt mora em outra branch. Levar o atlas opcional e a selecao de filtro para esse port requer incorporacao e testes de qualidade visual.
+
+Integracao continua: cada alteracao de character.json, atlas PNG ou receita executa automaticamente quality_guard.py --all --strict no workflow Sprite Quality PC P01. O teste apenas bloqueia assets estruturalmente invalidos; anomalias esteticas geram alertas. O aprimoramento PC continua em arquivos opcionais no build, nunca substitui fonte artistica sem comparacao.
