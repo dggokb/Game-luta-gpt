@@ -2,7 +2,7 @@
   "id": "player_base_walk_forward",
   "javaName": "WALK_FORWARD_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_walk_forward_video_normalized.png",
+  "source": "art/sprites/source/player_base_walk_forward_sr_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_walk_forward.png",
   "report": "tools/sprites/reports/player_base_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/walk_forward-import.png",
@@ -10,5 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+  "sourceNote": "P01 WALK_FORWARD test: same approved idle Real-ESRGAN AnimeVideo-v3 method; 4x masters uniformly reduced to 2x runtime, 20 frames, authored root and distancePerFrame 12.5 unchanged. Visual approval pending.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_walk_forward_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "pixelScale": 2
 }

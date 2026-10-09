@@ -1828,10 +1828,10 @@ final class GeneratedSpriteLayouts {
     static final int WALK_BACK_SET_ROOT_Y = 236;
     static final int WALK_BACK_SET_FRAME_COUNT = 17;
 
-    static final int WALK_FORWARD_SET_FRAME_WIDTH = 182;
-    static final int WALK_FORWARD_SET_FRAME_HEIGHT = 248;
-    static final int WALK_FORWARD_SET_ROOT_X = 96;
-    static final int WALK_FORWARD_SET_ROOT_Y = 237;
+    static final int WALK_FORWARD_SET_FRAME_WIDTH = 350;
+    static final int WALK_FORWARD_SET_FRAME_HEIGHT = 480;
+    static final int WALK_FORWARD_SET_ROOT_X = 185;
+    static final int WALK_FORWARD_SET_ROOT_Y = 466;
     static final int WALK_FORWARD_SET_FRAME_COUNT = 20;
 
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_WIDTH = 232;
