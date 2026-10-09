@@ -30,3 +30,7 @@ python tools/sprites/build_characters.py --write
 ```
 
 Para testar no jogo, selecionar P01, verificar a transição idle→andar para frente→idle, caminhar em ambas as direções de orientação e observar pés, cabelo e faixas na passagem 019→000. O estado de andar para trás continua com sua arte original.
+
+## Integração na branch principal
+
+Em 09/10/2026, a pedido do usuário, o WALK_FORWARD com super-resolução foi integrado na `game-luta-sprite-gpt`, incluindo o atlas gerado e sua configuração de densidade. O conteúdo foi trazido de `test/p01-walk-forward-sr-20261009` em `7a43a164680442caf7c46c69c35cafeca66a65f0`, após incorporar as ferramentas da `ccr-60181022-rh9cms`. O idle aprovado, os originais e o avanço de 12,5 unidades por frame continuam preservados. A aprovação visual da caminhada ainda está pendente; este registro confirma a integração para o próximo teste. Nenhum novo build de APK foi solicitado nesta integração; o commit utiliza `[skip ci]`.

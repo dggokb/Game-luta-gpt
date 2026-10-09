@@ -12,7 +12,7 @@
     "source_atlas_sha256": "eef12b99cba2294e4c596b1450a363a08578810f56ab1a9c18d8420cb3e7fb52",
     "source_frames_unchanged": true,
     "learned_super_resolution": true,
-    "game_integration": "separate test branch, pixelScale 2",
+    "game_integration": "game-luta-sprite-gpt; pixelScale 2",
     "temporal_status": "visual review pending; deterministic per-frame model, no temporal smoothing",
     "elapsed_seconds": 10.549,
     "temporal_rgb_mae_source": 22.573067,
