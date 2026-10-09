@@ -63,6 +63,7 @@ public class ExtractedSystemsTest {
         assertEquals(ControlsLayout.Control.LIGHT,ControlsLayout.controlAt(ControlsLayout.LIGHT_X,ControlsLayout.LIGHT_Y));
         assertEquals(ControlsLayout.Control.TAG,ControlsLayout.controlAt(ControlsLayout.TAG_X,ControlsLayout.TAG_Y));
         assertEquals(ControlsLayout.Control.NONE,ControlsLayout.controlAt(640,300));
+        assertEquals(ControlsLayout.Control.CHARACTER_SELECT,ControlsLayout.controlAt(640,70));
         assertEquals(0,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X+5,ControlsLayout.DPAD_Y));
         assertEquals(1,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X+90,ControlsLayout.DPAD_Y));
         assertEquals(3,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y+90));

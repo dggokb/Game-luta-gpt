@@ -267,7 +267,8 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 
 - O **CPU agora usa o nosso personagem** (mesmo corpo e golpes), desenhado **pálido e
   azulado** para não confundir com o jogador.
-- **Botões DEMO 80…85 (e 87)** no topo da tela: cada um faz os dois personagens demonstrarem
+- *(Os botões DEMO saíram da tela de luta; no lugar deles fica **◀ SELEÇÃO**, que volta à
+  escolha da dupla. As demos continuam no código e nos testes.)* **Botões DEMO 80…85 (e 87)** no topo da tela: cada um faz os dois personagens demonstrarem
   sozinhos o que entrou naquela versão, passo a passo, com legenda (✓ quando o passo
   mostrou o que devia). Toque de novo no mesmo botão para parar; no fim a luta volta
   como estava (posições, vida, barra).

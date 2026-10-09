@@ -1547,19 +1547,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         while ((event = pendingInput.poll()) != null) event.recycle();
     }
 
-    /** Starts demo {@code index}, or stops it when it is the one playing. Not during an ultra. */
-    private void toggleDemo(int index) {
-        if (index < 0 || paginaFinal.isActive() || ultraAttacker >= 0) return;
-        if (demo.demo() == index) {
-            demo.stop();
-        } else {
-            demo.start(index, engine, team, opponentFighter, PLAYER_START_X, OPPONENT_START_X);
-        }
-        throwBannerFrames = 0;
-        dummyDamageLabelFrames = 0;
-        beamShake = 0f;
-    }
-
     /**
      * Touch only records what the player holds and presses. Whether a press starts an
      * attack is decided by the engine (buffer, state machine and cancel windows).
@@ -1595,8 +1582,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case DEBUG_TOGGLE:
                     debugOverlay = !debugOverlay;
                     break;
-                case DEMO:
-                    toggleDemo(ControlsLayout.demoAt(x, y));
+                case CHARACTER_SELECT:
+                    openCharacterSelect();
                     break;
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
