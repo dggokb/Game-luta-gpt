@@ -1,0 +1,71 @@
+name: Game Luta Latest + Motor V2 - Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - game-luta-sprite-pc-v2-sync
+    paths:
+      - 'pc/**'
+      - 'android/app/src/main/java/**'
+      - 'android/app/src/main/res/drawable-nodpi/**'
+      - 'characters/**'
+      - 'tools/sprites/**'
+      - '.github/workflows/build-pc-latest-v2.yml'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify latest game roster and Motor V2 source
+        shell: pwsh
+        run: |
+          if (!(Test-Path android/app/src/main/java/com/gamelutagpt/CharacterSelect.java)) { throw 'Character select absent' }
+          if (!(Test-Path android/app/src/main/res/drawable-nodpi/p05_idle.png)) { throw 'P05 art absent' }
+          if (!(Test-Path android/app/src/main/res/drawable-nodpi/p06_idle.png)) { throw 'P06 art absent' }
+          if (!(Test-Path android/app/src/main/java/com/gamelutagpt/GeneratedSpriteTransitions.java)) { throw 'Motor V2 maps absent' }
+      - name: Compile desktop port
+        shell: pwsh
+        run: gradle -p pc clean jar --stacktrace --no-daemon
+
+      - name: Validate sprite packs
+        shell: pwsh
+        run: |
+          python -m pip install -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
+          python tools/sprites/build_characters.py --check
+          python -m unittest discover -s tools/sprites/tests -p test_autonomous_transitions.py -v
+          python -m unittest discover -s tools/sprites/tests -p test_quality_guard.py -v
+
+      - name: Package portable Windows app
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path pc/build/package | Out-Null
+          jpackage --type app-image --name GameLutaSpriteGPT --input pc/build/libs --main-jar game-luta-sprite-pc.jar --main-class com.gamelutagpt.DesktopLauncher --dest pc/build/package
+          Compress-Archive -Path pc/build/package/GameLutaSpriteGPT -DestinationPath pc/build/GameLutaSpriteGPT-Windows-Latest-V2.zip -Force
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaSpriteGPT-Windows-Latest-V2
+          path: pc/build/GameLutaSpriteGPT-Windows-Latest-V2.zip
+          if-no-files-found: error

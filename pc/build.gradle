@@ -1,0 +1,30 @@
+plugins { id 'application' }
+repositories { mavenCentral() }
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
+application { mainClass = 'com.gamelutagpt.DesktopLauncher' }
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src/main/java',
+        '../android/app/src/main/java',
+        '../android/render-core/src/main/java',
+        '../android/stage-core/src/main/java',
+        '../android/ultra-core/src/main/java']
+      exclude 'com/gamelutagpt/MainActivity.java'
+    }
+    resources { srcDirs = ['src/main/resources', '../android/app/src/main/assets'] }
+  }
+}
+tasks.named('processResources') {
+  from('../android/app/src/main/res/drawable-nodpi') {
+    into 'drawable'
+    include '*.png'
+    include '*.webp'
+  }
+}
+tasks.named('jar') {
+  archiveBaseName = 'game-luta-sprite-pc'
+  manifest { attributes 'Main-Class': application.mainClass.get() }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
