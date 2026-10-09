@@ -1,0 +1,18 @@
+{
+  "frames": 76,
+  "missing": [],
+  "dimensions": [
+    [
+      1254,
+      1254
+    ]
+  ],
+  "all_rgba": true,
+  "all_transparent": true,
+  "unique_hashes": 76,
+  "silhouette_iou_min": 0.666667,
+  "silhouette_iou_mean": 0.777584302631579,
+  "silhouette_iou_max": 0.826987,
+  "status": "requires_pose_and_temporal_review",
+  "generation_errors": 0
+}
