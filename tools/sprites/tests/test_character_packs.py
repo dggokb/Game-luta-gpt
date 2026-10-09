@@ -409,7 +409,7 @@ class BuiltPackTests(unittest.TestCase):
 
     def test_player_base_crouch_light_is_a_real_declarative_move(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_light.report.json').read_text())
-        self.assertEqual([384,256,140,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual([768,512,280,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         self.assertEqual(11,report['layout']['frameCount'])
         self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
@@ -418,7 +418,7 @@ class BuiltPackTests(unittest.TestCase):
 
     def test_player_base_crouch_medium_uses_wide_authored_prepared_grid(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_medium.report.json').read_text())
-        self.assertEqual([512,256,250,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual([1024,512,500,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         self.assertEqual(16,report['layout']['frameCount'])
         self.assertTrue(all(frame['minimumMargin'] >= 8 for frame in report['frames']))
         self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
