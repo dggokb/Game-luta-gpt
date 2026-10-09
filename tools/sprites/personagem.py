@@ -164,6 +164,8 @@ def crouch_frames(d):
 def knockdown_frames(d):
     h = d['info'][:, 0] - d['info'][:, 1]
     lying = np.nonzero(h < 0.45 * h[0])[0]
+    if not len(lying):  # deitado com as pernas para cima: o mais baixo do vídeo
+        lying = np.nonzero(h <= h.min() + 0.15 * (h[0] - h.min()))[0]
     l0, l1 = lying[0], lying[-1]
     s, e = segment(d)
     falling = np.nonzero(h[:l0] < 0.85 * h[0])[0]  # começa já caindo, não em pé
