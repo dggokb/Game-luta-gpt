@@ -11,8 +11,19 @@ final class GeneratedCharacters {
  static CharacterDefinition defaultCharacter() { return get("player_base"); }
  static CharacterDefinition opponentCharacter() { return get(OPPONENT); }
  private static Map<String,CharacterDefinition> build() {
- Map<String,CharacterDefinition> all=new LinkedHashMap<>();
- {
+  Map<String,CharacterDefinition> all=new LinkedHashMap<>();
+  loadCharacter0(all);
+  loadCharacter1(all);
+  loadCharacter2(all);
+  loadCharacter3(all);
+  loadCharacter4(all);
+  loadCharacter5(all);
+  loadCharacter6(all);
+  loadCharacter7(all);
+  loadCharacter8(all);
+  return Collections.unmodifiableMap(all);
+ }
+ private static void loadCharacter0(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -48,7 +59,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("ROAR"));
  all.put("monster_npc",new CharacterDefinition("monster_npc","Brutamonte",new CharacterVisualProfile("monster_npc",256,256,128.00000000f,248.00000000f,1.40000000f),1,295.40000000f,247.80000000f,new CharacterDefinition.Fighter(0xFFD9485F,10000,new String[]{},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(650).frames(6,1,11).stun(20,14,6).windows(AttackDefinition.window(6,17),AttackDefinition.window(6,17),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),560.00000000f,980.00000000f,100.00000000f,110.00000000f,90.00000000f,110.00000000f),new int[]{5,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(2850).frames(35,1,25).stun(30,20,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1320.00000000f,1280.00000000f,120.00000000f,115.00000000f,115.00000000f,115.00000000f),new CharacterDefinition.Body(78.00000000f,290.00000000f,240.00000000f,64.00000000f,130.00000000f),null,null),a,m,s,sm));
  }
- {
+ private static void loadCharacter1(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -113,7 +124,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("p02",new CharacterDefinition("p02","p02",new CharacterVisualProfile("p02",256,256,128.00000000f,238.00000000f,1.07500000f),1,223.60000000f,211.77500000f,new CharacterDefinition.Fighter(0xFF3FA7D6,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(12,1,22).stun(31,25,6).windows(AttackDefinition.window(12,34),AttackDefinition.window(12,34),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,61.00000000f,80.00000000f,63.00000000f,80.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(70,1,50).stun(55,45,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,76.00000000f,83.00000000f,83.00000000f,80.00000000f),new CharacterDefinition.Body(34.00000000f,141.00000000f,88.00000000f,29.00000000f,117.00000000f),null,"S").withWakeup(37),a,m,s,sm));
  }
- {
+ private static void loadCharacter2(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -178,7 +189,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("p03",new CharacterDefinition("p03","p03",new CharacterVisualProfile("player_base",256,256,128.00000000f,238.00000000f,1.07500000f),1,241.87500000f,238.65000000f,new CharacterDefinition.Fighter(0xFFD8323C,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(6,1,11).stun(20,14,6).windows(AttackDefinition.window(6,17),AttackDefinition.window(6,17),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,67.00000000f,88.00000000f,70.00000000f,88.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(70,1,50).stun(55,45,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,84.00000000f,92.00000000f,92.00000000f,88.00000000f),new CharacterDefinition.Body(37.00000000f,156.00000000f,97.00000000f,32.00000000f,129.00000000f),null,"S").withWakeup(43),a,m,s,sm));
  }
- {
+ private static void loadCharacter3(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -243,7 +254,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("p04",new CharacterDefinition("p04","p04",new CharacterVisualProfile("p04",256,256,128.00000000f,238.00000000f,1.07500000f),1,231.12500000f,231.12500000f,new CharacterDefinition.Fighter(0xFFE0A526,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(11,1,21).stun(30,24,6).windows(AttackDefinition.window(11,32),AttackDefinition.window(11,32),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,63.00000000f,82.00000000f,66.00000000f,82.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(70,1,50).stun(55,45,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,79.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(35.00000000f,146.00000000f,91.00000000f,30.00000000f,121.00000000f),null,"S").withWakeup(47),a,m,s,sm));
  }
- {
+ private static void loadCharacter4(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -308,7 +319,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("p05",new CharacterDefinition("p05","p05",new CharacterVisualProfile("p05",256,256,128.00000000f,238.00000000f,1.07500000f),1,228.97500000f,224.67500000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(11,1,20).stun(29,23,6).windows(AttackDefinition.window(11,31),AttackDefinition.window(11,31),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,60.00000000f,79.00000000f,63.00000000f,79.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(70,1,50).stun(55,45,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,75.00000000f,83.00000000f,83.00000000f,79.00000000f),new CharacterDefinition.Body(33.00000000f,140.00000000f,87.00000000f,29.00000000f,116.00000000f),null,"S"),a,m,s,sm));
  }
- {
+ private static void loadCharacter5(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -373,7 +384,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("p06",new CharacterDefinition("p06","p06",new CharacterVisualProfile("p06",256,256,128.00000000f,238.00000000f,1.07500000f),1,245.10000000f,237.57500000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(12,1,22).stun(31,25,6).windows(AttackDefinition.window(12,34),AttackDefinition.window(12,34),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,66.00000000f,86.00000000f,68.00000000f,86.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(70,1,50).stun(55,45,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,82.00000000f,90.00000000f,90.00000000f,86.00000000f),new CharacterDefinition.Body(36.00000000f,153.00000000f,95.00000000f,31.00000000f,126.00000000f),null,"S").withWakeup(33),a,m,s,sm));
  }
- {
+ private static void loadCharacter6(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -438,7 +449,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("p07",new CharacterDefinition("p07","p07",new CharacterVisualProfile("p07",256,256,128.00000000f,238.00000000f,1.07500000f),1,231.12500000f,231.12500000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(12,1,22).stun(31,25,6).windows(AttackDefinition.window(12,34),AttackDefinition.window(12,34),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,65.00000000f,86.00000000f,68.00000000f,86.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(70,1,50).stun(55,45,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,82.00000000f,90.00000000f,90.00000000f,86.00000000f),new CharacterDefinition.Body(36.00000000f,152.00000000f,94.00000000f,31.00000000f,126.00000000f),null,"S"),a,m,s,sm));
  }
- {
+ private static void loadCharacter7(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -503,7 +514,7 @@ final class GeneratedCharacters {
  s.put("SUPER",a.get("SUPER_WAVE"));
  all.put("player_base",new CharacterDefinition("player_base","Lutador base",new CharacterVisualProfile("player_base",256,256,128.00000000f,238.00000000f,1.07500000f),1,240.80000000f,239.72500000f,new CharacterDefinition.Fighter(0xFFF4B73B,10000,new String[]{"L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(850).frames(6,1,11).stun(20,14,6).windows(AttackDefinition.window(6,17),AttackDefinition.window(6,17),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),720.00000000f,760.00000000f,67.00000000f,88.00000000f,70.00000000f,88.00000000f),new int[]{3,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(3200).frames(35,1,25).stun(30,20,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1450.00000000f,1180.00000000f,84.00000000f,92.00000000f,92.00000000f,88.00000000f),new CharacterDefinition.Body(37.00000000f,156.00000000f,97.00000000f,32.00000000f,129.00000000f),null,"S"),a,m,s,sm));
  }
- {
+ private static void loadCharacter8(Map<String,CharacterDefinition> all) {
  Map<String,CharacterDefinition.Animation> a=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Move> m=new LinkedHashMap<>();
  Map<String,CharacterDefinition.Animation> s=new LinkedHashMap<>();
@@ -532,7 +543,5 @@ final class GeneratedCharacters {
  m.put("jM",new CharacterDefinition.Move("jM",null,"AIR",new AttackDefinition.Builder("jM",AttackDefinition.Kind.NORMAL).damage(500).frames(6,4,6).stun(16,12,7).windows(AttackDefinition.window(6,12),AttackDefinition.window(6,12),null).cancelInto("jH").pushback(20.00000000f,26.00000000f).reach(116.00000000f,78.00000000f).build()));
  m.put("jH",new CharacterDefinition.Move("jH",null,"AIR",new AttackDefinition.Builder("jH",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9).stun(18,14,9).windows(null,null,null).launch(AttackDefinition.Launch.GROUND_BOUNCE).knockback(30.00000000f).pushback(28.00000000f,34.00000000f).juggleCost(2).reach(148.00000000f,78.00000000f).build()));
  all.put("player_two",new CharacterDefinition("player_two","Lutador Teste 2",new CharacterVisualProfile("player_two",384,256,192.00000000f,246.00000000f,1.00000000f),1,227.00000000f,151.00000000f,new CharacterDefinition.Fighter(0xFF4ACDE8,10000,new String[]{"L","L","M","H"},new CharacterDefinition.Projectile(new AttackDefinition.Builder("S",AttackDefinition.Kind.PROJECTILE).damage(650).frames(6,1,11).stun(20,14,6).windows(AttackDefinition.window(6,17),AttackDefinition.window(6,17),null).cancelInto("SUPER").pushback(40.00000000f,50.00000000f).maxUsesPerCombo(2).build(),560.00000000f,980.00000000f,62.00000000f,82.00000000f,65.00000000f,82.00000000f),new int[]{5,1},new CharacterDefinition.Projectile(new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER).damage(2850).frames(35,1,25).stun(30,20,12).windows(null,null,null).pushback(60.00000000f,60.00000000f).build(),1320.00000000f,1280.00000000f,78.00000000f,86.00000000f,86.00000000f,82.00000000f),new CharacterDefinition.Body(34.00000000f,145.00000000f,90.00000000f,30.00000000f,120.00000000f),null,"H"),a,m,s,sm));
- }
- return Collections.unmodifiableMap(all);
  }
 }
