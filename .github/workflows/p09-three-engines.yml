@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: p09-three-engines
@@ -63,6 +63,26 @@ jobs:
       - name: Android unit tests and test APK
         working-directory: android
         run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+      - name: Persist validated P09 and P12 assets in test branch
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- characters/p09/character.json characters/p12/character.json characters/roster.json
+          git add -- tools/sprites/profiles/p09.json tools/sprites/profiles/p12.json
+          git add -- tools/sprites/clips/p09_pilot_idle.json tools/sprites/clips/p12_pilot_idle.json
+          git add -- art/sprites/source/p09_pilot_idle_original.png art/sprites/source/p09_pilot_idle_sr2x.png
+          git add -- art/sprites/source/p12_pilot_idle_original.png art/sprites/source/p12_pilot_idle_sr2x.png
+          git add -- tools/sprites/reports/p09_pilot_idle.report.json tools/sprites/reports/p12_pilot_idle.report.json
+          git add -- android/app/src/main/res/drawable-nodpi/p09_pilot_idle.png android/app/src/main/res/drawable-nodpi/p12_pilot_idle.png
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add -- android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          git diff --cached --check
+          if ! git diff --cached --quiet; then
+            git commit -m "Persist validated P09 and P12 three-engine test assets [skip ci]"
+            git push origin HEAD:test/p09-three-engines-20261009
+          fi
       - name: Upload P09 and P12 APK for manual test
         uses: actions/upload-artifact@v4
         with:
