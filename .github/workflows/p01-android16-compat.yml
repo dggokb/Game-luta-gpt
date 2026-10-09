@@ -1,4 +1,4 @@
-name: P01 Android 16 Startup Compatibility
+name: P01 FIX v0.88 Android 16 Startup
 on:
   push:
     branches: [teste-motor-sprite]
@@ -18,7 +18,7 @@ jobs:
       - name: Download exact P01 debug APK from already verified build
         uses: actions/download-artifact@v4
         with:
-          run-id: 37872273503
+          run-id: 37911474883
           name: P01-Motor-Sprite-V2-Android-APK
           path: android/app/build/outputs/apk/debug
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -26,6 +26,8 @@ jobs:
         run: |
           ls -lh android/app/build/outputs/apk/debug/
           test -s android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Install screenshot verifier
+        run: python3 -m pip install --disable-pip-version-check pillow numpy
       - name: Android 16 emulator acceleration
         run: |
           test -c /dev/kvm
