@@ -53,6 +53,7 @@ Fichas completas (golpes, lista de animações e prompts):
 - [p06](p06.md)
 - [p07](p07.md)
 - [p08](p08.md)
+- [p09](p09.md)
 
 ## Método de animação
 
