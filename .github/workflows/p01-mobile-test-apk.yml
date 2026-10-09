@@ -83,6 +83,15 @@ jobs:
           disable-animations: true
           script: |
             set -eu
+            mkdir -p android/app/build/p01-test-mobile
+            capture() {
+              timeout 15s adb logcat -d -v time > android/app/build/p01-test-mobile/startup-logcat.txt || true
+              timeout 15s adb shell dumpsys activity activities > android/app/build/p01-test-mobile/activities.txt || true
+              timeout 15s adb exec-out screencap -p > p01-motor-v2-screen.png || true
+              timeout 15s adb shell uiautomator dump /sdcard/window.xml || true
+              timeout 15s adb shell cat /sdcard/window.xml > p01-motor-v2-ui.xml || true
+            }
+            trap capture EXIT
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb logcat -c
             adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
@@ -104,11 +113,12 @@ jobs:
             print("Game screenshot colored-pixel fraction",round(fraction,3))
             assert fraction>.06, "Screenshot seems blank or monochrome ANR dialog, not the fighting game"
             PY
-      - name: Export Android startup crash logs
+      - name: Show on-failure logs if collected
         if: always()
         run: |
-          mkdir -p android/app/build/p01-test-mobile/
-          adb logcat -d -v time -s AndroidRuntime:E ActivityManager:E SpriteAtlasCache:D GameView:D > android/app/build/p01-test-mobile/startup-logcat.txt || true
+          if test -s android/app/build/p01-test-mobile/startup-logcat.txt; then
+            grep -E 'FATAL EXCEPTION|OutOfMemory|com.gamelutagpt|am_anr|ANR in|not responding' android/app/build/p01-test-mobile/startup-logcat.txt | tail -n 100 || true
+          fi
       - name: Upload screenshot and quality report
         if: always()
         uses: actions/upload-artifact@v4
