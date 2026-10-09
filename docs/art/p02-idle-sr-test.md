@@ -1,6 +1,6 @@
 # P02: idle com super-resolução para teste
 
-Branch `test/p02-idle-sr-20261009`, baseada na `game-luta-sprite-gpt` em `f141c542607e7b642c4d40e256d25d45039ad51b`. O P01 com idle e caminhada melhorados permanece intacto. A branch principal não foi modificada neste teste do P02. Aprovação visual pendente. Nenhum APK foi solicitado.
+Integrado na `game-luta-sprite-gpt`, nossa branch de testes, em 09/10/2026 a pedido do usuário. O teste original está em `test/p02-idle-sr-20261009`, commit `5dfaf8f830931ddfb0b134984c74be11d727d22a`, baseado em `f141c542607e7b642c4d40e256d25d45039ad51b`. O P01 com idle e caminhada melhorados permanece intacto. Aprovação visual do P02 pendente. Nenhum APK gerado para esta integração.
 
 ## Método e resultado
 
@@ -20,7 +20,7 @@ Original preservado e declarado em `sourceReferences`. A receita original do ví
 
 ## Validação
 
-`build_characters.py --write`: PASS, 10 personagens e 310 atlases. 14 BuiltPackTests passaram, incluindo teste específico do P02: 56 alphas, proporções, root, sequência, duração, densidade, proveniência e orçamento de memória, mais regressões do P01. `git diff --check`: PASS.
+`build_characters.py --write` e `--check`: PASS, 10 personagens e 310 atlases. 14 BuiltPackTests passaram, incluindo teste específico do P02: 56 alphas, proporções, root, sequência, duração, densidade, proveniência e orçamento de memória, mais regressões do P01. `git diff --check`: PASS.
 
 Diagnóstico temporal em resolução original, sobre pixels conjuntamente opacos, incluindo 055→000: diferença RGB média de 5,176934 no original e 5,477865 no resultado reduzido. Não há compensação de movimento; a métrica não garante ausência de tremulação. A reconstrução altera linhas e cores internas; a aprovação visual deve ser feita na comparação e no jogo.
 
@@ -33,4 +33,4 @@ python tools/sprites/prepare_p02_idle_sr.py --frames PASTA_MASTERS --manifest do
 python tools/sprites/build_characters.py --write
 ```
 
-Para testar no jogo, gerar o APK desta branch em outro fluxo, selecionar `p02` e observar olhos, cabelo, mãos e faixa na transição 055→000 e na passagem entre idle e movimento. `player_two` é outro pacote; selecionar `p02` para este teste.
+Para testar no jogo, gerar o APK da `game-luta-sprite-gpt` em outro fluxo, selecionar `p02` e observar olhos, cabelo, mãos e faixa na transição 055→000 e na passagem entre idle e movimento. `player_two` é outro pacote; selecionar `p02` para este teste.
