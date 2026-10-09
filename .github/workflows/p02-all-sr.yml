@@ -1,0 +1,108 @@
+name: P02 complete sprite super-resolution
+
+on:
+  push:
+    branches:
+      - test/p02-all-sr-20261009
+    paths:
+      - .github/workflows/p02-all-sr.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install inventory dependency
+        run: python -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - id: plan
+        name: Check the 37 pending P02 animation sheets; preserve existing upgraded idle
+        run: python tools/sprites/p02_sr_batch.py plan
+
+  render:
+    needs: inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PyTorch CPU and sprite dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install --disable-pip-version-check "Pillow==12.3.0" numpy scipy
+      - name: Retrieve official Real-ESRGAN AnimeVideo-v3 model
+        run: |
+          curl --retry 3 -fLsS "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth" -o /tmp/realesr-animevideov3.pth
+      - name: Enhance P02 animation retaining alpha and animation order
+        run: python tools/sprites/p02_sr_batch.py render --clip "${{ matrix.clip }}" --weights /tmp/realesr-animevideov3.pth --output-dir /tmp/p02-hd-outputs
+      - name: Upload HD animation and provenance manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-${{ matrix.clip }}
+          path: /tmp/p02-hd-outputs/
+          if-no-files-found: error
+          retention-days: 30
+
+  integrate:
+    needs: [inventory, render]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install sprite pack dependency
+        run: python -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - name: Collect the 37 individual P02 animation results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: p02-p02_*
+          merge-multiple: true
+          path: /tmp/p02-hd-outputs
+      - name: Validate frame alpha, pack all 37 atlases and run sprite tests
+        run: |
+          python tools/sprites/p02_sr_batch.py integrate --input-dir /tmp/p02-hd-outputs
+          git diff --check
+      - name: Publish full results to test branch only if all tests pass
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- 'tools/sprites/clips/p02_*.json'
+          git add -- 'art/sprites/source/p02_*_sr_hd.png'
+          git add -- 'android/app/src/main/res/drawable-nodpi/p02_*.png'
+          git add -- 'tools/sprites/reports/p02_*.report.json'
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add -- android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          git add -- docs/art/p02-all-sr-results.json
+          git diff --cached --check
+          git commit -m "Integrate 37 P02 high-definition animation atlases after all tests [skip ci]"
+          git push origin HEAD:test/p02-all-sr-20261009
+      - name: Store combined P02 test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P02-All-Sprite-SR-Validation
+          path: |
+            docs/art/p02-all-sr-results.json
+            tools/sprites/reports/p02_*.report.json
+          if-no-files-found: warn
