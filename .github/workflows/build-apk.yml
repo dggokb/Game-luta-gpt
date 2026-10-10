@@ -45,6 +45,10 @@ jobs:
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         run: python3 tools/sprites/repair_p01_heavy_art.py --apply
 
+      - name: Restore torn P01 2H artwork before packaging
+        if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
+        run: python3 tools/sprites/repair_p01_crouch_heavy.py --apply
+
       - name: Verify P01 geometry and generate sprite review
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         run: python3 tools/sprites/qa_p01_visual.py
