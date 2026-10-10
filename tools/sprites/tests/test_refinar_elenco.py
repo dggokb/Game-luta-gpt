@@ -98,6 +98,7 @@ class CharacterStabilizerTest(unittest.TestCase):
             keys.mkdir(parents=True)
             (keys/"tamanho.json").write_text(json.dumps({
                 "altura":224,"chaves":{"inicio_centro":.5}}))
+            (keys/"inicio_centro.png").write_bytes(b"dummy image: metadata check only")
             videos=root/"animations"/"p01"
             videos.mkdir(parents=True)
             (videos/"idle.mp4").touch()
