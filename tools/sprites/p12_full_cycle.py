@@ -388,7 +388,7 @@ def prepare(weights):
             px=x+8+j*99+(88-crop.width)//2;py=y+22+(94-crop.height)//2
             sheet.paste(crop,(px,py),crop)
     sheet.save(RESULTS/"p12-all-actions-contact-sheet.png")
-    print("P12 ALL STATES PREPARED: "+str(len(manifest["states"]))+" distinct action clips",flush=True)
+    print("P12 IDLE-WARP PROTOTYPE PREPARED: "+str(len(manifest["states"]))+" state clips, NOT genuine action poses",flush=True)
 
 
 def verify():
@@ -434,7 +434,7 @@ def verify():
             if (delta>64).sum()<180:
                 raise ValueError(state+": has no identifiable peak-action motion")
         print(f"P12 VERIFY {state}: {n} distinct-validated SR frames",flush=True)
-    print("P12 FULL CYCLE VERIFIED: all animations have own art and correct alpha.")
+    print("P12 TECHNICAL ATLAS PASS ONLY: RGBA, frame maps and hashes; action semantics NOT verified.")
 
 
 def audit():
@@ -449,7 +449,7 @@ def audit():
         "harmony_issues":issues,
         "visual_audit":detailed,
         "visual_errors":[x for x in detailed if x["level"]=="erro"],
-        "quality_caveat":"True sprite actions with articulated warp; not hand-authored frames"
+        "quality_caveat":"REJECTED: synthesized warps from idle master are NOT genuine action poses; independent artwork required"
     }
     write_json(RESULTS/"audit.json",summary)
     if not rows:raise SystemExit("P12 harmony has no frames")
@@ -457,6 +457,9 @@ def audit():
     print("P12 AUDIT: "+str(len(rows))+" frame samples, "+str(len(issues))+
           " harmony findings, "+str(len(summary["visual_errors"]))+
           " detailed findings. Review report.",flush=True)
+    if issues or summary["visual_errors"]:
+        raise SystemExit("P12 ART REJECTED: harmony/visual defects are blocking errors. "
+                         "Do not mark the character complete or publish its APK.")
 
 
 if __name__=="__main__":
