@@ -200,13 +200,16 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
     indices=anim.get("frames",[])
     if not indices:
         return []
-    sample_ids=[min(len(indices)-1,round((len(indices)-1)*ratio))
-                for ratio in selection]
+    # Original-video selection percentages cannot be applied to the
+    # already isolated atlas clip. FALL's 6 frames, for example, represent
+    # the FULL descent, not just the last third of jump.mp4.
+    count=len(selection)
+    if count<1 or count>len(indices):
+        return []
+    sample_ids=[round(x) for x in np.linspace(0,len(indices)-1,count)]
     selected_frames=[indices[position] for position in sample_ids]
-    # Reused video/atlas cells are HOLDs, not independent evidence of a
-    # stable body scale. This is a proof gate, not a rendering error.
-    if (len(set(sample_ids))!=len(sample_ids) or
-            len(set(selected_frames))!=len(selected_frames)):
+    # Repeated cells are valid HOLDs but do not count as independent proof.
+    if len(set(sample_ids))!=count or len(set(selected_frames))!=count:
         return []
     with Image.open(file) as img:
         if w<=0 or h<=0 or cols<=0 or img.width!=w*cols or img.height%h:
