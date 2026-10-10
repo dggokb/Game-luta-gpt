@@ -1,0 +1,10 @@
+{
+  "state": "ULTRA_BEAM",
+  "count": 8,
+  "columns": 4,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in 4 columns and 2 rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action ULTRA_BEAM: 1 neutral; 2 very wide braced stance and torso coils back; 3 right arm thrusts forward RIGHT at chest height with fingers splayed, LEFT hand grips right forearm to brace it; 4 and 5 sustain intense one-handed beam-casting stance with left hand reinforcing the right arm, knees bent and face snarling; 6 exertion recoil with same arm direction; 7 lower arms; 8 neutral. Distinct braced one-hand ultra; no painted beam or aura. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "3bca6a06457f29683e009444b57b3a1ecf019e31"
+}
