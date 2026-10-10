@@ -16,6 +16,9 @@ public class P01HeavyLaunchRegressionTest {
         assertEquals(AttackDefinition.Launch.WALL_BOUNCE,h.launch);
         assertEquals(h.startupFrames/(float)h.totalFrames,
             art.timeOfFrame(10)/art.duration,0.03f);
+        assertEquals("Contact must actually show artwork frame 10",10,
+            art.frame(art.timeFor(h.startupFrames/(float)CombatConfig.FPS,
+                h.totalFrames/(float)CombatConfig.FPS),0f));
     }
 
     @Test public void lightMediumHeavyRemainsSameComboAndThrowsOpponentToWall() {

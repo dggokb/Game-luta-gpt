@@ -1,3 +1,5 @@
+P01 v0.89: sincronização exata do frame de contato visual 10 com a hitbox no frame de jogo 10, sem alterar a duração total do H. Teste automatizado exige o mesmo frame da arte no instante do golpe.
+
 ## Correção: o H volta a lançar no fim do combo (P01)
 
 O H tinha o startup aumentado de 10 para **23 frames** quando o refinamento
