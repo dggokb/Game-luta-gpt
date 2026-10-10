@@ -67,7 +67,10 @@ def normalized(name):
 def match_videos(folder, states):
     """Devolve matches determinísticos e conflitos explícitos, nunca um chute."""
     folder = Path(folder)
-    candidates = sorted(folder.glob("*.mp4")) if folder.is_dir() else []
+    candidates = (sorted((p for p in folder.iterdir()
+                          if p.is_file() and p.suffix.lower()==".mp4"),
+                         key=lambda p:(p.name.casefold(),p.name))
+                  if folder.is_dir() else [])
     index = {}
     for f in candidates:
         index.setdefault(normalized(f.stem), []).append(f)
