@@ -132,7 +132,12 @@ final class SpriteFighterRenderer {
     private void drawP01Calibrated(Canvas canvas,CharacterDefinition.Animation anim,
                                     int frame,float x,float baseY,int alpha) {
         float[] k=P01SpriteCalibration.get(anim.atlas.resource,frame);
-        drawAtlas(canvas,anim.atlas,frame,x+k[2],baseY+k[3],k[0],k[1],alpha);
+        float userScale=P01VisualTuning.scale(anim.atlas.resource);
+        // Scale the offsets as well, keeping grounded feet and lateral
+        // rooting intact at every adjustment (including mirrored sprites).
+        drawAtlas(canvas,anim.atlas,frame,
+            x+k[2]*userScale,baseY+k[3]*userScale,
+            k[0]*userScale,k[1]*userScale,alpha);
     }
 
     private void drawP01Idle(Canvas canvas,float x,float baseY,int alpha) {
