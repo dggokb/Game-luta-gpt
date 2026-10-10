@@ -561,19 +561,19 @@
         18,
         19,
         17,
-        17,
-        17,
-        16,
-        16,
-        17,
-        17,
-        17,
-        17,
-        16,
-        17,
-        16,
-        17,
-        16
+        60,
+        60,
+        56,
+        56,
+        60,
+        60,
+        60,
+        60,
+        56,
+        60,
+        56,
+        60,
+        56
       ],
       "impactFrame": 10
     },
@@ -1630,20 +1630,20 @@
       "animation": "HEAVY_STRAIGHT",
       "damage": 800,
       "reach": 159,
-      "startupFrames": 23,
-      "activeFrames": 9,
-      "recoveryFrames": 20,
+      "startupFrames": 10,
+      "activeFrames": 5,
+      "recoveryFrames": 37,
       "hitstunFrames": 18,
       "blockstunFrames": 11,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          23,
-          33
+          10,
+          17
         ],
         "block": [
-          23,
-          33
+          10,
+          17
         ],
         "whiff": null
       },

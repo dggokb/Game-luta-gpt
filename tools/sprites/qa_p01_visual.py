@@ -78,9 +78,14 @@ def preview():
 def main():
     pack=json.loads(MANIFEST.read_text())
     h=pack["moves"]["H"]
-    assert (h["startupFrames"],h["activeFrames"],h["recoveryFrames"])==(23,9,20)
+    assert (h["startupFrames"],h["activeFrames"],h["recoveryFrames"])==(10,5,37)
     assert sum([h["startupFrames"],h["activeFrames"],h["recoveryFrames"]])==52
     assert len(pack["animations"]["HEAVY_STRAIGHT"]["frames"])==23
+    timings=pack["animations"]["HEAVY_STRAIGHT"]["durationsMs"]
+    impact_frame=pack["animations"]["HEAVY_STRAIGHT"]["impactFrame"]
+    impact_ratio=sum(timings[:impact_frame])/sum(timings)
+    contact_ratio=h["startupFrames"]/(h["startupFrames"]+h["activeFrames"]+h["recoveryFrames"])
+    assert abs(impact_ratio-contact_ratio)<0.02, (impact_ratio,contact_ratio)
     assert sum(pack["animations"]["RISE"]["durationsMs"])==150
     k=calibration("CROUCH")
     assert len(k)==8
@@ -104,7 +109,7 @@ def main():
     print("P01 visual test PASS: idle width",stand_w,
         "crouch",[round(v) for v in widths_c],"rise",[round(v) for v in widths_r],
         "intro end",[round(intro_w*ix[-1]),round(intro_h*iy[-1])],
-        "H 52 gameplay frames / 23 artwork frames")
+        "H 52 gameplay frames / H active at frame 10 / 23 artwork frames")
     preview()
 
 if __name__=="__main__":main()

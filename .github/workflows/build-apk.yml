@@ -78,6 +78,15 @@ jobs:
         working-directory: android
         run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
 
+      - name: Verify P01 H combo and wall bounce regressions
+        if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
+        working-directory: android
+        run: |
+          gradle :app:testDebugUnitTest \
+            --tests 'com.gamelutagpt.BounceTest.heavyInAComboBouncesOffTheWallAndCanBeFollowedUp' \
+            --tests 'com.gamelutagpt.CombatEngineTest.longComboInTheEngineIsScaled' \
+            --tests 'com.gamelutagpt.P01HeavyLaunchRegressionTest' --stacktrace
+
       - name: Build P01-only debug APK
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         working-directory: android

@@ -1,3 +1,20 @@
+## Correção: o H volta a lançar no fim do combo (P01)
+
+O H tinha o startup aumentado de 10 para **23 frames** quando o refinamento
+estético deveria ter alterado apenas a velocidade visual. O M concede 15 frames
+de reação: no combo L→M→H, o rival recuperava antes do H; o motor encerrava
+a sessão e não aplicava o lançamento de parede (condição
+`session.hitCount >= 2`). O H ainda parecia acertar, mas como um golpe
+isolado, sem wall bounce.
+
+Correção: startup 10, ativo 5, recuperação 37 (total 52 quadros a 60 FPS).
+O H continua visualmente mais longo, mas o contato volta a ocorrer no tempo
+certo do combo; durações dos 23 sprites ajustadas para o quadro de impacto
+coincidir com o frame 10 da simulação e a recuperação ficar mais lenta.
+Novos testes de regressão reais verificam L→M→H, mesma sessão de combo,
+lançamento de parede e sincronia do desenho. A compilação do APK de teste
+deve ser bloqueada se falharem.
+
 **Reparo visual direcionado do H:** inspeção dos PNGs revelou que
 o quadro 20 contém um trecho semitransparente no meio da coxa (RGB correto,
 alfa errado) e o 21 contém pernas/canela borradas e deformadas. Agora o 20
