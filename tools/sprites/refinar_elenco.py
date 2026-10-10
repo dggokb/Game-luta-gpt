@@ -270,7 +270,9 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                         for e0 in checks.values()))
     warnings=[state for state,v in checks.items()
               if v.get("video",{}).get("analise",{}).get("tremor") or
+                 v.get("video",{}).get("analise",{}).get("deslize") or
                  v.get("sprite",{}).get("tremor") or
+                 v.get("sprite",{}).get("deslize") or
                  v.get("diferenca_video_jogo") or
                  v.get("proporcao_video",{}).get("status")=="SUSPEITA_DE_ESCALA" or
                  v.get("proporcao_sprite",{}).get("status")=="SUSPEITA_DE_ESCALA" or
