@@ -165,7 +165,16 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                 evidence_video=vv[1] if len(vv)>=2 else None
             ss=g.read_sprite_samples(root,pack,"IDLE",selection=(.35,.50,.65))
             evidence_sprite=ss[1] if len(ss)>=2 else None
-    get_video=original_video_inspector or e.load_video
+    original_reader=original_video_inspector or e.load_video
+    # One invocation may inspect JUMP, FALL and LAND from the same MP4.
+    # Decode it ONCE per character; otherwise the engine reopens long videos
+    # and subtly increases memory/time with the number of derived states.
+    video_cache={}
+    def get_video(path):
+        k=str(Path(path).resolve())
+        if k not in video_cache:
+            video_cache[k]=original_reader(path)
+        return video_cache[k]
     get_pack=packed_inspector or e.load_atlas_state
     # A referência é sempre o idle do PRÓPRIO lutador, nunca de outro.
     idle_mapping=e.match_videos(videos_dir,["IDLE"])["IDLE"] if videos_dir else None
