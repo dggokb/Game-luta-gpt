@@ -1351,7 +1351,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // Opponent KO: the winner plays VICTORY once and holds its last pose.
             CharacterDefinition.Animation win = character.animations.get(SpriteStates.VICTORY);
             animation = SpriteStates.VICTORY;
-            animationElapsed = Math.min(win.duration - 0.0001f, victoryFrames[side]++ * FIXED_STEP);
+            // P01 source frames 0-6 include a walk toward the camera.
+            // Celebrate from the planted stance, frame 7, without translation.
+            boolean p01Victory = "player_base".equals(character.id) ||
+                "p01_training".equals(character.id);
+            float start = p01Victory ? win.timeOfFrame(7) : 0f;
+            animationElapsed = Math.min(win.duration - 0.0001f,
+                start + victoryFrames[side]++ * FIXED_STEP);
         } else {
             victoryFrames[side] = 0;
         }
