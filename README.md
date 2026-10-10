@@ -1,3 +1,20 @@
+## P01 v0.91 — 2H contínuo, ataques baixos e movimento global
+
+- P01 2L: 10 → 12 frames; 2M: 16 → 19 frames; 2H: 24 → 29 frames.
+  Só foi prolongada a recuperação. Os sprites após o impacto ficam mais
+  tempo na tela, sem mudar o instante da hitbox. O teste a 60 FPS verifica
+  que todos os 12 frames do 2H são exibidos na ordem, sem saltos.
+- Dash P01: 40 → 48 ms por sprite (20% mais lento), sem mudar
+  a velocidade de deslocamento.
+- Backdash de todos os personagens: ~152 → ~191 unidades de recuo
+  (+26%), com pequeno arco visual de 34 unidades de altura. Permanece
+  um backdash terrestre nas regras de defesa/colisão (não habilita ataques aéreos).
+- Pulo normal de todos: impulso inicial 660 → 700 unidades/s,
+  ápice ~132 → ~148 unidades, cerca de 12% mais alto. Superpulo inalterado.
+- Os testes verificam 2L/2M/2H, frames desenhados, dash, 2H lançando,
+  L→M→H lançando, e física compartilhada pelos personagens.
+- APK de teste: `0.91-p01-crouch-movement`.
+
 ## P01 v0.90 — ataques um pouco mais lentos (L, M, jL, jM, jH)
 
 Os 5 movimentos ganharam 10%–12,5% de duração de jogo **somente na recuperação**:
