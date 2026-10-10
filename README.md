@@ -1,3 +1,12 @@
+**Reparo visual direcionado do H:** inspeção dos PNGs revelou que
+o quadro 20 contém um trecho semitransparente no meio da coxa (RGB correto,
+alfa errado) e o 21 contém pernas/canela borradas e deformadas. Agora o 20
+tem a transparência do tecido restaurada apenas no polígono medido; o 21
+temporariamente reutiliza o quadro seguinte (22), visualmente íntegro.
+O reparo é idempotente e executa **antes do APK ser compilado**, além de ser
+persistido automaticamente na branch pelo job de arte. O QA compara os
+pixels desses quadros: não depende só do sucesso do compilador.
+
 ## P01 revisão geométrica (segunda tentativa)
 
 Este refinamento substitui o ajuste anterior por **medidas reais dos contornos

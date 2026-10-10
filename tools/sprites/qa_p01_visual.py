@@ -15,6 +15,10 @@ PREVIEW=ROOT/"android/app/build/sprite-review"
 CELLS={"idle":(331,476,10),"intro":(347,569,9),"crouch":(373,475,8),"rise":(370,460,6),"heavy_straight":(570,485,7)}
 
 def calibration(key):
+    # Confirm the actual previously-broken H thigh and silhouette pixels.
+    h20=cell("heavy_straight",20)
+    assert all(h20.getchannel("A").getpixel(p)==255 for p in [(314,251),(307,257),(327,263)]), "H20 still has a hole"
+    assert cell("heavy_straight",21).tobytes()==cell("heavy_straight",22).tobytes(), "H21 still has corrupted legs"
     java=JAVA.read_text()
     m=re.search(r"private static final float\[\]\s+P01_"+key+r"\s*=\s*\{([^}]+)\}",java,re.S)
     if not m:raise AssertionError("Missing renderer calibration "+key)
