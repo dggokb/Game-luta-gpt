@@ -198,11 +198,13 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         # proxies alone NEVER prove scale normalization.
         proof={"status":"INCONCLUSIVO",
                "motivo":"sem pares de imagens comparaveis com confianca"}
-        if evidence_video is not None and evidence_sprite is not None and \
-                matches["status"]=="ENCONTRADO" and \
+        if matches["status"]=="ENCONTRADO" and \
                 entry.get("sprite",{}).get("status")=="MEDIDO" and \
-                entry.get("video",{}).get("analise",{}).get("status")=="MEDIDO":
+                entry.get("video",{}).get("analise",{}).get("status")=="MEDIDO" and \
+                (geometry_inspector is not None or
+                 (evidence_video is not None and evidence_sprite is not None)):
             if geometry_inspector is not None:
+                # Unit-test seam; normal CLI never injects external approval.
                 proof=geometry_inspector(character,state)
             else:
                 slices={
@@ -245,7 +247,11 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
     warnings=[state for state,v in checks.items()
               if v.get("video",{}).get("analise",{}).get("tremor") or
                  v.get("sprite",{}).get("tremor") or
-                 v.get("diferenca_video_jogo")]
+                 v.get("diferenca_video_jogo") or
+                 v.get("proporcao_video",{}).get("status")=="SUSPEITA_DE_ESCALA" or
+                 v.get("proporcao_sprite",{}).get("status")=="SUSPEITA_DE_ESCALA" or
+                 v["prova_geometrica"]["status"] in ("ESCALA_DIVERGENTE",
+                                                       "INSTAVEL_GEOMETRICAMENTE")]
     # Mesmo com métricas boas, somente o *jogo em execução* pode validar
     # transições, câmera e tamanho renderizado. Nenhuma aprovação falsa.
     return {
@@ -258,8 +264,8 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         "referencia_sprite":idle_packed or {"status":"SEM_IDLE_VALIDADO"},
         "estados":checks,
         "pendentes_revisao":warnings,
-        "status":"PENDENTE_FONTES" if incomplete else
-                 ("ANOMALIAS_IDENTIFICADAS" if warnings else "MEDICOES_CONCLUIDAS"),
+        "status":"ANOMALIAS_IDENTIFICADAS" if warnings else
+                 ("PENDENTE_FONTES" if incomplete else "MEDICOES_CONCLUIDAS"),
         "aprovado_automaticamente":False,
         "validacao_runtime":"PENDENTE",
         "alteracoes_realizadas":0,
