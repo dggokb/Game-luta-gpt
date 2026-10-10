@@ -43,6 +43,21 @@ São reconhecidos aliases do Drive (como `m2(rasteira).mp4`,
 `backDash.mp4`, `vitoria.mp4`), com correspondência exata e
 ambiguidade sinalizada em vez de escolher aleatoriamente.
 
+## Evidência verificada nos arquivos originais do P01 (2026-10-10)
+
+Os MP4 reais `animations/p01/idle.mp4` e `animations/p01/vitoria.mp4`
+foram lidos diretamente da pasta do projeto no Drive. Em amostras com
+fundo verde segmentado, na mesma resolução de inspeção (640 × 360):
+
+- região superior/cabeça (*proxy*): idle ≈ **103 px**, vitória ≈ **54 px**;
+- região do tronco (*proxy*): idle ≈ **105 px**, vitória ≈ **57 px**.
+
+Ambas diferem na mesma direção (~0,52–0,54×), o que **sinaliza**
+variação significativa de escala já na fonte. Não é medição anatômica
+definitiva: vídeos têm poses e enquadramentos diferentes. É exatamente
+o caso para sinalizar `SUSPEITA_DE_ESCALA` e pedir calibração
+pela imagem-base, sem aumentar/reduzir todo o sprite automaticamente.
+
 ## Definição da escala
 
 NÃO igualar a bbox externa de cada pose à bbox externa do idle.
