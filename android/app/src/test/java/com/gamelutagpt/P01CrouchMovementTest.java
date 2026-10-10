@@ -82,8 +82,13 @@ public class P01CrouchMovementTest {
             e.step(in,enemy);
             if(e.fighter(0).attacking() && "2M".equals(e.fighter(0).attack.id))
                 mediumStarted=true;
-            ComboSession combo=e.session(1);
-            if(combo!=null)maxHits=Math.max(maxHits,combo.hitCount);
+            // A 2M knockdown ends the active combo in this same engine step.
+            // Inspect both the live and the finalized session, or we would
+            // report a false gap even for a confirmed 2-hit knockdown combo.
+            ComboSession live=e.session(1);
+            ComboSession finalized=e.lastSession(1);
+            if(live!=null)maxHits=Math.max(maxHits,live.hitCount);
+            if(finalized!=null)maxHits=Math.max(maxHits,finalized.hitCount);
         }
         assertTrue("2M should remain cancellable from 2L",mediumStarted);
         assertTrue("2L > 2M should remain one combo, observed "+maxHits,maxHits>=2);
