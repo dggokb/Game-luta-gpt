@@ -261,7 +261,9 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                         (geometria and e0["prova_geometrica"]["status"]!="PADRONIZADA_FONTE_ATLAS")
                         for e0 in checks.values()))
     warnings=[state for state,v in checks.items()
-              if v.get("video",{}).get("analise",{}).get("tremor") or
+              if v.get("video",{}).get("analise",{}).get("quadros_invalidos") or
+                 v.get("sprite",{}).get("quadros_invalidos") or
+                 v.get("video",{}).get("analise",{}).get("tremor") or
                  v.get("video",{}).get("analise",{}).get("deslize") or
                  v.get("sprite",{}).get("tremor") or
                  v.get("sprite",{}).get("deslize") or
@@ -283,7 +285,9 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         "estados":checks,
         "pendentes_revisao":warnings,
         "status":"ANOMALIAS_IDENTIFICADAS" if warnings else
-                 ("PENDENTE_FONTES" if incomplete else "MEDICOES_CONCLUIDAS"),
+                 ("DIAGNOSTICO_PRELIMINAR" if not geometria or not inspect_sprites
+                   else "PENDENTE_FONTES" if incomplete
+                   else "MEDICOES_CONCLUIDAS"),
         "aprovado_automaticamente":False,
         "validacao_runtime":"PENDENTE",
         "alteracoes_realizadas":0,
@@ -317,6 +321,9 @@ def main(argv=None):
           "inconclusivos:",sum(not s["evidencias_suficientes"] for s in result["estados"].values()),
           "anomalias:",len(result["pendentes_revisao"]))
     print("Relatório:",args.saida)
+    # The CLI is not a runtime certification. A read-only measurement may
+    # finish successfully only with a full independent geometric check;
+    # --sem-geometria must never mark CI green as though size were proved.
     return 0 if result["status"]=="MEDICOES_CONCLUIDAS" else 2
 
 
