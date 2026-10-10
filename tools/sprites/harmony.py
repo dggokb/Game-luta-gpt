@@ -75,10 +75,12 @@ def measure(cell, packed, scale):
     }
 
 
-def audit(root=ROOT):
-    """Returns (rows, problems) for every frame of every pack."""
+def audit(root=ROOT, only_characters=None):
+    """Returns (rows, problems); optionally restrict to named character IDs."""
     rows, problems, cache = [], [], {}
     for path in sorted((root / 'characters').glob('*/character.json')):
+        if only_characters is not None and path.parent.name not in only_characters:
+            continue
         pack = _read(path)
         scale = _read(root / 'tools/sprites/profiles' / pack['profile'])['worldScale']
         metrics = {}
