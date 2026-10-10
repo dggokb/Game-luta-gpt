@@ -473,15 +473,15 @@
       "durationsMs": [
         17,
         17,
-        17,
-        17,
-        17,
-        17,
-        13,
-        13,
-        13,
-        14,
-        14
+        20,
+        19,
+        19,
+        19,
+        15,
+        15,
+        15,
+        16,
+        16
       ],
       "impactFrame": 2
     },
@@ -508,17 +508,17 @@
         22,
         22,
         22,
+        24,
+        23,
+        23,
+        23,
+        23,
         20,
         20,
         20,
         20,
         20,
-        17,
-        17,
-        17,
-        17,
-        17,
-        17
+        20
       ],
       "impactFrame": 3
     },
@@ -881,11 +881,11 @@
       "durationsMs": [
         30,
         35,
-        40,
-        17,
-        15,
-        15,
-        15
+        44,
+        21,
+        18,
+        18,
+        18
       ],
       "impactFrame": 2
     },
@@ -904,11 +904,11 @@
       "durationsMs": [
         55,
         40,
-        80,
-        25,
-        25,
-        22,
-        20
+        87,
+        32,
+        32,
+        28,
+        26
       ],
       "impactFrame": 2
     },
@@ -927,11 +927,11 @@
       "durationsMs": [
         80,
         65,
-        110,
-        40,
-        35,
-        35,
-        35
+        120,
+        50,
+        45,
+        45,
+        45
       ],
       "impactFrame": 2
     },
@@ -1567,7 +1567,7 @@
       "reach": 90,
       "startupFrames": 2,
       "activeFrames": 4,
-      "recoveryFrames": 4,
+      "recoveryFrames": 5,
       "hitstunFrames": 12,
       "blockstunFrames": 9,
       "hitstopFrames": 5,
@@ -1599,7 +1599,7 @@
       "reach": 125,
       "startupFrames": 4,
       "activeFrames": 6,
-      "recoveryFrames": 6,
+      "recoveryFrames": 8,
       "hitstunFrames": 15,
       "blockstunFrames": 12,
       "hitstopFrames": 7,
@@ -1755,7 +1755,7 @@
       "reach": 90,
       "startupFrames": 4,
       "activeFrames": 2,
-      "recoveryFrames": 4,
+      "recoveryFrames": 5,
       "hitstunFrames": 14,
       "blockstunFrames": 10,
       "hitstopFrames": 5,
@@ -1786,7 +1786,7 @@
       "reach": 125,
       "startupFrames": 6,
       "activeFrames": 4,
-      "recoveryFrames": 6,
+      "recoveryFrames": 8,
       "hitstunFrames": 16,
       "blockstunFrames": 12,
       "hitstopFrames": 7,
@@ -1815,7 +1815,7 @@
       "reach": 159,
       "startupFrames": 9,
       "activeFrames": 6,
-      "recoveryFrames": 9,
+      "recoveryFrames": 12,
       "hitstunFrames": 18,
       "blockstunFrames": 14,
       "hitstopFrames": 9,

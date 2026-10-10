@@ -1,3 +1,16 @@
+## P01 v0.90 — ataques um pouco mais lentos (L, M, jL, jM, jH)
+
+Os 5 movimentos ganharam 10%–12,5% de duração de jogo **somente na recuperação**:
+L 10→11 frames, M 16→18, jL 10→11, jM 16→18, jH 24→27.
+Startup, frames ativos, dano, hitstun, hitstop, alcance, lançamento e
+cancelamento não foram alterados. Os tempos individuais dos sprites após o
+frame de impacto aumentaram proporcionalmente, mantendo **o mesmo instante
+em que a pose de contato aparece**. Os quadros originais não foram redesenhados.
+
+A CI executa `P01AttackPacingTest` e a regressão anterior
+`P01HeavyLaunchRegressionTest` para preservar L→M→H e wall bounce.
+Identificação do APK: `0.90-p01-lm-air-pacing`.
+
 P01 v0.89: sincronização exata do frame de contato visual 10 com a hitbox no frame de jogo 10, sem alterar a duração total do H. Teste automatizado exige o mesmo frame da arte no instante do golpe.
 
 ## Correção: o H volta a lançar no fim do combo (P01)
