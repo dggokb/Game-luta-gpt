@@ -86,7 +86,10 @@ jobs:
             --tests 'com.gamelutagpt.BounceTest.heavyInAComboBouncesOffTheWallAndCanBeFollowedUp' \
             --tests 'com.gamelutagpt.CombatEngineTest.longComboInTheEngineIsScaled' \
             --tests 'com.gamelutagpt.P01HeavyLaunchRegressionTest' \
-            --tests 'com.gamelutagpt.P01AttackPacingTest' --stacktrace
+            --tests 'com.gamelutagpt.P01AttackPacingTest' \
+            --tests 'com.gamelutagpt.P01CrouchMovementTest' \
+            --tests 'com.gamelutagpt.GlobalMovementTuningTest' \
+            --tests 'com.gamelutagpt.CombatEngineTest.launcherConfirmCancelsIntoSuperJumpChase' --stacktrace
 
       - name: Build P01-only debug APK
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
