@@ -1,9 +1,8 @@
 name: P09 and P12 pilots - character, audit and graphic SR
 
+# The automated branch pipeline is now p12-full-cycle.yml.
+# Preserve this legacy pilot as a manual diagnostic only.
 on:
-  push:
-    branches:
-      - test/p09-three-engines-20261009
   workflow_dispatch:
 
 permissions:
