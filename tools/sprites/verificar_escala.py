@@ -143,9 +143,14 @@ def read_video_samples(path,selection=(.16,.28,.40,.52,.64,.76,.88)):
         count=int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         if count<8:
             return []
+        indices=[max(0,min(count-1,int((count-1)*fraction)))
+                 for fraction in selection]
+        # One video frame cannot count as several independent proofs.
+        if len(indices)!=len(set(indices)):
+            return []
         samples=[]
-        for fraction in selection:
-            cap.set(cv2.CAP_PROP_POS_FRAMES,max(0,min(count-1,int((count-1)*fraction))))
+        for position in indices:
+            cap.set(cv2.CAP_PROP_POS_FRAMES,position)
             ok,frame=cap.read()
             if not ok:
                 return []  # Never silently omit a hard frame.
@@ -195,6 +200,14 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
     indices=anim.get("frames",[])
     if not indices:
         return []
+    sample_ids=[min(len(indices)-1,round((len(indices)-1)*ratio))
+                for ratio in selection]
+    selected_frames=[indices[position] for position in sample_ids]
+    # Reused video/atlas cells are HOLDs, not independent evidence of a
+    # stable body scale. This is a proof gate, not a rendering error.
+    if len(set(sample_ids))!=len(sample_ids) or
+       len(set(selected_frames))!=len(selected_frames):
+        return []
     with Image.open(file) as img:
         if w<=0 or h<=0 or cols<=0 or img.width!=w*cols or img.height%h:
             return []
@@ -205,9 +218,8 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
                ((i//cols)+1)*h>img.height for i in indices):
             return []
         output=[]
-        for ratio in selection:
-            at=min(len(indices)-1,round((len(indices)-1)*ratio))
-            f=int(indices[at])
+        for f in selected_frames:
+            f=int(f)
             if f<0 or f>=int(meta.get("frameCount",cols*((img.height+h-1)//h))):
                 return []  # PIL.crop pads invalid indices with transparent black.
             x=(f%cols)*w
