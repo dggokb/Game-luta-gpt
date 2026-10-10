@@ -1,3 +1,19 @@
+## P01 v0.93 — salto 820, backdash +15%, 2M de 26 frames, intro/idle
+
+- Salto normal UNIVERSAL: impulso vertical 780→820, gravity inalterada;
+  permite passar por cima do adversário e cair do outro lado.
+- Backdash UNIVERSAL: 850→978 u/s com 15 frames, recuo de 212,5→244,5
+  unidades (+15,06%), arco visual 40 inalterado.
+- 2M P01: 6 startup + 4 ativos + 16 recuperação, total 26 frames;
+  efeitos/hitstun/cancelamento sem alterações. Todos os 16 sprites exibidos
+  em ordem, pose de impacto no quadro 6.
+- Intro do P01: redução inicial de 3,5%; normalização vertical nos quadros
+  20–21 (antes altos demais) e deslocamento exato da última pose até o
+  IDLE (corrigindo ~6 px à direita e os pés). Crossfade mantém a arte
+  original do idle no encerramento.
+- QA mede ocupação real de pixels alfa e exige alinhamento <=2,5px.
+- Identificação Android `0.93-p01-intro-2m-jump`.
+
 ## P01 v0.92 — normal jump crosses the opponent; backdash and 2M refinement
 
 - Universal normal jump: initial vertical speed **700 -> 780 world units/s** (gravity constant at 1650); apex approx **178 units** after discrete physics, beyond the standing hurtbox (P01 156). New combat unit test requires player to cross an opponent in midair, land on the far side, and face back. Superjump untouched.
