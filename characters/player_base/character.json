@@ -814,22 +814,22 @@
       ],
       "loop": false,
       "durationsMs": [
-        17,
-        17,
-        16,
-        17,
-        17,
-        16,
-        42,
-        42,
-        41,
-        42,
-        40,
-        40,
-        39,
-        39,
-        39,
-        38
+        34,
+        33,
+        33,
+        33,
+        33,
+        34,
+        47,
+        47,
+        47,
+        47,
+        47,
+        47,
+        47,
+        47,
+        47,
+        47
       ],
       "impactFrame": 6
     },
@@ -1695,20 +1695,20 @@
       "damage": 500,
       "reach": 125,
       "low": true,
-      "startupFrames": 6,
+      "startupFrames": 12,
       "activeFrames": 4,
-      "recoveryFrames": 20,
+      "recoveryFrames": 24,
       "hitstunFrames": 20,
       "blockstunFrames": 10,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
-          6,
-          12
+          12,
+          18
         ],
         "block": [
-          6,
-          12
+          12,
+          18
         ],
         "whiff": null
       },
