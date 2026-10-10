@@ -321,7 +321,9 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                  v.get("video",{}).get("analise",{}).get("deslize") or
                  v.get("sprite",{}).get("tremor") or
                  v.get("sprite",{}).get("deslize") or
-                 v.get("progressao_pose",{}).get("status")=="SUSPEITA_CLIP_CONGELADO" or
+                 v.get("progressao_pose",{}).get("status") in (
+                     "SUSPEITA_CLIP_CONGELADO",
+                     "SUSPEITA_MOVIMENTO_NAO_PRESENTE_NA_FONTE") or
                  v.get("diferenca_video_jogo") or
                  v.get("proporcao_video",{}).get("status")=="SUSPEITA_DE_ESCALA" or
                  v.get("proporcao_sprite",{}).get("status")=="SUSPEITA_DE_ESCALA" or
