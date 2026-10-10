@@ -136,7 +136,9 @@ class CharacterStabilizerTest(unittest.TestCase):
             videos.mkdir(parents=True)
             (videos/"idle.mp4").touch()
             (videos/"dash.mp4").touch()
+            counts={}
             def read_video(path):
+                counts[str(path)]=counts.get(str(path),0)+1
                 return {"status":"EXTRAIDO"},[body_frame(head=20,torso=40)]*12
             def read_pack(root,pack,state):
                 return {"status":"EXTRAIDO","atlas":"test_"+state.lower()},[
@@ -161,6 +163,14 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertEqual("MEDICOES_CONCLUIDAS",result_geo["status"])
             self.assertEqual(["DASH"],result_geo["padronizacao_comprovada_nos_estados"])
             self.assertFalse(result_geo["aprovado_automaticamente"])
+            counts.clear()
+            # IDLE is needed as reference and may also be a requested state.
+            # Its original MP4 must only be decoded once per invocation.
+            MOD.inspect_character("p01",videos,states=["IDLE","DASH"],
+                    root=root,original_video_inspector=read_video,
+                    packed_inspector=read_pack,geometria=False)
+            self.assertEqual(1,counts.get(str(videos/"idle.mp4")))
+            self.assertEqual(1,counts.get(str(videos/"dash.mp4")))
             (videos/"dash.mp4").unlink()
             result=MOD.inspect_character("p01",videos,states=["DASH"],
                     root=root,original_video_inspector=read_video,
@@ -220,6 +230,19 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertEqual(2.,dash_meta["pixel_scale_normalizado"])
             self.assertAlmostEqual(100.,np.median([x["height"] for x in idle]))
             self.assertAlmostEqual(100.,np.median([x["height"] for x in dash]))
+            # Declared frameCount may lie about physical PNG rows. Even an
+            # invalid frame omitted by sampling must reject the entire clip.
+            report=reports/"mock_dash.report.json"
+            metadata=json.loads(report.read_text())
+            metadata["packed"]["frameCount"]=7
+            report.write_text(json.dumps(metadata))
+            pack["animations"]["DASH"]["frames"]=[0,1,2,3,4,6]
+            self.assertNotEqual("EXTRAIDO",
+                e.load_atlas_state(root,pack,"DASH")[0]["status"])
+            import verificar_escala as proof
+            self.assertEqual([],proof.read_sprite_samples(root,pack,"DASH"))
+            metadata["packed"]["frameCount"]=6
+            report.write_text(json.dumps(metadata))
             # Negative atlas indices must not wrap around to another frame.
             pack["animations"]["DASH"]["frames"]=[-1]
             self.assertEqual("FRAME_FORA_DO_ATLAS",
