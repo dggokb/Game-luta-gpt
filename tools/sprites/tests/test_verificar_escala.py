@@ -87,7 +87,8 @@ class GeometricScaleProofTest(unittest.TestCase):
     def test_video_non_chroma_must_not_be_measured_as_character(self):
         from tempfile import TemporaryDirectory
         with TemporaryDirectory() as d:
-            for name,background_green in [("green",True),("red",False)]:
+            import estabilizador as temporal
+            for name,background_green in [("green",True),("red",False),("bad_bottom",True)]:
                 out=Path(d)/(name+".mp4")
                 codec=cv2.VideoWriter_fourcc(*"mp4v")
                 writer=cv2.VideoWriter(str(out),codec,24.,(96,96))
@@ -97,13 +98,19 @@ class GeometricScaleProofTest(unittest.TestCase):
                         (0,255,0) if background_green else (0,0,255),
                         dtype=np.uint8)
                     cv2.rectangle(canvas,(35,20),(65,88),(30,40,185),-1)
+                    if name=="bad_bottom":
+                        canvas[-22:,-22:]=(0,0,255)
                     writer.write(canvas)
                 writer.release()
                 samples=geo.read_video_samples(out)
-                if background_green:
+                state,temporal_frames=temporal.load_video(out)
+                if name=="green":
                     self.assertEqual(7,len(samples),"Green source must remain usable")
+                    self.assertEqual("EXTRAIDO",state["status"])
                 else:
-                    self.assertEqual([],samples,"A colored stage is not green-screen")
+                    self.assertEqual([],samples,"Non-green corner may not pass")
+                    self.assertEqual("INCONCLUSIVO",state["status"])
+                    self.assertEqual([],temporal_frames)
 
     def test_source_atlas_agreement_and_disagreement_are_distinct(self):
         a={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.82}
