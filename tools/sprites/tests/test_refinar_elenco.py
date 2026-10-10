@@ -114,6 +114,22 @@ class CharacterStabilizerTest(unittest.TestCase):
         steady=[dict(body_frame(),shoe_x=40.) for _ in range(30)]
         self.assertIsNone(e.metrics(steady,100,"VICTORY")["deslize"])
 
+    def test_jitter_origin_is_not_conflated_with_import_error(self):
+        steady=e.metrics([body_frame(x=75) for _ in range(18)],100,"VICTORY")
+        noisy=e.metrics([body_frame(x=75+(10 if i==7 else 0))
+                         for i in range(18)],100,"VICTORY")
+        self.assertEqual("SUSPEITA_DE_TREMOR_NA_FONTE",
+                         e.compare_motion_evidence(noisy,steady)["status"])
+        self.assertEqual("SUSPEITA_DE_TREMOR_INTRODUZIDO_NOS_SPRITES",
+                         e.compare_motion_evidence(steady,noisy)["status"])
+        self.assertEqual("ANOMALIA_TAMBEM_PRESENTE_NO_VIDEO",
+                         e.compare_motion_evidence(noisy,noisy)["status"])
+        self.assertEqual("SEM_ANOMALIA_TEMPORAL_DETECTADA",
+                         e.compare_motion_evidence(steady,steady)["status"])
+        self.assertEqual("INCONCLUSIVO",
+                         e.compare_motion_evidence(
+                           {"status":"MEDIDO_COM_LACUNAS"},noisy)["status"])
+
     def test_pose_change_cannot_be_mistaken_for_small_character(self):
         idle=e.metrics([body_frame(head=20,torso=40)]*12,100,"IDLE")
         changed=e.metrics([body_frame(head=25,torso=40)]*12,100,"CROUCH_HEAVY")
