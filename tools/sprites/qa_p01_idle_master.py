@@ -75,9 +75,15 @@ def run():
         assert .94*stand_w <= (c-a)*sx <= 1.08*stand_w
         assert 1.13*stand_h <= (d-b)*sy <= 1.18*stand_h
 
-    # Ensure squat and aerial poses are not enlarged into standing characters.
+    # FALL is one constant body scale across all six poses, so descent
+    # never shrinks because its pixel bbox changed in the video.
+    fall = transforms["player_base_fall_air"]
+    assert len(fall) == 6
+    assert all(abs(sx-1.02)<.001 and abs(sy-1.02)<.001
+               for sx,sy,_,_ in fall), fall
+    # Other low and airborne poses are not enlarged into idle silhouettes.
     for name in ("player_base_crouch_light","player_base_crouch_medium",
-                 "player_base_jump","player_base_fall_air"):
+                 "player_base_jump"):
         assert all(sx <= 1 for sx,_,_,_ in transforms[name])
     print("P01 IDLE MASTER PASS:",len(atlases),"atlases;",
           sum(len(x) for x in transforms.values()),"frames;",
