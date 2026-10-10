@@ -129,6 +129,10 @@ def motion(state,t):
         elif state=="DEFEAT":progress=0.95*min(1,t*2)
         else:progress=0.95
         p.update(tilt=-72*progress,leg_front=8*progress,front=18*progress)
+        if state=="GROUNDED":
+            # Prone breathing must remain a genuine loop, not a duplicate still image.
+            p["front"]+=2.5*math.sin(tau)
+            p["head"]=1.8*math.sin(tau)
     elif state in ATTACKS:
         low=state.startswith("CROUCH")
         air=state.startswith("JUMP")
