@@ -928,8 +928,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void updateFightCamera(float dt) {
         // Frame what is actually drawn: opaque sprite height measured at import time.
         float highestFighterTop = Math.min(visualTop(player()), visualTop(opponent()));
-        camera.update(dt, player().x, opponent().x, highestFighterTop,
-            player().superJumping || opponent().superJumping);
+        // KO leaves the winner's world X fixed, so its screen X must also
+        // be fixed. Continue to update the camera only while BOTH fight.
+        camera.updateForRound(dt, player().x, opponent().x, highestFighterTop,
+            player().superJumping || opponent().superJumping,
+            player().ko() || opponent().ko());
     }
 
     /** Highest opaque pixel of a fighter, for camera framing and the opponent HUD. */
