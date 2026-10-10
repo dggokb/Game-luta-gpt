@@ -1,3 +1,12 @@
+## P01 v0.94 — jump less floaty, slower 2M, matched intro/idle and planted victory
+
+- **Normal jump, universal:** keeps the 820 impulse, but applies 1.10× gravity on ascent and 1.25× on descent only to ordinary jumps. The shorter flight preserves enough height to pass over a standing opponent. Super jump, launcher, juggle and projectile arcs are unchanged.
+- **P01 2M:** 26→30 gameplay frames; first contact remains at frame 6 with identical startup/active windows. Recovery 16→20; all 16 original poses remain visible.
+- **Intro→idle:** reduce P01 idle 2% and recalibrate late intro frame sizes and foot/root offsets to the NEW idle silhouette; source sprites unchanged. The ending intro crossfade still renders the actual idle texture.
+- **Victory:** source frames 0–6 contain walking. P01 win animation starts on the planted pose at frame 7, uses 94% source scale (same drawn height as intro's first pose), corrects foot anchor; no fresh inputs or winner horizontal movement are processed after KO.
+- **Verification:** sprite QA measures the real pixel heights and intro/idle boundary; combat tests verify crossing the opponent and that a winning character remains fixed even with held movement input.
+- Test APK: `0.94-p01-jump-victory-2m`.
+
 ## P01 v0.93 — salto 820, backdash +15%, 2M de 26 frames, intro/idle
 
 - Salto normal UNIVERSAL: impulso vertical 780→820, gravity inalterada;
