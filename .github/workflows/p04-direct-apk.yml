@@ -1,0 +1,47 @@
+name: P04 Direct APK Download
+on:
+  push:
+    branches:
+      - 'apk-export-p04-52a3a60'
+    paths:
+      - '.github/workflows/p04-direct-apk.yml'
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish-direct-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the successful P04 Android build
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 38009828133
+          name: GameLutaGPT-Quick-APK
+          github-token: ${{ github.token }}
+          path: apk
+      - name: Verify and name the standalone APK
+        run: |
+          python - <<'PY'
+          import zipfile, os
+          from pathlib import Path
+          p=Path('apk/app-debug.apk')
+          assert p.is_file() and p.stat().st_size>100_000_000, 'Missing built APK'
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None, 'Corrupted APK'
+              assert 'AndroidManifest.xml' in z.namelist()
+              assert 'classes.dex' in z.namelist()
+          print('Verified APK bytes:',p.stat().st_size)
+          p.rename('GameLutaGPT-P04-52a3a60.apk')
+          PY
+      - name: Publish standalone APK as GitHub release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: dggokb/Game-luta-gpt
+        run: |
+          tag="apk-p04-sr-52a3a60"
+          asset="GameLutaGPT-P04-52a3a60.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
+          else
+            gh release create "$tag" "$asset" --target 52a3a60272da1973803c95cafd3af025dcb49986 --title "P04 SR Test APK (52a3a60)" --notes "APK de teste do P04, gerado do commit 52a3a60 da branch test/p04-all-sr-20261009. Arquivo APK direto, sem ZIP."
+          fi
