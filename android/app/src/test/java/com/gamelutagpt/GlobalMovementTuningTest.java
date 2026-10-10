@@ -91,6 +91,30 @@ public class GlobalMovementTuningTest {
         assertFalse(winner.forwardDashing);
     }
 
+    @Test public void backwardHopCannotChainWhileHeldOrBeforeNeutralReset() {
+        CombatEngine e=engine();
+        CombatFighter p=e.fighter(0);
+        FighterInput in=new FighterInput(),cpu=new FighterInput();
+        in.backdash=true;
+        e.step(in,cpu);
+        assertEquals(e.config.backdashFrames-1,p.backdashFrames);
+        assertFalse(p.backdashArmed);
+        float x=p.x;
+        for(int i=0;i<e.config.backdashFrames+e.config.backdashRecoveryFrames+8;i++) {
+            in.backdash=true; // simulate attempts to spam while holding backward
+            in.direction=5;
+            e.step(in,cpu);
+        }
+        assertEquals("No second dash without neutral release",0,p.backdashFrames);
+        assertFalse(p.backdashArmed);
+        in.clear();
+        e.step(in,cpu);
+        assertTrue("Backdash rearmed after full neutral release",p.backdashArmed);
+        in.backdash=true;
+        e.step(in,cpu);
+        assertTrue("Fresh press after neutral triggers a backdash",p.backdashFrames>0);
+    }
+
     @Test public void normalJumpCanCrossOverAStandingOpponent() {
         // Test an actual crossover, not just an increased impulse value.
         CombatEngine e=new CombatEngine(
