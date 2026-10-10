@@ -177,7 +177,7 @@ def cell(master, state, t):
     src=np.asarray(master)
     yy,xx=np.mgrid[0:FH,0:FW].astype(np.float32)
     scale=1-0.48*p["crouch"]
-    ysrc=RY-(yy-RY-p["float_y"]-p["bob"])/scale
+    ysrc=RY+(yy-RY-p["float_y"]-p["bob"])/scale
     xsrc=xx-p["lean"]*(RY-yy)/3.3
     # Anatomical subparts use gaussian falloffs, preserving the interior ink style.
     def g(cx,cy,sx,sy):
