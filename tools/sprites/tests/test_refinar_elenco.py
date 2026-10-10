@@ -76,6 +76,12 @@ class CharacterStabilizerTest(unittest.TestCase):
         self.assertEqual([5,9],report["tremor"]["torso"])
         self.assertEqual([5,9],report["tremor"]["pe_apoio"])
 
+    def test_slow_victory_foot_drift_detected(self):
+        samples=[dict(body_frame(),shoe_x=40+i*.95) for i in range(30)]
+        self.assertEqual("SUSPEITA_DE_DESLIZE",e.metrics(samples,100,"VICTORY")["deslize"]["status"])
+        self.assertIsNone(e.metrics(samples,100,"DASH")["deslize"])
+        self.assertIsNone(e.metrics([dict(body_frame(),shoe_x=40.)]*30,100,"VICTORY")["deslize"])
+
     def test_pose_change_cannot_be_mistaken_for_small_character(self):
         idle=e.metrics([body_frame(head=20,torso=40)]*12,100,"IDLE")
         changed=e.metrics([body_frame(head=25,torso=40)]*12,100,"CROUCH_HEAVY")
