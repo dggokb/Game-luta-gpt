@@ -1,0 +1,10 @@
+{
+  "state": "SUPER_WAVE",
+  "count": 8,
+  "columns": 4,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in 4 columns and 2 rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action SUPER_WAVE: a zombie two-handed sweeping super cast: 1 neutral; 2 wide low stance and both arms spread out beside shoulders; 3 rotate torso drawing BOTH palms behind the body; 4 and 5 sweep both open hands forward together to RIGHT at waist height, deep grounded lunge, palms extended far toward opponent; 6 follow through; 7 retract hands; 8 neutral. Strong silhouette different from simple projectile cast; no painted effects. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "4d8742085ce9ebc680ced5af98e0dd98494dd47c"
+}
