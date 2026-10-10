@@ -43,13 +43,13 @@ final class SpriteFighterRenderer {
     // P01 visual normalization measured from the actual alpha bounds of each
     // atlas frame. These values are not estimates of the canvas width.
     private static final float[] P01_CROUCH = {
-        0.974f,0.965f,0.929f,0.924f,0.918f,0.907f,0.886f,0.878f
+        0.9545f,0.9457f,0.9104f,0.9055f,0.8996f,0.8889f,0.8683f,0.8604f
     };
     private static final float[] P01_RISE_X = {
-        0.886f,0.904f,0.921f,0.926f,0.929f,0.929f
+        0.8683f,0.8859f,0.9026f,0.9075f,0.9104f,0.9104f
     };
     private static final float[] P01_RISE_Y = {
-        0.885f,0.890f,0.920f,0.960f,1.000f,1.035f
+        0.8673f,0.8722f,0.9016f,0.9408f,0.9800f,1.0143f
     };
     // Original atlas silhouettes change proportions across frames 20..26.
     // Align the final silhouette with idle's occupied pixels (not canvas width).
