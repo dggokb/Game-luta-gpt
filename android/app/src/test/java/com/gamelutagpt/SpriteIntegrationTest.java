@@ -285,9 +285,9 @@ public class SpriteIntegrationTest {
         renderer.motion.clip="LIGHT_JAB";renderer.motion.time=0f;
         renderer.draw(canvas,300f,300f,1,false,false);
         CharacterDefinition.Atlas jab=character.animation("LIGHT_JAB").atlas;
-        assertEquals(1f,jab.pixelScale,0f);
+        assertTrue("Attack atlas density must be positive",jab.pixelScale>0f);
         RectF destination=(RectF)field.get(renderer);
-        assertEquals(jab.width*character.profile.worldScale,destination.width(),.001f);
+        assertEquals(jab.width*character.profile.worldScale/jab.pixelScale,destination.width(),.001f);
         screen.recycle();
     }
     /** Every packed cell of the attack atlas holds one whole pose with a safety margin. */
@@ -417,8 +417,12 @@ public class SpriteIntegrationTest {
             *(idle.getHeight()/GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT)>=GeneratedSpriteLayouts.IDLE_FRAME_COUNT);
         assertEquals(0,jab.getWidth()%GeneratedSpriteLayouts.JAB_FRAME_WIDTH);
         assertEquals(0,jab.getHeight()%GeneratedSpriteLayouts.JAB_FRAME_HEIGHT);
-        // Packing never grows past the canonical 256x256 authoring cell.
-        assertTrue(GeneratedSpriteLayouts.IDLE_FRAME_WIDTH<=256 && GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT<=256);
+        // Compare logical dimensions, not physical HD pixels: 2x textures
+        // legitimately have more than 256 pixels in their packed cells.
+        CharacterDefinition.Atlas idleAtlas=GeneratedCharacters.defaultCharacter().animation("IDLE").atlas;
+        assertTrue(idleAtlas.pixelScale>0f);
+        assertTrue(idleAtlas.width/idleAtlas.pixelScale<=256f
+            && idleAtlas.height/idleAtlas.pixelScale<=256f);
     }
 
     @Test public void characterProfilesCanRepresentDifferentSizedFighters() {
