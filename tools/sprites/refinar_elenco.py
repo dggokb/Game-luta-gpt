@@ -248,7 +248,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                     proof=g.compare_source_and_atlas(source,packed)
         entry["prova_geometrica"]=proof
         # A geometric inconsistency makes the entire state suspect.
-        if proof["status"]=="ESCALA_DIVERGENTE":
+        if proof["status"] in ("ESCALA_DIVERGENTE","ESCALA_FORA_DO_IDLE"):
             entry["diferenca_video_jogo"]={
                 "status":"SUSPEITA_GEOMETRICA",
                 "diferenca_relativa":proof["diferenca_relativa"]}
@@ -269,7 +269,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                  v.get("proporcao_video",{}).get("status")=="SUSPEITA_DE_ESCALA" or
                  v.get("proporcao_sprite",{}).get("status")=="SUSPEITA_DE_ESCALA" or
                  v["prova_geometrica"]["status"] in ("ESCALA_DIVERGENTE",
-                                                       "INSTAVEL_GEOMETRICAMENTE")]
+                    "ESCALA_FORA_DO_IDLE","INSTAVEL_GEOMETRICAMENTE")]
     # Mesmo com métricas boas, somente o *jogo em execução* pode validar
     # transições, câmera e tamanho renderizado. Nenhuma aprovação falsa.
     return {
