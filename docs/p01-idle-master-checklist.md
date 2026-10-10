@@ -56,9 +56,9 @@ posição de referência dos pés e âncora visual. **Não** alterar hitboxes pa
 
 - [x] Teste Java de cobertura de todos os atlas: `P01VisualMasterTest`.
 - [x] Teste Java de bloqueio e rearme do backdash: `GlobalMovementTuningTest`.
-- [ ] CI: geometria + QA completo dos 39 atlas aprovados.
-- [ ] CI: testes de combo, launcher e mobilidade aprovados.
-- [ ] CI: APK de depuração gerado e publicado como artefato.
+- [x] CI: geometria + QA completo dos 39 atlas aprovados.
+- [x] CI: testes de combo, launcher e mobilidade aprovados.
+- [x] CI: APK de depuração v0.96 gerado e publicado como artefato.
 - [ ] Teste real no celular e conferência de transições (requer feedback após instalação).
 - [ ] Enviar a branch estável `game-luta-sprite-gpt` **somente com aprovação explícita**.
 
@@ -69,3 +69,9 @@ Os ajustes atuais são P01-específicos no renderizador, mas a metodologia
 QA; build) é reutilizável para os próximos personagens. Para um novo lutador,
 criar dados de calibração independentes — nunca usar os offsets do P01 em outro
 personagem.
+
+## Validação automatizada executada
+
+- [Build Game Luta APK #38069585984](https://github.com/dggokb/Game-luta-gpt/actions/runs/38069585984) — normalização e QA dos 39 atlas, testes P01, compilação do APK concluídos com sucesso.
+- APK compilado na branch `refino/p01-animacoes-20261009`, versão `0.96-p01-idle-master`.
+- Smoke test Android pode terminar depois do upload do APK; não confundir compilação aprovada com teste manual no dispositivo.
