@@ -207,3 +207,43 @@ python3 tools/sprites/refinar_elenco.py p01 \
 
 Nem o comando nem os testes alteram PNGs, vídeos, manifestos, colisão
 ou gameplay. O mecanismo trabalha sobre **um personagem**, não o elenco.
+
+## v4 — nova auditoria de falsos positivos (2026-10-10)
+
+Esta etapa corrigiu defeitos que **permitiam aprovar escalas erradas**:
+
+1. **Ambos menores não é tamanho correto.** Anteriormente vídeo=0,82 e
+   atlas=0,84 contra o IDLE eram considerados "padronizados", pois
+   concordavam entre si. A prova agora exige **cada um** dentro de
+   **±8% do corpo do próprio IDLE** além de concordância fonte↔atlas
+   em até 6%. Caso ambos estejam fora, produz
+   `ESCALA_FORA_DO_IDLE`. Isso é uma prova conservadora para
+   poses com correspondência geométrica válida; quando a pose
+   atrapalha a medição, o resultado deve continuar INCONCLUSIVO.
+2. **Poucos quadros fáceis não validam clipe longo.** A prova de escala
+   exige agora **pelo menos 70% das amostras válidas** (mínimo 3),
+   incluindo ao menos uma em cada terço temporal. Exemplo: 3 quadros
+   compatíveis e 4 ilegíveis não passam.
+3. **Vídeo sem chroma-key não entra na comparação.** A extração
+   amostral verifica os quatro cantos do quadro. Se qualquer
+   amostra não tiver o fundo verde esperado, a medição retorna
+   INCONCLUSIVA. Não escolher apenas quadros fáceis e ignorar
+   os que falharam ao decodificar.
+4. **A auditoria de silhueta também respeita o pixelScale.** O
+   leitor de atlas antigo usava pixels brutos ao medir tremor e
+   tamanho, enquanto a prova geométrica convertia escala. Agora
+   ambos usam a escala física do IDLE. Frames negativos ou fora
+   dos limites são rejeitados explicitamente.
+5. **Testes adversariais:** atlas 1×/2× da mesma figura devem
+   produzir medidas iguais; um frame inválido não pode voltar
+   ao último frame; vídeo verde sintético é aceito, vídeo com
+   fundo vermelho não pode ser segmentado como se fosse verde;
+   corpo +18%/−18% e translação sem zoom são casos distintos;
+   concordância de duas fontes igualmente pequenas deve falhar.
+
+**Atenção:** estes gates comprovam apenas a consistência de tamanho
+nos trechos com detalhes comparáveis. **Não** comprovam anatomia em
+todas as poses, qualidade dos frames nem resultado final após câmera,
+`P01SpriteCalibration` e `P01VisualTuning`. O motor permanece
+read-only e `validacao_runtime=PENDENTE` até termos captura real
+de transições e execução dentro do jogo.
