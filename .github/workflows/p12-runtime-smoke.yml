@@ -1,12 +1,10 @@
 name: P12 full-cycle Android runtime smoke
 
 on:
-  push:
-    branches:
-      - test/p09-three-engines-20261009
-    paths:
-      - .github/workflows/p12-runtime-smoke.yml
-  workflow_dispatch:
+  workflow_run:
+    workflows: ['P12 action source gate and animation build']
+    types: [completed]
+    branches: [test/p09-three-engines-20261009]
 
 permissions:
   contents: read
@@ -14,16 +12,19 @@ permissions:
 
 jobs:
   launch-test:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'test/p09-three-engines-20261009'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - name: Download the EXACT validated P12 full-cycle APK
         uses: actions/download-artifact@v4
         with:
           name: P12-Full-Cycle-Test-APK
           path: /tmp/p12-apk
-          run-id: 38011770619
+          run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
       - name: Check APK file exists and is not empty
         run: |

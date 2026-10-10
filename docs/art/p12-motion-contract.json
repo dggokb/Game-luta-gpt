@@ -1,0 +1,1518 @@
+{
+  "schemaVersion": 3,
+  "id": "p12",
+  "displayName": "P12 Zumbi - procedural",
+  "profile": "p12.json",
+  "artFacing": "right",
+  "fighter": {
+    "color": "#F4B73B",
+    "maxLife": 10000,
+    "autoCombo": [
+      "L",
+      "M",
+      "H"
+    ],
+    "body": {
+      "halfWidth": 37,
+      "standHeight": 156,
+      "crouchHeight": 97,
+      "pushHalfWidth": 32,
+      "pushHeight": 129
+    },
+    "energy": {
+      "damage": 850,
+      "range": 720,
+      "speed": 760,
+      "command": [
+        3,
+        1
+      ],
+      "spawnX": 67,
+      "spawnY": 88,
+      "crouchSpawnY": 70,
+      "attack": {
+        "startupFrames": 6,
+        "activeFrames": 1,
+        "recoveryFrames": 11,
+        "hitstunFrames": 20,
+        "blockstunFrames": 14,
+        "hitstopFrames": 6,
+        "cancelWindows": {
+          "hit": [
+            6,
+            17
+          ],
+          "block": [
+            6,
+            17
+          ],
+          "whiff": null
+        },
+        "cancelInto": [
+          "SUPER"
+        ],
+        "maxUsesPerCombo": 2,
+        "pushbackOnHit": 40,
+        "pushbackOnBlock": 50
+      }
+    },
+    "super": {
+      "damage": 3200,
+      "range": 1450,
+      "speed": 1180,
+      "spawnX": 84,
+      "spawnY": 92,
+      "airSpawnY": 88,
+      "attack": {
+        "startupFrames": 35,
+        "activeFrames": 1,
+        "recoveryFrames": 25,
+        "hitstunFrames": 30,
+        "blockstunFrames": 20,
+        "hitstopFrames": 12,
+        "cancelWindows": {
+          "hit": null,
+          "block": null,
+          "whiff": null
+        },
+        "cancelInto": [],
+        "pushbackOnHit": 60,
+        "pushbackOnBlock": 60
+      }
+    },
+    "assist": {
+      "move": "S"
+    }
+  },
+  "animations": {
+    "IDLE": {
+      "atlas": "p12_full_idle",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": true,
+      "durationsMs": [
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2
+      ]
+    },
+    "COMBAT": {
+      "atlas": "p12_full_combat",
+      "frames": [
+        0
+      ],
+      "loop": false,
+      "durationsMs": [
+        100.0
+      ]
+    },
+    "WALK_FORWARD": {
+      "atlas": "p12_full_walk_forward",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": true,
+      "distancePerFrame": 25.0
+    },
+    "WALK_BACK": {
+      "atlas": "p12_full_walk_back",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": true,
+      "distancePerFrame": 15.64
+    },
+    "CROUCH": {
+      "atlas": "p12_full_crouch",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false,
+      "durationsMs": [
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0
+      ]
+    },
+    "RISE": {
+      "atlas": "p12_full_rise",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0
+      ]
+    },
+    "JUMP": {
+      "atlas": "p12_full_jump",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0
+      ]
+    },
+    "FALL": {
+      "atlas": "p12_full_fall",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        66.6667,
+        66.6667,
+        66.6667,
+        66.6667,
+        66.6667,
+        66.6667
+      ]
+    },
+    "DASH": {
+      "atlas": "p12_full_dash",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": true,
+      "durationsMs": [
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0
+      ]
+    },
+    "BACKDASH": {
+      "atlas": "p12_full_backdash",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+      ]
+    },
+    "LAND": {
+      "atlas": "p12_full_land",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667
+      ]
+    },
+    "LIGHT_JAB": {
+      "atlas": "p12_full_light_jab",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        17.0,
+        17.0,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875
+      ],
+      "impactFrame": 2
+    },
+    "MEDIUM_KICK": {
+      "atlas": "p12_full_medium_kick",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        33.0,
+        33.0,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25
+      ],
+      "impactFrame": 2
+    },
+    "HEAVY_STRAIGHT": {
+      "atlas": "p12_full_heavy_straight",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        36.8,
+        36.8,
+        36.8,
+        36.8,
+        36.8,
+        43.2,
+        43.2,
+        43.2,
+        43.2,
+        43.2
+      ],
+      "impactFrame": 5
+    },
+    "DEFENSE_STAND": {
+      "atlas": "p12_full_defense_stand",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false,
+      "durationsMs": [
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375
+      ]
+    },
+    "DEFENSE_CROUCH": {
+      "atlas": "p12_full_defense_crouch",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714
+      ]
+    },
+    "HIT_STAND": {
+      "atlas": "p12_full_hit_stand",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778
+      ]
+    },
+    "HIT_CROUCH": {
+      "atlas": "p12_full_hit_crouch",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0
+      ]
+    },
+    "HIT_AIR": {
+      "atlas": "p12_full_hit_air",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        36.6667,
+        36.6667,
+        36.6667,
+        36.6667,
+        36.6667,
+        36.6667
+      ]
+    },
+    "KNOCKDOWN": {
+      "atlas": "p12_full_knockdown",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        31.0,
+        31.0,
+        31.0,
+        31.0,
+        31.0,
+        31.0,
+        31.0
+      ]
+    },
+    "GROUNDED": {
+      "atlas": "p12_full_grounded",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "loop": false,
+      "durationsMs": [
+        300.0,
+        300.0,
+        300.0,
+        300.0
+      ]
+    },
+    "GETUP": {
+      "atlas": "p12_full_getup",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0
+      ]
+    },
+    "CROUCH_LIGHT": {
+      "atlas": "p12_full_crouch_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        17.0,
+        17.0,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875
+      ],
+      "impactFrame": 2
+    },
+    "CROUCH_MEDIUM": {
+      "atlas": "p12_full_crouch_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        25.0,
+        25.0,
+        25.0,
+        25.0,
+        27.83333,
+        27.83333,
+        27.83333,
+        27.83333,
+        27.83333,
+        27.83333
+      ],
+      "impactFrame": 4
+    },
+    "CROUCH_HEAVY": {
+      "atlas": "p12_full_crouch_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        37.25,
+        37.25,
+        37.25,
+        37.25,
+        41.83333,
+        41.83333,
+        41.83333,
+        41.83333,
+        41.83333,
+        41.83333
+      ],
+      "impactFrame": 4
+    },
+    "JUMP_LIGHT": {
+      "atlas": "p12_full_jump_light",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        21.66667,
+        21.66667,
+        21.66667,
+        25.5,
+        25.5,
+        25.5,
+        25.5
+      ],
+      "impactFrame": 3
+    },
+    "JUMP_MEDIUM": {
+      "atlas": "p12_full_jump_medium",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        47.5,
+        47.5,
+        34.4,
+        34.4,
+        34.4,
+        34.4,
+        34.4
+      ],
+      "impactFrame": 2
+    },
+    "JUMP_HEAVY": {
+      "atlas": "p12_full_jump_heavy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        48.33333,
+        48.33333,
+        48.33333,
+        63.75,
+        63.75,
+        63.75,
+        63.75
+      ],
+      "impactFrame": 3
+    },
+    "DEFENSE_AIR": {
+      "atlas": "p12_full_defense_air",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714
+      ]
+    },
+    "ULTRA_BEAM": {
+      "atlas": "p12_full_ultra_beam",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "loop": false,
+      "durationsMs": [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ]
+    },
+    "SPECIAL_ENERGY": {
+      "atlas": "p12_full_special_energy",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        28.75,
+        28.75,
+        28.75,
+        28.75,
+        30.83333,
+        30.83333,
+        30.83333,
+        30.83333,
+        30.83333,
+        30.83333
+      ],
+      "impactFrame": 4
+    },
+    "THROW_GRAB": {
+      "atlas": "p12_full_throw_grab",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667
+      ]
+    },
+    "THROW_TOSS": {
+      "atlas": "p12_full_throw_toss",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "loop": false,
+      "durationsMs": [
+        44.5,
+        44.5,
+        44.5,
+        44.5,
+        44.5,
+        44.5
+      ]
+    },
+    "SPECIAL_S2": {
+      "atlas": "p12_full_special_s2",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        68.5,
+        68.5,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375
+      ],
+      "impactFrame": 2
+    },
+    "SPECIAL_S3": {
+      "atlas": "p12_full_special_s3",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        73.2,
+        73.2,
+        73.2,
+        73.2,
+        73.2,
+        66.8,
+        66.8,
+        66.8,
+        66.8,
+        66.8
+      ],
+      "impactFrame": 5
+    },
+    "SPECIAL_S4": {
+      "atlas": "p12_full_special_s4",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        83.5,
+        83.5,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75
+      ],
+      "impactFrame": 2
+    },
+    "SUPER_WAVE": {
+      "atlas": "p12_full_super_wave",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        97.16667,
+        97.16667,
+        97.16667,
+        97.16667,
+        97.16667,
+        97.16667,
+        108.25,
+        108.25,
+        108.25,
+        108.25
+      ],
+      "impactFrame": 6
+    },
+    "INTRO": {
+      "atlas": "p12_full_intro",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0
+      ]
+    },
+    "JUMP_HEAVY_DOWN": {
+      "atlas": "p12_full_jump_heavy_down",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "loop": false,
+      "durationsMs": [
+        48.33333,
+        48.33333,
+        48.33333,
+        63.75,
+        63.75,
+        63.75,
+        63.75
+      ],
+      "impactFrame": 3
+    },
+    "VICTORY": {
+      "atlas": "p12_full_victory",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5
+      ]
+    },
+    "DEFEAT": {
+      "atlas": "p12_full_defeat",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5
+      ]
+    },
+    "TAUNT": {
+      "atlas": "p12_full_taunt",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "loop": false,
+      "durationsMs": [
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5
+      ]
+    }
+  },
+  "moves": {
+    "L": {
+      "animation": "LIGHT_JAB",
+      "damage": 300,
+      "reach": 90,
+      "startupFrames": 2,
+      "activeFrames": 4,
+      "recoveryFrames": 4,
+      "hitstunFrames": 12,
+      "blockstunFrames": 9,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          2,
+          8
+        ],
+        "block": [
+          2,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "L",
+        "M",
+        "2L"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 24,
+      "pushbackOnBlock": 30,
+      "maxUsesPerCombo": 3,
+      "hitHeight": 84
+    },
+    "M": {
+      "animation": "MEDIUM_KICK",
+      "damage": 500,
+      "reach": 125,
+      "startupFrames": 4,
+      "activeFrames": 6,
+      "recoveryFrames": 6,
+      "hitstunFrames": 15,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          4,
+          12
+        ],
+        "block": [
+          4,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H",
+        "2M",
+        "S",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "pushbackOnHit": 32,
+      "pushbackOnBlock": 38,
+      "hitHeight": 84
+    },
+    "H": {
+      "animation": "HEAVY_STRAIGHT",
+      "damage": 800,
+      "reach": 159,
+      "startupFrames": 10,
+      "activeFrames": 5,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 11,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          10,
+          17
+        ],
+        "block": [
+          10,
+          17
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "S",
+        "SUPER",
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "pushbackOnHit": 44,
+      "pushbackOnBlock": 50,
+      "launchType": "wallBounce",
+      "hitHeight": 84
+    },
+    "2L": {
+      "animation": "CROUCH_LIGHT",
+      "damage": 300,
+      "reach": 90,
+      "low": true,
+      "startupFrames": 2,
+      "activeFrames": 4,
+      "recoveryFrames": 4,
+      "hitstunFrames": 12,
+      "blockstunFrames": 9,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          2,
+          8
+        ],
+        "block": [
+          2,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "M",
+        "2M"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 22,
+      "pushbackOnBlock": 28,
+      "hitHeight": 45
+    },
+    "2M": {
+      "animation": "CROUCH_MEDIUM",
+      "damage": 500,
+      "reach": 125,
+      "low": true,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 20,
+      "blockstunFrames": 10,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "H"
+      ],
+      "launchType": "knockdown",
+      "knockback": 40,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 36,
+      "hitHeight": 45
+    },
+    "2H": {
+      "animation": "CROUCH_HEAVY",
+      "damage": 800,
+      "reach": 159,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 44,
+      "blockstunFrames": 10,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          9,
+          17
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "JUMP"
+      ],
+      "launchType": "launch",
+      "knockback": 20,
+      "pushbackOnHit": 0,
+      "pushbackOnBlock": 48,
+      "juggleCost": 2,
+      "hitHeight": 45
+    },
+    "jL": {
+      "animation": "JUMP_LIGHT",
+      "damage": 300,
+      "reach": 90,
+      "startupFrames": 4,
+      "activeFrames": 2,
+      "recoveryFrames": 4,
+      "hitstunFrames": 14,
+      "blockstunFrames": 10,
+      "hitstopFrames": 5,
+      "cancelWindows": {
+        "hit": [
+          4,
+          8
+        ],
+        "block": [
+          4,
+          8
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jM",
+        "jH",
+        "j2H"
+      ],
+      "damageProration": 0.9,
+      "pushbackOnHit": 14,
+      "pushbackOnBlock": 20,
+      "hitHeight": 84
+    },
+    "jM": {
+      "animation": "JUMP_MEDIUM",
+      "damage": 500,
+      "reach": 125,
+      "startupFrames": 6,
+      "activeFrames": 4,
+      "recoveryFrames": 6,
+      "hitstunFrames": 16,
+      "blockstunFrames": 12,
+      "hitstopFrames": 7,
+      "cancelWindows": {
+        "hit": [
+          6,
+          12
+        ],
+        "block": [
+          6,
+          12
+        ],
+        "whiff": null
+      },
+      "cancelInto": [
+        "jH",
+        "j2H"
+      ],
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 26,
+      "hitHeight": 84
+    },
+    "jH": {
+      "animation": "JUMP_HEAVY",
+      "damage": 800,
+      "reach": 159,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": null,
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [],
+      "launchType": "wallBounce",
+      "knockback": 30,
+      "pushbackOnHit": 28,
+      "pushbackOnBlock": 34,
+      "juggleCost": 2,
+      "hitHeight": 84
+    },
+    "j2H": {
+      "animation": "JUMP_HEAVY_DOWN",
+      "damage": 800,
+      "reach": 159,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": null,
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [],
+      "launchType": "groundBounce",
+      "knockback": 30,
+      "pushbackOnHit": 28,
+      "pushbackOnBlock": 34,
+      "juggleCost": 2,
+      "hitHeight": 84
+    }
+  },
+  "specialAnimations": {
+    "ULTRA": "ULTRA_BEAM",
+    "S": "SPECIAL_ENERGY",
+    "SUPER": "SUPER_WAVE"
+  },
+  "specialMoves": {
+    "S2": {
+      "command": [
+        1,
+        3,
+        2
+      ],
+      "animation": "SPECIAL_S2",
+      "damage": 1100,
+      "reach": 108,
+      "hitHeight": 140,
+      "startupFrames": 7,
+      "activeFrames": 10,
+      "recoveryFrames": 24,
+      "hitstunFrames": 30,
+      "blockstunFrames": 12,
+      "hitstopFrames": 10,
+      "cancelWindows": {
+        "hit": [
+          7,
+          22
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "launchType": "knockdown",
+      "knockback": 60,
+      "pushbackOnHit": 20,
+      "pushbackOnBlock": 50
+    },
+    "S3": {
+      "command": [
+        3,
+        5
+      ],
+      "buttons": [
+        "L",
+        "M"
+      ],
+      "animation": "SPECIAL_S3",
+      "damage": 900,
+      "reach": 118,
+      "hitHeight": 97,
+      "startupFrames": 20,
+      "activeFrames": 4,
+      "recoveryFrames": 18,
+      "hitstunFrames": 22,
+      "blockstunFrames": 14,
+      "hitstopFrames": 9,
+      "cancelWindows": {
+        "hit": [
+          20,
+          29
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "pushbackOnHit": 40,
+      "pushbackOnBlock": 50
+    },
+    "S4": {
+      "command": [
+        3,
+        5
+      ],
+      "buttons": [
+        "H"
+      ],
+      "animation": "SPECIAL_S4",
+      "damage": 1000,
+      "reach": 150,
+      "hitHeight": 118,
+      "startupFrames": 10,
+      "activeFrames": 20,
+      "recoveryFrames": 14,
+      "hitstunFrames": 24,
+      "blockstunFrames": 14,
+      "hitstopFrames": 8,
+      "cancelWindows": {
+        "hit": [
+          10,
+          35
+        ],
+        "block": null,
+        "whiff": null
+      },
+      "cancelInto": [
+        "SUPER"
+      ],
+      "launchType": "knockdown",
+      "knockback": 70,
+      "pushbackOnHit": 30,
+      "pushbackOnBlock": 60
+    }
+  }
+}

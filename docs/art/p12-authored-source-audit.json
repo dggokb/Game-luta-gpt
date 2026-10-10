@@ -1,0 +1,256 @@
+{
+  "character": "p12",
+  "status": "NOT_APPROVED",
+  "sourceStates": 33,
+  "requiredStates": 42,
+  "missingStates": [
+    "COMBAT",
+    "ULTRA_BEAM",
+    "THROW_GRAB",
+    "THROW_TOSS",
+    "INTRO",
+    "JUMP_HEAVY_DOWN",
+    "VICTORY",
+    "DEFEAT",
+    "TAUNT"
+  ],
+  "states": {
+    "IDLE": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "WALK_FORWARD": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "WALK_BACK": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "CROUCH": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {
+        "peakHeightRelativeToStandingStart": 0.5537340619307832
+      },
+      "findings": [],
+      "visualApproval": false
+    },
+    "RISE": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {
+        "standingEndRelativeToSquatStart": 1.6412698412698412
+      },
+      "findings": [],
+      "visualApproval": false
+    },
+    "JUMP": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "FALL": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "DASH": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "BACKDASH": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "LAND": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {
+        "absorptionHeightRelativeToStandingEnd": 0.6339113680154143
+      },
+      "findings": [],
+      "visualApproval": false
+    },
+    "LIGHT_JAB": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "MEDIUM_KICK": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "HEAVY_STRAIGHT": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "DEFENSE_STAND": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "DEFENSE_CROUCH": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "HIT_STAND": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "HIT_CROUCH": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "HIT_AIR": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "KNOCKDOWN": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {
+        "proneEndAspect": 3.73
+      },
+      "findings": [],
+      "visualApproval": false
+    },
+    "GROUNDED": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {
+        "minimumProneAspect": 2.2232558139534886
+      },
+      "findings": [],
+      "visualApproval": false
+    },
+    "GETUP": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {
+        "startProneAspect": 3.9237288135593222,
+        "endStandingAspect": 1.7867132867132867
+      },
+      "findings": [],
+      "visualApproval": false
+    },
+    "CROUCH_LIGHT": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "CROUCH_MEDIUM": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "CROUCH_HEAVY": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "JUMP_LIGHT": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "JUMP_MEDIUM": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "JUMP_HEAVY": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "DEFENSE_AIR": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "SPECIAL_ENERGY": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "SPECIAL_S2": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "SPECIAL_S3": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "SPECIAL_S4": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    },
+    "SUPER_WAVE": {
+      "status": "SOURCE_REVIEW_PENDING",
+      "signals": {},
+      "findings": [],
+      "visualApproval": false
+    }
+  },
+  "blockingErrors": [
+    {
+      "error": "source coverage incomplete",
+      "states": [
+        "COMBAT",
+        "ULTRA_BEAM",
+        "THROW_GRAB",
+        "THROW_TOSS",
+        "INTRO",
+        "JUMP_HEAVY_DOWN",
+        "VICTORY",
+        "DEFEAT",
+        "TAUNT"
+      ]
+    }
+  ],
+  "pending": [
+    "registered native frames",
+    "joint/support motion evidence",
+    "anatomy and palette consistency",
+    "runtime source consumption",
+    "transition audit",
+    "super-resolution and alpha verification",
+    "Character Pack integration",
+    "Android/emulator validation"
+  ]
+}
