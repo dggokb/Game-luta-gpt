@@ -22,7 +22,7 @@ ALIASES = {
     "FALL": ("jump", "pulo"),  # descida pode estar no mesmo vídeo
     "LAND": ("jump", "pulo"),
     "LIGHT_JAB": ("l", "ljab"),
-    "MEDIUM_KICK": ("m", "msoco", "mmediokick"),
+    "MEDIUM_KICK": ("m", "msoco", "msocomedio", "mmediokick"),
     "HEAVY_STRAIGHT": ("h", "hchutealto"),
     "CROUCH_LIGHT": ("2l", "l2", "l2jab"),
     "CROUCH_MEDIUM": ("2m", "m2", "m2rasteira"),
@@ -143,6 +143,7 @@ def metrics(measures, reference_height, state):
         return {"status":"INCONCLUSIVO", "motivo":"quadros ou silhuetas sem medida confiável"}
     xs = [m["torso_x"] for _,m in good]
     heads = [m["head_proxy"] for _,m in good]
+    heights = [m["height"] for _,m in good]
     bodies = [m["torso_proxy"] for _,m in good]
     feet = [m["shoe_x"] for _,m in good]
     pairs = {k:v for k,v in (("torso",xs),("cabeca",heads),("tronco",bodies))}
@@ -154,7 +155,8 @@ def metrics(measures, reference_height, state):
         defects["pe_apoio"] = [good[i][0] for i in isolated_spikes(feet,reference_height)]
     return {"status":"MEDIDO", "quadros":len(good),
             "tremor": {k:v for k,v in defects.items() if v},
-            "medianas": {"cabeca":round(float(np.median(heads)),2),
+            "medianas": {"altura":round(float(np.median(heights)),2),
+                         "cabeca":round(float(np.median(heads)),2),
                          "tronco":round(float(np.median(bodies)),2)},
             "limite_px":round(max(1.5,reference_height*.015),2)}
 
@@ -232,3 +234,34 @@ def suggested_actions(inspection):
     if inspection.get("escala",{}).get("status")=="SUSPEITA_DE_ESCALA":
         actions.append("MEDIR_COM_IMAGEM_BASE_E_HEAD_MATCH")
     return actions
+
+
+def load_atlas_state(root, pack, state, limit=100):
+    """Inspeciona imagens realmente empacotadas pelo jogo, sem carregar o elenco."""
+    import json
+    from PIL import Image
+    root=Path(root)
+    anim=pack["animations"][state]
+    atlas=anim["atlas"]
+    report_file=root/"tools/sprites/reports"/(atlas+".report.json")
+    image_file=root/"android/app/src/main/res/drawable-nodpi"/(atlas+".png")
+    if not image_file.exists() or not report_file.exists():
+        return {"status":"SEM_SPRITE_EMPACOTADO","atlas":atlas},[]
+    report=json.loads(report_file.read_text(encoding="utf-8"))
+    packed=report["packed"]
+    width,height,columns=packed["frameWidth"],packed["frameHeight"],packed["columns"]
+    indices=anim["frames"]
+    step=max(1,(len(indices)+limit-1)//limit)
+    with Image.open(image_file) as atlas_img:
+        expected_width=width*columns
+        if atlas_img.width!=expected_width:
+            return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
+        samples=[]
+        for frame in indices[::step]:
+            x0=(frame%columns)*width
+            y0=(frame//columns)*height
+            if x0+width>atlas_img.width or y0+height>atlas_img.height:
+                return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas,"frame":frame},[]
+            cell=atlas_img.crop((x0,y0,x0+width,y0+height)).getchannel("A")
+            samples.append(properties(np.array(cell)))
+    return {"status":"EXTRAIDO","atlas":atlas,"quadros":len(samples)},samples
