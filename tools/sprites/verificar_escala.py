@@ -161,6 +161,22 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
     import json
     meta=json.loads(report_file.read_text(encoding="utf-8"))["packed"]
     w,h,cols=(int(meta[k]) for k in ("frameWidth","frameHeight","columns"))
+    # Packed PNG resolution is not always the rendering resolution.
+    # Normalize candidate RGBA into the IDLE atlas' pixelScale before
+    # comparing detail sizes. Otherwise a 1x atlas appears 50% smaller
+    # than a 2x atlas even when the actual fighter is the same size.
+    idle_atlas=pack["animations"]["IDLE"]["atlas"]
+    idle_report=root/"tools/sprites/reports"/(idle_atlas+".report.json")
+    if not idle_report.is_file():
+        return []
+    idle_meta=json.loads(idle_report.read_text(encoding="utf-8"))["packed"]
+    ps=float(meta.get("pixelScale",0))
+    reference_ps=float(idle_meta.get("pixelScale",0))
+    if ps<=0 or reference_ps<=0 or not np.isfinite(ps*reference_ps):
+        return []
+    normalization=reference_ps/ps
+    if not .25<=normalization<=4.:
+        return []
     indices=anim.get("frames",[])
     if not indices:
         return []
@@ -173,5 +189,11 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
             y=(f//cols)*h
             if x+w>img.width or y+h>img.height:
                 return []
-            output.append(np.asarray(img.crop((x,y,x+w,y+h)).convert("RGBA")))
+            raw=np.asarray(img.crop((x,y,x+w,y+h)).convert("RGBA"))
+            if abs(normalization-1.)>.001:
+                import cv2
+                raw=cv2.resize(raw,None,fx=normalization,fy=normalization,
+                    interpolation=(cv2.INTER_AREA if normalization<1
+                                   else cv2.INTER_LINEAR))
+            output.append(raw)
         return output
