@@ -197,3 +197,26 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
                                    else cv2.INTER_LINEAR))
             output.append(raw)
         return output
+
+
+def compare_source_and_atlas(video,atlas,max_difference=.06):
+    """Gate do tamanho relativo ao IDLE medido em domínios independentes.
+
+    O jogo ainda exige conferência em runtime. Nunca transformar 'prova da
+    fonte' em 'aprovação visual do jogo'.
+    """
+    if video.get("status")!="ESCALA_GEOMETRICA_ESTAVEL" or             atlas.get("status")!="ESCALA_GEOMETRICA_ESTAVEL":
+        return {"status":"INCONCLUSIVO","video":video,"atlas":atlas}
+    vs=float(video["fator_mediano"])
+    ps=float(atlas["fator_mediano"])
+    if min(vs,ps)<=0 or not np.isfinite(vs*ps):
+        return {"status":"INCONCLUSIVO","motivo":"fatores invalidos"}
+    difference=abs(vs-ps)/max(vs,ps)
+    return {
+        "status":"PADRONIZADA_FONTE_ATLAS" if difference<=max_difference
+                 else "ESCALA_DIVERGENTE",
+        "diferenca_relativa":round(difference,4),
+        "fator_video":vs,"fator_atlas":ps,
+        "validacao_runtime":"PENDENTE",
+        "video":video,"atlas":atlas
+    }
