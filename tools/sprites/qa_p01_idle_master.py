@@ -27,7 +27,8 @@ def run():
                             "player_base_jump_light", "player_base_jump_medium",
                             "player_base_jump_heavy", "player_base_jump_heavy_down",
                             "player_base_backdash", "player_base_defense_air",
-                            "player_base_hit_air"):
+                            "player_base_hit_air", "player_base_special_s2",
+                            "player_base_special_s4"):
                 assert abs(foot*sy + dy) < .02, (name,index,"feet",foot*sy+dy)
     for name in ("player_base_intro","player_base_victory"):
         atlas=json.loads((REPORTS/(name+".report.json")).read_text())
