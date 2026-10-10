@@ -56,6 +56,10 @@ jobs:
             android/app/build/generated/source/p01/com/gamelutagpt/P01SpriteCalibration.java
           python3 tools/sprites/qa_p01_idle_master.py
 
+      - name: Verify safe automatic roster triage rules
+        if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v
+
       - name: Verify P01 geometry and generate sprite review
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         run: python3 tools/sprites/qa_p01_visual.py
@@ -102,6 +106,7 @@ jobs:
             --tests 'com.gamelutagpt.P01VisualMasterTest' \
             --tests 'com.gamelutagpt.P01VisualTuningTest' \
             --tests 'com.gamelutagpt.GlobalMovementTuningTest' \
+            --tests 'com.gamelutagpt.CameraRigRoundEndTest' \
             --tests 'com.gamelutagpt.CombatEngineTest.launcherConfirmCancelsIntoSuperJumpChase' --stacktrace
 
       - name: Build P01-only debug APK
