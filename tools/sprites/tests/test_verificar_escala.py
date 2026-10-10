@@ -224,6 +224,11 @@ class GeometricScaleProofTest(unittest.TestCase):
         # A legitimate static source held in the atlas is not a defect.
         static=geo.check_pose_progression(frozen,frozen)
         self.assertNotEqual("SUSPEITA_CLIP_CONGELADO",static["status"])
+        # The reverse regression also matters: imported artwork must not
+        # invent a movement that was absent in the original recording.
+        added=geo.check_pose_progression(frozen,video)
+        self.assertEqual("SUSPEITA_MOVIMENTO_NAO_PRESENTE_NA_FONTE",
+                         added["status"],added)
         # Distinct exported poses are not automatically graded "perfect";
         # they merely avoid being flagged as frozen.
         moving=geo.check_pose_progression(video,video)
