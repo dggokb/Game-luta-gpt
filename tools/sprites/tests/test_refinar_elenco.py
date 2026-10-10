@@ -230,6 +230,33 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertEqual("FRAME_FORA_DO_ATLAS",
                              e.load_atlas_state(root,pack,"DASH",limit=1)[0]["status"])
 
+    def test_reference_rejects_nan_text_negative_and_fake_background(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            folder=root/"art/keys/p01"
+            folder.mkdir(parents=True)
+            config=folder/"tamanho.json"
+            import cv2
+            image=np.full((600,550,3),(0,255,0),dtype=np.uint8)
+            image[70:518,180:315]=(25,45,125)
+            cv2.imwrite(str(folder/"inicio_centro.png"),image)
+            for height in ["NaN","abc",-224,0]:
+                config.write_text(json.dumps({
+                    "altura":height,"chaves":{"inicio_centro":.5}}))
+                self.assertEqual("REFERENCIA_INVALIDA",
+                                 MOD.calibration_info(root,"p01")["status"])
+            config.write_text(json.dumps({
+                "altura":224,"chaves":{"inicio_centro":float("inf")}}))
+            self.assertEqual("REFERENCIA_INVALIDA",
+                             MOD.calibration_info(root,"p01")["status"])
+            config.write_text(json.dumps({
+                "altura":300,"chaves":{"inicio_centro":.5}}))
+            # All-red canvas can't impersonate a full-body image.
+            image[:]=(0,0,255)
+            cv2.imwrite(str(folder/"inicio_centro.png"),image)
+            self.assertEqual("REFERENCIA_SEM_CHROMA",
+                             MOD.calibration_info(root,"p01")["status"])
+
     def test_p12_without_import_is_not_audited_successfully(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
