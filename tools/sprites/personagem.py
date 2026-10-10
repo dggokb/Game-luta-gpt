@@ -41,6 +41,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 from video_para_sprite import best_loop, key, read_frames, torso_x  # noqa: E402
+from video_names import resolve  # noqa: E402
 
 CACHE = ROOT / 'android/app/build/video-cache'
 P01 = json.loads((ROOT / 'characters/player_base/character.json').read_text(encoding='utf-8'))
@@ -51,22 +52,7 @@ STATES = ['IDLE', 'WALK_FORWARD', 'WALK_BACK', 'DASH', 'BACKDASH', 'CROUCH', 'JU
           'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN', 'SPECIAL_ENERGY', 'SPECIAL_S2', 'SPECIAL_S3',
           'SPECIAL_S4', 'SUPER_WAVE', 'ULTRA_BEAM', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'DEFENSE_AIR',
           'HIT_STAND', 'HIT_CROUCH', 'HIT_AIR', 'KNOCKDOWN', 'INTRO', 'VICTORY', 'DEFEAT', 'TAUNT', 'THROW']
-# Nomes de arquivo já usados nos vídeos (sem .mp4, sem diferença de maiúsculas).
-ALIASES = {
-    'IDLE': ['idle'], 'WALK_FORWARD': ['frente', 'andarfrente', 'andarparafrente'], 'WALK_BACK': ['tras', 'back', 'andartras', 'andarparatras'],
-    'DASH': ['dash'], 'BACKDASH': ['backdash'], 'CROUCH': ['agachar', 'abaixar', 'agachado', 'agacha'], 'JUMP': ['pulo', 'jump'],
-    'LIGHT_JAB': ['l', 'socofraco', 'll'], 'MEDIUM_KICK': ['m', 'socomedio'], 'HEAVY_STRAIGHT': ['h', 'socoforte'],
-    'CROUCH_LIGHT': ['2l', 'socofracobaixo', 'chutebaixofraco'], 'CROUCH_MEDIUM': ['2m', 'rasteira', 'rasteirabaixo'],
-    'CROUCH_HEAVY': ['2h', 'upper'], 'JUMP_LIGHT': ['jl', 'pulochute', 'pulochutefraco'],
-    'JUMP_MEDIUM': ['jm', 'socopulo'], 'JUMP_HEAVY': ['jh', 'pulosocoforte', 'pulochuteforteparafrente'],
-    'JUMP_HEAVY_DOWN': ['j2h', 'pulosocoparabaixo', 'pulosocoparabaixoforte'], 'SPECIAL_ENERGY': ['s1'],
-    'SPECIAL_S2': ['s2'], 'SPECIAL_S3': ['s3'], 'SPECIAL_S4': ['s4'], 'SUPER_WAVE': ['super'], 'ULTRA_BEAM': ['ultra'],
-    'DEFENSE_STAND': ['defesaempe', 'defesacima', 'defendecima'], 'DEFENSE_CROUCH': ['defesaagachado', 'defesaagaxado', 'defesabaixo', 'defesanochao', 'defesaembaixo', 'defesachao', 'defendebaixo'],
-    'DEFENSE_AIR': ['defesanoar', 'defesapulo', 'defesapulando'], 'HIT_STAND': ['levargolpeempe', 'danoempe', 'damoempe', 'danocima'],
-    'HIT_CROUCH': ['levargolpeagachada', 'levargolpeagachado', 'danochao', 'danoagachado', 'danobaixo'],
-    'HIT_AIR': ['levargolpenoar', 'danopulando', 'danoar', 'golpenoar', 'danopulo', 'dano pulo'], 'KNOCKDOWN': ['derrubado', 'cair_levantar', 'caindo', 'queda_levanta', 'derrubar_levantar', 'derruma_levanta', 'derrumba_levanta', 'derruba_levanta'],
-    'INTRO': ['intro'], 'VICTORY': ['vitoria'], 'DEFEAT': ['derrota'], 'TAUNT': ['provocacao', 'provocar', 'provoca'], 'THROW': ['agarrao', 'agarrar'],
-}
+# As variantes de nomes pertencem a video_names.py (módulo leve, testável).
 UP = {'CROUCH_HEAVY', 'SPECIAL_S2'}  # impacto pela altura (golpe para cima)
 AIR = {'JUMP_LIGHT', 'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN', 'DEFENSE_AIR', 'HIT_AIR'}
 PUSHED = {'DEFENSE_STAND', 'DEFENSE_CROUCH', 'HIT_STAND', 'HIT_CROUCH', 'BACKDASH', 'DASH'}
@@ -365,18 +351,20 @@ def update_pack(char, rebuilt):
 # ---------------------------------------------------------------- comando
 
 def video_map(char, folder):
+    """Resolve nomes equivalentes sem renomear fontes nem sobrescrever escolhas feitas."""
     path = HERE / f'videos/{char}.json'
     known = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
-    files = {p.stem.lower(): p.stem for p in Path(folder).glob('*.mp4')}
+    available = [p.name for p in Path(folder).iterdir()
+                 if p.is_file() and p.suffix.lower() == '.mp4']
+    detected, ambiguous, _ = resolve(available, char)
     for state in STATES:
-        if state not in known:
-            hit = next((files[a] for a in ALIASES.get(state, []) if a in files), None)
-            if hit:
-                known[state] = hit
+        if state not in known and state in detected:
+            known[state] = detected[state]
+        elif state not in known and state in ambiguous:
+            print(f'{char}: nomes ambiguos para {state}: {ambiguous[state]}; revisar manualmente')
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(known, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     return known
-
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
