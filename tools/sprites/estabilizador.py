@@ -353,6 +353,12 @@ def load_atlas_state(root, pack, state, limit=100):
             return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
         total_rows=atlas_img.height//height
         frames_count=int(packed.get("frameCount",columns*total_rows))
+        # Check EVERY referenced frame against the physical PNG, even when
+        # later sampling only a subset. A bad frame must fail the entire clip.
+        if atlas_img.height%height or frames_count>columns*total_rows:
+            return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
+        if any(((f//columns)+1)*height>atlas_img.height for f in indices):
+            return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas},[]
         samples=[]
         for frame in indices[::step]:
             if not isinstance(frame,int) or frame<0 or frame>=frames_count:
