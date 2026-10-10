@@ -105,11 +105,20 @@ def estimate_sequence(idle_rgba,frames,required=3):
     """Não marca todos os frames como corretos por poucos exemplos bons."""
     values=[estimate_pair(idle_rgba,f) for f in frames]
     valid=[v["fator"] for v in values if v["status"]=="CONFIRMADO_GEOMETRIA"]
-    if len(valid)<required:
+    # 3/7 successful matches is NOT a validated animation. Require at
+    # least 70% of ALL sampled frames plus evidence in the first, middle
+    # and final thirds. This blocks isolated easy poses hiding bad frames.
+    required=max(required,int(math.ceil(len(values)*.70)))
+    confirmed=[i for i,v in enumerate(values)
+               if v["status"]=="CONFIRMADO_GEOMETRIA"]
+    thirds=np.array_split(np.arange(len(values)),3)
+    coverage=all(any(i in confirmed for i in group) for group in thirds)
+    if len(valid)<required or not coverage:
         return {"status":"INCONCLUSIVO",
-                "motivo":"confirmacao de tamanho insuficiente em poses reais",
-                "confirmados":len(valid),"testados":len(values),
-                "medidas":values}
+                "motivo":"cobertura temporal insuficiente; quadro(s) sem prova",
+                "confirmados":len(valid),"exigidos":required,
+                "cobertura_tercos":coverage,
+                "testados":len(values),"medidas":values}
     median=float(np.median(valid))
     spread=float(np.max(np.abs(np.asarray(valid)-median))/median)
     if spread>.07:
@@ -138,9 +147,23 @@ def read_video_samples(path,selection=(.16,.28,.40,.52,.64,.76,.88)):
             cap.set(cv2.CAP_PROP_POS_FRAMES,max(0,min(count-1,int((count-1)*fraction))))
             ok,frame=cap.read()
             if not ok:
-                continue
+                return []  # Never silently omit a hard frame.
+            # The video segmentation strategy below only works when the
+            # canvas really is green-screen. Otherwise foreground masks
+            # include the background and produce false feature matches.
+            hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+            corner=24
+            corners=np.concatenate((
+                hsv[:corner,:corner].reshape(-1,3),
+                hsv[:corner,-corner:].reshape(-1,3),
+                hsv[-corner:,:corner].reshape(-1,3),
+                hsv[-corner:,-corner:].reshape(-1,3)))
+            ratio=np.mean((corners[:,0]>35)&(corners[:,0]<95)&
+                          (corners[:,1]>45))
+            if ratio<.80:
+                return []  # Non-chroma footage must remain INCONCLUSIVE.
             samples.append(key(frame))
-        return samples
+        return samples if len(samples)==len(selection) else []
     finally:
         cap.release()
 
@@ -185,6 +208,8 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
         for ratio in selection:
             at=min(len(indices)-1,round((len(indices)-1)*ratio))
             f=int(indices[at])
+            if f<0 or f>=int(meta.get("frameCount",cols*((img.height+h-1)//h))):
+                return []  # PIL.crop pads invalid indices with transparent black.
             x=(f%cols)*w
             y=(f//cols)*h
             if x+w>img.width or y+h>img.height:
@@ -199,7 +224,8 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
         return output
 
 
-def compare_source_and_atlas(video,atlas,max_difference=.06):
+def compare_source_and_atlas(video,atlas,max_difference=.06,
+                             idle_tolerance=.08):
     """Gate do tamanho relativo ao IDLE medido em domínios independentes.
 
     O jogo ainda exige conferência em runtime. Nunca transformar 'prova da
@@ -212,10 +238,20 @@ def compare_source_and_atlas(video,atlas,max_difference=.06):
     if min(vs,ps)<=0 or not np.isfinite(vs*ps):
         return {"status":"INCONCLUSIVO","motivo":"fatores invalidos"}
     difference=abs(vs-ps)/max(vs,ps)
+    # Agreement between two wrong-sized sources must NEVER be called
+    # normalization. Require both to remain close to the same character's
+    # idle body size. An inconclusive pose is screened earlier by RANSAC.
+    wrong_reference=(abs(vs-1.)>idle_tolerance or
+                     abs(ps-1.)>idle_tolerance)
+    status=("ESCALA_DIVERGENTE" if difference>max_difference else
+            "ESCALA_FORA_DO_IDLE" if wrong_reference else
+            "PADRONIZADA_FONTE_ATLAS")
     return {
-        "status":"PADRONIZADA_FONTE_ATLAS" if difference<=max_difference
-                 else "ESCALA_DIVERGENTE",
+        "status":status,
         "diferenca_relativa":round(difference,4),
+        "desvio_idle_video":round(vs-1.,4),
+        "desvio_idle_atlas":round(ps-1.,4),
+        "tolerancia_idle":idle_tolerance,
         "fator_video":vs,"fator_atlas":ps,
         "validacao_runtime":"PENDENTE",
         "video":video,"atlas":atlas
