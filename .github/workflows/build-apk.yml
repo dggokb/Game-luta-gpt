@@ -49,6 +49,13 @@ jobs:
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         run: python3 tools/sprites/repair_p01_crouch_heavy.py --apply
 
+      - name: Generate P01 idle-master calibration and audit all sprite frames
+        if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
+        run: |
+          python3 tools/sprites/generate_p01_calibration.py --output \
+            android/app/build/generated/source/p01/com/gamelutagpt/P01SpriteCalibration.java
+          python3 tools/sprites/qa_p01_idle_master.py
+
       - name: Verify P01 geometry and generate sprite review
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         run: python3 tools/sprites/qa_p01_visual.py
@@ -92,6 +99,7 @@ jobs:
             --tests 'com.gamelutagpt.P01HeavyLaunchRegressionTest' \
             --tests 'com.gamelutagpt.P01AttackPacingTest' \
             --tests 'com.gamelutagpt.P01CrouchMovementTest' \
+            --tests 'com.gamelutagpt.P01VisualMasterTest' \
             --tests 'com.gamelutagpt.GlobalMovementTuningTest' \
             --tests 'com.gamelutagpt.CombatEngineTest.launcherConfirmCancelsIntoSuperJumpChase' --stacktrace
 
