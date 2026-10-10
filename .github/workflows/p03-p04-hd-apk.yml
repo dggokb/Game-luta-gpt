@@ -1,0 +1,124 @@
+name: Build P03 and P04 combined HD Android APK
+
+on:
+  push:
+    branches:
+      - test/p03-p04-hd-combined-20261009
+    paths:
+      - .github/workflows/p03-p04-hd-apk.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p03-p04-hd-apk
+  cancel-in-progress: true
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow for atlas validation
+        run: python -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - name: Verify all P03/P04 textures and regenerate global Java without rasterizing any atlas
+        run: |
+          python - <<'PY'
+          import hashlib,json,math,sys
+          from pathlib import Path
+          from PIL import Image
+          sys.path.insert(0,'tools/sprites')
+          import import_sprites as importer
+          import build_characters as pipeline
+          root=Path('.').resolve()
+          results=[]; counts={'p03':0,'p04':0}
+          for path in sorted((root/'tools/sprites/clips').glob('*.json')):
+              cfg=json.loads(path.read_text())
+              report=json.loads((root/cfg['report']).read_text())
+              assert cfg['id']==report['id'],cfg['id']
+              for prefix in counts:
+                  if cfg['id'].startswith(prefix+'_'):
+                      counts[prefix]+=1
+                      assert cfg.get('pixelScale')==2, (cfg['id'],'missing HD scale')
+                      assert report['packed'].get('pixelScale')==2, (cfg['id'],'packed scale')
+                      assert len(report['frames'])==cfg['expectedFrames'], (cfg['id'],'missing frames')
+                      assert report['passed'],cfg['id']
+                      original=root/cfg['source']
+                      assert original.is_file(),cfg['source']
+                      checksum=hashlib.sha256(original.read_bytes()).hexdigest()
+                      assert checksum==report['provenance']['sha256']['source'], (cfg['id'],'source checksum')
+                      output=root/cfg['output']
+                      assert output.is_file(),cfg['output']
+                      with Image.open(output) as atlas:
+                          w=report['packed']['frameWidth']*report['packed']['columns']
+                          h=report['packed']['frameHeight']*math.ceil(report['packed']['frameCount']/report['packed']['columns'])
+                          assert atlas.size==(w,h),(cfg['id'],atlas.size,(w,h))
+                          assert max(atlas.size)<=4096,cfg['id']
+              results.append((cfg,report))
+          assert counts=={'p03':37,'p04':38},counts
+          importer.write_generated_java(results)
+          pipeline.compile_packs(root,results)
+          java=(root/'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java').read_text()
+          assert 'new CharacterDefinition.Atlas("p03_walk_forward"' in java
+          assert 'new CharacterDefinition.Atlas("p04_idle"' in java
+          print('PASS: P03=37, P04=38 HD atlases; generated global Java with both characters')
+          PY
+          git diff --check
+      - name: Commit matching Java metadata to combined test branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          if git diff --cached --quiet; then
+            echo "Generated Java metadata already matches P03 and P04 assets"
+          else
+            git commit -m "Align runtime character atlas metadata for combined P03 and P04 HD [skip ci]"
+            git push origin HEAD:test/p03-p04-hd-combined-20261009
+          fi
+
+  android_apk:
+    needs: metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test/p03-p04-hd-combined-20261009
+      - name: Confirm HD atlas metadata is committed
+        run: |
+          grep -F 'new CharacterDefinition.Atlas("p03_walk_forward"' android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java | grep -F '2.00000000f'
+          grep -F 'new CharacterDefinition.Atlas("p04_idle"' android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java | grep -F '2.00000000f'
+          echo "Building combined test version from $(git rev-parse --short HEAD)"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Pillow for strict Gradle sprite check
+        run: python3 -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - name: Build APK with strict packed-sprite validation
+        working-directory: android
+        run: gradle :app:assembleDebug -PrequireSpriteCheck=true --stacktrace
+      - name: Upload correctly combined Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-P03-P04-HD-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
