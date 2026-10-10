@@ -34,10 +34,11 @@ class CharacterStabilizerTest(unittest.TestCase):
     def test_real_aliases_from_p01_p02_and_p12_drive(self):
         with tempfile.TemporaryDirectory() as d:
             for filename in ["idle.mp4","m2(rasteira).mp4","back_dash.mp4",
-                             "vitoria.mp4","jump.mp4","2H.mp4"]:
+                             "vitoria.mp4","jump.mp4","2H.mp4","defesa_pulo.MP4"]:
                 (Path(d)/filename).touch()
             mapped=e.match_videos(d,["IDLE","CROUCH_MEDIUM","BACKDASH",
-                                      "VICTORY","JUMP","FALL","CROUCH_HEAVY"])
+                                      "VICTORY","JUMP","FALL","CROUCH_HEAVY",
+                                      "DEFENSE_AIR"])
             self.assertTrue(all(x["status"]=="ENCONTRADO" for x in mapped.values()))
             self.assertTrue(mapped["CROUCH_MEDIUM"]["files"][0].endswith("m2(rasteira).mp4"))
 
