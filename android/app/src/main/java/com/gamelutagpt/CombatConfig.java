@@ -61,6 +61,7 @@ final class CombatConfig {
     float dashSpeed = 620f;
     float backdashSpeed = 978f;
     int backdashFrames = 15;
+    int backdashRecoveryFrames = 12; // extra grounded neutral frames before another hop
     /** Visual retreat hop is shared by all fighters; ground collision remains unchanged. */
     float backdashHopHeight = 40f;
     float backdashVisualLift(int framesLeft) {
