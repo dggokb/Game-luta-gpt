@@ -380,11 +380,15 @@ def verify():
             if not box or min(box[0],box[1],256-box[2],256-box[3])<6:
                 raise ValueError(state+f"[{i}]: clipped pose")
         if state in ATTACKS:
-            v=low.crop((0,0,256,256))
+            # The first attack frame should MATCH idle for smooth transitions.
+            # Validate the peak-action midpoint, not the anticipation frame.
+            peak=n//2
+            x,y=peak%4*256,peak//4*256
+            v=low.crop((x,y,x+256,y+256))
             delta=np.abs(np.asarray(v.getchannel("A"),dtype=np.int16)-
                          np.asarray(baseline.getchannel("A"),dtype=np.int16))
             if (delta>64).sum()<180:
-                raise ValueError(state+": still looks like an IDLE placeholder")
+                raise ValueError(state+": has no identifiable peak-action motion")
         print(f"P12 VERIFY {state}: {n} distinct-validated SR frames",flush=True)
     print("P12 FULL CYCLE VERIFIED: all animations have own art and correct alpha.")
 
