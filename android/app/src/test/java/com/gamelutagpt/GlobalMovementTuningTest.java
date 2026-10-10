@@ -16,6 +16,8 @@ public class GlobalMovementTuningTest {
         CombatEngine e=engine();
         assertEquals(820f,e.config.jumpSpeed,.001f);
         assertEquals(1450f,e.config.superJumpSpeed,.001f);
+        assertEquals(1.10f,e.config.normalJumpRisingGravityScale,.001f);
+        assertEquals(1.25f,e.config.normalJumpFallingGravityScale,.001f);
         FighterInput[] pad={new FighterInput(),new FighterInput()};
         pad[0].jump=true;pad[1].jump=true;
         e.step(pad[0],pad[1]);
@@ -26,8 +28,8 @@ public class GlobalMovementTuningTest {
             e.step(pad[0],pad[1]);
         }
         for(int i=0;i<2;i++) {
-            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>195f);
-            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<215f);
+            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>176f);
+            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<194f);
             assertTrue("Fighter did not land "+i,e.fighter(i).grounded);
         }
     }
