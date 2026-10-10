@@ -2,13 +2,13 @@
   "id": "p02_defeat",
   "javaName": "P02_DEFEAT",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defeat_video_normalized.png",
+  "source": "art/sprites/source/p02_defeat_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defeat.png",
   "report": "tools/sprites/reports/p02_defeat.report.json",
   "preview": "android/app/build/sprite-review/p02_defeat-import.png",
   "expectedFrames": 33,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -21,5 +21,12 @@
     "raiz": "148,238",
     "colunas": 11
   },
-  "rootX": 148
+  "rootX": 296,
+  "sourceReferences": [
+    "art/sprites/source/p02_defeat_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

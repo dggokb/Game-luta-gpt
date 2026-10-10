@@ -2,13 +2,13 @@
   "id": "p02_jump_medium",
   "javaName": "P02_JUMP_MEDIUM",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_jump_medium_video_normalized.png",
+  "source": "art/sprites/source/p02_jump_medium_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_jump_medium.png",
   "report": "tools/sprites/reports/p02_jump_medium.report.json",
   "preview": "android/app/build/sprite-review/p02_jump_medium-import.png",
   "expectedFrames": 7,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -23,8 +23,12 @@
     "colunas": 7,
     "pe_no_chao": true
   },
-  "frameWidth": 352,
-  "frameHeight": 288,
-  "rootX": 134,
-  "rootY": 270
+  "frameWidth": 704,
+  "frameHeight": 576,
+  "rootX": 268,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p02_jump_medium_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

@@ -2,13 +2,13 @@
   "id": "p02_heavy_straight",
   "javaName": "P02_HEAVY_STRAIGHT",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_heavy_straight_video_normalized.png",
+  "source": "art/sprites/source/p02_heavy_straight_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_heavy_straight.png",
   "report": "tools/sprites/reports/p02_heavy_straight.report.json",
   "preview": "android/app/build/sprite-review/p02_heavy_straight-import.png",
   "expectedFrames": 23,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 7,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -24,8 +24,12 @@
     "limpar_chao": true,
     "ancorar_pe": true
   },
-  "frameWidth": 298,
-  "frameHeight": 320,
-  "rootX": 104,
-  "rootY": 302
+  "frameWidth": 596,
+  "frameHeight": 640,
+  "rootX": 208,
+  "rootY": 604,
+  "sourceReferences": [
+    "art/sprites/source/p02_heavy_straight_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

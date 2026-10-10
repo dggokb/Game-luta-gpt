@@ -1,143 +1,148 @@
 {
   "id": "p02_ultra_beam",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/p02_ultra_beam_sr_hd.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 384,
-    "frameHeight": 320,
-    "rootX": 115,
-    "rootY": 277,
-    "columns": 9,
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 230,
+    "rootY": 554,
+    "columns": 7,
     "frameCount": 9
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        39,
-        73,
-        188,
-        278
+        77,
+        145,
+        377,
+        556
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 13298
+      "minimumMargin": 77,
+      "opaquePixels": 53533
     },
     {
       "index": 1,
       "outputBbox": [
-        103,
-        108,
-        284,
-        298
+        205,
+        217,
+        568,
+        596
       ],
-      "minimumMargin": 22,
-      "opaquePixels": 12198
+      "minimumMargin": 44,
+      "opaquePixels": 49189
     },
     {
       "index": 2,
       "outputBbox": [
-        126,
-        91,
-        307,
-        300
+        252,
+        181,
+        613,
+        599
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 13126
+      "minimumMargin": 41,
+      "opaquePixels": 53086
     },
     {
       "index": 3,
       "outputBbox": [
-        63,
-        75,
-        254,
-        292
+        126,
+        149,
+        509,
+        583
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 14085
+      "minimumMargin": 57,
+      "opaquePixels": 56829
     },
     {
       "index": 4,
       "outputBbox": [
-        96,
-        78,
-        217,
-        289
+        191,
+        155,
+        435,
+        579
       ],
-      "minimumMargin": 31,
-      "opaquePixels": 12279
+      "minimumMargin": 61,
+      "opaquePixels": 49483
     },
     {
       "index": 5,
       "outputBbox": [
-        91,
-        109,
-        221,
-        295
+        181,
+        217,
+        443,
+        590
       ],
-      "minimumMargin": 25,
-      "opaquePixels": 12304
+      "minimumMargin": 50,
+      "opaquePixels": 49442
     },
     {
       "index": 6,
       "outputBbox": [
-        43,
-        114,
-        272,
-        291
+        85,
+        228,
+        544,
+        581
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 14254
+      "minimumMargin": 59,
+      "opaquePixels": 57452
     },
     {
       "index": 7,
       "outputBbox": [
-        42,
-        113,
-        272,
-        291
+        83,
+        225,
+        544,
+        581
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 14271
+      "minimumMargin": 59,
+      "opaquePixels": 57485
     },
     {
       "index": 8,
       "outputBbox": [
-        31,
-        73,
-        180,
-        278
+        61,
+        145,
+        361,
+        556
       ],
-      "minimumMargin": 31,
-      "opaquePixels": 12954
+      "minimumMargin": 61,
+      "opaquePixels": 52292
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 296,
-    "frameHeight": 247,
-    "rootX": 94,
-    "rootY": 214,
-    "columns": 9,
+    "frameWidth": 577,
+    "frameHeight": 480,
+    "rootX": 181,
+    "rootY": 421,
+    "columns": 7,
     "frameCount": 9,
     "cropOffset": [
-      21,
-      63
+      49,
+      133
     ],
     "decodedBytes": {
-      "canonical": 4423680,
-      "packed": 2632032
-    }
+      "canonical": 27525120,
+      "packed": 15509760
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5ca93e3ccdfa205730488c4747eb6e9388f22c16a98f8d4483bcf86d0bdb1a99",
-      "config": "d154f36e7f29f3b594b98f12bd74ae2218bef7f2b1856bb9fe3abd9fa7800be9",
+      "source": "523a3e2bccc14000ec72ec0a368f4b825e905d46edaba5c3aafd6f11ee39f6f4",
+      "config": "17102c65425152ffc4b9fa2207096c0dc4cbd1ddffb5034769cdd2e316c7c1bc",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_ultra_beam_video_normalized.png": "5ca93e3ccdfa205730488c4747eb6e9388f22c16a98f8d4483bcf86d0bdb1a99"
     }
   }
 }

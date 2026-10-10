@@ -2,13 +2,13 @@
   "id": "p02_crouch_light",
   "javaName": "P02_CROUCH_LIGHT",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_crouch_light_video_normalized.png",
+  "source": "art/sprites/source/p02_crouch_light_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_crouch_light.png",
   "report": "tools/sprites/reports/p02_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/p02_crouch_light-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -24,8 +24,12 @@
     "limpar_chao": true,
     "ancorar_pe": true
   },
-  "frameWidth": 224,
-  "frameHeight": 192,
-  "rootX": 108,
-  "rootY": 174
+  "frameWidth": 448,
+  "frameHeight": 384,
+  "rootX": 216,
+  "rootY": 348,
+  "sourceReferences": [
+    "art/sprites/source/p02_crouch_light_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

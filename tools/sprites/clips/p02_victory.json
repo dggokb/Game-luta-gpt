@@ -2,13 +2,13 @@
   "id": "p02_victory",
   "javaName": "P02_VICTORY",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_victory_video_normalized.png",
+  "source": "art/sprites/source/p02_victory_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_victory.png",
   "report": "tools/sprites/reports/p02_victory.report.json",
   "preview": "android/app/build/sprite-review/p02_victory-import.png",
   "expectedFrames": 33,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -22,7 +22,12 @@
     "raiz": "112,270",
     "colunas": 11
   },
-  "frameHeight": 288,
-  "rootX": 112,
-  "rootY": 270
+  "frameHeight": 576,
+  "rootX": 224,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p02_victory_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }
