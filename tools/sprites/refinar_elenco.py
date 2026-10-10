@@ -78,8 +78,9 @@ def calibration_info(root,character):
 
 def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                       inspect_sprites=True, original_video_inspector=None,
-                      packed_inspector=None):
+                      packed_inspector=None, geometria=True, geometry_inspector=None):
     import estabilizador as e
+    import verificar_escala as g
     if not re.fullmatch(r"p(?:0[1-9]|1[0-2])",character):
         raise ValueError("Somente UM personagem: p01..p12")
     pack, location=manifest(root,character)
@@ -107,6 +108,18 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
     checks={}
     idle_video=None
     idle_packed=None
+    evidence_video=None
+    evidence_sprite=None
+    # Geometric matches only run when original footage + atlas both exist.
+    # Fake/mock readers do not have real frames; tests must inject evidence.
+    if geometria and videos_dir and pack and "IDLE" in all_states:
+        if original_video_inspector is None and packed_inspector is None:
+            idle_path=e.match_videos(videos_dir,["IDLE"])["IDLE"]
+            if idle_path["status"]=="ENCONTRADO":
+                vv=g.read_video_samples(idle_path["files"][0],selection=(.35,.50,.65))
+                evidence_video=vv[1] if len(vv)>=2 else None
+            ss=g.read_sprite_samples(root,pack,"IDLE",selection=(.35,.50,.65))
+            evidence_sprite=ss[1] if len(ss)>=2 else None
     get_video=original_video_inspector or e.load_video
     get_pack=packed_inspector or e.load_atlas_state
     # A referência é sempre o idle do PRÓPRIO lutador, nunca de outro.
@@ -180,12 +193,55 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                     "proporcao_video":ratio_video,
                     "proporcao_sprite":ratio_sprite
                 }
+        # Independent geometric proof: >=3 mutually consistent body matches
+        # in BOTH the source video and exported sprite atlas. Silhouette
+        # proxies alone NEVER prove scale normalization.
+        proof={"status":"INCONCLUSIVO",
+               "motivo":"sem pares de imagens comparaveis com confianca"}
+        if evidence_video is not None and evidence_sprite is not None and \
+                matches["status"]=="ENCONTRADO" and \
+                entry.get("sprite",{}).get("status")=="MEDIDO" and \
+                entry.get("video",{}).get("analise",{}).get("status")=="MEDIDO":
+            if geometry_inspector is not None:
+                proof=geometry_inspector(character,state)
+            else:
+                slices={
+                    "JUMP":(.06,.13,.20,.27,.34),
+                    "FALL":(.65,.73,.81,.89,.97),
+                    "LAND":(.80,.84,.88,.92,.96),
+                    "VICTORY":(.52,.61,.70,.79,.88,.97),
+                }.get(state,(.12,.27,.42,.57,.72,.87))
+                vf=g.read_video_samples(matches["files"][0],selection=slices)
+                sf=g.read_sprite_samples(root,pack,state,selection=slices)
+                if vf and sf:
+                    source=g.estimate_sequence(evidence_video,vf)
+                    packed=g.estimate_sequence(evidence_sprite,sf)
+                    proof={"status":"INCONCLUSIVO",
+                           "video":source,"atlas":packed}
+                    if source["status"]=="ESCALA_GEOMETRICA_ESTAVEL" and \
+                            packed["status"]=="ESCALA_GEOMETRICA_ESTAVEL":
+                        vs,ps=source["fator_mediano"],packed["fator_mediano"]
+                        discrepancy=abs(vs-ps)/max(vs,ps)
+                        proof={"status":"PADRONIZADA_FONTE_ATLAS" if discrepancy<=.06 else
+                                        "ESCALA_DIVERGENTE",
+                               "diferenca_relativa":round(discrepancy,4),
+                               "fator_video":vs,"fator_atlas":ps,
+                               "video":source,"atlas":packed,
+                               "validacao_runtime":"PENDENTE"}
+        entry["prova_geometrica"]=proof
+        # A geometric inconsistency makes the entire state suspect.
+        if proof["status"]=="ESCALA_DIVERGENTE":
+            entry["diferenca_video_jogo"]={
+                "status":"SUSPEITA_GEOMETRICA",
+                "diferenca_relativa":proof["diferenca_relativa"]}
         checks[state]=entry
     incomplete=bool(missing or not pack or
                     calibration["status"]!="CALIBRADO" or
                     idle_video is None or idle_video.get("status")!="MEDIDO" or
                     (inspect_sprites and (idle_packed is None or idle_packed.get("status")!="MEDIDO")) or
-                    any(not e0["evidencias_suficientes"] for e0 in checks.values()))
+                    any(not e0["evidencias_suficientes"] or
+                        (geometria and e0["prova_geometrica"]["status"]!="PADRONIZADA_FONTE_ATLAS")
+                        for e0 in checks.values()))
     warnings=[state for state,v in checks.items()
               if v.get("video",{}).get("analise",{}).get("tremor") or
                  v.get("sprite",{}).get("tremor") or
@@ -207,6 +263,9 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         "aprovado_automaticamente":False,
         "validacao_runtime":"PENDENTE",
         "alteracoes_realizadas":0,
+        "padronizacao_comprovada_nos_estados":[state for state,x in checks.items()
+            if x["prova_geometrica"]["status"]=="PADRONIZADA_FONTE_ATLAS"],
+        "critico":"Sem prova geometrica E teste runtime nao afirmar tamanho correto",
     }
 
 
@@ -217,12 +276,15 @@ def main(argv=None):
     parser.add_argument("--estado",action="append",help="somente este estado; repetir para múltiplos")
     parser.add_argument("--saida",type=Path,default=ROOT/"android/app/build/sprite-review/estabilizador.json")
     parser.add_argument("--sem-sprites",action="store_true",help="video-only para personagem ainda não importado")
+    parser.add_argument("--sem-geometria",action="store_true",
+        help="somente diagnóstico preliminar; NÃO comprova padronização")
     args=parser.parse_args(argv)
     if args.videos_dir is not None and not args.videos_dir.is_dir():
         parser.error("--videos-dir deve apontar para pasta existente com MP4s")
     try:
         result=inspect_character(args.personagem,args.videos_dir,args.estado,
-                                  inspect_sprites=not args.sem_sprites)
+                                  inspect_sprites=not args.sem_sprites,
+                                  geometria=not args.sem_geometria)
     except ValueError as exc:
         parser.error(str(exc))
     args.saida.parent.mkdir(parents=True,exist_ok=True)
