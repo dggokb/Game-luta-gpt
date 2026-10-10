@@ -1,0 +1,10 @@
+{
+  "state": "THROW_TOSS",
+  "count": 8,
+  "columns": 4,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in 4 columns and 2 rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action THROW_TOSS: 1 secure two-hand grapple in front of chest, knees bent; 2 lowers hips underneath imagined opponent; 3 torso rotates back LEFT and elbows pull in; 4 and 5 drives hips and sweeps BOTH arms upward/forward to RIGHT, hands open in release, back foot pushes through; 6 follows through leaning forward with arms extended high RIGHT; 7 retracts arms; 8 neutral. Draw only zombie, genuine full-body throwing release. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "d1652eb7a00ef31f98dea13abfbd8c881d862eec"
+}
