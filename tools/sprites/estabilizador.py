@@ -228,6 +228,60 @@ def metrics(measures, reference_height, state):
             "limite_px":round(max(1.5,reference_height*.015),2)}
 
 
+
+def compare_motion_evidence(source, packed):
+    """Diagnose likely jitter origin; never claim certainty from index alignment.
+
+    Two clips may run at different frame rates and have different anticipation
+    lengths. Match suspicious events by RELATIVE timeline with ±8% tolerance.
+    The result is only a diagnostic; independent runtime validation remains.
+    """
+    if source.get("status")!="MEDIDO" or packed.get("status")!="MEDIDO":
+        return {"status":"INCONCLUSIVO","motivo":"frames insuficientes ou lacunas"}
+    keys=("torso","cabeca","tronco","pe_apoio")
+    a=source.get("tremor",{})
+    b=packed.get("tremor",{})
+    n1=max(1,int(source.get("quadros",0))-1)
+    n2=max(1,int(packed.get("quadros",0))-1)
+    if min(n1,n2)<4:
+        return {"status":"INCONCLUSIVO","motivo":"poucos quadros"}
+    matching,source_only,packed_only=[],[],[]
+    for key in keys:
+        sa=[float(i)/n1 for i in a.get(key,[])]
+        sb=[float(i)/n2 for i in b.get(key,[])]
+        used=set()
+        for i,at in enumerate(sa):
+            candidates=[(abs(at-bt),j) for j,bt in enumerate(sb)
+                        if j not in used and abs(at-bt)<=.08]
+            if candidates:
+                j=min(candidates)[1]
+                used.add(j)
+                matching.append(key)
+            else:
+                source_only.append(key)
+        packed_only.extend(key for j in range(len(sb)) if j not in used)
+    source_drift=bool(source.get("deslize"))
+    packed_drift=bool(packed.get("deslize"))
+    if source_drift and packed_drift:
+        matching.append("deslize")
+    elif source_drift:
+        source_only.append("deslize")
+    elif packed_drift:
+        packed_only.append("deslize")
+    if not (matching or source_only or packed_only):
+        status="SEM_ANOMALIA_TEMPORAL_DETECTADA"
+    elif packed_only:
+        status="SUSPEITA_DE_TREMOR_INTRODUZIDO_NOS_SPRITES"
+    elif source_only:
+        status="SUSPEITA_DE_TREMOR_NA_FONTE"
+    else:
+        status="ANOMALIA_TAMBEM_PRESENTE_NO_VIDEO"
+    return {"status":status,"coincidencias":len(matching),
+            "eventos_so_video":len(source_only),
+            "eventos_so_sprite":len(packed_only),
+            "observacao":"comparacao temporal aproximada; requer verificar ritmo e camera"}
+
+
 def compare_body(idle_stats, other_stats):
     """Retorna *suspeita* de escala, nunca fator para aplicar cegamente.
 
