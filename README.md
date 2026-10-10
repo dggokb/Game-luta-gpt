@@ -1,3 +1,25 @@
+## P01 v0.97 — ajuste fino em tempo real no Android
+
+A regra por bbox do v0.96 encolheu excessivamente alguns estados. Corrigido
+**sem editar PNG, hitboxes ou frames**: DASH agora usa largura máxima natural
+1,32× idle e altura 0,965; VICTORY passa a 0,880 uniforme na pose plantada,
+preservando centralização/solo; o 2H conserva a largura do torso próxima ao idle,
+mas permite a mão estendida chegar a ~1,16× a altura do idle.
+
+**Pela primeira vez dá para acertar a escala no próprio celular**:
+abra o botão **DEBUG**, e à direita aparece **P01 - AJUSTAR TAMANHO**
+com as linhas DASH / 2H / VITORIA. Cada toque em **- / +** altera
+apenas aquela animação em **5%** (80% a 125% do v0.97).
+Os três ajustes são salvos automaticamente e mantidos depois de fechar o app.
+**RESTAURAR 100%** retorna ao novo valor padrão.
+Para aprovação definitiva basta informar as três porcentagens escolhidas;
+não é necessário gerar outro APK para descobrir o tamanho desejado.
+
+Testes: alfa-bounds QA, continuidade de intro→idle, 2M a 30 FPS,
+combos e launcher, backdash, Robolectric da persistência e limites.
+Branch experimental `refino/p01-animacoes-20261009`; não fazer merge
+sem aprovação explícita.
+
 ## v0.95 — pulo com referência de jogos de luta, dash menor, 2M sem quadros perdidos
 
 - Pesquisa: DBFZ normal jump 41 frames, high jump 55 (Dustloop);
