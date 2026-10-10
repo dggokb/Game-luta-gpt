@@ -205,8 +205,8 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
     selected_frames=[indices[position] for position in sample_ids]
     # Reused video/atlas cells are HOLDs, not independent evidence of a
     # stable body scale. This is a proof gate, not a rendering error.
-    if len(set(sample_ids))!=len(sample_ids) or
-       len(set(selected_frames))!=len(selected_frames):
+    if (len(set(sample_ids))!=len(sample_ids) or
+            len(set(selected_frames))!=len(selected_frames)):
         return []
     with Image.open(file) as img:
         if w<=0 or h<=0 or cols<=0 or img.width!=w*cols or img.height%h:
