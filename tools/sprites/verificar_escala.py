@@ -328,6 +328,10 @@ def check_pose_progression(source_frames,atlas_frames):
         return {"status":"SUSPEITA_CLIP_CONGELADO",
                 "poses_distintas_video":video_changes+1,
                 "poses_distintas_atlas":1}
+    if video_changes==0 and atlas_changes>=2:
+        return {"status":"SUSPEITA_MOVIMENTO_NAO_PRESENTE_NA_FONTE",
+                "poses_distintas_video":1,
+                "poses_distintas_atlas":atlas_changes+1}
     return {"status":"SEM_CONGELAMENTO_EVIDENTE" if atlas_changes else "INCONCLUSIVO",
             "poses_distintas_video":video_changes+1,
             "poses_distintas_atlas":atlas_changes+1,
