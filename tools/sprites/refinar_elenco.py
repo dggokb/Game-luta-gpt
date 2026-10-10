@@ -303,9 +303,13 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         "estados":checks,
         "pendentes_revisao":warnings,
         "status":"ANOMALIAS_IDENTIFICADAS" if warnings else
-                 ("DIAGNOSTICO_PRELIMINAR" if not geometria or not inspect_sprites
-                   else "PENDENTE_FONTES" if incomplete
-                   else "MEDICOES_CONCLUIDAS"),
+                 ("PENDENTE_FONTES" if incomplete and
+                  (not geometria or not inspect_sprites) and
+                  (not pack or calibration["status"]!="CALIBRADO" or
+                   any(not x["evidencias_suficientes"] for x in checks.values()))
+                  else "DIAGNOSTICO_PRELIMINAR" if not geometria or not inspect_sprites
+                  else "PENDENTE_FONTES" if incomplete
+                  else "MEDICOES_CONCLUIDAS"),
         "aprovado_automaticamente":False,
         "validacao_runtime":"PENDENTE",
         "alteracoes_realizadas":0,
