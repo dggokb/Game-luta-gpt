@@ -69,6 +69,9 @@ final class CombatConfig {
         return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
     }
     float jumpSpeed = 820f;
+    /** Less hang-time for ordinary jumps, without affecting launched victims or superjumps. */
+    float normalJumpRisingGravityScale = 1.10f;
+    float normalJumpFallingGravityScale = 1.25f;
     float superJumpSpeed = 1450f;
     float gravity = 1650f;
     float launchSpeed = 1450f;
