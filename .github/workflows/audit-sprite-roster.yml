@@ -1,0 +1,37 @@
+name: Audit Sprite Roster
+
+# Run manually from the experimental branch. Read-only reporting, no asset edits,
+# pushes or merges. Scales to however many fighter packs exist.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install sprite analysis libraries
+        run: python3 -m pip install -r tools/sprites/requirements-animar.txt
+      - name: Validate roster triage logic
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v
+      - name: Audit available fighter packs
+        run: |
+          mkdir -p android/app/build/sprite-review
+          python3 tools/sprites/refinar_elenco.py --todos \
+            --saida android/app/build/sprite-review/elenco.json
+      - name: Upload actionable audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sprite-Roster-Audit
+          path: android/app/build/sprite-review/elenco.json
+          if-no-files-found: warn
