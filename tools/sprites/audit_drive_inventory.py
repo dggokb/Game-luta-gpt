@@ -132,7 +132,8 @@ def audit_character(pid, entry, video_root=None, inspect_media=False):
     for state, basename in CANONICAL.items():
         video = found.get(state)
         mapping_video = mapped.get(state)
-        atlas = anims.get(state, {}).get("atlas")
+        atlas_state = "THROW_GRAB" if state == "THROW" else state
+        atlas = anims.get(atlas_state, {}).get("atlas")
         warnings = []
         if state in ambiguous:
             warnings.append("ambiguous_name")
