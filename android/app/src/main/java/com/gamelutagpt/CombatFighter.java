@@ -50,6 +50,9 @@ final class CombatFighter {
     boolean crouching;
     boolean forwardDashing;
     int backdashFrames;
+    /** Prevent repeated retreats while the previous hop/recovery has not reset. */
+    int backdashCooldown;
+    boolean backdashArmed = true;
     /** Horizontal distance moved during the last frame (animation). */
     float travel;
 
