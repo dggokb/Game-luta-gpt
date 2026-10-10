@@ -1475,7 +1475,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float angle = knockdownAngle(renderer, f);
         c.save();
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
-        renderer.draw(c, f.x, f.y, f.facing, damageFlash, guardFlash);
+        // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
+        float visualY = f.y;
+        if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
+            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
+        }
+        renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         c.restore();
     }
 
