@@ -253,8 +253,17 @@ def chroma_confidence(bgr):
     patches=(hsv[:corner,:corner],hsv[:corner,-corner:],
              hsv[-corner:,:corner],hsv[-corner:,-corner:])
     values=np.concatenate([x.reshape(-1,3) for x in patches])
-    return float(np.mean((values[:,0]>35)&(values[:,0]<95)&
-                         (values[:,1]>45)))
+    # Green corners alone are not evidence that the whole scene is keyed:
+    # a framed stage could have green corners and opaque colored borders.
+    strip=max(2,min(h,w)//30)
+    border=np.concatenate((hsv[:strip,:,:].reshape(-1,3),
+                           hsv[-strip:,:,:].reshape(-1,3),
+                           hsv[:,:strip,:].reshape(-1,3),
+                           hsv[:,-strip:,:].reshape(-1,3)))
+    def green_ratio(samples):
+        return float(np.mean((samples[:,0]>35)&(samples[:,0]<95)&
+                             (samples[:,1]>45)))
+    return min(green_ratio(values),green_ratio(border))
 
 
 def load_video(path, max_frames=250):
