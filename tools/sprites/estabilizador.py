@@ -185,7 +185,7 @@ def compare_body(idle_stats, other_stats):
             "observacao":"nao aplicar sem referencia de imagem-base e exame das poses"}
 
 
-def load_video(path, max_frames=100):
+def load_video(path, max_frames=250):
     """Só vídeos com chroma-key reconhecido; jamais segmentar cenário arbitrário."""
     import cv2
     from video_para_sprite import key
@@ -193,6 +193,7 @@ def load_video(path, max_frames=100):
     if not cap.isOpened():
         return {"status":"FALHA_VIDEO","motivo":"arquivo nao abriu"},[]
     fps=cap.get(cv2.CAP_PROP_FPS)
+    declared=cap.get(cv2.CAP_PROP_FRAME_COUNT)
     samples=[]; frames_read=0; green=0
     try:
         while len(samples)<max_frames:
@@ -216,6 +217,9 @@ def load_video(path, max_frames=100):
         cap.release()
     if not samples:
         return {"status":"FALHA_VIDEO","motivo":"sem quadros"},[]
+    if declared>0 and declared>frames_read+1:
+        return {"status":"INCONCLUSIVO","motivo":"vídeo não foi percorrido até o final","quadros_lidos":frames_read,
+                "quadros_no_arquivo":int(declared)},[]
     return {"status":"EXTRAIDO","fps":round(float(fps),3),
             "quadros_lidos":frames_read,"quadros_validos":sum(x is not None for x in samples)},samples
 
