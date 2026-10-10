@@ -117,7 +117,13 @@ def compute():
             elif key == "player_base_backdash":
                 sy = min(.98, idle_height / max(1, height))
                 sx = min(sy, idle_width * 1.40 / max(1, width))
-            elif key in ("player_base_jump", "player_base_fall_air",
+            elif key == "player_base_fall_air":
+                # All six fall frames represent the same-sized fighter as
+                # JUMP, even as the pose unfolds (bounding-box heights
+                # change from 416 to 507px). Applying individual bbox scales
+                # made the final part of the superjump visibly shrink.
+                sx = sy = 1.02
+            elif key in ("player_base_jump",
                          "player_base_jump_light", "player_base_jump_medium",
                          "player_base_jump_heavy", "player_base_jump_heavy_down"):
                 sx = sy = min(.98, idle_height / max(1, height))
