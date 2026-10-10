@@ -271,9 +271,10 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                "motivo":"sem pares de imagens comparaveis com confianca"}
         if matches["status"]=="ENCONTRADO" and \
                 entry.get("sprite",{}).get("status")=="MEDIDO" and \
-                entry.get("video",{}).get("analise",{}).get("status")=="MEDIDO" and \
-                (geometry_inspector is not None or
-                 (evidence_video is not None and evidence_sprite is not None)):
+                entry.get("video",{}).get("analise",{}).get("status")=="MEDIDO":
+            # Motion-quality checks need source + atlas frames, NOT a valid
+            # SIFT baseline. The old gate skipped frozen-animation QA
+            # completely whenever IDLE lacked enough geometric features.
             if geometry_inspector is not None:
                 # Unit-test seam; normal CLI never injects external approval.
                 proof=geometry_inspector(character,state)
@@ -290,9 +291,10 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                     # A motionless atlas can still look perfectly sized.
                     # Detect it independently of RANSAC scale consistency.
                     entry["progressao_pose"]=g.check_pose_progression(vf,sf)
-                    source=g.estimate_sequence(evidence_video,vf)
-                    packed=g.estimate_sequence(evidence_sprite,sf)
-                    proof=g.compare_source_and_atlas(source,packed)
+                    if evidence_video is not None and evidence_sprite is not None:
+                        source=g.estimate_sequence(evidence_video,vf)
+                        packed=g.estimate_sequence(evidence_sprite,sf)
+                        proof=g.compare_source_and_atlas(source,packed)
         entry["prova_geometrica"]=proof
         # A geometric inconsistency makes the entire state suspect.
         if proof["status"] in ("ESCALA_DIVERGENTE","ESCALA_FORA_DO_IDLE"):
