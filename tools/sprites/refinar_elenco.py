@@ -72,7 +72,31 @@ def calibration_info(root,character):
     image=path.parent/"inicio_centro.png"
     if not image.is_file():
         return {"status":"SEM_IMAGEM_BASE","path":str(image)}
+    import cv2
+    import numpy as np
+    im=cv2.imread(str(image),cv2.IMREAD_COLOR)
+    if im is None:
+        return {"status":"IMAGEM_BASE_INVALIDA","path":str(image)}
+    hsv=cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
+    bg=(hsv[:,:,0]>35)&(hsv[:,:,0]<95)&(hsv[:,:,1]>45)
+    n,_,stats,_=cv2.connectedComponentsWithStats((~bg).astype(np.uint8))
+    if n<2:
+        return {"status":"REFERENCIA_SEM_CORPO","path":str(image)}
+    largest=stats[1+int(np.argmax(stats[1:,cv2.CC_STAT_AREA]))]
+    visible_height=float(largest[cv2.CC_STAT_HEIGHT])
+    area=int(largest[cv2.CC_STAT_AREA])
+    if area<1000 or visible_height<60:
+        return {"status":"REFERENCIA_SEM_CORPO","path":str(image)}
+    expected=visible_height*float(data["chaves"]["inicio_centro"])
+    delta=abs(expected-float(data["altura"]))/float(data["altura"])
+    if delta>.075:
+        return {"status":"REFERENCIA_INCONSISTENTE","path":str(image),
+                "altura_declarada":data["altura"],
+                "altura_medida":round(expected,2),
+                "diferenca_relativa":round(delta,4)}
     return {"status":"CALIBRADO","altura":data["altura"],
+            "altura_observada":round(expected,2),
+            "tolerancia_relativa":.075,
             "imagem_base":str(image),"path":str(path)}
 
 
