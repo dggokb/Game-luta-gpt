@@ -69,7 +69,11 @@ def calibration_info(root,character):
     data=json.loads(path.read_text(encoding="utf-8"))
     if not data.get("altura") or not data.get("chaves",{}).get("inicio_centro"):
         return {"status":"REFERENCIA_INVALIDA","path":str(path)}
-    return {"status":"CALIBRADO","altura":data["altura"],"path":str(path)}
+    image=path.parent/"inicio_centro.png"
+    if not image.is_file():
+        return {"status":"SEM_IMAGEM_BASE","path":str(image)}
+    return {"status":"CALIBRADO","altura":data["altura"],
+            "imagem_base":str(image),"path":str(path)}
 
 
 def inspect_character(character, videos_dir=None, states=None, root=ROOT,
