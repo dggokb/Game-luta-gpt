@@ -287,6 +287,9 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                 vf=g.read_video_samples(matches["files"][0],selection=slices)
                 sf=g.read_sprite_samples(root,pack,state,selection=slices)
                 if vf and sf:
+                    # A motionless atlas can still look perfectly sized.
+                    # Detect it independently of RANSAC scale consistency.
+                    entry["progressao_pose"]=g.check_pose_progression(vf,sf)
                     source=g.estimate_sequence(evidence_video,vf)
                     packed=g.estimate_sequence(evidence_sprite,sf)
                     proof=g.compare_source_and_atlas(source,packed)
@@ -316,6 +319,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                  v.get("video",{}).get("analise",{}).get("deslize") or
                  v.get("sprite",{}).get("tremor") or
                  v.get("sprite",{}).get("deslize") or
+                 v.get("progressao_pose",{}).get("status")=="SUSPEITA_CLIP_CONGELADO" or
                  v.get("diferenca_video_jogo") or
                  v.get("proporcao_video",{}).get("status")=="SUSPEITA_DE_ESCALA" or
                  v.get("proporcao_sprite",{}).get("status")=="SUSPEITA_DE_ESCALA" or
