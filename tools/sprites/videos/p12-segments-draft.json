@@ -1,0 +1,722 @@
+{
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "status": "DRAFT_NOT_APPROVED",
+  "note": "Explicit candidate selections from inspected real video contacts. Counts and impact indices preserve the original contract. No runtime approval.",
+  "states": {
+    "IDLE": {
+      "selectedVideoFrames": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        96
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Hunched breathing and head movement",
+      "findings": []
+    },
+    "COMBAT": {
+      "selectedVideoFrames": [
+        0
+      ],
+      "mainIndex": 0,
+      "observedMotion": "Single neutral guard frame from original idle",
+      "findings": [],
+      "phaseLabels": [
+        "entry",
+        "main/hold",
+        "hold/end"
+      ]
+    },
+    "WALK_FORWARD": {
+      "selectedVideoFrames": [
+        32,
+        39,
+        46,
+        53,
+        60,
+        67,
+        74,
+        81,
+        88,
+        95
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Forward stagger with alternating leg support",
+      "findings": [
+        "LOOP_REVIEW: verify alternating planted feet and matching endpoint at one registered body scale."
+      ]
+    },
+    "WALK_BACK": {
+      "selectedVideoFrames": [
+        4,
+        13,
+        22,
+        31,
+        40,
+        49,
+        58,
+        67,
+        76,
+        88
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Backward stagger; support foot and cycle seam need registration",
+      "findings": [
+        "LOOP_REVIEW: verify actual backward travel and alternating support; avoid sliding."
+      ]
+    },
+    "CROUCH": {
+      "selectedVideoFrames": [
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32,
+        40
+      ],
+      "mainIndex": 5,
+      "observedMotion": "Body descends to hands-and-knee low posture",
+      "findings": [],
+      "phaseLabels": [
+        "entry",
+        "main/hold",
+        "hold/end"
+      ]
+    },
+    "RISE": {
+      "selectedVideoFrames": [
+        80,
+        84,
+        88,
+        90,
+        93,
+        96
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Actual recovery from low posture to standing",
+      "findings": []
+    },
+    "JUMP": {
+      "selectedVideoFrames": [
+        24,
+        28,
+        32,
+        36,
+        40,
+        44
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Crouched impulse followed by takeoff",
+      "findings": []
+    },
+    "FALL": {
+      "selectedVideoFrames": [
+        48,
+        52,
+        56,
+        60,
+        64,
+        68
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Airborne folded legs followed by descent",
+      "findings": []
+    },
+    "DASH": {
+      "selectedVideoFrames": [
+        26,
+        30,
+        34,
+        38,
+        42,
+        46,
+        50,
+        54,
+        58,
+        62
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Forward low running lunge",
+      "findings": [
+        "LOOP_REVIEW: running interval must close without visible snap; source speed line must be removed."
+      ]
+    },
+    "BACKDASH": {
+      "selectedVideoFrames": [
+        28,
+        34,
+        40,
+        46,
+        52,
+        58,
+        64,
+        72,
+        80,
+        88
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Hop and low recoil before returning to guard",
+      "findings": []
+    },
+    "LAND": {
+      "selectedVideoFrames": [
+        64,
+        68,
+        72,
+        76,
+        80,
+        84
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Crouched landing and torso recovery",
+      "findings": []
+    },
+    "LIGHT_JAB": {
+      "selectedVideoFrames": [
+        43,
+        49,
+        64,
+        66,
+        68,
+        71,
+        74,
+        79,
+        84,
+        88
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Real extended forward claw/straight-arm strike",
+      "findings": []
+    },
+    "MEDIUM_KICK": {
+      "selectedVideoFrames": [
+        40,
+        43,
+        48,
+        51,
+        54,
+        57,
+        59,
+        61,
+        64,
+        68
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Original M is a shoulder/body lunge; no extended kicking leg visible",
+      "findings": [
+        "SEMANTIC_REVIEW: M.mp4 shows a body charge, not a medium kick. Do not invent a kick or change combat data to hide this."
+      ]
+    },
+    "HEAVY_STRAIGHT": {
+      "selectedVideoFrames": [
+        28,
+        32,
+        40,
+        44,
+        52,
+        60,
+        64,
+        70,
+        78,
+        88
+      ],
+      "mainIndex": 5,
+      "observedMotion": "Overhead two-hand preparation followed by forward/downward swing",
+      "findings": [
+        "SEMANTIC_REVIEW: H.mp4 is an overhead swing, not a straight punch. Match its real attack phase to the unchanged impact index."
+      ]
+    },
+    "DEFENSE_STAND": {
+      "selectedVideoFrames": [
+        24,
+        28,
+        34,
+        38,
+        42,
+        46,
+        50,
+        54
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Standing raised forearm guard; hold phase ends in defensive pose",
+      "findings": [],
+      "phaseLabels": [
+        "entry",
+        "main/hold",
+        "hold/end"
+      ]
+    },
+    "DEFENSE_CROUCH": {
+      "selectedVideoFrames": [
+        16,
+        20,
+        24,
+        28,
+        32,
+        36,
+        40
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Kneeling forearm guard; hold phase ends defensively",
+      "findings": [],
+      "phaseLabels": [
+        "entry",
+        "main/hold",
+        "hold/end"
+      ]
+    },
+    "HIT_STAND": {
+      "selectedVideoFrames": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Candidate initial standing recoil before knockdown begins",
+      "findings": [
+        "CANDIDATE_ONLY: no dedicated standing-hit file; recoil continues into knockdown, with no standalone standing recovery.",
+        "ATTACHED_EFFECT: impact beam/star obscures head/body."
+      ]
+    },
+    "HIT_CROUCH": {
+      "selectedVideoFrames": [
+        16,
+        20,
+        24,
+        28,
+        34,
+        40,
+        48,
+        56,
+        64
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Low hit reaction rises and recoils before crouch recovery",
+      "findings": [
+        "HEIGHT_REVIEW: reaction rises above the low posture; compare against crouch body/hurtbox."
+      ]
+    },
+    "HIT_AIR": {
+      "selectedVideoFrames": [
+        32,
+        36,
+        40,
+        48,
+        56,
+        64
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Visible backward airborne tumble and landing",
+      "findings": [
+        "ATTACHED_EFFECT: source hit beam and shadows must not remain in the fighter sprite."
+      ]
+    },
+    "KNOCKDOWN": {
+      "selectedVideoFrames": [
+        18,
+        20,
+        24,
+        28,
+        32,
+        36,
+        40
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Complete backward collapse to prone posture",
+      "findings": []
+    },
+    "GROUNDED": {
+      "selectedVideoFrames": [
+        40,
+        44,
+        48,
+        52
+      ],
+      "mainIndex": 1,
+      "observedMotion": "Actual prone interval between collapse and getup",
+      "findings": [],
+      "phaseLabels": [
+        "entry",
+        "main/hold",
+        "hold/end"
+      ]
+    },
+    "GETUP": {
+      "selectedVideoFrames": [
+        56,
+        58,
+        60,
+        62,
+        64,
+        66,
+        68,
+        70,
+        72,
+        76
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Original prone-to-standing spring recovery",
+      "findings": [
+        "TRANSITION_REVIEW: source recovery springs quickly from prone to standing; verify continuity to grounded and idle."
+      ]
+    },
+    "CROUCH_LIGHT": {
+      "selectedVideoFrames": [
+        30,
+        36,
+        47,
+        49,
+        51,
+        53,
+        55,
+        58,
+        62,
+        66
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Low extended claw jab with real arm reach and recovery",
+      "findings": []
+    },
+    "CROUCH_MEDIUM": {
+      "selectedVideoFrames": [
+        22,
+        25,
+        28,
+        32,
+        40,
+        43,
+        46,
+        49,
+        53,
+        57
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Low spinning sweep with extended leg",
+      "findings": [
+        "ATTACHED_EFFECT: sweep ring overlaps the extended kicking leg."
+      ]
+    },
+    "CROUCH_HEAVY": {
+      "selectedVideoFrames": [
+        52,
+        54,
+        55,
+        56,
+        59,
+        65,
+        73,
+        80,
+        84,
+        88
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Original 2H rises to a chest-up recoil/roar; no raised striking arm visible",
+      "findings": [
+        "SEMANTIC_REVIEW: 2H.mp4 rises into a roar/recoil; no clear uppercut or forward striking limb."
+      ]
+    },
+    "JUMP_LIGHT": {
+      "selectedVideoFrames": [
+        20,
+        26,
+        32,
+        40,
+        46,
+        54,
+        64
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Real airborne high kick and leg recovery",
+      "findings": []
+    },
+    "JUMP_MEDIUM": {
+      "selectedVideoFrames": [
+        30,
+        36,
+        48,
+        52,
+        58,
+        64,
+        72
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Airborne extended-arm strike with bent legs",
+      "findings": []
+    },
+    "JUMP_HEAVY": {
+      "selectedVideoFrames": [
+        44,
+        48,
+        56,
+        64,
+        66,
+        71,
+        80
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Overhead airborne two-hand attack; source has abrupt zoom",
+      "findings": [
+        "ZOOM: large size discontinuities around video frames 65\u201370.",
+        "ATTACHED_EFFECT: ring and limb ghosts overlap the fighter."
+      ]
+    },
+    "DEFENSE_AIR": {
+      "selectedVideoFrames": [
+        28,
+        32,
+        36,
+        40,
+        44,
+        48,
+        52
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Raised crossed arms with bent airborne legs; defensive hold endpoint",
+      "findings": [],
+      "phaseLabels": [
+        "entry",
+        "main/hold",
+        "hold/end"
+      ]
+    },
+    "ULTRA_BEAM": {
+      "selectedVideoFrames": [
+        4,
+        16,
+        28,
+        40,
+        52,
+        56,
+        64,
+        80,
+        92
+      ],
+      "mainIndex": 5,
+      "observedMotion": "Roar, forward hand strike, overhead swing and ground slam",
+      "findings": [
+        "FX_ALIGNMENT: original roar/strike/slam sequence must align with existing beam effect and unchanged frame data."
+      ]
+    },
+    "SPECIAL_ENERGY": {
+      "selectedVideoFrames": [
+        24,
+        28,
+        32,
+        36,
+        48,
+        51,
+        55,
+        59,
+        64,
+        72
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Low ground lunge and hand strike",
+      "findings": [
+        "FX_ALIGNMENT: low hand strike must align with existing combat effect origin."
+      ]
+    },
+    "THROW_GRAB": {
+      "selectedVideoFrames": [
+        20,
+        24,
+        28,
+        32,
+        36,
+        40
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Reach and grab of source-video opponent",
+      "findings": [
+        "SOURCE_OPPONENT: separate the embedded dark opponent without erasing P12 hands."
+      ]
+    },
+    "THROW_TOSS": {
+      "selectedVideoFrames": [
+        40,
+        44,
+        50,
+        56,
+        60,
+        68
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Grapple/bite and release; no distinct toss shown in these source phases",
+      "findings": [
+        "SOURCE_OPPONENT: embedded opponent must not appear in the character sprite.",
+        "SEMANTIC_REVIEW: bite/release visible, distinct toss not demonstrated."
+      ]
+    },
+    "SPECIAL_S2": {
+      "selectedVideoFrames": [
+        28,
+        36,
+        48,
+        50,
+        54,
+        58,
+        62,
+        68,
+        74,
+        82
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Rising airborne claw swing and landing",
+      "findings": [
+        "ATTACHED_EFFECT: bright claw arc overlaps raised hands."
+      ]
+    },
+    "SPECIAL_S3": {
+      "selectedVideoFrames": [
+        24,
+        30,
+        36,
+        40,
+        48,
+        58,
+        64,
+        68,
+        72,
+        80
+      ],
+      "mainIndex": 5,
+      "observedMotion": "Chest-open windup and long forward claw strike",
+      "findings": []
+    },
+    "SPECIAL_S4": {
+      "selectedVideoFrames": [
+        28,
+        34,
+        44,
+        46,
+        48,
+        52,
+        56,
+        60,
+        66,
+        72
+      ],
+      "mainIndex": 2,
+      "observedMotion": "Full backward flip and recovery",
+      "findings": []
+    },
+    "SUPER_WAVE": {
+      "selectedVideoFrames": [
+        18,
+        24,
+        30,
+        38,
+        48,
+        56,
+        68,
+        74,
+        82,
+        90
+      ],
+      "mainIndex": 6,
+      "observedMotion": "Multi-hit punch/knee/overhead slam action",
+      "findings": [
+        "FX_ALIGNMENT: original combo must align to existing wave effect and unchanged frame data."
+      ]
+    },
+    "INTRO": {
+      "selectedVideoFrames": [
+        0,
+        16,
+        28,
+        40,
+        52,
+        64,
+        72,
+        80,
+        88,
+        96
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Head turns and torso lowers into zombie guard",
+      "findings": []
+    },
+    "JUMP_HEAVY_DOWN": {
+      "selectedVideoFrames": [
+        56,
+        60,
+        64,
+        66,
+        67,
+        70,
+        74
+      ],
+      "mainIndex": 3,
+      "observedMotion": "Candidate downward phase of original jH overhead attack",
+      "findings": [
+        "CANDIDATE_ONLY: shared jH downward phase, not an independently confirmed downward-heavy clip.",
+        "ZOOM_AND_EFFECTS: large size shifts and attached ring/limb ghosts."
+      ]
+    },
+    "VICTORY": {
+      "selectedVideoFrames": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        72,
+        84,
+        96
+      ],
+      "mainIndex": 6,
+      "observedMotion": "Body straightens and head tilts into victory posture",
+      "findings": []
+    },
+    "DEFEAT": {
+      "selectedVideoFrames": [
+        24,
+        32,
+        40,
+        44,
+        48,
+        52,
+        56,
+        64,
+        80,
+        96
+      ],
+      "mainIndex": 6,
+      "observedMotion": "Kneeling collapse and persistent defeated posture",
+      "findings": []
+    },
+    "TAUNT": {
+      "selectedVideoFrames": [
+        8,
+        20,
+        28,
+        36,
+        48,
+        56,
+        64,
+        72,
+        84,
+        96
+      ],
+      "mainIndex": 4,
+      "observedMotion": "Head turn and raised beckoning claw before recovery",
+      "findings": []
+    }
+  }
+}

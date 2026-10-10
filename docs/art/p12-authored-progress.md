@@ -30,6 +30,14 @@ The runtime P12 pack is still the rejected previous pack. The newly generated dr
 
 `p12_pose_gate.py`, harmony and graphic audit thresholds remain unchanged. The old runtime still fails source binding and has its known 14 harmony defects and 16 critical graphic findings. These have NOT been marked resolved by the extraction work.
 
-Pending: reviewed frame/impact selections; scale and support-foot correction; alpha/effect review; cached real super-resolution; Character Pack/Android resources and Java generation; mandatory audit passes; Android tests; emulator exercise and APK.
+Candidate frame/impact selections now cover all 42 states in `tools/sprites/videos/p12-segments-draft.json`. Each selected source hash matches the original extraction. Counts and impact indices match the unchanged combat contract. Walk previews use original source PTS because runtime walking is distance-driven, not duration-driven. `docs/art/p12-video-state-review/` contains 42 animated source previews, individual three-phase sheets, six overview pages, an offline HTML gallery and exact provenance. All are explicitly DRAFT_NOT_APPROVED, not normalized final animations.
+
+Source review identified distinct high kicks in `jL.mp4`, a real low leg sweep in `2M.mp4` and a forward claw strike in `L.mp4`. It also records real unresolved mismatches: `M.mp4` shows a body charge rather than an extended kick; `2H.mp4` rises into a roar/recoil without a clear striking limb; `agarrao.mp4` embeds a dark opponent and shows bite/release rather than a distinct toss. Existing engine state names and combat data have not been changed to hide these differences.
+
+Production `p12_full_cycle.py` now calls `p12_video_cycle.py`, not the superseded authored-sheet renderer. Its source reader hashes the actual consumed video extraction pixels against the recorded originals and only permits subtractive alpha masks, measured uniform whole-pose camera scaling and root translation. The mandatory start/peak files are actually read into the rendered atlas. It rejects missing/unreviewed registration before runtime or SR writes. No registration was fabricated, and no state was marked reviewed. Cached SR implementation is reused without rewriting the model or alpha validation.
+
+The additional 10 video provenance tests exercise changed pixels disguised as a video frame, stale masks, alpha-only removal, repeated neutral frames, fabricated timestamps, shifted impact indices and distance-driven walk timing. All 18 focused P12 tests pass (8 previous + 10 new). A preparation trial remains correctly blocked because video registration is absent; production atlases and APK have not been replaced.
+
+Pending: visual confirmation/correction of the 42 candidate selections; scale and support-foot correction; alpha/effect review; cached real super-resolution; Character Pack/Android resources and Java generation; mandatory audit passes; Android tests; emulator exercise and APK.
 
 The character is NOT finalized. Extraction is not animation approval.

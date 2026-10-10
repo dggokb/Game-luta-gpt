@@ -1,0 +1,5351 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "contractSha256": "231699ea2ae4deacb20ddacd5da5575916736808254a335719db006bc11a5fa8",
+  "planSha256": "94ac144d2914d609753c5a79e3906749cf5039e6939732f35f8ed7a2b8b03f61",
+  "states": {
+    "IDLE": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "idle.mp4",
+        "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+        "driveUrl": "https://drive.google.com/file/d/1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2/view?usp=drivesdk",
+        "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f"
+      },
+      "frames": [
+        {
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourcePixelSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+          "sourceBox": [
+            439,
+            97,
+            853,
+            679
+          ]
+        },
+        {
+          "videoFrame": 10,
+          "sourceTimeSeconds": 0.416667,
+          "sourcePixelSha256": "395048c8e3221994dd59ba9147b1f73c9584054d35e640c8971e99aa75f79ac6",
+          "sourceBox": [
+            439,
+            91,
+            847,
+            679
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "b11fea9427a22dbbc0f0949f41faed62ca065ff0eed0c9280dfc5e2a4b88c27a",
+          "sourceBox": [
+            439,
+            89,
+            871,
+            679
+          ]
+        },
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "9d5c2728623c1d92ef4be969a6cb1e754592d6bca5eb62b0ad7475b1ec0782aa",
+          "sourceBox": [
+            439,
+            101,
+            851,
+            679
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "da5c3339ebeee0d06356199f41379442a086394c6981c6d0329d1982a719f9f0",
+          "sourceBox": [
+            439,
+            79,
+            863,
+            679
+          ]
+        },
+        {
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourcePixelSha256": "9ade6b0fadf91d32bc29130f4fdf824ad961f58bfad481e4bdd80961ee28d69d",
+          "sourceBox": [
+            439,
+            97,
+            847,
+            679
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "4c71012118856261146453d6c71471e91b4bd86e8f33a28df0994a808fc81832",
+          "sourceBox": [
+            439,
+            85,
+            851,
+            679
+          ]
+        },
+        {
+          "videoFrame": 70,
+          "sourceTimeSeconds": 2.916667,
+          "sourcePixelSha256": "ce58d5051afadfcb165951f2901b3a8557ac3ad1f46338c20004b141ba754c40",
+          "sourceBox": [
+            439,
+            91,
+            865,
+            679
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "93f3dcfbfa7fd3ebfe9f262c5f7048581b7f840dd9ff4e8de1193a0fe285443f",
+          "sourceBox": [
+            439,
+            95,
+            849,
+            679
+          ]
+        },
+        {
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourcePixelSha256": "d2bc59fafa83f5cf31cedc43275c10d7c4a1cb7cc550fb0f5784f8ef328a4079",
+          "sourceBox": [
+            439,
+            97,
+            859,
+            681
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2,
+        319.2
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Hunched breathing and head movement",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "63aff5188916a3207cb611358feb2adf1336244bf6b00abe5fa1af1cb4f29251"
+    },
+    "COMBAT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "idle.mp4",
+        "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+        "driveUrl": "https://drive.google.com/file/d/1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2/view?usp=drivesdk",
+        "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f"
+      },
+      "frames": [
+        {
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourcePixelSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+          "sourceBox": [
+            439,
+            97,
+            853,
+            679
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        100.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 0,
+      "observedMotion": "Single neutral guard frame from original idle",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "f34e75ea0efe4890a5cb3f7410baed5f9d3ab8682f46adc173d2b6ac89430cf3"
+    },
+    "WALK_FORWARD": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "frente.mp4",
+        "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+        "driveUrl": "https://drive.google.com/file/d/1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS/view?usp=drivesdk",
+        "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8"
+      },
+      "frames": [
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "4c43bbcc37fe50cf47a6da40e17fae44ced6769c7355e771b881c3a9c78a773c",
+          "sourceBox": [
+            389,
+            241,
+            781,
+            657
+          ]
+        },
+        {
+          "videoFrame": 39,
+          "sourceTimeSeconds": 1.633333,
+          "sourcePixelSha256": "80256463b9a818f47519eb800088caff204982cd8ec7a28073bda35d6a69c400",
+          "sourceBox": [
+            415,
+            214,
+            789,
+            653
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "bbc4408e9e91639fcd350fbb1c3cbfe27178e3257bb7ae15cfae8f4014055686",
+          "sourceBox": [
+            335,
+            249,
+            807,
+            651
+          ]
+        },
+        {
+          "videoFrame": 53,
+          "sourceTimeSeconds": 2.216667,
+          "sourcePixelSha256": "c8afb4bedeea66affe2d24d5a656dc033317c84b279a09ad0d3809e557324a8b",
+          "sourceBox": [
+            329,
+            257,
+            795,
+            649
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "048feae09f0e1a63c2a32733dbfdcc0a5b496324a6b37802a17adeb39e2e0e28",
+          "sourceBox": [
+            479,
+            217,
+            790,
+            643
+          ]
+        },
+        {
+          "videoFrame": 67,
+          "sourceTimeSeconds": 2.8,
+          "sourcePixelSha256": "d1a7b35c337f4eba4ec82971fe2aa50c94f9296365eee240e8bf16a47883241b",
+          "sourceBox": [
+            382,
+            233,
+            855,
+            657
+          ]
+        },
+        {
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourcePixelSha256": "2e017303cd5877b67d7764de5a71b87057f771e2676cb60e2de495a620081ecb",
+          "sourceBox": [
+            367,
+            249,
+            785,
+            657
+          ]
+        },
+        {
+          "videoFrame": 81,
+          "sourceTimeSeconds": 3.383333,
+          "sourcePixelSha256": "7138f8e4186a322d5fef69db828240d73a4db3db6707d62eb190a2537823361f",
+          "sourceBox": [
+            451,
+            215,
+            787,
+            655
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "0b2ebb09b4a4391a5b49c1101c95891d18413080ffeca8e202dfd952514b17c8",
+          "sourceBox": [
+            359,
+            233,
+            809,
+            653
+          ]
+        },
+        {
+          "videoFrame": 95,
+          "sourceTimeSeconds": 3.966667,
+          "sourcePixelSha256": "2b35a097e35a68e91499b844dc7fff07980a1fc851754e30bb98a086631b5c22",
+          "sourceBox": [
+            325,
+            261,
+            793,
+            651
+          ]
+        }
+      ],
+      "runtimeDurationsMs": null,
+      "runtimeDistancePerFrame": 25.0,
+      "previewTiming": "source-PTS-distance-driven-runtime",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Forward stagger with alternating leg support",
+      "findings": [
+        "LOOP_REVIEW: verify alternating planted feet and matching endpoint at one registered body scale."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "65b26bca73b809cf96f572f2b3ca817f9e35be335fda6e0916af8a5a8e3e3a8c"
+    },
+    "WALK_BACK": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "tras.mp4",
+        "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+        "driveUrl": "https://drive.google.com/file/d/1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh/view?usp=drivesdk",
+        "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe"
+      },
+      "frames": [
+        {
+          "videoFrame": 4,
+          "sourceTimeSeconds": 0.166667,
+          "sourcePixelSha256": "392561a6c321c3a1f1648e29102084287bc6a83df3cc2ac54308ad0ddd9af486",
+          "sourceBox": [
+            405,
+            219,
+            791,
+            673
+          ]
+        },
+        {
+          "videoFrame": 13,
+          "sourceTimeSeconds": 0.55,
+          "sourcePixelSha256": "4a4a02059c36bec4d5bcf1ddb19865dc06ee8ad599621cd48a7975b9b02269fa",
+          "sourceBox": [
+            421,
+            209,
+            775,
+            671
+          ]
+        },
+        {
+          "videoFrame": 22,
+          "sourceTimeSeconds": 0.916667,
+          "sourcePixelSha256": "645ff93ece0c14333408f3434d864709d741dcf4e2493470899e5c1635fb299a",
+          "sourceBox": [
+            381,
+            189,
+            711,
+            671
+          ]
+        },
+        {
+          "videoFrame": 31,
+          "sourceTimeSeconds": 1.3,
+          "sourcePixelSha256": "9b49b99d32f1cd6da1f2d4df49c46939c537ba84fe1862779e785c49d827b8ef",
+          "sourceBox": [
+            331,
+            191,
+            673,
+            671
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "6e9de397fdacd523a32ce6e57817717a3398c17f09c8612bd97ce9d9f9e24e29",
+          "sourceBox": [
+            281,
+            177,
+            645,
+            671
+          ]
+        },
+        {
+          "videoFrame": 49,
+          "sourceTimeSeconds": 2.05,
+          "sourcePixelSha256": "aaed7d344d683c6f304b8ee4373805950ff5841eb22fcca33fd543e794d4fb91",
+          "sourceBox": [
+            199,
+            205,
+            659,
+            673
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "5c49ccf4a86c56217ab027b0d6896b5dd19f795918d7cba22818f21716cc38b5",
+          "sourceBox": [
+            237,
+            225,
+            631,
+            673
+          ]
+        },
+        {
+          "videoFrame": 67,
+          "sourceTimeSeconds": 2.8,
+          "sourcePixelSha256": "ac86dd5f955dcc4cd0a0ef116b62939647b04ff623288145594a38010509ff18",
+          "sourceBox": [
+            271,
+            208,
+            639,
+            673
+          ]
+        },
+        {
+          "videoFrame": 76,
+          "sourceTimeSeconds": 3.166667,
+          "sourcePixelSha256": "699cecbaef558ad4913e9fe2e6ca9d724d23e5a2eb640fe53d50ea0d91f8207a",
+          "sourceBox": [
+            265,
+            195,
+            563,
+            673
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "bfb16256f33311b3babff80568903b81e7d1519f9410ed394d55d1e91cfa7538",
+          "sourceBox": [
+            117,
+            189,
+            527,
+            673
+          ]
+        }
+      ],
+      "runtimeDurationsMs": null,
+      "runtimeDistancePerFrame": 15.64,
+      "previewTiming": "source-PTS-distance-driven-runtime",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Backward stagger; support foot and cycle seam need registration",
+      "findings": [
+        "LOOP_REVIEW: verify actual backward travel and alternating support; avoid sliding."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "c4cadde588ae72083aa53a11ab1fe15c5342c01196e4b2496b15eb6be22d744e"
+    },
+    "CROUCH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "agachado.mp4",
+        "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+        "driveUrl": "https://drive.google.com/file/d/1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-/view?usp=drivesdk",
+        "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4"
+      },
+      "frames": [
+        {
+          "videoFrame": 8,
+          "sourceTimeSeconds": 0.333333,
+          "sourcePixelSha256": "2b523a66439379606232b03f05bc6ee16d9bae7b494d3637f5a46261e6b90059",
+          "sourceBox": [
+            481,
+            151,
+            789,
+            679
+          ]
+        },
+        {
+          "videoFrame": 12,
+          "sourceTimeSeconds": 0.5,
+          "sourcePixelSha256": "7f46b3c30e843ec44d2927f94af9390d1d2a805cf39179cc5bbf1f8dd4c24f49",
+          "sourceBox": [
+            485,
+            175,
+            845,
+            679
+          ]
+        },
+        {
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourcePixelSha256": "60df6c8988c2b897f1e0ed29ebc1aca8627247b9decb300a19064d5723d3d32a",
+          "sourceBox": [
+            489,
+            369,
+            947,
+            695
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "87f86eeffdcbd5f47cdbf75c6a103c162641e285ad5430c64c9b70e9c61b1720",
+          "sourceBox": [
+            489,
+            436,
+            943,
+            695
+          ]
+        },
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "3a741f45423f0f0be71b51fa7da1691670a7c69cf5b6d8ed5ea38b663f02545f",
+          "sourceBox": [
+            489,
+            427,
+            943,
+            695
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "af324796fd96b4d43c29df49f16e2814450cbe3c6c04dd97ef0cbc32e084f14c",
+          "sourceBox": [
+            489,
+            425,
+            943,
+            695
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "6b875fb8674a7f00d533d332f18f229b540bfd628d30bdf448ac26b9e400cac4",
+          "sourceBox": [
+            489,
+            429,
+            943,
+            695
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "d53a68f12f2bfcfc1d76bd3c8836be842a4e3413e8b6e2701a4c8588ab448801",
+          "sourceBox": [
+            489,
+            425,
+            943,
+            695
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0,
+        22.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 5,
+      "observedMotion": "Body descends to hands-and-knee low posture",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "953938f737dd19de21458a5c5675f0367eeb908e54d9c742800692e153b9f4ba"
+    },
+    "RISE": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "agachado.mp4",
+        "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+        "driveUrl": "https://drive.google.com/file/d/1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-/view?usp=drivesdk",
+        "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4"
+      },
+      "frames": [
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "3f721d84ebda07c6d5f573b6134386d460030193a83ce923a7e602edfb252702",
+          "sourceBox": [
+            485,
+            272,
+            827,
+            677
+          ]
+        },
+        {
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourcePixelSha256": "11a8bbc021181e5384061a4947ed79922a42edd74ffed08601c5044505bfecff",
+          "sourceBox": [
+            481,
+            245,
+            811,
+            679
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "8d00d01a3a593f7b5c01724862be0afc2e9cf86701627c8034a61dc37040aca5",
+          "sourceBox": [
+            481,
+            207,
+            795,
+            679
+          ]
+        },
+        {
+          "videoFrame": 90,
+          "sourceTimeSeconds": 3.75,
+          "sourcePixelSha256": "4e62aa6c084da52422cd87375612a984bd5c40e27ed6fdd9e83043f282b1906f",
+          "sourceBox": [
+            481,
+            185,
+            789,
+            679
+          ]
+        },
+        {
+          "videoFrame": 93,
+          "sourceTimeSeconds": 3.883333,
+          "sourcePixelSha256": "880008819cedd7ef5b11000fd081c131718f9776490a3f907cd2a9ef8524016e",
+          "sourceBox": [
+            481,
+            173,
+            789,
+            679
+          ]
+        },
+        {
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourcePixelSha256": "9e28d42f25379d44e079f4b9e7a4ff904c30cea6c64c59e459221bfa4e2f5a64",
+          "sourceBox": [
+            480,
+            167,
+            789,
+            679
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 2,
+      "observedMotion": "Actual recovery from low posture to standing",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "a06158571b849a7476d0e986eef78c77494bf6d236502932d1cadeeabf6c057d"
+    },
+    "JUMP": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jump.mp4",
+        "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+        "driveUrl": "https://drive.google.com/file/d/1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN/view?usp=drivesdk",
+        "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc"
+      },
+      "frames": [
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "ddeba6b62f212790017f5de060da674bce106384c20e6c65711d7fc477628ecf",
+          "sourceBox": [
+            493,
+            295,
+            797,
+            663
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "b827f18a98c9acbd426315eb2ae1ea05e43bc1e1b4597e59ff5b4a3cfe5277be",
+          "sourceBox": [
+            495,
+            335,
+            807,
+            663
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "b965db96b22e271c47af26f59f14688ae5cfc9ca72fc3e9c1487da35dbda8aeb",
+          "sourceBox": [
+            495,
+            377,
+            819,
+            663
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "094d03a3b39178afa0a802ef93788635d1482d9a6e0d8a5a594c5daeccd854a2",
+          "sourceBox": [
+            495,
+            385,
+            821,
+            663
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "74e0c74d0479831a3b834ec6d71a08e4158994f533857775ab693485ca16d409",
+          "sourceBox": [
+            503,
+            89,
+            781,
+            663
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "a4032c0ac2b27e37b502d05b3e46c5a32a6385e63e1eb67e32c7d6e4b652e8a1",
+          "sourceBox": [
+            549,
+            39,
+            827,
+            477
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 3,
+      "observedMotion": "Crouched impulse followed by takeoff",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "042d14833c011ca390346eeb7d5e2f24045e650622016de4fe929c4347d17b20"
+    },
+    "FALL": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jump.mp4",
+        "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+        "driveUrl": "https://drive.google.com/file/d/1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN/view?usp=drivesdk",
+        "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc"
+      },
+      "frames": [
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "71dcf3fc72dfe3d6a385e859adada60e70e461242e7875aaa0de53e4d1d85b3e",
+          "sourceBox": [
+            539,
+            71,
+            817,
+            439
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "6a220eeba05bcbcd9694fe8c20b5373870cf53bdfcd69d4489f347826f3504e4",
+          "sourceBox": [
+            531,
+            81,
+            813,
+            439
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "e19fb31c45d770ba942b686f50331de4e281fcf0d2ea280e4c844422534e9d4c",
+          "sourceBox": [
+            529,
+            87,
+            815,
+            443
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "edf7d5e3760d698db3691da64dbc09a37de9a674a30ee30480254fa8c91ce47f",
+          "sourceBox": [
+            525,
+            103,
+            827,
+            555
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "5c7db9dbe81b92f2d9f9dbeed82f23d6aefc712ffe971c0f6b9a99d897e3e10d",
+          "sourceBox": [
+            494,
+            279,
+            861,
+            667
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "8470484540796dade9e5fa44c1242588abd66a06c754d3308d9c56a72c37027e",
+          "sourceBox": [
+            493,
+            351,
+            819,
+            663
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        66.6667,
+        66.6667,
+        66.6667,
+        66.6667,
+        66.6667,
+        66.6667
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 2,
+      "observedMotion": "Airborne folded legs followed by descent",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "7760ef3a4a401291490d5f7e489f15913261fd406cb7afd18326491a7b6486a2"
+    },
+    "DASH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "dash.mp4",
+        "driveId": "1hytD7iXF_5Ucu0Ku5YifnniZN9gUqHpW",
+        "driveUrl": "https://drive.google.com/file/d/1hytD7iXF_5Ucu0Ku5YifnniZN9gUqHpW/view?usp=drivesdk",
+        "videoSha256": "7442f378d8b1bb1d02639832de714f988bed7b1fe9928a24ad7f6dd054e3e086"
+      },
+      "frames": [
+        {
+          "videoFrame": 26,
+          "sourceTimeSeconds": 1.083333,
+          "sourcePixelSha256": "02bf8921ad84ee5dab949d75bb4ae82031fc8da74a19166599bd5c13fa80aa25",
+          "sourceBox": [
+            351,
+            415,
+            967,
+            643
+          ]
+        },
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "fab8d14ce65b2b26ef24544ef03f35d1500030a3598c21d2900da3461309dc22",
+          "sourceBox": [
+            451,
+            403,
+            851,
+            643
+          ]
+        },
+        {
+          "videoFrame": 34,
+          "sourceTimeSeconds": 1.416667,
+          "sourcePixelSha256": "3826a9e5c7abece42b32a3cf24ce987e44fe3dba2a2e071ea581f56185a5086a",
+          "sourceBox": [
+            355,
+            417,
+            1280,
+            651
+          ]
+        },
+        {
+          "videoFrame": 38,
+          "sourceTimeSeconds": 1.583333,
+          "sourcePixelSha256": "dc1caca8bbe538d986c11d65305a163a9cd04a324df0fd82245b1d6b41b16973",
+          "sourceBox": [
+            469,
+            407,
+            851,
+            649
+          ]
+        },
+        {
+          "videoFrame": 42,
+          "sourceTimeSeconds": 1.75,
+          "sourcePixelSha256": "a794683d4f150b690843b13c2a55fa8e513509c0a9185a775c26d77bec82b416",
+          "sourceBox": [
+            359,
+            411,
+            965,
+            643
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "b6490d357e496b88bf9d430d0715321d1d7716226d7b209e1634ca3185d41afd",
+          "sourceBox": [
+            425,
+            409,
+            849,
+            653
+          ]
+        },
+        {
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourcePixelSha256": "bb5bea7f95e2ee338f77375ee4271e9832845d94d583086feec737efe89b108c",
+          "sourceBox": [
+            395,
+            402,
+            859,
+            645
+          ]
+        },
+        {
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourcePixelSha256": "cf71e1a64f1ea367dd47e39334c9ef87e6d62278818ade667f5a818cee9e471d",
+          "sourceBox": [
+            373,
+            409,
+            915,
+            653
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "c096407520ecf90d6290b423ebdcb70724b9d483c4cc536b972d7b4d41573ec8",
+          "sourceBox": [
+            0,
+            397,
+            855,
+            657
+          ]
+        },
+        {
+          "videoFrame": 62,
+          "sourceTimeSeconds": 2.583333,
+          "sourcePixelSha256": "89289d65146f14ce98414dfd9715981d1e83910979bfeb6bca45a0769ce73cfa",
+          "sourceBox": [
+            0,
+            409,
+            987,
+            678
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0,
+        24.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Forward low running lunge",
+      "findings": [
+        "LOOP_REVIEW: running interval must close without visible snap; source speed line must be removed."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "ebd41eda168ca2622603d5cd9c2e917a6e263f8aa7c95e9e2ee4fb2c9767a20c"
+    },
+    "BACKDASH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "backDash.mp4",
+        "driveId": "1I4lafKnQ7PymRgYZDLPzRcTMpdKjvKyz",
+        "driveUrl": "https://drive.google.com/file/d/1I4lafKnQ7PymRgYZDLPzRcTMpdKjvKyz/view?usp=drivesdk",
+        "videoSha256": "34f2a84d0711520926eeb030524ea2d60c50f0213938192ef41cd94a661497a5"
+      },
+      "frames": [
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "663465508144bb7c0b788547935c8488253b1b48de6ead02f1a4ed96245c2827",
+          "sourceBox": [
+            507,
+            293,
+            791,
+            659
+          ]
+        },
+        {
+          "videoFrame": 34,
+          "sourceTimeSeconds": 1.416667,
+          "sourcePixelSha256": "87af8fbe1a7c2cc201073e74796b6e82c73dc28cc6f722b6d685322a578e3fac",
+          "sourceBox": [
+            505,
+            329,
+            811,
+            661
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "caa09f565ba71753d0f5d63d7e72351dff508bca4b49a82a776503d3eccafac1",
+          "sourceBox": [
+            341,
+            147,
+            703,
+            625
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "0e2cedc95d7c798d20624004b118cc7525aa6f0bd7b5d752d57c82f951bbaea8",
+          "sourceBox": [
+            211,
+            193,
+            665,
+            667
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "604acd445b12b7d1e8355998e1ff5e761ce2f15a10be0dd4fb949b783c01ab1e",
+          "sourceBox": [
+            149,
+            309,
+            513,
+            667
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "397c7f4ad1ffb5b01bb46ca759a669b534818bd5b2bbd8d649e1a300030bf1b6",
+          "sourceBox": [
+            143,
+            297,
+            507,
+            667
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "1e573df68baec17853133c0ee9d2d232010ed641bc98d5443f3504e1b37eddc0",
+          "sourceBox": [
+            145,
+            313,
+            511,
+            667
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "1993160136224b31d16d25997abaebe3b4b83466d848bc338b5fcef44a8fcc99",
+          "sourceBox": [
+            345,
+            185,
+            787,
+            593
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "1e3ed5862dd1f0f60da6136082e1840caf7c32ad4b23392422ef51aa82b14de6",
+          "sourceBox": [
+            511,
+            293,
+            797,
+            661
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "9411a38e8f9f62d1fea556529233a8b60ab77ea858ef5286be9ce22a207788fa",
+          "sourceBox": [
+            511,
+            269,
+            785,
+            661
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Hop and low recoil before returning to guard",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "b166d7ea27c57e37fb87d32be50679db2c5fcf7023465cc905a62c109da80365"
+    },
+    "LAND": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jump.mp4",
+        "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+        "driveUrl": "https://drive.google.com/file/d/1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN/view?usp=drivesdk",
+        "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc"
+      },
+      "frames": [
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "5c7db9dbe81b92f2d9f9dbeed82f23d6aefc712ffe971c0f6b9a99d897e3e10d",
+          "sourceBox": [
+            494,
+            279,
+            861,
+            667
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "8470484540796dade9e5fa44c1242588abd66a06c754d3308d9c56a72c37027e",
+          "sourceBox": [
+            493,
+            351,
+            819,
+            663
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "1c29c0d0ee76e0c7e5d11907f9762bdbab0c2cd34edde63dede729e21e923ff1",
+          "sourceBox": [
+            493,
+            331,
+            801,
+            663
+          ]
+        },
+        {
+          "videoFrame": 76,
+          "sourceTimeSeconds": 3.166667,
+          "sourcePixelSha256": "4382dcf1028f5a6e6cb8b719fff1e5d1a58958fded60cb7a5d49d6e25015dcbd",
+          "sourceBox": [
+            493,
+            307,
+            797,
+            663
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "1cbcddf2e7a4d54d904224f98dfde27980e572de410157f312edd7d52b2f6593",
+          "sourceBox": [
+            495,
+            293,
+            795,
+            663
+          ]
+        },
+        {
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourcePixelSha256": "9e872ea4481fa04827994209dd169f50ea20644e12707d2cbfb627cdf6486c42",
+          "sourceBox": [
+            495,
+            293,
+            795,
+            663
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 2,
+      "observedMotion": "Crouched landing and torso recovery",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "fe8411793d01113d49afc181cacc4ad9eebc91219dc2e2eae9e6eeba1310bd52"
+    },
+    "LIGHT_JAB": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "L.mp4",
+        "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+        "driveUrl": "https://drive.google.com/file/d/1C7gktSi2rxku1nEusiuttV96RJa0MXHg/view?usp=drivesdk",
+        "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8"
+      },
+      "frames": [
+        {
+          "videoFrame": 43,
+          "sourceTimeSeconds": 1.8,
+          "sourcePixelSha256": "f513832144b5f4b7ed7e9ea5ee859c1955a0352219ccd27316e2d3429eb62aea",
+          "sourceBox": [
+            307,
+            153,
+            785,
+            681
+          ]
+        },
+        {
+          "videoFrame": 49,
+          "sourceTimeSeconds": 2.05,
+          "sourcePixelSha256": "2a65031baf91b9487766a80a20dfa62008b2f619dcddf82ceada08a1ede666a5",
+          "sourceBox": [
+            305,
+            95,
+            815,
+            681
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "5bd5f566f58d52e7ba7dfd498c99c3271e45f5fae0e9ef102fd41ada3b7f2766",
+          "sourceBox": [
+            317,
+            123,
+            1107,
+            681
+          ]
+        },
+        {
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourcePixelSha256": "f8e8ff544d5c21cf30eb8ad9b22934a90b7b85f05dc8b7e6912bc1ed97117d3f",
+          "sourceBox": [
+            317,
+            123,
+            1107,
+            681
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "c1aa0397fa19cb972fd23c9b5544a0b71d7a810c516189053c577770197718f0",
+          "sourceBox": [
+            317,
+            125,
+            1107,
+            681
+          ]
+        },
+        {
+          "videoFrame": 71,
+          "sourceTimeSeconds": 2.966667,
+          "sourcePixelSha256": "c5ca1047cea02d075636e9fb58df2a53b753b0a7a57989c10196d80f4eacb1fa",
+          "sourceBox": [
+            315,
+            145,
+            1021,
+            681
+          ]
+        },
+        {
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourcePixelSha256": "0193514758329b651fb3dde7bcaa66ecb791af97763eb1be9695746195012d42",
+          "sourceBox": [
+            313,
+            169,
+            871,
+            681
+          ]
+        },
+        {
+          "videoFrame": 79,
+          "sourceTimeSeconds": 3.3,
+          "sourcePixelSha256": "dd2f1aea374582ccf6e1021f3d9c71a962b17708171b57c151e2b3c6e397ac97",
+          "sourceBox": [
+            309,
+            179,
+            801,
+            681
+          ]
+        },
+        {
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourcePixelSha256": "4065c5d812808b313aaebe98d2f58cd18075586669d9b279078152576dd2be07",
+          "sourceBox": [
+            307,
+            171,
+            797,
+            681
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "84893c47b61d56184cfaa5b7e10cd6ccf01f81537a9729b04e27cdde304f9f43",
+          "sourceBox": [
+            307,
+            163,
+            793,
+            681
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        17.0,
+        17.0,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 2,
+      "mainIndex": 2,
+      "observedMotion": "Real extended forward claw/straight-arm strike",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "2a75357688abea45176e2a856975c44f4d0c2ac95fed0647a2bd210e11743181"
+    },
+    "MEDIUM_KICK": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "M.mp4",
+        "driveId": "1G1f00w_lhEImpEgiD_NOCBrNp4C9MpAU",
+        "driveUrl": "https://drive.google.com/file/d/1G1f00w_lhEImpEgiD_NOCBrNp4C9MpAU/view?usp=drivesdk",
+        "videoSha256": "27e40c87ba382309e0a7e18a1c8d122504720e4812e2748b984389cb6b55fd74"
+      },
+      "frames": [
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "7dc60b0527b8c58303b39ce19cdb5d2e27c3dcdb66d43c9e9448d8b17077fcf3",
+          "sourceBox": [
+            529,
+            249,
+            751,
+            649
+          ]
+        },
+        {
+          "videoFrame": 43,
+          "sourceTimeSeconds": 1.8,
+          "sourcePixelSha256": "095259eda9a7e63bab628482e609fb155fb139013192081ed06cae7579c79e58",
+          "sourceBox": [
+            527,
+            267,
+            810,
+            649
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "a108d28d417cf8ce8e3d6c6844da0b1bc54b7ddcbbf68ec34cb44dea9ef8ad28",
+          "sourceBox": [
+            527,
+            307,
+            879,
+            649
+          ]
+        },
+        {
+          "videoFrame": 51,
+          "sourceTimeSeconds": 2.133333,
+          "sourcePixelSha256": "763f716a175662d027a3eb922a7ba7c4a0cabb139871232bba2e0b3c5746739d",
+          "sourceBox": [
+            527,
+            309,
+            881,
+            649
+          ]
+        },
+        {
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourcePixelSha256": "936dffcef32d19f7481c8161d526255f66ed4d78bf8f6c592c0c17cabf50b5ae",
+          "sourceBox": [
+            527,
+            309,
+            879,
+            649
+          ]
+        },
+        {
+          "videoFrame": 57,
+          "sourceTimeSeconds": 2.383333,
+          "sourcePixelSha256": "3ccdbd2c720b25da5bacd2cadfe1d0fdfe637029016c069c5334a85a9838ac37",
+          "sourceBox": [
+            527,
+            301,
+            853,
+            649
+          ]
+        },
+        {
+          "videoFrame": 59,
+          "sourceTimeSeconds": 2.466667,
+          "sourcePixelSha256": "33642ca08f61d27fb4a60c54856d92be9cb288feb772717a465f192045f097b4",
+          "sourceBox": [
+            529,
+            285,
+            795,
+            649
+          ]
+        },
+        {
+          "videoFrame": 61,
+          "sourceTimeSeconds": 2.55,
+          "sourcePixelSha256": "80463e39a7a460ebc9282fc15e2009161a39d112bc52e8077dde4d44568bc523",
+          "sourceBox": [
+            527,
+            273,
+            755,
+            649
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "5f9dd902063d1fa15ebb20ee7a92649c8ba9db9db9c1685e5c4fabcbc0510662",
+          "sourceBox": [
+            527,
+            261,
+            753,
+            649
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "96ee738f60b11f25ec3d25153febedad5f071f6c3d7adc0ccb8cf65b62a1826b",
+          "sourceBox": [
+            527,
+            259,
+            751,
+            649
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        33.0,
+        33.0,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25,
+        25.25
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 2,
+      "mainIndex": 2,
+      "observedMotion": "Original M is a shoulder/body lunge; no extended kicking leg visible",
+      "findings": [
+        "SEMANTIC_REVIEW: M.mp4 shows a body charge, not a medium kick. Do not invent a kick or change combat data to hide this."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "fd44a5671650ed739d10742a191114c2ea519aed8b5a9babb521d270b9deb647"
+    },
+    "HEAVY_STRAIGHT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "H.mp4",
+        "driveId": "1r1JePO5vGThbPI5KPVnaNfXW1Z0LNVgs",
+        "driveUrl": "https://drive.google.com/file/d/1r1JePO5vGThbPI5KPVnaNfXW1Z0LNVgs/view?usp=drivesdk",
+        "videoSha256": "c777dcb188057bf5ef2880690ac622e470e3ffe43c70aca13cddce5d130939a7"
+      },
+      "frames": [
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "6603a367128c4761b69702a6f6ed62f364028b5e74460fc26cb68381e65ba23e",
+          "sourceBox": [
+            503,
+            267,
+            789,
+            657
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "387fb080d3ee97681a8b1722d15f18e54916e2b85bc3bacc62c0f69f3372c6c9",
+          "sourceBox": [
+            503,
+            243,
+            867,
+            657
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "c500129034881eb4a030827ad3e3f16b931eb6511ee7027499383055ca03bfb3",
+          "sourceBox": [
+            503,
+            71,
+            771,
+            657
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "e54704c151a82b8a904fc8379fe3c8de97ce0aecf5fafe7980e465e887ca934b",
+          "sourceBox": [
+            503,
+            83,
+            771,
+            657
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "c391bb270c29de8e72169a4a416548d153fd4afa5060ac4e328da196dc94c75e",
+          "sourceBox": [
+            507,
+            77,
+            773,
+            659
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "024b469b6edea72a00ee3dd0f7ec006de5f4265e38aa8f008cdfc66b30906d4f",
+          "sourceBox": [
+            439,
+            271,
+            785,
+            659
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "45410351b2a8d768b50ab2566e0d24a4751a7af8c5b0ba46306f6f551bffb75f",
+          "sourceBox": [
+            439,
+            271,
+            783,
+            659
+          ]
+        },
+        {
+          "videoFrame": 70,
+          "sourceTimeSeconds": 2.916667,
+          "sourcePixelSha256": "43142f175cfa9a8166646c4c559f1f607e882567390d503a1fc00fc0bb6cd8f4",
+          "sourceBox": [
+            493,
+            291,
+            775,
+            657
+          ]
+        },
+        {
+          "videoFrame": 78,
+          "sourceTimeSeconds": 3.25,
+          "sourcePixelSha256": "9d817e3da97893708382f93ed07cb268f8ef40e39db5ddf6d260a033b073123d",
+          "sourceBox": [
+            505,
+            255,
+            769,
+            657
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "0d7dff3b3128c0e9a69cb6c925d21389b6f837b109d4e5af4eb25cb7ccd5447d",
+          "sourceBox": [
+            505,
+            255,
+            769,
+            657
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        36.8,
+        36.8,
+        36.8,
+        36.8,
+        36.8,
+        43.2,
+        43.2,
+        43.2,
+        43.2,
+        43.2
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 5,
+      "mainIndex": 5,
+      "observedMotion": "Overhead two-hand preparation followed by forward/downward swing",
+      "findings": [
+        "SEMANTIC_REVIEW: H.mp4 is an overhead swing, not a straight punch. Match its real attack phase to the unchanged impact index."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "16e4228331026fc40660fd6ecbf8e1c2eac3ceba2eb76e1ef36761127ffb549a"
+    },
+    "DEFENSE_STAND": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "defendeCima.mp4",
+        "driveId": "14qVgSoLn67-vd-6_xrMrx0fqETAM17UW",
+        "driveUrl": "https://drive.google.com/file/d/14qVgSoLn67-vd-6_xrMrx0fqETAM17UW/view?usp=drivesdk",
+        "videoSha256": "bc9e1aba5a17920cce437c7d762ca05f11658a43704074d35db7894c1c569a98"
+      },
+      "frames": [
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "c11285ded5513e534e3f745c6cad788a8a9c9f53621c884c3d540b827cb9a299",
+          "sourceBox": [
+            525,
+            261,
+            757,
+            649
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "56670cdc15cd2466d0c0d622eaa6283015341dcb8a147fbe97c8cdcbd2455006",
+          "sourceBox": [
+            526,
+            263,
+            757,
+            649
+          ]
+        },
+        {
+          "videoFrame": 34,
+          "sourceTimeSeconds": 1.416667,
+          "sourcePixelSha256": "f794be866dc21fe4c5300452fbf65014c9b460048ea32e4b350e19290439e0f0",
+          "sourceBox": [
+            507,
+            233,
+            763,
+            647
+          ]
+        },
+        {
+          "videoFrame": 38,
+          "sourceTimeSeconds": 1.583333,
+          "sourcePixelSha256": "c2c2f21083365caec7e854b67a086033e0f11932d42dbee6bd6f2b42f2ff0854",
+          "sourceBox": [
+            489,
+            231,
+            761,
+            647
+          ]
+        },
+        {
+          "videoFrame": 42,
+          "sourceTimeSeconds": 1.75,
+          "sourcePixelSha256": "4c9ecb38fbe30948adba59b6946434856f9d07789763b56a5afca35fca60dfc9",
+          "sourceBox": [
+            489,
+            231,
+            761,
+            647
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "5c555a20ee33df5576a422d0a17f3bc406126484ab770ae6c25ef58b76de1c0c",
+          "sourceBox": [
+            491,
+            231,
+            759,
+            647
+          ]
+        },
+        {
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourcePixelSha256": "8973655becee065c5a2ba52b0127445fb8fda72b46b0d659ec2d86bc781ec74e",
+          "sourceBox": [
+            493,
+            235,
+            759,
+            647
+          ]
+        },
+        {
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourcePixelSha256": "c6deb8abfb97b8bc1f66c5ebf413217c34aa920f7b85b782f00a737687866192",
+          "sourceBox": [
+            497,
+            253,
+            759,
+            647
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375,
+        44.375
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Standing raised forearm guard; hold phase ends in defensive pose",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "eacb94a336aa15aab12c4a86c85b76ad1b7d85a046f06734b398c89a6b74cce8"
+    },
+    "DEFENSE_CROUCH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "defendeBaixo.mp4",
+        "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+        "driveUrl": "https://drive.google.com/file/d/1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI/view?usp=drivesdk",
+        "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6"
+      },
+      "frames": [
+        {
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourcePixelSha256": "30ae63b58b3ff59298e6c5d3dc66bdad9d847db87012c4d2e27e6ce1a4f6cb1e",
+          "sourceBox": [
+            457,
+            341,
+            916,
+            639
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "025e68d53c839b562aa599de3ce762dbf021509a12d562e35aa05869ddd2b1bd",
+          "sourceBox": [
+            347,
+            240,
+            831,
+            639
+          ]
+        },
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "16c6662c71cc2209c90475f377b9d06881f3412aa27df56f71af2e908c5cf17a",
+          "sourceBox": [
+            309,
+            235,
+            785,
+            639
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "246fbdf4c67a5fd195aa48b03241495e843c77cca2d6e75cc2acdb9f38a52e0a",
+          "sourceBox": [
+            283,
+            233,
+            753,
+            639
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "8d2de8cdfb6b86ef40bd1490915827deb1ee6af5a8b99b7d3acfec94f4b263fd",
+          "sourceBox": [
+            271,
+            251,
+            729,
+            639
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "93427ae2d1f3fc35f6f3dcdc98076324c8ff41d45faa76f3a4d76246fe0878a0",
+          "sourceBox": [
+            267,
+            263,
+            719,
+            639
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "ba28f841ee24b254b3a05f3ded78cfff393ffaa27265005c399e549817480aba",
+          "sourceBox": [
+            267,
+            259,
+            719,
+            639
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Kneeling forearm guard; hold phase ends defensively",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "3a090a93eb4039ba7d9745bfa782e87cabac10a56eaf7128d801012e434eb751"
+    },
+    "HIT_STAND": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "derruba_levanta.mp4",
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "driveUrl": "https://drive.google.com/file/d/1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2/view?usp=drivesdk",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+      },
+      "frames": [
+        {
+          "videoFrame": 12,
+          "sourceTimeSeconds": 0.5,
+          "sourcePixelSha256": "d5ec06d39b915f27324f06e20791e4f0ba5d9a8d0a74ce9b81bdefea848bf693",
+          "sourceBox": [
+            527,
+            269,
+            759,
+            649
+          ]
+        },
+        {
+          "videoFrame": 13,
+          "sourceTimeSeconds": 0.55,
+          "sourcePixelSha256": "19be06b09d0e4d5d324191079132844c86c53aea0b8fbdefb5dbe361c5811cfe",
+          "sourceBox": [
+            527,
+            269,
+            759,
+            649
+          ]
+        },
+        {
+          "videoFrame": 14,
+          "sourceTimeSeconds": 0.583333,
+          "sourcePixelSha256": "e4e2c47e6aba2c0e585435a2f347efa2914a8505e1d5a68fc1aa670fafbdeffc",
+          "sourceBox": [
+            527,
+            271,
+            759,
+            649
+          ]
+        },
+        {
+          "videoFrame": 15,
+          "sourceTimeSeconds": 0.633333,
+          "sourcePixelSha256": "6f693f3e8b7c64c0aab617502f972f5e129af1768c76dc30b7993e191656c534",
+          "sourceBox": [
+            527,
+            271,
+            759,
+            649
+          ]
+        },
+        {
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourcePixelSha256": "b838dcba4b25c103c3a3988908b73ee5b9eaebf1d47350c330b8427f7ab0a76e",
+          "sourceBox": [
+            527,
+            251,
+            1280,
+            649
+          ]
+        },
+        {
+          "videoFrame": 17,
+          "sourceTimeSeconds": 0.716667,
+          "sourcePixelSha256": "3e944ae7e2d7a1ff30dda4f64f247719ebd64a9a2e297cf4494e911868ddea76",
+          "sourceBox": [
+            419,
+            221,
+            1280,
+            633
+          ]
+        },
+        {
+          "videoFrame": 18,
+          "sourceTimeSeconds": 0.75,
+          "sourcePixelSha256": "05a63ed46f64fad9c7c71ef4836cff023dc61c4d8d81c2eadf9b08e61e23005a",
+          "sourceBox": [
+            307,
+            211,
+            717,
+            583
+          ]
+        },
+        {
+          "videoFrame": 19,
+          "sourceTimeSeconds": 0.8,
+          "sourcePixelSha256": "e07dd0192bb9cbf57ad8b629b35b52049e30649795d3dfdf681124bf4e4ed156",
+          "sourceBox": [
+            259,
+            235,
+            671,
+            565
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "16475001e320a2c9c7e530e23e5ad164eda573c7ac8ca88086e2793aa6fb6d20",
+          "sourceBox": [
+            211,
+            265,
+            671,
+            553
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778,
+        42.7778
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Candidate initial standing recoil before knockdown begins",
+      "findings": [
+        "CANDIDATE_ONLY: no dedicated standing-hit file; recoil continues into knockdown, with no standalone standing recovery.",
+        "ATTACHED_EFFECT: impact beam/star obscures head/body."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "1803e598e1fae185096753788be708c81419dbe6f6aecc5233f6c426ad564ca3"
+    },
+    "HIT_CROUCH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "danoBaixo.mp4",
+        "driveId": "1fOk832ZgDX1Z8018tcerTlgT0tqEmNPV",
+        "driveUrl": "https://drive.google.com/file/d/1fOk832ZgDX1Z8018tcerTlgT0tqEmNPV/view?usp=drivesdk",
+        "videoSha256": "addadb43e887c9d235e10b90ab8768f443d98576f000074b5274c72a589503fe"
+      },
+      "frames": [
+        {
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourcePixelSha256": "4cd600507fc3753d7cc2f80e27508756553cf553ad98982537d651e71f96adb5",
+          "sourceBox": [
+            421,
+            359,
+            875,
+            647
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "617dc053d71a47c096ea286df6ac44cc1545216888bb811d5206abb9187dc7fa",
+          "sourceBox": [
+            423,
+            225,
+            1280,
+            649
+          ]
+        },
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "12971c4d68312cb4bfc2466e030be7393a1e7e770368f0e786529d34fc52c228",
+          "sourceBox": [
+            433,
+            151,
+            865,
+            633
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "eecd1de27fdfcd133f0de29d03611a7518ce9f9eb599e5bb31141815af3ff148",
+          "sourceBox": [
+            341,
+            153,
+            857,
+            633
+          ]
+        },
+        {
+          "videoFrame": 34,
+          "sourceTimeSeconds": 1.416667,
+          "sourcePixelSha256": "56535f9d361a369d54b143d61cdc14f75423362d270a3840448962b38a083f3e",
+          "sourceBox": [
+            247,
+            145,
+            831,
+            633
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "12ceb8622fbf38d2714ef9f5579b2373e1b65010540ee98b96e2bf6c91487d6b",
+          "sourceBox": [
+            213,
+            183,
+            767,
+            637
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "0c29a3945ae4a0c2784260eff92b984db4ff148e00d74b9f8f96ce2b183819f0",
+          "sourceBox": [
+            185,
+            199,
+            711,
+            637
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "befc38b47256294086409b36c55670cc03470790cde1082e2a64097ab4e278f7",
+          "sourceBox": [
+            369,
+            219,
+            843,
+            633
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "8d9830e5953e46a288b0f8c82b05270eec5f20e1c5381e6b0232d58262d10fff",
+          "sourceBox": [
+            421,
+            367,
+            875,
+            645
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0,
+        40.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 3,
+      "observedMotion": "Low hit reaction rises and recoils before crouch recovery",
+      "findings": [
+        "HEIGHT_REVIEW: reaction rises above the low posture; compare against crouch body/hurtbox."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "204291060cd7ee112f966dd5fb2287a67cd2fc2c3903549d1356b7e4d38ea64e"
+    },
+    "HIT_AIR": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "danoPulo.mp4",
+        "driveId": "17E3_5ZgX2R2vcbGrvmDGh6WVnS2rhqNT",
+        "driveUrl": "https://drive.google.com/file/d/17E3_5ZgX2R2vcbGrvmDGh6WVnS2rhqNT/view?usp=drivesdk",
+        "videoSha256": "256ba180bdc504a4f6819dee093c44739f95904e3ab79162fc3620fa099712bb"
+      },
+      "frames": [
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "665656f53efee99240bec7fca3a3a89e05e21696fc7ccc9c8687bfa1f6e68fcb",
+          "sourceBox": [
+            529,
+            285,
+            767,
+            651
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "a3432b5af94f7ce148ff0d918f231739015d647df35a58997814d9159ba9ff63",
+          "sourceBox": [
+            503,
+            369,
+            799,
+            651
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "846aec0a1a3874540912ab86fcc48fe2922ff4276c21dddf9dec40d2a52d3c6c",
+          "sourceBox": [
+            365,
+            71,
+            1280,
+            501
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "e1a2bf4d14b6516db5a2b225714d1b43205fd7fa94014ee2cb35217cdedd16c0",
+          "sourceBox": [
+            415,
+            67,
+            885,
+            425
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "2fe9679ea3041a962dc48c7069eca42c925b054563315910d7d24669abbad45a",
+          "sourceBox": [
+            549,
+            24,
+            847,
+            437
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "dc6b1179538939c6f628038868f249a2d833f24493f09886dd20fa83a304bded",
+          "sourceBox": [
+            525,
+            361,
+            829,
+            651
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        36.6667,
+        36.6667,
+        36.6667,
+        36.6667,
+        36.6667,
+        36.6667
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 2,
+      "observedMotion": "Visible backward airborne tumble and landing",
+      "findings": [
+        "ATTACHED_EFFECT: source hit beam and shadows must not remain in the fighter sprite."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "d574c1e9ba632ad7330c422d0dd4f1804a1a6e26e75f1734fe87b4a1ef89599a"
+    },
+    "KNOCKDOWN": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "derruba_levanta.mp4",
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "driveUrl": "https://drive.google.com/file/d/1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2/view?usp=drivesdk",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+      },
+      "frames": [
+        {
+          "videoFrame": 18,
+          "sourceTimeSeconds": 0.75,
+          "sourcePixelSha256": "05a63ed46f64fad9c7c71ef4836cff023dc61c4d8d81c2eadf9b08e61e23005a",
+          "sourceBox": [
+            307,
+            211,
+            717,
+            583
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "16475001e320a2c9c7e530e23e5ad164eda573c7ac8ca88086e2793aa6fb6d20",
+          "sourceBox": [
+            211,
+            265,
+            671,
+            553
+          ]
+        },
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "14cb546b967f5cd1e2e6e17aaecfd589254c3b9f596d2a5170c6ced9b77b44c2",
+          "sourceBox": [
+            129,
+            317,
+            613,
+            651
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "3e59af791ec62622712f920a168b508225360e198012ba8ac0d7c451e7a0bed3",
+          "sourceBox": [
+            141,
+            439,
+            701,
+            657
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "09b1e1450f88d7236a454721384983aff52ca29063cd1a282442421283516527",
+          "sourceBox": [
+            143,
+            435,
+            701,
+            663
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "c37d7096e839e7f580da269b12e05bc916bb73ab4e9cc74332991f0546c2d522",
+          "sourceBox": [
+            143,
+            519,
+            705,
+            665
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "2d80786378218858297acf3aca3f49675a9feff47ea34263563df7d2cfa83cba",
+          "sourceBox": [
+            143,
+            543,
+            705,
+            665
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        31.0,
+        31.0,
+        31.0,
+        31.0,
+        31.0,
+        31.0,
+        31.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 3,
+      "observedMotion": "Complete backward collapse to prone posture",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "3bc4f06fb7a65cb8aadbf2325bfad1c2e90c3246357eb9d316c03c564ec10a19"
+    },
+    "GROUNDED": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "derruba_levanta.mp4",
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "driveUrl": "https://drive.google.com/file/d/1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2/view?usp=drivesdk",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+      },
+      "frames": [
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "2d80786378218858297acf3aca3f49675a9feff47ea34263563df7d2cfa83cba",
+          "sourceBox": [
+            143,
+            543,
+            705,
+            665
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "17c063dfd50b6d509c4cbd405dcfe70bb95d052910dbcc9c958217bc47ab99c3",
+          "sourceBox": [
+            143,
+            543,
+            705,
+            665
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "cadd5dda0190fa0b8a107c3d3d08423bd16cc00a59897c02481efaa533ecca27",
+          "sourceBox": [
+            143,
+            543,
+            703,
+            665
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "b9f9e01d05fa2d402cfb764b3488fa3b4ed689d3dd2190a9f420723d12eedd0f",
+          "sourceBox": [
+            143,
+            543,
+            703,
+            665
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        300.0,
+        300.0,
+        300.0,
+        300.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 1,
+      "observedMotion": "Actual prone interval between collapse and getup",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "72cb059bd8c682dda37ca3a43f4e329b7889d789bd427b01009be91a8246b6aa"
+    },
+    "GETUP": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "derruba_levanta.mp4",
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "driveUrl": "https://drive.google.com/file/d/1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2/view?usp=drivesdk",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+      },
+      "frames": [
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "81d1f51d42285aec05845c82ed9739bd44247dff8b643f85621355e6a5b78f47",
+          "sourceBox": [
+            143,
+            543,
+            703,
+            665
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "0c0c3f97e925caf39828243708d817f0bbb642064d3eb3f0b4aca27226ec8b88",
+          "sourceBox": [
+            143,
+            543,
+            703,
+            665
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "455efe6f621b2a89af64b0e64b6e558b650b8a659827d71cb7f118e0a6b366e7",
+          "sourceBox": [
+            351,
+            201,
+            637,
+            613
+          ]
+        },
+        {
+          "videoFrame": 62,
+          "sourceTimeSeconds": 2.583333,
+          "sourcePixelSha256": "b9354ecfeabfc74c0d991a4075afa85a694db2a1552a1908d2b96f5ffb1b2960",
+          "sourceBox": [
+            449,
+            122,
+            691,
+            585
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "830ceae0cc5120f16698d38177dbc323056310900aa6b7ff4e1c1adf6147d764",
+          "sourceBox": [
+            463,
+            131,
+            723,
+            597
+          ]
+        },
+        {
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourcePixelSha256": "947fae6018edf97c1be695ff37797b271f40eba161387e774b26556ec53a200c",
+          "sourceBox": [
+            481,
+            263,
+            812,
+            651
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "26ceef85b939b181c46a9d9c33ded62df7a7794d58e1fcdcb497a11278c9d80a",
+          "sourceBox": [
+            527,
+            297,
+            793,
+            651
+          ]
+        },
+        {
+          "videoFrame": 70,
+          "sourceTimeSeconds": 2.916667,
+          "sourcePixelSha256": "6e55d7b93e7e29f805e7d0ff76cb5d91140f096210742b6e3ade5b51e9d7b734",
+          "sourceBox": [
+            527,
+            291,
+            761,
+            651
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "04ce1732cb4fca2c22b41781e12849fe0cec858493aea653a4cf98cdeb508c88",
+          "sourceBox": [
+            527,
+            283,
+            760,
+            651
+          ]
+        },
+        {
+          "videoFrame": 76,
+          "sourceTimeSeconds": 3.166667,
+          "sourcePixelSha256": "eb2dbc8a9acd1dabc3785aaabc01c0ed359c60bfa7216d2cefdb571d1083f95f",
+          "sourceBox": [
+            529,
+            266,
+            759,
+            649
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0,
+        35.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Original prone-to-standing spring recovery",
+      "findings": [
+        "TRANSITION_REVIEW: source recovery springs quickly from prone to standing; verify continuity to grounded and idle."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "aca31bc5341ef3d58800e2a9b266abc5fec6a00b735ba73d02d9c982ee910285"
+    },
+    "CROUCH_LIGHT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "2L.mp4",
+        "driveId": "1dMthyNXsSGXM8lOk6ErwTd93eoKmGmyF",
+        "driveUrl": "https://drive.google.com/file/d/1dMthyNXsSGXM8lOk6ErwTd93eoKmGmyF/view?usp=drivesdk",
+        "videoSha256": "2788c895fb099bdc6356a9c8d947ffdf2b28778ef22b2a320673c672c6379f58"
+      },
+      "frames": [
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "8e93769bd6f942fd9e227ee08f52992f0e0325254cce85c3dfa2347291f75aa1",
+          "sourceBox": [
+            461,
+            413,
+            809,
+            645
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "905f8e6833d7059bbb2d0db4b84e977f30fec51876b65856a7985acc45b7e6aa",
+          "sourceBox": [
+            461,
+            389,
+            763,
+            645
+          ]
+        },
+        {
+          "videoFrame": 47,
+          "sourceTimeSeconds": 1.966667,
+          "sourcePixelSha256": "989744174a9d58a6dcc3d7c6f63d4f266dc79275470d29b79e3a137e348d9407",
+          "sourceBox": [
+            463,
+            427,
+            1001,
+            645
+          ]
+        },
+        {
+          "videoFrame": 49,
+          "sourceTimeSeconds": 2.05,
+          "sourcePixelSha256": "ee9f94deb15328cb8863ff03f6e9a0ab83a00ef7734626cf236692b9e902b8f4",
+          "sourceBox": [
+            463,
+            426,
+            969,
+            645
+          ]
+        },
+        {
+          "videoFrame": 51,
+          "sourceTimeSeconds": 2.133333,
+          "sourcePixelSha256": "66db7e5a28aea83b1f5f177818bb3e095b31e61cb45f9c55f46de68683f16616",
+          "sourceBox": [
+            463,
+            425,
+            897,
+            645
+          ]
+        },
+        {
+          "videoFrame": 53,
+          "sourceTimeSeconds": 2.216667,
+          "sourcePixelSha256": "fed6e51bb9d2812e57e3b13d4a85cf87fb15eab11f9452cd825a08ba806960a5",
+          "sourceBox": [
+            463,
+            425,
+            845,
+            645
+          ]
+        },
+        {
+          "videoFrame": 55,
+          "sourceTimeSeconds": 2.3,
+          "sourcePixelSha256": "000859a7c903e1f40a6ec66aee7a387c02d2a2c28f8d2864ee8a439ee910fe49",
+          "sourceBox": [
+            463,
+            425,
+            829,
+            645
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "28d13046f7884f63c36a0e4ebb9fe50f4e2fc3706ab898fbe2ef22c24753c5cb",
+          "sourceBox": [
+            463,
+            425,
+            825,
+            645
+          ]
+        },
+        {
+          "videoFrame": 62,
+          "sourceTimeSeconds": 2.583333,
+          "sourcePixelSha256": "82f0188741e06a0d0a334afde3baa67155c432f752d4c7867f62cfcaca71914a",
+          "sourceBox": [
+            461,
+            427,
+            825,
+            645
+          ]
+        },
+        {
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourcePixelSha256": "76cddd73ad9f73e011bc8b59f81cc7b5329fa0667e01ea43384a1cf2b2c4e4f7",
+          "sourceBox": [
+            461,
+            429,
+            825,
+            645
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        17.0,
+        17.0,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875,
+        16.875
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 2,
+      "mainIndex": 2,
+      "observedMotion": "Low extended claw jab with real arm reach and recovery",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "0ae01196ac4dc50c7dc1c4b1d015baf615d0c25b6f7c927a5f7e1af4fc03fe13"
+    },
+    "CROUCH_MEDIUM": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "2M.mp4",
+        "driveId": "1n8z5AsUaWCO9TTSXWuaUNG2FI14-ofAS",
+        "driveUrl": "https://drive.google.com/file/d/1n8z5AsUaWCO9TTSXWuaUNG2FI14-ofAS/view?usp=drivesdk",
+        "videoSha256": "4a4f32b191d91331c472167b015f2651162a159e86d77008b59d809cf45bbf91"
+      },
+      "frames": [
+        {
+          "videoFrame": 22,
+          "sourceTimeSeconds": 0.916667,
+          "sourcePixelSha256": "fca32945ef674e3c8974f3f0c0721c3367931093a4f9821509bbd35e6afec7c1",
+          "sourceBox": [
+            465,
+            425,
+            817,
+            639
+          ]
+        },
+        {
+          "videoFrame": 25,
+          "sourceTimeSeconds": 1.05,
+          "sourcePixelSha256": "6221c1092cd688f8018875b34435ca9b3b94182dd0db30042e524929d75127fe",
+          "sourceBox": [
+            465,
+            397,
+            819,
+            631
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "9926752b0a034ead2e7e91255e898ad5915a7ceaa93eab344b45680e6a70afc0",
+          "sourceBox": [
+            453,
+            321,
+            819,
+            629
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "7b1f20b706b2138afa0a923aad80e28918b360ce505116eb3a79431a25be1219",
+          "sourceBox": [
+            487,
+            279,
+            853,
+            627
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "4156713ee8f86c615968538bccfa1998a9d7cc22c05e4e3571d61842f94ff98f",
+          "sourceBox": [
+            121,
+            281,
+            1213,
+            633
+          ]
+        },
+        {
+          "videoFrame": 43,
+          "sourceTimeSeconds": 1.8,
+          "sourcePixelSha256": "6a725445d5f12a96fdb4bc8c6c83f84f832e03917bc5477c2e9a643543877f45",
+          "sourceBox": [
+            107,
+            269,
+            841,
+            631
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "254b8ea82236f4d22be8c1c41b119912b64c2b2b02d4a9555dbaa1173dffa415",
+          "sourceBox": [
+            417,
+            289,
+            839,
+            631
+          ]
+        },
+        {
+          "videoFrame": 49,
+          "sourceTimeSeconds": 2.05,
+          "sourcePixelSha256": "109a995f0b75bfb4140784186817a388992a9a3b88682533dc26d6a39515ff0a",
+          "sourceBox": [
+            445,
+            357,
+            837,
+            631
+          ]
+        },
+        {
+          "videoFrame": 53,
+          "sourceTimeSeconds": 2.216667,
+          "sourcePixelSha256": "afd5773f5cc2a4d7877a5678727c90fa6aac2aace1d90706122f69ee2a283fc3",
+          "sourceBox": [
+            465,
+            417,
+            825,
+            639
+          ]
+        },
+        {
+          "videoFrame": 57,
+          "sourceTimeSeconds": 2.383333,
+          "sourcePixelSha256": "1c101edd8ff678ba2ff8ab9385b3fe608bbbabf7f2500293cb30014bbcb5cf1f",
+          "sourceBox": [
+            465,
+            419,
+            823,
+            641
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        25.0,
+        25.0,
+        25.0,
+        25.0,
+        27.83333,
+        27.83333,
+        27.83333,
+        27.83333,
+        27.83333,
+        27.83333
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 4,
+      "mainIndex": 4,
+      "observedMotion": "Low spinning sweep with extended leg",
+      "findings": [
+        "ATTACHED_EFFECT: sweep ring overlaps the extended kicking leg."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "3d059d94334b58fdf53f3d2f853cabac97417f713fb3dc958038ccb7ba6bb74d"
+    },
+    "CROUCH_HEAVY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "2H.mp4",
+        "driveId": "1_hWmFzCW6LK1eg35xEqnANiwgCJ7CvSw",
+        "driveUrl": "https://drive.google.com/file/d/1_hWmFzCW6LK1eg35xEqnANiwgCJ7CvSw/view?usp=drivesdk",
+        "videoSha256": "9838b17665b135b4d9e79f29c83f5172cbc0a2e6c42b2f0bb3c04184e26db98d"
+      },
+      "frames": [
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "12714c332547de9cfa0728779e0474d2987488240be2db99c4b7b591fd4f2782",
+          "sourceBox": [
+            467,
+            443,
+            809,
+            643
+          ]
+        },
+        {
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourcePixelSha256": "0577e5219fb90985abed922849aeee2dc69d125fa967636b362b9f52ce577c57",
+          "sourceBox": [
+            469,
+            437,
+            807,
+            643
+          ]
+        },
+        {
+          "videoFrame": 55,
+          "sourceTimeSeconds": 2.3,
+          "sourcePixelSha256": "f57150b7a26aca6ff4c04a814d43f2af8f97c2f4543aa1668bdf2ed447645e87",
+          "sourceBox": [
+            469,
+            351,
+            809,
+            643
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "2b0c3da870808031c334777cff8ecb13cbcdf79530e1f3fe135873e89f1cec7e",
+          "sourceBox": [
+            473,
+            205,
+            795,
+            633
+          ]
+        },
+        {
+          "videoFrame": 59,
+          "sourceTimeSeconds": 2.466667,
+          "sourcePixelSha256": "f4f79903e4ed2ffcecdb285f1434bb769d917699e6c264e4b0f2de6b24a519dc",
+          "sourceBox": [
+            393,
+            67,
+            745,
+            639
+          ]
+        },
+        {
+          "videoFrame": 65,
+          "sourceTimeSeconds": 2.716667,
+          "sourcePixelSha256": "10a127a7abc5e84e7d91b0b73335aa16dfb513012ead1d4b2f2e227ee43f79b3",
+          "sourceBox": [
+            389,
+            67,
+            749,
+            639
+          ]
+        },
+        {
+          "videoFrame": 73,
+          "sourceTimeSeconds": 3.05,
+          "sourcePixelSha256": "309c491e779dcc900980687cc0a8db30c7fafec1a2d34c686cb083f7550f6374",
+          "sourceBox": [
+            387,
+            66,
+            759,
+            639
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "b10dc6b68799c98af30d6aedfb6017e4fc5aa2a067145feed14289f5f0c64229",
+          "sourceBox": [
+            381,
+            69,
+            761,
+            639
+          ]
+        },
+        {
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourcePixelSha256": "e50270bee39bf64fceb9dc521f06a45988a073c910550a9b81abdfc6db0af3e6",
+          "sourceBox": [
+            469,
+            263,
+            831,
+            635
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "e5f2e0b5e885d91fb39969e9cf9bbb7eb08adafca104cbbc43e54273cae7ed2d",
+          "sourceBox": [
+            469,
+            435,
+            817,
+            647
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        37.25,
+        37.25,
+        37.25,
+        37.25,
+        41.83333,
+        41.83333,
+        41.83333,
+        41.83333,
+        41.83333,
+        41.83333
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 4,
+      "mainIndex": 4,
+      "observedMotion": "Original 2H rises to a chest-up recoil/roar; no raised striking arm visible",
+      "findings": [
+        "SEMANTIC_REVIEW: 2H.mp4 rises into a roar/recoil; no clear uppercut or forward striking limb."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "c83905f5baae2dee38fcbc58758de035b4f922f7d475895f1f06777e70e6bde6"
+    },
+    "JUMP_LIGHT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jL.mp4",
+        "driveId": "1OJkn0AyQegHYqznBbytFFsQ4CnAwyaqD",
+        "driveUrl": "https://drive.google.com/file/d/1OJkn0AyQegHYqznBbytFFsQ4CnAwyaqD/view?usp=drivesdk",
+        "videoSha256": "02352f7b65f17e38ee3b102c181d7573238f43b54eb740c3f3db8158ea61f48d"
+      },
+      "frames": [
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "a7e9de8ddf498343c0789460aceb1e828e1a0b5a7823483a8acd02bef9443a28",
+          "sourceBox": [
+            533,
+            335,
+            759,
+            647
+          ]
+        },
+        {
+          "videoFrame": 26,
+          "sourceTimeSeconds": 1.083333,
+          "sourcePixelSha256": "6517d1fd5dd88e959903056d3cf9c3e5146d913cd41ac017f773b23624f5d248",
+          "sourceBox": [
+            519,
+            375,
+            759,
+            647
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "76614bd35b9a3044de8f5571e9a296a57c378bf0d18a766e731b12f7e8aa1949",
+          "sourceBox": [
+            533,
+            361,
+            761,
+            647
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "4e8c4151a38eddabc4cc7223062fe00f54ae5b50bf3c936cdf26d1eb0cf19fb4",
+          "sourceBox": [
+            489,
+            63,
+            943,
+            483
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "0fb98485312a0f3a0b5e29d7df070dba7f8352a5714d90d6f934bd7b49f30d3b",
+          "sourceBox": [
+            511,
+            79,
+            859,
+            547
+          ]
+        },
+        {
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourcePixelSha256": "3c99ed77b727ae14105711ceb1e8342c82043656fd2f80850d81903ccbdcdb98",
+          "sourceBox": [
+            531,
+            378,
+            821,
+            647
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "5b02942be9ef23a30a8e40769804949ab039ab62f3c0141990121a67e35d5dc6",
+          "sourceBox": [
+            529,
+            317,
+            751,
+            647
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        21.66667,
+        21.66667,
+        21.66667,
+        25.5,
+        25.5,
+        25.5,
+        25.5
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 3,
+      "mainIndex": 3,
+      "observedMotion": "Real airborne high kick and leg recovery",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "31b7e525ede9836d9281dc9c2277ed89700e0b89116fdf45d6d2392c20bf301f"
+    },
+    "JUMP_MEDIUM": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jM.mp4",
+        "driveId": "1VzTAAk0NAOb8lEZ2UVge3fgZ7VHeB_Lw",
+        "driveUrl": "https://drive.google.com/file/d/1VzTAAk0NAOb8lEZ2UVge3fgZ7VHeB_Lw/view?usp=drivesdk",
+        "videoSha256": "c15542879fd2e0465f8c25be716cc06cd9c484142475e2a229fa4ba6ae03eaf8"
+      },
+      "frames": [
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "cfa60f12c8524763946631e0c058f039cb3e785187d38bf880a82bead700fa61",
+          "sourceBox": [
+            463,
+            319,
+            789,
+            649
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "ac70ae1faf662d0c92931d02cbdc3d9abdfd855a339d1a9f86c6caad7aa4e828",
+          "sourceBox": [
+            467,
+            285,
+            779,
+            649
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "d541a8ef2161283ebb2bb1fbc1e3de33e62ac06f8ae9680a86f252dec9f6b8fe",
+          "sourceBox": [
+            495,
+            83,
+            905,
+            381
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "96db8f2a16138562ee582a3e70261928b2ce1d66e8727fcb9c3a169576540c88",
+          "sourceBox": [
+            503,
+            85,
+            895,
+            393
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "31ec12ad759b0c89c3a02f5168d6200c4930b6b231fc5b0520dc9229fe32ef06",
+          "sourceBox": [
+            527,
+            287,
+            823,
+            649
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "20c950d85545c43cb283634a61e71828d13d59f2dfc505e42d18718a93f0428c",
+          "sourceBox": [
+            525,
+            325,
+            779,
+            649
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "2edbd266f400f582aab4caad4b6c293fada8dc996cf77c2dc16472e31fd17a8b",
+          "sourceBox": [
+            525,
+            279,
+            759,
+            649
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        47.5,
+        47.5,
+        34.4,
+        34.4,
+        34.4,
+        34.4,
+        34.4
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 2,
+      "mainIndex": 2,
+      "observedMotion": "Airborne extended-arm strike with bent legs",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "727943559ce7dcf00fc304bf43b91c6a8eed3a50e9d0ebde574b2f909beb4113"
+    },
+    "JUMP_HEAVY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jH.mp4",
+        "driveId": "19FvQrkBPuAKGr818tlRJ9h-9oG4OkgiC",
+        "driveUrl": "https://drive.google.com/file/d/19FvQrkBPuAKGr818tlRJ9h-9oG4OkgiC/view?usp=drivesdk",
+        "videoSha256": "95c9ad881acd4bd638a18192e9969692979e3c5a42cf1baa252ace024cbe601d"
+      },
+      "frames": [
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "6281f9f06088cfe82142f2848d27ebf878a13975a02ad79a4030b1deaa51bdac",
+          "sourceBox": [
+            521,
+            349,
+            776,
+            659
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "5d62d3beac227f3ca3b26dea1488e20b9aafbe33e24db90fc1a91bc259d85290",
+          "sourceBox": [
+            519,
+            373,
+            767,
+            659
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "e3fdeb88e2e5c234aea4cea5e87260c8687b03c952478cba18cba74197fedbd9",
+          "sourceBox": [
+            519,
+            29,
+            787,
+            555
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "01bb328f71a30559ffc4cb917063c2fbafbcb8cd3046f90cd8655f8e4e8560e6",
+          "sourceBox": [
+            519,
+            33,
+            781,
+            573
+          ]
+        },
+        {
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourcePixelSha256": "3cf27960c69a8039cda5f43f168cafb4668b60bc5ab7b319e674af64e35e1bd5",
+          "sourceBox": [
+            521,
+            321,
+            829,
+            661
+          ]
+        },
+        {
+          "videoFrame": 71,
+          "sourceTimeSeconds": 2.966667,
+          "sourcePixelSha256": "2c319828e1becc883d375f2060151502397ec18e70d8367456c46d2a619c6296",
+          "sourceBox": [
+            521,
+            343,
+            773,
+            661
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "a5f6fd2ef037c4eb4acc1e755d35978964deea548a6c3ad38a1474395b2024a0",
+          "sourceBox": [
+            519,
+            317,
+            769,
+            661
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        48.33333,
+        48.33333,
+        48.33333,
+        63.75,
+        63.75,
+        63.75,
+        63.75
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 3,
+      "mainIndex": 3,
+      "observedMotion": "Overhead airborne two-hand attack; source has abrupt zoom",
+      "findings": [
+        "ZOOM: large size discontinuities around video frames 65–70.",
+        "ATTACHED_EFFECT: ring and limb ghosts overlap the fighter."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "3709ddae24b4d0707931ba1ea2d35c513829aec4dd37de09104a237c3698708b"
+    },
+    "DEFENSE_AIR": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "defesaPulo.mp4",
+        "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+        "driveUrl": "https://drive.google.com/file/d/1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO/view?usp=drivesdk",
+        "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5"
+      },
+      "frames": [
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "3d865a8d2e61824eb6fe5414051ae18db74faaa29f8176b08ea80c87aea61e60",
+          "sourceBox": [
+            515,
+            365,
+            807,
+            659
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "6fc82a45abfaf5bce03b0218b08cb33cc45dfc41465bd10507bd0bab73c453ee",
+          "sourceBox": [
+            517,
+            267,
+            805,
+            659
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "8ddc68c8a0940e9b3402fb66ebe94e64c4975967cebe9d164b130f52725f1cc5",
+          "sourceBox": [
+            547,
+            69,
+            781,
+            557
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "756e838ccd5403751e8055320e3781c06502a56cdde66c35e311f5a0ade78820",
+          "sourceBox": [
+            553,
+            65,
+            765,
+            531
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "16eca8a6145fe4841bd24e47585a174084597cd7c39a6667c2133792f463ac6e",
+          "sourceBox": [
+            551,
+            63,
+            763,
+            523
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "eb3e9082149126fc42c5dad088261828acfb47c0a3bea8997fe8d2d360aeb3ee",
+          "sourceBox": [
+            513,
+            75,
+            771,
+            477
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "dd1492089ef95bd30e526673aa579f9efa033947ac12724dd3359552e7f1f5e2",
+          "sourceBox": [
+            499,
+            77,
+            769,
+            481
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714,
+        48.5714
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Raised crossed arms with bent airborne legs; defensive hold endpoint",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "c3c0ab6a080c1ac8cfbe163eb4f9cad288b8db7fb370a900fd503d747e494fa6"
+    },
+    "ULTRA_BEAM": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "ultra.mp4",
+        "driveId": "1vd91k29718ClSGrOS3c3u5QwzpImTjf8",
+        "driveUrl": "https://drive.google.com/file/d/1vd91k29718ClSGrOS3c3u5QwzpImTjf8/view?usp=drivesdk",
+        "videoSha256": "06b65437b240ac8edb10d30a931eb934b457bf5680e063b0931905a1d9fb9aa7"
+      },
+      "frames": [
+        {
+          "videoFrame": 4,
+          "sourceTimeSeconds": 0.166667,
+          "sourcePixelSha256": "718e041bc92597488a7c53a73e799d11e9f1eeb77d65f7987679d0698e8f75cb",
+          "sourceBox": [
+            525,
+            273,
+            755,
+            649
+          ]
+        },
+        {
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourcePixelSha256": "13c777384b0519ec2789698d240733210b15010c59c6bf8e65e3f2ea65a6c961",
+          "sourceBox": [
+            523,
+            335,
+            775,
+            651
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "5c677e305841a92cac3c2e3a1627a717da8f9cf212e95a7daf17e611dc0cd541",
+          "sourceBox": [
+            523,
+            235,
+            767,
+            651
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "e996db2a8d9d2e19527f29c16ff2be354ba16035d337d5eaf3de5ea4d549b7b6",
+          "sourceBox": [
+            521,
+            219,
+            859,
+            653
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "a33db37fe054617a54c9dd0ecde503359b1c7b2b43869fdb55f5333c385477f4",
+          "sourceBox": [
+            507,
+            247,
+            995,
+            653
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "6d027af861299896b4cba6e046eacc90f5af9ca12ce394b8c3f4c160f713622f",
+          "sourceBox": [
+            507,
+            277,
+            1041,
+            653
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "6b957a337901a696c2216e8435be1255dcc657bd245c4944c3576c8441ea5698",
+          "sourceBox": [
+            519,
+            137,
+            801,
+            653
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "6946fa716e0954afb2eeaf949348798f5abf4be1f773e7f95242c6ada74631e1",
+          "sourceBox": [
+            525,
+            403,
+            835,
+            653
+          ]
+        },
+        {
+          "videoFrame": 92,
+          "sourceTimeSeconds": 3.833333,
+          "sourcePixelSha256": "7d71b9e6c911ae913c4ea31d5c02be2b89d63b4cf58fc74cf7628d1483d56e6a",
+          "sourceBox": [
+            523,
+            287,
+            765,
+            651
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+        100.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 5,
+      "observedMotion": "Roar, forward hand strike, overhead swing and ground slam",
+      "findings": [
+        "FX_ALIGNMENT: original roar/strike/slam sequence must align with existing beam effect and unchanged frame data."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "2886af8a013711488fee2638087a201cff04e66d435ba54ad9bdadcd15423a64"
+    },
+    "SPECIAL_ENERGY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "s1.mp4",
+        "driveId": "1t7gqdbzmFvx1-dOt_JV2puFQJ2qu_50M",
+        "driveUrl": "https://drive.google.com/file/d/1t7gqdbzmFvx1-dOt_JV2puFQJ2qu_50M/view?usp=drivesdk",
+        "videoSha256": "ab4b7a3a19eaac0b0d1f5d327ea6c9363753eb4b1ce6cd24e6de69d037d7f307"
+      },
+      "frames": [
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "9557c6b99eed5ffc7e7f95c2076b8cb40433197e38a006d39c8bf57202da90cb",
+          "sourceBox": [
+            525,
+            301,
+            773,
+            649
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "eefe1c911960b56dd5763dd45d9e5938524f2c874d9147c7f6e2feb2890adda0",
+          "sourceBox": [
+            367,
+            359,
+            915,
+            647
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "57566586d852c62925ac4f44e74e7e8c681681632d4c9323a9582c30ca7229fd",
+          "sourceBox": [
+            403,
+            413,
+            835,
+            647
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "d713608391e9fdcf840da86d3460a2084e4049052c0dd59ab855fa8f67caa9c8",
+          "sourceBox": [
+            239,
+            429,
+            1280,
+            651
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "1f01219a585a1730b48ae95065ecaa51bbb491707f2e8ef11f1ad618e29656a1",
+          "sourceBox": [
+            699,
+            367,
+            1145,
+            651
+          ]
+        },
+        {
+          "videoFrame": 51,
+          "sourceTimeSeconds": 2.133333,
+          "sourcePixelSha256": "b0d5c37c850f5886d0b4bf8eab2841950a7781861c6b83e37f8f99392fad4498",
+          "sourceBox": [
+            743,
+            435,
+            1271,
+            651
+          ]
+        },
+        {
+          "videoFrame": 55,
+          "sourceTimeSeconds": 2.3,
+          "sourcePixelSha256": "a478987bf33037a3e7700ce28ffb855249bfda68f9b2c90bb8ea50f25650bd1b",
+          "sourceBox": [
+            695,
+            433,
+            1123,
+            653
+          ]
+        },
+        {
+          "videoFrame": 59,
+          "sourceTimeSeconds": 2.466667,
+          "sourcePixelSha256": "ed26ac90b90e29728d3b29010953f784a378768cabc0b51b6e8678064e4d3fce",
+          "sourceBox": [
+            611,
+            403,
+            937,
+            649
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "536da922a11c72a49c0806c4c1ebaf5dcb3beb008da0bbcd2701314d5243a49a",
+          "sourceBox": [
+            533,
+            301,
+            781,
+            649
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "f9a5ee06c5bcb9d6b6585bcac9d533bdaf4db1a7d9b7e20cc36966f074958d51",
+          "sourceBox": [
+            527,
+            261,
+            753,
+            649
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        28.75,
+        28.75,
+        28.75,
+        28.75,
+        30.83333,
+        30.83333,
+        30.83333,
+        30.83333,
+        30.83333,
+        30.83333
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 4,
+      "mainIndex": 4,
+      "observedMotion": "Low ground lunge and hand strike",
+      "findings": [
+        "FX_ALIGNMENT: low hand strike must align with existing combat effect origin."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "40cf79baf2702d322d684f154081e4435745bd59c0a501da07daca782c737b4c"
+    },
+    "THROW_GRAB": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "agarrao.mp4",
+        "driveId": "1g-rodKH_UmHjXfpN2u0EZp1F5kY2Dtg9",
+        "driveUrl": "https://drive.google.com/file/d/1g-rodKH_UmHjXfpN2u0EZp1F5kY2Dtg9/view?usp=drivesdk",
+        "videoSha256": "a33f63b74342ec5d915e8db20dedff1635c8beb5669fc417d127b6f81e19a53f"
+      },
+      "frames": [
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "96734cd16a9c4393b6a907c070c0ae1830a11185e73da156ae4b5004b569fa4d",
+          "sourceBox": [
+            521,
+            269,
+            769,
+            657
+          ]
+        },
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "d8deb061759eb50203938eb325b4aa151716b52789e2af75a294913525a7ea64",
+          "sourceBox": [
+            523,
+            297,
+            797,
+            659
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "5260d4dd09149072d6304ab95a3c989dc0e642d30053324f873eb97a1c02de54",
+          "sourceBox": [
+            521,
+            285,
+            989,
+            659
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "97aeb7f867fd5ff604a5a076be22a6aafc833478f0d143bdb5da8d35e9d17624",
+          "sourceBox": [
+            693,
+            269,
+            1280,
+            653
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "94d04650c805f3f6fd8d683d87bdd4de6cfe41a689909fbdd203e6cf44b83e84",
+          "sourceBox": [
+            815,
+            113,
+            1280,
+            667
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "f20bd92635165e4b47c9ea29e238383d589f31eaf48c7046df9899fb12468c2b",
+          "sourceBox": [
+            769,
+            219,
+            1280,
+            667
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667,
+        16.6667
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Reach and grab of source-video opponent",
+      "findings": [
+        "SOURCE_OPPONENT: separate the embedded dark opponent without erasing P12 hands."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "97b8672436176c6d97efc9328faebc424cab2edb49685de00ad81b85eaa5c05c"
+    },
+    "THROW_TOSS": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "agarrao.mp4",
+        "driveId": "1g-rodKH_UmHjXfpN2u0EZp1F5kY2Dtg9",
+        "driveUrl": "https://drive.google.com/file/d/1g-rodKH_UmHjXfpN2u0EZp1F5kY2Dtg9/view?usp=drivesdk",
+        "videoSha256": "a33f63b74342ec5d915e8db20dedff1635c8beb5669fc417d127b6f81e19a53f"
+      },
+      "frames": [
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "f20bd92635165e4b47c9ea29e238383d589f31eaf48c7046df9899fb12468c2b",
+          "sourceBox": [
+            769,
+            219,
+            1280,
+            667
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "f04f9d81d2e07aa4731083745c3c00c41745464cad36326008652943f015d8e4",
+          "sourceBox": [
+            767,
+            159,
+            1280,
+            667
+          ]
+        },
+        {
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourcePixelSha256": "b9e440cb77d68fef3acf2de6a07d3177c9f6213d6aa11928b842d3ecb3f5dde8",
+          "sourceBox": [
+            763,
+            283,
+            1280,
+            667
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "294f435a24476508d7c06676eb47e3c3ea7553b5fc9d48ce5c86bd991533ec04",
+          "sourceBox": [
+            763,
+            301,
+            1280,
+            667
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "8ec2b49df2868d91e5ee6c647644b7f385719c4fd05541d8516a50d869130016",
+          "sourceBox": [
+            517,
+            361,
+            1109,
+            667
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "29c3bb3d085e166b1880a549bdb4a7610c8baa9dd3eae8ba4fce0bfaad3e46b1",
+          "sourceBox": [
+            519,
+            327,
+            973,
+            665
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        44.5,
+        44.5,
+        44.5,
+        44.5,
+        44.5,
+        44.5
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 2,
+      "observedMotion": "Grapple/bite and release; no distinct toss shown in these source phases",
+      "findings": [
+        "SOURCE_OPPONENT: embedded opponent must not appear in the character sprite.",
+        "SEMANTIC_REVIEW: bite/release visible, distinct toss not demonstrated."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "c4222ed73a995ef575a292156dbe53b6aa05abf04faaa72b2aa4426a9be85f67"
+    },
+    "SPECIAL_S2": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "s2.mp4",
+        "driveId": "189tn9eo9q5aphBh-ppmSVbsnbsppAvMw",
+        "driveUrl": "https://drive.google.com/file/d/189tn9eo9q5aphBh-ppmSVbsnbsppAvMw/view?usp=drivesdk",
+        "videoSha256": "02fd46bd7f833eaa7d17df7988e8cc36fa63488cec247bd568a5e0d9dfa136fa"
+      },
+      "frames": [
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "564f8dec22249b7fb10319204c0374fc43722e763d37f7e2adeb4cc5a0892fc5",
+          "sourceBox": [
+            519,
+            343,
+            797,
+            649
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "7c352430d5753e7f11903a2c9fd9414da6bad249e2a98dc13b300e22fb123a12",
+          "sourceBox": [
+            503,
+            383,
+            807,
+            647
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "fbe8c7bbbd78d1a664058dc64b2de1cd6b9048d484afb4954a59a55886506039",
+          "sourceBox": [
+            529,
+            11,
+            927,
+            533
+          ]
+        },
+        {
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourcePixelSha256": "599dc53571edf6185957b621aac653749774e034f9a231e30c1fca6b27eb2541",
+          "sourceBox": [
+            509,
+            89,
+            953,
+            453
+          ]
+        },
+        {
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourcePixelSha256": "3215cdf20245157009dcb00dc30b689620367294408751565eb2408367f49b71",
+          "sourceBox": [
+            509,
+            93,
+            933,
+            443
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "ffcb8c3f5ee0b85c58dd4773424dbcf390efc8321ebf907eb60a826f37b54840",
+          "sourceBox": [
+            519,
+            129,
+            931,
+            517
+          ]
+        },
+        {
+          "videoFrame": 62,
+          "sourceTimeSeconds": 2.583333,
+          "sourcePixelSha256": "3f94ff2c3b3270fca1daf057ea07c3186bb7d120ef8cad5d0f4895d0b2d163c7",
+          "sourceBox": [
+            529,
+            361,
+            865,
+            651
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "15ef26481d135013fc0f21951d8b93b2f6566c2e9c41aefc5520e47cd58e9a8a",
+          "sourceBox": [
+            527,
+            349,
+            779,
+            649
+          ]
+        },
+        {
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourcePixelSha256": "79db2141d434bc5d628c6c9f128d1fae6d14519554a4975e091f9657eb8c3f1b",
+          "sourceBox": [
+            525,
+            267,
+            753,
+            649
+          ]
+        },
+        {
+          "videoFrame": 82,
+          "sourceTimeSeconds": 3.416667,
+          "sourcePixelSha256": "983dce1bea7faa5f3027c90041c31e3c7a5af27432f455f4c2fe2fc9044c117d",
+          "sourceBox": [
+            525,
+            257,
+            753,
+            649
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        68.5,
+        68.5,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375,
+        68.375
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 2,
+      "mainIndex": 2,
+      "observedMotion": "Rising airborne claw swing and landing",
+      "findings": [
+        "ATTACHED_EFFECT: bright claw arc overlaps raised hands."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "994693fac759233d1ec6e0c04de6a54888f91d13cd10583d35d770f248cbaa2f"
+    },
+    "SPECIAL_S3": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "s3.mp4",
+        "driveId": "1Yvvd2DCrhAyhaU9ziGSePjKph14CjsGs",
+        "driveUrl": "https://drive.google.com/file/d/1Yvvd2DCrhAyhaU9ziGSePjKph14CjsGs/view?usp=drivesdk",
+        "videoSha256": "1bef36528c986323623a2074b4e2df037199bcffe00a1dfd8a508b4822cd256a"
+      },
+      "frames": [
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "74d9b0bfabc614f9abe52ed6b6a821fe3b137048291d14d1010f33eabbea1131",
+          "sourceBox": [
+            517,
+            289,
+            785,
+            659
+          ]
+        },
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "f8f6cbb2f239bc1cc3560c3eb05f2089a6d5feddd6d8af6401352d75a17f2c3e",
+          "sourceBox": [
+            517,
+            303,
+            797,
+            659
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "f2ea4efe5cd654078e2b7d3222f4e26d307bee3f5d803a06077308df219b3446",
+          "sourceBox": [
+            477,
+            225,
+            793,
+            661
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "a12223c92fc0540e7952dec319cafa368defe3a7a59a64c9c0c0d749a9b83285",
+          "sourceBox": [
+            393,
+            215,
+            789,
+            663
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "66b21459c47a8dce350385455f4d023c7fd06c67a20808f29c718100e2623c07",
+          "sourceBox": [
+            377,
+            213,
+            803,
+            661
+          ]
+        },
+        {
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourcePixelSha256": "5631664c85576620ac5f6b44d2a0c60387e1eb472a6a0bbe6b0481837bd31932",
+          "sourceBox": [
+            507,
+            271,
+            995,
+            659
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "fb6cbb7c6f6d3bd4b2da47919a0127676779c9c59b2dfd03d2a7d99d2cbc6c18",
+          "sourceBox": [
+            509,
+            273,
+            985,
+            659
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "dfe4c44861a991075db9ffd390b5505f462e46a93a7ea8b8ae3b565e1ee2982b",
+          "sourceBox": [
+            519,
+            271,
+            815,
+            659
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "f987b1afcc41ac74c00347027d3d59ac264492615f9a0d77987f7bf6abe19a4c",
+          "sourceBox": [
+            519,
+            261,
+            767,
+            659
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "e920e66024448716def372fbf3be3cfed7a32b96acf604937b2c761856b5a293",
+          "sourceBox": [
+            519,
+            257,
+            765,
+            659
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        73.2,
+        73.2,
+        73.2,
+        73.2,
+        73.2,
+        66.8,
+        66.8,
+        66.8,
+        66.8,
+        66.8
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 5,
+      "mainIndex": 5,
+      "observedMotion": "Chest-open windup and long forward claw strike",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "094b6b8fb02684b3c39e0bdab7b24c3a27c1bc98021b427dd33e234bc1e14df0"
+    },
+    "SPECIAL_S4": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "s4.mp4",
+        "driveId": "1PjdoG7fWi-boK_763z7jm22j_HHxL1fu",
+        "driveUrl": "https://drive.google.com/file/d/1PjdoG7fWi-boK_763z7jm22j_HHxL1fu/view?usp=drivesdk",
+        "videoSha256": "e128f34bf0d241dc2b2aaebf3b25459ca732b6e2a4b3bd5bad59504bede6911a"
+      },
+      "frames": [
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "ad106a44adbf7721892aae888be8f5e7aff8e7b23ba2b3c99902cdd416863191",
+          "sourceBox": [
+            505,
+            351,
+            787,
+            651
+          ]
+        },
+        {
+          "videoFrame": 34,
+          "sourceTimeSeconds": 1.416667,
+          "sourcePixelSha256": "7c148645e99f3197bb1428bf5db2557ba8336dc1d0525dd056c7b494c0e3d7c5",
+          "sourceBox": [
+            449,
+            151,
+            817,
+            653
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "adb89f026e577d1293a2fedd223fc281bb03c3799d0c8ff2f00169a996a507bb",
+          "sourceBox": [
+            437,
+            39,
+            927,
+            481
+          ]
+        },
+        {
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourcePixelSha256": "ded862523cd2ecd6e94bb8679835263d9af7fa4724c37f4b82d9d48f19434fe5",
+          "sourceBox": [
+            395,
+            21,
+            869,
+            487
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "00b8ca1e3b789f064e9eb6477a6c67f929597a6fd9304d8092c992dd33c14151",
+          "sourceBox": [
+            385,
+            0,
+            883,
+            491
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "5f737931bfad5459c2688884fe96dec4938bdac5956e112d1373c9b7d501aba8",
+          "sourceBox": [
+            359,
+            49,
+            843,
+            513
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "00d69fd0a385cddea1ed1f6096a4fca1c0c1eb74b7fbd67319581005bafb3b34",
+          "sourceBox": [
+            477,
+            177,
+            883,
+            597
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "dad97185bef99edf985db89e747c3d19d88bdccc3224cea82ec3eee4135a30ef",
+          "sourceBox": [
+            497,
+            339,
+            825,
+            651
+          ]
+        },
+        {
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourcePixelSha256": "b7492b526c9a9cab17b2788f8018ef9785eba1f15a90dbd49de3d249cd544c63",
+          "sourceBox": [
+            523,
+            275,
+            757,
+            651
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "08e614116c966add2682c2b0f5ec067eab79f3f5a9bf08ac8ddecb071370fba7",
+          "sourceBox": [
+            523,
+            257,
+            755,
+            651
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        83.5,
+        83.5,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75,
+        70.75
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 2,
+      "mainIndex": 2,
+      "observedMotion": "Full backward flip and recovery",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "f5ee6e968b62c07701a57c6afd629cb9dcf351649a13f75b55ed98620d051680"
+    },
+    "SUPER_WAVE": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "super.mp4",
+        "driveId": "1qdAW_JXPbr-JvgT-4pHFzYGOyXce7pAZ",
+        "driveUrl": "https://drive.google.com/file/d/1qdAW_JXPbr-JvgT-4pHFzYGOyXce7pAZ/view?usp=drivesdk",
+        "videoSha256": "0f4525cad96f3a381acab7aeb30e95c19dbdfc1a392ceaf5f8bec59db97a33c1"
+      },
+      "frames": [
+        {
+          "videoFrame": 18,
+          "sourceTimeSeconds": 0.75,
+          "sourcePixelSha256": "f7cc2d198955b988b6b14ac7965403c0bfba5b56c092f012b99df7652d36066f",
+          "sourceBox": [
+            525,
+            267,
+            753,
+            649
+          ]
+        },
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "610d02c6375f820a7638670a39f762be0805b91273d94619cc2e21e402c10de0",
+          "sourceBox": [
+            520,
+            249,
+            809,
+            651
+          ]
+        },
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "32b9a4227e411986156179937a952195051707c90722ba631f2cec054dda7a02",
+          "sourceBox": [
+            511,
+            249,
+            951,
+            649
+          ]
+        },
+        {
+          "videoFrame": 38,
+          "sourceTimeSeconds": 1.583333,
+          "sourcePixelSha256": "f935ae7858bfc975d18d4a28e81d7e3fc25f86785c746fef0928ab2c96946d54",
+          "sourceBox": [
+            519,
+            279,
+            957,
+            649
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "ec3326b06d7d7f004107460850fe62fd1b3f871acd0d7f584d2f4546c1e20ef0",
+          "sourceBox": [
+            617,
+            241,
+            835,
+            639
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "a11d1f63f5832b7e08f888a2b868b3a28dc3cceb713ad65469e4e7c50d84f7f7",
+          "sourceBox": [
+            601,
+            215,
+            875,
+            639
+          ]
+        },
+        {
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourcePixelSha256": "d7eb63697e6b1c4ee485ae5d9521172039eb3652787d00adfb7ea55d127a9238",
+          "sourceBox": [
+            457,
+            339,
+            769,
+            663
+          ]
+        },
+        {
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourcePixelSha256": "b11e6a829dafd7d4483833006f013ba5e49e97a40ca23be63b2bdc83561c2766",
+          "sourceBox": [
+            463,
+            323,
+            769,
+            653
+          ]
+        },
+        {
+          "videoFrame": 82,
+          "sourceTimeSeconds": 3.416667,
+          "sourcePixelSha256": "2a76e2fed633a799d59c00bced974540df306b078523972e16ec3b685a7c6939",
+          "sourceBox": [
+            503,
+            293,
+            753,
+            653
+          ]
+        },
+        {
+          "videoFrame": 90,
+          "sourceTimeSeconds": 3.75,
+          "sourcePixelSha256": "ab33fdf8fd90277e0fbed00bc215e3c11da38fdc3efef83c61530fe729d08722",
+          "sourceBox": [
+            523,
+            259,
+            753,
+            651
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        97.16667,
+        97.16667,
+        97.16667,
+        97.16667,
+        97.16667,
+        97.16667,
+        108.25,
+        108.25,
+        108.25,
+        108.25
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 6,
+      "mainIndex": 6,
+      "observedMotion": "Multi-hit punch/knee/overhead slam action",
+      "findings": [
+        "FX_ALIGNMENT: original combo must align to existing wave effect and unchanged frame data."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "3cc148909781fb2033e2eae7d76d2d53b7a19744de2b30dbea18d5c1e6103a80"
+    },
+    "INTRO": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "intro.mp4",
+        "driveId": "135g-BI9HqN1OiTen8-bTZZtjhl-5M5JN",
+        "driveUrl": "https://drive.google.com/file/d/135g-BI9HqN1OiTen8-bTZZtjhl-5M5JN/view?usp=drivesdk",
+        "videoSha256": "84efa354b5b233b9a61ca64ac329f0a7c11bc33dbb4a9cd0c7bd820f89b8834a"
+      },
+      "frames": [
+        {
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourcePixelSha256": "e74087a68a996cf1ff635436c9927431725f0022de1fe078fc6def26847649da",
+          "sourceBox": [
+            517,
+            251,
+            768,
+            657
+          ]
+        },
+        {
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourcePixelSha256": "51b7978f80af65b3b4ee68625dd96d9ddb4f0bac8eb910172fdb756d5faa1427",
+          "sourceBox": [
+            517,
+            247,
+            769,
+            657
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "2d20501c9ca982cf121d61b3c2390e1cdd3970e4196f9a9432ee746c8104e270",
+          "sourceBox": [
+            517,
+            229,
+            769,
+            657
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "309c601f7c3a3de0f826d7458cb0c1e39aa1fe4fe1b46675f8d7dc27adc871b1",
+          "sourceBox": [
+            517,
+            231,
+            769,
+            657
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "3ce3d5d2275465674dd86a6dd583d2357a59bdc8a95b0a073929187e568a57f2",
+          "sourceBox": [
+            517,
+            231,
+            769,
+            657
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "d77061ef784b7941a92e2609569bc13bb6b0e079fe04561c2ae5949be33d07df",
+          "sourceBox": [
+            517,
+            219,
+            769,
+            659
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "dbdcedbc25c8a882c67b312a5be91d1584fab2af98cc5a20a47dff36f9fb0635",
+          "sourceBox": [
+            432,
+            351,
+            833,
+            671
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "79bd771cbde4bbbfa640539556c5ae50d5950d5dc8e390f3d305d781022b100a",
+          "sourceBox": [
+            433,
+            333,
+            837,
+            671
+          ]
+        },
+        {
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourcePixelSha256": "59696540c5d86dac0015c5bd44c6b6648103f8010d97cc1df408628d830e0c6a",
+          "sourceBox": [
+            432,
+            337,
+            835,
+            671
+          ]
+        },
+        {
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourcePixelSha256": "4413877c44c72d9a63cc6b01b2e7b450fcded6751cb9f0ba9fc284b3966c5077",
+          "sourceBox": [
+            433,
+            341,
+            831,
+            671
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0,
+        240.0
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 3,
+      "observedMotion": "Head turns and torso lowers into zombie guard",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "a8e95a6cb98c25b0f21951793d3b9cfcf8cd85fca95d1aa6aa0b096cf2a0f648"
+    },
+    "JUMP_HEAVY_DOWN": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "jH.mp4",
+        "driveId": "19FvQrkBPuAKGr818tlRJ9h-9oG4OkgiC",
+        "driveUrl": "https://drive.google.com/file/d/19FvQrkBPuAKGr818tlRJ9h-9oG4OkgiC/view?usp=drivesdk",
+        "videoSha256": "95c9ad881acd4bd638a18192e9969692979e3c5a42cf1baa252ace024cbe601d"
+      },
+      "frames": [
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "e3fdeb88e2e5c234aea4cea5e87260c8687b03c952478cba18cba74197fedbd9",
+          "sourceBox": [
+            519,
+            29,
+            787,
+            555
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "dcf25042d075a15c2eeaaee5f5ad460e4252e22b8facf1839cd3e351c30ff8a0",
+          "sourceBox": [
+            513,
+            27,
+            787,
+            547
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "01bb328f71a30559ffc4cb917063c2fbafbcb8cd3046f90cd8655f8e4e8560e6",
+          "sourceBox": [
+            519,
+            33,
+            781,
+            573
+          ]
+        },
+        {
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourcePixelSha256": "3cf27960c69a8039cda5f43f168cafb4668b60bc5ab7b319e674af64e35e1bd5",
+          "sourceBox": [
+            521,
+            321,
+            829,
+            661
+          ]
+        },
+        {
+          "videoFrame": 67,
+          "sourceTimeSeconds": 2.8,
+          "sourcePixelSha256": "033cb6dcc5829ac10655fdf273ce8577c728d4c98d492838a3f12d926a3b85f6",
+          "sourceBox": [
+            429,
+            355,
+            925,
+            663
+          ]
+        },
+        {
+          "videoFrame": 70,
+          "sourceTimeSeconds": 2.916667,
+          "sourcePixelSha256": "d5f2a219278f557a4c1de4a53e35d22d1ebae7521016bdc5af558ae4666ae13a",
+          "sourceBox": [
+            519,
+            344,
+            773,
+            657
+          ]
+        },
+        {
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourcePixelSha256": "bed2d2f9b4c5fc81eedd3310dd14af8d2708e2ba543ede3e80c5d900e8c56b1f",
+          "sourceBox": [
+            519,
+            317,
+            769,
+            661
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        48.33333,
+        48.33333,
+        48.33333,
+        63.75,
+        63.75,
+        63.75,
+        63.75
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": 3,
+      "mainIndex": 3,
+      "observedMotion": "Candidate downward phase of original jH overhead attack",
+      "findings": [
+        "CANDIDATE_ONLY: shared jH downward phase, not an independently confirmed downward-heavy clip.",
+        "ZOOM_AND_EFFECTS: large size shifts and attached ring/limb ghosts."
+      ],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "e94e6ef6b390dbe8fcec32b844a547e5da22bd90ab1ac2446a4f32410cc14f0d"
+    },
+    "VICTORY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "vitoria.mp4",
+        "driveId": "1XV-3Vak6ozLlSHjZsIpj-uXFMpPsukaJ",
+        "driveUrl": "https://drive.google.com/file/d/1XV-3Vak6ozLlSHjZsIpj-uXFMpPsukaJ/view?usp=drivesdk",
+        "videoSha256": "f6ae7d2dc1df38c1f459738a54d438a33a2f4a136342fb91b5779de2e62f4801"
+      },
+      "frames": [
+        {
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourcePixelSha256": "7e69cb28bc7c762bee601e955c667f0622d0afce22616304510dce937ee60d3d",
+          "sourceBox": [
+            493,
+            318,
+            791,
+            659
+          ]
+        },
+        {
+          "videoFrame": 10,
+          "sourceTimeSeconds": 0.416667,
+          "sourcePixelSha256": "8b4bd35ab74857e8c5f31649fb4ecd3def1895533eed86de8843c9904e7be563",
+          "sourceBox": [
+            493,
+            289,
+            789,
+            659
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "42e20128bac4eb9de1ac7ada324055575ac14b61b6c1a7a33a0917d038b668eb",
+          "sourceBox": [
+            493,
+            243,
+            777,
+            659
+          ]
+        },
+        {
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourcePixelSha256": "c2e43a01d34ad9b4108ea2812e12b5dad3415d2770438e5bbf3f79e596d3b64a",
+          "sourceBox": [
+            491,
+            177,
+            775,
+            659
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "68802f5ad1188773fbe9573464cf5c8cfa4571e504a0424f9cdaab2fa58d92fe",
+          "sourceBox": [
+            491,
+            131,
+            775,
+            661
+          ]
+        },
+        {
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourcePixelSha256": "4041c7a0d84b9ddd3faa9ba51f760e1377ef962a668ce0f882b9c29a7536a05e",
+          "sourceBox": [
+            491,
+            99,
+            775,
+            661
+          ]
+        },
+        {
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourcePixelSha256": "826586600c7589bc20eff9175c6ebe46a20a18010aa0559edf6e461f8d6ee6be",
+          "sourceBox": [
+            491,
+            97,
+            773,
+            661
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "20cac857a2190b91f45b4bd867ea950e212561c2aac794653f755f00888c715e",
+          "sourceBox": [
+            491,
+            99,
+            773,
+            661
+          ]
+        },
+        {
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourcePixelSha256": "8f93e21420d06837c30197fda30a881b0ad5e1fc12eedef6e06ff5ce39b3a185",
+          "sourceBox": [
+            490,
+            99,
+            773,
+            661
+          ]
+        },
+        {
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourcePixelSha256": "b78e32849a4e30e7653d0e5cd412e1f2ce8083c6f4a12965459e406578632dac",
+          "sourceBox": [
+            491,
+            97,
+            773,
+            661
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 6,
+      "observedMotion": "Body straightens and head tilts into victory posture",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "44a2f6b45dfb4ce5094e346237f04e0f1bb46a56be3b118dea22c0c5ec6ec76d"
+    },
+    "DEFEAT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "derrota.mp4",
+        "driveId": "19e2-bwMHORpsCdO56aD92uADZ6UXGzJo",
+        "driveUrl": "https://drive.google.com/file/d/19e2-bwMHORpsCdO56aD92uADZ6UXGzJo/view?usp=drivesdk",
+        "videoSha256": "1d2700620bfd0e8f95b2a607b6ec17a7a1f4d635d773eb0bedc37305739e9655"
+      },
+      "frames": [
+        {
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourcePixelSha256": "fe024becd844c97f7ba531e3afe81c849a5ce53641946004c49fcb467cc1ea8c",
+          "sourceBox": [
+            343,
+            203,
+            793,
+            665
+          ]
+        },
+        {
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourcePixelSha256": "e1def00287b5da7727ccd940f4c300038d970d53283af208f656bdbd78173616",
+          "sourceBox": [
+            355,
+            199,
+            797,
+            665
+          ]
+        },
+        {
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourcePixelSha256": "a0ffe68b3797b05387ee568f60be6da5c0d81c38871ef2af7896224d1465b533",
+          "sourceBox": [
+            387,
+            193,
+            799,
+            665
+          ]
+        },
+        {
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourcePixelSha256": "6602c475468fc76e67851c31ab4ec1873b1317cf5311f6609d99a9b203a186bb",
+          "sourceBox": [
+            399,
+            197,
+            811,
+            667
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "3491d5b34639c83c395a42ed7bfe6cc5ec6350177772568409d13183d94963c7",
+          "sourceBox": [
+            395,
+            289,
+            995,
+            665
+          ]
+        },
+        {
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourcePixelSha256": "200c9e80a9f6d447e6d65e16cfb3993444e0103e6034eeafada7000e276981d7",
+          "sourceBox": [
+            381,
+            411,
+            1081,
+            671
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "a19f8da1dd622016c478c4be1f580dbd3fe1c476e0cc8697657441f7afffd878",
+          "sourceBox": [
+            380,
+            409,
+            1081,
+            673
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "0e8ff528269413516eba90480bdb55f27b4269a30b37a37ac885581b4b444f5f",
+          "sourceBox": [
+            381,
+            409,
+            1081,
+            673
+          ]
+        },
+        {
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourcePixelSha256": "abff9c922145f8e5239604f667e32ac5c91deddf81a654c41b09860257afa4bb",
+          "sourceBox": [
+            381,
+            409,
+            1081,
+            673
+          ]
+        },
+        {
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourcePixelSha256": "dea53de3b3de3b752799c555b0462035e533cc7f838ea0b293a9132602aeee8c",
+          "sourceBox": [
+            381,
+            409,
+            1081,
+            671
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 6,
+      "observedMotion": "Kneeling collapse and persistent defeated posture",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "58c3b843f8f9891162b65b8f182b69f2732b09655c3d5f8c536f2b74ed30e79f"
+    },
+    "TAUNT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "source": {
+        "file": "provocacao.mp4",
+        "driveId": "1-u5HfNSiS6nRDFzUCQiFFctKVZoTZt91",
+        "driveUrl": "https://drive.google.com/file/d/1-u5HfNSiS6nRDFzUCQiFFctKVZoTZt91/view?usp=drivesdk",
+        "videoSha256": "48cf71b024a1a2070f091727bfb2a7053e89ca215220304132901bd54f89627d"
+      },
+      "frames": [
+        {
+          "videoFrame": 8,
+          "sourceTimeSeconds": 0.333333,
+          "sourcePixelSha256": "c421dea00f1e271f4694f2d29b4470c7bab0e4f692aced4355f5da4840f34e29",
+          "sourceBox": [
+            521,
+            249,
+            763,
+            653
+          ]
+        },
+        {
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourcePixelSha256": "04af8761645e9b96796889a5049f3b7572887a4115c1539537a182c62138f322",
+          "sourceBox": [
+            519,
+            265,
+            777,
+            653
+          ]
+        },
+        {
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourcePixelSha256": "ec698140aca1294a1cc6ddb85ba8c7239a104f19166a8653865b3430c532b1b5",
+          "sourceBox": [
+            519,
+            265,
+            773,
+            653
+          ]
+        },
+        {
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourcePixelSha256": "49791b416e3fa4ce2e5d9f05bbace2b7533deac19833d7c50fa2471f13bf5f2f",
+          "sourceBox": [
+            519,
+            259,
+            847,
+            655
+          ]
+        },
+        {
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourcePixelSha256": "d9e5b1c36e14fecf058a30279df048b3f000b8cb9fc6fd555c123215893c6803",
+          "sourceBox": [
+            519,
+            247,
+            827,
+            653
+          ]
+        },
+        {
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourcePixelSha256": "0c55904c20da823d503833afa869da30a0a4bbe313a340e9a9436115c787f8d6",
+          "sourceBox": [
+            513,
+            247,
+            817,
+            653
+          ]
+        },
+        {
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourcePixelSha256": "692135580267913a773a1bf86ca5120511a160220dac649df65e8793f907b641",
+          "sourceBox": [
+            513,
+            249,
+            849,
+            653
+          ]
+        },
+        {
+          "videoFrame": 72,
+          "sourceTimeSeconds": 3.0,
+          "sourcePixelSha256": "878cc147243ee5078801942da34d014297fb6e622806dc79c10d83f054e9174c",
+          "sourceBox": [
+            521,
+            251,
+            807,
+            653
+          ]
+        },
+        {
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourcePixelSha256": "34430ee5997e7aafd5dfb065dcdc65dde1dbf7816c15c3a75989984ddd695c3f",
+          "sourceBox": [
+            521,
+            251,
+            763,
+            653
+          ]
+        },
+        {
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourcePixelSha256": "4386a2d03b00b5d503d6718240ee4faedf06662627e7107b764060c9b00a6ea4",
+          "sourceBox": [
+            521,
+            249,
+            763,
+            653
+          ]
+        }
+      ],
+      "runtimeDurationsMs": [
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5,
+        412.5
+      ],
+      "runtimeDistancePerFrame": null,
+      "previewTiming": "runtime-ms-rounded-to-10ms",
+      "runtimeImpactIndex": null,
+      "mainIndex": 4,
+      "observedMotion": "Head turn and raised beckoning claw before recovery",
+      "findings": [],
+      "pending": [
+        "uniform anatomy scale",
+        "support/root registration",
+        "alpha/effect masks",
+        "state transitions",
+        "runtime visual audit"
+      ],
+      "previewSha256": "0c8a787a3df20dd53b15b09fd361bd28f7f3451c6f75c07fc283ba674af69a85"
+    }
+  },
+  "note": "Source segment previews only. Not normalized runtime animations; no SR, pack binding or approval."
+}

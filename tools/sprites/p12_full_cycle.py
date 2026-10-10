@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from p12_authored_cycle import ROOT, prepare as authored_prepare, verify as authored_verify, read as read_json, write_json
+from p12_video_cycle import ROOT, prepare as video_prepare, verify as video_verify, read as read_json, write_json
 
 RESULTS = ROOT / 'android/app/build/p12-full-cycle'
 
@@ -30,12 +30,12 @@ def require_existing_video_sources():
 
 def prepare(weights):
     require_existing_video_sources()
-    authored_prepare(weights)
+    video_prepare(weights)
 
 
 def verify():
     require_existing_video_sources()
-    authored_verify()
+    video_verify()
 
 
 def audit():
