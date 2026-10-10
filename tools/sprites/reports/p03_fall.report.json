@@ -1,16 +1,16 @@
 {
   "id": "p03_fall",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_fall_video_normalized.png",
+  "source": "art/sprites/source/p03_fall_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Descida do pulo; pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 320,
-    "rootX": 128,
-    "rootY": 300,
+    "frameWidth": 640,
+    "frameHeight": 640,
+    "rootX": 256,
+    "rootY": 600,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        65,
-        127,
-        191,
-        302
+        131,
+        254,
+        382,
+        603
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 11924
+      "minimumMargin": 37,
+      "opaquePixels": 47824
     },
     {
       "index": 1,
       "outputBbox": [
-        63,
-        127,
-        192,
-        302
+        126,
+        255,
+        384,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 11916
+      "minimumMargin": 36,
+      "opaquePixels": 47761
     },
     {
       "index": 2,
       "outputBbox": [
-        57,
-        114,
-        193,
-        301
+        113,
+        228,
+        386,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 12852
+      "minimumMargin": 37,
+      "opaquePixels": 51666
     },
     {
       "index": 3,
       "outputBbox": [
-        54,
-        95,
-        196,
-        301
+        109,
+        189,
+        393,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 13786
+      "minimumMargin": 37,
+      "opaquePixels": 55513
     },
     {
       "index": 4,
       "outputBbox": [
-        53,
-        68,
-        197,
-        302
+        107,
+        136,
+        395,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15369
+      "minimumMargin": 36,
+      "opaquePixels": 61805
     },
     {
       "index": 5,
       "outputBbox": [
-        57,
-        42,
-        192,
-        302
+        113,
+        84,
+        384,
+        603
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 14541
+      "minimumMargin": 37,
+      "opaquePixels": 58753
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 165,
-    "frameHeight": 280,
-    "rootX": 85,
-    "rootY": 268,
+    "frameWidth": 314,
+    "frameHeight": 546,
+    "rootX": 162,
+    "rootY": 529,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      43,
-      32
+      94,
+      71
     ],
     "decodedBytes": {
-      "canonical": 2457600,
-      "packed": 1108800
-    }
+      "canonical": 9830400,
+      "packed": 4114656
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "16ffb012a74cb642f627555b9b11e35bcc0b7cbd0ea91f0e6c390074fc3dbab0",
-      "config": "bbb8999e39bc250628ad6ffcf12ece001727f62e98ce8e1d897170ae057d4183",
+      "source": "6bc1cd83d586e3a93b62eaad5d2bbec8adde3816afdc60ee8a60264a530e3222",
+      "config": "d62dc6f095b7df0d76c4909981c34e9863dab5f12ec1cac7d8458bba88dc534d",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_fall_video_normalized.png": "16ffb012a74cb642f627555b9b11e35bcc0b7cbd0ea91f0e6c390074fc3dbab0"
     }
   }
 }

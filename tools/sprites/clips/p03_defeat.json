@@ -2,18 +2,18 @@
   "id": "p03_defeat",
   "javaName": "P03_DEFEAT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_defeat_video_normalized.png",
+  "source": "art/sprites/source/p03_defeat_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_defeat.png",
   "report": "tools/sprites/reports/p03_defeat.report.json",
   "preview": "android/app/build/sprite-review/p03_defeat-import.png",
   "expectedFrames": 33,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "frameHeight": 320,
-  "rootX": 160,
-  "rootY": 300,
+  "frameWidth": 768,
+  "frameHeight": 640,
+  "rootX": 320,
+  "rootY": 600,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Derrota, 1 a cada 3 quadros.",
   "video": {
     "arquivo": "derrota.mp4",
@@ -27,5 +27,9 @@
     "largura": 384,
     "raiz": "160,300",
     "colunas": 11
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p03_defeat_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

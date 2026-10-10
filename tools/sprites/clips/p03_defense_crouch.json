@@ -2,7 +2,7 @@
   "id": "p03_defense_crouch",
   "javaName": "P03_DEFENSE_CROUCH",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_defense_crouch_video_normalized.png",
+  "source": "art/sprites/source/p03_defense_crouch_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_defense_crouch.png",
   "report": "tools/sprites/reports/p03_defense_crouch.report.json",
   "preview": "android/app/build/sprite-review/p03_defense_crouch-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "frameHeight": 256,
-  "rootX": 140,
-  "rootY": 238,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa agachado; quadro 0 e a guarda segurada."
+  "frameWidth": 640,
+  "frameHeight": 512,
+  "rootX": 280,
+  "rootY": 476,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa agachado; quadro 0 e a guarda segurada.",
+  "sourceReferences": [
+    "art/sprites/source/p03_defense_crouch_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

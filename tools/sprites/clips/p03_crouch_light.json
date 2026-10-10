@@ -2,7 +2,7 @@
   "id": "p03_crouch_light",
   "javaName": "P03_CROUCH_LIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_crouch_light_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_light_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_light.png",
   "report": "tools/sprites/reports/p03_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch_light-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 448,
-  "rootX": 170,
+  "frameWidth": 896,
+  "rootX": 340,
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 2L chute baixo fraco; escala pelo corpo agachado (0.42, personagem maior no video).",
-  "frameHeight": 320,
-  "rootY": 300
+  "frameHeight": 640,
+  "rootY": 600,
+  "sourceReferences": [
+    "art/sprites/source/p03_crouch_light_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
