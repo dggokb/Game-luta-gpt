@@ -43,7 +43,9 @@ class CharacterStabilizerTest(unittest.TestCase):
 
     def test_game_commands_are_resolved_to_actual_animation_states(self):
         self.assertEqual("CROUCH_MEDIUM",MOD.canonical_state("2M"))
+        self.assertEqual("CROUCH_MEDIUM",MOD.canonical_state("2m"))
         self.assertEqual("JUMP_HEAVY",MOD.canonical_state("jH"))
+        self.assertEqual("JUMP_HEAVY_DOWN",MOD.canonical_state("jh_baixo"))
         self.assertEqual("VICTORY",MOD.canonical_state("victory"))
 
     def test_jump_video_is_split_by_apex_and_never_assumed(self):
