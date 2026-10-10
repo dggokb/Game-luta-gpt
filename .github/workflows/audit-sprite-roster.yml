@@ -1,17 +1,27 @@
-name: Audit Sprite Roster
+name: Diagnosticar um personagem
 
-# Run manually from the experimental branch. Read-only reporting, no asset edits,
-# pushes or merges. Scales to however many fighter packs exist.
+# Não percorre o elenco. Não acessa Drive sem autorização, nem altera artes.
+# CI executa testes do motor e pode produzir relatório PARCIAL sem vídeos.
 on:
   workflow_dispatch:
+    inputs:
+      personagem:
+        description: "ID do ÚNICO personagem (p01..p12)"
+        type: choice
+        options: [p01, p02, p03, p04, p05, p06, p07, p08, p09, p10, p11, p12]
+        required: true
+      estado:
+        description: "Estado opcional (ex.: VICTORY, DASH, CROUCH_MEDIUM)"
+        type: string
+        required: false
 
 permissions:
   contents: read
 
 jobs:
-  audit:
+  diagnosticar:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,19 +29,29 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install sprite analysis libraries
+      - name: Bibliotecas para análise
         run: python3 -m pip install -r tools/sprites/requirements-animar.txt
-      - name: Validate roster triage logic
+      - name: Regressões do estabilizador
         run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v
-      - name: Audit available fighter packs
+      - name: Diagnóstico do personagem solicitado
+        env:
+          CHARACTER: ${{ inputs.personagem }}
+          STATE: ${{ inputs.estado }}
         run: |
           mkdir -p android/app/build/sprite-review
-          python3 tools/sprites/refinar_elenco.py --todos \
-            --saida android/app/build/sprite-review/elenco.json
-      - name: Upload actionable audit results
+          # Os vídeos originais não estão neste checkout.
+          # Falta de fonte deve BLOQUEAR aprovação, não produzir workflow verde.
+          if [ -n "$STATE" ]; then
+            python3 tools/sprites/refinar_elenco.py "$CHARACTER" --estado "$STATE" \
+              --saida android/app/build/sprite-review/estabilizador.json
+          else
+            python3 tools/sprites/refinar_elenco.py "$CHARACTER" \
+              --saida android/app/build/sprite-review/estabilizador.json
+          fi
+      - name: Relatório mesmo se incompleto
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Sprite-Roster-Audit
-          path: android/app/build/sprite-review/elenco.json
+          name: Diagnostico-Sprite-Individual
+          path: android/app/build/sprite-review/estabilizador.json
           if-no-files-found: warn
