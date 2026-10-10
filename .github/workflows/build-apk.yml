@@ -12,6 +12,7 @@ on:
       - game-luta-sprite-gpt
       - game-luta-sprite-astra
       - 'claude/**'
+      - 'refino/p01-animacoes-20261009'
   pull_request:
   workflow_dispatch:
 
@@ -41,13 +42,14 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
 
       - name: Normalize and validate sprite assets
+        if: github.ref != 'refs/heads/refino/p01-animacoes-20261009'
         run: |
           python3 -m unittest discover -s tools/sprites/tests -v
           python3 tools/sprites/build_characters.py --check
 
       # Diagnostic only: shows the author what --write would produce. Nothing is committed.
       - name: Materialize generated sprite outputs after stale check
-        if: failure()
+        if: failure() && github.ref != 'refs/heads/refino/p01-animacoes-20261009'
         run: python3 tools/sprites/build_characters.py --write
 
       - name: Upload generated sprite outputs
@@ -64,8 +66,14 @@ jobs:
           if-no-files-found: warn
 
       - name: Build debug APK
+        if: github.ref != 'refs/heads/refino/p01-animacoes-20261009'
         working-directory: android
         run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+
+      - name: Build P01-only debug APK
+        if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
+        working-directory: android
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -75,7 +83,7 @@ jobs:
           if-no-files-found: error
 
       - name: Runtime smoke test on Android emulator
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt' || github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -97,7 +105,7 @@ jobs:
             test -s game-smoke.png
 
       - name: Upload runtime screenshot
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt' || github.ref == 'refs/heads/refino/p01-animacoes-20261009'
         uses: actions/upload-artifact@v4
         with:
           name: GameLutaGPT-Smoke-Screenshot

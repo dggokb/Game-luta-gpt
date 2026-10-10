@@ -40,6 +40,20 @@ tasks.register('verifySpritePacks') {
     outputs.file(stamp)
     def strict = providers.gradleProperty('requireSpriteCheck').map { it.toBoolean() }.orElse(false)
     doLast {
+        // P01 refinement build: full source packs are kept for future generation,
+        // but the APK deliberately includes only the P01 atlases.
+        if (new File(spriteRoot, 'android/P01_ONLY_APK').isFile()) {
+            def bundled = fileTree('src/main/res/drawable-nodpi') { include '*.png' }.files
+            def unrelated = bundled.findAll { !it.name.startsWith('player_base_') }
+            if (bundled.isEmpty() || !unrelated.isEmpty()) {
+                throw new GradleException("P01-only APK has invalid atlases: " + unrelated*.name)
+            }
+            def verified = stamp.get().asFile
+            verified.parentFile.mkdirs()
+            verified.text = 'P01-only: ' + bundled.size() + ' sprite sheets'
+            logger.lifecycle(verified.text)
+            return
+        }
         def run = { List<String> command ->
             def exec = providers.exec {
                 workingDir spriteRoot

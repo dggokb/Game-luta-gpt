@@ -297,7 +297,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Each character's ultra lives in assets/ultras/&lt;character id&gt;/. */
     private static String ultraFolder(FighterState fighter) {
-        return "ultras/" + fighter.character.id;
+        return "ultras/" + ("p01_training".equals(fighter.character.id) ? "player_base" : fighter.character.id);
     }
 
     private static StageScene loadStage(AndroidRenderAssets assets) {

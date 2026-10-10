@@ -1,3 +1,22 @@
+## APK leve: refinamento exclusivo do P01
+
+Esta branch só empacota os 39 atlas `player_base_*.png` do P01. O treino usa
+dois lutadores independentes, P01 e P01 (Treino), compartilhando as mesmas artes.
+O combate, cenários, TAG e animações do P01 permanecem ativos. Os pacotes-fonte
+dos demais lutadores permanecem disponíveis para referência, mas fora do APK.
+
+Depois de qualquer geração completa de sprites, rode:
+```bash
+python3 tools/sprites/build_characters.py --write
+python3 tools/sprites/apply_p01_only.py
+cd android && gradle assembleDebug
+```
+A rotina `apply_p01_only.py` preserva os atlas do P01, ajusta o elenco de treino e
+remove os demais recursos empacotáveis. O workflow `build-apk.yml` compila e
+executa o smoke test Android para esta branch, sem a suíte multijogador.
+
+---
+
 # Game Luta Sprite GPT
 
 Branch `game-luta-sprite-gpt`. Versão `0.87-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
