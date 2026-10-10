@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 96
-        versionName '0.96-p01-idle-master'
+        versionCode 97
+        versionName '0.97-p01-visual-tuner'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
