@@ -16,7 +16,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from p12_video_sources import ROOT, STATE_FILES, sha, write_json
-from p12_video_review import PLAN, CONTRACT, validate_selection
+from p12_video_review import PLAN, CONTRACT, resolve_selection
 from p12_video_cycle import render_pose, FW, FH, RX, RY
 from limpar import clean_cell, hsv_bins, PALETTE_SHARE
 from tamanho import match_zoom
@@ -111,19 +111,20 @@ def generate(extraction, output):
         durable = json.loads((ROOT / 'docs/art/p12-video-sources' / (stem + '.frames.json')).read_text())
         if record['videoSha256'] != durable['videoSha256'] or record['frames'] != durable['frames']:
             raise ValueError(state + ': original extraction differs from durable provenance')
-        peak = validate_selection(state, spec, animation, record, folder)
+        sources, peak = resolve_selection(state, spec, animation, record, folder)
         anchor = [RX, 256 if state in HIP_REGISTERED else RY]
-        baseline = calibration['videos'][stem]['scale']
-        reference_index = calibration['videos'][stem].get('headReferenceFrame', 0)
-        reference_path = folder / f'{reference_index:04d}.png'
-        if sha(reference_path) != calibration['videos'][stem]['referenceFrameSha256']:
-            raise ValueError(state + ': head calibration belongs to a different source frame')
-        first = np.array(Image.open(reference_path).convert('RGBA'))
-        box = calibration['videos'][stem]['headBox']
-        head = first[box[1]:box[3], box[0]:box[2]]
         cells, recipes, native = [], [], []
-        ground = max(f['sourceBox'][3] for f in record['frames']) - 1
-        for ordinal, index in enumerate(spec['selectedVideoFrames']):
+        for ordinal, (source_name, index, record, folder) in enumerate(sources):
+            stem = Path(source_name).stem
+            baseline = calibration['videos'][stem]['scale']
+            reference_index = calibration['videos'][stem].get('headReferenceFrame', 0)
+            reference_path = folder / f'{reference_index:04d}.png'
+            if sha(reference_path) != calibration['videos'][stem]['referenceFrameSha256']:
+                raise ValueError(state + ': head calibration belongs to a different source frame')
+            first = np.array(Image.open(reference_path).convert('RGBA'))
+            box = calibration['videos'][stem]['headBox']
+            head = first[box[1]:box[3], box[0]:box[2]]
+            ground = max(f['sourceBox'][3] for f in record['frames']) - 1
             entry = record['frames'][index]
             source = Image.open(folder / entry['file']).convert('RGBA')
             rgba = np.array(source)
@@ -142,7 +143,8 @@ def generate(extraction, output):
             # A mask is incapable of drawing/reconstructing occluded body parts.
             removal = np.full(rgba.shape[:2], 255, dtype=np.uint8)
             removal[(rgba[..., 3] > 0) & (after[..., 3] == 0)] = 0
-            mask_path = output / 'masks' / state.lower() / entry['file']
+            mask_file = (stem + '_' if spec.get('frameSources') is not None else '') + entry['file']
+            mask_path = output / 'masks' / state.lower() / mask_file
             if (removal == 0).any():
                 mask_path.parent.mkdir(parents=True, exist_ok=True)
                 Image.fromarray(removal).save(mask_path)
@@ -161,10 +163,12 @@ def generate(extraction, output):
             draw = ImageDraw.Draw(shown)
             draw.line((0, anchor[1] + 1, FW, anchor[1] + 1), fill='#445362')
             draw.line((RX, anchor[1] - 7, RX, anchor[1] + 7), fill='#7ca0bf')
-            draw.text((8, 8), f'{state} / video {index}' + ((' / IMPACT' if 'impactFrame' in animation else ' / MAIN') if ordinal == peak else ''), fill='white')
+            draw.text((8, 8), f'{state} / {source_name} {index}' + ((' / IMPACT' if 'impactFrame' in animation else ' / MAIN') if ordinal == peak else ''), fill='white')
             draw.text((8, 24), 'DRAFT / NOT APPROVED', fill='#ffc078')
             cells.append(shown.convert('RGB'))
             recipes.append({'videoFrame': index, 'sourceTimeSeconds': entry['time'],
+                'videoName': source_name, 'driveId': record['driveId'],
+                'videoSha256': record['videoSha256'], 'maskFile': mask_file,
                 'sourceSha256': entry['sha256'], 'sourceBox': entry['sourceBox'],
                 'scale': scale, 'root': [root_x, root_y], 'anchor': anchor,
                 'airHipRegistration': state in HIP_REGISTERED and not (state == 'JUMP' and index < 40),
@@ -191,7 +195,7 @@ def generate(extraction, output):
         cards.append(card)
         report['states'][state] = {'status': 'DRAFT_NOT_APPROVED',
             'anchor': anchor,
-            'videoOrigin': {'driveId': record['driveId'], 'videoSha256': record['videoSha256']},
+            'videoOrigin': {'driveId': durable['driveId'], 'videoSha256': durable['videoSha256']},
             'mainIndex': peak, 'recipes': recipes, 'observedMotion': spec['observedMotion'],
             'findings': spec['findings'],
             'pending': ['manual mask inspection', 'anatomy scale confirmation', 'support tracking', 'transitions', 'semantic movement audit']}

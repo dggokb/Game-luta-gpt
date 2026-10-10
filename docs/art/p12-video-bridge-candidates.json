@@ -1,0 +1,970 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "activeRuntimeChanged": false,
+  "note": "Resume-only candidates. Not active selections or reviewed production registrations. Original hashes, masks, scale, support, transitions and semantic audit remain required. GETUP frame 59 keying correction is still pending.",
+  "states": {
+    "DASH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 28
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 31
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 34
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 37
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 43
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 46
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 49
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "dash.mp4",
+          "videoFrame": 55
+        }
+      ]
+    },
+    "BACKDASH": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 34
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 46
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 58
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 80
+        },
+        {
+          "videoName": "backDash.mp4",
+          "videoFrame": 88
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "MEDIUM_KICK": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 2,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 46
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 49
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 50
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 51
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 54
+        },
+        {
+          "videoName": "M.mp4",
+          "videoFrame": 57
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "HEAVY_STRAIGHT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 5,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "H.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "H.mp4",
+          "videoFrame": 44
+        },
+        {
+          "videoName": "H.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "H.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "H.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "H.mp4",
+          "videoFrame": 70
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "DEFENSE_STAND": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 37
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 38
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 39
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 41
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 42
+        },
+        {
+          "videoName": "defendeCima.mp4",
+          "videoFrame": 43
+        }
+      ]
+    },
+    "KNOCKDOWN": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 18
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 19
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 20
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 22
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 26
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 28
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 30
+        }
+      ]
+    },
+    "GROUNDED": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 32
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 34
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 40
+        }
+      ]
+    },
+    "GETUP": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 58
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 62
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 66
+        },
+        {
+          "videoName": "derruba_levanta.mp4",
+          "videoFrame": 68
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 8
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "CROUCH_LIGHT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 2,
+      "frameSources": [
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 47
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 49
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 51
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 53
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 55
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 58
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 62
+        },
+        {
+          "videoName": "2L.mp4",
+          "videoFrame": 66
+        }
+      ]
+    },
+    "JUMP_LIGHT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 3,
+      "frameSources": [
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "jL.mp4",
+          "videoFrame": 32
+        },
+        {
+          "videoName": "jL.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "jL.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "jL.mp4",
+          "videoFrame": 44
+        },
+        {
+          "videoName": "jL.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 56
+        }
+      ]
+    },
+    "JUMP_MEDIUM": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 2,
+      "frameSources": [
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "jM.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "jM.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "jM.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "jM.mp4",
+          "videoFrame": 58
+        },
+        {
+          "videoName": "jM.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 56
+        }
+      ]
+    },
+    "JUMP_HEAVY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 3,
+      "frameSources": [
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 66
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 67
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 70
+        },
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 60
+        }
+      ]
+    },
+    "JUMP_HEAVY_DOWN": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 3,
+      "frameSources": [
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 66
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 67
+        },
+        {
+          "videoName": "jH.mp4",
+          "videoFrame": 70
+        },
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 60
+        }
+      ]
+    },
+    "SPECIAL_ENERGY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 4,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "s1.mp4",
+          "videoFrame": 32
+        },
+        {
+          "videoName": "s1.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "s1.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "s1.mp4",
+          "videoFrame": 51
+        },
+        {
+          "videoName": "s1.mp4",
+          "videoFrame": 55
+        },
+        {
+          "videoName": "s1.mp4",
+          "videoFrame": 59
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "SPECIAL_S2": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 2,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 50
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 54
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 58
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 62
+        },
+        {
+          "videoName": "s2.mp4",
+          "videoFrame": 68
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "SPECIAL_S3": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 5,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "s3.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "s3.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "s3.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "s3.mp4",
+          "videoFrame": 58
+        },
+        {
+          "videoName": "s3.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "s3.mp4",
+          "videoFrame": 68
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "SPECIAL_S4": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 2,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 34
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 44
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 46
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "s4.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "SUPER_WAVE": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": 6,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "super.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "super.mp4",
+          "videoFrame": 38
+        },
+        {
+          "videoName": "super.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "super.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "super.mp4",
+          "videoFrame": 68
+        },
+        {
+          "videoName": "super.mp4",
+          "videoFrame": 74
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "ULTRA_BEAM": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "ultra.mp4",
+          "videoFrame": 16
+        },
+        {
+          "videoName": "ultra.mp4",
+          "videoFrame": 28
+        },
+        {
+          "videoName": "ultra.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "ultra.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "ultra.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "ultra.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "TAUNT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "provocacao.mp4",
+          "videoFrame": 28
+        },
+        {
+          "videoName": "provocacao.mp4",
+          "videoFrame": 36
+        },
+        {
+          "videoName": "provocacao.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "provocacao.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "provocacao.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 8
+        },
+        {
+          "videoName": "agachado.mp4",
+          "videoFrame": 14
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "VICTORY": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 20
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 50
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 72
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 84
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "DEFEAT": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 32
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 44
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 48
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 56
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 80
+        },
+        {
+          "videoName": "derrota.mp4",
+          "videoFrame": 96
+        }
+      ]
+    },
+    "INTRO": {
+      "status": "DRAFT_NOT_APPROVED",
+      "runtimeImpactIndex": null,
+      "frameSources": [
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 0
+        },
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 16
+        },
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 28
+        },
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 40
+        },
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 52
+        },
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 60
+        },
+        {
+          "videoName": "intro.mp4",
+          "videoFrame": 64
+        },
+        {
+          "videoName": "vitoria.mp4",
+          "videoFrame": 30
+        },
+        {
+          "videoName": "jump.mp4",
+          "videoFrame": 96
+        },
+        {
+          "videoName": "idle.mp4",
+          "videoFrame": 96
+        }
+      ]
+    }
+  }
+}

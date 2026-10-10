@@ -18,6 +18,7 @@ from scipy.ndimage import distance_transform_edt
 
 from p12_video_sources import ROOT, STATE_FILES, sha, write_json
 from p12_authored_cycle import CachedUpscaler, atlas, MODEL_HASH
+from p12_video_selection import bind_sources
 
 # Logical dimensions, before SR. The importer applies pixelScale=2 to its
 # dimensional limits. Extended limbs must fit without changing fighter scale.
@@ -120,7 +121,8 @@ def original_frame(state, index, ordinal, main, origin, record, frame_spec):
     elif ordinal == main:
         relative = f'art/keys/p12/poses/{tag}_peak.png'
     else:
-        relative = f'art/keys/p12/video_frames/{tag}/{index:04d}.png'
+        prefix = Path(frame_spec['videoName']).stem + '_' if 'videoName' in frame_spec else ''
+        relative = f'art/keys/p12/video_frames/{tag}/{prefix}{index:04d}.png'
     source = ROOT / relative
     if not source.exists() or sha(source) != record['sha256']:
         raise ValueError(state + f': frame {index} is not the recorded original-video extraction')
@@ -131,7 +133,8 @@ def original_frame(state, index, ordinal, main, origin, record, frame_spec):
     references = [relative]
     mask_spec = frame_spec.get('alphaMask')
     if mask_spec:
-        mask_name = f'art/keys/p12/video_masks/{tag}/{index:04d}.png'
+        prefix = Path(frame_spec['videoName']).stem + '_' if 'videoName' in frame_spec else ''
+        mask_name = f'art/keys/p12/video_masks/{tag}/{prefix}{index:04d}.png'
         if mask_spec.get('path') != mask_name or sha(ROOT / mask_name) != mask_spec.get('sha256'):
             raise ValueError(state + ': invalid cleanup mask provenance')
         mask = Image.open(ROOT / mask_name)
@@ -148,6 +151,8 @@ def original_frame(state, index, ordinal, main, origin, record, frame_spec):
               'driveId': origin['driveId'], 'videoSha256': origin['videoSha256'],
               'videoFrame': index, 'sourceTimeSeconds': record['time'],
               'sourceBox': box, 'alphaMask': mask_spec}
+    if 'videoName' in frame_spec:
+        recipe['videoName'] = frame_spec['videoName']
     return picture, references, recipe
 
 
@@ -184,18 +189,31 @@ def preflight(selected_states=None):
             raise ValueError(state + ': video origin differs from the recorded Drive original')
         selected = origin.get('selectedVideoFrames', [])
         count = len(animation['frames'])
+        frame_specs = spec.get('frames', [])
+        composite = any('videoName' in f for f in frame_specs)
         if (len(selected) != count or any(type(i) is not int for i in selected)
-                or selected != sorted(set(selected))
-                or any(not 0 <= i < len(records['frames']) for i in selected)):
+                or (not composite and (selected != sorted(set(selected))
+                    or any(not 0 <= i < len(records['frames']) for i in selected)))):
             raise ValueError(state + ': explicit, real sequential frames must preserve the combat frame count')
         main = animation.get('impactFrame', spec.get('mainIndex'))
         if type(main) is not int or not 0 <= main < count or spec.get('mainIndex') != main:
             raise ValueError(state + ': main pose does not preserve impact index')
         if count > 1 and state not in ('IDLE', 'COMBAT') and main == 0:
             raise ValueError(state + ': independent preparation and main pose required')
-        frame_specs = spec.get('frames', [])
         if len(frame_specs) != count:
             raise ValueError(state + ': each source frame needs explicit root and measured uniform scale')
+        source_names = [f.get('videoName', name) for f in frame_specs]
+        source_records, source_origins = {name: records}, {name: origin}
+        for source_name in set(source_names) - {name}:
+            if source_name not in originals:
+                raise ValueError(state + ': bridge video is not an inventoried Drive original')
+            source_record = read(ROOT / 'docs/art/p12-video-sources' / (source_name.removesuffix('.mp4') + '.frames.json'))
+            source_origin = spec.get('videoOrigins', {}).get(source_name, {})
+            if (source_origin.get('driveId') != originals[source_name]
+                    or source_origin.get('videoSha256') != source_record['videoSha256']):
+                raise ValueError(state + ': bridge origin differs from the recorded Drive original')
+            source_records[source_name], source_origins[source_name] = source_record, source_origin
+        bind_sources(state, source_names, selected, main, name, count, source_records)
         frames, references, recipes = [], [], []
         for ordinal, (index, frame_spec) in enumerate(zip(selected, frame_specs)):
             if frame_spec.get('videoFrame') != index:
@@ -205,7 +223,9 @@ def preflight(selected_states=None):
                     or not isinstance(root, list) or len(root) != 2
                     or any(not isinstance(n, (float, int)) or not np.isfinite(n) for n in root)):
                 raise ValueError(state + ': invalid measured scale/root')
-            source, used, recipe = original_frame(state, index, ordinal, main, origin, records['frames'][index], frame_spec)
+            source_name = source_names[ordinal]
+            source, used, recipe = original_frame(state, index, ordinal, main,
+                source_origins[source_name], source_records[source_name]['frames'][index], frame_spec)
             anchor = spec.get('anchor', [RX, RY])
             image = render_pose(source, scale, root, anchor)
             recipe.update(scale=scale, root=root, anchor=anchor,

@@ -15,6 +15,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from p12_video_sources import ROOT, STATE_FILES, sha, write_json
+from p12_video_selection import bind_sources
 
 PLAN = ROOT / 'tools/sprites/videos/p12-segments-draft.json'
 CONTRACT = ROOT / 'docs/art/p12-motion-contract.json'
@@ -48,17 +49,61 @@ def validate_selection(state, spec, animation, record, folder):
     return peak
 
 
+def resolve_selection(state, spec, animation, record, folder):
+    """Return exact original sources; neutral bridges are never new drawings."""
+    primary = STATE_FILES[state]
+    entries = spec.get('frameSources')
+    if entries is None:
+        peak = validate_selection(state, spec, animation, record, folder)
+        return [(primary, i, record, folder) for i in spec['selectedVideoFrames']], peak
+    count = len(animation['frames'])
+    if len(entries) != count:
+        raise ValueError(state + ': source bindings differ from combat frame count')
+    indices = [e.get('videoFrame') for e in entries]
+    names = [e.get('videoName') for e in entries]
+    if spec['selectedVideoFrames'] != indices:
+        raise ValueError(state + ': frame source indices and explicit selection differ')
+    if 'durationsMs' not in animation and len(set(names)) > 1:
+        raise ValueError(state + ': distance-driven preview needs one continuous original video clock')
+    peak = animation.get('impactFrame', spec['mainIndex'])
+    if spec['mainIndex'] != peak:
+        raise ValueError(state + ': main pose does not respect impact index')
+    if ('durationsMs' in animation and len(animation['durationsMs']) != count
+            or 'durationsMs' not in animation and animation.get('distancePerFrame', 0) <= 0):
+        raise ValueError(state + ': invalid immutable animation timing')
+    records, folders = {primary: record}, {primary: folder}
+    for name in set(names) - {primary}:
+        if name not in set(STATE_FILES.values()):
+            raise ValueError(state + ': transition source is not an existing P12 Drive video')
+        source_folder = folder.parent / Path(name).stem
+        source_record = json.loads((source_folder / 'frames.json').read_text())
+        durable = json.loads((ROOT / 'docs/art/p12-video-sources' / (Path(name).stem + '.frames.json')).read_text())
+        if source_record['videoSha256'] != durable['videoSha256'] or source_record['frames'] != durable['frames']:
+            raise ValueError(state + ': transition extraction differs from original provenance')
+        records[name], folders[name] = source_record, source_folder
+    bindings = bind_sources(state, names, indices, peak, primary, count, records)
+    result = []
+    for name, i in bindings:
+        entry = records[name]['frames'][i]
+        if sha(folders[name] / entry['file']) != entry['sha256']:
+            raise ValueError(state + ': transition pixels differ from original extraction')
+        result.append((name, i, records[name], folders[name]))
+    return result, peak
+
+
 def source_cells(state, spec, animation, record, folder):
-    peak = validate_selection(state, spec, animation, record, folder)
+    sources, peak = resolve_selection(state, spec, animation, record, folder)
     # Use the union of ALL original frames, not per-pose fitting. Preserve zoom
     # and source movement in the review instead of hiding them in a contact sheet.
-    bounds = record['sourceBoundsUnion']
+    unions = [r['sourceBoundsUnion'] for _, _, r, _ in sources]
+    bounds = [min(b[0] for b in unions), min(b[1] for b in unions),
+              max(b[2] for b in unions), max(b[3] for b in unions)]
     scale = min((CW - 28) / (bounds[2] - bounds[0]),
                 (CH - 62) / (bounds[3] - bounds[1]))
     cells, provenance = [], []
-    for ordinal, i in enumerate(spec['selectedVideoFrames']):
-        frame = record['frames'][i]
-        picture = Image.open(folder / frame['file']).convert('RGBA')
+    for ordinal, (name, i, source_record, source_folder) in enumerate(sources):
+        frame = source_record['frames'][i]
+        picture = Image.open(source_folder / frame['file']).convert('RGBA')
         picture = picture.convert('RGBa').resize(
             (max(1, round(picture.width * scale)), max(1, round(picture.height * scale))),
             Image.Resampling.LANCZOS).convert('RGBA')
@@ -69,11 +114,13 @@ def source_cells(state, spec, animation, record, folder):
         draw = ImageDraw.Draw(canvas)
         label = (' / IMPACT' if 'impactFrame' in animation else ' / MAIN') if ordinal == peak else ''
         draw.text((8, 5), state + label, fill='white')
-        draw.text((8, 20), f"{record['name']} / frame {i} / {frame['time']:.3f}s", fill='#b8c7d8')
+        draw.text((8, 20), f"{name} / frame {i} / {frame['time']:.3f}s", fill='#b8c7d8')
         draw.text((8, CH - 20), 'SOURCE CANDIDATE / NOT APPROVED', fill='#ffc078')
         cells.append(canvas.convert('RGB'))
         provenance.append({'videoFrame': i, 'sourceTimeSeconds': frame['time'],
-                           'sourcePixelSha256': frame['sha256'], 'sourceBox': frame['sourceBox']})
+                           'sourcePixelSha256': frame['sha256'], 'sourceBox': frame['sourceBox'],
+                           'videoName': name, 'driveId': source_record['driveId'],
+                           'videoSha256': source_record['videoSha256']})
     return cells, provenance, peak
 
 

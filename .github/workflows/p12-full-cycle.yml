@@ -11,6 +11,7 @@ on:
       - tools/sprites/p12_authored_sources.py
       - tools/sprites/p12_video_sources.py
       - tools/sprites/p12_video_cycle.py
+      - tools/sprites/p12_video_selection.py
       - tools/sprites/p12_video_review.py
       - tools/sprites/p12_video_registration.py
       - tools/sprites/build_characters.py
@@ -19,6 +20,7 @@ on:
       - tools/sprites/videos/p12-video-scale-draft.json
       - tools/sprites/tests/test_p12_video_cycle.py
       - tools/sprites/tests/test_p12_video_review.py
+      - tools/sprites/tests/test_p12_video_selection.py
       - tools/sprites/tests/test_p12_character_sources.py
       - art/keys/p12/registration.json
       - tools/sprites/p12_pose_gate.py
@@ -62,8 +64,13 @@ jobs:
           python -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
       - name: Check existing-video extractor and renderer tests
         run: |
-          python -m compileall -q tools/sprites/p12_video_sources.py tools/sprites/p12_video_cycle.py tools/sprites/p12_video_review.py tools/sprites/p12_video_registration.py tools/sprites/p12_full_cycle.py
+          python -m compileall -q tools/sprites/p12_video_selection.py tools/sprites/p12_video_sources.py tools/sprites/p12_video_cycle.py tools/sprites/p12_video_review.py tools/sprites/p12_video_registration.py tools/sprites/p12_full_cycle.py
           python -m unittest discover -s tools/sprites/tests -p 'test_p12_*.py' -q
+      - name: Verify the 12 integrated video states without granting full approval
+        run: |
+          python tools/sprites/p12_video_cycle.py verify --states \
+            IDLE COMBAT WALK_FORWARD WALK_BACK LIGHT_JAB CROUCH RISE \
+            JUMP FALL LAND DEFENSE_CROUCH DEFENSE_AIR
       - name: Require independently sourced P12 actions (reject fake IDLE movements)
         run: python tools/sprites/p12_pose_gate.py
       - name: Fetch verified AnimeVideo-v3 AI model
