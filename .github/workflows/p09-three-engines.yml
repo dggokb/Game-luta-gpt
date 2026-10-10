@@ -55,7 +55,7 @@ jobs:
         run: |
           python tools/sprites/build_characters.py --write
           python tools/sprites/build_characters.py --check
-          python -m unittest discover -s tools/sprites/tests -v
+          python tools/sprites/verify_three_engines_pilots.py
       - name: Audit P09 and P12 temporal harmony and collect all warnings
         run: |
           python -u tools/sprites/p09_three_engines_pilot.py audit
