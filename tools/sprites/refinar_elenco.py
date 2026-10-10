@@ -242,18 +242,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                 if vf and sf:
                     source=g.estimate_sequence(evidence_video,vf)
                     packed=g.estimate_sequence(evidence_sprite,sf)
-                    proof={"status":"INCONCLUSIVO",
-                           "video":source,"atlas":packed}
-                    if source["status"]=="ESCALA_GEOMETRICA_ESTAVEL" and \
-                            packed["status"]=="ESCALA_GEOMETRICA_ESTAVEL":
-                        vs,ps=source["fator_mediano"],packed["fator_mediano"]
-                        discrepancy=abs(vs-ps)/max(vs,ps)
-                        proof={"status":"PADRONIZADA_FONTE_ATLAS" if discrepancy<=.06 else
-                                        "ESCALA_DIVERGENTE",
-                               "diferenca_relativa":round(discrepancy,4),
-                               "fator_video":vs,"fator_atlas":ps,
-                               "video":source,"atlas":packed,
-                               "validacao_runtime":"PENDENTE"}
+                    proof=g.compare_source_and_atlas(source,packed)
         entry["prova_geometrica"]=proof
         # A geometric inconsistency makes the entire state suspect.
         if proof["status"]=="ESCALA_DIVERGENTE":
