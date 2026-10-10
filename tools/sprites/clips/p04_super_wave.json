@@ -2,13 +2,13 @@
   "id": "p04_super_wave",
   "javaName": "P04_SUPER_WAVE",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_super_wave_video_normalized.png",
+  "source": "art/sprites/source/p04_super_wave_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_super_wave.png",
   "report": "tools/sprites/reports/p04_super_wave.report.json",
   "preview": "android/app/build/sprite-review/p04_super_wave-import.png",
   "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 7,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -22,7 +22,12 @@
     "colunas": 11,
     "limpar_chao": true
   },
-  "frameWidth": 288,
-  "rootX": 95,
-  "rootY": 236
+  "frameWidth": 576,
+  "rootX": 190,
+  "rootY": 472,
+  "sourceReferences": [
+    "art/sprites/source/p04_super_wave_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "pixelScale": 2.0
 }

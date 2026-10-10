@@ -2,7 +2,7 @@
   "id": "p04_crouch_heavy",
   "javaName": "P04_CROUCH_HEAVY",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_crouch_heavy_video_normalized.png",
+  "source": "art/sprites/source/p04_crouch_heavy_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_crouch_heavy.png",
   "report": "tools/sprites/reports/p04_crouch_heavy.report.json",
   "preview": "android/app/build/sprite-review/p04_crouch_heavy-import.png",
@@ -26,8 +26,12 @@
       4
     ]
   },
-  "frameWidth": 192,
-  "frameHeight": 384,
-  "rootX": 85,
-  "rootY": 366
+  "frameWidth": 384,
+  "frameHeight": 768,
+  "rootX": 170,
+  "rootY": 732,
+  "sourceReferences": [
+    "art/sprites/source/p04_crouch_heavy_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

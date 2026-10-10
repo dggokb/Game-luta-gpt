@@ -2,7 +2,7 @@
   "id": "p04_defense_stand",
   "javaName": "P04_DEFENSE_STAND",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_defense_stand_video_normalized.png",
+  "source": "art/sprites/source/p04_defense_stand_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_defense_stand.png",
   "report": "tools/sprites/reports/p04_defense_stand.report.json",
   "preview": "android/app/build/sprite-review/p04_defense_stand-import.png",
@@ -23,6 +23,12 @@
     "pe_no_chao": true,
     "limpar_chao": true
   },
-  "frameWidth": 224,
-  "rootX": 105
+  "frameWidth": 448,
+  "rootX": 210,
+  "sourceReferences": [
+    "art/sprites/source/p04_defense_stand_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

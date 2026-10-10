@@ -2,7 +2,7 @@
   "id": "p04_idle",
   "javaName": "P04_IDLE",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_idle_video_normalized.png",
+  "source": "art/sprites/source/p04_idle_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_idle.png",
   "report": "tools/sprites/reports/p04_idle.report.json",
   "preview": "android/app/build/sprite-review/p04_idle-import.png",
@@ -21,6 +21,12 @@
     "raiz": "96,238",
     "colunas": 11
   },
-  "frameWidth": 192,
-  "rootX": 96
+  "frameWidth": 384,
+  "rootX": 192,
+  "sourceReferences": [
+    "art/sprites/source/p04_idle_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

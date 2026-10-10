@@ -2,7 +2,7 @@
   "id": "p04_jump_heavy_down",
   "javaName": "P04_JUMP_HEAVY_DOWN",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_jump_heavy_down_video_normalized.png",
+  "source": "art/sprites/source/p04_jump_heavy_down_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_jump_heavy_down.png",
   "report": "tools/sprites/reports/p04_jump_heavy_down.report.json",
   "preview": "android/app/build/sprite-review/p04_jump_heavy_down-import.png",
@@ -23,8 +23,12 @@
     "colunas": 7,
     "pe_no_chao": true
   },
-  "frameWidth": 224,
-  "frameHeight": 352,
-  "rootX": 119,
-  "rootY": 334
+  "frameWidth": 448,
+  "frameHeight": 704,
+  "rootX": 238,
+  "rootY": 668,
+  "sourceReferences": [
+    "art/sprites/source/p04_jump_heavy_down_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

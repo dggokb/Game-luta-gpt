@@ -1,16 +1,16 @@
 {
   "id": "p04_land",
   "characterProfile": "p04",
-  "source": "art/sprites/source/p04_land_video_normalized.png",
+  "source": "art/sprites/source/p04_land_sr_hd.png",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 192,
-    "frameHeight": 288,
-    "rootX": 103,
-    "rootY": 270,
+    "frameWidth": 384,
+    "frameHeight": 576,
+    "rootX": 206,
+    "rootY": 540,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,71 +18,76 @@
     {
       "index": 0,
       "outputBbox": [
-        20,
-        36,
-        170,
-        271
+        40,
+        72,
+        340,
+        543
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14348
+      "minimumMargin": 33,
+      "opaquePixels": 57775
     },
     {
       "index": 1,
       "outputBbox": [
-        39,
-        87,
-        171,
-        271
+        77,
+        174,
+        343,
+        543
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12311
+      "minimumMargin": 33,
+      "opaquePixels": 49562
     },
     {
       "index": 2,
       "outputBbox": [
-        37,
-        87,
-        169,
-        271
+        75,
+        174,
+        339,
+        543
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12341
+      "minimumMargin": 33,
+      "opaquePixels": 49616
     },
     {
       "index": 3,
       "outputBbox": [
-        36,
-        75,
-        169,
-        271
+        71,
+        150,
+        339,
+        543
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11937
+      "minimumMargin": 33,
+      "opaquePixels": 47954
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 171,
-    "frameHeight": 255,
-    "rootX": 93,
-    "rootY": 244,
+    "frameWidth": 328,
+    "frameHeight": 496,
+    "rootX": 179,
+    "rootY": 481,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      10,
-      26
+      27,
+      59
     ],
     "decodedBytes": {
-      "canonical": 884736,
-      "packed": 697680
-    }
+      "canonical": 3538944,
+      "packed": 2603008
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0b82af6146fa92777a5bc9aaa9662f64b20890108e6da77a5acda94f0959cb00",
-      "config": "c305f331d9b0806c8550551932d6f9ebe6551a3fbe16ebf49ecaa454ce7d5809",
+      "source": "92664aa9d7da1f1ab086d07c69f174d9dd1ee486b2c3f2d3cd6dc24b43999783",
+      "config": "d9bd24be79e99254ee924c1e787576333f4e21a6573ef9996c67464342193eff",
       "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    },
+    "referenceSources": {
+      "art/sprites/source/p04_land_video_normalized.png": "0b82af6146fa92777a5bc9aaa9662f64b20890108e6da77a5acda94f0959cb00"
     }
   }
 }

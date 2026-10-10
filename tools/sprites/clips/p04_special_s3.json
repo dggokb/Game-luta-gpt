@@ -2,13 +2,13 @@
   "id": "p04_special_s3",
   "javaName": "P04_SPECIAL_S3",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_special_s3_video_normalized.png",
+  "source": "art/sprites/source/p04_special_s3_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_special_s3.png",
   "report": "tools/sprites/reports/p04_special_s3.report.json",
   "preview": "android/app/build/sprite-review/p04_special_s3-import.png",
   "expectedFrames": 21,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -23,6 +23,12 @@
     "limpar_chao": true,
     "ancorar_pe": true
   },
-  "frameWidth": 314,
-  "rootX": 137
+  "frameWidth": 628,
+  "rootX": 274,
+  "sourceReferences": [
+    "art/sprites/source/p04_special_s3_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

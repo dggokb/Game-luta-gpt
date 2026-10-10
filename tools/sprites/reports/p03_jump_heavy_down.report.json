@@ -1,16 +1,16 @@
 {
   "id": "p03_jump_heavy_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_jump_heavy_down_video_normalized.png",
+  "source": "art/sprites/source/p03_jump_heavy_down_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Baixo + jH soco forte para baixo no ar; pes na raiz; quadros com clarao pulados.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 384,
-    "frameHeight": 320,
-    "rootX": 150,
-    "rootY": 300,
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 300,
+    "rootY": 600,
     "columns": 7,
     "frameCount": 7
   },
@@ -18,104 +18,109 @@
     {
       "index": 0,
       "outputBbox": [
-        67,
-        39,
-        246,
-        302
+        133,
+        77,
+        493,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 18065
+      "minimumMargin": 36,
+      "opaquePixels": 72532
     },
     {
       "index": 1,
       "outputBbox": [
-        67,
-        40,
-        247,
-        302
+        133,
+        79,
+        495,
+        603
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17906
+      "minimumMargin": 37,
+      "opaquePixels": 72004
     },
     {
       "index": 2,
       "outputBbox": [
-        65,
-        39,
-        228,
-        302
+        129,
+        77,
+        456,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 18144
+      "minimumMargin": 36,
+      "opaquePixels": 72949
     },
     {
       "index": 3,
       "outputBbox": [
-        39,
-        75,
-        245,
-        301
+        77,
+        149,
+        491,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17179
+      "minimumMargin": 37,
+      "opaquePixels": 69082
     },
     {
       "index": 4,
       "outputBbox": [
-        40,
-        76,
-        245,
-        301
+        79,
+        152,
+        491,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 16973
+      "minimumMargin": 37,
+      "opaquePixels": 68227
     },
     {
       "index": 5,
       "outputBbox": [
-        41,
-        73,
-        242,
-        302
+        82,
+        146,
+        483,
+        603
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 16680
+      "minimumMargin": 37,
+      "opaquePixels": 67073
     },
     {
       "index": 6,
       "outputBbox": [
-        57,
-        57,
-        209,
-        302
+        115,
+        115,
+        417,
+        605
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15539
+      "minimumMargin": 35,
+      "opaquePixels": 62510
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 228,
-    "frameHeight": 284,
-    "rootX": 121,
-    "rootY": 272,
+    "frameWidth": 442,
+    "frameHeight": 553,
+    "rootX": 235,
+    "rootY": 536,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      29,
-      28
+      65,
+      64
     ],
     "decodedBytes": {
-      "canonical": 3440640,
-      "packed": 1813056
-    }
+      "canonical": 13762560,
+      "packed": 6843928
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ac4b0cf8dd7fd9d951a81e287388bfdc60f6e78153da07f8b97e90399f8f0394",
-      "config": "b0ad0410efff352c3ca3810aba6ab742cf33fab68392c679ad14fc77d313784f",
+      "source": "d9efe39e4fedfab612a279349f5ca0d3f55bc5d9ed6d99b13485370a09ac0c21",
+      "config": "03e607306d7cdd8b401d4573190a07bb9a1c4df81238b834db48231a8fb86e64",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_jump_heavy_down_video_normalized.png": "ac4b0cf8dd7fd9d951a81e287388bfdc60f6e78153da07f8b97e90399f8f0394"
     }
   }
 }

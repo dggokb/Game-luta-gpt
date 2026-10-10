@@ -2,18 +2,18 @@
   "id": "p03_crouch_medium",
   "javaName": "P03_CROUCH_MEDIUM",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_crouch_medium_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_medium_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_medium.png",
   "report": "tools/sprites/reports/p03_crouch_medium.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch_medium-import.png",
   "expectedFrames": 16,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 4,
   "rootMode": "authored",
-  "frameWidth": 640,
-  "frameHeight": 320,
-  "rootX": 320,
-  "rootY": 280,
+  "frameWidth": 1280,
+  "frameHeight": 640,
+  "rootX": 640,
+  "rootY": 560,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). 2M rasteira; arco do pe recortado.",
   "video": {
     "arquivo": "rasteiraBaixo.mp4",
@@ -26,5 +26,9 @@
     "raiz": "320,280",
     "sem_poeira": true,
     "sem_efeitos": true
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p03_crouch_medium_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

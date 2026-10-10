@@ -1,165 +1,170 @@
 {
   "id": "p03_fall_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_fall_down_video_normalized.png",
+  "source": "art/sprites/source/p03_fall_down_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Derrubado: queda (0-6) e no chao (7-10); pes na raiz, cada quadro no proprio tronco; poeira recortada.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 320,
-    "rootX": 256,
-    "rootY": 300,
-    "columns": 11,
+    "frameWidth": 1024,
+    "frameHeight": 640,
+    "rootX": 512,
+    "rootY": 600,
+    "columns": 6,
     "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        171,
-        93,
-        401,
-        301
+        342,
+        185,
+        803,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17803
+      "minimumMargin": 38,
+      "opaquePixels": 71463
     },
     {
       "index": 1,
       "outputBbox": [
-        169,
-        97,
-        405,
-        301
+        337,
+        193,
+        811,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17905
+      "minimumMargin": 38,
+      "opaquePixels": 72200
     },
     {
       "index": 2,
       "outputBbox": [
-        167,
-        100,
-        407,
-        301
+        335,
+        199,
+        815,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 18047
+      "minimumMargin": 37,
+      "opaquePixels": 72722
     },
     {
       "index": 3,
       "outputBbox": [
-        166,
-        105,
-        410,
-        301
+        331,
+        211,
+        820,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 18066
+      "minimumMargin": 38,
+      "opaquePixels": 72853
     },
     {
       "index": 4,
       "outputBbox": [
-        169,
-        163,
-        429,
-        301
+        337,
+        325,
+        858,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 16429
+      "minimumMargin": 38,
+      "opaquePixels": 66111
     },
     {
       "index": 5,
       "outputBbox": [
-        122,
-        100,
-        305,
-        301
+        243,
+        199,
+        611,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 15882
+      "minimumMargin": 37,
+      "opaquePixels": 63850
     },
     {
       "index": 6,
       "outputBbox": [
-        205,
-        129,
-        394,
-        301
+        410,
+        258,
+        787,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 14655
+      "minimumMargin": 38,
+      "opaquePixels": 59021
     },
     {
       "index": 7,
       "outputBbox": [
-        190,
-        112,
-        403,
-        301
+        379,
+        225,
+        807,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 16098
+      "minimumMargin": 37,
+      "opaquePixels": 64498
     },
     {
       "index": 8,
       "outputBbox": [
-        190,
-        112,
-        403,
-        301
+        379,
+        225,
+        807,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 16080
+      "minimumMargin": 37,
+      "opaquePixels": 64424
     },
     {
       "index": 9,
       "outputBbox": [
-        192,
-        118,
-        405,
-        301
+        383,
+        235,
+        810,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 15863
+      "minimumMargin": 37,
+      "opaquePixels": 63698
     },
     {
       "index": 10,
       "outputBbox": [
-        181,
-        156,
-        399,
-        300
+        361,
+        312,
+        799,
+        601
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 14565
+      "minimumMargin": 39,
+      "opaquePixels": 58562
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 328,
-    "frameHeight": 228,
-    "rootX": 145,
-    "rootY": 217,
-    "columns": 11,
+    "frameWidth": 641,
+    "frameHeight": 442,
+    "rootX": 282,
+    "rootY": 427,
+    "columns": 6,
     "frameCount": 11,
     "cropOffset": [
-      111,
-      83
+      230,
+      173
     ],
     "decodedBytes": {
-      "canonical": 7208960,
-      "packed": 3290496
-    }
+      "canonical": 31457280,
+      "packed": 13599456
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d24764cd165ea8107477eaccede5f6150eb0879f142f1963662bb119d3a8487f",
-      "config": "ec4d8cec7e1bbd196f26d7ac1203fa5a7291d865cabe890afbd332e0b51426d7",
+      "source": "40e2ed07c166c7e66648bd659223e622188f79b76020887cba3c7899736ee9db",
+      "config": "fc5119e8cec9c09dcb29e559b6e9f2732ae3f1efafe2950ce800cc2ea5fff787",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_fall_down_video_normalized.png": "d24764cd165ea8107477eaccede5f6150eb0879f142f1963662bb119d3a8487f"
     }
   }
 }

@@ -2,13 +2,13 @@
   "id": "p04_ultra_beam",
   "javaName": "P04_ULTRA_BEAM",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/p04_ultra_beam_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_ultra_beam.png",
   "report": "tools/sprites/reports/p04_ultra_beam.report.json",
   "preview": "android/app/build/sprite-review/p04_ultra_beam-import.png",
   "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 7,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -23,8 +23,12 @@
     "colunas": 9,
     "limpar_chao": true
   },
-  "frameWidth": 288,
-  "frameHeight": 320,
-  "rootX": 99,
-  "rootY": 302
+  "frameWidth": 576,
+  "frameHeight": 640,
+  "rootX": 198,
+  "rootY": 604,
+  "sourceReferences": [
+    "art/sprites/source/p04_ultra_beam_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
