@@ -1,0 +1,55 @@
+name: P12 full-cycle Android runtime smoke
+
+on:
+  push:
+    branches:
+      - test/p09-three-engines-20261009
+    paths:
+      - .github/workflows/p12-runtime-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  launch-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the EXACT validated P12 full-cycle APK
+        uses: actions/download-artifact@v4
+        with:
+          name: P12-Full-Cycle-Test-APK
+          path: /tmp/p12-apk
+          run-id: 38011770619
+          github-token: ${{ github.token }}
+      - name: Check APK file exists and is not empty
+        run: |
+          ls -lh /tmp/p12-apk/
+          test -s /tmp/p12-apk/app-debug.apk
+      - name: Install and launch P12 in Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r /tmp/p12-apk/app-debug.apk
+            adb logcat -c
+            adb shell am force-stop com.gamelutagpt
+            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
+            sleep 7
+            adb shell pidof com.gamelutagpt | grep -E '[0-9]+'
+            ! adb logcat -d -v brief | grep -E -q 'FATAL EXCEPTION|Process: com.gamelutagpt'
+            adb exec-out screencap -p > p12-runtime-screen.png
+            test -s p12-runtime-screen.png
+      - name: Upload runtime screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P12-Runtime-Smoke-Screenshot
+          path: p12-runtime-screen.png
+          if-no-files-found: warn
