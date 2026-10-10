@@ -232,6 +232,11 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                     entry["proporcao_video"]=e.compare_body(idle_video or {},video_stats)
             else:
                 entry["video"]={**matches,"analise":meta}
+        # Distinguish defects in source motion from artifacts introduced
+        # while extracting/packing sprites; keep the independent timelines.
+        entry["origem_tremor"]=e.compare_motion_evidence(
+            entry.get("video",{}).get("analise",{}),
+            entry.get("sprite",{}))
         entry["evidencias_suficientes"]=bool(
             entry["video"].get("analise",{}).get("status")=="MEDIDO" and
             entry.get("sprite",{}).get("status")=="MEDIDO" and
