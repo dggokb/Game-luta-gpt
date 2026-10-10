@@ -20,6 +20,10 @@ No dedicated standing-hit or downward-air-heavy file was found in the P12 folder
 
 Additional review is required for body scale, effects attached to the silhouette, foot support, segment boundaries, motion recognition and state transitions. A different hash is not a semantic pass.
 
+A first native LIGHT_JAB trial was rejected by the existing size-measurement engine: its best match against the known initial poses scored only 0.40. No arbitrary scale was applied and no runtime atlas was published. Matching/calibration against the actual video Idle and source-head measurements remains necessary.
+
+All 8 existing focused extractor/renderer/cache regression tests pass locally after installing the required CPU Torch dependency. They are engineering tests, not a visual approval of the new video-derived P12.
+
 ## Runtime and validation
 
 The runtime P12 pack is still the rejected previous pack. The newly generated drafts have not been integrated. `p12_full_cycle.py` now requires traceable existing-video provenance before production preparation or verification, preventing the superseded generated-sheet path from preparing another pack.
