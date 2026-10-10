@@ -7,11 +7,43 @@ Run automatically by Gradle; source reports ship with the repository.
 import argparse
 import json
 from pathlib import Path
+from statistics import median
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 REPORTS = ROOT / "tools/sprites/reports"
 STAND_SCALE = .980
 SKIP = {"player_base_crouch", "player_base_rise"}  # pre-calibrated transitions
+VICTORY_PLANTED_START = 7  # source frames 0..6 show a walk-in; the game skips them
+
+
+def victory_foot_track(report):
+    """Return the horizontal center of the *shoes*, not the arm-sensitive bbox.
+
+    The supplied victory artwork slides by ~8 source pixels even after the
+    walking intro ends. Use the alpha silhouette in the bottom 56px around
+    the authored standing foot anchor to measure it for every frame.
+    """
+    packed = report["packed"]
+    width, height = packed["frameWidth"], packed["frameHeight"]
+    columns = packed["columns"]
+    bottom = min(height, packed["rootY"] + 5)
+    top = max(0, packed["rootY"] - 56)
+    atlas = ROOT / "android/app/src/main/res/drawable-nodpi/player_base_victory.png"
+    with Image.open(atlas) as image:
+        if image.size[0] != width * columns:
+            raise ValueError("Victory atlas width changed; foot calibration invalid")
+        centers = []
+        for i in range(packed["frameCount"]):
+            x0 = (i % columns) * width
+            y0 = (i // columns) * height
+            alpha = image.crop((x0, y0 + top, x0 + width, y0 + bottom)).getchannel("A")
+            x_coords = [idx % width for idx, opacity in enumerate(alpha.getdata())
+                        if opacity > 80]
+            if not x_coords:
+                raise ValueError(f"Victory frame {i} has no grounded shoe pixels")
+            centers.append(float(median(x_coords)))
+        return centers
 
 
 def clamp(value, lo, hi):
@@ -32,6 +64,14 @@ def compute():
             continue
         root_x = report["layout"]["rootX"]
         root_y = report["layout"]["rootY"]
+        shoe_track = victory_foot_track(report) if key == "player_base_victory" else None
+        if shoe_track is not None:
+            packed = report["packed"]
+            f7 = report["frames"][VICTORY_PLANTED_START]["outputBbox"]
+            # Preserve the exact on-screen positioning of frame 7 from v0.98,
+            # but hold its shoes at that X throughout frames 7..32.
+            bbox_center_7 = (f7[0] + f7[2]) / 2 - report["packed"]["cropOffset"][0]
+            shoe_anchor_px = shoe_track[VICTORY_PLANTED_START] - bbox_center_7
         rows = []
         heights = []
         feet = []
@@ -85,7 +125,12 @@ def compute():
                 sx = sy = min(.98, idle_height / max(1, height))
                 if key not in ("player_base_fall", "player_base_getup"):
                     sx = min(sx, idle_width * 1.55 / max(1, width))
-            if key in ("player_base_intro", "player_base_victory"):
+            if key == "player_base_victory" and entry["index"] >= VICTORY_PLANTED_START:
+                # Old bbox-centering still allowed a few pixels of visual
+                # skating as arms moved. Keep the *shoe* world anchor constant.
+                foot_in_packed = shoe_track[entry["index"]] - packed["rootX"]
+                dx = shoe_anchor_px * sx - foot_in_packed * sx
+            elif key in ("player_base_intro", "player_base_victory"):
                 dx = -cx * sx
             else:
                 dx = 0.0  # animation extensions must NOT shift the fighter root
