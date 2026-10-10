@@ -231,6 +231,11 @@ final class CombatEngine {
             f.overdriveRequestAge = -1;
             return;
         }
+        // Require a fully completed backdash AND a release to neutral before
+        // another can be recognized. This avoids backdash chaining by holding
+        // backward or repeated double taps while the hop is active.
+        if (f.backdashFrames == 0 && f.backdashCooldown == 0 &&
+            in.direction == 0) f.backdashArmed = true;
         int relative = MotionParser.relative(in.direction, f.facing);
         f.motion.record(relative, f.clock);
         int clock = f.clock;
@@ -332,10 +337,13 @@ final class CombatEngine {
         }
 
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
-            if (f.backdashRequest) {
+            if (f.backdashRequest && f.backdashFrames == 0 &&
+                f.backdashCooldown == 0 && f.backdashArmed) {
                 f.backdashFrames = config.backdashFrames;
+                f.backdashCooldown = config.backdashFrames + config.backdashRecoveryFrames;
+                f.backdashArmed = false;
                 f.forwardDashing = false;
-            } else if (f.dashRequest) {
+            } else if (f.dashRequest && f.backdashFrames == 0) {
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
             }
@@ -634,6 +642,7 @@ final class CombatEngine {
         if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
         if (f.invulnFrames > 0) f.invulnFrames--;
         if (f.throwProtect > 0) f.throwProtect--;
+        if (f.backdashCooldown > 0) f.backdashCooldown--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.launcherChase > 0) f.launcherChase--;
