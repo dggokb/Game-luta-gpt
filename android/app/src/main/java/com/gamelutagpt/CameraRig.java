@@ -18,6 +18,19 @@ final class CameraRig {
     float zoom = CAMERA_ZOOM;
 
     /**
+     * Called by the fight shell. After either fighter is KO, both the camera
+     * focus and its smoothing MUST stop; otherwise a stationary victory pose
+     * appears to slide across the arena as the KO body falls/gets knocked back.
+     * This is a camera issue, not an atlas offset issue.
+     */
+    void updateForRound(float dt,float playerX,float opponentX,
+                        float highestFighterTop,boolean superJumpActive,
+                        boolean roundFinished) {
+        if (!roundFinished)
+            update(dt,playerX,opponentX,highestFighterTop,superJumpActive);
+    }
+
+    /**
      * @param highestFighterTop world y of the highest opaque pixel of either fighter
      * @param superJumpActive while true, height does not widen the framing
      */
