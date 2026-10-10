@@ -1,0 +1,9 @@
+{
+  "state": "HIT_CROUCH",
+  "count": 8,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in FOUR columns and TWO rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action HIT_CROUCH: all eight frames grounded DEEP SQUAT. 1 crouched neutral; 2 struck from RIGHT; 3 and 4 head snaps back LEFT, bent torso twists backward, arms spread with open hands; 5 dazed crouch; 6 regain squat balance; 7 and 8 crouched neutral. Body remains low and BOTH feet on same floor line. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "f439eb5d4f33e34bb44371506b4b25bc5b5ed482"
+}
