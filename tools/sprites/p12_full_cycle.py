@@ -323,9 +323,15 @@ def prepare(weights):
             "sourceNote":f"P12 articulated {state}, native P12 ink, 4x SR inference -> 2x atlas"
         })
         original_total=sum(animation.get("durationsMs",[]) or [0])
+        original_count=len(animation["frames"])
+        original_stride=animation.get("distancePerFrame")
         animation["atlas"]=atlas_id
         animation["frames"]=list(range(len(images)))
-        if "distancePerFrame" not in animation:
+        if original_stride is not None:
+            # A whole gait cycle must travel the SAME world distance as before;
+            # otherwise changing frame count speeds up the fighter visually.
+            animation["distancePerFrame"]=round(original_stride*original_count/len(images),4)
+        else:
             original_total=max(1,original_total)
             animation["durationsMs"]=[round(original_total/len(images),4)]*len(images)
         manifest["states"][state]={
