@@ -691,6 +691,15 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        // The winner has already won: no stale held direction, dash or air
+        // momentum may translate the victory animation around the arena.
+        // Keep the defeated fighter's knockdown and physics untouched.
+        if (!f.ko() && fighters[1 - f.index].ko()) {
+            f.forwardDashing = false;
+            f.backdashFrames = 0;
+            f.airDashFrames = 0;
+            return;
+        }
         if (f.rolling()) {
             f.x += f.rollDirection * config.rollSpeed * CombatConfig.DT;
             f.rollFrames--;
@@ -761,6 +770,13 @@ final class CombatEngine {
             return;
         }
         float scale = 1f;
+        // Ordinary neutral jumps now rise/fall briskly; preserve the superjump
+        // arc, juggle/launch physics and specialized projectile trajectories.
+        if (!f.superJumping && (f.status == CombatFighter.Status.NEUTRAL ||
+            (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
+            scale = f.vy < 0f ? config.normalJumpRisingGravityScale
+                              : config.normalJumpFallingGravityScale;
+        }
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
             scale = 0f;
