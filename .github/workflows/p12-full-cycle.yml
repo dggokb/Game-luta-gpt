@@ -9,6 +9,8 @@ on:
       - tools/sprites/p12_full_cycle.py
       - tools/sprites/p12_authored_cycle.py
       - tools/sprites/p12_authored_sources.py
+      - tools/sprites/p12_video_sources.py
+      - tools/sprites/videos/p12-drive-inventory.json
       - art/keys/p12/registration.json
       - tools/sprites/p12_pose_gate.py
       - tools/sprites/harmony.py
@@ -49,9 +51,9 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check "Pillow==12.3.0" "numpy<3" scipy opencv-python-headless
           python -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
-      - name: Extract traceable authored sources and test the renderer
+      - name: Check existing-video extractor and renderer tests
         run: |
-          python tools/sprites/p12_authored_sources.py
+          python -m compileall -q tools/sprites/p12_video_sources.py tools/sprites/p12_full_cycle.py
           python -m unittest discover -s tools/sprites/tests -p 'test_p12_authored_*.py' -q
       - name: Require independently sourced P12 actions (reject fake IDLE movements)
         run: python tools/sprites/p12_pose_gate.py
@@ -66,7 +68,7 @@ jobs:
           path: android/app/build/p12-sr-cache
           key: p12-sr-alpha-v2-${{ hashFiles('art/keys/p12/sheets/*.png', 'art/keys/p12/registration.json', 'tools/sprites/p12_authored_cycle.py') }}
           restore-keys: p12-sr-alpha-v2-
-      - name: Generate P12 preview clips from independent action sources and refine frames
+      - name: Prepare reviewed original-video frames and refine them
         run: |
           python -m compileall -q tools/sprites/p12_full_cycle.py
           python -u tools/sprites/p12_full_cycle.py prepare \
@@ -114,6 +116,7 @@ jobs:
             android/app/build/p12-full-cycle/
             android/app/build/reports/tests/
             tools/sprites/reports/p12_full_*.report.json
-            docs/art/p12-authored-source-preview.png
-            docs/art/p12-authored-source-audit.json
+            docs/art/p12-existing-videos-preview.jpg
+            docs/art/p12-video-sources/
+            docs/art/p12-authored-progress.md
           if-no-files-found: warn
