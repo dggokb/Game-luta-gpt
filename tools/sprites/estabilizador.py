@@ -152,9 +152,27 @@ def metrics(measures, reference_height, state):
                for key,values in pairs.items()}
     # Plantar pé não significa impedir animação dos membros: somente reportar
     # oscilações, não aplicar deslocamento automático.
+    drift=None
     if state in PLANTED:
         defects["pe_apoio"] = [good[i][0] for i in isolated_spikes(feet,reference_height)]
+        # Victory sometimes has an authored entrance walk. Assess only the
+        # *planted celebration* portion, never treat a real walk as skating.
+        window = feet[max(0,int(len(feet)*.45)):] if state=="VICTORY" else feet
+        if len(window)>=8:
+            first=float(np.median(window[:max(2,len(window)//5)]))
+            last=float(np.median(window[-max(2,len(window)//5):]))
+            shift=last-first
+            changes=np.diff(window)
+            meaningful=changes[np.abs(changes)>=.2]
+            agreement=(float(np.mean(np.sign(meaningful)==np.sign(shift)))
+                       if len(meaningful) else 0)
+            threshold=max(3.,float(reference_height)*.03)
+            if abs(shift)>threshold and agreement>=.67:
+                drift={"status":"SUSPEITA_DE_DESLIZE","delta_x":round(shift,2),
+                       "limite":round(threshold,2),
+                       "trecho":"apos entrada" if state=="VICTORY" else "completo"}
     return {"status":"MEDIDO", "quadros":len(good),
+            "deslize":drift,
             "tremor": {k:v for k,v in defects.items() if v},
             "medianas": {"altura":round(float(np.median(heights)),2),
                          "cabeca":round(float(np.median(heads)),2),
