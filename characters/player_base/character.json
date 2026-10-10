@@ -342,12 +342,12 @@
       ],
       "loop": false,
       "durationsMs": [
-        15,
-        15,
-        15,
-        15,
-        15,
-        15
+        25,
+        25,
+        25,
+        25,
+        25,
+        25
       ]
     },
     "JUMP": {
@@ -1630,20 +1630,20 @@
       "animation": "HEAVY_STRAIGHT",
       "damage": 800,
       "reach": 159,
-      "startupFrames": 15,
-      "activeFrames": 7,
-      "recoveryFrames": 12,
+      "startupFrames": 23,
+      "activeFrames": 9,
+      "recoveryFrames": 20,
       "hitstunFrames": 18,
       "blockstunFrames": 11,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          15,
-          23
+          23,
+          33
         ],
         "block": [
-          15,
-          23
+          23,
+          33
         ],
         "whiff": null
       },

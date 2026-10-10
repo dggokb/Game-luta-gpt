@@ -1,3 +1,25 @@
+## P01 revisão geométrica (segunda tentativa)
+
+Este refinamento substitui o ajuste anterior por **medidas reais dos contornos
+opacos de cada frame**, sem normalizar pela célula inteira do atlas.
+- CROUCH: tamanho decresce quadro a quadro com escala medida
+  `0.974 ... 0.878`, mantendo largura visível em aproximadamente 302 pixels,
+  igual ao IDLE e sem crescimento ao agachar.
+- RISE: corrige separadamente os dois eixos, com transição ao quadro real
+  de IDLE nos últimos frames e aumento da duração para 150 ms.
+- INTRO: o último quadro da animação medido tem 319 x 420 px, enquanto IDLE
+  tem 302 x 448 px. A correção usa escalas **X=.947, Y=1.067** e fecha com
+  o frame exato do IDLE, não amplia os dois eixos em 6.5% como antes.
+- H: agora 52 frames de jogo para 23 quadros de arte (~867 ms a 60 FPS);
+  janela ativa e cancelamentos atualizados. Antes eram só 34, o que
+  permitia pular muitos quadros intermediários visualmente.
+- **Arte danificada do H:** nenhuma nova afirmação de que o buraco foi
+  corrigido. O reparo automático anterior preencheu transparências sem
+  localizar visualmente o defeito relatado. A inspeção gera folha numerada
+  `p01-heavy-frames.png` para apontar o quadro/ponto exato.
+- CI: `qa_p01_visual.py` valida as dimensões dos PNG reais e gera
+  comparativo visual de IDLE, INTRO, CROUCH e RISE.
+
 ## Ajustes do P01 — outubro de 2026
 
 - INTRO/IDLE: início do idle vira exatamente o último frame visual da intro, após
