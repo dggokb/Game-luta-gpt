@@ -139,6 +139,11 @@ def main():
     ix=calibration("INTRO_X");iy=calibration("INTRO_Y")
     assert len(ix)==len(iy)==7
     stand_w,stand_h=dims(cell("idle",0))
+    idle_match=re.search(r"private static final float P01_IDLE_SCALE\s*=\s*(\d+\.\d+)f;",JAVA.read_text())
+    assert idle_match, "Missing P01 idle scalar"
+    idle_scale=float(idle_match.group(1))
+    stand_w*=idle_scale
+    stand_h*=idle_scale
     widths_c=[dims(cell("crouch",i))[0]*s for i,s in enumerate(k)]
     widths_r=[dims(cell("rise",i))[0]*s for i,s in enumerate(x)]
     for widths,name in [(widths_c,"crouch"),(widths_r,"rise")]:
