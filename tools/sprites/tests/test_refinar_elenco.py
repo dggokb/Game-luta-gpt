@@ -251,6 +251,54 @@ class CharacterStabilizerTest(unittest.TestCase):
                     packed_inspector=read_pack,geometria=False)
             self.assertEqual("PENDENTE_FONTES",result["status"])
 
+    def test_frozen_import_flagged_even_when_idle_sift_is_inconclusive(self):
+        from unittest.mock import patch
+        import cv2
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            p=root/"characters/player_base"
+            p.mkdir(parents=True)
+            (p/"character.json").write_text(json.dumps({"animations":{
+                "IDLE":{"atlas":"test_idle","frames":list(range(12))},
+                "DASH":{"atlas":"test_dash","frames":list(range(12))}}}))
+            keys=root/"art/keys/p01"
+            keys.mkdir(parents=True)
+            (keys/"tamanho.json").write_text(json.dumps({
+                "altura":224,"chaves":{"inicio_centro":.5}}))
+            base=np.full((600,550,3),(0,255,0),dtype=np.uint8)
+            base[70:518,180:315]=(25,45,125)
+            cv2.imwrite(str(keys/"inicio_centro.png"),base)
+            videos=root/"animations/p01"
+            videos.mkdir(parents=True)
+            (videos/"idle.mp4").touch()
+            (videos/"dash.mp4").touch()
+            def video_reader(path):
+                return {"status":"EXTRAIDO"},[body_frame()]*12
+            def pack_reader(root,pack,state):
+                return {"status":"EXTRAIDO","atlas":"test_"+state.lower()},[body_frame()]*12
+            def actor(pose):
+                rgba=np.zeros((130,170,4),dtype=np.uint8)
+                rgba[12:110,62:103,:3]=(110,150,205)
+                rgba[12:110,62:103,3]=255
+                x,y=[(0,0),(28,65),(5,40),(28,82),(46,34),(0,63)][pose]
+                rgba[y:y+16,x:x+58,:3]=(230,65,40)
+                rgba[y:y+16,x:x+58,3]=255
+                return rgba
+            vf=[actor(i) for i in range(6)]
+            sf=[actor(0)]*6
+            with patch("verificar_escala.read_video_samples",return_value=vf), \
+                 patch("verificar_escala.read_sprite_samples",return_value=sf):
+                result=MOD.inspect_character("p01",videos,states=["DASH"],
+                    root=root,original_video_inspector=video_reader,
+                    packed_inspector=pack_reader,geometria=True)
+            state=result["estados"]["DASH"]
+            self.assertEqual("INCONCLUSIVO",state["prova_geometrica"]["status"])
+            self.assertEqual("SUSPEITA_CLIP_CONGELADO",
+                             state["progressao_pose"]["status"])
+            self.assertEqual("ANOMALIAS_IDENTIFICADAS",result["status"])
+            self.assertIn("DASH",result["pendentes_revisao"])
+            self.assertFalse(result["aprovado_automaticamente"])
+
     def test_calibration_rejects_false_image_and_wrong_scale(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
