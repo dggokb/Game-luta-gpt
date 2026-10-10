@@ -1,3 +1,11 @@
+## P01 v0.92 — normal jump crosses the opponent; backdash and 2M refinement
+
+- Universal normal jump: initial vertical speed **700 -> 780 world units/s** (gravity constant at 1650); apex approx **178 units** after discrete physics, beyond the standing hurtbox (P01 156). New combat unit test requires player to cross an opponent in midair, land on the far side, and face back. Superjump untouched.
+- Universal backdash: **820 × 14/60 ≈ 191 units -> 850 × 15/60 = 212.5 units** (+11%). Render-only hop height 34 -> 40 units, retaining grounded combat semantics.
+- P01 crouching medium (2M): startup **6**, active **4** (unchanged), recovery **9 -> 11**; total **19 -> 21 frames** (+10.5%). Sprite timings 317 -> 351 milliseconds; first 6 poses unchanged, contact still shows frame 6; all 16 atlas poses preserved in playback.
+- Regression tests: old 2H and L-M-H intact, global jump and backdash for both teams, and *physical crossing* over a standing opponent.
+- Android test build **0.92-p01-jump-backdash-2m**.
+
 ## P01 v0.91 — 2H contínuo, ataques baixos e movimento global
 
 - P01 2L: 10 → 12 frames; 2M: 16 → 19 frames; 2H: 24 → 29 frames.
