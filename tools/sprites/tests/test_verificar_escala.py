@@ -69,6 +69,46 @@ class GeometricScaleProofTest(unittest.TestCase):
             self.affine(.82),unrelated,unrelated,unrelated,unrelated])
         self.assertEqual("INCONCLUSIVO",result["status"])
 
+    def test_source_atlas_agreement_and_disagreement_are_distinct(self):
+        a={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.82}
+        b={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.84}
+        ok=geo.compare_source_and_atlas(a,b)
+        self.assertEqual("PADRONIZADA_FONTE_ATLAS",ok["status"])
+        self.assertEqual("PENDENTE",ok["validacao_runtime"])
+        fail=geo.compare_source_and_atlas(a,{**b,"fator_mediano":1.06})
+        self.assertEqual("ESCALA_DIVERGENTE",fail["status"])
+        self.assertGreater(fail["diferenca_relativa"],.15)
+        self.assertEqual("INCONCLUSIVO",geo.compare_source_and_atlas(
+            a,{"status":"INCONCLUSIVO"})["status"])
+
+    def test_atlas_pixel_scale_normalizes_to_idle(self):
+        import json
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as d:
+            root=Path(d)
+            report_dir=root/"tools/sprites/reports"
+            image_dir=root/"android/app/src/main/res/drawable-nodpi"
+            report_dir.mkdir(parents=True)
+            image_dir.mkdir(parents=True)
+            pack={"animations":{
+                "IDLE":{"atlas":"test_idle","frames":[0]},
+                "DASH":{"atlas":"test_dash","frames":[0]}
+            }}
+            for name,ps in (("idle",2),("dash",1)):
+                atlas="test_"+name
+                payload={"packed":{"frameWidth":30,"frameHeight":50,
+                                   "columns":1,"pixelScale":ps}}
+                (report_dir/(atlas+".report.json")).write_text(json.dumps(payload))
+                Image.new("RGBA",(30,50),(100,130,180,255)).save(image_dir/(atlas+".png"))
+            idle=geo.read_sprite_samples(root,pack,"IDLE")
+            dash=geo.read_sprite_samples(root,pack,"DASH")
+            self.assertEqual((50,30,4),idle[0].shape)
+            self.assertEqual((100,60,4),dash[0].shape)
+            meta=report_dir/"test_dash.report.json"
+            meta.write_text(json.dumps({"packed":{"frameWidth":30,"frameHeight":50,
+                        "columns":1,"pixelScale":0}}))
+            self.assertEqual([],geo.read_sprite_samples(root,pack,"DASH"))
+
     def test_corrupted_or_invalid_rgba_fails_closed(self):
         self.assertEqual("INCONCLUSIVO",
             geo.estimate_pair(self.base,self.base[:,:,:3])["status"])
