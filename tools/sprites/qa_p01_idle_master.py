@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Fail CI if any P01 atlas is missing its frame-by-frame idle-master calibration."""
 from pathlib import Path
-from generate_p01_calibration import compute, ROOT, REPORTS, SKIP
+from generate_p01_calibration import (
+    compute, ROOT, REPORTS, SKIP, victory_foot_track, VICTORY_PLANTED_START
+)
 import json
 
 def run():
@@ -35,13 +37,25 @@ def run():
         for i,(sx,sy,dx,dy) in enumerate(transforms[name]):
             x0,y0,x1,y1=atlas["frames"][i]["outputBbox"]
             center=(x0+x1)*.5-atlas["layout"]["rootX"]
-            assert abs(center*sx+dx)<.01, (name,i,"fake translation")
             if name=="player_base_intro":
+                assert abs(center*sx+dx)<.01, (name,i,"intro lateral drift")
                 assert abs((y1-y0)*sy-stand_h)<.6, (name,i,"size")
             else:
                 # Victory has a narrow standing silhouette; full-height
                 # bounding-box equality made it visually undersized.
                 assert .85<=sy<=.93, (name,i,"victory calibrated size")
+    victory=json.loads((REPORTS/"player_base_victory.report.json").read_text())
+    planted=transforms["player_base_victory"]
+    shoes=victory_foot_track(victory)
+    root=victory["packed"]["rootX"]
+    world_shoe=[(shoes[i]-root)*planted[i][0]+planted[i][2]
+                for i in range(VICTORY_PLANTED_START,len(planted))]
+    assert max(world_shoe)-min(world_shoe)<.002, (
+        "Victory shoe drift is not locked",world_shoe)
+    assert all(abs(planted[i][0]-.880)<.0001 and abs(planted[i][1]-.880)<.0001
+               for i in range(VICTORY_PLANTED_START,len(planted))), "Victory size changed"
+    # This tracks planted shoes; tests based on the whole silhouette's
+    # center would hide the source artwork's real lateral displacement.
     dash=json.loads((REPORTS/"player_base_dash.report.json").read_text())
     for i,frame in enumerate(dash["frames"]):
         a,b,c,d=frame["outputBbox"]
