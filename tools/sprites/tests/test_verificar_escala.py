@@ -117,6 +117,24 @@ class GeometricScaleProofTest(unittest.TestCase):
                     self.assertEqual("INCONCLUSIVO",state["status"])
                     self.assertEqual([],temporal_frames)
 
+    def test_duplicate_sample_positions_are_not_independent_video_evidence(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as d:
+            file=Path(d)/"short.mp4"
+            writer=cv2.VideoWriter(str(file),
+                cv2.VideoWriter_fourcc(*"mp4v"),24.,(96,96))
+            self.assertTrue(writer.isOpened())
+            for i in range(20):
+                canvas=np.full((96,96,3),(0,255,0),dtype=np.uint8)
+                cv2.rectangle(canvas,(30+i//3,20),(60+i//3,82),(30,40,180),-1)
+                writer.write(canvas)
+            writer.release()
+            repeated=geo.read_video_samples(file,selection=(.01,.015,.4))
+            self.assertEqual([],repeated,
+                "Two samples at identical video position cannot prove stability")
+            distinct=geo.read_video_samples(file,selection=(.05,.30,.65))
+            self.assertEqual(3,len(distinct))
+
     def test_source_atlas_agreement_and_disagreement_are_distinct(self):
         a={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.82}
         b={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.84}
@@ -152,10 +170,12 @@ class GeometricScaleProofTest(unittest.TestCase):
                                    "columns":1,"pixelScale":ps}}
                 (report_dir/(atlas+".report.json")).write_text(json.dumps(payload))
                 Image.new("RGBA",(30,50),(100,130,180,255)).save(image_dir/(atlas+".png"))
-            idle=geo.read_sprite_samples(root,pack,"IDLE")
-            dash=geo.read_sprite_samples(root,pack,"DASH")
+            idle=geo.read_sprite_samples(root,pack,"IDLE",selection=(.5,))
+            dash=geo.read_sprite_samples(root,pack,"DASH",selection=(.5,))
             self.assertEqual((50,30,4),idle[0].shape)
             self.assertEqual((100,60,4),dash[0].shape)
+            self.assertEqual([],geo.read_sprite_samples(root,pack,"DASH"),
+                "One atlas cell must not count as seven independent scale proofs")
             meta=report_dir/"test_dash.report.json"
             meta.write_text(json.dumps({"packed":{"frameWidth":30,"frameHeight":50,
                         "columns":1,"pixelScale":0}}))
