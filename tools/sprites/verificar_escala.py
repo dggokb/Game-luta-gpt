@@ -135,6 +135,7 @@ def read_video_samples(path,selection=(.16,.28,.40,.52,.64,.76,.88)):
     """Descompacta apenas alguns quadros, não mantém o vídeo na memória."""
     import cv2
     from video_para_sprite import key
+    from estabilizador import chroma_confidence
     cap=cv2.VideoCapture(str(path))
     if not cap.isOpened():
         return []
@@ -151,16 +152,7 @@ def read_video_samples(path,selection=(.16,.28,.40,.52,.64,.76,.88)):
             # The video segmentation strategy below only works when the
             # canvas really is green-screen. Otherwise foreground masks
             # include the background and produce false feature matches.
-            hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-            corner=24
-            corners=np.concatenate((
-                hsv[:corner,:corner].reshape(-1,3),
-                hsv[:corner,-corner:].reshape(-1,3),
-                hsv[-corner:,:corner].reshape(-1,3),
-                hsv[-corner:,-corner:].reshape(-1,3)))
-            ratio=np.mean((corners[:,0]>35)&(corners[:,0]<95)&
-                          (corners[:,1]>45))
-            if ratio<.80:
+            if chroma_confidence(frame)<.80:
                 return []  # Non-chroma footage must remain INCONCLUSIVE.
             samples.append(key(frame))
         return samples if len(samples)==len(selection) else []
