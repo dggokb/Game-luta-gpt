@@ -2,15 +2,15 @@
   "id": "p12_full_light_jab",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_light_jab_sr2x.png",
-  "sourceNote": "P12 articulated LIGHT_JAB, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 10
   },
@@ -18,129 +18,129 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        509,
+        433,
+        783,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45255
+      "opaquePixels": 40510
     },
     {
       "index": 1,
       "outputBbox": [
-        141,
-        58,
-        381,
-        479
+        509,
+        425,
+        777,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 44751
+      "minimumMargin": 35,
+      "opaquePixels": 39302
     },
     {
       "index": 2,
       "outputBbox": [
-        142,
-        57,
-        391,
-        479
+        515,
+        417,
+        973,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 41836
+      "minimumMargin": 35,
+      "opaquePixels": 45918
     },
     {
       "index": 3,
       "outputBbox": [
-        142,
-        58,
-        390,
-        479
+        515,
+        417,
+        965,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 42138
+      "minimumMargin": 35,
+      "opaquePixels": 45785
     },
     {
       "index": 4,
       "outputBbox": [
-        141,
-        58,
-        387,
-        479
+        515,
+        417,
+        965,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 42973
+      "minimumMargin": 35,
+      "opaquePixels": 45861
     },
     {
       "index": 5,
       "outputBbox": [
-        141,
-        58,
-        384,
-        479
+        515,
+        419,
+        963,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 44186
+      "opaquePixels": 46260
     },
     {
       "index": 6,
       "outputBbox": [
-        140,
-        58,
-        379,
-        479
+        513,
+        427,
+        791,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45224
+      "minimumMargin": 35,
+      "opaquePixels": 37155
     },
     {
       "index": 7,
       "outputBbox": [
-        139,
-        59,
-        375,
-        479
+        511,
+        447,
+        793,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45892
+      "opaquePixels": 40178
     },
     {
       "index": 8,
       "outputBbox": [
-        139,
-        59,
-        374,
-        479
+        509,
+        439,
+        793,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45865
+      "opaquePixels": 41632
     },
     {
       "index": 9,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        511,
+        437,
+        789,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45255
+      "minimumMargin": 35,
+      "opaquePixels": 40438
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 276,
-    "frameHeight": 445,
-    "rootX": 129,
-    "rootY": 430,
+    "frameWidth": 488,
+    "frameHeight": 342,
+    "rootX": 143,
+    "rootY": 327,
     "columns": 4,
     "frameCount": 10,
     "cropOffset": [
-      127,
-      46
+      497,
+      405
     ],
     "decodedBytes": {
-      "canonical": 12582912,
-      "packed": 5895360
+      "canonical": 56623104,
+      "packed": 8011008
     },
     "pixelScale": 2
   },
@@ -148,12 +148,31 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "4f5473878e5289ddd529ebdbfcf9a27d1449d656a70d736aa2d771a52967469e",
-      "config": "45621e661387815f326b99b39e2c83768a50479fc1c1a97e798fe43726609435",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "bf228ad8dcc01b7a635ac12ac9e1bdbdae80e78fac8151abd40e2788387c567f",
+      "config": "de3fe3b0453d2f0a9caa85d40190082a0a460a37b6aee919b1558ba985ee0763",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_light_jab_original.png": "86cf4880fbd57f513ab1e009fc7ce73d6139dea95bc65646c2293370364e9804"
+      "art/sprites/source/p12_full_light_jab_original.png": "221e8bea0cbde8416896fc94c94892c0c62875736be7ece99b8b555b3b54c211",
+      "art/keys/p12/poses/light_jab_start.png": "f513832144b5f4b7ed7e9ea5ee859c1955a0352219ccd27316e2d3429eb62aea",
+      "art/keys/p12/video_masks/light_jab/0043.png": "6426bc916237646d10c0941e98f783162c3603d6f8dc5452d74c90245a3920b2",
+      "art/keys/p12/video_frames/light_jab/0045.png": "e9f1cce0a0e637134ea68bf8d869665bf3edccec92f91ee9453e1f11c985176f",
+      "art/keys/p12/video_masks/light_jab/0045.png": "b6efb83e0549cb5185b8ae01500d786d65f6ad65800c8000600882f4fee46f25",
+      "art/keys/p12/poses/light_jab_peak.png": "d2ed0cacbfb4e0f4cdd1d445944aa829c4ec0324ce93fc6a78bc67461ee545b5",
+      "art/keys/p12/video_masks/light_jab/0056.png": "a17fbc1d1e1c16b0fec2ad87f6b7992694cdca8ba35a23858334bde4fc903849",
+      "art/keys/p12/video_frames/light_jab/0058.png": "3e58c1db3703fd9c484b4d658fa3228c1f9ec6d85efc19f56a56997ed18efdde",
+      "art/keys/p12/video_frames/light_jab/0060.png": "a8f01abac62c2f512e2040d2d3bcaca4631949bc7aa58fea7be378f95d28f1af",
+      "art/keys/p12/video_masks/light_jab/0060.png": "75b3b65bc5113d478e549b83a00f66e403a3ce18f9afc930f816773fd07a4926",
+      "art/keys/p12/video_frames/light_jab/0068.png": "c1aa0397fa19cb972fd23c9b5544a0b71d7a810c516189053c577770197718f0",
+      "art/keys/p12/video_masks/light_jab/0068.png": "a6fb9185e38fa2072e7647a9144c8ead1d98ebc0b580514742bf71932efba58f",
+      "art/keys/p12/video_frames/light_jab/0071.png": "c5ca1047cea02d075636e9fb58df2a53b753b0a7a57989c10196d80f4eacb1fa",
+      "art/keys/p12/video_masks/light_jab/0071.png": "666aeefeb3453e5229d55d68d153c241f79201dda4a760557d4444029fa41fbf",
+      "art/keys/p12/video_frames/light_jab/0079.png": "dd2f1aea374582ccf6e1021f3d9c71a962b17708171b57c151e2b3c6e397ac97",
+      "art/keys/p12/video_masks/light_jab/0079.png": "6abfd3f73ac36378e610d10695f15177cc32ddb6e0ff78a807d4f9ac1ed79f48",
+      "art/keys/p12/video_frames/light_jab/0084.png": "4065c5d812808b313aaebe98d2f58cd18075586669d9b279078152576dd2be07",
+      "art/keys/p12/video_masks/light_jab/0084.png": "6dde4b3b96c2b79be37c7db60bdda0db6568bf4698d86f1b645bc560d87a6783",
+      "art/keys/p12/video_frames/light_jab/0088.png": "84893c47b61d56184cfaa5b7e10cd6ccf01f81537a9729b04e27cdde304f9f43",
+      "art/keys/p12/video_masks/light_jab/0088.png": "f0867c66c14aa6c315d34fa206ba4461277e2dcf4c4c23d78532f596da48d958"
     }
   }
 }

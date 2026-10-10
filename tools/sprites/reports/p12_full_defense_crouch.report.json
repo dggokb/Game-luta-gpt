@@ -2,15 +2,15 @@
   "id": "p12_full_defense_crouch",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_defense_crouch_sr2x.png",
-  "sourceNote": "P12 articulated DEFENSE_CROUCH, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 7
   },
@@ -18,96 +18,96 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        127,
-        373,
-        479
+        467,
+        539,
+        767,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 38108
+      "opaquePixels": 32387
     },
     {
       "index": 1,
       "outputBbox": [
-        139,
-        123,
-        373,
-        479
+        467,
+        541,
+        767,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 37644
+      "opaquePixels": 31942
     },
     {
       "index": 2,
       "outputBbox": [
-        138,
-        119,
-        372,
-        478
+        467,
+        541,
+        767,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 36234
+      "minimumMargin": 33,
+      "opaquePixels": 31918
     },
     {
       "index": 3,
       "outputBbox": [
-        138,
-        118,
-        372,
-        477
+        467,
+        541,
+        767,
+        735
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 35440
+      "minimumMargin": 33,
+      "opaquePixels": 31989
     },
     {
       "index": 4,
       "outputBbox": [
-        138,
-        119,
-        372,
-        478
+        467,
+        541,
+        767,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 36234
+      "minimumMargin": 33,
+      "opaquePixels": 32038
     },
     {
       "index": 5,
       "outputBbox": [
-        139,
-        123,
-        373,
-        479
+        465,
+        537,
+        769,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 37644
+      "opaquePixels": 33027
     },
     {
       "index": 6,
       "outputBbox": [
-        139,
-        127,
-        373,
-        479
+        467,
+        539,
+        767,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 38108
+      "opaquePixels": 32260
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 259,
-    "frameHeight": 385,
-    "rootX": 130,
-    "rootY": 370,
+    "frameWidth": 328,
+    "frameHeight": 222,
+    "rootX": 187,
+    "rootY": 207,
     "columns": 4,
     "frameCount": 7,
     "cropOffset": [
-      126,
-      106
+      453,
+      525
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 3190880
+      "canonical": 37748736,
+      "packed": 2330112
     },
     "pixelScale": 2
   },
@@ -115,12 +115,19 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "15691fc42607425f9769db88775ffacc723f1e9cc8b3a390cc458e5b47cc6519",
-      "config": "e4894c4048257b3f48f2dc1554b954a2b3e101c9f811063bfdde7e67d1b8bdf2",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "119c6527a3d80f61fd90d5681c5865cad9da0a0c2f3e5f938927b9cf8a02220c",
+      "config": "847140c382b46210c0d708e3b552dc5f71c28901950cc3d3bb8bd1ba046a581a",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_defense_crouch_original.png": "57b6e56e8cc3105d281001676dbe05940f45cc18f55780bd0224f49dd54ded0b"
+      "art/sprites/source/p12_full_defense_crouch_original.png": "2701d91dc318890470ca20037f29c4c0370795144e01c91713e3d3d3dd76eb92",
+      "art/keys/p12/poses/defense_crouch_start.png": "3ebcc10a689845baea4f5b41641d303bd55c62dbb31109e4ae9d56587d2c7610",
+      "art/keys/p12/video_frames/defense_crouch/0002.png": "449a1f43460e67f3f2dee4f18ad58f58c8b0062d40c7b6de2ab3b875a9583cdb",
+      "art/keys/p12/video_frames/defense_crouch/0004.png": "45ce5f0e5df3c8365f0b07246874f677f61397c72d5baa04daf064d25c06baad",
+      "art/keys/p12/video_frames/defense_crouch/0006.png": "458d14babe55e934d1799fdf9ec8b4a2ee6ac8743288eaa500c3431b6d3b27bc",
+      "art/keys/p12/poses/defense_crouch_peak.png": "87b041539eb04e367847ac38b968575ff79257e0dcb345b49b327eb29741c10a",
+      "art/keys/p12/video_frames/defense_crouch/0010.png": "8a6c1d2370f31727aea513172ab9146ebacefa17e434ae73ed6114b7ddb2b8a1",
+      "art/keys/p12/video_frames/defense_crouch/0016.png": "30ae63b58b3ff59298e6c5d3dc66bdad9d847db87012c4d2e27e6ce1a4f6cb1e"
     }
   }
 }

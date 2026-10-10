@@ -2,15 +2,15 @@
   "id": "p12_full_land",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_land_sr2x.png",
-  "sourceNote": "P12 articulated LAND, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 6
   },
@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        113,
-        373,
-        479
+        507,
+        471,
+        795,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 39592
+      "minimumMargin": 35,
+      "opaquePixels": 38687
     },
     {
       "index": 1,
       "outputBbox": [
-        139,
-        102,
-        373,
-        479
+        507,
+        471,
+        789,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 40743
+      "minimumMargin": 35,
+      "opaquePixels": 38390
     },
     {
       "index": 2,
       "outputBbox": [
-        139,
-        91,
-        373,
-        479
+        505,
+        471,
+        779,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 41900
+      "minimumMargin": 35,
+      "opaquePixels": 38243
     },
     {
       "index": 3,
       "outputBbox": [
-        139,
-        81,
-        373,
-        479
+        505,
+        443,
+        761,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 43023
+      "opaquePixels": 40089
     },
     {
       "index": 4,
       "outputBbox": [
-        139,
-        70,
-        373,
-        479
+        509,
+        427,
+        759,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 44170
+      "opaquePixels": 40593
     },
     {
       "index": 5,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        509,
+        427,
+        761,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45255
+      "opaquePixels": 40657
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 258,
-    "frameHeight": 443,
-    "rootX": 129,
-    "rootY": 428,
+    "frameWidth": 314,
+    "frameHeight": 332,
+    "rootX": 147,
+    "rootY": 317,
     "columns": 4,
     "frameCount": 6,
     "cropOffset": [
-      127,
-      48
+      493,
+      415
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 3657408
+      "canonical": 37748736,
+      "packed": 3335936
     },
     "pixelScale": 2
   },
@@ -104,12 +104,21 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "bb276a46d2330534bf092f678cd343636179ab22c14508b7327b8720809e844c",
-      "config": "8f401df8d24ae91c81a137a0de08c3248e95773c528c32d412d2e2fb6ca3dab5",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "d1f44427b6c6635d95e76174f42ab2b64939c615d48253f1bbc8dd31946c0deb",
+      "config": "c6983682c28ba06cc65bd4f039b2ef1f215d925e3e079eeb96b684a79ec2100b",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_land_original.png": "c13d520a6bf50fdb1e33d733bdf84d090d2f8ca043e648580853364587896e6b"
+      "art/sprites/source/p12_full_land_original.png": "8c73e93aa091198b49769b4f3a5e7ca31bbf6257653c85547d3e102d278c1f64",
+      "art/keys/p12/poses/land_start.png": "f5aff3e2014608d698400b653c5fb5c3d2c00124d0cd92a05ac38d97e4aba5ee",
+      "art/keys/p12/video_masks/land/0066.png": "8aa210a7a0e03cb4a54aa5cd64411ee79aab58fda1eaebccb451ea19ced828f3",
+      "art/keys/p12/video_frames/land/0067.png": "4fd9634516142a097abfeee8ca817b2361131f4e1a8dfc2a826ca584f9aac7c4",
+      "art/keys/p12/video_masks/land/0067.png": "589027ea33cc8ba94aeab8484bbc251ac1479176a356c6f9d88c7ecb06bd79b7",
+      "art/keys/p12/poses/land_peak.png": "8470484540796dade9e5fa44c1242588abd66a06c754d3308d9c56a72c37027e",
+      "art/keys/p12/video_masks/land/0068.png": "23c7fa822aabd2e71c2c77b8fd3d15fb63c6b78f93200099922a7f8e0b02115a",
+      "art/keys/p12/video_frames/land/0074.png": "e4513d89c9aa21ce7bccfcc9cb35c755b057a66b97a332f9ab844948edc80bb8",
+      "art/keys/p12/video_frames/land/0080.png": "1cbcddf2e7a4d54d904224f98dfde27980e572de410157f312edd7d52b2f6593",
+      "art/keys/p12/video_frames/land/0096.png": "63c6cec18509531b73fc40fd4f909e2e1e80d6d78848ecc0c91367c122a29277"
     }
   }
 }

@@ -106,7 +106,7 @@
     "sha256": {
       "source": "f0ed4fb2bfe58f3852e9f726bf33c3236a22d5dc4b6874ca542f9418e003e18d",
       "config": "a41fe6456a71db4997dc01639f7e1908a682db3119e52d9f962157b5c2d6f303",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_throw_grab_original.png": "ff881fb3b3e4a24fcdda3ce486ff143ce111735ebaaccab848ca42be7be813ea"

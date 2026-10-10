@@ -60,6 +60,19 @@ def safe(root, value):
         raise ValueError(f'Path escapes project: {value}')
     return p
 
+def stage_reference(root, stage, reference, clip_id):
+    """Copy a real source into transactional staging without changing bytes."""
+    original = safe(root, reference)
+    if not original.is_file():
+        raise ValueError(clip_id+': missing referenced source '+reference)
+    staged = safe(stage, reference)
+    if not staged.exists():
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original, staged)
+    if not staged.is_file() or staged.read_bytes() != original.read_bytes():
+        raise ValueError(clip_id+': staged source differs from repository '+reference)
+    return staged
+
 def validate_projectile(data, name, body):
     positive_int(data['damage'], name+'.damage')
     positive(data['range'], name+'.range');positive(data['speed'], name+'.speed')
@@ -516,6 +529,10 @@ def build(root=ROOT, check=False):
                 if not isinstance(references, list) or any(not isinstance(p, str) for p in references):
                     raise ValueError(cfg['id']+': sourceReferences must list source paths')
                 for reference in references:
+                    # Poses/video sources can live outside art/sprites/source.
+                    # Validate the real repository path, then stage its exact
+                    # bytes so provenance checks remain transactional.
+                    stage_reference(root, stage, reference, cfg['id'])
                     if not safe(stage, reference).is_file():
                         raise ValueError(cfg['id']+': missing referenced source '+reference)
                 for key in ('output','report','preview'):

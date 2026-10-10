@@ -117,7 +117,7 @@
     "sha256": {
       "source": "2c46ca2cd811df0f55a5dccd3880f46ec741e907f84ff489da6a2eba4f6f6209",
       "config": "3659c432d0358355523934f2f340e093d12f6f43dd40f6e77c18af3ec927e08e",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_jump_light_original.png": "1f6f11851e6b985c369ec62e3cd99dec7fdcc6dd52c2daf0968872244266e1d4"

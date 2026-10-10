@@ -1,0 +1,573 @@
+{
+  "status": "DRAFT_NOT_APPROVED",
+  "method": "uniform whole-video camera correction; manual head landmark candidates and canonical standing-key matches; pending visual confirmation",
+  "reference": {
+    "path": "art/keys/p12/inicio_centro.png",
+    "standingHeight": 208,
+    "canonicalScale": 0.5375
+  },
+  "videos": {
+    "2H": {
+      "scale": 0.3376,
+      "standingKeyMatch": {
+        "score": -1.0,
+        "zoom": 0.6305,
+        "scale": 0.8525
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        199,
+        32,
+        287,
+        137
+      ],
+      "referenceFrameSha256": "8f46479f844fe4dfdee2174898425a2a240620ada7eb820ab25b6190691d9c3c",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "2L": {
+      "scale": 0.3376,
+      "standingKeyMatch": {
+        "score": -1.0,
+        "zoom": 0.6305,
+        "scale": 0.8525
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        211,
+        39,
+        300,
+        145
+      ],
+      "referenceFrameSha256": "3b3abd053da53dae1f3f219a5333a556e1f0dc4387f11a61c7546005ccf78245",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "2M": {
+      "scale": 0.3376,
+      "standingKeyMatch": {
+        "score": -1.0,
+        "zoom": 0.6305,
+        "scale": 0.8525
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        207,
+        35,
+        299,
+        141
+      ],
+      "referenceFrameSha256": "a994f20cdfdd4ded37f9390994f23f9fe87ffcf1a2131217f0548168a662a455",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "H": {
+      "scale": 0.53977,
+      "standingKeyMatch": {
+        "score": 0.5061,
+        "zoom": 0.9958,
+        "scale": 0.53977
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        153,
+        0,
+        253,
+        69
+      ],
+      "referenceFrameSha256": "186cc9d18a1de97a9346874eb40b20b4cadd727d2366aed1ff281ce33ab2b2f9",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "L": {
+      "scale": 0.2822,
+      "standingKeyMatch": {
+        "score": 0.3055,
+        "zoom": 0.6934,
+        "scale": 0.77511
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        348,
+        0,
+        482,
+        126
+      ],
+      "referenceFrameSha256": "79d7c54db2743e3fc3bd2829fab59153ad680c45f0ab96a4c6d8622fbc20d274",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "M": {
+      "scale": 0.53442,
+      "standingKeyMatch": {
+        "score": 0.8387,
+        "zoom": 1.0058,
+        "scale": 0.53442
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        101,
+        0,
+        201,
+        69
+      ],
+      "referenceFrameSha256": "ce966543cc5fa1b205829e9eed7da8ed59143136fd63219d04581733231bf317",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "agachado": {
+      "scale": 0.4002,
+      "standingKeyMatch": {
+        "score": 0.6703,
+        "zoom": 1.3377,
+        "scale": 0.4018
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        188,
+        0,
+        294,
+        94
+      ],
+      "referenceFrameSha256": "34eeaae96a085bf83b86624756b84f765f2ab974c30d7cd665ea331f28c88c38",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "agarrao": {
+      "scale": 0.52084,
+      "standingKeyMatch": {
+        "score": 0.6783,
+        "zoom": 1.032,
+        "scale": 0.52084
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        119,
+        0,
+        219,
+        69
+      ],
+      "referenceFrameSha256": "a2f9e839c956b97090042272995c8b2bef7d0e39b248100a642d1897ed26e412",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "backDash": {
+      "scale": 0.4533,
+      "standingKeyMatch": {
+        "score": 0.3133,
+        "zoom": 0.8529,
+        "scale": 0.63021
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        174,
+        0,
+        267,
+        84
+      ],
+      "referenceFrameSha256": "8c67664df251b58b3d0677a8fa2bbb8dd9a9ddcdb2f9e1e8c325ad7700376e0f",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "danoBaixo": {
+      "scale": 0.317,
+      "standingKeyMatch": {
+        "score": 0.2913,
+        "zoom": 0.7229,
+        "scale": 0.74351
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        323,
+        33,
+        423,
+        145
+      ],
+      "referenceFrameSha256": "c53e761e641d55c31a3830a50aeb8c15970346d2d3e5d21ff1cb4f4473b86aee",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "danoPulo": {
+      "scale": 0.53619,
+      "standingKeyMatch": {
+        "score": 0.8051,
+        "zoom": 1.0024,
+        "scale": 0.53619
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        106,
+        0,
+        206,
+        69
+      ],
+      "referenceFrameSha256": "0f8158569cb64ac5a052112c1e70c1c32f875a236e19c8b11d553585909ccd05",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "dash": {
+      "scale": 0.53442,
+      "standingKeyMatch": {
+        "score": 0.7583,
+        "zoom": 1.0058,
+        "scale": 0.53442
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        109,
+        0,
+        209,
+        69
+      ],
+      "referenceFrameSha256": "9c8ea714b895fb9988688ff387267c0e202798a5c28c8147b26219452f4afa62",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "defendeBaixo": {
+      "scale": 0.3269,
+      "standingKeyMatch": {
+        "score": 0.2526,
+        "zoom": 0.6305,
+        "scale": 0.8525
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        271,
+        0,
+        371,
+        116
+      ],
+      "referenceFrameSha256": "3ebcc10a689845baea4f5b41641d303bd55c62dbb31109e4ae9d56587d2c7610",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "defendeCima": {
+      "scale": 0.53977,
+      "standingKeyMatch": {
+        "score": 0.6768,
+        "zoom": 0.9958,
+        "scale": 0.53977
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        118,
+        0,
+        218,
+        69
+      ],
+      "referenceFrameSha256": "4e8386f032334486ff43df234fbcb8feba452ea5b3647e489af8d7b3e2ae3cbd",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "defesaPulo": {
+      "scale": 0.4462,
+      "standingKeyMatch": {
+        "score": 0.3347,
+        "zoom": 0.8871,
+        "scale": 0.60591
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        178,
+        0,
+        267,
+        83
+      ],
+      "referenceFrameSha256": "7f42857b62b227dee61349baa1eb78da6cb6efd0f430a29c494286edfa95a877",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "derrota": {
+      "scale": 0.3001,
+      "standingKeyMatch": {
+        "score": 0.3564,
+        "zoom": 1.1957,
+        "scale": 0.44953
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        309,
+        0,
+        439,
+        128
+      ],
+      "referenceFrameSha256": "6910c665bf77aa535b03d0937bbfaa68b6253e12de0159cc6debc058ab0d1407",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "derruba_levanta": {
+      "scale": 0.53977,
+      "standingKeyMatch": {
+        "score": 0.704,
+        "zoom": 0.9958,
+        "scale": 0.53977
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        111,
+        0,
+        211,
+        69
+      ],
+      "referenceFrameSha256": "5148c28b721a21dc7d25c5a90d0686d06f4adba94ee45bd574665c9552b017c2",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "frente": {
+      "scale": 0.385,
+      "standingKeyMatch": {
+        "score": 0.7314,
+        "zoom": 1.0218,
+        "scale": 0.52603
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        300,
+        0,
+        389,
+        95
+      ],
+      "referenceFrameSha256": "4c43bbcc37fe50cf47a6da40e17fae44ced6769c7355e771b881c3a9c78a773c",
+      "manualScaleStatus": "DRAFT: source frame 32 hair-to-chin and body proportions compared with real Idle; first standing frame has a different camera scale",
+      "headReferenceFrame": 32
+    },
+    "idle": {
+      "scale": 0.26455,
+      "standingKeyMatch": {
+        "score": 0.3392,
+        "zoom": 0.9792,
+        "scale": 0.54892
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        292,
+        0,
+        414,
+        134
+      ],
+      "referenceFrameSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "intro": {
+      "scale": 0.51953,
+      "standingKeyMatch": {
+        "score": 0.5689,
+        "zoom": 1.0346,
+        "scale": 0.51953
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        144,
+        0,
+        244,
+        69
+      ],
+      "referenceFrameSha256": "e74087a68a996cf1ff635436c9927431725f0022de1fe078fc6def26847649da",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "jH": {
+      "scale": 0.53267,
+      "standingKeyMatch": {
+        "score": 0.7361,
+        "zoom": 1.0091,
+        "scale": 0.53267
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        109,
+        0,
+        209,
+        69
+      ],
+      "referenceFrameSha256": "7f6d6d21edabcb58d8b15f069f8fde35b40310dc3b46d002fe7373185f3837d0",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "jL": {
+      "scale": 0.53619,
+      "standingKeyMatch": {
+        "score": 0.8843,
+        "zoom": 1.0024,
+        "scale": 0.53619
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        100,
+        0,
+        200,
+        69
+      ],
+      "referenceFrameSha256": "5545298a00ff9c289ed255cdbde8ced32f489928f2b309fec2d3d66506f94e77",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "jM": {
+      "scale": 0.53442,
+      "standingKeyMatch": {
+        "score": 0.8535,
+        "zoom": 1.0058,
+        "scale": 0.53442
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        102,
+        0,
+        202,
+        69
+      ],
+      "referenceFrameSha256": "c121cef26808680e5b843207aa90bcecae59c63c90b2fa2ef10fb68352a1c3ea",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "jump": {
+      "scale": 0.4180555555555555,
+      "standingKeyMatch": {
+        "score": 0.3176,
+        "zoom": 0.6625,
+        "scale": 0.81127
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        205,
+        0,
+        299,
+        81
+      ],
+      "referenceFrameSha256": "ef5173893d1aac786d95f5ec7a440b9b41ca67ea903d375119d210ec8f502db1",
+      "manualScaleStatus": "Reviewed source jump frame 0 and 96 beside source Idle: hair-to-chin 81 px; neck excluded. Whole-source scale, canonical head 33.8625 px."
+    },
+    "provocacao": {
+      "scale": 0.51744,
+      "standingKeyMatch": {
+        "score": 0.6561,
+        "zoom": 1.0388,
+        "scale": 0.51744
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        130,
+        0,
+        230,
+        69
+      ],
+      "referenceFrameSha256": "5230b82817b336f903afeac2b1713192fb34e8a65ae582ac2060ae48777e576b",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "s1": {
+      "scale": 0.53977,
+      "standingKeyMatch": {
+        "score": 0.7981,
+        "zoom": 0.9958,
+        "scale": 0.53977
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        105,
+        0,
+        205,
+        69
+      ],
+      "referenceFrameSha256": "11a767781a3820369151f0a5f0563f23a292cc20f14877a14032dcf219988a82",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "s2": {
+      "scale": 0.53267,
+      "standingKeyMatch": {
+        "score": 0.7869,
+        "zoom": 1.0091,
+        "scale": 0.53267
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        110,
+        0,
+        210,
+        69
+      ],
+      "referenceFrameSha256": "c9143e3e1d0d12c60e21ff59701708bd13e5b7046031469d65cca7254de9f2e5",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "s3": {
+      "scale": 0.52084,
+      "standingKeyMatch": {
+        "score": 0.618,
+        "zoom": 1.032,
+        "scale": 0.52084
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        130,
+        0,
+        230,
+        69
+      ],
+      "referenceFrameSha256": "c5513ade8a740a1e78846486100bb3fab49c9b2ec21071ce783c501f3236e371",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "s4": {
+      "scale": 0.52603,
+      "standingKeyMatch": {
+        "score": 0.7499,
+        "zoom": 1.0218,
+        "scale": 0.52603
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        114,
+        0,
+        214,
+        69
+      ],
+      "referenceFrameSha256": "44400c646691cd51a96b1868ea3e10223aa16c0d1948bcf1d3f20b2b2e1a6a8d",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "super": {
+      "scale": 0.53442,
+      "standingKeyMatch": {
+        "score": 0.7517,
+        "zoom": 1.0058,
+        "scale": 0.53442
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        112,
+        0,
+        212,
+        69
+      ],
+      "referenceFrameSha256": "e802e7ecf79ea7ac461e4de62f44112282627759069dc9cb9323b9efb0a76079",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "tras": {
+      "scale": 0.3001,
+      "standingKeyMatch": {
+        "score": 0.3722,
+        "zoom": 0.9224,
+        "scale": 0.58271
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        268,
+        0,
+        391,
+        125
+      ],
+      "referenceFrameSha256": "7c3184d167ba6597f22d94766099fd026cbf4b3447075fbda32bde48c40260a9",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "ultra": {
+      "scale": 0.53442,
+      "standingKeyMatch": {
+        "score": 0.7621,
+        "zoom": 1.0058,
+        "scale": 0.53442
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        111,
+        0,
+        211,
+        69
+      ],
+      "referenceFrameSha256": "25948255217251584a6704acc9d656f3a44e8695caca13707e572778fc810904",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    },
+    "vitoria": {
+      "scale": 0.3848,
+      "standingKeyMatch": {
+        "score": 0.3034,
+        "zoom": 0.7512,
+        "scale": 0.71555
+      },
+      "status": "DRAFT_NOT_APPROVED",
+      "headBox": [
+        195,
+        0,
+        292,
+        100
+      ],
+      "referenceFrameSha256": "7e69cb28bc7c762bee601e955c667f0622d0afce22616304510dce937ee60d3d",
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+    }
+  }
+}

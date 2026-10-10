@@ -150,7 +150,7 @@
     "sha256": {
       "source": "c4517ad9e7007b676610c2b64b492b672f11424e98aabce72a1a1073788e8001",
       "config": "a9b58251866622d5f09dd6c21d174e4855ca67a872b32fc1a4d20598c1c6f7e1",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_super_wave_original.png": "f24758e0636d9cee6216f80f50e14b4b679c1d97314db69d86d2b59fe04b08fc"

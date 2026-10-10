@@ -150,7 +150,7 @@
     "sha256": {
       "source": "adb2dcede24b60714de417af60f02ec896b64f4169654a7f284ec3f39e076749",
       "config": "74a3369c865b6985072a3c641cb9541dfe38f15f27dab219f4a7bf68c5116c6c",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_crouch_light_original.png": "7b1c029b03efed2b88942d2d447bb1f659faffd51e64b1a9e8779d8a1cd4caa6"

@@ -106,7 +106,7 @@
     "sha256": {
       "source": "f0ed4fb2bfe58f3852e9f726bf33c3236a22d5dc4b6874ca542f9418e003e18d",
       "config": "1a3a51c4853c4d730dd7023228c2b3154dde64068c929e54350666ed525abdc7",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_throw_toss_original.png": "ff881fb3b3e4a24fcdda3ce486ff143ce111735ebaaccab848ca42be7be813ea"

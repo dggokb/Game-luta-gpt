@@ -2,15 +2,15 @@
   "id": "p12_full_defense_air",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_defense_air_sr2x.png",
-  "sourceNote": "P12 articulated DEFENSE_AIR, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 512,
     "columns": 4,
     "frameCount": 7
   },
@@ -18,96 +18,96 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        33,
-        373,
-        453
+        533,
+        177,
+        765,
+        537
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45255
+      "minimumMargin": 177,
+      "opaquePixels": 38085
     },
     {
       "index": 1,
       "outputBbox": [
-        138,
-        33,
-        372,
-        452
+        527,
+        179,
+        763,
+        539
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 43687
+      "minimumMargin": 179,
+      "opaquePixels": 38534
     },
     {
       "index": 2,
       "outputBbox": [
-        137,
-        32,
-        371,
-        450
+        521,
+        179,
+        761,
+        541
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 40810
+      "minimumMargin": 179,
+      "opaquePixels": 38963
     },
     {
       "index": 3,
       "outputBbox": [
-        137,
-        32,
-        369,
-        449
+        521,
+        179,
+        763,
+        543
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 39486
+      "minimumMargin": 179,
+      "opaquePixels": 39041
     },
     {
       "index": 4,
       "outputBbox": [
-        137,
-        32,
-        371,
-        450
+        521,
+        181,
+        763,
+        543
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 40810
+      "minimumMargin": 181,
+      "opaquePixels": 38808
     },
     {
       "index": 5,
       "outputBbox": [
-        138,
-        33,
-        372,
-        452
+        521,
+        181,
+        765,
+        547
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 43687
+      "minimumMargin": 181,
+      "opaquePixels": 39177
     },
     {
       "index": 6,
       "outputBbox": [
-        139,
-        33,
-        373,
-        453
+        519,
+        179,
+        765,
+        547
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45255
+      "minimumMargin": 179,
+      "opaquePixels": 39262
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 260,
-    "frameHeight": 457,
-    "rootX": 131,
-    "rootY": 456,
+    "frameWidth": 270,
+    "frameHeight": 394,
+    "rootX": 133,
+    "rootY": 347,
     "columns": 4,
     "frameCount": 7,
     "cropOffset": [
-      125,
-      20
+      507,
+      165
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 3802240
+      "canonical": 37748736,
+      "packed": 3404160
     },
     "pixelScale": 2
   },
@@ -115,12 +115,19 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "405e54c050560e204df0897dd0935541b74dae215b4ac2259aa1575cb8d7eb3a",
-      "config": "a9a19ea6b7732bf554c773dcc8fd3e6e218219e1415cb57e007fc91389a0e3da",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "b9342f30b790e738ace870413998aeffcfbc35e5421ac26a573aada89fb0fe90",
+      "config": "e3040a39ab958ad2f24267589e65f0f8577ca7d421bec5981952a7a3d0d1143e",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_defense_air_original.png": "a436f0482f0bb846ea1e2216dffdb8d8bc57c8bacdaf3e228130316847558da8"
+      "art/sprites/source/p12_full_defense_air_original.png": "414aba4122f122313e9b25de0a8f6c4057a71a0c7ac589983cfcb50ddca425ad",
+      "art/keys/p12/poses/defense_air_start.png": "eb3e9082149126fc42c5dad088261828acfb47c0a3bea8997fe8d2d360aeb3ee",
+      "art/keys/p12/video_frames/defense_air/0049.png": "387287ce23aa5d057bcb197c17f4713ca31fba7e8926768a5122d5fa5abbdd15",
+      "art/keys/p12/video_frames/defense_air/0050.png": "941846012ac8e756e4a67941839ccb26e5c0c24d89df17f4b5c72ff8515653c7",
+      "art/keys/p12/video_frames/defense_air/0051.png": "bf64b7cfa1ea26a1a3f771bd727964d9f0921879d082f7bf3eff171a8d31f893",
+      "art/keys/p12/poses/defense_air_peak.png": "dd1492089ef95bd30e526673aa579f9efa033947ac12724dd3359552e7f1f5e2",
+      "art/keys/p12/video_frames/defense_air/0053.png": "71bcaca93907f4d69a961671e4c1572baae0f525937e22d5c56fa0f3d74be00a",
+      "art/keys/p12/video_frames/defense_air/0054.png": "a2993438cd7a0ef0a2b2830746f5d4ecb5250b76cacea2abb4dfffc66bea2bc4"
     }
   }
 }

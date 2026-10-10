@@ -5,13 +5,13 @@
   "preferredRootX": 128,
   "preferredRootY": 238,
   "worldScale": 1.075,
-  "standingVisualHeight": 208,
+  "standingVisualHeight": 158,
   "anatomyReference": {
     "source": "art/sprites/source/p12_full_idle_original.png",
     "frame": 0,
     "columns": 4,
-    "frameWidth": 256,
-    "frameHeight": 256,
+    "frameWidth": 768,
+    "frameHeight": 384,
     "bands": [
       [
         0.0,

@@ -139,7 +139,7 @@
     "sha256": {
       "source": "94e95e2f554116ab45a92e5130f932db984fbf4a11426c85f3b3b153d73b923b",
       "config": "e31fe3527d5ece717d36b52874ec97a994498cd39f112ecd4f24b75879f7ea61",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_hit_stand_original.png": "7ce80055ad8d390b05aa0e3c19d2bc95c4fc7e74ac546d49eb76091cfa94bc77"

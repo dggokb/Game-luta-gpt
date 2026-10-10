@@ -1,0 +1,692 @@
+{
+  "character": "p12",
+  "status": "PARTIAL_NOT_ART_APPROVED",
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "integratedStates": [
+    "IDLE",
+    "COMBAT",
+    "WALK_FORWARD",
+    "WALK_BACK",
+    "LIGHT_JAB",
+    "CROUCH",
+    "RISE",
+    "JUMP",
+    "FALL",
+    "LAND",
+    "DEFENSE_CROUCH",
+    "DEFENSE_AIR"
+  ],
+  "pendingStates": [
+    "DASH",
+    "BACKDASH",
+    "MEDIUM_KICK",
+    "HEAVY_STRAIGHT",
+    "DEFENSE_STAND",
+    "HIT_STAND",
+    "HIT_CROUCH",
+    "HIT_AIR",
+    "KNOCKDOWN",
+    "GROUNDED",
+    "GETUP",
+    "CROUCH_LIGHT",
+    "CROUCH_MEDIUM",
+    "CROUCH_HEAVY",
+    "JUMP_LIGHT",
+    "JUMP_MEDIUM",
+    "JUMP_HEAVY",
+    "ULTRA_BEAM",
+    "SPECIAL_ENERGY",
+    "THROW_GRAB",
+    "THROW_TOSS",
+    "SPECIAL_S2",
+    "SPECIAL_S3",
+    "SPECIAL_S4",
+    "SUPER_WAVE",
+    "INTRO",
+    "JUMP_HEAVY_DOWN",
+    "VICTORY",
+    "DEFEAT",
+    "TAUNT"
+  ],
+  "sourceFrameCount": 87,
+  "modelSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "srCache": {
+    "hits": 38,
+    "misses": 49
+  },
+  "validations": {
+    "focusedTests": {
+      "passed": 30,
+      "failed": 0
+    },
+    "sourcePixelSrAlphaCombatProof": {
+      "passedStates": [
+        "IDLE",
+        "COMBAT",
+        "WALK_FORWARD",
+        "WALK_BACK",
+        "LIGHT_JAB",
+        "CROUCH",
+        "RISE",
+        "JUMP",
+        "FALL",
+        "LAND",
+        "DEFENSE_CROUCH",
+        "DEFENSE_AIR"
+      ],
+      "status": "PASS_FOR_SELECTED_BATCH_ONLY"
+    },
+    "characterPackWrite": "PASS: 11 characters, 352 atlases",
+    "characterPackCheck": "PASS: deterministic generated files match",
+    "mandatorySourceGate": {
+      "acceptedActions": 10,
+      "requiredActions": 40,
+      "status": "REJECTED",
+      "missing": [
+        "DASH",
+        "BACKDASH",
+        "MEDIUM_KICK",
+        "HEAVY_STRAIGHT",
+        "DEFENSE_STAND",
+        "HIT_STAND",
+        "HIT_CROUCH",
+        "HIT_AIR",
+        "KNOCKDOWN",
+        "GROUNDED",
+        "GETUP",
+        "CROUCH_LIGHT",
+        "CROUCH_MEDIUM",
+        "CROUCH_HEAVY",
+        "JUMP_LIGHT",
+        "JUMP_MEDIUM",
+        "JUMP_HEAVY",
+        "ULTRA_BEAM",
+        "SPECIAL_ENERGY",
+        "THROW_GRAB",
+        "THROW_TOSS",
+        "SPECIAL_S2",
+        "SPECIAL_S3",
+        "SPECIAL_S4",
+        "SUPER_WAVE",
+        "INTRO",
+        "JUMP_HEAVY_DOWN",
+        "VICTORY",
+        "DEFEAT",
+        "TAUNT"
+      ]
+    },
+    "graphicAudit": {
+      "findings": [
+        {
+          "state": "CROUCH_LIGHT",
+          "kind": "pose",
+          "level": "erro",
+          "text": "fica em pé (agachado tem 213 px de altura)",
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "state": "CROUCH_LIGHT",
+          "kind": "ritmo",
+          "level": "erro",
+          "text": "anima 3.5x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "CROUCH_MEDIUM",
+          "kind": "pose",
+          "level": "erro",
+          "text": "fica em pé (agachado tem 213 px de altura)",
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        {
+          "state": "DEFENSE_STAND",
+          "kind": "ritmo",
+          "level": "erro",
+          "text": "anima 6.4x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "GROUNDED",
+          "kind": "ritmo",
+          "level": "erro",
+          "text": "anima 5.9x mais lenta que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "HIT_CROUCH",
+          "kind": "pose",
+          "level": "erro",
+          "text": "fica em pé (agachado tem 213 px de altura)",
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "state": "SPECIAL_S4",
+          "kind": "ritmo",
+          "level": "erro",
+          "text": "anima 2.7x mais lenta que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "DEFENSE_AIR",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.6x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "DEFENSE_CROUCH",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.1x mais lenta que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "FALL",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.9x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "HEAVY_STRAIGHT",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.8x mais lenta que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "HIT_AIR",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.9x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "JUMP",
+          "kind": "tamanho",
+          "level": "aviso",
+          "text": "cabeça +16% do tamanho da do idle (nota 0.74)",
+          "frames": []
+        },
+        {
+          "state": "JUMP",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.7x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "JUMP_HEAVY",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.7x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "JUMP_HEAVY_DOWN",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.7x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "JUMP_LIGHT",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.1x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "JUMP_MEDIUM",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.6x mais lenta que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "LAND",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.1x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "LIGHT_JAB",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.4x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "RISE",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.7x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "SPECIAL_ENERGY",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.2x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "SPECIAL_S2",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.7x mais lenta que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "SUPER_WAVE",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 1.6x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "ULTRA_BEAM",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.0x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "WALK_BACK",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.0x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "WALK_FORWARD",
+          "kind": "ritmo",
+          "level": "aviso",
+          "text": "anima 2.3x mais rápida que a do p01 no mesmo tempo de jogo",
+          "frames": []
+        },
+        {
+          "state": "BACKDASH",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "COMBAT",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "CROUCH",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "CROUCH_HEAVY",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "CROUCH_LIGHT",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "CROUCH_MEDIUM",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "DASH",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "DEFEAT",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "DEFENSE_AIR",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "DEFENSE_CROUCH",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "DEFENSE_STAND",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "FALL",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "GETUP",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "GROUNDED",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "HEAVY_STRAIGHT",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "HIT_AIR",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "HIT_CROUCH",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "HIT_STAND",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "IDLE",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "INTRO",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "JUMP",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "JUMP_HEAVY",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "JUMP_HEAVY_DOWN",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "JUMP_LIGHT",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "JUMP_MEDIUM",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "KNOCKDOWN",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "LAND",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "LIGHT_JAB",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "MEDIUM_KICK",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "RISE",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "SPECIAL_ENERGY",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "SPECIAL_S2",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "SPECIAL_S3",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "SPECIAL_S4",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "SUPER_WAVE",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "TAUNT",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "THROW_GRAB",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "THROW_TOSS",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "ULTRA_BEAM",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "VICTORY",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "WALK_BACK",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        },
+        {
+          "state": "WALK_FORWARD",
+          "kind": "receita",
+          "level": "info",
+          "text": "sem receita de vídeo: tamanho não garantido pela medida",
+          "frames": []
+        }
+      ],
+      "criticalTotal": 7,
+      "criticalIntegratedBatch": 0,
+      "warningsIntegratedBatch": 10
+    },
+    "harmony": {
+      "problems": [
+        "p12/BACKDASH[0]: torso -26px off the Idle registration",
+        "p12/BACKDASH[1]: torso -31px off the Idle registration",
+        "p12/BACKDASH[2]: torso -34px off the Idle registration",
+        "p12/BACKDASH[3]: torso -33px off the Idle registration",
+        "p12/BACKDASH[4]: torso -29px off the Idle registration",
+        "p12/BACKDASH[5]: torso -24px off the Idle registration",
+        "p12/BACKDASH[8]: torso -22px off the Idle registration",
+        "p12/BACKDASH[9]: torso -26px off the Idle registration",
+        "p12/DEFENSE_STAND[3]: torso -26px off the Idle registration",
+        "p12/DEFENSE_STAND[4]: torso -26px off the Idle registration",
+        "p12/HIT_STAND[2]: torso -33px off the Idle registration",
+        "p12/HIT_STAND[3]: torso -44px off the Idle registration",
+        "p12/HIT_STAND[4]: torso -48px off the Idle registration",
+        "p12/HIT_STAND[5]: torso -44px off the Idle registration",
+        "p12/HIT_STAND[6]: torso -33px off the Idle registration",
+        "p12/HIT_CROUCH[2]: torso -31px off the Idle registration",
+        "p12/HIT_CROUCH[3]: torso -42px off the Idle registration",
+        "p12/HIT_CROUCH[4]: torso -45px off the Idle registration",
+        "p12/HIT_CROUCH[5]: torso -42px off the Idle registration",
+        "p12/HIT_CROUCH[6]: torso -31px off the Idle registration",
+        "p12/GETUP[1]: torso -37px off the Idle registration"
+      ],
+      "total": 21,
+      "integratedBatchProblems": []
+    }
+  },
+  "resolved": [
+    "Original source frames, Drive IDs, complete video hashes and original PTS are bound to actually rendered pixels.",
+    "Real video engine chroma extraction; uniform measured source camera scale; alpha masks only subtract pixels.",
+    "Logical canvas widened without shrinking extended limbs; air sash registration stabilizes torso while legs unfold.",
+    "Real hunched Idle visual height corrected to 158 native pixels; upright anatomy is a separate measurement.",
+    "CharacterPack transactional staging now copies and verifies external source references.",
+    "Runtime atlas source binding cannot be disguised by video references.",
+    "Cached crop-context SR matches full model on visible pixels; exact native-derived alpha retained.",
+    "LIGHT_JAB and LAND intervals corrected without changing combat counts, duration or impact windows."
+  ],
+  "sourceBlockers": {
+    "HIT_STAND": "Candidate source main frame 16 is neutral after alpha cleanup; subsequent frames tumble into knockdown. Complete grounded flinch/recovery not found.",
+    "HIT_CROUCH": "Real reaction raises torso above mandatory crouch height tolerance; cannot shrink head/body to hide this.",
+    "CROUCH_HEAVY": "Source rises into chest-up roar/recoil rather than a recognizable striking limb; still unapproved.",
+    "CROUCH_MEDIUM": "Impact candidate leg swings away from opponent; dust intersects body and support-root tracking follows moving foot.",
+    "THROW_GRAB": "Dark embedded opponent overlaps character, including grab hand. Subtractive masking cannot reconstruct occluded limbs.",
+    "THROW_TOSS": "Existing candidate peak is bite; actual release occurs later. No distinct toss verified.",
+    "JUMP_HEAVY": "Existing candidate impact is still overhead windup; actual downward stroke must be selected at preserved impact index."
+  },
+  "apk": {
+    "status": "NOT_BUILT_FOR_RELEASE",
+    "reason": "Full 42-state source and art gates remain rejected; local Android SDK/emulator not available."
+  },
+  "note": "42 normalized preview segments are drafts. Only 12 runtime states have been replaced and refined. Remaining 30 runtime atlases are the rejected old prototype; no state is declared art-approved."
+}

@@ -2,15 +2,15 @@
   "id": "p12_full_fall",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_fall_sr2x.png",
-  "sourceNote": "P12 articulated FALL, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 512,
     "columns": 4,
     "frameCount": 6
   },
@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        133,
-        27,
-        379,
-        445
+        519,
+        181,
+        753,
+        491
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 42243
+      "minimumMargin": 181,
+      "opaquePixels": 39152
     },
     {
       "index": 1,
       "outputBbox": [
-        133,
-        27,
-        379,
-        454
+        513,
+        187,
+        751,
+        489
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 42326
+      "minimumMargin": 187,
+      "opaquePixels": 38554
     },
     {
       "index": 2,
       "outputBbox": [
-        133,
-        28,
-        379,
-        455
+        511,
+        187,
+        753,
+        487
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 42176
+      "minimumMargin": 187,
+      "opaquePixels": 38575
     },
     {
       "index": 3,
       "outputBbox": [
-        135,
-        17,
-        381,
-        443
+        511,
+        175,
+        765,
+        555
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 42066
+      "minimumMargin": 175,
+      "opaquePixels": 43943
     },
     {
       "index": 4,
       "outputBbox": [
-        135,
-        26,
-        381,
-        452
+        539,
+        155,
+        813,
+        591
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 41941
+      "minimumMargin": 155,
+      "opaquePixels": 47571
     },
     {
       "index": 5,
       "outputBbox": [
-        135,
-        35,
-        381,
-        461
+        507,
+        195,
+        759,
+        521
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 41812
+      "minimumMargin": 195,
+      "opaquePixels": 39123
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 272,
-    "frameHeight": 471,
-    "rootX": 135,
-    "rootY": 470,
+    "frameWidth": 332,
+    "frameHeight": 460,
+    "rootX": 145,
+    "rootY": 369,
     "columns": 4,
     "frameCount": 6,
     "cropOffset": [
-      121,
-      6
+      495,
+      143
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 4099584
+      "canonical": 37748736,
+      "packed": 4887040
     },
     "pixelScale": 2
   },
@@ -104,12 +104,24 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d8e1c0763a8b87593c3a79e7d9ad14de74642ce39eb0853498f3a7f83438b61a",
-      "config": "341f2126f2d561f38d27d829e5c1078fc5c6917f20f34f32f71a5c54b23060ac",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "91bd6bb344f3bf482ff292127324dbd646ca07d660ab56b76d32f547514f8acd",
+      "config": "2d32d57f08f21794b1dd2ac58129c9a683a6719bd6195142cc463fbc38ac747a",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_fall_original.png": "57e59ee69c97061ae522fc3b454a311f41c9903c93e63116839068467d6ac9ea"
+      "art/sprites/source/p12_full_fall_original.png": "c24bfd477c4a39f0008b738e24bc7a53697ca6d85f83dc41e0253f92d14d9043",
+      "art/keys/p12/poses/fall_start.png": "71dcf3fc72dfe3d6a385e859adada60e70e461242e7875aaa0de53e4d1d85b3e",
+      "art/keys/p12/video_masks/fall/0048.png": "28e0838ab3d8d52102d2072f14e4c7cf22e873824b5e41dc3c43497ca4f53ff5",
+      "art/keys/p12/video_frames/fall/0052.png": "6a220eeba05bcbcd9694fe8c20b5373870cf53bdfcd69d4489f347826f3504e4",
+      "art/keys/p12/video_masks/fall/0052.png": "243557157a95a3b02123933cb2bc8f8b39b43258f63364b8b89e3e29954a0512",
+      "art/keys/p12/poses/fall_peak.png": "e19fb31c45d770ba942b686f50331de4e281fcf0d2ea280e4c844422534e9d4c",
+      "art/keys/p12/video_masks/fall/0056.png": "42ca80bf01d3f28e9c10615f9fde235bf858d429e73f3feff6d4530578c7b309",
+      "art/keys/p12/video_frames/fall/0060.png": "edf7d5e3760d698db3691da64dbc09a37de9a674a30ee30480254fa8c91ce47f",
+      "art/keys/p12/video_masks/fall/0060.png": "7efdc5ba1de9356baa540b1abe47cfb262588bb07617e262d42081a4ac6b0f8b",
+      "art/keys/p12/video_frames/fall/0062.png": "b6f98992e41e481c080dbd214a72663bf6f1a01fde8de07dbe26d7c1b359fd14",
+      "art/keys/p12/video_masks/fall/0062.png": "936bba39da0e7ce56e31b3d062d7dd408f1932a4e9194bdb6d2a9470c8df767a",
+      "art/keys/p12/video_frames/fall/0064.png": "5c7db9dbe81b92f2d9f9dbeed82f23d6aefc712ffe971c0f6b9a99d897e3e10d",
+      "art/keys/p12/video_masks/fall/0064.png": "a06f36e489ca082ca0cbac89c3ad2e8226afdfbbc9764cc25a7913421307c1ca"
     }
   }
 }

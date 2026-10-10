@@ -4,7 +4,13 @@
   "profile": "p12.json",
   "source": "art/sprites/source/p12_full_rise_sr2x.png",
   "sourceReferences": [
-    "art/sprites/source/p12_full_rise_original.png"
+    "art/sprites/source/p12_full_rise_original.png",
+    "art/keys/p12/poses/rise_start.png",
+    "art/keys/p12/video_frames/rise/0068.png",
+    "art/keys/p12/poses/rise_peak.png",
+    "art/keys/p12/video_frames/rise/0074.png",
+    "art/keys/p12/video_frames/rise/0078.png",
+    "art/keys/p12/video_frames/rise/0080.png"
   ],
   "output": "android/app/src/main/res/drawable-nodpi/p12_full_rise.png",
   "report": "tools/sprites/reports/p12_full_rise.report.json",
@@ -12,11 +18,11 @@
   "expectedFrames": 6,
   "columns": 4,
   "segmentation": "prepared-grid",
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 256,
-  "rootY": 476,
+  "frameWidth": 1536,
+  "frameHeight": 768,
+  "rootX": 640,
+  "rootY": 732,
   "rootMode": "authored",
   "pixelScale": 2,
-  "sourceNote": "P12 articulated RISE, native P12 ink, 4x SR inference -> 2x atlas"
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR"
 }

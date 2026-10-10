@@ -14,6 +14,15 @@ class CharacterPackTests(unittest.TestCase):
         for folder in ('characters','art/sprites/source','tools/sprites/clips','tools/sprites/profiles'):
             shutil.copytree(pipeline.ROOT/folder,self.root/folder)
         shutil.copyfile(pipeline.ROOT/'tools/sprites/preview.html',self.root/'tools/sprites/preview.html')
+        # Pack fixtures include actual video/pose references outside the sprite
+        # source folder, just as a repository checkout does.
+        for clip in (self.root/'tools/sprites/clips').glob('*.json'):
+            for reference in json.loads(clip.read_text()).get('sourceReferences',[]):
+                target=pipeline.safe(self.root,reference)
+                if not target.exists():
+                    target.parent.mkdir(parents=True,exist_ok=True)
+                    shutil.copyfile(pipeline.safe(pipeline.ROOT,reference),target)
+
         self.path=self.root/'characters/player_base/character.json'
     def tearDown(self): self.tmp.cleanup()
     def edit(self,fn):

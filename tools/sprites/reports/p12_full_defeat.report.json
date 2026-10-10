@@ -150,7 +150,7 @@
     "sha256": {
       "source": "3eef87ecd32726b46ba89ab0d6f26c27eb090c0463fbfc5211f118e2fadd230e",
       "config": "70f3e77f7ae424b423056b5375608538d970fc5fddfde05d49aced1a1b720f99",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_defeat_original.png": "6b0aa617023ab28daba0f499e1c0d5e459fc77e034bd5dca5eadabf034d074bf"

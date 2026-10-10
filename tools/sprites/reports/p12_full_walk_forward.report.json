@@ -2,15 +2,15 @@
   "id": "p12_full_walk_forward",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_walk_forward_sr2x.png",
-  "sourceNote": "P12 articulated WALK_FORWARD, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 10
   },
@@ -18,129 +18,129 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        461,
+        411,
+        765,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45546
+      "opaquePixels": 38293
     },
     {
       "index": 1,
       "outputBbox": [
-        133,
-        58,
-        379,
-        479
+        475,
+        389,
+        769,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 43326
+      "opaquePixels": 42000
     },
     {
       "index": 2,
       "outputBbox": [
-        131,
-        56,
-        382,
-        478
+        407,
+        403,
+        795,
+        733
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 41595
+      "minimumMargin": 35,
+      "opaquePixels": 46062
     },
     {
       "index": 3,
       "outputBbox": [
-        131,
-        56,
-        382,
-        478
+        425,
+        421,
+        799,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 41595
+      "minimumMargin": 33,
+      "opaquePixels": 42522
     },
     {
       "index": 4,
       "outputBbox": [
-        133,
-        58,
-        379,
-        479
+        507,
+        389,
+        759,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 43326
+      "minimumMargin": 35,
+      "opaquePixels": 37014
     },
     {
       "index": 5,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        457,
+        407,
+        823,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45546
+      "opaquePixels": 44990
     },
     {
       "index": 6,
       "outputBbox": [
-        145,
-        58,
-        367,
-        479
+        445,
+        415,
+        773,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 46588
+      "opaquePixels": 39702
     },
     {
       "index": 7,
       "outputBbox": [
-        150,
-        56,
-        371,
-        478
+        519,
+        391,
+        781,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 46785
+      "minimumMargin": 33,
+      "opaquePixels": 38221
     },
     {
       "index": 8,
       "outputBbox": [
-        150,
-        56,
-        371,
-        478
+        425,
+        409,
+        773,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 46785
+      "minimumMargin": 33,
+      "opaquePixels": 41456
     },
     {
       "index": 9,
       "outputBbox": [
-        145,
-        58,
-        367,
-        479
+        413,
+        419,
+        791,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 46588
+      "opaquePixels": 45381
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 276,
-    "frameHeight": 447,
-    "rootX": 137,
-    "rootY": 432,
+    "frameWidth": 440,
+    "frameHeight": 370,
+    "rootX": 245,
+    "rootY": 355,
     "columns": 4,
     "frameCount": 10,
     "cropOffset": [
-      119,
-      44
+      395,
+      377
     ],
     "decodedBytes": {
-      "canonical": 12582912,
-      "packed": 5921856
+      "canonical": 56623104,
+      "packed": 7814400
     },
     "pixelScale": 2
   },
@@ -148,12 +148,22 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "3e7e37711756acdde279a00d1777efaafd5ecd6859ba724d1237ede5f4446d0a",
-      "config": "abb63ac95cdb8d7634e09dddabc0e8e31f7c29ac0fdc5f21ca2e4631b798991e",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "1d6c8e1c6b8250d391f0e44756a945802ddf31956d9434ddcfeac5b369d541ee",
+      "config": "64731b3d69b6fe4d8deeb58be2903105e82190edd4c480dbe1ae6c569a11531e",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_walk_forward_original.png": "e2caf7d889c4eac02bd2e590afeee60d281fd1058274ff01c3f2b0355a115e80"
+      "art/sprites/source/p12_full_walk_forward_original.png": "e4b77c2b748714aed00f58ca684fab013eb1dca136107c2a671dfc24653584ea",
+      "art/keys/p12/poses/walk_forward_start.png": "4c43bbcc37fe50cf47a6da40e17fae44ced6769c7355e771b881c3a9c78a773c",
+      "art/keys/p12/video_frames/walk_forward/0039.png": "80256463b9a818f47519eb800088caff204982cd8ec7a28073bda35d6a69c400",
+      "art/keys/p12/video_frames/walk_forward/0046.png": "bbc4408e9e91639fcd350fbb1c3cbfe27178e3257bb7ae15cfae8f4014055686",
+      "art/keys/p12/video_frames/walk_forward/0053.png": "c8afb4bedeea66affe2d24d5a656dc033317c84b279a09ad0d3809e557324a8b",
+      "art/keys/p12/poses/walk_forward_peak.png": "048feae09f0e1a63c2a32733dbfdcc0a5b496324a6b37802a17adeb39e2e0e28",
+      "art/keys/p12/video_frames/walk_forward/0067.png": "d1a7b35c337f4eba4ec82971fe2aa50c94f9296365eee240e8bf16a47883241b",
+      "art/keys/p12/video_frames/walk_forward/0074.png": "2e017303cd5877b67d7764de5a71b87057f771e2676cb60e2de495a620081ecb",
+      "art/keys/p12/video_frames/walk_forward/0081.png": "7138f8e4186a322d5fef69db828240d73a4db3db6707d62eb190a2537823361f",
+      "art/keys/p12/video_frames/walk_forward/0088.png": "0b2ebb09b4a4391a5b49c1101c95891d18413080ffeca8e202dfd952514b17c8",
+      "art/keys/p12/video_frames/walk_forward/0095.png": "2b35a097e35a68e91499b844dc7fff07980a1fc851754e30bb98a086631b5c22"
     }
   }
 }

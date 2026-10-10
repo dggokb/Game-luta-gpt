@@ -12,10 +12,14 @@ on:
       - tools/sprites/p12_video_sources.py
       - tools/sprites/p12_video_cycle.py
       - tools/sprites/p12_video_review.py
+      - tools/sprites/p12_video_registration.py
+      - tools/sprites/build_characters.py
       - tools/sprites/videos/p12-drive-inventory.json
       - tools/sprites/videos/p12-segments-draft.json
+      - tools/sprites/videos/p12-video-scale-draft.json
       - tools/sprites/tests/test_p12_video_cycle.py
       - tools/sprites/tests/test_p12_video_review.py
+      - tools/sprites/tests/test_p12_character_sources.py
       - art/keys/p12/registration.json
       - tools/sprites/p12_pose_gate.py
       - tools/sprites/harmony.py
@@ -58,7 +62,7 @@ jobs:
           python -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
       - name: Check existing-video extractor and renderer tests
         run: |
-          python -m compileall -q tools/sprites/p12_video_sources.py tools/sprites/p12_video_cycle.py tools/sprites/p12_video_review.py tools/sprites/p12_full_cycle.py
+          python -m compileall -q tools/sprites/p12_video_sources.py tools/sprites/p12_video_cycle.py tools/sprites/p12_video_review.py tools/sprites/p12_video_registration.py tools/sprites/p12_full_cycle.py
           python -m unittest discover -s tools/sprites/tests -p 'test_p12_*.py' -q
       - name: Require independently sourced P12 actions (reject fake IDLE movements)
         run: python tools/sprites/p12_pose_gate.py
@@ -124,6 +128,8 @@ jobs:
             docs/art/p12-existing-videos-preview.jpg
             docs/art/p12-video-sources/
             docs/art/p12-video-state-review/
+            docs/art/p12-video-normalized-review/
+            docs/art/p12-video-batch-report.json
             docs/art/p12-video-render-manifest.json
             docs/art/p12-authored-progress.md
           if-no-files-found: warn

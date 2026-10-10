@@ -106,7 +106,7 @@
     "sha256": {
       "source": "102114f04f78ac40c305b9271cda506d1010f2d611ff4489b0ae5d688b2b6614",
       "config": "30f55016b692601d886ee7a431864c4038d891b738dfe79fdb6789e5471ab643",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_hit_air_original.png": "56999658a3db99397c732fd34d8bd3fdd06cf3d408edd6d8cae32872c156f671"

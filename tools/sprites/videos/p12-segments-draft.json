@@ -73,18 +73,20 @@
     },
     "CROUCH": {
       "selectedVideoFrames": [
-        8,
-        12,
+        14,
+        15,
         16,
+        18,
         20,
         24,
-        28,
         32,
         40
       ],
       "mainIndex": 5,
       "observedMotion": "Body descends to hands-and-knee low posture",
-      "findings": [],
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ],
       "phaseLabels": [
         "entry",
         "main/hold",
@@ -93,25 +95,27 @@
     },
     "RISE": {
       "selectedVideoFrames": [
-        80,
-        84,
-        88,
-        90,
-        93,
-        96
+        64,
+        68,
+        70,
+        74,
+        78,
+        80
       ],
       "mainIndex": 2,
       "observedMotion": "Actual recovery from low posture to standing",
-      "findings": []
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ]
     },
     "JUMP": {
       "selectedVideoFrames": [
-        24,
         28,
-        32,
         36,
         40,
-        44
+        44,
+        46,
+        48
       ],
       "mainIndex": 3,
       "observedMotion": "Crouched impulse followed by takeoff",
@@ -123,12 +127,14 @@
         52,
         56,
         60,
-        64,
-        68
+        62,
+        64
       ],
       "mainIndex": 2,
       "observedMotion": "Airborne folded legs followed by descent",
-      "findings": []
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ]
     },
     "DASH": {
       "selectedVideoFrames": [
@@ -168,33 +174,37 @@
     },
     "LAND": {
       "selectedVideoFrames": [
-        64,
+        66,
+        67,
         68,
-        72,
-        76,
+        74,
         80,
-        84
+        96
       ],
       "mainIndex": 2,
       "observedMotion": "Crouched landing and torso recovery",
-      "findings": []
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ]
     },
     "LIGHT_JAB": {
       "selectedVideoFrames": [
         43,
-        49,
-        64,
-        66,
+        45,
+        56,
+        58,
+        60,
         68,
         71,
-        74,
         79,
         84,
         88
       ],
       "mainIndex": 2,
       "observedMotion": "Real extended forward claw/straight-arm strike",
-      "findings": []
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ]
     },
     "MEDIUM_KICK": {
       "selectedVideoFrames": [
@@ -256,17 +266,19 @@
     },
     "DEFENSE_CROUCH": {
       "selectedVideoFrames": [
-        16,
-        20,
-        24,
-        28,
-        32,
-        36,
-        40
+        0,
+        2,
+        4,
+        6,
+        8,
+        10,
+        16
       ],
       "mainIndex": 4,
       "observedMotion": "Kneeling forearm guard; hold phase ends defensively",
-      "findings": [],
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ],
       "phaseLabels": [
         "entry",
         "main/hold",
@@ -476,17 +488,19 @@
     },
     "DEFENSE_AIR": {
       "selectedVideoFrames": [
-        28,
-        32,
-        36,
-        40,
-        44,
         48,
-        52
+        49,
+        50,
+        51,
+        52,
+        53,
+        54
       ],
       "mainIndex": 4,
       "observedMotion": "Raised crossed arms with bent airborne legs; defensive hold endpoint",
-      "findings": [],
+      "findings": [
+        "Revised source interval; normalized preview and mandatory audits still required"
+      ],
       "phaseLabels": [
         "entry",
         "main/hold",

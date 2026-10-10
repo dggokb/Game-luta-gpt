@@ -2,15 +2,15 @@
   "id": "p12_full_crouch",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_crouch_sr2x.png",
-  "sourceNote": "P12 articulated CROUCH, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 8
   },
@@ -18,107 +18,107 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        479,
+        401,
+        821,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45614
+      "opaquePixels": 46583
     },
     {
       "index": 1,
       "outputBbox": [
-        139,
-        83,
-        373,
-        479
+        475,
+        431,
+        843,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 43077
+      "opaquePixels": 47919
     },
     {
       "index": 2,
       "outputBbox": [
-        139,
-        107,
-        373,
-        479
+        483,
+        471,
+        851,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 40486
+      "minimumMargin": 35,
+      "opaquePixels": 46127
     },
     {
       "index": 3,
       "outputBbox": [
-        139,
-        131,
-        373,
-        479
+        465,
+        527,
+        831,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 37882
+      "opaquePixels": 44486
     },
     {
       "index": 4,
       "outputBbox": [
-        139,
-        143,
-        373,
-        479
+        467,
+        525,
+        833,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 36569
+      "opaquePixels": 44293
     },
     {
       "index": 5,
       "outputBbox": [
-        139,
-        143,
-        373,
-        479
+        469,
+        519,
+        835,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 36569
+      "opaquePixels": 44970
     },
     {
       "index": 6,
       "outputBbox": [
-        139,
-        143,
-        373,
-        479
+        469,
+        519,
+        835,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 36569
+      "minimumMargin": 35,
+      "opaquePixels": 44869
     },
     {
       "index": 7,
       "outputBbox": [
-        139,
-        143,
-        373,
-        479
+        471,
+        517,
+        837,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 36569
+      "opaquePixels": 45533
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 259,
-    "frameHeight": 443,
-    "rootX": 129,
-    "rootY": 428,
+    "frameWidth": 410,
+    "frameHeight": 358,
+    "rootX": 187,
+    "rootY": 343,
     "columns": 4,
     "frameCount": 8,
     "cropOffset": [
-      127,
-      48
+      453,
+      389
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 3671584
+      "canonical": 37748736,
+      "packed": 4696960
     },
     "pixelScale": 2
   },
@@ -126,12 +126,20 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f0ee69939cd1ccfacad8b39386e363b8181b5deb773dd2c7b9cbde88ac5f0308",
-      "config": "e155fa589917720f865ed9d9e3c95bb4949bf617185c99ccf82cd4a49f973eca",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "7e0205691e2e4f5e73c42eba324d5e9643bd2611fc363459bd964d741f087321",
+      "config": "883142d43f4251507b152ffe27364bfb85742a5483f6d0bbc88a7731072d6f86",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_crouch_original.png": "73c39e30f3a024829ccd0dc1f7b6586af7e6e0b62e99de8870086271c53e4f1a"
+      "art/sprites/source/p12_full_crouch_original.png": "f8b60f7a738bb1a305bf683d0d8e7768a9c65edc311f0c4c02cf54a134145437",
+      "art/keys/p12/poses/crouch_start.png": "03a313240c9f8d812a0ba6bfbe5e61e1c84c5a03a8fc14fc80bc895e6f957327",
+      "art/keys/p12/video_frames/crouch/0015.png": "bd36e841570513a4dbaf83ab68c68cde1f2bc1ccdd444b9af050c6d9ca5261f0",
+      "art/keys/p12/video_frames/crouch/0016.png": "60df6c8988c2b897f1e0ed29ebc1aca8627247b9decb300a19064d5723d3d32a",
+      "art/keys/p12/video_frames/crouch/0018.png": "09ecddb6db8407e85546365ab3f3f6cf17e49d52c5148aa05fcfcd9315ac73f4",
+      "art/keys/p12/video_frames/crouch/0020.png": "87f86eeffdcbd5f47cdbf75c6a103c162641e285ad5430c64c9b70e9c61b1720",
+      "art/keys/p12/poses/crouch_peak.png": "3a741f45423f0f0be71b51fa7da1691670a7c69cf5b6d8ed5ea38b663f02545f",
+      "art/keys/p12/video_frames/crouch/0032.png": "6b875fb8674a7f00d533d332f18f229b540bfd628d30bdf448ac26b9e400cac4",
+      "art/keys/p12/video_frames/crouch/0040.png": "d53a68f12f2bfcfc1d76bd3c8836be842a4e3413e8b6e2701a4c8588ab448801"
     }
   }
 }

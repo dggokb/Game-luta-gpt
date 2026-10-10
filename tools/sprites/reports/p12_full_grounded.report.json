@@ -84,7 +84,7 @@
     "sha256": {
       "source": "8e683c062eee8ed6fddaab43f7d953112def192618da630afae0a5d2fdc48d13",
       "config": "6f7a4b0332962dd091fce2edfd0de93ce838981e3ae3ef415b967681748c3112",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_grounded_original.png": "047fac6688db591804a32042d1adfd76ebb1e564f263b28ddbbc12de3bc904ea"

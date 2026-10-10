@@ -117,7 +117,7 @@
     "sha256": {
       "source": "bfb1efed02a9deb124e1df8238ab989edc1d6c8f6b55cc1dab7972bf1688dadc",
       "config": "be484ad381e510ce55785c5f38cede4e6a899c8611a3861288dc73e24b2e85ca",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_jump_heavy_down_original.png": "bd17bfa0daf3d5073857255b45c770c49242c192092a950388cd4f6838ec64d1"

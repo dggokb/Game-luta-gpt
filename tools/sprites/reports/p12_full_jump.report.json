@@ -2,15 +2,15 @@
   "id": "p12_full_jump",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_jump_sr2x.png",
-  "sourceNote": "P12 articulated JUMP, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 512,
     "columns": 4,
     "frameCount": 6
   },
@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        135,
-        35,
-        381,
-        461
+        513,
+        237,
+        777,
+        515
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 41812
+      "minimumMargin": 237,
+      "opaquePixels": 38882
     },
     {
       "index": 1,
       "outputBbox": [
-        135,
-        26,
-        381,
-        452
+        493,
+        281,
+        767,
+        515
       ],
-      "minimumMargin": 26,
-      "opaquePixels": 41941
+      "minimumMargin": 253,
+      "opaquePixels": 35294
     },
     {
       "index": 2,
       "outputBbox": [
-        135,
-        17,
-        381,
-        443
+        503,
+        159,
+        737,
+        641
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 42066
+      "minimumMargin": 127,
+      "opaquePixels": 48533
     },
     {
       "index": 3,
       "outputBbox": [
-        133,
-        28,
-        379,
-        455
+        525,
+        157,
+        759,
+        525
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 42176
+      "minimumMargin": 157,
+      "opaquePixels": 42325
     },
     {
       "index": 4,
       "outputBbox": [
-        133,
-        27,
-        379,
-        454
+        521,
+        173,
+        753,
+        493
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 42326
+      "minimumMargin": 173,
+      "opaquePixels": 39466
     },
     {
       "index": 5,
       "outputBbox": [
-        133,
-        27,
-        379,
-        445
+        519,
+        181,
+        753,
+        491
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 42243
+      "minimumMargin": 181,
+      "opaquePixels": 39152
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 272,
-    "frameHeight": 471,
-    "rootX": 135,
-    "rootY": 470,
+    "frameWidth": 308,
+    "frameHeight": 508,
+    "rootX": 159,
+    "rootY": 367,
     "columns": 4,
     "frameCount": 6,
     "cropOffset": [
-      121,
-      6
+      481,
+      145
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 4099584
+      "canonical": 37748736,
+      "packed": 5006848
     },
     "pixelScale": 2
   },
@@ -104,12 +104,22 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "335aece18838375f031a83641b1e9c5486cc9f389904312463d5c740dc48fc85",
-      "config": "ef04f085822ce6d4a72c7e14c86ea797b7ff0bc488a0b94928ce522c0f990843",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "dd90b36f8903d2a7afce9222b49d9153e480bc1e4554da6698eaf753e1bda285",
+      "config": "f4916448e42f169e8b8535ef9a03c36d508dcf73fb486a739a17e5f41aebf010",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_jump_original.png": "6a4cdc6a772efc712871b380f5551580eb11aff062560f36a591764d3e2f5ae4"
+      "art/sprites/source/p12_full_jump_original.png": "7fac17418eeb2e766beea5169409d0e354784f17e1fb2df1ddc2403de42515df",
+      "art/keys/p12/poses/jump_start.png": "b827f18a98c9acbd426315eb2ae1ea05e43bc1e1b4597e59ff5b4a3cfe5277be",
+      "art/keys/p12/video_frames/jump/0036.png": "094d03a3b39178afa0a802ef93788635d1482d9a6e0d8a5a594c5daeccd854a2",
+      "art/keys/p12/video_frames/jump/0040.png": "74e0c74d0479831a3b834ec6d71a08e4158994f533857775ab693485ca16d409",
+      "art/keys/p12/video_masks/jump/0040.png": "dd358234523a767c5d2a128bfec0ae66ed72c2bb28a1539761a3d6bb91363b5b",
+      "art/keys/p12/poses/jump_peak.png": "a4032c0ac2b27e37b502d05b3e46c5a32a6385e63e1eb67e32c7d6e4b652e8a1",
+      "art/keys/p12/video_masks/jump/0044.png": "bf27856a96a8c460198c562d568f610971be47e8a6b3b298de80f7422e35bd7f",
+      "art/keys/p12/video_frames/jump/0046.png": "da3479daf2f1c91520ea924a7ff6f9005529c29977178ef49bf86724e3127f11",
+      "art/keys/p12/video_masks/jump/0046.png": "12971f15c1c35ba256bd977321d5ccad41d23d7b9a0caa66a2f5fdc59e611fd8",
+      "art/keys/p12/video_frames/jump/0048.png": "71dcf3fc72dfe3d6a385e859adada60e70e461242e7875aaa0de53e4d1d85b3e",
+      "art/keys/p12/video_masks/jump/0048.png": "28e0838ab3d8d52102d2072f14e4c7cf22e873824b5e41dc3c43497ca4f53ff5"
     }
   }
 }

@@ -2,15 +2,15 @@
   "id": "p12_full_combat",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_combat_sr2x.png",
-  "sourceNote": "P12 articulated COMBAT, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 1
   },
@@ -18,30 +18,30 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        527,
+        423,
+        749,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45255
+      "minimumMargin": 35,
+      "opaquePixels": 36939
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 258,
-    "frameHeight": 443,
-    "rootX": 129,
-    "rootY": 428,
+    "frameWidth": 246,
+    "frameHeight": 334,
+    "rootX": 125,
+    "rootY": 321,
     "columns": 4,
     "frameCount": 1,
     "cropOffset": [
-      127,
-      48
+      515,
+      411
     ],
     "decodedBytes": {
-      "canonical": 4194304,
-      "packed": 1828704
+      "canonical": 18874368,
+      "packed": 1314624
     },
     "pixelScale": 2
   },
@@ -49,12 +49,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5341c54c6e10918cef71c704afeccc3ca9e0494a76cbc3481594b66f9500c526",
-      "config": "452f5cbec8e8ffa02bcd4ef5e66e6048e556e5fe0b261a1a81e1dd48d754a72c",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "0a300f5d9a832b2974a42dba15286ca714df75b1a8b7997d5a7a9de1c16c0725",
+      "config": "2af39809f138fd71b34f4f588b0b999fde7bd4696692b18d213df3ad95527a23",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_combat_original.png": "57d52b2a55e516e5511addf8e1eaaf5e116c50e57b175f804ee446854a2d6e71"
+      "art/sprites/source/p12_full_combat_original.png": "cfd114c630aae47147a485c905341a168a6e53264fa01a5bbfa1aea14b29ab70",
+      "art/keys/p12/poses/combat_start.png": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e"
     }
   }
 }

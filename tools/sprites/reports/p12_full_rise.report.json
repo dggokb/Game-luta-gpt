@@ -2,15 +2,15 @@
   "id": "p12_full_rise",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_rise_sr2x.png",
-  "sourceNote": "P12 articulated RISE, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 6
   },
@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        143,
-        373,
-        479
+        471,
+        497,
+        837,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 36378
+      "opaquePixels": 46221
     },
     {
       "index": 1,
       "outputBbox": [
-        139,
-        116,
-        373,
-        479
+        475,
+        473,
+        841,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 39232
+      "opaquePixels": 48167
     },
     {
       "index": 2,
       "outputBbox": [
-        139,
-        89,
-        373,
-        479
+        477,
+        457,
+        839,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 42107
+      "opaquePixels": 49385
     },
     {
       "index": 3,
       "outputBbox": [
-        139,
-        63,
-        373,
-        479
+        479,
+        439,
+        813,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 44995
+      "minimumMargin": 35,
+      "opaquePixels": 49307
     },
     {
       "index": 4,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        489,
+        415,
+        775,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45255
+      "minimumMargin": 35,
+      "opaquePixels": 48608
     },
     {
       "index": 5,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        493,
+        409,
+        769,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45255
+      "opaquePixels": 49061
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 258,
-    "frameHeight": 443,
-    "rootX": 129,
-    "rootY": 428,
+    "frameWidth": 394,
+    "frameHeight": 350,
+    "rootX": 181,
+    "rootY": 335,
     "columns": 4,
     "frameCount": 6,
     "cropOffset": [
-      127,
-      48
+      459,
+      397
     ],
     "decodedBytes": {
-      "canonical": 8388608,
-      "packed": 3657408
+      "canonical": 37748736,
+      "packed": 4412800
     },
     "pixelScale": 2
   },
@@ -104,12 +104,18 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "9d49ffed54926d025560f64fed5b42741a57859707f1f511cdb1ad02da78b927",
-      "config": "6a9a0f504d62bb130a7c6963a5fbb254ec73a9ddca7622d4132bd88b70c113b3",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "7785f305af6c68bbd4f0bd52e6ced3308333db855ecf2515ed30ff3b81f2fc6e",
+      "config": "132d7a8977a359d07c1b8e8b45b4b3178fb26f8788aac9c9eaa1afab5b0e57ae",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_rise_original.png": "9392347551b8b55e5eaf2ddbc5e1c85b9665ac8bf5718c2ccc9e25dad29096de"
+      "art/sprites/source/p12_full_rise_original.png": "394247b63862acc0372329a320e56e25b93769530f4762e3e93d3901248ad61a",
+      "art/keys/p12/poses/rise_start.png": "76297f73d56c3d3a9903f94c2db26a021c18bd1f52e1cfb4790bf299b1c4d046",
+      "art/keys/p12/video_frames/rise/0068.png": "f4278ddf96af5401dc5d0e5727f368bac120271365f9becf4ec80f7c47419ec8",
+      "art/keys/p12/poses/rise_peak.png": "726ab28aa45d3bcf06b4dc5e343b617b7fccdf062fd5ba635efb131d6a9f7752",
+      "art/keys/p12/video_frames/rise/0074.png": "b30b225acc7c0a3de8f1bd80d01cfceaf32b61c3ee0947aa53a678bbf16d1ba3",
+      "art/keys/p12/video_frames/rise/0078.png": "c800f59c75f16eb88c78a2fb78ae47789ec058221147be82c3abb6fa5d7e25a8",
+      "art/keys/p12/video_frames/rise/0080.png": "3f721d84ebda07c6d5f573b6134386d460030193a83ce923a7e602edfb252702"
     }
   }
 }

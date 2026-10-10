@@ -150,7 +150,7 @@
     "sha256": {
       "source": "71bed61d957cb6ef72bd94271b781e265966f48084ffcc6323cd269733fc5287",
       "config": "67b6ced28309a5428727f57a83d3eb0c53736a02e19ff13c455b8e707e376abd",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_medium_kick_original.png": "6a0f9661be5491e476fba18e797a8a6684b43384e2701be1a828ff299172ca65"

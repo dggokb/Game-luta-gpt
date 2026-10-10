@@ -117,7 +117,7 @@
     "sha256": {
       "source": "95adba6ef6597fc5d344929ca7c36912d1905dcdefd73a2100c1a7337b82535b",
       "config": "c4f2a0b37d57ad7121851a72c251f2eb6e19c227fd401f96a842ad83cd684bdf",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_knockdown_original.png": "8ddc839acb6c159ec9de8f9f3fe4b9b8489f351f24f80798ba8b0f6ec83f22ff"

@@ -1,0 +1,2327 @@
+{
+  "character": "p12",
+  "status": "PARTIAL_NOT_ART_APPROVED",
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "modelSha256": "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d",
+  "registrationSha256": "495f0a3e548209ed951fae9db5aa790226107292cb8309025b4f0bc973256a63",
+  "contractSha256": "231699ea2ae4deacb20ddacd5da5575916736808254a335719db006bc11a5fa8",
+  "states": {
+    "IDLE": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/idle_start.png",
+          "sourceSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourceBox": [
+            439,
+            97,
+            853,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.2652986185511393,
+          "root": [
+            210.5,
+            580
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "d41f0d68e4d11526ce096e38863662daa51a260cc737f45aab9fb2a77e38b5a0"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0010.png",
+          "sourceSha256": "395048c8e3221994dd59ba9147b1f73c9584054d35e640c8971e99aa75f79ac6",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 10,
+          "sourceTimeSeconds": 0.416667,
+          "sourceBox": [
+            439,
+            91,
+            847,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26455,
+          "root": [
+            210.5,
+            586
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "f31e346cee604ef5aec5cb27a8f98840942eeda090c492e6f79f1eaa9f8cb5cf"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0020.png",
+          "sourceSha256": "b11fea9427a22dbbc0f0949f41faed62ca065ff0eed0c9280dfc5e2a4b88c27a",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourceBox": [
+            439,
+            89,
+            871,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26455,
+          "root": [
+            209.5,
+            588
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "15b5dae1ea43f1122f5bb4eb1c0f0305157096b2f2b33ebb2d25fd6eca5191d3"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0030.png",
+          "sourceSha256": "9d5c2728623c1d92ef4be969a6cb1e754592d6bca5eb62b0ad7475b1ec0782aa",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 30,
+          "sourceTimeSeconds": 1.25,
+          "sourceBox": [
+            439,
+            101,
+            851,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26455,
+          "root": [
+            210.5,
+            576
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "5a91baf44193ccb83d607e1b388b31644fa13c4e782713cf4fda0d5225f4e0d1"
+        },
+        {
+          "source": "art/keys/p12/poses/idle_peak.png",
+          "sourceSha256": "da5c3339ebeee0d06356199f41379442a086394c6981c6d0329d1982a719f9f0",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourceBox": [
+            439,
+            79,
+            863,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26455,
+          "root": [
+            209.5,
+            598
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "773002b9a7738903eb571935b694fe9cbce0b3db6d74c8dc4eff87111d5c10cc"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0050.png",
+          "sourceSha256": "9ade6b0fadf91d32bc29130f4fdf824ad961f58bfad481e4bdd80961ee28d69d",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourceBox": [
+            439,
+            97,
+            847,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26455,
+          "root": [
+            210.5,
+            580
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "aa5e26e661583c29aec9bf7397a93f56b6da1377c528f1ee11a63913975af81c"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0060.png",
+          "sourceSha256": "4c71012118856261146453d6c71471e91b4bd86e8f33a28df0994a808fc81832",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourceBox": [
+            439,
+            85,
+            851,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26636193747003434,
+          "root": [
+            210.5,
+            592
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "6c5c5f3966d0cf9be6fb14cf277efe9d5096ed98fc066d50b6af13456437c305"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0070.png",
+          "sourceSha256": "ce58d5051afadfcb165951f2901b3a8557ac3ad1f46338c20004b141ba754c40",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 70,
+          "sourceTimeSeconds": 2.916667,
+          "sourceBox": [
+            439,
+            91,
+            865,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26455,
+          "root": [
+            209.5,
+            586
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "cc8ac37cf6e68c94f78ffe75239b71b4c5d14f115bbce4dcb9a1434cb7bc632d"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0080.png",
+          "sourceSha256": "93f3dcfbfa7fd3ebfe9f262c5f7048581b7f840dd9ff4e8de1193a0fe285443f",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourceBox": [
+            439,
+            95,
+            849,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.26083287963526663,
+          "root": [
+            210.5,
+            582
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "4ba754bb7dbfee54e24b31fa97089ab7e23720c79ddd3040cfb232690c5aee64"
+        },
+        {
+          "source": "art/keys/p12/video_frames/idle/0096.png",
+          "sourceSha256": "d2bc59fafa83f5cf31cedc43275c10d7c4a1cb7cc550fb0f5784f8ef328a4079",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourceBox": [
+            439,
+            97,
+            859,
+            681
+          ],
+          "alphaMask": null,
+          "scale": 0.2662429381686159,
+          "root": [
+            210.5,
+            582
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "d3043c42c3fbc79bede83eecb124372dc752a62f52ff13c85777583ccff4e51c"
+        }
+      ],
+      "nativeSha256": "dc02bbaa7d6371458e8be4fc6dea64cebb3441c779fcf51e80ef0a668f726c4e",
+      "refinedSha256": "04a8c74a3cc8d66ca2a9007ce090e208fd915ba81b4895e5e2606a681cc6a0ae"
+    },
+    "COMBAT": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/combat_start.png",
+          "sourceSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+          "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+          "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourceBox": [
+            439,
+            97,
+            853,
+            679
+          ],
+          "alphaMask": null,
+          "scale": 0.2652986185511393,
+          "root": [
+            210.5,
+            580
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "d41f0d68e4d11526ce096e38863662daa51a260cc737f45aab9fb2a77e38b5a0"
+        }
+      ],
+      "nativeSha256": "cfd114c630aae47147a485c905341a168a6e53264fa01a5bbfa1aea14b29ab70",
+      "refinedSha256": "0a300f5d9a832b2974a42dba15286ca714df75b1a8b7997d5a7a9de1c16c0725"
+    },
+    "WALK_FORWARD": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/walk_forward_start.png",
+          "sourceSha256": "4c43bbcc37fe50cf47a6da40e17fae44ced6769c7355e771b881c3a9c78a773c",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourceBox": [
+            389,
+            241,
+            781,
+            657
+          ],
+          "alphaMask": null,
+          "scale": 0.38608946566693864,
+          "root": [
+            229.5,
+            414
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "caa3e202fe65dc83f3fe2df39038aa2069557f2c7af09f29bcd8527801a50177"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0039.png",
+          "sourceSha256": "80256463b9a818f47519eb800088caff204982cd8ec7a28073bda35d6a69c400",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 39,
+          "sourceTimeSeconds": 1.633333,
+          "sourceBox": [
+            415,
+            214,
+            789,
+            653
+          ],
+          "alphaMask": null,
+          "scale": 0.39170511722685214,
+          "root": [
+            209.0,
+            437
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "610092f22ed975fa2ac01131d307bdc5e668abfaea571e3ee92b8d276044f22a"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0046.png",
+          "sourceSha256": "bbc4408e9e91639fcd350fbb1c3cbfe27178e3257bb7ae15cfae8f4014055686",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourceBox": [
+            335,
+            249,
+            807,
+            651
+          ],
+          "alphaMask": null,
+          "scale": 0.40907136959798207,
+          "root": [
+            284.5,
+            400
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "fd7ab5e7f956b3992e1e83410020666640a2a8d59b79ed719f67679b38e4fb44"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0053.png",
+          "sourceSha256": "c8afb4bedeea66affe2d24d5a656dc033317c84b279a09ad0d3809e557324a8b",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 53,
+          "sourceTimeSeconds": 2.216667,
+          "sourceBox": [
+            329,
+            257,
+            795,
+            649
+          ],
+          "alphaMask": null,
+          "scale": 0.39819030128689936,
+          "root": [
+            267.5,
+            390
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "c434743c39bcb38bae0b34e84412fda6346e1cf46a9187d9d1f87c31228c6862"
+        },
+        {
+          "source": "art/keys/p12/poses/walk_forward_peak.png",
+          "sourceSha256": "048feae09f0e1a63c2a32733dbfdcc0a5b496324a6b37802a17adeb39e2e0e28",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourceBox": [
+            479,
+            217,
+            790,
+            643
+          ],
+          "alphaMask": null,
+          "scale": 0.4021855217011492,
+          "root": [
+            163.5,
+            424
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "fdfa15ca4c4574c1e131f0b7f0e6384a14bb01a6e2665cdaad105206054cc593"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0067.png",
+          "sourceSha256": "d1a7b35c337f4eba4ec82971fe2aa50c94f9296365eee240e8bf16a47883241b",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 67,
+          "sourceTimeSeconds": 2.8,
+          "sourceBox": [
+            382,
+            233,
+            855,
+            657
+          ],
+          "alphaMask": null,
+          "scale": 0.385,
+          "root": [
+            236.0,
+            422
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "35a0f3abcda0211736f4d586d3f412819caea7f78698b57886b821a10ce28a81"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0074.png",
+          "sourceSha256": "2e017303cd5877b67d7764de5a71b87057f771e2676cb60e2de495a620081ecb",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourceBox": [
+            367,
+            249,
+            785,
+            657
+          ],
+          "alphaMask": null,
+          "scale": 0.388912036668757,
+          "root": [
+            248.5,
+            406
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "2cc2cb8560fa5ba081b4f382077baff1fd11a42dde5cd43aae6e19e001711a9c"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0081.png",
+          "sourceSha256": "7138f8e4186a322d5fef69db828240d73a4db3db6707d62eb190a2537823361f",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 81,
+          "sourceTimeSeconds": 3.383333,
+          "sourceBox": [
+            451,
+            215,
+            787,
+            655
+          ],
+          "alphaMask": null,
+          "scale": 0.38763691523705623,
+          "root": [
+            153.5,
+            438
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "fe8473cbdc4fb75bb883dfede7cf6f4fcc4ddb6d2fa4bb4bd0eb7a7d9cc1525b"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0088.png",
+          "sourceSha256": "0b2ebb09b4a4391a5b49c1101c95891d18413080ffeca8e202dfd952514b17c8",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourceBox": [
+            359,
+            233,
+            809,
+            653
+          ],
+          "alphaMask": null,
+          "scale": 0.385,
+          "root": [
+            278.5,
+            418
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "152f9bd99c0563705111203a752f6f0783dbc18737a93dcfd63298ec8b50d907"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_forward/0095.png",
+          "sourceSha256": "2b35a097e35a68e91499b844dc7fff07980a1fc851754e30bb98a086631b5c22",
+          "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+          "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+          "videoFrame": 95,
+          "sourceTimeSeconds": 3.966667,
+          "sourceBox": [
+            325,
+            261,
+            793,
+            651
+          ],
+          "alphaMask": null,
+          "scale": 0.4021855217011492,
+          "root": [
+            280.5,
+            388
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "877de03d47da1b3782e7bcdf537e2050478fdae9c2e7a57e770c4a5a592ece02"
+        }
+      ],
+      "nativeSha256": "e4b77c2b748714aed00f58ca684fab013eb1dca136107c2a671dfc24653584ea",
+      "refinedSha256": "1d6c8e1c6b8250d391f0e44756a945802ddf31956d9434ddcfeac5b369d541ee"
+    },
+    "WALK_BACK": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/walk_back_start.png",
+          "sourceSha256": "392561a6c321c3a1f1648e29102084287bc6a83df3cc2ac54308ad0ddd9af486",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 4,
+          "sourceTimeSeconds": 0.166667,
+          "sourceBox": [
+            405,
+            219,
+            791,
+            673
+          ],
+          "alphaMask": null,
+          "scale": 0.30196938410220464,
+          "root": [
+            207.5,
+            452
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "fe8815d10928e3ff1a2c77490e80a58ac7de14a6ffa9517635e58116de2f8074"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0013.png",
+          "sourceSha256": "4a4a02059c36bec4d5bcf1ddb19865dc06ee8ad599621cd48a7975b9b02269fa",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 13,
+          "sourceTimeSeconds": 0.55,
+          "sourceBox": [
+            421,
+            209,
+            775,
+            671
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            126.0,
+            460
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "8a1fe0bbaf38ed2f7ec613b60792584d88d949b5e0b9943c5e4f58a47309bbe2"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0022.png",
+          "sourceSha256": "645ff93ece0c14333408f3434d864709d741dcf4e2493470899e5c1635fb299a",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 22,
+          "sourceTimeSeconds": 0.916667,
+          "sourceBox": [
+            381,
+            189,
+            711,
+            671
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            130.5,
+            480
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "0e5db8b39b7cbb73679244703f6a232d9ebf67162662baef23b0105dbccc9813"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0031.png",
+          "sourceSha256": "9b49b99d32f1cd6da1f2d4df49c46939c537ba84fe1862779e785c49d827b8ef",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 31,
+          "sourceTimeSeconds": 1.3,
+          "sourceBox": [
+            331,
+            191,
+            673,
+            671
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            154.5,
+            478
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "958e821ffb4ddf75a4abbd6a348397d356ea9fe8b4b0488b014a86bfca11c923"
+        },
+        {
+          "source": "art/keys/p12/poses/walk_back_peak.png",
+          "sourceSha256": "6e9de397fdacd523a32ce6e57817717a3398c17f09c8612bd97ce9d9f9e24e29",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourceBox": [
+            281,
+            177,
+            645,
+            671
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            164.5,
+            492
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "601094f7e94a5379af3864ef10835c24a386f989299ec0ef8634713f1d14a4b0"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0049.png",
+          "sourceSha256": "aaed7d344d683c6f304b8ee4373805950ff5841eb22fcca33fd543e794d4fb91",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 49,
+          "sourceTimeSeconds": 2.05,
+          "sourceBox": [
+            199,
+            205,
+            659,
+            673
+          ],
+          "alphaMask": null,
+          "scale": 0.30196938410220464,
+          "root": [
+            239.5,
+            466
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "7af510224ffc65e744a2b7cb93824c933ecaa3c6313147edfa0dd51be22b09de"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0058.png",
+          "sourceSha256": "5c49ccf4a86c56217ab027b0d6896b5dd19f795918d7cba22818f21716cc38b5",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourceBox": [
+            237,
+            225,
+            631,
+            673
+          ],
+          "alphaMask": null,
+          "scale": 0.30215542405880663,
+          "root": [
+            210.5,
+            446
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "2008b66a9b33f7ca951f856bce108e2213806d134324e88e346bb038cffa37f4"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0067.png",
+          "sourceSha256": "ac86dd5f955dcc4cd0a0ef116b62939647b04ff623288145594a38010509ff18",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 67,
+          "sourceTimeSeconds": 2.8,
+          "sourceBox": [
+            271,
+            208,
+            639,
+            673
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            128.25,
+            463
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "5a3311f600fdd3fcc1d883c837a62991a928a5ef495150bc1ee60ea1d246a6b8"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0076.png",
+          "sourceSha256": "699cecbaef558ad4913e9fe2e6ca9d724d23e5a2eb640fe53d50ea0d91f8207a",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 76,
+          "sourceTimeSeconds": 3.166667,
+          "sourceBox": [
+            265,
+            195,
+            563,
+            673
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            105.5,
+            476
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "454fcdca3eec98a03cc8114beda6c1ba50685866ee5372567f1aec91e57b43eb"
+        },
+        {
+          "source": "art/keys/p12/video_frames/walk_back/0088.png",
+          "sourceSha256": "bfb16256f33311b3babff80568903b81e7d1519f9410ed394d55d1e91cfa7538",
+          "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+          "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourceBox": [
+            117,
+            189,
+            527,
+            673
+          ],
+          "alphaMask": null,
+          "scale": 0.3001,
+          "root": [
+            219.5,
+            482
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "130444a9d6f6cb5fd90c5265e09d5fd961e0cede4c6691237ab4ef60504360cb"
+        }
+      ],
+      "nativeSha256": "3f803b7f35088e8839272596b5ee71cfa37a1a54ec8db5e659c7d42dd266dac3",
+      "refinedSha256": "5599ac2756929d3eab3005977e6dde18f9e0d7487e54ff643dfd56287f9fd5f5"
+    },
+    "CROUCH": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/crouch_start.png",
+          "sourceSha256": "03a313240c9f8d812a0ba6bfbe5e61e1c84c5a03a8fc14fc80bc895e6f957327",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 14,
+          "sourceTimeSeconds": 0.583333,
+          "sourceBox": [
+            487,
+            263,
+            913,
+            677
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            199.5,
+            412
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "43db2b85a47fd3491ec239f949c941b4dd91bdc6de986fa5f6af117f891ba63d"
+        },
+        {
+          "source": "art/keys/p12/video_frames/crouch/0015.png",
+          "sourceSha256": "bd36e841570513a4dbaf83ab68c68cde1f2bc1ccdd444b9af050c6d9ca5261f0",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 15,
+          "sourceTimeSeconds": 0.633333,
+          "sourceBox": [
+            489,
+            315,
+            947,
+            693
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            205.5,
+            376
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "9bb67ba3389a089b30f1d8ee50efdad47ee5625c034286b20fab78a3643816cf"
+        },
+        {
+          "source": "art/keys/p12/video_frames/crouch/0016.png",
+          "sourceSha256": "60df6c8988c2b897f1e0ed29ebc1aca8627247b9decb300a19064d5723d3d32a",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourceBox": [
+            489,
+            369,
+            947,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            195.5,
+            324
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "07d3dd112e4cd2eb3b84dbe97444a2ef1c5759843a8d1e1cfc8775628b245937"
+        },
+        {
+          "source": "art/keys/p12/video_frames/crouch/0018.png",
+          "sourceSha256": "09ecddb6db8407e85546365ab3f3f6cf17e49d52c5148aa05fcfcd9315ac73f4",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 18,
+          "sourceTimeSeconds": 0.75,
+          "sourceBox": [
+            489,
+            437,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            217.0,
+            256
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "02f2fbbad255964f028cb9a6cd0b342d364e9641914f312e77c5f92aca996933"
+        },
+        {
+          "source": "art/keys/p12/video_frames/crouch/0020.png",
+          "sourceSha256": "87f86eeffdcbd5f47cdbf75c6a103c162641e285ad5430c64c9b70e9c61b1720",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 20,
+          "sourceTimeSeconds": 0.833333,
+          "sourceBox": [
+            489,
+            436,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            214.5,
+            257
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "7c2290e21a415cd951837179bfaccad49c1259fde2c4d71a9814cc7da4aae16b"
+        },
+        {
+          "source": "art/keys/p12/poses/crouch_peak.png",
+          "sourceSha256": "3a741f45423f0f0be71b51fa7da1691670a7c69cf5b6d8ed5ea38b663f02545f",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 24,
+          "sourceTimeSeconds": 1.0,
+          "sourceBox": [
+            489,
+            427,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            211.5,
+            266
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "a1fb6ae18e41991e4365c14e2a2d4bdbfa6994472ed4d0cf90d102489f2e14ff"
+        },
+        {
+          "source": "art/keys/p12/video_frames/crouch/0032.png",
+          "sourceSha256": "6b875fb8674a7f00d533d332f18f229b540bfd628d30bdf448ac26b9e400cac4",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 32,
+          "sourceTimeSeconds": 1.333333,
+          "sourceBox": [
+            489,
+            429,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            212.5,
+            264
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "19eb27457a9749cfa63a83b91cdb855397e48115aea5146fa493a65e8c3cd224"
+        },
+        {
+          "source": "art/keys/p12/video_frames/crouch/0040.png",
+          "sourceSha256": "d53a68f12f2bfcfc1d76bd3c8836be842a4e3413e8b6e2701a4c8588ab448801",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourceBox": [
+            489,
+            425,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            210.5,
+            268
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "7b50c01b926733ced8a6bd13621f69507fb0d131a9d86787e7f20c20950be3c6"
+        }
+      ],
+      "nativeSha256": "f8b60f7a738bb1a305bf683d0d8e7768a9c65edc311f0c4c02cf54a134145437",
+      "refinedSha256": "7e0205691e2e4f5e73c42eba324d5e9643bd2611fc363459bd964d741f087321"
+    },
+    "RISE": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/rise_start.png",
+          "sourceSha256": "76297f73d56c3d3a9903f94c2db26a021c18bd1f52e1cfb4790bf299b1c4d046",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourceBox": [
+            487,
+            401,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            209.0,
+            292
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "cd2a5d4c5f3753601fdebe5aa54b238aa0092a88d140e029e6b90a9a8755824e"
+        },
+        {
+          "source": "art/keys/p12/video_frames/rise/0068.png",
+          "sourceSha256": "f4278ddf96af5401dc5d0e5727f368bac120271365f9becf4ec80f7c47419ec8",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourceBox": [
+            487,
+            371,
+            943,
+            695
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            205.5,
+            322
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "d5a7673debc3ec1d082d8b611ca1e395b2b41b7e4b362dbf88c7088516c8e572"
+        },
+        {
+          "source": "art/keys/p12/poses/rise_peak.png",
+          "sourceSha256": "726ab28aa45d3bcf06b4dc5e343b617b7fccdf062fd5ba635efb131d6a9f7752",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 70,
+          "sourceTimeSeconds": 2.916667,
+          "sourceBox": [
+            487,
+            347,
+            937,
+            691
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            203.5,
+            342
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "fcfbe979c0451c7a700496bda7c8ed13b6831ec07038470fe48e3c0172c37005"
+        },
+        {
+          "source": "art/keys/p12/video_frames/rise/0074.png",
+          "sourceSha256": "b30b225acc7c0a3de8f1bd80d01cfceaf32b61c3ee0947aa53a678bbf16d1ba3",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourceBox": [
+            485,
+            315,
+            901,
+            681
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            198.75,
+            364
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "b97746f7d5bc15d807cf89326b3a9f1bb5f65bbfe4653d5556ff386e378a6658"
+        },
+        {
+          "source": "art/keys/p12/video_frames/rise/0078.png",
+          "sourceSha256": "c800f59c75f16eb88c78a2fb78ae47789ec058221147be82c3abb6fa5d7e25a8",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 78,
+          "sourceTimeSeconds": 3.25,
+          "sourceBox": [
+            485,
+            281,
+            841,
+            677
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            186.5,
+            394
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "a08b418db97e48493912541489295d22d26eff394b1302c1477de6899314bb0b"
+        },
+        {
+          "source": "art/keys/p12/video_frames/rise/0080.png",
+          "sourceSha256": "3f721d84ebda07c6d5f573b6134386d460030193a83ce923a7e602edfb252702",
+          "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+          "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourceBox": [
+            485,
+            272,
+            827,
+            677
+          ],
+          "alphaMask": null,
+          "scale": 0.4002,
+          "root": [
+            182.5,
+            403
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "8df3dbee1bb1473a9937155245d4e9cdbc096fa4f6d357e0d1a78371a6adc245"
+        }
+      ],
+      "nativeSha256": "394247b63862acc0372329a320e56e25b93769530f4762e3e93d3901248ad61a",
+      "refinedSha256": "7785f305af6c68bbd4f0bd52e6ced3308333db855ecf2515ed30ff3b81f2fc6e"
+    },
+    "JUMP": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/jump_start.png",
+          "sourceSha256": "b827f18a98c9acbd426315eb2ae1ea05e43bc1e1b4597e59ff5b4a3cfe5277be",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 28,
+          "sourceTimeSeconds": 1.166667,
+          "sourceBox": [
+            495,
+            335,
+            807,
+            663
+          ],
+          "alphaMask": null,
+          "scale": 0.42073082377177895,
+          "root": [
+            150.5,
+            326
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "e3c288510adc14aef6b86f59ea43fab63d0c4380a0db544194a71c316a1c111d"
+        },
+        {
+          "source": "art/keys/p12/video_frames/jump/0036.png",
+          "sourceSha256": "094d03a3b39178afa0a802ef93788635d1482d9a6e0d8a5a594c5daeccd854a2",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 36,
+          "sourceTimeSeconds": 1.5,
+          "sourceBox": [
+            495,
+            385,
+            821,
+            663
+          ],
+          "alphaMask": null,
+          "scale": 0.4180555555555555,
+          "root": [
+            175.0,
+            276
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "00bf934954c64cefbf9bb2976e96e949c2db00337e9c43e2bc74304c7bac186c"
+        },
+        {
+          "source": "art/keys/p12/video_frames/jump/0040.png",
+          "sourceSha256": "74e0c74d0479831a3b834ec6d71a08e4158994f533857775ab693485ca16d409",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 40,
+          "sourceTimeSeconds": 1.666667,
+          "sourceBox": [
+            503,
+            89,
+            781,
+            663
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0040.png",
+            "sha256": "dd358234523a767c5d2a128bfec0ae66ed72c2bb28a1539761a3d6bb91363b5b"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            161.5,
+            421.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "bfd208a3ac0035c1705e3bac94239ce21af953348e2ec8e53a663782d5a43a7b"
+        },
+        {
+          "source": "art/keys/p12/poses/jump_peak.png",
+          "sourceSha256": "a4032c0ac2b27e37b502d05b3e46c5a32a6385e63e1eb67e32c7d6e4b652e8a1",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 44,
+          "sourceTimeSeconds": 1.833333,
+          "sourceBox": [
+            549,
+            39,
+            827,
+            477
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0044.png",
+            "sha256": "bf27856a96a8c460198c562d568f610971be47e8a6b3b298de80f7422e35bd7f"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            135.5,
+            423.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "53c15463a0b51f3e80d834d2d93b3e8ab8cc4063f069d8800775fc1f38d9a6c3"
+        },
+        {
+          "source": "art/keys/p12/video_frames/jump/0046.png",
+          "sourceSha256": "da3479daf2f1c91520ea924a7ff6f9005529c29977178ef49bf86724e3127f11",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 46,
+          "sourceTimeSeconds": 1.916667,
+          "sourceBox": [
+            543,
+            59,
+            819,
+            439
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0046.png",
+            "sha256": "12971f15c1c35ba256bd977321d5ccad41d23d7b9a0caa66a2f5fdc59e611fd8"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            141.5,
+            404.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "d2662ba605b7a29aaaf2a6c8c9d73a19b9106a9fa3ca8e970437ce62e0f361e2"
+        },
+        {
+          "source": "art/keys/p12/video_frames/jump/0048.png",
+          "sourceSha256": "71dcf3fc72dfe3d6a385e859adada60e70e461242e7875aaa0de53e4d1d85b3e",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourceBox": [
+            539,
+            71,
+            817,
+            439
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0048.png",
+            "sha256": "28e0838ab3d8d52102d2072f14e4c7cf22e873824b5e41dc3c43497ca4f53ff5"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            144.5,
+            393.6743122923589
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "41efedeacf296c743e7afde617b27daa4e47b000be8c0119e1aa947527c17a36"
+        }
+      ],
+      "nativeSha256": "7fac17418eeb2e766beea5169409d0e354784f17e1fb2df1ddc2403de42515df",
+      "refinedSha256": "dd90b36f8903d2a7afce9222b49d9153e480bc1e4554da6698eaf753e1bda285"
+    },
+    "FALL": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/fall_start.png",
+          "sourceSha256": "71dcf3fc72dfe3d6a385e859adada60e70e461242e7875aaa0de53e4d1d85b3e",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourceBox": [
+            539,
+            71,
+            817,
+            439
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0048.png",
+            "sha256": "28e0838ab3d8d52102d2072f14e4c7cf22e873824b5e41dc3c43497ca4f53ff5"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            144.5,
+            393.6743122923589
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "41efedeacf296c743e7afde617b27daa4e47b000be8c0119e1aa947527c17a36"
+        },
+        {
+          "source": "art/keys/p12/video_frames/fall/0052.png",
+          "sourceSha256": "6a220eeba05bcbcd9694fe8c20b5373870cf53bdfcd69d4489f347826f3504e4",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourceBox": [
+            531,
+            81,
+            813,
+            439
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0052.png",
+            "sha256": "243557157a95a3b02123933cb2bc8f8b39b43258f63364b8b89e3e29954a0512"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            151.0,
+            387.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "fa1bfa4626cb8084068176d6f81eb5df0b871baeb42586a48f38727aaa41782e"
+        },
+        {
+          "source": "art/keys/p12/poses/fall_peak.png",
+          "sourceSha256": "e19fb31c45d770ba942b686f50331de4e281fcf0d2ea280e4c844422534e9d4c",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourceBox": [
+            529,
+            87,
+            815,
+            443
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0056.png",
+            "sha256": "42ca80bf01d3f28e9c10615f9fde235bf858d429e73f3feff6d4530578c7b309"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            153.5,
+            386.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "3038f747f77a9918227bbdf935041e4ca6511413994f2d9a2b95d9b79b1d6a6a"
+        },
+        {
+          "source": "art/keys/p12/video_frames/fall/0060.png",
+          "sourceSha256": "edf7d5e3760d698db3691da64dbc09a37de9a674a30ee30480254fa8c91ce47f",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourceBox": [
+            525,
+            103,
+            827,
+            555
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0060.png",
+            "sha256": "7efdc5ba1de9356baa540b1abe47cfb262588bb07617e262d42081a4ac6b0f8b"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            153.5,
+            401.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "a0605ed5e42c4bd3b2aa7339d3308935a37cd340931d95953fd49dc12677f30b"
+        },
+        {
+          "source": "art/keys/p12/video_frames/fall/0062.png",
+          "sourceSha256": "b6f98992e41e481c080dbd214a72663bf6f1a01fde8de07dbe26d7c1b359fd14",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 62,
+          "sourceTimeSeconds": 2.583333,
+          "sourceBox": [
+            511,
+            139,
+            843,
+            657
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0062.png",
+            "sha256": "936bba39da0e7ce56e31b3d062d7dd408f1932a4e9194bdb6d2a9470c8df767a"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            118.5,
+            425.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "cbf4c4d0bc5aed10b66209d4f3efa8c70a9972f36347bbd4d8ed62a274969e9a"
+        },
+        {
+          "source": "art/keys/p12/video_frames/fall/0064.png",
+          "sourceSha256": "5c7db9dbe81b92f2d9f9dbeed82f23d6aefc712ffe971c0f6b9a99d897e3e10d",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 64,
+          "sourceTimeSeconds": 2.666667,
+          "sourceBox": [
+            494,
+            279,
+            861,
+            667
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0064.png",
+            "sha256": "a06f36e489ca082ca0cbac89c3ad2e8226afdfbbc9764cc25a7913421307c1ca"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            158.5,
+            378.8743122923588
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "5b5862f0052af673b850a3226e78533f93206650732cee8a7b3a63820c0df2b5"
+        }
+      ],
+      "nativeSha256": "c24bfd477c4a39f0008b738e24bc7a53697ca6d85f83dc41e0253f92d14d9043",
+      "refinedSha256": "91bd6bb344f3bf482ff292127324dbd646ca07d660ab56b76d32f547514f8acd"
+    },
+    "LAND": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/land_start.png",
+          "sourceSha256": "f5aff3e2014608d698400b653c5fb5c3d2c00124d0cd92a05ac38d97e4aba5ee",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 66,
+          "sourceTimeSeconds": 2.75,
+          "sourceBox": [
+            493,
+            349,
+            835,
+            661
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/land/0066.png",
+            "sha256": "8aa210a7a0e03cb4a54aa5cd64411ee79aab58fda1eaebccb451ea19ced828f3"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            158.5,
+            310
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "8e0eca8a2d7e3fddd2ef72d5ea1a48aee29c55e7818a14d58391d7a7e39593ef"
+        },
+        {
+          "source": "art/keys/p12/video_frames/land/0067.png",
+          "sourceSha256": "4fd9634516142a097abfeee8ca817b2361131f4e1a8dfc2a826ca584f9aac7c4",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 67,
+          "sourceTimeSeconds": 2.8,
+          "sourceBox": [
+            493,
+            351,
+            827,
+            663
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/land/0067.png",
+            "sha256": "589027ea33cc8ba94aeab8484bbc251ac1479176a356c6f9d88c7ecb06bd79b7"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            158.5,
+            310
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "988d040e86d00546901f5d1ca51221d5ca8a28e5b76a91c5b26ee3fb6af6078c"
+        },
+        {
+          "source": "art/keys/p12/poses/land_peak.png",
+          "sourceSha256": "8470484540796dade9e5fa44c1242588abd66a06c754d3308d9c56a72c37027e",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourceBox": [
+            493,
+            351,
+            819,
+            663
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/land/0068.png",
+            "sha256": "23c7fa822aabd2e71c2c77b8fd3d15fb63c6b78f93200099922a7f8e0b02115a"
+          },
+          "scale": 0.4180555555555555,
+          "root": [
+            159.5,
+            310
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "61dbcbb074309b953f16e46a85f146916024de56c2500b55fb0bd0fa6e97ff00"
+        },
+        {
+          "source": "art/keys/p12/video_frames/land/0074.png",
+          "sourceSha256": "e4513d89c9aa21ce7bccfcc9cb35c755b057a66b97a332f9ab844948edc80bb8",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 74,
+          "sourceTimeSeconds": 3.083333,
+          "sourceBox": [
+            493,
+            316,
+            797,
+            663
+          ],
+          "alphaMask": null,
+          "scale": 0.4180555555555555,
+          "root": [
+            159.5,
+            345
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "f5172370d9906506850df474b76fb47cd60e2d9d0c41e9897851422600cd077c"
+        },
+        {
+          "source": "art/keys/p12/video_frames/land/0080.png",
+          "sourceSha256": "1cbcddf2e7a4d54d904224f98dfde27980e572de410157f312edd7d52b2f6593",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 80,
+          "sourceTimeSeconds": 3.333333,
+          "sourceBox": [
+            495,
+            293,
+            795,
+            663
+          ],
+          "alphaMask": null,
+          "scale": 0.41383359715256945,
+          "root": [
+            157.5,
+            368
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "f8593d220a696f14da68cd4229cc9072aae16ad54d8d634ce0d420b54aabff6f"
+        },
+        {
+          "source": "art/keys/p12/video_frames/land/0096.png",
+          "sourceSha256": "63c6cec18509531b73fc40fd4f909e2e1e80d6d78848ecc0c91367c122a29277",
+          "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+          "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+          "videoFrame": 96,
+          "sourceTimeSeconds": 4.0,
+          "sourceBox": [
+            495,
+            295,
+            795,
+            663
+          ],
+          "alphaMask": null,
+          "scale": 0.415470084610996,
+          "root": [
+            156.0,
+            366
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "5500138c34b086f5577c1b4db065af3994cfe7cf8501b0d798bd3edd3c6a8652"
+        }
+      ],
+      "nativeSha256": "8c73e93aa091198b49769b4f3a5e7ca31bbf6257653c85547d3e102d278c1f64",
+      "refinedSha256": "d1f44427b6c6635d95e76174f42ab2b64939c615d48253f1bbc8dd31946c0deb"
+    },
+    "LIGHT_JAB": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/light_jab_start.png",
+          "sourceSha256": "f513832144b5f4b7ed7e9ea5ee859c1955a0352219ccd27316e2d3429eb62aea",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 43,
+          "sourceTimeSeconds": 1.8,
+          "sourceBox": [
+            307,
+            153,
+            785,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0043.png",
+            "sha256": "6426bc916237646d10c0941e98f783162c3603d6f8dc5452d74c90245a3920b2"
+          },
+          "scale": 0.28395788135169,
+          "root": [
+            227.49601277926112,
+            526
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "215428923376d1b153d478a79a76a630e26a38acc7f5ea013460ac57b69c2e3b"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0045.png",
+          "sourceSha256": "e9f1cce0a0e637134ea68bf8d869665bf3edccec92f91ee9453e1f11c985176f",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 45,
+          "sourceTimeSeconds": 1.883333,
+          "sourceBox": [
+            305,
+            141,
+            773,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0045.png",
+            "sha256": "b6efb83e0549cb5185b8ae01500d786d65f6ad65800c8000600882f4fee46f25"
+          },
+          "scale": 0.2841328246231098,
+          "root": [
+            229.40365881343425,
+            538
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "9e3668a8d57b729bdcae463fee60a0bda3831fbeccbcbae56334f6f94c67e14e"
+        },
+        {
+          "source": "art/keys/p12/poses/light_jab_peak.png",
+          "sourceSha256": "d2ed0cacbfb4e0f4cdd1d445944aa829c4ec0324ce93fc6a78bc67461ee545b5",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 56,
+          "sourceTimeSeconds": 2.333333,
+          "sourceBox": [
+            317,
+            123,
+            1125,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0056.png",
+            "sha256": "a17fbc1d1e1c16b0fec2ad87f6b7992694cdca8ba35a23858334bde4fc903849"
+          },
+          "scale": 0.2822,
+          "root": [
+            218.43036853295536,
+            556
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "95dcd407c7b12b0892f11c9067135e5a560ee9d3bf9930222eb502c4cdd1a2ab"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0058.png",
+          "sourceSha256": "3e58c1db3703fd9c484b4d658fa3228c1f9ec6d85efc19f56a56997ed18efdde",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 58,
+          "sourceTimeSeconds": 2.416667,
+          "sourceBox": [
+            317,
+            123,
+            1111,
+            681
+          ],
+          "alphaMask": null,
+          "scale": 0.2822,
+          "root": [
+            218.43036853295536,
+            556
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "61b785eea51615dc42b664549947abd9c02dfd80578df5d42ef6aa551f798ab7"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0060.png",
+          "sourceSha256": "a8f01abac62c2f512e2040d2d3bcaca4631949bc7aa58fea7be378f95d28f1af",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 60,
+          "sourceTimeSeconds": 2.5,
+          "sourceBox": [
+            317,
+            123,
+            1109,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0060.png",
+            "sha256": "75b3b65bc5113d478e549b83a00f66e403a3ce18f9afc930f816773fd07a4926"
+          },
+          "scale": 0.2822,
+          "root": [
+            218.43036853295536,
+            556
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "b815e057532edf1a707a3841ce020443ae4a9518b294d7343a29f55b5f5c67c5"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0068.png",
+          "sourceSha256": "c1aa0397fa19cb972fd23c9b5544a0b71d7a810c516189053c577770197718f0",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 68,
+          "sourceTimeSeconds": 2.833333,
+          "sourceBox": [
+            317,
+            125,
+            1107,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0068.png",
+            "sha256": "a6fb9185e38fa2072e7647a9144c8ead1d98ebc0b580514742bf71932efba58f"
+          },
+          "scale": 0.2822,
+          "root": [
+            218.43036853295536,
+            554
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "0ca18f680343f45eab4fb83425f05caf8fb134d39053ba3d07fc6b9d1bcbb37c"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0071.png",
+          "sourceSha256": "c5ca1047cea02d075636e9fb58df2a53b753b0a7a57989c10196d80f4eacb1fa",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 71,
+          "sourceTimeSeconds": 2.966667,
+          "sourceBox": [
+            315,
+            145,
+            1021,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0071.png",
+            "sha256": "666aeefeb3453e5229d55d68d153c241f79201dda4a760557d4444029fa41fbf"
+          },
+          "scale": 0.2841328246231098,
+          "root": [
+            220.40365881343425,
+            534
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "ffa974fea8147f11cb20475a597da1709155c8edfdc5aea8cd4643c57dee8abf"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0079.png",
+          "sourceSha256": "dd2f1aea374582ccf6e1021f3d9c71a962b17708171b57c151e2b3c6e397ac97",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 79,
+          "sourceTimeSeconds": 3.3,
+          "sourceBox": [
+            309,
+            179,
+            801,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0079.png",
+            "sha256": "6abfd3f73ac36378e610d10695f15177cc32ddb6e0ff78a807d4f9ac1ed79f48"
+          },
+          "scale": 0.28400588603735927,
+          "root": [
+            225.4706593911832,
+            500
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "6e0638ea29490e4cef1aeb490c722617b20a651b398ae1b7d83e27d0a711534b"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0084.png",
+          "sourceSha256": "4065c5d812808b313aaebe98d2f58cd18075586669d9b279078152576dd2be07",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 84,
+          "sourceTimeSeconds": 3.5,
+          "sourceBox": [
+            307,
+            171,
+            797,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0084.png",
+            "sha256": "6dde4b3b96c2b79be37c7db60bdda0db6568bf4698d86f1b645bc560d87a6783"
+          },
+          "scale": 0.2879086761131179,
+          "root": [
+            224.9377091896515,
+            508
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "5becc0c23b6f1bba990678916cf81e16a5f111a6e61642a2b2838eb961bd3b47"
+        },
+        {
+          "source": "art/keys/p12/video_frames/light_jab/0088.png",
+          "sourceSha256": "84893c47b61d56184cfaa5b7e10cd6ccf01f81537a9729b04e27cdde304f9f43",
+          "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+          "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+          "videoFrame": 88,
+          "sourceTimeSeconds": 3.666667,
+          "sourceBox": [
+            307,
+            163,
+            793,
+            681
+          ],
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0088.png",
+            "sha256": "f0867c66c14aa6c315d34fa206ba4461277e2dcf4c4c23d78532f596da48d958"
+          },
+          "scale": 0.28395788135169,
+          "root": [
+            225.99601277926112,
+            516
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "8f374cf2b422b6231d33000c2ab971e5f5249641402b371dcb2eb009febf4222"
+        }
+      ],
+      "nativeSha256": "221e8bea0cbde8416896fc94c94892c0c62875736be7ece99b8b555b3b54c211",
+      "refinedSha256": "bf228ad8dcc01b7a635ac12ac9e1bdbdae80e78fac8151abd40e2788387c567f"
+    },
+    "DEFENSE_CROUCH": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/defense_crouch_start.png",
+          "sourceSha256": "3ebcc10a689845baea4f5b41641d303bd55c62dbb31109e4ae9d56587d2c7610",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 0,
+          "sourceTimeSeconds": 0.0,
+          "sourceBox": [
+            459,
+            343,
+            915,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.32782505539356427,
+          "root": [
+            263.5,
+            294
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "12df0fb5587f78d3bac7fdb78854e5211599d5466797c9e51308b89fb1416378"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_crouch/0002.png",
+          "sourceSha256": "449a1f43460e67f3f2dee4f18ad58f58c8b0062d40c7b6de2ab3b875a9583cdb",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 2,
+          "sourceTimeSeconds": 0.083333,
+          "sourceBox": [
+            457,
+            343,
+            915,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.32466309405987526,
+          "root": [
+            264.5,
+            294
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "a48d4815b523c33b70e219179a055266116de58b1990d4ac7fd4327e85915a63"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_crouch/0004.png",
+          "sourceSha256": "45ce5f0e5df3c8365f0b07246874f677f61397c72d5baa04daf064d25c06baad",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 4,
+          "sourceTimeSeconds": 0.166667,
+          "sourceBox": [
+            457,
+            343,
+            915,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.32466309405987526,
+          "root": [
+            264.5,
+            294
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "3c399b0b918087da5e26b27f65ba0a84d81c7e81f564843ae63bb18ac105d389"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_crouch/0006.png",
+          "sourceSha256": "458d14babe55e934d1799fdf9ec8b4a2ee6ac8743288eaa500c3431b6d3b27bc",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 6,
+          "sourceTimeSeconds": 0.25,
+          "sourceBox": [
+            457,
+            343,
+            915,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.32466309405987526,
+          "root": [
+            264.5,
+            294
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "34ccb10666d9e66e9dfac58497cb913a4d75f36ef5b9567dc0c62e7c3cde4af9"
+        },
+        {
+          "source": "art/keys/p12/poses/defense_crouch_peak.png",
+          "sourceSha256": "87b041539eb04e367847ac38b968575ff79257e0dcb345b49b327eb29741c10a",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 8,
+          "sourceTimeSeconds": 0.333333,
+          "sourceBox": [
+            457,
+            343,
+            915,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.32466309405987526,
+          "root": [
+            264.0,
+            294
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "303f7d530a803cb4100fdc4e3162a4c9dcc273c3092c118d676a89dfde4db42e"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_crouch/0010.png",
+          "sourceSha256": "8a6c1d2370f31727aea513172ab9146ebacefa17e434ae73ed6114b7ddb2b8a1",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 10,
+          "sourceTimeSeconds": 0.416667,
+          "sourceBox": [
+            457,
+            342,
+            915,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.3289363267677798,
+          "root": [
+            263.5,
+            295
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "76dc96ea040f449469ade3c69177058ad63d4782cdb0674e41ecd76bb1cfab03"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_crouch/0016.png",
+          "sourceSha256": "30ae63b58b3ff59298e6c5d3dc66bdad9d847db87012c4d2e27e6ce1a4f6cb1e",
+          "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+          "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+          "videoFrame": 16,
+          "sourceTimeSeconds": 0.666667,
+          "sourceBox": [
+            457,
+            341,
+            916,
+            639
+          ],
+          "alphaMask": null,
+          "scale": 0.32453584079095327,
+          "root": [
+            265.0,
+            296
+          ],
+          "anchor": [
+            320,
+            366
+          ],
+          "nativePixelSha256": "e9a68879733555a7e9408ab8866f6b0de381ad4b552a7f42fdaa5872fa60a4a3"
+        }
+      ],
+      "nativeSha256": "2701d91dc318890470ca20037f29c4c0370795144e01c91713e3d3d3dd76eb92",
+      "refinedSha256": "119c6527a3d80f61fd90d5681c5865cad9da0a0c2f3e5f938927b9cf8a02220c"
+    },
+    "DEFENSE_AIR": {
+      "recipes": [
+        {
+          "source": "art/keys/p12/poses/defense_air_start.png",
+          "sourceSha256": "eb3e9082149126fc42c5dad088261828acfb47c0a3bea8997fe8d2d360aeb3ee",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 48,
+          "sourceTimeSeconds": 2.0,
+          "sourceBox": [
+            513,
+            75,
+            771,
+            477
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            119.5,
+            375.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "5271bf85dc3ed63ca2544c80d50283953982e69bde63fcfec9ca8747375084d9"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_air/0049.png",
+          "sourceSha256": "387287ce23aa5d057bcb197c17f4713ca31fba7e8926768a5122d5fa5abbdd15",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 49,
+          "sourceTimeSeconds": 2.05,
+          "sourceBox": [
+            507,
+            75,
+            769,
+            477
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            125.5,
+            372.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "8f4c331c336a4ed2996800e589f4b13086f0d3b4020f11510ab097d14dc0a5ad"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_air/0050.png",
+          "sourceSha256": "941846012ac8e756e4a67941839ccb26e5c0c24d89df17f4b5c72ff8515653c7",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 50,
+          "sourceTimeSeconds": 2.083333,
+          "sourceBox": [
+            503,
+            75,
+            769,
+            479
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            131.5,
+            372.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "7cdb293418f29c4197c9bf3c3f36c4712e324cdb165859e4ff0e05ad7b192a86"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_air/0051.png",
+          "sourceSha256": "bf64b7cfa1ea26a1a3f771bd727964d9f0921879d082f7bf3eff171a8d31f893",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 51,
+          "sourceTimeSeconds": 2.133333,
+          "sourceBox": [
+            501,
+            75,
+            769,
+            481
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            131.5,
+            372.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "72f37ca44d6a92d68bb6da3fb3d26c1900ad6de4a431f22d7a11b02b101cbb91"
+        },
+        {
+          "source": "art/keys/p12/poses/defense_air_peak.png",
+          "sourceSha256": "dd1492089ef95bd30e526673aa579f9efa033947ac12724dd3359552e7f1f5e2",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 52,
+          "sourceTimeSeconds": 2.166667,
+          "sourceBox": [
+            499,
+            77,
+            769,
+            481
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            132.5,
+            370.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "bc3626a91f7754307e867f924bed8182027ed2fe4c5939178f42ab8764ce7f02"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_air/0053.png",
+          "sourceSha256": "71bcaca93907f4d69a961671e4c1572baae0f525937e22d5c56fa0f3d74be00a",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 53,
+          "sourceTimeSeconds": 2.216667,
+          "sourceBox": [
+            497,
+            77,
+            769,
+            485
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            133.0,
+            370.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "98af8ad6155ef82a3c9342514e4da714f619b220ab269cd9a2351d33d9f3c510"
+        },
+        {
+          "source": "art/keys/p12/video_frames/defense_air/0054.png",
+          "sourceSha256": "a2993438cd7a0ef0a2b2830746f5d4ecb5250b76cacea2abb4dfffc66bea2bc4",
+          "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+          "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+          "videoFrame": 54,
+          "sourceTimeSeconds": 2.25,
+          "sourceBox": [
+            493,
+            77,
+            767,
+            487
+          ],
+          "alphaMask": null,
+          "scale": 0.4462,
+          "root": [
+            135.0,
+            371.1855670103093
+          ],
+          "anchor": [
+            320,
+            256
+          ],
+          "nativePixelSha256": "6cbdb8c141509e28f04668cc6a5a786e5955dabadf07f72309d220008744f49a"
+        }
+      ],
+      "nativeSha256": "414aba4122f122313e9b25de0a8f6c4057a71a0c7ac589983cfcb50ddca425ad",
+      "refinedSha256": "b9342f30b790e738ace870413998aeffcfbc35e5421ac26a573aada89fb0fe90"
+    }
+  },
+  "srCache": {
+    "hits": 38,
+    "misses": 49
+  }
+}

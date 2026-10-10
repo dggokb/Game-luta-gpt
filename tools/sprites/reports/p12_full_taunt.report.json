@@ -150,7 +150,7 @@
     "sha256": {
       "source": "c7cf4e884355465ce191e5b11baf5f3846fe8dbee1343dc15ce4dfe5f8287fa0",
       "config": "bba115da70cd7eae605878aecdf6478cbf25ae87bb24465a0e81733e3f664b94",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_taunt_original.png": "2497ddfbe11f4428024e99bb97d1f317ae813ec78f29949bef6b679f796bebff"

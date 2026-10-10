@@ -2,15 +2,15 @@
   "id": "p12_full_walk_back",
   "characterProfile": "p12",
   "source": "art/sprites/source/p12_full_walk_back_sr2x.png",
-  "sourceNote": "P12 articulated WALK_BACK, native P12 ink, 4x SR inference -> 2x atlas",
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 512,
-    "rootX": 256,
-    "rootY": 476,
+    "frameWidth": 1536,
+    "frameHeight": 768,
+    "rootX": 640,
+    "rootY": 732,
     "columns": 4,
     "frameCount": 10
   },
@@ -18,129 +18,129 @@
     {
       "index": 0,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        513,
+        459,
+        749,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 45550
+      "opaquePixels": 29063
     },
     {
       "index": 1,
       "outputBbox": [
-        145,
-        58,
-        366,
-        479
+        563,
+        455,
+        777,
+        735
       ],
       "minimumMargin": 33,
-      "opaquePixels": 46599
+      "opaquePixels": 28629
     },
     {
       "index": 2,
       "outputBbox": [
-        143,
-        56,
-        363,
-        478
+        561,
+        443,
+        761,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 46765
+      "minimumMargin": 33,
+      "opaquePixels": 25665
     },
     {
       "index": 3,
       "outputBbox": [
-        143,
-        56,
-        363,
-        478
+        547,
+        445,
+        755,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 46765
+      "minimumMargin": 33,
+      "opaquePixels": 29208
     },
     {
       "index": 4,
       "outputBbox": [
-        145,
-        58,
-        366,
-        479
+        541,
+        435,
+        761,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 46599
+      "minimumMargin": 35,
+      "opaquePixels": 28301
     },
     {
       "index": 5,
       "outputBbox": [
-        139,
-        59,
-        373,
-        479
+        495,
+        449,
+        775,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 45550
+      "minimumMargin": 35,
+      "opaquePixels": 32694
     },
     {
       "index": 6,
       "outputBbox": [
-        133,
-        58,
-        379,
-        479
+        511,
+        461,
+        751,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 43453
+      "minimumMargin": 35,
+      "opaquePixels": 29747
     },
     {
       "index": 7,
       "outputBbox": [
-        131,
-        56,
-        381,
-        478
+        563,
+        453,
+        785,
+        735
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 41718
+      "minimumMargin": 33,
+      "opaquePixels": 28477
     },
     {
       "index": 8,
       "outputBbox": [
-        131,
-        56,
-        381,
-        478
+        575,
+        445,
+        755,
+        733
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 41718
+      "minimumMargin": 35,
+      "opaquePixels": 26177
     },
     {
       "index": 9,
       "outputBbox": [
-        133,
-        58,
-        379,
-        479
+        507,
+        441,
+        755,
+        733
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 43453
+      "minimumMargin": 35,
+      "opaquePixels": 32507
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 275,
-    "frameHeight": 447,
-    "rootX": 138,
-    "rootY": 432,
+    "frameWidth": 314,
+    "frameHeight": 324,
+    "rootX": 157,
+    "rootY": 309,
     "columns": 4,
     "frameCount": 10,
     "cropOffset": [
-      118,
-      44
+      483,
+      423
     ],
     "decodedBytes": {
-      "canonical": 12582912,
-      "packed": 5900400
+      "canonical": 56623104,
+      "packed": 4883328
     },
     "pixelScale": 2
   },
@@ -148,12 +148,22 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c2ab53391a04d647df27a41ca604153ee6a070f76c35f99d91e56f5d3f9de99b",
-      "config": "70f42cb2f552748578752726c9396ad9c83b63952414b309ddf91f8faaf3b616",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "source": "5599ac2756929d3eab3005977e6dde18f9e0d7487e54ff643dfd56287f9fd5f5",
+      "config": "9195c497f5c42229121bd00f165a8f30f7c80050291451ba18f1704419ebe4ed",
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
-      "art/sprites/source/p12_full_walk_back_original.png": "e3ab493e7f918d18d4f5577ed11638375817fd04735b12e4a5fb2d7dfe9a8807"
+      "art/sprites/source/p12_full_walk_back_original.png": "3f803b7f35088e8839272596b5ee71cfa37a1a54ec8db5e659c7d42dd266dac3",
+      "art/keys/p12/poses/walk_back_start.png": "392561a6c321c3a1f1648e29102084287bc6a83df3cc2ac54308ad0ddd9af486",
+      "art/keys/p12/video_frames/walk_back/0013.png": "4a4a02059c36bec4d5bcf1ddb19865dc06ee8ad599621cd48a7975b9b02269fa",
+      "art/keys/p12/video_frames/walk_back/0022.png": "645ff93ece0c14333408f3434d864709d741dcf4e2493470899e5c1635fb299a",
+      "art/keys/p12/video_frames/walk_back/0031.png": "9b49b99d32f1cd6da1f2d4df49c46939c537ba84fe1862779e785c49d827b8ef",
+      "art/keys/p12/poses/walk_back_peak.png": "6e9de397fdacd523a32ce6e57817717a3398c17f09c8612bd97ce9d9f9e24e29",
+      "art/keys/p12/video_frames/walk_back/0049.png": "aaed7d344d683c6f304b8ee4373805950ff5841eb22fcca33fd543e794d4fb91",
+      "art/keys/p12/video_frames/walk_back/0058.png": "5c49ccf4a86c56217ab027b0d6896b5dd19f795918d7cba22818f21716cc38b5",
+      "art/keys/p12/video_frames/walk_back/0067.png": "ac86dd5f955dcc4cd0a0ef116b62939647b04ff623288145594a38010509ff18",
+      "art/keys/p12/video_frames/walk_back/0076.png": "699cecbaef558ad4913e9fe2e6ca9d724d23e5a2eb640fe53d50ea0d91f8207a",
+      "art/keys/p12/video_frames/walk_back/0088.png": "bfb16256f33311b3babff80568903b81e7d1519f9410ed394d55d1e91cfa7538"
     }
   }
 }

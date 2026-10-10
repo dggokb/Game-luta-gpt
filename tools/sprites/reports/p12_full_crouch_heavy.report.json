@@ -150,7 +150,7 @@
     "sha256": {
       "source": "9e8492f57a0856d1c41507ee2135497b19efcdd409a682af293f6c6ebbb7b364",
       "config": "f1e3c63048534cdba4c6f8cc4d3b602ec77c800266888f7cda9c96d77f4bc314",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_crouch_heavy_original.png": "2b58f59dcae14ad1f9bb134da63f28a5befe9e2b5e9c521db56dbaca03091483"

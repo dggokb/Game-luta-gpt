@@ -4,7 +4,17 @@
   "profile": "p12.json",
   "source": "art/sprites/source/p12_full_jump_sr2x.png",
   "sourceReferences": [
-    "art/sprites/source/p12_full_jump_original.png"
+    "art/sprites/source/p12_full_jump_original.png",
+    "art/keys/p12/poses/jump_start.png",
+    "art/keys/p12/video_frames/jump/0036.png",
+    "art/keys/p12/video_frames/jump/0040.png",
+    "art/keys/p12/video_masks/jump/0040.png",
+    "art/keys/p12/poses/jump_peak.png",
+    "art/keys/p12/video_masks/jump/0044.png",
+    "art/keys/p12/video_frames/jump/0046.png",
+    "art/keys/p12/video_masks/jump/0046.png",
+    "art/keys/p12/video_frames/jump/0048.png",
+    "art/keys/p12/video_masks/jump/0048.png"
   ],
   "output": "android/app/src/main/res/drawable-nodpi/p12_full_jump.png",
   "report": "tools/sprites/reports/p12_full_jump.report.json",
@@ -12,11 +22,11 @@
   "expectedFrames": 6,
   "columns": 4,
   "segmentation": "prepared-grid",
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 256,
-  "rootY": 476,
+  "frameWidth": 1536,
+  "frameHeight": 768,
+  "rootX": 640,
+  "rootY": 512,
   "rootMode": "authored",
   "pixelScale": 2,
-  "sourceNote": "P12 articulated JUMP, native P12 ink, 4x SR inference -> 2x atlas"
+  "sourceNote": "Existing animations/p12 Drive video pixels; measured uniform camera correction; alpha removal; cached AnimeVideo-v3 SR"
 }

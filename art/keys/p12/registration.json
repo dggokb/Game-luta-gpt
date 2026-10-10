@@ -1,0 +1,6769 @@
+{
+  "character": "p12",
+  "status": "PARTIAL_NOT_ART_APPROVED",
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "states": {
+    "IDLE": {
+      "videoOrigin": {
+        "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+        "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+        "selectedVideoFrames": [
+          0,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          96
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 0,
+          "root": [
+            210.5,
+            580
+          ],
+          "scale": 0.2652986185511393
+        },
+        {
+          "videoFrame": 10,
+          "root": [
+            210.5,
+            586
+          ],
+          "scale": 0.26455
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            209.5,
+            588
+          ],
+          "scale": 0.26455
+        },
+        {
+          "videoFrame": 30,
+          "root": [
+            210.5,
+            576
+          ],
+          "scale": 0.26455
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            209.5,
+            598
+          ],
+          "scale": 0.26455
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            210.5,
+            580
+          ],
+          "scale": 0.26455
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            210.5,
+            592
+          ],
+          "scale": 0.26636193747003434
+        },
+        {
+          "videoFrame": 70,
+          "root": [
+            209.5,
+            586
+          ],
+          "scale": 0.26455
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            210.5,
+            582
+          ],
+          "scale": 0.26083287963526663
+        },
+        {
+          "videoFrame": 96,
+          "root": [
+            210.5,
+            582
+          ],
+          "scale": 0.2662429381686159
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "idle.mp4",
+        "referenceFrameSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+        "headBox": [
+          292,
+          0,
+          414,
+          134
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 0,
+            "score": 0.999998927116394,
+            "zoom": 0.9971782041111723,
+            "appliedScale": 0.2652986185511393
+          },
+          {
+            "videoFrame": 10,
+            "score": 0.6553051471710205,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.26455
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.6497530341148376,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.26455
+          },
+          {
+            "videoFrame": 30,
+            "score": 0.6759732961654663,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.26455
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4890480637550354,
+            "zoom": 1.286282896203846,
+            "appliedScale": 0.26455
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.5251593589782715,
+            "zoom": 0.9604712367172129,
+            "appliedScale": 0.26455
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.711098313331604,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.26636193747003434
+          },
+          {
+            "videoFrame": 70,
+            "score": 0.4944859743118286,
+            "zoom": 0.9380602411938113,
+            "appliedScale": 0.26455
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.8195056319236755,
+            "zoom": 1.0142509654838423,
+            "appliedScale": 0.26083287963526663
+          },
+          {
+            "videoFrame": 96,
+            "score": 0.8168308734893799,
+            "zoom": 0.9936413781328401,
+            "appliedScale": 0.2662429381686159
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 10 native frames inspected: hunched torso, subtle breathing and head turn. Floor remains at root; last/first pose retains head size and rear support.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "COMBAT": {
+      "videoOrigin": {
+        "driveId": "1DzJJ2LsPlfORdR0QBBo6n7sBDhgi9_n2",
+        "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f",
+        "selectedVideoFrames": [
+          0
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 0,
+      "frames": [
+        {
+          "videoFrame": 0,
+          "root": [
+            210.5,
+            580
+          ],
+          "scale": 0.2652986185511393
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "idle.mp4",
+        "referenceFrameSha256": "72f511e37f026f45a24d8fc7c84aad00ca634f4e7834d9bd6f0aa732ee292a4e",
+        "headBox": [
+          292,
+          0,
+          414,
+          134
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 0,
+            "score": 0.999998927116394,
+            "zoom": 0.9971782041111723,
+            "appliedScale": 0.2652986185511393
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "Recorded neutral frame 0 of the same Idle video, same exact scale and support. Transition to Idle has identical source pixels.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "WALK_FORWARD": {
+      "videoOrigin": {
+        "driveId": "1DyZ0aawbcYi-jFTYoGkAJaXfQ6zkINTS",
+        "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+        "selectedVideoFrames": [
+          32,
+          39,
+          46,
+          53,
+          60,
+          67,
+          74,
+          81,
+          88,
+          95
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 32,
+          "root": [
+            229.5,
+            414
+          ],
+          "scale": 0.38608946566693864
+        },
+        {
+          "videoFrame": 39,
+          "root": [
+            209.0,
+            437
+          ],
+          "scale": 0.39170511722685214
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            284.5,
+            400
+          ],
+          "scale": 0.40907136959798207
+        },
+        {
+          "videoFrame": 53,
+          "root": [
+            267.5,
+            390
+          ],
+          "scale": 0.39819030128689936
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            163.5,
+            424
+          ],
+          "scale": 0.4021855217011492
+        },
+        {
+          "videoFrame": 67,
+          "root": [
+            236.0,
+            422
+          ],
+          "scale": 0.385
+        },
+        {
+          "videoFrame": 74,
+          "root": [
+            248.5,
+            406
+          ],
+          "scale": 0.388912036668757
+        },
+        {
+          "videoFrame": 81,
+          "root": [
+            153.5,
+            438
+          ],
+          "scale": 0.38763691523705623
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            278.5,
+            418
+          ],
+          "scale": 0.385
+        },
+        {
+          "videoFrame": 95,
+          "root": [
+            280.5,
+            388
+          ],
+          "scale": 0.4021855217011492
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "frente.mp4",
+        "referenceFrameSha256": "4c43bbcc37fe50cf47a6da40e17fae44ced6769c7355e771b881c3a9c78a773c",
+        "headBox": [
+          300,
+          0,
+          389,
+          95
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 32,
+            "score": 0.9999998211860657,
+            "zoom": 0.9971782041111723,
+            "appliedScale": 0.38608946566693864
+          },
+          {
+            "videoFrame": 39,
+            "score": 0.7607139945030212,
+            "zoom": 0.9828822322406146,
+            "appliedScale": 0.39170511722685214
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.7338913679122925,
+            "zoom": 0.9411560637410573,
+            "appliedScale": 0.40907136959798207
+          },
+          {
+            "videoFrame": 53,
+            "score": 0.8293290734291077,
+            "zoom": 0.9668743782953276,
+            "appliedScale": 0.39819030128689936
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.8179787993431091,
+            "zoom": 0.9572696659281555,
+            "appliedScale": 0.4021855217011492
+          },
+          {
+            "videoFrame": 67,
+            "score": 0.6422354578971863,
+            "zoom": 0.9668743782953276,
+            "appliedScale": 0.385
+          },
+          {
+            "videoFrame": 74,
+            "score": 0.8878595232963562,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.388912036668757
+          },
+          {
+            "videoFrame": 81,
+            "score": 0.810780942440033,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.38763691523705623
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.6125531792640686,
+            "zoom": 0.953746780312844,
+            "appliedScale": 0.385
+          },
+          {
+            "videoFrame": 95,
+            "score": 0.8043459057807922,
+            "zoom": 0.9572696659281555,
+            "appliedScale": 0.4021855217011492
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 10 native frames inspected: first rear leg lifted, then forward leg advances at frames 60/67, alternating contacts through frame 95. Torso stays centred, head size follows frame-32 camera calibration.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "WALK_BACK": {
+      "videoOrigin": {
+        "driveId": "1Hs51adG5vj46OkgbMozZhEDLa-VHv9Nh",
+        "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe",
+        "selectedVideoFrames": [
+          4,
+          13,
+          22,
+          31,
+          40,
+          49,
+          58,
+          67,
+          76,
+          88
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 4,
+          "root": [
+            207.5,
+            452
+          ],
+          "scale": 0.30196938410220464
+        },
+        {
+          "videoFrame": 13,
+          "root": [
+            126.0,
+            460
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 22,
+          "root": [
+            130.5,
+            480
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 31,
+          "root": [
+            154.5,
+            478
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            164.5,
+            492
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 49,
+          "root": [
+            239.5,
+            466
+          ],
+          "scale": 0.30196938410220464
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            210.5,
+            446
+          ],
+          "scale": 0.30215542405880663
+        },
+        {
+          "videoFrame": 67,
+          "root": [
+            128.25,
+            463
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 76,
+          "root": [
+            105.5,
+            476
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            219.5,
+            482
+          ],
+          "scale": 0.3001
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "tras.mp4",
+        "referenceFrameSha256": "7c3184d167ba6597f22d94766099fd026cbf4b3447075fbda32bde48c40260a9",
+        "headBox": [
+          268,
+          0,
+          391,
+          125
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 4,
+            "score": 0.8297131657600403,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.30196938410220464
+          },
+          {
+            "videoFrame": 13,
+            "score": 0.6355276703834534,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 22,
+            "score": 0.6157557964324951,
+            "zoom": 1.0313835831440423,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 31,
+            "score": 0.6362790465354919,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.63913494348526,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 49,
+            "score": 0.782293438911438,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.30196938410220464
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.7079954147338867,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.30215542405880663
+          },
+          {
+            "videoFrame": 67,
+            "score": 0.6200070381164551,
+            "zoom": 0.970075949084385,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 76,
+            "score": 0.5780486464500427,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.6830996870994568,
+            "zoom": 1.0315541074185595,
+            "appliedScale": 0.3001
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 10 native frames inspected: legs exchange positions and bend during the retreat; forearms swing independently. Hunched endpoint and size agree with Idle.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "CROUCH": {
+      "videoOrigin": {
+        "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+        "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+        "selectedVideoFrames": [
+          14,
+          15,
+          16,
+          18,
+          20,
+          24,
+          32,
+          40
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 5,
+      "frames": [
+        {
+          "videoFrame": 14,
+          "root": [
+            199.5,
+            412
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 15,
+          "root": [
+            205.5,
+            376
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 16,
+          "root": [
+            195.5,
+            324
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 18,
+          "root": [
+            217.0,
+            256
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            214.5,
+            257
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 24,
+          "root": [
+            211.5,
+            266
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            212.5,
+            264
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            210.5,
+            268
+          ],
+          "scale": 0.4002
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "agachado.mp4",
+        "referenceFrameSha256": "34eeaae96a085bf83b86624756b84f765f2ab974c30d7cd665ea331f28c88c38",
+        "headBox": [
+          188,
+          0,
+          294,
+          94
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 14,
+            "score": 0.46169301867485046,
+            "zoom": 0.6305,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 15,
+            "score": 0.43751195073127747,
+            "zoom": 0.7271381540215766,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 16,
+            "score": 0.4689471423625946,
+            "zoom": 1.1069042415674448,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 18,
+            "score": 0.44315195083618164,
+            "zoom": 1.5766544691366657,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.4307844042778015,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 24,
+            "score": 0.4308912754058838,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.43574094772338867,
+            "zoom": 1.570714371715187,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4315488934516907,
+            "zoom": 1.423969251101994,
+            "appliedScale": 0.4002
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 8 source frames inspected: 14 begins near the hunched Idle height, 15/16 bend knees and place hands, 18/20 lower torso, 24/32/40 hold a real crawl crouch. Native body height falls from about 164 to 106 pixels; supported hands and knees are visible. No body-height scaling per pose.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "RISE": {
+      "videoOrigin": {
+        "driveId": "1DywUc2G8pZ9HCsN1JLdYBVaPvPWopIZ-",
+        "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4",
+        "selectedVideoFrames": [
+          64,
+          68,
+          70,
+          74,
+          78,
+          80
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 64,
+          "root": [
+            209.0,
+            292
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            205.5,
+            322
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 70,
+          "root": [
+            203.5,
+            342
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 74,
+          "root": [
+            198.75,
+            364
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 78,
+          "root": [
+            186.5,
+            394
+          ],
+          "scale": 0.4002
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            182.5,
+            403
+          ],
+          "scale": 0.4002
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "agachado.mp4",
+        "referenceFrameSha256": "34eeaae96a085bf83b86624756b84f765f2ab974c30d7cd665ea331f28c88c38",
+        "headBox": [
+          188,
+          0,
+          294,
+          94
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 64,
+            "score": 0.42341187596321106,
+            "zoom": 0.6305,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.4229922890663147,
+            "zoom": 0.6305,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 70,
+            "score": 0.43340280652046204,
+            "zoom": 0.6305,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 74,
+            "score": 0.45378413796424866,
+            "zoom": 0.6348333333333332,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 78,
+            "score": 0.4614110589027405,
+            "zoom": 0.6305,
+            "appliedScale": 0.4002
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.45961904525756836,
+            "zoom": 0.6651666666666668,
+            "appliedScale": 0.4002
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 6 source frames inspected: 64 starts in the crawl, 68/70 push with hands while extending legs, 74/78/80 recover the hunched stance. Height rises from about 116 to 160 native pixels, near the 158-pixel Idle; face and proportions use the same measured source-head scale.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "JUMP": {
+      "videoOrigin": {
+        "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+        "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+        "selectedVideoFrames": [
+          28,
+          36,
+          40,
+          44,
+          46,
+          48
+        ]
+      },
+      "anchor": [
+        320,
+        256
+      ],
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 28,
+          "root": [
+            150.5,
+            326
+          ],
+          "scale": 0.42073082377177895
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            175.0,
+            276
+          ],
+          "scale": 0.4180555555555555
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            161.5,
+            421.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0040.png",
+            "sha256": "dd358234523a767c5d2a128bfec0ae66ed72c2bb28a1539761a3d6bb91363b5b"
+          }
+        },
+        {
+          "videoFrame": 44,
+          "root": [
+            135.5,
+            423.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0044.png",
+            "sha256": "bf27856a96a8c460198c562d568f610971be47e8a6b3b298de80f7422e35bd7f"
+          }
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            141.5,
+            404.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0046.png",
+            "sha256": "12971f15c1c35ba256bd977321d5ccad41d23d7b9a0caa66a2f5fdc59e611fd8"
+          }
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            144.5,
+            393.6743122923589
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/jump/0048.png",
+            "sha256": "28e0838ab3d8d52102d2072f14e4c7cf22e873824b5e41dc3c43497ca4f53ff5"
+          }
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jump.mp4",
+        "referenceFrameSha256": "ef5173893d1aac786d95f5ec7a440b9b41ca67ea903d375119d210ec8f502db1",
+        "headBox": [
+          205,
+          0,
+          299,
+          81
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 28,
+            "score": 0.7781630754470825,
+            "zoom": 0.9936413781328401,
+            "appliedScale": 0.42073082377177895
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.5780460834503174,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.5709943175315857,
+            "zoom": 0.9801719205194256,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 44,
+            "score": 0.41510793566703796,
+            "zoom": 0.6633324601319721,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5609173774719238,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.6467854380607605,
+            "zoom": 1.0740924211265412,
+            "appliedScale": 0.4180555555555555
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 6 source frames inspected: 28 compresses knees, 36 pushes off, 40 extends legs after takeoff, 44/46/48 draw knees up in flight. Air frames are registered to the red waist sash, with a fixed Idle hip-to-floor offset, while the combat engine supplies jump height. Hair-to-chin calibration excludes the neck. Last frame is also the first FALL frame.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "FALL": {
+      "videoOrigin": {
+        "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+        "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+        "selectedVideoFrames": [
+          48,
+          52,
+          56,
+          60,
+          62,
+          64
+        ]
+      },
+      "anchor": [
+        320,
+        256
+      ],
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 48,
+          "root": [
+            144.5,
+            393.6743122923589
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0048.png",
+            "sha256": "28e0838ab3d8d52102d2072f14e4c7cf22e873824b5e41dc3c43497ca4f53ff5"
+          }
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            151.0,
+            387.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0052.png",
+            "sha256": "243557157a95a3b02123933cb2bc8f8b39b43258f63364b8b89e3e29954a0512"
+          }
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            153.5,
+            386.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0056.png",
+            "sha256": "42ca80bf01d3f28e9c10615f9fde235bf858d429e73f3feff6d4530578c7b309"
+          }
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            153.5,
+            401.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0060.png",
+            "sha256": "7efdc5ba1de9356baa540b1abe47cfb262588bb07617e262d42081a4ac6b0f8b"
+          }
+        },
+        {
+          "videoFrame": 62,
+          "root": [
+            118.5,
+            425.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0062.png",
+            "sha256": "936bba39da0e7ce56e31b3d062d7dd408f1932a4e9194bdb6d2a9470c8df767a"
+          }
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            158.5,
+            378.8743122923588
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/fall/0064.png",
+            "sha256": "a06f36e489ca082ca0cbac89c3ad2e8226afdfbbc9764cc25a7913421307c1ca"
+          }
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jump.mp4",
+        "referenceFrameSha256": "ef5173893d1aac786d95f5ec7a440b9b41ca67ea903d375119d210ec8f502db1",
+        "headBox": [
+          205,
+          0,
+          299,
+          81
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 48,
+            "score": 0.6467854380607605,
+            "zoom": 1.0740924211265412,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.5397955775260925,
+            "zoom": 1.0211040125479223,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.5588769316673279,
+            "zoom": 1.0528232642725504,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.6903424263000488,
+            "zoom": 1.0450896772722023,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 62,
+            "score": 0.653390109539032,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.539634108543396,
+            "zoom": 0.9285653471692705,
+            "appliedScale": 0.4180555555555555
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 6 source frames inspected: 48/52/56 retain tucked airborne legs, 60 extends them, 62 unfolds for descent, 64 prepares ground contact. Sash registration avoids moving the head when feet unfold. JUMP-to-FALL uses source frame 48 at identical scale and root; engine trajectory is unchanged.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "DASH": {
+      "videoOrigin": {
+        "driveId": "1hytD7iXF_5Ucu0Ku5YifnniZN9gUqHpW",
+        "videoSha256": "7442f378d8b1bb1d02639832de714f988bed7b1fe9928a24ad7f6dd054e3e086",
+        "selectedVideoFrames": [
+          26,
+          30,
+          34,
+          38,
+          42,
+          46,
+          50,
+          54,
+          58,
+          62
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 26,
+          "root": [
+            291.5,
+            226
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 30,
+          "root": [
+            231.5,
+            238
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 34,
+          "root": [
+            299.0,
+            227
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 38,
+          "root": [
+            161.5,
+            240
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 42,
+          "root": [
+            306.0,
+            230
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            211.5,
+            242
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            247.5,
+            241
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            231.5,
+            242
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            642.5,
+            246
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 62,
+          "root": [
+            740.5,
+            246
+          ],
+          "scale": 0.53442
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "dash.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 26,
+            "score": 0.5833767652511597,
+            "zoom": 1.2016391975153073,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 30,
+            "score": 0.5490237474441528,
+            "zoom": 1.2266180333696746,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 34,
+            "score": 0.5823400616645813,
+            "zoom": 1.281797604509375,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 38,
+            "score": 0.5799804925918579,
+            "zoom": 1.281797604509375,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 42,
+            "score": 0.5927292108535767,
+            "zoom": 1.308089166754573,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5794037580490112,
+            "zoom": 1.2596582497567366,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.585315465927124,
+            "zoom": 1.2903429218727709,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.5680928230285645,
+            "zoom": 1.2096235111200602,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.5586913228034973,
+            "zoom": 1.2647069697825835,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 62,
+            "score": 0.4902804493904114,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53442
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "LOOP_REVIEW: running interval must close without visible snap; source speed line must be removed.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Forward low running lunge",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "BACKDASH": {
+      "videoOrigin": {
+        "driveId": "1I4lafKnQ7PymRgYZDLPzRcTMpdKjvKyz",
+        "videoSha256": "34f2a84d0711520926eeb030524ea2d60c50f0213938192ef41cd94a661497a5",
+        "selectedVideoFrames": [
+          28,
+          34,
+          40,
+          46,
+          52,
+          58,
+          64,
+          72,
+          80,
+          88
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 28,
+          "root": [
+            145.5,
+            373
+          ],
+          "scale": 0.45640471084924045
+        },
+        {
+          "videoFrame": 34,
+          "root": [
+            133.0,
+            337
+          ],
+          "scale": 0.45640471084924045
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            168.5,
+            519
+          ],
+          "scale": 0.4281278904244827
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            141.5,
+            473
+          ],
+          "scale": 0.4533
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            191.5,
+            357
+          ],
+          "scale": 0.4247391874136763
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            188.5,
+            369
+          ],
+          "scale": 0.4291117743988683
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            182.5,
+            353
+          ],
+          "scale": 0.4533
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            262.0,
+            481
+          ],
+          "scale": 0.4533
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            141.5,
+            373
+          ],
+          "scale": 0.44393126893008444
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            139.5,
+            397
+          ],
+          "scale": 0.45640471084924045
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "backDash.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 28,
+            "score": 0.7940701842308044,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.45640471084924045
+          },
+          {
+            "videoFrame": 34,
+            "score": 0.7486535310745239,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.45640471084924045
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.720439076423645,
+            "zoom": 1.0587957714003624,
+            "appliedScale": 0.4281278904244827
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5875598192214966,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.4533
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.7097582221031189,
+            "zoom": 1.0672431775373408,
+            "appliedScale": 0.4247391874136763
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.7061069011688232,
+            "zoom": 1.0563681237482154,
+            "appliedScale": 0.4291117743988683
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.647657036781311,
+            "zoom": 1.0705475616508762,
+            "appliedScale": 0.4533
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.6584137678146362,
+            "zoom": 1.0485162008042423,
+            "appliedScale": 0.4533
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.7547222971916199,
+            "zoom": 1.0211040125479223,
+            "appliedScale": 0.44393126893008444
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.8763512969017029,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.45640471084924045
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Hop and low recoil before returning to guard",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "LAND": {
+      "videoOrigin": {
+        "driveId": "1r2alwqO_4_WYX9YbNBi_D-luui3UI3RN",
+        "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc",
+        "selectedVideoFrames": [
+          66,
+          67,
+          68,
+          74,
+          80,
+          96
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 66,
+          "root": [
+            158.5,
+            310
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/land/0066.png",
+            "sha256": "8aa210a7a0e03cb4a54aa5cd64411ee79aab58fda1eaebccb451ea19ced828f3"
+          }
+        },
+        {
+          "videoFrame": 67,
+          "root": [
+            158.5,
+            310
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/land/0067.png",
+            "sha256": "589027ea33cc8ba94aeab8484bbc251ac1479176a356c6f9d88c7ecb06bd79b7"
+          }
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            159.5,
+            310
+          ],
+          "scale": 0.4180555555555555,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/land/0068.png",
+            "sha256": "23c7fa822aabd2e71c2c77b8fd3d15fb63c6b78f93200099922a7f8e0b02115a"
+          }
+        },
+        {
+          "videoFrame": 74,
+          "root": [
+            159.5,
+            345
+          ],
+          "scale": 0.4180555555555555
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            157.5,
+            368
+          ],
+          "scale": 0.41383359715256945
+        },
+        {
+          "videoFrame": 96,
+          "root": [
+            156.0,
+            366
+          ],
+          "scale": 0.415470084610996
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jump.mp4",
+        "referenceFrameSha256": "ef5173893d1aac786d95f5ec7a440b9b41ca67ea903d375119d210ec8f502db1",
+        "headBox": [
+          205,
+          0,
+          299,
+          81
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 66,
+            "score": 0.6077374219894409,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 67,
+            "score": 0.5829910039901733,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.5774229168891907,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 74,
+            "score": 0.6261861324310303,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.4180555555555555
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.8656638860702515,
+            "zoom": 1.0102020677683874,
+            "appliedScale": 0.41383359715256945
+          },
+          {
+            "videoFrame": 96,
+            "score": 0.8868389129638672,
+            "zoom": 1.0062230014634634,
+            "appliedScale": 0.415470084610996
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 6 source frames inspected: 66/67/68 compress knees on contact, 74 raises the torso, 80/96 settle into the hunched recovery stance. Feet are grounded; source-head scale is retained, without shrinking the landing pose. End height about 151.5 native pixels compared to 158 Idle. Selection preserves every contract frame and duration; source 66 is the next contact pose after FALL 64.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "LIGHT_JAB": {
+      "videoOrigin": {
+        "driveId": "1C7gktSi2rxku1nEusiuttV96RJa0MXHg",
+        "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8",
+        "selectedVideoFrames": [
+          43,
+          45,
+          56,
+          58,
+          60,
+          68,
+          71,
+          79,
+          84,
+          88
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 43,
+          "root": [
+            227.49601277926112,
+            526
+          ],
+          "scale": 0.28395788135169,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0043.png",
+            "sha256": "6426bc916237646d10c0941e98f783162c3603d6f8dc5452d74c90245a3920b2"
+          }
+        },
+        {
+          "videoFrame": 45,
+          "root": [
+            229.40365881343425,
+            538
+          ],
+          "scale": 0.2841328246231098,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0045.png",
+            "sha256": "b6efb83e0549cb5185b8ae01500d786d65f6ad65800c8000600882f4fee46f25"
+          }
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            218.43036853295536,
+            556
+          ],
+          "scale": 0.2822,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0056.png",
+            "sha256": "a17fbc1d1e1c16b0fec2ad87f6b7992694cdca8ba35a23858334bde4fc903849"
+          }
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            218.43036853295536,
+            556
+          ],
+          "scale": 0.2822
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            218.43036853295536,
+            556
+          ],
+          "scale": 0.2822,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0060.png",
+            "sha256": "75b3b65bc5113d478e549b83a00f66e403a3ce18f9afc930f816773fd07a4926"
+          }
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            218.43036853295536,
+            554
+          ],
+          "scale": 0.2822,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0068.png",
+            "sha256": "a6fb9185e38fa2072e7647a9144c8ead1d98ebc0b580514742bf71932efba58f"
+          }
+        },
+        {
+          "videoFrame": 71,
+          "root": [
+            220.40365881343425,
+            534
+          ],
+          "scale": 0.2841328246231098,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0071.png",
+            "sha256": "666aeefeb3453e5229d55d68d153c241f79201dda4a760557d4444029fa41fbf"
+          }
+        },
+        {
+          "videoFrame": 79,
+          "root": [
+            225.4706593911832,
+            500
+          ],
+          "scale": 0.28400588603735927,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0079.png",
+            "sha256": "6abfd3f73ac36378e610d10695f15177cc32ddb6e0ff78a807d4f9ac1ed79f48"
+          }
+        },
+        {
+          "videoFrame": 84,
+          "root": [
+            224.9377091896515,
+            508
+          ],
+          "scale": 0.2879086761131179,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0084.png",
+            "sha256": "6dde4b3b96c2b79be37c7db60bdda0db6568bf4698d86f1b645bc560d87a6783"
+          }
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            225.99601277926112,
+            516
+          ],
+          "scale": 0.28395788135169,
+          "alphaMask": {
+            "path": "art/keys/p12/video_masks/light_jab/0088.png",
+            "sha256": "f0867c66c14aa6c315d34fa206ba4461277e2dcf4c4c23d78532f596da48d958"
+          }
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "L.mp4",
+        "referenceFrameSha256": "79d7c54db2743e3fc3bd2829fab59153ad680c45f0ab96a4c6d8622fbc20d274",
+        "headBox": [
+          348,
+          0,
+          482,
+          126
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 43,
+            "score": 0.810960590839386,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.28395788135169
+          },
+          {
+            "videoFrame": 45,
+            "score": 0.7976796627044678,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.2841328246231098
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.6531982421875,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.2822
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.6340425610542297,
+            "zoom": 0.9638899949294019,
+            "appliedScale": 0.2822
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.6253663897514343,
+            "zoom": 0.9638899949294019,
+            "appliedScale": 0.2822
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.6127964854240417,
+            "zoom": 0.9638899949294019,
+            "appliedScale": 0.2822
+          },
+          {
+            "videoFrame": 71,
+            "score": 0.7193523645401001,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.2841328246231098
+          },
+          {
+            "videoFrame": 79,
+            "score": 0.8805885314941406,
+            "zoom": 0.9936413781328401,
+            "appliedScale": 0.28400588603735927
+          },
+          {
+            "videoFrame": 84,
+            "score": 0.8689388036727905,
+            "zoom": 0.9801719205194256,
+            "appliedScale": 0.2879086761131179
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.9036325216293335,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.28395788135169
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 10 normalized source frames inspected: 43/45 are neutral and short preparation, 56/58/60/68 project the wrapped arm and claw towards the opponent on the right; 71/79/84/88 retract it. Peak stays at combat impact index 2. Rear support foot stays aligned; original source pixels only. Final graphic audit still required.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "MEDIUM_KICK": {
+      "videoOrigin": {
+        "driveId": "1G1f00w_lhEImpEgiD_NOCBrNp4C9MpAU",
+        "videoSha256": "27e40c87ba382309e0a7e18a1c8d122504720e4812e2748b984389cb6b55fd74",
+        "selectedVideoFrames": [
+          40,
+          43,
+          48,
+          51,
+          54,
+          57,
+          59,
+          61,
+          64,
+          68
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 40,
+          "root": [
+            100.88510549281277,
+            398
+          ],
+          "scale": 0.523345761390718
+        },
+        {
+          "videoFrame": 43,
+          "root": [
+            100.19864526028218,
+            380
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            101.19864526028218,
+            340
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 51,
+          "root": [
+            101.19864526028218,
+            338
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            101.19864526028218,
+            338
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 57,
+          "root": [
+            101.19864526028218,
+            346
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 59,
+          "root": [
+            98.19864526028218,
+            362
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 61,
+          "root": [
+            99.19864526028218,
+            374
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            100.56133861953938,
+            386
+          ],
+          "scale": 0.5286971484069852
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            101.06133861953938,
+            388
+          ],
+          "scale": 0.5286971484069852
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "M.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 40,
+            "score": 0.7858336567878723,
+            "zoom": 1.0211604629793003,
+            "appliedScale": 0.523345761390718
+          },
+          {
+            "videoFrame": 43,
+            "score": 0.5495511293411255,
+            "zoom": 1.5192155398556728,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5150661468505859,
+            "zoom": 0.775616042158342,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 51,
+            "score": 0.5237843990325928,
+            "zoom": 0.7856697879303288,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.5134443044662476,
+            "zoom": 0.7569604015098564,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 57,
+            "score": 0.6412127614021301,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 59,
+            "score": 0.6589009761810303,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 61,
+            "score": 0.6678138375282288,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.8282623291015625,
+            "zoom": 1.0108244419518022,
+            "appliedScale": 0.5286971484069852
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.895703911781311,
+            "zoom": 1.0108244419518022,
+            "appliedScale": 0.5286971484069852
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "SEMANTIC_REVIEW: M.mp4 shows a body charge, not a medium kick. Do not invent a kick or change combat data to hide this.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Original M is a shoulder/body lunge; no extended kicking leg visible",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "HEAVY_STRAIGHT": {
+      "videoOrigin": {
+        "driveId": "1r1JePO5vGThbPI5KPVnaNfXW1Z0LNVgs",
+        "videoSha256": "c777dcb188057bf5ef2880690ac622e470e3ffe43c70aca13cddce5d130939a7",
+        "selectedVideoFrames": [
+          28,
+          32,
+          40,
+          44,
+          52,
+          60,
+          64,
+          70,
+          78,
+          88
+        ]
+      },
+      "mainIndex": 5,
+      "frames": [
+        {
+          "videoFrame": 28,
+          "root": [
+            102.87192233201392,
+            388
+          ],
+          "scale": 0.5434669551623528
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            106.1555221837197,
+            412
+          ],
+          "scale": 0.5216126094224159
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            103.40870185449359,
+            584
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 44,
+          "root": [
+            103.40870185449359,
+            572
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            106.40870185449359,
+            580
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            183.4087018544936,
+            386
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            183.4087018544936,
+            386
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 70,
+          "root": [
+            127.696287231294,
+            364
+          ],
+          "scale": 0.5181809475183211
+        },
+        {
+          "videoFrame": 78,
+          "root": [
+            101.90695125737241,
+            400
+          ],
+          "scale": 0.5432241570034918
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            101.64559475318116,
+            400
+          ],
+          "scale": 0.5450409602041725
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "H.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 28,
+            "score": 0.8114351630210876,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.5434669551623528
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.782905638217926,
+            "zoom": 1.0348101066760824,
+            "appliedScale": 0.5216126094224159
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4978809952735901,
+            "zoom": 1.3481659221380518,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 44,
+            "score": 0.4989458918571472,
+            "zoom": 0.6305,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.4598369300365448,
+            "zoom": 0.6545174108278927,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.4900178015232086,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.49510279297828674,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 70,
+            "score": 0.7104163765907288,
+            "zoom": 1.0416631537401624,
+            "appliedScale": 0.5181809475183211
+          },
+          {
+            "videoFrame": 78,
+            "score": 0.9120256900787354,
+            "zoom": 0.9936413781328401,
+            "appliedScale": 0.5432241570034918
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.9036905765533447,
+            "zoom": 0.9903292402057307,
+            "appliedScale": 0.5450409602041725
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "SEMANTIC_REVIEW: H.mp4 is an overhead swing, not a straight punch. Match its real attack phase to the unchanged impact index.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Overhead two-hand preparation followed by forward/downward swing",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "DEFENSE_STAND": {
+      "videoOrigin": {
+        "driveId": "14qVgSoLn67-vd-6_xrMrx0fqETAM17UW",
+        "videoSha256": "bc9e1aba5a17920cce437c7d762ca05f11658a43704074d35db7894c1c569a98",
+        "selectedVideoFrames": [
+          24,
+          28,
+          34,
+          38,
+          42,
+          46,
+          50,
+          54
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 24,
+          "root": [
+            111.0,
+            386
+          ],
+          "scale": 0.5452546754095973
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            110.5,
+            384
+          ],
+          "scale": 0.5452546754095973
+        },
+        {
+          "videoFrame": 34,
+          "root": [
+            119.5,
+            412
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 38,
+          "root": [
+            113.5,
+            414
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 42,
+          "root": [
+            99.5,
+            414
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            96.5,
+            414
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            103.5,
+            410
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            112.5,
+            392
+          ],
+          "scale": 0.53977
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "defendeCima.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 24,
+            "score": 0.8175153732299805,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5452546754095973
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.8151989579200745,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5452546754095973
+          },
+          {
+            "videoFrame": 34,
+            "score": 0.4526877999305725,
+            "zoom": 1.2560205260242963,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 38,
+            "score": 0.5191841721534729,
+            "zoom": 1.5025114704397635,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 42,
+            "score": 0.5006594657897949,
+            "zoom": 1.4884123383373284,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5646736025810242,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.5482417941093445,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.5744603276252747,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Standing raised forearm guard; hold phase ends in defensive pose",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "DEFENSE_CROUCH": {
+      "videoOrigin": {
+        "driveId": "1DGzHUAokV8tx3jlQCbO3m4ej-Y3xgDJI",
+        "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6",
+        "selectedVideoFrames": [
+          0,
+          2,
+          4,
+          6,
+          8,
+          10,
+          16
+        ]
+      },
+      "anchor": [
+        320,
+        366
+      ],
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 0,
+          "root": [
+            263.5,
+            294
+          ],
+          "scale": 0.32782505539356427
+        },
+        {
+          "videoFrame": 2,
+          "root": [
+            264.5,
+            294
+          ],
+          "scale": 0.32466309405987526
+        },
+        {
+          "videoFrame": 4,
+          "root": [
+            264.5,
+            294
+          ],
+          "scale": 0.32466309405987526
+        },
+        {
+          "videoFrame": 6,
+          "root": [
+            264.5,
+            294
+          ],
+          "scale": 0.32466309405987526
+        },
+        {
+          "videoFrame": 8,
+          "root": [
+            264.0,
+            294
+          ],
+          "scale": 0.32466309405987526
+        },
+        {
+          "videoFrame": 10,
+          "root": [
+            263.5,
+            295
+          ],
+          "scale": 0.3289363267677798
+        },
+        {
+          "videoFrame": 16,
+          "root": [
+            265.0,
+            296
+          ],
+          "scale": 0.32453584079095327
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "defendeBaixo.mp4",
+        "referenceFrameSha256": "3ebcc10a689845baea4f5b41641d303bd55c62dbb31109e4ae9d56587d2c7610",
+        "headBox": [
+          271,
+          0,
+          371,
+          116
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 0,
+            "score": 0.9999998807907104,
+            "zoom": 0.9971782041111723,
+            "appliedScale": 0.32782505539356427
+          },
+          {
+            "videoFrame": 2,
+            "score": 0.9561977982521057,
+            "zoom": 1.006889929841278,
+            "appliedScale": 0.32466309405987526
+          },
+          {
+            "videoFrame": 4,
+            "score": 0.9452759623527527,
+            "zoom": 1.006889929841278,
+            "appliedScale": 0.32466309405987526
+          },
+          {
+            "videoFrame": 6,
+            "score": 0.949887752532959,
+            "zoom": 1.006889929841278,
+            "appliedScale": 0.32466309405987526
+          },
+          {
+            "videoFrame": 8,
+            "score": 0.9309367537498474,
+            "zoom": 1.006889929841278,
+            "appliedScale": 0.32466309405987526
+          },
+          {
+            "videoFrame": 10,
+            "score": 0.9236336946487427,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.3289363267677798
+          },
+          {
+            "videoFrame": 16,
+            "score": 0.9017802476882935,
+            "zoom": 1.0072847399636504,
+            "appliedScale": 0.32453584079095327
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 7 source frames inspected: 0/2/4/6/8/10/16 have both forearms braced in front of face and chest, knees bent with rear knee grounded. Held defensive pose starts immediately for existing block timing. Height about 96 native pixels, below the 106-pixel crouch. No hit flash or extra opponent.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "HIT_STAND": {
+      "videoOrigin": {
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f",
+        "selectedVideoFrames": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 12,
+          "root": [
+            110.5,
+            378
+          ],
+          "scale": 0.5303939664833995
+        },
+        {
+          "videoFrame": 13,
+          "root": [
+            110.5,
+            378
+          ],
+          "scale": 0.5358061498148627
+        },
+        {
+          "videoFrame": 14,
+          "root": [
+            110.5,
+            376
+          ],
+          "scale": 0.5452546754095973
+        },
+        {
+          "videoFrame": 15,
+          "root": [
+            110.5,
+            376
+          ],
+          "scale": 0.5358061498148627
+        },
+        {
+          "videoFrame": 16,
+          "root": [
+            110.25,
+            396
+          ],
+          "scale": 0.5456160722526806
+        },
+        {
+          "videoFrame": 17,
+          "root": [
+            129.0,
+            408
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 18,
+          "root": [
+            140.0,
+            370
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 19,
+          "root": [
+            151.75,
+            328
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            229.5,
+            286
+          ],
+          "scale": 0.53977
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "derruba_levanta.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 12,
+            "score": 0.8711591958999634,
+            "zoom": 1.0176774890158822,
+            "appliedScale": 0.5303939664833995
+          },
+          {
+            "videoFrame": 13,
+            "score": 0.8770356178283691,
+            "zoom": 1.0073979184197621,
+            "appliedScale": 0.5358061498148627
+          },
+          {
+            "videoFrame": 14,
+            "score": 0.8701757192611694,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5452546754095973
+          },
+          {
+            "videoFrame": 15,
+            "score": 0.8550562262535095,
+            "zoom": 1.0073979184197621,
+            "appliedScale": 0.5358061498148627
+          },
+          {
+            "videoFrame": 16,
+            "score": 0.7325562238693237,
+            "zoom": 0.9892853738187293,
+            "appliedScale": 0.5456160722526806
+          },
+          {
+            "videoFrame": 17,
+            "score": 0.6045055985450745,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 18,
+            "score": 0.6853483319282532,
+            "zoom": 1.0563681237482154,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 19,
+            "score": 0.5479332804679871,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.5192193984985352,
+            "zoom": 1.0781809621050904,
+            "appliedScale": 0.53977
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "CANDIDATE_ONLY: no dedicated standing-hit file; recoil continues into knockdown, with no standalone standing recovery.",
+          "ATTACHED_EFFECT: impact beam/star obscures head/body.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Candidate initial standing recoil before knockdown begins",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "HIT_CROUCH": {
+      "videoOrigin": {
+        "driveId": "1fOk832ZgDX1Z8018tcerTlgT0tqEmNPV",
+        "videoSha256": "addadb43e887c9d235e10b90ab8768f443d98576f000074b5274c72a589503fe",
+        "selectedVideoFrames": [
+          16,
+          20,
+          24,
+          28,
+          34,
+          40,
+          48,
+          56,
+          64
+        ]
+      },
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 16,
+          "root": [
+            199.5,
+            286
+          ],
+          "scale": 0.31897465764877997
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            197.0,
+            422
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 24,
+          "root": [
+            158.5,
+            480
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            227.25,
+            478
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 34,
+          "root": [
+            312.5,
+            486
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            173.5,
+            452
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            217.5,
+            436
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            187.5,
+            412
+          ],
+          "scale": 0.317
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            198.5,
+            276
+          ],
+          "scale": 0.320433323274913
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "danoBaixo.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 16,
+            "score": 0.8624058365821838,
+            "zoom": 0.9938093588270129,
+            "appliedScale": 0.31897465764877997
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.5764133334159851,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 24,
+            "score": 0.4451768696308136,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4403599202632904,
+            "zoom": 1.4835163804254088,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 34,
+            "score": 0.4597158432006836,
+            "zoom": 0.7886752681124022,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4302743077278137,
+            "zoom": 0.6522744929395636,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5735704898834229,
+            "zoom": 0.9058380574278806,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.5598160624504089,
+            "zoom": 0.9058380574278806,
+            "appliedScale": 0.317
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.7969553470611572,
+            "zoom": 0.9892853738187293,
+            "appliedScale": 0.320433323274913
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "HEIGHT_REVIEW: reaction rises above the low posture; compare against crouch body/hurtbox.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Low hit reaction rises and recoils before crouch recovery",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "HIT_AIR": {
+      "videoOrigin": {
+        "driveId": "17E3_5ZgX2R2vcbGrvmDGh6WVnS2rhqNT",
+        "videoSha256": "256ba180bdc504a4f6819dee093c44739f95904e3ab79162fc3620fa099712bb",
+        "selectedVideoFrames": [
+          32,
+          36,
+          40,
+          48,
+          56,
+          64
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 32,
+          "root": [
+            100.5,
+            364
+          ],
+          "scale": 0.541638298549145
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            147.5,
+            280
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            287.5,
+            428
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            274.5,
+            356
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            112.5,
+            411
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            128.5,
+            288
+          ],
+          "scale": 0.53619
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "danoPulo.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 32,
+            "score": 0.7371370196342468,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.541638298549145
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.5867692232131958,
+            "zoom": 1.0455567880334133,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.5039563179016113,
+            "zoom": 1.3437457059998943,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5387564301490784,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.4421975016593933,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.5489136576652527,
+            "zoom": 1.1376713475671936,
+            "appliedScale": 0.53619
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "ATTACHED_EFFECT: source hit beam and shadows must not remain in the fighter sprite.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Visible backward airborne tumble and landing",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "KNOCKDOWN": {
+      "videoOrigin": {
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f",
+        "selectedVideoFrames": [
+          18,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40
+        ]
+      },
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 18,
+          "root": [
+            140.0,
+            370
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            229.5,
+            286
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 24,
+          "root": [
+            315.5,
+            332
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            279.5,
+            216
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            376.5,
+            226
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            282.5,
+            144
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "derruba_levanta.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 18,
+            "score": 0.6853483319282532,
+            "zoom": 1.0563681237482154,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.5192193984985352,
+            "zoom": 1.0781809621050904,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 24,
+            "score": 0.4507457911968231,
+            "zoom": 0.7446770851932422,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4318225383758545,
+            "zoom": 0.6522744929395636,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.44606471061706543,
+            "zoom": 1.2183579792729091,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.4494662880897522,
+            "zoom": 0.8468851497928506,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4543166756629944,
+            "zoom": 0.8468851497928506,
+            "appliedScale": 0.53977
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Complete backward collapse to prone posture",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "GROUNDED": {
+      "videoOrigin": {
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f",
+        "selectedVideoFrames": [
+          40,
+          44,
+          48,
+          52
+        ]
+      },
+      "mainIndex": 1,
+      "frames": [
+        {
+          "videoFrame": 40,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 44,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "derruba_levanta.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 40,
+            "score": 0.4543166756629944,
+            "zoom": 0.8468851497928506,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 44,
+            "score": 0.44275298714637756,
+            "zoom": 0.8189351448491922,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.4285167157649994,
+            "zoom": 0.8468851497928506,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.4399983882904053,
+            "zoom": 0.8357051478153872,
+            "appliedScale": 0.53977
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Actual prone interval between collapse and getup",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "GETUP": {
+      "videoOrigin": {
+        "driveId": "1CRt1PMmOUo_4ff1COwaGfI-kyCxW21b2",
+        "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f",
+        "selectedVideoFrames": [
+          56,
+          58,
+          60,
+          62,
+          64,
+          66,
+          68,
+          70,
+          72,
+          76
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 56,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            276.5,
+            120
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            157.5,
+            410
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 62,
+          "root": [
+            101.0,
+            461
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            112.5,
+            464
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 66,
+          "root": [
+            110.5,
+            386
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            122.5,
+            352
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 70,
+          "root": [
+            121.5,
+            358
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            120.5,
+            366
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 76,
+          "root": [
+            113.5,
+            381
+          ],
+          "scale": 0.5452546754095973
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "derruba_levanta.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 56,
+            "score": 0.44749879837036133,
+            "zoom": 0.8468851497928506,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.45142197608947754,
+            "zoom": 0.8468851497928506,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.4487236440181732,
+            "zoom": 0.9606336098113972,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 62,
+            "score": 0.4612073302268982,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.49583321809768677,
+            "zoom": 1.4927231220981365,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 66,
+            "score": 0.5657303333282471,
+            "zoom": 0.8911328941579475,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.566724956035614,
+            "zoom": 1.063637626261877,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 70,
+            "score": 0.6519684195518494,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.6540760397911072,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 76,
+            "score": 0.8033925294876099,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5452546754095973
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "TRANSITION_REVIEW: source recovery springs quickly from prone to standing; verify continuity to grounded and idle.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Original prone-to-standing spring recovery",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "CROUCH_LIGHT": {
+      "videoOrigin": {
+        "driveId": "1dMthyNXsSGXM8lOk6ErwTd93eoKmGmyF",
+        "videoSha256": "2788c895fb099bdc6356a9c8d947ffdf2b28778ef22b2a320673c672c6379f58",
+        "selectedVideoFrames": [
+          30,
+          36,
+          47,
+          49,
+          51,
+          53,
+          55,
+          58,
+          62,
+          66
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 30,
+          "root": [
+            339.6627665876777,
+            230
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            340.6627665876777,
+            254
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 47,
+          "root": [
+            326.6627665876777,
+            216
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 49,
+          "root": [
+            326.6627665876777,
+            217
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 51,
+          "root": [
+            326.6627665876777,
+            218
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 53,
+          "root": [
+            326.6627665876777,
+            218
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 55,
+          "root": [
+            326.6627665876777,
+            218
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            329.3324291394224,
+            218
+          ],
+          "scale": 0.3306042607789873
+        },
+        {
+          "videoFrame": 62,
+          "root": [
+            334.41033700282156,
+            216
+          ],
+          "scale": 0.3228901613608109
+        },
+        {
+          "videoFrame": 66,
+          "root": [
+            332.97063587947883,
+            214
+          ],
+          "scale": 0.32397006156603103
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "2L.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 30,
+            "score": 0.6779870986938477,
+            "zoom": 0.9769155354014208,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.49291661381721497,
+            "zoom": 0.9834283056374303,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 47,
+            "score": 0.4452210068702698,
+            "zoom": 0.702199920316071,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 49,
+            "score": 0.4631151556968689,
+            "zoom": 0.9764790906624998,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 51,
+            "score": 0.5476645827293396,
+            "zoom": 0.9769155354014208,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 53,
+            "score": 0.6303064227104187,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 55,
+            "score": 0.6521431803703308,
+            "zoom": 1.085270933914661,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.7149863839149475,
+            "zoom": 1.0211604629793003,
+            "appliedScale": 0.3306042607789873
+          },
+          {
+            "videoFrame": 62,
+            "score": 0.7625217437744141,
+            "zoom": 1.0455567880334133,
+            "appliedScale": 0.3228901613608109
+          },
+          {
+            "videoFrame": 66,
+            "score": 0.7915114164352417,
+            "zoom": 1.0420715987399687,
+            "appliedScale": 0.32397006156603103
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Low extended claw jab with real arm reach and recovery",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "CROUCH_MEDIUM": {
+      "videoOrigin": {
+        "driveId": "1n8z5AsUaWCO9TTSXWuaUNG2FI14-ofAS",
+        "videoSha256": "4a4f32b191d91331c472167b015f2651162a159e86d77008b59d809cf45bbf91",
+        "selectedVideoFrames": [
+          22,
+          25,
+          28,
+          32,
+          40,
+          43,
+          46,
+          49,
+          53,
+          57
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 22,
+          "root": [
+            333.5720357798505,
+            212
+          ],
+          "scale": 0.34328887837042404
+        },
+        {
+          "videoFrame": 25,
+          "root": [
+            155.1627665876777,
+            232
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            167.6627665876777,
+            306
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            152.6627665876777,
+            346
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            763.6627665876778,
+            350
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 43,
+          "root": [
+            699.6627665876778,
+            360
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            389.6627665876777,
+            340
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 49,
+          "root": [
+            440.6627665876777,
+            272
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 53,
+          "root": [
+            320.4567153290867,
+            220
+          ],
+          "scale": 0.34085843156030493
+        },
+        {
+          "videoFrame": 57,
+          "root": [
+            348.86054526123195,
+            220
+          ],
+          "scale": 0.3397604079596474
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "2M.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 22,
+            "score": 0.7367915511131287,
+            "zoom": 0.9834283056374303,
+            "appliedScale": 0.34328887837042404
+          },
+          {
+            "videoFrame": 25,
+            "score": 0.5857101678848267,
+            "zoom": 0.9540680951390982,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4150143563747406,
+            "zoom": 0.7625618529912015,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.43450066447257996,
+            "zoom": 0.6567574791453339,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4131137430667877,
+            "zoom": 0.9279936206896695,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 43,
+            "score": 0.45026132464408875,
+            "zoom": 0.9474514220269507,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5403860807418823,
+            "zoom": 0.9500712570177512,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 49,
+            "score": 0.5424346923828125,
+            "zoom": 0.9222190051833545,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 53,
+            "score": 0.7883371114730835,
+            "zoom": 0.9904405135428536,
+            "appliedScale": 0.34085843156030493
+          },
+          {
+            "videoFrame": 57,
+            "score": 0.8550038933753967,
+            "zoom": 0.9936413781328401,
+            "appliedScale": 0.3397604079596474
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "ATTACHED_EFFECT: sweep ring overlaps the extended kicking leg.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Low spinning sweep with extended leg",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "CROUCH_HEAVY": {
+      "videoOrigin": {
+        "driveId": "1_hWmFzCW6LK1eg35xEqnANiwgCJ7CvSw",
+        "videoSha256": "9838b17665b135b4d9e79f29c83f5172cbc0a2e6c42b2f0bb3c04184e26db98d",
+        "selectedVideoFrames": [
+          52,
+          54,
+          55,
+          56,
+          59,
+          65,
+          73,
+          80,
+          84,
+          88
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 52,
+          "root": [
+            312.6627665876777,
+            198
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            340.6627665876777,
+            204
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 55,
+          "root": [
+            340.6627665876777,
+            290
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            153.6627665876777,
+            426
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 59,
+          "root": [
+            259.6627665876777,
+            570
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 65,
+          "root": [
+            264.6627665876777,
+            570
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 73,
+          "root": [
+            266.6627665876777,
+            571
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            271.6627665876777,
+            568
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 84,
+          "root": [
+            156.6627665876777,
+            370
+          ],
+          "scale": 0.3376
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            345.6627665876777,
+            210
+          ],
+          "scale": 0.3376
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "2H.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 52,
+            "score": 0.4865420162677765,
+            "zoom": 0.9828822322406146,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.48818397521972656,
+            "zoom": 0.9834283056374303,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 55,
+            "score": 0.49359720945358276,
+            "zoom": 0.9860838030296719,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.5401700139045715,
+            "zoom": 1.0670027021752109,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 59,
+            "score": 0.40791550278663635,
+            "zoom": 0.7395875398358597,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 65,
+            "score": 0.4209326207637787,
+            "zoom": 0.8914331145277207,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 73,
+            "score": 0.40119925141334534,
+            "zoom": 0.7005044011321493,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.40591520071029663,
+            "zoom": 0.6724479308655296,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 84,
+            "score": 0.4217533767223358,
+            "zoom": 0.6435,
+            "appliedScale": 0.3376
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.6284087896347046,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3376
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "SEMANTIC_REVIEW: 2H.mp4 rises into a roar/recoil; no clear uppercut or forward striking limb.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Original 2H rises to a chest-up recoil/roar; no raised striking arm visible",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "JUMP_LIGHT": {
+      "videoOrigin": {
+        "driveId": "1OJkn0AyQegHYqznBbytFFsQ4CnAwyaqD",
+        "videoSha256": "02352f7b65f17e38ee3b102c181d7573238f43b54eb740c3f3db8158ea61f48d",
+        "selectedVideoFrames": [
+          20,
+          26,
+          32,
+          40,
+          46,
+          54,
+          64
+        ]
+      },
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 20,
+          "root": [
+            95.25,
+            310
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 26,
+          "root": [
+            97.0,
+            270
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            97.0,
+            284
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            150.5,
+            418
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            149.5,
+            466
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            123.5,
+            267
+          ],
+          "scale": 0.53619
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            121.5,
+            328
+          ],
+          "scale": 0.53619
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jL.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 20,
+            "score": 0.630741536617279,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 26,
+            "score": 0.5977667570114136,
+            "zoom": 1.096517373025245,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.548146665096283,
+            "zoom": 1.0854503676788632,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.5759281516075134,
+            "zoom": 1.1345133651495993,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5688920617103577,
+            "zoom": 1.0855155264731524,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.4746401011943817,
+            "zoom": 1.103851937393307,
+            "appliedScale": 0.53619
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.5019708275794983,
+            "zoom": 1.1460900321409218,
+            "appliedScale": 0.53619
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Real airborne high kick and leg recovery",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "JUMP_MEDIUM": {
+      "videoOrigin": {
+        "driveId": "1VzTAAk0NAOb8lEZ2UVge3fgZ7VHeB_Lw",
+        "videoSha256": "c15542879fd2e0465f8c25be716cc06cd9c484142475e2a229fa4ba6ae03eaf8",
+        "selectedVideoFrames": [
+          30,
+          36,
+          48,
+          52,
+          58,
+          64,
+          72
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 30,
+          "root": [
+            205.0,
+            328
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            202.5,
+            362
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            221.0,
+            296
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            213.5,
+            306
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            109.5,
+            360
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            117.5,
+            322
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            112.5,
+            368
+          ],
+          "scale": 0.5025304986640523
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jM.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 30,
+            "score": 0.6462416052818298,
+            "zoom": 1.1495616367925205,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.5870909690856934,
+            "zoom": 1.1381798384084363,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5828349590301514,
+            "zoom": 1.165712323873399,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.5834118127822876,
+            "zoom": 1.181607482467633,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.5815141201019287,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.5890212655067444,
+            "zoom": 1.141973771203131,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.7131973505020142,
+            "zoom": 1.0634578426995458,
+            "appliedScale": 0.5025304986640523
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Airborne extended-arm strike with bent legs",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "JUMP_HEAVY": {
+      "videoOrigin": {
+        "driveId": "19FvQrkBPuAKGr818tlRJ9h-9oG4OkgiC",
+        "videoSha256": "95c9ad881acd4bd638a18192e9969692979e3c5a42cf1baa252ace024cbe601d",
+        "selectedVideoFrames": [
+          44,
+          48,
+          56,
+          64,
+          66,
+          71,
+          80
+        ]
+      },
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 44,
+          "root": [
+            113.0,
+            308
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            126.0,
+            284
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            118.5,
+            524
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            113.0,
+            538
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 66,
+          "root": [
+            120.5,
+            338
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 71,
+          "root": [
+            120.5,
+            316
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            121.5,
+            342
+          ],
+          "scale": 0.53267
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jH.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 44,
+            "score": 0.6437126398086548,
+            "zoom": 1.1499489211380292,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.6878921389579773,
+            "zoom": 1.1653844771264592,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.5220131874084473,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.5471066236495972,
+            "zoom": 1.0587957714003624,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 66,
+            "score": 0.55012047290802,
+            "zoom": 1.326064841447264,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 71,
+            "score": 0.48398321866989136,
+            "zoom": 0.7703947155402604,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.5889567136764526,
+            "zoom": 1.1814121531511554,
+            "appliedScale": 0.53267
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "ZOOM: large size discontinuities around video frames 65\u201370.",
+          "ATTACHED_EFFECT: ring and limb ghosts overlap the fighter.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Overhead airborne two-hand attack; source has abrupt zoom",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "DEFENSE_AIR": {
+      "videoOrigin": {
+        "driveId": "1UET9IO_szjFz02YhTMQQpY5ZDrYdvQCO",
+        "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5",
+        "selectedVideoFrames": [
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54
+        ]
+      },
+      "anchor": [
+        320,
+        256
+      ],
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 48,
+          "root": [
+            119.5,
+            375.1855670103093
+          ],
+          "scale": 0.4462
+        },
+        {
+          "videoFrame": 49,
+          "root": [
+            125.5,
+            372.1855670103093
+          ],
+          "scale": 0.4462
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            131.5,
+            372.1855670103093
+          ],
+          "scale": 0.4462
+        },
+        {
+          "videoFrame": 51,
+          "root": [
+            131.5,
+            372.1855670103093
+          ],
+          "scale": 0.4462
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            132.5,
+            370.1855670103093
+          ],
+          "scale": 0.4462
+        },
+        {
+          "videoFrame": 53,
+          "root": [
+            133.0,
+            370.1855670103093
+          ],
+          "scale": 0.4462
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            135.0,
+            371.1855670103093
+          ],
+          "scale": 0.4462
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head measurement and visual anatomy comparison; original whole-frame pixels only",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "defesaPulo.mp4",
+        "referenceFrameSha256": "7f42857b62b227dee61349baa1eb78da6cb6efd0f430a29c494286edfa95a877",
+        "headBox": [
+          178,
+          0,
+          267,
+          83
+        ],
+        "frameMeasurements": [
+          {
+            "videoFrame": 48,
+            "score": 0.460846483707428,
+            "zoom": 0.6413333333333333,
+            "appliedScale": 0.4462
+          },
+          {
+            "videoFrame": 49,
+            "score": 0.47454866766929626,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.4462
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.46861952543258667,
+            "zoom": 0.6545159860424488,
+            "appliedScale": 0.4462
+          },
+          {
+            "videoFrame": 51,
+            "score": 0.46725404262542725,
+            "zoom": 0.6545159860424488,
+            "appliedScale": 0.4462
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.48556095361709595,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.4462
+          },
+          {
+            "videoFrame": 53,
+            "score": 0.4832914173603058,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.4462
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.4762655198574066,
+            "zoom": 0.6545159860424488,
+            "appliedScale": 0.4462
+          }
+        ]
+      },
+      "review": {
+        "status": "reviewed",
+        "findings": [],
+        "movementEvidence": "All 7 source frames inspected: 48 through 54 maintain closed forearm guard covering head and upper chest, legs tucked in the air, with visible bracing. Sash registration keeps the torso stable; no opaque hit-star from earlier frame 46 is included. Engine air movement and blockstun stay unchanged.",
+        "transitionsReviewed": true,
+        "supportReviewed": true,
+        "alphaReviewed": true
+      }
+    },
+    "ULTRA_BEAM": {
+      "videoOrigin": {
+        "driveId": "1vd91k29718ClSGrOS3c3u5QwzpImTjf8",
+        "videoSha256": "06b65437b240ac8edb10d30a931eb934b457bf5680e063b0931905a1d9fb9aa7",
+        "selectedVideoFrames": [
+          4,
+          16,
+          28,
+          40,
+          52,
+          56,
+          64,
+          80,
+          92
+        ]
+      },
+      "mainIndex": 5,
+      "frames": [
+        {
+          "videoFrame": 4,
+          "root": [
+            103.99616495346551,
+            374
+          ],
+          "scale": 0.51629733362788
+        },
+        {
+          "videoFrame": 16,
+          "root": [
+            101.19864526028218,
+            314
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            101.19864526028218,
+            414
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            107.19864526028218,
+            432
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            124.19864526028218,
+            404
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            124.19864526028218,
+            374
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            110.19864526028218,
+            514
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            107.19864526028218,
+            248
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 92,
+          "root": [
+            100.19864526028218,
+            362
+          ],
+          "scale": 0.53442
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "ultra.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 4,
+            "score": 0.710841953754425,
+            "zoom": 1.0351012201530791,
+            "appliedScale": 0.51629733362788
+          },
+          {
+            "videoFrame": 16,
+            "score": 0.44177791476249695,
+            "zoom": 0.6695000000000001,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4864281713962555,
+            "zoom": 0.6695000000000001,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.4468028247356415,
+            "zoom": 0.8133939683765257,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.5854548215866089,
+            "zoom": 1.1735622385122773,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.614514946937561,
+            "zoom": 1.0928500908412142,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.47698473930358887,
+            "zoom": 0.7882373362568985,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.4295159876346588,
+            "zoom": 1.3124349779398041,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 92,
+            "score": 0.5718772411346436,
+            "zoom": 1.115290927615052,
+            "appliedScale": 0.53442
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "FX_ALIGNMENT: original roar/strike/slam sequence must align with existing beam effect and unchanged frame data.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Roar, forward hand strike, overhead swing and ground slam",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "SPECIAL_ENERGY": {
+      "videoOrigin": {
+        "driveId": "1t7gqdbzmFvx1-dOt_JV2puFQJ2qu_50M",
+        "videoSha256": "ab4b7a3a19eaac0b0d1f5d327ea6c9363753eb4b1ce6cd24e6de69d037d7f307",
+        "selectedVideoFrames": [
+          24,
+          28,
+          32,
+          36,
+          48,
+          51,
+          55,
+          59,
+          64,
+          72
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 24,
+          "root": [
+            103.96666975508114,
+            346
+          ],
+          "scale": 0.5164819935920316
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            106.40870185449359,
+            286
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            327.4087018544936,
+            232
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            244.4087018544936,
+            220
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            422.4087018544936,
+            282
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 51,
+          "root": [
+            104.90870185449359,
+            212
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 55,
+          "root": [
+            117.40870185449359,
+            218
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 59,
+          "root": [
+            109.40870185449359,
+            244
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            100.40870185449359,
+            346
+          ],
+          "scale": 0.53977
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            100.53322704099678,
+            386
+          ],
+          "scale": 0.5321858379917893
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "s1.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 24,
+            "score": 0.7828620672225952,
+            "zoom": 1.0450896772722023,
+            "appliedScale": 0.5164819935920316
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4862220287322998,
+            "zoom": 1.1931870251094727,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.49647682905197144,
+            "zoom": 0.6611286978059523,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.5142747759819031,
+            "zoom": 1.2555282227083537,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5413001179695129,
+            "zoom": 0.7933724329100379,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 51,
+            "score": 0.45272380113601685,
+            "zoom": 1.2555282227083537,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 55,
+            "score": 0.4795037508010864,
+            "zoom": 1.529511976704008,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 59,
+            "score": 0.4228573143482208,
+            "zoom": 1.2993975443841106,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.5933189392089844,
+            "zoom": 1.1383722541467067,
+            "appliedScale": 0.53977
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.8649944067001343,
+            "zoom": 1.0142509654838423,
+            "appliedScale": 0.5321858379917893
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "FX_ALIGNMENT: low hand strike must align with existing combat effect origin.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Low ground lunge and hand strike",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "THROW_GRAB": {
+      "videoOrigin": {
+        "driveId": "1g-rodKH_UmHjXfpN2u0EZp1F5kY2Dtg9",
+        "videoSha256": "a33f63b74342ec5d915e8db20dedff1635c8beb5669fc417d127b6f81e19a53f",
+        "selectedVideoFrames": [
+          20,
+          24,
+          28,
+          32,
+          36,
+          40
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 20,
+          "root": [
+            105.38179571806263,
+            386
+          ],
+          "scale": 0.513895115700512
+        },
+        {
+          "videoFrame": 24,
+          "root": [
+            103.45406414867,
+            360
+          ],
+          "scale": 0.5261323251391049
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            106.27664925888949,
+            372
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            581.2766492588895,
+            382
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            107.27664925888949,
+            552
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            108.27664925888949,
+            446
+          ],
+          "scale": 0.52084
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "agarrao.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 20,
+            "score": 0.8330509662628174,
+            "zoom": 1.0135142056954969,
+            "appliedScale": 0.513895115700512
+          },
+          {
+            "videoFrame": 24,
+            "score": 0.7344448566436768,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5261323251391049
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.5298882126808167,
+            "zoom": 1.1078307876310047,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.5040589570999146,
+            "zoom": 1.0563681237482154,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.6434949040412903,
+            "zoom": 1.1538078101351368,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.49353039264678955,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.52084
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "SOURCE_OPPONENT: separate the embedded dark opponent without erasing P12 hands.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Reach and grab of source-video opponent",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "THROW_TOSS": {
+      "videoOrigin": {
+        "driveId": "1g-rodKH_UmHjXfpN2u0EZp1F5kY2Dtg9",
+        "videoSha256": "a33f63b74342ec5d915e8db20dedff1635c8beb5669fc417d127b6f81e19a53f",
+        "selectedVideoFrames": [
+          40,
+          44,
+          50,
+          56,
+          60,
+          68
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 40,
+          "root": [
+            108.27664925888949,
+            446
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 44,
+          "root": [
+            107.27664925888949,
+            506
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            107.27664925888949,
+            382
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            107.27664925888949,
+            364
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            107.27664925888949,
+            304
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            106.27664925888949,
+            336
+          ],
+          "scale": 0.52084
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "agarrao.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 40,
+            "score": 0.49353039264678955,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 44,
+            "score": 0.5577088594436646,
+            "zoom": 0.6412948368717737,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.4992341101169586,
+            "zoom": 0.6695000000000001,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.4748210310935974,
+            "zoom": 0.7044797901872271,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.47862234711647034,
+            "zoom": 0.7730062230505663,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.5345551371574402,
+            "zoom": 1.2222125505936687,
+            "appliedScale": 0.52084
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "SOURCE_OPPONENT: embedded opponent must not appear in the character sprite.",
+          "SEMANTIC_REVIEW: bite/release visible, distinct toss not demonstrated.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Grapple/bite and release; no distinct toss shown in these source phases",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "SPECIAL_S2": {
+      "videoOrigin": {
+        "driveId": "189tn9eo9q5aphBh-ppmSVbsnbsppAvMw",
+        "videoSha256": "02fd46bd7f833eaa7d17df7988e8cc36fa63488cec247bd568a5e0d9dfa136fa",
+        "selectedVideoFrames": [
+          28,
+          36,
+          48,
+          50,
+          54,
+          58,
+          62,
+          68,
+          74,
+          82
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 28,
+          "root": [
+            120.5,
+            304
+          ],
+          "scale": 0.5011087976421699
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            131.0,
+            262
+          ],
+          "scale": 0.5011087976421699
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            146.5,
+            520
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            255.5,
+            362
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 54,
+          "root": [
+            248.5,
+            348
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            234.5,
+            382
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 62,
+          "root": [
+            139.0,
+            288
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            131.5,
+            298
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 74,
+          "root": [
+            114.25,
+            380
+          ],
+          "scale": 0.5378716273078469
+        },
+        {
+          "videoFrame": 82,
+          "root": [
+            108.5,
+            390
+          ],
+          "scale": 0.5363183263359032
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "s2.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 28,
+            "score": 0.7312047481536865,
+            "zoom": 1.0629827345006368,
+            "appliedScale": 0.5011087976421699
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.7255127429962158,
+            "zoom": 1.0629827345006368,
+            "appliedScale": 0.5011087976421699
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5926059484481812,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.6707057952880859,
+            "zoom": 1.100184655209276,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 54,
+            "score": 0.6871770620346069,
+            "zoom": 1.0928500908412142,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.6734639406204224,
+            "zoom": 1.063637626261877,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 62,
+            "score": 0.5485684871673584,
+            "zoom": 1.126798040024352,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.5207852125167847,
+            "zoom": 1.1221883483134616,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 74,
+            "score": 0.7998418807983398,
+            "zoom": 0.9903292402057307,
+            "appliedScale": 0.5378716273078469
+          },
+          {
+            "videoFrame": 82,
+            "score": 0.8997950553894043,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.5363183263359032
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "ATTACHED_EFFECT: bright claw arc overlaps raised hands.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Rising airborne claw swing and landing",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "SPECIAL_S3": {
+      "videoOrigin": {
+        "driveId": "1Yvvd2DCrhAyhaU9ziGSePjKph14CjsGs",
+        "videoSha256": "1bef36528c986323623a2074b4e2df037199bcffe00a1dfd8a508b4822cd256a",
+        "selectedVideoFrames": [
+          24,
+          30,
+          36,
+          40,
+          48,
+          58,
+          64,
+          68,
+          72,
+          80
+        ]
+      },
+      "mainIndex": 5,
+      "frames": [
+        {
+          "videoFrame": 24,
+          "root": [
+            110.18587119933675,
+            368
+          ],
+          "scale": 0.49134362279242905
+        },
+        {
+          "videoFrame": 30,
+          "root": [
+            112.20533938413715,
+            354
+          ],
+          "scale": 0.4801576804250035
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            107.27664925888949,
+            434
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            185.2766492588895,
+            446
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            200.2766492588895,
+            446
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 58,
+          "root": [
+            119.27664925888949,
+            386
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            116.27664925888949,
+            384
+          ],
+          "scale": 0.52084
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            108.72669862397491,
+            386
+          ],
+          "scale": 0.49975595309541176
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            106.56288391709008,
+            396
+          ],
+          "scale": 0.5066748607150854
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            106.00708101810345,
+            400
+          ],
+          "scale": 0.5100471658297623
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "s3.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 24,
+            "score": 0.8010072112083435,
+            "zoom": 1.060032074986413,
+            "appliedScale": 0.49134362279242905
+          },
+          {
+            "videoFrame": 30,
+            "score": 0.7215366363525391,
+            "zoom": 1.0847269995535367,
+            "appliedScale": 0.4801576804250035
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.4494473338127136,
+            "zoom": 0.6634819584539892,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.5115157961845398,
+            "zoom": 0.6479061238498333,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5024759769439697,
+            "zoom": 0.6434985991977935,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 58,
+            "score": 0.5537304878234863,
+            "zoom": 1.0594975452071922,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.6303450465202332,
+            "zoom": 1.0634578426995458,
+            "appliedScale": 0.52084
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.8531997799873352,
+            "zoom": 1.042188685845555,
+            "appliedScale": 0.49975595309541176
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.8696432709693909,
+            "zoom": 1.0279570596120022,
+            "appliedScale": 0.5066748607150854
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.8929418921470642,
+            "zoom": 1.0211604629793003,
+            "appliedScale": 0.5100471658297623
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Chest-open windup and long forward claw strike",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "SPECIAL_S4": {
+      "videoOrigin": {
+        "driveId": "1PjdoG7fWi-boK_763z7jm22j_HHxL1fu",
+        "videoSha256": "e128f34bf0d241dc2b2aaebf3b25459ca732b6e2a4b3bd5bad59504bede6911a",
+        "selectedVideoFrames": [
+          28,
+          34,
+          44,
+          46,
+          48,
+          52,
+          56,
+          60,
+          66,
+          72
+        ]
+      },
+      "mainIndex": 2,
+      "frames": [
+        {
+          "videoFrame": 28,
+          "root": [
+            113.5,
+            298
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 34,
+          "root": [
+            201.25,
+            500
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 44,
+          "root": [
+            181.0,
+            440
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 46,
+          "root": [
+            237.5,
+            464
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            242.5,
+            489
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            278.5,
+            462
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            236.5,
+            418
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            139.75,
+            310
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 66,
+          "root": [
+            117.5,
+            374
+          ],
+          "scale": 0.52603
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            112.5,
+            392
+          ],
+          "scale": 0.5313750614256266
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "s4.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 28,
+            "score": 0.4809783101081848,
+            "zoom": 0.6305,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 34,
+            "score": 0.49023592472076416,
+            "zoom": 0.6413333333333333,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 44,
+            "score": 0.4293053150177002,
+            "zoom": 0.8159123879492333,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 46,
+            "score": 0.5092623233795166,
+            "zoom": 0.6633324601319721,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.5201107859611511,
+            "zoom": 1.2425150846566866,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.4158373475074768,
+            "zoom": 1.523258112144557,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.5060634016990662,
+            "zoom": 1.3627904566307498,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.5000928640365601,
+            "zoom": 1.1457677039978258,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 66,
+            "score": 0.588340163230896,
+            "zoom": 1.0386438263698898,
+            "appliedScale": 0.52603
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.782034158706665,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5313750614256266
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Full backward flip and recovery",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "SUPER_WAVE": {
+      "videoOrigin": {
+        "driveId": "1qdAW_JXPbr-JvgT-4pHFzYGOyXce7pAZ",
+        "videoSha256": "0f4525cad96f3a381acab7aeb30e95c19dbdfc1a392ceaf5f8bec59db97a33c1",
+        "selectedVideoFrames": [
+          18,
+          24,
+          30,
+          38,
+          48,
+          56,
+          68,
+          74,
+          82,
+          90
+        ]
+      },
+      "mainIndex": 6,
+      "frames": [
+        {
+          "videoFrame": 18,
+          "root": [
+            103.42678503681971,
+            380
+          ],
+          "scale": 0.5198855292668688
+        },
+        {
+          "videoFrame": 24,
+          "root": [
+            108.19864526028218,
+            400
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 30,
+          "root": [
+            116.19864526028218,
+            398
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 38,
+          "root": [
+            121.19864526028218,
+            368
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            194.13728460334892,
+            396
+          ],
+          "scale": 0.49735988474270687
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            231.59867171262107,
+            422
+          ],
+          "scale": 0.48901492023360105
+        },
+        {
+          "videoFrame": 68,
+          "root": [
+            164.19864526028218,
+            322
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 74,
+          "root": [
+            159.69864526028218,
+            328
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 82,
+          "root": [
+            120.19864526028218,
+            358
+          ],
+          "scale": 0.53442
+        },
+        {
+          "videoFrame": 90,
+          "root": [
+            101.78824933608331,
+            390
+          ],
+          "scale": 0.5304954380274172
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "super.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 18,
+            "score": 0.8519326448440552,
+            "zoom": 1.0279570596120022,
+            "appliedScale": 0.5198855292668688
+          },
+          {
+            "videoFrame": 24,
+            "score": 0.4674132764339447,
+            "zoom": 1.5983207504271795,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 30,
+            "score": 0.5109919309616089,
+            "zoom": 1.088876485190125,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 38,
+            "score": 0.6049342751502991,
+            "zoom": 1.0587957714003624,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.7273564338684082,
+            "zoom": 1.0745136799210595,
+            "appliedScale": 0.49735988474270687
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.7201657295227051,
+            "zoom": 1.0928500908412142,
+            "appliedScale": 0.48901492023360105
+          },
+          {
+            "videoFrame": 68,
+            "score": 0.47428208589553833,
+            "zoom": 0.6501098861758531,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 74,
+            "score": 0.48346278071403503,
+            "zoom": 0.6633324601319721,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 82,
+            "score": 0.6180300116539001,
+            "zoom": 1.092482036465589,
+            "appliedScale": 0.53442
+          },
+          {
+            "videoFrame": 90,
+            "score": 0.8896182775497437,
+            "zoom": 1.0073979184197621,
+            "appliedScale": 0.5304954380274172
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "FX_ALIGNMENT: original combo must align to existing wave effect and unchanged frame data.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Multi-hit punch/knee/overhead slam action",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "INTRO": {
+      "videoOrigin": {
+        "driveId": "135g-BI9HqN1OiTen8-bTZZtjhl-5M5JN",
+        "videoSha256": "84efa354b5b233b9a61ca64ac329f0a7c11bc33dbb4a9cd0c7bd820f89b8834a",
+        "selectedVideoFrames": [
+          0,
+          16,
+          28,
+          40,
+          52,
+          64,
+          72,
+          80,
+          88,
+          96
+        ]
+      },
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 0,
+          "root": [
+            106.2330904480188,
+            404
+          ],
+          "scale": 0.5211175763271587
+        },
+        {
+          "videoFrame": 16,
+          "root": [
+            109.33668163360416,
+            408
+          ],
+          "scale": 0.5020534653152784
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            107.4828498835486,
+            426
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            106.4828498835486,
+            424
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            106.4828498835486,
+            424
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            106.4828498835486,
+            438
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            110.9828498835486,
+            318
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            110.4828498835486,
+            336
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 88,
+          "root": [
+            110.9828498835486,
+            332
+          ],
+          "scale": 0.51953
+        },
+        {
+          "videoFrame": 96,
+          "root": [
+            109.4828498835486,
+            328
+          ],
+          "scale": 0.51953
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "intro.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 0,
+            "score": 0.9999999403953552,
+            "zoom": 0.9969535160599495,
+            "appliedScale": 0.5211175763271587
+          },
+          {
+            "videoFrame": 16,
+            "score": 0.7775210738182068,
+            "zoom": 1.0348101066760824,
+            "appliedScale": 0.5020534653152784
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4832538366317749,
+            "zoom": 0.6523136485018729,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.46215710043907166,
+            "zoom": 0.6930804408314467,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.45002031326293945,
+            "zoom": 0.6930804408314467,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.4574834406375885,
+            "zoom": 0.6412948368717737,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.4802595376968384,
+            "zoom": 1.0780598313637328,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.4773086905479431,
+            "zoom": 0.8188898735682589,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 88,
+            "score": 0.4835923910140991,
+            "zoom": 0.8078980631847924,
+            "appliedScale": 0.51953
+          },
+          {
+            "videoFrame": 96,
+            "score": 0.4816647469997406,
+            "zoom": 0.8078980631847924,
+            "appliedScale": 0.51953
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Head turns and torso lowers into zombie guard",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "JUMP_HEAVY_DOWN": {
+      "videoOrigin": {
+        "driveId": "19FvQrkBPuAKGr818tlRJ9h-9oG4OkgiC",
+        "videoSha256": "95c9ad881acd4bd638a18192e9969692979e3c5a42cf1baa252ace024cbe601d",
+        "selectedVideoFrames": [
+          56,
+          60,
+          64,
+          66,
+          67,
+          70,
+          74
+        ]
+      },
+      "mainIndex": 3,
+      "frames": [
+        {
+          "videoFrame": 56,
+          "root": [
+            118.5,
+            524
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            123.5,
+            518
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            113.0,
+            538
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 66,
+          "root": [
+            120.5,
+            338
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 67,
+          "root": [
+            212.5,
+            306
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 70,
+          "root": [
+            121.5,
+            311
+          ],
+          "scale": 0.53267
+        },
+        {
+          "videoFrame": 74,
+          "root": [
+            121.5,
+            342
+          ],
+          "scale": 0.53267
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "jH.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 56,
+            "score": 0.5220131874084473,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.5811725854873657,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.5471066236495972,
+            "zoom": 1.0587957714003624,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 66,
+            "score": 0.55012047290802,
+            "zoom": 1.326064841447264,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 67,
+            "score": 0.5092726945877075,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 70,
+            "score": 0.48729240894317627,
+            "zoom": 0.8078072980027177,
+            "appliedScale": 0.53267
+          },
+          {
+            "videoFrame": 74,
+            "score": 0.5782117247581482,
+            "zoom": 1.188537811109104,
+            "appliedScale": 0.53267
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "CANDIDATE_ONLY: shared jH downward phase, not an independently confirmed downward-heavy clip.",
+          "ZOOM_AND_EFFECTS: large size shifts and attached ring/limb ghosts.",
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Candidate downward phase of original jH overhead attack",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "VICTORY": {
+      "videoOrigin": {
+        "driveId": "1XV-3Vak6ozLlSHjZsIpj-uXFMpPsukaJ",
+        "videoSha256": "f6ae7d2dc1df38c1f459738a54d438a33a2f4a136342fb91b5779de2e62f4801",
+        "selectedVideoFrames": [
+          0,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          72,
+          84,
+          96
+        ]
+      },
+      "mainIndex": 6,
+      "frames": [
+        {
+          "videoFrame": 0,
+          "root": [
+            139.79498509123965,
+            339
+          ],
+          "scale": 0.3861694161775899
+        },
+        {
+          "videoFrame": 10,
+          "root": [
+            140.1875,
+            368
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            140.1875,
+            414
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 30,
+          "root": [
+            139.6875,
+            480
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            138.07410283574137,
+            528
+          ],
+          "scale": 0.38871000444191606
+        },
+        {
+          "videoFrame": 50,
+          "root": [
+            138.1875,
+            560
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 60,
+          "root": [
+            139.1875,
+            562
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            138.1875,
+            560
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 84,
+          "root": [
+            138.6875,
+            560
+          ],
+          "scale": 0.3848
+        },
+        {
+          "videoFrame": 96,
+          "root": [
+            138.1875,
+            562
+          ],
+          "scale": 0.3848
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "vitoria.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 0,
+            "score": 0.9999997615814209,
+            "zoom": 0.9964538461094492,
+            "appliedScale": 0.3861694161775899
+          },
+          {
+            "videoFrame": 10,
+            "score": 0.5866825580596924,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.5396098494529724,
+            "zoom": 1.0211040125479223,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 30,
+            "score": 0.6282808184623718,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.7212153077125549,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.38871000444191606
+          },
+          {
+            "videoFrame": 50,
+            "score": 0.48010024428367615,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 60,
+            "score": 0.48227444291114807,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.483161598443985,
+            "zoom": 0.6305,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 84,
+            "score": 0.47512292861938477,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.3848
+          },
+          {
+            "videoFrame": 96,
+            "score": 0.4840884208679199,
+            "zoom": 0.6305,
+            "appliedScale": 0.3848
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Body straightens and head tilts into victory posture",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "DEFEAT": {
+      "videoOrigin": {
+        "driveId": "19e2-bwMHORpsCdO56aD92uADZ6UXGzJo",
+        "videoSha256": "1d2700620bfd0e8f95b2a607b6ec17a7a1f4d635d773eb0bedc37305739e9655",
+        "selectedVideoFrames": [
+          24,
+          32,
+          40,
+          44,
+          48,
+          52,
+          56,
+          64,
+          80,
+          96
+        ]
+      },
+      "mainIndex": 6,
+      "frames": [
+        {
+          "videoFrame": 24,
+          "root": [
+            211.42785738087306,
+            460
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 32,
+          "root": [
+            200.42785738087306,
+            464
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 40,
+          "root": [
+            184.42310466393872,
+            470
+          ],
+          "scale": 0.29389758174700714
+        },
+        {
+          "videoFrame": 44,
+          "root": [
+            173.92785738087306,
+            468
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            170.42785738087306,
+            374
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 52,
+          "root": [
+            322.4278573808731,
+            258
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            549.9278573808731,
+            262
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            551.4278573808731,
+            262
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 80,
+          "root": [
+            550.4278573808731,
+            262
+          ],
+          "scale": 0.3001
+        },
+        {
+          "videoFrame": 96,
+          "root": [
+            325.4278573808731,
+            260
+          ],
+          "scale": 0.3001
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "derrota.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 24,
+            "score": 0.6426379680633545,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 32,
+            "score": 0.6838107705116272,
+            "zoom": 1.0382366302081223,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 40,
+            "score": 0.787320613861084,
+            "zoom": 1.0211040125479223,
+            "appliedScale": 0.29389758174700714
+          },
+          {
+            "videoFrame": 44,
+            "score": 0.5109866261482239,
+            "zoom": 0.9931974609914445,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.43101707100868225,
+            "zoom": 1.0455567880334133,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 52,
+            "score": 0.39877086877822876,
+            "zoom": 1.1295229126815234,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.38379326462745667,
+            "zoom": 0.7268932655583604,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.37313899397850037,
+            "zoom": 0.7264505899545871,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 80,
+            "score": 0.37181025743484497,
+            "zoom": 0.7264505899545871,
+            "appliedScale": 0.3001
+          },
+          {
+            "videoFrame": 96,
+            "score": 0.376674085855484,
+            "zoom": 0.7099403492738011,
+            "appliedScale": 0.3001
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Kneeling collapse and persistent defeated posture",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    },
+    "TAUNT": {
+      "videoOrigin": {
+        "driveId": "1-u5HfNSiS6nRDFzUCQiFFctKVZoTZt91",
+        "videoSha256": "48cf71b024a1a2070f091727bfb2a7053e89ca215220304132901bd54f89627d",
+        "selectedVideoFrames": [
+          8,
+          20,
+          28,
+          36,
+          48,
+          56,
+          64,
+          72,
+          84,
+          96
+        ]
+      },
+      "mainIndex": 4,
+      "frames": [
+        {
+          "videoFrame": 8,
+          "root": [
+            103.98599793443353,
+            402
+          ],
+          "scale": 0.5226977772828094
+        },
+        {
+          "videoFrame": 20,
+          "root": [
+            105.8139880952381,
+            386
+          ],
+          "scale": 0.51744
+        },
+        {
+          "videoFrame": 28,
+          "root": [
+            104.8139880952381,
+            386
+          ],
+          "scale": 0.51744
+        },
+        {
+          "videoFrame": 36,
+          "root": [
+            104.8139880952381,
+            394
+          ],
+          "scale": 0.51744
+        },
+        {
+          "videoFrame": 48,
+          "root": [
+            104.8139880952381,
+            404
+          ],
+          "scale": 0.51744
+        },
+        {
+          "videoFrame": 56,
+          "root": [
+            110.8139880952381,
+            404
+          ],
+          "scale": 0.51744
+        },
+        {
+          "videoFrame": 64,
+          "root": [
+            110.8139880952381,
+            402
+          ],
+          "scale": 0.51744
+        },
+        {
+          "videoFrame": 72,
+          "root": [
+            103.0179492886607,
+            400
+          ],
+          "scale": 0.5224929033626304
+        },
+        {
+          "videoFrame": 84,
+          "root": [
+            102.98599793443353,
+            400
+          ],
+          "scale": 0.5226977772828094
+        },
+        {
+          "videoFrame": 96,
+          "root": [
+            102.98599793443353,
+            402
+          ],
+          "scale": 0.5226977772828094
+        }
+      ],
+      "scaleEvidence": {
+        "method": "Uniform source-head template camera measurement plus visual comparison to canonical head anatomy; no body-height fitting",
+        "calibration": "tools/sprites/videos/p12-video-scale-draft.json",
+        "source": "provocacao.mp4",
+        "frameMeasurements": [
+          {
+            "videoFrame": 8,
+            "score": 0.9054736495018005,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5226977772828094
+          },
+          {
+            "videoFrame": 20,
+            "score": 0.44527092576026917,
+            "zoom": 1.317297230240307,
+            "appliedScale": 0.51744
+          },
+          {
+            "videoFrame": 28,
+            "score": 0.4494921565055847,
+            "zoom": 1.3627151206654988,
+            "appliedScale": 0.51744
+          },
+          {
+            "videoFrame": 36,
+            "score": 0.48183169960975647,
+            "zoom": 0.8321225678422643,
+            "appliedScale": 0.51744
+          },
+          {
+            "videoFrame": 48,
+            "score": 0.45133623480796814,
+            "zoom": 1.243418313388601,
+            "appliedScale": 0.51744
+          },
+          {
+            "videoFrame": 56,
+            "score": 0.46281754970550537,
+            "zoom": 0.6326666666666666,
+            "appliedScale": 0.51744
+          },
+          {
+            "videoFrame": 64,
+            "score": 0.4667089283466339,
+            "zoom": 0.8670704405356313,
+            "appliedScale": 0.51744
+          },
+          {
+            "videoFrame": 72,
+            "score": 0.8156160712242126,
+            "zoom": 0.9903292402057307,
+            "appliedScale": 0.5224929033626304
+          },
+          {
+            "videoFrame": 84,
+            "score": 0.9067972898483276,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5226977772828094
+          },
+          {
+            "videoFrame": 96,
+            "score": 0.8910377025604248,
+            "zoom": 0.9899410758734398,
+            "appliedScale": 0.5226977772828094
+          }
+        ]
+      },
+      "review": {
+        "status": "pending",
+        "findings": [
+          "manual mask inspection",
+          "anatomy scale confirmation",
+          "support tracking",
+          "transitions",
+          "semantic movement audit"
+        ],
+        "movementEvidence": "Head turn and raised beckoning claw before recovery",
+        "transitionsReviewed": false,
+        "supportReviewed": false,
+        "alphaReviewed": false
+      }
+    }
+  },
+  "reviewedSourceStates": [
+    "IDLE",
+    "COMBAT",
+    "WALK_FORWARD",
+    "WALK_BACK",
+    "LIGHT_JAB",
+    "CROUCH",
+    "RISE",
+    "JUMP",
+    "FALL",
+    "LAND",
+    "DEFENSE_CROUCH",
+    "DEFENSE_AIR"
+  ]
+}

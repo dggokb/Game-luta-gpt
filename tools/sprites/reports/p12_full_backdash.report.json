@@ -150,7 +150,7 @@
     "sha256": {
       "source": "6f46ea29cda6d35df19631afe4e1d68a98563f6c860579f01e6e7e4af603174d",
       "config": "12ef3258d5c28539f277e42f5609a569e835a3faaa4072b9e1426cb75ae4812e",
-      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+      "profile": "c0f056ac97841698238e1369abecf2641940b8091133be800059510647df75db"
     },
     "referenceSources": {
       "art/sprites/source/p12_full_backdash_original.png": "7c5eaf855aca288c29eec33bd2943ea2d462cb665bc13480825b8860f372c838"
