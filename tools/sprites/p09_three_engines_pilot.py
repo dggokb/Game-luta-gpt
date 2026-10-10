@@ -188,7 +188,7 @@ def audit(results):
     sys.path.insert(0, str(ROOT / "tools/sprites"))
     import harmony
     import auditoria
-    rows, problems = harmony.audit()
+    rows, problems = harmony.audit(only_characters={"p09"})
     p09_rows = [row for row in rows if row["character"] == "p09"]
     p09_problems = [p for p in problems if p.startswith("p09/")]
     notices = auditoria.audit("p09")
