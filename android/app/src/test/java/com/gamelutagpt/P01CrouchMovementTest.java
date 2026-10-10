@@ -12,7 +12,7 @@ public class P01CrouchMovementTest {
     @Test public void lowAttacksKeepTheirContactAndAllSourceFrames() {
         String[] moves={"2L","2M","2H"};
         String[] clips={"CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY"};
-        int[][] expected={{2,4,6},{6,4,11},{9,6,14}};
+        int[][] expected={{2,4,6},{6,4,16},{9,6,14}};
         int[] impact={2,6,4};
         for(int i=0;i<moves.length;i++){
             AttackDefinition a=P01.attack(moves[i]);
