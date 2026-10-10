@@ -42,6 +42,25 @@ def dims(img):
     x0,y0,x1,y1=bb(img)
     return (x1-x0,y1-y0)
 
+def check_intro_handoff():
+    # The real video source, not canvas sizes: right/left/top/feet of the
+    # last intro pose must meet the actual idle within ~2 authored pixels.
+    ix,iy,idle_x,idle_y=161,551,163,458
+    xs=calibration("INTRO_X")
+    ys=calibration("INTRO_Y")
+    ox=calibration("INTRO_OFFSET_X")
+    oy=calibration("INTRO_OFFSET_Y")
+    assert xs[0]<1.0 and ys[0]<1.0, "Early intro wasn't scaled down"
+    assert ys[0]<ys[2], "Intro frame 20 was not normalized"
+    b=bb(cell("intro",26))
+    idle=bb(cell("idle",0))
+    received=((b[0]-ix)*xs[-1]+ox[-1],(b[2]-ix)*xs[-1]+ox[-1],
+              (b[1]-iy)*ys[-1]+oy[-1],(b[3]-iy)*ys[-1]+oy[-1])
+    target=(idle[0]-idle_x,idle[2]-idle_x,idle[1]-idle_y,idle[3]-idle_y)
+    for got,wanted in zip(received,target):
+        assert abs(got-wanted)<2.5, (received,target)
+    print("Intro last silhouette aligns with real idle within 2.5px.")
+
 def preview():
     PREVIEW.mkdir(parents=True,exist_ok=True)
     idle=cell("idle",0)
@@ -82,6 +101,7 @@ def preview():
 
 def main():
     pack=json.loads(MANIFEST.read_text())
+    check_intro_handoff()
     h=pack["moves"]["H"]
     assert (h["startupFrames"],h["activeFrames"],h["recoveryFrames"])==(10,5,37)
     assert sum([h["startupFrames"],h["activeFrames"],h["recoveryFrames"]])==52
