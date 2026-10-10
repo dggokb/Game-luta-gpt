@@ -59,7 +59,7 @@ final class CombatConfig {
     /** Walking (or drifting in the air) away is slower, so retreating cannot outrun a chase. */
     float walkBackSpeed = 220f;
     float dashSpeed = 620f;
-    float backdashSpeed = 850f;
+    float backdashSpeed = 978f;
     int backdashFrames = 15;
     /** Visual retreat hop is shared by all fighters; ground collision remains unchanged. */
     float backdashHopHeight = 40f;
@@ -68,7 +68,7 @@ final class CombatConfig {
         float fraction = (backdashFrames - framesLeft) / (float)backdashFrames;
         return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
     }
-    float jumpSpeed = 780f;
+    float jumpSpeed = 820f;
     float superJumpSpeed = 1450f;
     float gravity = 1650f;
     float launchSpeed = 1450f;
