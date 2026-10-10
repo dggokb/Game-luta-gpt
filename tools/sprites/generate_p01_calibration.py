@@ -147,7 +147,8 @@ def main():
                ("player_base_jump", "player_base_fall_air", "player_base_backdash",
                 "player_base_hit_air", "player_base_defense_air",
                 "player_base_jump_light", "player_base_jump_medium",
-                "player_base_jump_heavy", "player_base_jump_heavy_down")), "Ground foot drift"
+                "player_base_jump_heavy", "player_base_jump_heavy_down",
+                "player_base_special_s2", "player_base_special_s4")), "Ground foot drift"
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(make_java(data))
