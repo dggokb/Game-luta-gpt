@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 90
-        versionName '0.90-p01-lm-air-pacing'
+        versionCode 91
+        versionName '0.91-p01-crouch-movement'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
