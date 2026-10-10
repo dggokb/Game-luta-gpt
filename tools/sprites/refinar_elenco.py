@@ -54,6 +54,17 @@ def canonical_state(value):
     return shorthand.get(normalized,value.upper())
 
 
+def split_jump_video(state, mapping, jump_mapping):
+    """Segment a full jump video; NEVER demand an apex in a fall-only file."""
+    if state=="JUMP":
+        return True
+    if state not in ("FALL","LAND"):
+        return False
+    return (mapping.get("status")=="ENCONTRADO" and
+            jump_mapping.get("status")=="ENCONTRADO" and
+            mapping["files"][0]==jump_mapping["files"][0])
+
+
 def character_pack_id(character):
     return "player_base" if character=="p01" else character
 
@@ -150,6 +161,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
     videos=e.match_videos(videos_dir,requested) if videos_dir else {
         state:{"status":"SEM_VIDEO_LOCAL","files":[]} for state in requested
     }
+    jump_mapping=e.match_videos(videos_dir,["JUMP"])["JUMP"] if videos_dir else {}
     checks={}
     idle_video=None
     idle_packed=None
@@ -216,7 +228,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         if matches["status"]=="ENCONTRADO":
             meta,trace=get_video(matches["files"][0])
             if meta.get("status")=="EXTRAIDO":
-                if state in ("JUMP","FALL","LAND"):
+                if split_jump_video(state,matches,jump_mapping):
                     phase=e.jump_phase(trace,state)
                     if phase is None:
                         entry["video"]={**matches,"analise":{
