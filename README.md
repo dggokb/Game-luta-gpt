@@ -320,3 +320,10 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - O botão mostra o tempo restante; depois fica "USADO". Os botões **VIDA P1 / VIDA CPU**
   também recarregam o Overdrive (novo round no treino).
 - **DEMO 87** mostra tudo isso. A CPU ainda não usa o Overdrive.
+
+**Build corrigido do H:** o commit automático de correção de transparência
+altera `player_base_heavy_straight.png` depois que a compilação inicial inicia.
+Este commit de sincronização garante que o próximo APK inclua a arte atualizada.
+O resultado final deve ser conferido visualmente no aparelho; a varredura corrige
+apenas regiões internas transparentes detectáveis e não garante cobrir todos os
+defeitos de desenho.
