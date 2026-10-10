@@ -207,6 +207,32 @@ class GeometricScaleProofTest(unittest.TestCase):
                         "columns":1,"pixelScale":0}}))
             self.assertEqual([],geo.read_sprite_samples(root,pack,"DASH"))
 
+    def test_frozen_atlas_is_detected_against_authored_motion(self):
+        def actor(pose):
+            a=np.zeros((130,170,4),dtype=np.uint8)
+            a[12:110,62:103,:3]=(110,150,205)
+            a[12:110,62:103,3]=255
+            x,y=[(0,0),(28,65),(5,40),(28,82),(46,34),(0,63)][pose]
+            a[y:y+16,x:x+58,:3]=(230,65,40)
+            a[y:y+16,x:x+58,3]=255
+            return a
+        video=[actor(i) for i in range(6)]
+        frozen=[actor(0) for _ in range(6)]
+        result=geo.check_pose_progression(video,frozen)
+        self.assertEqual("SUSPEITA_CLIP_CONGELADO",result["status"],result)
+        self.assertGreaterEqual(result["poses_distintas_video"],3)
+        # A legitimate static source held in the atlas is not a defect.
+        static=geo.check_pose_progression(frozen,frozen)
+        self.assertNotEqual("SUSPEITA_CLIP_CONGELADO",static["status"])
+        # Distinct exported poses are not automatically graded "perfect";
+        # they merely avoid being flagged as frozen.
+        moving=geo.check_pose_progression(video,video)
+        self.assertNotEqual("SUSPEITA_CLIP_CONGELADO",moving["status"])
+        self.assertEqual("INCONCLUSIVO",geo.check_pose_progression(
+            video[:2],frozen[:2])["status"])
+        self.assertEqual("INCONCLUSIVO",geo.check_pose_progression(
+            video,[np.zeros_like(actor(0))]*6)["status"])
+
     def test_corrupted_or_invalid_rgba_fails_closed(self):
         self.assertEqual("INCONCLUSIVO",
             geo.estimate_pair(self.base,self.base[:,:,:3])["status"])
