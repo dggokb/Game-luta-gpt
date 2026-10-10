@@ -31,6 +31,16 @@ STATE_DEPENDENCIES={
 }
 
 
+STATE_SHORTCUTS={
+    "2L":"CROUCH_LIGHT","2M":"CROUCH_MEDIUM","2H":"CROUCH_HEAVY",
+    "L":"LIGHT_JAB","M":"MEDIUM_KICK","H":"HEAVY_STRAIGHT",
+    "jL":"JUMP_LIGHT","jM":"JUMP_MEDIUM","jH":"JUMP_HEAVY",
+    "jH_baixo":"JUMP_HEAVY_DOWN",
+}
+def canonical_state(value):
+    return STATE_SHORTCUTS.get(value,value.upper())
+
+
 def character_pack_id(character):
     return "player_base" if character=="p01" else character
 
@@ -61,7 +71,8 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
     pack, location=manifest(root,character)
     calibration=calibration_info(root,character)
     all_states=list(pack.get("animations",{})) if pack else []
-    requested=list(dict.fromkeys(states or all_states or ["IDLE"]))
+    requested=list(dict.fromkeys(
+        [canonical_state(s) for s in states] if states else all_states or ["IDLE"]))
     missing=sorted(EXPECTED_CORE-set(all_states)) if pack else sorted(EXPECTED_CORE)
     if states and pack:
         missing=sorted(set(states)-set(all_states))
@@ -113,10 +124,20 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         if matches["status"]=="ENCONTRADO":
             meta,trace=get_video(matches["files"][0])
             if meta.get("status")=="EXTRAIDO":
-                videoh=idle_video.get("medianas",{}).get("altura",0) if idle_video else 0
-                video_stats=e.metrics(trace,videoh or 1,state)
-                entry["video"]={**matches,"analise":video_stats}
-                entry["proporcao_video"]=e.compare_body(idle_video or {},video_stats)
+                if state in ("JUMP","FALL","LAND"):
+                    phase=e.jump_phase(trace,state)
+                    if phase is None:
+                        entry["video"]={**matches,"analise":{
+                            "status":"INCONCLUSIVO",
+                            "motivo":"salto no vídeo sem ápice e fase de descida confiáveis"}}
+                        trace=[]
+                    else:
+                        trace=phase
+                if trace:
+                    videoh=idle_video.get("medianas",{}).get("altura",0) if idle_video else 0
+                    video_stats=e.metrics(trace,videoh or 1,state)
+                    entry["video"]={**matches,"analise":video_stats}
+                    entry["proporcao_video"]=e.compare_body(idle_video or {},video_stats)
             else:
                 entry["video"]={**matches,"analise":meta}
         entry["evidencias_suficientes"]=bool(
