@@ -1,0 +1,60 @@
+{
+  "id": "p12_full_combat",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_combat_sr2x.png",
+  "sourceNote": "P12 articulated COMBAT, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 1
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 258,
+    "frameHeight": 443,
+    "rootX": 129,
+    "rootY": 428,
+    "columns": 4,
+    "frameCount": 1,
+    "cropOffset": [
+      127,
+      48
+    ],
+    "decodedBytes": {
+      "canonical": 4194304,
+      "packed": 1828704
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "5341c54c6e10918cef71c704afeccc3ca9e0494a76cbc3481594b66f9500c526",
+      "config": "452f5cbec8e8ffa02bcd4ef5e66e6048e556e5fe0b261a1a81e1dd48d754a72c",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_combat_original.png": "57d52b2a55e516e5511addf8e1eaaf5e116c50e57b175f804ee446854a2d6e71"
+    }
+  }
+}

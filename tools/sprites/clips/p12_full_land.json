@@ -1,0 +1,22 @@
+{
+  "id": "p12_full_land",
+  "javaName": "P12_FULL_LAND",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_full_land_sr2x.png",
+  "sourceReferences": [
+    "art/sprites/source/p12_full_land_original.png"
+  ],
+  "output": "android/app/src/main/res/drawable-nodpi/p12_full_land.png",
+  "report": "tools/sprites/reports/p12_full_land.report.json",
+  "preview": "android/app/build/sprite-review/p12_full_land.png",
+  "expectedFrames": 6,
+  "columns": 4,
+  "segmentation": "prepared-grid",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "rootMode": "authored",
+  "pixelScale": 2,
+  "sourceNote": "P12 articulated LAND, native P12 ink, 4x SR inference -> 2x atlas"
+}

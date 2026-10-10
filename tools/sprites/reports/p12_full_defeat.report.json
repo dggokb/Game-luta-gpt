@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_defeat",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_defeat_sr2x.png",
+  "sourceNote": "P12 articulated DEFEAT, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        112,
+        112,
+        369,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 36429
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        97,
+        129,
+        419,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 37060
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        74,
+        162,
+        441,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 37674
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        62,
+        195,
+        451,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 38236
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 415,
+    "frameHeight": 443,
+    "rootX": 206,
+    "rootY": 428,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      50,
+      48
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 8824560
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "3eef87ecd32726b46ba89ab0d6f26c27eb090c0463fbfc5211f118e2fadd230e",
+      "config": "70f3e77f7ae424b423056b5375608538d970fc5fddfde05d49aced1a1b720f99",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_defeat_original.png": "6b0aa617023ab28daba0f499e1c0d5e459fc77e034bd5dca5eadabf034d074bf"
+    }
+  }
+}

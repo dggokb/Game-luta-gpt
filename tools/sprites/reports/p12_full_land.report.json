@@ -1,0 +1,115 @@
+{
+  "id": "p12_full_land",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_land_sr2x.png",
+  "sourceNote": "P12 articulated LAND, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        113,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 39592
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        102,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 40743
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        139,
+        91,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 41900
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        139,
+        81,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43023
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        139,
+        70,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44170
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 258,
+    "frameHeight": 443,
+    "rootX": 129,
+    "rootY": 428,
+    "columns": 4,
+    "frameCount": 6,
+    "cropOffset": [
+      127,
+      48
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 3657408
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "bb276a46d2330534bf092f678cd343636179ab22c14508b7327b8720809e844c",
+      "config": "8f401df8d24ae91c81a137a0de08c3248e95773c528c32d412d2e2fb6ca3dab5",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_land_original.png": "c13d520a6bf50fdb1e33d733bdf84d090d2f8ca043e648580853364587896e6b"
+    }
+  }
+}

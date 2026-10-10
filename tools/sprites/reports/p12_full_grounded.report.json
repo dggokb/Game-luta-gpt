@@ -1,0 +1,93 @@
+{
+  "id": "p12_full_grounded",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_grounded_sr2x.png",
+  "sourceNote": "P12 articulated GROUNDED, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        60,
+        220,
+        452,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38779
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        62,
+        216,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38334
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 417,
+    "frameHeight": 287,
+    "rootX": 208,
+    "rootY": 272,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      48,
+      204
+    ],
+    "decodedBytes": {
+      "canonical": 4194304,
+      "packed": 1914864
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "8e683c062eee8ed6fddaab43f7d953112def192618da630afae0a5d2fdc48d13",
+      "config": "6f7a4b0332962dd091fce2edfd0de93ce838981e3ae3ef415b967681748c3112",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_grounded_original.png": "047fac6688db591804a32042d1adfd76ebb1e564f263b28ddbbc12de3bc904ea"
+    }
+  }
+}

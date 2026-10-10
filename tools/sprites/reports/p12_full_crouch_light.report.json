@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_crouch_light",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_crouch_light_sr2x.png",
+  "sourceNote": "P12 articulated CROUCH_LIGHT, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        127,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38108
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        141,
+        123,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 37984
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        142,
+        121,
+        387,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 35535
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        141,
+        121,
+        386,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 35778
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        141,
+        122,
+        384,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 36498
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        141,
+        123,
+        381,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 37523
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        140,
+        124,
+        377,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38325
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        125,
+        375,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38716
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        126,
+        374,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38580
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        127,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38108
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 272,
+    "frameHeight": 381,
+    "rootX": 129,
+    "rootY": 366,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      127,
+      110
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 4974336
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "adb2dcede24b60714de417af60f02ec896b64f4169654a7f284ec3f39e076749",
+      "config": "74a3369c865b6985072a3c641cb9541dfe38f15f27dab219f4a7bf68c5116c6c",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_crouch_light_original.png": "7b1c029b03efed2b88942d2d447bb1f659faffd51e64b1a9e8779d8a1cd4caa6"
+    }
+  }
+}

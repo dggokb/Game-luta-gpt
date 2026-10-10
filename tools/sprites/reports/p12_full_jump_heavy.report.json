@@ -1,0 +1,126 @@
+{
+  "id": "p12_full_jump_heavy",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_jump_heavy_sr2x.png",
+  "sourceNote": "P12 articulated JUMP_HEAVY, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        27,
+        373,
+        447
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        141,
+        27,
+        381,
+        447
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 45982
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        145,
+        27,
+        395,
+        446
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 42560
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        147,
+        27,
+        401,
+        445
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 40118
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        145,
+        27,
+        395,
+        446
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 42560
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        141,
+        27,
+        381,
+        447
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 45982
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        139,
+        27,
+        373,
+        447
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 286,
+    "frameHeight": 461,
+    "rootX": 129,
+    "rootY": 460,
+    "columns": 4,
+    "frameCount": 7,
+    "cropOffset": [
+      127,
+      16
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 4219072
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d90c084801a04a7b08e8ff340e7869fd429d8e5c87b80884e73cc39377cdb9cc",
+      "config": "e9d1400660b25e8a6830de9cba504276f8438e2ff531339aa58650916d50e6e6",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_jump_heavy_original.png": "fbd10024fa2df63be4f5ba6cfcf4db8e70a81952ab5188c1af5e8a0141918785"
+    }
+  }
+}

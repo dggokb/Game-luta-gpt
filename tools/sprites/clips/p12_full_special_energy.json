@@ -1,0 +1,22 @@
+{
+  "id": "p12_full_special_energy",
+  "javaName": "P12_FULL_SPECIAL_ENERGY",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_full_special_energy_sr2x.png",
+  "sourceReferences": [
+    "art/sprites/source/p12_full_special_energy_original.png"
+  ],
+  "output": "android/app/src/main/res/drawable-nodpi/p12_full_special_energy.png",
+  "report": "tools/sprites/reports/p12_full_special_energy.report.json",
+  "preview": "android/app/build/sprite-review/p12_full_special_energy.png",
+  "expectedFrames": 10,
+  "columns": 4,
+  "segmentation": "prepared-grid",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "rootMode": "authored",
+  "pixelScale": 2,
+  "sourceNote": "P12 articulated SPECIAL_ENERGY, native P12 ink, 4x SR inference -> 2x atlas"
+}

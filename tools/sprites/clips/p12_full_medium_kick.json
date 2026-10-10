@@ -1,0 +1,22 @@
+{
+  "id": "p12_full_medium_kick",
+  "javaName": "P12_FULL_MEDIUM_KICK",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_full_medium_kick_sr2x.png",
+  "sourceReferences": [
+    "art/sprites/source/p12_full_medium_kick_original.png"
+  ],
+  "output": "android/app/src/main/res/drawable-nodpi/p12_full_medium_kick.png",
+  "report": "tools/sprites/reports/p12_full_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/p12_full_medium_kick.png",
+  "expectedFrames": 10,
+  "columns": 4,
+  "segmentation": "prepared-grid",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "rootMode": "authored",
+  "pixelScale": 2,
+  "sourceNote": "P12 articulated MEDIUM_KICK, native P12 ink, 4x SR inference -> 2x atlas"
+}

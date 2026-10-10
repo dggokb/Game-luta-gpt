@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_walk_back",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_walk_back_sr2x.png",
+  "sourceNote": "P12 articulated WALK_BACK, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45550
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        145,
+        58,
+        366,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46599
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        143,
+        56,
+        363,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 46765
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        143,
+        56,
+        363,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 46765
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        145,
+        58,
+        366,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46599
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45550
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        133,
+        58,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43453
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        131,
+        56,
+        381,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 41718
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        131,
+        56,
+        381,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 41718
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        133,
+        58,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43453
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 275,
+    "frameHeight": 447,
+    "rootX": 138,
+    "rootY": 432,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      118,
+      44
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5900400
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c2ab53391a04d647df27a41ca604153ee6a070f76c35f99d91e56f5d3f9de99b",
+      "config": "70f42cb2f552748578752726c9396ad9c83b63952414b309ddf91f8faaf3b616",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_walk_back_original.png": "e3ab493e7f918d18d4f5577ed11638375817fd04735b12e4a5fb2d7dfe9a8807"
+    }
+  }
+}

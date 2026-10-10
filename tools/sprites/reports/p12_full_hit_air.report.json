@@ -1,0 +1,115 @@
+{
+  "id": "p12_full_hit_air",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_hit_air_sr2x.png",
+  "sourceNote": "P12 articulated HIT_AIR, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        137,
+        44,
+        371,
+        464
+      ],
+      "minimumMargin": 44,
+      "opaquePixels": 44255
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        131,
+        30,
+        369,
+        449
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 41839
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        131,
+        30,
+        369,
+        449
+      ],
+      "minimumMargin": 30,
+      "opaquePixels": 41839
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        137,
+        44,
+        371,
+        464
+      ],
+      "minimumMargin": 44,
+      "opaquePixels": 44255
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 266,
+    "frameHeight": 473,
+    "rootX": 137,
+    "rootY": 458,
+    "columns": 4,
+    "frameCount": 6,
+    "cropOffset": [
+      119,
+      18
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 4026176
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "102114f04f78ac40c305b9271cda506d1010f2d611ff4489b0ae5d688b2b6614",
+      "config": "30f55016b692601d886ee7a431864c4038d891b738dfe79fdb6789e5471ab643",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_hit_air_original.png": "56999658a3db99397c732fd34d8bd3fdd06cf3d408edd6d8cae32872c156f671"
+    }
+  }
+}

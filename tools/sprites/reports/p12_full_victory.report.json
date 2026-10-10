@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_victory",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_victory_sr2x.png",
+  "sourceNote": "P12 articulated VICTORY, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45970
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        139,
+        57,
+        374,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 45283
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        138,
+        57,
+        375,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43549
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        138,
+        57,
+        375,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 42157
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        138,
+        57,
+        375,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 42157
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        138,
+        57,
+        375,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43549
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        57,
+        374,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 45283
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45970
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 261,
+    "frameHeight": 447,
+    "rootX": 130,
+    "rootY": 432,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      126,
+      44
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5600016
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f62a8238bea60ea76ca157ec58774e0acf408ae647491868a84ada883b7255d8",
+      "config": "98c34f00cf55917000386a5ce68878bedb0fec13ef8e2b48318478f30acfef0a",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_victory_original.png": "15d753dfed7f2e0548ed8c858ccdf921af36289bf1c10e3877476ff0c01dd5c4"
+    }
+  }
+}

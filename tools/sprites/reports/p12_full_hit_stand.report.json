@@ -1,0 +1,148 @@
+{
+  "id": "p12_full_hit_stand",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_hit_stand_sr2x.png",
+  "sourceNote": "P12 articulated HIT_STAND, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44988
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        138,
+        59,
+        372,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43552
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        133,
+        59,
+        371,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 42144
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        131,
+        59,
+        371,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 41509
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        133,
+        59,
+        371,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 42144
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        138,
+        59,
+        372,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43552
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44988
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 266,
+    "frameHeight": 443,
+    "rootX": 137,
+    "rootY": 428,
+    "columns": 4,
+    "frameCount": 9,
+    "cropOffset": [
+      119,
+      48
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5656224
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "94e95e2f554116ab45a92e5130f932db984fbf4a11426c85f3b3b153d73b923b",
+      "config": "e31fe3527d5ece717d36b52874ec97a994498cd39f112ecd4f24b75879f7ea61",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_hit_stand_original.png": "7ce80055ad8d390b05aa0e3c19d2bc95c4fc7e74ac546d49eb76091cfa94bc77"
+    }
+  }
+}

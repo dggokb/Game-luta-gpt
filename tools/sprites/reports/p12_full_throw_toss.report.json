@@ -1,0 +1,115 @@
+{
+  "id": "p12_full_throw_toss",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_throw_toss_sr2x.png",
+  "sourceNote": "P12 articulated THROW_TOSS, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        141,
+        59,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45310
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        142,
+        56,
+        391,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 41350
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        142,
+        56,
+        391,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 41350
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        141,
+        59,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45310
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 276,
+    "frameHeight": 447,
+    "rootX": 129,
+    "rootY": 432,
+    "columns": 4,
+    "frameCount": 6,
+    "cropOffset": [
+      127,
+      44
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 3947904
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f0ed4fb2bfe58f3852e9f726bf33c3236a22d5dc4b6874ca542f9418e003e18d",
+      "config": "1a3a51c4853c4d730dd7023228c2b3154dde64068c929e54350666ed525abdc7",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_throw_toss_original.png": "ff881fb3b3e4a24fcdda3ce486ff143ce111735ebaaccab848ca42be7be813ea"
+    }
+  }
+}

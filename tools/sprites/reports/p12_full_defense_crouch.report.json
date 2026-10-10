@@ -1,0 +1,126 @@
+{
+  "id": "p12_full_defense_crouch",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_defense_crouch_sr2x.png",
+  "sourceNote": "P12 articulated DEFENSE_CROUCH, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        127,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38108
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        123,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 37644
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        138,
+        119,
+        372,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 36234
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        138,
+        118,
+        372,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 35440
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        138,
+        119,
+        372,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 36234
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        123,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 37644
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        139,
+        127,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38108
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 259,
+    "frameHeight": 385,
+    "rootX": 130,
+    "rootY": 370,
+    "columns": 4,
+    "frameCount": 7,
+    "cropOffset": [
+      126,
+      106
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 3190880
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "15691fc42607425f9769db88775ffacc723f1e9cc8b3a390cc458e5b47cc6519",
+      "config": "e4894c4048257b3f48f2dc1554b954a2b3e101c9f811063bfdde7e67d1b8bdf2",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_defense_crouch_original.png": "57b6e56e8cc3105d281001676dbe05940f45cc18f55780bd0224f49dd54ded0b"
+    }
+  }
+}

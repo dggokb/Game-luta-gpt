@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_taunt",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_taunt_sr2x.png",
+  "sourceNote": "P12 articulated TAUNT, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        58,
+        374,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 48284
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        138,
+        57,
+        376,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 48697
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        139,
+        56,
+        375,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 47422
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        139,
+        56,
+        374,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45471
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        56,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 42973
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        139,
+        56,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 40941
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        57,
+        372,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 40714
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 42596
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 263,
+    "frameHeight": 447,
+    "rootX": 130,
+    "rootY": 432,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      126,
+      44
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5642928
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c7cf4e884355465ce191e5b11baf5f3846fe8dbee1343dc15ce4dfe5f8287fa0",
+      "config": "bba115da70cd7eae605878aecdf6478cbf25ae87bb24465a0e81733e3f664b94",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_taunt_original.png": "2497ddfbe11f4428024e99bb97d1f317ae813ec78f29949bef6b679f796bebff"
+    }
+  }
+}

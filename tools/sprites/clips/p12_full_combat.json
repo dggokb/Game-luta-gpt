@@ -1,0 +1,22 @@
+{
+  "id": "p12_full_combat",
+  "javaName": "P12_FULL_COMBAT",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_full_combat_sr2x.png",
+  "sourceReferences": [
+    "art/sprites/source/p12_full_combat_original.png"
+  ],
+  "output": "android/app/src/main/res/drawable-nodpi/p12_full_combat.png",
+  "report": "tools/sprites/reports/p12_full_combat.report.json",
+  "preview": "android/app/build/sprite-review/p12_full_combat.png",
+  "expectedFrames": 1,
+  "columns": 4,
+  "segmentation": "prepared-grid",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "rootMode": "authored",
+  "pixelScale": 2,
+  "sourceNote": "P12 articulated COMBAT, native P12 ink, 4x SR inference -> 2x atlas"
+}

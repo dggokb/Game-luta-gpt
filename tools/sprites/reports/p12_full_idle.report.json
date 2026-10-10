@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_idle",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_idle_sr2x.png",
+  "sourceNote": "P12 articulated IDLE, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45899
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46149
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        139,
+        57,
+        373,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 46030
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45948
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45477
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45327
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 45052
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        58,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45146
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45297
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 258,
+    "frameHeight": 445,
+    "rootX": 129,
+    "rootY": 430,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      127,
+      46
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5510880
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f3e4dcd5d9bfb7cd07ac2b939a9fd2bf6077cc6b43d0c33fc776dc32797bad61",
+      "config": "595a97b0f373757bd495eb24e5828c224d6a2929d27653dab9a4fe0633434941",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_idle_original.png": "c534735ad2855d57486c4e1a9609dc50a549a6f7b8631e2fa1685b73b677e48d"
+    }
+  }
+}

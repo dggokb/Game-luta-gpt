@@ -1,0 +1,148 @@
+{
+  "id": "p12_full_ultra_beam",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_ultra_beam_sr2x.png",
+  "sourceNote": "P12 articulated ULTRA_BEAM, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        59,
+        375,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46572
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        141,
+        58,
+        387,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45325
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        141,
+        58,
+        395,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 42064
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        142,
+        57,
+        397,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 40549
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        141,
+        58,
+        395,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 42064
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        141,
+        58,
+        387,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45325
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        59,
+        375,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46572
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 283,
+    "frameHeight": 445,
+    "rootX": 129,
+    "rootY": 430,
+    "columns": 4,
+    "frameCount": 9,
+    "cropOffset": [
+      127,
+      46
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 6044880
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "bcaeb33a36d10209849b717aa9563264245e6b2d9d7bb8aae3825c0a63ba4e9a",
+      "config": "a7834d5d44902ca684293bc24bca514c282947ff6d0419eaf9a16f6038d93a73",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_ultra_beam_original.png": "20211788b7686eafa66bd6e308bb09b9cd85fe7e77f7e3ffd923ce3de5be6edf"
+    }
+  }
+}

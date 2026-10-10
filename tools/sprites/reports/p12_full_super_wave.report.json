@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_super_wave",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_super_wave_sr2x.png",
+  "sourceNote": "P12 articulated SUPER_WAVE, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        139,
+        59,
+        374,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46398
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        140,
+        59,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46511
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        141,
+        58,
+        387,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45325
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        141,
+        58,
+        394,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43156
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        142,
+        58,
+        397,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 41256
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        142,
+        57,
+        397,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 40549
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        141,
+        58,
+        394,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43156
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        140,
+        59,
+        379,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 46511
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 283,
+    "frameHeight": 445,
+    "rootX": 129,
+    "rootY": 430,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      127,
+      46
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 6044880
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c4517ad9e7007b676610c2b64b492b672f11424e98aabce72a1a1073788e8001",
+      "config": "a9b58251866622d5f09dd6c21d174e4855ca67a872b32fc1a4d20598c1c6f7e1",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_super_wave_original.png": "f24758e0636d9cee6216f80f50e14b4b679c1d97314db69d86d2b59fe04b08fc"
+    }
+  }
+}

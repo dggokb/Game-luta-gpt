@@ -1,0 +1,126 @@
+{
+  "id": "p12_full_knockdown",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_knockdown_sr2x.png",
+  "sourceNote": "P12 articulated KNOCKDOWN, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        105,
+        115,
+        376,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 36588
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        85,
+        143,
+        428,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 37352
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        67,
+        180,
+        449,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 38015
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        62,
+        218,
+        453,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 38605
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 415,
+    "frameHeight": 443,
+    "rootX": 206,
+    "rootY": 428,
+    "columns": 4,
+    "frameCount": 7,
+    "cropOffset": [
+      50,
+      48
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 5883040
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "95adba6ef6597fc5d344929ca7c36912d1905dcdefd73a2100c1a7337b82535b",
+      "config": "c4f2a0b37d57ad7121851a72c251f2eb6e19c227fd401f96a842ad83cd684bdf",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_knockdown_original.png": "8ddc839acb6c159ec9de8f9f3fe4b9b8489f351f24f80798ba8b0f6ec83f22ff"
+    }
+  }
+}

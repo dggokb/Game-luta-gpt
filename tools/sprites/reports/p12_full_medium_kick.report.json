@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_medium_kick",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_medium_kick_sr2x.png",
+  "sourceNote": "P12 articulated MEDIUM_KICK, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        140,
+        53,
+        385,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44645
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        141,
+        51,
+        391,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44636
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        141,
+        51,
+        391,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44557
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        141,
+        51,
+        389,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44562
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        141,
+        53,
+        387,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 44638
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        140,
+        53,
+        383,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 44671
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        139,
+        55,
+        379,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 44899
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        57,
+        376,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45375
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 276,
+    "frameHeight": 451,
+    "rootX": 129,
+    "rootY": 436,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      127,
+      40
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5974848
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "71bed61d957cb6ef72bd94271b781e265966f48084ffcc6323cd269733fc5287",
+      "config": "67b6ced28309a5428727f57a83d3eb0c53736a02e19ff13c455b8e707e376abd",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_medium_kick_original.png": "6a0f9661be5491e476fba18e797a8a6684b43384e2701be1a828ff299172ca65"
+    }
+  }
+}

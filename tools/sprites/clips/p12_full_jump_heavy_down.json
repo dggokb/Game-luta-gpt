@@ -1,0 +1,22 @@
+{
+  "id": "p12_full_jump_heavy_down",
+  "javaName": "P12_FULL_JUMP_HEAVY_DOWN",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_full_jump_heavy_down_sr2x.png",
+  "sourceReferences": [
+    "art/sprites/source/p12_full_jump_heavy_down_original.png"
+  ],
+  "output": "android/app/src/main/res/drawable-nodpi/p12_full_jump_heavy_down.png",
+  "report": "tools/sprites/reports/p12_full_jump_heavy_down.report.json",
+  "preview": "android/app/build/sprite-review/p12_full_jump_heavy_down.png",
+  "expectedFrames": 7,
+  "columns": 4,
+  "segmentation": "prepared-grid",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "rootMode": "authored",
+  "pixelScale": 2,
+  "sourceNote": "P12 articulated JUMP_HEAVY_DOWN, native P12 ink, 4x SR inference -> 2x atlas"
+}

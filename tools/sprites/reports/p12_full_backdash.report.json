@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_backdash",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_backdash_sr2x.png",
+  "sourceNote": "P12 articulated BACKDASH, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        49,
+        371,
+        469
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 41082
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        147,
+        43,
+        356,
+        463
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 38871
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        145,
+        37,
+        342,
+        457
+      ],
+      "minimumMargin": 37,
+      "opaquePixels": 37765
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        145,
+        33,
+        344,
+        453
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 38401
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        143,
+        32,
+        361,
+        453
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 40447
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        134,
+        32,
+        375,
+        453
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 41985
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        129,
+        33,
+        383,
+        453
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 41895
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        129,
+        37,
+        384,
+        457
+      ],
+      "minimumMargin": 37,
+      "opaquePixels": 41784
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        132,
+        43,
+        380,
+        463
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 41955
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        49,
+        371,
+        469
+      ],
+      "minimumMargin": 43,
+      "opaquePixels": 41082
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 281,
+    "frameHeight": 461,
+    "rootX": 140,
+    "rootY": 456,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      116,
+      20
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 6217968
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "6f46ea29cda6d35df19631afe4e1d68a98563f6c860579f01e6e7e4af603174d",
+      "config": "12ef3258d5c28539f277e42f5609a569e835a3faaa4072b9e1426cb75ae4812e",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_backdash_original.png": "7c5eaf855aca288c29eec33bd2943ea2d462cb665bc13480825b8860f372c838"
+    }
+  }
+}

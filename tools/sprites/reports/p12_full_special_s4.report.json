@@ -1,0 +1,159 @@
+{
+  "id": "p12_full_special_s4",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_special_s4_sr2x.png",
+  "sourceNote": "P12 articulated SPECIAL_S4, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 10
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        141,
+        55,
+        387,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43890
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        143,
+        53,
+        393,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 39873
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        143,
+        53,
+        393,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 40200
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        143,
+        55,
+        391,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 41889
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        142,
+        55,
+        389,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 43246
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        141,
+        55,
+        385,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 44449
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        140,
+        57,
+        381,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45086
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        139,
+        57,
+        377,
+        478
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 45566
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        139,
+        59,
+        373,
+        479
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 45255
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 278,
+    "frameHeight": 449,
+    "rootX": 129,
+    "rootY": 434,
+    "columns": 4,
+    "frameCount": 10,
+    "cropOffset": [
+      127,
+      42
+    ],
+    "decodedBytes": {
+      "canonical": 12582912,
+      "packed": 5991456
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "434d01c0317bb075d4a782b12fd1b3b00b562f4c70e531476d533f98e6984ca7",
+      "config": "88c28a7c050729692c732fa1ee60c5cb9e3136f2aed828962ba44d3aca50069c",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_special_s4_original.png": "b7c97cc7c8fd378a38b44798d639e38eddfecbe3e69fb9374140ab1ff6a52e55"
+    }
+  }
+}

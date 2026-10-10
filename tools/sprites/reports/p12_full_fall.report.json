@@ -1,0 +1,115 @@
+{
+  "id": "p12_full_fall",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_full_fall_sr2x.png",
+  "sourceNote": "P12 articulated FALL, native P12 ink, 4x SR inference -> 2x atlas",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
+    "columns": 4,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        133,
+        27,
+        379,
+        445
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 42243
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        133,
+        27,
+        379,
+        454
+      ],
+      "minimumMargin": 27,
+      "opaquePixels": 42326
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        133,
+        28,
+        379,
+        455
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 42176
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        135,
+        17,
+        381,
+        443
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 42066
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        135,
+        26,
+        381,
+        452
+      ],
+      "minimumMargin": 26,
+      "opaquePixels": 41941
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        135,
+        35,
+        381,
+        461
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 41812
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 272,
+    "frameHeight": 471,
+    "rootX": 135,
+    "rootY": 470,
+    "columns": 4,
+    "frameCount": 6,
+    "cropOffset": [
+      121,
+      6
+    ],
+    "decodedBytes": {
+      "canonical": 8388608,
+      "packed": 4099584
+    },
+    "pixelScale": 2
+  },
+  "pixelScale": 2,
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d8e1c0763a8b87593c3a79e7d9ad14de74642ce39eb0853498f3a7f83438b61a",
+      "config": "341f2126f2d561f38d27d829e5c1078fc5c6917f20f34f32f71a5c54b23060ac",
+      "profile": "71d3b5936bca84d5b98232b8f6b45978fa89e58f26c8c7bc1e5ddf47e4c0e904"
+    },
+    "referenceSources": {
+      "art/sprites/source/p12_full_fall_original.png": "57e59ee69c97061ae522fc3b454a311f41c9903c93e63116839068467d6ac9ea"
+    }
+  }
+}
