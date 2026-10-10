@@ -92,15 +92,13 @@ final class SpriteFighterRenderer {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,
                 P01_IDLE_SCALE,P01_IDLE_SCALE,255);
         } else if(p01 && SpriteStates.DASH.equals(motion.clip)) {
-            drawAtlas(canvas,anim.atlas,frame,x,baseY,
-                P01_DASH_X,P01_DASH_Y,255);
+            // The running pose can extend its limbs, but never enlarges
+            // the fighter relative to the canonical idle body.
+            drawP01Calibrated(canvas,anim,frame,x,baseY,255);
         } else if(p01 && SpriteStates.VICTORY.equals(motion.clip)) {
-            // Skip the source's walking frames; a minor foot-root adjustment
-            // keeps the standing celebration anchored instead of skating.
-            float anchor=P01_VICTORY_FOOT_SHIFT+
-                Math.max(0,frame-7)*0.10f;
-            drawAtlas(canvas,anim.atlas,frame,x+anchor,baseY,
-                P01_VICTORY_SCALE,P01_VICTORY_SCALE,255);
+            // Per-frame center and feet stay on the same world root, even
+            // when the original victory video shifts the painted body.
+            drawP01Calibrated(canvas,anim,frame,x,baseY,255);
         } else if(p01 && SpriteStates.CROUCH.equals(motion.clip)) {
             // Widening of the painted figure across CROUCH 0..7 is compensated.
             // Result: occupied width stays ~302px in authored sprite coordinates.
@@ -113,27 +111,28 @@ final class SpriteFighterRenderer {
                 P01_RISE_X[i],P01_RISE_Y[i],Math.round(255*(1f-fade)));
             if(fade>0f)drawP01Idle(canvas,x,baseY,Math.round(255*fade));
         } else if(p01 && SpriteStates.INTRO.equals(motion.clip)) {
-            // Reduce the early intro by 3.5%, then align the late occupied
-            // silhouettes and feet to idle before blending into the actual IDLE.
+            // The intro's natural silhouette changes from narrow to a
+            // fighting stance: normalize every frame, then crossfade to idle.
             float fade=clamp01((frame-22f)/4f);
-            if(fade<1f) {
-                if(frame<20) {
-                    drawAtlas(canvas,anim.atlas,frame,x,baseY,0.965f,0.965f,255);
-                } else {
-                    int i=Math.min(6,frame-20);
-                    drawAtlas(canvas,anim.atlas,frame,
-                        x+P01_INTRO_OFFSET_X[i],baseY+P01_INTRO_OFFSET_Y[i],
-                        P01_INTRO_X[i],P01_INTRO_Y[i],
-                        Math.round(255*(1f-fade)));
-                }
-            }
+            if(fade<1f) drawP01Calibrated(canvas,anim,frame,x,baseY,
+                Math.round(255*(1f-fade)));
             if(fade>0f) drawP01Idle(canvas,x,baseY,Math.round(255*fade));
+        } else if(p01) {
+            // Every other P01 state, including all attacks, hit, air, guard,
+            // recovery, dash, throw, victory and taunt, uses the same master.
+            drawP01Calibrated(canvas,anim,frame,x,baseY,255);
         } else {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,1f,1f,255);
         }
 
         spritePaint.setAlpha(255);
         if(mirror)canvas.restore();
+    }
+
+    private void drawP01Calibrated(Canvas canvas,CharacterDefinition.Animation anim,
+                                    int frame,float x,float baseY,int alpha) {
+        float[] k=P01SpriteCalibration.get(anim.atlas.resource,frame);
+        drawAtlas(canvas,anim.atlas,frame,x+k[2],baseY+k[3],k[0],k[1],alpha);
     }
 
     private void drawP01Idle(Canvas canvas,float x,float baseY,int alpha) {
