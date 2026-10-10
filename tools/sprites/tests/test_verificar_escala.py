@@ -69,12 +69,31 @@ class GeometricScaleProofTest(unittest.TestCase):
             self.affine(.82),unrelated,unrelated,unrelated,unrelated])
         self.assertEqual("INCONCLUSIVO",result["status"])
 
+    def test_three_easy_frames_cannot_certify_seven_frame_clip(self):
+        self.assertEqual("INCONCLUSIVO",geo.estimate_sequence(
+            self.base,[self.affine(1.0),self.affine(1.0),
+                       self.affine(1.0)]+[
+                       np.zeros_like(self.base) for _ in range(4)])["status"])
+        # Four good frames still fail a 70% requirement.
+        self.assertEqual("INCONCLUSIVO",geo.estimate_sequence(
+            self.base,[self.affine(1.0)]*4+[
+                       np.zeros_like(self.base) for _ in range(3)])["status"])
+
+    def test_temporal_coverage_must_include_end_of_animation(self):
+        frames=[self.affine(1.0)]*5+[np.zeros_like(self.base)]*2
+        self.assertEqual("INCONCLUSIVO",
+                         geo.estimate_sequence(self.base,frames)["status"])
+
     def test_source_atlas_agreement_and_disagreement_are_distinct(self):
         a={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.82}
         b={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.84}
-        ok=geo.compare_source_and_atlas(a,b)
+        wrong=geo.compare_source_and_atlas(a,b)
+        self.assertEqual("ESCALA_FORA_DO_IDLE",wrong["status"],
+                         "Two equally small fighters must never pass")
+        self.assertEqual("PENDENTE",wrong["validacao_runtime"])
+        ok=geo.compare_source_and_atlas({**a,"fator_mediano":1.02},
+                                        {**b,"fator_mediano":1.04})
         self.assertEqual("PADRONIZADA_FONTE_ATLAS",ok["status"])
-        self.assertEqual("PENDENTE",ok["validacao_runtime"])
         fail=geo.compare_source_and_atlas(a,{**b,"fator_mediano":1.06})
         self.assertEqual("ESCALA_DIVERGENTE",fail["status"])
         self.assertGreater(fail["diferenca_relativa"],.15)
