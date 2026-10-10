@@ -14,10 +14,10 @@ public class GlobalMovementTuningTest {
 
     @Test public void higherNormalJumpAppliesToBothAndKeepsSuperJump() {
         CombatEngine e=engine();
-        assertEquals(820f,e.config.jumpSpeed,.001f);
+        assertEquals(1030f,e.config.jumpSpeed,.001f);
         assertEquals(1450f,e.config.superJumpSpeed,.001f);
-        assertEquals(1.10f,e.config.normalJumpRisingGravityScale,.001f);
-        assertEquals(1.25f,e.config.normalJumpFallingGravityScale,.001f);
+        assertEquals(1.70f,e.config.normalJumpRisingGravityScale,.001f);
+        assertEquals(2.00f,e.config.normalJumpFallingGravityScale,.001f);
         FighterInput[] pad={new FighterInput(),new FighterInput()};
         pad[0].jump=true;pad[1].jump=true;
         e.step(pad[0],pad[1]);
@@ -28,10 +28,30 @@ public class GlobalMovementTuningTest {
             e.step(pad[0],pad[1]);
         }
         for(int i=0;i<2;i++) {
-            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>176f);
-            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<194f);
+            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>175f);
+            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<189f);
             assertTrue("Fighter did not land "+i,e.fighter(i).grounded);
         }
+    }
+
+    @Test public void neutralJumpMatchesDbfzCadenceWithApexJustOverRivalHeight() {
+        CombatEngine e=engine();
+        FighterInput jump=new FighterInput(),neutral=new FighterInput();
+        jump.jump=true;
+        e.step(jump,neutral);
+        jump.clearPresses();
+        int airborne=1;
+        float apex=0;
+        while(!e.fighter(0).grounded && airborne<100){
+            apex=Math.max(apex,Arena.GROUND_Y-e.fighter(0).y);
+            e.step(jump,neutral);
+            airborne++;
+        }
+        assertTrue("Normal jump expected ~41-43 frames, got "+airborne,
+            airborne>=40 && airborne<=44);
+        float rivalHeight=e.fighter(1).body().standHeight;
+        assertTrue("Normal jump must clear standing rival",apex>rivalHeight*1.10f);
+        assertTrue("Normal jump should not reach superjump heights",apex<rivalHeight*1.23f);
     }
 
     @Test public void longerBackwardHopAndArcApplyToBoth() {
