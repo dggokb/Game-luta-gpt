@@ -1,0 +1,37 @@
+name: Validate Sprite Stabilizer
+
+# Fast, isolated motor tests; no Android build and no sprite changes.
+on:
+  push:
+    branches:
+      - refino/p01-animacoes-20261009
+    paths:
+      - 'tools/sprites/estabilizador.py'
+      - 'tools/sprites/refinar_elenco.py'
+      - 'tools/sprites/verificar_escala.py'
+      - 'tools/sprites/tests/test_refinar_elenco.py'
+      - 'tools/sprites/tests/test_verificar_escala.py'
+      - 'tools/sprites/requirements-animar.txt'
+      - '.github/workflows/validate-sprite-stabilizer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install only the stabilizer dependencies
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements-animar.txt
+      - name: Validate pose, motion, gaps and nonfinite measurements
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v
+      - name: Validate independent geometric and freeze proofs
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_verificar_escala.py -v
