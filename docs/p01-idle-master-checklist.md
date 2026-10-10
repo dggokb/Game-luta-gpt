@@ -97,3 +97,15 @@ personagem.
 - [x] Os botões DEBUG +/- permanecem operacionais sobre o novo valor inicial 100%;
   isso funciona mesmo com preferências antigas do v0.97 preservadas.
 - [ ] Validar escala no dispositivo comparando DASH × IDLE, com novo screenshot.
+
+## v0.99 — correção restrita ao deslocamento residual de vitória
+
+- [x] Inspecionadas as poses plantadas 7..32 do atlas original de vitória.
+- [x] Verificado que centralizar a bbox completa não fixa o personagem, pois
+  a largura da silhueta varia quando braços/ombros se movimentam.
+- [x] O gerador passa a medir a faixa inferior de **calçados** em cada quadro
+  do PNG real e a ancorá-la exatamente à posição do quadro 7, sem afetar escala
+  `0.880`, altura, tempo, poses, dash, 2H ou gameplay.
+- [x] QA com regressão específica: amplitude horizontal dos calçados da
+  vitória nos quadros 7–32 deve ser menor que **0,002 pixel de arte**.
+- [ ] Usuário verificar no Android que a vitória não desliza lateralmente.
