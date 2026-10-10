@@ -41,6 +41,24 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertTrue(all(x["status"]=="ENCONTRADO" for x in mapped.values()))
             self.assertTrue(mapped["CROUCH_MEDIUM"]["files"][0].endswith("m2(rasteira).mp4"))
 
+    def test_game_commands_are_resolved_to_actual_animation_states(self):
+        self.assertEqual("CROUCH_MEDIUM",MOD.canonical_state("2M"))
+        self.assertEqual("JUMP_HEAVY",MOD.canonical_state("jH"))
+        self.assertEqual("VICTORY",MOD.canonical_state("victory"))
+
+    def test_jump_video_is_split_by_apex_and_never_assumed(self):
+        # Foreground clearly rises, then descends; original jump.mp4 is
+        # shared by both character states and MUST be segmented.
+        ys=[105,95,85,76,66,55,44,38,43,51,62,75,88,102,110]
+        samples=[dict(body_frame(),shoe_y=float(y)) for y in ys]
+        up=e.jump_phase(samples,"JUMP")
+        down=e.jump_phase(samples,"FALL")
+        self.assertTrue(len(up)>4 and len(down)>4)
+        self.assertLess(up[-1]["shoe_y"],up[0]["shoe_y"])
+        self.assertGreater(down[-1]["shoe_y"],down[0]["shoe_y"])
+        stuck=[dict(body_frame(),shoe_y=100.0)]*15
+        self.assertIsNone(e.jump_phase(stuck,"FALL"))
+
     def test_ambiguous_sources_never_choose_random_file(self):
         with tempfile.TemporaryDirectory() as d:
             (Path(d)/"dash.mp4").touch()
