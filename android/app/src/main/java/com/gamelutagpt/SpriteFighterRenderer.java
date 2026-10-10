@@ -55,6 +55,10 @@ final class SpriteFighterRenderer {
     // Align the final silhouette with idle's occupied pixels (not canvas width).
     // Idle is 2% smaller to match the final intro pose more closely.
     private static final float P01_IDLE_SCALE = 0.980f;
+    // DASH atlas is ~538px wide in its broadest pose (idle is only 302px).
+    // Trim the exaggerated drawn size without affecting travel or hitboxes.
+    private static final float P01_DASH_X = 0.760f;
+    private static final float P01_DASH_Y = 0.940f;
     // Standing part of the victory uses approximately the same on-screen
     // figure height as the first intro frame (before the action).
     private static final float P01_VICTORY_SCALE = 0.940f;
@@ -87,6 +91,9 @@ final class SpriteFighterRenderer {
         if(p01 && SpriteStates.IDLE.equals(motion.clip)) {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,
                 P01_IDLE_SCALE,P01_IDLE_SCALE,255);
+        } else if(p01 && SpriteStates.DASH.equals(motion.clip)) {
+            drawAtlas(canvas,anim.atlas,frame,x,baseY,
+                P01_DASH_X,P01_DASH_Y,255);
         } else if(p01 && SpriteStates.VICTORY.equals(motion.clip)) {
             // Skip the source's walking frames; a minor foot-root adjustment
             // keeps the standing celebration anchored instead of skating.
