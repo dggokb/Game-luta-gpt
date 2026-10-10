@@ -126,3 +126,84 @@ simulações antes/depois e provas independentes de melhora.
 - [ ] Reprodução independente do render final, câmera e transições.
 - [ ] Correções automáticas com diff, rollback, e comparação de métricas
       antes/depois. **Não executar refino automático nesta etapa.**
+
+## v3 — confirmação de padronização por provas independentes
+
+A partir desta revisão, o comando usa `verificar_escala.py` além dos
+proxies de silhueta de `estabilizador.py`. Um resultado de bbox nunca mais
+pode, sozinho, declarar uma animação com escala padronizada.
+
+### Etapas de prova
+
+1. **Imagem-base verdadeira:** a ferramenta lê `inicio_centro.png`, extrai
+   a silhueta real e confere se sua altura multiplicada pela escala
+   `tamanho.json/chaves/inicio_centro` coincide com `tamanho.json/altura`
+   em até **7,5%**. JSON sozinho não constitui confirmação.
+2. **Triagem temporal:** o vídeo chroma-key e o atlas são comparados com
+   o próprio `IDLE`. Cabeça/tronco, drift lento do pé plantado e
+   oscilações que revertem em um quadro são medidas independentemente.
+   Sem vídeo legível => **INCONCLUSIVO**.
+3. **Correspondências geométricas SIFT/RANSAC:** exige ao menos
+   **22 pontos consistentes**, mínimo **43% de correspondências corretas**
+   após RANSAC, cobertura corporal horizontal 15% e vertical 16%,
+   erro mediano <= 3,8 px, ângulo <= 28 graus e fator reversível
+   (`zoom_ida * zoom_volta` com diferença <= 3,5%).
+   Sem tais evidências => **INCONCLUSIVO**; não supor que braço erguido
+   ou agachamento alterou tamanho.
+4. **Sequência inteira:** ao menos **três quadros** válidos do clipe.
+   Divergência de escala superior a **7%** ao longo do clipe é
+   `INSTAVEL_GEOMETRICAMENTE`, não aprovado.
+5. **Vídeo versus atlas:** a proporção do estado em relação ao idle
+   precisa concordar entre vídeo original e atlas em até **6%**.
+   Se divergir, emitir `ESCALA_DIVERGENTE`, não corrigir por tentativa.
+6. **Jogo real:** continua **obrigatório** verificar escala final
+   aplicada pelo renderizador, câmera, espelhamento e transições.
+   A prova de pixels brutos do atlas não valida automaticamente
+   a escala renderizada e nunca muda `validacao_runtime: PENDENTE`.
+
+### Testes independentes e evidência negativa
+
+`test_verificar_escala.py` utiliza os pixels **reais** do atlas idle do
+P01, faz redução conhecida de 18%, ampliação conhecida de 18%,
+translação sem redimensionamento, zoom variável, arte incompatível e
+imagens sem informações geométricas; verifica que apenas medidas de
+escala reversíveis são aceitas. `test_refinar_elenco.py` verifica que
+jitter isolado, drift lento do pé em vitória, movimento contínuo real,
+vídeos sem fonte, aliases ambíguos e imagem-base falsa são tratados
+sem mascarar reprovação.
+
+Na amostra real de `idle.mp4` e `vitoria.mp4` do P01, o casamento
+de detalhes do corpo apresentou poucas correspondências em vários
+quadros devido à **mudança de pose**. Essa situação deve ser
+**INCONCLUSIVA**, mesmo quando a medida aproximada da silhueta sugere
+escala menor. Não produzir fatores de redimensionamento por essa
+métrica fraca.
+
+### Limitações que bloqueiam declaração de motor finalizado
+
+- NÃO existe confirmação por pontos anatômicos sem ambiguidade em
+  poses extremas (cabeça escondida, giro, crouch, personagens não humanos).
+- NÃO existe medição automatizada do último pixel efetivamente
+  renderizado no Android, incluindo `P01SpriteCalibration`,
+  `P01VisualTuning`, `pixelScale`, espelhamento e câmera.
+- NÃO existe executor de correção reversível com teste antes/depois
+  em arquivo temporário. Até existir, o motor é um **diagnosticador e
+  validador conservador**, não um estabilizador autônomo completo.
+- O GitHub Actions não acessa os vídeos do Drive automaticamente;
+  a pasta local deve ser disponibilizada ao comando. Sem ela o CI
+  marca pendência, não aprovação.
+
+### Segurança de execução
+
+```bash
+python3 tools/sprites/refinar_elenco.py p01 \
+  --videos-dir /pasta/animations/p01 \
+  --estado DASH --saida /tmp/p01-dash.json
+
+# Diagnóstico rápido — nunca equivale a aprovação de escala
+python3 tools/sprites/refinar_elenco.py p01 \
+  --videos-dir /pasta/animations/p01 --sem-geometria
+```
+
+Nem o comando nem os testes alteram PNGs, vídeos, manifestos, colisão
+ou gameplay. O mecanismo trabalha sobre **um personagem**, não o elenco.
