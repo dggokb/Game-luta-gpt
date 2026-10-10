@@ -75,3 +75,13 @@ personagem.
 - [Build Game Luta APK #38069585984](https://github.com/dggokb/Game-luta-gpt/actions/runs/38069585984) — normalização e QA dos 39 atlas, testes P01, compilação do APK concluídos com sucesso.
 - APK compilado na branch `refino/p01-animacoes-20261009`, versão `0.96-p01-idle-master`.
 - Smoke test Android pode terminar depois do upload do APK; não confundir compilação aprovada com teste manual no dispositivo.
+
+## v0.97 — revisão após teste visual em dispositivo
+
+- [x] Identificada a causa da regressão: padronizar a bbox inteira fez DASH,
+  VICTORY e 2H encolherem, embora a pose natural abra um braço/perna.
+- [x] Corrigida escala padrão dos três estados, com largura do torso independente
+  da altura estendida do golpe.
+- [x] Criados controles DEBUG **DASH / 2H / VITORIA**, +/- 5% no Android.
+- [x] Percentuais salvos localmente e preservados nos próximos builds.
+- [ ] Obter feedback dos três percentuais escolhidos no celular e fixar padrão final.
