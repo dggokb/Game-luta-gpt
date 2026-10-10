@@ -196,6 +196,14 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
     if not indices:
         return []
     with Image.open(file) as img:
+        if w<=0 or h<=0 or cols<=0 or img.width!=w*cols or img.height%h:
+            return []
+        total=int(meta.get("frameCount",cols*(img.height//h)))
+        if total>cols*(img.height//h):
+            return []
+        if any(not isinstance(i,int) or i<0 or i>=total or
+               ((i//cols)+1)*h>img.height for i in indices):
+            return []
         output=[]
         for ratio in selection:
             at=min(len(indices)-1,round((len(indices)-1)*ratio))
