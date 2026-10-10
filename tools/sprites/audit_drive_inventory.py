@@ -100,6 +100,11 @@ def inspect_videos(pid, videos, root, media):
             missing.append(name)
             continue
         entry = {"local_size_bytes": path.stat().st_size}
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        entry["file_sha256"] = digest.hexdigest()
         if media:
             entry.update(probe(path))
             entry.update(fingerprint(path))
@@ -192,6 +197,14 @@ def audit(manifest, root=None, media=False):
         "integrated_characters": sum(c["integrated"] for c in allchars.values()),
         "not_integrated_characters": [pid for pid,c in allchars.items() if not c["integrated"]],
     }
+    if root:
+        files_by_hash = defaultdict(list)
+        for pid, char in allchars.items():
+            for name, info in char["inspected_files"].items():
+                if info.get("file_sha256"):
+                    files_by_hash[info["file_sha256"]].append(pid + "/" + name)
+        result["exact_duplicate_files"] = [
+            group for group in files_by_hash.values() if len(group) > 1]
     if root and media:
         # Assinaturas somente para arquivos AMOSTRADOS — não confundir com hash de MP4.
         signatures = defaultdict(list)
@@ -244,6 +257,10 @@ def make_markdown(result):
             lines.append("\n**Nomes ambiguos:** " + str(c["ambiguous_names"]))
         if c["missing_local_files"]:
             lines.append(f"\n**Videos locais faltantes:** {len(c['missing_local_files'])}")
+    if result.get("exact_duplicate_files"):
+        lines.append("\\n## Arquivos MP4 identicos (SHA256)")
+        for group in result["exact_duplicate_files"]:
+            lines.append("- " + " = ".join(group))
     if result.get("possible_duplicate_samples"):
         lines.append("\n## Possiveis videos duplicados na amostra")
         for group in result["possible_duplicate_samples"]:
