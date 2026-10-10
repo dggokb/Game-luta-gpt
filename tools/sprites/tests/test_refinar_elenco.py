@@ -103,6 +103,17 @@ class CharacterStabilizerTest(unittest.TestCase):
         self.assertIsNone(e.metrics(samples,100,"DASH")["deslize"])
         self.assertIsNone(e.metrics([dict(body_frame(),shoe_x=40.)]*30,100,"VICTORY")["deslize"])
 
+    def test_few_pixel_victory_skating_is_detected_without_falsifying_dash(self):
+        # Slow drift: just 4 pixels across 30 source frames. Per-frame motion
+        # is <0.2 px, so the old detector discarded all consecutive deltas.
+        frames=[dict(body_frame(),shoe_x=40.+4.*i/29) for i in range(30)]
+        result=e.metrics(frames,100,"VICTORY")
+        self.assertIsNotNone(result["deslize"],result)
+        self.assertEqual("SUSPEITA_DE_DESLIZE",result["deslize"]["status"])
+        self.assertIsNone(e.metrics(frames,100,"DASH")["deslize"])
+        steady=[dict(body_frame(),shoe_x=40.) for _ in range(30)]
+        self.assertIsNone(e.metrics(steady,100,"VICTORY")["deslize"])
+
     def test_pose_change_cannot_be_mistaken_for_small_character(self):
         idle=e.metrics([body_frame(head=20,torso=40)]*12,100,"IDLE")
         changed=e.metrics([body_frame(head=25,torso=40)]*12,100,"CROUCH_HEAVY")
