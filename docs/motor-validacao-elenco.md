@@ -1,82 +1,113 @@
-# Motor de validação escalável dos sprites — elenco inteiro
+# Corretor / estabilizador de sprites — contrato técnico v2
 
-**Motivo:** o P01 provou que corrigir manualmente cada frame, voltar ao celular,
-comparar IDLE e repetir é caro demais para 12 personagens.
+## Contrato de operação
 
-## O que realmente causou os erros anteriores
+**Somente um personagem por execução.** O usuário indica `p01` até `p12`.
+O P01 usa internamente o pack `player_base`. O motor NÃO possui opção
+`--todos`, NÃO percorre outros packs e NUNCA faz merge.
 
-- A altura do retângulo do sprite **não** mede tamanho do corpo quando o braço
-  é levantado, um lutador se agacha ou muda a pose. Não aplicar "bbox igual ao
-  idle" indiscriminadamente: isso encolheu o DASH e o 2H.
-- O valor do root X ou um simples offset no PNG **não** garante que a animação
-  fique parada **na tela**, pois o enquadramento acompanha os dois lutadores.
-  Na v0.100 a câmera é congelada no KO; não se tenta mascarar a câmera com dx
-  de sprite.
-- No superpulo, FALL era escalado independentemente em cada um dos seis
-  quadros conforme sua altura (que cresce conforme o lutador estica a postura).
-  O mesmo corpo passava a encolher na descida. Na v0.100 a escala corporal de
-  FALL é fixa de ponta a ponta.
-- O jogo pode ter ritmo de 60 FPS, mas o celular renderizar a 30 FPS. A
-  validação deve garantir visualização dos quadros (ou indicar o limite).
+Fontes prioritárias (não intercambiáveis):
+1. **Imagem-base e `idle.mp4`** do personagem — tamanho corporal de referência;
+2. **Vídeo original do movimento** em Google Drive/`animations/<pXX>` — ordem,
+   intenção, ritmo, poses e mudanças reais;
+3. **Sprites empacotados** de `characters/<pack>` e
+   `android/app/src/main/res/drawable-nodpi` — o que é efetivamente desenhado
+   no Android; animações na pasta Drive sem versão empacotada ficam PENDENTES.
+4. **Runtime Android** — câmera, transições, física e pixels finais da tela.
 
-## Motor reutilizável existente
+As fontes 1 e 2 devem ser disponibilizadas localmente para análise dos vídeos.
+A ferramenta **não possui credenciais de Drive no CI**. O nome ou a listagem
+no Drive não é a mesma coisa que ler os quadros do vídeo. Caso a fonte não esteja
+presente, o relatório deve registrar `PENDENTE_FONTES`; jamais mostrar sucesso.
 
-1. `tamanho.py`: mede a escala do vídeo com referência original e cabeça.
-2. `auditoria.py`: aponta corpo pequeno/grande, deslize, ancoragem, frames
-   partidos, efeitos, ritmo, loops e discrepâncias entre personagens.
-3. `ancorar.py`: desloca os quadros pela posição do pé de apoio quando
-   esse pé realmente deveria estar parado. NÃO usar indiscriminadamente
-   em DASH/WALK, que mudam de posição de propósito.
-4. `reescalar.py`: detecta a escala pela cabeça (mais confiável que bbox).
-   No primeiro ciclo usar `--ver`; redimensionamento do PNG deve ser uma
-   exceção porque introduz perda gráfica; preferir escala no renderizador.
-5. `refinar_elenco.py`: novo orquestrador para correr pelos packs e **filtrar
-   apenas estados anômalos**. Não mascara imagens sem fonte como sucesso.
-
-## Procedimento operacional
-
-Instale `pip install -r tools/sprites/requirements-animar.txt`, depois:
+## Como executar
 
 ```bash
-# Um personagem — gerar relatório legível
-python3 tools/sprites/refinar_elenco.py player_base --saida android/app/build/sprite-review/p01.json
+pip install -r tools/sprites/requirements-animar.txt
 
-# Todos os packs atualmente presentes, sejam 8, 10 ou 12
-python3 tools/sprites/refinar_elenco.py --todos --saida android/app/build/sprite-review/elenco.json
+python3 tools/sprites/refinar_elenco.py p01 \
+  --videos-dir /pasta/local/animations/p01 \
+  --saida android/app/build/sprite-review/p01.json
 
-# Para medir uma anomalia sem escrever PNG nem desregular um personagem
-python3 tools/sprites/ancorar.py p02 MEDIUM_KICK --ver
-python3 tools/sprites/reescalar.py p02 MEDIUM_KICK --ver
+# Examinar apenas a vitória e NÃO os outros estados/personagens:
+python3 tools/sprites/refinar_elenco.py p01 \
+  --videos-dir /pasta/local/animations/p01 --estado VICTORY
+
+# Analisar um personagem novo mesmo sem assets importados:
+python3 tools/sprites/refinar_elenco.py p12 \
+  --videos-dir /pasta/local/animations/p12 --sem-sprites
 ```
 
-O JSON por lutador inclui `AUDITADO`, `PENDENTE_FONTE_OU_LAYOUT` ou
-`FALHA_AUDITORIA`, quantidades por severidade, frames problemáticos e
-rota de correção (ancorar pé, rever cabeça/escala, corrigir arte, ritmo
-ou mudança intencional).
+São reconhecidos aliases do Drive (como `m2(rasteira).mp4`,
+`2M.mp4`, `pulo.mp4`, `jump.mp4`, `back_dash.mp4`,
+`backDash.mp4`, `vitoria.mp4`), com correspondência exata e
+ambiguidade sinalizada em vez de escolher aleatoriamente.
 
-A auditoria pode executar remotamente por **GitHub Actions → Audit Sprite
-Roster → Run workflow** na branch experimental. Os resultados ficam em
-artefato `Sprite-Roster-Audit`. Não altera a branch nem a arte.
+## Definição da escala
 
-## Critérios de aceitação automáticos
+NÃO igualar a bbox externa de cada pose à bbox externa do idle.
+A silhueta muda por pose, inclinação, joelho, braço e efeitos.
+Medir proxies de cabeça e tronco nos dois vídeos e no sprite
+para comparar diferenças **relativas ao idle do mesmo lutador**.
+Somente quando essas duas referências concordam a anomalia
+é sinalizada como `SUSPEITA_DE_ESCALA`. Desacordo entre cabeça
+e tronco é `INCONCLUSIVO`. Isso NÃO fornece um fator de correção
+aplicável sem revisão da imagem-base.
 
-- **Corpo:** usar cabeça/torso e a pose IDLE do **próprio lutador**;
-  aceitar braços/pernas estendidos sem redimensionar todo o personagem.
-- **Ancoragem:** per-frame estável na arte para poses plantadas; e X na
-  tela invariável se lutador + câmera estão congelados no KO.
-- **Air states:** comparar JUMP ↔ FALL e aplicar escala corporal coerente
-  durante a subida, ápice, descida e aterrissagem.
-- **Ritmo:** confirmar as poses visíveis em 60 e 30 FPS nos movimentos
-  em que todas as poses devem aparecer.
-- **Colisões:** nenhuma mudança de escala só-visual muda hitboxes,
-  dano, knockback, movimento físico ou janelas de combo.
-- **Qualidade:** nunca reamostrar todos os quadros repetidamente para
-  corrigir proporções; preferir transformações de renderização.
-- **Gate:** casos ambíguos (personagens novos, rota faltante, ataque com
-  deslocamento real) recebem **revisão excepcional**; nada deve ser marcado
-  como aprovado automaticamente apenas por ter gerado PNG.
+A calibração autoral em `art/keys/pXX/tamanho.json` define a
+altura do personagem e as escalas de imagens iniciais. Ela é
+obrigatória para uma análise completa. O valor está disponível
+no relatório, mas o algoritmo atual ainda NÃO comprova
+automaticamente alinhamento anatômico pelo rosto e tronco.
 
-Não copiar fatores do P01 para outros lutadores: cada personagem tem
-sua própria referência, escala física e animações distintas. A meta não
-é zerar intervenção humana, e sim concentrar revisão apenas nas
-anomalias onde a automação não tem evidência suficiente.
+## Detecção de tremor
+
+Medir centros de tronco, larguras aproximadas de cabeça/tronco,
+e posição de pé durante segmentos com apoio.
+Usar mediana temporal de cinco quadros e detectar
+**oscilações rápidas que revertem no quadro seguinte**.
+Movimento contínuo, deslocamento intencional e troca de
+perna de apoio NÃO são estabilizados à força. Para o IDLE e
+a VITÓRIA, tremor isolado dos pés é reportado separadamente.
+Limite inicial: maior entre 1,5 pixel e 1,5% da altura
+do idle para quadros na resolução analisada.
+Não é limiar universal, e detectar tremor NÃO significa
+conhecer sua causa.
+
+**Limitações importantes:** a extração do vídeo exige
+fundo verde (chroma-key) confiável; vídeo com outro cenário
+fica inconclusivo. A métrica atual usa proxies da silhueta,
+não pose estimation anatômica robusta nem compensação
+óptica de câmera em cenário arbitrário. Os vídeos comparados
+aos sprites usam medidas relativas ao respectivo idle;
+não comparar pixels absolutos de resoluções diferentes.
+
+## Status e segurança
+
+- `PENDENTE_FONTES`: vídeo original, atlas, frame, calibração ou confiança
+  insuficiente; bloqueia aprovação;
+- `ANOMALIAS_IDENTIFICADAS`: há tremor ou divergência mensurável;
+- `MEDICOES_CONCLUIDAS`: medidas preliminares disponíveis, mas **NÃO** aprovado;
+- `aprovado_automaticamente: false`, `validacao_runtime: PENDENTE`
+  até houver teste independente do resultado na execução real.
+
+**Nenhuma arte, PNG, vídeo, duração, hitbox ou script de gameplay é alterado**
+pelo diagnóstico. `ancorar.py`, `reescalar.py`, `tamanho.py` e
+`auditoria.py` são motores legados auxiliares; alterações
+automáticas só serão habilitadas com plano/diff reversível,
+simulações antes/depois e provas independentes de melhora.
+
+## Checklist para implementar depois desta etapa
+
+- [x] Invocação por personagem (sem `--todos`).
+- [x] Mapeamento seguro de nomes reais de vídeos.
+- [x] Contrato de referência IDLE + calibração oficial.
+- [x] Leitura read-only de quadros de vídeo chroma-key e atlas do personagem.
+- [x] Métricas temporais com regressões de jitter vs movimento contínuo.
+- [x] Reprovação de fontes ausentes, ambíguas ou resultados inconclusivos.
+- [ ] Calibração anatômica mais forte que proxies de silhueta
+      (cabeça/ombros/tronco em mudanças extremas de pose).
+- [ ] Medição de vídeo com cenários não verdes via compensação de câmera.
+- [ ] Reprodução independente do render final, câmera e transições.
+- [ ] Correções automáticas com diff, rollback, e comparação de métricas
+      antes/depois. **Não executar refino automático nesta etapa.**
