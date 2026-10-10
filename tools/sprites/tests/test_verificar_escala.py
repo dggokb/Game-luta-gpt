@@ -151,6 +151,32 @@ class GeometricScaleProofTest(unittest.TestCase):
         self.assertEqual("INCONCLUSIVO",geo.compare_source_and_atlas(
             a,{"status":"INCONCLUSIVO"})["status"])
 
+    def test_fall_atlas_samples_all_six_frames_even_if_video_fraction_is_late(self):
+        import json
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as d:
+            root=Path(d)
+            reports=root/"tools/sprites/reports"
+            images=root/"android/app/src/main/res/drawable-nodpi"
+            reports.mkdir(parents=True)
+            images.mkdir(parents=True)
+            pack={"animations":{
+                "IDLE":{"atlas":"idle_6","frames":list(range(6))},
+                "FALL":{"atlas":"fall_6","frames":list(range(6))},
+            }}
+            for atlas in ("idle_6","fall_6"):
+                (reports/(atlas+".report.json")).write_text(json.dumps({
+                    "packed":{"frameWidth":30,"frameHeight":50,
+                              "columns":6,"pixelScale":2,"frameCount":6}}))
+                Image.new("RGBA",(180,50),(100,130,180,255)).save(images/(atlas+".png"))
+            # These fractions indicate the FALL part of the original
+            # jump.mp4, NOT a subsection of the already cut FALL atlas.
+            fall=geo.read_sprite_samples(root,pack,"FALL",
+                        selection=(.65,.73,.81,.89,.97))
+            self.assertEqual(5,len(fall),
+                "FALL must use the whole 6-frame animation, not sample frame 4 repeatedly")
+            self.assertTrue(all(image.shape==(50,30,4) for image in fall))
+
     def test_atlas_pixel_scale_normalizes_to_idle(self):
         import json
         from tempfile import TemporaryDirectory
