@@ -350,7 +350,24 @@ def prepare(weights):
     RESULTS.mkdir(parents=True,exist_ok=True)
     write_json(RESULTS/"manifest.json",manifest)
     master.save(RESULTS/"p12_master.png")
-    print("P12 ALL STATES PREPARED: "+str(len(manifest["states"]))+" unique move clips",flush=True)
+    # Mobile-friendly visual contact sheet: first, peak and exit pose of EVERY state.
+    states=sorted(manifest["states"])
+    cols=3;tile_w=306;tile_h=124
+    sheet=Image.new("RGB",(cols*tile_w,math.ceil(len(states)/cols)*tile_h),(24,27,35))
+    d=ImageDraw.Draw(sheet)
+    for idx,state in enumerate(states):
+        x=(idx%cols)*tile_w;y=(idx//cols)*tile_h
+        d.text((x+7,y+5),state,fill=(242,242,245))
+        src=Image.open(ROOT/f"art/sprites/source/p12_full_{state.lower()}_original.png").convert("RGBA")
+        n=manifest["states"][state]["frames"]
+        for j,frame_no in enumerate((0,n//2,n-1)):
+            crop=src.crop(((frame_no%4)*256,(frame_no//4)*256,
+                           (frame_no%4+1)*256,(frame_no//4+1)*256))
+            crop.thumbnail((88,94),Image.Resampling.LANCZOS)
+            px=x+8+j*99+(88-crop.width)//2;py=y+22+(94-crop.height)//2
+            sheet.paste(crop,(px,py),crop)
+    sheet.save(RESULTS/"p12-all-actions-contact-sheet.png")
+    print("P12 ALL STATES PREPARED: "+str(len(manifest["states"]))+" distinct action clips",flush=True)
 
 
 def verify():
