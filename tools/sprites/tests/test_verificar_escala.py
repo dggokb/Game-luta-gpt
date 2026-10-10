@@ -84,6 +84,27 @@ class GeometricScaleProofTest(unittest.TestCase):
         self.assertEqual("INCONCLUSIVO",
                          geo.estimate_sequence(self.base,frames)["status"])
 
+    def test_video_non_chroma_must_not_be_measured_as_character(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as d:
+            for name,background_green in [("green",True),("red",False)]:
+                out=Path(d)/(name+".mp4")
+                codec=cv2.VideoWriter_fourcc(*"mp4v")
+                writer=cv2.VideoWriter(str(out),codec,24.,(96,96))
+                self.assertTrue(writer.isOpened(),"OpenCV mp4v writer unavailable")
+                for frame in range(20):
+                    canvas=np.full((96,96,3),
+                        (0,255,0) if background_green else (0,0,255),
+                        dtype=np.uint8)
+                    cv2.rectangle(canvas,(35,20),(65,88),(30,40,185),-1)
+                    writer.write(canvas)
+                writer.release()
+                samples=geo.read_video_samples(out)
+                if background_green:
+                    self.assertEqual(7,len(samples),"Green source must remain usable")
+                else:
+                    self.assertEqual([],samples,"A colored stage is not green-screen")
+
     def test_source_atlas_agreement_and_disagreement_are_distinct(self):
         a={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.82}
         b={"status":"ESCALA_GEOMETRICA_ESTAVEL","fator_mediano":.84}
