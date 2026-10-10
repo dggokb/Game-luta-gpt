@@ -167,6 +167,46 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertEqual("REFERENCIA_INCONSISTENTE",
                              MOD.calibration_info(root,"p01")["status"])
 
+    def test_atlas_proxies_use_same_pixel_scale_as_geometry(self):
+        import cv2
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            reports=root/"tools/sprites/reports"
+            images=root/"android/app/src/main/res/drawable-nodpi"
+            reports.mkdir(parents=True)
+            images.mkdir(parents=True)
+            pack={"animations":{
+                "IDLE":{"atlas":"mock_idle","frames":[0,1,2,3,4,5]},
+                "DASH":{"atlas":"mock_dash","frames":[0,1,2,3,4,5]}}}
+            for atlas,ps in [("mock_idle",2),("mock_dash",1)]:
+                h,w=140,140
+                rgba=np.zeros((h,w*6,4),dtype=np.uint8)
+                # Same physical silhouette. Source DASH at half pixelScale
+                # must be enlarged to idle's pixel coordinate space.
+                for frame in range(6):
+                    size=100 if ps==2 else 50
+                    left=15 if ps==2 else 8
+                    top=5 if ps==2 else 3
+                    x0=frame*w+left
+                    rgba[top:top+size,x0:x0+size,3]=255
+                    rgba[top:top+size,x0:x0+size,:3]=180
+                Image.fromarray(rgba).save(images/(atlas+".png"))
+                (reports/(atlas+".report.json")).write_text(json.dumps({
+                    "packed":{"pixelScale":ps,"frameWidth":140,"frameHeight":140,
+                              "columns":6,"frameCount":6}}))
+            idle_meta,idle=e.load_atlas_state(root,pack,"IDLE")
+            dash_meta,dash=e.load_atlas_state(root,pack,"DASH")
+            self.assertEqual("EXTRAIDO",idle_meta["status"])
+            self.assertEqual("EXTRAIDO",dash_meta["status"])
+            self.assertEqual(2.,dash_meta["pixel_scale_normalizado"])
+            self.assertAlmostEqual(100.,np.median([x["height"] for x in idle]))
+            self.assertAlmostEqual(100.,np.median([x["height"] for x in dash]))
+            # Negative atlas indices must not wrap around to another frame.
+            pack["animations"]["DASH"]["frames"]=[-1]
+            self.assertEqual("FRAME_FORA_DO_ATLAS",
+                             e.load_atlas_state(root,pack,"DASH")[0]["status"])
+
     def test_p12_without_import_is_not_audited_successfully(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
