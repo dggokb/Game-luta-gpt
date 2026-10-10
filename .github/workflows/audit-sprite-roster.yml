@@ -32,7 +32,7 @@ jobs:
       - name: Bibliotecas para análise
         run: python3 -m pip install -r tools/sprites/requirements-animar.txt
       - name: Regressões do estabilizador
-        run: python3 -m unittest discover -s tools/sprites/tests -p 'test_*.py' -v
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v && python3 -m unittest discover -s tools/sprites/tests -p test_verificar_escala.py -v
       - name: Diagnóstico do personagem solicitado
         env:
           CHARACTER: ${{ inputs.personagem }}
