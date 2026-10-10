@@ -113,7 +113,8 @@ def properties(alpha):
         return None
     return {"head_proxy": head[0], "torso_proxy": torso[0],
             "torso_x": torso[1], "shoe_x": feet[1],
-            "height": float(h), "confidence": "PROXY_SILHUETA"}
+            "height": float(h), "shoe_y":float(y1),
+            "body_y":float((y0+y1)*.5), "confidence": "PROXY_SILHUETA"}
 
 
 def isolated_spikes(values, ref_height, fraction=.015):
@@ -265,3 +266,32 @@ def load_atlas_state(root, pack, state, limit=100):
             cell=atlas_img.crop((x0,y0,x0+width,y0+height)).getchannel("A")
             samples.append(properties(np.array(cell)))
     return {"status":"EXTRAIDO","atlas":atlas,"quadros":len(samples)},samples
+
+
+def jump_phase(samples, state):
+    """Se JUMP/FALL compartilham um vídeo, NÃO avaliar ambos como clipe inteiro.
+
+    Detectar ápice pela subida/descida da posição do pé. Caso a câmera
+    acompanhe o salto ou não exista deslocamento vertical confiável, abortar.
+    """
+    if state not in ("JUMP", "FALL", "LAND"):
+        return samples
+    valid=[(i,m["shoe_y"],m["height"]) for i,m in enumerate(samples)
+           if m and "shoe_y" in m]
+    if len(valid)<8:
+        return None
+    ys=np.array([z[1] for z in valid],float)
+    # Mediana de 3 quadros evita falso ápice causado por tremor isolado.
+    filtered=np.array([np.median(ys[max(0,i-1):min(len(ys),i+2)])
+                       for i in range(len(ys))])
+    apex=int(np.argmin(filtered))
+    scale=float(np.median([x[2] for x in valid]))
+    span=float(max(filtered[0],filtered[-1])-filtered[apex])
+    if apex<max(2,int(len(ys)*.15)) or apex>min(len(ys)-3,int(len(ys)*.85))             or span<max(10.0,.16*scale):
+        return None
+    cut=valid[apex][0]
+    if state=="JUMP":
+        return samples[:cut+1]
+    if state=="FALL":
+        return samples[cut:]
+    return samples[max(cut,len(samples)-max(5,len(samples)//5)):]
