@@ -499,7 +499,11 @@ public class SpriteIntegrationTest {
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         // The 4x4 movement grid of the drawn character (player_two); p01 uses one atlas per video clip.
-        Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_two_movement);
+        android.content.res.Resources resources=RuntimeEnvironment.getApplication().getResources();
+        int atlasId=resources.getIdentifier("player_two_movement","drawable",
+            RuntimeEnvironment.getApplication().getPackageName());
+        org.junit.Assume.assumeTrue("P02 atlas intentionally absent in P01-only APK",atlasId!=0);
+        Bitmap atlas=BitmapFactory.decodeResource(resources,atlasId);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());
         int fw=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_WIDTH,fh=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_HEIGHT;
         assertEquals(4*fw,atlas.getWidth());assertEquals(4*fh,atlas.getHeight());
