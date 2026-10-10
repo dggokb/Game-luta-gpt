@@ -3,6 +3,36 @@
 **Branch isolada**: `test/sprite-inventory-drive-20261010` (a branch de producao
 `game-luta-sprite-gpt` nao foi alterada). Inventario lido do Google Drive em 10/10/2026.
 
+## Inspecao efetivamente executada em 10/10/2026 (fora do runner CI)
+
+Foi possivel materializar **todos os 399 MP4** do Drive na area de trabalho do
+ChatGPT, preservando o nome e os bytes de cada arquivo, e rodar o FFmpeg
+sobre os videos reais (12 quadros RGB amostrados por arquivo e hash SHA256
+do MP4 completo). Resultados:
+
+- **399/399**: decodificacao de quadros sem falha.
+- **1 duplicacao EXATA (mesmo SHA256)**:
+  `p04/socoPulo.mp4` e `p04/puloSocoForte.mp4`.
+  O jM do P04 nao possui arte propria, embora exista um MP4 com nome diferente.
+- **49 alertas** de variacao elevada da bounding box. Sao avisos de triagem:
+  quedas, saltos, golpes ascendentes e agachamentos tambem mudam a altura aparente.
+  NAO interpretar como 49 defeitos confirmados.
+- **0 videos classificados como estaticos** pelo criterio conservador de media
+  de diferenca entre frames <0,6 (na amostra).
+- A previa do P12 mostrou ataques, deslocamentos e reacoes realmente diferentes,
+  mas tambem efeitos acoplados ao corpo (ex.: 2M, jL, dano aereo) e um oponente
+  adicional desenhado no agarrão. Refinar antes de integrar.
+
+Os resultados detalhados foram entregues como
+`relatorio_final_drive_sprites_399.xlsx` e `qc_399_videos.json`
+na conversa de origem. **Os 399 arquivos MP4 nao foram publicados no GitHub**,
+pois continuaram intocados no Drive; a CI continua limitada ao inventario de
+metadados quando nao recebe os videos localmente.
+
+A checagem nao certifica correção semântica dos 399 golpes, transicoes
+perfeitas entre estados ou fidelidade de model sheet — esses criterios
+ainda exigem revisao visual.
+
 ## Fonte e escopo
 
 - Drive: `game-luta-gpt/animations/p01..p12`; **399 MP4**.
