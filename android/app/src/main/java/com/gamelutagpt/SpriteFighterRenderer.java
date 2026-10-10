@@ -51,11 +51,19 @@ final class SpriteFighterRenderer {
     private static final float[] P01_RISE_Y = {
         0.885f,0.890f,0.920f,0.960f,1.000f,1.035f
     };
+    // Original atlas silhouettes change proportions across frames 20..26.
+    // Align the final silhouette with idle's occupied pixels (not canvas width).
     private static final float[] P01_INTRO_X = {
-        1.000f,1.000f,0.947f,0.947f,0.947f,0.947f,0.947f
+        0.965f,0.950f,0.947f,0.947f,0.947f,0.947f,0.947f
     };
     private static final float[] P01_INTRO_Y = {
-        1.000f,1.000f,1.072f,1.072f,1.069f,1.067f,1.067f
+        0.970f,1.010f,1.072f,1.072f,1.069f,1.067f,1.067f
+    };
+    private static final float[] P01_INTRO_OFFSET_X = {
+        -12.9f,-10.3f,-9.8f,-9.8f,-9.8f,-9.8f,-9.8f
+    };
+    private static final float[] P01_INTRO_OFFSET_Y = {
+        2.1f,0.0f,-0.3f,-0.3f,0.8f,0.8f,0.8f
     };
 
     /** Sprite artwork coordinates, not fighter hitboxes or simulation sizes. */
@@ -79,16 +87,19 @@ final class SpriteFighterRenderer {
                 P01_RISE_X[i],P01_RISE_Y[i],Math.round(255*(1f-fade)));
             if(fade>0f)drawP01Idle(canvas,x,baseY,Math.round(255*fade));
         } else if(p01 && SpriteStates.INTRO.equals(motion.clip)) {
-            // Pose after frame 21 is 319px wide/420px tall versus the IDLE
-            // 302px/448px. Correct axes independently before the handoff.
-            // The last INTRO frame displays the ACTUAL IDLE bitmap, unchanged.
+            // Reduce the early intro by 3.5%, then align the late occupied
+            // silhouettes and feet to idle before blending into the actual IDLE.
             float fade=clamp01((frame-22f)/4f);
             if(fade<1f) {
-                int i=Math.max(0,Math.min(6,frame-20));
-                float ox=frame>=22 ? -3.8f : 0f;
-                float oy=frame>=22 ? -3.0f : 0f;
-                drawAtlas(canvas,anim.atlas,frame,x+ox,baseY+oy,
-                    P01_INTRO_X[i],P01_INTRO_Y[i],Math.round(255*(1f-fade)));
+                if(frame<20) {
+                    drawAtlas(canvas,anim.atlas,frame,x,baseY,0.965f,0.965f,255);
+                } else {
+                    int i=Math.min(6,frame-20);
+                    drawAtlas(canvas,anim.atlas,frame,
+                        x+P01_INTRO_OFFSET_X[i],baseY+P01_INTRO_OFFSET_Y[i],
+                        P01_INTRO_X[i],P01_INTRO_Y[i],
+                        Math.round(255*(1f-fade)));
+                }
             }
             if(fade>0f) drawP01Idle(canvas,x,baseY,Math.round(255*fade));
         } else {
