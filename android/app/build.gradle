@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 98
-        versionName '0.98-p01-dash-plus15'
+        versionCode 99
+        versionName '0.99-p01-victory-foot-lock'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
@@ -34,7 +34,8 @@ tasks.register('generateP01Calibration', Exec) {
     description = 'Generate framewise P01 idle-master normalization from source sprite reports'
     inputs.files(fileTree(new File(spriteRoot, 'tools/sprites/reports')) {
         include 'player_base_*.report.json'
-    }, new File(spriteRoot, 'tools/sprites/generate_p01_calibration.py'))
+    }, file('src/main/res/drawable-nodpi/player_base_victory.png'),
+       new File(spriteRoot, 'tools/sprites/generate_p01_calibration.py'))
     outputs.file(p01CalibratedSource)
     workingDir spriteRoot
     commandLine 'python3', 'tools/sprites/generate_p01_calibration.py',
