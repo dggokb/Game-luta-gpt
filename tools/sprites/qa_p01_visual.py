@@ -47,7 +47,7 @@ def check_intro_handoff():
     # slightly smaller actual idle. All coordinates are atlas-root relative.
     java=JAVA.read_text()
     def scalar(name):
-        m=re.search(r"private static final float "+name+r"\\s*=\\s*(\\d+\\.\\d+)f;",java)
+        m=re.search(r"private static final float "+name+r"\s*=\s*(\d+\.\d+)f;",java)
         assert m, "Missing P01 calibration scalar "+name
         return float(m.group(1))
     idle_scale=scalar("P01_IDLE_SCALE")
