@@ -4,6 +4,7 @@
 SEM modificar PNG, sem corrigir por bounding box, sem aprovar clipes sem evidência.
 As métricas de cabeça/tronco são aproximações; nunca fazem resize automático.
 """
+import math
 import re
 import unicodedata
 from pathlib import Path
@@ -97,7 +98,12 @@ def match_videos(folder, states):
 
 def properties(alpha):
     """Proxies observáveis por silhueta; não são detecção anatômica infalível."""
-    a = np.asarray(alpha) > 128
+    raw = np.asarray(alpha)
+    if raw.ndim != 2 or raw.size == 0 or not np.issubdtype(raw.dtype,np.number):
+        return None
+    if not np.all(np.isfinite(raw)):
+        return None
+    a = raw > 128
     ys, xs = np.nonzero(a)
     if len(xs) < 75:
         return None
@@ -150,6 +156,31 @@ def metrics(measures, reference_height, state):
     """Sinaliza anomalias sem inventar continuidade onde quadros estão ausentes."""
     if not measures:
         return {"status":"INCONCLUSIVO","motivo":"sem quadros"}
+    try:
+        ref=float(reference_height)
+    except (ValueError,TypeError,OverflowError):
+        ref=float("nan")
+    if not math.isfinite(ref) or ref<=0:
+        return {"status":"INCONCLUSIVO","motivo":"altura idle invalida"}
+    # OCR, corrupt alpha, broken metadata and injected data may produce NaN
+    # while still returning a dict. Those must be treated as missing frames,
+    # never MEDIDO or a valid body-scale ratio.
+    mandatory=("torso_x","head_proxy","torso_proxy","shoe_x","height")
+    cleaned=[]
+    for m in measures:
+        if not isinstance(m,dict):
+            cleaned.append(None)
+            continue
+        try:
+            values={k:float(m[k]) for k in mandatory}
+            optional=[float(m[k]) for k in ("shoe_y","body_y") if k in m]
+            valid=(all(math.isfinite(v) for v in list(values.values())+optional)
+                   and values["height"]>0 and values["head_proxy"]>0
+                   and values["torso_proxy"]>0)
+        except (KeyError,ValueError,TypeError,OverflowError):
+            valid=False
+        cleaned.append(m if valid else None)
+    measures=cleaned
     good = [(i,m) for i,m in enumerate(measures) if m is not None]
     invalid=[i for i,m in enumerate(measures) if m is None]
     if len(good) < 5 or len(good) < len(measures)*.75:
@@ -296,11 +327,18 @@ def compare_body(idle_stats, other_stats):
     """
     if idle_stats.get("status")!="MEDIDO" or other_stats.get("status")!="MEDIDO":
         return {"status":"INCONCLUSIVO"}
-    a,b=idle_stats["medianas"],other_stats["medianas"]
-    if min(a["cabeca"],a["tronco"],b["cabeca"],b["tronco"])<=0:
+    try:
+        a,b=idle_stats["medianas"],other_stats["medianas"]
+        values=[float(a["cabeca"]),float(a["tronco"]),
+                float(b["cabeca"]),float(b["tronco"])]
+    except (KeyError,TypeError,ValueError,OverflowError):
         return {"status":"INCONCLUSIVO"}
-    h=b["cabeca"]/a["cabeca"]
-    t=b["tronco"]/a["tronco"]
+    if not all(math.isfinite(v) and v>0 for v in values):
+        return {"status":"INCONCLUSIVO"}
+    h=values[2]/values[0]
+    t=values[3]/values[1]
+    if not math.isfinite(h) or not math.isfinite(t):
+        return {"status":"INCONCLUSIVO"}
     if abs(h-t)>.12:
         return {"status":"INCONCLUSIVO","motivo":"cabeca e tronco discordam; pose ou angulo diferentes",
                 "proporcoes":[round(h,3),round(t,3)]}
