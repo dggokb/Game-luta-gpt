@@ -53,17 +53,26 @@ final class SpriteFighterRenderer {
     };
     // Original atlas silhouettes change proportions across frames 20..26.
     // Align the final silhouette with idle's occupied pixels (not canvas width).
+    // Idle is 2% smaller to match the final intro pose more closely.
+    private static final float P01_IDLE_SCALE = 0.980f;
+    // Standing part of the victory uses approximately the same on-screen
+    // figure height as the first intro frame (before the action).
+    private static final float P01_VICTORY_SCALE = 0.940f;
+    // During the supplied victory sheet the fighter walks in during frames
+    // 0..6. The clip starts at 7; its planted feet are offset ~47 atlas
+    // pixels from the declared atlas root, so re-anchor them at world x.
+    private static final float P01_VICTORY_FOOT_SHIFT = 24.0f;
     private static final float[] P01_INTRO_X = {
-        0.965f,0.950f,0.947f,0.947f,0.947f,0.947f,0.947f
+        0.965f,0.950f,0.940f,0.935f,0.931f,0.928f,0.928f
     };
     private static final float[] P01_INTRO_Y = {
-        0.970f,1.010f,1.072f,1.072f,1.069f,1.067f,1.067f
+        0.970f,1.010f,1.052f,1.050f,1.047f,1.045f,1.045f
     };
     private static final float[] P01_INTRO_OFFSET_X = {
-        -12.9f,-10.3f,-9.8f,-9.8f,-9.8f,-9.8f,-9.8f
+        -12.9f,-10.3f,-10.7f,-11.0f,-11.3f,-11.6f,-11.6f
     };
     private static final float[] P01_INTRO_OFFSET_Y = {
-        2.1f,0.0f,-0.3f,-0.3f,0.8f,0.8f,0.8f
+        2.1f,0.0f,-4.1f,-4.1f,-3.4f,-3.14f,-3.14f
     };
 
     /** Sprite artwork coordinates, not fighter hitboxes or simulation sizes. */
@@ -75,7 +84,17 @@ final class SpriteFighterRenderer {
         if(mirror) {canvas.save();canvas.scale(-1f,1f,x,0f);}
         boolean p01="player_base".equals(character.id)||"p01_training".equals(character.id);
 
-        if(p01 && SpriteStates.CROUCH.equals(motion.clip)) {
+        if(p01 && SpriteStates.IDLE.equals(motion.clip)) {
+            drawAtlas(canvas,anim.atlas,frame,x,baseY,
+                P01_IDLE_SCALE,P01_IDLE_SCALE,255);
+        } else if(p01 && SpriteStates.VICTORY.equals(motion.clip)) {
+            // Skip the source's walking frames; a minor foot-root adjustment
+            // keeps the standing celebration anchored instead of skating.
+            float anchor=P01_VICTORY_FOOT_SHIFT+
+                Math.max(0,frame-7)*0.10f;
+            drawAtlas(canvas,anim.atlas,frame,x+anchor,baseY,
+                P01_VICTORY_SCALE,P01_VICTORY_SCALE,255);
+        } else if(p01 && SpriteStates.CROUCH.equals(motion.clip)) {
             // Widening of the painted figure across CROUCH 0..7 is compensated.
             // Result: occupied width stays ~302px in authored sprite coordinates.
             float k=P01_CROUCH[Math.min(frame,P01_CROUCH.length-1)];
@@ -112,7 +131,7 @@ final class SpriteFighterRenderer {
 
     private void drawP01Idle(Canvas canvas,float x,float baseY,int alpha) {
         CharacterDefinition.Animation idle=character.animation(SpriteStates.IDLE);
-        drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,1f,1f,alpha);
+        drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,P01_IDLE_SCALE,P01_IDLE_SCALE,alpha);
     }
 
     private void drawAtlas(Canvas canvas,CharacterDefinition.Atlas a,int frame,float x,
