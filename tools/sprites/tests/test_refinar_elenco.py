@@ -78,6 +78,24 @@ class CharacterStabilizerTest(unittest.TestCase):
         self.assertEqual([5,9],report["tremor"]["torso"])
         self.assertEqual([5,9],report["tremor"]["pe_apoio"])
 
+    def test_gaps_are_not_silently_joined_across_missing_frames(self):
+        smooth=[body_frame(x=75) for _ in range(16)]
+        smooth[6]=None
+        smooth[7]=None
+        result=e.metrics(smooth,100,"VICTORY")
+        self.assertEqual("MEDIDO_COM_LACUNAS",result["status"])
+        self.assertEqual([6,7],result["quadros_invalidos"])
+        self.assertEqual([],result["tremor"].get("torso",[]))
+        self.assertEqual([],result["tremor"].get("pe_apoio",[]))
+
+    def test_repeated_foot_wobble_does_not_escape_median_filter(self):
+        alternating=[dict(body_frame(),shoe_x=40+8*(i%2))
+                     for i in range(18)]
+        motion=e.metrics(alternating,100,"VICTORY")
+        self.assertTrue(motion["tremor"].get("pe_apoio"),motion)
+        legitimate=e.metrics(alternating,100,"DASH")
+        self.assertFalse(legitimate["tremor"].get("pe_apoio"),legitimate)
+
     def test_slow_victory_foot_drift_detected(self):
         samples=[dict(body_frame(),shoe_x=40+i*.95) for i in range(30)]
         self.assertEqual("SUSPEITA_DE_DESLIZE",e.metrics(samples,100,"VICTORY")["deslize"]["status"])
@@ -126,7 +144,7 @@ class CharacterStabilizerTest(unittest.TestCase):
             result=MOD.inspect_character("p01",videos,states=["DASH"],
                     root=root,original_video_inspector=read_video,
                     packed_inspector=read_pack,geometria=False)
-            self.assertEqual("MEDICOES_CONCLUIDAS",result["status"])
+            self.assertEqual("DIAGNOSTICO_PRELIMINAR",result["status"])
             self.assertFalse(result["aprovado_automaticamente"])
             self.assertEqual("COMPATIVEL",result["estados"]["DASH"]["proporcao_video"]["status"])
             self.assertEqual("COMPATIVEL",result["estados"]["DASH"]["proporcao_sprite"]["status"])
@@ -206,6 +224,11 @@ class CharacterStabilizerTest(unittest.TestCase):
             pack["animations"]["DASH"]["frames"]=[-1]
             self.assertEqual("FRAME_FORA_DO_ATLAS",
                              e.load_atlas_state(root,pack,"DASH")[0]["status"])
+            pack["animations"]["DASH"]["frames"]=list(range(151))
+            pack["animations"]["DASH"]["frames"][1]=500
+            # Even with a low sample limit that skips frame 1, this must fail.
+            self.assertEqual("FRAME_FORA_DO_ATLAS",
+                             e.load_atlas_state(root,pack,"DASH",limit=1)[0]["status"])
 
     def test_p12_without_import_is_not_audited_successfully(self):
         with tempfile.TemporaryDirectory() as d:
