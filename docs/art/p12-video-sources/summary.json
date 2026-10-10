@@ -1,0 +1,235 @@
+{
+  "character": "p12",
+  "status": "NOT_APPROVED",
+  "sourcePolicy": "EXISTING_DRIVE_VIDEOS_ONLY",
+  "folder": "https://drive.google.com/drive/folders/1gk8gEgCZaAm1AXkwHheqTfuUpfY-lFi-",
+  "videosExtracted": 33,
+  "actualFrames": 3201,
+  "potentialStateBindings": {
+    "IDLE": {
+      "file": "idle.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f"
+    },
+    "COMBAT": {
+      "file": "idle.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "ba134067277f5673b05a2388fc8c4ea2a04133f099679353a3772948d401d72f"
+    },
+    "WALK_FORWARD": {
+      "file": "frente.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8"
+    },
+    "WALK_BACK": {
+      "file": "tras.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "ca23dde0ad6fbab84df4327627e4b4c1957bc88c1c60cdd49d1a5d3dd9e819fe"
+    },
+    "CROUCH": {
+      "file": "agachado.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4"
+    },
+    "RISE": {
+      "file": "agachado.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "8c057df79f894564facc222c22e5591b4d2dd795577c7eeee10cc534d391dfd4"
+    },
+    "JUMP": {
+      "file": "jump.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc"
+    },
+    "FALL": {
+      "file": "jump.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc"
+    },
+    "LAND": {
+      "file": "jump.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "edde6505715ba63ff5bb19af280ff7f3a4ec5a1fa66ea9b68938a5440dd7c2bc"
+    },
+    "DASH": {
+      "file": "dash.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "7442f378d8b1bb1d02639832de714f988bed7b1fe9928a24ad7f6dd054e3e086"
+    },
+    "BACKDASH": {
+      "file": "backDash.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "34f2a84d0711520926eeb030524ea2d60c50f0213938192ef41cd94a661497a5"
+    },
+    "LIGHT_JAB": {
+      "file": "L.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "e4515e9cf74a13b72aa67d53c3498bb04a7a6b3d7da8ecfc7e3a6189382eacd8"
+    },
+    "MEDIUM_KICK": {
+      "file": "M.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "27e40c87ba382309e0a7e18a1c8d122504720e4812e2748b984389cb6b55fd74"
+    },
+    "HEAVY_STRAIGHT": {
+      "file": "H.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "c777dcb188057bf5ef2880690ac622e470e3ffe43c70aca13cddce5d130939a7"
+    },
+    "CROUCH_LIGHT": {
+      "file": "2L.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "2788c895fb099bdc6356a9c8d947ffdf2b28778ef22b2a320673c672c6379f58"
+    },
+    "CROUCH_MEDIUM": {
+      "file": "2M.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "4a4f32b191d91331c472167b015f2651162a159e86d77008b59d809cf45bbf91"
+    },
+    "CROUCH_HEAVY": {
+      "file": "2H.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "9838b17665b135b4d9e79f29c83f5172cbc0a2e6c42b2f0bb3c04184e26db98d"
+    },
+    "JUMP_LIGHT": {
+      "file": "jL.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "02352f7b65f17e38ee3b102c181d7573238f43b54eb740c3f3db8158ea61f48d"
+    },
+    "JUMP_MEDIUM": {
+      "file": "jM.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "c15542879fd2e0465f8c25be716cc06cd9c484142475e2a229fa4ba6ae03eaf8"
+    },
+    "JUMP_HEAVY": {
+      "file": "jH.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "95c9ad881acd4bd638a18192e9969692979e3c5a42cf1baa252ace024cbe601d"
+    },
+    "DEFENSE_STAND": {
+      "file": "defendeCima.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "bc9e1aba5a17920cce437c7d762ca05f11658a43704074d35db7894c1c569a98"
+    },
+    "DEFENSE_CROUCH": {
+      "file": "defendeBaixo.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "030b11b6f7b436f497c22bf9aeedeeb5a7d4711cbe7d113df38e01ef56ce95e6"
+    },
+    "DEFENSE_AIR": {
+      "file": "defesaPulo.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "62d454f95da34a4c1ba6e2f28071c3249503cb16218ce307e19c16b342d43ec5"
+    },
+    "HIT_CROUCH": {
+      "file": "danoBaixo.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "addadb43e887c9d235e10b90ab8768f443d98576f000074b5274c72a589503fe"
+    },
+    "HIT_AIR": {
+      "file": "danoPulo.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "256ba180bdc504a4f6819dee093c44739f95904e3ab79162fc3620fa099712bb"
+    },
+    "HIT_STAND": {
+      "file": "derruba_levanta.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f",
+      "candidatePhase": "initial standing hit/recoil before the knockdown; impact beam must be removed",
+      "dedicatedFileMissing": true
+    },
+    "JUMP_HEAVY_DOWN": {
+      "file": "jH.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "95c9ad881acd4bd638a18192e9969692979e3c5a42cf1baa252ace024cbe601d",
+      "candidatePhase": "overhead hands to downward slam, frames 64\u201371; source zoom/effects require correction",
+      "dedicatedFileMissing": true
+    },
+    "KNOCKDOWN": {
+      "file": "derruba_levanta.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+    },
+    "GROUNDED": {
+      "file": "derruba_levanta.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+    },
+    "GETUP": {
+      "file": "derruba_levanta.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f"
+    },
+    "THROW_GRAB": {
+      "file": "agarrao.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "a33f63b74342ec5d915e8db20dedff1635c8beb5669fc417d127b6f81e19a53f"
+    },
+    "THROW_TOSS": {
+      "file": "agarrao.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "a33f63b74342ec5d915e8db20dedff1635c8beb5669fc417d127b6f81e19a53f"
+    },
+    "SPECIAL_ENERGY": {
+      "file": "s1.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "ab4b7a3a19eaac0b0d1f5d327ea6c9363753eb4b1ce6cd24e6de69d037d7f307"
+    },
+    "SPECIAL_S2": {
+      "file": "s2.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "02fd46bd7f833eaa7d17df7988e8cc36fa63488cec247bd568a5e0d9dfa136fa"
+    },
+    "SPECIAL_S3": {
+      "file": "s3.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "1bef36528c986323623a2074b4e2df037199bcffe00a1dfd8a508b4822cd256a"
+    },
+    "SPECIAL_S4": {
+      "file": "s4.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "e128f34bf0d241dc2b2aaebf3b25459ca732b6e2a4b3bd5bad59504bede6911a"
+    },
+    "SUPER_WAVE": {
+      "file": "super.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "0f4525cad96f3a381acab7aeb30e95c19dbdfc1a392ceaf5f8bec59db97a33c1"
+    },
+    "ULTRA_BEAM": {
+      "file": "ultra.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "06b65437b240ac8edb10d30a931eb934b457bf5680e063b0931905a1d9fb9aa7"
+    },
+    "INTRO": {
+      "file": "intro.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "84efa354b5b233b9a61ca64ac329f0a7c11bc33dbb4a9cd0c7bd820f89b8834a"
+    },
+    "VICTORY": {
+      "file": "vitoria.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "f6ae7d2dc1df38c1f459738a54d438a33a2f4a136342fb91b5779de2e62f4801"
+    },
+    "DEFEAT": {
+      "file": "derrota.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "1d2700620bfd0e8f95b2a607b6ec17a7a1f4d635d773eb0bedc37305739e9655"
+    },
+    "TAUNT": {
+      "file": "provocacao.mp4",
+      "status": "SEGMENT_REVIEW_PENDING",
+      "videoSha256": "48cf71b024a1a2070f091727bfb2a7053e89ca215220304132901bd54f89627d"
+    }
+  },
+  "missingVideoStates": [],
+  "errors": [],
+  "pending": [
+    "Review source motions and effect mattes",
+    "Select preparation/impact/recovery intervals",
+    "Preserve combat timing and impact indices",
+    "Anatomy, roots and support feet",
+    "Cached SR",
+    "Character Pack import and mandatory audits",
+    "Android tests, emulator and APK"
+  ]
+}

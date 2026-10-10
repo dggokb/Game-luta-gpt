@@ -1,32 +1,31 @@
-# P12 authored motion — in progress, NOT APPROVED
+# P12 — existing Drive video extraction, NOT APPROVED
 
 Branch: `test/p09-three-engines-20261009`. No merge to main branches.
 
-## Source checkpoint
+The user corrected the source requirement: use the existing videos in `animations/p12` on Google Drive. Newly generated sprite sheets are superseded drafts and are NOT the movement source for this integration. No more poses are to be generated for this task.
 
-33 of 42 states have independently drawn source sequences. Every new sequence is preserved in `art/keys/p12/sheets/`; the new `.source.json` files contain the exact generation prompt, grid, peak and Git blob identity. Twelve sheets recovered from the interrupted session have no surviving exact prompt; their recovery is explicitly disclosed by the extractor.
+## Real source work
 
-The extractor isolates actual connected figures and preserves their color/alpha. It rejects cropped or merged drawings. An initial GROUNDED sheet failed because it had seven connected figures instead of eight; it was replaced with a two-column, four-row sheet. Previews now use one scale per state, instead of hiding scale variation by independently resizing thumbnails.
+The exact Drive folder is recorded in `tools/sprites/videos/p12-drive-inventory.json`. It contains 33 MP4 videos and two initial pose PNGs. The originals were downloaded, byte lengths checked, and each complete video strictly decoded with FFmpeg. Two initial partial downloads were detected and replaced with complete originals.
 
-## Engine work
+`p12_video_sources.py` extracts every sequential frame with its original timestamp, source bounding box, original-video SHA-256 and extracted-frame SHA-256. It uses the existing chroma-key engine, with no pose synthesis, limb warping or resize. All 33 videos have 97 frames: 3,201 real source frames were extracted without decode errors. Cache reuse requires the same video, extractor version, keyer and all frame hashes.
 
-The rejected Idle deformation generator has been removed from `p12_full_cycle.py`. Its entry points now use `p12_authored_cycle.py`, which reads independently drawn start, peak, recovery and intermediate poses. It has no Idle deformation fallback. Full refinement requires all 42 clean sources and explicit scale/root/movement review registration. That registration is still missing; the new production renderer has NOT prepared or integrated the pack.
+The existing measurement engine calibrated the original `inicio_centro` and `inicio_agachado` against `agachado.mp4`. Standing visual height remains 208. Measured source scales are 0.5375 and 0.5366; the crouch reference matches video frame 52 with score 0.97 and zoom 1.343. This calibration is a measurement, not final animation approval.
 
-The combat contract is preserved verbatim in `p12-motion-contract.json`. The renderer keeps frame counts, durations, impact indices, locomotion stride, moves, specials and cancel windows. Native pixels are reproducibly derived from their consumed sources. AnimeVideo-v3 uses a persistent content-addressed cache keyed by source pixels, size, model and alpha pipeline version; alpha is preserved separately.
+## Segments and defects still under review
 
-The existing harmony and visual audit errors remain blocking. `p12_pose_gate.py` is unchanged. The runtime smoke workflow no longer fetches hardcoded old run 38011770619: it selects the artifact and checkout SHA from the corresponding successful P12 build. Valid build runs are no longer cancelled by later pushes.
+The input filenames do not map one-to-one to 42 states. Jump, crouch, grab and knockdown/getup videos contain multiple phases. The extraction tool records candidate bindings to all 42 states, explicitly pending interval review. No combat durations, impact indices, commands, hitboxes or cancel windows have changed.
 
-## Verification so far
+No dedicated standing-hit or downward-air-heavy file was found in the P12 folder. Candidate footage exists in the initial recoil of `derruba_levanta.mp4` and the downward slam of `jH.mp4`; these candidates are not automatically approved as replacement clips. The former includes an attached beam/impact effect. The latter has visible zoom and scale changes around frames 65–70, plus a ground ring. These need correction and review using the actual source frames.
 
-- 8 focused extractor/renderer/cache tests pass.
-- The first renderer test exposed a color rounding error at unit scale; it was corrected by avoiding unnecessary premultiplied conversion when no resize is requested.
-- Official AnimeVideo-v3 weights downloaded and SHA-256 checked against `b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d`.
-- Source geometry checks show actual standing-to-squat, squat-to-standing and landing absorption changes. These limited measurements do not approve attacks or walking.
-- Runtime source gate still rejects 0/40 consumed action bindings, correctly: the runtime still contains the old rejected pack.
-- The full existing Python suite was started and remains running at this checkpoint; no success is claimed.
+Additional review is required for body scale, effects attached to the silhouette, foot support, segment boundaries, motion recognition and state transitions. A different hash is not a semantic pass.
 
-## Unresolved
+## Runtime and validation
 
-Nine source states remain to be drawn: COMBAT, ULTRA_BEAM, THROW_GRAB, THROW_TOSS, INTRO, JUMP_HEAVY_DOWN, VICTORY, DEFEAT and TAUNT. DEFENSE_CROUCH needs a lower posture. All states still need anatomical scale/root registration, support-foot/gait evidence, final continuity review, refinement, Character Pack import and mandatory audit passes. No new APK or emulator approval exists yet.
+The runtime P12 pack is still the rejected previous pack. The newly generated drafts have not been integrated. `p12_full_cycle.py` now requires traceable existing-video provenance before production preparation or verification, preventing the superseded generated-sheet path from preparing another pack.
 
-The character is NOT finalized. Source coverage is not animation approval.
+`p12_pose_gate.py`, harmony and graphic audit thresholds remain unchanged. The old runtime still fails source binding and has its known 14 harmony defects and 16 critical graphic findings. These have NOT been marked resolved by the extraction work.
+
+Pending: reviewed frame/impact selections; scale and support-foot correction; alpha/effect review; cached real super-resolution; Character Pack/Android resources and Java generation; mandatory audit passes; Android tests; emulator exercise and APK.
+
+The character is NOT finalized. Extraction is not animation approval.
