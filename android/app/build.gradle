@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 93
-        versionName '0.93-p01-intro-2m-jump'
+        versionCode 94
+        versionName '0.94-p01-jump-victory-2m'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
