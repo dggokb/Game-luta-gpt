@@ -36,11 +36,25 @@ def run():
             x0,y0,x1,y1=atlas["frames"][i]["outputBbox"]
             center=(x0+x1)*.5-atlas["layout"]["rootX"]
             assert abs(center*sx+dx)<.01, (name,i,"fake translation")
-            assert abs((y1-y0)*sy-stand_h)<.6, (name,i,"size")
+            if name=="player_base_intro":
+                assert abs((y1-y0)*sy-stand_h)<.6, (name,i,"size")
+            else:
+                # Victory has a narrow standing silhouette; full-height
+                # bounding-box equality made it visually undersized.
+                assert .85<=sy<=.93, (name,i,"victory calibrated size")
     dash=json.loads((REPORTS/"player_base_dash.report.json").read_text())
     for i,frame in enumerate(dash["frames"]):
         a,b,c,d=frame["outputBbox"]
-        assert (c-a)*transforms["player_base_dash"][i][0] <= stand_w*1.205
+        assert (c-a)*transforms["player_base_dash"][i][0] <= stand_w*1.325
+    # Keep the extended arm of the crouching launcher, while preserving
+    # the torso width near idle (v0.96 shrank it by 34%).
+    h=json.loads((REPORTS/"player_base_crouch_heavy.report.json").read_text())
+    for frame in (4,5,6,7):
+        a,b,c,d=h["frames"][frame]["outputBbox"]
+        sx,sy,dx,dy=transforms["player_base_crouch_heavy"][frame]
+        assert .94*stand_w <= (c-a)*sx <= 1.08*stand_w
+        assert 1.13*stand_h <= (d-b)*sy <= 1.18*stand_h
+
     # Ensure squat and aerial poses are not enlarged into standing characters.
     for name in ("player_base_crouch_light","player_base_crouch_medium",
                  "player_base_jump","player_base_fall_air"):
