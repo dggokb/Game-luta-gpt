@@ -1,0 +1,101 @@
+name: P12 full character animation cycle
+
+on:
+  push:
+    branches:
+      - test/p09-three-engines-20261009
+    paths:
+      - .github/workflows/p12-full-cycle.yml
+      - tools/sprites/p12_full_cycle.py
+      - tools/sprites/harmony.py
+      - android/app/src/test/java/com/gamelutagpt/SpriteIntegrationTest.java
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p12-full-cycle
+  cancel-in-progress: true
+
+jobs:
+  full-character:
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Image and model dependencies
+        run: |
+          python -m pip install --disable-pip-version-check "Pillow==12.3.0" "numpy<3" scipy opencv-python-headless
+          python -m pip install --disable-pip-version-check torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Fetch verified AnimeVideo-v3 AI model
+        run: |
+          curl -fLS --retry 3 --output /tmp/realesr-animevideov3.pth \
+            https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth
+          echo "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d  /tmp/realesr-animevideov3.pth" | sha256sum --check
+      - name: Generate ALL real P12 motion clips and refine every frame
+        run: |
+          python -m compileall -q tools/sprites/p12_full_cycle.py
+          python -u tools/sprites/p12_full_cycle.py prepare \
+            --weights /tmp/realesr-animevideov3.pth
+      - name: Validate and integrate character, all atlases and frame maps
+        run: |
+          python tools/sprites/p12_full_cycle.py verify
+          python tools/sprites/build_characters.py --write
+          python tools/sprites/build_characters.py --check
+      - name: Run temporal, ground, registration and graphic audits
+        run: python -u tools/sprites/p12_full_cycle.py audit
+      - name: Android tests and APK
+        working-directory: android
+        run: gradle testDebugUnitTest :ultra-core:test :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+      - name: Publish passed P12 character in TEST BRANCH only
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- 'art/sprites/source/p12_full_*.png'
+          git add -- 'tools/sprites/clips/p12_full_*.json' tools/sprites/profiles/p12.json
+          git add -- characters/p12/character.json characters/roster.json
+          git add -- 'tools/sprites/reports/p12_full_*.report.json'
+          git add -- 'android/app/src/main/res/drawable-nodpi/p12_full_*.png'
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add -- android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          git diff --cached --check
+          git diff --cached --quiet && { echo "No changed files"; exit 1; }
+          git commit -m "Integrate P12 complete procedural state animations with SR and checks [skip ci]"
+          git push origin HEAD:test/p09-three-engines-20261009
+      - name: Upload playable P12 APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P12-Full-Cycle-Test-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Upload detailed frame review even on error
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P12-Full-Cycle-Quality-Reports
+          path: |
+            android/app/build/p12-full-cycle/
+            android/app/build/reports/tests/
+            tools/sprites/reports/p12_full_*.report.json
+          if-no-files-found: warn
