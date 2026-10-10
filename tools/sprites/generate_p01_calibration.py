@@ -46,11 +46,13 @@ def compute():
             if key == "player_base_idle":
                 sx = sy = STAND_SCALE
             elif key == "player_base_dash":
-                # 0.96 overcorrected the exaggerated running sheet: it made
-                # the body too small. Preserve the low running pose but
-                # retain ~1.30x idle maximum for its natural stride width.
-                sx = min(.730, idle_width * 1.32 / max(1, width))
-                sy = .965
+                # v0.98: P01's low running pose was SMALLER than the idle
+                # in real device tests (not larger). Lift both draw axes by
+                # 15% from v0.97; a crouched running pose remains naturally
+                # shorter, but the fighter's anatomy stops looking miniature.
+                # Width is allowed to exceed idle from the extended stride.
+                sx = min(.8395, idle_width * 1.518 / max(1, width))
+                sy = 1.10975
             elif key in ("player_base_intro", "player_base_victory"):
                 # The victory silhouette has arms compact against the body.
                 # Matching its *overall* bbox to idle yielded a tiny figure.
