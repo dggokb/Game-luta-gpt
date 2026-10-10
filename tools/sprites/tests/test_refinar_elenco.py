@@ -49,6 +49,20 @@ class CharacterStabilizerTest(unittest.TestCase):
         self.assertEqual("JUMP_HEAVY_DOWN",MOD.canonical_state("jh_baixo"))
         self.assertEqual("VICTORY",MOD.canonical_state("victory"))
 
+    def test_fall_only_video_does_not_require_a_jump_apex(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            for name in ("jump.mp4","fall.mp4","land.mp4"):
+                (root/name).touch()
+            clips=e.match_videos(root,["JUMP","FALL","LAND"])
+            self.assertNotEqual(clips["JUMP"]["files"],clips["FALL"]["files"])
+            self.assertTrue(MOD.split_jump_video("JUMP",clips["JUMP"],clips["JUMP"]))
+            self.assertFalse(MOD.split_jump_video("FALL",clips["FALL"],clips["JUMP"]))
+            self.assertFalse(MOD.split_jump_video("LAND",clips["LAND"],clips["JUMP"]))
+            (root/"fall.mp4").unlink()
+            clips=e.match_videos(root,["JUMP","FALL"])
+            self.assertTrue(MOD.split_jump_video("FALL",clips["FALL"],clips["JUMP"]))
+
     def test_jump_video_is_split_by_apex_and_never_assumed(self):
         # Foreground clearly rises, then descends; original jump.mp4 is
         # shared by both character states and MUST be segmented.
