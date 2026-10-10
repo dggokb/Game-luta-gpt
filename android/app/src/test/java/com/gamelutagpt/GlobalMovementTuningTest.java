@@ -55,6 +55,22 @@ public class GlobalMovementTuningTest {
             assertEquals(0,e.fighter(i).backdashFrames);
         }
     }
+    @Test public void winnerCannotWalkOrDashAfterKnockout() {
+        CombatEngine e=engine();
+        CombatFighter winner=e.fighter(0);
+        e.fighter(1).state.life=0;
+        float x=winner.x;
+        FighterInput pressed=new FighterInput();
+        pressed.direction=1;
+        pressed.dash=true;
+        pressed.backdash=true;
+        FighterInput neutral=new FighterInput();
+        for(int i=0;i<26;i++)e.step(pressed,neutral);
+        assertEquals("Winner moved under its own victory pose",x,winner.x,.001f);
+        assertEquals(0,winner.backdashFrames);
+        assertFalse(winner.forwardDashing);
+    }
+
     @Test public void normalJumpCanCrossOverAStandingOpponent() {
         // Test an actual crossover, not just an increased impulse value.
         CombatEngine e=new CombatEngine(
