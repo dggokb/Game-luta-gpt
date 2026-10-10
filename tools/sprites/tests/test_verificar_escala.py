@@ -88,7 +88,7 @@ class GeometricScaleProofTest(unittest.TestCase):
         from tempfile import TemporaryDirectory
         with TemporaryDirectory() as d:
             import estabilizador as temporal
-            for name,background_green in [("green",True),("red",False),("bad_bottom",True)]:
+            for name,background_green in [("green",True),("red",False),("bad_bottom",True),("fake_edges",True)]:
                 out=Path(d)/(name+".mp4")
                 codec=cv2.VideoWriter_fourcc(*"mp4v")
                 writer=cv2.VideoWriter(str(out),codec,24.,(96,96))
@@ -100,6 +100,11 @@ class GeometricScaleProofTest(unittest.TestCase):
                     cv2.rectangle(canvas,(35,20),(65,88),(30,40,185),-1)
                     if name=="bad_bottom":
                         canvas[-22:,-22:]=(0,0,255)
+                    if name=="fake_edges":
+                        # Green corners with colored top/bottom borders must
+                        # never be accepted as a clean green-screen canvas.
+                        canvas[:5,25:-25]=(0,0,255)
+                        canvas[-5:,25:-25]=(0,0,255)
                     writer.write(canvas)
                 writer.release()
                 samples=geo.read_video_samples(out)
