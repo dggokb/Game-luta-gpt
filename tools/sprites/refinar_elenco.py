@@ -69,8 +69,15 @@ def calibration_info(root,character):
     path=Path(root)/"art/keys"/character/"tamanho.json"
     if not path.is_file():
         return {"status":"SEM_REFERENCIA_OFICIAL","path":str(path)}
-    data=json.loads(path.read_text(encoding="utf-8"))
-    if not data.get("altura") or not data.get("chaves",{}).get("inicio_centro"):
+    import math
+    try:
+        data=json.loads(path.read_text(encoding="utf-8"))
+        body_height=float(data["altura"])
+        author_scale=float(data["chaves"]["inicio_centro"])
+    except (ValueError,TypeError,KeyError,AttributeError,OverflowError):
+        return {"status":"REFERENCIA_INVALIDA","path":str(path)}
+    if (not math.isfinite(body_height) or body_height<=0 or
+        not math.isfinite(author_scale) or not .01<=author_scale<=5.):
         return {"status":"REFERENCIA_INVALIDA","path":str(path)}
     image=path.parent/"inicio_centro.png"
     if not image.is_file():
@@ -82,6 +89,17 @@ def calibration_info(root,character):
         return {"status":"IMAGEM_BASE_INVALIDA","path":str(image)}
     hsv=cv2.cvtColor(im,cv2.COLOR_BGR2HSV)
     bg=(hsv[:,:,0]>35)&(hsv[:,:,0]<95)&(hsv[:,:,1]>45)
+    # Without actual green-screen the entire picture may be detected as
+    # 'body', and a specially chosen fake height would pass calibration.
+    # Base images use the same green background as authored source clips.
+    h,w=bg.shape
+    tile=max(4,min(h,w)//12)
+    border=np.concatenate((bg[:tile,:tile].ravel(),
+                           bg[:tile,-tile:].ravel(),
+                           bg[-tile:,:tile].ravel(),
+                           bg[-tile:,-tile:].ravel()))
+    if float(border.mean())<.80:
+        return {"status":"REFERENCIA_SEM_CHROMA","path":str(image)}
     n,_,stats,_=cv2.connectedComponentsWithStats((~bg).astype(np.uint8))
     if n<2:
         return {"status":"REFERENCIA_SEM_CORPO","path":str(image)}
@@ -90,8 +108,8 @@ def calibration_info(root,character):
     area=int(largest[cv2.CC_STAT_AREA])
     if area<1000 or visible_height<60:
         return {"status":"REFERENCIA_SEM_CORPO","path":str(image)}
-    expected=visible_height*float(data["chaves"]["inicio_centro"])
-    delta=abs(expected-float(data["altura"]))/float(data["altura"])
+    expected=visible_height*author_scale
+    delta=abs(expected-body_height)/body_height
     if delta>.075:
         return {"status":"REFERENCIA_INCONSISTENTE","path":str(image),
                 "altura_declarada":data["altura"],
