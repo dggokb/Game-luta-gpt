@@ -8,8 +8,8 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 99
-        versionName '0.99-p01-victory-foot-lock'
+        versionCode 100
+        versionName '0.100-p01-ko-camera-fall'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
