@@ -110,15 +110,28 @@ class CharacterStabilizerTest(unittest.TestCase):
                     body_frame(head=20,torso=40)]*12
             result=MOD.inspect_character("p01",videos,states=["DASH"],
                     root=root,original_video_inspector=read_video,
-                    packed_inspector=read_pack)
+                    packed_inspector=read_pack,geometria=False)
             self.assertEqual("MEDICOES_CONCLUIDAS",result["status"])
             self.assertFalse(result["aprovado_automaticamente"])
             self.assertEqual("COMPATIVEL",result["estados"]["DASH"]["proporcao_video"]["status"])
             self.assertEqual("COMPATIVEL",result["estados"]["DASH"]["proporcao_sprite"]["status"])
+            self.assertEqual("INCONCLUSIVO",result["estados"]["DASH"]["prova_geometrica"]["status"])
+            # Metadata and silhouette alone never prove size; a proven
+            # geometric comparison must be supplied independently.
+            result_geo=MOD.inspect_character("p01",videos,states=["DASH"],
+                    root=root,original_video_inspector=read_video,
+                    packed_inspector=read_pack,geometria=True,
+                    geometry_inspector=lambda cid,state:{
+                        "status":"PADRONIZADA_FONTE_ATLAS",
+                        "diferenca_relativa":.015,
+                        "validacao_runtime":"PENDENTE"})
+            self.assertEqual("MEDICOES_CONCLUIDAS",result_geo["status"])
+            self.assertEqual(["DASH"],result_geo["padronizacao_comprovada_nos_estados"])
+            self.assertFalse(result_geo["aprovado_automaticamente"])
             (videos/"dash.mp4").unlink()
             result=MOD.inspect_character("p01",videos,states=["DASH"],
                     root=root,original_video_inspector=read_video,
-                    packed_inspector=read_pack)
+                    packed_inspector=read_pack,geometria=False)
             self.assertEqual("PENDENTE_FONTES",result["status"])
 
     def test_p12_without_import_is_not_audited_successfully(self):
