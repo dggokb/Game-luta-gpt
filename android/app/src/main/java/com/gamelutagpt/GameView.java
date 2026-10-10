@@ -61,6 +61,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final DemoDirector demo = new DemoDirector();
     private final FighterInput ignoredInput = new FighterInput();
     private boolean debugOverlay;
+    /** Screen-space controls shown only in DEBUG, away from combat buttons. */
+    private static final float TUNE_LEFT = 944f, TUNE_TOP = 168f;
+    private static final float TUNE_ROW_TOP = 208f, TUNE_ROW_H = 48f;
+    private final Paint tuningPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private String dummyDamageLabel = "";
     private int dummyDamageLabelFrames = 0;
@@ -196,6 +200,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
+        P01VisualTuning.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
@@ -1117,7 +1122,63 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
-        if (debugOverlay) debug.drawPanel(c, engine);
+        if (debugOverlay) {
+            debug.drawPanel(c, engine);
+            drawP01Tuner(c);
+        }
+    }
+
+    private void drawP01Tuner(Canvas c) {
+        Paint p=tuningPaint;
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.argb(225,10,17,29));
+        c.drawRoundRect(TUNE_LEFT,TUNE_TOP,1274f,411f,12f,12f,p);
+        p.setColor(Color.rgb(245,225,170));
+        p.setTextSize(17f);
+        p.setFakeBoldText(true);
+        c.drawText("P01 - AJUSTAR TAMANHO",TUNE_LEFT+10f,TUNE_TOP+24f,p);
+        p.setFakeBoldText(false);
+        p.setTextSize(13f);
+        p.setColor(Color.LTGRAY);
+        c.drawText("Comparar com o IDLE / salva sozinho",TUNE_LEFT+10f,TUNE_TOP+41f,p);
+        for(int row=0;row<3;row++) {
+            float top=TUNE_ROW_TOP+row*TUNE_ROW_H;
+            p.setColor(Color.WHITE);
+            p.setTextSize(18f);
+            c.drawText(P01VisualTuning.NAMES[row],TUNE_LEFT+12f,top+25f,p);
+            p.setTextSize(15f);
+            c.drawText(P01VisualTuning.percent(row)+"%",TUNE_LEFT+135f,top+25f,p);
+            p.setColor(Color.rgb(65,80,100));
+            c.drawRoundRect(1155f,top+2f,1198f,top+42f,7f,7f,p);
+            c.drawRoundRect(1208f,top+2f,1251f,top+42f,7f,7f,p);
+            p.setColor(Color.WHITE);
+            p.setTextSize(29f);
+            c.drawText("-",1169f,top+31f,p);
+            c.drawText("+",1218f,top+31f,p);
+        }
+        p.setColor(Color.rgb(65,80,100));
+        c.drawRoundRect(TUNE_LEFT+10f,360f,1261f,400f,7f,7f,p);
+        p.setColor(Color.WHITE);
+        p.setTextSize(16f);
+        c.drawText("RESTAURAR 100% (os 3)",TUNE_LEFT+27f,386f,p);
+    }
+
+    /** Return true when DEBUG scale editing consumes the tap. */
+    private boolean handleP01TunerTap(float x,float y) {
+        if (x<TUNE_LEFT || x>1274f || y<TUNE_TOP || y>411f) return false;
+        if (y>=360f && y<=401f) {
+            P01VisualTuning.reset(getContext());
+            return true;
+        }
+        int row=(int)((y-TUNE_ROW_TOP)/TUNE_ROW_H);
+        if(row>=0 && row<3 && y>=TUNE_ROW_TOP && y<TUNE_ROW_TOP+3*TUNE_ROW_H) {
+            float rowTop=TUNE_ROW_TOP+row*TUNE_ROW_H;
+            if(y>=rowTop+2f && y<=rowTop+42f) {
+                if(x>=1155f && x<=1198f) P01VisualTuning.adjust(getContext(),row,-1);
+                if(x>=1208f && x<=1251f) P01VisualTuning.adjust(getContext(),row,+1);
+            }
+        }
+        return true;
     }
 
     private static String guardLabel(int guard, String prefix) {
@@ -1589,6 +1650,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             int pointerId = event.getPointerId(index);
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
+            if(debugOverlay && handleP01TunerTap(x,y))return;
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
             switch (control) {
