@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Python syntax check (importer and auditor)
-        run: python -m py_compile tools/sprites/personagem.py tools/sprites/video_names.py tools/sprites/audit_drive_inventory.py
+        run: python -m py_compile tools/sprites/personagem.py tools/sprites/video_names.py tools/sprites/audit_drive_inventory.py tools/sprites/audit_video_content.py
       - name: Resolver regression tests
         run: python -m unittest discover -s tools/sprites/tests -p 'test_drive_inventory.py' -v
       - name: Drive snapshot x runtime report
