@@ -29,8 +29,10 @@ public class P01VisualMasterTest {
     }
 
     @Test public void excessiveDashJumpAndVictorySizesAreReduced() {
-        assertTrue("Dash not excessively wide",
-                   P01SpriteCalibration.get("player_base_dash",0)[0]>=.70f);
+        assertEquals("Dash visually grows by 15% from v0.97 in X",
+                     .8395f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
+        assertEquals("Dash visually grows by 15% from v0.97 in Y",
+                     1.10975f,P01SpriteCalibration.get("player_base_dash",0)[1],.001f);
         assertTrue("Jump start must shrink",P01SpriteCalibration.get("player_base_jump",0)[1]<.90f);
         assertEquals("Victory compromise between previous oversized and undersized",
                      .880f,P01SpriteCalibration.get("player_base_victory",15)[1],.001f);
