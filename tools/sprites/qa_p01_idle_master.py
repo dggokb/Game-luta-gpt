@@ -45,7 +45,13 @@ def run():
     dash=json.loads((REPORTS/"player_base_dash.report.json").read_text())
     for i,frame in enumerate(dash["frames"]):
         a,b,c,d=frame["outputBbox"]
-        assert (c-a)*transforms["player_base_dash"][i][0] <= stand_w*1.325
+        assert (c-a)*transforms["player_base_dash"][i][0] <= stand_w*1.525
+    # v0.98 boosts dash uniformly relative to v0.97; the naturally low
+    # running pose must stay shorter than idle without miniaturizing its body.
+    for sx,sy,dx,dy in transforms["player_base_dash"]:
+        assert .80 <= sx <= .845, (sx,sy)
+        assert 1.105 <= sy <= 1.115, (sx,sy)
+
     # Keep the extended arm of the crouching launcher, while preserving
     # the torso width near idle (v0.96 shrank it by 34%).
     h=json.loads((REPORTS/"player_base_crouch_heavy.report.json").read_text())
