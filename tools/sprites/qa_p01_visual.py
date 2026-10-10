@@ -19,6 +19,11 @@ def calibration(key):
     h20=cell("heavy_straight",20)
     assert all(h20.getchannel("A").getpixel(p)==255 for p in [(314,251),(307,257),(327,263)]), "H20 still has a hole"
     assert cell("heavy_straight",21).tobytes()==cell("heavy_straight",22).tobytes(), "H21 still has corrupted legs"
+    # Damaged frame 2 of the CROUCH_HEAVY atlas must be repaired before build.
+    crouch_h=Image.open(SPRITES/"player_base_crouch_heavy.png").convert("RGBA")
+    assert crouch_h.size == (3780,1384)
+    assert crouch_h.getpixel((2*378+245,447))[3] >= 225, "2H frame 2 still has a torn pant"
+    assert crouch_h.getpixel((2*378+257,452))[3] >= 225, "2H frame 2 right thigh still torn"
     java=JAVA.read_text()
     m=re.search(r"private static final float\[\]\s+P01_"+key+r"\s*=\s*\{([^}]+)\}",java,re.S)
     if not m:raise AssertionError("Missing renderer calibration "+key)
