@@ -12,7 +12,7 @@ JAVA=ROOT/"android/app/src/main/java/com/gamelutagpt/SpriteFighterRenderer.java"
 SPRITES=ROOT/"android/app/src/main/res/drawable-nodpi"
 MANIFEST=ROOT/"characters/player_base/character.json"
 PREVIEW=ROOT/"android/app/build/sprite-review"
-CELLS={"idle":(331,476,10),"intro":(347,569,9),"crouch":(373,475,8),"rise":(370,460,6),"heavy_straight":(570,485,7)}
+CELLS={"idle":(331,476,10),"intro":(347,569,9),"crouch":(373,475,8),"rise":(370,460,6),"heavy_straight":(570,485,7),"dash":(566,300,4)}
 
 def calibration(key):
     # Confirm the actual previously-broken H thigh and silhouette pixels.
@@ -41,6 +41,24 @@ def bb(img):
 def dims(img):
     x0,y0,x1,y1=bb(img)
     return (x1-x0,y1-y0)
+
+def check_dash_scale():
+    java=JAVA.read_text()
+    ratios={}
+    for symbol in ["P01_DASH_X","P01_DASH_Y","P01_IDLE_SCALE"]:
+        match=re.search(r"private static final float "+symbol+r"\s*=\s*(\d+\.\d+)f;",java)
+        assert match, "Dash scale calibration missing: "+symbol
+        ratios[symbol]=float(match.group(1))
+    idle_width,idle_height=dims(cell("idle",0))
+    dash_widths=[dims(cell("dash",frame))[0]*ratios["P01_DASH_X"]
+                 for frame in range(6)]
+    dash_heights=[dims(cell("dash",frame))[1]*ratios["P01_DASH_Y"]
+                  for frame in range(6)]
+    normalized_idle_width=idle_width*ratios["P01_IDLE_SCALE"]
+    # A running silhouette is wider, but no longer almost 1.8x idle.
+    assert max(dash_widths)/normalized_idle_width<1.40, dash_widths
+    assert max(dash_heights)<idle_height*ratios["P01_IDLE_SCALE"]
+    print("Dash drawn silhouette normalised:",dash_widths)
 
 def check_intro_handoff():
     # Source-pixel comparison of the last authored intro pose with the
@@ -122,6 +140,7 @@ def preview():
 def main():
     pack=json.loads(MANIFEST.read_text())
     check_intro_handoff()
+    check_dash_scale()
     h=pack["moves"]["H"]
     assert (h["startupFrames"],h["activeFrames"],h["recoveryFrames"])==(10,5,37)
     assert sum([h["startupFrames"],h["activeFrames"],h["recoveryFrames"]])==52
