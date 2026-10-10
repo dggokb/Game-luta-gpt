@@ -230,8 +230,17 @@ def frames_for(state,template):
     elif state in ("IDLE","WALK_FORWARD","WALK_BACK","DASH","BACKDASH"):n=10
     else:n=min(10,max(6,len(template["frames"])))
     frames=[]
+    hit=template.get("impactFrame")
+    original_ms=template.get("durationsMs",[])
+    hit_fraction=(sum(original_ms[:hit])/sum(original_ms)
+                  if hit is not None and sum(original_ms)>0 else None)
+    peak_index=(max(1,min(n-2,round(hit_fraction*n)))
+                if hit_fraction is not None and n>2 else None)
     for i in range(n):
         t=(i/n) if template.get("loop") else (i/max(1,n-1))
+        if peak_index is not None:
+            peak=peak_index/max(1,n-1)
+            t=(0.5*t/peak) if t<=peak else (0.5+0.5*(t-peak)/(1-peak))
         frames.append(t)
     return frames
 
@@ -333,7 +342,19 @@ def prepare(weights):
             animation["distancePerFrame"]=round(original_stride*original_count/len(images),4)
         else:
             original_total=max(1,original_total)
-            animation["durationsMs"]=[round(original_total/len(images),4)]*len(images)
+            old_hit=animation.get("impactFrame")
+            if old_hit is not None:
+                old_duration=read_json(ROOT/"characters/player_base/character.json")["animations"][state]["durationsMs"]
+                event_fraction=sum(old_duration[:old_hit])/sum(old_duration)
+                new_hit=max(1,min(len(images)-2,round(event_fraction*len(images))))
+                # Keep the original active-window event time EXACTLY despite fewer
+                # frames: otherwise a super/special could land during startup.
+                lead=original_total*event_fraction/new_hit
+                tail=original_total*(1-event_fraction)/(len(images)-new_hit)
+                animation["durationsMs"]=[round(lead,5)]*new_hit+[round(tail,5)]*(len(images)-new_hit)
+                animation["impactFrame"]=new_hit
+            else:
+                animation["durationsMs"]=[round(original_total/len(images),4)]*len(images)
         manifest["states"][state]={
             "frames":len(images),"unique_native_frames":len(set(im.tobytes() for im in images)),
             "sha_original":sha(orig),"sha_sr":sha(hd),
