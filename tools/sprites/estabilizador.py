@@ -202,10 +202,21 @@ def metrics(measures, reference_height, state):
             meaningful=changes[np.abs(changes)>=.2]
             agreement=(float(np.mean(np.sign(meaningful)==np.sign(shift)))
                        if len(meaningful) else 0)
-            threshold=max(3.,float(reference_height)*.03)
-            if abs(shift)>threshold and agreement>=.67:
+            # Small gradual skating (2-4px on a 400px idle figure) was
+            # previously invisible behind a 3%-of-height threshold and
+            # a hard 0.2px/frame movement cutoff. Detect a coherent long
+            # trend, not just large single-frame changes.
+            threshold=max(1.5,float(reference_height)*.004)
+            time=np.arange(len(window),dtype=float)
+            linear=np.asarray(window,dtype=float)
+            spread=float(np.std(linear))
+            correlation=(float(np.corrcoef(time,linear)[0,1])
+                         if spread>=.15 else 0.)
+            steady=abs(correlation)>=.80
+            if abs(shift)>threshold and (agreement>=.67 or steady):
                 drift={"status":"SUSPEITA_DE_DESLIZE","delta_x":round(shift,2),
                        "limite":round(threshold,2),
+                       "correlacao_temporal":round(correlation,3),
                        "trecho":"apos entrada" if state=="VICTORY" else "completo"}
     return {"status":"MEDIDO" if not invalid else "MEDIDO_COM_LACUNAS",
             "quadros":len(good),"quadros_invalidos":invalid,
