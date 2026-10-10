@@ -46,19 +46,32 @@ def compute():
             if key == "player_base_idle":
                 sx = sy = STAND_SCALE
             elif key == "player_base_dash":
-                sx = min(.76, idle_width * 1.20 / max(1, width))
-                sy = .90
+                # 0.96 overcorrected the exaggerated running sheet: it made
+                # the body too small. Preserve the low running pose but
+                # retain ~1.30x idle maximum for its natural stride width.
+                sx = min(.730, idle_width * 1.32 / max(1, width))
+                sy = .965
             elif key in ("player_base_intro", "player_base_victory"):
-                sy = clamp(idle_height / max(1, height), .68, 1.10)
-                # At the end of intro the body fills the idle's width.
-                sx = min(sy, idle_width / max(1, width)) if key.endswith("intro") and entry["index"] >= 20 else sy
+                # The victory silhouette has arms compact against the body.
+                # Matching its *overall* bbox to idle yielded a tiny figure.
+                # 0.880 stands between the overlarge 0.95 and undersized 0.96
+                # builds. Natural intro sizes continue using the idle reference.
+                if key == "player_base_victory":
+                    sx = sy = .880
+                else:
+                    sy = clamp(idle_height / max(1, height), .68, 1.10)
+                    sx = min(sy, idle_width / max(1, width)) if entry["index"] >= 20 else sy
             elif key == "player_base_crouch_light":
                 sx = sy = .92
             elif key == "player_base_crouch_medium":
                 sx = sy = .94
             elif key == "player_base_crouch_heavy":
-                target = 315 if height < 380 else idle_height
-                sx = sy = clamp(target / max(1, height), .66, 1.06)
+                # 2H naturally extends one arm above the standing fighter.
+                # Keep the body WIDTH close to idle; don't shrink the whole
+                # character merely because its active pose raises a hand.
+                target_height = idle_height * (.76 if height < 380 else 1.16)
+                sy = clamp(target_height / max(1, height), .73, 1.12)
+                sx = clamp(idle_width * 1.02 / max(1, width), .86, 1.05)
             elif key == "player_base_backdash":
                 sy = min(.98, idle_height / max(1, height))
                 sx = min(sy, idle_width * 1.40 / max(1, width))
