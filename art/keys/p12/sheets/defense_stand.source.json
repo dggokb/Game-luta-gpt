@@ -1,0 +1,9 @@
+{
+  "state": "DEFENSE_STAND",
+  "count": 8,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in FOUR columns and TWO rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action DEFENSE_STAND: 1 normal grounded neutral stance; 2 raise bandaged forearms; 3 and 4 crossed forearms directly in front of face and chest, chin tucked, weight on rear LEFT leg, full standing height; 5 slight defensive recoil backward without moving feet; 6 maintain guard; 7 lower arms; 8 neutral. Keep both feet positions fixed. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "97110aa2ff3145fc717879dba11daef00a5ee891"
+}
