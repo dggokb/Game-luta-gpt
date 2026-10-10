@@ -154,6 +154,38 @@ class CharacterStabilizerTest(unittest.TestCase):
     def test_no_frames_means_inconclusive_not_approved(self):
         self.assertEqual("INCONCLUSIVO",e.metrics([None]*12,100,"VICTORY")["status"])
 
+    def test_nonfinite_pose_values_cannot_pass_stabilization(self):
+        from math import inf,nan
+        baseline=[body_frame(x=75) for _ in range(12)]
+        for bad in (nan,inf,-inf):
+            for key in ("torso_x","shoe_x","head_proxy","torso_proxy","height"):
+                sample=[dict(x) for x in baseline]
+                sample[4][key]=bad
+                result=e.metrics(sample,100,"VICTORY")
+                self.assertEqual("MEDIDO_COM_LACUNAS",result["status"],(key,bad,result))
+                self.assertEqual([4],result["quadros_invalidos"])
+                self.assertTrue(all(np.isfinite(x) for x in result["medianas"].values()))
+                self.assertEqual("INCONCLUSIVO",e.compare_body(
+                    {"status":"MEDIDO","medianas":{"cabeca":20,"tronco":40}},
+                    {"status":"MEDIDO","medianas":{"cabeca":bad,"tronco":40}}
+                )["status"])
+        self.assertEqual("INCONCLUSIVO",e.metrics(baseline,nan,"IDLE")["status"])
+        self.assertEqual("INCONCLUSIVO",e.metrics(baseline,0,"IDLE")["status"])
+        self.assertEqual("INCONCLUSIVO",e.metrics(baseline,"bad","IDLE")["status"])
+        for bad in (nan,inf,-inf):
+            self.assertIsNone(e.properties(np.full((40,40),bad,dtype=float)))
+        self.assertIsNone(e.properties(np.ones((40,40,4),dtype=np.uint8)))
+        self.assertIsNone(e.properties(np.array([],dtype=np.uint8)))
+        self.assertIsNone(e.properties(np.array([["not alpha"]],dtype=str)))
+
+    def test_many_invalid_pose_values_cannot_produce_measured_status(self):
+        samples=[body_frame() for _ in range(12)]
+        for pos in (2,4,6,8):
+            samples[pos]["head_proxy"]=float("nan")
+        result=e.metrics(samples,100,"VICTORY")
+        self.assertEqual("INCONCLUSIVO",result["status"])
+        self.assertEqual([2,4,6,8],result["quadros_invalidos"])
+
     def test_character_report_uses_both_video_and_packed_idle_references(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d)
