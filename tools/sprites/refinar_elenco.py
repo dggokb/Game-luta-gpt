@@ -17,11 +17,21 @@ import sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
+# Contrato para um lutador completo. Um NPC simplificado precisa de perfil
+# explícito, jamais pode passar apenas por ter IDLE e poucos golpes.
 EXPECTED_CORE={
-    "IDLE","WALK_FORWARD","WALK_BACK","DASH","BACKDASH",
-    "CROUCH","JUMP","LIGHT_JAB","MEDIUM_KICK","HEAVY_STRAIGHT",
+    "IDLE","COMBAT","WALK_FORWARD","WALK_BACK","DASH","BACKDASH",
+    "CROUCH","RISE","JUMP","FALL","LAND",
+    "LIGHT_JAB","MEDIUM_KICK","HEAVY_STRAIGHT",
     "CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY",
-    "JUMP_LIGHT","JUMP_MEDIUM","JUMP_HEAVY","VICTORY","DEFEAT",
+    "JUMP_LIGHT","JUMP_MEDIUM","JUMP_HEAVY","JUMP_HEAVY_DOWN",
+    "DEFENSE_STAND","DEFENSE_CROUCH","DEFENSE_AIR",
+    "HIT_STAND","HIT_CROUCH","HIT_AIR",
+    "KNOCKDOWN","GROUNDED","GETUP",
+    "THROW_GRAB","THROW_TOSS",
+    "SPECIAL_ENERGY","SPECIAL_S2","SPECIAL_S3","SPECIAL_S4",
+    "SUPER_WAVE","ULTRA_BEAM",
+    "INTRO","VICTORY","DEFEAT","TAUNT",
 }
 # Estado derivado pode compartilhar o mesmo vídeo de outra pose (FALL/JUMP),
 # mas deve existir no manifest quando se testa um lutador completo.
