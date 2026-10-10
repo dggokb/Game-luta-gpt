@@ -58,6 +58,24 @@ Saidas: `android/app/build/sprite-audit/audit.json` e `audit.md`.
 O GitHub Actions da branch executa o mesmo comando e publica os relatorios
 como artifact `sprite-drive-inventory`.
 
+## Reproduzir a inspecao de quadros dos 399 MP4
+
+O motor usado para a verificacao de conteudo esta agora versionado em
+`tools/sprites/audit_video_content.py`; e independente do importador.
+Com os vídeos reais acessíveis em uma pasta `animations/pNN/`,
+`numpy` e `ffmpeg` instalados:
+
+```bash
+python3 tools/sprites/audit_video_content.py \\
+  --root "/caminho/para/animations" \\
+  --output "android/app/build/sprite-audit/qc_videos.json"
+```
+
+O scanner calcula SHA256 de todos os vídeos, amostra 12 quadros reais,
+compara movimento e variaçao de bounding box e publica erros de
+decodificacao e grupos duplicados. Os arquivos de entrada nunca
+sao modificados.
+
 ## Verificar conteudo REAL dos MP4 (opcional)
 
 Requer que os MP4 sejam **acessiveis localmente**, mantendo a estrutura
