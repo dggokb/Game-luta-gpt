@@ -48,7 +48,10 @@ STATE_SHORTCUTS={
     "jH_baixo":"JUMP_HEAVY_DOWN",
 }
 def canonical_state(value):
-    return STATE_SHORTCUTS.get(value,value.upper())
+    value=value.strip()
+    shorthand={key.lower():target for key,target in STATE_SHORTCUTS.items()}
+    normalized=value.lower().replace("-","_")
+    return shorthand.get(normalized,value.upper())
 
 
 def character_pack_id(character):
