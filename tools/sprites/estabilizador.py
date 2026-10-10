@@ -138,23 +138,56 @@ def isolated_spikes(values, ref_height, fraction=.015):
 
 
 def metrics(measures, reference_height, state):
-    """Sinaliza anomalias; ausência de medição nunca vira aprovação."""
+    """Sinaliza anomalias sem inventar continuidade onde quadros estão ausentes."""
+    if not measures:
+        return {"status":"INCONCLUSIVO","motivo":"sem quadros"}
     good = [(i,m) for i,m in enumerate(measures) if m is not None]
+    invalid=[i for i,m in enumerate(measures) if m is None]
     if len(good) < 5 or len(good) < len(measures)*.75:
-        return {"status":"INCONCLUSIVO", "motivo":"quadros ou silhuetas sem medida confiável"}
+        return {"status":"INCONCLUSIVO",
+                "motivo":"quadros ou silhuetas sem medida confiável",
+                "quadros_invalidos":invalid}
     xs = [m["torso_x"] for _,m in good]
     heads = [m["head_proxy"] for _,m in good]
     heights = [m["height"] for _,m in good]
     bodies = [m["torso_proxy"] for _,m in good]
     feet = [m["shoe_x"] for _,m in good]
     pairs = {k:v for k,v in (("torso",xs),("cabeca",heads),("tronco",bodies))}
-    defects = {key: [good[i][0] for i in isolated_spikes(values, reference_height)]
-               for key,values in pairs.items()}
+    # In the previous implementation, invalid frames were silently removed
+    # and both sides joined as adjacent time positions. That fabricates motion
+    # and could miss glitches. Only compare five consecutive original frames.
+    def contiguous_spikes(field):
+        detected=[]
+        for idx in range(2,len(measures)-2):
+            window=measures[idx-2:idx+3]
+            if any(m is None for m in window):
+                continue
+            x=[m[field] for m in window]
+            if isolated_spikes(x,reference_height):
+                detected.append(idx)
+        return detected
+
+    defects={"torso":contiguous_spikes("torso_x"),
+             "cabeca":contiguous_spikes("head_proxy"),
+             "tronco":contiguous_spikes("torso_proxy")}
     # Plantar pé não significa impedir animação dos membros: somente reportar
     # oscilações, não aplicar deslocamento automático.
     drift=None
     if state in PLANTED:
-        defects["pe_apoio"] = [good[i][0] for i in isolated_spikes(feet,reference_height)]
+        defects["pe_apoio"] = contiguous_spikes("shoe_x")
+        # A continuous left-right wobble is different from an isolated spike.
+        # A perfect alternating sequence can evade a five-frame median.
+        # Only flag this in grounded, nominally stationary states.
+        for idx in range(2,len(measures)-1):
+            a,b,c=measures[idx-1:idx+2]
+            if a is None or b is None or c is None:
+                continue
+            limit=max(1.5,reference_height*.015)
+            d1=b["shoe_x"]-a["shoe_x"]
+            d2=c["shoe_x"]-b["shoe_x"]
+            if d1*d2<0 and min(abs(d1),abs(d2))>=limit:
+                defects["pe_apoio"].append(idx)
+        defects["pe_apoio"]=sorted(set(defects["pe_apoio"]))
         # Victory sometimes has an authored entrance walk. Assess only the
         # *planted celebration* portion, never treat a real walk as skating.
         window = feet[max(0,int(len(feet)*.45)):] if state=="VICTORY" else feet
@@ -171,7 +204,8 @@ def metrics(measures, reference_height, state):
                 drift={"status":"SUSPEITA_DE_DESLIZE","delta_x":round(shift,2),
                        "limite":round(threshold,2),
                        "trecho":"apos entrada" if state=="VICTORY" else "completo"}
-    return {"status":"MEDIDO", "quadros":len(good),
+    return {"status":"MEDIDO" if not invalid else "MEDIDO_COM_LACUNAS",
+            "quadros":len(good),"quadros_invalidos":invalid,
             "deslize":drift,
             "tremor": {k:v for k,v in defects.items() if v},
             "medianas": {"altura":round(float(np.median(heights)),2),
@@ -291,6 +325,11 @@ def load_atlas_state(root, pack, state, limit=100):
     indices=anim["frames"]
     if not indices or width<=0 or height<=0 or columns<=0:
         return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
+    # Verify EVERY authored index before inspecting a subset of frames.
+    # Sampling is a cost optimization, not a license to miss corrupted frames.
+    if any(not isinstance(frame,int) or frame<0 or
+           frame>=int(packed.get("frameCount",0)) for frame in indices):
+        return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas},[]
     step=max(1,(len(indices)+limit-1)//limit)
     with Image.open(image_file) as atlas_img:
         expected_width=width*columns
