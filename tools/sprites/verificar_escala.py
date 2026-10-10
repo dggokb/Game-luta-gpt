@@ -271,3 +271,64 @@ def compare_source_and_atlas(video,atlas,max_difference=.06,
         "validacao_runtime":"PENDENTE",
         "video":video,"atlas":atlas
     }
+
+
+def _pose_fingerprint(rgba):
+    """Compact translation-invariant pose signature, used only for freeze QA.
+
+    Measure shape + large internal color changes; small compression noise is
+    ignored. This is NOT a test that an animation looks good.
+    """
+    import cv2
+    a=np.asarray(rgba)
+    if a.ndim!=3 or a.shape[2]!=4 or a.dtype.kind not in "uif":
+        return None
+    alpha=a[:,:,3]>90
+    yy,xx=np.nonzero(alpha)
+    if len(xx)<80:
+        return None
+    x0,x1=int(xx.min()),int(xx.max()+1)
+    y0,y1=int(yy.min()),int(yy.max()+1)
+    if min(x1-x0,y1-y0)<12:
+        return None
+    fg=np.ascontiguousarray(a[y0:y1,x0:x1,:3],dtype=np.uint8)
+    aa=np.asarray(alpha[y0:y1,x0:x1],dtype=np.uint8)
+    shape=cv2.resize(aa,(48,48),interpolation=cv2.INTER_NEAREST)>0
+    gray=cv2.cvtColor(cv2.resize(fg,(48,48),interpolation=cv2.INTER_AREA),
+                      cv2.COLOR_RGB2GRAY)
+    return shape,gray
+
+
+def check_pose_progression(source_frames,atlas_frames):
+    """Flag an atlas frozen despite clear pose changes in original video.
+
+    Never auto-approve a clippy animation based on this metric; never flag a
+    legitimate held pose if original footage is also static.
+    """
+    if len(source_frames)<4 or len(atlas_frames)<4:
+        return {"status":"INCONCLUSIVO","motivo":"amostras insuficientes"}
+    a=[_pose_fingerprint(x) for x in source_frames]
+    b=[_pose_fingerprint(x) for x in atlas_frames]
+    if any(x is None for x in a+b):
+        return {"status":"INCONCLUSIVO","motivo":"silhueta nao segmentavel"}
+    def changed(samples):
+        mask,gray=samples[0]
+        result=[]
+        for other_mask,other_gray in samples[1:]:
+            shape=float(np.mean(mask!=other_mask))
+            # JPEG/H.264 noise affects colors, but strong body-color changes
+            # have much larger differences over substantial regions.
+            color=float(np.mean(np.abs(gray.astype(np.float32)-
+                                      other_gray.astype(np.float32))>32))
+            result.append(shape>.075 or color>.105)
+        return sum(result)
+    video_changes=changed(a)
+    atlas_changes=changed(b)
+    if video_changes>=2 and atlas_changes==0:
+        return {"status":"SUSPEITA_CLIP_CONGELADO",
+                "poses_distintas_video":video_changes+1,
+                "poses_distintas_atlas":1}
+    return {"status":"SEM_CONGELAMENTO_EVIDENTE" if atlas_changes else "INCONCLUSIVO",
+            "poses_distintas_video":video_changes+1,
+            "poses_distintas_atlas":atlas_changes+1,
+            "observacao":"teste de congelamento, nao certificacao visual"}
