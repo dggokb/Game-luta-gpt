@@ -1,0 +1,10 @@
+{
+  "state": "THROW_GRAB",
+  "count": 8,
+  "columns": 4,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in 4 columns and 2 rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action THROW_GRAB: 1 neutral; 2 lunges forward RIGHT slightly; 3 both hands reach open toward opponent chest; 4 and 5 both clawed hands close tightly at shoulder width in front of torso as if gripping opponent, elbows flex and pull inward, hips lower to brace; 6 secure low grasp; 7 draws grip near chest; 8 holds secured grapple preparing toss. Draw ONLY zombie, no opponent, clear gripping hand pose not punch. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "54835750af2cfbdd4199d4c49e9d94bc7c9dae58"
+}
