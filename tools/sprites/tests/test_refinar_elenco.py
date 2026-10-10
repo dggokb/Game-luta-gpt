@@ -98,7 +98,14 @@ class CharacterStabilizerTest(unittest.TestCase):
             keys.mkdir(parents=True)
             (keys/"tamanho.json").write_text(json.dumps({
                 "altura":224,"chaves":{"inicio_centro":.5}}))
-            (keys/"inicio_centro.png").write_bytes(b"dummy image: metadata check only")
+            # Verified chroma-key image: body 448px tall at x0.5 -> 224px.
+            import cv2
+            base=np.full((600,550,3),(0,255,0),dtype=np.uint8)
+            base[70:518,180:315]=(25,45,125)
+            self.assertTrue(cv2.imwrite(str(keys/"inicio_centro.png"),base))
+            reference=MOD.calibration_info(root,"p01")
+            self.assertEqual("CALIBRADO",reference["status"])
+            self.assertAlmostEqual(224,reference["altura_observada"],delta=.01)
             videos=root/"animations"/"p01"
             videos.mkdir(parents=True)
             (videos/"idle.mp4").touch()
@@ -133,6 +140,24 @@ class CharacterStabilizerTest(unittest.TestCase):
                     root=root,original_video_inspector=read_video,
                     packed_inspector=read_pack,geometria=False)
             self.assertEqual("PENDENTE_FONTES",result["status"])
+
+    def test_calibration_rejects_false_image_and_wrong_scale(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            keys=root/"art/keys/p01"
+            keys.mkdir(parents=True)
+            conf=keys/"tamanho.json"
+            conf.write_text(json.dumps({"altura":224,"chaves":{"inicio_centro":.5}}))
+            (keys/"inicio_centro.png").write_bytes(b"not a png")
+            self.assertEqual("IMAGEM_BASE_INVALIDA",
+                             MOD.calibration_info(root,"p01")["status"])
+            import cv2
+            base=np.full((600,550,3),(0,255,0),dtype=np.uint8)
+            base[70:518,180:315]=(25,45,125)
+            cv2.imwrite(str(keys/"inicio_centro.png"),base)
+            conf.write_text(json.dumps({"altura":300,"chaves":{"inicio_centro":.5}}))
+            self.assertEqual("REFERENCIA_INCONSISTENTE",
+                             MOD.calibration_info(root,"p01")["status"])
 
     def test_p12_without_import_is_not_audited_successfully(self):
         with tempfile.TemporaryDirectory() as d:
