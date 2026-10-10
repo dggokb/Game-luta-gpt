@@ -1,0 +1,234 @@
+#!/usr/bin/env python3
+"""Análise conservadora de um único personagem: vídeo original -> arte -> jogo.
+
+SEM modificar PNG, sem corrigir por bounding box, sem aprovar clipes sem evidência.
+As métricas de cabeça/tronco são aproximações; nunca fazem resize automático.
+"""
+import re
+import unicodedata
+from pathlib import Path
+
+import numpy as np
+
+# Mapeamentos usados pelos autores no Drive: nomes diferentes, mesma intenção.
+ALIASES = {
+    "IDLE": ("idle", "parado"),
+    "WALK_FORWARD": ("frente", "walkfward", "walkforward", "andarfrente"),
+    "WALK_BACK": ("tras", "walkback", "andartras"),
+    "DASH": ("dash",),
+    "BACKDASH": ("backdash", "backdash"),
+    "CROUCH": ("agachado", "agachar", "crounch", "crouch"),
+    "JUMP": ("jump", "pulo", "saltar"),
+    "FALL": ("jump", "pulo"),  # descida pode estar no mesmo vídeo
+    "LAND": ("jump", "pulo"),
+    "LIGHT_JAB": ("l", "ljab"),
+    "MEDIUM_KICK": ("m", "msoco", "mmediokick"),
+    "HEAVY_STRAIGHT": ("h", "hchutealto"),
+    "CROUCH_LIGHT": ("2l", "l2", "l2jab"),
+    "CROUCH_MEDIUM": ("2m", "m2", "m2rasteira"),
+    "CROUCH_HEAVY": ("2h", "upper", "uppercut"),
+    "JUMP_LIGHT": ("jl",),
+    "JUMP_MEDIUM": ("jm",),
+    "JUMP_HEAVY": ("jh",),
+    "JUMP_HEAVY_DOWN": ("jhbaixo", "j2h"),
+    "THROW_GRAB": ("agarrao", "agarrar"),
+    "VICTORY": ("vitoria", "victory"),
+    "DEFEAT": ("derrota", "defeat"),
+    "INTRO": ("intro",),
+    "TAUNT": ("provocacao", "taunt"),
+    "KNOCKDOWN": ("derrubalevanta", "derrubado", "knockdown"),
+    "GETUP": ("derrubalevanta", "levanta"),
+    "DEFENSE_STAND": ("defendecima", "defesaempe", "defesacima"),
+    "DEFENSE_CROUCH": ("defendebaixo", "defesaagachado", "defesabaixo"),
+    "DEFENSE_AIR": ("defesapulo", "defesanoar"),
+    "HIT_STAND": ("danocima", "levargolpeempe"),
+    "HIT_CROUCH": ("danobaixo", "levargolpeagachada"),
+    "HIT_AIR": ("danopulo", "levargolpenoar"),
+    "SPECIAL_ENERGY": ("s1", "especial1"),
+    "SPECIAL_S2": ("s2",),
+    "SPECIAL_S3": ("s3",),
+    "SPECIAL_S4": ("s4",),
+    "SUPER_WAVE": ("super",),
+    "ULTRA_BEAM": ("ultra",),
+}
+
+# Movimento de cena e troca de pé não são tremor. Somente repousos são
+# candidatos a "pé plantado"; a estabilidade anatômica é avaliada separadamente.
+PLANTED = {"IDLE", "COMBAT", "VICTORY", "DEFENSE_STAND", "DEFENSE_CROUCH"}
+MOVING = {"WALK_FORWARD", "WALK_BACK", "DASH", "BACKDASH", "JUMP",
+          "FALL", "LAND", "INTRO", "KNOCKDOWN", "GETUP", "DEFEAT"}
+
+
+def normalized(name):
+    ascii_name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]", "", ascii_name.lower())
+
+
+def match_videos(folder, states):
+    """Devolve matches determinísticos e conflitos explícitos, nunca um chute."""
+    folder = Path(folder)
+    candidates = sorted(folder.glob("*.mp4")) if folder.is_dir() else []
+    index = {}
+    for f in candidates:
+        index.setdefault(normalized(f.stem), []).append(f)
+    out = {}
+    for state in states:
+        aliases = (normalized(state),) + ALIASES.get(state, ())
+        valid = []
+        for alias in dict.fromkeys(aliases):
+            valid += index.get(alias, [])
+        valid = list(dict.fromkeys(valid))
+        out[state] = {
+            "status": "ENCONTRADO" if len(valid) == 1 else
+                      ("AMBIGUO" if valid else "SEM_VIDEO"),
+            "files": [str(f) for f in valid],
+        }
+    return out
+
+
+def properties(alpha):
+    """Proxies observáveis por silhueta; não são detecção anatômica infalível."""
+    a = np.asarray(alpha) > 128
+    ys, xs = np.nonzero(a)
+    if len(xs) < 75:
+        return None
+    x0, x1 = int(xs.min()), int(xs.max())
+    y0, y1 = int(ys.min()), int(ys.max())
+    h = y1-y0+1
+    if h < 18:
+        return None
+
+    def band(lo, hi):
+        left, right = y0+int(h*lo), y0+int(h*hi)
+        yy, xx = np.nonzero(a[left:max(left+1,right)])
+        if len(xx) < 10:
+            return None
+        return (float(np.quantile(xx, .90)-np.quantile(xx, .10)),
+                float(np.median(xx)))
+
+    head = band(.08, .27)
+    torso = band(.36, .58)
+    feet = band(.90, 1.00)
+    if not head or not torso or not feet:
+        return None
+    return {"head_proxy": head[0], "torso_proxy": torso[0],
+            "torso_x": torso[1], "shoe_x": feet[1],
+            "height": float(h), "confidence": "PROXY_SILHUETA"}
+
+
+def isolated_spikes(values, ref_height, fraction=.015):
+    """Outliers de um quadro em trajetória temporal, não velocidade natural.
+
+    Mudança real contínua é mantida; alternância 0,8,0 é sinalizada.
+    Usa mediana de vizinhos em janela 5, e reversão de direção local.
+    """
+    x = np.asarray(values,dtype=float)
+    found = []
+    if len(x) < 5:
+        return found
+    limit = max(1.5, float(ref_height) * fraction)
+    for i in range(2,len(x)-2):
+        local = np.median(x[i-2:i+3])
+        prev_delta = x[i]-x[i-1]
+        next_delta = x[i+1]-x[i]
+        if abs(x[i]-local) > limit and prev_delta*next_delta < 0 and                 min(abs(prev_delta),abs(next_delta)) >= limit:
+            found.append(i)
+    return found
+
+
+def metrics(measures, reference_height, state):
+    """Sinaliza anomalias; ausência de medição nunca vira aprovação."""
+    good = [(i,m) for i,m in enumerate(measures) if m is not None]
+    if len(good) < 5 or len(good) < len(measures)*.75:
+        return {"status":"INCONCLUSIVO", "motivo":"quadros ou silhuetas sem medida confiável"}
+    xs = [m["torso_x"] for _,m in good]
+    heads = [m["head_proxy"] for _,m in good]
+    bodies = [m["torso_proxy"] for _,m in good]
+    feet = [m["shoe_x"] for _,m in good]
+    pairs = {k:v for k,v in (("torso",xs),("cabeca",heads),("tronco",bodies))}
+    defects = {key: [good[i][0] for i in isolated_spikes(values, reference_height)]
+               for key,values in pairs.items()}
+    # Plantar pé não significa impedir animação dos membros: somente reportar
+    # oscilações, não aplicar deslocamento automático.
+    if state in PLANTED:
+        defects["pe_apoio"] = [good[i][0] for i in isolated_spikes(feet,reference_height)]
+    return {"status":"MEDIDO", "quadros":len(good),
+            "tremor": {k:v for k,v in defects.items() if v},
+            "medianas": {"cabeca":round(float(np.median(heads)),2),
+                         "tronco":round(float(np.median(bodies)),2)},
+            "limite_px":round(max(1.5,reference_height*.015),2)}
+
+
+def compare_body(idle_stats, other_stats):
+    """Retorna *suspeita* de escala, nunca fator para aplicar cegamente.
+
+    Cabeça e tronco precisam concordar sobre o mesmo erro. Braço levantado,
+    roupa, pose agachada, zoom e baixa confiabilidade não devem ser 'corrigidos'.
+    """
+    if idle_stats.get("status")!="MEDIDO" or other_stats.get("status")!="MEDIDO":
+        return {"status":"INCONCLUSIVO"}
+    a,b=idle_stats["medianas"],other_stats["medianas"]
+    if min(a["cabeca"],a["tronco"],b["cabeca"],b["tronco"])<=0:
+        return {"status":"INCONCLUSIVO"}
+    h=b["cabeca"]/a["cabeca"]
+    t=b["tronco"]/a["tronco"]
+    if abs(h-t)>.12:
+        return {"status":"INCONCLUSIVO","motivo":"cabeca e tronco discordam; pose ou angulo diferentes",
+                "proporcoes":[round(h,3),round(t,3)]}
+    ratio=(h+t)*.5
+    if abs(ratio-1) < .09:
+        return {"status":"COMPATIVEL","proporcao_aproximada":round(ratio,3)}
+    return {"status":"SUSPEITA_DE_ESCALA","proporcao_aproximada":round(ratio,3),
+            "observacao":"nao aplicar sem referencia de imagem-base e exame das poses"}
+
+
+def load_video(path, max_frames=100):
+    """Só vídeos com chroma-key reconhecido; jamais segmentar cenário arbitrário."""
+    import cv2
+    from video_para_sprite import key
+    cap=cv2.VideoCapture(str(path))
+    if not cap.isOpened():
+        return {"status":"FALHA_VIDEO","motivo":"arquivo nao abriu"},[]
+    fps=cap.get(cv2.CAP_PROP_FPS)
+    samples=[]; frames_read=0; green=0
+    try:
+        while len(samples)<max_frames:
+            ok,bgr=cap.read()
+            if not ok:
+                break
+            frames_read+=1
+            if bgr.shape[1]>900:
+                scale=900/bgr.shape[1]
+                bgr=cv2.resize(bgr,(900,int(bgr.shape[0]*scale)))
+            hsv=cv2.cvtColor(bgr,cv2.COLOR_BGR2HSV)
+            corners=np.concatenate((hsv[:35,:35].reshape(-1,3),
+                                    hsv[:35,-35:].reshape(-1,3)))
+            fraction=np.mean((corners[:,0]>35)&(corners[:,0]<95)&(corners[:,1]>45))
+            if fraction < .65:
+                return {"status":"INCONCLUSIVO","motivo":"fundo não é chroma-key verde uniforme; segmentação não validada"},[]
+            green+=1
+            rgba=key(bgr)
+            samples.append(properties(rgba[...,3]))
+    finally:
+        cap.release()
+    if not samples:
+        return {"status":"FALHA_VIDEO","motivo":"sem quadros"},[]
+    return {"status":"EXTRAIDO","fps":round(float(fps),3),
+            "quadros_lidos":frames_read,"quadros_validos":sum(x is not None for x in samples)},samples
+
+
+def inspect_video(path, state, idle_height):
+    extract,frames=load_video(path)
+    if extract["status"]!="EXTRAIDO":
+        return extract
+    return {**extract,"analise":metrics(frames,idle_height,state)}
+
+
+def suggested_actions(inspection):
+    """Somente recomendações até validação independente, sem escrita."""
+    actions=[]
+    if inspection.get("analise",{}).get("tremor"):
+        actions.append("REVISAR_TREMOR_COMPARANDO_VIDEO_E_SPRITE")
+    if inspection.get("escala",{}).get("status")=="SUSPEITA_DE_ESCALA":
+        actions.append("MEDIR_COM_IMAGEM_BASE_E_HEAD_MATCH")
+    return actions
