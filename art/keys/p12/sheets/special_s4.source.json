@@ -1,0 +1,10 @@
+{
+  "state": "SPECIAL_S4",
+  "count": 8,
+  "columns": 4,
+  "peak": 3,
+  "status": "source-draft",
+  "tool": "built-in imagegen",
+  "prompt": "Use case: stylized-concept. Production source sprite sheet for a 2D fighting game: P12 stitched zombie. Use the input image ONLY as the character design and ink/color reference; draw NEW actual anatomical poses. Transparent background. Exactly EIGHT separate full-body drawings arranged in 4 columns and 2 rows, reading left to right, top to bottom. Each drawing entirely contained in its cell, wide transparent gutter, no overlap. Match the same physical body and head scale in all cells, same fixed side camera in 3/4 facing RIGHT toward the opponent. Pale olive gray stitched skin, sparse black hair, exposed stitched scalp patch, emaciated bare scarred torso, ivory forearm wraps, charcoal shredded trousers, burgundy torn waist sash, bare feet. 1990s anime detailed clean ink with restrained flat cel shadows matching reference. Exactly two arms and two legs per figure. Keep the figure large and legible but fully inside its cell. No labels, numbers, background, shadow floor, effects, extra characters or weapons. Action SPECIAL_S4: a lunging shoulder tackle: 1 neutral; 2 draws torso back and bends both knees; 3 drives left shoulder forward RIGHT while folding bandaged arms close to torso; 4 and 5 deep forward lunge with shoulder/chest leading, front knee bent and rear leg extended, palms never punch; 6 decelerates into bent knees; 7 raises torso; 8 neutral. Clear bodily tackle not arm punch. Eight progressive anatomical frames including preparation, main action and recovery, with strong readable silhouettes. These are independent redraws, never stretches or warps of a standing Idle. Keep floor baseline stable when grounded; airborne poses relative to pelvis (the game supplies world jump trajectory).",
+  "blobSha": "c9afddeec478fdc06e129b297f4f47f85f061862"
+}
