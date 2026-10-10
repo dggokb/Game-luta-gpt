@@ -1,3 +1,27 @@
+## v0.95 — pulo com referência de jogos de luta, dash menor, 2M sem quadros perdidos
+
+- Pesquisa: DBFZ normal jump 41 frames, high jump 55 (Dustloop);
+  UMVC3 em geral ~39–46 frames. A altura *não* tem razão universal
+  para a altura dos personagens, portanto usar **1,16×** a hurtbox
+  padrão do rival P01 e **42 frames**, em vez de manter ar lento.
+- Impulso normal 1030 u/s, gravidade subindo 1.70× e caindo 2.00×
+  (base 1650) → auge ~180,5 unidades, queda total ~42 frames.
+  Superpulo / launch physics preservados; teste de atravessar
+  adversário permanece.
+- Dash P01: fonte original tem até 538px de largura contra 302px do
+  idle. Escala visual independente **X=0,760, Y=0,940**, diminuindo
+  a proporção horizontal máxima para ~1,38× o idle.
+  Velocidade física do dash permanece 620 u/s.
+- 2M P01: 6 startup em 6 frames de motor era impossível mostrar
+  todos os seis sprites anteriores ao impacto num aparelho de 30 FPS.
+  Refeito com **12 startup + 4 active + 24 recovery = 40 frames**:
+  first six art poses occupy two simulation frames each; the other
+  ten at least 2-3 frames each. Testes simulam apresentação de todos
+  os 16 desenhos em renderização 30 FPS, ambos os offsets.
+  Pose 6 ainda é a pose física do contato, janelas de cancelamento
+  deslocadas para 12–18, combo 2L→2M testado.
+- Identificação do APK Android: `0.95-p01-2m-30fps-dash-jump`.
+
 ## P01 v0.94 — jump less floaty, slower 2M, matched intro/idle and planted victory
 
 - **Normal jump, universal:** keeps the 820 impulse, but applies 1.10× gravity on ascent and 1.25× on descent only to ordinary jumps. The shorter flight preserves enough height to pass over a standing opponent. Super jump, launcher, juggle and projectile arcs are unchanged.
