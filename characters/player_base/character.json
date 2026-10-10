@@ -1630,20 +1630,20 @@
       "animation": "HEAVY_STRAIGHT",
       "damage": 800,
       "reach": 159,
-      "startupFrames": 10,
-      "activeFrames": 5,
-      "recoveryFrames": 9,
+      "startupFrames": 15,
+      "activeFrames": 7,
+      "recoveryFrames": 12,
       "hitstunFrames": 18,
       "blockstunFrames": 11,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          10,
-          17
+          15,
+          23
         ],
         "block": [
-          10,
-          17
+          15,
+          23
         ],
         "whiff": null
       },

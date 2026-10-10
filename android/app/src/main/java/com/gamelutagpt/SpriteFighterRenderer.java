@@ -40,18 +40,50 @@ final class SpriteFighterRenderer {
      * Draws the current frame with its root at (x, baseY). {@code facing} is the world
      * direction the fighter looks at; mirroring follows the pack's declared art facing.
      */
+    /** P01: continuous crouch scaling and a pixel-identical INTRO-to-IDLE handoff. */
     void draw(Canvas canvas,float x,float baseY,int facing,boolean damageFlash,boolean guardFlash) {
-        CharacterDefinition.Atlas a=character.animation(motion.clip).atlas;
-        int frame=motion.frame(),col=frame%a.columns,row=frame/a.columns;
-        source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
-        float scale=character.profile.worldScale/a.pixelScale,left=x-a.rootX*scale,top=baseY-a.rootY*scale;
-        destination.set(left,top,left+a.width*scale,top+a.height*scale);
+        CharacterDefinition.Animation anim=character.animation(motion.clip);
+        int frame=motion.frame();
         spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:tint);
         boolean mirror=facing*character.artFacing<0;
         if(mirror){canvas.save();canvas.scale(-1f,1f,x,0f);}
-        canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
+        boolean p01="player_base".equals(character.id)||"p01_training".equals(character.id);
+        float size=1f;
+        if(p01 && SpriteStates.CROUCH.equals(motion.clip)) {
+            size=1f-0.08f*clamp01(frame/7f);
+        } else if(p01 && SpriteStates.RISE.equals(motion.clip)) {
+            size=0.92f+0.08f*clamp01(frame/5f);
+        }
+        if(p01 && SpriteStates.INTRO.equals(motion.clip)) {
+            // Last INTRO guard (421px) and first IDLE (450px) previously jumped.
+            // Align the root gradually; end with the actual IDLE cell, not a rescale.
+            float align=clamp01((frame-18f)/8f);
+            float blend=clamp01((frame-22f)/4f);
+            if(blend<1f) drawAtlas(canvas,anim.atlas,frame,x-6.72f*align,
+                baseY,1f+0.065f*align,Math.round((1f-blend)*255f));
+            if(blend>0f) {
+                CharacterDefinition.Animation idle=character.animation(SpriteStates.IDLE);
+                drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,1f,Math.round(blend*255f));
+            }
+        } else {
+            drawAtlas(canvas,anim.atlas,frame,x,baseY,size,255);
+        }
+        spritePaint.setAlpha(255);
         if(mirror)canvas.restore();
     }
+
+    private void drawAtlas(Canvas canvas,CharacterDefinition.Atlas a,int frame,float x,
+                           float baseY,float size,int alpha) {
+        if(alpha<=0)return;
+        int col=frame%a.columns,row=frame/a.columns;
+        source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
+        float scale=character.profile.worldScale/a.pixelScale*size;
+        float left=x-a.rootX*scale,top=baseY-a.rootY*scale;
+        destination.set(left,top,left+a.width*scale,top+a.height*scale);
+        spritePaint.setAlpha(alpha);
+        canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
+    }
+    private static float clamp01(float v){return Math.max(0f,Math.min(1f,v));}
     void setTint(ColorFilter tint){this.tint=tint;}
     /** Pale, cooler copy of the art: the same character as the opponent still reads apart. */
     static ColorFilter washedOut() {

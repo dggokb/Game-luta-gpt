@@ -1,0 +1,31 @@
+name: P01 H pixel repair
+on:
+  push:
+    branches: [refino/p01-animacoes-20261009]
+    paths: [tools/sprites/repair_p01_heavy.py, .github/workflows/p01-repair-heavy.yml]
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pillow numpy scipy
+      - name: Repair enclosed leg transparency
+        run: python tools/sprites/repair_p01_heavy.py --apply
+      - name: Save corrected H atlas
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add android/app/src/main/res/drawable-nodpi/player_base_heavy_straight.png
+          if ! git diff --cached --quiet; then
+            git commit -m "fix(p01): heal enclosed transparency holes in H leg"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          else
+            echo "No enclosed alpha hole detected; no binary changes made."
+          fi

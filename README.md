@@ -1,3 +1,15 @@
+## Ajustes do P01 — outubro de 2026
+
+- INTRO/IDLE: início do idle vira exatamente o último frame visual da intro, após
+  uma transição progressiva de quatro frames e alinhamento suave de posição.
+- Agachar: ajuste de escala progressivo no CROUCH (100% a 92%) e no RISE
+  (92% a 100%), preservando a base no chão.
+- Ataque H: duração de 24 para 34 frames em 60 FPS; startup 15,
+  ativo 7 e recuperação 12. Cancelamentos e quadro de impacto sincronizados.
+- Perna do H: reparo conservador de pequenos buracos *transparentes e fechados*
+  por script em Python (Pillow/numpy/scipy), com relatório dos pixels corrigidos.
+  Buracos abertos ou arte pintada incorretamente ainda exigem revisão visual.
+
 ## APK leve: refinamento exclusivo do P01
 
 Esta branch só empacota os 39 atlas `player_base_*.png` do P01. O treino usa
