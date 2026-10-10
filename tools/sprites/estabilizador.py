@@ -76,11 +76,17 @@ def match_videos(folder, states):
         index.setdefault(normalized(f.stem), []).append(f)
     out = {}
     for state in states:
-        aliases = (normalized(state),) + ALIASES.get(state, ())
-        valid = []
-        for alias in dict.fromkeys(aliases):
-            valid += index.get(alias, [])
-        valid = list(dict.fromkeys(valid))
+        # An explicitly named fall.mp4 or land.mp4 takes precedence over
+        # jump.mp4 used as a FALL/LAND fallback. Otherwise both legitimate
+        # sources become AMBIGUO and the isolated descent cannot be audited.
+        direct=index.get(normalized(state), [])
+        if direct:
+            valid=list(dict.fromkeys(direct))
+        else:
+            valid=[]
+            for alias in dict.fromkeys(ALIASES.get(state, ())):
+                valid.extend(index.get(alias, []))
+            valid=list(dict.fromkeys(valid))
         out[state] = {
             "status": "ENCONTRADO" if len(valid) == 1 else
                       ("AMBIGUO" if valid else "SEM_VIDEO"),
