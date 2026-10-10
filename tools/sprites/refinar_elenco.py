@@ -271,13 +271,18 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                 "status":"SUSPEITA_GEOMETRICA",
                 "diferenca_relativa":proof["diferenca_relativa"]}
         checks[state]=entry
-    incomplete=bool(missing or not pack or
-                    calibration["status"]!="CALIBRADO" or
-                    idle_video is None or idle_video.get("status")!="MEDIDO" or
-                    (inspect_sprites and (idle_packed is None or idle_packed.get("status")!="MEDIDO")) or
-                    any(not e0["evidencias_suficientes"] or
-                        (geometria and e0["prova_geometrica"]["status"]!="PADRONIZADA_FONTE_ATLAS")
-                        for e0 in checks.values()))
+    source_incomplete=bool(
+        missing or not pack or calibration["status"]!="CALIBRADO" or
+        idle_video is None or idle_video.get("status")!="MEDIDO" or
+        (inspect_sprites and
+         (idle_packed is None or idle_packed.get("status")!="MEDIDO")) or
+        any(not entry["evidencias_suficientes"] for entry in checks.values())
+    )
+    proof_incomplete=bool(
+        geometria and any(
+            entry["prova_geometrica"]["status"]!="PADRONIZADA_FONTE_ATLAS"
+            for entry in checks.values())
+    )
     warnings=[state for state,v in checks.items()
               if v.get("video",{}).get("analise",{}).get("quadros_invalidos") or
                  v.get("sprite",{}).get("quadros_invalidos") or
@@ -290,8 +295,19 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                  v.get("proporcao_sprite",{}).get("status")=="SUSPEITA_DE_ESCALA" or
                  v["prova_geometrica"]["status"] in ("ESCALA_DIVERGENTE",
                     "ESCALA_FORA_DO_IDLE","INSTAVEL_GEOMETRICAMENTE")]
-    # Mesmo com métricas boas, somente o *jogo em execução* pode validar
-    # transições, câmera e tamanho renderizado. Nenhuma aprovação falsa.
+    # State precedence is explicit: a source failure cannot be hidden by
+    # --sem-geometria; a successful diagnostic is NOT a game approval.
+    if warnings:
+        status="ANOMALIAS_IDENTIFICADAS"
+    elif source_incomplete:
+        status="PENDENTE_FONTES"
+    elif not geometria or not inspect_sprites:
+        status="DIAGNOSTICO_PRELIMINAR"
+    elif proof_incomplete:
+        status="PENDENTE_FONTES"
+    else:
+        status="MEDICOES_CONCLUIDAS"
+    # Runtime size, camera and transitions are always validated separately.
     return {
         "schema":2, "personagem":character, "pacote":character_pack_id(character),
         "manifesto":location if pack else None,
@@ -302,14 +318,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         "referencia_sprite":idle_packed or {"status":"SEM_IDLE_VALIDADO"},
         "estados":checks,
         "pendentes_revisao":warnings,
-        "status":"ANOMALIAS_IDENTIFICADAS" if warnings else
-                 ("PENDENTE_FONTES" if incomplete and
-                  (not geometria or not inspect_sprites) and
-                  (not pack or calibration["status"]!="CALIBRADO" or
-                   any(not x["evidencias_suficientes"] for x in checks.values()))
-                  else "DIAGNOSTICO_PRELIMINAR" if not geometria or not inspect_sprites
-                  else "PENDENTE_FONTES" if incomplete
-                  else "MEDICOES_CONCLUIDAS"),
+        "status":status,
         "aprovado_automaticamente":False,
         "validacao_runtime":"PENDENTE",
         "alteracoes_realizadas":0,
