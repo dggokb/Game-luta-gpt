@@ -470,6 +470,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }
+        if (player().ko() || opponent().ko()) {
+            // Inputs must not start a new attack/move once the match is over.
+            playerInput.clear();
+            opponentInput.clear();
+        }
         engine.step(playerInput, opponentInput);
         demo.afterStep();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
