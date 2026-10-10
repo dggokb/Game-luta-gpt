@@ -272,22 +272,50 @@ def load_atlas_state(root, pack, state, limit=100):
         return {"status":"SEM_SPRITE_EMPACOTADO","atlas":atlas},[]
     report=json.loads(report_file.read_text(encoding="utf-8"))
     packed=report["packed"]
-    width,height,columns=packed["frameWidth"],packed["frameHeight"],packed["columns"]
+    width,height,columns=(int(packed[k]) for k in ("frameWidth","frameHeight","columns"))
+    # Make both silhouette proxies and SIFT inspect the SAME physical size.
+    # The old proxy analyzer compared raw pixels, while SIFT normalized
+    # pixelScale. That could report conflicting results for a correct fighter.
+    idle_atlas=pack.get("animations",{}).get("IDLE",{}).get("atlas")
+    reference_report=root/"tools/sprites/reports"/(str(idle_atlas)+".report.json")
+    if not reference_report.is_file():
+        return {"status":"SEM_REFERENCIA_IDLE","atlas":atlas},[]
+    idle_packed=json.loads(reference_report.read_text(encoding="utf-8"))["packed"]
+    ps=float(packed.get("pixelScale",0))
+    idle_ps=float(idle_packed.get("pixelScale",0))
+    if ps<=0 or idle_ps<=0 or not np.isfinite(ps*idle_ps):
+        return {"status":"PIXEL_SCALE_INVALIDO","atlas":atlas},[]
+    factor=idle_ps/ps
+    if not .25<=factor<=4.:
+        return {"status":"PIXEL_SCALE_INVALIDO","atlas":atlas},[]
     indices=anim["frames"]
+    if not indices or width<=0 or height<=0 or columns<=0:
+        return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
     step=max(1,(len(indices)+limit-1)//limit)
     with Image.open(image_file) as atlas_img:
         expected_width=width*columns
         if atlas_img.width!=expected_width:
             return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
+        total_rows=atlas_img.height//height
+        frames_count=int(packed.get("frameCount",columns*total_rows))
         samples=[]
         for frame in indices[::step]:
+            if not isinstance(frame,int) or frame<0 or frame>=frames_count:
+                return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas,"frame":frame},[]
             x0=(frame%columns)*width
             y0=(frame//columns)*height
             if x0+width>atlas_img.width or y0+height>atlas_img.height:
                 return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas,"frame":frame},[]
-            cell=atlas_img.crop((x0,y0,x0+width,y0+height)).getchannel("A")
-            samples.append(properties(np.array(cell)))
-    return {"status":"EXTRAIDO","atlas":atlas,"quadros":len(samples)},samples
+            cell=np.asarray(atlas_img.crop((x0,y0,x0+width,y0+height)).getchannel("A"))
+            if abs(factor-1.)>.001:
+                import cv2
+                cell=cv2.resize(cell,None,fx=factor,fy=factor,
+                                interpolation=(cv2.INTER_AREA if factor<1
+                                               else cv2.INTER_LINEAR))
+            samples.append(properties(cell))
+    return {"status":"EXTRAIDO","atlas":atlas,
+            "pixel_scale_normalizado":round(factor,4),
+            "quadros":len(samples)},samples
 
 
 def jump_phase(samples, state):
