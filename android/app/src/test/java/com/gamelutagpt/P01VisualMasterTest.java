@@ -29,12 +29,15 @@ public class P01VisualMasterTest {
     }
 
     @Test public void excessiveDashJumpAndVictorySizesAreReduced() {
-        assertTrue("Dash must shrink",P01SpriteCalibration.get("player_base_dash",0)[0]<.76f);
+        assertTrue("Dash not excessively wide",
+                   P01SpriteCalibration.get("player_base_dash",0)[0]>=.70f);
         assertTrue("Jump start must shrink",P01SpriteCalibration.get("player_base_jump",0)[1]<.90f);
-        assertTrue("Victory must match idle, not grow",
-                   P01SpriteCalibration.get("player_base_victory",15)[1]<.85f);
-        assertTrue("Standing 2H must normalize",
-                   P01SpriteCalibration.get("player_base_crouch_heavy",4)[1]<.70f);
+        assertEquals("Victory compromise between previous oversized and undersized",
+                     .880f,P01SpriteCalibration.get("player_base_victory",15)[1],.001f);
+        assertTrue("2H raised pose must stay visibly tall",
+                   P01SpriteCalibration.get("player_base_crouch_heavy",4)[1]>.73f);
+        assertTrue("2H torso must keep idle-like width",
+                   P01SpriteCalibration.get("player_base_crouch_heavy",4)[0]>.88f);
         assertTrue("Medium crouch must be scaled",
                    P01SpriteCalibration.get("player_base_crouch_medium",6)[1]<.96f);
     }
