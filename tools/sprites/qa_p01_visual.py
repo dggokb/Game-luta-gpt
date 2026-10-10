@@ -27,7 +27,7 @@ def calibration(key):
     java=JAVA.read_text()
     m=re.search(r"private static final float\[\]\s+P01_"+key+r"\s*=\s*\{([^}]+)\}",java,re.S)
     if not m:raise AssertionError("Missing renderer calibration "+key)
-    return [float(x) for x in re.findall(r"(\d+\.\d+)f",m.group(1))]
+    return [float(x) for x in re.findall(r"(-?\d+\.\d+)f",m.group(1))]
 
 def cell(name,f):
     w,h,cols=CELLS[name]
