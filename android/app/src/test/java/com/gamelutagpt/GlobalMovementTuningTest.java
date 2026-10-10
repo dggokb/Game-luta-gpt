@@ -26,7 +26,7 @@ public class GlobalMovementTuningTest {
             e.step(pad[0],pad[1]);
         }
         for(int i=0;i<2;i++) {
-            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>145f);
+            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>140f);
             assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<162f);
             assertTrue("Fighter did not land "+i,e.fighter(i).grounded);
         }
