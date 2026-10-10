@@ -14,7 +14,7 @@ public class GlobalMovementTuningTest {
 
     @Test public void higherNormalJumpAppliesToBothAndKeepsSuperJump() {
         CombatEngine e=engine();
-        assertEquals(780f,e.config.jumpSpeed,.001f);
+        assertEquals(820f,e.config.jumpSpeed,.001f);
         assertEquals(1450f,e.config.superJumpSpeed,.001f);
         FighterInput[] pad={new FighterInput(),new FighterInput()};
         pad[0].jump=true;pad[1].jump=true;
@@ -26,8 +26,8 @@ public class GlobalMovementTuningTest {
             e.step(pad[0],pad[1]);
         }
         for(int i=0;i<2;i++) {
-            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>171f);
-            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<189f);
+            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>195f);
+            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<215f);
             assertTrue("Fighter did not land "+i,e.fighter(i).grounded);
         }
     }
@@ -35,7 +35,7 @@ public class GlobalMovementTuningTest {
     @Test public void longerBackwardHopAndArcApplyToBoth() {
         CombatEngine e=engine();
         assertEquals(15,e.config.backdashFrames);
-        assertEquals(850f,e.config.backdashSpeed,.001f);
+        assertEquals(978f,e.config.backdashSpeed,.001f);
         assertEquals(0f,e.config.backdashVisualLift(15),.001f);
         assertTrue(e.config.backdashVisualLift(7)>37f);
         assertEquals(0f,e.config.backdashVisualLift(0),.001f);
