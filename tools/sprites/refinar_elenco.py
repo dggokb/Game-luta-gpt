@@ -125,7 +125,7 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
         requested=["IDLE"]
     missing=sorted(EXPECTED_CORE-set(all_states)) if pack else sorted(EXPECTED_CORE)
     if states and pack:
-        missing=sorted(set(states)-set(all_states))
+        missing=sorted(set(requested)-set(all_states))
     videos=e.match_videos(videos_dir,requested) if videos_dir else {
         state:{"status":"SEM_VIDEO_LOCAL","files":[]} for state in requested
     }
