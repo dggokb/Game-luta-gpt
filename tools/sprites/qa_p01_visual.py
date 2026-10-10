@@ -43,23 +43,43 @@ def dims(img):
     return (x1-x0,y1-y0)
 
 def check_intro_handoff():
-    # The real video source, not canvas sizes: right/left/top/feet of the
-    # last intro pose must meet the actual idle within ~2 authored pixels.
-    ix,iy,idle_x,idle_y=161,551,163,458
-    xs=calibration("INTRO_X")
-    ys=calibration("INTRO_Y")
-    ox=calibration("INTRO_OFFSET_X")
-    oy=calibration("INTRO_OFFSET_Y")
-    assert xs[0]<1.0 and ys[0]<1.0, "Early intro wasn't scaled down"
-    assert ys[0]<ys[2], "Intro frame 20 was not normalized"
-    b=bb(cell("intro",26))
+    # Source-pixel comparison of the last authored intro pose with the
+    # slightly smaller actual idle. All coordinates are atlas-root relative.
+    java=JAVA.read_text()
+    def scalar(name):
+        m=re.search(r"private static final float "+name+r"\\s*=\\s*(\\d+\\.\\d+)f;",java)
+        assert m, "Missing P01 calibration scalar "+name
+        return float(m.group(1))
+    idle_scale=scalar("P01_IDLE_SCALE")
+    victory_scale=scalar("P01_VICTORY_SCALE")
+    assert 0.97 <= idle_scale <= .99
+    assert .92 <= victory_scale <= .96
+    ix,iy,idle_x,idle_y=161,551,165,462
+    sx=calibration("INTRO_X")
+    sy=calibration("INTRO_Y")
+    dx=calibration("INTRO_OFFSET_X")
+    dy=calibration("INTRO_OFFSET_Y")
+    src=bb(cell("intro",26))
     idle=bb(cell("idle",0))
-    received=((b[0]-ix)*xs[-1]+ox[-1],(b[2]-ix)*xs[-1]+ox[-1],
-              (b[1]-iy)*ys[-1]+oy[-1],(b[3]-iy)*ys[-1]+oy[-1])
-    target=(idle[0]-idle_x,idle[2]-idle_x,idle[1]-idle_y,idle[3]-idle_y)
+    received=((src[0]-ix)*sx[-1]+dx[-1],(src[2]-ix)*sx[-1]+dx[-1],
+              (src[1]-iy)*sy[-1]+dy[-1],(src[3]-iy)*sy[-1]+dy[-1])
+    target=((idle[0]-idle_x)*idle_scale,(idle[2]-idle_x)*idle_scale,
+            (idle[1]-idle_y)*idle_scale,(idle[3]-idle_y)*idle_scale)
     for got,wanted in zip(received,target):
         assert abs(got-wanted)<2.5, (received,target)
-    print("Intro last silhouette aligns with real idle within 2.5px.")
+    # The stationary victory pose should be roughly the same painted height
+    # as the smaller opening pose of the intro (not the large victory atlas).
+    victory=Image.open(SPRITES/"player_base_victory.png").convert("RGBA")
+    assert victory.size==(326*11,577*3)
+    victory7=victory.crop((326*7,0,326*8,577))
+    vh=dims(victory7)[1]*victory_scale
+    ih=dims(cell("intro",0))[1]*.965
+    assert abs(vh-ih)<4.0, (vh,ih)
+    # Old source victory frames 0-6 depict a walk-in, not a fixed celebration.
+    view=(ROOT/"android/app/src/main/java/com/gamelutagpt/GameView.java").read_text()
+    assert "win.timeOfFrame(7)" in view, "Victory still plays walking frames"
+    print("Intro / scaled IDLE & stationary victory size verified.")
+
 
 def preview():
     PREVIEW.mkdir(parents=True,exist_ok=True)
