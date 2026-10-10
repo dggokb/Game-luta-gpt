@@ -237,6 +237,26 @@ def compare_body(idle_stats, other_stats):
             "observacao":"nao aplicar sem referencia de imagem-base e exame das poses"}
 
 
+def chroma_confidence(bgr):
+    """Shared four-corner green-screen gate for temporal and geometric readers.
+
+    Fail-closed on malformed, undersized, or opaque arbitrary backgrounds.
+    """
+    import cv2
+    if bgr is None or getattr(bgr, "ndim", 0)!=3 or bgr.shape[2]!=3:
+        return 0.
+    h,w=bgr.shape[:2]
+    if min(h,w)<48:
+        return 0.
+    hsv=cv2.cvtColor(bgr,cv2.COLOR_BGR2HSV)
+    corner=min(35,h//5,w//5)
+    patches=(hsv[:corner,:corner],hsv[:corner,-corner:],
+             hsv[-corner:,:corner],hsv[-corner:,-corner:])
+    values=np.concatenate([x.reshape(-1,3) for x in patches])
+    return float(np.mean((values[:,0]>35)&(values[:,0]<95)&
+                         (values[:,1]>45)))
+
+
 def load_video(path, max_frames=250):
     """Só vídeos com chroma-key reconhecido; jamais segmentar cenário arbitrário."""
     import cv2
@@ -256,13 +276,9 @@ def load_video(path, max_frames=250):
             if bgr.shape[1]>900:
                 scale=900/bgr.shape[1]
                 bgr=cv2.resize(bgr,(900,int(bgr.shape[0]*scale)))
-            hsv=cv2.cvtColor(bgr,cv2.COLOR_BGR2HSV)
-            corners=np.concatenate((hsv[:35,:35].reshape(-1,3),
-                                    hsv[:35,-35:].reshape(-1,3)))
-            fraction=np.mean((corners[:,0]>35)&(corners[:,0]<95)&(corners[:,1]>45))
-            if fraction < .65:
-                return {"status":"INCONCLUSIVO","motivo":"fundo não é chroma-key verde uniforme; segmentação não validada"},[]
-            green+=1
+            if chroma_confidence(bgr)<.80:
+                return {"status":"INCONCLUSIVO",
+                        "motivo":"fundo não é chroma-key verde uniforme nos quatro cantos"},[]
             rgba=key(bgr)
             samples.append(properties(rgba[...,3]))
     finally:
