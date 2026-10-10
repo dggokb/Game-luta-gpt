@@ -85,8 +85,19 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
     pack, location=manifest(root,character)
     calibration=calibration_info(root,character)
     all_states=list(pack.get("animations",{})) if pack else []
-    requested=list(dict.fromkeys(
-        [canonical_state(s) for s in states] if states else all_states or ["IDLE"]))
+    if states:
+        requested=list(dict.fromkeys(canonical_state(s) for s in states))
+    elif all_states:
+        requested=all_states
+    elif videos_dir:
+        # A character not yet imported (P09-P12) can still be audited
+        # against its ORIGINAL animations without inventing a game pack.
+        discovered=e.match_videos(videos_dir,list(e.ALIASES))
+        requested=[state for state,match in discovered.items()
+                   if match["status"] in ("ENCONTRADO","AMBIGUO")]
+        requested=list(dict.fromkeys(["IDLE"]+requested))
+    else:
+        requested=["IDLE"]
     missing=sorted(EXPECTED_CORE-set(all_states)) if pack else sorted(EXPECTED_CORE)
     if states and pack:
         missing=sorted(set(states)-set(all_states))
