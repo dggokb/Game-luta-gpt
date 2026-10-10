@@ -50,7 +50,18 @@ def main():
                     and start.stat().st_size > 1024 and peak.stat().st_size > 1024
                     and digest(start) != digest(peak)
                     and digest(start) != base_sha and digest(peak) != base_sha)
-        if video or key_pair:
+        # Owning independent files is insufficient: the generated animation
+        # MUST prove that its clip actually consumed those source files.
+        bound = set()
+        cfg = ROOT / "tools/sprites/clips" / f"p12_full_{tag}.json"
+        if cfg.is_file():
+            clip = json.loads(cfg.read_text(encoding="utf-8"))
+            bound = set(clip.get("sourceReferences", []))
+        used_video = video is not None and video.relative_to(ROOT).as_posix() in bound
+        used_keys = (bool(key_pair)
+                     and start.relative_to(ROOT).as_posix() in bound
+                     and peak.relative_to(ROOT).as_posix() in bound)
+        if used_video or used_keys:
             accepted.append(state)
         else:
             lacking.append(state)
@@ -59,7 +70,7 @@ def main():
           " action states have independent motion source.", flush=True)
     if lacking:
         print("REJECTED: P12 remains an IDLE-warp prototype. Real distinct poses or"
-              " independent movement video are missing for:", file=sys.stderr)
+              " independent movement video are missing OR not actually used by the renderer for:", file=sys.stderr)
         for state in lacking:
             print(f"  {state}", file=sys.stderr)
         print("Accepted examples: art/videos/p12/light_jab.mp4 OR "
