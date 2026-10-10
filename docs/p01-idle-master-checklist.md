@@ -85,3 +85,15 @@ personagem.
 - [x] Criados controles DEBUG **DASH / 2H / VITORIA**, +/- 5% no Android.
 - [x] Percentuais salvos localmente e preservados nos próximos builds.
 - [ ] Obter feedback dos três percentuais escolhidos no celular e fixar padrão final.
+
+## v0.98 — dash menor que idle no celular: correção orientada por print
+
+- [x] O dash estava **pequeno**, não grande: comparar massa corporal e anatomia
+  em vez de equiparar o retângulo de um personagem agachado ao de um em pé.
+- [x] Aumentar **15% nos dois eixos** exclusivamente no atlas `player_base_dash`
+  sobre o padrão v0.97 (X: 0,730 → 0,8395; Y: 0,965 → 1,10975).
+- [x] Preservar a âncora do solo (`dy` acompanha o novo valor) e o deslocamento
+  vindo do motor de combate, sem tocar em imagens, colisões ou duração de quadros.
+- [x] Os botões DEBUG +/- permanecem operacionais sobre o novo valor inicial 100%;
+  isso funciona mesmo com preferências antigas do v0.97 preservadas.
+- [ ] Validar escala no dispositivo comparando DASH × IDLE, com novo screenshot.
