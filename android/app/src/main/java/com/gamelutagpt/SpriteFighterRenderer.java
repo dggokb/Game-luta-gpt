@@ -151,8 +151,13 @@ final class SpriteFighterRenderer {
         int col=frame%a.columns,row=frame/a.columns;
         source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
         float scale=character.profile.worldScale/a.pixelScale;
-        float widthScale=scale*sizeX,heightScale=scale*sizeY;
-        float left=x-a.rootX*widthScale,top=baseY-a.rootY*heightScale;
+        // Accepted corrections are applied AFTER legacy calibrations and
+        // debug tuning, so the engine really renders the corrected image.
+        SpriteAutoFix.Adjustment fix=SpriteAutoFix.get(character.id,a.resource,frame);
+        float widthScale=scale*sizeX*fix.size;
+        float heightScale=scale*sizeY*fix.size;
+        float left=x+fix.dx*scale-a.rootX*widthScale;
+        float top=baseY+fix.dy*scale-a.rootY*heightScale;
         destination.set(left,top,left+a.width*widthScale,top+a.height*heightScale);
         spritePaint.setAlpha(alpha);
         canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
