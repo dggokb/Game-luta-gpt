@@ -56,14 +56,15 @@ jobs:
         run: python tools/sprites/validar_p01_victory_real.py
       - name: Python real PNG validation (INTRO)
         run: |
-          if test -f tools/sprites/validar_p01_intro_real.py; then
-            python tools/sprites/validar_p01_intro_real.py
-          else
-            echo "INTRO validator not committed yet; diagnostic input extraction only"
-          fi
+          python tools/sprites/validar_p01_intro_real.py
       - name: Android tests
         run: |
-          gradle -p android --no-daemon :app:testDebugUnitTest
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            --tests com.gamelutagpt.CameraRigRoundEndTest \
+            --tests com.gamelutagpt.P01VisualMasterTest
       - name: Build debug APK
         run: gradle -p android --no-daemon :app:assembleDebug
       - name: Verify packaged assets
