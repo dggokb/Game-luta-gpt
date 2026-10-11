@@ -12,6 +12,7 @@ import json
 import subprocess
 from io import BytesIO
 from pathlib import Path
+from urllib.request import urlopen
 
 import cv2
 import numpy as np
@@ -113,7 +114,13 @@ def main():
     for name in IMAGES:
         file = STAGE / name
         rel = file.relative_to(REPO).as_posix()
-        raw = subprocess.check_output(["git", "show", f"{BASE_SHA}:{rel}"], cwd=REPO)
+        try:
+            raw = subprocess.check_output(["git", "show", f"{BASE_SHA}:{rel}"], cwd=REPO, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            # Checkout do Actions é shallow; baixa somente a arte original necessária.
+            url = f"https://raw.githubusercontent.com/dggokb/Game-luta-gpt/{BASE_SHA}/{rel}"
+            with urlopen(url, timeout=90) as response:
+                raw = response.read()
         with Image.open(BytesIO(raw)) as source:
             original = source.copy()
         changed = transform(original, name)
