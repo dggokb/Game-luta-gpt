@@ -1,0 +1,96 @@
+name: Comparar Templo da Lua original e redesenhado no motor
+
+on:
+  push:
+    branches:
+      - art/cenarios-anime-20261011
+    paths:
+      - '.github/workflows/comparar-stage-antes-depois.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  comparacao:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Recuperar somente as artes originais
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, urllib.request
+          orig = pathlib.Path('/tmp/templo-original/templo_lua')
+          orig.mkdir(parents=True, exist_ok=True)
+          src = pathlib.Path('android/app/src/main/assets/stages/templo_lua')
+          manifest = json.loads((src/'anime-style-manifest.json').read_text())
+          (orig/'stage.json').write_bytes((src/'stage.json').read_bytes())
+          sha = manifest['original_commit']
+          for file in manifest['files']:
+              name = file['file']
+              url = (f'https://raw.githubusercontent.com/dggokb/Game-luta-gpt/'
+                     f'{sha}/android/app/src/main/assets/stages/templo_lua/{name}')
+              raw = urllib.request.urlopen(url, timeout=90).read()
+              assert hashlib.sha256(raw).hexdigest() == file['original_sha256'], name
+              (orig/name).write_bytes(raw)
+              print('Original validado:', name)
+          PY
+
+      - name: Renderizar camera ORIGINAL (12 segundos)
+        working-directory: android
+        run: |
+          gradle :pc-preview:runStage --args="/tmp/templo-original/templo_lua --quadros /tmp/stage-before --segundos 12"
+
+      - name: Renderizar camera REDESENHADA (mesmos 12 segundos)
+        working-directory: android
+        run: |
+          gradle :pc-preview:runStage --args="app/src/main/assets/stages/templo_lua --quadros /tmp/stage-after --segundos 12"
+
+      - name: Montar comparativos frame a frame com camera identica
+        run: |
+          python3 -m pip install --disable-pip-version-check pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          output = Path('/tmp/templo-stage-camera-comparativo')
+          output.mkdir(parents=True, exist_ok=True)
+          for i in (0, 90, 180, 270, 310, 359):
+              name = f'quadro_{i:03d}.png'
+              before = Image.open('/tmp/stage-before/'+name).convert('RGB')
+              after = Image.open('/tmp/stage-after/'+name).convert('RGB')
+              assert before.size == after.size
+              w,h=before.size
+              pair=Image.new('RGB',(2*w,h+30),'#171522')
+              pair.paste(before,(0,30))
+              pair.paste(after,(w,30))
+              d=ImageDraw.Draw(pair)
+              d.text((16,9),f'ORIGINAL - frame {i:03}',fill='white')
+              d.text((w+16,9),f'ANIME IMAGEM-PARA-IMAGEM - frame {i:03}',fill='white')
+              pair.save(output/f'comparativo_{i:03}.jpg',quality=89)
+          print('Comparativos reais produzidos:',len(list(output.iterdir())))
+          PY
+
+      - name: Evidencia da composicao com motor real
+        uses: actions/upload-artifact@v4
+        with:
+          name: Templo-da-Lua-Antes-Depois-Mesma-Camera
+          path: /tmp/templo-stage-camera-comparativo/*.jpg
+          if-no-files-found: error
