@@ -137,6 +137,12 @@ def analyze(frames, loop=True, min_floor=.020, ratio=2.25):
         # Ignore harmless one-pixel breathing raster steps, even if the median is zero.
         # Require an appreciable absolute change as well as statistical spike.
         threshold = max(min_floor, ratio*median, ratio*local, median + 4*mad)
+        if row["loop_seam"]:
+            # Restart is especially perceptible: a moderate pose mismatch
+            # at N-1 -> 0 must not hide behind the threshold for ordinary
+            # breathing raster variation. It is a review flag, not an edit.
+            seam_threshold = max(min_floor, 1.85*median, 1.60*local)
+            threshold = min(threshold, seam_threshold)
         row["local_reference"] = round(local, 6)
         row["threshold"] = round(threshold, 6)
         row["ratio_to_median"] = round(row["score"]/max(median,1e-9), 3)
