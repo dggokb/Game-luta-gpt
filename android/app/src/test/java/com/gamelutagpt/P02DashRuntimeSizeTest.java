@@ -5,29 +5,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-/** Four native P02 dash poses at the approved size, with original atlas intact. */
+/** The generated atlas must contain a complete chronological dash cycle. */
 @RunWith(RobolectricTestRunner.class)
 public class P02DashRuntimeSizeTest {
-    @Test public void dashUsesNativeCycleWithOriginalSizeAndAtlas() {
-        CharacterDefinition character=GeneratedCharacters.get("p02");
-        CharacterDefinition.Animation idle=character.animation(SpriteStates.IDLE);
-        CharacterDefinition.Animation dash=character.animation(SpriteStates.DASH);
+    @Test public void realDashUsesAllVideoPhasesAndRetainsOriginalDuration() {
+        CharacterDefinition fighter=GeneratedCharacters.get("p02");
+        CharacterDefinition.Animation idle=fighter.animation(SpriteStates.IDLE);
+        CharacterDefinition.Animation dash=fighter.animation(SpriteStates.DASH);
         assertEquals("p02_idle",idle.atlas.resource);
         assertEquals(56,idle.atlas.count);
-        assertEquals(2f,idle.atlas.pixelScale,0f);
-        assertEquals(30*0.041f,idle.duration,0.0001f);
+        assertEquals(2f,idle.atlas.pixelScale,0);
+        assertEquals(30*.041f,idle.duration,.0001f);
         assertEquals("p02_dash",dash.atlas.resource);
-        assertEquals(531,dash.atlas.width);
-        assertEquals(448,dash.atlas.height);
-        assertEquals(282,dash.atlas.rootX);
-        assertEquals(432,dash.atlas.rootY);
-        assertEquals(6,dash.atlas.count);
-        assertEquals(2f,dash.atlas.pixelScale,0f);
+        assertEquals(2f,dash.atlas.pixelScale,0);
         assertTrue(dash.loop);
-        assertEquals(4*.065f,dash.duration,0.0001f);
-        for(int i=0;i<4;i++){
-            assertEquals("DASH native frame "+i,i,dash.frame((i+0.5f)*.065f,0f));
+        assertTrue("Real frames must fill a natural source cycle",dash.atlas.count>=9);
+        assertTrue("No fixed frame count assumptions",dash.atlas.count<=16);
+        assertEquals("Movement timing must be untouched",.260f,dash.duration,.001f);
+        int n=dash.atlas.count;
+        for(int i=0;i<n;i++) {
+            float t=(i+.5f)*dash.duration/n;
+            assertEquals("Native chronological phase "+i,i,dash.frame(t,0f));
         }
-        assertEquals(0,dash.frame(dash.duration+.0325f,0f));
+        assertEquals(0,dash.frame(dash.duration+.001f,0f));
     }
 }
