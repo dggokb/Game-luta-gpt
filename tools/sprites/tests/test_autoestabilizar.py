@@ -68,8 +68,9 @@ class AutoCorrectionTest(unittest.TestCase):
             (reports/"p02_victory.report.json").write_text(json.dumps({
                 "packed":{"frameWidth":fw,"frameHeight":fh,
                           "columns":12,"frameCount":12,"rootX":64}}))
-            analysis={"estados":{"VICTORY":{"prova_geometrica":{
-                "status":"INCONCLUSIVO"}}}}
+            analysis={"estados":{"VICTORY":{
+                "video":{"status":"ENCONTRADO","analise":{"status":"MEDIDO"}},
+                "prova_geometrica":{"status":"INCONCLUSIVO"}}}}
             result,record=AUTO.propose(root,"p02","VICTORY",analysis)
             self.assertEqual("CORRIGIDO",result["status"],result)
             self.assertEqual("CORRIGIDO",result["pes"]["status"])
