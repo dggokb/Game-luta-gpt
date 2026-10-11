@@ -10,9 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.GraphicsMode;
 
 /** End-to-end actual atlas/Canvas regression for INTRO -> IDLE. */
 @RunWith(RobolectricTestRunner.class)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class SpriteIntroTransitionTest {
     private static final int W=900,H=680;
     private static Bitmap render(SpriteFighterRenderer renderer,String state,float seconds) {
