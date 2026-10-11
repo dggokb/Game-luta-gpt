@@ -1,0 +1,87 @@
+name: Build direct P05 HD APK
+
+on:
+  push:
+    branches:
+      - test/p05-all-sr-20261011
+    paths:
+      - .github/workflows/p05-hd-apk.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p05-hd-apk-direct
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout P05 test branch
+        uses: actions/checkout@v4
+      - name: Verify the 38 HD animation configs and runtime atlas mappings
+        run: |
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          clips=sorted(Path('tools/sprites/clips').glob('p05_*.json'))
+          assert len(clips)==38,(len(clips),'P05 clips')
+          for path in clips:
+              cfg=json.loads(path.read_text())
+              assert cfg['id']==path.stem,path
+              assert cfg.get('pixelScale')==2,(path,'not HD 2x')
+              assert cfg['source'].endswith('_sr_hd.png'),(path,'incorrect HD source')
+              assert Path(cfg['source']).exists(),(path,'missing source')
+              assert Path(cfg['output']).exists(),(path,'missing in-game atlas')
+          java=Path('android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java').read_text()
+          start=java.index(' private static void add',java.index(' private static void add1('))
+          for path in clips:
+              name=path.stem
+              assert re.search(r'new CharacterDefinition\.Atlas\("'+name+r'"[^\n]*?2\.00000000f\)',java),(name,'runtime scale')
+          print('PASS: 38/38 P05 real HD sprites with 2x runtime mappings')
+          PY
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Configure Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Android platform and build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Pillow for sprite pack consistency validation
+        run: python3 -m pip install --disable-pip-version-check "Pillow==12.3.0"
+      - name: Compile P05 HD Android test APK with strict sprite check
+        working-directory: android
+        run: gradle :app:assembleDebug -PrequireSpriteCheck=true --stacktrace
+      - name: Publish direct APK to GitHub prerelease (not ZIP)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHA="$(git rev-parse --short=8 HEAD)"
+          TAG="p05-hd-test-$SHA"
+          FILE="GameLutaGPT-P05-HD-$SHA.apk"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$FILE"
+          test -s "$FILE"
+          gh release create "$TAG" "$FILE" \
+            --target "$(git rev-parse HEAD)" \
+            --title "P05 HD - APK teste ($SHA)" \
+            --notes "APK de teste da branch test/p05-all-sr-20261011. 38 atlases HD do P05 em 2x. Sem integrar game-luta-sprite-gpt." \
+            --prerelease
+          echo "DIRECT_APK=https://github.com/dggokb/Game-luta-gpt/releases/download/$TAG/$FILE" >> "$GITHUB_STEP_SUMMARY"
+          echo "Direct APK: https://github.com/dggokb/Game-luta-gpt/releases/download/$TAG/$FILE"
+      - name: Backup APK artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P05-HD-APK-BACKUP
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: warn
