@@ -67,7 +67,16 @@ jobs:
           test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
       - name: Verify corrected scale on real Android Canvas and unchanged P01
         run: |
-          gradle -p android --no-daemon :app:testDebugUnitTest \
+          cat > /tmp/p02-robolectric-memory.gradle <<'GRADLE'
+          allprojects {
+            tasks.withType(org.gradle.api.tasks.testing.Test).configureEach {
+              maxHeapSize = '4g'
+              maxParallelForks = 1
+            }
+          }
+          GRADLE
+          gradle -p android --no-daemon --max-workers=1 \
+            -I /tmp/p02-robolectric-memory.gradle :app:testDebugUnitTest \
             --tests com.gamelutagpt.P02AnatomyRendererTest \
             --tests com.gamelutagpt.P02IdleRuntimeFixTest \
             --tests com.gamelutagpt.P02DashRuntimeSizeTest \
