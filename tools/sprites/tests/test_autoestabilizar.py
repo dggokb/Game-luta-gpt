@@ -67,7 +67,7 @@ class AutoCorrectionTest(unittest.TestCase):
             Image.fromarray(sheet,"RGBA").save(images/"p02_victory.png")
             (reports/"p02_victory.report.json").write_text(json.dumps({
                 "packed":{"frameWidth":fw,"frameHeight":fh,
-                          "columns":12,"frameCount":12,"rootX":64}}))
+                          "columns":12,"frameCount":12,"rootX":64,"rootY":126}}))
             analysis={"estados":{"VICTORY":{
                 "video":{"status":"ENCONTRADO","analise":{"status":"MEDIDO"}},
                 "prova_geometrica":{"status":"INCONCLUSIVO"}}}}
