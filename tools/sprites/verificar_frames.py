@@ -108,7 +108,7 @@ def distance(a, b):
             "centroid_px": float(move), "feet_px": float(feet), "iou": float(iou)}
 
 
-def analyze(frames, loop=True, min_floor=.008, ratio=2.25):
+def analyze(frames, loop=True, min_floor=.020, ratio=2.25):
     """Detects isolated temporal jumps while preserving smooth breathing cycles.
 
     Every consecutive pair is measured. Circular local baseline is computed
@@ -129,6 +129,7 @@ def analyze(frames, loop=True, min_floor=.008, ratio=2.25):
         indices = ([(i+d) % len(scores) for d in (-3,-2,-1,1,2,3)]
                    if loop else [k for k in range(max(0,i-3),min(len(scores),i+4)) if k != i])
         local = float(statistics.median(scores[k] for k in indices))
+        # Ignore harmless one-pixel breathing raster steps, even if the median is zero.
         # Require an appreciable absolute change as well as statistical spike.
         threshold = max(min_floor, ratio*median, ratio*local, median + 4*mad)
         row["local_reference"] = round(local, 6)
