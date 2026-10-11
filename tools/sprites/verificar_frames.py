@@ -43,8 +43,14 @@ def source_sheet(path, width, height, columns, count):
     return result
 
 
-def apply_runtime(frames, character, atlas_id, fixes):
-    """Mirror the explicit per-frame atlas-pixel correction, without writing PNGs."""
+def apply_runtime(frames, character, atlas_id, fixes, packed=None):
+    """Project actual SpriteAutoFix uniform scale around authored atlas root.
+
+    Normal renders are unchanged. For size patches, all projected frames use
+    one equally padded diagnostic canvas so no frame is truncated and temporal
+    comparisons are made at identical pixel density and on the same ground.
+    Size, dx, and dy are exactly the parameters passed to drawAtlas().
+    """
     matches = [x for x in fixes.get("corrections", [])
                if x.get("character") == character and x.get("atlas") == atlas_id]
     if len(matches) > 1:
@@ -56,24 +62,40 @@ def apply_runtime(frames, character, atlas_id, fixes):
                 raise ValueError(f"Duplicate/out-of-range frame {f}")
             if not all(math.isfinite(float(v)) for v in (size, dx, dy)):
                 raise ValueError("Nonfinite sprite correction")
+            if not 0.8 <= size <= 1.25:
+                raise ValueError("Unsafe/non-uniform correction")
             table[f] = (float(size), float(dx), float(dy))
-    adjusted = []
+    if not any(size != 1 for size, _, _ in table.values()):
+        adjusted = []
+        for i, frame in enumerate(frames):
+            size, dx, dy = table.get(i, (1.0, 0.0, 0.0))
+            if not float(dx).is_integer() or not float(dy).is_integer():
+                raise ValueError(f"Frame {i}: fractional patch requires renderer projection")
+            x, y = int(dx), int(dy)
+            rgba = Image.new("RGBA", frame.size)
+            rgba.paste(frame, (x, y))
+            if np.count_nonzero(np.asarray(rgba)[..., 3]) != np.count_nonzero(np.asarray(frame)[..., 3]):
+                raise ValueError(f"Frame {i}: runtime translation clips artwork")
+            adjusted.append(rgba)
+        return adjusted
+    if packed is None:
+        raise ValueError("Renderer projection requires authored atlas layout/root")
+    px = int(packed["rootX"])
+    py = int(packed["rootY"])
+    pad = math.ceil(max(frames[0].size) * .3)
+    resized=[]
     for i, frame in enumerate(frames):
         size, dx, dy = table.get(i, (1.0, 0.0, 0.0))
-        # SpriteAutoFix takes dx/dy in atlas pixels. For IDLE the accepted
-        # correction keeps scale exactly 1. Other sizes cannot be emulated
-        # faithfully without root geometry and must not silently be ignored.
-        if size != 1:
-            raise ValueError(f"Frame {i}: scaled patch requires renderer projection")
-        if not float(dx).is_integer() or not float(dy).is_integer():
-            raise ValueError(f"Frame {i}: fractional patch requires renderer projection")
-        dx, dy = int(dx), int(dy)
-        rgba = Image.new("RGBA", frame.size)
-        rgba.paste(frame, (dx, dy))
-        if np.count_nonzero(np.asarray(rgba)[..., 3]) != np.count_nonzero(np.asarray(frame)[..., 3]):
-            raise ValueError(f"Frame {i}: runtime translation clips artwork")
-        adjusted.append(rgba)
-    return adjusted
+        width, height = frame.size
+        scaled=frame.resize((round(width*size),round(height*size)),Image.Resampling.BILINEAR)
+        x=round(pad+px+dx-px*size)
+        y=round(pad+py+dy-py*size)
+        result=Image.new("RGBA",(width+2*pad,height+2*pad))
+        result.alpha_composite(scaled,(x,y))
+        if np.count_nonzero(np.asarray(result)[..., 3]) < np.count_nonzero(np.asarray(scaled)[..., 3])*.99:
+            raise ValueError(f"Frame {i}: runtime projection loses visible art")
+        resized.append(result)
+    return resized
 
 
 def feature(image):
@@ -202,7 +224,7 @@ def project_report(root, character, clip_id, compare_source=False):
     runtime=source_sheet(root/cfg["output"],packed["frameWidth"],
         packed["frameHeight"],packed["columns"],count)
     fixes=json.loads((root/"android/app/src/main/assets/sprite-autofix.json").read_text())
-    stages = {"runtime_effective": apply_runtime(runtime,character,clip_id,fixes)}
+    stages = {"runtime_effective": apply_runtime(runtime,character,clip_id,fixes,packed)}
     if compare_source:
         layout=report["layout"]
         stages["hd_source"]=source_sheet(root/cfg["source"],layout["frameWidth"],
