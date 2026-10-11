@@ -89,7 +89,10 @@ def feature(image):
     rgb = rgba[..., :3] * alpha[..., None] + 235 * (1 - alpha[..., None])
     bbox = [int(xx.min()), int(yy.min()), int(xx.max()), int(yy.max())]
     centroid = [float(xx.mean()), float(yy.mean())]
-    foot = [float(np.median(xx[yy >= np.quantile(yy, .90)])), float(yy.max())]
+    # Foot region is relative to *ground contact*, not an alpha-quantile
+    # that shifts whenever breathing changes the number of opaque pixels.
+    ground_band = yy >= (int(yy.max()) - max(3, int(SIZE[1] * .07)))
+    foot = [float(np.median(xx[ground_band])), float(yy.max())]
     return {"rgb": rgb, "mask": mask, "bbox": bbox,
             "centroid": centroid, "foot": foot}
 
