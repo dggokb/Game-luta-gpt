@@ -14,11 +14,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Verify exact game source commit
         run: |
-          test "$(git rev-parse HEAD^)" = "55213ae8edbc03b11a6cf5c765dae085b0569ea0"
-          test "$(git diff --name-only HEAD^ HEAD)" = ".github/workflows/sprite-direct-apk.yml"
+          git merge-base --is-ancestor 55213ae8edbc03b11a6cf5c765dae085b0569ea0 HEAD
+          test "$(git diff --name-only 55213ae8edbc03b11a6cf5c765dae085b0569ea0 HEAD)" = ".github/workflows/sprite-direct-apk.yml"
       - name: Configure Java 17
         uses: actions/setup-java@v4
         with:
