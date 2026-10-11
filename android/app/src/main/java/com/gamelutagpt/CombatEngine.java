@@ -231,6 +231,11 @@ final class CombatEngine {
             f.overdriveRequestAge = -1;
             return;
         }
+        // Require a fully completed backdash AND a release to neutral before
+        // another can be recognized. This avoids backdash chaining by holding
+        // backward or repeated double taps while the hop is active.
+        if (f.backdashFrames == 0 && f.backdashCooldown == 0 &&
+            in.direction == 0) f.backdashArmed = true;
         int relative = MotionParser.relative(in.direction, f.facing);
         f.motion.record(relative, f.clock);
         int clock = f.clock;
@@ -332,10 +337,13 @@ final class CombatEngine {
         }
 
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
-            if (f.backdashRequest) {
+            if (f.backdashRequest && f.backdashFrames == 0 &&
+                f.backdashCooldown == 0 && f.backdashArmed) {
                 f.backdashFrames = config.backdashFrames;
+                f.backdashCooldown = config.backdashFrames + config.backdashRecoveryFrames;
+                f.backdashArmed = false;
                 f.forwardDashing = false;
-            } else if (f.dashRequest) {
+            } else if (f.dashRequest && f.backdashFrames == 0) {
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
             }
@@ -634,6 +642,7 @@ final class CombatEngine {
         if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
         if (f.invulnFrames > 0) f.invulnFrames--;
         if (f.throwProtect > 0) f.throwProtect--;
+        if (f.backdashCooldown > 0) f.backdashCooldown--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.launcherChase > 0) f.launcherChase--;
@@ -691,6 +700,15 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        // The winner has already won: no stale held direction, dash or air
+        // momentum may translate the victory animation around the arena.
+        // Keep the defeated fighter's knockdown and physics untouched.
+        if (!f.ko() && fighters[1 - f.index].ko()) {
+            f.forwardDashing = false;
+            f.backdashFrames = 0;
+            f.airDashFrames = 0;
+            return;
+        }
         if (f.rolling()) {
             f.x += f.rollDirection * config.rollSpeed * CombatConfig.DT;
             f.rollFrames--;
@@ -761,6 +779,13 @@ final class CombatEngine {
             return;
         }
         float scale = 1f;
+        // Ordinary neutral jumps now rise/fall briskly; preserve the superjump
+        // arc, juggle/launch physics and specialized projectile trajectories.
+        if (!f.superJumping && (f.status == CombatFighter.Status.NEUTRAL ||
+            (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
+            scale = f.vy < 0f ? config.normalJumpRisingGravityScale
+                              : config.normalJumpFallingGravityScale;
+        }
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
             scale = 0f;

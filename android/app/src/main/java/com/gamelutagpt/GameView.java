@@ -61,6 +61,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final DemoDirector demo = new DemoDirector();
     private final FighterInput ignoredInput = new FighterInput();
     private boolean debugOverlay;
+    /** Screen-space controls shown only in DEBUG, away from combat buttons. */
+    private static final float TUNE_LEFT = 944f, TUNE_TOP = 168f;
+    private static final float TUNE_ROW_TOP = 208f, TUNE_ROW_H = 48f;
+    private final Paint tuningPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private String dummyDamageLabel = "";
     private int dummyDamageLabelFrames = 0;
@@ -196,6 +200,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
+        P01VisualTuning.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
@@ -297,7 +302,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Each character's ultra lives in assets/ultras/&lt;character id&gt;/. */
     private static String ultraFolder(FighterState fighter) {
-        return "ultras/" + fighter.character.id;
+        return "ultras/" + ("p01_training".equals(fighter.character.id) ? "player_base" : fighter.character.id);
     }
 
     private static StageScene loadStage(AndroidRenderAssets assets) {
@@ -469,6 +474,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             } else {
                 ai.fill(engine, OPPONENT, opponentInput);
             }
+        }
+        if (player().ko() || opponent().ko()) {
+            // Inputs must not start a new attack/move once the match is over.
+            playerInput.clear();
+            opponentInput.clear();
         }
         engine.step(playerInput, opponentInput);
         demo.afterStep();
@@ -918,8 +928,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void updateFightCamera(float dt) {
         // Frame what is actually drawn: opaque sprite height measured at import time.
         float highestFighterTop = Math.min(visualTop(player()), visualTop(opponent()));
-        camera.update(dt, player().x, opponent().x, highestFighterTop,
-            player().superJumping || opponent().superJumping);
+        // KO leaves the winner's world X fixed, so its screen X must also
+        // be fixed. Continue to update the camera only while BOTH fight.
+        camera.updateForRound(dt, player().x, opponent().x, highestFighterTop,
+            player().superJumping || opponent().superJumping,
+            player().ko() || opponent().ko());
     }
 
     /** Highest opaque pixel of a fighter, for camera framing and the opponent HUD. */
@@ -1112,7 +1125,63 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
-        if (debugOverlay) debug.drawPanel(c, engine);
+        if (debugOverlay) {
+            debug.drawPanel(c, engine);
+            drawP01Tuner(c);
+        }
+    }
+
+    private void drawP01Tuner(Canvas c) {
+        Paint p=tuningPaint;
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.argb(225,10,17,29));
+        c.drawRoundRect(TUNE_LEFT,TUNE_TOP,1274f,411f,12f,12f,p);
+        p.setColor(Color.rgb(245,225,170));
+        p.setTextSize(17f);
+        p.setFakeBoldText(true);
+        c.drawText("P01 - AJUSTAR TAMANHO",TUNE_LEFT+10f,TUNE_TOP+24f,p);
+        p.setFakeBoldText(false);
+        p.setTextSize(13f);
+        p.setColor(Color.LTGRAY);
+        c.drawText("Comparar com o IDLE / salva sozinho",TUNE_LEFT+10f,TUNE_TOP+41f,p);
+        for(int row=0;row<3;row++) {
+            float top=TUNE_ROW_TOP+row*TUNE_ROW_H;
+            p.setColor(Color.WHITE);
+            p.setTextSize(18f);
+            c.drawText(P01VisualTuning.NAMES[row],TUNE_LEFT+12f,top+25f,p);
+            p.setTextSize(15f);
+            c.drawText(P01VisualTuning.percent(row)+"%",TUNE_LEFT+135f,top+25f,p);
+            p.setColor(Color.rgb(65,80,100));
+            c.drawRoundRect(1155f,top+2f,1198f,top+42f,7f,7f,p);
+            c.drawRoundRect(1208f,top+2f,1251f,top+42f,7f,7f,p);
+            p.setColor(Color.WHITE);
+            p.setTextSize(29f);
+            c.drawText("-",1169f,top+31f,p);
+            c.drawText("+",1218f,top+31f,p);
+        }
+        p.setColor(Color.rgb(65,80,100));
+        c.drawRoundRect(TUNE_LEFT+10f,360f,1261f,400f,7f,7f,p);
+        p.setColor(Color.WHITE);
+        p.setTextSize(16f);
+        c.drawText("RESTAURAR 100% (os 3)",TUNE_LEFT+27f,386f,p);
+    }
+
+    /** Return true when DEBUG scale editing consumes the tap. */
+    private boolean handleP01TunerTap(float x,float y) {
+        if (x<TUNE_LEFT || x>1274f || y<TUNE_TOP || y>411f) return false;
+        if (y>=360f && y<=401f) {
+            P01VisualTuning.reset(getContext());
+            return true;
+        }
+        int row=(int)((y-TUNE_ROW_TOP)/TUNE_ROW_H);
+        if(row>=0 && row<3 && y>=TUNE_ROW_TOP && y<TUNE_ROW_TOP+3*TUNE_ROW_H) {
+            float rowTop=TUNE_ROW_TOP+row*TUNE_ROW_H;
+            if(y>=rowTop+2f && y<=rowTop+42f) {
+                if(x>=1155f && x<=1198f) P01VisualTuning.adjust(getContext(),row,-1);
+                if(x>=1208f && x<=1251f) P01VisualTuning.adjust(getContext(),row,+1);
+            }
+        }
+        return true;
     }
 
     private static String guardLabel(int guard, String prefix) {
@@ -1346,7 +1415,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // Opponent KO: the winner plays VICTORY once and holds its last pose.
             CharacterDefinition.Animation win = character.animations.get(SpriteStates.VICTORY);
             animation = SpriteStates.VICTORY;
-            animationElapsed = Math.min(win.duration - 0.0001f, victoryFrames[side]++ * FIXED_STEP);
+            // P01 source frames 0-6 include a walk toward the camera.
+            // Celebrate from the planted stance, frame 7, without translation.
+            boolean p01Victory = "player_base".equals(character.id) ||
+                "p01_training".equals(character.id);
+            float start = p01Victory ? win.timeOfFrame(7) : 0f;
+            animationElapsed = Math.min(win.duration - 0.0001f,
+                start + victoryFrames[side]++ * FIXED_STEP);
         } else {
             victoryFrames[side] = 0;
         }
@@ -1475,7 +1550,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float angle = knockdownAngle(renderer, f);
         c.save();
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
-        renderer.draw(c, f.x, f.y, f.facing, damageFlash, guardFlash);
+        // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
+        float visualY = f.y;
+        if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
+            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
+        }
+        renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         c.restore();
     }
 
@@ -1573,6 +1653,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             int pointerId = event.getPointerId(index);
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
+            if(debugOverlay && handleP01TunerTap(x,y))return;
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
             switch (control) {
