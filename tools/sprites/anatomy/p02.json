@@ -1,0 +1,13 @@
+{
+  "id": "p02", "reference": "approved IDLE frames 15..44",
+  "headTopFraction": 0.28,
+  "topToleranceFraction": 0.09,
+  "rgbMin": [110, 105, 110],
+  "rgbMax": [255, 255, 255],
+  "minBtoGRatio": 0.94,
+  "minPixels": 250,
+  "rasterUncertainty": 0.012,
+  "maxScaleDisagreement": 0.06,
+  "minAutoScale": 0.80,
+  "maxAutoScale": 1.25
+}
