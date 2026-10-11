@@ -1,0 +1,44 @@
+name: APK snapshot game-luta-sprite-gpt 2026-10-11
+on:
+  push:
+    branches:
+      - build/apk-sprite-gpt-20261011-1105
+permissions:
+  contents: read
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout exact source snapshot
+        uses: actions/checkout@v4
+      - name: Verify source commit
+        run: |
+          test "$(git rev-parse HEAD^)" = "fd038e8027901ebbf97ffddc995a8b8efe8d11d4"
+          git diff --exit-code HEAD^ HEAD -- android art characters tools
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Install P01 calibration dependency
+        run: python3 -m pip install --disable-pip-version-check Pillow
+      - name: Assemble APK without slow complete sprite sweep
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks --stacktrace
+      - name: Verify APK and source
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo "SOURCE_SHA=fd038e8027901ebbf97ffddc995a8b8efe8d11d4"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload raw APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-luta-sprite-gpt-fd038e8-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
