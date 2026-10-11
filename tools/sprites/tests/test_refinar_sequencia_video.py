@@ -51,6 +51,7 @@ class IntroVideoTest(unittest.TestCase):
         # Regression that the previous motor was incapable of passing:
         # every frame must preserve its own source-video displacement.
         g=self.report['packed']
+        crop_x,crop_y=g['cropOffset']
         geo=self.generated['frameGeometry']
         self.assertEqual(len(geo),len(self.poses))
         for i,(frame,record) in enumerate(zip(self.poses,geo)):
@@ -59,8 +60,8 @@ class IntroVideoTest(unittest.TestCase):
             self.assertGreaterEqual(min(b[0],b[1],frame.width-b[2],frame.height-b[3]),7)
             foot=b[3]-1
             trunk=registration_x(np.asarray(frame))
-            self.assertAlmostEqual(foot,record['expectedFootY'],delta=2.5)
-            self.assertAlmostEqual(trunk,record['expectedTorsoX'],delta=3.5)
+            self.assertAlmostEqual(foot+crop_y,record['expectedFootY'],delta=2.5)
+            self.assertAlmostEqual(trunk+crop_x,record['expectedTorsoX'],delta=3.5)
 
     def test_fixed_registration_preserves_synthetic_camera_space_translation(self):
         # Same character rendered 30 px to the right and 24 px higher must
