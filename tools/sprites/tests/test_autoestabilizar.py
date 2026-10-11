@@ -125,6 +125,52 @@ class AutoCorrectionTest(unittest.TestCase):
                     "character":"p03","atlas":"p03_idle","state":"IDLE",
                     "frames":[[0,1.,0.,0.]]}])
 
+    def test_rollback_rejects_external_changes_and_cannot_repeat(self):
+        with tempfile.TemporaryDirectory() as folder:
+            asset=Path(folder)/"sprite-autofix.json"
+            patch={"character":"p02","atlas":"p02_idle","state":"IDLE",
+                   "frames":[[0,1.0,2.0,0.0]]}
+            AUTO.publish(asset,patch)
+            published=asset.read_text()
+            changed=json.loads(published)
+            changed["corrections"].append({
+                "character":"p03","atlas":"p03_idle","state":"IDLE",
+                "frames":[[0,1.,0.,0.]]})
+            asset.write_text(json.dumps(changed))
+            with self.assertRaisesRegex(ValueError,"modificado"):
+                AUTO.rollback(asset,"p02")
+            self.assertEqual(changed,json.loads(asset.read_text()),
+                             "Rollback must never discard unrelated changes")
+            asset.write_text(published)
+            self.assertEqual("REVERTIDO",AUTO.rollback(asset,"p02")["status"])
+            self.assertFalse(asset.with_suffix(".expected.sha256").exists())
+            with self.assertRaises(ValueError):
+                AUTO.rollback(asset,"p02")
+
+    def test_publisher_rejects_invalid_rows_atomically(self):
+        with tempfile.TemporaryDirectory() as folder:
+            asset=Path(folder)/"sprite-autofix.json"
+            original='{"schema":1,"corrections":[]}\\n'
+            asset.write_text(original)
+            good={"character":"p02","atlas":"p02_idle","state":"IDLE",
+                  "frames":[[0,1.,.4,0.]]}
+            variants=[
+                {**good,"frames":[[0,1.8,0.,0.]]},
+                {**good,"frames":[[0,float("nan"),0.,0.]]},
+                {**good,"frames":[[-1,1.,0.,0.]]},
+                {**good,"frames":[[0,1.,0.,0.],[0,1.,0.,0.]]},
+                {**good,"atlas":"!bad"},
+                {**good,"frames":[]},
+                {**good,"frames":[[0,1.,60.,0.]]},
+            ]
+            for item in variants:
+                with self.assertRaises(ValueError):
+                    AUTO.publish_batch(asset,[good,item])
+                self.assertEqual(original,asset.read_text(),
+                                 "Failed batch must leave prior asset unchanged")
+                self.assertFalse(asset.with_suffix(".previous.json").exists(),
+                                 "Failed batch must not create rollback metadata")
+
     def test_no_correction_of_unimported_character_or_deliberately_moving_state(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):
