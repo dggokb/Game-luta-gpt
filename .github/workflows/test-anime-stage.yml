@@ -51,8 +51,12 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add android/app/src/main/assets/stages/templo_lua/
-          git commit -m "test(stage): substitui 10 imagens por versoes anime cel-shading"
-          git push origin HEAD:art/cenarios-anime-20261011
+          if ! git diff --cached --quiet; then
+            git commit -m "test(stage): substitui 10 imagens por versoes anime cel-shading"
+            git push origin HEAD:art/cenarios-anime-20261011
+          else
+            echo "As 10 camadas ja estao no estilo esperado; nenhuma alteracao."
+          fi
 
       - name: Comparativo visual original x anime
         uses: actions/upload-artifact@v4
@@ -97,6 +101,23 @@ jobs:
           name: GameLutaGPT-APK-Cenarios-Anime
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Publicar arquivo APK puro no GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk /tmp/GameLutaGPT-Cenarios-Anime.apk
+          TAG=cenarios-anime-20261011
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$TAG" /tmp/GameLutaGPT-Cenarios-Anime.apk --repo "${{ github.repository }}" --clobber
+          else
+            gh release create "$TAG" /tmp/GameLutaGPT-Cenarios-Anime.apk \
+              --repo "${{ github.repository }}" \
+              --target "$(git rev-parse HEAD)" \
+              --title "Teste de cenarios anime - Templo da Lua" \
+              --notes "APK experimental do Templo da Lua com 10 camadas anime cel-shading. Nao foi integrado a main nem a game-luta-sprite-gpt." \
+              --prerelease
+          fi
 
       - name: Emulador Android e captura de inicializacao
         uses: reactivecircus/android-emulator-runner@v2
