@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Verify exact game source commit
         run: |
           test "$(git rev-parse HEAD^)" = "55213ae8edbc03b11a6cf5c765dae085b0569ea0"
