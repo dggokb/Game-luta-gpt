@@ -664,28 +664,28 @@ final class GeneratedSpriteLayouts {
     static final int P04_THROW_ROOT_Y = 435;
     static final int P04_THROW_FRAME_COUNT = 9;
 
-    static final int P04_ULTRA_BEAM_FRAME_WIDTH = 271;
-    static final int P04_ULTRA_BEAM_FRAME_HEIGHT = 284;
-    static final int P04_ULTRA_BEAM_ROOT_X = 90;
-    static final int P04_ULTRA_BEAM_ROOT_Y = 270;
+    static final int P04_ULTRA_BEAM_FRAME_WIDTH = 527;
+    static final int P04_ULTRA_BEAM_FRAME_HEIGHT = 553;
+    static final int P04_ULTRA_BEAM_ROOT_X = 173;
+    static final int P04_ULTRA_BEAM_ROOT_Y = 532;
     static final int P04_ULTRA_BEAM_FRAME_COUNT = 9;
 
-    static final int P04_VICTORY_FRAME_WIDTH = 190;
-    static final int P04_VICTORY_FRAME_HEIGHT = 338;
-    static final int P04_VICTORY_ROOT_X = 84;
-    static final int P04_VICTORY_ROOT_Y = 320;
+    static final int P04_VICTORY_FRAME_WIDTH = 366;
+    static final int P04_VICTORY_FRAME_HEIGHT = 662;
+    static final int P04_VICTORY_ROOT_X = 161;
+    static final int P04_VICTORY_ROOT_Y = 633;
     static final int P04_VICTORY_FRAME_COUNT = 33;
 
-    static final int P04_WALK_BACK_FRAME_WIDTH = 168;
-    static final int P04_WALK_BACK_FRAME_HEIGHT = 246;
-    static final int P04_WALK_BACK_ROOT_X = 83;
-    static final int P04_WALK_BACK_ROOT_Y = 234;
+    static final int P04_WALK_BACK_FRAME_WIDTH = 321;
+    static final int P04_WALK_BACK_FRAME_HEIGHT = 477;
+    static final int P04_WALK_BACK_ROOT_X = 159;
+    static final int P04_WALK_BACK_ROOT_Y = 461;
     static final int P04_WALK_BACK_FRAME_COUNT = 27;
 
-    static final int P04_WALK_FORWARD_FRAME_WIDTH = 173;
-    static final int P04_WALK_FORWARD_FRAME_HEIGHT = 236;
-    static final int P04_WALK_FORWARD_ROOT_X = 84;
-    static final int P04_WALK_FORWARD_ROOT_Y = 225;
+    static final int P04_WALK_FORWARD_FRAME_WIDTH = 332;
+    static final int P04_WALK_FORWARD_FRAME_HEIGHT = 457;
+    static final int P04_WALK_FORWARD_ROOT_X = 161;
+    static final int P04_WALK_FORWARD_ROOT_Y = 442;
     static final int P04_WALK_FORWARD_FRAME_COUNT = 28;
 
     static final int P05_BACKDASH_FRAME_WIDTH = 449;
