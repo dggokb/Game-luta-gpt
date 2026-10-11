@@ -9,6 +9,7 @@ on:
       - tools/sprites/validar_p02_idle_real.py
       - android/app/src/main/assets/sprite-autofix.json
       - android/app/src/test/java/com/gamelutagpt/P02IdleRuntimeFixTest.java
+      - android/app/src/test/java/com/gamelutagpt/P01IntroRealAssetTest.java
 permissions:
   contents: read
 jobs:
