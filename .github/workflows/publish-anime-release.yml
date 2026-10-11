@@ -1,0 +1,46 @@
+name: Publicar APK puro de cenarios anime
+
+on:
+  push:
+    branches:
+      - art/cenarios-anime-20261011
+    paths:
+      - '.github/workflows/publish-anime-release.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar APK ja compilado no teste visual
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/anime-apk
+          gh run download 38141131253 --repo "${{ github.repository }}" \
+            --name GameLutaGPT-APK-Cenarios-Anime \
+            --dir /tmp/anime-apk
+          test -s /tmp/anime-apk/app-debug.apk
+          mv /tmp/anime-apk/app-debug.apk /tmp/GameLutaGPT-Cenarios-Anime.apk
+          unzip -t /tmp/GameLutaGPT-Cenarios-Anime.apk | tail -1
+
+      - name: Publicar APK Android direto sem ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=cenarios-anime-20261011
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$TAG" /tmp/GameLutaGPT-Cenarios-Anime.apk \
+              --repo "${{ github.repository }}" --clobber
+          else
+            gh release create "$TAG" /tmp/GameLutaGPT-Cenarios-Anime.apk \
+              --repo "${{ github.repository }}" \
+              --target art/cenarios-anime-20261011 \
+              --title "APK teste cenarios anime - Templo da Lua" \
+              --notes "Teste isolado na branch art/cenarios-anime-20261011, dez camadas em estilo anime cel-shading, geometria/alpha preservados. Nao foi integrado ao jogo principal." \
+              --prerelease
+          fi
