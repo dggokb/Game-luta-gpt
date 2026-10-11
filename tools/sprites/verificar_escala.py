@@ -158,9 +158,15 @@ def read_video_samples(path,selection=(.16,.28,.40,.52,.64,.76,.88)):
     if not cap.isOpened():
         return []
     try:
-        count=int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if count<8:
+        # OpenCV may return NaN/Inf/zero when metadata is missing.
+        # Never crash or certify a clip without a trustworthy sample range.
+        try:
+            declared=float(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        except (TypeError,ValueError,OverflowError):
             return []
+        if not math.isfinite(declared) or declared<8:
+            return []
+        count=int(declared)
         indices=[max(0,min(count-1,int((count-1)*fraction)))
                  for fraction in selection]
         # One video frame cannot count as several independent proofs.
