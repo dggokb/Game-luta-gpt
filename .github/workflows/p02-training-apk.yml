@@ -29,6 +29,8 @@ jobs:
         run: |
           test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
           test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Install P01 sprite calibration dependency
+        run: python3 -m pip install --disable-pip-version-check Pillow
       - name: Verify P02 solo and P01 existing art regression
         run: |
           gradle -p android --no-daemon :app:testDebugUnitTest \
