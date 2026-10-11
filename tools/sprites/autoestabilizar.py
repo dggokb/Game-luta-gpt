@@ -267,23 +267,38 @@ def propose(root,character,state,analysis):
 
 
 def publish(asset,record):
+    return publish_batch(asset,[record])
+
+
+def publish_batch(asset,records):
+    """One atomic commit for ALL correctable states of ONE chosen fighter."""
+    if not records:
+        raise ValueError("No evidence-backed corrections to publish")
+    characters={r["character"] for r in records}
+    if len(characters)!=1:
+        raise ValueError("Multiple characters in one correction batch")
+    atlas_keys=[r["atlas"] for r in records]
+    if len(set(atlas_keys))!=len(atlas_keys):
+        raise ValueError("Same atlas has conflicting state corrections")
     asset=Path(asset)
     doc=json.loads(asset.read_text(encoding="utf8")) if asset.exists() else {
         "schema":1,"corrections":[]}
     if doc.get("schema")!=1 or not isinstance(doc.get("corrections"),list):
         raise ValueError("Arquivo de correcoes invalido")
-    if any(x.get("character")==record["character"] and
-           x.get("atlas")==record["atlas"] for x in doc["corrections"]):
+    existing={(x.get("character"),x.get("atlas"))
+              for x in doc["corrections"]}
+    if any((r["character"],r["atlas"]) in existing for r in records):
         raise ValueError("Ja existe correcao para esta animacao; reverta primeiro")
     previous=json.dumps(doc,indent=2,ensure_ascii=False)+"\n"
     asset.parent.mkdir(parents=True,exist_ok=True)
     backup=asset.with_suffix(".previous.json")
     backup.write_text(previous,encoding="utf8")
-    doc["corrections"].append(record)
+    doc["corrections"].extend(records)
     tmp=asset.with_suffix(".tmp")
     tmp.write_text(json.dumps(doc,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
     os.replace(tmp,asset)
-    return {"asset":str(asset),"backup":str(backup)}
+    return {"asset":str(asset),"backup":str(backup),
+            "estados_corrigidos":[r["state"] for r in records]}
 
 
 def rollback(asset,expected_character=None):
@@ -297,12 +312,19 @@ def rollback(asset,expected_character=None):
     current=json.loads(asset.read_text(encoding="utf8")) if asset.exists() else {}
     added=[x for x in current.get("corrections",[]) if x not in doc.get("corrections",[])]
     if expected_character is not None and (
-        len(added)!=1 or added[0].get("character")!=expected_character):
+        not added or any(x.get("character")!=expected_character for x in added)):
         raise ValueError("Rollback pertence a outro personagem")
     tmp=asset.with_suffix(".tmp")
     tmp.write_text(json.dumps(doc,indent=2)+"\n",encoding="utf8")
     os.replace(tmp,asset)
     return {"status":"REVERTIDO","asset":str(asset)}
+
+
+def load_manifest_for_batch(root,cid):
+    path=Path(root)/"characters"/character_pack(cid)/"character.json"
+    if not path.is_file():
+        raise ValueError("Personagem nao importado: "+cid)
+    return json.loads(path.read_text(encoding="utf8"))
 
 
 def main(argv=None):
@@ -320,22 +342,43 @@ def main(argv=None):
         if args.reverter:
             outcome=rollback(args.asset,character_pack(args.personagem))
         else:
-            if not args.estado or args.videos_dir is None or not args.videos_dir.is_dir():
-                parser.error("Para corrigir, informe --estado e --videos-dir")
+            if args.videos_dir is None or not args.videos_dir.is_dir():
+                parser.error("Informe --videos-dir com originais do personagem")
             import refinar_elenco
+            if args.estado:
+                states=[refinar_elenco.canonical_state(args.estado)]
+            else:
+                pack=load_manifest_for_batch(ROOT,args.personagem)
+                states=list(pack.get("animations",{}))
+            # Diagnose the SELECTED CHARACTER, then attempt each of its
+            # states safely; no iteration over the full fighter roster.
             report=refinar_elenco.inspect_character(args.personagem,args.videos_dir,
-                states=[args.estado],root=ROOT)
-            outcome,record=propose(ROOT,args.personagem,args.estado,report)
-            if record and args.corrigir:
-                outcome["publicacao"]=publish(args.asset,record)
-            elif record:
-                outcome["previa"]=record
+                states=states,root=ROOT)
+            results={}
+            records=[]
+            for state in states:
+                try:
+                    result,record=propose(ROOT,args.personagem,state,report)
+                except (ValueError,KeyError,OSError,IndexError) as exc:
+                    result,record={"status":"BLOQUEADO","reason":str(exc)},None
+                results[state]=result
+                if record:
+                    records.append(record)
+            outcome={"personagem":args.personagem,
+                     "estados_analisados":len(states),
+                     "corrigidos":[r["state"] for r in records],
+                     "estados":results,
+                     "status":"CORRIGIDO_PARCIAL" if records else "SEM_AJUSTE_SEGURO"}
+            if records and args.corrigir:
+                outcome["publicacao"]=publish_batch(args.asset,records)
+            elif records:
+                outcome["previa"]=records
     except (ValueError,KeyError,OSError,IndexError) as exc:
         parser.error(str(exc))
     args.saida.parent.mkdir(parents=True,exist_ok=True)
     args.saida.write_text(json.dumps(outcome,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
     print(json.dumps(outcome,indent=2,ensure_ascii=False))
-    return 0 if outcome["status"] in ("CORRIGIDO","REVERTIDO") else 2
+    return 0 if outcome["status"] in ("CORRIGIDO_PARCIAL","REVERTIDO") else 2
 
 
 if __name__=="__main__":
