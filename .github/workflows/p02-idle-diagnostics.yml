@@ -1,0 +1,27 @@
+name: P02 IDLE - Pixel Diagnosis
+on:
+  push:
+    branches:
+      - refino/p02-animacoes-20261011
+    paths:
+      - .github/workflows/p02-idle-diagnostics.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install Pillow==12.3.0 numpy
+      - run: python tools/sprites/validar_p02_idle_real.py
+      - name: Publish real PNG diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-idle-real-pixel-diagnostics
+          path: android/app/build/sprite-review/p02-idle-diagnose/
+          if-no-files-found: error
