@@ -1,27 +1,88 @@
-name: P02 IDLE - Pixel Diagnosis
+name: P02 IDLE - Real PNG Validation and APK
 on:
+  workflow_dispatch:
   push:
     branches:
       - refino/p02-animacoes-20261011
     paths:
       - .github/workflows/p02-idle-diagnostics.yml
-  workflow_dispatch:
+      - tools/sprites/validar_p02_idle_real.py
+      - android/app/src/main/assets/sprite-autofix.json
+      - android/app/src/test/java/com/gamelutagpt/P02IdleRuntimeFixTest.java
 permissions:
   contents: read
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install Pillow==12.3.0 numpy
-      - run: python tools/sprites/validar_p02_idle_real.py
-      - name: Publish real PNG diagnostics
+      - run: python -m pip install Pillow==12.3.0 numpy
+      - name: Verify all 56 real PNG frames and accepted runtime patch
+        run: python tools/sprites/validar_p02_idle_real.py
+      - name: Publish measurements and animated before-after loop
         uses: actions/upload-artifact@v4
         with:
-          name: p02-idle-real-pixel-diagnostics
+          name: p02-idle-before-after-real-png
           path: android/app/build/sprite-review/p02-idle-diagnose/
           if-no-files-found: error
+  apk:
+    needs: diagnose
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android 35
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Install image verifier dependency for P01 calibration
+        run: python3 -m pip install --disable-pip-version-check Pillow
+      - name: Test P02 only, NPC matchup and previous P01 fixes
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.P02TrainingMatchTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            -x :app:verifySpritePacks
+      - name: Build focused P02 vs P01 debug APK
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Verify APK contains runtime patch and actual P02 bitmap
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -p "$APK" assets/sprite-autofix.json > /tmp/p02-packaged-autofix.json
+          cmp android/app/src/main/assets/sprite-autofix.json /tmp/p02-packaged-autofix.json
+          unzip -Z1 "$APK" | grep -E '(^|/)p02_idle[.]png$'
+          git rev-parse HEAD
+          sha256sum "$APK"
+          echo "SOURCE_COMMIT=$(git rev-parse HEAD)"
+          echo "SOURCE_BRANCH=$GITHUB_REF_NAME"
+          echo "P02_IDLE_CORRECTION_VERIFIED"
+      - name: Upload direct-source debug APK (artifact wrapper is ZIP)
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-idle-refino-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          compression-level: 0
+      - name: Upload Android test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-idle-android-tests
+          path: android/app/build/reports/tests/
+          if-no-files-found: warn
