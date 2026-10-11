@@ -2,7 +2,10 @@ package com.gamelutagpt;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
+@RunWith(RobolectricTestRunner.class)
 public class SpriteAutoFixTest {
     @Test public void correctionsAreAppliedOnlyToTheExplicitFighterAtlasAndFrame() throws Exception {
         SpriteAutoFix.replaceFromJson("{\"schema\":1,\"corrections\":["
