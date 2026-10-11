@@ -6,9 +6,11 @@ Pe: apenas pose plantada (IDLE/VICTORY/DEFENSE), com comparacao antes/depois.
 Sem escrita de PNG. Um personagem por execucao; alteracoes reversiveis.
 """
 import argparse
+import hashlib
 import json
 import math
 import os
+import re
 import sys
 from pathlib import Path
 import numpy as np
@@ -266,6 +268,43 @@ def propose(root,character,state,analysis):
             "quadros":len(frames)},record
 
 
+def _file_digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def _validate_publish_record(record):
+    """Match the Android reader's safety contract before changing ANY file."""
+    if not isinstance(record,dict):
+        raise ValueError("Invalid correction record")
+    character=record.get("character")
+    atlas=record.get("atlas")
+    state=record.get("state")
+    if not isinstance(character,str) or not re.fullmatch(r"[a-z][a-z0-9_]{1,50}",character):
+        raise ValueError("Invalid correction character")
+    if not isinstance(atlas,str) or not re.fullmatch(r"[a-z][a-z0-9_]{1,90}",atlas):
+        raise ValueError("Invalid correction atlas")
+    if not isinstance(state,str) or not re.fullmatch(r"[A-Z][A-Z0-9_]{1,60}",state):
+        raise ValueError("Invalid correction state")
+    rows=record.get("frames")
+    if not isinstance(rows,list) or not rows:
+        raise ValueError("Empty or invalid corrections")
+    used=set()
+    for row in rows:
+        if not isinstance(row,(list,tuple)) or len(row)!=4:
+            raise ValueError("Invalid correction frame")
+        frame,size,dx,dy=row
+        if not isinstance(frame,int) or isinstance(frame,bool) or frame<0 or frame>5000:
+            raise ValueError("Frame index out of range")
+        if frame in used:
+            raise ValueError("Duplicate frame index")
+        used.add(frame)
+        if any(not isinstance(x,(int,float)) or isinstance(x,bool) or
+               not math.isfinite(x) for x in (size,dx,dy)):
+            raise ValueError("Invalid non-finite correction")
+        if not .80<=size<=1.25 or abs(dx)>45 or abs(dy)>45:
+            raise ValueError("Correction outside Android safety bounds")
+
+
 def publish(asset,record):
     return publish_batch(asset,[record])
 
@@ -274,6 +313,8 @@ def publish_batch(asset,records):
     """One atomic commit for ALL correctable states of ONE chosen fighter."""
     if not records:
         raise ValueError("No evidence-backed corrections to publish")
+    for r in records:
+        _validate_publish_record(r)
     characters={r["character"] for r in records}
     if len(characters)!=1:
         raise ValueError("Multiple characters in one correction batch")
@@ -289,23 +330,34 @@ def publish_batch(asset,records):
               for x in doc["corrections"]}
     if any((r["character"],r["atlas"]) in existing for r in records):
         raise ValueError("Ja existe correcao para esta animacao; reverta primeiro")
-    previous=json.dumps(doc,indent=2,ensure_ascii=False)+"\n"
+    previous=asset.read_bytes() if asset.exists() else (
+        json.dumps(doc,indent=2,ensure_ascii=False)+"\n").encode("utf8")
+    doc["corrections"].extend(records)
+    updated=(json.dumps(doc,indent=2,ensure_ascii=False)+"\n").encode("utf8")
     asset.parent.mkdir(parents=True,exist_ok=True)
     backup=asset.with_suffix(".previous.json")
-    backup.write_text(previous,encoding="utf8")
-    doc["corrections"].extend(records)
+    guard=asset.with_suffix(".expected.sha256")
+    # Preserve rollback of the PREVIOUS state, but only for this exact
+    # published version. An independent edit invalidates rollback.
+    backup.write_bytes(previous)
+    guard.write_text(_file_digest(updated)+"\n",encoding="ascii")
     tmp=asset.with_suffix(".tmp")
-    tmp.write_text(json.dumps(doc,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
+    tmp.write_bytes(updated)
     os.replace(tmp,asset)
     return {"asset":str(asset),"backup":str(backup),
+            "rollback_verification":str(guard),
             "estados_corrigidos":[r["state"] for r in records]}
 
 
 def rollback(asset,expected_character=None):
     asset=Path(asset)
     backup=asset.with_suffix(".previous.json")
-    if not backup.exists():
-        raise ValueError("Nao existe snapshot para reverter")
+    guard=asset.with_suffix(".expected.sha256")
+    if not backup.exists() or not guard.exists() or not asset.exists():
+        raise ValueError("Nao existe snapshot verificavel para reverter")
+    expected=guard.read_text(encoding="ascii").strip()
+    if _file_digest(asset.read_bytes())!=expected:
+        raise ValueError("O arquivo foi modificado desde a publicacao; rollback bloqueado")
     doc=json.loads(backup.read_text(encoding="utf8"))
     if doc.get("schema")!=1:
         raise ValueError("Snapshot invalido")
@@ -317,6 +369,9 @@ def rollback(asset,expected_character=None):
     tmp=asset.with_suffix(".tmp")
     tmp.write_text(json.dumps(doc,indent=2)+"\n",encoding="utf8")
     os.replace(tmp,asset)
+    # Consume this snapshot. Repeated undo must not overwrite new changes.
+    guard.unlink()
+    backup.unlink()
     return {"status":"REVERTIDO","asset":str(asset)}
 
 
