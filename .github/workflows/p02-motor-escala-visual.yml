@@ -1,0 +1,116 @@
+name: P02 Anatomical Sprite Scale - Verified APK
+on:
+  push:
+    branches:
+      - 'refino/motor-escala-visual-p02-20261011'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  anatomy-android-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install sprite visual analysis dependencies
+        run: python -m pip install Pillow==12.3.0 numpy opencv-python-headless
+      - name: Assert approved IDLE P02 and P01 preserved
+        run: |
+          git diff --exit-code 826d1cd45d8dbe34ae425b79a1fc4ed2e666cc1c HEAD -- \
+            android/app/src/main/res/drawable-nodpi/p02_idle.png \
+            art/sprites/source/p02_idle_sr_2x.png \
+            characters/p02/character.json \
+            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java \
+            'android/app/src/main/res/drawable-nodpi/p01_*.png' \
+            'android/app/src/main/res/drawable-nodpi/player_base_*.png' \
+            characters/p01 \
+            characters/player_base
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          c=json.loads(Path('characters/p02/character.json').read_text())
+          assert c['animations']['IDLE']['frames']==list(range(15,45))
+          assert c['animations']['DASH']['frames']==[0,1,2,3]
+          assert c['animations']['DASH']['durationsMs']==[65]*4
+          f=json.loads(Path('android/app/src/main/assets/sprite-autofix.json').read_text())
+          assert not any(x['character']=='p02' and x['atlas']=='p02_idle' for x in f['corrections'])
+          PY
+      - name: Python negative controls and actual sprite review
+        run: |
+          python -m unittest discover -s tools/sprites/tests -p test_verificar_frames.py -v
+          python -m unittest discover -s tools/sprites/tests -p test_escala_anatomica.py -v
+          python tools/sprites/escala_anatomica.py --apply
+          python tools/sprites/validar_p02_idle_real.py
+          python tools/sprites/validar_p02_dash_real.py
+      - name: Real atlas GIFs with renderer dimensions and authored roots
+        run: |
+          python tools/sprites/render_escala_p02.py
+          test -s android/app/build/sprite-review/p02-anatomy/01_antes.gif
+          test -s android/app/build/sprite-review/p02-anatomy/02_depois.gif
+          test -s android/app/build/sprite-review/p02-anatomy/03_lado_a_lado.gif
+          test -s android/app/build/sprite-review/p02-anatomy/04_comparacao_estatica.png
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android SDK 35
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Verify corrected scale on real Android Canvas and unchanged P01
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P02AnatomyRendererTest \
+            --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.P02DashRuntimeSizeTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            -x :app:verifySpritePacks
+      - name: Assemble debug APK
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Verify shipped APK contains the measured actual assets
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -p "$APK" res/drawable-nodpi-v4/p02_idle.png >/tmp/p02-idle.png
+          unzip -p "$APK" res/drawable-nodpi-v4/p02_dash.png >/tmp/p02-dash.png
+          unzip -p "$APK" assets/sprite-autofix.json >/tmp/autofix.json
+          cmp /tmp/p02-idle.png android/app/src/main/res/drawable-nodpi/p02_idle.png
+          cmp /tmp/p02-dash.png android/app/src/main/res/drawable-nodpi/p02_dash.png
+          cmp /tmp/autofix.json android/app/src/main/assets/sprite-autofix.json
+          sha256sum "$APK" >android/app/build/sprite-review/p02-anatomy/apk.sha256
+      - name: Upload real GIFs, reports and test APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-anatomy-apk-and-gifs
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/sprite-review/p02-anatomy/
+            android/app/build/reports/tests/
+          if-no-files-found: warn
+      - name: Publish direct .apk as isolated experimental release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHORT="$(git rev-parse --short=8 HEAD)"
+          TAG="p02-anatomy-$SHORT"
+          SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          DEST="$RUNNER_TEMP/P02-anatomy-$SHORT.apk"
+          cp "$SRC" "$DEST"
+          gh release create "$TAG" "$DEST" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "P02 experimental anatomy $SHORT" \
+            --notes "No merge. Original P02 IDLE, original DASH and P01 unchanged. Synthetic error scale corrections tested on Android. Real P02 DASH frame 2 requires manual anatomical review; unsafe resize not applied." \
+            --prerelease
