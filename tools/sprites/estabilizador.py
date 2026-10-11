@@ -378,8 +378,13 @@ def chroma_confidence(bgr):
     return min(green_ratio(values),green_ratio(border))
 
 
-def load_video(path, max_frames=250):
-    """Só vídeos com chroma-key reconhecido; jamais segmentar cenário arbitrário."""
+def load_video(path, max_frames=1200):
+    """Percorre até 1200 quadros do vídeo original, sem omitir o final.
+
+    Um vídeo comum de 8 segundos a 60 FPS contém ~480 quadros. O antigo
+    limite 250 declarava esse vídeo INCONCLUSIVO mesmo sendo uma fonte boa.
+    Vídeos maiores continuam recusados, nunca parcialmente aprovados.
+    """
     import cv2
     from video_para_sprite import key
     cap=cv2.VideoCapture(str(path))
@@ -387,6 +392,11 @@ def load_video(path, max_frames=250):
         return {"status":"FALHA_VIDEO","motivo":"arquivo nao abriu"},[]
     fps=cap.get(cv2.CAP_PROP_FPS)
     declared=cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    if max_frames<=0 or (declared>0 and declared>max_frames):
+        cap.release()
+        return {"status":"INCONCLUSIVO",
+                "motivo":"quantidade de quadros excede limite de auditoria",
+                "quadros_no_arquivo":int(declared),"limite":max_frames},[]
     samples=[]; frames_read=0; green=0
     try:
         while len(samples)<max_frames:
