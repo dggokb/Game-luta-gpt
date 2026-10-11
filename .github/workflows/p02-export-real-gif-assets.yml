@@ -1,0 +1,33 @@
+name: P02 Export Real Atlas For GIF Review
+
+on:
+  push:
+    branches:
+      - integracao/p02-idle-aprovado-20261011
+    paths:
+      - .github/workflows/p02-export-real-gif-assets.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-p02:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package actual game assets (not screenshot previews)
+        run: |
+          mkdir -p out
+          cp android/app/src/main/res/drawable-nodpi/p02_idle.png out/p02_idle.png
+          cp android/app/src/main/res/drawable-nodpi/p02_dash.png out/p02_dash.png
+          cp tools/sprites/reports/p02_idle.report.json out/p02_idle.report.json
+          cp tools/sprites/reports/p02_dash.report.json out/p02_dash.report.json
+          cp characters/p02/character.json out/p02_character.json
+          sha256sum out/* > out/checksums.sha256
+          echo "Actual packaged resources, unchanged."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p02-gif-actual-atlases
+          path: out/
+          if-no-files-found: error
