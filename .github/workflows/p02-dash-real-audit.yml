@@ -1,0 +1,46 @@
+name: P02 DASH - Real Sprite Diagnostic
+on:
+  push:
+    branches:
+      - integracao/p02-idle-aprovado-20261011
+    paths:
+      - .github/workflows/p02-dash-real-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-real-dash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow==12.3.0 numpy
+      - name: Analyze P02 DASH native Android atlas and master source
+        run: |
+          python tools/sprites/verificar_frames.py --character p02 --clip p02_dash --compare-source --output android/app/build/sprite-review/p02-dash-before
+          python - <<'PY'
+          import sys,json
+          from pathlib import Path
+          sys.path.insert(0,'tools/sprites')
+          import verificar_frames as f
+          layers,timeline=f.project_report(Path('.'),'p02','p02_dash',True)
+          print('Runtime frame order:',timeline)
+          for key,frames in layers.items():
+              feat=[f.feature(im) for im in frames]
+              print('LAYER',key)
+              for i in range(len(frames)):
+                  a,b=feat[i],feat[(i+1)%len(frames)]
+                  print(i,'=>',(i+1)%len(frames),json.dumps(f.distance(a,b)))
+                  print('geom',i,'foot',a['foot'],'center',a['centroid'],'bbox',a['bbox'])
+              for aa in range(6):
+                  candidates=[]
+                  for bb in range(6):
+                      if aa!=bb:candidates.append((round(f.distance(feat[aa],feat[bb])['score'],5),bb))
+                  print('nearest',aa,sorted(candidates)[:3])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p02-dash-original-real-png-visual-audit
+          path: android/app/build/sprite-review/p02-dash-before/
