@@ -1,0 +1,40 @@
+name: P01 Victory Android wiring tests
+on:
+  push:
+    branches:
+      - refino/p01-animacoes-20261009
+    paths:
+      - .github/workflows/p01-victory-android-tests.yml
+      - android/app/src/test/java/com/gamelutagpt/P01VictoryRealAssetTest.java
+      - android/app/src/main/assets/sprite-autofix.json
+      - android/app/src/main/java/com/gamelutagpt/SpriteAutoFix.java
+      - android/app/src/main/java/com/gamelutagpt/SpriteFighterRenderer.java
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  p01-android-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow for P01 calibration generation
+        run: python -m pip install Pillow
+      - name: Android unit tests with real packaged correction asset
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            --tests com.gamelutagpt.CameraRigRoundEndTest \
+            --tests com.gamelutagpt.P01VisualMasterTest
