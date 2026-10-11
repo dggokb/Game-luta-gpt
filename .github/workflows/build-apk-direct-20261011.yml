@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout exact source snapshot
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Verify source commit
         run: |
           test "$(git rev-parse HEAD^)" = "fd038e8027901ebbf97ffddc995a8b8efe8d11d4"
