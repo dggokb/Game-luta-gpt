@@ -62,6 +62,7 @@ jobs:
             }
           }
           GRADLE
+          set +e
           gradle -p android --no-daemon --max-workers=1 -I /tmp/sprite-test-memory.gradle \
             :app:testDebugUnitTest \
             --tests com.gamelutagpt.SpriteIntroTransitionTest \
@@ -72,6 +73,12 @@ jobs:
             --tests com.gamelutagpt.P01IntroRealAssetTest \
             --tests com.gamelutagpt.P01VictoryRealAssetTest \
             -x :app:verifySpritePacks
+          RESULT="$?"
+          if [ "$RESULT" -ne 0 ]; then
+            echo '=== ACTUAL ANDROID TEST METRICS AND ASSERTION ==='
+            find android/app/build/test-results/testDebugUnitTest -name '*SpriteIntroTransitionTest*.xml' -print -exec cat {} \; || true
+            exit "$RESULT"
+          fi
       - name: Assemble APK with fixed universal renderer
         run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
       - name: Verify the final APK uses exact actual P01/P02 sprites
