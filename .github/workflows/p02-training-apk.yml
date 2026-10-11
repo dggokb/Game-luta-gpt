@@ -1,0 +1,58 @@
+name: P02 Focus - Android matchup and APK
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - game-luta-sprite-gpt
+    paths:
+      - .github/workflows/p02-training-apk.yml
+      - android/app/src/main/java/com/gamelutagpt/P02TrainingMatch.java
+      - android/app/src/main/java/com/gamelutagpt/GameView.java
+      - android/app/src/test/java/com/gamelutagpt/P02TrainingMatchTest.java
+      - android/app/src/main/java/com/gamelutagpt/HudRenderer.java
+permissions:
+  contents: read
+jobs:
+  p02-focus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Verify P02 solo and P01 existing art regression
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P02TrainingMatchTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            -x :app:verifySpritePacks
+      - name: Build full-roster APK with P02 training matchup
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Confirm APK
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo "SOURCE_COMMIT=$(git rev-parse HEAD)"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p02-p01-training-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Publish focused unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-training-unit-tests
+          path: android/app/build/reports/tests/
+          if-no-files-found: warn
