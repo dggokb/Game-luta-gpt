@@ -36,6 +36,10 @@ jobs:
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Install Python sprite validation dependencies
         run: python3 -m pip install --disable-pip-version-check --user 'Pillow==12.3.0'
+      - name: Regenerate stale sprite reports for this isolated build
+        run: |
+          python3 tools/sprites/build_characters.py --write
+          git status --short | head -60
       - name: Compile debug APK
         working-directory: android
         run: gradle assembleDebug --stacktrace
