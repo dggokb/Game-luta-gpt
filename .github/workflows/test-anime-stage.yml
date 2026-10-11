@@ -1,0 +1,121 @@
+name: Testar cenarios anime e gerar APK
+
+on:
+  push:
+    branches:
+      - art/cenarios-anime-20261011
+    paths:
+      - 'tools/stage/anime_redraw.py'
+      - '.github/workflows/test-anime-stage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: anime-stage-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gerar-e-testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout branch experimental
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Python e dependencias visuais
+        run: |
+          python3 -m pip install --disable-pip-version-check pillow numpy opencv-python-headless
+
+      - name: Aplicar novo visual nas dez imagens do Templo da Lua
+        run: |
+          python3 tools/stage/anime_redraw.py --apply --preview /tmp/cenarios-anime-comparativo.jpg
+
+      - name: Verificar o que sera salvo
+        run: |
+          git status --short
+          python3 - <<'PY'
+          import json, pathlib
+          d = pathlib.Path('android/app/src/main/assets/stages/templo_lua')
+          manifest = json.loads((d / 'anime-style-manifest.json').read_text())
+          assert len(manifest['files']) == 10
+          assert all(f['alpha_exact'] and f['color_change_mad'] >= 1 for f in manifest['files'])
+          print('Dez camadas transformadas com alpha preservado.')
+          PY
+
+      - name: Salvar imagens no ramo de teste
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add android/app/src/main/assets/stages/templo_lua/
+          git commit -m "test(stage): substitui 10 imagens por versoes anime cel-shading"
+          git push origin HEAD:art/cenarios-anime-20261011
+
+      - name: Comparativo visual original x anime
+        uses: actions/upload-artifact@v4
+        with:
+          name: Templo-da-Lua-Anime-Comparativo
+          path: /tmp/cenarios-anime-comparativo.jpg
+          if-no-files-found: error
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Instalar plataforma Android
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Dependencias do pipeline de personagens
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+
+      - name: Validar sprites e compilar o APK
+        working-directory: android
+        run: |
+          python3 ../tools/sprites/build_characters.py --check
+          gradle testDebugUnitTest :stage-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+
+      - name: Enviar APK sem ZIP dentro do artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-APK-Cenarios-Anime
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Emulador Android e captura de inicializacao
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell am force-stop com.gamelutagpt
+            adb shell am start -W -n com.gamelutagpt/com.gamelutagpt.MainActivity
+            sleep 8
+            adb shell pidof com.gamelutagpt | grep -E '[0-9]+'
+            adb exec-out screencap -p > android-startup-anime.png
+            test -s android-startup-anime.png
+
+      - name: Screenshot do APK executando
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-Anime-Screenshot
+          path: android-startup-anime.png
+          if-no-files-found: warn
