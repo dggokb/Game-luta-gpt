@@ -13,11 +13,11 @@ jobs:
       - name: Checkout exact source snapshot
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 8
       - name: Verify source commit
         run: |
-          test "$(git rev-parse HEAD^)" = "fd038e8027901ebbf97ffddc995a8b8efe8d11d4"
-          git diff --exit-code HEAD^ HEAD -- android art characters tools
+          git cat-file -e fd038e8027901ebbf97ffddc995a8b8efe8d11d4^{commit}
+          git diff --exit-code fd038e8027901ebbf97ffddc995a8b8efe8d11d4 HEAD -- android art characters tools
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
