@@ -133,7 +133,7 @@ final class HudRenderer {
             HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.HEAL_OPPONENT), "VIDA CPU",
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
-        drawToggle(c, s.pressed(Control.TEAM_SELECT), "DUPLA " + s.teamLabel(),
+        drawToggle(c, s.pressed(Control.TEAM_SELECT), "p02".equals(s.teamLabel()) ? "REINICIAR P02" : "DUPLA " + s.teamLabel(),
             TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);

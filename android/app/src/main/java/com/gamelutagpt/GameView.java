@@ -32,12 +32,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     // Team and opponent rules come from the generated character packs; DUPLA opens the
     // character select, where the player picks the pair.
     private int teamIndex;
-    private FighterState[] team = membersOf(0);
+    private FighterState[] team = P02TrainingMatch.ENABLED ? P02TrainingMatch.newPlayerTeam() : membersOf(0);
     private final CharacterSelect characterSelect = new CharacterSelect(GeneratedCharacters.SELECTABLE);
     private CharacterSelectRenderer characterSelectRenderer;
 
-    // Training opponent: our point character (same body and moves), drawn washed out.
-    private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
+    // P02 workbench uses P01 (player_base) as the CPU; default team mode keeps mirror training.
+    private FighterState opponentFighter = P02TrainingMatch.ENABLED
+        ? P02TrainingMatch.newOpponent() : new FighterState(team[0].character, "CPU");
 
     private static final float VW = Arena.VW;
     private static final float VH = Arena.VH;
@@ -205,10 +206,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
         for (FighterState fighter : team) atlases.preload(fighter.character);
+        // NPC is a different character in P02 training; it must be decoded too.
+        atlases.preload(opponentFighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
-        partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
+        partnerSpriteRenderer = new SpriteFighterRenderer(atlases,
+            team.length > 1 ? team[1].character : team[0].character);
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
@@ -253,11 +257,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Character select: the picked pair takes the fight (first on point, second in reserve). */
     private void selectPair(String point, String partner) {
-        team = membersOf(point, partner);
-        opponentFighter = new FighterState(team[0].character, "CPU");
-        atlases.retainOnly(team[0].character, team[1].character);
+        team = P02TrainingMatch.ENABLED ? P02TrainingMatch.newPlayerTeam()
+            : membersOf(point, partner);
+        opponentFighter = P02TrainingMatch.ENABLED ? P02TrainingMatch.newOpponent()
+            : new FighterState(team[0].character, "CPU");
+        // Every character on the new battlefield must be preloaded before rendering.
+        for (FighterState fighter : team) atlases.preload(fighter.character);
+        atlases.preload(opponentFighter.character);
+        atlases.retainOnly(team[0].character, team[team.length-1].character,
+            opponentFighter.character);
         spriteFighterRenderer.setCharacter(team[0].character.id);
-        partnerSpriteRenderer.setCharacter(team[1].character.id);
+        partnerSpriteRenderer.setCharacter(team[team.length-1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
         engine.setTeam(PLAYER, team);
         engine.setTeam(OPPONENT, opponentFighter);
@@ -271,6 +281,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (P02TrainingMatch.ENABLED) {
+            // In the P02 workbench, DUPLA resets P02 vs P01 instead of changing fighters.
+            clearInput();
+            selectPair(P02TrainingMatch.PLAYER_ID, P02TrainingMatch.PLAYER_ID);
+            return;
+        }
         characterSelect.open(team[0].character.id, team[1].character.id);
         pad.reset();
         releaseAllPointers();
@@ -291,7 +307,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private String teamLabel() {
-        return displayId(team[0]) + "+" + displayId(team[1]);
+        return team.length == 1 ? displayId(team[0])
+            : displayId(team[0]) + "+" + displayId(team[1]);
     }
 
     /** p01 is the player_base pack. */
@@ -352,7 +369,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (!introPlayed) {
             introPlayed = true;
             startIntro();
-            openCharacterSelect();
+            if (!P02TrainingMatch.ENABLED) openCharacterSelect();
         }
         surfaceReady = true;
         startLoopIfReady();
