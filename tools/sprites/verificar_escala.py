@@ -103,7 +103,25 @@ def estimate_pair(reference_rgba,candidate_rgba):
 
 def estimate_sequence(idle_rgba,frames,required=3):
     """Não marca todos os frames como corretos por poucos exemplos bons."""
-    values=[estimate_pair(idle_rgba,f) for f in frames]
+    # A held sprite cell is one observation, not N independent proofs.
+    # Exact pixel identity is a safe lower bound for duplicate detection.
+    # Never certify a repeatedly held frame as seven independent body poses.
+    import hashlib
+    signatures=[]
+    for frame in frames:
+        image=np.asarray(frame)
+        signatures.append(hashlib.blake2b(
+            np.ascontiguousarray(image).tobytes(),digest_size=16).digest()
+            if image.ndim==3 and image.shape[-1]==4 else None)
+    values=[]
+    already=set()
+    for signature,frame in zip(signatures,frames):
+        if signature is None or signature in already:
+            values.append({"status":"INCONCLUSIVO",
+                           "motivo":"quadro repetido ou invalido"})
+            continue
+        already.add(signature)
+        values.append(estimate_pair(idle_rgba,frame))
     valid=[v["fator"] for v in values if v["status"]=="CONFIRMADO_GEOMETRIA"]
     # 3/7 successful matches is NOT a validated animation. Require at
     # least 70% of ALL sampled frames plus evidence in the first, middle
@@ -208,8 +226,10 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
         return []
     sample_ids=[round(x) for x in np.linspace(0,len(indices)-1,count)]
     selected_frames=[indices[position] for position in sample_ids]
-    # Repeated cells are valid HOLDs but do not count as independent proof.
-    if len(set(sample_ids))!=count or len(set(selected_frames))!=count:
+    # Holds are part of the original animation. Keep repeated atlas cells
+    # for motion/freeze QA; discard duplicate evidence only inside the
+    # GEOMETRIC proof, where two identical cells cannot be independent.
+    if len(set(sample_ids))!=count:
         return []
     with Image.open(file) as img:
         if w<=0 or h<=0 or cols<=0 or img.width!=w*cols or img.height%h:
