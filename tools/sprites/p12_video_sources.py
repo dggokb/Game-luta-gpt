@@ -20,6 +20,7 @@ from video_para_sprite import key
 
 ROOT = Path(__file__).resolve().parents[2]
 INVENTORY = ROOT / 'tools/sprites/videos/p12-drive-inventory.json'
+MATTE_POLICIES = ROOT / 'tools/sprites/videos/p12-video-matte-overrides.json'
 VERSION = 'drive-video-frames-v1'
 STATE_FILES = {
     'IDLE': 'idle.mp4', 'COMBAT': 'idle.mp4',
@@ -45,6 +46,38 @@ STATE_FILES = {
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def restore_original_matte(bgr, policy):
+    """Recover keyed-out source anatomy, without painting RGB or new poses.
+
+    The original shared keyer despills RGB; this correction changes ONLY alpha.
+    A reviewed source rectangle and exact decoded RGB hash limit the override.
+    Saturated green background remains transparent; muted green zombie skin is
+    retained. Neither a different video frame nor an unbounded ROI is accepted.
+    """
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    if hashlib.sha256(rgb.tobytes()).hexdigest() != policy.get('decodedRgbSha256'):
+        raise ValueError('matte override belongs to different original video pixels')
+    if policy.get('method') != 'restore-muted-green-alpha-v1':
+        raise ValueError('unknown reviewed source matte method')
+    rgba = key(bgr)
+    height, width = bgr.shape[:2]
+    regions = policy.get('regions', [])
+    if not regions:
+        raise ValueError('matte recovery needs a reviewed original source region')
+    for box in regions:
+        if (not isinstance(box, list) or len(box) != 4
+                or any(type(v) is not int for v in box)):
+            raise ValueError('invalid original source matte region')
+        x0, y0, x1, y1 = box
+        if not (0 <= x0 < x1 <= width and 0 <= y0 < y1 <= height):
+            raise ValueError('matte region outside original source frame')
+        pixels = rgb[y0:y1, x0:x1].astype(np.int16)
+        green = pixels[..., 1]
+        background = (green - np.maximum(pixels[..., 0], pixels[..., 2]) > 45) & (green > 90)
+        rgba[y0:y1, x0:x1, 3][~background] = 255
+    return rgba
 
 
 def write_json(path, value):
@@ -98,12 +131,21 @@ def extract_video(file, source_dir, output, key_hash):
     if not path.exists() or path.stat().st_size != file['size']:
         raise ValueError('missing/truncated download: ' + file['name'])
     digest = sha(path)
+    policies = json.loads(MATTE_POLICIES.read_text()) if MATTE_POLICIES.exists() else {}
+    policy = policies.get('videos', {}).get(file['name'])
+    policy_hash = None
+    if policy is not None:
+        if policy.get('videoSha256') != digest:
+            raise ValueError('matte policy belongs to a different original video: ' + file['name'])
+        policy_hash = hashlib.sha256(json.dumps(policy, sort_keys=True).encode()).hexdigest()
     folder = output / path.stem
     manifest_path = folder / 'frames.json'
     if manifest_path.exists():
         existing = json.loads(manifest_path.read_text())
         if (existing.get('videoSha256') == digest and existing.get('keyerSha256') == key_hash
                 and existing.get('extractorVersion') == VERSION
+                and existing.get('mattePolicySha256') == policy_hash
+                and (policy is None or existing.get('matteImplementationSha256') == sha(Path(__file__)))
                 and all((folder / r['file']).exists() and sha(folder / r['file']) == r['sha256']
                         for r in existing['frames'])):
             if existing.get('contactLayout') != 'fixed-source-scale-v2':
@@ -121,7 +163,8 @@ def extract_video(file, source_dir, output, key_hash):
         ok, bgr = cap.read()
         if not ok:
             break
-        rgba = key(bgr)
+        override = policy.get('frames', {}).get(str(index)) if policy is not None else None
+        rgba = restore_original_matte(bgr, override) if override is not None else key(bgr)
         ys, xs = np.where(rgba[:, :, 3] > 10)
         if not len(xs):
             raise ValueError(file['name'] + f': empty matte at frame {index}')
@@ -139,6 +182,8 @@ def extract_video(file, source_dir, output, key_hash):
         temporary.replace(destination)
         frames.append({'index': index, 'time': stamps[index], 'file': name,
                        'sourceBox': box, 'sha256': sha(destination)})
+        if override is not None:
+            frames[-1]['matteOverride'] = override
         index += 1
     cap.release()
     if len(frames) != len(stamps) or len(frames) != int(metadata['streams'][0]['nb_frames']):
@@ -149,6 +194,9 @@ def extract_video(file, source_dir, output, key_hash):
               'stream': metadata['streams'][0], 'frames': frames,
               'status': 'EXTRACTED_NOT_ART_APPROVED',
               'note': 'Actual sequential video frames; alpha isolation only. No pose generation, uniform scale or runtime timing applied yet.'}
+    if policy is not None:
+        record.update(mattePolicySha256=policy_hash,
+                      matteImplementationSha256=sha(Path(__file__)))
     write_contact(record, folder)
     write_json(manifest_path, record)
     print(f"{file['name']}: {len(frames)} actual video frames", flush=True)
@@ -156,6 +204,7 @@ def extract_video(file, source_dir, output, key_hash):
 
 
 def main():
+    cv2.setNumThreads(1)
     parser = argparse.ArgumentParser()
     parser.add_argument('source_dir', type=Path)
     parser.add_argument('--output', type=Path, default=ROOT / 'android/app/build/p12-video-extraction')

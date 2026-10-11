@@ -751,12 +751,25 @@
       "time": 2.466667,
       "file": "0059.png",
       "sourceBox": [
-        349,
+        284,
         277,
         653,
         643
       ],
-      "sha256": "a03e95916368504343425bd35061c8c47c3a3af1d835ca6e1cf50d667f0ea4b6"
+      "sha256": "d71876e19f63705062ebf89cd183b1c8f0ded3697111f6d863368f96c8096e3a",
+      "matteOverride": {
+        "method": "restore-muted-green-alpha-v1",
+        "decodedRgbSha256": "460d22e4784364f992e6f7ccf42716b4ad72ca10eb4f8eb62fae17ae59d6d110",
+        "regions": [
+          [
+            272,
+            270,
+            662,
+            650
+          ]
+        ],
+        "evidence": "Original full RGB frame 59 visibly retains head, neck, chest and feet. Shared HSV keyer removes muted green skin and discards the detached head. Restore alpha within reviewed body bounds only; retain shared keyer RGB unchanged."
+      }
     },
     {
       "index": 60,
@@ -1205,6 +1218,8 @@
   ],
   "status": "EXTRACTED_NOT_ART_APPROVED",
   "note": "Actual sequential video frames; alpha isolation only. No pose generation, uniform scale or runtime timing applied yet.",
+  "mattePolicySha256": "07e5c3c3c3890ad28dd6f6a0467aee369145ce7d78ca63973b4819cf934954f5",
+  "matteImplementationSha256": "074cc5da384e14c1e3505c2bc580630d2c31159ffda059541bb58959bef9b64a",
   "contactLayout": "fixed-source-scale-v2",
   "sourceBoundsUnion": [
     129,

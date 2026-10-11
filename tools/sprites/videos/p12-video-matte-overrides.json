@@ -1,0 +1,22 @@
+{
+  "videos": {
+    "derruba_levanta.mp4": {
+      "videoSha256": "4ae80e1893579fbfb5bcffa29ab842828bf3108e18d422a0fc8c9535ead0b63f",
+      "frames": {
+        "59": {
+          "method": "restore-muted-green-alpha-v1",
+          "decodedRgbSha256": "460d22e4784364f992e6f7ccf42716b4ad72ca10eb4f8eb62fae17ae59d6d110",
+          "regions": [
+            [
+              272,
+              270,
+              662,
+              650
+            ]
+          ],
+          "evidence": "Original full RGB frame 59 visibly retains head, neck, chest and feet. Shared HSV keyer removes muted green skin and discards the detached head. Restore alpha within reviewed body bounds only; retain shared keyer RGB unchanged."
+        }
+      }
+    }
+  }
+}

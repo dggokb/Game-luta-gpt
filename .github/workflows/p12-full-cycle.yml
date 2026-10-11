@@ -10,6 +10,8 @@ on:
       - tools/sprites/p12_authored_cycle.py
       - tools/sprites/p12_authored_sources.py
       - tools/sprites/p12_video_sources.py
+      - tools/sprites/videos/p12-video-matte-overrides.json
+      - tools/sprites/tests/test_p12_video_matte.py
       - tools/sprites/p12_video_cycle.py
       - tools/sprites/p12_video_selection.py
       - tools/sprites/p12_video_review.py
