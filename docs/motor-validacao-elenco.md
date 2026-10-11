@@ -247,3 +247,62 @@ todas as poses, qualidade dos frames nem resultado final após câmera,
 `P01SpriteCalibration` e `P01VisualTuning`. O motor permanece
 read-only e `validacao_runtime=PENDENTE` até termos captura real
 de transições e execução dentro do jogo.
+
+## v5 — corretor executável, não apenas diagnosticador
+
+`tools/sprites/autoestabilizar.py` aplica modificações de verdade ao jogo:
+gera `android/app/src/main/assets/sprite-autofix.json` com escala e
+deslocamento por quadro do **único personagem informado**. O renderer
+`SpriteFighterRenderer` consulta `SpriteAutoFix` e aplica os ajustes
+**depois** da calibração legado (P01), sem alterar PNG, hitbox ou gameplay.
+
+```bash
+# Calcular, comparar antes/depois e MOSTRAR o patch; não escreve o jogo
+python3 tools/sprites/autoestabilizar.py p01 --estado VICTORY \
+  --videos-dir /videos/animations/p01
+
+# Publicar somente o ajuste que passou a validação do corretor
+python3 tools/sprites/autoestabilizar.py p01 --estado VICTORY \
+  --videos-dir /videos/animations/p01 --corrigir
+
+# Voltar exatamente ao JSON anterior, sem alterar PNG
+python3 tools/sprites/autoestabilizar.py p01 --reverter
+```
+
+**Garantias e limites implementados:**
+
+- Só aceita `p01..p12`, e correções por `--estado` (um estado por execução).
+- Tamanho: exige prova independente do vídeo e atlas (geometria, pelo
+  menos 70% de quadros), fatores concordantes e tamanho final fora do
+  idle depois de aplicar a calibração já existente no renderer.
+  Corrige com escala uniforme <=25%, sem inventar escala em poses
+  anisotrópicas.
+- Pés: somente `IDLE`, `VICTORY`, `DEFENSE_STAND`, `DEFENSE_CROUCH`.
+  Nas primeiras poses da vitória **do P01** os quadros 0–6
+  representam caminhada e não são travados. Deslocamento natural
+  além de 32px fica bloqueado; correções menores precisam melhorar
+  pelo menos 85% do erro e deixar <0,25px de amplitude.
+- Combinar tamanho+ancoragem: offsets são calculados na escala final,
+  não sobre uma imagem que já foi esticada duas vezes.
+- Nunca substituir sem confirmação um ajuste existente do mesmo
+  personagem/atlas; salva snapshot anterior e permite rollback.
+- A camada Java valida tamanho, limites, índices e character IDs,
+  rejeitando correções inválidas sem aplicar metade do arquivo.
+- Um personagem sem atlas/manifesto e estados sem prova ou com
+  deslocamento intencional **não é falsamente corrigido**; recebe
+  `SEM_AJUSTE_SEGURO`.
+- O motor não recalcula fisicamente o personagem ou a câmera.
+  Avaliação de qualidade no dispositivo continua distinta da prova
+  matemática dos ajustes.
+
+**Validação funcional:** `test_autoestabilizar.py` gera um atlas PNG
+sintético com deriva dos pés, executa a correção verdadeira, verifica
+amplitude/RMS antes e depois, grava o JSON consumido pelo Android e
+reverte exatamente; `SpriteAutoFixTest` valida carregamento seguro
+e isolamento no Android. A automação não é descrita como concluída
+antes dos testes de CI verdes.
+
+O GitHub Actions não contém as gravações privadas da pasta Drive
+automaticamente. Elas precisam ser disponibilizadas ao comando
+`--videos-dir` durante a execução; ausência de arquivo original
+bloqueia a correção de escala em vez de inventá-la.
