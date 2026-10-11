@@ -78,7 +78,7 @@ def correct_shoes(positions,start=0):
             "depois_amplitude":round(float(np.ptp(after)),4)}
 
 
-def art_track(root,atlas,ids,transforms):
+def art_track(root,atlas,ids,transforms,world_scale=1.):
     root=Path(root)
     report=root/"tools/sprites/reports"/(atlas+".report.json")
     png=root/"android/app/src/main/res/drawable-nodpi"/(atlas+".png")
@@ -87,6 +87,9 @@ def art_track(root,atlas,ids,transforms):
     meta=json.loads(report.read_text(encoding="utf8"))["packed"]
     w,h,cols=(int(meta[k]) for k in ("frameWidth","frameHeight","columns"))
     r_x=float(meta["rootX"])
+    to_atlas=float(meta["pixelScale"])/world_scale
+    if not np.isfinite(to_atlas) or to_atlas<=0:
+        raise ValueError("Invalid world-to-atlas conversion")
     if len(transforms)!=len(ids) or any(f<0 or f>=int(meta["frameCount"]) for f in ids):
         raise ValueError("Quadros fora do atlas ou baseline incompleta")
     result=[]
@@ -102,7 +105,7 @@ def art_track(root,atlas,ids,transforms):
             floor=int(np.max(yy))
             shoe_x=float(np.median(xx[yy>=floor-max(8,int(h*.09))]))
             sx,sy,dx,dy=affine
-            result.append((shoe_x-r_x)*sx+dx)
+            result.append((shoe_x-r_x)*sx+dx*to_atlas)
     return result
 
 
@@ -117,7 +120,7 @@ def base_calibration(root,atlas,ids):
     return [(1.,1.,0.,0.) for _ in ids]
 
 
-def validate_pixels_after(root,atlas,ids,baseline,rows,start):
+def validate_pixels_after(root,atlas,ids,baseline,rows,start,world_scale=1.):
     """SECOND validation: render transformed alpha pixels, then remeasure feet.
 
     Never approve on the same algebra used to calculate corrections alone.
@@ -131,6 +134,7 @@ def validate_pixels_after(root,atlas,ids,baseline,rows,start):
     w,h,cols=(int(meta[k]) for k in ("frameWidth","frameHeight","columns"))
     root_x=float(meta["rootX"])
     root_y=float(meta["rootY"])
+    to_atlas=float(meta["pixelScale"])/world_scale
     corrections={int(row[0]):row for row in rows}
     def track(apply):
         shoes=[]
@@ -155,8 +159,8 @@ def validate_pixels_after(root,atlas,ids,baseline,rows,start):
                 # by authored root and existing user-calibrated offsets.
                 cw=int(w*4)
                 ch=int(h*3)
-                x=int(round(w*2-root_x*scale_x+bx+dx))
-                y=int(round(h*2-root_y*scale_y+by+dy))
+                x=int(round(w*2-root_x*scale_x+bx*to_atlas+dx))
+                y=int(round(h*2-root_y*scale_y+by*to_atlas+dy))
                 if x<0 or y<0 or x+width>cw or y+height>ch:
                     raise ValueError("frame leaves confirmation canvas")
                 picture=np.zeros((ch,cw),dtype=np.uint8)
@@ -202,6 +206,14 @@ def propose(root,character,state,analysis):
         return {"status":"SEM_AJUSTE_SEGURO","reason":"video original ausente, ambiguo ou nao mensuravel"},None
     proof=source.get("prova_geometrica",{})
     baseline=base_calibration(root,atlas,ids)
+    profile=Path(root)/"tools/sprites/profiles"/(cid+".json")
+    world_scale=(float(json.loads(profile.read_text(encoding="utf8"))["worldScale"])
+                 if profile.exists() else 1.)
+    report_path=Path(root)/"tools/sprites/reports"/(atlas+".report.json")
+    atlas_meta=json.loads(report_path.read_text(encoding="utf8"))["packed"]
+    to_atlas=float(atlas_meta["pixelScale"])/world_scale
+    if world_scale<=0 or not np.isfinite(to_atlas) or to_atlas<=0:
+        raise ValueError("Invalid atlas world scale")
     sx=[v[0] for v in baseline];sy=[v[1] for v in baseline]
     # Anisotropic poses require framewise anatomical evaluation; a uniform
     # factor cannot prove both dimensions correct if X/Y differ strongly.
@@ -212,21 +224,25 @@ def propose(root,character,state,analysis):
         scale=correct_scale(proof,float(np.median(sx)),idle_base)
     shoe={"status":"INCONCLUSIVO","reason":"pose com deslocamento intencional"}
     if state in PLANTED:
-        positions=art_track(root,atlas,ids,baseline)
+        positions=art_track(root,atlas,ids,baseline,world_scale)
         start=7 if state=="VICTORY" and cid=="player_base" else 0
-        shoe=correct_shoes(positions,start)
+        # Existing framewise root shifts are world-space offsets, while new
+        # corrections are atlas pixels. Scale only the bitmap-root component.
+        scaled_positions=[
+            (pos-v[2]*to_atlas)*scale.get("scale",1.)+v[2]*to_atlas
+            for pos,v in zip(positions,baseline)]
+        shoe=correct_shoes(scaled_positions,start)
     if scale["status"]!="CORRIGIDO" and shoe["status"]!="CORRIGIDO":
         return {"status":"SEM_AJUSTE_SEGURO","state":state,
                 "tamanho":scale,"pes":shoe},None
     correction=scale.get("scale",1.)
     offsets=[0.]*len(ids)
     if shoe["status"]=="CORRIGIDO":
-        # Screen position is original shoe track multiplied by the proposed
-        # uniform scale, THEN augmented by the new offset. Scale the intended
-        # foot offsets as well or mixed size+drift fixes would be invalid.
-        offsets[shoe["start"]:]=[round(v*correction,4) for v in shoe["dx"]]
-        # Independent post-fix metric using the exact rendering equation.
-        next_positions=[positions[i]*correction+offsets[i] for i in range(len(ids))]
+        # Foot offsets are already measured AFTER size correction and after
+        # existing base offsets. Never multiply them by uniform scale again.
+        offsets[shoe["start"]:]=shoe["dx"]
+        # Renderer-equivalent post-fix position.
+        next_positions=[scaled_positions[i]+offsets[i] for i in range(len(ids))]
         if np.ptp(next_positions[shoe["start"]:])>.25:
             return {"status":"REPROVADO","reason":"trilha final nao estabilizou"},None
     frames={}
@@ -240,7 +256,7 @@ def propose(root,character,state,analysis):
     image_proof={"status":"NAO_APLICAVEL"}
     if shoe["status"]=="CORRIGIDO":
         image_proof=validate_pixels_after(root,atlas,ids,baseline,
-                                          record["frames"],shoe["start"])
+                                          record["frames"],shoe["start"],world_scale)
         if image_proof["status"]!="CONFIRMADO_EM_PIXELS":
             return {"status":"REPROVADO","reason":"render real divergiu da previsao",
                     "validacao":image_proof},None
