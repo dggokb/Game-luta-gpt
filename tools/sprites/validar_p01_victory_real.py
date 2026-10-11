@@ -79,7 +79,35 @@ def main():
         summary[kind] = {"amplitude_x_px":max(foot)-min(foot),
                          "deslocamento_x_px":foot[-1]-foot[0],
                          "min_height_px":min(heights),"max_height_px":max(heights)}
-    data={"status":"PARCIAL_SEM_CAPTURA_ANDROID","fonte":"atlas integrado P01/Victory",
+    # Fail closed against the actual integrated pixels (not the algorithm's
+    # own equations). Old empty autofix had amplitude 3px and drift 3px.
+    source=summary["calibrado"]
+    final=summary["autofix"]
+    drift=source["amplitude_x_px"]
+    improved=(drift-final["amplitude_x_px"])/max(drift,1e-6)
+    if any(not (abs(float(row[1])-1.0)<1e-6 and
+                    abs(float(row[2]))<1e-6 and abs(float(row[3]))<1e-6)
+           for entry in corrections["corrections"]
+           if entry.get("character")=="player_base" and
+              entry.get("atlas")=="player_base_victory"
+           for row in entry.get("frames",[]) if int(row[0])<7):
+        raise AssertionError("Entrada intencional alterada por autofix")
+    if any(entry.get("character")!="player_base" or
+           entry.get("atlas")!="player_base_victory" or
+           entry.get("state")!="VICTORY" for entry in corrections["corrections"]):
+        raise AssertionError("Correcoes fora do escopo P01 VICTORY")
+    if not (drift >= 1.6 and improved >= 0.55 and
+            final["amplitude_x_px"] <= 1.25 and
+            abs(final["deslocamento_x_px"])<=1.0 and
+            source["min_height_px"]==final["min_height_px"] and
+            source["max_height_px"]==final["max_height_px"] and
+            len([n for n in fix_by_frame if any(abs(float(v))>1e-6 for v in
+                (fix_by_frame[n][0]-1, fix_by_frame[n][1], fix_by_frame[n][2]))])>0):
+        raise AssertionError("Falha REAL em pixels: deslize, escala ou patch sem efeito")
+    data={"status":"PARCIAL_SEM_CAPTURA_ANDROID",
+          "verificacao_independente":"PASSA_NO_ATLAS_REAL_APOS_RENDER_EQUIVALENTE",
+          "reducao_amplitude":round(improved,4),
+          "fonte":"atlas integrado P01/Victory",
           "frame_count":count,"time_per_frame_ms":125,
           "runtime_starts_at_frame":7,"autofix_frames":sorted(fix_by_frame),
           "summary":summary,"frames":track,
