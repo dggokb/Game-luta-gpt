@@ -117,6 +117,67 @@ def base_calibration(root,atlas,ids):
     return [(1.,1.,0.,0.) for _ in ids]
 
 
+def validate_pixels_after(root,atlas,ids,baseline,rows,start):
+    """SECOND validation: render transformed alpha pixels, then remeasure feet.
+
+    Never approve on the same algebra used to calculate corrections alone.
+    This emulates the renderer's scale and translated foot root; no PNG write.
+    """
+    from PIL import Image
+    import json
+    root=Path(root)
+    src=root/"android/app/src/main/res/drawable-nodpi"/(atlas+".png")
+    meta=json.loads((root/"tools/sprites/reports"/(atlas+".report.json")).read_text())["packed"]
+    w,h,cols=(int(meta[k]) for k in ("frameWidth","frameHeight","columns"))
+    root_x=float(meta["rootX"])
+    root_y=float(meta["rootY"])
+    corrections={int(row[0]):row for row in rows}
+    def track(apply):
+        shoes=[]
+        with Image.open(src) as atlas_image:
+            for i in range(start,len(ids)):
+                frame=int(ids[i])
+                sx,sy,bx,by=baseline[i]
+                _,scale,dx,dy=corrections[frame]
+                if not apply:
+                    scale,dx,dy=1.,0.,0.
+                scale_x=sx*scale
+                scale_y=sy*scale
+                cell=np.asarray(atlas_image.crop((
+                    frame%cols*w,frame//cols*h,
+                    (frame%cols+1)*w,(frame//cols+1)*h
+                )).getchannel("A"))
+                import cv2
+                width=max(1,int(round(w*scale_x)))
+                height=max(1,int(round(h*scale_y)))
+                rendered=cv2.resize(cell,(width,height),interpolation=cv2.INTER_LINEAR)
+                # Draw in a generous, COMMON world-space canvas, anchored
+                # by authored root and existing user-calibrated offsets.
+                cw=int(w*4)
+                ch=int(h*3)
+                x=int(round(w*2-root_x*scale_x+bx+dx))
+                y=int(round(h*2-root_y*scale_y+by+dy))
+                if x<0 or y<0 or x+width>cw or y+height>ch:
+                    raise ValueError("frame leaves confirmation canvas")
+                picture=np.zeros((ch,cw),dtype=np.uint8)
+                picture[y:y+height,x:x+width]=rendered
+                yy,xx=np.nonzero(picture>90)
+                if len(xx)<80:
+                    raise ValueError("image disappeared after transformation")
+                foot_line=int(yy.max())
+                shoes.append(float(np.median(xx[yy>=foot_line-max(8,int(h*.09))])))
+        return np.asarray(shoes)
+    original=track(False)
+    corrected=track(True)
+    before=float(np.ptp(original))
+    after=float(np.ptp(corrected))
+    if before<1.6 or after>max(1.6,before*.22):
+        return {"status":"REPROVADO","reason":"independent pixel render did not stabilize",
+                "antes_px":round(before,3),"depois_px":round(after,3)}
+    return {"status":"CONFIRMADO_EM_PIXELS","antes_px":round(before,3),
+            "depois_px":round(after,3),"melhoria":round(1-after/before,4)}
+
+
 def propose(root,character,state,analysis):
     sys.path.insert(0,str(Path(root)/"tools/sprites"))
     import refinar_elenco
@@ -170,8 +231,17 @@ def propose(root,character,state,analysis):
         frames[index]=row
     record={"character":cid,"atlas":atlas,"state":state,"frames":list(frames.values()),
             "evidence":{"tamanho":scale,"pes":shoe}}
+    image_proof={"status":"NAO_APLICAVEL"}
+    if shoe["status"]=="CORRIGIDO":
+        image_proof=validate_pixels_after(root,atlas,ids,baseline,
+                                          record["frames"],shoe["start"])
+        if image_proof["status"]!="CONFIRMADO_EM_PIXELS":
+            return {"status":"REPROVADO","reason":"render real divergiu da previsao",
+                    "validacao":image_proof},None
+    record["evidence"]["validacao_pixels"]=image_proof
     return {"status":"CORRIGIDO","state":state,"tamanho":scale,
-            "pes":shoe,"quadros":len(frames)},record
+            "pes":shoe,"validacao_pixels":image_proof,
+            "quadros":len(frames)},record
 
 
 def publish(asset,record):
