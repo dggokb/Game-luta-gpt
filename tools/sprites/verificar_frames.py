@@ -106,7 +106,9 @@ def distance(a, b):
     move = math.hypot(a["centroid"][0] - b["centroid"][0],
                       a["centroid"][1] - b["centroid"][1])
     feet = math.hypot(a["foot"][0] - b["foot"][0], a["foot"][1] - b["foot"][1])
-    score = rgb + .20 * silhouette + .005 * move + .003 * feet
+    # Contact-foot center can switch between two planted feet during
+    # ordinary breathing. Keep it in diagnostics, not as dominant evidence.
+    score = rgb + .20 * silhouette + .005 * move + .0005 * feet
     return {"score": float(score), "rgb": rgb, "silhouette": silhouette,
             "centroid_px": float(move), "feet_px": float(feet), "iou": float(iou)}
 
