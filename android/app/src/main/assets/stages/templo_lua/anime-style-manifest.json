@@ -1,5 +1,5 @@
 {
-  "mode": "deterministic_90s_anime_cel_shading_not_generational_redraw",
+  "mode": "deterministic_90s_anime_cel_shading_v2_not_generational_redraw",
   "source_branch": "game-luta-sprite-gpt",
   "preserves": [
     "image_size",
@@ -15,9 +15,9 @@
         941
       ],
       "source_sha256": "c492dde6ef6c3eb0bbf3e93b204fa41280d46ed506a3f4ca76753a61de7332dc",
-      "color_change_mad": 3.799,
+      "color_change_mad": 11.444,
       "alpha_exact": true,
-      "output_sha256": "bb10364fc3164ec35772953c4057bdf28edf59d7319d7e6f3051e39ceb0c5235"
+      "output_sha256": "3e2ebf4d97556236a2585e1ac1fad6958def0c233945716f9a3ca75b2fdcc309"
     },
     {
       "file": "montanhas.png",
@@ -26,9 +26,9 @@
         379
       ],
       "source_sha256": "0bccfae23111b13581e16cd656cb112a0d269c9c7cfa58c80fd219ffc12b90a4",
-      "color_change_mad": 6.266,
+      "color_change_mad": 10.085,
       "alpha_exact": true,
-      "output_sha256": "bdae9dc27ce5c893e868bc74b8ed9f72a5479920ac23fccca4150a3c4e77ab1b"
+      "output_sha256": "59589baf25c44cc21ce0c0b2d5d72d166913ac33724ba989d50a7e82bd64ab49"
     },
     {
       "file": "cidade.png",
@@ -37,9 +37,9 @@
         763
       ],
       "source_sha256": "fdd1ab2b627c82bd03aebe106da538e394cae8d95ad99a2f5d23e5769013a58d",
-      "color_change_mad": 7.348,
+      "color_change_mad": 13.157,
       "alpha_exact": true,
-      "output_sha256": "2945ce2dedd1dac0d728c2936bffedbd0ad1e499ecf33570a4f913fbe52bd3fe"
+      "output_sha256": "564f97e0d8902fb650c1bcff54f8616e87e951abee2b547427501ff30ea319db"
     },
     {
       "file": "portal.png",
@@ -48,9 +48,9 @@
         591
       ],
       "source_sha256": "f544f8d2158bf6bc0f3915d12d4fae076dac08f3e331d51e61b8cc55c45babf4",
-      "color_change_mad": 17.603,
+      "color_change_mad": 21.2,
       "alpha_exact": true,
-      "output_sha256": "fb93dcae6cb4a4a3c305bdbde7e7c7df492a68cd32011ec3b4610c95096f9562"
+      "output_sha256": "d6998bd4a9936a10272f66fc7557c4b843c62b9c45064cfdf847395b41c16a3f"
     },
     {
       "file": "grade.png",
@@ -59,9 +59,9 @@
         486
       ],
       "source_sha256": "bc51958418eb403bfa94115d3591ccd04e0f0b7436d7e1acb4a0c78b35c38caf",
-      "color_change_mad": 10.548,
+      "color_change_mad": 14.181,
       "alpha_exact": true,
-      "output_sha256": "b38abe41db88d19c1ec4c070d321545449342016c9fac342a320f6011ee2b0fa"
+      "output_sha256": "ba508e3fdc7012f4c8ea7f59203cbb6855c414ba4ff49cefd0548f6bc4cd5ddb"
     },
     {
       "file": "pilar.png",
@@ -70,9 +70,9 @@
         1447
       ],
       "source_sha256": "fbab7d86c5add0c9439236243dd56af8766faf428b06ce06224499cb8f53afda",
-      "color_change_mad": 11.434,
+      "color_change_mad": 14.466,
       "alpha_exact": true,
-      "output_sha256": "5c074a7d2562c8921e976eab3b81522266d974cc0c5dfbd08aa924091d08f9ee"
+      "output_sha256": "855446ff8673d61d60697f7342f6ac183e2bc7310d143c7d3006b342dcb95a76"
     },
     {
       "file": "teto.png",
@@ -81,9 +81,9 @@
         287
       ],
       "source_sha256": "03ef66ef3dd0f1e213ca615b677a98e3a185fe5fed2952327890aac6283438d1",
-      "color_change_mad": 7.452,
+      "color_change_mad": 13.469,
       "alpha_exact": true,
-      "output_sha256": "00323ef0f17ac46b8c46b058b28c8bb68cfbd5d40c575dd3561286f075e2fb11"
+      "output_sha256": "68ca0acea8637a601caeb53e80bb61d13593cc91d0fb43e3072c6c46a6c369ed"
     },
     {
       "file": "braseiro.png",
@@ -92,9 +92,9 @@
         1197
       ],
       "source_sha256": "5b3ec2db4cb8c3fd7d9061d033575c469097f858e292211907d8f1b89a426fc2",
-      "color_change_mad": 13.371,
+      "color_change_mad": 19.429,
       "alpha_exact": true,
-      "output_sha256": "ad764a15fc7cdaf928d6baeee9033af6057c6bf23be04bda4d7cd3c330440f47"
+      "output_sha256": "2a7fc5c67675df9b2973292ef0dfb2bf8191b8660587be5cf86c5da158fcd117"
     },
     {
       "file": "chao.jpg",
@@ -103,9 +103,9 @@
         1254
       ],
       "source_sha256": "06f0aa8f5cc3e12d2ee03779e1cba304aeb50e9caecd3af1fabffba0164063bd",
-      "color_change_mad": 9.56,
+      "color_change_mad": 19.994,
       "alpha_exact": true,
-      "output_sha256": "abf83002b16c6db59c05dfe08a07789f759fa4f0e8badcf0b19732e6423524a5"
+      "output_sha256": "c49f1992b78c4a69b67325da5b0fd31c50bda0611cd378c7ffb031218d82193d"
     },
     {
       "file": "chao_lajotas.jpg",
@@ -114,9 +114,9 @@
         1254
       ],
       "source_sha256": "b859b9c33d9e43a8614bc3ee29d396c71398209bd0c4a6a089b9e32d9622c290",
-      "color_change_mad": 9.361,
+      "color_change_mad": 19.095,
       "alpha_exact": true,
-      "output_sha256": "7fc64e49e9a6443c102be356b4349d321352cf09245bdce59f00eeeab6094f3b"
+      "output_sha256": "f50b6ca531533bbe523bd63af5f650de56b25be54b2f6edf0793899b23f44451"
     }
   ]
 }
