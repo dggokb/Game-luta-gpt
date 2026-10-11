@@ -279,12 +279,20 @@ def inspect_character(character, videos_dir=None, states=None, root=ROOT,
                 # Unit-test seam; normal CLI never injects external approval.
                 proof=geometry_inspector(character,state)
             else:
-                slices={
-                    "JUMP":(.06,.13,.20,.27,.34),
-                    "FALL":(.65,.73,.81,.89,.97),
-                    "LAND":(.80,.84,.88,.92,.96),
-                    "VICTORY":(.52,.61,.70,.79,.88,.97),
-                }.get(state,(.12,.27,.42,.57,.72,.87))
+                # Only a SHARED full jump.mp4 must be sampled by
+                # ascent/descent thirds. A dedicated fall.mp4 or land.mp4
+                # already starts at that phase and must be sampled start to end.
+                shared_jump=split_jump_video(state,matches,jump_mapping)
+                if shared_jump:
+                    slices={
+                        "JUMP":(.06,.13,.20,.27,.34),
+                        "FALL":(.65,.73,.81,.89,.97),
+                        "LAND":(.80,.84,.88,.92,.96),
+                    }.get(state,(.12,.27,.42,.57,.72,.87))
+                elif state=="VICTORY":
+                    slices=(.52,.61,.70,.79,.88,.97)
+                else:
+                    slices=(.12,.27,.42,.57,.72,.87)
                 vf=g.read_video_samples(matches["files"][0],selection=slices)
                 sf=g.read_sprite_samples(root,pack,state,selection=slices)
                 if vf and sf:
