@@ -11,6 +11,7 @@ package com.gamelutagpt;
  */
 final class SpriteIntroTransition {
     static final float MAX_BLEND_SECONDS = 0.42f;
+    static final float END_IDLE_HOLD_SECONDS = 0.067f;
     private SpriteIntroTransition() {}
 
     static float blend(CharacterDefinition.Animation intro,float time) {
@@ -19,7 +20,12 @@ final class SpriteIntroTransition {
         }
         float window=Math.min(MAX_BLEND_SECONDS,intro.duration*0.16f);
         if (!(window>0f)) return 0f;
-        float raw=(time-(intro.duration-window))/window;
+        // Finish fading before the switch rather than relying on the last
+        // draw tick reaching intro.duration exactly (e.g. 60 Hz fixed step).
+        // This ensures several final INTRO ticks are literally the IDLE art.
+        float hold=Math.min(END_IDLE_HOLD_SECONDS,intro.duration*.07f);
+        float finish=intro.duration-hold;
+        float raw=(time-(finish-window))/window;
         float p=Math.max(0f,Math.min(1f,raw));
         // Smoothstep gives zero velocity on either side of the boundary,
         // mitigating sudden jumps from nonidentical source silhouettes.
