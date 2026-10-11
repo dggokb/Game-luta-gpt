@@ -69,7 +69,9 @@ public class SpriteIntroTransitionTest {
         assertEquals("Old policy would never fade on P02",0f,
             SpriteIntroTransition.blend(intro,0f),0f);
         float window=Math.min(SpriteIntroTransition.MAX_BLEND_SECONDS,intro.duration*.16f);
-        assertEquals(0f,SpriteIntroTransition.blend(intro,intro.duration-window-.001f),0f);
+        float hold=Math.min(SpriteIntroTransition.END_IDLE_HOLD_SECONDS,intro.duration*.07f);
+        assertEquals(0f,SpriteIntroTransition.blend(intro,intro.duration-hold-window-.001f),0f);
+        assertEquals(1f,SpriteIntroTransition.blend(intro,intro.duration-hold),0f);
         assertEquals(1f,SpriteIntroTransition.blend(intro,intro.duration),0f);
         assertTrue(SpriteIntroTransition.blend(intro,intro.duration-.012f)>.99f);
 
