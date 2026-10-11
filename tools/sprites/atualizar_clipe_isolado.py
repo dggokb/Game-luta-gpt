@@ -42,7 +42,7 @@ def assemble(character,clip_id,root=ROOT):
     durations=animation['durationsMs']
     if len(indices)!=len(durations) or any(i<0 or i>=p['frameCount'] for i in indices):
         raise ValueError('Invalid regenerated animation indices')
-    atlas='new CharacterDefinition.Atlas("%s",%s)'%(clip_id,','.join(map(str,[
+    atlas='new CharacterDefinition.Atlas("%s",%s'%(clip_id,','.join(map(str,[
         p['frameWidth'],p['frameHeight'],p['rootX'],p['rootY'],
         p['columns'],p['frameCount']]))+f',{p["pixelScale"]:.8f}f)'
     # Keep original Java serialization format, update exactly one P02 DASH line.
