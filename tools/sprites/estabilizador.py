@@ -412,6 +412,15 @@ def load_video(path, max_frames=1200):
                         "motivo":"fundo não é chroma-key verde uniforme nos quatro cantos"},[]
             rgba=key(bgr)
             samples.append(properties(rgba[...,3]))
+        # VideoCapture often reports zero/incorrect frame counts. A full
+        # buffer is not EOF; explicitly probe the next frame before claiming
+        # a complete timeline, while keeping memory bounded.
+        if frames_read==max_frames:
+            has_more,_=cap.read()
+            if has_more:
+                return {"status":"INCONCLUSIVO",
+                        "motivo":"video ultrapassa limite de auditoria",
+                        "quadros_lidos":frames_read,"limite":max_frames},[]
     finally:
         cap.release()
     if not samples:
@@ -474,7 +483,7 @@ def load_atlas_state(root, pack, state, limit=100):
         return {"status":"LAYOUT_DIVERGENTE","atlas":atlas},[]
     # Verify EVERY authored index before inspecting a subset of frames.
     # Sampling is a cost optimization, not a license to miss corrupted frames.
-    if any(not isinstance(frame,int) or frame<0 or
+    if any(not isinstance(frame,int) or isinstance(frame,bool) or frame<0 or
            frame>=int(packed.get("frameCount",0)) for frame in indices):
         return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas},[]
     step=max(1,(len(indices)+limit-1)//limit)
@@ -492,7 +501,7 @@ def load_atlas_state(root, pack, state, limit=100):
             return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas},[]
         samples=[]
         for frame in indices[::step]:
-            if not isinstance(frame,int) or frame<0 or frame>=frames_count:
+            if not isinstance(frame,int) or isinstance(frame,bool) or frame<0 or frame>=frames_count:
                 return {"status":"FRAME_FORA_DO_ATLAS","atlas":atlas,"frame":frame},[]
             x0=(frame%columns)*width
             y0=(frame//columns)*height
