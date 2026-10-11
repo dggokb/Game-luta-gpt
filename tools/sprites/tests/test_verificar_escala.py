@@ -176,6 +176,10 @@ class GeometricScaleProofTest(unittest.TestCase):
             self.assertEqual(5,len(fall),
                 "FALL must use the whole 6-frame animation, not sample frame 4 repeatedly")
             self.assertTrue(all(image.shape==(50,30,4) for image in fall))
+            pack["animations"]["FALL"]["frames"]=[0,1,2,True,4,5]
+            self.assertEqual([],geo.read_sprite_samples(root,pack,"FALL",
+                         selection=(.65,.73,.81,.89,.97)),
+                "A boolean is not a valid packed frame number")
 
     def test_atlas_pixel_scale_normalizes_to_idle(self):
         import json

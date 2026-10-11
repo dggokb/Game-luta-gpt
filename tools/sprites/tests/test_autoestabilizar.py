@@ -239,6 +239,16 @@ class AutoCorrectionTest(unittest.TestCase):
                 self.assertEqual("CORRIGIDO",result["status"],result)
                 self.assertIsNotNone(record)
 
+                # One atlas can supply several states; a frame correction
+                # keyed only by atlas+frame would also affect the other state.
+                manifest.write_text(json.dumps({"animations":{
+                    "VICTORY":{"atlas":"p02_victory","frames":list(range(12))},
+                    "INTRO":{"atlas":"p02_victory","frames":[0,1,2]}
+                }}))
+                result,record=AUTO.propose(root,"p02","VICTORY",evidence)
+                self.assertEqual("BLOQUEADO",result["status"],result)
+                self.assertIsNone(record)
+
     def test_no_correction_of_unimported_character_or_deliberately_moving_state(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):
