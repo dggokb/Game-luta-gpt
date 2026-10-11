@@ -3,6 +3,9 @@ package com.gamelutagpt;
 import static org.junit.Assert.*;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -21,10 +24,27 @@ public class SpriteIntroTransitionTest {
         return shot;
     }
 
+    /** Unmodified old renderer output; negative control uses the ACTUAL final INTRO. */
+    private static Bitmap originalLastFrame(SpriteFighterRenderer renderer,
+                                            CharacterDefinition.Animation intro,float t) {
+        Bitmap shot=Bitmap.createBitmap(W,H,Bitmap.Config.ARGB_8888);
+        Canvas target=new Canvas(shot);
+        int frame=intro.frame(t,0f);
+        CharacterDefinition.Atlas a=intro.atlas;
+        float scale=renderer.character().profile.worldScale/a.pixelScale;
+        Rect source=new Rect((frame%a.columns)*a.width,(frame/a.columns)*a.height,
+                             (frame%a.columns+1)*a.width,(frame/a.columns+1)*a.height);
+        RectF dest=new RectF(450f-a.rootX*scale,612f-a.rootY*scale,
+                            450f+(a.width-a.rootX)*scale,612f+(a.height-a.rootY)*scale);
+        target.drawBitmap(renderer.atlases.get(a),source,dest,new Paint(Paint.FILTER_BITMAP_FLAG));
+        return shot;
+    }
+
     private static double averagePixelDistance(Bitmap a,Bitmap b) {
         long change=0;
         long pixels=0;
-        for(int y=70;y<H;y+=3) for(int x=75;x<W-75;x+=3) {
+        // Measure the standing artwork region, not mostly empty screen pixels.
+        for(int y=270;y<640;y+=3) for(int x=230;x<685;x+=3) {
             int p=a.getPixel(x,y),q=b.getPixel(x,y);
             change+=Math.abs((p>>>24)-(q>>>24));
             change+=Math.abs(((p>>>16)&255)-((q>>>16)&255));
@@ -50,17 +70,20 @@ public class SpriteIntroTransitionTest {
         assertEquals(1f,SpriteIntroTransition.blend(intro,intro.duration),0f);
         assertTrue(SpriteIntroTransition.blend(intro,intro.duration-.012f)>.99f);
 
-        Bitmap start=render(renderer,SpriteStates.INTRO,.025f);
+        Bitmap original=originalLastFrame(renderer,intro,intro.duration-.012f);
         Bitmap finish=render(renderer,SpriteStates.INTRO,intro.duration-.012f);
         Bitmap next=render(renderer,SpriteStates.IDLE,0f);
-        double originallyDifferent=averagePixelDistance(start,next);
+        double originallyDifferent=averagePixelDistance(original,next);
         double boundaryError=averagePixelDistance(finish,next);
-        assertTrue("Intro must start as genuinely different art",originallyDifferent>.004);
-        assertTrue("The actual INTRO -> IDLE transition must be nearly pixel-identical",
-            boundaryError<.0025);
-        assertTrue("The boundary must improve sharply over a naive hard cut",
-            boundaryError<originallyDifferent*.15);
-        start.recycle();finish.recycle();next.recycle();
+        System.out.println("P02 ACTUAL TRANSITION rawEndVsIdle="+originallyDifferent
+                +" blendedEndVsIdle="+boundaryError);
+        assertTrue("Original final INTRO must demonstrably jump to IDLE: "+originallyDifferent,
+                   originallyDifferent>.008);
+        assertTrue("The actual INTRO -> IDLE transition must be nearly pixel-identical: "+boundaryError,
+                   boundaryError<.0025);
+        assertTrue("End-to-IDLE must improve over the ACTUAL original hard cut",
+                   boundaryError<originallyDifferent*.15);
+        original.recycle();finish.recycle();next.recycle();
     }
 
     @Test public void genericPolicyUsesAnimationClockInsteadOfP02FrameIndices() {
