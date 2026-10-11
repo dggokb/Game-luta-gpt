@@ -121,8 +121,8 @@ def analyze(frames, loop=True, min_floor=.020, ratio=2.25):
     global motion. Closing seam participates in that same analysis.
     """
     n = len(frames)
-    if n < 6:
-        raise ValueError("A minimum of six frames is required for temporal analysis")
+    if n < 4:
+        raise ValueError("A minimum of four frames is required for temporal analysis")
     ff = [feature(f) for f in frames]
     transitions = [(i, (i+1) % n) for i in range(n if loop else n-1)]
     rows = [{"from": i, "to": j, "loop_seam": j == 0, **distance(ff[i], ff[j])}

@@ -35,6 +35,19 @@ class TemporalContinuityTests(unittest.TestCase):
                          msg=str(report["suspect_transitions"]))
         self.assertEqual([],report["suspect_transitions"])
 
+
+    def test_short_native_dashing_loop_uses_four_frames(self):
+        frames=example_frames(count=4)
+        result=F.analyze(frames)
+        self.assertEqual(4,result["frame_count"])
+        self.assertEqual(4,result["transitions_tested"])
+        self.assertEqual((3,0),(result["all_transitions"][-1]["from"],result["all_transitions"][-1]["to"]))
+        self.assertFalse(result["suspect_transitions"])
+
+    def test_three_frames_is_too_few_for_continuity_gate(self):
+        with self.assertRaisesRegex(ValueError,"minimum of four"):
+            F.analyze(example_frames(count=3))
+
     def test_real_frame_mutation_catches_both_adjacent_transitions(self):
         report=F.analyze(example_frames(broken=24))
         indices={(r["from"],r["to"]) for r in report["suspect_transitions"]}

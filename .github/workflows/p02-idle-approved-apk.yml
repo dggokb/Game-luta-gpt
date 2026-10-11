@@ -1,4 +1,4 @@
-name: Approved P02 IDLE - Sprite Engine and Direct APK
+name: Approved P02 IDLE and DASH - Native Engine and Direct APK
 
 on:
   push:
@@ -12,6 +12,8 @@ on:
       - tools/sprites/verificar_frames.py
       - tools/sprites/tests/test_verificar_frames.py
       - tools/sprites/validar_p02_idle_real.py
+      - tools/sprites/validar_p02_dash_real.py
+      - android/app/src/test/java/com/gamelutagpt/P02DashRuntimeSizeTest.java
   workflow_dispatch:
 
 permissions:
@@ -65,6 +67,8 @@ jobs:
             --character p02 --clip p02_idle --compare-source --fail-on-break \
             --output android/app/build/sprite-review/p02-idle-approved-continuity
           python tools/sprites/validar_p02_idle_real.py
+          python tools/sprites/verificar_frames.py --character p02 --clip p02_dash --compare-source --fail-on-break --output android/app/build/sprite-review/p02-dash-approved-continuity
+          python tools/sprites/validar_p02_dash_real.py
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -80,6 +84,7 @@ jobs:
         run: |
           gradle -p android --no-daemon :app:testDebugUnitTest \
             --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.P02DashRuntimeSizeTest \
             --tests com.gamelutagpt.P01IntroRealAssetTest \
             --tests com.gamelutagpt.P01VictoryRealAssetTest \
             --tests com.gamelutagpt.SpriteAutoFixTest \
@@ -93,6 +98,8 @@ jobs:
           test -s "$APK"
           unzip -p "$APK" res/drawable-nodpi-v4/p02_idle.png >/tmp/p02-published.png
           cmp /tmp/p02-published.png android/app/src/main/res/drawable-nodpi/p02_idle.png
+          unzip -p "$APK" res/drawable-nodpi-v4/p02_dash.png >/tmp/p02-published-dash.png
+          cmp /tmp/p02-published-dash.png android/app/src/main/res/drawable-nodpi/p02_dash.png
           unzip -p "$APK" assets/sprite-autofix.json >/tmp/p02-published-autofix.json
           cmp /tmp/p02-published-autofix.json android/app/src/main/assets/sprite-autofix.json
           echo "BUILT_FROM_COMMIT=$(git rev-parse HEAD)"
@@ -106,6 +113,8 @@ jobs:
             android/app/build/outputs/apk/debug/app-debug.apk
             android/app/build/sprite-review/p02-idle-approved-continuity/
             android/app/build/sprite-review/p02-idle-diagnose/
+            android/app/build/sprite-review/p02-dash-approved/
+            android/app/build/sprite-review/p02-dash-approved-continuity/
             android/app/build/reports/tests/
           if-no-files-found: warn
       - name: Publish direct .apk in experimental release
@@ -114,12 +123,12 @@ jobs:
         run: |
           set -euo pipefail
           SHORT="${GITHUB_SHA:0:8}"
-          TAG="p02-idle-integrado-${SHORT}"
+          TAG="p02-idle-dash-integrado-${SHORT}"
           SRC="android/app/build/outputs/apk/debug/app-debug.apk"
-          DEST="$RUNNER_TEMP/P02-IDLE-integrado-${SHORT}.apk"
+          DEST="$RUNNER_TEMP/P02-IDLE-DASH-integrado-${SHORT}.apk"
           cp "$SRC" "$DEST"
           gh release create "$TAG" "$DEST" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "P02 IDLE aprovado - integracao isolada ${SHORT}" \
-            --notes "APK debug gerado da integracao isolada do IDLE aprovado do P02 sobre game-luta-sprite-gpt. 30 quadros nativos 15-44, atlas HD original intacto; P01 preservado. Sem merge ou alteracao da branch principal." \
+            --title "P02 IDLE + DASH tamanho verificado - integracao isolada ${SHORT}" \
+            --notes "APK debug da integracao isolada do P02 IDLE (30 quadros, indices 15-44) e DASH (4 quadros nativos 0-3, 65ms). Testes reais da altura do corpo em pixels contra IDLE aprovado, solo e fechamento do ciclo. Atlas HD 2x original intacto e P01 preservado. Sem merge." \
             --prerelease
