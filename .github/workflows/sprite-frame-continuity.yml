@@ -1,0 +1,38 @@
+name: Sprite Frame Continuity - P02 IDLE Review
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - refino/p02-animacoes-20261011
+    paths:
+      - .github/workflows/sprite-frame-continuity.yml
+      - tools/sprites/verificar_frames.py
+      - tools/sprites/tests/test_verificar_frames.py
+permissions:
+  contents: read
+jobs:
+  test-and-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pixel analysis dependencies
+        run: python -m pip install Pillow==12.3.0 numpy
+      - name: Exercise break detection and natural breathing
+        run: python -m unittest discover -s tools/sprites/tests -p test_verificar_frames.py -v
+      - name: Analyze only the shipped P02 IDLE and its source layers
+        run: |
+          python tools/sprites/verificar_frames.py \
+            --character p02 --clip p02_idle --compare-source \
+            --output android/app/build/sprite-review/p02-idle-continuity
+          cat android/app/build/sprite-review/p02-idle-continuity/review.txt
+      - name: Upload real frame-pair evidence and JSON measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-idle-frame-continuity-review
+          path: android/app/build/sprite-review/p02-idle-continuity/
+          if-no-files-found: warn
