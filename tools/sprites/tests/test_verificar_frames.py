@@ -31,7 +31,8 @@ class TemporalContinuityTests(unittest.TestCase):
         report=F.analyze(example_frames())
         self.assertEqual(56,report["frame_count"])
         self.assertEqual(56,report["transitions_tested"])
-        self.assertEqual("NO_AUTOMATIC_BREAK_DETECTED",report["status"])
+        self.assertEqual("NO_AUTOMATIC_BREAK_DETECTED",report["status"],
+                         msg=str(report["suspect_transitions"]))
         self.assertEqual([],report["suspect_transitions"])
 
     def test_real_frame_mutation_catches_both_adjacent_transitions(self):
