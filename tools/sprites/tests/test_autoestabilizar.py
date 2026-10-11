@@ -278,7 +278,7 @@ class AutoCorrectionTest(unittest.TestCase):
     def test_rollback_restores_original_json_bytes_exactly(self):
         with tempfile.TemporaryDirectory() as folder:
             asset=Path(folder)/"sprite-autofix.json"
-            original=b'{ "corrections": [], "schema": 1 }\\n\\n'
+            original=b'{ "corrections": [], "schema": 1 }\n\n'
             asset.write_bytes(original)
             record={"character":"p02","atlas":"p02_idle","state":"IDLE",
                     "frames":[[0,1.0,-2.0,0.0]]}
