@@ -30,16 +30,17 @@ final class SpriteAutoFix {
 
     static synchronized void load(Context context) {
         if(loaded) return;
-        loaded=true;
         try(InputStream stream=context.getAssets().open("sprite-autofix.json")) {
             ByteArrayOutputStream buffer=new ByteArrayOutputStream();
             byte[] bytes=new byte[8192];
             int n;
             while((n=stream.read(bytes))!=-1)buffer.write(bytes,0,n);
             replaceFromJson(new String(buffer.toByteArray(), "UTF-8"));
-        } catch(Exception unused) {
-            // No accepted corrections is a valid state. Existing gameplay
-            // and sprites must remain identical in that situation.
+            loaded=true;
+        } catch(Exception error) {
+            // Silent fallback hides malformed corrections and falsely approves
+            // APKs whose scaling never reached the Android renderer.
+            throw new IllegalStateException("Cannot load sprite-autofix.json",error);
         }
     }
 
