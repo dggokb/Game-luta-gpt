@@ -7,8 +7,10 @@ from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'tools/sprites'))
-from refinar_sequencia_video import relative_timeline
+from refinar_sequencia_video import relative_timeline,project_source_registration
 from refinar_ciclo_video import cells
+from video_para_sprite import registration_x
+import numpy as np
 
 class IntroVideoTest(unittest.TestCase):
     @classmethod
@@ -45,13 +47,35 @@ class IntroVideoTest(unittest.TestCase):
         self.assertLess(self.generated['relativeSize'],.98,
                         'Oversized original should not be falsely approved')
 
-    def test_all_frames_remain_whole_and_feet_anchored(self):
+    def test_source_xy_motion_survives_full_pipeline(self):
+        # Regression that the previous motor was incapable of passing:
+        # every frame must preserve its own source-video displacement.
         g=self.report['packed']
-        for i,im in enumerate(self.poses):
-            b=im.getchannel('A').getbbox()
+        geo=self.generated['frameGeometry']
+        self.assertEqual(len(geo),len(self.poses))
+        for i,(frame,record) in enumerate(zip(self.poses,geo)):
+            b=frame.getchannel('A').getbbox()
             self.assertIsNotNone(b,f'Frame {i} is blank')
-            self.assertGreaterEqual(min(b[0],b[1],im.width-b[2],im.height-b[3]),7)
-            self.assertLessEqual(abs((b[3]-1)-g['rootY']),3)
+            self.assertGreaterEqual(min(b[0],b[1],frame.width-b[2],frame.height-b[3]),7)
+            foot=b[3]-1
+            trunk=registration_x(np.asarray(frame))
+            self.assertAlmostEqual(foot,record['expectedFootY'],delta=2.5)
+            self.assertAlmostEqual(trunk,record['expectedTorsoX'],delta=3.5)
+
+    def test_fixed_registration_preserves_synthetic_camera_space_translation(self):
+        # Same character rendered 30 px to the right and 24 px higher must
+        # remain displaced: NOT normalized back to zero per sprite frame.
+        size=1.125
+        rootX,rootY=200,450
+        ref_x,ref_y=100.0,400.0
+        first=(75,125,145,401)
+        moved=(105,101,175,377)
+        p0=project_source_registration(first,ref_x,ref_y,rootX,rootY,size)
+        p1=project_source_registration(moved,ref_x,ref_y,rootX,rootY,size)
+        self.assertEqual(p1[0]-p0[0],round(30*size))
+        self.assertEqual(p1[1]-p0[1],round(-24*size))
+        with self.assertRaises(ValueError):
+            project_source_registration(first,float('nan'),ref_y,rootX,rootY,size)
 
     def test_original_idle_and_approved_dash_unchanged(self):
         self.assertEqual(self.ch['animations']['IDLE']['frames'],list(range(15,45)))
