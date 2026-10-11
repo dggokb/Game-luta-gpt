@@ -192,6 +192,31 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertEqual("INCONCLUSIVO",result["status"],result)
             self.assertFalse(samples)
 
+    def test_invalid_video_frame_rate_blocks_temporal_proof(self):
+        import cv2
+        with tempfile.TemporaryDirectory() as folder:
+            file=Path(folder)/"invalid_fps.mp4"
+            writer=cv2.VideoWriter(str(file),cv2.VideoWriter_fourcc(*"mp4v"),30.,(96,96))
+            self.assertTrue(writer.isOpened())
+            for _ in range(12):
+                frame=np.full((96,96,3),(0,255,0),dtype=np.uint8)
+                cv2.rectangle(frame,(24,14),(65,85),(35,40,220),-1)
+                writer.write(frame)
+            writer.release()
+            for invalid in (0,float("nan")):
+                cap=cv2.VideoCapture(str(file))
+                self.assertTrue(cap.isOpened())
+                class BadRateCapture:
+                    def isOpened(self): return cap.isOpened()
+                    def get(self,prop):
+                        return invalid if prop==cv2.CAP_PROP_FPS else cap.get(prop)
+                    def read(self): return cap.read()
+                    def release(self): cap.release()
+                with patch("cv2.VideoCapture",return_value=BadRateCapture()):
+                    result,frames=e.load_video(file)
+                self.assertEqual("INCONCLUSIVO",result["status"],result)
+                self.assertFalse(frames)
+
     def test_boolean_frame_ids_are_not_silently_cast_to_atlas_frames(self):
         from PIL import Image
         with tempfile.TemporaryDirectory() as folder:

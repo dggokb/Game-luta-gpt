@@ -5,6 +5,7 @@ mensuráveis de zoom e translação, não apenas labels de diagnóstico.
 """
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 import numpy as np
 import cv2
@@ -83,6 +84,14 @@ class GeometricScaleProofTest(unittest.TestCase):
         frames=[self.affine(1.0)]*5+[np.zeros_like(self.base)]*2
         self.assertEqual("INCONCLUSIVO",
                          geo.estimate_sequence(self.base,frames)["status"])
+
+    def test_unknown_or_nan_video_frame_count_is_inconclusive(self):
+        class InvalidVideoMetadata:
+            def isOpened(self): return True
+            def get(self,prop): return float("nan")
+            def release(self): pass
+        with patch("cv2.VideoCapture",return_value=InvalidVideoMetadata()):
+            self.assertEqual([],geo.read_video_samples("irrelevant.mp4"))
 
     def test_video_non_chroma_must_not_be_measured_as_character(self):
         from tempfile import TemporaryDirectory
