@@ -100,6 +100,30 @@ class AutoCorrectionTest(unittest.TestCase):
             self.assertEqual("REVERTIDO",AUTO.rollback(asset)["status"])
             self.assertEqual(original,json.loads(asset.read_text()))
 
+    def test_batch_correction_of_one_fighter_is_atomic_and_rollback_all(self):
+        with tempfile.TemporaryDirectory() as folder:
+            asset=Path(folder)/"sprite-autofix.json"
+            records=[{"character":"p02","atlas":atlas,"state":state,
+                      "frames":[[0,1.,dx,0.]]}
+                     for atlas,state,dx in (
+                         ("p02_victory","VICTORY",-2.),
+                         ("p02_idle","IDLE",1.))]
+            saved=AUTO.publish_batch(asset,records)
+            self.assertEqual(["VICTORY","IDLE"],saved["estados_corrigidos"])
+            entries=json.loads(asset.read_text())["corrections"]
+            self.assertEqual(2,len(entries))
+            with self.assertRaises(ValueError):
+                AUTO.publish_batch(asset,records)
+            with self.assertRaises(ValueError):
+                AUTO.rollback(asset,"p03")
+            self.assertEqual(2,len(json.loads(asset.read_text())["corrections"]))
+            self.assertEqual("REVERTIDO",AUTO.rollback(asset,"p02")["status"])
+            self.assertEqual([],json.loads(asset.read_text())["corrections"])
+            with self.assertRaises(ValueError):
+                AUTO.publish_batch(asset,records+[{
+                    "character":"p03","atlas":"p03_idle","state":"IDLE",
+                    "frames":[[0,1.,0.,0.]]}])
+
     def test_no_correction_of_unimported_character_or_deliberately_moving_state(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):
