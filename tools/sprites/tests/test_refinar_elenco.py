@@ -251,6 +251,36 @@ class CharacterStabilizerTest(unittest.TestCase):
                     packed_inspector=read_pack,geometria=False)
             self.assertEqual("PENDENTE_FONTES",result["status"])
 
+    def test_dedicated_fall_video_is_sampled_from_the_start(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            p=root/"characters/player_base"
+            p.mkdir(parents=True)
+            (p/"character.json").write_text(json.dumps({"animations":{
+                "IDLE":{"atlas":"test_idle","frames":list(range(12))},
+                "FALL":{"atlas":"test_fall","frames":list(range(12))}}}))
+            videos=root/"animations/p01"
+            videos.mkdir(parents=True)
+            (videos/"idle.mp4").touch()
+            (videos/"fall.mp4").touch()
+            def read_video(path):
+                return {"status":"EXTRAIDO"},[body_frame()]*12
+            def read_pack(root,pack,state):
+                return {"status":"EXTRAIDO","atlas":"test_"+state.lower()},[body_frame()]*12
+            blank=[np.zeros((50,50,4),dtype=np.uint8) for _ in range(6)]
+            with patch("verificar_escala.read_video_samples",return_value=blank) as vr, \
+                 patch("verificar_escala.read_sprite_samples",return_value=blank):
+                report=MOD.inspect_character("p01",videos,states=["FALL"],root=root,
+                    original_video_inspector=read_video,
+                    packed_inspector=read_pack,geometria=True)
+            self.assertEqual("ENCONTRADO",report["estados"]["FALL"]["video"]["status"])
+            self.assertEqual("fall.mp4",
+                Path(vr.call_args.args[0]).name)
+            start=min(vr.call_args.kwargs["selection"])
+            self.assertLess(start,.20,
+                "Dedicated fall.mp4 is already a descent; sample the whole source")
+
     def test_frozen_import_flagged_even_when_idle_sift_is_inconclusive(self):
         from unittest.mock import patch
         import cv2
