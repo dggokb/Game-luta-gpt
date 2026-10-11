@@ -1,0 +1,153 @@
+name: P02 INTRO - Original Video Scale and Continuity APK
+on:
+  push:
+    branches:
+      - 'refino/p02-intro-video-20261011'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: p02-intro-source-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  original-video-intro:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install original video analysis dependencies
+        run: python -m pip install Pillow==12.3.0 numpy opencv-python-headless
+      - name: Restore original p02 intro video from Drive without changing bytes
+        run: |
+          cat tools/sprites/video_sources/p02_intro_original.part* >"$RUNNER_TEMP/p02_intro.mp4"
+          test "$(wc -c < "$RUNNER_TEMP/p02_intro.mp4")" -eq 3314199
+          python - "$RUNNER_TEMP/p02_intro.mp4" <<'PY'
+          import cv2,sys,hashlib
+          p=sys.argv[1];v=cv2.VideoCapture(p)
+          assert v.isOpened()
+          assert int(v.get(cv2.CAP_PROP_FRAME_COUNT))>=97
+          print('SOURCE VIDEO',int(v.get(cv2.CAP_PROP_FRAME_COUNT)),v.get(cv2.CAP_PROP_FPS),
+                'sha256',hashlib.sha256(open(p,'rb').read()).hexdigest())
+          PY
+      - name: Rebuild INTRO from chronological real video and canonical IDLE scale
+        run: |
+          python tools/sprites/refinar_sequencia_video.py \
+            --video "$RUNNER_TEMP/p02_intro.mp4" --character p02 --clip p02_intro --stride 2
+          python tools/sprites/atualizar_clipe_isolado.py --character p02 --clip p02_intro
+      - name: Approved P02 IDLE/DASH and all P01 sprites must remain byte-identical
+        run: |
+          git diff --exit-code 7ac76f830b7b565a70679e80116724d0cc1e4ee8 -- \
+            android/app/src/main/res/drawable-nodpi/p02_idle.png \
+            android/app/src/main/res/drawable-nodpi/p02_dash.png \
+            art/sprites/source/p02_dash_sr_hd.png \
+            tools/sprites/clips/p02_dash.json \
+            tools/sprites/reports/p02_dash.report.json \
+            tools/sprites/profiles/p02.json \
+            'android/app/src/main/res/drawable-nodpi/player_base_*.png' \
+            characters/player_base \
+            characters/p01
+      - name: Real asset checks and negative timeline tests
+        run: |
+          python -m unittest discover -s tools/sprites/tests -p test_refinar_sequencia_video.py -v
+          python -m unittest discover -s tools/sprites/tests -p test_verificar_frames.py -v
+          python -m unittest discover -s tools/sprites/tests -p test_ciclo_video.py -v
+      - name: Synced original vs corrected GIFs and same-scale IDLE comparison
+        run: |
+          git show 7ac76f830b7b565a70679e80116724d0cc1e4ee8:android/app/src/main/res/drawable-nodpi/p02_intro.png >"$RUNNER_TEMP/p02_intro_old.png"
+          git show 7ac76f830b7b565a70679e80116724d0cc1e4ee8:tools/sprites/reports/p02_intro.report.json >"$RUNNER_TEMP/p02_intro_old.report.json"
+          git show 7ac76f830b7b565a70679e80116724d0cc1e4ee8:characters/p02/character.json >"$RUNNER_TEMP/p02_old.character.json"
+          python tools/sprites/render_sequencia_video.py \
+            --old-atlas "$RUNNER_TEMP/p02_intro_old.png" \
+            --old-report "$RUNNER_TEMP/p02_intro_old.report.json" \
+            --old-character "$RUNNER_TEMP/p02_old.character.json"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Test runtime intro and P01/P02 regressions
+        run: |
+          cat >/tmp/test-heap.gradle <<'GRADLE'
+          allprojects {
+            tasks.withType(org.gradle.api.tasks.testing.Test).configureEach {
+              maxHeapSize = '4g'
+              maxParallelForks = 1
+            }
+          }
+          GRADLE
+          gradle -p android --no-daemon --max-workers=1 -I /tmp/test-heap.gradle \
+            :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P02IntroVideoTest \
+            --tests com.gamelutagpt.P02DashRuntimeSizeTest \
+            --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            -x :app:verifySpritePacks
+      - name: Assemble direct Android APK
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Check exact regenerated INTRO, IDLE, DASH Android payload
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          for name in p02_intro p02_idle p02_dash; do
+            unzip -p "$APK" "res/drawable-nodpi-v4/$name.png" >/tmp/"$name".png
+            cmp /tmp/"$name".png android/app/src/main/res/drawable-nodpi/"$name".png
+          done
+          unzip -p "$APK" assets/sprite-autofix.json >/tmp/runtime-fix.json
+          cmp /tmp/runtime-fix.json android/app/src/main/assets/sprite-autofix.json
+      - name: Commit ONLY tested INTRO atlas, mapping, metadata on experimental branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            characters/p02/character.json \
+            tools/sprites/clips/p02_intro.json \
+            tools/sprites/reports/p02_intro.report.json \
+            tools/sprites/reports/p02_intro_video_refinement.json \
+            art/sprites/source/p02_intro_sr_hd.png \
+            android/app/src/main/res/drawable-nodpi/p02_intro.png \
+            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java \
+            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          if git diff --cached --quiet; then
+            echo 'ERROR: no real INTRO integration applied'
+            exit 1
+          fi
+          git commit -m 'feat(p02): store validated original-video INTRO [skip ci]'
+          git push origin HEAD:refs/heads/refino/p02-intro-video-20261011
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p02-intro-video-direct-apk-and-gifs
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/sprite-review/p02-intro-video/
+            tools/sprites/reports/p02_intro_video_refinement.json
+            android/app/build/reports/tests/
+          if-no-files-found: warn
+      - name: Publish direct APK and comparison GIFs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHORT="$(git rev-parse --short=8 HEAD)"
+          TAG="p02-intro-video-$SHORT"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/P02-INTRO-video-$SHORT.apk"
+          gh release create "$TAG" "$RUNNER_TEMP/P02-INTRO-video-$SHORT.apk" \
+            android/app/build/sprite-review/p02-intro-video/*.gif \
+            android/app/build/sprite-review/p02-intro-video/04_idle_intro_antes_depois.png \
+            --repo "$GITHUB_REPOSITORY" --target "$(git rev-parse HEAD)" \
+            --title "P02 INTRO source-video full-cycle and canonical scale $SHORT" \
+            --notes "P02 INTRO experimental. Original p02 INTRO video used, frames chronological, global standing stature based on approved IDLE. P02 DASH/IDLE and P01 untouched. Requires player visual approval, no merge." --prerelease
