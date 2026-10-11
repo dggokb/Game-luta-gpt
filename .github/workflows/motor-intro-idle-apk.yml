@@ -1,0 +1,112 @@
+name: Universal INTRO to IDLE - Real Canvas Validation and APK
+on:
+  push:
+    branches:
+      - 'refino/motor-transicao-intro-idle-20261011'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: intro-idle-universal-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  renderer-intro-idle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install real atlas analysis dependencies
+        run: python -m pip install Pillow==12.3.0 numpy
+      - name: Prove approved atlas/P01/physics are byte-for-byte untouched
+        run: |
+          git diff --exit-code 41d23e8425e2be675e2f026f69bcfebec1d24b3d HEAD -- \
+            android/app/src/main/res/drawable-nodpi/ \
+            art/sprites/source/ \
+            characters/ \
+            tools/sprites/clips/ \
+            tools/sprites/reports/ \
+            android/app/src/main/java/com/gamelutagpt/CombatEngine.java \
+            android/app/src/main/java/com/gamelutagpt/SpriteMotion.java \
+            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java \
+            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java \
+            android/app/src/main/assets/sprite-autofix.json
+      - name: Render actual full-state P02 INTRO to IDLE before/after animated GIFs
+        run: |
+          python tools/sprites/render_transicao_intro_idle.py --character p02
+          test -s android/app/build/sprite-review/intro-idle-transition/01_antes_intro_idle.gif
+          test -s android/app/build/sprite-review/intro-idle-transition/02_depois_intro_idle.gif
+          test -s android/app/build/sprite-review/intro-idle-transition/03_comparacao_intro_idle.gif
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Test real Android Canvas transition and preserve P01/P02 approvals
+        run: |
+          cat >/tmp/sprite-test-memory.gradle <<'GRADLE'
+          allprojects {
+            tasks.withType(org.gradle.api.tasks.testing.Test).configureEach {
+              maxHeapSize = '4g'
+              maxParallelForks = 1
+            }
+          }
+          GRADLE
+          gradle -p android --no-daemon --max-workers=1 -I /tmp/sprite-test-memory.gradle \
+            :app:testDebugUnitTest \
+            --tests com.gamelutagpt.SpriteIntroTransitionTest \
+            --tests com.gamelutagpt.P02IntroVideoTest \
+            --tests com.gamelutagpt.P02DashRuntimeSizeTest \
+            --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            -x :app:verifySpritePacks
+      - name: Assemble APK with fixed universal renderer
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Verify the final APK uses exact actual P01/P02 sprites
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          for NAME in p02_intro p02_idle p02_dash player_base_intro player_base_idle; do
+            unzip -p "$APK" "res/drawable-nodpi-v4/$NAME.png" >/tmp/"$NAME".png
+            cmp /tmp/"$NAME".png android/app/src/main/res/drawable-nodpi/"$NAME".png
+          done
+          unzip -p "$APK" assets/sprite-autofix.json >/tmp/sprite-autofix.json
+          cmp /tmp/sprite-autofix.json android/app/src/main/assets/sprite-autofix.json
+      - name: Store tested direct APK, before/after GIF and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: intro-idle-real-android-apk-gif-and-tests
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/sprite-review/intro-idle-transition/
+            android/app/build/reports/tests/
+          if-no-files-found: warn
+      - name: Release direct .apk not zip, only after every quality gate passes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHORT="$(git rev-parse --short=8 HEAD)"
+          TAG="intro-idle-motor-$SHORT"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/INTRO-IDLE-motor-$SHORT.apk"
+          gh release create "$TAG" "$RUNNER_TEMP/INTRO-IDLE-motor-$SHORT.apk" \
+            android/app/build/sprite-review/intro-idle-transition/*.gif \
+            android/app/build/sprite-review/intro-idle-transition/runtime_transition.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "INTRO → IDLE reusable renderer $SHORT" \
+            --notes "Experimental branch; real P02 INTRO+IDLE. Generic, duration-relative fade rather than hardcoded character ID. Existing P01 approved special renderer left untouched. Approved PNGs/timing/gameplay unchanged, Android Canvas boundary and negative regression tests passed. Requires final in-game visual approval, no merge." \
+            --prerelease
