@@ -1,0 +1,86 @@
+name: P01 INTRO isolated evidence and APK
+on:
+  push:
+    branches:
+      - refino/p01-animacoes-20261009
+    paths:
+      - .github/workflows/p01-intro-evidence-apk.yml
+      - android/app/src/main/assets/sprite-autofix.json
+      - tools/sprites/validar_p01_intro_real.py
+      - android/app/src/test/java/com/gamelutagpt/P01IntroRealAssetTest.java
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  intro-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pixel reader
+        run: python -m pip install Pillow numpy
+      - name: Record source and unchanged VICTORY contract
+        run: |
+          mkdir -p android/app/build/sprite-review/p01-intro-real
+          echo "$(git rev-parse HEAD)" > android/app/build/sprite-review/p01-intro-real/commit.txt
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('.')
+          manifest=json.loads((root/'characters/player_base/character.json').read_text())
+          clips=manifest['animations']
+          corrections=json.loads((root/'android/app/src/main/assets/sprite-autofix.json').read_text())
+          assert len(clips['INTRO']['frames'])==27
+          assert len(clips['INTRO']['durationsMs'])==27
+          assert [i['atlas'] for i in corrections['corrections'] if i['state']=='VICTORY']==['player_base_victory']
+          out=root/'android/app/build/sprite-review/p01-intro-real'
+          (out/'victory_sha256.txt').write_text(hashlib.sha256(json.dumps(next(i for i in corrections['corrections'] if i['state']=='VICTORY'),sort_keys=True).encode()).hexdigest()+'\n')
+          (out/'intro_manifest.json').write_text(json.dumps(clips['INTRO'],indent=2)+'\n')
+          PY
+      - name: Package actual inputs for independent off-runner pixel measurement
+        if: always()
+        run: |
+          mkdir -p android/app/build/sprite-review/p01-intro-real
+          tar -czf android/app/build/sprite-review/p01-intro-real/p01-intro-actual-inputs.tar.gz             android/app/src/main/res/drawable-nodpi/player_base_intro.png             android/app/src/main/res/drawable-nodpi/player_base_idle.png             art/sprites/source/player_base_intro_video_normalized.png             tools/sprites/reports/player_base_intro.report.json             tools/sprites/reports/player_base_idle.report.json             tools/sprites/generate_p01_calibration.py             tools/sprites/validar_p01_victory_real.py             tools/sprites/autoestabilizar.py             tools/sprites/profiles/player_base.json             android/app/src/main/assets/sprite-autofix.json             characters/player_base/character.json
+      - name: Python real PNG regression (VICTORY)
+        run: python tools/sprites/validar_p01_victory_real.py
+      - name: Python real PNG validation (INTRO)
+        run: |
+          if test -f tools/sprites/validar_p01_intro_real.py; then
+            python tools/sprites/validar_p01_intro_real.py
+          else
+            echo "INTRO validator not committed yet; diagnostic input extraction only"
+          fi
+      - name: Android tests
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest
+      - name: Build debug APK
+        run: gradle -p android --no-daemon :app:assembleDebug
+      - name: Verify packaged assets
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          unzip -p android/app/build/outputs/apk/debug/app-debug.apk assets/sprite-autofix.json             > android/app/build/sprite-review/p01-intro-real/packaged-sprite-autofix.json
+          cmp android/app/build/sprite-review/p01-intro-real/packaged-sprite-autofix.json               android/app/src/main/assets/sprite-autofix.json
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p01-intro-actual-evidence
+          path: android/app/build/sprite-review/p01-intro-real/*
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: p01-intro-direct-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
