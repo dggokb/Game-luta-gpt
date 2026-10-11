@@ -23,7 +23,7 @@ jobs:
         run: |
           cat tools/sprites/video_sources/p02_dash_original.part* > "$RUNNER_TEMP/p02_dash.mp4"
           test -s "$RUNNER_TEMP/p02_dash.mp4"
-          ffprobe -v error -select_streams v:0 -show_entries stream=width,height,nb_frames -of default=nw=1 "$RUNNER_TEMP/p02_dash.mp4"
+          python -c 'import cv2,sys; c=cv2.VideoCapture(sys.argv[1]); print("original-video",c.get(cv2.CAP_PROP_FRAME_COUNT),c.get(cv2.CAP_PROP_FRAME_WIDTH),c.get(cv2.CAP_PROP_FRAME_HEIGHT)); assert c.isOpened()' "$RUNNER_TEMP/p02_dash.mp4"
       - name: Select chronological run cycle and normalize optical size once
         run: |
           python tools/sprites/refinar_ciclo_video.py --video "$RUNNER_TEMP/p02_dash.mp4" --character p02 --clip p02_dash
