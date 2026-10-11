@@ -29,6 +29,7 @@ AIR = {'HIT_AIR', 'JUMP_LIGHT', 'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN',
        'SPECIAL_S2', 'SPECIAL_S4', 'KNOCKDOWN', 'GROUNDED'}
 HIP_REGISTERED = {'JUMP', 'FALL', 'DEFENSE_AIR', 'HIT_AIR', 'JUMP_LIGHT',
                   'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN'}
+AIR_ATTACKS = {'JUMP_LIGHT', 'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN'}
 NO_FX = {'idle', 'frente', 'tras', 'agachado', 'backDash', 'intro',
          'vitoria', 'derrota', 'provocacao', 'defendeBaixo', 'defesaPulo'}
 
@@ -66,7 +67,7 @@ def source_palette(extraction):
     return count >= count.sum() * PALETTE_SHARE
 
 
-def waist_row(rgba):
+def waist_region(rgba):
     """Upper part of the red sash: an intrinsic landmark, not a foot/bbox.
 
     In air, unfolding the knees must not lift the entire torso. This measured
@@ -79,8 +80,23 @@ def waist_row(rgba):
     if count < 2 or stats[1:, cv2.CC_STAT_AREA].max() < 50:
         raise ValueError('red waist landmark not identifiable in original source')
     largest = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
-    rows = np.where(labels == largest)[0]
-    return float(np.quantile(rows, .20))
+    return np.where(labels == largest)
+
+
+def waist_row(rgba):
+    return float(np.quantile(waist_region(rgba)[0], .20))
+
+
+def waist_point(rgba):
+    rows, cols = waist_region(rgba)
+    return float(np.median(cols)), float(np.quantile(rows, .20))
+
+
+def frame_override(calibration, field, index, entry):
+    value = calibration.get(field, {}).get(str(index))
+    if value is not None and (value.get('sourceSha256') != entry['sha256'] or not value.get('evidence')):
+        raise ValueError(f'{field}: measured correction is not bound to the original frame and evidence')
+    return value
 
 
 def generate(extraction, output):
@@ -99,6 +115,8 @@ def generate(extraction, output):
     idle_back, _ = foot(idle)
     back_offset = (idle_back - torso(idle)) * calibration['videos']['idle']['scale']
     hip_offset = (foot(idle)[1] - waist_row(idle)) * calibration['videos']['idle']['scale']
+    airborne = np.array(Image.open(extraction / 'jump/0048.png').convert('RGBA'))
+    air_hip_x = (waist_point(airborne)[0] - torso(airborne)) * calibration['videos']['jump']['scale']
     report = {'status': 'DRAFT_NOT_APPROVED', 'sourcePolicy': plan['sourcePolicy'],
               'calibrationSha256': sha(CALIBRATION), 'contractSha256': sha(CONTRACT),
               'canvas': [FW, FH], 'root': [RX, RY], 'states': {}}
@@ -129,6 +147,20 @@ def generate(extraction, output):
             source = Image.open(folder / entry['file']).convert('RGBA')
             rgba = np.array(source)
             after, erased = (rgba.copy(), 0) if stem in NO_FX else clean_cell(rgba, known)
+            preserved = frame_override(calibration['videos'][stem], 'preserveAlphaFrames', index, entry)
+            if preserved:
+                after, erased = rgba.copy(), 0
+            reviewed_mask = frame_override(calibration['videos'][stem], 'alphaMasks', index, entry)
+            if reviewed_mask:
+                reviewed_path = (ROOT / reviewed_mask['path']).resolve()
+                if ROOT.resolve() not in reviewed_path.parents or sha(reviewed_path) != reviewed_mask['maskSha256']:
+                    raise ValueError('reviewed source mask path/hash differs')
+                mask = Image.open(reviewed_path)
+                if mask.mode != 'L' or mask.size != source.size:
+                    raise ValueError('reviewed source mask must be L at original dimensions')
+                if not set(np.unique(mask)) <= {0, 255}:
+                    raise ValueError('draft removal masks must be binary')
+                after[..., 3] = ((after[..., 3].astype(np.uint16) * np.asarray(mask).astype(np.uint16) + 127) // 255).astype(np.uint8)
             # Per-frame camera correction is measured from the SAME source
             # head, not from total body height (crouching changes that height).
             cache_key = hashlib.sha256((calibration['videos'][stem]['referenceFrameSha256']
@@ -140,6 +172,11 @@ def generate(extraction, output):
                 score, zoom = match_zoom(head, rgba, .65, 1.8)
                 write_json(cache_path, [score, zoom])
             scale = baseline / zoom if score >= .7 else baseline
+            measured = frame_override(calibration['videos'][stem], 'measuredFrames', index, entry)
+            if measured:
+                if not isinstance(measured.get('scale'), (float, int)) or not 0 < measured['scale'] <= 1:
+                    raise ValueError('invalid intrinsic camera scale')
+                scale = measured['scale']
             # A mask is incapable of drawing/reconstructing occluded body parts.
             removal = np.full(rgba.shape[:2], 255, dtype=np.uint8)
             removal[(rgba[..., 3] > 0) & (after[..., 3] == 0)] = 0
@@ -150,6 +187,8 @@ def generate(extraction, output):
                 Image.fromarray(removal).save(mask_path)
             back, floor = foot(after)
             root_x = torso(after) if state in REGISTERED or state in AIR else back - back_offset / scale
+            if state in AIR_ATTACKS:
+                root_x = waist_point(after)[0] - air_hip_x / scale
             root_y = ground - entry['sourceBox'][1] if state in {'BACKDASH','SPECIAL_S2','SPECIAL_S4'} else floor
             if state in HIP_REGISTERED and not (state == 'JUMP' and index < 40):
                 root_y = waist_row(after) + hip_offset / scale
@@ -174,7 +213,10 @@ def generate(extraction, output):
                 'airHipRegistration': state in HIP_REGISTERED and not (state == 'JUMP' and index < 40),
                 'removedSourcePixels': int((removal == 0).sum()),
                 'headTemplateScore': score, 'headTemplateZoom': zoom,
-                'cameraCorrectionConfirmed': score >= .7,
+                'cameraCorrectionConfirmed': measured is not None or score >= .7,
+                'measuredCameraEvidence': measured,
+                'preservedAlphaEvidence': preserved,
+                'reviewedAlphaMask': reviewed_mask,
                 'maskSha256': sha(mask_path) if (removal == 0).any() else None,
                 'nativePixelSha256': hashlib.sha256(frame.tobytes()).hexdigest()})
         durations = animation.get('durationsMs')

@@ -36,8 +36,7 @@ somente subtrativas, escala anatômica, apoio e transições revisadas. Gates e
 limites de qualidade permanecem ativos.
 
 As seleções alternativas estão em p12-video-bridge-candidates.json como
-rascunho separado. Elas NÃO alteram o plano ativo, os assets de runtime ou
-as aprovações. Precisam de inspeção, calibração, máscaras, SR, integração e
+rascunho separado. Elas foram aplicadas ao plano de prévia, ainda como DRAFT. NÃO alteram assets de runtime ou aprovações. Precisam de inspeção, calibração, máscaras, SR, integração e
 auditoria. Elas não resolvem automaticamente os 30 estados pendentes.
 
 ## Retomada necessária
@@ -52,19 +51,14 @@ Se o ambiente for restaurado, preservar esses caches. Se estiverem ausentes,
 recuperar os 33 MP4s do Drive pelos IDs de p12-drive-inventory.json, conferir
 SHA dos vídeos e reextrair. Nunca inventar hashes ou aprovações.
 
-1. Corrigir o recorte de fundo de derruba_levanta.mp4, frame 59. O MP4 original
-   contém a cabeça intacta; o keyer a descartou ao separar uma região ligada
-   por pescoço esverdeado. A correção AINDA NÃO foi implementada. ROI original
-   [272,285,375,401] no frame RGB 1280x720. Qualquer restauração deve copiar
-   somente RGB do próprio frame, ligada ao SHA do MP4 e ao SHA dos pixels
-   RGB decodificados. Não preencher membros nem pintar novas cores. Conferir
-   que os demais frames e os outros 32 vídeos não mudaram e atualizar a
-   proveniência durable antes de consumir o frame corrigido.
-2. Revisar as seleções alternativas e impedir falsos matches de cabeça:
-   defendeCima 34..46 e dash 28..55 têm o template confundido por antebraços/
-   rotação. Medir cabeça verdadeira e vincular evidências aos hashes.
-3. Em ataques aéreos, registrar a pelve por landmark do cinto vermelho;
-   o centro da silhueta se desloca com um chute e não é pivô corporal confiável.
+1. Recorte de derruba_levanta frame 59 corrigido em 41c7f882; evidência em
+   p12-video-matte-review/. Recupera somente alpha de pixels originais.
+   Agora o normalizador preserva esse alpha revisado em vez de apagá-lo de novo.
+2. Correções medidas para dash/defendeCima vinculadas aos hashes dos frames;
+   revisão do próximo lote permanece obrigatória.
+3. Ataques aéreos agora usam a faixa vermelha como referência horizontal
+   intrínseca. Teste comprova que estender uma perna não desloca esse pivô.
+   Pulos/defesas já integrados não mudaram.
 4. Resolver os críticos de cadência ainda encontrados em DASH, HIT_AIR,
    JUMP_LIGHT, JUMP_HEAVY_DOWN, SPECIAL_ENERGY, SUPER_WAVE e ULTRA_BEAM.
    Não reduzir limites para fazê-los passar.
@@ -84,3 +78,14 @@ Fontes: https://drive.google.com/drive/folders/1gk8gEgCZaAm1AXkwHheqTfuUpfY-lFi-
 Prévia: docs/art/p12-video-normalized-review/
 Relatório: docs/art/p12-video-batch-report.json
 CI: https://github.com/dggokb/Game-luta-gpt/actions/runs/38083873560
+
+## Retomada de 2026-10-11
+
+Os 33 MP4s foram recuperados novamente e conferidos pelo SHA-256. A extração
+está sendo reconstruída. Correções do normalizador e seleções compostas ficam
+salvas antes da próxima rodada de auditoria. O runtime continua com 12/42.
+GETUP usa o frame 59 recuperado; JUMP_MEDIUM evita o frame 58 borrado;
+JUMP_HEAVY usa 67/68, cujos efeitos de solo ainda precisam de máscara revisada.
+CROUCH_LIGHT e CROUCH_MEDIUM precisam de nova medição da cabeça contra a
+referência agachada, pois o template de pé falhou. Não aprovar nem rodar SR
+nesses estados antes de resolver a diferença real de escala.

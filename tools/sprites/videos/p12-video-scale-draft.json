@@ -209,7 +209,149 @@
         69
       ],
       "referenceFrameSha256": "9c8ea714b895fb9988688ff387267c0e202798a5c28c8147b26219452f4afa62",
-      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy",
+      "measuredFrames": {
+        "28": {
+          "sourceSha256": "ea1326d47a52b737e7ccdfd813073814e49d336fff99704f9bcf5a2bc43b4734",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "29": {
+          "sourceSha256": "5516c3c9cea13ed4587bc5120dad5cd615a620d2d808fb47be41a5c539b703b4",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "30": {
+          "sourceSha256": "fab8d14ce65b2b26ef24544ef03f35d1500030a3598c21d2900da3461309dc22",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "31": {
+          "sourceSha256": "3d92da7a73ccb6b763e7631fa0f0c89bd924de9ea650dc28857759e78dc58e76",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "32": {
+          "sourceSha256": "97dc80adf7de0ea5ef084b5445f6c95e55dc3a0eb6644fd7bd4ef23478eb62b5",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "33": {
+          "sourceSha256": "0bf02099ab0d46a89384aed4c7c1a8e92f8f113ecbf3c77a4c99540bdb9f5051",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "34": {
+          "sourceSha256": "3826a9e5c7abece42b32a3cf24ce987e44fe3dba2a2e071ea581f56185a5086a",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "35": {
+          "sourceSha256": "ac42fe84e67511ddc483f65b7ac7f72e327d3e3cab5aa421e1ae419be68bea60",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "36": {
+          "sourceSha256": "2584ad7bf7eeafb4654337a34c596f33ca25d509fd6ea80c75fd7f6cd3530ad0",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "37": {
+          "sourceSha256": "2284526d04f3afefb260369069e778e258ebe718006e244c5b9dc0936098507a",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "38": {
+          "sourceSha256": "dc1caca8bbe538d986c11d65305a163a9cd04a324df0fd82245b1d6b41b16973",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "39": {
+          "sourceSha256": "ba31735381f704f672b3aebbfc903e078692a2a85a32be0411f8032a5a25702e",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "40": {
+          "sourceSha256": "37aa5e7fbbb746c7206b67383de72f05496db7dac407dd6aed7f94386f228272",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "41": {
+          "sourceSha256": "a1ed7b05b3dfbdadca96655ec92f6b4a281a597f37f2dc9ae51d51e9c3c57b7a",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "42": {
+          "sourceSha256": "a794683d4f150b690843b13c2a55fa8e513509c0a9185a775c26d77bec82b416",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "43": {
+          "sourceSha256": "a0d87faa064c1910873b56f7d40b1df8f1871598c88c3a1a0c91a5bf5bcc5a34",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "44": {
+          "sourceSha256": "63fb948c4bf922bc3e3d46dc04c646c50796815519c817e3c111cd6f2554b171",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "45": {
+          "sourceSha256": "366a4701a3295c78fc20fe148732df10d261e26b2b0033b501f7f102d23bcfe1",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "46": {
+          "sourceSha256": "b6490d357e496b88bf9d430d0715321d1d7716226d7b209e1634ca3185d41afd",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "47": {
+          "sourceSha256": "75d3ef0a868115cfc99ed28d4257579a9ed220ed51b357fbb245f08d156e9837",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "48": {
+          "sourceSha256": "796e3d95ae6bbe9ea1e951c793181c1df709ca04c5ac121328964fffc45b5699",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "49": {
+          "sourceSha256": "6dbc0a9c8572e526ff205620111a65259586b5a90d7ff877b78a9229f033c0d1",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "50": {
+          "sourceSha256": "bb5bea7f95e2ee338f77375ee4271e9832845d94d583086feec737efe89b108c",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "51": {
+          "sourceSha256": "097c6a40802b82bce13e599d7077889164bb5c98cd741c5f55c79182e0d465ae",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "52": {
+          "sourceSha256": "b575c04583117dd9ec405e022d67d7b8449408c07693bcfe83c74030a409945a",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "53": {
+          "sourceSha256": "5b568c21b221a9d60bb418e940c0ad3391e7f254a97a0b9873997f90e3f9d56c",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "54": {
+          "sourceSha256": "cf71e1a64f1ea367dd47e39334c9ef87e6d62278818ade667f5a818cee9e471d",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        },
+        "55": {
+          "sourceSha256": "4706fc951c16c736c1f4d8304a8d37ff733c24883790b2d8a88243e7272fe5df",
+          "scale": 0.45149999999999996,
+          "evidence": "Original dash frame 34 hair-to-chin is 75 px, box [425,5,505,80]. Stable video camera; raised arms produce false head-template zoom matches."
+        }
+      }
     },
     "defendeBaixo": {
       "scale": 0.3269,
@@ -243,7 +385,74 @@
         69
       ],
       "referenceFrameSha256": "4e8386f032334486ff43df234fbcb8feba452ea5b3647e489af8d7b3e2ae3cbd",
-      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy",
+      "measuredFrames": {
+        "34": {
+          "sourceSha256": "f794be866dc21fe4c5300452fbf65014c9b460048ea32e4b350e19290439e0f0",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "35": {
+          "sourceSha256": "baf26ffd4329c33ca241c5064109baaefb75328c3a6979d03179e0958c746a2f",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "36": {
+          "sourceSha256": "ff63e17fbcc65d05e1527ee0b5ebcc70a8b14df5e2b2fdf816b10c203f2eca91",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "37": {
+          "sourceSha256": "7a52f421143dc8f6e3d8fddc365293d5ae338926ccfca98c630c206028dccedd",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "38": {
+          "sourceSha256": "c2c2f21083365caec7e854b67a086033e0f11932d42dbee6bd6f2b42f2ff0854",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "39": {
+          "sourceSha256": "56310d7465b97275d6a26b25a1482156ee1137ee937aa604acc9550d30b83241",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "40": {
+          "sourceSha256": "1d5827227a6b37c884dcc827c5fa000848a2b8a0ff8fe58fd3ad1153928b3bde",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "41": {
+          "sourceSha256": "a8ab4ae755c8277f17f24c02db816a23fd84d331a769365ec8665128c5c4e755",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "42": {
+          "sourceSha256": "4c9ecb38fbe30948adba59b6946434856f9d07789763b56a5afca35fca60dfc9",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "43": {
+          "sourceSha256": "a868698d4ecfb7cebcbef8ceb16e85e3ed2a6494aa14dfa34da93d949245cf60",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "44": {
+          "sourceSha256": "07b00756ae92ba9b07262e9017f89e0e7f16deab73caf565b02b027700b82afa",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "45": {
+          "sourceSha256": "1eccc77f1dacbe75acc65ba9bc1b9c15b63dac2d1ccb997b05ea309cf628d528",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        },
+        "46": {
+          "sourceSha256": "5c555a20ee33df5576a422d0a17f3bc406126484ab770ae6c25ef58b76de1c0c",
+          "scale": 0.53977,
+          "evidence": "Stable original-video camera and intrinsic head calibration. Crossing forearms and head rotation produce false head-template zoom matches."
+        }
+      }
     },
     "defesaPulo": {
       "scale": 0.4462,
@@ -294,7 +503,13 @@
         69
       ],
       "referenceFrameSha256": "5148c28b721a21dc7d25c5a90d0686d06f4adba94ee45bd574665c9552b017c2",
-      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy"
+      "manualScaleStatus": "DRAFT_NOT_APPROVED; hair-to-chin landmark requires confirmation against canonical anatomy",
+      "preserveAlphaFrames": {
+        "59": {
+          "sourceSha256": "d71876e19f63705062ebf89cd183b1c8f0ded3697111f6d863368f96c8096e3a",
+          "evidence": "Original decoded video and committed getup-frame59-before-after.jpg show the recovered head/chest/feet. No embedded effect or opponent in this frame; the neutral-palette cleanup incorrectly removes green skin again. Preserve the reviewed extraction alpha."
+        }
+      }
     },
     "frente": {
       "scale": 0.385,
