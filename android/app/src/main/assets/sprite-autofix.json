@@ -395,6 +395,58 @@
         "guard_vs_idle_foot_delta_after_px": 0,
         "runtime_android_capture": "PENDING"
       }
+    },
+    {
+      "character": "p02",
+      "atlas": "p02_idle",
+      "state": "IDLE",
+      "frames": [
+        [
+          51,
+          1,
+          2,
+          0
+        ],
+        [
+          52,
+          1,
+          2,
+          0
+        ],
+        [
+          53,
+          1,
+          2,
+          0
+        ],
+        [
+          54,
+          1,
+          2,
+          0
+        ],
+        [
+          55,
+          1,
+          2,
+          0
+        ]
+      ],
+      "evidence": {
+        "source_video": "Google Drive animations/p02/idle.mp4 (visual review only; no runtime source change)",
+        "source_atlas": "android/app/src/main/res/drawable-nodpi/p02_idle.png",
+        "source_diagnostic_run": 38149617837,
+        "geometry": "56 real packed RGBA frames, 332x445 cells, atlas pixelScale=2; source HD Real-ESRGAN AnimeVideo-v3 already integrated",
+        "method": "Circular five-frame median of max-IoU contact-foot masks versus frame 0; per-frame integral dx. Only frames 51-55 corrected; preserve breathing vertical movement.",
+        "feet_range_px_before": 2,
+        "feet_range_px_after": 0,
+        "feet_seam_px_before": 2,
+        "feet_seam_px_after": 0,
+        "loop_foot_iou_before": 0.86307,
+        "loop_foot_iou_after": 0.95645,
+        "graphical_reconstruction": "none; reuse approved existing 2x SR atlas",
+        "approval": "EXPERIMENTAL_P02_IDLE_ONLY"
+      }
     }
   ]
 }
