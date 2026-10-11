@@ -2,7 +2,7 @@
   "id": "p05_hit_stand",
   "javaName": "P05_HIT_STAND",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_hit_stand_video_normalized.png",
+  "source": "art/sprites/source/p05_hit_stand_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_hit_stand.png",
   "report": "tools/sprites/reports/p05_hit_stand.report.json",
   "preview": "android/app/build/sprite-review/p05_hit_stand-import.png",
@@ -24,5 +24,12 @@
     "pe_no_chao": true,
     "limpar_chao": true
   },
-  "rootX": 134
+  "rootX": 268,
+  "sourceReferences": [
+    "art/sprites/source/p05_hit_stand_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

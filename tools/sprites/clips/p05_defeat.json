@@ -2,13 +2,13 @@
   "id": "p05_defeat",
   "javaName": "P05_DEFEAT",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_defeat_video_normalized.png",
+  "source": "art/sprites/source/p05_defeat_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_defeat.png",
   "report": "tools/sprites/reports/p05_defeat.report.json",
   "preview": "android/app/build/sprite-review/p05_defeat-import.png",
   "expectedFrames": 33,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 7,
   "rootMode": "authored",
   "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -22,6 +22,12 @@
     "colunas": 11,
     "limpar_chao": true
   },
-  "frameWidth": 320,
-  "rootX": 186
+  "frameWidth": 640,
+  "rootX": 372,
+  "sourceReferences": [
+    "art/sprites/source/p05_defeat_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

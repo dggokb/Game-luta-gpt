@@ -664,256 +664,256 @@ final class GeneratedSpriteLayouts {
     static final int P04_THROW_ROOT_Y = 435;
     static final int P04_THROW_FRAME_COUNT = 9;
 
-    static final int P04_ULTRA_BEAM_FRAME_WIDTH = 527;
-    static final int P04_ULTRA_BEAM_FRAME_HEIGHT = 553;
-    static final int P04_ULTRA_BEAM_ROOT_X = 173;
-    static final int P04_ULTRA_BEAM_ROOT_Y = 532;
+    static final int P04_ULTRA_BEAM_FRAME_WIDTH = 271;
+    static final int P04_ULTRA_BEAM_FRAME_HEIGHT = 284;
+    static final int P04_ULTRA_BEAM_ROOT_X = 90;
+    static final int P04_ULTRA_BEAM_ROOT_Y = 270;
     static final int P04_ULTRA_BEAM_FRAME_COUNT = 9;
 
-    static final int P04_VICTORY_FRAME_WIDTH = 366;
-    static final int P04_VICTORY_FRAME_HEIGHT = 662;
-    static final int P04_VICTORY_ROOT_X = 161;
-    static final int P04_VICTORY_ROOT_Y = 633;
+    static final int P04_VICTORY_FRAME_WIDTH = 190;
+    static final int P04_VICTORY_FRAME_HEIGHT = 338;
+    static final int P04_VICTORY_ROOT_X = 84;
+    static final int P04_VICTORY_ROOT_Y = 320;
     static final int P04_VICTORY_FRAME_COUNT = 33;
 
-    static final int P04_WALK_BACK_FRAME_WIDTH = 321;
-    static final int P04_WALK_BACK_FRAME_HEIGHT = 477;
-    static final int P04_WALK_BACK_ROOT_X = 159;
-    static final int P04_WALK_BACK_ROOT_Y = 461;
+    static final int P04_WALK_BACK_FRAME_WIDTH = 168;
+    static final int P04_WALK_BACK_FRAME_HEIGHT = 246;
+    static final int P04_WALK_BACK_ROOT_X = 83;
+    static final int P04_WALK_BACK_ROOT_Y = 234;
     static final int P04_WALK_BACK_FRAME_COUNT = 27;
 
-    static final int P04_WALK_FORWARD_FRAME_WIDTH = 332;
-    static final int P04_WALK_FORWARD_FRAME_HEIGHT = 457;
-    static final int P04_WALK_FORWARD_ROOT_X = 161;
-    static final int P04_WALK_FORWARD_ROOT_Y = 442;
+    static final int P04_WALK_FORWARD_FRAME_WIDTH = 173;
+    static final int P04_WALK_FORWARD_FRAME_HEIGHT = 236;
+    static final int P04_WALK_FORWARD_ROOT_X = 84;
+    static final int P04_WALK_FORWARD_ROOT_Y = 225;
     static final int P04_WALK_FORWARD_FRAME_COUNT = 28;
 
-    static final int P05_BACKDASH_FRAME_WIDTH = 232;
-    static final int P05_BACKDASH_FRAME_HEIGHT = 265;
-    static final int P05_BACKDASH_ROOT_X = 120;
-    static final int P05_BACKDASH_ROOT_Y = 254;
+    static final int P05_BACKDASH_FRAME_WIDTH = 449;
+    static final int P05_BACKDASH_FRAME_HEIGHT = 515;
+    static final int P05_BACKDASH_ROOT_X = 233;
+    static final int P05_BACKDASH_ROOT_Y = 500;
     static final int P05_BACKDASH_FRAME_COUNT = 10;
 
-    static final int P05_CROUCH_FRAME_WIDTH = 225;
-    static final int P05_CROUCH_FRAME_HEIGHT = 230;
-    static final int P05_CROUCH_ROOT_X = 102;
-    static final int P05_CROUCH_ROOT_Y = 219;
+    static final int P05_CROUCH_FRAME_WIDTH = 434;
+    static final int P05_CROUCH_FRAME_HEIGHT = 446;
+    static final int P05_CROUCH_ROOT_X = 196;
+    static final int P05_CROUCH_ROOT_Y = 431;
     static final int P05_CROUCH_FRAME_COUNT = 8;
 
-    static final int P05_CROUCH_HEAVY_FRAME_WIDTH = 256;
-    static final int P05_CROUCH_HEAVY_FRAME_HEIGHT = 341;
-    static final int P05_CROUCH_HEAVY_ROOT_X = 142;
-    static final int P05_CROUCH_HEAVY_ROOT_Y = 329;
+    static final int P05_CROUCH_HEAVY_FRAME_WIDTH = 497;
+    static final int P05_CROUCH_HEAVY_FRAME_HEIGHT = 667;
+    static final int P05_CROUCH_HEAVY_ROOT_X = 276;
+    static final int P05_CROUCH_HEAVY_ROOT_Y = 650;
     static final int P05_CROUCH_HEAVY_FRAME_COUNT = 12;
 
-    static final int P05_CROUCH_LIGHT_FRAME_WIDTH = 276;
-    static final int P05_CROUCH_LIGHT_FRAME_HEIGHT = 233;
-    static final int P05_CROUCH_LIGHT_ROOT_X = 112;
-    static final int P05_CROUCH_LIGHT_ROOT_Y = 222;
+    static final int P05_CROUCH_LIGHT_FRAME_WIDTH = 538;
+    static final int P05_CROUCH_LIGHT_FRAME_HEIGHT = 452;
+    static final int P05_CROUCH_LIGHT_ROOT_X = 217;
+    static final int P05_CROUCH_LIGHT_ROOT_Y = 437;
     static final int P05_CROUCH_LIGHT_FRAME_COUNT = 11;
 
-    static final int P05_CROUCH_MEDIUM_FRAME_WIDTH = 333;
-    static final int P05_CROUCH_MEDIUM_FRAME_HEIGHT = 175;
-    static final int P05_CROUCH_MEDIUM_ROOT_X = 182;
-    static final int P05_CROUCH_MEDIUM_ROOT_Y = 162;
+    static final int P05_CROUCH_MEDIUM_FRAME_WIDTH = 654;
+    static final int P05_CROUCH_MEDIUM_FRAME_HEIGHT = 334;
+    static final int P05_CROUCH_MEDIUM_ROOT_X = 359;
+    static final int P05_CROUCH_MEDIUM_ROOT_Y = 316;
     static final int P05_CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int P05_DASH_FRAME_WIDTH = 213;
-    static final int P05_DASH_FRAME_HEIGHT = 165;
-    static final int P05_DASH_ROOT_X = 112;
-    static final int P05_DASH_ROOT_Y = 154;
+    static final int P05_DASH_FRAME_WIDTH = 411;
+    static final int P05_DASH_FRAME_HEIGHT = 315;
+    static final int P05_DASH_ROOT_X = 216;
+    static final int P05_DASH_ROOT_Y = 300;
     static final int P05_DASH_FRAME_COUNT = 6;
 
-    static final int P05_DEFEAT_FRAME_WIDTH = 297;
-    static final int P05_DEFEAT_FRAME_HEIGHT = 234;
-    static final int P05_DEFEAT_ROOT_X = 175;
-    static final int P05_DEFEAT_ROOT_Y = 220;
+    static final int P05_DEFEAT_FRAME_WIDTH = 579;
+    static final int P05_DEFEAT_FRAME_HEIGHT = 453;
+    static final int P05_DEFEAT_ROOT_X = 342;
+    static final int P05_DEFEAT_ROOT_Y = 433;
     static final int P05_DEFEAT_FRAME_COUNT = 33;
 
-    static final int P05_DEFENSE_AIR_FRAME_WIDTH = 212;
-    static final int P05_DEFENSE_AIR_FRAME_HEIGHT = 262;
-    static final int P05_DEFENSE_AIR_ROOT_X = 120;
-    static final int P05_DEFENSE_AIR_ROOT_Y = 250;
+    static final int P05_DEFENSE_AIR_FRAME_WIDTH = 409;
+    static final int P05_DEFENSE_AIR_FRAME_HEIGHT = 510;
+    static final int P05_DEFENSE_AIR_ROOT_X = 232;
+    static final int P05_DEFENSE_AIR_ROOT_Y = 493;
     static final int P05_DEFENSE_AIR_FRAME_COUNT = 7;
 
-    static final int P05_DEFENSE_CROUCH_FRAME_WIDTH = 228;
-    static final int P05_DEFENSE_CROUCH_FRAME_HEIGHT = 163;
-    static final int P05_DEFENSE_CROUCH_ROOT_X = 114;
-    static final int P05_DEFENSE_CROUCH_ROOT_Y = 152;
+    static final int P05_DEFENSE_CROUCH_FRAME_WIDTH = 441;
+    static final int P05_DEFENSE_CROUCH_FRAME_HEIGHT = 312;
+    static final int P05_DEFENSE_CROUCH_ROOT_X = 220;
+    static final int P05_DEFENSE_CROUCH_ROOT_Y = 297;
     static final int P05_DEFENSE_CROUCH_FRAME_COUNT = 7;
 
-    static final int P05_DEFENSE_STAND_FRAME_WIDTH = 246;
-    static final int P05_DEFENSE_STAND_FRAME_HEIGHT = 224;
-    static final int P05_DEFENSE_STAND_ROOT_X = 115;
-    static final int P05_DEFENSE_STAND_ROOT_Y = 213;
+    static final int P05_DEFENSE_STAND_FRAME_WIDTH = 478;
+    static final int P05_DEFENSE_STAND_FRAME_HEIGHT = 434;
+    static final int P05_DEFENSE_STAND_ROOT_X = 223;
+    static final int P05_DEFENSE_STAND_ROOT_Y = 419;
     static final int P05_DEFENSE_STAND_FRAME_COUNT = 8;
 
-    static final int P05_FALL_FRAME_WIDTH = 207;
-    static final int P05_FALL_FRAME_HEIGHT = 313;
-    static final int P05_FALL_ROOT_X = 117;
-    static final int P05_FALL_ROOT_Y = 302;
+    static final int P05_FALL_FRAME_WIDTH = 399;
+    static final int P05_FALL_FRAME_HEIGHT = 612;
+    static final int P05_FALL_ROOT_X = 226;
+    static final int P05_FALL_ROOT_Y = 597;
     static final int P05_FALL_FRAME_COUNT = 6;
 
-    static final int P05_FALL_DOWN_FRAME_WIDTH = 327;
-    static final int P05_FALL_DOWN_FRAME_HEIGHT = 271;
-    static final int P05_FALL_DOWN_ROOT_X = 125;
-    static final int P05_FALL_DOWN_ROOT_Y = 259;
+    static final int P05_FALL_DOWN_FRAME_WIDTH = 638;
+    static final int P05_FALL_DOWN_FRAME_HEIGHT = 527;
+    static final int P05_FALL_DOWN_ROOT_X = 242;
+    static final int P05_FALL_DOWN_ROOT_Y = 510;
     static final int P05_FALL_DOWN_FRAME_COUNT = 11;
 
-    static final int P05_GETUP_FRAME_WIDTH = 260;
-    static final int P05_GETUP_FRAME_HEIGHT = 285;
-    static final int P05_GETUP_ROOT_X = 126;
-    static final int P05_GETUP_ROOT_Y = 273;
+    static final int P05_GETUP_FRAME_WIDTH = 506;
+    static final int P05_GETUP_FRAME_HEIGHT = 555;
+    static final int P05_GETUP_ROOT_X = 245;
+    static final int P05_GETUP_ROOT_Y = 538;
     static final int P05_GETUP_FRAME_COUNT = 12;
 
-    static final int P05_HEAVY_STRAIGHT_FRAME_WIDTH = 337;
-    static final int P05_HEAVY_STRAIGHT_FRAME_HEIGHT = 226;
-    static final int P05_HEAVY_STRAIGHT_ROOT_X = 131;
-    static final int P05_HEAVY_STRAIGHT_ROOT_Y = 214;
+    static final int P05_HEAVY_STRAIGHT_FRAME_WIDTH = 660;
+    static final int P05_HEAVY_STRAIGHT_FRAME_HEIGHT = 438;
+    static final int P05_HEAVY_STRAIGHT_ROOT_X = 255;
+    static final int P05_HEAVY_STRAIGHT_ROOT_Y = 421;
     static final int P05_HEAVY_STRAIGHT_FRAME_COUNT = 23;
 
-    static final int P05_HIT_AIR_FRAME_WIDTH = 258;
-    static final int P05_HIT_AIR_FRAME_HEIGHT = 293;
-    static final int P05_HIT_AIR_ROOT_X = 139;
-    static final int P05_HIT_AIR_ROOT_Y = 281;
+    static final int P05_HIT_AIR_FRAME_WIDTH = 502;
+    static final int P05_HIT_AIR_FRAME_HEIGHT = 572;
+    static final int P05_HIT_AIR_ROOT_X = 271;
+    static final int P05_HIT_AIR_ROOT_Y = 555;
     static final int P05_HIT_AIR_FRAME_COUNT = 4;
 
-    static final int P05_HIT_CROUCH_FRAME_WIDTH = 283;
-    static final int P05_HIT_CROUCH_FRAME_HEIGHT = 186;
-    static final int P05_HIT_CROUCH_ROOT_X = 130;
-    static final int P05_HIT_CROUCH_ROOT_Y = 175;
+    static final int P05_HIT_CROUCH_FRAME_WIDTH = 552;
+    static final int P05_HIT_CROUCH_FRAME_HEIGHT = 362;
+    static final int P05_HIT_CROUCH_ROOT_X = 253;
+    static final int P05_HIT_CROUCH_ROOT_Y = 347;
     static final int P05_HIT_CROUCH_FRAME_COUNT = 9;
 
-    static final int P05_HIT_STAND_FRAME_WIDTH = 229;
-    static final int P05_HIT_STAND_FRAME_HEIGHT = 241;
-    static final int P05_HIT_STAND_ROOT_X = 121;
-    static final int P05_HIT_STAND_ROOT_Y = 230;
+    static final int P05_HIT_STAND_FRAME_WIDTH = 443;
+    static final int P05_HIT_STAND_FRAME_HEIGHT = 468;
+    static final int P05_HIT_STAND_ROOT_X = 235;
+    static final int P05_HIT_STAND_ROOT_Y = 453;
     static final int P05_HIT_STAND_FRAME_COUNT = 9;
 
-    static final int P05_IDLE_FRAME_WIDTH = 209;
-    static final int P05_IDLE_FRAME_HEIGHT = 232;
-    static final int P05_IDLE_ROOT_X = 110;
-    static final int P05_IDLE_ROOT_Y = 223;
+    static final int P05_IDLE_FRAME_WIDTH = 403;
+    static final int P05_IDLE_FRAME_HEIGHT = 454;
+    static final int P05_IDLE_ROOT_X = 213;
+    static final int P05_IDLE_ROOT_Y = 439;
     static final int P05_IDLE_FRAME_COUNT = 44;
 
-    static final int P05_INTRO_FRAME_WIDTH = 203;
-    static final int P05_INTRO_FRAME_HEIGHT = 229;
-    static final int P05_INTRO_ROOT_X = 106;
-    static final int P05_INTRO_ROOT_Y = 216;
+    static final int P05_INTRO_FRAME_WIDTH = 391;
+    static final int P05_INTRO_FRAME_HEIGHT = 444;
+    static final int P05_INTRO_ROOT_X = 205;
+    static final int P05_INTRO_ROOT_Y = 425;
     static final int P05_INTRO_FRAME_COUNT = 27;
 
-    static final int P05_JUMP_FRAME_WIDTH = 192;
-    static final int P05_JUMP_FRAME_HEIGHT = 276;
-    static final int P05_JUMP_ROOT_X = 107;
-    static final int P05_JUMP_ROOT_Y = 265;
+    static final int P05_JUMP_FRAME_WIDTH = 370;
+    static final int P05_JUMP_FRAME_HEIGHT = 538;
+    static final int P05_JUMP_ROOT_X = 207;
+    static final int P05_JUMP_ROOT_Y = 523;
     static final int P05_JUMP_FRAME_COUNT = 6;
 
-    static final int P05_JUMP_HEAVY_FRAME_WIDTH = 413;
-    static final int P05_JUMP_HEAVY_FRAME_HEIGHT = 271;
-    static final int P05_JUMP_HEAVY_ROOT_X = 170;
-    static final int P05_JUMP_HEAVY_ROOT_Y = 259;
+    static final int P05_JUMP_HEAVY_FRAME_WIDTH = 812;
+    static final int P05_JUMP_HEAVY_FRAME_HEIGHT = 532;
+    static final int P05_JUMP_HEAVY_ROOT_X = 333;
+    static final int P05_JUMP_HEAVY_ROOT_Y = 515;
     static final int P05_JUMP_HEAVY_FRAME_COUNT = 7;
 
-    static final int P05_JUMP_LIGHT_FRAME_WIDTH = 270;
-    static final int P05_JUMP_LIGHT_FRAME_HEIGHT = 283;
-    static final int P05_JUMP_LIGHT_ROOT_X = 130;
-    static final int P05_JUMP_LIGHT_ROOT_Y = 271;
+    static final int P05_JUMP_LIGHT_FRAME_WIDTH = 526;
+    static final int P05_JUMP_LIGHT_FRAME_HEIGHT = 551;
+    static final int P05_JUMP_LIGHT_ROOT_X = 253;
+    static final int P05_JUMP_LIGHT_ROOT_Y = 534;
     static final int P05_JUMP_LIGHT_FRAME_COUNT = 7;
 
-    static final int P05_JUMP_MEDIUM_FRAME_WIDTH = 377;
-    static final int P05_JUMP_MEDIUM_FRAME_HEIGHT = 282;
-    static final int P05_JUMP_MEDIUM_ROOT_X = 122;
-    static final int P05_JUMP_MEDIUM_ROOT_Y = 271;
+    static final int P05_JUMP_MEDIUM_FRAME_WIDTH = 744;
+    static final int P05_JUMP_MEDIUM_FRAME_HEIGHT = 549;
+    static final int P05_JUMP_MEDIUM_ROOT_X = 237;
+    static final int P05_JUMP_MEDIUM_ROOT_Y = 534;
     static final int P05_JUMP_MEDIUM_FRAME_COUNT = 7;
 
-    static final int P05_LAND_FRAME_WIDTH = 211;
-    static final int P05_LAND_FRAME_HEIGHT = 293;
-    static final int P05_LAND_ROOT_X = 99;
-    static final int P05_LAND_ROOT_Y = 282;
+    static final int P05_LAND_FRAME_WIDTH = 408;
+    static final int P05_LAND_FRAME_HEIGHT = 572;
+    static final int P05_LAND_ROOT_X = 191;
+    static final int P05_LAND_ROOT_Y = 557;
     static final int P05_LAND_FRAME_COUNT = 4;
 
-    static final int P05_LIGHT_JAB_FRAME_WIDTH = 247;
-    static final int P05_LIGHT_JAB_FRAME_HEIGHT = 234;
-    static final int P05_LIGHT_JAB_ROOT_X = 102;
-    static final int P05_LIGHT_JAB_ROOT_Y = 222;
+    static final int P05_LIGHT_JAB_FRAME_WIDTH = 479;
+    static final int P05_LIGHT_JAB_FRAME_HEIGHT = 454;
+    static final int P05_LIGHT_JAB_ROOT_X = 197;
+    static final int P05_LIGHT_JAB_ROOT_Y = 437;
     static final int P05_LIGHT_JAB_FRAME_COUNT = 11;
 
-    static final int P05_MEDIUM_KICK_FRAME_WIDTH = 293;
-    static final int P05_MEDIUM_KICK_FRAME_HEIGHT = 233;
-    static final int P05_MEDIUM_KICK_ROOT_X = 91;
-    static final int P05_MEDIUM_KICK_ROOT_Y = 222;
+    static final int P05_MEDIUM_KICK_FRAME_WIDTH = 576;
+    static final int P05_MEDIUM_KICK_FRAME_HEIGHT = 451;
+    static final int P05_MEDIUM_KICK_ROOT_X = 175;
+    static final int P05_MEDIUM_KICK_ROOT_Y = 436;
     static final int P05_MEDIUM_KICK_FRAME_COUNT = 14;
 
-    static final int P05_RISE_FRAME_WIDTH = 232;
-    static final int P05_RISE_FRAME_HEIGHT = 229;
-    static final int P05_RISE_ROOT_X = 114;
-    static final int P05_RISE_ROOT_Y = 218;
+    static final int P05_RISE_FRAME_WIDTH = 449;
+    static final int P05_RISE_FRAME_HEIGHT = 444;
+    static final int P05_RISE_ROOT_X = 220;
+    static final int P05_RISE_ROOT_Y = 429;
     static final int P05_RISE_FRAME_COUNT = 6;
 
-    static final int P05_SPECIAL_ENERGY_FRAME_WIDTH = 254;
-    static final int P05_SPECIAL_ENERGY_FRAME_HEIGHT = 220;
-    static final int P05_SPECIAL_ENERGY_ROOT_X = 106;
-    static final int P05_SPECIAL_ENERGY_ROOT_Y = 209;
+    static final int P05_SPECIAL_ENERGY_FRAME_WIDTH = 494;
+    static final int P05_SPECIAL_ENERGY_FRAME_HEIGHT = 425;
+    static final int P05_SPECIAL_ENERGY_ROOT_X = 205;
+    static final int P05_SPECIAL_ENERGY_ROOT_Y = 410;
     static final int P05_SPECIAL_ENERGY_FRAME_COUNT = 11;
 
-    static final int P05_SPECIAL_S2_FRAME_WIDTH = 252;
-    static final int P05_SPECIAL_S2_FRAME_HEIGHT = 212;
-    static final int P05_SPECIAL_S2_ROOT_X = 102;
-    static final int P05_SPECIAL_S2_ROOT_Y = 202;
+    static final int P05_SPECIAL_S2_FRAME_WIDTH = 490;
+    static final int P05_SPECIAL_S2_FRAME_HEIGHT = 412;
+    static final int P05_SPECIAL_S2_ROOT_X = 197;
+    static final int P05_SPECIAL_S2_ROOT_Y = 397;
     static final int P05_SPECIAL_S2_FRAME_COUNT = 20;
 
-    static final int P05_SPECIAL_S3_FRAME_WIDTH = 366;
-    static final int P05_SPECIAL_S3_FRAME_HEIGHT = 231;
-    static final int P05_SPECIAL_S3_ROOT_X = 145;
-    static final int P05_SPECIAL_S3_ROOT_Y = 218;
+    static final int P05_SPECIAL_S3_FRAME_WIDTH = 718;
+    static final int P05_SPECIAL_S3_FRAME_HEIGHT = 448;
+    static final int P05_SPECIAL_S3_ROOT_X = 283;
+    static final int P05_SPECIAL_S3_ROOT_Y = 429;
     static final int P05_SPECIAL_S3_FRAME_COUNT = 21;
 
-    static final int P05_SPECIAL_S4_FRAME_WIDTH = 316;
-    static final int P05_SPECIAL_S4_FRAME_HEIGHT = 209;
-    static final int P05_SPECIAL_S4_ROOT_X = 119;
-    static final int P05_SPECIAL_S4_ROOT_Y = 198;
+    static final int P05_SPECIAL_S4_FRAME_WIDTH = 621;
+    static final int P05_SPECIAL_S4_FRAME_HEIGHT = 405;
+    static final int P05_SPECIAL_S4_ROOT_X = 230;
+    static final int P05_SPECIAL_S4_ROOT_Y = 389;
     static final int P05_SPECIAL_S4_FRAME_COUNT = 20;
 
-    static final int P05_SUPER_WAVE_FRAME_WIDTH = 338;
-    static final int P05_SUPER_WAVE_FRAME_HEIGHT = 255;
-    static final int P05_SUPER_WAVE_ROOT_X = 100;
-    static final int P05_SUPER_WAVE_ROOT_Y = 244;
+    static final int P05_SUPER_WAVE_FRAME_WIDTH = 660;
+    static final int P05_SUPER_WAVE_FRAME_HEIGHT = 496;
+    static final int P05_SUPER_WAVE_ROOT_X = 192;
+    static final int P05_SUPER_WAVE_ROOT_Y = 481;
     static final int P05_SUPER_WAVE_FRAME_COUNT = 22;
 
-    static final int P05_TAUNT_FRAME_WIDTH = 253;
-    static final int P05_TAUNT_FRAME_HEIGHT = 239;
-    static final int P05_TAUNT_ROOT_X = 109;
-    static final int P05_TAUNT_ROOT_Y = 228;
+    static final int P05_TAUNT_FRAME_WIDTH = 492;
+    static final int P05_TAUNT_FRAME_HEIGHT = 464;
+    static final int P05_TAUNT_ROOT_X = 211;
+    static final int P05_TAUNT_ROOT_Y = 449;
     static final int P05_TAUNT_FRAME_COUNT = 33;
 
-    static final int P05_THROW_FRAME_WIDTH = 430;
-    static final int P05_THROW_FRAME_HEIGHT = 351;
-    static final int P05_THROW_ROOT_X = 88;
-    static final int P05_THROW_ROOT_Y = 337;
+    static final int P05_THROW_FRAME_WIDTH = 845;
+    static final int P05_THROW_FRAME_HEIGHT = 691;
+    static final int P05_THROW_ROOT_X = 169;
+    static final int P05_THROW_ROOT_Y = 671;
     static final int P05_THROW_FRAME_COUNT = 9;
 
-    static final int P05_ULTRA_BEAM_FRAME_WIDTH = 292;
-    static final int P05_ULTRA_BEAM_FRAME_HEIGHT = 253;
-    static final int P05_ULTRA_BEAM_ROOT_X = 125;
-    static final int P05_ULTRA_BEAM_ROOT_Y = 225;
+    static final int P05_ULTRA_BEAM_FRAME_WIDTH = 570;
+    static final int P05_ULTRA_BEAM_FRAME_HEIGHT = 491;
+    static final int P05_ULTRA_BEAM_ROOT_X = 243;
+    static final int P05_ULTRA_BEAM_ROOT_Y = 442;
     static final int P05_ULTRA_BEAM_FRAME_COUNT = 9;
 
-    static final int P05_VICTORY_FRAME_WIDTH = 226;
-    static final int P05_VICTORY_FRAME_HEIGHT = 269;
-    static final int P05_VICTORY_ROOT_X = 131;
-    static final int P05_VICTORY_ROOT_Y = 257;
+    static final int P05_VICTORY_FRAME_WIDTH = 438;
+    static final int P05_VICTORY_FRAME_HEIGHT = 523;
+    static final int P05_VICTORY_ROOT_X = 255;
+    static final int P05_VICTORY_ROOT_Y = 506;
     static final int P05_VICTORY_FRAME_COUNT = 33;
 
-    static final int P05_WALK_BACK_FRAME_WIDTH = 189;
-    static final int P05_WALK_BACK_FRAME_HEIGHT = 234;
-    static final int P05_WALK_BACK_ROOT_X = 106;
-    static final int P05_WALK_BACK_ROOT_Y = 222;
+    static final int P05_WALK_BACK_FRAME_WIDTH = 363;
+    static final int P05_WALK_BACK_FRAME_HEIGHT = 453;
+    static final int P05_WALK_BACK_ROOT_X = 205;
+    static final int P05_WALK_BACK_ROOT_Y = 437;
     static final int P05_WALK_BACK_FRAME_COUNT = 24;
 
-    static final int P05_WALK_FORWARD_FRAME_WIDTH = 195;
-    static final int P05_WALK_FORWARD_FRAME_HEIGHT = 221;
-    static final int P05_WALK_FORWARD_ROOT_X = 103;
-    static final int P05_WALK_FORWARD_ROOT_Y = 210;
+    static final int P05_WALK_FORWARD_FRAME_WIDTH = 376;
+    static final int P05_WALK_FORWARD_FRAME_HEIGHT = 428;
+    static final int P05_WALK_FORWARD_ROOT_X = 199;
+    static final int P05_WALK_FORWARD_ROOT_Y = 413;
     static final int P05_WALK_FORWARD_FRAME_COUNT = 22;
 
     static final int P06_BACKDASH_FRAME_WIDTH = 241;

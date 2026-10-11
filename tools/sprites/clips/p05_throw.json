@@ -2,13 +2,13 @@
   "id": "p05_throw",
   "javaName": "P05_THROW",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_throw_video_normalized.png",
+  "source": "art/sprites/source/p05_throw_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_throw.png",
   "report": "tools/sprites/reports/p05_throw.report.json",
   "preview": "android/app/build/sprite-review/p05_throw-import.png",
   "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 4,
   "rootMode": "authored",
   "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -23,8 +23,12 @@
     "colunas": 9,
     "limpar_chao": true
   },
-  "frameWidth": 448,
-  "frameHeight": 384,
-  "rootX": 97,
-  "rootY": 366
+  "frameWidth": 896,
+  "frameHeight": 768,
+  "rootX": 194,
+  "rootY": 732,
+  "sourceReferences": [
+    "art/sprites/source/p05_throw_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

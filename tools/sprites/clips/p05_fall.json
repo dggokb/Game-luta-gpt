@@ -2,7 +2,7 @@
   "id": "p05_fall",
   "javaName": "P05_FALL",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_fall_video_normalized.png",
+  "source": "art/sprites/source/p05_fall_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_fall.png",
   "report": "tools/sprites/reports/p05_fall.report.json",
   "preview": "android/app/build/sprite-review/p05_fall-import.png",
@@ -23,8 +23,12 @@
     "colunas": 6,
     "pe_no_chao": true
   },
-  "frameWidth": 224,
-  "frameHeight": 352,
-  "rootX": 125,
-  "rootY": 334
+  "frameWidth": 448,
+  "frameHeight": 704,
+  "rootX": 250,
+  "rootY": 668,
+  "sourceReferences": [
+    "art/sprites/source/p05_fall_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
