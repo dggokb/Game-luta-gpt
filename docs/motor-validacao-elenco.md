@@ -467,3 +467,23 @@ personagem ou transições no jogo.
 ainda **não finalizado** como corretor visual universal. Não promover
 essa branch a `game-luta-sprite-gpt`/`main` sem aprovação e validação
 de runtime.
+
+
+### v6.1 — metadados de vídeo inválidos (2026-10-11)
+
+Rodada adicional de testes adversariais detectou duas falhas de robustez:
+`load_video` podia aceitar vídeo com FPS igual a zero (ou não finito)
+e anunciar `EXTRAIDO`, embora não existisse base para preservar timings
+a 30/60 FPS. Agora essa situação é `INCONCLUSIVO`, sem amostras.
+`read_video_samples` fazia `int(NaN)` quando o OpenCV retornava
+contagem de quadros inválida e lançava exceção, em vez de emitir
+prova ausente. O leitor geométrico agora rejeita metadados não
+numéricos, NaN, infinito e sequências curtas, retornando lista vazia
+para que a análise de escala permaneça inconclusiva.
+
+Testes de regressão em `test_refinar_elenco.py` usam MP4 temporário
+com FPS real substituído por zero/NaN apenas na interface de leitura;
+`test_verificar_escala.py` injeta `CAP_PROP_FRAME_COUNT=NaN`.
+Esses testes verificam classificação e integridade da saída,
+não a simples existência de uma condição no código.
+A reprodução visual real em 30 e 60 FPS permanece pendente.
