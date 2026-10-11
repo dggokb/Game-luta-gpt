@@ -10,7 +10,7 @@
   "segmentation": "prepared-grid",
   "columns": 10,
   "rootMode": "authored",
-  "sourceNote": "Non-looping original video, chronological sampling; standing-size IDLE calibration, uniform clip scale.",
+  "sourceNote": "Source-video chronology preserved; uniform IDLE-calibrated scale and fixed initial clip origin; all native XY motion retained.",
   "video": {
     "arquivo": "intro.mp4",
     "personagem": "p02",

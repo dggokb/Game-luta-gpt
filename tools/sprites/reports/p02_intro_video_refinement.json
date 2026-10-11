@@ -3,7 +3,7 @@
   "state": "INTRO",
   "source": "p02_intro.mp4",
   "videoSHA256": "d7d51ca733d0429b481d568d251ca2d8db4616d05bd5f80b745f6a381479d089",
-  "originalFrames": 27,
+  "originalFrames": 49,
   "newFrames": 49,
   "frames": [
     0,
@@ -65,448 +65,1141 @@
   "standingSpread": 0.00531,
   "originalTotalMs": 4160,
   "newTotalMs": 4160,
-  "policy": "One global scale based on standing frames; no individual frame transforms",
+  "policy": "Uniform standing-IDLE scale + FIXED initial video registration; preserve every frame XY movement (no snap to root)",
+  "registration": {
+    "mode": "static-camera fixed origin, no per-frame torso/foot locking",
+    "referenceTorsoX": 611.5,
+    "referenceFootY": 660.0,
+    "maxHorizontalMotionPx": 38.241,
+    "maxVerticalMotionPx": 10.296
+  },
   "frameGeometry": [
     {
       "videoFrame": 0,
+      "sourceTorsoX": 612.5,
+      "sourceFootY": 658.0,
+      "sourceBBox": [
+        487,
+        97,
+        697,
+        659
+      ],
       "packedBBox": [
         136,
-        119,
+        118,
         290,
-        532
-      ]
+        531
+      ],
+      "expectedTorsoX": 228.735,
+      "expectedFootY": 530.529,
+      "renderTorsoX": 227.75,
+      "renderFootY": 530,
+      "offsetXFromOrigin": 0.735,
+      "offsetYFromOrigin": -1.471
     },
     {
       "videoFrame": 2,
+      "sourceTorsoX": 611.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        489,
+        96,
+        697,
+        661
+      ],
       "packedBBox": [
         138,
         117,
         291,
         533
-      ]
+      ],
+      "expectedTorsoX": 228.0,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 228.25,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 0.0,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 4,
+      "sourceTorsoX": 611.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        487,
+        96,
+        697,
+        661
+      ],
       "packedBBox": [
         136,
         117,
         290,
         533
-      ]
+      ],
+      "expectedTorsoX": 228.0,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 227.25,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 0.0,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 6,
+      "sourceTorsoX": 611.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        485,
+        96,
+        697,
+        661
+      ],
       "packedBBox": [
         135,
         117,
         291,
         533
-      ]
+      ],
+      "expectedTorsoX": 228.0,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 228.0,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 0.0,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 8,
+      "sourceTorsoX": 611.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        483,
+        96,
+        697,
+        661
+      ],
       "packedBBox": [
         134,
         117,
         291,
         533
-      ]
+      ],
+      "expectedTorsoX": 228.0,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 228.0,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 0.0,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 10,
+      "sourceTorsoX": 612.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        475,
+        96,
+        703,
+        661
+      ],
       "packedBBox": [
-        127,
+        128,
         117,
-        295,
+        296,
         533
-      ]
+      ],
+      "expectedTorsoX": 228.735,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 229.0,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 0.735,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 12,
-      "packedBBox": [
-        120,
-        116,
-        305,
-        532
-      ]
-    },
-    {
-      "videoFrame": 14,
-      "packedBBox": [
-        100,
-        116,
-        340,
-        532
-      ]
-    },
-    {
-      "videoFrame": 16,
-      "packedBBox": [
+      "sourceTorsoX": 615.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        469,
         95,
-        116,
-        363,
-        532
-      ]
-    },
-    {
-      "videoFrame": 18,
+        721,
+        661
+      ],
       "packedBBox": [
-        90,
-        116,
-        328,
-        532
-      ]
-    },
-    {
-      "videoFrame": 20,
-      "packedBBox": [
-        89,
+        123,
         116,
         308,
         532
-      ]
+      ],
+      "expectedTorsoX": 230.942,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 230.5,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 2.942,
+      "offsetYFromOrigin": 0.0
+    },
+    {
+      "videoFrame": 14,
+      "sourceTorsoX": 628.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        455,
+        95,
+        781,
+        661
+      ],
+      "packedBBox": [
+        113,
+        116,
+        353,
+        532
+      ],
+      "expectedTorsoX": 240.502,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 241.0,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 12.502,
+      "offsetYFromOrigin": 0.0
+    },
+    {
+      "videoFrame": 16,
+      "sourceTorsoX": 628.25,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        447,
+        95,
+        811,
+        661
+      ],
+      "packedBBox": [
+        107,
+        116,
+        375,
+        532
+      ],
+      "expectedTorsoX": 240.318,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 240.25,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 12.318,
+      "offsetYFromOrigin": 0.0
+    },
+    {
+      "videoFrame": 18,
+      "sourceTorsoX": 622.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        435,
+        95,
+        759,
+        661
+      ],
+      "packedBBox": [
+        98,
+        116,
+        336,
+        532
+      ],
+      "expectedTorsoX": 236.089,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 235.5,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 8.089,
+      "offsetYFromOrigin": 0.0
+    },
+    {
+      "videoFrame": 20,
+      "sourceTorsoX": 622.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        433,
+        95,
+        731,
+        661
+      ],
+      "packedBBox": [
+        97,
+        116,
+        316,
+        532
+      ],
+      "expectedTorsoX": 236.089,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 236.0,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 8.089,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 22,
+      "sourceTorsoX": 622.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        431,
+        95,
+        733,
+        661
+      ],
       "packedBBox": [
-        87,
+        95,
         116,
-        309,
+        317,
         532
-      ]
+      ],
+      "expectedTorsoX": 236.089,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 235.5,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 8.089,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 24,
+      "sourceTorsoX": 622.0,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        431,
+        95,
+        733,
+        661
+      ],
       "packedBBox": [
-        88,
+        95,
         116,
-        310,
+        317,
         532
-      ]
+      ],
+      "expectedTorsoX": 235.722,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 235.25,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 7.722,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 26,
+      "sourceTorsoX": 618.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        439,
+        95,
+        733,
+        661
+      ],
       "packedBBox": [
-        96,
+        101,
         116,
-        312,
+        317,
         532
-      ]
+      ],
+      "expectedTorsoX": 233.148,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 233.0,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 5.148,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 28,
+      "sourceTorsoX": 614.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        441,
+        97,
+        735,
+        661
+      ],
       "packedBBox": [
-        100,
+        103,
         118,
-        316,
+        319,
         533
-      ]
+      ],
+      "expectedTorsoX": 230.206,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 230.25,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 2.206,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 30,
+      "sourceTorsoX": 604.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        441,
+        100,
+        735,
+        661
+      ],
       "packedBBox": [
-        108,
+        103,
         120,
-        324,
+        319,
         533
-      ]
+      ],
+      "expectedTorsoX": 222.852,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 223.25,
+      "renderFootY": 532,
+      "offsetXFromOrigin": -5.148,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 32,
+      "sourceTorsoX": 600.25,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        439,
+        101,
+        735,
+        661
+      ],
       "packedBBox": [
-        109,
+        101,
         121,
-        327,
+        319,
         533
-      ]
+      ],
+      "expectedTorsoX": 219.727,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 219.5,
+      "renderFootY": 532,
+      "offsetXFromOrigin": -8.273,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 34,
+      "sourceTorsoX": 590.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        455,
+        103,
+        733,
+        661
+      ],
       "packedBBox": [
-        128,
+        113,
         122,
-        332,
+        317,
         532
-      ]
+      ],
+      "expectedTorsoX": 212.557,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 212.5,
+      "renderFootY": 531,
+      "offsetXFromOrigin": -15.443,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 36,
+      "sourceTorsoX": 588.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        453,
+        103,
+        733,
+        661
+      ],
       "packedBBox": [
-        128,
+        111,
         122,
-        334,
+        317,
         532
-      ]
+      ],
+      "expectedTorsoX": 211.086,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 210.75,
+      "renderFootY": 531,
+      "offsetXFromOrigin": -16.914,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 38,
+      "sourceTorsoX": 599.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        441,
+        101,
+        733,
+        661
+      ],
       "packedBBox": [
-        111,
+        103,
         121,
-        326,
+        318,
         533
-      ]
+      ],
+      "expectedTorsoX": 219.175,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 222.0,
+      "renderFootY": 532,
+      "offsetXFromOrigin": -8.825,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 40,
+      "sourceTorsoX": 611.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        433,
+        99,
+        733,
+        661
+      ],
       "packedBBox": [
         97,
         119,
         318,
         532
-      ]
+      ],
+      "expectedTorsoX": 228.0,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 228.75,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 0.0,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 42,
+      "sourceTorsoX": 617.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        427,
+        97,
+        731,
+        661
+      ],
       "packedBBox": [
-        88,
+        92,
         118,
-        312,
+        316,
         533
-      ]
+      ],
+      "expectedTorsoX": 232.412,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 232.5,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 4.412,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 44,
+      "sourceTorsoX": 619.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        427,
+        95,
+        729,
+        661
+      ],
       "packedBBox": [
-        86,
+        92,
         116,
-        308,
+        314,
         532
-      ]
+      ],
+      "expectedTorsoX": 233.883,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 233.5,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 5.883,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 46,
+      "sourceTorsoX": 620.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        431,
+        95,
+        729,
+        661
+      ],
       "packedBBox": [
-        89,
+        95,
         116,
-        308,
+        314,
         532
-      ]
+      ],
+      "expectedTorsoX": 234.619,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 234.0,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 6.619,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 48,
+      "sourceTorsoX": 620.25,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        437,
+        95,
+        729,
+        661
+      ],
       "packedBBox": [
-        93,
+        100,
         116,
-        308,
+        315,
         532
-      ]
+      ],
+      "expectedTorsoX": 234.435,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 235.0,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 6.435,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 50,
+      "sourceTorsoX": 616.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        443,
+        95,
+        729,
+        661
+      ],
       "packedBBox": [
-        100,
+        104,
         116,
-        310,
+        314,
         532
-      ]
+      ],
+      "expectedTorsoX": 231.677,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 231.5,
+      "renderFootY": 531,
+      "offsetXFromOrigin": 3.677,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 52,
+      "sourceTorsoX": 613.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        443,
+        97,
+        731,
+        661
+      ],
       "packedBBox": [
-        103,
+        104,
         118,
-        315,
+        316,
         533
-      ]
+      ],
+      "expectedTorsoX": 229.471,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 229.25,
+      "renderFootY": 532,
+      "offsetXFromOrigin": 1.471,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 54,
+      "sourceTorsoX": 609.0,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        455,
+        99,
+        737,
+        661
+      ],
       "packedBBox": [
-        115,
+        113,
         119,
-        322,
+        320,
         532
-      ]
+      ],
+      "expectedTorsoX": 226.162,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 227.0,
+      "renderFootY": 531,
+      "offsetXFromOrigin": -1.838,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 56,
+      "sourceTorsoX": 608.5,
+      "sourceFootY": 660.0,
+      "sourceBBox": [
+        459,
+        103,
+        755,
+        661
+      ],
       "packedBBox": [
-        118,
+        116,
         122,
-        336,
+        334,
         532
-      ]
+      ],
+      "expectedTorsoX": 225.794,
+      "expectedFootY": 532.0,
+      "renderTorsoX": 226.25,
+      "renderFootY": 531,
+      "offsetXFromOrigin": -2.206,
+      "offsetYFromOrigin": 0.0
     },
     {
       "videoFrame": 58,
+      "sourceTorsoX": 615.5,
+      "sourceFootY": 672.0,
+      "sourceBBox": [
+        469,
+        119,
+        845,
+        673
+      ],
       "packedBBox": [
-        120,
-        125,
-        397,
-        532
-      ]
+        123,
+        134,
+        400,
+        541
+      ],
+      "expectedTorsoX": 230.942,
+      "expectedFootY": 540.825,
+      "renderTorsoX": 231.0,
+      "renderFootY": 540,
+      "offsetXFromOrigin": 2.942,
+      "offsetYFromOrigin": 8.825
     },
     {
       "videoFrame": 60,
+      "sourceTorsoX": 625.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        481,
+        135,
+        845,
+        675
+      ],
       "packedBBox": [
-        122,
-        136,
-        390,
-        533
-      ]
+        132,
+        146,
+        400,
+        543
+      ],
+      "expectedTorsoX": 238.296,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 238.0,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 10.296,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 62,
+      "sourceTorsoX": 657.25,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        499,
+        164,
+        851,
+        675
+      ],
       "packedBBox": [
-        112,
-        157,
-        371,
-        533
-      ]
+        145,
+        167,
+        404,
+        543
+      ],
+      "expectedTorsoX": 261.644,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 261.25,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 33.644,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 64,
+      "sourceTorsoX": 663.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        499,
+        183,
+        851,
+        675
+      ],
       "packedBBox": [
-        107,
-        171,
-        366,
-        533
-      ]
+        145,
+        181,
+        404,
+        543
+      ],
+      "expectedTorsoX": 266.241,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 266.0,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 38.241,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 66,
+      "sourceTorsoX": 650.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        233,
+        845,
+        675
+      ],
       "packedBBox": [
-        102,
-        208,
-        371,
-        533
-      ]
+        131,
+        218,
+        400,
+        543
+      ],
+      "expectedTorsoX": 256.681,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 255.5,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 28.681,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 68,
+      "sourceTorsoX": 651.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        238,
+        845,
+        675
+      ],
       "packedBBox": [
-        101,
-        211,
-        370,
-        532
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 257.416,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 258.0,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 29.416,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 70,
+      "sourceTorsoX": 648.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        103,
-        212,
-        372,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 255.21,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 255.5,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 27.21,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 72,
+      "sourceTorsoX": 652.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        100,
-        212,
-        369,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 258.151,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 258.0,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 30.151,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 74,
+      "sourceTorsoX": 653.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        100,
-        212,
-        369,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 258.887,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 259.0,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 30.887,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 76,
+      "sourceTorsoX": 655.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        98,
-        212,
-        367,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 260.358,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 260.5,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 32.358,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 78,
+      "sourceTorsoX": 652.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        100,
-        212,
-        369,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 258.151,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 258.25,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 30.151,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 80,
+      "sourceTorsoX": 651.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        101,
-        212,
-        370,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 257.416,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 257.5,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 29.416,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 82,
+      "sourceTorsoX": 652.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        100,
-        212,
-        369,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 258.151,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 257.75,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 30.151,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 84,
+      "sourceTorsoX": 652.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        100,
-        212,
-        369,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 258.151,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 257.75,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 30.151,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 86,
+      "sourceTorsoX": 653.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        100,
-        212,
-        369,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 258.887,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 259.25,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 30.887,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 88,
+      "sourceTorsoX": 655.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        98,
-        212,
-        367,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 260.358,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 260.5,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 32.358,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 90,
+      "sourceTorsoX": 656.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        97,
-        212,
-        366,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 261.093,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 261.25,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 33.093,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 92,
+      "sourceTorsoX": 656.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        97,
-        212,
-        366,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 261.093,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 261.75,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 33.093,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 94,
+      "sourceTorsoX": 658.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        238,
+        845,
+        675
+      ],
       "packedBBox": [
-        96,
-        211,
-        365,
-        532
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 262.564,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 262.5,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 34.564,
+      "offsetYFromOrigin": 10.296
     },
     {
       "videoFrame": 96,
+      "sourceTorsoX": 658.5,
+      "sourceFootY": 674.0,
+      "sourceBBox": [
+        479,
+        239,
+        845,
+        675
+      ],
       "packedBBox": [
-        96,
-        212,
-        365,
-        533
-      ]
+        131,
+        222,
+        400,
+        543
+      ],
+      "expectedTorsoX": 262.564,
+      "expectedFootY": 542.296,
+      "renderTorsoX": 262.75,
+      "renderFootY": 542,
+      "offsetXFromOrigin": 34.564,
+      "offsetYFromOrigin": 10.296
     }
   ]
 }
