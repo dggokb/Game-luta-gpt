@@ -26,6 +26,19 @@ jobs:
         run: python -m pip install Pillow
       - name: Measure integrated P01/VICTORY atlas
         run: python tools/sprites/validar_p01_victory_real.py
+      - name: Export actual P01 sprites and analyzer for original-Drive comparison
+        run: |
+          tar -czf android/app/build/sprite-review/p01-victory-real/p01-actual-inputs.tar.gz \
+            tools/sprites/*.py \
+            tools/sprites/profiles/player_base.json \
+            tools/sprites/reports/player_base_*.report.json \
+            characters/player_base/character.json \
+            android/app/src/main/res/drawable-nodpi/player_base_victory.png \
+            android/app/src/main/res/drawable-nodpi/player_base_idle.png \
+            art/sprites/source/player_base_idle_normalized.png \
+            art/keys/p01/tamanho.json \
+            art/keys/p01/inicio_centro.png \
+            android/app/src/main/assets/sprite-autofix.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
