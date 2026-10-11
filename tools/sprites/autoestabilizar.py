@@ -326,8 +326,14 @@ def publish_batch(asset,records):
         "schema":1,"corrections":[]}
     if doc.get("schema")!=1 or not isinstance(doc.get("corrections"),list):
         raise ValueError("Arquivo de correcoes invalido")
-    existing={(x.get("character"),x.get("atlas"))
-              for x in doc["corrections"]}
+    # Refuse to build on an already-invalid file; Android drops the entire
+    # autofix table when even one existing correction is malformed.
+    for existing_row in doc["corrections"]:
+        _validate_publish_record(existing_row)
+    previous_keys=[(x["character"],x["atlas"]) for x in doc["corrections"]]
+    if len(previous_keys)!=len(set(previous_keys)):
+        raise ValueError("Correcoes duplicadas no arquivo existente")
+    existing=set(previous_keys)
     if any((r["character"],r["atlas"]) in existing for r in records):
         raise ValueError("Ja existe correcao para esta animacao; reverta primeiro")
     previous=asset.read_bytes() if asset.exists() else (
