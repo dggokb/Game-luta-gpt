@@ -31,7 +31,7 @@ jobs:
       - name: Select chronological run cycle and normalize optical size once
         run: |
           python tools/sprites/refinar_ciclo_video.py --video "$RUNNER_TEMP/p02_dash.mp4" --character p02 --clip p02_dash
-          python tools/sprites/build_characters.py --write
+          python tools/sprites/atualizar_clipe_isolado.py --character p02 --clip p02_dash
       - name: Ensure approved IDLE/P01/movement physics have not changed
         run: |
           git diff --exit-code 826d1cd45d8dbe34ae425b79a1fc4ed2e666cc1c HEAD -- \
