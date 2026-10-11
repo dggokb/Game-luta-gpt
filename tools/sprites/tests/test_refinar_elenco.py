@@ -165,6 +165,49 @@ class CharacterStabilizerTest(unittest.TestCase):
             self.assertEqual("INCONCLUSIVO",limited["status"])
             self.assertFalse(not_accepted)
 
+    def test_unknown_video_length_cannot_be_silently_truncated(self):
+        import cv2
+        with tempfile.TemporaryDirectory() as folder:
+            file=Path(folder)/"unknown_length.mp4"
+            writer=cv2.VideoWriter(str(file),cv2.VideoWriter_fourcc(*"mp4v"),
+                                   30.,(96,96))
+            self.assertTrue(writer.isOpened())
+            for _ in range(9):
+                frame=np.full((96,96,3),(0,255,0),dtype=np.uint8)
+                cv2.rectangle(frame,(28,18),(68,88),(40,60,195),-1)
+                writer.write(frame)
+            writer.release()
+            capture=cv2.VideoCapture(str(file))
+            self.assertTrue(capture.isOpened())
+            class UnknownFrameCount:
+                def isOpened(self): return capture.isOpened()
+                def get(self,prop):
+                    return 0 if prop==cv2.CAP_PROP_FRAME_COUNT else capture.get(prop)
+                def read(self): return capture.read()
+                def release(self): capture.release()
+            # Some video providers return an unknown or inaccurate frame count.
+            # Reaching the sample cap is never proof of reaching video EOF.
+            with patch("cv2.VideoCapture",return_value=UnknownFrameCount()):
+                result,samples=e.load_video(file,max_frames=8)
+            self.assertEqual("INCONCLUSIVO",result["status"],result)
+            self.assertFalse(samples)
+
+    def test_boolean_frame_ids_are_not_silently_cast_to_atlas_frames(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            report=root/"tools/sprites/reports"/"p02_idle.report.json"
+            png=root/"android/app/src/main/res/drawable-nodpi"/"p02_idle.png"
+            report.parent.mkdir(parents=True);png.parent.mkdir(parents=True)
+            report.write_text(json.dumps({"packed":{
+                "frameWidth":80,"frameHeight":100,"columns":2,
+                "frameCount":2,"pixelScale":1.0}}))
+            Image.new("RGBA",(160,100),(0,0,0,0)).save(png)
+            pack={"animations":{"IDLE":{"atlas":"p02_idle","frames":[0,True]}}}
+            result,frames=e.load_atlas_state(root,pack,"IDLE")
+            self.assertEqual("FRAME_FORA_DO_ATLAS",result["status"],result)
+            self.assertFalse(frames)
+
     def test_pose_change_cannot_be_mistaken_for_small_character(self):
         idle=e.metrics([body_frame(head=20,torso=40)]*12,100,"IDLE")
         changed=e.metrics([body_frame(head=25,torso=40)]*12,100,"CROUCH_HEAVY")
