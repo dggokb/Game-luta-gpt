@@ -16,8 +16,11 @@ O renderer desenha o frame real de INTRO e a primeira pose REAL de IDLE,
 cada uma com os roots, pixelScale e worldScale de seus atlas. Nenhum
 bitmap é redesenhado, nenhuma duração/hitbox/mecânica é alterada.
 
-O período final de transição usa `min(0.42 s, 16% da duração INTRO)`.
-O blend tem curva smoothstep. Quando a INTRO termina, a imagem já é IDLE.
+A janela de transição usa `min(0.42 s, 16% da duração INTRO)` e
+termina `min(0.067 s, 7% da duração INTRO)` ANTES do fim do clipe.
+O blend tem curva smoothstep. Os últimos ticks de INTRO já desenham 100%
+do primeiro frame de IDLE, independentemente do instante exato de troca
+de estado do jogo. Isso evita o erro residual visto no Canvas Android.
 O IDLE subsequente começa de seu primeiro quadro canônico (P02 = 15).
 Se uma luta aguarda a INTRO mais longa do oponente, o personagem fica
 no primeiro quadro de IDLE até a luta começar.
@@ -45,5 +48,17 @@ Outros personagens com INTRO e IDLE passam pela mesma política comum.
 Reduzir o salto na passagem não equivale a redesenhar poses incompatíveis
 de forma convincente. Crossfade pode causar dupla silhueta por alguns
 instantes. O relatório automatizado nunca substitui avaliação visual no APK.
+
+### Registro das falhas encontradas durante a implantação
+
+1. O primeiro teste em modo LEGACY do Robolectric comparava imagens vazias e
+   produzia falsamente diferença zero. Corrigido para
+   `@GraphicsMode(GraphicsMode.Mode.NATIVE)`.
+2. O primeiro controle negativo usava o início da INTRO em vez do seu fim.
+   Corrigido: comparação entre o último quadro real, SEM fade, e IDLE.
+3. No Android Canvas, sem finalizar a mistura antecipadamente, a diferença
+   caiu de 0.049742 para 0.004333 (91%), mas foi reprovada pelo limite
+   0.0025. O motor agora encerra o fade 67 ms antes do final e deve atingir
+   erro próximo de zero nos últimos quadros. O teste não foi relaxado.
 Se o cruzamento for feio, a melhoria seguinte deve ser uma ponte real de
 poses (derivada de imagens existentes), não maquiagem em testes.
