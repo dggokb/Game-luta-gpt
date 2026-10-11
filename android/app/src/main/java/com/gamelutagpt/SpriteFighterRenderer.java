@@ -121,6 +121,21 @@ final class SpriteFighterRenderer {
             // Every other P01 state, including all attacks, hit, air, guard,
             // recovery, dash, throw, victory and taunt, uses the same master.
             drawP01Calibrated(canvas,anim,frame,x,baseY,255);
+        } else if(SpriteStates.INTRO.equals(motion.clip)
+                && character.animations.containsKey(SpriteStates.IDLE)) {
+            // Universal INTRO -> IDLE contract for all non-legacy characters.
+            // Blend into the very same approved IDLE first frame which the
+            // simulation will draw in the first tick after the introduction.
+            // No per-character magic, no changes to bitmap dimensions or
+            // gameplay state. P01's previously approved result above is kept.
+            float fade=SpriteIntroTransition.blend(anim,motion.time);
+            int introAlpha=Math.round(255f*(1f-fade));
+            int idleAlpha=Math.round(255f*fade);
+            if(introAlpha>0) drawAtlas(canvas,anim.atlas,frame,x,baseY,1f,1f,introAlpha);
+            if(idleAlpha>0) {
+                CharacterDefinition.Animation idle=character.animation(SpriteStates.IDLE);
+                drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,1f,1f,idleAlpha);
+            }
         } else {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,1f,1f,255);
         }
