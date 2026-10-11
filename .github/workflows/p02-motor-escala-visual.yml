@@ -1,4 +1,7 @@
 name: P02 - Original Video Cycle / Experimental APK
+concurrency:
+  group: p02-dash-video-${{ github.ref }}
+  cancel-in-progress: true
 on:
   push:
     branches:
@@ -23,6 +26,7 @@ jobs:
         run: |
           cat tools/sprites/video_sources/p02_dash_original.part* > "$RUNNER_TEMP/p02_dash.mp4"
           test -s "$RUNNER_TEMP/p02_dash.mp4"
+          echo "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b  $RUNNER_TEMP/p02_dash.mp4" | sha256sum -c
           python -c 'import cv2,sys; c=cv2.VideoCapture(sys.argv[1]); print("original-video",c.get(cv2.CAP_PROP_FRAME_COUNT),c.get(cv2.CAP_PROP_FRAME_WIDTH),c.get(cv2.CAP_PROP_FRAME_HEIGHT)); assert c.isOpened()' "$RUNNER_TEMP/p02_dash.mp4"
       - name: Select chronological run cycle and normalize optical size once
         run: |
