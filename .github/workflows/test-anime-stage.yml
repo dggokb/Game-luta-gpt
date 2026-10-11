@@ -5,6 +5,7 @@ on:
     branches:
       - art/cenarios-anime-20261011
     paths:
+      - 'tools/stage/redesenhar_anime_onnx.py'
       - 'tools/stage/anime_redraw.py'
       - '.github/workflows/test-anime-stage.yml'
   workflow_dispatch:
@@ -28,11 +29,11 @@ jobs:
 
       - name: Python e dependencias visuais
         run: |
-          python3 -m pip install --disable-pip-version-check pillow numpy opencv-python-headless
+          python3 -m pip install --disable-pip-version-check pillow numpy opencv-python-headless onnxruntime
 
-      - name: Aplicar novo visual nas dez imagens do Templo da Lua
+      - name: Redesenhar dez imagens a partir dos originais com AnimeGANv2 ONNX
         run: |
-          python3 tools/stage/anime_redraw.py --apply --preview /tmp/cenarios-anime-comparativo.jpg
+          python3 tools/stage/redesenhar_anime_onnx.py --apply --preview /tmp/cenarios-anime-comparativo.jpg
 
       - name: Verificar o que sera salvo
         run: |
@@ -42,8 +43,9 @@ jobs:
           d = pathlib.Path('android/app/src/main/assets/stages/templo_lua')
           manifest = json.loads((d / 'anime-style-manifest.json').read_text())
           assert len(manifest['files']) == 10
-          assert all(f['alpha_exact'] and f['color_change_mad'] >= 1 for f in manifest['files'])
-          print('Dez camadas transformadas com alpha preservado.')
+          assert manifest['mode'] == 'animeganv2_hayao_onnx_image_to_image'
+          assert all(f['alpha_exact'] and f['color_change_mad'] >= 6 and f['original_edges_covered_2px'] >= .38 for f in manifest['files'])
+          print('Dez camadas redesenhadas via image-to-image, estrutura/alpha preservados.')
           PY
 
       - name: Salvar imagens no ramo de teste
@@ -52,7 +54,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add android/app/src/main/assets/stages/templo_lua/
           if ! git diff --cached --quiet; then
-            git commit -m "test(stage): substitui 10 imagens por versoes anime cel-shading"
+            git commit -m "feat(stage): integra 10 camadas redesenhadas por AnimeGANv2 ao Templo da Lua"
             git push origin HEAD:art/cenarios-anime-20261011
           else
             echo "As 10 camadas ja estao no estilo esperado; nenhuma alteracao."
@@ -61,7 +63,7 @@ jobs:
       - name: Comparativo visual original x anime
         uses: actions/upload-artifact@v4
         with:
-          name: Templo-da-Lua-Anime-Comparativo
+          name: Templo-da-Lua-Comparativo-Imagem-a-Imagem
           path: /tmp/cenarios-anime-comparativo.jpg
           if-no-files-found: error
 
@@ -94,6 +96,26 @@ jobs:
           # relatórios de P04 preexistentes desatualizados. Não os regenerar nem
           # bloquear o teste visual por causa desse problema de outra área.
           gradle :stage-core:test assembleDebug -x :app:verifySpritePacks --stacktrace
+
+      - name: Renderizar camera do jogo ao longo de 12 segundos
+        working-directory: android
+        run: |
+          gradle :pc-preview:runStage --args="app/src/main/assets/stages/templo_lua --quadros /tmp/templo-lua-frames --segundos 12"
+          test -s /tmp/templo-lua-frames/quadro_000.png
+          test -s /tmp/templo-lua-frames/quadro_310.png
+
+      - name: Enviar imagens reais do stage com camera em movimento
+        uses: actions/upload-artifact@v4
+        with:
+          name: Templo-da-Lua-Render-Motor
+          path: |
+            /tmp/templo-lua-frames/quadro_000.png
+            /tmp/templo-lua-frames/quadro_090.png
+            /tmp/templo-lua-frames/quadro_180.png
+            /tmp/templo-lua-frames/quadro_270.png
+            /tmp/templo-lua-frames/quadro_310.png
+            /tmp/templo-lua-frames/quadro_359.png
+          if-no-files-found: error
 
       - name: Enviar APK sem ZIP dentro do artefato
         uses: actions/upload-artifact@v4
