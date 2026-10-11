@@ -144,6 +144,27 @@ class CharacterStabilizerTest(unittest.TestCase):
                          e.compare_motion_evidence(
                            {"status":"MEDIDO_COM_LACUNAS"},noisy)["status"])
 
+    def test_complete_sixty_fps_video_is_not_truncated_at_250_frames(self):
+        import cv2
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"idle_60fps.mp4"
+            writer=cv2.VideoWriter(str(path),
+                cv2.VideoWriter_fourcc(*"mp4v"),60.,(96,96))
+            self.assertTrue(writer.isOpened())
+            for _ in range(320):
+                frame=np.full((96,96,3),(0,255,0),dtype=np.uint8)
+                cv2.rectangle(frame,(28,18),(68,88),(40,60,195),-1)
+                writer.write(frame)
+            writer.release()
+            info,frames=e.load_video(path)
+            self.assertEqual("EXTRAIDO",info["status"],info)
+            self.assertEqual(320,info["quadros_lidos"])
+            self.assertEqual(320,len(frames))
+            self.assertGreaterEqual(info["quadros_validos"],310)
+            limited,not_accepted=e.load_video(path,max_frames=200)
+            self.assertEqual("INCONCLUSIVO",limited["status"])
+            self.assertFalse(not_accepted)
+
     def test_pose_change_cannot_be_mistaken_for_small_character(self):
         idle=e.metrics([body_frame(head=20,torso=40)]*12,100,"IDLE")
         changed=e.metrics([body_frame(head=25,torso=40)]*12,100,"CROUCH_HEAVY")
