@@ -92,10 +92,20 @@ def main():
               entry.get("atlas")=="player_base_victory"
            for row in entry.get("frames",[]) if int(row[0])<7):
         raise AssertionError("Entrada intencional alterada por autofix")
+    # The VICTORY check remains strict for its OWN frames, but a separately
+    # approved P01 INTRO correction may coexist in the same Android asset.
+    # Its different atlas is isolated by SpriteAutoFix's atlas key.
     if any(entry.get("character")!="player_base" or
            entry.get("atlas")!="player_base_victory" or
-           entry.get("state")!="VICTORY" for entry in corrections["corrections"]):
-        raise AssertionError("Correcoes fora do escopo P01 VICTORY")
+           entry.get("state")!="VICTORY" for entry in corrections["corrections"]
+           if entry.get("state")!="INTRO"):
+        raise AssertionError("Correcoes VICTORY fora do escopo")
+    if any(entry.get("character")!="player_base" or
+           entry.get("atlas")!="player_base_intro" or
+           entry.get("state")!="INTRO" or
+           any(len(row)!=4 or row[1]!=1 or row[3]!=0 for row in entry.get("frames",[]))
+           for entry in corrections["corrections"] if entry.get("state")=="INTRO"):
+        raise AssertionError("INTRO deve permanecer isolada e sem escala/altura")
     if not (drift >= 1.6 and improved >= 0.55 and
             final["amplitude_x_px"] <= 1.25 and
             abs(final["deslocamento_x_px"])<=1.0 and
