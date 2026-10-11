@@ -392,6 +392,14 @@ def load_video(path, max_frames=1200):
         return {"status":"FALHA_VIDEO","motivo":"arquivo nao abriu"},[]
     fps=cap.get(cv2.CAP_PROP_FPS)
     declared=cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    try:
+        fps=float(fps)
+    except (ValueError,TypeError,OverflowError):
+        fps=float("nan")
+    if not math.isfinite(fps) or fps<=0:
+        cap.release()
+        return {"status":"INCONCLUSIVO",
+                "motivo":"fps de video ausente ou invalido"},[]
     if max_frames<=0 or (declared>0 and declared>max_frames):
         cap.release()
         return {"status":"INCONCLUSIVO",
