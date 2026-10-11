@@ -343,3 +343,127 @@ O GitHub Actions não contém as gravações privadas da pasta Drive
 automaticamente. Elas precisam ser disponibilizadas ao comando
 `--videos-dir` durante a execução; ausência de arquivo original
 bloqueia a correção de escala em vez de inventá-la.
+
+
+## v6 — revisão adversarial e barreiras de publicação (2026-10-11)
+
+**Escopo:** auditoria do motor na branch experimental `refino/p01-animacoes-20261009`.
+Não houve merge, alteração de PNG, vídeo, clipe, manifesto de personagem,
+timings, hitboxes, câmera ou gameplay. Somente implementação/CI/testes/docs
+do motor; build APK não é disparado automaticamente por push nesta branch.
+Esta seção atualiza afirmações históricas das versões anteriores:
+o corretor existe e publica ajustes de pés com garantias limitadas, mas
+**não é um estabilizador visual universal nem um certificado de runtime**.
+
+### Rodadas realmente executadas
+
+1. **Pé aparentemente estável, movimento original possivelmente intencional:**
+   o corretor aceitava `correct_shoes` e até validação em bitmap sem
+   evidência de que a fonte autoral estava imóvel. Um teste adversarial
+   falhou no CI (registrou `CORRIGIDO` onde devia bloquear). Agora
+   `foot_fix_permission` só autoriza correções em `IDLE`, `VICTORY`
+   ou estados de defesa com apoio quando vídeo e atlas são `MEDIDO`,
+   o vídeo não apresenta tremor/deslize de pé, o atlas apresenta defeito
+   correspondente e a auditoria temporal aponta
+   `SUSPEITA_DE_TREMOR_INTRODUZIDO_NOS_SPRITES`.
+   Movimentos também presentes no vídeo original ou evidências
+   incompletas bloqueiam a correção, independentemente de a trilha
+   parecer melhor após deslocá-la.
+2. **Vídeo com quantidade de quadros desconhecida:** a leitura podia
+   atingir `max_frames` e retornar `EXTRAIDO` mesmo quando havia
+   frames posteriores. Caso adversarial reproduzido com MP4 real
+   sintético e `CAP_PROP_FRAME_COUNT=0`. O leitor agora faz uma
+   leitura adicional para detectar truncamento; se houver outro frame,
+   resultado `INCONCLUSIVO` e nenhuma análise parcial utilizável.
+3. **Índices booleanos de frame:** `True` era aceito como inteiro
+   em Python e convertido implicitamente em frame 1. Testes reproduziram
+   aprovação indevida nos leitores temporal e geométrico. Ambos
+   rejeitam `bool`, além de negativos e valores fora de faixa.
+4. **Vários estados no mesmo atlas:** o Android endereça ajustes por
+   `character|atlas|frame`; a tabela NÃO inclui estado. Um ajuste
+   solicitado apenas para VICTORY podia contaminar INTRO no mesmo PNG.
+   Até o formato do patch representar o estado com segurança e o
+   renderizador consumir esse campo, `propose` bloqueia qualquer atlas
+   compartilhado por dois estados. Teste adversarial reproduz esse
+   isolamento.
+5. **Escala numérica sem inspeção dos pixels corrigidos:** o fator
+   geométrico permitia gerar e publicar correção de escala mesmo quando
+   `validacao_pixels=NAO_APLICAVEL`. Agora o cálculo continua disponível
+   como **proposta**, mas recebe
+   `AGUARDANDO_VALIDACAO_PIXELS` e NÃO é publicado como ajuste de
+   tamanho até haver prova geométrica/anatômica independente em pixels
+   depois da transformação. Isso protege tanto uma correção apenas de
+   escala quanto o caso combinado com correção de pé.
+6. **Rollback com reformatacão:** `rollback()` recriava JSON e perdia
+   os bytes exatos de indentação/ordem/quebras de linha da versão
+   anterior. Agora lê e repõe literalmente o snapshot anterior,
+   preservando a verificação do checksum do patch atual e a checagem
+   do personagem. Teste adversarial verifica igualdade byte a byte.
+
+As regressões foram incluídas nos arquivos existentes:
+`test_refinar_elenco.py`, `test_verificar_escala.py` e
+`test_autoestabilizar.py`. O workflow
+`validate-sprite-stabilizer.yml` agora inclui **os três grupos** e
+dispara também quando `autoestabilizar.py` ou seus testes mudam.
+`build-apk.yml` não roda mais em cada push experimental; mantém opção
+manual. Um workflow verde valida os testes executados, não a estética do
+personagem ou transições no jogo.
+
+### Critérios objetivos e limites da prova de tamanho
+
+- **A, base + IDLE:** confirmar que `inicio_centro.png` e o
+  `tamanho.json` concordam em até **7,5%**, com chroma e
+  silhueta legítimos. A altura do bounding box não é, isoladamente,
+  a medida do tamanho real em poses distintas.
+- **B, vídeo autoral:** exigir quadros decodificados sem truncamento,
+  chroma confiável e correspondências da **cabeça e tronco**, onde
+  verificáveis. Vídeo com zoom/câmera móvel sem compensação é
+  `INCONCLUSIVO`, não evidência para dimensionar sprite.
+- **C, atlas efetivo:** validar TODOS os índices contra layout físico,
+  converter `pixelScale` para o domínio do IDLE e medir escala
+  geométrica em imagens do atlas. Frames duplicados/holds não valem
+  como observações geométricas independentes.
+- **Geometria:** SIFT/RANSAC exige >=22 inliers, >=43% dos matches,
+  cobertura espacial significativa (15% horizontal e 16% vertical),
+  reprojeção mediana <=3,8 px, reversibilidade ida/volta em 3,5%.
+  A sequência precisa de >=70% de quadros válidos (mínimo 3),
+  distribuídos pelos três terços e com variação relativa <=7%.
+  Vídeo e atlas devem concordar em até 6% e ambos permanecer dentro
+  de ±8% do idle. Agachamento/braço estendido que impeçam
+  correspondência suficiente levam a `INCONCLUSIVO`.
+  Os valores são limiares de engenharia, **não** garantia universal
+  de reconhecimento anatômico correto.
+- **D, renderer Android:** confirmar escala final após
+  `P01SpriteCalibration`, `P01VisualTuning`, `pixelScale`,
+  offset, raiz, câmera, espelhamento e transições. Esta prova ainda
+  NÃO está automatizada end-to-end; `validacao_runtime=PENDENTE`.
+  Um PNG ou cálculo de offset consistente não fecha esta etapa.
+- **Autofix de pés:** somente em clipes apoiados, com evidência
+  independente de que o defeito entrou no atlas e comparação de
+  pixels transformados antes/depois; sem aprovação automática do
+  personagem como um todo. `--corrigir` publica patch JSON reversível,
+  não altera bitmap original. A proposta de escala ainda fica
+  pendente e não é gravada como ajuste.
+
+### Pendências críticas e validações NÃO executadas nesta revisão
+
+- A pasta real `animations` do Drive e suas subpastas `p01..p12`
+  foram localizadas, mas **não** foi feita nova análise integral
+  dos vídeos reais do Drive nem comparação com os atlases de cada um
+  dos 12 lutadores. Testes de vídeo geraram clipes MP4 sintéticos; a
+  prova geométrica usa também pixels reais do atlas IDLE de P01.
+- Ainda faltam confirmação anatômica confiável em poses extremas,
+  separação de movimento intencional/câmera em cenas sem chroma,
+  validação independente após correção de escala, transições entre
+  estados, integridade dos timings e render efetivo a 30/60 FPS.
+- Não foi feita captura de runtime Android/emulador nesta rodada:
+  o CI isolado não gera APK nem verifica jogabilidade em dispositivo.
+- O motor diagnostica um personagem selecionado e só aplica
+  automaticamente **correções de pés com evidência forte**.
+  `SEM_AJUSTE_SEGURO`, `BLOQUEADO` e `INCONCLUSIVO` são saídas
+  esperadas em situações duvidosas, não autorização para inferir poses.
+
+**Estado geral:** mais seguro diante dos falsos positivos reproduzidos,
+ainda **não finalizado** como corretor visual universal. Não promover
+essa branch a `game-luta-sprite-gpt`/`main` sem aprovação e validação
+de runtime.
