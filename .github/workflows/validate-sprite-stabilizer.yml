@@ -10,6 +10,7 @@ on:
       - 'tools/sprites/refinar_elenco.py'
       - 'tools/sprites/verificar_escala.py'
       - 'tools/sprites/autoestabilizar.py'
+      - 'android/app/src/main/assets/sprite-autofix.json'
       - 'tools/sprites/tests/test_autoestabilizar.py'
       - 'tools/sprites/tests/test_refinar_elenco.py'
       - 'tools/sprites/tests/test_verificar_escala.py'
