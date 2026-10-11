@@ -73,6 +73,10 @@ class AutoCorrectionTest(unittest.TestCase):
             result,record=AUTO.propose(root,"p02","VICTORY",analysis)
             self.assertEqual("CORRIGIDO",result["status"],result)
             self.assertEqual("CORRIGIDO",result["pes"]["status"])
+            self.assertEqual("CONFIRMADO_EM_PIXELS",
+                             result["validacao_pixels"]["status"],result)
+            self.assertLess(result["validacao_pixels"]["depois_px"],
+                            result["validacao_pixels"]["antes_px"]*.22)
             self.assertEqual("INCONCLUSIVO",result["tamanho"]["status"])
             self.assertEqual(12,len(record["frames"]))
             self.assertEqual("p02",record["character"])
