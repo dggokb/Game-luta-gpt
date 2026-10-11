@@ -171,6 +171,26 @@ class AutoCorrectionTest(unittest.TestCase):
                 self.assertFalse(asset.with_suffix(".previous.json").exists(),
                                  "Failed batch must not create rollback metadata")
 
+    def test_existing_invalid_patch_cannot_poison_new_batch(self):
+        with tempfile.TemporaryDirectory() as folder:
+            asset=Path(folder)/"sprite-autofix.json"
+            valid={"character":"p02","atlas":"p02_idle","state":"IDLE",
+                   "frames":[[0,1.0,0.0,0.0]]}
+            new={"character":"p03","atlas":"p03_idle","state":"IDLE",
+                 "frames":[[0,1.0,1.0,0.0]]}
+            invalid={"schema":1,"corrections":[{
+                **valid,"frames":[[0,99.0,0.,0.]]}]}
+            asset.write_text(json.dumps(invalid))
+            with self.assertRaises(ValueError):
+                AUTO.publish(asset,new)
+            self.assertEqual(invalid,json.loads(asset.read_text()))
+            self.assertFalse(asset.with_suffix(".previous.json").exists())
+            duplicates={"schema":1,"corrections":[valid,valid]}
+            asset.write_text(json.dumps(duplicates))
+            with self.assertRaisesRegex(ValueError,"duplicadas"):
+                AUTO.publish(asset,new)
+            self.assertEqual(duplicates,json.loads(asset.read_text()))
+
     def test_no_correction_of_unimported_character_or_deliberately_moving_state(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):
