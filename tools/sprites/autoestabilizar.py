@@ -259,6 +259,12 @@ def propose(root,character,state,analysis):
     else:
         idle_base=.98 if cid=="player_base" else 1.
         scale=correct_scale(proof,float(np.median(sx)),idle_base)
+    # Numeric scale prediction alone cannot authorize an autofix until
+    # the rendered body is independently remeasured from transformed pixels.
+    if scale["status"]=="CORRIGIDO":
+        scale={"status":"AGUARDANDO_VALIDACAO_PIXELS",
+               "reason":"falta conferir tamanho real dos pixels transformados",
+               "proposta":scale}
     shoe={"status":"INCONCLUSIVO","reason":"pose com deslocamento intencional"}
     if state in PLANTED:
         permission=foot_fix_permission(source)
@@ -403,7 +409,8 @@ def rollback(asset,expected_character=None):
     expected=guard.read_text(encoding="ascii").strip()
     if _file_digest(asset.read_bytes())!=expected:
         raise ValueError("O arquivo foi modificado desde a publicacao; rollback bloqueado")
-    doc=json.loads(backup.read_text(encoding="utf8"))
+    original_bytes=backup.read_bytes()
+    doc=json.loads(original_bytes.decode("utf8"))
     if doc.get("schema")!=1:
         raise ValueError("Snapshot invalido")
     current=json.loads(asset.read_text(encoding="utf8")) if asset.exists() else {}
@@ -412,7 +419,7 @@ def rollback(asset,expected_character=None):
         not added or any(x.get("character")!=expected_character for x in added)):
         raise ValueError("Rollback pertence a outro personagem")
     tmp=asset.with_suffix(".tmp")
-    tmp.write_text(json.dumps(doc,indent=2)+"\n",encoding="utf8")
+    tmp.write_bytes(original_bytes)
     os.replace(tmp,asset)
     # Consume this snapshot. Repeated undo must not overwrite new changes.
     guard.unlink()
