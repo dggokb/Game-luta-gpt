@@ -38,16 +38,14 @@ public class P02IdleRuntimeFixTest {
         assertEquals(445,atlas.height);
         assertEquals(2.0f,atlas.pixelScale,0f);
         assertTrue(idle.loop);
-        assertEquals(56*0.041f,idle.duration,0.0001f);
-        int[] timeline=new int[56];
-        int at=0;
-        for(int i=0;i<=28;i++) timeline[at++]=i;
-        for(int i=27;i>=1;i--) timeline[at++]=i;
+        assertEquals(30*0.041f,idle.duration,0.0001f);
+        int[] timeline=new int[30];
+        for(int i=0;i<timeline.length;i++) timeline[i]=15+i;
         for(int i=0;i<timeline.length;i++) {
             assertEquals("Unexpected original atlas cell at playback step "+i,
                 timeline[i],idle.frame((i+0.5f)*0.041f,0f));
         }
-        assertEquals(0,idle.frame(idle.duration+0.0205f,0f));
+        assertEquals(15,idle.frame(idle.duration+0.0205f,0f));
         try {
             SpriteAutoFix.replaceFromJson(json);
             for(int i=0;i<56;i++) {

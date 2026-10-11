@@ -13,7 +13,7 @@ import verificar_frames as F
 
 OUT=ROOT/"android/app/build/sprite-review/p02-idle-diagnose"
 PACKED=json.loads((ROOT/"tools/sprites/reports/p02_idle.report.json").read_text())["packed"]
-TIMELINE=list(range(0,29))+list(range(27,0,-1))
+TIMELINE=list(range(15,45))
 
 
 def preview(frames,path,title):
@@ -44,7 +44,7 @@ def main():
     layers,timeline=F.project_report(ROOT,"p02","p02_idle",True)
     assert timeline==TIMELINE, "The checker must use Android playback order"
     after=layers["runtime_effective"]
-    assert len(after)==56
+    assert len(after)==30
     assert all(after[i].tobytes()==all_frames[index].tobytes() for i,index in enumerate(timeline)), "Bitmap pixels or source cells changed"
     original_patches={"corrections":[{"character":"p02","atlas":"p02_idle",
         "frames":[[j,1,2,0] for j in range(51,56)]}]}
@@ -52,14 +52,14 @@ def main():
     prior_report=F.analyze(before)
     after_report=F.analyze(after)
     assert not after_report["suspect_transitions"],str(after_report["suspect_transitions"])
-    assert len(after_report["all_transitions"])==56
+    assert len(after_report["all_transitions"])==30
     assert after_report["all_transitions"][-1]["to"]==0
     assert PACKED["pixelScale"]==2, "The approved 2x size may not change"
     preview(before,OUT/"idle_before.gif","ANTES")
     preview(after,OUT/"idle_after.gif","DEPOIS")
     # Compare at equal frame duration. Different timeline lengths loop normally.
     side=[]
-    for step in range(112):
+    for step in range(90):
         left=before[step%len(before)]
         right=after[step%len(after)]
         card=Image.new("RGB",(520,357),(236,237,241))
@@ -70,18 +70,18 @@ def main():
             card.paste(image.convert("RGB"),(260*k+(260-image.width)//2,25))
         draw=ImageDraw.Draw(card)
         draw.text((8,6),f"ANTES {step%56:02}",fill=(15,15,15))
-        draw.text((268,6),f"DEPOIS {step%56:02}",fill=(15,15,15))
+        draw.text((268,6),f"DEPOIS frame {timeline[step%len(after)]:02}",fill=(15,15,15))
         side.append(card)
     side[0].save(OUT/"comparativo-lado-a-lado.gif",save_all=True,
                  append_images=side[1:],duration=41,loop=0,optimize=True)
-    info={"physical_atlas_frames":56,"playback_frames":40,"playback_indices":timeline,
+    info={"physical_atlas_frames":56,"playback_frames":30,"playback_indices":timeline,
           "real_png":str(source.relative_to(ROOT)),
           "atlas_dimensions":list(Image.open(source).size),
           "frame_size":[PACKED["frameWidth"],PACKED["frameHeight"]],
           "pixelScale":PACKED["pixelScale"],"p02_runtime_offsets":[],
           "before":prior_report,"after":after_report}
     (OUT/"before_after.json").write_text(json.dumps(info,indent=2)+"\n")
-    print("REAL ANDROID ATLAS 56 frames, 56 loop steps, 2x pixelScale preserved")
+    print("REAL ANDROID ATLAS 56 cells, 30 forward-only loop steps, 2x pixelScale preserved")
     print("BEFORE: "+str([(r["from"],r["to"]) for r in prior_report["suspect_transitions"]]))
     print("AFTER: "+str([(r["from"],r["to"]) for r in after_report["suspect_transitions"]]))
     print("SEAM BEFORE/AFTER:",prior_report["all_transitions"][-1]["score"],after_report["all_transitions"][-1]["score"])
