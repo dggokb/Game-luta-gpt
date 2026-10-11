@@ -25,8 +25,12 @@ def character_pack(cid):
     return "player_base" if cid=="p01" else cid
 
 
-def correct_scale(proof):
-    if proof.get("status")!="ESCALA_FORA_DO_IDLE":
+def correct_scale(proof,baseline_scale=1.,idle_scale=1.):
+    # A sprite can already be resized by the game's renderer. Correct the
+    # FINAL body size, not the raw atlas measured by SIFT. Without this P01's
+    # built-in calibration could be mistakenly resized a second time.
+    if proof.get("status") not in ("ESCALA_FORA_DO_IDLE",
+                                   "PADRONIZADA_FONTE_ATLAS"):
         return {"status":"INCONCLUSIVO","reason":"sem prova geometrica suficiente"}
     video=float(proof.get("fator_video",0))
     atlas=float(proof.get("fator_atlas",0))
@@ -34,11 +38,14 @@ def correct_scale(proof):
         return {"status":"BLOQUEADO","reason":"fator invalido"}
     if abs(video-atlas)/max(video,atlas)>.06:
         return {"status":"BLOQUEADO","reason":"video diverge do atlas"}
-    scale=1/atlas
+    if not all(math.isfinite(v) and v>0 for v in (baseline_scale,idle_scale)):
+        return {"status":"BLOQUEADO","reason":"renderizar base com escala invalida"}
+    rendered=atlas*baseline_scale/idle_scale
+    scale=1/rendered
     if not .8<=scale<=1.25:
         return {"status":"BLOQUEADO","reason":"escala acima do limite seguro"}
-    before=abs(1-atlas)
-    after=abs(1-atlas*round(scale,5))
+    before=abs(1-rendered)
+    after=abs(1-rendered*round(scale,5))
     if before<.08 or after>.015 or after>before*.15:
         return {"status":"REPROVADO","reason":"simulacao nao melhora tamanho"}
     return {"status":"CORRIGIDO","scale":round(scale,5),
@@ -127,8 +134,15 @@ def propose(root,character,state,analysis):
     if not ids:
         raise ValueError("Animacao sem quadros")
     proof=analysis.get("estados",{}).get(state,{}).get("prova_geometrica",{})
-    scale=correct_scale(proof)
     baseline=base_calibration(root,atlas,ids)
+    sx=[v[0] for v in baseline];sy=[v[1] for v in baseline]
+    # Anisotropic poses require framewise anatomical evaluation; a uniform
+    # factor cannot prove both dimensions correct if X/Y differ strongly.
+    if max(abs(x-y) for x,y in zip(sx,sy))>.07:
+        scale={"status":"INCONCLUSIVO","reason":"calibracao base nao uniforme"}
+    else:
+        idle_base=.98 if cid=="player_base" else 1.
+        scale=correct_scale(proof,float(np.median(sx)),idle_base)
     shoe={"status":"INCONCLUSIVO","reason":"pose com deslocamento intencional"}
     if state in PLANTED:
         positions=art_track(root,atlas,ids,baseline)
