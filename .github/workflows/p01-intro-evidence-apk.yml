@@ -7,6 +7,7 @@ on:
       - .github/workflows/p01-intro-evidence-apk.yml
       - android/app/src/main/assets/sprite-autofix.json
       - tools/sprites/validar_p01_intro_real.py
+      - tools/sprites/validar_p01_victory_real.py
       - android/app/src/test/java/com/gamelutagpt/P01IntroRealAssetTest.java
   workflow_dispatch:
 permissions:
