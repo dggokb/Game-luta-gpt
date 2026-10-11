@@ -132,7 +132,7 @@ def propose(root,character,state,analysis):
     shoe={"status":"INCONCLUSIVO","reason":"pose com deslocamento intencional"}
     if state in PLANTED:
         positions=art_track(root,atlas,ids,baseline)
-        start=7 if state=="VICTORY" else 0
+        start=7 if state=="VICTORY" and cid=="player_base" else 0
         shoe=correct_shoes(positions,start)
     if scale["status"]!="CORRIGIDO" and shoe["status"]!="CORRIGIDO":
         return {"status":"SEM_AJUSTE_SEGURO","state":state,
@@ -140,8 +140,11 @@ def propose(root,character,state,analysis):
     correction=scale.get("scale",1.)
     offsets=[0.]*len(ids)
     if shoe["status"]=="CORRIGIDO":
-        offsets[shoe["start"]:]=shoe["dx"]
-        # Independent post-fix metric using the final rendering equation.
+        # Screen position is original shoe track multiplied by the proposed
+        # uniform scale, THEN augmented by the new offset. Scale the intended
+        # foot offsets as well or mixed size+drift fixes would be invalid.
+        offsets[shoe["start"]:]=[round(v*correction,4) for v in shoe["dx"]]
+        # Independent post-fix metric using the exact rendering equation.
         next_positions=[positions[i]*correction+offsets[i] for i in range(len(ids))]
         if np.ptp(next_positions[shoe["start"]:])>.25:
             return {"status":"REPROVADO","reason":"trilha final nao estabilizou"},None
@@ -177,7 +180,7 @@ def publish(asset,record):
     return {"asset":str(asset),"backup":str(backup)}
 
 
-def rollback(asset):
+def rollback(asset,expected_character=None):
     asset=Path(asset)
     backup=asset.with_suffix(".previous.json")
     if not backup.exists():
@@ -185,6 +188,11 @@ def rollback(asset):
     doc=json.loads(backup.read_text(encoding="utf8"))
     if doc.get("schema")!=1:
         raise ValueError("Snapshot invalido")
+    current=json.loads(asset.read_text(encoding="utf8")) if asset.exists() else {}
+    added=[x for x in current.get("corrections",[]) if x not in doc.get("corrections",[])]
+    if expected_character is not None and (
+        len(added)!=1 or added[0].get("character")!=expected_character):
+        raise ValueError("Rollback pertence a outro personagem")
     tmp=asset.with_suffix(".tmp")
     tmp.write_text(json.dumps(doc,indent=2)+"\n",encoding="utf8")
     os.replace(tmp,asset)
@@ -204,7 +212,7 @@ def main(argv=None):
     try:
         character_pack(args.personagem)
         if args.reverter:
-            outcome=rollback(args.asset)
+            outcome=rollback(args.asset,character_pack(args.personagem))
         else:
             if not args.estado or args.videos_dir is None or not args.videos_dir.is_dir():
                 parser.error("Para corrigir, informe --estado e --videos-dir")
