@@ -1,0 +1,51 @@
+name: P02 IDLE - Publish Direct APK
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - refino/p02-animacoes-20261011
+    paths:
+      - .github/workflows/p02-idle-publish-apk.yml
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish-direct-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source build passed on its exact source commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SOURCE="4ec70edd18b86dfbf5c8741b4bb95aeefe7a8557"
+          RESULT="$(gh run view 38150688850 --repo "$GITHUB_REPOSITORY" --json conclusion,headSha --jq '"\(.conclusion) \(.headSha)"')"
+          test "$RESULT" = "success $SOURCE"
+          echo "Verified source commit: $SOURCE"
+      - name: Retrieve existing validated APK (do not rebuild or modify assets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/p02_download"
+          gh run download 38150688850 --repo "$GITHUB_REPOSITORY" \
+            --name p02-idle-refino-debug-apk --dir "$RUNNER_TEMP/p02_download"
+          test -s "$RUNNER_TEMP/p02_download/app-debug.apk"
+          unzip -p "$RUNNER_TEMP/p02_download/app-debug.apk" assets/sprite-autofix.json \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); p=[x for x in d["corrections"] if x["character"]=="p02" and x["atlas"]=="p02_idle"]; assert len(p)==1 and p[0]["frames"]==[[51,1,2,0],[52,1,2,0],[53,1,2,0],[54,1,2,0],[55,1,2,0]]'
+          cp "$RUNNER_TEMP/p02_download/app-debug.apk" "$RUNNER_TEMP/P02-IDLE-refino-4ec70edd.apk"
+          sha256sum "$RUNNER_TEMP/P02-IDLE-refino-4ec70edd.apk"
+      - name: Create experimental prerelease with RAW APK asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create p02-idle-refino-4ec70edd \
+            "$RUNNER_TEMP/P02-IDLE-refino-4ec70edd.apk" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "4ec70edd18b86dfbf5c8741b4bb95aeefe7a8557" \
+            --title "P02 IDLE — teste experimental (4ec70edd)" \
+            --notes "APK de debug para avaliar o IDLE do P02. Build/testes aprovados no workflow 38150688850. P02 controlado, P01 NPC sem TAG. Apenas 5 ajustes horizontais nao destrutivos em frames 51–55. Sem merge, sem aprovacao final." \
+            --prerelease
