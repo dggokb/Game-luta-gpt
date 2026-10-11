@@ -1,0 +1,125 @@
+name: Approved P02 IDLE - Sprite Engine and Direct APK
+
+on:
+  push:
+    branches:
+      - integracao/p02-idle-aprovado-20261011
+    paths:
+      - .github/workflows/p02-idle-approved-apk.yml
+      - characters/p02/character.json
+      - android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+      - android/app/src/test/java/com/gamelutagpt/P02IdleRuntimeFixTest.java
+      - tools/sprites/verificar_frames.py
+      - tools/sprites/tests/test_verificar_frames.py
+      - tools/sprites/validar_p02_idle_real.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sprite-motor-and-android-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install sprite engine dependencies
+        run: python -m pip install Pillow==12.3.0 numpy
+      - name: Verify approved P02 pack and engine-generated Android mapping
+        run: |
+          python - <<'PY'
+          import json,re,hashlib
+          from pathlib import Path
+          from PIL import Image
+          cfg=json.loads(Path('characters/p02/character.json').read_text())
+          anim=cfg['animations']['IDLE']
+          assert anim['atlas']=='p02_idle' and anim['loop'] is True
+          assert anim['frames']==list(range(15,45)), "P02 IDLE must preserve authored, forward 15..44"
+          assert anim['durationsMs']==[41]*30
+          java=Path('android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java').read_text()
+          match=re.search(r'(?m)^.*a\.put\("IDLE".*Atlas\("p02_idle".*$',java)
+          assert match, "Missing compiled P02 IDLE definition"
+          s=match.group()
+          assert 'new int[]{'+','.join(map(str,anim['frames']))+'}' in s
+          assert 'new float[]{'+','.join(['0.04100000f']*30)+'}' in s
+          assert 'new CharacterDefinition.Atlas("p02_idle",332,445,169,429,11,56,2.00000000f)' in s
+          atlas=Path('android/app/src/main/res/drawable-nodpi/p02_idle.png')
+          report=json.loads(Path('tools/sprites/reports/p02_idle.report.json').read_text())
+          with Image.open(atlas) as im:
+              assert im.mode=='RGBA' and im.size==(332*11,445*6)
+          assert report['packed']['pixelScale']==2 and report['packed']['frameCount']==56
+          fixes=json.loads(Path('android/app/src/main/assets/sprite-autofix.json').read_text())['corrections']
+          assert not any(x['character']=='p02' and x['atlas']=='p02_idle' for x in fixes)
+          assert {x['atlas'] for x in fixes if x['character']=='player_base'}=={'player_base_intro','player_base_victory'}
+          print('P02 engine mapping OK; 30 steps over original 56-cell HD atlas; P01 untouched')
+          print('P02 atlas SHA256:',hashlib.sha256(atlas.read_bytes()).hexdigest())
+          PY
+      - name: Test continuity detector
+        run: python -m unittest discover -s tools/sprites/tests -p test_verificar_frames.py -v
+      - name: Validate real packed Android PNG across source layers and loop
+        run: |
+          python tools/sprites/verificar_frames.py \
+            --character p02 --clip p02_idle --compare-source --fail-on-break \
+            --output android/app/build/sprite-review/p02-idle-approved-continuity
+          python tools/sprites/validar_p02_idle_real.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Run P02 and P01 Android regression tests
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            -x :app:verifySpritePacks
+      - name: Assemble Android debug APK
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Verify final packaged P02 atlas and P01 fixes
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -p "$APK" res/drawable-nodpi-v4/p02_idle.png >/tmp/p02-published.png
+          cmp /tmp/p02-published.png android/app/src/main/res/drawable-nodpi/p02_idle.png
+          unzip -p "$APK" assets/sprite-autofix.json >/tmp/p02-published-autofix.json
+          cmp /tmp/p02-published-autofix.json android/app/src/main/assets/sprite-autofix.json
+          echo "BUILT_FROM_COMMIT=$(git rev-parse HEAD)"
+          sha256sum "$APK"
+      - name: Upload APK and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-idle-approved-integration
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/sprite-review/p02-idle-approved-continuity/
+            android/app/build/sprite-review/p02-idle-diagnose/
+            android/app/build/reports/tests/
+          if-no-files-found: warn
+      - name: Publish direct .apk in experimental release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHORT="${GITHUB_SHA:0:8}"
+          TAG="p02-idle-integrado-${SHORT}"
+          SRC="android/app/build/outputs/apk/debug/app-debug.apk"
+          DEST="$RUNNER_TEMP/P02-IDLE-integrado-${SHORT}.apk"
+          cp "$SRC" "$DEST"
+          gh release create "$TAG" "$DEST" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "P02 IDLE aprovado - integracao isolada ${SHORT}" \
+            --notes "APK debug gerado da integracao isolada do IDLE aprovado do P02 sobre game-luta-sprite-gpt. 30 quadros nativos 15-44, atlas HD original intacto; P01 preservado. Sem merge ou alteracao da branch principal." \
+            --prerelease
