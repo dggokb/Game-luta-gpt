@@ -68,8 +68,8 @@ def panel(intro,idle,time,blended,world,total,elapsed):
 def error(a,b):
     # Same exact ground, root and bitmap transforms; all BG identical.
     import numpy as np
-    x=np.asarray(a.convert('RGB')).astype('int16')
-    y=np.asarray(b.convert('RGB')).astype('int16')
+    x=np.asarray(a.crop((65,58,W-65,H-12)).convert('RGB')).astype('int16')
+    y=np.asarray(b.crop((65,58,W-65,H-12)).convert('RGB')).astype('int16')
     return float(np.abs(x-y).mean()/255.)
 
 def main(root,character,out):
