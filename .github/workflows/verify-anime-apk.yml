@@ -1,0 +1,62 @@
+name: Verificar APK Templo da Lua por hashes
+
+on:
+  push:
+    branches:
+      - art/cenarios-anime-20261011
+    paths:
+      - '.github/workflows/verify-anime-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conferir-arquivos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout branch de teste
+        uses: actions/checkout@v4
+
+      - name: Baixar APK direto da release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/templo-apk
+          gh release download cenarios-anime-20261011 \
+            --repo ${{ github.repository }} \
+            --pattern 'GameLutaGPT-Cenarios-Anime.apk' --dir /tmp/templo-apk
+          test -s /tmp/templo-apk/GameLutaGPT-Cenarios-Anime.apk
+
+      - name: Conferir dez imagens e stage.json dentro do APK (hash exato)
+        run: |
+          python3 - <<'PY' | tee /tmp/templo-apk/validacao.txt
+          import hashlib, json, pathlib, zipfile
+          folder = pathlib.Path("android/app/src/main/assets/stages/templo_lua")
+          apk = pathlib.Path("/tmp/templo-apk/GameLutaGPT-Cenarios-Anime.apk")
+          manifest = json.loads((folder/"anime-style-manifest.json").read_text())
+          assert manifest["mode"] == "animeganv2_hayao_onnx_image_to_image"
+          assert len(manifest["files"]) == 10
+          with zipfile.ZipFile(apk) as z:
+              assert z.testzip() is None, "APK com entrada ZIP corrompida"
+              for info in manifest["files"]:
+                  name = info["file"]
+                  path = "assets/stages/templo_lua/" + name
+                  apk_data = z.read(path)
+                  apk_sha = hashlib.sha256(apk_data).hexdigest()
+                  local_sha = hashlib.sha256((folder/name).read_bytes()).hexdigest()
+                  assert apk_sha == local_sha == info["output_sha256"], name
+                  print(f"OK {name} {len(apk_data)} bytes {apk_sha}")
+              stage_path = "assets/stages/templo_lua/stage.json"
+              assert z.read(stage_path) == (folder/"stage.json").read_bytes()
+              print("OK stage.json - sem alterações de geometria")
+          print("APROVADO: os 10 arquivos redesenhados estão presentes no APK.")
+          PY
+
+      - name: Publicar comprovação textual
+        uses: actions/upload-artifact@v4
+        with:
+          name: Validacao-Arquivos-Dentro-APK
+          path: /tmp/templo-apk/validacao.txt
+          if-no-files-found: error
