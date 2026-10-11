@@ -194,7 +194,13 @@ def propose(root,character,state,analysis):
     ids=animation["frames"]
     if not ids:
         raise ValueError("Animacao sem quadros")
-    proof=analysis.get("estados",{}).get(state,{}).get("prova_geometrica",{})
+    source=analysis.get("estados",{}).get(state,{})
+    video=source.get("video",{})
+    # The SOURCE must exist and have measurable foreground. Never publish
+    # an atlas-only guess when the author video is missing or ambiguous.
+    if video.get("status")!="ENCONTRADO" or video.get("analise",{}).get("status")!="MEDIDO":
+        return {"status":"SEM_AJUSTE_SEGURO","reason":"video original ausente, ambiguo ou nao mensuravel"},None
+    proof=source.get("prova_geometrica",{})
     baseline=base_calibration(root,atlas,ids)
     sx=[v[0] for v in baseline];sy=[v[1] for v in baseline]
     # Anisotropic poses require framewise anatomical evaluation; a uniform
