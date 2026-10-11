@@ -100,6 +100,6 @@ jobs:
             gh release create "$TAG" "$RUNNER_TEMP"/p02-ready/* \
               --target "$GITHUB_SHA" \
               --title "P02 IDLE - teste de continuidade ${SHORT}" \
-              --notes "P02 controlado, P01 NPC sem TAG; 56 sprites HD fisicos inalterados; 40 passos de playback, loop de respiracao sem offsets. Escala original preservada. Sem merge. Pendente aprovacao visual." \
+              --notes "P02 controlado, P01 NPC sem TAG; 56 sprites HD fisicos inalterados; 56 passos de playback mantendo frame 0 na entrada e saida, loop de respiracao sem offsets. Escala original preservada. Sem merge. Pendente aprovacao visual." \
               --prerelease
           fi
