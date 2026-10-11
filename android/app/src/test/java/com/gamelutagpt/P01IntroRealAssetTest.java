@@ -26,7 +26,7 @@ public class P01IntroRealAssetTest {
         }
         try {
             SpriteAutoFix.replaceFromJson(new String(bytes.toByteArray(),StandardCharsets.UTF_8));
-            assertEquals("Original P01: 33 VICTORY + 27 INTRO; P02: 5 IDLE",65,SpriteAutoFix.count());
+            assertEquals("P01 offsets unchanged: 33 VICTORY + 27 INTRO; obsolete P02 shifts removed",60,SpriteAutoFix.count());
             int active=0;
             for(int frame=0;frame<27;frame++) {
                 SpriteAutoFix.Adjustment a=SpriteAutoFix.get(
