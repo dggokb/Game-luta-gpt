@@ -1,0 +1,57 @@
+name: Build P01 Victory experimental APK
+on:
+  push:
+    branches:
+      - refino/p01-animacoes-20261009
+    paths:
+      - .github/workflows/p01-victory-apk.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  android-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout branch commit
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install P01 calibration dependency
+        run: python -m pip install Pillow
+      - name: Confirm Android SDK
+        run: |
+          echo "SDK path: $ANDROID_HOME"
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Test actual victory correction wiring
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            --tests com.gamelutagpt.CameraRigRoundEndTest
+      - name: Build APK
+        run: gradle -p android --no-daemon :app:assembleDebug
+      - name: Verify APK and source commit
+        run: |
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          echo "APK_SOURCE_COMMIT=$(git rev-parse HEAD)"
+          sha256sum android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload directly built APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: p01-victory-experimental-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
