@@ -8,10 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.GraphicsMode;
 import java.lang.reflect.Method;
 
 /** Real Android Canvas/Bitmap proof that SpriteAutoFix scales only the desired atlas. */
 @RunWith(RobolectricTestRunner.class)
+@GraphicsMode(mode = GraphicsMode.Mode.NATIVE)
 public class P02AnatomyRendererTest {
     private Bitmap render(SpriteFighterRenderer renderer, CharacterDefinition.Atlas atlas,
                           int physicalFrame) throws Exception {
