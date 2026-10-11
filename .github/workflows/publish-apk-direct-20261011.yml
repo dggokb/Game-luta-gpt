@@ -1,0 +1,46 @@
+name: Publish direct test APK for sprite-gpt snapshot
+on:
+  push:
+    branches:
+      - build/apk-sprite-gpt-20261011-1105
+    paths:
+      - .github/workflows/publish-apk-direct-20261011.yml
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download verified APK from snapshot build
+        uses: actions/download-artifact@v4
+        with:
+          name: game-luta-sprite-gpt-fd038e8-apk
+          run-id: 38150152196
+          github-token: ${{ github.token }}
+          path: /tmp/apk
+      - name: Verify checksum and prepare direct APK
+        run: |
+          cd /tmp/apk
+          echo "0e64044efff6502755371cc58c41efc10c364e9d6fce7132aad4ae8ad7253f61  app-debug.apk" | sha256sum --check
+          mv app-debug.apk GameLutaGPT-sprite-gpt-fd038e8.apk
+          test -s GameLutaGPT-sprite-gpt-fd038e8.apk
+      - name: Publish preview release with direct APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          TAG="apk-sprite-gpt-fd038e8-20261011"
+          APK="/tmp/apk/GameLutaGPT-sprite-gpt-fd038e8.apk"
+          if gh release view "$TAG" --repo dggokb/Game-luta-gpt >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber --repo dggokb/Game-luta-gpt
+          else
+            gh release create "$TAG" "$APK" \
+              --repo dggokb/Game-luta-gpt \
+              --target fd038e8027901ebbf97ffddc995a8b8efe8d11d4 \
+              --prerelease \
+              --title "APK de teste sprite-gpt (fd038e8)" \
+              --notes "APK Android de teste gerado exatamente a partir dos arquivos de jogo do commit fd038e8027901ebbf97ffddc995a8b8efe8d11d4 da branch game-luta-sprite-gpt. Sem merge. SHA256: 0e64044efff6502755371cc58c41efc10c364e9d6fce7132aad4ae8ad7253f61."
+          fi
+          gh release view "$TAG" --repo dggokb/Game-luta-gpt --json assets,tagName,url
