@@ -1,3 +1,40 @@
+## v6 — execução autônoma POR PERSONAGEM
+
+O corretor deixou de ser apenas diagnosticador. O comando abaixo analisa
+**um único personagem** e percorre **todas as animações desse personagem**
+presentes no manifesto. Para cada estado ele mede, verifica fontes,
+propõe correções seguras e renderiza pixels corrigidos para comparar
+o deslizamento antes/depois. **Publica um único lote, com rollback único.**
+
+```bash
+# Corrigir automaticamente as animações comprovadamente defeituosas do P01:
+python3 tools/sprites/autoestabilizar.py p01 \
+  --videos-dir /pasta/animations/p01 --corrigir
+
+# Apenas visualizar o que o motor mudaria, sem escrever nada:
+python3 tools/sprites/autoestabilizar.py p01 \
+  --videos-dir /pasta/animations/p01
+
+# Corrigir somente 2M, por exemplo:
+python3 tools/sprites/autoestabilizar.py p01 \
+  --videos-dir /pasta/animations/p01 --estado 2M --corrigir
+
+# Desfazer o último lote publicado, somente do P01:
+python3 tools/sprites/autoestabilizar.py p01 --reverter
+```
+
+O arquivo publicado em `android/app/src/main/assets/sprite-autofix.json`
+é consumido pelo novo `SpriteAutoFix.java` chamado pelo
+`SpriteFighterRenderer.java`. A validação inclui testes Python com um
+atlas real criado no teste, aplicação e rollback, além de testes
+Android de escopo do personagem, limites de escala e rejeição de JSON
+inválido.
+
+**Restrições:** só corrige automaticamente tamanho quando os originais
+do vídeo dão prova geométrica confiável e o valor final renderizado
+está incorreto; só ajusta ancoragem em estados plantados e sem deslocamento
+intencional. Sem fonte ou com movimento ambíguo o motor não inventa alteração.
+
 # Corretor / estabilizador de sprites — contrato técnico v2
 
 ## Contrato de operação
