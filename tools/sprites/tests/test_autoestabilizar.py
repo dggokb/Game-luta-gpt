@@ -8,6 +8,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -71,6 +72,8 @@ class AutoCorrectionTest(unittest.TestCase):
                           "pixelScale":1}}))
             analysis={"estados":{"VICTORY":{
                 "video":{"status":"ENCONTRADO","analise":{"status":"MEDIDO"}},
+                "sprite":{"status":"MEDIDO","deslize":{"status":"SUSPEITA_DE_DESLIZE"}},
+                "origem_tremor":{"status":"SUSPEITA_DE_TREMOR_INTRODUZIDO_NOS_SPRITES"},
                 "prova_geometrica":{"status":"INCONCLUSIVO"}}}}
             result,record=AUTO.propose(root,"p02","VICTORY",analysis)
             self.assertEqual("CORRIGIDO",result["status"],result)
@@ -190,6 +193,51 @@ class AutoCorrectionTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"duplicadas"):
                 AUTO.publish(asset,new)
             self.assertEqual(duplicates,json.loads(asset.read_text()))
+
+
+    def test_foot_autofix_requires_independent_stable_source(self):
+        # Monotonic foot travel may be an intentional step, not a defect.
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            manifest=root/"characters/p02/character.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(json.dumps({"animations":{
+                "VICTORY":{"atlas":"p02_victory","frames":list(range(12))}
+            }}))
+            report=root/"tools/sprites/reports/p02_victory.report.json"
+            report.parent.mkdir(parents=True)
+            report.write_text(json.dumps({"packed":{"pixelScale":1}}))
+            base={"status":"MEDIDO","deslize":None,"tremor":{}}
+            source={"status":"ENCONTRADO","analise":base}
+            evidence={"estados":{"VICTORY":{
+                "video":source,"sprite":base,
+                "prova_geometrica":{"status":"INCONCLUSIVO"}
+            }}}
+            # Extreme certainty in pixel offsets alone does not prove intent.
+            with (patch.object(AUTO,"art_track",return_value=list(range(12))),
+                  patch.object(AUTO,"validate_pixels_after",
+                               return_value={"status":"CONFIRMADO_EM_PIXELS"})):
+                result,record=AUTO.propose(root,"p02","VICTORY",evidence)
+                self.assertEqual("SEM_AJUSTE_SEGURO",result["status"],result)
+                self.assertIsNone(record)
+
+                # Same movement in the author video is not introduced by atlas.
+                observed=evidence["estados"]["VICTORY"]
+                observed["origem_tremor"]={"status":"ANOMALIA_TAMBEM_PRESENTE_NO_VIDEO"}
+                observed["video"]={"status":"ENCONTRADO","analise":{
+                    **base,"deslize":{"status":"SUSPEITA_DE_DESLIZE"}}}
+                observed["sprite"]={**base,"deslize":{"status":"SUSPEITA_DE_DESLIZE"}}
+                result,record=AUTO.propose(root,"p02","VICTORY",evidence)
+                self.assertEqual("SEM_AJUSTE_SEGURO",result["status"],result)
+                self.assertIsNone(record)
+
+                # Clean source and independently confirmed atlas-only motion.
+                observed["video"]=source
+                observed["origem_tremor"]={
+                    "status":"SUSPEITA_DE_TREMOR_INTRODUZIDO_NOS_SPRITES"}
+                result,record=AUTO.propose(root,"p02","VICTORY",evidence)
+                self.assertEqual("CORRIGIDO",result["status"],result)
+                self.assertIsNotNone(record)
 
     def test_no_correction_of_unimported_character_or_deliberately_moving_state(self):
         with tempfile.TemporaryDirectory() as d:

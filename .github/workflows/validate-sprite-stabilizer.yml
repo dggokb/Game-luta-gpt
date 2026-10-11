@@ -9,6 +9,8 @@ on:
       - 'tools/sprites/estabilizador.py'
       - 'tools/sprites/refinar_elenco.py'
       - 'tools/sprites/verificar_escala.py'
+      - 'tools/sprites/autoestabilizar.py'
+      - 'tools/sprites/tests/test_autoestabilizar.py'
       - 'tools/sprites/tests/test_refinar_elenco.py'
       - 'tools/sprites/tests/test_verificar_escala.py'
       - 'tools/sprites/requirements-animar.txt'
@@ -35,3 +37,5 @@ jobs:
         run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v
       - name: Validate independent geometric and freeze proofs
         run: python3 -m unittest discover -s tools/sprites/tests -p test_verificar_escala.py -v
+      - name: Validate guarded non-destructive auto-correction
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_autoestabilizar.py -v

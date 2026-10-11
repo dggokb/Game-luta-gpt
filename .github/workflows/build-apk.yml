@@ -12,7 +12,6 @@ on:
       - game-luta-sprite-gpt
       - game-luta-sprite-astra
       - 'claude/**'
-      - 'refino/p01-animacoes-20261009'
   pull_request:
   workflow_dispatch:
 
