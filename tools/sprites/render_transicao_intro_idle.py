@@ -35,7 +35,9 @@ def fade(intro,t):
     total=sum(intro['durationsMs'])
     window=min(420,total*0.16)
     if not window:return 0.0
-    p=max(0.,min(1.,(t-(total-window))/window))
+    hold=min(67,total*.07)
+    finish=total-hold
+    p=max(0.,min(1.,(t-(finish-window))/window))
     return p*p*(3.-2.*p)
 
 def draw(canvas,cell,geometry,world,opacity):
@@ -110,7 +112,7 @@ def main(root,character,out):
             'introDurationMs':total,'endToIdleBefore':round(old_error,6),
             'endToIdleAfter':round(new_error,6),
             'boundaryReductionPct':round(100*(1-new_error/old_error),2),
-            'blendMs':min(420,total*.16),
+            'blendMs':min(420,total*.16),'idleHoldBeforeSwitchMs':min(67,total*.07),
             'usedRealAndroidAtlases':True,'unchangedArt':True,
             'note':'A much smaller boundary difference is necessary but not sufficient for visual approval.'}
     (out/'runtime_transition.json').write_text(json.dumps(report,indent=2)+'\n')
