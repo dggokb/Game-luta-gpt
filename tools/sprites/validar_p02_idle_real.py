@@ -60,7 +60,23 @@ def main():
                        "aligned":round(iou(shapes[0],shift(m,chosen)),5)})
     # Circular temporal median to prevent introducing correction jitter.
     smoothed=[int(np.median([proposed[(i+d)%N] for d in (-2,-1,0,1,2)])) for i in range(N)]
-    ground_shift=[round(f["feet"]+d,3) for f,d in zip(ff,smoothed)]
+
+    # Validate the ACTUAL Android runtime corrections rather than candidates.
+    fixes=json.loads((R/"android/app/src/main/assets/sprite-autofix.json").read_text())["corrections"]
+    selected=[e for e in fixes if e.get("character")=="p02" and e.get("atlas")=="p02_idle"]
+    assert len(selected)==1, "P02 IDLE must have exactly one runtime adjustment scope"
+    rows=selected[0]["frames"]
+    assert sorted(int(row[0]) for row in rows)==list(range(51,56))
+    assert all(len(row)==4 and row[1]==1 and row[3]==0 and row[2]==2 for row in rows)
+    offsets=[0]*N
+    for i,size,dx,dy in rows: offsets[int(i)]=int(dx)
+    assert offsets==smoothed, "Runtime offsets deviate from measured candidate"
+    with Image.open(PATH) as atlas:
+        assert atlas.mode=="RGBA", "Alpha channel removed"
+        assert atlas.size==(W*C,H*((N+C-1)//C)), "Invalid packed Android resource"
+    assert all(f["opaque"]>1000 for f in ff), "Transparent or empty frame"
+    assert all(0<f["bbox"][0] and f["bbox"][2]+max(offsets)<W for f in ff), "Sprite clipped after shift"
+
     def measures(offsets):
         feet=[f["feet"]+d for f,d in zip(ff,offsets)]
         torso=[f["torso_x"]+d for f,d in zip(ff,offsets)]
@@ -73,14 +89,21 @@ def main():
                 "width_range_px":[min(f["width"] for f in ff),max(f["width"] for f in ff)],
                 "ground_y_range_px":[min(f["bottom"] for f in ff),max(f["bottom"] for f in ff)],
                 "foot_mask_loop_iou":round(iou(shift(shapes[-1],offsets[-1]),shift(shapes[0],offsets[0])),5)}
-    orig=measures([0]*N); aligned=measures(smoothed)
+    orig=measures([0]*N); aligned=measures(offsets)
+    assert aligned["foot_range_px"] < orig["foot_range_px"]
+    assert aligned["foot_seam_px"] < orig["foot_seam_px"]
+    assert aligned["foot_mask_loop_iou"] > orig["foot_mask_loop_iou"]
+    assert aligned["ground_y_range_px"]==orig["ground_y_range_px"]
+    assert aligned["height_range_px"]==orig["height_range_px"]
+    assert aligned["width_range_px"]==orig["width_range_px"]
+
     # Contact pixel shifts are presented as candidates only. Preserve video
     # movement unless a human reviews the measurements and visual overlay.
-    info={"status":"DIAGNOSTIC_ONLY_NO_ASSET_CHANGED",
+    info={"status":"RUNTIME_P02_IDLE_FIX_VERIFIED_REAL_PACKED_PNG",
       "source":"android/app/src/main/res/drawable-nodpi/p02_idle.png",
-      "packed":CFG,"count":N,"before":orig,"candidate_after":aligned,
-      "candidate_shifts_px_2x":smoothed,"raw_shifts":proposed,
-      "candidate_changes":sum(d!=0 for d in smoothed),
+      "packed":CFG,"count":N,"before":orig,"after":aligned,
+      "applied_shifts_px_2x":offsets,"raw_shifts":proposed,
+      "changed_frames":sum(d!=0 for d in offsets),
       "frame_scores":scores,
       "frames":[{"index":i,"bbox":f["bbox"],"height":f["height"],
            "width":f["width"],"feet":round(f["feet"],2),
@@ -91,10 +114,23 @@ def main():
     for k,i in enumerate((0,11,22,33,44,55)):
         for row in range(2):
             pic=Image.new("RGBA",(W,H),(239,240,244,255))
-            dx=smoothed[i] if row else 0
+            dx=offsets[i] if row else 0
             pic.alpha_composite(pngs[i],(dx,0))
             compare.paste(pic.convert("RGB").resize((215,280)),(k*240,row*310+23))
-            d.text((k*240+6,row*310+4),f"f{i:02} "+("candidate" if row else "current")+f" dx={dx}",fill=(0,0,0))
-    compare.save(OUT/"preview_before_candidate.png")
+            d.text((k*240+6,row*310+4),f"f{i:02} "+("after" if row else "before")+f" dx={dx}",fill=(0,0,0))
+    compare.save(OUT/"preview_before_after.png")
+    # 56 actual PNG cells, two synchronized loops at the authored 41 ms.
+    frames=[]
+    for i,source in enumerate(pngs):
+        pair=Image.new("RGB",(480,324),(239,240,244))
+        for side,dx in enumerate((0,offsets[i])):
+            target=Image.new("RGBA",(W,H),(239,240,244,255))
+            target.alpha_composite(source,(dx,0))
+            small=target.convert("RGB").resize((240,322),Image.Resampling.LANCZOS)
+            pair.paste(small,(240*side,1))
+        frames.append(pair.quantize(colors=128))
+    frames[0].save(OUT/"loop_before_after.gif",save_all=True,
+                   append_images=frames[1:],duration=41,loop=0,optimize=False)
+
     print(json.dumps({k:v for k,v in info.items() if k not in ("frames","frame_scores")},indent=2))
 if __name__=="__main__":main()
