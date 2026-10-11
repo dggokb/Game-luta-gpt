@@ -25,7 +25,7 @@ public class SpriteIntroTransitionTest {
     }
 
     /** Unmodified old renderer output; negative control uses the ACTUAL final INTRO. */
-    private static Bitmap originalLastFrame(SpriteFighterRenderer renderer,
+    private static Bitmap originalLastFrame(SpriteAtlasCache atlasCache,SpriteFighterRenderer renderer,
                                             CharacterDefinition.Animation intro,float t) {
         Bitmap shot=Bitmap.createBitmap(W,H,Bitmap.Config.ARGB_8888);
         Canvas target=new Canvas(shot);
@@ -36,7 +36,7 @@ public class SpriteIntroTransitionTest {
                              (frame%a.columns+1)*a.width,(frame/a.columns+1)*a.height);
         RectF dest=new RectF(450f-a.rootX*scale,612f-a.rootY*scale,
                             450f+(a.width-a.rootX)*scale,612f+(a.height-a.rootY)*scale);
-        target.drawBitmap(renderer.atlases.get(a),source,dest,new Paint(Paint.FILTER_BITMAP_FLAG));
+        target.drawBitmap(atlasCache.get(a),source,dest,new Paint(Paint.FILTER_BITMAP_FLAG));
         return shot;
     }
 
@@ -57,7 +57,8 @@ public class SpriteIntroTransitionTest {
 
     @Test public void realP02IntroConvergesToFirstApprovedIdleFrame() {
         CharacterDefinition actor=GeneratedCharacters.get("p02");
-        SpriteFighterRenderer renderer=new SpriteFighterRenderer(RuntimeEnvironment.getApplication(),actor);
+        SpriteAtlasCache atlasCache=new SpriteAtlasCache(RuntimeEnvironment.getApplication());
+        SpriteFighterRenderer renderer=new SpriteFighterRenderer(atlasCache,actor);
         CharacterDefinition.Animation intro=actor.animation(SpriteStates.INTRO);
         CharacterDefinition.Animation idle=actor.animation(SpriteStates.IDLE);
         assertFalse(intro.loop);
@@ -70,7 +71,7 @@ public class SpriteIntroTransitionTest {
         assertEquals(1f,SpriteIntroTransition.blend(intro,intro.duration),0f);
         assertTrue(SpriteIntroTransition.blend(intro,intro.duration-.012f)>.99f);
 
-        Bitmap original=originalLastFrame(renderer,intro,intro.duration-.012f);
+        Bitmap original=originalLastFrame(atlasCache,renderer,intro,intro.duration-.012f);
         Bitmap finish=render(renderer,SpriteStates.INTRO,intro.duration-.012f);
         Bitmap next=render(renderer,SpriteStates.IDLE,0f);
         double originallyDifferent=averagePixelDistance(original,next);
