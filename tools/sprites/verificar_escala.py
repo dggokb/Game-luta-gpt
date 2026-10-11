@@ -237,7 +237,7 @@ def read_sprite_samples(root,pack,state,selection=(.16,.28,.40,.52,.64,.76,.88))
         total=int(meta.get("frameCount",cols*(img.height//h)))
         if total>cols*(img.height//h):
             return []
-        if any(not isinstance(i,int) or i<0 or i>=total or
+        if any(not isinstance(i,int) or isinstance(i,bool) or i<0 or i>=total or
                ((i//cols)+1)*h>img.height for i in indices):
             return []
         output=[]

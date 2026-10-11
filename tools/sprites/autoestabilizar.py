@@ -223,6 +223,15 @@ def propose(root,character,state,analysis):
     if not animation:
         raise ValueError(f"Animacao ausente: {state}")
     atlas=animation["atlas"]
+    # Android's correction map uses character+atlas+frame (not state).
+    # Modifying an atlas shared with another state would silently change
+    # that other animation, even if --estado selected only this one.
+    shared=[name for name,other in pack["animations"].items()
+            if name!=state and other.get("atlas")==atlas]
+    if shared:
+        return {"status":"BLOQUEADO","state":state,
+                "reason":"atlas compartilhado; correcoes por estado nao sao isoladas",
+                "estados_afetados":shared},None
     ids=animation["frames"]
     if not ids:
         raise ValueError("Animacao sem quadros")
