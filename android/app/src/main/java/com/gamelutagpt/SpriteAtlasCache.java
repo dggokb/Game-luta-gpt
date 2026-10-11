@@ -17,7 +17,7 @@ final class SpriteAtlasCache {
     private final Context context;
     private final Map<String,Bitmap> sheets=new HashMap<>();
 
-    SpriteAtlasCache(Context context) { this.context=context; }
+    SpriteAtlasCache(Context context) { this.context=context; SpriteAutoFix.load(context); }
 
     /** Decodes every atlas of a character before gameplay; never called per frame. */
     void preload(CharacterDefinition definition) {
