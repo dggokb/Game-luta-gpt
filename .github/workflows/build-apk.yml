@@ -62,7 +62,7 @@ jobs:
 
       - name: Verify safe automatic roster triage rules
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
-        run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v && python3 -m unittest discover -s tools/sprites/tests -p test_verificar_escala.py -v
+        run: python3 -m unittest discover -s tools/sprites/tests -p test_refinar_elenco.py -v && python3 -m unittest discover -s tools/sprites/tests -p test_verificar_escala.py -v && python3 -m unittest discover -s tools/sprites/tests -p test_autoestabilizar.py -v
 
       - name: Verify P01 geometry and generate sprite review
         if: github.ref == 'refs/heads/refino/p01-animacoes-20261009'
@@ -111,6 +111,7 @@ jobs:
             --tests 'com.gamelutagpt.P01VisualTuningTest' \
             --tests 'com.gamelutagpt.GlobalMovementTuningTest' \
             --tests 'com.gamelutagpt.CameraRigRoundEndTest' \
+            --tests 'com.gamelutagpt.SpriteAutoFixTest' \
             --tests 'com.gamelutagpt.CombatEngineTest.launcherConfirmCancelsIntoSuperJumpChase' --stacktrace
 
       - name: Build P01-only debug APK
