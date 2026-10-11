@@ -218,11 +218,24 @@ def project_report(root, character, clip_id, compare_source=False):
                     fh=image.height//math.ceil(count/layout["columns"])
                 stages["video_normalized"]=source_sheet(
                     original_path,fw,fh,layout["columns"],count)
-    return stages
+    # Pixel corrections use physical atlas indices. After applying those
+    # corrections, inspect the real timeline of the character's animation,
+    # rather than blindly considering every cell of a (possibly larger) atlas.
+    timeline=list(range(count))
+    character_file=root/"characters"/character/"character.json"
+    if character_file.exists():
+        definition=json.loads(character_file.read_text(encoding="utf-8"))
+        dedicated_state=clip_id[len(character)+1:].upper()
+        animation=definition.get("animations",{}).get(dedicated_state,{})
+        if animation.get("atlas")==clip_id:
+            timeline=animation["frames"]
+            if not timeline or any(type(i) is not int or i<0 or i>=count for i in timeline):
+                raise ValueError("Invalid atlas index in authored playback timeline")
+    return {key:[frames[i] for i in timeline] for key,frames in stages.items()},timeline
 
 
 def run(root,character,clip_id,output,compare_source=True):
-    stages=project_report(root,character,clip_id,compare_source)
+    stages,playback_indices=project_report(root,character,clip_id,compare_source)
     output.mkdir(parents=True,exist_ok=True)
     results={}
     for name,frames in stages.items():
@@ -232,7 +245,7 @@ def run(root,character,clip_id,output,compare_source=True):
     stage_names=list(results)
     all_flags={stage:{f"{x['from']}->{x['to']}" for x in r["suspect_transitions"]}
                for stage,r in results.items()}
-    output_data={"character":character,"clip":clip_id,"source_layers":stage_names,
+    output_data={"character":character,"clip":clip_id,"playback_indices":playback_indices,"source_layers":stage_names,
                  "stages":results,"flags_by_stage":{k:sorted(v) for k,v in all_flags.items()}}
     (output/"continuity.json").write_text(json.dumps(output_data,indent=2)+"\n")
     lines=[f"{character}/{clip_id} actual frame-continuity review"]

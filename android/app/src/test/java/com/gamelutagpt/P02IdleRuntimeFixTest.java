@@ -12,53 +12,49 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-/** Verifies the same P02 IDLE runtime asset/atlas that the APK loads. */
+/** Android P02 IDLE uses only untouched atlas pixels and the approved scale. */
 @RunWith(RobolectricTestRunner.class)
 public class P02IdleRuntimeFixTest {
-    @Test public void packagedIdlesHaveOnlyTheMeasuredFiveFrameFootCorrection() throws Exception {
+    @Test public void continuousBreathingPlaybackKeepsApprovedAtlasSize() throws Exception {
         Context app=RuntimeEnvironment.getApplication();
-        String json;
+        ByteArrayOutputStream buffer=new ByteArrayOutputStream();
         try(InputStream input=app.getAssets().open("sprite-autofix.json")) {
-            ByteArrayOutputStream buffer=new ByteArrayOutputStream();
-            byte[] bytes=new byte[4096];
-            int n;
+            byte[] bytes=new byte[4096]; int n;
             while((n=input.read(bytes))!=-1) buffer.write(bytes,0,n);
-            json=new String(buffer.toByteArray(),StandardCharsets.UTF_8);
         }
+        String json=new String(buffer.toByteArray(),StandardCharsets.UTF_8);
         JSONObject config=new JSONObject(json);
-        JSONArray corrections=config.getJSONArray("corrections");
-        int p02Entries=0;
-        for(int i=0;i<corrections.length();i++) {
-            JSONObject entry=corrections.getJSONObject(i);
-            if(!"p02".equals(entry.getString("character")))continue;
-            assertEquals("p02_idle",entry.getString("atlas"));
-            assertEquals("IDLE",entry.getString("state"));
-            JSONArray rows=entry.getJSONArray("frames");
-            assertEquals(5,rows.length());
-            for(int j=0;j<5;j++) {
-                JSONArray row=rows.getJSONArray(j);
-                assertEquals(51+j,row.getInt(0));
-                assertEquals(1f,(float)row.getDouble(1),0f);
-                assertEquals(2f,(float)row.getDouble(2),0f);
-                assertEquals(0f,(float)row.getDouble(3),0f);
-            }
-            p02Entries++;
+        JSONArray patches=config.getJSONArray("corrections");
+        for(int i=0;i<patches.length();i++) {
+            JSONObject patch=patches.getJSONObject(i);
+            assertFalse("Obsolete P02 IDLE shifts must not affect playback",
+                "p02".equals(patch.getString("character")) && "p02_idle".equals(patch.getString("atlas")));
         }
-        assertEquals(1,p02Entries);
-        CharacterDefinition.Atlas atlas=GeneratedCharacters.get("p02").animation(SpriteStates.IDLE).atlas;
+        CharacterDefinition.Animation idle=GeneratedCharacters.get("p02").animation(SpriteStates.IDLE);
+        CharacterDefinition.Atlas atlas=idle.atlas;
         assertEquals("p02_idle",atlas.resource);
-        assertEquals(56,atlas.count);
+        assertEquals(56,atlas.count); // Original 56 physical HD cells are untouched.
         assertEquals(332,atlas.width);
         assertEquals(445,atlas.height);
+        assertEquals(2.0f,atlas.pixelScale,0f);
+        assertTrue(idle.loop);
+        assertEquals(40*0.041f,idle.duration,0.0001f);
+        int[] timeline=new int[40];
+        int at=0;
+        for(int i=12;i<=32;i++) timeline[at++]=i;
+        for(int i=31;i>=13;i--) timeline[at++]=i;
+        for(int i=0;i<timeline.length;i++) {
+            assertEquals("Unexpected original atlas cell at playback step "+i,
+                timeline[i],idle.frame((i+0.5f)*0.041f,0f));
+        }
+        assertEquals(12,idle.frame(idle.duration+0.0205f,0f));
         try {
             SpriteAutoFix.replaceFromJson(json);
-            for(int frame=0;frame<56;frame++) {
-                SpriteAutoFix.Adjustment fix=SpriteAutoFix.get("p02","p02_idle",frame);
-                assertEquals(1f,fix.size,0f);
-                assertEquals(frame>=51?2f:0f,fix.dx,0f);
+            for(int i=0;i<56;i++) {
+                SpriteAutoFix.Adjustment fix=SpriteAutoFix.get("p02","p02_idle",i);
+                assertEquals(1.0f,fix.size,0f);
+                assertEquals(0f,fix.dx,0f);
                 assertEquals(0f,fix.dy,0f);
-                assertEquals(0f,SpriteAutoFix.get("player_base","p02_idle",frame).dx,0f);
-                assertEquals(0f,SpriteAutoFix.get("p02","p02_intro",frame).dx,0f);
             }
         } finally {
             SpriteAutoFix.replaceFromJson("{\"schema\":1,\"corrections\":[]}");

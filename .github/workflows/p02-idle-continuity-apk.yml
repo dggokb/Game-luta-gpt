@@ -1,0 +1,105 @@
+name: P02 IDLE - Continuity Gate and Raw APK
+on:
+  push:
+    branches:
+      - refino/p02-animacoes-20261011
+    paths:
+      - .github/workflows/p02-idle-continuity-apk.yml
+      - characters/p02/character.json
+      - android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+      - android/app/src/main/assets/sprite-autofix.json
+      - tools/sprites/verificar_frames.py
+      - tools/sprites/validar_p02_idle_real.py
+      - android/app/src/test/java/com/gamelutagpt/P02IdleRuntimeFixTest.java
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install pixel analysis dependencies
+        run: python -m pip install Pillow==12.3.0 numpy
+      - name: Check generated characters and source atlas
+        run: python tools/sprites/build_characters.py --check
+      - name: Test temporal verification engine
+        run: python -m unittest discover -s tools/sprites/tests -p test_verificar_frames.py -v
+      - name: Gate REAL Android pixels and review before/after
+        run: |
+          python tools/sprites/verificar_frames.py --character p02 --clip p02_idle --compare-source --fail-on-break --output android/app/build/sprite-review/p02-idle-continuity-final
+          python tools/sprites/validar_p02_idle_real.py
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Configure Android SDK 35
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-35" || sdkmanager "platforms;android-35"
+          test -d "$ANDROID_HOME/build-tools/35.0.0" || sdkmanager "build-tools;35.0.0"
+      - name: Test P02 and preserve P01 and no TAG
+        run: |
+          gradle -p android --no-daemon :app:testDebugUnitTest \
+            --tests com.gamelutagpt.P02IdleRuntimeFixTest \
+            --tests com.gamelutagpt.P02TrainingMatchTest \
+            --tests com.gamelutagpt.P01IntroRealAssetTest \
+            --tests com.gamelutagpt.P01VictoryRealAssetTest \
+            --tests com.gamelutagpt.SpriteAutoFixTest \
+            -x :app:verifySpritePacks
+      - name: Build debug APK from validated commit
+        run: gradle -p android --no-daemon :app:assembleDebug -x :app:verifySpritePacks
+      - name: Verify final APK resources match source commit
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          unzip -p "$APK" assets/sprite-autofix.json > /tmp/packaged.json
+          cmp android/app/src/main/assets/sprite-autofix.json /tmp/packaged.json
+          unzip -Z1 "$APK" | grep -E '(^|/)p02_idle[.]png$'
+          python - <<'PY'
+          import json
+          patches=json.load(open('/tmp/packaged.json'))['corrections']
+          assert not any(p['character']=='p02' and p['atlas']=='p02_idle' for p in patches)
+          PY
+          echo "SOURCE_COMMIT=$GITHUB_SHA"
+          sha256sum "$APK"
+      - name: Upload continuity evidence and test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p02-idle-continuity-evidence
+          path: |
+            android/app/build/sprite-review/p02-idle-diagnose/
+            android/app/build/sprite-review/p02-idle-continuity-final/
+            android/app/build/reports/tests/
+          if-no-files-found: warn
+      - name: Publish direct .apk and image evidence in experimental Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          SHORT="${GITHUB_SHA:0:8}"
+          TAG="p02-idle-continuity-${SHORT}"
+          D=android/app/build/sprite-review/p02-idle-diagnose
+          mkdir -p "$RUNNER_TEMP/p02-ready"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/p02-ready/P02-IDLE-continuity-${SHORT}.apk"
+          cp "$D/idle_before.gif" "$RUNNER_TEMP/p02-ready/antes.gif"
+          cp "$D/idle_after.gif" "$RUNNER_TEMP/p02-ready/depois.gif"
+          cp "$D/comparativo-lado-a-lado.gif" "$RUNNER_TEMP/p02-ready/comparativo.gif"
+          cp "$D/before_after.json" "$RUNNER_TEMP/p02-ready/continuidade.json"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$RUNNER_TEMP"/p02-ready/* --clobber
+          else
+            gh release create "$TAG" "$RUNNER_TEMP"/p02-ready/* \
+              --target "$GITHUB_SHA" \
+              --title "P02 IDLE - teste de continuidade ${SHORT}" \
+              --notes "P02 controlado, P01 NPC sem TAG; 56 sprites HD fisicos inalterados; 40 passos de playback, loop de respiracao sem offsets. Escala original preservada. Sem merge. Pendente aprovacao visual." \
+              --prerelease
+          fi
