@@ -249,6 +249,45 @@ class AutoCorrectionTest(unittest.TestCase):
                 self.assertEqual("BLOQUEADO",result["status"],result)
                 self.assertIsNone(record)
 
+    def test_scale_only_cannot_be_published_without_rendered_pixel_confirmation(self):
+        # A geometric prediction alone is not an independent AFTER render
+        # measurement. Prevent a mathematically plausible false approval.
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            manifest=root/"characters/p02/character.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(json.dumps({"animations":{
+                "DASH":{"atlas":"p02_dash","frames":[0,1,2,3]}
+            }}))
+            report=root/"tools/sprites/reports/p02_dash.report.json"
+            report.parent.mkdir(parents=True)
+            report.write_text(json.dumps({"packed":{"pixelScale":1.0}}))
+            evidence={"estados":{"DASH":{
+                "video":{"status":"ENCONTRADO","analise":{"status":"MEDIDO"}},
+                "prova_geometrica":{"status":"ESCALA_FORA_DO_IDLE",
+                    "fator_video":.90,"fator_atlas":.90}
+            }}}
+            result,record=AUTO.propose(root,"p02","DASH",evidence)
+            self.assertEqual("SEM_AJUSTE_SEGURO",result["status"],result)
+            self.assertIsNone(record)
+            self.assertEqual("AGUARDANDO_VALIDACAO_PIXELS",
+                             result["tamanho"]["status"])
+            self.assertAlmostEqual(1/.90,
+                result["tamanho"]["proposta"]["scale"],delta=.0001)
+
+    def test_rollback_restores_original_json_bytes_exactly(self):
+        with tempfile.TemporaryDirectory() as folder:
+            asset=Path(folder)/"sprite-autofix.json"
+            original=b'{ "corrections": [], "schema": 1 }\\n\\n'
+            asset.write_bytes(original)
+            record={"character":"p02","atlas":"p02_idle","state":"IDLE",
+                    "frames":[[0,1.0,-2.0,0.0]]}
+            AUTO.publish(asset,record)
+            self.assertNotEqual(original,asset.read_bytes())
+            self.assertEqual("REVERTIDO",AUTO.rollback(asset,"p02")["status"])
+            self.assertEqual(original,asset.read_bytes(),
+                "Rollback must restore byte-exact prior asset, not reformat it")
+
     def test_no_correction_of_unimported_character_or_deliberately_moving_state(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):
