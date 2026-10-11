@@ -56,7 +56,14 @@ Arquivo realmente atualizado na branch: `android/app/src/main/assets/sprite-auto
 1. Captura instrumentada do renderizador Android (ou teste de integração de Canvas com câmera e bitmap reais, além da confirmação no dispositivo), incluindo KO → VICTORY → pose final, nas duas orientações/espelhamentos relevantes.
 2. Reexecutar o monitoramento dos pés na captura real em coordenadas de tela; confrontar com camera.x/zoom, root, pixelScale e `P01VisualTuning` persistido.
 3. Validar por inspeção humana a animação completa, transições e ausência de distorção anatômica em escala de aparelho.
-4. Rodar/registar testes de regressão Android com assets publicados (sem confundir teste unitário com prova visual).
+4. **[Concluído]** Testes Android Robolectric/JUnit da correção publicada, câmera congelada após KO, escopo SpriteAutoFix e calibração P01: [workflow 38141616699](https://github.com/dggokb/Game-luta-gpt/actions/runs/38141616699) — **SUCESSO**, Android `:app:testDebugUnitTest` com SDK de CI; 33 tarefas Gradle, sem gerar APK. Ainda é teste unitário, não captura de dispositivo.
 5. **Não** testar P01 2H nem outros personagens antes da aprovação visual completa da VICTORY.
+
+## Execuções de regressão concluídas
+
+- Prova de pixels do atlas em CI com limiar de melhora obrigatório: [38141301017](https://github.com/dggokb/Game-luta-gpt/actions/runs/38141301017) — SUCESSO, redução de amplitude **66,67%**, +3,0 → 0,0 px de deslocamento líquido.
+- Suíte de regressão Python do motor `refinar_elenco.py`, `verificar_escala.py` e `autoestabilizar.py`: [38141663877](https://github.com/dggokb/Game-luta-gpt/actions/runs/38141663877) — SUCESSO.
+- Testes Android focados com o **asset integrado real**, câmera após KO, calibração e SpriteAutoFix: [38141616699](https://github.com/dggokb/Game-luta-gpt/actions/runs/38141616699) — SUCESSO.
+- Primeiro workflow Android falhou **antes dos testes** por erro de SDK `sdkmanager tools`; a execução corrigida passou. Nunca classificar o primeiro erro como falha visual.
 
 **Portabilidade:** o motor é genérico em interface, mas este reparo concreto depende de prova geométrica do personagem e movimento plantado; não há prova suficiente de funcionamento em personagens/poses diferentes. A única validação honesta é **PARCIAL**.
