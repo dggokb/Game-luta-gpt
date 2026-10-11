@@ -80,6 +80,32 @@ def correct_shoes(positions,start=0):
             "depois_amplitude":round(float(np.ptp(after)),4)}
 
 
+def foot_fix_permission(state_report):
+    """Fail closed when foot motion might be intentional in the original.
+
+    Pixel-perfect flattening of a foot trace is not proof that it SHOULD be
+    flat. Require complete, independent source and packed measurements:
+    atlas-only instability, clean source contacts, and a grounded state.
+    The final bitmap-based before/after proof still runs in propose().
+    """
+    video=state_report.get("video",{}).get("analise",{})
+    packed=state_report.get("sprite",{})
+    origin=state_report.get("origem_tremor",{}).get("status")
+    if video.get("status")!="MEDIDO" or packed.get("status")!="MEDIDO":
+        return {"status":"INCONCLUSIVO",
+                "reason":"sem trilhas completas e independentes para comparar"}
+    if video.get("deslize") or video.get("tremor",{}).get("pe_apoio"):
+        return {"status":"BLOQUEADO",
+                "reason":"movimento dos pes presente no video original"}
+    if origin!="SUSPEITA_DE_TREMOR_INTRODUZIDO_NOS_SPRITES":
+        return {"status":"INCONCLUSIVO",
+                "reason":"movimento nao atribuido exclusivamente ao atlas"}
+    if not (packed.get("deslize") or packed.get("tremor",{}).get("pe_apoio")):
+        return {"status":"INCONCLUSIVO",
+                "reason":"atlas sem anomalia de pe comprovada"}
+    return {"status":"AUTORIZADO"}
+
+
 def art_track(root,atlas,ids,transforms,world_scale=1.):
     root=Path(root)
     report=root/"tools/sprites/reports"/(atlas+".report.json")
@@ -226,14 +252,18 @@ def propose(root,character,state,analysis):
         scale=correct_scale(proof,float(np.median(sx)),idle_base)
     shoe={"status":"INCONCLUSIVO","reason":"pose com deslocamento intencional"}
     if state in PLANTED:
-        positions=art_track(root,atlas,ids,baseline,world_scale)
-        start=7 if state=="VICTORY" and cid=="player_base" else 0
-        # Existing framewise root shifts are world-space offsets, while new
-        # corrections are atlas pixels. Scale only the bitmap-root component.
-        scaled_positions=[
-            (pos-v[2]*to_atlas)*scale.get("scale",1.)+v[2]*to_atlas
-            for pos,v in zip(positions,baseline)]
-        shoe=correct_shoes(scaled_positions,start)
+        permission=foot_fix_permission(source)
+        if permission["status"]=="AUTORIZADO":
+            positions=art_track(root,atlas,ids,baseline,world_scale)
+            start=7 if state=="VICTORY" and cid=="player_base" else 0
+            # Existing framewise root shifts are world-space offsets, while new
+            # corrections are atlas pixels. Scale only the bitmap-root component.
+            scaled_positions=[
+                (pos-v[2]*to_atlas)*scale.get("scale",1.)+v[2]*to_atlas
+                for pos,v in zip(positions,baseline)]
+            shoe=correct_shoes(scaled_positions,start)
+        else:
+            shoe=permission
     if scale["status"]!="CORRIGIDO" and shoe["status"]!="CORRIGIDO":
         return {"status":"SEM_AJUSTE_SEGURO","state":state,
                 "tamanho":scale,"pes":shoe},None
