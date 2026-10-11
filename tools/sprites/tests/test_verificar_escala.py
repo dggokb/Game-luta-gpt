@@ -52,7 +52,7 @@ class GeometricScaleProofTest(unittest.TestCase):
 
     def test_stable_series_confirms_and_unstable_series_fails(self):
         stable=geo.estimate_sequence(self.base,[self.affine(z)
-            for z in (.82,.82,.83,.81,.82)])
+            for z in (.80,.81,.82,.83,.84)])
         self.assertEqual("ESCALA_GEOMETRICA_ESTAVEL",stable["status"],stable)
         self.assertAlmostEqual(.82,stable["fator_mediano"],delta=.03)
         unstable=geo.estimate_sequence(self.base,[self.affine(z)
@@ -206,6 +206,38 @@ class GeometricScaleProofTest(unittest.TestCase):
             meta.write_text(json.dumps({"packed":{"frameWidth":30,"frameHeight":50,
                         "columns":1,"pixelScale":0}}))
             self.assertEqual([],geo.read_sprite_samples(root,pack,"DASH"))
+
+    def test_held_frames_are_analyzed_but_cannot_fake_independent_size_proof(self):
+        import json
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as d:
+            root=Path(d)
+            reports=root/"tools/sprites/reports"
+            images=root/"android/app/src/main/res/drawable-nodpi"
+            reports.mkdir(parents=True)
+            images.mkdir(parents=True)
+            pack={"animations":{
+                "IDLE":{"atlas":"held_idle","frames":[0,1,2]},
+                "CROUCH_MEDIUM":{"atlas":"held_attack",
+                                 "frames":[0,0,1,1,2,2]}}}
+            for atlas in ("held_idle","held_attack"):
+                (reports/(atlas+".report.json")).write_text(json.dumps({
+                    "packed":{"frameWidth":40,"frameHeight":60,
+                              "columns":3,"pixelScale":2,"frameCount":3}}))
+                pic=Image.new("RGBA",(120,60),(0,0,0,0))
+                for i in range(3):
+                    for x in range(8+i*4,30+i*4):
+                        for y in range(8,45):
+                            pic.putpixel((i*40+x,y),(220,130,60,255))
+                pic.save(images/(atlas+".png"))
+            frames=geo.read_sprite_samples(root,pack,"CROUCH_MEDIUM",
+                       selection=(.05,.2,.4,.6,.8,.95))
+            self.assertEqual(6,len(frames),
+                "Hold frame may repeat and must remain visible to motion QA")
+            self.assertTrue(np.array_equal(frames[0],frames[1]))
+            self.assertEqual("INCONCLUSIVO",geo.estimate_sequence(
+                self.base,[self.affine(.82)]*6)["status"],
+                "Six identical holds cannot certify six independent poses")
 
     def test_frozen_atlas_is_detected_against_authored_motion(self):
         def actor(pose):
