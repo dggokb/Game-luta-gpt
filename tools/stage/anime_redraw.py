@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
+from io import BytesIO
 from pathlib import Path
 
 import cv2
@@ -16,6 +18,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageOps
 
 REPO = Path(__file__).resolve().parents[2]
+BASE_SHA = "7ff11cde385d358e93159096c18ed50bf6e97752"
 STAGE = REPO / "android/app/src/main/assets/stages/templo_lua"
 REPORT = STAGE / "anime-style-manifest.json"
 IMAGES = (
@@ -25,16 +28,16 @@ IMAGES = (
 )
 # Céu e pisos mantêm detalhes mais finos; silhuetas recebem contornos mais fortes.
 PARAMS = {
-    "ceu.jpg": (10, 14, .53, .20, 100, 200),
-    "montanhas.png": (18, 18, .78, .35, 70, 145),
-    "cidade.png": (14, 16, .69, .52, 56, 125),
-    "portal.png": (20, 20, .80, .67, 48, 112),
-    "grade.png": (21, 20, .82, .70, 55, 125),
-    "pilar.png": (20, 20, .79, .65, 55, 120),
-    "teto.png": (18, 20, .75, .62, 65, 145),
-    "braseiro.png": (21, 20, .78, .71, 52, 115),
-    "chao.jpg": (17, 18, .70, .40, 80, 165),
-    "chao_lajotas.jpg": (17, 18, .70, .40, 80, 165),
+    "ceu.jpg": (23, 23, .92, .40, 70, 150),
+    "montanhas.png": (31, 29, .96, .66, 48, 108),
+    "cidade.png": (25, 26, .94, .70, 46, 103),
+    "portal.png": (35, 32, .98, .83, 36, 90),
+    "grade.png": (36, 33, .98, .86, 36, 93),
+    "pilar.png": (35, 33, .98, .85, 37, 88),
+    "teto.png": (35, 33, .98, .80, 42, 96),
+    "braseiro.png": (37, 35, .98, .89, 36, 83),
+    "chao.jpg": (34, 31, .97, .72, 48, 105),
+    "chao_lajotas.jpg": (34, 31, .97, .72, 48, 105),
 }
 
 
@@ -48,7 +51,7 @@ def transform(image: Image.Image, filename: str) -> Image.Image:
     rgb, alpha = src[:, :, :3], src[:, :, 3]
     light_step, chroma_step, flat_strength, ink_strength, low, high = PARAMS[filename]
 
-    smooth = cv2.bilateralFilter(rgb, d=7, sigmaColor=50, sigmaSpace=5)
+    smooth = cv2.bilateralFilter(rgb, d=9, sigmaColor=75, sigmaSpace=7)
     lab = cv2.cvtColor(smooth, cv2.COLOR_RGB2LAB)
     quant = lab.astype(np.uint16)
     quant[:, :, 0] = np.clip(
@@ -102,15 +105,16 @@ def main():
     names_in_stage |= {stage["chao"]["imagem"], stage["chao"]["imagemLajotas"]}
     assert names_in_stage == set(IMAGES), ("arquivos diferentes no stage.json", names_in_stage)
 
+    # Sempre parte da arte original, nunca de uma imagem já pós-processada.
     if REPORT.exists():
-        raise SystemExit("Já existe estilização registrada; não aplicar filtro duas vezes. "
-                         "Use o commit-base original para um novo teste.")
+        print("Refinamento: recuperando fontes do commit-base original.")
 
     before, after, metadata = {}, {}, []
     for name in IMAGES:
         file = STAGE / name
-        raw = file.read_bytes()
-        with Image.open(file) as source:
+        rel = file.relative_to(REPO).as_posix()
+        raw = subprocess.check_output(["git", "show", f"{BASE_SHA}:{rel}"], cwd=REPO)
+        with Image.open(BytesIO(raw)) as source:
             original = source.copy()
         changed = transform(original, name)
         if original.size != changed.size:
@@ -145,7 +149,7 @@ def main():
         for m in metadata:
             m["output_sha256"] = digest((STAGE / m["file"]).read_bytes())
         REPORT.write_text(json.dumps({
-            "mode": "deterministic_90s_anime_cel_shading_not_generational_redraw",
+            "mode": "deterministic_90s_anime_cel_shading_v2_not_generational_redraw",
             "source_branch": "game-luta-sprite-gpt",
             "preserves": ["image_size", "png_alpha", "stage_json", "layer_positions"],
             "files": metadata,
