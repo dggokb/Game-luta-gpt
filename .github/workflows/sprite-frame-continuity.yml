@@ -27,7 +27,7 @@ jobs:
         run: |
           python tools/sprites/verificar_frames.py \
             --character p02 --clip p02_idle --compare-source \
-            --output android/app/build/sprite-review/p02-idle-continuity
+            --output android/app/build/sprite-review/p02-idle-continuity --fail-on-break
           cat android/app/build/sprite-review/p02-idle-continuity/review.txt
       - name: Upload real frame-pair evidence and JSON measurements
         if: always()
