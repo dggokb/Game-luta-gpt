@@ -111,7 +111,7 @@ assert differs(before,swapped,(1087,383,1247,609)), 'Team swap did not change sl
 results['checks'].extend(['P2 point and TAG independent','focused team point/TAG swap'])
 
 # Actual APK video: ambient energy, cursor glow, pick flash, then fight transition.
-record=sp.Popen(['adb','shell','screenrecord','--size','1280x720','--bit-rate','3000000','--time-limit','16','/sdcard/selection-effects.mp4'])
+record=sp.Popen(['adb','shell','screenrecord','--size','1280x720','--bit-rate','3000000','--time-limit','45','/sdcard/selection-effects.mp4'])
 time.sleep(1)
 tap(110,420)
 tap(*cell(3))
@@ -121,9 +121,19 @@ tap(*cell(0))
 time.sleep(1)
 ready=capture('ready')
 tap(370,700)
-time.sleep(3)
-fight=capture('confirmed')
-assert differs(ready,fight,(440,150,485,205)) and differs(ready,fight,(550,150,595,205)), 'Confirmation did not leave stationary portrait cores'
+# Cold sprites load synchronously on the game thread. Wait for observed fight
+# pixels instead of treating an arbitrary 3-second loading frame as failure.
+deadline=time.monotonic()+35
+while time.monotonic()<deadline:
+    time.sleep(.5)
+    fight=capture('confirmed')
+    if differs(ready,fight,(440,150,485,205)) and differs(ready,fight,(550,150,595,205)):
+        break
+    logs=adb('logcat','-d','-v','brief').decode(errors='replace')
+    Path('selection-logcat.txt').write_text(logs)
+    assert 'FATAL EXCEPTION' not in logs, 'Android crash during fight loading'
+else:
+    raise AssertionError('Confirmation did not render fight within 35 seconds')
 assert adb('shell','pidof','com.gamelutagpt').strip(), 'App exited'
 logs=adb('logcat','-d','-v','brief').decode(errors='replace')
 Path('selection-logcat.txt').write_text(logs)
@@ -133,6 +143,8 @@ results['checks'].append('confirmation enters running fight without crash')
 Path('selection-qa.json').write_text(json.dumps(results,indent=2))
 print(json.dumps(results,indent=2))
 
+time.sleep(1)
+sp.run(['adb','shell','pkill','-2','screenrecord'],check=False)
 record.wait(timeout=20)
 adb('pull','/sdcard/selection-effects.mp4','selection-effects.mp4')
 assert Path('selection-effects.mp4').stat().st_size>10000, 'Missing emulator video'

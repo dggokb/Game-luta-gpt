@@ -48,6 +48,7 @@ jobs:
           path: |
             selection-*.png
             selection-effects.mp4
+            selection-logcat.txt
             android/app/build/reports/tests/
           if-no-files-found: warn
       - name: Publish tested APK and captures without ZIP
