@@ -38,6 +38,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     // Training opponent: our point character (same body and moves), drawn washed out.
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
+    // O parceiro P2 aparece no seletor; o CPU atual luta somente com o titular.
+    private String opponentTagId = "p04";
 
     private static final float VW = Arena.VW;
     private static final float VH = Arena.VH;
@@ -251,11 +253,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         selectPair(ids[0], ids[1]);
     }
 
-    /** Character select: the picked pair takes the fight (first on point, second in reserve). */
+    /** Compatibilidade com troca de dupla existente. */
     private void selectPair(String point, String partner) {
+        selectTeams(point, partner, opponentFighter.character.id, opponentTagId);
+    }
+
+    /** A seleção muda a dupla P1 e o titular do adversário de treino. */
+    private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
         team = membersOf(point, partner);
-        opponentFighter = new FighterState(team[0].character, "CPU");
-        atlases.retainOnly(team[0].character, team[1].character);
+        opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
+        opponentTagId = cpuPartner;
+        atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
@@ -271,7 +279,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
-        characterSelect.open(team[0].character.id, team[1].character.id);
+        characterSelect.open(team[0].character.id, team[1].character.id,
+            opponentFighter.character.id, opponentTagId);
         pad.reset();
         releaseAllPointers();
     }
@@ -280,7 +289,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         switch (characterSelect.tap(x, y)) {
             case CONFIRM:
                 characterSelect.close();
-                selectPair(characterSelect.point(), characterSelect.partner());
+                selectTeams(characterSelect.point(), characterSelect.partner(),
+                    characterSelect.opponentPoint(), characterSelect.opponentPartner());
                 break;
             case CANCEL:
                 characterSelect.close();
@@ -958,6 +968,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.save();
             canvas.scale(sx, sy);
+            // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
+            if (characterSelect.isOpen()) {
+                characterSelectRenderer.draw(canvas, paint, characterSelect);
+                canvas.restore();
+                return;
+            }
 
             float baseZoom = camera.zoom * superCameraZoom;
             float renderZoom = baseZoom * ultraCameraZoom;
@@ -1055,7 +1071,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
-            if (characterSelect.isOpen()) characterSelectRenderer.draw(canvas, paint, characterSelect);
 
             canvas.restore();
         } finally {
