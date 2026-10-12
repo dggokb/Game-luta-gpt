@@ -48,6 +48,11 @@ jobs:
             android/app/build/hud-effects-frames/0130.png
             android/app/build/reports/tests/
 
+      - name: Enable Android emulator hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Record actual app with assist and raw tag touch input
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -55,6 +60,7 @@ jobs:
           arch: x86_64
           profile: pixel_2
           disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096
           script: |
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
@@ -62,6 +68,7 @@ jobs:
             adb shell screenrecord --time-limit 45 --bit-rate 3000000 /sdcard/hud-runtime.mp4 &
             adb shell am instrument -w -e class com.gamelutagpt.HudRuntimeTest com.gamelutagpt.test/androidx.test.runner.AndroidJUnitRunner > hud-runtime-result.txt
             adb shell pkill -2 screenrecord || true
+            sleep 2
             adb pull /sdcard/hud-runtime.mp4 hud-runtime.mp4
             adb pull /sdcard/Android/data/com.gamelutagpt/files/ hud-runtime-captures
             cat hud-runtime-result.txt

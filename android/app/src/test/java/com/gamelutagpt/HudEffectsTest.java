@@ -98,6 +98,7 @@ public class HudEffectsTest {
             if(i==205) game.engine.team(0).point=1;
             if(i>=205&&i<255)game.engine.team(0).tagCooldown=600-(i-205)*2;
             if(i==255) {hud.resetEffects();game.engine.team(0).point=0;game.engine.team(0).tagCooldown=0;}
+            state.active().refreshHudLabels();cpu.refreshHudLabels();
             Method labels=GameView.class.getDeclaredMethod("updateTagCooldownLabels",TeamSystem.Side.class);
             labels.setAccessible(true);labels.invoke(game,game.engine.team(0));
             c.drawColor(Color.BLACK);scenario.invoke(game,c);player.invoke(game,c);
