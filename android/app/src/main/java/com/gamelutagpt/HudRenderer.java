@@ -334,7 +334,7 @@ final class HudRenderer {
         c.drawRect(x, y + 2f, x + w * life, y + 4f, paint);
         HudEffects.Meter fx = fighter == effects.point.fighter ? effects.point
             : fighter == effects.cpu.fighter ? effects.cpu : effects.reserve;
-        drawLifeEffects(c, fx, x, y, w, h);
+        if (hudArt == null) drawLifeEffects(c, fx, x, y, w, h);
         c.restore();
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.WHITE);
@@ -444,6 +444,16 @@ final class HudRenderer {
         for (int side = 0; side < 2; side++) {
             c.save(); if (side == 1) { c.translate(Arena.VW, 0); c.scale(-1, 1); }
             HudEffects.Meter fx = side == 0 ? effects.point : effects.cpu;
+            if (art) {
+                // The ornament overlays part of the original fill rectangle. Apply
+                // visual life overlays in its visible interior after compositing it.
+                c.save(); c.clipRect(174, 78, 546, 87);
+                drawLifeEffects(c, fx, 165, 78, 389, 9); c.restore();
+                if (side == 0 && effects.reserve.fighter != null) {
+                    c.save(); c.clipRect(267, 120, 433, 127);
+                    drawLifeEffects(c, effects.reserve, 259, 120, 182, 7); c.restore();
+                }
+            }
             float hit = effects.fade(fx.hitAt, HudEffects.HIT_FLASH);
             float critical = fx.life > 0 && fx.life <= .25f ? .18f + .12f * (float)Math.sin(effects.now * 4) : 0;
             energyEdge(c, art ? 165 : 109, art ? 73 : 62, art ? 389 : 474, art ? 20 : 28,
