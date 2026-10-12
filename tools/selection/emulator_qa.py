@@ -1,0 +1,100 @@
+"""Exercise the actual APK using its real landscape dimensions, not fixed taps."""
+import json
+import subprocess as sp
+import time
+from pathlib import Path
+from PIL import Image, ImageChops
+
+def adb(*args):
+    return sp.check_output(['adb', *args])
+
+def capture(name):
+    path = Path('selection-' + name + '.png')
+    path.write_bytes(adb('exec-out', 'screencap', '-p'))
+    return Image.open(path).convert('RGB')
+
+adb('install', '-r', 'android/app/build/outputs/apk/debug/app-debug.apk')
+adb('logcat', '-c')
+adb('shell', 'am', 'start', '-W', '-n', 'com.gamelutagpt/com.gamelutagpt.MainActivity')
+time.sleep(10)
+initial = capture('default')
+w, h = initial.size
+assert w > h, (w, h)
+results = {'resolution': [w, h], 'checks': []}
+
+def tap(x, y):
+    adb('shell', 'input', 'tap', str(round(x*w/1280)), str(round(y*h/720)))
+    time.sleep(.5)
+
+def differs(a, b, region=None):
+    if region:
+        region = tuple(round(v*(w/1280 if i%2==0 else h/720)) for i,v in enumerate(region))
+        a,b = a.crop(region), b.crop(region)
+    return ImageChops.difference(a.convert('RGB'), b.convert('RGB')).getbbox() is not None
+
+def cell(i):
+    cw=(440-18)/4
+    ch=(400-18)/4
+    y=137+(i//4)*(ch+6)+ch/2
+    x=420+(i%4)*(cw+6)+cw/2
+    return 640+(x-640)*(440+148*(y-137)/400)/440,y
+
+# All eight unavailable cells must leave the entire static selection unchanged.
+for i in range(8,16):
+    tap(*cell(i))
+    locked=capture('locked')
+    assert not differs(initial, locked), 'Locked cell changed selection: '+str(i)
+results['checks'].append('all eight locked cells ignore touches')
+
+# P1 TAG: choose P02 (visual cell 3), then choose it as point, swapping duplicate.
+tap(110,560)
+focused=capture('tag-focused')
+tap(*cell(3))
+tag=capture('tag')
+assert differs(focused,tag,(33,513,193,609)), 'TAG art did not change'
+results['checks'].append('P1 TAG changes its portrait')
+tap(110,420)
+tap(*cell(3))
+point=capture('p02')
+assert differs(initial,point,(195,55,330,350)), 'P02 atlas hero missing'
+results['checks'].append('P02 atlas point art rendered')
+
+# Every selectable fighter renders a distinct large concept hero on the same side.
+previous=point
+for i, name in [(1,'p03'),(5,'p04'),(6,'p05'),(2,'p06'),(7,'p07'),(4,'p08')]:
+    tap(110,420)
+    tap(*cell(i))
+    current=capture(name)
+    assert differs(previous,current,(195,55,330,350)), name+' large hero did not change'
+    previous=current
+    results['checks'].append(name+' concept hero rendered')
+
+# Focus and edit the opposing team; P1 must remain unchanged.
+tap(1150,420)
+tap(*cell(5))
+p2=capture('p2')
+assert differs(previous,p2,(950,55,1080,350)), 'P2 point did not change'
+assert not differs(previous,p2,(0,55,330,350)), 'P2 changed P1 hero'
+tap(1150,560)
+tap(*cell(7))
+p2tag=capture('p2-tag')
+assert differs(p2,p2tag,(1087,513,1247,609)), 'P2 TAG did not change'
+tap(1150,420)
+before=capture('before-swap')
+tap(914,700)
+swapped=capture('swapped')
+assert differs(before,swapped,(1087,383,1247,609)), 'Team swap did not change slots'
+results['checks'].extend(['P2 point and TAG independent','focused team point/TAG swap'])
+
+tap(370,700)
+time.sleep(3)
+fight=capture('confirmed')
+assert differs(swapped,fight,(330,128,949,546)), 'Confirmation did not leave selection'
+assert adb('shell','pidof','com.gamelutagpt').strip(), 'App exited'
+logs=adb('logcat','-d','-v','brief').decode(errors='replace')
+Path('selection-logcat.txt').write_text(logs)
+assert 'FATAL EXCEPTION' not in logs, 'Android crash'
+assert 'Missing selection art: selection/art/hero_' not in logs, 'Missing hero asset'
+results['checks'].append('confirmation enters running fight without crash')
+Path('selection-qa.json').write_text(json.dumps(results,indent=2))
+print(json.dumps(results,indent=2))

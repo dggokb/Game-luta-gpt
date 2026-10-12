@@ -28,6 +28,16 @@ final class CharacterSelectRenderer {
         this.context=context;
         backdrop=read("selection/art/backdrop.png",1);
         stageArt=read("selection/art/reference_stage.png",1);
+        // The saved atlas is row-major P02/P03, P04/P05. Decode once,
+        // then cache the four transparent cells before drawing any frame.
+        Bitmap atlas=read("selection/art/heroes_p02_p05.png",1);
+        if(atlas!=null) {
+            int w=atlas.getWidth()/2,h=atlas.getHeight()/2;
+            for(int i=0;i<4;i++) {
+                heroes.put("p0"+(i+2),Bitmap.createBitmap(atlas,(i%2)*w,(i/2)*h,w,h));
+            }
+            atlas.recycle();
+        }
         // The reference's future fighters remain illustrated but locked, never fake roster IDs.
         if(stageArt!=null) {
             int[][] regions={{450,404,608,513},{629,404,766,512},{785,404,929,512},
@@ -66,8 +76,11 @@ final class CharacterSelectRenderer {
         if(b==null)return;
         c.save();
         c.clipRect(side==0?0:906,44,side==0?374:1280,687);
-        float left=side==0?-25:870, width=435, top=55;
-        boolean facesRight="player_base".equals(id);
+        // Wide action concepts need the same vertical presence as portrait art.
+        // Center them behind the side's TEAM panel rather than shrinking the fighter.
+        float width=Math.max(435,630f*b.getWidth()/b.getHeight()),top=55;
+        float left=(side==0?192.5f:1087.5f)-width/2;
+        boolean facesRight="player_base".equals(id)||"p06".equals(id);
         if((side==0&&!facesRight)||(side==1&&facesRight)) c.scale(-1,1,left+width/2,0);
         box.set(left,top,left+width,top+width*b.getHeight()/b.getWidth());
         imagePaint.setAlpha(255);c.drawBitmap(b,null,box,imagePaint);

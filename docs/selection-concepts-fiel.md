@@ -6,7 +6,7 @@ Base: game-luta-sprite-gpt em 32a5e9e23513ddcde57f4cc75f26d515b3a27e57. Branch d
 
 A versão anterior usava fichas inteiras de personagens nos retratos e nas figuras laterais.
 Agora o renderizador extrai somente os closes corretos das fichas p01…p08. As figuras laterais
-usam oito artes individuais com transparência, derivadas dos mesmos conceitos.
+usam artes com transparência derivadas dos mesmos conceitos: P01 individual, P02–P05 no atlas 2×2 e P06–P08 individuais.
 O fundo usa o templo, dragão azul e tigre vermelho da referência, reconstruído sem UI.
 Somente a área do preview do Templo da Lua e os retratos futuros bloqueados reutilizam
 a imagem de referência diretamente. A seleção, suas bordas, seus jogadores e a TAG são dinâmicos.
@@ -49,11 +49,30 @@ Geração/edição feita com imagegen integrado, com preservação da identidade
 
 ## Verificação
 
-- Prévia local executa CharacterSelectRenderer.java e CharacterSelect.java reais por adaptador Java2D.
-  Isso verifica a composição e a geometria; fontes e filtragem podem diferir discretamente do Android.
 - Testes verificam os 16 quadriláteros em perspectiva, os espaços entre células, os slots bloqueados,
   a independência das equipes, a TAG, a troca de parceiro, a confirmação e os comandos inferiores.
 - Workflow isolado compila o Android e produz APK. Como o workflow existente da seleção,
   não regenera nem valida todos os sprites: relatórios P04 desatualizados já eram um bloqueio na base.
 - Smoke Android captura estado inicial, toque em bloqueado, mudança de TAG, titular P02
   e entrada no combate, e verifica ausência de crash.
+
+## Continuação a partir do HEAD 20f8a28526b9a79c55909ea55b692c503503f068
+
+- O renderer decodifica `heroes_p02_p05.png` uma vez, divide em quatro células iguais
+  com alpha e associa P02/P03/P04/P05 em ordem de leitura. Não há procura por
+  arquivos individuais ausentes para esses IDs.
+- P06 e P07: extração/recriação da pose de ação superior direita dos concepts,
+  preservando rosto, cabelo, roupa, cores e acessórios; personagem isolado com alpha.
+- P08: figura única baseada no concept, cabelo rosa, flor, luvas e chicote bordô,
+  pose de luta em três quartos. Não se usa a ficha inteira como figura lateral.
+- Artes largas mantêm presença vertical de 630 unidades, centralizadas no lado
+  selecionado e recortadas apenas pelo painel central, sem invadir a grade.
+- `selection-reference.yml` foi recuperado do blob informado e adaptado.
+  `tools/selection/emulator_qa.py` obtém largura/altura da captura Android e
+  transforma todas as coordenadas 1280×720 antes de enviar toques. Todas as
+  comparações convertem para RGB, incluindo captura com alpha opaco.
+- QA cobre oito células bloqueadas, todos os heróis, TAG P1/P2, independência
+  de equipes, inversão titular/TAG, confirmação e ausência de crash/arte ausente.
+  Capturas e resultados JSON são artefatos do mesmo build do APK.
+- Workflow publica APK e PNG como arquivos diretos somente após o QA passar.
+  A validação global de sprites permanece fora desta alteração de UI.
