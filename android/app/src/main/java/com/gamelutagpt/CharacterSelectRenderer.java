@@ -323,7 +323,7 @@ final class CharacterSelectRenderer {
         return (Math.max(0, Math.min(255, alpha)) << 24) | (rgb & 0x00FFFFFF);
     }
 
-    private Bitmap portrait(CharacterDefinition character) {
+    Bitmap portrait(CharacterDefinition character) {
         if (portraits.containsKey(character.id)) return portraits.get(character.id);
         Bitmap cell = null;
         CharacterDefinition.Animation idle = character.animations.get(SpriteStates.IDLE);

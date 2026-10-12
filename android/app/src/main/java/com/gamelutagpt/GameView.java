@@ -538,6 +538,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final HudRenderer.State hudState = new HudRenderer.State() {
         @Override public FighterState active() { return activeFighter(); }
         @Override public FighterState reserve() { return reserveFighter(); }
+        @Override public FighterState opponent() { return opponentFighter; }
+        @Override public CharacterDefinition opponentReserveCharacter() { return GeneratedCharacters.get(opponentTagId); }
         @Override public String versionLabel() { return VERSION_HUD_LABEL; }
         @Override public String stateLabel() { return currentStateLabel(); }
         @Override public int facing() { return player().facing; }
@@ -1132,7 +1134,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawHud(Canvas c) {
-        hud.drawHud(c, hudState);
+        hud.drawHud(c, hudState, characterSelectRenderer);
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
@@ -1263,7 +1265,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         opponentPanel.superLabel = opponentFighter.superHudLabel;
         opponentPanel.damageLabel = dummyDamageLabel;
         opponentPanel.damageProgress = dummyDamageLabelFrames / (float)DAMAGE_LABEL_FRAMES;
-        hud.drawOpponentPanel(c, opponentPanel);
+        if (debugOverlay) hud.drawOpponentPanel(c, opponentPanel);
     }
 
     private String opponentStatusLabel() {

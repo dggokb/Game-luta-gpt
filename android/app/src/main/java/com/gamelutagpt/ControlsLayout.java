@@ -86,9 +86,9 @@ final class ControlsLayout {
 
     // SELEÇÃO: back to the character select (top center).
     static final float SELECT_BUTTON_LEFT = 565f;
-    static final float SELECT_BUTTON_TOP = 48f;
+    static final float SELECT_BUTTON_TOP = 112f;
     static final float SELECT_BUTTON_RIGHT = 715f;
-    static final float SELECT_BUTTON_BOTTOM = 90f;
+    static final float SELECT_BUTTON_BOTTOM = 154f;
 
     /** First control under the point, in the priority order the input handler uses. */
     static Control controlAt(float x, float y) {

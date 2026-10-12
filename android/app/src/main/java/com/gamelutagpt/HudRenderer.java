@@ -5,6 +5,11 @@ import static com.gamelutagpt.ControlsLayout.*;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Bitmap;
+import android.graphics.RectF;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 
 /**
  * Screen-space HUD and touch controls plus the opponent's overhead panel. It reads
@@ -15,6 +20,8 @@ final class HudRenderer {
     interface State {
         FighterState active();
         FighterState reserve();
+        FighterState opponent();
+        CharacterDefinition opponentReserveCharacter();
         String versionLabel();
         String stateLabel();
         int facing();
@@ -70,61 +77,22 @@ final class HudRenderer {
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    void drawHud(Canvas c, State s) {
+    void drawHud(Canvas c, State s, CharacterSelectRenderer portraits) {
         reset();
         FighterState active = s.active();
         FighterState reserve = s.reserve();
 
-        paint.setColor(Color.argb(185, 10, 15, 27));
-        c.drawRoundRect(32, 28, 560, 234, 18, 18, paint);
-
-        paint.setColor(active.profile.color);
-        c.drawCircle(78, 74, 29, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4);
-        paint.setColor(Color.WHITE);
-        c.drawCircle(78, 74, 29, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(22);
-        paint.setFakeBoldText(true);
-        c.drawText(active.hudTitle, 122, 58, paint);
-        paint.setFakeBoldText(false);
-
-        drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
-        drawSuperMeter(c, active, 122f, 106f, 525f, 118f, true);
-        drawTagCooldown(c, s, 122f, 139f, 525f, 149f);
-
-        // Reserva: indicador menor com vida e Super próprios.
-        paint.setColor(reserve.profile.color);
-        c.drawCircle(78, 187, 14, paint);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(14);
-        paint.setFakeBoldText(true);
-        c.drawText(reserve.reserveHudLabel, 105, 184, paint);
-        paint.setFakeBoldText(false);
-
-        drawLifeBar(c, reserve, 105f, 193f, 525f, 206f, false);
-        drawSuperMeter(c, reserve, 105f, 213f, 525f, 223f, false);
-
-        paint.setColor(Color.argb(180, 10, 15, 27));
-        c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(20);
-        paint.setFakeBoldText(true);
-        c.drawText(s.versionLabel(), 975, 59, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextSize(16);
-
-        c.drawText("Estado:", 975, 88, paint);
-        c.drawText(s.stateLabel(), 1032, 88, paint);
-
-        paint.setTextSize(14f);
-        c.drawText(s.facing() > 0 ? "FACING: →" : "FACING: ←", 975, 106, paint);
-
+        drawTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
+        drawTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+        drawPower(c, active, false);
+        drawPower(c, s.opponent(), true);
+        // Training has no round clock: never display a fabricated countdown.
+        panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
+        text(c, "∞", 640f, 63f, 58f, Color.WHITE);
+        text(c, "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
+        if (s.debugEnabled()) {
+            text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
+        }
         drawToggle(c, s.aiEnabled(), s.aiEnabled() ? "IA ON" : "IA OFF",
             AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 19f);
         drawToggle(c, s.debugEnabled(), s.debugEnabled() ? "DEBUG ON" : "DEBUG OFF",
@@ -137,6 +105,179 @@ final class HudRenderer {
             TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
+    }
+
+
+    private static final int BLUE = 0xFF22BFFF, RED = 0xFFFF354D;
+    private final Path shape = new Path();
+    private final RectF portraitBox = new RectF();
+    private final Paint imagePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+    private final Shader pointLifeGradient = new LinearGradient(0f, 63f, 0f, 89f,
+        new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
+    private final Shader reserveLifeGradient = new LinearGradient(0f, 119f, 0f, 136f,
+        new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
+    private static final String[] LEVELS = {"0", "1", "2", "3", "4", "5"};
+
+    /** Reused path and paint: the ornamental frame allocates no per-frame geometry. */
+    private void panel(Canvas c, float x, float y, float w, float h, float bevel,
+                       int fill, int stroke, float width) {
+        shape.reset();
+        shape.moveTo(x + bevel, y);
+        shape.lineTo(x + w - bevel, y);
+        shape.lineTo(x + w, y + h);
+        shape.lineTo(x, y + h);
+        shape.close();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(fill);
+        c.drawPath(shape, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(width);
+        paint.setColor(stroke);
+        c.drawPath(shape, paint);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    private void text(Canvas c, String value, float x, float y, float size, int color) {
+        paint.setShader(null);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setFakeBoldText(true);
+        paint.setTextSkewX(-0.16f);
+        paint.setTextSize(size);
+        paint.setColor(0xFF050813);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        c.drawText(value, x, y, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        c.drawText(value, x, y, paint);
+        paint.setTextSkewX(0f);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private void drawTeam(Canvas c, FighterState point, FighterState reserve,
+                          CharacterDefinition absentPartner, boolean right, float ready,
+                          CharacterSelectRenderer portraits) {
+        int accent = right ? RED : BLUE;
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        // Angular energy strokes radiate from the portrait towards the center.
+        for (int i = 0; i < 12; i++) {
+            float y = 6f + i * 11f;
+            paint.setStrokeWidth(i % 3 == 0 ? 7f : 3f);
+            paint.setColor((i % 3 == 0 ? 0x99000000 : 0x55000000) | (accent & 0xFFFFFF));
+            c.drawLine(5f, y - 23f, 157f + (i % 4) * 22f, y + 18f, paint);
+            paint.setColor(0xBFFFFFFF);
+            paint.setStrokeWidth(1.3f);
+            c.drawLine(8f, y - 21f, 93f + (i % 4) * 13f, y + 5f, paint);
+        }
+        panel(c, 82f, 30f, 503f, 65f, 28f, 0xEF060B19, accent, 5f);
+        panel(c, 165f, 31f, 393f, 27f, 15f, 0xE908101E, 0xFFDDE8FF, 1.5f);
+        energyLife(c, point, 109f, 63f, 474f, 26f);
+        drawSegments(c, point.superBars(), 181f, 98f, 319f, 12f, accent);
+        portrait(c, portraits, point.character, 8f, 1f, 98f, 103f, accent);
+        panel(c, 83f, 114f, 394f, 31f, 16f, 0xEB070D1B, accent, 3f);
+        CharacterDefinition partner = reserve == null ? absentPartner : reserve.character;
+        if (partner != null) portrait(c, portraits, partner, 88f, 114f, 74f, 36f, accent);
+        if (reserve != null) {
+            energyLife(c, reserve, 258f, 119f, 205f, 17f);
+            drawSegments(c, reserve.superBars(), 260f, 140f, 199f, 4f, accent);
+        } else {
+            panel(c, 258f, 119f, 205f, 17f, 8f, 0xFF1A1F2B, 0xFF626A80, 1f);
+        }
+        paint.setColor(0xFF080D19);
+        c.drawCircle(551f, 109f, 9f, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(accent);
+        paint.setStrokeWidth(2f);
+        c.drawCircle(551f, 109f, 9f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(reserve != null && ready >= 1f ? Color.WHITE : 0xFF454B5A);
+        c.drawCircle(551f, 109f, 4f, paint);
+        c.restore();
+        // Text stays readable when the frame is mirrored.
+        float labelX = right ? Arena.VW - 353f : 353f;
+        text(c, point.hudTitle, labelX, 51f, 16f, Color.WHITE);
+        text(c, reserve == null ? "TAG OFF" : "TAG", right ? Arena.VW - 209f : 209f, 133f, 14f,
+            reserve == null ? 0xFF8991A5 : Color.WHITE);
+    }
+
+    private void portrait(Canvas c, CharacterSelectRenderer portraits, CharacterDefinition character,
+                          float x, float y, float w, float h, int accent) {
+        panel(c, x, y, w, h, 12f, 0xEE0A1122, accent, 2f);
+        Bitmap bitmap = portraits.portrait(character);
+        if (bitmap == null) return;
+        c.save();
+        c.clipPath(shape);
+        // Crop the top of the real installed idle sprite to a bust, not a generic avatar.
+        float bustHeight = bitmap.getHeight() * 0.43f;
+        float scale = Math.max(w / bitmap.getWidth(), h / bustHeight);
+        float drawW = bitmap.getWidth() * scale;
+        portraitBox.set(x + (w - drawW) / 2f, y, x + (w + drawW) / 2f,
+            y + bitmap.getHeight() * scale);
+        c.drawBitmap(bitmap, null, portraitBox, imagePaint);
+        c.restore();
+    }
+
+    private void energyLife(Canvas c, FighterState fighter, float x, float y, float w, float h) {
+        float life = Arena.clamp(fighter.life / (float)fighter.profile.maxLife, 0f, 1f);
+        float recoverable = Arena.clamp(fighter.recoverableLife / (float)fighter.profile.maxLife, 0f, 1f - life);
+        panel(c, x, y, w, h, 15f, 0xFF171E2B, Color.WHITE, 2f);
+        c.save();
+        c.clipPath(shape);
+        if (recoverable > 0f) {
+            paint.setColor(0xFFE63D54);
+            c.drawRect(x + w * life, y, x + w * (life + recoverable), y + h, paint);
+        }
+        paint.setShader(y < 100f ? pointLifeGradient : reserveLifeGradient);
+        c.drawRect(x, y, x + w * life, y + h, paint);
+        paint.setShader(null);
+        paint.setColor(0x99FFFFFF);
+        c.drawRect(x, y + 2f, x + w * life, y + 4f, paint);
+        c.restore();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(2f);
+        c.drawPath(shape, paint);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    private void drawSegments(Canvas c, float bars, float x, float y, float w, float h, int accent) {
+        float segment = (w - 20f) / 5f;
+        for (int i = 0; i < 5; i++) {
+            float left = x + i * (segment + 5f);
+            panel(c, left, y, segment, h, Math.min(7f, h * 0.4f), 0xFF0A1020, 0xFFCED9F0, 1.3f);
+            float fill = Arena.clamp(bars - i, 0f, 1f);
+            c.save();
+            c.clipPath(shape);
+            paint.setColor(accent);
+            c.drawRect(left, y, left + segment * fill, y + h, paint);
+            paint.setColor(0xAAFFFFFF);
+            c.drawRect(left, y + 1f, left + segment * fill, y + Math.max(2f, h * 0.25f), paint);
+            c.restore();
+        }
+    }
+
+    private void drawPower(Canvas c, FighterState fighter, boolean right) {
+        int accent = right ? RED : BLUE;
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        panel(c, 21f, 683f, 400f, 33f, 19f, 0xEF070C1C, accent, 4f);
+        drawSegments(c, fighter.superBars(), 86f, 692f, 246f, 17f, accent);
+        paint.setColor(0xFF080E22);
+        c.drawCircle(52f, 696f, 24f, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4f);
+        paint.setColor(accent);
+        c.drawCircle(52f, 696f, 24f, paint);
+        paint.setStrokeWidth(1.5f);
+        paint.setColor(Color.WHITE);
+        c.drawCircle(52f, 696f, 19f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        c.restore();
+        int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
+        text(c, LEVELS[level], right ? Arena.VW - 52f : 52f, 707f, 31f, Color.WHITE);
+        text(c, "SUPER", right ? Arena.VW - 377f : 377f, 706f, 18f, Color.WHITE);
     }
 
     private void drawToggle(Canvas c, boolean enabled, String label,
