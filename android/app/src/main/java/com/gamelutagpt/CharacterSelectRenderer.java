@@ -311,8 +311,11 @@ final class CharacterSelectRenderer {
         }
     }
 
-    void beginFightTransition() {fightTransitionAt=SystemClock.uptimeMillis();}
+    // Arm the reveal now, but start its clock on the first actual fight frame:
+    // loading another character's atlases must not consume the whole fade.
+    void beginFightTransition() {fightTransitionAt=-2;}
     void drawFightTransition(Canvas c) {
+        if(fightTransitionAt==-2)fightTransitionAt=SystemClock.uptimeMillis();
         if(fightTransitionAt<0)return;
         long age=SystemClock.uptimeMillis()-fightTransitionAt;
         if(age>=240) {fightTransitionAt=-1;return;}
