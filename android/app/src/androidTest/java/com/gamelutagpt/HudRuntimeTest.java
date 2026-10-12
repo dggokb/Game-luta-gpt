@@ -58,6 +58,13 @@ public class HudRuntimeTest {
         game=(GameView)field(activity,"gameView");
         await("Surface ready",()->game.getWidth()>0,10000);
         await("Selection opened",()->((CharacterSelect)field(game,"characterSelect")).isOpen(),15000);
+        for(int step=1;step<=4;step++) {
+            tap((CharacterSelect.FIGHT_LEFT+CharacterSelect.FIGHT_RIGHT)/2,
+                (CharacterSelect.FIGHT_TOP+CharacterSelect.FIGHT_BOTTOM)/2);
+            final int expected=step;
+            await("Sequential selection step "+step,
+                ()->((CharacterSelect)field(game,"characterSelect")).step()==expected,4000);
+        }
         tap((CharacterSelect.FIGHT_LEFT+CharacterSelect.FIGHT_RIGHT)/2,
             (CharacterSelect.FIGHT_TOP+CharacterSelect.FIGHT_BOTTOM)/2);
         await("Match selected",()->!((CharacterSelect)field(game,"characterSelect")).isOpen(),4000);

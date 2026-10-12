@@ -5,52 +5,84 @@ import org.junit.Test;
 
 public class CharacterSelectTest {
     private CharacterSelect make() {
-        return new CharacterSelect(new String[]{"p01","p02","p03","p04","p05","p06","p07","p08"});
+        CharacterSelect s=new CharacterSelect(new String[]{"p01","p02","p03","p04","p05","p06","p07","p08"});
+        s.open("p01","p08","p03","p06");return s;
     }
-    @Test public void templateHasOriginalFourByFourGridAndTeamAreas() {
+    private CharacterSelect.Result pick(CharacterSelect s,int i) {
+        float[] q=new float[8];s.cardCorners(i,q);
+        return s.tap((q[0]+q[2]+q[4]+q[6])/4,(q[1]+q[5])/2);
+    }
+    private void finish(CharacterSelect s) {pick(s,0);pick(s,1);pick(s,2);pick(s,3);}
+
+    @Test public void startsWithOnlyPlayerOneActiveAndNoConfirmedSlots() {
+        CharacterSelect s=make();assertFalse(s.ready());assertEquals(0,s.step());
+        assertEquals(0,s.focusSide());assertEquals(0,s.focusSlot());
+        for(int side=0;side<2;side++)for(int slot=0;slot<2;slot++)assertFalse(s.chosen(side,slot));
+    }
+    @Test public void fourPortraitTapsChooseBothTeamsInOrderWithoutSlotTaps() {
         CharacterSelect s=make();
-        assertEquals(4,CharacterSelect.COLUMNS);
-        assertEquals(4,CharacterSelect.ROWS);
-        for(int i=0;i<s.ids.length;i++)
-            assertEquals(i,s.cardAt(s.cardLeft(i)+10f,s.cardTop(i)+10f));
-        assertEquals(-1,s.cardAt(s.cardLeft(8)+10f,s.cardTop(8)+10f));
-        assertEquals(1,s.stageCount());
-    }
-    @Test public void twoTeamsAreIndependentAndValid() {
-        CharacterSelect s=make();s.open("p01","p03","p02","p04");
-        assertEquals("p01",s.point());assertEquals("p03",s.partner());
-        assertEquals("p02",s.opponentPoint());assertEquals("p04",s.opponentPartner());
-        assertTrue(s.ready());
-        s.tap(s.cardLeft(2)+10,s.cardTop(2)+10);
-        assertEquals("p03",s.point());assertEquals("p01",s.partner());
-    }
-    @Test public void selectingBothSlotsChangesP1ThenP2() {
-        CharacterSelect s=make();s.open("p01","p03","p02","p04");
-        s.tap(s.cardLeft(1)+10,s.cardTop(1)+10);
-        assertEquals("p02",s.point());assertEquals(1,s.focusSlot());
-        s.tap(s.cardLeft(4)+10,s.cardTop(4)+10);
-        assertEquals("p05",s.partner());assertEquals(1,s.focusSide());
-        s.tap(s.cardLeft(3)+10,s.cardTop(3)+10);
-        assertEquals("p04",s.opponentPoint());assertEquals("p02",s.opponentPartner());
-    }
-    @Test public void footerActionsAreClickableAndReflectActualImage() {
-        CharacterSelect s=make();s.open("p01","p03","p02","p04");
-        assertEquals(CharacterSelect.Result.CHANGED,s.tap(660,699));
-        assertTrue(s.settingsOpen());
-        s.tap(600,400);assertFalse(s.settingsOpen());
-        assertEquals(CharacterSelect.Result.CHANGED,s.tap(914,699));
-        assertEquals("p03",s.point());assertEquals("p01",s.partner());
+        assertEquals(CharacterSelect.Result.CHANGED,pick(s,4));assertEquals("p05",s.point());
+        assertEquals(0,s.focusSide());assertEquals(1,s.focusSlot());assertFalse(s.ready());
+        pick(s,1);assertEquals("p02",s.partner());assertEquals(1,s.focusSide());assertEquals(0,s.focusSlot());
+        pick(s,2);assertEquals("p03",s.opponentPoint());assertEquals(1,s.focusSlot());
+        pick(s,6);assertEquals("p07",s.opponentPartner());assertEquals(4,s.step());assertTrue(s.ready());
         assertEquals(CharacterSelect.Result.CONFIRM,s.tap(370,700));
-        assertEquals(CharacterSelect.Result.CANCEL,s.tap(503,700));
     }
-    @Test public void dpadsAndRandomCannotDuplicateTheTwoSlots() {
-        CharacterSelect s=make();s.open("p01","p03","p02","p04");
-        s.moveCursor(1,0);assertEquals(1,s.cursorIndex());s.selectCursor();
-        assertEquals("p02",s.point());
-        for(int i=0;i<100;i++) {s.tap(1131,698);assertTrue(s.ready());}
+    @Test public void teamPanelsAndHeroesCannotJumpAheadInTheSequence() {
+        CharacterSelect s=make();
+        for(float[] p:new float[][]{{110,420},{110,560},{1150,420},{1150,560},{60,100},{1210,100}})
+            assertEquals(CharacterSelect.Result.NONE,s.tap(p[0],p[1]));
+        assertEquals(0,s.step());pick(s,0);s.tap(1150,420);assertEquals(1,s.step());assertEquals(0,s.focusSide());
     }
-    @Test public void lockedGridSlotsNeverAcceptInput() {
-        CharacterSelect s=make();s.open("p01","p03","p02","p04");
-        assertEquals(CharacterSelect.Result.NONE,s.tap(s.cardLeft(9)+12,s.cardTop(9)+12));
+    @Test public void duplicateTagIsRejectedWithoutReplacingConfirmedPoint() {
+        CharacterSelect s=make();pick(s,4);assertEquals(CharacterSelect.Result.NONE,pick(s,4));
+        assertEquals(1,s.step());assertEquals("p05",s.point());assertFalse(s.chosen(0,1));
+        pick(s,1);pick(s,2);assertEquals(CharacterSelect.Result.NONE,pick(s,2));
+        assertEquals(3,s.step());assertEquals("p03",s.opponentPoint());
+    }
+    @Test public void conceptsNineThroughSixteenStayLockedAtEveryStep() {
+        CharacterSelect s=make();
+        for(int stage=0;stage<=4;stage++) {
+            for(int i=8;i<16;i++)assertEquals(CharacterSelect.Result.NONE,pick(s,i));
+            assertEquals(stage,s.step());assertFalse(s.contains("p09"));assertFalse(s.contains("p16"));
+            if(stage<4)pick(s,stage);
+        }
+    }
+    @Test public void backReopensThePreviousSlotAndPreservesEarlierChoices() {
+        CharacterSelect s=make();finish(s);
+        assertEquals(CharacterSelect.Result.CHANGED,s.back());assertEquals(3,s.step());assertFalse(s.ready());
+        assertEquals("p03",s.opponentPoint());assertFalse(s.chosen(1,1));
+        pick(s,6);assertTrue(s.ready());assertEquals("p07",s.opponentPartner());
+        for(int i=0;i<4;i++)assertEquals(CharacterSelect.Result.CHANGED,s.back());
+        assertEquals(CharacterSelect.Result.CANCEL,s.back());
+    }
+    @Test public void confirmButtonChoosesCurrentCursorUntilAllFourAreConfirmed() {
+        CharacterSelect s=make();
+        for(int i=0;i<4;i++) {assertEquals(CharacterSelect.Result.CHANGED,s.tap(370,700));assertEquals(i+1,s.step());}
+        assertEquals(CharacterSelect.Result.CONFIRM,s.tap(370,700));
+        assertEquals(CharacterSelect.Result.NONE,pick(s,7));assertEquals(4,s.step());
+    }
+    @Test public void randomFollowsTheSameFourStepsAndNeverDuplicatesPartner() {
+        for(int attempt=0;attempt<100;attempt++) {
+            CharacterSelect s=make();for(int i=0;i<4;i++)assertTrue(s.randomFocused());
+            assertTrue(s.ready());assertNotEquals(s.point(),s.partner());assertNotEquals(s.opponentPoint(),s.opponentPartner());
+            assertFalse(s.randomFocused());
+        }
+    }
+    @Test public void swapRequiresTwoConfirmedMembersAndKeepsSequenceComplete() {
+        CharacterSelect s=make();assertFalse(s.swapFocusedTeam());finish(s);
+        assertTrue(s.swapFocusedTeam());assertEquals("p04",s.opponentPoint());assertEquals("p03",s.opponentPartner());assertTrue(s.ready());
+    }
+    @Test public void helpDoesNotAdvanceOrUndoTheSequence() {
+        CharacterSelect s=make();pick(s,0);s.toggleSettings();assertTrue(s.settingsOpen());
+        assertEquals(CharacterSelect.Result.CHANGED,s.back());assertFalse(s.settingsOpen());assertEquals(1,s.step());
+    }
+    @Test public void perspectiveProjectionAndGapsMatchTheVisibleFourByFourGrid() {
+        CharacterSelect s=new CharacterSelect(new String[]{"p01","p02","p03","p04","p05","p06","p07","p08",
+            "p09","p10","p11","p12","p13","p14","p15","p16"});
+        float[] q=new float[8];
+        for(int i=0;i<16;i++){s.cardCorners(i,q);assertEquals(i,s.cardAt((q[0]+q[2]+q[4]+q[6])/4,(q[1]+q[5])/2));}
+        s.cardCorners(12,q);assertTrue(q[0]<CharacterSelect.GRID_X);assertEquals(12,s.cardAt(q[6]+4,q[5]-4));
+        s.cardCorners(0,q);assertEquals(-1,s.cardAt(q[2]+4,q[3]+1));assertEquals(1,s.stageCount());
     }
 }
