@@ -24,10 +24,14 @@ jobs:
       - name: Native Canvas effects tests and APK
         working-directory: android
         run: gradle :app:testDebugUnitTest --tests '*HudEffectsTest' --tests '*HudArtTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :app:assembleDebug -x :app:verifySpritePacks --stacktrace
+      - name: Preserve native Canvas frames before encoding
+        uses: actions/upload-artifact@v4
+        with:
+          name: HUD-effects-native-frames
+          path: android/app/build/hud-effects-frames/*.png
       - name: Encode real renderer technical animation
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
+          command -v ffmpeg
           ffmpeg -y -framerate 30 -i android/app/build/hud-effects-frames/%04d.png -c:v libx264 -crf 20 -pix_fmt yuv420p hud-effects-native-canvas.mp4
       - uses: actions/upload-artifact@v4
         if: always()
