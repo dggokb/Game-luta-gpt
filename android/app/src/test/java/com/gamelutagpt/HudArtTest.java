@@ -20,6 +20,15 @@ public class HudArtTest {
         Method m=GameView.class.getDeclaredMethod(name,Canvas.class);m.setAccessible(true);m.invoke(game,canvas);
     }
     @Test public void ornamentalArtKeepsLifeLiveAndCenterTransparent() throws Exception {
+        // BitmapFactory can accept a truncated PNG; validate bytes before native decode.
+        java.security.MessageDigest digest=java.security.MessageDigest.getInstance("SHA-256");
+        try(InputStream input=RuntimeEnvironment.getApplication().getAssets().open("ui/hud/energy-frame.png")) {
+            byte[] buffer=new byte[8192];int n;
+            while((n=input.read(buffer))!=-1)digest.update(buffer,0,n);
+        }
+        StringBuilder sha=new StringBuilder();
+        for(byte value:digest.digest())sha.append(String.format(java.util.Locale.ROOT,"%02x",value&255));
+        assertEquals("Complete production atlas", "80980cb5091fdcb0c2117e3e2dd529bcc8de71f06e7f50b04af2c81dbab65ea9",sha.toString());
         GameView game=new GameView(RuntimeEnvironment.getApplication());
         game.layout(0,0,1280,720);
         HudRenderer hud=(HudRenderer)field(game,"hud");
