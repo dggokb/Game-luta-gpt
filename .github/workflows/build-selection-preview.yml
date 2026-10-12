@@ -11,6 +11,7 @@ on:
       - 'android/app/src/main/java/com/gamelutagpt/CharacterSelectRenderer.java'
       - 'android/app/src/main/java/com/gamelutagpt/GameView.java'
       - 'android/app/src/test/java/com/gamelutagpt/CharacterSelectTest.java'
+      - 'android/app/src/test/java/com/gamelutagpt/SpriteIntegrationTest.java'
   workflow_dispatch:
 
 permissions:
