@@ -55,15 +55,19 @@ public class ExtractedSystemsTest {
         assertTrue(r.log.isEmpty());
     }
     @Test public void controlsHitTestFollowsInputPriority() {
-        assertEquals(ControlsLayout.Control.AI_TOGGLE,ControlsLayout.controlAt(1100,150));
-        assertEquals(ControlsLayout.Control.DEBUG_TOGGLE,ControlsLayout.controlAt(1100,200));
-        assertEquals(ControlsLayout.Control.HEAL_PLAYER,ControlsLayout.controlAt(1120,250));
-        assertEquals(ControlsLayout.Control.HEAL_OPPONENT,ControlsLayout.controlAt(1210,250));
+        assertEquals(ControlsLayout.Control.AI_TOGGLE,ControlsLayout.controlAt(1100,196));
+        assertEquals(ControlsLayout.Control.DEBUG_TOGGLE,ControlsLayout.controlAt(1100,246));
+        assertEquals(ControlsLayout.Control.HEAL_PLAYER,ControlsLayout.controlAt(1120,296));
+        assertEquals(ControlsLayout.Control.HEAL_OPPONENT,ControlsLayout.controlAt(1210,296));
         assertEquals(ControlsLayout.Control.DPAD,ControlsLayout.controlAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y));
         assertEquals(ControlsLayout.Control.LIGHT,ControlsLayout.controlAt(ControlsLayout.LIGHT_X,ControlsLayout.LIGHT_Y));
         assertEquals(ControlsLayout.Control.TAG,ControlsLayout.controlAt(ControlsLayout.TAG_X,ControlsLayout.TAG_Y));
         assertEquals(ControlsLayout.Control.NONE,ControlsLayout.controlAt(640,300));
-        assertEquals(ControlsLayout.Control.CHARACTER_SELECT,ControlsLayout.controlAt(640,70));
+        assertEquals(ControlsLayout.Control.CHARACTER_SELECT,ControlsLayout.controlAt(640,133));
+        assertEquals("HUD TAG must not toggle training controls", ControlsLayout.Control.NONE,
+            ControlsLayout.controlAt(1100,130));
+        assertEquals("Training timer must not open selection", ControlsLayout.Control.NONE,
+            ControlsLayout.controlAt(640,70));
         assertEquals(0,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X+5,ControlsLayout.DPAD_Y));
         assertEquals(1,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X+90,ControlsLayout.DPAD_Y));
         assertEquals(3,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y+90));
