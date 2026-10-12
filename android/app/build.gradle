@@ -29,6 +29,19 @@ dependencies {
 // tracked files. Without Python/Pillow the local build warns and continues, while
 // CI passes -PrequireSpriteCheck=true to make a missing toolchain an error.
 def spriteRoot = rootProject.projectDir.parentFile
+
+// Reuse the existing 90s-anime portrait concepts, instead of a generic sprite UI.
+// The game packages ONLY the eight portraits currently available in the roster.
+android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/selection/assets'))
+tasks.register('copySelectionConcepts', Copy) {
+    from(new File(spriteRoot, 'art/concepts')) {
+        include 'p01.png', 'p02.png', 'p03.png', 'p04.png',
+                'p05.png', 'p06.png', 'p07.png', 'p08.png'
+        into 'selection/portraits'
+    }
+    into(layout.buildDirectory.dir('generated/selection/assets'))
+}
+tasks.named('preBuild').configure { dependsOn 'copySelectionConcepts' }
 // P01-only visual transforms are regenerated at build time; all other
 // fighters and sprite pack validation remain untouched.
 def p01CalibratedSource = layout.buildDirectory.file(

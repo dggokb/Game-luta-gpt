@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.gamelutagpt.stage.StagePack;
@@ -34,6 +35,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private int teamIndex;
     private FighterState[] team = membersOf(0);
     private final CharacterSelect characterSelect = new CharacterSelect(GeneratedCharacters.SELECTABLE);
+    private final ConcurrentLinkedQueue<Integer> selectionKeys = new ConcurrentLinkedQueue<>();
     private CharacterSelectRenderer characterSelectRenderer;
 
     // Training opponent: our point character (same body and moves), drawn washed out.
@@ -282,8 +284,44 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
+        selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
+    }
+
+    @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (characterSelect.isOpen()) {
+            selectionKeys.offer(keyCode);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void handleSelectionKey(int keyCode) {
+        switch(keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT: characterSelect.moveCursor(-1,0); break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT: characterSelect.moveCursor(1,0); break;
+            case KeyEvent.KEYCODE_DPAD_UP: characterSelect.moveCursor(0,-1); break;
+            case KeyEvent.KEYCODE_DPAD_DOWN: characterSelect.moveCursor(0,1); break;
+            case KeyEvent.KEYCODE_BUTTON_A:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER: characterSelect.selectCursor(); break;
+            case KeyEvent.KEYCODE_BUTTON_B:
+            case KeyEvent.KEYCODE_ESCAPE:
+            case KeyEvent.KEYCODE_BACK: characterSelect.close(); break;
+            case KeyEvent.KEYCODE_BUTTON_X: characterSelect.randomFocused(); break;
+            case KeyEvent.KEYCODE_BUTTON_Y: characterSelect.toggleSettings(); break;
+            case KeyEvent.KEYCODE_BUTTON_L1:
+            case KeyEvent.KEYCODE_BUTTON_R1: characterSelect.swapFocusedTeam(); break;
+            case KeyEvent.KEYCODE_BUTTON_START:
+                if (characterSelect.ready()) {
+                    characterSelect.close();
+                    selectTeams(characterSelect.point(), characterSelect.partner(),
+                        characterSelect.opponentPoint(), characterSelect.opponentPartner());
+                }
+                break;
+            default: break;
+        }
     }
 
     private void handleCharacterSelectTap(float x, float y) {
@@ -452,8 +490,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void update() {
         if (stageScene != null) stageScene.update(FIXED_STEP);
         if (characterSelect.isOpen()) {
-            // The fight waits behind the select screen.
+            // Freeze combat while processing queued hardware controls on this same game thread.
             pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) handleSelectionKey(key);
             return;
         }
         if (paginaFinal.isActive()) {

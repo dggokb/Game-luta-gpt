@@ -1,368 +1,356 @@
 package com.gamelutagpt;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Shader;
+import android.graphics.*;
 import android.util.Log;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tela real de seleção TAG: painel central simétrico, 2 equipes independentes,
- * previews grandes e pequeno preview do Templo da Lua. Nada é um screenshot clicável.
- * Reaproveita o primeiro quadro IDLE dos sprites instalados (sem decodificar atlases inteiros).
+ * Screen layout based on the APPROVED 1648x928 concept, mapped to 1280x720.
+ * Exact reference positions: symmetric central four-by-four grid; huge P1/P2
+ * character art under blue dragon/red tiger emblems; left/right TAG panels;
+ * Moon Temple stage preview in a trapezoid; dark controller-command footer.
+ * All selectable art comes from the project's OWN art/concepts (not full-body IDLE cells).
  */
 final class CharacterSelectRenderer {
-    private static final int BLUE = 0xFF26A8FF;
-    private static final int RED = 0xFFFF4151;
-    private static final int WHITE = 0xFFF3F5FF;
+    private static final int BLUE=0xFF158AFF, RED=0xFFFF263E, WHITE=0xFFFAFAFF;
     private final Context context;
-    private final Map<String, Bitmap> portraits = new HashMap<>();
-    private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint img = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final RectF box = new RectF();
-    private final Rect src = new Rect();
-    private final Path path = new Path();
+    private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    private final Paint bitmapPaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    private final Path path=new Path();
+    private final Map<String,Bitmap> art=new HashMap<>();
+    private final Map<String,Bitmap> scenery=new HashMap<>();
+    CharacterSelectRenderer(Context context) {this.context=context;}
 
-    CharacterSelectRenderer(Context context) { this.context = context; }
-
-    void draw(Canvas canvas, Paint unused, CharacterSelect select) {
-        backdrop(canvas);
-        drawHero(canvas, select, 0);
-        drawHero(canvas, select, 1);
-        drawHeading(canvas, select, 0);
-        drawHeading(canvas, select, 1);
-        drawGrid(canvas, select);
-        drawTeams(canvas, select, 0);
-        drawTeams(canvas, select, 1);
-        drawStagePreview(canvas);
-        drawBottomBar(canvas, select);
+    void draw(Canvas c,Paint unused,CharacterSelect s) {
+        c.save();
+        background(c);
+        spiritEmblem(c,0);
+        spiritEmblem(c,1);
+        hero(c,s,0);
+        hero(c,s,1);
+        playerTitles(c,s);
+        grid(c,s);
+        teamPanel(c,s,0);
+        teamPanel(c,s,1);
+        stagePreview(c);
+        footer(c,s);
+        if (s.settingsOpen()) settings(c);
+        c.restore();
     }
 
-    private void backdrop(Canvas c) {
+    private void background(Canvas c) {
+        c.drawColor(0xFF06091B);
+        Bitmap sky=stage("ceu.jpg");
+        if(sky!=null) c.drawBitmap(sky,null,new RectF(0f,0f,1280f,690f),bitmapPaint);
+        shade(c,0f,0f,640f,684f,0xB5031A51,0x2C050816);
+        shade(c,640f,0f,1280f,684f,0xA340001A,0x450B0514);
+        // Moon behind the temple
         p.setStyle(Paint.Style.FILL);
-        p.setShader(new LinearGradient(0f, 0f, 0f, Arena.VH,
-            0xFF08142F, 0xFF070814, Shader.TileMode.CLAMP));
-        c.drawColor(Color.BLACK);
-        c.drawRect(0f, 0f, Arena.VW, Arena.VH, p);
-        p.setShader(null);
-        p.setColor(0x40278BFF);
-        c.drawCircle(245f, 177f, 254f, p);
-        p.setColor(0x40FF243E);
-        c.drawCircle(1035f, 177f, 254f, p);
-        p.setColor(0x40D0DAFF);
-        c.drawCircle(640f, 61f, 57f, p);
-        p.setColor(0x30081022);
-        c.drawCircle(652f, 54f, 58f, p);
-        for (int i = 0; i < 9; i++) {
-            float x = i * 153f - 17f;
-            p.setColor(0x44000713);
-            c.drawRect(x, 0f, x + 22f, 658f, p);
-            p.setColor(0x323F5481);
-            c.drawRect(x + 17f, 0f, x + 20f, 658f, p);
+        p.setColor(0x995BA9FF);c.drawCircle(640f,28f,59f,p);
+        p.setColor(0xFFE8F4FF);c.drawCircle(640f,27f,32f,p);
+        p.setColor(0x553E65C8);c.drawCircle(625f,22f,9f,p);
+        p.setColor(0x663B52A0);c.drawCircle(651f,44f,7f,p);
+        // Temple interior: vertical black stone columns and hanging banners
+        for(int i=0;i<7;i++) {
+            float x=105f+i*178f;
+            p.setColor(0xBF090C25);c.drawRect(x,0,x+42f,661f,p);
+            p.setColor(0xBB172F55);c.drawRect(x+6f,0,x+12f,661f,p);
+            p.setColor(0xAA3C4263);c.drawRect(x+37f,0,x+40f,661f,p);
+            p.setColor(0xFF040D25);c.drawRect(x-7f,45f,x+49f,56f,p);
+            p.setColor(i%2==0?0xAA15234E:0xAA581B2F);
+            c.drawRect(x+56f,58f,x+114f,232f,p);
+            p.setColor(i%2==0?0xFF42517B:0xFF775363);
+            c.drawCircle(x+85f,119f,23f,p);
+            p.setColor(0xFF111329);c.drawCircle(x+85f,119f,18f,p);
+            flame(c,x+26f,62f,i%2==0?BLUE:RED,0.72f);
+            flame(c,x-15f,353f,0xFFFF8730,0.88f);
         }
-        for (int i = 0; i < 11; i++) {
-            float x = 42f + i * 124f;
-            p.setColor(0x778099BF);
-            c.drawCircle(x, 80f + (i % 3) * 15f, 1.8f, p);
+        // floor
+        shade(c,0f,570f,1280f,690f,0x0021203D,0xEF030614);
+        for(int i=0;i<14;i++){
+            line(c,0,579+i*i*.58f,1280,579+i*i*.58f,0x154674B5,1f);
         }
-        // duas auréolas em oposição: dragão azul e tigre vermelho no conceito
-        drawAura(c, 235f, 215f, BLUE);
-        drawAura(c, 1045f, 215f, RED);
-        p.setColor(0xB7000711);
-        c.drawRect(0f, 638f, 1280f, 720f, p);
-        line(c, 0, 656, 1280, 656, 0xFF586A87, 2f);
+        line(c,0f,687f,1280f,687f,0xFF6D8DC7,2.5f);
     }
 
-    private void drawAura(Canvas c, float cx, float cy, int color) {
-        p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(3.4f);
-        for (int i = 0; i < 4; i++) {
-            p.setColor(withAlpha(color, 66 - i * 11));
-            float rad = 154f + i * 19f;
-            c.drawArc(cx - rad, cy - rad, cx + rad, cy + rad, 195f, 205f, false, p);
-            c.drawArc(cx - rad, cy - rad, cx + rad, cy + rad, 17f, 131f, false, p);
+    private void shade(Canvas c,float l,float t,float r,float b,int a,int z) {
+        p.setShader(new LinearGradient(l,t,l,b,a,z,Shader.TileMode.CLAMP));
+        p.setStyle(Paint.Style.FILL);c.drawRect(l,t,r,b,p);p.setShader(null);
+    }
+
+    private void spiritEmblem(Canvas c,int side) {
+        int color=side==0?BLUE:RED;
+        float x=side==0?238f:1042f, y=142f;
+        c.save();
+        if(side==1)c.scale(-1f,1f,x,0f);
+        // Stylized glowing dragon/tiger spirit behind the fighter, not an inert UI card
+        p.setStyle(Paint.Style.STROKE);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);
+        for(int glow=3;glow>=0;glow--) {
+            p.setColor(alpha(color,glow==0?225:35));
+            p.setStrokeWidth(glow==0?4f:6f+glow*7f);
+            path.reset();
+            path.moveTo(x-151,y-18);
+            path.cubicTo(x-121,y-127,x+2,y-125,x+98,y-59);
+            path.cubicTo(x+125,y-31,x+140,y+17,x+84,y+30);
+            path.cubicTo(x+42,y+46,x+59,y+10,x+11,y+19);
+            path.cubicTo(x-52,y+32,x-93,y+126,x-158,y+141);
+            c.drawPath(path,p);
+            path.reset();path.moveTo(x+20,y-100);path.quadTo(x+55,y-139,x+95,y-128);
+            path.moveTo(x+24,y-96);path.quadTo(x+14,y-159,x-22,y-165);
+            path.moveTo(x+82,y+18);path.quadTo(x+148,y+55,x+164,y+5);
+            c.drawPath(path,p);
         }
+        p.setStrokeWidth(3f);p.setColor(alpha(color,235));
+        for(int i=0;i<6;i++){
+            float bx=x-113+i*23f,by=y-92+(i%2)*9f;
+            path.reset();path.moveTo(bx,by);path.lineTo(bx+15,by-28);path.lineTo(bx+33,by-18);
+            c.drawPath(path,p);
+        }
+        for(int i=0;i<5;i++) {
+            float yy=y-34+i*21f;
+            path.reset();path.moveTo(x+91,yy);path.lineTo(x+136+i*2,yy+9);c.drawPath(path,p);
+        }
+        p.setStyle(Paint.Style.FILL);p.setColor(0xFFFFFFFF);c.drawCircle(x+81,y-19,5f,p);
+        p.setColor(0xFF0C1626);c.drawCircle(x+82,y-19,2f,p);
+        c.restore();
+    }
+
+    private void hero(Canvas c,CharacterSelect s,int side) {
+        boolean left=side==0;
+        float cx=left?179f:1101f;
+        int tone=left?BLUE:RED;
+        Bitmap b=concept(s.pick(side,0));
+        c.save();
+        c.clipRect(left?0f:913f,55f,left?365f:1280f,660f);
+        if(b!=null){
+            float maxW=left?376f:387f,maxH=left?586f:586f;
+            float scale=Math.min(maxW/b.getWidth(),maxH/b.getHeight());
+            float w=b.getWidth()*scale,h=b.getHeight()*scale;
+            bitmapPaint.setColor(Color.WHITE);bitmapPaint.setAlpha(255);
+            // Full-body approved 90s anime concept art, enlarged near the outer edge.
+            if(!left)c.scale(-1f,1f,cx,0f);
+            c.drawBitmap(b,null,new RectF(cx-w/2f,79f,cx+w/2f,79f+h),bitmapPaint);
+        }
+        // Subtle edge-colored light while keeping the art visible.
+        shade(c,left?0f:913f,56f,left?365f:1280f,640f,
+                alpha(tone,10),alpha(tone,22));
+        c.restore();
+    }
+
+    private void playerTitles(Canvas c,CharacterSelect s) {
+        labelPanel(c,0f,21f,117f,84f,BLUE,"P1");
+        labelPanel(c,1163f,21f,1280f,84f,RED,"P2");
+        // The approved concept does not have a game logo at the top.
+    }
+
+    private void labelPanel(Canvas c,float l,float t,float r,float b,int color,String text) {
+        p.setColor(0xDA081128);c.drawRect(l,t,r,b,p);
+        line(c,l,t,r,t,color,3f);line(c,l,b,r,b,color,3f);
+        text(c,text,(l+r)/2f,b-14f,48f,WHITE,true,Paint.Align.CENTER);
+    }
+
+    private void grid(Canvas c,CharacterSelect s) {
+        // Straight left/right symmetry; vanishing-point perspective comes from framing,
+        // not rotating one side of the select grid.
+        p.setColor(0xF0091128);c.drawRect(376f,128f,904f,542f,p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3.2f);
+        p.setColor(0xFF7898D5);c.drawRect(376f,128f,904f,542f,p);
         p.setStyle(Paint.Style.FILL);
+        for(int i=0;i<CharacterSelect.ROWS*CharacterSelect.COLUMNS;i++) tile(c,s,i);
     }
 
-    private void drawHero(Canvas c, CharacterSelect s, int side) {
-        boolean left = side == 0;
-        float x = left ? 12f : 947f;
-        float w = 322f;
-        int accent = left ? BLUE : RED;
-        p.setShader(new LinearGradient(x, 190f, x + w, 450f,
-            withAlpha(accent, 45), 0x00222233, Shader.TileMode.CLAMP));
-        c.drawRect(x, 128f, x + w, 559f, p);
-        p.setShader(null);
-        Bitmap b = portrait(GeneratedCharacters.get(s.pick(side, 0)));
-        if (b != null) {
-            float scale = Math.min(360f / b.getWidth(), 430f / b.getHeight());
-            float width = b.getWidth() * scale, height = b.getHeight() * scale;
-            float centerX = left ? 178f : 1104f;
-            float bottom = 552f;
-            box.set(centerX - width / 2f, bottom - height, centerX + width / 2f, bottom);
-            img.setAlpha(245);
-            c.drawBitmap(b, null, box, img);
-        }
-        p.setColor(withAlpha(accent, 242));
-        p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(3f);
-        if (left) c.drawLine(0f, 365f, 0f, 651f, p);
-        else c.drawLine(1279f, 365f, 1279f, 651f, p);
-        p.setStyle(Paint.Style.FILL);
-    }
-
-    private void drawHeading(Canvas c, CharacterSelect s, int side) {
-        boolean left = side == 0;
-        int accent = left ? BLUE : RED;
-        float x = left ? 12f : 1088f;
-        p.setColor(withAlpha(accent, 205));
-        c.drawRoundRect(x, 18f, x + 181f, 81f, 5f, 5f, p);
-        p.setColor(0xFF090E22);
-        c.drawRoundRect(x + 4f, 22f, x + 177f, 77f, 4f, 4f, p);
-        text(c, left ? "P1" : "P2", left ? x + 90f : x + 91f, 66f, 48f,
-             WHITE, Paint.Align.CENTER, true);
-        String name = GeneratedCharacters.get(s.pick(side, 0)).displayName.toUpperCase();
-        text(c, name, left ? 21f : 1257f, 113f, 22f, WHITE,
-             left ? Paint.Align.LEFT : Paint.Align.RIGHT, true);
-    }
-
-    private void drawGrid(Canvas c, CharacterSelect s) {
-        // Contorno rígido e simétrico: perspectiva baixa sem inclinação lateral.
-        p.setColor(0xF00A142B);
-        c.drawRoundRect(370f, 143f, 910f, 519f, 10f, 10f, p);
-        p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(2.5f);
-        p.setColor(0xFF778FBC);
-        c.drawRoundRect(370f, 143f, 910f, 519f, 10f, 10f, p);
-        p.setStyle(Paint.Style.FILL);
-        for (int i = 0; i < CharacterSelect.COLUMNS * CharacterSelect.ROWS; i++)
-            drawTile(c, s, i);
-    }
-
-    private void drawTile(Canvas c, CharacterSelect s, int index) {
-        float l = s.cardLeft(index), t = s.cardTop(index);
-        float w = s.cardWidth(), h = s.cardHeight();
-        boolean locked = index >= s.ids.length;
-        String id = locked ? null : s.ids[index];
-        box.set(l, t, l + w, t + h);
-        p.setColor(locked ? 0xFF0B1020 : 0xFF18243C);
-        c.drawRect(box, p);
-        if (!locked) {
-            Bitmap b = portrait(GeneratedCharacters.get(id));
-            if (b != null) {
-                float scale = Math.max((w - 8f) / b.getWidth(), (h - 11f) / b.getHeight());
-                // Centralizar o rosto/corpo com recorte dentro de cada carta.
-                float width = b.getWidth() * scale, height = b.getHeight() * scale;
-                c.save();
-                c.clipRect(l + 2f, t + 2f, l + w - 2f, t + h - 2f);
-                img.setAlpha(255);
-                c.drawBitmap(b, null, new RectF(l + (w - width) / 2f,
-                    t + h - height + 12f, l + (w + width) / 2f, t + h + 12f), img);
+    private void tile(Canvas c,CharacterSelect s,int index) {
+        float x=s.cardLeft(index),y=s.cardTop(index),w=s.cardWidth(),h=s.cardHeight();
+        boolean locked=index>=s.ids.length;
+        p.setStyle(Paint.Style.FILL);p.setColor(locked?0xFF14192C:0xFF1D2539);
+        c.drawRect(x,y,x+w,y+h,p);
+        if(!locked) {
+            String id=s.ids[index];
+            Bitmap art=concept(id);
+            if(art!=null) {
+                c.save();c.clipRect(x+1f,y+1f,x+w-1f,y+h-1f);
+                float scale=Math.max(w/(art.getWidth()*.72f),h/(art.getHeight()*.61f));
+                float aw=art.getWidth()*scale,ah=art.getHeight()*scale;
+                bitmapPaint.setAlpha(255);
+                c.drawBitmap(art,null,new RectF(x+(w-aw)*.5f,y-0.19f*ah,x+(w+aw)*.5f,y+0.81f*ah),bitmapPaint);
                 c.restore();
             }
-            p.setShader(new LinearGradient(l, t + h - 31f, l, t + h,
-                0x00000000, 0xE6080C1D, Shader.TileMode.CLAMP));
-            c.drawRect(l, t + h - 35f, l + w, t + h, p);
-            p.setShader(null);
-            String name = GeneratedCharacters.get(id).displayName;
-            if (name.length() > 11) name = name.substring(0, 11);
-            text(c, name, l + w / 2f, t + h - 7f, 14f, WHITE, Paint.Align.CENTER, true);
-            int p1 = s.order(0, id), p2 = s.order(1, id);
-            if (p1 > 0) selectorCorner(c, l, t, w, h, BLUE, "P1 " + p1, true);
-            if (p2 > 0) selectorCorner(c, l, t, w, h, RED, "P2 " + p2, false);
-            int focusedOrder = s.order(s.focusSide(), id);
-            if (focusedOrder == s.focusSlot() + 1) {
-                p.setStyle(Paint.Style.STROKE);
-                p.setStrokeWidth(4f);
-                p.setColor(s.focusSide() == 0 ? BLUE : RED);
-                c.drawRect(l + 1, t + 1, l + w - 1, t + h - 1, p);
+            shade(c,x,y+h*.72f,x+w,y+h,0x00060B14,0xDD050711);
+            String name=GeneratedCharacters.get(id).displayName;
+            // Two corner tabs may coexist when both players select the same fighter.
+            int n1=s.order(0,id),n2=s.order(1,id);
+            if(n1!=0)tab(c,x+2f,y+2f,BLUE,"P1"+(n1==2?" TAG":""));
+            if(n2!=0)tab(c,x+w-48f,y+2f,RED,"P2"+(n2==2?" TAG":""));
+            text(c,name,x+w/2f,y+h-9f,13f,WHITE,true,Paint.Align.CENTER);
+            if(index==s.cursorIndex()) {
+                p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3.4f);
+                p.setColor(s.focusSide()==0?BLUE:RED);
+                c.drawRect(x+2f,y+2f,x+w-2f,y+h-2f,p);
                 p.setStyle(Paint.Style.FILL);
             }
         } else {
-            // Slots futuros ficam visivelmente trancados, sem cartões fictícios.
-            text(c, "◇", l + w / 2f, t + 69f, 44f, 0xFF75809A, Paint.Align.CENTER, false);
-            text(c, "BLOQUEADO", l + w / 2f, t + 96f, 13f,
-                0xFF7C87A4, Paint.Align.CENTER, false);
+            lock(c,x+w/2f,y+h/2f,0xFF838B9D);
         }
-        p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(1f);
-        p.setColor(0xFF4A6186);
-        c.drawRect(box, p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1f);p.setColor(0xFF9BA8C9);
+        c.drawRect(x,y,x+w,y+h,p);p.setStyle(Paint.Style.FILL);
+    }
+
+    private void tab(Canvas c,float x,float y,int color,String label) {
+        p.setColor(color);c.drawRect(x,y,x+46f,y+23f,p);
+        text(c,label,x+23f,y+16f,label.length()>4?9f:15f,WHITE,true,Paint.Align.CENTER);
+    }
+
+    private void lock(Canvas c,float x,float y,int color) {
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(4.2f);p.setColor(color);
+        c.drawRoundRect(x-10f,y-24f,x+10f,y-1f,9f,9f,p);
+        p.setStyle(Paint.Style.FILL);c.drawRoundRect(x-16f,y-7f,x+16f,y+22f,2f,2f,p);
+        p.setColor(0xFF202739);c.drawCircle(x,y+6f,3.8f,p);
+    }
+
+    private void teamPanel(Canvas c,CharacterSelect s,int side) {
+        float l=s.slotLeft(side),top=s.slotTop(0)-34f;
+        int color=side==0?BLUE:RED;
+        p.setColor(0xEE05091F);c.drawRoundRect(l-8f,top,l+CharacterSelect.TEAM_W+8f,630f,10f,10f,p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3f);p.setColor(color);
+        c.drawRoundRect(l-8f,top,l+CharacterSelect.TEAM_W+8f,630f,10f,10f,p);
         p.setStyle(Paint.Style.FILL);
-    }
-
-    private void selectorCorner(Canvas c, float l, float t, float w, float h,
-                                int color, String label, boolean left) {
-        float bx = left ? l + 2f : l + w - 48f;
-        p.setColor(color);
-        c.drawRect(bx, t + 2f, bx + 46f, t + 23f, p);
-        text(c, label, bx + 23f, t + 18f, 13f, WHITE, Paint.Align.CENTER, true);
-    }
-
-    private void drawTeams(Canvas c, CharacterSelect s, int side) {
-        int accent = side == 0 ? BLUE : RED;
-        float x = s.slotLeft(side), y = CharacterSelect.TEAM_TOP;
-        boolean focusedSide = s.focusSide() == side;
-        text(c, "TEAM", x + CharacterSelect.TEAM_W / 2f, y - 14f, 22f,
-             WHITE, Paint.Align.CENTER, true);
-        for (int slot = 0; slot < 2; slot++) {
-            float top = s.slotTop(slot);
-            box.set(x, top, x + CharacterSelect.TEAM_W, top + CharacterSelect.SLOT_H);
-            p.setColor(0xEE090E22);
-            c.drawRoundRect(box, 8f, 8f, p);
+        text(c,"TEAM",l+CharacterSelect.TEAM_W/2f,top+26f,21f,WHITE,true,Paint.Align.CENTER);
+        for(int slot=0;slot<2;slot++) {
+            float y=s.slotTop(slot);
+            p.setColor(0xF0060E25);c.drawRect(l,y,l+CharacterSelect.TEAM_W,y+CharacterSelect.SLOT_H,p);
+            Bitmap b=concept(s.pick(side,slot));
+            if(b!=null) {
+                c.save();c.clipRect(l+31f,y+3f,l+CharacterSelect.TEAM_W-4f,y+CharacterSelect.SLOT_H-3f);
+                float w=144f,h=144f*b.getHeight()/b.getWidth();
+                bitmapPaint.setAlpha(255);
+                c.drawBitmap(b,null,new RectF(l+47f,y-0.21f*h,l+47f+w,y+0.79f*h),bitmapPaint);
+                c.restore();
+            }
+            shade(c,l+5f,y+75f,l+CharacterSelect.TEAM_W-5f,y+CharacterSelect.SLOT_H-3f,0x00000000,0xDB000718);
             p.setStyle(Paint.Style.STROKE);
-            p.setStrokeWidth(focusedSide && s.focusSlot() == slot ? 4f : 2f);
-            p.setColor(focusedSide && s.focusSlot() == slot ? accent : withAlpha(accent, 130));
-            c.drawRoundRect(box, 8f, 8f, p);
+            p.setStrokeWidth(s.focusSide()==side && s.focusSlot()==slot?3.5f:1.5f);
+            p.setColor(color);
+            c.drawRect(l,y,l+CharacterSelect.TEAM_W,y+CharacterSelect.SLOT_H,p);
             p.setStyle(Paint.Style.FILL);
-            text(c, String.valueOf(slot + 1), x + 18f, top + 47f, 27f,
-                 WHITE, Paint.Align.CENTER, true);
-            Bitmap b = portrait(GeneratedCharacters.get(s.pick(side, slot)));
-            if (b != null) {
-                float scale = Math.min(62f / b.getWidth(), 67f / b.getHeight());
-                float w = b.getWidth() * scale, h = b.getHeight() * scale;
-                img.setAlpha(255);
-                c.drawBitmap(b, null, new RectF(x + 39f, top + CharacterSelect.SLOT_H - 5f - h,
-                     x + 39f + w, top + CharacterSelect.SLOT_H - 5f), img);
-            }
-            String label = GeneratedCharacters.get(s.pick(side, slot)).displayName;
-            if (label.length() > 14) label = label.substring(0, 14);
-            text(c, label, x + 155f, top + 36f, 17f, WHITE, Paint.Align.CENTER, true);
-            text(c, slot == 0 ? "TITULAR" : "TAG", x + 154f, top + 60f, 15f,
-                 accent, Paint.Align.CENTER, true);
+            text(c,""+(slot+1),l+18f,y+43f,25f,WHITE,true,Paint.Align.CENTER);
+            text(c,slot==0?(side==0?"P1":"P2"):"TAG",
+                    l+CharacterSelect.TEAM_W-31f,y+CharacterSelect.SLOT_H-11f,20f,WHITE,true,Paint.Align.CENTER);
         }
+        text(c,"⇄",l+CharacterSelect.TEAM_W/2f,s.slotTop(1)-9f,27f,WHITE,true,Paint.Align.CENTER);
     }
 
-    private void drawStagePreview(Canvas c) {
-        float l = 352f, t = 527f, r = 928f, b = 640f;
-        box.set(l, t, r, b);
-        p.setShader(new LinearGradient(l, t, l, b, 0xFF19386D, 0xFF090C24, Shader.TileMode.CLAMP));
-        c.drawRoundRect(box, 7f, 7f, p);
-        p.setShader(null);
-        p.setColor(0xFFE5E9FF);
-        c.drawCircle(641f, 556f, 23f, p);
-        p.setColor(0x6EFFFFFF);
-        c.drawCircle(641f, 556f, 30f, p);
-        // silhuetas de telhados orientais, pátio e pilares do Templo da Lua
-        p.setColor(0xFF020B19);
-        for (int j = 0; j < 5; j++) {
-            float x = 391 + j * 107f, roof = 576 + (j % 2) * 6f;
-            path.reset();path.moveTo(x - 38f, roof + 18f);
-            path.lineTo(x + 4f, roof - 12f);path.lineTo(x + 45f, roof + 18f);
-            path.close();c.drawPath(path, p);
-            c.drawRect(x - 29f, roof + 17f, x + 38f, 625f, p);
+    private void stagePreview(Canvas c) {
+        // Low-view trapezoidal preview at exactly the location in the supplied art.
+        float top=547f,bottom=684f;
+        path.reset();path.moveTo(338f,top);path.lineTo(942f,top);
+        path.lineTo(987f,bottom);path.lineTo(293f,bottom);path.close();
+        c.save();c.clipPath(path);
+        p.setColor(0xFF0E2151);c.drawRect(290f,top,990f,bottom,p);
+        Bitmap sky=stage("ceu.jpg"), city=stage("cidade.png"), gate=stage("portal.png");
+        if(sky!=null)c.drawBitmap(sky,null,new RectF(297f,547f,987f,685f),bitmapPaint);
+        if(city!=null) {
+            bitmapPaint.setAlpha(245);
+            c.drawBitmap(city,null,new RectF(297f,565f,987f,664f),bitmapPaint);
         }
-        p.setColor(0xFF49638E);
-        c.drawRect(l + 8f, 624f, r - 8f, 628f, p);
-        p.setColor(0xE6070B1B);
-        c.drawRect(l + 2f, 603f, r - 2f, 638f, p);
-        text(c, CharacterSelect.STAGE, 640f, 628f, 21f, WHITE, Paint.Align.CENTER, true);
-        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(2.5f);
-        p.setColor(0xFF5F93D2); c.drawRoundRect(box, 7f, 7f, p);
-        p.setStyle(Paint.Style.FILL);
-    }
-
-    private void drawBottomBar(Canvas c, CharacterSelect s) {
-        drawButton(c, CharacterSelect.BACK_LEFT, CharacterSelect.BACK_TOP,
-             CharacterSelect.BACK_RIGHT, CharacterSelect.BACK_BOTTOM,
-             0xFF7B89A6, "VOLTAR", true);
-        drawButton(c, CharacterSelect.FIGHT_LEFT, CharacterSelect.FIGHT_TOP,
-             CharacterSelect.FIGHT_RIGHT, CharacterSelect.FIGHT_BOTTOM,
-             s.ready() ? 0xFF2DC7F7 : 0xFF6A7488, "LUTAR", s.ready());
-        drawButton(c, CharacterSelect.RANDOM_LEFT, CharacterSelect.RANDOM_TOP,
-             CharacterSelect.RANDOM_RIGHT, CharacterSelect.RANDOM_BOTTOM,
-             0xFFA1ABCB, "ALEATÓRIO", true);
-        text(c, "TOQUE NA EQUIPE PARA ESCOLHER O TITULAR OU TAG",
-             640f, 140f, 16f, 0xFFB4C4E5, Paint.Align.CENTER, false);
-    }
-
-    private void drawButton(Canvas c, float l, float t, float r, float b, int accent,
-                            String name, boolean active) {
-        p.setColor(active ? withAlpha(accent, 56) : 0x80222935);
-        c.drawRoundRect(l, t, r, b, 8f, 8f, p);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2f);
-        p.setColor(accent);
-        c.drawRoundRect(l, t, r, b, 8f, 8f, p);
-        p.setStyle(Paint.Style.FILL);
-        text(c, name, (l + r) / 2f, (t + b) / 2f + 8f, 23f,
-             active ? WHITE : 0xFFAAB2C4, Paint.Align.CENTER, true);
-    }
-
-    private void text(Canvas c, String value, float x, float y, float size, int color,
-                      Paint.Align align, boolean bold) {
-        p.setShader(null);
-        p.setColor(color);
-        p.setTextSize(size);
-        p.setTextAlign(align);
-        p.setTypeface(bold ? android.graphics.Typeface.create("sans-serif-condensed", 1) :
-                android.graphics.Typeface.create("sans-serif", 0));
-        p.setStyle(Paint.Style.FILL);
-        c.drawText(value, x, y, p);
-    }
-
-    private void line(Canvas c, float x1, float y1, float x2, float y2, int color, float stroke) {
-        p.setColor(color);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(stroke);
-        c.drawLine(x1, y1, x2, y2, p);
-        p.setStyle(Paint.Style.FILL);
-    }
-
-    private static int withAlpha(int rgb, int alpha) {
-        return (Math.max(0, Math.min(255, alpha)) << 24) | (rgb & 0x00FFFFFF);
-    }
-
-    private Bitmap portrait(CharacterDefinition character) {
-        if (portraits.containsKey(character.id)) return portraits.get(character.id);
-        Bitmap cell = null;
-        CharacterDefinition.Animation idle = character.animations.get(SpriteStates.IDLE);
-        if (idle != null) {
-            CharacterDefinition.Atlas a = idle.atlas;
-            int frame = idle.frame(0f, 0f);
-            int id = context.getResources().getIdentifier(a.resource, "drawable", context.getPackageName());
-            if (id != 0) {
-                try (InputStream in = context.getResources().openRawResource(id)) {
-                    BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(in, false);
-                    int x = frame % a.columns * a.width, y = frame / a.columns * a.height;
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inScaled = false;
-                    cell = decoder.decodeRegion(new Rect(x, y, x + a.width, y + a.height), options);
-                    decoder.recycle();
-                    cell = crop(cell);
-                } catch (IOException | RuntimeException ex) {
-                    Log.w("GameLuta", "retrato de " + character.id + " indisponivel", ex);
-                }
-            }
+        if(gate!=null) {
+            bitmapPaint.setAlpha(240);
+            c.drawBitmap(gate,null,new RectF(548f,563f,734f,665f),bitmapPaint);
         }
-        portraits.put(character.id, cell);
-        return cell;
+        Bitmap pillar=stage("pilar.png");
+        if(pillar!=null) {
+            bitmapPaint.setAlpha(255);
+            c.drawBitmap(pillar,null,new RectF(302f,542f,405f,670f),bitmapPaint);
+            c.drawBitmap(pillar,null,new RectF(874f,542f,978f,670f),bitmapPaint);
+        }
+        p.setColor(0xD9020C22);c.drawRect(306f,650f,970f,678f,p);
+        text(c,CharacterSelect.STAGE,640f,672f,21f,WHITE,true,Paint.Align.CENTER);
+        // One stage currently exists; muted arrows never pretend to change the fight.
+        text(c,"❮",432f,672f,24f,0xFFB2C6EE,true,Paint.Align.CENTER);
+        text(c,"❯",845f,672f,24f,0xFFB2C6EE,true,Paint.Align.CENTER);
+        c.restore();
+        p.setColor(BLUE);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2.8f);
+        c.drawPath(path,p);p.setStyle(Paint.Style.FILL);
     }
 
-    private static Bitmap crop(Bitmap cell) {
-        if (cell == null) return null;
-        int w = cell.getWidth(), h = cell.getHeight();
-        int[] pixels = new int[w * h];
-        cell.getPixels(pixels, 0, w, 0, 0, w, h);
-        int l = w, t = h, r = -1, b = -1;
-        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
-            if ((pixels[y * w + x] >>> 24) > 16) {
-                l = Math.min(l, x);r = Math.max(r, x);t = Math.min(t, y);b = Math.max(b, y);
-            }
+    private void footer(Canvas c,CharacterSelect s) {
+        p.setColor(0xF8060A16);c.drawRect(0f,687f,1280f,720f,p);
+        line(c,0f,688f,1280f,688f,0xFF4786F5,2f);
+        command(c,66f,"✣","SELECIONAR",0xFFDCE6FF,175f);
+        command(c,318f,"A","CONFIRMAR",0xFF56E882,415f);
+        command(c,473f,"B","VOLTAR",0xFFFF4454,531f);
+        command(c,622f,"Y","CONFIGURAÇÕES",0xFFEBCC40,708f);
+        command(c,813f,"LB / RB","TROCAR TAG",0xFFF9F9FF,928f);
+        command(c,1045f,"X","ALEATÓRIO",0xFF258DFF,1137f);
+    }
+    private void command(Canvas c,float x,String key,String word,int color,float wordX) {
+        p.setColor(0xDD090F20);p.setStyle(Paint.Style.FILL);
+        c.drawCircle(x,706f,key.length()==1?15f:20f,p);
+        p.setStyle(Paint.Style.STROKE);p.setColor(color);p.setStrokeWidth(2f);
+        c.drawCircle(x,706f,key.length()==1?15f:20f,p);
+        p.setStyle(Paint.Style.FILL);
+        text(c,key,x,712f,key.length()>1?10f:21f,color,true,Paint.Align.CENTER);
+        text(c,word,wordX,711f,14f,WHITE,true,Paint.Align.CENTER);
+    }
+
+    private void settings(Canvas c) {
+        p.setColor(0xF50A122C);c.drawRoundRect(313f,204f,967f,485f,16f,16f,p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3f);p.setColor(BLUE);
+        c.drawRoundRect(313f,204f,967f,485f,16f,16f,p);p.setStyle(Paint.Style.FILL);
+        text(c,"CONFIGURAÇÕES · SELEÇÃO TAG",640f,250f,28f,WHITE,true,Paint.Align.CENTER);
+        text(c,"TOQUE UM SLOT TEAM PARA ESCOLHER O TITULAR OU PARCEIRO",640f,302f,18f,WHITE,false,Paint.Align.CENTER);
+        text(c,"TOQUE UM RETRATO OU USE O DIRECIONAL PARA SELECIONAR",640f,344f,18f,WHITE,false,Paint.Align.CENTER);
+        text(c,"LB / RB INVERTE TITULAR E TAG DA EQUIPE ATIVA",640f,386f,18f,WHITE,false,Paint.Align.CENTER);
+        text(c,"TOQUE PARA FECHAR",640f,455f,17f,0xFF84BBFF,true,Paint.Align.CENTER);
+    }
+
+    private void flame(Canvas c,float x,float y,int color,float scale){
+        p.setStyle(Paint.Style.FILL);p.setColor(alpha(color,30));
+        c.drawCircle(x,y,24f*scale,p);
+        path.reset();path.moveTo(x-7f*scale,y+12f*scale);
+        path.quadTo(x-9f*scale,y-6f*scale,x+3f*scale,y-22f*scale);
+        path.quadTo(x+23f*scale,y+4f*scale,x+7f*scale,y+14f*scale);
+        path.close();p.setColor(alpha(color,210));c.drawPath(path,p);
+    }
+
+    private void line(Canvas c,float a,float b,float x,float y,int color,float width){
+        p.setStyle(Paint.Style.STROKE);p.setColor(color);p.setStrokeWidth(width);
+        c.drawLine(a,b,x,y,p);p.setStyle(Paint.Style.FILL);
+    }
+
+    private void text(Canvas c,String text,float x,float y,float size,int color,boolean bold,Paint.Align align){
+        p.setShader(null);p.setStyle(Paint.Style.FILL);p.setTextAlign(align);
+        p.setTypeface(Typeface.create("sans-serif-condensed",bold?Typeface.BOLD:Typeface.NORMAL));
+        p.setColor(color);p.setTextSize(size);c.drawText(text,x,y,p);
+    }
+    private static int alpha(int color,int opacity){
+        return (Math.max(0,Math.min(opacity,255))<<24)|(color&0x00FFFFFF);
+    }
+    private Bitmap concept(String id) {
+        if(art.containsKey(id))return art.get(id);
+        String file="player_base".equals(id)?"p01":id;
+        Bitmap bitmap=read("selection/portraits/"+file+".png");
+        art.put(id,bitmap);
+        return bitmap;
+    }
+    private Bitmap stage(String name) {
+        if(scenery.containsKey(name))return scenery.get(name);
+        Bitmap bitmap=read("stages/templo_lua/"+name);
+        scenery.put(name,bitmap);
+        return bitmap;
+    }
+    private Bitmap read(String path) {
+        try(InputStream in=context.getAssets().open(path)) {
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inPreferredConfig=Bitmap.Config.ARGB_8888;
+            options.inSampleSize=2;
+            return BitmapFactory.decodeStream(in,null,options);
+        } catch(IOException ex) {
+            Log.w("CharacterSelect","Could not load "+path,ex);
+            return null;
         }
-        if (r < l) return cell;
-        Bitmap out = Bitmap.createBitmap(cell, l, t, r - l + 1, b - t + 1);
-        cell.recycle();
-        return out;
     }
 }
