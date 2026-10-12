@@ -28,6 +28,7 @@ final class CharacterSelectRenderer {
     private static final int RED = 0xFFFF4151;
     private static final int WHITE = 0xFFF3F5FF;
     private final Context context;
+    private final HudConceptPortraits hudConcepts;
     private final Map<String, Bitmap> portraits = new HashMap<>();
     private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint img = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
@@ -35,7 +36,12 @@ final class CharacterSelectRenderer {
     private final Rect src = new Rect();
     private final Path path = new Path();
 
-    CharacterSelectRenderer(Context context) { this.context = context; }
+    CharacterSelectRenderer(Context context) {
+        this.context = context;
+        this.hudConcepts = new HudConceptPortraits(context);
+    }
+
+    Bitmap hudPortrait(CharacterDefinition character) { return hudConcepts.get(character.id); }
 
     void draw(Canvas canvas, Paint unused, CharacterSelect select) {
         backdrop(canvas);

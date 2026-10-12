@@ -19,6 +19,41 @@ public class HudArtTest {
     private void draw(GameView game, String name, Canvas canvas) throws Exception {
         Method m=GameView.class.getDeclaredMethod(name,Canvas.class);m.setAccessible(true);m.invoke(game,canvas);
     }
+    private Bitmap hud(GameView game) throws Exception {
+        Bitmap bitmap=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
+        draw(game,"drawHud",new Canvas(bitmap));return bitmap;
+    }
+    @Test public void upperMeterTracksAssistCooldownIndependentlyFromSuper() throws Exception {
+        GameView game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
+        FighterState active=((FighterState[])field(game,"team"))[0];
+        active.superMeter=0;
+        Bitmap ready=hud(game);int charged=ready.getPixel(350,103);
+        active.superMeter=5*CombatConfig.METER_PER_BAR;
+        Bitmap superCharged=hud(game);
+        assertEquals("Super must not change the assist meter",charged,superCharged.getPixel(350,103));
+        game.engine.team(0).assistCooldown=game.engine.config.assistCooldownFrames;
+        Bitmap cooling=hud(game);
+        assertNotEquals("Assist cooldown must empty the upper meter",charged,cooling.getPixel(350,103));
+        assertEquals("Assist must not spend the lower Super meter",superCharged.getPixel(290,687),cooling.getPixel(290,687));
+        game.engine.team(0).assistCooldown=game.engine.config.assistCooldownFrames/2;
+        HudRenderer.State state=(HudRenderer.State)field(game,"hudState");
+        assertEquals(.5f,state.tagReadyRatio(),.001f);
+        game.engine.team(0).assistCooldown=0;
+        Bitmap restored=hud(game);
+        assertEquals("Upper meter refills when assist becomes ready",charged,restored.getPixel(350,103));
+        ready.recycle();superCharged.recycle();cooling.recycle();restored.recycle();
+    }
+    @Test public void everySelectableHudFaceComesFromDriveConcepts() throws Exception {
+        HudConceptPortraits concepts=new HudConceptPortraits(RuntimeEnvironment.getApplication());
+        for(String id:GeneratedCharacters.SELECTABLE) {
+            String expected="ui/hud/concepts/"+("player_base".equals(id)?"p01":id)+".webp";
+            assertEquals(expected,HudConceptPortraits.source(id));
+            Bitmap face=concepts.get(id);
+            assertNotNull("Concept must exist for "+id,face);
+            assertFalse(face.isRecycled());
+            assertTrue("Use authored close-up, not combat frame",face.getWidth()>250 && face.getHeight()>250);
+        }
+    }
     @Test public void ornamentalArtKeepsLifeLiveAndCenterTransparent() throws Exception {
         // BitmapFactory can accept a truncated PNG; validate bytes before native decode.
         java.security.MessageDigest digest=java.security.MessageDigest.getInstance("SHA-256");
@@ -38,8 +73,8 @@ public class HudArtTest {
         assertEquals(0,Color.alpha(atlas.getPixel(800,400)));
         FighterState active=((FighterState[])field(game,"team"))[0];
         CharacterSelectRenderer portraits=(CharacterSelectRenderer)field(game,"characterSelectRenderer");
-        assertNotNull("Point portrait must contain real character pixels",portraits.portrait(active.character));
-        assertNotNull("Reserve portrait must contain real character pixels",portraits.portrait(((FighterState[])field(game,"team"))[1].character));
+        assertNotNull("Point portrait must contain real character pixels",portraits.hudPortrait(active.character));
+        assertNotNull("Reserve portrait must contain real character pixels",portraits.hudPortrait(((FighterState[])field(game,"team"))[1].character));
         active.restoreLife();
         Bitmap full=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         draw(game,"drawHud",new Canvas(full));

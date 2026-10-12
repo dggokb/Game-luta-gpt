@@ -1,0 +1,78 @@
+{
+  "folder": "https://drive.google.com/drive/folders/1mGv56-qpEFg5GoFzoL4irTcsoST88BT2",
+  "conversion": "Lossless WebP; decoded RGBA pixels checked equal to source PNG. Runtime face rectangles in HudConceptPortraits.java.",
+  "sources": [
+    {
+      "name": "p06.png",
+      "drive_file_id": "1JGlnG1yZdHXS67YU3MHvOrvFt0lWgndO",
+      "drive_url": "https://drive.google.com/file/d/1JGlnG1yZdHXS67YU3MHvOrvFt0lWgndO/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p06.webp",
+      "sha256": "88a5cc1f2822efcd0ef862e9403b43169449401cc982688eafa3cd6517663224",
+      "bytes": 1471582,
+      "git_sha": "c7fad959b71d930eb40d6f8eebb0b71057d2b762"
+    },
+    {
+      "name": "p08.png",
+      "drive_file_id": "1osfvgFOHDVvNBTpBl_Ddflpr5U40e7PC",
+      "drive_url": "https://drive.google.com/file/d/1osfvgFOHDVvNBTpBl_Ddflpr5U40e7PC/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p08.webp",
+      "sha256": "f9a235c4049b6f33fc92143169ed6dad6dd08ea3aa74bc64555414d546c9dad0",
+      "bytes": 1600248,
+      "git_sha": "4dec03d1de3505aab2f9c16beafe42993acf03cb"
+    },
+    {
+      "name": "p07.png",
+      "drive_file_id": "1QWRT1QUuXAZ0lVNu6S_aLSRhO_NcFTb0",
+      "drive_url": "https://drive.google.com/file/d/1QWRT1QUuXAZ0lVNu6S_aLSRhO_NcFTb0/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p07.webp",
+      "sha256": "7ae6b988c68c5431349c4e15f2b88559f119cfc1301560730f9f8aee928d2ff9",
+      "bytes": 1239504,
+      "git_sha": "3e2c9d6e47ccb1f845491ba585bec51d25f38ab3"
+    },
+    {
+      "name": "p04.png",
+      "drive_file_id": "1-UwIYpixDTyGcsTnQYc_Czw4J9rdul84",
+      "drive_url": "https://drive.google.com/file/d/1-UwIYpixDTyGcsTnQYc_Czw4J9rdul84/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p04.webp",
+      "sha256": "55a390ae991ff54bf560b34be4a324627943d6a48f62b5c40165e0fd49612749",
+      "bytes": 1372458,
+      "git_sha": "9e931d29be87735e467139c244276a8f485be90b"
+    },
+    {
+      "name": "p05.png",
+      "drive_file_id": "1o-8F40VhluO7lkW6xJn9ZlWApq0T6-nw",
+      "drive_url": "https://drive.google.com/file/d/1o-8F40VhluO7lkW6xJn9ZlWApq0T6-nw/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p05.webp",
+      "sha256": "8bbbdf6cf98bfa80241566324683670c61845099344863a41dcb5053593c9412",
+      "bytes": 1601504,
+      "git_sha": "c27582642b6fd5e78c5f4b7ef2043d1814497d98"
+    },
+    {
+      "name": "p02.png",
+      "drive_file_id": "1Aw53vtHsqsU8bdmr_ws91mYFvihekElh",
+      "drive_url": "https://drive.google.com/file/d/1Aw53vtHsqsU8bdmr_ws91mYFvihekElh/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p02.webp",
+      "sha256": "814a73a82fe046023264297e10a9939250b0ba16588d28f5657581ff8ba88158",
+      "bytes": 1653254,
+      "git_sha": "522e5596b9eb1674f8d9efb695c2e8f496a61f1f"
+    },
+    {
+      "name": "p03.png",
+      "drive_file_id": "156SlykDC5g34TNw3YPw6MwN99VSq3HxN",
+      "drive_url": "https://drive.google.com/file/d/156SlykDC5g34TNw3YPw6MwN99VSq3HxN/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p03.webp",
+      "sha256": "02b09acecb080dda5d2949338fdb16d2fce302af5892428907c8b4c0fce4ff72",
+      "bytes": 1705804,
+      "git_sha": "093951a7041fbeefb8de10d3c8e30fa46aa11344"
+    },
+    {
+      "name": "p01.png",
+      "drive_file_id": "1_Xughz9lk1-xNaMRZmfwHigDD6zJv7DI",
+      "drive_url": "https://drive.google.com/file/d/1_Xughz9lk1-xNaMRZmfwHigDD6zJv7DI/view?usp=drivesdk",
+      "asset": "ui/hud/concepts/p01.webp",
+      "sha256": "c28252bc17e5eb94fb09099e87236955983ad24bafbc3bb466bf594ca8e19e87",
+      "bytes": 1571250,
+      "git_sha": "d8c00dcfb3a85942d80448f141d93acd93530c01"
+    }
+  ]
+}

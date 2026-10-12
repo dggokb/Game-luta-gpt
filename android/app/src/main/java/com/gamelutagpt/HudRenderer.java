@@ -115,9 +115,10 @@ final class HudRenderer {
             drawArtTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
             drawArtTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
             artwork(c, 0, 0, 1672, 280, 0f, 0f, 1280f, 170f);
-            drawSegments(c, active.superBars(), 174f, 96f, 330f, 11f, BLUE);
+            drawSegments(c, Arena.clamp(s.tagReadyRatio(), 0f, 1f) * 5f, 174f, 96f, 330f, 11f, BLUE);
             c.save(); c.translate(Arena.VW, 0f); c.scale(-1f, 1f);
-            drawSegments(c, s.opponent().superBars(), 174f, 96f, 330f, 11f, RED);
+            // Training CPU has no playable reserve or assist system.
+            drawSegments(c, 0f, 174f, 96f, 330f, 11f, 0xFF596072);
             c.restore();
             drawArtPower(c, active, false);
             drawArtPower(c, s.opponent(), true);
@@ -259,14 +260,13 @@ final class HudRenderer {
         panel(c, 82f, 30f, 503f, 65f, 28f, 0xEF060B19, accent, 5f);
         panel(c, 165f, 31f, 393f, 27f, 15f, 0xE908101E, 0xFFDDE8FF, 1.5f);
         energyLife(c, point, 109f, 63f, 474f, 26f);
-        drawSegments(c, point.superBars(), 181f, 98f, 319f, 12f, accent);
+        drawSegments(c, Arena.clamp(ready, 0f, 1f) * 5f, 181f, 98f, 319f, 12f, accent);
         portrait(c, portraits, point.character, 8f, 1f, 98f, 103f, accent);
         panel(c, 83f, 114f, 394f, 31f, 16f, 0xEB070D1B, accent, 3f);
         CharacterDefinition partner = reserve == null ? absentPartner : reserve.character;
         if (partner != null) portrait(c, portraits, partner, 88f, 114f, 74f, 36f, accent);
         if (reserve != null) {
             energyLife(c, reserve, 258f, 119f, 205f, 17f);
-            drawSegments(c, reserve.superBars(), 260f, 140f, 199f, 4f, accent);
         } else {
             panel(c, 258f, 119f, 205f, 17f, 8f, 0xFF1A1F2B, 0xFF626A80, 1f);
         }
@@ -290,16 +290,16 @@ final class HudRenderer {
     private void portrait(Canvas c, CharacterSelectRenderer portraits, CharacterDefinition character,
                           float x, float y, float w, float h, int accent) {
         panel(c, x, y, w, h, 12f, 0xEE0A1122, accent, 2f);
-        Bitmap bitmap = portraits.portrait(character);
+        Bitmap bitmap = portraits.hudPortrait(character);
         if (bitmap == null) return;
         c.save();
         c.clipPath(shape);
-        // Crop the top of the real installed idle sprite to a bust, not a generic avatar.
-        float bustHeight = bitmap.getHeight() * 0.43f;
-        float scale = Math.max(w / bitmap.getWidth(), h / bustHeight);
+        // Center-crop the face close-up from the original Drive concept sheet.
+        float scale = Math.max(w / bitmap.getWidth(), h / bitmap.getHeight());
         float drawW = bitmap.getWidth() * scale;
-        portraitBox.set(x + (w - drawW) / 2f, y, x + (w + drawW) / 2f,
-            y + bitmap.getHeight() * scale);
+        float drawH = bitmap.getHeight() * scale;
+        portraitBox.set(x + (w - drawW) / 2f, y + (h - drawH) / 2f,
+            x + (w + drawW) / 2f, y + (h + drawH) / 2f);
         c.drawBitmap(bitmap, null, portraitBox, imagePaint);
         c.restore();
     }
