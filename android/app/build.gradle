@@ -8,8 +8,9 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 101
-        versionName '0.101-sprite-gpt-p01'
+        versionCode 102
+        versionName '0.102-hud-contadores-super5'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
@@ -20,6 +21,8 @@ dependencies {
     implementation project(':ultra-core')
     // Cenário com falso 3D, também Java puro.
     implementation project(':stage-core')
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
 }

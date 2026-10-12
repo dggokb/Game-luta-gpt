@@ -5,6 +5,16 @@ import static com.gamelutagpt.ControlsLayout.*;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Bitmap;
+import android.graphics.RectF;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.content.Context;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * Screen-space HUD and touch controls plus the opponent's overhead panel. It reads
@@ -15,6 +25,8 @@ final class HudRenderer {
     interface State {
         FighterState active();
         FighterState reserve();
+        FighterState opponent();
+        CharacterDefinition opponentReserveCharacter();
         String versionLabel();
         String stateLabel();
         int facing();
@@ -24,7 +36,11 @@ final class HudRenderer {
         String teamLabel();
         /** 0 while tagging, rising to 1 when the tag is ready. */
         float tagReadyRatio();
+        default int presentationEpoch() { return 0; }
+        default boolean assistInUse() { return false; }
         String tagCooldownLabel();
+        default String assistStatusLabel() { return tagCooldownLabel(); }
+        default String swapStatusLabel() { return ""; }
         String tagButtonLabel();
         /** Text of the TAG button while it can be used: ASSIST, or TROCA during Assist → Tag. */
         String tagButtonTitle();
@@ -59,6 +75,25 @@ final class HudRenderer {
     }
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Bitmap hudArt;
+    private final Rect artSource = new Rect();
+    private final RectF artTarget = new RectF();
+
+    /** Decode the ornamental atlas once; life, portraits and meters remain live. */
+    void loadArt(Context context) {
+        try (InputStream input = context.getAssets().open("ui/hud/energy-frame.png")) {
+            hudArt = BitmapFactory.decodeStream(input);
+        } catch (IOException e) {
+            android.util.Log.w("HudRenderer", "Energy artwork unavailable; using vector HUD", e);
+        }
+    }
+
+    private void artwork(Canvas c, int l, int t, int r, int b,
+                         float x, float y, float w, float h) {
+        artSource.set(l, t, r, b);
+        artTarget.set(x, y, x + w, y + h);
+        c.drawBitmap(hudArt, artSource, artTarget, imagePaint);
+    }
 
     private void reset() {
         paint.setShader(null);
@@ -70,61 +105,53 @@ final class HudRenderer {
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    void drawHud(Canvas c, State s) {
+    final HudEffects effects = new HudEffects();
+    void resetEffects() { effects.reset(); }
+
+    void drawHud(Canvas c, State s, CharacterSelectRenderer portraits) {
+        drawHudAt(c, s, portraits, System.nanoTime() / 1e9);
+    }
+
+    /** Same production renderer with a deterministic clock for native Canvas review. */
+    void drawHudAt(Canvas c, State s, CharacterSelectRenderer portraits, double seconds) {
+        effects.update(s, seconds);
         reset();
         FighterState active = s.active();
         FighterState reserve = s.reserve();
 
-        paint.setColor(Color.argb(185, 10, 15, 27));
-        c.drawRoundRect(32, 28, 560, 234, 18, 18, paint);
-
-        paint.setColor(active.profile.color);
-        c.drawCircle(78, 74, 29, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4);
-        paint.setColor(Color.WHITE);
-        c.drawCircle(78, 74, 29, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(22);
-        paint.setFakeBoldText(true);
-        c.drawText(active.hudTitle, 122, 58, paint);
-        paint.setFakeBoldText(false);
-
-        drawLifeBar(c, active, 122f, 70f, 525f, 98f, true);
-        drawSuperMeter(c, active, 122f, 106f, 525f, 118f, true);
-        drawTagCooldown(c, s, 122f, 139f, 525f, 149f);
-
-        // Reserva: indicador menor com vida e Super próprios.
-        paint.setColor(reserve.profile.color);
-        c.drawCircle(78, 187, 14, paint);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(14);
-        paint.setFakeBoldText(true);
-        c.drawText(reserve.reserveHudLabel, 105, 184, paint);
-        paint.setFakeBoldText(false);
-
-        drawLifeBar(c, reserve, 105f, 193f, 525f, 206f, false);
-        drawSuperMeter(c, reserve, 105f, 213f, 525f, 223f, false);
-
-        paint.setColor(Color.argb(180, 10, 15, 27));
-        c.drawRoundRect(945, 28, 1248, 112, 18, 18, paint);
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(20);
-        paint.setFakeBoldText(true);
-        c.drawText(s.versionLabel(), 975, 59, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextSize(16);
-
-        c.drawText("Estado:", 975, 88, paint);
-        c.drawText(s.stateLabel(), 1032, 88, paint);
-
-        paint.setTextSize(14f);
-        c.drawText(s.facing() > 0 ? "FACING: →" : "FACING: ←", 975, 106, paint);
-
+        if (hudArt == null) {
+            drawTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
+            drawTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+            drawPower(c, active, false);
+            drawPower(c, s.opponent(), true);
+        } else {
+            drawArtTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
+            drawArtTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+            artwork(c, 0, 0, 1672, 280, 0f, 0f, 1280f, 170f);
+            drawSegments(c, Arena.clamp(s.tagReadyRatio(), 0f, 1f) * 5f, 174f, 96f, 330f, 11f, BLUE);
+            c.save(); c.translate(Arena.VW, 0f); c.scale(-1f, 1f);
+            // Training CPU has no playable reserve or assist system.
+            drawSegments(c, 0f, 174f, 96f, 330f, 11f, 0xFF596072);
+            c.restore();
+            drawArtPower(c, active, false);
+            drawArtPower(c, s.opponent(), true);
+            text(c, "PLAYER 1", 220f, 65f, 15f, Color.WHITE);
+            text(c, "PLAYER 2", 1060f, 65f, 15f, Color.WHITE);
+            text(c, "TAG", 222f, 132f, 13f, Color.WHITE);
+            text(c, "TAG OFF", 1058f, 132f, 13f, 0xFFBCC4D8);
+        }
+        drawFrameEffects(c);
+        // Cached strings computed from independent real assist and raw-tag cooldowns.
+        panel(c, 187, 140, 355, 43, 9, 0xE8081427, BLUE, 1.5f);
+        text(c, s.assistStatusLabel(), 364, 157, 16, effects.assistRatio >= 1 ? 0xFF9BEEFF : Color.WHITE);
+        text(c, s.swapStatusLabel(), 364, 175, 14, Color.WHITE);
+        // Training has no round clock: never display a fabricated countdown.
+        if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
+        text(c, "∞", 640f, 70f, 58f, Color.WHITE);
+        text(c, "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
+        if (s.debugEnabled()) {
+            text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
+        }
         drawToggle(c, s.aiEnabled(), s.aiEnabled() ? "IA ON" : "IA OFF",
             AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 19f);
         drawToggle(c, s.debugEnabled(), s.debugEnabled() ? "DEBUG ON" : "DEBUG OFF",
@@ -137,6 +164,405 @@ final class HudRenderer {
             TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
+    }
+
+
+    private static final int BLUE = 0xFF22BFFF, RED = 0xFFFF354D;
+    private final Path shape = new Path();
+    private final RectF portraitBox = new RectF();
+    private final Paint imagePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+    private final Shader pointLifeGradient = new LinearGradient(0f, 63f, 0f, 89f,
+        new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
+    private final Shader reserveLifeGradient = new LinearGradient(0f, 119f, 0f, 136f,
+        new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
+    private static final String[] LEVELS = {"0", "1", "2", "3", "4", "5"};
+
+    private void drawArtTeam(Canvas c, FighterState point, FighterState reserve,
+                             CharacterDefinition absent, boolean right, float ready,
+                             CharacterSelectRenderer portraits) {
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        // All coordinates are calibrated against the ornament atlas, not its bounding box.
+        portrait(c, portraits, point.character, 43f, 24f, 119f, 86f, right ? RED : BLUE);
+        CharacterDefinition partner = reserve == null ? absent : reserve.character;
+        if (partner != null) portrait(c, portraits, partner, 120f, 110f, 65f, 25f, right ? RED : BLUE);
+        energyLife(c, point, 165f, 74f, 389f, 18f);
+        if (reserve != null) energyLife(c, reserve, 259f, 119f, 182f, 10f);
+        else panel(c, 259f, 119f, 182f, 10f, 6f, 0xFF161B28, 0xFF596072, 1f);
+        paint.setColor(right ? RED : BLUE);
+        c.drawCircle(554f, 115f, 8f, paint);
+        paint.setColor(reserve != null && ready >= 1f ? Color.WHITE : 0xFF111723);
+        c.drawCircle(554f, 115f, 4f, paint);
+        c.restore();
+    }
+
+    private void drawArtPower(Canvas c, FighterState fighter, boolean right) {
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        // Reuse the blue/red sides independently so the meter stays compact like the reference.
+        if (right) {
+            c.save(); c.translate(400f, 0f); c.scale(-1f, 1f);
+            artwork(c, 922, 735, 1672, 941, 0f, 625f, 400f, 95f);
+            c.restore();
+        } else artwork(c, 0, 735, 750, 941, 0f, 625f, 400f, 95f);
+        // Replace only the obsolete four inner cells. The outer energy frame stays.
+        panel(c, 86, 675, 240, 23, 7, 0xFF070E20, right ? RED : BLUE, 2);
+        int count = CombatConfig.MAX_METER / CombatConfig.METER_PER_BAR;
+        float step = 225f / count, width = step - 5;
+        HudEffects.Meter fx = right ? effects.cpu : effects.point;
+        float bars = fighter.superBars();
+        for (int i = 0; i < count; i++) {
+            float x = 94 + i * step;
+            panel(c, x, 679, width, 15, 5, 0xFF070E20, right ? RED : BLUE, 1.5f);
+            c.save(); c.clipPath(shape);
+            float fill = Arena.clamp(bars - i, 0, 1);
+            paint.setColor(right ? RED : BLUE);
+            c.drawRect(x, 679, x + width * fill, 694, paint);
+            paint.setColor(0xBBFFFFFF);
+            c.drawRect(x, 680, x + width * fill, 683, paint);
+            float gain = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
+            float spend = effects.fade(fx.spendAt, HudEffects.SPEND_FLASH);
+            if (i >= fx.gainFrom && i < fx.gainTo && gain > 0) {
+                fxPaint.setColor(Color.WHITE); fxPaint.setAlpha(Math.round(190 * gain));
+                c.drawRect(x, 679, x + width, 694, fxPaint);
+            }
+            if (spend > 0) {
+                float lo = Arena.clamp(fx.spentFrom / (float)CombatConfig.METER_PER_BAR - i, 0, 1);
+                float hi = Arena.clamp(fx.spentTo / (float)CombatConfig.METER_PER_BAR - i, 0, 1);
+                fxPaint.setColor(0xFFFFD698); fxPaint.setAlpha(Math.round(210 * spend));
+                c.drawRect(x + width * lo, 679, x + width * hi, 694, fxPaint);
+            }
+            fxPaint.setAlpha(255); c.restore();
+        }
+        if (fighter.superMeter >= CombatConfig.MAX_METER)
+            energyEdge(c, 87, 676, 238, 21, right ? RED : BLUE, 1);
+        c.restore();
+        int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
+        text(c, LEVELS[level], right ? Arena.VW - 51f : 51f, 698f, 38f, Color.WHITE);
+        text(c, "SUPER", right ? Arena.VW - 348f : 348f, 702f, 17f, Color.WHITE);
+    }
+
+    /** Reused path and paint: the ornamental frame allocates no per-frame geometry. */
+    private void panel(Canvas c, float x, float y, float w, float h, float bevel,
+                       int fill, int stroke, float width) {
+        shape.reset();
+        shape.moveTo(x + bevel, y);
+        shape.lineTo(x + w - bevel, y);
+        shape.lineTo(x + w, y + h);
+        shape.lineTo(x, y + h);
+        shape.close();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(fill);
+        c.drawPath(shape, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(width);
+        paint.setColor(stroke);
+        c.drawPath(shape, paint);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    private void text(Canvas c, String value, float x, float y, float size, int color) {
+        paint.setShader(null);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setFakeBoldText(true);
+        paint.setTextSkewX(-0.16f);
+        paint.setTextSize(size);
+        paint.setColor(0xFF050813);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3f);
+        c.drawText(value, x, y, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        c.drawText(value, x, y, paint);
+        paint.setTextSkewX(0f);
+        paint.setFakeBoldText(false);
+        paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    private void drawTeam(Canvas c, FighterState point, FighterState reserve,
+                          CharacterDefinition absentPartner, boolean right, float ready,
+                          CharacterSelectRenderer portraits) {
+        int accent = right ? RED : BLUE;
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        // Angular energy strokes radiate from the portrait towards the center.
+        for (int i = 0; i < 12; i++) {
+            float y = 6f + i * 11f;
+            paint.setStrokeWidth(i % 3 == 0 ? 7f : 3f);
+            paint.setColor((i % 3 == 0 ? 0x99000000 : 0x55000000) | (accent & 0xFFFFFF));
+            c.drawLine(5f, y - 23f, 157f + (i % 4) * 22f, y + 18f, paint);
+            paint.setColor(0xBFFFFFFF);
+            paint.setStrokeWidth(1.3f);
+            c.drawLine(8f, y - 21f, 93f + (i % 4) * 13f, y + 5f, paint);
+        }
+        panel(c, 82f, 30f, 503f, 65f, 28f, 0xEF060B19, accent, 5f);
+        panel(c, 165f, 31f, 393f, 27f, 15f, 0xE908101E, 0xFFDDE8FF, 1.5f);
+        energyLife(c, point, 109f, 63f, 474f, 26f);
+        drawSegments(c, Arena.clamp(ready, 0f, 1f) * 5f, 181f, 98f, 319f, 12f, accent);
+        portrait(c, portraits, point.character, 8f, 1f, 98f, 103f, accent);
+        panel(c, 83f, 114f, 394f, 31f, 16f, 0xEB070D1B, accent, 3f);
+        CharacterDefinition partner = reserve == null ? absentPartner : reserve.character;
+        if (partner != null) portrait(c, portraits, partner, 88f, 114f, 74f, 36f, accent);
+        if (reserve != null) {
+            energyLife(c, reserve, 258f, 119f, 205f, 17f);
+        } else {
+            panel(c, 258f, 119f, 205f, 17f, 8f, 0xFF1A1F2B, 0xFF626A80, 1f);
+        }
+        paint.setColor(0xFF080D19);
+        c.drawCircle(551f, 109f, 9f, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(accent);
+        paint.setStrokeWidth(2f);
+        c.drawCircle(551f, 109f, 9f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(reserve != null && ready >= 1f ? Color.WHITE : 0xFF454B5A);
+        c.drawCircle(551f, 109f, 4f, paint);
+        c.restore();
+        // Text stays readable when the frame is mirrored.
+        float labelX = right ? Arena.VW - 353f : 353f;
+        text(c, point.hudTitle, labelX, 51f, 16f, Color.WHITE);
+        text(c, reserve == null ? "TAG OFF" : "TAG", right ? Arena.VW - 209f : 209f, 133f, 14f,
+            reserve == null ? 0xFF8991A5 : Color.WHITE);
+    }
+
+    private void portrait(Canvas c, CharacterSelectRenderer portraits, CharacterDefinition character,
+                          float x, float y, float w, float h, int accent) {
+        panel(c, x, y, w, h, 12f, 0xEE0A1122, accent, 2f);
+        Bitmap bitmap = portraits.hudPortrait(character);
+        if (bitmap == null) return;
+        c.save();
+        c.clipPath(shape);
+        // Center-crop the face close-up from the original Drive concept sheet.
+        float scale = Math.max(w / bitmap.getWidth(), h / bitmap.getHeight());
+        float drawW = bitmap.getWidth() * scale;
+        float drawH = bitmap.getHeight() * scale;
+        portraitBox.set(x + (w - drawW) / 2f, y + (h - drawH) / 2f,
+            x + (w + drawW) / 2f, y + (h + drawH) / 2f);
+        c.drawBitmap(bitmap, null, portraitBox, imagePaint);
+        c.restore();
+    }
+
+    private void energyLife(Canvas c, FighterState fighter, float x, float y, float w, float h) {
+        float life = Arena.clamp(fighter.life / (float)fighter.profile.maxLife, 0f, 1f);
+        float recoverable = Arena.clamp(fighter.recoverableLife / (float)fighter.profile.maxLife, 0f, 1f - life);
+        panel(c, x, y, w, h, 15f, 0xFF171E2B, Color.WHITE, 2f);
+        c.save();
+        c.clipPath(shape);
+        if (recoverable > 0f) {
+            paint.setColor(0xFFE63D54);
+            c.drawRect(x + w * life, y, x + w * (life + recoverable), y + h, paint);
+        }
+        paint.setShader(y < 100f ? pointLifeGradient : reserveLifeGradient);
+        c.drawRect(x, y, x + w * life, y + h, paint);
+        paint.setShader(null);
+        paint.setColor(0x99FFFFFF);
+        c.drawRect(x, y + 2f, x + w * life, y + 4f, paint);
+        HudEffects.Meter fx = fighter == effects.point.fighter ? effects.point
+            : fighter == effects.cpu.fighter ? effects.cpu : effects.reserve;
+        if (hudArt == null) drawLifeEffects(c, fx, x, y, w, h);
+        c.restore();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(2f);
+        c.drawPath(shape, paint);
+        float flash = effects.fade(fx.hitAt, HudEffects.HIT_FLASH);
+        float critical = fx.life > 0 && fx.life <= .25f ? .18f + .12f * (float)Math.sin(effects.now * 4) : 0;
+        paint.setColor(flash > 0 ? 0xFFFFE5A0 : RED);
+        paint.setAlpha(Math.round(255 * Math.max(flash, critical)));
+        c.drawPath(shape, paint);
+        paint.setAlpha(255);
+        paint.setStyle(Paint.Style.FILL);
+    }
+
+    private void drawSegments(Canvas c, float bars, float x, float y, float w, float h, int accent) {
+        float segment = (w - 20f) / 5f;
+        for (int i = 0; i < 5; i++) {
+            float left = x + i * (segment + 5f);
+            panel(c, left, y, segment, h, Math.min(7f, h * 0.4f), 0xFF0A1020, 0xFFCED9F0, 1.3f);
+            float fill = Arena.clamp(bars - i, 0f, 1f);
+            c.save();
+            c.clipPath(shape);
+            paint.setColor(accent);
+            c.drawRect(left, y, left + segment * fill, y + h, paint);
+            paint.setColor(0xAAFFFFFF);
+            c.drawRect(left, y + 1f, left + segment * fill, y + Math.max(2f, h * 0.25f), paint);
+            c.restore();
+        }
+    }
+
+    private void drawPower(Canvas c, FighterState fighter, boolean right) {
+        int accent = right ? RED : BLUE;
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        panel(c, 21f, 696f, 400f, 21f, 19f, 0xEF070C1C, accent, 4f);
+        drawSegments(c, fighter.superBars(), 86f, 699f, 246f, 14f, accent);
+        drawSuperEffects(c, right ? effects.cpu : effects.point, right, 86f, 699f, 246f, 14f);
+        paint.setColor(0xFF080E22);
+        c.drawCircle(52f, 696f, 24f, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4f);
+        paint.setColor(accent);
+        c.drawCircle(52f, 696f, 24f, paint);
+        paint.setStrokeWidth(1.5f);
+        paint.setColor(Color.WHITE);
+        c.drawCircle(52f, 696f, 19f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        c.restore();
+        int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
+        text(c, LEVELS[level], right ? Arena.VW - 52f : 52f, 707f, 31f, Color.WHITE);
+        text(c, "SUPER", right ? Arena.VW - 377f : 377f, 706f, 18f, Color.WHITE);
+    }
+
+    private final Paint fxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private void drawLifeEffects(Canvas c, HudEffects.Meter fx, float x, float y, float w, float h) {
+        // Amber lower stripe is the impact tail. Red recoverable health above stays visible.
+        if (fx.trail > fx.life) {
+            fxPaint.setColor(0xFFFFCC64);
+            c.drawRect(x + w * fx.life, y + h * .65f, x + w * fx.trail, y + h, fxPaint);
+        }
+        float heal = effects.fade(fx.healAt, HudEffects.HEAL_FLASH);
+        if (heal > 0) {
+            fxPaint.setColor(0xFFBBFFD8); fxPaint.setAlpha(Math.round(180 * heal));
+            c.drawRect(x + w * fx.healFrom, y, x + w * fx.healTo, y + h, fxPaint);
+        }
+        fxPaint.setAlpha(255);
+    }
+
+    private void drawSuperEffects(Canvas c, HudEffects.Meter fx, boolean right,
+                                  float x, float y, float w, float h) {
+        c.save(); c.clipRect(x, y, x + w, y + h);
+        float gain = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
+        float spend = effects.fade(fx.spendAt, HudEffects.SPEND_FLASH);
+        fxPaint.setStyle(Paint.Style.FILL);
+        if (gain > 0) {
+            fxPaint.setColor(0xFFDFFFFF); fxPaint.setAlpha(Math.round(160 * gain));
+            c.drawRect(x + w * fx.gainFrom * CombatConfig.METER_PER_BAR / CombatConfig.MAX_METER,
+                y, x + w * fx.gainTo * CombatConfig.METER_PER_BAR / CombatConfig.MAX_METER, y + h, fxPaint);
+        }
+        if (spend > 0) {
+            fxPaint.setColor(0xFFFFD698); fxPaint.setAlpha(Math.round(190 * spend));
+            c.drawRect(x + w * fx.spentFrom / CombatConfig.MAX_METER, y,
+                x + w * fx.spentTo / CombatConfig.MAX_METER, y + h, fxPaint);
+        }
+        fxPaint.setAlpha(255); c.restore();
+        if (fx.superMeter >= CombatConfig.MAX_METER) energyEdge(c, x, y, w, h, right ? RED : BLUE, .65f);
+    }
+
+    private void energyEdge(Canvas c, float x, float y, float w, float h, int color, float strength) {
+        fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(2);
+        fxPaint.setColor(color); fxPaint.setAlpha(Math.round(100 * strength));
+        c.drawRect(x, y, x + w, y + h, fxPaint);
+        // Fixed six deterministic sparks, contained in the frame; no particle allocation.
+        for (int i = 0; i < 6; i++) {
+            float t = (float)((effects.now * .24 + i / 6.0) % 1);
+            float sx = x + 4 + t * (w - 16);
+            float sy = i % 2 == 0 ? y : y + h;
+            fxPaint.setAlpha((int)Math.round((60 + 100 * strength) * (.5 + .5 * Math.sin(effects.now * 5 + i))));
+            c.drawLine(sx, sy, sx + 7, sy, fxPaint);
+        }
+        fxPaint.setAlpha(255); fxPaint.setStyle(Paint.Style.FILL);
+    }
+
+    private void drawFrameEffects(Canvas c) {
+        boolean art = hudArt != null;
+        for (int side = 0; side < 2; side++) {
+            c.save(); if (side == 1) { c.translate(Arena.VW, 0); c.scale(-1, 1); }
+            HudEffects.Meter fx = side == 0 ? effects.point : effects.cpu;
+            if (art) {
+                // The ornament overlays part of the original fill rectangle. Apply
+                // visual life overlays in its visible interior after compositing it.
+                c.save(); c.clipRect(174, 78, 546, 87);
+                drawLifeEffects(c, fx, 165, 78, 389, 9); c.restore();
+                if (side == 0 && effects.reserve.fighter != null) {
+                    c.save(); c.clipRect(267, 120, 433, 127);
+                    drawLifeEffects(c, effects.reserve, 259, 120, 182, 7); c.restore();
+                }
+            }
+            float hit = effects.fade(fx.hitAt, HudEffects.HIT_FLASH);
+            float critical = fx.life > 0 && fx.life <= .25f ? .18f + .12f * (float)Math.sin(effects.now * 4) : 0;
+            energyEdge(c, art ? 165 : 109, art ? 73 : 62, art ? 389 : 474, art ? 20 : 28,
+                hit > 0 ? 0xFFFFE5A0 : critical > 0 ? RED : side == 0 ? BLUE : RED,
+                .10f + hit * .8f + critical);
+            if (side == 0 && effects.assistEnabled) {
+                drawTagWave(c, art);
+                float ready = effects.fade(effects.readyAt, HudEffects.READY_FLASH);
+                float use = effects.fade(effects.useAt, HudEffects.SPEND_FLASH);
+                float x = art ? 174 : 181, y = art ? 96 : 98, w = art ? 330 : 319, h = art ? 11 : 12;
+                if (ready > 0) {
+                    drawAssistFlash(c, x, y, w, h, ready);
+                }
+                // Persistent, readable availability even after the one-shot flash ends.
+                if (effects.assistRatio >= 1 && !effects.assistUsing) {
+                    fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(3);
+                    fxPaint.setColor(0xFF84ECFF); fxPaint.setAlpha(200);
+                    c.drawCircle(art ? 554 : 551, art ? 115 : 109, 11, fxPaint);
+                    fxPaint.setAlpha(255); fxPaint.setStyle(Paint.Style.FILL);
+                }
+                if (ready > 0 || use > 0) {
+                    energyEdge(c, x, y, w, h, use > 0 ? 0xFFFFFFFF : BLUE, Math.max(ready, use));
+                    fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(2);
+                    fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(210 * Math.max(ready, use)));
+                    c.drawCircle(art ? 554 : 551, art ? 115 : 109, 9, fxPaint);
+                    fxPaint.setAlpha(255); fxPaint.setStyle(Paint.Style.FILL);
+                }
+                if (effects.recharging) {
+                    float bars = effects.assistRatio * 5;
+                    int segment = Math.min(4, (int)bars);
+                    float sw = (w - 20) / 5;
+                    float left = x + segment * (sw + 5), front = left + sw * (bars - segment);
+                    c.save(); c.clipRect(left, y, left + sw, y + h);
+                    fxPaint.setColor(0xFFCDFAFF);
+                    fxPaint.setAlpha((int)(90 + 35 * Math.sin(effects.now * 7)));
+                    c.drawRect(Math.max(left, front - 7), y, front, y + h, fxPaint);
+                    fxPaint.setAlpha(255); c.restore();
+                }
+            }
+            c.restore();
+        }
+    }
+
+    private void drawAssistFlash(Canvas c, float x, float y, float w, float h, float fade) {
+        float sw = (w - 20) / 5;
+        fxPaint.setColor(0xFFB9F8FF); fxPaint.setAlpha(Math.round(190 * fade));
+        for (int i = 0; i < 5; i++) {
+            float left = x + i * (sw + 5);
+            c.drawRect(left + 5, y + 2, left + sw - 5, y + h - 2, fxPaint);
+        }
+        fxPaint.setAlpha(255);
+    }
+
+    /** A single wave travels inward to the new point portrait, without changing fill. */
+    private void drawTagWave(Canvas c, boolean art) {
+        float remaining = effects.fade(effects.tagAt, HudEffects.TAG_WAVE);
+        if (remaining <= 0) return;
+        float progress = 1 - remaining;
+        float x = art ? 174 : 181, y = art ? 96 : 98;
+        float w = art ? 330 : 319, h = art ? 11 : 12;
+        float front = x + w * (1 - Math.min(1, progress / .72f));
+        float sw = (w - 20) / 5;
+        for (int i = 0; i < 5; i++) {
+            float left = x + i * (sw + 5);
+            c.save(); c.clipRect(left + 3, y + 1, left + sw - 3, y + h - 1);
+            fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(220 * remaining));
+            c.drawRect(front - 18, y, front + 80, y + h, fxPaint);
+            fxPaint.setColor(0xFFE4FFFF); fxPaint.setAlpha(Math.round(235 * remaining));
+            c.drawRect(front - 3, y, front + 14, y + h, fxPaint);
+            c.restore();
+        }
+        fxPaint.setAlpha(255);
+        if (progress >= .55f) {
+            float glow = Math.min(1, (progress - .55f) / .16f) * remaining * 2.5f;
+            fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(5);
+            fxPaint.setColor(0xFF8AF3FF); fxPaint.setAlpha(Math.round(255 * Math.min(1, glow)));
+            // Trace only the existing portrait frame; never bleach the face itself.
+            float px = art ? 43 : 8, py = art ? 24 : 1;
+            float pw = art ? 119 : 98, ph = art ? 86 : 103;
+            shape.reset();shape.moveTo(px+12,py);shape.lineTo(px+pw-12,py);
+            shape.lineTo(px+pw,py+ph);shape.lineTo(px,py+ph);shape.close();
+            c.drawPath(shape,fxPaint);
+            fxPaint.setAlpha(255);fxPaint.setStyle(Paint.Style.FILL);
+        }
     }
 
     private void drawToggle(Canvas c, boolean enabled, String label,

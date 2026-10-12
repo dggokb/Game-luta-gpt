@@ -13,6 +13,7 @@ import java.util.Map;
 final class CharacterSelectRenderer {
     private static final int BLUE=0xFF24AAFF, RED=0xFFFF3149, WHITE=0xFFF7FAFF;
     private final Context context;
+    private final HudConceptPortraits hudConcepts;
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final Paint imagePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final Path path=new Path();
@@ -39,10 +40,11 @@ final class CharacterSelectRenderer {
 
     CharacterSelectRenderer(Context context) {
         this.context=context;
+        hudConcepts=new HudConceptPortraits(context);
         backdrop=read("selection/art/backdrop.png",1);
         stageArt=read("selection/art/reference_stage.png",1);
         // P05 already uses the exact upper-right action pose from its concept.
-        // The corrected P01/P02/P03/P04/P08 now have their own isolated assets.
+        // P01 and the corrected P02/P03/P04/P08 now have their own isolated assets.
         Bitmap atlas=read("selection/art/heroes_p02_p05.png",1);
         if(atlas!=null) {
             int w=atlas.getWidth()/2,h=atlas.getHeight()/2;
@@ -52,6 +54,8 @@ final class CharacterSelectRenderer {
         // Decode before the render loop; changing a selection never loads a full model sheet.
         for(String id:GeneratedCharacters.SELECTABLE) { face(id);heroArt(id); }
     }
+    /** HUD close-ups stay independent from the selection artwork. */
+    Bitmap hudPortrait(CharacterDefinition character) {return hudConcepts.get(character.id);}
 
     void draw(Canvas c,Paint unused,CharacterSelect s) {
         tick(s);

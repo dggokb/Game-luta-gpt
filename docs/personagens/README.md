@@ -1,8 +1,10 @@
 # Elenco — estilos de luta e plano de sprites
 
-Documento vivo. Os nomes ainda não existem: cada lutador é chamado pelo número do concept
-(`p01` … `p12`). Os concepts/model sheets ficam em `art/concepts/pNN.png` e são a
-**referência obrigatória** de toda folha de sprite daquele personagem.
+Documento vivo. As fichas são identificadas por código (`p01` … `p16`); os irmãos
+p01 e p03 já têm nomes na história (Ryūga Komyo e Kōga Komyo). Os concepts/model sheets
+do elenco original p01–p12 ficam em `art/concepts/pNN.png` e são a **referência obrigatória**
+para gerar os sprites. Os quatro concepts novos p13–p16 **ainda estão somente no Drive**
+e não devem ser considerados importados, animados ou jogáveis.
 
 História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt).
 
@@ -10,6 +12,8 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 
 - **Duplas fixas no modo história:** p01+p02, p03+p04, p05+p06, p07+p08, p09+p10,
   p11+p12. No arcade o jogador monta a dupla que quiser.
+- **p13+p14 e p15+p16:** pares **propostos** para expansão do elenco; aguardam aprovação
+  narrativa e de gameplay. Não são parte das duplas fixas acima até decisão explícita.
 - **Sem armas na mão.** Kunai, shuriken, machado, bisturi, seringa etc. só existem
   como **projéteis/poderes lançados**. Exceção única: **p08 luta com o chicote na mão**
   (longo alcance, estilo Dhalsim) — normais fortes e lançados; detalhes na mecânica.
@@ -42,6 +46,10 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 | **p10** | p09 | Bombeira loira, mesmo uniforme | **Bombeira ágil.** Chutes, acrobacias, rushdown | Machado lançado, vapor/água |
 | **p11** | p12 | Médico grisalho, jaleco com sangue, luvas | **Cirurgião sádico.** Trapper, veneno ao longo do tempo | Bisturis e seringas lançados |
 | **p12** | p11 | Morto-vivo costurado, bandagens | **Criatura feral.** Contorcido, imprevisível, mordidas, golpes que custam vida, super armor | Força que cresce com a vida perdida |
+| **p13** | p14 *(proposta)* | Homem enorme, careca, colete preto rasgado, luvas reforçadas e faixas vermelhas | **Brawler pesado**, punhos esmagadores, ombradas e pressão de curta distância *(proposta)* | Ondas de choque cinéticas curtas *(proposta)* |
+| **p14** | p13 *(proposta)* | Homem magro, cabelo preto preso, casaco preto de mangas compridas, faixa vermelha e sorriso malandro | **Trickster de fintas**, esquivas, rasteiras e mudanças de ritmo *(proposta)* | Cortes curtos de ar *(proposta)* |
+| **p15** | p16 *(proposta)* | Karateca forte de cabelo preto preso em rabo de cavalo, quimono branco, faixa preta | **Shotokan técnico**, base firme, golpes retos e chutes precisos *(proposta)* | Ki focalizado nos impactos *(proposta)* |
+| **p16** | p15 *(proposta)* | Palhacinha marcial ruiva, roupa vermelha/preta de losangos e meias diferentes | **Rushdown caótico/acrobático**, fingimentos e ataques imprevisíveis *(proposta)* | Estrelas e faíscas de impacto *(proposta)* |
 
 Fichas completas (golpes, lista de animações e prompts):
 
@@ -57,6 +65,18 @@ Fichas completas (golpes, lista de animações e prompts):
 - [p10](p10.md)
 - [p11](p11.md)
 - [p12](p12.md)
+- [p13](p13.md) — proposta (somente PNG no Drive)
+- [p14](p14.md) — proposta (somente PNG no Drive)
+- [p15](p15.md) — proposta (somente PNG no Drive)
+- [p16](p16.md) — proposta (somente PNG no Drive)
+
+## Personagens novos no Drive (ainda sem vídeos)
+
+Em `game-luta-gpt/animations/`, as pastas `p13`, `p14`, `p15` e `p16` contêm somente
+`pNN.png` cada uma, e as referências visuais equivalentes estão em `game-luta-gpt/concepts/`.
+Os documentos `p13.md`–`p16.md` registram **propostas de jogabilidade, não recursos
+implementados**. Importação das artes, criação de bases, vídeos, dados, hitboxes, poderes,
+comandos e balanceamento dependem de etapas futuras e validação.
 
 ## Método de animação
 

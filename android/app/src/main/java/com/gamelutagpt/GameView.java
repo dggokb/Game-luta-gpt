@@ -150,6 +150,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     // Team HUD labels (the rules live in the engine's TeamSystem).
     private String tagCooldownHudLabel = "ASSIST: PRONTO";
+    private String assistHudStatus = "ASSIST: PRONTO";
+    private String swapHudStatus = "TROCA: PRONTA (↓+TAG)";
     private String tagCooldownButtonLabel = "";
     private int shownAssistTenths = -2;
     private int shownTagSeconds = -2;
@@ -204,6 +206,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
+        hud.loadArt(context);
         P01VisualTuning.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
@@ -272,6 +275,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** A seleção muda a dupla P1 e o titular do adversário de treino. */
     private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
+        hud.resetEffects();
         team = membersOf(point, partner);
         opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
         opponentTagId = cpuPartner;
@@ -291,6 +295,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
         selectionKeys.clear();
@@ -584,6 +589,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
+        hud.resetEffects();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -596,6 +602,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final HudRenderer.State hudState = new HudRenderer.State() {
         @Override public FighterState active() { return activeFighter(); }
         @Override public FighterState reserve() { return reserveFighter(); }
+        @Override public FighterState opponent() { return opponentFighter; }
+        @Override public CharacterDefinition opponentReserveCharacter() { return GeneratedCharacters.get(opponentTagId); }
         @Override public String versionLabel() { return VERSION_HUD_LABEL; }
         @Override public String stateLabel() { return currentStateLabel(); }
         @Override public int facing() { return player().facing; }
@@ -610,6 +618,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return 1f;
         }
+        @Override public int presentationEpoch() { return demo.demo() * 100 + demo.stepIndex(); }
+        @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
+        @Override public String assistStatusLabel() { return assistHudStatus; }
+        @Override public String swapStatusLabel() { return swapHudStatus; }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
@@ -975,6 +987,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int tagSeconds = (int)Math.ceil(team.tagCooldown / (float)CombatConfig.FPS);
         if (isTagAnimationActive()) {
             tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
+            assistHudStatus = "ASSIST: INDISPONIVEL";
+            swapHudStatus = "TROCA: EM ANDAMENTO";
             tagCooldownButtonLabel = "...";
             shownAssistTenths = shownTagSeconds = -2;
             return;
@@ -986,6 +1000,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             : assistTenths == 0 ? "ASSIST: PRONTO"
             : String.format(Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
         String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
+        assistHudStatus = assist;
+        swapHudStatus = tagSeconds == 0 ? "TROCA: PRONTA (↓+TAG)" : "TROCA: " + tagSeconds + "s";
         tagCooldownHudLabel = assist + tag;
         tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
     }
@@ -1191,7 +1207,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawHud(Canvas c) {
-        hud.drawHud(c, hudState);
+        hud.drawHud(c, hudState, characterSelectRenderer);
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
@@ -1322,7 +1338,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         opponentPanel.superLabel = opponentFighter.superHudLabel;
         opponentPanel.damageLabel = dummyDamageLabel;
         opponentPanel.damageProgress = dummyDamageLabelFrames / (float)DAMAGE_LABEL_FRAMES;
-        hud.drawOpponentPanel(c, opponentPanel);
+        if (debugOverlay) hud.drawOpponentPanel(c, opponentPanel);
     }
 
     private String opponentStatusLabel() {
@@ -1744,6 +1760,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
                     healPlayerPointer = pointerId;
+                    hud.resetEffects();
                     for (FighterState member : team) member.restoreLife();
                     engine.refreshOverdrive(PLAYER);
                     break;
@@ -1752,6 +1769,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
+                    hud.resetEffects();
                     opponentFighter.restoreLife();
                     engine.refreshOverdrive(OPPONENT);
                     break;
