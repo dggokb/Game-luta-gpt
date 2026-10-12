@@ -2,6 +2,8 @@
 import json
 import subprocess as sp
 import time
+import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from PIL import Image, ImageChops
 
@@ -15,8 +17,18 @@ def capture(name):
 
 adb('install', '-r', 'android/app/build/outputs/apk/debug/app-debug.apk')
 adb('logcat', '-c')
+adb('shell', 'settings', 'put', 'secure', 'immersive_mode_confirmations', 'confirmed')
 adb('shell', 'am', 'start', '-W', '-n', 'com.gamelutagpt/com.gamelutagpt.MainActivity')
 time.sleep(10)
+# A fresh Android user may overlay its first-use fullscreen tutorial. Dismiss
+# only an observed system button using its actual bounds before baseline QA.
+adb('shell', 'uiautomator', 'dump', '/sdcard/selection-ui.xml')
+ui=ET.fromstring(adb('shell', 'cat', '/sdcard/selection-ui.xml'))
+for node in ui.iter('node'):
+    if node.attrib.get('package') == 'com.android.systemui' and node.attrib.get('text','').upper() == 'GOT IT':
+        x1,y1,x2,y2=map(int,re.findall(r'\d+',node.attrib['bounds']))
+        adb('shell','input','tap',str((x1+x2)//2),str((y1+y2)//2))
+        time.sleep(1)
 initial = capture('default')
 w, h = initial.size
 assert w > h, (w, h)
