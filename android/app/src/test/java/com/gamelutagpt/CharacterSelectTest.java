@@ -53,4 +53,32 @@ public class CharacterSelectTest {
         CharacterSelect s=make();s.open("p01","p03","p02","p04");
         assertEquals(CharacterSelect.Result.NONE,s.tap(s.cardLeft(9)+12,s.cardTop(9)+12));
     }
+    @Test public void perspectiveHitTestsIncludeTheWiderBottomRowsAndExcludeGaps() {
+        CharacterSelect s=new CharacterSelect(new String[]{"p01","p02","p03","p04","p05","p06","p07","p08",
+            "p09","p10","p11","p12","p13","p14","p15","p16"});
+        float[] q=new float[8];
+        for(int i=0;i<16;i++) {
+            s.cardCorners(i,q);
+            float x=(q[0]+q[2]+q[4]+q[6])/4f,y=(q[1]+q[5])/2f;
+            assertEquals("visible cell "+i,i,s.cardAt(x,y));
+        }
+        s.cardCorners(12,q);
+        assertTrue("bottom edge is wider than top",q[0]<CharacterSelect.GRID_X);
+        assertEquals(12,s.cardAt(q[6]+4,q[5]-4));
+        s.cardCorners(0,q);
+        assertEquals(-1,s.cardAt(q[2]+4,q[3]+1));
+    }
+
+    @Test public void illustratedFutureFacesRemainLockedAndDoNotChangeTeams() {
+        CharacterSelect s=make();s.open("p01","p08","p03","p06");
+        float[] q=new float[8];
+        for(int i=8;i<16;i++) {
+            s.cardCorners(i,q);
+            assertEquals(CharacterSelect.Result.NONE,
+                s.tap((q[0]+q[2]+q[4]+q[6])/4f,(q[1]+q[5])/2f));
+            assertEquals("p01",s.point());assertEquals("p08",s.partner());
+            assertEquals("p03",s.opponentPoint());assertEquals("p06",s.opponentPartner());
+        }
+    }
+
 }

@@ -8,349 +8,262 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Screen layout based on the APPROVED 1648x928 concept, mapped to 1280x720.
- * Exact reference positions: symmetric central four-by-four grid; huge P1/P2
- * character art under blue dragon/red tiger emblems; left/right TAG panels;
- * Moon Temple stage preview in a trapezoid; dark controller-command footer.
- * All selectable art comes from the project's OWN art/concepts (not full-body IDLE cells).
- */
+/** Reference-based selection: illustrated backdrop, isolated fighters and actual cropped faces. */
 final class CharacterSelectRenderer {
-    private static final int BLUE=0xFF158AFF, RED=0xFFFF263E, WHITE=0xFFFAFAFF;
+    private static final int BLUE=0xFF24AAFF, RED=0xFFFF3149, WHITE=0xFFF7FAFF;
     private final Context context;
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
-    private final Paint bitmapPaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
+    private final Paint imagePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final Path path=new Path();
-    private final Map<String,Bitmap> art=new HashMap<>();
-    private final Map<String,Bitmap> scenery=new HashMap<>();
-    CharacterSelectRenderer(Context context) {this.context=context;}
+    private final RectF box=new RectF();
+    private final Matrix warp=new Matrix();
+    private final float[] corners=new float[8], source=new float[8];
+    private final Map<String,Bitmap> faces=new HashMap<>(), heroes=new HashMap<>();
+    private final Typeface bold=Typeface.create("sans-serif-condensed",Typeface.BOLD_ITALIC);
+    private final Typeface regular=Typeface.create("sans-serif-condensed",Typeface.NORMAL);
+    private Bitmap backdrop,stageArt;
+    private final Bitmap[] futureFaces=new Bitmap[7];
+
+    CharacterSelectRenderer(Context context) {
+        this.context=context;
+        backdrop=read("selection/art/backdrop.png",1);
+        stageArt=read("selection/art/reference_stage.png",1);
+        // The reference's future fighters remain illustrated but locked, never fake roster IDs.
+        if(stageArt!=null) {
+            int[][] regions={{450,404,608,513},{629,404,766,512},{785,404,929,512},
+                {950,404,1088,512},{437,530,597,639},{615,530,776,639},{791,530,950,639}};
+            for(int i=0;i<regions.length;i++) {
+                int[] q=regions[i];
+                int x=q[0]*stageArt.getWidth()/1536,y=q[1]*stageArt.getHeight()/864;
+                int w=(q[2]-q[0])*stageArt.getWidth()/1536,h=(q[3]-q[1])*stageArt.getHeight()/864;
+                futureFaces[i]=Bitmap.createBitmap(stageArt,x,y,w,h);
+            }
+        }
+        // Decode before the render loop; changing a selection never loads a full model sheet.
+        for(String id:GeneratedCharacters.SELECTABLE) { face(id);heroArt(id); }
+    }
 
     void draw(Canvas c,Paint unused,CharacterSelect s) {
         c.save();
-        background(c);
-        spiritEmblem(c,0);
-        spiritEmblem(c,1);
-        hero(c,s,0);
-        hero(c,s,1);
-        playerTitles(c,s);
+        c.drawColor(0xFF060B1C);
+        imagePaint.setAlpha(255);
+        if(backdrop!=null) {
+            box.set(0,0,1280,720);c.drawBitmap(backdrop,null,box,imagePaint);
+        }
+        hero(c,s.pick(0,0),0);
+        hero(c,s.pick(1,0),1);
+        playerTitle(c,0);playerTitle(c,1);
         grid(c,s);
-        teamPanel(c,s,0);
-        teamPanel(c,s,1);
-        stagePreview(c);
-        footer(c,s);
-        if (s.settingsOpen()) settings(c);
+        team(c,s,0);team(c,s,1);
+        stage(c);
+        footer(c);
+        if(s.settingsOpen()) settings(c);
         c.restore();
     }
 
-    private void background(Canvas c) {
-        c.drawColor(0xFF06091B);
-        Bitmap sky=stage("ceu.jpg");
-        if(sky!=null) c.drawBitmap(sky,null,new RectF(0f,0f,1280f,690f),bitmapPaint);
-        shade(c,0f,0f,640f,684f,0xB5031A51,0x2C050816);
-        shade(c,640f,0f,1280f,684f,0xA340001A,0x450B0514);
-        // Moon behind the temple
-        p.setStyle(Paint.Style.FILL);
-        p.setColor(0x995BA9FF);c.drawCircle(640f,28f,59f,p);
-        p.setColor(0xFFE8F4FF);c.drawCircle(640f,27f,32f,p);
-        p.setColor(0x553E65C8);c.drawCircle(625f,22f,9f,p);
-        p.setColor(0x663B52A0);c.drawCircle(651f,44f,7f,p);
-        // Temple interior: vertical black stone columns and hanging banners
-        for(int i=0;i<7;i++) {
-            float x=105f+i*178f;
-            p.setColor(0xBF090C25);c.drawRect(x,0,x+42f,661f,p);
-            p.setColor(0xBB172F55);c.drawRect(x+6f,0,x+12f,661f,p);
-            p.setColor(0xAA3C4263);c.drawRect(x+37f,0,x+40f,661f,p);
-            p.setColor(0xFF040D25);c.drawRect(x-7f,45f,x+49f,56f,p);
-            p.setColor(i%2==0?0xAA15234E:0xAA581B2F);
-            c.drawRect(x+56f,58f,x+114f,232f,p);
-            p.setColor(i%2==0?0xFF42517B:0xFF775363);
-            c.drawCircle(x+85f,119f,23f,p);
-            p.setColor(0xFF111329);c.drawCircle(x+85f,119f,18f,p);
-            flame(c,x+26f,62f,i%2==0?BLUE:RED,0.72f);
-            flame(c,x-15f,353f,0xFFFF8730,0.88f);
-        }
-        // floor
-        shade(c,0f,570f,1280f,690f,0x0021203D,0xEF030614);
-        for(int i=0;i<14;i++){
-            line(c,0,579+i*i*.58f,1280,579+i*i*.58f,0x154674B5,1f);
-        }
-        line(c,0f,687f,1280f,687f,0xFF6D8DC7,2.5f);
+    private void hero(Canvas c,String id,int side) {
+        Bitmap b=heroArt(id);
+        if(b==null)return;
+        c.save();
+        c.clipRect(side==0?0:906,44,side==0?374:1280,687);
+        float left=side==0?-25:870, width=435, top=55;
+        boolean facesRight="player_base".equals(id);
+        if((side==0&&!facesRight)||(side==1&&facesRight)) c.scale(-1,1,left+width/2,0);
+        box.set(left,top,left+width,top+width*b.getHeight()/b.getWidth());
+        imagePaint.setAlpha(255);c.drawBitmap(b,null,box,imagePaint);
+        c.restore();
     }
 
-    private void shade(Canvas c,float l,float t,float r,float b,int a,int z) {
-        p.setShader(new LinearGradient(l,t,l,b,a,z,Shader.TileMode.CLAMP));
-        p.setStyle(Paint.Style.FILL);c.drawRect(l,t,r,b,p);p.setShader(null);
-    }
-
-    private void spiritEmblem(Canvas c,int side) {
+    private void playerTitle(Canvas c,int side) {
         int color=side==0?BLUE:RED;
-        float x=side==0?238f:1042f, y=142f;
-        c.save();
-        if(side==1)c.scale(-1f,1f,x,0f);
-        // Stylized glowing dragon/tiger spirit behind the fighter, not an inert UI card
-        p.setStyle(Paint.Style.STROKE);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);
-        for(int glow=3;glow>=0;glow--) {
-            p.setColor(alpha(color,glow==0?225:35));
-            p.setStrokeWidth(glow==0?4f:6f+glow*7f);
-            path.reset();
-            path.moveTo(x-151,y-18);
-            path.cubicTo(x-121,y-127,x+2,y-125,x+98,y-59);
-            path.cubicTo(x+125,y-31,x+140,y+17,x+84,y+30);
-            path.cubicTo(x+42,y+46,x+59,y+10,x+11,y+19);
-            path.cubicTo(x-52,y+32,x-93,y+126,x-158,y+141);
-            c.drawPath(path,p);
-            path.reset();path.moveTo(x+20,y-100);path.quadTo(x+55,y-139,x+95,y-128);
-            path.moveTo(x+24,y-96);path.quadTo(x+14,y-159,x-22,y-165);
-            path.moveTo(x+82,y+18);path.quadTo(x+148,y+55,x+164,y+5);
-            c.drawPath(path,p);
-        }
-        p.setStrokeWidth(3f);p.setColor(alpha(color,235));
-        for(int i=0;i<6;i++){
-            float bx=x-113+i*23f,by=y-92+(i%2)*9f;
-            path.reset();path.moveTo(bx,by);path.lineTo(bx+15,by-28);path.lineTo(bx+33,by-18);
-            c.drawPath(path,p);
-        }
-        for(int i=0;i<5;i++) {
-            float yy=y-34+i*21f;
-            path.reset();path.moveTo(x+91,yy);path.lineTo(x+136+i*2,yy+9);c.drawPath(path,p);
-        }
-        p.setStyle(Paint.Style.FILL);p.setColor(0xFFFFFFFF);c.drawCircle(x+81,y-19,5f,p);
-        p.setColor(0xFF0C1626);c.drawCircle(x+82,y-19,2f,p);
-        c.restore();
-    }
-
-    private void hero(Canvas c,CharacterSelect s,int side) {
-        boolean left=side==0;
-        float cx=left?179f:1101f;
-        int tone=left?BLUE:RED;
-        Bitmap b=concept(s.pick(side,0));
-        c.save();
-        c.clipRect(left?0f:913f,55f,left?365f:1280f,660f);
-        if(b!=null){
-            float maxW=left?376f:387f,maxH=left?586f:586f;
-            float scale=Math.min(maxW/b.getWidth(),maxH/b.getHeight());
-            float w=b.getWidth()*scale,h=b.getHeight()*scale;
-            bitmapPaint.setColor(Color.WHITE);bitmapPaint.setAlpha(255);
-            // Full-body approved 90s anime concept art, enlarged near the outer edge.
-            if(!left)c.scale(-1f,1f,cx,0f);
-            c.drawBitmap(b,null,new RectF(cx-w/2f,79f,cx+w/2f,79f+h),bitmapPaint);
-        }
-        // Subtle edge-colored light while keeping the art visible.
-        shade(c,left?0f:913f,56f,left?365f:1280f,640f,
-                alpha(tone,10),alpha(tone,22));
-        c.restore();
-    }
-
-    private void playerTitles(Canvas c,CharacterSelect s) {
-        labelPanel(c,0f,21f,117f,84f,BLUE,"P1");
-        labelPanel(c,1163f,21f,1280f,84f,RED,"P2");
-        // The approved concept does not have a game logo at the top.
-    }
-
-    private void labelPanel(Canvas c,float l,float t,float r,float b,int color,String text) {
-        p.setColor(0xDA081128);c.drawRect(l,t,r,b,p);
-        line(c,l,t,r,t,color,3f);line(c,l,b,r,b,color,3f);
-        text(c,text,(l+r)/2f,b-14f,48f,WHITE,true,Paint.Align.CENTER);
+        float l=side==0?-22:1166,r=side==0?116:1302;
+        path.reset();path.moveTo(l,21);path.lineTo(r-24,21);
+        path.lineTo(r+15,84);path.lineTo(l,84);path.close();
+        fill(c,0xAF02132A);stroke(c,color,2.7f);
+        text(c,side==0?"P1":"P2",side==0?62:1218,71,50,WHITE,true);
     }
 
     private void grid(Canvas c,CharacterSelect s) {
-        // Straight left/right symmetry; vanishing-point perspective comes from framing,
-        // not rotating one side of the select grid.
-        p.setColor(0xF0091128);c.drawRect(376f,128f,904f,542f,p);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3.2f);
-        p.setColor(0xFF7898D5);c.drawRect(376f,128f,904f,542f,p);
-        p.setStyle(Paint.Style.FILL);
-        for(int i=0;i<CharacterSelect.ROWS*CharacterSelect.COLUMNS;i++) tile(c,s,i);
-    }
-
-    private void tile(Canvas c,CharacterSelect s,int index) {
-        float x=s.cardLeft(index),y=s.cardTop(index),w=s.cardWidth(),h=s.cardHeight();
-        boolean locked=index>=s.ids.length;
-        p.setStyle(Paint.Style.FILL);p.setColor(locked?0xFF14192C:0xFF1D2539);
-        c.drawRect(x,y,x+w,y+h,p);
-        if(!locked) {
-            String id=s.ids[index];
-            Bitmap art=concept(id);
-            if(art!=null) {
-                c.save();c.clipRect(x+1f,y+1f,x+w-1f,y+h-1f);
-                float scale=Math.max(w/(art.getWidth()*.72f),h/(art.getHeight()*.61f));
-                float aw=art.getWidth()*scale,ah=art.getHeight()*scale;
-                bitmapPaint.setAlpha(255);
-                c.drawBitmap(art,null,new RectF(x+(w-aw)*.5f,y-0.19f*ah,x+(w+aw)*.5f,y+0.81f*ah),bitmapPaint);
-                c.restore();
+        path.reset();path.moveTo(414,128);path.lineTo(866,128);
+        path.lineTo(949,546);path.lineTo(331,546);path.close();
+        fill(c,0xEA080C19);stroke(c,0xAA080D21,8);stroke(c,0xFF8AA4D0,1.6f);
+        for(int i=0;i<CharacterSelect.COLUMNS*CharacterSelect.ROWS;i++) {
+            s.cardCorners(i,corners);quadPath();
+            fill(c,0xFF101624);
+            if(i<s.ids.length) {
+                String id=s.ids[i];
+                Bitmap face=face(id);
+                if(face!=null) warpedFace(c,face);
+                quadPath();
+                stroke(c,0xFF9FAABD,1.1f);
+                int p1=s.order(0,id),p2=s.order(1,id);
+                if(p1>0) {quadPath();stroke(c,0x8822A8FF,7);stroke(c,BLUE,p1==1?2.6f:1.6f);}
+                if(p2>0) {quadPath();stroke(c,0x88FF213D,7);stroke(c,RED,p2==1?2.6f:1.6f);}
+                float cy=corners[5]-8,rx=corners[4]-8,lx=corners[6]+8;
+                if(p1>0) textAt(c,p1==1?"P1":"TAG",p2>0?lx:rx,cy,19,WHITE,true,p2>0?Paint.Align.LEFT:Paint.Align.RIGHT);
+                if(p2>0) textAt(c,p2==1?"P2":"TAG",rx,cy,19,WHITE,true,Paint.Align.RIGHT);
+                if(i==s.cursorIndex()) {quadPath();stroke(c,0x88FFFFFF,1);}
+            } else {
+                if(i>=8&&i<15&&futureFaces[i-8]!=null) {
+                    warpedFace(c,futureFaces[i-8]);
+                    quadPath();stroke(c,0xFF647089,1.1f);
+                    float x=corners[2]-14,y=corners[3]+18;
+                    p.setColor(0xDE061021);c.drawCircle(x,y,12,p);
+                    c.save();c.scale(.35f,.35f,x,y);lock(c,x,y,0xFFAFBCD2);c.restore();
+                    text(c,"BLOQUEADO",(corners[6]+corners[4])/2,corners[5]-6,9,0xFFE6ECF7,false);
+                } else {
+                    quadPath();stroke(c,0xFF647089,1.1f);
+                    lock(c,(corners[0]+corners[2]+corners[4]+corners[6])/4,
+                        (corners[1]+corners[5])/2,0xFF8892A4);
+                }
             }
-            shade(c,x,y+h*.72f,x+w,y+h,0x00060B14,0xDD050711);
-            String name=GeneratedCharacters.get(id).displayName;
-            // Two corner tabs may coexist when both players select the same fighter.
-            int n1=s.order(0,id),n2=s.order(1,id);
-            if(n1!=0)tab(c,x+2f,y+2f,BLUE,"P1"+(n1==2?" TAG":""));
-            if(n2!=0)tab(c,x+w-48f,y+2f,RED,"P2"+(n2==2?" TAG":""));
-            text(c,name,x+w/2f,y+h-9f,13f,WHITE,true,Paint.Align.CENTER);
-            if(index==s.cursorIndex()) {
-                p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3.4f);
-                p.setColor(s.focusSide()==0?BLUE:RED);
-                c.drawRect(x+2f,y+2f,x+w-2f,y+h-2f,p);
-                p.setStyle(Paint.Style.FILL);
-            }
-        } else {
-            lock(c,x+w/2f,y+h/2f,0xFF838B9D);
         }
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1f);p.setColor(0xFF9BA8C9);
-        c.drawRect(x,y,x+w,y+h,p);p.setStyle(Paint.Style.FILL);
     }
 
-    private void tab(Canvas c,float x,float y,int color,String label) {
-        p.setColor(color);c.drawRect(x,y,x+46f,y+23f,p);
-        text(c,label,x+23f,y+16f,label.length()>4?9f:15f,WHITE,true,Paint.Align.CENTER);
+    private void warpedFace(Canvas c,Bitmap b) {
+        source[0]=0;source[1]=0;source[2]=b.getWidth();source[3]=0;
+        source[4]=b.getWidth();source[5]=b.getHeight();source[6]=0;source[7]=b.getHeight();
+        warp.reset();
+        if(warp.setPolyToPoly(source,0,corners,0,4)) {
+            c.save();quadPath();c.clipPath(path);
+            imagePaint.setAlpha(255);c.drawBitmap(b,warp,imagePaint);c.restore();
+        }
+    }
+
+    private void quadPath() {
+        path.reset();path.moveTo(corners[0],corners[1]);
+        path.lineTo(corners[2],corners[3]);path.lineTo(corners[4],corners[5]);
+        path.lineTo(corners[6],corners[7]);path.close();
+    }
+
+    private void team(Canvas c,CharacterSelect s,int side) {
+        float l=s.slotLeft(side),r=l+CharacterSelect.TEAM_W,top=350,bottom=624;
+        int color=side==0?BLUE:RED;
+        path.reset();path.moveTo(l-11,top+18);path.lineTo(l+4,top);
+        path.lineTo(r-5,top);path.lineTo(r+11,top+18);
+        path.lineTo(r+11,bottom-9);path.lineTo(r+2,bottom);
+        path.lineTo(l-4,bottom);path.lineTo(l-11,bottom-9);path.close();
+        fill(c,0xEF040B1B);stroke(c,0x5521A2FF,side==0?8:0.1f);
+        stroke(c,color,2.5f);
+        text(c,"TEAM",(l+r)/2,375,23,WHITE,true);
+        for(int slot=0;slot<2;slot++) {
+            float t=s.slotTop(slot),b=t+CharacterSelect.SLOT_H;
+            p.setColor(0xFF050C1D);p.setStyle(Paint.Style.FILL);c.drawRect(l,t,r,b,p);
+            Bitmap face=face(s.pick(side,slot));
+            if(face!=null) {
+                box.set(l+23,t+2,r-2,b-2);imagePaint.setAlpha(255);c.drawBitmap(face,null,box,imagePaint);
+            }
+            p.setColor(color);p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(s.focusSide()==side&&s.focusSlot()==slot?3:1.5f);
+            c.drawRect(l,t,r,b,p);p.setStyle(Paint.Style.FILL);
+            text(c,String.valueOf(slot+1),l+12,t+32,25,WHITE,true);
+            textAt(c,slot==1?"TAG":side==0?"P1":"P2",r-7,b-9,23,WHITE,true,Paint.Align.RIGHT);
+        }
+        text(c,"⇄",(l+r)/2,s.slotTop(1)-13,29,WHITE,true);
+    }
+
+    private void stage(Canvas c) {
+        path.reset();path.moveTo(336,547);path.lineTo(944,547);
+        path.lineTo(986,682);path.lineTo(294,682);path.close();
+        c.save();c.clipPath(path);
+        p.setColor(0xFF081F3F);c.drawRect(294,547,986,682,p);
+        if(stageArt!=null) {
+            // Only the stage-art region of the supplied reference is rendered.
+            // Portraits, selection state and all controls above are real dynamic UI.
+            box.set(0,0,1280,720);imagePaint.setAlpha(255);c.drawBitmap(stageArt,null,box,imagePaint);
+        }
+        p.setColor(0xD8051025);c.drawRect(315,651,965,678,p);
+        text(c,CharacterSelect.STAGE,640,673,22,WHITE,false);
+        text(c,"❮",434,670,25,WHITE,true);text(c,"❯",846,670,25,WHITE,true);
+        c.restore();stroke(c,0x66FFFFFF,6);stroke(c,BLUE,1.8f);
+    }
+
+    private void footer(Canvas c) {
+        p.setColor(0xF3030711);c.drawRect(0,687,1280,720,p);
+        p.setColor(0xFF84A8EB);p.setStrokeWidth(2);c.drawLine(0,689,1280,689,p);
+        text(c,"✣",148,715,27,WHITE,false);
+        text(c,"SELECIONAR",224,713,14,WHITE,false);
+        key(c,"A",327,0xFF57DB78);text(c,"CONFIRMAR",385,713,14,WHITE,false);
+        key(c,"B",480,0xFFFF3448);text(c,"VOLTAR",535,713,14,WHITE,false);
+        key(c,"Y",615,0xFFFFD62C);text(c,"CONFIGURAÇÕES",710,713,14,WHITE,false);
+        text(c,"LB / RB",834,713,13,WHITE,false);text(c,"TROCAR TAG",940,713,14,WHITE,false);
+        key(c,"X",1058,BLUE);text(c,"ALEATÓRIO",1145,713,14,WHITE,false);
+    }
+
+    private void key(Canvas c,String label,float x,int color) {
+        p.setStyle(Paint.Style.STROKE);p.setColor(color);p.setStrokeWidth(2);c.drawCircle(x,705,12,p);
+        p.setStyle(Paint.Style.FILL);text(c,label,x,712,19,color,false);
     }
 
     private void lock(Canvas c,float x,float y,int color) {
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(4.2f);p.setColor(color);
-        c.drawRoundRect(x-10f,y-24f,x+10f,y-1f,9f,9f,p);
-        p.setStyle(Paint.Style.FILL);c.drawRoundRect(x-16f,y-7f,x+16f,y+22f,2f,2f,p);
-        p.setColor(0xFF202739);c.drawCircle(x,y+6f,3.8f,p);
-    }
-
-    private void teamPanel(Canvas c,CharacterSelect s,int side) {
-        float l=s.slotLeft(side),top=s.slotTop(0)-34f;
-        int color=side==0?BLUE:RED;
-        p.setColor(0xEE05091F);c.drawRoundRect(l-8f,top,l+CharacterSelect.TEAM_W+8f,630f,10f,10f,p);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3f);p.setColor(color);
-        c.drawRoundRect(l-8f,top,l+CharacterSelect.TEAM_W+8f,630f,10f,10f,p);
-        p.setStyle(Paint.Style.FILL);
-        text(c,"TEAM",l+CharacterSelect.TEAM_W/2f,top+26f,21f,WHITE,true,Paint.Align.CENTER);
-        for(int slot=0;slot<2;slot++) {
-            float y=s.slotTop(slot);
-            p.setColor(0xF0060E25);c.drawRect(l,y,l+CharacterSelect.TEAM_W,y+CharacterSelect.SLOT_H,p);
-            Bitmap b=concept(s.pick(side,slot));
-            if(b!=null) {
-                c.save();c.clipRect(l+31f,y+3f,l+CharacterSelect.TEAM_W-4f,y+CharacterSelect.SLOT_H-3f);
-                float w=144f,h=144f*b.getHeight()/b.getWidth();
-                bitmapPaint.setAlpha(255);
-                c.drawBitmap(b,null,new RectF(l+47f,y-0.21f*h,l+47f+w,y+0.79f*h),bitmapPaint);
-                c.restore();
-            }
-            shade(c,l+5f,y+75f,l+CharacterSelect.TEAM_W-5f,y+CharacterSelect.SLOT_H-3f,0x00000000,0xDB000718);
-            p.setStyle(Paint.Style.STROKE);
-            p.setStrokeWidth(s.focusSide()==side && s.focusSlot()==slot?3.5f:1.5f);
-            p.setColor(color);
-            c.drawRect(l,y,l+CharacterSelect.TEAM_W,y+CharacterSelect.SLOT_H,p);
-            p.setStyle(Paint.Style.FILL);
-            text(c,""+(slot+1),l+18f,y+43f,25f,WHITE,true,Paint.Align.CENTER);
-            text(c,slot==0?(side==0?"P1":"P2"):"TAG",
-                    l+CharacterSelect.TEAM_W-31f,y+CharacterSelect.SLOT_H-11f,20f,WHITE,true,Paint.Align.CENTER);
-        }
-        text(c,"⇄",l+CharacterSelect.TEAM_W/2f,s.slotTop(1)-9f,27f,WHITE,true,Paint.Align.CENTER);
-    }
-
-    private void stagePreview(Canvas c) {
-        // Low-view trapezoidal preview at exactly the location in the supplied art.
-        float top=547f,bottom=684f;
-        path.reset();path.moveTo(338f,top);path.lineTo(942f,top);
-        path.lineTo(987f,bottom);path.lineTo(293f,bottom);path.close();
-        c.save();c.clipPath(path);
-        p.setColor(0xFF0E2151);c.drawRect(290f,top,990f,bottom,p);
-        Bitmap sky=stage("ceu.jpg"), city=stage("cidade.png"), gate=stage("portal.png");
-        if(sky!=null)c.drawBitmap(sky,null,new RectF(297f,547f,987f,685f),bitmapPaint);
-        if(city!=null) {
-            bitmapPaint.setAlpha(245);
-            c.drawBitmap(city,null,new RectF(297f,565f,987f,664f),bitmapPaint);
-        }
-        if(gate!=null) {
-            bitmapPaint.setAlpha(240);
-            c.drawBitmap(gate,null,new RectF(548f,563f,734f,665f),bitmapPaint);
-        }
-        Bitmap pillar=stage("pilar.png");
-        if(pillar!=null) {
-            bitmapPaint.setAlpha(255);
-            c.drawBitmap(pillar,null,new RectF(302f,542f,405f,670f),bitmapPaint);
-            c.drawBitmap(pillar,null,new RectF(874f,542f,978f,670f),bitmapPaint);
-        }
-        p.setColor(0xD9020C22);c.drawRect(306f,650f,970f,678f,p);
-        text(c,CharacterSelect.STAGE,640f,672f,21f,WHITE,true,Paint.Align.CENTER);
-        // One stage currently exists; muted arrows never pretend to change the fight.
-        text(c,"❮",432f,672f,24f,0xFFB2C6EE,true,Paint.Align.CENTER);
-        text(c,"❯",845f,672f,24f,0xFFB2C6EE,true,Paint.Align.CENTER);
-        c.restore();
-        p.setColor(BLUE);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2.8f);
-        c.drawPath(path,p);p.setStyle(Paint.Style.FILL);
-    }
-
-    private void footer(Canvas c,CharacterSelect s) {
-        p.setColor(0xF8060A16);c.drawRect(0f,687f,1280f,720f,p);
-        line(c,0f,688f,1280f,688f,0xFF4786F5,2f);
-        command(c,66f,"✣","SELECIONAR",0xFFDCE6FF,175f);
-        command(c,318f,"A","CONFIRMAR",0xFF56E882,415f);
-        command(c,473f,"B","VOLTAR",0xFFFF4454,531f);
-        command(c,622f,"Y","CONFIGURAÇÕES",0xFFEBCC40,708f);
-        command(c,813f,"LB / RB","TROCAR TAG",0xFFF9F9FF,928f);
-        command(c,1045f,"X","ALEATÓRIO",0xFF258DFF,1137f);
-    }
-    private void command(Canvas c,float x,String key,String word,int color,float wordX) {
-        p.setColor(0xDD090F20);p.setStyle(Paint.Style.FILL);
-        c.drawCircle(x,706f,key.length()==1?15f:20f,p);
-        p.setStyle(Paint.Style.STROKE);p.setColor(color);p.setStrokeWidth(2f);
-        c.drawCircle(x,706f,key.length()==1?15f:20f,p);
-        p.setStyle(Paint.Style.FILL);
-        text(c,key,x,712f,key.length()>1?10f:21f,color,true,Paint.Align.CENTER);
-        text(c,word,wordX,711f,14f,WHITE,true,Paint.Align.CENTER);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(4);p.setColor(color);
+        c.drawRoundRect(x-10,y-24,x+10,y-1,9,9,p);
+        p.setStyle(Paint.Style.FILL);c.drawRoundRect(x-16,y-7,x+16,y+22,2,2,p);
+        p.setColor(0xFF141C2D);c.drawCircle(x,y+6,3.5f,p);
     }
 
     private void settings(Canvas c) {
-        p.setColor(0xF50A122C);c.drawRoundRect(313f,204f,967f,485f,16f,16f,p);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3f);p.setColor(BLUE);
-        c.drawRoundRect(313f,204f,967f,485f,16f,16f,p);p.setStyle(Paint.Style.FILL);
-        text(c,"CONFIGURAÇÕES · SELEÇÃO TAG",640f,250f,28f,WHITE,true,Paint.Align.CENTER);
-        text(c,"TOQUE UM SLOT TEAM PARA ESCOLHER O TITULAR OU PARCEIRO",640f,302f,18f,WHITE,false,Paint.Align.CENTER);
-        text(c,"TOQUE UM RETRATO OU USE O DIRECIONAL PARA SELECIONAR",640f,344f,18f,WHITE,false,Paint.Align.CENTER);
-        text(c,"LB / RB INVERTE TITULAR E TAG DA EQUIPE ATIVA",640f,386f,18f,WHITE,false,Paint.Align.CENTER);
-        text(c,"TOQUE PARA FECHAR",640f,455f,17f,0xFF84BBFF,true,Paint.Align.CENTER);
+        p.setStyle(Paint.Style.FILL);p.setColor(0xF50A122C);c.drawRoundRect(313,204,967,485,16,16,p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3);p.setColor(BLUE);c.drawRoundRect(313,204,967,485,16,16,p);
+        p.setStyle(Paint.Style.FILL);
+        text(c,"SELEÇÃO TAG",640,250,28,WHITE,true);
+        text(c,"TOQUE UM SLOT TEAM PARA ESCOLHER TITULAR OU PARCEIRO",640,302,17,WHITE,false);
+        text(c,"TOQUE UM RETRATO OU USE O DIRECIONAL",640,344,18,WHITE,false);
+        text(c,"LB / RB INVERTE TITULAR E TAG DA EQUIPE ATIVA",640,386,18,WHITE,false);
+        text(c,"TOQUE PARA FECHAR",640,455,17,BLUE,true);
     }
 
-    private void flame(Canvas c,float x,float y,int color,float scale){
-        p.setStyle(Paint.Style.FILL);p.setColor(alpha(color,30));
-        c.drawCircle(x,y,24f*scale,p);
-        path.reset();path.moveTo(x-7f*scale,y+12f*scale);
-        path.quadTo(x-9f*scale,y-6f*scale,x+3f*scale,y-22f*scale);
-        path.quadTo(x+23f*scale,y+4f*scale,x+7f*scale,y+14f*scale);
-        path.close();p.setColor(alpha(color,210));c.drawPath(path,p);
+    private void fill(Canvas c,int color) {p.setStyle(Paint.Style.FILL);p.setColor(color);c.drawPath(path,p);}
+    private void stroke(Canvas c,int color,float width) {
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setColor(color);c.drawPath(path,p);
+        p.setStyle(Paint.Style.FILL);
+    }
+    private void text(Canvas c,String value,float x,float y,float size,int color,boolean isBold) {
+        textAt(c,value,x,y,size,color,isBold,Paint.Align.CENTER);
+    }
+    private void textAt(Canvas c,String value,float x,float y,float size,int color,boolean isBold,Paint.Align align) {
+        p.setShader(null);p.setTypeface(isBold?bold:regular);p.setTextSize(size);p.setTextAlign(align);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2.5f);p.setColor(0xFF030711);c.drawText(value,x,y,p);
+        p.setStyle(Paint.Style.FILL);p.setColor(color);c.drawText(value,x,y,p);p.setTextAlign(Paint.Align.LEFT);
     }
 
-    private void line(Canvas c,float a,float b,float x,float y,int color,float width){
-        p.setStyle(Paint.Style.STROKE);p.setColor(color);p.setStrokeWidth(width);
-        c.drawLine(a,b,x,y,p);p.setStyle(Paint.Style.FILL);
+    private String assetId(String id) {return "player_base".equals(id)?"p01":id;}
+    private Bitmap heroArt(String id) {
+        if(heroes.containsKey(id))return heroes.get(id);
+        Bitmap b=read("selection/art/hero_"+assetId(id)+".png",2);
+        heroes.put(id,b);return b;
     }
 
-    private void text(Canvas c,String text,float x,float y,float size,int color,boolean bold,Paint.Align align){
-        p.setShader(null);p.setStyle(Paint.Style.FILL);p.setTextAlign(align);
-        p.setTypeface(Typeface.create("sans-serif-condensed",bold?Typeface.BOLD:Typeface.NORMAL));
-        p.setColor(color);p.setTextSize(size);c.drawText(text,x,y,p);
-    }
-    private static int alpha(int color,int opacity){
-        return (Math.max(0,Math.min(opacity,255))<<24)|(color&0x00FFFFFF);
-    }
-    private Bitmap concept(String id) {
-        if(art.containsKey(id))return art.get(id);
-        String file="player_base".equals(id)?"p01":id;
-        Bitmap bitmap=read("selection/portraits/"+file+".png");
-        art.put(id,bitmap);
-        return bitmap;
-    }
-    private Bitmap stage(String name) {
-        if(scenery.containsKey(name))return scenery.get(name);
-        Bitmap bitmap=read("stages/templo_lua/"+name);
-        scenery.put(name,bitmap);
-        return bitmap;
-    }
-    private Bitmap read(String path) {
-        try(InputStream in=context.getAssets().open(path)) {
-            BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inPreferredConfig=Bitmap.Config.ARGB_8888;
-            options.inSampleSize=2;
-            return BitmapFactory.decodeStream(in,null,options);
-        } catch(IOException ex) {
-            Log.w("CharacterSelect","Could not load "+path,ex);
-            return null;
+    private Bitmap face(String id) {
+        if(faces.containsKey(id))return faces.get(id);
+        Bitmap sheet=read("selection/portraits/"+assetId(id)+".png",1);
+        Bitmap b=null;
+        if(sheet!=null) {
+            // Exact source ROIs, normalized to the original sheet. Never show the whole sheet.
+            float l=.805f,t=.027f,r=.991f,bottom=.312f;
+            switch(assetId(id)) {
+                case "p02":l=.79f;t=.012f;r=.992f;bottom=.252f;break;
+                case "p03":l=.796f;t=.014f;r=.992f;bottom=.311f;break;
+                case "p04":l=.809f;t=.023f;r=.991f;bottom=.323f;break;
+                case "p05":l=.007f;t=.67f;r=.202f;bottom=.985f;break;
+                case "p06":l=.552f;t=.601f;r=.768f;bottom=.992f;break;
+                case "p07":l=.011f;t=.668f;r=.231f;bottom=.982f;break;
+                case "p08":l=.008f;t=.594f;r=.208f;bottom=.985f;break;
+            }
+            int x=Math.round(l*sheet.getWidth()),y=Math.round(t*sheet.getHeight());
+            int w=Math.round((r-l)*sheet.getWidth()),h=Math.round((bottom-t)*sheet.getHeight());
+            b=Bitmap.createBitmap(sheet,x,y,Math.max(1,w),Math.max(1,h));
+            if(b!=sheet)sheet.recycle();
         }
+        faces.put(id,b);return b;
+    }
+
+    private Bitmap read(String asset,int sample) {
+        try(InputStream in=context.getAssets().open(asset)) {
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inPreferredConfig=Bitmap.Config.ARGB_8888;options.inSampleSize=sample;
+            options.inScaled=false;
+            return BitmapFactory.decodeStream(in,null,options);
+        } catch(IOException ex) {Log.w("CharacterSelect","Missing selection art: "+asset,ex);return null;}
     }
 }

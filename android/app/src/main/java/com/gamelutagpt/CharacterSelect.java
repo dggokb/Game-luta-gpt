@@ -9,9 +9,9 @@ import java.util.Random;
 final class CharacterSelect {
     enum Result { NONE, CHANGED, CONFIRM, CANCEL }
     static final int COLUMNS = 4, ROWS = 4;
-    static final float GRID_X = 387f, GRID_Y = 137f, GRID_W = 506f, GRID_H = 400f, GRID_GAP = 5f;
-    static final float TEAM_LEFT = 22f, TEAM_RIGHT = 1058f, TEAM_TOP = 382f;
-    static final float TEAM_W = 201f, SLOT_H = 100f, SLOT_GAP = 32f;
+    static final float GRID_X = 420f, GRID_Y = 137f, GRID_W = 440f, GRID_H = 400f, GRID_GAP = 6f;
+    static final float TEAM_LEFT = 33f, TEAM_RIGHT = 1087f, TEAM_TOP = 383f;
+    static final float TEAM_W = 160f, SLOT_H = 96f, SLOT_GAP = 34f;
     static final float FIGHT_LEFT = 301f, FIGHT_TOP = 685f, FIGHT_RIGHT = 439f, FIGHT_BOTTOM = 720f;
     static final float BACK_LEFT = 442f, BACK_TOP = 685f, BACK_RIGHT = 565f, BACK_BOTTOM = 720f;
     static final float SETTINGS_LEFT = 565f, SETTINGS_RIGHT = 802f;
@@ -72,13 +72,34 @@ final class CharacterSelect {
     }
     float cardWidth() { return (GRID_W - GRID_GAP * (COLUMNS-1)) / COLUMNS; }
     float cardHeight() { return (GRID_H - GRID_GAP * (ROWS-1)) / ROWS; }
-    float cardLeft(int i) { return GRID_X + (i%COLUMNS) * (cardWidth()+GRID_GAP); }
-    float cardTop(int i) { return GRID_Y + (i/COLUMNS) * (cardHeight()+GRID_GAP); }
-    float slotLeft(int side) { return side == 0 ? TEAM_LEFT : TEAM_RIGHT; }
-    float slotTop(int slot) { return TEAM_TOP + slot * (SLOT_H+SLOT_GAP); }
-    int cardAt(float x, float y) {
-        for (int i = 0; i < ids.length; i++)
-            if (inside(x,y,cardLeft(i),cardTop(i),cardLeft(i)+cardWidth(),cardTop(i)+cardHeight())) return i;
+    /** Both rendering and hit testing use the same symmetric perspective projection. */
+    static float gridWidthAt(float y) {
+        float t = Math.max(0f, Math.min(1f, (y-GRID_Y)/GRID_H));
+        return GRID_W + 148f*t;
+    }
+    private static float projectX(float x, float y) {
+        return 640f+(x-640f)*gridWidthAt(y)/GRID_W;
+    }
+    float cardLeft(int i) {
+        return projectX(GRID_X+(i%COLUMNS)*(cardWidth()+GRID_GAP),cardTop(i));
+    }
+    float cardTop(int i) { return GRID_Y+(i/COLUMNS)*(cardHeight()+GRID_GAP); }
+    void cardCorners(int i, float[] out) {
+        float x=GRID_X+(i%COLUMNS)*(cardWidth()+GRID_GAP), y=cardTop(i);
+        out[0]=projectX(x,y);out[1]=y;
+        out[2]=projectX(x+cardWidth(),y);out[3]=y;
+        out[4]=projectX(x+cardWidth(),y+cardHeight());out[5]=y+cardHeight();
+        out[6]=projectX(x,y+cardHeight());out[7]=y+cardHeight();
+    }
+    float slotLeft(int side) { return side==0?TEAM_LEFT:TEAM_RIGHT; }
+    float slotTop(int slot) { return TEAM_TOP+slot*(SLOT_H+SLOT_GAP); }
+    int cardAt(float x,float y) {
+        if(y<GRID_Y || y>GRID_Y+GRID_H) return -1;
+        float designX=640f+(x-640f)*GRID_W/gridWidthAt(y);
+        for(int i=0;i<ids.length;i++) {
+            float l=GRID_X+(i%COLUMNS)*(cardWidth()+GRID_GAP),t=cardTop(i);
+            if(inside(designX,y,l,t,l+cardWidth(),t+cardHeight())) return i;
+        }
         return -1;
     }
     void chooseFocus(int side, int slot) {

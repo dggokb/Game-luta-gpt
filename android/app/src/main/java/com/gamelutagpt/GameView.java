@@ -34,7 +34,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     // character select, where the player picks the pair.
     private int teamIndex;
     private FighterState[] team = membersOf(0);
-    private final CharacterSelect characterSelect = new CharacterSelect(GeneratedCharacters.SELECTABLE);
+    private final CharacterSelect characterSelect = new CharacterSelect(selectionRoster());
     private final ConcurrentLinkedQueue<Integer> selectionKeys = new ConcurrentLinkedQueue<>();
     private CharacterSelectRenderer characterSelectRenderer;
 
@@ -225,6 +225,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         setKeepScreenOn(true);
     }
 
+    private static String[] selectionRoster() {
+        java.util.ArrayList<String> ids=new java.util.ArrayList<>();
+        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07"};
+        for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
+            if(wanted.equals(available)) ids.add(available);
+        for(String available:GeneratedCharacters.SELECTABLE) if(!ids.contains(available)) ids.add(available);
+        return ids.toArray(new String[0]);
+    }
+
     private static FighterState[] membersOf(int index) {
         String[] ids = GeneratedCharacters.TEAMS[index];
         return membersOf(ids[0], ids[1]);
@@ -402,6 +411,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             introPlayed = true;
             startIntro();
             openCharacterSelect();
+            characterSelect.open("player_base", "p08", "p03", "p06");
         }
         surfaceReady = true;
         startLoopIfReady();
