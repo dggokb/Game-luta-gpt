@@ -596,24 +596,29 @@ public class SpriteIntegrationTest {
     private void tapCard(CharacterSelect s,String id)throws Exception {
         int i=java.util.Arrays.asList(s.ids).indexOf(id);
         invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
-            s.cardLeft(i)+s.cardWidth()/2,CharacterSelect.CARD_TOP+CharacterSelect.CARD_H/2);
+            s.cardLeft(i)+s.cardWidth()/2,s.cardTop(i)+s.cardHeight()/2);
+    }
+    private void tapSelectSlot(CharacterSelect s,int side,int slot)throws Exception {
+        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
+            s.slotLeft(side)+60f,s.slotTop(slot)+CharacterSelect.SLOT_H/2);
     }
     @Test public void characterSelectPicksThePairAndPausesTheFight()throws Exception {
         CharacterSelect s=(CharacterSelect)get("characterSelect");
         assertTrue("p01 to p04 are selectable",s.ids.length>=4);
         invoke("openCharacterSelect",new Class<?>[0]);
         assertTrue(s.isOpen());
-        // Opens with the current pair; drop both, then pick p04 (point) and p02 (partner).
-        tapCard(s,"player_base");tapCard(s,"p03");
-        assertFalse(s.ready());
+        // Os slots são independentes e trocar o personagem selecionado não apaga a dupla.
+        assertTrue(s.ready());
         float x=player().x;
         press(PadInput.Button.HEAVY,0);frames(5);
         assertFalse("The fight waits behind the select screen",player().attacking());
         assertEquals(x,player().x,0.01f);
-        tapCard(s,"p04");tapCard(s,"p02");
-        assertEquals(1,s.order("p04"));assertEquals(2,s.order("p02"));
-        tapCard(s,"p03");
-        assertEquals("Only two picks",0,s.order("p03"));
+        tapSelectSlot(s,0,0);tapCard(s,"p04");
+        tapSelectSlot(s,0,1);tapCard(s,"p02");
+        assertEquals(1,s.order(0,"p04"));
+        assertEquals(2,s.order(0,"p02"));
+        assertEquals(0,s.order(0,"p03"));
+        assertTrue("P2 has its own point and TAG",s.order(1,s.opponentPoint())==1);
         invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
             (CharacterSelect.FIGHT_LEFT+CharacterSelect.FIGHT_RIGHT)/2,(CharacterSelect.FIGHT_TOP+CharacterSelect.FIGHT_BOTTOM)/2);
         assertFalse(s.isOpen());
