@@ -1,7 +1,7 @@
-name: Selection reference APK
+name: Selection effects APK
 on:
   push:
-    branches: ['ui/selecao-concepts-fiel-20261012']
+    branches: ['ui/selecao-efeitos-20261012']
 permissions:
   contents: write
 jobs:
@@ -27,7 +27,7 @@ jobs:
         run: gradle :app:testDebugUnitTest --tests '*CharacterSelectTest' :app:assembleDebug -x :app:verifySpritePacks --stacktrace
       - uses: actions/upload-artifact@v4
         with:
-          name: GameLuta-Selecao-Fiel-APK
+          name: GameLuta-Selecao-Efeitos-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
       - name: Enable emulator acceleration
@@ -44,14 +44,15 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Selection-reference-QA
+          name: Selection-effects-QA
           path: |
             selection-*.png
+            selection-effects.mp4
             android/app/build/reports/tests/
           if-no-files-found: warn
       - name: Publish tested APK and captures without ZIP
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk GameLuta-Selecao.apk
-          gh release create "selection-${GITHUB_SHA:0:12}" GameLuta-Selecao.apk selection-*.png selection-qa.json --target "$GITHUB_SHA" --title "Seleção concepts - ${GITHUB_SHA:0:12}" --notes "APK da branch ui/selecao-concepts-fiel-20261012. Testes de seleção e validação no emulador passaram." --prerelease
+          cp android/app/build/outputs/apk/debug/app-debug.apk GameLuta-Selecao-Efeitos.apk
+          gh release create "selectionfx-${GITHUB_SHA:0:12}" GameLuta-Selecao-Efeitos.apk selection-*.png selection-effects.mp4 selection-qa.json --target "$GITHUB_SHA" --title "Seleção com efeitos - ${GITHUB_SHA:0:12}" --notes "APK da branch ui/selecao-efeitos-20261012. Testes de seleção e validação no emulador passaram." --prerelease

@@ -51,11 +51,23 @@ def cell(i):
     x=420+(i%4)*(cw+6)+cw/2
     return 640+(x-640)*(440+148*(y-137)/400)/440,y
 
-# All eight unavailable cells must leave the entire static selection unchanged.
+# Decorations animate, while portrait cores and selection state stay stationary.
+def stable_team(a,b,side,slot):
+    x=70 if side==0 else 1124
+    y=398+slot*130
+    return not differs(a,b,(x,y,x+95,y+64))
+
+time.sleep(1)
+animated=capture('animated')
+assert differs(initial,animated), 'Selection effects are static'
+assert all(stable_team(initial,animated,side,slot) for side in range(2) for slot in range(2)), 'Idle effects move portraits'
+results['checks'].append('effects animate while portrait cores stay stationary')
+
+# Locked touches must leave both teams unchanged despite ambient animation.
 for i in range(8,16):
     tap(*cell(i))
     locked=capture('locked')
-    assert not differs(initial, locked), 'Locked cell changed selection: '+str(i)
+    assert all(stable_team(initial,locked,side,slot) for side in range(2) for slot in range(2)), 'Locked cell changed teams: '+str(i)
 results['checks'].append('all eight locked cells ignore touches')
 
 # P1 TAG: choose P02 (visual cell 3), then choose it as point, swapping duplicate.
@@ -86,7 +98,7 @@ tap(1150,420)
 tap(*cell(5))
 p2=capture('p2')
 assert differs(previous,p2,(950,55,1080,350)), 'P2 point did not change'
-assert not differs(previous,p2,(0,55,330,350)), 'P2 changed P1 hero'
+assert stable_team(previous,p2,0,0) and stable_team(previous,p2,0,1), 'P2 changed P1 team'
 tap(1150,560)
 tap(*cell(7))
 p2tag=capture('p2-tag')
@@ -98,6 +110,15 @@ swapped=capture('swapped')
 assert differs(before,swapped,(1087,383,1247,609)), 'Team swap did not change slots'
 results['checks'].extend(['P2 point and TAG independent','focused team point/TAG swap'])
 
+# Actual APK video: ambient energy, cursor glow, pick flash, then fight transition.
+record=sp.Popen(['adb','shell','screenrecord','--size','1280x720','--bit-rate','3000000','--time-limit','12','/sdcard/selection-effects.mp4'])
+time.sleep(1)
+tap(110,420)
+tap(*cell(3))
+time.sleep(1)
+tap(110,420)
+tap(*cell(0))
+time.sleep(1)
 tap(370,700)
 time.sleep(3)
 fight=capture('confirmed')
@@ -110,3 +131,7 @@ assert 'Missing selection art: selection/art/hero_' not in logs, 'Missing hero a
 results['checks'].append('confirmation enters running fight without crash')
 Path('selection-qa.json').write_text(json.dumps(results,indent=2))
 print(json.dumps(results,indent=2))
+
+record.wait(timeout=20)
+adb('pull','/sdcard/selection-effects.mp4','selection-effects.mp4')
+assert Path('selection-effects.mp4').stat().st_size>10000, 'Missing emulator video'

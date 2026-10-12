@@ -324,6 +324,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             case KeyEvent.KEYCODE_BUTTON_R1: characterSelect.swapFocusedTeam(); break;
             case KeyEvent.KEYCODE_BUTTON_START:
                 if (characterSelect.ready()) {
+                    characterSelectRenderer.beginFightTransition();
                     characterSelect.close();
                     selectTeams(characterSelect.point(), characterSelect.partner(),
                         characterSelect.opponentPoint(), characterSelect.opponentPartner());
@@ -336,6 +337,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void handleCharacterSelectTap(float x, float y) {
         switch (characterSelect.tap(x, y)) {
             case CONFIRM:
+                characterSelectRenderer.beginFightTransition();
                 characterSelect.close();
                 selectTeams(characterSelect.point(), characterSelect.partner(),
                     characterSelect.opponentPoint(), characterSelect.opponentPartner());
@@ -1124,6 +1126,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
 
             canvas.restore();
+            characterSelectRenderer.drawFightTransition(canvas);
         } finally {
             holder.unlockCanvasAndPost(canvas);
         }

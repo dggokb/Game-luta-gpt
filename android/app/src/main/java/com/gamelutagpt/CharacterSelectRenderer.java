@@ -3,6 +3,7 @@ package com.gamelutagpt;
 import android.content.Context;
 import android.graphics.*;
 import android.util.Log;
+import android.os.SystemClock;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,6 +23,13 @@ final class CharacterSelectRenderer {
     private final Typeface bold=Typeface.create("sans-serif-condensed",Typeface.BOLD_ITALIC);
     private final Typeface regular=Typeface.create("sans-serif-condensed",Typeface.NORMAL);
     private Bitmap backdrop,stageArt;
+    private final String[] shownPicks=new String[4];
+    private final long[] pickChangedAt=new long[4];
+    private final long effectsEpoch=SystemClock.uptimeMillis();
+    private long now, fightTransitionAt=-1;
+    private float phase;
+    private boolean observedPicks;
+
     private final Bitmap[] futureFaces=new Bitmap[7];
 
     CharacterSelectRenderer(Context context) {
@@ -54,12 +62,14 @@ final class CharacterSelectRenderer {
     }
 
     void draw(Canvas c,Paint unused,CharacterSelect s) {
+        tick(s);
         c.save();
         c.drawColor(0xFF060B1C);
         imagePaint.setAlpha(255);
         if(backdrop!=null) {
             box.set(0,0,1280,720);c.drawBitmap(backdrop,null,box,imagePaint);
         }
+        ambient(c);
         hero(c,s.pick(0,0),0);
         hero(c,s.pick(1,0),1);
         playerTitle(c,0);playerTitle(c,1);
@@ -93,7 +103,7 @@ final class CharacterSelectRenderer {
         float l=side==0?-22:1166,r=side==0?116:1302;
         path.reset();path.moveTo(l,21);path.lineTo(r-24,21);
         path.lineTo(r+15,84);path.lineTo(l,84);path.close();
-        fill(c,0xAF02132A);stroke(c,color,2.7f);
+        fill(c,0xAF02132A);glow(c,color,.55f);stroke(c,color,2.7f);
         text(c,side==0?"P1":"P2",side==0?62:1218,71,50,WHITE,true);
     }
 
@@ -116,7 +126,13 @@ final class CharacterSelectRenderer {
                 float cy=corners[5]-8,rx=corners[4]-8,lx=corners[6]+8;
                 if(p1>0) textAt(c,p1==1?"P1":"TAG",p2>0?lx:rx,cy,19,WHITE,true,p2>0?Paint.Align.LEFT:Paint.Align.RIGHT);
                 if(p2>0) textAt(c,p2==1?"P2":"TAG",rx,cy,19,WHITE,true,Paint.Align.RIGHT);
-                if(i==s.cursorIndex()) {quadPath();stroke(c,0x88FFFFFF,1);}
+                if(i==s.cursorIndex()) {
+                    quadPath();glow(c,s.focusSide()==0?BLUE:RED,1f);
+                    stroke(c,alphaColor(WHITE,160+Math.round(80*pulse())),1.6f);
+                    edgeSpark(c);
+                }
+                float flash=selectionFlash(s,id);
+                if(flash>0) {quadPath();fill(c,alphaColor(WHITE,Math.round(46*flash)));}
             } else {
                 if(i>=8&&i<15&&futureFaces[i-8]!=null) {
                     warpedFace(c,futureFaces[i-8]);
@@ -157,7 +173,7 @@ final class CharacterSelectRenderer {
         path.lineTo(r-5,top);path.lineTo(r+11,top+18);
         path.lineTo(r+11,bottom-9);path.lineTo(r+2,bottom);
         path.lineTo(l-4,bottom);path.lineTo(l-11,bottom-9);path.close();
-        fill(c,0xEF040B1B);stroke(c,0x5521A2FF,side==0?8:0.1f);
+        fill(c,0xEF040B1B);glow(c,color,s.focusSide()==side?.9f:.45f);
         stroke(c,color,2.5f);
         text(c,"TEAM",(l+r)/2,375,23,WHITE,true);
         for(int slot=0;slot<2;slot++) {
@@ -170,6 +186,10 @@ final class CharacterSelectRenderer {
             p.setColor(color);p.setStyle(Paint.Style.STROKE);
             p.setStrokeWidth(s.focusSide()==side&&s.focusSlot()==slot?3:1.5f);
             c.drawRect(l,t,r,b,p);p.setStyle(Paint.Style.FILL);
+            if(s.focusSide()==side&&s.focusSlot()==slot) {
+                path.reset();path.addRect(l,t,r,b,Path.Direction.CW);
+                glow(c,color,.8f);
+            }
             text(c,String.valueOf(slot+1),l+12,t+32,25,WHITE,true);
             textAt(c,slot==1?"TAG":side==0?"P1":"P2",r-7,b-9,23,WHITE,true,Paint.Align.RIGHT);
         }
@@ -189,7 +209,7 @@ final class CharacterSelectRenderer {
         p.setColor(0xD8051025);c.drawRect(315,651,965,678,p);
         text(c,CharacterSelect.STAGE,640,673,22,WHITE,false);
         text(c,"❮",434,670,25,WHITE,true);text(c,"❯",846,670,25,WHITE,true);
-        c.restore();stroke(c,0x66FFFFFF,6);stroke(c,BLUE,1.8f);
+        c.restore();glow(c,BLUE,.35f);stroke(c,0x66FFFFFF,6);stroke(c,BLUE,1.8f);
     }
 
     private void footer(Canvas c) {
@@ -197,6 +217,9 @@ final class CharacterSelectRenderer {
         p.setColor(0xFF84A8EB);p.setStrokeWidth(2);c.drawLine(0,689,1280,689,p);
         text(c,"✣",148,715,27,WHITE,false);
         text(c,"SELECIONAR",224,713,14,WHITE,false);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(3);
+        p.setColor(alphaColor(0xFF57DB78,Math.round(38+40*pulse())));
+        c.drawCircle(327,705,16+2*pulse(),p);p.setStyle(Paint.Style.FILL);
         key(c,"A",327,0xFF57DB78);text(c,"CONFIRMAR",385,713,14,WHITE,false);
         key(c,"B",480,0xFFFF3448);text(c,"VOLTAR",535,713,14,WHITE,false);
         key(c,"Y",615,0xFFFFD62C);text(c,"CONFIGURAÇÕES",710,713,14,WHITE,false);
@@ -225,6 +248,75 @@ final class CharacterSelectRenderer {
         text(c,"TOQUE UM RETRATO OU USE O DIRECIONAL",640,344,18,WHITE,false);
         text(c,"LB / RB INVERTE TITULAR E TAG DA EQUIPE ATIVA",640,386,18,WHITE,false);
         text(c,"TOQUE PARA FECHAR",640,455,17,BLUE,true);
+    }
+
+    // All presentation timing is monotonic wall time; render FPS never changes speed.
+    private void tick(CharacterSelect s) {
+        now=SystemClock.uptimeMillis();phase=(now-effectsEpoch)/1000f;
+        for(int i=0;i<4;i++) {
+            String current=s.pick(i/2,i%2);
+            if(!current.equals(shownPicks[i])) {
+                if(observedPicks) pickChangedAt[i]=now;
+                shownPicks[i]=current;
+            }
+        }
+        observedPicks=true;
+    }
+
+    private float pulse() {return .5f+.5f*(float)Math.sin(phase*2.4f);}
+    private static int alphaColor(int color,int alpha) {
+        return (Math.max(0,Math.min(255,alpha))<<24)|(color&0x00FFFFFF);
+    }
+
+    private void glow(Canvas c,int color,float strength) {
+        float power=strength*(.65f+.35f*pulse());
+        stroke(c,alphaColor(color,Math.round(17*power)),13);
+        stroke(c,alphaColor(color,Math.round(43*power)),7);
+        stroke(c,alphaColor(color,Math.round(155*power)),2);
+    }
+
+    private float selectionFlash(CharacterSelect s,String id) {
+        float flash=0;
+        for(int i=0;i<4;i++) if(id.equals(s.pick(i/2,i%2))&&pickChangedAt[i]>0) {
+            flash=Math.max(flash,Math.max(0,1-(now-pickChangedAt[i])/240f));
+        }
+        return flash;
+    }
+
+    private void edgeSpark(Canvas c) {
+        float t=(phase*.55f)%1f;
+        float x=corners[0]+(corners[2]-corners[0])*t,y=corners[1]+2;
+        c.save();quadPath();c.clipPath(path);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2);
+        p.setColor(alphaColor(WHITE,205));c.drawLine(x-13,y,x+3,y,p);
+        p.setStyle(Paint.Style.FILL);c.restore();
+    }
+
+    private void ambient(Canvas c) {
+        // Twenty-four cheap motes behind the side heroes, never over the grid/text.
+        for(int side=0;side<2;side++) {
+            c.save();c.clipRect(side==0?0:950,90,side==0?330:1280,680);
+            int color=side==0?BLUE:RED;
+            for(int i=0;i<12;i++) {
+                float x=18+(i*47)%310+7*(float)Math.sin(phase*.6f+i);
+                if(side==1)x=1280-x;
+                float y=680-((phase*(16+i%4*3)+i*57)%590);
+                int alpha=45+Math.round(30*(.5f+.5f*(float)Math.sin(phase+i)));
+                p.setStyle(Paint.Style.FILL);p.setColor(alphaColor(color,alpha));
+                c.drawCircle(x,y,1.3f+i%3*.3f,p);
+                p.setStrokeWidth(1);p.setColor(alphaColor(color,alpha/2));
+                c.drawLine(x,y+8,x,y,p);
+            }
+            c.restore();
+        }
+    }
+
+    void beginFightTransition() {fightTransitionAt=SystemClock.uptimeMillis();}
+    void drawFightTransition(Canvas c) {
+        if(fightTransitionAt<0)return;
+        long age=SystemClock.uptimeMillis()-fightTransitionAt;
+        if(age>=240) {fightTransitionAt=-1;return;}
+        c.drawColor(alphaColor(0xFF020611,Math.round(220*(1-age/240f))));
     }
 
     private void fill(Canvas c,int color) {p.setStyle(Paint.Style.FILL);p.setColor(color);c.drawPath(path,p);}
