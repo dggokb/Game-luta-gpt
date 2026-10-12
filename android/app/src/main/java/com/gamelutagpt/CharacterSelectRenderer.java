@@ -85,7 +85,7 @@ final class CharacterSelectRenderer {
         float anchor=side==0?192.5f:1087.5f;
         float headX=.55f;
         switch(assetId(id)) {
-            case "p01":headX=.60f;break;
+            case "p01":headX=.50f;break;
             case "p02":headX=.56f;break;
             case "p03":headX=.60f;break;
             case "p04":headX=.43f;break;

@@ -12,7 +12,7 @@ P01–P16 conferidos na pasta concepts do Drive (1mGv56-qpEFg5GoFzoL4irTcsoST88B
 
 Os oito espaços inferiores usam os retratos verdadeiros P09–P16, com nome e cadeado. Os antigos personagens inventados da imagem de referência não são renderizados. O roster de gameplay permanece explicitamente limitado aos oito IDs implementados, independentemente dos retratos futuros.
 
-P01/P02/P03/P04/P08 foram isolados com transparência a partir das poses de ação do bloco superior direito de cada concept. O prompt de extração exige a quarta figura em ação (quando há vistas frontal/lateral/costas), preservação da pose, identidade, cores e roupa, remoção da ficha e do fundo, sem aura ou novo personagem. P01 e P02 têm os dois punhos na guarda; P03 tem o soco curto do concept; P04 usa cabelo grisalho; P08 usa a ação horizontal com chicote. P05, P06 e P07 já correspondiam àquela pose e foram preservados. As âncoras por personagem mantêm o rosto visível ao espelhar cada lado.
+P02/P03/P04/P08 foram isolados com transparência a partir das poses de ação do bloco superior direito de cada concept. O prompt de extração exige a quarta figura em ação (quando há vistas frontal/lateral/costas), preservação da pose, identidade, cores e roupa, remoção da ficha e do fundo, sem aura ou novo personagem. P02 tem os dois punhos na guarda; P03 tem o soco curto do concept; P04 usa cabelo grisalho; P08 usa a ação horizontal com chicote. P05, P06 e P07 já correspondiam àquela pose e foram preservados. Por orientação do usuário, P01 mantém exatamente a arte anterior e seu enquadramento centralizado. As âncoras por personagem mantêm o rosto visível ao espelhar cada lado.
 
 ## Efeitos
 
