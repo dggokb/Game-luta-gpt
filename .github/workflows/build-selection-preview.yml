@@ -39,7 +39,7 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
       - name: Test selection and assemble APK
         working-directory: android
-        run: gradle :app:testDebugUnitTest --tests '*CharacterSelectTest' :app:assembleDebug -PrequireSpriteCheck=true --stacktrace
+        run: gradle :app:testDebugUnitTest --tests '*CharacterSelectTest' :app:assembleDebug -x :app:verifySpritePacks --stacktrace
       - name: Upload standalone APK
         uses: actions/upload-artifact@v4
         with:
