@@ -36,6 +36,7 @@ final class HudRenderer {
         String teamLabel();
         /** 0 while tagging, rising to 1 when the tag is ready. */
         float tagReadyRatio();
+        default int presentationEpoch() { return 0; }
         default boolean assistInUse() { return false; }
         String tagCooldownLabel();
         String tagButtonLabel();

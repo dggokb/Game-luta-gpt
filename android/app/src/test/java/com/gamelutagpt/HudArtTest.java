@@ -21,7 +21,12 @@ public class HudArtTest {
     }
     private Bitmap hud(GameView game) throws Exception {
         Bitmap bitmap=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
-        draw(game,"drawHud",new Canvas(bitmap));return bitmap;
+        // Static meter assertions compare the same presentation time, so fading overlays
+        // do not turn a model independence check into a wall-clock race.
+        ((HudRenderer)field(game,"hud")).drawHudAt(new Canvas(bitmap),
+            (HudRenderer.State)field(game,"hudState"),
+            (CharacterSelectRenderer)field(game,"characterSelectRenderer"),10.0);
+        return bitmap;
     }
     @Test public void upperMeterTracksAssistCooldownIndependentlyFromSuper() throws Exception {
         GameView game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);

@@ -558,6 +558,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return 1f;
         }
+        @Override public int presentationEpoch() { return demo.demo() * 100 + demo.stepIndex(); }
         @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }

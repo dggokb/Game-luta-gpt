@@ -42,6 +42,7 @@ final class HudEffects {
     final Meter point = new Meter(), reserve = new Meter(), cpu = new Meter();
     double now, readyAt = -100, useAt = -100;
     float assistRatio;
+    int epoch;
     boolean initialized, assistUsing, assistEnabled, recharging;
     void reset() { initialized = false; }
     void update(HudRenderer.State s, double seconds) {
@@ -50,7 +51,7 @@ final class HudEffects {
         float ratio = enabled ? Arena.clamp(s.tagReadyRatio(), 0, 1) : 0;
         boolean using = enabled && s.assistInUse();
         // A roster change establishes a new baseline, including meters, without events.
-        if (!initialized || point.fighter != s.active() || reserve.fighter != s.reserve() || cpu.fighter != s.opponent()) {
+        if (!initialized || epoch != s.presentationEpoch() || point.fighter != s.active() || reserve.fighter != s.reserve() || cpu.fighter != s.opponent()) {
             point.seed(s.active()); cpu.seed(s.opponent());
             if (s.reserve() != null) reserve.seed(s.reserve()); else reserve.fighter = null;
             readyAt = useAt = -100; initialized = true;
@@ -60,6 +61,7 @@ final class HudEffects {
             if (enabled && assistEnabled && ratio >= 1 && assistRatio < 1 && !using) readyAt = now;
             if (using && !assistUsing) useAt = now;
         }
+        epoch = s.presentationEpoch();
         recharging = enabled && !using && ratio > 0 && ratio < 1;
         assistEnabled = enabled; assistUsing = using; assistRatio = ratio;
     }
