@@ -23,16 +23,9 @@ jobs:
           gradle-version: '8.7'
       - run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
-      - name: Build only the touch test harness
+      - name: Build the unchanged validated app and touch harness together
         working-directory: android
-        run: gradle :app:assembleDebugAndroidTest -x :app:verifySpritePacks
-      - name: Download the exact already tested v0.102 APK
-        uses: actions/download-artifact@v4
-        with:
-          name: HUD-effects-delivery
-          run-id: 38270974931
-          github-token: ${{ github.token }}
-          path: installed-hud
+        run: gradle :app:assembleDebug :app:assembleDebugAndroidTest -x :app:verifySpritePacks
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -47,7 +40,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 4096
           script: |
-            adb install -r installed-hud/android/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
             adb shell settings put secure immersive_mode_confirmations confirmed
             adb shell wm size 1280x720
@@ -64,6 +57,7 @@ jobs:
         with:
           name: HUD-visible-runtime-proof
           path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
             hud-runtime.mp4
             hud-runtime-result.txt
             hud-runtime-captures/
