@@ -54,6 +54,9 @@ public class HudEffectsTest {
         // Actual point swap establishes a fresh baseline even at different life/meter.
         game.engine.team(0).point=1; state.active().life=10; e.update(state,7);
         assertEquals(-100,e.point.hitAt,0); assertEquals(-100,e.point.spendAt,0);
+        assertEquals("Real swap emits the tag wave once",7,e.tagAt,0);
+        e.update(state,7.1);assertEquals(7,e.tagAt,0);
+        e.reset();e.update(state,7.2);assertEquals("Restoring must not emit tag wave",-100,e.tagAt,0);
         HudRenderer.State disabled=(HudRenderer.State)Proxy.newProxyInstance(
             getClass().getClassLoader(),new Class[]{HudRenderer.State.class},
             (proxy,method,args)->method.getName().equals("reserve")?null:method.invoke(state,args));
@@ -98,7 +101,7 @@ public class HudEffectsTest {
             hud.drawHudAt(c,state,portraits,t);hud.drawControls(c,state);
             Paint label=new Paint(Paint.ANTI_ALIAS_FLAG);label.setColor(Color.WHITE);label.setTextSize(18);
             c.drawText("PREVIA TECNICA • Canvas real da HUD / estados controlados",320,235,label);
-            String event=i<20?"Repouso":i<55?"Impactos consecutivos":i<70?"Recuperacao":i<120?"Critico / ASSIST recarregando / niveis SUPER":i<155?"ASSIST pronto / SUPER maximo":i<180?"Descarga de SUPER":i<205?"Restauracao sem falso impacto":i<222?"Troca de titular sem falso impacto":"Retorno da selecao sem falso impacto";
+            String event=i<20?"Repouso":i<55?"Impactos consecutivos":i<70?"Recuperacao":i<120?"Critico / ASSIST recarregando / niveis SUPER":i<155?"ASSIST pronto / SUPER maximo":i<180?"Descarga de SUPER":i<205?"Restauracao sem falso impacto":i<222?"TROCA: onda azul e brilho no novo titular":"Retorno da selecao sem falso impacto";
             c.drawText(event,380,261,label);
             try(FileOutputStream out=new FileOutputStream(new File(dir,String.format("%04d.png",i)))) {bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}
         }

@@ -20,3 +20,7 @@ HudEffectsTest: cauda contínua, dano zero, recuperação, níveis/gasto, mudan�
 HudArtTest: portraits concepts, atlas original e independência dos medidores.
 Demais testes: sistemas extraídos, seleção, restauração de vida, ultra-core e stage-core.
 Prévia técnica: 240 quadros a 30 fps desenhados por HudRenderer.drawHudAt em Canvas nativo Robolectric, com GameView e assets reais, estados controlados. Não é gravação de uma partida. Vídeo deve ser revisado antes da entrega; compilação isolada não valida aparência.
+
+## Onda na troca (atualização)
+
+Uma troca real entre os mesmos dois membros emite uma onda azul de 650 ms pelos cinco segmentos, da extremidade interna em direção ao retrato do novo titular. O brilho na borda do retrato começa em 55% do tempo. Evento detectado pela inversão das identidades de titular/reserva, com adversário e época de apresentação iguais. Troca de roster, seleção, restauração e primeiro desenho não disparam. Faixa de vida não sofre falso impacto. Paint e Path reutilizados; preenchimento ASSIST e medidor SUPER permanecem reais.

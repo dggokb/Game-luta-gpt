@@ -40,7 +40,8 @@ final class HudEffects {
         }
     }
     final Meter point = new Meter(), reserve = new Meter(), cpu = new Meter();
-    double now, readyAt = -100, useAt = -100;
+    static final float TAG_WAVE = .65f;
+    double now, readyAt = -100, useAt = -100, tagAt = -100;
     float assistRatio;
     int epoch;
     boolean initialized, assistUsing, assistEnabled, recharging;
@@ -50,11 +51,16 @@ final class HudEffects {
         boolean enabled = s.reserve() != null;
         float ratio = enabled ? Arena.clamp(s.tagReadyRatio(), 0, 1) : 0;
         boolean using = enabled && s.assistInUse();
+        // Only a swap of the same two members is a tag. Roster/selection/reset
+        // establish a baseline and must not emit this event or damage flashes.
+        boolean swapped = initialized && epoch == s.presentationEpoch()
+            && point.fighter == s.reserve() && reserve.fighter == s.active()
+            && point.fighter != reserve.fighter && cpu.fighter == s.opponent();
         // A roster change establishes a new baseline, including meters, without events.
         if (!initialized || epoch != s.presentationEpoch() || point.fighter != s.active() || reserve.fighter != s.reserve() || cpu.fighter != s.opponent()) {
             point.seed(s.active()); cpu.seed(s.opponent());
             if (s.reserve() != null) reserve.seed(s.reserve()); else reserve.fighter = null;
-            readyAt = useAt = -100; initialized = true;
+            readyAt = useAt = -100; tagAt = swapped ? now : -100; initialized = true;
         } else {
             point.update(s.active(), now); cpu.update(s.opponent(), now);
             if (s.reserve() != null) reserve.update(s.reserve(), now);

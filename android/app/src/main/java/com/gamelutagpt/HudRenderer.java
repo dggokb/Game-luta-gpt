@@ -460,6 +460,7 @@ final class HudRenderer {
                 hit > 0 ? 0xFFFFE5A0 : critical > 0 ? RED : side == 0 ? BLUE : RED,
                 .10f + hit * .8f + critical);
             if (side == 0 && effects.assistEnabled) {
+                drawTagWave(c, art);
                 float ready = effects.fade(effects.readyAt, HudEffects.READY_FLASH);
                 float use = effects.fade(effects.useAt, HudEffects.SPEND_FLASH);
                 float x = art ? 174 : 181, y = art ? 96 : 98, w = art ? 330 : 319, h = art ? 11 : 12;
@@ -483,6 +484,39 @@ final class HudRenderer {
                 }
             }
             c.restore();
+        }
+    }
+
+    /** A single wave travels inward to the new point portrait, without changing fill. */
+    private void drawTagWave(Canvas c, boolean art) {
+        float remaining = effects.fade(effects.tagAt, HudEffects.TAG_WAVE);
+        if (remaining <= 0) return;
+        float progress = 1 - remaining;
+        float x = art ? 174 : 181, y = art ? 96 : 98;
+        float w = art ? 330 : 319, h = art ? 11 : 12;
+        float front = x + w * (1 - Math.min(1, progress / .72f));
+        float sw = (w - 20) / 5;
+        for (int i = 0; i < 5; i++) {
+            float left = x + i * (sw + 5);
+            c.save(); c.clipRect(left + 3, y + 1, left + sw - 3, y + h - 1);
+            fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(150 * remaining));
+            c.drawRect(front - 12, y, front + 48, y + h, fxPaint);
+            fxPaint.setColor(0xFFE4FFFF); fxPaint.setAlpha(Math.round(235 * remaining));
+            c.drawRect(front - 2, y, front + 7, y + h, fxPaint);
+            c.restore();
+        }
+        fxPaint.setAlpha(255);
+        if (progress >= .55f) {
+            float glow = Math.min(1, (progress - .55f) / .16f) * remaining * 2.5f;
+            fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(3);
+            fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(255 * Math.min(1, glow)));
+            // Trace only the existing portrait frame; never bleach the face itself.
+            float px = art ? 43 : 8, py = art ? 24 : 1;
+            float pw = art ? 119 : 98, ph = art ? 86 : 103;
+            shape.reset();shape.moveTo(px+12,py);shape.lineTo(px+pw-12,py);
+            shape.lineTo(px+pw,py+ph);shape.lineTo(px,py+ph);shape.close();
+            c.drawPath(shape,fxPaint);
+            fxPaint.setAlpha(255);fxPaint.setStyle(Paint.Style.FILL);
         }
     }
 
