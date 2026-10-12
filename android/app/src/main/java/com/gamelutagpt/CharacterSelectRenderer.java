@@ -18,12 +18,16 @@ import java.util.Map;
 final class CharacterSelectRenderer {
     private static final int BLUE=0xFF158AFF, RED=0xFFFF263E, WHITE=0xFFFAFAFF;
     private final Context context;
+    private final HudConceptPortraits hudConcepts;
     private final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final Paint bitmapPaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final Path path=new Path();
     private final Map<String,Bitmap> art=new HashMap<>();
     private final Map<String,Bitmap> scenery=new HashMap<>();
-    CharacterSelectRenderer(Context context) {this.context=context;}
+    CharacterSelectRenderer(Context context) {this.context=context;hudConcepts=new HudConceptPortraits(context);}
+
+    /** HUD close-ups stay independent from the selection artwork. */
+    Bitmap hudPortrait(CharacterDefinition character) {return hudConcepts.get(character.id);}
 
     void draw(Canvas c,Paint unused,CharacterSelect s) {
         c.save();
