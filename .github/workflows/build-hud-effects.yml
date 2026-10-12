@@ -2,6 +2,7 @@ name: HUD animated effects validation
 on:
   push:
     branches: ['ui/hud-efeitos-barras-20261012']
+    paths-ignore: ['.github/workflows/verify-hud-runtime.yml']
 permissions:
   contents: read
 jobs:
@@ -64,6 +65,7 @@ jobs:
           script: |
             adb install -r android/app/build/outputs/apk/debug/app-debug.apk
             adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell settings put secure immersive_mode_confirmations confirmed
             adb shell wm size 1280x720
             adb shell screenrecord --time-limit 45 --bit-rate 3000000 /sdcard/hud-runtime.mp4 &
             adb shell am instrument -w -e class com.gamelutagpt.HudRuntimeTest com.gamelutagpt.test/androidx.test.runner.AndroidJUnitRunner > hud-runtime-result.txt
