@@ -2,7 +2,7 @@
   "id": "p02_dash",
   "characterProfile": "p02",
   "source": "art/sprites/source/p02_dash_sr_hd.png",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "Recovered native complete running cycle from original video; all frames chronological.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -12,91 +12,157 @@
     "rootX": 286,
     "rootY": 476,
     "columns": 6,
-    "frameCount": 6
+    "frameCount": 12
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        104,
-        57,
-        473,
-        478
+        126,
+        107,
+        449,
+        477
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 68981
+      "minimumMargin": 35,
+      "opaquePixels": 52843
     },
     {
       "index": 1,
       "outputBbox": [
-        92,
-        63,
-        457,
-        478
+        126,
+        109,
+        444,
+        477
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 60092
+      "minimumMargin": 35,
+      "opaquePixels": 44645
     },
     {
       "index": 2,
       "outputBbox": [
-        18,
-        67,
-        486,
-        478
+        116,
+        113,
+        436,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 73275
+      "minimumMargin": 35,
+      "opaquePixels": 46085
     },
     {
       "index": 3,
       "outputBbox": [
-        51,
-        59,
-        523,
-        478
+        62,
+        117,
+        454,
+        477
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 72580
+      "minimumMargin": 35,
+      "opaquePixels": 54283
     },
     {
       "index": 4,
       "outputBbox": [
-        88,
-        67,
-        449,
-        478
+        52,
+        117,
+        462,
+        477
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 62054
+      "minimumMargin": 35,
+      "opaquePixels": 55990
     },
     {
       "index": 5,
       "outputBbox": [
-        17,
-        81,
-        478,
-        479
+        72,
+        113,
+        501,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 75557
+      "minimumMargin": 35,
+      "opaquePixels": 55437
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        80,
+        109,
+        494,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 55637
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        141,
+        109,
+        464,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 50196
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        112,
+        117,
+        428,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 47526
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        53,
+        118,
+        445,
+        476
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 56290
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        50,
+        128,
+        455,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 57851
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        54,
+        111,
+        490,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 58645
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 531,
-    "frameHeight": 448,
-    "rootX": 282,
-    "rootY": 432,
+    "frameWidth": 467,
+    "frameHeight": 386,
+    "rootX": 244,
+    "rootY": 377,
     "columns": 6,
-    "frameCount": 6,
+    "frameCount": 12,
     "cropOffset": [
-      4,
-      44
+      42,
+      99
     ],
     "decodedBytes": {
-      "canonical": 7077888,
-      "packed": 5709312
+      "canonical": 14155776,
+      "packed": 8652576
     },
     "pixelScale": 2.0
   },
@@ -104,8 +170,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "71d4f01db3a12eb9707d284154626bab8b8d34f35411d49dbbd9b2b9cf293c69",
-      "config": "a938e8d0d67bc636aec419d85afc1fb9d9eff4a30e533e8ed1ff9862f4754b75",
+      "source": "ed954ce5da3c050d7f7f7667574b6cf8efd879dc57cdb3c0a25421fe7e7488e1",
+      "config": "ac5958f00051eced2039c34df7869327a1db74955997e5a6b1d6a303c281467d",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
     },
     "referenceSources": {
