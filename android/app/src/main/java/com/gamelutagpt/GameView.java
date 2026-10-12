@@ -255,7 +255,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Compatibilidade com troca de dupla existente. */
     private void selectPair(String point, String partner) {
-        selectTeams(point, partner, opponentFighter.character.id, opponentTagId);
+        // Legacy team preset: training CPU continues mirroring the chosen point.
+        selectTeams(point, partner, point, opponentTagId);
     }
 
     /** A seleção muda a dupla P1 e o titular do adversário de treino. */
