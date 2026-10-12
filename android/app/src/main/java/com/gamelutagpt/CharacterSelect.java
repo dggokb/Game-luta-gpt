@@ -22,7 +22,7 @@ final class CharacterSelect {
     private final String[][] picks = new String[2][2];
     private final Random random = new Random();
     private boolean open, showHelp;
-    private int focusSide, focusSlot, cursorIndex;
+    private int focusSide, focusSlot, cursorIndex, confirmedSteps;
 
     CharacterSelect(String[] ids) {
         if (ids == null || ids.length < 2) throw new IllegalArgumentException("need at least two fighters");
@@ -31,7 +31,7 @@ final class CharacterSelect {
     void open(String p1, String tag1, String p2, String tag2) {
         setTeam(0, p1, tag1);
         setTeam(1, p2, tag2);
-        focusSide = focusSlot = 0;
+        focusSide = focusSlot = confirmedSteps = 0;
         cursorIndex = indexOf(picks[0][0]);
         showHelp = false;
         open = true;
@@ -55,7 +55,25 @@ final class CharacterSelect {
     void close() { open = false; }
     boolean isOpen() { return open; }
     boolean settingsOpen() { return showHelp; }
-    boolean ready() { return !picks[0][0].equals(picks[0][1]) && !picks[1][0].equals(picks[1][1]); }
+    boolean ready() { return confirmedSteps==4 && !picks[0][0].equals(picks[0][1]) && !picks[1][0].equals(picks[1][1]); }
+    int step() { return confirmedSteps; }
+    boolean chosen(int side,int slot) { return side*2+slot<confirmedSteps; }
+    String stepLabel() {
+        switch(confirmedSteps) {
+            case 0:return "1/4  ESCOLHA PLAYER 1";
+            case 1:return "2/4  ESCOLHA TAG DO PLAYER 1";
+            case 2:return "3/4  ESCOLHA PLAYER 2";
+            case 3:return "4/4  ESCOLHA TAG DO PLAYER 2";
+            default:return "EQUIPES PRONTAS — CONFIRMAR";
+        }
+    }
+    String preview(int side) {return confirmedSteps<4&&focusSide==side?ids[cursorIndex]:pick(side,0);}
+    Result back() {
+        if(showHelp) {showHelp=false;return Result.CHANGED;}
+        if(confirmedSteps==0)return Result.CANCEL;
+        confirmedSteps--;focusSide=confirmedSteps/2;focusSlot=confirmedSteps%2;
+        cursorIndex=indexOf(picks[focusSide][focusSlot]);return Result.CHANGED;
+    }
     String pick(int side, int slot) { return picks[side][slot]; }
     String point() { return pick(0,0); }
     String partner() { return pick(0,1); }
@@ -66,8 +84,8 @@ final class CharacterSelect {
     int cursorIndex() { return cursorIndex; }
     int stageCount() { return 1; }  // no imaginary, unimplemented stages
     int order(int side, String id) {
-        if (id.equals(picks[side][0])) return 1;
-        if (id.equals(picks[side][1])) return 2;
+        if (chosen(side,0)&&id.equals(picks[side][0])) return 1;
+        if (chosen(side,1)&&id.equals(picks[side][1])) return 2;
         return 0;
     }
     float cardWidth() { return (GRID_W - GRID_GAP * (COLUMNS-1)) / COLUMNS; }
@@ -102,10 +120,6 @@ final class CharacterSelect {
         }
         return -1;
     }
-    void chooseFocus(int side, int slot) {
-        focusSide = side; focusSlot = slot;
-        cursorIndex = indexOf(picks[side][slot]);
-    }
     void moveCursor(int dx, int dy) {
         int row = cursorIndex / COLUMNS, col = cursorIndex % COLUMNS;
         row = Math.max(0, Math.min(ROWS-1, row+dy));
@@ -113,19 +127,25 @@ final class CharacterSelect {
         int next = row * COLUMNS + col;
         if (next < ids.length) cursorIndex = next;
     }
-    void selectCursor() { assign(focusSide,focusSlot,ids[cursorIndex]);advanceFocus(); }
-    void swapFocusedTeam() {
+    boolean selectCursor() {return choose(ids[cursorIndex]);}
+    private boolean choose(String id) {
+        if(confirmedSteps>=4 || !contains(id))return false;
+        if(focusSlot==1&&id.equals(picks[focusSide][0]))return false;
+        assign(focusSide,focusSlot,id);advanceFocus();return true;
+    }
+    boolean swapFocusedTeam() {
+        if(!chosen(focusSide,1))return false;
         String tmp = picks[focusSide][0];
         picks[focusSide][0] = picks[focusSide][1];
         picks[focusSide][1] = tmp;
-        focusSlot = 0;
-        cursorIndex = indexOf(picks[focusSide][0]);
+        cursorIndex = indexOf(picks[focusSide][focusSlot]);
+        return true;
     }
-    void randomFocused() {
+    boolean randomFocused() {
+        if(confirmedSteps>=4)return false;
         int next = random.nextInt(ids.length);
         if (ids[next].equals(picks[focusSide][1-focusSlot])) next = (next+1)%ids.length;
-        assign(focusSide, focusSlot, ids[next]);
-        advanceFocus();
+        return choose(ids[next]);
     }
     void toggleSettings() { showHelp = !showHelp; }
     private void assign(int side,int slot,String id) {
@@ -135,29 +155,23 @@ final class CharacterSelect {
         cursorIndex = indexOf(id);
     }
     private void advanceFocus() {
-        if (focusSlot==0) focusSlot=1;
-        else if (focusSide==0) {focusSide=1;focusSlot=0;}
+        confirmedSteps++;
+        if(confirmedSteps<4) {focusSide=confirmedSteps/2;focusSlot=confirmedSteps%2;}
         cursorIndex=indexOf(picks[focusSide][focusSlot]);
     }
     Result tap(float x,float y) {
         if (!open) return Result.NONE;
         // The bottom command bar uses exactly the same visible hit zones as the artwork.
         if (y>=FIGHT_TOP && y<=FIGHT_BOTTOM) {
-            if (x>=FIGHT_LEFT && x<=FIGHT_RIGHT) return ready()?Result.CONFIRM:Result.NONE;
-            if (x>=BACK_LEFT && x<=BACK_RIGHT) return Result.CANCEL;
+            if (x>=FIGHT_LEFT && x<=FIGHT_RIGHT) return ready()?Result.CONFIRM:(selectCursor()?Result.CHANGED:Result.NONE);
+            if (x>=BACK_LEFT && x<=BACK_RIGHT) return back();
             if (x>=SETTINGS_LEFT && x<=SETTINGS_RIGHT) {toggleSettings();return Result.CHANGED;}
-            if (x>=SWAP_LEFT && x<=SWAP_RIGHT) {swapFocusedTeam();return Result.CHANGED;}
-            if (x>=RANDOM_LEFT && x<=RANDOM_RIGHT) {randomFocused();return Result.CHANGED;}
+            if (x>=SWAP_LEFT && x<=SWAP_RIGHT) {return swapFocusedTeam()?Result.CHANGED:Result.NONE;}
+            if (x>=RANDOM_LEFT && x<=RANDOM_RIGHT) {return randomFocused()?Result.CHANGED:Result.NONE;}
         }
         if (showHelp) {showHelp=false;return Result.CHANGED;}
-        for (int side=0;side<2;side++) for(int slot=0;slot<2;slot++) {
-            float l=slotLeft(side),t=slotTop(slot);
-            if (inside(x,y,l,t,l+TEAM_W,t+SLOT_H)) {chooseFocus(side,slot);return Result.CHANGED;}
-        }
         int card=cardAt(x,y);
-        if(card>=0) {assign(focusSide,focusSlot,ids[card]);advanceFocus();return Result.CHANGED;}
-        if (y<TEAM_TOP && x<300f) {chooseFocus(0,0);return Result.CHANGED;}
-        if (y<TEAM_TOP && x>980f) {chooseFocus(1,0);return Result.CHANGED;}
+        if(card>=0)return choose(ids[card])?Result.CHANGED:Result.NONE;
         return Result.NONE;
     }
     private static boolean inside(float x,float y,float l,float t,float r,float b) {

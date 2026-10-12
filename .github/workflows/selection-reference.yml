@@ -1,7 +1,7 @@
-name: Selection effects APK
+name: Sequential concept selection APK
 on:
   push:
-    branches: ['ui/selecao-efeitos-20261012']
+    branches: ['ui/selecao-sequencial-concepts-20261012']
 permissions:
   contents: write
 jobs:
@@ -22,12 +22,14 @@ jobs:
           gradle-version: '8.7'
       - run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Verify all sixteen source concepts
+        run: python3 tools/selection/verify_concepts.py
       - name: Test selection and build APK
         working-directory: android
-        run: gradle :app:testDebugUnitTest --tests '*CharacterSelectTest' :app:assembleDebug -x :app:verifySpritePacks --stacktrace
+        run: gradle :app:testDebugUnitTest --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.characterSelectPicksThePairAndPausesTheFight' :app:assembleDebug -x :app:verifySpritePacks --stacktrace
       - uses: actions/upload-artifact@v4
         with:
-          name: GameLuta-Selecao-Efeitos-APK
+          name: GameLuta-Selecao-Sequencial-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
       - name: Enable emulator acceleration
@@ -44,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Selection-effects-QA
+          name: Selection-sequential-QA
           path: |
             selection-*.png
             selection-effects.mp4
@@ -55,5 +57,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk GameLuta-Selecao-Efeitos.apk
-          gh release create "selectionfx-${GITHUB_SHA:0:12}" GameLuta-Selecao-Efeitos.apk selection-*.png selection-effects.mp4 selection-qa.json --target "$GITHUB_SHA" --title "Seleção com efeitos - ${GITHUB_SHA:0:12}" --notes "APK da branch ui/selecao-efeitos-20261012. Testes de seleção e validação no emulador passaram." --prerelease
+          cp android/app/build/outputs/apk/debug/app-debug.apk GameLuta-Selecao-Sequencial.apk
+          gh release create "selectionseq-${GITHUB_SHA:0:12}" GameLuta-Selecao-Sequencial.apk selection-*.png selection-effects.mp4 selection-qa.json --target "$GITHUB_SHA" --title "Seleção sequencial - ${GITHUB_SHA:0:12}" --notes "APK da branch ui/selecao-sequencial-concepts-20261012. Testes de seleção e validação no emulador passaram." --prerelease

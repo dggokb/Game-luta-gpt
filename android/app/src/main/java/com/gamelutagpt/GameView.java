@@ -230,7 +230,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07"};
         for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
             if(wanted.equals(available)) ids.add(available);
-        for(String available:GeneratedCharacters.SELECTABLE) if(!ids.contains(available)) ids.add(available);
+        // P09–P16 are concept-only slots until their gameplay is implemented.
         return ids.toArray(new String[0]);
     }
 
@@ -314,21 +314,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             case KeyEvent.KEYCODE_DPAD_DOWN: characterSelect.moveCursor(0,1); break;
             case KeyEvent.KEYCODE_BUTTON_A:
             case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER: characterSelect.selectCursor(); break;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if(characterSelect.ready()) confirmCharacterSelection();
+                else characterSelect.selectCursor();
+                break;
             case KeyEvent.KEYCODE_BUTTON_B:
             case KeyEvent.KEYCODE_ESCAPE:
-            case KeyEvent.KEYCODE_BACK: characterSelect.close(); break;
+            case KeyEvent.KEYCODE_BACK:
+                if(characterSelect.back()==CharacterSelect.Result.CANCEL) characterSelect.close();
+                break;
             case KeyEvent.KEYCODE_BUTTON_X: characterSelect.randomFocused(); break;
             case KeyEvent.KEYCODE_BUTTON_Y: characterSelect.toggleSettings(); break;
             case KeyEvent.KEYCODE_BUTTON_L1:
             case KeyEvent.KEYCODE_BUTTON_R1: characterSelect.swapFocusedTeam(); break;
             case KeyEvent.KEYCODE_BUTTON_START:
-                if (characterSelect.ready()) {
-                    characterSelectRenderer.beginFightTransition();
-                    characterSelect.close();
-                    selectTeams(characterSelect.point(), characterSelect.partner(),
-                        characterSelect.opponentPoint(), characterSelect.opponentPartner());
-                }
+                if(characterSelect.ready()) confirmCharacterSelection();
+                else characterSelect.selectCursor();
                 break;
             default: break;
         }
@@ -337,10 +338,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void handleCharacterSelectTap(float x, float y) {
         switch (characterSelect.tap(x, y)) {
             case CONFIRM:
-                characterSelectRenderer.beginFightTransition();
-                characterSelect.close();
-                selectTeams(characterSelect.point(), characterSelect.partner(),
-                    characterSelect.opponentPoint(), characterSelect.opponentPartner());
+                confirmCharacterSelection();
                 break;
             case CANCEL:
                 characterSelect.close();
@@ -348,6 +346,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             default:
                 break;
         }
+    }
+
+    private void confirmCharacterSelection() {
+        if(!characterSelect.ready())return;
+        characterSelectRenderer.beginFightTransition();
+        characterSelect.close();
+        selectTeams(characterSelect.point(),characterSelect.partner(),
+            characterSelect.opponentPoint(),characterSelect.opponentPartner());
     }
 
     private String teamLabel() {

@@ -607,14 +607,16 @@ public class SpriteIntegrationTest {
         assertTrue("p01 to p04 are selectable",s.ids.length>=4);
         invoke("openCharacterSelect",new Class<?>[0]);
         assertTrue(s.isOpen());
-        // Os slots são independentes e trocar o personagem selecionado não apaga a dupla.
-        assertTrue(s.ready());
+        // A new pass always asks for P1, TAG P1, P2, TAG P2 in order.
+        assertFalse(s.ready());
         float x=player().x;
         press(PadInput.Button.HEAVY,0);frames(5);
         assertFalse("The fight waits behind the select screen",player().attacking());
         assertEquals(x,player().x,0.01f);
-        tapSelectSlot(s,0,0);tapCard(s,"p04");
-        tapSelectSlot(s,0,1);tapCard(s,"p02");
+        tapCard(s,"p04");assertEquals(1,s.step());
+        tapCard(s,"p02");assertEquals(2,s.step());
+        tapCard(s,"p03");assertEquals(3,s.step());
+        tapCard(s,"p06");assertTrue(s.ready());
         assertEquals(1,s.order(0,"p04"));
         assertEquals(2,s.order(0,"p02"));
         assertEquals(0,s.order(0,"p03"));
@@ -626,6 +628,8 @@ public class SpriteIntegrationTest {
         assertEquals("p04",team[0].character.id);
         assertEquals("p02",team[1].character.id);
         assertEquals("p04",rendererCharacterId());
+        assertEquals("p03",npc().character().id);
+        assertEquals("p06",get("opponentTagId"));
         frames(1);
         assertEquals("INTRO",motion().clip);
     }
