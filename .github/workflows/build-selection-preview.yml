@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   selection-preview:
@@ -70,3 +70,32 @@ jobs:
           name: GameLuta-Selecao-TAG-Screenshot
           path: selection-smoke.png
           if-no-files-found: ignore
+
+      - name: Publish validated APK as direct GitHub release asset
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="tag-select-${GITHUB_SHA:0:12}"
+          gh release create "$TAG" \
+            android/app/build/outputs/apk/debug/app-debug.apk#GameLuta-Selecao-TAG.apk \
+            --target "$GITHUB_SHA" \
+            --title "Seleção TAG - teste ${GITHUB_SHA:0:12}" \
+            --notes "APK de teste da tela de seleção TAG. Branch game-luta-sprite-gpt. Compilação e smoke test passaram." \
+            --prerelease
+      - name: Export small visual QA preview to build log
+        if: always()
+        run: |
+          if test -s selection-smoke.png; then
+            python3 - <<'PY'
+          from PIL import Image
+          import base64
+          image = Image.open("selection-smoke.png").convert("RGB")
+          image.thumbnail((960,540))
+          image.save("/tmp/selection-preview.jpg", "JPEG", quality=64)
+          encoded = base64.b64encode(open("/tmp/selection-preview.jpg","rb").read()).decode()
+          print("BEGIN_SELECTION_PREVIEW_JPEG")
+          print(encoded)
+          print("END_SELECTION_PREVIEW_JPEG")
+          PY
+          fi
