@@ -82,7 +82,7 @@ public class HudEffectsTest {
         Method player=GameView.class.getDeclaredMethod("drawPlayer",Canvas.class);player.setAccessible(true);
         Bitmap bitmap=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);
         File dir=new File("build/hud-effects-frames");dir.mkdirs();
-        for(int i=0;i<240;i++) {
+        for(int i=0;i<300;i++) {
             double t=i/30.0;
             if(i==20||i==26||i==34) {p.life-=p.profile.maxLife/8;p.recoverableLife+=p.profile.maxLife/16;}
             if(i==55) p.life+=p.profile.maxLife/6;
@@ -96,12 +96,15 @@ public class HudEffectsTest {
             if(i==155) p.superMeter=CombatConfig.METER_PER_BAR;
             if(i==180) {hud.resetEffects();p.restoreLife();cpu.restoreLife();}
             if(i==205) game.engine.team(0).point=1;
-            if(i==222) {hud.resetEffects();game.engine.team(0).point=0;}
+            if(i>=205&&i<255)game.engine.team(0).tagCooldown=600-(i-205)*2;
+            if(i==255) {hud.resetEffects();game.engine.team(0).point=0;game.engine.team(0).tagCooldown=0;}
+            Method labels=GameView.class.getDeclaredMethod("updateTagCooldownLabels",TeamSystem.Side.class);
+            labels.setAccessible(true);labels.invoke(game,game.engine.team(0));
             c.drawColor(Color.BLACK);scenario.invoke(game,c);player.invoke(game,c);
             hud.drawHudAt(c,state,portraits,t);hud.drawControls(c,state);
             Paint label=new Paint(Paint.ANTI_ALIAS_FLAG);label.setColor(Color.WHITE);label.setTextSize(18);
             c.drawText("PREVIA TECNICA • Canvas real da HUD / estados controlados",320,235,label);
-            String event=i<20?"Repouso":i<55?"Impactos consecutivos":i<70?"Recuperacao":i<120?"Critico / ASSIST recarregando / niveis SUPER":i<155?"ASSIST pronto / SUPER maximo":i<180?"Descarga de SUPER":i<205?"Restauracao sem falso impacto":i<222?"TROCA: onda azul e brilho no novo titular":"Retorno da selecao sem falso impacto";
+            String event=i<20?"Repouso":i<55?"Impactos consecutivos":i<70?"Recuperacao":i<120?"Critico / ASSIST recarregando / niveis SUPER":i<155?"ASSIST pronto / SUPER maximo":i<180?"Descarga de SUPER":i<205?"Restauracao sem falso impacto":i<255?"TROCA: onda azul e brilho no novo titular":"Retorno da selecao sem falso impacto";
             c.drawText(event,380,261,label);
             try(FileOutputStream out=new FileOutputStream(new File(dir,String.format("%04d.png",i)))) {bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}
         }

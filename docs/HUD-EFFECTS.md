@@ -24,3 +24,13 @@ Prévia técnica: 240 quadros a 30 fps desenhados por HudRenderer.drawHudAt em C
 ## Onda na troca (atualização)
 
 Uma troca real entre os mesmos dois membros emite uma onda azul de 650 ms pelos cinco segmentos, da extremidade interna em direção ao retrato do novo titular. O brilho na borda do retrato começa em 55% do tempo. Evento detectado pela inversão das identidades de titular/reserva, com adversário e época de apresentação iguais. Troca de roster, seleção, restauração e primeiro desenho não disparam. Faixa de vida não sofre falso impacto. Paint e Path reutilizados; preenchimento ASSIST e medidor SUPER permanecem reais.
+
+## Correção de leitura e visibilidade — v0.102
+
+A HUD agora desenha explicitamente os rótulos reais de ASSIST e TROCA. ASSIST mostra entrada/em campo, segundos com uma casa decimal durante recarga e PRONTO; TROCA mostra andamento, cooldown real de raw TAG (até 10 s neste motor) e PRONTA (↓+TAG). São contadores separados: raw TAG em cooldown não esvazia ASSIST pronto. Strings armazenadas pelo GameView, sem formatação por frame.
+
+SUPER: cinco células reais, cada uma representando METER_PER_BAR, total MAX_METER. Removidas as quatro divisões internas antigas por composição Canvas; moldura externa e retratos preservados. Pulsos e descargas recortados em cada célula, sem pintar os intervalos entre elas. Teste nativo verifica uma célula cheia com um nível e cinco com máximo, inclusive no CPU espelhado.
+
+Troca: onda ampliada para 1,1 s, núcleo branco de 17 px e cauda azul de 98 px, borda do retrato de 5 px. ASSIST pronto: flash único de 900 ms nos cinco segmentos e indicador iluminado persistentemente enquanto a disponibilidade real permanece cheia.
+
+HudRuntimeTest roda o APK instalado no Android, deixa a seleção pelo toque, usa ASSIST, aguarda o cooldown real, usa ↓+TAG com multitouch, verifica titular trocado, evento observado pelo renderer e contador de raw TAG. Não escreve vida, meter ou cooldowns. A gravação de tela do emulador complementa a prévia técnica nativa; ambas devem ser revisadas antes da entrega.

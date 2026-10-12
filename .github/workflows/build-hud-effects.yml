@@ -23,7 +23,7 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
       - name: Native Canvas effects tests and APK
         working-directory: android
-        run: gradle :app:testDebugUnitTest --tests '*HudEffectsTest' --tests '*HudArtTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :app:assembleDebug -x :app:verifySpritePacks --stacktrace
+        run: gradle :app:testDebugUnitTest --tests '*HudEffectsTest' --tests '*HudArtTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :app:assembleDebug :app:assembleDebugAndroidTest -x :app:verifySpritePacks --stacktrace
       - name: Preserve native Canvas frames before encoding
         uses: actions/upload-artifact@v4
         with:
@@ -47,3 +47,30 @@ jobs:
             android/app/build/hud-effects-frames/0060.png
             android/app/build/hud-effects-frames/0130.png
             android/app/build/reports/tests/
+
+      - name: Record actual app with assist and raw tag touch input
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell wm size 1280x720
+            adb shell screenrecord --time-limit 45 --bit-rate 3000000 /sdcard/hud-runtime.mp4 &
+            adb shell am instrument -w -e class com.gamelutagpt.HudRuntimeTest com.gamelutagpt.test/androidx.test.runner.AndroidJUnitRunner > hud-runtime-result.txt
+            adb shell pkill -2 screenrecord || true
+            adb pull /sdcard/hud-runtime.mp4 hud-runtime.mp4
+            adb pull /sdcard/Android/data/com.gamelutagpt/files/ hud-runtime-captures
+            cat hud-runtime-result.txt
+            grep -q 'OK (1 test)' hud-runtime-result.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUD-real-runtime-proof
+          path: |
+            hud-runtime.mp4
+            hud-runtime-result.txt
+            hud-runtime-captures/

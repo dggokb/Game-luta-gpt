@@ -39,6 +39,8 @@ final class HudRenderer {
         default int presentationEpoch() { return 0; }
         default boolean assistInUse() { return false; }
         String tagCooldownLabel();
+        default String assistStatusLabel() { return tagCooldownLabel(); }
+        default String swapStatusLabel() { return ""; }
         String tagButtonLabel();
         /** Text of the TAG button while it can be used: ASSIST, or TROCA during Assist → Tag. */
         String tagButtonTitle();
@@ -139,6 +141,10 @@ final class HudRenderer {
             text(c, "TAG OFF", 1058f, 132f, 13f, 0xFFBCC4D8);
         }
         drawFrameEffects(c);
+        // Cached strings computed from independent real assist and raw-tag cooldowns.
+        panel(c, 187, 140, 355, 43, 9, 0xE8081427, BLUE, 1.5f);
+        text(c, s.assistStatusLabel(), 364, 157, 16, effects.assistRatio >= 1 ? 0xFF9BEEFF : Color.WHITE);
+        text(c, s.swapStatusLabel(), 364, 175, 14, Color.WHITE);
         // Training has no round clock: never display a fabricated countdown.
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
         text(c, "∞", 640f, 70f, 58f, Color.WHITE);
@@ -199,18 +205,37 @@ final class HudRenderer {
             artwork(c, 922, 735, 1672, 941, 0f, 625f, 400f, 95f);
             c.restore();
         } else artwork(c, 0, 735, 750, 941, 0f, 625f, 400f, 95f);
-        float bars = Arena.clamp(fighter.superMeter / (float)CombatConfig.MAX_METER, 0f, 1f) * 4f;
-        for (int i = 0; i < 4; i++) {
-            float x = 94f + i * 57f;
-            panel(c, x, 679f, 51f, 15f, 8f, 0xFF070E20, right ? RED : BLUE, 1.5f);
+        // Replace only the obsolete four inner cells. The outer energy frame stays.
+        panel(c, 86, 675, 240, 23, 7, 0xFF070E20, right ? RED : BLUE, 2);
+        int count = CombatConfig.MAX_METER / CombatConfig.METER_PER_BAR;
+        float step = 225f / count, width = step - 5;
+        HudEffects.Meter fx = right ? effects.cpu : effects.point;
+        float bars = fighter.superBars();
+        for (int i = 0; i < count; i++) {
+            float x = 94 + i * step;
+            panel(c, x, 679, width, 15, 5, 0xFF070E20, right ? RED : BLUE, 1.5f);
             c.save(); c.clipPath(shape);
+            float fill = Arena.clamp(bars - i, 0, 1);
             paint.setColor(right ? RED : BLUE);
-            c.drawRect(x, 679f, x + 51f * Arena.clamp(bars - i, 0f, 1f), 694f, paint);
-            paint.setColor(0xDDFFFFFF);
-            c.drawRect(x, 680f, x + 51f * Arena.clamp(bars - i, 0f, 1f), 683f, paint);
-            c.restore();
+            c.drawRect(x, 679, x + width * fill, 694, paint);
+            paint.setColor(0xBBFFFFFF);
+            c.drawRect(x, 680, x + width * fill, 683, paint);
+            float gain = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
+            float spend = effects.fade(fx.spendAt, HudEffects.SPEND_FLASH);
+            if (i >= fx.gainFrom && i < fx.gainTo && gain > 0) {
+                fxPaint.setColor(Color.WHITE); fxPaint.setAlpha(Math.round(190 * gain));
+                c.drawRect(x, 679, x + width, 694, fxPaint);
+            }
+            if (spend > 0) {
+                float lo = Arena.clamp(fx.spentFrom / (float)CombatConfig.METER_PER_BAR - i, 0, 1);
+                float hi = Arena.clamp(fx.spentTo / (float)CombatConfig.METER_PER_BAR - i, 0, 1);
+                fxPaint.setColor(0xFFFFD698); fxPaint.setAlpha(Math.round(210 * spend));
+                c.drawRect(x + width * lo, 679, x + width * hi, 694, fxPaint);
+            }
+            fxPaint.setAlpha(255); c.restore();
         }
-        drawSuperEffects(c, right ? effects.cpu : effects.point, right, 94f, 679f, 222f, 15f);
+        if (fighter.superMeter >= CombatConfig.MAX_METER)
+            energyEdge(c, 87, 676, 238, 21, right ? RED : BLUE, 1);
         c.restore();
         int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
         text(c, LEVELS[level], right ? Arena.VW - 51f : 51f, 698f, 38f, Color.WHITE);
@@ -464,6 +489,16 @@ final class HudRenderer {
                 float ready = effects.fade(effects.readyAt, HudEffects.READY_FLASH);
                 float use = effects.fade(effects.useAt, HudEffects.SPEND_FLASH);
                 float x = art ? 174 : 181, y = art ? 96 : 98, w = art ? 330 : 319, h = art ? 11 : 12;
+                if (ready > 0) {
+                    drawAssistFlash(c, x, y, w, h, ready);
+                }
+                // Persistent, readable availability even after the one-shot flash ends.
+                if (effects.assistRatio >= 1 && !effects.assistUsing) {
+                    fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(3);
+                    fxPaint.setColor(0xFF84ECFF); fxPaint.setAlpha(200);
+                    c.drawCircle(art ? 554 : 551, art ? 115 : 109, 11, fxPaint);
+                    fxPaint.setAlpha(255); fxPaint.setStyle(Paint.Style.FILL);
+                }
                 if (ready > 0 || use > 0) {
                     energyEdge(c, x, y, w, h, use > 0 ? 0xFFFFFFFF : BLUE, Math.max(ready, use));
                     fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(2);
@@ -487,6 +522,16 @@ final class HudRenderer {
         }
     }
 
+    private void drawAssistFlash(Canvas c, float x, float y, float w, float h, float fade) {
+        float sw = (w - 20) / 5;
+        fxPaint.setColor(0xFFB9F8FF); fxPaint.setAlpha(Math.round(190 * fade));
+        for (int i = 0; i < 5; i++) {
+            float left = x + i * (sw + 5);
+            c.drawRect(left + 5, y + 2, left + sw - 5, y + h - 2, fxPaint);
+        }
+        fxPaint.setAlpha(255);
+    }
+
     /** A single wave travels inward to the new point portrait, without changing fill. */
     private void drawTagWave(Canvas c, boolean art) {
         float remaining = effects.fade(effects.tagAt, HudEffects.TAG_WAVE);
@@ -499,17 +544,17 @@ final class HudRenderer {
         for (int i = 0; i < 5; i++) {
             float left = x + i * (sw + 5);
             c.save(); c.clipRect(left + 3, y + 1, left + sw - 3, y + h - 1);
-            fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(150 * remaining));
-            c.drawRect(front - 12, y, front + 48, y + h, fxPaint);
+            fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(220 * remaining));
+            c.drawRect(front - 18, y, front + 80, y + h, fxPaint);
             fxPaint.setColor(0xFFE4FFFF); fxPaint.setAlpha(Math.round(235 * remaining));
-            c.drawRect(front - 2, y, front + 7, y + h, fxPaint);
+            c.drawRect(front - 3, y, front + 14, y + h, fxPaint);
             c.restore();
         }
         fxPaint.setAlpha(255);
         if (progress >= .55f) {
             float glow = Math.min(1, (progress - .55f) / .16f) * remaining * 2.5f;
-            fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(3);
-            fxPaint.setColor(BLUE); fxPaint.setAlpha(Math.round(255 * Math.min(1, glow)));
+            fxPaint.setStyle(Paint.Style.STROKE); fxPaint.setStrokeWidth(5);
+            fxPaint.setColor(0xFF8AF3FF); fxPaint.setAlpha(Math.round(255 * Math.min(1, glow)));
             // Trace only the existing portrait frame; never bleach the face itself.
             float px = art ? 43 : 8, py = art ? 24 : 1;
             float pw = art ? 119 : 98, ph = art ? 86 : 103;

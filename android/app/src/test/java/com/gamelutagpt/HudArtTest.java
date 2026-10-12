@@ -21,6 +21,7 @@ public class HudArtTest {
     }
     private Bitmap hud(GameView game) throws Exception {
         Bitmap bitmap=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
+        ((HudRenderer)field(game,"hud")).resetEffects();
         // Static meter assertions compare the same presentation time, so fading overlays
         // do not turn a model independence check into a wall-clock race.
         ((HudRenderer)field(game,"hud")).drawHudAt(new Canvas(bitmap),
@@ -48,6 +49,26 @@ public class HudArtTest {
         assertEquals("Upper meter refills when assist becomes ready",charged,restored.getPixel(350,103));
         ready.recycle();superCharged.recycle();cooling.recycle();restored.recycle();
     }
+    @Test public void superHasFiveRealLevelCellsOnBothSides() throws Exception {
+        GameView game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
+        FighterState active=((FighterState[])field(game,"team"))[0];
+        FighterState cpu=(FighterState)field(game,"opponentFighter");
+        active.superMeter=CombatConfig.METER_PER_BAR;
+        cpu.superMeter=CombatConfig.MAX_METER;
+        Bitmap one=hud(game);
+        for(int i=0;i<5;i++) {
+            int x=114+i*45;
+            int left=one.getPixel(x,687);
+            assertEquals("One real bar fills only the first cell",i==0,Color.blue(left)>Color.red(left)+40);
+            int right=one.getPixel(1280-x,687);
+            assertTrue("CPU max fills all five mirrored cells",Color.red(right)>Color.blue(right)+40);
+        }
+        active.superMeter=CombatConfig.MAX_METER;
+        Bitmap max=hud(game);
+        for(int i=0;i<5;i++)assertTrue(Color.blue(max.getPixel(114+i*45,687))>180);
+        one.recycle();max.recycle();
+    }
+
     @Test public void everySelectableHudFaceComesFromDriveConcepts() throws Exception {
         HudConceptPortraits concepts=new HudConceptPortraits(RuntimeEnvironment.getApplication());
         for(String id:GeneratedCharacters.SELECTABLE) {

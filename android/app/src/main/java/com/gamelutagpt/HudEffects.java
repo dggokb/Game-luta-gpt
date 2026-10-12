@@ -3,7 +3,7 @@ package com.gamelutagpt;
 /** Presentation only. Absolute monotonic seconds, no combat writes or frame-count timers. */
 final class HudEffects {
     static final float HIT_FLASH = .16f, HIT_HOLD = .18f, HIT_FOLLOW = .55f;
-    static final float HEAL_FLASH = .38f, READY_FLASH = .48f, SPEND_FLASH = .30f, LEVEL_FLASH = .42f;
+    static final float HEAL_FLASH = .38f, READY_FLASH = .9f, SPEND_FLASH = .30f, LEVEL_FLASH = .42f;
     static final class Meter {
         FighterState fighter;
         float life, trail, healFrom, healTo;
@@ -40,7 +40,7 @@ final class HudEffects {
         }
     }
     final Meter point = new Meter(), reserve = new Meter(), cpu = new Meter();
-    static final float TAG_WAVE = .65f;
+    static final float TAG_WAVE = 1.1f;
     double now, readyAt = -100, useAt = -100, tagAt = -100;
     float assistRatio;
     int epoch;

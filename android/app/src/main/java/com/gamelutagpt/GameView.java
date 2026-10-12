@@ -148,6 +148,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     // Team HUD labels (the rules live in the engine's TeamSystem).
     private String tagCooldownHudLabel = "ASSIST: PRONTO";
+    private String assistHudStatus = "ASSIST: PRONTO";
+    private String swapHudStatus = "TROCA: PRONTA (↓+TAG)";
     private String tagCooldownButtonLabel = "";
     private int shownAssistTenths = -2;
     private int shownTagSeconds = -2;
@@ -560,6 +562,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         @Override public int presentationEpoch() { return demo.demo() * 100 + demo.stepIndex(); }
         @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
+        @Override public String assistStatusLabel() { return assistHudStatus; }
+        @Override public String swapStatusLabel() { return swapHudStatus; }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
@@ -925,6 +929,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int tagSeconds = (int)Math.ceil(team.tagCooldown / (float)CombatConfig.FPS);
         if (isTagAnimationActive()) {
             tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
+            assistHudStatus = "ASSIST: INDISPONIVEL";
+            swapHudStatus = "TROCA: EM ANDAMENTO";
             tagCooldownButtonLabel = "...";
             shownAssistTenths = shownTagSeconds = -2;
             return;
@@ -936,6 +942,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             : assistTenths == 0 ? "ASSIST: PRONTO"
             : String.format(Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
         String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
+        assistHudStatus = assist;
+        swapHudStatus = tagSeconds == 0 ? "TROCA: PRONTA (↓+TAG)" : "TROCA: " + tagSeconds + "s";
         tagCooldownHudLabel = assist + tag;
         tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
     }
