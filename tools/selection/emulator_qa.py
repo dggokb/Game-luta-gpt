@@ -30,8 +30,14 @@ def differs(a,b,region=None):
     if region:
         q=tuple(round(v*(w/1280 if i%2==0 else h/720)) for i,v in enumerate(region));a,b=a.crop(q),b.crop(q)
     return ImageChops.difference(a.convert('RGB'),b.convert('RGB')).getbbox() is not None
+def portrait_region(side,slot):
+    # The empty slot label changes AGUARDANDO → ESCOLHA on focus. Compare
+    # a fixed inner portrait area above that label, away from the animated rim.
+    x=80 if side==0 else 1134;y=400+130*slot
+    return x,y,x+75,y+22
+
 def stable_slots(a,b):
-    return all(not differs(a,b,(x,y,x+95,y+64)) for x in [70,1124] for y in [398,528])
+    return all(not differs(a,b,portrait_region(side,slot)) for side in range(2) for slot in range(2))
 def cell(i):
     cw=(440-18)/4;ch=(400-18)/4;y=137+(i//4)*(ch+6)+ch/2;x=420+(i%4)*(cw+6)+cw/2
     return 640+(x-640)*(440+148*(y-137)/400)/440,y
@@ -51,7 +57,7 @@ results['checks'].append('P09–P16 are visible concepts and all remain blocked'
 last=initial
 for i,name in [(0,'p01'),(3,'p02'),(1,'p03'),(5,'p04'),(6,'p05'),(2,'p06'),(7,'p07'),(4,'p08')]:
     tap(*cell(i));selected=capture(name+'-chosen')
-    assert differs(initial,selected,(70,398,165,462)),name+' did not fill first point slot'
+    assert differs(initial,selected,portrait_region(0,0)),name+' did not fill first point slot'
     tap(503,700);preview=capture(name)
     if name!='p01':assert differs(last,preview,(170,55,330,340)),name+' upper-right action art not rendered'
     assert stable_slots(initial,preview),'Back failed to reopen the first slot'
@@ -62,23 +68,23 @@ results['checks'].append('all eight playable action illustrations render; Back r
 record=sp.Popen(['adb','shell','screenrecord','--size','1280x720','--bit-rate','3000000','--time-limit','90','/sdcard/selection-effects.mp4'])
 time.sleep(1)
 tap(*cell(0));one=capture('step-1')
-assert differs(initial,one,(70,398,165,462)),'P1 point not chosen'
-assert not differs(initial,one,(70,528,165,592)),'TAG P1 filled before second choice'
+assert differs(initial,one,portrait_region(0,0)),'P1 point not chosen'
+assert not differs(initial,one,portrait_region(0,1)),'TAG P1 filled before second choice'
 tap(*cell(0));duplicate=capture('duplicate-tag');assert stable_slots(one,duplicate),'Duplicate TAG replaced point'
 tap(*cell(4));two=capture('step-2')
-assert differs(one,two,(70,528,165,592)),'Second portrait did not choose TAG P1'
-assert not differs(initial,two,(1124,398,1219,462)),'P2 filled too early'
+assert differs(one,two,portrait_region(0,1)),'Second portrait did not choose TAG P1'
+assert not differs(initial,two,portrait_region(1,0)),'P2 filled too early'
 tap(*cell(1));three=capture('step-3')
-assert differs(two,three,(1124,398,1219,462)),'Third portrait did not choose P2 point'
-assert not differs(initial,three,(1124,528,1219,592)),'TAG P2 filled too early'
+assert differs(two,three,portrait_region(1,0)),'Third portrait did not choose P2 point'
+assert not differs(initial,three,portrait_region(1,1)),'TAG P2 filled too early'
 tap(*cell(2));four=capture('ready')
-assert differs(three,four,(1124,528,1219,592)),'Fourth portrait did not choose TAG P2'
+assert differs(three,four,portrait_region(1,1)),'Fourth portrait did not choose TAG P2'
 results['checks'].append('four portrait taps choose P1 → TAG P1 → P2 → TAG P2 automatically')
 results['checks'].append('duplicate partner is rejected without replacing the point')
 for i in range(8,16):tap(*cell(i))
 locked_ready=capture('locked-ready');assert stable_slots(four,locked_ready),'Blocked concepts changed finished teams'
 tap(914,700);swapped=capture('swapped')
-assert differs(four,swapped,(1124,398,1219,462)),'Finished team did not swap point/TAG'
+assert differs(four,swapped,portrait_region(1,0)),'Finished team did not swap point/TAG'
 results['checks'].append('point/TAG swap works after completing the sequence')
 ready=swapped
 tap(370,700);deadline=time.monotonic()+35
