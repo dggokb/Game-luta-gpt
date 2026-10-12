@@ -1,0 +1,43 @@
+name: Publish Direct Selection TAG APK
+
+on:
+  push:
+    branches:
+      - game-luta-sprite-gpt
+    paths:
+      - '.github/workflows/publish-selection-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Download already compiled and tested selection APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p build-output
+          for attempt in 1 2 3 4 5; do
+            if gh run download 38198214215 -n GameLuta-Selecao-TAG-APK -D build-output; then
+              break
+            fi
+            sleep 20
+          done
+          test -s build-output/app-debug.apk
+      - name: Publish one prerelease with APK file, not a ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "moon-selection-27505dcf" \
+            "build-output/app-debug.apk#GameLuta-Selecao-TAG.apk" \
+            --target 27505dcf473402534ff193db0bbb307a41b8f060 \
+            --title "Templo da Lua - Seletor TAG (APK de teste)" \
+            --notes "Build da tela de seleção TAG na branch game-luta-sprite-gpt. Inclui artes de conceito do elenco e layout reconstruído a partir da referência aprovada. Teste de compilação passou; confirmar visualmente no aparelho." \
+            --prerelease
