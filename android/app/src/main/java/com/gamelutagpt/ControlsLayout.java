@@ -61,18 +61,18 @@ final class ControlsLayout {
     static final float OVERDRIVE_RADIUS = 34f;
 
     static final float AI_BUTTON_LEFT = 1082f;
-    static final float AI_BUTTON_TOP = 124f;
+    static final float AI_BUTTON_TOP = 176f;
     static final float AI_BUTTON_RIGHT = 1248f;
-    static final float AI_BUTTON_BOTTOM = 172f;
+    static final float AI_BUTTON_BOTTOM = 216f;
 
     static final float DEBUG_BUTTON_LEFT = 1082f;
-    static final float DEBUG_BUTTON_TOP = 182f;
+    static final float DEBUG_BUTTON_TOP = 226f;
     static final float DEBUG_BUTTON_RIGHT = 1248f;
-    static final float DEBUG_BUTTON_BOTTOM = 222f;
+    static final float DEBUG_BUTTON_BOTTOM = 266f;
 
     // Test helpers: refill the player's team and the CPU without restarting the app.
-    static final float HEAL_BUTTON_TOP = 232f;
-    static final float HEAL_BUTTON_BOTTOM = 272f;
+    static final float HEAL_BUTTON_TOP = 276f;
+    static final float HEAL_BUTTON_BOTTOM = 316f;
     static final float HEAL_PLAYER_LEFT = 1082f;
     static final float HEAL_PLAYER_RIGHT = 1162f;
     static final float HEAL_OPPONENT_LEFT = 1168f;
@@ -80,9 +80,9 @@ final class ControlsLayout {
 
     // DUPLA: opens the character select (pick the pair; fresh round).
     static final float TEAM_BUTTON_LEFT = 1082f;
-    static final float TEAM_BUTTON_TOP = 282f;
+    static final float TEAM_BUTTON_TOP = 326f;
     static final float TEAM_BUTTON_RIGHT = 1248f;
-    static final float TEAM_BUTTON_BOTTOM = 322f;
+    static final float TEAM_BUTTON_BOTTOM = 366f;
 
     // SELEÇÃO: back to the character select (top center).
     static final float SELECT_BUTTON_LEFT = 565f;

@@ -262,8 +262,8 @@ final class HudRenderer {
         int accent = right ? RED : BLUE;
         c.save();
         if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
-        panel(c, 21f, 683f, 400f, 33f, 19f, 0xEF070C1C, accent, 4f);
-        drawSegments(c, fighter.superBars(), 86f, 692f, 246f, 17f, accent);
+        panel(c, 21f, 696f, 400f, 21f, 19f, 0xEF070C1C, accent, 4f);
+        drawSegments(c, fighter.superBars(), 86f, 699f, 246f, 14f, accent);
         paint.setColor(0xFF080E22);
         c.drawCircle(52f, 696f, 24f, paint);
         paint.setStyle(Paint.Style.STROKE);
