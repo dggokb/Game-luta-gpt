@@ -432,7 +432,7 @@ final class HudRenderer {
             float t = (float)((effects.now * .24 + i / 6.0) % 1);
             float sx = x + 4 + t * (w - 16);
             float sy = i % 2 == 0 ? y : y + h;
-            fxPaint.setAlpha(Math.round((60 + 100 * strength) * (.5 + .5 * Math.sin(effects.now * 5 + i))));
+            fxPaint.setAlpha((int)Math.round((60 + 100 * strength) * (.5 + .5 * Math.sin(effects.now * 5 + i))));
             c.drawLine(sx, sy, sx + 7, sy, fxPaint);
         }
         fxPaint.setAlpha(255); fxPaint.setStyle(Paint.Style.FILL);
@@ -444,8 +444,10 @@ final class HudRenderer {
             c.save(); if (side == 1) { c.translate(Arena.VW, 0); c.scale(-1, 1); }
             HudEffects.Meter fx = side == 0 ? effects.point : effects.cpu;
             float hit = effects.fade(fx.hitAt, HudEffects.HIT_FLASH);
+            float critical = fx.life > 0 && fx.life <= .25f ? .18f + .12f * (float)Math.sin(effects.now * 4) : 0;
             energyEdge(c, art ? 165 : 109, art ? 73 : 62, art ? 389 : 474, art ? 20 : 28,
-                side == 0 ? BLUE : RED, .10f + hit * .8f);
+                hit > 0 ? 0xFFFFE5A0 : critical > 0 ? RED : side == 0 ? BLUE : RED,
+                .10f + hit * .8f + critical);
             if (side == 0 && effects.assistEnabled) {
                 float ready = effects.fade(effects.readyAt, HudEffects.READY_FLASH);
                 float use = effects.fade(effects.useAt, HudEffects.SPEND_FLASH);

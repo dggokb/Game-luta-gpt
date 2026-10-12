@@ -37,6 +37,10 @@ public class HudEffectsTest {
         HudRenderer.State state=(HudRenderer.State)field(game,"hudState");
         HudEffects e=new HudEffects(); e.update(state,0);
         assertEquals(-100,e.readyAt,0); assertEquals(-100,e.useAt,0);
+        game.engine.team(0).assistPhase=TeamSystem.ASSIST_ENTER;
+        e.update(state,.2); assertEquals(.2,e.useAt,0); assertEquals(0,e.assistRatio,0);
+        e.update(state,.3); assertEquals(.2,e.useAt,0);
+        game.engine.team(0).assistPhase=TeamSystem.ASSIST_NONE;
         game.engine.team(0).assistCooldown=game.engine.config.assistCooldownFrames;
         e.update(state,1); assertEquals(0,e.assistRatio,0);
         game.engine.team(0).assistCooldown=100; e.update(state,2); assertTrue(e.recharging);
@@ -47,6 +51,15 @@ public class HudEffectsTest {
         state.active().restoreLife(); e.reset(); e.update(state,6);
         assertEquals(-100,e.point.healAt,0); assertEquals(-100,e.readyAt,0);
         assertEquals(CombatConfig.MAX_METER,e.point.superMeter);
+        // Actual point swap establishes a fresh baseline even at different life/meter.
+        game.engine.team(0).point=1; state.active().life=10; e.update(state,7);
+        assertEquals(-100,e.point.hitAt,0); assertEquals(-100,e.point.spendAt,0);
+        HudRenderer.State disabled=(HudRenderer.State)Proxy.newProxyInstance(
+            getClass().getClassLoader(),new Class[]{HudRenderer.State.class},
+            (proxy,method,args)->method.getName().equals("reserve")?null:method.invoke(state,args));
+        e.update(disabled,8); e.update(disabled,9);
+        assertFalse(e.assistEnabled);assertFalse(e.recharging);assertEquals(-100,e.readyAt,0);
+        assertFalse("Training CPU has no assist",game.engine.team(1).assistOut());
     }
     @Test public void elapsedTimeMatchesAcrossRenderRates() {
         FighterState f=new FighterState(GeneratedCharacters.get("player_base"),"P1");
@@ -71,17 +84,21 @@ public class HudEffectsTest {
             if(i==20||i==26||i==34) {p.life-=p.profile.maxLife/8;p.recoverableLife+=p.profile.maxLife/16;}
             if(i==55) p.life+=p.profile.maxLife/6;
             if(i==70) cpu.life=cpu.profile.maxLife/5;
+            if(i==72) game.engine.team(0).assistPhase=TeamSystem.ASSIST_ENTER;
+            if(i==75) game.engine.team(0).assistPhase=TeamSystem.ASSIST_NONE;
             if(i>=75&&i<=120) game.engine.team(0).assistCooldown=(int)(game.engine.config.assistCooldownFrames*(120-i)/45f);
             if(i==80) p.superMeter=CombatConfig.METER_PER_BAR;
             if(i==95) p.superMeter=3*CombatConfig.METER_PER_BAR;
             if(i==125) p.superMeter=CombatConfig.MAX_METER;
             if(i==155) p.superMeter=CombatConfig.METER_PER_BAR;
             if(i==180) {hud.resetEffects();p.restoreLife();cpu.restoreLife();}
+            if(i==205) game.engine.team(0).point=1;
+            if(i==222) {hud.resetEffects();game.engine.team(0).point=0;}
             c.drawColor(Color.BLACK);scenario.invoke(game,c);player.invoke(game,c);
             hud.drawHudAt(c,state,portraits,t);hud.drawControls(c,state);
             Paint label=new Paint(Paint.ANTI_ALIAS_FLAG);label.setColor(Color.WHITE);label.setTextSize(18);
             c.drawText("PREVIA TECNICA • Canvas real da HUD / estados controlados",320,235,label);
-            String event=i<20?"Repouso":i<55?"Impactos consecutivos":i<70?"Recuperacao":i<120?"Critico / ASSIST recarregando / niveis SUPER":i<155?"ASSIST pronto / SUPER maximo":i<180?"Descarga de SUPER":"Restauracao sem falso impacto";
+            String event=i<20?"Repouso":i<55?"Impactos consecutivos":i<70?"Recuperacao":i<120?"Critico / ASSIST recarregando / niveis SUPER":i<155?"ASSIST pronto / SUPER maximo":i<180?"Descarga de SUPER":i<205?"Restauracao sem falso impacto":i<222?"Troca de titular sem falso impacto":"Retorno da selecao sem falso impacto";
             c.drawText(event,380,261,label);
             try(FileOutputStream out=new FileOutputStream(new File(dir,String.format("%04d.png",i)))) {bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}
         }

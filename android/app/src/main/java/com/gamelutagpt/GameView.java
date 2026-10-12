@@ -529,6 +529,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
+        hud.resetEffects();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
