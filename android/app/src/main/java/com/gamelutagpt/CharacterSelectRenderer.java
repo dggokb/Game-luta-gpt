@@ -80,7 +80,8 @@ final class CharacterSelectRenderer {
         // Center them behind the side's TEAM panel rather than shrinking the fighter.
         float width=Math.max(435,630f*b.getWidth()/b.getHeight()),top=55;
         float left=(side==0?192.5f:1087.5f)-width/2;
-        boolean facesRight="player_base".equals(id)||"p06".equals(id);
+        boolean facesRight="player_base".equals(id)||"p02".equals(id)
+            ||"p04".equals(id)||"p05".equals(id)||"p06".equals(id);
         if((side==0&&!facesRight)||(side==1&&facesRight)) c.scale(-1,1,left+width/2,0);
         box.set(left,top,left+width,top+width*b.getHeight()/b.getWidth());
         imagePaint.setAlpha(255);c.drawBitmap(b,null,box,imagePaint);
