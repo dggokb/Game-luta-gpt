@@ -343,6 +343,25 @@ final class CharacterSelectRenderer {
                 } catch (IOException | RuntimeException ex) {
                     Log.w("GameLuta", "retrato de " + character.id + " indisponivel", ex);
                 }
+                // Some region decoders return an empty bitmap instead of throwing.
+                // Fall back to a sampled atlas once, never on the render loop.
+                if (cell == null) {
+                    try (InputStream in = context.getResources().openRawResource(id)) {
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inScaled = false;
+                        options.inSampleSize = 2;
+                        Bitmap atlas = BitmapFactory.decodeStream(in, null, options);
+                        if (atlas != null) {
+                            int x = frame % a.columns * a.width / 2;
+                            int y = frame / a.columns * a.height / 2;
+                            cell = Bitmap.createBitmap(atlas, x, y, a.width / 2, a.height / 2);
+                            if (cell != atlas) atlas.recycle();
+                            cell = crop(cell);
+                        }
+                    } catch (IOException | RuntimeException ex) {
+                        Log.w("GameLuta", "fallback de retrato " + character.id, ex);
+                    }
+                }
             }
         }
         portraits.put(character.id, cell);
@@ -360,7 +379,7 @@ final class CharacterSelectRenderer {
                 l = Math.min(l, x);r = Math.max(r, x);t = Math.min(t, y);b = Math.max(b, y);
             }
         }
-        if (r < l) return cell;
+        if (r < l) { cell.recycle(); return null; }
         Bitmap out = Bitmap.createBitmap(cell, l, t, r - l + 1, b - t + 1);
         cell.recycle();
         return out;

@@ -37,6 +37,9 @@ public class HudArtTest {
         assertNotNull("The production art must be decoded",atlas);
         assertEquals(0,Color.alpha(atlas.getPixel(800,400)));
         FighterState active=((FighterState[])field(game,"team"))[0];
+        CharacterSelectRenderer portraits=(CharacterSelectRenderer)field(game,"characterSelectRenderer");
+        assertNotNull("Point portrait must contain real character pixels",portraits.portrait(active.character));
+        assertNotNull("Reserve portrait must contain real character pixels",portraits.portrait(((FighterState[])field(game,"team"))[1].character));
         active.restoreLife();
         Bitmap full=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         draw(game,"drawHud",new Canvas(full));
