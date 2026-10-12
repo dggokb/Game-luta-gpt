@@ -202,6 +202,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
+        hud.loadArt(context);
         P01VisualTuning.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.

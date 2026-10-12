@@ -10,6 +10,11 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.content.Context;
+import java.io.InputStream;
+import java.io.IOException;
 
 /**
  * Screen-space HUD and touch controls plus the opponent's overhead panel. It reads
@@ -66,6 +71,25 @@ final class HudRenderer {
     }
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Bitmap hudArt;
+    private final Rect artSource = new Rect();
+    private final RectF artTarget = new RectF();
+
+    /** Decode the ornamental atlas once; life, portraits and meters remain live. */
+    void loadArt(Context context) {
+        try (InputStream input = context.getAssets().open("ui/hud/energy-frame.png")) {
+            hudArt = BitmapFactory.decodeStream(input);
+        } catch (IOException e) {
+            android.util.Log.w("HudRenderer", "Energy artwork unavailable; using vector HUD", e);
+        }
+    }
+
+    private void artwork(Canvas c, int l, int t, int r, int b,
+                         float x, float y, float w, float h) {
+        artSource.set(l, t, r, b);
+        artTarget.set(x, y, x + w, y + h);
+        c.drawBitmap(hudArt, artSource, artTarget, imagePaint);
+    }
 
     private void reset() {
         paint.setShader(null);
@@ -82,13 +106,29 @@ final class HudRenderer {
         FighterState active = s.active();
         FighterState reserve = s.reserve();
 
-        drawTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
-        drawTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
-        drawPower(c, active, false);
-        drawPower(c, s.opponent(), true);
+        if (hudArt == null) {
+            drawTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
+            drawTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+            drawPower(c, active, false);
+            drawPower(c, s.opponent(), true);
+        } else {
+            drawArtTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
+            drawArtTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+            artwork(c, 0, 0, 1672, 280, 0f, 0f, 1280f, 170f);
+            drawSegments(c, active.superBars(), 174f, 96f, 330f, 11f, BLUE);
+            c.save(); c.translate(Arena.VW, 0f); c.scale(-1f, 1f);
+            drawSegments(c, s.opponent().superBars(), 174f, 96f, 330f, 11f, RED);
+            c.restore();
+            drawArtPower(c, active, false);
+            drawArtPower(c, s.opponent(), true);
+            text(c, "PLAYER 1", 220f, 65f, 15f, Color.WHITE);
+            text(c, "PLAYER 2", 1060f, 65f, 15f, Color.WHITE);
+            text(c, "TAG", 222f, 132f, 13f, Color.WHITE);
+            text(c, "TAG OFF", 1058f, 132f, 13f, 0xFFBCC4D8);
+        }
         // Training has no round clock: never display a fabricated countdown.
-        panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
-        text(c, "∞", 640f, 63f, 58f, Color.WHITE);
+        if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
+        text(c, "∞", 640f, 70f, 58f, Color.WHITE);
         text(c, "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
         if (s.debugEnabled()) {
             text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
@@ -117,6 +157,51 @@ final class HudRenderer {
     private final Shader reserveLifeGradient = new LinearGradient(0f, 119f, 0f, 136f,
         new int[]{0xFFFFFF9C, 0xFF7BFF22, 0xFF0ADF49}, null, Shader.TileMode.CLAMP);
     private static final String[] LEVELS = {"0", "1", "2", "3", "4", "5"};
+
+    private void drawArtTeam(Canvas c, FighterState point, FighterState reserve,
+                             CharacterDefinition absent, boolean right, float ready,
+                             CharacterSelectRenderer portraits) {
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        // All coordinates are calibrated against the ornament atlas, not its bounding box.
+        portrait(c, portraits, point.character, 43f, 24f, 119f, 86f, right ? RED : BLUE);
+        CharacterDefinition partner = reserve == null ? absent : reserve.character;
+        if (partner != null) portrait(c, portraits, partner, 120f, 110f, 65f, 25f, right ? RED : BLUE);
+        energyLife(c, point, 165f, 74f, 389f, 18f);
+        if (reserve != null) energyLife(c, reserve, 259f, 119f, 182f, 10f);
+        else panel(c, 259f, 119f, 182f, 10f, 6f, 0xFF161B28, 0xFF596072, 1f);
+        paint.setColor(right ? RED : BLUE);
+        c.drawCircle(554f, 115f, 8f, paint);
+        paint.setColor(reserve != null && ready >= 1f ? Color.WHITE : 0xFF111723);
+        c.drawCircle(554f, 115f, 4f, paint);
+        c.restore();
+    }
+
+    private void drawArtPower(Canvas c, FighterState fighter, boolean right) {
+        c.save();
+        if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
+        // Reuse the blue/red sides independently so the meter stays compact like the reference.
+        if (right) {
+            c.save(); c.translate(400f, 0f); c.scale(-1f, 1f);
+            artwork(c, 922, 735, 1672, 941, 0f, 625f, 400f, 95f);
+            c.restore();
+        } else artwork(c, 0, 735, 750, 941, 0f, 625f, 400f, 95f);
+        float bars = Arena.clamp(fighter.superBars() / 5f, 0f, 1f) * 4f;
+        for (int i = 0; i < 4; i++) {
+            float x = 94f + i * 57f;
+            panel(c, x, 679f, 51f, 15f, 8f, 0xFF070E20, right ? RED : BLUE, 1.5f);
+            c.save(); c.clipPath(shape);
+            paint.setColor(right ? RED : BLUE);
+            c.drawRect(x, 679f, x + 51f * Arena.clamp(bars - i, 0f, 1f), 694f, paint);
+            paint.setColor(0xDDFFFFFF);
+            c.drawRect(x, 680f, x + 51f * Arena.clamp(bars - i, 0f, 1f), 683f, paint);
+            c.restore();
+        }
+        c.restore();
+        int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
+        text(c, LEVELS[level], right ? Arena.VW - 51f : 51f, 698f, 38f, Color.WHITE);
+        text(c, "SUPER", right ? Arena.VW - 348f : 348f, 702f, 17f, Color.WHITE);
+    }
 
     /** Reused path and paint: the ornamental frame allocates no per-frame geometry. */
     private void panel(Canvas c, float x, float y, float w, float h, float bevel,
