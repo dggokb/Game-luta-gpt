@@ -4,7 +4,11 @@ Decidido no p01: cada animação é um **vídeo curto** gerado no Seedance a par
 imagem inicial do personagem. O vídeo vira os quadros do jogo com
 `tools/sprites/video_para_sprite.py` (recorta o verde, tira sombra e poeira, corrige o
 deslizamento, escolhe o loop e coloca tudo na mesma escala). Os prompts de cada
-personagem estão na ficha dele (`p01.md`, `p03.md`).
+personagem estão na ficha individual correspondente (`p01.md` a `p16.md`).
+As fichas `p13.md`–`p16.md` são **propostas**: em 12/10/2026 as pastas
+`game-luta-gpt/animations/p13` a `p16` do Drive continham apenas um PNG de cada
+personagem, sem vídeo. Não marcar nenhum clipe ✅ antes de produzi-lo, convertê-lo e
+validá-lo no jogo.
 
 ## Antes do primeiro vídeo de um personagem
 
