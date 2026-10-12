@@ -262,6 +262,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** A seleção muda a dupla P1 e o titular do adversário de treino. */
     private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
+        hud.resetEffects();
         team = membersOf(point, partner);
         opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
         opponentTagId = cpuPartner;
@@ -281,6 +282,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
         pad.reset();
@@ -555,6 +557,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return 1f;
         }
+        @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
@@ -1688,6 +1691,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
                     healPlayerPointer = pointerId;
+                    hud.resetEffects();
                     for (FighterState member : team) member.restoreLife();
                     engine.refreshOverdrive(PLAYER);
                     break;
@@ -1696,6 +1700,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
+                    hud.resetEffects();
                     opponentFighter.restoreLife();
                     engine.refreshOverdrive(OPPONENT);
                     break;

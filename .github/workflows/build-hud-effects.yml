@@ -1,0 +1,42 @@
+name: HUD animated effects validation
+on:
+  push:
+    branches: ['ui/hud-efeitos-barras-20261012']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Native Canvas effects tests and APK
+        working-directory: android
+        run: gradle :app:testDebugUnitTest --tests '*HudEffectsTest' --tests '*HudArtTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :app:assembleDebug -x :app:verifySpritePacks --stacktrace
+      - name: Encode real renderer technical animation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          ffmpeg -y -framerate 30 -i android/app/build/hud-effects-frames/%04d.png -c:v libx264 -crf 20 -pix_fmt yuv420p hud-effects-native-canvas.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HUD-effects-delivery
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            hud-effects-native-canvas.mp4
+            android/app/build/hud-effects-frames/0028.png
+            android/app/build/hud-effects-frames/0060.png
+            android/app/build/hud-effects-frames/0130.png
+            android/app/build/reports/tests/
