@@ -1,0 +1,27 @@
+{
+  "id": "p11_walk_back",
+  "javaName": "P11_WALK_BACK",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_walk_back_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_walk_back.png",
+  "report": "tools/sprites/reports/p11_walk_back.report.json",
+  "preview": "android/app/build/sprite-review/p11_walk_back-import.png",
+  "expectedFrames": 21,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "tras.mp4",
+    "personagem": "p11",
+    "escala": 0.3736,
+    "medida": "cabeça do IDLE em 9 quadros (nota 0.76)",
+    "quadros": "17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57",
+    "largura": 224,
+    "raiz": "143,238",
+    "colunas": 11,
+    "pe_no_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 143
+}

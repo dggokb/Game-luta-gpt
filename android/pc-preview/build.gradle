@@ -29,6 +29,15 @@ tasks.register('runStage', JavaExec) {
     workingDir = rootProject.projectDir
 }
 
+// Atores de fundo: gradle :pc-preview:runAtor --args="app/src/main/assets/stages/dojo_shinshinkan takatoshi parado,aplaudir,rir,surpreso,aprovar 345 build/ator.png"
+tasks.register('runAtor', JavaExec) {
+    group = 'application'
+    description = 'Grava uma folha de conferência das animações de um ator de fundo.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.preview.AtorPreview'
+    workingDir = rootProject.projectDir
+}
+
 // Raio final do ultra no cenário, gravado em PNG: gradle :pc-preview:runRaio
 tasks.register('runRaio', JavaExec) {
     group = 'application'

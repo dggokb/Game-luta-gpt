@@ -1,0 +1,29 @@
+{
+  "id": "p11_jump",
+  "javaName": "P11_JUMP",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_jump_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_jump.png",
+  "report": "tools/sprites/reports/p11_jump.report.json",
+  "preview": "android/app/build/sprite-review/p11_jump-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pulo.mp4",
+    "personagem": "p11",
+    "escala": 0.5208,
+    "medida": "1º quadro = inicio_centro (nota 0.94)",
+    "quadros": "0,22,23,28,32,37",
+    "celula": 320,
+    "largura": 256,
+    "raiz": "147,302",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameHeight": 320,
+  "rootX": 147,
+  "rootY": 302
+}

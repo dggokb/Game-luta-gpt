@@ -1,0 +1,30 @@
+{
+  "id": "p11_special_s2",
+  "javaName": "P11_SPECIAL_S2",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_special_s2_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_special_s2.png",
+  "report": "tools/sprites/reports/p11_special_s2.report.json",
+  "preview": "android/app/build/sprite-review/p11_special_s2-import.png",
+  "expectedFrames": 20,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "s2.mp4",
+    "personagem": "p11",
+    "escala": 0.4101,
+    "medida": "1º quadro = inicio_centro (nota 0.82)",
+    "quadros": "8,11,13,16,18,21,26,32,37,42,48,53,58,64,69,75,80,85,91,96",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "175,270",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 288,
+  "rootX": 175,
+  "rootY": 270
+}

@@ -2,15 +2,15 @@
   "id": "p05_super_wave",
   "javaName": "P05_SUPER_WAVE",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_super_wave_video_normalized.png",
+  "source": "art/sprites/source/p05_super_wave_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_super_wave.png",
   "report": "tools/sprites/reports/p05_super_wave.report.json",
   "preview": "android/app/build/sprite-review/p05_super_wave-import.png",
   "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 5,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "Super.mp4",
     "personagem": "p05",
@@ -20,11 +20,29 @@
     "celula": 288,
     "largura": 352,
     "raiz": "106,270",
-    "colunas": 11,
-    "limpar_chao": true
+    "colunas": 5,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p05_super_wave_video_normalized.png",
+      "celula": [
+        352,
+        288
+      ],
+      "raiz": [
+        106,
+        270
+      ],
+      "colunas": 11
+    }
   },
-  "frameWidth": 352,
-  "frameHeight": 288,
-  "rootX": 106,
-  "rootY": 270
+  "frameWidth": 704,
+  "frameHeight": 576,
+  "rootX": 212,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p05_super_wave_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

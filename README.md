@@ -294,8 +294,8 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 
 - Botão **HISTÓRIA** no HUD (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de
   *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
-  11 páginas prontas lidas quadro a quadro (com a luta de treino Ryūga × Kōga depois da página
-  4), o Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
+  11 páginas prontas lidas quadro a quadro (com o treino/tutorial depois da página 4), o
+  Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
 - Motor em `android/story-core` (Java puro); episódios em JSON em
   `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do
   arquivo esperado.
@@ -305,3 +305,17 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - Proposta, formato e roadmap da temporada: `docs/historia/README.md`. Prompts das imagens
   para o ChatGPT: `docs/historia/prompts-ep00-ep01.md`. Revisão no PC:
   `gradle :pc-preview:runHistoria`.
+- **Cenas pelo nome** (`historia/cenas.json` + `playScene("intro", depois)` no `GameView`):
+  um episódio ou um trecho dele, entre marcas, que o jogo chama em vários momentos.
+  `docs/historia/cenas.md`.
+
+## Modo tutorial
+
+- Botão **TUTORIAL** (abaixo de HISTÓRIA): a intro do Prólogo (páginas 1 a 4) e depois o
+  treino guiado dos golpes no **Dojo Shinshinkan**, lição por lição (movimento, golpes,
+  combos, defesa, especiais, agarrão, SUPER e ULTRA). No modo história o treino vem no mesmo
+  ponto do Prólogo. `docs/tutorial.md`.
+- Takatoshi e Dafu assistem no fundo do dojo e reagem ao treino (atores de cenário, tipo
+  `ator` no `stage.json`), e um quadro de mangá com a fala deles entra antes de cada lição.
+  Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
+  vídeos: `tools/stage/video_para_ator.py`.

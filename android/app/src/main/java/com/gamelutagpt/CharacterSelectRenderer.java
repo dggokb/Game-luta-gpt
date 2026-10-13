@@ -144,6 +144,7 @@ final class CharacterSelectRenderer {
             case "p08":return "CHICOTE";
             case "p09":return "BOMBEIRO GRAPPLER";
             case "p10":return "BOMBEIRA ÁGIL";
+            case "p11":return "CIRURGIÃO SÁDICO";
             case "p12":return "CRIATURA FERAL";
             default:return "";
         }

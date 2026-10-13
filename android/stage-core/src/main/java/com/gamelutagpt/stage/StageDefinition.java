@@ -32,7 +32,7 @@ import java.util.Map;
  * </pre>
  */
 public final class StageDefinition {
-    public enum Kind { IMAGE, FOG, WATER }
+    public enum Kind { IMAGE, FOG, WATER, ACTOR }
 
     public enum Repeat { NONE, REPEAT, MIRROR }
 
@@ -95,6 +95,10 @@ public final class StageDefinition {
         public final int shimmer;
         public final List<Light> lights;
         public final List<Fire> fires;
+        /** Ator: pasta dele, relativa ao cenário (com o ator.json e as folhas). */
+        public final String actor;
+        /** Ator: espelhado (olhando para o outro lado). */
+        public final boolean flip;
 
         Layer(Builder b) {
             id = b.id;
@@ -118,6 +122,8 @@ public final class StageDefinition {
             shimmer = b.shimmer;
             lights = Collections.unmodifiableList(new ArrayList<>(b.lights));
             fires = Collections.unmodifiableList(new ArrayList<>(b.fires));
+            actor = b.actor;
+            flip = b.flip;
         }
 
         /** Profundidade usada para ordenar (a água usa a borda de trás). */
@@ -145,6 +151,8 @@ public final class StageDefinition {
         int shimmer;
         final List<Light> lights = new ArrayList<>();
         final List<Fire> fires = new ArrayList<>();
+        String actor;
+        boolean flip;
     }
 
     public static final class Floor {
@@ -282,6 +290,7 @@ public final class StageDefinition {
         if ("imagem".equals(kind)) b.kind = Kind.IMAGE;
         else if ("neblina".equals(kind)) b.kind = Kind.FOG;
         else if ("agua".equals(kind)) b.kind = Kind.WATER;
+        else if ("ator".equals(kind)) b.kind = Kind.ACTOR;
         else throw new IllegalArgumentException(where + ": tipo desconhecido \"" + kind + "\"");
 
         b.depth = number(map, "profundidade", Float.NaN);
@@ -312,6 +321,15 @@ public final class StageDefinition {
                     if (!(b.height > 0f)) throw new IllegalArgumentException(where + ": noChao precisa de \"altura\"");
                 } else if (Float.isNaN(b.top) || Float.isNaN(b.bottom) || b.bottom <= b.top) {
                     throw new IllegalArgumentException(where + " precisa de \"topo\" e \"base\" (base > topo) ou noChao + altura");
+                }
+                break;
+            case ACTOR:
+                b.actor = string(map, "pasta", null);
+                if (b.actor == null) throw new IllegalArgumentException(where + ": ator precisa de \"pasta\"");
+                b.flip = bool(map, "virar", false);
+                requireDepth(b, where);
+                if (!b.onGround || !(b.height > 0f)) {
+                    throw new IllegalArgumentException(where + ": ator precisa de noChao + altura");
                 }
                 break;
             case FOG:

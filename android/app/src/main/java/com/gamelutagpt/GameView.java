@@ -10,9 +10,11 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
 import com.gamelutagpt.historia.PaginaHistoria;
+import com.gamelutagpt.historia.QuadroTreino;
 import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
@@ -124,8 +126,10 @@ public class GameView extends SurfaceView
     private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
 
     // Cenário com falso 3D (stage-core). Sem ele, o StageRenderer antigo desenha o fundo.
-    private static final String STAGE_FOLDER = "stages/templo_lua";
-    private final StageScene stageScene;
+    private static final String DEFAULT_STAGE = "templo_lua";
+    private StageScene stageScene;
+    /** Cenário carregado agora (pasta em assets/stages). Cada luta pode pedir o seu. */
+    private String stageId;
     /** Desenho pela GPU (Android 8+); cai para o Canvas por software se falhar. */
     private boolean hardwareCanvas = Build.VERSION.SDK_INT >= 26;
     private final UltraSounds ultraSounds;
@@ -133,6 +137,14 @@ public class GameView extends SurfaceView
     // Modo história (story-core): páginas de mangá entre as lutas do episódio.
     private final PaginaHistoria historia;
     private Temporada temporada;
+    /** Cenas chamadas pelo nome (historia/cenas.json), carregadas na primeira vez. */
+    private Cenas cenas;
+    /** O que fazer quando a cena que está tocando acabar (playScene); null no modo história. */
+    private Runnable sceneAfter;
+    /** Modo tutorial: o treino guiado dos golpes no dojo (o boneco não usa a IA). */
+    private final TutorialDirector tutorial = new TutorialDirector();
+    /** Quadro de mangá entre as lições do tutorial (historia/tutorial/quadros.json). */
+    private QuadroTreino quadroTreino;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
@@ -236,7 +248,10 @@ public class GameView extends SurfaceView
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
         historia = new PaginaHistoria(this, ultraAssets);
-        stageScene = loadStage(ultraAssets);
+        quadroTreino = new QuadroTreino(ultraAssets);
+        quadroTreino.load();
+        stageId = DEFAULT_STAGE;
+        stageScene = loadStage(ultraAssets, stageId);
         characterSelectRenderer = new CharacterSelectRenderer(context);
         loadTeamUltras();
         holder = getHolder();
@@ -312,9 +327,13 @@ public class GameView extends SurfaceView
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
-        // Voltar à seleção abandona o episódio que estiver tocando.
+        // Voltar à seleção abandona o episódio, a cena e o treino que estiverem tocando.
         historia.stop();
         storyEpisode = -1;
+        sceneAfter = null;
+        tutorial.stop();
+        quadroTreino.stop();
+        useStage(null);
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
@@ -324,7 +343,7 @@ public class GameView extends SurfaceView
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (characterSelect.isOpen() || historia.coversScreen()) {
+        if (characterSelect.isOpen() || historia.coversScreen() || quadroTreino.active()) {
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -396,15 +415,28 @@ public class GameView extends SurfaceView
         return "ultras/" + ("p01_training".equals(fighter.character.id) ? "player_base" : fighter.character.id);
     }
 
-    private static StageScene loadStage(AndroidRenderAssets assets) {
+    /**
+     * Troca o cenário (pasta em assets/stages; null = o padrão). As imagens do anterior são
+     * soltas antes de carregar o novo, para os dois não ocuparem a memória juntos.
+     */
+    private void useStage(String id) {
+        String wanted = id != null ? id : DEFAULT_STAGE;
+        if (wanted.equals(stageId)) return;
+        stageScene = null;
+        stageId = wanted;
+        stageScene = loadStage(ultraAssets, wanted);
+    }
+
+    private static StageScene loadStage(AndroidRenderAssets assets, String id) {
+        String folder = "stages/" + id;
         try {
-            StagePack pack = StagePack.load(assets, STAGE_FOLDER);
-            for (String warning : pack.warnings) Log.w(LOG_TAG, STAGE_FOLDER + ": " + warning);
+            StagePack pack = StagePack.load(assets, folder);
+            for (String warning : pack.warnings) Log.w(LOG_TAG, folder + ": " + warning);
             StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CameraRig.CAMERA_ZOOM,
                 (PLAYER_START_X + OPPONENT_START_X) * 0.5f, CameraRig.CAMERA_GROUND_SCREEN_Y);
             return new StageScene(pack, world);
         } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "cenário " + STAGE_FOLDER + " indisponível, usando o fundo simples", ex);
+            Log.w(LOG_TAG, "cenário " + folder + " indisponível, usando o fundo simples", ex);
             return null;
         }
     }
@@ -547,6 +579,7 @@ public class GameView extends SurfaceView
             historia.update(FIXED_STEP);
             return;
         }
+        if (updateTutorialPanel()) return;
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
             paginaFinal.update(FIXED_STEP);
@@ -569,6 +602,10 @@ public class GameView extends SurfaceView
             // Touches never reach the fight during a demo.
             pad.drainInto(ignoredInput);
             demo.fill(playerInput, opponentInput);
+        } else if (tutorial.active()) {
+            // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
+            pad.drainInto(playerInput);
+            tutorial.fillDummy(opponentInput);
         } else {
             pad.drainInto(playerInput);
             if (tagging) {
@@ -584,6 +621,13 @@ public class GameView extends SurfaceView
         }
         engine.step(playerInput, opponentInput);
         demo.afterStep();
+        tutorial.afterStep();
+        // Quem assiste no fundo (Dafu e Takatoshi) reage ao que aconteceu no treino.
+        if (stageScene != null) {
+            for (String reaction : tutorial.reactions()) stageScene.react(reaction);
+        }
+        // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
+        if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
         for (CombatEngine.HitEvent event : engine.events()) {
@@ -677,7 +721,8 @@ public class GameView extends SurfaceView
         @Override public int demoPlaying() { return demo.demo(); }
         @Override public String demoTitle() { return demo.title(); }
         @Override public String demoCaption() { return demo.caption(); }
-        @Override public boolean storyActive() { return historia.isActive(); }
+        @Override public boolean storyActive() { return historia.isActive() && !tutorial.active(); }
+        @Override public boolean tutorialActive() { return tutorial.active(); }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -1214,6 +1259,7 @@ public class GameView extends SurfaceView
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
+            quadroTreino.render(renderCanvas);
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
@@ -1282,6 +1328,7 @@ public class GameView extends SurfaceView
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
+        hud.drawTutorial(c, tutorial);
         if (debugOverlay) {
             debug.drawPanel(c, engine);
             drawP01Tuner(c);
@@ -1807,6 +1854,11 @@ public class GameView extends SurfaceView
             }
             return;
         }
+        if (quadroTreino.active()) {
+            // O quadro entre as lições: o toque passa o balão ou fecha o quadro.
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) quadroTreino.tap();
+            return;
+        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing.
@@ -1817,6 +1869,10 @@ public class GameView extends SurfaceView
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
             if(debugOverlay && handleP01TunerTap(x,y))return;
+            if (tutorial.active() && ControlsLayout.tutorialSkipAt(x, y)) {
+                tutorial.skip();
+                return;
+            }
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
             switch (control) {
@@ -1841,6 +1897,9 @@ public class GameView extends SurfaceView
                     break;
                 case STORY:
                     startStory();
+                    break;
+                case TUTORIAL:
+                    startTutorialMode();
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
@@ -1931,19 +1990,67 @@ public class GameView extends SurfaceView
     /** HISTÓRIA: toca a temporada desde o primeiro episódio. */
     private void startStory() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
-        try {
-            temporada = Temporada.load(ultraAssets);
-            // Textos da história no idioma do aparelho; sem tradução, em português.
-            temporada.setIdioma(ultraAssets, Locale.getDefault().getLanguage());
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "modo história indisponível", ex);
-            return;
-        }
+        if (!loadTemporada()) return;
+        tutorial.stop();
+        quadroTreino.stop();
+        sceneAfter = null;
         hud.resetEffects();
         pad.reset();
         releaseAllPointers();
         selectionKeys.clear();
         playStoryEpisode(0);
+    }
+
+    /** TUTORIAL: a cena "tutorial" (a intro do Prólogo e o treino no dojo); no fim, a seleção. */
+    private void startTutorialMode() {
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        tutorial.stop();
+        quadroTreino.stop();
+        playScene("tutorial", this::openCharacterSelect);
+    }
+
+    /**
+     * Toca a cena {@code id} de historia/cenas.json (um episódio ou um trecho dele) por cima da
+     * luta e, quando ela acaba, chama {@code after}. É o jeito de chamar uma cena de qualquer
+     * ponto do jogo: {@code playScene("intro", () -> ...)}. As lutas e o treino que a cena
+     * tiver acontecem no meio, como no modo história. Cena que não abre chama {@code after} direto.
+     */
+    void playScene(String id, Runnable after) {
+        if (!loadTemporada()) {
+            if (after != null) after.run();
+            return;
+        }
+        Episodio cena;
+        try {
+            if (cenas == null) cenas = Cenas.load(ultraAssets);
+            cena = cenas.carregar(temporada, ultraAssets, id);
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "cena " + id + " indisponível", ex);
+            if (after != null) after.run();
+            return;
+        }
+        storyEpisode = -1;
+        sceneAfter = after;
+        hud.resetEffects();
+        pad.reset();
+        releaseAllPointers();
+        selectionKeys.clear();
+        historia.start(temporada, cena);
+    }
+
+    /** A temporada (elenco, episódios) no idioma do aparelho; falso se não abriu. */
+    private boolean loadTemporada() {
+        if (temporada != null) return true;
+        try {
+            temporada = Temporada.load(ultraAssets);
+            // Textos da história no idioma do aparelho; sem tradução, em português.
+            temporada.setIdioma(ultraAssets, Locale.getDefault().getLanguage());
+            return true;
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "modo história indisponível", ex);
+            temporada = null;
+            return false;
+        }
     }
 
     private void playStoryEpisode(int index) {
@@ -1986,8 +2093,27 @@ public class GameView extends SurfaceView
 
     @Override
     public void onHistoriaLuta(Episodio.Passo luta) {
+        // Cada luta pode pedir o seu cenário (o treino é no dojo).
+        useStage(luta.cenario);
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta.
-        selectTeams(luta.dupla[0], luta.dupla[1], luta.cpu[0], luta.cpu[1]);
+        if (luta.dupla != null && luta.cpu != null) {
+            selectTeams(luta.dupla[0], luta.dupla[1], luta.cpu[0], luta.cpu[1]);
+        } else {
+            selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
+        }
+        if (luta.tutorial()) {
+            // O boneco de treino não usa a IA; as lições dizem o que ele faz.
+            setOpponentAiEnabled(false);
+            tutorial.setPanels(true);
+            tutorial.start(engine, team, PLAYER_START_X);
+            storyKoFrames = 0;
+            pad.reset();
+            releaseAllPointers();
+            if (luta.rotulo != null) showBanner(luta.rotulo);
+            return;
+        }
+        tutorial.stop();
+        quadroTreino.stop();
         setOpponentAiEnabled(true);
         storyKoFrames = 0;
         pad.reset();
@@ -2000,8 +2126,49 @@ public class GameView extends SurfaceView
         ultraSounds.play(Temporada.PASTA, id);
     }
 
+    /**
+     * Quadro de mangá entre as lições: enquanto ele está na tela a luta espera; qualquer
+     * tecla ou toque passa o balão. Verdadeiro quando o quadro ocupou este passo.
+     */
+    private boolean updateTutorialPanel() {
+        if (!quadroTreino.active()) {
+            String wanted = tutorial.panelWanted();
+            if (wanted == null) return false;
+            if (!quadroTreino.start(temporada, wanted)) {
+                // Lição sem quadro: segue direto.
+                tutorial.panelDone();
+                return false;
+            }
+            pad.reset();
+            releaseAllPointers();
+        }
+        pad.drainInto(ignoredInput);
+        Integer key;
+        while ((key = selectionKeys.poll()) != null) quadroTreino.tap();
+        quadroTreino.update(FIXED_STEP);
+        if (!quadroTreino.active()) tutorial.panelDone();
+        updateFightCamera(FIXED_STEP);
+        return true;
+    }
+
+    /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
+    private void finishTutorial() {
+        tutorial.stop();
+        quadroTreino.stop();
+        pad.reset();
+        releaseAllPointers();
+        if (historia.waitingFight()) historia.resultadoLuta(true);
+    }
+
     @Override
     public void onHistoriaFim(Episodio episodio) {
+        if (sceneAfter != null) {
+            // Cena chamada por playScene: quem chamou decide o que vem depois.
+            Runnable after = sceneAfter;
+            sceneAfter = null;
+            after.run();
+            return;
+        }
         int next = storyEpisode + 1;
         if (temporada != null && next < temporada.episodios.size()) {
             playStoryEpisode(next);

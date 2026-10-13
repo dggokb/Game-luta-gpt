@@ -2,15 +2,15 @@
   "id": "p05_walk_forward",
   "javaName": "P05_WALK_FORWARD",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_walk_forward_video_normalized.png",
+  "source": "art/sprites/source/p05_walk_forward_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_walk_forward.png",
   "report": "tools/sprites/reports/p05_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p05_walk_forward-import.png",
   "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "andarParaFrente.mp4",
     "personagem": "p05",
@@ -19,9 +19,29 @@
     "quadros": "49,51,53,55,57,59,61,63,65,67,69,71,73,75,77,79,81,83,85,87,89,91",
     "largura": 224,
     "raiz": "117,238",
-    "colunas": 11,
-    "pe_no_chao": true
+    "colunas": 9,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p05_walk_forward_video_normalized.png",
+      "celula": [
+        224,
+        256
+      ],
+      "raiz": [
+        117,
+        238
+      ],
+      "colunas": 11
+    }
   },
-  "frameWidth": 224,
-  "rootX": 117
+  "frameWidth": 448,
+  "rootX": 234,
+  "sourceReferences": [
+    "art/sprites/source/p05_walk_forward_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

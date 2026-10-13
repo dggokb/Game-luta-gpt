@@ -1,121 +1,126 @@
 {
   "id": "p05_jump_heavy",
   "characterProfile": "p05",
-  "source": "art/sprites/source/p05_jump_heavy_video_normalized.png",
-  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "source": "art/sprites/source/p05_jump_heavy_video_hd.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do v\u00eddeo, retoques da folha 1x revisada (sourceReferences).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 448,
-    "frameHeight": 288,
-    "rootX": 187,
-    "rootY": 270,
-    "columns": 7,
+    "frameWidth": 896,
+    "frameHeight": 576,
+    "rootX": 374,
+    "rootY": 540,
+    "columns": 4,
     "frameCount": 7
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        67,
-        19,
-        330,
-        271
+        134,
+        38,
+        659,
+        541
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 20321
+      "minimumMargin": 35,
+      "opaquePixels": 78387
     },
     {
       "index": 1,
       "outputBbox": [
-        61,
-        19,
-        324,
-        271
+        122,
+        38,
+        647,
+        541
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 20321
+      "minimumMargin": 35,
+      "opaquePixels": 78387
     },
     {
       "index": 2,
       "outputBbox": [
-        51,
-        42,
-        420,
-        271
+        103,
+        85,
+        840,
+        541
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 22184
+      "minimumMargin": 35,
+      "opaquePixels": 85596
     },
     {
       "index": 3,
       "outputBbox": [
-        45,
-        42,
-        414,
-        271
+        91,
+        85,
+        828,
+        541
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 22184
+      "minimumMargin": 35,
+      "opaquePixels": 85596
     },
     {
       "index": 4,
       "outputBbox": [
-        39,
-        42,
-        365,
-        271
+        78,
+        85,
+        728,
+        540
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 21639
+      "minimumMargin": 36,
+      "opaquePixels": 83677
     },
     {
       "index": 5,
       "outputBbox": [
-        33,
-        41,
-        358,
-        272
+        66,
+        83,
+        715,
+        542
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 21636
+      "minimumMargin": 34,
+      "opaquePixels": 83433
     },
     {
       "index": 6,
       "outputBbox": [
-        27,
-        39,
-        350,
-        271
+        55,
+        78,
+        699,
+        540
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 21634
+      "minimumMargin": 36,
+      "opaquePixels": 83282
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 413,
-    "frameHeight": 271,
-    "rootX": 170,
-    "rootY": 259,
-    "columns": 7,
+    "frameWidth": 801,
+    "frameHeight": 520,
+    "rootX": 327,
+    "rootY": 510,
+    "columns": 4,
     "frameCount": 7,
     "cropOffset": [
-      17,
-      11
+      47,
+      30
     ],
     "decodedBytes": {
-      "canonical": 3612672,
-      "packed": 3133844
-    }
+      "canonical": 16515072,
+      "packed": 13328640
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "9b5bdff4a8e40a132c00673b89b115bbce44b22c2e398c3c4b64fee0c46a1e24",
-      "config": "f05b1d17109fa3e911ab3a62edb64fbe8d986d701ddd2f70a63918302f8b7ee2",
+      "source": "c1adecf3bba46f84e7fa787442c37e0bfaaa547d428bec06ce4051c89f32f762",
+      "config": "69cf50f9b5be367dc134f2bd427ef36f4ff6a20d3a42ab11390e0bfad86b7c36",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    },
+    "referenceSources": {
+      "art/sprites/source/p05_jump_heavy_video_normalized.png": "9b5bdff4a8e40a132c00673b89b115bbce44b22c2e398c3c4b64fee0c46a1e24"
     }
   }
 }

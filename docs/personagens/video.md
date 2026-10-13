@@ -136,10 +136,51 @@ reconversão repetir; depois `build_characters.py --write`):
 |---|---|
 | deslize, pulo ao trocar de animação | `ancorar.py p04 HEAVY_STRAIGHT` fixa o pé de apoio no lugar do idle |
 | tamanho errado, zoom de câmera no meio | `reescalar.py p02 MEDIUM_KICK --ver` mede pela cabeça quadro a quadro; sem `--ver` aplica (`--fatores` à mão quando a medida erra) |
-| poeira, risco, arco, clarão | `limpar.py p02 LIGHT_JAB:3,4,5 --previa pasta` apaga manchas de cor fora da paleta |
+| poeira, risco, arco, clarão | `limpar.py p02 LIGHT_JAB:3,4,5 --previa pasta` apaga manchas de cor fora da paleta; `CROUCH_HEAVY:4@0-0.2` limpa só nessa faixa da altura do corpo (0 = topo), quando a limpeza inteira comeria parte borrada do corpo |
 
 Não resolvem: efeito por cima do corpo (o arco cobre a perna), pose errada (agachado que
 levanta), tamanho em pose ereta (intro/vitória: a cabeça engana). Aí é gerar o vídeo de novo.
+
+## Régua de tamanho (uma animação maior ou menor que outra)
+
+```
+python3 tools/sprites/regua.py p02 --relatorio
+```
+
+Grava `docs/personagens/regua/<id>.md` (tabela), `.json` e `-trocas.png` (cada troca de
+animação sobreposta ao IDLE como o jogo faz). Leva uns 3 min por personagem, sem APK.
+
+**A referência é a imagem inicial** (`art/keys/<id>/inicio_*.png`) no tamanho oficial do
+`tamanho.json`: a mesma arte de onde saem todos os vídeos. O **fator** de um clipe é o
+tamanho do corpo no jogo dividido pelo dessa referência (100% = certo; aviso fora de ±3%,
+erro fora de ±6%). A altura da silhueta não serve de régua: guarda aberta, corrida e
+agachado mudam a altura sem mudar o corpo. O fator vem, nesta ordem:
+
+1. a imagem inicial inteira achada num quadro do clipe;
+2. a escala que a conversão mediu na câmera do vídeo pela imagem inicial (nota ≥ 0,9), vezes
+   o que mudou o tamanho depois (fator óptico, folha do vídeo × folha do jogo);
+3. a cabeça da imagem inicial achada nos quadros (normalizada pela do IDLE). A cabeça
+   crescendo ou diminuindo ao longo do clipe é zoom de câmera no vídeo.
+
+A troca de animação (ponta do clipe sobre o IDLE q0, raiz no mesmo ponto) separa dois
+problemas que parecem iguais no jogo: **tamanho** (mesma pose, corpo maior ou menor:
+`reescalar.py`) e **pose** (a ponta do clipe é outra guarda, por exemplo aberta e baixa: a
+altura salta na troca mesmo com o corpo certo; escolher outros quadros ou gerar o vídeo
+terminando na imagem inicial). Também mostra o corpo fora do lugar (`ancorar.py`).
+
+**Corrigir o tamanho** (sem vídeo novo), depois de ver o relatório:
+
+```
+python3 tools/sprites/regua.py p02 --corrigir DASH VICTORY INTRO   # leva a 100%
+python3 tools/sprites/build_characters.py --write
+python3 tools/sprites/regua.py p02 --relatorio                    # confere
+```
+
+Reescala a folha do jogo em volta da raiz (aumenta ou diminui) e grava na receita
+(`reescala`, `reguaFatores` e o motivo em `regua`). Fator óptico aplicado depois da medida
+da câmera é desfeito. Zoom de câmera vira um fator por quadro (a reta da cabeça ao longo do
+clipe). Só corrigir clipes cujo fator foi confirmado por duas medidas; a pose não se corrige
+assim.
 
 ## Ritmo: animação e movimento do jogo
 
@@ -158,6 +199,36 @@ de cada um tem mais ou menos movimento; sem acerto, um dash com corrida de verda
 O loop (andar, corrida) tem de ser um ciclo do vídeo: começa e termina no mesmo ponto da
 passada, sem largada nem freada. Dash de vídeo que é só arrancada vira um loop curto do
 trecho do avanço.
+
+## HD direto do vídeo (densidade 2) — piloto p05
+
+Nos vídeos o personagem tem ~420 px de altura (mais nos que deram zoom); a folha 1x usa
+~200. Com `--densidade 2` o `video_para_sprite.py` escala para o dobro e grava a folha com o
+dobro de px: célula, raiz, `largura`, `raiz` e `aparar_borda` da receita continuam
+**lógicos**, o clipe ganha `"pixelScale": 2.0` (como o p01–p04 por super-resolução) e o jogo
+desenha no mesmo tamanho. A folha HD fica no máximo com 4096 px de lado (mais linhas, menos
+colunas). `--nitidez` aplica unsharp mask leve e tira a franja verde da borda.
+
+Auditoria, ancorar, limpar, reescalar, tamanho e harmonia medem a folha HD reduzida ao
+tamanho lógico (os limites em px valem igual) e editam na folha física.
+
+Personagem que já estava no jogo em 1x tem retoques fora da receita. Para não perdê-los:
+
+1. a folha 1x revisada fica como está (`*_video_normalized.png`) e entra em
+   `sourceReferences`; a HD vai para `*_video_hd.png` (`source`);
+2. a receita guarda `"referencia"` (folha, célula, raiz e colunas da 1x) e
+   `tools/sprites/retoque_hd.py` repete na HD, célula a célula, o deslocamento e o que foi
+   apagado à mão;
+3. quadro trocado à mão por outro do vídeo vai na lista `quadros` (no p05: `fall_down`,
+   15 → 16);
+4. `--escala-da-receita` reusa a escala gravada (refazer em HD não muda o tamanho).
+
+```
+python3 tools/sprites/video_para_sprite.py <vídeo> --clipe tools/sprites/clips/p05_idle.json \
+    --densidade 2 --escala-da-receita [--nitidez]
+```
+
+Custo por personagem HD (p05): PNG 27 → 84 MB no APK, memória decodificada 151 → 566 MB.
 
 ## Um vídeo pode virar vários clipes
 

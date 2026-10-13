@@ -1,0 +1,121 @@
+{
+  "id": "p11_defense_crouch",
+  "characterProfile": "p11",
+  "source": "art/sprites/source/p11_defense_crouch_video_normalized.png",
+  "sourceNote": "p11 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 288,
+    "frameHeight": 192,
+    "rootX": 167,
+    "rootY": 174,
+    "columns": 7,
+    "frameCount": 7
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        33,
+        37,
+        232,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13152
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        66,
+        38,
+        263,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14411
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        59,
+        36,
+        260,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13979
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        24,
+        35,
+        227,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 14385
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        33,
+        34,
+        227,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13356
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        29,
+        34,
+        227,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13153
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        28,
+        34,
+        226,
+        175
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 13129
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 257,
+    "frameHeight": 162,
+    "rootX": 151,
+    "rootY": 150,
+    "columns": 7,
+    "frameCount": 7,
+    "cropOffset": [
+      16,
+      24
+    ],
+    "decodedBytes": {
+      "canonical": 1548288,
+      "packed": 1165752
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "c8fb7e349ce4125470c2d4a56b896534ddafec3d4e55fe05b5f9b1b2186b133c",
+      "config": "d88466668f72bead65a66afa571f6a379be50c5326eaa5dbcb1391fdefa42788",
+      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+    }
+  }
+}

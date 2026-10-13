@@ -1,0 +1,58 @@
+{
+  "nome": "Takatoshi",
+  "_comentario": "Animações sem \"folha\" usam a parada com um movimento provisório até o vídeo chegar (tools/stage/video_para_ator.py preenche folha, quadros, colunas e fps).",
+  "parado": "parado",
+  "animacoes": {
+    "parado": {
+      "folha": "parado.png",
+      "quadros": 21,
+      "colunas": 8,
+      "fps": 10.0,
+      "loop": true
+    },
+    "aplaudir": {
+      "folha": "aplaudir.png",
+      "quadros": 32,
+      "colunas": 8,
+      "fps": 10.0
+    },
+    "rir": {
+      "folha": "rir.png",
+      "quadros": 32,
+      "colunas": 8,
+      "fps": 10.0
+    },
+    "surpreso": {
+      "folha": "surpreso.png",
+      "quadros": 32,
+      "colunas": 8,
+      "fps": 10.0
+    },
+    "aprovar": {
+      "folha": "aprovar.png",
+      "quadros": 39,
+      "colunas": 8,
+      "fps": 10.0
+    }
+  },
+  "reacoes": {
+    "licao": [
+      "aprovar",
+      "aplaudir"
+    ],
+    "impacto": [
+      "surpreso"
+    ],
+    "levou": [
+      "rir"
+    ],
+    "fim": [
+      "aplaudir"
+    ]
+  },
+  "video": {
+    "escala": 0.43275,
+    "centroX": 644.7,
+    "chaoY": 705
+  }
+}

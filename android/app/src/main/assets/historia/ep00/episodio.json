@@ -55,6 +55,7 @@
     },
     {
       "tipo": "pagina",
+      "marca": "intro",
       "imagem": "pag4.jpg",
       "quadros": [
         {
@@ -88,8 +89,9 @@
         }
       ]
     },
-    {"tipo": "luta", "rotulo": "TREINO", "dupla": ["player_base", "p02"], "cpu": ["p03", "p04"], "repetirSeDerrota": false},
+    {"tipo": "luta", "marca": "treino", "modo": "tutorial", "cenario": "dojo_shinshinkan", "rotulo": "TREINO", "dupla": ["player_base", "p02"], "cpu": ["p03", "p04"]},
     {
+      "marca": "pai-parte",
       "tipo": "pagina",
       "imagem": "pag5.jpg",
       "quadros": [

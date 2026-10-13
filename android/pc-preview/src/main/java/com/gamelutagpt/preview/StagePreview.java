@@ -93,8 +93,13 @@ public final class StagePreview {
         if (highest < top + 64f / zoom) top = highest - 64f / zoom;
     }
 
+    /** Reações dos atores de fundo, uma a cada 3 s, para ver todas no visualizador. */
+    private static final String[] REACTIONS = {"licao", "impacto", "levou", "fim"};
+
     private void update(float dt) {
+        float before = time;
         time += dt;
+        if ((int)(time / 3f) != (int)(before / 3f)) scene.react(REACTIONS[(int)(time / 3f) % REACTIONS.length]);
         script(time);
         scene.setCamera(zoom, left, top);
         scene.update(dt);

@@ -25,7 +25,7 @@
   "DEFENSE_STAND": "defendeCima",
   "DEFENSE_CROUCH": "defendeBaixo",
   "DEFENSE_AIR": "defesaPulo",
-  "HIT_CROUCH": "danoBaixo",
+  "HIT_CROUCH": "defendeBaixo",
   "HIT_AIR": "danoPulo",
   "KNOCKDOWN": "derruba_levanta",
   "INTRO": "intro",

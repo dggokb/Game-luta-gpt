@@ -103,6 +103,14 @@
       "sha256": "c3d182b9f8cc426cfc26c41ed9f9408767656a2459bfe724e025af4ca701353c",
       "bytes": 2446418,
       "git_sha": "f07c047a3106162303e2650644289b824dc35623"
+    },
+    {
+      "name": "p11.png",
+      "repo_source": "art/concepts/p11.png",
+      "asset": "ui/hud/concepts/p11.webp",
+      "sha256": "bda037ce6d135a786d081ed017c1c5a4d245a75b1f8e0f03ee96d49ae0175a5c",
+      "bytes": 1645910,
+      "git_sha": "e879a968cdfb177931efcbbac8033e8f8442dd82"
     }
   ]
 }

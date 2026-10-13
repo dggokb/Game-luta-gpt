@@ -18,7 +18,7 @@ final class HudConceptPortraits {
 
     static String source(String id) {
         if ("player_base".equals(id)) return "ui/hud/concepts/p01.webp";
-        if (id.matches("p0[2-9]|p1[02]")) return "ui/hud/concepts/" + id + ".webp";
+        if (id.matches("p0[2-9]|p1[0-2]")) return "ui/hud/concepts/" + id + ".webp";
         return null;
     }
 
@@ -35,6 +35,7 @@ final class HudConceptPortraits {
             case "p08": return new int[]{12, 645, 307, 1070};
             case "p09": return new int[]{18, 758, 372, 1014};
             case "p10": return new int[]{13, 770, 368, 1058};
+            case "p11": return new int[]{870, 419, 1145, 747};
             case "p12": return new int[]{1169, 15, 1435, 332};
             default: return null;
         }

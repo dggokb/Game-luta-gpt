@@ -106,6 +106,11 @@ def pack_frames(pacote, state, picks):
                          f'(vídeo que começa no inicio_centro)')
     sheet = rgba_png(ROOT / cfg['source'])
     w, h = cfg.get('frameWidth', 256), cfg.get('frameHeight', 256)
+    d = int(cfg.get('pixelScale', 1))
+    if d != 1:  # folha HD: quadros no tamanho oficial (lógico), como as escalas das receitas
+        img = Image.fromarray(sheet)
+        sheet = np.array(img.resize((img.width // d, img.height // d), Image.LANCZOS))
+        w, h = w // d, h // d
     cols, n = cfg['columns'], cfg['expectedFrames']
     frames = char['animations'][state]['frames'] if char else list(range(n))
     idx = [frames[i] for i in picks(len(frames))]
