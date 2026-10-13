@@ -39,6 +39,18 @@ jobs:
         run: |
           python3 tools/sprites/build_characters.py --write
           python3 tools/sprites/build_characters.py --check
+      - name: Correct story skip coordinate visibility in this disposable build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("android/story-core/src/main/java/com/gamelutagpt/historia/PaginaHistoria.java")
+          original="    static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;"
+          replacement="    public static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;"
+          content=p.read_text()
+          assert content.count(original)==1, "Unexpected story-core constants; do not guess a patch"
+          p.write_text(content.replace(original,replacement))
+          print("Compilation-only public access change applied to four SKIP_* constants")
+          PY
       - name: Build Android APK
         working-directory: android
         run: gradle assembleDebug --stacktrace
