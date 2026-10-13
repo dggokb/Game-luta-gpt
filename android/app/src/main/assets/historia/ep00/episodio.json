@@ -3,72 +3,90 @@
   "numero": 0,
   "titulo": "O Pai que Partiu",
   "passos": [
-    { "tipo": "titulo" },
-
-    { "tipo": "pagina", "layout": "faixa-e-dois", "tom": "flashback", "paineis": [
-      { "imagem": "pag1_q1.jpg", "cena": "dojo", "personagens": ["koga", "takatoshi", "ryuga"], "foco": 0.45,
-        "baloes": [
-          { "tipo": "narracao", "texto": "Dez anos atrás. Dojo da família Komyo.", "pos": [0.17, 0.2] },
-          { "tipo": "fala", "quem": "takatoshi", "texto": "De novo! O Estilo Komyo não perdoa uma guarda baixa.", "pos": [0.75, 0.32], "rabo": [0.52, 0.45] }
-        ] },
-      { "imagem": "pag1_q2.jpg", "cena": "dojo", "personagens": ["koga"], "efeito": "velocidade",
-        "sfx": "PÁ!", "posicaoSfx": [0.75, 0.3],
-        "baloes": [
-          { "tipo": "grito", "quem": "koga", "texto": "HYAAAH!", "pos": [0.28, 0.2], "rabo": [0.45, 0.5] }
-        ] },
-      { "imagem": "pag1_q3.jpg", "cena": "dojo", "personagens": ["ryuga"], "enquadramento": "close",
-        "baloes": [
-          { "tipo": "pensamento", "quem": "ryuga", "texto": "O Kōga sempre ataca primeiro... Eu espero.", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
-        ] }
-    ] },
-
-    { "tipo": "pagina", "layout": "quatro", "tom": "flashback", "paineis": [
-      { "imagem": "pag2_q1.jpg", "cena": "casa", "personagens": ["dafu"], "foco": 0.4,
-        "baloes": [
-          { "tipo": "fala", "quem": "dafu", "texto": "Hora do lanche! Daifuku fresquinho para o dragão e para o tigre!", "pos": [0.68, 0.45], "rabo": [0.5, 0.55] }
-        ] },
-      { "imagem": "pag2_q2.jpg", "cena": "estrada", "personagens": ["mensageiro", "takatoshi"],
-        "baloes": [
-          { "tipo": "narracao", "texto": "Naquela tarde, chegou um convite.", "pos": [0.5, 0.12] }
-        ] },
-      { "imagem": "pag2_q3.jpg", "cena": "carta", "enquadramento": "detalhe",
-        "baloes": [
-          { "tipo": "narracao", "texto": "Sem remetente. Só um selo negro.", "pos": [0.3, 0.2] }
-        ] },
-      { "imagem": "pag2_q4.jpg", "cena": "casa", "personagens": ["takatoshi"], "enquadramento": "close",
-        "baloes": [
-          { "tipo": "pensamento", "quem": "takatoshi", "texto": "...Finalmente.", "pos": [0.22, 0.4], "rabo": [0.42, 0.5] }
-        ] }
-    ] },
-
-    { "tipo": "pagina", "layout": "dois-e-faixa", "tom": "flashback", "paineis": [
-      { "imagem": "pag3_q1.jpg", "cena": "casa", "personagens": ["ryuga"],
-        "baloes": [
-          { "tipo": "fala", "quem": "ryuga", "texto": "Não vai, pai. Tem alguma coisa errada nesse torneio.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
-        ] },
-      { "imagem": "pag3_q2.jpg", "cena": "casa", "personagens": ["koga"], "efeito": "brilho",
-        "baloes": [
-          { "tipo": "grito", "quem": "koga", "texto": "Ele vai ganhar de todo mundo! O pai é o mais forte do mundo!", "pos": [0.5, 0.24], "rabo": [0.5, 0.5] }
-        ] },
-      { "imagem": "pag3_q3.jpg", "cena": "casa", "personagens": ["ryuga", "takatoshi", "koga", "dafu"], "foco": 0.35,
-        "baloes": [
-          { "tipo": "fala", "quem": "takatoshi", "texto": "Dafu... cuide deles até eu voltar.", "pos": [0.22, 0.32], "rabo": [0.38, 0.45] },
-          { "tipo": "fala", "quem": "dafu", "texto": "Pode ir tranquilo, mestre. Eles estão em boas mãos.", "pos": [0.78, 0.32], "rabo": [0.86, 0.45] }
-        ] }
-    ] },
-
-    { "tipo": "pagina", "layout": "splash", "tom": "flashback", "paineis": [
-      { "imagem": "pag4_q1.jpg", "cena": "estrada", "personagens": ["takatoshi"], "foco": 0.55,
-        "baloes": [
-          { "tipo": "narracao", "texto": "Takatoshi Komyo partiu para o torneio.", "pos": [0.22, 0.1] },
-          { "tipo": "narracao", "texto": "Ele nunca voltou.", "pos": [0.8, 0.88] }
-        ] }
-    ] },
-
-    { "tipo": "proximo", "titulo": "Duas Cartas", "linhas": [
-      "Dez anos se passaram.",
-      "Os irmãos Komyo cresceram treinando o estilo do pai...",
-      "...até o dia em que o mesmo selo negro voltou a bater na porta."
-    ] }
+    {"tipo": "titulo"},
+    {
+      "tipo": "pagina",
+      "imagem": "pag1.jpg",
+      "quadros": [
+        {"area": [0.618, 0.004, 0.6265, 0.159, 0.0, 0.1328, 0.0, 0.0322], "legenda": "Tóquio. Dez anos atrás."},
+        {"area": [0.9991, 0.0, 0.9991, 0.1751, 0.6578, 0.1616, 0.6474, 0.0]},
+        {"area": [0.0, 0.135, 0.627, 0.159, 0.999, 0.178, 0.999, 0.892, 0.46, 0.822, 0.0, 0.744], "legenda": "Dojo Shūshinkan, casa do Estilo Komyo."},
+        {"area": [0.0, 0.7438, 0.4389, 0.8182, 0.4502, 0.9993, 0.0, 0.9993]},
+        {"area": [0.4626, 0.8243, 0.9991, 0.894, 0.9991, 0.9993, 0.4749, 0.9993]}
+      ]
+    },
+    {
+      "tipo": "pagina",
+      "imagem": "pag2.jpg",
+      "quadros": [
+        {"area": [0.999, 0.0, 0.999, 0.1987, 0.3802, 0.2475, 0.0, 0.2348, 0.0, 0.0]},
+        {"area": [0.5238, 0.2415, 0.5618, 0.4635, 0.0, 0.4669, 0.0, 0.2415]},
+        {"area": [0.999, 0.206, 0.999, 0.4609, 0.5713, 0.4635, 0.5323, 0.2408], "impacto": true},
+        {"area": [0.4857, 0.4696, 0.4952, 0.5893, 0.0, 0.59, 0.0, 0.4722], "impacto": true},
+        {"area": [0.999, 0.4682, 0.999, 0.5866, 0.5038, 0.5893, 0.4952, 0.4702], "impacto": true},
+        {"area": [0.0, 0.594, 0.8717, 0.594, 0.8717, 0.6863, 0.0, 0.6863]},
+        {"area": [0.999, 0.5933, 0.999, 0.6856, 0.8793, 0.6856, 0.8793, 0.594]},
+        {"area": [0.0, 0.6896, 0.999, 0.6896, 0.999, 0.7779, 0.0, 0.7779], "impacto": true},
+        {"area": [0.0, 0.7813, 0.5323, 0.7813, 0.5095, 0.9993, 0.0, 0.9993], "impacto": true},
+        {"area": [0.999, 0.7813, 0.999, 0.9993, 0.5181, 0.9993, 0.5418, 0.7826]}
+      ]
+    },
+    {
+      "tipo": "pagina",
+      "imagem": "pag3.jpg",
+      "quadros": [
+        {"area": [0.999, 0.0, 0.999, 0.1933, 0.5029, 0.2341, 0.0, 0.2047, 0.0, 0.0]},
+        {"area": [0.0, 0.212, 0.5, 0.2401, 0.5095, 0.4334, 0.0, 0.4294]},
+        {"area": [0.999, 0.2007, 0.999, 0.4314, 0.519, 0.4328, 0.5105, 0.2395]},
+        {"area": [0.0, 0.4355, 0.4857, 0.4395, 0.4914, 0.5759, 0.0, 0.5465], "impacto": true},
+        {"area": [0.999, 0.4375, 0.999, 0.5525, 0.501, 0.5759, 0.4981, 0.4401], "impacto": true},
+        {"area": [0.0, 0.5525, 0.999, 0.5585, 0.999, 0.9993, 0.0, 0.9993]}
+      ]
+    },
+    {
+      "tipo": "pagina",
+      "imagem": "pag4.jpg",
+      "quadros": [
+        {"area": [0.9877, 0.0, 0.9877, 0.1831, 0.0114, 0.1844, 0.0114, 0.0]},
+        {"area": [0.9877, 0.1898, 0.9867, 0.4105, 0.0123, 0.4105, 0.0123, 0.1911]},
+        {"area": [0.9877, 0.4172, 0.9877, 0.5788, 0.0123, 0.5795, 0.0123, 0.4172]},
+        {"area": [0.9877, 0.5862, 0.9877, 0.7243, 0.0123, 0.7257, 0.0123, 0.5862]},
+        {"area": [0.9877, 0.7317, 0.9877, 0.9993, 0.0123, 0.9993, 0.0123, 0.7317], "impacto": true}
+      ]
+    },
+    {
+      "tipo": "pagina",
+      "layout": "quatro",
+      "tom": "papel",
+      "paineis": [
+        {"imagem": "pag5_q1.jpg", "cena": "casa", "personagens": ["dafu"], "foco": 0.4, "baloes": [{"tipo": "fala", "quem": "dafu", "texto": "Hora do lanche! Daifuku fresquinho para o dragão e para o tigre!", "pos": [0.68, 0.45], "rabo": [0.5, 0.55]}]},
+        {"imagem": "pag5_q2.jpg", "cena": "estrada", "personagens": ["mensageiro", "takatoshi"], "baloes": [{"tipo": "narracao", "texto": "Naquela tarde, chegou um convite.", "pos": [0.5, 0.12]}]},
+        {"imagem": "pag5_q3.jpg", "cena": "carta", "enquadramento": "detalhe", "baloes": [{"tipo": "narracao", "texto": "Sem remetente. Só um selo negro.", "pos": [0.3, 0.2]}]},
+        {"imagem": "pag5_q4.jpg", "cena": "casa", "personagens": ["takatoshi"], "enquadramento": "close", "baloes": [{"tipo": "pensamento", "quem": "takatoshi", "texto": "...Finalmente.", "pos": [0.22, 0.4], "rabo": [0.42, 0.5]}]}
+      ]
+    },
+    {
+      "tipo": "pagina",
+      "layout": "dois-e-faixa",
+      "tom": "papel",
+      "paineis": [
+        {"imagem": "pag6_q1.jpg", "cena": "casa", "personagens": ["ryuga"], "baloes": [{"tipo": "fala", "quem": "ryuga", "texto": "Não vai, pai. Tem alguma coisa errada nesse torneio.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5]}]},
+        {"imagem": "pag6_q2.jpg", "cena": "casa", "personagens": ["koga"], "efeito": "brilho", "baloes": [{"tipo": "grito", "quem": "koga", "texto": "Ele vai ganhar de todo mundo! O pai é o mais forte do mundo!", "pos": [0.5, 0.24], "rabo": [0.5, 0.5]}]},
+        {"imagem": "pag6_q3.jpg", "cena": "casa", "personagens": ["ryuga", "takatoshi", "koga", "dafu"], "foco": 0.35, "baloes": [{"tipo": "fala", "quem": "takatoshi", "texto": "Dafu... cuide deles até eu voltar.", "pos": [0.22, 0.32], "rabo": [0.38, 0.45]}, {"tipo": "fala", "quem": "dafu", "texto": "Pode ir tranquilo, mestre. Eles estão em boas mãos.", "pos": [0.78, 0.32], "rabo": [0.86, 0.45]}]}
+      ]
+    },
+    {
+      "tipo": "pagina",
+      "layout": "splash",
+      "tom": "papel",
+      "paineis": [
+        {"imagem": "pag7_q1.jpg", "cena": "estrada", "personagens": ["takatoshi"], "foco": 0.55, "baloes": [{"tipo": "narracao", "texto": "Takatoshi Komyo partiu para o torneio.", "pos": [0.22, 0.1]}, {"tipo": "narracao", "texto": "Ele nunca voltou.", "pos": [0.8, 0.88]}]}
+      ]
+    },
+    {
+      "tipo": "proximo",
+      "titulo": "Duas Cartas",
+      "linhas": ["Dez anos se passaram.", "Os irmãos Komyo cresceram treinando o estilo do pai...", "...até o dia em que o mesmo selo negro voltou a bater na porta."]
+    }
   ]
 }

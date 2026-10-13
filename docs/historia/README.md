@@ -94,6 +94,42 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 Sem a imagem, o painel mostra a arte provisória (cenário, silhuetas nas cores do elenco e
 o nome do arquivo esperado). Assim dá para escrever e testar o ritmo antes da arte.
 
+## Páginas prontas (recomendado)
+
+Uma página de mangá inteira numa imagem só (em pé, como as do GPT), com balões e
+onomatopeias já desenhados. O jogo faz a **leitura guiada**: mostra a página inteira, entra
+quadro a quadro com o resto da página escurecido (o zoom leva o quadro até preencher a tela,
+e quadros altos são percorridos de cima para baixo) e, depois do último, volta para a página
+inteira antes de seguir.
+
+```bash
+pip install opencv-python-headless numpy
+python3 tools/historia/recortar_pagina.py pagina.png --episodio ep00 --nome pag5
+```
+
+O script grava a página em `assets/historia/ep00/pag5.jpg`, acha os quadros pelas divisas
+claras e imprime o passo pronto para colar no `episodio.json`, na ordem de leitura (de cima
+para baixo, da esquerda para a direita). Ele também grava `pag5_quadros.jpg` com os quadros
+numerados: confira. Quadros separados só por uma linha preta, ou com o desenho passando por
+cima da divisa (cabelo, onomatopeia), podem sair juntos; aí corrija o `area` à mão (foi o
+caso dos olhos na página 2 do Prólogo).
+
+```json
+{ "tipo": "pagina", "imagem": "pag1.jpg", "quadros": [
+  { "area": [0.0, 0.03, 0.62, 0.0, 0.63, 0.16, 0.0, 0.13], "legenda": "Tóquio. Dez anos atrás." },
+  { "area": [0.0, 0.69, 1.0, 0.69, 1.0, 0.78, 0.0, 0.78], "impacto": true }
+] }
+```
+
+- `area`: o contorno do quadro em frações da página (`[x0, y0, x1, y1, ...]`, de 0 a 1).
+- `impacto`: o quadro chega tremendo a tela com um clarão (golpes, gritos).
+- `legenda`: narração escrita pelo jogo numa faixa embaixo da tela. Vale para texto que não
+  está desenhado na página e é o lugar para o texto traduzível.
+
+Texto desenhado na imagem (balões, onomatopeias) aparece igual em todos os idiomas. Para
+traduzir, a página precisa ser refeita por idioma, ou os balões ficam vazios na arte e o texto
+vem do jogo (a fazer).
+
 ## Revisar no PC
 
 ```bash

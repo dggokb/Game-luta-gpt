@@ -118,6 +118,50 @@ public class PaginaHistoriaTest {
         assertEquals(1, rec.fights.size());
     }
 
+    private static final String EPISODIO_PRONTO = "{\"id\":\"e2\",\"passos\":[" +
+        "{\"tipo\":\"pagina\",\"imagem\":\"pag1.jpg\",\"quadros\":[" +
+        "  {\"area\":[0,0,1,0,1,0.5,0,0.5],\"legenda\":\"Tóquio.\"}," +
+        "  {\"area\":[0,0.5,1,0.5,1,1,0,1],\"impacto\":true}]}," +
+        "{\"tipo\":\"proximo\",\"titulo\":\"Depois\"}]}";
+
+    @Test
+    public void paginaProntaLeQuadroAQuadroEVoltaParaAPaginaInteira() {
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, new NoImages());
+        Episodio ep = Episodio.fromJson(EPISODIO_PRONTO);
+        assertTrue(ep.passos.get(0).paginaPronta());
+        assertEquals(2, ep.passos.get(0).quadros.size());
+        assertTrue(ep.passos.get(0).quadros.get(1).impacto);
+
+        p.start(Temporada.fromJson(TEMPORADA), ep);
+        RenderCanvas canvas = new NullCanvas();
+        // A página inteira aparece e a câmera entra sozinha no primeiro quadro.
+        assertFalse(p.waitingTap());
+        run(p, PaginaGuiada.OVERVIEW_HOLD + PaginaGuiada.MOVE + 0.1f);
+        p.render(canvas);
+        assertTrue(p.waitingTap());
+        assertFalse(p.pageComplete());
+        p.tap(640f, 360f);
+        run(p, PaginaGuiada.MOVE + 0.1f);
+        assertTrue(p.pageComplete());
+        // Depois do último quadro a câmera volta para a página inteira e a página sai sozinha.
+        p.tap(640f, 360f);
+        run(p, PaginaGuiada.OUTRO_MOVE + PaginaGuiada.OUTRO_HOLD + PaginaHistoria.EXIT_DURATION + 0.1f);
+        assertEquals(Episodio.TipoPasso.PROXIMO, p.passo().tipo);
+        p.render(canvas);
+        assertTrue(rec.sounds.contains("painel"));
+    }
+
+    @Test
+    public void paginaProntaSemQuadrosFalha() {
+        try {
+            Episodio.fromJson("{\"passos\":[{\"tipo\":\"pagina\",\"imagem\":\"a.jpg\"}]}");
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("sem quadros"));
+        }
+    }
+
     @Test
     public void layoutComQuantidadeErradaDePaineisFalha() {
         try {
@@ -158,6 +202,10 @@ public class PaginaHistoriaTest {
                     for (String fighter : new String[] {passo.dupla[0], passo.dupla[1], passo.cpu[0], passo.cpu[1]}) {
                         assertTrue(id + ": lutador fora do roster: " + fighter, roster.contains("\"" + fighter + "\""));
                     }
+                }
+                if (passo.paginaPronta()) {
+                    assertTrue(id + ": imagem da página pronta não existe: " + passo.imagem,
+                        new File(ASSETS, "historia/" + id + "/" + passo.imagem).isFile());
                 }
                 for (Episodio.Painel painel : passo.paineis) {
                     for (String who : painel.personagens) {
