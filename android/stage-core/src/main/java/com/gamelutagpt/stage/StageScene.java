@@ -6,7 +6,9 @@ import com.gamelutagpt.render.RenderImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Cenário em execução: projeta as camadas com a {@link StageCamera} a cada quadro.
@@ -44,7 +46,30 @@ public final class StageScene {
         }
     }
 
+    /** Ator em cena: a animação que toca agora e o tempo dela. */
+    private static final class ActorState {
+        final Placed placed;
+        final StageActor actor;
+        final String folder;
+        final RenderImage idleSheet;
+        String anim;
+        float animTime;
+        /** Reação esperando para começar (cada ator reage num tempo um pouco diferente). */
+        String queued;
+        float delay;
+
+        ActorState(Placed placed, StageActor actor, String folder, RenderImage idleSheet) {
+            this.placed = placed;
+            this.actor = actor;
+            this.folder = folder;
+            this.idleSheet = idleSheet;
+            this.anim = actor.idle;
+        }
+    }
+
     private final StagePack pack;
+    /** Atores pelo id da camada, na ordem do stage.json. */
+    private final Map<String, ActorState> actors = new LinkedHashMap<>();
     private final StageWorld world;
     private final StageCamera camera;
     private final List<Placed> placed = new ArrayList<>();
@@ -73,10 +98,17 @@ public final class StageScene {
         for (StageDefinition.Layer layer : def.layers) {
             RenderImage image = pack.image(layer.image);
             if (layer.kind == StageDefinition.Kind.IMAGE && image == null) continue;
+            StageActor actor = null;
+            if (layer.kind == StageDefinition.Kind.ACTOR) {
+                actor = pack.actor(layer.actor);
+                StageActor.Animation idle = actor != null ? actor.animations.get(actor.idle) : null;
+                image = idle != null ? pack.image(StagePack.actorImage(layer.actor, idle.sheet)) : null;
+                if (image == null) continue;
+            }
             float z = layer.depth;
             float scale = rest.scale(z);
             float top, bottom;
-            if (layer.kind == StageDefinition.Kind.IMAGE && layer.onGround) {
+            if ((layer.kind == StageDefinition.Kind.IMAGE || layer.kind == StageDefinition.Kind.ACTOR) && layer.onGround) {
                 bottom = world.groundY;
                 top = bottom - layer.height * VH / scale;
             } else if (layer.kind == StageDefinition.Kind.WATER) {
@@ -85,10 +117,14 @@ public final class StageScene {
                 top = rest.worldY(layer.top * VH, z);
                 bottom = rest.worldY(layer.bottom * VH, z);
             }
-            float width = image != null ? (bottom - top) * image.width() / (float)image.height() : 0f;
+            float aspect = image != null ? image.width() / (float)image.height() : 0f;
+            if (actor != null) aspect = cellAspect(actor.animations.get(actor.idle), image);
+            float width = (bottom - top) * aspect;
             float centerX = rest.worldX(layer.x * VW, z);
             float period = Float.isNaN(layer.period) ? width : layer.period * VW / scale;
-            placed.add(new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period)));
+            Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period));
+            placed.add(p);
+            if (actor != null) actors.put(layer.id, new ActorState(p, actor, layer.actor, image));
         }
         Collections.sort(placed, new Comparator<Placed>() {
             @Override
@@ -137,8 +173,129 @@ public final class StageScene {
         camera.set(zoom, cameraLeft, top);
     }
 
+    // ------------------------------------------------------------- atores
+
+    /** Ids (das camadas) dos atores em cena. */
+    public List<String> actorIds() {
+        return new ArrayList<>(actors.keySet());
+    }
+
+    /** Animação que o ator está tocando agora, ou null se ele não existe. */
+    public String actorAnimation(String id) {
+        ActorState a = actors.get(id);
+        return a == null ? null : a.anim;
+    }
+
+    /** O ator toca {@code anim} uma vez e volta à parada. Falso se o ator ou a animação não existe. */
+    public boolean actorPlay(String id, String anim) {
+        ActorState a = actors.get(id);
+        if (a == null || !a.actor.animations.containsKey(anim)) return false;
+        a.anim = anim;
+        a.animTime = 0f;
+        a.queued = null;
+        return true;
+    }
+
+    /**
+     * Um acontecimento do jogo ("licao", "impacto", "levou", "fim"...): cada ator que tem
+     * reação para ele escolhe uma das animações da lista e toca, com um atraso pequeno e
+     * diferente para cada um, para não reagirem como robôs.
+     */
+    public void react(String event) {
+        for (ActorState a : actors.values()) {
+            List<String> options = a.actor.reactions.get(event);
+            if (options == null || options.isEmpty()) continue;
+            int pick = Math.min(options.size() - 1, (int)(rand.next() * options.size()));
+            a.queued = options.get(pick);
+            a.delay = rand.range(0.05f, 0.35f);
+        }
+    }
+
+    private static float cellAspect(StageActor.Animation a, RenderImage sheet) {
+        int rows = (a.frames + a.columns - 1) / a.columns;
+        return (sheet.width() / (float)a.columns) / (sheet.height() / (float)rows);
+    }
+
+    private void updateActors(float dt) {
+        for (ActorState a : actors.values()) {
+            if (a.queued != null) {
+                a.delay -= dt;
+                if (a.delay <= 0f) actorPlay(a.placed.layer.id, a.queued);
+            }
+            if (a.anim.equals(a.actor.idle)) continue;
+            a.animTime += dt;
+            StageActor.Animation anim = a.actor.animations.get(a.anim);
+            if (!anim.loop && a.animTime >= animDuration(a, anim)) {
+                a.anim = a.actor.idle;
+                a.animTime = 0f;
+            }
+        }
+    }
+
+    /** Duração da animação; sem folha carregada, o tempo do movimento provisório. */
+    private float animDuration(ActorState a, StageActor.Animation anim) {
+        RenderImage sheet = anim.sheet != null ? pack.image(StagePack.actorImage(a.folder, anim.sheet)) : null;
+        return sheet != null ? anim.frames / anim.fps : anim.fallbackSeconds;
+    }
+
+    private void drawActor(RenderCanvas c, Placed p) {
+        ActorState a = actors.get(p.layer.id);
+        if (a == null) return;
+        float z = p.z;
+        float scale = camera.scale(z);
+        float top = camera.screenY(p.top, z);
+        float bottom = camera.screenY(p.bottom, z);
+        float halfWidth = p.width * 0.5f * scale;
+        float cx = camera.screenX(p.firstCenterX, z);
+        if (bottom < 0f || top > VH || cx + halfWidth < 0f || cx - halfWidth > VW) return;
+
+        StageActor.Animation anim = a.actor.animations.get(a.anim);
+        RenderImage sheet = anim.sheet != null ? pack.image(StagePack.actorImage(a.folder, anim.sheet)) : null;
+        float dx = 0f, dy = 0f, grow = 1f;
+        int frame;
+        if (sheet == null) {
+            // Sem a arte da reação: a parada com um movimento provisório.
+            StageActor.Animation idle = a.actor.animations.get(a.actor.idle);
+            float[] m = StageActor.provisorio(a.anim, Math.min(1f, a.animTime / Math.max(0.01f, anim.fallbackSeconds)));
+            float h = bottom - top;
+            dx = m[0] * h;
+            dy = m[1] * h;
+            grow = m[2];
+            anim = idle;
+            sheet = a.idleSheet;
+            frame = (int)(time * idle.fps) % idle.frames;
+        } else if (anim.name.equals(a.actor.idle) || anim.loop) {
+            float t = anim.name.equals(a.actor.idle) ? time : a.animTime;
+            frame = (int)(t * anim.fps) % anim.frames;
+        } else {
+            frame = Math.min(anim.frames - 1, (int)(a.animTime * anim.fps));
+        }
+        int rows = (anim.frames + anim.columns - 1) / anim.columns;
+        float cellW = sheet.width() / (float)anim.columns;
+        float cellH = sheet.height() / (float)rows;
+        float sl = (frame % anim.columns) * cellW;
+        float st = (frame / anim.columns) * cellH;
+        float h = (bottom - top) * grow;
+        float w = h * cellW / cellH;
+        float l = cx + dx - w * 0.5f, r = cx + dx + w * 0.5f;
+        float b = bottom + dy, t = b - h;
+        int alpha = Math.round(255f * p.layer.alpha);
+        // Sombra de contato no chão (fica no lugar quando o ator pula de surpresa).
+        float shadowW = w * 0.42f;
+        c.fillOval(cx - shadowW, bottom - h * 0.018f, cx + shadowW, bottom + h * 0.018f, 0x55000000);
+        if (p.layer.flip) {
+            c.save();
+            c.scale(-1f, 1f, cx, 0f);
+            c.drawImageRegion(sheet, sl, st, sl + cellW, st + cellH, l, t, r, b, alpha);
+            c.restore();
+        } else {
+            c.drawImageRegion(sheet, sl, st, sl + cellW, st + cellH, l, t, r, b, alpha);
+        }
+    }
+
     public void update(float dt) {
         time += dt;
+        updateActors(dt);
         StageDefinition.Petals petals = pack.definition.petals;
         if (petals == null) return;
         for (int i = 0; i < petalX.length; i++) {
@@ -188,6 +345,7 @@ public final class StageScene {
             case IMAGE: drawImageLayer(c, p); break;
             case FOG: drawFog(c, p); break;
             case WATER: drawWater(c, p); break;
+            case ACTOR: drawActor(c, p); break;
         }
     }
 

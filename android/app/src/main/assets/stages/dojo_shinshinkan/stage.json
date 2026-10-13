@@ -226,6 +226,24 @@
       "alfa": 0.14
     },
     {
+      "id": "takatoshi",
+      "tipo": "ator",
+      "pasta": "atores/takatoshi",
+      "profundidade": 850,
+      "noChao": true,
+      "altura": 0.27,
+      "x": 0.27
+    },
+    {
+      "id": "dafu",
+      "tipo": "ator",
+      "pasta": "atores/dafu",
+      "profundidade": 850,
+      "noChao": true,
+      "altura": 0.26,
+      "x": 0.73
+    },
+    {
       "id": "lanternas",
       "imagem": "lanterna_poste.png",
       "profundidade": 560,
