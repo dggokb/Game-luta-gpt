@@ -107,7 +107,7 @@ cloth shoes.`
 | Ator | parado | aplaudir | rir | surpreso | aprovar |
 |---|---|---|---|---|---|
 | Takatoshi | ✅ | ✅ | ✅ ¹ | ✅ ¹ | ✅ ¹ |
-| Dafu | provisório | provisório | provisório | provisório | provisório |
+| Dafu | ✅ | ✅ | ✅ ² | ✅ ² | ✅ |
 
 ¹ Começa e termina de braços soltos, e o parado é de braços cruzados. O jogo faz uma
 transição curta (0,22 s) entre as animações, então não "pula", mas fica melhor refazer
@@ -116,7 +116,14 @@ primeiro quadro do parado), escrevendo no começo do ACTION: "Starting from the 
 image, with his arms crossed over his chest, ..." e no fim "... then crosses his arms again and
 holds the pose in the image until the end of the video."
 
-O verde do Seedance veio mais escuro e em degradê, e o recorte funcionou do mesmo jeito.
+² Vieram com fundo bege claro em vez de verde. A ferramenta percebe sozinha (`--fundo auto`) e
+recorta a partir das bordas, parando no contorno do desenho, para não apagar a camisa creme do
+Dafu; também tira a sombra cinza do chão e o fundo preso entre as pernas. Ficou bom, mas
+fundo verde continua sendo o mais seguro.
+
+O verde do Seedance veio mais escuro e em degradê, e o recorte funcionou do mesmo jeito. Os 5
+do Dafu começam e terminam na mesma pose (mãos na cintura), então as trocas não precisam de
+transição para emendar.
 
 ### Converter (quando os vídeos chegarem)
 

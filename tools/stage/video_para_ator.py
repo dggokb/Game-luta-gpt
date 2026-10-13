@@ -33,10 +33,58 @@ except ImportError:
     sys.exit("Instale: pip install -r tools/sprites/requirements-animar.txt")
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "sprites"))
-from video_para_sprite import best_loop, key, read_frames, torso_x  # noqa: E402
+from video_para_sprite import best_loop, keep_largest, key, read_frames, torso_x  # noqa: E402
 
 FOLGA = 12
 COLUNAS_MAX = 8
+
+
+def fundo_verde(frame):
+    """A borda do quadro é verde (o fundo pedido)? O Seedance às vezes entrega fundo claro."""
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    borda = np.concatenate([hsv[0], hsv[-1], hsv[:, 0], hsv[:, -1]])
+    h, sat = np.median(borda[:, 0]), np.median(borda[:, 1])
+    return 35 < h < 95 and sat > 45
+
+
+def key_claro(frame, tol=24):
+    """Fundo claro liso (bege, cinza, branco): o fundo é o que a cor da borda alcança sem
+    atravessar o contorno do desenho. Roupa clara dentro do contorno (a camisa creme do Dafu)
+    fica, o que um recorte só pela cor apagaria. A sombra cinza do chão embaixo dos pés sai."""
+    img = frame.astype(np.int16)
+    h, w = img.shape[:2]
+    borda = np.concatenate([img[0], img[-1], img[:, 0], img[:, -1]])
+    fundo = np.median(borda, axis=0)
+    parecido = (np.abs(img - fundo).max(2) < tol).astype(np.uint8)
+    mascara = np.zeros((h + 2, w + 2), np.uint8)
+    for x, y in ([(x, 0) for x in range(0, w, 4)] + [(x, h - 1) for x in range(0, w, 4)] +
+                 [(0, y) for y in range(0, h, 4)] + [(w - 1, y) for y in range(0, h, 4)]):
+        if parecido[y, x] == 1:
+            cv2.floodFill(parecido, mascara, (x, y), 2)
+    alpha = np.where(parecido == 2, 0, 255).astype(np.uint8)
+    alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
+    # Sombra no chão: cinza sem cor, um pouco mais escura que o fundo, só na faixa dos pés.
+    rows = np.nonzero((alpha > 0).any(1))[0]
+    if len(rows):
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        luz = img.mean(2)
+        faixa = np.zeros_like(alpha, bool)
+        faixa[rows.max() - (rows.max() - rows.min()) * 8 // 100:] = True
+        sombra = faixa & (hsv[..., 1] < 22) & (luz > fundo.mean() - 70) & (luz < fundo.mean() + 6)
+        alpha[sombra] = 0
+        # Fundo preso entre as pernas (cercado pelas pernas e pela sombra, a borda não chega
+        # lá): cor do fundo, só na parte de baixo do corpo. A camisa clara fica mais acima.
+        pernas = np.zeros_like(alpha, bool)
+        pernas[rows.max() - (rows.max() - rows.min()) * 22 // 100:] = True
+        vao = ((np.abs(img - fundo).max(2) < tol) & pernas & (alpha > 0)).astype(np.uint8)
+        n, rotulos, stats, _ = cv2.connectedComponentsWithStats(vao, 8)
+        for i in range(1, n):
+            if stats[i, cv2.CC_STAT_AREA] >= 120:
+                alpha[rotulos == i] = 0
+        alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
+    alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    return np.dstack([rgb, alpha])
 
 
 def trecho_com_movimento(recortes, inicio, fim, fps):
@@ -81,6 +129,8 @@ def main():
     parser.add_argument("--altura", type=int, default=320, help="altura da célula em px")
     parser.add_argument("--loop", action="store_true", help="animação em loop (a parada)")
     parser.add_argument("--espelhar", action="store_true", help="o vídeo olha para o lado errado")
+    parser.add_argument("--fundo", choices=["auto", "verde", "claro"], default="auto",
+                        help="cor do fundo do vídeo (auto: verde, ou claro se a borda não for verde)")
     parser.add_argument("--cores", type=int, default=256, help="cores da paleta (0 = PNG cheio)")
     parser.add_argument("--medir", action="store_true", help="mede a escala de novo neste vídeo")
     args = parser.parse_args()
@@ -91,9 +141,14 @@ def main():
     if not frames:
         sys.exit(f"não li nenhum quadro de {args.video}")
     fps_video = fps_video or 24.0
-    # Recorte simples: o modo de efeitos dos lutadores apagaria roupa clara (camisa do
-    # Dafu, casaco branco do Takatoshi), e as reações não têm efeitos.
-    todos = [key(f) for f in frames]
+    claro = args.fundo == "claro" or (args.fundo == "auto" and not fundo_verde(frames[0]))
+    if claro:
+        print("fundo claro (não verde): recorte a partir das bordas, parando no contorno")
+        todos = [key_claro(f) for f in frames]
+    else:
+        # Recorte simples: o modo de efeitos dos lutadores apagaria roupa clara (camisa do
+        # Dafu, casaco branco do Takatoshi), e as reações não têm efeitos.
+        todos = [key(f) for f in frames]
     if args.espelhar:
         todos = [r[:, ::-1] for r in todos]
 

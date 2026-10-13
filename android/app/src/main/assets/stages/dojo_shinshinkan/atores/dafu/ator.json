@@ -3,16 +3,57 @@
   "_comentario": "Animações sem \"folha\" usam a parada com um movimento provisório até o vídeo chegar (tools/stage/video_para_ator.py preenche folha, quadros, colunas e fps).",
   "parado": "parado",
   "animacoes": {
-    "parado": { "folha": "parado.png", "quadros": 8, "colunas": 4, "fps": 6, "loop": true },
-    "aplaudir": { "segundos": 1.6 },
-    "rir": { "segundos": 1.8 },
-    "surpreso": { "segundos": 1.2 },
-    "aprovar": { "segundos": 1.2 }
+    "parado": {
+      "folha": "parado.png",
+      "quadros": 16,
+      "colunas": 8,
+      "fps": 10.0,
+      "loop": true
+    },
+    "aplaudir": {
+      "folha": "aplaudir.png",
+      "quadros": 39,
+      "colunas": 8,
+      "fps": 10.0
+    },
+    "rir": {
+      "folha": "rir.png",
+      "quadros": 39,
+      "colunas": 8,
+      "fps": 10.0
+    },
+    "surpreso": {
+      "folha": "surpreso.png",
+      "quadros": 35,
+      "colunas": 8,
+      "fps": 10.0
+    },
+    "aprovar": {
+      "folha": "aprovar.png",
+      "quadros": 40,
+      "colunas": 8,
+      "fps": 10.0
+    }
   },
   "reacoes": {
-    "licao": ["aplaudir", "rir"],
-    "impacto": ["surpreso"],
-    "levou": ["rir"],
-    "fim": ["aplaudir", "rir"]
+    "licao": [
+      "aplaudir",
+      "rir"
+    ],
+    "impacto": [
+      "surpreso"
+    ],
+    "levou": [
+      "rir"
+    ],
+    "fim": [
+      "aplaudir",
+      "rir"
+    ]
+  },
+  "video": {
+    "escala": 0.43658,
+    "centroX": 630.3,
+    "chaoY": 693
   }
 }
