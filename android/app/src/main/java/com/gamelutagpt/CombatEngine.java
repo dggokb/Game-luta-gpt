@@ -26,6 +26,10 @@ final class CombatEngine {
         final int attacker, defender, damage;
         final boolean blocked, projectile;
         final String moveId;
+        /** Contact point in world space for presentation (NaN when the move has none, e.g. throws). */
+        float impactX = Float.NaN, impactY = Float.NaN;
+        /** Button class of the contact, or null when unknown. Presentation only. */
+        AttackDefinition.Strength strength;
         HitEvent(int attacker, int defender, int damage, boolean blocked, boolean projectile, String moveId) {
             this.attacker = attacker;
             this.defender = defender;
@@ -201,7 +205,18 @@ final class CombatEngine {
         detectProjectiles(superProjectiles);
 
         // 5. Reactions and pushback.
-        for (Contact contact : contacts) applyContact(contact);
+        for (Contact contact : contacts) {
+            // The point is measured before pushback moves the defender.
+            float ix = impactX(contact), iy = impactY(contact);
+            int before = events.size();
+            applyContact(contact);
+            for (int e = before; e < events.size(); e++) {
+                HitEvent event = events.get(e);
+                event.impactX = ix;
+                event.impactY = iy;
+                event.strength = contact.attack.strength;
+            }
+        }
         detectUltra(fighters[0], fighters[1]);
         detectUltra(fighters[1], fighters[0]);
         updateThrow(fighters[0], fighters[1]);
@@ -1447,6 +1462,24 @@ final class CombatEngine {
         push(d, a, a.facing * config.ultraKnockback);
         ComboSession session = sessions[d.index];
         if (session != null) session.airCombo = true;
+    }
+
+    /** Presentation contact point: the hitbox front clamped into the defender's body. */
+    private static float impactX(Contact c) {
+        CombatFighter a = c.attacker, d = c.defender;
+        float half = d.body().halfWidth;
+        if (c.projectile != null) return d.x - c.projectile.direction * half * .6f;
+        AttackDefinition.Box box = c.attack.hitbox(c.hitbox);
+        float front = a.facing > 0 ? a.x + box.x1 : a.x - box.x1;
+        return Math.max(d.x - half, Math.min(d.x + half, front));
+    }
+
+    private static float impactY(Contact c) {
+        CombatFighter a = c.attacker, d = c.defender;
+        float top = d.y - d.body().height(d.crouchingBody()), bottom = d.y;
+        float y = c.projectile != null ? c.projectile.y
+            : a.y - (c.attack.hitbox(c.hitbox).y0 + c.attack.hitbox(c.hitbox).y1) * .5f;
+        return Math.max(top + 12f, Math.min(bottom - 12f, y));
     }
 
     private void addContact(CombatFighter a, CombatFighter d, AttackDefinition attack, int hitbox, Projectile p) {

@@ -3,64 +3,116 @@ package com.gamelutagpt;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
 import java.util.List;
 
 /** Projectiles and Super cinematic overlays, drawn in world space. */
 final class EffectsRenderer {
-    void drawEnergyProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {
-        for (Projectile projectile : projectiles) {
-            c.save();
-            if (projectile.direction < 0) {
-                c.scale(-1f, 1f, projectile.x, projectile.y);
-            }
+    private final Paint fx = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Path tail = new Path();
+    /** Unit-radius glows per colour, created once per fighter colour (never per frame). */
+    private final java.util.Map<Integer, Shader> glows = new java.util.HashMap<>();
+    private final Shader whiteCore = new RadialGradient(0f, 0f, 1f,
+        new int[]{0xFFFFFFFF, 0xF0FFFFFF, 0x00FFFFFF}, new float[]{0f, .45f, 1f}, Shader.TileMode.CLAMP);
 
-            paint.setColor(Color.argb(75, 255, 255, 255));
-            c.drawCircle(projectile.x, projectile.y, 29f, paint);
-
-            paint.setColor(projectile.color);
-            c.drawCircle(projectile.x, projectile.y, 20f, paint);
-
-            paint.setColor(Color.WHITE);
-            c.drawCircle(projectile.x + 5f, projectile.y - 5f, 8f, paint);
-            c.restore();
+    private Shader glow(int color) {
+        Shader shader = glows.get(color);
+        if (shader == null) {
+            int rgb = color & 0xFFFFFF;
+            shader = new RadialGradient(0f, 0f, 1f,
+                new int[]{0xE0000000 | rgb, 0x80000000 | rgb, 0x00000000 | rgb}, new float[]{0f, .45f, 1f},
+                Shader.TileMode.CLAMP);
+            glows.put(color, shader);
         }
+        return shader;
+    }
+
+    void drawEnergyProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {
+        for (Projectile projectile : projectiles) drawOrb(c, projectile, 20f, false);
     }
 
     void drawSuperProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {
-        for (Projectile projectile : projectiles) {
-            c.save();
-            if (projectile.direction < 0) {
-                c.scale(-1f, 1f, projectile.x, projectile.y);
-            }
+        for (Projectile projectile : projectiles) drawOrb(c, projectile, 40f, true);
+    }
 
-            paint.setColor(Color.argb(70, 255, 255, 255));
-            c.drawCircle(projectile.x, projectile.y, 62f, paint);
+    /** Energy orb: comet tail, soft glow, hot core and spinning rings. Canvas faces the travel. */
+    private void drawOrb(Canvas c, Projectile p, float r, boolean big) {
+        float travelled = Math.abs(p.x - p.startX);
+        float spin = travelled / (big ? 55f : 34f);
+        c.save();
+        c.translate(p.x, p.y);
+        if (p.direction < 0) c.scale(-1f, 1f);
+        int rgb = p.color & 0xFFFFFF;
 
-            paint.setColor(Color.argb(120, Color.red(projectile.color), Color.green(projectile.color), Color.blue(projectile.color)));
-            c.drawOval(
-                projectile.x - 72f,
-                projectile.y - 34f,
-                projectile.x + 34f,
-                projectile.y + 34f,
-                paint
-            );
-
-            paint.setColor(projectile.color);
-            c.drawCircle(projectile.x, projectile.y, 40f, paint);
-
-            paint.setColor(Color.WHITE);
-            c.drawCircle(projectile.x + 12f, projectile.y - 10f, 17f, paint);
-
-            paint.setColor(Color.argb(100, 255, 255, 255));
-            c.drawRect(
-                projectile.x - 135f,
-                projectile.y - 9f,
-                projectile.x - 38f,
-                projectile.y + 9f,
-                paint
-            );
-            c.restore();
+        // Tapered comet tail behind the orb, two layers.
+        float length = Math.min(travelled, r * (big ? 5.2f : 4.4f));
+        for (int layer = 0; layer < 2; layer++) {
+            float w = r * (layer == 0 ? .95f : .45f);
+            tail.reset();
+            tail.moveTo(0f, -w);
+            tail.cubicTo(-length * .45f, -w * .9f, -length * .8f, -w * .25f, -length, 0f);
+            tail.cubicTo(-length * .8f, w * .25f, -length * .45f, w * .9f, 0f, w);
+            tail.close();
+            fx.setStyle(Paint.Style.FILL);
+            fx.setColor(layer == 0 ? (0x88000000 | rgb) : 0xCCFFFFFF);
+            c.drawPath(tail, fx);
         }
+        // Trailing sparks peeling off the tail.
+        fx.setStrokeCap(Paint.Cap.ROUND);
+        fx.setStyle(Paint.Style.STROKE);
+        for (int i = 0; i < (big ? 8 : 5); i++) {
+            float t = (spin * .35f + i / (big ? 8f : 5f)) % 1f;
+            float sx = -r * .6f - t * length * 1.1f;
+            float sy = (float)Math.sin(i * 2.7f + spin) * r * (.4f + .6f * t);
+            fx.setStrokeWidth((big ? 4f : 3f) * (1f - t));
+            fx.setColor(i % 2 == 0 ? 0xFFFFFFFF : (0xFF000000 | rgb));
+            fx.setAlpha(Math.round(230 * (1f - t)));
+            c.drawLine(sx, sy, sx - 10f - 12f * t, sy, fx);
+        }
+
+        // Soft outer glow and the orb body.
+        fx.setStyle(Paint.Style.FILL);
+        fx.setAlpha(255);
+        c.save(); c.scale(r * 2.3f, r * 2.3f);
+        fx.setShader(glow(p.color)); c.drawCircle(0f, 0f, 1f, fx);
+        c.restore();
+        fx.setShader(null);
+        fx.setColor(0xFF000000 | rgb);
+        c.drawCircle(0f, 0f, r, fx);
+        c.save(); c.scale(r * .95f, r * .95f); c.translate(.12f, -.08f);
+        fx.setShader(whiteCore); c.drawCircle(0f, 0f, 1f, fx);
+        c.restore();
+        fx.setShader(null);
+
+        // Two counter-rotating energy rings.
+        fx.setStyle(Paint.Style.STROKE);
+        fx.setStrokeWidth(big ? 4f : 2.5f);
+        float ring = r * 1.28f;
+        fx.setColor(0xE6FFFFFF);
+        c.drawArc(-ring, -ring * .78f, ring, ring * .78f, (spin * 57f) % 360f, 110f, false, fx);
+        c.drawArc(-ring, -ring * .78f, ring, ring * .78f, (spin * 57f + 180f) % 360f, 80f, false, fx);
+        fx.setColor(0xFF000000 | rgb);
+        float ring2 = r * 1.55f;
+        c.drawArc(-ring2, -ring2, ring2, ring2, (-spin * 41f) % 360f, 70f, false, fx);
+        if (big) {
+            // Crackling bolts around the Super orb.
+            fx.setStrokeWidth(2.2f);
+            fx.setColor(0xFFFFFFFF);
+            for (int i = 0; i < 3; i++) {
+                double a = spin * 1.7 + i * 2.094;
+                float x0 = (float)Math.cos(a) * r * .9f, y0 = (float)Math.sin(a) * r * .9f;
+                float x1 = (float)Math.cos(a + .25) * r * 1.5f, y1 = (float)Math.sin(a + .25) * r * 1.5f;
+                float x2 = (float)Math.cos(a - .1) * r * 1.95f, y2 = (float)Math.sin(a - .1) * r * 1.95f;
+                c.drawLine(x0, y0, x1, y1, fx);
+                c.drawLine(x1, y1, x2, y2, fx);
+            }
+        }
+        fx.setStrokeCap(Paint.Cap.BUTT);
+        fx.setStyle(Paint.Style.FILL);
+        fx.setAlpha(255);
+        c.restore();
     }
 
     /** Full-world tint; used for the Super darkening and the release flash. */
@@ -123,28 +175,61 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
-    /** Charge rings and speed lines around the fighter; canvas is already mirrored to its facing. */
+    /** Charge aura around the fighter: glow, spinning rune rings, converging lines and rising motes. */
     void drawSuperCharge(Canvas c, Paint paint, float x, float baseY, float phaseTimer, int color) {
-        float centerY = baseY - 78f;
-        float pulse = 1f + 0.16f * (float)Math.sin(phaseTimer * 28f);
+        float centerY = baseY - 96f;
+        int rgb = color & 0xFFFFFF;
+        float pulse = 1f + 0.10f * (float)Math.sin(phaseTimer * 28f);
+        c.save();
+        c.translate(x, centerY);
 
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(6f);
-        paint.setColor(Color.argb(185, 255, 255, 255));
-        c.drawCircle(x, centerY, 58f * pulse, paint);
+        // Vertical aura column and the soft glow behind the body.
+        fx.setStyle(Paint.Style.FILL);
+        c.save(); c.scale(150f * pulse, 190f * pulse);
+        fx.setShader(glow(color)); c.drawCircle(0f, 0f, 1f, fx);
+        c.restore();
+        fx.setShader(null);
 
-        paint.setStrokeWidth(3f);
-        paint.setColor(color);
-        c.drawCircle(x, centerY, 82f * pulse, paint);
+        // Lines rushing inward from the edge of the screen area.
+        fx.setStyle(Paint.Style.STROKE);
+        fx.setStrokeCap(Paint.Cap.ROUND);
+        for (int i = 0; i < 14; i++) {
+            double a = i * 0.4488 + 0.21;
+            float t = (phaseTimer * 2.6f + i * 0.37f) % 1f;
+            float outer = 260f - 150f * t, inner = outer - 60f - 30f * (i % 3);
+            fx.setStrokeWidth(i % 3 == 0 ? 4.5f : 2.5f);
+            fx.setColor(i % 2 == 0 ? 0xFFFFFFFF : (0xFF000000 | rgb));
+            fx.setAlpha(Math.round(220 * (float)Math.sin(Math.PI * t)));
+            float cos = (float)Math.cos(a), sin = (float)Math.sin(a) * 1.15f;
+            c.drawLine(cos * outer, sin * outer, cos * inner, sin * inner, fx);
+        }
+        fx.setAlpha(255);
 
-        for (int i = 0; i < 7; i++) {
-            float y = centerY - 105f + i * 34f;
-            float length = 90f + (i % 3) * 42f;
-            paint.setStrokeWidth(4f);
-            paint.setColor(Color.argb(145, 255, 255, 255));
-            c.drawLine(x - 150f - length, y + 24f, x - 78f, y, paint);
+        // Two elliptic rings tilted like a halo, dashed by arcs.
+        for (int ring = 0; ring < 2; ring++) {
+            float rx = (ring == 0 ? 92f : 122f) * pulse, ry = rx * (ring == 0 ? .34f : .28f);
+            float yOffset = ring == 0 ? 62f : -8f;
+            float spin = phaseTimer * (ring == 0 ? 420f : -300f);
+            fx.setStrokeWidth(ring == 0 ? 5f : 3f);
+            for (int arc = 0; arc < 4; arc++) {
+                fx.setColor(arc % 2 == 0 ? 0xF0FFFFFF : (0xFF000000 | rgb));
+                c.drawArc(-rx, yOffset - ry, rx, yOffset + ry, spin + arc * 90f, 58f, false, fx);
+            }
         }
 
-        paint.setStyle(Paint.Style.FILL);
+        // Motes rising through the aura.
+        for (int i = 0; i < 12; i++) {
+            float t = (phaseTimer * 1.6f + i / 12f) % 1f;
+            float px = (float)Math.sin(i * 2.3f + phaseTimer * 3f) * (40f + 9f * (i % 5));
+            float py = 120f - t * 250f;
+            fx.setStrokeWidth(4f - 2.5f * t);
+            fx.setColor(i % 3 == 0 ? 0xFFFFFFFF : (0xFF000000 | rgb));
+            fx.setAlpha(Math.round(255 * (1f - t)));
+            c.drawLine(px, py, px, py + 16f + 18f * (1f - t), fx);
+        }
+        fx.setAlpha(255);
+        fx.setStrokeCap(Paint.Cap.BUTT);
+        fx.setStyle(Paint.Style.FILL);
+        c.restore();
     }
 }

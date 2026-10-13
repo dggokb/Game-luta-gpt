@@ -82,6 +82,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final SpriteFighterRenderer opponentSpriteRenderer;
     private final StageRenderer stage = new StageRenderer();
     private final EffectsRenderer effects = new EffectsRenderer();
+    /** Hit and guard sparks at the real contact point (presentation only). */
+    private final ImpactEffects impacts = new ImpactEffects();
     private final HudRenderer hud = new HudRenderer();
     private final DebugOverlay debug = new DebugOverlay();
     private final HudRenderer.OpponentPanel opponentPanel = new HudRenderer.OpponentPanel();
@@ -563,6 +565,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
+            spawnImpact(event, ultraHit);
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
@@ -575,6 +578,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) beamShake = Math.max(beamShake, 14f);
         }
         updateUltraBeam();
+        impacts.update(FIXED_STEP);
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
         if (throwBannerFrames > 0) throwBannerFrames--;
 
@@ -590,6 +594,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
         hud.resetEffects();
+        impacts.clear();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -922,6 +927,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
+    /** Spark, ring and debris at the contact point; heavier blows also nudge the camera. */
+    private void spawnImpact(CombatEngine.HitEvent event, boolean ultraHit) {
+        CombatFighter attacker = engine.fighter(event.attacker), defender = engine.fighter(event.defender);
+        float x = event.impactX, y = event.impactY;
+        if (Float.isNaN(x) || Float.isNaN(y)) {
+            // Throws and the ultra have no hitbox: use the defender's chest.
+            int side = defender.x >= attacker.x ? -1 : 1;
+            x = defender.x + side * defender.body().halfWidth * .5f;
+            y = defender.y - defender.body().height(defender.crouchingBody()) * .6f;
+        }
+        int direction = defender.x >= attacker.x ? 1 : -1;
+        int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
+        if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
+        int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentFighter.profile.color;
+        impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 7f : 10f);
+        else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
+    }
+
     private void showBanner(String text) {
         throwBanner = text;
         throwBannerFrames = THROW_BANNER_FRAMES;
@@ -1136,6 +1160,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
+            impacts.draw(canvas);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
                 drawUltraBeamOverlay(canvas, true);

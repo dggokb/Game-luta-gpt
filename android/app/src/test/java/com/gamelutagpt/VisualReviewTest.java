@@ -83,4 +83,66 @@ public class VisualReviewTest {
         }
         b.recycle();
     }
+
+    /** Stills of overlays that a short scripted fight does not always reach. */
+    @Test public void renderEffectShowcase() throws Exception {
+        game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
+        select().close();
+        set("introFrame",-1);
+        CombatFighter p=game.engine.fighter(0),npc=game.engine.fighter(1);
+        npc.x=p.x+170f;
+        frames(2);
+        File dir=new File("build/visual-review/showcase");
+        Bitmap b=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
+        ImpactEffects impacts=(ImpactEffects)get("impacts");
+        float y=npc.y-150f;
+        // Hit sparks of each size and a guard spark, a few frames after spawning.
+        impacts.spawn(ImpactEffects.HIT,npc.x-30f,y,1,ImpactEffects.HEAVY,0xFF22BFFF);
+        for(int i=0;i<3;i++) {impacts.update(1f/60);render(b);save(b,new File(dir,String.format("hit_heavy_%d.png",i)));}
+        impacts.update(.2f);render(b);save(b,new File(dir,"hit_heavy_late.png"));
+        impacts.clear();
+        impacts.spawn(ImpactEffects.HIT,npc.x-30f,y,1,ImpactEffects.LIGHT,0xFF22BFFF);
+        impacts.update(1f/30);render(b);save(b,new File(dir,"hit_light.png"));
+        impacts.clear();
+        impacts.spawn(ImpactEffects.GUARD,npc.x-30f,y,1,ImpactEffects.MEDIUM,0xFF22BFFF);
+        impacts.update(1f/30);render(b);save(b,new File(dir,"guard.png"));
+        impacts.clear();
+        // Projectiles drawn by the production effects renderer over the fight frame.
+        render(b);
+        Canvas c=new Canvas(b);
+        EffectsRenderer effects=new EffectsRenderer();
+        java.util.List<Projectile> orbs=new java.util.ArrayList<>();
+        Projectile small=new Projectile(p.x+40f,npc.y-140f,900f,600f,24f,10,0xFF22BFFF,0,1,null);
+        small.x+=180f;orbs.add(small);
+        effects.drawEnergyProjectiles(c,new Paint(),orbs);
+        orbs.clear();
+        Projectile big=new Projectile(p.x-200f,npc.y-300f,900f,600f,58f,10,0xFFFF4FA0,0,1,null);
+        big.x+=260f;orbs.add(big);
+        effects.drawSuperProjectiles(c,new Paint(),orbs);
+        c.save();c.translate(-200f,0f);
+        effects.drawSuperCharge(c,new Paint(),900f,npc.y,.37f,0xFF22BFFF);
+        c.restore();
+        save(b,new File(dir,"projectiles_charge.png"));
+        // Combo counter and banner.
+        render(b);
+        c=new Canvas(b);
+        HudRenderer hud=(HudRenderer)get("hud");
+        ComboSession combo=new ComboSession(0,1);
+        combo.hitCount=7;combo.comboDamage=486;combo.damageScale=700;combo.airCombo=true;combo.juggleCount=3;
+        hud.drawCombo(c,combo,null,0,true);
+        ComboSession cpu=new ComboSession(1,0);cpu.hitCount=3;cpu.comboDamage=120;
+        hud.drawCombo(c,cpu,null,0,false);
+        hud.drawBanner(c,"AGARRÃO!",255,1.1f);
+        save(b,new File(dir,"combo_banner.png"));
+        // Low life and lost-life trail on the HUD.
+        FighterState active=((FighterState[])get("team"))[0];
+        hud.resetEffects();
+        render(b);
+        active.life=active.profile.maxLife/5;
+        FighterState opp=(FighterState)get("opponentFighter");
+        opp.life=opp.profile.maxLife/2;
+        for(int i=0;i<4;i++) {frames(1);render(b);}
+        save(b,new File(dir,"hud_low_life_hit.png"));
+        b.recycle();
+    }
 }

@@ -48,3 +48,5 @@ for f in seq[::3]:
     # Full-size samples for close inspection of single moments.
     Image.open(f).convert("RGB").save(out / f"f_{f.stem}.jpg", quality=82)
 still(src.parent / "hud-review.png", "hud_review.jpg")
+for f in sorted((src / "showcase").glob("*.png")):
+    still(f, f"show_{f.stem}.jpg")
