@@ -302,6 +302,11 @@ public final class Episodio {
         return out;
     }
 
+    /** Um painel avulso no formato dos episódios (quadros do tutorial). */
+    static Painel painelDe(Map<String, Object> map) {
+        return painel(map);
+    }
+
     private static Painel painel(Map<String, Object> map) {
         List<String> personagens = new ArrayList<>();
         for (Object item : list(map, "personagens")) personagens.add(String.valueOf(item));

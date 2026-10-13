@@ -63,14 +63,19 @@ public class TutorialDirectorTest {
         Treino t = new Treino("player_base");
         t.tutorial.start(t.engine, t.team, HOME);
         int n = t.tutorial.lessonCount();
+        boolean hurt = false;
         for (int i = 0; i < n; i++) {
-            for (int f = 0; f < 400; f++) t.step(false);
+            for (int f = 0; f < 400; f++) {
+                t.step(false);
+                hurt |= t.tutorial.reactions().contains("levou");
+            }
             assertEquals(i, t.tutorial.lessonIndex());
             assertFalse("a lição " + t.tutorial.lesson().title + " passou sem o jogador fazer nada",
                 t.tutorial.praising());
             assertEquals(0, t.tutorial.count());
             t.tutorial.skip();
         }
+        assertTrue("parado na defesa, o jogador leva o golpe do boneco", hurt);
     }
 
     @Test public void pularVaiParaAProximaENaUltimaTermina() {
@@ -102,5 +107,43 @@ public class TutorialDirectorTest {
         assertEquals("↓ →", TutorialDirector.arrows(new int[] {3, 1}));
         assertEquals("→ ↓ ↘", TutorialDirector.arrows(new int[] {1, 3, 2}));
         assertEquals("↓ ←", TutorialDirector.arrows(new int[] {3, 5}));
+    }
+
+    @Test public void quadrosEntreAsLicoesEsperamOJogo() {
+        Treino t = new Treino("player_base");
+        t.tutorial.setPanels(true);
+        t.tutorial.start(t.engine, t.team, HOME);
+        assertEquals("andar", t.tutorial.panelWanted());
+        for (int i = 0; i < 200; i++) t.step(true);
+        assertEquals("com o quadro na tela a lição não anda", 0, t.tutorial.count());
+        t.tutorial.panelDone();
+        List<String> seen = new java.util.ArrayList<>();
+        int n = t.tutorial.lessonCount();
+        for (int lesson = 0; lesson < n; lesson++) {
+            int frames = 0;
+            while (t.tutorial.panelWanted() == null && t.tutorial.active() && frames++ < 2000) {
+                t.step(true);
+                seen.addAll(t.tutorial.reactions());
+            }
+            String wanted = t.tutorial.panelWanted();
+            assertEquals(lesson + 1 < n ? TutorialDirector.lessons(t.engine.fighter(0).character()).get(lesson + 1).id : "fim",
+                wanted);
+            t.tutorial.panelDone();
+        }
+        for (int i = 0; i < TutorialDirector.COMPLETE_FRAMES; i++) t.step(false);
+        assertTrue(t.tutorial.finished());
+        assertTrue(seen.contains("licao"));
+        assertTrue(seen.contains("impacto"));
+    }
+
+    @Test public void idsDasLicoesSaoUnicosESemAcento() {
+        List<TutorialDirector.Lesson> lessons = TutorialDirector.lessons(GeneratedCharacters.get("player_base"));
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        for (TutorialDirector.Lesson l : lessons) {
+            assertTrue(l.id, l.id.matches("[a-z0-9-]+"));
+            assertTrue("id repetido: " + l.id, ids.add(l.id));
+        }
+        assertEquals("golpe-medio", TutorialDirector.idOf("GOLPE MÉDIO"));
+        assertEquals("agarrao", TutorialDirector.idOf("AGARRÃO"));
     }
 }

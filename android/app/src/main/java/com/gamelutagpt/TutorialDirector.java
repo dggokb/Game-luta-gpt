@@ -102,6 +102,8 @@ final class TutorialDirector {
     interface Example { void drive(Ctx c, FighterInput p1); }
 
     static final class Lesson {
+        /** Nome fixo da lição ("golpe-fraco", "especial-s2"...), usado pelos quadros entre as lições. */
+        final String id;
         final String title;
         /** O que fazer, com as setas do direcional (virado para a direita). */
         final String how;
@@ -116,6 +118,7 @@ final class TutorialDirector {
 
         Lesson(String title, String how, int times, boolean close, Setup setup, Dummy dummy, Check check,
                Example example) {
+            this.id = idOf(title);
             this.title = title;
             this.how = how;
             this.times = times;
@@ -125,6 +128,13 @@ final class TutorialDirector {
             this.check = check;
             this.example = example;
         }
+    }
+
+    /** "ESPECIAL DE ENERGIA" → "especial-de-energia" (sem acentos). */
+    static String idOf(String title) {
+        String plain = java.text.Normalizer.normalize(title, java.text.Normalizer.Form.NFD)
+            .replaceAll("\\p{M}", "");
+        return plain.toLowerCase(java.util.Locale.ROOT).trim().replaceAll("[^a-z0-9]+", "-");
     }
 
     // ------------------------------------------------------------ lições
@@ -322,8 +332,23 @@ final class TutorialDirector {
     private int farFrames;
     private boolean[] done = new boolean[0];
     private boolean finished;
+    /** O jogo mostra um quadro antes de cada lição (e no fim); o treino espera por ele. */
+    private boolean panels;
+    /** Quadro que o treino espera agora (id da lição, ou "fim"), ou null. */
+    private String panelWanted;
+    /** Acontecimentos deste passo para quem assiste: "licao", "impacto", "levou", "fim". */
+    private final List<String> reactions = new ArrayList<>();
+    private int lastImpact = -999, lastHurt = -999, frame;
 
     boolean active() { return index >= 0 && !finished; }
+    /** Liga os quadros entre as lições (o jogo responde com {@link #panelDone}). */
+    void setPanels(boolean on) { panels = on; }
+    /** Id do quadro que o treino espera agora, ou null. */
+    String panelWanted() { return active() ? panelWanted : null; }
+    /** O quadro acabou: a lição começa (ou o treino termina). */
+    void panelDone() { panelWanted = null; }
+    /** Acontecimentos do último passo (a lista é reaproveitada). */
+    List<String> reactions() { return reactions; }
     /** Acabou (todas as lições, ou pulou a última): o jogo segue para o que vem depois. */
     boolean finished() { return finished; }
     int lessonIndex() { return index; }
@@ -349,6 +374,7 @@ final class TutorialDirector {
         done = new boolean[lessons.size()];
         finished = false;
         complete = -1;
+        reactions.clear();
         begin(0);
     }
 
@@ -356,6 +382,8 @@ final class TutorialDirector {
         index = -1;
         finished = false;
         praise = complete = -1;
+        panelWanted = null;
+        reactions.clear();
     }
 
     private void begin(int i) {
@@ -376,6 +404,7 @@ final class TutorialDirector {
         ctx.dummy().state.restoreLife();
         ctx.dummy().state.superMeter = 0;
         lessons.get(i).setup.apply(ctx);
+        panelWanted = panels ? lessons.get(i).id : null;
     }
 
     /** PULAR: vai para a próxima lição (ou termina, na última). */
@@ -385,6 +414,7 @@ final class TutorialDirector {
             finished = true;
             return;
         }
+        panelWanted = null;
         next();
     }
 
@@ -394,6 +424,34 @@ final class TutorialDirector {
         } else {
             praise = -1;
             complete = 0;
+            reactions.add("fim");
+            panelWanted = panels ? "fim" : null;
+        }
+    }
+
+    /** Golpes que fazem quem assiste se espantar. */
+    private static final java.util.Set<String> BIG = new java.util.HashSet<>(java.util.Arrays.asList(
+        "H", "2H", "jH", "j2H", "S2", "S3", "S4", "SUPER", "ULTRA", "THROW"));
+    /** Intervalo mínimo entre duas reações do mesmo tipo (quadros). */
+    private static final int REACTION_GAP = 75;
+
+    /** Golpe forte que acertou ("impacto") e golpe do boneco que pegou o jogador ("levou"). */
+    private void watch() {
+        boolean impact = false, hurt = false;
+        for (CombatEngine.HitEvent e : ctx.engine.events()) {
+            if (e.attacker == 0 && !e.blocked && BIG.contains(e.moveId)) impact = true;
+            if (e.attacker == 1 && !e.blocked) hurt = true;
+        }
+        for (String cue : ctx.engine.cues()) {
+            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) impact = true;
+        }
+        if (impact && frame - lastImpact >= REACTION_GAP) {
+            lastImpact = frame;
+            reactions.add("impacto");
+        }
+        if (hurt && frame - lastHurt >= REACTION_GAP) {
+            lastHurt = frame;
+            reactions.add("levou");
         }
     }
 
@@ -401,7 +459,7 @@ final class TutorialDirector {
     void fillDummy(FighterInput dummy) {
         dummy.clear();
         Lesson l = lesson();
-        if (l == null || l.dummy == null || praise >= 0 || complete >= 0) return;
+        if (l == null || l.dummy == null || praise >= 0 || complete >= 0 || panelWanted != null) return;
         l.dummy.drive(ctx, dummy);
     }
 
@@ -409,13 +467,16 @@ final class TutorialDirector {
     void fillExample(FighterInput p1) {
         p1.clear();
         Lesson l = lesson();
-        if (l == null || praise >= 0 || complete >= 0) return;
+        if (l == null || praise >= 0 || complete >= 0 || panelWanted != null) return;
         l.example.drive(ctx, p1);
     }
 
     /** Depois do passo do motor: confere a lição, segura a vida e anda o treino. */
     void afterStep() {
+        reactions.clear();
         if (!active()) return;
+        frame++;
+        if (panelWanted != null) return;
         // Treino: ninguém cai. A vida volta cheia e o Ultra tem barra para sair.
         for (int i = 0; i < 2; i++) {
             FighterState s = ctx.engine.fighter(i).state;
@@ -430,6 +491,7 @@ final class TutorialDirector {
             return;
         }
         Lesson l = lessons.get(index);
+        watch();
         ctx.observe();
         boolean met = l.check.met(ctx);
         if (met && !wasMet) count++;
@@ -438,6 +500,7 @@ final class TutorialDirector {
         if (count >= l.times) {
             done[index] = true;
             praise = 0;
+            reactions.add("licao");
             return;
         }
         // O boneco foi parar longe numa lição de golpe: volta para perto quando os dois param.
