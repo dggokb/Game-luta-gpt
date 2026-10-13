@@ -4,7 +4,7 @@ on:
     branches: ['ccr-60181022-rh9cms']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   render:
     runs-on: ubuntu-latest
@@ -33,12 +33,23 @@ jobs:
         if: always()
         with:
           name: visual-review
-          path: |
-            android/app/build/visual-review/
-            android/app/build/hud-review.png
-            android/app/build/reports/tests/
+          path: android/app/build/reports/tests/
       - uses: actions/upload-artifact@v4
         if: success()
         with:
           name: visual-review-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish review images to the visual-review-rh9cms branch
+        if: always()
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          python3 tools/visual_review_sheets.py android/app/build/visual-review /tmp/review
+          cp -r android/app/build/reports/tests/testDebugUnitTest /tmp/review/test-report 2>/dev/null || true
+          cd /tmp/review
+          git init -q -b visual-review-rh9cms
+          git config user.name "visual-review-bot"
+          git config user.email "visual-review-bot@users.noreply.github.com"
+          echo "$SHA" > SOURCE_SHA
+          git add -A && git commit -q -m "Visual review for $SHA"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" visual-review-rh9cms
