@@ -1,0 +1,31 @@
+{
+  "id": "p10_getup",
+  "javaName": "P10_GETUP",
+  "profile": "p10.json",
+  "source": "art/sprites/source/p10_getup_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_getup.png",
+  "report": "tools/sprites/reports/p10_getup.report.json",
+  "preview": "android/app/build/sprite-review/p10_getup-import.png",
+  "expectedFrames": 12,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p10 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "derruba_levanta.mp4",
+    "personagem": "p10",
+    "escala": 0.5173,
+    "medida": "último quadro = inicio_centro (nota 0.89)",
+    "quadros": "49,53,58,62,66,70,75,79,83,87,92,96",
+    "celula": 320,
+    "largura": 384,
+    "raiz": "230,302",
+    "colunas": 11,
+    "fixar": "registro",
+    "pe_no_chao": true
+  },
+  "frameWidth": 384,
+  "frameHeight": 320,
+  "rootX": 230,
+  "rootY": 302
+}

@@ -1,0 +1,31 @@
+{
+  "id": "p10_hit_crouch",
+  "javaName": "P10_HIT_CROUCH",
+  "profile": "p10.json",
+  "source": "art/sprites/source/p10_hit_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_hit_crouch.png",
+  "report": "tools/sprites/reports/p10_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p10_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p10 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoBaixo.mp4",
+    "personagem": "p10",
+    "escala": 0.252,
+    "motivo": "agachado de guarda com zoom: cabeça contra a defesa agachada (0,2313; 0,256, nota 0,76) e contra o 2M (0,3904; 0,248, nota 0,71); mesma altura do 2L (147 px)",
+    "quadros": "7,15,21,27,33,39,45,51,57",
+    "celula": 192,
+    "largura": 256,
+    "raiz": "118,174",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameHeight": 192,
+  "rootX": 118,
+  "rootY": 174
+}

@@ -31,7 +31,8 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 KEYS = ROOT / 'art/keys'
-MIN_SCORE = 0.8   # semelhança mínima (TM_CCOEFF_NORMED) para aceitar a medida
+MIN_SCORE = 0.75   # semelhança mínima (TM_CCOEFF_NORMED) para aceitar a medida
+UNIT_SCORE, UNIT_ZOOM = 0.70, 0.06  # na imagem inicial sem zoom (±6%), basta essa nota
 ENDS_SCORE = 0.6    # as duas pontas batem com a imagem inicial um pouco abaixo de MIN_SCORE...
 ENDS_SPREAD = 1.01  # ... e concordam no zoom: vale (vídeo gerado maior, traço muda um pouco)
 GUARD_MIN_SCORE = 0.6   # guarda do IDLE achada no meio do vídeo (pose parecida, não igual)
@@ -126,6 +127,10 @@ def medir(frames, personagem, keyer):
             f"{e['medida']}: {e['escala']:.4f}" for e in good) + '); gere o vídeo de novo com a câmera parada.')
     best = max(ends.values(), key=lambda e: e['nota'])
     if best['nota'] >= MIN_SCORE:
+        return best
+    # O normal é o vídeo começar exatamente na imagem inicial (zoom 1). Comparação errada
+    # quase nunca cai em zoom 1, então ali basta uma nota menor (cabelo e trapos que mudam).
+    if best['nota'] >= UNIT_SCORE and abs(best['zoom'] - 1) <= UNIT_ZOOM:
         return best
     a, b = ends['1º quadro'], ends['último quadro']
     if min(a['nota'], b['nota']) >= ENDS_SCORE and max(a['escala'], b['escala']) / min(a['escala'], b['escala']) <= ENDS_SPREAD \
