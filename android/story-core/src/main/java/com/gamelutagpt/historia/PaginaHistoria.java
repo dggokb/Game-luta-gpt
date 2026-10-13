@@ -53,6 +53,8 @@ public final class PaginaHistoria {
     private final List<String> warnings = new ArrayList<>();
 
     private Temporada temporada;
+    private RenderImage logo;
+    private String logoPath;
     private Episodio episodio;
     private int stepIndex = -1;
     private float time;
@@ -80,8 +82,22 @@ public final class PaginaHistoria {
         active = true;
         waitingFight = false;
         warnings.clear();
+        loadLogo();
         stepIndex = -1;
         nextStep();
+    }
+
+    private void loadLogo() {
+        String path = temporada.logo != null ? Temporada.PASTA + "/" + temporada.logo : null;
+        if (path == null ? logoPath == null : path.equals(logoPath)) return;
+        logoPath = path;
+        logo = null;
+        if (path == null) return;
+        try {
+            logo = assets.loadImage(path);
+        } catch (IOException | RuntimeException ex) {
+            warnings.add(path + ": " + ex.getMessage());
+        }
     }
 
     /** Abandona o episódio sem avisar o jogo (ex.: o jogador voltou para a seleção). */
@@ -457,7 +473,8 @@ public final class PaginaHistoria {
     }
 
     private void drawTitle(RenderCanvas c, Episodio.Passo p) {
-        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, 0xFF0A0A0C);
+        // Preto puro, o mesmo fundo do logo.
+        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, 0xFF000000);
         float in = Tinta.easeOutCubic(time / 0.35f);
         float offset = (1f - in) * -1400f;
         // Pincelada vermelha atravessando a tela.
@@ -466,6 +483,13 @@ public final class PaginaHistoria {
         c.drawLine(offset - 60f, 486f, offset + 1340f, 436f, 6f, 0xFF7A0F17);
 
         float pop = Tinta.clamp01((time - 0.25f) / 0.25f);
+        if (logo != null && time >= 0.4f) {
+            // Logo do jogo embaixo da pincelada, aparecendo depois do título.
+            float alpha = Tinta.clamp01((time - 0.4f) / 0.35f);
+            float h = 200f;
+            float w = h * logo.width() / logo.height();
+            c.drawImage(logo, VW * 0.5f - w * 0.5f, 500f, VW * 0.5f + w * 0.5f, 500f + h, (int)(255f * alpha));
+        }
         if (pop > 0f) {
             String label = episodio.numero == 0 ? "PRÓLOGO" : "EPISÓDIO " + episodio.numero;
             c.drawText(label, VW * 0.5f, 220f, 40f, WHITE, INK, 6f, true);
@@ -477,7 +501,7 @@ public final class PaginaHistoria {
             c.drawText(title, VW * 0.5f, 400f, size, WHITE, INK, size * 0.14f, true);
             c.restore();
         }
-        if (time >= 0.6f) {
+        if (logo == null && time >= 0.6f) {
             c.drawText(temporada.titulo, VW - 250f, VH - 60f, 30f, WHITE, INK, 5f, true);
             if (!temporada.subtitulo.isEmpty()) c.drawText(temporada.subtitulo, VW - 250f, VH - 22f, 26f, RED, INK, 4f, false);
         }
