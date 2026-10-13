@@ -144,9 +144,9 @@ public class PaginaHistoriaTest {
         p.tap(640f, 360f);
         run(p, PaginaGuiada.MOVE + 0.1f);
         assertTrue(p.pageComplete());
-        // Depois do último quadro a câmera volta para a página inteira e a página sai sozinha.
+        // Depois do último quadro a página sai direto (sem voltar para a página inteira).
         p.tap(640f, 360f);
-        run(p, PaginaGuiada.OUTRO_MOVE + PaginaGuiada.OUTRO_HOLD + PaginaHistoria.EXIT_DURATION + 0.1f);
+        run(p, PaginaHistoria.EXIT_DURATION + 0.05f);
         assertEquals(Episodio.TipoPasso.PROXIMO, p.passo().tipo);
         p.render(canvas);
         assertTrue(rec.sounds.contains("painel"));

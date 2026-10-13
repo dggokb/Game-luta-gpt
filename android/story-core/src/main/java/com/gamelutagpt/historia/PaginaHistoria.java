@@ -306,6 +306,7 @@ public final class PaginaHistoria {
             guiada.tap();
             String sound = guiada.takeSound();
             if (sound != null) listener.onHistoriaSom(sound);
+            if (guiada.finished()) exit();
             return;
         }
         // Toque com texto ainda sendo digitado: mostra o texto inteiro.
