@@ -1,5 +1,7 @@
 # Modo história: mangá animado entre as lutas
 
+> Motor das páginas (padrão do jogo inteiro): [motor-paginas.md](motor-paginas.md).
+
 A história vem do documento "História Base — Torneio dos Irmãos" (Drive, pasta
 game-luta-gpt). Este documento descreve **como ela é contada no jogo**. Os episódios
 `ep00` e `ep01` são o MVP: textos de rascunho para revisar, com arte provisória até as
@@ -94,60 +96,19 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 Sem a imagem, o painel mostra a arte provisória (cenário, silhuetas nas cores do elenco e
 o nome do arquivo esperado). Assim dá para escrever e testar o ritmo antes da arte.
 
-## Páginas prontas (recomendado)
+## Páginas prontas: o padrão do jogo
 
-Uma página de mangá inteira numa imagem só (em pé, como as do GPT), com balões e
-onomatopeias já desenhados. O jogo faz a **leitura guiada**: mostra a página inteira, entra
-quadro a quadro com o resto da página escurecido (o zoom leva o quadro até preencher a tela,
-e quadros altos são percorridos de cima para baixo) e, depois do último, volta para a página
-inteira antes de seguir.
+Toda a história é contada com **páginas de mangá prontas** (a página inteira numa imagem, com
+balões e onomatopeias) e a **leitura guiada** do jogo: a página aparece inteira, a câmera vai
+quadro a quadro com efeitos de ação, os balões são escritos no idioma do aparelho e, depois
+do último quadro, segue direto para a próxima página.
 
-```bash
-pip install opencv-python-headless numpy
-python3 tools/historia/recortar_pagina.py pagina.png --episodio ep00 --nome pag5
-```
+Como funciona, o formato do `episodio.json`, os efeitos, os idiomas e o passo a passo de
+uma página nova (gerar, recortar, preencher, traduzir, revisar):
+**[motor-paginas.md](motor-paginas.md)**.
 
-O script grava a página em `assets/historia/ep00/pag5.jpg`, acha os quadros pelas divisas
-claras e imprime o passo pronto para colar no `episodio.json`, na ordem de leitura (de cima
-para baixo, da esquerda para a direita). Ele também grava `pag5_quadros.jpg` com os quadros
-numerados: confira. Quadros separados só por uma linha preta, ou com o desenho passando por
-cima da divisa (cabelo, onomatopeia), podem sair juntos; aí corrija o `area` à mão (foi o
-caso dos olhos na página 2 do Prólogo).
-
-```json
-{ "tipo": "pagina", "imagem": "pag4.jpg", "quadros": [
-  { "area": [0.0, 0.0, 1.0, 0.0, 1.0, 0.18, 0.0, 0.18], "efeitos": ["zoom"],
-    "baloes": [ { "texto": "Meninos!", "caixa": [0.53, 0.04, 0.65, 0.09], "area": [0.68, 0.06, ...] } ] },
-  { "area": [0.0, 0.73, 1.0, 0.73, 1.0, 1.0, 0.0, 1.0], "efeitos": ["impacto", "velocidade"],
-    "legenda": "Tóquio. Dez anos atrás." }
-] }
-```
-
-- `area`: o contorno do quadro em frações da página (`[x0, y0, x1, y1, ...]`, de 0 a 1).
-- `efeitos` (quantos quiser):
-  - `impacto`: a câmera chega de supetão, com tranco de zoom, tela tremendo e clarão (golpes, gritos);
-  - `tremor`: a tela treme de leve o tempo todo enquanto o quadro está em foco (tensão, força);
-  - `velocidade`: linhas de foco de mangá tremeluzindo por cima do quadro (ação);
-  - `zoom`: a câmera avança devagar sobre o quadro (olhares, momentos dramáticos).
-- `baloes`: os balões de fala desenhados na página. O jogo pinta o miolo (`area`) de branco,
-  apagando o texto da arte, e escreve o `texto` dentro da `caixa`, no idioma do aparelho, com
-  a letra do maior tamanho que couber. O primeiro balão do quadro abre sozinho e digita; cada
-  toque completa o texto ou abre o próximo balão; depois do último, o toque passa de quadro.
-  O script acha os balões sozinho (miolo branco liso com texto); falta escrever o `texto`.
-- `legenda`: narração do jogo numa faixa embaixo da tela.
-
-As onomatopeias (HA, PA, TCHECK, HAA!...) ficam na arte: são iguais em qualquer idioma.
-
-## Idiomas
-
-`historia/idiomas/<código>.json` (ex.: `en.json`, `es.json`) é um objeto com o texto em
-português como chave e a tradução como valor. Vale para balões (das páginas prontas e das
-provisórias), legendas, títulos, o "próximo episódio" e os botões (PULAR, CONTINUA...). O jogo
-usa o idioma do aparelho; texto sem tradução aparece em português. O teste
-`traducoesCobremOPrologo` avisa quando um texto novo do Prólogo ficou sem tradução.
-
-Para ver as páginas em outro idioma no PC:
-`gradle :pc-preview:runHistoria -Pidioma=en`.
+As páginas com painéis montados pelo jogo (`layout`, `paineis`, arte provisória) continuam
+funcionando e servem de rascunho até a página pronta existir.
 
 ## Revisar no PC
 

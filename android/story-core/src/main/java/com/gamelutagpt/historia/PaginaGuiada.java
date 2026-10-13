@@ -9,9 +9,9 @@ import java.util.Map;
 
 /**
  * Leitura guiada de uma página pronta (a página inteira numa imagem): a câmera mostra a
- * página toda, entra quadro a quadro com o resto da página escurecido e, depois do último,
- * volta para a página inteira. É o jeito que os leitores de mangá mostram uma página em pé
- * numa tela deitada.
+ * página toda e entra quadro a quadro com o resto da página escurecido; depois do último
+ * quadro a página sai direto para a próxima. É o jeito que os leitores de mangá mostram uma
+ * página em pé numa tela deitada.
  *
  * Os balões de fala desenhados na página têm o miolo pintado de branco e o texto escrito
  * pelo jogo, no idioma atual, digitando um balão por vez. Os efeitos de cada quadro
@@ -25,8 +25,6 @@ final class PaginaGuiada {
     static final float MOVE = 0.5f;
     /** Chegada de supetão nos quadros de impacto. */
     static final float WHIP = 0.24f;
-    static final float OUTRO_MOVE = 0.55f;
-    static final float OUTRO_HOLD = 0.45f;
     static final float FIRST_BALLOON_DELAY = 0.25f;
     /** Zoom máximo sobre a imagem (quadros pequenos não ficam borrados demais). */
     static final float MAX_SCALE = 3.0f;
@@ -50,7 +48,8 @@ final class PaginaGuiada {
     private int balloonsShown;
     private float balloonAt;
     private boolean arrived;
-    private boolean outro;
+    /** O último quadro foi lido: a página já pode sair (ela some congelada no último quadro). */
+    private boolean done;
     private float stateTime;
     private float arrivedAt;
     private float time;
@@ -76,7 +75,7 @@ final class PaginaGuiada {
         panel = -1;
         balloonsShown = 0;
         arrived = false;
-        outro = false;
+        done = false;
         stateTime = 0f;
         time = 0f;
         shake = 0f;
@@ -98,10 +97,10 @@ final class PaginaGuiada {
         shake = Math.max(0f, shake - dt * 55f);
         flash = Math.max(0f, flash - dt);
         if (moveTime >= 0f) moveTime += dt;
-        if (panel < 0 && !outro && stateTime >= OVERVIEW_HOLD) goTo(0);
-        if (panel >= 0 && !outro && !arrived && moving() < 0f) arrive();
+        if (panel < 0 && !done && stateTime >= OVERVIEW_HOLD) goTo(0);
+        if (panel >= 0 && !done && !arrived && moving() < 0f) arrive();
         // O primeiro balão do quadro abre sozinho logo depois que a câmera chega.
-        if (arrived && !outro && balloonsShown == 0 && current().baloes.size() > 0 &&
+        if (arrived && !done && balloonsShown == 0 && current().baloes.size() > 0 &&
             time - arrivedAt >= FIRST_BALLOON_DELAY) {
             openBalloon();
         }
@@ -110,7 +109,7 @@ final class PaginaGuiada {
 
     /** Toque: completa o texto, abre o próximo balão ou passa para o próximo quadro. */
     void tap() {
-        if (outro) return;
+        if (done) return;
         if (panel >= 0 && arrived) {
             if (typing()) {
                 balloonAt = -1000f;
@@ -124,17 +123,17 @@ final class PaginaGuiada {
         if (panel < quadros.size() - 1) {
             goTo(panel + 1);
         } else {
-            startOutro();
+            done = true;
         }
     }
 
-    /** A volta para a página inteira terminou: a página pode sair. */
+    /** O último quadro foi lido: a página pode sair. */
     boolean finished() {
-        return outro && stateTime >= OUTRO_MOVE + OUTRO_HOLD;
+        return done;
     }
 
     boolean waitingTap() {
-        if (panel < 0 || outro || !arrived || typing()) return false;
+        if (panel < 0 || done || !arrived || typing()) return false;
         // O primeiro balão ainda vai abrir sozinho.
         return !(balloonsShown == 0 && current().baloes.size() > 0);
     }
@@ -185,13 +184,6 @@ final class PaginaGuiada {
         if (panel < 0 || balloonsShown == 0) return false;
         Episodio.BalaoPronto b = current().baloes.get(balloonsShown - 1);
         return (time - balloonAt) * PaginaHistoria.TYPE_SPEED < temporada.t(b.texto).length();
-    }
-
-    private void startOutro() {
-        startMove(OUTRO_MOVE);
-        outro = true;
-        stateTime = 0f;
-        dimFrom = dim;
     }
 
     private void startMove(float duration) {
@@ -267,7 +259,7 @@ final class PaginaGuiada {
     private void updateCamera() {
         float[] goal;
         float goalDim;
-        if (outro || panel < 0) {
+        if (panel < 0) {
             goal = overview();
             goalDim = 0f;
         } else {
@@ -297,7 +289,7 @@ final class PaginaGuiada {
         c.fillRect(-40f, -40f, VW + 40f, VH + 40f, 0xFF000000);
         c.save();
         float jolt = shake;
-        if (panel >= 0 && arrived && !outro && current().tremor) jolt = Math.max(jolt, 3.2f);
+        if (panel >= 0 && arrived && !done && current().tremor) jolt = Math.max(jolt, 3.2f);
         if (jolt > 0f) {
             rand.reset((long)(time * 600f));
             c.translate(rand.range(-jolt, jolt), rand.range(-jolt, jolt));
@@ -310,7 +302,7 @@ final class PaginaGuiada {
                 c.save();
                 c.clipPolygon(poly);
                 drawLayer(c, true);
-                if (current().velocidade && arrived && !outro) drawSpeedLines(c, poly);
+                if (current().velocidade && arrived && !done) drawSpeedLines(c, poly);
                 c.restore();
                 if (image == null) c.strokePolygon(poly, 5f, Baloes.INK);
             }
@@ -342,7 +334,7 @@ final class PaginaGuiada {
 
     /** Quantos caracteres do balão aparecem: lidos inteiros, o atual digitando, os próximos nada. */
     private int visibleChars(int panelIndex, int balloon, String text) {
-        if (outro) return text.length();
+        if (done) return text.length();
         if (panel < 0 || panelIndex > panel) return 0;
         if (panelIndex < panel || balloon < balloonsShown - 1) return text.length();
         if (balloon > balloonsShown - 1) return 0;
@@ -422,7 +414,7 @@ final class PaginaGuiada {
     }
 
     private void drawCaption(RenderCanvas c) {
-        if (panel < 0 || outro || !arrived) return;
+        if (panel < 0 || done || !arrived) return;
         String text = temporada.t(current().legenda);
         if (text == null) return;
         float alpha = Tinta.clamp01((time - arrivedAt) / 0.25f);
