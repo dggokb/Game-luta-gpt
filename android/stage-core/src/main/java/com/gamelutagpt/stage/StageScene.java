@@ -57,6 +57,12 @@ public final class StageScene {
         /** Reação esperando para começar (cada ator reage num tempo um pouco diferente). */
         String queued;
         float delay;
+        /** Troca de animação: o último quadro da anterior some aos poucos por cima da nova. */
+        RenderImage fadeSheet;
+        float fadeLeft, fadeTop, fadeDx, fadeDy, fadeGrow, fadeCellW, fadeCellH;
+        float fade;
+        RenderImage lastSheet;
+        float lastDx, lastDy, lastGrow, lastCellW, lastCellH, lastSl, lastSt;
 
         ActorState(Placed placed, StageActor actor, String folder, RenderImage idleSheet) {
             this.placed = placed;
@@ -190,6 +196,7 @@ public final class StageScene {
     public boolean actorPlay(String id, String anim) {
         ActorState a = actors.get(id);
         if (a == null || !a.actor.animations.containsKey(anim)) return false;
+        startFade(a);
         a.anim = anim;
         a.animTime = 0f;
         a.queued = null;
@@ -216,8 +223,25 @@ public final class StageScene {
         return (sheet.width() / (float)a.columns) / (sheet.height() / (float)rows);
     }
 
+    /** Tempo da transição entre duas animações do ator (a pose de uma não emenda na outra). */
+    private static final float ACTOR_FADE = 0.22f;
+
+    private static void startFade(ActorState a) {
+        if (a.lastSheet == null) return;
+        a.fadeSheet = a.lastSheet;
+        a.fadeLeft = a.lastSl;
+        a.fadeTop = a.lastSt;
+        a.fadeCellW = a.lastCellW;
+        a.fadeCellH = a.lastCellH;
+        a.fadeDx = a.lastDx;
+        a.fadeDy = a.lastDy;
+        a.fadeGrow = a.lastGrow;
+        a.fade = ACTOR_FADE;
+    }
+
     private void updateActors(float dt) {
         for (ActorState a : actors.values()) {
+            if (a.fade > 0f) a.fade = Math.max(0f, a.fade - dt);
             if (a.queued != null) {
                 a.delay -= dt;
                 if (a.delay <= 0f) actorPlay(a.placed.layer.id, a.queued);
@@ -226,6 +250,7 @@ public final class StageScene {
             a.animTime += dt;
             StageActor.Animation anim = a.actor.animations.get(a.anim);
             if (!anim.loop && a.animTime >= animDuration(a, anim)) {
+                startFade(a);
                 a.anim = a.actor.idle;
                 a.animTime = 0f;
             }
@@ -286,11 +311,27 @@ public final class StageScene {
         if (p.layer.flip) {
             c.save();
             c.scale(-1f, 1f, cx, 0f);
-            c.drawImageRegion(sheet, sl, st, sl + cellW, st + cellH, l, t, r, b, alpha);
-            c.restore();
-        } else {
-            c.drawImageRegion(sheet, sl, st, sl + cellW, st + cellH, l, t, r, b, alpha);
         }
+        c.drawImageRegion(sheet, sl, st, sl + cellW, st + cellH, l, t, r, b, alpha);
+        if (a.fade > 0f && a.fadeSheet != null) {
+            float fh = (bottom - top) * a.fadeGrow;
+            float fw = fh * a.fadeCellW / a.fadeCellH;
+            float fb = bottom + a.fadeDy * (bottom - top);
+            float fl = cx + a.fadeDx * (bottom - top) - fw * 0.5f;
+            c.drawImageRegion(a.fadeSheet, a.fadeLeft, a.fadeTop, a.fadeLeft + a.fadeCellW, a.fadeTop + a.fadeCellH,
+                fl, fb - fh, fl + fw, fb, Math.round(alpha * a.fade / ACTOR_FADE));
+        }
+        if (p.layer.flip) c.restore();
+        // O quadro de agora, para a transição se a animação trocar.
+        float hh = Math.max(1f, bottom - top);
+        a.lastSheet = sheet;
+        a.lastSl = sl;
+        a.lastSt = st;
+        a.lastCellW = cellW;
+        a.lastCellH = cellH;
+        a.lastDx = dx / hh;
+        a.lastDy = dy / hh;
+        a.lastGrow = grow;
     }
 
     public void update(float dt) {

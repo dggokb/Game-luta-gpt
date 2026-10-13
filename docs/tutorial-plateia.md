@@ -102,6 +102,22 @@ cloth shoes.`
 | Dafu | surpreso | "Starting from the pose in the image, he is suddenly amazed by something in front of him: his eyes pop open wide, eyebrows up, mouth open in an 'oh!', both hands rising to the sides of his face, body leaning back a little; then he laughs it off and returns to the pose in the image and holds it until the end of the video. His feet stay in place." |
 | Dafu | aprovar | "Starting from the pose in the image, he nods happily twice and strokes his long mustache with one hand, smiling, then returns to the pose in the image and holds it until the end of the video." |
 
+### Andamento
+
+| Ator | parado | aplaudir | rir | surpreso | aprovar |
+|---|---|---|---|---|---|
+| Takatoshi | ✅ | ✅ | ✅ ¹ | ✅ ¹ | ✅ ¹ |
+| Dafu | provisório | provisório | provisório | provisório | provisório |
+
+¹ Começa e termina de braços soltos, e o parado é de braços cruzados. O jogo faz uma
+transição curta (0,22 s) entre as animações, então não "pula", mas fica melhor refazer
+começando da imagem inicial de braços cruzados (`art/keys/takatoshi/inicio_centro.png`, o
+primeiro quadro do parado), escrevendo no começo do ACTION: "Starting from the pose in the
+image, with his arms crossed over his chest, ..." e no fim "... then crosses his arms again and
+holds the pose in the image until the end of the video."
+
+O verde do Seedance veio mais escuro e em degradê, e o recorte funcionou do mesmo jeito.
+
 ### Converter (quando os vídeos chegarem)
 
 ```bash
@@ -114,10 +130,13 @@ python3 tools/stage/video_para_ator.py takatoshi_aplaudir.mp4 --ator $A/takatosh
 
 - Converta o **parado primeiro** (com `--medir`): ele mede o tamanho e o lugar dos pés, que ficam
   gravados no `ator.json` e valem para os outros vídeos do mesmo ator.
-- `--inicio`/`--fim` cortam o trecho (quadros do vídeo); `--fps` muda a velocidade no jogo (12).
+- Sem `--inicio`/`--fim`, a ferramenta corta sozinha a pose parada do começo e do fim (e, com
+  `--loop`, acha o trecho que fecha melhor em loop). `--fps` muda a velocidade no jogo (10).
+- As folhas saem com paleta de 256 cores (`--cores 0` desliga): ~5x menores, sem diferença visível.
 - A ferramenta grava `<animacao>.png` na pasta do ator e preenche a animação no `ator.json`.
 - Confira no PC: `gradle :pc-preview:runStage --args="app/src/main/assets/stages/dojo_shinshinkan"`
-  (no visualizador eles reagem sozinhos a cada 3 s).
+  (no visualizador eles reagem sozinhos a cada 3 s), ou uma folha com cada animação em vários
+  instantes: `gradle :pc-preview:runAtor --args="app/src/main/assets/stages/dojo_shinshinkan takatoshi parado,aplaudir,rir,surpreso,aprovar 345 build/ator.png"`.
 - Pode me mandar os vídeos que eu converto e ajusto.
 
 ## As imagens dos quadros (ChatGPT)
