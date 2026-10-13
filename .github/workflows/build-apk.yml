@@ -30,6 +30,16 @@ jobs:
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Install PIL for P01 asset calibration
         run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Fix story skip button visibility in isolated build workspace
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/story-core/src/main/java/com/gamelutagpt/historia/PaginaHistoria.java")
+          s = p.read_text()
+          old = "    static final float SKIP_LEFT = "
+          assert s.count(old) == 1, "Unexpected source: cannot apply controlled compilation fix"
+          p.write_text(s.replace(old, "    public static final float SKIP_LEFT = ", 1))
+          PY
       - name: Compile debug APK without known-broken sprite validation
         working-directory: android
         run: gradle :app:assembleDebug -x :app:verifySpritePacks --stacktrace
