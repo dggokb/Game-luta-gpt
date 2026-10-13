@@ -34,7 +34,7 @@ def sheet(frames, name, cols=4, scale=0.5):
 
 
 sel = src / "selection"
-for n in ["step0", "step1_flash", "step1", "step3", "ready"]:
+for n in ["step0", "step1_flash", "step1", "step3", "ready_in", "ready"]:
     still(sel / f"{n}.png", f"selection_{n}.jpg")
 anim = sorted((sel / "anim").glob("*.png"))
 sheet(anim[::5], "selection_anim_sheet.jpg")

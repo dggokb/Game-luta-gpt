@@ -49,10 +49,13 @@ public class VisualReviewTest {
         Bitmap b=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         File dir=new File("build/visual-review/selection");
         SystemClock.sleep(400);render(b);save(b,new File(dir,"step0.png"));
-        tapCard(4);SystemClock.sleep(120);render(b);save(b,new File(dir,"step1_flash.png"));
+        // The production loop renders every frame; render right after each tap so
+        // transitions start at the tap, then sample them later.
+        tapCard(4);render(b);SystemClock.sleep(120);render(b);save(b,new File(dir,"step1_flash.png"));
         SystemClock.sleep(700);render(b);save(b,new File(dir,"step1.png"));
-        tapCard(1);tapCard(2);SystemClock.sleep(900);render(b);save(b,new File(dir,"step3.png"));
-        tapCard(6);SystemClock.sleep(900);render(b);save(b,new File(dir,"ready.png"));
+        tapCard(1);render(b);tapCard(2);render(b);SystemClock.sleep(900);render(b);save(b,new File(dir,"step3.png"));
+        tapCard(6);render(b);SystemClock.sleep(130);render(b);save(b,new File(dir,"ready_in.png"));
+        SystemClock.sleep(800);render(b);save(b,new File(dir,"ready.png"));
         // Short animation of the cursor idling, for motion review.
         select().open("player_base","p08","p03","p06");tapCard(1);
         for(int i=0;i<45;i++) {SystemClock.sleep(33);render(b);save(b,new File(dir,String.format("anim/%04d.png",i)));}

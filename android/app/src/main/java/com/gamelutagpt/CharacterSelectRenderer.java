@@ -495,7 +495,7 @@ final class CharacterSelectRenderer {
     }
     private void textAt(Canvas c,String value,float x,float y,float size,int color,boolean isBold,Paint.Align align) {
         p.setShader(null);p.setTypeface(isBold?bold:regular);p.setTextSize(size);p.setTextAlign(align);
-        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2.5f);p.setColor(0xFF030711);c.drawText(value,x,y,p);
+        p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2.5f);p.setColor(alphaColor(0xFF030711,color>>>24));c.drawText(value,x,y,p);
         p.setStyle(Paint.Style.FILL);p.setColor(color);c.drawText(value,x,y,p);p.setTextAlign(Paint.Align.LEFT);
     }
 
