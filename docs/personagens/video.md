@@ -141,6 +141,33 @@ reconversão repetir; depois `build_characters.py --write`):
 Não resolvem: efeito por cima do corpo (o arco cobre a perna), pose errada (agachado que
 levanta), tamanho em pose ereta (intro/vitória: a cabeça engana). Aí é gerar o vídeo de novo.
 
+## Régua de tamanho (uma animação maior ou menor que outra)
+
+```
+python3 tools/sprites/regua.py p02 --relatorio
+```
+
+Grava `docs/personagens/regua/<id>.md` (tabela), `.json` e `-trocas.png` (cada troca de
+animação sobreposta ao IDLE como o jogo faz). Leva uns 3 min por personagem, sem APK.
+
+**A referência é a imagem inicial** (`art/keys/<id>/inicio_*.png`) no tamanho oficial do
+`tamanho.json`: a mesma arte de onde saem todos os vídeos. O **fator** de um clipe é o
+tamanho do corpo no jogo dividido pelo dessa referência (100% = certo; aviso fora de ±3%,
+erro fora de ±6%). A altura da silhueta não serve de régua: guarda aberta, corrida e
+agachado mudam a altura sem mudar o corpo. O fator vem, nesta ordem:
+
+1. a imagem inicial inteira achada num quadro do clipe;
+2. a escala que a conversão mediu na câmera do vídeo pela imagem inicial (nota ≥ 0,9), vezes
+   o que mudou o tamanho depois (fator óptico, folha do vídeo × folha do jogo);
+3. a cabeça da imagem inicial achada nos quadros (normalizada pela do IDLE). A cabeça
+   crescendo ou diminuindo ao longo do clipe é zoom de câmera no vídeo.
+
+A troca de animação (ponta do clipe sobre o IDLE q0, raiz no mesmo ponto) separa dois
+problemas que parecem iguais no jogo: **tamanho** (mesma pose, corpo maior ou menor:
+`reescalar.py`) e **pose** (a ponta do clipe é outra guarda, por exemplo aberta e baixa: a
+altura salta na troca mesmo com o corpo certo; escolher outros quadros ou gerar o vídeo
+terminando na imagem inicial). Também mostra o corpo fora do lugar (`ancorar.py`).
+
 ## Ritmo: animação e movimento do jogo
 
 O motor dá o mesmo tempo a todos (frame data, velocidade de andar e dash, hitstun). A arte
