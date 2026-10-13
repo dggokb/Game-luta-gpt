@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.gamelutagpt.stage.StagePack;
@@ -33,11 +34,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     // character select, where the player picks the pair.
     private int teamIndex;
     private FighterState[] team = membersOf(0);
-    private final CharacterSelect characterSelect = new CharacterSelect(GeneratedCharacters.SELECTABLE);
+    private final CharacterSelect characterSelect = new CharacterSelect(selectionRoster());
+    private final ConcurrentLinkedQueue<Integer> selectionKeys = new ConcurrentLinkedQueue<>();
     private CharacterSelectRenderer characterSelectRenderer;
 
     // Training opponent: our point character (same body and moves), drawn washed out.
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
+    // O parceiro P2 aparece no seletor; o CPU atual luta somente com o titular.
+    private String opponentTagId = "p04";
 
     private static final float VW = Arena.VW;
     private static final float VH = Arena.VH;
@@ -61,6 +65,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final DemoDirector demo = new DemoDirector();
     private final FighterInput ignoredInput = new FighterInput();
     private boolean debugOverlay;
+    /** Screen-space controls shown only in DEBUG, away from combat buttons. */
+    private static final float TUNE_LEFT = 944f, TUNE_TOP = 168f;
+    private static final float TUNE_ROW_TOP = 208f, TUNE_ROW_H = 48f;
+    private final Paint tuningPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private String dummyDamageLabel = "";
     private int dummyDamageLabelFrames = 0;
@@ -142,6 +150,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     // Team HUD labels (the rules live in the engine's TeamSystem).
     private String tagCooldownHudLabel = "ASSIST: PRONTO";
+    private String assistHudStatus = "ASSIST: PRONTO";
+    private String swapHudStatus = "TROCA: PRONTA (↓+TAG)";
     private String tagCooldownButtonLabel = "";
     private int shownAssistTenths = -2;
     private int shownTagSeconds = -2;
@@ -196,6 +206,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     public GameView(Context context) {
         super(context);
+        hud.loadArt(context);
+        P01VisualTuning.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
@@ -214,6 +226,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
+    }
+
+    private static String[] selectionRoster() {
+        java.util.ArrayList<String> ids=new java.util.ArrayList<>();
+        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07","p09","p10","p12"};
+        for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
+            if(wanted.equals(available)) ids.add(available);
+        // P09–P16 without gameplay yet stay as locked concept slots after these.
+        return ids.toArray(new String[0]);
     }
 
     private static FighterState[] membersOf(int index) {
@@ -246,11 +267,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         selectPair(ids[0], ids[1]);
     }
 
-    /** Character select: the picked pair takes the fight (first on point, second in reserve). */
+    /** Compatibilidade com troca de dupla existente. */
     private void selectPair(String point, String partner) {
+        // Legacy team preset: training CPU continues mirroring the chosen point.
+        selectTeams(point, partner, point, opponentTagId);
+    }
+
+    /** A seleção muda a dupla P1 e o titular do adversário de treino. */
+    private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
+        hud.resetEffects();
         team = membersOf(point, partner);
-        opponentFighter = new FighterState(team[0].character, "CPU");
-        atlases.retainOnly(team[0].character, team[1].character);
+        opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
+        opponentTagId = cpuPartner;
+        atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
@@ -266,16 +295,55 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
-        characterSelect.open(team[0].character.id, team[1].character.id);
+        hud.resetEffects();
+        characterSelect.open(team[0].character.id, team[1].character.id,
+            opponentFighter.character.id, opponentTagId);
+        selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
+    }
+
+    @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (characterSelect.isOpen()) {
+            selectionKeys.offer(keyCode);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void handleSelectionKey(int keyCode) {
+        switch(keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT: characterSelect.moveCursor(-1,0); break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT: characterSelect.moveCursor(1,0); break;
+            case KeyEvent.KEYCODE_DPAD_UP: characterSelect.moveCursor(0,-1); break;
+            case KeyEvent.KEYCODE_DPAD_DOWN: characterSelect.moveCursor(0,1); break;
+            case KeyEvent.KEYCODE_BUTTON_A:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                if(characterSelect.ready()) confirmCharacterSelection();
+                else characterSelect.selectCursor();
+                break;
+            case KeyEvent.KEYCODE_BUTTON_B:
+            case KeyEvent.KEYCODE_ESCAPE:
+            case KeyEvent.KEYCODE_BACK:
+                if(characterSelect.back()==CharacterSelect.Result.CANCEL) characterSelect.close();
+                break;
+            case KeyEvent.KEYCODE_BUTTON_X: characterSelect.randomFocused(); break;
+            case KeyEvent.KEYCODE_BUTTON_Y: characterSelect.toggleSettings(); break;
+            case KeyEvent.KEYCODE_BUTTON_L1:
+            case KeyEvent.KEYCODE_BUTTON_R1: characterSelect.swapFocusedTeam(); break;
+            case KeyEvent.KEYCODE_BUTTON_START:
+                if(characterSelect.ready()) confirmCharacterSelection();
+                else characterSelect.selectCursor();
+                break;
+            default: break;
+        }
     }
 
     private void handleCharacterSelectTap(float x, float y) {
         switch (characterSelect.tap(x, y)) {
             case CONFIRM:
-                characterSelect.close();
-                selectPair(characterSelect.point(), characterSelect.partner());
+                confirmCharacterSelection();
                 break;
             case CANCEL:
                 characterSelect.close();
@@ -283,6 +351,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             default:
                 break;
         }
+    }
+
+    private void confirmCharacterSelection() {
+        if(!characterSelect.ready())return;
+        characterSelectRenderer.beginFightTransition();
+        characterSelect.close();
+        selectTeams(characterSelect.point(),characterSelect.partner(),
+            characterSelect.opponentPoint(),characterSelect.opponentPartner());
     }
 
     private String teamLabel() {
@@ -297,7 +373,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Each character's ultra lives in assets/ultras/&lt;character id&gt;/. */
     private static String ultraFolder(FighterState fighter) {
-        return "ultras/" + fighter.character.id;
+        return "ultras/" + ("p01_training".equals(fighter.character.id) ? "player_base" : fighter.character.id);
     }
 
     private static StageScene loadStage(AndroidRenderAssets assets) {
@@ -348,6 +424,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             introPlayed = true;
             startIntro();
             openCharacterSelect();
+            characterSelect.open("player_base", "p08", "p03", "p06");
         }
         surfaceReady = true;
         startLoopIfReady();
@@ -436,8 +513,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void update() {
         if (stageScene != null) stageScene.update(FIXED_STEP);
         if (characterSelect.isOpen()) {
-            // The fight waits behind the select screen.
+            // Freeze combat while processing queued hardware controls on this same game thread.
             pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) handleSelectionKey(key);
             return;
         }
         if (paginaFinal.isActive()) {
@@ -469,6 +548,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             } else {
                 ai.fill(engine, OPPONENT, opponentInput);
             }
+        }
+        if (player().ko() || opponent().ko()) {
+            // Inputs must not start a new attack/move once the match is over.
+            playerInput.clear();
+            opponentInput.clear();
         }
         engine.step(playerInput, opponentInput);
         demo.afterStep();
@@ -505,6 +589,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
+        hud.resetEffects();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -517,6 +602,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final HudRenderer.State hudState = new HudRenderer.State() {
         @Override public FighterState active() { return activeFighter(); }
         @Override public FighterState reserve() { return reserveFighter(); }
+        @Override public FighterState opponent() { return opponentFighter; }
+        @Override public CharacterDefinition opponentReserveCharacter() { return GeneratedCharacters.get(opponentTagId); }
         @Override public String versionLabel() { return VERSION_HUD_LABEL; }
         @Override public String stateLabel() { return currentStateLabel(); }
         @Override public int facing() { return player().facing; }
@@ -531,6 +618,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return 1f;
         }
+        @Override public int presentationEpoch() { return demo.demo() * 100 + demo.stepIndex(); }
+        @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
+        @Override public String assistStatusLabel() { return assistHudStatus; }
+        @Override public String swapStatusLabel() { return swapHudStatus; }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
@@ -896,6 +987,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         int tagSeconds = (int)Math.ceil(team.tagCooldown / (float)CombatConfig.FPS);
         if (isTagAnimationActive()) {
             tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
+            assistHudStatus = "ASSIST: INDISPONIVEL";
+            swapHudStatus = "TROCA: EM ANDAMENTO";
             tagCooldownButtonLabel = "...";
             shownAssistTenths = shownTagSeconds = -2;
             return;
@@ -907,6 +1000,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             : assistTenths == 0 ? "ASSIST: PRONTO"
             : String.format(Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
         String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
+        assistHudStatus = assist;
+        swapHudStatus = tagSeconds == 0 ? "TROCA: PRONTA (↓+TAG)" : "TROCA: " + tagSeconds + "s";
         tagCooldownHudLabel = assist + tag;
         tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
     }
@@ -918,8 +1013,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private void updateFightCamera(float dt) {
         // Frame what is actually drawn: opaque sprite height measured at import time.
         float highestFighterTop = Math.min(visualTop(player()), visualTop(opponent()));
-        camera.update(dt, player().x, opponent().x, highestFighterTop,
-            player().superJumping || opponent().superJumping);
+        // KO leaves the winner's world X fixed, so its screen X must also
+        // be fixed. Continue to update the camera only while BOTH fight.
+        camera.updateForRound(dt, player().x, opponent().x, highestFighterTop,
+            player().superJumping || opponent().superJumping,
+            player().ko() || opponent().ko());
     }
 
     /** Highest opaque pixel of a fighter, for camera framing and the opponent HUD. */
@@ -945,6 +1043,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.save();
             canvas.scale(sx, sy);
+            // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
+            if (characterSelect.isOpen()) {
+                characterSelectRenderer.draw(canvas, paint, characterSelect);
+                canvas.restore();
+                return;
+            }
 
             float baseZoom = camera.zoom * superCameraZoom;
             float renderZoom = baseZoom * ultraCameraZoom;
@@ -1042,9 +1146,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
-            if (characterSelect.isOpen()) characterSelectRenderer.draw(canvas, paint, characterSelect);
 
             canvas.restore();
+            characterSelectRenderer.drawFightTransition(canvas);
         } finally {
             holder.unlockCanvasAndPost(canvas);
         }
@@ -1103,7 +1207,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     private void drawHud(Canvas c) {
-        hud.drawHud(c, hudState);
+        hud.drawHud(c, hudState, characterSelectRenderer);
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
@@ -1112,7 +1216,63 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
-        if (debugOverlay) debug.drawPanel(c, engine);
+        if (debugOverlay) {
+            debug.drawPanel(c, engine);
+            drawP01Tuner(c);
+        }
+    }
+
+    private void drawP01Tuner(Canvas c) {
+        Paint p=tuningPaint;
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.argb(225,10,17,29));
+        c.drawRoundRect(TUNE_LEFT,TUNE_TOP,1274f,411f,12f,12f,p);
+        p.setColor(Color.rgb(245,225,170));
+        p.setTextSize(17f);
+        p.setFakeBoldText(true);
+        c.drawText("P01 - AJUSTAR TAMANHO",TUNE_LEFT+10f,TUNE_TOP+24f,p);
+        p.setFakeBoldText(false);
+        p.setTextSize(13f);
+        p.setColor(Color.LTGRAY);
+        c.drawText("Comparar com o IDLE / salva sozinho",TUNE_LEFT+10f,TUNE_TOP+41f,p);
+        for(int row=0;row<3;row++) {
+            float top=TUNE_ROW_TOP+row*TUNE_ROW_H;
+            p.setColor(Color.WHITE);
+            p.setTextSize(18f);
+            c.drawText(P01VisualTuning.NAMES[row],TUNE_LEFT+12f,top+25f,p);
+            p.setTextSize(15f);
+            c.drawText(P01VisualTuning.percent(row)+"%",TUNE_LEFT+135f,top+25f,p);
+            p.setColor(Color.rgb(65,80,100));
+            c.drawRoundRect(1155f,top+2f,1198f,top+42f,7f,7f,p);
+            c.drawRoundRect(1208f,top+2f,1251f,top+42f,7f,7f,p);
+            p.setColor(Color.WHITE);
+            p.setTextSize(29f);
+            c.drawText("-",1169f,top+31f,p);
+            c.drawText("+",1218f,top+31f,p);
+        }
+        p.setColor(Color.rgb(65,80,100));
+        c.drawRoundRect(TUNE_LEFT+10f,360f,1261f,400f,7f,7f,p);
+        p.setColor(Color.WHITE);
+        p.setTextSize(16f);
+        c.drawText("RESTAURAR 100% (os 3)",TUNE_LEFT+27f,386f,p);
+    }
+
+    /** Return true when DEBUG scale editing consumes the tap. */
+    private boolean handleP01TunerTap(float x,float y) {
+        if (x<TUNE_LEFT || x>1274f || y<TUNE_TOP || y>411f) return false;
+        if (y>=360f && y<=401f) {
+            P01VisualTuning.reset(getContext());
+            return true;
+        }
+        int row=(int)((y-TUNE_ROW_TOP)/TUNE_ROW_H);
+        if(row>=0 && row<3 && y>=TUNE_ROW_TOP && y<TUNE_ROW_TOP+3*TUNE_ROW_H) {
+            float rowTop=TUNE_ROW_TOP+row*TUNE_ROW_H;
+            if(y>=rowTop+2f && y<=rowTop+42f) {
+                if(x>=1155f && x<=1198f) P01VisualTuning.adjust(getContext(),row,-1);
+                if(x>=1208f && x<=1251f) P01VisualTuning.adjust(getContext(),row,+1);
+            }
+        }
+        return true;
     }
 
     private static String guardLabel(int guard, String prefix) {
@@ -1178,7 +1338,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         opponentPanel.superLabel = opponentFighter.superHudLabel;
         opponentPanel.damageLabel = dummyDamageLabel;
         opponentPanel.damageProgress = dummyDamageLabelFrames / (float)DAMAGE_LABEL_FRAMES;
-        hud.drawOpponentPanel(c, opponentPanel);
+        if (debugOverlay) hud.drawOpponentPanel(c, opponentPanel);
     }
 
     private String opponentStatusLabel() {
@@ -1346,7 +1506,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // Opponent KO: the winner plays VICTORY once and holds its last pose.
             CharacterDefinition.Animation win = character.animations.get(SpriteStates.VICTORY);
             animation = SpriteStates.VICTORY;
-            animationElapsed = Math.min(win.duration - 0.0001f, victoryFrames[side]++ * FIXED_STEP);
+            // P01 source frames 0-6 include a walk toward the camera.
+            // Celebrate from the planted stance, frame 7, without translation.
+            boolean p01Victory = "player_base".equals(character.id) ||
+                "p01_training".equals(character.id);
+            float start = p01Victory ? win.timeOfFrame(7) : 0f;
+            animationElapsed = Math.min(win.duration - 0.0001f,
+                start + victoryFrames[side]++ * FIXED_STEP);
         } else {
             victoryFrames[side] = 0;
         }
@@ -1475,7 +1641,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         float angle = knockdownAngle(renderer, f);
         c.save();
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
-        renderer.draw(c, f.x, f.y, f.facing, damageFlash, guardFlash);
+        // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
+        float visualY = f.y;
+        if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
+            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
+        }
+        renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         c.restore();
     }
 
@@ -1573,6 +1744,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             int pointerId = event.getPointerId(index);
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
+            if(debugOverlay && handleP01TunerTap(x,y))return;
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
             switch (control) {
@@ -1588,6 +1760,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
                     healPlayerPointer = pointerId;
+                    hud.resetEffects();
                     for (FighterState member : team) member.restoreLife();
                     engine.refreshOverdrive(PLAYER);
                     break;
@@ -1596,6 +1769,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
+                    hud.resetEffects();
                     opponentFighter.restoreLife();
                     engine.refreshOverdrive(OPPONENT);
                     break;

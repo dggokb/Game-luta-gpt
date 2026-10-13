@@ -1,16 +1,16 @@
 {
   "id": "player_base_defense_stand",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_defense_stand_video_normalized.png",
+  "source": "art/sprites/source/player_base_defense_stand_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Guarda alta segurada e reacao ao impacto; cada quadro registrado no proprio tronco (--fixar quadro): o empurrao vem do jogo.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 140,
-    "rootY": 238,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 280,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        44,
-        22,
-        204,
-        240
+        87,
+        43,
+        407,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15989
+      "minimumMargin": 32,
+      "opaquePixels": 64572
     },
     {
       "index": 1,
       "outputBbox": [
-        66,
-        18,
-        217,
-        240
+        132,
+        37,
+        435,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16241
+      "minimumMargin": 32,
+      "opaquePixels": 65353
     },
     {
       "index": 2,
       "outputBbox": [
-        65,
-        18,
-        216,
-        240
+        130,
+        37,
+        433,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16136
+      "minimumMargin": 32,
+      "opaquePixels": 64932
     },
     {
       "index": 3,
       "outputBbox": [
-        65,
-        18,
-        216,
-        240
+        130,
+        37,
+        433,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16039
+      "minimumMargin": 32,
+      "opaquePixels": 64577
     },
     {
       "index": 4,
       "outputBbox": [
-        65,
-        18,
-        216,
-        240
+        130,
+        37,
+        433,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16038
+      "minimumMargin": 32,
+      "opaquePixels": 64532
     },
     {
       "index": 5,
       "outputBbox": [
-        65,
-        19,
-        216,
-        240
+        130,
+        39,
+        433,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15981
+      "minimumMargin": 32,
+      "opaquePixels": 64284
     },
     {
       "index": 6,
       "outputBbox": [
-        65,
-        19,
-        216,
-        240
+        130,
+        39,
+        433,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15922
+      "minimumMargin": 32,
+      "opaquePixels": 64066
     },
     {
       "index": 7,
       "outputBbox": [
-        65,
-        18,
-        216,
-        240
+        130,
+        37,
+        433,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15927
+      "minimumMargin": 32,
+      "opaquePixels": 64073
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 194,
-    "frameHeight": 242,
-    "rootX": 106,
-    "rootY": 230,
+    "frameWidth": 373,
+    "frameHeight": 469,
+    "rootX": 205,
+    "rootY": 452,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      34,
-      8
+      75,
+      24
     ],
     "decodedBytes": {
-      "canonical": 2621440,
-      "packed": 1502336
-    }
+      "canonical": 10485760,
+      "packed": 5597984
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "055f0fee484a75fd9888bc2c2cccff67ca994404a91f62a1bfece101e544d5e2",
-      "config": "433120e16ccca1b7ddd316101a89d9d674f53474400dcdddd448c0c705f459f0",
+      "source": "e44aaedde3a121bc892cafc4afae354374d13ef5d967c48e109785dc5d98d96c",
+      "config": "717d0618f332a49dde95faa38f4f9f9c9548a8a7a1f48929714ed760f08f5d3f",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_defense_stand_video_normalized.png": "055f0fee484a75fd9888bc2c2cccff67ca994404a91f62a1bfece101e544d5e2"
     }
   }
 }

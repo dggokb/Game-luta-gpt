@@ -2,7 +2,7 @@
   "id": "p04_hit_air",
   "javaName": "P04_HIT_AIR",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_hit_air_video_normalized.png",
+  "source": "art/sprites/source/p04_hit_air_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_hit_air.png",
   "report": "tools/sprites/reports/p04_hit_air.report.json",
   "preview": "android/app/build/sprite-review/p04_hit_air-import.png",
@@ -23,8 +23,12 @@
     "colunas": 4,
     "pe_no_chao": true
   },
-  "frameWidth": 384,
-  "frameHeight": 288,
-  "rootX": 263,
-  "rootY": 270
+  "frameWidth": 768,
+  "frameHeight": 576,
+  "rootX": 526,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p04_hit_air_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

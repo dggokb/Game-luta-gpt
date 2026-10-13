@@ -9,9 +9,16 @@ final class CharacterDefinition {
     static final class Atlas {
         final String resource;
         final int width, height, rootX, rootY, columns, count;
+        /** Texture pixels per canonical art pixel; gameplay/profile units stay unchanged. */
+        final float pixelScale;
         Atlas(String resource,int width,int height,int rootX,int rootY,int columns,int count) {
+            this(resource,width,height,rootX,rootY,columns,count,1f);
+        }
+        Atlas(String resource,int width,int height,int rootX,int rootY,int columns,int count,float pixelScale) {
+            if(!Float.isFinite(pixelScale)||pixelScale<=0f)throw new IllegalArgumentException("Invalid atlas pixelScale");
             this.resource=resource;this.width=width;this.height=height;
             this.rootX=rootX;this.rootY=rootY;this.columns=columns;this.count=count;
+            this.pixelScale=pixelScale;
         }
     }
     static final class Animation {

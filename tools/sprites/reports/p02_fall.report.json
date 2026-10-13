@@ -1,16 +1,16 @@
 {
   "id": "p02_fall",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_fall_video_normalized.png",
+  "source": "art/sprites/source/p02_fall_sr_hd.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 192,
-    "frameHeight": 288,
-    "rootX": 106,
-    "rootY": 270,
+    "frameWidth": 384,
+    "frameHeight": 576,
+    "rootX": 212,
+    "rootY": 540,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        15,
-        80,
-        165,
-        271
+        29,
+        159,
+        329,
+        542
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 13265
+      "minimumMargin": 29,
+      "opaquePixels": 53325
     },
     {
       "index": 1,
       "outputBbox": [
-        19,
-        79,
-        168,
-        271
+        37,
+        159,
+        336,
+        542
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13283
+      "minimumMargin": 34,
+      "opaquePixels": 53432
     },
     {
       "index": 2,
       "outputBbox": [
-        18,
-        80,
-        171,
-        271
+        35,
+        159,
+        342,
+        542
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13163
+      "minimumMargin": 34,
+      "opaquePixels": 53062
     },
     {
       "index": 3,
       "outputBbox": [
-        21,
-        79,
-        173,
-        271
+        41,
+        157,
+        345,
+        542
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13084
+      "minimumMargin": 34,
+      "opaquePixels": 52594
     },
     {
       "index": 4,
       "outputBbox": [
-        26,
-        76,
-        176,
-        271
+        51,
+        152,
+        351,
+        543
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 12882
+      "minimumMargin": 33,
+      "opaquePixels": 51655
     },
     {
       "index": 5,
       "outputBbox": [
-        36,
-        37,
-        171,
-        271
+        72,
+        73,
+        343,
+        542
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14284
+      "minimumMargin": 34,
+      "opaquePixels": 57644
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 181,
-    "frameHeight": 255,
-    "rootX": 101,
-    "rootY": 244,
+    "frameWidth": 348,
+    "frameHeight": 495,
+    "rootX": 195,
+    "rootY": 480,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      5,
-      26
+      17,
+      60
     ],
     "decodedBytes": {
-      "canonical": 1327104,
-      "packed": 1107720
-    }
+      "canonical": 5308416,
+      "packed": 4134240
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "4a91b4fb6deb8bbc9696247f49532bc50a6a186a3f97d1d1475a9ca6645935b7",
-      "config": "246cf90419fdb596e349562a6f1c265e78ad97e234cdd5724afde0f4a680a094",
+      "source": "da030b72e46f61fa38f9dcdca038bb90e709e965aaf907c72e8bd1a978fe82f5",
+      "config": "b6fa0d0ca24a160a4407c5d6329d63d00464b572c8d76d18d2be90d08cce79c4",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_fall_video_normalized.png": "4a91b4fb6deb8bbc9696247f49532bc50a6a186a3f97d1d1475a9ca6645935b7"
     }
   }
 }

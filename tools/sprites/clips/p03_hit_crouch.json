@@ -2,16 +2,16 @@
   "id": "p03_hit_crouch",
   "javaName": "P03_HIT_CROUCH",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_hit_crouch_video_normalized.png",
+  "source": "art/sprites/source/p03_hit_crouch_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_hit_crouch.png",
   "report": "tools/sprites/reports/p03_hit_crouch.report.json",
   "preview": "android/app/build/sprite-review/p03_hit_crouch-import.png",
   "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "rootX": 170,
+  "frameWidth": 768,
+  "rootX": 340,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Levar golpe agachado.",
   "video": {
     "arquivo": "danoChao.mp4",
@@ -23,5 +23,11 @@
     "raiz": "170,238",
     "colunas": 9,
     "fixar": "quadro"
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p03_hit_crouch_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

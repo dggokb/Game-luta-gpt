@@ -2,7 +2,7 @@
   "id": "p03_jump_heavy",
   "javaName": "P03_JUMP_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_jump_heavy_video_normalized.png",
+  "source": "art/sprites/source/p03_jump_heavy_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_jump_heavy.png",
   "report": "tools/sprites/reports/p03_jump_heavy.report.json",
   "preview": "android/app/build/sprite-review/p03_jump_heavy-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 448,
-  "frameHeight": 320,
-  "rootX": 150,
-  "rootY": 300,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. jH chute forte para a frente no ar; pes na raiz; quadros com arco pulados."
+  "frameWidth": 896,
+  "frameHeight": 640,
+  "rootX": 300,
+  "rootY": 600,
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. jH chute forte para a frente no ar; pes na raiz; quadros com arco pulados.",
+  "sourceReferences": [
+    "art/sprites/source/p03_jump_heavy_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

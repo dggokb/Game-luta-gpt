@@ -2,13 +2,13 @@
   "id": "p04_fall_down",
   "javaName": "P04_FALL_DOWN",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_fall_down_video_normalized.png",
+  "source": "art/sprites/source/p04_fall_down_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_fall_down.png",
   "report": "tools/sprites/reports/p04_fall_down.report.json",
   "preview": "android/app/build/sprite-review/p04_fall_down-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -24,8 +24,12 @@
     "fixar": "quadro",
     "pe_no_chao": true
   },
-  "frameWidth": 416,
-  "frameHeight": 224,
-  "rootX": 234,
-  "rootY": 206
+  "frameWidth": 832,
+  "frameHeight": 448,
+  "rootX": 468,
+  "rootY": 412,
+  "sourceReferences": [
+    "art/sprites/source/p04_fall_down_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

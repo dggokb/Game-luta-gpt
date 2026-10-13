@@ -2,7 +2,7 @@
   "id": "player_base_hit_air",
   "javaName": "HIT_AIR_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_hit_air_video_normalized.png",
+  "source": "art/sprites/source/player_base_hit_air_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_hit_air.png",
   "report": "tools/sprites/reports/player_base_hit_air.report.json",
   "preview": "android/app/build/sprite-review/hit_air-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "frameHeight": 320,
-  "rootX": 150,
-  "rootY": 300,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Arqueado pelo golpe, topo, mergulho e descida; escala da guarda do fim do video (o 1o quadro e agachado); pes na raiz."
+  "frameWidth": 640,
+  "frameHeight": 640,
+  "rootX": 300,
+  "rootY": 600,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Arqueado pelo golpe, topo, mergulho e descida; escala da guarda do fim do video (o 1o quadro e agachado); pes na raiz.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_hit_air_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

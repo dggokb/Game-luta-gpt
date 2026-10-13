@@ -2,17 +2,21 @@
   "id": "p03_getup",
   "javaName": "P03_GETUP",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_getup_video_normalized.png",
+  "source": "art/sprites/source/p03_getup_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_getup.png",
   "report": "tools/sprites/reports/p03_getup.report.json",
   "preview": "android/app/build/sprite-review/p03_getup-import.png",
   "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 12,
+  "columns": 5,
   "rootMode": "authored",
-  "frameWidth": 576,
-  "frameHeight": 384,
-  "rootX": 288,
-  "rootY": 364,
-  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Levantar com reversao de maos do video caindo. Quadros da parada de maos (3-5) deslocados para o registro do idle."
+  "frameWidth": 1152,
+  "frameHeight": 768,
+  "rootX": 576,
+  "rootY": 728,
+  "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Levantar com reversao de maos do video caindo. Quadros da parada de maos (3-5) deslocados para o registro do idle.",
+  "sourceReferences": [
+    "art/sprites/source/p03_getup_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

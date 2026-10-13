@@ -1,16 +1,16 @@
 {
   "id": "p02_crouch",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_crouch_video_normalized.png",
+  "source": "art/sprites/source/p02_crouch_sr_hd.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 224,
-    "frameHeight": 256,
-    "rootX": 115,
-    "rootY": 238,
+    "frameWidth": 448,
+    "frameHeight": 512,
+    "rootX": 230,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        30,
-        41,
-        198,
-        239
+        59,
+        81,
+        396,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13915
+      "minimumMargin": 35,
+      "opaquePixels": 56310
     },
     {
       "index": 1,
       "outputBbox": [
-        30,
-        45,
-        198,
-        239
+        59,
+        89,
+        395,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13890
+      "minimumMargin": 35,
+      "opaquePixels": 56126
     },
     {
       "index": 2,
       "outputBbox": [
-        29,
-        56,
-        197,
-        239
+        57,
+        111,
+        393,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13392
+      "minimumMargin": 35,
+      "opaquePixels": 54127
     },
     {
       "index": 3,
       "outputBbox": [
-        27,
-        69,
-        195,
-        238
+        54,
+        138,
+        390,
+        476
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 12839
+      "minimumMargin": 36,
+      "opaquePixels": 51948
     },
     {
       "index": 4,
       "outputBbox": [
-        26,
-        75,
-        195,
-        238
+        51,
+        151,
+        389,
+        476
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 12652
+      "minimumMargin": 36,
+      "opaquePixels": 51210
     },
     {
       "index": 5,
       "outputBbox": [
-        27,
-        89,
-        193,
-        238
+        54,
+        177,
+        386,
+        476
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 12079
+      "minimumMargin": 36,
+      "opaquePixels": 48819
     },
     {
       "index": 6,
       "outputBbox": [
-        27,
-        97,
-        193,
-        238
+        55,
+        195,
+        385,
+        476
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 11520
+      "minimumMargin": 36,
+      "opaquePixels": 46713
     },
     {
       "index": 7,
       "outputBbox": [
-        26,
-        100,
-        192,
-        238
+        53,
+        200,
+        383,
+        476
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 11197
+      "minimumMargin": 36,
+      "opaquePixels": 45305
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 192,
-    "frameHeight": 219,
-    "rootX": 99,
-    "rootY": 208,
+    "frameWidth": 370,
+    "frameHeight": 422,
+    "rootX": 191,
+    "rootY": 408,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      16,
-      30
+      39,
+      68
     ],
     "decodedBytes": {
-      "canonical": 1835008,
-      "packed": 1345536
-    }
+      "canonical": 7340032,
+      "packed": 4996480
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d2d3f337b32b4cff145efca9b89bd59fcb1551be332c815c83378288e1d97a29",
-      "config": "6ac9c03515a9c53532983e5764cf95cd05fa92b91a4029a4347ea6ae4c1caff4",
+      "source": "f919b9f7ec58d84aba28718c340f3d79d5ee880b315e9796948d4d5af80ea9b2",
+      "config": "755044d3a4e623b3007b53744256cb5ef87f887b79e4058794ef6116b6edaa8c",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_crouch_video_normalized.png": "d2d3f337b32b4cff145efca9b89bd59fcb1551be332c815c83378288e1d97a29"
     }
   }
 }

@@ -55,15 +55,19 @@ public class ExtractedSystemsTest {
         assertTrue(r.log.isEmpty());
     }
     @Test public void controlsHitTestFollowsInputPriority() {
-        assertEquals(ControlsLayout.Control.AI_TOGGLE,ControlsLayout.controlAt(1100,150));
-        assertEquals(ControlsLayout.Control.DEBUG_TOGGLE,ControlsLayout.controlAt(1100,200));
-        assertEquals(ControlsLayout.Control.HEAL_PLAYER,ControlsLayout.controlAt(1120,250));
-        assertEquals(ControlsLayout.Control.HEAL_OPPONENT,ControlsLayout.controlAt(1210,250));
+        assertEquals(ControlsLayout.Control.AI_TOGGLE,ControlsLayout.controlAt(1100,196));
+        assertEquals(ControlsLayout.Control.DEBUG_TOGGLE,ControlsLayout.controlAt(1100,246));
+        assertEquals(ControlsLayout.Control.HEAL_PLAYER,ControlsLayout.controlAt(1120,296));
+        assertEquals(ControlsLayout.Control.HEAL_OPPONENT,ControlsLayout.controlAt(1210,296));
         assertEquals(ControlsLayout.Control.DPAD,ControlsLayout.controlAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y));
         assertEquals(ControlsLayout.Control.LIGHT,ControlsLayout.controlAt(ControlsLayout.LIGHT_X,ControlsLayout.LIGHT_Y));
         assertEquals(ControlsLayout.Control.TAG,ControlsLayout.controlAt(ControlsLayout.TAG_X,ControlsLayout.TAG_Y));
         assertEquals(ControlsLayout.Control.NONE,ControlsLayout.controlAt(640,300));
-        assertEquals(ControlsLayout.Control.CHARACTER_SELECT,ControlsLayout.controlAt(640,70));
+        assertEquals(ControlsLayout.Control.CHARACTER_SELECT,ControlsLayout.controlAt(640,133));
+        assertEquals("HUD TAG must not toggle training controls", ControlsLayout.Control.NONE,
+            ControlsLayout.controlAt(1100,130));
+        assertEquals("Training timer must not open selection", ControlsLayout.Control.NONE,
+            ControlsLayout.controlAt(640,70));
         assertEquals(0,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X+5,ControlsLayout.DPAD_Y));
         assertEquals(1,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X+90,ControlsLayout.DPAD_Y));
         assertEquals(3,ControlsLayout.dpadDirectionAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y+90));
@@ -98,7 +102,7 @@ public class ExtractedSystemsTest {
         for(int i=0;i<1200;i++)tall.update(1/120f,500,700,top,false);
         assertTrue("Top of the tallest fighter stays visible",tall.top<=top);
     }
-    @Test public void characterSelectCardsFitOneRowForTheWholeRoster() {
+    @Test public void characterSelectCardsFitGridForTheWholeRoster() {
         for(int n=2;n<=10;n++) {
             String[] ids=new String[n];
             for(int i=0;i<n;i++)ids[i]="c"+i;
@@ -107,8 +111,9 @@ public class ExtractedSystemsTest {
             assertTrue("first card inside the screen",s.cardLeft(0)>=0);
             assertTrue("last card inside the screen",s.cardLeft(n-1)+w<=Arena.VW);
             for(int i=0;i<n;i++) {
-                if(i>0)assertTrue("cards do not overlap",s.cardLeft(i)>=s.cardLeft(i-1)+w);
-                assertEquals(i,s.cardAt(s.cardLeft(i)+w/2,CharacterSelect.CARD_TOP+CharacterSelect.CARD_H/2));
+                if(i>0 && i%CharacterSelect.COLUMNS!=0)assertTrue("cards do not overlap",s.cardLeft(i)>=s.cardLeft(i-1)+w);
+                assertTrue("card inside the screen vertically",s.cardTop(i)+s.cardHeight()<=Arena.VH);
+                assertEquals(i,s.cardAt(s.cardLeft(i)+w/2,s.cardTop(i)+s.cardHeight()/2));
             }
         }
     }

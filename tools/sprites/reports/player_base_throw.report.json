@@ -1,143 +1,148 @@
 {
   "id": "player_base_throw",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_throw_video_normalized.png",
+  "source": "art/sprites/source/player_base_throw_sr_hd.png",
   "sourceNote": "Agarrao do p01 (video Seedance): guarda, alcance e pegada (0-3), arremesso e volta (3-8). Os quadros com o adversario no video foram pulados; o jogo desenha quem e arremessado.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 448,
-    "frameHeight": 256,
-    "rootX": 150,
-    "rootY": 238,
-    "columns": 9,
+    "frameWidth": 896,
+    "frameHeight": 512,
+    "rootX": 300,
+    "rootY": 476,
+    "columns": 6,
     "frameCount": 9
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        67,
-        15,
-        222,
-        239
+        133,
+        29,
+        445,
+        479
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 16322
+      "minimumMargin": 29,
+      "opaquePixels": 65894
     },
     {
       "index": 1,
       "outputBbox": [
-        67,
-        18,
-        222,
-        240
+        135,
+        36,
+        444,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16972
+      "minimumMargin": 32,
+      "opaquePixels": 68395
     },
     {
       "index": 2,
       "outputBbox": [
-        67,
-        21,
-        266,
-        240
+        135,
+        42,
+        533,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17766
+      "minimumMargin": 32,
+      "opaquePixels": 71667
     },
     {
       "index": 3,
       "outputBbox": [
-        90,
-        24,
-        342,
-        240
+        181,
+        49,
+        685,
+        481
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17898
+      "minimumMargin": 31,
+      "opaquePixels": 72263
     },
     {
       "index": 4,
       "outputBbox": [
-        28,
-        62,
-        267,
-        238
+        57,
+        124,
+        534,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 16603
+      "minimumMargin": 35,
+      "opaquePixels": 66911
     },
     {
       "index": 5,
       "outputBbox": [
-        28,
-        61,
-        267,
-        238
+        57,
+        123,
+        535,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 16574
+      "minimumMargin": 35,
+      "opaquePixels": 66899
     },
     {
       "index": 6,
       "outputBbox": [
-        25,
-        67,
-        255,
-        238
+        50,
+        133,
+        511,
+        477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15945
+      "minimumMargin": 35,
+      "opaquePixels": 64303
     },
     {
       "index": 7,
       "outputBbox": [
-        69,
-        33,
-        233,
-        240
+        137,
+        67,
+        466,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15582
+      "minimumMargin": 33,
+      "opaquePixels": 62854
     },
     {
       "index": 8,
       "outputBbox": [
-        67,
-        17,
-        222,
-        240
+        135,
+        33,
+        445,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16252
+      "minimumMargin": 32,
+      "opaquePixels": 65608
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 337,
-    "frameHeight": 244,
-    "rootX": 135,
-    "rootY": 233,
-    "columns": 9,
+    "frameWidth": 660,
+    "frameHeight": 476,
+    "rootX": 263,
+    "rootY": 459,
+    "columns": 6,
     "frameCount": 9,
     "cropOffset": [
-      15,
-      5
+      37,
+      17
     ],
     "decodedBytes": {
-      "canonical": 4128768,
-      "packed": 2960208
-    }
+      "canonical": 22020096,
+      "packed": 15079680
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a2fc787ab6cf3b5781b7c93a19022923892810cc598a859038de391b24d7de89",
-      "config": "0ecb85546d9c56a636598d019b36cf053dda44c2db85db8c214d003202e32b6e",
+      "source": "7d695545218c17d78ed17d6983c483467527877f15bac3af821ff1e927403a8f",
+      "config": "93bb85ee370a60e34efcb94314d2740b7cc87daf97efc349b291914dcc61e2fe",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_throw_video_normalized.png": "a2fc787ab6cf3b5781b7c93a19022923892810cc598a859038de391b24d7de89"
     }
   }
 }

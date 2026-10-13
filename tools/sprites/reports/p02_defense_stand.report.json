@@ -1,16 +1,16 @@
 {
   "id": "p02_defense_stand",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_defense_stand_video_normalized.png",
+  "source": "art/sprites/source/p02_defense_stand_sr_hd.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 97,
-    "rootY": 238,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 194,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        25,
-        34,
-        174,
-        239
+        49,
+        67,
+        349,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13086
+      "minimumMargin": 34,
+      "opaquePixels": 52675
     },
     {
       "index": 1,
       "outputBbox": [
-        35,
-        30,
-        232,
-        240
+        71,
+        61,
+        465,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16060
+      "minimumMargin": 32,
+      "opaquePixels": 64613
     },
     {
       "index": 2,
       "outputBbox": [
-        38,
-        28,
-        236,
-        239
+        77,
+        57,
+        471,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15525
+      "minimumMargin": 33,
+      "opaquePixels": 62333
     },
     {
       "index": 3,
       "outputBbox": [
-        40,
-        27,
-        227,
-        239
+        79,
+        55,
+        455,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15546
+      "minimumMargin": 34,
+      "opaquePixels": 62342
     },
     {
       "index": 4,
       "outputBbox": [
-        31,
-        32,
-        214,
-        240
+        62,
+        65,
+        429,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14798
+      "minimumMargin": 32,
+      "opaquePixels": 59184
     },
     {
       "index": 5,
       "outputBbox": [
-        29,
-        35,
-        181,
-        239
+        57,
+        69,
+        363,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13700
+      "minimumMargin": 34,
+      "opaquePixels": 55293
     },
     {
       "index": 6,
       "outputBbox": [
-        20,
-        33,
-        172,
-        239
+        39,
+        65,
+        345,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13084
+      "minimumMargin": 34,
+      "opaquePixels": 52744
     },
     {
       "index": 7,
       "outputBbox": [
-        24,
-        31,
-        176,
-        239
+        47,
+        61,
+        353,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13323
+      "minimumMargin": 34,
+      "opaquePixels": 53573
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 236,
-    "frameHeight": 233,
-    "rootX": 87,
-    "rootY": 221,
+    "frameWidth": 457,
+    "frameHeight": 452,
+    "rootX": 167,
+    "rootY": 435,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      10,
-      17
+      27,
+      41
     ],
     "decodedBytes": {
-      "canonical": 2097152,
-      "packed": 1759616
-    }
+      "canonical": 8388608,
+      "packed": 6610048
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "142db18d037e53eb16df0e5dd89b56a1981a7ebf7dc18831605e97aba7267476",
-      "config": "8153764dd289e8bbb84928a21cdda9585ed812985dcf3a5239d8b7f0b993c2a3",
+      "source": "0b66ba37a282e124dabe7996886f5b84bdc36499ba25b3235689b20805e87568",
+      "config": "d5c717011ae2a9abb455f50d044252b0d075d7cd35d660c6a5e284a9a43e7c92",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_defense_stand_video_normalized.png": "142db18d037e53eb16df0e5dd89b56a1981a7ebf7dc18831605e97aba7267476"
     }
   }
 }

@@ -2,7 +2,7 @@
   "id": "p03_dash",
   "javaName": "P03_DASH",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_dash_video_normalized.png",
+  "source": "art/sprites/source/p03_dash_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_dash.png",
   "report": "tools/sprites/reports/p03_dash.report.json",
   "preview": "android/app/build/sprite-review/p03_dash-import.png",
@@ -10,7 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 512,
-  "rootX": 300,
-  "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Corrida 20-35, 1 a cada 3; chao, poeira e linhas de velocidade recortados."
+  "frameWidth": 1024,
+  "rootX": 600,
+  "sourceNote": "p03 gerado em video (Seedance) a partir de art/keys/p03/inicio_centro.png, convertido por tools/sprites/video_para_sprite.py; mesmo perfil e escala do p01. Corrida 20-35, 1 a cada 3; chao, poeira e linhas de velocidade recortados.",
+  "sourceReferences": [
+    "art/sprites/source/p03_dash_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

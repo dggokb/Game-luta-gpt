@@ -2,13 +2,21 @@
   "id": "player_base_idle",
   "javaName": "IDLE",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_idle_video_normalized.png",
+  "source": "art/sprites/source/player_base_idle_sr_2x.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.png",
   "report": "tools/sprites/reports/player_base_idle.report.json",
   "preview": "android/app/build/sprite-review/idle-import.png",
   "expectedFrames": 76,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 10,
   "rootMode": "authored",
-  "sourceNote": "Teste: idle do p01 gerado em video (Seedance), fundo verde recortado, loop de 76 quadros a ~24 fps."
+  "sourceNote": "P01 idle: Real-ESRGAN AnimeVideo-v3 4x master, uniformly reduced to 2x for runtime memory. 76 frames, authored root, 42 ms; originals preserved. No per-frame alignment or temporal smoothing.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_idle_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootX": 256,
+  "rootY": 476,
+  "pixelScale": 2
 }

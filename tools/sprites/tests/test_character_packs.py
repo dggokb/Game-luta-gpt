@@ -296,7 +296,107 @@ class BuiltPackTests(unittest.TestCase):
         report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
         self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['canonical'])
         self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
-        self.assertEqual(256,report['layout']['frameWidth'])
+        self.assertEqual(512,report['layout']['frameWidth'])
+        self.assertEqual(2,report['packed']['pixelScale'])
+
+    def test_hd_idle_preserves_timing_registration_and_runtime_budget(self):
+        from PIL import Image
+        character=json.loads(self.path.read_text())
+        idle=character['animations']['IDLE']
+        self.assertEqual(list(range(76)),idle['frames'])
+        self.assertEqual([42]*76,idle['durationsMs'])
+        self.assertTrue(idle['loop'])
+        report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
+        self.assertEqual([512,512,256,476], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        packed=report['packed']
+        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
+        self.assertLessEqual(packed['frameHeight']*8,4096)
+        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
+        original=Image.open(self.root/'art/sprites/source/player_base_idle_video_normalized.png').convert('RGBA')
+        master=Image.open(self.root/'art/sprites/source/player_base_idle_sr_2x.png').convert('RGBA')
+        for i in range(76):
+            old=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
+            new=master.crop((i%10*512,i//10*512,(i%10+1)*512,(i//10+1)*512))
+            self.assertEqual(old.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),new.getchannel('A').tobytes(),i)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn(',10,76,2.00000000f)',java)
+        self.assertIn('art/sprites/source/player_base_idle_video_normalized.png',report['provenance']['referenceSources'])
+
+    def test_hd_walk_forward_preserves_distance_root_and_runtime_budget(self):
+        from PIL import Image
+        walk=json.loads(self.path.read_text())['animations']['WALK_FORWARD']
+        self.assertEqual(list(range(20)),walk['frames'])
+        self.assertEqual(12.5,walk['distancePerFrame'])
+        self.assertTrue(walk['loop'])
+        self.assertNotIn('durationsMs',walk)
+        report=json.loads((self.root/'tools/sprites/reports/player_base_walk_forward.report.json').read_text())
+        self.assertEqual([512,512,256,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        packed=report['packed']
+        self.assertEqual(2,packed['pixelScale'])
+        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
+        self.assertLessEqual(packed['frameHeight']*3,4096)
+        self.assertLess(packed['decodedBytes']['packed'],32*1024*1024)
+        original=Image.open(self.root/'art/sprites/source/player_base_walk_forward_video_normalized.png').convert('RGBA')
+        hd=Image.open(self.root/'art/sprites/source/player_base_walk_forward_sr_2x.png').convert('RGBA')
+        for i in range(20):
+            src=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
+            cell=hd.crop((i%8*512,i//8*512,(i%8+1)*512,(i//8+1)*512))
+            self.assertEqual(src.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn(',8,20,2.00000000f)',java)
+        self.assertIn('art/sprites/source/player_base_walk_forward_video_normalized.png',report['provenance']['referenceSources'])
+
+    def test_p02_hd_idle_preserves_proportions_root_timing_and_budget(self):
+        from PIL import Image
+        char=json.loads((self.root/'characters/p02/character.json').read_text())
+        idle=char['animations']['IDLE']
+        self.assertEqual(list(range(56)),idle['frames'])
+        self.assertEqual([41]*56,idle['durationsMs'])
+        self.assertTrue(idle['loop'])
+        report=json.loads((self.root/'tools/sprites/reports/p02_idle.report.json').read_text())
+        self.assertEqual([384,512,194,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        packed=report['packed']
+        self.assertEqual(2,packed['pixelScale'])
+        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
+        self.assertLessEqual(packed['frameHeight']*6,4096)
+        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
+        self.assertEqual(194,packed['rootX']+packed['cropOffset'][0])
+        self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
+        original=Image.open(self.root/'art/sprites/source/p02_idle_video_normalized.png').convert('RGBA')
+        hd=Image.open(self.root/'art/sprites/source/p02_idle_sr_2x.png').convert('RGBA')
+        for i in range(56):
+            src=original.crop((i%11*192,i//11*256,(i%11+1)*192,(i//11+1)*256))
+            cell=hd.crop((i%11*384,i//11*512,(i%11+1)*384,(i//11+1)*512))
+            self.assertEqual(src.getchannel('A').resize((384,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn(',11,56,2.00000000f)',java)
+        self.assertIn('art/sprites/source/p02_idle_video_normalized.png',report['provenance']['referenceSources'])
+
+    def test_p03_hd_idle_preserves_registration_timing_and_budget(self):
+        from PIL import Image
+        char=json.loads((self.root/'characters/p03/character.json').read_text())
+        idle=char['animations']['IDLE']
+        self.assertEqual(list(range(60)),idle['frames'])
+        self.assertEqual([41]*60,idle['durationsMs'])
+        self.assertTrue(idle['loop'])
+        report=json.loads((self.root/'tools/sprites/reports/p03_idle.report.json').read_text())
+        self.assertEqual([512,512,256,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        packed=report['packed']
+        self.assertEqual(2,packed['pixelScale'])
+        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
+        self.assertLessEqual(packed['frameHeight']*8,4096)
+        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
+        self.assertEqual(256,packed['rootX']+packed['cropOffset'][0])
+        self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
+        original=Image.open(self.root/'art/sprites/source/p03_idle_video_normalized.png').convert('RGBA')
+        hd=Image.open(self.root/'art/sprites/source/p03_idle_sr_2x.png').convert('RGBA')
+        for i in range(60):
+            src=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
+            cell=hd.crop((i%8*512,i//8*512,(i%8+1)*512,(i//8+1)*512))
+            self.assertEqual(src.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn(',8,60,2.00000000f)',java)
+        self.assertIn('art/sprites/source/p03_idle_video_normalized.png',report['provenance']['referenceSources'])
 
     def test_visual_heights_and_stats_are_generated(self):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
@@ -309,7 +409,7 @@ class BuiltPackTests(unittest.TestCase):
 
     def test_player_base_crouch_light_is_a_real_declarative_move(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_light.report.json').read_text())
-        self.assertEqual([384,256,140,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual([768,512,280,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         self.assertEqual(11,report['layout']['frameCount'])
         self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
@@ -318,7 +418,7 @@ class BuiltPackTests(unittest.TestCase):
 
     def test_player_base_crouch_medium_uses_wide_authored_prepared_grid(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_medium.report.json').read_text())
-        self.assertEqual([512,256,250,238],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual([1024,512,500,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         self.assertEqual(16,report['layout']['frameCount'])
         self.assertTrue(all(frame['minimumMargin'] >= 8 for frame in report['frames']))
         self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))

@@ -2,13 +2,13 @@
   "id": "p02_super_wave",
   "javaName": "P02_SUPER_WAVE",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_super_wave_video_normalized.png",
+  "source": "art/sprites/source/p02_super_wave_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_super_wave.png",
   "report": "tools/sprites/reports/p02_super_wave.report.json",
   "preview": "android/app/build/sprite-review/p02_super_wave-import.png",
   "expectedFrames": 22,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -23,8 +23,12 @@
     "colunas": 11,
     "limpar_chao": true
   },
-  "frameWidth": 384,
-  "frameHeight": 288,
-  "rootY": 270,
-  "rootX": 113
+  "frameWidth": 768,
+  "frameHeight": 576,
+  "rootY": 540,
+  "rootX": 226,
+  "sourceReferences": [
+    "art/sprites/source/p02_super_wave_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

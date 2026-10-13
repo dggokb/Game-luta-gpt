@@ -1,16 +1,16 @@
 {
   "id": "player_base_fall_air",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_fall_video_normalized.png",
+  "source": "art/sprites/source/player_base_fall_air_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 320,
-    "rootX": 128,
-    "rootY": 300,
+    "frameWidth": 512,
+    "frameHeight": 640,
+    "rootX": 256,
+    "rootY": 600,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        47,
         93,
-        198,
-        301
+        186,
+        397,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17098
+      "minimumMargin": 38,
+      "opaquePixels": 68707
     },
     {
       "index": 1,
       "outputBbox": [
-        47,
-        92,
-        197,
-        301
+        93,
+        184,
+        394,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17129
+      "minimumMargin": 38,
+      "opaquePixels": 68788
     },
     {
       "index": 2,
       "outputBbox": [
-        50,
-        88,
-        196,
-        301
+        100,
+        177,
+        392,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17153
+      "minimumMargin": 37,
+      "opaquePixels": 68987
     },
     {
       "index": 3,
       "outputBbox": [
-        53,
-        84,
-        195,
-        301
+        106,
+        169,
+        390,
+        601
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17052
+      "minimumMargin": 39,
+      "opaquePixels": 68624
     },
     {
       "index": 4,
       "outputBbox": [
-        61,
-        63,
-        192,
-        301
+        121,
+        125,
+        384,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17141
+      "minimumMargin": 38,
+      "opaquePixels": 68969
     },
     {
       "index": 5,
       "outputBbox": [
-        63,
-        48,
-        190,
-        301
+        125,
+        95,
+        379,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17683
+      "minimumMargin": 38,
+      "opaquePixels": 71140
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 171,
-    "frameHeight": 274,
-    "rootX": 91,
-    "rootY": 262,
+    "frameWidth": 328,
+    "frameHeight": 533,
+    "rootX": 175,
+    "rootY": 517,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      37,
-      38
+      81,
+      83
     ],
     "decodedBytes": {
-      "canonical": 1966080,
-      "packed": 1124496
-    }
+      "canonical": 7864320,
+      "packed": 4195776
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "91a478dcbfba747983b57296ccfe97c0c70f306e5ab291aede80a1754c82d97e",
-      "config": "2f44216d98b1aef5207bf9f0b8eb4d64a9e57557832f9adc81bdca6bace067a9",
+      "source": "9de079c77ff2affee8781042081c40e58e8ac953ff9000e53a0738d3ef23fac3",
+      "config": "1cf448bcf536860e336a78f465a3ef9907a830d9518f37b157a283f409797d0e",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_fall_video_normalized.png": "91a478dcbfba747983b57296ccfe97c0c70f306e5ab291aede80a1754c82d97e"
     }
   }
 }

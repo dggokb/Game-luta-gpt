@@ -1,16 +1,16 @@
 {
   "id": "player_base_crouch",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_crouch_video_normalized.png",
+  "source": "art/sprites/source/player_base_crouch_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 128,
-    "rootY": 238,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        55,
-        15,
-        211,
-        239
+        110,
+        29,
+        421,
+        478
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 16542
+      "minimumMargin": 29,
+      "opaquePixels": 66723
     },
     {
       "index": 1,
       "outputBbox": [
-        54,
-        16,
-        211,
-        238
+        107,
+        33,
+        421,
+        477
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16627
+      "minimumMargin": 33,
+      "opaquePixels": 67076
     },
     {
       "index": 2,
       "outputBbox": [
-        47,
-        24,
-        210,
-        237
+        93,
+        48,
+        420,
+        474
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 16933
+      "minimumMargin": 38,
+      "opaquePixels": 68166
     },
     {
       "index": 3,
       "outputBbox": [
-        46,
-        33,
-        210,
-        237
+        92,
+        65,
+        420,
+        475
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17109
+      "minimumMargin": 37,
+      "opaquePixels": 68959
     },
     {
       "index": 4,
       "outputBbox": [
-        44,
-        44,
-        209,
-        237
+        88,
+        87,
+        419,
+        475
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17235
+      "minimumMargin": 37,
+      "opaquePixels": 69491
     },
     {
       "index": 5,
       "outputBbox": [
-        42,
-        47,
-        209,
-        237
+        84,
+        95,
+        419,
+        475
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17219
+      "minimumMargin": 37,
+      "opaquePixels": 69361
     },
     {
       "index": 6,
       "outputBbox": [
-        38,
-        53,
-        209,
-        237
+        77,
+        106,
+        419,
+        475
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17118
+      "minimumMargin": 37,
+      "opaquePixels": 69011
     },
     {
       "index": 7,
       "outputBbox": [
-        37,
-        55,
-        209,
-        237
+        73,
+        109,
+        419,
+        475
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17111
+      "minimumMargin": 37,
+      "opaquePixels": 68949
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 194,
-    "frameHeight": 245,
-    "rootX": 101,
-    "rootY": 234,
+    "frameWidth": 373,
+    "frameHeight": 475,
+    "rootX": 195,
+    "rootY": 460,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      27,
-      4
+      61,
+      16
     ],
     "decodedBytes": {
-      "canonical": 2097152,
-      "packed": 1520960
-    }
+      "canonical": 8388608,
+      "packed": 5669600
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0a7d543d0dd16f9e1553664401323119213d6b5e8cead588c8aee47421653f4e",
-      "config": "ebeb838a70cdf91c2abc9152e1f2b68a3620504f6fe37e5e9e00b34e372312ca",
+      "source": "680d0d717f425c797e1acbcfa014f15f6ea367c3fb5aaa5eb6c9c87b833e9c60",
+      "config": "805e4610607b61cab5c3da51bc8825b20892299876931547c9c6e2d8a66f2bdf",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_crouch_video_normalized.png": "0a7d543d0dd16f9e1553664401323119213d6b5e8cead588c8aee47421653f4e"
     }
   }
 }

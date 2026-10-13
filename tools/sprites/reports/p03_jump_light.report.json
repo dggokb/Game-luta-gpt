@@ -1,16 +1,16 @@
 {
   "id": "p03_jump_light",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_jump_light_video_normalized.png",
+  "source": "art/sprites/source/p03_jump_light_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. jL chute fraco no ar; pes na raiz.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 384,
-    "frameHeight": 320,
-    "rootX": 150,
-    "rootY": 300,
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 300,
+    "rootY": 600,
     "columns": 7,
     "frameCount": 7
   },
@@ -18,104 +18,109 @@
     {
       "index": 0,
       "outputBbox": [
-        88,
-        63,
-        218,
-        301
+        176,
+        127,
+        436,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 14927
+      "minimumMargin": 37,
+      "opaquePixels": 59976
     },
     {
       "index": 1,
       "outputBbox": [
-        85,
-        71,
-        220,
-        302
+        169,
+        143,
+        440,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 13966
+      "minimumMargin": 36,
+      "opaquePixels": 56074
     },
     {
       "index": 2,
       "outputBbox": [
-        70,
-        86,
-        338,
-        302
+        139,
+        173,
+        676,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17664
+      "minimumMargin": 36,
+      "opaquePixels": 71189
     },
     {
       "index": 3,
       "outputBbox": [
-        69,
-        86,
-        337,
-        302
+        137,
+        173,
+        674,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17733
+      "minimumMargin": 36,
+      "opaquePixels": 71395
     },
     {
       "index": 4,
       "outputBbox": [
-        68,
-        86,
-        334,
-        302
+        135,
+        172,
+        667,
+        604
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 17489
+      "minimumMargin": 36,
+      "opaquePixels": 70511
     },
     {
       "index": 5,
       "outputBbox": [
-        71,
-        78,
-        244,
-        301
+        141,
+        155,
+        488,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 14836
+      "minimumMargin": 37,
+      "opaquePixels": 59561
     },
     {
       "index": 6,
       "outputBbox": [
-        74,
-        72,
-        220,
-        302
+        148,
+        144,
+        441,
+        603
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 15398
+      "minimumMargin": 37,
+      "opaquePixels": 61865
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 291,
-    "frameHeight": 259,
-    "rootX": 93,
-    "rootY": 247,
+    "frameWidth": 567,
+    "frameHeight": 504,
+    "rootX": 178,
+    "rootY": 487,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      57,
-      53
+      122,
+      113
     ],
     "decodedBytes": {
-      "canonical": 3440640,
-      "packed": 2110332
-    }
+      "canonical": 13762560,
+      "packed": 8001504
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2885d3a4679806e695c5eea67eeb47fc14d6ad24dc0b7a69a81266aa69126bb5",
-      "config": "528ca51a3f4bdb37eb790681bb632d62edf439aa3df44f8a10cebd1fcc28cb4b",
+      "source": "6cae517ea21243765ff90c875bccdd78a0c84a5288f9a280576e39cf168a3455",
+      "config": "bc56220d2077513e9864d02ec70f0662f1d2731fb02d1abcba7a6b387b09d23e",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_jump_light_video_normalized.png": "2885d3a4679806e695c5eea67eeb47fc14d6ad24dc0b7a69a81266aa69126bb5"
     }
   }
 }

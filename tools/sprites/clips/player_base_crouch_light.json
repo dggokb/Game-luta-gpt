@@ -2,7 +2,7 @@
   "id": "player_base_crouch_light",
   "javaName": "CROUCH_LIGHT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_crouch_light_video_normalized.png",
+  "source": "art/sprites/source/player_base_crouch_light_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_crouch_light.png",
   "report": "tools/sprites/reports/player_base_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/crouch_light-import.png",
@@ -10,7 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "rootX": 140,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py."
+  "frameWidth": 768,
+  "rootX": 280,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "sourceReferences": [
+    "art/sprites/source/player_base_crouch_light_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

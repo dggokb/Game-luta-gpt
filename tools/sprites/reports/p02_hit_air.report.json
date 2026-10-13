@@ -1,16 +1,16 @@
 {
   "id": "p02_hit_air",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_hit_air_video_normalized.png",
+  "source": "art/sprites/source/p02_hit_air_sr_hd.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 512,
-    "frameHeight": 320,
-    "rootX": 137,
-    "rootY": 302,
+    "frameWidth": 1024,
+    "frameHeight": 640,
+    "rootX": 274,
+    "rootY": 604,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,71 +18,76 @@
     {
       "index": 0,
       "outputBbox": [
-        90,
-        43,
-        188,
-        303
+        180,
+        85,
+        377,
+        607
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14936
+      "minimumMargin": 33,
+      "opaquePixels": 60028
     },
     {
       "index": 1,
       "outputBbox": [
-        29,
-        96,
-        220,
-        303
+        59,
+        191,
+        441,
+        607
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15193
+      "minimumMargin": 33,
+      "opaquePixels": 61476
     },
     {
       "index": 2,
       "outputBbox": [
-        38,
-        95,
-        228,
-        303
+        77,
+        190,
+        457,
+        606
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15776
+      "minimumMargin": 34,
+      "opaquePixels": 63498
     },
     {
       "index": 3,
       "outputBbox": [
-        82,
-        68,
-        231,
-        303
+        164,
+        137,
+        463,
+        607
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14657
+      "minimumMargin": 33,
+      "opaquePixels": 58963
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 220,
-    "frameHeight": 281,
-    "rootX": 116,
-    "rootY": 269,
+    "frameWidth": 428,
+    "frameHeight": 547,
+    "rootX": 227,
+    "rootY": 531,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      21,
-      33
+      47,
+      73
     ],
     "decodedBytes": {
-      "canonical": 2621440,
-      "packed": 989120
-    }
+      "canonical": 10485760,
+      "packed": 3745856
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "e623454d7067813fd036884512c7b9ed502087b8551b964651818a599569ebed",
-      "config": "8bb7bac878da26af64306f09957701e05684f5a74002b29170cdb36f0ea6832f",
+      "source": "7b1bf951e984fa83f83e71b35afc92a1e9ef7bee66b8cad927a9773b2e1f7ef5",
+      "config": "61eefc8efa3c6db1db80c9d326d40416bfc6f3270a70086b3b2ac41b364bd7a9",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_hit_air_video_normalized.png": "e623454d7067813fd036884512c7b9ed502087b8551b964651818a599569ebed"
     }
   }
 }
