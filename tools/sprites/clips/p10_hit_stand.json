@@ -1,0 +1,32 @@
+{
+  "id": "p10_hit_stand",
+  "javaName": "P10_HIT_STAND",
+  "profile": "p10.json",
+  "source": "art/sprites/source/p10_hit_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_hit_stand.png",
+  "report": "tools/sprites/reports/p10_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/p10_hit_stand-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p10 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoCima.mp4",
+    "personagem": "p10",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.90)",
+    "quadros": "8,18,28,38,48,58,68,78,88",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "105,270",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 105,
+  "frameHeight": 288,
+  "rootY": 270
+}

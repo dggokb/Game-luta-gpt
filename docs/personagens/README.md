@@ -28,7 +28,11 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 - **Qualidade:** exatamente a do concept, sem readaptar traço ou proporção; animação de
   anime viva, com muitos frames. Base de cada personagem no ChatGPT (uma conversa por
   personagem, com o concept anexado); animações em vídeo no Seedance (veja Método abaixo).
-- O ajudante (pai adotivo, gordão) e o pai ainda não têm concept: ficam para depois.
+- **Personagens da história** (concepts no Drive, copiados em `art/concepts/`): Takatoshi
+  Komyo aos 45 anos (`takatoshi_45.png`, quando parte para o torneio) e aos 55
+  (`takatoshi_55.png`, o Campeão/chefe final), Dafu (`dafu.png`), Ryūga e Kōga aos 8 anos
+  (`ryuga_8.png`, `koga_8.png`) e o logo do jogo (`logo.png`). Ainda não são lutadores
+  jogáveis; o uso deles no modo história está em `docs/historia/`.
 
 ## Elenco
 

@@ -104,6 +104,8 @@ final class CharacterDefinition {
             this.move=move;this.command=command.clone();this.buttons=buttons;
         }
         int commandLength() { return command.length; }
+        /** The motion, in relative directions (tutorial text and examples). */
+        int[] command() { return command.clone(); }
         boolean acceptsButton(String button) { return buttons.contains(button); }
         boolean matches(MotionParser motion,int clock,int motionWindow,int pressWindow) {
             return motion.matchCommand(command,clock,motionWindow,pressWindow);

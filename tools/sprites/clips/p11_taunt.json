@@ -1,0 +1,29 @@
+{
+  "id": "p11_taunt",
+  "javaName": "P11_TAUNT",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_taunt_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_taunt.png",
+  "report": "tools/sprites/reports/p11_taunt.report.json",
+  "preview": "android/app/build/sprite-review/p11_taunt-import.png",
+  "expectedFrames": 33,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "provocacao.mp4",
+    "personagem": "p11",
+    "escala": 0.4512,
+    "medida": "1º quadro = inicio_centro (nota 0.82)",
+    "quadros": "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60,63,66,69,72,75,78,81,84,87,90,93,96",
+    "celula": 320,
+    "largura": 256,
+    "raiz": "131,302",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameHeight": 320,
+  "rootX": 131,
+  "rootY": 302
+}

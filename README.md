@@ -289,3 +289,29 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - O botão mostra o tempo restante; depois fica "USADO". Os botões **VIDA P1 / VIDA CPU**
   também recarregam o Overdrive (novo round no treino).
 - **DEMO 87** mostra tudo isso. A CPU ainda não usa o Overdrive.
+
+## Modo história (MVP)
+
+- Botão **HISTÓRIA** no HUD (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de
+  *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, as páginas prontas do
+  Prólogo lidas quadro a quadro, páginas provisórias, a luta de treino Ryūga × Kōga no meio e
+  o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
+- Motor em `android/story-core` (Java puro); episódios em JSON em
+  `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do
+  arquivo esperado.
+- **Motor padrão das páginas** (leitura guiada de páginas de mangá prontas: quadro a quadro,
+  efeitos de impacto/tremor/velocidade/zoom, balões traduzidos pelo idioma do aparelho):
+  `docs/historia/motor-paginas.md`. Ferramenta de recorte: `tools/historia/recortar_pagina.py`.
+- Proposta, formato e roadmap da temporada: `docs/historia/README.md`. Prompts das imagens
+  para o ChatGPT: `docs/historia/prompts-ep00-ep01.md`. Revisão no PC:
+  `gradle :pc-preview:runHistoria`.
+- **Cenas pelo nome** (`historia/cenas.json` + `playScene("intro", depois)` no `GameView`):
+  um episódio ou um trecho dele, entre marcas, que o jogo chama em vários momentos.
+  `docs/historia/cenas.md`.
+
+## Modo tutorial
+
+- Botão **TUTORIAL** (abaixo de HISTÓRIA): a intro do Prólogo (páginas 1 a 4) e depois o
+  treino guiado dos golpes no **Dojo Shinshinkan**, lição por lição (movimento, golpes,
+  combos, defesa, especiais, agarrão, SUPER e ULTRA). No modo história o treino vem no mesmo
+  ponto do Prólogo. `docs/tutorial.md`.

@@ -68,22 +68,33 @@ def load_pack(cid):
 
 
 class Sheet:
-    """Quadros de um atlas (RGBA) com a raiz da célula."""
+    """Quadros de um atlas (RGBA) com a raiz da célula.
+
+    Folha HD ("pixelScale": 2) é medida reduzida ao tamanho lógico, para os limites em px
+    valerem igual para todos; `cell(i)` e pw/ph/prx/pry dão a célula física (edição)."""
     cache = {}
 
     def __init__(self, cfg):
         self.cfg = cfg
-        self.w, self.h = cfg.get('frameWidth', 256), cfg.get('frameHeight', 256)
-        self.rx, self.ry = cfg.get('rootX', 128), cfg.get('rootY', 238)
+        self.d = d = int(cfg.get('pixelScale', 1))
+        self.pw, self.ph = cfg.get('frameWidth', 256), cfg.get('frameHeight', 256)
+        self.prx, self.pry = cfg.get('rootX', 128), cfg.get('rootY', 238)
+        self.w, self.h, self.rx, self.ry = self.pw // d, self.ph // d, self.prx // d, self.pry // d
         self.cols = cfg['columns']
         src = cfg['source']
         if src not in Sheet.cache:
-            Sheet.cache[src] = np.array(Image.open(ROOT / src).convert('RGBA'))
-        self.img = Sheet.cache[src]
+            full = Image.open(ROOT / src).convert('RGBA')
+            small = full if d == 1 else full.resize((full.width // d, full.height // d), Image.LANCZOS)
+            Sheet.cache[src] = (np.array(small), np.array(full))
+        self.img, self.full = Sheet.cache[src]
 
     def frame(self, i):
         y, x = i // self.cols * self.h, i % self.cols * self.w
         return self.img[y:y + self.h, x:x + self.w]
+
+    def cell(self, i):
+        y, x = i // self.cols * self.ph, i % self.cols * self.pw
+        return self.full[y:y + self.ph, x:x + self.pw]
 
 
 def measure(rgba, rx, ry):

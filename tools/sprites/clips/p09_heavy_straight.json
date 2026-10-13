@@ -1,0 +1,31 @@
+{
+  "id": "p09_heavy_straight",
+  "javaName": "P09_HEAVY_STRAIGHT",
+  "profile": "p09.json",
+  "source": "art/sprites/source/p09_heavy_straight_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p09_heavy_straight.png",
+  "report": "tools/sprites/reports/p09_heavy_straight.report.json",
+  "preview": "android/app/build/sprite-review/p09_heavy_straight-import.png",
+  "expectedFrames": 23,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p09 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "H.mp4",
+    "personagem": "p09",
+    "escala": 0.5156,
+    "medida": "1º quadro = inicio_centro (nota 0.90)",
+    "quadros": "5,10,14,19,23,28,33,37,42,46,54,54,56,58,60,62,64,67,69,71,74,76,78",
+    "celula": 320,
+    "largura": 242,
+    "raiz": "124,302",
+    "colunas": 11,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameHeight": 320,
+  "rootX": 124,
+  "rootY": 302,
+  "frameWidth": 242
+}

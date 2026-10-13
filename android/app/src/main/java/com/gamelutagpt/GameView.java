@@ -10,6 +10,11 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.historia.Cenas;
+import com.gamelutagpt.historia.Episodio;
+import com.gamelutagpt.historia.HistoriaListener;
+import com.gamelutagpt.historia.PaginaHistoria;
+import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
 import com.gamelutagpt.stage.StageWorld;
@@ -29,7 +34,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * fixed 60 Hz {@link CombatEngine} step, then rendering. Every combat rule lives in the
  * engine; this class only presents it (sprites, Super and ultra cinematics, tag, HUD, debug).
  */
-public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable, UltraListener {
+public class GameView extends SurfaceView
+    implements SurfaceHolder.Callback, Runnable, UltraListener, HistoriaListener {
     // Team and opponent rules come from the generated character packs; DUPLA opens the
     // character select, where the player picks the pair.
     private int teamIndex;
@@ -82,6 +88,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final SpriteFighterRenderer opponentSpriteRenderer;
     private final StageRenderer stage = new StageRenderer();
     private final EffectsRenderer effects = new EffectsRenderer();
+    /** Hit and guard sparks at the real contact point (presentation only). */
+    private final ImpactEffects impacts = new ImpactEffects();
     private final HudRenderer hud = new HudRenderer();
     private final DebugOverlay debug = new DebugOverlay();
     private final HudRenderer.OpponentPanel opponentPanel = new HudRenderer.OpponentPanel();
@@ -117,11 +125,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
 
     // Cenário com falso 3D (stage-core). Sem ele, o StageRenderer antigo desenha o fundo.
-    private static final String STAGE_FOLDER = "stages/templo_lua";
-    private final StageScene stageScene;
+    private static final String DEFAULT_STAGE = "templo_lua";
+    private StageScene stageScene;
+    /** Cenário carregado agora (pasta em assets/stages). Cada luta pode pedir o seu. */
+    private String stageId;
     /** Desenho pela GPU (Android 8+); cai para o Canvas por software se falhar. */
     private boolean hardwareCanvas = Build.VERSION.SDK_INT >= 26;
     private final UltraSounds ultraSounds;
+
+    // Modo história (story-core): páginas de mangá entre as lutas do episódio.
+    private final PaginaHistoria historia;
+    private Temporada temporada;
+    /** Cenas chamadas pelo nome (historia/cenas.json), carregadas na primeira vez. */
+    private Cenas cenas;
+    /** O que fazer quando a cena que está tocando acabar (playScene); null no modo história. */
+    private Runnable sceneAfter;
+    /** Modo tutorial: o treino guiado dos golpes no dojo (o boneco não usa a IA). */
+    private final TutorialDirector tutorial = new TutorialDirector();
+    /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
+    private int storyEpisode = -1;
+    /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
+    private int storyKoFrames;
+    private static final int STORY_KO_FRAMES = 150;
     private int ultraAttacker = -1;
     private int ultraDamageDealt;
     private float ultraCameraZoom = 1f;
@@ -219,7 +244,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
-        stageScene = loadStage(ultraAssets);
+        historia = new PaginaHistoria(this, ultraAssets);
+        stageId = DEFAULT_STAGE;
+        stageScene = loadStage(ultraAssets, stageId);
         characterSelectRenderer = new CharacterSelectRenderer(context);
         loadTeamUltras();
         holder = getHolder();
@@ -230,10 +257,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private static String[] selectionRoster() {
         java.util.ArrayList<String> ids=new java.util.ArrayList<>();
-        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07"};
+        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07","p09","p10","p12"};
         for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
             if(wanted.equals(available)) ids.add(available);
-        // P09–P16 are concept-only slots until their gameplay is implemented.
+        // P09–P16 without gameplay yet stay as locked concept slots after these.
         return ids.toArray(new String[0]);
     }
 
@@ -295,6 +322,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        // Voltar à seleção abandona o episódio, a cena e o treino que estiverem tocando.
+        historia.stop();
+        storyEpisode = -1;
+        sceneAfter = null;
+        tutorial.stop();
+        useStage(null);
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
@@ -304,7 +337,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (characterSelect.isOpen()) {
+        if (characterSelect.isOpen() || historia.coversScreen()) {
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -376,15 +409,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         return "ultras/" + ("p01_training".equals(fighter.character.id) ? "player_base" : fighter.character.id);
     }
 
-    private static StageScene loadStage(AndroidRenderAssets assets) {
+    /**
+     * Troca o cenário (pasta em assets/stages; null = o padrão). As imagens do anterior são
+     * soltas antes de carregar o novo, para os dois não ocuparem a memória juntos.
+     */
+    private void useStage(String id) {
+        String wanted = id != null ? id : DEFAULT_STAGE;
+        if (wanted.equals(stageId)) return;
+        stageScene = null;
+        stageId = wanted;
+        stageScene = loadStage(ultraAssets, wanted);
+    }
+
+    private static StageScene loadStage(AndroidRenderAssets assets, String id) {
+        String folder = "stages/" + id;
         try {
-            StagePack pack = StagePack.load(assets, STAGE_FOLDER);
-            for (String warning : pack.warnings) Log.w(LOG_TAG, STAGE_FOLDER + ": " + warning);
+            StagePack pack = StagePack.load(assets, folder);
+            for (String warning : pack.warnings) Log.w(LOG_TAG, folder + ": " + warning);
             StageWorld world = new StageWorld(GROUND_Y, WORLD_WIDTH, CameraRig.CAMERA_ZOOM,
                 (PLAYER_START_X + OPPONENT_START_X) * 0.5f, CameraRig.CAMERA_GROUND_SCREEN_Y);
             return new StageScene(pack, world);
         } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "cenário " + STAGE_FOLDER + " indisponível, usando o fundo simples", ex);
+            Log.w(LOG_TAG, "cenário " + folder + " indisponível, usando o fundo simples", ex);
             return null;
         }
     }
@@ -519,6 +565,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             while ((key = selectionKeys.poll()) != null) handleSelectionKey(key);
             return;
         }
+        if (historia.coversScreen()) {
+            // The fight waits behind the story page; any key turns the page, B skips.
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) handleStoryKey(key);
+            historia.update(FIXED_STEP);
+            return;
+        }
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
             paginaFinal.update(FIXED_STEP);
@@ -541,6 +595,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // Touches never reach the fight during a demo.
             pad.drainInto(ignoredInput);
             demo.fill(playerInput, opponentInput);
+        } else if (tutorial.active()) {
+            // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
+            pad.drainInto(playerInput);
+            tutorial.fillDummy(opponentInput);
         } else {
             pad.drainInto(playerInput);
             if (tagging) {
@@ -556,6 +614,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
         engine.step(playerInput, opponentInput);
         demo.afterStep();
+        tutorial.afterStep();
+        // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
+        if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
         for (CombatEngine.HitEvent event : engine.events()) {
@@ -563,6 +624,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
+            spawnImpact(event, ultraHit);
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
@@ -575,6 +637,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) beamShake = Math.max(beamShake, 14f);
         }
         updateUltraBeam();
+        impacts.update(FIXED_STEP);
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
         if (throwBannerFrames > 0) throwBannerFrames--;
 
@@ -585,11 +648,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateFighterSprite(spriteFighterRenderer, player(), true);
         updateFighterSprite(opponentSpriteRenderer, opponent(), false);
         if (intro && ++introFrame >= introTotalFrames) introFrame = -1;
+        updateStoryFight();
     }
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
         hud.resetEffects();
+        impacts.clear();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -645,6 +710,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public int demoPlaying() { return demo.demo(); }
         @Override public String demoTitle() { return demo.title(); }
         @Override public String demoCaption() { return demo.caption(); }
+        @Override public boolean storyActive() { return historia.isActive() && !tutorial.active(); }
+        @Override public boolean tutorialActive() { return tutorial.active(); }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -922,6 +989,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         }
     }
 
+    /** Spark, ring and debris at the contact point; heavier blows also nudge the camera. */
+    private void spawnImpact(CombatEngine.HitEvent event, boolean ultraHit) {
+        CombatFighter attacker = engine.fighter(event.attacker), defender = engine.fighter(event.defender);
+        float x = event.impactX, y = event.impactY;
+        if (Float.isNaN(x) || Float.isNaN(y)) {
+            // Throws and the ultra have no hitbox: use the defender's chest.
+            int side = defender.x >= attacker.x ? -1 : 1;
+            x = defender.x + side * defender.body().halfWidth * .5f;
+            y = defender.y - defender.body().height(defender.crouchingBody()) * .6f;
+        }
+        int direction = defender.x >= attacker.x ? 1 : -1;
+        int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
+        if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
+        int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentFighter.profile.color;
+        impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 7f : 10f);
+        else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
+    }
+
     private void showBanner(String text) {
         throwBanner = text;
         throwBannerFrames = THROW_BANNER_FRAMES;
@@ -1036,6 +1122,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (canvas == null) return;
 
         try {
+            renderFrame(canvas);
+        } finally {
+            holder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    /** Whole frame into any canvas: the surface in production, a bitmap in visual review tests. */
+    private void renderFrame(Canvas canvas) {
+        {
             resetPaintForFrame();
 
             float sx = canvas.getWidth() / VW;
@@ -1046,6 +1141,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
             if (characterSelect.isOpen()) {
                 characterSelectRenderer.draw(canvas, paint, characterSelect);
+                canvas.restore();
+                return;
+            }
+            if (historia.coversScreen()) {
+                renderCanvas.begin(canvas);
+                historia.render(renderCanvas);
                 canvas.restore();
                 return;
             }
@@ -1127,6 +1228,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
+            impacts.draw(canvas);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
                 drawUltraBeamOverlay(canvas, true);
@@ -1149,8 +1251,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
-        } finally {
-            holder.unlockCanvasAndPost(canvas);
         }
     }
 
@@ -1216,6 +1316,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
+        hud.drawTutorial(c, tutorial);
         if (debugOverlay) {
             debug.drawPanel(c, engine);
             drawP01Tuner(c);
@@ -1735,6 +1836,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return;
         }
+        if (historia.coversScreen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                historia.tap(event.getX(index) / sx, event.getY(index) / sy);
+            }
+            return;
+        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing.
@@ -1745,6 +1852,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
             if(debugOverlay && handleP01TunerTap(x,y))return;
+            if (tutorial.active() && ControlsLayout.tutorialSkipAt(x, y)) {
+                tutorial.skip();
+                return;
+            }
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
             switch (control) {
@@ -1766,6 +1877,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     break;
                 case TEAM_SELECT:
                     openCharacterSelect();
+                    break;
+                case STORY:
+                    startStory();
+                    break;
+                case TUTORIAL:
+                    startTutorialMode();
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
@@ -1848,6 +1965,169 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else if (action == MotionEvent.ACTION_CANCEL) {
             releaseAllPointers();
             pad.setDirection(0);
+        }
+    }
+
+    // ------------------------------------------------------------ modo história
+
+    /** HISTÓRIA: toca a temporada desde o primeiro episódio. */
+    private void startStory() {
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (!loadTemporada()) return;
+        tutorial.stop();
+        sceneAfter = null;
+        hud.resetEffects();
+        pad.reset();
+        releaseAllPointers();
+        selectionKeys.clear();
+        playStoryEpisode(0);
+    }
+
+    /** TUTORIAL: a cena "tutorial" (a intro do Prólogo e o treino no dojo); no fim, a seleção. */
+    private void startTutorialMode() {
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        tutorial.stop();
+        playScene("tutorial", this::openCharacterSelect);
+    }
+
+    /**
+     * Toca a cena {@code id} de historia/cenas.json (um episódio ou um trecho dele) por cima da
+     * luta e, quando ela acaba, chama {@code after}. É o jeito de chamar uma cena de qualquer
+     * ponto do jogo: {@code playScene("intro", () -> ...)}. As lutas e o treino que a cena
+     * tiver acontecem no meio, como no modo história. Cena que não abre chama {@code after} direto.
+     */
+    void playScene(String id, Runnable after) {
+        if (!loadTemporada()) {
+            if (after != null) after.run();
+            return;
+        }
+        Episodio cena;
+        try {
+            if (cenas == null) cenas = Cenas.load(ultraAssets);
+            cena = cenas.carregar(temporada, ultraAssets, id);
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "cena " + id + " indisponível", ex);
+            if (after != null) after.run();
+            return;
+        }
+        storyEpisode = -1;
+        sceneAfter = after;
+        hud.resetEffects();
+        pad.reset();
+        releaseAllPointers();
+        selectionKeys.clear();
+        historia.start(temporada, cena);
+    }
+
+    /** A temporada (elenco, episódios) no idioma do aparelho; falso se não abriu. */
+    private boolean loadTemporada() {
+        if (temporada != null) return true;
+        try {
+            temporada = Temporada.load(ultraAssets);
+            // Textos da história no idioma do aparelho; sem tradução, em português.
+            temporada.setIdioma(ultraAssets, Locale.getDefault().getLanguage());
+            return true;
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "modo história indisponível", ex);
+            temporada = null;
+            return false;
+        }
+    }
+
+    private void playStoryEpisode(int index) {
+        storyEpisode = index;
+        String id = temporada.episodios.get(index);
+        try {
+            historia.start(temporada, temporada.loadEpisodio(ultraAssets, id));
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
+            storyEpisode = -1;
+            openCharacterSelect();
+        }
+    }
+
+    private void handleStoryKey(int keyCode) {
+        boolean skip = keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_BACK ||
+            keyCode == KeyEvent.KEYCODE_ESCAPE;
+        if (skip) {
+            historia.tap((PaginaHistoria.SKIP_LEFT + PaginaHistoria.SKIP_RIGHT) * 0.5f,
+                (PaginaHistoria.SKIP_TOP + PaginaHistoria.SKIP_BOTTOM) * 0.5f);
+        } else {
+            historia.tap(VW * 0.5f, VH * 0.5f);
+        }
+    }
+
+    /** Luta de um episódio: depois do KO e da comemoração, a história continua. */
+    private void updateStoryFight() {
+        if (!historia.waitingFight()) return;
+        if (!player().ko() && !opponent().ko()) {
+            storyKoFrames = 0;
+            return;
+        }
+        if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0) return;
+        storyKoFrames = 0;
+        boolean won = opponent().ko() && !player().ko();
+        pad.reset();
+        releaseAllPointers();
+        historia.resultadoLuta(won);
+    }
+
+    @Override
+    public void onHistoriaLuta(Episodio.Passo luta) {
+        // Cada luta pode pedir o seu cenário (o treino é no dojo).
+        useStage(luta.cenario);
+        // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta.
+        if (luta.dupla != null && luta.cpu != null) {
+            selectTeams(luta.dupla[0], luta.dupla[1], luta.cpu[0], luta.cpu[1]);
+        } else {
+            selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
+        }
+        if (luta.tutorial()) {
+            // O boneco de treino não usa a IA; as lições dizem o que ele faz.
+            setOpponentAiEnabled(false);
+            tutorial.start(engine, team, PLAYER_START_X);
+            storyKoFrames = 0;
+            pad.reset();
+            releaseAllPointers();
+            if (luta.rotulo != null) showBanner(luta.rotulo);
+            return;
+        }
+        tutorial.stop();
+        setOpponentAiEnabled(true);
+        storyKoFrames = 0;
+        pad.reset();
+        releaseAllPointers();
+        if (luta.rotulo != null) showBanner(luta.rotulo);
+    }
+
+    @Override
+    public void onHistoriaSom(String id) {
+        ultraSounds.play(Temporada.PASTA, id);
+    }
+
+    /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
+    private void finishTutorial() {
+        tutorial.stop();
+        pad.reset();
+        releaseAllPointers();
+        if (historia.waitingFight()) historia.resultadoLuta(true);
+    }
+
+    @Override
+    public void onHistoriaFim(Episodio episodio) {
+        if (sceneAfter != null) {
+            // Cena chamada por playScene: quem chamou decide o que vem depois.
+            Runnable after = sceneAfter;
+            sceneAfter = null;
+            after.run();
+            return;
+        }
+        int next = storyEpisode + 1;
+        if (temporada != null && next < temporada.episodios.size()) {
+            playStoryEpisode(next);
+        } else {
+            storyEpisode = -1;
+            openCharacterSelect();
         }
     }
 

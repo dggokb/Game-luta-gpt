@@ -1,0 +1,31 @@
+{
+  "id": "p11_ultra_beam",
+  "javaName": "P11_ULTRA_BEAM",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_ultra_beam_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_ultra_beam.png",
+  "report": "tools/sprites/reports/p11_ultra_beam.report.json",
+  "preview": "android/app/build/sprite-review/p11_ultra_beam-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "ultra.mp4",
+    "personagem": "p11",
+    "escala": 0.4997,
+    "medida": "1º quadro = inicio_centro (nota 0.87)",
+    "quadros": "4,15,26,40,48,60,71,82,93",
+    "celula": 288,
+    "largura": 480,
+    "raiz": "136,267",
+    "colunas": 9,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameWidth": 480,
+  "frameHeight": 288,
+  "rootX": 136,
+  "rootY": 267
+}

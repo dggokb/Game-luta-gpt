@@ -1,0 +1,30 @@
+{
+  "id": "p11_jump_light",
+  "javaName": "P11_JUMP_LIGHT",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_jump_light_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_jump_light.png",
+  "report": "tools/sprites/reports/p11_jump_light.report.json",
+  "preview": "android/app/build/sprite-review/p11_jump_light-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "jL.mp4",
+    "personagem": "p11",
+    "escala": 0.525,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "24,27,32,35,40,45,50",
+    "celula": 320,
+    "largura": 288,
+    "raiz": "150,302",
+    "colunas": 7,
+    "pe_no_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 320,
+  "rootX": 150,
+  "rootY": 302
+}

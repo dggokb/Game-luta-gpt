@@ -1,0 +1,29 @@
+{
+  "id": "p12_dash",
+  "javaName": "P12_DASH",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p12_dash.png",
+  "report": "tools/sprites/reports/p12_dash.report.json",
+  "preview": "android/app/build/sprite-review/p12_dash-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p12 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p12",
+    "escala": 0.5105,
+    "medida": "1º quadro = inicio_centro (nota 0.79)",
+    "quadros": "5,19,31,48,63,76",
+    "largura": 288,
+    "raiz": "137,238",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "rootX": 137
+}

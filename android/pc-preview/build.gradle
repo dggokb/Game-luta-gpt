@@ -7,6 +7,7 @@ java {
 
 dependencies {
     implementation project(':ultra-core')
+    implementation project(':story-core')
     implementation project(':stage-core')
 }
 
@@ -37,4 +38,16 @@ tasks.register('runRaio', JavaExec) {
     workingDir = rootProject.projectDir
     args 'app/src/main/assets/ultras/player_base', 'app/src/main/assets/stages/templo_lua',
         '--quadros', 'build/raio'
+}
+
+// Modo história: grava cada página dos episódios em PNG: gradle :pc-preview:runHistoria
+tasks.register('runHistoria', JavaExec) {
+    group = 'application'
+    description = 'Grava as páginas dos episódios do modo história em build/historia/.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.preview.HistoriaPreview'
+    workingDir = rootProject.projectDir
+    args 'app/src/main/assets', 'build/historia'
+    // Outro idioma: gradle :pc-preview:runHistoria -Pidioma=en
+    systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
 }

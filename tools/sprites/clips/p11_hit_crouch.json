@@ -1,0 +1,29 @@
+{
+  "id": "p11_hit_crouch",
+  "javaName": "P11_HIT_CROUCH",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_hit_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_hit_crouch.png",
+  "report": "tools/sprites/reports/p11_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p11_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoBaixo.mp4",
+    "personagem": "p11",
+    "escala": 0.48,
+    "motivo": "a câmera muda o zoom ~5% no vídeo (1º quadro = inicio_agachado 0,4929; último 0,4670): média 0,48, conferida com reescalar.py --ver",
+    "quadros": "7,18,29,40,52,63,74,85,96",
+    "largura": 320,
+    "raiz": "180,238",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "rootX": 180
+}

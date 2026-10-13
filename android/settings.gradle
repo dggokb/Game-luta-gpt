@@ -5,6 +5,7 @@ include ':app'
 // Motores visuais em Java puro: o mesmo código roda no Android e no PC.
 include ':render-core'
 include ':ultra-core'
+include ':story-core'
 include ':stage-core'
 // Visualizador no PC (gradle :pc-preview:run, :pc-preview:runStage).
 include ':pc-preview'

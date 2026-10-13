@@ -1,0 +1,26 @@
+{
+  "id": "p09_crouch",
+  "javaName": "P09_CROUCH",
+  "profile": "p09.json",
+  "source": "art/sprites/source/p09_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p09_crouch.png",
+  "report": "tools/sprites/reports/p09_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p09_crouch-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p09 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agacha.mp4",
+    "personagem": "p09",
+    "escala": 0.4163,
+    "medida": "1º e último quadro = inicio_centro, mesmo zoom (nota 0.80)",
+    "quadros": "9,12,14,17,20,23,25,28",
+    "largura": 192,
+    "raiz": "99,238",
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "rootX": 99
+}

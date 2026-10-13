@@ -1,0 +1,32 @@
+{
+  "id": "p10_defense_crouch",
+  "javaName": "P10_DEFENSE_CROUCH",
+  "profile": "p10.json",
+  "source": "art/sprites/source/p10_defense_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_defense_crouch.png",
+  "report": "tools/sprites/reports/p10_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p10_defense_crouch-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p10 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaChao.mp4",
+    "personagem": "p10",
+    "escala": 0.2313,
+    "medida": "1º e último quadro = inicio_agachado, mesmo zoom (nota 0.72)",
+    "quadros": "8,16,24,32,39,47,55",
+    "celula": 192,
+    "largura": 224,
+    "raiz": "97,174",
+    "colunas": 7,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 192,
+  "rootX": 97,
+  "rootY": 174
+}

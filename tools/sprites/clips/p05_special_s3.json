@@ -2,15 +2,15 @@
   "id": "p05_special_s3",
   "javaName": "P05_SPECIAL_S3",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_special_s3_video_normalized.png",
+  "source": "art/sprites/source/p05_special_s3_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_special_s3.png",
   "report": "tools/sprites/reports/p05_special_s3.report.json",
   "preview": "android/app/build/sprite-review/p05_special_s3-import.png",
   "expectedFrames": 21,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 5,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"). S3 é teleporte: o quadro 10 é só o rastro (por isso minOpaquePixels baixo).",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"). S3 é teleporte: o quadro 10 é só o rastro (por isso minOpaquePixels baixo); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "S3.mp4",
     "personagem": "p05",
@@ -19,10 +19,30 @@
     "quadros": "6,11,15,20,24,29,33,38,42,47,51,56,57,62,62,62,62,63,65,66,67",
     "largura": 384,
     "raiz": "154,238",
-    "colunas": 11,
-    "limpar_chao": true
+    "colunas": 5,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p05_special_s3_video_normalized.png",
+      "celula": [
+        384,
+        256
+      ],
+      "raiz": [
+        154,
+        238
+      ],
+      "colunas": 11
+    }
   },
-  "frameWidth": 384,
-  "rootX": 154,
-  "minOpaquePixels": 1500
+  "frameWidth": 768,
+  "rootX": 308,
+  "minOpaquePixels": 1500,
+  "sourceReferences": [
+    "art/sprites/source/p05_special_s3_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

@@ -1,0 +1,34 @@
+{
+  "id": "p09_throw",
+  "javaName": "P09_THROW",
+  "profile": "p09.json",
+  "source": "art/sprites/source/p09_throw_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p09_throw.png",
+  "report": "tools/sprites/reports/p09_throw.report.json",
+  "preview": "android/app/build/sprite-review/p09_throw-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p09 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agarrao.mp4",
+    "personagem": "p09",
+    "escala": 0.3246,
+    "medida": "cabeça do IDLE em 5 quadros (nota 0.79)",
+    "quadros": "10,18,27,35,44,52,60,69,77",
+    "celula": 288,
+    "largura": 416,
+    "raiz": "177,270",
+    "colunas": 9,
+    "limpar_chao": true,
+    "limpar_quadros": [
+      1,
+      5
+    ]
+  },
+  "frameWidth": 416,
+  "frameHeight": 288,
+  "rootX": 177,
+  "rootY": 270
+}

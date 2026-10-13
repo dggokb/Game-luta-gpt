@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -84,6 +84,29 @@ final class ControlsLayout {
     static final float TEAM_BUTTON_RIGHT = 1248f;
     static final float TEAM_BUTTON_BOTTOM = 366f;
 
+    // HISTÓRIA: starts the story mode (manga pages between the fights).
+    static final float STORY_BUTTON_LEFT = 1082f;
+    static final float STORY_BUTTON_TOP = 376f;
+    static final float STORY_BUTTON_RIGHT = 1248f;
+    static final float STORY_BUTTON_BOTTOM = 416f;
+
+    // TUTORIAL: a intro do Prólogo e o treino guiado dos golpes no dojo (logo abaixo de HISTÓRIA,
+    // acabando antes do círculo do M).
+    static final float TUTORIAL_BUTTON_LEFT = 1082f;
+    static final float TUTORIAL_BUTTON_TOP = 422f;
+    static final float TUTORIAL_BUTTON_RIGHT = 1248f;
+    static final float TUTORIAL_BUTTON_BOTTOM = 456f;
+
+    // Painel da lição do tutorial (abaixo das barras de vida) e o PULAR dentro dele.
+    static final float TUTORIAL_PANEL_LEFT = 330f;
+    static final float TUTORIAL_PANEL_TOP = 196f;
+    static final float TUTORIAL_PANEL_RIGHT = 950f;
+    static final float TUTORIAL_PANEL_BOTTOM = 292f;
+    static final float TUTORIAL_SKIP_LEFT = 842f;
+    static final float TUTORIAL_SKIP_TOP = 204f;
+    static final float TUTORIAL_SKIP_RIGHT = 940f;
+    static final float TUTORIAL_SKIP_BOTTOM = 236f;
+
     // SELEÇÃO: back to the character select (top center).
     static final float SELECT_BUTTON_LEFT = 565f;
     static final float SELECT_BUTTON_TOP = 112f;
@@ -107,6 +130,12 @@ final class ControlsLayout {
         if (insideRect(x, y, TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM)) {
             return Control.TEAM_SELECT;
         }
+        if (insideRect(x, y, STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM)) {
+            return Control.STORY;
+        }
+        if (insideRect(x, y, TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM)) {
+            return Control.TUTORIAL;
+        }
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;
         }
@@ -121,6 +150,11 @@ final class ControlsLayout {
         if (insideCircle(x, y, COMBO_X, COMBO_Y, COMBO_RADIUS)) return Control.COMBO;
         if (insideCircle(x, y, TAG_X, TAG_Y, TAG_RADIUS)) return Control.TAG;
         return Control.NONE;
+    }
+
+    /** O PULAR do painel do tutorial (só vale enquanto o treino roda). */
+    static boolean tutorialSkipAt(float x, float y) {
+        return insideRect(x, y, TUTORIAL_SKIP_LEFT, TUTORIAL_SKIP_TOP, TUTORIAL_SKIP_RIGHT, TUTORIAL_SKIP_BOTTOM);
     }
 
     /** D-pad direction 1..8 under the point, or 0 inside the dead zone. */

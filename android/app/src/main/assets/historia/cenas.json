@@ -1,0 +1,8 @@
+{
+  "_comentario": "Cenas que o jogo chama pelo nome (playScene no GameView). Uma cena é um episódio inteiro ou um trecho dele, entre os passos com \"marca\" de e ate (os dois entram). Veja docs/historia/cenas.md.",
+  "intro": { "episodio": "ep00", "ate": "intro" },
+  "tutorial": { "episodio": "ep00", "ate": "treino" },
+  "pai-parte": { "episodio": "ep00", "de": "pai-parte" },
+  "prologo": { "episodio": "ep00" },
+  "duas-cartas": { "episodio": "ep01" }
+}

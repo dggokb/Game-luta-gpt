@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.graphics.LinearGradient;
 import android.graphics.Shader;
+import android.graphics.RadialGradient;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.content.Context;
@@ -50,6 +51,10 @@ final class HudRenderer {
         boolean ultraReady();
         int dpadDirection();
         boolean pressed(Control control);
+        /** A luta atual faz parte de um episódio do modo história. */
+        default boolean storyActive() { return false; }
+        /** O treino guiado dos golpes (modo tutorial) está rodando. */
+        default boolean tutorialActive() { return false; }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -162,6 +167,10 @@ final class HudRenderer {
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.TEAM_SELECT), "DUPLA " + s.teamLabel(),
             TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
+        drawToggle(c, s.storyActive(), "HISTÓRIA",
+            STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM, 16f);
+        drawToggle(c, s.tutorialActive(), "TUTORIAL",
+            TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 16f);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }
@@ -183,7 +192,17 @@ final class HudRenderer {
         c.save();
         if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
         // All coordinates are calibrated against the ornament atlas, not its bounding box.
-        portrait(c, portraits, point.character, 43f, 24f, 119f, 86f, right ? RED : BLUE);
+        HudEffects.Meter hitFx = right ? effects.cpu : effects.point;
+        float hurt = effects.fade(hitFx.hitAt, .32f);
+        float shake = hurt * 5f * (float)Math.sin(effects.now * 95.0);
+        portrait(c, portraits, point.character, 43f + shake, 24f, 119f, 86f, right ? RED : BLUE);
+        if (hurt > 0f) {
+            // Red flash on the face that just took the hit (same portrait outline).
+            fxPaint.setColor(0xFFFF2A3A);
+            fxPaint.setAlpha(Math.round(120 * hurt));
+            c.drawPath(shape, fxPaint);
+            fxPaint.setAlpha(255);
+        }
         CharacterDefinition partner = reserve == null ? absent : reserve.character;
         if (partner != null) portrait(c, portraits, partner, 120f, 110f, 65f, 25f, right ? RED : BLUE);
         energyLife(c, point, 165f, 74f, 389f, 18f);
@@ -232,13 +251,30 @@ final class HudRenderer {
                 fxPaint.setColor(0xFFFFD698); fxPaint.setAlpha(Math.round(210 * spend));
                 c.drawRect(x + width * lo, 679, x + width * hi, 694, fxPaint);
             }
+            if (fill > 0f) {
+                // Energy flowing through every charged cell (light cyan/pink band, never white-out).
+                float flow = (float)((effects.now * .9 + i * .17) % 1.0);
+                float fx0 = x + (width + 30f) * flow - 30f;
+                fxPaint.setColor(right ? 0xFFFFC2CC : 0xFFBDF2FF);
+                fxPaint.setAlpha(fill >= 1f ? 105 : 70);
+                c.drawRect(Math.max(x, fx0), 679, Math.min(x + width * fill, fx0 + 22f), 694, fxPaint);
+            }
             fxPaint.setAlpha(255); c.restore();
         }
         if (fighter.superMeter >= CombatConfig.MAX_METER)
             energyEdge(c, 87, 676, 238, 21, right ? RED : BLUE, 1);
         c.restore();
         int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
-        text(c, LEVELS[level], right ? Arena.VW - 51f : 51f, 698f, 38f, Color.WHITE);
+        float pop = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
+        float levelX = right ? Arena.VW - 51f : 51f;
+        if (level > 0) {
+            // Charged level: soft halo behind the digit, brighter when it just went up.
+            fxPaint.setColor(right ? RED : BLUE);
+            fxPaint.setAlpha(Math.round(70 + 120 * pop + (level == 5 ? 40 * (float)Math.sin(effects.now * 6) + 40 : 0)));
+            c.drawCircle(levelX, 686f, 20f + 8f * pop, fxPaint);
+            fxPaint.setAlpha(255);
+        }
+        text(c, LEVELS[level], levelX, 698f + 4f * pop, 38f * (1f + .35f * pop), pop > 0f ? 0xFFFFF3B0 : Color.WHITE);
         text(c, "SUPER", right ? Arena.VW - 348f : 348f, 702f, 17f, Color.WHITE);
     }
 
@@ -355,10 +391,18 @@ final class HudRenderer {
         paint.setShader(y < 100f ? pointLifeGradient : reserveLifeGradient);
         c.drawRect(x, y, x + w * life, y + h, paint);
         paint.setShader(null);
-        paint.setColor(0x99FFFFFF);
-        c.drawRect(x, y + 2f, x + w * life, y + 4f, paint);
         HudEffects.Meter fx = fighter == effects.point.fighter ? effects.point
             : fighter == effects.cpu.fighter ? effects.cpu : effects.reserve;
+        if (life > 0f && life <= .25f) {
+            // Danger: the remaining life burns red-orange and pulses.
+            paint.setColor(0xFFFF2A1A);
+            paint.setAlpha(Math.round(185 + 55 * (float)Math.sin(effects.now * 6.0)));
+            c.drawRect(x, y, x + w * life, y + h, paint);
+            paint.setAlpha(255);
+        }
+        paint.setColor(0x99FFFFFF);
+        c.drawRect(x, y + 2f, x + w * life, y + 4f, paint);
+        sheen(c, x, y, w * life, h, (float)(effects.now * .42 + (y < 100f ? 0 : .37)));
         if (hudArt == null) drawLifeEffects(c, fx, x, y, w, h);
         c.restore();
         paint.setStyle(Paint.Style.STROKE);
@@ -372,6 +416,38 @@ final class HudRenderer {
         c.drawPath(shape, paint);
         paint.setAlpha(255);
         paint.setStyle(Paint.Style.FILL);
+    }
+
+    /** Slanted light band sweeping across a filled region; {@code cycle} advances 1 per sweep. */
+    private void sheen(Canvas c, float x, float y, float w, float h, float cycle) {
+        if (w <= 2f) return;
+        float t = cycle - (float)Math.floor(cycle);
+        // Visible for the first 45% of each cycle, then a pause.
+        if (t > .45f) return;
+        float k = t / .45f;
+        float band = Math.max(18f, h * 1.6f);
+        float bx = x - band + (w + band * 2f) * k;
+        c.save();
+        c.clipRect(x, y, x + w, y + h);
+        shine.reset();
+        shine.moveTo(bx, y); shine.lineTo(bx + band, y);
+        shine.lineTo(bx + band - h * .8f, y + h); shine.lineTo(bx - h * .8f, y + h); shine.close();
+        fxPaint.setStyle(Paint.Style.FILL);
+        fxPaint.setColor(Color.WHITE);
+        fxPaint.setAlpha(Math.round(110 * (float)Math.sin(Math.PI * k)));
+        c.drawPath(shine, fxPaint);
+        fxPaint.setAlpha(255);
+        c.restore();
+    }
+
+    private final Path shine = new Path();
+
+    private static int blend(int from, int to, float t) {
+        t = Math.max(0f, Math.min(1f, t));
+        int r = Math.round(Color.red(from) + (Color.red(to) - Color.red(from)) * t);
+        int g = Math.round(Color.green(from) + (Color.green(to) - Color.green(from)) * t);
+        int b = Math.round(Color.blue(from) + (Color.blue(to) - Color.blue(from)) * t);
+        return Color.argb(255, r, g, b);
     }
 
     private void drawSegments(Canvas c, float bars, float x, float y, float w, float h, int accent) {
@@ -418,8 +494,10 @@ final class HudRenderer {
     private void drawLifeEffects(Canvas c, HudEffects.Meter fx, float x, float y, float w, float h) {
         // Amber lower stripe is the impact tail. Red recoverable health above stays visible.
         if (fx.trail > fx.life) {
-            fxPaint.setColor(0xFFFFCC64);
-            c.drawRect(x + w * fx.life, y + h * .65f, x + w * fx.trail, y + h, fxPaint);
+            // Lost chunk: white right after the hit, cooling to amber while it drains.
+            float hot = effects.fade(fx.hitAt, HudEffects.HIT_HOLD + .1f);
+            fxPaint.setColor(blend(0xFFFF9A3C, 0xFFFFFFFF, hot));
+            c.drawRect(x + w * fx.life, y + h * .35f, x + w * fx.trail, y + h, fxPaint);
         }
         float heal = effects.fade(fx.healAt, HudEffects.HEAL_FLASH);
         if (heal > 0) {
@@ -567,43 +645,178 @@ final class HudRenderer {
 
     private void drawToggle(Canvas c, boolean enabled, String label,
                             float left, float top, float right, float bottom, float textSize) {
-        paint.setColor(enabled ? Color.rgb(74, 205, 232) : Color.argb(180, 45, 53, 62));
-        c.drawRoundRect(left, top, right, bottom, 12f, 12f, paint);
+        float w = right - left, h = bottom - top;
+        panel(c, left, top, w, h, Math.min(12f, h * .3f), enabled ? 0xE6123A4E : 0xD60A1224,
+            enabled ? 0xFF6FE3FF : 0xFF7B88A6, enabled ? 2.5f : 1.5f);
+        paint.setColor(enabled ? 0xFF6FE3FF : BLUE);
+        paint.setAlpha(enabled ? 255 : 170);
+        c.drawRect(left + 3f, top + 5f, left + 7f, bottom - 5f, paint);
+        paint.setAlpha(255);
+        label(c, label, (left + right) * .5f + 3f, (top + bottom) * .5f, textSize, Color.WHITE);
+    }
 
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2.5f);
-        paint.setColor(Color.WHITE);
-        c.drawRoundRect(left, top, right, bottom, 12f, 12f, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(enabled ? Color.rgb(18, 35, 48) : Color.WHITE);
+    /** Centered bold label with a dark outline, vertically centred on {@code cy}. */
+    private void label(Canvas c, String value, float cx, float cy, float size, int color) {
+        paint.setShader(null);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
-        paint.setTextSize(textSize);
-        float cy = (top + bottom) * 0.5f;
-        c.drawText(label, (left + right) * 0.5f, cy - (paint.ascent() + paint.descent()) * 0.5f, paint);
+        paint.setTextSkewX(-0.1f);
+        paint.setTextSize(size);
+        float y = cy - (paint.ascent() + paint.descent()) * .5f;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3.5f);
+        paint.setColor(0xE6050813);
+        c.drawText(value, cx, y, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        c.drawText(value, cx, y, paint);
+        paint.setTextSkewX(0f);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
+
+    /**
+     * Painel da lição do tutorial: em que lição está, o nome, o que fazer, quantas vezes já
+     * fez e o PULAR. Entre as lições, "MUITO BEM!"; no fim, "TREINO COMPLETO!".
+     */
+    void drawTutorial(Canvas c, TutorialDirector tutorial) {
+        if (!tutorial.active()) return;
+        reset();
+        if (tutorial.completing()) {
+            drawBanner(c, "TREINO COMPLETO!", 255, 1.1f);
+            return;
+        }
+        TutorialDirector.Lesson lesson = tutorial.lesson();
+        if (lesson == null) return;
+        float left = TUTORIAL_PANEL_LEFT, top = TUTORIAL_PANEL_TOP;
+        float right = TUTORIAL_PANEL_RIGHT, bottom = TUTORIAL_PANEL_BOTTOM;
+        float cx = (left + right) * 0.5f;
+        panel(c, left, top, right - left, bottom - top, 14f, 0xE6120A04, 0xFFFFB04A, 2f);
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(14f);
+        paint.setColor(0xFFFFC870);
+        c.drawText("TREINO  " + (tutorial.lessonIndex() + 1) + "/" + tutorial.lessonCount(), left + 26f, top + 24f, paint);
+        paint.setFakeBoldText(false);
+        text(c, lesson.title, cx, top + 46f, 26f, Color.WHITE);
+        text(c, lesson.how, cx, top + 74f, 19f, 0xFFFFE6B8);
+        // Quantas vezes: uma bolinha por repetição, cheia quando já fez.
+        float pip = 7f, gap = 22f;
+        float px = cx - (lesson.times - 1) * gap * 0.5f;
+        for (int i = 0; i < lesson.times; i++) {
+            boolean filled = i < tutorial.count();
+            paint.setStyle(filled ? Paint.Style.FILL : Paint.Style.STROKE);
+            paint.setStrokeWidth(2f);
+            paint.setColor(filled ? 0xFF7BFF22 : 0xFFFFC870);
+            c.drawCircle(px + i * gap, bottom - 10f, pip, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+        drawToggle(c, false, "PULAR ▶▶", TUTORIAL_SKIP_LEFT, TUTORIAL_SKIP_TOP, TUTORIAL_SKIP_RIGHT,
+            TUTORIAL_SKIP_BOTTOM, 14f);
+        if (tutorial.praising()) {
+            float k = Math.min(1f, tutorial.praiseFrame() / 8f);
+            drawBanner(c, "MUITO BEM!", 255, 1.3f - 0.3f * k);
+        }
+    }
+
+    private final Shader buttonBody = new RadialGradient(0f, -.35f, 1.2f,
+        new int[]{0xCC3A4560, 0xBB141B2E, 0xAA05080F}, new float[]{0f, .6f, 1f}, Shader.TileMode.CLAMP);
+
+    /** Round touch button: dark glassy body, coloured ring, bevel highlight and press glow. */
+    private void button(Canvas c, float x, float y, float r, int ring, boolean pressed, boolean enabled) {
+        c.save();
+        c.translate(x, y);
+        if (pressed && enabled) {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(ring);
+            paint.setAlpha(80);
+            paint.setStrokeWidth(14f);
+            c.drawCircle(0f, 0f, r + 5f, paint);
+        }
+        float rr = pressed ? r * .94f : r;
+        paint.setStyle(Paint.Style.FILL);
+        c.save();
+        c.scale(rr, rr);
+        paint.setShader(buttonBody);
+        paint.setAlpha(enabled ? 255 : 140);
+        c.drawCircle(0f, 0f, 1f, paint);
+        paint.setShader(null);
+        c.restore();
+        if (pressed && enabled) {
+            paint.setColor(ring);
+            paint.setAlpha(150);
+            c.drawCircle(0f, 0f, rr, paint);
+        }
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(4f);
+        paint.setColor(enabled ? ring : 0xFF5A6070);
+        paint.setAlpha(enabled ? 235 : 140);
+        c.drawCircle(0f, 0f, rr - 2f, paint);
+        paint.setStrokeWidth(2f);
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(enabled ? 120 : 40);
+        c.drawArc(-rr + 8f, -rr + 8f, rr - 8f, rr - 8f, 200f, 130f, false, paint);
+        paint.setAlpha(255);
+        paint.setStyle(Paint.Style.FILL);
+        c.restore();
+    }
+
+    private static final int L_RING = 0xFF45C6FF, M_RING = 0xFFFFC53A, H_RING = 0xFFFF4D5E;
+
+    private final Shader bannerFill = new LinearGradient(0f, 168f, 0f, 214f,
+        new int[]{0xFFFFFFFF, 0xFFFFE27A, 0xFFFF9A1F, 0xFFE0461A}, new float[]{0f, .35f, .7f, 1f},
+        Shader.TileMode.CLAMP);
+    private final Shader comboFill = new LinearGradient(0f, 250f, 0f, 302f,
+        new int[]{0xFFFFFFFF, 0xFFFFEA8A, 0xFFFFA81E, 0xFFFF5A1A}, new float[]{0f, .3f, .7f, 1f},
+        Shader.TileMode.CLAMP);
 
     /** Big centered call-out over the fight ("AGARRÃO!", "TECH!"). */
     void drawBanner(Canvas c, String text, int alpha, float scale) {
         if (text == null || alpha <= 0) return;
         reset();
+        float cx = Arena.VW * 0.5f, cy = 210f;
+        float a = alpha / 255f;
+        // Slashed backing strip that widens in with the scale pop.
+        float half = 330f * Math.min(1f, 2.2f - scale * 1.1f + .35f);
+        shape.reset();
+        shape.moveTo(cx - half + 24f, cy - 52f);
+        shape.lineTo(cx + half + 24f, cy - 52f);
+        shape.lineTo(cx + half - 24f, cy + 14f);
+        shape.lineTo(cx - half - 24f, cy + 14f);
+        shape.close();
+        paint.setColor(Color.argb(Math.round(170 * a), 8, 6, 20));
+        c.drawPath(shape, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2.5f);
+        paint.setColor(Color.argb(Math.round(230 * a), 255, 196, 70));
+        c.drawLine(cx - half + 24f, cy - 52f, cx + half + 24f, cy - 52f, paint);
+        c.drawLine(cx - half - 24f, cy + 14f, cx + half - 24f, cy + 14f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        c.save();
+        c.scale(scale, scale, cx, cy - 18f);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setFakeBoldText(true);
-        paint.setTextSize(54f * scale);
-        paint.setTextSkewX(-0.18f);
+        paint.setTextSize(58f);
+        paint.setTextSkewX(-0.22f);
         paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeWidth(14f);
+        paint.setColor(Color.argb(Math.round(150 * a), 255, 70, 20));
+        c.drawText(text, cx, cy, paint);
         paint.setStrokeWidth(8f);
-        paint.setColor(Color.argb(alpha, 20, 12, 30));
-        c.drawText(text, Arena.VW * 0.5f, 210f, paint);
+        paint.setColor(Color.argb(alpha, 20, 8, 24));
+        c.drawText(text, cx, cy, paint);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.argb(alpha, 255, 226, 120));
-        c.drawText(text, Arena.VW * 0.5f, 210f, paint);
+        paint.setShader(bannerFill);
+        paint.setAlpha(alpha);
+        c.drawText(text, cx, cy, paint);
+        paint.setShader(null);
+        c.restore();
+        paint.setStrokeJoin(Paint.Join.MITER);
         paint.setTextSkewX(0f);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+        paint.setAlpha(255);
     }
 
     /** Frames the result of a finished combo stays on screen. */
@@ -633,23 +846,96 @@ final class HudRenderer {
         }
         float bump = Math.max(0f, 1f - (now - comboBumpAt[side]) / (float)COMBO_BUMP_NANOS);
         reset();
+        float a = alpha / 255f;
         float x = leftSide ? 40f : VW_RIGHT;
-        paint.setTextAlign(leftSide ? Paint.Align.LEFT : Paint.Align.RIGHT);
+        Paint.Align align = leftSide ? Paint.Align.LEFT : Paint.Align.RIGHT;
+        String count = comboCount(side, combo.hitCount);
+        // Number: gradient fill, double outline, pops on every new hit.
+        paint.setTextAlign(align);
         paint.setFakeBoldText(true);
-        paint.setTextSize(46f * (1f + 0.32f * bump));
-        paint.setColor(Color.argb(alpha, 255, 214 + Math.round(41f * bump), 92 + Math.round(163f * bump)));
-        c.drawText(combo.hitCount + " HITS", x, 300f, paint);
-        paint.setTextSize(18f);
-        paint.setColor(Color.argb(alpha, 255, 255, 255));
-        c.drawText("DANO " + combo.comboDamage + "  •  ESCALA " + combo.damageScale / 10 + "%", x, 326f, paint);
-        if (combo.airCombo) {
-            c.drawText("JUGGLE " + combo.juggleCount, x, 348f, paint);
+        paint.setTextSkewX(-0.2f);
+        float numberSize = 62f * (1f + 0.30f * bump);
+        paint.setTextSize(numberSize);
+        float numberWidth = paint.measureText(count);
+        c.save();
+        // Small shake on the hit that just landed.
+        c.translate(bump > .5f ? (side == 0 ? 3f : -3f) * (bump - .5f) * 2f : 0f, 0f);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeWidth(12f);
+        paint.setColor(Color.argb(Math.round(140 * a), 255, 80, 20));
+        c.drawText(count, x, 300f, paint);
+        paint.setStrokeWidth(6f);
+        paint.setColor(Color.argb(alpha, 18, 8, 22));
+        c.drawText(count, x, 300f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setShader(comboFill);
+        paint.setAlpha(alpha);
+        c.drawText(count, x, 300f, paint);
+        paint.setShader(null);
+        if (bump > 0f) {
+            paint.setColor(Color.argb(Math.round(200 * bump * a), 255, 255, 255));
+            c.drawText(count, x, 300f, paint);
         }
+        c.restore();
+        // "HITS" tag next to the number.
+        paint.setTextSize(24f);
+        float hitsX = leftSide ? x + numberWidth + 8f : x - numberWidth - 18f;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5f);
+        paint.setColor(Color.argb(alpha, 18, 8, 22));
+        c.drawText("HITS", hitsX, 296f, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.argb(alpha, 255, 255, 255));
+        c.drawText("HITS", hitsX, 296f, paint);
+        // Damage and scaling on a slanted strip.
+        String info = comboInfo(side, combo);
+        paint.setTextSize(17f);
+        paint.setTextSkewX(-0.12f);
+        float infoWidth = paint.measureText(info) + 28f;
+        float left = leftSide ? x - 14f : x - infoWidth + 14f;
+        shape.reset();
+        shape.moveTo(left + 10f, 309f); shape.lineTo(left + infoWidth + 10f, 309f);
+        shape.lineTo(left + infoWidth - 6f, 333f); shape.lineTo(left - 6f, 333f); shape.close();
+        paint.setColor(Color.argb(Math.round(190 * a), 8, 10, 24));
+        c.drawPath(shape, paint);
+        paint.setColor(Color.argb(alpha, 255, 170, 40));
+        c.drawRect(leftSide ? left - 6f : left + infoWidth - 2f, 309f, leftSide ? left - 2f : left + infoWidth + 2f, 333f, paint);
+        paint.setColor(Color.argb(alpha, 255, 255, 255));
+        c.drawText(info, leftSide ? x : x, 327f, paint);
+        if (combo.airCombo) {
+            paint.setColor(Color.argb(alpha, 140, 225, 255));
+            c.drawText("JUGGLE " + combo.juggleCount, x, 354f, paint);
+        }
+        paint.setStrokeJoin(Paint.Join.MITER);
+        paint.setTextSkewX(0f);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    private static final float VW_RIGHT = Arena.VW - 40f;
+    private final int[] comboCountShown = {-1, -1}, comboDamageShown = {-1, -1}, comboScaleShown = {-1, -1};
+    private final String[] comboCountText = {"", ""}, comboInfoText = {"", ""};
+
+    /** Strings rebuilt only when the hit count changes, not every frame. */
+    private String comboCount(int side, int hits) {
+        if (comboCountShown[side] != hits) {
+            comboCountShown[side] = hits;
+            comboCountText[side] = String.valueOf(hits);
+        }
+        return comboCountText[side];
+    }
+
+    private String comboInfo(int side, ComboSession combo) {
+        if (comboDamageShown[side] != combo.comboDamage || comboScaleShown[side] != combo.damageScale) {
+            comboDamageShown[side] = combo.comboDamage;
+            comboScaleShown[side] = combo.damageScale;
+            comboInfoText[side] = "DANO " + combo.comboDamage + "  •  ESCALA " + combo.damageScale / 10 + "%";
+        }
+        return comboInfoText[side];
+    }
+
+    /** Right combo sits left of the training toggles column. */
+    private static final float VW_RIGHT = 1060f;
 
     private void drawSuperMeter(
         Canvas c,
@@ -811,49 +1097,57 @@ final class HudRenderer {
 
     void drawControls(Canvas c, State s) {
         reset();
-        paint.setColor(Color.argb(105, 7, 13, 26));
-        c.drawCircle(DPAD_X, DPAD_Y, DPAD_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4f);
-        paint.setColor(Color.argb(215, 255, 255, 255));
-        c.drawCircle(DPAD_X, DPAD_Y, DPAD_RADIUS, paint);
-
-        paint.setStrokeWidth(2f);
-        paint.setColor(Color.argb(90, 255, 255, 255));
-        for (int i = 0; i < DPAD_LABELS.length; i++) {
-            float x = DPAD_X + DPAD_UNIT_X[i] * DPAD_RADIUS;
-            float y = DPAD_Y + DPAD_UNIT_Y[i] * DPAD_RADIUS;
-            c.drawLine(DPAD_X, DPAD_Y, x, y, paint);
-        }
-        paint.setStyle(Paint.Style.FILL);
-
+        // D-pad: glassy disc, eight sectors, the active one lit in the player's blue.
+        c.save();
+        c.translate(DPAD_X, DPAD_Y);
+        c.save();
+        c.scale(DPAD_RADIUS, DPAD_RADIUS);
+        paint.setShader(buttonBody);
+        paint.setAlpha(210);
+        c.drawCircle(0f, 0f, 1f, paint);
+        paint.setShader(null);
+        c.restore();
+        paint.setAlpha(255);
         int direction = s.dpadDirection();
         if (direction != 0) {
             int directionIndex = direction - 1;
-            float hx = DPAD_X + DPAD_UNIT_X[directionIndex] * 72f;
-            float hy = DPAD_Y + DPAD_UNIT_Y[directionIndex] * 72f;
-            paint.setColor(Color.argb(165, 255, 255, 255));
-            c.drawCircle(hx, hy, 31f, paint);
+            float angle = (float)Math.toDegrees(Math.atan2(DPAD_UNIT_Y[directionIndex], DPAD_UNIT_X[directionIndex]));
+            paint.setColor(BLUE);
+            paint.setAlpha(120);
+            c.drawArc(-DPAD_RADIUS + 4f, -DPAD_RADIUS + 4f, DPAD_RADIUS - 4f, DPAD_RADIUS - 4f,
+                angle - 22.5f, 45f, true, paint);
+            paint.setAlpha(255);
+            paint.setColor(0xE6FFFFFF);
+            c.drawCircle(DPAD_UNIT_X[directionIndex] * 72f, DPAD_UNIT_Y[directionIndex] * 72f, 27f, paint);
         }
-
-        paint.setColor(Color.argb(175, 10, 18, 32));
-        c.drawCircle(DPAD_X, DPAD_Y, DPAD_DEADZONE, paint);
-
-        paint.setColor(Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(27f);
-
-        float textCenterOffset = -(paint.ascent() + paint.descent()) / 2f;
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(1.5f);
+        paint.setColor(0x40FFFFFF);
+        for (int i = 0; i < 8; i++) {
+            double a = Math.PI / 4 * i + Math.PI / 8;
+            c.drawLine((float)Math.cos(a) * (DPAD_DEADZONE + 4f), (float)Math.sin(a) * (DPAD_DEADZONE + 4f),
+                (float)Math.cos(a) * (DPAD_RADIUS - 8f), (float)Math.sin(a) * (DPAD_RADIUS - 8f), paint);
+        }
+        paint.setStrokeWidth(4f);
+        paint.setColor(0xD9A9D8FF);
+        c.drawCircle(0f, 0f, DPAD_RADIUS - 2f, paint);
+        paint.setStrokeWidth(2f);
+        paint.setColor(0x66FFFFFF);
+        c.drawArc(-DPAD_RADIUS + 10f, -DPAD_RADIUS + 10f, DPAD_RADIUS - 10f, DPAD_RADIUS - 10f, 200f, 130f, false, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(0xD90A1222);
+        c.drawCircle(0f, 0f, DPAD_DEADZONE, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(2f);
+        paint.setColor(0x80A9D8FF);
+        c.drawCircle(0f, 0f, DPAD_DEADZONE, paint);
+        paint.setStyle(Paint.Style.FILL);
+        c.restore();
         for (int i = 0; i < DPAD_LABELS.length; i++) {
-            float tx = DPAD_X + DPAD_UNIT_X[i] * 78f;
-            float ty = DPAD_Y + DPAD_UNIT_Y[i] * 78f + textCenterOffset;
-            c.drawText(DPAD_LABELS[i], tx, ty, paint);
+            boolean lit = direction == i + 1;
+            label(c, DPAD_LABELS[i], DPAD_X + DPAD_UNIT_X[i] * 78f, DPAD_Y + DPAD_UNIT_Y[i] * 78f,
+                lit ? 28f : 25f, lit ? 0xFF0A1424 : 0xE6FFFFFF);
         }
-
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
 
         drawAttackButton(c, LIGHT_X, LIGHT_Y, "L", s.pressed(Control.LIGHT));
         drawAttackButton(c, MEDIUM_X, MEDIUM_Y, "M", s.pressed(Control.MEDIUM));
@@ -872,29 +1166,22 @@ final class HudRenderer {
         float left = s.overdriveRatio();
         boolean ready = s.overdriveReady();
         boolean pressed = s.pressed(Control.OVERDRIVE);
-        paint.setColor(left > 0f ? Color.argb(210, 150, 30, 10)
-            : ready ? (pressed ? Color.rgb(255, 120, 40) : Color.argb(185, 90, 24, 12))
-            : Color.argb(90, 55, 60, 68));
-        c.drawCircle(x, y, r, paint);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4f);
-        paint.setColor(ready || left > 0f ? Color.argb(235, 255, 140, 50) : Color.argb(120, 180, 180, 180));
+        int ring = 0xFFFF7A2E;
+        button(c, x, y, r, ring, pressed || left > 0f, ready || left > 0f);
         if (left > 0f) {
-            c.drawArc(x - r, y - r, x + r, y + r, -90f, 360f * left, false, paint);
-        } else {
-            c.drawCircle(x, y, r, paint);
+            // Draining ring while Overdrive burns.
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(5f);
+            paint.setColor(0xFFFFE08A);
+            c.drawArc(x - r - 5f, y - r - 5f, x + r + 5f, y + r + 5f, -90f, 360f * left, false, paint);
+            paint.setStyle(Paint.Style.FILL);
+        } else if (ready && !pressed) {
+            readyHalo(c, x, y, r, ring);
         }
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(ready || left > 0f ? Color.WHITE : Color.argb(150, 220, 220, 220));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(17f);
-        c.drawText("OD", x, y + (left > 0f || !ready ? -2f : 6f), paint);
-        paint.setTextSize(10f);
-        if (left > 0f) c.drawText(overdriveLabel(s.overdriveSeconds()), x, y + 13f, paint);
-        else if (!ready) c.drawText("USADO", x, y + 13f, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
+        boolean lit = ready || left > 0f;
+        label(c, "OD", x, y + (left > 0f || !ready ? -6f : 0f), 17f, lit ? Color.WHITE : 0xFFB4BCCB);
+        if (left > 0f) label(c, overdriveLabel(s.overdriveSeconds()), x, y + 11f, 10f, Color.WHITE);
+        else if (!ready) label(c, "USADO", x, y + 11f, 9f, 0xFFB4BCCB);
     }
 
     private int overdriveTenthsShown = -1;
@@ -911,118 +1198,53 @@ final class HudRenderer {
     }
 
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
-        paint.setColor(pressed ? Color.argb(195, 255, 255, 255) : Color.argb(120, 7, 13, 26));
-        c.drawCircle(x, y, ATTACK_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        paint.setColor(Color.argb(220, 255, 255, 255));
-        c.drawCircle(x, y, ATTACK_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(31f);
-        paint.setFakeBoldText(true);
-        float textY = y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(label, x, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
+        int ring = "L".equals(label) ? L_RING : "M".equals(label) ? M_RING : H_RING;
+        button(c, x, y, ATTACK_RADIUS, ring, pressed, true);
+        label(c, label, x, y, pressed ? 33f : 34f, pressed ? Color.WHITE : 0xFFF2F6FF);
     }
 
     /** A spot between two buttons that presses both: L+M throw/tech, M+H pushblock. */
     private void drawPairSpot(Canvas c, float x, float y, String label, boolean pressed) {
-        paint.setColor(pressed ? Color.argb(220, 255, 255, 255) : Color.argb(170, 7, 13, 26));
-        c.drawCircle(x, y, THROW_RADIUS, paint);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(2f);
-        paint.setColor(Color.argb(225, 255, 214, 92));
-        c.drawCircle(x, y, THROW_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(11f);
-        paint.setFakeBoldText(true);
-        float textY = y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(label, x, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
+        button(c, x, y, THROW_RADIUS, 0xFFFFD65C, pressed, true);
+        label(c, label, x, y, 11f, Color.WHITE);
     }
 
     private void drawComboButton(Canvas c, boolean pressed) {
-        paint.setColor(pressed ? Color.argb(205, 255, 255, 255) : Color.argb(135, 7, 13, 26));
-        c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(3f);
-        paint.setColor(Color.argb(225, 255, 255, 255));
-        c.drawCircle(COMBO_X, COMBO_Y, COMBO_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(pressed ? Color.rgb(25, 35, 48) : Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(18f);
-        paint.setFakeBoldText(true);
-        float textY = COMBO_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText("COMBO", COMBO_X, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
+        button(c, COMBO_X, COMBO_Y, COMBO_RADIUS, 0xFFB98CFF, pressed, true);
+        label(c, "COMBO", COMBO_X, COMBO_Y, 17f, Color.WHITE);
     }
 
     private void drawTagButton(Canvas c, State s) {
         boolean pressed = s.pressed(Control.TAG);
         boolean enabled = s.canTag();
-        int reserveColor = s.reserve().profile.color;
+        int reserveColor = s.reserve().profile.color | 0xFF000000;
+        button(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor, pressed, enabled);
+        if (enabled && !pressed) readyHalo(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor);
+        label(c, enabled ? s.tagButtonTitle() : s.tagButtonLabel(), TAG_X, TAG_Y, enabled ? 16f : 13f,
+            enabled ? Color.WHITE : 0xFFB4BCCB);
+    }
 
-        if (!enabled) {
-            paint.setColor(Color.argb(95, 55, 60, 68));
-        } else {
-            paint.setColor(pressed ? reserveColor : Color.argb(145, 7, 13, 26));
-        }
-        c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
-
+    /** Slowly rotating arc that tells a button is ready to use. */
+    private void readyHalo(Canvas c, float x, float y, float r, int color) {
+        float spin = (float)((effects.now * 140.0) % 360.0);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(3f);
-        paint.setColor(enabled ? reserveColor : Color.argb(120, 180, 180, 180));
-        c.drawCircle(TAG_X, TAG_Y, TAG_RADIUS, paint);
+        paint.setColor(color);
+        paint.setAlpha(Math.round(150 + 80 * (float)Math.sin(effects.now * 5.0)));
+        c.drawArc(x - r - 6f, y - r - 6f, x + r + 6f, y + r + 6f, spin, 70f, false, paint);
+        c.drawArc(x - r - 6f, y - r - 6f, x + r + 6f, y + r + 6f, spin + 180f, 70f, false, paint);
+        paint.setAlpha(255);
         paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(enabled ? Color.WHITE : Color.argb(155, 220, 220, 220));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(enabled ? 17f : 14f);
-        paint.setFakeBoldText(true);
-        float textY = TAG_Y - (paint.ascent() + paint.descent()) / 2f;
-        c.drawText(enabled ? s.tagButtonTitle() : s.tagButtonLabel(), TAG_X, textY, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawSuperButton(Canvas c, State s) {
         boolean pressed = s.pressed(Control.SUPER);
         boolean ultra = s.ultraReady();
         boolean enabled = ultra || s.canSuper();
-
-        paint.setColor(
-            enabled
-                ? (pressed ? s.active().profile.color : Color.argb(170, 42, 16, 68))
-                : Color.argb(90, 55, 60, 68)
-        );
-        c.drawCircle(SUPER_X, SUPER_Y, SUPER_RADIUS, paint);
-
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4f);
-        paint.setColor(enabled ? Color.argb(235, 255, 220, 90) : Color.argb(120, 180, 180, 180));
-        c.drawCircle(SUPER_X, SUPER_Y, SUPER_RADIUS, paint);
-        paint.setStyle(Paint.Style.FILL);
-
-        paint.setColor(enabled ? Color.WHITE : Color.argb(150, 220, 220, 220));
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(15f);
-        paint.setFakeBoldText(true);
-        c.drawText(ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 4f, paint);
-        paint.setTextSize(11f);
-        c.drawText(s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 14f, paint);
-        paint.setFakeBoldText(false);
-        paint.setTextAlign(Paint.Align.LEFT);
+        int ring = ultra ? 0xFFFF6AD5 : 0xFFFFD45A;
+        button(c, SUPER_X, SUPER_Y, SUPER_RADIUS, ring, pressed, enabled);
+        if (enabled && !pressed) readyHalo(c, SUPER_X, SUPER_Y, SUPER_RADIUS, ring);
+        label(c, ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 7f, 16f, enabled ? Color.WHITE : 0xFFB4BCCB);
+        label(c, s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 13f, 11f, enabled ? ring : 0xFF9AA2B2);
     }
 }

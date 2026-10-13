@@ -1,0 +1,32 @@
+{
+  "id": "p11_hit_stand",
+  "javaName": "P11_HIT_STAND",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_hit_stand_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_hit_stand.png",
+  "report": "tools/sprites/reports/p11_hit_stand.report.json",
+  "preview": "android/app/build/sprite-review/p11_hit_stand-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "danoAlto.mp4",
+    "personagem": "p11",
+    "escala": 0.335,
+    "motivo": "o vídeo começa com zoom ~2x e não passa pela imagem inicial nem pela guarda: cabeça contra o 1º quadro de frente/pulo/jL/derruba (escala conhecida): 0,333-0,339, nota 0,61; altura em pé no fim confere (688 px)",
+    "quadros": "3,15,26,38,50,61,73,84,96",
+    "celula": 288,
+    "largura": 320,
+    "raiz": "164,270",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 288,
+  "rootX": 164,
+  "rootY": 270
+}

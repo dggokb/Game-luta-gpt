@@ -1,0 +1,31 @@
+{
+  "id": "p12_hit_crouch",
+  "javaName": "P12_HIT_CROUCH",
+  "profile": "p12.json",
+  "source": "art/sprites/source/p12_hit_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p12_hit_crouch.png",
+  "report": "tools/sprites/reports/p12_hit_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p12_hit_crouch-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p12 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defendeBaixo.mp4",
+    "personagem": "p12",
+    "escala": 0.345,
+    "motivo": "provisório: o dano agachado do p12 levantava (170-190 px, mais alto que a guarda), então usa o vídeo da defesa agachada, como o dano em pé usa a defesa em pé; escala igual à da defesa agachada (cabeça contra o idle curvado: 0,338-0,351)",
+    "quadros": "17,27,37,47,56,66,76,86,96",
+    "celula": 192,
+    "largura": 256,
+    "raiz": "112,174",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameHeight": 192,
+  "rootX": 112,
+  "rootY": 174
+}
