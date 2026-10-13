@@ -1,0 +1,71 @@
+name: Direct APK CCR b289e68
+on:
+  push:
+    branches: ['apk-export-ccr-b289e68']
+    paths: ['.github/workflows/ccr-direct-apk-b289e68.yml']
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout source with history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify exact game source and isolated workflow
+        run: |
+          test "$(git merge-base --is-ancestor b289e680a2e7a67a1cbab034c3d2840155fc3bce HEAD; echo $?)" = "0"
+          test "$(git diff --name-only b289e680a2e7a67a1cbab034c3d2840155fc3bce HEAD)" = ".github/workflows/ccr-direct-apk-b289e68.yml"
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install Android Platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install sprite validation dependency
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Normalize generated sprite metadata inside checkout
+        run: |
+          python3 tools/sprites/build_characters.py --write
+          python3 tools/sprites/build_characters.py --check
+      - name: Build Android APK
+        working-directory: android
+        run: gradle assembleDebug --stacktrace
+      - name: Verify APK content and provenance
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          src=Path('android/app/build/outputs/apk/debug/app-debug.apk')
+          assert src.exists() and src.stat().st_size>100_000_000
+          with ZipFile(src) as z:
+              assert z.testzip() is None
+              assert 'AndroidManifest.xml' in z.namelist()
+              assert 'classes.dex' in z.namelist()
+          target=Path('GameLutaGPT-CCR-b289e68.apk')
+          src.rename(target)
+          print('APK verified:',target.stat().st_size,'bytes')
+          PY
+      - name: Publish APK directly to GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="apk-ccr-b289e68"
+          name="GameLutaGPT-CCR-b289e68.apk"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$name" --clobber
+          else
+            gh release create "$tag" "$name" --target b289e680a2e7a67a1cbab034c3d2840155fc3bce --title "CCR APK b289e68" --notes "APK direto (sem ZIP), criado a partir do commit b289e680a2e7a67a1cbab034c3d2840155fc3bce da branch ccr-60181022-rh9cms. Ajustes de metadados gerados feitos somente durante o build." --prerelease
+          fi
