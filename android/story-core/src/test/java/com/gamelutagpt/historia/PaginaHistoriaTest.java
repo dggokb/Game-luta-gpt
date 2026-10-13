@@ -152,6 +152,64 @@ public class PaginaHistoriaTest {
         assertTrue(rec.sounds.contains("painel"));
     }
 
+    private static final String EPISODIO_BALOES = "{\"id\":\"e3\",\"passos\":[" +
+        "{\"tipo\":\"pagina\",\"imagem\":\"pag1.jpg\",\"quadros\":[" +
+        "  {\"area\":[0,0,1,0,1,1,0,1],\"efeitos\":[\"impacto\",\"tremor\",\"velocidade\"],\"baloes\":[" +
+        "    {\"texto\":\"Meninos!\",\"caixa\":[0.1,0.1,0.3,0.2],\"area\":[0.1,0.1,0.3,0.1,0.3,0.2,0.1,0.2]}," +
+        "    {\"texto\":\"SIM!\",\"caixa\":[0.6,0.1,0.8,0.2],\"area\":[0.6,0.1,0.8,0.1,0.8,0.2,0.6,0.2]}]}]}]}";
+
+    @Test
+    public void baloesDaPaginaProntaAbremUmPorToqueNoIdiomaAtual() {
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, new NoImages());
+        Temporada temporada = Temporada.fromJson(TEMPORADA);
+        RenderAssets traducao = new RenderAssets() {
+            @Override public String readText(String path) throws IOException {
+                if (!path.equals("historia/idiomas/en.json")) throw new IOException(path);
+                return "{\"_sobre\":\"x\",\"Meninos!\":\"Boys!\"}";
+            }
+            @Override public RenderImage loadImage(String path) throws IOException { throw new IOException(path); }
+        };
+        assertTrue(temporada.setIdioma(traducao, "en"));
+        assertEquals("Boys!", temporada.t("Meninos!"));
+        assertEquals("SIM!", temporada.t("SIM!"));
+        assertFalse(temporada.setIdioma(traducao, "fr"));
+        assertEquals("Meninos!", temporada.t("Meninos!"));
+        temporada.setIdioma(traducao, "en");
+
+        Episodio ep = Episodio.fromJson(EPISODIO_BALOES);
+        Episodio.Quadro q = ep.passos.get(0).quadros.get(0);
+        assertTrue(q.impacto && q.tremor && q.velocidade && !q.zoom);
+        assertEquals(2, q.baloes.size());
+
+        p.start(temporada, ep);
+        RenderCanvas canvas = new NullCanvas();
+        // Chega no quadro (impacto) e o primeiro balão abre sozinho.
+        run(p, PaginaGuiada.OVERVIEW_HOLD + PaginaGuiada.WHIP + PaginaGuiada.FIRST_BALLOON_DELAY + 0.05f);
+        assertTrue(rec.sounds.contains("impacto"));
+        assertFalse(p.waitingTap()); // digitando
+        p.tap(640f, 360f);           // completa o texto
+        p.update(DT);
+        p.render(canvas);
+        assertTrue(p.waitingTap());
+        assertFalse(p.pageComplete()); // falta o segundo balão
+        p.tap(640f, 360f);
+        run(p, 1f);
+        assertTrue(p.pageComplete());
+        p.render(canvas);
+    }
+
+    @Test
+    public void efeitoDesconhecidoFalha() {
+        try {
+            Episodio.fromJson("{\"passos\":[{\"tipo\":\"pagina\",\"imagem\":\"a.jpg\",\"quadros\":[" +
+                "{\"area\":[0,0,1,0,1,1],\"efeitos\":[\"explosao\"]}]}]}");
+            fail();
+        } catch (IllegalArgumentException expected) {
+            assertTrue(expected.getMessage().contains("explosao"));
+        }
+    }
+
     @Test
     public void paginaProntaSemQuadrosFalha() {
         try {
@@ -217,6 +275,33 @@ public class PaginaHistoriaTest {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /** Toda tradução que vai no jogo abre, e cobre todos os textos do Prólogo. */
+    @Test
+    public void traducoesCobremOPrologo() throws IOException {
+        Episodio ep = Episodio.fromJson(read("historia/ep00/episodio.json"));
+        List<String> textos = new ArrayList<>();
+        textos.add(ep.titulo);
+        for (Episodio.Passo passo : ep.passos) {
+            if (passo.titulo != null) textos.add(passo.titulo);
+            textos.addAll(passo.linhas);
+            for (Episodio.Quadro q : passo.quadros) {
+                if (q.legenda != null) textos.add(q.legenda);
+                for (Episodio.BalaoPronto b : q.baloes) textos.add(b.texto);
+            }
+            for (Episodio.Painel painel : passo.paineis) {
+                for (Episodio.Balao b : painel.baloes) textos.add(b.texto);
+            }
+        }
+        File[] idiomas = new File(ASSETS, "historia/idiomas").listFiles();
+        assertNotNull(idiomas);
+        for (File arquivo : idiomas) {
+            java.util.Map<String, String> traducao = Temporada.traducaoFromJson(read("historia/idiomas/" + arquivo.getName()));
+            for (String texto : textos) {
+                assertTrue(arquivo.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
             }
         }
     }

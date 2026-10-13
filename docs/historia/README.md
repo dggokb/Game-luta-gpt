@@ -115,20 +115,39 @@ cima da divisa (cabelo, onomatopeia), podem sair juntos; aí corrija o `area` à
 caso dos olhos na página 2 do Prólogo).
 
 ```json
-{ "tipo": "pagina", "imagem": "pag1.jpg", "quadros": [
-  { "area": [0.0, 0.03, 0.62, 0.0, 0.63, 0.16, 0.0, 0.13], "legenda": "Tóquio. Dez anos atrás." },
-  { "area": [0.0, 0.69, 1.0, 0.69, 1.0, 0.78, 0.0, 0.78], "impacto": true }
+{ "tipo": "pagina", "imagem": "pag4.jpg", "quadros": [
+  { "area": [0.0, 0.0, 1.0, 0.0, 1.0, 0.18, 0.0, 0.18], "efeitos": ["zoom"],
+    "baloes": [ { "texto": "Meninos!", "caixa": [0.53, 0.04, 0.65, 0.09], "area": [0.68, 0.06, ...] } ] },
+  { "area": [0.0, 0.73, 1.0, 0.73, 1.0, 1.0, 0.0, 1.0], "efeitos": ["impacto", "velocidade"],
+    "legenda": "Tóquio. Dez anos atrás." }
 ] }
 ```
 
 - `area`: o contorno do quadro em frações da página (`[x0, y0, x1, y1, ...]`, de 0 a 1).
-- `impacto`: o quadro chega tremendo a tela com um clarão (golpes, gritos).
-- `legenda`: narração escrita pelo jogo numa faixa embaixo da tela. Vale para texto que não
-  está desenhado na página e é o lugar para o texto traduzível.
+- `efeitos` (quantos quiser):
+  - `impacto`: a câmera chega de supetão, com tranco de zoom, tela tremendo e clarão (golpes, gritos);
+  - `tremor`: a tela treme de leve o tempo todo enquanto o quadro está em foco (tensão, força);
+  - `velocidade`: linhas de foco de mangá tremeluzindo por cima do quadro (ação);
+  - `zoom`: a câmera avança devagar sobre o quadro (olhares, momentos dramáticos).
+- `baloes`: os balões de fala desenhados na página. O jogo pinta o miolo (`area`) de branco,
+  apagando o texto da arte, e escreve o `texto` dentro da `caixa`, no idioma do aparelho, com
+  a letra do maior tamanho que couber. O primeiro balão do quadro abre sozinho e digita; cada
+  toque completa o texto ou abre o próximo balão; depois do último, o toque passa de quadro.
+  O script acha os balões sozinho (miolo branco liso com texto); falta escrever o `texto`.
+- `legenda`: narração do jogo numa faixa embaixo da tela.
 
-Texto desenhado na imagem (balões, onomatopeias) aparece igual em todos os idiomas. Para
-traduzir, a página precisa ser refeita por idioma, ou os balões ficam vazios na arte e o texto
-vem do jogo (a fazer).
+As onomatopeias (HA, PA, TCHECK, HAA!...) ficam na arte: são iguais em qualquer idioma.
+
+## Idiomas
+
+`historia/idiomas/<código>.json` (ex.: `en.json`, `es.json`) é um objeto com o texto em
+português como chave e a tradução como valor. Vale para balões (das páginas prontas e das
+provisórias), legendas, títulos, o "próximo episódio" e os botões (PULAR, CONTINUA...). O jogo
+usa o idioma do aparelho; texto sem tradução aparece em português. O teste
+`traducoesCobremOPrologo` avisa quando um texto novo do Prólogo ficou sem tradução.
+
+Para ver as páginas em outro idioma no PC:
+`gradle :pc-preview:runHistoria -Pidioma=en`.
 
 ## Revisar no PC
 

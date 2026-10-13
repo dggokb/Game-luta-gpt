@@ -48,4 +48,6 @@ tasks.register('runHistoria', JavaExec) {
     mainClass = 'com.gamelutagpt.preview.HistoriaPreview'
     workingDir = rootProject.projectDir
     args 'app/src/main/assets', 'build/historia'
+    // Outro idioma: gradle :pc-preview:runHistoria -Pidioma=en
+    systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
 }

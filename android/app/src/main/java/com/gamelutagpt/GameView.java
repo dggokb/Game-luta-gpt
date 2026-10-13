@@ -1901,6 +1901,8 @@ public class GameView extends SurfaceView
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         try {
             temporada = Temporada.load(ultraAssets);
+            // Textos da história no idioma do aparelho; sem tradução, em português.
+            temporada.setIdioma(ultraAssets, Locale.getDefault().getLanguage());
         } catch (IOException | RuntimeException ex) {
             Log.w(LOG_TAG, "modo história indisponível", ex);
             return;

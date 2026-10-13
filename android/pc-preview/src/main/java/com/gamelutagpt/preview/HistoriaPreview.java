@@ -42,6 +42,9 @@ public final class HistoriaPreview implements HistoriaListener {
         if (!outDir.isDirectory() && !outDir.mkdirs()) throw new IOException("não consegui criar " + outDir);
         FileRenderAssets assets = new FileRenderAssets(assetsDir);
         Temporada temporada = Temporada.load(assets);
+        // -Didioma=en grava as páginas em inglês (historia/idiomas/en.json).
+        String idioma = System.getProperty("idioma", "pt");
+        if (!temporada.setIdioma(assets, idioma)) System.out.println("sem tradução para " + idioma);
         HistoriaPreview preview = new HistoriaPreview(assets, outDir);
         for (String id : temporada.episodios) {
             if (args.length > 2 && !args[2].equals(id)) continue;

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Prepara uma página de mangá pronta para o modo história.
 
-Acha os quadros pelas divisas claras (brancas) entre eles, grava a página em JPG na pasta
-do episódio e imprime o passo do episodio.json com o contorno de cada quadro, na ordem de
-leitura (linhas de cima para baixo, quadros da esquerda para a direita). Também grava uma
-imagem de conferência com os quadros numerados.
+Acha os quadros pelas divisas claras (brancas) entre eles e os balões de fala (miolo branco
+com texto), grava a página em JPG na pasta do episódio e imprime o passo do episodio.json
+com o contorno de cada quadro na ordem de leitura (linhas de cima para baixo, quadros da
+esquerda para a direita) e os balões de cada quadro. No jogo, o miolo de cada balão é
+pintado de branco e o texto vem do episódio (traduzível); falta só preencher o "texto".
+Também grava uma imagem de conferência com os quadros numerados e os balões marcados.
 
     pip install opencv-python-headless numpy
     python3 tools/historia/recortar_pagina.py pagina.png --episodio ep00 --nome pag1
@@ -60,6 +62,49 @@ def find_panels(img, min_area=0.006):
     return reading_order(panels, w * h)
 
 
+def find_balloons(img):
+    """Balões de fala: miolo branco e liso (quase elíptico) com texto escuro dentro. As
+    onomatopeias em balão espetado ficam de fora (fazem parte da arte em qualquer idioma).
+    Devolve o contorno do miolo branco (o jogo pinta de branco para apagar o texto) e a
+    caixa onde o texto traduzido é escrito."""
+    h, w = img.shape[:2]
+    white = (img.min(axis=2) > 200).astype(np.uint8)
+    filled = white.copy()
+    contours, hierarchy = cv2.findContours(white, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+    for i, c in enumerate(contours):
+        # Buracos pequenos dentro do branco são as letras; os grandes são quadros cercados por divisas.
+        if hierarchy[0][i][3] >= 0 and cv2.contourArea(c) < w * h * 0.01:
+            cv2.drawContours(filled, contours, i, 1, -1)
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(filled, 8)
+    balloons = []
+    for i in range(1, count):
+        x, y, bw, bh, area = stats[i]
+        if area < w * h * 0.002 or area > w * h * 0.08:
+            continue
+        mask = (labels == i).astype(np.uint8)
+        c = max(cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0], key=cv2.contourArea)
+        hull = cv2.convexHull(c)
+        solidity = cv2.contourArea(c) / max(1.0, cv2.contourArea(hull))
+        text = ((mask == 1) & (white == 0)).sum() / float(area)
+        if solidity < 0.93 or text < 0.03:
+            continue
+        # Caixa do texto: em volta do ponto mais "fundo" do balão (longe do rabicho).
+        dist = cv2.distanceTransform(mask, cv2.DIST_L2, 5)
+        _, _, _, (cx, cy) = cv2.minMaxLoc(dist)
+        row = np.where(mask[cy] == 1)[0]
+        col = np.where(mask[:, cx] == 1)[0]
+        half_w = min(cx - row.min(), row.max() - cx) * 0.74
+        half_h = min(cy - col.min(), col.max() - cy) * 0.72
+        poly = cv2.approxPolyDP(c, 1.5, True).reshape(-1, 2).astype(float)
+        balloons.append({"poly": poly, "box": (cx - half_w, cy - half_h, cx + half_w, cy + half_h),
+                         "center": (cx, cy)})
+    return balloons
+
+
+def inside(poly, point):
+    return cv2.pointPolygonTest(poly.astype(np.float32).reshape(-1, 1, 2), point, False) >= 0
+
+
 def reading_order(panels, page_area):
     """Linhas pela sobreposição vertical, da esquerda para a direita. Um quadro de fundo
     enorme (mais de 35% da página) entra na posição do centro dele."""
@@ -113,6 +158,11 @@ def main():
 
     check = img.copy()
     quadros = []
+    balloons = find_balloons(img)
+    for b in balloons:
+        cv2.polylines(check, [b["poly"].astype(np.int32).reshape(-1, 1, 2)], True, (255, 0, 255), 3)
+        l, t, r, bt = [int(v) for v in b["box"]]
+        cv2.rectangle(check, (l, t), (r, bt), (0, 200, 0), 2)
     for k, p in enumerate(panels):
         cv2.polylines(check, [p.astype(np.int32).reshape(-1, 1, 2)], True, (0, 0, 255), 4)
         cx, cy = p.mean(axis=0).astype(int)
@@ -120,15 +170,29 @@ def main():
         area = []
         for x, y in p:
             area += [round(min(max(x / w, 0.0), 1.0), 4), round(min(max(y / h, 0.0), 1.0), 4)]
-        quadros.append({"area": area})
+        quadro = {"area": area}
+        mine = [b for b in balloons if inside(p, (float(b["center"][0]), float(b["center"][1])))]
+        # Ordem de leitura dos balões: de cima para baixo e da esquerda para a direita.
+        mine.sort(key=lambda b: (round(b["center"][1] / (h * 0.06)), b["center"][0]))
+        if mine:
+            quadro["baloes"] = []
+            for b in mine:
+                outline = []
+                for x, y in b["poly"]:
+                    outline += [round(x / w, 4), round(y / h, 4)]
+                l, t, r, bt = b["box"]
+                quadro["baloes"].append({"texto": "", "caixa": [round(l / w, 4), round(t / h, 4),
+                                                             round(r / w, 4), round(bt / h, 4)],
+                                         "area": outline})
+        quadros.append(quadro)
     check_path = args.conferencia or (args.nome + "_quadros.jpg")
     cv2.imwrite(check_path, check)
 
     passo = {"tipo": "pagina", "imagem": jpg, "quadros": quadros}
-    text = json.dumps(passo, ensure_ascii=False)
-    print(text.replace('{"area"', '\n  {"area"').replace("]}]}", "]}\n]}"))
-    print("\n%d quadros. Página em %s; conferência em %s" % (len(panels), os.path.join(out_dir, jpg), check_path),
-          file=sys.stderr)
+    print(json.dumps(passo, ensure_ascii=False, indent=1))
+    total = sum(len(q.get("baloes", [])) for q in quadros)
+    print("\n%d quadros e %d balões de fala (preencha o \"texto\" de cada um). Página em %s; conferência em %s"
+          % (len(panels), total, os.path.join(out_dir, jpg), check_path), file=sys.stderr)
 
 
 if __name__ == "__main__":
