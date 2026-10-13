@@ -236,8 +236,8 @@ final class CharacterSelectRenderer {
                 if(flash>0) {
                     quadPath();fill(c,alphaColor(WHITE,Math.round(150*flash)));
                     // Lock-in ring expanding out of the card.
-                    float cx=(corners[0]+corners[2]+corners[4]+corners[6])/4,cy=(corners[1]+corners[5])/2;
-                    c.save();c.scale(1f+.35f*(1f-flash),1f+.35f*(1f-flash),cx,cy);
+                    float fcx=(corners[0]+corners[2]+corners[4]+corners[6])/4,fcy=(corners[1]+corners[5])/2;
+                    c.save();c.scale(1f+.35f*(1f-flash),1f+.35f*(1f-flash),fcx,fcy);
                     quadPath();stroke(c,alphaColor(WHITE,Math.round(255*flash)),4f*flash+1f);
                     c.restore();
                 }

@@ -24,11 +24,12 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
       - name: Native Canvas tests and visual review frames
         working-directory: android
-        run: >
-          gradle :app:testDebugUnitTest
-          --tests '*VisualReviewTest' --tests '*HudEffectsTest' --tests '*HudArtTest'
-          --tests '*CharacterSelectTest' --tests '*ExtractedSystemsTest' --tests '*CameraRigRoundEndTest'
-          :app:assembleDebug -x :app:verifySpritePacks --stacktrace --continue
+        run: |
+          set -o pipefail
+          gradle :app:testDebugUnitTest \
+            --tests '*VisualReviewTest' --tests '*HudEffectsTest' --tests '*HudArtTest' \
+            --tests '*CharacterSelectTest' --tests '*ExtractedSystemsTest' --tests '*CameraRigRoundEndTest' \
+            :app:assembleDebug -x :app:verifySpritePacks --continue 2>&1 | tee /tmp/gradle.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -46,6 +47,8 @@ jobs:
         run: |
           python3 tools/visual_review_sheets.py android/app/build/visual-review /tmp/review
           cp -r android/app/build/reports/tests/testDebugUnitTest /tmp/review/test-report 2>/dev/null || true
+          grep -E "error:|warning: \[|FAILED|tests completed|BUILD|What went wrong|Exception|at com\.gamelutagpt" /tmp/gradle.log | head -300 > /tmp/review/gradle-summary.txt || true
+          tail -150 /tmp/gradle.log > /tmp/review/gradle-tail.txt || true
           cd /tmp/review
           git init -q -b visual-review-rh9cms
           git config user.name "visual-review-bot"
