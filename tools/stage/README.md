@@ -166,17 +166,31 @@ Dicas do dojo:
 - O brilho das lanternas, o reflexo forte no piso encerado e as pétalas são feitos pelo
   jogo. Não precisa pôr brilho exagerado na arte.
 
-Planejamento do `stage.json` (ponto de partida, ajustar no visualizador):
+## Notas do Dojo Shinshinkan
 
-| Camada | Profundidade | Observação |
-| --- | --- | --- |
-| `parede` | 1200 | `repetir: "espelhar"`, alta (vai acima da tela no super pulo), luzes fracas nos shoji com `reflexo` |
-| `altar` | 1180 | `noChao`, `repetir: "nao"`, centrado nos lutadores (x 0.5) |
-| neblina | 900 | âmbar bem leve, a "luz no ar" do salão |
-| `lanterna_poste` | 560 (fim do piso) | `noChao`, `repetir: "espelhar"`, luz no topo com `reflexo` |
-| `pilares` | 300 | como no templo, luz na chōchin |
-| `teto` | 250 | como no templo, `corAcima` madeira escura |
-| `makiwara` | 140 | `noChao`, nas laterais |
-| `frente` | −250 | na frente dos lutadores, só nos cantos |
-| `chao` | perto −600, longe 1200 | `reflexoLutadores` ≈ 0.32, `reflexoLuzes` ≈ 0.6 (piso espelhado da página 2), `imagemLajotas: "chao_tabuas.jpg"` |
-| `petalas` | — | poucas (≈ 30), como na página |
+As imagens do GPT passam pelo `montar_dojo.py` (em vez do `preparar_cenario.py` sozinho):
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_dojo.py --entrada pasta/com/as/imagens
+```
+
+- **Piso**: as tábuas vieram levemente em perspectiva (abrem em leque, 74 px no topo e
+  86 px na base). O script endireita cada linha, monta o assoalho tábua por tábua,
+  sorteando as tábuas da imagem do GPT, com emendas e tons variados (repetir a imagem
+  inteira, mesmo espelhada, deixava brilhos e veios em grade), e cola o brasão do
+  `chao.png` embaixo dos lutadores, com as juntas alinhadas. Cada tábua tem ~68 unidades
+  do mundo e o círculo do brasão ~750.
+- **Primeiro plano**: o `frente.png` é dividido em `frente_esq.png` (cerca) e
+  `frente_dir.png` (suporte de bokken), desfocados. Ficam no chão a −250, na frente dos
+  lutadores, e aparecem de vez em quando (`periodo` 1.9) quando a câmera anda.
+- **Teto**: o `teto.png` é usado quatro vezes, a 250 (vigas com lanternas, perto) e a
+  550, 800 e 1080, empilhadas acima da parede. Quando a câmera afasta ou no super pulo,
+  aparece o andar de cima do salão em vez de um vazio escuro. Só a mais funda tem
+  `corAcima`: nas outras, a cor cobriria as faixas de trás.
+- **Pilares**: a 230, na frente do teto, para a lanterna chōchin não ficar escondida
+  atrás das vigas.
+- O brasão da lanterna do pilar veio diferente (três folhas) do das lanternas de poste e
+  do piso (flor de cerejeira). Para corrigir, gere o `pilar.png` de novo pedindo "o mesmo
+  brasão das outras imagens: flor de cerejeira de cinco pétalas dentro de um círculo".
+

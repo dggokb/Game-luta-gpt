@@ -1,0 +1,363 @@
+{
+  "nome": "Dojo Shinshinkan",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#1A0E06",
+  "camadas": [
+    {
+      "id": "parede",
+      "imagem": "parede.jpg",
+      "profundidade": 1100,
+      "noChao": true,
+      "altura": 0.66,
+      "repetir": "espelhar",
+      "luzes": [
+        {
+          "x": 0.157,
+          "y": 0.26,
+          "raio": 0.16,
+          "cor": "#FFB04A",
+          "pulsar": 0.04
+        },
+        {
+          "x": 0.498,
+          "y": 0.62,
+          "raio": 0.16,
+          "cor": "#FFB04A",
+          "pulsar": 0.04
+        },
+        {
+          "x": 0.84,
+          "y": 0.26,
+          "raio": 0.16,
+          "cor": "#FFB04A",
+          "pulsar": 0.04
+        }
+      ]
+    },
+    {
+      "id": "altar",
+      "imagem": "altar.png",
+      "profundidade": 1060,
+      "noChao": true,
+      "altura": 0.5,
+      "x": 0.5,
+      "repetir": "nao",
+      "luzes": [
+        {
+          "x": 0.262,
+          "y": 0.435,
+          "raio": 0.07,
+          "cor": "#FFC060",
+          "pulsar": 0.08
+        },
+        {
+          "x": 0.737,
+          "y": 0.435,
+          "raio": 0.07,
+          "cor": "#FFC060",
+          "pulsar": 0.08
+        }
+      ]
+    },
+    {
+      "id": "teto-longe",
+      "imagem": "teto.png",
+      "profundidade": 1080,
+      "topo": -0.22,
+      "base": -0.07,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "corAcima": "#1A0E06",
+      "luzes": [
+        {
+          "x": 0.047,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.273,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.5,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.728,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.953,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        }
+      ]
+    },
+    {
+      "id": "teto-800",
+      "imagem": "teto.png",
+      "profundidade": 800,
+      "topo": -0.33,
+      "base": -0.14,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "luzes": [
+        {
+          "x": 0.047,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.273,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.5,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.728,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.953,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        }
+      ]
+    },
+    {
+      "id": "teto-550",
+      "imagem": "teto.png",
+      "profundidade": 550,
+      "topo": -0.46,
+      "base": -0.23,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "luzes": [
+        {
+          "x": 0.047,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.273,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.5,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.728,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.953,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08,
+          "reflexo": false
+        }
+      ]
+    },
+    {
+      "id": "neblina",
+      "tipo": "neblina",
+      "profundidade": 800,
+      "topo": 0.2,
+      "base": 0.62,
+      "cor": "#FFA040",
+      "alfa": 0.14
+    },
+    {
+      "id": "lanternas",
+      "imagem": "lanterna_poste.png",
+      "profundidade": 560,
+      "noChao": true,
+      "altura": 0.34,
+      "x": 0.18,
+      "repetir": "espelhar",
+      "periodo": 0.64,
+      "luzes": [
+        {
+          "x": 0.55,
+          "y": 0.22,
+          "raio": 0.08,
+          "cor": "#FFB45A",
+          "pulsar": 0.1
+        }
+      ]
+    },
+    {
+      "id": "pilares",
+      "imagem": "pilar.png",
+      "profundidade": 230,
+      "noChao": true,
+      "altura": 0.68,
+      "x": 0.08,
+      "repetir": "espelhar",
+      "periodo": 0.86,
+      "luzes": [
+        {
+          "x": 0.747,
+          "y": 0.387,
+          "raio": 0.1,
+          "cor": "#FFB45A",
+          "pulsar": 0.1
+        }
+      ]
+    },
+    {
+      "id": "teto",
+      "imagem": "teto.png",
+      "profundidade": 250,
+      "topo": -0.01,
+      "base": 0.19,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "luzes": [
+        {
+          "x": 0.047,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08
+        },
+        {
+          "x": 0.273,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08
+        },
+        {
+          "x": 0.5,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08
+        },
+        {
+          "x": 0.728,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08
+        },
+        {
+          "x": 0.953,
+          "y": 0.75,
+          "raio": 0.2,
+          "cor": "#FFB45A",
+          "pulsar": 0.08
+        }
+      ]
+    },
+    {
+      "id": "makiwara",
+      "imagem": "makiwara.png",
+      "profundidade": 140,
+      "noChao": true,
+      "altura": 0.3,
+      "x": 0.04,
+      "repetir": "espelhar",
+      "periodo": 0.92
+    },
+    {
+      "id": "frente-cerca",
+      "imagem": "frente_esq.png",
+      "profundidade": -250,
+      "x": 0.07,
+      "repetir": "repetir",
+      "periodo": 1.9,
+      "noChao": true,
+      "altura": 0.25,
+      "alfa": 0.92
+    },
+    {
+      "id": "frente-suporte",
+      "imagem": "frente_dir.png",
+      "profundidade": -250,
+      "x": 0.97,
+      "repetir": "repetir",
+      "periodo": 1.9,
+      "noChao": true,
+      "altura": 0.36,
+      "alfa": 0.92
+    }
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "perto": -600,
+    "longe": 1100,
+    "centroX": 700,
+    "reflexoLutadores": 0.32,
+    "reflexoLuzes": 0.6,
+    "imagemLajotas": "chao_tabuas.jpg"
+  },
+  "petalas": {
+    "quantidade": 30,
+    "cor": "#FFB7D5",
+    "perto": -350,
+    "longe": 1000,
+    "vento": 35,
+    "queda": 55,
+    "tamanho": 6
+  }
+}
