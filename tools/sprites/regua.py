@@ -3,6 +3,8 @@
 
     python3 tools/sprites/regua.py p02               # tabela no terminal (~1 min)
     python3 tools/sprites/regua.py p02 --relatorio   # + docs/personagens/regua/<id>.md, .json e .png
+    python3 tools/sprites/regua.py p02 --corrigir VICTORY DASH   # leva esses clipes a 100%
+                                                 # (depois: build_characters.py --write)
 
 A referência é a imagem inicial do personagem (art/keys/<id>/inicio_*.png): a mesma arte de
 onde saem todos os vídeos, no tamanho oficial do tamanho.json. Tudo é medido no que o jogo
@@ -45,6 +47,9 @@ HEAD_SCORE = 0.60                    # cabeça achada no quadro
 HEAD_FRAMES = 2                      # quadros com cabeça achada para valer a medida
 STRONG_SCORE = 0.90                  # receita medida pela imagem inicial com essa nota
 CHAIN_TOL = 0.02                     # conversão vídeo -> jogo não muda o tamanho
+FIX_SCORE = 0.50                     # correção: cabeça achada com essa nota entra na linha de zoom
+FIX_ZOOM = 0.04                      # correção: linha da cabeça varia mais que isso -> por quadro
+FIX_MARGIN = 8                       # px da folha: o quadro aumentado não chega mais perto da borda
 CANVAS, CX, CY = 900, 450, 760       # tela comum das emendas, raiz em (CX, CY)
 AIR = {'JUMP', 'FALL', 'JUMP_LIGHT', 'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN',
        'DEFENSE_AIR', 'HIT_AIR'}
@@ -317,12 +322,13 @@ def chain(p, state):
         return None, f'folha do vídeo com {count} quadros, a do jogo com {cfg["expectedFrames"]}: ' \
                      'a receita não reproduz a folha do jogo'
     ratios = []
+    fixed = v.get('reguaFatores', [1.0] * cfg['expectedFrames'])
     for i in p.anim(state)['frames']:
         cell = sheet[i // cols * h:(i // cols + 1) * h, i % cols * w:(i % cols + 1) * w]
         ys = np.nonzero(cell.any(1))[0]
         ys2 = np.nonzero((p.atlas_frame(p.anim(state)['atlas'], i)[0][..., 3] > 128).any(1))[0]
         if len(ys) >= 20 and len(ys2) >= 20:
-            ratios.append((ys2[-1] - ys2[0] + 1) / ((ys[-1] - ys[0] + 1) * p.profile['worldScale']))
+            ratios.append((ys2[-1] - ys2[0] + 1) * fixed[i] / ((ys[-1] - ys[0] + 1) * p.profile['worldScale']))
     if not ratios:
         return None, 'quadros vazios'
     return float(np.median(ratios)), ''
@@ -393,6 +399,89 @@ def audit(cid, progress=None):
                          medida=text, fator_optico=after, cadeia=ch, cadeia_nota=ch_note, inicio=ini,
                          cabeca=cab, emendas=mine, problemas=problems, nivel=level))
     return p, rows
+
+
+# ---------------------------------------------------------------- correção
+
+def correction(p, row, head, idle_head):
+    """(fatores por quadro da folha, motivo) que levam o clipe a 100%. Fator óptico aplicado
+    depois da medida da câmera é desfeito. Zoom de câmera (a cabeça cresce ou diminui ao longo
+    do clipe) vira um fator por quadro: a reta da cabeça pelos quadros, sem passar dos valores
+    medidos. Senão, o fator do clipe em todos os quadros."""
+    from tamanho import crop, flat
+    atlas = row['atlas']
+    n = p.clips[atlas]['expectedFrames']
+    if row['fator_optico'] != 1.0 and row['fonte'].startswith('receita'):
+        return [row['fator_optico']] * n, f"desfaz o fator óptico {row['fator_optico']:.3f}"
+    good = []
+    for i in range(n):
+        nota, z = zoom_search(head, flat(crop(p.atlas_frame(atlas, i)[0], 30)), 0.7, 1.45, 38)
+        if nota >= FIX_SCORE:
+            good.append((i, z / idle_head, nota))
+    if len(good) >= 4:
+        idx, zs, w = (np.array(v) for v in zip(*good))
+        b, a = np.polyfit(idx, zs, 1, w=w)
+        line = np.clip(a + b * np.arange(n), zs.min(), zs.max())
+        if line.max() / line.min() - 1 > FIX_ZOOM:
+            return [round(float(v), 4) for v in line], \
+                f'zoom de câmera: {line[0] * 100:.0f}% no 1º quadro, {line[-1] * 100:.0f}% no último'
+    if row['fator'] is None:
+        raise SystemExit(f"{row['estado']}: sem medida de tamanho, nada a corrigir")
+    return [round(row['fator'], 4)] * n, f"fator {row['fator'] * 100:.0f}% em todos os quadros"
+
+
+def fits(cfg, z):
+    """Quadros que, aumentados, chegariam a menos de FIX_MARGIN px da borda da célula."""
+    img = Image.open(ROOT / cfg['source']).convert('RGBA')
+    w, h, cols, rx, ry = cfg['frameWidth'], cfg['frameHeight'], cfg['columns'], cfg['rootX'], cfg['rootY']
+    bad = []
+    for i, f in enumerate(z):
+        box = img.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)).getchannel('A') \
+            .point(lambda v: 255 if v > 10 else 0).getbbox()
+        if not box or f >= 1:
+            continue
+        x0, y0, x1, y1 = rx + (box[0] - rx) / f, ry + (box[1] - ry) / f, rx + (box[2] - rx) / f, ry + (box[3] - ry) / f
+        if min(x0, y0) < FIX_MARGIN or x1 > w - FIX_MARGIN or y1 > h - FIX_MARGIN + 1:
+            bad.append(i)
+    return bad
+
+
+def fix(cid, states):
+    """Reescala a folha do jogo (source da receita) em volta da raiz e grava na receita."""
+    import reescalar
+    from ancorar import clip_path
+    p, rows = audit(cid)
+    refs = inicio_images(p)
+    head = head_of(refs['inicio_centro'])
+    idle_head = float(np.median([z for _, n, z in head_zooms(p, head, 'IDLE') if n >= HEAD_SCORE]))
+    by_state = {r['estado']: r for r in rows}
+    done = set()
+    for state in states:
+        row = by_state[state]
+        if row['atlas'] in done:
+            continue
+        done.add(row['atlas'])
+        cfg = p.clips[row['atlas']]
+        z, reason = correction(p, row, head, idle_head)
+        bad = fits(cfg, z)
+        if bad:
+            raise SystemExit(f'{state}: quadros {bad} passariam da célula aumentados; aumente a célula antes')
+        reescalar.rescale(cfg, np.array(z))
+        path = clip_path(row['atlas'])
+        data = read_json(path)
+        target = data.get('video', data)
+        if reason.startswith('desfaz'):
+            target.pop('normalizedOpticalScale')
+        else:
+            # reescala: a reconversão do vídeo repete a correção; reguaFatores: o que a régua
+            # mudou na folha do jogo depois da folha do vídeo (a cadeia desconta)
+            for key in ('reescala', 'reguaFatores'):
+                old = target.get(key, [1.0] * len(z))
+                target[key] = [round(a * b, 4) for a, b in zip(old, z)]
+        target.setdefault('regua', []).append(reason)
+        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+        print(f"{state} ({row['atlas']}): {reason}")
+    print('agora: python3 tools/sprites/build_characters.py --write  e rode a régua de novo')
 
 
 # ---------------------------------------------------------------- saída
@@ -475,7 +564,13 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('personagens', nargs='+')
     ap.add_argument('--relatorio', action='store_true', help='grava docs/personagens/regua/<id>.md, .json e .png')
+    ap.add_argument('--corrigir', nargs='+', metavar='ESTADO', help='leva esses clipes do personagem a 100%%')
     args = ap.parse_args()
+    if args.corrigir:
+        if len(args.personagens) != 1:
+            ap.error('--corrigir é para um personagem por vez')
+        fix(args.personagens[0], args.corrigir)
+        return
     for cid in args.personagens:
         p, rows = audit(cid)
         print(f'== {cid}')

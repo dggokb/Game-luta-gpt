@@ -51,7 +51,7 @@ class ReguaTests(unittest.TestCase):
         self.assertEqual('forte', regua.recipe(p, 'LIGHT_JAB')[0])
         self.assertEqual('manual', regua.recipe(p, 'MEDIUM_KICK')[0])
         self.assertEqual('fraca', regua.recipe(p, 'INTRO')[0])
-        self.assertAlmostEqual(0.88, regua.recipe(p, 'DASH')[2], places=2)
+        self.assertEqual(1.0, regua.recipe(p, 'DASH')[2])  # fator óptico 0,88 desfeito pela régua
 
 
 if __name__ == '__main__':

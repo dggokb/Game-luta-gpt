@@ -23,7 +23,9 @@
     "fixar": "registro",
     "pe_no_chao": true,
     "limpar_chao": true,
-    "normalizedOpticalScale": 0.879878
+    "regua": [
+      "desfaz o fator óptico 0.880"
+    ]
   },
   "frameWidth": 576,
   "rootX": 286,
