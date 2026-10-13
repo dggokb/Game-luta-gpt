@@ -1,52 +1,38 @@
-name: Build Game Luta APK (temporary release build)
+name: Publish direct APK from completed build
 permissions:
-  contents: read
+  contents: write
 on:
   push:
     branches:
       - 'claude/apk-ccr-4434da12-5490pk-20261013'
   workflow_dispatch:
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 20
     steps:
-      - name: Checkout exact source
-        uses: actions/checkout@v4
-      - name: Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-      - name: Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: ''
-      - name: Gradle 8.7
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-      - name: Install Android platform
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-      - name: Install PIL for P01 asset calibration
-        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
-      - name: Fix story skip button visibility in isolated build workspace
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("android/story-core/src/main/java/com/gamelutagpt/historia/PaginaHistoria.java")
-          s = p.read_text()
-          old = "    static final float SKIP_LEFT = "
-          assert s.count(old) == 1, "Unexpected source: cannot apply controlled compilation fix"
-          p.write_text(s.replace(old, "    public static final float SKIP_LEFT = ", 1))
-          PY
-      - name: Compile debug APK without known-broken sprite validation
-        working-directory: android
-        run: gradle :app:assembleDebug -x :app:verifySpritePacks --stacktrace
-      - name: Upload installable APK
-        uses: actions/upload-artifact@v4
+      - name: Download validated APK artifact from successful run
+        uses: actions/download-artifact@v4
         with:
           name: GameLutaGPT-APK-ccr-4434da12-5490pk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 15
+          repository: dggokb/Game-luta-gpt
+          run-id: 38396921743
+          github-token: ${{ github.token }}
+          path: release-files
+      - name: Inspect APK
+        run: |
+          find release-files -maxdepth 3 -type f -printf '%p %s bytes\n'
+          test -s release-files/app-debug.apk
+          file release-files/app-debug.apk
+          mv release-files/app-debug.apk release-files/GameLutaGPT-ccr-4434da12-5490pk.apk
+      - name: Publish APK as direct-download GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "apk-ccr-4434da12-5490pk-20261013" \
+            "release-files/GameLutaGPT-ccr-4434da12-5490pk.apk" \
+            --repo "${{ github.repository }}" \
+            --target "66c3c0a728f7541fa2cd8879b0cdbd745d229367" \
+            --title "APK da branch ccr-4434da12-5490pk (13/10/2026)" \
+            --notes "APK de teste compilado do snapshot 66c3c0a728f7541fa2cd8879b0cdbd745d229367. Compilação isolada com validação antiga de sprites ignorada e visibilidade dos campos SKIP_* corrigida apenas em workspace; branch de origem não foi modificada." \
+            --prerelease
