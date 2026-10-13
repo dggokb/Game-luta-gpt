@@ -24,7 +24,7 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
       - name: Native Canvas effects tests and APK
         working-directory: android
-        run: gradle :app:testDebugUnitTest --tests '*HudEffectsTest' --tests '*HudArtTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :app:assembleDebug :app:assembleDebugAndroidTest -x :app:verifySpritePacks --stacktrace
+        run: gradle :app:testDebugUnitTest --tests '*HudEffectsTest' --tests '*HudArtTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :story-core:test :app:assembleDebug :app:assembleDebugAndroidTest -x :app:verifySpritePacks --stacktrace
       - name: Preserve native Canvas frames before encoding
         uses: actions/upload-artifact@v4
         with:

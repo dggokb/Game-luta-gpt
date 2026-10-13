@@ -289,3 +289,17 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - O botão mostra o tempo restante; depois fica "USADO". Os botões **VIDA P1 / VIDA CPU**
   também recarregam o Overdrive (novo round no treino).
 - **DEMO 87** mostra tudo isso. A CPU ainda não usa o Overdrive.
+
+## Modo história (MVP)
+
+- Botão **HISTÓRIA** no HUD (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de
+  *SŌKON: BLOODLINES* como mangá animado, com a mesma linguagem da Página Final do ultra:
+  cartão de título, páginas que se montam painel por painel, balões com texto digitado, a
+  luta de treino Ryūga × Kōga no meio e o "Próximo episódio" no fim. **PULAR** vai direto
+  para a luta.
+- Motor em `android/story-core` (Java puro); episódios em JSON em
+  `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do
+  arquivo esperado.
+- Proposta, formato e roadmap da temporada: `docs/historia/README.md`. Prompts das imagens
+  para o ChatGPT: `docs/historia/prompts-ep00-ep01.md`. Revisão no PC:
+  `gradle :pc-preview:runHistoria`.

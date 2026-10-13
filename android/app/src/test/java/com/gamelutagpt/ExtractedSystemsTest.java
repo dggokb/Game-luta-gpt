@@ -59,6 +59,7 @@ public class ExtractedSystemsTest {
         assertEquals(ControlsLayout.Control.DEBUG_TOGGLE,ControlsLayout.controlAt(1100,246));
         assertEquals(ControlsLayout.Control.HEAL_PLAYER,ControlsLayout.controlAt(1120,296));
         assertEquals(ControlsLayout.Control.HEAL_OPPONENT,ControlsLayout.controlAt(1210,296));
+        assertEquals(ControlsLayout.Control.STORY,ControlsLayout.controlAt(1100,396));
         assertEquals(ControlsLayout.Control.DPAD,ControlsLayout.controlAt(ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y));
         assertEquals(ControlsLayout.Control.LIGHT,ControlsLayout.controlAt(ControlsLayout.LIGHT_X,ControlsLayout.LIGHT_Y));
         assertEquals(ControlsLayout.Control.TAG,ControlsLayout.controlAt(ControlsLayout.TAG_X,ControlsLayout.TAG_Y));

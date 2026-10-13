@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, STORY, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
 
     static final float DPAD_X = 175f;
     static final float DPAD_Y = 555f;
@@ -84,6 +84,12 @@ final class ControlsLayout {
     static final float TEAM_BUTTON_RIGHT = 1248f;
     static final float TEAM_BUTTON_BOTTOM = 366f;
 
+    // HISTÓRIA: starts the story mode (manga pages between the fights).
+    static final float STORY_BUTTON_LEFT = 1082f;
+    static final float STORY_BUTTON_TOP = 376f;
+    static final float STORY_BUTTON_RIGHT = 1248f;
+    static final float STORY_BUTTON_BOTTOM = 416f;
+
     // SELEÇÃO: back to the character select (top center).
     static final float SELECT_BUTTON_LEFT = 565f;
     static final float SELECT_BUTTON_TOP = 112f;
@@ -106,6 +112,9 @@ final class ControlsLayout {
         }
         if (insideRect(x, y, TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM)) {
             return Control.TEAM_SELECT;
+        }
+        if (insideRect(x, y, STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM)) {
+            return Control.STORY;
         }
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;

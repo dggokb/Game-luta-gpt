@@ -51,6 +51,8 @@ final class HudRenderer {
         boolean ultraReady();
         int dpadDirection();
         boolean pressed(Control control);
+        /** A luta atual faz parte de um episódio do modo história. */
+        default boolean storyActive() { return false; }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -163,6 +165,8 @@ final class HudRenderer {
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.TEAM_SELECT), "DUPLA " + s.teamLabel(),
             TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
+        drawToggle(c, s.storyActive(), "HISTÓRIA",
+            STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM, 16f);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }

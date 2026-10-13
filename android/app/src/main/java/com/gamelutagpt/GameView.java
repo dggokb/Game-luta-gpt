@@ -10,6 +10,10 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.historia.Episodio;
+import com.gamelutagpt.historia.HistoriaListener;
+import com.gamelutagpt.historia.PaginaHistoria;
+import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
 import com.gamelutagpt.stage.StageWorld;
@@ -29,7 +33,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * fixed 60 Hz {@link CombatEngine} step, then rendering. Every combat rule lives in the
  * engine; this class only presents it (sprites, Super and ultra cinematics, tag, HUD, debug).
  */
-public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable, UltraListener {
+public class GameView extends SurfaceView
+    implements SurfaceHolder.Callback, Runnable, UltraListener, HistoriaListener {
     // Team and opponent rules come from the generated character packs; DUPLA opens the
     // character select, where the player picks the pair.
     private int teamIndex;
@@ -124,6 +129,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** Desenho pela GPU (Android 8+); cai para o Canvas por software se falhar. */
     private boolean hardwareCanvas = Build.VERSION.SDK_INT >= 26;
     private final UltraSounds ultraSounds;
+
+    // Modo história (story-core): páginas de mangá entre as lutas do episódio.
+    private final PaginaHistoria historia;
+    private Temporada temporada;
+    /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
+    private int storyEpisode = -1;
+    /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
+    private int storyKoFrames;
+    private static final int STORY_KO_FRAMES = 150;
     private int ultraAttacker = -1;
     private int ultraDamageDealt;
     private float ultraCameraZoom = 1f;
@@ -221,6 +235,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
+        historia = new PaginaHistoria(this, ultraAssets);
         stageScene = loadStage(ultraAssets);
         characterSelectRenderer = new CharacterSelectRenderer(context);
         loadTeamUltras();
@@ -297,6 +312,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        // Voltar à seleção abandona o episódio que estiver tocando.
+        historia.stop();
+        storyEpisode = -1;
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
             opponentFighter.character.id, opponentTagId);
@@ -306,7 +324,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (characterSelect.isOpen()) {
+        if (characterSelect.isOpen() || historia.coversScreen()) {
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -521,6 +539,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             while ((key = selectionKeys.poll()) != null) handleSelectionKey(key);
             return;
         }
+        if (historia.coversScreen()) {
+            // The fight waits behind the story page; any key turns the page, B skips.
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) handleStoryKey(key);
+            historia.update(FIXED_STEP);
+            return;
+        }
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
             paginaFinal.update(FIXED_STEP);
@@ -589,6 +615,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         updateFighterSprite(spriteFighterRenderer, player(), true);
         updateFighterSprite(opponentSpriteRenderer, opponent(), false);
         if (intro && ++introFrame >= introTotalFrames) introFrame = -1;
+        updateStoryFight();
     }
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
@@ -650,6 +677,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         @Override public int demoPlaying() { return demo.demo(); }
         @Override public String demoTitle() { return demo.title(); }
         @Override public String demoCaption() { return demo.caption(); }
+        @Override public boolean storyActive() { return historia.isActive(); }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -1079,6 +1107,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
             if (characterSelect.isOpen()) {
                 characterSelectRenderer.draw(canvas, paint, characterSelect);
+                canvas.restore();
+                return;
+            }
+            if (historia.coversScreen()) {
+                renderCanvas.begin(canvas);
+                historia.render(renderCanvas);
                 canvas.restore();
                 return;
             }
@@ -1767,6 +1801,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             return;
         }
+        if (historia.coversScreen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                historia.tap(event.getX(index) / sx, event.getY(index) / sy);
+            }
+            return;
+        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing.
@@ -1798,6 +1838,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
                     break;
                 case TEAM_SELECT:
                     openCharacterSelect();
+                    break;
+                case STORY:
+                    startStory();
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
@@ -1880,6 +1923,89 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else if (action == MotionEvent.ACTION_CANCEL) {
             releaseAllPointers();
             pad.setDirection(0);
+        }
+    }
+
+    // ------------------------------------------------------------ modo história
+
+    /** HISTÓRIA: toca a temporada desde o primeiro episódio. */
+    private void startStory() {
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        try {
+            temporada = Temporada.load(ultraAssets);
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "modo história indisponível", ex);
+            return;
+        }
+        hud.resetEffects();
+        pad.reset();
+        releaseAllPointers();
+        selectionKeys.clear();
+        playStoryEpisode(0);
+    }
+
+    private void playStoryEpisode(int index) {
+        storyEpisode = index;
+        String id = temporada.episodios.get(index);
+        try {
+            historia.start(temporada, temporada.loadEpisodio(ultraAssets, id));
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
+            storyEpisode = -1;
+            openCharacterSelect();
+        }
+    }
+
+    private void handleStoryKey(int keyCode) {
+        boolean skip = keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_BACK ||
+            keyCode == KeyEvent.KEYCODE_ESCAPE;
+        if (skip) {
+            historia.tap((PaginaHistoria.SKIP_LEFT + PaginaHistoria.SKIP_RIGHT) * 0.5f,
+                (PaginaHistoria.SKIP_TOP + PaginaHistoria.SKIP_BOTTOM) * 0.5f);
+        } else {
+            historia.tap(VW * 0.5f, VH * 0.5f);
+        }
+    }
+
+    /** Luta de um episódio: depois do KO e da comemoração, a história continua. */
+    private void updateStoryFight() {
+        if (!historia.waitingFight()) return;
+        if (!player().ko() && !opponent().ko()) {
+            storyKoFrames = 0;
+            return;
+        }
+        if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0) return;
+        storyKoFrames = 0;
+        boolean won = opponent().ko() && !player().ko();
+        pad.reset();
+        releaseAllPointers();
+        historia.resultadoLuta(won);
+    }
+
+    @Override
+    public void onHistoriaLuta(Episodio.Passo luta) {
+        // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta.
+        selectTeams(luta.dupla[0], luta.dupla[1], luta.cpu[0], luta.cpu[1]);
+        setOpponentAiEnabled(true);
+        storyKoFrames = 0;
+        pad.reset();
+        releaseAllPointers();
+        if (luta.rotulo != null) showBanner(luta.rotulo);
+    }
+
+    @Override
+    public void onHistoriaSom(String id) {
+        ultraSounds.play(Temporada.PASTA, id);
+    }
+
+    @Override
+    public void onHistoriaFim(Episodio episodio) {
+        int next = storyEpisode + 1;
+        if (temporada != null && next < temporada.episodios.size()) {
+            playStoryEpisode(next);
+        } else {
+            storyEpisode = -1;
+            openCharacterSelect();
         }
     }
 

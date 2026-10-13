@@ -1,0 +1,13 @@
+plugins { id 'java-library' }
+
+// Modo história em páginas de mangá. Java puro e sem Android, como o ultra-core,
+// para rodar igual no Android e no PC.
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    api project(':render-core')
+    testImplementation 'junit:junit:4.13.2'
+}
