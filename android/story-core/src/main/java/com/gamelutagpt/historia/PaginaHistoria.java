@@ -48,6 +48,7 @@ public final class PaginaHistoria {
     private final RenderAssets assets;
     private final ArteHistoria arte = new ArteHistoria();
     private final Baloes baloes = new Baloes();
+    private final PaginaGuiada guiada = new PaginaGuiada();
     private final Rand rand = new Rand(5);
     private final Map<String, RenderImage> images = new HashMap<>();
     private final List<String> warnings = new ArrayList<>();
@@ -181,6 +182,9 @@ public final class PaginaHistoria {
         Episodio.Passo p = passo();
         if (p.tipo == Episodio.TipoPasso.TITULO && time >= TITLE_DURATION) {
             exit();
+        } else if (p.tipo == Episodio.TipoPasso.PAGINA && p.paginaPronta()) {
+            guiada.update(dt);
+            if (guiada.finished()) exit();
         } else if (p.tipo == Episodio.TipoPasso.PAGINA) {
             int[] current = beats.get(beat);
             boolean panelBeat = current[1] < 0;
@@ -249,6 +253,19 @@ public final class PaginaHistoria {
     private void beginPage(Episodio.Passo p) {
         releaseImages();
         String folder = Temporada.pasta(episodio.id);
+        if (p.paginaPronta()) {
+            RenderImage page = null;
+            try {
+                page = assets.loadImage(folder + "/" + p.imagem);
+            } catch (IOException | RuntimeException ex) {
+                warnings.add(folder + "/" + p.imagem + ": " + ex.getMessage());
+            }
+            images.put(p.imagem, page);
+            // Sem a imagem, a página vira um papel do tamanho de uma página do GPT (2:3).
+            guiada.begin(p, page, page != null ? page.width() : 1024f, page != null ? page.height() : 1536f);
+            listener.onHistoriaSom("pagina");
+            return;
+        }
         for (Episodio.Painel panel : p.paineis) {
             if (panel.imagem == null || images.containsKey(panel.imagem)) continue;
             RenderImage image = null;
@@ -283,6 +300,11 @@ public final class PaginaHistoria {
     }
 
     private void tapPage() {
+        if (passo().paginaPronta()) {
+            guiada.tap();
+            listener.onHistoriaSom("painel");
+            return;
+        }
         // Toque com texto ainda sendo digitado: mostra o texto inteiro.
         int[] current = beats.get(beat);
         if (current[1] >= 0) {
@@ -317,8 +339,9 @@ public final class PaginaHistoria {
     /** A página está inteira na tela: último painel e último balão, com o texto todo digitado. */
     public boolean pageComplete() {
         Episodio.Passo p = passo();
-        return p != null && p.tipo == Episodio.TipoPasso.PAGINA && !waitingFight && exitAt < 0f &&
-            beat + 1 >= beats.size() && waitingTap();
+        if (p == null || p.tipo != Episodio.TipoPasso.PAGINA || waitingFight || exitAt >= 0f) return false;
+        if (p.paginaPronta()) return guiada.onLastPanel();
+        return beat + 1 >= beats.size() && waitingTap();
     }
 
     /** Esperando o toque do jogador (mostra a setinha). */
@@ -327,6 +350,7 @@ public final class PaginaHistoria {
         Episodio.Passo p = passo();
         if (p.tipo == Episodio.TipoPasso.PROXIMO) return time >= NEXT_MIN_TAP;
         if (p.tipo != Episodio.TipoPasso.PAGINA) return false;
+        if (p.paginaPronta()) return guiada.waitingTap();
         int[] current = beats.get(beat);
         if (current[1] < 0) {
             boolean auto = !p.paineis.get(current[0]).baloes.isEmpty();
@@ -354,7 +378,11 @@ public final class PaginaHistoria {
                 drawNext(c, p);
                 break;
             case PAGINA:
-                drawPage(c, p);
+                if (p.paginaPronta()) {
+                    guiada.render(c);
+                } else {
+                    drawPage(c, p);
+                }
                 break;
             default:
                 break;

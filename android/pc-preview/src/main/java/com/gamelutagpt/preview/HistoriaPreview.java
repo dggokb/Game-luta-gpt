@@ -65,7 +65,12 @@ public final class HistoriaPreview implements HistoriaListener {
             Episodio.Passo passo = pagina.passo();
             if (passo == null) break;
             float holdFor = passo.tipo == Episodio.TipoPasso.TITULO ? 1.4f : 2.0f;
-            if (passo.tipo == Episodio.TipoPasso.PAGINA) {
+            if (passo.tipo == Episodio.TipoPasso.PAGINA && passo.paginaPronta()) {
+                // Página pronta: um quadro por toque; grava cada quadro em foco.
+                step(1.6f);
+                if (pagina.passo() == passo) save(passo);
+                pagina.tap(640f, 360f);
+            } else if (passo.tipo == Episodio.TipoPasso.PAGINA) {
                 // Toca até a página estar inteira; o próximo toque já sai dela.
                 step(3.0f);
                 boolean complete = pagina.pageComplete();

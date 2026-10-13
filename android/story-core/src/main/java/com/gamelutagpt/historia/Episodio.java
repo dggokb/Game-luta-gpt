@@ -42,9 +42,13 @@ public final class Episodio {
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
+        // PAGINA pronta: a página inteira numa imagem, mostrada quadro a quadro (leitura guiada)
+        public final String imagem;
+        public final List<Quadro> quadros;
 
         Passo(TipoPasso tipo, String layout, String tom, List<Painel> paineis, String[] dupla, String[] cpu,
-              String rotulo, boolean repetirSeDerrota, String titulo, List<String> linhas) {
+              String rotulo, boolean repetirSeDerrota, String titulo, List<String> linhas,
+              String imagem, List<Quadro> quadros) {
             this.tipo = tipo;
             this.layout = layout;
             this.tom = tom;
@@ -55,10 +59,35 @@ public final class Episodio {
             this.repetirSeDerrota = repetirSeDerrota;
             this.titulo = titulo;
             this.linhas = linhas;
+            this.imagem = imagem;
+            this.quadros = quadros;
         }
 
         public boolean flashback() {
             return "flashback".equals(tom);
+        }
+
+        /** Página pronta (uma imagem com tudo desenhado), lida quadro a quadro. */
+        public boolean paginaPronta() {
+            return imagem != null;
+        }
+    }
+
+    /**
+     * Um quadro de uma página pronta: o contorno dele na imagem, em frações da página
+     * ({0, 0} topo esquerdo, {1, 1} base direita), na ordem de leitura.
+     */
+    public static final class Quadro {
+        public final float[] area;
+        /** O quadro chega tremendo a tela, com um clarão (golpes, gritos). */
+        public final boolean impacto;
+        /** Narração escrita pelo jogo embaixo da tela enquanto o quadro está em foco, ou null. */
+        public final String legenda;
+
+        Quadro(float[] area, boolean impacto, String legenda) {
+            this.area = area;
+            this.impacto = impacto;
+            this.legenda = legenda;
         }
     }
 
@@ -136,7 +165,12 @@ public final class Episodio {
         List<Painel> paineis = new ArrayList<>();
         for (Object item : list(map, "paineis")) paineis.add(painel(asMap(item)));
         String layout = string(map, "layout", null);
-        if (tipo == TipoPasso.PAGINA) {
+        String imagem = string(map, "imagem", null);
+        List<Quadro> quadros = new ArrayList<>();
+        for (Object item : list(map, "quadros")) quadros.add(quadro(asMap(item)));
+        if (tipo == TipoPasso.PAGINA && imagem != null) {
+            if (quadros.isEmpty()) throw new IllegalArgumentException("página pronta " + imagem + " sem quadros");
+        } else if (tipo == TipoPasso.PAGINA) {
             if (paineis.isEmpty()) throw new IllegalArgumentException("página sem painéis");
             if (layout == null) layout = Layouts.padrao(paineis.size());
             if (Layouts.get(layout).length != paineis.size()) {
@@ -149,7 +183,22 @@ public final class Episodio {
         return new Passo(tipo, layout, string(map, "tom", "papel"), Collections.unmodifiableList(paineis),
             pair(map, "dupla"), pair(map, "cpu"), string(map, "rotulo", null),
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), string(map, "titulo", null),
-            Collections.unmodifiableList(linhas));
+            Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros));
+    }
+
+    private static Quadro quadro(Map<String, Object> map) {
+        List<Object> values = list(map, "area");
+        if (values.size() < 6 || values.size() % 2 != 0) {
+            throw new IllegalArgumentException("area do quadro precisa ser [x0, y0, x1, y1, x2, y2, ...]");
+        }
+        float[] area = new float[values.size()];
+        for (int i = 0; i < area.length; i++) {
+            Object v = values.get(i);
+            if (!(v instanceof Number)) throw new IllegalArgumentException("area do quadro com valor que não é número");
+            area[i] = ((Number)v).floatValue();
+            if (area[i] < -0.01f || area[i] > 1.01f) throw new IllegalArgumentException("area do quadro fora da página: " + area[i]);
+        }
+        return new Quadro(area, Boolean.TRUE.equals(map.get("impacto")), string(map, "legenda", null));
     }
 
     private static Painel painel(Map<String, Object> map) {
