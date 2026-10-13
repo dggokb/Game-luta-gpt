@@ -1,0 +1,12 @@
+{
+  "titulo": "SŌKON: BLOODLINES",
+  "subtitulo": "双魂",
+  "elenco": {
+    "ryuga":     { "nome": "Ryūga",     "cor": "#2F6FD6", "lutador": "player_base" },
+    "koga":      { "nome": "Kōga",      "cor": "#C62F2F", "lutador": "p03" },
+    "takatoshi": { "nome": "Takatoshi", "cor": "#3B3F8F" },
+    "dafu":      { "nome": "Dafu",      "cor": "#D9A441" },
+    "mensageiro":{ "nome": "???",       "cor": "#4A4A55" }
+  },
+  "episodios": ["ep00", "ep01"]
+}

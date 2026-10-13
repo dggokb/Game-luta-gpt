@@ -19,6 +19,8 @@ android {
 dependencies {
     // Ultra "Página Final": pure Java engine shared with the PC preview.
     implementation project(':ultra-core')
+    // Modo história em páginas de mangá, também Java puro.
+    implementation project(':story-core')
     // Cenário com falso 3D, também Java puro.
     implementation project(':stage-core')
     androidTestImplementation 'androidx.test:runner:1.6.2'

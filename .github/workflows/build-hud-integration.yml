@@ -23,7 +23,7 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
       - name: Validate HUD with the destination selection and compile APK
         working-directory: android
-        run: gradle :app:testDebugUnitTest --tests '*HudArtTest' --tests '*HudEffectsTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelect*Test' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :app:assembleDebug -x :app:verifySpritePacks --stacktrace
+        run: gradle :app:testDebugUnitTest --tests '*HudArtTest' --tests '*HudEffectsTest' --tests '*ExtractedSystemsTest' --tests '*CharacterSelect*Test' --tests '*SpriteIntegrationTest.lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting' :ultra-core:test :stage-core:test :story-core:test :app:assembleDebug -x :app:verifySpritePacks --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:

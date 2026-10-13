@@ -67,6 +67,14 @@ public interface RenderCanvas {
         boolean italic
     );
 
+    /**
+     * Largura do texto como o {@link #drawText} desenha (negrito). A versão padrão é só uma
+     * estimativa; as plataformas medem com a fonte de verdade.
+     */
+    default float measureText(String text, float size, boolean italic) {
+        return text.length() * size * 0.56f;
+    }
+
     /** Tudo entre beginInvert e endInvert sai com as cores invertidas (quadro de impacto). */
     void beginInvert();
 

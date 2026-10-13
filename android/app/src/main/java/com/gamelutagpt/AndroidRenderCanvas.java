@@ -181,6 +181,15 @@ final class AndroidRenderCanvas implements RenderCanvas {
     }
 
     @Override
+    public float measureText(String text, float size, boolean italic) {
+        paint.setTextSize(size);
+        paint.setTextSkewX(italic ? -0.22f : 0f);
+        float width = paint.measureText(text);
+        paint.setTextSkewX(0f);
+        return width;
+    }
+
+    @Override
     public void beginInvert() {
         canvas.saveLayer(null, invertPaint);
     }

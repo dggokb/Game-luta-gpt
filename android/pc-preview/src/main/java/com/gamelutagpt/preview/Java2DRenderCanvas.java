@@ -232,6 +232,12 @@ public final class Java2DRenderCanvas implements RenderCanvas {
     }
 
     @Override
+    public float measureText(String text, float size, boolean italic) {
+        Font font = new Font(Font.SANS_SERIF, Font.BOLD | (italic ? Font.ITALIC : 0), 1).deriveFont(size);
+        return (float)font.createGlyphVector(g.getFontRenderContext(), text).getLogicalBounds().getWidth();
+    }
+
+    @Override
     public void beginInvert() {
         BufferedImage layer = new BufferedImage(pixelWidth, pixelHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D layerGraphics = layer.createGraphics();
