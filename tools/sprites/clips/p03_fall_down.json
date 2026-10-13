@@ -2,18 +2,18 @@
   "id": "p03_fall_down",
   "javaName": "P03_FALL_DOWN",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_fall_down_video_normalized.png",
+  "source": "art/sprites/source/p03_fall_down_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_fall_down.png",
   "report": "tools/sprites/reports/p03_fall_down.report.json",
   "preview": "android/app/build/sprite-review/p03_fall_down-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 6,
   "rootMode": "authored",
-  "frameWidth": 512,
-  "frameHeight": 320,
-  "rootX": 256,
-  "rootY": 300,
+  "frameWidth": 1024,
+  "frameHeight": 640,
+  "rootX": 512,
+  "rootY": 600,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). Derrubado: queda (0-6) e no chao (7-10); pes na raiz, cada quadro no proprio tronco; poeira recortada.",
   "video": {
     "arquivo": "caindo.mp4",
@@ -29,5 +29,9 @@
     "pe_no_chao": true,
     "sem_poeira": true,
     "sem_efeitos": true
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p03_fall_down_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

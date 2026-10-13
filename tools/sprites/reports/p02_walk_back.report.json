@@ -1,16 +1,16 @@
 {
   "id": "p02_walk_back",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_walk_back_video_normalized.png",
+  "source": "art/sprites/source/p02_walk_back_sr_hd.png",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 224,
-    "frameHeight": 256,
-    "rootX": 111,
-    "rootY": 238,
+    "frameWidth": 448,
+    "frameHeight": 512,
+    "rootX": 222,
+    "rootY": 476,
     "columns": 11,
     "frameCount": 15
   },
@@ -18,192 +18,197 @@
     {
       "index": 0,
       "outputBbox": [
-        31,
-        30,
-        187,
-        239
+        61,
+        60,
+        374,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14070
+      "minimumMargin": 34,
+      "opaquePixels": 56550
     },
     {
       "index": 1,
       "outputBbox": [
-        27,
-        30,
-        192,
-        239
+        55,
+        61,
+        385,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14140
+      "minimumMargin": 33,
+      "opaquePixels": 56785
     },
     {
       "index": 2,
       "outputBbox": [
-        30,
-        31,
-        195,
-        239
+        59,
+        63,
+        391,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13949
+      "minimumMargin": 33,
+      "opaquePixels": 56147
     },
     {
       "index": 3,
       "outputBbox": [
-        34,
-        32,
-        194,
-        239
+        68,
+        65,
+        389,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13733
+      "minimumMargin": 34,
+      "opaquePixels": 55262
     },
     {
       "index": 4,
       "outputBbox": [
-        42,
-        32,
-        179,
-        240
+        84,
+        64,
+        357,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13466
+      "minimumMargin": 32,
+      "opaquePixels": 54108
     },
     {
       "index": 5,
       "outputBbox": [
-        45,
-        32,
-        176,
-        240
+        90,
+        63,
+        353,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13505
+      "minimumMargin": 32,
+      "opaquePixels": 54324
     },
     {
       "index": 6,
       "outputBbox": [
-        42,
-        31,
-        182,
-        240
+        84,
+        62,
+        363,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13875
+      "minimumMargin": 32,
+      "opaquePixels": 55657
     },
     {
       "index": 7,
       "outputBbox": [
-        38,
-        29,
-        186,
-        239
+        75,
+        58,
+        372,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13998
+      "minimumMargin": 34,
+      "opaquePixels": 56300
     },
     {
       "index": 8,
       "outputBbox": [
-        28,
-        31,
-        194,
-        239
+        57,
+        63,
+        389,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14115
+      "minimumMargin": 34,
+      "opaquePixels": 56642
     },
     {
       "index": 9,
       "outputBbox": [
-        29,
-        32,
-        196,
-        239
+        58,
+        65,
+        392,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14030
+      "minimumMargin": 34,
+      "opaquePixels": 56367
     },
     {
       "index": 10,
       "outputBbox": [
-        38,
-        32,
-        192,
-        239
+        75,
+        63,
+        385,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13719
+      "minimumMargin": 34,
+      "opaquePixels": 55175
     },
     {
       "index": 11,
       "outputBbox": [
-        43,
-        33,
-        187,
-        240
+        86,
+        67,
+        374,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13596
+      "minimumMargin": 32,
+      "opaquePixels": 54620
     },
     {
       "index": 12,
       "outputBbox": [
-        45,
-        31,
-        176,
-        240
+        90,
+        62,
+        353,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13561
+      "minimumMargin": 32,
+      "opaquePixels": 54573
     },
     {
       "index": 13,
       "outputBbox": [
-        44,
-        31,
-        178,
-        240
+        88,
+        62,
+        357,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13690
+      "minimumMargin": 32,
+      "opaquePixels": 54974
     },
     {
       "index": 14,
       "outputBbox": [
-        35,
-        29,
-        187,
-        239
+        69,
+        58,
+        374,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14007
+      "minimumMargin": 34,
+      "opaquePixels": 56331
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 189,
-    "frameHeight": 231,
-    "rootX": 94,
-    "rootY": 219,
+    "frameWidth": 363,
+    "frameHeight": 448,
+    "rootX": 180,
+    "rootY": 431,
     "columns": 11,
     "frameCount": 15,
     "cropOffset": [
-      17,
-      19
+      42,
+      45
     ],
     "decodedBytes": {
-      "canonical": 5046272,
-      "packed": 3841992
-    }
+      "canonical": 20185088,
+      "packed": 14310912
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f0de78b533fba5b728c8fa40c788e97f9e8f9f1a7d48cb71089af24b829b846d",
-      "config": "dff9884e81ca0410ec853bd5b896a643911f4e5f3c6556d7254147230b7b820e",
+      "source": "d4541cce00a727911391d375c195d1fd0fd1992e776a31a36661e1dd77325298",
+      "config": "2dad2b85c4f18f38352ee0f78c57c425e5dc690165ac72b3dec9e05a5ced96e6",
       "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+    },
+    "referenceSources": {
+      "art/sprites/source/p02_walk_back_video_normalized.png": "f0de78b533fba5b728c8fa40c788e97f9e8f9f1a7d48cb71089af24b829b846d"
     }
   }
 }

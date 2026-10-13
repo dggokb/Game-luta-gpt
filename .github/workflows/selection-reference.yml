@@ -1,0 +1,79 @@
+name: Integrated selection and current sprite APK
+on:
+  push:
+    branches: ['integracao/selecao-sprite-atual-20261012']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Verify all sixteen source concepts
+        run: python3 tools/selection/verify_concepts.py
+      - name: Test selection and build APK
+        working-directory: android
+        run: gradle :app:testDebugUnitTest --tests '*CharacterSelectTest' --tests '*SpriteIntegrationTest.characterSelectPicksThePairAndPausesTheFight' --tests '*HudArtTest' --tests '*HudEffectsTest' --tests '*ExtractedSystemsTest' :app:assembleDebug :app:assembleDebugAndroidTest -x :app:verifySpritePacks --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GameLuta-Integrado-Selecao-HUD-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Enable emulator acceleration
+        run: sudo chmod 666 /dev/kvm
+      - name: Verify actual selection and TAG interaction
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_2
+          ram-size: 4096M
+          disable-animations: true
+          script: |
+            python3 tools/selection/emulator_qa.py
+            adb shell am force-stop com.gamelutagpt
+            adb install -r android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            adb shell screenrecord --size 1280x720 --time-limit 90 --bit-rate 3000000 /sdcard/hud-runtime.mp4 &
+            adb shell am instrument -w -e class com.gamelutagpt.HudRuntimeTest com.gamelutagpt.test/androidx.test.runner.AndroidJUnitRunner > hud-runtime-result.txt
+            adb shell pkill -2 screenrecord || true
+            sleep 2
+            adb pull /sdcard/hud-runtime.mp4 hud-runtime.mp4
+            mkdir -p hud-runtime-captures
+            adb pull /sdcard/Android/data/com.gamelutagpt/files/hud-assist-cooldown.png hud-runtime-captures/hud-assist-cooldown.png
+            adb pull /sdcard/Android/data/com.gamelutagpt/files/hud-assist-ready.png hud-runtime-captures/hud-assist-ready.png
+            adb pull /sdcard/Android/data/com.gamelutagpt/files/hud-tag-wave.png hud-runtime-captures/hud-tag-wave.png
+            adb pull /sdcard/Android/data/com.gamelutagpt/files/hud-tag-countdown.png hud-runtime-captures/hud-tag-countdown.png
+            cat hud-runtime-result.txt
+            grep -q 'OK (1 test)' hud-runtime-result.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Integrated-selection-HUD-QA
+          path: |
+            selection-*.png
+            selection-effects.mp4
+            selection-logcat.txt
+            hud-runtime.mp4
+            hud-runtime-result.txt
+            hud-runtime-captures/
+            android/app/build/reports/tests/
+          if-no-files-found: warn
+      - name: Publish tested APK and captures without ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk GameLuta-Integrado-Selecao-HUD.apk
+          gh release create "selectionmerged-${GITHUB_SHA:0:12}" GameLuta-Integrado-Selecao-HUD.apk selection-*.png selection-effects.mp4 selection-qa.json hud-runtime.mp4 hud-runtime-captures/hud-*.png --target "$GITHUB_SHA" --title "Seleção e HUD integradas - ${GITHUB_SHA:0:12}" --notes "APK da branch integracao/selecao-sprite-atual-20261012. Testes de seleção e validação no emulador passaram." --prerelease

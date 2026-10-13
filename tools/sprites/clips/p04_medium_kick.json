@@ -2,13 +2,13 @@
   "id": "p04_medium_kick",
   "javaName": "P04_MEDIUM_KICK",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_medium_kick_video_normalized.png",
+  "source": "art/sprites/source/p04_medium_kick_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_medium_kick.png",
   "report": "tools/sprites/reports/p04_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p04_medium_kick-import.png",
   "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -22,5 +22,12 @@
     "colunas": 11,
     "limpar_chao": true
   },
-  "rootX": 86
+  "rootX": 172,
+  "sourceReferences": [
+    "art/sprites/source/p04_medium_kick_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

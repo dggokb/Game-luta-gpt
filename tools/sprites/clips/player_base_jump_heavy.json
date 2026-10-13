@@ -2,7 +2,7 @@
   "id": "player_base_jump_heavy",
   "javaName": "JUMP_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_jump_heavy_video_normalized.png",
+  "source": "art/sprites/source/player_base_jump_heavy_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_jump_heavy.png",
   "report": "tools/sprites/reports/player_base_jump_heavy.report.json",
   "preview": "android/app/build/sprite-review/jump_heavy-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 448,
-  "rootX": 150,
+  "frameWidth": 896,
+  "rootX": 300,
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
-  "frameHeight": 320,
-  "rootY": 300
+  "frameHeight": 640,
+  "rootY": 600,
+  "sourceReferences": [
+    "art/sprites/source/player_base_jump_heavy_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

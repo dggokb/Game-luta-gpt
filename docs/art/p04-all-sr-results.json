@@ -1,0 +1,502 @@
+{
+  "totalAtlases": 38,
+  "alreadyApproved": [],
+  "generatedAtlases": 38,
+  "status": "batch generated and integrated into test branch; visual review required",
+  "atlases": [
+    {
+      "id": "p04_backdash",
+      "expectedFrames": 10,
+      "pixelScale": 2.0,
+      "columns": 10,
+      "packed": {
+        "columns": 10,
+        "rows": 1,
+        "packedWidth": 353,
+        "packedHeight": 496,
+        "decodedBytes": 7003520
+      }
+    },
+    {
+      "id": "p04_crouch",
+      "expectedFrames": 8,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 1,
+        "packedWidth": 308,
+        "packedHeight": 459,
+        "decodedBytes": 4523904
+      }
+    },
+    {
+      "id": "p04_crouch_heavy",
+      "expectedFrames": 12,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 2,
+        "packedWidth": 354,
+        "packedHeight": 664,
+        "decodedBytes": 20684928
+      }
+    },
+    {
+      "id": "p04_crouch_light",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 2,
+        "packedWidth": 453,
+        "packedHeight": 343,
+        "decodedBytes": 11187288
+      }
+    },
+    {
+      "id": "p04_crouch_medium",
+      "expectedFrames": 16,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 3,
+        "packedWidth": 603,
+        "packedHeight": 372,
+        "decodedBytes": 16150752
+      }
+    },
+    {
+      "id": "p04_dash",
+      "expectedFrames": 5,
+      "pixelScale": 2.0,
+      "columns": 5,
+      "packed": {
+        "columns": 5,
+        "rows": 1,
+        "packedWidth": 481,
+        "packedHeight": 351,
+        "decodedBytes": 3376620
+      }
+    },
+    {
+      "id": "p04_defeat",
+      "expectedFrames": 33,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 5,
+        "packedWidth": 474,
+        "packedHeight": 459,
+        "decodedBytes": 34810560
+      }
+    },
+    {
+      "id": "p04_defense_air",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 374,
+        "packedHeight": 516,
+        "decodedBytes": 5403552
+      }
+    },
+    {
+      "id": "p04_defense_crouch",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 367,
+        "packedHeight": 299,
+        "decodedBytes": 3072524
+      }
+    },
+    {
+      "id": "p04_defense_stand",
+      "expectedFrames": 8,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 1,
+        "packedWidth": 378,
+        "packedHeight": 454,
+        "decodedBytes": 5491584
+      }
+    },
+    {
+      "id": "p04_fall",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 334,
+        "packedHeight": 451,
+        "decodedBytes": 3615216
+      }
+    },
+    {
+      "id": "p04_fall_down",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 5,
+      "packed": {
+        "columns": 5,
+        "rows": 3,
+        "packedWidth": 789,
+        "packedHeight": 364,
+        "decodedBytes": 17231760
+      }
+    },
+    {
+      "id": "p04_getup",
+      "expectedFrames": 12,
+      "pixelScale": 2.0,
+      "columns": 5,
+      "packed": {
+        "columns": 5,
+        "rows": 3,
+        "packedWidth": 688,
+        "packedHeight": 539,
+        "decodedBytes": 22249920
+      }
+    },
+    {
+      "id": "p04_heavy_straight",
+      "expectedFrames": 23,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 3,
+        "packedWidth": 476,
+        "packedHeight": 472,
+        "decodedBytes": 21568512
+      }
+    },
+    {
+      "id": "p04_hit_air",
+      "expectedFrames": 4,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 1,
+        "packedWidth": 707,
+        "packedHeight": 482,
+        "decodedBytes": 5452384
+      }
+    },
+    {
+      "id": "p04_hit_crouch",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 1,
+        "packedWidth": 422,
+        "packedHeight": 322,
+        "decodedBytes": 4891824
+      }
+    },
+    {
+      "id": "p04_hit_stand",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 1,
+        "packedWidth": 350,
+        "packedHeight": 454,
+        "decodedBytes": 5720400
+      }
+    },
+    {
+      "id": "p04_idle",
+      "expectedFrames": 68,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 7,
+        "packedWidth": 296,
+        "packedHeight": 459,
+        "decodedBytes": 41846112
+      }
+    },
+    {
+      "id": "p04_intro",
+      "expectedFrames": 27,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 368,
+        "packedHeight": 601,
+        "decodedBytes": 29194176
+      }
+    },
+    {
+      "id": "p04_jump",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 289,
+        "packedHeight": 490,
+        "decodedBytes": 3398640
+      }
+    },
+    {
+      "id": "p04_jump_heavy",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 488,
+        "packedHeight": 518,
+        "decodedBytes": 7077952
+      }
+    },
+    {
+      "id": "p04_jump_heavy_down",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 403,
+        "packedHeight": 617,
+        "decodedBytes": 6962228
+      }
+    },
+    {
+      "id": "p04_jump_light",
+      "expectedFrames": 7,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 1,
+        "packedWidth": 570,
+        "packedHeight": 494,
+        "decodedBytes": 7884240
+      }
+    },
+    {
+      "id": "p04_land",
+      "expectedFrames": 4,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 1,
+        "packedWidth": 328,
+        "packedHeight": 496,
+        "decodedBytes": 2603008
+      }
+    },
+    {
+      "id": "p04_light_jab",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 2,
+        "packedWidth": 428,
+        "packedHeight": 455,
+        "decodedBytes": 14021280
+      }
+    },
+    {
+      "id": "p04_medium_kick",
+      "expectedFrames": 14,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 2,
+        "packedWidth": 461,
+        "packedHeight": 456,
+        "decodedBytes": 13453824
+      }
+    },
+    {
+      "id": "p04_rise",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 303,
+        "packedHeight": 452,
+        "decodedBytes": 3286944
+      }
+    },
+    {
+      "id": "p04_special_energy",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 2,
+        "packedWidth": 504,
+        "packedHeight": 504,
+        "decodedBytes": 16257024
+      }
+    },
+    {
+      "id": "p04_special_s2",
+      "expectedFrames": 20,
+      "pixelScale": 2.0,
+      "columns": 10,
+      "packed": {
+        "columns": 10,
+        "rows": 2,
+        "packedWidth": 384,
+        "packedHeight": 470,
+        "decodedBytes": 14438400
+      }
+    },
+    {
+      "id": "p04_special_s3",
+      "expectedFrames": 21,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 3,
+        "packedWidth": 512,
+        "packedHeight": 448,
+        "decodedBytes": 22020096
+      }
+    },
+    {
+      "id": "p04_special_s4",
+      "expectedFrames": 20,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 5,
+        "packedWidth": 874,
+        "packedHeight": 452,
+        "decodedBytes": 31603840
+      }
+    },
+    {
+      "id": "p04_super_wave",
+      "expectedFrames": 22,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 4,
+        "packedWidth": 529,
+        "packedHeight": 474,
+        "decodedBytes": 28083552
+      }
+    },
+    {
+      "id": "p04_taunt",
+      "expectedFrames": 33,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 4,
+        "packedWidth": 425,
+        "packedHeight": 474,
+        "decodedBytes": 29008800
+      }
+    },
+    {
+      "id": "p04_throw",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 626,
+        "packedHeight": 458,
+        "decodedBytes": 13761984
+      }
+    },
+    {
+      "id": "p04_ultra_beam",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 7,
+      "packed": {
+        "columns": 7,
+        "rows": 2,
+        "packedWidth": 527,
+        "packedHeight": 553,
+        "decodedBytes": 16320136
+      }
+    },
+    {
+      "id": "p04_victory",
+      "expectedFrames": 33,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 366,
+        "packedHeight": 662,
+        "decodedBytes": 31982544
+      }
+    },
+    {
+      "id": "p04_walk_back",
+      "expectedFrames": 27,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 321,
+        "packedHeight": 477,
+        "decodedBytes": 20211444
+      }
+    },
+    {
+      "id": "p04_walk_forward",
+      "expectedFrames": 28,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 332,
+        "packedHeight": 457,
+        "decodedBytes": 20027568
+      }
+    }
+  ]
+}

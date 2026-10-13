@@ -1,16 +1,16 @@
 {
   "id": "p03_crouch",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/p03_crouch_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_sr_hd.png",
   "sourceNote": "p03 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Abaixar.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 128,
-    "rootY": 238,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 256,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        54,
-        16,
-        201,
-        240
+        109,
+        31,
+        402,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14983
+      "minimumMargin": 31,
+      "opaquePixels": 60131
     },
     {
       "index": 1,
       "outputBbox": [
-        50,
-        24,
-        201,
-        240
+        100,
+        49,
+        402,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15460
+      "minimumMargin": 33,
+      "opaquePixels": 62082
     },
     {
       "index": 2,
       "outputBbox": [
-        45,
-        43,
-        202,
-        240
+        89,
+        87,
+        405,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 16077
+      "minimumMargin": 33,
+      "opaquePixels": 64656
     },
     {
       "index": 3,
       "outputBbox": [
-        45,
-        57,
-        202,
-        240
+        89,
+        114,
+        405,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15881
+      "minimumMargin": 33,
+      "opaquePixels": 63653
     },
     {
       "index": 4,
       "outputBbox": [
-        44,
-        59,
-        201,
-        240
+        87,
+        119,
+        403,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15737
+      "minimumMargin": 33,
+      "opaquePixels": 63105
     },
     {
       "index": 5,
       "outputBbox": [
-        43,
-        59,
-        200,
-        240
+        85,
+        119,
+        401,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15373
+      "minimumMargin": 33,
+      "opaquePixels": 61587
     },
     {
       "index": 6,
       "outputBbox": [
-        42,
-        60,
-        198,
-        240
+        83,
+        121,
+        397,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14898
+      "minimumMargin": 33,
+      "opaquePixels": 59704
     },
     {
       "index": 7,
       "outputBbox": [
-        41,
-        59,
-        197,
-        240
+        81,
+        119,
+        395,
+        479
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14939
+      "minimumMargin": 33,
+      "opaquePixels": 59821
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 181,
-    "frameHeight": 244,
-    "rootX": 97,
-    "rootY": 232,
+    "frameWidth": 348,
+    "frameHeight": 473,
+    "rootX": 187,
+    "rootY": 457,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      31,
-      6
+      69,
+      19
     ],
     "decodedBytes": {
-      "canonical": 2097152,
-      "packed": 1413248
-    }
+      "canonical": 8388608,
+      "packed": 5267328
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d8f91cc056ba628eb5c8697adbb9ac60cca14cd29ff031a557f4b234ab9c5d9e",
-      "config": "7f6a57cce8fe944cbd4c47e754513ed2a83ccb22e4196ab4d5b29626cebaa8fb",
+      "source": "d8b62ded833dfcc8a5c996e639bad9bbe055582e7edb4b979669687d9845809f",
+      "config": "d25edbbc20e1845b3c01856a7d21a6b9c9bd7b981ee38252faed63080c0d1148",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/p03_crouch_video_normalized.png": "d8f91cc056ba628eb5c8697adbb9ac60cca14cd29ff031a557f4b234ab9c5d9e"
     }
   }
 }

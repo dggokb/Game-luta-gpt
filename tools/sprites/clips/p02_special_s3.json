@@ -2,13 +2,13 @@
   "id": "p02_special_s3",
   "javaName": "P02_SPECIAL_S3",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_special_s3_video_normalized.png",
+  "source": "art/sprites/source/p02_special_s3_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_special_s3.png",
   "report": "tools/sprites/reports/p02_special_s3.report.json",
   "preview": "android/app/build/sprite-review/p02_special_s3-import.png",
   "expectedFrames": 21,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -26,6 +26,12 @@
       13
     ]
   },
-  "rootX": 188,
-  "frameWidth": 322
+  "rootX": 376,
+  "frameWidth": 644,
+  "sourceReferences": [
+    "art/sprites/source/p02_special_s3_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

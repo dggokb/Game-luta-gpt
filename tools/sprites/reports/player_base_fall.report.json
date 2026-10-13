@@ -1,165 +1,170 @@
 {
   "id": "player_base_fall",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_knockdown_video_normalized.png",
+  "source": "art/sprites/source/player_base_fall_sr_hd.png",
   "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 0-6 caindo para tras ate bater no chao; 7-10 caido; pes na raiz (o estado de queda e no chao).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 384,
-    "frameHeight": 320,
-    "rootX": 200,
-    "rootY": 300,
-    "columns": 11,
+    "frameWidth": 768,
+    "frameHeight": 640,
+    "rootX": 400,
+    "rootY": 600,
+    "columns": 6,
     "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        48,
-        104,
-        323,
-        301
+        96,
+        207,
+        646,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 19400
+      "minimumMargin": 37,
+      "opaquePixels": 77907
     },
     {
       "index": 1,
       "outputBbox": [
-        47,
-        108,
-        324,
-        301
+        93,
+        215,
+        648,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 19518
+      "minimumMargin": 38,
+      "opaquePixels": 78377
     },
     {
       "index": 2,
       "outputBbox": [
-        42,
-        114,
-        326,
-        300
+        83,
+        227,
+        652,
+        601
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 20112
+      "minimumMargin": 39,
+      "opaquePixels": 80889
     },
     {
       "index": 3,
       "outputBbox": [
-        42,
-        120,
-        327,
-        301
+        83,
+        239,
+        654,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 20212
+      "minimumMargin": 37,
+      "opaquePixels": 81285
     },
     {
       "index": 4,
       "outputBbox": [
-        41,
-        136,
-        324,
-        301
+        83,
+        272,
+        648,
+        602
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 19884
+      "minimumMargin": 38,
+      "opaquePixels": 79860
     },
     {
       "index": 5,
       "outputBbox": [
-        45,
-        154,
-        306,
-        301
+        90,
+        309,
+        612,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17313
+      "minimumMargin": 37,
+      "opaquePixels": 69536
     },
     {
       "index": 6,
       "outputBbox": [
-        51,
-        188,
-        331,
-        301
+        103,
+        375,
+        663,
+        601
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 17066
+      "minimumMargin": 39,
+      "opaquePixels": 68720
     },
     {
       "index": 7,
       "outputBbox": [
-        51,
-        218,
-        340,
-        300
+        103,
+        436,
+        679,
+        601
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 16085
+      "minimumMargin": 39,
+      "opaquePixels": 64653
     },
     {
       "index": 8,
       "outputBbox": [
-        52,
-        209,
-        340,
-        301
+        105,
+        417,
+        679,
+        601
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 15624
+      "minimumMargin": 39,
+      "opaquePixels": 62734
     },
     {
       "index": 9,
       "outputBbox": [
-        49,
-        229,
-        340,
-        301
+        98,
+        458,
+        679,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 15239
+      "minimumMargin": 37,
+      "opaquePixels": 60960
     },
     {
       "index": 10,
       "outputBbox": [
-        49,
-        229,
-        341,
-        301
+        97,
+        458,
+        682,
+        603
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 15195
+      "minimumMargin": 37,
+      "opaquePixels": 60835
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 320,
-    "frameHeight": 218,
-    "rootX": 169,
-    "rootY": 206,
-    "columns": 11,
+    "frameWidth": 625,
+    "frameHeight": 421,
+    "rootX": 330,
+    "rootY": 405,
+    "columns": 6,
     "frameCount": 11,
     "cropOffset": [
-      31,
-      94
+      70,
+      195
     ],
     "decodedBytes": {
-      "canonical": 5406720,
-      "packed": 3069440
-    }
+      "canonical": 23592960,
+      "packed": 12630000
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d1f5b7aee8101e57dcce11e52ff16b5c0eb031b994e06cd5baa109a1ee7ba2fc",
-      "config": "51d710fb0bfd5cc3144ce00de077ca437e184f67e088daf66dfd4ad161755ebb",
+      "source": "954a490c4bea34e44d9438f655ac36c065191670c361a39cd85ef0178aded473",
+      "config": "56017b49983158aee2c553a7763f259040772ebc78559af1cfc7133ec2d20288",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
+    },
+    "referenceSources": {
+      "art/sprites/source/player_base_knockdown_video_normalized.png": "d1f5b7aee8101e57dcce11e52ff16b5c0eb031b994e06cd5baa109a1ee7ba2fc"
     }
   }
 }

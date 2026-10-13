@@ -2,18 +2,18 @@
   "id": "p03_crouch_heavy",
   "javaName": "P03_CROUCH_HEAVY",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_crouch_heavy_video_normalized.png",
+  "source": "art/sprites/source/p03_crouch_heavy_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_heavy.png",
   "report": "tools/sprites/reports/p03_crouch_heavy.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch_heavy-import.png",
   "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 12,
+  "columns": 11,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "frameHeight": 384,
-  "rootX": 150,
-  "rootY": 366,
+  "frameWidth": 640,
+  "frameHeight": 768,
+  "rootX": 300,
+  "rootY": 732,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\"). 2H uppercut a partir do agachado; quadros com clarao pulados.",
   "video": {
     "arquivo": "upper.mp4",
@@ -25,5 +25,9 @@
     "largura": 320,
     "raiz": "150,366",
     "colunas": 12
-  }
+  },
+  "sourceReferences": [
+    "art/sprites/source/p03_crouch_heavy_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

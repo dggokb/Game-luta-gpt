@@ -26,6 +26,10 @@ final class CombatEngine {
         final int attacker, defender, damage;
         final boolean blocked, projectile;
         final String moveId;
+        /** Contact point in world space for presentation (NaN when the move has none, e.g. throws). */
+        float impactX = Float.NaN, impactY = Float.NaN;
+        /** Button class of the contact, or null when unknown. Presentation only. */
+        AttackDefinition.Strength strength;
         HitEvent(int attacker, int defender, int damage, boolean blocked, boolean projectile, String moveId) {
             this.attacker = attacker;
             this.defender = defender;
@@ -201,7 +205,18 @@ final class CombatEngine {
         detectProjectiles(superProjectiles);
 
         // 5. Reactions and pushback.
-        for (Contact contact : contacts) applyContact(contact);
+        for (Contact contact : contacts) {
+            // The point is measured before pushback moves the defender.
+            float ix = impactX(contact), iy = impactY(contact);
+            int before = events.size();
+            applyContact(contact);
+            for (int e = before; e < events.size(); e++) {
+                HitEvent event = events.get(e);
+                event.impactX = ix;
+                event.impactY = iy;
+                event.strength = contact.attack.strength;
+            }
+        }
         detectUltra(fighters[0], fighters[1]);
         detectUltra(fighters[1], fighters[0]);
         updateThrow(fighters[0], fighters[1]);
@@ -231,6 +246,11 @@ final class CombatEngine {
             f.overdriveRequestAge = -1;
             return;
         }
+        // Require a fully completed backdash AND a release to neutral before
+        // another can be recognized. This avoids backdash chaining by holding
+        // backward or repeated double taps while the hop is active.
+        if (f.backdashFrames == 0 && f.backdashCooldown == 0 &&
+            in.direction == 0) f.backdashArmed = true;
         int relative = MotionParser.relative(in.direction, f.facing);
         f.motion.record(relative, f.clock);
         int clock = f.clock;
@@ -332,10 +352,13 @@ final class CombatEngine {
         }
 
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
-            if (f.backdashRequest) {
+            if (f.backdashRequest && f.backdashFrames == 0 &&
+                f.backdashCooldown == 0 && f.backdashArmed) {
                 f.backdashFrames = config.backdashFrames;
+                f.backdashCooldown = config.backdashFrames + config.backdashRecoveryFrames;
+                f.backdashArmed = false;
                 f.forwardDashing = false;
-            } else if (f.dashRequest) {
+            } else if (f.dashRequest && f.backdashFrames == 0) {
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
             }
@@ -634,6 +657,7 @@ final class CombatEngine {
         if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
         if (f.invulnFrames > 0) f.invulnFrames--;
         if (f.throwProtect > 0) f.throwProtect--;
+        if (f.backdashCooldown > 0) f.backdashCooldown--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.launcherChase > 0) f.launcherChase--;
@@ -691,6 +715,15 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        // The winner has already won: no stale held direction, dash or air
+        // momentum may translate the victory animation around the arena.
+        // Keep the defeated fighter's knockdown and physics untouched.
+        if (!f.ko() && fighters[1 - f.index].ko()) {
+            f.forwardDashing = false;
+            f.backdashFrames = 0;
+            f.airDashFrames = 0;
+            return;
+        }
         if (f.rolling()) {
             f.x += f.rollDirection * config.rollSpeed * CombatConfig.DT;
             f.rollFrames--;
@@ -761,6 +794,13 @@ final class CombatEngine {
             return;
         }
         float scale = 1f;
+        // Ordinary neutral jumps now rise/fall briskly; preserve the superjump
+        // arc, juggle/launch physics and specialized projectile trajectories.
+        if (!f.superJumping && (f.status == CombatFighter.Status.NEUTRAL ||
+            (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
+            scale = f.vy < 0f ? config.normalJumpRisingGravityScale
+                              : config.normalJumpFallingGravityScale;
+        }
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
             scale = 0f;
@@ -1422,6 +1462,24 @@ final class CombatEngine {
         push(d, a, a.facing * config.ultraKnockback);
         ComboSession session = sessions[d.index];
         if (session != null) session.airCombo = true;
+    }
+
+    /** Presentation contact point: the hitbox front clamped into the defender's body. */
+    private static float impactX(Contact c) {
+        CombatFighter a = c.attacker, d = c.defender;
+        float half = d.body().halfWidth;
+        if (c.projectile != null) return d.x - c.projectile.direction * half * .6f;
+        AttackDefinition.Box box = c.attack.hitbox(c.hitbox);
+        float front = a.facing > 0 ? a.x + box.x1 : a.x - box.x1;
+        return Math.max(d.x - half, Math.min(d.x + half, front));
+    }
+
+    private static float impactY(Contact c) {
+        CombatFighter a = c.attacker, d = c.defender;
+        float top = d.y - d.body().height(d.crouchingBody()), bottom = d.y;
+        float y = c.projectile != null ? c.projectile.y
+            : a.y - (c.attack.hitbox(c.hitbox).y0 * .3f + c.attack.hitbox(c.hitbox).y1 * .7f);
+        return Math.max(top + 12f, Math.min(bottom - 12f, y));
     }
 
     private void addContact(CombatFighter a, CombatFighter d, AttackDefinition attack, int hitbox, Projectile p) {

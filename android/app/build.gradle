@@ -8,8 +8,9 @@ android {
         minSdk 24
         targetSdk 35
         // Single version source: the HUD reads BuildConfig.VERSION_NAME.
-        versionCode 87
-        versionName '0.87-sprite-gpt-pack-v2'
+        versionCode 102
+        versionName '0.102-hud-contadores-super5'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildFeatures { buildConfig true }
     testOptions { unitTests.includeAndroidResources = true }
@@ -20,6 +21,8 @@ dependencies {
     implementation project(':ultra-core')
     // Cenário com falso 3D, também Java puro.
     implementation project(':stage-core')
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
 }
@@ -29,6 +32,38 @@ dependencies {
 // tracked files. Without Python/Pillow the local build warns and continues, while
 // CI passes -PrequireSpriteCheck=true to make a missing toolchain an error.
 def spriteRoot = rootProject.projectDir.parentFile
+
+// Reuse the existing 90s-anime portrait concepts, instead of a generic sprite UI.
+// The game packages ONLY the eight portraits currently available in the roster.
+android.sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/selection/assets'))
+tasks.register('copySelectionConcepts', Copy) {
+    from(new File(spriteRoot, 'art/concepts')) {
+        include 'p01.png', 'p02.png', 'p03.png', 'p04.png',
+                'p05.png', 'p06.png', 'p07.png', 'p08.png',
+                'p09.png', 'p10.png', 'p11.png', 'p12.png',
+                'p13.png', 'p14.png', 'p15.png', 'p16.png'
+        into 'selection/portraits'
+    }
+    into(layout.buildDirectory.dir('generated/selection/assets'))
+}
+tasks.named('preBuild').configure { dependsOn 'copySelectionConcepts' }
+// P01-only visual transforms are regenerated at build time; all other
+// fighters and sprite pack validation remain untouched.
+def p01CalibratedSource = layout.buildDirectory.file(
+    'generated/source/p01/com/gamelutagpt/P01SpriteCalibration.java')
+android.sourceSets.main.java.srcDir(layout.buildDirectory.dir('generated/source/p01'))
+tasks.register('generateP01Calibration', Exec) {
+    description = 'Generate P01 framewise idle-master calibration'
+    inputs.files(fileTree(new File(spriteRoot, 'tools/sprites/reports')) {
+        include 'player_base_*.report.json'
+    }, file('src/main/res/drawable-nodpi/player_base_victory.png'),
+       new File(spriteRoot, 'tools/sprites/generate_p01_calibration.py'))
+    outputs.file(p01CalibratedSource)
+    workingDir spriteRoot
+    commandLine 'python3', 'tools/sprites/generate_p01_calibration.py',
+        '--output', p01CalibratedSource.get().asFile.absolutePath
+}
+tasks.named('preBuild').configure { dependsOn 'generateP01Calibration' }
 tasks.register('verifySpritePacks') {
     description = 'Fails when generated sprite outputs are stale or orphaned.'
     inputs.files(fileTree(new File(spriteRoot, 'characters')),

@@ -2,7 +2,7 @@
   "id": "p03_hit_stand",
   "javaName": "P03_HIT_STAND",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_hit_stand_video_normalized.png",
+  "source": "art/sprites/source/p03_hit_stand_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_hit_stand.png",
   "report": "tools/sprites/reports/p03_hit_stand.report.json",
   "preview": "android/app/build/sprite-review/p03_hit_stand-import.png",
@@ -10,9 +10,13 @@
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "frameHeight": 288,
-  "rootX": 180,
-  "rootY": 270,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe em pe; quadros com clarao pulados."
+  "frameWidth": 768,
+  "frameHeight": 576,
+  "rootX": 360,
+  "rootY": 540,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Levar golpe em pe; quadros com clarao pulados.",
+  "sourceReferences": [
+    "art/sprites/source/p03_hit_stand_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

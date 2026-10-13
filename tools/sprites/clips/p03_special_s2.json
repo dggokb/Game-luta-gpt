@@ -2,17 +2,21 @@
   "id": "p03_special_s2",
   "javaName": "P03_SPECIAL_S2",
   "profile": "player_base.json",
-  "source": "art/sprites/source/p03_special_s2_video_normalized.png",
+  "source": "art/sprites/source/p03_special_s2_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p03_special_s2.png",
   "report": "tools/sprites/reports/p03_special_s2.report.json",
   "preview": "android/app/build/sprite-review/p03_special_s2-import.png",
   "expectedFrames": 20,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 384,
-  "frameHeight": 448,
-  "rootX": 170,
-  "rootY": 428,
-  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S2 punho ascendente; subida desenhada na arte."
+  "frameWidth": 768,
+  "frameHeight": 896,
+  "rootX": 340,
+  "rootY": 856,
+  "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. S2 punho ascendente; subida desenhada na arte.",
+  "sourceReferences": [
+    "art/sprites/source/p03_special_s2_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

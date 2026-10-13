@@ -260,7 +260,7 @@ def visual_heights(pack, atlases):
         a = pack['animations'][state];cfg,report = atlases[a['atlas']]
         frames = {f['index']:f for f in report['frames']}
         top = min(frames[i]['outputBbox'][1] for i in a['frames'])
-        return (report['layout']['rootY'] - top) * pack['_profile']['worldScale']
+        return (report['layout']['rootY'] - top) * pack['_profile']['worldScale'] / cfg.get('pixelScale', 1)
     return height('IDLE'), height('CROUCH')
 
 def compile_packs(root, results):
@@ -398,6 +398,8 @@ def compile_packs(root, results):
         for key,a in pack['animations'].items():
             cfg,report = atlases[a['atlas']]; l = report['packed']
             atlas = 'new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]+[str(l.get('columns',l['frameCount'])),str(l['frameCount'])])+')'
+            if cfg.get('pixelScale', 1) != 1:
+                atlas = atlas[:-1] + ',' + f(cfg['pixelScale']) + ')'
             lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
         for key in [b for b in BINDINGS + AIR_DOWN_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
@@ -476,6 +478,8 @@ def pack_atlas(stage, cfg, report):
     report['packed'] = {'frameWidth': pw, 'frameHeight': ph, 'rootX': l['rootX'] - x0, 'rootY': l['rootY'] - y0,
                         'columns': cols, 'frameCount': n, 'cropOffset': [x0, y0],
                         'decodedBytes': {'canonical': w * h * cols * rows * 4, 'packed': pw * ph * cols * rows * 4}}
+    if cfg.get('pixelScale', 1) != 1:
+        report['pixelScale'] = report['packed']['pixelScale'] = cfg['pixelScale']
 
 def orphans(root, outputs, results):
     """Files in generated/authored folders that no clip produces or reads."""
@@ -485,6 +489,7 @@ def orphans(root, outputs, results):
             found += [p.relative_to(root).as_posix() for p in sorted((root/folder).glob(pattern))]
     stale = [rel for rel in found if rel not in outputs]
     sources = {cfg['source'] for cfg,_ in results}
+    sources |= {source for cfg,_ in results for source in cfg.get('sourceReferences', [])}
     sources |= {read(p).get('anatomyReference',{}).get('source') for p in (root/'tools/sprites/profiles').glob('*.json')}
     unused = [p.relative_to(root).as_posix() for p in sorted((root/'art/sprites/source').iterdir()) if p.is_file() and p.relative_to(root).as_posix() not in sources]
     return stale, unused
@@ -506,6 +511,13 @@ def build(root=ROOT, check=False):
                 if cfg['id'] in ids or cfg['javaName'] in names: raise ValueError(f'{path.name}: duplicate atlas id/javaName')
                 ids.add(cfg['id']);names.add(cfg['javaName'])
                 safe(stage,cfg['source']);safe(importer.PROFILES_DIR,cfg['profile'])
+                positive(cfg.get('pixelScale', 1), cfg['id']+'.pixelScale')
+                references = cfg.get('sourceReferences', [])
+                if not isinstance(references, list) or any(not isinstance(p, str) for p in references):
+                    raise ValueError(cfg['id']+': sourceReferences must list source paths')
+                for reference in references:
+                    if not safe(stage, reference).is_file():
+                        raise ValueError(cfg['id']+': missing referenced source '+reference)
                 for key in ('output','report','preview'):
                     target=cfg[key];safe(stage,target)
                     expected=OUTPUT_FOLDERS[key]
@@ -517,6 +529,9 @@ def build(root=ROOT, check=False):
                     'source':hashlib.sha256((stage/cfg['source']).read_bytes()).hexdigest(),
                     'config':hashlib.sha256(path.read_bytes()).hexdigest(),
                     'profile':hashlib.sha256((importer.PROFILES_DIR/cfg['profile']).read_bytes()).hexdigest()}}
+                if references:
+                    report['provenance']['referenceSources'] = {
+                        p: hashlib.sha256((stage/p).read_bytes()).hexdigest() for p in references}
                 (stage/cfg['report']).write_text(json.dumps(report,indent=2)+'\n', encoding='utf-8')
                 results.append((cfg,report))
             importer.write_generated_java(results)

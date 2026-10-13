@@ -2,7 +2,7 @@
   "id": "p04_jump_light",
   "javaName": "P04_JUMP_LIGHT",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_jump_light_video_normalized.png",
+  "source": "art/sprites/source/p04_jump_light_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_jump_light.png",
   "report": "tools/sprites/reports/p04_jump_light.report.json",
   "preview": "android/app/build/sprite-review/p04_jump_light-import.png",
@@ -23,8 +23,12 @@
     "colunas": 7,
     "pe_no_chao": true
   },
-  "frameWidth": 320,
-  "frameHeight": 288,
-  "rootX": 125,
-  "rootY": 270
+  "frameWidth": 640,
+  "frameHeight": 576,
+  "rootX": 250,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p04_jump_light_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

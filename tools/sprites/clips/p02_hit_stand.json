@@ -2,13 +2,13 @@
   "id": "p02_hit_stand",
   "javaName": "P02_HIT_STAND",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_hit_stand_video_normalized.png",
+  "source": "art/sprites/source/p02_hit_stand_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_hit_stand.png",
   "report": "tools/sprites/reports/p02_hit_stand.report.json",
   "preview": "android/app/build/sprite-review/p02_hit_stand-import.png",
   "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 6,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -24,6 +24,12 @@
     "pe_no_chao": true,
     "limpar_chao": true
   },
-  "frameWidth": 352,
-  "rootX": 108
+  "frameWidth": 704,
+  "rootX": 216,
+  "sourceReferences": [
+    "art/sprites/source/p02_hit_stand_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

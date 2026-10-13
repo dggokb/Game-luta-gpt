@@ -1,16 +1,16 @@
 {
   "id": "p04_defense_stand",
   "characterProfile": "p04",
-  "source": "art/sprites/source/p04_defense_stand_video_normalized.png",
+  "source": "art/sprites/source/p04_defense_stand_sr_hd.png",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 224,
-    "frameHeight": 256,
-    "rootX": 105,
-    "rootY": 238,
+    "frameWidth": 448,
+    "frameHeight": 512,
+    "rootX": 210,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        37,
-        27,
-        171,
-        240
+        73,
+        55,
+        343,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 12169
+      "minimumMargin": 32,
+      "opaquePixels": 48940
     },
     {
       "index": 1,
       "outputBbox": [
-        24,
-        28,
-        167,
-        240
+        48,
+        57,
+        335,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14066
+      "minimumMargin": 32,
+      "opaquePixels": 56537
     },
     {
       "index": 2,
       "outputBbox": [
-        33,
-        28,
-        185,
-        240
+        66,
+        57,
+        371,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14300
+      "minimumMargin": 32,
+      "opaquePixels": 57553
     },
     {
       "index": 3,
       "outputBbox": [
-        31,
-        27,
-        183,
-        240
+        62,
+        55,
+        367,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14247
+      "minimumMargin": 32,
+      "opaquePixels": 57232
     },
     {
       "index": 4,
       "outputBbox": [
-        48,
-        28,
-        200,
-        240
+        96,
+        57,
+        401,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13656
+      "minimumMargin": 32,
+      "opaquePixels": 54905
     },
     {
       "index": 5,
       "outputBbox": [
-        50,
-        27,
-        199,
-        240
+        100,
+        54,
+        399,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13052
+      "minimumMargin": 32,
+      "opaquePixels": 52400
     },
     {
       "index": 6,
       "outputBbox": [
-        50,
-        27,
-        190,
-        240
+        99,
+        53,
+        381,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 12733
+      "minimumMargin": 32,
+      "opaquePixels": 51125
     },
     {
       "index": 7,
       "outputBbox": [
-        39,
-        26,
-        173,
-        240
+        77,
+        52,
+        346,
+        480
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 12349
+      "minimumMargin": 32,
+      "opaquePixels": 49624
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 196,
-    "frameHeight": 234,
-    "rootX": 91,
-    "rootY": 222,
+    "frameWidth": 378,
+    "frameHeight": 454,
+    "rootX": 175,
+    "rootY": 437,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      14,
-      16
+      35,
+      39
     ],
     "decodedBytes": {
-      "canonical": 1835008,
-      "packed": 1467648
-    }
+      "canonical": 7340032,
+      "packed": 5491584
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "294f7252b33460abf37a553f155711b7d9280874a4ea3ad31556390a44ae456f",
-      "config": "a097e84c59c3214ca2167b3c76d247afc0992afab8d961e0cb72fa027765e28d",
+      "source": "3d49b2737ce8e6f1a8874fb87b7f30fd1bec284ce89c2b0904dae8b28070a482",
+      "config": "7ac8c5b6d2f2836106b888a4c35ff00fa9bc6133d46861bbb7d841f5bd38157d",
       "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    },
+    "referenceSources": {
+      "art/sprites/source/p04_defense_stand_video_normalized.png": "294f7252b33460abf37a553f155711b7d9280874a4ea3ad31556390a44ae456f"
     }
   }
 }

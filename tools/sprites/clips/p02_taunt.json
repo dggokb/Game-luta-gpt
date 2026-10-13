@@ -2,7 +2,7 @@
   "id": "p02_taunt",
   "javaName": "P02_TAUNT",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_taunt_video_normalized.png",
+  "source": "art/sprites/source/p02_taunt_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_taunt.png",
   "report": "tools/sprites/reports/p02_taunt.report.json",
   "preview": "android/app/build/sprite-review/p02_taunt-import.png",
@@ -56,5 +56,12 @@
       1.209
     ]
   },
-  "rootX": 112
+  "rootX": 224,
+  "sourceReferences": [
+    "art/sprites/source/p02_taunt_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

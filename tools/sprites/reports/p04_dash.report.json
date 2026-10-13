@@ -1,99 +1,104 @@
 {
   "id": "p04_dash",
   "characterProfile": "p04",
-  "source": "art/sprites/source/p04_dash_video_normalized.png",
+  "source": "art/sprites/source/p04_dash_sr_hd.png",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 320,
-    "frameHeight": 256,
-    "rootX": 160,
-    "rootY": 238,
-    "columns": 6,
+    "frameWidth": 640,
+    "frameHeight": 512,
+    "rootX": 320,
+    "rootY": 476,
+    "columns": 5,
     "frameCount": 5
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        44,
-        78,
-        232,
-        239
+        89,
+        155,
+        465,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13665
+      "minimumMargin": 33,
+      "opaquePixels": 55368
     },
     {
       "index": 1,
       "outputBbox": [
-        51,
-        77,
-        232,
-        239
+        103,
+        153,
+        464,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13636
+      "minimumMargin": 33,
+      "opaquePixels": 54958
     },
     {
       "index": 2,
       "outputBbox": [
-        27,
-        79,
-        251,
-        239
+        53,
+        157,
+        501,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14032
+      "minimumMargin": 33,
+      "opaquePixels": 56690
     },
     {
       "index": 3,
       "outputBbox": [
-        56,
-        80,
-        241,
-        239
+        113,
+        160,
+        482,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12974
+      "minimumMargin": 33,
+      "opaquePixels": 52291
     },
     {
       "index": 4,
       "outputBbox": [
-        23,
-        87,
-        244,
-        239
+        45,
+        173,
+        489,
+        479
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15012
+      "minimumMargin": 33,
+      "opaquePixels": 60358
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 248,
-    "frameHeight": 183,
-    "rootX": 147,
-    "rootY": 171,
-    "columns": 6,
+    "frameWidth": 481,
+    "frameHeight": 351,
+    "rootX": 287,
+    "rootY": 335,
+    "columns": 5,
     "frameCount": 5,
     "cropOffset": [
-      13,
-      67
+      33,
+      141
     ],
     "decodedBytes": {
-      "canonical": 1966080,
-      "packed": 1089216
-    }
+      "canonical": 6553600,
+      "packed": 3376620
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "57c3f3d6b5b270296e54fd83fa62837a735216646200bd95ec2877c48d7c0c0e",
-      "config": "1651425e0f0a65e2ffe81473bb0d0a563307c8b434ee3540c21babe2439193cf",
+      "source": "baf0939110c3c0597ba3b671224fb544570ead4a666182f1e0266bd2f0ccf54c",
+      "config": "128ece5a5e18961580770fb7fae4d470c5400b20592dd06d6a19e1c39f53bba7",
       "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    },
+    "referenceSources": {
+      "art/sprites/source/p04_dash_video_normalized.png": "57c3f3d6b5b270296e54fd83fa62837a735216646200bd95ec2877c48d7c0c0e"
     }
   }
 }

@@ -262,6 +262,34 @@ public class SpriteIntegrationTest {
         int id=r.getIdentifier(a.resource,"drawable",RuntimeEnvironment.getApplication().getPackageName());
         return BitmapFactory.decodeResource(r,id);
     }
+
+    @Test public void hdIdleDrawsAtCanonicalSizeAndKeepsRootInBothDirections()throws Exception {
+        SpriteFighterRenderer renderer=(SpriteFighterRenderer)get("spriteFighterRenderer");
+        CharacterDefinition character=renderer.character();
+        CharacterDefinition.Animation idle=character.animation("IDLE");
+        assertEquals(2f,idle.atlas.pixelScale,0f);
+        assertEquals(76,idle.atlas.count);
+        assertEquals(76*.042f,idle.duration,.00001f);
+        Field field=SpriteFighterRenderer.class.getDeclaredField("destination");field.setAccessible(true);
+        Bitmap screen=Bitmap.createBitmap(600,400,Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(screen);
+        for(int facing:new int[]{1,-1}) {
+            renderer.motion.clip="IDLE";renderer.motion.time=75*.042f+.01f;
+            renderer.draw(canvas,300f,300f,facing,false,false);
+            RectF destination=(RectF)field.get(renderer);
+            float scale=character.profile.worldScale/2f;
+            assertEquals(idle.atlas.width*scale,destination.width(),.001f);
+            assertEquals(300f,destination.left+idle.atlas.rootX*scale,.001f);
+            assertEquals(300f,destination.top+idle.atlas.rootY*scale,.001f);
+        }
+        renderer.motion.clip="LIGHT_JAB";renderer.motion.time=0f;
+        renderer.draw(canvas,300f,300f,1,false,false);
+        CharacterDefinition.Atlas jab=character.animation("LIGHT_JAB").atlas;
+        assertEquals(1f,jab.pixelScale,0f);
+        RectF destination=(RectF)field.get(renderer);
+        assertEquals(jab.width*character.profile.worldScale,destination.width(),.001f);
+        screen.recycle();
+    }
     /** Every packed cell of the attack atlas holds one whole pose with a safety margin. */
     private void assertAttackAtlasCellsAreWhole(String animation) {
         CharacterDefinition.Atlas a=GeneratedCharacters.defaultCharacter().animation(animation).atlas;
@@ -523,12 +551,12 @@ public class SpriteIntegrationTest {
     @Test public void lifeButtonsRefillTheTeamAndTheCpuWithoutRestarting()throws Exception {
         FighterState[] team=(FighterState[])get("team");
         team[0].life=0;team[1].life=1234;npc().state.life=10;
-        touch(MotionEvent.ACTION_DOWN,1120,250);touch(MotionEvent.ACTION_UP,1120,250);frames(1);
+        touch(MotionEvent.ACTION_DOWN,1120,296);touch(MotionEvent.ACTION_UP,1120,296);frames(1);
         assertEquals(team[0].profile.maxLife,team[0].life);
         assertEquals(team[1].profile.maxLife,team[1].life);
         assertFalse("A KO'd player fights again",player().ko());
         assertEquals("CPU untouched",10,npc().state.life);
-        touch(MotionEvent.ACTION_DOWN,1210,250);touch(MotionEvent.ACTION_UP,1210,250);frames(1);
+        touch(MotionEvent.ACTION_DOWN,1210,296);touch(MotionEvent.ACTION_UP,1210,296);frames(1);
         assertEquals(npc().state.profile.maxLife,npc().state.life);
     }
     @Test public void walkingIntoTheOpponentPushesInsteadOfOverlapping()throws Exception {
@@ -568,24 +596,31 @@ public class SpriteIntegrationTest {
     private void tapCard(CharacterSelect s,String id)throws Exception {
         int i=java.util.Arrays.asList(s.ids).indexOf(id);
         invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
-            s.cardLeft(i)+s.cardWidth()/2,CharacterSelect.CARD_TOP+CharacterSelect.CARD_H/2);
+            s.cardLeft(i)+s.cardWidth()/2,s.cardTop(i)+s.cardHeight()/2);
+    }
+    private void tapSelectSlot(CharacterSelect s,int side,int slot)throws Exception {
+        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
+            s.slotLeft(side)+60f,s.slotTop(slot)+CharacterSelect.SLOT_H/2);
     }
     @Test public void characterSelectPicksThePairAndPausesTheFight()throws Exception {
         CharacterSelect s=(CharacterSelect)get("characterSelect");
         assertTrue("p01 to p04 are selectable",s.ids.length>=4);
         invoke("openCharacterSelect",new Class<?>[0]);
         assertTrue(s.isOpen());
-        // Opens with the current pair; drop both, then pick p04 (point) and p02 (partner).
-        tapCard(s,"player_base");tapCard(s,"p03");
+        // A new pass always asks for P1, TAG P1, P2, TAG P2 in order.
         assertFalse(s.ready());
         float x=player().x;
         press(PadInput.Button.HEAVY,0);frames(5);
         assertFalse("The fight waits behind the select screen",player().attacking());
         assertEquals(x,player().x,0.01f);
-        tapCard(s,"p04");tapCard(s,"p02");
-        assertEquals(1,s.order("p04"));assertEquals(2,s.order("p02"));
-        tapCard(s,"p03");
-        assertEquals("Only two picks",0,s.order("p03"));
+        tapCard(s,"p04");assertEquals(1,s.step());
+        tapCard(s,"p02");assertEquals(2,s.step());
+        tapCard(s,"p03");assertEquals(3,s.step());
+        tapCard(s,"p06");assertTrue(s.ready());
+        assertEquals(1,s.order(0,"p04"));
+        assertEquals(2,s.order(0,"p02"));
+        assertEquals(0,s.order(0,"p03"));
+        assertTrue("P2 has its own point and TAG",s.order(1,s.opponentPoint())==1);
         invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
             (CharacterSelect.FIGHT_LEFT+CharacterSelect.FIGHT_RIGHT)/2,(CharacterSelect.FIGHT_TOP+CharacterSelect.FIGHT_BOTTOM)/2);
         assertFalse(s.isOpen());
@@ -593,6 +628,8 @@ public class SpriteIntegrationTest {
         assertEquals("p04",team[0].character.id);
         assertEquals("p02",team[1].character.id);
         assertEquals("p04",rendererCharacterId());
+        assertEquals("p03",npc().character().id);
+        assertEquals("p06",get("opponentTagId"));
         frames(1);
         assertEquals("INTRO",motion().clip);
     }

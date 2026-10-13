@@ -1,165 +1,170 @@
 {
   "id": "p04_crouch_light",
   "characterProfile": "p04",
-  "source": "art/sprites/source/p04_crouch_light_video_normalized.png",
+  "source": "art/sprites/source/p04_crouch_light_sr_hd.png",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 192,
-    "rootX": 103,
-    "rootY": 174,
-    "columns": 11,
+    "frameWidth": 512,
+    "frameHeight": 384,
+    "rootX": 206,
+    "rootY": 348,
+    "columns": 9,
     "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        25,
-        36,
-        160,
-        174
+        50,
+        71,
+        321,
+        349
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 10541
+      "minimumMargin": 35,
+      "opaquePixels": 42440
     },
     {
       "index": 1,
       "outputBbox": [
-        26,
-        19,
-        165,
-        175
+        52,
+        37,
+        331,
+        349
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12221
+      "minimumMargin": 35,
+      "opaquePixels": 49187
     },
     {
       "index": 2,
       "outputBbox": [
-        21,
-        21,
-        173,
-        175
+        41,
+        41,
+        346,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11275
+      "minimumMargin": 33,
+      "opaquePixels": 45484
     },
     {
       "index": 3,
       "outputBbox": [
-        24,
-        22,
-        234,
-        175
+        47,
+        43,
+        468,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12831
+      "minimumMargin": 33,
+      "opaquePixels": 51945
     },
     {
       "index": 4,
       "outputBbox": [
-        26,
-        20,
-        207,
-        175
+        52,
+        39,
+        414,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11547
+      "minimumMargin": 33,
+      "opaquePixels": 46636
     },
     {
       "index": 5,
       "outputBbox": [
-        27,
-        20,
-        208,
-        175
+        54,
+        39,
+        416,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11547
+      "minimumMargin": 33,
+      "opaquePixels": 46636
     },
     {
       "index": 6,
       "outputBbox": [
-        27,
-        18,
-        192,
-        175
+        54,
+        35,
+        384,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11376
+      "minimumMargin": 33,
+      "opaquePixels": 45825
     },
     {
       "index": 7,
       "outputBbox": [
-        29,
-        17,
-        171,
-        175
+        58,
+        33,
+        341,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11111
+      "minimumMargin": 33,
+      "opaquePixels": 44847
     },
     {
       "index": 8,
       "outputBbox": [
-        27,
-        17,
-        167,
-        175
+        53,
+        34,
+        335,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11288
+      "minimumMargin": 33,
+      "opaquePixels": 45720
     },
     {
       "index": 9,
       "outputBbox": [
-        24,
-        23,
-        166,
-        175
+        47,
+        46,
+        333,
+        351
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11195
+      "minimumMargin": 33,
+      "opaquePixels": 45207
     },
     {
       "index": 10,
       "outputBbox": [
-        21,
-        36,
-        162,
-        174
+        41,
+        71,
+        324,
+        349
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 10661
+      "minimumMargin": 35,
+      "opaquePixels": 42924
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 234,
-    "frameHeight": 179,
-    "rootX": 93,
-    "rootY": 168,
-    "columns": 11,
+    "frameWidth": 453,
+    "frameHeight": 343,
+    "rootX": 178,
+    "rootY": 328,
+    "columns": 9,
     "frameCount": 11,
     "cropOffset": [
-      10,
-      6
+      28,
+      20
     ],
     "decodedBytes": {
-      "canonical": 2162688,
-      "packed": 1842984
-    }
+      "canonical": 14155776,
+      "packed": 11187288
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "9aaf2ba9c694c0e5df0e1ab25007cdcbee638b8ebf208890c8890bd70e2fbd0a",
-      "config": "6b69ae00476596387eaa9131407744453c067dc9ea9f22e181484ca2873d5b96",
+      "source": "e631001b246f3febbf7c784494d13a14a7bfc7eabe5a8ef299349becbe6bed0b",
+      "config": "2ace2ad907c8a9be917dc1746c2112517e8f06977d34774b6427f470f83f8fae",
       "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+    },
+    "referenceSources": {
+      "art/sprites/source/p04_crouch_light_video_normalized.png": "9aaf2ba9c694c0e5df0e1ab25007cdcbee638b8ebf208890c8890bd70e2fbd0a"
     }
   }
 }

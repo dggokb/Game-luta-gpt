@@ -2,13 +2,13 @@
   "id": "p02_intro",
   "javaName": "P02_INTRO",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_intro_video_normalized.png",
+  "source": "art/sprites/source/p02_intro_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_intro.png",
   "report": "tools/sprites/reports/p02_intro.report.json",
   "preview": "android/app/build/sprite-review/p02_intro-import.png",
   "expectedFrames": 27,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -22,8 +22,12 @@
     "raiz": "114,266",
     "colunas": 11
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 114,
-  "rootY": 266
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 228,
+  "rootY": 532,
+  "sourceReferences": [
+    "art/sprites/source/p02_intro_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

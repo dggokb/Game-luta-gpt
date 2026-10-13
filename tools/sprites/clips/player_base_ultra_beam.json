@@ -2,15 +2,21 @@
   "id": "player_base_ultra_beam",
   "javaName": "ULTRA_BEAM",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/player_base_ultra_beam_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_ultra_beam.png",
   "report": "tools/sprites/reports/player_base_ultra_beam.report.json",
   "preview": "android/app/build/sprite-review/ultra_beam-import.png",
   "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 320,
-  "rootX": 140,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 9 poses do raio final: 0-2 carga (video do Super), 3 disparo, 4-6 sustentacao, 7 recuperacao, 8 guarda (video do Ultra)."
+  "frameWidth": 640,
+  "rootX": 280,
+  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. 9 poses do raio final: 0-2 carga (video do Super), 3 disparo, 4-6 sustentacao, 7 recuperacao, 8 guarda (video do Ultra).",
+  "sourceReferences": [
+    "art/sprites/source/player_base_ultra_beam_video_normalized.png"
+  ],
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

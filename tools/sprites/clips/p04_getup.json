@@ -2,13 +2,13 @@
   "id": "p04_getup",
   "javaName": "P04_GETUP",
   "profile": "p04.json",
-  "source": "art/sprites/source/p04_getup_video_normalized.png",
+  "source": "art/sprites/source/p04_getup_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p04_getup.png",
   "report": "tools/sprites/reports/p04_getup.report.json",
   "preview": "android/app/build/sprite-review/p04_getup-import.png",
   "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 5,
   "rootMode": "authored",
   "sourceNote": "p04 gerado em video (Seedance, pasta animations/p04 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
   "video": {
@@ -25,8 +25,12 @@
     "pe_no_chao": true,
     "limpar_chao": true
   },
-  "frameWidth": 384,
-  "frameHeight": 288,
-  "rootX": 218,
-  "rootY": 270
+  "frameWidth": 768,
+  "frameHeight": 576,
+  "rootX": 436,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p04_getup_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
