@@ -2,7 +2,7 @@
 
 O botão **TUTORIAL** (abaixo de HISTÓRIA) toca a cena `tutorial`: o cartão de título e as
 páginas 1 a 4 do Prólogo, até o "Vamos começar o treinamento... Estão prontos?". Depois vem o
-treino no **Dojo Shinshinkan**. No modo história é igual, porque o treino é um passo do Prólogo
+treino no **Dojo Shūshinkan**. No modo história é igual, porque o treino é um passo do Prólogo
 (`"modo": "tutorial"`), e a história continua depois dele.
 
 Takatoshi e Dafu assistem do fundo do dojo e reagem (aplaudem, riem, se espantam), e antes

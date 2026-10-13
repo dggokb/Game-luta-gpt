@@ -312,7 +312,7 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 ## Modo tutorial
 
 - Botão **TUTORIAL** (abaixo de HISTÓRIA): a intro do Prólogo (páginas 1 a 4) e depois o
-  treino guiado dos golpes no **Dojo Shinshinkan**, lição por lição (movimento, golpes,
+  treino guiado dos golpes no **Dojo Shūshinkan**, lição por lição (movimento, golpes,
   combos, defesa, especiais, agarrão, SUPER e ULTRA). No modo história o treino vem no mesmo
   ponto do Prólogo. `docs/tutorial.md`.
 - Takatoshi e Dafu assistem no fundo do dojo e reagem ao treino (atores de cenário, tipo

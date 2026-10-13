@@ -114,7 +114,7 @@ Dicas:
 - A cidade já vem com o rio e os reflexos pintados, então a camada `rio` só acrescenta os
   brilhos que piscam (`alfa` 0).
 
-## Prompts do Dojo Shinshinkan (修心館)
+## Prompts do Dojo Shūshinkan (修心館)
 
 Segundo cenário (`dojo_shinshinkan`), baseado nas duas páginas de mangá do dojo 修心館. A
 luta é **dentro do salão de treino**, um salão fechado, como na página 2: piso de madeira
@@ -166,7 +166,7 @@ Dicas do dojo:
 - O brilho das lanternas, o reflexo forte no piso encerado e as pétalas são feitos pelo
   jogo. Não precisa pôr brilho exagerado na arte.
 
-## Notas do Dojo Shinshinkan
+## Notas do Dojo Shūshinkan
 
 As imagens do GPT passam pelo `montar_dojo.py` (em vez do `preparar_cenario.py` sozinho):
 
