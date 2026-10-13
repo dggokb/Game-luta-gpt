@@ -99,7 +99,7 @@ final class ImpactEffects {
             dvy[d] = (float)Math.sin(angle) * speed - 120f * random();
             dAge[d] = 0f;
             dLife[d] = .16f + .22f * random() + .03f * size;
-            dWidth[d] = 2f + random() * (1.6f + size * .8f);
+            dWidth[d] = 3f + random() * (2f + size);
             int pick = (int)(random() * 3);
             dColor[d] = kind == GUARD ? (pick == 0 ? 0xFFFFFFFF : 0xFF7FE3FF)
                 : pick == 0 ? 0xFFFFFFFF : pick == 1 ? 0xFFFFD25A : (accent | 0xFF000000);
@@ -129,7 +129,7 @@ final class ImpactEffects {
             paint.setColor(dColor[i]);
             paint.setAlpha(Math.round(255 * (1f - k * k)));
             // Streak along velocity: fast sparks read as lines, slow ones as dots.
-            float tail = .028f;
+            float tail = .045f;
             c.drawLine(dx[i], dy[i], dx[i] - dvx[i] * tail, dy[i] - dvy[i] * tail, paint);
         }
         paint.setAlpha(255);
@@ -157,7 +157,7 @@ final class ImpactEffects {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(Math.max(1f, size * .14f * fade));
         paint.setColor(bKind[i] == GUARD ? 0xFF9BE9FF : 0xFFFFE6A6);
-        paint.setAlpha(Math.round(220 * fade));
+        paint.setAlpha(Math.round(170 * fade));
         c.drawOval(-size * (.35f + 1.05f * grow), -size * (.28f + .8f * grow),
             size * (.35f + 1.05f * grow), size * (.28f + .8f * grow), paint);
 
@@ -180,9 +180,28 @@ final class ImpactEffects {
             c.drawPath(star, paint);
         }
 
-        // Star spikes: long thin rays, longest along the blow direction.
-        int spikes = bKind[i] == GUARD ? 8 : 10;
-        float inner = size * .14f, outer = size * (.55f + .7f * grow) * (k < .12f ? .6f + 3.3f * k : 1f);
+        if (bKind[i] == HIT && size >= BURST_SIZE[HEAVY]) {
+            // Heavy blows: two long slash streaks crossing the contact point.
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            float len = size * (1.1f + 1.1f * grow);
+            for (int s = 0; s < 2; s++) {
+                double a = bAngle[i] * .15 + (s == 0 ? -.42 : .5);
+                float ex = (float)Math.cos(a) * len, ey = (float)Math.sin(a) * len * .7f;
+                paint.setStrokeWidth(size * .11f * fade + 1f);
+                paint.setColor(bColor[i]);
+                paint.setAlpha(Math.round(200 * fade));
+                c.drawLine(-ex, -ey, ex, ey, paint);
+                paint.setStrokeWidth(size * .045f * fade + 1f);
+                paint.setColor(0xFFFFFFFF);
+                paint.setAlpha(Math.round(255 * fade));
+                c.drawLine(-ex * .9f, -ey * .9f, ex * .9f, ey * .9f, paint);
+            }
+        }
+
+        // Star spikes: long rays, longest along the blow direction.
+        int spikes = bKind[i] == GUARD ? 8 : 9;
+        float inner = size * .24f, outer = size * (.55f + .7f * grow) * (k < .12f ? .6f + 3.3f * k : 1f);
         star.reset();
         for (int s = 0; s < spikes * 2; s++) {
             double a = bAngle[i] + Math.PI * s / spikes;
@@ -194,15 +213,16 @@ final class ImpactEffects {
         }
         star.close();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(bKind[i] == GUARD ? 0xFF7CDFFF : bColor[i]);
-        paint.setAlpha(Math.round(200 * fade));
-        c.save(); c.scale(1.18f, 1.18f); c.drawPath(star, paint); c.restore();
+        // Hot orange outer star, then the white one inside it.
+        paint.setColor(bKind[i] == GUARD ? 0xFF7CDFFF : 0xFFFF9A2A);
+        paint.setAlpha(Math.round(235 * fade));
+        c.save(); c.scale(1.3f, 1.3f); c.drawPath(star, paint); c.restore();
         paint.setColor(0xFFFFFFFF);
         paint.setAlpha(Math.round(255 * Math.min(1f, fade * 1.6f)));
         c.drawPath(star, paint);
 
         // Hot core: radial gradient, brightest in the first frames.
-        float core = size * (.5f + .25f * grow) * (k < .5f ? 1f : 1.6f - 1.2f * k);
+        float core = size * (.42f + .18f * grow) * (k < .5f ? 1f : 1.6f - 1.2f * k);
         if (core > 1f) {
             c.save();
             c.scale(core, core);

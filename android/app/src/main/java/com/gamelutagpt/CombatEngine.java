@@ -1478,7 +1478,7 @@ final class CombatEngine {
         CombatFighter a = c.attacker, d = c.defender;
         float top = d.y - d.body().height(d.crouchingBody()), bottom = d.y;
         float y = c.projectile != null ? c.projectile.y
-            : a.y - (c.attack.hitbox(c.hitbox).y0 + c.attack.hitbox(c.hitbox).y1) * .5f;
+            : a.y - (c.attack.hitbox(c.hitbox).y0 * .3f + c.attack.hitbox(c.hitbox).y1 * .7f);
         return Math.max(top + 12f, Math.min(bottom - 12f, y));
     }
 

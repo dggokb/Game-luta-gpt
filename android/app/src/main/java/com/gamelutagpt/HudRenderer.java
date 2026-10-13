@@ -387,8 +387,8 @@ final class HudRenderer {
             : fighter == effects.cpu.fighter ? effects.cpu : effects.reserve;
         if (life > 0f && life <= .25f) {
             // Danger: the remaining life burns red-orange and pulses.
-            paint.setColor(0xFFFF3B1E);
-            paint.setAlpha(Math.round(120 + 70 * (float)Math.sin(effects.now * 6.0)));
+            paint.setColor(0xFFFF2A1A);
+            paint.setAlpha(Math.round(185 + 55 * (float)Math.sin(effects.now * 6.0)));
             c.drawRect(x, y, x + w * life, y + h, paint);
             paint.setAlpha(255);
         }
@@ -828,7 +828,7 @@ final class HudRenderer {
         c.restore();
         // "HITS" tag next to the number.
         paint.setTextSize(24f);
-        float hitsX = leftSide ? x + numberWidth + 8f : x - numberWidth - 8f;
+        float hitsX = leftSide ? x + numberWidth + 8f : x - numberWidth - 18f;
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5f);
         paint.setColor(Color.argb(alpha, 18, 8, 22));
@@ -882,7 +882,8 @@ final class HudRenderer {
         return comboInfoText[side];
     }
 
-    private static final float VW_RIGHT = Arena.VW - 40f;
+    /** Right combo sits left of the training toggles column. */
+    private static final float VW_RIGHT = 1060f;
 
     private void drawSuperMeter(
         Canvas c,

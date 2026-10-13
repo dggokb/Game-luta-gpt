@@ -196,8 +196,8 @@ final class EffectsRenderer {
         for (int i = 0; i < 14; i++) {
             double a = i * 0.4488 + 0.21;
             float t = (phaseTimer * 2.6f + i * 0.37f) % 1f;
-            float outer = 260f - 150f * t, inner = outer - 60f - 30f * (i % 3);
-            fx.setStrokeWidth(i % 3 == 0 ? 4.5f : 2.5f);
+            float outer = 200f - 120f * t, inner = outer - 34f - 18f * (i % 3);
+            fx.setStrokeWidth(i % 3 == 0 ? 3.5f : 2f);
             fx.setColor(i % 2 == 0 ? 0xFFFFFFFF : (0xFF000000 | rgb));
             fx.setAlpha(Math.round(220 * (float)Math.sin(Math.PI * t)));
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a) * 1.15f;
@@ -210,6 +210,10 @@ final class EffectsRenderer {
             float rx = (ring == 0 ? 92f : 122f) * pulse, ry = rx * (ring == 0 ? .34f : .28f);
             float yOffset = ring == 0 ? 62f : -8f;
             float spin = phaseTimer * (ring == 0 ? 420f : -300f);
+            // Faint full ellipse, then bright travelling dashes on it.
+            fx.setStrokeWidth(ring == 0 ? 3f : 2f);
+            fx.setColor(0x66000000 | rgb);
+            c.drawOval(-rx, yOffset - ry, rx, yOffset + ry, fx);
             fx.setStrokeWidth(ring == 0 ? 5f : 3f);
             for (int arc = 0; arc < 4; arc++) {
                 fx.setColor(arc % 2 == 0 ? 0xF0FFFFFF : (0xFF000000 | rgb));
