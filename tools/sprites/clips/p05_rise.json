@@ -23,6 +23,7 @@
     "fixar": "registro",
     "limpar_chao": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_rise_video_normalized.png",
       "celula": [

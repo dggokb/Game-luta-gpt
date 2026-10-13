@@ -22,6 +22,7 @@
     "colunas": 7,
     "limpar_chao": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_taunt_video_normalized.png",
       "celula": [

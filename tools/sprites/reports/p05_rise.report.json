@@ -18,24 +18,24 @@
     {
       "index": 0,
       "outputBbox": [
-        79,
+        80,
         182,
         484,
         475
       ],
       "minimumMargin": 28,
-      "opaquePixels": 56524
+      "opaquePixels": 55426
     },
     {
       "index": 1,
       "outputBbox": [
-        61,
+        62,
         173,
         459,
         475
       ],
       "minimumMargin": 37,
-      "opaquePixels": 57358
+      "opaquePixels": 56210
     },
     {
       "index": 2,
@@ -43,10 +43,10 @@
         100,
         134,
         459,
-        477
+        476
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 58181
+      "minimumMargin": 36,
+      "opaquePixels": 57047
     },
     {
       "index": 3,
@@ -54,49 +54,49 @@
         117,
         94,
         441,
-        477
+        476
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 60207
+      "minimumMargin": 36,
+      "opaquePixels": 58995
     },
     {
       "index": 4,
       "outputBbox": [
-        119,
+        120,
         74,
         421,
-        477
+        476
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 60482
+      "minimumMargin": 36,
+      "opaquePixels": 59297
     },
     {
       "index": 5,
       "outputBbox": [
         124,
         61,
-        413,
-        477
+        412,
+        476
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 60889
+      "minimumMargin": 36,
+      "opaquePixels": 59634
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 443,
-    "frameHeight": 437,
-    "rootX": 217,
-    "rootY": 426,
+    "frameWidth": 438,
+    "frameHeight": 431,
+    "rootX": 214,
+    "rootY": 423,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      51,
-      50
+      54,
+      53
     ],
     "decodedBytes": {
       "canonical": 6291456,
-      "packed": 4646184
+      "packed": 4530672
     },
     "pixelScale": 2.0
   },
@@ -104,8 +104,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2e9819bf1204b437cbe66b34540f35d8423de8d03cd98a9f9e7e8fb15bbd5b7d",
-      "config": "9083e9c0a1a266941e1b4ed5765c0be9de4e2efee317405ccbc4e20b8f062c6f",
+      "source": "d6cb67a56dba81ba580c9b6f8ecc58a663fd1b571bd61aff97f987f2b2be9cea",
+      "config": "2da97ecb4da41bdc41f6ee9dd3ce72eb9b85b14fac2cb11d700a0b2fe72069e8",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
     },
     "referenceSources": {

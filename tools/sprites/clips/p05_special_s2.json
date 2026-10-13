@@ -23,6 +23,7 @@
     "colunas": 7,
     "limpar_chao": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_special_s2_video_normalized.png",
       "celula": [

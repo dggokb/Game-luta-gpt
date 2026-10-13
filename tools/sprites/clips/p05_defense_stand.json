@@ -23,6 +23,7 @@
     "pe_no_chao": true,
     "limpar_chao": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_defense_stand_video_normalized.png",
       "celula": [

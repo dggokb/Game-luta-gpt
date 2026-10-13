@@ -58,6 +58,7 @@
       1.184
     ],
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_victory_video_normalized.png",
       "celula": [

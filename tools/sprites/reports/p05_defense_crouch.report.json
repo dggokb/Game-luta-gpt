@@ -20,11 +20,11 @@
       "outputBbox": [
         58,
         64,
-        462,
+        461,
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 57027
+      "opaquePixels": 56035
     },
     {
       "index": 1,
@@ -35,7 +35,7 @@
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 57249
+      "opaquePixels": 56453
     },
     {
       "index": 2,
@@ -46,68 +46,68 @@
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 53934
+      "opaquePixels": 53209
     },
     {
       "index": 3,
       "outputBbox": [
+        76,
         75,
-        74,
         420,
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 53465
+      "opaquePixels": 52648
     },
     {
       "index": 4,
       "outputBbox": [
         86,
-        73,
-        422,
+        74,
+        421,
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 53370
+      "opaquePixels": 52542
     },
     {
       "index": 5,
       "outputBbox": [
-        84,
+        85,
         76,
         420,
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 53189
+      "opaquePixels": 52402
     },
     {
       "index": 6,
       "outputBbox": [
-        84,
-        77,
+        85,
+        78,
         420,
         349
       ],
       "minimumMargin": 35,
-      "opaquePixels": 52969
+      "opaquePixels": 52204
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 435,
-    "frameHeight": 306,
-    "rootX": 217,
-    "rootY": 294,
+    "frameWidth": 429,
+    "frameHeight": 301,
+    "rootX": 214,
+    "rootY": 292,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      37,
-      54
+      40,
+      56
     ],
     "decodedBytes": {
       "canonical": 5505024,
-      "packed": 3727080
+      "packed": 3615612
     },
     "pixelScale": 2.0
   },
@@ -115,8 +115,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f677a2b2e6e1ddbe1c34d476cbaa4fffbf631154b27448467a071d4b7c7322e0",
-      "config": "6b497e6a011d70cffcd131477b3938ddb56fd443b8de51d97c357d364a4e5f23",
+      "source": "1f7b7077eeb29181d9ba255544d76fa3cece2aa8d83fe49a0038ea5073c4dc0d",
+      "config": "e6c900ae4f6329eda852d3048c28771de1ff45b23026c8aee929432710da564b",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
     },
     "referenceSources": {

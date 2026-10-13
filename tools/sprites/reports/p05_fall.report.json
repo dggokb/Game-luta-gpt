@@ -20,83 +20,83 @@
       "outputBbox": [
         64,
         269,
-        408,
-        671
+        407,
+        670
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 68118
+      "minimumMargin": 34,
+      "opaquePixels": 66220
     },
     {
       "index": 1,
       "outputBbox": [
         62,
         261,
-        407,
-        671
+        406,
+        670
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 68081
+      "minimumMargin": 34,
+      "opaquePixels": 66373
     },
     {
       "index": 2,
       "outputBbox": [
         52,
-        252,
-        408,
-        671
+        253,
+        407,
+        670
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 67860
+      "minimumMargin": 34,
+      "opaquePixels": 66305
     },
     {
       "index": 3,
       "outputBbox": [
-        43,
-        242,
-        408,
-        671
+        44,
+        243,
+        407,
+        670
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 67833
+      "minimumMargin": 34,
+      "opaquePixels": 66170
     },
     {
       "index": 4,
       "outputBbox": [
-        39,
+        40,
         230,
-        404,
+        403,
         671
       ],
       "minimumMargin": 33,
-      "opaquePixels": 68758
+      "opaquePixels": 67109
     },
     {
       "index": 5,
       "outputBbox": [
-        37,
-        84,
-        410,
+        38,
+        85,
+        409,
         670
       ],
       "minimumMargin": 34,
-      "opaquePixels": 77377
+      "opaquePixels": 75147
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 393,
-    "frameHeight": 607,
-    "rootX": 223,
-    "rootY": 594,
+    "frameWidth": 387,
+    "frameHeight": 602,
+    "rootX": 220,
+    "rootY": 591,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      27,
-      74
+      30,
+      77
     ],
     "decodedBytes": {
       "canonical": 7569408,
-      "packed": 5725224
+      "packed": 5591376
     },
     "pixelScale": 2.0
   },
@@ -104,8 +104,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "63da71bbd64495a230b30a30f249794a54cd2a8ef240379d526fc4d3c772a776",
-      "config": "1cbee8a1b4acb793b504d8fe16c28d385891ffdcfaa44c9550ec822dabdc31b0",
+      "source": "045da5c90071d7e9c3ea6f08ab50738ff109b4b3e1104ae2825b19623bc9f960",
+      "config": "a4f18433fd876fee87ba483fe6ac0c058d710608e1f347e5c988e1a6378a21b6",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
     },
     "referenceSources": {

@@ -24,6 +24,7 @@
     "fixar": "quadro",
     "pe_no_chao": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_fall_down_video_normalized.png",
       "celula": [

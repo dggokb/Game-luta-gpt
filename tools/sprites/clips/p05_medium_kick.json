@@ -25,6 +25,7 @@
       3
     ],
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_medium_kick_video_normalized.png",
       "celula": [

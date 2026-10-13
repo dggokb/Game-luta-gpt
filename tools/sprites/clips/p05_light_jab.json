@@ -21,6 +21,7 @@
     "raiz": "107,238",
     "limpar_chao": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_light_jab_video_normalized.png",
       "celula": [

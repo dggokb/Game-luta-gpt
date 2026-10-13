@@ -24,6 +24,7 @@
     "limpar_chao": true,
     "ancorar_pe": true,
     "densidade": 2,
+    "nitidez": true,
     "referencia": {
       "folha": "art/sprites/source/p05_crouch_medium_video_normalized.png",
       "celula": [
