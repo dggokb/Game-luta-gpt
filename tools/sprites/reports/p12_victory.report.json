@@ -1,0 +1,407 @@
+{
+  "id": "p12_victory",
+  "characterProfile": "p12",
+  "source": "art/sprites/source/p12_victory_video_normalized.png",
+  "sourceNote": "p12 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 288,
+    "rootX": 93,
+    "rootY": 270,
+    "columns": 11,
+    "frameCount": 33
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        29,
+        133,
+        150,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 9519
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        29,
+        131,
+        150,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 9635
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        30,
+        127,
+        151,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 9827
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        31,
+        123,
+        152,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 9975
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        31,
+        119,
+        151,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10136
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        32,
+        113,
+        150,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10460
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        32,
+        105,
+        148,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10522
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        33,
+        99,
+        147,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10469
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        34,
+        93,
+        148,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10487
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        34,
+        84,
+        148,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10528
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        35,
+        76,
+        149,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10478
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        34,
+        70,
+        149,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10612
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        35,
+        65,
+        150,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10669
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        35,
+        58,
+        150,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10980
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        36,
+        52,
+        151,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11352
+    },
+    {
+      "index": 15,
+      "outputBbox": [
+        37,
+        48,
+        152,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11525
+    },
+    {
+      "index": 16,
+      "outputBbox": [
+        37,
+        46,
+        152,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11720
+    },
+    {
+      "index": 17,
+      "outputBbox": [
+        38,
+        44,
+        153,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11515
+    },
+    {
+      "index": 18,
+      "outputBbox": [
+        38,
+        44,
+        153,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11232
+    },
+    {
+      "index": 19,
+      "outputBbox": [
+        39,
+        43,
+        154,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11184
+    },
+    {
+      "index": 20,
+      "outputBbox": [
+        40,
+        43,
+        155,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11231
+    },
+    {
+      "index": 21,
+      "outputBbox": [
+        40,
+        44,
+        155,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11379
+    },
+    {
+      "index": 22,
+      "outputBbox": [
+        41,
+        44,
+        156,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11481
+    },
+    {
+      "index": 23,
+      "outputBbox": [
+        41,
+        44,
+        156,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11601
+    },
+    {
+      "index": 24,
+      "outputBbox": [
+        42,
+        44,
+        157,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11586
+    },
+    {
+      "index": 25,
+      "outputBbox": [
+        43,
+        44,
+        158,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11600
+    },
+    {
+      "index": 26,
+      "outputBbox": [
+        43,
+        44,
+        158,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11594
+    },
+    {
+      "index": 27,
+      "outputBbox": [
+        44,
+        44,
+        159,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11579
+    },
+    {
+      "index": 28,
+      "outputBbox": [
+        44,
+        44,
+        159,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11573
+    },
+    {
+      "index": 29,
+      "outputBbox": [
+        45,
+        43,
+        160,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11553
+    },
+    {
+      "index": 30,
+      "outputBbox": [
+        45,
+        43,
+        160,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11573
+    },
+    {
+      "index": 31,
+      "outputBbox": [
+        46,
+        43,
+        161,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11574
+    },
+    {
+      "index": 32,
+      "outputBbox": [
+        47,
+        43,
+        162,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 11453
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 153,
+    "frameHeight": 249,
+    "rootX": 74,
+    "rootY": 237,
+    "columns": 11,
+    "frameCount": 33,
+    "cropOffset": [
+      19,
+      33
+    ],
+    "decodedBytes": {
+      "canonical": 7299072,
+      "packed": 5028804
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "836280ca344bb185661a41802b83d8642cca24c43669c0eb43cae7e465d0ab42",
+      "config": "e634926241e612918667f37934dd29aac5af97c63fb1d87a88a7ce1e2e4ea320",
+      "profile": "bf4b8e3536c396d10dba234f12745f12c20b3cbacf439b73dd3c0dbee7b099d7"
+    }
+  }
+}

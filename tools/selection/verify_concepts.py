@@ -16,5 +16,5 @@ java=(root/'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java')
 m=re.search(r'SELECTABLE\s*=\s*new String\[\]\s*\{([^}]+)\}',java)
 assert m
 ids=re.findall(r'"([^"]+)"',m.group(1))
-assert set(ids)=={'player_base','p02','p03','p04','p05','p06','p07','p08'}
-print('16 complete concepts, 8 playable characters; future portraits never enter gameplay roster')
+assert set(ids)=={'player_base','p02','p03','p04','p05','p06','p07','p08','p09','p10','p12'}
+print('16 complete concepts, 11 playable characters; remaining future portraits never enter gameplay roster')

@@ -1,16 +1,16 @@
 {
   "id": "p05_hit_air",
   "characterProfile": "p05",
-  "source": "art/sprites/source/p05_hit_air_video_normalized.png",
-  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "source": "art/sprites/source/p05_hit_air_video_hd.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do v\u00eddeo, retoques da folha 1x revisada (sourceReferences).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 288,
-    "frameHeight": 320,
-    "rootX": 154,
-    "rootY": 302,
+    "frameWidth": 576,
+    "frameHeight": 640,
+    "rootX": 308,
+    "rootY": 604,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,71 +18,76 @@
     {
       "index": 0,
       "outputBbox": [
-        88,
-        31,
-        226,
-        304
+        177,
+        63,
+        453,
+        607
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 19016
+      "minimumMargin": 33,
+      "opaquePixels": 73899
     },
     {
       "index": 1,
       "outputBbox": [
-        38,
-        62,
-        243,
-        303
+        78,
+        124,
+        486,
+        605
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 19900
+      "minimumMargin": 35,
+      "opaquePixels": 76916
     },
     {
       "index": 2,
       "outputBbox": [
-        25,
-        64,
-        251,
-        304
+        51,
+        128,
+        503,
+        607
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 20416
+      "minimumMargin": 33,
+      "opaquePixels": 78975
     },
     {
       "index": 3,
       "outputBbox": [
-        52,
-        53,
-        263,
-        303
+        104,
+        106,
+        525,
+        606
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 20079
+      "minimumMargin": 34,
+      "opaquePixels": 77333
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 258,
-    "frameHeight": 293,
-    "rootX": 139,
-    "rootY": 281,
+    "frameWidth": 490,
+    "frameHeight": 560,
+    "rootX": 265,
+    "rootY": 549,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      15,
-      21
+      43,
+      55
     ],
     "decodedBytes": {
-      "canonical": 1474560,
-      "packed": 1209504
-    }
+      "canonical": 5898240,
+      "packed": 4390400
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1498f4f6b5170add12d0955d267b05205cc84bd7c24993375ed9816945c38342",
-      "config": "09ba88cc7f997ab84e764cb4d2b7998f65eedb82496fb29fe1d1a9fd42443f55",
+      "source": "72a639a6891a10b4ed729287e7f4a9942fec0de36a88b2fe16010bf5d8fd4cd3",
+      "config": "52a325311209648221d77e5d287db3b93a1f90c67f824010bfcb730f93a9b822",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    },
+    "referenceSources": {
+      "art/sprites/source/p05_hit_air_video_normalized.png": "1498f4f6b5170add12d0955d267b05205cc84bd7c24993375ed9816945c38342"
     }
   }
 }

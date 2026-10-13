@@ -88,6 +88,8 @@ public class GameView extends SurfaceView
     private final SpriteFighterRenderer opponentSpriteRenderer;
     private final StageRenderer stage = new StageRenderer();
     private final EffectsRenderer effects = new EffectsRenderer();
+    /** Hit and guard sparks at the real contact point (presentation only). */
+    private final ImpactEffects impacts = new ImpactEffects();
     private final HudRenderer hud = new HudRenderer();
     private final DebugOverlay debug = new DebugOverlay();
     private final HudRenderer.OpponentPanel opponentPanel = new HudRenderer.OpponentPanel();
@@ -255,10 +257,10 @@ public class GameView extends SurfaceView
 
     private static String[] selectionRoster() {
         java.util.ArrayList<String> ids=new java.util.ArrayList<>();
-        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07"};
+        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07","p09","p10","p12"};
         for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
             if(wanted.equals(available)) ids.add(available);
-        // P09–P16 are concept-only slots until their gameplay is implemented.
+        // P09–P16 without gameplay yet stay as locked concept slots after these.
         return ids.toArray(new String[0]);
     }
 
@@ -622,6 +624,7 @@ public class GameView extends SurfaceView
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
+            spawnImpact(event, ultraHit);
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
@@ -634,6 +637,7 @@ public class GameView extends SurfaceView
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) beamShake = Math.max(beamShake, 14f);
         }
         updateUltraBeam();
+        impacts.update(FIXED_STEP);
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
         if (throwBannerFrames > 0) throwBannerFrames--;
 
@@ -650,6 +654,7 @@ public class GameView extends SurfaceView
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
     void startIntro() {
         hud.resetEffects();
+        impacts.clear();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -984,6 +989,25 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** Spark, ring and debris at the contact point; heavier blows also nudge the camera. */
+    private void spawnImpact(CombatEngine.HitEvent event, boolean ultraHit) {
+        CombatFighter attacker = engine.fighter(event.attacker), defender = engine.fighter(event.defender);
+        float x = event.impactX, y = event.impactY;
+        if (Float.isNaN(x) || Float.isNaN(y)) {
+            // Throws and the ultra have no hitbox: use the defender's chest.
+            int side = defender.x >= attacker.x ? -1 : 1;
+            x = defender.x + side * defender.body().halfWidth * .5f;
+            y = defender.y - defender.body().height(defender.crouchingBody()) * .6f;
+        }
+        int direction = defender.x >= attacker.x ? 1 : -1;
+        int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
+        if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
+        int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentFighter.profile.color;
+        impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 7f : 10f);
+        else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
+    }
+
     private void showBanner(String text) {
         throwBanner = text;
         throwBannerFrames = THROW_BANNER_FRAMES;
@@ -1098,6 +1122,15 @@ public class GameView extends SurfaceView
         if (canvas == null) return;
 
         try {
+            renderFrame(canvas);
+        } finally {
+            holder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    /** Whole frame into any canvas: the surface in production, a bitmap in visual review tests. */
+    private void renderFrame(Canvas canvas) {
+        {
             resetPaintForFrame();
 
             float sx = canvas.getWidth() / VW;
@@ -1195,6 +1228,7 @@ public class GameView extends SurfaceView
             canvas.translate(tagOffset(), 0f);
             drawPlayer(canvas);
             canvas.restore();
+            impacts.draw(canvas);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
                 drawUltraBeamOverlay(canvas, true);
@@ -1217,8 +1251,6 @@ public class GameView extends SurfaceView
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
-        } finally {
-            holder.unlockCanvasAndPost(canvas);
         }
     }
 

@@ -1,16 +1,16 @@
 {
   "id": "p05_fall",
   "characterProfile": "p05",
-  "source": "art/sprites/source/p05_fall_video_normalized.png",
-  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "source": "art/sprites/source/p05_fall_video_hd.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do v\u00eddeo, retoques da folha 1x revisada (sourceReferences).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 224,
-    "frameHeight": 352,
-    "rootX": 125,
-    "rootY": 334,
+    "frameWidth": 448,
+    "frameHeight": 704,
+    "rootX": 250,
+    "rootY": 668,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        32,
-        134,
-        204,
-        335
+        64,
+        269,
+        407,
+        670
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17130
+      "minimumMargin": 34,
+      "opaquePixels": 66220
     },
     {
       "index": 1,
       "outputBbox": [
-        31,
-        130,
-        203,
-        335
+        62,
+        261,
+        406,
+        670
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17132
+      "minimumMargin": 34,
+      "opaquePixels": 66373
     },
     {
       "index": 2,
       "outputBbox": [
-        26,
-        126,
-        204,
-        335
+        52,
+        253,
+        407,
+        670
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17095
+      "minimumMargin": 34,
+      "opaquePixels": 66305
     },
     {
       "index": 3,
       "outputBbox": [
-        22,
-        121,
-        204,
-        335
+        44,
+        243,
+        407,
+        670
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17083
+      "minimumMargin": 34,
+      "opaquePixels": 66170
     },
     {
       "index": 4,
       "outputBbox": [
-        19,
-        115,
-        202,
-        335
+        40,
+        230,
+        403,
+        671
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17286
+      "minimumMargin": 33,
+      "opaquePixels": 67109
     },
     {
       "index": 5,
       "outputBbox": [
-        18,
-        42,
-        205,
-        335
+        38,
+        85,
+        409,
+        670
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 19499
+      "minimumMargin": 34,
+      "opaquePixels": 75147
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 207,
-    "frameHeight": 313,
-    "rootX": 117,
-    "rootY": 302,
+    "frameWidth": 387,
+    "frameHeight": 602,
+    "rootX": 220,
+    "rootY": 591,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      8,
-      32
+      30,
+      77
     ],
     "decodedBytes": {
-      "canonical": 1892352,
-      "packed": 1554984
-    }
+      "canonical": 7569408,
+      "packed": 5591376
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "fa034cff38902dfa007cf5c3d51e36265ee0fecf4bea1df1cf74da390ddd8c98",
-      "config": "f76407e26e30cd8cc167f316bede631d119bc0977c2893b608ba2b4048eeddf6",
+      "source": "045da5c90071d7e9c3ea6f08ab50738ff109b4b3e1104ae2825b19623bc9f960",
+      "config": "a4f18433fd876fee87ba483fe6ac0c058d710608e1f347e5c988e1a6378a21b6",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    },
+    "referenceSources": {
+      "art/sprites/source/p05_fall_video_normalized.png": "fa034cff38902dfa007cf5c3d51e36265ee0fecf4bea1df1cf74da390ddd8c98"
     }
   }
 }

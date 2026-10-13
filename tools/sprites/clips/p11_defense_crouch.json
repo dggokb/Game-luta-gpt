@@ -1,0 +1,32 @@
+{
+  "id": "p11_defense_crouch",
+  "javaName": "P11_DEFENSE_CROUCH",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_defense_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_defense_crouch.png",
+  "report": "tools/sprites/reports/p11_defense_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p11_defense_crouch-import.png",
+  "expectedFrames": 7,
+  "segmentation": "prepared-grid",
+  "columns": 7,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "defesaBaixo.mp4",
+    "personagem": "p11",
+    "escala": 0.2676,
+    "medida": "1º quadro = inicio_agachado (nota 0.79)",
+    "quadros": "1,17,33,48,64,80,96",
+    "celula": 192,
+    "largura": 288,
+    "raiz": "167,174",
+    "colunas": 7,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "frameHeight": 192,
+  "rootX": 167,
+  "rootY": 174
+}

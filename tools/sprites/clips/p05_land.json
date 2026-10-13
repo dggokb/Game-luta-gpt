@@ -2,7 +2,7 @@
   "id": "p05_land",
   "javaName": "P05_LAND",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_land_video_normalized.png",
+  "source": "art/sprites/source/p05_land_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_land.png",
   "report": "tools/sprites/reports/p05_land.report.json",
   "preview": "android/app/build/sprite-review/p05_land-import.png",
@@ -10,7 +10,7 @@
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "pulo.mp4",
     "personagem": "p05",
@@ -22,10 +22,28 @@
     "raiz": "105,334",
     "colunas": 4,
     "pe_no_chao": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p05_land_video_normalized.png",
+      "celula": [
+        224,
+        352
+      ],
+      "raiz": [
+        105,
+        334
+      ],
+      "colunas": 4
+    }
   },
-  "frameWidth": 224,
-  "frameHeight": 352,
-  "rootX": 105,
-  "rootY": 334
+  "frameWidth": 448,
+  "frameHeight": 704,
+  "rootX": 210,
+  "rootY": 668,
+  "sourceReferences": [
+    "art/sprites/source/p05_land_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

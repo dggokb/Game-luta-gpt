@@ -1,0 +1,27 @@
+{
+  "id": "p11_rise",
+  "javaName": "P11_RISE",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_rise_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_rise.png",
+  "report": "tools/sprites/reports/p11_rise.report.json",
+  "preview": "android/app/build/sprite-review/p11_rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p11",
+    "escala": 0.389,
+    "medida": "cabeça do IDLE em 4 quadros (nota 0.75)",
+    "quadros": "65,69,74,78,83,87",
+    "largura": 224,
+    "raiz": "144,238",
+    "colunas": 6,
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "rootX": 144
+}

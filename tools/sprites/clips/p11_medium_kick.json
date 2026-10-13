@@ -1,0 +1,27 @@
+{
+  "id": "p11_medium_kick",
+  "javaName": "P11_MEDIUM_KICK",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_medium_kick_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_medium_kick.png",
+  "report": "tools/sprites/reports/p11_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/p11_medium_kick-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p11",
+    "escala": 0.498,
+    "medida": "1º quadro = inicio_centro (nota 0.88)",
+    "quadros": "13,18,22,27,29,32,34,36,38,41,43,45,48,50",
+    "largura": 288,
+    "raiz": "141,238",
+    "colunas": 11,
+    "limpar_chao": true
+  },
+  "frameWidth": 288,
+  "rootX": 141
+}

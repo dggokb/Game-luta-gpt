@@ -73,6 +73,36 @@
       "sha256": "c28252bc17e5eb94fb09099e87236955983ad24bafbc3bb466bf594ca8e19e87",
       "bytes": 1571250,
       "git_sha": "d8c00dcfb3a85942d80448f141d93acd93530c01"
+    },
+    {
+      "name": "p09.png",
+      "drive_file_id": null,
+      "drive_url": null,
+      "source": "art/concepts/p09.png",
+      "asset": "ui/hud/concepts/p09.webp",
+      "sha256": "397be513533f1da72d0dcbce3973baf24c573ef9ed7b1b533ca565ce500e1b76",
+      "bytes": 2037519,
+      "git_sha": "5d66ffb219a533531e147b6ecbe363ba4a64ae1e"
+    },
+    {
+      "name": "p10.png",
+      "drive_file_id": null,
+      "drive_url": null,
+      "source": "art/concepts/p10.png",
+      "asset": "ui/hud/concepts/p10.webp",
+      "sha256": "df44a8db1dbd392fa7573bd4828ed6769fb60acabf96fd63960cd95b09c43c18",
+      "bytes": 2205474,
+      "git_sha": "1fedf5051c83969b1874738c35bbd28675e51757"
+    },
+    {
+      "name": "p12.png",
+      "drive_file_id": null,
+      "drive_url": null,
+      "source": "art/concepts/p12.png",
+      "asset": "ui/hud/concepts/p12.webp",
+      "sha256": "c3d182b9f8cc426cfc26c41ed9f9408767656a2459bfe724e025af4ca701353c",
+      "bytes": 2446418,
+      "git_sha": "f07c047a3106162303e2650644289b824dc35623"
     }
   ]
 }

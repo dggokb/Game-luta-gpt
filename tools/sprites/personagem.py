@@ -260,8 +260,9 @@ def run(args):
     return r.stdout
 
 
-def convert(char, name, video, quadros, opts, manual):
-    """Duas passadas: célula grande para medir o alcance dos quadros, depois a célula justa."""
+def convert(char, name, video, quadros, opts, manual, densidade=None):
+    """Duas passadas: célula grande para medir o alcance dos quadros, depois a célula justa.
+    Medidas em px lógicos; com densidade 2 (HD) a folha tem o dobro de px."""
     clip = clip_path(char, name)
     cols = min(len(quadros), 11)
     args = [video, '--clipe', str(clip), '--personagem', char, '--quadros', ','.join(map(str, quadros)),
@@ -272,11 +273,14 @@ def convert(char, name, video, quadros, opts, manual):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:
         args += ['--escala', str(manual[0]), '--motivo', manual[1]]
+    if densidade:
+        args += ['--densidade', str(densidade)]
     run(args + ['--celula', '512', '--largura', '768', '--raiz', '384,470', '--aparar-borda', '0'])
+    d = int(json.loads(clip.read_text(encoding='utf-8')).get('pixelScale', 1))
     sheet = Image.open(ROOT / f'art/sprites/source/{char}_{name}_video_normalized.png')
-    boxes = [sheet.crop((i % cols * 768, i // cols * 512, i % cols * 768 + 768, i // cols * 512 + 512))
+    boxes = [sheet.crop((i % cols * 768 * d, i // cols * 512 * d, (i % cols + 1) * 768 * d, (i // cols + 1) * 512 * d))
              .getchannel('A').point(lambda v: 255 if v > 10 else 0).getbbox() for i in range(len(quadros))]
-    boxes = [b for b in boxes if b]
+    boxes = [[v // d for v in b] for b in boxes if b]
     x0, y0 = min(b[0] for b in boxes), min(b[1] for b in boxes)
     x1, y1 = max(b[2] for b in boxes), max(b[3] for b in boxes)
     m = 14
@@ -385,6 +389,8 @@ def main():
     p.add_argument('estados', nargs='*', help='estados a refazer (padrão: todos com vídeo)')
     p.add_argument('--manual', action='append', default=[], help='CLIPE=ESCALA (com --motivo)')
     p.add_argument('--motivo', help='por que a escala é manual')
+    p.add_argument('--densidade', type=int,
+                   help='px de textura por px do jogo (2 = HD direto do vídeo); padrão: o da receita')
     args = p.parse_args()
     char = args.personagem
     if not (ROOT / f'art/keys/{char}/tamanho.json').exists():
@@ -414,7 +420,7 @@ def main():
 
     def work(name):
         try:
-            msg = convert(char, name, *jobs[name], manual.get(name))
+            msg = convert(char, name, *jobs[name], manual.get(name), args.densidade)
             done.append(name)
             return f'{name:16} {msg}'
         except Exception as e:  # noqa: BLE001 - relata e segue com os outros clipes

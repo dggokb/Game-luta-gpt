@@ -1,0 +1,31 @@
+{
+  "id": "p11_crouch_medium",
+  "javaName": "P11_CROUCH_MEDIUM",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_crouch_medium_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_crouch_medium.png",
+  "report": "tools/sprites/reports/p11_crouch_medium.report.json",
+  "preview": "android/app/build/sprite-review/p11_crouch_medium-import.png",
+  "expectedFrames": 16,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "2M.mp4",
+    "personagem": "p11",
+    "escala": 0.4251,
+    "medida": "último quadro = inicio_agachado (nota 0.90)",
+    "quadros": "5,8,10,13,16,16,22,24,27,30,33,37,40,43,46,49",
+    "celula": 224,
+    "largura": 416,
+    "raiz": "226,206",
+    "colunas": 11,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameWidth": 416,
+  "frameHeight": 224,
+  "rootX": 226,
+  "rootY": 206
+}

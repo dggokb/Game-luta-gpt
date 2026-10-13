@@ -2,15 +2,15 @@
   "id": "p05_backdash",
   "javaName": "P05_BACKDASH",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_backdash_video_normalized.png",
+  "source": "art/sprites/source/p05_backdash_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_backdash.png",
   "report": "tools/sprites/reports/p05_backdash.report.json",
   "preview": "android/app/build/sprite-review/p05_backdash-import.png",
   "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "backDash.mp4",
     "personagem": "p05",
@@ -20,11 +20,29 @@
     "celula": 288,
     "largura": 256,
     "raiz": "132,270",
-    "colunas": 10,
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p05_backdash_video_normalized.png",
+      "celula": [
+        256,
+        288
+      ],
+      "raiz": [
+        132,
+        270
+      ],
+      "colunas": 10
+    }
   },
-  "frameHeight": 288,
-  "rootX": 132,
-  "rootY": 270
+  "frameHeight": 576,
+  "rootX": 264,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p05_backdash_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

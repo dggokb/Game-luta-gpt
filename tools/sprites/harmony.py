@@ -51,6 +51,11 @@ def frame_cell(root, atlas_id, frame, cache):
 
 
 def measure(cell, packed, scale):
+    # HD atlas (pixelScale 2): measured at the logical size, like the 1x atlases.
+    density = int(packed.get('pixelScale', 1))
+    if density != 1:
+        cell = cell.resize((cell.width // density, cell.height // density), Image.LANCZOS)
+        packed = dict(packed, rootX=packed['rootX'] / density, rootY=packed['rootY'] / density)
     alpha = cell.getchannel('A').point(lambda v: 255 if v > 10 else 0)
     x0, y0, x1, y1 = alpha.getbbox()
     height = y1 - y0

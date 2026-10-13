@@ -78,21 +78,23 @@ def anchor(cid, atlas, show=False, pack=None, clips=None):
     rights = [int(np.nonzero(m['mask'].any(0))[0].max()) + d for m, d in zip(ms, off)]
     pad_l = int(max(0, MARGIN - min(lefts)))
     pad_r = int(max(0, max(rights) - (sheet.w - 1 - MARGIN)))
-    w = sheet.w + pad_l + pad_r
+    # Folha HD: desloca e alarga em px físicos (d x o lógico); a receita guarda o lógico.
+    d = sheet.d
+    w = sheet.pw + d * (pad_l + pad_r)
     img = Image.open(A.ROOT / cfg['source']).convert('RGBA')
     rows = (cfg['expectedFrames'] + sheet.cols - 1) // sheet.cols
-    out = Image.new('RGBA', (w * sheet.cols, sheet.h * rows), (0, 0, 0, 0))
-    for i, d in enumerate(off):
-        x, y = i % sheet.cols * sheet.w, i // sheet.cols * sheet.h
-        cell = img.crop((x, y, x + sheet.w, y + sheet.h))
-        out.alpha_composite(cell, (i % sheet.cols * w + pad_l + d, y))
+    out = Image.new('RGBA', (w * sheet.cols, sheet.ph * rows), (0, 0, 0, 0))
+    for i, o in enumerate(off):
+        x, y = i % sheet.cols * sheet.pw, i // sheet.cols * sheet.ph
+        cell = img.crop((x, y, x + sheet.pw, y + sheet.ph))
+        out.alpha_composite(cell, (i % sheet.cols * w + d * (pad_l + o), y))
     out.save(A.ROOT / cfg['source'])
     if pad_l or pad_r:
         path = clip_path(atlas)
         data = json.loads(path.read_text(encoding='utf-8'))
-        data['frameWidth'], data['rootX'] = w, sheet.rx + pad_l
+        data['frameWidth'], data['rootX'] = w, sheet.prx + d * pad_l
         if 'video' in data:
-            data['video']['largura'] = w
+            data['video']['largura'] = w // d
             rx, ry = data['video'].get('raiz', '128,238').split(',')
             data['video']['raiz'] = f'{int(rx) + pad_l},{ry}'
         path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')

@@ -1,0 +1,32 @@
+{
+  "id": "p11_dash",
+  "javaName": "P11_DASH",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_dash.png",
+  "report": "tools/sprites/reports/p11_dash.report.json",
+  "preview": "android/app/build/sprite-review/p11_dash-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p11",
+    "escala": 0.5088,
+    "medida": "último quadro = inicio_centro (nota 0.92)",
+    "quadros": "35,47,59,70,82,94",
+    "celula": 288,
+    "largura": 352,
+    "raiz": "188,270",
+    "colunas": 6,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 352,
+  "frameHeight": 288,
+  "rootX": 188,
+  "rootY": 270
+}

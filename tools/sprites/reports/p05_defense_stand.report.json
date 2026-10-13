@@ -1,16 +1,16 @@
 {
   "id": "p05_defense_stand",
   "characterProfile": "p05",
-  "source": "art/sprites/source/p05_defense_stand_video_normalized.png",
-  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "source": "art/sprites/source/p05_defense_stand_video_hd.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do v\u00eddeo, retoques da folha 1x revisada (sourceReferences).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 120,
-    "rootY": 238,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 240,
+    "rootY": 476,
     "columns": 8,
     "frameCount": 8
   },
@@ -18,115 +18,120 @@
     {
       "index": 0,
       "outputBbox": [
-        41,
-        35,
-        192,
-        239
+        82,
+        71,
+        384,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15024
+      "minimumMargin": 34,
+      "opaquePixels": 57731
     },
     {
       "index": 1,
       "outputBbox": [
-        62,
-        45,
-        241,
-        239
+        125,
+        90,
+        482,
+        477
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15051
+      "minimumMargin": 30,
+      "opaquePixels": 58363
     },
     {
       "index": 2,
       "outputBbox": [
-        23,
-        44,
-        227,
-        239
+        47,
+        88,
+        454,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15128
+      "minimumMargin": 35,
+      "opaquePixels": 58480
     },
     {
       "index": 3,
       "outputBbox": [
-        15,
-        45,
-        226,
-        239
+        31,
+        90,
+        453,
+        477
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 14688
+      "minimumMargin": 31,
+      "opaquePixels": 56731
     },
     {
       "index": 4,
       "outputBbox": [
-        26,
-        45,
-        227,
-        239
+        52,
+        90,
+        455,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14569
+      "minimumMargin": 35,
+      "opaquePixels": 56424
     },
     {
       "index": 5,
       "outputBbox": [
-        34,
-        46,
-        232,
-        239
+        69,
+        91,
+        465,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14368
+      "minimumMargin": 35,
+      "opaquePixels": 55532
     },
     {
       "index": 6,
       "outputBbox": [
-        21,
-        39,
-        203,
-        239
+        43,
+        80,
+        406,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14433
+      "minimumMargin": 34,
+      "opaquePixels": 55818
     },
     {
       "index": 7,
       "outputBbox": [
-        38,
-        35,
-        192,
-        239
+        77,
+        71,
+        383,
+        478
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15227
+      "minimumMargin": 34,
+      "opaquePixels": 58491
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 246,
-    "frameHeight": 224,
-    "rootX": 115,
-    "rootY": 213,
+    "frameWidth": 467,
+    "frameHeight": 423,
+    "rootX": 217,
+    "rootY": 413,
     "columns": 8,
     "frameCount": 8,
     "cropOffset": [
-      5,
-      25
+      23,
+      63
     ],
     "decodedBytes": {
-      "canonical": 2097152,
-      "packed": 1763328
-    }
+      "canonical": 8388608,
+      "packed": 6321312
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d8c2b45a4fa0c4a74707eeca956fe8c53420fb38ecad600a8f47aa8da9803fc3",
-      "config": "b7ad2ef0065ce9dee40b155d12284e589a45a8af0271d69c5b7a5238cc66a922",
+      "source": "2d5508be08fa84b4ecb74fafff1e40f00c13300642733b81f77d65ca3bfdd955",
+      "config": "bb3d9afb60ac4be3c9d724259f382407f8b77220767cc3419066be7a8d778cf9",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    },
+    "referenceSources": {
+      "art/sprites/source/p05_defense_stand_video_normalized.png": "d8c2b45a4fa0c4a74707eeca956fe8c53420fb38ecad600a8f47aa8da9803fc3"
     }
   }
 }

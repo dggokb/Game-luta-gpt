@@ -48,9 +48,9 @@ results['checks'].append('strong effects animate; slot contents stay stationary'
 for x,y in [(110,420),(110,560),(1150,420),(1150,560)]:tap(x,y)
 slots=capture('slot-taps');assert stable_slots(initial,slots),'TEAM taps jumped sequence'
 results['checks'].append('TEAM panels do not change the active step')
-for i in range(8,16):
+for i in range(11,16):
     tap(*cell(i));locked=capture('locked');assert stable_slots(initial,locked),'Unavailable concept changed teams: '+str(i)
-results['checks'].append('P09–P16 are visible concepts and all remain blocked')
+results['checks'].append('P11 and P13–P16 are visible concepts and all remain blocked')
 
 # Select a point, then Back automatically returns to P1 preview. This exercises
 # every actual side illustration without manually choosing a TEAM slot.
@@ -81,7 +81,7 @@ tap(*cell(2));four=capture('ready')
 assert differs(three,four,portrait_region(1,1)),'Fourth portrait did not choose TAG P2'
 results['checks'].append('four portrait taps choose P1 → TAG P1 → P2 → TAG P2 automatically')
 results['checks'].append('duplicate partner is rejected without replacing the point')
-for i in range(8,16):tap(*cell(i))
+for i in range(11,16):tap(*cell(i))
 locked_ready=capture('locked-ready');assert stable_slots(four,locked_ready),'Blocked concepts changed finished teams'
 tap(914,700);swapped=capture('swapped')
 assert differs(four,swapped,portrait_region(1,0)),'Finished team did not swap point/TAG'
