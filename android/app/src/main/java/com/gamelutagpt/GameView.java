@@ -1036,6 +1036,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         if (canvas == null) return;
 
         try {
+            renderFrame(canvas);
+        } finally {
+            holder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    /** Whole frame into any canvas: the surface in production, a bitmap in visual review tests. */
+    private void renderFrame(Canvas canvas) {
+        {
             resetPaintForFrame();
 
             float sx = canvas.getWidth() / VW;
@@ -1149,8 +1158,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
-        } finally {
-            holder.unlockCanvasAndPost(canvas);
         }
     }
 
