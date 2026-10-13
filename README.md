@@ -293,9 +293,9 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 ## Modo história (MVP)
 
 - Botão **HISTÓRIA** no HUD (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de
-  *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, as páginas prontas do
-  Prólogo lidas quadro a quadro, páginas provisórias, a luta de treino Ryūga × Kōga no meio e
-  o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
+  *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
+  11 páginas prontas lidas quadro a quadro (com a luta de treino Ryūga × Kōga depois da página
+  4), o Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
 - Motor em `android/story-core` (Java puro); episódios em JSON em
   `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do
   arquivo esperado.

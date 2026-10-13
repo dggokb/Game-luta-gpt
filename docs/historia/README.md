@@ -35,7 +35,7 @@ salvar progresso e um menu de episódios.
 
 | Episódio | Conteúdo | Luta |
 |---|---|---|
-| 0 — O Pai que Partiu | Infância, o convite, a divisão dos irmãos, o pai parte e não volta | — |
+| 0 — O Pai que Partiu | Infância no dojo Shūshinkan, o treino (tutorial), o convite, a divisão dos irmãos, o pai parte e não volta. **Pronto** (11 páginas) | Treino Ryūga × Kōga (tutorial) |
 | 1 — Duas Cartas | Dez anos depois, treino, as duas cartas, motivos de cada um | Treino Ryūga × Kōga |
 | 2 — O Sorteio | O templo, a regra dos capitães, a formação das duplas, o chaveamento em lados opostos | 1ª luta de cada lado |
 | 3 a 6 | Episódios alternando o lado do Ryūga e o lado do Kōga (lutas fixas de história + lutas variáveis) | uma por episódio |

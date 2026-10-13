@@ -51,6 +51,9 @@ Combinações que funcionaram no Prólogo: golpe = `impacto` + `velocidade`; gri
   texto em português; valor = a tradução. Texto sem tradução aparece em português.
 - **Onomatopeias** (balões espetados, letras soltas como HA, TCHECK, HAA!) não são tocadas:
   fazem parte da arte e valem para qualquer idioma.
+- **Gritos com palavra** num balão espetado (como o "MALDITO!" da página 5 do Prólogo) precisam
+  de tradução: rode o recorte com `--gritos`, que também lista os balões espetados com texto
+  (em laranja na imagem de conferência), e apague do JSON os que forem onomatopeia.
 - `legenda`: narração escrita pelo jogo numa faixa embaixo da tela (para o que não está
   desenhado na página, como "Tóquio. Dez anos atrás."). Também é traduzida.
 

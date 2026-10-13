@@ -62,7 +62,7 @@ def find_panels(img, min_area=0.006):
     return reading_order(panels, w * h)
 
 
-def find_balloons(img):
+def find_balloons(img, shouts=False):
     """Balões de fala: miolo branco e liso (quase elíptico) com texto escuro dentro. As
     onomatopeias em balão espetado ficam de fora (fazem parte da arte em qualquer idioma).
     Devolve o contorno do miolo branco (o jogo pinta de branco para apagar o texto) e a
@@ -86,18 +86,26 @@ def find_balloons(img):
         hull = cv2.convexHull(c)
         solidity = cv2.contourArea(c) / max(1.0, cv2.contourArea(hull))
         text = ((mask == 1) & (white == 0)).sum() / float(area)
-        if solidity < 0.93 or text < 0.03:
+        shout = solidity < 0.93
+        if text < 0.03 or (shout and (not shouts or solidity < 0.6)):
             continue
         # Caixa do texto: em volta do ponto mais "fundo" do balão (longe do rabicho).
-        dist = cv2.distanceTransform(mask, cv2.DIST_L2, 5)
-        _, _, _, (cx, cy) = cv2.minMaxLoc(dist)
-        row = np.where(mask[cy] == 1)[0]
-        col = np.where(mask[:, cx] == 1)[0]
-        half_w = min(cx - row.min(), row.max() - cx) * 0.74
-        half_h = min(cy - col.min(), col.max() - cy) * 0.72
         poly = cv2.approxPolyDP(c, 1.5, True).reshape(-1, 2).astype(float)
-        balloons.append({"poly": poly, "box": (cx - half_w, cy - half_h, cx + half_w, cy + half_h),
-                         "center": (cx, cy)})
+        if shout:
+            # Balão espetado: a caixa do texto é a área das letras da arte.
+            ys, xs = np.where((mask == 1) & (white == 0))
+            box = (float(xs.min()), float(ys.min()), float(xs.max()), float(ys.max()))
+            center = ((box[0] + box[2]) / 2.0, (box[1] + box[3]) / 2.0)
+        else:
+            dist = cv2.distanceTransform(mask, cv2.DIST_L2, 5)
+            _, _, _, (cx, cy) = cv2.minMaxLoc(dist)
+            row = np.where(mask[cy] == 1)[0]
+            col = np.where(mask[:, cx] == 1)[0]
+            half_w = min(cx - row.min(), row.max() - cx) * 0.74
+            half_h = min(cy - col.min(), col.max() - cy) * 0.72
+            box = (cx - half_w, cy - half_h, cx + half_w, cy + half_h)
+            center = (cx, cy)
+        balloons.append({"poly": poly, "box": box, "center": center, "grito": shout})
     return balloons
 
 
@@ -140,6 +148,9 @@ def main():
     parser.add_argument("pagina", help="imagem da página (png, jpg ou webp)")
     parser.add_argument("--episodio", required=True, help="pasta do episódio em assets/historia (ex.: ep00)")
     parser.add_argument("--nome", required=True, help="nome do arquivo sem extensão (ex.: pag1)")
+    parser.add_argument("--gritos", action="store_true",
+                        help="inclui balões espetados com texto (gritos como MALDITO!); apague os que forem "
+                             "onomatopeia, que ficam na arte")
     parser.add_argument("--conferencia", help="onde gravar a imagem de conferência (padrão: <nome>_quadros.jpg aqui)")
     args = parser.parse_args()
 
@@ -158,9 +169,10 @@ def main():
 
     check = img.copy()
     quadros = []
-    balloons = find_balloons(img)
+    balloons = find_balloons(img, args.gritos)
     for b in balloons:
-        cv2.polylines(check, [b["poly"].astype(np.int32).reshape(-1, 1, 2)], True, (255, 0, 255), 3)
+        color = (0, 140, 255) if b["grito"] else (255, 0, 255)
+        cv2.polylines(check, [b["poly"].astype(np.int32).reshape(-1, 1, 2)], True, color, 3)
         l, t, r, bt = [int(v) for v in b["box"]]
         cv2.rectangle(check, (l, t), (r, bt), (0, 200, 0), 2)
     for k, p in enumerate(panels):
