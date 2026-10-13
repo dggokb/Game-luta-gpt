@@ -28,5 +28,6 @@
   "totalMs": 260,
   "idleMedianPaintedArea": 54722.5,
   "dashMedianPaintedArea": 54860.0,
-  "caveat": "Optical area can change with pose; user review required."
+  "caveat": "Optical area can change with pose; user review required.",
+  "opticalScaleUndone": "13/10/2026: tools/sprites/regua.py --corrigir DASH desfez o opticalScale; o corpo voltou à escala medida na câmera do vídeo (0.525)."
 }

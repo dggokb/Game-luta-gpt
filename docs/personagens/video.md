@@ -168,6 +168,20 @@ problemas que parecem iguais no jogo: **tamanho** (mesma pose, corpo maior ou me
 altura salta na troca mesmo com o corpo certo; escolher outros quadros ou gerar o vídeo
 terminando na imagem inicial). Também mostra o corpo fora do lugar (`ancorar.py`).
 
+**Corrigir o tamanho** (sem vídeo novo), depois de ver o relatório:
+
+```
+python3 tools/sprites/regua.py p02 --corrigir DASH VICTORY INTRO   # leva a 100%
+python3 tools/sprites/build_characters.py --write
+python3 tools/sprites/regua.py p02 --relatorio                    # confere
+```
+
+Reescala a folha do jogo em volta da raiz (aumenta ou diminui) e grava na receita
+(`reescala`, `reguaFatores` e o motivo em `regua`). Fator óptico aplicado depois da medida
+da câmera é desfeito. Zoom de câmera vira um fator por quadro (a reta da cabeça ao longo do
+clipe). Só corrigir clipes cujo fator foi confirmado por duas medidas; a pose não se corrige
+assim.
+
 ## Ritmo: animação e movimento do jogo
 
 O motor dá o mesmo tempo a todos (frame data, velocidade de andar e dash, hitstun). A arte

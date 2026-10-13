@@ -61,9 +61,10 @@ def rescale(cfg, z):
         x, y = i % sheet.cols * sheet.w, i // sheet.cols * sheet.h
         cell = img.crop((x, y, x + sheet.w, y + sheet.h))
         if f != 1:
-            small = cell.resize((round(sheet.w / f), round(sheet.h / f)), Image.LANCZOS)
+            scaled = cell.resize((round(sheet.w / f), round(sheet.h / f)), Image.LANCZOS)
             cell = Image.new('RGBA', cell.size, (0, 0, 0, 0))
-            cell.alpha_composite(small, (sheet.rx - round(sheet.rx / f), sheet.ry - round(sheet.ry / f)))
+            # paste aceita posição negativa: fator < 1 aumenta o quadro e corta o que passa da célula
+            cell.paste(scaled, (sheet.rx - round(sheet.rx / f), sheet.ry - round(sheet.ry / f)))
         out.alpha_composite(cell, (x, y))
     out.save(A.ROOT / cfg['source'])
     A.Sheet.cache.pop(cfg['source'], None)

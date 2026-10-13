@@ -335,16 +335,16 @@
  {
   "estado": "DASH",
   "atlas": "p02_dash",
-  "fator": 0.879878,
-  "fonte": "receita forte x fator óptico 0.88",
+  "fator": 1.0,
+  "fonte": "receita forte",
   "receita": "forte",
   "medida": "1º quadro = inicio_centro (nota 0.96)",
-  "fator_optico": 0.879878,
+  "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "folha do vídeo com 6 quadros, a do jogo com 12: a receita não reproduz a folha do jogo",
   "inicio": {
-   "fator": 0.7864111645081593,
-   "nota": 0.4490942656993866,
+   "fator": 0.8882288664929162,
+   "nota": 0.4468826651573181,
    "quadro": 11,
    "ref": "inicio_centro"
   },
@@ -355,28 +355,20 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.7968127490039837,
+    "fator": 0.9049773755656105,
     "pe": 0,
-    "iou": 0.4138099167354287,
-    "altura": 0.8879092491716741,
+    "iou": 0.4129539498315238,
+    "altura": 1.0114000112315382,
     "mesma_pose": 0.0
    }
   ],
   "problemas": [
    [
-    "erro",
-    "corpo 88% do tamanho certo"
-   ],
-   [
     "aviso",
     "folha do vídeo com 6 quadros, a do jogo com 12: a receita não reproduz a folha do jogo"
-   ],
-   [
-    "erro",
-    "fator óptico 0.88 aplicado depois da medida da câmera"
    ]
   ],
-  "nivel": "erro"
+  "nivel": "aviso"
  },
  {
   "estado": "BACKDASH",
@@ -781,28 +773,28 @@
  {
   "estado": "HIT_STAND",
   "atlas": "p02_hit_stand",
-  "fator": 1.081910528902127,
+  "fator": 0.980510306789828,
   "fonte": "cabeça em 3 quadros",
   "receita": "fraca",
-  "medida": "quadros 6, 0, 12 = guarda do IDLE (nota 0.80)",
+  "medida": "quadros 6, 0, 12 = guarda do IDLE (nota 0.80); reescala 1.08-1.08",
   "fator_optico": 1.0,
-  "cadeia": 1.0028360748723766,
+  "cadeia": 0.9969240895129444,
   "cadeia_nota": "",
   "inicio": {
-   "fator": 1.0338378325959068,
-   "nota": 0.7725253105163574,
+   "fator": 0.9590786820847087,
+   "nota": 0.7903056144714355,
    "quadro": 0,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.081910528902127,
-   "min": 1.081910528902127,
-   "max": 1.081910528902127,
+   "fator": 0.980510306789828,
+   "min": 0.980510306789828,
+   "max": 1.0,
    "zoom": false,
    "por_quadro": {
-    "0": 1.082,
-    "7": 1.082,
-    "8": 1.082
+    "0": 1.0,
+    "7": 0.981,
+    "8": 0.981
    }
   },
   "emendas": [
@@ -811,20 +803,20 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9708737864077668,
+    "fator": 0.9090909090909088,
     "pe": 5,
-    "iou": 0.8096590909090909,
-    "altura": 0.9909586117818836,
+    "iou": 0.8143345514558529,
+    "altura": 0.9157634638063683,
     "mesma_pose": 0.0
    }
   ],
   "problemas": [
    [
-    "erro",
-    "corpo 108% do tamanho certo"
+    "aviso",
+    "troca (ini): pose diferente da guarda, altura 92% (salto de pose, não de tamanho)"
    ]
   ],
-  "nivel": "erro"
+  "nivel": "aviso"
  },
  {
   "estado": "HIT_CROUCH",
@@ -1707,30 +1699,30 @@
  {
   "estado": "INTRO",
   "atlas": "p02_intro",
-  "fator": 1.081910528902127,
+  "fator": 1.0,
   "fonte": "cabeça em 5 quadros",
   "receita": "fraca",
-  "medida": "quadros 90, 84, 96 = guarda do IDLE (nota 0.63)",
+  "medida": "quadros 90, 84, 96 = guarda do IDLE (nota 0.63); reescala 1.06-1.24",
   "fator_optico": 1.0,
-  "cadeia": 0.9981947541679941,
+  "cadeia": 0.9990607651912979,
   "cadeia_nota": "",
   "inicio": {
-   "fator": 0.9479371465373134,
-   "nota": 0.5546449422836304,
+   "fator": 0.8941858987976968,
+   "nota": 0.5593533515930176,
    "quadro": 24,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.081910528902127,
-   "min": 1.0608244246129694,
-   "max": 1.193797132415236,
-   "zoom": true,
+   "fator": 1.0,
+   "min": 1.0,
+   "max": 1.0401492820274056,
+   "zoom": false,
    "por_quadro": {
-    "15": 1.194,
-    "18": 1.148,
-    "21": 1.082,
-    "24": 1.061,
-    "26": 1.061
+    "15": 1.04,
+    "18": 1.0,
+    "21": 1.0,
+    "24": 1.0,
+    "26": 1.02
    }
   },
   "emendas": [
@@ -1739,28 +1731,20 @@
     "ponta": "fim",
     "quadro": 26,
     "ref": "guarda",
-    "fator": 0.8810572687224666,
-    "pe": -4,
-    "iou": 0.5891082045184305,
-    "altura": 0.8849328915594991,
+    "fator": 0.8196721311475407,
+    "pe": -5,
+    "iou": 0.5903331769122477,
+    "altura": 0.8327062391194475,
     "mesma_pose": 0.0
    }
   ],
   "problemas": [
    [
-    "erro",
-    "corpo 108% do tamanho certo"
-   ],
-   [
     "aviso",
-    "tamanho muda dentro do clipe (106-119% pela cabeça): zoom de câmera no vídeo"
-   ],
-   [
-    "aviso",
-    "troca (fim): pose diferente da guarda, altura 88% (salto de pose, não de tamanho)"
+    "troca (fim): pose diferente da guarda, altura 83% (salto de pose, não de tamanho)"
    ]
   ],
-  "nivel": "erro"
+  "nivel": "aviso"
  },
  {
   "estado": "JUMP_HEAVY_DOWN",
@@ -1800,27 +1784,27 @@
  {
   "estado": "VICTORY",
   "atlas": "p02_victory",
-  "fator": 1.1253484598554377,
+  "fator": 0.980510306789828,
   "fonte": "cabeça em 2 quadros",
   "receita": "fraca",
-  "medida": "quadros 0, 6, 12 = guarda do IDLE (nota 0.63)",
+  "medida": "quadros 0, 6, 12 = guarda do IDLE (nota 0.63); reescala 1.13-1.19",
   "fator_optico": 1.0,
-  "cadeia": 0.9989689540611755,
+  "cadeia": 0.9986347801525282,
   "cadeia_nota": "",
   "inicio": {
-   "fator": 0.9949190431421423,
-   "nota": 0.6077407002449036,
+   "fator": 0.8941858987976968,
+   "nota": 0.6098170280456543,
    "quadro": 0,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.1253484598554377,
-   "min": 1.1253484598554377,
-   "max": 1.1253484598554377,
+   "fator": 0.980510306789828,
+   "min": 0.980510306789828,
+   "max": 0.980510306789828,
    "zoom": false,
    "por_quadro": {
-    "0": 1.125,
-    "4": 1.125
+    "0": 0.981,
+    "4": 0.981
    }
   },
   "emendas": [
@@ -1829,48 +1813,48 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9569377990430619,
+    "fator": 0.856531049250535,
     "pe": -3,
-    "iou": 0.6720604099244876,
-    "altura": 0.9657438086145897,
+    "iou": 0.6735404113858301,
+    "altura": 0.855450103891728,
     "mesma_pose": 0.0
    }
   ],
   "problemas": [
    [
-    "erro",
-    "corpo 113% do tamanho certo"
+    "aviso",
+    "troca (ini): pose diferente da guarda, altura 86% (salto de pose, não de tamanho)"
    ]
   ],
-  "nivel": "erro"
+  "nivel": "aviso"
  },
  {
   "estado": "DEFEAT",
   "atlas": "p02_defeat",
-  "fator": 1.081910528902127,
+  "fator": 0.980510306789828,
   "fonte": "cabeça em 5 quadros",
   "receita": "fraca",
-  "medida": "quadros 6, 0, 30 = guarda do IDLE (nota 0.75)",
+  "medida": "quadros 6, 0, 30 = guarda do IDLE (nota 0.75); reescala 1.06-1.19",
   "fator_optico": 1.0,
-  "cadeia": 0.9989689540611755,
+  "cadeia": 0.9992663535341963,
   "cadeia_nota": "",
   "inicio": {
-   "fator": 1.0338378325959068,
-   "nota": 0.7299914956092834,
+   "fator": 0.9703511691564822,
+   "nota": 0.741678774356842,
    "quadro": 0,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.081910528902127,
-   "min": 1.0608244246129694,
-   "max": 1.1253484598554377,
+   "fator": 0.980510306789828,
+   "min": 0.980510306789828,
+   "max": 1.0198770916279105,
    "zoom": false,
    "por_quadro": {
-    "0": 1.061,
-    "4": 1.082,
-    "8": 1.082,
-    "12": 1.103,
-    "16": 1.125
+    "0": 1.02,
+    "4": 1.0,
+    "8": 0.981,
+    "12": 0.981,
+    "16": 0.981
    }
   },
   "emendas": [
@@ -1879,20 +1863,20 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 0.9638554216867466,
+    "fator": 0.9111617312072889,
     "pe": 1,
-    "iou": 0.7388112845795672,
-    "altura": 0.9761891391026002,
+    "iou": 0.7402141092506176,
+    "altura": 0.9203122367608244,
     "mesma_pose": 0.0
    }
   ],
   "problemas": [
    [
-    "erro",
-    "corpo 108% do tamanho certo"
+    "aviso",
+    "troca (ini): pose diferente da guarda, altura 92% (salto de pose, não de tamanho)"
    ]
   ],
-  "nivel": "erro"
+  "nivel": "aviso"
  },
  {
   "estado": "TAUNT",
