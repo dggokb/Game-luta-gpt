@@ -72,7 +72,9 @@ class CharacterPackTests(unittest.TestCase):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['output']='android/app/src/main/res/drawable-nodpi/player_base_idle.png';path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'duplicate output'):pipeline.build(self.root)
     def test_missing_source_is_rejected(self):
-        (self.root/'art/sprites/source/player_base_jab_video_normalized.png').unlink()
+        # The atlas master (HD clips keep their reviewed 1x sheet as a reference, not as source).
+        source=json.loads((self.root/'tools/sprites/clips/player_base_jab.json').read_text())['source']
+        (self.root/source).unlink()
         with self.assertRaises(FileNotFoundError):pipeline.build(self.root)
     def test_wrong_prepared_grid_geometry_is_rejected(self):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['columns']=2;path.write_text(json.dumps(d))

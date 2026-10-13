@@ -5,30 +5,46 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import harmony  # noqa: E402
 
-HAS_CV2 = importlib.util.find_spec('cv2') is not None
+# CI installs only Pillow; numpy/opencv come with the authoring tools.
+HAS_NUMPY = importlib.util.find_spec('numpy') is not None
+HAS_CV2 = HAS_NUMPY and importlib.util.find_spec('cv2') is not None
 
 
 def body(w, h, x0, y0, x1, y1, color=(200, 60, 60)):
-    a = np.zeros((h, w, 4), np.uint8)
-    a[y0:y1, x0:x1, :3] = color
-    a[y0:y1, x0:x1, 3] = 255
-    return a
+    img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    ImageDraw.Draw(img).rectangle((x0, y0, x1 - 1, y1 - 1), fill=color + (255,))
+    return img
 
 
+def array(*args):
+    import numpy as np
+    return np.array(body(*args))
+
+
+class HdHarmonyTests(unittest.TestCase):
+    def test_harmony_measures_world_units_on_hd_atlas(self):
+        cell = body(200, 160, 80, 20, 120, 150)
+        hd = harmony.measure(cell, {'rootX': 100, 'rootY': 150, 'pixelScale': 2}, 1.0)
+        sd = harmony.measure(cell.resize((100, 80), Image.NEAREST), {'rootX': 50, 'rootY': 75}, 1.0)
+        self.assertAlmostEqual(sd['height'], hd['height'], delta=1.0)  # 1 logical px of resampling
+        self.assertAlmostEqual(sd['torso'], hd['torso'], delta=1.0)
+
+
+@unittest.skipUnless(HAS_NUMPY, 'numpy only in the authoring tools')
 class LogicalSheetTests(unittest.TestCase):
     """HD sheets ("pixelScale": 2) are measured at the logical size by the review tools."""
 
     def test_sheet_measures_hd_at_logical_size(self):
+        import numpy as np
         import auditoria
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            Image.fromarray(np.hstack([body(200, 160, 80, 20, 120, 150)] * 2), 'RGBA').save(root / 'hd.png')
+            Image.fromarray(np.hstack([array(200, 160, 80, 20, 120, 150)] * 2), 'RGBA').save(root / 'hd.png')
             old = auditoria.ROOT
             auditoria.ROOT = root
             try:
@@ -43,13 +59,6 @@ class LogicalSheetTests(unittest.TestCase):
                 auditoria.ROOT = old
                 auditoria.Sheet.cache.clear()
 
-    def test_harmony_measures_world_units_on_hd_atlas(self):
-        cell = Image.fromarray(body(200, 160, 80, 20, 120, 150), 'RGBA')
-        hd = harmony.measure(cell, {'rootX': 100, 'rootY': 150, 'pixelScale': 2}, 1.0)
-        sd = harmony.measure(cell.resize((100, 80), Image.NEAREST), {'rootX': 50, 'rootY': 75}, 1.0)
-        self.assertAlmostEqual(sd['height'], hd['height'], delta=1.0)  # 1 logical px of resampling
-        self.assertAlmostEqual(sd['torso'], hd['torso'], delta=1.0)
-
 
 @unittest.skipUnless(HAS_CV2, 'opencv only in the authoring tools')
 class HandTouchTransferTests(unittest.TestCase):
@@ -57,10 +66,10 @@ class HandTouchTransferTests(unittest.TestCase):
 
     def test_shift_and_erase_follow_the_reference(self):
         import retoque_hd
-        hd = body(200, 160, 80, 20, 120, 150)
+        hd = array(200, 160, 80, 20, 120, 150)
         hd[30:50, 130:170] = (240, 240, 120, 255)          # effect the 1x review erased
         ref = body(100, 80, 41, 10, 61, 75)                # body moved 1 logical px right
-        up = retoque_hd.ref_cell(Image.fromarray(ref, 'RGBA'), 0,
+        up = retoque_hd.ref_cell(ref, 0,
                                  {'celula': [100, 80], 'raiz': [50, 75], 'colunas': 1}, hd.shape, (100, 150), 2)
         out, off, erased, score = retoque_hd.transfer_cell(hd, up, 2)
         self.assertEqual((2, 0), off)
@@ -70,9 +79,10 @@ class HandTouchTransferTests(unittest.TestCase):
         self.assertGreater(score, 0.95)
 
     def test_transfer_records_nothing_when_sheets_agree(self):
+        import numpy as np
         import retoque_hd
-        hd = body(200, 160, 80, 20, 120, 150)
-        ref = Image.fromarray(body(100, 80, 40, 10, 60, 75), 'RGBA')
+        hd = array(200, 160, 80, 20, 120, 150)
+        ref = body(100, 80, 40, 10, 60, 75)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             Image.fromarray(hd, 'RGBA').save(root / 'hd.png')
