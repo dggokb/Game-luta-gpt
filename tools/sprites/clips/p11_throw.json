@@ -1,0 +1,30 @@
+{
+  "id": "p11_throw",
+  "javaName": "P11_THROW",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_throw_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_throw.png",
+  "report": "tools/sprites/reports/p11_throw.report.json",
+  "preview": "android/app/build/sprite-review/p11_throw-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agarrao.mp4",
+    "personagem": "p11",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.93)",
+    "quadros": "17,22,28,34,39,44,50,56,61",
+    "celula": 288,
+    "largura": 384,
+    "raiz": "144,268",
+    "colunas": 9,
+    "limpar_chao": true
+  },
+  "frameWidth": 384,
+  "frameHeight": 288,
+  "rootX": 144,
+  "rootY": 268
+}

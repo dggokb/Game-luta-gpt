@@ -1,0 +1,132 @@
+{
+  "id": "p11_defense_stand",
+  "characterProfile": "p11",
+  "source": "art/sprites/source/p11_defense_stand_video_normalized.png",
+  "sourceNote": "p11 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 256,
+    "frameHeight": 288,
+    "rootX": 107,
+    "rootY": 270,
+    "columns": 8,
+    "frameCount": 8
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        20,
+        42,
+        168,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16332
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        30,
+        44,
+        185,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 17094
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        21,
+        48,
+        231,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 19937
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        15,
+        47,
+        242,
+        271
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 18793
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        18,
+        48,
+        225,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 18956
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        14,
+        43,
+        176,
+        271
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 17734
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        36,
+        42,
+        183,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16772
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        34,
+        41,
+        182,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 16752
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 248,
+    "frameHeight": 251,
+    "rootX": 103,
+    "rootY": 239,
+    "columns": 8,
+    "frameCount": 8,
+    "cropOffset": [
+      4,
+      31
+    ],
+    "decodedBytes": {
+      "canonical": 2359296,
+      "packed": 1991936
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "d166c34617a02e1968c1a36b3bae29215ac783169b86e384f3cf71ce2aa12c87",
+      "config": "101853539a00c0711dd182b1f0947a0c795685ea63d17ba1c32b5e7a5d201a33",
+      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+    }
+  }
+}

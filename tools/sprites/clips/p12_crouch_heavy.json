@@ -21,7 +21,16 @@
     "largura": 256,
     "raiz": "143,334",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "limpar_quadros": [
+      4
+    ],
+    "limpar_area": {
+      "4": [
+        0.0,
+        0.2
+      ]
+    }
   },
   "frameHeight": 352,
   "rootX": 143,

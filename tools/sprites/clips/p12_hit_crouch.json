@@ -12,21 +12,20 @@
   "rootMode": "authored",
   "sourceNote": "p12 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
-    "arquivo": "danoBaixo.mp4",
+    "arquivo": "defendeBaixo.mp4",
     "personagem": "p12",
-    "escala": 0.3929,
-    "medida": "1º e último quadro = inicio_agachado, mesmo zoom (nota 0.71)",
-    "quadros": "19,24,30,35,40,45,50,56,61",
-    "celula": 224,
-    "largura": 320,
-    "raiz": "152,206",
+    "escala": 0.345,
+    "motivo": "provisório: o dano agachado do p12 levantava (170-190 px, mais alto que a guarda), então usa o vídeo da defesa agachada, como o dano em pé usa a defesa em pé; escala igual à da defesa agachada (cabeça contra o idle curvado: 0,338-0,351)",
+    "quadros": "17,27,37,47,56,66,76,86,96",
+    "celula": 192,
+    "largura": 256,
+    "raiz": "112,174",
     "colunas": 9,
     "fixar": "registro",
     "pe_no_chao": true,
     "limpar_chao": true
   },
-  "frameWidth": 320,
-  "frameHeight": 224,
-  "rootX": 152,
-  "rootY": 206
+  "frameHeight": 192,
+  "rootX": 112,
+  "rootY": 174
 }

@@ -132,7 +132,7 @@ reconversão repetir; depois `build_characters.py --write`):
 |---|---|
 | deslize, pulo ao trocar de animação | `ancorar.py p04 HEAVY_STRAIGHT` fixa o pé de apoio no lugar do idle |
 | tamanho errado, zoom de câmera no meio | `reescalar.py p02 MEDIUM_KICK --ver` mede pela cabeça quadro a quadro; sem `--ver` aplica (`--fatores` à mão quando a medida erra) |
-| poeira, risco, arco, clarão | `limpar.py p02 LIGHT_JAB:3,4,5 --previa pasta` apaga manchas de cor fora da paleta |
+| poeira, risco, arco, clarão | `limpar.py p02 LIGHT_JAB:3,4,5 --previa pasta` apaga manchas de cor fora da paleta; `CROUCH_HEAVY:4@0-0.2` limpa só nessa faixa da altura do corpo (0 = topo), quando a limpeza inteira comeria parte borrada do corpo |
 
 Não resolvem: efeito por cima do corpo (o arco cobre a perna), pose errada (agachado que
 levanta), tamanho em pose ereta (intro/vitória: a cabeça engana). Aí é gerar o vídeo de novo.

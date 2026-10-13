@@ -1,0 +1,143 @@
+{
+  "id": "p11_hit_stand",
+  "characterProfile": "p11",
+  "source": "art/sprites/source/p11_hit_stand_video_normalized.png",
+  "sourceNote": "p11 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 288,
+    "rootX": 164,
+    "rootY": 270,
+    "columns": 9,
+    "frameCount": 9
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        15,
+        54,
+        238,
+        270
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 20492
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        29,
+        65,
+        304,
+        270
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 23006
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        64,
+        43,
+        240,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 19571
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        55,
+        39,
+        225,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17542
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        60,
+        41,
+        231,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17549
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        61,
+        42,
+        234,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17885
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        59,
+        40,
+        230,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17904
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        54,
+        39,
+        223,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17559
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        55,
+        39,
+        223,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 17590
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 309,
+    "frameHeight": 250,
+    "rootX": 159,
+    "rootY": 241,
+    "columns": 9,
+    "frameCount": 9,
+    "cropOffset": [
+      5,
+      29
+    ],
+    "decodedBytes": {
+      "canonical": 3317760,
+      "packed": 2781000
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "75890622f08176106d6f368e92d76b43e90985afd59c7ccb33aec418d5797e3f",
+      "config": "4a8d03607fdbe41f7a42cce26d6003ffe1446a8b5ec8a3ded1647689c3241f95",
+      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+    }
+  }
+}

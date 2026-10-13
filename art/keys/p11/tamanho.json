@@ -1,0 +1,8 @@
+{
+  "pacote": "p11",
+  "altura": 222,
+  "chaves": {
+    "inicio_centro": 0.5258,
+    "inicio_agachado": 0.537
+  }
+}

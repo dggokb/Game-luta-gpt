@@ -1,0 +1,25 @@
+{
+  "id": "p11_crouch",
+  "javaName": "P11_CROUCH",
+  "profile": "p11.json",
+  "source": "art/sprites/source/p11_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_crouch.png",
+  "report": "tools/sprites/reports/p11_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p11_crouch-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p11 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p11",
+    "escala": 0.389,
+    "medida": "cabeça do IDLE em 4 quadros (nota 0.75)",
+    "quadros": "2,5,9,12,15,18,22,25",
+    "largura": 256,
+    "raiz": "152,238",
+    "limpar_chao": true
+  },
+  "rootX": 152
+}

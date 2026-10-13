@@ -154,7 +154,7 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              aparar_borda=0)
+              limpar_area=None, aparar_borda=0)
 
 
 def parser():
@@ -189,6 +189,8 @@ def parser():
                    help="fator de tamanho por quadro (tools/sprites/reescalar.py): divide a escala")
     p.add_argument("--limpar-quadros", type=lambda v: [int(x) for x in v.split(",")],
                    help="células a limpar de efeito depois de converter (tools/sprites/limpar.py)")
+    p.add_argument("--limpar-area", type=json.loads,
+                   help='faixa de altura onde limpar cada célula, {"4": [0, 0.3]} (fração do corpo, 0 = topo)')
     p.add_argument("--ancorar-pe", action="store_true",
                    help="depois de converter, fixa o pé de apoio no lugar do idle (tools/sprites/ancorar.py)")
     p.add_argument("--aparar-borda", type=int, default=0,
@@ -344,7 +346,7 @@ def main(argv=None):
             print("pé de apoio fixado: " + " ".join(f"{d:+d}" for d in off))
         if args.limpar_quadros and in_place:
             import limpar
-            limpar.clean_atlas(pack_id, atlas, args.limpar_quadros)
+            limpar.clean_atlas(pack_id, atlas, args.limpar_quadros, areas=args.limpar_area)
         sheet = Image.open(args.saida)
         cw = json.loads(Path(args.clipe).read_text(encoding="utf-8")).get("frameWidth", cw)
     if args.previa:
