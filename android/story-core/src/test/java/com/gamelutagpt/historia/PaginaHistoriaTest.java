@@ -260,6 +260,10 @@ public class PaginaHistoriaTest {
                     for (String fighter : new String[] {passo.dupla[0], passo.dupla[1], passo.cpu[0], passo.cpu[1]}) {
                         assertTrue(id + ": lutador fora do roster: " + fighter, roster.contains("\"" + fighter + "\""));
                     }
+                    if (passo.cenario != null) {
+                        assertTrue(id + ": cenário não existe: " + passo.cenario,
+                            new File(ASSETS, "stages/" + passo.cenario + "/stage.json").isFile());
+                    }
                 }
                 if (passo.paginaPronta()) {
                     assertTrue(id + ": imagem da página pronta não existe: " + passo.imagem,

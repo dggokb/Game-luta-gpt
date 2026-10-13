@@ -52,6 +52,8 @@ final class HudRenderer {
         boolean pressed(Control control);
         /** A luta atual faz parte de um episódio do modo história. */
         default boolean storyActive() { return false; }
+        /** O treino guiado dos golpes (modo tutorial) está rodando. */
+        default boolean tutorialActive() { return false; }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -166,6 +168,8 @@ final class HudRenderer {
             TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.storyActive(), "HISTÓRIA",
             STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM, 16f);
+        drawToggle(c, s.tutorialActive(), "TUTORIAL",
+            TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 16f);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }
@@ -588,6 +592,50 @@ final class HudRenderer {
         c.drawText(label, (left + right) * 0.5f, cy - (paint.ascent() + paint.descent()) * 0.5f, paint);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    /**
+     * Painel da lição do tutorial: em que lição está, o nome, o que fazer, quantas vezes já
+     * fez e o PULAR. Entre as lições, "MUITO BEM!"; no fim, "TREINO COMPLETO!".
+     */
+    void drawTutorial(Canvas c, TutorialDirector tutorial) {
+        if (!tutorial.active()) return;
+        reset();
+        if (tutorial.completing()) {
+            drawBanner(c, "TREINO COMPLETO!", 255, 1.1f);
+            return;
+        }
+        TutorialDirector.Lesson lesson = tutorial.lesson();
+        if (lesson == null) return;
+        float left = TUTORIAL_PANEL_LEFT, top = TUTORIAL_PANEL_TOP;
+        float right = TUTORIAL_PANEL_RIGHT, bottom = TUTORIAL_PANEL_BOTTOM;
+        float cx = (left + right) * 0.5f;
+        panel(c, left, top, right - left, bottom - top, 14f, 0xE6120A04, 0xFFFFB04A, 2f);
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(14f);
+        paint.setColor(0xFFFFC870);
+        c.drawText("TREINO  " + (tutorial.lessonIndex() + 1) + "/" + tutorial.lessonCount(), left + 26f, top + 24f, paint);
+        paint.setFakeBoldText(false);
+        text(c, lesson.title, cx, top + 46f, 26f, Color.WHITE);
+        text(c, lesson.how, cx, top + 74f, 19f, 0xFFFFE6B8);
+        // Quantas vezes: uma bolinha por repetição, cheia quando já fez.
+        float pip = 7f, gap = 22f;
+        float px = cx - (lesson.times - 1) * gap * 0.5f;
+        for (int i = 0; i < lesson.times; i++) {
+            boolean filled = i < tutorial.count();
+            paint.setStyle(filled ? Paint.Style.FILL : Paint.Style.STROKE);
+            paint.setStrokeWidth(2f);
+            paint.setColor(filled ? 0xFF7BFF22 : 0xFFFFC870);
+            c.drawCircle(px + i * gap, bottom - 10f, pip, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+        drawToggle(c, false, "PULAR ▶▶", TUTORIAL_SKIP_LEFT, TUTORIAL_SKIP_TOP, TUTORIAL_SKIP_RIGHT,
+            TUTORIAL_SKIP_BOTTOM, 14f);
+        if (tutorial.praising()) {
+            float k = Math.min(1f, tutorial.praiseFrame() / 8f);
+            drawBanner(c, "MUITO BEM!", 255, 1.3f - 0.3f * k);
+        }
     }
 
     /** Big centered call-out over the fight ("AGARRÃO!", "TECH!"). */

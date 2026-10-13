@@ -35,7 +35,7 @@ public final class PaginaHistoria {
     static final float NEXT_MIN_TAP = 0.8f;
 
     /** Botão PULAR (canto de cima à direita). */
-    static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;
+    public static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;
 
     private static final int PAPER = 0xFFF1ECE1;
     private static final int FLASHBACK_PAPER = 0xFF0C0C0C;

@@ -23,6 +23,26 @@ public final class Episodio {
         this.passos = Collections.unmodifiableList(passos);
     }
 
+    /**
+     * Trecho do episódio entre os passos marcados {@code de} e {@code ate} (os dois entram;
+     * null = do primeiro / até o último). Usa a mesma pasta de imagens do episódio. É assim
+     * que uma cena ({@link Cenas}) reaproveita parte de um episódio.
+     */
+    public Episodio trecho(String de, String ate) {
+        int first = de == null ? 0 : indiceDaMarca(de);
+        int last = ate == null ? passos.size() - 1 : indiceDaMarca(ate);
+        if (last < first) throw new IllegalArgumentException(id + ": a marca \"" + ate + "\" vem antes de \"" + de + "\"");
+        return new Episodio(id, numero, titulo, new ArrayList<>(passos.subList(first, last + 1)));
+    }
+
+    /** Posição do passo com essa {@code marca}. */
+    public int indiceDaMarca(String marca) {
+        for (int i = 0; i < passos.size(); i++) {
+            if (marca.equals(passos.get(i).marca)) return i;
+        }
+        throw new IllegalArgumentException(id + ": nenhum passo com a marca \"" + marca + "\"");
+    }
+
     public enum TipoPasso { TITULO, PAGINA, LUTA, PROXIMO }
 
     public enum TipoBalao { FALA, PENSAMENTO, GRITO, NARRACAO }
@@ -30,6 +50,8 @@ public final class Episodio {
     /** Um passo do episódio. Só os campos do tipo dele são usados. */
     public static final class Passo {
         public final TipoPasso tipo;
+        /** Nome opcional do passo, para uma cena começar ou terminar nele ({@link #trecho}). */
+        public final String marca;
         // PAGINA
         public final String layout;
         public final String tom;
@@ -39,6 +61,10 @@ public final class Episodio {
         public final String[] cpu;
         public final String rotulo;
         public final boolean repetirSeDerrota;
+        /** "tutorial" (o treino guiado dos golpes) ou null (luta normal). */
+        public final String modo;
+        /** Cenário da luta (pasta em assets/stages), ou null para o cenário padrão. */
+        public final String cenario;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -46,10 +72,11 @@ public final class Episodio {
         public final String imagem;
         public final List<Quadro> quadros;
 
-        Passo(TipoPasso tipo, String layout, String tom, List<Painel> paineis, String[] dupla, String[] cpu,
-              String rotulo, boolean repetirSeDerrota, String titulo, List<String> linhas,
-              String imagem, List<Quadro> quadros) {
+        Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
+              String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String titulo,
+              List<String> linhas, String imagem, List<Quadro> quadros) {
             this.tipo = tipo;
+            this.marca = marca;
             this.layout = layout;
             this.tom = tom;
             this.paineis = paineis;
@@ -57,6 +84,8 @@ public final class Episodio {
             this.cpu = cpu;
             this.rotulo = rotulo;
             this.repetirSeDerrota = repetirSeDerrota;
+            this.modo = modo;
+            this.cenario = cenario;
             this.titulo = titulo;
             this.linhas = linhas;
             this.imagem = imagem;
@@ -65,6 +94,11 @@ public final class Episodio {
 
         public boolean flashback() {
             return "flashback".equals(tom);
+        }
+
+        /** Luta que é o treino guiado dos golpes (modo tutorial). */
+        public boolean tutorial() {
+            return tipo == TipoPasso.LUTA && "tutorial".equals(modo);
         }
 
         /** Página pronta (uma imagem com tudo desenhado), lida quadro a quadro. */
@@ -182,6 +216,12 @@ public final class Episodio {
         List<Passo> passos = new ArrayList<>();
         for (Object item : list(map, "passos")) passos.add(passo(asMap(item)));
         if (passos.isEmpty()) throw new IllegalArgumentException(id + ": episódio sem passos");
+        java.util.Set<String> marcas = new java.util.HashSet<>();
+        for (Passo p : passos) {
+            if (p.marca != null && !marcas.add(p.marca)) {
+                throw new IllegalArgumentException(id + ": marca repetida \"" + p.marca + "\"");
+            }
+        }
         return new Episodio(id, number(map, "numero", 0).intValue(), string(map, "titulo", id), passos);
     }
 
@@ -209,11 +249,16 @@ public final class Episodio {
                     " painéis, mas a página tem " + paineis.size());
             }
         }
+        String modo = string(map, "modo", null);
+        if (modo != null && !modo.equals("tutorial")) {
+            throw new IllegalArgumentException("modo de luta desconhecido: " + modo + " (use tutorial)");
+        }
         List<String> linhas = new ArrayList<>();
         for (Object item : list(map, "linhas")) linhas.add(String.valueOf(item));
-        return new Passo(tipo, layout, string(map, "tom", "papel"), Collections.unmodifiableList(paineis),
-            pair(map, "dupla"), pair(map, "cpu"), string(map, "rotulo", null),
-            !Boolean.FALSE.equals(map.get("repetirSeDerrota")), string(map, "titulo", null),
+        return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
+            Collections.unmodifiableList(paineis), pair(map, "dupla"), pair(map, "cpu"), string(map, "rotulo", null),
+            !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
+            string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros));
     }
 

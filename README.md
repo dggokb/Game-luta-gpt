@@ -305,3 +305,13 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - Proposta, formato e roadmap da temporada: `docs/historia/README.md`. Prompts das imagens
   para o ChatGPT: `docs/historia/prompts-ep00-ep01.md`. Revisão no PC:
   `gradle :pc-preview:runHistoria`.
+- **Cenas pelo nome** (`historia/cenas.json` + `playScene("intro", depois)` no `GameView`):
+  um episódio ou um trecho dele, entre marcas, que o jogo chama em vários momentos.
+  `docs/historia/cenas.md`.
+
+## Modo tutorial
+
+- Botão **TUTORIAL** (abaixo de HISTÓRIA): a intro do Prólogo (páginas 1 a 4) e depois o
+  treino guiado dos golpes no **Dojo Shinshinkan**, lição por lição (movimento, golpes,
+  combos, defesa, especiais, agarrão, SUPER e ULTRA). No modo história o treino vem no mesmo
+  ponto do Prólogo. `docs/tutorial.md`.
