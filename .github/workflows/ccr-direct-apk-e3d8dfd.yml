@@ -39,6 +39,12 @@ jobs:
         run: |
           python3 tools/sprites/build_characters.py --write
           python3 tools/sprites/build_characters.py --check
+      - name: Fix story skip-button visibility in disposable build only
+        run: |
+          script="android/story-core/src/main/java/com/gamelutagpt/historia/PaginaHistoria.java"
+          grep -Fq '    static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;' "$script"
+          sed -i 's/^    static final float SKIP_LEFT = /    public static final float SKIP_LEFT = /' "$script"
+          grep -Fq '    public static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;' "$script"
       - name: Build Android APK
         working-directory: android
         run: gradle assembleDebug --stacktrace
