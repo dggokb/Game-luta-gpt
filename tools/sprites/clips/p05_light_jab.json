@@ -2,15 +2,15 @@
   "id": "p05_light_jab",
   "javaName": "P05_LIGHT_JAB",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_light_jab_video_normalized.png",
+  "source": "art/sprites/source/p05_light_jab_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_light_jab.png",
   "report": "tools/sprites/reports/p05_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p05_light_jab-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "L.mp4",
     "personagem": "p05",
@@ -19,8 +19,27 @@
     "quadros": "17,20,21,26,30,34,38,41,45,49,53",
     "largura": 256,
     "raiz": "107,238",
-    "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p05_light_jab_video_normalized.png",
+      "celula": [
+        256,
+        256
+      ],
+      "raiz": [
+        107,
+        238
+      ],
+      "colunas": 11
+    }
   },
-  "rootX": 107
+  "rootX": 214,
+  "sourceReferences": [
+    "art/sprites/source/p05_light_jab_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

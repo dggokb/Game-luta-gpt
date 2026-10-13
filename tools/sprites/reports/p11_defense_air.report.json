@@ -7,7 +7,7 @@
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 288,
+    "frameWidth": 320,
     "frameHeight": 256,
     "rootX": 166,
     "rootY": 238,
@@ -18,9 +18,9 @@
     {
       "index": 0,
       "outputBbox": [
-        66,
+        78,
         22,
-        228,
+        240,
         239
       ],
       "minimumMargin": 17,
@@ -29,9 +29,9 @@
     {
       "index": 1,
       "outputBbox": [
-        43,
+        62,
         40,
-        241,
+        260,
         239
       ],
       "minimumMargin": 17,
@@ -40,9 +40,9 @@
     {
       "index": 2,
       "outputBbox": [
-        38,
+        62,
         44,
-        245,
+        269,
         240
       ],
       "minimumMargin": 16,
@@ -51,9 +51,9 @@
     {
       "index": 3,
       "outputBbox": [
-        33,
+        59,
         54,
-        253,
+        279,
         239
       ],
       "minimumMargin": 17,
@@ -62,9 +62,9 @@
     {
       "index": 4,
       "outputBbox": [
-        31,
+        50,
         60,
-        258,
+        277,
         239
       ],
       "minimumMargin": 17,
@@ -73,9 +73,9 @@
     {
       "index": 5,
       "outputBbox": [
-        26,
+        48,
         67,
-        264,
+        286,
         239
       ],
       "minimumMargin": 17,
@@ -84,9 +84,9 @@
     {
       "index": 6,
       "outputBbox": [
-        21,
+        44,
         65,
-        267,
+        290,
         240
       ],
       "minimumMargin": 16,
@@ -97,24 +97,24 @@
   "packed": {
     "frameWidth": 266,
     "frameHeight": 238,
-    "rootX": 155,
+    "rootX": 132,
     "rootY": 226,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      11,
+      34,
       12
     ],
     "decodedBytes": {
-      "canonical": 2064384,
+      "canonical": 2293760,
       "packed": 1772624
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "45c94d60c76f70da2202b612028a890b7e663d3ebccd8ef68ea22823d0e49be6",
-      "config": "9e48e4289b02d3b1a2c8dc91e9ac4887926988294c8fdd74372a082a95980e45",
+      "source": "69a6c0c4a3457ee92747195de6840ffa393592042cbdde43bca507344a6061ab",
+      "config": "efbe71abfbb2f67b4d83bacea5021bc2ef40ef4c125dcbccbe3c23e5e8086dbd",
       "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
     }
   }

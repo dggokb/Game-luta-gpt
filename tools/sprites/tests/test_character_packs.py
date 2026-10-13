@@ -350,8 +350,9 @@ class BuiltPackTests(unittest.TestCase):
         from PIL import Image
         char=json.loads((self.root/'characters/p02/character.json').read_text())
         idle=char['animations']['IDLE']
-        self.assertEqual(list(range(56)),idle['frames'])
-        self.assertEqual([41]*56,idle['durationsMs'])
+        # Approved playback (4189d492): the loop plays cells 15-44 of the 56-cell atlas.
+        self.assertEqual(list(range(15,45)),idle['frames'])
+        self.assertEqual([41]*30,idle['durationsMs'])
         self.assertTrue(idle['loop'])
         report=json.loads((self.root/'tools/sprites/reports/p02_idle.report.json').read_text())
         self.assertEqual([384,512,194,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])

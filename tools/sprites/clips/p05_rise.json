@@ -2,7 +2,7 @@
   "id": "p05_rise",
   "javaName": "P05_RISE",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_rise_video_normalized.png",
+  "source": "art/sprites/source/p05_rise_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_rise.png",
   "report": "tools/sprites/reports/p05_rise.report.json",
   "preview": "android/app/build/sprite-review/p05_rise-import.png",
@@ -10,7 +10,7 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "agachar.mp4",
     "personagem": "p05",
@@ -21,7 +21,27 @@
     "raiz": "134,238",
     "colunas": 6,
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p05_rise_video_normalized.png",
+      "celula": [
+        256,
+        256
+      ],
+      "raiz": [
+        134,
+        238
+      ],
+      "colunas": 6
+    }
   },
-  "rootX": 134
+  "rootX": 268,
+  "sourceReferences": [
+    "art/sprites/source/p05_rise_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

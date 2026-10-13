@@ -2,15 +2,15 @@
   "id": "p05_ultra_beam",
   "javaName": "P05_ULTRA_BEAM",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_ultra_beam_video_normalized.png",
+  "source": "art/sprites/source/p05_ultra_beam_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_ultra_beam.png",
   "report": "tools/sprites/reports/p05_ultra_beam.report.json",
   "preview": "android/app/build/sprite-review/p05_ultra_beam-import.png",
   "expectedFrames": 9,
   "segmentation": "prepared-grid",
-  "columns": 9,
+  "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "ultra.mp4",
     "personagem": "p05",
@@ -20,8 +20,9 @@
     "celula": 384,
     "largura": 448,
     "raiz": "209,345",
-    "colunas": 9,
+    "colunas": 4,
     "limpar_chao": true,
+    "ancorar_pe": true,
     "reescala": [
       1.0,
       1.459,
@@ -33,10 +34,26 @@
       1.439,
       1.0
     ],
-    "ancorar_pe": true
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p05_ultra_beam_video_normalized.png",
+      "celula": [
+        448,
+        384
+      ],
+      "raiz": [
+        209,
+        345
+      ],
+      "colunas": 9
+    }
   },
-  "frameWidth": 448,
-  "frameHeight": 384,
-  "rootX": 209,
-  "rootY": 345
+  "frameWidth": 896,
+  "frameHeight": 768,
+  "rootX": 418,
+  "rootY": 690,
+  "sourceReferences": [
+    "art/sprites/source/p05_ultra_beam_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

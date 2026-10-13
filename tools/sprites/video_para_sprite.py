@@ -154,7 +154,7 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              limpar_area=None, aparar_borda=0)
+              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None)
 
 
 def parser():
@@ -196,6 +196,17 @@ def parser():
     p.add_argument("--aparar-borda", type=int, default=0,
                    help="apaga N px nas bordas de cima e dos lados de cada célula: o que passa da "
                         "célula máxima (chicote, capa) sai cortado limpo em vez de colado na borda")
+    p.add_argument("--densidade", type=int, default=1,
+                   help="px de textura por px do jogo (2 = HD tirado direto do vídeo): célula, raiz e "
+                        "medidas da receita continuam lógicas; o clipe ganha \"pixelScale\"")
+    p.add_argument("--referencia", type=json.loads,
+                   help='folha 1x revisada cujos retoques à mão a folha HD repete (tools/sprites/retoque_hd.py): '
+                        '{"folha": "art/...png", "celula": [W, H], "raiz": [X, Y], "colunas": N}')
+    p.add_argument("--escala-da-receita", action="store_true",
+                   help="reusa a escala medida gravada no clipe em vez de medir de novo (refazer em "
+                        "outra densidade sem mudar o tamanho)")
+    p.add_argument("--nitidez", action="store_true",
+                   help="unsharp mask leve e borda sem verde (franja do recorte) depois de escalar")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -211,6 +222,8 @@ def parse_args(argv=None):
         recipe = clip.get("video", {})
         keep = set(RECIPE) | {"personagem"} | ({"escala", "motivo"} if "motivo" in recipe else set())
         p.set_defaults(**{k: v for k, v in recipe.items() if k in keep})  # escala medida é medida de novo
+        if "medida" in recipe:
+            p.set_defaults(_medida=recipe)
     args = p.parse_args(argv)
     if args.saida is None:
         if clip is None:
@@ -230,6 +243,8 @@ def save_recipe(path, clip, args, start, end, measured, count, cw):
     recipe["escala"] = round(args.escala, 4) if args.escala is not None else round(measured["escala"], 4)
     if args.escala is not None:
         recipe["motivo"] = args.motivo
+    elif "gravada" in measured:
+        recipe["medida"] = measured["gravada"]
     else:
         recipe["medida"] = f"{measured['medida']} (nota {measured['nota']:.2f})"
     resolved = dict(vars(args), inicio=start, fim=end)
@@ -238,12 +253,17 @@ def save_recipe(path, clip, args, start, end, measured, count, cw):
     recipe.update({k: resolved[k] for k, default in RECIPE.items() if resolved[k] != default})
     rx, ry = (int(v) for v in args.raiz.split(","))
     clip.update(expectedFrames=count, columns=args.colunas, video=recipe)
-    for name, value, default in (("frameWidth", cw, 256), ("frameHeight", args.celula, 256),
-                                 ("rootX", rx, 128), ("rootY", ry, 238)):
+    d = args.densidade
+    for name, value, default in (("frameWidth", cw * d, 256), ("frameHeight", args.celula * d, 256),
+                                 ("rootX", rx * d, 128), ("rootY", ry * d, 238)):
         if value != default:
             clip[name] = value
         else:
             clip.pop(name, None)
+    if d != 1:
+        clip["pixelScale"] = float(d)
+    else:
+        clip.pop("pixelScale", None)
     Path(path).write_text(json.dumps(clip, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"receita gravada em {path}")
 
@@ -260,6 +280,44 @@ def registration_x(rgba):
         if len(xs):
             mids.append((xs.min() + xs.max()) / 2)
     return float(np.median(mids))
+
+
+MAX_SIDE = 4096  # px: lado máximo de textura que a GPU de qualquer aparelho aceita (folha HD)
+FRINGE = 2      # px físicos da borda onde o verde do fundo ainda tinge a cor
+SHARP_RADIUS, SHARP_AMOUNT = 1.2, 0.6
+
+
+def sharpen(img, d):
+    """Versão b do HD: nitidez leve (unsharp mask) e borda sem franja verde.
+
+    A cor é afiada sobre fundo opaco (sangrando a cor do corpo para fora, para o fundo
+    transparente não escurecer a borda) e a franja dos FRINGE*d/2 px da borda perde o verde que
+    ainda passa da média de vermelho e azul."""
+    import cv2
+    a = np.array(img)
+    alpha = a[..., 3]
+    if not alpha.any():
+        return img
+    rgb = a[..., :3].astype(np.float32)
+    solid = alpha > 200
+    # Cor do corpo sangrada para fora: o borrão do unsharp não puxa preto da transparência.
+    _, idx = cv2.distanceTransformWithLabels((~solid).astype(np.uint8), cv2.DIST_L2, 5,
+                                             labelType=cv2.DIST_LABEL_PIXEL)
+    ys, xs = np.nonzero(solid)
+    lut = np.zeros((idx.max() + 1, 3), np.float32)
+    lut[idx[ys, xs]] = rgb[ys, xs]
+    bled = np.where(solid[..., None], rgb, lut[idx])
+    blur = cv2.GaussianBlur(bled, (0, 0), SHARP_RADIUS * d / 2)
+    rgb = np.clip(bled + SHARP_AMOUNT * (bled - blur), 0, 255)
+    # Franja: perto da transparência, o verde não passa da média de vermelho e azul.
+    inner = cv2.erode((alpha > 128).astype(np.uint8), np.ones((2 * FRINGE * d // 2 + 1,) * 2, np.uint8))
+    edge = (alpha > 0) & (inner == 0)
+    g_max = (rgb[..., 0] + rgb[..., 2]) / 2
+    rgb[..., 1] = np.where(edge, np.minimum(rgb[..., 1], g_max), rgb[..., 1])
+    # A borda meio transparente mais externa (só verde misturado ao fundo) sai.
+    a[..., 3] = np.where(alpha < 48, 0, alpha)
+    a[..., :3] = rgb.astype(np.uint8)
+    return Image.fromarray(a, "RGBA")
 
 
 def main(argv=None):
@@ -285,7 +343,11 @@ def main(argv=None):
         s = args.escala
         print(f"escala manual {s:.4f}: {args.motivo}")
     else:
-        measured = tamanho.medir(frames, args.personagem, key)
+        gravada = getattr(args, "_medida", None)
+        if args.escala_da_receita and gravada:
+            measured = dict(escala=gravada["escala"], gravada=gravada["medida"], medida=gravada["medida"], nota=0, zoom=0)
+        else:
+            measured = tamanho.medir(frames, args.personagem, key)
         s = measured["escala"]
         print(f"escala {s:.4f} ({measured['medida']}, nota {measured['nota']:.2f}, zoom {measured['zoom']:.3f})")
     scale = s
@@ -308,19 +370,28 @@ def main(argv=None):
     first = keyed_frame(0, args.sem_poeira)
     foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
     ref_x = torso_x(first) if args.fixar == "video" else xs[0]
+    # Densidade d: a folha sai d vezes maior em px (célula, raiz, borda), mesma geometria lógica.
+    d = args.densidade
     rx, ry = (int(v) for v in args.raiz.split(","))
     dx, dy = (int(v) for v in args.deslocar.split(","))
-    rx, ry = rx + dx, ry + dy
-    cell, cols = args.celula, args.colunas
-    cw = args.largura or cell
+    rx, ry = (rx + dx) * d, (ry + dy) * d
+    lcell, cols = args.celula, args.colunas
+    lcw = args.largura or lcell
+    cell, cw = lcell * d, lcw * d
+    if d > 1 and cols * cw > MAX_SIDE:
+        # Folha HD em mais linhas, para nenhum lado passar do limite de textura.
+        cols = max(1, MAX_SIDE // cw)
+        args.colunas = cols
     rows = (len(keyed) + cols - 1) // cols
     sheet = Image.new("RGBA", (cols * cw, rows * cell), (0, 0, 0, 0))
     if args.reescala and len(args.reescala) != len(keyed):
         raise SystemExit(f"--reescala tem {len(args.reescala)} fatores para {len(keyed)} quadros")
     for n, (k, off) in enumerate(zip(keyed, offsets)):
-        s = scale / args.reescala[n] if args.reescala else scale
+        s = (scale / args.reescala[n] if args.reescala else scale) * d
         img = Image.fromarray(k, "RGBA")
         img = img.resize((round(img.width * s), round(img.height * s)), Image.LANCZOS)
+        if args.nitidez:
+            img = sharpen(img, d)
         x = rx - round((ref_x - off) * s)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
         y = ry - round(bottom * s)
@@ -329,14 +400,14 @@ def main(argv=None):
         box.paste(img, (x, y))
         if args.aparar_borda:
             a = np.array(box)
-            b = args.aparar_borda
+            b = args.aparar_borda * d
             a[:b, :, 3] = a[:, :b, 3] = a[:, -b:, 3] = 0
             box = Image.fromarray(a, "RGBA")
         sheet.paste(box, ((n % cols) * cw, (n // cols) * cell))
     sheet.save(args.saida)
     print(f"{len(keyed)} quadros, {cols}×{rows}, {fps:.1f} fps de origem → {args.saida}")
     if clip is not None:
-        save_recipe(args.clipe, clip, args, start, end, measured, len(keyed), cw)
+        save_recipe(args.clipe, clip, args, start, end, measured, len(keyed), lcw)
         pack_id = "player_base" if args.personagem == "p01" else args.personagem
         atlas = Path(clip["output"]).stem
         in_place = Path(args.saida).resolve() == (ROOT / clip["source"]).resolve()
@@ -347,6 +418,11 @@ def main(argv=None):
         if args.limpar_quadros and in_place:
             import limpar
             limpar.clean_atlas(pack_id, atlas, args.limpar_quadros, areas=args.limpar_area)
+        if args.referencia and in_place and args.densidade > 1:
+            import retoque_hd
+            done = json.loads(Path(args.clipe).read_text(encoding="utf-8"))
+            for line in retoque_hd.transfer(Path(args.saida), done, args.referencia, ROOT):
+                print("retoque da referência: " + line)
         sheet = Image.open(args.saida)
         cw = json.loads(Path(args.clipe).read_text(encoding="utf-8")).get("frameWidth", cw)
     if args.previa:

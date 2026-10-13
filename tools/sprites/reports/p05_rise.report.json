@@ -1,16 +1,16 @@
 {
   "id": "p05_rise",
   "characterProfile": "p05",
-  "source": "art/sprites/source/p05_rise_video_normalized.png",
-  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "source": "art/sprites/source/p05_rise_video_hd.png",
+  "sourceNote": "p05 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do v\u00eddeo, retoques da folha 1x revisada (sourceReferences).",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 134,
-    "rootY": 238,
+    "frameWidth": 512,
+    "frameHeight": 512,
+    "rootX": 268,
+    "rootY": 476,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,93 +18,98 @@
     {
       "index": 0,
       "outputBbox": [
-        39,
-        91,
-        242,
-        238
+        79,
+        182,
+        484,
+        475
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 14378
+      "minimumMargin": 28,
+      "opaquePixels": 56524
     },
     {
       "index": 1,
       "outputBbox": [
-        30,
-        86,
-        230,
-        238
+        61,
+        173,
+        459,
+        475
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 14615
+      "minimumMargin": 37,
+      "opaquePixels": 57358
     },
     {
       "index": 2,
       "outputBbox": [
-        50,
-        67,
-        230,
-        239
+        100,
+        134,
+        459,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14785
+      "minimumMargin": 35,
+      "opaquePixels": 58181
     },
     {
       "index": 3,
       "outputBbox": [
-        58,
-        47,
-        221,
-        239
+        117,
+        94,
+        441,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15310
+      "minimumMargin": 35,
+      "opaquePixels": 60207
     },
     {
       "index": 4,
       "outputBbox": [
-        59,
-        37,
-        211,
-        239
+        119,
+        74,
+        421,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15349
+      "minimumMargin": 35,
+      "opaquePixels": 60482
     },
     {
       "index": 5,
       "outputBbox": [
-        62,
-        30,
-        207,
-        239
+        124,
+        61,
+        413,
+        477
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15510
+      "minimumMargin": 35,
+      "opaquePixels": 60889
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 232,
-    "frameHeight": 229,
-    "rootX": 114,
-    "rootY": 218,
+    "frameWidth": 443,
+    "frameHeight": 437,
+    "rootX": 217,
+    "rootY": 426,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      20,
-      20
+      51,
+      50
     ],
     "decodedBytes": {
-      "canonical": 1572864,
-      "packed": 1275072
-    }
+      "canonical": 6291456,
+      "packed": 4646184
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "11f9eaedcb6892456f9a1cb30d74ab31d618b1728f5c7fc29f6e7f9b1e233946",
-      "config": "f18b17659ee09cc37c8f61a30beae65d07b6be1a07734e77bfd122959824ed2d",
+      "source": "2e9819bf1204b437cbe66b34540f35d8423de8d03cd98a9f9e7e8fb15bbd5b7d",
+      "config": "9083e9c0a1a266941e1b4ed5765c0be9de4e2efee317405ccbc4e20b8f062c6f",
       "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+    },
+    "referenceSources": {
+      "art/sprites/source/p05_rise_video_normalized.png": "11f9eaedcb6892456f9a1cb30d74ab31d618b1728f5c7fc29f6e7f9b1e233946"
     }
   }
 }

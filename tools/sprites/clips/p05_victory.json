@@ -2,15 +2,15 @@
   "id": "p05_victory",
   "javaName": "P05_VICTORY",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_victory_video_normalized.png",
+  "source": "art/sprites/source/p05_victory_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_victory.png",
   "report": "tools/sprites/reports/p05_victory.report.json",
   "preview": "android/app/build/sprite-review/p05_victory-import.png",
   "expectedFrames": 33,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 7,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "vitoria.mp4",
     "personagem": "p05",
@@ -20,7 +20,7 @@
     "celula": 320,
     "largura": 288,
     "raiz": "169,302",
-    "colunas": 11,
+    "colunas": 7,
     "limpar_chao": true,
     "reescala": [
       1.044,
@@ -56,10 +56,27 @@
       1.2,
       1.2,
       1.184
-    ]
+    ],
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p05_victory_video_normalized.png",
+      "celula": [
+        288,
+        320
+      ],
+      "raiz": [
+        169,
+        302
+      ],
+      "colunas": 11
+    }
   },
-  "frameHeight": 320,
-  "rootX": 169,
-  "rootY": 302,
-  "frameWidth": 288
+  "frameHeight": 640,
+  "rootX": 338,
+  "rootY": 604,
+  "frameWidth": 576,
+  "sourceReferences": [
+    "art/sprites/source/p05_victory_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

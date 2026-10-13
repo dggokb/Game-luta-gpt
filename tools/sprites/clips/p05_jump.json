@@ -2,7 +2,7 @@
   "id": "p05_jump",
   "javaName": "P05_JUMP",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_jump_video_normalized.png",
+  "source": "art/sprites/source/p05_jump_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_jump.png",
   "report": "tools/sprites/reports/p05_jump.report.json",
   "preview": "android/app/build/sprite-review/p05_jump-import.png",
@@ -10,7 +10,7 @@
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "sourceNote": "p05 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\"); HD (densidade 2) direto do vídeo, retoques da folha 1x revisada (sourceReferences).",
   "video": {
     "arquivo": "pulo.mp4",
     "personagem": "p05",
@@ -22,10 +22,27 @@
     "raiz": "119,270",
     "colunas": 6,
     "fixar": "registro",
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p05_jump_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        119,
+        270
+      ],
+      "colunas": 6
+    }
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 119,
-  "rootY": 270
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 238,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p05_jump_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

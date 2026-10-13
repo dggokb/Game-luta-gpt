@@ -56,15 +56,16 @@ def band_mask(rgba, area):
     return mask
 
 
-def clean_cell(rgba, known, area=None):
+def clean_cell(rgba, known, area=None, d=1):
+    """d: densidade da folha (2 = HD); áreas e contorno em px físicos."""
     import cv2
     a = rgba[..., 3] > 128
     band = band_mask(rgba, area) if area else np.ones(a.shape, bool)
     foreign = (a & band & ~known[hsv_bins(rgba)]).astype(np.uint8)
     n, lab, stats, _ = cv2.connectedComponentsWithStats(foreign, connectivity=8)
-    erase = np.isin(lab, [i for i in range(1, n) if stats[i, cv2.CC_STAT_AREA] >= MIN_BLOB])
+    erase = np.isin(lab, [i for i in range(1, n) if stats[i, cv2.CC_STAT_AREA] >= MIN_BLOB * d * d])
     # Contorno da mancha: borda meio transparente ou de cor estranha em volta dela.
-    ring = cv2.dilate(erase.astype(np.uint8), np.ones((7, 7), np.uint8)) > 0
+    ring = cv2.dilate(erase.astype(np.uint8), np.ones((6 * d + 1,) * 2, np.uint8)) > 0
     erase |= ring & band & ((rgba[..., 3] < 250) | (foreign > 0))
     out = rgba.copy()
     out[erase] = 0
@@ -88,11 +89,11 @@ def clean_atlas(cid, atlas, cells, pack=None, clips=None, preview=None, areas=No
     img = np.array(Image.open(A.ROOT / cfg['source']).convert('RGBA'))
     shots = []
     for c in cells:
-        y, x = c // sheet.cols * sheet.h, c % sheet.cols * sheet.w
-        before = img[y:y + sheet.h, x:x + sheet.w].copy()
-        after, n = clean_cell(before, known, (areas or {}).get(str(c)))
+        y, x = c // sheet.cols * sheet.ph, c % sheet.cols * sheet.pw
+        before = img[y:y + sheet.ph, x:x + sheet.pw].copy()
+        after, n = clean_cell(before, known, (areas or {}).get(str(c)), sheet.d)
         print(f'{cid} {atlas} célula {c}: {n} px apagados')
-        img[y:y + sheet.h, x:x + sheet.w] = after
+        img[y:y + sheet.ph, x:x + sheet.pw] = after
         shots.append((before, after))
     if not preview:
         Image.fromarray(img).save(A.ROOT / cfg['source'])

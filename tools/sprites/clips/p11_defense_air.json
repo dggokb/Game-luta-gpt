@@ -17,11 +17,13 @@
     "escala": 0.3969,
     "medida": "cabeça do IDLE em 7 quadros (nota 0.71)",
     "quadros": "29,34,38,42,47,52,56",
-    "largura": 288,
+    "largura": 320,
     "raiz": "166,238",
     "colunas": 7,
-    "pe_no_chao": true
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "deslocar": "-3,0"
   },
-  "frameWidth": 288,
+  "frameWidth": 320,
   "rootX": 166
 }
