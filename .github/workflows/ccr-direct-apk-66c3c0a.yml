@@ -39,6 +39,18 @@ jobs:
         run: |
           python3 tools/sprites/build_characters.py --write
           python3 tools/sprites/build_characters.py --check
+      - name: Correct story skip-button constant visibility in disposable checkout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/story-core/src/main/java/com/gamelutagpt/historia/PaginaHistoria.java')
+          old='    static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;'
+          new=old.replace('    static final float ', '    public static final float ')
+          content=p.read_text()
+          assert content.count(old)==1, 'Expected exact source declaration not found'
+          p.write_text(content.replace(old,new))
+          print('Applied Java visibility fix to temporary checkout only')
+          PY
       - name: Build Android APK
         working-directory: android
         run: gradle assembleDebug --stacktrace
