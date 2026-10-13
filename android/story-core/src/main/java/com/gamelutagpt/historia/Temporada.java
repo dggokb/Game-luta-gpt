@@ -23,6 +23,9 @@ public final class Temporada {
     public final String logo;
     public final Map<String, Personagem> elenco;
     public final List<String> episodios;
+    /** Tradução do idioma atual (texto em português → texto traduzido); vazia em português. */
+    private Map<String, String> traducao = Collections.emptyMap();
+    private String idioma = "pt";
 
     /** Quem aparece na história: nome nos balões, cor na arte provisória e o pack de luta, se tiver. */
     public static final class Personagem {
@@ -49,6 +52,44 @@ public final class Temporada {
 
     public static Temporada load(RenderAssets assets) throws IOException {
         return fromJson(assets.readText(PASTA + "/temporada.json"));
+    }
+
+    /**
+     * Troca o idioma dos textos (balões, legendas, títulos). A tradução fica em
+     * {@code historia/idiomas/<idioma>.json}: um objeto com o texto em português como chave e
+     * o texto traduzido como valor. Idioma sem arquivo (ou português) mostra o original;
+     * devolve falso nesse caso.
+     */
+    public boolean setIdioma(RenderAssets assets, String codigo) {
+        idioma = codigo == null ? "pt" : codigo;
+        traducao = Collections.emptyMap();
+        if ("pt".equals(idioma)) return true;
+        try {
+            traducao = traducaoFromJson(assets.readText(PASTA + "/idiomas/" + idioma + ".json"));
+            return true;
+        } catch (IOException | RuntimeException ex) {
+            return false;
+        }
+    }
+
+    public String idioma() {
+        return idioma;
+    }
+
+    /** O texto no idioma atual; sem tradução, o original em português. */
+    public String t(String texto) {
+        if (texto == null) return null;
+        String traduzido = traducao.get(texto);
+        return traduzido != null ? traduzido : texto;
+    }
+
+    static Map<String, String> traducaoFromJson(String json) {
+        Map<String, String> out = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : Episodio.asMap(MiniJson.parse(json)).entrySet()) {
+            if (entry.getKey().startsWith("_")) continue; // comentários
+            out.put(entry.getKey(), String.valueOf(entry.getValue()));
+        }
+        return out;
     }
 
     public Episodio loadEpisodio(RenderAssets assets, String id) throws IOException {

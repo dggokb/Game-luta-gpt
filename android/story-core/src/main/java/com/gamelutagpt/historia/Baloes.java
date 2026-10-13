@@ -43,13 +43,13 @@ final class Baloes {
      * @param visible quantos caracteres do texto já apareceram (efeito de digitação)
      * @param pop     0 → 1 enquanto o balão entra
      */
-    void draw(RenderCanvas c, Episodio.Balao b, Temporada.Personagem speaker, float l, float t, float r, float bottom,
-              int visible, float pop) {
+    void draw(RenderCanvas c, Episodio.Balao b, String texto, Temporada.Personagem speaker, float l, float t, float r,
+              float bottom, int visible, float pop) {
         boolean narration = b.tipo == Episodio.TipoBalao.NARRACAO;
         float size = narration ? NARRATION_SIZE : (b.tipo == Episodio.TipoBalao.GRITO ? TEXT_SIZE + 5f : TEXT_SIZE);
         float panelW = r - l;
         float maxWidth = Math.min(narration ? 520f : 360f, panelW * (narration ? 0.86f : 0.70f));
-        List<String> lines = wrap(c, b.texto, size, maxWidth);
+        List<String> lines = wrap(c, texto, size, maxWidth);
         float textW = 0f;
         for (String line : lines) textW = Math.max(textW, c.measureText(line, size, false));
         float textH = lines.size() * size * LINE;

@@ -184,6 +184,8 @@ public final class PaginaHistoria {
             exit();
         } else if (p.tipo == Episodio.TipoPasso.PAGINA && p.paginaPronta()) {
             guiada.update(dt);
+            String sound = guiada.takeSound();
+            if (sound != null) listener.onHistoriaSom(sound);
             if (guiada.finished()) exit();
         } else if (p.tipo == Episodio.TipoPasso.PAGINA) {
             int[] current = beats.get(beat);
@@ -262,7 +264,7 @@ public final class PaginaHistoria {
             }
             images.put(p.imagem, page);
             // Sem a imagem, a página vira um papel do tamanho de uma página do GPT (2:3).
-            guiada.begin(p, page, page != null ? page.width() : 1024f, page != null ? page.height() : 1536f);
+            guiada.begin(temporada, p, page, page != null ? page.width() : 1024f, page != null ? page.height() : 1536f);
             listener.onHistoriaSom("pagina");
             return;
         }
@@ -302,7 +304,8 @@ public final class PaginaHistoria {
     private void tapPage() {
         if (passo().paginaPronta()) {
             guiada.tap();
-            listener.onHistoriaSom("painel");
+            String sound = guiada.takeSound();
+            if (sound != null) listener.onHistoriaSom(sound);
             return;
         }
         // Toque com texto ainda sendo digitado: mostra o texto inteiro.
@@ -310,8 +313,9 @@ public final class PaginaHistoria {
         if (current[1] >= 0) {
             Episodio.Balao b = passo().paineis.get(current[0]).baloes.get(current[1]);
             float typed = (time - balloonAt[current[0]][current[1]] - BALLOON_POP) * TYPE_SPEED;
-            if (typed < b.texto.length()) {
-                balloonAt[current[0]][current[1]] = time - BALLOON_POP - b.texto.length() / TYPE_SPEED;
+            int length = temporada.t(b.texto).length();
+            if (typed < length) {
+                balloonAt[current[0]][current[1]] = time - BALLOON_POP - length / TYPE_SPEED;
                 return;
             }
         } else if (time - panelAt[current[0]] < SLAM_DURATION) {
@@ -357,7 +361,7 @@ public final class PaginaHistoria {
             return !auto && time - panelAt[current[0]] >= SLAM_DURATION;
         }
         Episodio.Balao b = p.paineis.get(current[0]).baloes.get(current[1]);
-        return (time - balloonAt[current[0]][current[1]] - BALLOON_POP) * TYPE_SPEED >= b.texto.length();
+        return (time - balloonAt[current[0]][current[1]] - BALLOON_POP) * TYPE_SPEED >= temporada.t(b.texto).length();
     }
 
     // ------------------------------------------------------------ desenho
@@ -417,7 +421,8 @@ public final class PaginaHistoria {
                 int visible = (int)Math.max(0f, (age - BALLOON_POP) * TYPE_SPEED);
                 if (age >= BALLOON_POP) visible = Math.max(visible, 1);
                 Temporada.Personagem speaker = b.quem != null ? temporada.personagem(b.quem) : null;
-                baloes.draw(c, b, speaker, box[0], box[1], box[2], box[3], Math.min(visible, b.texto.length()),
+                String texto = temporada.t(b.texto);
+                baloes.draw(c, b, texto, speaker, box[0], box[1], box[2], box[3], Math.min(visible, texto.length()),
                     Tinta.clamp01(age / BALLOON_POP));
             }
         }
@@ -519,9 +524,9 @@ public final class PaginaHistoria {
             c.drawImage(logo, VW * 0.5f - w * 0.5f, 500f, VW * 0.5f + w * 0.5f, 500f + h, (int)(255f * alpha));
         }
         if (pop > 0f) {
-            String label = episodio.numero == 0 ? "PRÓLOGO" : "EPISÓDIO " + episodio.numero;
+            String label = episodio.numero == 0 ? temporada.t("PRÓLOGO") : temporada.t("EPISÓDIO") + " " + episodio.numero;
             c.drawText(label, VW * 0.5f, 220f, 40f, WHITE, INK, 6f, true);
-            String title = p.titulo != null ? p.titulo : episodio.titulo;
+            String title = temporada.t(p.titulo != null ? p.titulo : episodio.titulo);
             float scale = 1.5f - 0.5f * Tinta.easeOutCubic(pop);
             float size = fit(c, title, 96f, 1180f, true);
             c.save();
@@ -544,11 +549,11 @@ public final class PaginaHistoria {
         float in = Tinta.easeOutCubic(time / 0.3f);
         float[] strip = {-20f, 70f, 760f * in, 70f, 720f * in, 150f, -20f, 150f};
         c.fillPolygon(strip, INK);
-        if (in > 0.6f) c.drawText("PRÓXIMO EPISÓDIO", 340f * in, 128f, 46f, WHITE, INK, 0f, true);
+        if (in > 0.6f) c.drawText(temporada.t("PRÓXIMO EPISÓDIO"), 340f * in, 128f, 46f, WHITE, INK, 0f, true);
 
         float pop = Tinta.clamp01((time - 0.25f) / 0.25f);
         if (pop > 0f) {
-            String title = p.titulo != null ? p.titulo : "";
+            String title = p.titulo != null ? temporada.t(p.titulo) : "";
             float size = fit(c, title, 84f, 1160f, true);
             float scale = 1.4f - 0.4f * Tinta.easeOutCubic(pop);
             c.save();
@@ -560,17 +565,17 @@ public final class PaginaHistoria {
         for (int i = 0; i < p.linhas.size(); i++) {
             float lineIn = Tinta.clamp01((time - 0.45f - i * 0.18f) / 0.2f);
             if (lineIn <= 0f) break;
-            String line = p.linhas.get(i);
+            String line = temporada.t(p.linhas.get(i));
             c.drawText(line, VW * 0.5f, y, fit(c, line, 32f, 1140f, false),
                 Tinta.withAlpha(INK, (int)(255 * lineIn)), 0, 0f, false);
             y += 46f;
         }
-        c.drawText("CONTINUA...", VW - 250f, VH - 40f, 40f, WHITE, INK, 7f, true);
+        c.drawText(temporada.t("CONTINUA..."), VW - 250f, VH - 40f, 40f, WHITE, INK, 7f, true);
     }
 
     private void drawSkip(RenderCanvas c) {
         c.fillRect(SKIP_LEFT, SKIP_TOP, SKIP_RIGHT, SKIP_BOTTOM, 0xB0000000);
-        c.drawText("PULAR ▶▶", (SKIP_LEFT + SKIP_RIGHT) * 0.5f, SKIP_BOTTOM - 9f, 19f, WHITE, 0, 0f, true);
+        c.drawText(temporada.t("PULAR") + " ▶▶", (SKIP_LEFT + SKIP_RIGHT) * 0.5f, SKIP_BOTTOM - 9f, 19f, WHITE, 0, 0f, true);
     }
 
     private void drawTapArrow(RenderCanvas c) {

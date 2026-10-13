@@ -79,15 +79,46 @@ public final class Episodio {
      */
     public static final class Quadro {
         public final float[] area;
-        /** O quadro chega tremendo a tela, com um clarão (golpes, gritos). */
+        /** A câmera chega de supetão: tranco de zoom, tela tremendo e clarão (golpes, gritos). */
         public final boolean impacto;
+        /** A tela treme de leve o tempo todo enquanto o quadro está em foco (tensão, força). */
+        public final boolean tremor;
+        /** Linhas de velocidade correndo por cima do quadro (ação, movimento). */
+        public final boolean velocidade;
+        /** A câmera avança devagar sobre o quadro (olhares, momentos dramáticos). */
+        public final boolean zoom;
         /** Narração escrita pelo jogo embaixo da tela enquanto o quadro está em foco, ou null. */
         public final String legenda;
+        /** Balões de fala desenhados na página, na ordem de leitura. */
+        public final List<BalaoPronto> baloes;
 
-        Quadro(float[] area, boolean impacto, String legenda) {
+        Quadro(float[] area, boolean impacto, boolean tremor, boolean velocidade, boolean zoom, String legenda,
+               List<BalaoPronto> baloes) {
             this.area = area;
             this.impacto = impacto;
+            this.tremor = tremor;
+            this.velocidade = velocidade;
+            this.zoom = zoom;
             this.legenda = legenda;
+            this.baloes = baloes;
+        }
+    }
+
+    /**
+     * Balão desenhado na página pronta. O jogo pinta o miolo ({@link #area}) de branco, apagando
+     * o texto da arte, e escreve {@link #texto} (traduzido) dentro da {@link #caixa}.
+     */
+    public static final class BalaoPronto {
+        /** Contorno do miolo branco, em frações da página. */
+        public final float[] area;
+        /** Onde o texto cabe: {esquerda, topo, direita, base} em frações da página. */
+        public final float[] caixa;
+        public final String texto;
+
+        BalaoPronto(float[] area, float[] caixa, String texto) {
+            this.area = area;
+            this.caixa = caixa;
+            this.texto = texto;
         }
     }
 
@@ -187,18 +218,43 @@ public final class Episodio {
     }
 
     private static Quadro quadro(Map<String, Object> map) {
-        List<Object> values = list(map, "area");
-        if (values.size() < 6 || values.size() % 2 != 0) {
-            throw new IllegalArgumentException("area do quadro precisa ser [x0, y0, x1, y1, x2, y2, ...]");
+        float[] area = fractions(map, "area", 6, "area do quadro");
+        List<String> efeitos = new ArrayList<>();
+        for (Object item : list(map, "efeitos")) efeitos.add(String.valueOf(item));
+        for (String efeito : efeitos) {
+            if (!efeito.equals("impacto") && !efeito.equals("tremor") && !efeito.equals("velocidade") &&
+                !efeito.equals("zoom")) {
+                throw new IllegalArgumentException("efeito desconhecido: " + efeito + " (use impacto, tremor, velocidade, zoom)");
+            }
         }
-        float[] area = new float[values.size()];
-        for (int i = 0; i < area.length; i++) {
+        List<BalaoPronto> baloes = new ArrayList<>();
+        for (Object item : list(map, "baloes")) {
+            Map<String, Object> b = asMap(item);
+            String texto = string(b, "texto", "");
+            if (texto.isEmpty()) throw new IllegalArgumentException("balão da página pronta sem texto");
+            float[] caixa = fractions(b, "caixa", 4, "caixa do balão");
+            if (caixa.length != 4) throw new IllegalArgumentException("caixa do balão precisa ser [esquerda, topo, direita, base]");
+            baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto));
+        }
+        boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
+        return new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),
+            efeitos.contains("zoom"), string(map, "legenda", null), Collections.unmodifiableList(baloes));
+    }
+
+    /** Lista de números entre 0 e 1 (frações da página), com tamanho par. */
+    private static float[] fractions(Map<String, Object> map, String key, int min, String what) {
+        List<Object> values = list(map, key);
+        if (values.size() < min || values.size() % 2 != 0) {
+            throw new IllegalArgumentException(what + " precisa ser [x0, y0, x1, y1, ...]");
+        }
+        float[] out = new float[values.size()];
+        for (int i = 0; i < out.length; i++) {
             Object v = values.get(i);
-            if (!(v instanceof Number)) throw new IllegalArgumentException("area do quadro com valor que não é número");
-            area[i] = ((Number)v).floatValue();
-            if (area[i] < -0.01f || area[i] > 1.01f) throw new IllegalArgumentException("area do quadro fora da página: " + area[i]);
+            if (!(v instanceof Number)) throw new IllegalArgumentException(what + " com valor que não é número");
+            out[i] = ((Number)v).floatValue();
+            if (out[i] < -0.01f || out[i] > 1.01f) throw new IllegalArgumentException(what + " fora da página: " + out[i]);
         }
-        return new Quadro(area, Boolean.TRUE.equals(map.get("impacto")), string(map, "legenda", null));
+        return out;
     }
 
     private static Painel painel(Map<String, Object> map) {
