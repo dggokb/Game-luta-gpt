@@ -21,6 +21,9 @@ o que o jogo já tem é o **mangá animado**, a mesma linguagem da Página Final
   do ultra. Movimento vem do motor (zoom lento de câmera, painel batendo, linhas de
   velocidade, tremor), não da arte, então não precisa de animação nem de vídeo.
 - **Gancho de anime**: todo episódio fecha com o cartão "PRÓXIMO EPISÓDIO" + "CONTINUA...".
+- **Referências visuais**: os concepts dos personagens da história (Takatoshi aos 45 e aos 55,
+  Dafu, os irmãos aos 8 anos) e o logo estão em `art/concepts/`. O logo aparece no cartão de
+  título de cada episódio (`historia/logo.jpg`).
 
 O que fica para depois do MVP (quando o ritmo estiver aprovado): vozes e trilha, escolha de
 lado no chaveamento (campanha do Ryūga e campanha do Kōga), lutas variáveis sorteadas,
@@ -55,7 +58,8 @@ toca o episódio e desenha; o `GameView` só repassa toques, desenha por cima e 
 
 `android/app/src/main/assets/historia/temporada.json` define o elenco (nome e cor nos
 balões; a cor também pinta a arte provisória) e a ordem dos episódios. Cada episódio fica em
-`historia/<id>/episodio.json`, com as imagens dos painéis na mesma pasta.
+`historia/<id>/episodio.json`, com as imagens dos painéis na mesma pasta. O campo `logo`
+aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo).
 
 ```json
 {

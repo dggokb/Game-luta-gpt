@@ -19,6 +19,8 @@ public final class Temporada {
 
     public final String titulo;
     public final String subtitulo;
+    /** Imagem do logo (em {@code historia/}) para o cartão de título, ou null. */
+    public final String logo;
     public final Map<String, Personagem> elenco;
     public final List<String> episodios;
 
@@ -37,9 +39,10 @@ public final class Temporada {
         }
     }
 
-    Temporada(String titulo, String subtitulo, Map<String, Personagem> elenco, List<String> episodios) {
+    Temporada(String titulo, String subtitulo, String logo, Map<String, Personagem> elenco, List<String> episodios) {
         this.titulo = titulo;
         this.subtitulo = subtitulo;
+        this.logo = logo;
         this.elenco = Collections.unmodifiableMap(elenco);
         this.episodios = Collections.unmodifiableList(episodios);
     }
@@ -79,7 +82,7 @@ public final class Temporada {
         for (Object item : Episodio.list(map, "episodios")) episodios.add(String.valueOf(item));
         if (episodios.isEmpty()) throw new IllegalArgumentException("temporada.json sem episódios");
         return new Temporada(Episodio.string(map, "titulo", "MODO HISTÓRIA"),
-            Episodio.string(map, "subtitulo", ""), elenco, episodios);
+            Episodio.string(map, "subtitulo", ""), Episodio.string(map, "logo", null), elenco, episodios);
     }
 
     static int parseColor(String text) {
