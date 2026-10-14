@@ -152,6 +152,22 @@ final class ControlsLayout {
         return Control.NONE;
     }
 
+    /** Botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL): somem durante o tutorial. */
+    static boolean isTestButton(Control control) {
+        switch (control) {
+            case AI_TOGGLE:
+            case DEBUG_TOGGLE:
+            case HEAL_PLAYER:
+            case HEAL_OPPONENT:
+            case TEAM_SELECT:
+            case STORY:
+            case TUTORIAL:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     /** O PULAR do painel do tutorial (só vale enquanto o treino roda). */
     static boolean tutorialSkipAt(float x, float y) {
         return insideRect(x, y, TUTORIAL_SKIP_LEFT, TUTORIAL_SKIP_TOP, TUTORIAL_SKIP_RIGHT, TUTORIAL_SKIP_BOTTOM);

@@ -5,9 +5,10 @@ páginas 1 a 4 do Prólogo, até o "Vamos começar o treinamento... Estão pront
 treino no **Dojo Shūshinkan**. No modo história é igual, porque o treino é um passo do Prólogo
 (`"modo": "tutorial"`), e a história continua depois dele.
 
-Takatoshi e Dafu assistem do fundo do dojo e reagem (aplaudem, riem, se espantam), e antes
-de cada lição entra um quadro de mangá com a fala de um deles. Os vídeos e as imagens que
-faltam, com os prompts: [tutorial-plateia.md](tutorial-plateia.md).
+Takatoshi e Dafu assistem do fundo do dojo e reagem (aplaudem, riem, se espantam) e falam
+em quadros de mangá nas laterais da tela (Takatoshi à esquerda, Dafu à direita), sem parar a
+luta: a explicação de cada lição e comentários sobre o que o jogador faz. Os vídeos e as
+imagens que faltam, com os prompts: [tutorial-plateia.md](tutorial-plateia.md).
 
 ## Como funciona
 

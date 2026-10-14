@@ -316,6 +316,7 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   combos, defesa, especiais, agarrão, SUPER e ULTRA). No modo história o treino vem no mesmo
   ponto do Prólogo. `docs/tutorial.md`.
 - Takatoshi e Dafu assistem no fundo do dojo e reagem ao treino (atores de cenário, tipo
-  `ator` no `stage.json`), e um quadro de mangá com a fala deles entra antes de cada lição.
+  `ator` no `stage.json`), e falam em quadros de mangá nas laterais da tela sem parar a luta
+  (`historia/tutorial/falas.json`). No tutorial os botões de teste somem.
   Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
   vídeos: `tools/stage/video_para_ator.py`.

@@ -14,7 +14,7 @@ import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
 import com.gamelutagpt.historia.PaginaHistoria;
-import com.gamelutagpt.historia.QuadroTreino;
+import com.gamelutagpt.historia.RetratosTreino;
 import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
@@ -144,8 +144,13 @@ public class GameView extends SurfaceView
     private Runnable sceneAfter;
     /** Modo tutorial: o treino guiado dos golpes no dojo (o boneco não usa a IA). */
     private final TutorialDirector tutorial = new TutorialDirector();
-    /** Quadro de mangá entre as lições do tutorial (historia/tutorial/quadros.json). */
-    private QuadroTreino quadroTreino;
+    /**
+     * Takatoshi e Dafu nos quadros laterais durante o treino (historia/tutorial/falas.json):
+     * falam a cada lição e reagem ao jogador sem parar a luta.
+     */
+    private RetratosTreino retratos;
+    /** Lição do treino que já teve a fala dos retratos (-1: nenhuma). */
+    private int retratosLicao = -1;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
@@ -261,8 +266,8 @@ public class GameView extends SurfaceView
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
         historia = new PaginaHistoria(this, ultraAssets);
-        quadroTreino = new QuadroTreino(ultraAssets);
-        quadroTreino.load();
+        retratos = new RetratosTreino(ultraAssets);
+        retratos.load();
         stageId = DEFAULT_STAGE;
         stageScene = loadStage(ultraAssets, stageId);
         characterSelectRenderer = new CharacterSelectRenderer(context);
@@ -345,7 +350,7 @@ public class GameView extends SurfaceView
         storyEpisode = -1;
         sceneAfter = null;
         tutorial.stop();
-        quadroTreino.stop();
+        retratos.stop();
         useStage(null);
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
@@ -356,7 +361,7 @@ public class GameView extends SurfaceView
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (ajusteTamanho.isOpen() || characterSelect.isOpen() || historia.coversScreen() || quadroTreino.active()) {
+        if (ajusteTamanho.isOpen() || characterSelect.isOpen() || historia.coversScreen()) {
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -600,7 +605,6 @@ public class GameView extends SurfaceView
             historia.update(FIXED_STEP);
             return;
         }
-        if (updateTutorialPanel()) return;
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
             paginaFinal.update(FIXED_STEP);
@@ -642,11 +646,14 @@ public class GameView extends SurfaceView
         }
         engine.step(playerInput, opponentInput);
         demo.afterStep();
+        // O "treino completo" espera a conversa do fim (ela anda sozinha, sem toque).
+        tutorial.setHoldEnd(retratos.falando());
         tutorial.afterStep();
         // Quem assiste no fundo (Dafu e Takatoshi) reage ao que aconteceu no treino.
         if (stageScene != null) {
             for (String reaction : tutorial.reactions()) stageScene.react(reaction);
         }
+        updateTutorialTalk();
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
@@ -1281,11 +1288,11 @@ public class GameView extends SurfaceView
             if (!pageCoversGame) {
                 drawHud(canvas);
                 drawControls(canvas);
+                retratos.render(renderCanvas);
             }
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
-            quadroTreino.render(renderCanvas);
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
@@ -1876,11 +1883,6 @@ public class GameView extends SurfaceView
             }
             return;
         }
-        if (quadroTreino.active()) {
-            // O quadro entre as lições: o toque passa o balão ou fecha o quadro.
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) quadroTreino.tap();
-            return;
-        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing.
@@ -1892,11 +1894,15 @@ public class GameView extends SurfaceView
             float y = event.getY(index) / sy;
             if(debugOverlay && handleSizeTunerTap(x,y))return;
             if (tutorial.active() && ControlsLayout.tutorialSkipAt(x, y)) {
+                // PULAR no fim do treino não espera a conversa terminar.
+                if (tutorial.completing()) retratos.stop();
                 tutorial.skip();
                 return;
             }
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
+            // No tutorial os botões de teste não aparecem nem respondem.
+            if (tutorial.active() && ControlsLayout.isTestButton(control)) control = ControlsLayout.Control.NONE;
             switch (control) {
                 case AI_TOGGLE:
                     setOpponentAiEnabled(!ai.enabled());
@@ -2014,7 +2020,7 @@ public class GameView extends SurfaceView
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         if (!loadTemporada()) return;
         tutorial.stop();
-        quadroTreino.stop();
+        retratos.stop();
         sceneAfter = null;
         hud.resetEffects();
         pad.reset();
@@ -2027,7 +2033,7 @@ public class GameView extends SurfaceView
     private void startTutorialMode() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         tutorial.stop();
-        quadroTreino.stop();
+        retratos.stop();
         playScene("tutorial", this::openCharacterSelect);
     }
 
@@ -2126,8 +2132,11 @@ public class GameView extends SurfaceView
         if (luta.tutorial()) {
             // O boneco de treino não usa a IA; as lições dizem o que ele faz.
             setOpponentAiEnabled(false);
-            tutorial.setPanels(true);
+            // As lições não esperam quadro nenhum: os retratos falam por cima da luta.
+            tutorial.setPanels(false);
             tutorial.start(engine, team, PLAYER_START_X);
+            retratos.stop();
+            retratosLicao = -1;
             storyKoFrames = 0;
             pad.reset();
             releaseAllPointers();
@@ -2135,7 +2144,7 @@ public class GameView extends SurfaceView
             return;
         }
         tutorial.stop();
-        quadroTreino.stop();
+        retratos.stop();
         setOpponentAiEnabled(true);
         storyKoFrames = 0;
         pad.reset();
@@ -2149,34 +2158,31 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * Quadro de mangá entre as lições: enquanto ele está na tela a luta espera; qualquer
-     * tecla ou toque passa o balão. Verdadeiro quando o quadro ocupou este passo.
+     * Os retratos do treino: a fala de cada lição quando ela começa, a do fim e as reações ao
+     * que o jogador fez. Nada disso para a luta.
      */
-    private boolean updateTutorialPanel() {
-        if (!quadroTreino.active()) {
-            String wanted = tutorial.panelWanted();
-            if (wanted == null) return false;
-            if (!quadroTreino.start(temporada, wanted)) {
-                // Lição sem quadro: segue direto.
-                tutorial.panelDone();
-                return false;
+    private void updateTutorialTalk() {
+        if (temporada != null && tutorial.active()) {
+            int lesson = tutorial.lessonIndex();
+            if (lesson != retratosLicao && tutorial.lesson() != null) {
+                retratosLicao = lesson;
+                retratos.licao(temporada, tutorial.lesson().id);
             }
-            pad.reset();
-            releaseAllPointers();
+            for (String reaction : tutorial.reactions()) {
+                if ("fim".equals(reaction)) {
+                    retratos.licao(temporada, "fim");
+                } else {
+                    retratos.reacao(temporada, reaction);
+                }
+            }
         }
-        pad.drainInto(ignoredInput);
-        Integer key;
-        while ((key = selectionKeys.poll()) != null) quadroTreino.tap();
-        quadroTreino.update(FIXED_STEP);
-        if (!quadroTreino.active()) tutorial.panelDone();
-        updateFightCamera(FIXED_STEP);
-        return true;
+        retratos.update(FIXED_STEP);
     }
 
     /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
     private void finishTutorial() {
         tutorial.stop();
-        quadroTreino.stop();
+        retratos.stop();
         pad.reset();
         releaseAllPointers();
         if (historia.waitingFight()) historia.resultadoLuta(true);

@@ -1,4 +1,4 @@
-# Tutorial: Takatoshi e Dafu assistindo, e os quadros entre as lições
+# Tutorial: Takatoshi e Dafu assistindo e falando nas laterais
 
 O treino do tutorial (no Dojo Shūshinkan) tem duas coisas a mais:
 
@@ -15,15 +15,23 @@ O treino do tutorial (no Dojo Shūshinkan) tem duas coisas a mais:
    Quem reage o quê fica no `ator.json` de cada um (`reacoes`), dá para mudar sem mexer no código.
    Cada um reage com um atrasinho diferente, para não parecerem robôs.
 
-2. **Um quadro de mangá antes de cada lição** (e um no fim). O quadro bate na tela por cima da
-   luta, o Takatoshi ou o Dafu falam (balão digitado) e o toque passa. Se ninguém tocar, o
-   balão passa sozinho em ~3 s. As falas estão em
-   `android/app/src/main/assets/historia/tutorial/quadros.json` (uma entrada por lição).
+2. **Os dois falando nas laterais, sem parar a luta.** Takatoshi aparece num quadro de mangá
+   pequeno à esquerda e Dafu à direita, logo abaixo das barras de vida. Quando uma lição
+   começa, quem explica entra deslizando, fala num balão digitado e sai sozinho; ninguém
+   precisa tocar e o treino não espera. Eles também comentam o que o jogador faz (uma fala
+   sorteada, só quando ninguém está falando): `licao` (cumpriu a lição), `impacto` (acertou
+   forte) e `levou` (apanhou). No fim do treino a conversa do `fim` termina antes da história
+   seguir (PULAR corta). O rosto troca de expressão conforme a fala.
 
-Enquanto os vídeos e as imagens não chegam, já funciona: os dois aparecem parados (recortados
-do concept, respirando de leve) e as reações usam um movimento provisório (pulinho de
-surpresa, balanço de riso). Os quadros usam a arte provisória da história (silhuetas nas
-cores do elenco e o nome do arquivo esperado).
+   As falas, as expressões e as reações ficam em
+   `android/app/src/main/assets/historia/tutorial/falas.json`; as traduções, em
+   `historia/idiomas/` como o resto da história. Durante o tutorial os botões de teste (IA,
+   DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) somem: o canto direito é do quadro do Dafu.
+
+Enquanto os vídeos e as imagens não chegam, já funciona: os dois aparecem parados no fundo
+(recortados do concept, respirando de leve) e as reações usam um movimento provisório (pulinho
+de surpresa, balanço de riso). Nos quadros laterais, o rosto "normal" de cada um é um recorte
+do concept; as outras expressões usam ele até a imagem existir.
 
 ## Os vídeos (Seedance)
 
@@ -146,49 +154,60 @@ python3 tools/stage/video_para_ator.py takatoshi_aplaudir.mp4 --ator $A/takatosh
   instantes: `gradle :pc-preview:runAtor --args="app/src/main/assets/stages/dojo_shinshinkan takatoshi parado,aplaudir,rir,surpreso,aprovar 345 build/ator.png"`.
 - Pode me mandar os vídeos que eu converto e ajusto.
 
-## As imagens dos quadros (ChatGPT)
+## Os rostos dos quadros laterais (ChatGPT)
 
-Uma imagem por quadro, com o nome da lição (`andar.jpg`, `combo.jpg`...), em
-`android/app/src/main/assets/historia/tutorial/`. O quadro na tela é **horizontal (~16:9)**.
-**Sem balões e sem texto:** o jogo escreve as falas por cima (assim dá para traduzir).
+Quatro expressões de cada um, salvas em `android/app/src/main/assets/historia/tutorial/retratos/`
+como **PNG** com estes nomes (a expressão que falta usa a `normal`):
 
-Cole antes de cada prompt e anexe as páginas do mangá do dojo e os concepts dos dois:
+| Arquivo | Expressão | Quando aparece |
+|---|---|---|
+| `takatoshi_normal.png` | sério, calmo | explicando a lição |
+| `takatoshi_sorrindo.png` | meio sorriso orgulhoso | "Bom.", "Isso. De novo, sem pensar.", fim do treino |
+| `takatoshi_surpreso.png` | sobrancelha erguida, impressionado | "Hm. Boa força." |
+| `takatoshi_bravo.png` | firme, cobrando | "Guarda alta!", especial de energia, Ultra |
+| `dafu_normal.png` | o sorriso de sempre, olhos fechados | explicando a lição |
+| `dafu_rindo.png` | gargalhada, boca aberta | "Hohoho!", "Muito bem, garoto!" |
+| `dafu_surpreso.png` | olhos arregalados (raro nele) | "Opa! Que pancada!" |
+| `dafu_preocupado.png` | sem graça, gota de suor | "Ai, essa doeu!", "cuidado com o meu dojo!" |
+
+O quadro na tela é um retrato (mais alto que largo) e mostra **da cabeça aos ombros**, com o
+rosto no terço de cima. **Takatoshi olha para a direita e Dafu para a esquerda** (os dois
+olham para o centro da tela). Gere em **1024x1024**, um rosto por imagem, com o fundo liso (o
+jogo pinta o fundo do quadro com a cor de cada um e as linhas de foco).
+
+Anexe o concept de quem aparece (`art/concepts/takatoshi_45.png` ou `art/concepts/dafu.png`) e,
+a partir da segunda imagem, a primeira que ficou boa (para manter o mesmo rosto). Cole antes de
+cada prompt:
 
 ```
-Quadro único de mangá colorido, no mesmo estilo das páginas anexadas (anime anos 90, traço
-limpo, cores quentes do dojo à noite, iluminação âmbar das lanternas). Interior do Dojo
-Shūshinkan. Takatoshi e Dafu exatamente como nos concepts anexados. Horizontal 16:9.
-Sem balões, sem texto, sem onomatopeias, sem moldura, sem marca d'água. Deixe espaço livre
-na parte de cima do quadro para os balões.
+Retrato de mangá colorido, no estilo de anime de luta dos anos 90 (traço de tinta preto e
+grosso, cores chapadas e vibrantes, sombras duras, muito contraste). Exatamente o personagem
+do concept anexado: mesmo rosto, cabelo, roupa e cores. Enquadramento da cabeça aos ombros,
+rosto grande ocupando o terço de cima e o centro da imagem, cabeça inteira dentro da imagem.
+Fundo liso de uma cor só, cinza claro, sem cenário. Sem texto, sem balões, sem moldura, sem
+marca d'água. Quadrado 1024x1024.
 ```
 
-| Arquivo | Cena |
+**Takatoshi** (45 anos, concept `takatoshi_45.png`), corpo virado de três quartos, **olhando
+para a direita da imagem**:
+
+| Arquivo | Prompt |
 |---|---|
-| `andar.jpg` | Takatoshi de braços cruzados, sério, olhando para baixo (para o menino fora do quadro), plano médio. |
-| `agachar.jpg` | Dafu inclinado para a frente rindo, mão espalmada para baixo mostrando "abaixa". |
-| `pular.jpg` | Takatoshi apontando para cima com dois dedos, calmo. |
-| `super-pulo.jpg` | Dafu rindo alto olhando para o teto, mãos na barriga. |
-| `dash.jpg` | Takatoshi de perfil, olhar afiado, mão cortando o ar para a frente. |
-| `recuo.jpg` | Takatoshi dando um passo para trás em guarda, demonstrando. |
-| `golpe-fraco.jpg` | Dafu socando a própria palma, empolgado. |
-| `golpe-medio.jpg` | Takatoshi tocando o próprio quadril, explicando o peso do golpe. |
-| `golpe-forte.jpg` | Dafu gritando de punho erguido, linhas de foco atrás. |
-| `fraco-agachado.jpg` | Takatoshi agachado demonstrando um soco baixo. |
-| `medio-agachado.jpg` | Dafu coçando a nuca, rindo sem graça (lembrando que já levou uma rasteira). |
-| `forte-agachado.jpg` | Takatoshi mostrando um gancho de baixo para cima, em silhueta contra a lanterna. |
-| `golpe-no-ar.jpg` | Dafu apontando para o alto, olhos arregalados de empolgação. |
-| `cravada.jpg` | Takatoshi com a mão descendo como um martelo, close dramático. |
-| `combo.jpg` | Takatoshi e Dafu lado a lado; Takatoshi sério, Dafu sorrindo com o dedo levantado. |
-| `botao-combo.jpg` | Dafu piscando um olho, sorriso maroto, polegar para cima. |
-| `defesa.jpg` | Dafu em guarda de luta, sorrindo, Takatoshi ao lado de braços cruzados. |
-| `defesa-baixa.jpg` | Takatoshi apontando para os próprios pés. |
-| `especial-de-energia.jpg` | Takatoshi com as mãos juntas na cintura, um brilho suave entre elas, olhar concentrado. |
-| `especial-s2.jpg` | Dafu desenhando no ar com o dedo o movimento de um dragão subindo. |
-| `especial-s3.jpg` | Takatoshi meio de costas, olhar por cima do ombro, misterioso. |
-| `especial-s4.jpg` | Dafu flexionando o braço, músculo enorme, rindo. |
-| `agarrao.jpg` | Takatoshi com a mão estendida agarrando o ar, close na mão. |
-| `super.jpg` | Dafu apontando para cima, aura dourada suave em volta dele. |
-| `ultra.jpg` | Takatoshi de olhos fechados concentrado, Dafu atrás dele assustado protegendo o rosto. |
-| `fim.jpg` | Os dois sorrindo, Dafu batendo palmas, Takatoshi com um meio sorriso orgulhoso, pétalas de cerejeira caindo. |
+| `takatoshi_normal.png` | Expressão séria e calma de mestre, olhar firme para a direita, boca fechada, sobrancelhas levemente franzidas. |
+| `takatoshi_sorrindo.png` | Meio sorriso orgulhoso de canto de boca, olhos um pouco semicerrados, satisfeito, olhando para a direita. |
+| `takatoshi_surpreso.png` | Impressionado: uma sobrancelha erguida, olhos um pouco mais abertos, boca levemente entreaberta, olhando para a direita. |
+| `takatoshi_bravo.png` | Firme e cobrando: sobrancelhas franzidas, dentes cerrados, falando alto, olhar intenso para a direita, sombra dura no rosto. |
 
-Gere em 1536x1024 (o jogo corta o meio). Se mudar alguma fala, mude no `quadros.json`.
+**Dafu** (concept `dafu.png`), corpo virado de três quartos, **olhando para a esquerda da
+imagem**:
+
+| Arquivo | Prompt |
+|---|---|
+| `dafu_normal.png` | O sorriso bonachão de sempre, olhos fechados de tanto sorrir, bochechas redondas, virado para a esquerda. |
+| `dafu_rindo.png` | Gargalhada: boca bem aberta, cabeça um pouco para trás, olhos fechados, bigode balançando, virado para a esquerda. |
+| `dafu_surpreso.png` | Espantado: pela primeira vez os olhos abertos e arregalados, boca em "O", bigode levantado, virado para a esquerda. |
+| `dafu_preocupado.png` | Sem graça e preocupado: sorriso torto, sobrancelhas inclinadas para cima, gota de suor na testa, mão coçando a nuca, virado para a esquerda. |
+
+Se o GPT virar o rosto para o lado errado, é só espelhar a imagem. Pode me mandar as imagens
+que eu recorto, tiro o fundo e coloco no lugar. Para mudar uma fala ou a expressão dela, mude
+no `falas.json` (e a tradução em `historia/idiomas/`).

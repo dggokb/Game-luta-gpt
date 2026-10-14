@@ -334,6 +334,8 @@ final class TutorialDirector {
     private boolean finished;
     /** O jogo mostra um quadro antes de cada lição (e no fim); o treino espera por ele. */
     private boolean panels;
+    /** O jogo pede para segurar o "treino completo" (a conversa do fim ainda está tocando). */
+    private boolean holdEnd;
     /** Quadro que o treino espera agora (id da lição, ou "fim"), ou null. */
     private String panelWanted;
     /** Acontecimentos deste passo para quem assiste: "licao", "impacto", "levou", "fim". */
@@ -343,6 +345,8 @@ final class TutorialDirector {
     boolean active() { return index >= 0 && !finished; }
     /** Liga os quadros entre as lições (o jogo responde com {@link #panelDone}). */
     void setPanels(boolean on) { panels = on; }
+    /** Segura o fim do treino enquanto for verdadeiro (PULAR ainda termina na hora). */
+    void setHoldEnd(boolean hold) { holdEnd = hold; }
     /** Id do quadro que o treino espera agora, ou null. */
     String panelWanted() { return active() ? panelWanted : null; }
     /** O quadro acabou: a lição começa (ou o treino termina). */
@@ -483,7 +487,7 @@ final class TutorialDirector {
             if (s.life < s.profile.maxLife) s.restoreLife();
         }
         if (complete >= 0) {
-            if (++complete >= COMPLETE_FRAMES) finished = true;
+            if (++complete >= COMPLETE_FRAMES && !holdEnd) finished = true;
             return;
         }
         if (praise >= 0) {

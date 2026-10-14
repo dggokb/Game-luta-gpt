@@ -157,6 +157,13 @@ final class HudRenderer {
         if (s.debugEnabled()) {
             text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
         }
+        // No tutorial os botões de teste somem: o canto é dos quadros do Takatoshi e do Dafu.
+        if (!s.tutorialActive()) drawTestButtons(c, s);
+        drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
+            SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
+    }
+
+    private void drawTestButtons(Canvas c, State s) {
         drawToggle(c, s.aiEnabled(), s.aiEnabled() ? "IA ON" : "IA OFF",
             AI_BUTTON_LEFT, AI_BUTTON_TOP, AI_BUTTON_RIGHT, AI_BUTTON_BOTTOM, 19f);
         drawToggle(c, s.debugEnabled(), s.debugEnabled() ? "DEBUG ON" : "DEBUG OFF",
@@ -171,8 +178,6 @@ final class HudRenderer {
             STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM, 16f);
         drawToggle(c, s.tutorialActive(), "TUTORIAL",
             TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 16f);
-        drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
-            SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }
 
 
