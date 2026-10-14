@@ -14,7 +14,7 @@ import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
 import com.gamelutagpt.historia.PaginaHistoria;
-import com.gamelutagpt.historia.RetratosTreino;
+import com.gamelutagpt.historia.ConversaLuta;
 import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
@@ -145,12 +145,15 @@ public class GameView extends SurfaceView
     /** Modo tutorial: o treino guiado dos golpes no dojo (o boneco não usa a IA). */
     private final TutorialDirector tutorial = new TutorialDirector();
     /**
-     * Takatoshi e Dafu nos quadros laterais durante o treino (historia/tutorial/falas.json):
-     * falam a cada lição e reagem ao jogador sem parar a luta.
+     * Conversa nos quadros laterais durante uma luta da história (o "conversa" do passo de
+     * luta): no treino, Takatoshi e Dafu a cada lição; nas lutas, o parceiro de tag e o
+     * adversário que espera. Não para a luta. Padrão: docs/historia/motor-conversas.md.
      */
-    private RetratosTreino retratos;
-    /** Lição do treino que já teve a fala dos retratos (-1: nenhuma). */
-    private int retratosLicao = -1;
+    private ConversaLuta conversa;
+    /** Lição do treino que já teve a fala da conversa (-1: nenhuma). */
+    private int conversaLicao = -1;
+    /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
+    private boolean conversaKo;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
@@ -266,8 +269,7 @@ public class GameView extends SurfaceView
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
         historia = new PaginaHistoria(this, ultraAssets);
-        retratos = new RetratosTreino(ultraAssets);
-        retratos.load();
+        conversa = new ConversaLuta(ultraAssets);
         stageId = DEFAULT_STAGE;
         stageScene = loadStage(ultraAssets, stageId);
         characterSelectRenderer = new CharacterSelectRenderer(context);
@@ -350,7 +352,7 @@ public class GameView extends SurfaceView
         storyEpisode = -1;
         sceneAfter = null;
         tutorial.stop();
-        retratos.stop();
+        conversa.descarregar();
         useStage(null);
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
@@ -647,13 +649,13 @@ public class GameView extends SurfaceView
         engine.step(playerInput, opponentInput);
         demo.afterStep();
         // O "treino completo" espera a conversa do fim (ela anda sozinha, sem toque).
-        tutorial.setHoldEnd(retratos.falando());
+        tutorial.setHoldEnd(conversa.falando());
         tutorial.afterStep();
         // Quem assiste no fundo (Dafu e Takatoshi) reage ao que aconteceu no treino.
         if (stageScene != null) {
             for (String reaction : tutorial.reactions()) stageScene.react(reaction);
         }
-        updateTutorialTalk();
+        updateConversa();
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
@@ -751,6 +753,7 @@ public class GameView extends SurfaceView
         @Override public String demoCaption() { return demo.caption(); }
         @Override public boolean storyActive() { return historia.isActive() && !tutorial.active(); }
         @Override public boolean tutorialActive() { return tutorial.active(); }
+        @Override public boolean hideTestButtons() { return testButtonsHidden(); }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -1288,7 +1291,7 @@ public class GameView extends SurfaceView
             if (!pageCoversGame) {
                 drawHud(canvas);
                 drawControls(canvas);
-                retratos.render(renderCanvas);
+                conversa.render(renderCanvas);
             }
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
@@ -1895,14 +1898,14 @@ public class GameView extends SurfaceView
             if(debugOverlay && handleSizeTunerTap(x,y))return;
             if (tutorial.active() && ControlsLayout.tutorialSkipAt(x, y)) {
                 // PULAR no fim do treino não espera a conversa terminar.
-                if (tutorial.completing()) retratos.stop();
+                if (tutorial.completing()) conversa.stop();
                 tutorial.skip();
                 return;
             }
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
-            // No tutorial os botões de teste não aparecem nem respondem.
-            if (tutorial.active() && ControlsLayout.isTestButton(control)) control = ControlsLayout.Control.NONE;
+            // No tutorial e nas lutas com conversa os botões de teste não aparecem nem respondem.
+            if (testButtonsHidden() && ControlsLayout.isTestButton(control)) control = ControlsLayout.Control.NONE;
             switch (control) {
                 case AI_TOGGLE:
                     setOpponentAiEnabled(!ai.enabled());
@@ -2020,7 +2023,7 @@ public class GameView extends SurfaceView
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         if (!loadTemporada()) return;
         tutorial.stop();
-        retratos.stop();
+        conversa.descarregar();
         sceneAfter = null;
         hud.resetEffects();
         pad.reset();
@@ -2033,7 +2036,7 @@ public class GameView extends SurfaceView
     private void startTutorialMode() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         tutorial.stop();
-        retratos.stop();
+        conversa.descarregar();
         playScene("tutorial", this::openCharacterSelect);
     }
 
@@ -2111,9 +2114,15 @@ public class GameView extends SurfaceView
             storyKoFrames = 0;
             return;
         }
-        if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0) return;
-        storyKoFrames = 0;
         boolean won = opponent().ko() && !player().ko();
+        if (!conversaKo && !tutorial.active()) {
+            // Quem está de fora comenta o resultado; a história espera a fala acabar.
+            conversaKo = true;
+            conversa.momento(won ? "vitoria" : "derrota");
+        }
+        if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0 || conversa.falando()) return;
+        storyKoFrames = 0;
+        conversa.descarregar();
         pad.reset();
         releaseAllPointers();
         historia.resultadoLuta(won);
@@ -2129,14 +2138,20 @@ public class GameView extends SurfaceView
         } else {
             selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
         }
+        // A conversa da luta (nos quadros laterais, sem parar a luta) começa com o "inicio".
+        conversa.descarregar();
+        conversaLicao = -1;
+        conversaKo = false;
+        if (luta.conversa != null && temporada != null && !conversa.carregar(temporada, luta.conversa)) {
+            Log.w(LOG_TAG, "conversa " + luta.conversa + " não abriu");
+        }
+        conversa.momento("inicio");
         if (luta.tutorial()) {
             // O boneco de treino não usa a IA; as lições dizem o que ele faz.
             setOpponentAiEnabled(false);
-            // As lições não esperam quadro nenhum: os retratos falam por cima da luta.
+            // As lições não esperam quadro nenhum: a conversa fala por cima da luta.
             tutorial.setPanels(false);
             tutorial.start(engine, team, PLAYER_START_X);
-            retratos.stop();
-            retratosLicao = -1;
             storyKoFrames = 0;
             pad.reset();
             releaseAllPointers();
@@ -2144,7 +2159,6 @@ public class GameView extends SurfaceView
             return;
         }
         tutorial.stop();
-        retratos.stop();
         setOpponentAiEnabled(true);
         storyKoFrames = 0;
         pad.reset();
@@ -2158,31 +2172,44 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * Os retratos do treino: a fala de cada lição quando ela começa, a do fim e as reações ao
-     * que o jogador fez. Nada disso para a luta.
+     * A conversa da luta: no treino, a fala de cada lição quando ela começa, a do fim e as
+     * reações ao que o jogador fez; numa luta da história, as reações aos golpes. Nada disso
+     * para a luta.
      */
-    private void updateTutorialTalk() {
-        if (temporada != null && tutorial.active()) {
+    private void updateConversa() {
+        if (tutorial.active()) {
             int lesson = tutorial.lessonIndex();
-            if (lesson != retratosLicao && tutorial.lesson() != null) {
-                retratosLicao = lesson;
-                retratos.licao(temporada, tutorial.lesson().id);
+            if (lesson != conversaLicao && tutorial.lesson() != null) {
+                conversaLicao = lesson;
+                conversa.momento(tutorial.lesson().id);
             }
             for (String reaction : tutorial.reactions()) {
                 if ("fim".equals(reaction)) {
-                    retratos.licao(temporada, "fim");
+                    conversa.momento("fim");
                 } else {
-                    retratos.reacao(temporada, reaction);
+                    conversa.reacao(reaction);
                 }
             }
+        } else if (conversa.ativa() && !player().ko() && !opponent().ko()) {
+            // Golpe forte do jogador que entrou ("impacto") e golpe do adversário que pegou ("levou").
+            for (CombatEngine.HitEvent e : engine.events()) {
+                if (e.blocked) continue;
+                if (e.attacker == PLAYER && TutorialDirector.BIG_MOVES.contains(e.moveId)) conversa.reacao("impacto");
+                if (e.attacker == OPPONENT) conversa.reacao("levou");
+            }
         }
-        retratos.update(FIXED_STEP);
+        conversa.update(FIXED_STEP);
+    }
+
+    /** Botões de teste escondidos: no tutorial e nas lutas com conversa (o canto é dos quadros). */
+    private boolean testButtonsHidden() {
+        return tutorial.active() || conversa.ativa();
     }
 
     /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
     private void finishTutorial() {
         tutorial.stop();
-        retratos.stop();
+        conversa.descarregar();
         pad.reset();
         releaseAllPointers();
         if (historia.waitingFight()) historia.resultadoLuta(true);

@@ -89,7 +89,7 @@
         }
       ]
     },
-    {"tipo": "luta", "marca": "treino", "modo": "tutorial", "cenario": "dojo_shinshinkan", "rotulo": "TREINO", "dupla": ["player_base", "p02"], "cpu": ["p03", "p04"]},
+    {"tipo": "luta", "marca": "treino", "modo": "tutorial", "cenario": "dojo_shinshinkan", "conversa": "ep00/conversa_treino.json", "rotulo": "TREINO", "dupla": ["player_base", "p02"], "cpu": ["p03", "p04"]},
     {
       "marca": "pai-parte",
       "tipo": "pagina",

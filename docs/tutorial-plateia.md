@@ -24,7 +24,7 @@ O treino do tutorial (no Dojo Shūshinkan) tem duas coisas a mais:
    seguir (PULAR corta). O rosto troca de expressão conforme a fala.
 
    As falas, as expressões e as reações ficam em
-   `android/app/src/main/assets/historia/tutorial/falas.json`; as traduções, em
+   `android/app/src/main/assets/historia/ep00/conversa_treino.json` (motor e formato: [historia/motor-conversas.md](historia/motor-conversas.md)); as traduções, em
    `historia/idiomas/` como o resto da história. Durante o tutorial os botões de teste (IA,
    DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) somem: o canto direito é do quadro do Dafu.
 
@@ -156,7 +156,7 @@ python3 tools/stage/video_para_ator.py takatoshi_aplaudir.mp4 --ator $A/takatosh
 
 ## Os rostos dos quadros laterais (ChatGPT)
 
-Quatro expressões de cada um, salvas em `android/app/src/main/assets/historia/tutorial/retratos/`
+Quatro expressões de cada um, salvas em `android/app/src/main/assets/historia/retratos/`
 como **PNG** com estes nomes (a expressão que falta usa a `normal`):
 
 | Arquivo | Expressão | Quando aparece |
@@ -210,4 +210,4 @@ imagem**:
 
 Se o GPT virar o rosto para o lado errado, é só espelhar a imagem. Pode me mandar as imagens
 que eu recorto, tiro o fundo e coloco no lugar. Para mudar uma fala ou a expressão dela, mude
-no `falas.json` (e a tradução em `historia/idiomas/`).
+no `ep00/conversa_treino.json` (e a tradução em `historia/idiomas/`).

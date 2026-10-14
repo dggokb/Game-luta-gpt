@@ -55,6 +55,8 @@ final class HudRenderer {
         default boolean storyActive() { return false; }
         /** O treino guiado dos golpes (modo tutorial) está rodando. */
         default boolean tutorialActive() { return false; }
+        /** Tutorial ou luta com conversa: o canto dos botões de teste é dos quadros laterais. */
+        default boolean hideTestButtons() { return tutorialActive(); }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -157,8 +159,8 @@ final class HudRenderer {
         if (s.debugEnabled()) {
             text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
         }
-        // No tutorial os botões de teste somem: o canto é dos quadros do Takatoshi e do Dafu.
-        if (!s.tutorialActive()) drawTestButtons(c, s);
+        // No tutorial e nas lutas com conversa os botões de teste somem (o canto é dos quadros).
+        if (!s.hideTestButtons()) drawTestButtons(c, s);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }

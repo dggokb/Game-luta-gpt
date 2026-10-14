@@ -14,19 +14,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Takatoshi e Dafu falando durante o treino, sem parar a luta: cada um num quadro de mangá
- * pequeno na lateral da tela (Takatoshi à esquerda, Dafu à direita), logo abaixo da barra de
- * vida, com um balão que entra digitando e some sozinho. O quadro troca de expressão conforme
- * a fala e sai deslizando quando a pessoa para de falar.
+ * Conversa durante uma luta, sem parar a luta: quem está de fora (o parceiro de tag esperando,
+ * o adversário que aguarda a vez, o mestre assistindo o treino) fala num quadro de mangá
+ * pequeno na lateral da tela, logo abaixo da barra de vida: o lado do jogador à esquerda, o
+ * do adversário à direita. O balão entra digitando e some sozinho; ninguém precisa tocar. O
+ * quadro troca de expressão conforme a fala e sai deslizando quando a pessoa para de falar.
  *
- * As falas ficam em {@code historia/tutorial/falas.json}: as de cada lição (pelo id da lição,
- * mais "fim") e as reações sorteadas ao que o jogador faz ("licao", "impacto", "levou"). Os
- * rostos ficam em {@code historia/tutorial/retratos/<quem>_<expressao>.png}; uma expressão sem
- * imagem usa a "normal".
+ * Cada luta da história pode apontar um arquivo de conversa ({@code "conversa"} no passo de
+ * luta, caminho dentro de {@code historia/}). Nele, {@code lados} diz de que lado cada um
+ * aparece, {@code momentos} são as falas de momentos certos da luta (o jogo chama
+ * {@link #momento}: "inicio", "vitoria", "derrota", as lições do treino, "fim") e
+ * {@code reacoes} são falas sorteadas quando algo acontece ("impacto", "levou", "licao"),
+ * só quando ninguém está falando. Os rostos são do elenco inteiro e ficam em
+ * {@code historia/retratos/<quem>_<expressao>.png}; uma expressão sem imagem usa a "normal".
+ * Padrão completo: docs/historia/motor-conversas.md.
  */
-public final class RetratosTreino {
-    public static final String PASTA = Temporada.PASTA + "/tutorial";
-    public static final String ARQUIVO = PASTA + "/falas.json";
+public final class ConversaLuta {
+    public static final String RETRATOS = Temporada.PASTA + "/retratos";
 
     // Quadros nas laterais, entre a barra de vida e os controles (coordenadas 1280x720).
     static final float[] QUADRO_ESQ = {14f, 202f, 192f, 193f, 186f, 376f, 10f, 388f};
@@ -43,8 +47,10 @@ public final class RetratosTreino {
     static final float SEGURA_MIN = 1.6f;
     static final float SEGURA_POR_LETRA = 0.035f;
     static final float SEGURA_MAX = 4.5f;
-    /** Reação é curta: fica menos na tela e não segura a fala da lição seguinte. */
+    /** Reação é curta: fica menos na tela e não segura a fala do momento seguinte. */
     static final float SEGURA_REACAO = 0.9f;
+    /** Silêncio mínimo antes de uma reação (a conversa não vira falatório numa luta). */
+    static final float PAUSA_REACAO = 1.5f;
     /** Quem parou de falar fica um pouco antes de sair (conversa de dois não pisca). */
     static final float SAIR_DEPOIS = 1.0f;
     private static final int INK = Baloes.INK;
@@ -65,37 +71,28 @@ public final class RetratosTreino {
         }
     }
 
-    /** Quem pode falar: lado da tela, cor do fundo do quadro e as expressões com imagem. */
-    static final class Retrato {
-        final String id;
-        final boolean direita;
-        final int fundo;
-        final List<String> expressoes;
-
-        Retrato(String id, boolean direita, int fundo, List<String> expressoes) {
-            this.id = id;
-            this.direita = direita;
-            this.fundo = fundo;
-            this.expressoes = expressoes;
-        }
-    }
-
     /** Estado de um quadro na tela. */
     private static final class Lado {
-        Retrato retrato;
+        final boolean direita;
+        String quem;
         String expressao = "normal";
         float entrou = -1f;
         float saiu = -1f;
         float ultimaFala = -1f;
         float troca = -1f;
+
+        Lado(boolean direita) {
+            this.direita = direita;
+        }
     }
 
     private final RenderAssets assets;
     private final Baloes baloes = new Baloes();
     private final Rand rand = new Rand(41);
+    /** Rostos já lidos (o elenco se repete de luta em luta); null = não existe. */
     private final Map<String, RenderImage> imagens = new HashMap<>();
-    private Map<String, Retrato> retratos = Collections.emptyMap();
-    private Map<String, List<Fala>> licoes = Collections.emptyMap();
+    private Map<String, Boolean> direita = Collections.emptyMap();
+    private Map<String, List<Fala>> momentos = Collections.emptyMap();
     private Map<String, List<Fala>> reacoes = Collections.emptyMap();
     private final Map<String, Integer> sorteio = new HashMap<>();
 
@@ -103,55 +100,71 @@ public final class RetratosTreino {
     private final List<Fala> fila = new ArrayList<>();
     private Fala atual;
     private float falaDesde;
+    private float caladoDesde = -999f;
     private float time;
-    private final Lado esq = new Lado();
-    private final Lado dir = new Lado();
+    private final Lado esq = new Lado(false);
+    private final Lado dir = new Lado(true);
     private long frame;
 
-    public RetratosTreino(RenderAssets assets) {
+    public ConversaLuta(RenderAssets assets) {
         this.assets = assets;
     }
 
-    /** Lê as falas e os rostos; sem o arquivo, ninguém fala (o treino segue igual). */
-    public void load() {
+    /**
+     * Carrega a conversa de uma luta ({@code arquivo} dentro de {@code historia/}) e os rostos
+     * de quem fala nela. Falso (e ninguém fala) se o arquivo não abre: a luta segue igual.
+     */
+    public boolean carregar(Temporada temporada, String arquivo) {
+        descarregar();
         try {
-            fromJson(assets.readText(ARQUIVO));
+            fromJson(temporada, assets.readText(Temporada.PASTA + "/" + arquivo));
         } catch (IOException | RuntimeException ex) {
-            retratos = Collections.emptyMap();
-            licoes = Collections.emptyMap();
-            reacoes = Collections.emptyMap();
-            return;
+            descarregar();
+            return false;
         }
-        imagens.clear();
-        for (Retrato r : retratos.values()) {
-            for (String e : r.expressoes) {
-                String nome = r.id + "_" + e;
+        for (List<Fala> falas : momentos.values()) carregarRostos(falas);
+        for (List<Fala> falas : reacoes.values()) carregarRostos(falas);
+        return true;
+    }
+
+    private void carregarRostos(List<Fala> falas) {
+        for (Fala f : falas) {
+            for (String nome : new String[] {f.quem + "_normal", f.quem + "_" + f.expressao}) {
+                if (imagens.containsKey(nome)) continue;
+                RenderImage img = null;
                 try {
-                    imagens.put(nome, assets.loadImage(PASTA + "/retratos/" + nome + ".png"));
+                    img = assets.loadImage(RETRATOS + "/" + nome + ".png");
                 } catch (IOException | RuntimeException ex) {
-                    // Expressão ainda sem imagem: usa a normal.
+                    // Expressão ainda sem imagem: usa a normal (ou o nome, sem nenhuma).
                 }
+                imagens.put(nome, img);
             }
         }
     }
 
-    void fromJson(String json) {
+    /** Lê e valida a conversa (quem fala tem lado e está no elenco; toda fala tem texto). */
+    void fromJson(Temporada temporada, String json) {
         Map<String, Object> root = Episodio.asMap(MiniJson.parse(json));
-        Map<String, Retrato> rs = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> e : Episodio.asMap(root.get("retratos")).entrySet()) {
-            Map<String, Object> m = Episodio.asMap(e.getValue());
-            List<String> expressoes = new ArrayList<>();
-            for (Object x : Episodio.list(m, "expressoes")) expressoes.add(String.valueOf(x));
-            if (!expressoes.contains("normal")) expressoes.add(0, "normal");
-            rs.put(e.getKey(), new Retrato(e.getKey(), "direita".equals(Episodio.string(m, "lado", "esquerda")),
-                Temporada.parseColor(Episodio.string(m, "fundo", "#2B3F8F")), expressoes));
+        Map<String, Boolean> lados = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> e : Episodio.asMap(root.get("lados")).entrySet()) {
+            String lado = String.valueOf(e.getValue());
+            if (!lado.equals("esquerda") && !lado.equals("direita")) {
+                throw new IllegalArgumentException(e.getKey() + ": lado " + lado + " (use esquerda ou direita)");
+            }
+            if (temporada != null && !temporada.elenco.containsKey(e.getKey())) {
+                throw new IllegalArgumentException("fora do elenco da temporada: " + e.getKey());
+            }
+            lados.put(e.getKey(), lado.equals("direita"));
         }
-        retratos = rs;
-        licoes = falas(root.get("licoes"), rs, false);
-        reacoes = falas(root.get("reacoes"), rs, true);
+        Map<String, List<Fala>> ms = falas(root.get("momentos"), lados, false);
+        Map<String, List<Fala>> rs = falas(root.get("reacoes"), lados, true);
+        this.temporada = temporada;
+        direita = lados;
+        momentos = ms;
+        reacoes = rs;
     }
 
-    private static Map<String, List<Fala>> falas(Object json, Map<String, Retrato> rs, boolean reacao) {
+    private static Map<String, List<Fala>> falas(Object json, Map<String, Boolean> lados, boolean reacao) {
         Map<String, List<Fala>> out = new LinkedHashMap<>();
         if (json == null) return out;
         for (Map.Entry<String, Object> e : Episodio.asMap(json).entrySet()) {
@@ -160,13 +173,11 @@ public final class RetratosTreino {
             for (Object item : (List<?>)e.getValue()) {
                 Map<String, Object> m = Episodio.asMap(item);
                 String quem = Episodio.string(m, "quem", null);
-                if (!rs.containsKey(quem)) throw new IllegalArgumentException(e.getKey() + ": quem fala? " + quem);
+                if (!lados.containsKey(quem)) throw new IllegalArgumentException(e.getKey() + ": quem fala sem lado? " + quem);
                 String texto = Episodio.string(m, "texto", "");
                 if (texto.isEmpty()) throw new IllegalArgumentException(e.getKey() + ": fala sem texto");
                 String expressao = Episodio.string(m, "expressao", "normal");
-                if (!rs.get(quem).expressoes.contains(expressao)) {
-                    throw new IllegalArgumentException(e.getKey() + ": " + quem + " não tem a expressão " + expressao);
-                }
+                if (!expressao.matches("[a-z]+")) throw new IllegalArgumentException(e.getKey() + ": expressão " + expressao);
                 lista.add(new Fala(quem, expressao, texto, reacao));
             }
             out.put(e.getKey(), Collections.unmodifiableList(lista));
@@ -174,27 +185,52 @@ public final class RetratosTreino {
         return out;
     }
 
+    /** Esquece a conversa (luta sem conversa, ou fim da luta). */
+    public void descarregar() {
+        stop();
+        direita = Collections.emptyMap();
+        momentos = Collections.emptyMap();
+        reacoes = Collections.emptyMap();
+        sorteio.clear();
+    }
+
+    /** Há uma conversa carregada para a luta atual. */
+    public boolean ativa() {
+        return !direita.isEmpty();
+    }
+
+    /** Todos os textos (em português), para conferir as traduções. */
+    public List<String> textos() {
+        List<String> out = new ArrayList<>();
+        for (List<Fala> falas : momentos.values()) for (Fala f : falas) out.add(f.texto);
+        for (List<Fala> falas : reacoes.values()) for (Fala f : falas) out.add(f.texto);
+        return out;
+    }
+
+    /** Quem fala nesta conversa. */
+    public java.util.Set<String> quem() {
+        return direita.keySet();
+    }
+
     /**
-     * Falas de uma lição (ou de "fim"): entram no lugar do que estiver sendo dito. Uma reação
-     * que ainda está na tela ("Bom.") termina antes, ela é curta.
+     * Falas de um momento ("inicio", uma lição, "fim", "vitoria"...): entram no lugar do que
+     * estiver sendo dito. Uma reação que ainda está na tela ("Bom.") termina antes, ela é curta.
      */
-    public void licao(Temporada temporada, String id) {
-        List<Fala> falas = licoes.get(id);
+    public void momento(String id) {
+        List<Fala> falas = momentos.get(id);
         if (falas == null || falas.isEmpty()) return;
-        this.temporada = temporada;
         fila.clear();
         fila.addAll(falas);
         if (atual == null || !atual.reacao) proxima();
     }
 
     /**
-     * Reação ao que o jogador fez ("licao" = cumpriu a lição, "impacto", "levou"): uma fala
-     * sorteada, só quando ninguém está falando (não atropela a explicação da lição).
+     * Reação ao que aconteceu ("impacto", "levou", "licao"...): uma fala sorteada, só depois de
+     * um silêncio (não atropela um momento nem vira falatório).
      */
-    public void reacao(Temporada temporada, String tipo) {
+    public void reacao(String tipo) {
         List<Fala> falas = reacoes.get(tipo);
-        if (falas == null || falas.isEmpty() || atual != null || !fila.isEmpty()) return;
-        this.temporada = temporada;
+        if (falas == null || falas.isEmpty() || falando() || time - caladoDesde < PAUSA_REACAO) return;
         int n = sorteio.containsKey(tipo) ? sorteio.get(tipo) : -1;
         // Sorteia sem repetir a última.
         rand.reset(frame * 31L + tipo.hashCode());
@@ -204,29 +240,33 @@ public final class RetratosTreino {
         proxima();
     }
 
-    public boolean has(String licao) {
-        return licoes.containsKey(licao);
+    public boolean tem(String momento) {
+        return momentos.containsKey(momento);
     }
 
-    /** Alguém falando ou com fala na fila (o fim do treino espera a conversa acabar). */
+    /** Alguém falando ou com fala na fila (o fim da luta espera a conversa acabar). */
     public boolean falando() {
         return atual != null || !fila.isEmpty();
     }
 
     /** Alguém falando ou um quadro ainda na tela. */
     public boolean busy() {
-        return atual != null || visivel(esq) || visivel(dir);
+        return falando() || visivel(esq) || visivel(dir);
     }
 
     public Fala atual() {
         return atual;
     }
 
+    /** Cala todo mundo e tira os quadros (a conversa continua carregada). */
     public void stop() {
         fila.clear();
         atual = null;
-        esq.retrato = dir.retrato = null;
-        esq.entrou = dir.entrou = -1f;
+        caladoDesde = -999f;
+        for (Lado l : new Lado[] {esq, dir}) {
+            l.quem = null;
+            l.entrou = l.saiu = -1f;
+        }
     }
 
     public void update(float dt) {
@@ -234,15 +274,16 @@ public final class RetratosTreino {
         time += dt;
         if (atual != null && time - falaDesde >= duracao(atual)) {
             atual = null;
+            caladoDesde = time;
             proxima();
         }
         for (Lado l : new Lado[] {esq, dir}) {
-            boolean falando = atual != null && l.retrato != null && atual.quem.equals(l.retrato.id);
-            if (!falando && l.entrou >= 0f && l.saiu < 0f && time - l.ultimaFala >= SAIR_DEPOIS) l.saiu = time;
+            boolean falandoAgora = atual != null && atual.quem.equals(l.quem);
+            if (!falandoAgora && l.entrou >= 0f && l.saiu < 0f && time - l.ultimaFala >= SAIR_DEPOIS) l.saiu = time;
             if (l.saiu >= 0f && time - l.saiu >= SAI) {
                 l.entrou = -1f;
                 l.saiu = -1f;
-                l.retrato = null;
+                l.quem = null;
             }
         }
     }
@@ -251,10 +292,10 @@ public final class RetratosTreino {
         if (fila.isEmpty()) return;
         atual = fila.remove(0);
         falaDesde = time;
-        Retrato r = retratos.get(atual.quem);
-        Lado l = r.direita ? dir : esq;
-        if (l.retrato != r || l.entrou < 0f || l.saiu >= 0f) {
-            l.retrato = r;
+        Lado l = Boolean.TRUE.equals(direita.get(atual.quem)) ? dir : esq;
+        if (!atual.quem.equals(l.quem) || l.entrou < 0f || l.saiu >= 0f) {
+            // Outra pessoa do mesmo lado: o quadro entra de novo com o rosto dela.
+            l.quem = atual.quem;
             l.entrou = time;
             l.saiu = -1f;
         } else if (!l.expressao.equals(atual.expressao)) {
@@ -276,7 +317,7 @@ public final class RetratosTreino {
     }
 
     private boolean visivel(Lado l) {
-        return l.retrato != null && l.entrou >= 0f;
+        return l.quem != null && l.entrou >= 0f;
     }
 
     // ------------------------------------------------------------ desenho
@@ -289,14 +330,14 @@ public final class RetratosTreino {
     }
 
     private void drawQuadro(RenderCanvas c, Lado l) {
-        boolean direita = l.retrato.direita;
+        boolean direita = l.direita;
         float[] poly = direita ? QUADRO_DIR : QUADRO_ESQ;
         float[] caixa = Layouts.caixa(poly);
         float in = Tinta.easeOutBack(Tinta.clamp01((time - l.entrou) / ENTRA));
         float out = l.saiu >= 0f ? Tinta.clamp01((time - l.saiu) / SAI) : 0f;
         float largura = caixa[2] - caixa[0] + 40f;
         float dx = (direita ? 1f : -1f) * largura * ((1f - in) + out * out);
-        boolean falando = atual != null && atual.quem.equals(l.retrato.id);
+        boolean falando = atual != null && atual.quem.equals(l.quem);
         float bob = falando ? (float)Math.sin(time * 9f) * 1.5f : 0f;
         float cx = (caixa[0] + caixa[2]) * 0.5f, cy = (caixa[1] + caixa[3]) * 0.5f;
         float troca = l.troca >= 0f ? Tinta.clamp01((time - l.troca) / 0.18f) : 1f;
@@ -313,9 +354,9 @@ public final class RetratosTreino {
         c.fillPolygon(sombra, 0x77000000);
         c.save();
         c.clipPolygon(poly);
-        c.fillRect(caixa[0], caixa[1], caixa[2], caixa[3], l.retrato.fundo);
+        c.fillRect(caixa[0], caixa[1], caixa[2], caixa[3], cor(l.quem));
         drawLinhasDeFoco(c, caixa);
-        RenderImage img = imagem(l.retrato.id, l.expressao);
+        RenderImage img = imagem(l.quem, l.expressao);
         if (img != null) {
             // Cobre o quadro, ancorado no alto (o rosto fica no terço de cima).
             float w = caixa[2] - caixa[0], h = caixa[3] - caixa[1];
@@ -325,7 +366,7 @@ public final class RetratosTreino {
             float y = caixa[1] + (h - ih) * 0.15f;
             c.drawImage(img, x, y, x + iw, y + ih, 255);
         } else {
-            c.drawText(nome(l.retrato.id), cx, cy + 8f, 22f, WHITE, INK, 4f, true);
+            c.drawText(nome(l.quem), cx, cy + 8f, 22f, WHITE, INK, 4f, true);
         }
         if (troca < 1f) c.fillRect(caixa[0], caixa[1], caixa[2], caixa[3], Tinta.withAlpha(WHITE, (int)(160f * (1f - troca))));
         c.restore();
@@ -346,14 +387,13 @@ public final class RetratosTreino {
     }
 
     private void drawNome(RenderCanvas c, Lado l, float[] poly) {
-        String nome = nome(l.retrato.id).toUpperCase(java.util.Locale.ROOT);
+        String nome = nome(l.quem).toUpperCase(java.util.Locale.ROOT);
         float size = 15f;
         float w = c.measureText(nome, size, true) + 14f;
-        boolean direita = l.retrato.direita;
+        boolean direita = l.direita;
         float x = direita ? poly[4] - w - 10f : poly[6] + 6f;
         float y = (direita ? poly[5] : poly[7]) - 26f;
-        Temporada.Personagem p = temporada != null ? temporada.personagem(l.retrato.id) : null;
-        int cor = p != null ? p.cor : l.retrato.fundo;
+        int cor = cor(l.quem);
         c.fillRect(x - 3f, y - 3f, x + w + 3f, y + 23f, INK);
         c.fillRect(x, y, x + w, y + 20f, cor);
         c.drawText(nome, x + w * 0.5f, y + 15f, size, WHITE, INK, 3f, true);
@@ -364,21 +404,26 @@ public final class RetratosTreino {
         return p != null ? p.nome : id;
     }
 
+    /** Cor do elenco: pinta o fundo do quadro e a plaquinha do nome. */
+    private int cor(String id) {
+        return temporada != null ? temporada.personagem(id).cor : 0xFF2B3F8F;
+    }
+
     private RenderImage imagem(String quem, String expressao) {
         RenderImage img = imagens.get(quem + "_" + expressao);
         return img != null ? img : imagens.get(quem + "_normal");
     }
 
     private void drawBalao(RenderCanvas c) {
-        Retrato r = retratos.get(atual.quem);
+        boolean naDireita = Boolean.TRUE.equals(direita.get(atual.quem));
         float idade = time - falaDesde - ENTRA * 0.6f;
         if (idade <= 0f) return;
         String texto = texto(atual);
-        float[] b = r.direita ? BALAO_DIR : BALAO_ESQ;
+        float[] b = naDireita ? BALAO_DIR : BALAO_ESQ;
         // Rabicho para o quadro de quem fala.
-        float[] rabo = r.direita ? new float[] {1.06f, 0.30f} : new float[] {-0.06f, 0.30f};
+        float[] rabo = naDireita ? new float[] {1.06f, 0.30f} : new float[] {-0.06f, 0.30f};
         Episodio.Balao balao = new Episodio.Balao(Episodio.TipoBalao.FALA, atual.quem, texto,
-            r.direita ? 0.62f : 0.38f, 0.42f, rabo);
+            naDireita ? 0.62f : 0.38f, 0.42f, rabo);
         int visiveis = (int)Math.max(1f, (idade - PaginaHistoria.BALLOON_POP) * DIGITA);
         float some = time - falaDesde > duracao(atual) - 0.18f ? 1f - Tinta.clamp01((duracao(atual) - (time - falaDesde)) / 0.18f) : 0f;
         c.save();

@@ -65,6 +65,8 @@ public final class Episodio {
         public final String modo;
         /** Cenário da luta (pasta em assets/stages), ou null para o cenário padrão. */
         public final String cenario;
+        /** Conversa nos quadros laterais durante a luta (caminho dentro de historia/), ou null. */
+        public final String conversa;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -73,8 +75,8 @@ public final class Episodio {
         public final List<Quadro> quadros;
 
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
-              String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String titulo,
-              List<String> linhas, String imagem, List<Quadro> quadros) {
+              String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
+              String titulo, List<String> linhas, String imagem, List<Quadro> quadros) {
             this.tipo = tipo;
             this.marca = marca;
             this.layout = layout;
@@ -86,6 +88,7 @@ public final class Episodio {
             this.repetirSeDerrota = repetirSeDerrota;
             this.modo = modo;
             this.cenario = cenario;
+            this.conversa = conversa;
             this.titulo = titulo;
             this.linhas = linhas;
             this.imagem = imagem;
@@ -258,7 +261,7 @@ public final class Episodio {
         return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
             Collections.unmodifiableList(paineis), pair(map, "dupla"), pair(map, "cpu"), string(map, "rotulo", null),
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
-            string(map, "titulo", null),
+            string(map, "conversa", null), string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros));
     }
 

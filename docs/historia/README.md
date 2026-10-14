@@ -1,6 +1,7 @@
 # Modo história: mangá animado entre as lutas
 
 > Motor das páginas (padrão do jogo inteiro): [motor-paginas.md](motor-paginas.md).
+> Motor das conversas durante as lutas (parceiro de tag, adversário esperando): [motor-conversas.md](motor-conversas.md).
 
 A história vem do documento "História Base — Torneio dos Irmãos" (Drive, pasta
 game-luta-gpt). Este documento descreve **como ela é contada no jogo**. Os episódios
@@ -92,6 +93,7 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 | `tipo` do balão | `fala`, `pensamento`, `grito`, `narracao` |
 | `pos`, `rabo`, `posicaoSfx` | frações da caixa do painel: `[0, 0]` topo esquerdo, `[1, 1]` base direita. `rabo` é para onde aponta o bico do balão (a boca de quem fala) |
 | `foco` | 0 a 1: que parte da imagem aparece quando o painel é mais largo que ela |
+| `conversa` (passo de luta) | arquivo da conversa durante a luta, dentro de `historia/` (ex.: `ep00/conversa_treino.json`). Veja [motor-conversas.md](motor-conversas.md) |
 
 Sem a imagem, o painel mostra a arte provisória (cenário, silhuetas nas cores do elenco e
 o nome do arquivo esperado). Assim dá para escrever e testar o ritmo antes da arte.

@@ -1,28 +1,10 @@
 {
-  "_comentario": "Falas do Takatoshi e do Dafu durante o treino, nos quadros laterais (não param a luta). 'licoes': ditas quando a lição começa (id da lição) e no fim. 'reacoes': uma sorteada quando ninguém está falando ('licao' = cumpriu a lição, 'impacto' = acertou forte, 'levou' = apanhou). Rostos em retratos/<quem>_<expressao>.png; sem a imagem da expressão, usa a normal. Prompts: docs/tutorial-plateia.md.",
-  "retratos": {
-    "takatoshi": {
-      "lado": "esquerda",
-      "fundo": "#2B3F8F",
-      "expressoes": [
-        "normal",
-        "sorrindo",
-        "surpreso",
-        "bravo"
-      ]
-    },
-    "dafu": {
-      "lado": "direita",
-      "fundo": "#D9A42E",
-      "expressoes": [
-        "normal",
-        "rindo",
-        "surpreso",
-        "preocupado"
-      ]
-    }
+  "_comentario": "Conversa do treino (Prólogo). Motor e formato: docs/historia/motor-conversas.md. 'momentos': falas quando a lição começa (id da lição) e no fim do treino ('fim'). 'reacoes': uma sorteada quando ninguém está falando ('licao' = cumpriu a lição, 'impacto' = acertou forte, 'levou' = apanhou).",
+  "lados": {
+    "takatoshi": "esquerda",
+    "dafu": "direita"
   },
-  "licoes": {
+  "momentos": {
     "andar": [
       {
         "quem": "takatoshi",

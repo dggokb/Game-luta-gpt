@@ -434,7 +434,7 @@ final class TutorialDirector {
     }
 
     /** Golpes que fazem quem assiste se espantar. */
-    private static final java.util.Set<String> BIG = new java.util.HashSet<>(java.util.Arrays.asList(
+    static final java.util.Set<String> BIG_MOVES = new java.util.HashSet<>(java.util.Arrays.asList(
         "H", "2H", "jH", "j2H", "S2", "S3", "S4", "SUPER", "ULTRA", "THROW"));
     /** Intervalo mínimo entre duas reações do mesmo tipo (quadros). */
     private static final int REACTION_GAP = 75;
@@ -443,7 +443,7 @@ final class TutorialDirector {
     private void watch() {
         boolean impact = false, hurt = false;
         for (CombatEngine.HitEvent e : ctx.engine.events()) {
-            if (e.attacker == 0 && !e.blocked && BIG.contains(e.moveId)) impact = true;
+            if (e.attacker == 0 && !e.blocked && BIG_MOVES.contains(e.moveId)) impact = true;
             if (e.attacker == 1 && !e.blocked) hurt = true;
         }
         for (String cue : ctx.engine.cues()) {

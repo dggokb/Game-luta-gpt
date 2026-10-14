@@ -302,6 +302,9 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - **Motor padrão das páginas** (leitura guiada de páginas de mangá prontas: quadro a quadro,
   efeitos de impacto/tremor/velocidade/zoom, balões traduzidos pelo idioma do aparelho):
   `docs/historia/motor-paginas.md`. Ferramenta de recorte: `tools/historia/recortar_pagina.py`.
+- **Motor padrão das conversas na luta** (quem está de fora fala em quadros de mangá nas
+  laterais, sem parar a luta: parceiro de tag, adversário esperando, o mestre no treino;
+  `"conversa"` no passo de luta): `docs/historia/motor-conversas.md`.
 - Proposta, formato e roadmap da temporada: `docs/historia/README.md`. Prompts das imagens
   para o ChatGPT: `docs/historia/prompts-ep00-ep01.md`. Revisão no PC:
   `gradle :pc-preview:runHistoria`.
@@ -317,6 +320,7 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   ponto do Prólogo. `docs/tutorial.md`.
 - Takatoshi e Dafu assistem no fundo do dojo e reagem ao treino (atores de cenário, tipo
   `ator` no `stage.json`), e falam em quadros de mangá nas laterais da tela sem parar a luta
-  (`historia/tutorial/falas.json`). No tutorial os botões de teste somem.
+  (`historia/ep00/conversa_treino.json`). É o motor de conversas na luta, padrão para as lutas
+  do torneio (parceiro de tag e adversário esperando): `docs/historia/motor-conversas.md`.
   Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
   vídeos: `tools/stage/video_para_ator.py`.
