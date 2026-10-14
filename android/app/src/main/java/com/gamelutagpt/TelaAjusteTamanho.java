@@ -9,20 +9,24 @@ import java.util.List;
 /**
  * DEBUG > AJUSTAR TAMANHOS: escolhe o personagem, a folha de sprite (as animações que a
  * usam) e ajusta o tamanho no olho. A animação toca em loop com o IDLE em transparência
- * atrás, raiz no mesmo ponto, como na troca de animação no jogo. Cada toque salva sozinho
+ * atrás, raiz no mesmo ponto, como na troca de animação no jogo. O P01 fica ao lado, no
+ * mesmo chão e na mesma escala, como referência de tamanho entre personagens. Cada toque salva sozinho
  * no aparelho; SALVAR NO DRIVE exporta para gravar nas folhas (tools/sprites/regua.py).
  */
 final class TelaAjusteTamanho {
     /** O que a tela pede ao jogo. */
     interface Host {
-        /** Mantém decodificadas só as folhas da luta e deste personagem. */
-        void manterAtlas(CharacterDefinition extra);
+        /** Mantém decodificadas só as folhas destes personagens (a luta está parada). */
+        void manterAtlas(CharacterDefinition... manter);
         void salvar();
         void fechar();
     }
 
     private static final float VW = Arena.VW, VH = Arena.VH;
-    private static final float ZOOM = 1.85f, ROOT_X = 360f, ROOT_Y = 640f;
+    private static final float ROOT_Y = 622f, STAGE_RIGHT = 715f;
+    /** Referência de tamanho: o P01 ao lado, na mesma escala do jogo. */
+    private static final String REF_ID = "player_base";
+    private static final String[] REF_MODES = {"P01: MESMA ANIM.", "P01: PARADO", "P01: NÃO"};
     private static final float HOLD = 0.45f;            // s parado no fim de um golpe antes de repetir
     private static final float WALK_SPEED = 300f;       // px/s, CombatConfig: andar baseado em distância
     private static final float LIST_LEFT = 730f, LIST_RIGHT = 1268f, LIST_TOP = 84f, ROW_H = 42f;
@@ -36,7 +40,8 @@ final class TelaAjusteTamanho {
     private boolean open;
     private int character;
     private CharacterDefinition definition;
-    private SpriteFighterRenderer renderer;
+    private SpriteFighterRenderer renderer, reference;
+    private int refMode;
     private List<AjusteTamanho.Folha> folhas;
     private int selected, scroll, speed;
     private boolean ghost = true, paused;
@@ -61,15 +66,17 @@ final class TelaAjusteTamanho {
 
     void close() {
         open = false;
-        renderer = null;
+        renderer = reference = null;
         host.fechar();
     }
 
     private void show(int index) {
         character = (index + GeneratedCharacters.SELECTABLE.length) % GeneratedCharacters.SELECTABLE.length;
         definition = GeneratedCharacters.get(GeneratedCharacters.SELECTABLE[character]);
-        host.manterAtlas(definition);
+        CharacterDefinition ref = GeneratedCharacters.get(REF_ID);
+        host.manterAtlas(definition, ref);
         renderer = new SpriteFighterRenderer(atlases, definition);
+        reference = new SpriteFighterRenderer(atlases, ref);
         folhas = AjusteTamanho.folhas(definition);
         selected = scroll = 0;
         restart();
@@ -142,10 +149,11 @@ final class TelaAjusteTamanho {
         if (in(x, y, 730, 610, 980, 664)) { AjusteTamanho.reset(definition); say("Tamanhos do " + definition.displayName + " voltaram a 100%"); return; }
         if (in(x, y, 988, 610, 1268, 664)) { host.salvar(); return; }
         // Reprodução.
-        if (in(x, y, 20, 660, 140, 706)) { paused = !paused; return; }
-        if (in(x, y, 150, 660, 270, 706)) { speed = (speed + 1) % SPEEDS.length; return; }
-        if (in(x, y, 280, 660, 460, 706)) { ghost = !ghost; return; }
-        if (in(x, y, 470, 660, 590, 706)) { restart(); }
+        if (in(x, y, 10, 660, 110, 706)) { paused = !paused; return; }
+        if (in(x, y, 116, 660, 206, 706)) { speed = (speed + 1) % SPEEDS.length; return; }
+        if (in(x, y, 212, 660, 372, 706)) { ghost = !ghost; return; }
+        if (in(x, y, 378, 660, 578, 706)) { refMode = (refMode + 1) % REF_MODES.length; return; }
+        if (in(x, y, 584, 660, 705, 706)) { restart(); }
     }
 
     private void scroll(int rows) {
@@ -178,21 +186,43 @@ final class TelaAjusteTamanho {
         }
     }
 
+    /** Com a referência: P01 à esquerda e o personagem à direita, os dois no mesmo chão e na
+     * mesma escala (o tamanho de um diante do outro é o do jogo). */
     private void drawStage(Canvas c) {
         paint.setColor(Color.rgb(24, 30, 44));
-        c.drawRect(0, 70, 715, 650, paint);
+        c.drawRect(0, 70, STAGE_RIGHT, 650, paint);
         paint.setColor(Color.rgb(90, 100, 120));
         paint.setStrokeWidth(2f);
-        c.drawLine(10, ROOT_Y, 705, ROOT_Y, paint);
+        c.drawLine(10, ROOT_Y, STAGE_RIGHT - 10, ROOT_Y, paint);
+        boolean showRef = refMode < 2 && !REF_ID.equals(definition.id);
+        float zoom = showRef ? 1.42f : 1.85f;
+        float subjectX = showRef ? 485f : 360f;
         CharacterDefinition.Animation anim = animation();
+        if (showRef) {
+            CharacterDefinition.Animation same = reference.character().animations.get(anim.id);
+            CharacterDefinition.Animation refAnim = refMode == 0 && same != null ? same
+                : reference.character().animation(SpriteStates.IDLE);
+            drawFighter(c, reference, refAnim, 175f, zoom, false);
+            label(c, "P01 (referência)" + (refAnim == same ? "" : " parado"), 175f);
+        }
+        drawFighter(c, renderer, anim, subjectX, zoom, ghost);
+        label(c, definition.displayName.toUpperCase(), subjectX);
+        paint.setColor(Color.LTGRAY);
+        paint.setTextSize(14f);
+        paint.setTextAlign(Paint.Align.LEFT);
+        c.drawText(ghost ? "IDLE do próprio personagem em transparência atrás" : "IDLE atrás desligado", 20, 96, paint);
+    }
+
+    private void drawFighter(Canvas c, SpriteFighterRenderer who, CharacterDefinition.Animation anim,
+                             float rootX, float zoom, boolean withGhost) {
         c.save();
-        c.clipRect(0, 70, 715, 650);
-        c.translate(ROOT_X, ROOT_Y);
-        c.scale(ZOOM, ZOOM);
-        if (ghost) {
-            renderer.pose(SpriteStates.IDLE, 0f, 0f);
-            int layer = c.saveLayerAlpha(-ROOT_X / ZOOM, -ROOT_Y / ZOOM, (715 - ROOT_X) / ZOOM, (650 - ROOT_Y) / ZOOM, 95);
-            renderer.draw(c, 0f, 0f, 1, false, false);
+        c.clipRect(0, 70, STAGE_RIGHT, 650);
+        c.translate(rootX, ROOT_Y);
+        c.scale(zoom, zoom);
+        if (withGhost) {
+            who.pose(SpriteStates.IDLE, 0f, 0f);
+            int layer = c.saveLayerAlpha(-rootX / zoom, -ROOT_Y / zoom, (STAGE_RIGHT - rootX) / zoom, (650 - ROOT_Y) / zoom, 95);
+            who.draw(c, 0f, 0f, 1, false, false);
             c.restoreToCount(layer);
         }
         float t = time;
@@ -201,12 +231,17 @@ final class TelaAjusteTamanho {
             t = cycle > 0f ? time % cycle : 0f;
             if (!anim.loop) t = Math.min(t, Math.max(0f, anim.duration - .0001f));
         }
-        renderer.pose(anim.id, t, distance);
-        renderer.draw(c, 0f, 0f, 1, false, false);
+        who.pose(anim.id, t, distance);
+        who.draw(c, 0f, 0f, 1, false, false);
         c.restore();
+    }
+
+    private void label(Canvas c, String text, float x) {
         paint.setColor(Color.LTGRAY);
         paint.setTextSize(14f);
-        c.drawText(ghost ? "IDLE em transparência atrás, raiz no mesmo ponto" : "IDLE atrás desligado", 20, 96, paint);
+        paint.setTextAlign(Paint.Align.CENTER);
+        c.drawText(text, x, ROOT_Y + 20f, paint);
+        paint.setTextAlign(Paint.Align.LEFT);
     }
 
     private void drawHeader(Canvas c) {
@@ -289,10 +324,11 @@ final class TelaAjusteTamanho {
         paint.setTextSize(12f);
         c.drawText("todos os personagens ajustados", 1128, 655, paint);
         paint.setTextAlign(Paint.Align.LEFT);
-        button(c, 20, 660, 140, 706, paused ? "TOCAR" : "PAUSA", 15f, false);
-        button(c, 150, 660, 270, 706, "VEL " + (SPEEDS[speed] == 1f ? "1x" : SPEEDS[speed] == .5f ? "½x" : "¼x"), 15f, false);
-        button(c, 280, 660, 460, 706, ghost ? "IDLE ATRÁS: SIM" : "IDLE ATRÁS: NÃO", 15f, false);
-        button(c, 470, 660, 590, 706, "DO INÍCIO", 15f, false);
+        button(c, 10, 660, 110, 706, paused ? "TOCAR" : "PAUSA", 15f, false);
+        button(c, 116, 660, 206, 706, "VEL " + (SPEEDS[speed] == 1f ? "1x" : SPEEDS[speed] == .5f ? "½x" : "¼x"), 15f, false);
+        button(c, 212, 660, 372, 706, ghost ? "IDLE ATRÁS: SIM" : "IDLE ATRÁS: NÃO", 14f, false);
+        button(c, 378, 660, 578, 706, REF_MODES[refMode], 14f, REF_ID.equals(definition.id));
+        button(c, 584, 660, 705, 706, "DO INÍCIO", 14f, false);
     }
 
     private void button(Canvas c, float l, float t, float rr, float b, String text, float size, boolean dim) {
