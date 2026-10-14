@@ -848,9 +848,9 @@
         63,
         17,
         1,
-        69,
-        69,
-        69
+        81,
+        81,
+        81
       ],
       "impactFrame": 2
     },
@@ -1250,9 +1250,9 @@
         63,
         17,
         1,
-        69,
-        69,
-        69
+        75,
+        75,
+        75
       ],
       "impactFrame": 2
     },
@@ -1734,10 +1734,10 @@
       "damage": 720,
       "reach": 144,
       "startupFrames": 8,
-      "activeFrames": 4,
+      "activeFrames": 6,
       "recoveryFrames": 9,
-      "hitstunFrames": 18,
-      "blockstunFrames": 14,
+      "hitstunFrames": 20,
+      "blockstunFrames": 16,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,
@@ -1757,10 +1757,10 @@
       "damage": 720,
       "reach": 154,
       "startupFrames": 8,
-      "activeFrames": 5,
+      "activeFrames": 6,
       "recoveryFrames": 8,
-      "hitstunFrames": 17,
-      "blockstunFrames": 13,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,

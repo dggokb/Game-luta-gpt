@@ -90,8 +90,11 @@ def fit_impact(anim, m):
     anim['durationsMs'] = [max(1, round(x)) for x in head + [hold * whole] + tail]
 
 
-def scaled(base, f):
-    return [max(1, round(x * f)) for x in base]
+def scaled(base, f, air=False):
+    """Startup e recuperação seguem o ritmo; no ar a janela ativa fica a da base (golpe
+    aéreo precisa de tempo ativo para encostar na descida)."""
+    s, a, r = (max(1, round(x * f)) for x in base)
+    return [s, base[1] if air else a, r]
 
 
 def apply(cid, spec, base):
@@ -113,7 +116,7 @@ def apply(cid, spec, base):
         if key not in base['frames']:
             continue
         if not keep:
-            retime(m, scaled(base['frames'][key], pace(key)), base['vantagem'][key])
+            retime(m, scaled(base['frames'][key], pace(key), key.startswith('j')), base['vantagem'][key])
         m['damage'] = damage(key)
         attacks.append((key, m.get('animation'), m))
     energy = fighter['energy']

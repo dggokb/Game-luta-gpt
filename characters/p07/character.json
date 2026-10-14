@@ -873,13 +873,13 @@
       ],
       "loop": false,
       "durationsMs": [
-        37,
-        37,
+        38,
+        38,
         17,
-        48,
-        48,
-        48,
-        48
+        44,
+        44,
+        44,
+        44
       ],
       "impactFrame": 2
     },
@@ -898,11 +898,11 @@
       "durationsMs": [
         52,
         73,
-        28,
-        51,
-        69,
-        51,
-        60
+        27,
+        48,
+        63,
+        48,
+        56
       ],
       "impactFrame": 2
     },
@@ -1321,13 +1321,13 @@
       ],
       "loop": false,
       "durationsMs": [
-        87,
-        87,
-        68,
-        65,
-        65,
-        65,
-        60
+        88,
+        88,
+        64,
+        58,
+        58,
+        58,
+        53
       ],
       "impactFrame": 2
     },
@@ -1751,19 +1751,19 @@
       "damage": 360,
       "reach": 188,
       "startupFrames": 5,
-      "activeFrames": 4,
+      "activeFrames": 3,
       "recoveryFrames": 8,
-      "hitstunFrames": 19,
-      "blockstunFrames": 15,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
           5,
-          13
+          12
         ],
         "block": [
           5,
-          13
+          12
         ],
         "whiff": null
       },
@@ -1782,19 +1782,19 @@
       "damage": 600,
       "reach": 192,
       "startupFrames": 8,
-      "activeFrames": 5,
+      "activeFrames": 4,
       "recoveryFrames": 10,
-      "hitstunFrames": 21,
-      "blockstunFrames": 17,
+      "hitstunFrames": 20,
+      "blockstunFrames": 16,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
           8,
-          16
+          15
         ],
         "block": [
           8,
-          16
+          15
         ],
         "whiff": null
       },
@@ -1834,10 +1834,10 @@
       "damage": 960,
       "reach": 215,
       "startupFrames": 11,
-      "activeFrames": 8,
+      "activeFrames": 6,
       "recoveryFrames": 11,
-      "hitstunFrames": 23,
-      "blockstunFrames": 19,
+      "hitstunFrames": 21,
+      "blockstunFrames": 17,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,

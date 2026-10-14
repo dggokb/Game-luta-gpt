@@ -878,13 +878,13 @@
       ],
       "loop": false,
       "durationsMs": [
-        70,
-        70,
-        44,
-        53,
-        53,
-        53,
-        53
+        71,
+        71,
+        46,
+        57,
+        57,
+        57,
+        57
       ],
       "impactFrame": 2
     },
@@ -1769,10 +1769,10 @@
       "damage": 760,
       "reach": 149,
       "startupFrames": 9,
-      "activeFrames": 5,
+      "activeFrames": 6,
       "recoveryFrames": 10,
-      "hitstunFrames": 20,
-      "blockstunFrames": 16,
+      "hitstunFrames": 21,
+      "blockstunFrames": 17,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,

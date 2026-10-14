@@ -884,11 +884,11 @@
       "durationsMs": [
         71,
         71,
-        67,
-        48,
-        48,
-        48,
-        48
+        69,
+        51,
+        51,
+        51,
+        51
       ],
       "impactFrame": 2
     },
@@ -1772,10 +1772,10 @@
       "damage": 880,
       "reach": 144,
       "startupFrames": 9,
-      "activeFrames": 5,
+      "activeFrames": 6,
       "recoveryFrames": 10,
-      "hitstunFrames": 20,
-      "blockstunFrames": 16,
+      "hitstunFrames": 21,
+      "blockstunFrames": 17,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,
