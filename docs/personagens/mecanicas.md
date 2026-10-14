@@ -1,9 +1,8 @@
-# Mecânicas por personagem — RASCUNHO v2
+# Mecânicas por personagem — v3 (números no jogo)
 
-Documento de trabalho: **nada aqui está no jogo ainda.** Hoje os 12 lutadores têm os
-mesmos números (vida 10.000, L tira 300, projétil tira 850, todos andam, correm e pulam
-igual). Este rascunho traduz o estilo de cada ficha (`pNN.md`) em números de jogo, para a
-gente refinar antes de implementar.
+Documento de trabalho. Traduz o estilo de cada ficha (`pNN.md`) em números de jogo.
+**Vida, dano, tempo dos golpes e projéteis já estão no jogo (14/10, seção 3);** as mecânicas
+únicas 🔧 ainda não. A ideia é jogar, rever e ajustar.
 
 Ordem combinada:
 
@@ -85,56 +84,88 @@ iguais, viram o mesmo golpe com outra roupa. Proposta para cada um ser diferente
 
 ---
 
-## 3. Ficha detalhada: p09 + p10 (modelo para os outros)
+## 3. O que está no jogo (aplicado em 14/10)
 
-Formato: dano · startup/ativo/recuperação em frames (60 por segundo) · alcance.
-A vantagem no hit e na defesa fica igual à da base (L +5/+2, M +4/+1, H +5/−2…):
-o hitstun sobe junto com o golpe. A última coluna mostra o tempo total no jogo contra o
-tempo do vídeo atual.
+Aplicado por `tools/sprites/mecanicas.py` a partir de `tools/sprites/mecanicas.json` (é lá que
+se muda um número; depois `build_characters.py --write`). O que foi aplicado:
 
-### p09 — Grappler (vida 11.500)
+- **Vida, dano e projétil** (velocidade e alcance) de cada um.
+- **Tempo dos golpes:** tempo base × ritmo do personagem. A vantagem no hit e na defesa é
+  a mesma para todos (L +5/+2, M +4/+1, H +5/−2…), então os links continuam funcionando.
+- **Cadência da animação:** cada quadro ganha o tempo que tinha no vídeo (142 de 168
+  golpes têm receita de vídeo), e o quadro do impacto aparece exatamente no frame em que o
+  golpe acerta (teste `test_mecanicas.py`).
+- **p01 mantém o tempo dos golpes** (`manterTempo`): a arte dele é desenhada quadro a
+  quadro e calibrada por testes (o 2M precisa de 40 frames para mostrar as 16 poses, o H tem
+  52 frames). Só vida, dano e projétil seguem a tabela. ⚠ Por isso o H do p01 (0,87s) ficou
+  mais lento que o do p09 (0,70s): a decidir se encurta (perdendo poses) ou fica.
+- **Não muda:** alcance e caixas (vêm do DEBUG > AJUSTAR CAIXAS), andar/correr/pular, Super
+  (só o dano) e as mecânicas únicas 🔧, que ainda precisam de código.
+- O `ritmo.py` não estica mais o tempo dos golpes pela arte (a mecânica decide).
 
-| Golpe | Dano | s/a/r | Alcance | Nota | Jogo × vídeo |
-|---|---|---|---|---|---|
-| L | 400 | 5/3/9 | 95 | jab pesado, o mais rápido dele | 0,28s × 3,75s |
-| M | 650 | 9/4/14 | 125 | cotovelada | 0,45s × 2,42s |
-| H | 1.000 | 13/5/20 | 150 | soco martelo, derruba no counter hit | 0,63s × 3,17s |
-| 2L | 350 | 5/3/9 | 90 | baixo | 0,28s × 1,50s |
-| 2M | 600 | 9/4/16 | 125 | rasteira, derruba | 0,48s × 2,17s |
-| 2H | 950 | 11/6/20 | 140 | uppercut lançador | 0,62s × 2,58s |
-| jL / jM / jH | 380 / 600 / 1.000 | 6/4/8 · 8/4/8 · 11/5/10 | — | jH faz slam | — |
-| S1 Machado | 900 | 16/1/24 | tela | projétil lento (600) e giratório | 0,68s × 3,29s |
-| S2 Cotovelada ↑ | 1.200 | 6/6/24 | 110 | anti-aéreo, derruba | 0,60s × 2,25s |
-| S3 Escudo | 1.000 | 20 de armadura + cabeçada | 100 | aguenta 1 golpe 🔧 | 0,70s × 3,79s |
-| S4 Ombrada | 1.100 | 12/10/18 | avança | armadura de 1 golpe no startup 🔧, derruba | 0,67s × 2,46s |
-| Agarrão de comando | 2.200 | 5/2/30 | 110 | meia-lua + agarrão, não pode ser defendido 🔧 | — |
-| Super | 3.400 | — | — | Tempestade de Fogo | — × 3,29s |
+Tempo base (ritmo 1,0×): L 3/3/7 · M 6/4/11 · H 10/5/18 · 2L 3/3/7 · 2M 7/4/13 · 2H 10/6/18 ·
+jL 4/3/6 · jM 6/4/8 · jH 9/5/10 · S2 6/8/22 · S3 18/4/18 · S4 10/14/14 · S1 10/1/18 (frames, 60 por segundo).
 
-### p10 — Rushdown acrobático (vida 9.300 · 2 air dashes)
+### Os 12 (dano · tempo total)
 
-| Golpe | Dano | s/a/r | Alcance | Nota | Jogo × vídeo |
-|---|---|---|---|---|---|
-| L | 250 | 3/3/6 | 85 | encadeia até 4× | 0,20s × 4,12s |
-| M | 400 | 6/4/9 | 120 | chute | 0,32s × 3,58s |
-| H | 650 | 9/4/14 | 145 | chute alto | 0,45s × 1,87s |
-| 2L | 230 | 3/3/6 | 85 | baixo | 0,20s × 1,00s |
-| 2M | 380 | 6/4/10 | 120 | rasteira, derruba | 0,33s × 1,96s |
-| 2H | 650 | 8/5/14 | 130 | lançador | 0,45s × 2,25s |
-| jL / jM / jH | 250 / 400 / 600 | 4/3/5 · 5/4/6 · 8/4/8 | — | aéreos rápidos, base do jogo dela | — |
-| S1 Machado | 650 | 12/1/18 | tela | projétil rápido (900), menos dano que o do p09 | 0,52s × 3,12s |
-| S2 Vapor ↑ | 900 | 4/6/20 | 100 | anti-aéreo rápido | 0,50s × 4,12s |
-| S3 Esquiva | 700 | 30 no total | 110 | invencível em cima nos frames 2–10 e chuta 🔧 | 0,50s × 4,08s |
-| S4 Voadora em parafuso | 850 | 10/12/14 | avança | pode cruzar o adversário (mixup) | 0,60s × 2,63s |
-| Agarrão Tesoura | 1.300 | 5/2/24 | 90 | agarrão normal, joga para o outro lado | — |
-| Super | 2.800 | — | — | Cortina de Vapor | — × 4,17s |
+| # | Molde | Vida | L | M | H | S1 (projétil) | Super |
+|---|---|---|---|---|---|---|---|
+| **p01** | Equilibrado | 10.000 | 300 · 0.18s | 500 · 0.30s | 800 · 0.87s | 850 · vel 760 · alc 720 | 3200 |
+| **p02** | Rushdown / contra-golpe | 9.600 | 270 · 0.20s | 450 · 0.32s | 720 · 0.48s | 760 · vel 700 · alc 260 | 2880 |
+| **p03** | Rushdown | 9.800 | 300 · 0.22s | 500 · 0.33s | 800 · 0.53s | 850 · vel 950 · alc 380 | 3200 |
+| **p04** | Brawler | 10.300 | 320 · 0.20s | 520 · 0.32s | 840 · 0.48s | 890 · vel 800 · alc 200 | 3360 |
+| **p05** | Mixup | 9.200 | 270 · 0.20s | 450 · 0.28s | 720 · 0.45s | 760 · vel 1000 · alc 900 | 2880 |
+| **p06** | Zoner / trapper | 9.500 | 260 · 0.22s | 420 · 0.35s | 680 · 0.55s | 720 · vel 480 · alc 800 | 2720 |
+| **p07** | Brawler pesado | 10.800 | 360 · 0.28s | 600 · 0.45s | 960 · 0.67s | 1020 · vel 700 · alc 150 | 3840 |
+| **p08** | Zoner longo | 9.300 | 280 · 0.22s | 480 · 0.35s | 760 · 0.55s | 810 · vel 1100 · alc 650 | 3040 |
+| **p09** | Grappler | 11.500 | 380 · 0.28s | 620 · 0.45s | 1000 · 0.70s | 1060 · vel 600 · alc 900 | 4000 |
+| **p10** | Rushdown acrobático | 9.300 | 260 · 0.20s | 420 · 0.28s | 680 · 0.45s | 720 · vel 900 · alc 720 | 2720 |
+| **p11** | Zoner / trapper | 9.000 | 240 · 0.22s | 400 · 0.35s | 640 · 0.55s | 680 · vel 950 · alc 900 | 2560 |
+| **p12** | Berserker | 9.500 | 330 · 0.22s | 550 · 0.35s | 880 · 0.55s | 940 · vel 700 · alc 150 | 3520 |
 
-**O que a coluna "jogo × vídeo" mostra:** o vídeo precisa ser comprimido de 4× a 20×.
-Até uns 6× a compressão fica natural. Acima disso (L e M da p10, L do p09, S2 e S3 da p10)
-o vídeo tem muito movimento antes ou depois do golpe: o certo é **cortar o trecho** (começar
-mais perto do soco e terminar antes de voltar à guarda), não comprimir mais. Se mesmo
-cortado não couber, entra na lista de refazer no Seedance.
+### p09 — Grappler (ritmo 1,3×, dano 1,25×)
 
----
+| Golpe | Dano | s/a/r | Tempo | Hit / defesa |
+|---|---|---|---|---|
+| L | 380 | 4/4/9 | 0.28s | +5 / +2 |
+| M | 620 | 8/5/14 | 0.45s | +4 / +1 |
+| H | 1000 | 13/6/23 | 0.70s | +5 / -2 |
+| 2L | 380 | 4/4/9 | 0.28s | +5 / +2 |
+| 2M | 620 | 9/5/17 | 0.52s | +20 / +1 |
+| 2H | 1000 | 13/8/23 | 0.73s | +25 / -4 |
+| jL | 380 | 5/4/8 | 0.28s | +8 / +4 |
+| jM | 620 | 8/5/10 | 0.38s | +7 / +3 |
+| jH | 1000 | 12/6/13 | 0.52s | +6 / +2 |
+| j2H | 1000 | 12/8/12 | 0.53s | +5 / +1 |
+| S2 | 1380 | 8/10/29 | 0.78s | +10 / -12 |
+| S3 | 1120 | 23/5/23 | 0.85s | +4 / -4 |
+| S4 | 1250 | 13/18/18 | 0.82s | +10 / -6 |
+| S1 | 1060 | 13/1/23 | 0.62s | projétil: vel 600, alcance 900 |
+| Super | 4000 | (tempo mantido) | | |
+
+### p10 — Rushdown acrobático (ritmo 0,85×, dano 0,85×)
+
+| Golpe | Dano | s/a/r | Tempo | Hit / defesa |
+|---|---|---|---|---|
+| L | 260 | 3/3/6 | 0.20s | +5 / +2 |
+| M | 420 | 5/3/9 | 0.28s | +4 / +1 |
+| H | 680 | 8/4/15 | 0.45s | +5 / -2 |
+| 2L | 260 | 3/3/6 | 0.20s | +5 / +2 |
+| 2M | 420 | 6/3/11 | 0.33s | +20 / +1 |
+| 2H | 680 | 8/5/15 | 0.47s | +25 / -4 |
+| jL | 260 | 3/3/5 | 0.18s | +8 / +4 |
+| jM | 420 | 5/3/7 | 0.25s | +7 / +3 |
+| jH | 680 | 8/4/8 | 0.33s | +6 / +2 |
+| j2H | 680 | 8/5/8 | 0.35s | +5 / +1 |
+| S2 | 940 | 5/7/19 | 0.52s | +10 / -12 |
+| S3 | 760 | 15/3/15 | 0.55s | +4 / -4 |
+| S4 | 850 | 8/12/12 | 0.53s | +10 / -6 |
+| S1 | 720 | 8/1/15 | 0.40s | projétil: vel 900, alcance 720 |
+| Super | 2720 | (tempo mantido) | | |
+
+**Vídeo × jogo:** os golpes no jogo duram de 4× a 20× menos que no vídeo. Até uns 6× a
+compressão fica natural; acima disso o vídeo tem movimento sobrando antes ou depois do golpe,
+e o certo é cortar o trecho (refazer a receita do clipe), não comprimir mais.
 
 ## 4. Perguntas em aberto
 
@@ -150,8 +181,8 @@ cortado não couber, entra na lista de refazer no Seedance.
 
 ## 5. Ordem sugerida de implementação
 
-1. ✅ Vida, dano, alcance e frame data dos normais de todos (só dados).
-2. ✅ Compressão do vídeo para o novo tempo (o plano anterior), começando por p09 + p10.
+1. ✅ **Feito (14/10):** vida, dano, projéteis e frame data de todos (alcance ficou o do app).
+2. ✅ **Feito (14/10):** cadência do vídeo nas animações dos golpes.
 3. Jogar, rever e ajustar o que não fizer sentido (mexer no número e refazer a animação).
 4. 🔧 Mecânicas únicas, uma por vez, das mais simples para as mais complexas: chicote (p08,
    já é dado) → armadura (p09, p12) → contra-golpes → esquiva (p04, p10) → rekka (p03) →

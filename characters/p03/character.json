@@ -6,7 +6,7 @@
   "artFacing": "right",
   "fighter": {
     "color": "#D8323C",
-    "maxLife": 10000,
+    "maxLife": 9800,
     "autoCombo": [
       "L",
       "M",
@@ -21,8 +21,8 @@
     },
     "energy": {
       "damage": 850,
-      "range": 720,
-      "speed": 760,
+      "range": 380,
+      "speed": 950,
       "command": [
         3,
         1
@@ -31,20 +31,20 @@
       "spawnY": 88,
       "crouchSpawnY": 177,
       "attack": {
-        "startupFrames": 6,
+        "startupFrames": 10,
         "activeFrames": 1,
-        "recoveryFrames": 11,
+        "recoveryFrames": 17,
         "hitstunFrames": 20,
         "blockstunFrames": 14,
         "hitstopFrames": 6,
         "cancelWindows": {
           "hit": [
-            6,
-            17
+            10,
+            26
           ],
           "block": [
-            6,
-            17
+            10,
+            26
           ],
           "whiff": null
         },
@@ -458,17 +458,17 @@
       ],
       "loop": false,
       "durationsMs": [
-        17,
-        17,
-        17,
-        17,
-        17,
-        17,
-        13,
-        13,
-        13,
-        14,
-        14
+        12,
+        12,
+        12,
+        19,
+        19,
+        19,
+        15,
+        15,
+        15,
+        16,
+        16
       ],
       "impactFrame": 3
     },
@@ -492,20 +492,20 @@
       ],
       "loop": false,
       "durationsMs": [
-        22,
-        22,
-        22,
         20,
         20,
         20,
-        20,
-        20,
-        17,
-        17,
-        17,
-        17,
-        17,
-        17
+        18,
+        21,
+        21,
+        21,
+        21,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18
       ],
       "impactFrame": 4
     },
@@ -538,29 +538,29 @@
       ],
       "loop": false,
       "durationsMs": [
-        19,
-        18,
-        19,
-        18,
-        19,
-        18,
-        19,
-        18,
-        19,
-        17,
-        17,
-        17,
-        16,
-        16,
-        17,
-        17,
-        17,
-        17,
-        16,
-        17,
-        16,
-        17,
-        16
+        13,
+        12,
+        13,
+        12,
+        13,
+        12,
+        13,
+        12,
+        13,
+        11,
+        22,
+        22,
+        21,
+        21,
+        22,
+        22,
+        22,
+        22,
+        21,
+        22,
+        21,
+        22,
+        21
       ],
       "impactFrame": 10
     },
@@ -765,17 +765,17 @@
       ],
       "loop": false,
       "durationsMs": [
+        9,
+        9,
+        9,
+        9,
+        22,
+        22,
         17,
         17,
         17,
-        17,
-        17,
-        17,
-        13,
-        13,
-        13,
-        14,
-        14
+        18,
+        18
       ],
       "impactFrame": 4
     },
@@ -801,22 +801,22 @@
       ],
       "loop": false,
       "durationsMs": [
-        17,
-        17,
-        16,
-        17,
-        17,
-        16,
-        17,
-        17,
-        16,
-        17,
-        17,
-        17,
-        16,
-        17,
-        17,
-        16
+        26,
+        19,
+        13,
+        13,
+        13,
+        13,
+        13,
+        13,
+        26,
+        22,
+        43,
+        65,
+        65,
+        65,
+        65,
+        43
       ],
       "impactFrame": 9
     },
@@ -838,18 +838,18 @@
       ],
       "loop": false,
       "durationsMs": [
-        30,
-        30,
-        30,
-        30,
-        30,
-        50,
-        50,
-        30,
-        30,
-        30,
-        30,
-        30
+        72,
+        36,
+        36,
+        18,
+        72,
+        25,
+        123,
+        123,
+        61,
+        61,
+        123,
+        61
       ],
       "impactFrame": 5
     },
@@ -866,13 +866,13 @@
       ],
       "loop": false,
       "durationsMs": [
-        30,
-        35,
-        40,
+        22,
+        26,
+        47,
+        20,
         17,
-        15,
-        15,
-        15
+        17,
+        17
       ],
       "impactFrame": 2
     },
@@ -889,13 +889,13 @@
       ],
       "loop": false,
       "durationsMs": [
-        55,
-        40,
-        80,
-        25,
-        25,
-        22,
-        20
+        49,
+        36,
+        85,
+        26,
+        26,
+        23,
+        21
       ],
       "impactFrame": 2
     },
@@ -1113,27 +1113,27 @@
       ],
       "loop": false,
       "durationsMs": [
-        37,
-        37,
-        37,
-        37,
-        37,
-        37,
-        37,
-        37,
-        37,
-        16,
+        34,
+        34,
+        34,
+        34,
+        34,
+        34,
+        34,
+        34,
+        34,
         17,
-        17,
-        17,
-        40,
-        40,
-        40,
-        35,
-        35,
-        35,
-        35,
-        40
+        18,
+        18,
+        18,
+        43,
+        43,
+        43,
+        37,
+        37,
+        37,
+        37,
+        43
       ],
       "impactFrame": 9
     },
@@ -1163,26 +1163,26 @@
       ],
       "loop": false,
       "durationsMs": [
-        40,
-        40,
-        45,
-        42,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        30,
-        31,
-        31,
-        31,
-        50,
-        45,
-        45,
-        45,
-        48
+        35,
+        35,
+        39,
+        37,
+        26,
+        26,
+        32,
+        32,
+        32,
+        32,
+        32,
+        32,
+        33,
+        33,
+        33,
+        53,
+        48,
+        48,
+        48,
+        51
       ],
       "impactFrame": 6
     },
@@ -1314,13 +1314,13 @@
       ],
       "loop": false,
       "durationsMs": [
-        52,
-        42,
-        72,
-        64,
-        56,
-        56,
-        58
+        46,
+        37,
+        63,
+        70,
+        61,
+        61,
+        63
       ],
       "impactFrame": 3
     },
@@ -1552,20 +1552,20 @@
       "animation": "LIGHT_JAB",
       "damage": 300,
       "reach": 120,
-      "startupFrames": 4,
-      "activeFrames": 8,
-      "recoveryFrames": 8,
-      "hitstunFrames": 20,
-      "blockstunFrames": 17,
+      "startupFrames": 3,
+      "activeFrames": 3,
+      "recoveryFrames": 7,
+      "hitstunFrames": 14,
+      "blockstunFrames": 11,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
-          4,
-          16
+          3,
+          10
         ],
         "block": [
-          4,
-          16
+          3,
+          10
         ],
         "whiff": null
       },
@@ -1585,19 +1585,19 @@
       "damage": 500,
       "reach": 135,
       "startupFrames": 6,
-      "activeFrames": 9,
-      "recoveryFrames": 9,
-      "hitstunFrames": 21,
-      "blockstunFrames": 18,
+      "activeFrames": 4,
+      "recoveryFrames": 10,
+      "hitstunFrames": 17,
+      "blockstunFrames": 14,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
           6,
-          18
+          13
         ],
         "block": [
           6,
-          18
+          13
         ],
         "whiff": null
       },
@@ -1619,18 +1619,18 @@
       "reach": 129,
       "startupFrames": 10,
       "activeFrames": 5,
-      "recoveryFrames": 9,
-      "hitstunFrames": 18,
-      "blockstunFrames": 11,
+      "recoveryFrames": 17,
+      "hitstunFrames": 26,
+      "blockstunFrames": 19,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
           10,
-          17
+          19
         ],
         "block": [
           10,
-          17
+          19
         ],
         "whiff": null
       },
@@ -1652,20 +1652,20 @@
       "damage": 300,
       "reach": 150,
       "low": true,
-      "startupFrames": 4,
-      "activeFrames": 8,
-      "recoveryFrames": 8,
-      "hitstunFrames": 20,
-      "blockstunFrames": 17,
+      "startupFrames": 3,
+      "activeFrames": 3,
+      "recoveryFrames": 7,
+      "hitstunFrames": 14,
+      "blockstunFrames": 11,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
-          4,
-          16
+          3,
+          10
         ],
         "block": [
-          4,
-          16
+          3,
+          10
         ],
         "whiff": null
       },
@@ -1683,20 +1683,20 @@
       "damage": 500,
       "reach": 195,
       "low": true,
-      "startupFrames": 9,
-      "activeFrames": 6,
-      "recoveryFrames": 9,
-      "hitstunFrames": 25,
-      "blockstunFrames": 15,
+      "startupFrames": 7,
+      "activeFrames": 4,
+      "recoveryFrames": 12,
+      "hitstunFrames": 35,
+      "blockstunFrames": 16,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
-          9,
-          19
+          7,
+          16
         ],
         "block": [
-          9,
-          19
+          7,
+          16
         ],
         "whiff": null
       },
@@ -1713,16 +1713,16 @@
       "animation": "CROUCH_HEAVY",
       "damage": 800,
       "reach": 36,
-      "startupFrames": 9,
+      "startupFrames": 10,
       "activeFrames": 6,
-      "recoveryFrames": 9,
-      "hitstunFrames": 44,
-      "blockstunFrames": 10,
+      "recoveryFrames": 17,
+      "hitstunFrames": 47,
+      "blockstunFrames": 18,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          9,
-          17
+          10,
+          20
         ],
         "block": null,
         "whiff": null
@@ -1743,19 +1743,19 @@
       "damage": 300,
       "reach": 190,
       "startupFrames": 4,
-      "activeFrames": 2,
-      "recoveryFrames": 4,
-      "hitstunFrames": 14,
-      "blockstunFrames": 10,
+      "activeFrames": 3,
+      "recoveryFrames": 6,
+      "hitstunFrames": 16,
+      "blockstunFrames": 12,
       "hitstopFrames": 5,
       "cancelWindows": {
         "hit": [
           4,
-          8
+          10
         ],
         "block": [
           4,
-          8
+          10
         ],
         "whiff": null
       },
@@ -1775,18 +1775,18 @@
       "reach": 125,
       "startupFrames": 6,
       "activeFrames": 4,
-      "recoveryFrames": 6,
-      "hitstunFrames": 16,
-      "blockstunFrames": 12,
+      "recoveryFrames": 8,
+      "hitstunFrames": 18,
+      "blockstunFrames": 14,
       "hitstopFrames": 7,
       "cancelWindows": {
         "hit": [
           6,
-          12
+          13
         ],
         "block": [
           6,
-          12
+          13
         ],
         "whiff": null
       },
@@ -1802,11 +1802,11 @@
       "animation": "JUMP_HEAVY",
       "damage": 800,
       "reach": 139,
-      "startupFrames": 12,
-      "activeFrames": 8,
-      "recoveryFrames": 12,
-      "hitstunFrames": 23,
-      "blockstunFrames": 19,
+      "startupFrames": 9,
+      "activeFrames": 5,
+      "recoveryFrames": 10,
+      "hitstunFrames": 20,
+      "blockstunFrames": 16,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,
@@ -1825,11 +1825,11 @@
       "animation": "JUMP_HEAVY_DOWN",
       "damage": 800,
       "reach": 99,
-      "startupFrames": 17,
-      "activeFrames": 11,
-      "recoveryFrames": 17,
-      "hitstunFrames": 31,
-      "blockstunFrames": 27,
+      "startupFrames": 9,
+      "activeFrames": 6,
+      "recoveryFrames": 9,
+      "hitstunFrames": 19,
+      "blockstunFrames": 15,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": null,
@@ -1861,16 +1861,16 @@
       "damage": 1100,
       "reach": 108,
       "hitHeight": 180,
-      "startupFrames": 7,
-      "activeFrames": 10,
-      "recoveryFrames": 24,
-      "hitstunFrames": 30,
-      "blockstunFrames": 12,
+      "startupFrames": 6,
+      "activeFrames": 8,
+      "recoveryFrames": 21,
+      "hitstunFrames": 38,
+      "blockstunFrames": 16,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
-          7,
-          22
+          6,
+          18
         ],
         "block": null,
         "whiff": null
@@ -1896,16 +1896,16 @@
       "damage": 900,
       "reach": 118,
       "hitHeight": 147,
-      "startupFrames": 40,
-      "activeFrames": 8,
-      "recoveryFrames": 36,
-      "hitstunFrames": 44,
-      "blockstunFrames": 36,
+      "startupFrames": 17,
+      "activeFrames": 4,
+      "recoveryFrames": 17,
+      "hitstunFrames": 24,
+      "blockstunFrames": 16,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
-          40,
-          58
+          17,
+          26
         ],
         "block": null,
         "whiff": null
@@ -1929,15 +1929,15 @@
       "reach": 160,
       "hitHeight": 228,
       "startupFrames": 10,
-      "activeFrames": 20,
-      "recoveryFrames": 14,
-      "hitstunFrames": 24,
-      "blockstunFrames": 14,
+      "activeFrames": 13,
+      "recoveryFrames": 13,
+      "hitstunFrames": 35,
+      "blockstunFrames": 19,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
           10,
-          35
+          28
         ],
         "block": null,
         "whiff": null

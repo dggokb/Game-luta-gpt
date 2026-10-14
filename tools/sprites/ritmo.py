@@ -11,10 +11,9 @@ própria arte em vez de copiar o tempo do p01:
     python3 tools/sprites/ritmo.py p02 --ver     # só mostra
     python3 tools/sprites/ritmo.py p02           # grava no character.json
 
-  * golpes, especiais e super: frame data próprio do personagem, esticado (ou encurtado)
-    pelo ritmo da arte contra o p01, até 2x. Hitstun e blockstun sobem junto com o ativo e a
-    recuperação, então a vantagem do golpe não muda; janelas de cancelamento e caixas de
-    acerto acompanham;
+  * golpes, especiais e projétil: NÃO mexe mais no frame data. O tempo dos golpes vem das
+    mecânicas de cada personagem (tools/sprites/mecanicas.py e mecanicas.json); aqui só o
+    quadro do impacto é reencaixado na janela ativa;
   * levantar do chão: wakeupFrames próprio do personagem, no tempo do clipe GETUP.
 
 Reações ao golpe (esticadas pelo hitstun de quem bate), defesa e backdash ficam no motor.
@@ -34,6 +33,7 @@ VISUAL = ['WALK_FORWARD', 'WALK_BACK', 'DASH', 'JUMP', 'FALL', 'LAND', 'CROUCH',
 TOLERANCE = 0.25   # diferença de ritmo menor que isso fica como está
 LIMIT = 3.0        # nunca estica/encurta mais que isso de uma vez
 MOVE_LIMIT = (0.67, 2.0)   # frame data: no máximo 2x mais lento ou 1,5x mais rápido
+MECANICAS = True           # frame data dos golpes vem de mecanicas.json
 
 
 def plan(cid):
@@ -77,9 +77,9 @@ def attacks(pack):
 
 
 def plan_moves(cid):
-    """{golpe: (fator, motivo)} sobre o frame data atual. O alvo é o tempo do p01 vezes o
-    ritmo da arte (limitado), então rodar de novo não estica outra vez."""
-    if cid == A.REFERENCE:
+    """{golpe: (fator, motivo)} sobre o frame data atual. Desligado: o tempo dos golpes agora
+    vem de mecanicas.json (a mecânica decide, a animação se ajusta)."""
+    if cid == A.REFERENCE or MECANICAS:
         return {}
     pack, _ = A.load_pack(cid)
     ref_pack, _ = A.load_pack(A.REFERENCE)
