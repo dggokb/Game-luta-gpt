@@ -175,3 +175,27 @@ da ficha). O que falta é o jogo fazer o que a animação mostra:
    S4 do p03 no ar, S2 projétil do p05 e da p11, vapor da p10.
 6. **Comandos:** decidir se cada personagem tem comandos próprios ou se fica o padrão de jogo de
    luta (todos iguais), mas com S3 e S4 em movimentos diferentes.
+
+## Comandos por personagem (proposta, 14/10)
+
+Decidido: cada personagem tem comandos próprios (o jogo vai para PC). Setas com o personagem
+virado para a direita. `[←] →` = segura ← um instante e aperta →; `[↓] ↑` = segura ↓ e aperta ↑.
+Super e Ultra continuam no botão SUPER (Ultra = ↓ + SUPER).
+
+| # | S1 | S2 | S3 | S4 |
+|---|---|---|---|---|
+| p01 | Onda ↓↘→ | Punho ascendente →↓↘ | Aparar ↓↓ | Chute giratório ↓↙← |
+| p02 | Palma ↓↘→ | Chute da garça [↓] ↑ | Contra-golpe ←↙↓ | Chute rodopiante [←] → |
+| p03 | Onda curta ↓↘→ | Punho em sequência →↓↘ | Avanço em três ↓↙← (repetir até 3×) | Mergulho, no ar: ↓↘→ |
+| p04 | Soco de impacto ↓↘→ | Cabeçada [←] → | Esquiva ↓↓ | Ombrada ←↙↓↘→ |
+| p05 | Kunai ↓↘→ | Shuriken ↓↙← | Selo e mudança ↓↓ | Corte de mão ←↙↓↘→ |
+| p06 | Sombra rastejante ↓↙← | Eco de sombra ↓↓ | Puxar →↘↓↙← | Passo-sombra ↓↘→ |
+| p07 | Tapa de luva ↓↘→ | Chute ascendente →↓↘ | Contra-golpe ↓↙← | Chute giratório baixo ↓↓ |
+| p08 | Chicote ←↙↓↘→ | Giro ascendente [↓] ↑ | Contra-golpe ↓↙← | Salto-agulha ↓↘→ |
+| p09 | Machado →↘↓↙← | Cotovelada →↓↘ | Escudo ↓↓ | Ombrada [←] → |
+| p10 | Machadinho ↓↙← | Jato de vapor →↓↘ | Esquiva acrobática ↓↓ | Voadora em parafuso ↓↘→ |
+| p11 | Bisturi ↓↘→ | Seringa ↓↙← | Bloqueio de nervos →↘↓↙← | Passo cirúrgico [←] → |
+| p12 | Investida [←] → | Salto de garras [↓] ↑ | Fúria ↓↓ | Contorção ↓↙← |
+
+Ideia: quem é "de carga" (p02 garça, p04 boxe, p12 fera) segura para trás ou para baixo; o
+grappler (p09) tem meias-luas longas; os irmãos (p01, p03) usam os comandos clássicos.
