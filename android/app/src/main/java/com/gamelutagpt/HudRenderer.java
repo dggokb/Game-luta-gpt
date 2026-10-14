@@ -132,7 +132,8 @@ final class HudRenderer {
         effects.update(s, seconds);
         reset();
         FighterState active = s.active();
-        FighterState reserve = s.reserve();
+        // Sem parceiro (duelo 1x1), reserve() devolve o próprio titular: o HUD mostra a vaga vazia.
+        FighterState reserve = s.reserve() == active ? null : s.reserve();
 
         if (hudArt == null) {
             drawTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);

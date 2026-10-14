@@ -199,7 +199,8 @@ public final class PaginaHistoria {
     public void resultadoLuta(boolean venceu) {
         if (!waitingFight()) return;
         Episodio.Passo luta = passo();
-        if (!venceu && luta.repetirSeDerrota) {
+        boolean segue = campanha != null && campanha.derrotaSegue(luta);
+        if (!venceu && luta.repetirSeDerrota && !segue) {
             listener.onHistoriaLuta(luta);
             return;
         }
@@ -331,10 +332,11 @@ public final class PaginaHistoria {
      */
     private boolean toca(Episodio.Passo p) {
         if (campanha == null) {
-            return p.irmao == null && p.tipo != Episodio.TipoPasso.ESCOLHA && p.tipo != Episodio.TipoPasso.SORTEIO &&
-                p.tipo != Episodio.TipoPasso.CHAVE && !p.torneio;
+            return p.irmao == null && p.caminho == null && !p.duelo && p.tipo != Episodio.TipoPasso.ESCOLHA &&
+                p.tipo != Episodio.TipoPasso.SORTEIO && p.tipo != Episodio.TipoPasso.CHAVE && !p.torneio;
         }
         if (!campanha.vale(p)) return false;
+        if (p.duelo) return true;
         boolean precisaChave = p.tipo == Episodio.TipoPasso.SORTEIO || p.tipo == Episodio.TipoPasso.CHAVE || p.torneio;
         if (precisaChave && campanha.torneio() == null) return false;
         if (p.torneio && campanha.torneio().adversario() == null) return false;

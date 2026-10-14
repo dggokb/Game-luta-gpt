@@ -183,6 +183,8 @@ public class GameView extends SurfaceView
      * construtor): se a seleção for cancelada, a luta de teste começa com {@link #testPicks}.
      */
     private boolean testFightPending;
+    /** Duelo 1x1 da história: um lutador por lado (sem parceiro no motor nem no HUD). */
+    private boolean duel;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
@@ -368,12 +370,26 @@ public class GameView extends SurfaceView
 
     /** A seleção muda a dupla P1 e o titular do adversário de treino. */
     private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
+        selectTeams(point, partner, cpuPoint, cpuPartner, false);
+    }
+
+    /**
+     * Duelo 1x1 (a regra escondida do torneio): um lutador de cada lado, sem tag nem assist.
+     * O "parceiro" guardado no time do jogador é o próprio adversário, só para a arte e o ultra
+     * dele já estarem carregados; o motor recebe um membro por lado.
+     */
+    private void selectDuel(String player, String cpu) {
+        selectTeams(player, cpu, cpu, player, true);
+    }
+
+    private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
         hud.resetEffects();
+        duel = solo;
         team = membersOf(point, partner);
         opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
         opponentTagId = cpuPartner;
         CharacterDefinition cpuPartnerCharacter = GeneratedCharacters.get(cpuPartner);
-        if (flow.battle()) {
+        if (flow.battle() && !duel) {
             // Batalha 2x2: o parceiro do CPU entra de assist, na troca e quando o titular cai,
             // então a arte dele fica carregada (sem decodificar no meio da luta).
             atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
@@ -384,8 +400,8 @@ public class GameView extends SurfaceView
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
-        engine.setTeam(PLAYER, team);
-        if (flow.battle()) {
+        engine.setTeam(PLAYER, duel ? new FighterState[] {team[0]} : team);
+        if (flow.battle() && !duel) {
             engine.setTeam(OPPONENT, opponentFighter, new FighterState(cpuPartnerCharacter, "CPU"));
         } else {
             engine.setTeam(OPPONENT, opponentFighter);
@@ -885,6 +901,7 @@ public class GameView extends SurfaceView
         @Override public FighterState reserve() { return reserveFighter(); }
         @Override public FighterState opponent() { return opponentPoint(); }
         @Override public CharacterDefinition opponentReserveCharacter() {
+            if (duel) return null;
             FighterState partner = engine.team(OPPONENT).partner();
             return partner != null ? partner.character : GeneratedCharacters.get(opponentTagId);
         }
@@ -2597,7 +2614,10 @@ public class GameView extends SurfaceView
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
         // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
         String[][] lados = historia.lados(luta);
-        if (lados != null && fightersExist(lados[0][0], lados[0][1], lados[1][0], lados[1][1])) {
+        if (lados != null && lados[0].length == 1 && fightersExist(lados[0][0], lados[1][0])) {
+            // Duelo 1x1: um de cada lado.
+            selectDuel(lados[0][0], lados[1][0]);
+        } else if (lados != null && lados[0].length == 2 && fightersExist(lados[0][0], lados[0][1], lados[1][0], lados[1][1])) {
             selectTeams(lados[0][0], lados[0][1], lados[1][0], lados[1][1]);
         } else {
             if (lados != null) Log.w(LOG_TAG, "dupla da história sem golpes ainda; usando as duplas atuais");

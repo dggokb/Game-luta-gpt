@@ -2,7 +2,7 @@
 
 > Motor das páginas (padrão do jogo inteiro): [motor-paginas.md](motor-paginas.md).
 > Motor das conversas durante as lutas (parceiro de tag, adversário esperando): [motor-conversas.md](motor-conversas.md).
-> Torneio (escolha do irmão, sorteio, chave de 8 duplas fixas): [torneio.md](torneio.md).
+> Torneio (escolha do irmão, sorteio, chave de 8 duplas fixas com repescagem, duelo 1x1): [torneio.md](torneio.md).
 
 A história vem do documento "História Base — Torneio dos Irmãos" (Drive, pasta
 game-luta-gpt). Este documento descreve **como ela é contada no jogo**. Os episódios
@@ -97,6 +97,8 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 | `torneio` (passo de luta) | `true`: luta contra o próximo adversário da chave |
 | `dupla` / `cpu` | `[titular, parceiro]`, ou `"jogador"` / `"rival"` (a dupla fixa do irmão escolhido / do outro) |
 | `irmao` (qualquer passo) | `ryuga` ou `koga`: o passo só toca na campanha desse irmão |
+| `caminho` (qualquer passo) | `direto` ou `repescagem`: só para quem venceu ou perdeu as quartas |
+| `duelo` (passo de luta) | `true`: o 1x1 da regra escondida, capitão × parceiro |
 | `layout` | `splash` (1), `duas-colunas` (2), `tres-colunas`, `tres-faixas`, `faixa-e-dois`, `dois-e-faixa` (3), `quatro`, `grade` (4). Sem `layout`, vale o padrão pela quantidade de painéis |
 | `tom` | `papel` (normal) ou `flashback` (página preta, cores sépia) |
 | `cena` (arte provisória) | `dojo`, `dojo-noite`, `casa`, `estrada`, `templo`, `ceu`, `chuva`, `carta` |
