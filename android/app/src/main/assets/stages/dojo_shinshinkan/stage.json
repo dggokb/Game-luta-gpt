@@ -241,7 +241,8 @@
       "profundidade": 850,
       "noChao": true,
       "altura": 0.26,
-      "x": 0.73
+      "x": 0.73,
+      "virar": true
     },
     {
       "id": "lanternas",
