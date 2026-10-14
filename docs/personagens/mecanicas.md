@@ -1,4 +1,4 @@
-# Mecânicas por personagem — RASCUNHO v1
+# Mecânicas por personagem — RASCUNHO v2
 
 Documento de trabalho: **nada aqui está no jogo ainda.** Hoje os 12 lutadores têm os
 mesmos números (vida 10.000, L tira 300, projétil tira 850, todos andam, correm e pulam
@@ -22,43 +22,53 @@ Legenda: ✅ só muda dados (dá para fazer já) · 🔧 precisa de código novo
 Valores relativos ao `player_base` (vida 10.000, andar 300, dash 620, L 2/4/4 frames).
 "Velocidade dos golpes" multiplica o tempo dos normais: 1,3× = 30% mais lentos.
 
-| Molde | Quem | Vida | Andar / dash | Dano dos normais | Velocidade dos golpes | Alcance | Jogo |
+| Molde | Quem | Vida | Mobilidade | Dano dos normais | Velocidade dos golpes | Alcance | Jogo |
 |---|---|---|---|---|---|---|---|
-| **Equilibrado** | p01 | 10.000 | 1,0× | 1,0× | 1,0× | médio | Projétil + anti-aéreo + punição. Referência do elenco |
-| **Rushdown** | p03, p10, p02 | 9.300–9.800 | 1,1–1,2× | 0,85–1,0× | 0,85–0,95× | curto | Entra, pressiona, combos longos |
-| **Brawler** | p04, p07 | 10.300–10.800 | 0,85–1,0× | 1,05–1,2× | 0,95–1,25× | curto/médio | Troca golpe, contra-ataca, dano consistente |
-| **Grappler** | p09 | 11.500 | 0,8× | 1,25× | 1,3× | curto | Aguenta, chega perto e agarra |
-| **Zoner** | p06, p08, p11 | 9.000–9.500 | 0,9× | 0,8–0,95× | 1,0× | longo | Controla espaço, pune quem entra |
-| **Mixup** | p05 | 9.200 | 1,2× | 0,9× | 0,85× | curto | Mobilidade, teleporte, adversário nunca sabe de onde vem |
-| **Berserker** | p12 | 9.500 | 1,1× | 1,1× (até 1,4× com pouca vida) | 1,0× | curto | Aguenta golpe, troca vida por poder |
+| **Equilibrado** | p01 | 10.000 | padrão | 1,0× | 1,0× | médio | Projétil + anti-aéreo + punição. Referência do elenco |
+| **Rushdown** | p03, p10, p02 | 9.300–9.800 | especiais que avançam | 0,85–1,0× | 0,85–0,95× | curto | Entra, pressiona, combos longos |
+| **Brawler** | p04, p07 | 10.300–10.800 | padrão | 1,05–1,2× | 0,95–1,25× | curto/médio | Troca golpe, contra-ataca, dano consistente |
+| **Grappler** | p09 | 11.500 | padrão (lento nos golpes) | 1,25× | 1,3× | curto | Aguenta, chega perto e agarra |
+| **Zoner** | p06, p08, p11 | 9.000–9.500 | padrão | 0,8–0,95× | 1,0× | longo | Controla espaço, pune quem entra |
+| **Mixup** | p05 | 9.200 | teleporte, wall jump | 0,9× | 0,85× | curto | Mobilidade, teleporte, adversário nunca sabe de onde vem |
+| **Berserker** | p12 | 9.500 | padrão | 1,1× (até 1,4× com pouca vida) | 1,0× | curto | Aguenta golpe, troca vida por poder |
 
-> 🔧 Andar, dash e pulo hoje são **globais** (`CombatConfig`). Para cada um ter os seus,
-> esses valores precisam ir para o `character.json` (`fighter`). É uma mudança pequena no
-> motor e é a primeira a fazer, porque quase todos os moldes dependem dela.
+> **Decidido (14/10):** andar, dash e pulo continuam **iguais para todos** (`CombatConfig`).
+> A diferença de mobilidade vem dos especiais (teleporte do p05, air dash extra da p10).
 > ✅ Vida (`maxLife`) e dano já são por personagem.
 
 ---
 
 ## 2. Os 12 lado a lado
 
-| # | Molde | Vida | Andar | Dano | Golpes | Mecânica única | Forte contra | Fraco contra |
-|---|---|---|---|---|---|---|---|---|
-| **p01** | Equilibrado | 10.000 | 300 | 1,0× | 1,0× | **Onda carregável:** segurar S deixa a Onda maior e mais rápida 🔧 | quem pula muito (anti-aéreo) | rushdown que não dá espaço |
-| **p02** | Rushdown / contra | 9.600 | 340 | 0,9× | 0,9× | **Contra-golpe alto:** S3 desvia golpes altos e médios e responde 🔧 | brawlers lentos (p07, p09) | zoners (p08, p06) |
-| **p03** | Rushdown | 9.800 | 320 | 1,0× | 0,95× | **Rekka:** S3 com até 3 investidas, cada uma com novo input 🔧 | zoners (p06, p11) | contra-golpes (p02, p07) |
-| **p04** | Brawler | 10.300 | 310 | 1,05× | 0,9× (só socos) | **Esquiva que cancela:** S3 passa por baixo de golpe alto e de projétil e pode cancelar em soco 🔧 | projéteis curtos | quem tem alcance (p08) |
-| **p05** | Mixup | 9.200 | 360 | 0,9× | 0,85× | **Teleporte** (S3, à frente ou atrás) e **wall jump** 🔧 | defensivos (p01, p07) | grappler (p09) se for pego |
-| **p06** | Zoner / trapper | 9.500 | 270 | 0,85× | 1,0× | **Clone** que avança sozinho (S2) e **puxar** à distância (S3) 🔧 | grappler (p09) | rushdown (p03, p10) |
-| **p07** | Brawler pesado | 10.800 | 250 | 1,2× | 1,25× | **Capangas no Super** (entram e batem sozinhos) 🔧 | rushdown impulsivo (p03) | zoners (p08, p11) |
-| **p08** | Zoner longo | 9.300 | 280 | 0,95× | 1,0× | **Chicote:** H, 2H e jH com quase o dobro do alcance ✅ (é só `reach` e hitbox) | lentos (p07, p09) | mixup (p05), quem passa por baixo (p04) |
-| **p09** | Grappler | 11.500 | 240 | 1,25× | 1,3× | **Agarrão de comando** (meia-lua + agarrão, mais alcance e dano) e **armadura** no S3 e S4 🔧 | rushdown (p03, p10, p12) | zoners (p06, p08, p11) |
-| **p10** | Rushdown acrobático | 9.300 | 350 | 0,85× | 0,85× | **Mobilidade aérea:** 2 air dashes e voadora que cruza o adversário ✅ air dash já existe, 🔧 o segundo | zoners (p06, p11) | grappler (p09) |
-| **p11** | Zoner / trapper | 9.000 | 280 | 0,8× | 1,0× | **Veneno:** S2 e alguns golpes tiram vida ao longo do tempo 🔧 | tanques (p09, p07) | rushdown (p03, p10) |
-| **p12** | Berserker | 9.500 | 330 | 1,1× → 1,4× | 1,0× | **Fúria:** dano cresce com a vida perdida, especiais custam vida, S3 com super armor 🔧 | rushdown (troca golpe e ganha) | zoners (não chega perto) |
+| # | Molde | Vida | Dano | Golpes | Mecânica única | Forte contra | Fraco contra |
+|---|---|---|---|---|---|---|---|
+| **p01** | Equilibrado | 10.000 | 1,0× | 1,0× | **Onda carregável:** segurar S deixa a Onda maior e mais rápida 🔧 | quem pula muito (anti-aéreo) | rushdown que não dá espaço |
+| **p02** | Rushdown / contra | 9.600 | 0,9× | 0,9× | **Contra-golpe alto:** S3 desvia golpes altos e médios e responde 🔧 | brawlers lentos (p07, p09) | zoners (p08, p06) |
+| **p03** | Rushdown | 9.800 | 1,0× | 0,95× | **Rekka:** S3 com até 3 investidas, cada uma com novo input 🔧 | zoners (p06, p11) | contra-golpes (p02, p07) |
+| **p04** | Brawler | 10.300 | 1,05× | 0,9× (só socos) | **Esquiva que cancela:** S3 passa por baixo de golpe alto e de projétil e pode cancelar em soco 🔧 | projéteis curtos | quem tem alcance (p08) |
+| **p05** | Mixup | 9.200 | 0,9× | 0,85× | **Teleporte** (S3, à frente ou atrás) e **wall jump** 🔧 | defensivos (p01, p07) | grappler (p09) se for pego |
+| **p06** | Zoner / trapper | 9.500 | 0,85× | 1,0× | **Clone** que avança sozinho (S2) e **puxar** à distância (S3) 🔧 | grappler (p09) | rushdown (p03, p10) |
+| **p07** | Brawler pesado | 10.800 | 1,2× | 1,25× | **Capangas no Super** (entram e batem sozinhos) 🔧 | rushdown impulsivo (p03) | zoners (p08, p11) |
+| **p08** | Zoner longo | 9.300 | 0,95× | 1,0× | **Chicote:** H, 2H e jH com quase o dobro do alcance ✅ (é só `reach` e hitbox) | lentos (p07, p09) | mixup (p05), quem passa por baixo (p04) |
+| **p09** | Grappler | 11.500 | 1,25× | 1,3× | **Agarrão de comando** (meia-lua + agarrão, mais alcance e dano) e **armadura** no S3 e S4 🔧 | rushdown (p03, p10, p12) | zoners (p06, p08, p11) |
+| **p10** | Rushdown acrobático | 9.300 | 0,85× | 0,85× | **Mobilidade aérea:** 2 air dashes e voadora que cruza o adversário ✅ air dash já existe, 🔧 o segundo | zoners (p06, p11) | grappler (p09) |
+| **p11** | Zoner / trapper | 9.000 | 0,8× | 1,0× | **Veneno:** S2 e alguns golpes tiram vida ao longo do tempo 🔧 | tanques (p09, p07) | rushdown (p03, p10) |
+| **p12** | Berserker | 9.500 | 1,1× → 1,4× | 1,0× | **Fúria:** dano cresce com a vida perdida, especiais custam vida, S3 com super armor 🔧 | rushdown (troca golpe e ganha) | zoners (não chega perto) |
 
 **Ciclo de forças:** zoner > grappler/pesado > rushdown > zoner. p01, p04, p05 e p12 ficam
 no meio e se viram contra todos. Cada dupla da história mistura dois lados do ciclo: p09
 (tanque) + p10 (ágil), p05 (perto) + p06 (longe), p07 (pesado) + p08 (longe).
+
+### ⚠ Em aberto: mecânica única da p06
+
+O rascunho dava duas (clone no S2 e puxar no S3). Opções para ter **uma** marca própria
+(puxar continua como especial normal dela):
+
+| Opção | Como funciona | Animação nova? |
+|---|---|---|
+| **Eco de sombra** (sugerida) | Ao ativar, uma sombra roxa dela repete cada golpe meio segundo depois, por alguns segundos. Pressão e confusão de longe e de perto | Não: a sombra usa os próprios sprites da p06 pintados de roxo |
+| Poça de sombra | O S1 deixa uma poça no chão por alguns segundos; quem pisa fica lento | Só o efeito da poça |
+| Troca com o clone | O clone fica parado na tela; apertar de novo troca ela de lugar com ele | Não, mas parece com o teleporte do p05 |
 
 ### ⚠ Ponto para decidir: contra-golpe demais
 
@@ -82,7 +92,7 @@ A vantagem no hit e na defesa fica igual à da base (L +5/+2, M +4/+1, H +5/−2
 o hitstun sobe junto com o golpe. A última coluna mostra o tempo total no jogo contra o
 tempo do vídeo atual.
 
-### p09 — Grappler (vida 11.500 · andar 240 · dash 520 · pulo mais baixo e mais lento)
+### p09 — Grappler (vida 11.500)
 
 | Golpe | Dano | s/a/r | Alcance | Nota | Jogo × vídeo |
 |---|---|---|---|---|---|
@@ -100,7 +110,7 @@ tempo do vídeo atual.
 | Agarrão de comando | 2.200 | 5/2/30 | 110 | meia-lua + agarrão, não pode ser defendido 🔧 | — |
 | Super | 3.400 | — | — | Tempestade de Fogo | — × 3,29s |
 
-### p10 — Rushdown acrobático (vida 9.300 · andar 350 · dash 720 · pulo mais alto · 2 air dashes)
+### p10 — Rushdown acrobático (vida 9.300 · 2 air dashes)
 
 | Golpe | Dano | s/a/r | Alcance | Nota | Jogo × vídeo |
 |---|---|---|---|---|---|
@@ -133,15 +143,16 @@ cortado não couber, entra na lista de refazer no Seedance.
 2. **Vida:** a diferença de 9.000 (p11) a 11.500 (p09) está boa ou é pouca/demais?
 3. **Mecânicas únicas:** concorda com uma por personagem? Alguma que você imaginou diferente?
 4. **Contra-golpes:** a separação da tabela acima resolve?
-5. **p01 carregar a Onda:** foi invenção minha a partir de "poder concentrado (Takuma)".
+5. **p13–p16:** quando as fichas forem criadas, entram nos mesmos moldes.
+6. **p01 carregar a Onda:** foi invenção minha a partir de "poder concentrado (Takuma)".
    Prefere outra coisa?
-6. **Ordem de implementar:** sugestão abaixo.
+7. **Ordem de implementar:** sugestão abaixo.
 
 ## 5. Ordem sugerida de implementação
 
-1. 🔧 Movimento por personagem (andar, dash, pulo no `character.json`). Pequeno, destrava tudo.
-2. ✅ Vida, dano, alcance e frame data dos normais de todos (só dados).
-3. ✅ Compressão do vídeo para o novo tempo (o plano anterior), começando por p09 + p10.
+1. ✅ Vida, dano, alcance e frame data dos normais de todos (só dados).
+2. ✅ Compressão do vídeo para o novo tempo (o plano anterior), começando por p09 + p10.
+3. Jogar, rever e ajustar o que não fizer sentido (mexer no número e refazer a animação).
 4. 🔧 Mecânicas únicas, uma por vez, das mais simples para as mais complexas: chicote (p08,
    já é dado) → armadura (p09, p12) → contra-golpes → esquiva (p04, p10) → rekka (p03) →
    veneno (p11) → teleporte e wall jump (p05) → clones, puxar e capangas (p06, p07).
