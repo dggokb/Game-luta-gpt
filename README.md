@@ -297,7 +297,8 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - **IA ON** é a **batalha de verdade, 2x2**: ligar a IA começa uma luta nova; o CPU luta com a
   dupla dele, o titular que cai é substituído pelo parceiro e **o time só perde quando os dois
   da dupla caem**. Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
-  também usam essa regra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
+  também usam essa regra. Na batalha o CPU usa tudo: assist, troca, Assist → Tag, Super,
+  DHC, Guard Cancel, pushblock, Overdrive e Ultra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
 
 ## Modo história (MVP)
 

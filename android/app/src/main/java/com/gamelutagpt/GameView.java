@@ -199,6 +199,11 @@ public class GameView extends SurfaceView
     /** Partner on screen: the assist, or the former point running off after Assist → Tag. */
     private final SpriteFighterRenderer partnerSpriteRenderer;
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
+    /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag), pálido. */
+    private final SpriteFighterRenderer opponentPartnerRenderer;
+    private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
+    /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
+    private final java.util.Map<String, UltraPack> cpuUltraPacks = new java.util.HashMap<>();
 
     // Single version source: versionName in app/build.gradle.
     private static final String VERSION_HUD_LABEL =
@@ -256,6 +261,8 @@ public class GameView extends SurfaceView
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
+        opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        opponentPartnerRenderer.setTint(SpriteFighterRenderer.washedOut());
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
             @Override public void manterAtlas(CharacterDefinition extra) {
                 // Só as folhas do personagem em ajuste: a luta está parada e volta a decodificar ao sair.
@@ -334,14 +341,21 @@ public class GameView extends SurfaceView
         team = membersOf(point, partner);
         opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
         opponentTagId = cpuPartner;
-        atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
+        CharacterDefinition cpuPartnerCharacter = GeneratedCharacters.get(cpuPartner);
+        if (flow.battle()) {
+            // Batalha 2x2: o parceiro do CPU entra de assist, na troca e quando o titular cai,
+            // então a arte dele fica carregada (sem decodificar no meio da luta).
+            atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
+            atlases.preload(cpuPartnerCharacter);
+        } else {
+            atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
+        }
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
         engine.setTeam(PLAYER, team);
         if (flow.battle()) {
-            // Batalha 2x2: o parceiro do CPU espera fora e entra quando o titular cair.
-            engine.setTeam(OPPONENT, opponentFighter, new FighterState(GeneratedCharacters.get(cpuPartner), "CPU"));
+            engine.setTeam(OPPONENT, opponentFighter, new FighterState(cpuPartnerCharacter, "CPU"));
         } else {
             engine.setTeam(OPPONENT, opponentFighter);
         }
@@ -349,7 +363,30 @@ public class GameView extends SurfaceView
         engine.refreshOverdrive(OPPONENT);
         engine.restage(PLAYER_START_X, OPPONENT_START_X);
         loadTeamUltras();
+        loadCpuUltras();
         startIntro();
+    }
+
+    /**
+     * O Ultra do CPU usa a arte do personagem dele. Quem também está no time do jogador
+     * reaproveita o pack já carregado; os outros carregam aqui, antes da luta.
+     */
+    private void loadCpuUltras() {
+        cpuUltraPacks.clear();
+        if (!flow.battle()) return;
+        for (FighterState member : engine.team(OPPONENT).members) {
+            String id = member.character.id;
+            if (teamUltraPack(id) != null || cpuUltraPacks.containsKey(id)) continue;
+            cpuUltraPacks.put(id, loadUltraPack(ultraAssets, member));
+            ultraSounds.loadUltra(ultraFolder(member));
+        }
+    }
+
+    private UltraPack teamUltraPack(String characterId) {
+        for (int i = 0; i < team.length; i++) {
+            if (team[i].character.id.equals(characterId)) return ultraPacks[i];
+        }
+        return null;
     }
 
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
@@ -703,8 +740,8 @@ public class GameView extends SurfaceView
         updateUltraVisuals();
         updateFightCamera(FIXED_STEP);
         updateTeamVisuals();
-        updateFighterSprite(spriteFighterRenderer, player(), true);
-        updateFighterSprite(opponentSpriteRenderer, opponent(), false);
+        updateFighterSprite(spriteFighterRenderer, player());
+        updateFighterSprite(opponentSpriteRenderer, opponent());
         if (intro && ++introFrame >= introTotalFrames) {
             introFrame = -1;
             flow.startCountdown();
@@ -716,8 +753,14 @@ public class GameView extends SurfaceView
     private void updateOpponentVisuals() {
         CharacterDefinition onPoint = opponentPoint().character;
         if (opponentSpriteRenderer.character() == onPoint) return;
-        // Quem caiu sai da memória antes de o próximo ser carregado.
-        atlases.retainOnly(team[0].character, team[1].character, onPoint);
+        // Quem caiu sai da memória; quem ainda luta (titular e parceiro de pé) fica.
+        java.util.List<CharacterDefinition> keep = new java.util.ArrayList<>();
+        keep.add(team[0].character);
+        keep.add(team[1].character);
+        for (FighterState member : engine.team(OPPONENT).members) {
+            if (member.life > 0 || member == opponentPoint()) keep.add(member.character);
+        }
+        atlases.retainOnly(keep.toArray(new CharacterDefinition[0]));
         opponentSpriteRenderer.setCharacter(onPoint.id);
     }
 
@@ -751,6 +794,11 @@ public class GameView extends SurfaceView
         }
         @Override public FighterState opponentReserve() { return engine.team(OPPONENT).partner(); }
         @Override public boolean battleActive() { return flow.battle(); }
+        @Override public float opponentTagReadyRatio() {
+            TeamSystem.Side cpu = engine.team(OPPONENT);
+            if (!cpu.partnerStanding() || cpu.tagging() || cpu.assistOut()) return 0f;
+            return 1f - cpu.assistCooldown / (float)engine.config.assistCooldownFrames;
+        }
         @Override public String versionLabel() { return VERSION_HUD_LABEL; }
         @Override public String stateLabel() { return currentStateLabel(); }
         @Override public int facing() { return player().facing; }
@@ -839,19 +887,26 @@ public class GameView extends SurfaceView
             !isTagAnimationActive();
     }
 
-    /** Activation and rush of the player's ultra (engine state), before any cinematic. */
+    /** Who is doing an ultra now (the player or, in battle, the CPU); the player when nobody is. */
+    private CombatFighter ultraFighter() {
+        if (ultraAttacker >= 0) return engine.fighter(ultraAttacker);
+        CombatFighter cpu = opponent();
+        return player().status != CombatFighter.Status.ULTRA && cpu.status == CombatFighter.Status.ULTRA ? cpu : player();
+    }
+
+    /** Activation and rush of an ultra (engine state), before any cinematic. */
     private boolean ultraWindupActive() {
-        CombatFighter p = player();
+        CombatFighter p = ultraFighter();
         return p.status == CombatFighter.Status.ULTRA &&
             (p.ultraPhase == CombatFighter.ULTRA_STARTUP || p.ultraPhase == CombatFighter.ULTRA_RUSH);
     }
 
     private void updateUltraVisuals() {
-        CombatFighter p = player();
+        CombatFighter p = ultraFighter();
         int phase = p.status == CombatFighter.Status.ULTRA ? p.ultraPhase : -1;
         if (phase != ultraPhaseSeen) {
-            if (phase == CombatFighter.ULTRA_STARTUP) ultraSounds.play(ultraFolder(activeFighter()), "ativacao");
-            if (phase == CombatFighter.ULTRA_RUSH) ultraSounds.play(ultraFolder(activeFighter()), "investida");
+            if (phase == CombatFighter.ULTRA_STARTUP) ultraSounds.play(ultraFolder(p.state), "ativacao");
+            if (phase == CombatFighter.ULTRA_RUSH) ultraSounds.play(ultraFolder(p.state), "investida");
             ultraPhaseSeen = phase;
         }
         if (phase == CombatFighter.ULTRA_STARTUP) {
@@ -883,10 +938,15 @@ public class GameView extends SurfaceView
         ultraDarkAlpha = 0;
         ultraCameraZoom = 1f;
         FighterState state = attacker == PLAYER ? activeFighter() : opponentPoint();
-        ultraPack = attacker == PLAYER
-            ? ultraPacks[engine.team(PLAYER).point]
-            : UltraPack.placeholder("ULTRA " + state.character.displayName, state.profile.color);
+        ultraPack = attacker == PLAYER ? ultraPacks[engine.team(PLAYER).point] : cpuUltraPack(state);
         paginaFinal.start(ultraPack, engine.fighter(attacker).facing);
+    }
+
+    /** O pack do Ultra do CPU: o do time do jogador se é o mesmo personagem, o carregado na luta, ou o provisório. */
+    private UltraPack cpuUltraPack(FighterState state) {
+        UltraPack pack = teamUltraPack(state.character.id);
+        if (pack == null) pack = cpuUltraPacks.get(state.character.id);
+        return pack != null ? pack : UltraPack.placeholder("ULTRA " + state.character.displayName, state.profile.color);
     }
 
     private String ultraAttackerFolder() {
@@ -1130,7 +1190,14 @@ public class GameView extends SurfaceView
             if (!partnerSpriteRenderer.character().id.equals(partner.state.character.id)) {
                 partnerSpriteRenderer.setCharacter(partner.state.character.id);
             }
-            updateFighterSprite(partnerSpriteRenderer, partner, false);
+            updateFighterSprite(partnerSpriteRenderer, partner);
+        }
+        CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
+        if (cpuPartner != null) {
+            if (opponentPartnerRenderer.character() != cpuPartner.state.character) {
+                opponentPartnerRenderer.setCharacter(cpuPartner.state.character.id);
+            }
+            updateFighterSprite(opponentPartnerRenderer, cpuPartner);
         }
         updateTagCooldownLabels(team);
     }
@@ -1139,8 +1206,8 @@ public class GameView extends SurfaceView
     private CombatFighter partnerBody(TeamSystem.Side team) {
         if (team.assist != null) return team.assist;
         if (team.leaving == null || team.leavingFrame < 0) return null;
-        CombatFighter f = leavingBody;
-        float x = engine.teams.leavingX(PLAYER);
+        CombatFighter f = team.index == PLAYER ? leavingBody : opponentLeavingBody;
+        float x = engine.teams.leavingX(team.index);
         f.travel = x - f.x;
         f.state = team.leaving;
         f.x = x;
@@ -1178,6 +1245,8 @@ public class GameView extends SurfaceView
     /** A IA ligada é o modo batalha (2x2, derrota quando a dupla cai); desligada, o treino. */
     private void setOpponentAiEnabled(boolean enabled) {
         ai.setEnabled(enabled);
+        // Na batalha o CPU usa o kit inteiro: assist, troca, DHC, Guard Cancel, Overdrive, Ultra.
+        ai.setFullKit(enabled);
         flow.setBattle(enabled);
     }
 
@@ -1247,8 +1316,8 @@ public class GameView extends SurfaceView
             float renderCameraX = camera.x;
             float renderCameraTop = camera.top;
             if (ultraCameraZoom != 1f) {
-                // Ultra activation zooms into the player, keeping it on the same screen spot.
-                CombatFighter p = player();
+                // Ultra activation zooms into whoever does it, keeping it on the same screen spot.
+                CombatFighter p = ultraFighter();
                 float baseLeft = clamp(camera.x - VW / baseZoom / 2f, 0f, WORLD_WIDTH - VW / baseZoom);
                 float focusY = p.y - 80f;
                 float playerScreenX = (p.x - baseLeft) * baseZoom;
@@ -1297,14 +1366,14 @@ public class GameView extends SurfaceView
             if (ultraWindupActive()) {
                 effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
                 canvas.save();
-                if (player().facing < 0) {
-                    canvas.scale(-1f, 1f, player().x, 0f);
+                CombatFighter u = ultraFighter();
+                if (u.facing < 0) {
+                    canvas.scale(-1f, 1f, u.x, 0f);
                 }
-                if (player().ultraPhase == CombatFighter.ULTRA_STARTUP) {
-                    effects.drawSuperCharge(canvas, paint, player().x, player().y, ultraAuraTime,
-                        activeFighter().profile.color);
+                if (u.ultraPhase == CombatFighter.ULTRA_STARTUP) {
+                    effects.drawSuperCharge(canvas, paint, u.x, u.y, ultraAuraTime, u.state.profile.color);
                 } else {
-                    effects.drawUltraRush(canvas, paint, player().x, player().y, activeFighter().profile.color);
+                    effects.drawUltraRush(canvas, paint, u.x, u.y, u.state.profile.color);
                 }
                 canvas.restore();
             }
@@ -1366,6 +1435,8 @@ public class GameView extends SurfaceView
         drawReflection(c, opponentSpriteRenderer, npc, engine.teams.tagOffset(OPPONENT), alpha);
         CombatFighter partner = partnerBody(engine.team(PLAYER));
         if (partner != null) drawReflection(c, partnerSpriteRenderer, partner, 0f, alpha);
+        CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
+        if (cpuPartner != null) drawReflection(c, opponentPartnerRenderer, cpuPartner, 0f, alpha);
         drawReflection(c, spriteFighterRenderer, player(), tagOffset(), alpha);
     }
 
@@ -1632,7 +1703,7 @@ public class GameView extends SurfaceView
     }
 
     /** Picks the clip of one fighter from its engine state. Same rules for both sides. */
-    private void updateFighterSprite(SpriteFighterRenderer renderer, CombatFighter f, boolean isPlayer) {
+    private void updateFighterSprite(SpriteFighterRenderer renderer, CombatFighter f) {
         CharacterDefinition character = f.character();
         String animation = reactionState(renderer, f);
         float animationElapsed = reactionElapsed;
@@ -1690,11 +1761,13 @@ public class GameView extends SurfaceView
             animation = throwPose(f, character);
             animationElapsed = throwPoseTime;
         }
-        CombatFighter rival = isPlayer ? opponent() : player();
-        int side = isPlayer ? 0 : 1;
+        CombatFighter rival = engine.fighter(1 - f.index);
+        int side = f.index;
+        // Só o titular comemora; o parceiro em campo (assist, saindo) não mexe no relógio dele.
+        boolean onPoint = f == engine.fighter(side);
         // No 2x2 só se comemora quando a dupla inteira do outro lado caiu.
         boolean matchWon = !flow.battle() || flow.over();
-        boolean celebrating = animation == null && matchWon && rival.ko() && !f.ko() && f.grounded &&
+        boolean celebrating = animation == null && onPoint && matchWon && rival.ko() && !f.ko() && f.grounded &&
             f.status == CombatFighter.Status.NEUTRAL && !f.attacking() && renderer.hasAnimation(SpriteStates.VICTORY);
         if (celebrating) {
             // Opponent KO: the winner plays VICTORY once and holds its last pose.
@@ -1707,7 +1780,7 @@ public class GameView extends SurfaceView
             float start = p01Victory ? win.timeOfFrame(7) : 0f;
             animationElapsed = Math.min(win.duration - 0.0001f,
                 start + victoryFrames[side]++ * FIXED_STEP);
-        } else {
+        } else if (onPoint) {
             victoryFrames[side] = 0;
         }
         CharacterDefinition.Animation beamPose =
@@ -1753,7 +1826,7 @@ public class GameView extends SurfaceView
             f.status == CombatFighter.Status.THROW ||
             f.attacking() ||
             guard != CombatFighter.GUARD_NONE ||
-            (isPlayer && isTagAnimationActive())
+            (onPoint && engine.team(side).tagging())
         );
         boolean locked = f.status != CombatFighter.Status.NEUTRAL && !f.attacking() &&
             f.status != CombatFighter.Status.ULTRA;
@@ -1864,6 +1937,8 @@ public class GameView extends SurfaceView
     private void drawPartner(Canvas c) {
         CombatFighter partner = partnerBody(engine.team(PLAYER));
         if (partner != null) drawFighter(c, partnerSpriteRenderer, partner, false, false);
+        CombatFighter cpuPartner = partnerBody(engine.team(OPPONENT));
+        if (cpuPartner != null) drawFighter(c, opponentPartnerRenderer, cpuPartner, false, false);
     }
 
     private void drawPlayer(Canvas c) {
@@ -1943,8 +2018,9 @@ public class GameView extends SurfaceView
         }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
-                // During the "Página Final" any touch counts for the timing.
-                paginaFinal.tap();
+                // During the "Página Final" any touch counts for the timing (only for the player's
+                // own ultra: the CPU's one plays without the bonus).
+                if (ultraAttacker == PLAYER) paginaFinal.tap();
                 return;
             }
             int pointerId = event.getPointerId(index);

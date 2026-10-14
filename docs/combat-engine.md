@@ -115,8 +115,20 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
     luta recomeça com as mesmas duplas. Só o vencedor final comemora.
 - As lutas da história são batalhas (o treino do tutorial não): a página volta quando uma
   dupla inteira cai.
+- **O CPU usa o kit inteiro na batalha** (`AiController.setFullKit`), com sorteios próprios
+  (não mexem nas decisões do `OpponentAi`, nem no treino):
+  - **assist** no neutro a meia distância e para estender o combo quando um golpe acerta;
+  - **Assist → Tag** com o assist em campo; **troca** (↓ + TAG) com a vida baixa e o parceiro melhor;
+  - **Super** cancelando um golpe que acertou (além do Super à distância de antes) e **DHC**
+    quando o próprio Super já saiu;
+  - **Guard Cancel Tag** e **pushblock** quando está defendendo;
+  - **Overdrive** no meio do combo ou com a vida baixa; **Ultra** com 3 barras e perto.
+  - Chances e distâncias: constantes no topo do `AiController`.
+- O parceiro do CPU em campo (assist, ou saindo depois do Assist → Tag) é desenhado pálido
+  como o titular; a arte dele já vem carregada na batalha. O Ultra do CPU usa o pack do
+  personagem dele (ou o provisório) e o toque do jogador não dá bônus nele.
 
-Testes: `BattleFlowTest`.
+Testes: `BattleFlowTest`, `AiFullKitTest`.
 
 ## Overdrive — v0.87
 
