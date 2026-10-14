@@ -73,8 +73,7 @@ public class GameView extends SurfaceView
     private final FighterInput ignoredInput = new FighterInput();
     private boolean debugOverlay;
     /** Screen-space controls shown only in DEBUG, away from combat buttons. */
-    private static final float TUNE_LEFT = 944f, TUNE_TOP = 168f;
-    private static final float TUNE_ROW_TOP = 208f, TUNE_ROW_H = 48f;
+    private static final float TUNE_LEFT = 944f, TUNE_TOP = 176f, TUNE_RIGHT = 1076f, TUNE_BOTTOM = 266f;
     private final Paint tuningPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private String dummyDamageLabel = "";
@@ -84,6 +83,8 @@ public class GameView extends SurfaceView
     private final SurfaceHolder holder;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final SpriteAtlasCache atlases;
+    /** DEBUG > AJUSTAR TAMANHOS: tamanho de cada folha no olho, exportado para o Drive. */
+    private final TelaAjusteTamanho ajusteTamanho;
     private final AndroidRenderAssets ultraAssets;
     private final SpriteFighterRenderer spriteFighterRenderer;
     private final SpriteFighterRenderer opponentSpriteRenderer;
@@ -235,7 +236,7 @@ public class GameView extends SurfaceView
     public GameView(Context context) {
         super(context);
         hud.loadArt(context);
-        P01VisualTuning.load(context);
+        AjusteTamanho.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
@@ -244,6 +245,18 @@ public class GameView extends SurfaceView
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
+        ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
+            @Override public void manterAtlas(CharacterDefinition extra) {
+                // Só as folhas do personagem em ajuste: a luta está parada e volta a decodificar ao sair.
+                atlases.retainOnly(extra);
+            }
+            @Override public void salvar() { post(GameView.this::exportSizeTuning); }
+            @Override public void fechar() {
+                atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
+                for (FighterState fighter : team) atlases.preload(fighter.character);
+                atlases.preload(opponentFighter.character);
+            }
+        });
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
@@ -343,7 +356,7 @@ public class GameView extends SurfaceView
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (characterSelect.isOpen() || historia.coversScreen() || quadroTreino.active()) {
+        if (ajusteTamanho.isOpen() || characterSelect.isOpen() || historia.coversScreen() || quadroTreino.active()) {
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -564,6 +577,14 @@ public class GameView extends SurfaceView
     /** One simulation frame: inputs, engine step, then presentation state. */
     private void update() {
         if (stageScene != null) stageScene.update(FIXED_STEP);
+        if (ajusteTamanho.isOpen()) {
+            // A luta fica parada atrás da tela de ajuste.
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) ajusteTamanho.key(key);
+            ajusteTamanho.update(FIXED_STEP);
+            return;
+        }
         if (characterSelect.isOpen()) {
             // Freeze combat while processing queued hardware controls on this same game thread.
             pad.drainInto(ignoredInput);
@@ -1149,6 +1170,11 @@ public class GameView extends SurfaceView
 
             canvas.save();
             canvas.scale(sx, sy);
+            if (ajusteTamanho.isOpen()) {
+                ajusteTamanho.draw(canvas);
+                canvas.restore();
+                return;
+            }
             // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
             if (characterSelect.isOpen()) {
                 characterSelectRenderer.draw(canvas, paint, characterSelect);
@@ -1331,61 +1357,51 @@ public class GameView extends SurfaceView
         hud.drawTutorial(c, tutorial);
         if (debugOverlay) {
             debug.drawPanel(c, engine);
-            drawP01Tuner(c);
+            drawSizeTunerButton(c);
         }
     }
 
-    private void drawP01Tuner(Canvas c) {
+    private void drawSizeTunerButton(Canvas c) {
         Paint p=tuningPaint;
         p.setStyle(Paint.Style.FILL);
-        p.setColor(Color.argb(225,10,17,29));
-        c.drawRoundRect(TUNE_LEFT,TUNE_TOP,1274f,411f,12f,12f,p);
+        p.setColor(Color.argb(225,20,60,90));
+        c.drawRoundRect(TUNE_LEFT,TUNE_TOP,TUNE_RIGHT,TUNE_BOTTOM,10f,10f,p);
         p.setColor(Color.rgb(245,225,170));
-        p.setTextSize(17f);
         p.setFakeBoldText(true);
-        c.drawText("P01 - AJUSTAR TAMANHO",TUNE_LEFT+10f,TUNE_TOP+24f,p);
-        p.setFakeBoldText(false);
-        p.setTextSize(13f);
-        p.setColor(Color.LTGRAY);
-        c.drawText("Comparar com o IDLE / salva sozinho",TUNE_LEFT+10f,TUNE_TOP+41f,p);
-        for(int row=0;row<3;row++) {
-            float top=TUNE_ROW_TOP+row*TUNE_ROW_H;
-            p.setColor(Color.WHITE);
-            p.setTextSize(18f);
-            c.drawText(P01VisualTuning.NAMES[row],TUNE_LEFT+12f,top+25f,p);
-            p.setTextSize(15f);
-            c.drawText(P01VisualTuning.percent(row)+"%",TUNE_LEFT+135f,top+25f,p);
-            p.setColor(Color.rgb(65,80,100));
-            c.drawRoundRect(1155f,top+2f,1198f,top+42f,7f,7f,p);
-            c.drawRoundRect(1208f,top+2f,1251f,top+42f,7f,7f,p);
-            p.setColor(Color.WHITE);
-            p.setTextSize(29f);
-            c.drawText("-",1169f,top+31f,p);
-            c.drawText("+",1218f,top+31f,p);
-        }
-        p.setColor(Color.rgb(65,80,100));
-        c.drawRoundRect(TUNE_LEFT+10f,360f,1261f,400f,7f,7f,p);
-        p.setColor(Color.WHITE);
         p.setTextSize(16f);
-        c.drawText("RESTAURAR 100% (os 3)",TUNE_LEFT+27f,386f,p);
+        p.setTextAlign(Paint.Align.CENTER);
+        float cx=(TUNE_LEFT+TUNE_RIGHT)/2f;
+        c.drawText("AJUSTAR",cx,TUNE_TOP+30f,p);
+        c.drawText("TAMANHOS",cx,TUNE_TOP+50f,p);
+        p.setFakeBoldText(false);
+        p.setTextSize(11f);
+        p.setColor(Color.LTGRAY);
+        c.drawText("todas as animações",cx,TUNE_TOP+72f,p);
+        p.setTextAlign(Paint.Align.LEFT);
     }
 
-    /** Return true when DEBUG scale editing consumes the tap. */
-    private boolean handleP01TunerTap(float x,float y) {
-        if (x<TUNE_LEFT || x>1274f || y<TUNE_TOP || y>411f) return false;
-        if (y>=360f && y<=401f) {
-            P01VisualTuning.reset(getContext());
-            return true;
-        }
-        int row=(int)((y-TUNE_ROW_TOP)/TUNE_ROW_H);
-        if(row>=0 && row<3 && y>=TUNE_ROW_TOP && y<TUNE_ROW_TOP+3*TUNE_ROW_H) {
-            float rowTop=TUNE_ROW_TOP+row*TUNE_ROW_H;
-            if(y>=rowTop+2f && y<=rowTop+42f) {
-                if(x>=1155f && x<=1198f) P01VisualTuning.adjust(getContext(),row,-1);
-                if(x>=1208f && x<=1251f) P01VisualTuning.adjust(getContext(),row,+1);
-            }
-        }
+    /** DEBUG: o botão abre a tela de ajuste de tamanho (a luta fica parada atrás). */
+    private boolean handleSizeTunerTap(float x,float y) {
+        if (x<TUNE_LEFT || x>TUNE_RIGHT || y<TUNE_TOP || y>TUNE_BOTTOM) return false;
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return true;
+        selectionKeys.clear();
+        pad.reset();
+        releaseAllPointers();
+        ajusteTamanho.open(team[0].character.id);
         return true;
+    }
+
+    /** SALVAR NO DRIVE: arquivo com os ajustes de todos os personagens no menu Compartilhar. */
+    private void exportSizeTuning() {
+        String date = new java.text.SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(new java.util.Date());
+        String json = AjusteTamanho.exportJson(BuildConfig.VERSION_NAME, date);
+        try {
+            ArquivosCompartilhados.compartilhar(getContext(), "ajustes-tamanho-" + date + ".json", "application/json", json);
+            ajusteTamanho.say("Escolha o Drive para salvar o arquivo");
+        } catch (IOException | RuntimeException e) {
+            Log.e("GameLuta", "ajustes de tamanho", e);
+            ajusteTamanho.say("Não deu para salvar: " + e.getMessage());
+        }
     }
 
     private static String guardLabel(int guard, String prefix) {
@@ -1842,6 +1858,12 @@ public class GameView extends SurfaceView
         int action = event.getActionMasked();
         int index = event.getActionIndex();
 
+        if (ajusteTamanho.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                ajusteTamanho.tap(event.getX(index) / sx, event.getY(index) / sy);
+            }
+            return;
+        }
         if (characterSelect.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 handleCharacterSelectTap(event.getX(index) / sx, event.getY(index) / sy);
@@ -1868,7 +1890,7 @@ public class GameView extends SurfaceView
             int pointerId = event.getPointerId(index);
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
-            if(debugOverlay && handleP01TunerTap(x,y))return;
+            if(debugOverlay && handleSizeTunerTap(x,y))return;
             if (tutorial.active() && ControlsLayout.tutorialSkipAt(x, y)) {
                 tutorial.skip();
                 return;

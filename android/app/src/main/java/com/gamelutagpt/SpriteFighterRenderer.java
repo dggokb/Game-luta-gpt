@@ -132,12 +132,7 @@ final class SpriteFighterRenderer {
     private void drawP01Calibrated(Canvas canvas,CharacterDefinition.Animation anim,
                                     int frame,float x,float baseY,int alpha) {
         float[] k=P01SpriteCalibration.get(anim.atlas.resource,frame);
-        float userScale=P01VisualTuning.scale(anim.atlas.resource);
-        // Scale the offsets as well, keeping grounded feet and lateral
-        // rooting intact at every adjustment (including mirrored sprites).
-        drawAtlas(canvas,anim.atlas,frame,
-            x+k[2]*userScale,baseY+k[3]*userScale,
-            k[0]*userScale,k[1]*userScale,alpha);
+        drawAtlas(canvas,anim.atlas,frame,x+k[2],baseY+k[3],k[0],k[1],alpha);
     }
 
     private void drawP01Idle(Canvas canvas,float x,float baseY,int alpha) {
@@ -154,8 +149,10 @@ final class SpriteFighterRenderer {
         // Accepted corrections are applied AFTER legacy calibrations and
         // debug tuning, so the engine really renders the corrected image.
         SpriteAutoFix.Adjustment fix=SpriteAutoFix.get(character.id,a.resource,frame);
-        float widthScale=scale*sizeX*fix.size;
-        float heightScale=scale*sizeY*fix.size;
+        // DEBUG > AJUSTAR TAMANHOS: prévia em volta da raiz até o tamanho ser gravado na folha.
+        float tuned=AjusteTamanho.scale(a);
+        float widthScale=scale*sizeX*fix.size*tuned;
+        float heightScale=scale*sizeY*fix.size*tuned;
         float left=x+fix.dx*scale-a.rootX*widthScale;
         float top=baseY+fix.dy*scale-a.rootY*heightScale;
         destination.set(left,top,left+a.width*widthScale,top+a.height*heightScale);
@@ -176,6 +173,8 @@ final class SpriteFighterRenderer {
             0f,0f,0f,1f,0f}));
         return new ColorMatrixColorFilter(m);
     }
+    /** Mostra um clipe num instante dado, sem a simulação (tela de ajuste de tamanho). */
+    void pose(String clip,float time,float distance){motion.clip=clip;motion.time=time;motion.distance=distance;}
     boolean hasAnimation(String id){return character.animations.containsKey(id);}
     CharacterDefinition character(){return character;}
     CharacterVisualProfile visualProfile(){return character.profile;}

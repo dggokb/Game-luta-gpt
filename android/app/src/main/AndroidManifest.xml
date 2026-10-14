@@ -7,5 +7,7 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+    <!-- DEBUG > AJUSTAR TAMANHOS > SALVAR: entrega o arquivo de ajustes ao Drive (só leitura, não exportado). -->
+    <provider android:name=".ArquivosCompartilhados" android:authorities="com.gamelutagpt.arquivos" android:exported="false" android:grantUriPermissions="true" />
   </application>
 </manifest>

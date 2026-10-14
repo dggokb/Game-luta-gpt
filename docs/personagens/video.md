@@ -182,6 +182,21 @@ da câmera é desfeito. Zoom de câmera vira um fator por quadro (a reta da cabe
 clipe). Só corrigir clipes cujo fator foi confirmado por duas medidas; a pose não se corrige
 assim.
 
+**Ajustar no olho, no celular** (DEBUG > **AJUSTAR TAMANHOS**):
+
+1. Escolha o personagem (◀ ▶) e a animação na lista. Ela toca em loop com o IDLE em
+   transparência atrás, raiz no mesmo ponto, como na troca de animação no jogo
+   (PAUSA, VEL ½x/¼x e IDLE ATRÁS ajudam a comparar).
+2. −5 / −1 / +1 / +5 mudam o tamanho da folha (1% por toque); 100% desfaz. Cada toque já
+   vale no jogo e fica salvo no aparelho. Animações que usam a mesma folha (IDLE e COMBAT,
+   agarrão) mudam juntas.
+3. **SALVAR NO DRIVE** abre o Compartilhar do Android: escolha Drive. O arquivo
+   `ajustes-tamanho-<data>.json` leva os ajustes de todos os personagens.
+4. Para gravar no jogo: `python3 tools/sprites/regua.py --aplicar ajustes-tamanho-<data>.json`,
+   depois `build_characters.py --write`. A célula cresce sozinha quando o quadro aumentado
+   não cabe. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
+   tamanho), porque o tamanho já está no desenho.
+
 ## Ritmo: animação e movimento do jogo
 
 O motor dá o mesmo tempo a todos (frame data, velocidade de andar e dash, hitstun). A arte

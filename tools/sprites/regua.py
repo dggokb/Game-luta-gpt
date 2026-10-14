@@ -4,6 +4,7 @@
     python3 tools/sprites/regua.py p02               # tabela no terminal (~1 min)
     python3 tools/sprites/regua.py p02 --relatorio   # + docs/personagens/regua/<id>.md, .json e .png
     python3 tools/sprites/regua.py p02 --corrigir VICTORY DASH   # leva esses clipes a 100%
+    python3 tools/sprites/regua.py --aplicar ajustes-tamanho-20261014-1000.json   # do app
                                                  # (depois: build_characters.py --write)
 
 A referência é a imagem inicial do personagem (art/keys/<id>/inicio_*.png): a mesma arte de
@@ -430,26 +431,70 @@ def correction(p, row, head, idle_head):
     return [round(row['fator'], 4)] * n, f"fator {row['fator'] * 100:.0f}% em todos os quadros"
 
 
-def fits(cfg, z):
-    """Quadros que, aumentados, chegariam a menos de FIX_MARGIN px da borda da célula."""
+def overflow(cfg, z):
+    """(esquerda, cima, direita, baixo): px que faltam na célula para os quadros aumentados
+    ficarem a FIX_MARGIN px da borda. Tudo 0 = cabe."""
     img = Image.open(ROOT / cfg['source']).convert('RGBA')
     w, h, cols, rx, ry = cfg['frameWidth'], cfg['frameHeight'], cfg['columns'], cfg['rootX'], cfg['rootY']
-    bad = []
+    need = [0, 0, 0, 0]
     for i, f in enumerate(z):
         box = img.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)).getchannel('A') \
             .point(lambda v: 255 if v > 10 else 0).getbbox()
         if not box or f >= 1:
             continue
         x0, y0, x1, y1 = rx + (box[0] - rx) / f, ry + (box[1] - ry) / f, rx + (box[2] - rx) / f, ry + (box[3] - ry) / f
-        if min(x0, y0) < FIX_MARGIN or x1 > w - FIX_MARGIN or y1 > h - FIX_MARGIN + 1:
-            bad.append(i)
-    return bad
+        for k, v in enumerate((FIX_MARGIN - x0, FIX_MARGIN - y0, x1 - (w - FIX_MARGIN), y1 - (h - FIX_MARGIN))):
+            need[k] = max(need[k], v)
+    # par: a raiz da folha HD (pixelScale 2) continua num pixel inteiro do tamanho lógico
+    return [int(np.ceil(max(0.0, v) / 2)) * 2 for v in need]
+
+
+def grow_cell(cfg, pad):
+    """Aumenta a célula de todos os quadros (borda transparente) e move a raiz junto."""
+    left, top, right, bottom = pad
+    img = Image.open(ROOT / cfg['source']).convert('RGBA')
+    w, h, cols = cfg['frameWidth'], cfg['frameHeight'], cfg['columns']
+    n = cfg['expectedFrames']
+    rows = -(-n // cols)
+    nw, nh = w + left + right, h + top + bottom
+    out = Image.new('RGBA', (nw * cols, nh * rows), (0, 0, 0, 0))
+    for i in range(n):
+        cell = img.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h))
+        out.paste(cell, (i % cols * nw + left, i // cols * nh + top))
+    out.save(ROOT / cfg['source'])
+    import auditoria
+    auditoria.Sheet.cache.pop(cfg['source'], None)
+    cfg.update(frameWidth=nw, frameHeight=nh, rootX=cfg['rootX'] + left, rootY=cfg['rootY'] + top)
+
+
+def bake(cfg, atlas, z, reason, undo_optical=False):
+    """Reescala a folha do jogo (source da receita) em volta da raiz e grava na receita:
+    reescala (a reconversão do vídeo repete), reguaFatores (o que mudou depois da folha do
+    vídeo; a cadeia desconta) e o motivo em regua."""
+    import reescalar
+    from ancorar import clip_path
+    path = clip_path(atlas)
+    data = read_json(path)
+    pad = overflow(cfg, z)
+    if any(pad):
+        grow_cell(cfg, pad)
+        for key in ('frameWidth', 'frameHeight', 'rootX', 'rootY'):
+            data[key] = cfg[key]
+        print(f'{atlas}: célula aumentada para {cfg["frameWidth"]}x{cfg["frameHeight"]} (borda {pad})')
+    reescalar.rescale(cfg, np.array(z))
+    target = data.get('video', data)
+    if undo_optical:
+        target.pop('normalizedOpticalScale')
+    else:
+        for key in ('reescala', 'reguaFatores'):
+            old = target.get(key, [1.0] * len(z))
+            target[key] = [round(a * b, 4) for a, b in zip(old, z)]
+    target.setdefault('regua', []).append(reason)
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 
 
 def fix(cid, states):
-    """Reescala a folha do jogo (source da receita) em volta da raiz e grava na receita."""
-    import reescalar
-    from ancorar import clip_path
+    """Leva os clipes a 100% pela medida da régua."""
     p, rows = audit(cid)
     refs = inicio_images(p)
     head = head_of(refs['inicio_centro'])
@@ -461,27 +506,36 @@ def fix(cid, states):
         if row['atlas'] in done:
             continue
         done.add(row['atlas'])
-        cfg = p.clips[row['atlas']]
         z, reason = correction(p, row, head, idle_head)
-        bad = fits(cfg, z)
-        if bad:
-            raise SystemExit(f'{state}: quadros {bad} passariam da célula aumentados; aumente a célula antes')
-        reescalar.rescale(cfg, np.array(z))
-        path = clip_path(row['atlas'])
-        data = read_json(path)
-        target = data.get('video', data)
-        if reason.startswith('desfaz'):
-            target.pop('normalizedOpticalScale')
-        else:
-            # reescala: a reconversão do vídeo repete a correção; reguaFatores: o que a régua
-            # mudou na folha do jogo depois da folha do vídeo (a cadeia desconta)
-            for key in ('reescala', 'reguaFatores'):
-                old = target.get(key, [1.0] * len(z))
-                target[key] = [round(a * b, 4) for a, b in zip(old, z)]
-        target.setdefault('regua', []).append(reason)
-        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+        bake(p.clips[row['atlas']], row['atlas'], z, reason, undo_optical=reason.startswith('desfaz'))
         print(f"{state} ({row['atlas']}): {reason}")
     print('agora: python3 tools/sprites/build_characters.py --write  e rode a régua de novo')
+
+
+def apply_tuning(path):
+    """Grava nas folhas os tamanhos ajustados no app (DEBUG > AJUSTAR TAMANHOS > SALVAR NO
+    DRIVE). fator 1.05 = folha 5% maior; na receita fica como reescala 1/fator."""
+    data = read_json(path)
+    if data.get('tipo') != 'ajuste-tamanho':
+        raise SystemExit(f'{path}: não é um arquivo de ajuste de tamanho do app')
+    clips = {}
+    for c in (ROOT / 'tools/sprites/clips').glob('*.json'):
+        cfg = read_json(c)
+        clips[Path(cfg['output']).stem] = cfg
+    for item in data['ajustes']:
+        atlas, f = item['folha'], float(item['fator'])
+        if atlas not in clips:
+            raise SystemExit(f'{atlas}: folha sem receita em tools/sprites/clips')
+        if not 0.7 <= f <= 1.4:
+            raise SystemExit(f'{atlas}: fator {f} fora de 0,70-1,40')
+        if abs(f - 1) < 0.005:
+            continue
+        cfg = clips[atlas]
+        bake(cfg, atlas, [1 / f] * cfg['expectedFrames'],
+             f"ajuste no app {data.get('data', '')}: {f * 100:.0f}% ({' / '.join(item.get('animacoes', []))})")
+        print(f"{item.get('personagem', '?')} {atlas}: {f * 100:.0f}%")
+    print('agora: python3 tools/sprites/build_characters.py --write  (o APK novo nasce com esses tamanhos;'
+          ' no app o ajuste volta a 100% sozinho)')
 
 
 # ---------------------------------------------------------------- saída
@@ -562,10 +616,16 @@ def markdown(p, rows, png):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('personagens', nargs='+')
+    ap.add_argument('personagens', nargs='*')
     ap.add_argument('--relatorio', action='store_true', help='grava docs/personagens/regua/<id>.md, .json e .png')
     ap.add_argument('--corrigir', nargs='+', metavar='ESTADO', help='leva esses clipes do personagem a 100%%')
+    ap.add_argument('--aplicar', metavar='ARQUIVO', help='grava nas folhas o arquivo salvo pelo app (AJUSTAR TAMANHOS)')
     args = ap.parse_args()
+    if args.aplicar:
+        apply_tuning(args.aplicar)
+        return
+    if not args.personagens:
+        ap.error('diga o personagem (ex.: p02) ou use --aplicar ARQUIVO')
     if args.corrigir:
         if len(args.personagens) != 1:
             ap.error('--corrigir é para um personagem por vez')
