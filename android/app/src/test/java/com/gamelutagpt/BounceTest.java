@@ -45,11 +45,15 @@ public class BounceTest {
             fail("H never hit");
         }
 
-        /** Both in the air, the defender in air hitstun right in front; the attacker swings ↓ + jH (j2H). */
+        /**
+         * Both in the air, the defender in air hitstun right in front and a little below (the
+         * stomp comes from above: the jump falls faster than a body in hitstun); the attacker
+         * swings ↓ + jH (j2H).
+         */
         void airHeavy() {
             for (int i = 0; i < 2; i++) {
                 f(i).grounded = false;
-                f(i).y = Arena.GROUND_Y - 160f;
+                f(i).y = Arena.GROUND_Y - (i == 0 ? 200f : 160f);
                 f(i).vy = 0f;
             }
             f(1).status = CombatFighter.Status.AIR_HITSTUN;
