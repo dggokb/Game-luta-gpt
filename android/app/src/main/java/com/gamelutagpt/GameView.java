@@ -1279,6 +1279,9 @@ public class GameView extends SurfaceView
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             case "DHC": return "TEAM SUPER!";
             case "OVERDRIVE": return "OVERDRIVE!";
+            case "COUNTER": return "CONTRA-GOLPE!";
+            case "ARMOR": return "ARMADURA!";
+            case "POISON": return "VENENO!";
             default: return null;
         }
     }
@@ -1506,6 +1509,8 @@ public class GameView extends SurfaceView
 
             drawOverdriveAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawOverdriveAura(canvas, player(), tagOffset());
+            drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
+            drawMechanicAura(canvas, player(), tagOffset());
             drawPartner(canvas);
             drawAirDashTrail(canvas, player());
             drawAirDashTrail(canvas, opponent());
@@ -2077,6 +2082,30 @@ public class GameView extends SurfaceView
     private void drawOverdriveAura(Canvas c, CombatFighter f, float offset) {
         if (!engine.teams.overdriveActive(f.index)) return;
         effects.drawOverdrive(c, paint, f.x + offset, f.y, engine.frame() * FIXED_STEP);
+    }
+
+    /** Mecânica própria visível: veneno, armadura, postura de contra-golpe, esquiva ou fúria. */
+    private void drawMechanicAura(Canvas c, CombatFighter f, float offset) {
+        float time = engine.frame() * FIXED_STEP;
+        float x = f.x + offset;
+        AttackDefinition.Mechanics m = f.mechanics();
+        int frame = f.attackFrame;
+        if (m.armorAt(frame) && f.armorUsed < m.armorHits) {
+            effects.drawMechanicAura(c, paint, x, f.y, time, EffectsRenderer.AURA_ARMOR, 1f);
+        } else if (m.counterAt(frame)) {
+            effects.drawMechanicAura(c, paint, x, f.y, time, EffectsRenderer.AURA_COUNTER, 1f);
+        } else if (m.evadeAt(frame)) {
+            effects.drawMechanicAura(c, paint, x, f.y, time, EffectsRenderer.AURA_EVADE, 1f);
+        }
+        if (f.state.poisoned()) {
+            effects.drawMechanicAura(c, paint, x, f.y, time, EffectsRenderer.AURA_POISON, 1f);
+        }
+        CharacterDefinition.Fighter profile = f.state.profile;
+        if (profile.furyPermille > 0 && !f.ko()) {
+            // Fury shows once a third of the life is gone and burns brighter as it drops.
+            float lost = 1f - f.state.life / (float)profile.maxLife;
+            effects.drawMechanicAura(c, paint, x, f.y, time, EffectsRenderer.AURA_FURY, (lost - 0.33f) * 1.5f);
+        }
     }
 
     /** Speed lines behind a fighter during its air dash. */

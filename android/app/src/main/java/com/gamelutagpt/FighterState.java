@@ -33,6 +33,7 @@ final class FighterState {
     void restoreLife() {
         life = profile.maxLife;
         recoverableLife = 0;
+        poisonLeft = poisonFramesLeft = 0;
         refreshHudLabels();
     }
 
@@ -46,6 +47,45 @@ final class FighterState {
         recoverableLife += damage * recoverablePermille / 1000;
         if (life == 0) recoverableLife = 0;
         recoverableLife = Math.min(recoverableLife, profile.maxLife - life);
+        refreshLifeLabel();
+    }
+
+    /** Poison still to come and the frames it is spread over (0 when clean). */
+    int poisonLeft;
+    int poisonFramesLeft;
+
+    /** Poisoned: {@code damage} over {@code frames}; a new dose replaces a weaker one. */
+    void poison(int damage, int frames) {
+        if (damage <= 0 || frames <= 0 || life <= 0) return;
+        if (damage >= poisonLeft) {
+            poisonLeft = damage;
+            poisonFramesLeft = frames;
+        }
+    }
+
+    boolean poisoned() { return poisonLeft > 0; }
+
+    /** One frame of poison: its share of the damage, never the last point of life. Returns it. */
+    int tickPoison() {
+        if (poisonLeft <= 0 || poisonFramesLeft <= 0) return 0;
+        int dose = poisonLeft / poisonFramesLeft;
+        poisonFramesLeft--;
+        poisonLeft -= dose;
+        if (poisonFramesLeft == 0) poisonLeft = 0;
+        int dealt = Math.min(dose, Math.max(0, life - 1));
+        if (dealt > 0) {
+            life -= dealt;
+            recoverableLife = Math.min(recoverableLife, profile.maxLife - life);
+            refreshLifeLabel();
+        }
+        return dealt;
+    }
+
+    /** Pays life for a move (no recoverable part); never the last point. */
+    void payLife(int amount) {
+        int paid = Math.min(amount, Math.max(0, life - 1));
+        if (paid <= 0) return;
+        life -= paid;
         refreshLifeLabel();
     }
 

@@ -10,10 +10,11 @@ public class CombatRulesTest {
 
     @Test public void reachIsMeasuredToTheTargetHurtboxEdge() {
         CharacterDefinition.Move jab=BASE.moves.get("L");
+        CharacterDefinition.Body body=BASE.fighter.body;
         // Center-to-center reach is the jab reach plus the target half width...
-        float edge=jab.reach+LEGACY.halfWidth;
-        assertTrue(CombatRules.meleeConnects(0,565,1,jab,edge,565,LEGACY,false));
-        assertFalse(CombatRules.meleeConnects(0,565,1,jab,edge+1,565,LEGACY,false));
+        float edge=jab.reach+body.halfWidth;
+        assertTrue(CombatRules.meleeConnects(0,565,1,jab,edge,565,body,false));
+        assertFalse(CombatRules.meleeConnects(0,565,1,jab,edge+1,565,body,false));
         // ...and a wider body is touched sooner, in both directions.
         assertTrue(CombatRules.meleeConnects(0,565,1,jab,jab.reach+NPC.fighter.body.halfWidth,565,NPC.fighter.body,false));
         assertTrue(CombatRules.meleeConnects(500,565,-1,jab,500-jab.reach-NPC.fighter.body.halfWidth,565,NPC.fighter.body,false));
@@ -21,9 +22,20 @@ public class CombatRulesTest {
     }
     @Test public void overlappingBodiesAndFarVerticalTargetsDoNotConnect() {
         CharacterDefinition.Move jab=BASE.moves.get("L");
-        assertFalse(CombatRules.meleeConnects(0,565,1,jab,10,565,LEGACY,false));
-        assertTrue(CombatRules.meleeConnects(0,565,1,jab,80,565-90,LEGACY,false));
-        assertFalse(CombatRules.meleeConnects(0,565,1,jab,80,565-110,LEGACY,false));
+        CharacterDefinition.Body body=BASE.fighter.body;
+        assertFalse(CombatRules.meleeConnects(0,565,1,jab,10,565,body,false));
+        // A target in the air is touched while its feet are not above the top of the strike box.
+        float top=jab.attack.hitHeight+CombatRules.VERTICAL_SLACK;
+        assertTrue(CombatRules.meleeConnects(0,565,1,jab,80,565-top,body,false));
+        assertFalse(CombatRules.meleeConnects(0,565,1,jab,80,565-top-1,body,false));
+    }
+    @Test public void hitFloorStretchesTheStrikeBoxDown() {
+        // An uppercut (2H) set at the fist's highest point still reaches the body below it.
+        AttackDefinition up=BASE.moves.get("2H").attack;
+        assertTrue(up.hitFloor<up.hitHeight-CombatRules.VERTICAL_SLACK);
+        assertEquals(up.hitFloor,up.hitbox(0).y0,0f);
+        for(String id:GeneratedCharacters.SELECTABLE)
+            assertTrue(id,CombatRules.meleeConnects(0,565,1,BASE.moves.get("2H"),60,565,GeneratedCharacters.get(id).fighter.body,false));
     }
     @Test public void projectileUsesCrouchHeightOfTheTarget() {
         float y=565-120;
@@ -98,13 +110,13 @@ public class CombatRulesTest {
     }
     @Test public void projectilesSpawnFromThePackLaunchPoint() {
         CharacterDefinition.Projectile energy=BASE.fighter.energy;
-        // Values of characters/player_base/character.json (scaled with the art, worldScale).
-        assertEquals(88f,energy.spawnHeight(false,false),0);
-        assertEquals(70f,energy.spawnHeight(true,false),0);
-        assertEquals(92f,BASE.fighter.superAttack.spawnHeight(false,false),0);
+        // Values of characters/player_base/character.json (tuned in DEBUG > AJUSTAR CAIXAS).
+        assertEquals(168f,energy.spawnHeight(false,false),0);
+        assertEquals(90f,energy.spawnHeight(true,false),0);
+        assertEquals(182f,BASE.fighter.superAttack.spawnHeight(false,false),0);
         assertEquals(88f,BASE.fighter.superAttack.spawnHeight(false,true),0);
-        assertTrue("A big fighter launches from higher up",
-            NPC.fighter.energy.spawnHeight(false,false)>energy.spawnHeight(false,false));
+        assertTrue(energy.spawnHeight(false,false)<=BASE.fighter.body.standHeight);
+        assertTrue(energy.spawnHeight(true,false)<=BASE.fighter.body.crouchHeight);
         assertTrue(NPC.fighter.energy.spawnHeight(true,false)<=NPC.fighter.body.crouchHeight);
     }
     @Test public void pushboxesSeparateBodiesAndRespectWalls() {

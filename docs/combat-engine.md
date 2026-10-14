@@ -408,7 +408,7 @@ pé**, **corpo agachado**, cada **golpe** (L, M, H, agachados, aéreos, S2–S4)
 |---|---|---|
 | verde | corpo que leva golpe | `fighter.body.halfWidth`, `standHeight`, `crouchHeight` |
 | amarelo | empurrão | `fighter.body.pushHalfWidth`, `pushHeight` |
-| vermelho | acerto do golpe: da raiz até o alcance, na altura ± 19,5 (cheio nos quadros ativos) | `moves.<botão>.reach`, `hitHeight`; `specialMoves.S2…` |
+| vermelho | acerto do golpe: da raiz até o alcance, da base até a altura + 19,5 (cheio nos quadros ativos) | `moves.<botão>.reach`, `hitHeight`, `hitFloor`; `specialMoves.S2…` |
 | círculo | saída da magia (cheio depois do quadro em que sai) | `fighter.energy.spawnX`, `spawnY`, `crouchSpawnY`; `fighter.super.…` |
 
 PAUSA, VEL (¼x, ½x, 1x), ◀ QUADRO / QUADRO ▶ e IR AO IMPACTO (para no primeiro quadro ativo)
@@ -424,6 +424,36 @@ python3 tools/sprites/build_characters.py --write
 
 Cada ajuste leva o valor em que foi feito; se o pacote mudou desde então, o `caixas.py`
 recusa em vez de passar por cima, e no app o ajuste antigo deixa de valer sozinho.
+
+**Base do acerto (`hitFloor`).** Sem ela a caixa vermelha é uma faixa de 39 de altura em
+volta de `hitHeight`. Num golpe que varre de baixo para cima (gancho, 2H) a altura marca o
+punho lá no alto e a base desce a caixa até onde o golpe começa, para ainda acertar quem está
+em pé. Valor ausente = altura − 19,5.
+
+Conferências do build depois de aplicar (o `caixas.py` grava o que veio do app; o
+`build_characters.py` recusa o que quebra a luta):
+
+- empurrão dentro do corpo: `pushHalfWidth ≤ halfWidth` e `pushHeight ≤ crouchHeight + 60`
+  (o empurrão baixo deixa um pulo passar por cima do outro);
+- magia sai de dentro do corpo: `spawnY`/`airSpawnY ≤ standHeight`, `crouchSpawnY ≤ crouchHeight`;
+- `hitFloor ≤ hitHeight`.
+
+Duas coisas o build não pega e vale olhar no app: golpe de chão com a caixa inteira acima da
+cabeça de alguém (a base dele acima de `standHeight` do rival não acerta quem está em pé) e
+alcance menor que a distância colado (`pushHalfWidth` dos dois − `halfWidth` do rival), que
+nunca encosta.
+
+Rodada de 14/10/2026 (`docs/personagens/regua/ajustes-caixas-20261014.json`: P01, p02 e p03
+da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao gravar:
+
+- empurrão cortado no limite: p03, p04, p07, p08, p09, p10, p11, p12 e P01 (altura), p04, p08
+  e p12 (largura);
+- saída da magia agachado cortada na altura agachado: p03, p04 e p05;
+- base do acerto na altura antiga nos 26 golpes que ficaram acima da cabeça do rival mais
+  baixo (todos os 2H, p03 H/S4, p04 S2, p07 L/M/H/S2, p08 L/S3, p09 L/S3, p10 S4, p11 L/M/S2);
+- alcance do 2H (lançador) para pegar depois de um L ou M que acertou, contra todo o elenco:
+  distância depois do M + 20. P01 41→79, p02 54→86, p03 36→89, p04 39→87, p05 43→105,
+  p06 35→88, p09 45→88, p11 68→109, p12 50→98 (p07, p08 e p10 já alcançavam).
 
 ## Critérios de aceite → testes (`CombatEngineTest`, JVM, sem renderização)
 

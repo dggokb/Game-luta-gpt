@@ -14,10 +14,10 @@ public class GlobalMovementTuningTest {
 
     @Test public void higherNormalJumpAppliesToBothAndKeepsSuperJump() {
         CombatEngine e=engine();
-        assertEquals(1030f,e.config.jumpSpeed,.001f);
+        assertEquals(1492f,e.config.jumpSpeed,.001f);
         assertEquals(1450f,e.config.superJumpSpeed,.001f);
-        assertEquals(1.70f,e.config.normalJumpRisingGravityScale,.001f);
-        assertEquals(2.00f,e.config.normalJumpFallingGravityScale,.001f);
+        assertEquals(2.463f,e.config.normalJumpRisingGravityScale,.001f);
+        assertEquals(2.897f,e.config.normalJumpFallingGravityScale,.001f);
         FighterInput[] pad={new FighterInput(),new FighterInput()};
         pad[0].jump=true;pad[1].jump=true;
         e.step(pad[0],pad[1]);
@@ -28,14 +28,22 @@ public class GlobalMovementTuningTest {
             e.step(pad[0],pad[1]);
         }
         for(int i=0;i<2;i++) {
-            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>175f);
-            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<189f);
+            assertTrue("Low jump for fighter "+i+": "+apex[i],apex[i]>254f);
+            assertTrue("Too high for fighter "+i+": "+apex[i],apex[i]<274f);
             assertTrue("Fighter did not land "+i,e.fighter(i).grounded);
         }
     }
 
+    /** Jump height is sized for the cast, with P01 as the reference rival (the boss is taller). */
+    private CombatEngine mirror(float p2x) {
+        return new CombatEngine(
+            new FighterState(GeneratedCharacters.get("player_base"),"P01"),
+            new FighterState(GeneratedCharacters.get("player_base"),"P01 B"),
+            500f,p2x,new CombatConfig());
+    }
+
     @Test public void neutralJumpMatchesDbfzCadenceWithApexJustOverRivalHeight() {
-        CombatEngine e=engine();
+        CombatEngine e=mirror(1700f);
         FighterInput jump=new FighterInput(),neutral=new FighterInput();
         jump.jump=true;
         e.step(jump,neutral);
@@ -117,10 +125,7 @@ public class GlobalMovementTuningTest {
 
     @Test public void normalJumpCanCrossOverAStandingOpponent() {
         // Test an actual crossover, not just an increased impulse value.
-        CombatEngine e=new CombatEngine(
-            new FighterState(GeneratedCharacters.get("player_base"),"P01"),
-            new FighterState(GeneratedCharacters.opponentCharacter(),"CPU"),
-            500f,600f,new CombatConfig());
+        CombatEngine e=mirror(600f);
         FighterInput moving=new FighterInput(),idle=new FighterInput();
         moving.jump=true;
         moving.direction=1;

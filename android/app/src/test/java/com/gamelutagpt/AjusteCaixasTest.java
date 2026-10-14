@@ -25,6 +25,8 @@ public class AjusteCaixasTest {
         AjusteCaixas.Campo reach = campo(itens, "moves.L.reach");
         assertEquals(p07.moves.get("L").attack.reach, reach.base, 0f);
         campo(itens, "specialMoves.S2.hitHeight");
+        // A base do acerto estica a caixa para baixo (gancho): por padrão, altura menos a folga.
+        assertEquals(Math.round(p07.moves.get("2H").attack.hitFloor), campo(itens, "moves.2H.hitFloor").base, 0f);
         campo(itens, "fighter.energy.spawnX");
         // A largura do corpo aparece em pé e agachado: um ajuste vale para os dois.
         AjusteCaixas.adjust(p07, itens.get(0).campos.get(0), +2);

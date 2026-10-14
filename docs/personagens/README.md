@@ -55,6 +55,8 @@ História: "História Base — Torneio dos Irmãos" (Drive, pasta game-luta-gpt)
 | **p15** | p16 *(proposta)* | Karateca forte de cabelo preto preso em rabo de cavalo, quimono branco, faixa preta | **Shotokan técnico**, base firme, golpes retos e chutes precisos *(proposta)* | Ki focalizado nos impactos *(proposta)* |
 | **p16** | p15 *(proposta)* | Palhacinha marcial ruiva, roupa vermelha/preta de losangos e meias diferentes | **Rushdown caótico/acrobático**, fingimentos e ataques imprevisíveis *(proposta)* | Estrelas e faíscas de impacto *(proposta)* |
 
+Mecânicas de jogo por personagem (vida, movimento, dano, mecânica única): [mecanicas.md](mecanicas.md) — rascunho.
+
 Fichas completas (golpes, lista de animações e prompts):
 
 - [p01](p01.md)
