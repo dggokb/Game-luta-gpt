@@ -46,8 +46,9 @@ public class GameView extends SurfaceView
     private CharacterSelectRenderer characterSelectRenderer;
 
     // Training opponent: our point character (same body and moves), drawn washed out.
+    // É o titular escolhido para o CPU; quem está em campo agora é opponentPoint().
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
-    // O parceiro P2 aparece no seletor; o CPU atual luta somente com o titular.
+    // O parceiro do CPU: no treino (IA OFF) só aparece no seletor; no modo batalha (IA ON) luta.
     private String opponentTagId = "p04";
 
     private static final float VW = Arena.VW;
@@ -68,6 +69,8 @@ public class GameView extends SurfaceView
     private final FighterInput playerInput = new FighterInput();
     private final FighterInput opponentInput = new FighterInput();
     private final AiController ai = new AiController(new OpponentAi(new Random()));
+    /** READY → GO depois da intro e, com a IA ligada, a batalha de verdade (2x2). */
+    private final BattleFlow flow = new BattleFlow();
     /** Demo buttons: while one plays it drives both fighters (pad and CPU brain are ignored). */
     private final DemoDirector demo = new DemoDirector();
     private final FighterInput ignoredInput = new FighterInput();
@@ -260,9 +263,9 @@ public class GameView extends SurfaceView
             }
             @Override public void salvar() { post(GameView.this::exportSizeTuning); }
             @Override public void fechar() {
-                atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
+                atlases.retainOnly(team[0].character, team[1].character, opponentPoint().character);
                 for (FighterState fighter : team) atlases.preload(fighter.character);
-                atlases.preload(opponentFighter.character);
+                atlases.preload(opponentPoint().character);
             }
         });
         engine.setTeam(PLAYER, team);
@@ -336,7 +339,12 @@ public class GameView extends SurfaceView
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
         engine.setTeam(PLAYER, team);
-        engine.setTeam(OPPONENT, opponentFighter);
+        if (flow.battle()) {
+            // Batalha 2x2: o parceiro do CPU espera fora e entra quando o titular cair.
+            engine.setTeam(OPPONENT, opponentFighter, new FighterState(GeneratedCharacters.get(cpuPartner), "CPU"));
+        } else {
+            engine.setTeam(OPPONENT, opponentFighter);
+        }
         engine.refreshOverdrive(PLAYER);
         engine.refreshOverdrive(OPPONENT);
         engine.restage(PLAYER_START_X, OPPONENT_START_X);
@@ -490,6 +498,11 @@ public class GameView extends SurfaceView
         return engine.fighter(OPPONENT);
     }
 
+    /** Quem do CPU está em campo agora (no 2x2 muda quando o titular cai). */
+    private FighterState opponentPoint() {
+        return engine.team(OPPONENT).pointState();
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (!introPlayed) {
@@ -620,8 +633,8 @@ public class GameView extends SurfaceView
         boolean tagging = isTagAnimationActive();
 
         boolean intro = introFrame >= 0;
-        if (intro) {
-            // Both fighters play their INTRO; nobody moves until it ends.
+        if (intro || flow.holdsFighters()) {
+            // Both fighters play their INTRO, then stand in the READY; nobody moves until GO.
             pad.drainInto(ignoredInput);
             playerInput.clear();
             opponentInput.clear();
@@ -647,6 +660,10 @@ public class GameView extends SurfaceView
             opponentInput.clear();
         }
         engine.step(playerInput, opponentInput);
+        // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
+        flow.update(engine, ultraAttacker < 0);
+        updateOpponentVisuals();
+        if (flow.restartDue() && !historia.waitingFight() && !tutorial.active()) restartBattle();
         demo.afterStep();
         // O "treino completo" espera a conversa do fim (ela anda sozinha, sem toque).
         tutorial.setHoldEnd(conversa.falando());
@@ -688,8 +705,25 @@ public class GameView extends SurfaceView
         updateTeamVisuals();
         updateFighterSprite(spriteFighterRenderer, player(), true);
         updateFighterSprite(opponentSpriteRenderer, opponent(), false);
-        if (intro && ++introFrame >= introTotalFrames) introFrame = -1;
+        if (intro && ++introFrame >= introTotalFrames) {
+            introFrame = -1;
+            flow.startCountdown();
+        }
         updateStoryFight();
+    }
+
+    /** No 2x2 o CPU troca de lutador quando o titular cai: o desenho acompanha. */
+    private void updateOpponentVisuals() {
+        CharacterDefinition onPoint = opponentPoint().character;
+        if (opponentSpriteRenderer.character() == onPoint) return;
+        // Quem caiu sai da memória antes de o próximo ser carregado.
+        atlases.retainOnly(team[0].character, team[1].character, onPoint);
+        opponentSpriteRenderer.setCharacter(onPoint.id);
+    }
+
+    /** Modo batalha: depois do resultado, uma luta nova com as mesmas duplas. */
+    private void restartBattle() {
+        selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
     }
 
     /** Starts the match intro, as long as the longest INTRO clip of the two fighters. */
@@ -703,13 +737,20 @@ public class GameView extends SurfaceView
         }
         introTotalFrames = (int)Math.ceil(longest / FIXED_STEP);
         introFrame = introTotalFrames > 0 ? 0 : -1;
+        flow.reset();
+        if (introFrame < 0) flow.startCountdown();
     }
 
     private final HudRenderer.State hudState = new HudRenderer.State() {
         @Override public FighterState active() { return activeFighter(); }
         @Override public FighterState reserve() { return reserveFighter(); }
-        @Override public FighterState opponent() { return opponentFighter; }
-        @Override public CharacterDefinition opponentReserveCharacter() { return GeneratedCharacters.get(opponentTagId); }
+        @Override public FighterState opponent() { return opponentPoint(); }
+        @Override public CharacterDefinition opponentReserveCharacter() {
+            FighterState partner = engine.team(OPPONENT).partner();
+            return partner != null ? partner.character : GeneratedCharacters.get(opponentTagId);
+        }
+        @Override public FighterState opponentReserve() { return engine.team(OPPONENT).partner(); }
+        @Override public boolean battleActive() { return flow.battle(); }
         @Override public String versionLabel() { return VERSION_HUD_LABEL; }
         @Override public String stateLabel() { return currentStateLabel(); }
         @Override public int facing() { return player().facing; }
@@ -773,7 +814,7 @@ public class GameView extends SurfaceView
     };
 
     private CharacterDefinition opponentCharacter() {
-        return opponentFighter.character;
+        return opponentPoint().character;
     }
 
     private CharacterDefinition activeCharacter() {
@@ -841,7 +882,7 @@ public class GameView extends SurfaceView
         ultraDamageDealt = 0;
         ultraDarkAlpha = 0;
         ultraCameraZoom = 1f;
-        FighterState state = attacker == PLAYER ? activeFighter() : opponentFighter;
+        FighterState state = attacker == PLAYER ? activeFighter() : opponentPoint();
         ultraPack = attacker == PLAYER
             ? ultraPacks[engine.team(PLAYER).point]
             : UltraPack.placeholder("ULTRA " + state.character.displayName, state.profile.color);
@@ -849,7 +890,7 @@ public class GameView extends SurfaceView
     }
 
     private String ultraAttackerFolder() {
-        return ultraAttacker == PLAYER ? ultraFolder(activeFighter()) : ultraFolder(opponentFighter);
+        return ultraAttacker == PLAYER ? ultraFolder(activeFighter()) : ultraFolder(opponentPoint());
     }
 
     private int ultraTotalDamage() {
@@ -1044,7 +1085,7 @@ public class GameView extends SurfaceView
         int direction = defender.x >= attacker.x ? 1 : -1;
         int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
-        int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentFighter.profile.color;
+        int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 7f : 10f);
         else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
@@ -1134,8 +1175,10 @@ public class GameView extends SurfaceView
         tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
     }
 
+    /** A IA ligada é o modo batalha (2x2, derrota quando a dupla cai); desligada, o treino. */
     private void setOpponentAiEnabled(boolean enabled) {
         ai.setEnabled(enabled);
+        flow.setBattle(enabled);
     }
 
     private void updateFightCamera(float dt) {
@@ -1266,7 +1309,7 @@ public class GameView extends SurfaceView
                 canvas.restore();
             }
 
-            drawOverdriveAura(canvas, opponent(), 0f);
+            drawOverdriveAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawOverdriveAura(canvas, player(), tagOffset());
             drawPartner(canvas);
             drawAirDashTrail(canvas, player());
@@ -1320,7 +1363,7 @@ public class GameView extends SurfaceView
         if (strength <= 0f) return;
         int alpha = Math.round(255f * strength);
         CombatFighter npc = opponent();
-        drawReflection(c, opponentSpriteRenderer, npc, 0f, alpha);
+        drawReflection(c, opponentSpriteRenderer, npc, engine.teams.tagOffset(OPPONENT), alpha);
         CombatFighter partner = partnerBody(engine.team(PLAYER));
         if (partner != null) drawReflection(c, partnerSpriteRenderer, partner, 0f, alpha);
         drawReflection(c, spriteFighterRenderer, player(), tagOffset(), alpha);
@@ -1359,6 +1402,11 @@ public class GameView extends SurfaceView
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
+        }
+        String call = flow.banner();
+        if (call != null) {
+            float t = flow.bannerProgress();
+            hud.drawBanner(c, call, Math.round(255f * clamp((1f - t) * 5f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
         }
         hud.drawCombo(c, engine.session(OPPONENT), engine.lastSession(OPPONENT),
             engine.framesSinceSessionEnd(OPPONENT), true);
@@ -1464,17 +1512,22 @@ public class GameView extends SurfaceView
 
     private void drawDamageDummy(Canvas c) {
         CombatFighter npc = opponent();
+        // No 2x2 o parceiro do CPU entra correndo depois do KO, como na troca.
+        c.save();
+        c.translate(engine.teams.tagOffset(OPPONENT), 0f);
         paint.setColor(Color.argb(70, 0, 0, 0));
         c.drawOval(npc.x - 43f, GROUND_Y - 10f, npc.x + 43f, GROUND_Y + 10f, paint);
 
         drawFighter(c, opponentSpriteRenderer, npc, npc.framesSinceHit < 4 && !npc.ko(), false);
+        c.restore();
 
         opponentPanel.x = npc.x;
         opponentPanel.visualTop = opponentVisualTop();
-        opponentPanel.lifeRatio = opponentFighter.life / (float)opponentFighter.profile.maxLife;
+        FighterState cpu = opponentPoint();
+        opponentPanel.lifeRatio = cpu.life / (float)cpu.profile.maxLife;
         opponentPanel.status = opponentStatusLabel();
-        opponentPanel.lifeLabel = opponentFighter.life + " / " + opponentFighter.profile.maxLife;
-        opponentPanel.superLabel = opponentFighter.superHudLabel;
+        opponentPanel.lifeLabel = cpu.life + " / " + cpu.profile.maxLife;
+        opponentPanel.superLabel = cpu.superHudLabel;
         opponentPanel.damageLabel = dummyDamageLabel;
         opponentPanel.damageProgress = dummyDamageLabelFrames / (float)DAMAGE_LABEL_FRAMES;
         if (debugOverlay) hud.drawOpponentPanel(c, opponentPanel);
@@ -1639,7 +1692,9 @@ public class GameView extends SurfaceView
         }
         CombatFighter rival = isPlayer ? opponent() : player();
         int side = isPlayer ? 0 : 1;
-        boolean celebrating = animation == null && rival.ko() && !f.ko() && f.grounded &&
+        // No 2x2 só se comemora quando a dupla inteira do outro lado caiu.
+        boolean matchWon = !flow.battle() || flow.over();
+        boolean celebrating = animation == null && matchWon && rival.ko() && !f.ko() && f.grounded &&
             f.status == CombatFighter.Status.NEUTRAL && !f.attacking() && renderer.hasAnimation(SpriteStates.VICTORY);
         if (celebrating) {
             // Opponent KO: the winner plays VICTORY once and holds its last pose.
@@ -1908,7 +1963,9 @@ public class GameView extends SurfaceView
             if (testButtonsHidden() && ControlsLayout.isTestButton(control)) control = ControlsLayout.Control.NONE;
             switch (control) {
                 case AI_TOGGLE:
+                    // IA ON: a batalha de verdade (2x2) começa do zero; IA OFF volta ao treino.
                     setOpponentAiEnabled(!ai.enabled());
+                    restartBattle();
                     break;
                 case DEBUG_TOGGLE:
                     debugOverlay = !debugOverlay;
@@ -1935,7 +1992,8 @@ public class GameView extends SurfaceView
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
                     hud.resetEffects();
-                    opponentFighter.restoreLife();
+                    // A dupla inteira do CPU no 2x2 (só o titular no treino).
+                    for (FighterState member : engine.team(OPPONENT).members) member.restoreLife();
                     engine.refreshOverdrive(OPPONENT);
                     break;
                 case DPAD:
@@ -2110,11 +2168,13 @@ public class GameView extends SurfaceView
     /** Luta de um episódio: depois do KO e da comemoração, a história continua. */
     private void updateStoryFight() {
         if (!historia.waitingFight()) return;
-        if (!player().ko() && !opponent().ko()) {
+        // No 2x2 a luta só acaba quando uma dupla inteira cai.
+        boolean ended = flow.battle() ? flow.over() : player().ko() || opponent().ko();
+        if (!ended) {
             storyKoFrames = 0;
             return;
         }
-        boolean won = opponent().ko() && !player().ko();
+        boolean won = flow.battle() ? flow.winner() == PLAYER : opponent().ko() && !player().ko();
         if (!conversaKo && !tutorial.active()) {
             // Quem está de fora comenta o resultado; a história espera a fala acabar.
             conversaKo = true;
@@ -2132,6 +2192,9 @@ public class GameView extends SurfaceView
     public void onHistoriaLuta(Episodio.Passo luta) {
         // Cada luta pode pedir o seu cenário (o treino é no dojo).
         useStage(luta.cenario);
+        // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA
+        // e as lições dizem o que ele faz.
+        setOpponentAiEnabled(!luta.tutorial());
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta.
         if (luta.dupla != null && luta.cpu != null) {
             selectTeams(luta.dupla[0], luta.dupla[1], luta.cpu[0], luta.cpu[1]);
@@ -2147,8 +2210,6 @@ public class GameView extends SurfaceView
         }
         conversa.momento("inicio");
         if (luta.tutorial()) {
-            // O boneco de treino não usa a IA; as lições dizem o que ele faz.
-            setOpponentAiEnabled(false);
             // As lições não esperam quadro nenhum: a conversa fala por cima da luta.
             tutorial.setPanels(false);
             tutorial.start(engine, team, PLAYER_START_X);
@@ -2159,7 +2220,6 @@ public class GameView extends SurfaceView
             return;
         }
         tutorial.stop();
-        setOpponentAiEnabled(true);
         storyKoFrames = 0;
         pad.reset();
         releaseAllPointers();

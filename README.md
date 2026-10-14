@@ -290,6 +290,15 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   também recarregam o Overdrive (novo round no treino).
 - **DEMO 87** mostra tudo isso. A CPU ainda não usa o Overdrive.
 
+## Modo batalha (IA ON) e READY → GO
+
+- Depois da intro, **READY → GO** (nomes provisórios) antes de o controle voltar.
+- **IA OFF** continua sendo o treino (no Templo da Lua): CPU só com o titular, KO não encerra.
+- **IA ON** é a **batalha de verdade, 2x2**: ligar a IA começa uma luta nova; o CPU luta com a
+  dupla dele, o titular que cai é substituído pelo parceiro e **o time só perde quando os dois
+  da dupla caem**. Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
+  também usam essa regra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
+
 ## Modo história (MVP)
 
 - Botão **HISTÓRIA** no HUD (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de

@@ -95,6 +95,29 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Modo batalha 2x2 e READY → GO
+
+O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de cada passo do motor.
+
+- **READY → GO** (nomes provisórios): entre a intro e o idle os dois ficam parados no READY
+  (`READY_FRAMES`); no GO (`GO_FRAMES`) o controle já volta. Vale para toda luta, no treino também.
+- **IA OFF = treino** (o de antes): o CPU luta só com o titular, o KO não encerra nada e os
+  botões VIDA P1 / VIDA CPU recarregam.
+- **IA ON = batalha de verdade**: ligar a IA começa uma luta nova do zero. O CPU luta com a
+  dupla dele (titular + parceiro escolhidos na seleção).
+  - O titular que cai fica no chão `koReplaceFrames` (75) depois de bater no chão e o
+    parceiro com vida entra correndo por trás, a mesma entrada da troca, invulnerável até
+    terminar a pose (`CombatEngine.replaceFallenPoint`, `TeamSystem.enterAfterKo`). A barra do
+    time passa para quem entra.
+  - **O time só perde quando os dois da dupla caem** (`TeamSystem.defeated`). Os dois juntos: empate.
+  - Parceiro caído não vem mais de assist, troca, Guard Cancel nem DHC.
+  - Fim: K.O. (`KO_FRAMES`), o resultado (VITÓRIA / DERROTA / EMPATE, `RESULT_FRAMES`) e a
+    luta recomeça com as mesmas duplas. Só o vencedor final comemora.
+- As lutas da história são batalhas (o treino do tutorial não): a página volta quando uma
+  dupla inteira cai.
+
+Testes: `BattleFlowTest`.
+
 ## Overdrive — v0.87
 
 - Entrada: `FighterInput.overdrive` (botão OD em `ControlsLayout.OVERDRIVE_*`, ou SUPER + TAG

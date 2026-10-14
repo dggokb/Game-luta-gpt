@@ -159,6 +159,25 @@ final class CombatEngine {
         teams.calm();
     }
 
+    /**
+     * Batalha 2x2: o titular caído sai e o parceiro que ainda tem vida entra correndo por trás
+     * no lugar dele (a entrada da troca), invulnerável até terminar a entrada. Falso quando não
+     * há ninguém para entrar (o time perdeu).
+     */
+    boolean replaceFallenPoint(int side) {
+        CombatFighter fallen = fighters[side];
+        if (!fallen.ko() || !teams.canReplaceFallen(side)) return false;
+        float x = Arena.clamp(fallen.x, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        int facing = fighters[1 - side].x >= x ? 1 : -1;
+        teams.enterAfterKo(side, facing);
+        CombatFighter in = new CombatFighter(side, teams.sides[side].pointState(), x, facing);
+        in.locked = true;
+        in.invulnFrames = config.tagEnterFrames + config.tagPoseFrames + config.koEntryInvulnPadding;
+        fighters[side] = in;
+        sessions[side] = null;
+        return true;
+    }
+
     /** Tag: the slot now plays another team member. Any action in progress is dropped. */
     void setFighterState(int index, FighterState state) {
         CombatFighter f = fighters[index];

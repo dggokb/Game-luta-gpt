@@ -241,6 +241,12 @@ final class CombatConfig {
     /** After Assist → Tag: neither another assist nor a raw tag for this long. */
     int assistTagCooldownFrames = 300;
 
+    // Batalha 2x2 (BattleFlow): o titular caído fica no chão um pouco e o parceiro entra.
+    /** Frames do titular caído no chão antes do parceiro entrar. */
+    int koReplaceFrames = 75;
+    /** Invulnerável além da entrada (corrida + pose) do parceiro que entra depois do KO. */
+    int koEntryInvulnPadding = 20;
+
     static int hitstunDecay(int[] table, int index) {
         if (table.length == 0) return 0;
         return table[Math.min(Math.max(0, index), table.length - 1)];
