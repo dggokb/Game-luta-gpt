@@ -77,6 +77,7 @@ public class GameView extends SurfaceView
     private boolean debugOverlay;
     /** Screen-space controls shown only in DEBUG, away from combat buttons. */
     private static final float TUNE_LEFT = 944f, TUNE_TOP = 176f, TUNE_RIGHT = 1076f, TUNE_BOTTOM = 266f;
+    private static final float BOXES_TOP = 274f, BOXES_BOTTOM = 364f;
     private final Paint tuningPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private String dummyDamageLabel = "";
@@ -88,6 +89,8 @@ public class GameView extends SurfaceView
     private final SpriteAtlasCache atlases;
     /** DEBUG > AJUSTAR TAMANHOS: tamanho de cada folha no olho, exportado para o Drive. */
     private final TelaAjusteTamanho ajusteTamanho;
+    /** DEBUG > AJUSTAR CAIXAS: hitbox, hurtbox e empurrão no olho, exportados para o Drive. */
+    private final TelaAjusteCaixas ajusteCaixas;
     private final AndroidRenderAssets ultraAssets;
     private final SpriteFighterRenderer spriteFighterRenderer;
     private final SpriteFighterRenderer opponentSpriteRenderer;
@@ -253,6 +256,7 @@ public class GameView extends SurfaceView
         super(context);
         hud.loadArt(context);
         AjusteTamanho.load(context);
+        AjusteCaixas.load(context);
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
@@ -270,6 +274,11 @@ public class GameView extends SurfaceView
                 atlases.retainOnly(manter);
             }
             @Override public void salvar() { post(GameView.this::exportSizeTuning); }
+            @Override public void fechar() { keepFightAtlases(); }
+        });
+        ajusteCaixas = new TelaAjusteCaixas(atlases, new TelaAjusteTamanho.Host() {
+            @Override public void manterAtlas(CharacterDefinition... manter) { atlases.retainOnly(manter); }
+            @Override public void salvar() { post(GameView.this::exportBoxTuning); }
             @Override public void fechar() { keepFightAtlases(); }
         });
         engine.setTeam(PLAYER, team);
@@ -405,7 +414,7 @@ public class GameView extends SurfaceView
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (ajusteTamanho.isOpen() || characterSelect.isOpen() || historia.coversScreen()) {
+        if (ajusteTamanho.isOpen() || ajusteCaixas.isOpen() || characterSelect.isOpen() || historia.coversScreen()) {
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -637,6 +646,13 @@ public class GameView extends SurfaceView
             Integer key;
             while ((key = selectionKeys.poll()) != null) ajusteTamanho.key(key);
             ajusteTamanho.update(FIXED_STEP);
+            return;
+        }
+        if (ajusteCaixas.isOpen()) {
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) ajusteCaixas.key(key);
+            ajusteCaixas.update(FIXED_STEP);
             return;
         }
         if (characterSelect.isOpen()) {
@@ -1301,6 +1317,11 @@ public class GameView extends SurfaceView
                 canvas.restore();
                 return;
             }
+            if (ajusteCaixas.isOpen()) {
+                ajusteCaixas.draw(canvas);
+                canvas.restore();
+                return;
+            }
             // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
             if (characterSelect.isOpen()) {
                 characterSelectRenderer.draw(canvas, paint, characterSelect);
@@ -1510,18 +1531,46 @@ public class GameView extends SurfaceView
         p.setTextSize(11f);
         p.setColor(Color.LTGRAY);
         c.drawText("todas as animações",cx,TUNE_TOP+72f,p);
+        // Logo abaixo: caixas de combate (hitbox, hurtbox, empurrão).
+        p.setColor(Color.argb(225,90,30,40));
+        c.drawRoundRect(TUNE_LEFT,BOXES_TOP,TUNE_RIGHT,BOXES_BOTTOM,10f,10f,p);
+        p.setColor(Color.rgb(245,225,170));
+        p.setFakeBoldText(true);
+        p.setTextSize(16f);
+        c.drawText("AJUSTAR",cx,BOXES_TOP+30f,p);
+        c.drawText("CAIXAS",cx,BOXES_TOP+50f,p);
+        p.setFakeBoldText(false);
+        p.setTextSize(11f);
+        p.setColor(Color.LTGRAY);
+        c.drawText("hitbox e hurtbox",cx,BOXES_TOP+72f,p);
         p.setTextAlign(Paint.Align.LEFT);
     }
 
-    /** DEBUG: o botão abre a tela de ajuste de tamanho (a luta fica parada atrás). */
+    /** DEBUG: os botões abrem as telas de ajuste de tamanho e de caixas (a luta fica parada atrás). */
     private boolean handleSizeTunerTap(float x,float y) {
-        if (x<TUNE_LEFT || x>TUNE_RIGHT || y<TUNE_TOP || y>TUNE_BOTTOM) return false;
+        if (x<TUNE_LEFT || x>TUNE_RIGHT || y<TUNE_TOP || y>BOXES_BOTTOM) return false;
+        boolean boxes = y >= BOXES_TOP;
+        if (!boxes && y > TUNE_BOTTOM) return true;
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return true;
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
-        ajusteTamanho.open(team[0].character.id);
+        if (boxes) ajusteCaixas.open(team[0].character.id);
+        else ajusteTamanho.open(team[0].character.id);
         return true;
+    }
+
+    /** SALVAR NO DRIVE das caixas: arquivo com os ajustes de todos os personagens. */
+    private void exportBoxTuning() {
+        String date = new java.text.SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(new java.util.Date());
+        String json = AjusteCaixas.exportJson(BuildConfig.VERSION_NAME, date);
+        try {
+            ArquivosCompartilhados.compartilhar(getContext(), "ajustes-caixas-" + date + ".json", "application/json", json);
+            ajusteCaixas.say("Escolha o Drive para salvar o arquivo");
+        } catch (IOException | RuntimeException e) {
+            Log.e("GameLuta", "ajustes de caixas", e);
+            ajusteCaixas.say("Não deu para salvar: " + e.getMessage());
+        }
     }
 
     /** SALVAR NO DRIVE: arquivo com os ajustes de todos os personagens no menu Compartilhar. */
@@ -2005,6 +2054,12 @@ public class GameView extends SurfaceView
         if (ajusteTamanho.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 ajusteTamanho.tap(event.getX(index) / sx, event.getY(index) / sy);
+            }
+            return;
+        }
+        if (ajusteCaixas.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                ajusteCaixas.tap(event.getX(index) / sx, event.getY(index) / sy);
             }
             return;
         }

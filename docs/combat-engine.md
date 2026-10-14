@@ -398,6 +398,33 @@ Hitstun decay por número de hits (0,0,0,1,1,2,2,3,3,4,4,5 frames) ou por segund
 combo (0,0,1,2,4,6), o maior dos dois. Juggle limit 6. Pushback distribuído em 8
 frames.
 
+## Ajustar caixas no celular (DEBUG > AJUSTAR CAIXAS)
+
+Tela do DEBUG, abaixo de AJUSTAR TAMANHOS. Escolha o personagem (◀ ▶) e o item: **corpo em
+pé**, **corpo agachado**, cada **golpe** (L, M, H, agachados, aéreos, S2–S4), **magia** e
+**super**. A animação toca no tempo do golpe (60 quadros por segundo) com as caixas por cima:
+
+| Cor | Caixa | Campos (`character.json`) |
+|---|---|---|
+| verde | corpo que leva golpe | `fighter.body.halfWidth`, `standHeight`, `crouchHeight` |
+| amarelo | empurrão | `fighter.body.pushHalfWidth`, `pushHeight` |
+| vermelho | acerto do golpe: da raiz até o alcance, na altura ± 19,5 (cheio nos quadros ativos) | `moves.<botão>.reach`, `hitHeight`; `specialMoves.S2…` |
+| círculo | saída da magia (cheio depois do quadro em que sai) | `fighter.energy.spawnX`, `spawnY`, `crouchSpawnY`; `fighter.super.…` |
+
+PAUSA, VEL (¼x, ½x, 1x), ◀ QUADRO / QUADRO ▶ e IR AO IMPACTO (para no primeiro quadro ativo)
+ajudam a conferir se o vermelho cobre o punho no impacto. −10/−2/+2/+10 mudam o valor,
+ORIG volta ao do pacote. Cada toque fica salvo no aparelho; a tela é só prévia (a luta usa
+o pacote). **SALVAR NO DRIVE** exporta `ajustes-caixas-<data>.json` de todos os personagens;
+para gravar:
+
+```
+python3 tools/sprites/caixas.py --aplicar ajustes-caixas-<data>.json
+python3 tools/sprites/build_characters.py --write
+```
+
+Cada ajuste leva o valor em que foi feito; se o pacote mudou desde então, o `caixas.py`
+recusa em vez de passar por cima, e no app o ajuste antigo deixa de valer sozinho.
+
 ## Critérios de aceite → testes (`CombatEngineTest`, JVM, sem renderização)
 
 | Critério | Teste |
