@@ -222,10 +222,10 @@ final class TelaAjusteCaixas {
         if (it.tipo == AjusteCaixas.Item.Tipo.GOLPE) {
             float reach = AjusteCaixas.value(definition, it.campos.get(0));
             float hit = AjusteCaixas.value(definition, it.campos.get(1));
+            float floor = Math.min(AjusteCaixas.value(definition, it.campos.get(2)), hit - CombatRules.VERTICAL_SLACK);
             boolean active = a.isActive(f);
-            box(c, active ? RED_FILL : RED, 0f, -(hit + CombatRules.VERTICAL_SLACK), reach,
-                -(hit - CombatRules.VERTICAL_SLACK), active ? false : true);
-            if (active) box(c, RED, 0f, -(hit + CombatRules.VERTICAL_SLACK), reach, -(hit - CombatRules.VERTICAL_SLACK), false);
+            box(c, active ? RED_FILL : RED, 0f, -(hit + CombatRules.VERTICAL_SLACK), reach, -floor, active ? false : true);
+            if (active) box(c, RED, 0f, -(hit + CombatRules.VERTICAL_SLACK), reach, -floor, false);
         } else if (it.tipo == AjusteCaixas.Item.Tipo.MAGIA || it.tipo == AjusteCaixas.Item.Tipo.SUPER) {
             boolean fired = a != null && f >= a.startupFrames;
             float radius = it.tipo == AjusteCaixas.Item.Tipo.SUPER ? 58f : 24f;

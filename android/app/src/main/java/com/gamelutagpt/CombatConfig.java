@@ -69,12 +69,12 @@ final class CombatConfig {
         float fraction = (backdashFrames - framesLeft) / (float)backdashFrames;
         return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
     }
-    // 60 FPS normal jump: ~42 airborne frames, ~180 world-unit apex.
-    // With P01's 156-unit standing hurtbox, this is ~1.16x opponent height.
-    // Faster ascent + descent eliminates the previous floaty ~53f arc.
-    float jumpSpeed = 1030f;
-    float normalJumpRisingGravityScale = 1.70f;
-    float normalJumpFallingGravityScale = 2.00f;
+    // 60 FPS normal jump: ~42 airborne frames, apex ~1.16x P01's standing hurtbox.
+    // Sized for the 226-unit P01 (the 156-unit version used 1030 / 1.70 / 2.00, apex ~182):
+    // speed and gravity scale by 226/156, so the cadence stays and only the height grows.
+    float jumpSpeed = 1492f;
+    float normalJumpRisingGravityScale = 2.463f;
+    float normalJumpFallingGravityScale = 2.897f;
     float superJumpSpeed = 1450f;
     float gravity = 1650f;
     float launchSpeed = 1450f;

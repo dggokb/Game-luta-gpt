@@ -205,6 +205,11 @@ def validate_move(pack, binding, m):
     validate_attack(binding, m, False)
     positive(m['reach'], binding)
     if 'hitHeight' in m: positive(m['hitHeight'], binding)
+    # Base of the strike box, below hitHeight - 19.5 for a sweeping hit (uppercut): fist path, low to high.
+    if 'hitFloor' in m:
+        positive(m['hitFloor'], binding+'.hitFloor')
+        if m['hitFloor'] > m.get('hitHeight', 42 if binding.startswith('2') else 78):
+            raise ValueError(f'{binding}.hitFloor: must stay below hitHeight')
     if type(m['damage']) is not int or m['damage'] <= 0:
         raise ValueError(f'{binding}: damage must be a positive integer')
 
@@ -365,7 +370,7 @@ def compile_packs(root, results):
         if 'maxHits' in m: code += '.maxHits('+str(m['maxHits'])+')'
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
         if m.get('low'): code += '.low(true)'
-        if reach is not None: code += '.reach('+f(reach)+','+f(height)+')'
+        if reach is not None: code += '.reach('+f(reach)+','+f(height)+(','+f(m['hitFloor']) if 'hitFloor' in m else '')+')'
         for key in ('hitboxes','hurtboxes'):
             for box in m.get(key, []):
                 code += '.'+key[:-2]+'('+','.join([str(box['frames'][0]),str(box['frames'][1])]+[f(v) for v in box['x']+box['y']])+')'

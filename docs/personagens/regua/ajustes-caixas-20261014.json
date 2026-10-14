@@ -1,0 +1,2258 @@
+{
+  "tipo": "ajuste-caixas",
+  "app": "0.102-hud-contadores-super5",
+  "data": "20261014-1039+1326",
+  "como_aplicar": "python3 tools/sprites/caixas.py --aplicar este_arquivo.json",
+  "ajustes": [
+    {
+      "personagem": "player_base",
+      "campo": "fighter.body.halfWidth",
+      "antes": 37,
+      "valor": 27
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.body.standHeight",
+      "antes": 156,
+      "valor": 226
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 32,
+      "valor": 24
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.body.pushHeight",
+      "antes": 129,
+      "valor": 229
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 97,
+      "valor": 157
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.L.reach",
+      "antes": 90,
+      "valor": 130
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.L.hitHeight",
+      "antes": 84,
+      "valor": 184
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.M.reach",
+      "antes": 125,
+      "valor": 135
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.M.hitHeight",
+      "antes": 84,
+      "valor": 184
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.H.reach",
+      "antes": 159,
+      "valor": 169
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.H.hitHeight",
+      "antes": 84,
+      "valor": 194
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.2L.reach",
+      "antes": 90,
+      "valor": 134
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.2L.hitHeight",
+      "antes": 45,
+      "valor": 115
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.2M.reach",
+      "antes": 125,
+      "valor": 131
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.2M.hitHeight",
+      "antes": 45,
+      "valor": 25
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.2H.reach",
+      "antes": 159,
+      "valor": 41
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.2H.hitHeight",
+      "antes": 45,
+      "valor": 265
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.jL.reach",
+      "antes": 90,
+      "valor": 146
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.jL.hitHeight",
+      "antes": 84,
+      "valor": 124
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.jM.reach",
+      "antes": 125,
+      "valor": 185
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.jM.hitHeight",
+      "antes": 84,
+      "valor": 114
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.jH.reach",
+      "antes": 159,
+      "valor": 169
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.jH.hitHeight",
+      "antes": 84,
+      "valor": 174
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.j2H.reach",
+      "antes": 159,
+      "valor": 65
+    },
+    {
+      "personagem": "player_base",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 84,
+      "valor": 24
+    },
+    {
+      "personagem": "player_base",
+      "campo": "specialMoves.S2.reach",
+      "antes": 108,
+      "valor": 82
+    },
+    {
+      "personagem": "player_base",
+      "campo": "specialMoves.S3.reach",
+      "antes": 118,
+      "valor": 148
+    },
+    {
+      "personagem": "player_base",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 97,
+      "valor": 187
+    },
+    {
+      "personagem": "player_base",
+      "campo": "specialMoves.S4.reach",
+      "antes": 150,
+      "valor": 164
+    },
+    {
+      "personagem": "player_base",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 118,
+      "valor": 198
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.energy.spawnX",
+      "antes": 67,
+      "valor": 87
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.energy.spawnY",
+      "antes": 88,
+      "valor": 168
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.energy.crouchSpawnY",
+      "antes": 70,
+      "valor": 90
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.super.spawnX",
+      "antes": 84,
+      "valor": 104
+    },
+    {
+      "personagem": "player_base",
+      "campo": "fighter.super.spawnY",
+      "antes": 92,
+      "valor": 182
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.body.standHeight",
+      "antes": 141,
+      "valor": 211
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.body.pushHeight",
+      "antes": 117,
+      "valor": 207
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 88,
+      "valor": 148
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.L.reach",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.L.hitHeight",
+      "antes": 76,
+      "valor": 166
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.M.reach",
+      "antes": 113,
+      "valor": 173
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.M.hitHeight",
+      "antes": 76,
+      "valor": 126
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.H.reach",
+      "antes": 144,
+      "valor": 184
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.H.hitHeight",
+      "antes": 76,
+      "valor": 206
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.2L.reach",
+      "antes": 82,
+      "valor": 102
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.2L.hitHeight",
+      "antes": 41,
+      "valor": 101
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.2M.reach",
+      "antes": 113,
+      "valor": 133
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.2M.hitHeight",
+      "antes": 41,
+      "valor": 21
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.2H.reach",
+      "antes": 144,
+      "valor": 54
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.2H.hitHeight",
+      "antes": 41,
+      "valor": 261
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.jL.reach",
+      "antes": 82,
+      "valor": 192
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.jL.hitHeight",
+      "antes": 76,
+      "valor": 136
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.jM.reach",
+      "antes": 113,
+      "valor": 193
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.jM.hitHeight",
+      "antes": 76,
+      "valor": 106
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.jH.hitHeight",
+      "antes": 76,
+      "valor": 216
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.j2H.reach",
+      "antes": 144,
+      "valor": 154
+    },
+    {
+      "personagem": "p02",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 76,
+      "valor": 216
+    },
+    {
+      "personagem": "p02",
+      "campo": "specialMoves.S4.reach",
+      "antes": 136,
+      "valor": 216
+    },
+    {
+      "personagem": "p02",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 107,
+      "valor": 207
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.energy.spawnX",
+      "antes": 61,
+      "valor": 101
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.energy.spawnY",
+      "antes": 80,
+      "valor": 150
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.super.spawnX",
+      "antes": 76,
+      "valor": 126
+    },
+    {
+      "personagem": "p02",
+      "campo": "fighter.super.spawnY",
+      "antes": 83,
+      "valor": 173
+    },
+    {
+      "personagem": "p03",
+      "campo": "fighter.body.standHeight",
+      "antes": 156,
+      "valor": 236
+    },
+    {
+      "personagem": "p03",
+      "campo": "fighter.body.pushHeight",
+      "antes": 129,
+      "valor": 239
+    },
+    {
+      "personagem": "p03",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 97,
+      "valor": 177
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.L.reach",
+      "antes": 90,
+      "valor": 120
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.L.hitHeight",
+      "antes": 84,
+      "valor": 194
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.M.reach",
+      "antes": 125,
+      "valor": 135
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.M.hitHeight",
+      "antes": 84,
+      "valor": 194
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.H.reach",
+      "antes": 159,
+      "valor": 129
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.H.hitHeight",
+      "antes": 84,
+      "valor": 244
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.2L.reach",
+      "antes": 90,
+      "valor": 150
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.2L.hitHeight",
+      "antes": 45,
+      "valor": 135
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.2M.reach",
+      "antes": 125,
+      "valor": 195
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.2M.hitHeight",
+      "antes": 45,
+      "valor": 25
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.2H.reach",
+      "antes": 159,
+      "valor": 29
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.2H.hitHeight",
+      "antes": 45,
+      "valor": 295
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.jL.reach",
+      "antes": 90,
+      "valor": 190
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.jL.hitHeight",
+      "antes": 84,
+      "valor": 144
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.jH.reach",
+      "antes": 159,
+      "valor": 139
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.jH.hitHeight",
+      "antes": 84,
+      "valor": 24
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.j2H.reach",
+      "antes": 159,
+      "valor": 99
+    },
+    {
+      "personagem": "p03",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 84,
+      "valor": 144
+    },
+    {
+      "personagem": "p03",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 140,
+      "valor": 180
+    },
+    {
+      "personagem": "p03",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 97,
+      "valor": 147
+    },
+    {
+      "personagem": "p03",
+      "campo": "specialMoves.S4.reach",
+      "antes": 150,
+      "valor": 160
+    },
+    {
+      "personagem": "p03",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 118,
+      "valor": 228
+    },
+    {
+      "personagem": "p03",
+      "campo": "fighter.energy.spawnX",
+      "antes": 67,
+      "valor": 127
+    },
+    {
+      "personagem": "p03",
+      "campo": "fighter.energy.crouchSpawnY",
+      "antes": 70,
+      "valor": 200
+    },
+    {
+      "personagem": "p03",
+      "campo": "fighter.super.airSpawnY",
+      "antes": 88,
+      "valor": 168
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.body.standHeight",
+      "antes": 146,
+      "valor": 246
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 30,
+      "valor": 40
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.body.pushHeight",
+      "antes": 121,
+      "valor": 241
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 91,
+      "valor": 161
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.L.reach",
+      "antes": 84,
+      "valor": 144
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.L.hitHeight",
+      "antes": 79,
+      "valor": 199
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.M.reach",
+      "antes": 117,
+      "valor": 177
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.M.hitHeight",
+      "antes": 79,
+      "valor": 199
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.H.reach",
+      "antes": 149,
+      "valor": 179
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.H.hitHeight",
+      "antes": 79,
+      "valor": 199
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.2L.reach",
+      "antes": 84,
+      "valor": 154
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.2L.hitHeight",
+      "antes": 42,
+      "valor": 132
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.2M.reach",
+      "antes": 117,
+      "valor": 197
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.2M.hitHeight",
+      "antes": 42,
+      "valor": 72
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.2H.reach",
+      "antes": 149,
+      "valor": 29
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.2H.hitHeight",
+      "antes": 42,
+      "valor": 322
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.jL.reach",
+      "antes": 84,
+      "valor": 174
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.jL.hitHeight",
+      "antes": 79,
+      "valor": 129
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.jM.reach",
+      "antes": 117,
+      "valor": 157
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.jM.hitHeight",
+      "antes": 79,
+      "valor": 153
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.jH.reach",
+      "antes": 149,
+      "valor": 155
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.jH.hitHeight",
+      "antes": 79,
+      "valor": 153
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.j2H.reach",
+      "antes": 149,
+      "valor": 89
+    },
+    {
+      "personagem": "p04",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 79,
+      "valor": 169
+    },
+    {
+      "personagem": "p04",
+      "campo": "specialMoves.S2.reach",
+      "antes": 101,
+      "valor": 121
+    },
+    {
+      "personagem": "p04",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 131,
+      "valor": 211
+    },
+    {
+      "personagem": "p04",
+      "campo": "specialMoves.S3.reach",
+      "antes": 111,
+      "valor": 201
+    },
+    {
+      "personagem": "p04",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 91,
+      "valor": 171
+    },
+    {
+      "personagem": "p04",
+      "campo": "specialMoves.S4.reach",
+      "antes": 141,
+      "valor": 131
+    },
+    {
+      "personagem": "p04",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 111,
+      "valor": 151
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.energy.spawnX",
+      "antes": 63,
+      "valor": 153
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.energy.spawnY",
+      "antes": 82,
+      "valor": 72
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.energy.crouchSpawnY",
+      "antes": 66,
+      "valor": 196
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.super.spawnX",
+      "antes": 79,
+      "valor": 149
+    },
+    {
+      "personagem": "p04",
+      "campo": "fighter.super.airSpawnY",
+      "antes": 82,
+      "valor": 192
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.body.halfWidth",
+      "antes": 33,
+      "valor": 53
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.body.standHeight",
+      "antes": 140,
+      "valor": 190
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 29,
+      "valor": 39
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.body.pushHeight",
+      "antes": 116,
+      "valor": 186
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 87,
+      "valor": 137
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.L.reach",
+      "antes": 81,
+      "valor": 131
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.L.hitHeight",
+      "antes": 75,
+      "valor": 165
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.M.reach",
+      "antes": 112,
+      "valor": 180
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.M.hitHeight",
+      "antes": 75,
+      "valor": 165
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.H.reach",
+      "antes": 143,
+      "valor": 183
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.H.hitHeight",
+      "antes": 75,
+      "valor": 155
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.2L.reach",
+      "antes": 81,
+      "valor": 151
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.2L.hitHeight",
+      "antes": 40,
+      "valor": 118
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.2M.reach",
+      "antes": 112,
+      "valor": 134
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.2M.hitHeight",
+      "antes": 40,
+      "valor": 24
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.2H.reach",
+      "antes": 143,
+      "valor": 43
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.2H.hitHeight",
+      "antes": 40,
+      "valor": 270
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.jL.reach",
+      "antes": 81,
+      "valor": 121
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.jL.hitHeight",
+      "antes": 75,
+      "valor": 205
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.jM.reach",
+      "antes": 112,
+      "valor": 172
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.jM.hitHeight",
+      "antes": 75,
+      "valor": 95
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.jH.hitHeight",
+      "antes": 75,
+      "valor": 165
+    },
+    {
+      "personagem": "p05",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 75,
+      "valor": 165
+    },
+    {
+      "personagem": "p05",
+      "campo": "specialMoves.S2.reach",
+      "antes": 97,
+      "valor": 137
+    },
+    {
+      "personagem": "p05",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 126,
+      "valor": 156
+    },
+    {
+      "personagem": "p05",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 87,
+      "valor": 147
+    },
+    {
+      "personagem": "p05",
+      "campo": "specialMoves.S4.reach",
+      "antes": 135,
+      "valor": 175
+    },
+    {
+      "personagem": "p05",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 106,
+      "valor": 136
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.energy.spawnX",
+      "antes": 60,
+      "valor": 120
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.energy.spawnY",
+      "antes": 79,
+      "valor": 69
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.energy.crouchSpawnY",
+      "antes": 63,
+      "valor": 153
+    },
+    {
+      "personagem": "p05",
+      "campo": "fighter.super.airSpawnY",
+      "antes": 79,
+      "valor": 149
+    },
+    {
+      "personagem": "p06",
+      "campo": "fighter.body.standHeight",
+      "antes": 153,
+      "valor": 203
+    },
+    {
+      "personagem": "p06",
+      "campo": "fighter.body.pushHeight",
+      "antes": 126,
+      "valor": 196
+    },
+    {
+      "personagem": "p06",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 95,
+      "valor": 145
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.L.reach",
+      "antes": 88,
+      "valor": 108
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.L.hitHeight",
+      "antes": 82,
+      "valor": 168
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.M.reach",
+      "antes": 122,
+      "valor": 116
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.M.hitHeight",
+      "antes": 82,
+      "valor": 178
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.H.reach",
+      "antes": 155,
+      "valor": 145
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.H.hitHeight",
+      "antes": 82,
+      "valor": 192
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.2L.reach",
+      "antes": 88,
+      "valor": 138
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.2L.hitHeight",
+      "antes": 44,
+      "valor": 114
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.2M.reach",
+      "antes": 122,
+      "valor": 192
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.2M.hitHeight",
+      "antes": 44,
+      "valor": 24
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.2H.reach",
+      "antes": 155,
+      "valor": 35
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.2H.hitHeight",
+      "antes": 44,
+      "valor": 284
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.jL.reach",
+      "antes": 88,
+      "valor": 118
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.jL.hitHeight",
+      "antes": 82,
+      "valor": 192
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.jM.reach",
+      "antes": 122,
+      "valor": 192
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.jM.hitHeight",
+      "antes": 82,
+      "valor": 102
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.jH.reach",
+      "antes": 155,
+      "valor": 135
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.jH.hitHeight",
+      "antes": 82,
+      "valor": 152
+    },
+    {
+      "personagem": "p06",
+      "campo": "moves.j2H.reach",
+      "antes": 155,
+      "valor": 75
+    },
+    {
+      "personagem": "p06",
+      "campo": "specialMoves.S2.reach",
+      "antes": 106,
+      "valor": 86
+    },
+    {
+      "personagem": "p06",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 137,
+      "valor": 177
+    },
+    {
+      "personagem": "p06",
+      "campo": "specialMoves.S3.reach",
+      "antes": 115,
+      "valor": 135
+    },
+    {
+      "personagem": "p06",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 95,
+      "valor": 185
+    },
+    {
+      "personagem": "p06",
+      "campo": "specialMoves.S4.reach",
+      "antes": 147,
+      "valor": 197
+    },
+    {
+      "personagem": "p06",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 115,
+      "valor": 135
+    },
+    {
+      "personagem": "p06",
+      "campo": "fighter.super.airSpawnY",
+      "antes": 86,
+      "valor": 176
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.body.halfWidth",
+      "antes": 36,
+      "valor": 56
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.body.standHeight",
+      "antes": 152,
+      "valor": 262
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.body.pushHeight",
+      "antes": 126,
+      "valor": 266
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 94,
+      "valor": 154
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.L.reach",
+      "antes": 88,
+      "valor": 118
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.L.hitHeight",
+      "antes": 82,
+      "valor": 232
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.M.reach",
+      "antes": 122,
+      "valor": 192
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.M.hitHeight",
+      "antes": 82,
+      "valor": 212
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.H.hitHeight",
+      "antes": 82,
+      "valor": 272
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.2L.reach",
+      "antes": 88,
+      "valor": 118
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.2L.hitHeight",
+      "antes": 44,
+      "valor": 94
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.2M.reach",
+      "antes": 122,
+      "valor": 152
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.2M.hitHeight",
+      "antes": 44,
+      "valor": 24
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.2H.reach",
+      "antes": 155,
+      "valor": 175
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.2H.hitHeight",
+      "antes": 44,
+      "valor": 174
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.jL.reach",
+      "antes": 88,
+      "valor": 188
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.jL.hitHeight",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.jM.reach",
+      "antes": 122,
+      "valor": 192
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.jM.hitHeight",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.jH.reach",
+      "antes": 155,
+      "valor": 215
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.jH.hitHeight",
+      "antes": 82,
+      "valor": 172
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.j2H.reach",
+      "antes": 155,
+      "valor": 215
+    },
+    {
+      "personagem": "p07",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 82,
+      "valor": 172
+    },
+    {
+      "personagem": "p07",
+      "campo": "specialMoves.S2.reach",
+      "antes": 105,
+      "valor": 185
+    },
+    {
+      "personagem": "p07",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 136,
+      "valor": 236
+    },
+    {
+      "personagem": "p07",
+      "campo": "specialMoves.S3.reach",
+      "antes": 115,
+      "valor": 225
+    },
+    {
+      "personagem": "p07",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 94,
+      "valor": 194
+    },
+    {
+      "personagem": "p07",
+      "campo": "specialMoves.S4.reach",
+      "antes": 146,
+      "valor": 276
+    },
+    {
+      "personagem": "p07",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 115,
+      "valor": 185
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.energy.spawnX",
+      "antes": 65,
+      "valor": 175
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.energy.spawnY",
+      "antes": 86,
+      "valor": 236
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.super.spawnX",
+      "antes": 82,
+      "valor": 152
+    },
+    {
+      "personagem": "p07",
+      "campo": "fighter.super.spawnY",
+      "antes": 90,
+      "valor": 200
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.body.halfWidth",
+      "antes": 35,
+      "valor": 23
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.body.standHeight",
+      "antes": 146,
+      "valor": 246
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 30,
+      "valor": 26
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.body.pushHeight",
+      "antes": 121,
+      "valor": 241
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 91,
+      "valor": 151
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.L.reach",
+      "antes": 84,
+      "valor": 104
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.L.hitHeight",
+      "antes": 79,
+      "valor": 219
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.M.reach",
+      "antes": 117,
+      "valor": 177
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.M.hitHeight",
+      "antes": 79,
+      "valor": 179
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.H.reach",
+      "antes": 149,
+      "valor": 269
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.H.hitHeight",
+      "antes": 79,
+      "valor": 199
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.2L.reach",
+      "antes": 84,
+      "valor": 124
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.2L.hitHeight",
+      "antes": 42,
+      "valor": 62
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.2M.reach",
+      "antes": 117,
+      "valor": 147
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.2M.hitHeight",
+      "antes": 42,
+      "valor": 32
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.2H.reach",
+      "antes": 149,
+      "valor": 89
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.2H.hitHeight",
+      "antes": 42,
+      "valor": 222
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.jL.hitHeight",
+      "antes": 79,
+      "valor": 159
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.jM.reach",
+      "antes": 117,
+      "valor": 177
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.jM.hitHeight",
+      "antes": 79,
+      "valor": 189
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.jH.hitHeight",
+      "antes": 79,
+      "valor": 189
+    },
+    {
+      "personagem": "p08",
+      "campo": "moves.j2H.reach",
+      "antes": 149,
+      "valor": 79
+    },
+    {
+      "personagem": "p08",
+      "campo": "specialMoves.S2.reach",
+      "antes": 101,
+      "valor": 281
+    },
+    {
+      "personagem": "p08",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 131,
+      "valor": 201
+    },
+    {
+      "personagem": "p08",
+      "campo": "specialMoves.S3.reach",
+      "antes": 111,
+      "valor": 121
+    },
+    {
+      "personagem": "p08",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 91,
+      "valor": 211
+    },
+    {
+      "personagem": "p08",
+      "campo": "specialMoves.S4.reach",
+      "antes": 141,
+      "valor": 151
+    },
+    {
+      "personagem": "p08",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 111,
+      "valor": 141
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.energy.spawnX",
+      "antes": 63,
+      "valor": 103
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.energy.spawnY",
+      "antes": 82,
+      "valor": 212
+    },
+    {
+      "personagem": "p08",
+      "campo": "fighter.super.spawnY",
+      "antes": 86,
+      "valor": 216
+    },
+    {
+      "personagem": "p09",
+      "campo": "fighter.body.standHeight",
+      "antes": 152,
+      "valor": 242
+    },
+    {
+      "personagem": "p09",
+      "campo": "fighter.body.pushHeight",
+      "antes": 126,
+      "valor": 246
+    },
+    {
+      "personagem": "p09",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 94,
+      "valor": 164
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.L.reach",
+      "antes": 88,
+      "valor": 148
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.L.hitHeight",
+      "antes": 82,
+      "valor": 212
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.M.reach",
+      "antes": 122,
+      "valor": 192
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.M.hitHeight",
+      "antes": 82,
+      "valor": 202
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.H.reach",
+      "antes": 155,
+      "valor": 115
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.H.hitHeight",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.2L.reach",
+      "antes": 88,
+      "valor": 178
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.2L.hitHeight",
+      "antes": 44,
+      "valor": 104
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.2M.reach",
+      "antes": 122,
+      "valor": 202
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.2M.hitHeight",
+      "antes": 44,
+      "valor": 24
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.2H.reach",
+      "antes": 155,
+      "valor": 45
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.2H.hitHeight",
+      "antes": 44,
+      "valor": 314
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.jL.reach",
+      "antes": 88,
+      "valor": 178
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.jL.hitHeight",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.jM.reach",
+      "antes": 122,
+      "valor": 172
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.jM.hitHeight",
+      "antes": 82,
+      "valor": 132
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.jH.reach",
+      "antes": 155,
+      "valor": 85
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.jH.hitHeight",
+      "antes": 82,
+      "valor": 92
+    },
+    {
+      "personagem": "p09",
+      "campo": "moves.j2H.reach",
+      "antes": 155,
+      "valor": 95
+    },
+    {
+      "personagem": "p09",
+      "campo": "specialMoves.S3.reach",
+      "antes": 115,
+      "valor": 85
+    },
+    {
+      "personagem": "p09",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 94,
+      "valor": 214
+    },
+    {
+      "personagem": "p09",
+      "campo": "specialMoves.S4.reach",
+      "antes": 146,
+      "valor": 204
+    },
+    {
+      "personagem": "p09",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 115,
+      "valor": 195
+    },
+    {
+      "personagem": "p09",
+      "campo": "fighter.energy.spawnX",
+      "antes": 65,
+      "valor": 165
+    },
+    {
+      "personagem": "p09",
+      "campo": "fighter.energy.spawnY",
+      "antes": 86,
+      "valor": 176
+    },
+    {
+      "personagem": "p09",
+      "campo": "fighter.super.spawnY",
+      "antes": 90,
+      "valor": 150
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.body.halfWidth",
+      "antes": 34,
+      "valor": 36
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.body.standHeight",
+      "antes": 143,
+      "valor": 229
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 29,
+      "valor": 25
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.body.pushHeight",
+      "antes": 118,
+      "valor": 226
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 89,
+      "valor": 129
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.L.reach",
+      "antes": 82,
+      "valor": 122
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.L.hitHeight",
+      "antes": 77,
+      "valor": 187
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.M.reach",
+      "antes": 114,
+      "valor": 184
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.M.hitHeight",
+      "antes": 77,
+      "valor": 177
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.H.reach",
+      "antes": 146,
+      "valor": 126
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.H.hitHeight",
+      "antes": 77,
+      "valor": 107
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.2L.reach",
+      "antes": 82,
+      "valor": 122
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.2L.hitHeight",
+      "antes": 41,
+      "valor": 111
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.2M.reach",
+      "antes": 114,
+      "valor": 154
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.2M.hitHeight",
+      "antes": 41,
+      "valor": 21
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.2H.hitHeight",
+      "antes": 41,
+      "valor": 251
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.jL.reach",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.jL.hitHeight",
+      "antes": 77,
+      "valor": 127
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.jM.reach",
+      "antes": 114,
+      "valor": 184
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.jM.hitHeight",
+      "antes": 77,
+      "valor": 117
+    },
+    {
+      "personagem": "p10",
+      "campo": "moves.j2H.reach",
+      "antes": 146,
+      "valor": 106
+    },
+    {
+      "personagem": "p10",
+      "campo": "specialMoves.S2.reach",
+      "antes": 99,
+      "valor": 129
+    },
+    {
+      "personagem": "p10",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 128,
+      "valor": 188
+    },
+    {
+      "personagem": "p10",
+      "campo": "specialMoves.S3.reach",
+      "antes": 108,
+      "valor": 188
+    },
+    {
+      "personagem": "p10",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 89,
+      "valor": 209
+    },
+    {
+      "personagem": "p10",
+      "campo": "specialMoves.S4.reach",
+      "antes": 137,
+      "valor": 147
+    },
+    {
+      "personagem": "p10",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 108,
+      "valor": 218
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.energy.spawnX",
+      "antes": 61,
+      "valor": 121
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.energy.spawnY",
+      "antes": 81,
+      "valor": 181
+    },
+    {
+      "personagem": "p10",
+      "campo": "fighter.super.spawnY",
+      "antes": 84,
+      "valor": 184
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.body.halfWidth",
+      "antes": 37,
+      "valor": 57
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.body.standHeight",
+      "antes": 155,
+      "valor": 245
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 32,
+      "valor": 42
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.body.pushHeight",
+      "antes": 128,
+      "valor": 248
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 96,
+      "valor": 156
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.L.reach",
+      "antes": 89,
+      "valor": 149
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.L.hitHeight",
+      "antes": 83,
+      "valor": 213
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.M.reach",
+      "antes": 124,
+      "valor": 144
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.M.hitHeight",
+      "antes": 83,
+      "valor": 213
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.H.reach",
+      "antes": 158,
+      "valor": 154
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.H.hitHeight",
+      "antes": 83,
+      "valor": 163
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.2L.reach",
+      "antes": 89,
+      "valor": 149
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.2L.hitHeight",
+      "antes": 45,
+      "valor": 115
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.2M.reach",
+      "antes": 124,
+      "valor": 164
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.2H.reach",
+      "antes": 158,
+      "valor": 68
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.2H.hitHeight",
+      "antes": 45,
+      "valor": 335
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.jL.reach",
+      "antes": 89,
+      "valor": 109
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.jL.hitHeight",
+      "antes": 83,
+      "valor": 193
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.jM.reach",
+      "antes": 124,
+      "valor": 204
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.jM.hitHeight",
+      "antes": 83,
+      "valor": 153
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.jH.hitHeight",
+      "antes": 83,
+      "valor": 173
+    },
+    {
+      "personagem": "p11",
+      "campo": "moves.j2H.reach",
+      "antes": 158,
+      "valor": 98
+    },
+    {
+      "personagem": "p11",
+      "campo": "specialMoves.S2.reach",
+      "antes": 107,
+      "valor": 127
+    },
+    {
+      "personagem": "p11",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 139,
+      "valor": 229
+    },
+    {
+      "personagem": "p11",
+      "campo": "specialMoves.S3.reach",
+      "antes": 117,
+      "valor": 177
+    },
+    {
+      "personagem": "p11",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 96,
+      "valor": 206
+    },
+    {
+      "personagem": "p11",
+      "campo": "specialMoves.S4.reach",
+      "antes": 149,
+      "valor": 199
+    },
+    {
+      "personagem": "p11",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 117,
+      "valor": 207
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.energy.spawnX",
+      "antes": 66,
+      "valor": 126
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.energy.spawnY",
+      "antes": 87,
+      "valor": 227
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.super.spawnX",
+      "antes": 83,
+      "valor": 163
+    },
+    {
+      "personagem": "p11",
+      "campo": "fighter.super.spawnY",
+      "antes": 91,
+      "valor": 201
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.body.halfWidth",
+      "antes": 34,
+      "valor": 46
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.body.standHeight",
+      "antes": 141,
+      "valor": 191
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.body.pushHalfWidth",
+      "antes": 29,
+      "valor": 49
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.body.pushHeight",
+      "antes": 117,
+      "valor": 197
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.body.crouchHeight",
+      "antes": 88,
+      "valor": 98
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.L.reach",
+      "antes": 82,
+      "valor": 182
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.L.hitHeight",
+      "antes": 76,
+      "valor": 144
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.M.reach",
+      "antes": 113,
+      "valor": 153
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.M.hitHeight",
+      "antes": 76,
+      "valor": 186
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.H.reach",
+      "antes": 144,
+      "valor": 104
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.H.hitHeight",
+      "antes": 76,
+      "valor": 166
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.2L.reach",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.2L.hitHeight",
+      "antes": 41,
+      "valor": 21
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.2M.reach",
+      "antes": 113,
+      "valor": 183
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.2M.hitHeight",
+      "antes": 41,
+      "valor": 61
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.2H.reach",
+      "antes": 144,
+      "valor": 34
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.2H.hitHeight",
+      "antes": 41,
+      "valor": 257
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.jL.reach",
+      "antes": 82,
+      "valor": 142
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.jL.hitHeight",
+      "antes": 76,
+      "valor": 196
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.jM.reach",
+      "antes": 113,
+      "valor": 231
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.jM.hitHeight",
+      "antes": 76,
+      "valor": 72
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.jH.hitHeight",
+      "antes": 76,
+      "valor": 176
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.j2H.reach",
+      "antes": 144,
+      "valor": 74
+    },
+    {
+      "personagem": "p12",
+      "campo": "moves.j2H.hitHeight",
+      "antes": 76,
+      "valor": 106
+    },
+    {
+      "personagem": "p12",
+      "campo": "specialMoves.S2.reach",
+      "antes": 98,
+      "valor": 138
+    },
+    {
+      "personagem": "p12",
+      "campo": "specialMoves.S2.hitHeight",
+      "antes": 127,
+      "valor": 187
+    },
+    {
+      "personagem": "p12",
+      "campo": "specialMoves.S3.reach",
+      "antes": 107,
+      "valor": 157
+    },
+    {
+      "personagem": "p12",
+      "campo": "specialMoves.S3.hitHeight",
+      "antes": 88,
+      "valor": 178
+    },
+    {
+      "personagem": "p12",
+      "campo": "specialMoves.S4.hitHeight",
+      "antes": 107,
+      "valor": 167
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.energy.spawnX",
+      "antes": 61,
+      "valor": 121
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.energy.spawnY",
+      "antes": 80,
+      "valor": 150
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.super.spawnX",
+      "antes": 76,
+      "valor": 116
+    },
+    {
+      "personagem": "p12",
+      "campo": "fighter.super.spawnY",
+      "antes": 83,
+      "valor": 183
+    }
+  ]
+}

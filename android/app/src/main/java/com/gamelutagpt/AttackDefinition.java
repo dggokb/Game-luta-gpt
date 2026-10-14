@@ -73,6 +73,8 @@ final class AttackDefinition {
     /** Must be guarded crouching. Airborne attackers are always overheads. */
     final boolean low;
     final float reach, hitHeight;
+    /** Base of the default strike box: hitHeight minus the slack, or lower for a sweeping hit (uppercut). */
+    final float hitFloor;
     private final Box[] hitboxes;
     private final Box[] hurtboxes;
 
@@ -104,12 +106,13 @@ final class AttackDefinition {
         low = b.low;
         reach = b.reach;
         hitHeight = b.hitHeight;
+        hitFloor = Math.min(b.hitFloor > 0f ? b.hitFloor : Float.MAX_VALUE, hitHeight - CombatRules.VERTICAL_SLACK);
         if (b.hitboxes.isEmpty() && kind == Kind.NORMAL) {
-            // Default strike: from the root to the reach, around hitHeight, on every active frame.
+            // Default strike: from the root to the reach, from hitFloor up to hitHeight + slack, on every active frame.
             hitboxes = new Box[] { new Box(
                 startupFrames, startupFrames + activeFrames - 1,
                 0f, reach,
-                hitHeight - CombatRules.VERTICAL_SLACK, hitHeight + CombatRules.VERTICAL_SLACK
+                hitFloor, hitHeight + CombatRules.VERTICAL_SLACK
             ) };
         } else {
             hitboxes = b.hitboxes.toArray(new Box[0]);
@@ -187,7 +190,7 @@ final class AttackDefinition {
         private float pushbackOnHit, pushbackOnBlock;
         private int juggleCost = 1, maxHits = 1, maxUses = 0;
         private boolean low;
-        private float reach, hitHeight;
+        private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
         private final List<Box> hurtboxes = new ArrayList<>();
 
@@ -216,6 +219,8 @@ final class AttackDefinition {
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
         Builder reach(float reachValue, float hitHeightValue) { reach = reachValue; hitHeight = hitHeightValue; return this; }
+        /** Reach with the box stretched down to {@code floor} (fist path of an uppercut). */
+        Builder reach(float reachValue, float hitHeightValue, float floor) { reach(reachValue, hitHeightValue); hitFloor = floor; return this; }
         Builder hitbox(int first, int last, float x0, float x1, float y0, float y1) {
             hitboxes.add(new Box(first, last, x0, x1, y0, y1)); return this;
         }
