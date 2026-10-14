@@ -1,8 +1,8 @@
-# Mecânicas por personagem — v3 (números no jogo)
+# Mecânicas por personagem — v4 (números e mecânicas no jogo)
 
 Documento de trabalho. Traduz o estilo de cada ficha (`pNN.md`) em números de jogo.
-**Vida, dano, tempo dos golpes e projéteis já estão no jogo (14/10, seção 3);** as mecânicas
-únicas 🔧 ainda não. A ideia é jogar, rever e ajustar.
+**Vida, dano, tempo dos golpes, projéteis (seção 3) e as mecânicas únicas (seção 4) já estão
+no jogo (14/10).** A ideia é jogar, rever e ajustar.
 
 Ordem combinada:
 
@@ -167,7 +167,39 @@ jL 4/3/6 · jM 6/4/8 · jH 9/5/10 · S2 6/8/22 · S3 18/4/18 · S4 10/14/14 · S
 compressão fica natural; acima disso o vídeo tem movimento sobrando antes ou depois do golpe,
 e o certo é cortar o trecho (refazer a receita do clipe), não comprimir mais.
 
-## 4. Perguntas em aberto
+## 4. Mecânicas únicas no jogo (14/10)
+
+Definidas no bloco `unica` de `tools/sprites/mecanicas.json` e aplicadas pelo mesmo
+`mecanicas.py` (grava `mecanica` nos golpes e no lutador do `character.json`). O motor sabe
+fazer: **armadura** (aguenta N golpes sem atordoar), **contra-golpe** (lê golpe alto, baixo ou
+qualquer um na preparação e responde na hora), **esquiva** (passa por baixo de golpe alto e de
+projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival),
+**teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata),
+**custo de vida**, **fúria** (dano cresce com a vida perdida), **air dashes extras** e
+**agarrão próprio** (dano e alcance). Testes: `MechanicsTest`.
+
+Na tela: aura dourada (armadura), anel ciano (postura de contra-golpe), véu branco (esquiva),
+bolhas verdes (envenenado), brasas vermelhas (fúria) e as faixas CONTRA-GOLPE!, ARMADURA! e VENENO!.
+
+| # | Mecânica no jogo |
+|---|---|
+| **p01** | Referência do elenco: sem mecânica própria (projétil, anti-aéreo e punição). |
+| **p02** | Contra-golpe alto: o S3 lê golpes em pé e no ar durante a preparação e responde na hora. |
+| **p03** | Rekka: o S3 avança e encadeia até 3 vezes (novo comando a cada investida); o S2 sobe avançando. |
+| **p04** | Esquiva que cancela: o S3 passa por baixo de golpe alto e de projétil e pode virar soco (L, M, H); a cabeçada (S2) avança. |
+| **p05** | Teleporte: o S3 some na fumaça e reaparece atrás do rival; o corte de mão (S4) avança baixo. |
+| **p06** | Puxar: o S3 alcança longe e arrasta o rival para perto (o eco de sombra fica para a próxima etapa). |
+| **p07** | Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar. |
+| **p08** | Chicote: alcance longo nos fortes; contra-golpe baixo no S3 (pune quem tenta passar por baixo). |
+| **p09** | Grappler: armadura de 1 golpe no escudo (S3) e na ombrada (S4, que avança); agarrão mais forte e de mais longe. |
+| **p10** | Acrobata: dois air dashes por pulo, esquiva alta no S3 e voadora (S4) que atravessa o rival. |
+| **p11** | Veneno: a seringa (S2) e a resposta do contra-golpe (S3, lê qualquer golpe) envenenam; o passo cirúrgico (S4) avança. |
+| **p12** | Fúria: bate até 40% mais forte conforme perde vida; os especiais custam vida e a Fúria (S3) tem armadura. |
+
+**Ainda falta (precisa de desenho ou de efeito novo):** eco de sombra da p06, capangas no
+Super do p07, wall jump do p05 e a Onda carregável do p01.
+
+## 5. Perguntas em aberto
 
 1. **Os moldes fazem sentido?** Algum personagem está no molde errado? (ex.: p02 é mais
    rushdown ou mais contra-ataque?)
@@ -179,11 +211,11 @@ e o certo é cortar o trecho (refazer a receita do clipe), não comprimir mais.
    Prefere outra coisa?
 7. **Ordem de implementar:** sugestão abaixo.
 
-## 5. Ordem sugerida de implementação
+## 6. Ordem sugerida de implementação
 
 1. ✅ **Feito (14/10):** vida, dano, projéteis e frame data de todos (alcance ficou o do app).
 2. ✅ **Feito (14/10):** cadência do vídeo nas animações dos golpes.
 3. Jogar, rever e ajustar o que não fizer sentido (mexer no número e refazer a animação).
-4. 🔧 Mecânicas únicas, uma por vez, das mais simples para as mais complexas: chicote (p08,
+4. ✅ **Feito (14/10), menos os itens de "Ainda falta":** mecânicas únicas, uma por vez, das mais simples para as mais complexas: chicote (p08,
    já é dado) → armadura (p09, p12) → contra-golpes → esquiva (p04, p10) → rekka (p03) →
    veneno (p11) → teleporte e wall jump (p05) → clones, puxar e capangas (p06, p07).

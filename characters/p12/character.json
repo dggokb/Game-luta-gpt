@@ -53,7 +53,10 @@
         ],
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
-        "pushbackOnBlock": 50
+        "pushbackOnBlock": 50,
+        "mecanica": {
+          "custoVida": 150
+        }
       }
     },
     "super": {
@@ -82,6 +85,9 @@
     },
     "assist": {
       "move": "S"
+    },
+    "mecanica": {
+      "furia": 400
     }
   },
   "animations": {
@@ -1850,7 +1856,10 @@
       "launchType": "knockdown",
       "knockback": 60,
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "custoVida": 250
+      }
     },
     "S3": {
       "command": [
@@ -1883,7 +1892,17 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "custoVida": 250,
+        "armadura": {
+          "golpes": 1,
+          "frames": [
+            1,
+            17
+          ]
+        }
+      }
     },
     "S4": {
       "command": [
@@ -1917,7 +1936,10 @@
       "launchType": "knockdown",
       "knockback": 70,
       "pushbackOnHit": 30,
-      "pushbackOnBlock": 60
+      "pushbackOnBlock": 60,
+      "mecanica": {
+        "custoVida": 250
+      }
     }
   }
 }

@@ -1859,7 +1859,7 @@
       ],
       "animation": "SPECIAL_S3",
       "damage": 760,
-      "reach": 135,
+      "reach": 380,
       "hitHeight": 185,
       "startupFrames": 18,
       "activeFrames": 4,
@@ -1879,7 +1879,10 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "puxar": 320
+      }
     },
     "S4": {
       "command": [

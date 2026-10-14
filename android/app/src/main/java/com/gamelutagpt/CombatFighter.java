@@ -69,6 +69,8 @@ final class CombatFighter {
     int autoStep = -1;
     int hitsOnTarget;
     long hitboxMask;
+    /** Hits the current move's armor already absorbed. */
+    int armorUsed;
 
     // Reaction.
     int stunLeft;
@@ -139,6 +141,8 @@ final class CombatFighter {
     boolean airDashBack;
     /** The air dash of this jump was spent; landing gives it back. */
     boolean airDashUsed;
+    /** Air dashes done in this jump (a fighter may have more than one). */
+    int airDashCount;
 
     // Throw.
     int throwPhase;
@@ -264,5 +268,15 @@ final class CombatFighter {
         autoStep = -1;
         hitsOnTarget = 0;
         hitboxMask = 0L;
+        armorUsed = 0;
+    }
+
+    /** Mechanics of the move in progress at its current frame (none outside an attack). */
+    AttackDefinition.Mechanics mechanics() {
+        return attacking() ? attack.mechanics : AttackDefinition.NO_MECHANICS;
+    }
+
+    int moveFrame() {
+        return Math.max(0, attackFrame);
     }
 }

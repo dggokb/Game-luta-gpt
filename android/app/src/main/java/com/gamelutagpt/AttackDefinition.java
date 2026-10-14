@@ -52,6 +52,56 @@ final class AttackDefinition {
         boolean activeAt(int frame) { return frame >= firstFrame && frame <= lastFrame; }
     }
 
+    /** What a counter stance catches, and what an evasion slips under. */
+    enum Reads { NONE, HIGH, LOW, ANY }
+
+    /**
+     * Character mechanics of a move (docs/personagens/mecanicas.md), all optional. Frame
+     * ranges count from the first frame of the move, like the hitboxes.
+     */
+    static final class Mechanics {
+        /** Super armor: absorbs this many hits in [armorStart, armorEnd] (damage, no stun). */
+        int armorHits, armorStart, armorEnd;
+        /** Counter stance: a melee strike it reads in the window is answered by this move. */
+        Reads counter = Reads.NONE;
+        int counterStart, counterEnd;
+        /** Evasion: HIGH slips standing/air strikes and projectiles, ANY everything. */
+        Reads evade = Reads.NONE;
+        int evadeStart, evadeEnd;
+        /** Forward travel (world units per second) in [advanceStart, advanceEnd]. */
+        float advanceSpeed;
+        int advanceStart, advanceEnd;
+        /** The body passes through the opponent while advancing (cross-up). */
+        boolean passThrough;
+        /** Frame on which the fighter reappears behind the opponent, or -1. */
+        int teleportFrame = -1;
+        /** On hit the defender is pulled this far toward the attacker instead of pushed. */
+        float pull;
+        /** On hit: this much damage over poisonFrames (never the last point of life). */
+        int poisonDamage, poisonFrames;
+        /** Life the attacker pays when the move starts (never the last point). */
+        int lifeCost;
+
+        Mechanics armor(int hits, int start, int end) { armorHits = hits; armorStart = start; armorEnd = end; return this; }
+        Mechanics counter(Reads reads, int start, int end) { counter = reads; counterStart = start; counterEnd = end; return this; }
+        Mechanics evade(Reads reads, int start, int end) { evade = reads; evadeStart = start; evadeEnd = end; return this; }
+        Mechanics advance(float speed, int start, int end, boolean through) {
+            advanceSpeed = speed; advanceStart = start; advanceEnd = end; passThrough = through; return this;
+        }
+        Mechanics teleport(int frame) { teleportFrame = frame; return this; }
+        Mechanics pull(float distance) { pull = distance; return this; }
+        Mechanics poison(int damage, int frames) { poisonDamage = damage; poisonFrames = frames; return this; }
+        Mechanics lifeCost(int value) { lifeCost = value; return this; }
+
+        boolean armorAt(int frame) { return armorHits > 0 && frame >= armorStart && frame <= armorEnd; }
+        boolean counterAt(int frame) { return counter != Reads.NONE && frame >= counterStart && frame <= counterEnd; }
+        boolean evadeAt(int frame) { return evade != Reads.NONE && frame >= evadeStart && frame <= evadeEnd; }
+        boolean advanceAt(int frame) { return advanceSpeed > 0f && frame >= advanceStart && frame <= advanceEnd; }
+    }
+
+    /** Mechanics with nothing in them (moves without a character mechanic). */
+    static final Mechanics NO_MECHANICS = new Mechanics();
+
     final String id;
     final Kind kind;
     final Strength strength;
@@ -77,8 +127,11 @@ final class AttackDefinition {
     final float hitFloor;
     private final Box[] hitboxes;
     private final Box[] hurtboxes;
+    /** Character mechanics of the move; never null. */
+    final Mechanics mechanics;
 
     private AttackDefinition(Builder b) {
+        mechanics = b.mechanics;
         id = b.id;
         kind = b.kind;
         strength = b.strength;
@@ -193,6 +246,7 @@ final class AttackDefinition {
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
         private final List<Box> hurtboxes = new ArrayList<>();
+        private Mechanics mechanics = NO_MECHANICS;
 
         Builder(String id, Kind kind) {
             this.id = id;
@@ -227,6 +281,7 @@ final class AttackDefinition {
         Builder hurtbox(int first, int last, float x0, float x1, float y0, float y1) {
             hurtboxes.add(new Box(first, last, x0, x1, y0, y1)); return this;
         }
+        Builder mechanics(Mechanics value) { mechanics = value; return this; }
 
         AttackDefinition build() {
             String name = "attack " + id + ": ";
@@ -275,7 +330,26 @@ final class AttackDefinition {
             } else if (active != 1 || !hitboxes.isEmpty()) {
                 throw new IllegalArgumentException(name + "projectile moves spawn on one active frame and have no hitboxes");
             }
+            Mechanics m = mechanics;
+            if (m.armorHits < 0 || m.poisonDamage < 0 || m.lifeCost < 0 || m.pull < 0f || m.advanceSpeed < 0f) {
+                throw new IllegalArgumentException(name + "mechanics cannot be negative");
+            }
+            if (m.armorHits > 0) checkRange(name + "armor", m.armorStart, m.armorEnd, total);
+            if (m.counter != Reads.NONE) checkRange(name + "counter", m.counterStart, m.counterEnd, total);
+            if (m.evade != Reads.NONE) checkRange(name + "evade", m.evadeStart, m.evadeEnd, total);
+            if (m.advanceSpeed > 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
+            if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
+            if (m.poisonDamage > 0 && m.poisonFrames < 1) throw new IllegalArgumentException(name + "poison needs frames");
+            if (m.counter != Reads.NONE && (kind != Kind.NORMAL || m.counterEnd >= startup)) {
+                throw new IllegalArgumentException(name + "a counter stance is a melee move that reads before its strike");
+            }
             return new AttackDefinition(this);
+        }
+
+        private static void checkRange(String name, int start, int end, int total) {
+            if (start < 0 || start > end || end >= total) {
+                throw new IllegalArgumentException(name + " [" + start + "," + end + "] is outside the move (0.." + (total - 1) + ")");
+            }
         }
 
         private static void checkWindow(String name, Window w, int total, int earliest) {

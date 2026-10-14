@@ -83,7 +83,13 @@
     "assist": {
       "move": "S"
     },
-    "wakeupFrames": 34
+    "wakeupFrames": 34,
+    "mecanica": {
+      "agarrao": {
+        "dano": 2200,
+        "alcance": 40
+      }
+    }
   },
   "animations": {
     "IDLE": {
@@ -1880,7 +1886,16 @@
       ],
       "pushbackOnHit": 40,
       "pushbackOnBlock": 50,
-      "hitFloor": 74
+      "hitFloor": 74,
+      "mecanica": {
+        "armadura": {
+          "golpes": 1,
+          "frames": [
+            1,
+            22
+          ]
+        }
+      }
     },
     "S4": {
       "command": [
@@ -1914,7 +1929,23 @@
       "launchType": "knockdown",
       "knockback": 70,
       "pushbackOnHit": 30,
-      "pushbackOnBlock": 60
+      "pushbackOnBlock": 60,
+      "mecanica": {
+        "armadura": {
+          "golpes": 1,
+          "frames": [
+            1,
+            12
+          ]
+        },
+        "avanco": {
+          "velocidade": 480,
+          "frames": [
+            0,
+            30
+          ]
+        }
+      }
     }
   }
 }

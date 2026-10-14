@@ -83,6 +83,8 @@ final class CombatConfig {
     float projectileAirVelocityScale = 0.32f;
     float projectileAirGravityScale = 0.12f;
     float facingEpsilon = 6f;
+    /** Space left between two bodies by a teleport or a pull (world units). */
+    float teleportGap = 24f;
 
     // Super meter, in thousandths of a bar.
     static final int METER_PER_BAR = 1000;

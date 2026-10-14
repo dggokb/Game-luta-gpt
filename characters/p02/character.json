@@ -1845,7 +1845,16 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "contra": {
+          "le": "alto",
+          "frames": [
+            1,
+            15
+          ]
+        }
+      }
     },
     "S4": {
       "command": [

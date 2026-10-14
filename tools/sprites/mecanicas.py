@@ -90,6 +90,51 @@ def fit_impact(anim, m):
     anim['durationsMs'] = [max(1, round(x)) for x in head + [hold * whole] + tail]
 
 
+def window(name, m):
+    """Janela nomeada em frames do golpe: startup = antes do golpe sair, ate_ativo = do início
+    ao último frame ativo."""
+    s, a = m['startupFrames'], m['activeFrames']
+    if isinstance(name, list):
+        return name
+    return {'startup': [1, s - 1], 'ate_ativo': [0, s + a - 1]}[name]
+
+
+def unique(pack, spec):
+    """Mecânica própria do personagem (bloco "unica"): grava "mecanica" nos golpes e no lutador."""
+    fighter = pack['fighter']
+    targets = dict(pack['moves'])
+    targets.update(pack.get('specialMoves', {}))
+    targets['S'] = fighter['energy']['attack']
+    for m in targets.values():
+        m.pop('mecanica', None)
+    fighter.pop('mecanica', None)
+    u = spec.get('unica', {})
+    for key, wanted in u.get('golpes', {}).items():
+        m, mech = targets[key], {}
+        for kind, value in wanted.items():
+            if kind == 'teleporte':
+                mech[kind] = m['startupFrames'] - 2 if value == 'fimStartup' else value
+            elif isinstance(value, dict) and 'janela' in value:
+                mech[kind] = {k: v for k, v in value.items() if k != 'janela'}
+                mech[kind]['frames'] = window(value['janela'], m)
+            else:
+                mech[kind] = value
+        m['mecanica'] = mech
+    for key, route in u.get('rotas', {}).items():
+        m = targets[key]
+        total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+        m['cancelInto'] = list(dict.fromkeys(m['cancelInto'] + route['cancelaEm']))
+        m['cancelWindows']['hit'] = m['cancelWindows']['block'] = [m['startupFrames'], total - 1]
+        if route.get('noVazio'):
+            m['cancelWindows']['whiff'] = [m['startupFrames'], total - 1]
+        if 'maxUsos' in route:
+            m['maxUsesPerCombo'] = route['maxUsos']
+    for key, reach in u.get('alcance', {}).items():
+        targets[key]['reach'] = reach
+    if u.get('lutador'):
+        fighter['mecanica'] = dict(u['lutador'])
+
+
 def scaled(base, f, air=False):
     """Startup e recuperação seguem o ritmo; no ar a janela ativa fica a da base (golpe
     aéreo precisa de tempo ativo para encostar na descida)."""
@@ -127,6 +172,7 @@ def apply(cid, spec, base):
     energy['range'] = spec['projetil']['alcance']
     attacks.append(('S', pack.get('specialAnimations', {}).get('S'), energy['attack']))
     fighter['super']['damage'] = damage('SUPER')
+    unique(pack, spec)
 
     for key, anim_id, m in attacks:
         total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']

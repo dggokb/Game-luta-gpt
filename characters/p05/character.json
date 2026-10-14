@@ -1871,7 +1871,17 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "teleporte": 13,
+        "esquiva": {
+          "de": "tudo",
+          "frames": [
+            1,
+            14
+          ]
+        }
+      }
     },
     "S4": {
       "command": [
@@ -1905,7 +1915,16 @@
       "launchType": "knockdown",
       "knockback": 70,
       "pushbackOnHit": 30,
-      "pushbackOnBlock": 60
+      "pushbackOnBlock": 60,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 520,
+          "frames": [
+            0,
+            19
+          ]
+        }
+      }
     }
   }
 }

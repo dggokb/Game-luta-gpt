@@ -546,6 +546,11 @@ final class CombatEngine {
         f.forwardDashing = false;
         f.backdashFrames = 0;
         if (f.move != null) f.crouching = attack.id.startsWith("2");
+        if (attack.mechanics.lifeCost > 0) {
+            // Fury: the special is paid with the fighter's own life.
+            f.state.payLife(attack.mechanics.lifeCost);
+            cues.add("LIFE_COST");
+        }
         if (attack.kind == AttackDefinition.Kind.PROJECTILE && !f.grounded) {
             f.vy *= config.projectileAirVelocityScale;
         }
@@ -587,9 +592,9 @@ final class CombatEngine {
         return ("L".equals(binding) || "M".equals(binding)) && f.attackFrame < f.attack.startupFrames;
     }
 
-    /** Air dash: a fixed burst forward (or back) that holds the height; one per jump. */
+    /** Air dash: a fixed burst forward (or back) that holds the height; one per jump (an acrobat has more). */
     private void startAirDash(CombatFighter f, boolean back) {
-        f.airDashUsed = true;
+        f.airDashUsed = ++f.airDashCount >= Math.max(1, f.state.profile.airDashes);
         f.airDashBack = back;
         f.airDashDirection = back ? -f.facing : f.facing;
         f.airDashFrames = back ? config.backAirDashFrames : config.airDashFrames;
@@ -680,6 +685,7 @@ final class CombatEngine {
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.launcherChase > 0) f.launcherChase--;
+        if (f.state.poisoned() && f.state.tickPoison() > 0 && f.state.poisonLeft == 0) cues.add("POISON_END");
 
         switch (f.status) {
             case ATTACK:
@@ -687,6 +693,7 @@ final class CombatEngine {
                 if (f.attack.kind != AttackDefinition.Kind.NORMAL && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
                 }
+                if (f.attackFrame == f.attack.mechanics.teleportFrame) teleportBehind(f);
                 break;
             case HITSTUN:
             case BLOCKSTUN:
@@ -716,6 +723,22 @@ final class CombatEngine {
         moveHorizontally(f);
         moveVertically(f);
         f.x = Arena.clamp(f.x, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+    }
+
+    /** Teleport: the fighter reappears just behind the opponent, already facing it. */
+    private void teleportBehind(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        int side = f.x <= other.x ? 1 : -1;
+        float gap = f.body().halfWidth + other.body().halfWidth + config.teleportGap;
+        float target = other.x + side * gap;
+        if (target < Arena.LEFT_BOUND || target > Arena.RIGHT_BOUND) {
+            // Cornered opponent: there is no room behind it, so the fighter lands in front.
+            target = other.x - side * gap;
+        }
+        f.x = Arena.clamp(target, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        f.facing = other.x >= f.x ? 1 : -1;
+        f.motion.clear();
+        cues.add("TELEPORT");
     }
 
     private void applyPush(CombatFighter f) {
@@ -794,6 +817,9 @@ final class CombatEngine {
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
+        } else if (f.attacking() && f.attack.mechanics.advanceAt(f.attackFrame)) {
+            // Rushing special (shoulder charge, flying kick, slide): it carries the body forward.
+            f.x += f.facing * f.attack.mechanics.advanceSpeed * boost * CombatConfig.DT;
         } else if (f.attacking() && !f.grounded && f.attack.kind == AttackDefinition.Kind.NORMAL) {
             // Air normals keep the jump's steering; ground attacks and specials lock it.
             f.x += horizontal * walk * CombatConfig.DT;
@@ -844,6 +870,7 @@ final class CombatEngine {
         f.grounded = true;
         f.airDashFrames = 0;
         f.airDashUsed = false;
+        f.airDashCount = 0;
         f.superJumping = false;
         if (f.attacking() && f.move != null && f.attack.id.startsWith("j")) {
             // Landing ends an air normal.
@@ -881,6 +908,7 @@ final class CombatEngine {
         f.grounded = true;
         f.airDashFrames = 0;
         f.airDashUsed = false;
+        f.airDashCount = 0;
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.launched = false;
@@ -904,13 +932,18 @@ final class CombatEngine {
 
     private void resolveBodies() {
         CombatFighter a = fighters[0], b = fighters[1];
-        // A wake-up roll passes through the other body.
-        if (a.rolling() || b.rolling()) return;
+        // A wake-up roll passes through the other body, and so does a cross-up rush.
+        if (a.rolling() || b.rolling() || passingThrough(a) || passingThrough(b)) return;
         if (CombatRules.resolvePush(a.x, a.y, a.body(), b.x, b.y, b.body(),
             Arena.LEFT_BOUND, Arena.RIGHT_BOUND, a.facing, pushResult)) {
             a.x = pushResult[0];
             b.x = pushResult[1];
         }
+    }
+
+    private static boolean passingThrough(CombatFighter f) {
+        AttackDefinition.Mechanics m = f.mechanics();
+        return m.passThrough && m.advanceAt(f.attackFrame);
     }
 
     private void updateFacing(CombatFighter f) {
@@ -1097,6 +1130,7 @@ final class CombatEngine {
     private void detectMelee(CombatFighter a, CombatFighter d) {
         if (a.frozen() || !a.attacking() || a.attack.kind != AttackDefinition.Kind.NORMAL) return;
         if (!a.attack.isActive(a.attackFrame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
+        if (evades(d, a.attack, !a.grounded, false)) return;
         CharacterDefinition.Body body = d.body();
         boolean crouch = d.crouchingBody();
         for (int i = 0; i < a.attack.hitboxCount(); i++) {
@@ -1107,6 +1141,27 @@ final class CombatEngine {
                 addContact(a, d, a.attack, i, null);
                 return;
             }
+        }
+    }
+
+    /**
+     * The defender's move slips this strike: a dodge under standing/air strikes and
+     * projectiles (HIGH), or a vanish that nothing touches (ANY). Low strikes still hit a HIGH dodge.
+     */
+    private static boolean evades(CombatFighter d, AttackDefinition attack, boolean airborneAttacker, boolean projectile) {
+        AttackDefinition.Mechanics m = d.mechanics();
+        if (!m.evadeAt(d.attackFrame)) return false;
+        if (m.evade == AttackDefinition.Reads.ANY) return true;
+        return projectile || airborneAttacker || !attack.low;
+    }
+
+    /** The counter stance reads this melee strike (high = standing and air strikes, low = low strikes). */
+    private static boolean reads(AttackDefinition.Reads reads, AttackDefinition attack, boolean airborneAttacker) {
+        switch (reads) {
+            case ANY: return true;
+            case HIGH: return airborneAttacker || !attack.low;
+            case LOW: return attack.low && !airborneAttacker;
+            default: return false;
         }
     }
 
@@ -1130,7 +1185,8 @@ final class CombatEngine {
         while (it.hasNext()) {
             Projectile p = it.next();
             CombatFighter d = fighters[1 - p.ownerIndex];
-            if (!d.hittable()) continue;
+            // An evading body lets the projectile fly on.
+            if (!d.hittable() || evades(d, p.attack, false, true)) continue;
             if (CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), d.crouchingBody())) {
                 addContact(fighters[p.ownerIndex], d, p.attack, -1, p);
                 it.remove();
@@ -1257,7 +1313,7 @@ final class CombatEngine {
         if (!a.grounded || !d.grounded) return false;
         float ahead = (d.x - a.x) * a.facing;
         float gap = Math.abs(d.x - a.x) - a.body().halfWidth - d.body().halfWidth;
-        return ahead >= 0f && gap <= config.throwRange;
+        return ahead >= 0f && gap <= config.throwRange + a.state.profile.throwRangeBonus;
     }
 
     /**
@@ -1314,7 +1370,10 @@ final class CombatEngine {
         endSession(d.index);
         ComboSession session = new ComboSession(a.index, d.index);
         sessions[d.index] = session;
-        int damage = session.registerHit(throwAttack, throwAttack.damage, config);
+        // A grappler throws harder than the engine's standard throw.
+        int own = a.state.profile.throwDamage;
+        int base = (own > 0 ? own : throwAttack.damage) * a.state.profile.furyScale(a.state.life) / 1000;
+        int damage = session.registerHit(throwAttack, base, config);
         d.state.takeDamage(damage, config.recoverableLifePermille);
         gainMeter(a, CombatRules.superGainOnHit(throwAttack.strength));
         d.framesSinceHit = 0;
@@ -1541,6 +1600,12 @@ final class CombatEngine {
             return;
         }
 
+        AttackDefinition.Mechanics stance = d.mechanics();
+        if (!projectile && stance.counterAt(d.attackFrame) && reads(stance.counter, attack, !a.grounded)) {
+            counter(d, a);
+            return;
+        }
+
         int guard = effectiveGuard(d);
         if (guardStops(guard, attack, !a.grounded, projectile)) {
             block(a, d, attack, guard, direction, projectile);
@@ -1548,11 +1613,29 @@ final class CombatEngine {
             return;
         }
 
+        // Fury: the attacker hits harder the less life it has left.
+        int raw = (projectile ? c.projectile.damage : attack.damage) * a.state.profile.furyScale(a.state.life) / 1000;
+        if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
+            // Super armor: the damage goes through, the stun does not; the move carries on.
+            d.armorUsed++;
+            d.state.takeDamage(raw, config.recoverableLifePermille);
+            gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
+            freeze(a, d, attack.hitstopFrames, projectile);
+            if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
+            cues.add("ARMOR");
+            events.add(new HitEvent(a.index, d.index, raw, false, projectile, attack.id));
+            return;
+        }
+
         session = sessionFor(a, d);
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
-        int damage = session.registerHit(attack, projectile ? c.projectile.damage : attack.damage, config);
+        int damage = session.registerHit(attack, raw, config);
         d.state.takeDamage(damage, config.recoverableLifePermille);
         gainMeter(a, CombatRules.superGainOnHit(attack.strength));
+        if (attack.mechanics.poisonDamage > 0) {
+            d.state.poison(attack.mechanics.poisonDamage, attack.mechanics.poisonFrames);
+            cues.add("POISON");
+        }
 
         boolean wasCrouching = d.crouchingBody();
         d.clearAttack();
@@ -1629,12 +1712,33 @@ final class CombatEngine {
             d.hitCrouching = wasCrouching;
             push(d, a, direction * attack.pushbackOnHit);
         }
+        if (attack.mechanics.pull > 0f && d.grounded && !projectile) {
+            // Pull: the defender is dragged to the attacker instead of pushed away.
+            float gap = Math.abs(d.x - a.x) - a.body().halfWidth - d.body().halfWidth - config.teleportGap;
+            push(d, a, -direction * Math.min(attack.mechanics.pull, Math.max(0f, gap)));
+            cues.add("PULL");
+        }
         // Every hit that leaves the defender juggled costs juggle points.
         if (d.status == CombatFighter.Status.AIR_HITSTUN) session.juggleCount += attack.juggleCost;
         if (!d.grounded) session.airCombo = true;
         freeze(a, d, attack.hitstopFrames, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
+    }
+
+    /**
+     * Counter: the stance read the strike. Nothing reaches the defender; its move jumps to
+     * the strike, which lands at once on the attacker (poison included when the move has it).
+     */
+    private void counter(CombatFighter d, CombatFighter a) {
+        cues.add("COUNTER");
+        d.attackFrame = d.attack.startupFrames;
+        Contact answer = new Contact();
+        answer.attacker = d;
+        answer.defender = a;
+        answer.attack = d.attack;
+        answer.hitbox = 0;
+        applyContact(answer);
     }
 
     /** Guarded contact: blockstun, pushback, guard meter and hitstop. */

@@ -83,7 +83,10 @@
     "assist": {
       "move": "S"
     },
-    "wakeupFrames": 32
+    "wakeupFrames": 32,
+    "mecanica": {
+      "airDashes": 2
+    }
   },
   "animations": {
     "IDLE": {
@@ -1901,7 +1904,16 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "esquiva": {
+          "de": "alto",
+          "frames": [
+            1,
+            14
+          ]
+        }
+      }
     },
     "S4": {
       "command": [
@@ -1936,7 +1948,17 @@
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
-      "hitFloor": 88
+      "hitFloor": 88,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 620,
+          "atravessa": true,
+          "frames": [
+            0,
+            19
+          ]
+        }
+      }
     }
   }
 }

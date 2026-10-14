@@ -1834,7 +1834,13 @@
       "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
-      "hitFloor": 119
+      "hitFloor": 119,
+      "mecanica": {
+        "veneno": {
+          "dano": 900,
+          "frames": 240
+        }
+      }
     },
     "S3": {
       "command": [
@@ -1867,7 +1873,20 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "contra": {
+          "le": "tudo",
+          "frames": [
+            1,
+            17
+          ]
+        },
+        "veneno": {
+          "dano": 600,
+          "frames": 180
+        }
+      }
     },
     "S4": {
       "command": [
@@ -1901,7 +1920,16 @@
       "launchType": "knockdown",
       "knockback": 70,
       "pushbackOnHit": 30,
-      "pushbackOnBlock": 60
+      "pushbackOnBlock": 60,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 480,
+          "frames": [
+            0,
+            23
+          ]
+        }
+      }
     }
   }
 }

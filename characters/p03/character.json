@@ -1881,7 +1881,16 @@
       "launchType": "knockdown",
       "knockback": 60,
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 300,
+          "frames": [
+            0,
+            13
+          ]
+        }
+      }
     },
     "S3": {
       "command": [
@@ -1905,16 +1914,30 @@
       "cancelWindows": {
         "hit": [
           17,
-          26
+          37
         ],
-        "block": null,
+        "block": [
+          17,
+          37
+        ],
         "whiff": null
       },
       "cancelInto": [
-        "SUPER"
+        "SUPER",
+        "S3"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 520,
+          "frames": [
+            0,
+            20
+          ]
+        }
+      },
+      "maxUsesPerCombo": 3
     },
     "S4": {
       "command": [

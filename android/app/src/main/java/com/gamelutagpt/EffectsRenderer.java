@@ -159,6 +159,71 @@ final class EffectsRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
 
+    static final int AURA_POISON = 0, AURA_ARMOR = 1, AURA_COUNTER = 2, AURA_EVADE = 3, AURA_FURY = 4;
+
+    /**
+     * Character mechanic around a fighter (docs/personagens/mecanicas.md): green bubbles for
+     * poison, a gold shell for armor, a cyan ring for a counter stance, a pale veil for an
+     * evasion and red embers for fury. {@code strength} 0..1 scales the effect.
+     */
+    void drawMechanicAura(Canvas c, Paint paint, float x, float baseY, float time, int kind, float strength) {
+        if (strength <= 0f) return;
+        float centerY = baseY - 100f;
+        int a = Math.round(255f * Math.min(1f, strength));
+        float pulse = 1f + 0.06f * (float)Math.sin(time * 16f);
+        paint.setStyle(Paint.Style.FILL);
+        switch (kind) {
+            case AURA_POISON:
+                paint.setColor(Color.argb(a * 45 / 255, 90, 230, 70));
+                c.drawOval(x - 70f, centerY - 105f, x + 70f, baseY + 6f, paint);
+                for (int i = 0; i < 6; i++) {
+                    float phase = (time * 0.9f + i / 6f) % 1f;
+                    float px = x + (float)Math.sin(i * 1.9f + time * 3f) * 46f;
+                    paint.setColor(Color.argb(Math.round(a * (1f - phase) * 0.85f), 120, 255, 90));
+                    c.drawCircle(px, baseY - 20f - phase * 190f, 5f + (i % 3) * 2f, paint);
+                }
+                break;
+            case AURA_ARMOR:
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(6f);
+                paint.setColor(Color.argb(a * 200 / 255, 255, 205, 70));
+                c.drawOval(x - 76f * pulse, centerY - 112f * pulse, x + 76f * pulse, baseY + 6f, paint);
+                paint.setStrokeWidth(2f);
+                paint.setColor(Color.argb(a * 150 / 255, 255, 250, 210));
+                c.drawOval(x - 68f * pulse, centerY - 104f * pulse, x + 68f * pulse, baseY, paint);
+                break;
+            case AURA_COUNTER:
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeWidth(4f);
+                paint.setColor(Color.argb(a * 210 / 255, 120, 230, 255));
+                c.drawCircle(x, centerY, 78f * pulse, paint);
+                paint.setColor(Color.argb(a * 120 / 255, 255, 255, 255));
+                c.drawArc(x - 92f, centerY - 92f, x + 92f, centerY + 92f, time * 400f % 360f, 70f, false, paint);
+                break;
+            case AURA_EVADE:
+                paint.setColor(Color.argb(a * 60 / 255, 230, 240, 255));
+                c.drawOval(x - 64f, centerY - 108f, x + 64f, baseY + 4f, paint);
+                break;
+            case AURA_FURY:
+                paint.setColor(Color.argb(a * 40 / 255, 255, 40, 30));
+                c.drawOval(x - 74f * pulse, centerY - 110f * pulse, x + 74f * pulse, baseY + 8f, paint);
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeCap(Paint.Cap.ROUND);
+                for (int i = 0; i < 5; i++) {
+                    float phase = (time * 1.6f + i / 5f) % 1f;
+                    float px = x + (float)Math.sin(i * 2.7f + time * 4f) * 54f;
+                    paint.setStrokeWidth(4f - phase * 2f);
+                    paint.setColor(Color.argb(Math.round(a * (1f - phase)), 255, 70 + i * 20, 30));
+                    c.drawLine(px, baseY - 10f - phase * 170f, px, baseY - 30f - phase * 170f, paint);
+                }
+                paint.setStrokeCap(Paint.Cap.BUTT);
+                break;
+            default:
+                break;
+        }
+        paint.setStyle(Paint.Style.FILL);
+    }
+
     /** Air dash streaks behind the body; canvas is mirrored so the motion goes right. */
     void drawAirDash(Canvas c, Paint paint, float x, float baseY, int color) {
         float centerY = baseY - 90f;

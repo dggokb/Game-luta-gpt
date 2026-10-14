@@ -1895,7 +1895,16 @@
       "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
-      "hitFloor": 111
+      "hitFloor": 111,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 450,
+          "frames": [
+            0,
+            13
+          ]
+        }
+      }
     },
     "S3": {
       "command": [
@@ -1919,16 +1928,34 @@
       "cancelWindows": {
         "hit": [
           18,
-          27
+          39
         ],
-        "block": null,
-        "whiff": null
+        "block": [
+          18,
+          39
+        ],
+        "whiff": [
+          18,
+          39
+        ]
       },
       "cancelInto": [
-        "SUPER"
+        "SUPER",
+        "L",
+        "M",
+        "H"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "esquiva": {
+          "de": "alto",
+          "frames": [
+            1,
+            17
+          ]
+        }
+      }
     },
     "S4": {
       "command": [

@@ -1923,7 +1923,16 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "mecanica": {
+        "contra": {
+          "le": "tudo",
+          "frames": [
+            1,
+            21
+          ]
+        }
+      }
     },
     "S4": {
       "command": [

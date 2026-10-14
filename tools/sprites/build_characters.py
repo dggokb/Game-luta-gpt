@@ -100,6 +100,7 @@ def validate_fighter(pack):
         if key in f:
             if 'attack' not in f[key]: raise ValueError(f'{name}.{key}: attack frame data is required')
             validate_attack(f'{name}.{key}.attack', f[key]['attack'], True)
+    if 'mecanica' in f: validate_fighter_mechanics(name, f['mecanica'])
     if 'inputPriority' in f and sorted(f['inputPriority']) != sorted(STRENGTHS):
         raise ValueError(f'{name}.inputPriority: order all of {", ".join(STRENGTHS)}')
     if 'assist' in f:
@@ -110,6 +111,48 @@ def validate_fighter(pack):
         if move == 'S' and 'energy' not in f:
             raise ValueError(f'{name}.assist: S needs fighter.energy')
 
+READS = {'alto':'HIGH','baixo':'LOW','tudo':'ANY'}
+
+def validate_mechanics(name, mech, m, projectile):
+    """Mecânica do golpe (docs/personagens/mecanicas.md); espelha AttackDefinition.Builder."""
+    if not isinstance(mech, dict):
+        raise ValueError(f'{name}.mecanica: expected an object')
+    total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida'}
+    if set(mech) - known:
+        raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
+    def frames(key, value):
+        w = value.get('frames') if isinstance(value, dict) else None
+        if not (isinstance(w,list) and len(w) == 2 and all(type(v) is int for v in w) and 0 <= w[0] <= w[1] < total):
+            raise ValueError(f'{name}.mecanica.{key}.frames: expected [a, b] inside 0..{total-1}')
+    if 'armadura' in mech:
+        frames('armadura', mech['armadura']); positive_int(mech['armadura'].get('golpes'), f'{name}.mecanica.armadura.golpes')
+    for key,field,allowed in (('contra','le',('alto','baixo','tudo')),('esquiva','de',('alto','tudo'))):
+        if key in mech:
+            frames(key, mech[key])
+            if mech[key].get(field) not in allowed:
+                raise ValueError(f'{name}.mecanica.{key}.{field}: one of {allowed}')
+    if 'contra' in mech and (projectile or mech['contra']['frames'][1] >= m['startupFrames']):
+        raise ValueError(f'{name}.mecanica.contra: a melee move that reads before its strike')
+    if 'avanco' in mech:
+        frames('avanco', mech['avanco']); positive(mech['avanco'].get('velocidade'), f'{name}.mecanica.avanco.velocidade')
+    if 'teleporte' in mech and not (type(mech['teleporte']) is int and 0 <= mech['teleporte'] < total):
+        raise ValueError(f'{name}.mecanica.teleporte: a frame inside the move')
+    if 'puxar' in mech: positive(mech['puxar'], f'{name}.mecanica.puxar')
+    if 'veneno' in mech:
+        positive_int(mech['veneno'].get('dano'), f'{name}.mecanica.veneno.dano'); positive_int(mech['veneno'].get('frames'), f'{name}.mecanica.veneno.frames')
+    if 'custoVida' in mech: positive_int(mech['custoVida'], f'{name}.mecanica.custoVida')
+
+def validate_fighter_mechanics(name, mech):
+    known = {'furia','airDashes','agarrao'}
+    if not isinstance(mech, dict) or set(mech) - known:
+        raise ValueError(f'{name}.mecanica: expected some of {sorted(known)}')
+    if 'furia' in mech: positive_int(mech['furia'], name+'.mecanica.furia')
+    if 'airDashes' in mech: positive_int(mech['airDashes'], name+'.mecanica.airDashes')
+    if 'agarrao' in mech:
+        positive_int(mech['agarrao'].get('dano'), name+'.mecanica.agarrao.dano')
+        if mech['agarrao'].get('alcance', 0) < 0: raise ValueError(name+'.mecanica.agarrao.alcance: >= 0')
+
 def non_negative_int(value, name):
     if type(value) is not int or value < 0:
         raise ValueError(f'{name}: expected an integer >= 0')
@@ -119,6 +162,7 @@ def validate_attack(name, m, projectile):
     missing = [k for k in REQUIRED_ATTACK if k not in m]
     if missing:
         raise ValueError(f'{name}: missing frame data {missing}')
+    if 'mecanica' in m: validate_mechanics(name, m['mecanica'], m, projectile)
     for key in ('startupFrames','recoveryFrames','hitstopFrames'): non_negative_int(m[key], f'{name}.{key}')
     for key in ('activeFrames','hitstunFrames','blockstunFrames'): positive_int(m[key], f'{name}.{key}')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
@@ -374,7 +418,25 @@ def compile_packs(root, results):
         for key in ('hitboxes','hurtboxes'):
             for box in m.get(key, []):
                 code += '.'+key[:-2]+'('+','.join([str(box['frames'][0]),str(box['frames'][1])]+[f(v) for v in box['x']+box['y']])+')'
+        if 'mecanica' in m: code += '.mechanics('+mechanics(m['mecanica'])+')'
         return code+'.build()'
+    def mechanics(mech):
+        code = 'new AttackDefinition.Mechanics()'
+        if 'armadura' in mech: code += '.armor('+str(mech['armadura']['golpes'])+','+','.join(map(str,mech['armadura']['frames']))+')'
+        if 'contra' in mech: code += '.counter(AttackDefinition.Reads.'+READS[mech['contra']['le']]+','+','.join(map(str,mech['contra']['frames']))+')'
+        if 'esquiva' in mech: code += '.evade(AttackDefinition.Reads.'+READS[mech['esquiva']['de']]+','+','.join(map(str,mech['esquiva']['frames']))+')'
+        if 'avanco' in mech:
+            v = mech['avanco']
+            code += '.advance('+f(v['velocidade'])+','+','.join(map(str,v['frames']))+','+str(bool(v.get('atravessa'))).lower()+')'
+        if 'teleporte' in mech: code += '.teleport('+str(mech['teleporte'])+')'
+        if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
+        if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
+        if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
+        return code
+    def fighter_mechanics(mech):
+        grab = mech.get('agarrao', {})
+        return ('.withMechanics('+str(mech.get('furia',0))+','+str(mech.get('airDashes',1))+','
+                +str(grab.get('dano',0))+','+f(grab.get('alcance',0))+')')
     def projectile(data, binding):
         if data is None: return 'null'
         return ('new CharacterDefinition.Projectile('+attack(binding,data['attack'],'PROJECTILE' if binding=='S' else 'SUPER',data['damage'])+','+f(data['range'])+','+f(data['speed'])+','+f(data['spawnX'])
@@ -428,7 +490,8 @@ def compile_packs(root, results):
                    +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+')'
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
-                   +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else ''))
+                   +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
+                   +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']
     lines += ['}','']

@@ -166,6 +166,22 @@ final class CharacterDefinition {
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
+        /** Fury: extra damage, in permille, when the life is all gone (it grows as life is lost). */
+        int furyPermille;
+        /** Air dashes per jump (the engine default is one). */
+        int airDashes=1;
+        /** Own throw: damage (0 = the engine's) and extra reach in world units. */
+        int throwDamage;
+        float throwRangeBonus;
+        Fighter withMechanics(int fury,int dashes,int grabDamage,float grabRange) {
+            furyPermille=fury;airDashes=dashes;throwDamage=grabDamage;throwRangeBonus=grabRange;return this;
+        }
+        /** Damage multiplier (permille) of this fighter's hits at the given life. */
+        int furyScale(int life) {
+            if(furyPermille<=0||maxLife<=0)return 1000;
+            int lost=Math.max(0,maxLife-life);
+            return 1000+(int)((long)furyPermille*lost/maxLife);
+        }
     }
     final String id,displayName;
     final CharacterVisualProfile profile;

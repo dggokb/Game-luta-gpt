@@ -1881,7 +1881,16 @@
       ],
       "pushbackOnHit": 40,
       "pushbackOnBlock": 50,
-      "hitFloor": 71
+      "hitFloor": 71,
+      "mecanica": {
+        "contra": {
+          "le": "baixo",
+          "frames": [
+            1,
+            17
+          ]
+        }
+      }
     },
     "S4": {
       "command": [
