@@ -176,6 +176,9 @@ final class CharacterDefinition {
         Fighter withMechanics(int fury,int dashes,int grabDamage,float grabRange) {
             furyPermille=fury;airDashes=dashes;throwDamage=grabDamage;throwRangeBonus=grabRange;return this;
         }
+        /** Jumps off the arena's walls (once per jump). */
+        boolean wallJump;
+        Fighter withWallJump(boolean value) { wallJump=value; return this; }
         /** Damage multiplier (permille) of this fighter's hits at the given life. */
         int furyScale(int life) {
             if(furyPermille<=0||maxLife<=0)return 1000;

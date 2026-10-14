@@ -252,6 +252,11 @@ public class MechanicsTest {
         assertTrue(mech("p11", "S3").poisonDamage > 0);
         assertEquals(400, GeneratedCharacters.get("p12").fighter.furyPermille);
         assertTrue(mech("p12", "S2").lifeCost > 0);
+        assertTrue("p01 charges the Onda", mech("player_base", "S").chargeFrames > 0);
+        assertTrue(GeneratedCharacters.get("player_base").animations.containsKey(SpriteStates.SPECIAL_CHARGE));
+        assertTrue(GeneratedCharacters.get("player_base").animations.containsKey(SpriteStates.SPECIAL_ENERGY_CHARGED));
+        assertTrue("p06 wakes the shadow", mech("p06", "S2").echoFrames > 0);
+        assertTrue(GeneratedCharacters.get("p05").fighter.wallJump);
     }
 
     private static AttackDefinition.Mechanics mech(String character, String move) {
@@ -266,5 +271,97 @@ public class MechanicsTest {
         s.in[0].light = true;
         s.until(() -> cue(s, "ARMOR"), 15);
         assertEquals("S3", s.attackId(1));
+    }
+
+    /** Copy of the base character with another fighter block (energy, wall jump...). */
+    private static CharacterDefinition withFighterBlock(CharacterDefinition.Fighter fighter, AttackDefinition... moves) {
+        CharacterDefinition c = CombatEngineTest.withMoves(BASE, moves);
+        return new CharacterDefinition("mech_block", BASE.displayName, BASE.profile, BASE.artFacing,
+            BASE.visualStandHeight, BASE.visualCrouchHeight, fighter, BASE.animations, c.moves, BASE.specialAnimations,
+            BASE.specials);
+    }
+
+    private static CharacterDefinition chargeShooter() {
+        CharacterDefinition.Fighter f = BASE.fighter;
+        AttackDefinition shot = new AttackDefinition.Builder("S", AttackDefinition.Kind.PROJECTILE).damage(850)
+            .frames(6, 1, 11).stun(20, 14, 6).windows(null, null, null).pushback(40f, 50f)
+            .mechanics(new AttackDefinition.Mechanics().charge(60, 800)).build();
+        CharacterDefinition.Projectile energy = new CharacterDefinition.Projectile(shot, f.energy.range, f.energy.speed,
+            f.energy.spawnX, f.energy.spawnY, f.energy.crouchSpawnY, f.energy.airSpawnY);
+        return withFighterBlock(new CharacterDefinition.Fighter(f.color, f.maxLife, f.autoCombo, energy,
+            f.energyCommand, f.superAttack, f.body, f.inputPriority));
+    }
+
+    /** Fires S, holding the button for {@code hold} frames; returns the projectile that came out. */
+    private static Projectile fire(int hold) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(chargeShooter(), BASE, 300f, 1200f);
+        s.in[0].special = "M";
+        s.in[0].holding = hold > 0;
+        boolean charged = false;
+        for (int i = 0; i < hold + 40 && s.engine.energyProjectiles.isEmpty(); i++) {
+            if (i >= hold) s.in[0].holding = false;
+            s.step();
+            charged |= s.f(0).charging;
+        }
+        assertEquals("charging only while held", hold > 0, charged);
+        assertFalse("a projectile came out", s.engine.energyProjectiles.isEmpty());
+        return s.engine.energyProjectiles.get(0);
+    }
+
+    @Test public void holdingTheButtonChargesTheShot() {
+        Projectile tap = fire(0), full = fire(80);
+        assertTrue("bigger", full.radius > tap.radius * 1.5f);
+        assertTrue("harder", full.damage > tap.damage * 3 / 2);
+        assertTrue("faster", full.speed > tap.speed);
+    }
+
+    @Test public void theShadowRepeatsTheNextMoveLater() {
+        AttackDefinition call = move("H", 6, 3, 10)
+            .mechanics(new AttackDefinition.Mechanics().echo(300, 20, 500)).build();
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(call), BASE, 500f, 600f);
+        s.in[0].heavy = true;
+        s.until(() -> s.f(0).echoLeft > 0, 10);
+        s.until(() -> !s.f(0).attacking(), 40);
+        s.steps(30);
+        s.in[0].light = true;
+        boolean ownHit = false, shadowHit = false;
+        for (int i = 0; i < 60; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker != 0 || !"L".equals(e.moveId)) continue;
+                if (e.projectile) shadowHit = true; else ownHit = true;
+            }
+        }
+        assertTrue("the jab hit", ownHit);
+        assertTrue("the shadow's copy hit later", shadowHit);
+        assertTrue(s.engine.echoes.isEmpty());
+
+        CombatEngineTest.Sim plain = new CombatEngineTest.Sim(BASE, BASE, 500f, 600f);
+        plain.in[0].light = true;
+        plain.steps(40);
+        assertTrue("control: no shadow without the echo", plain.engine.echoes.isEmpty());
+    }
+
+    @Test public void aNinjaJumpsOffTheWall() {
+        CharacterDefinition.Fighter f = BASE.fighter;
+        CharacterDefinition ninja = withFighterBlock(new CharacterDefinition.Fighter(f.color, f.maxLife, f.autoCombo,
+            f.energy, f.energyCommand, f.superAttack, f.body, f.inputPriority).withWallJump(true));
+        float x = Arena.LEFT_BOUND + 20f;
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(ninja, BASE, x, x + 600f);
+        s.in[0].jump = true;
+        s.steps(8);
+        s.in[0].jump = true;
+        s.steps(2);
+        assertTrue("off the wall", s.f(0).wallJumpUsed);
+        s.steps(12);
+        assertTrue("pushed away from the wall", s.f(0).x > x + 120f);
+
+        CombatEngineTest.Sim plain = new CombatEngineTest.Sim(BASE, BASE, x, x + 600f);
+        plain.in[0].jump = true;
+        plain.steps(8);
+        plain.in[0].jump = true;
+        plain.steps(14);
+        assertFalse("control: no wall jump without the mechanic", plain.f(0).wallJumpUsed);
+        assertTrue(plain.f(0).x < x + 60f);
     }
 }

@@ -9,6 +9,8 @@ final class PadInput {
     enum Button { LIGHT, MEDIUM, HEAVY, AUTO, SUPER, TAG, THROW, PUSHBLOCK, OVERDRIVE }
 
     private int direction;
+    /** An attack button is still under a finger. */
+    private boolean holding;
     private boolean light, medium, heavy, auto, superAttack, tag, grab, pushblock, overdrive;
     /** Frames since L or M was delivered alone, or -1: two fingers rarely land on one frame. */
     private int lightAge = -1, mediumAge = -1;
@@ -21,6 +23,10 @@ final class PadInput {
 
     void setDirection(int screenDirection) {
         direction = screenDirection;
+    }
+
+    void setHolding(boolean held) {
+        holding = held;
     }
 
     void press(Button button) {
@@ -42,6 +48,7 @@ final class PadInput {
     void drainInto(FighterInput out) {
         out.clear();
         out.direction = direction;
+        out.holding = holding;
         // L + M (two fingers, up to THROW_LENIENCY_FRAMES apart) or the spot between them:
         // throw. When the first button already started a jab, the engine turns it into the throw.
         boolean late = (light && mediumAge >= 0) || (medium && lightAge >= 0);
@@ -74,6 +81,7 @@ final class PadInput {
 
     void reset() {
         direction = 0;
+        holding = false;
         lightAge = mediumAge = -1;
         clearPresses();
     }

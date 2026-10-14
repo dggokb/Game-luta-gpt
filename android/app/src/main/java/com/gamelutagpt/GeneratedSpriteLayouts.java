@@ -976,6 +976,12 @@ final class GeneratedSpriteLayouts {
     static final int P06_DEFENSE_STAND_ROOT_Y = 205;
     static final int P06_DEFENSE_STAND_FRAME_COUNT = 8;
 
+    static final int P06_ECHO_FRAME_WIDTH = 244;
+    static final int P06_ECHO_FRAME_HEIGHT = 259;
+    static final int P06_ECHO_ROOT_X = 126;
+    static final int P06_ECHO_ROOT_Y = 246;
+    static final int P06_ECHO_FRAME_COUNT = 23;
+
     static final int P06_FALL_FRAME_WIDTH = 166;
     static final int P06_FALL_FRAME_HEIGHT = 245;
     static final int P06_FALL_ROOT_X = 92;
@@ -2577,6 +2583,18 @@ final class GeneratedSpriteLayouts {
     static final int ENERGY_SET_ROOT_X = 189;
     static final int ENERGY_SET_ROOT_Y = 472;
     static final int ENERGY_SET_FRAME_COUNT = 11;
+
+    static final int ENERGY_CHARGE_FRAME_WIDTH = 346;
+    static final int ENERGY_CHARGE_FRAME_HEIGHT = 465;
+    static final int ENERGY_CHARGE_ROOT_X = 151;
+    static final int ENERGY_CHARGE_ROOT_Y = 448;
+    static final int ENERGY_CHARGE_FRAME_COUNT = 14;
+
+    static final int ENERGY_CHARGED_FRAME_WIDTH = 517;
+    static final int ENERGY_CHARGED_FRAME_HEIGHT = 470;
+    static final int ENERGY_CHARGED_ROOT_X = 201;
+    static final int ENERGY_CHARGED_ROOT_Y = 459;
+    static final int ENERGY_CHARGED_FRAME_COUNT = 20;
 
     static final int FALL_DOWN_FRAME_WIDTH = 625;
     static final int FALL_DOWN_FRAME_HEIGHT = 421;

@@ -183,12 +183,12 @@ bolhas verdes (envenenado), brasas vermelhas (fúria) e as faixas CONTRA-GOLPE!,
 
 | # | Mecânica no jogo |
 |---|---|
-| **p01** | Referência do elenco: sem mecânica própria (projétil, anti-aéreo e punição). |
+| **p01** | Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte. |
 | **p02** | Contra-golpe alto: o S3 lê golpes em pé e no ar durante a preparação e responde na hora. |
 | **p03** | Rekka: o S3 avança e encadeia até 3 vezes (novo comando a cada investida); o S2 sobe avançando. |
 | **p04** | Esquiva que cancela: o S3 passa por baixo de golpe alto e de projétil e pode virar soco (L, M, H); a cabeçada (S2) avança. |
-| **p05** | Teleporte: o S3 some na fumaça e reaparece atrás do rival; o corte de mão (S4) avança baixo. |
-| **p06** | Puxar: o S3 alcança longe e arrasta o rival para perto (o eco de sombra fica para a próxima etapa). |
+| **p05** | Teleporte: o S3 some na fumaça e reaparece atrás do rival; o corte de mão (S4) avança baixo; no ar, encostado na parede, aperta pra cima e pula da parede. |
+| **p06** | Eco de sombra: o S2 desperta a sombra por 5 s; cada golpe que ela dá é repetido pela sombra roxa um terço de segundo depois, com metade do dano. O S3 alcança longe e puxa o rival. |
 | **p07** | Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar. |
 | **p08** | Chicote: alcance longo nos fortes; contra-golpe baixo no S3 (pune quem tenta passar por baixo). |
 | **p09** | Grappler: armadura de 1 golpe no escudo (S3) e na ombrada (S4, que avança); agarrão mais forte e de mais longe. |
@@ -196,8 +196,14 @@ bolhas verdes (envenenado), brasas vermelhas (fúria) e as faixas CONTRA-GOLPE!,
 | **p11** | Veneno: a seringa (S2) e a resposta do contra-golpe (S3, lê qualquer golpe) envenenam; o passo cirúrgico (S4) avança. |
 | **p12** | Fúria: bate até 40% mais forte conforme perde vida; os especiais custam vida e a Fúria (S3) tem armadura. |
 
-**Ainda falta (precisa de desenho ou de efeito novo):** eco de sombra da p06, capangas no
-Super do p07, wall jump do p05 e a Onda carregável do p01.
+**Com vídeo novo (14/10):** a carga e o disparo carregado do p01 (`SPECIAL_CHARGE`,
+`SPECIAL_ENERGY_CHARGED`) e o gesto do eco da p06 (`SPECIAL_ECHO`, no S2). O motor também
+sabe **segurar o botão** (`FighterInput.holding`, dos dedos na tela), **eco de sombra** (cópia
+roxa dos golpes, metade do dano, desenhada atrás dela) e **wall jump** (o p05 encosta na parede
+no ar, aperta pra cima e sai empurrado para longe dela).
+
+**Ainda falta:** o vídeo do wall jump do p05 (o primeiro desenhou uma parede e deu zoom; até o
+novo chegar ele usa o pulo normal) e os capangas do Super do p07 (vídeo em produção).
 
 ## 5. Perguntas em aberto
 

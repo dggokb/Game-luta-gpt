@@ -173,6 +173,14 @@ final class SpriteFighterRenderer {
             0f,0f,0f,1f,0f}));
         return new ColorMatrixColorFilter(m);
     }
+    /** Sombra roxa e translúcida do próprio lutador (o eco de sombra da p06). */
+    static ColorFilter shadowEcho() {
+        return new ColorMatrixColorFilter(new ColorMatrix(new float[]{
+            0.25f,0.10f,0.10f,0f,70f,
+            0.05f,0.10f,0.05f,0f,20f,
+            0.30f,0.15f,0.35f,0f,110f,
+            0f,0f,0f,0.55f,0f}));
+    }
     /** Mostra um clipe num instante dado, sem a simulação (tela de ajuste de tamanho). */
     void pose(String clip,float time,float distance){motion.clip=clip;motion.time=time;motion.distance=distance;}
     boolean hasAnimation(String id){return character.animations.containsKey(id);}

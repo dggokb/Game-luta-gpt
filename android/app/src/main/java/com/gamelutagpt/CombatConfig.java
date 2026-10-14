@@ -85,6 +85,11 @@ final class CombatConfig {
     float facingEpsilon = 6f;
     /** Space left between two bodies by a teleport or a pull (world units). */
     float teleportGap = 24f;
+    /** Wall jump: how close to the wall, the push away from it and the lift (share of a jump). */
+    float wallJumpReach = 40f;
+    int wallJumpFrames = 22;
+    float wallJumpSpeed = 760f;
+    float wallJumpLift = 0.95f;
 
     // Super meter, in thousandths of a bar.
     static final int METER_PER_BAR = 1000;

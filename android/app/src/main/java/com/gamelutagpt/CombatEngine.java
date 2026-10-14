@@ -45,6 +45,32 @@ final class CombatEngine {
         AttackDefinition attack;
         int hitbox;
         Projectile projectile;
+        /** The owner's shadow struck (the owner's own move is not touched). */
+        boolean echo;
+    }
+
+    /**
+     * Shadow echo: a copy of one of the owner's moves, played {@code delay} frames later from
+     * the spot where the owner started it. It hits like a projectile (only the defender stops)
+     * with a share of the damage. The shell draws it as a tinted copy of the owner.
+     */
+    static final class Echo {
+        final int owner;
+        final AttackDefinition attack;
+        final CharacterDefinition.Move move;
+        final float x, y;
+        final int facing;
+        final int damagePermille;
+        /** Frame of the copied move; negative while it waits for its delay. */
+        int frame;
+        int hitsOnTarget;
+        long hitboxMask;
+        Echo(int owner, AttackDefinition attack, CharacterDefinition.Move move, float x, float y, int facing,
+             int delay, int damagePermille) {
+            this.owner = owner; this.attack = attack; this.move = move; this.x = x; this.y = y;
+            this.facing = facing; this.frame = -delay - 1; this.damagePermille = damagePermille;
+        }
+        boolean visible() { return frame >= 0; }
     }
 
     final CombatConfig config;
@@ -53,6 +79,8 @@ final class CombatEngine {
     final TeamSystem teams;
     final List<Projectile> energyProjectiles = new ArrayList<>();
     final List<Projectile> superProjectiles = new ArrayList<>();
+    /** Shadow copies of moves (p06's echo) waiting or playing. */
+    final List<Echo> echoes = new ArrayList<>();
     private final ComboSession[] sessions = new ComboSession[2];
     private final ComboSession[] lastSessions = new ComboSession[2];
     private final int[] sessionEndFrame = {-1, -1};
@@ -152,6 +180,7 @@ final class CombatEngine {
         }
         energyProjectiles.clear();
         superProjectiles.clear();
+        echoes.clear();
         events.clear();
         cues.clear();
         superFreeze = 0;
@@ -184,6 +213,7 @@ final class CombatEngine {
         f.state = state;
         f.status = CombatFighter.Status.NEUTRAL;
         f.clearAttack();
+        f.echoLeft = 0;
         f.buffer.clear();
         f.motion.clear();
     }
@@ -212,6 +242,7 @@ final class CombatEngine {
         resolveBodies();
         for (CombatFighter f : fighters) updateFacing(f);
         advanceProjectiles();
+        advanceEchoes();
 
         // 4. Collisions (simultaneous: trades are possible).
         contacts.clear();
@@ -222,6 +253,7 @@ final class CombatEngine {
         }
         detectProjectiles(energyProjectiles);
         detectProjectiles(superProjectiles);
+        detectEchoes();
 
         // 5. Reactions and pushback.
         for (Contact contact : contacts) {
@@ -359,6 +391,7 @@ final class CombatEngine {
             return;
         }
 
+        if (f.pendingJumpAge >= 0 && !f.grounded && canWallJump(f)) wallJump(f);
         if (f.pendingJumpAge >= 0 && f.grounded) {
             boolean superJump = f.pendingSuperJump || f.launcherChase > 0;
             if (f.status == CombatFighter.Status.NEUTRAL) {
@@ -546,6 +579,15 @@ final class CombatEngine {
         f.forwardDashing = false;
         f.backdashFrames = 0;
         if (f.move != null) f.crouching = attack.id.startsWith("2");
+        if (attack.mechanics.echoFrames > 0) {
+            // The shadow wakes up: the moves started from now on are repeated by it.
+            f.echoLeft = attack.mechanics.echoFrames;
+            f.echoDelay = attack.mechanics.echoDelay;
+            f.echoDamagePermille = attack.mechanics.echoDamagePermille;
+            cues.add("ECHO");
+        } else if (f.echoLeft > 0 && attack.kind == AttackDefinition.Kind.NORMAL && f.move != null) {
+            echoes.add(new Echo(f.index, attack, f.move, f.x, f.y, f.facing, f.echoDelay, f.echoDamagePermille));
+        }
         if (attack.mechanics.lifeCost > 0) {
             // Fury: the special is paid with the fighter's own life.
             f.state.payLife(attack.mechanics.lifeCost);
@@ -687,8 +729,19 @@ final class CombatEngine {
         if (f.launcherChase > 0) f.launcherChase--;
         if (f.state.poisoned() && f.state.tickPoison() > 0 && f.state.poisonLeft == 0) cues.add("POISON_END");
 
+        if (f.echoLeft > 0) f.echoLeft--;
+
         switch (f.status) {
             case ATTACK:
+                AttackDefinition.Mechanics moveMechanics = f.attack.mechanics;
+                if (moveMechanics.chargeFrames > 0 && f.input.holding && f.charge < moveMechanics.chargeFrames &&
+                    f.attackFrame == moveMechanics.chargeHoldFrame(f.attack.startupFrames)) {
+                    // Charging: the move waits just before it fires while the button is held.
+                    f.charge++;
+                    f.charging = true;
+                    break;
+                }
+                f.charging = false;
                 f.attackFrame++;
                 if (f.attack.kind != AttackDefinition.Kind.NORMAL && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
@@ -723,6 +776,62 @@ final class CombatEngine {
         moveHorizontally(f);
         moveVertically(f);
         f.x = Arena.clamp(f.x, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+    }
+
+    /** Wall jump: airborne, touching a wall of the arena, and pressing up (once per jump). */
+    private boolean canWallJump(CombatFighter f) {
+        if (!f.state.profile.wallJump || f.wallJumpUsed || f.status != CombatFighter.Status.NEUTRAL) return false;
+        return f.x - Arena.LEFT_BOUND <= config.wallJumpReach || Arena.RIGHT_BOUND - f.x <= config.wallJumpReach;
+    }
+
+    private void wallJump(CombatFighter f) {
+        f.pendingJumpAge = -1;
+        f.wallJumpUsed = true;
+        f.wallJumpDirection = f.x - Arena.LEFT_BOUND <= config.wallJumpReach ? 1 : -1;
+        f.wallJumpFrames = config.wallJumpFrames;
+        f.airDashFrames = 0;
+        f.superJumping = false;
+        f.vy = -config.jumpSpeed * config.wallJumpLift;
+        cues.add("WALL_JUMP");
+    }
+
+    private void advanceEchoes() {
+        if (superFreeze > 0) return;
+        Iterator<Echo> it = echoes.iterator();
+        while (it.hasNext()) {
+            Echo e = it.next();
+            if (fighters[e.owner].frozen() && e.frame >= 0) continue;
+            e.frame++;
+            if (e.frame >= e.attack.totalFrames) it.remove();
+        }
+    }
+
+    /** The shadow's strike, with the attack's own hitboxes from where the shadow stands. */
+    private void detectEchoes() {
+        for (Echo e : echoes) {
+            if (!e.visible() || !e.attack.isActive(e.frame) || e.hitsOnTarget >= e.attack.maxHits) continue;
+            CombatFighter a = fighters[e.owner], d = fighters[1 - e.owner];
+            if (!d.hittable() || evades(d, e.attack, false, true)) continue;
+            for (int i = 0; i < e.attack.hitboxCount(); i++) {
+                AttackDefinition.Box box = e.attack.hitbox(i);
+                if (!box.activeAt(e.frame) || (e.hitboxMask & (1L << i)) != 0) continue;
+                if (CombatRules.hitboxTouches(e.x, e.y, e.facing, box, d.x, d.y, d.body(), d.crouchingBody())) {
+                    e.hitboxMask |= 1L << i;
+                    e.hitsOnTarget++;
+                    Contact c = new Contact();
+                    c.attacker = a;
+                    c.defender = d;
+                    c.attack = e.attack;
+                    c.hitbox = i;
+                    c.echo = true;
+                    // Hits like a projectile: a share of the damage, the owner is not frozen.
+                    c.projectile = new Projectile(d.x, d.y - d.body().height(false) * 0.6f, 0f, 0f, 1f,
+                        e.attack.damage * e.damagePermille / 1000, a.state.profile.color, e.owner, e.facing, e.attack);
+                    contacts.add(c);
+                    break;
+                }
+            }
+        }
     }
 
     /** Teleport: the fighter reappears just behind the opponent, already facing it. */
@@ -786,6 +895,16 @@ final class CombatEngine {
                 cues.add("WALL_BOUNCE");
             }
             return;
+        }
+        if (f.wallJumpFrames > 0) {
+            // Off the wall: a push away from it that air control cannot cancel.
+            if (f.grounded || f.status != CombatFighter.Status.NEUTRAL && !f.attacking()) {
+                f.wallJumpFrames = 0;
+            } else {
+                f.x += f.wallJumpDirection * config.wallJumpSpeed * boost * CombatConfig.DT;
+                f.wallJumpFrames--;
+                return;
+            }
         }
         if (f.airDashFrames > 0) {
             // The burst keeps going under the air normals started from it; a hit stops it.
@@ -871,6 +990,8 @@ final class CombatEngine {
         f.airDashFrames = 0;
         f.airDashUsed = false;
         f.airDashCount = 0;
+        f.wallJumpUsed = false;
+        f.wallJumpFrames = 0;
         f.superJumping = false;
         if (f.attacking() && f.move != null && f.attack.id.startsWith("j")) {
             // Landing ends an air normal.
@@ -909,6 +1030,8 @@ final class CombatEngine {
         f.airDashFrames = 0;
         f.airDashUsed = false;
         f.airDashCount = 0;
+        f.wallJumpUsed = false;
+        f.wallJumpFrames = 0;
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.launched = false;
@@ -1086,10 +1209,22 @@ final class CombatEngine {
                 damage = Math.round(damage * 1.45f);
             }
         }
+        float radius = superKind ? 58f : 24f;
+        float range = data.range;
+        if (!superKind && f.charge > 0) {
+            // Charged shot: bigger, faster, further and harder, up to the full charge.
+            AttackDefinition.Mechanics m = f.attack.mechanics;
+            float full = Math.min(1f, f.charge / (float)Math.max(1, m.chargeFrames));
+            damage = damage * (1000 + Math.round(m.chargeBonusPermille * full)) / 1000;
+            speed *= 1f + 0.3f * full;
+            radius *= 1f + 0.8f * full;
+            range *= 1f + 0.5f * full;
+            if (f.charged()) cues.add("CHARGED");
+        }
         float height = superKind ? data.spawnHeight(false, !f.grounded) : data.spawnHeight(f.crouching, !f.grounded);
         Projectile p = new Projectile(
-            f.x + f.facing * data.spawnX, f.y - height, data.range, speed,
-            superKind ? 58f : 24f, damage, profile.color, f.index, f.facing, f.attack);
+            f.x + f.facing * data.spawnX, f.y - height, range, speed,
+            radius, damage, profile.color, f.index, f.facing, f.attack);
         (superKind ? superProjectiles : energyProjectiles).add(p);
     }
 
@@ -1583,7 +1718,7 @@ final class CombatEngine {
         if (!d.hittable()) return;
         int direction = projectile ? c.projectile.direction : a.facing;
         // The owner's S/SUPER learns about its projectile while it still runs.
-        boolean ownerMove = !projectile || (a.attacking() && a.attack == attack);
+        boolean ownerMove = !c.echo && (!projectile || (a.attacking() && a.attack == attack));
         ComboSession session = sessions[d.index];
 
         if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null &&

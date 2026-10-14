@@ -82,6 +82,9 @@
     },
     "assist": {
       "move": "S"
+    },
+    "mecanica": {
+      "wallJump": true
     }
   },
   "animations": {

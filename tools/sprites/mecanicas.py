@@ -131,6 +131,8 @@ def unique(pack, spec):
             m['maxUsesPerCombo'] = route['maxUsos']
     for key, reach in u.get('alcance', {}).items():
         targets[key]['reach'] = reach
+    for key, animation in u.get('animacao', {}).items():
+        targets[key]['animation'] = animation
     if u.get('lutador'):
         fighter['mecanica'] = dict(u['lutador'])
 
@@ -175,6 +177,7 @@ def apply(cid, spec, base):
     unique(pack, spec)
 
     for key, anim_id, m in attacks:
+        anim_id = m.get('animation', anim_id)   # a mecânica pode trocar a animação do golpe
         total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
         anim = pack['animations'].get(anim_id) if anim_id else None
         cadence = 'sem animação' if not keep else 'tempo mantido'
