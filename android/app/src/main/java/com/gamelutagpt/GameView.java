@@ -264,9 +264,10 @@ public class GameView extends SurfaceView
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentPartnerRenderer.setTint(SpriteFighterRenderer.washedOut());
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
-            @Override public void manterAtlas(CharacterDefinition extra) {
-                // Só as folhas do personagem em ajuste: a luta está parada e volta a decodificar ao sair.
-                atlases.retainOnly(extra);
+            @Override public void manterAtlas(CharacterDefinition... manter) {
+                // Só as folhas do personagem em ajuste e da referência: a luta está parada e volta a
+                // decodificar ao sair.
+                atlases.retainOnly(manter);
             }
             @Override public void salvar() { post(GameView.this::exportSizeTuning); }
             @Override public void fechar() {

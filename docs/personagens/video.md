@@ -186,7 +186,9 @@ assim.
 
 1. Escolha o personagem (◀ ▶) e a animação na lista. Ela toca em loop com o IDLE em
    transparência atrás, raiz no mesmo ponto, como na troca de animação no jogo
-   (PAUSA, VEL ½x/¼x e IDLE ATRÁS ajudam a comparar).
+   (PAUSA, VEL ½x/¼x e IDLE ATRÁS ajudam a comparar). O **P01 fica ao lado como referência**,
+   no mesmo chão e na mesma escala do jogo, fazendo a mesma animação (ou parado no IDLE; o
+   botão P01 troca).
 2. −5 / −1 / +1 / +5 mudam o tamanho da folha (1% por toque); 100% desfaz. Cada toque já
    vale no jogo e fica salvo no aparelho. Animações que usam a mesma folha (IDLE e COMBAT,
    agarrão) mudam juntas.
