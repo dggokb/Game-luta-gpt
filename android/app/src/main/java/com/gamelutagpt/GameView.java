@@ -270,11 +270,7 @@ public class GameView extends SurfaceView
                 atlases.retainOnly(manter);
             }
             @Override public void salvar() { post(GameView.this::exportSizeTuning); }
-            @Override public void fechar() {
-                atlases.retainOnly(team[0].character, team[1].character, opponentPoint().character);
-                for (FighterState fighter : team) atlases.preload(fighter.character);
-                atlases.preload(opponentPoint().character);
-            }
+            @Override public void fechar() { keepFightAtlases(); }
         });
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
@@ -754,15 +750,22 @@ public class GameView extends SurfaceView
     private void updateOpponentVisuals() {
         CharacterDefinition onPoint = opponentPoint().character;
         if (opponentSpriteRenderer.character() == onPoint) return;
-        // Quem caiu sai da memória; quem ainda luta (titular e parceiro de pé) fica.
+        keepFightAtlases();
+        opponentSpriteRenderer.setCharacter(onPoint.id);
+    }
+
+    /**
+     * Arte decodificada da luta: a dupla do jogador e, do CPU, o titular e quem ainda está de pé
+     * (no 2x2 o parceiro entra de assist e na troca). Quem caiu sai da memória.
+     */
+    private void keepFightAtlases() {
         java.util.List<CharacterDefinition> keep = new java.util.ArrayList<>();
-        keep.add(team[0].character);
-        keep.add(team[1].character);
+        for (FighterState member : team) keep.add(member.character);
         for (FighterState member : engine.team(OPPONENT).members) {
             if (member.life > 0 || member == opponentPoint()) keep.add(member.character);
         }
         atlases.retainOnly(keep.toArray(new CharacterDefinition[0]));
-        opponentSpriteRenderer.setCharacter(onPoint.id);
+        for (CharacterDefinition character : keep) atlases.preload(character);
     }
 
     /** Modo batalha: depois do resultado, uma luta nova com as mesmas duplas. */
