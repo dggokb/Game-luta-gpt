@@ -18,63 +18,63 @@
     {
       "index": 0,
       "outputBbox": [
-        85,
-        139,
-        474,
+        98,
+        167,
+        464,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 73447
+      "opaquePixels": 64958
     },
     {
       "index": 1,
       "outputBbox": [
-        93,
-        149,
-        475,
-        603
+        106,
+        176,
+        464,
+        604
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 73629
+      "minimumMargin": 36,
+      "opaquePixels": 65155
     },
     {
       "index": 2,
       "outputBbox": [
-        107,
-        154,
-        467,
+        118,
+        181,
+        458,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 72680
+      "opaquePixels": 64261
     },
     {
       "index": 3,
       "outputBbox": [
-        125,
-        147,
-        467,
+        136,
+        174,
+        457,
         604
       ],
       "minimumMargin": 36,
-      "opaquePixels": 71732
+      "opaquePixels": 63402
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 415,
-    "frameHeight": 491,
-    "rootX": 228,
-    "rootY": 474,
+    "frameWidth": 392,
+    "frameHeight": 463,
+    "rootX": 215,
+    "rootY": 446,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      72,
-      126
+      85,
+      154
     ],
     "decodedBytes": {
       "canonical": 6553600,
-      "packed": 3260240
+      "packed": 2903936
     },
     "pixelScale": 2.0
   },
@@ -82,8 +82,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "f739cfa4a880460c4f2acdaeac9442010b3a1af3242d2cb3b7d6f12772de99d7",
-      "config": "14c66c4b8f1637979e7104a1099ed13379f95028b07e14ea0527920044f3a6ad",
+      "source": "8ac98c197be069fd0559d29e855dfedf7877886255d7a33fafa89b0992641c16",
+      "config": "5f235be72e70f9df78fad1da36b679259872c1705a10f8275754e59d300b0f94",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

@@ -21,7 +21,32 @@
     "largura": 288,
     "raiz": "99,302",
     "colunas": 9,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434
+    ],
+    "reguaFatores": [
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434,
+      0.9434
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 106% (ULTRA_BEAM)"
+    ]
   },
   "frameWidth": 576,
   "frameHeight": 640,

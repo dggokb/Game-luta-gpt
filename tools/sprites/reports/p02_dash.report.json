@@ -18,151 +18,151 @@
     {
       "index": 0,
       "outputBbox": [
-        104,
-        56,
-        472,
+        129,
+        115,
+        445,
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 68387
+      "opaquePixels": 50460
     },
     {
       "index": 1,
       "outputBbox": [
-        104,
-        59,
-        466,
+        129,
+        117,
+        441,
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 57692
+      "opaquePixels": 42599
     },
     {
       "index": 2,
       "outputBbox": [
-        93,
-        63,
-        457,
+        120,
+        121,
+        433,
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 59519
+      "opaquePixels": 44012
     },
     {
       "index": 3,
       "outputBbox": [
-        31,
-        68,
-        477,
+        67,
+        125,
+        450,
         477
       ],
-      "minimumMargin": 31,
-      "opaquePixels": 70178
+      "minimumMargin": 35,
+      "opaquePixels": 51826
     },
     {
       "index": 4,
       "outputBbox": [
-        20,
-        68,
-        487,
+        57,
+        125,
+        458,
         477
       ],
-      "minimumMargin": 20,
-      "opaquePixels": 72446
+      "minimumMargin": 35,
+      "opaquePixels": 53525
     },
     {
       "index": 5,
       "outputBbox": [
-        43,
-        63,
-        531,
+        77,
+        121,
+        496,
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 71624
+      "opaquePixels": 52856
     },
     {
       "index": 6,
       "outputBbox": [
-        52,
-        59,
-        523,
-        477
-      ],
-      "minimumMargin": 35,
-      "opaquePixels": 71969
-    },
-    {
-      "index": 7,
-      "outputBbox": [
-        121,
-        59,
+        84,
+        117,
         489,
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 64885
+      "opaquePixels": 53177
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        144,
+        117,
+        460,
+        477
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 47908
     },
     {
       "index": 8,
       "outputBbox": [
-        88,
-        68,
-        448,
+        116,
+        125,
+        425,
         477
       ],
       "minimumMargin": 35,
-      "opaquePixels": 61520
+      "opaquePixels": 45414
     },
     {
       "index": 9,
       "outputBbox": [
-        21,
-        69,
-        467,
+        58,
+        126,
+        442,
         476
       ],
-      "minimumMargin": 21,
-      "opaquePixels": 72760
+      "minimumMargin": 36,
+      "opaquePixels": 53726
     },
     {
       "index": 10,
       "outputBbox": [
-        18,
-        80,
-        479,
+        55,
+        136,
+        451,
         477
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 74802
+      "minimumMargin": 35,
+      "opaquePixels": 55273
     },
     {
       "index": 11,
       "outputBbox": [
-        22,
-        61,
-        518,
+        59,
+        119,
+        486,
         477
       ],
-      "minimumMargin": 22,
-      "opaquePixels": 75852
+      "minimumMargin": 35,
+      "opaquePixels": 56002
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 534,
-    "frameHeight": 442,
-    "rootX": 279,
-    "rootY": 430,
+    "frameWidth": 462,
+    "frameHeight": 383,
+    "rootX": 241,
+    "rootY": 371,
     "columns": 6,
     "frameCount": 12,
     "cropOffset": [
-      7,
-      46
+      45,
+      105
     ],
     "decodedBytes": {
       "canonical": 14155776,
-      "packed": 11329344
+      "packed": 8493408
     },
     "pixelScale": 2.0
   },
@@ -170,9 +170,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "591e668f0bbe5358651c274129f9ba20988267157e23a97bff159cc3e37a7b7b",
-      "config": "31214a1e2b202e9b730b0d7c195344291720f46734ab73afbc00fc939f799557",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "source": "d68745e05a02a09e5e8010e3c1bdb1971eff2c52fb4e79e70eaeb554afd24871",
+      "config": "b9b55f0e44624686f43dee13ca8bc5c0411bb910afa74200372a174f448ff61f",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_dash_video_normalized.png": "c9cfd9e3a1877e2cf4c5924c90bf1a3bd12115fb78e2a6e28c113e4437445031"

@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        127,
-        96,
-        412,
+        131,
+        111,
+        408,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 62483
+      "opaquePixels": 58818
     },
     {
       "index": 1,
       "outputBbox": [
-        125,
-        95,
-        416,
+        129,
+        111,
+        412,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 62630
+      "opaquePixels": 58982
     },
     {
       "index": 2,
       "outputBbox": [
-        120,
-        95,
-        423,
+        124,
+        111,
+        418,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 62855
+      "opaquePixels": 59150
     },
     {
       "index": 3,
       "outputBbox": [
-        120,
-        96,
-        418,
+        124,
+        111,
+        414,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 62895
+      "opaquePixels": 59184
     },
     {
       "index": 4,
       "outputBbox": [
-        120,
-        95,
-        418,
+        124,
+        110,
+        414,
         604
       ],
       "minimumMargin": 36,
-      "opaquePixels": 63133
+      "opaquePixels": 59357
     },
     {
       "index": 5,
       "outputBbox": [
-        127,
-        91,
-        416,
+        131,
+        107,
+        412,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 63445
+      "opaquePixels": 59675
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 328,
-    "frameHeight": 538,
-    "rootX": 173,
-    "rootY": 521,
+    "frameWidth": 318,
+    "frameHeight": 522,
+    "rootX": 168,
+    "rootY": 505,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      107,
-      79
+      112,
+      95
     ],
     "decodedBytes": {
       "canonical": 9830400,
-      "packed": 4235136
+      "packed": 3983904
     },
     "pixelScale": 2.0
   },
@@ -104,8 +104,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "acb3481b011a17b24280263e64c5ea643c48ffa0372375e539c2fd1da6159026",
-      "config": "0f1d38eb53eb6abb7b827ddafa0fa0f4043fdc85c4b1c359b41b00cc3c8ba65d",
+      "source": "58d7fcd6ff10027d151d158f696cb4dc8e3a7af73161ef607d55d60372320644",
+      "config": "132f51e01c479d1049ffdd49992a3eedec0dcf937676e530657cc44d017a6100",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

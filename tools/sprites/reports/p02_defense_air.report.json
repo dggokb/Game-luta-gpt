@@ -18,96 +18,96 @@
     {
       "index": 0,
       "outputBbox": [
-        103,
-        91,
-        317,
-        607
+        115,
+        152,
+        303,
+        606
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 62354
+      "minimumMargin": 34,
+      "opaquePixels": 48239
     },
     {
       "index": 1,
       "outputBbox": [
-        81,
-        200,
-        420,
-        605
+        95,
+        248,
+        393,
+        604
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 57129
+      "minimumMargin": 36,
+      "opaquePixels": 44173
     },
     {
       "index": 2,
       "outputBbox": [
-        35,
-        189,
-        341,
-        606
+        55,
+        239,
+        324,
+        605
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 59076
+      "minimumMargin": 35,
+      "opaquePixels": 45690
     },
     {
       "index": 3,
       "outputBbox": [
-        33,
-        219,
-        343,
-        607
+        53,
+        264,
+        326,
+        606
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 57751
+      "minimumMargin": 34,
+      "opaquePixels": 44702
     },
     {
       "index": 4,
       "outputBbox": [
-        29,
-        219,
-        345,
-        607
+        49,
+        265,
+        328,
+        606
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 57555
+      "minimumMargin": 34,
+      "opaquePixels": 44543
     },
     {
       "index": 5,
       "outputBbox": [
-        31,
-        217,
-        347,
-        607
+        51,
+        263,
+        329,
+        606
       ],
-      "minimumMargin": 31,
-      "opaquePixels": 57349
+      "minimumMargin": 34,
+      "opaquePixels": 44374
     },
     {
       "index": 6,
       "outputBbox": [
-        55,
-        82,
-        349,
-        607
+        73,
+        144,
+        331,
+        606
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 69098
+      "minimumMargin": 34,
+      "opaquePixels": 53339
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 417,
-    "frameHeight": 551,
-    "rootX": 182,
-    "rootY": 535,
+    "frameWidth": 369,
+    "frameHeight": 486,
+    "rootX": 161,
+    "rootY": 472,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      16,
-      69
+      37,
+      132
     ],
     "decodedBytes": {
       "canonical": 8028160,
-      "packed": 6433476
+      "packed": 5021352
     },
     "pixelScale": 2.0
   },
@@ -115,9 +115,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "6e4d49f91b634440607b5e9be3d5cbd7b6b15e0625e9d929ef084b00b3d3871e",
-      "config": "30f4d8fabe75380efeec8009206c20a9162fb4230cd633287950dfe8bfb9c77f",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "source": "039dcb80f6c19c8e9cc8d2c508608debea3c73c5b28824a30916ae0380e2d32d",
+      "config": "e6cf2d8d98081b97bda994406eb1030b92fa25e20b7662c6a6722b71af71b0ec",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_defense_air_video_normalized.png": "5d258b57e88dd812a06c5d97d01bca191dcaca760179cba2724aa341e029918c"

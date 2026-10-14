@@ -19,5 +19,30 @@
   "sourceReferences": [
     "art/sprites/source/p03_ultra_beam_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901
+  ],
+  "reguaFatores": [
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901,
+    0.9901
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 101% (ULTRA_BEAM)"
+  ]
 }

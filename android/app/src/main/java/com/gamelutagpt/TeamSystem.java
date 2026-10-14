@@ -59,6 +59,12 @@ final class TeamSystem {
         /** The member waiting off screen, or null without a partner. */
         FighterState partner() { return members.length > 1 ? members[(point + 1) % members.length] : null; }
 
+        /** The partner can come in (assist, tag): there is one and it still has life. */
+        boolean partnerStanding() {
+            FighterState p = partner();
+            return p != null && p.life > 0;
+        }
+
         boolean tagging() { return tagPhase != TAG_NONE; }
 
         boolean assistOut() { return assistPhase != ASSIST_NONE; }
@@ -197,7 +203,7 @@ final class TeamSystem {
     }
 
     private boolean canAssist(Side s, CombatFighter point) {
-        if (s.partner() == null || s.assistOut() || s.assistCooldown > 0 || s.tagging() || s.leavingFrame >= 0) {
+        if (!s.partnerStanding() || s.assistOut() || s.assistCooldown > 0 || s.tagging() || s.leavingFrame >= 0) {
             return false;
         }
         if (point.locked || point.ko()) return false;
@@ -208,7 +214,7 @@ final class TeamSystem {
 
     /** The partner is free to come in (assist ready, no tag or assist going on). */
     private static boolean canGuardCancel(Side s) {
-        return s.partner() != null && !s.tagging() && !s.assistOut() && s.assistCooldown == 0 && s.leavingFrame < 0;
+        return s.partnerStanding() && !s.tagging() && !s.assistOut() && s.assistCooldown == 0 && s.leavingFrame < 0;
     }
 
     /** TAG would Guard Cancel now (blocking on the ground with the partner ready and a bar). */
@@ -236,7 +242,7 @@ final class TeamSystem {
     }
 
     private boolean canRawTag(Side s, CombatFighter point) {
-        return s.partner() != null && !s.tagging() && s.tagCooldown == 0 && !s.assistOut() &&
+        return s.partnerStanding() && !s.tagging() && s.tagCooldown == 0 && !s.assistOut() &&
             s.leavingFrame < 0 && point.canAct();
     }
 
@@ -387,6 +393,54 @@ final class TeamSystem {
         s.convert = false;
         lockTeamActions(s);
         if (a != null) a.travel = 0f;
+    }
+
+    // ---------------------------------------------------------------- batalha 2x2
+
+    /** Batalha 2x2: o lado perdeu quando ninguém do time tem vida. */
+    boolean defeated(int side) {
+        for (FighterState m : sides[side].members) if (m.life > 0) return false;
+        return true;
+    }
+
+    /** O próximo membro com vida depois do titular, ou -1. */
+    private static int nextStanding(Side s) {
+        for (int i = 1; i < s.members.length; i++) {
+            int index = (s.point + i) % s.members.length;
+            if (s.members[index].life > 0) return index;
+        }
+        return -1;
+    }
+
+    /** O titular caiu e há alguém com vida para entrar no lugar dele. */
+    boolean canReplaceFallen(int side) {
+        Side s = sides[side];
+        return s.pointState().life <= 0 && nextStanding(s) >= 0;
+    }
+
+    /**
+     * Batalha 2x2: o titular caiu; o próximo com vida vira titular e entra correndo por trás
+     * (a mesma entrada da troca), olhando para {@code facing}. O assist em campo some com ele
+     * e a barra do time passa para quem entra. Falso quando não há ninguém para entrar.
+     */
+    boolean enterAfterKo(int side, int facing) {
+        Side s = sides[side];
+        int next = nextStanding(s);
+        if (s.pointState().life > 0 || next < 0) return false;
+        s.assist = null;
+        s.assistPhase = ASSIST_NONE;
+        s.assistFrame = 0;
+        s.convert = false;
+        s.leaving = null;
+        s.leavingFrame = -1;
+        s.assistRequestAge = s.tagRequestAge = -1;
+        FighterState fallen = s.pointState();
+        s.point = next;
+        handMeter(fallen, s.pointState());
+        s.tagPhase = TAG_ENTER;
+        s.tagFrame = 0;
+        s.tagDirection = -facing;
+        return true;
     }
 
     // ---------------------------------------------------------------- meter

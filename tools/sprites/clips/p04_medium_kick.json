@@ -20,13 +20,48 @@
     "largura": 256,
     "raiz": "86,238",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "reguaFatores": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 110% (MEDIUM_KICK)"
+    ]
   },
   "rootX": 172,
   "sourceReferences": [
     "art/sprites/source/p04_medium_kick_video_normalized.png"
   ],
-  "frameWidth": 512,
+  "frameWidth": 514,
   "frameHeight": 512,
   "rootY": 476,
   "pixelScale": 2.0

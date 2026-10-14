@@ -282,7 +282,7 @@
     "sha256": {
       "source": "7f32f5d4edcd473932f2bae8cda5c90f265fd2d22514b58222c527602f289264",
       "config": "bdd1e6144b7ba32525a013dd57a64e3c02af1ec85b25ef975be65c11d40c4796",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_super_wave_video_normalized.png": "85b96f04c1306414e9b67ef42169362e1069db0d2d9605a59fefdf684327a377"

@@ -18,14 +18,37 @@
     "medida": "1º quadro = inicio_centro (nota 0.87)",
     "quadros": "25,26,26,27,28,29,29,30",
     "largura": 192,
-    "raiz": "103,238"
+    "raiz": "103,238",
+    "reescala": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "reguaFatores": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 110% (CROUCH)"
+    ]
   },
   "frameWidth": 384,
   "rootX": 206,
   "sourceReferences": [
     "art/sprites/source/p04_crouch_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
+  "frameHeight": 520,
+  "rootY": 484,
   "pixelScale": 2.0
 }

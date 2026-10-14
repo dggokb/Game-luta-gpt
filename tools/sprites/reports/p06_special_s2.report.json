@@ -18,247 +18,247 @@
     {
       "index": 0,
       "outputBbox": [
-        32,
-        48,
-        182,
-        271
+        42,
+        74,
+        174,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14030
+      "minimumMargin": 18,
+      "opaquePixels": 10908
     },
     {
       "index": 1,
       "outputBbox": [
-        32,
-        48,
-        181,
-        271
+        42,
+        74,
+        174,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14011
+      "minimumMargin": 18,
+      "opaquePixels": 10894
     },
     {
       "index": 2,
       "outputBbox": [
-        32,
-        47,
-        181,
-        271
+        42,
+        73,
+        174,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14059
+      "minimumMargin": 18,
+      "opaquePixels": 10969
     },
     {
       "index": 3,
       "outputBbox": [
-        32,
-        47,
-        181,
-        271
+        42,
+        73,
+        174,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13878
+      "minimumMargin": 18,
+      "opaquePixels": 10833
     },
     {
       "index": 4,
       "outputBbox": [
-        32,
-        47,
-        181,
-        271
+        42,
+        73,
+        174,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13978
+      "minimumMargin": 18,
+      "opaquePixels": 10884
     },
     {
       "index": 5,
       "outputBbox": [
-        32,
-        46,
-        181,
-        271
+        42,
+        72,
+        174,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14018
+      "minimumMargin": 18,
+      "opaquePixels": 10878
     },
     {
       "index": 6,
       "outputBbox": [
-        30,
-        45,
-        181,
-        270
+        40,
+        71,
+        174,
+        269
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 13844
+      "minimumMargin": 19,
+      "opaquePixels": 10775
     },
     {
       "index": 7,
       "outputBbox": [
-        27,
-        45,
-        181,
-        270
+        37,
+        71,
+        174,
+        269
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 13905
+      "minimumMargin": 19,
+      "opaquePixels": 10836
     },
     {
       "index": 8,
       "outputBbox": [
-        23,
-        46,
-        181,
+        34,
+        72,
+        174,
         268
       ],
       "minimumMargin": 20,
-      "opaquePixels": 13841
+      "opaquePixels": 10795
     },
     {
       "index": 9,
       "outputBbox": [
-        22,
-        47,
-        207,
+        33,
+        73,
+        196,
         268
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14976
+      "minimumMargin": 20,
+      "opaquePixels": 11680
     },
     {
       "index": 10,
       "outputBbox": [
-        21,
-        46,
-        206,
+        32,
+        72,
+        196,
         268
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 14849
+      "minimumMargin": 20,
+      "opaquePixels": 11621
     },
     {
       "index": 11,
       "outputBbox": [
-        20,
-        46,
-        205,
+        31,
+        72,
+        195,
         268
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 14758
+      "minimumMargin": 20,
+      "opaquePixels": 11552
     },
     {
       "index": 12,
       "outputBbox": [
-        19,
-        46,
-        203,
+        30,
+        72,
+        193,
         268
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 14689
+      "minimumMargin": 20,
+      "opaquePixels": 11501
     },
     {
       "index": 13,
       "outputBbox": [
-        19,
-        46,
-        204,
+        30,
+        72,
+        194,
         268
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 14737
+      "minimumMargin": 20,
+      "opaquePixels": 11527
     },
     {
       "index": 14,
       "outputBbox": [
-        18,
-        45,
-        203,
+        29,
+        71,
+        193,
         268
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 14726
+      "minimumMargin": 20,
+      "opaquePixels": 11518
     },
     {
       "index": 15,
       "outputBbox": [
-        17,
-        45,
-        202,
+        29,
+        71,
+        192,
         268
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14671
+      "minimumMargin": 20,
+      "opaquePixels": 11480
     },
     {
       "index": 16,
       "outputBbox": [
-        16,
-        45,
-        202,
+        28,
+        71,
+        192,
         268
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14623
+      "minimumMargin": 20,
+      "opaquePixels": 11447
     },
     {
       "index": 17,
       "outputBbox": [
-        21,
-        47,
-        198,
-        270
+        32,
+        73,
+        188,
+        269
       ],
-      "minimumMargin": 18,
-      "opaquePixels": 13949
+      "minimumMargin": 19,
+      "opaquePixels": 10899
     },
     {
       "index": 18,
       "outputBbox": [
-        20,
-        49,
-        170,
-        271
+        31,
+        75,
+        164,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13554
+      "minimumMargin": 18,
+      "opaquePixels": 10566
     },
     {
       "index": 19,
       "outputBbox": [
-        18,
-        51,
-        167,
-        271
+        30,
+        77,
+        161,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13786
+      "minimumMargin": 18,
+      "opaquePixels": 10724
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 211,
-    "frameHeight": 246,
-    "rootX": 107,
-    "rootY": 235,
+    "frameWidth": 188,
+    "frameHeight": 219,
+    "rootX": 95,
+    "rootY": 209,
     "columns": 11,
     "frameCount": 20,
     "cropOffset": [
-      6,
-      35
+      18,
+      61
     ],
     "decodedBytes": {
       "canonical": 5677056,
-      "packed": 4567728
+      "packed": 3623136
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "7e993339ae500ac5f04cab8de18c44e244ad174d67c8e608dc6271b529ed1b93",
-      "config": "68348da6288cf1f20b15262377bc03a04dbef65a72d23a6b1a1133f7fd5f62fc",
-      "profile": "ed9db22060e90690715e9be1f7a9baa28a89d85737c20c432e40c3e9015911ca"
+      "source": "db00743de75e9b8ec4e4374977d1475b4ce541bf565cdf52a9f9cf47940bde28",
+      "config": "e6550568bc2d05ed4fd96fde45f1ed87000a839fb60b924cc9bcff69b59adbe9",
+      "profile": "d3d108101055136c07a3f73bafba462a354b7d6730d1d93c6224b067fc938dfc"
     }
   }
 }

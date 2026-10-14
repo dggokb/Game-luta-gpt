@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        26,
-        41,
-        272,
-        271
+        11,
+        18,
+        281,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 18112
+      "minimumMargin": 11,
+      "opaquePixels": 22074
     },
     {
       "index": 1,
       "outputBbox": [
-        59,
-        60,
-        285,
-        271
+        47,
+        40,
+        295,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17093
+      "minimumMargin": 16,
+      "opaquePixels": 20769
     },
     {
       "index": 2,
       "outputBbox": [
-        77,
-        58,
-        286,
-        272
+        67,
+        37,
+        297,
+        273
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17035
+      "minimumMargin": 15,
+      "opaquePixels": 20734
     },
     {
       "index": 3,
       "outputBbox": [
-        61,
-        57,
-        266,
-        272
+        49,
+        36,
+        275,
+        273
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17045
+      "minimumMargin": 15,
+      "opaquePixels": 20733
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 280,
-    "frameHeight": 252,
-    "rootX": 160,
-    "rootY": 240,
+    "frameWidth": 307,
+    "frameHeight": 276,
+    "rootX": 176,
+    "rootY": 263,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      16,
-      30
+      0,
+      7
     ],
     "decodedBytes": {
       "canonical": 1474560,
-      "packed": 1128960
+      "packed": 1355712
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "1ec5a6382b801714cfb5a034a6d05fbe3786b7387682b1aecbd223cda2ddc447",
-      "config": "b0abda9408f3afeac236d0aaf612ecd8f106392669ca2e49dc3aba817cc41caf",
-      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+      "source": "f7b41d0cb6f4f129a01af6f65d83d23f9332642a45a057122d53bbdb3073abac",
+      "config": "8bd22f0b8c5b9493199481ac5b6dd5b70aec76677a960fe71473cc4f2e5c1ac7",
+      "profile": "7027f1483542b0d12a978515370e55f2628bbd34a3c9f02206899d8e57a349b3"
     }
   }
 }

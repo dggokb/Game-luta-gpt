@@ -8,9 +8,9 @@
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 192,
-    "frameHeight": 256,
+    "frameHeight": 262,
     "rootX": 89,
-    "rootY": 238,
+    "rootY": 244,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        24,
-        14,
-        167,
-        236
+        21,
+        9,
+        172,
+        242
       ],
-      "minimumMargin": 14,
-      "opaquePixels": 12426
+      "minimumMargin": 9,
+      "opaquePixels": 13810
     },
     {
       "index": 1,
       "outputBbox": [
-        17,
-        75,
-        175,
-        240
+        14,
+        73,
+        180,
+        247
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 10722
+      "minimumMargin": 12,
+      "opaquePixels": 11939
     },
     {
       "index": 2,
       "outputBbox": [
-        16,
-        104,
-        162,
-        238
+        13,
+        103,
+        167,
+        244
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 10024
+      "minimumMargin": 13,
+      "opaquePixels": 11144
     },
     {
       "index": 3,
       "outputBbox": [
-        16,
+        13,
         104,
-        155,
-        239
+        160,
+        245
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 9992
+      "minimumMargin": 13,
+      "opaquePixels": 11104
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 179,
-    "frameHeight": 247,
-    "rootX": 83,
-    "rootY": 234,
+    "frameWidth": 188,
+    "frameHeight": 258,
+    "rootX": 87,
+    "rootY": 244,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      6,
-      4
+      2,
+      0
     ],
     "decodedBytes": {
-      "canonical": 786432,
-      "packed": 707408
+      "canonical": 804864,
+      "packed": 776064
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5c66f5cc567bd74398672c8b99b94f425b42231abdf972a7106048ed10f3294a",
-      "config": "db22bf62d496b4e90a2307e495795a3e4eda176fd5c6d98412724a9434b293ac",
-      "profile": "bf4b8e3536c396d10dba234f12745f12c20b3cbacf439b73dd3c0dbee7b099d7"
+      "source": "d225ee800f37ad46e24927f2507b1d73e575eede2a9876c2ceaab4ef0dadee16",
+      "config": "501543face7b7f1fb78da0ce4fc718a68ed416eca05d51cbd1f4a90d3cf35e1b",
+      "profile": "f7a23ee0d43bd85d8d286f98d49b6623777b882367a98aa873a07f510bc9f6ab"
     }
   }
 }

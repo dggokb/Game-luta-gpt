@@ -21,10 +21,31 @@
     "largura": 320,
     "raiz": "166,302",
     "colunas": 7,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "reescala": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "reguaFatores": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 110% (JUMP_HEAVY / JUMP_HEAVY_DOWN)"
+    ]
   },
   "frameWidth": 320,
-  "frameHeight": 320,
+  "frameHeight": 334,
   "rootX": 166,
-  "rootY": 302
+  "rootY": 316
 }

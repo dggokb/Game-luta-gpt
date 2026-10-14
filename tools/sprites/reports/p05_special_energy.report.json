@@ -18,140 +18,140 @@
     {
       "index": 0,
       "outputBbox": [
-        86,
-        79,
-        388,
-        477
+        92,
+        95,
+        383,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 56128
+      "minimumMargin": 34,
+      "opaquePixels": 52737
     },
     {
       "index": 1,
       "outputBbox": [
-        71,
-        89,
-        408,
-        477
+        78,
+        104,
+        402,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 55249
+      "minimumMargin": 34,
+      "opaquePixels": 51829
     },
     {
       "index": 2,
       "outputBbox": [
-        61,
-        95,
-        429,
-        477
+        68,
+        110,
+        422,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 55008
+      "minimumMargin": 34,
+      "opaquePixels": 51646
     },
     {
       "index": 3,
       "outputBbox": [
-        55,
-        96,
-        434,
-        477
+        63,
+        111,
+        427,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 55036
+      "minimumMargin": 34,
+      "opaquePixels": 51650
     },
     {
       "index": 4,
       "outputBbox": [
-        69,
-        101,
-        521,
-        477
+        76,
+        116,
+        510,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 61802
+      "minimumMargin": 34,
+      "opaquePixels": 57848
     },
     {
       "index": 5,
       "outputBbox": [
-        69,
-        97,
-        517,
-        477
+        76,
+        112,
+        507,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 62407
+      "minimumMargin": 34,
+      "opaquePixels": 58485
     },
     {
       "index": 6,
       "outputBbox": [
-        67,
-        88,
-        513,
-        476
+        74,
+        103,
+        503,
+        477
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 60687
+      "minimumMargin": 35,
+      "opaquePixels": 56771
     },
     {
       "index": 7,
       "outputBbox": [
-        65,
-        99,
-        511,
-        476
+        72,
+        114,
+        501,
+        477
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 59523
+      "minimumMargin": 35,
+      "opaquePixels": 55751
     },
     {
       "index": 8,
       "outputBbox": [
-        67,
-        100,
-        497,
-        476
+        74,
+        115,
+        487,
+        477
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 58489
+      "minimumMargin": 35,
+      "opaquePixels": 54739
     },
     {
       "index": 9,
       "outputBbox": [
-        79,
-        89,
-        369,
-        477
+        86,
+        104,
+        365,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 55508
+      "minimumMargin": 34,
+      "opaquePixels": 52042
     },
     {
       "index": 10,
       "outputBbox": [
-        77,
-        80,
-        371,
-        477
+        84,
+        96,
+        367,
+        478
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 56360
+      "minimumMargin": 34,
+      "opaquePixels": 52931
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 482,
-    "frameHeight": 414,
-    "rootX": 199,
-    "rootY": 405,
+    "frameWidth": 466,
+    "frameHeight": 402,
+    "rootX": 193,
+    "rootY": 390,
     "columns": 7,
     "frameCount": 11,
     "cropOffset": [
-      47,
-      71
+      53,
+      86
     ],
     "decodedBytes": {
       "canonical": 16515072,
-      "packed": 11174688
+      "packed": 10490592
     },
     "pixelScale": 2.0
   },
@@ -159,9 +159,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5c7501eb584349f4665c4b6e963c9f16f6aa13fea6387438e89068be6dec119e",
-      "config": "007518e93c532599819c536c6e07feb42c4fb179bdcfcedb4812ee8e1aac8064",
-      "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+      "source": "2a070796dfe6718b8bf23d94b1973338e05212a7fb13d3453ca73a452c6e4596",
+      "config": "d07e64d47445d3f056d7d38fe17ae809d53a79e7209cf38193c51c2ab7850769",
+      "profile": "1399fbfca02c9eb84b74570911705356bec6b2c360af9d66f0de19f79e242159"
     },
     "referenceSources": {
       "art/sprites/source/p05_special_energy_video_normalized.png": "3927cc87bf2ad59244dd663b21fa745e259880411e3f4deda9488867a08d7f57"

@@ -18,63 +18,63 @@
     {
       "index": 0,
       "outputBbox": [
-        180,
-        85,
-        377,
-        607
+        191,
+        147,
+        365,
+        606
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 60028
+      "minimumMargin": 34,
+      "opaquePixels": 46485
     },
     {
       "index": 1,
       "outputBbox": [
-        59,
-        191,
-        441,
-        607
+        85,
+        240,
+        421,
+        606
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 61476
+      "minimumMargin": 34,
+      "opaquePixels": 47520
     },
     {
       "index": 2,
       "outputBbox": [
-        77,
-        190,
-        457,
-        606
+        101,
+        239,
+        435,
+        605
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 63498
+      "minimumMargin": 35,
+      "opaquePixels": 49091
     },
     {
       "index": 3,
       "outputBbox": [
-        164,
-        137,
-        463,
-        607
+        178,
+        192,
+        440,
+        606
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 58963
+      "minimumMargin": 34,
+      "opaquePixels": 45618
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 428,
-    "frameHeight": 547,
-    "rootX": 227,
-    "rootY": 531,
+    "frameWidth": 378,
+    "frameHeight": 483,
+    "rootX": 200,
+    "rootY": 469,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      47,
-      73
+      74,
+      135
     ],
     "decodedBytes": {
       "canonical": 10485760,
-      "packed": 3745856
+      "packed": 2921184
     },
     "pixelScale": 2.0
   },
@@ -82,9 +82,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "7b1bf951e984fa83f83e71b35afc92a1e9ef7bee66b8cad927a9773b2e1f7ef5",
-      "config": "61eefc8efa3c6db1db80c9d326d40416bfc6f3270a70086b3b2ac41b364bd7a9",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "source": "fe01a582b0bc20aa0b9b554382a748a71558bbe5d4293eb4905ef32d6b37f5fb",
+      "config": "0ce38b870015932284cbcda887a2d2994dab2033c1a1719563693fa10a8055e9",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_hit_air_video_normalized.png": "e623454d7067813fd036884512c7b9ed502087b8551b964651818a599569ebed"

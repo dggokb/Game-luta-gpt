@@ -18,96 +18,96 @@
     {
       "index": 0,
       "outputBbox": [
-        108,
-        79,
-        340,
-        606
+        110,
+        90,
+        337,
+        605
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 61210
+      "minimumMargin": 35,
+      "opaquePixels": 58683
     },
     {
       "index": 1,
       "outputBbox": [
-        64,
-        81,
-        344,
+        66,
+        92,
+        341,
         607
       ],
       "minimumMargin": 33,
-      "opaquePixels": 66234
+      "opaquePixels": 63490
     },
     {
       "index": 2,
       "outputBbox": [
-        55,
-        243,
-        586,
-        608
+        58,
+        250,
+        578,
+        607
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 72139
+      "minimumMargin": 33,
+      "opaquePixels": 69193
     },
     {
       "index": 3,
       "outputBbox": [
-        57,
-        243,
-        586,
-        608
+        60,
+        250,
+        578,
+        607
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 71564
+      "minimumMargin": 33,
+      "opaquePixels": 68599
     },
     {
       "index": 4,
       "outputBbox": [
-        64,
-        243,
-        584,
-        608
+        66,
+        250,
+        576,
+        607
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 71668
+      "minimumMargin": 33,
+      "opaquePixels": 68666
     },
     {
       "index": 5,
       "outputBbox": [
-        55,
-        235,
-        443,
+        58,
+        242,
+        438,
         606
       ],
       "minimumMargin": 34,
-      "opaquePixels": 62318
+      "opaquePixels": 59837
     },
     {
       "index": 6,
       "outputBbox": [
-        51,
-        196,
-        347,
+        54,
+        204,
+        344,
         607
       ],
       "minimumMargin": 33,
-      "opaquePixels": 58837
+      "opaquePixels": 56420
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 560,
-    "frameHeight": 554,
-    "rootX": 173,
-    "rootY": 537,
+    "frameWidth": 549,
+    "frameHeight": 542,
+    "rootX": 170,
+    "rootY": 526,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      39,
-      67
+      42,
+      78
     ],
     "decodedBytes": {
       "canonical": 11468800,
-      "packed": 8686720
+      "packed": 8331624
     },
     "pixelScale": 2.0
   },
@@ -115,9 +115,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "b969634ed90f0be045b754cc0e707deb83755170121ad6596576445f68656897",
-      "config": "3a6e596558a571bf478009fe0683439fcdf818a8ddb742c59d1e6ee752b6d89d",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "source": "6663157254b0fb12a57e0e55e5754a50c37b4c094826bd42924bfd823af4fb26",
+      "config": "befe5a37b3f44b91cd84de8bd4a2c1b46d04b2bf4e7b3b1c1992c76ac0f90dfa",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_jump_light_video_normalized.png": "56734b63e6efc4a01fc189bbeb738a851276d8950319d7542ed7b5ae02c97477"

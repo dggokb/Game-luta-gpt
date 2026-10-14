@@ -24,10 +24,25 @@
     "pe_no_chao": true,
     "limpar_quadros": [
       0
+    ],
+    "reescala": [
+      0.885,
+      0.885,
+      0.885,
+      0.885
+    ],
+    "reguaFatores": [
+      0.885,
+      0.885,
+      0.885,
+      0.885
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 113% (HIT_AIR)"
     ]
   },
-  "frameWidth": 288,
+  "frameWidth": 306,
   "frameHeight": 288,
-  "rootX": 168,
+  "rootX": 180,
   "rootY": 270
 }

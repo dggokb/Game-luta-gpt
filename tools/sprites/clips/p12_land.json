@@ -20,8 +20,25 @@
     "largura": 192,
     "raiz": "89,238",
     "colunas": 4,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524
+    ],
+    "reguaFatores": [
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 105% (LAND)"
+    ]
   },
   "frameWidth": 192,
-  "rootX": 89
+  "rootX": 89,
+  "frameHeight": 262,
+  "rootY": 244
 }

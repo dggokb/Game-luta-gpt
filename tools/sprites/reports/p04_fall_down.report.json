@@ -161,7 +161,7 @@
     "sha256": {
       "source": "bbd1b43ce5778a8d2bf7e4652ba1fa2c63dc35e076c51912899b72e9e9f9468f",
       "config": "24b5a2e492a138185c86ae263da4be4111a4b0a744db801663c9ac01c9c4266e",
-      "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+      "profile": "c9520a0d18b4af74b1ad3db9725a757c42a2a7ee4178bcb6adad6d0039b39b5d"
     },
     "referenceSources": {
       "art/sprites/source/p04_fall_down_video_normalized.png": "22fbf86008c54bd4647239bf5a2bc9720cb588d7510d36959f1c2b7ca7a09add"

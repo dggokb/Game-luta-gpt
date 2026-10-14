@@ -139,7 +139,7 @@
     "sha256": {
       "source": "523a3e2bccc14000ec72ec0a368f4b825e905d46edaba5c3aafd6f11ee39f6f4",
       "config": "17102c65425152ffc4b9fa2207096c0dc4cbd1ddffb5034769cdd2e316c7c1bc",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_ultra_beam_video_normalized.png": "5ca93e3ccdfa205730488c4747eb6e9388f22c16a98f8d4483bcf86d0bdb1a99"

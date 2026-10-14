@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        46,
-        127,
-        235,
+        40,
+        119,
+        238,
         271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 13264
+      "opaquePixels": 14674
     },
     {
       "index": 1,
       "outputBbox": [
-        39,
-        39,
-        207,
+        32,
+        27,
+        208,
         271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 18823
+      "opaquePixels": 20828
     },
     {
       "index": 2,
       "outputBbox": [
-        16,
-        40,
-        210,
-        272
+        8,
+        28,
+        212,
+        271
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18215
+      "minimumMargin": 8,
+      "opaquePixels": 20174
     },
     {
       "index": 3,
       "outputBbox": [
-        44,
-        121,
-        240,
+        37,
+        113,
+        244,
         271
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14282
+      "minimumMargin": 12,
+      "opaquePixels": 15773
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 245,
-    "frameHeight": 253,
-    "rootX": 170,
-    "rootY": 241,
+    "frameWidth": 254,
+    "frameHeight": 266,
+    "rootX": 176,
+    "rootY": 254,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      6,
-      29
+      0,
+      16
     ],
     "decodedBytes": {
       "canonical": 1179648,
-      "packed": 991760
+      "packed": 1081024
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "fb3112be9c3b58ae3bb00a098fb83d49f2b75bc568aed9ee8fe7076595c6b157",
-      "config": "ee6a0e15f65885841444f0feb8b2dccbb13490e1279337095e8d6af8d7aab544",
-      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+      "source": "80b2ea4c50fbcc1f7882d35467994bb23851d4b4ee21935d8324a0b1b2f2db02",
+      "config": "7d315f7ed9d766549f9bbe22b7e589594a1abb5ce25a8723f705406353cf9a6e",
+      "profile": "7027f1483542b0d12a978515370e55f2628bbd34a3c9f02206899d8e57a349b3"
     }
   }
 }

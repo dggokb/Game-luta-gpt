@@ -194,7 +194,7 @@
     "sha256": {
       "source": "315d88da3d9e20d9de79b0a4719a5fc7ac7bc8124431bfb93e0edca353d2a49d",
       "config": "456657b2d731d715a237a7bf82bb0ecd140020f5b5085e4d956bed6b93b470b0",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_medium_kick_video_normalized.png": "00fa641f9cc5a52df21f7523982e651ebe396dedccad97ed6b4c8224b0ce932d"

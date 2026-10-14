@@ -18,5 +18,9 @@
   "sourceReferences": [
     "art/sprites/source/player_base_hit_air_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "ajusteTamanho": 0.98,
+  "regua": [
+    "ajuste no app 20261014-0532: 98% (HIT_AIR)"
+  ]
 }

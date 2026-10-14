@@ -18,63 +18,63 @@
     {
       "index": 0,
       "outputBbox": [
-        128,
-        131,
-        399,
-        603
-      ],
-      "minimumMargin": 37,
-      "opaquePixels": 62419
-    },
-    {
-      "index": 1,
-      "outputBbox": [
-        124,
-        179,
+        121,
+        108,
         406,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 57646
+      "opaquePixels": 68721
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        117,
+        158,
+        413,
+        603
+      ],
+      "minimumMargin": 37,
+      "opaquePixels": 63514
     },
     {
       "index": 2,
       "outputBbox": [
-        120,
-        183,
-        395,
+        113,
+        162,
+        402,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 57447
+      "opaquePixels": 63328
     },
     {
       "index": 3,
       "outputBbox": [
-        116,
-        183,
-        400,
+        109,
+        162,
+        407,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 56026
+      "opaquePixels": 61772
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 316,
-    "frameHeight": 497,
-    "rootX": 153,
-    "rootY": 481,
+    "frameWidth": 330,
+    "frameHeight": 521,
+    "rootX": 160,
+    "rootY": 504,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      103,
-      119
+      96,
+      96
     ],
     "decodedBytes": {
       "canonical": 6553600,
-      "packed": 2512832
+      "packed": 2750880
     },
     "pixelScale": 2.0
   },
@@ -82,8 +82,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "04fec657d0acc3c9b0b5d68bdb26727d113d8219fed5ed802405af6547c859ee",
-      "config": "895536ac3fce2b4adc05209cd4760cddb5da63e3d54674cfb78c673e547ddb6a",
+      "source": "576a42813d4a71685467aa5d4a313629a231d489ab303184bd0394c480dfdc38",
+      "config": "7acbdf270dae3a6c0e589f3ac3efd7a50141f7c1be928c2c72d6943a67f94041",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

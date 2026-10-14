@@ -25,10 +25,35 @@
     "limpar_quadros": [
       1,
       5
+    ],
+    "reescala": [
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772
+    ],
+    "reguaFatores": [
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772,
+      0.8772
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 114% (THROW_GRAB / THROW_TOSS)"
     ]
   },
-  "frameWidth": 416,
-  "frameHeight": 288,
-  "rootX": 177,
-  "rootY": 270
+  "frameWidth": 428,
+  "frameHeight": 290,
+  "rootX": 189,
+  "rootY": 272
 }

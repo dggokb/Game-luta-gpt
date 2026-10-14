@@ -84,7 +84,7 @@
     "sha256": {
       "source": "a8709518b2ec69eac0b14538281f5033f7e3ccd2fdee5a613ec9fc065b7fb8fb",
       "config": "739b77cb0c5d39aed17c0211768946ff420babeb8b5bcc585c56be5ae22cd4da",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_land_video_normalized.png": "bad1937c83d1cd7ac5ac4eb328f3eab237c26b2af522f4e429ae1f826cbd0c5f"

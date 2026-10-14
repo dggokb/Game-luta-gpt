@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        29,
-        159,
-        329,
+        39,
+        178,
+        324,
         542
       ],
-      "minimumMargin": 29,
-      "opaquePixels": 53325
+      "minimumMargin": 34,
+      "opaquePixels": 48071
     },
     {
       "index": 1,
       "outputBbox": [
-        37,
-        159,
-        336,
+        46,
+        178,
+        330,
         542
       ],
       "minimumMargin": 34,
-      "opaquePixels": 53432
+      "opaquePixels": 48185
     },
     {
       "index": 2,
       "outputBbox": [
-        35,
-        159,
-        342,
+        44,
+        178,
+        336,
         542
       ],
       "minimumMargin": 34,
-      "opaquePixels": 53062
+      "opaquePixels": 47915
     },
     {
       "index": 3,
       "outputBbox": [
-        41,
-        157,
-        345,
+        50,
+        177,
+        339,
         542
       ],
       "minimumMargin": 34,
-      "opaquePixels": 52594
+      "opaquePixels": 47482
     },
     {
       "index": 4,
       "outputBbox": [
-        51,
-        152,
-        351,
+        60,
+        171,
+        345,
         543
       ],
       "minimumMargin": 33,
-      "opaquePixels": 51655
+      "opaquePixels": 46547
     },
     {
       "index": 5,
       "outputBbox": [
-        72,
-        73,
-        343,
-        542
+        79,
+        96,
+        337,
+        541
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 57644
+      "minimumMargin": 35,
+      "opaquePixels": 51957
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 348,
-    "frameHeight": 495,
-    "rootX": 195,
-    "rootY": 480,
+    "frameWidth": 331,
+    "frameHeight": 470,
+    "rootX": 185,
+    "rootY": 456,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      17,
-      60
+      27,
+      84
     ],
     "decodedBytes": {
       "canonical": 5308416,
-      "packed": 4134240
+      "packed": 3733680
     },
     "pixelScale": 2.0
   },
@@ -104,9 +104,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "da030b72e46f61fa38f9dcdca038bb90e709e965aaf907c72e8bd1a978fe82f5",
-      "config": "b6fa0d0ca24a160a4407c5d6329d63d00464b572c8d76d18d2be90d08cce79c4",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "source": "67af61c16c31141c6f73a44b800337d8c80764f7604c02530629451650802c28",
+      "config": "d94584dd73365f81f93e9292d2f5d9f2758b37ced5b22ec4b69bc63c12ed2fdf",
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_fall_video_normalized.png": "4a91b4fb6deb8bbc9696247f49532bc50a6a186a3f97d1d1475a9ca6645935b7"

@@ -24,6 +24,21 @@
     "pe_no_chao": true,
     "limpar_quadros": [
       1
+    ],
+    "reescala": [
+      1.1364,
+      1.1364,
+      1.1364,
+      1.1364
+    ],
+    "reguaFatores": [
+      1.1364,
+      1.1364,
+      1.1364,
+      1.1364
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 88% (HIT_AIR)"
     ]
   },
   "frameWidth": 1024,

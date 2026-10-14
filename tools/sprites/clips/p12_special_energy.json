@@ -20,8 +20,39 @@
     "largura": 448,
     "raiz": "177,238",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "reguaFatores": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 110% (SPECIAL_ENERGY)"
+    ]
   },
-  "frameWidth": 448,
-  "rootX": 177
+  "frameWidth": 460,
+  "rootX": 179,
+  "frameHeight": 256,
+  "rootY": 238
 }

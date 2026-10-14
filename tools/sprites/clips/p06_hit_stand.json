@@ -23,7 +23,32 @@
     "colunas": 9,
     "fixar": "registro",
     "pe_no_chao": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236
+    ],
+    "reguaFatores": [
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 89% (HIT_STAND)"
+    ]
   },
   "frameWidth": 224,
   "frameHeight": 288,

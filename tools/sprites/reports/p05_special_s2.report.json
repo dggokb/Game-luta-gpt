@@ -260,7 +260,7 @@
     "sha256": {
       "source": "cca8143f2247ca232b17a5f8ed66b541e5baf84c3069b2e0b37dfb5411174edd",
       "config": "adfff53d857df760804a40838ba08041dec1f2d25cf91ae5208aa83bfbf0350d",
-      "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+      "profile": "1399fbfca02c9eb84b74570911705356bec6b2c360af9d66f0de19f79e242159"
     },
     "referenceSources": {
       "art/sprites/source/p05_special_s2_video_normalized.png": "757ff7fe393e365f1591d51d84be07f10d571af23a8819d988df6b18f8292509"

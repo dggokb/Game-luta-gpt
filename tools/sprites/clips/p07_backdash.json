@@ -22,9 +22,37 @@
     "raiz": "126,302",
     "colunas": 10,
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696
+    ],
+    "reguaFatores": [
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 115% (BACKDASH)"
+    ]
   },
-  "frameHeight": 320,
+  "frameHeight": 346,
   "rootX": 126,
-  "rootY": 302
+  "rootY": 328,
+  "frameWidth": 256
 }

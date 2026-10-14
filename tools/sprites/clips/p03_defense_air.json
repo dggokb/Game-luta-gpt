@@ -18,5 +18,24 @@
   "sourceReferences": [
     "art/sprites/source/p03_defense_air_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    1.0309,
+    1.0309,
+    1.0309,
+    1.0309,
+    1.0309,
+    1.0309
+  ],
+  "reguaFatores": [
+    1.0309,
+    1.0309,
+    1.0309,
+    1.0309,
+    1.0309,
+    1.0309
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 97% (DEFENSE_AIR)"
+  ]
 }

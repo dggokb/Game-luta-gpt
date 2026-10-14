@@ -18,5 +18,20 @@
   "sourceReferences": [
     "art/sprites/source/p03_hit_air_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    1.0638,
+    1.0638,
+    1.0638,
+    1.0638
+  ],
+  "reguaFatores": [
+    1.0638,
+    1.0638,
+    1.0638,
+    1.0638
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 94% (HIT_AIR)"
+  ]
 }

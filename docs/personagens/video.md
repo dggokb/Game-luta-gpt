@@ -186,7 +186,9 @@ assim.
 
 1. Escolha o personagem (◀ ▶) e a animação na lista. Ela toca em loop com o IDLE em
    transparência atrás, raiz no mesmo ponto, como na troca de animação no jogo
-   (PAUSA, VEL ½x/¼x e IDLE ATRÁS ajudam a comparar).
+   (PAUSA, VEL ½x/¼x e IDLE ATRÁS ajudam a comparar). O **P01 fica ao lado como referência**,
+   no mesmo chão e na mesma escala do jogo, fazendo a mesma animação (ou parado no IDLE; o
+   botão P01 troca).
 2. −5 / −1 / +1 / +5 mudam o tamanho da folha (1% por toque); 100% desfaz. Cada toque já
    vale no jogo e fica salvo no aparelho. Animações que usam a mesma folha (IDLE e COMBAT,
    agarrão) mudam juntas.
@@ -194,7 +196,10 @@ assim.
    `ajustes-tamanho-<data>.json` leva os ajustes de todos os personagens.
 4. Para gravar no jogo: `python3 tools/sprites/regua.py --aplicar ajustes-tamanho-<data>.json`,
    depois `build_characters.py --write`. A célula cresce sozinha quando o quadro aumentado
-   não cabe. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
+   não cabe (margem medida como o import mede). No P01 o fator vai para a receita
+   (`ajusteTamanho`) e a calibração gerada multiplica por ele, porque ela normaliza a folha
+   pela altura do idle. Se o IDLE mudou mais de 5%, atualize `standingVisualHeight` no
+   perfil (o build avisa). Hurtbox, alcance e saída das magias não mudam sozinhos. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
    tamanho), porque o tamanho já está no desenho.
 
 ## Ritmo: animação e movimento do jogo

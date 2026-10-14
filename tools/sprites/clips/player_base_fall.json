@@ -18,5 +18,9 @@
   "sourceReferences": [
     "art/sprites/source/player_base_knockdown_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "ajusteTamanho": 0.87,
+  "regua": [
+    "ajuste no app 20261014-0532: 87% (KNOCKDOWN / GROUNDED)"
+  ]
 }

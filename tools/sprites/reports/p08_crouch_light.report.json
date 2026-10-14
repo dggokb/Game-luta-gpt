@@ -18,148 +18,148 @@
     {
       "index": 0,
       "outputBbox": [
-        27,
-        35,
-        230,
-        175
+        37,
+        46,
+        225,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13482
+      "minimumMargin": 16,
+      "opaquePixels": 11612
     },
     {
       "index": 1,
       "outputBbox": [
-        27,
-        35,
-        229,
-        175
+        37,
+        46,
+        224,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13000
+      "minimumMargin": 16,
+      "opaquePixels": 11177
     },
     {
       "index": 2,
       "outputBbox": [
-        27,
-        36,
-        292,
-        175
+        37,
+        48,
+        282,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14326
+      "minimumMargin": 16,
+      "opaquePixels": 12319
     },
     {
       "index": 3,
       "outputBbox": [
-        27,
         37,
-        292,
-        175
+        48,
+        282,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 15400
+      "minimumMargin": 16,
+      "opaquePixels": 13200
     },
     {
       "index": 4,
       "outputBbox": [
-        27,
-        36,
-        291,
-        175
+        37,
+        48,
+        281,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16056
+      "minimumMargin": 16,
+      "opaquePixels": 13772
     },
     {
       "index": 5,
       "outputBbox": [
-        27,
-        36,
-        287,
+        37,
+        47,
+        277,
         175
       ],
       "minimumMargin": 17,
-      "opaquePixels": 16228
+      "opaquePixels": 13951
     },
     {
       "index": 6,
       "outputBbox": [
-        27,
-        35,
-        227,
+        37,
+        46,
+        222,
         175
       ],
       "minimumMargin": 17,
-      "opaquePixels": 14940
+      "opaquePixels": 12828
     },
     {
       "index": 7,
       "outputBbox": [
-        27,
-        34,
-        227,
-        175
+        37,
+        46,
+        222,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14280
+      "minimumMargin": 16,
+      "opaquePixels": 12262
     },
     {
       "index": 8,
       "outputBbox": [
-        27,
-        34,
-        229,
-        175
+        37,
+        45,
+        223,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13854
+      "minimumMargin": 16,
+      "opaquePixels": 11929
     },
     {
       "index": 9,
       "outputBbox": [
-        27,
-        34,
-        229,
-        175
+        37,
+        46,
+        224,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13468
+      "minimumMargin": 16,
+      "opaquePixels": 11580
     },
     {
       "index": 10,
       "outputBbox": [
-        27,
-        35,
-        230,
-        175
+        37,
+        46,
+        225,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13441
+      "minimumMargin": 16,
+      "opaquePixels": 11581
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 283,
-    "frameHeight": 161,
-    "rootX": 142,
-    "rootY": 150,
+    "frameWidth": 265,
+    "frameHeight": 151,
+    "rootX": 134,
+    "rootY": 139,
     "columns": 11,
     "frameCount": 11,
     "cropOffset": [
-      19,
-      24
+      27,
+      35
     ],
     "decodedBytes": {
       "canonical": 2703360,
-      "packed": 2004772
+      "packed": 1760660
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c9caddca1e43e7142b3921e3b7e56d7b2f61e32ee24ce8c5b032398d6a93c337",
-      "config": "a1789ecbcf2ef51e20ac02a514d291764b1273efd49690cb0967d09afd078a97",
-      "profile": "cf1cbdc18b7adbea62e1084aee5ce2b2f97f376a4dbe8529d1ae393128a9deb7"
+      "source": "5216453dedc5ef7fe0c2de2dfef3f15cafc83849714de56a946560754c40240a",
+      "config": "d2e060ea18554eddefe1503d24a2f402ef07205561ecd4636f49965c4bf67914",
+      "profile": "7aa3fa1a4c8ecab11a80e99a293d6ae03bf6ee8d950a20efe4d911175dfa9349"
     }
   }
 }

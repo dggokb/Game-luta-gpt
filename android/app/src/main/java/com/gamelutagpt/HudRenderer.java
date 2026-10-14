@@ -28,6 +28,12 @@ final class HudRenderer {
         FighterState reserve();
         FighterState opponent();
         CharacterDefinition opponentReserveCharacter();
+        /** O parceiro do CPU no 2x2 (com a vida dele), ou null no treino. */
+        default FighterState opponentReserve() { return null; }
+        /** Modo batalha (IA ON): a luta de verdade, 2x2. */
+        default boolean battleActive() { return false; }
+        /** Assist do CPU no 2x2: 0 em uso, subindo até 1 quando está pronto. */
+        default float opponentTagReadyRatio() { return 0f; }
         String versionLabel();
         String stateLabel();
         int facing();
@@ -128,24 +134,25 @@ final class HudRenderer {
 
         if (hudArt == null) {
             drawTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
-            drawTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+            drawTeam(c, s.opponent(), s.opponentReserve(), s.opponentReserveCharacter(), true, s.opponentTagReadyRatio(), portraits);
             drawPower(c, active, false);
             drawPower(c, s.opponent(), true);
         } else {
             drawArtTeam(c, active, reserve, null, false, s.tagReadyRatio(), portraits);
-            drawArtTeam(c, s.opponent(), null, s.opponentReserveCharacter(), true, 0f, portraits);
+            drawArtTeam(c, s.opponent(), s.opponentReserve(), s.opponentReserveCharacter(), true, s.opponentTagReadyRatio(), portraits);
             artwork(c, 0, 0, 1672, 280, 0f, 0f, 1280f, 170f);
             drawSegments(c, Arena.clamp(s.tagReadyRatio(), 0f, 1f) * 5f, 174f, 96f, 330f, 11f, BLUE);
             c.save(); c.translate(Arena.VW, 0f); c.scale(-1f, 1f);
-            // Training CPU has no playable reserve or assist system.
-            drawSegments(c, 0f, 174f, 96f, 330f, 11f, 0xFF596072);
+            // The CPU's assist meter (empty in training, where it has no reserve).
+            float cpuReady = Arena.clamp(s.opponentTagReadyRatio(), 0f, 1f);
+            drawSegments(c, cpuReady * 5f, 174f, 96f, 330f, 11f, cpuReady > 0f ? RED : 0xFF596072);
             c.restore();
             drawArtPower(c, active, false);
             drawArtPower(c, s.opponent(), true);
             text(c, "PLAYER 1", 220f, 65f, 15f, Color.WHITE);
             text(c, "PLAYER 2", 1060f, 65f, 15f, Color.WHITE);
             text(c, "TAG", 222f, 132f, 13f, Color.WHITE);
-            text(c, "TAG OFF", 1058f, 132f, 13f, 0xFFBCC4D8);
+            text(c, s.opponentReserve() == null ? "TAG OFF" : "TAG", 1058f, 132f, 13f, 0xFFBCC4D8);
         }
         drawFrameEffects(c);
         // Cached strings computed from independent real assist and raw-tag cooldowns.
@@ -155,7 +162,7 @@ final class HudRenderer {
         // Training has no round clock: never display a fabricated countdown.
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
         text(c, "∞", 640f, 70f, 58f, Color.WHITE);
-        text(c, "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
+        text(c, s.battleActive() ? "BATALHA" : "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
         if (s.debugEnabled()) {
             text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
         }

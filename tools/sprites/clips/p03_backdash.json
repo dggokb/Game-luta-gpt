@@ -16,7 +16,34 @@
   "sourceReferences": [
     "art/sprites/source/p03_backdash_video_normalized.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "frameHeight": 526,
+  "rootY": 490,
+  "pixelScale": 2.0,
+  "reescala": [
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524
+  ],
+  "reguaFatores": [
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 105% (BACKDASH)"
+  ]
 }

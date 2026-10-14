@@ -18,93 +18,93 @@
     {
       "index": 0,
       "outputBbox": [
-        27,
-        84,
-        241,
+        20,
+        74,
+        245,
         271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 17936
+      "opaquePixels": 19808
     },
     {
       "index": 1,
       "outputBbox": [
-        33,
-        84,
-        247,
-        272
+        27,
+        74,
+        252,
+        271
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 17902
+      "minimumMargin": 17,
+      "opaquePixels": 19770
     },
     {
       "index": 2,
       "outputBbox": [
-        37,
-        81,
-        258,
-        271
+        31,
+        71,
+        263,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17945
+      "minimumMargin": 18,
+      "opaquePixels": 19808
     },
     {
       "index": 3,
       "outputBbox": [
-        42,
-        66,
-        268,
-        272
+        36,
+        55,
+        274,
+        271
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18357
+      "minimumMargin": 17,
+      "opaquePixels": 20345
     },
     {
       "index": 4,
       "outputBbox": [
-        40,
-        38,
-        282,
+        34,
+        25,
+        288,
         271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 19165
+      "opaquePixels": 21236
     },
     {
       "index": 5,
       "outputBbox": [
-        44,
-        23,
-        292,
+        38,
+        10,
+        299,
         271
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 18601
+      "minimumMargin": 10,
+      "opaquePixels": 20582
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 285,
-    "frameHeight": 269,
-    "rootX": 135,
-    "rootY": 257,
+    "frameWidth": 299,
+    "frameHeight": 282,
+    "rootX": 142,
+    "rootY": 270,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      17,
-      13
+      10,
+      0
     ],
     "decodedBytes": {
       "canonical": 2211840,
-      "packed": 1839960
+      "packed": 2023632
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "ee7f0d5a6dde7a346014decfadd6ca4e4a5f10b088d8be13a0ae8a9f89f25ac1",
-      "config": "df6e3507a84395da8a96debc0eb8304e66f6204ba4a18780cf4cb995c40b60d2",
-      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+      "source": "9d44cbe185c8c1527d23caa59f2f373b8ebcda14bb70e5aa54efe710983e3098",
+      "config": "9f3b9facbb593e893859d73fbc98483108450295f61ae5670ad01a127de446c7",
+      "profile": "7027f1483542b0d12a978515370e55f2628bbd34a3c9f02206899d8e57a349b3"
     }
   }
 }

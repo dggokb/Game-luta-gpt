@@ -14,8 +14,8 @@ import java.util.Map;
  * fatores (Drive) e {@code tools/sprites/regua.py --aplicar} grava o tamanho na folha; o APK
  * seguinte já nasce do tamanho certo.
  *
- * A chave é a folha com as dimensões do atlas: depois que o ajuste é gravado, a folha nova
- * tem outras dimensões e o ajuste antigo deixa de valer sozinho (não aplica duas vezes).
+ * A chave é a folha com as dimensões do atlas (e, no P01, o fator gravado na calibração):
+ * depois que o ajuste é gravado, a chave muda e o ajuste antigo deixa de valer sozinho.
  * Várias animações podem usar a mesma folha (IDLE e COMBAT, agarrão...): o ajuste é da folha.
  */
 final class AjusteTamanho {
@@ -50,7 +50,11 @@ final class AjusteTamanho {
     }
 
     static String key(CharacterDefinition.Atlas a) {
-        return a.resource + "@" + a.width + "x" + a.height + "#" + a.count;
+        // O P01 grava o ajuste na calibração (a folha não muda de tamanho): o fator gravado
+        // entra na chave para o ajuste antigo do aparelho não valer duas vezes.
+        float baked = P01SpriteCalibration.tuned(a.resource);
+        return a.resource + "@" + a.width + "x" + a.height + "#" + a.count
+            + (baked == 1f ? "" : String.format(Locale.US, "~%.4f", baked));
     }
 
     static synchronized float scale(CharacterDefinition.Atlas a) {

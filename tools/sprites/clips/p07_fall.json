@@ -21,7 +21,26 @@
     "largura": 256,
     "raiz": "127,270",
     "colunas": 6,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "reescala": [
+      0.9709,
+      0.9709,
+      0.9709,
+      0.9709,
+      0.9709,
+      0.9709
+    ],
+    "reguaFatores": [
+      0.9709,
+      0.9709,
+      0.9709,
+      0.9709,
+      0.9709,
+      0.9709
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 103% (FALL)"
+    ]
   },
   "frameHeight": 288,
   "rootX": 127,

@@ -8,9 +8,9 @@
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 320,
-    "frameHeight": 256,
+    "frameHeight": 268,
     "rootX": 155,
-    "rootY": 238,
+    "rootY": 250,
     "columns": 11,
     "frameCount": 11
   },
@@ -18,148 +18,148 @@
     {
       "index": 0,
       "outputBbox": [
-        70,
-        21,
-        219,
-        239
+        62,
+        11,
+        226,
+        252
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16579
+      "minimumMargin": 11,
+      "opaquePixels": 20105
     },
     {
       "index": 1,
       "outputBbox": [
-        64,
-        20,
-        220,
-        239
+        55,
+        10,
+        227,
+        252
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17308
+      "minimumMargin": 10,
+      "opaquePixels": 21036
     },
     {
       "index": 2,
       "outputBbox": [
-        51,
-        19,
-        285,
-        240
+        41,
+        9,
+        298,
+        253
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18124
+      "minimumMargin": 9,
+      "opaquePixels": 22093
     },
     {
       "index": 3,
       "outputBbox": [
-        37,
-        19,
-        296,
-        240
+        25,
+        9,
+        310,
+        253
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18469
+      "minimumMargin": 9,
+      "opaquePixels": 22508
     },
     {
       "index": 4,
       "outputBbox": [
-        26,
-        18,
-        292,
-        240
+        14,
+        8,
+        306,
+        253
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18769
+      "minimumMargin": 8,
+      "opaquePixels": 22869
     },
     {
       "index": 5,
       "outputBbox": [
-        24,
-        19,
-        294,
-        240
+        11,
+        9,
+        308,
+        253
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18706
+      "minimumMargin": 9,
+      "opaquePixels": 22766
     },
     {
       "index": 6,
       "outputBbox": [
-        24,
-        19,
-        294,
-        240
+        11,
+        9,
+        308,
+        253
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18635
+      "minimumMargin": 9,
+      "opaquePixels": 22657
     },
     {
       "index": 7,
       "outputBbox": [
-        28,
-        20,
-        272,
-        240
+        16,
+        10,
+        284,
+        253
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 18055
+      "minimumMargin": 10,
+      "opaquePixels": 21972
     },
     {
       "index": 8,
       "outputBbox": [
-        35,
-        21,
-        207,
-        239
+        23,
+        11,
+        213,
+        252
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16423
+      "minimumMargin": 11,
+      "opaquePixels": 19962
     },
     {
       "index": 9,
       "outputBbox": [
-        46,
-        22,
-        207,
-        239
+        35,
+        12,
+        212,
+        252
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17210
+      "minimumMargin": 12,
+      "opaquePixels": 20889
     },
     {
       "index": 10,
       "outputBbox": [
-        57,
-        22,
-        212,
-        239
+        47,
+        12,
+        219,
+        252
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 16629
+      "minimumMargin": 12,
+      "opaquePixels": 20199
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 292,
-    "frameHeight": 242,
-    "rootX": 141,
-    "rootY": 230,
+    "frameWidth": 319,
+    "frameHeight": 263,
+    "rootX": 154,
+    "rootY": 250,
     "columns": 11,
     "frameCount": 11,
     "cropOffset": [
-      14,
-      8
+      1,
+      0
     ],
     "decodedBytes": {
-      "canonical": 3604480,
-      "packed": 3109216
+      "canonical": 3773440,
+      "packed": 3691468
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "7a1c8bf39a317de1c366bcb4cb28b589a13f2006f9040a1dfd4c492b212fad3d",
-      "config": "c7e4545fe847afa9555b8bd4fe9119233fb22d8fb251978e71a0e0b6d904db60",
-      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+      "source": "b2f968560a0cefbd6a0b91621db65d9527ba0898ac7785a13c74d19643a7a4ee",
+      "config": "cc8a56232bba45acff14a032ac233d31fe923fcf4a4dc8133eac0be0fdf2eae4",
+      "profile": "7027f1483542b0d12a978515370e55f2628bbd34a3c9f02206899d8e57a349b3"
     }
   }
 }

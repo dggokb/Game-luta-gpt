@@ -18,5 +18,9 @@
   "sourceReferences": [
     "art/sprites/source/player_base_intro_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "ajusteTamanho": 0.99,
+  "regua": [
+    "ajuste no app 20261014-0532: 99% (INTRO)"
+  ]
 }

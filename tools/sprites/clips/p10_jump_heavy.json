@@ -20,7 +20,28 @@
     "largura": 320,
     "raiz": "144,238",
     "colunas": 7,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "reescala": [
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111
+    ],
+    "reguaFatores": [
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111,
+      1.1111
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 90% (JUMP_HEAVY / JUMP_HEAVY_DOWN)"
+    ]
   },
   "rootX": 144,
   "frameWidth": 320

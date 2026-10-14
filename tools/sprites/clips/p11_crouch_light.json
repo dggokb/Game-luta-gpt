@@ -22,10 +22,39 @@
     "raiz": "169,174",
     "colunas": 11,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "reescala": [
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524
+    ],
+    "reguaFatores": [
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524,
+      0.9524
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 105% (CROUCH_LIGHT)"
+    ]
   },
-  "frameWidth": 352,
+  "frameWidth": 356,
   "frameHeight": 192,
-  "rootX": 169,
+  "rootX": 173,
   "rootY": 174
 }

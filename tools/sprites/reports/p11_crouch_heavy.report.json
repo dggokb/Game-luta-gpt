@@ -18,159 +18,159 @@
     {
       "index": 0,
       "outputBbox": [
-        59,
-        230,
-        244,
+        51,
+        222,
+        248,
         365
       ],
       "minimumMargin": 19,
-      "opaquePixels": 12636
+      "opaquePixels": 14222
     },
     {
       "index": 1,
       "outputBbox": [
-        99,
-        117,
-        264,
+        94,
+        102,
+        268,
         366
       ],
       "minimumMargin": 18,
-      "opaquePixels": 21233
+      "opaquePixels": 23921
     },
     {
       "index": 2,
       "outputBbox": [
-        116,
-        61,
-        256,
+        112,
+        42,
+        261,
         367
       ],
       "minimumMargin": 17,
-      "opaquePixels": 21591
+      "opaquePixels": 24373
     },
     {
       "index": 3,
       "outputBbox": [
-        115,
-        40,
-        261,
-        368
-      ],
-      "minimumMargin": 16,
-      "opaquePixels": 23558
-    },
-    {
-      "index": 4,
-      "outputBbox": [
-        112,
-        37,
+        111,
+        20,
         266,
         368
       ],
       "minimumMargin": 16,
-      "opaquePixels": 24071
+      "opaquePixels": 26468
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        107,
+        17,
+        271,
+        368
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 27037
     },
     {
       "index": 5,
       "outputBbox": [
-        74,
-        38,
-        250,
+        67,
+        18,
+        254,
         368
       ],
       "minimumMargin": 16,
-      "opaquePixels": 23786
+      "opaquePixels": 26728
     },
     {
       "index": 6,
       "outputBbox": [
-        52,
-        40,
-        251,
+        44,
+        20,
+        255,
         368
       ],
       "minimumMargin": 16,
-      "opaquePixels": 24201
+      "opaquePixels": 27255
     },
     {
       "index": 7,
       "outputBbox": [
-        42,
-        40,
-        250,
+        33,
+        20,
+        254,
         368
       ],
       "minimumMargin": 16,
-      "opaquePixels": 23831
+      "opaquePixels": 26858
     },
     {
       "index": 8,
       "outputBbox": [
-        41,
-        39,
-        251,
+        32,
+        19,
+        255,
         368
       ],
       "minimumMargin": 16,
-      "opaquePixels": 23858
+      "opaquePixels": 26815
     },
     {
       "index": 9,
       "outputBbox": [
-        32,
-        37,
-        250,
+        23,
+        17,
+        254,
         368
       ],
       "minimumMargin": 16,
-      "opaquePixels": 24038
+      "opaquePixels": 27023
     },
     {
       "index": 10,
       "outputBbox": [
-        49,
-        229,
-        258,
+        40,
+        221,
+        263,
         365
       ],
       "minimumMargin": 19,
-      "opaquePixels": 15572
+      "opaquePixels": 17548
     },
     {
       "index": 11,
       "outputBbox": [
-        70,
-        226,
-        260,
+        63,
+        217,
+        265,
         365
       ],
       "minimumMargin": 19,
-      "opaquePixels": 13146
+      "opaquePixels": 14761
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 254,
-    "frameHeight": 351,
-    "rootX": 159,
-    "rootY": 339,
+    "frameWidth": 269,
+    "frameHeight": 372,
+    "rootX": 169,
+    "rootY": 359,
     "columns": 11,
     "frameCount": 12,
     "cropOffset": [
-      22,
-      27
+      12,
+      7
     ],
     "decodedBytes": {
       "canonical": 9732096,
-      "packed": 7845552
+      "packed": 8805984
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5e90300ba1762f45f9191f16849149f28527bf7af906e789ccc9b9faebcaf7d4",
-      "config": "5b688602e4c24cd239be5623175df909488fe85ba341282d1e78fe0ddc66f787",
-      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+      "source": "f93da8c0493dcf04315b493375a4546828491dee63d8e6f90cfc81b290e3069a",
+      "config": "6df26b7e494624e53fcba48641bb580cd746873f33df4045ee169cabf27e4990",
+      "profile": "7027f1483542b0d12a978515370e55f2628bbd34a3c9f02206899d8e57a349b3"
     }
   }
 }

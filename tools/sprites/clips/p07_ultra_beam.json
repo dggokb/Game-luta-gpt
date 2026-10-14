@@ -24,10 +24,35 @@
     "limpar_chao": true,
     "limpar_quadros": [
       3
+    ],
+    "reescala": [
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696
+    ],
+    "reguaFatores": [
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696,
+      0.8696
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 115% (ULTRA_BEAM)"
     ]
   },
-  "frameWidth": 416,
-  "frameHeight": 288,
-  "rootX": 193,
-  "rootY": 268
+  "frameWidth": 440,
+  "frameHeight": 300,
+  "rootX": 203,
+  "rootY": 280
 }

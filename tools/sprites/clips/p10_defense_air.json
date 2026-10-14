@@ -21,7 +21,28 @@
     "largura": 160,
     "raiz": "78,302",
     "colunas": 7,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "reescala": [
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638
+    ],
+    "reguaFatores": [
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638,
+      1.0638
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 94% (DEFENSE_AIR)"
+    ]
   },
   "frameWidth": 160,
   "frameHeight": 320,

@@ -18,5 +18,9 @@
   ],
   "frameHeight": 512,
   "rootY": 476,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "ajusteTamanho": 0.95,
+  "regua": [
+    "ajuste no app 20261014-0532: 95% (DASH)"
+  ]
 }
