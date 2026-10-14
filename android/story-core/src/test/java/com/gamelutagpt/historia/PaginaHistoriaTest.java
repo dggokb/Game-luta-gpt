@@ -254,10 +254,14 @@ public class PaginaHistoriaTest {
             Episodio ep = Episodio.fromJson(read("historia/" + id + "/episodio.json"));
             assertEquals(id, ep.id);
             for (Episodio.Passo passo : ep.passos) {
-                if (passo.tipo == Episodio.TipoPasso.LUTA) {
-                    assertNotNull(id + ": luta sem dupla", passo.dupla);
-                    assertNotNull(id + ": luta sem cpu", passo.cpu);
-                    for (String fighter : new String[] {passo.dupla[0], passo.dupla[1], passo.cpu[0], passo.cpu[1]}) {
+                if (passo.tipo == Episodio.TipoPasso.LUTA && !passo.torneio) {
+                    // Duplas da luta: fixas no passo ou a dupla fixa de um irmão ("jogador" / "rival").
+                    assertTrue(id + ": luta sem dupla", passo.dupla != null || passo.duplaRef != null);
+                    assertTrue(id + ": luta sem cpu", passo.cpu != null || passo.cpuRef != null);
+                    List<String> fighters = new ArrayList<>();
+                    if (passo.dupla != null) fighters.addAll(java.util.Arrays.asList(passo.dupla));
+                    if (passo.cpu != null) fighters.addAll(java.util.Arrays.asList(passo.cpu));
+                    for (String fighter : fighters) {
                         assertTrue(id + ": lutador fora do roster: " + fighter, roster.contains("\"" + fighter + "\""));
                     }
                     if (passo.cenario != null) {
@@ -294,6 +298,9 @@ public class PaginaHistoriaTest {
         for (String id : temporada.episodios) textos.addAll(textosDoEpisodio(Episodio.fromJson(read("historia/" + id + "/episodio.json"))));
         textos.addAll(java.util.Arrays.asList(MenuInicial.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuPausa.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(EscolhaIrmao.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(ChaveTorneio.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(Torneio.NOMES_RODADAS));
         File[] idiomas = new File(ASSETS, "historia/idiomas").listFiles();
         assertNotNull(idiomas);
         for (File arquivo : idiomas) {

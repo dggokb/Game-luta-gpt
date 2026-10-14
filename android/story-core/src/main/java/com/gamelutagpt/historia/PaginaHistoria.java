@@ -51,6 +51,11 @@ public final class PaginaHistoria {
     private final ArteHistoria arte = new ArteHistoria();
     private final Baloes baloes = new Baloes();
     private final PaginaGuiada guiada = new PaginaGuiada();
+    private final Rostos rostos;
+    private final ChaveTorneio chave;
+    private final EscolhaIrmao escolha;
+    /** Irmão escolhido e a chave do torneio; null = sem escolha nem torneio (passos pulados). */
+    private Campanha campanha;
     private final Rand rand = new Rand(5);
     private final Map<String, RenderImage> images = new HashMap<>();
     private final List<String> warnings = new ArrayList<>();
@@ -78,6 +83,47 @@ public final class PaginaHistoria {
     public PaginaHistoria(HistoriaListener listener, RenderAssets assets) {
         this.listener = listener;
         this.assets = assets;
+        rostos = new Rostos(assets);
+        chave = new ChaveTorneio(rostos);
+        escolha = new EscolhaIrmao(rostos);
+    }
+
+    /**
+     * A campanha da partida (irmão escolhido e chave do torneio). Sem ela, os passos "escolha",
+     * "sorteio" e "chave" e as lutas do torneio são pulados.
+     */
+    public void setCampanha(Campanha campanha) {
+        this.campanha = campanha;
+    }
+
+    public Campanha campanha() {
+        return campanha;
+    }
+
+    /** As duplas da luta {jogador, CPU} (veja {@link Campanha#lados}); null = as que já estão no jogo. */
+    public String[][] lados(Episodio.Passo luta) {
+        if (campanha != null) return campanha.lados(luta);
+        if (luta.dupla == null || luta.cpu == null) return null;
+        return new String[][] {luta.dupla.clone(), luta.cpu.clone()};
+    }
+
+    /** O rótulo da luta (no torneio, o nome da rodada). */
+    public String rotulo(Episodio.Passo luta) {
+        return campanha != null ? campanha.rotulo(luta) : luta.rotulo;
+    }
+
+    /** O passo "escolha" está esperando o jogador escolher o irmão (controle: ◀▶ e A). */
+    public boolean esperandoEscolha() {
+        return coversScreen() && exitAt < 0f && passo().tipo == Episodio.TipoPasso.ESCOLHA && escolha.escolha() == null;
+    }
+
+    /** Controle na escolha: -1 Ryūga, +1 Kōga. */
+    public void moverEscolha(int direcao) {
+        if (esperandoEscolha()) escolha.mover(direcao);
+    }
+
+    public void confirmarEscolha() {
+        if (esperandoEscolha()) escolha.confirmar();
     }
 
     public void start(Temporada temporada, Episodio episodio) {
@@ -109,6 +155,7 @@ public final class PaginaHistoria {
         active = false;
         waitingFight = false;
         releaseImages();
+        rostos.liberar();
     }
 
     /** Mostra o botão MENU (o modo história do menu inicial; o jogo abre a pausa no toque). */
@@ -156,6 +203,8 @@ public final class PaginaHistoria {
             listener.onHistoriaLuta(luta);
             return;
         }
+        // Luta do torneio: a rodada fecha (o rival avança, as outras lutas são sorteadas).
+        if (luta.torneio && campanha != null && campanha.torneio() != null) campanha.torneio().registrar(venceu);
         waitingFight = false;
         nextStep();
     }
@@ -164,11 +213,29 @@ public final class PaginaHistoria {
     public void tap(float x, float y) {
         if (!coversScreen() || exitAt >= 0f) return;
         Episodio.Passo p = passo();
-        if (p.tipo != Episodio.TipoPasso.PROXIMO && x >= SKIP_LEFT && x <= SKIP_RIGHT && y >= SKIP_TOP && y <= SKIP_BOTTOM) {
+        if (temSkip(p) && x >= SKIP_LEFT && x <= SKIP_RIGHT && y >= SKIP_TOP && y <= SKIP_BOTTOM) {
             skip();
             return;
         }
         switch (p.tipo) {
+            case ESCOLHA:
+                escolha.tap(x, y);
+                break;
+            case SORTEIO:
+                // Toque no meio do sorteio mostra a chave inteira; depois, segue.
+                if (time < ChaveTorneio.duracaoSorteio()) {
+                    time = ChaveTorneio.duracaoSorteio();
+                } else {
+                    exit();
+                }
+                break;
+            case CHAVE:
+                if (time < ChaveTorneio.duracaoRevelacao(campanha.torneio())) {
+                    time = ChaveTorneio.duracaoRevelacao(campanha.torneio());
+                } else if (time >= TITLE_MIN_TAP) {
+                    exit();
+                }
+                break;
             case TITULO:
                 if (time >= TITLE_MIN_TAP) exit();
                 break;
@@ -195,6 +262,12 @@ public final class PaginaHistoria {
         Episodio.Passo p = passo();
         if (p.tipo == Episodio.TipoPasso.TITULO && time >= TITLE_DURATION) {
             exit();
+        } else if (p.tipo == Episodio.TipoPasso.ESCOLHA) {
+            escolha.update(dt);
+            if (escolha.terminou()) {
+                campanha.escolher(escolha.escolha());
+                exit();
+            }
         } else if (p.tipo == Episodio.TipoPasso.PAGINA && p.paginaPronta()) {
             guiada.update(dt);
             String sound = guiada.takeSound();
@@ -219,12 +292,24 @@ public final class PaginaHistoria {
         exitAt = -1f;
         time = 0f;
         stepIndex++;
+        while (stepIndex < episodio.passos.size() && !toca(episodio.passos.get(stepIndex))) stepIndex++;
         if (stepIndex >= episodio.passos.size()) {
             finish();
             return;
         }
         Episodio.Passo p = passo();
         switch (p.tipo) {
+            case ESCOLHA:
+                releaseImages();
+                escolha.begin();
+                listener.onHistoriaSom("pagina");
+                break;
+            case SORTEIO:
+                releaseImages();
+                // A chave é sorteada aqui (depois da escolha do irmão).
+                campanha.torneio();
+                listener.onHistoriaSom("pagina");
+                break;
             case PAGINA:
                 beginPage(p);
                 break;
@@ -240,6 +325,27 @@ public final class PaginaHistoria {
         }
     }
 
+    /**
+     * O passo toca nesta partida? Passos com "irmao" só para quem escolheu esse irmão; escolha,
+     * sorteio, chave e lutas do torneio precisam da campanha (e a luta, de um adversário).
+     */
+    private boolean toca(Episodio.Passo p) {
+        if (campanha == null) {
+            return p.irmao == null && p.tipo != Episodio.TipoPasso.ESCOLHA && p.tipo != Episodio.TipoPasso.SORTEIO &&
+                p.tipo != Episodio.TipoPasso.CHAVE && !p.torneio;
+        }
+        if (!campanha.vale(p)) return false;
+        boolean precisaChave = p.tipo == Episodio.TipoPasso.SORTEIO || p.tipo == Episodio.TipoPasso.CHAVE || p.torneio;
+        if (precisaChave && campanha.torneio() == null) return false;
+        if (p.torneio && campanha.torneio().adversario() == null) return false;
+        return true;
+    }
+
+    /** O PULAR aparece e funciona (não na escolha nem no "próximo episódio"). */
+    private static boolean temSkip(Episodio.Passo p) {
+        return p.tipo != Episodio.TipoPasso.PROXIMO && p.tipo != Episodio.TipoPasso.ESCOLHA;
+    }
+
     private void finish() {
         active = false;
         waitingFight = false;
@@ -247,11 +353,16 @@ public final class PaginaHistoria {
         listener.onHistoriaFim(episodio);
     }
 
-    /** PULAR: vai direto para a próxima luta ou para o "próximo episódio". */
+    /**
+     * PULAR: vai direto para a próxima luta, a escolha do irmão ou o "próximo episódio" (a
+     * escolha não se pula; o sorteio, se pulado, acontece na primeira luta do torneio).
+     */
     private void skip() {
         for (int i = stepIndex + 1; i < episodio.passos.size(); i++) {
-            Episodio.TipoPasso tipo = episodio.passos.get(i).tipo;
-            if (tipo == Episodio.TipoPasso.LUTA || tipo == Episodio.TipoPasso.PROXIMO) {
+            Episodio.Passo alvo = episodio.passos.get(i);
+            Episodio.TipoPasso tipo = alvo.tipo;
+            if (!toca(alvo)) continue;
+            if (tipo == Episodio.TipoPasso.LUTA || tipo == Episodio.TipoPasso.PROXIMO || tipo == Episodio.TipoPasso.ESCOLHA) {
                 stepIndex = i - 1;
                 nextStep();
                 return;
@@ -367,6 +478,10 @@ public final class PaginaHistoria {
         if (!coversScreen() || exitAt >= 0f) return false;
         Episodio.Passo p = passo();
         if (p.tipo == Episodio.TipoPasso.PROXIMO) return time >= NEXT_MIN_TAP;
+        if (p.tipo == Episodio.TipoPasso.SORTEIO) return time >= ChaveTorneio.duracaoSorteio() + 0.3f;
+        if (p.tipo == Episodio.TipoPasso.CHAVE) {
+            return time >= Math.max(TITLE_MIN_TAP, ChaveTorneio.duracaoRevelacao(campanha.torneio()));
+        }
         if (p.tipo != Episodio.TipoPasso.PAGINA) return false;
         if (p.paginaPronta()) return guiada.waitingTap();
         int[] current = beats.get(beat);
@@ -395,6 +510,15 @@ public final class PaginaHistoria {
             case PROXIMO:
                 drawNext(c, p);
                 break;
+            case ESCOLHA:
+                escolha.draw(c, temporada, campanha, logo);
+                break;
+            case SORTEIO:
+                chave.draw(c, temporada, campanha.torneio(), true, time);
+                break;
+            case CHAVE:
+                chave.draw(c, temporada, campanha.torneio(), false, time);
+                break;
             case PAGINA:
                 if (p.paginaPronta()) {
                     guiada.render(c);
@@ -406,7 +530,7 @@ public final class PaginaHistoria {
                 break;
         }
         c.restore();
-        if (p.tipo != Episodio.TipoPasso.PROXIMO) drawSkip(c);
+        if (temSkip(p)) drawSkip(c);
         if (botaoMenu) drawMenu(c);
         if (waitingTap()) drawTapArrow(c);
 

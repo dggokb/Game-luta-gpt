@@ -59,6 +59,9 @@ tasks.register('runHistoria', JavaExec) {
     args 'app/src/main/assets', 'build/historia'
     // Outro idioma: gradle :pc-preview:runHistoria -Pidioma=en
     systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
+    // Campanha do Kōga e outra chave: -Pirmao=koga -Psorteio=3
+    systemProperty 'irmao', project.findProperty('irmao') ?: 'ryuga'
+    systemProperty 'sorteio', project.findProperty('sorteio') ?: '1'
 }
 
 // Menu inicial e pausa em PNG: gradle :pc-preview:runMenu (-Pidioma=en para outro idioma)

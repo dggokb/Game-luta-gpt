@@ -2,6 +2,7 @@
 
 > Motor das páginas (padrão do jogo inteiro): [motor-paginas.md](motor-paginas.md).
 > Motor das conversas durante as lutas (parceiro de tag, adversário esperando): [motor-conversas.md](motor-conversas.md).
+> Torneio (escolha do irmão, sorteio, chave de 8 duplas fixas): [torneio.md](torneio.md).
 
 A história vem do documento "História Base — Torneio dos Irmãos" (Drive, pasta
 game-luta-gpt). Este documento descreve **como ela é contada no jogo**. Os episódios
@@ -37,7 +38,7 @@ salvar progresso e um menu de episódios.
 | Episódio | Conteúdo | Luta |
 |---|---|---|
 | 0 — O Pai que Partiu | Infância no dojo Shūshinkan, o treino (tutorial), o convite, a divisão dos irmãos, o pai parte e não volta. **Pronto** (11 páginas) | Treino Ryūga × Kōga (tutorial) |
-| 1 — Duas Cartas | Dez anos depois, treino, as duas cartas, motivos de cada um | Treino Ryūga × Kōga |
+| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um | Treino jogador × rival |
 | 2 — O Sorteio | O templo, a regra dos capitães, a formação das duplas, o chaveamento em lados opostos | 1ª luta de cada lado |
 | 3 a 6 | Episódios alternando o lado do Ryūga e o lado do Kōga (lutas fixas de história + lutas variáveis) | uma por episódio |
 | meio da temporada | A revelação de que o desejo é real e pode ressuscitar a mãe | luta fixa |
@@ -92,7 +93,10 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 
 | Campo | Valores |
 |---|---|
-| `tipo` do passo | `titulo`, `pagina`, `luta`, `proximo` |
+| `tipo` do passo | `titulo`, `pagina`, `luta`, `proximo`, e os do torneio: `escolha`, `sorteio`, `chave` ([torneio.md](torneio.md)) |
+| `torneio` (passo de luta) | `true`: luta contra o próximo adversário da chave |
+| `dupla` / `cpu` | `[titular, parceiro]`, ou `"jogador"` / `"rival"` (a dupla fixa do irmão escolhido / do outro) |
+| `irmao` (qualquer passo) | `ryuga` ou `koga`: o passo só toca na campanha desse irmão |
 | `layout` | `splash` (1), `duas-colunas` (2), `tres-colunas`, `tres-faixas`, `faixa-e-dois`, `dois-e-faixa` (3), `quatro`, `grade` (4). Sem `layout`, vale o padrão pela quantidade de painéis |
 | `tom` | `papel` (normal) ou `flashback` (página preta, cores sépia) |
 | `cena` (arte provisória) | `dojo`, `dojo-noite`, `casa`, `estrada`, `templo`, `ceu`, `chuva`, `carta` |

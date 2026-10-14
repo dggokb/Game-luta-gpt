@@ -9,5 +9,5 @@
     "dafu":      { "nome": "Dafu",      "cor": "#D9A42E" },
     "mensageiro":{ "nome": "???",       "cor": "#4A4A55" }
   },
-  "episodios": ["ep00", "ep01"]
+  "episodios": ["ep00", "ep01", "ep02", "ep03", "ep04"]
 }

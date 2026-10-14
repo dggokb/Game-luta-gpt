@@ -1,0 +1,13 @@
+{
+  "_comentario": "As 8 duplas fixas do torneio do modo história (docs/historia/torneio.md). A do Ryūga fica na ponta esquerda da chave e a do Kōga na ponta direita; as outras são sorteadas. \"pronta\": false = dupla ainda sem golpes: o sorteio a põe no lado do rival, longe do jogador. Retratos: torneio/rostos/pNN.jpg (tools/historia/rostos_torneio.py).",
+  "duplas": [
+    { "id": "ryuga", "irmao": "ryuga", "lutadores": ["player_base", "p02"] },
+    { "id": "koga", "irmao": "koga", "lutadores": ["p03", "p04"] },
+    { "id": "p05", "lutadores": ["p05", "p06"] },
+    { "id": "p07", "lutadores": ["p07", "p08"] },
+    { "id": "p09", "lutadores": ["p09", "p10"] },
+    { "id": "p11", "lutadores": ["p11", "p12"] },
+    { "id": "p13", "lutadores": ["p13", "p14"], "pronta": false },
+    { "id": "p15", "lutadores": ["p15", "p16"], "pronta": false }
+  ]
+}

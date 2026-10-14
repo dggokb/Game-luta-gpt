@@ -314,6 +314,10 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
   11 páginas prontas lidas quadro a quadro (com o treino/tutorial depois da página 4), o
   Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
+- **Torneio** (ep01–ep04, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
+  **Kōga (p03)**; o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
+  opostas; quartas → semifinal → final contra o outro irmão. O rival sempre avança; CPU × CPU
+  é sorteado. `docs/historia/torneio.md`.
 - Motor em `android/story-core` (Java puro); episódios em JSON em
   `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do
   arquivo esperado.

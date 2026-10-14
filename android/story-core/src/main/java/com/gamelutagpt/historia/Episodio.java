@@ -43,7 +43,11 @@ public final class Episodio {
         throw new IllegalArgumentException(id + ": nenhum passo com a marca \"" + marca + "\"");
     }
 
-    public enum TipoPasso { TITULO, PAGINA, LUTA, PROXIMO }
+    /**
+     * ESCOLHA: o jogador escolhe o irmão (Ryūga ou Kōga). SORTEIO: o sorteio animado da chave
+     * do torneio. CHAVE: a chave com os resultados até aqui e a próxima luta do jogador.
+     */
+    public enum TipoPasso { TITULO, PAGINA, LUTA, PROXIMO, ESCOLHA, SORTEIO, CHAVE }
 
     public enum TipoBalao { FALA, PENSAMENTO, GRITO, NARRACAO }
 
@@ -67,6 +71,13 @@ public final class Episodio {
         public final String cenario;
         /** Conversa nos quadros laterais durante a luta (caminho dentro de historia/), ou null. */
         public final String conversa;
+        /** Luta do torneio: o jogador contra o próximo adversário da chave. */
+        public final boolean torneio;
+        /** {@code "dupla": "jogador"} ou {@code "rival"}: a dupla fixa do irmão escolhido ou do outro. */
+        public final String duplaRef;
+        public final String cpuRef;
+        /** Só toca para quem escolheu este irmão ("ryuga" / "koga"); null = para os dois. */
+        public final String irmao;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -76,8 +87,13 @@ public final class Episodio {
 
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
-              String titulo, List<String> linhas, String imagem, List<Quadro> quadros) {
+              String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
+              String duplaRef, String cpuRef, String irmao) {
             this.tipo = tipo;
+            this.torneio = torneio;
+            this.duplaRef = duplaRef;
+            this.cpuRef = cpuRef;
+            this.irmao = irmao;
             this.marca = marca;
             this.layout = layout;
             this.tom = tom;
@@ -258,11 +274,29 @@ public final class Episodio {
         }
         List<String> linhas = new ArrayList<>();
         for (Object item : list(map, "linhas")) linhas.add(String.valueOf(item));
+        String irmao = string(map, "irmao", null);
+        if (irmao != null && !irmao.equals("ryuga") && !irmao.equals("koga")) {
+            throw new IllegalArgumentException("irmao desconhecido: " + irmao + " (use ryuga ou koga)");
+        }
+        String duplaRef = ref(map, "dupla");
+        String cpuRef = ref(map, "cpu");
         return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
-            Collections.unmodifiableList(paineis), pair(map, "dupla"), pair(map, "cpu"), string(map, "rotulo", null),
+            Collections.unmodifiableList(paineis), duplaRef != null ? null : pair(map, "dupla"),
+            cpuRef != null ? null : pair(map, "cpu"), string(map, "rotulo", null),
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
             string(map, "conversa", null), string(map, "titulo", null),
-            Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros));
+            Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
+            Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao);
+    }
+
+    /** {@code "dupla": "jogador"} ou {@code "rival"} (dupla fixa de um irmão); null se for uma lista. */
+    private static String ref(Map<String, Object> map, String key) {
+        Object value = map.get(key);
+        if (!(value instanceof String)) return null;
+        if (!value.equals("jogador") && !value.equals("rival")) {
+            throw new IllegalArgumentException(key + " precisa ser [titular, parceiro], \"jogador\" ou \"rival\"");
+        }
+        return (String)value;
     }
 
     private static Quadro quadro(Map<String, Object> map) {

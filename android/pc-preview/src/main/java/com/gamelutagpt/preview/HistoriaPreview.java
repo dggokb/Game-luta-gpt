@@ -1,5 +1,6 @@
 package com.gamelutagpt.preview;
 
+import com.gamelutagpt.historia.Campanha;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
 import com.gamelutagpt.historia.PaginaHistoria;
@@ -30,6 +31,7 @@ public final class HistoriaPreview implements HistoriaListener {
     private int shot;
     private boolean fightRequested;
     private boolean finished;
+    private String irmao = "ryuga";
 
     private HistoriaPreview(FileRenderAssets assets, File outDir) {
         this.pagina = new PaginaHistoria(this, assets);
@@ -46,6 +48,9 @@ public final class HistoriaPreview implements HistoriaListener {
         String idioma = System.getProperty("idioma", "pt");
         if (!temporada.setIdioma(assets, idioma)) System.out.println("sem tradução para " + idioma);
         HistoriaPreview preview = new HistoriaPreview(assets, outDir);
+        // -Dirmao=koga joga a campanha do Kōga; -Dsorteio=N troca a semente da chave.
+        preview.irmao = System.getProperty("irmao", "ryuga");
+        preview.pagina.setCampanha(Campanha.load(assets, new java.util.Random(Long.getLong("sorteio", 1L))));
         for (String id : temporada.episodios) {
             if (args.length > 2 && !args[2].equals(id)) continue;
             preview.play(temporada, temporada.loadEpisodio(assets, id));
@@ -67,8 +72,16 @@ public final class HistoriaPreview implements HistoriaListener {
             }
             Episodio.Passo passo = pagina.passo();
             if (passo == null) break;
-            float holdFor = passo.tipo == Episodio.TipoPasso.TITULO ? 1.4f : 2.0f;
-            if (passo.tipo == Episodio.TipoPasso.PAGINA && passo.paginaPronta()) {
+            float holdFor = passo.tipo == Episodio.TipoPasso.TITULO ? 1.4f
+                : passo.tipo == Episodio.TipoPasso.SORTEIO ? 4.6f
+                : passo.tipo == Episodio.TipoPasso.CHAVE ? 2.4f : 2.0f;
+            if (passo.tipo == Episodio.TipoPasso.ESCOLHA) {
+                // Escolha do irmão: grava a tela e toca no lado pedido.
+                step(1.2f);
+                save(passo);
+                pagina.tap("koga".equals(irmao) ? 1000f : 280f, 400f);
+                step(1.0f);
+            } else if (passo.tipo == Episodio.TipoPasso.PAGINA && passo.paginaPronta()) {
                 // Página pronta: um quadro por toque; grava cada quadro em foco.
                 step(1.6f);
                 if (pagina.passo() == passo) save(passo);
@@ -107,8 +120,9 @@ public final class HistoriaPreview implements HistoriaListener {
 
     @Override
     public void onHistoriaLuta(Episodio.Passo luta) {
-        System.out.println("  " + episodeId + ": luta " + luta.rotulo + " " + String.join("+", luta.dupla) +
-            " x " + String.join("+", luta.cpu));
+        String[][] lados = pagina.lados(luta);
+        System.out.println("  " + episodeId + ": luta " + pagina.rotulo(luta) + " " +
+            (lados == null ? "(duplas atuais)" : String.join("+", lados[0]) + " x " + String.join("+", lados[1])));
         fightRequested = true;
     }
 

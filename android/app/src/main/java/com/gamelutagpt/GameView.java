@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.historia.Campanha;
 import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
@@ -2451,7 +2452,19 @@ public class GameView extends SurfaceView
         pad.reset();
         releaseAllPointers();
         selectionKeys.clear();
+        // Partida nova: a escolha do irmão (depois do Prólogo) e a chave do torneio começam do zero.
+        historia.setCampanha(newCampanha());
         playStoryEpisode(0);
+    }
+
+    /** Campanha nova com as duplas do torneio; sem o torneio.json, a história pula a escolha e a chave. */
+    private Campanha newCampanha() {
+        try {
+            return Campanha.load(ultraAssets, new Random());
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "torneio indisponível", ex);
+            return null;
+        }
     }
 
     /** TUTORIAL: a cena "tutorial" (a intro do Prólogo e o treino no dojo); no fim, a seleção. */
@@ -2484,6 +2497,7 @@ public class GameView extends SurfaceView
         }
         storyEpisode = -1;
         sceneAfter = after;
+        if (historia.campanha() == null) historia.setCampanha(newCampanha());
         hud.resetEffects();
         pad.reset();
         releaseAllPointers();
@@ -2522,6 +2536,22 @@ public class GameView extends SurfaceView
         if (storyMode && isPauseKey(keyCode)) {
             // Modo história: voltar/START abre a pausa (dali, o menu inicial); B continua pulando.
             openPause();
+            return;
+        }
+        if (historia.esperandoEscolha()) {
+            // Escolha do irmão: ◀ Ryūga, ▶ Kōga, A confirma (não se pula).
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_LEFT: historia.moverEscolha(-1); break;
+                case KeyEvent.KEYCODE_DPAD_RIGHT: historia.moverEscolha(1); break;
+                case KeyEvent.KEYCODE_BUTTON_A:
+                case KeyEvent.KEYCODE_ENTER:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                case KeyEvent.KEYCODE_BUTTON_START:
+                    historia.confirmarEscolha();
+                    break;
+                default:
+                    break;
+            }
             return;
         }
         boolean skip = keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_BACK ||
@@ -2564,12 +2594,17 @@ public class GameView extends SurfaceView
         // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA
         // e as lições dizem o que ele faz.
         setOpponentAiEnabled(!luta.tutorial());
-        // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta.
-        if (luta.dupla != null && luta.cpu != null) {
-            selectTeams(luta.dupla[0], luta.dupla[1], luta.cpu[0], luta.cpu[1]);
+        // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
+        // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
+        String[][] lados = historia.lados(luta);
+        if (lados != null && fightersExist(lados[0][0], lados[0][1], lados[1][0], lados[1][1])) {
+            selectTeams(lados[0][0], lados[0][1], lados[1][0], lados[1][1]);
         } else {
+            if (lados != null) Log.w(LOG_TAG, "dupla da história sem golpes ainda; usando as duplas atuais");
             selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
         }
+        String rotulo = historia.rotulo(luta);
+        if (rotulo != null && temporada != null) rotulo = temporada.t(rotulo);
         // A conversa da luta (nos quadros laterais, sem parar a luta) começa com o "inicio".
         conversa.descarregar();
         conversaLicao = -1;
@@ -2585,14 +2620,26 @@ public class GameView extends SurfaceView
             storyKoFrames = 0;
             pad.reset();
             releaseAllPointers();
-            if (luta.rotulo != null) showBanner(luta.rotulo);
+            if (rotulo != null) showBanner(rotulo);
             return;
         }
         tutorial.stop();
         storyKoFrames = 0;
         pad.reset();
         releaseAllPointers();
-        if (luta.rotulo != null) showBanner(luta.rotulo);
+        if (rotulo != null) showBanner(rotulo);
+    }
+
+    /** Todos têm pack de luta (p13–p16 ainda não têm). */
+    private static boolean fightersExist(String... ids) {
+        for (String id : ids) {
+            try {
+                GeneratedCharacters.get(id);
+            } catch (IllegalArgumentException ex) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

@@ -3,6 +3,8 @@
   "numero": 1,
   "titulo": "Duas Cartas",
   "passos": [
+    { "tipo": "escolha" },
+
     { "tipo": "titulo" },
 
     { "tipo": "pagina", "layout": "faixa-e-dois", "paineis": [
@@ -27,7 +29,7 @@
         ] }
     ] },
 
-    { "tipo": "luta", "rotulo": "TREINO", "dupla": ["player_base", "p02"], "cpu": ["p03", "p04"], "repetirSeDerrota": false },
+    { "tipo": "luta", "rotulo": "TREINO", "dupla": "jogador", "cpu": "rival", "repetirSeDerrota": false },
 
     { "tipo": "pagina", "layout": "quatro", "paineis": [
       { "imagem": "pag3_q1.jpg", "cena": "dojo", "personagens": ["ryuga", "dafu", "koga"], "foco": 0.55,
