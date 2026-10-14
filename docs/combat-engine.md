@@ -95,6 +95,41 @@ Testes: `ultraNeedsThreeBarsOtherwiseThePressIsASuper`,
 `finalBeamCountsEveryHitAndDealsItsWholeDamage`, `finalBeamHoldsAnAirborneDefenderAndThrowsItAtTheBlast`,
 `finalBeamOnAKnockedOutDefenderStillEnds`, `finalBeamChargesBeforeTheFirstHit`.
 
+## Modo batalha 2x2 e READY → GO
+
+O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de cada passo do motor.
+
+- **READY → GO** (nomes provisórios): entre a intro e o idle os dois ficam parados no READY
+  (`READY_FRAMES`); no GO (`GO_FRAMES`) o controle já volta. Vale para toda luta, no treino também.
+- **IA OFF = treino** (o de antes): o CPU luta só com o titular, o KO não encerra nada e os
+  botões VIDA P1 / VIDA CPU recarregam.
+- **IA ON = batalha de verdade**: ligar a IA começa uma luta nova do zero. O CPU luta com a
+  dupla dele (titular + parceiro escolhidos na seleção).
+  - O titular que cai fica no chão `koReplaceFrames` (75) depois de bater no chão e o
+    parceiro com vida entra correndo por trás, a mesma entrada da troca, invulnerável até
+    terminar a pose (`CombatEngine.replaceFallenPoint`, `TeamSystem.enterAfterKo`). A barra do
+    time passa para quem entra.
+  - **O time só perde quando os dois da dupla caem** (`TeamSystem.defeated`). Os dois juntos: empate.
+  - Parceiro caído não vem mais de assist, troca, Guard Cancel nem DHC.
+  - Fim: K.O. (`KO_FRAMES`), o resultado (VITÓRIA / DERROTA / EMPATE, `RESULT_FRAMES`) e a
+    luta recomeça com as mesmas duplas. Só o vencedor final comemora.
+- As lutas da história são batalhas (o treino do tutorial não): a página volta quando uma
+  dupla inteira cai.
+- **O CPU usa o kit inteiro na batalha** (`AiController.setFullKit`), com sorteios próprios
+  (não mexem nas decisões do `OpponentAi`, nem no treino):
+  - **assist** no neutro a meia distância e para estender o combo quando um golpe acerta;
+  - **Assist → Tag** com o assist em campo; **troca** (↓ + TAG) com a vida baixa e o parceiro melhor;
+  - **Super** cancelando um golpe que acertou (além do Super à distância de antes) e **DHC**
+    quando o próprio Super já saiu;
+  - **Guard Cancel Tag** e **pushblock** quando está defendendo;
+  - **Overdrive** no meio do combo ou com a vida baixa; **Ultra** com 3 barras e perto.
+  - Chances e distâncias: constantes no topo do `AiController`.
+- O parceiro do CPU em campo (assist, ou saindo depois do Assist → Tag) é desenhado pálido
+  como o titular; a arte dele já vem carregada na batalha. O Ultra do CPU usa o pack do
+  personagem dele (ou o provisório) e o toque do jogador não dá bônus nele.
+
+Testes: `BattleFlowTest`, `AiFullKitTest`.
+
 ## Overdrive — v0.87
 
 - Entrada: `FighterInput.overdrive` (botão OD em `ControlsLayout.OVERDRIVE_*`, ou SUPER + TAG

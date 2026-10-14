@@ -1,5 +1,7 @@
 package com.gamelutagpt;
 
+import java.util.Random;
+
 /**
  * Turns {@link OpponentAi} decisions into engine input for one fighter, frame by frame.
  * The CPU presses buttons like a player: its attacks go through the same buffer and
@@ -12,8 +14,43 @@ final class AiController {
     static final int ENERGY_COOLDOWN = 24;
     static final int SUPER_COOLDOWN = 27;
 
+    // Batalha (IA ON): o kit inteiro, como um jogador usa. Chances por oportunidade.
+    /** Frames entre as decisões do kit no neutro (assist, troca, Ultra, Overdrive). */
+    static final int KIT_DECISION_FRAMES = 15;
+    static final double ASSIST_NEUTRAL_CHANCE = 0.18;
+    /** Golpe que acertou: chama o assist para estender o combo. */
+    static final double ASSIST_COMBO_CHANCE = 0.45;
+    /** Golpe que acertou: cancela no Super. */
+    static final double SUPER_COMBO_CHANCE = 0.35;
+    /** O próprio Super saiu: DHC com o Super do parceiro. */
+    static final double DHC_CHANCE = 0.55;
+    /** Assist em campo: Assist → Tag. */
+    static final double CONVERT_CHANCE = 0.30;
+    /** Vida baixa e parceiro melhor: troca (↓ + TAG). */
+    static final double TAG_CHANCE = 0.40;
+    static final float TAG_LIFE_RATIO = 0.40f;
+    static final double ULTRA_CHANCE = 0.35;
+    /** Distância até onde a investida do Ultra alcança (com folga). */
+    static final float ULTRA_REACH = 380f;
+    /** Overdrive no meio do combo, ou no neutro com a vida baixa. */
+    static final double OVERDRIVE_COMBO_CHANCE = 0.15;
+    static final double OVERDRIVE_LOW_LIFE_CHANCE = 0.08;
+    /** Defendendo: Guard Cancel Tag ou pushblock na sequência de bloqueio. */
+    static final double GUARD_CANCEL_CHANCE = 0.25;
+    static final double PUSHBLOCK_CHANCE = 0.35;
+
     private final OpponentAi ai;
     private final OpponentAi.Situation situation = new OpponentAi.Situation();
+    /** Sorteios do kit: separados, para não mexer na sequência das decisões do OpponentAi. */
+    private final Random kitRandom;
+    private boolean fullKit;
+    private int kitTimer;
+    /** Golpe para o qual os planos de combo já foram sorteados, e em que frame dele. */
+    private AttackDefinition plannedAttack;
+    private int plannedAttackFrame;
+    private boolean assistPlan, superPlan, dhcPlan, overdrivePlan;
+    private boolean wasBlocking, guardCancelPlan, pushblockPlan;
+    private boolean wasAssistOut, convertPlan;
     private boolean enabled;
     private boolean movingForward;
     private boolean dashing;
@@ -55,7 +92,31 @@ final class AiController {
     };
 
     AiController(OpponentAi ai) {
+        this(ai, new Random());
+    }
+
+    AiController(OpponentAi ai, Random kitRandom) {
         this.ai = ai;
+        this.kitRandom = kitRandom;
+    }
+
+    /**
+     * Batalha: além de andar, bater, soltar energia e Super, o CPU usa o kit inteiro — assist,
+     * troca, Assist → Tag, DHC, Guard Cancel, pushblock, Overdrive e Ultra.
+     */
+    void setFullKit(boolean value) {
+        fullKit = value;
+        resetKit();
+    }
+
+    boolean fullKit() { return fullKit; }
+
+    private void resetKit() {
+        kitTimer = 0;
+        plannedAttack = null;
+        assistPlan = superPlan = dhcPlan = overdrivePlan = false;
+        wasBlocking = guardCancelPlan = pushblockPlan = false;
+        wasAssistOut = convertPlan = false;
     }
 
     boolean enabled() {
@@ -69,6 +130,7 @@ final class AiController {
         cooldown = 0;
         lastAttack = null;
         clearRequests();
+        resetKit();
     }
 
     /** Fills the CPU input for the next engine step. */
@@ -100,6 +162,8 @@ final class AiController {
             return;
         }
         wakeupPlan = -2;
+
+        if (fullKit && !target.ko() && fillKit(engine, me, target, out)) return;
 
         if (cooldown > 0) cooldown--;
         if (me.framesSinceHit == 0) cooldown = Math.max(cooldown, HIT_COOLDOWN);
@@ -153,6 +217,104 @@ final class AiController {
             out.medium = button == 'M';
             out.heavy = button == 'H';
         }
+    }
+
+    /**
+     * O kit da batalha neste frame. Verdadeiro quando apertou algo que pede o frame só para
+     * si (a troca, o Ultra e o Overdrive no neutro): a decisão normal fica para depois.
+     */
+    private boolean fillKit(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        int self = me.index;
+        TeamSystem teams = engine.teams;
+        TeamSystem.Side team = engine.team(self);
+
+        // Assist em campo: às vezes vira o novo titular (Assist → Tag).
+        boolean assistOut = team.assistOut();
+        if (assistOut && !wasAssistOut) convertPlan = chance(CONVERT_CHANCE);
+        wasAssistOut = assistOut;
+        if (convertPlan && team.conversionOpen()) {
+            out.assist = true;
+            convertPlan = false;
+        }
+
+        // Defendendo: Guard Cancel Tag (o parceiro entra batendo) ou pushblock.
+        boolean blocking = me.status == CombatFighter.Status.BLOCKSTUN;
+        if (blocking && !wasBlocking) {
+            guardCancelPlan = chance(GUARD_CANCEL_CHANCE);
+            pushblockPlan = chance(PUSHBLOCK_CHANCE);
+        }
+        wasBlocking = blocking;
+        if (blocking) {
+            if (guardCancelPlan && teams.guardCancelReady(self, me)) {
+                out.assist = true;
+                guardCancelPlan = false;
+            } else if (pushblockPlan && me.state.superMeter >= engine.config.pushblockCost) {
+                out.pushblock = true;
+                pushblockPlan = false;
+            }
+            return false;
+        }
+
+        // O próprio golpe: um sorteio por golpe novo, usado quando ele acerta.
+        if (me.attacking()) {
+            if (me.attack != plannedAttack || me.attackFrame < plannedAttackFrame) {
+                plannedAttack = me.attack;
+                assistPlan = chance(ASSIST_COMBO_CHANCE);
+                superPlan = chance(SUPER_COMBO_CHANCE);
+                dhcPlan = chance(DHC_CHANCE);
+                overdrivePlan = chance(OVERDRIVE_COMBO_CHANCE);
+            }
+            plannedAttackFrame = me.attackFrame;
+            boolean hit = me.outcome == CombatFighter.Outcome.HIT;
+            if (teams.dhcReady(self, me)) {
+                if (dhcPlan) out.assist = true;
+            } else if (hit && me.attack.kind != AttackDefinition.Kind.SUPER) {
+                if (overdrivePlan && teams.canOverdrive(me)) {
+                    out.overdrive = true;
+                    overdrivePlan = false;
+                } else if (assistPlan && teams.canAssist(self, me)) {
+                    out.assist = true;
+                    assistPlan = false;
+                } else if (superPlan && me.state.profile.hasSuperAttack() &&
+                    me.state.superMeter >= CombatConfig.SUPER_COST) {
+                    // Os cancels do golpe decidem se o Super entra agora.
+                    out.superAttack = true;
+                }
+            }
+            return false;
+        }
+        plannedAttack = null;
+
+        // Neutro: de tempos em tempos olha o que o time e a barra permitem.
+        if (!me.canAct() || ++kitTimer < KIT_DECISION_FRAMES) return false;
+        kitTimer = 0;
+        float distance = Math.abs(target.x - me.x);
+        float life = me.state.life / (float)me.state.profile.maxLife;
+        FighterState partner = team.partner();
+        if (me.grounded && target.grounded && distance <= ULTRA_REACH &&
+            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE)) {
+            out.ultra = true;
+            return true;
+        }
+        if (team.partnerStanding() && !team.tagging() && team.tagCooldown == 0 && !assistOut &&
+            life < TAG_LIFE_RATIO && partner.life / (float)partner.profile.maxLife > life + 0.15f &&
+            chance(TAG_CHANCE)) {
+            out.tag = true;
+            return true;
+        }
+        if (!team.overdriveUsed && life < 0.5f && teams.canOverdrive(me) && chance(OVERDRIVE_LOW_LIFE_CHANCE)) {
+            out.overdrive = true;
+            return true;
+        }
+        if (distance >= 150f && distance <= 700f && teams.canAssist(self, me) && chance(ASSIST_NEUTRAL_CHANCE)) {
+            // O assist vem junto com o que a decisão normal fizer (andar, energia).
+            out.assist = true;
+        }
+        return false;
+    }
+
+    private boolean chance(double p) {
+        return kitRandom.nextDouble() < p;
     }
 
     private void clearRequests() {
