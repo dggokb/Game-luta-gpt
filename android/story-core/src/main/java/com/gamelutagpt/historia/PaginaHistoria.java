@@ -36,6 +36,8 @@ public final class PaginaHistoria {
 
     /** Botão PULAR (canto de cima à direita). */
     public static final float SKIP_LEFT = 1132f, SKIP_TOP = 0f, SKIP_RIGHT = 1270f, SKIP_BOTTOM = 34f;
+    /** Botão MENU (canto de cima à esquerda), só quando o jogo liga com {@link #setBotaoMenu}. */
+    public static final float MENU_LEFT = 10f, MENU_TOP = 0f, MENU_RIGHT = 148f, MENU_BOTTOM = 34f;
 
     private static final int PAPER = 0xFFF1ECE1;
     private static final int FLASHBACK_PAPER = 0xFF0C0C0C;
@@ -64,6 +66,7 @@ public final class PaginaHistoria {
     private float exitAt = -1f;
     private float shake;
     private long frame;
+    private boolean botaoMenu;
 
     // Página atual: quando cada painel e cada balão apareceu (-1 = ainda não).
     private float[] panelAt = new float[0];
@@ -106,6 +109,16 @@ public final class PaginaHistoria {
         active = false;
         waitingFight = false;
         releaseImages();
+    }
+
+    /** Mostra o botão MENU (o modo história do menu inicial; o jogo abre a pausa no toque). */
+    public void setBotaoMenu(boolean visivel) {
+        botaoMenu = visivel;
+    }
+
+    /** O toque em (x, y) caiu no botão MENU (visível, com a página na tela). */
+    public boolean menuAt(float x, float y) {
+        return botaoMenu && coversScreen() && x >= MENU_LEFT && x <= MENU_RIGHT && y >= MENU_TOP && y <= MENU_BOTTOM;
     }
 
     /** Verdadeiro do começo ao fim do episódio, inclusive durante as lutas dele. */
@@ -394,6 +407,7 @@ public final class PaginaHistoria {
         }
         c.restore();
         if (p.tipo != Episodio.TipoPasso.PROXIMO) drawSkip(c);
+        if (botaoMenu) drawMenu(c);
         if (waitingTap()) drawTapArrow(c);
 
         float fadeIn = 1f - Tinta.clamp01(time / PAGE_FADE);
@@ -577,6 +591,11 @@ public final class PaginaHistoria {
     private void drawSkip(RenderCanvas c) {
         c.fillRect(SKIP_LEFT, SKIP_TOP, SKIP_RIGHT, SKIP_BOTTOM, 0xB0000000);
         c.drawText(temporada.t("PULAR") + " ▶▶", (SKIP_LEFT + SKIP_RIGHT) * 0.5f, SKIP_BOTTOM - 9f, 19f, WHITE, 0, 0f, true);
+    }
+
+    private void drawMenu(RenderCanvas c) {
+        c.fillRect(MENU_LEFT, MENU_TOP, MENU_RIGHT, MENU_BOTTOM, 0xB0000000);
+        c.drawText("◀ " + temporada.t(MenuPausa.MENU), (MENU_LEFT + MENU_RIGHT) * 0.5f, MENU_BOTTOM - 9f, 19f, WHITE, 0, 0f, true);
     }
 
     private void drawTapArrow(RenderCanvas c) {

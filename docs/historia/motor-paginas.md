@@ -117,8 +117,9 @@ Cole o passo onde a página entra no episódio e complete:
 ### 4. Traduzir
 
 Acrescente cada texto novo (falas, legendas, títulos) em `historia/idiomas/en.json` e
-`es.json`. O teste `traducoesCobremOPrologo` avisa quando um texto do Prólogo fica sem
-tradução; ao criar um episódio novo, estenda o teste para ele.
+`es.json`. O teste `traducoesCobremOsEpisodiosEOMenu` avisa quando um texto de qualquer
+episódio da temporada (ou do menu inicial) fica sem tradução; um episódio novo entra no teste
+assim que é posto em `temporada.json`.
 
 ### 5. Revisar no PC
 

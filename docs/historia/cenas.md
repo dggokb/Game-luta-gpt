@@ -36,7 +36,8 @@ Hoje:
 | Quem chama | Cena | Depois |
 |---|---|---|
 | Botão **TUTORIAL** | `tutorial`: a intro (título + páginas 1 a 4 do Prólogo) e o treino no dojo | volta para a seleção |
-| Botão **HISTÓRIA** | a temporada inteira (o Prólogo já inclui o treino depois da página 4) | próximo episódio |
+| **MODO HISTÓRIA** (menu inicial) | a temporada inteira (o Prólogo já inclui o treino depois da página 4) | próximo episódio; no fim, o menu inicial |
+| Botão **HISTÓRIA** (modo teste) | a temporada inteira | próximo episódio; no fim, a seleção |
 
 ## Para criar uma cena nova
 

@@ -60,3 +60,14 @@ tasks.register('runHistoria', JavaExec) {
     // Outro idioma: gradle :pc-preview:runHistoria -Pidioma=en
     systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
 }
+
+// Menu inicial e pausa em PNG: gradle :pc-preview:runMenu (-Pidioma=en para outro idioma)
+tasks.register('runMenu', JavaExec) {
+    group = 'application'
+    description = 'Grava o menu inicial e a pausa em build/menu/.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.preview.MenuPreview'
+    workingDir = rootProject.projectDir
+    args 'app/src/main/assets', 'build/menu'
+    systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
+}

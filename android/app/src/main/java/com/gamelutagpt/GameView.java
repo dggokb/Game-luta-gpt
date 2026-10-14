@@ -13,6 +13,8 @@ import android.view.SurfaceView;
 import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
+import com.gamelutagpt.historia.MenuInicial;
+import com.gamelutagpt.historia.MenuPausa;
 import com.gamelutagpt.historia.PaginaHistoria;
 import com.gamelutagpt.historia.ConversaLuta;
 import com.gamelutagpt.historia.Temporada;
@@ -160,6 +162,26 @@ public class GameView extends SurfaceView
     private int conversaLicao = -1;
     /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
     private boolean conversaKo;
+    /** Menu inicial (abre com o app): MODO HISTÓRIA ou MODO TESTE. */
+    private final MenuInicial menuInicial;
+    /** Pausa (botão MENU ou tecla voltar): continuar ou voltar ao menu inicial. */
+    private final MenuPausa pausa = new MenuPausa();
+    /**
+     * MODO HISTÓRIA do menu inicial: a temporada desde o Prólogo, sem os botões de teste nem o
+     * DEBUG; voltar (botão MENU ou tecla) abre a pausa e leva ao menu, nunca à seleção de teste.
+     * Falso no MODO TESTE (inclusive na história tocada pelo botão HISTÓRIA de teste).
+     */
+    private boolean storyMode;
+    /** Texto do botão do topo da luta: "◀ SELEÇÃO" no teste, "◀ MENU" na história. */
+    private String selectButtonLabel = SELECT_LABEL;
+    private static final String SELECT_LABEL = "◀ SELEÇÃO";
+    /** A última escolha da seleção no modo teste (titular, parceiro, CPU, parceiro do CPU). */
+    private String[] testPicks = {"player_base", "p08", "p03", "p06"};
+    /**
+     * Entrou no MODO TESTE pelo menu e a luta de trás ainda é a de antes (da história, ou a do
+     * construtor): se a seleção for cancelada, a luta de teste começa com {@link #testPicks}.
+     */
+    private boolean testFightPending;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
@@ -285,6 +307,8 @@ public class GameView extends SurfaceView
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
         historia = new PaginaHistoria(this, ultraAssets);
+        menuInicial = new MenuInicial(ultraAssets);
+        menuInicial.setVersao(VERSION_HUD_LABEL);
         conversa = new ConversaLuta(ultraAssets);
         stageId = DEFAULT_STAGE;
         stageScene = loadStage(ultraAssets, stageId);
@@ -414,11 +438,24 @@ public class GameView extends SurfaceView
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (ajusteTamanho.isOpen() || ajusteCaixas.isOpen() || characterSelect.isOpen() || historia.coversScreen()) {
+        if (menuInicial.isOpen()) {
+            // No menu inicial a tecla voltar fecha o app, como em toda tela raiz do Android.
+            if (keyCode == KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
+            selectionKeys.offer(keyCode);
+            return true;
+        }
+        // Na luta, voltar/START abre a pausa (o loop do jogo lê a fila).
+        if (pausa.isOpen() || ajusteTamanho.isOpen() || ajusteCaixas.isOpen() || characterSelect.isOpen() ||
+            historia.coversScreen() || isPauseKey(keyCode)) {
             selectionKeys.offer(keyCode);
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private static boolean isPauseKey(int keyCode) {
+        return keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE ||
+            keyCode == KeyEvent.KEYCODE_BUTTON_START;
     }
 
     private void handleSelectionKey(int keyCode) {
@@ -436,7 +473,7 @@ public class GameView extends SurfaceView
             case KeyEvent.KEYCODE_BUTTON_B:
             case KeyEvent.KEYCODE_ESCAPE:
             case KeyEvent.KEYCODE_BACK:
-                if(characterSelect.back()==CharacterSelect.Result.CANCEL) characterSelect.close();
+                if(characterSelect.back()==CharacterSelect.Result.CANCEL) closeCharacterSelect();
                 break;
             case KeyEvent.KEYCODE_BUTTON_X: characterSelect.randomFocused(); break;
             case KeyEvent.KEYCODE_BUTTON_Y: characterSelect.toggleSettings(); break;
@@ -456,7 +493,7 @@ public class GameView extends SurfaceView
                 confirmCharacterSelection();
                 break;
             case CANCEL:
-                characterSelect.close();
+                closeCharacterSelect();
                 break;
             default:
                 break;
@@ -467,8 +504,19 @@ public class GameView extends SurfaceView
         if(!characterSelect.ready())return;
         characterSelectRenderer.beginFightTransition();
         characterSelect.close();
-        selectTeams(characterSelect.point(),characterSelect.partner(),
-            characterSelect.opponentPoint(),characterSelect.opponentPartner());
+        testFightPending = false;
+        testPicks = new String[] {characterSelect.point(), characterSelect.partner(),
+            characterSelect.opponentPoint(), characterSelect.opponentPartner()};
+        selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
+    }
+
+    /** Seleção cancelada: volta para a luta (a de teste do zero, se veio do menu inicial). */
+    private void closeCharacterSelect() {
+        characterSelect.close();
+        if (testFightPending) {
+            testFightPending = false;
+            selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
+        }
     }
 
     private String teamLabel() {
@@ -551,8 +599,8 @@ public class GameView extends SurfaceView
         if (!introPlayed) {
             introPlayed = true;
             startIntro();
-            openCharacterSelect();
-            characterSelect.open("player_base", "p08", "p03", "p06");
+            // O app abre no menu inicial: MODO HISTÓRIA ou MODO TESTE (a luta de teste de antes).
+            openMainMenu();
         }
         surfaceReady = true;
         startLoopIfReady();
@@ -640,6 +688,24 @@ public class GameView extends SurfaceView
     /** One simulation frame: inputs, engine step, then presentation state. */
     private void update() {
         if (stageScene != null) stageScene.update(FIXED_STEP);
+        if (menuInicial.isOpen()) {
+            // A luta fica parada (e escondida) atrás do menu.
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while ((key = selectionKeys.poll()) != null) handleMenuKey(key);
+            MenuInicial.Opcao escolha = menuInicial.update(FIXED_STEP);
+            if (escolha == MenuInicial.Opcao.HISTORIA) startStoryMode();
+            else if (escolha == MenuInicial.Opcao.TESTE) startTestMode();
+            return;
+        }
+        if (pausa.isOpen()) {
+            // Tudo para (página, luta, treino, conversa) até CONTINUAR ou MENU INICIAL.
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while (pausa.isOpen() && (key = selectionKeys.poll()) != null) handlePauseKey(key);
+            pausa.update(FIXED_STEP);
+            return;
+        }
         if (ajusteTamanho.isOpen()) {
             // A luta fica parada atrás da tela de ajuste.
             pad.drainInto(ignoredInput);
@@ -672,6 +738,8 @@ public class GameView extends SurfaceView
         }
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
+            // Sem pausa no meio da Página Final.
+            selectionKeys.clear();
             paginaFinal.update(FIXED_STEP);
             if (paginaFinal.isShattering() && ultraAttacker >= 0) {
                 // Through the breaking page the fight is already in place for the beam.
@@ -679,6 +747,13 @@ public class GameView extends SurfaceView
                 updateFightCamera(FIXED_STEP);
             }
             return;
+        }
+        Integer fightKey;
+        while ((fightKey = selectionKeys.poll()) != null) {
+            if (isPauseKey(fightKey)) {
+                openPause();
+                if (pausa.isOpen()) return;
+            }
         }
         boolean tagging = isTagAnimationActive();
 
@@ -863,6 +938,7 @@ public class GameView extends SurfaceView
         @Override public boolean storyActive() { return historia.isActive() && !tutorial.active(); }
         @Override public boolean tutorialActive() { return tutorial.active(); }
         @Override public boolean hideTestButtons() { return testButtonsHidden(); }
+        @Override public String selectButtonLabel() { return selectButtonLabel; }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -1312,6 +1388,12 @@ public class GameView extends SurfaceView
 
             canvas.save();
             canvas.scale(sx, sy);
+            if (menuInicial.isOpen()) {
+                renderCanvas.begin(canvas);
+                menuInicial.render(renderCanvas);
+                canvas.restore();
+                return;
+            }
             if (ajusteTamanho.isOpen()) {
                 ajusteTamanho.draw(canvas);
                 canvas.restore();
@@ -1331,6 +1413,7 @@ public class GameView extends SurfaceView
             if (historia.coversScreen()) {
                 renderCanvas.begin(canvas);
                 historia.render(renderCanvas);
+                pausa.render(renderCanvas);
                 canvas.restore();
                 return;
             }
@@ -1433,6 +1516,8 @@ public class GameView extends SurfaceView
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
+            // A pausa por cima da luta parada.
+            pausa.render(renderCanvas);
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
@@ -2051,6 +2136,18 @@ public class GameView extends SurfaceView
         int action = event.getActionMasked();
         int index = event.getActionIndex();
 
+        if (menuInicial.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                menuInicial.tap(event.getX(index) / sx, event.getY(index) / sy);
+            }
+            return;
+        }
+        if (pausa.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                applyPause(pausa.tap(event.getX(index) / sx, event.getY(index) / sy));
+            }
+            return;
+        }
         if (ajusteTamanho.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 ajusteTamanho.tap(event.getX(index) / sx, event.getY(index) / sy);
@@ -2071,7 +2168,14 @@ public class GameView extends SurfaceView
         }
         if (historia.coversScreen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                historia.tap(event.getX(index) / sx, event.getY(index) / sy);
+                float x = event.getX(index) / sx;
+                float y = event.getY(index) / sy;
+                // MENU (só no modo história) abre a pausa; o resto da tela vira a página.
+                if (historia.menuAt(x, y)) {
+                    openPause();
+                } else {
+                    historia.tap(x, y);
+                }
             }
             return;
         }
@@ -2106,7 +2210,12 @@ public class GameView extends SurfaceView
                     debugOverlay = !debugOverlay;
                     break;
                 case CHARACTER_SELECT:
-                    openCharacterSelect();
+                    // No modo história o botão do topo é o MENU (pausa), não a seleção de teste.
+                    if (storyMode) {
+                        openPause();
+                    } else {
+                        openCharacterSelect();
+                    }
                     break;
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
@@ -2209,6 +2318,126 @@ public class GameView extends SurfaceView
         }
     }
 
+    // ------------------------------------------------------------ menu inicial e pausa
+
+    /**
+     * Menu inicial: abandona o que estiver tocando (episódio, cena, treino, seleção, pausa) e
+     * mostra o logo com MODO HISTÓRIA e MODO TESTE. A luta fica parada atrás.
+     */
+    private void openMainMenu() {
+        historia.stop();
+        historia.setBotaoMenu(false);
+        storyEpisode = -1;
+        sceneAfter = null;
+        storyMode = false;
+        selectButtonLabel = SELECT_LABEL;
+        tutorial.stop();
+        conversa.descarregar();
+        pausa.fechar();
+        characterSelect.close();
+        testFightPending = false;
+        hud.resetEffects();
+        // A temporada dá o logo e o idioma dos textos do menu (sem ela, logo padrão e português).
+        loadTemporada();
+        menuInicial.abrir(temporada);
+        selectionKeys.clear();
+        pad.reset();
+        releaseAllPointers();
+    }
+
+    private void handleMenuKey(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_UP:
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                menuInicial.mover(-1);
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                menuInicial.mover(1);
+                break;
+            case KeyEvent.KEYCODE_BUTTON_A:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_BUTTON_START:
+                menuInicial.confirmar();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /** MODO HISTÓRIA: a temporada desde o Prólogo, sem botões de teste; voltar leva ao menu. */
+    private void startStoryMode() {
+        if (!loadTemporada()) {
+            openMainMenu();
+            return;
+        }
+        storyMode = true;
+        selectButtonLabel = "◀ " + temporada.t(MenuPausa.MENU);
+        debugOverlay = false;
+        historia.setBotaoMenu(true);
+        startStory();
+    }
+
+    /**
+     * MODO TESTE: o que o app abria antes do menu, a luta de teste no cenário padrão com a
+     * seleção de dupla, os botões de teste e o DEBUG.
+     */
+    private void startTestMode() {
+        storyMode = false;
+        selectButtonLabel = SELECT_LABEL;
+        historia.setBotaoMenu(false);
+        // Treino (IA OFF) no cenário padrão; o botão IA liga o modo batalha.
+        setOpponentAiEnabled(false);
+        openCharacterSelect();
+        characterSelect.open(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
+        testFightPending = true;
+    }
+
+    /** Pausa (MENU ou voltar) por cima da página ou da luta. Não abre no meio de um ultra. */
+    private void openPause() {
+        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        loadTemporada();
+        // O aviso de progresso perdido só vale para um episódio do modo história.
+        pausa.abrir(temporada, storyMode && historia.isActive());
+        selectionKeys.clear();
+        pad.reset();
+        releaseAllPointers();
+    }
+
+    private void handlePauseKey(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_UP:
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                pausa.mover(-1);
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                pausa.mover(1);
+                break;
+            case KeyEvent.KEYCODE_BUTTON_A:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                applyPause(pausa.confirmar());
+                break;
+            case KeyEvent.KEYCODE_BUTTON_B:
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.KEYCODE_ESCAPE:
+            case KeyEvent.KEYCODE_BUTTON_START:
+                applyPause(pausa.voltar());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void applyPause(MenuPausa.Opcao opcao) {
+        if (opcao == null) return;
+        pad.reset();
+        releaseAllPointers();
+        if (opcao == MenuPausa.Opcao.MENU) openMainMenu();
+    }
+
     // ------------------------------------------------------------ modo história
 
     /** HISTÓRIA: toca a temporada desde o primeiro episódio. */
@@ -2285,11 +2514,16 @@ public class GameView extends SurfaceView
         } catch (IOException | RuntimeException ex) {
             Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
             storyEpisode = -1;
-            openCharacterSelect();
+            leaveStory();
         }
     }
 
     private void handleStoryKey(int keyCode) {
+        if (storyMode && isPauseKey(keyCode)) {
+            // Modo história: voltar/START abre a pausa (dali, o menu inicial); B continua pulando.
+            openPause();
+            return;
+        }
         boolean skip = keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_BACK ||
             keyCode == KeyEvent.KEYCODE_ESCAPE;
         if (skip) {
@@ -2396,9 +2630,12 @@ public class GameView extends SurfaceView
         conversa.update(FIXED_STEP);
     }
 
-    /** Botões de teste escondidos: no tutorial e nas lutas com conversa (o canto é dos quadros). */
+    /**
+     * Botões de teste escondidos: no modo história (o jogo de verdade), no tutorial e nas lutas
+     * com conversa (o canto é dos quadros).
+     */
     private boolean testButtonsHidden() {
-        return tutorial.active() || conversa.ativa();
+        return storyMode || tutorial.active() || conversa.ativa();
     }
 
     /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
@@ -2419,11 +2656,21 @@ public class GameView extends SurfaceView
             after.run();
             return;
         }
+        // Depois do "Próximo episódio" a temporada emenda no episódio seguinte (ep00 → ep01).
         int next = storyEpisode + 1;
         if (temporada != null && next < temporada.episodios.size()) {
             playStoryEpisode(next);
         } else {
             storyEpisode = -1;
+            leaveStory();
+        }
+    }
+
+    /** Fim (ou erro) da temporada: o modo história volta ao menu; o de teste, à seleção. */
+    private void leaveStory() {
+        if (storyMode) {
+            openMainMenu();
+        } else {
             openCharacterSelect();
         }
     }

@@ -300,9 +300,17 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   também usam essa regra. Na batalha o CPU usa tudo: assist, troca, Assist → Tag, Super,
   DHC, Guard Cancel, pushblock, Overdrive e Ultra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
 
+## Menu inicial
+
+- O app abre no **menu inicial** (logo + duas opções, toque ou controle):
+  **MODO HISTÓRIA** (o jogo de verdade: Prólogo e Episódio 1, sem botões de teste; ◀ MENU e a
+  tecla voltar abrem a pausa e levam de volta ao menu) e **MODO TESTE** (a luta de teste de
+  sempre, com seleção de dupla, botões de teste e DEBUG). Textos traduzidos pelos idiomas da
+  história. `docs/menu-inicial.md`; prévia no PC: `gradle :pc-preview:runMenu`.
+
 ## Modo história (MVP)
 
-- Botão **HISTÓRIA** no HUD (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de
+- **MODO HISTÓRIA** no menu inicial, ou o botão **HISTÓRIA** no HUD do modo teste (abaixo de DUPLA): toca o **Prólogo** e o **Episódio 1** de
   *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
   11 páginas prontas lidas quadro a quadro (com o treino/tutorial depois da página 4), o
   Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.

@@ -283,10 +283,28 @@ public class PaginaHistoriaTest {
         }
     }
 
-    /** Toda tradução que vai no jogo abre, e cobre todos os textos do Prólogo. */
+    /**
+     * Toda tradução que vai no jogo abre e cobre todos os textos dos episódios da temporada
+     * (o modo história toca todos eles em sequência) e os do menu inicial e da pausa.
+     */
     @Test
-    public void traducoesCobremOPrologo() throws IOException {
-        Episodio ep = Episodio.fromJson(read("historia/ep00/episodio.json"));
+    public void traducoesCobremOsEpisodiosEOMenu() throws IOException {
+        Temporada temporada = Temporada.fromJson(read("historia/temporada.json"));
+        List<String> textos = new ArrayList<>();
+        for (String id : temporada.episodios) textos.addAll(textosDoEpisodio(Episodio.fromJson(read("historia/" + id + "/episodio.json"))));
+        textos.addAll(java.util.Arrays.asList(MenuInicial.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(MenuPausa.TEXTOS));
+        File[] idiomas = new File(ASSETS, "historia/idiomas").listFiles();
+        assertNotNull(idiomas);
+        for (File arquivo : idiomas) {
+            java.util.Map<String, String> traducao = Temporada.traducaoFromJson(read("historia/idiomas/" + arquivo.getName()));
+            for (String texto : textos) {
+                assertTrue(arquivo.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
+            }
+        }
+    }
+
+    private static List<String> textosDoEpisodio(Episodio ep) {
         List<String> textos = new ArrayList<>();
         textos.add(ep.titulo);
         for (Episodio.Passo passo : ep.passos) {
@@ -300,14 +318,59 @@ public class PaginaHistoriaTest {
                 for (Episodio.Balao b : painel.baloes) textos.add(b.texto);
             }
         }
-        File[] idiomas = new File(ASSETS, "historia/idiomas").listFiles();
-        assertNotNull(idiomas);
-        for (File arquivo : idiomas) {
-            java.util.Map<String, String> traducao = Temporada.traducaoFromJson(read("historia/idiomas/" + arquivo.getName()));
-            for (String texto : textos) {
-                assertTrue(arquivo.getName() + " sem tradução para: " + texto, traducao.containsKey(texto));
-            }
+        return textos;
+    }
+
+    /**
+     * O modo história toca a temporada em ordem: o Prólogo termina no "Próximo episódio" que
+     * anuncia o episódio seguinte da lista, e o jogo emenda nele.
+     */
+    @Test
+    public void prologoTerminaAnunciandoOEpisodioSeguinte() throws IOException {
+        Temporada temporada = Temporada.fromJson(read("historia/temporada.json"));
+        assertEquals("ep00", temporada.episodios.get(0));
+        assertTrue("a temporada precisa de um episódio depois do Prólogo", temporada.episodios.size() > 1);
+        for (int i = 0; i + 1 < temporada.episodios.size(); i++) {
+            Episodio ep = Episodio.fromJson(read("historia/" + temporada.episodios.get(i) + "/episodio.json"));
+            Episodio seguinte = Episodio.fromJson(read("historia/" + temporada.episodios.get(i + 1) + "/episodio.json"));
+            Episodio.Passo ultimo = ep.passos.get(ep.passos.size() - 1);
+            assertEquals(ep.id + " termina no próximo episódio", Episodio.TipoPasso.PROXIMO, ultimo.tipo);
+            assertEquals(ep.id + " anuncia o episódio seguinte", seguinte.titulo, ultimo.titulo);
+            assertEquals(ep.numero + 1, seguinte.numero);
         }
+    }
+
+    /** No fim do Prólogo o toque no "Próximo episódio" termina o episódio (o jogo emenda o seguinte). */
+    @Test
+    public void toqueNoProximoEpisodioTerminaOEpisodio() {
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, new NoImages());
+        p.start(Temporada.fromJson(TEMPORADA), Episodio.fromJson(EPISODIO));
+        p.tap((PaginaHistoria.SKIP_LEFT + PaginaHistoria.SKIP_RIGHT) * 0.5f, 10f); // PULAR até a luta
+        p.resultadoLuta(true);
+        assertEquals(Episodio.TipoPasso.PROXIMO, p.passo().tipo);
+        run(p, PaginaHistoria.NEXT_MIN_TAP + 0.1f);
+        p.tap(640f, 360f);
+        run(p, PaginaHistoria.EXIT_DURATION + 0.1f);
+        assertFalse(p.isActive());
+        assertNotNull(rec.ended);
+    }
+
+    @Test
+    public void botaoMenuSoRespondeQuandoLigado() {
+        PaginaHistoria p = new PaginaHistoria(new Recorder(), new NoImages());
+        p.start(Temporada.fromJson(TEMPORADA), Episodio.fromJson(EPISODIO));
+        float x = (PaginaHistoria.MENU_LEFT + PaginaHistoria.MENU_RIGHT) * 0.5f;
+        float y = (PaginaHistoria.MENU_TOP + PaginaHistoria.MENU_BOTTOM) * 0.5f;
+        assertFalse(p.menuAt(x, y));
+        p.setBotaoMenu(true);
+        assertTrue(p.menuAt(x, y));
+        assertFalse(p.menuAt(640f, 360f));
+        p.render(new NullCanvas());
+        // Durante a luta do episódio a página não está na tela: o botão é o do HUD.
+        p.tap((PaginaHistoria.SKIP_LEFT + PaginaHistoria.SKIP_RIGHT) * 0.5f, 10f);
+        assertTrue(p.waitingFight());
+        assertFalse(p.menuAt(x, y));
     }
 
     private static String read(String path) throws IOException {

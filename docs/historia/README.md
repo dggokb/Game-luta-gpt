@@ -46,13 +46,21 @@ salvar progresso e um menu de episódios.
 
 ## Como funciona no jogo
 
-- Botão **HISTÓRIA** no HUD (abaixo de DUPLA) toca a temporada desde o Prólogo. **PULAR**
-  (canto de cima) vai direto para a próxima luta ou para o "próximo episódio". Com
-  controle, qualquer botão vira a página e B pula.
+- **MODO HISTÓRIA** no menu inicial ([../menu-inicial.md](../menu-inicial.md)) toca a
+  temporada desde o Prólogo e emenda um episódio no outro (depois do "Próximo episódio" do
+  ep00 vem o ep01); no fim da temporada volta ao menu. Sem os botões de teste nem o DEBUG.
+  **◀ MENU** (canto de cima à esquerda nas páginas, botão do topo nas lutas) e a tecla
+  voltar abrem a pausa (CONTINUAR / MENU INICIAL).
+- No MODO TESTE, o botão **HISTÓRIA** do HUD (abaixo de DUPLA) toca a mesma temporada, com
+  os botões de teste, e no fim volta para a seleção.
+- **PULAR** (canto de cima à direita) vai direto para a próxima luta ou para o "próximo
+  episódio". Com controle, qualquer botão vira a página e B pula (no modo história, voltar e
+  START abrem a pausa).
 - Numa luta da história, o jogo monta as duplas do episódio, liga a IA e mostra o rótulo
   da luta (ex.: TREINO). Depois do KO e da comemoração, a história continua. Uma derrota
   repete a luta, a não ser que o passo diga `"repetirSeDerrota": false`.
-- Voltar para a seleção (DUPLA ou SELEÇÃO) abandona o episódio.
+- No teste, voltar para a seleção (DUPLA ou SELEÇÃO) abandona o episódio; no modo história,
+  MENU INICIAL na pausa abandona o episódio (ainda não há save).
 
 O motor é o módulo `android/story-core` (Java puro, como o `ultra-core`): `PaginaHistoria`
 toca o episódio e desenha; o `GameView` só repassa toques, desenha por cima e faz as lutas.

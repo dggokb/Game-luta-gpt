@@ -63,6 +63,8 @@ final class HudRenderer {
         default boolean tutorialActive() { return false; }
         /** Tutorial ou luta com conversa: o canto dos botões de teste é dos quadros laterais. */
         default boolean hideTestButtons() { return tutorialActive(); }
+        /** Botão do topo da luta: a seleção no modo teste, o MENU (pausa) no modo história. */
+        default String selectButtonLabel() { return "◀ SELEÇÃO"; }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -168,7 +170,7 @@ final class HudRenderer {
         }
         // No tutorial e nas lutas com conversa os botões de teste somem (o canto é dos quadros).
         if (!s.hideTestButtons()) drawTestButtons(c, s);
-        drawToggle(c, s.pressed(Control.CHARACTER_SELECT), "◀ SELEÇÃO",
+        drawToggle(c, s.pressed(Control.CHARACTER_SELECT), s.selectButtonLabel(),
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
     }
 
