@@ -257,6 +257,7 @@ public class MechanicsTest {
         assertTrue(GeneratedCharacters.get("player_base").animations.containsKey(SpriteStates.SPECIAL_ENERGY_CHARGED));
         assertTrue("p06 wakes the shadow", mech("p06", "S2").echoFrames > 0);
         assertTrue(GeneratedCharacters.get("p05").fighter.wallJump);
+        assertTrue(GeneratedCharacters.get("p05").animations.containsKey(SpriteStates.WALL_JUMP));
     }
 
     private static AttackDefinition.Mechanics mech(String character, String move) {

@@ -916,6 +916,12 @@ final class GeneratedSpriteLayouts {
     static final int P05_WALK_FORWARD_ROOT_Y = 402;
     static final int P05_WALK_FORWARD_FRAME_COUNT = 22;
 
+    static final int P05_WALL_JUMP_FRAME_WIDTH = 524;
+    static final int P05_WALL_JUMP_FRAME_HEIGHT = 362;
+    static final int P05_WALL_JUMP_ROOT_X = 231;
+    static final int P05_WALL_JUMP_ROOT_Y = 352;
+    static final int P05_WALL_JUMP_FRAME_COUNT = 10;
+
     static final int P06_BACKDASH_FRAME_WIDTH = 209;
     static final int P06_BACKDASH_FRAME_HEIGHT = 270;
     static final int P06_BACKDASH_ROOT_X = 125;

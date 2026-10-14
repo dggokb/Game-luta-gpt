@@ -207,8 +207,10 @@ no ar, aperta pra cima e sai empurrado para longe dela).
 soca, o segundo dá uma ombrada, e saem correndo; cada um leva metade do dano do Super. O
 capanga não tem imagem inicial, então a escala é manual (225 px, um pouco maior que o p07).
 
-**Ainda falta:** o vídeo do wall jump do p05. O primeiro desenhou uma parede e deu zoom; o
-segundo saiu com a p06 no lugar do p05. Até o certo chegar ele usa o pulo normal.
+**Wall jump (14/10):** animação própria do p05 (`WALL_JUMP`, 3º vídeo: agacha no ar contra a
+parede invisível e sai de voadora), tocada enquanto dura o empurrão da parede.
+
+Todas as mecânicas planejadas estão no jogo.
 
 ## 5. Perguntas em aberto
 
