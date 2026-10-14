@@ -1,6 +1,6 @@
 # Tutorial: Takatoshi e Dafu assistindo, e os quadros entre as lições
 
-O treino do tutorial (no Dojo Shinshinkan) tem duas coisas a mais:
+O treino do tutorial (no Dojo Shūshinkan) tem duas coisas a mais:
 
 1. **Quem assiste.** Takatoshi (45 anos, o pai) e Dafu ficam no fundo do dojo, perto da parede,
    um de cada lado do altar. Eles reagem ao que acontece no treino:
@@ -157,7 +157,7 @@ Cole antes de cada prompt e anexe as páginas do mangá do dojo e os concepts do
 ```
 Quadro único de mangá colorido, no mesmo estilo das páginas anexadas (anime anos 90, traço
 limpo, cores quentes do dojo à noite, iluminação âmbar das lanternas). Interior do Dojo
-Shinshinkan. Takatoshi e Dafu exatamente como nos concepts anexados. Horizontal 16:9.
+Shūshinkan. Takatoshi e Dafu exatamente como nos concepts anexados. Horizontal 16:9.
 Sem balões, sem texto, sem onomatopeias, sem moldura, sem marca d'água. Deixe espaço livre
 na parte de cima do quadro para os balões.
 ```

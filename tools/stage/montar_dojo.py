@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Monta o cenário do Dojo Shinshinkan a partir das imagens geradas no GPT.
+"""Monta o cenário do Dojo Shūshinkan a partir das imagens geradas no GPT.
 
     python tools/stage/montar_dojo.py --entrada pasta/com/as/imagens
 
