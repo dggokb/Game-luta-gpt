@@ -1,6 +1,6 @@
 # Game Luta Sprite GPT
 
-Branch `game-luta-sprite-gpt`. Versão `0.87-sprite-gpt-pack-v2` (fonte única: `versionName` em `android/app/build.gradle`).
+Branch `game-luta-sprite-gpt`. Versão `0.102-hud-contadores-super5` (fonte única: `versionName` em `android/app/build.gradle`).
 
 ## Character Pack Engine
 
