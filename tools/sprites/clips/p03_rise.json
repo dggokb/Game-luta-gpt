@@ -15,8 +15,27 @@
     "art/sprites/source/p03_rise_video_normalized.png"
   ],
   "frameWidth": 512,
-  "frameHeight": 512,
+  "frameHeight": 514,
   "rootX": 256,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "rootY": 478,
+  "pixelScale": 2.0,
+  "reescala": [
+    0.9804,
+    0.9804,
+    0.9804,
+    0.9804,
+    0.9804,
+    0.9804
+  ],
+  "reguaFatores": [
+    0.9804,
+    0.9804,
+    0.9804,
+    0.9804,
+    0.9804,
+    0.9804
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 102% (RISE)"
+  ]
 }

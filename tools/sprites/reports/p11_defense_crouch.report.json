@@ -18,104 +18,104 @@
     {
       "index": 0,
       "outputBbox": [
-        33,
-        37,
-        232,
-        175
+        19,
+        23,
+        239,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13152
+      "minimumMargin": 16,
+      "opaquePixels": 16061
     },
     {
       "index": 1,
       "outputBbox": [
-        66,
-        38,
-        263,
-        175
+        55,
+        24,
+        273,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14411
+      "minimumMargin": 15,
+      "opaquePixels": 17537
     },
     {
       "index": 2,
       "outputBbox": [
-        59,
-        36,
-        260,
-        175
+        48,
+        23,
+        269,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13979
+      "minimumMargin": 16,
+      "opaquePixels": 17034
     },
     {
       "index": 3,
       "outputBbox": [
-        24,
-        35,
-        227,
-        175
+        9,
+        22,
+        232,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14385
+      "minimumMargin": 9,
+      "opaquePixels": 17515
     },
     {
       "index": 4,
       "outputBbox": [
-        33,
-        34,
-        227,
-        175
+        19,
+        21,
+        232,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13356
+      "minimumMargin": 16,
+      "opaquePixels": 16259
     },
     {
       "index": 5,
       "outputBbox": [
-        29,
-        34,
-        227,
-        175
+        15,
+        20,
+        232,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13153
+      "minimumMargin": 15,
+      "opaquePixels": 16056
     },
     {
       "index": 6,
       "outputBbox": [
-        28,
-        34,
-        226,
-        175
+        14,
+        21,
+        231,
+        176
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13129
+      "minimumMargin": 14,
+      "opaquePixels": 16024
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 257,
-    "frameHeight": 162,
-    "rootX": 151,
-    "rootY": 150,
+    "frameWidth": 283,
+    "frameHeight": 177,
+    "rootX": 167,
+    "rootY": 164,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      16,
-      24
+      0,
+      10
     ],
     "decodedBytes": {
       "canonical": 1548288,
-      "packed": 1165752
+      "packed": 1402548
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c8fb7e349ce4125470c2d4a56b896534ddafec3d4e55fe05b5f9b1b2186b133c",
-      "config": "d88466668f72bead65a66afa571f6a379be50c5326eaa5dbcb1391fdefa42788",
-      "profile": "00fc175ed503dee00f063796ddf56696760fcf9a00dbf801e2868e4bf77a7030"
+      "source": "210e5d43d8ebefc620a237cb677b32ec1ad315bc94c74e02bf149a728199fb7b",
+      "config": "b5151fc52111a561e5826119ead402857e09e965017c51e45e7ce6acb1505464",
+      "profile": "7027f1483542b0d12a978515370e55f2628bbd34a3c9f02206899d8e57a349b3"
     }
   }
 }

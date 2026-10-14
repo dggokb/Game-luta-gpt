@@ -12,6 +12,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 REPORTS = ROOT / "tools/sprites/reports"
+CLIPS = ROOT / "tools/sprites/clips"
 STAND_SCALE = .980
 SKIP = {"player_base_crouch", "player_base_rise"}  # pre-calibrated transitions
 VICTORY_PLANTED_START = 7  # source frames 0..6 show a walk-in; the game skips them
@@ -50,12 +51,20 @@ def clamp(value, lo, hi):
     return min(hi, max(lo, value))
 
 
+def tuned(key):
+    """Tamanho ajustado no app (DEBUG > AJUSTAR TAMANHOS), gravado na receita por
+    tools/sprites/regua.py --aplicar: a calibração abaixo normaliza a folha, então o
+    ajuste do P01 entra aqui e não na folha."""
+    clip = CLIPS / f"{key}.json"
+    return float(json.loads(clip.read_text()).get("ajusteTamanho", 1.0)) if clip.exists() else 1.0
+
+
 def compute():
     idle = json.loads((REPORTS / "player_base_idle.report.json").read_text())
     left, top, right, bottom = idle["frames"][0]["outputBbox"]
     idle_height = (bottom - top) * STAND_SCALE
     idle_width = (right - left) * STAND_SCALE
-    data, audit = {}, {}
+    data, audit, factors = {}, {}, {}
     for filename in sorted(REPORTS.glob("player_base_*.report.json")):
         report = json.loads(filename.read_text())
         key = report["id"]
@@ -75,6 +84,9 @@ def compute():
         rows = []
         heights = []
         feet = []
+        factor = tuned(key)
+        if factor != 1.0:
+            factors[key] = factor
         for entry in report["frames"]:
             box = entry["outputBbox"]
             width = box[2] - box[0]
@@ -131,6 +143,7 @@ def compute():
                 sx = sy = min(.98, idle_height / max(1, height))
                 if key not in ("player_base_fall", "player_base_getup"):
                     sx = min(sx, idle_width * 1.55 / max(1, width))
+            sx, sy = sx * factor, sy * factor
             if key == "player_base_victory" and entry["index"] >= VICTORY_PLANTED_START:
                 # Old bbox-centering still allowed a few pixels of visual
                 # skating as arms moved. Keep the *shoe* world anchor constant.
@@ -159,10 +172,10 @@ def compute():
             "max_drawn_height": max(heights),
             "max_abs_ground_foot_error": max(abs(x) for x in feet)
         }
-    return data, audit, idle_height, idle_width
+    return data, audit, idle_height, idle_width, factors
 
 
-def make_java(data):
+def make_java(data, factors=None):
     out = [
         "package com.gamelutagpt;",
         "import java.util.HashMap;",
@@ -171,8 +184,11 @@ def make_java(data):
         "final class P01SpriteCalibration {",
         " private static final HashMap<String,float[][]> VALUES = new HashMap<>();",
         " private static final float[] DEFAULT = {1f,1f,0f,0f};",
+        " private static final HashMap<String,Float> TUNED = new HashMap<>();",
         " static {"
     ]
+    for name, factor in sorted((factors or {}).items()):
+        out.append(f'  TUNED.put("{name}",{factor:.4f}f);')
     for name, rows in sorted(data.items()):
         out.append('  VALUES.put("' + name + '",new float[][]{')
         for i in range(0, len(rows), 4):
@@ -185,6 +201,10 @@ def make_java(data):
         "  float[][] entries=VALUES.get(atlas);",
         "  if(entries==null)return DEFAULT;",
         "  return entries[Math.max(0,Math.min(frame,entries.length-1))];",
+        " }",
+        " /** Tamanho do app já gravado nesta folha (1 = nenhum): muda a chave do ajuste. */",
+        " static float tuned(String atlas) {",
+        "  Float value=TUNED.get(atlas);return value==null?1f:value;",
         " }",
         " static int frames(String atlas) {",
         "  float[][] entries=VALUES.get(atlas);return entries==null?0:entries.length;",
@@ -199,7 +219,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    data, audit, stand_h, stand_w = compute()
+    data, audit, stand_h, stand_w, factors = compute()
     expected = len(list(REPORTS.glob("player_base_*.report.json")))
     assert len(data) + len(SKIP) == expected, "Missing atlas calibration"
     assert len(data) >= 35, "Missing P01 sprite states"
@@ -217,7 +237,7 @@ def main():
                 "player_base_special_s2", "player_base_special_s4")), "Ground foot drift"
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(make_java(data))
+    destination.write_text(make_java(data, factors))
     audit_file = ROOT / "android/app/build/sprite-review/p01-idle-master-audit.json"
     audit_file.parent.mkdir(parents=True, exist_ok=True)
     audit_file.write_text(json.dumps({"idle_visible_width":stand_w,"idle_visible_height":stand_h,

@@ -18,5 +18,20 @@
   "sourceReferences": [
     "art/sprites/source/p03_land_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524
+  ],
+  "reguaFatores": [
+    0.9524,
+    0.9524,
+    0.9524,
+    0.9524
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 105% (LAND)"
+  ]
 }

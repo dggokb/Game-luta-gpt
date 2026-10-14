@@ -271,7 +271,7 @@
     "sha256": {
       "source": "ab3436a73702223b84b65434ec0dd3025b3d5e22ed9a09299e62240c6c2edece",
       "config": "d35f9f390088b3da33ff5bfcdcb15fc1ae7887aa6fabbd433e0c3009a5844251",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_special_s3_video_normalized.png": "4aa1ef046c4531606a067f69e24a04d2a02af09ea51587fa78a60e38ea54a1bd"

@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        80,
-        182,
-        484,
+        93,
+        202,
+        469,
         475
       ],
-      "minimumMargin": 28,
-      "opaquePixels": 55426
+      "minimumMargin": 37,
+      "opaquePixels": 48739
     },
     {
       "index": 1,
       "outputBbox": [
-        62,
-        173,
-        459,
+        76,
+        193,
+        446,
         475
       ],
       "minimumMargin": 37,
-      "opaquePixels": 56210
+      "opaquePixels": 49385
     },
     {
       "index": 2,
       "outputBbox": [
-        100,
-        134,
-        459,
+        112,
+        157,
+        446,
         476
       ],
       "minimumMargin": 36,
-      "opaquePixels": 57047
+      "opaquePixels": 50073
     },
     {
       "index": 3,
       "outputBbox": [
-        117,
-        94,
-        441,
+        127,
+        120,
+        429,
         476
       ],
       "minimumMargin": 36,
-      "opaquePixels": 58995
+      "opaquePixels": 51826
     },
     {
       "index": 4,
       "outputBbox": [
-        120,
-        74,
-        421,
+        130,
+        102,
+        411,
         476
       ],
       "minimumMargin": 36,
-      "opaquePixels": 59297
+      "opaquePixels": 52059
     },
     {
       "index": 5,
       "outputBbox": [
-        124,
-        61,
-        412,
+        134,
+        89,
+        402,
         476
       ],
       "minimumMargin": 36,
-      "opaquePixels": 59634
+      "opaquePixels": 52423
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 438,
-    "frameHeight": 431,
-    "rootX": 214,
-    "rootY": 423,
+    "frameWidth": 411,
+    "frameHeight": 407,
+    "rootX": 202,
+    "rootY": 397,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      54,
-      53
+      66,
+      79
     ],
     "decodedBytes": {
       "canonical": 6291456,
-      "packed": 4530672
+      "packed": 4014648
     },
     "pixelScale": 2.0
   },
@@ -104,9 +104,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d6cb67a56dba81ba580c9b6f8ecc58a663fd1b571bd61aff97f987f2b2be9cea",
-      "config": "2da97ecb4da41bdc41f6ee9dd3ce72eb9b85b14fac2cb11d700a0b2fe72069e8",
-      "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+      "source": "471fc3dce0c849f288e18a3f80408a8fbb7ccbc2b7a67c8a0e0d9c7c8d274aeb",
+      "config": "875e41dc441e9e3363042ffc6685ff2694773c12686940b29a2bffcb247c8e71",
+      "profile": "1399fbfca02c9eb84b74570911705356bec6b2c360af9d66f0de19f79e242159"
     },
     "referenceSources": {
       "art/sprites/source/p05_rise_video_normalized.png": "11f9eaedcb6892456f9a1cb30d74ab31d618b1728f5c7fc29f6e7f9b1e233946"

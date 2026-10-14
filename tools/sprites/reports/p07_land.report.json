@@ -7,10 +7,10 @@
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 256,
-    "frameHeight": 256,
-    "rootX": 140,
-    "rootY": 238,
+    "frameWidth": 284,
+    "frameHeight": 290,
+    "rootX": 156,
+    "rootY": 272,
     "columns": 4,
     "frameCount": 4
   },
@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        17,
-        18,
-        231,
-        239
+        8,
+        9,
+        265,
+        274
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 18692
+      "minimumMargin": 8,
+      "opaquePixels": 27038
     },
     {
       "index": 1,
       "outputBbox": [
-        30,
-        30,
-        234,
-        239
+        25,
+        23,
+        269,
+        274
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 19610
+      "minimumMargin": 15,
+      "opaquePixels": 28384
     },
     {
       "index": 2,
       "outputBbox": [
-        35,
-        37,
-        232,
-        239
+        30,
+        32,
+        267,
+        274
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 18279
+      "minimumMargin": 16,
+      "opaquePixels": 26434
     },
     {
       "index": 3,
       "outputBbox": [
-        40,
-        34,
-        239,
-        239
+        36,
+        27,
+        276,
+        274
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 17640
+      "minimumMargin": 8,
+      "opaquePixels": 25510
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 242,
-    "frameHeight": 242,
-    "rootX": 133,
-    "rootY": 230,
+    "frameWidth": 284,
+    "frameHeight": 285,
+    "rootX": 156,
+    "rootY": 272,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      7,
-      8
+      0,
+      0
     ],
     "decodedBytes": {
-      "canonical": 1048576,
-      "packed": 937024
+      "canonical": 1317760,
+      "packed": 1295040
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "37a6fdce043c55a867952b351f0d8610aaea60ac08accc2256b5ec7d18632c9f",
-      "config": "930f16e30a4cb4fbf16554cd1f6368c1cb1a3540ec51a32c53c62706a031dc66",
-      "profile": "c56dde970747f68ac31c5be5fdbefe3c3b87269c7e46369880be2fcc9bd74ce1"
+      "source": "74ed3785376cceef8f93a39183a72464c5314edd3c6e97c4e503e072f89a0c7f",
+      "config": "ebae8abb0f269cb0744424325785f9db788e36aabce472b79869795d75bceeb6",
+      "profile": "0938c3e2b0a7804d8d9f790553c76321248f1b933ec2fded1486484712020c32"
     }
   }
 }

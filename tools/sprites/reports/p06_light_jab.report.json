@@ -18,148 +18,148 @@
     {
       "index": 0,
       "outputBbox": [
-        17,
-        20,
-        170,
+        28,
+        48,
+        161,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 14118
+      "opaquePixels": 10824
     },
     {
       "index": 1,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15197
+      "minimumMargin": 17,
+      "opaquePixels": 11685
     },
     {
       "index": 2,
       "outputBbox": [
-        15,
-        18,
-        209,
-        238
+        26,
+        47,
+        195,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15257
+      "minimumMargin": 17,
+      "opaquePixels": 11727
     },
     {
       "index": 3,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15308
+      "minimumMargin": 17,
+      "opaquePixels": 11779
     },
     {
       "index": 4,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15189
+      "minimumMargin": 17,
+      "opaquePixels": 11676
     },
     {
       "index": 5,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15221
+      "minimumMargin": 17,
+      "opaquePixels": 11703
     },
     {
       "index": 6,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15069
+      "minimumMargin": 17,
+      "opaquePixels": 11572
     },
     {
       "index": 7,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15057
+      "minimumMargin": 17,
+      "opaquePixels": 11564
     },
     {
       "index": 8,
       "outputBbox": [
-        15,
-        18,
-        208,
-        238
+        26,
+        47,
+        194,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 14905
+      "minimumMargin": 17,
+      "opaquePixels": 11437
     },
     {
       "index": 9,
       "outputBbox": [
-        15,
-        18,
-        206,
-        238
+        26,
+        47,
+        193,
+        239
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 14515
+      "minimumMargin": 17,
+      "opaquePixels": 11155
     },
     {
       "index": 10,
       "outputBbox": [
-        17,
-        18,
-        171,
+        28,
+        47,
+        162,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 14555
+      "opaquePixels": 11162
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 214,
-    "frameHeight": 241,
-    "rootX": 94,
-    "rootY": 230,
+    "frameWidth": 189,
+    "frameHeight": 214,
+    "rootX": 83,
+    "rootY": 202,
     "columns": 11,
     "frameCount": 11,
     "cropOffset": [
-      5,
-      8
+      16,
+      36
     ],
     "decodedBytes": {
       "canonical": 2523136,
-      "packed": 2269256
+      "packed": 1779624
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "6fe1bf18f42a7db311bfa3bbda1adff4e2d6fb791a86afc75b54e7884a7c39a9",
-      "config": "7bc176713a32459a2cc255b3f0c43f1bb3dc25f0a5969276746f771f657c03ad",
-      "profile": "ed9db22060e90690715e9be1f7a9baa28a89d85737c20c432e40c3e9015911ca"
+      "source": "db3f1b5fee317484cbc4a30e5998b70861fc046a2541f235827bf320066fe64b",
+      "config": "7f592c10586ac516afbc4b61118ec80200c3d5b29d956d71c49c4b09a9e994a9",
+      "profile": "d3d108101055136c07a3f73bafba462a354b7d6730d1d93c6224b067fc938dfc"
     }
   }
 }

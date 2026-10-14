@@ -22,8 +22,31 @@
     "colunas": 7,
     "fixar": "registro",
     "pe_no_chao": true,
-    "deslocar": "-3,0"
+    "deslocar": "-3,0",
+    "reescala": [
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174
+    ],
+    "reguaFatores": [
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 109% (DEFENSE_AIR)"
+    ]
   },
   "frameWidth": 320,
-  "rootX": 166
+  "rootX": 166,
+  "frameHeight": 262,
+  "rootY": 244
 }

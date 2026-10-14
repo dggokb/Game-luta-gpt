@@ -18,5 +18,34 @@
   "sourceReferences": [
     "art/sprites/source/p03_crouch_light_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087
+  ],
+  "reguaFatores": [
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087,
+    1.087
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 92% (CROUCH_LIGHT)"
+  ]
 }

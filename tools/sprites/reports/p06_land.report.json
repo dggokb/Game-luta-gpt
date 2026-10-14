@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        16,
-        45,
-        166,
+        22,
+        63,
+        161,
         305
       ],
       "minimumMargin": 15,
-      "opaquePixels": 16263
+      "opaquePixels": 14232
     },
     {
       "index": 1,
       "outputBbox": [
-        15,
-        48,
-        170,
+        21,
+        66,
+        166,
         305
       ],
       "minimumMargin": 15,
-      "opaquePixels": 16347
+      "opaquePixels": 14291
     },
     {
       "index": 2,
       "outputBbox": [
-        15,
-        93,
-        176,
+        21,
+        107,
+        171,
         304
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 14576
+      "minimumMargin": 16,
+      "opaquePixels": 12711
     },
     {
       "index": 3,
       "outputBbox": [
-        15,
-        92,
-        170,
+        21,
+        106,
+        166,
         304
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 14123
+      "minimumMargin": 16,
+      "opaquePixels": 12326
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 181,
-    "frameHeight": 280,
-    "rootX": 92,
-    "rootY": 267,
+    "frameWidth": 169,
+    "frameHeight": 262,
+    "rootX": 86,
+    "rootY": 249,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      5,
-      35
+      11,
+      53
     ],
     "decodedBytes": {
       "canonical": 983040,
-      "packed": 810880
+      "packed": 708448
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "504c27a8300ffe57d52c1cd3c2a63e6077570fdb6d9548b8b9f54ae2306cbc9a",
-      "config": "4ccbd096d98fb3684875d4fe6fe01e72a5925da9b19dc304bff56034fd48e54e",
-      "profile": "ed9db22060e90690715e9be1f7a9baa28a89d85737c20c432e40c3e9015911ca"
+      "source": "edcece46d9bd223dc0ca90e63d602043d47daf1b839e7dd91ab1ba03775b8f0d",
+      "config": "06e982576597c44a39c688fcd7b0834d73b9f84a00fab626c8e05fa25b5bb893",
+      "profile": "d3d108101055136c07a3f73bafba462a354b7d6730d1d93c6224b067fc938dfc"
     }
   }
 }

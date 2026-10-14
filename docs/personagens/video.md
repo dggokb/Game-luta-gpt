@@ -196,7 +196,10 @@ assim.
    `ajustes-tamanho-<data>.json` leva os ajustes de todos os personagens.
 4. Para gravar no jogo: `python3 tools/sprites/regua.py --aplicar ajustes-tamanho-<data>.json`,
    depois `build_characters.py --write`. A célula cresce sozinha quando o quadro aumentado
-   não cabe. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
+   não cabe (margem medida como o import mede). No P01 o fator vai para a receita
+   (`ajusteTamanho`) e a calibração gerada multiplica por ele, porque ela normaliza a folha
+   pela altura do idle. Se o IDLE mudou mais de 5%, atualize `standingVisualHeight` no
+   perfil (o build avisa). Hurtbox, alcance e saída das magias não mudam sozinhos. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
    tamanho), porque o tamanho já está no desenho.
 
 ## Ritmo: animação e movimento do jogo

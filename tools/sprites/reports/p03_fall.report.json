@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        131,
-        254,
-        382,
+        135,
+        268,
+        377,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 47824
+      "opaquePixels": 44056
     },
     {
       "index": 1,
       "outputBbox": [
-        126,
-        255,
-        384,
-        604
+        131,
+        268,
+        379,
+        603
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 47761
+      "minimumMargin": 37,
+      "opaquePixels": 43929
     },
     {
       "index": 2,
       "outputBbox": [
-        113,
-        228,
-        386,
-        603
+        118,
+        242,
+        381,
+        602
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 51666
+      "minimumMargin": 38,
+      "opaquePixels": 47556
     },
     {
       "index": 3,
       "outputBbox": [
-        109,
-        189,
-        393,
-        603
+        114,
+        205,
+        387,
+        602
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 55513
+      "minimumMargin": 38,
+      "opaquePixels": 51062
     },
     {
       "index": 4,
       "outputBbox": [
-        107,
-        136,
-        395,
-        604
+        112,
+        154,
+        389,
+        603
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61805
+      "minimumMargin": 37,
+      "opaquePixels": 56863
     },
     {
       "index": 5,
       "outputBbox": [
-        113,
-        84,
-        384,
+        118,
+        104,
+        378,
         603
       ],
       "minimumMargin": 37,
-      "opaquePixels": 58753
+      "opaquePixels": 53962
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 314,
-    "frameHeight": 546,
-    "rootX": 162,
-    "rootY": 529,
+    "frameWidth": 302,
+    "frameHeight": 524,
+    "rootX": 156,
+    "rootY": 508,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      94,
-      71
+      100,
+      92
     ],
     "decodedBytes": {
       "canonical": 9830400,
-      "packed": 4114656
+      "packed": 3797952
     },
     "pixelScale": 2.0
   },
@@ -104,8 +104,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "6bc1cd83d586e3a93b62eaad5d2bbec8adde3816afdc60ee8a60264a530e3222",
-      "config": "d62dc6f095b7df0d76c4909981c34e9863dab5f12ec1cac7d8458bba88dc534d",
+      "source": "9c372b371c0bf30e163974e8ef2b25a0fe320fb61c6736d65ba39e425669ec86",
+      "config": "46818d3fdcb1c546e63f6d38ff144e653cd842c35ceca069a3489f7f193793b1",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

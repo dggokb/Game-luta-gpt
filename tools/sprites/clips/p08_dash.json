@@ -22,7 +22,26 @@
     "colunas": 6,
     "fixar": "registro",
     "pe_no_chao": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.9901,
+      0.9901,
+      0.9901,
+      0.9901,
+      0.9901,
+      0.9901
+    ],
+    "reguaFatores": [
+      0.9901,
+      0.9901,
+      0.9901,
+      0.9901,
+      0.9901,
+      0.9901
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 101% (DASH)"
+    ]
   },
   "frameWidth": 352,
   "rootX": 193

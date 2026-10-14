@@ -36,7 +36,22 @@
         334
       ],
       "colunas": 4
-    }
+    },
+    "reescala": [
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101
+    ],
+    "reguaFatores": [
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 99% (LAND)"
+    ]
   },
   "frameWidth": 448,
   "frameHeight": 704,

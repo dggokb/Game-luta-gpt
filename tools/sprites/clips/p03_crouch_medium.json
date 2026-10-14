@@ -25,7 +25,46 @@
     "largura": 640,
     "raiz": "320,280",
     "sem_poeira": true,
-    "sem_efeitos": true
+    "sem_efeitos": true,
+    "reescala": [
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236
+    ],
+    "reguaFatores": [
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236,
+      1.1236
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 89% (CROUCH_MEDIUM)"
+    ]
   },
   "sourceReferences": [
     "art/sprites/source/p03_crouch_medium_video_normalized.png"

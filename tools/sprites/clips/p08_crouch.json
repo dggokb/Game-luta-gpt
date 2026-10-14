@@ -20,7 +20,30 @@
     "largura": 320,
     "raiz": "191,238",
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101
+    ],
+    "reguaFatores": [
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101,
+      1.0101
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 99% (CROUCH)"
+    ]
   },
   "frameWidth": 320,
   "rootX": 191

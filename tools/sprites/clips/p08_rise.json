@@ -21,8 +21,29 @@
     "raiz": "184,238",
     "colunas": 6,
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.9009,
+      0.9009,
+      0.9009,
+      0.9009,
+      0.9009,
+      0.9009
+    ],
+    "reguaFatores": [
+      0.9009,
+      0.9009,
+      0.9009,
+      0.9009,
+      0.9009,
+      0.9009
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 111% (RISE)"
+    ]
   },
-  "frameWidth": 288,
-  "rootX": 184
+  "frameWidth": 292,
+  "rootX": 188,
+  "frameHeight": 262,
+  "rootY": 244
 }

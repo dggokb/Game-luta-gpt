@@ -22,9 +22,38 @@
     "raiz": "105,268",
     "colunas": 11,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "reescala": [
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885
+    ],
+    "reguaFatores": [
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885,
+      0.885
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 113% (SPECIAL_ENERGY)"
+    ]
   },
-  "frameWidth": 576,
+  "frameWidth": 588,
   "frameHeight": 576,
   "rootX": 210,
   "rootY": 536,

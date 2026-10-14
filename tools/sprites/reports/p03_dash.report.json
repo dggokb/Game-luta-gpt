@@ -18,85 +18,85 @@
     {
       "index": 0,
       "outputBbox": [
-        283,
-        153,
-        775,
+        270,
+        140,
+        782,
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 67382
+      "opaquePixels": 72772
     },
     {
       "index": 1,
       "outputBbox": [
-        377,
-        150,
-        747,
+        369,
+        137,
+        753,
         478
       ],
       "minimumMargin": 34,
-      "opaquePixels": 55837
+      "opaquePixels": 60286
     },
     {
       "index": 2,
       "outputBbox": [
-        260,
-        153,
-        775,
+        246,
+        140,
+        782,
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 67324
+      "opaquePixels": 72673
     },
     {
       "index": 3,
       "outputBbox": [
-        393,
-        158,
-        760,
+        385,
+        145,
+        766,
         478
       ],
       "minimumMargin": 34,
-      "opaquePixels": 56588
+      "opaquePixels": 61134
     },
     {
       "index": 4,
       "outputBbox": [
-        287,
-        147,
-        773,
+        275,
+        134,
+        780,
         478
       ],
       "minimumMargin": 34,
-      "opaquePixels": 67276
+      "opaquePixels": 72624
     },
     {
       "index": 5,
       "outputBbox": [
-        309,
-        149,
-        768,
+        298,
+        136,
+        775,
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 63115
+      "opaquePixels": 68155
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 541,
-    "frameHeight": 357,
-    "rootX": 353,
-    "rootY": 342,
+    "frameWidth": 562,
+    "frameHeight": 370,
+    "rootX": 367,
+    "rootY": 355,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      247,
-      134
+      233,
+      121
     ],
     "decodedBytes": {
       "canonical": 12582912,
-      "packed": 4635288
+      "packed": 4990560
     },
     "pixelScale": 2.0
   },
@@ -104,8 +104,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d797bb9c22c337b7da636586204a8351bbea1cf144ac7c2473615ea0388ce120",
-      "config": "7088ab671ca8449997c4a33c910a4d973ccf420b1028dc504e4c5f2cafbbecfe",
+      "source": "bd62cc9ebbd6ae17ae3584c1f1428fec1b57edcfb1521cebeda555c0df10f835",
+      "config": "34ae749d1ccf597da506b9680688c670d4c922e8cbeebc86d85e906a6d77945c",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

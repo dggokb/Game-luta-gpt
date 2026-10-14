@@ -161,7 +161,7 @@
     "sha256": {
       "source": "e55333eb18701f9302cd9a9c408d108be296cfd06abe6a2e999d074ea1862699",
       "config": "135a62b5c9ab77255cddb6143bddd522788b8235a586d5423c48b644bb52aa6a",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_special_energy_video_normalized.png": "66496982454171f9b4420cf7b00ed6abf58dcfd8923018753d48635496e7e48d"

@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        24,
-        68,
-        259,
-        271
+        17,
+        57,
+        263,
+        270
       ],
       "minimumMargin": 17,
-      "opaquePixels": 13145
+      "opaquePixels": 14631
     },
     {
       "index": 1,
       "outputBbox": [
-        38,
-        109,
-        285,
-        271
+        32,
+        100,
+        292,
+        270
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13451
+      "minimumMargin": 18,
+      "opaquePixels": 14963
     },
     {
       "index": 2,
       "outputBbox": [
-        122,
-        68,
-        295,
-        272
+        120,
+        57,
+        302,
+        271
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 12273
+      "minimumMargin": 17,
+      "opaquePixels": 13572
     },
     {
       "index": 3,
       "outputBbox": [
-        77,
-        32,
-        260,
+        73,
+        19,
+        265,
         271
       ],
       "minimumMargin": 17,
-      "opaquePixels": 10939
+      "opaquePixels": 12191
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 292,
-    "frameHeight": 260,
-    "rootX": 138,
-    "rootY": 248,
+    "frameWidth": 306,
+    "frameHeight": 273,
+    "rootX": 145,
+    "rootY": 261,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      14,
-      22
+      7,
+      9
     ],
     "decodedBytes": {
       "canonical": 1474560,
-      "packed": 1214720
+      "packed": 1336608
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "bbc734846ec8b3ef6b976c0eca6d16288d1a98eba2193480bf0bc0a5bbf366a6",
-      "config": "31a159e1a212ff1facf5d70adad80ec8a88ef2a09ae177b232bf45002a46c9ca",
-      "profile": "bf4b8e3536c396d10dba234f12745f12c20b3cbacf439b73dd3c0dbee7b099d7"
+      "source": "fe915a3b4348b1c939db881c4b2d4c66a593ab6af6526b5fcfc7fccade0745ae",
+      "config": "06d6ec6190f027c8bcbec6ebdb4f88458dcc49d77e5b96f32955043b885b6683",
+      "profile": "f7a23ee0d43bd85d8d286f98d49b6623777b882367a98aa873a07f510bc9f6ab"
     }
   }
 }

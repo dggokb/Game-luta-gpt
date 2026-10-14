@@ -337,7 +337,7 @@
     "sha256": {
       "source": "7e2d8aac033f52448387a1153d0dee3772ac9809ce355bc7a8e37ecc78be7794",
       "config": "00a64260cd8f755ecebfd60269d292d73983afbc1ec22a6feeb9d4bf0884ceb4",
-      "profile": "db0929d99461ac35ebbe976ccc4139ec5da0a945826f0d1db058bb1f0251da44"
+      "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
       "art/sprites/source/p02_intro_video_normalized.png": "c29d84427e0c1b8079239132c22dd0df962b015a7601c51b9ff0d9e2dc0a97ce"

@@ -21,7 +21,26 @@
     "largura": 224,
     "raiz": "122,302",
     "colunas": 6,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "reescala": [
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753
+    ],
+    "reguaFatores": [
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 93% (JUMP)"
+    ]
   },
   "frameWidth": 448,
   "frameHeight": 640,

@@ -18,5 +18,26 @@
   "sourceReferences": [
     "art/sprites/source/p03_jump_heavy_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417
+  ],
+  "reguaFatores": [
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417,
+    1.0417
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 96% (JUMP_HEAVY)"
+  ]
 }

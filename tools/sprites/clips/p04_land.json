@@ -20,7 +20,22 @@
     "celula": 288,
     "largura": 192,
     "raiz": "103,270",
-    "colunas": 4
+    "colunas": 4,
+    "reescala": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "reguaFatores": [
+      0.9091,
+      0.9091,
+      0.9091,
+      0.9091
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 110% (LAND)"
+    ]
   },
   "frameWidth": 384,
   "frameHeight": 576,

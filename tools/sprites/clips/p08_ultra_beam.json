@@ -23,7 +23,32 @@
     "colunas": 9,
     "limpar_chao": true,
     "aparar_borda": 10,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "reescala": [
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174
+    ],
+    "reguaFatores": [
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174,
+      0.9174
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 109% (ULTRA_BEAM)"
+    ]
   },
   "frameWidth": 768,
   "frameHeight": 288,

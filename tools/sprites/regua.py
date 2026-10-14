@@ -75,7 +75,9 @@ class Pack:
         self.id = cid
         self.pack = read_json(ROOT / f'characters/{cid}/character.json')
         self.profile = read_json(ROOT / 'tools/sprites/profiles' / self.pack['profile'])
-        self.keys = read_json(ROOT / f'art/keys/{cid}/tamanho.json')['chaves']
+        self.keydir = ROOT / 'art/keys' / ('p01' if cid == 'player_base' else cid)
+        keys = self.keydir / 'tamanho.json'
+        self.keys = read_json(keys)['chaves'] if keys.exists() else {}
         self.clips = {}
         for p in (ROOT / 'tools/sprites/clips').glob('*.json'):
             cfg = read_json(p)
@@ -204,7 +206,7 @@ def inicio_images(p):
     from tamanho import crop
     out = {}
     for name, escala in p.keys.items():
-        rgba = crop(keyer(cv2.imread(str(ROOT / f'art/keys/{p.id}/{name}.png'))))
+        rgba = crop(keyer(cv2.imread(str(p.keydir / f'{name}.png'))))
         k = escala * p.profile['worldScale']
         img = Image.fromarray(rgba).resize((round(rgba.shape[1] * k), round(rgba.shape[0] * k)), Image.LANCZOS)
         out[name] = np.array(img)
@@ -431,6 +433,17 @@ def correction(p, row, head, idle_head):
     return [round(row['fator'], 4)] * n, f"fator {row['fator'] * 100:.0f}% em todos os quadros"
 
 
+def resolved(cfg):
+    """Receita com a célula explícita: o que a receita não declara vem do perfil, como no
+    import (import_sprites.prepared-grid)."""
+    profile = read_json(ROOT / 'tools/sprites/profiles' / cfg['profile'])
+    out = dict(cfg)
+    for key, default in (('frameWidth', 'baseFrameWidth'), ('frameHeight', 'baseFrameHeight'),
+                         ('rootX', 'preferredRootX'), ('rootY', 'preferredRootY')):
+        out.setdefault(key, int(profile[default]))
+    return out
+
+
 def overflow(cfg, z):
     """(esquerda, cima, direita, baixo): px que faltam na célula para os quadros aumentados
     ficarem a FIX_MARGIN px da borda. Tudo 0 = cabe."""
@@ -467,6 +480,32 @@ def grow_cell(cfg, pad):
     cfg.update(frameWidth=nw, frameHeight=nh, rootX=cfg['rootX'] + left, rootY=cfg['rootY'] + top)
 
 
+def margin_pad(cfg):
+    """(esquerda, cima, direita, baixo) que falta na célula para cada quadro ficar a minMargin
+    px da borda, medido como o import mede (alfa acima de alphaThreshold, depois da suavização)."""
+    validation = read_json(ROOT / 'tools/sprites/profiles' / cfg['profile'])['validation']
+    limit, threshold = validation['minMargin'], validation['alphaThreshold']
+    img = Image.open(ROOT / cfg['source']).convert('RGBA')
+    w, h, cols = cfg['frameWidth'], cfg['frameHeight'], cfg['columns']
+    need = [0, 0, 0, 0]
+    for i in range(cfg['expectedFrames']):
+        box = img.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)).getchannel('A') \
+            .point(lambda v: 255 if v > threshold else 0).getbbox()
+        if box:
+            for k, m in enumerate((box[0], box[1], w - box[2], h - box[3])):
+                need[k] = max(need[k], limit - m)
+    return [int(np.ceil(max(0, v) / 2)) * 2 for v in need]
+
+
+def min_opaque(cfg):
+    """Pixels visíveis do quadro mais vazio, contados como o import conta."""
+    threshold = read_json(ROOT / 'tools/sprites/profiles' / cfg['profile'])['validation']['alphaThreshold']
+    img = Image.open(ROOT / cfg['source']).convert('RGBA')
+    w, h, cols = cfg['frameWidth'], cfg['frameHeight'], cfg['columns']
+    return min(img.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)).getchannel('A')
+               .point(lambda v: 255 if v > threshold else 0).histogram()[255] for i in range(cfg['expectedFrames']))
+
+
 def bake(cfg, atlas, z, reason, undo_optical=False):
     """Reescala a folha do jogo (source da receita) em volta da raiz e grava na receita:
     reescala (a reconversão do vídeo repete), reguaFatores (o que mudou depois da folha do
@@ -475,6 +514,7 @@ def bake(cfg, atlas, z, reason, undo_optical=False):
     from ancorar import clip_path
     path = clip_path(atlas)
     data = read_json(path)
+    cfg = resolved(cfg)
     pad = overflow(cfg, z)
     if any(pad):
         grow_cell(cfg, pad)
@@ -482,6 +522,18 @@ def bake(cfg, atlas, z, reason, undo_optical=False):
             data[key] = cfg[key]
         print(f'{atlas}: célula aumentada para {cfg["frameWidth"]}x{cfg["frameHeight"]} (borda {pad})')
     reescalar.rescale(cfg, np.array(z))
+    pad = margin_pad(cfg)  # a suavização da reescala espalha a borda 1-2 px
+    if any(pad):
+        grow_cell(cfg, pad)
+        for key in ('frameWidth', 'frameHeight', 'rootX', 'rootY'):
+            data[key] = cfg[key]
+        print(f'{atlas}: célula aumentada para {cfg["frameWidth"]}x{cfg["frameHeight"]} (margem {pad})')
+    low = min_opaque(cfg)
+    validation = read_json(ROOT / 'tools/sprites/profiles' / cfg['profile'])['validation']
+    required = int(data.get('minOpaquePixels', validation['minOpaquePixels']))
+    if low < required:
+        # Figura menor ocupa menos pixels: o mínimo do import acompanha a área (fator²).
+        data['minOpaquePixels'] = min(int(required / max(z) ** 2), int(low * 0.95))
     target = data.get('video', data)
     if undo_optical:
         target.pop('normalizedOpticalScale')
@@ -512,6 +564,10 @@ def fix(cid, states):
     print('agora: python3 tools/sprites/build_characters.py --write  e rode a régua de novo')
 
 
+# Folhas do P01 que o renderer desenha com escala fixa própria, sem a calibração gerada.
+P01_UNCALIBRATED = {'player_base_crouch', 'player_base_rise'}
+
+
 def apply_tuning(path):
     """Grava nas folhas os tamanhos ajustados no app (DEBUG > AJUSTAR TAMANHOS > SALVAR NO
     DRIVE). fator 1.05 = folha 5% maior; na receita fica como reescala 1/fator."""
@@ -531,8 +587,18 @@ def apply_tuning(path):
         if abs(f - 1) < 0.005:
             continue
         cfg = clips[atlas]
-        bake(cfg, atlas, [1 / f] * cfg['expectedFrames'],
-             f"ajuste no app {data.get('data', '')}: {f * 100:.0f}% ({' / '.join(item.get('animacoes', []))})")
+        reason = f"ajuste no app {data.get('data', '')}: {f * 100:.0f}% ({' / '.join(item.get('animacoes', []))})"
+        if atlas.startswith('player_base_') and atlas not in P01_UNCALIBRATED:
+            # A calibração do P01 (generate_p01_calibration.py) normaliza a folha pela altura
+            # do idle e desfaria a folha reescalada: o fator vai para a receita e ela multiplica.
+            from ancorar import clip_path
+            path = clip_path(atlas)
+            clip = read_json(path)
+            clip['ajusteTamanho'] = round(clip.get('ajusteTamanho', 1.0) * f, 4)
+            clip.setdefault('regua', []).append(reason)
+            path.write_text(json.dumps(clip, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+        else:
+            bake(cfg, atlas, [1 / f] * cfg['expectedFrames'], reason)
         print(f"{item.get('personagem', '?')} {atlas}: {f * 100:.0f}%")
     print('agora: python3 tools/sprites/build_characters.py --write  (o APK novo nasce com esses tamanhos;'
           ' no app o ajuste volta a 100% sozinho)')

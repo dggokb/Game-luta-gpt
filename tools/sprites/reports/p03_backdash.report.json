@@ -8,9 +8,9 @@
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 1024,
-    "frameHeight": 512,
+    "frameHeight": 526,
     "rootX": 512,
-    "rootY": 476,
+    "rootY": 490,
     "columns": 10,
     "frameCount": 10
   },
@@ -18,129 +18,129 @@
     {
       "index": 0,
       "outputBbox": [
-        371,
-        41,
-        655,
-        479
+        364,
+        34,
+        662,
+        493
       ],
       "minimumMargin": 33,
-      "opaquePixels": 59617
+      "opaquePixels": 65659
     },
     {
       "index": 1,
       "outputBbox": [
-        410,
-        17,
-        661,
-        479
+        404,
+        8,
+        668,
+        493
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 60192
+      "minimumMargin": 8,
+      "opaquePixels": 66276
     },
     {
       "index": 2,
       "outputBbox": [
-        339,
-        35,
-        654,
-        485
+        330,
+        27,
+        661,
+        500
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 62721
+      "minimumMargin": 26,
+      "opaquePixels": 69071
     },
     {
       "index": 3,
       "outputBbox": [
-        361,
-        45,
-        657,
-        485
+        353,
+        38,
+        664,
+        500
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 60647
+      "minimumMargin": 26,
+      "opaquePixels": 66717
     },
     {
       "index": 4,
       "outputBbox": [
-        365,
-        35,
-        657,
-        485
+        357,
+        27,
+        664,
+        500
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 60428
+      "minimumMargin": 26,
+      "opaquePixels": 66591
     },
     {
       "index": 5,
       "outputBbox": [
-        365,
-        33,
-        657,
-        485
+        357,
+        25,
+        664,
+        500
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 61073
+      "minimumMargin": 25,
+      "opaquePixels": 67267
     },
     {
       "index": 6,
       "outputBbox": [
-        365,
-        33,
-        657,
-        485
+        357,
+        25,
+        664,
+        500
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 61051
+      "minimumMargin": 25,
+      "opaquePixels": 67256
     },
     {
       "index": 7,
       "outputBbox": [
-        359,
-        41,
-        655,
-        485
+        351,
+        34,
+        662,
+        500
       ],
-      "minimumMargin": 27,
-      "opaquePixels": 60833
+      "minimumMargin": 26,
+      "opaquePixels": 66977
     },
     {
       "index": 8,
       "outputBbox": [
-        349,
-        17,
-        665,
-        475
+        340,
+        8,
+        672,
+        489
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 60926
+      "minimumMargin": 8,
+      "opaquePixels": 67061
     },
     {
       "index": 9,
       "outputBbox": [
-        353,
-        41,
-        657,
-        479
+        344,
+        34,
+        664,
+        493
       ],
       "minimumMargin": 33,
-      "opaquePixels": 59378
+      "opaquePixels": 65352
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 352,
-    "frameHeight": 492,
-    "rootX": 186,
-    "rootY": 471,
+    "frameWidth": 368,
+    "frameHeight": 512,
+    "rootX": 195,
+    "rootY": 490,
     "columns": 10,
     "frameCount": 10,
     "cropOffset": [
-      326,
-      5
+      317,
+      0
     ],
     "decodedBytes": {
-      "canonical": 20971520,
-      "packed": 6927360
+      "canonical": 21544960,
+      "packed": 7536640
     },
     "pixelScale": 2.0
   },
@@ -148,8 +148,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "e3a8f147ce1c708286eda99d5081352af8fba51512fba984a58abbf2c68457bd",
-      "config": "1e54a70fb68bb3be1ad160e308fce20db672b016b7565872373b451ef3904b8f",
+      "source": "e93eeb774a1ac4d9c7c7f05faf0ce5467a6b71f5562c6183091861e25b991eb4",
+      "config": "45ba0cd6d77eecbaf895c40faa11144bdc5c11353833b0c9706b581153e514f4",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

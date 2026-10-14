@@ -24,7 +24,38 @@
     "celula": 384,
     "largura": 320,
     "raiz": "150,366",
-    "colunas": 12
+    "colunas": 12,
+    "reescala": [
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753
+    ],
+    "reguaFatores": [
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753,
+      1.0753
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 93% (CROUCH_HEAVY)"
+    ]
   },
   "sourceReferences": [
     "art/sprites/source/p03_crouch_heavy_video_normalized.png"

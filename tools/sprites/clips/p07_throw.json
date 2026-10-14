@@ -20,8 +20,35 @@
     "largura": 320,
     "raiz": "122,238",
     "colunas": 9,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197
+    ],
+    "reguaFatores": [
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197,
+      0.8197
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 122% (THROW_GRAB / THROW_TOSS)"
+    ]
   },
-  "frameWidth": 320,
-  "rootX": 122
+  "frameWidth": 362,
+  "rootX": 134,
+  "frameHeight": 278,
+  "rootY": 260
 }

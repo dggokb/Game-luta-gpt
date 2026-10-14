@@ -20,8 +20,29 @@
     "largura": 224,
     "raiz": "137,238",
     "colunas": 6,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      0.8621,
+      0.8621,
+      0.8621,
+      0.8621,
+      0.8621,
+      0.8621
+    ],
+    "reguaFatores": [
+      0.8621,
+      0.8621,
+      0.8621,
+      0.8621,
+      0.8621,
+      0.8621
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 116% (RISE)"
+    ]
   },
-  "frameWidth": 224,
-  "rootX": 137
+  "frameWidth": 234,
+  "rootX": 147,
+  "frameHeight": 276,
+  "rootY": 258
 }

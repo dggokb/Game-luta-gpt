@@ -28,7 +28,36 @@
     "fixar": "quadro",
     "pe_no_chao": true,
     "sem_poeira": true,
-    "sem_efeitos": true
+    "sem_efeitos": true,
+    "reescala": [
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526
+    ],
+    "reguaFatores": [
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526,
+      1.0526
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 95% (KNOCKDOWN / GROUNDED)"
+    ]
   },
   "sourceReferences": [
     "art/sprites/source/p03_fall_down_video_normalized.png"

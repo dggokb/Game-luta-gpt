@@ -18,74 +18,74 @@
     {
       "index": 0,
       "outputBbox": [
-        89,
-        155,
-        465,
+        66,
+        123,
+        479,
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 55368
+      "opaquePixels": 66818
     },
     {
       "index": 1,
       "outputBbox": [
-        103,
-        153,
-        464,
+        81,
+        121,
+        479,
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 54958
+      "opaquePixels": 66368
     },
     {
       "index": 2,
       "outputBbox": [
-        53,
-        157,
-        501,
+        27,
+        125,
+        519,
         479
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 56690
+      "minimumMargin": 27,
+      "opaquePixels": 68482
     },
     {
       "index": 3,
       "outputBbox": [
-        113,
-        160,
-        482,
+        92,
+        128,
+        498,
         479
       ],
       "minimumMargin": 33,
-      "opaquePixels": 52291
+      "opaquePixels": 63164
     },
     {
       "index": 4,
       "outputBbox": [
-        45,
-        173,
-        489,
+        18,
+        143,
+        506,
         479
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 60358
+      "minimumMargin": 18,
+      "opaquePixels": 72990
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 481,
-    "frameHeight": 351,
-    "rootX": 287,
-    "rootY": 335,
+    "frameWidth": 528,
+    "frameHeight": 384,
+    "rootX": 315,
+    "rootY": 368,
     "columns": 5,
     "frameCount": 5,
     "cropOffset": [
-      33,
-      141
+      5,
+      108
     ],
     "decodedBytes": {
       "canonical": 6553600,
-      "packed": 3376620
+      "packed": 4055040
     },
     "pixelScale": 2.0
   },
@@ -93,9 +93,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "baf0939110c3c0597ba3b671224fb544570ead4a666182f1e0266bd2f0ccf54c",
-      "config": "128ece5a5e18961580770fb7fae4d470c5400b20592dd06d6a19e1c39f53bba7",
-      "profile": "a5888ee714c7f2bfce1934a134250268184fcbdcc03b129f1e79acddc8ecd778"
+      "source": "67a2137e514963077701e977f202cf2457d63eb59f5bfc32f43022d6f6395020",
+      "config": "d5b2f265b114aa8a625176b2d964f7920c6cae1f7b81cfcb62ed83bf29183436",
+      "profile": "c9520a0d18b4af74b1ad3db9725a757c42a2a7ee4178bcb6adad6d0039b39b5d"
     },
     "referenceSources": {
       "art/sprites/source/p04_dash_video_normalized.png": "57c3f3d6b5b270296e54fd83fa62837a735216646200bd95ec2877c48d7c0c0e"

@@ -11,12 +11,35 @@
   "columns": 8,
   "rootMode": "authored",
   "frameWidth": 640,
-  "frameHeight": 512,
+  "frameHeight": 514,
   "rootX": 280,
-  "rootY": 476,
+  "rootY": 478,
   "sourceNote": "p03 gerado em video (Seedance, pasta animations/p03 do Drive), convertido por tools/sprites/video_para_sprite.py. Defesa em pe; quadro 7 e a guarda segurada.",
   "sourceReferences": [
     "art/sprites/source/p03_defense_stand_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615
+  ],
+  "reguaFatores": [
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615,
+    0.9615
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 104% (DEFENSE_STAND)"
+  ]
 }

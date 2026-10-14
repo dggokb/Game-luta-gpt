@@ -20,7 +20,26 @@
     "largura": 224,
     "raiz": "115,238",
     "colunas": 6,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "reescala": [
+      1.0989,
+      1.0989,
+      1.0989,
+      1.0989,
+      1.0989,
+      1.0989
+    ],
+    "reguaFatores": [
+      1.0989,
+      1.0989,
+      1.0989,
+      1.0989,
+      1.0989,
+      1.0989
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 91% (RISE)"
+    ]
   },
   "frameWidth": 224,
   "rootX": 115

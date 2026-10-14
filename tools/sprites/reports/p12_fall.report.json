@@ -18,93 +18,93 @@
     {
       "index": 0,
       "outputBbox": [
-        27,
-        85,
-        149,
-        239
+        30,
+        89,
+        147,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 10077
+      "minimumMargin": 18,
+      "opaquePixels": 9509
     },
     {
       "index": 1,
       "outputBbox": [
-        28,
-        86,
-        149,
-        240
+        30,
+        90,
+        148,
+        239
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 10054
+      "minimumMargin": 17,
+      "opaquePixels": 9492
     },
     {
       "index": 2,
       "outputBbox": [
-        28,
-        86,
-        152,
+        30,
+        90,
+        150,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 10027
+      "opaquePixels": 9452
     },
     {
       "index": 3,
       "outputBbox": [
-        29,
-        86,
-        153,
+        31,
+        90,
+        151,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 10063
+      "opaquePixels": 9513
     },
     {
       "index": 4,
       "outputBbox": [
-        33,
-        68,
-        158,
-        239
+        35,
+        73,
+        156,
+        238
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 10445
+      "minimumMargin": 18,
+      "opaquePixels": 9888
     },
     {
       "index": 5,
       "outputBbox": [
-        33,
-        31,
-        164,
+        35,
+        37,
+        161,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 11280
+      "opaquePixels": 10713
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 157,
-    "frameHeight": 229,
-    "rootX": 73,
-    "rootY": 217,
+    "frameWidth": 153,
+    "frameHeight": 223,
+    "rootX": 71,
+    "rootY": 211,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      17,
-      21
+      19,
+      27
     ],
     "decodedBytes": {
       "canonical": 1179648,
-      "packed": 862872
+      "packed": 818856
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "92413af1eef03a66b5185469d088c9049793475655a5d7cd7bc228399a523fdb",
-      "config": "95278a3308475a1c3008c2d6ba7e0f9001578d0ca7eb250d43d4f8aa82dc6788",
-      "profile": "bf4b8e3536c396d10dba234f12745f12c20b3cbacf439b73dd3c0dbee7b099d7"
+      "source": "6f4ec1766848edc406f55f6db61a9de493c0d7a3fa88f5aa4faca9e8605bc3dc",
+      "config": "f72bfc242c71afb4a0130dc01351ce7cc38e8d902bcd1faad5384a39bf98d547",
+      "profile": "f7a23ee0d43bd85d8d286f98d49b6623777b882367a98aa873a07f510bc9f6ab"
     }
   }
 }

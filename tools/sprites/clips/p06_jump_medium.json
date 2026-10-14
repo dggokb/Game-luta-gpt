@@ -21,7 +21,28 @@
     "largura": 384,
     "raiz": "138,302",
     "colunas": 7,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "reescala": [
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765
+    ],
+    "reguaFatores": [
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765,
+      1.1765
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 85% (JUMP_MEDIUM)"
+    ]
   },
   "frameWidth": 384,
   "frameHeight": 320,

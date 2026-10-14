@@ -18,71 +18,71 @@
     {
       "index": 0,
       "outputBbox": [
-        22,
-        15,
-        170,
-        240
+        19,
+        9,
+        172,
+        241
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15096
+      "minimumMargin": 9,
+      "opaquePixels": 16119
     },
     {
       "index": 1,
       "outputBbox": [
-        26,
-        42,
-        168,
+        24,
+        36,
+        170,
         235
       ],
       "minimumMargin": 21,
-      "opaquePixels": 14133
+      "opaquePixels": 15074
     },
     {
       "index": 2,
       "outputBbox": [
-        27,
-        41,
-        165,
+        25,
+        35,
+        168,
         239
       ],
       "minimumMargin": 17,
-      "opaquePixels": 14135
+      "opaquePixels": 15079
     },
     {
       "index": 3,
       "outputBbox": [
-        23,
-        37,
-        164,
-        239
+        21,
+        32,
+        167,
+        240
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14285
+      "minimumMargin": 16,
+      "opaquePixels": 15236
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 168,
-    "frameHeight": 245,
-    "rootX": 85,
-    "rootY": 233,
+    "frameWidth": 174,
+    "frameHeight": 251,
+    "rootX": 88,
+    "rootY": 238,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      12,
-      5
+      9,
+      0
     ],
     "decodedBytes": {
       "canonical": 786432,
-      "packed": 658560
+      "packed": 698784
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a9130055a2fd7d3253e9bd9c1b8fbd9a526e58895d9547b9a4217fc3dd44e445",
-      "config": "479b421de8d5fe9fbdd19a4dd06cd412ef7de7e47708e7c15f387d4ef0ba0e4c",
-      "profile": "64388399d81604c5f43164528e19822b908aa2143d1d2a7210aecbb9a9c8400c"
+      "source": "3a497a8276abbade2a2e6f059dce67d729b9c324d6273c1587bc2204c4714ba1",
+      "config": "e8bc4cdf74055fdaa2eca236dd7e88dd5ad480858f817139d167b0f15c10daef",
+      "profile": "b3dc6e529b18333286dc6b4de750a72909829eedf12facac7b6432e35d9da494"
     }
   }
 }

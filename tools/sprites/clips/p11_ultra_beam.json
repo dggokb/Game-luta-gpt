@@ -22,10 +22,35 @@
     "raiz": "136,267",
     "colunas": 9,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "reescala": [
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259
+    ],
+    "reguaFatores": [
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259,
+      0.9259
+    ],
+    "regua": [
+      "ajuste no app 20261014-0532: 108% (ULTRA_BEAM)"
+    ]
   },
   "frameWidth": 480,
-  "frameHeight": 288,
+  "frameHeight": 300,
   "rootX": 136,
-  "rootY": 267
+  "rootY": 279
 }

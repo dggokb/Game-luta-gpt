@@ -19,5 +19,34 @@
   "sourceReferences": [
     "art/sprites/source/p03_energy_video_normalized.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "reescala": [
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709
+  ],
+  "reguaFatores": [
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709,
+    0.9709
+  ],
+  "regua": [
+    "ajuste no app 20261014-0532: 103% (SPECIAL_ENERGY)"
+  ]
 }

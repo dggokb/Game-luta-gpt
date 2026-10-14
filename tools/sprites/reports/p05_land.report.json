@@ -18,63 +18,63 @@
     {
       "index": 0,
       "outputBbox": [
-        33,
-        125,
-        380,
-        670
+        34,
+        130,
+        379,
+        671
       ],
       "minimumMargin": 33,
-      "opaquePixels": 55881
+      "opaquePixels": 55687
     },
     {
       "index": 1,
       "outputBbox": [
-        72,
-        206,
-        413,
-        668
+        73,
+        211,
+        412,
+        669
       ],
       "minimumMargin": 35,
-      "opaquePixels": 62921
+      "opaquePixels": 62623
     },
     {
       "index": 2,
       "outputBbox": [
-        56,
-        226,
-        397,
-        668
+        57,
+        231,
+        396,
+        669
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61502
+      "minimumMargin": 35,
+      "opaquePixels": 61208
     },
     {
       "index": 3,
       "outputBbox": [
-        40,
-        270,
-        378,
-        668
+        41,
+        274,
+        377,
+        669
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 59772
+      "minimumMargin": 35,
+      "opaquePixels": 59639
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 396,
+    "frameWidth": 398,
     "frameHeight": 561,
-    "rootX": 185,
-    "rootY": 551,
+    "rootX": 186,
+    "rootY": 548,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      25,
-      117
+      24,
+      120
     ],
     "decodedBytes": {
       "canonical": 5046272,
-      "packed": 3554496
+      "packed": 3572448
     },
     "pixelScale": 2.0
   },
@@ -82,9 +82,9 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "73170c9fe735d6329b43082474628c993d7fc15e24d6ebb72e041f48e0f5e005",
-      "config": "7720ef53f00f8675f9662af0a4f20b4b538510430b18e4d3be04e543d89bf757",
-      "profile": "a27e02a44a62c43940ab621b137308bb8746ffb7ec2b71fe980965f94f9bb685"
+      "source": "51fe500dc01d6d224675c44403f64a92e391903379cce8674268601c85116b3f",
+      "config": "53e56c6b550edcff1c3c01c87b636833073eafb6c5df70f671c2838d50981eaf",
+      "profile": "1399fbfca02c9eb84b74570911705356bec6b2c360af9d66f0de19f79e242159"
     },
     "referenceSources": {
       "art/sprites/source/p05_land_video_normalized.png": "cd5847c1b3498e7dad89c3d6527862c240334d5b59db15685dd499aa74144134"
