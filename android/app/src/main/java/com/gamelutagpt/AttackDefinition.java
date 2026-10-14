@@ -81,6 +81,14 @@ final class AttackDefinition {
         int poisonDamage, poisonFrames;
         /** Life the attacker pays when the move starts (never the last point). */
         int lifeCost;
+        /** Charge: holding the button stops the move just before it fires, up to this many frames. */
+        int chargeFrames;
+        /** Extra damage of a full charge, in permille. */
+        int chargeBonusPermille;
+        /** Echo: the move turns on a shadow that repeats the next moves, for this many frames. */
+        int echoFrames;
+        /** Delay of the shadow's copy and its share of the damage (permille). */
+        int echoDelay, echoDamagePermille;
 
         Mechanics armor(int hits, int start, int end) { armorHits = hits; armorStart = start; armorEnd = end; return this; }
         Mechanics counter(Reads reads, int start, int end) { counter = reads; counterStart = start; counterEnd = end; return this; }
@@ -92,6 +100,12 @@ final class AttackDefinition {
         Mechanics pull(float distance) { pull = distance; return this; }
         Mechanics poison(int damage, int frames) { poisonDamage = damage; poisonFrames = frames; return this; }
         Mechanics lifeCost(int value) { lifeCost = value; return this; }
+        Mechanics charge(int frames, int bonusPermille) { chargeFrames = frames; chargeBonusPermille = bonusPermille; return this; }
+        Mechanics echo(int frames, int delay, int damagePermille) {
+            echoFrames = frames; echoDelay = delay; echoDamagePermille = damagePermille; return this;
+        }
+        /** Frame on which a charge holds the move (two frames before it fires). */
+        int chargeHoldFrame(int startupFrames) { return Math.max(0, startupFrames - 2); }
 
         boolean armorAt(int frame) { return armorHits > 0 && frame >= armorStart && frame <= armorEnd; }
         boolean counterAt(int frame) { return counter != Reads.NONE && frame >= counterStart && frame <= counterEnd; }
@@ -331,7 +345,9 @@ final class AttackDefinition {
                 throw new IllegalArgumentException(name + "projectile moves spawn on one active frame and have no hitboxes");
             }
             Mechanics m = mechanics;
-            if (m.armorHits < 0 || m.poisonDamage < 0 || m.lifeCost < 0 || m.pull < 0f || m.advanceSpeed < 0f) {
+            if (m.armorHits < 0 || m.poisonDamage < 0 || m.lifeCost < 0 || m.pull < 0f || m.advanceSpeed < 0f ||
+                m.chargeFrames < 0 || m.chargeBonusPermille < 0 || m.echoFrames < 0 || m.echoDelay < 0 ||
+                m.echoDamagePermille < 0) {
                 throw new IllegalArgumentException(name + "mechanics cannot be negative");
             }
             if (m.armorHits > 0) checkRange(name + "armor", m.armorStart, m.armorEnd, total);

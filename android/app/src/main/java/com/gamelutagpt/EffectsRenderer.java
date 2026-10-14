@@ -30,7 +30,8 @@ final class EffectsRenderer {
     }
 
     void drawEnergyProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {
-        for (Projectile projectile : projectiles) drawOrb(c, projectile, 20f, false);
+        // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
+        for (Projectile projectile : projectiles) drawOrb(c, projectile, 20f * projectile.radius / 24f, false);
     }
 
     void drawSuperProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {

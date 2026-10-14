@@ -31,9 +31,12 @@ final class FighterInput {
     String special;
     /** CPU only: requests that a human expresses through the direction history. */
     boolean dash, backdash, jump, superJump;
+    /** An attack button (L, M or H) is still held down (charges a chargeable special). */
+    boolean holding;
 
     void clear() {
         direction = 0;
+        holding = false;
         clearPresses();
     }
 
@@ -61,5 +64,6 @@ final class FighterInput {
         backdash = other.backdash;
         jump = other.jump;
         superJump = other.superJump;
+        holding = other.holding;
     }
 }

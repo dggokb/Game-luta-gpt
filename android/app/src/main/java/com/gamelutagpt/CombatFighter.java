@@ -71,6 +71,17 @@ final class CombatFighter {
     long hitboxMask;
     /** Hits the current move's armor already absorbed. */
     int armorUsed;
+    /** Frames the current move was charged, and whether it is charging right now. */
+    int charge;
+    boolean charging;
+    /** Frames of shadow echo left (the shadow repeats every move started meanwhile). */
+    int echoLeft;
+    /** Echo settings taken from the move that turned it on. */
+    int echoDelay, echoDamagePermille;
+    /** Jumped off the wall in this jump (once per jump), and frames of the push away. */
+    boolean wallJumpUsed;
+    int wallJumpFrames;
+    int wallJumpDirection;
 
     // Reaction.
     int stunLeft;
@@ -269,6 +280,13 @@ final class CombatFighter {
         hitsOnTarget = 0;
         hitboxMask = 0L;
         armorUsed = 0;
+        charge = 0;
+        charging = false;
+    }
+
+    /** The charge reached the point where it counts as a charged shot. */
+    boolean charged() {
+        return attack != null && attack.mechanics.chargeFrames > 0 && charge >= attack.mechanics.chargeFrames / 3;
     }
 
     /** Mechanics of the move in progress at its current frame (none outside an attack). */

@@ -53,7 +53,13 @@
         ],
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
-        "pushbackOnBlock": 50
+        "pushbackOnBlock": 50,
+        "mecanica": {
+          "carga": {
+            "frames": 60,
+            "bonus": 800
+          }
+        }
       }
     },
     "super": {
@@ -1558,6 +1564,91 @@
         125,
         125
       ]
+    },
+    "SPECIAL_CHARGE": {
+      "atlas": "player_base_energy_charge",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "loop": true,
+      "durationsMs": [
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83,
+        83
+      ]
+    },
+    "SPECIAL_ENERGY_CHARGED": {
+      "atlas": "player_base_energy_charged",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "loop": false,
+      "durationsMs": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        17,
+        17,
+        17,
+        17,
+        17,
+        17,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12
+      ],
+      "impactFrame": 6
     }
   },
   "moves": {

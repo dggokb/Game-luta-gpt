@@ -1,0 +1,31 @@
+{
+  "id": "p07_capanga_run",
+  "javaName": "P07_CAPANGA_RUN",
+  "profile": "p07.json",
+  "source": "art/sprites/source/p07_capanga_run_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_capanga_run.png",
+  "report": "tools/sprites/reports/p07_capanga_run.report.json",
+  "preview": "android/app/build/sprite-review/p07_capanga_run-import.png",
+  "expectedFrames": 11,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p07: capanga correndo (loop), vídeo Seedance correr.mp4.",
+  "video": {
+    "arquivo": "capanga_correr.mp4",
+    "escala": 0.328,
+    "motivo": "capanga sem imagem inicial: 686 px de altura no video -> 225 px (um pouco maior que o p07, 218)",
+    "inicio": 24,
+    "fim": 46,
+    "passo": 2,
+    "celula": 320,
+    "largura": 320,
+    "raiz": "172,302",
+    "sem_efeitos": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 320,
+  "frameHeight": 320,
+  "rootX": 172,
+  "rootY": 302
+}

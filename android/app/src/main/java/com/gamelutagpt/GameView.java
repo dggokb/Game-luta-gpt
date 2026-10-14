@@ -226,6 +226,10 @@ public class GameView extends SurfaceView
     private int shownPoint = 0;
     /** Partner on screen: the assist, or the former point running off after Assist → Tag. */
     private final SpriteFighterRenderer partnerSpriteRenderer;
+    /** Sombra do eco (p06): cópia roxa e translúcida dos golpes, desenhada atrás do lutador. */
+    private final SpriteFighterRenderer echoRenderer;
+    /** Capangas do Super (p07): as animações CAPANGA_* ficam no pacote de quem os chama. */
+    private final SpriteFighterRenderer henchmanRenderer;
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
     /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag), pálido. */
     private final SpriteFighterRenderer opponentPartnerRenderer;
@@ -290,6 +294,9 @@ public class GameView extends SurfaceView
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
+        echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
+        henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentPartnerRenderer.setTint(SpriteFighterRenderer.washedOut());
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
@@ -786,9 +793,11 @@ public class GameView extends SurfaceView
             demo.fill(playerInput, opponentInput);
         } else if (tutorial.active()) {
             // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
+            pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
             tutorial.fillDummy(opponentInput);
         } else {
+            pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
             if (tagging) {
                 opponentInput.clear();
@@ -1282,6 +1291,9 @@ public class GameView extends SurfaceView
             case "COUNTER": return "CONTRA-GOLPE!";
             case "ARMOR": return "ARMADURA!";
             case "POISON": return "VENENO!";
+            case "CHARGED": return "ONDA CARREGADA!";
+            case "ECHO": return "ECO DE SOMBRA!";
+            case "HENCHMEN": return "COBRANÇA!";
             default: return null;
         }
     }
@@ -1511,6 +1523,8 @@ public class GameView extends SurfaceView
             drawOverdriveAura(canvas, player(), tagOffset());
             drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawMechanicAura(canvas, player(), tagOffset());
+            drawEchoes(canvas);
+            drawHenchmen(canvas);
             drawPartner(canvas);
             drawAirDashTrail(canvas, player());
             drawAirDashTrail(canvas, opponent());
@@ -1902,13 +1916,29 @@ public class GameView extends SurfaceView
             } else {
                 CharacterDefinition.Animation special = character.specialAnimations.get(
                     f.attack.kind == AttackDefinition.Kind.SUPER ? "SUPER" : "S");
-                if (special != null) {
+                if (f.attack.kind == AttackDefinition.Kind.PROJECTILE) {
+                    // Onda carregável: o loop de carga enquanto segura, e o disparo carregado depois.
+                    CharacterDefinition.Animation charge = character.animations.get(SpriteStates.SPECIAL_CHARGE);
+                    CharacterDefinition.Animation charged = character.animations.get(SpriteStates.SPECIAL_ENERGY_CHARGED);
+                    if (f.charging && charge != null) {
+                        animation = charge.id;
+                        animationElapsed = f.charge * FIXED_STEP;
+                    } else if (f.charged() && charged != null) {
+                        special = charged;
+                    }
+                }
+                if (animation == null && special != null) {
                     animation = special.id;
                     animationElapsed = special.timeFor(elapsed, total);
                 }
             }
         }
 
+        if (animation == null && f.wallJumpFrames > 0 && f.status == CombatFighter.Status.NEUTRAL &&
+            renderer.hasAnimation(SpriteStates.WALL_JUMP)) {
+            animation = SpriteStates.WALL_JUMP;
+            animationElapsed = (engine.config.wallJumpFrames - f.wallJumpFrames) * FIXED_STEP;
+        }
         if (animation == null && f.airDashFrames > 0 && f.status == CombatFighter.Status.NEUTRAL) {
             // Air dash: the ground dash clip (or backdash), played on the burst's clock.
             String clip = f.airDashBack ? SpriteStates.BACKDASH : SpriteStates.DASH;
@@ -2082,6 +2112,41 @@ public class GameView extends SurfaceView
     private void drawOverdriveAura(Canvas c, CombatFighter f, float offset) {
         if (!engine.teams.overdriveActive(f.index)) return;
         effects.drawOverdrive(c, paint, f.x + offset, f.y, engine.frame() * FIXED_STEP);
+    }
+
+    /** Algum botão de ataque continua sob um dedo (carrega a Onda do p01). */
+    private boolean attackHeld() {
+        return lightPointer != -1 || mediumPointer != -1 || heavyPointer != -1;
+    }
+
+    /** Eco de sombra: cada cópia de golpe que já começou, roxa e translúcida, onde a dona estava. */
+    private void drawEchoes(Canvas c) {
+        for (CombatEngine.Echo e : engine.echoes) {
+            if (!e.visible() || e.move.animation == null) continue;
+            CharacterDefinition owner = engine.fighter(e.owner).character();
+            if (!echoRenderer.character().id.equals(owner.id)) echoRenderer.setCharacter(owner.id);
+            echoRenderer.pose(e.move.animation.id, e.move.animationTime((e.frame + 0.5f) * FIXED_STEP), 0f);
+            echoRenderer.draw(c, e.x, e.y, e.facing, false, false);
+        }
+    }
+
+    /** Capangas: correndo (loop), o soco ou a ombrada no tempo do golpe, e correndo de volta. */
+    private void drawHenchmen(Canvas c) {
+        for (CombatEngine.Henchman h : engine.henchmen) {
+            if (!h.visible()) continue;
+            CharacterDefinition owner = engine.fighter(h.owner).character();
+            String clip = h.phase == CombatEngine.Henchman.STRIKE
+                ? (h.shoulder ? SpriteStates.CAPANGA_SHOULDER : SpriteStates.CAPANGA_PUNCH)
+                : SpriteStates.CAPANGA_RUN;
+            CharacterDefinition.Animation animation = owner.animations.get(clip);
+            if (animation == null) continue;
+            if (!henchmanRenderer.character().id.equals(owner.id)) henchmanRenderer.setCharacter(owner.id);
+            float time = h.phase == CombatEngine.Henchman.STRIKE
+                ? animation.duration * Math.min(0.999f, h.frame / (float)engine.config.henchmanStrikeFrames)
+                : h.frame * FIXED_STEP;
+            henchmanRenderer.pose(clip, time, 0f);
+            henchmanRenderer.draw(c, h.x, h.y, h.direction, false, false);
+        }
     }
 
     /** Mecânica própria visível: veneno, armadura, postura de contra-golpe, esquiva ou fúria. */

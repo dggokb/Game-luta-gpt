@@ -17,7 +17,11 @@ JAVA = 'android/app/src/main/java/com/gamelutagpt/'
 # Semantic vocabulary. The runtime (generated SpriteStates.java) and this validator share it.
 REQUIRED = ('IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND')
 OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP',
-            'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT')
+            'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT',
+            # Mecânicas próprias: carga da Onda (loop e disparo carregado) e wall jump.
+            'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',
+            # Capangas do Super (p07): correm, socam ou dão ombrada e saem.
+            'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
@@ -118,7 +122,7 @@ def validate_mechanics(name, mech, m, projectile):
     if not isinstance(mech, dict):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
-    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida'}
+    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -142,12 +146,20 @@ def validate_mechanics(name, mech, m, projectile):
     if 'veneno' in mech:
         positive_int(mech['veneno'].get('dano'), f'{name}.mecanica.veneno.dano'); positive_int(mech['veneno'].get('frames'), f'{name}.mecanica.veneno.frames')
     if 'custoVida' in mech: positive_int(mech['custoVida'], f'{name}.mecanica.custoVida')
+    if 'carga' in mech:
+        positive_int(mech['carga'].get('frames'), f'{name}.mecanica.carga.frames')
+        positive_int(mech['carga'].get('bonus'), f'{name}.mecanica.carga.bonus')
+        if not projectile: raise ValueError(f'{name}.mecanica.carga: only the projectile (S) charges')
+    if 'eco' in mech:
+        for key in ('frames','atraso','dano'): positive_int(mech['eco'].get(key), f'{name}.mecanica.eco.{key}')
 
 def validate_fighter_mechanics(name, mech):
-    known = {'furia','airDashes','agarrao'}
+    known = {'furia','airDashes','agarrao','wallJump','capangas'}
     if not isinstance(mech, dict) or set(mech) - known:
         raise ValueError(f'{name}.mecanica: expected some of {sorted(known)}')
     if 'furia' in mech: positive_int(mech['furia'], name+'.mecanica.furia')
+    if 'wallJump' in mech and type(mech['wallJump']) is not bool: raise ValueError(name+'.mecanica.wallJump: true or false')
+    if 'capangas' in mech: positive_int(mech['capangas'], name+'.mecanica.capangas')
     if 'airDashes' in mech: positive_int(mech['airDashes'], name+'.mecanica.airDashes')
     if 'agarrao' in mech:
         positive_int(mech['agarrao'].get('dano'), name+'.mecanica.agarrao.dano')
@@ -432,11 +444,15 @@ def compile_packs(root, results):
         if 'puxar' in mech: code += '.pull('+f(mech['puxar'])+')'
         if 'veneno' in mech: code += '.poison('+str(mech['veneno']['dano'])+','+str(mech['veneno']['frames'])+')'
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
+        if 'carga' in mech: code += '.charge('+str(mech['carga']['frames'])+','+str(mech['carga']['bonus'])+')'
+        if 'eco' in mech: code += '.echo('+','.join(str(mech['eco'][k]) for k in ('frames','atraso','dano'))+')'
         return code
     def fighter_mechanics(mech):
         grab = mech.get('agarrao', {})
         return ('.withMechanics('+str(mech.get('furia',0))+','+str(mech.get('airDashes',1))+','
-                +str(grab.get('dano',0))+','+f(grab.get('alcance',0))+')')
+                +str(grab.get('dano',0))+','+f(grab.get('alcance',0))+')'
+                +('.withWallJump(true)' if mech.get('wallJump') else '')
+                +(f".withHenchmen({mech['capangas']})" if mech.get('capangas') else ''))
     def projectile(data, binding):
         if data is None: return 'null'
         return ('new CharacterDefinition.Projectile('+attack(binding,data['attack'],'PROJECTILE' if binding=='S' else 'SUPER',data['damage'])+','+f(data['range'])+','+f(data['speed'])+','+f(data['spawnX'])

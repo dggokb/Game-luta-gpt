@@ -62,7 +62,15 @@
         "alcance": 720
       },
       "unica": {
-        "descricao": "Referência do elenco: sem mecânica própria (projétil, anti-aéreo e punição)."
+        "descricao": "Onda carregável: segurar o botão do S1 segura a Onda na cintura (até 1 s); solta e ela sai maior, mais rápida, mais longe e até 80% mais forte.",
+        "golpes": {
+          "S": {
+            "carga": {
+              "frames": 60,
+              "bonus": 800
+            }
+          }
+        }
       }
     },
     "p02": {
@@ -168,7 +176,7 @@
         "alcance": 900
       },
       "unica": {
-        "descricao": "Teleporte: o S3 some na fumaça e reaparece atrás do rival; o corte de mão (S4) avança baixo.",
+        "descricao": "Teleporte: o S3 some na fumaça e reaparece atrás do rival; o corte de mão (S4) avança baixo; no ar, encostado na parede, aperta pra cima e pula da parede.",
         "golpes": {
           "S3": {
             "teleporte": "fimStartup",
@@ -183,6 +191,9 @@
               "janela": "ate_ativo"
             }
           }
+        },
+        "lutador": {
+          "wallJump": true
         }
       }
     },
@@ -196,15 +207,28 @@
         "alcance": 800
       },
       "unica": {
-        "descricao": "Puxar: o S3 alcança longe e arrasta o rival para perto (o eco de sombra fica para a próxima etapa).",
+        "descricao": "Eco de sombra: o S2 desperta a sombra por 5 s; cada golpe que ela dá é repetido pela sombra roxa um terço de segundo depois, com metade do dano. O S3 alcança longe e puxa o rival.",
         "golpes": {
           "S3": {
             "puxar": 320
+          },
+          "S2": {
+            "eco": {
+              "frames": 300,
+              "atraso": 20,
+              "dano": 500
+            }
           }
         },
         "alcance": {
           "S3": 380
+        },
+        "animacao": {
+          "S2": "SPECIAL_ECHO"
         }
+      },
+      "ritmoGolpe": {
+        "S2": 1.6
       }
     },
     "p07": {
@@ -217,7 +241,7 @@
         "alcance": 150
       },
       "unica": {
-        "descricao": "Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar.",
+        "descricao": "Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar. No Super ele estala os dedos e dois capangas entram correndo por trás: um soca, o outro dá uma ombrada, e saem.",
         "golpes": {
           "S3": {
             "contra": {
@@ -225,6 +249,9 @@
               "janela": "startup"
             }
           }
+        },
+        "lutador": {
+          "capangas": 2
         }
       }
     },
