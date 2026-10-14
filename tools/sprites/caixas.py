@@ -5,7 +5,8 @@
     python3 tools/sprites/build_characters.py --write
 
 Cada ajuste diz o personagem, o campo (caminho no character.json, por exemplo
-fighter.body.halfWidth, moves.L.reach, specialMoves.S2.hitHeight, fighter.energy.spawnX),
+fighter.body.halfWidth, moves.L.reach, specialMoves.S2.hitHeight, moves.2H.hitFloor,
+fighter.energy.spawnX),
 o valor em que foi feito ("antes") e o novo. Se o pacote mudou desde então (o valor atual não
 é o "antes"), o ajuste é recusado em vez de passar por cima. Sem imagens: só números.
 """
@@ -17,11 +18,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def default(path):
-    """Valor que o build usa quando o campo não está no JSON (hitHeight dos golpes)."""
+def default(path, node=None):
+    """Valor que o build usa quando o campo não está no JSON (hitHeight e hitFloor dos golpes)."""
     parts = path.split('.')
-    if parts[-1] == 'hitHeight' and parts[0] in ('moves', 'specialMoves'):
-        return 42 if parts[1].startswith('2') else 78
+    if parts[0] not in ('moves', 'specialMoves'):
+        return None
+    height = 42 if parts[1].startswith('2') else 78
+    if parts[-1] == 'hitHeight':
+        return height
+    if parts[-1] == 'hitFloor':
+        # Sem base própria a caixa começa na altura menos a folga (CombatRules.VERTICAL_SLACK).
+        return (node or {}).get('hitHeight', height) - 19.5
     return None
 
 
@@ -41,10 +48,10 @@ def apply(data, root=ROOT):
             if part not in node:
                 raise SystemExit(f'{cid}: campo {path} não existe no character.json')
             node = node[part]
-        current = node.get(leaf, default(path))
+        current = node.get(leaf, default(path, node))
         if current is None:
             raise SystemExit(f'{cid}: campo {path} não existe no character.json')
-        if round(current) != round(before):
+        if abs(current - before) > .5:  # o app arredonda a base (245.5 vira 246)
             raise SystemExit(f'{cid}: {path} é {current} no pacote, o ajuste foi feito sobre {before}; '
                              'ajuste de novo no app novo')
         if not 1 <= value <= 600:

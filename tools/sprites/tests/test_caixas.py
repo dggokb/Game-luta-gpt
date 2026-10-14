@@ -40,6 +40,15 @@ class CaixasTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             caixas.apply(self.data(('moves.L.reach', reach + 2, reach + 10)), self.root)
 
+    def test_floor_defaults_to_height_minus_slack(self):
+        height = self.pack['moves']['2H'].get('hitHeight', 42)
+        self.pack['moves']['2H'].pop('hitFloor', None)
+        (self.root / 'characters/p07/character.json').write_text(json.dumps(self.pack), encoding='utf-8')
+        # O app manda a base arredondada (x.5 vira o inteiro de cima).
+        caixas.apply(self.data(('moves.2H.hitFloor', round(height - 19.5 + .01), 30)), self.root)
+        out = json.loads((self.root / 'characters/p07/character.json').read_text(encoding='utf-8'))
+        self.assertEqual(30, out['moves']['2H']['hitFloor'])
+
     def test_refuses_unknown_field(self):
         with self.assertRaises(SystemExit):
             caixas.apply(self.data(('moves.ZZ.reach', 10, 20)), self.root)

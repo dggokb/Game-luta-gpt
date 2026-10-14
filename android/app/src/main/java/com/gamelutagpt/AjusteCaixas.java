@@ -96,7 +96,8 @@ final class AjusteCaixas {
         String anim = move.animation == null ? "" : "  " + move.animation.id;
         out.add(new Item(binding, binding + anim, Item.Tipo.GOLPE, move.animation, move.attack)
             .add(path + ".reach", "alcance", move.attack.reach, 2f)
-            .add(path + ".hitHeight", "altura do acerto", move.attack.hitHeight, 2f));
+            .add(path + ".hitHeight", "altura do acerto", move.attack.hitHeight, 2f)
+            .add(path + ".hitFloor", "base do acerto", Math.round(move.attack.hitFloor), 2f));
     }
 
     private static String key(CharacterDefinition c, Campo f) { return c.id + "|" + f.path; }

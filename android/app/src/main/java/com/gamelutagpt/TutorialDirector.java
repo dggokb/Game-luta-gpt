@@ -258,7 +258,9 @@ final class TutorialDirector {
     private static Lesson hit(CharacterDefinition character, String title, String how, String id, int times) {
         CharacterDefinition.Move move = character.moves.get(id);
         String effect = move == null ? null : effect(move.attack.launch);
-        return new Lesson(title, effect == null ? how : how + ": " + effect, times, true, c -> c.placeApart(CLOSE), null,
+        // Golpe curto (gancho colado): o boneco fica dentro do alcance, não só a CLOSE.
+        float gap = move == null ? CLOSE : Math.min(CLOSE, move.reach - character.fighter.body.halfWidth - 2f);
+        return new Lesson(title, effect == null ? how : how + ": " + effect, times, true, c -> c.placeApart(gap), null,
             c -> c.landed(id),
             (c, p1) -> {
                 if (id.startsWith("2")) p1.direction = 3;
