@@ -451,7 +451,9 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 - saída da magia agachado cortada na altura agachado: p03, p04 e p05;
 - base do acerto na altura antiga nos 26 golpes que ficaram acima da cabeça do rival mais
   baixo (todos os 2H, p03 H/S4, p04 S2, p07 L/M/H/S2, p08 L/S3, p09 L/S3, p10 S4, p11 L/M/S2);
-- alcance do 2H para encostar em todos colado: p03 29→36, p04 29→39, p12 34→50.
+- alcance do 2H (lançador) para pegar depois de um L ou M que acertou, contra todo o elenco:
+  distância depois do M + 20. P01 41→79, p02 54→86, p03 36→89, p04 39→87, p05 43→105,
+  p06 35→88, p09 45→88, p11 68→109, p12 50→98 (p07, p08 e p10 já alcançavam).
 
 ## Critérios de aceite → testes (`CombatEngineTest`, JVM, sem renderização)
 

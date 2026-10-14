@@ -1643,7 +1643,7 @@
     "2H": {
       "animation": "CROUCH_HEAVY",
       "damage": 720,
-      "reach": 54,
+      "reach": 86,
       "startupFrames": 9,
       "activeFrames": 5,
       "recoveryFrames": 16,
