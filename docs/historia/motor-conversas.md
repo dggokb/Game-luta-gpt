@@ -9,11 +9,14 @@ motor com outro arquivo.
 ## Como aparece na tela
 
 - **Um quadro de mangá em cada lateral**, logo abaixo das barras de vida: o lado do jogador
-  à **esquerda**, o do adversário à **direita**. O quadro mostra o rosto de quem fala, com
-  fundo na cor do personagem, linhas de foco e a plaquinha do nome.
-- **O balão** sai do lado do quadro e o texto é digitado (40 letras/s). A fala fica na tela de
-  1,6 a 4,5 s depois de digitada (mais tempo para fala mais longa) e some sozinha. **Ninguém
-  toca em nada e a luta não para.**
+  à **esquerda**, o do adversário à **direita**. O quadro (pequeno, ~140x145) mostra o rosto
+  de quem fala, com fundo na cor do personagem e linhas de foco.
+- **Legenda em vez de balão**: uma faixa escura e estreita sai de baixo do quadro, com o nome
+  numa plaquinha na cor do personagem e o texto em letra pequena (como nos jogos de luta). A
+  faixa só tem a largura do texto (no máximo ~330 px, 3 linhas para as falas longas), então
+  cobre pouco da luta. O texto é digitado (40 letras/s), fica na tela de 1,6 a 4,5 s depois
+  de digitado (mais tempo para fala mais longa) e a faixa fecha de volta para o quadro.
+  **Ninguém toca em nada e a luta não para.** (O balão branco cobria demais a tela do celular.)
 - **Entrada e saída**: o quadro entra deslizando da borda, balança de leve enquanto a pessoa
   fala e sai deslizando um segundo depois que ela para (numa conversa de dois, os quadros não
   piscam entre as falas).
@@ -157,9 +160,9 @@ na intro e nos primeiros segundos da luta; mais que isso, o jogador já está ap
 
 | O quê | Onde |
 |---|---|
-| Motor (fila de falas, quadros, balão, desenho) | `android/story-core/.../historia/ConversaLuta.java` |
+| Motor (fila de falas, quadros, legenda, desenho) | `android/story-core/.../historia/ConversaLuta.java` |
 | Campo `conversa` do passo de luta | `Episodio.Passo.conversa` |
 | Quando chama cada momento e reação | `GameView.onHistoriaLuta` (`inicio`), `GameView.updateConversa` (lições, `fim`, reações), `GameView.updateStoryFight` (`vitoria`/`derrota`) |
 | Botões de teste escondidos | `GameView.testButtonsHidden`, `HudRenderer.State.hideTestButtons` |
-| Posição dos quadros e balões | `ConversaLuta.QUADRO_ESQ/DIR`, `BALAO_ESQ/DIR` (coordenadas 1280x720) |
+| Posição e tamanho dos quadros e da legenda | `ConversaLuta.QUADRO_ESQ/DIR`, `LEGENDA_*` (coordenadas 1280x720) |
 | Testes | `android/story-core/src/test/.../ConversaLutaTest.java` |

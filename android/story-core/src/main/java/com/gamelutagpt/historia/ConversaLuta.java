@@ -33,11 +33,20 @@ public final class ConversaLuta {
     public static final String RETRATOS = Temporada.PASTA + "/retratos";
 
     // Quadros nas laterais, entre a barra de vida e os controles (coordenadas 1280x720).
-    static final float[] QUADRO_ESQ = {14f, 202f, 192f, 193f, 186f, 376f, 10f, 388f};
-    static final float[] QUADRO_DIR = {1088f, 193f, 1266f, 202f, 1270f, 388f, 1094f, 376f};
-    // Caixa do balão ao lado de cada quadro (o balão aponta para o quadro).
-    static final float[] BALAO_ESQ = {188f, 304f, 498f, 412f};
-    static final float[] BALAO_DIR = {782f, 304f, 1092f, 412f};
+    static final float[] QUADRO_ESQ = {14f, 198f, 150f, 192f, 146f, 330f, 10f, 338f};
+    static final float[] QUADRO_DIR = {1130f, 192f, 1266f, 198f, 1270f, 338f, 1134f, 330f};
+    /**
+     * Legenda colada no quadro (sem balão: uma faixa escura com o nome e o texto, como nos
+     * jogos de luta). Começa na borda de dentro do quadro e cresce para o centro até a largura
+     * máxima; o texto quebra em linhas.
+     */
+    static final float LEGENDA_ESQ = 140f;
+    static final float LEGENDA_DIR = 1140f;
+    static final float LEGENDA_TOPO = 300f;
+    static final float LEGENDA_LARGURA = 330f;
+    static final float LEGENDA_TEXTO = 18f;
+    static final float LEGENDA_LINHA = 22f;
+    private static final int LEGENDA_FUNDO = 0xE00D1220;
 
     static final float ENTRA = 0.24f;
     static final float SAI = 0.22f;
@@ -87,7 +96,6 @@ public final class ConversaLuta {
     }
 
     private final RenderAssets assets;
-    private final Baloes baloes = new Baloes();
     private final Rand rand = new Rand(41);
     /** Rostos já lidos (o elenco se repete de luta em luta); null = não existe. */
     private final Map<String, RenderImage> imagens = new HashMap<>();
@@ -323,10 +331,11 @@ public final class ConversaLuta {
     // ------------------------------------------------------------ desenho
 
     public void render(RenderCanvas c) {
+        // A legenda fica por baixo do quadro, que a "segura" pela borda.
+        if (atual != null) drawLegenda(c);
         for (Lado l : new Lado[] {esq, dir}) {
             if (visivel(l)) drawQuadro(c, l);
         }
-        if (atual != null) drawBalao(c);
     }
 
     private void drawQuadro(RenderCanvas c, Lado l) {
@@ -372,7 +381,6 @@ public final class ConversaLuta {
         c.restore();
         c.strokePolygon(poly, 6f, WHITE);
         c.strokePolygon(poly, 3.5f, INK);
-        drawNome(c, l, poly);
         c.restore();
     }
 
@@ -384,19 +392,6 @@ public final class ConversaLuta {
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
             c.drawLine(cx + cos * r * 0.25f, cy + sin * r * 0.25f, cx + cos * r, cy + sin * r, 2f, 0x55FFF0C8);
         }
-    }
-
-    private void drawNome(RenderCanvas c, Lado l, float[] poly) {
-        String nome = nome(l.quem).toUpperCase(java.util.Locale.ROOT);
-        float size = 15f;
-        float w = c.measureText(nome, size, true) + 14f;
-        boolean direita = l.direita;
-        float x = direita ? poly[4] - w - 10f : poly[6] + 6f;
-        float y = (direita ? poly[5] : poly[7]) - 26f;
-        int cor = cor(l.quem);
-        c.fillRect(x - 3f, y - 3f, x + w + 3f, y + 23f, INK);
-        c.fillRect(x, y, x + w, y + 20f, cor);
-        c.drawText(nome, x + w * 0.5f, y + 15f, size, WHITE, INK, 3f, true);
     }
 
     private String nome(String id) {
@@ -414,22 +409,62 @@ public final class ConversaLuta {
         return img != null ? img : imagens.get(quem + "_normal");
     }
 
-    private void drawBalao(RenderCanvas c) {
+    private void drawLegenda(RenderCanvas c) {
         boolean naDireita = Boolean.TRUE.equals(direita.get(atual.quem));
         float idade = time - falaDesde - ENTRA * 0.6f;
         if (idade <= 0f) return;
         String texto = texto(atual);
-        float[] b = naDireita ? BALAO_DIR : BALAO_ESQ;
-        // Rabicho para o quadro de quem fala.
-        float[] rabo = naDireita ? new float[] {1.06f, 0.30f} : new float[] {-0.06f, 0.30f};
-        Episodio.Balao balao = new Episodio.Balao(Episodio.TipoBalao.FALA, atual.quem, texto,
-            naDireita ? 0.62f : 0.38f, 0.42f, rabo);
-        int visiveis = (int)Math.max(1f, (idade - PaginaHistoria.BALLOON_POP) * DIGITA);
-        float some = time - falaDesde > duracao(atual) - 0.18f ? 1f - Tinta.clamp01((duracao(atual) - (time - falaDesde)) / 0.18f) : 0f;
+        float size = LEGENDA_TEXTO;
+        List<String> linhas = Baloes.wrap(c, texto, size, LEGENDA_LARGURA - 34f);
+        float larguraTexto = 0f;
+        for (String linha : linhas) larguraTexto = Math.max(larguraTexto, c.measureText(linha, size, false));
+        String nome = nome(atual.quem).toUpperCase(java.util.Locale.ROOT);
+        float nomeW = c.measureText(nome, 13f, true) + 14f;
+        float w = Math.max(larguraTexto, nomeW) + 34f;
+        float h = 14f + linhas.size() * LEGENDA_LINHA;
+        float top = LEGENDA_TOPO;
+        float x0 = naDireita ? LEGENDA_DIR - w : LEGENDA_ESQ;
+        float x1 = x0 + w;
+        // Abre a partir do quadro (0,15 s) e fecha de volta para ele no fim da fala.
+        float abre = Tinta.easeOutCubic(Tinta.clamp01(idade / 0.15f));
+        float resta = duracao(atual) - (time - falaDesde);
+        float fecha = resta < 0.15f ? Tinta.clamp01(resta / 0.15f) : 1f;
+        float sx = Math.max(0.02f, abre * fecha);
+        float ancora = naDireita ? x1 : x0;
+
         c.save();
-        if (some > 0f) c.scale(1f - 0.4f * some, 1f - 0.4f * some, (b[0] + b[2]) * 0.5f, (b[1] + b[3]) * 0.5f);
-        baloes.draw(c, balao, texto, null, b[0], b[1], b[2], b[3], Math.min(visiveis, texto.length()),
-            Tinta.clamp01(idade / PaginaHistoria.BALLOON_POP));
+        c.scale(sx, 1f, ancora, top);
+        // Faixa escura com a ponta inclinada do lado do centro da tela.
+        float ponta = 14f;
+        float[] faixa = naDireita
+            ? new float[] {x0 - ponta, top, x1, top, x1, top + h, x0, top + h}
+            : new float[] {x0, top, x1 + ponta, top, x1, top + h, x0, top + h};
+        c.fillPolygon(faixa, LEGENDA_FUNDO);
+        c.strokePolygon(faixa, 1.5f, 0x55FFFFFF);
+        // Barra na cor de quem fala, encostada no quadro.
+        int cor = cor(atual.quem);
+        if (naDireita) {
+            c.fillRect(x1 - 5f, top, x1, top + h, cor);
+        } else {
+            c.fillRect(x0, top, x0 + 5f, top + h, cor);
+        }
+        // Nome numa plaquinha em cima da faixa.
+        float nx = naDireita ? x1 - 14f - nomeW : x0 + 14f;
+        c.fillRect(nx - 2f, top - 13f, nx + nomeW + 2f, top + 5f, INK);
+        c.fillRect(nx, top - 11f, nx + nomeW, top + 3f, cor);
+        c.drawText(nome, nx + nomeW * 0.5f, top + 1f, 13f, WHITE, INK, 2.5f, true);
+        // Texto digitado, alinhado à esquerda.
+        int visiveis = (int)Math.max(1f, idade * DIGITA);
+        float tx = naDireita ? x1 - 17f - larguraTexto : x0 + 17f;
+        float y = top + 10f + LEGENDA_LINHA - 5f;
+        for (String linha : linhas) {
+            if (visiveis <= 0) break;
+            String parte = linha.length() <= visiveis ? linha : linha.substring(0, visiveis);
+            visiveis -= linha.length() + 1;
+            float pw = c.measureText(parte, size, false);
+            c.drawText(parte, tx + pw * 0.5f, y, size, WHITE, INK, 2f, false);
+            y += LEGENDA_LINHA;
+        }
         c.restore();
     }
 }

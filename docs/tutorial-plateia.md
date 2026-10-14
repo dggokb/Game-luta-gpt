@@ -17,7 +17,7 @@ O treino do tutorial (no Dojo Shūshinkan) tem duas coisas a mais:
 
 2. **Os dois falando nas laterais, sem parar a luta.** Takatoshi aparece num quadro de mangá
    pequeno à esquerda e Dafu à direita, logo abaixo das barras de vida. Quando uma lição
-   começa, quem explica entra deslizando, fala num balão digitado e sai sozinho; ninguém
+   começa, quem explica entra deslizando, fala numa legenda digitada colada no quadro e sai sozinho; ninguém
    precisa tocar e o treino não espera. Eles também comentam o que o jogador faz (uma fala
    sorteada, só quando ninguém está falando): `licao` (cumpriu a lição), `impacto` (acertou
    forte) e `levou` (apanhou). No fim do treino a conversa do `fim` termina antes da história
