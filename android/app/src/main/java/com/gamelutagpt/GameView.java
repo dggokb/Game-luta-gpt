@@ -226,6 +226,8 @@ public class GameView extends SurfaceView
     private final SpriteFighterRenderer partnerSpriteRenderer;
     /** Sombra do eco (p06): cópia roxa e translúcida dos golpes, desenhada atrás do lutador. */
     private final SpriteFighterRenderer echoRenderer;
+    /** Capangas do Super (p07): as animações CAPANGA_* ficam no pacote de quem os chama. */
+    private final SpriteFighterRenderer henchmanRenderer;
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
     /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag), pálido. */
     private final SpriteFighterRenderer opponentPartnerRenderer;
@@ -292,6 +294,7 @@ public class GameView extends SurfaceView
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
         echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
+        henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         opponentPartnerRenderer.setTint(SpriteFighterRenderer.washedOut());
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
@@ -1273,6 +1276,7 @@ public class GameView extends SurfaceView
             case "POISON": return "VENENO!";
             case "CHARGED": return "ONDA CARREGADA!";
             case "ECHO": return "ECO DE SOMBRA!";
+            case "HENCHMEN": return "COBRANÇA!";
             default: return null;
         }
     }
@@ -1503,6 +1507,7 @@ public class GameView extends SurfaceView
             drawMechanicAura(canvas, opponent(), engine.teams.tagOffset(OPPONENT));
             drawMechanicAura(canvas, player(), tagOffset());
             drawEchoes(canvas);
+            drawHenchmen(canvas);
             drawPartner(canvas);
             drawAirDashTrail(canvas, player());
             drawAirDashTrail(canvas, opponent());
@@ -2105,6 +2110,25 @@ public class GameView extends SurfaceView
             if (!echoRenderer.character().id.equals(owner.id)) echoRenderer.setCharacter(owner.id);
             echoRenderer.pose(e.move.animation.id, e.move.animationTime((e.frame + 0.5f) * FIXED_STEP), 0f);
             echoRenderer.draw(c, e.x, e.y, e.facing, false, false);
+        }
+    }
+
+    /** Capangas: correndo (loop), o soco ou a ombrada no tempo do golpe, e correndo de volta. */
+    private void drawHenchmen(Canvas c) {
+        for (CombatEngine.Henchman h : engine.henchmen) {
+            if (!h.visible()) continue;
+            CharacterDefinition owner = engine.fighter(h.owner).character();
+            String clip = h.phase == CombatEngine.Henchman.STRIKE
+                ? (h.shoulder ? SpriteStates.CAPANGA_SHOULDER : SpriteStates.CAPANGA_PUNCH)
+                : SpriteStates.CAPANGA_RUN;
+            CharacterDefinition.Animation animation = owner.animations.get(clip);
+            if (animation == null) continue;
+            if (!henchmanRenderer.character().id.equals(owner.id)) henchmanRenderer.setCharacter(owner.id);
+            float time = h.phase == CombatEngine.Henchman.STRIKE
+                ? animation.duration * Math.min(0.999f, h.frame / (float)engine.config.henchmanStrikeFrames)
+                : h.frame * FIXED_STEP;
+            henchmanRenderer.pose(clip, time, 0f);
+            henchmanRenderer.draw(c, h.x, h.y, h.direction, false, false);
         }
     }
 

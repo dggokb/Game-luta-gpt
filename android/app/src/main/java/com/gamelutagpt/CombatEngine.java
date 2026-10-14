@@ -81,6 +81,31 @@ final class CombatEngine {
     final List<Projectile> superProjectiles = new ArrayList<>();
     /** Shadow copies of moves (p06's echo) waiting or playing. */
     final List<Echo> echoes = new ArrayList<>();
+    /** Henchmen called by a Super (p07): they run in, strike once and run off. */
+    final List<Henchman> henchmen = new ArrayList<>();
+
+    static final class Henchman {
+        static final int RUN_IN = 0, STRIKE = 1, RUN_OUT = 2;
+        final int owner;
+        /** The second one charges with the shoulder; the first one punches. */
+        final boolean shoulder;
+        final float y;
+        final int damage;
+        final AttackDefinition attack;
+        float x;
+        int direction;
+        int phase = RUN_IN;
+        int frame;
+        /** Frames before it starts running (the second one comes a little later). */
+        int delay;
+        boolean struck;
+        Henchman(int owner, boolean shoulder, float x, float y, int direction, int delay, int damage,
+                 AttackDefinition attack) {
+            this.owner = owner; this.shoulder = shoulder; this.x = x; this.y = y; this.direction = direction;
+            this.delay = delay; this.damage = damage; this.attack = attack;
+        }
+        boolean visible() { return delay <= 0; }
+    }
     private final ComboSession[] sessions = new ComboSession[2];
     private final ComboSession[] lastSessions = new ComboSession[2];
     private final int[] sessionEndFrame = {-1, -1};
@@ -181,6 +206,7 @@ final class CombatEngine {
         energyProjectiles.clear();
         superProjectiles.clear();
         echoes.clear();
+        henchmen.clear();
         events.clear();
         cues.clear();
         superFreeze = 0;
@@ -243,6 +269,7 @@ final class CombatEngine {
         for (CombatFighter f : fighters) updateFacing(f);
         advanceProjectiles();
         advanceEchoes();
+        advanceHenchmen();
 
         // 4. Collisions (simultaneous: trades are possible).
         contacts.clear();
@@ -254,6 +281,7 @@ final class CombatEngine {
         detectProjectiles(energyProjectiles);
         detectProjectiles(superProjectiles);
         detectEchoes();
+        detectHenchmen();
 
         // 5. Reactions and pushback.
         for (Contact contact : contacts) {
@@ -795,6 +823,73 @@ final class CombatEngine {
         cues.add("WALL_JUMP");
     }
 
+    /** The Super's henchmen come running from behind the caller and share its damage. */
+    private void callHenchmen(CombatFighter f) {
+        CharacterDefinition.Fighter profile = f.state.profile;
+        int count = profile.henchmen;
+        int each = profile.superAttack.damage * profile.furyScale(f.state.life) / 1000 / count;
+        for (int i = 0; i < count; i++) {
+            float x = f.x - f.facing * (config.henchmanEntry + i * 90f);
+            henchmen.add(new Henchman(f.index, i % 2 == 1, x, Arena.GROUND_Y, f.facing, i * config.henchmanStagger,
+                each, f.attack));
+        }
+        cues.add("HENCHMEN");
+    }
+
+    private void advanceHenchmen() {
+        if (superFreeze > 0) return;
+        Iterator<Henchman> it = henchmen.iterator();
+        while (it.hasNext()) {
+            Henchman h = it.next();
+            if (h.delay > 0) {
+                h.delay--;
+                continue;
+            }
+            h.frame++;
+            CombatFighter d = fighters[1 - h.owner];
+            if (h.phase == Henchman.RUN_IN) {
+                h.x += h.direction * config.henchmanSpeed * CombatConfig.DT;
+                if ((d.x - h.x) * h.direction <= config.henchmanReach || h.frame > 120) {
+                    h.phase = Henchman.STRIKE;
+                    h.frame = 0;
+                }
+            } else if (h.phase == Henchman.STRIKE) {
+                if (h.frame >= config.henchmanStrikeFrames) {
+                    // Job done: it turns and runs off the screen.
+                    h.phase = Henchman.RUN_OUT;
+                    h.direction = -h.direction;
+                    h.frame = 0;
+                }
+            } else {
+                h.x += h.direction * config.henchmanSpeed * CombatConfig.DT;
+                if (h.frame > 90 || h.x < Arena.LEFT_BOUND - 400f || h.x > Arena.RIGHT_BOUND + 400f) it.remove();
+            }
+        }
+    }
+
+    /** Collision phase: the henchmen whose punch or shoulder reaches its impact frame now. */
+    private void detectHenchmen() {
+        for (Henchman h : henchmen) {
+            if (h.phase != Henchman.STRIKE || h.struck || h.frame != config.henchmanImpactFrame) continue;
+            h.struck = true;
+            henchmanStrike(h, fighters[1 - h.owner]);
+        }
+    }
+
+    /** The henchman's punch or shoulder: hits like a projectile (the caller is not frozen). */
+    private void henchmanStrike(Henchman h, CombatFighter d) {
+        if (!d.hittable() || Math.abs(d.x - h.x) > config.henchmanReach + d.body().halfWidth + 30f) return;
+        Contact c = new Contact();
+        c.attacker = fighters[h.owner];
+        c.defender = d;
+        c.attack = h.attack;
+        c.hitbox = -1;
+        c.echo = true;
+        c.projectile = new Projectile(d.x, d.y - d.body().height(false) * 0.6f, 0f, 0f, 1f, h.damage,
+            fighters[h.owner].state.profile.color, h.owner, h.direction, h.attack);
+        contacts.add(c);
+    }
+
     private void advanceEchoes() {
         if (superFreeze > 0) return;
         Iterator<Echo> it = echoes.iterator();
@@ -1197,6 +1292,10 @@ final class CombatEngine {
     private void spawnProjectile(CombatFighter f) {
         CharacterDefinition.Fighter profile = f.state.profile;
         boolean superKind = f.attack.kind == AttackDefinition.Kind.SUPER;
+        if (superKind && profile.henchmen > 0) {
+            callHenchmen(f);
+            return;
+        }
         CharacterDefinition.Projectile data = superKind ? profile.superAttack : profile.energy;
         float speed = data.speed;
         int damage = data.damage;

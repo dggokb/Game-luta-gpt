@@ -364,4 +364,34 @@ public class MechanicsTest {
         assertFalse("control: no wall jump without the mechanic", plain.f(0).wallJumpUsed);
         assertTrue(plain.f(0).x < x + 60f);
     }
+
+    /** Super of fighter 0 with full meter; returns the hits it dealt (moveId SUPER) and whether a wave flew. */
+    private static int[] superHits(CharacterDefinition caller) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(caller, BASE, 500f, 760f);
+        s.f(0).state.superMeter = CombatConfig.MAX_METER;
+        s.in[0].superAttack = true;
+        int hits = 0, wave = 0, crew = 0;
+        for (int i = 0; i < 240; i++) {
+            s.step();
+            if (!s.engine.superProjectiles.isEmpty()) wave = 1;
+            crew = Math.max(crew, s.engine.henchmen.size());
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && "SUPER".equals(e.moveId) && !e.blocked) hits++;
+        }
+        assertTrue("the henchmen leave the screen", s.engine.henchmen.isEmpty());
+        return new int[]{hits, wave, crew};
+    }
+
+    @Test public void theSuperCallsHenchmenThatStrikeAndLeave() {
+        CharacterDefinition.Fighter f = BASE.fighter;
+        CharacterDefinition boss = withFighterBlock(new CharacterDefinition.Fighter(f.color, f.maxLife, f.autoCombo,
+            f.energy, f.energyCommand, f.superAttack, f.body, f.inputPriority).withHenchmen(2));
+        int[] crew = superHits(boss);
+        assertEquals("two henchmen came", 2, crew[2]);
+        assertEquals("no wave", 0, crew[1]);
+        assertEquals("both struck", 2, crew[0]);
+        int[] wave = superHits(BASE);
+        assertEquals("control: the plain Super throws its wave", 1, wave[1]);
+        assertEquals(0, wave[2]);
+        assertTrue(GeneratedCharacters.get("p07").fighter.henchmen > 0);
+    }
 }

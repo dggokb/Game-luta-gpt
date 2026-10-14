@@ -31,6 +31,9 @@ final class SpriteStates {
  static final String SPECIAL_CHARGE = "SPECIAL_CHARGE";
  static final String SPECIAL_ENERGY_CHARGED = "SPECIAL_ENERGY_CHARGED";
  static final String WALL_JUMP = "WALL_JUMP";
+ static final String CAPANGA_RUN = "CAPANGA_RUN";
+ static final String CAPANGA_PUNCH = "CAPANGA_PUNCH";
+ static final String CAPANGA_SHOULDER = "CAPANGA_SHOULDER";
  static final String POSE_CROUCH = "CROUCH";
  static final String POSE_AIR = "AIR";
 }

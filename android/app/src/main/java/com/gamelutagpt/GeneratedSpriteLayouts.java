@@ -1156,6 +1156,24 @@ final class GeneratedSpriteLayouts {
     static final int P07_BACKDASH_ROOT_Y = 328;
     static final int P07_BACKDASH_FRAME_COUNT = 10;
 
+    static final int P07_CAPANGA_PUNCH_FRAME_WIDTH = 270;
+    static final int P07_CAPANGA_PUNCH_FRAME_HEIGHT = 245;
+    static final int P07_CAPANGA_PUNCH_ROOT_X = 123;
+    static final int P07_CAPANGA_PUNCH_ROOT_Y = 234;
+    static final int P07_CAPANGA_PUNCH_FRAME_COUNT = 19;
+
+    static final int P07_CAPANGA_RUN_FRAME_WIDTH = 215;
+    static final int P07_CAPANGA_RUN_FRAME_HEIGHT = 239;
+    static final int P07_CAPANGA_RUN_ROOT_X = 113;
+    static final int P07_CAPANGA_RUN_ROOT_Y = 224;
+    static final int P07_CAPANGA_RUN_FRAME_COUNT = 11;
+
+    static final int P07_CAPANGA_SHOULDER_FRAME_WIDTH = 263;
+    static final int P07_CAPANGA_SHOULDER_FRAME_HEIGHT = 246;
+    static final int P07_CAPANGA_SHOULDER_ROOT_X = 95;
+    static final int P07_CAPANGA_SHOULDER_ROOT_Y = 234;
+    static final int P07_CAPANGA_SHOULDER_FRAME_COUNT = 19;
+
     static final int P07_CROUCH_FRAME_WIDTH = 236;
     static final int P07_CROUCH_FRAME_HEIGHT = 247;
     static final int P07_CROUCH_ROOT_X = 111;

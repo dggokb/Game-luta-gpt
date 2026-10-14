@@ -241,7 +241,7 @@
         "alcance": 150
       },
       "unica": {
-        "descricao": "Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar.",
+        "descricao": "Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar. No Super ele estala os dedos e dois capangas entram correndo por trás: um soca, o outro dá uma ombrada, e saem.",
         "golpes": {
           "S3": {
             "contra": {
@@ -249,6 +249,9 @@
               "janela": "startup"
             }
           }
+        },
+        "lutador": {
+          "capangas": 2
         }
       }
     },

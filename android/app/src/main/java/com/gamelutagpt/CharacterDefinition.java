@@ -179,6 +179,9 @@ final class CharacterDefinition {
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }
+        /** Henchmen the Super calls in instead of its wave (0 = the wave). */
+        int henchmen;
+        Fighter withHenchmen(int count) { henchmen=count; return this; }
         /** Damage multiplier (permille) of this fighter's hits at the given life. */
         int furyScale(int life) {
             if(furyPermille<=0||maxLife<=0)return 1000;

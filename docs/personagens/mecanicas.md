@@ -189,7 +189,7 @@ bolhas verdes (envenenado), brasas vermelhas (fúria) e as faixas CONTRA-GOLPE!,
 | **p04** | Esquiva que cancela: o S3 passa por baixo de golpe alto e de projétil e pode virar soco (L, M, H); a cabeçada (S2) avança. |
 | **p05** | Teleporte: o S3 some na fumaça e reaparece atrás do rival; o corte de mão (S4) avança baixo; no ar, encostado na parede, aperta pra cima e pula da parede. |
 | **p06** | Eco de sombra: o S2 desperta a sombra por 5 s; cada golpe que ela dá é repetido pela sombra roxa um terço de segundo depois, com metade do dano. O S3 alcança longe e puxa o rival. |
-| **p07** | Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar. |
+| **p07** | Contra-golpe pesado: o S3 lê qualquer golpe corpo a corpo e responde com o calcanhar. No Super ele estala os dedos e dois capangas entram correndo por trás: um soca, o outro dá uma ombrada, e saem. |
 | **p08** | Chicote: alcance longo nos fortes; contra-golpe baixo no S3 (pune quem tenta passar por baixo). |
 | **p09** | Grappler: armadura de 1 golpe no escudo (S3) e na ombrada (S4, que avança); agarrão mais forte e de mais longe. |
 | **p10** | Acrobata: dois air dashes por pulo, esquiva alta no S3 e voadora (S4) que atravessa o rival. |
@@ -202,8 +202,13 @@ sabe **segurar o botão** (`FighterInput.holding`, dos dedos na tela), **eco de 
 roxa dos golpes, metade do dano, desenhada atrás dela) e **wall jump** (o p05 encosta na parede
 no ar, aperta pra cima e sai empurrado para longe dela).
 
-**Ainda falta:** o vídeo do wall jump do p05 (o primeiro desenhou uma parede e deu zoom; até o
-novo chegar ele usa o pulo normal) e os capangas do Super do p07 (vídeo em produção).
+**Capangas (14/10):** o Super do p07 chama dois capangas (`CAPANGA_RUN`, `CAPANGA_PUNCH`,
+`CAPANGA_SHOULDER`, no pacote do p07) em vez da onda: entram correndo por trás dele, o primeiro
+soca, o segundo dá uma ombrada, e saem correndo; cada um leva metade do dano do Super. O
+capanga não tem imagem inicial, então a escala é manual (225 px, um pouco maior que o p07).
+
+**Ainda falta:** o vídeo do wall jump do p05. O primeiro desenhou uma parede e deu zoom; o
+segundo saiu com a p06 no lugar do p05. Até o certo chegar ele usa o pulo normal.
 
 ## 5. Perguntas em aberto
 

@@ -1,0 +1,165 @@
+{
+  "id": "p07_capanga_run",
+  "characterProfile": "p07",
+  "source": "art/sprites/source/p07_capanga_run_video_normalized.png",
+  "sourceNote": "p07: capanga correndo (loop), v\u00eddeo Seedance correr.mp4.",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 320,
+    "frameHeight": 320,
+    "rootX": 172,
+    "rootY": 302,
+    "columns": 8,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        70,
+        88,
+        264,
+        304
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 15434
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        78,
+        91,
+        247,
+        306
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14751
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        101,
+        93,
+        235,
+        306
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14171
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        108,
+        91,
+        249,
+        305
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 15308
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        86,
+        89,
+        253,
+        305
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 17748
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        71,
+        88,
+        259,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 18591
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        69,
+        88,
+        262,
+        305
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 18523
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        81,
+        92,
+        249,
+        306
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 17004
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        104,
+        93,
+        244,
+        307
+      ],
+      "minimumMargin": 13,
+      "opaquePixels": 14702
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        106,
+        91,
+        236,
+        306
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14017
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        76,
+        89,
+        244,
+        306
+      ],
+      "minimumMargin": 14,
+      "opaquePixels": 14858
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 215,
+    "frameHeight": 239,
+    "rootX": 113,
+    "rootY": 224,
+    "columns": 8,
+    "frameCount": 11,
+    "cropOffset": [
+      59,
+      78
+    ],
+    "decodedBytes": {
+      "canonical": 6553600,
+      "packed": 3288640
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "f9782b6e1f7d1dfbce4a5a6c2ec00b4f536af9e48697dd5bc6749b7de91fd452",
+      "config": "7f7eda27598ef2b56e40eed7c4aa4380239bc041e53a3cb373ad8361df458d25",
+      "profile": "0938c3e2b0a7804d8d9f790553c76321248f1b933ec2fded1486484712020c32"
+    }
+  }
+}

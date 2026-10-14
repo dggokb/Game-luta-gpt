@@ -90,6 +90,13 @@ final class CombatConfig {
     int wallJumpFrames = 22;
     float wallJumpSpeed = 760f;
     float wallJumpLift = 0.95f;
+    /** Henchmen of a Super: run speed, start behind the caller, stagger, reach and strike timing. */
+    float henchmanSpeed = 950f;
+    float henchmanEntry = 260f;
+    int henchmanStagger = 22;
+    float henchmanReach = 120f;
+    int henchmanStrikeFrames = 28;
+    int henchmanImpactFrame = 10;
 
     // Super meter, in thousandths of a bar.
     static final int METER_PER_BAR = 1000;
