@@ -178,6 +178,16 @@ distributions {
     }
 }
 
+tasks.withType(Test).configureEach {
+    // Na CI a falha aparece inteira (mensagem, pilha e o que o jogo escreveu no log).
+    testLogging {
+        events 'failed'
+        exceptionFormat 'full'
+        showStandardStreams = true
+    }
+    systemProperty 'file.encoding', 'UTF-8'
+}
+
 tasks.named('test') {
     systemProperty 'gameluta.repo', repoRoot.absolutePath
     systemProperty 'java.awt.headless', 'true'

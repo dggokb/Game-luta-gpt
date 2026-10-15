@@ -237,7 +237,7 @@ def main():
                 "player_base_special_s2", "player_base_special_s4")), "Ground foot drift"
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(make_java(data, factors))
+    destination.write_text(make_java(data, factors), encoding="utf-8")
     audit_file = ROOT / "android/app/build/sprite-review/p01-idle-master-audit.json"
     audit_file.parent.mkdir(parents=True, exist_ok=True)
     audit_file.write_text(json.dumps({"idle_visible_width":stand_w,"idle_visible_height":stand_h,

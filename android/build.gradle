@@ -1,1 +1,7 @@
 // Os plugins e suas versões ficam no pluginManagement do settings.gradle.
+
+// Todo o código é UTF-8. Sem isto, no Windows o javac lê como windows-1252 e estraga os
+// textos com acento (ex.: "CONCLUÍDO" no menu de capítulos).
+subprojects {
+    tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+}
