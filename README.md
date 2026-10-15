@@ -52,6 +52,8 @@ O manifesto v3 registra `transform_source_to_output` e `scale_applied` em cada f
 
 No visualizador, `role: "idle"`, `"jab"`, `"dash"` e `"crouch"` habilitam as respectivas sequências. A comparação usa o mesmo zoom nos dois painéis normalizados. Ao encadear clips, a prévia conserva o apoio final para posicionar a próxima pose; essa translação é apenas da prévia e não altera os PNGs.
 
+Em **Comparar com**, a animação da direita acompanha a reprodução pelos timestamps originais. Sua barra própria permite escolher e fixar qualquer frame para comparar poses diferentes; **Junto com a esquerda** retoma a reprodução conjunta. Os dois lados mostram nome e número do frame. A comparação apenas exibe os resultados já normalizados. [Uso no celular](android/README.md#como-comparar).
+
 ## Fundo e qualidade
 
 O tratamento aceita transparência existente ou chroma verde. O redimensionamento usa alpha pré-multiplicado para evitar halos verdes de interpolação. Corpos/efeitos desconectados são preservados e sinalizados; não são apagados automaticamente.

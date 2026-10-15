@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+from comparison_checks import check_comparison
 
 
 def main():
@@ -60,6 +61,7 @@ def main():
         page.tap('#single');page.select_option('#clip',label='idle');page.select_option('#loop',index=1)
         page.tap('#play');page.wait_for_function('frame>range()[0]+2');page.tap('#play')
         result['checks'].append('cycle_preview_without_frame_discard')
+        result['checks'].extend(check_comparison(page, args.screenshots, touch=True))
         assert not result['page_errors'],result['page_errors']
         assert not result['external_requests'],result['external_requests']
         browser.close()

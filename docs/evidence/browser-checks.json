@@ -6,7 +6,11 @@
     "idle_dash_idle_sequence",
     "idle_crouch_idle_sequence",
     "seek_and_airborne_frame",
-    "advisory_loop_selection_and_timestamp_playback"
+    "advisory_loop_selection_and_timestamp_playback",
+    "jab_crouch_comparison_changes_the_actual_right_image",
+    "right_pose_can_be_fixed_scrubbed_and_stepped_independently",
+    "playback_animates_both_panes",
+    "comparison_uses_original_timestamps_and_individual_clip_durations"
   ],
   "page_errors": [],
   "status": "passed"

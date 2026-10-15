@@ -88,7 +88,7 @@ def render_mobile(manifest, output):
     const optionsTitle=document.createElement('summary');optionsTitle.textContent='Sequências, ciclos, mestre e zoom';options.append(optionsTitle);
     while(toolbar.firstChild)options.append(toolbar.firstChild);
     toolbar.replaceWith(selectors);
-    document.querySelector('.panes').after(playback,options);
+    document.querySelector('.panes').after(playback,document.getElementById('compareControls'),options);
     document.querySelectorAll('.pane pre').forEach(pre=>{
       const details=document.createElement('details');details.className='mobileMetrics';
       const title=document.createElement('summary');title.textContent='Medidas deste frame';details.append(title);
@@ -105,9 +105,14 @@ def render_mobile(manifest, output):
     document.querySelectorAll('#mobileTabs button').forEach(button=>button.onclick=()=>{
       document.body.dataset.view=button.dataset.view;
       document.querySelectorAll('#mobileTabs button').forEach(b=>b.setAttribute('aria-pressed',b===button?'true':'false'));
-      document.getElementById('mobileHint').textContent=button.dataset.view==='compare'?'Os dois painéis usam o mesmo zoom. Gire o celular para uma comparação maior.':'Use o zoom para aproximar e arraste a imagem. Prévia reduzida; metadados nas coordenadas originais.';
+      document.getElementById('mobileHint').textContent=button.dataset.view==='compare'?'Reproduzir move os dois lados no mesmo zoom. A barra da direita, abaixo, permite fixar uma pose.':'Use o zoom para aproximar e arraste a imagem. Prévia reduzida; metadados nas coordenadas originais.';
       render();
     });
+    const selectComparison=document.getElementById('compare').onchange;
+    document.getElementById('compare').onchange=()=>{
+      if(document.body.dataset.view!=='compare')document.querySelector('#mobileTabs button[data-view="compare"]').click();
+      selectComparison();
+    };
     render();
     </script>"""
     template=template.replace('</html>',extra+'</html>')

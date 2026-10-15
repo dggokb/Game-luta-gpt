@@ -1,7 +1,7 @@
 {
   "apk": "sprites-visualizador.apk",
   "bytes": 34846191,
-  "sha256": "8421bcc1363864cd8ef9e5f8276ea12af9af5e7b7d08e4504f7ef9e632883be5",
+  "sha256": "5f9c8648b713ffe3514c8ce74c24bbe38702dcde7e4a5bf018f37a147185c3c8",
   "application_id": "org.spriteviewer.offline",
   "minimum_android": "8.0 (API 26)",
   "offline": true,
@@ -9,10 +9,11 @@
   "clips": 8,
   "frames": 944,
   "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nSigner #1 certificate DN: CN=Sprite Viewer Preview\nSigner #1 certificate SHA-256 digest: 788da6bd2ed5a1a3bf3ba9c9878cb2216346527616f293b2d35a32abf0bed0bc\nSigner #1 certificate SHA-1 digest: 1a9b6e1f045e298475dc6ad4e929f269995d0db2\nSigner #1 certificate MD5 digest: 3aea7e0a4520067c254452ce62b7616a\nSigner #1 key algorithm: RSA\nSigner #1 key size (bits): 2048\nSigner #1 public key SHA-256 digest: 707cad3ff3d7ccf9c21ed2df8cf420e60d4c85d783ebdcbe9fee2357ab76070d\nSigner #1 public key SHA-1 digest: eb135015496bebbef51a033ccff08bc32bd2082c\nSigner #1 public key MD5 digest: cd5bf5efa68179fa8ed41328c8878221\n",
-  "badging": "package: name='org.spriteviewer.offline' versionCode='2' versionName='1.1-preview' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'\nsdkVersion:'26'\ntargetSdkVersion:'34'\napplication-label:'Sprites — Visualizador'\napplication-icon-160:'res/drawable/ic_sprite.xml'\napplication: label='Sprites — Visualizador' icon='res/drawable/ic_sprite.xml'\nlaunchable-activity: name='org.spriteviewer.offline.MainActivity'  label='' icon=''\nfeature-group: label=''\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160'\n",
+  "badging": "package: name='org.spriteviewer.offline' versionCode='3' versionName='1.2-preview' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'\nsdkVersion:'26'\ntargetSdkVersion:'34'\napplication-label:'Sprites — Visualizador'\napplication-icon-160:'res/drawable/ic_sprite.xml'\napplication: label='Sprites — Visualizador' icon='res/drawable/ic_sprite.xml'\nlaunchable-activity: name='org.spriteviewer.offline.MainActivity'  label='' icon=''\nfeature-group: label=''\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160'\n",
   "compiler_notes": "warning: [options] source value 8 is obsolete and will be removed in a future release\nwarning: [options] target value 8 is obsolete and will be removed in a future release\nwarning: [options] To suppress warnings about obsolete options, use -Xlint:-options.\nNote: /workspace/Game-luta-gpt/android/src/org/spriteviewer/offline/MainActivity.java uses or overrides a deprecated API.\nNote: Recompile with -Xlint:deprecation for details.\n3 warnings\n",
   "tested_on_physical_device": false,
   "mobile_browser_tested_separately": true,
+  "signing_key_reused": true,
   "preview": {
     "frame_count": 944,
     "maximum_image_width": 720,
@@ -22,12 +23,21 @@
     "full_resolution_pngs_included": false,
     "note": "Only display derivatives; original coordinate metadata, scale factors and PNG outputs are unchanged."
   },
-  "version_name": "1.1-preview",
-  "version_code": 2,
-  "signing_key_changed_from_1_0": true,
-  "installation_note": "Uninstall the previous preview before installing this build: its signing key was unavailable in the new environment.",
+  "version_name": "1.2-preview",
+  "version_code": 3,
+  "upgrade_compatible_with": [
+    "1.1-preview"
+  ],
+  "installation_note": "Direct update from 1.1-preview: certificate verified identical. Version 1.0 used a different key and requires reinstallation.",
   "scale_corrected_clips": [
     "crouch",
     "crouch_jab"
-  ]
+  ],
+  "unchanged_preview_images_verified": 1888,
+  "viewer_checks": {
+    "desktop": 11,
+    "mobile": 14,
+    "javascript_errors": 0,
+    "external_requests": 0
+  }
 }

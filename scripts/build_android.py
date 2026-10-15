@@ -18,16 +18,23 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 def run(command, env=None):
-    result=subprocess.run([str(c) for c in command],capture_output=True,text=True,env=env)
+    result=subprocess.run([str(c) for c in command],capture_output=True,text=True,env=env,stdin=subprocess.DEVNULL)
     if result.returncode:
         raise RuntimeError(f'{Path(str(command[0])).name} falhou:\n{result.stdout}\n{result.stderr}')
     return result.stdout+result.stderr
 
 
-def build(assets, android_jar, build_tools, output, work):
+def build(assets, android_jar, build_tools, output, work, *, signing_key=None, signing_password_file=None):
     assets,android_jar,build_tools,output,work=[Path(p).resolve() for p in (assets,android_jar,build_tools,output,work)]
     if output.exists():raise ValueError('Use um nome de APK ainda inexistente')
     if work.exists() and any(work.iterdir()):raise ValueError('Use uma pasta de compilação nova ou vazia')
+    reuse_key = signing_key is not None
+    if reuse_key != (signing_password_file is not None):
+        raise ValueError('Forneça a chave existente e seu arquivo de senha juntos')
+    if reuse_key:
+        signing_key, signing_password_file = Path(signing_key).resolve(), Path(signing_password_file).resolve()
+        if not signing_key.is_file() or not signing_password_file.is_file():
+            raise ValueError('Chave de assinatura ou arquivo de senha ausente')
     manifest=json.loads((assets/'manifest.json').read_text())
     if not (assets/'index.html').exists():raise ValueError('Assets incompletos')
     expected=sum(len(c['frames']) for c in manifest['clips'])
@@ -49,16 +56,22 @@ def build(assets, android_jar, build_tools, output, work):
     with zipfile.ZipFile(work/'unsigned.apk','a',compression=zipfile.ZIP_DEFLATED) as archive:
         archive.write(dex/'classes.dex','classes.dex')
     run([build_tools/'zipalign','-f','-p','4',work/'unsigned.apk',work/'aligned.apk'])
-    env=os.environ.copy();env['SPRITE_PREVIEW_KEY_PASSWORD']=secrets.token_hex(24)
-    key=work/'preview-signing.p12'
-    run(['keytool','-genkeypair','-keystore',key,'-storetype','PKCS12','-alias','sprite-preview',
-         '-keyalg','RSA','-keysize','2048','-validity','3650','-dname','CN=Sprite Viewer Preview',
-         '-storepass:env','SPRITE_PREVIEW_KEY_PASSWORD','-keypass:env','SPRITE_PREVIEW_KEY_PASSWORD'],env)
-    key.chmod(0o600)
-    # Retain the random password privately alongside the key for a later local update.
-    password=work/'signing-password';password.write_text(env['SPRITE_PREVIEW_KEY_PASSWORD']);password.chmod(0o600)
+    env=None
+    if reuse_key:
+        key=signing_key
+        password_spec='file:'+str(signing_password_file)
+    else:
+        env=os.environ.copy();env['SPRITE_PREVIEW_KEY_PASSWORD']=secrets.token_hex(24)
+        key=work/'preview-signing.p12'
+        run(['keytool','-genkeypair','-keystore',key,'-storetype','PKCS12','-alias','sprite-preview',
+             '-keyalg','RSA','-keysize','2048','-validity','3650','-dname','CN=Sprite Viewer Preview',
+             '-storepass:env','SPRITE_PREVIEW_KEY_PASSWORD','-keypass:env','SPRITE_PREVIEW_KEY_PASSWORD'],env)
+        key.chmod(0o600)
+        # Retain privately for later updates; never print the password or key.
+        password=work/'signing-password';password.write_text(env['SPRITE_PREVIEW_KEY_PASSWORD']);password.chmod(0o600)
+        password_spec='env:SPRITE_PREVIEW_KEY_PASSWORD'
     run([build_tools/'apksigner','sign','--ks',key,'--ks-key-alias','sprite-preview',
-         '--ks-pass','env:SPRITE_PREVIEW_KEY_PASSWORD','--key-pass','env:SPRITE_PREVIEW_KEY_PASSWORD',
+         '--ks-pass',password_spec,
          '--v1-signing-enabled','true','--v2-signing-enabled','true','--v3-signing-enabled','true',
          '--out',output,work/'aligned.apk'],env)
     signature=run([build_tools/'apksigner','verify','--verbose','--print-certs',output])
@@ -76,6 +89,7 @@ def build(assets, android_jar, build_tools, output, work):
             'offline':True,'requested_permissions':[],'clips':len(manifest['clips']),'frames':expected,
             'signature_verification':signature,'badging':badging,'compiler_notes':compiler,
             'tested_on_physical_device':False,'mobile_browser_tested_separately':True,
+            'signing_key_reused':reuse_key,
             'preview':manifest['mobile_preview']}
     output.with_suffix('.json').write_text(json.dumps(report,indent=2,ensure_ascii=False))
     print(json.dumps({k:report[k] for k in ('apk','bytes','sha256','frames','requested_permissions')},indent=2))
@@ -85,7 +99,9 @@ def build(assets, android_jar, build_tools, output, work):
 def main():
     p=argparse.ArgumentParser();p.add_argument('--assets',type=Path,required=True);p.add_argument('--android-jar',type=Path,required=True)
     p.add_argument('--build-tools',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--work',type=Path,required=True)
-    args=p.parse_args();build(args.assets,args.android_jar,args.build_tools,args.output,args.work)
+    p.add_argument('--signing-key',type=Path);p.add_argument('--signing-password-file',type=Path)
+    args=p.parse_args();build(args.assets,args.android_jar,args.build_tools,args.output,args.work,
+                            signing_key=args.signing_key,signing_password_file=args.signing_password_file)
 
 
 if __name__=='__main__':main()

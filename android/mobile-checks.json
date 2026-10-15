@@ -9,7 +9,11 @@
     "idle_jab_idle",
     "idle_dash_idle",
     "idle_crouch_idle",
-    "cycle_preview_without_frame_discard"
+    "cycle_preview_without_frame_discard",
+    "jab_crouch_comparison_changes_the_actual_right_image",
+    "right_pose_can_be_fixed_scrubbed_and_stepped_independently",
+    "playback_animates_both_panes",
+    "comparison_uses_original_timestamps_and_individual_clip_durations"
   ],
   "page_errors": [],
   "external_requests": [],

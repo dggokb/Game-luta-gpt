@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+from comparison_checks import check_comparison
 
 
 def main():
@@ -67,6 +68,7 @@ def main():
         page.click('#play')
         assert page.locator('#position').inner_text() != first
         report['checks'].append('advisory_loop_selection_and_timestamp_playback')
+        report['checks'].extend(check_comparison(page, args.screenshots))
         assert not report['page_errors'], report['page_errors']
         browser.close()
     report['status']='passed'

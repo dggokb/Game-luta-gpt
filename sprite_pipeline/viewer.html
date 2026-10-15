@@ -2,11 +2,12 @@
 <title>Padronizador universal — inspeção</title>
 <style>
 :root{color-scheme:dark;font:15px system-ui;background:#10151d;color:#e7ecf5}body{max-width:1600px;margin:auto;padding:26px}h1{font-size:26px}p{line-height:1.5;color:#b9c7d9}button,select,input{font:inherit;padding:8px;margin:4px;background:#222f41;color:#f3f7ff;border:1px solid #55708f;border-radius:5px}button:disabled{opacity:.4}a{color:#86ccff}.bar{position:sticky;top:0;background:#10151def;z-index:2;padding:10px 0}.panes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.pane{border:1px solid #3a4e67;border-radius:7px;padding:12px;min-width:0}.stage{position:relative;height:460px;overflow:auto;background:repeating-conic-gradient(#26313d 0 25%,#1c2630 0 50%) 0/28px 28px}.stage canvas{position:absolute;left:0;top:0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}summary{cursor:pointer}table{border-collapse:collapse;width:100%;font-size:13px}td,th{border:1px solid #405169;padding:8px;text-align:left}.warn{color:#ffd58d}#seek{width:35%;min-width:140px}.note{font-size:12px}@media(max-width:1000px){.panes{grid-template-columns:1fr}.stage{height:500px}}
+.paneMeta{display:block;font-size:12px;color:#b9c7d9;margin:4px 0 8px;font-variant-numeric:tabular-nums}.comparisonControls{border:1px solid #3a4e67;border-radius:7px;padding:12px;margin:12px 0}.comparisonControls p{margin:6px 0}.comparisonFrames{display:grid;grid-template-columns:auto minmax(80px,1fr) auto;align-items:center;gap:6px}.comparisonFrames input{width:100%;margin:0;padding:0}.comparisonFrames button{margin:0}#comparePosition{font-size:12px;font-variant-numeric:tabular-nums}
 </style>
 <h1>Padronizador universal de sprites</h1>
 <p id="summary"></p><p class="warn">Revisão visual obrigatória. Oscilações, deformações, cortes e movimento de câmera da fonte permanecem. O root padrão é uma referência de apoio da silhueta, não uma articulação detectada.</p>
 <div class="bar">
-<label>Animação <select id="clip"></select></label><label>Comparar <select id="compare"></select></label>
+<label>Animação <select id="clip"></select></label><label>Comparar com <select id="compare"></select></label>
 <button id="play">Reproduzir</button><button id="prev">◀ frame</button><button id="next">frame ▶</button>
 <input id="seek" type="range" min="0" value="0" aria-label="Frame"><span id="position"></span><br>
 <button id="jab">Idle → Jab → Idle</button><button id="dash">Idle → Dash → Idle</button><button id="crouch">Idle → Crouch → Idle</button>
@@ -17,10 +18,16 @@
 <p id="sequenceNote" class="note"></p>
 <div class="panes">
 <div class="pane"><b>Antes — frame original integral</b><div class="stage"><canvas id="before"></canvas></div><pre id="rawInfo"></pre></div>
-<div class="pane"><b>Depois — escala e coordenadas do projeto</b><div class="stage"><canvas id="after"></canvas></div><pre id="normalInfo"></pre></div>
-<div class="pane"><b>Comparação — mesma escala de exibição</b><div class="stage"><canvas id="comparison"></canvas></div><pre id="compareInfo"></pre></div>
+<div class="pane"><b id="leftTitle">Depois</b><span class="paneMeta" id="leftPosition"></span><div class="stage"><canvas id="after"></canvas></div><pre id="normalInfo"></pre></div>
+<div class="pane"><b id="rightTitle">Direita</b><span class="paneMeta" id="rightPosition"></span><div class="stage"><canvas id="comparison"></canvas></div><pre id="compareInfo"></pre></div>
 </div>
-<p class="note">O painel “Antes” mostra a resolução nativa com um ajuste visual próprio. Os dois painéis normalizados usam exatamente o mesmo zoom. A comparação congela a pose de referência; a sequência conserva o deslocamento dentro de cada clip. Ao encadear Dash → Idle, o apoio final da silhueta posiciona a próxima pose apenas na prévia; não é um root esquelético inferido nem uma alteração dos PNGs.</p>
+<div id="compareControls" class="comparisonControls">
+<label>Reprodução da direita <select id="compareMode"><option value="time">Junto com a esquerda</option><option value="fixed">Frame fixo</option></select></label>
+<p class="note">Reproduzir move os dois lados. Arraste a barra abaixo para fixar uma pose à direita. A comparação serve para conferir as animações prontas.</p>
+<div class="comparisonFrames"><button id="comparePrev" aria-label="Frame anterior da direita">◀</button><input id="compareSeek" type="range" min="0" value="0" aria-label="Frame da direita"><button id="compareNext" aria-label="Próximo frame da direita">▶</button></div>
+<span id="comparePosition"></span>
+</div>
+<p class="note">O painel “Antes” mostra a resolução nativa com um ajuste visual próprio. Os dois painéis normalizados usam exatamente o mesmo zoom. Em reprodução conjunta, cada animação segue seus timestamps originais e repete ao terminar. A comparação apenas exibe os resultados, sem aplicar novas correções. Ao encadear Dash → Idle, o apoio final da silhueta posiciona a próxima pose apenas na prévia.</p>
 <details open><summary>Calibração e revisão</summary><div id="table"></div></details>
 <details><summary>Coerência Idle / Crouch e segmentos anotados</summary><pre id="coherence"></pre><div id="masterImages"></div></details>
 <details><summary>Loops aproximados — propostas sem remoção de frames</summary><pre id="loopInfo"></pre></details>
@@ -30,7 +37,7 @@
 'use strict';
 const data=JSON.parse(document.querySelector('#data').textContent), $=id=>document.getElementById(id);
 const clips=data.clips, usable=clips.filter(c=>c.frames.some(f=>f.normalized_file)), cache=new Map();
-let current=0, frame=0, playing=false, lastTime=0, elapsed=0, sequence=null, sequenceIndex=0, carry=[0,0], pendingCarry=[0,0], renderToken=0;
+let current=0, frame=0, comparisonFrame=0, playing=false, lastTime=0, elapsed=0, sequence=null, sequenceIndex=0, carry=[0,0], pendingCarry=[0,0], renderToken=0;
 function option(select,value,text){const o=document.createElement('option');o.value=value;o.textContent=text;select.append(o)}
 clips.forEach((c,i)=>option($('clip'),i,c.name+(c.status==='rejected'?' — REJEITADO':'')));
 usable.forEach(c=>option($('compare'),clips.indexOf(c),c.name));
@@ -47,21 +54,44 @@ function load(src){if(!cache.has(src)){cache.set(src,new Promise(resolve=>{const
 function resize(canvas,shape,k){canvas.width=Math.ceil(shape[0]*k);canvas.height=Math.ceil(shape[1]*k);const ctx=canvas.getContext('2d');ctx.setTransform(k,0,0,k,0,0);return ctx}
 function outline(ctx,root,bbox,shape){if(!$('guides').checked)return;ctx.lineWidth=1;ctx.strokeStyle='#63e7be';ctx.beginPath();ctx.moveTo(0,root[1]);ctx.lineTo(shape[0],root[1]);ctx.stroke();ctx.strokeStyle='#ffc76b';ctx.beginPath();ctx.moveTo(root[0]-9,root[1]);ctx.lineTo(root[0]+9,root[1]);ctx.moveTo(root[0],root[1]-9);ctx.lineTo(root[0],root[1]+9);ctx.stroke();if(bbox){ctx.strokeStyle='#8ab9ff';ctx.strokeRect(bbox[0],bbox[1],bbox[2]-bbox[0],bbox[3]-bbox[1])}}
 function commonZoom(){const width=Math.min($('after').parentElement.clientWidth,$('comparison').parentElement.clientWidth);return Math.min(width/data.canvas[0],460/data.canvas[1])*Number($('zoom').value||1)}
+function frameAtTime(clip,time){
+ const frames=clip.frames,last=frames[frames.length-1],duration=clip.duration_s||(last.time_s+last.duration_s);
+ const t=duration>0?((time%duration)+duration)%duration:0;
+ let low=0,high=frames.length-1;
+ while(low<high){const mid=Math.ceil((low+high)/2);if(frames[mid].time_s<=t+1e-9)low=mid;else high=mid-1}
+ return low;
+}
+function comparisonIndex(){
+ const compare=clips[Number($('compare').value)]||clips[current];
+ if($('compareMode').value==='fixed')return Math.max(0,Math.min(comparisonFrame,compare.frame_count-1));
+ return frameAtTime(compare,clips[current].frames[frame].time_s+elapsed);
+}
+function pausePlayback(){playing=false;elapsed=0;$('play').textContent='Reproduzir'}
+function fixComparison(index){
+ pausePlayback();$('compareMode').value='fixed';
+ const compare=clips[Number($('compare').value)]||clips[current];
+ comparisonFrame=Math.max(0,Math.min(index,compare.frame_count-1));render();
+}
 async function render(){
  const token=++renderToken,c=clips[current],f=c.frames[frame];if(!f)return;
+ const compare=clips[Number($('compare').value)]||c;comparisonFrame=comparisonIndex();const cf=compare.frames[comparisonFrame];
  $('seek').max=c.frame_count-1;$('seek').value=frame;$('position').textContent=`${frame+1}/${c.frame_count} · ${f.time_s.toFixed(4)} s`;
+ $('leftTitle').textContent=`${document.body.dataset.view==='compare'?'Esquerda':'Depois'} · ${c.name}`;
+ $('leftPosition').textContent=`Frame ${frame+1}/${c.frame_count}`;
+ $('rightTitle').textContent=`Direita · ${compare.name}`;$('rightPosition').textContent=`Frame ${comparisonFrame+1}/${compare.frame_count}`;
+ $('compareSeek').max=compare.frame_count-1;$('compareSeek').value=comparisonFrame;
+ $('comparePosition').textContent=`${compare.name} · ${comparisonFrame+1}/${compare.frame_count} · ${cf.time_s.toFixed(4)} s · ${$('compareMode').value==='fixed'?'Frame fixo':'Junto com a esquerda'}`;
  const raw=await load(f.raw_file);if(token!==renderToken)return;
  const before=$('before'),kr=Math.min(before.parentElement.clientWidth/c.resolution[0],460/c.resolution[1]);const br=resize(before,c.resolution,kr);if(raw)br.drawImage(raw,0,0);if(c.source_root)outline(br,c.source_root,f.bbox_source,c.resolution);
  $('rawInfo').textContent=`${c.source_name}\n${c.resolution.join(' × ')} px · FPS médio ${c.fps_original}\nPTS ${f.pts} · base ${c.time_base} · VFR ${c.variable_frame_rate}`;
  if(!f.normalized_file){for(const id of ['after','comparison']){$(id).getContext('2d').clearRect(0,0,$(id).width,$(id).height)}$('normalInfo').textContent=c.rejection_reason;return}
- const compare=clips[Number($('compare').value)]||c,cf=compare.frames[compare.reference_frame];
  const [im,ci,ghost]=await Promise.all([load(f.normalized_file),load(cf.normalized_file),$('ghost').checked?load(data.references[c.reference_pose].aligned_file):Promise.resolve(null)]);if(token!==renderToken)return;
  const k=commonZoom(),ctx=resize($('after'),data.canvas,k),cc=resize($('comparison'),data.canvas,k);
  if(ghost){ctx.globalAlpha=.35;ctx.drawImage(ghost,0,0);ctx.globalAlpha=1}
  if(im)ctx.drawImage(im,carry[0],carry[1]);outline(ctx,[data.root[0]+carry[0],data.root[1]+carry[1]],f.bbox_output?.map((v,i)=>v+carry[i%2]),data.canvas);
  if(ci)cc.drawImage(ci,0,0);outline(cc,data.root,cf.bbox_output,data.canvas);
  $('normalInfo').textContent=`${c.name} · fator ${(f.scale_applied??c.scale_per_video).toFixed(7)}${c.scale_correction?' · correção anatômica anotada':''}\nroot ${JSON.stringify(data.root)} · bbox ${JSON.stringify(f.bbox_output)}\noffset ${JSON.stringify(f.offset_from_root)}\n${f.warnings.join(', ')||'Sem alerta de silhueta neste frame'}\nDeslocamento de prévia: ${carry.map(v=>v.toFixed(2))}`;
- $('compareInfo').textContent=`${compare.name} · frame equivalente ${compare.reference_frame}\nfator ${compare.scale_per_video.toFixed(7)} · bbox ${JSON.stringify(cf.bbox_output)}\nZoom comum: ${k.toFixed(4)} px de tela / px de saída`;
+ $('compareInfo').textContent=`${compare.name} · frame ${comparisonFrame+1}/${compare.frame_count}\nfator ${(cf.scale_applied??compare.scale_per_video).toFixed(7)} · bbox ${JSON.stringify(cf.bbox_output)}\nZoom comum: ${k.toFixed(4)} px de tela / px de saída`;
 }
 function change(){const c=clips[current];$('clip').value=current;frame=0;elapsed=0;$('loop').replaceChildren();option($('loop'),'','Todos os frames');(c.loops||[]).forEach((l,i)=>option($('loop'),i,`início ${l.start_frame}, ${l.period_frames} frames, ${(l.confidence*100).toFixed(1)}%`));$('loopInfo').textContent=JSON.stringify(c.loops||[],null,2);render()}
 function range(){const l=$('loop').value,c=clips[current];if(l!==''&&c.loops[Number(l)]){const x=c.loops[Number(l)];return[x.start_frame,x.end_frame_exclusive]}return[0,c.frame_count]}
@@ -69,11 +99,14 @@ function advance(){const [start,end]=range();if(frame+1<end){frame++;return}if(s
 function role(r){return clips.findIndex(c=>(c.role===r||c.name.toLowerCase()===r)&&c.status!=='rejected')}
 function startSequence(r){const idle=role('idle'),action=role(r);if(idle<0||action<0)return;sequence=[idle,action,idle];sequenceIndex=0;carry=[0,0];current=idle;playing=true;$('play').textContent='Pausar';$('sequenceNote').textContent=`Sequência: ${clips[idle].name} → ${clips[action].name} → ${clips[idle].name}. Encadeamento da prévia usa o apoio da silhueta; PNGs e metadados permanecem nas coordenadas comuns.`;change()}
 for(const r of ['jab','dash','crouch']){$(r).disabled=role('idle')<0||role(r)<0;$(r).onclick=()=>startSequence(r)}
-$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir';elapsed=0};
-$('prev').onclick=()=>{playing=false;$('play').textContent='Reproduzir';frame=Math.max(range()[0],frame-1);render()};$('next').onclick=()=>{playing=false;$('play').textContent='Reproduzir';advance();render()};
-$('seek').oninput=()=>{playing=false;$('play').textContent='Reproduzir';frame=Number($('seek').value);render()};
-$('clip').onchange=()=>{sequence=null;carry=[0,0];current=Number($('clip').value);$('sequenceNote').textContent='';change()};$('single').onclick=()=>{sequence=null;carry=[0,0];$('sequenceNote').textContent='';$('loop').value='';frame=0;render()};
-$('loop').onchange=()=>{sequence=null;carry=[0,0];frame=range()[0];elapsed=0;render()};for(const id of ['compare','guides','ghost','zoom'])$(id).onchange=render;window.addEventListener('resize',render);
-function tick(t){if(playing){elapsed+=Math.min((t-lastTime)/1000,.25);let duration=clips[current].frames[frame]?.duration_s||.04;let changed=false;while(elapsed>=duration){elapsed-=duration;advance();duration=clips[current].frames[frame]?.duration_s||.04;changed=true}if(changed)render()}lastTime=t;requestAnimationFrame(tick)}
+$('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir';render()};
+$('prev').onclick=()=>{pausePlayback();frame=Math.max(range()[0],frame-1);render()};$('next').onclick=()=>{pausePlayback();advance();render()};
+$('seek').oninput=()=>{pausePlayback();frame=Number($('seek').value);render()};
+$('clip').onchange=()=>{sequence=null;carry=[0,0];current=Number($('clip').value);$('sequenceNote').textContent='';change()};$('single').onclick=()=>{sequence=null;carry=[0,0];$('sequenceNote').textContent='';$('loop').value='';frame=0;elapsed=0;render()};
+$('compare').onchange=()=>{comparisonFrame=0;render()};$('compareMode').onchange=render;
+$('compareSeek').oninput=()=>fixComparison(Number($('compareSeek').value));
+$('comparePrev').onclick=()=>fixComparison(comparisonFrame-1);$('compareNext').onclick=()=>fixComparison(comparisonFrame+1);
+$('loop').onchange=()=>{sequence=null;carry=[0,0];frame=range()[0];elapsed=0;render()};for(const id of ['guides','ghost','zoom'])$(id).onchange=render;window.addEventListener('resize',render);
+function tick(t){if(playing){elapsed+=Math.min((t-lastTime)/1000,.25);let duration=clips[current].frames[frame]?.duration_s||.04;let changed=false;while(elapsed>=duration){elapsed-=duration;advance();duration=clips[current].frames[frame]?.duration_s||.04;changed=true}if($('compareMode').value==='time'&&comparisonIndex()!==comparisonFrame)changed=true;if(changed)render()}lastTime=t;requestAnimationFrame(tick)}
 if(clips.length){change();requestAnimationFrame(tick)}
 </script></html>
