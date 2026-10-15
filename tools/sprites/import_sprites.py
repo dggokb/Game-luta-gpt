@@ -15,6 +15,19 @@ GENERATED_JAVA = ROOT / "android" / "app" / "src" / "main" / "java" / "com" / "g
 DEFAULT_ANATOMY_BANDS = [[0.0, 0.12], [0.05, 0.20], [0.25, 0.40]]
 PREVIEW_BACKGROUND = (32, 36, 44, 255)
 
+
+def save_atlas(image, path):
+    """Writes a runtime atlas; the extension picks the format.
+
+    WEBP is lossless (every visible pixel identical to the PNG, ~20% smaller APK);
+    its encoder is deterministic, which --check relies on to compare bytes.
+    """
+    path = Path(path)
+    if path.suffix == ".webp":
+        image.convert("RGBA").save(path, format="WEBP", lossless=True, quality=100, method=4)
+    else:
+        image.save(path, format="PNG", optimize=True)
+
 def load_json(path):
     with open(path, "r", encoding="utf-8") as fh:
         return json.load(fh)
@@ -451,7 +464,7 @@ def process_clip(config_path):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     preview_path.parent.mkdir(parents=True, exist_ok=True)
-    sheet.save(output_path, optimize=True)
+    save_atlas(sheet, output_path)
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
     preview = Image.new("RGBA", sheet.size, PREVIEW_BACKGROUND)
@@ -550,7 +563,7 @@ def process_prepared(cfg, profile):
     for key in ("output", "report", "preview"):
         (ROOT / cfg[key]).parent.mkdir(parents=True, exist_ok=True)
     if transform_report is None:
-        shutil.copyfile(ROOT / cfg["source"], ROOT / cfg["output"])
+        save_atlas(source, ROOT / cfg["output"])
         output = source
     else:
         report["transform"] = transform_report
@@ -560,7 +573,7 @@ def process_prepared(cfg, profile):
         output = Image.new("RGBA", (width * columns, height * rows))
         for i, cell in enumerate(source_cells):
             output.paste(cell, (i % columns * width, i // columns * height))
-        output.save(ROOT / cfg["output"], format="PNG")
+        save_atlas(output, ROOT / cfg["output"])
     (ROOT / cfg["report"]).write_text(json.dumps(report, indent=2) + "\n")
     preview = Image.new("RGBA", output.size, PREVIEW_BACKGROUND)
     preview.alpha_composite(output)

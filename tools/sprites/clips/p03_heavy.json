@@ -3,7 +3,7 @@
   "javaName": "P03_HEAVY",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_heavy_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_heavy.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_heavy.webp",
   "report": "tools/sprites/reports/p03_heavy.report.json",
   "preview": "android/app/build/sprite-review/p03_heavy-import.png",
   "expectedFrames": 23,

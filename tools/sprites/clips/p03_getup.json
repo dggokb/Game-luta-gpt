@@ -3,7 +3,7 @@
   "javaName": "P03_GETUP",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_getup_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_getup.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_getup.webp",
   "report": "tools/sprites/reports/p03_getup.report.json",
   "preview": "android/app/build/sprite-review/p03_getup-import.png",
   "expectedFrames": 12,

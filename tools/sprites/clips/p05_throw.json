@@ -3,7 +3,7 @@
   "javaName": "P05_THROW",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_throw_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_throw.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_throw.webp",
   "report": "tools/sprites/reports/p05_throw.report.json",
   "preview": "android/app/build/sprite-review/p05_throw-import.png",
   "expectedFrames": 9,

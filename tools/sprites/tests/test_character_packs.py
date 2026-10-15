@@ -69,7 +69,7 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['animations']['IDLE'].update(atlas='missing'))
         with self.assertRaisesRegex(ValueError,'unknown atlas'):pipeline.build(self.root)
     def test_duplicate_outputs_are_rejected(self):
-        path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['output']='android/app/src/main/res/drawable-nodpi/player_base_idle.png';path.write_text(json.dumps(d))
+        path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['output']='android/app/src/main/res/drawable-nodpi/player_base_idle.webp';path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'duplicate output'):pipeline.build(self.root)
     def test_missing_source_is_rejected(self):
         # The atlas master (HD clips keep their reviewed 1x sheet as a reference, not as source).

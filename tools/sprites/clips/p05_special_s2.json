@@ -3,7 +3,7 @@
   "javaName": "P05_SPECIAL_S2",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_special_s2_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_special_s2.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_special_s2.webp",
   "report": "tools/sprites/reports/p05_special_s2.report.json",
   "preview": "android/app/build/sprite-review/p05_special_s2-import.png",
   "expectedFrames": 20,

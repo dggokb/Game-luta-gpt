@@ -34,15 +34,22 @@ public class KeyEvent {
     private final int action;
     private final int keyCode;
     private final int repeatCount;
+    private final InputDevice device;
 
     public KeyEvent(int action, int code) { this(action, code, 0); }
 
     /** Extensão do PC: com a contagem de repetição (tecla segurada). */
-    public KeyEvent(int action, int code, int repeatCount) {
+    public KeyEvent(int action, int code, int repeatCount) { this(action, code, repeatCount, null); }
+
+    /** Extensão do PC: de um controle ({@code device} = nome/tipo dele) ou do teclado (null). */
+    public KeyEvent(int action, int code, int repeatCount, String device) {
         this.action = action;
         this.keyCode = code;
         this.repeatCount = repeatCount;
+        this.device = device == null ? null : new InputDevice(device);
     }
+
+    public final InputDevice getDevice() { return device; }
 
     public final int getAction() { return action; }
 

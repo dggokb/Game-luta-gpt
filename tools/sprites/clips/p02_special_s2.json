@@ -3,7 +3,7 @@
   "javaName": "P02_SPECIAL_S2",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_special_s2_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_special_s2.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_special_s2.webp",
   "report": "tools/sprites/reports/p02_special_s2.report.json",
   "preview": "android/app/build/sprite-review/p02_special_s2-import.png",
   "expectedFrames": 20,

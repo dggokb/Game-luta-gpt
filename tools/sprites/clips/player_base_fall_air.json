@@ -3,7 +3,7 @@
   "javaName": "FALL_AIR_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_fall_air_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_fall_air.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_fall_air.webp",
   "report": "tools/sprites/reports/player_base_fall_air.report.json",
   "preview": "android/app/build/sprite-review/fall_air-import.png",
   "expectedFrames": 6,

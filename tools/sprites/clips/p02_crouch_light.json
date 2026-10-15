@@ -3,7 +3,7 @@
   "javaName": "P02_CROUCH_LIGHT",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_crouch_light_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_crouch_light.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_crouch_light.webp",
   "report": "tools/sprites/reports/p02_crouch_light.report.json",
   "preview": "android/app/build/sprite-review/p02_crouch_light-import.png",
   "expectedFrames": 11,

@@ -3,7 +3,7 @@
   "javaName": "P11_JUMP",
   "profile": "p11.json",
   "source": "art/sprites/source/p11_jump_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p11_jump.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_jump.webp",
   "report": "tools/sprites/reports/p11_jump.report.json",
   "preview": "android/app/build/sprite-review/p11_jump-import.png",
   "expectedFrames": 6,

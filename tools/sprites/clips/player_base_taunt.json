@@ -3,7 +3,7 @@
   "javaName": "TAUNT",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_taunt_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_taunt.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_taunt.webp",
   "report": "tools/sprites/reports/player_base_taunt.report.json",
   "preview": "android/app/build/sprite-review/taunt-import.png",
   "expectedFrames": 33,

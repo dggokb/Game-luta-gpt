@@ -3,7 +3,7 @@
   "javaName": "P12_GETUP",
   "profile": "p12.json",
   "source": "art/sprites/source/p12_getup_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p12_getup.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p12_getup.webp",
   "report": "tools/sprites/reports/p12_getup.report.json",
   "preview": "android/app/build/sprite-review/p12_getup-import.png",
   "expectedFrames": 12,

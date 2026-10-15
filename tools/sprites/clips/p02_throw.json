@@ -3,7 +3,7 @@
   "javaName": "P02_THROW",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_throw_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_throw.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_throw.webp",
   "report": "tools/sprites/reports/p02_throw.report.json",
   "preview": "android/app/build/sprite-review/p02_throw-import.png",
   "expectedFrames": 9,

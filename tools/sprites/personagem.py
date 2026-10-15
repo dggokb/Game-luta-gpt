@@ -244,7 +244,7 @@ def clip_path(char, name):
         path.write_text(json.dumps({
             'id': cid, 'javaName': cid.upper(), 'profile': f'{char}.json',
             'source': f'art/sprites/source/{cid}_video_normalized.png',
-            'output': f'android/app/src/main/res/drawable-nodpi/{cid}.png',
+            'output': f'android/app/src/main/res/drawable-nodpi/{cid}.webp',
             'report': f'tools/sprites/reports/{cid}.report.json',
             'preview': f'android/app/build/sprite-review/{cid}-import.png',
             'expectedFrames': 1, 'segmentation': 'prepared-grid', 'columns': 1, 'rootMode': 'authored',

@@ -3,7 +3,7 @@
   "javaName": "P09_WALK_BACK",
   "profile": "p09.json",
   "source": "art/sprites/source/p09_walk_back_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p09_walk_back.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p09_walk_back.webp",
   "report": "tools/sprites/reports/p09_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p09_walk_back-import.png",
   "expectedFrames": 20,

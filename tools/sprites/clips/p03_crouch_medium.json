@@ -3,7 +3,7 @@
   "javaName": "P03_CROUCH_MEDIUM",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_crouch_medium_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_medium.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_medium.webp",
   "report": "tools/sprites/reports/p03_crouch_medium.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch_medium-import.png",
   "expectedFrames": 16,

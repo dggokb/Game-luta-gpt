@@ -18,6 +18,8 @@ O build descobre todos os `character.json` e todos os clips. Não existe uma lis
 manual de personagens no renderer. `GeneratedCharacters.java`,
 `GeneratedSpriteLayouts.java`, `SpriteStates.java`, os atlas em `drawable-nodpi` e os
 relatórios em `tools/sprites/reports` são saídas geradas e versionadas. Não editar à mão.
+Os atlas saem em WEBP sem perda (`import_sprites.save_atlas`): cada pixel visível é igual ao
+PNG, com cerca de 20% menos espaço no APK. O `output` de um clip termina em `.webp`.
 
 ## Fluxo de trabalho
 

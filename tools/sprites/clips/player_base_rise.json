@@ -3,7 +3,7 @@
   "javaName": "RISE_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_rise_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_rise.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_rise.webp",
   "report": "tools/sprites/reports/player_base_rise.report.json",
   "preview": "android/app/build/sprite-review/rise-import.png",
   "expectedFrames": 6,

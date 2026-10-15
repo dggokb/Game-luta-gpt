@@ -127,7 +127,7 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "680d0d717f425c797e1acbcfa014f15f6ea367c3fb5aaa5eb6c9c87b833e9c60",
-      "config": "805e4610607b61cab5c3da51bc8825b20892299876931547c9c6e2d8a66f2bdf",
+      "config": "7a6f302736174ffce182492258f4362f05a4dcb3fed7ed80ea05007cf14bc0d2",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

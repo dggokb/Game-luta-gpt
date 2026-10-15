@@ -3,7 +3,7 @@
   "javaName": "P10_VICTORY",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_victory_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_victory.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_victory.webp",
   "report": "tools/sprites/reports/p10_victory.report.json",
   "preview": "android/app/build/sprite-review/p10_victory-import.png",
   "expectedFrames": 33,

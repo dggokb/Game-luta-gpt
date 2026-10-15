@@ -3,7 +3,7 @@
   "javaName": "INTRO_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_intro_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_intro.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_intro.webp",
   "report": "tools/sprites/reports/player_base_intro.report.json",
   "preview": "android/app/build/sprite-review/intro-import.png",
   "expectedFrames": 27,

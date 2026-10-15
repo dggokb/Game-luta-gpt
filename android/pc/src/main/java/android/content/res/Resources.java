@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * PC: os drawables (atlas dos lutadores) são os PNGs de uma pasta, como
+ * PC: os drawables (atlas dos lutadores) são as imagens (WEBP/PNG) de uma pasta, como
  * {@code res/drawable-nodpi}. O id de cada um é a posição na lista, a partir de 1.
  *
  * <p>Pré-carga: o jogo pede os atlas de um personagem um por um. Quando chega o primeiro
@@ -111,8 +111,8 @@ public class Resources {
             });
         }
         for (String file : names) {
-            if (!file.startsWith(prefix) || !file.endsWith(".png")) continue;
-            String sibling = file.substring(0, file.length() - 4);
+            if (!file.startsWith(prefix) || !(file.endsWith(".png") || file.endsWith(".webp"))) continue;
+            String sibling = baseName(new File(file));
             if (sibling.equals(name) || prefetched.containsKey(sibling)) continue;
             String path = new File(drawableDir, file).getPath();
             prefetched.put(sibling, new Prefetched(pool.submit(() -> BitmapFactory.decodeFile(path))));

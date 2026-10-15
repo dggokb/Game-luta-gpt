@@ -3,7 +3,7 @@
   "javaName": "P03_VICTORY",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_victory_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_victory.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_victory.webp",
   "report": "tools/sprites/reports/p03_victory.report.json",
   "preview": "android/app/build/sprite-review/p03_victory-import.png",
   "expectedFrames": 33,

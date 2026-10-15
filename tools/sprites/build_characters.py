@@ -595,7 +595,10 @@ def pack_atlas(stage, cfg, report):
     for i in range(n):
         sx, sy = i % cols * w + x0, i // cols * h + y0
         packed.paste(image.crop((sx, sy, sx + pw, sy + ph)), (i % cols * pw, i // cols * ph))
-    packed.save(path, format='PNG', **options)
+    if path.suffix == '.webp':
+        importer.save_atlas(packed, path)
+    else:
+        packed.save(path, format='PNG', **options)
     report['packed'] = {'frameWidth': pw, 'frameHeight': ph, 'rootX': l['rootX'] - x0, 'rootY': l['rootY'] - y0,
                         'columns': cols, 'frameCount': n, 'cropOffset': [x0, y0],
                         'decodedBytes': {'canonical': w * h * cols * rows * 4, 'packed': pw * ph * cols * rows * 4}}
@@ -659,7 +662,7 @@ def build(root=ROOT, check=False):
             packs=compile_packs(stage,results)
             outputs.update((JAVA+'GeneratedSpriteLayouts.java',JAVA+'GeneratedCharacters.java',JAVA+'SpriteStates.java'))
             # Preview embeds atlases; it works offline and never gets packaged in APK.
-            payload={'characters':packs,'atlases':{c['id']:{**r['packed'],'image':'data:image/png;base64,'+base64.b64encode((stage/c['output']).read_bytes()).decode()} for c,r in results}}
+            payload={'characters':packs,'atlases':{c['id']:{**r['packed'],'image':'data:image/'+Path(c['output']).suffix[1:]+';base64,'+base64.b64encode((stage/c['output']).read_bytes()).decode()} for c,r in results}}
             preview='android/app/build/sprite-review/index.html'
             (stage/preview).write_text((root/'tools/sprites/preview.html').read_text(encoding='utf-8').replace('__SPRITE_DATA__',json.dumps(payload).replace('<','\\u003c')), encoding='utf-8')
             outputs.add(preview)

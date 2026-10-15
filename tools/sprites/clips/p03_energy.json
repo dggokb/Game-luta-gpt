@@ -3,7 +3,7 @@
   "javaName": "P03_ENERGY",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_energy_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_energy.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_energy.webp",
   "report": "tools/sprites/reports/p03_energy.report.json",
   "preview": "android/app/build/sprite-review/p03_energy-import.png",
   "expectedFrames": 11,

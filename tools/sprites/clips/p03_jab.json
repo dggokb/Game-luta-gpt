@@ -3,7 +3,7 @@
   "javaName": "P03_JAB",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_jab_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_jab.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_jab.webp",
   "report": "tools/sprites/reports/p03_jab.report.json",
   "preview": "android/app/build/sprite-review/p03_jab-import.png",
   "expectedFrames": 11,

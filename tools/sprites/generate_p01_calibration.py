@@ -30,7 +30,7 @@ def victory_foot_track(report):
     columns = packed["columns"]
     bottom = min(height, packed["rootY"] + 5)
     top = max(0, packed["rootY"] - 56)
-    atlas = ROOT / "android/app/src/main/res/drawable-nodpi/player_base_victory.png"
+    atlas = ROOT / "android/app/src/main/res/drawable-nodpi/player_base_victory.webp"
     with Image.open(atlas) as image:
         if image.size[0] != width * columns:
             raise ValueError("Victory atlas width changed; foot calibration invalid")

@@ -3,7 +3,7 @@
   "javaName": "JUMP_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_jump_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_jump.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_jump.webp",
   "report": "tools/sprites/reports/player_base_jump.report.json",
   "preview": "android/app/build/sprite-review/jump-import.png",
   "expectedFrames": 6,

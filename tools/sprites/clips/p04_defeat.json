@@ -3,7 +3,7 @@
   "javaName": "P04_DEFEAT",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_defeat_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_defeat.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_defeat.webp",
   "report": "tools/sprites/reports/p04_defeat.report.json",
   "preview": "android/app/build/sprite-review/p04_defeat-import.png",
   "expectedFrames": 33,

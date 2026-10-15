@@ -3,7 +3,7 @@
   "javaName": "P07_SPECIAL_ENERGY",
   "profile": "p07.json",
   "source": "art/sprites/source/p07_special_energy_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p07_special_energy.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p07_special_energy.webp",
   "report": "tools/sprites/reports/p07_special_energy.report.json",
   "preview": "android/app/build/sprite-review/p07_special_energy-import.png",
   "expectedFrames": 11,

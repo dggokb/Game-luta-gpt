@@ -60,7 +60,7 @@ tasks.register('generateP01Calibration', Exec) {
     description = 'Generate P01 framewise idle-master calibration'
     inputs.files(fileTree(new File(spriteRoot, 'tools/sprites/reports')) {
         include 'player_base_*.report.json'
-    }, file('src/main/res/drawable-nodpi/player_base_victory.png'),
+    }, file('src/main/res/drawable-nodpi/player_base_victory.webp'),
        new File(spriteRoot, 'tools/sprites/generate_p01_calibration.py'))
     outputs.file(p01CalibratedSource)
     workingDir spriteRoot

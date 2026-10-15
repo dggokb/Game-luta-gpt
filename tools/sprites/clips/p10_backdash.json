@@ -3,7 +3,7 @@
   "javaName": "P10_BACKDASH",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_backdash_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_backdash.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_backdash.webp",
   "report": "tools/sprites/reports/p10_backdash.report.json",
   "preview": "android/app/build/sprite-review/p10_backdash-import.png",
   "expectedFrames": 10,

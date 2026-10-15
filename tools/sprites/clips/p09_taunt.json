@@ -3,7 +3,7 @@
   "javaName": "P09_TAUNT",
   "profile": "p09.json",
   "source": "art/sprites/source/p09_taunt_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p09_taunt.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p09_taunt.webp",
   "report": "tools/sprites/reports/p09_taunt.report.json",
   "preview": "android/app/build/sprite-review/p09_taunt-import.png",
   "expectedFrames": 33,

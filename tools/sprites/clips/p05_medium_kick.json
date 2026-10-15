@@ -3,7 +3,7 @@
   "javaName": "P05_MEDIUM_KICK",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_medium_kick_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_medium_kick.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_medium_kick.webp",
   "report": "tools/sprites/reports/p05_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p05_medium_kick-import.png",
   "expectedFrames": 14,

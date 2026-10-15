@@ -78,7 +78,7 @@ dependencies {
     implementation project(':ultra-core')
     implementation project(':story-core')
     implementation project(':stage-core')
-    // Os retratos do HUD são WEBP, que o ImageIO do Java não lê sozinho.
+    // Os atlas dos lutadores e os retratos do HUD são WEBP, que o ImageIO do Java não lê sozinho.
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.12.0'
     // org.json vem dentro do Android; no PC, o artefato com a mesma API.
     implementation 'org.json:json:20240303'
@@ -130,7 +130,7 @@ def generateP01Calibration = tasks.register('generateP01Calibration', Exec) {
     description = 'Gera a calibração quadro a quadro do P01 (igual ao app).'
     def out = generatedSource.map { it.file('com/gamelutagpt/P01SpriteCalibration.java') }
     inputs.files(fileTree(new File(repoRoot, 'tools/sprites/reports')) { include 'player_base_*.report.json' },
-        new File(appMain, 'res/drawable-nodpi/player_base_victory.png'),
+        new File(appMain, 'res/drawable-nodpi/player_base_victory.webp'),
         new File(repoRoot, 'tools/sprites/generate_p01_calibration.py'))
     outputs.file(out)
     workingDir repoRoot

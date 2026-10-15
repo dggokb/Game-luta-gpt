@@ -3,7 +3,7 @@
   "javaName": "P10_LAND",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_land_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_land.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_land.webp",
   "report": "tools/sprites/reports/p10_land.report.json",
   "preview": "android/app/build/sprite-review/p10_land-import.png",
   "expectedFrames": 4,

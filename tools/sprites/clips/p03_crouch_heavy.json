@@ -3,7 +3,7 @@
   "javaName": "P03_CROUCH_HEAVY",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_crouch_heavy_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_heavy.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_crouch_heavy.webp",
   "report": "tools/sprites/reports/p03_crouch_heavy.report.json",
   "preview": "android/app/build/sprite-review/p03_crouch_heavy-import.png",
   "expectedFrames": 12,

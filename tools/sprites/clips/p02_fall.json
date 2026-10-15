@@ -3,7 +3,7 @@
   "javaName": "P02_FALL",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_fall_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_fall.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_fall.webp",
   "report": "tools/sprites/reports/p02_fall.report.json",
   "preview": "android/app/build/sprite-review/p02_fall-import.png",
   "expectedFrames": 6,

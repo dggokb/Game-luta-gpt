@@ -3,7 +3,7 @@
   "javaName": "PLAYER_TWO_MOVEMENT",
   "profile": "player_two.json",
   "source": "art/sprites/source/player_two_movement_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_two_movement.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_two_movement.webp",
   "report": "tools/sprites/reports/player_two_movement.report.json",
   "preview": "android/app/build/sprite-review/player-two-movement-import.png",
   "expectedFrames": 16,

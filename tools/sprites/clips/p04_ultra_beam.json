@@ -3,7 +3,7 @@
   "javaName": "P04_ULTRA_BEAM",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_ultra_beam_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_ultra_beam.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_ultra_beam.webp",
   "report": "tools/sprites/reports/p04_ultra_beam.report.json",
   "preview": "android/app/build/sprite-review/p04_ultra_beam-import.png",
   "expectedFrames": 9,

@@ -3,7 +3,7 @@
   "javaName": "P04_LIGHT_JAB",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_light_jab_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_light_jab.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_light_jab.webp",
   "report": "tools/sprites/reports/p04_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p04_light_jab-import.png",
   "expectedFrames": 11,
