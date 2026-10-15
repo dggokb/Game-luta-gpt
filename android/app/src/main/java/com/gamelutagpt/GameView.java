@@ -65,6 +65,12 @@ public class GameView extends SurfaceView
 
     /** Fixed simulation step; rendering runs at whatever rate the device manages. */
     static final float FIXED_STEP = CombatConfig.DT;
+    /**
+     * Velocidade global da luta (1 = original). O relógio da simulação anda mais devagar,
+     * então golpes, pulos, IA, timer e efeitos desaceleram juntos sem mexer no frame data
+     * dos packs. Menus, pausa, seleção, páginas da história e a Página Final ficam em 1.
+     */
+    static final float GAME_SPEED = 0.8f;
 
     final CombatEngine engine = new CombatEngine(
         team[0], opponentFighter, PLAYER_START_X, OPPONENT_START_X, new CombatConfig());
@@ -702,11 +708,19 @@ public class GameView extends SurfaceView
     // Render cadence can vary; the simulation always advances in whole 60 Hz frames.
     private void advanceSimulation(float elapsedSeconds) {
         processPendingInput();
-        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f);
+        float speed = fightClockRunning() ? GAME_SPEED : 1f;
+        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
             update();
             accumulatedTime = Math.max(0f, accumulatedTime - FIXED_STEP);
         }
+    }
+
+    /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
+    private boolean fightClockRunning() {
+        return !menuInicial.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
+            !ajusteCaixas.isOpen() && !characterSelect.isOpen() && !historia.coversScreen() &&
+            !paginaFinal.isActive();
     }
 
     /** One simulation frame: inputs, engine step, then presentation state. */
