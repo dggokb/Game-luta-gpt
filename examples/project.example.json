@@ -1,0 +1,14 @@
+{
+  "references": {
+    "idle": "../entradas/idle_master.png",
+    "crouch": "../entradas/crouch_master.png"
+  },
+  "idle_target_height": 256,
+  "padding": 24,
+  "minimum_similarity": 0.62,
+  "clips": [
+    {"name": "idle", "video": "../entradas/idle.mp4", "reference_pose": "idle", "detect_loop": true},
+    {"name": "dash", "video": "../entradas/dash.mp4", "reference_pose": "idle"},
+    {"name": "crouch", "video": "../entradas/crouch.mp4", "reference_pose": "crouch"}
+  ]
+}
