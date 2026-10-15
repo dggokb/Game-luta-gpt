@@ -352,12 +352,11 @@ class BuiltPackTests(unittest.TestCase):
         """Every HD cell is its video cell at 2x times the size tuning applied in the app
         (docs/personagens/regua/ajustes-tamanho-20261014-0532.json), measured by body height."""
         from PIL import Image
-        import numpy as np
         original=Image.open(self.root/f'art/sprites/source/{sheet}_video_normalized.png').convert('RGBA')
         hd=Image.open(self.root/f'art/sprites/source/{sheet}_sr_2x.png').convert('RGBA')
         def tall(img):
-            rows=np.nonzero((np.asarray(img.getchannel('A'))>128).any(1))[0]
-            return rows[-1]-rows[0]+1
+            box=img.getchannel('A').point(lambda v:255 if v>128 else 0).getbbox()
+            return box[3]-box[1]
         for i in range(count):
             src=original.crop((i%columns*width,i//columns*height,(i%columns+1)*width,(i//columns+1)*height))
             cell=hd.crop((i%columns*width*2,i//columns*height*2,(i%columns+1)*width*2,(i//columns+1)*height*2))

@@ -2,7 +2,7 @@
   "id": "p05_wall_jump",
   "javaName": "P05_WALL_JUMP",
   "profile": "p05.json",
-  "source": "art/sprites/source/p05_wall_jump_video_normalized.png",
+  "source": "art/sprites/source/p05_wall_jump_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p05_wall_jump.png",
   "report": "tools/sprites/reports/p05_wall_jump.report.json",
   "preview": "android/app/build/sprite-review/p05_wall_jump-import.png",
@@ -38,11 +38,26 @@
       1.1364
     ],
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/p05_wall_jump_video_normalized.png",
+      "celula": [
+        360,
+        288
+      ],
+      "raiz": [
+        180,
+        270
+      ],
+      "colunas": 5
+    }
   },
   "frameWidth": 720,
   "frameHeight": 576,
   "rootX": 360,
   "rootY": 540,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p05_wall_jump_video_normalized.png"
+  ]
 }

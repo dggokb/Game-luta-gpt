@@ -1,7 +1,7 @@
 {
   "id": "p05_wall_jump",
   "characterProfile": "p05",
-  "source": "art/sprites/source/p05_wall_jump_video_normalized.png",
+  "source": "art/sprites/source/p05_wall_jump_video_hd.png",
   "sourceNote": "p05: wall jump (chute no ar e voo para a frente), v\u00eddeo Seedance wallJump.mp4; linhas de velocidade limpas.",
   "rootMode": "authored",
   "scale": 1,
@@ -149,8 +149,11 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "b893ab6a96df8783001271e64d47c0145b1743106e7bc449fb5466cd4886aec2",
-      "config": "273d8dd3843ec5f7d650e078c9446a8802c51a9ca644de2e5132145f21597196",
+      "config": "65fb320b56c452b16701f52e8187538bc16e2f0566ca3204c8cada30d48fd7c4",
       "profile": "1399fbfca02c9eb84b74570911705356bec6b2c360af9d66f0de19f79e242159"
+    },
+    "referenceSources": {
+      "art/sprites/source/p05_wall_jump_video_normalized.png": "b98dfa7df6635d366ebc0bbe37ea731b0e3596e8cd2fa485075e24fb100f15a0"
     }
   }
 }

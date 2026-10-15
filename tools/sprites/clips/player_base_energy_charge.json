@@ -2,7 +2,7 @@
   "id": "player_base_energy_charge",
   "javaName": "ENERGY_CHARGE",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_energy_charge_video_normalized.png",
+  "source": "art/sprites/source/player_base_energy_charge_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_energy_charge.png",
   "report": "tools/sprites/reports/player_base_energy_charge.report.json",
   "preview": "android/app/build/sprite-review/player_base_energy_charge-import.png",
@@ -25,11 +25,26 @@
     "sem_efeitos": true,
     "limpar_chao": true,
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "referencia": {
+      "folha": "art/sprites/source/player_base_energy_charge_video_normalized.png",
+      "celula": [
+        384,
+        256
+      ],
+      "raiz": [
+        140,
+        238
+      ],
+      "colunas": 5
+    }
   },
   "frameWidth": 768,
   "frameHeight": 512,
   "rootX": 280,
   "rootY": 476,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/player_base_energy_charge_video_normalized.png"
+  ]
 }

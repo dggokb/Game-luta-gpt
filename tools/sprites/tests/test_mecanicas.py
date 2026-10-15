@@ -4,7 +4,12 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import mecanicas  # noqa: E402
+try:  # mecanicas.py mede as folhas com numpy (ferramentas de autoria); a CI instala só o Pillow
+    import mecanicas  # noqa: E402
+except ModuleNotFoundError as missing:
+    if missing.name != 'numpy':
+        raise
+    raise unittest.SkipTest('numpy only in the authoring tools')
 
 ROOT = Path(__file__).resolve().parents[3]
 
