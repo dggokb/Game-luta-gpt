@@ -144,7 +144,7 @@ public final class CinematicaPreview {
         File assetsDir = new File(args.length > 0 ? args[0] : "app/src/main/assets");
         String arquivo = args.length > 1 ? args[1] : "ep01/cinematica_treino.json";
         File outDir = new File(args.length > 2 ? args[2] : "build/cinematica");
-        String cenario = args.length > 3 ? args[3] : "templo_lua";
+        String cenario = args.length > 3 ? args[3] : "dojo_shinshinkan";
         if (!outDir.isDirectory() && !outDir.mkdirs()) throw new IOException("não consegui criar " + outDir);
         new CinematicaPreview().gravar(assetsDir, arquivo, outDir, cenario);
     }

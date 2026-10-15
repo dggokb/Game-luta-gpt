@@ -5,7 +5,7 @@ Este é o terceiro motor da história, ao lado do [motor de páginas](motor-pagi
 conversas falam **durante** a luta, sem parar nada; a cinemática **transforma a luta em cena**
 num momento certo: faixas pretas de cinema entram, o jogador perde o controle e um roteiro guia
 os dois lutadores, põe falas nos quadros laterais, estoura onomatopeias de mangá na tela e pode
-encerrar a luta ali. A estreia é o treino do Episódio 1 (jogador × rival); em qualquer outra
+encerrar a luta ali. A estreia é o treino do Episódio 1 (jogador × rival, no dojo Shūshinkan); em qualquer outra
 luta é o mesmo motor com outro arquivo.
 
 ## Como aparece na tela (o treino do Episódio 1)
@@ -29,7 +29,7 @@ obedecer (o pulo sai quando o lutador pode agir). Enquanto o gatilho de vida esp
 a cena roda, **ninguém cai**: o jogo segura o último ponto de vida, para um golpe grande não
 pular a cena indo direto ao KO.
 
-![Treino do Episódio 1](cinematica-treino.png)
+![Treino do Episódio 1 (gravado no Templo da Lua, antes de a luta passar para o dojo)](cinematica-treino.png)
 
 ## O arquivo da cinemática
 
@@ -37,8 +37,8 @@ Cada luta da história aponta o arquivo dela no passo de luta do `episodio.json`
 dentro de `historia/` (como a `conversa`). A cinemática fica na pasta do episódio:
 
 ```json
-{ "tipo": "luta", "rotulo": "TREINO", "dupla": "jogador", "cpu": "rival", "repetirSeDerrota": false,
-  "cinematica": "ep01/cinematica_treino.json" }
+{ "tipo": "luta", "rotulo": "TREINO", "cenario": "dojo_shinshinkan", "dupla": "jogador", "cpu": "rival",
+  "repetirSeDerrota": false, "cinematica": "ep01/cinematica_treino.json" }
 ```
 
 O arquivo tem o **gatilho** e a lista de **ações**, que rodam em sequência. Cada ação espera

@@ -78,7 +78,7 @@ tasks.register('runMenu', JavaExec) {
 }
 
 // Cinemática de uma luta da história em PNG: gradle :pc-preview:runCinematica
-// (-Pcinematica=ep01/cinematica_treino.json, -Pirmao=koga, -Pidioma=en, -Pcenario=templo_lua)
+// (-Pcinematica=ep01/cinematica_treino.json, -Pirmao=koga, -Pidioma=en, -Pcenario=dojo_shinshinkan)
 tasks.register('runCinematica', JavaExec) {
     group = 'application'
     description = 'Grava os quadros de uma cinemática de luta em build/cinematica/.'
@@ -86,7 +86,7 @@ tasks.register('runCinematica', JavaExec) {
     mainClass = 'com.gamelutagpt.preview.CinematicaPreview'
     workingDir = rootProject.projectDir
     args 'app/src/main/assets', project.findProperty('cinematica') ?: 'ep01/cinematica_treino.json',
-        'build/cinematica', project.findProperty('cenario') ?: 'templo_lua'
+        'build/cinematica', project.findProperty('cenario') ?: 'dojo_shinshinkan'
     systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
     systemProperty 'irmao', project.findProperty('irmao') ?: 'ryuga'
 }
