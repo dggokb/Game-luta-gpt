@@ -76,7 +76,9 @@ function fixComparison(index){
 }
 async function render(){
  const token=++renderToken,c=clips[current],f=c.frames[frame];if(!f)return;
- const reviewNote=c.status==='rejected'?'Este vídeo precisa de revisão para ser padronizado. Confira o original em Antes.':c.frame_warnings?.length?'Este vídeo tem frames com alertas de imagem. Confira o original em Antes.':'';const clipNote=[reviewNote,c.note].filter(Boolean).join(' ');$('clipNote').textContent=clipNote;$('clipNote').hidden=!clipNote;
+ const reviewNote=c.status==='rejected'?'Este vídeo precisa de revisão para ser padronizado. Confira o original em Antes.':c.frame_warnings?.length?'Este vídeo tem frames com alertas de imagem. Confira o original em Antes.':'';
+ const audit=c.scale_audit,scaleNote=audit?.status==='drift_detected'?'Mudança de tamanho detectada durante a ação.':audit?.status==='within_annotation_tolerance'?`Tamanho conferido em ${audit.checkpoint_count} amostras, incluindo a ação; ${audit.holdout_count} de controle. Os demais frames ainda exigem revisão.`:'Tamanho nas outras poses da ação: ainda não conferido.';
+ const clipNote=[reviewNote,scaleNote,c.note].filter(Boolean).join(' ');$('clipNote').textContent=clipNote;$('clipNote').hidden=!clipNote;
  const compare=clips[Number($('compare').value)]||c;comparisonFrame=comparisonIndex();const cf=compare.frames[comparisonFrame];
  $('seek').max=c.frame_count-1;$('seek').value=frame;$('position').textContent=`${frame+1}/${c.frame_count} · ${f.time_s.toFixed(4)} s`;
  $('leftTitle').textContent=`${document.body.dataset.view==='compare'?'Esquerda':'Depois'} · ${c.name}`;
@@ -95,6 +97,7 @@ async function render(){
  drawFrame(cc,ci,cf.normalized_rect,data.canvas,0,0,cf.normalized_destination_rect);outline(cc,data.root,cf.bbox_output,data.canvas);
  $('normalInfo').textContent=`${c.name} · fator ${(f.scale_applied??c.scale_per_video).toFixed(7)}${c.scale_correction?' · correção anatômica anotada':''}${c.root_motion?' · movimento no lugar':''}\nroot ${JSON.stringify(data.root)} · bbox ${JSON.stringify(f.bbox_output)}\noffset ${JSON.stringify(f.offset_from_root)}\n${f.warnings.join(', ')||'Sem alerta de silhueta neste frame'}\nDeslocamento de prévia: ${carry.map(v=>v.toFixed(2))}`;
  $('compareInfo').textContent=`${compare.name} · frame ${comparisonFrame+1}/${compare.frame_count}\nfator ${(cf.scale_applied??compare.scale_per_video).toFixed(7)} · bbox ${JSON.stringify(cf.bbox_output)}\nZoom comum: ${k.toFixed(4)} px de tela / px de saída`;
+ window.dispatchEvent(new Event('spriteframe'));
 }
 function change(){const c=clips[current];$('clip').value=current;frame=0;elapsed=0;$('loop').replaceChildren();option($('loop'),'','Todos os frames');(c.loops||[]).forEach((l,i)=>option($('loop'),i,`início ${l.start_frame}, ${l.period_frames} frames, ${(l.confidence*100).toFixed(1)}%`));$('loopInfo').textContent=JSON.stringify(c.loops||[],null,2);render()}
 function range(){const l=$('loop').value,c=clips[current];if(l!==''&&c.loops[Number(l)]){const x=c.loops[Number(l)];return[x.start_frame,x.end_frame_exclusive]}return[0,c.frame_count]}

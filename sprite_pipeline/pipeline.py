@@ -10,6 +10,7 @@ from .extraction import extract_video, digest
 from .imaging import image_rgba, bounds, affine_rgba, save_rgba
 from .calibration import load_master, master_coherence, scan, calibrate
 from .corrections import frame_transforms
+from .scale_audit import audit_scale, require_scale_audit
 from .root_motion import register_in_place
 from .loops import loop_candidates
 from .motion import motion_summary
@@ -94,6 +95,7 @@ def process(config_path, output):
                 'role': clip.get('role'), 'note': clip.get('note', ''),
                 'reference_pose': clip.get('reference_pose', 'idle'), 'frames': []}
         manifest['clips'].append(info)
+        info['scale_audit'] = audit_scale(None, {}, [])
         if info['animation_type'] not in ('stationary', 'translation', 'airborne', 'crouched'):
             raise CalibrationError('animation_type inválido')
         pose = info['reference_pose']
@@ -117,6 +119,8 @@ def process(config_path, output):
             cal = calibrate(frames, masters[pose], height, clip, threshold,
                             allow_scale_drift=clip.get('scale_correction') is not None)
             transforms, correction = frame_transforms(clip, metadata, cal)
+            info['scale_audit'] = audit_scale(clip.get('scale_audit'), metadata, transforms)
+            require_scale_audit(info['scale_audit'])
             transforms, root_motion = register_in_place(clip, metadata, cal, transforms, dest/'raw', background)
         except CalibrationError as error:
             info['rejection_reason'] = str(error)
@@ -200,7 +204,7 @@ def process(config_path, output):
     manifest['review'] = {'visual_approval': False, 'reason': 'Aprovação visual externa obrigatória; execução de testes não aprova arte.'}
     write_json(output/'manifest.json', manifest)
     write_json(output/'calibration-report.json', {k: manifest[k] for k in ('status', 'references', 'master_coherence', 'review')} | {
-        'clips': [{k: c.get(k) for k in ('name', 'status', 'reference_frame', 'reference_similarity', 'metrics', 'scale_per_video', 'scale_mode', 'scale_correction', 'root_motion', 'source_root', 'peer_height_spread', 'rejection_reason', 'frame_warnings')} for c in manifest['clips']]})
+        'clips': [{k: c.get(k) for k in ('name', 'status', 'reference_frame', 'reference_similarity', 'metrics', 'scale_per_video', 'scale_mode', 'scale_correction', 'scale_audit', 'root_motion', 'source_root', 'peer_height_spread', 'rejection_reason', 'frame_warnings')} for c in manifest['clips']]})
     write_json(output/'project.snapshot.json', cfg)
     write_viewer(output, manifest)
     return manifest

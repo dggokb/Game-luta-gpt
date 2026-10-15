@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from sprite_pipeline.calibration import load_master, master_coherence, compare_pose, calibrate
 from sprite_pipeline.corrections import frame_transforms
+from sprite_pipeline.scale_audit import audit_scale, require_scale_audit
 from sprite_pipeline.root_motion import torso_anchor_x, register_anchors
 from sprite_pipeline.imaging import image_rgba, bounds, quality, affine_rgba_region as affine_rgba, save_rgba, border_rgb_color
 from sprite_pipeline.extraction import digest
@@ -137,12 +138,17 @@ def reference_files(character, folder, files, output):
     return {'idle':idle, **({'crouch':crouch} if crouch else {})}, note
 
 
-def process_character(character, source_root, output_root, mappings, annotations):
+def process_character(character, source_root, output_root, mappings, annotations, motion_annotations=None):
     cid = character['id']
     folder, output = source_root/cid, output_root/cid
     marker = output/'complete.json'
+    motion_path = motion_annotations/f'{cid}.json' if motion_annotations else None
+    motion_hash = digest(motion_path) if motion_path and motion_path.exists() else None
     if marker.exists():
-        return json.loads(marker.read_text())
+        cached = json.loads(marker.read_text())
+        if cached.get('motion_annotations_sha256') != motion_hash:
+            raise ValueError(f'Anotações de movimento mudaram para {cid}; use uma pasta de saída nova para reprocessar, sem reaproveitar o lote antigo')
+        return cached
     if output.exists() and any(output.iterdir()):
         raise ValueError(f'Saída parcial existe: {output}; escolha um destino novo')
     output.mkdir(parents=True, exist_ok=True)
@@ -151,7 +157,8 @@ def process_character(character, source_root, output_root, mappings, annotations
                  if f['mime_type'].startswith(('video/','image/'))}
     refs, reference_note = reference_files(cid, folder, files, output)
     if not refs:
-        summary = {'character':cid, 'videos':0, 'frames':0, 'converted':0, 'rejected':[], 'note':reference_note}
+        summary = {'character':cid, 'videos':0, 'frames':0, 'converted':0, 'rejected':[], 'note':reference_note,
+                   'motion_annotations_sha256':motion_hash}
         write_json(marker, summary)
         return summary
     character_background=copy.deepcopy(BACKGROUND)
@@ -170,6 +177,7 @@ def process_character(character, source_root, output_root, mappings, annotations
     else:
         mapping = {'idle':'IDLE','parado':'IDLE','frente':'WALK_FORWARD','tras':'WALK_BACK','walk_back':'WALK_BACK','walk_forward':'WALK_FORWARD','dash':'DASH','backDash':'BACKDASH','correr':'WALK_FORWARD'}
     annotation_doc = json.loads((annotations/f'{cid}.json').read_text()) if (annotations/f'{cid}.json').exists() else None
+    motion_doc = json.loads(motion_path.read_text()) if motion_hash else {}
     segments = annotation_doc.get('segments') if isinstance(annotation_doc,dict) else annotation_doc
     if isinstance(annotation_doc,dict):
         for pose,path in refs.items():
@@ -194,6 +202,7 @@ def process_character(character, source_root, output_root, mappings, annotations
                          correction_applied=True, crouch_scale_to_output=master_scales['crouch'],
                          reason='Uniform scale from explicitly annotated equivalent head segments; never pose height.')
     manifest = {'format_version':4, 'character':cid, 'status':'needs_review', 'canvas':None, 'root':None,
+                'motion_annotations_sha256':motion_hash,
                 'references':{}, 'master_coherence':coherence, 'reference_provenance':reference_note,
                 'review':{'visual_approval':False}, 'clips':[], 'original_sha256':originals,
                 'limitations':['Vertical pose motion remains in previews; integrate engine jump physics explicitly.',
@@ -210,9 +219,14 @@ def process_character(character, source_root, output_root, mappings, annotations
         if not f['mime_type'].startswith('video/'):
             continue
         spec = clip_spec(cid, f, mapping)
+        motion_spec = motion_doc.get('clips', {}).get(spec['name'], {})
+        for field in ('scale_correction', 'scale_audit'):
+            if field in motion_spec:
+                spec[field] = motion_spec[field]
         source = folder/f['name']
         metadata = probe_video(source)
         info = {**spec, **metadata, 'status':'rejected', 'frame_warnings':[], 'loops':[]}
+        info['scale_audit'] = audit_scale(None, {}, [])
         manifest['clips'].append(info)
         background = copy.deepcopy(character_background)
         if metadata['resolution'][0] < 64 or metadata['resolution'][1] < 50:
@@ -269,6 +283,8 @@ def process_character(character, source_root, output_root, mappings, annotations
         info.update(cal, reference_pose=pose)
         try:
             transforms, correction = frame_transforms(spec, metadata, cal)
+            info['scale_audit'] = audit_scale(spec.get('scale_audit'), metadata, transforms)
+            require_scale_audit(info['scale_audit'])
             if spec.get('root_motion'):
                 transforms, motion = register_anchors(anchors,transforms,cal['reference_frame'],metadata['source_sha256'])
                 info['root_motion'] = motion
@@ -335,11 +351,12 @@ def process_character(character, source_root, output_root, mappings, annotations
         'timestamps_changed':False,'full_resolution_pngs_included':False}
     write_json(assets/'manifest.json',manifest)
     write_json(assets/'calibration-report.json',{k:manifest[k] for k in ('character','status','master_coherence','reference_provenance')})
-    write_json(assets/'project.snapshot.json',{'inventory':character,'mappings':mapping,'segments':segments})
+    write_json(assets/'project.snapshot.json',{'inventory':character,'mappings':mapping,'segments':segments,'motion_annotations':motion_doc})
     if evidence:
         contact_sheet(assets/'calibration-comparison.png',evidence,labels,max_column=260)
     render_mobile(manifest, assets)
     summary = {'character':cid,'videos':len(manifest['clips']),
+        'motion_annotations_sha256':motion_hash,
         'frames':sum(c['frame_count'] for c in manifest['clips']),
         'converted':len(jobs),'rejected':[{'clip':c['name'],'reason':c['rejection_reason']} for c in manifest['clips'] if c['status']=='rejected'],
         'in_place_clips':[c['name'] for c in manifest['clips'] if c['status']!='rejected' and c.get('root_motion')],
@@ -356,13 +373,14 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--mappings',type=Path,required=True)
     parser.add_argument('--annotations',type=Path,required=True)
+    parser.add_argument('--motion-annotations',type=Path,default=ROOT/'examples/collection/motion-landmarks')
     parser.add_argument('--characters',nargs='*')
     args=parser.parse_args()
     inventory=json.loads(args.inventory.read_text())
     for character in inventory:
         if args.characters and character['id'] not in args.characters:
             continue
-        summary=process_character(character,args.inputs,args.output,args.mappings,args.annotations)
+        summary=process_character(character,args.inputs,args.output,args.mappings,args.annotations,args.motion_annotations)
         print(json.dumps({'complete':summary},ensure_ascii=False),flush=True)
 
 

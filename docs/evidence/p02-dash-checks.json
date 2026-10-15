@@ -1,0 +1,21 @@
+{
+  "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+  "original_frames": 97,
+  "exported_pngs": 194,
+  "pts_equal": true,
+  "before_maximum_head_growth_fraction": 0.24481593998339446,
+  "after_maximum_absolute_heldout_head_error_fraction": 0.05281113808365534,
+  "checkpoint_count": 26,
+  "head_holdouts": 8,
+  "shoulder_controls": 5,
+  "first_and_last_png_pixels_unchanged": true,
+  "preview_vs_png_mean_rgb_errors": {
+    "folder/dash_antes": 0.5915685296058655,
+    "folder/dash_corrigido": 0.5918897986412048,
+    "single/dash_antes": 0.5915685296058655,
+    "single/dash_corrigido": 0.5918897986412048
+  },
+  "page_errors": [],
+  "external_or_failed_requests": [],
+  "full_frame_anatomical_validation": false
+}

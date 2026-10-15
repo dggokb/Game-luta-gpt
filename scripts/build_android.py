@@ -13,6 +13,8 @@ import secrets
 import shutil
 import subprocess
 import zipfile
+import re
+import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -24,7 +26,8 @@ def run(command, env=None):
     return result.stdout+result.stderr
 
 
-def build(assets, android_jar, build_tools, output, work, *, signing_key=None, signing_password_file=None):
+def build(assets, android_jar, build_tools, output, work, *, signing_key=None, signing_password_file=None,
+          application_id=None, application_label=None):
     assets,android_jar,build_tools,output,work=[Path(p).resolve() for p in (assets,android_jar,build_tools,output,work)]
     if output.exists():raise ValueError('Use um nome de APK ainda inexistente')
     if work.exists() and any(work.iterdir()):raise ValueError('Use uma pasta de compilação nova ou vazia')
@@ -44,9 +47,29 @@ def build(assets, android_jar, build_tools, output, work, *, signing_key=None, s
                 if key in f and not (assets/f[key]).is_file():raise ValueError(f'Frame ausente: {f[key]}')
     work.mkdir(parents=True,exist_ok=True)
     output.parent.mkdir(parents=True,exist_ok=True)
+    manifest_path=ROOT/'android/AndroidManifest.xml'
+    document=ET.parse(manifest_path);root=document.getroot()
+    original_package=root.attrib['package']
+    namespace='{http://schemas.android.com/apk/res/android}'
+    if application_id is not None:
+        if not re.fullmatch(r'[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+',application_id):
+            raise ValueError('application_id inválido')
+        root.set('package',application_id)
+        # Java stays in its original package; qualify relative component names.
+        for element in root.iter():
+            name=element.get(namespace+'name')
+            if name and name.startswith('.'):
+                element.set(namespace+'name',original_package+name)
+    if application_label is not None:
+        if not application_label.strip():raise ValueError('application_label vazio')
+        root.find('application').set(namespace+'label',application_label)
+    package_name=root.attrib['package']
+    if application_id is not None or application_label is not None:
+        manifest_path=work/'AndroidManifest.xml'
+        document.write(manifest_path,encoding='utf-8',xml_declaration=True)
     run([build_tools/'aapt2','compile','--dir',ROOT/'android/res','-o',work/'resources.zip'])
     run([build_tools/'aapt2','link','-o',work/'unsigned.apk','-I',android_jar,
-         '--manifest',ROOT/'android/AndroidManifest.xml','-A',assets,work/'resources.zip'])
+         '--manifest',manifest_path,'-A',assets,work/'resources.zip'])
     classes=work/'classes';classes.mkdir()
     compiler=run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-bootclasspath',android_jar,
                   '-d',classes,ROOT/'android/src/org/spriteviewer/offline/MainActivity.java'])
@@ -85,7 +108,7 @@ def build(assets, android_jar, build_tools, output, work, *, signing_key=None, s
         assert sum(len(c['frames']) for c in bundled['clips'])==expected
         assert 'classes.dex' in archive.namelist()
     report={'apk':output.name,'bytes':output.stat().st_size,'sha256':hashlib.sha256(output.read_bytes()).hexdigest(),
-            'application_id':'org.spriteviewer.offline','minimum_android':'8.0 (API 26)',
+            'application_id':package_name,'minimum_android':'8.0 (API 26)',
             'offline':True,'requested_permissions':[],'clips':len(manifest['clips']),'frames':expected,
             'signature_verification':signature,'badging':badging,'compiler_notes':compiler,
             'tested_on_physical_device':False,'mobile_browser_tested_separately':True,
@@ -100,8 +123,10 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--assets',type=Path,required=True);p.add_argument('--android-jar',type=Path,required=True)
     p.add_argument('--build-tools',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--work',type=Path,required=True)
     p.add_argument('--signing-key',type=Path);p.add_argument('--signing-password-file',type=Path)
+    p.add_argument('--application-id');p.add_argument('--application-label')
     args=p.parse_args();build(args.assets,args.android_jar,args.build_tools,args.output,args.work,
-                            signing_key=args.signing_key,signing_password_file=args.signing_password_file)
+                            signing_key=args.signing_key,signing_password_file=args.signing_password_file,
+                            application_id=args.application_id,application_label=args.application_label)
 
 
 if __name__=='__main__':main()

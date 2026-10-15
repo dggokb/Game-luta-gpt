@@ -1,5 +1,7 @@
 # Visualizador offline para Android
 
+Há um [APK separado de revisão do dash da P02](../docs/REVISAO-P02-DASH.md), com comparação antes/depois de uma correção experimental de tamanho durante a ação. O visualizador completo 1.5 ainda contém a variação confirmada nesse movimento.
+
 [Baixar o APK com todos os personagens](https://github.com/dggokb/Game-luta-gpt/releases/download/sprites-preview-1.5-20261015/sprites-todos-personagens.apk).
 
 Android 8.0 ou superior, com Android System WebView atualizado. Baixe o arquivo pelo navegador do celular, abra-o e toque em **Instalar**. Se o Android pedir, permita a instalação pelo navegador utilizado.

@@ -1,5 +1,7 @@
 # Todos os personagens — processamento das fontes existentes
 
+**Pendência confirmada após a entrega 1.5:** o [dash da P02 aumenta de tamanho durante a ação](REVISAO-P02-DASH.md). A calibração por Idle não verificava as demais poses. Os 330 convertidos continuam sendo saídas para revisão; esse número não comprova tamanho corporal estável durante todos os movimentos.
+
 Inventário da pasta de animações do Drive em 15/10/2026: **418 vídeos** nas pastas P01–P13, Dafu, Takatoshi e capangas. P14, P15 e P16 têm somente imagens. Nenhuma animação é criada para preencher essas ausências.
 
 Cada personagem usa sua própria referência. O processo compara poses equivalentes, conserva todos os timestamps, produz PNGs normalizados em resolução integral e registra as matrizes de cada frame. Andar e dash usam `in_place_x`; a translação removida fica no manifesto. Vídeos que não oferecem uma calibração segura ficam rejeitados com o motivo explícito e com a fonte acessível em Antes.

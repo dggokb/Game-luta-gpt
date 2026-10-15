@@ -1,0 +1,760 @@
+{
+  "character": "p02",
+  "clips": {
+    "dash": {
+      "source_name": "dash.mp4",
+      "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+      "note": "Approximate manual source-pixel landmarks, including active dash poses. Crown follows the cranium, excluding outward flowing hair. Shoulder centers are secondary controls; projection/annotation uncertainty remains. Eight head checkpoints are withheld from the correction curve. Not automatic anatomical detection or full-frame approval.",
+      "scale_correction": {
+        "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+        "segment_name": "approximate_cranium_to_chin",
+        "maximum_change_fraction": 0.2,
+        "keyframes": [
+          {
+            "frame": 0,
+            "points": [
+              [
+                626,
+                262
+              ],
+              [
+                647,
+                335
+              ]
+            ]
+          },
+          {
+            "frame": 4,
+            "points": [
+              [
+                618,
+                311
+              ],
+              [
+                624,
+                387
+              ]
+            ]
+          },
+          {
+            "frame": 8,
+            "points": [
+              [
+                580,
+                346
+              ],
+              [
+                587,
+                422
+              ]
+            ]
+          },
+          {
+            "frame": 10,
+            "points": [
+              [
+                700,
+                285
+              ],
+              [
+                717,
+                375
+              ]
+            ]
+          },
+          {
+            "frame": 12,
+            "points": [
+              [
+                713,
+                281
+              ],
+              [
+                739,
+                368
+              ]
+            ]
+          },
+          {
+            "frame": 16,
+            "points": [
+              [
+                752,
+                261
+              ],
+              [
+                782,
+                347
+              ]
+            ]
+          },
+          {
+            "frame": 20,
+            "points": [
+              [
+                744,
+                261
+              ],
+              [
+                774,
+                350
+              ]
+            ]
+          },
+          {
+            "frame": 24,
+            "points": [
+              [
+                751,
+                262
+              ],
+              [
+                779,
+                349
+              ]
+            ]
+          },
+          {
+            "frame": 28,
+            "points": [
+              [
+                753,
+                263
+              ],
+              [
+                780,
+                347
+              ]
+            ]
+          },
+          {
+            "frame": 32,
+            "points": [
+              [
+                748,
+                263
+              ],
+              [
+                777,
+                351
+              ]
+            ]
+          },
+          {
+            "frame": 36,
+            "points": [
+              [
+                747,
+                269
+              ],
+              [
+                775,
+                350
+              ]
+            ]
+          },
+          {
+            "frame": 40,
+            "points": [
+              [
+                750,
+                263
+              ],
+              [
+                780,
+                346
+              ]
+            ]
+          },
+          {
+            "frame": 42,
+            "points": [
+              [
+                699,
+                245
+              ],
+              [
+                723,
+                316
+              ]
+            ]
+          },
+          {
+            "frame": 44,
+            "points": [
+              [
+                689,
+                237
+              ],
+              [
+                711,
+                318
+              ]
+            ]
+          },
+          {
+            "frame": 48,
+            "points": [
+              [
+                623,
+                261
+              ],
+              [
+                647,
+                335
+              ]
+            ]
+          },
+          {
+            "frame": 60,
+            "points": [
+              [
+                628,
+                264
+              ],
+              [
+                650,
+                335
+              ]
+            ]
+          },
+          {
+            "frame": 80,
+            "points": [
+              [
+                625,
+                265
+              ],
+              [
+                648,
+                334
+              ]
+            ]
+          },
+          {
+            "frame": 96,
+            "points": [
+              [
+                626,
+                262
+              ],
+              [
+                647,
+                335
+              ]
+            ]
+          }
+        ]
+      },
+      "scale_audit": {
+        "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+        "reference_frame": 0,
+        "tolerance_fraction": 0.06,
+        "segment_tolerances": {
+          "shoulder_span": 0.12
+        },
+        "required_phases": [
+          "idle_start",
+          "anticipation",
+          "dash",
+          "recovery",
+          "idle_end"
+        ],
+        "checkpoints": [
+          {
+            "frame": 0,
+            "phase": "idle_start",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  626,
+                  262
+                ],
+                [
+                  647,
+                  335
+                ]
+              ],
+              "shoulder_span": [
+                [
+                  595,
+                  346
+                ],
+                [
+                  663,
+                  355
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 4,
+            "phase": "anticipation",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  618,
+                  311
+                ],
+                [
+                  624,
+                  387
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 8,
+            "phase": "anticipation",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  580,
+                  346
+                ],
+                [
+                  587,
+                  422
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 10,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  700,
+                  285
+                ],
+                [
+                  717,
+                  375
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 12,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  713,
+                  281
+                ],
+                [
+                  739,
+                  368
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 14,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  753,
+                  260
+                ],
+                [
+                  781,
+                  344
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 16,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  752,
+                  261
+                ],
+                [
+                  782,
+                  347
+                ]
+              ],
+              "shoulder_span": [
+                [
+                  699,
+                  337
+                ],
+                [
+                  776,
+                  362
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 18,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  756,
+                  260
+                ],
+                [
+                  779,
+                  350
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 20,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  744,
+                  261
+                ],
+                [
+                  774,
+                  350
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 22,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  757,
+                  261
+                ],
+                [
+                  782,
+                  347
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 24,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  751,
+                  262
+                ],
+                [
+                  779,
+                  349
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 26,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  752,
+                  258
+                ],
+                [
+                  781,
+                  348
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 28,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  753,
+                  263
+                ],
+                [
+                  780,
+                  347
+                ]
+              ],
+              "shoulder_span": [
+                [
+                  704,
+                  335
+                ],
+                [
+                  780,
+                  358
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 30,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  752,
+                  263
+                ],
+                [
+                  783,
+                  349
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 32,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  748,
+                  263
+                ],
+                [
+                  777,
+                  351
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 34,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  745,
+                  268
+                ],
+                [
+                  777,
+                  347
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 36,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  747,
+                  269
+                ],
+                [
+                  775,
+                  350
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 38,
+            "phase": "dash",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  748,
+                  263
+                ],
+                [
+                  779,
+                  348
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 40,
+            "phase": "dash",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  750,
+                  263
+                ],
+                [
+                  780,
+                  346
+                ]
+              ],
+              "shoulder_span": [
+                [
+                  698,
+                  333
+                ],
+                [
+                  772,
+                  357
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 42,
+            "phase": "recovery",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  699,
+                  245
+                ],
+                [
+                  723,
+                  316
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 44,
+            "phase": "recovery",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  689,
+                  237
+                ],
+                [
+                  711,
+                  318
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 46,
+            "phase": "recovery",
+            "purpose": "holdout",
+            "segments": {
+              "head_axis": [
+                [
+                  624,
+                  248
+                ],
+                [
+                  650,
+                  326
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 48,
+            "phase": "idle_end",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  623,
+                  261
+                ],
+                [
+                  647,
+                  335
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 60,
+            "phase": "idle_end",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  628,
+                  264
+                ],
+                [
+                  650,
+                  335
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 80,
+            "phase": "idle_end",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  625,
+                  265
+                ],
+                [
+                  648,
+                  334
+                ]
+              ]
+            }
+          },
+          {
+            "frame": 96,
+            "phase": "idle_end",
+            "purpose": "correction_key",
+            "segments": {
+              "head_axis": [
+                [
+                  626,
+                  262
+                ],
+                [
+                  647,
+                  335
+                ]
+              ],
+              "shoulder_span": [
+                [
+                  595,
+                  346
+                ],
+                [
+                  663,
+                  355
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

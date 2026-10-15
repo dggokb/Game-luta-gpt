@@ -1,0 +1,16 @@
+{
+  "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+  "apk": {
+    "url": "https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-p02-dash-teste.apk",
+    "bytes": 5876422,
+    "sha256": "9ef8c496954789565ec6db18be2b7335b126488f65d2e276c09006e4b9f08686",
+    "application_id": "org.spriteviewer.p02review"
+  },
+  "review_zip": {
+    "url": "https://drive.google.com/file/d/1igx60I8nuW-yHxNpjO1PHRPp1BX52NTq/view",
+    "drive_file_id": "1igx60I8nuW-yHxNpjO1PHRPp1BX52NTq",
+    "bytes": 36227084,
+    "sha256": "81d5b96432711ea17b10c47c341f0f38065a18539efa7cfafdb7443ecfdd2cd5"
+  },
+  "scope": "P02 dash only; the full collection APK 1.5 remains unchanged. Approximate manual checkpoints, not full-frame anatomical approval."
+}
