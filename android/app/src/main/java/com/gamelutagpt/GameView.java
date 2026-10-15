@@ -120,6 +120,8 @@ public class GameView extends SurfaceView
     private static final float SUPER_FLASH_DURATION = 0.12f;
     private static final float SUPER_RELEASE_DURATION = 0.20f;
     private static final float SUPER_RECOVER_DURATION = 0.22f;
+    /** A cinemática do Super corpo a corpo toca mais rápido (as pancadas vêm logo depois do flash). */
+    private static final float STRIKING_SUPER_CINEMATIC_SPEED = 2.4f;
     private float superCameraZoom = 1f;
     private int superDarkAlpha = 0;
     private int superFlashAlpha = 0;
@@ -1249,6 +1251,9 @@ public class GameView extends SurfaceView
             return;
         }
         float t = superElapsed();
+        // Super que bate corpo a corpo: a cinemática passa no tempo do flash (o rival já está
+        // livre) e a câmera abre para a sequência de pancadas aparecer inteira.
+        if (player().attack.melee()) t *= STRIKING_SUPER_CINEMATIC_SPEED;
         float poseStart = SUPER_DARKEN_DURATION;
         float flashStart = poseStart + SUPER_POSE_DURATION;
         float releaseStart = flashStart + SUPER_FLASH_DURATION;

@@ -121,11 +121,15 @@ final class CombatConfig {
     float ultraKnockback = 420f;
     /** Ultra em sequência: pausa de impacto de cada golpe e do último (o que lança). */
     int ultraSequenceHitstop = 4;
-    /** Super that strikes (no wave): the freeze is only the flash. */
-    int strikingSuperFreezeFrames = 18;
+    /** Super that strikes (no wave): frames left to react between the freeze and its first strike. */
+    int strikingSuperReactFrames = 6;
     /** Several-strike move: frames of hitstun past the next strike, and the push of the strikes before the last. */
     int strikeHoldFrames = 8;
     float strikeHoldPushback = 0.2f;
+    /** Upward speed given to an airborne defender by a strike before the last (stays in reach). */
+    float strikeHoldLift = 260f;
+    /** An advancing move stops this close to the opponent's body (px past the pushboxes). */
+    float advanceContactSlack = 6f;
     int ultraSequenceFinalHitstop = 12;
     // Final beam (after the cinematic): a charge ("ka-me-ha-me"), then the beam reaches the
     // defender, hits every few frames (the combo counter climbs) and the blast throws the

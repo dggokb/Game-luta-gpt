@@ -537,4 +537,45 @@ public class MechanicsTest {
             assertTrue("no wave", s.engine.superProjectiles.isEmpty());
         }
     }
+
+    @Test public void aGuardHoldsEveryStrikeAndStaysInReach() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 600f);
+        s.in[1].direction = 1;            // back for the dummy on the right
+        s.in[0].special = "S2";
+        int blocked = 0;
+        for (int i = 0; i < 120; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && e.blocked) blocked++;
+        }
+        assertEquals("each strike meets the guard", 3, blocked);
+        assertEquals("guard meter once per move",
+            CombatRules.superGainOnGuard(GeneratedCharacters.get("p03").attack("S2").strength), s.f(1).state.superMeter);
+    }
+
+    @Test public void aSeveralStrikeMoveGivesTheMeterOfOneMove() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 600f);
+        s.in[0].special = "S2";
+        int hits = 0;
+        for (int i = 0; i < 120; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
+        }
+        assertEquals(3, hits);
+        assertEquals(CombatRules.superGainOnHit(GeneratedCharacters.get("p03").attack("S2").strength),
+            s.f(0).state.superMeter);
+    }
+
+    @Test public void anAdvancingSuperStopsAtTheOpponentInsteadOfShovingIt() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p10"), BASE, 500f, 640f);
+        s.f(0).state.superMeter = CombatConfig.MAX_METER;
+        s.in[0].superAttack = true;
+        float start = s.f(1).x;
+        int hits = 0, strikes = GeneratedCharacters.get("p10").attack("SUPER").maxHits;
+        for (int i = 0; i < 200 && hits < strikes - 1; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
+        }
+        assertEquals("every strike but the last landed", strikes - 1, hits);
+        assertTrue("held in front, not shoved across the stage: moved " + (s.f(1).x - start), s.f(1).x - start < 50f);
+    }
 }
