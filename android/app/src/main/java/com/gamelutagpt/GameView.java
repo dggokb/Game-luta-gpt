@@ -1789,7 +1789,7 @@ public class GameView extends SurfaceView
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
             drawDamageDummy(canvas);
-            effects.drawEnergyProjectiles(canvas, paint, engine.energyProjectiles);
+            effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
             effects.drawSuperProjectiles(canvas, paint, engine.superProjectiles);
             if (isSuperCinematicActive()) {
                 effects.drawWorldOverlay(canvas, paint, superDarkAlpha, 0, 0, 8);

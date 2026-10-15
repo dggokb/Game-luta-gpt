@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
+import com.gamelutagpt.efeitos.ProjetilVisual;
+import com.gamelutagpt.render.RenderCanvas;
 import java.util.List;
 
 /** Projectiles and Super cinematic overlays, drawn in world space. */
@@ -29,9 +31,28 @@ final class EffectsRenderer {
         return shader;
     }
 
-    void drawEnergyProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {
-        // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
-        for (Projectile projectile : projectiles) drawOrb(c, projectile, 20f * projectile.radius / 24f, false);
+    /**
+     * S1 em voo. A onda é a bola de energia daqui; os outros desenhos (palma, kunai, sombra,
+     * chicote...) vêm do ProjetilVisual, o mesmo do visualizador no PC. {@code rc} já desenha
+     * no mesmo {@code c}, com a câmera do mundo.
+     */
+    void drawEnergyProjectiles(Canvas c, RenderCanvas rc, List<Projectile> projectiles) {
+        for (Projectile p : projectiles) {
+            // A charged shot is bigger: the orb follows the projectile's own radius (24 at rest).
+            float scale = p.radius / 24f;
+            if (p.visual == null || "ONDA".equals(p.visual)) {
+                drawOrb(c, p, 20f * scale, false);
+            } else if ("ONDA_CURTA".equals(p.visual)) {
+                drawOrb(c, p, 13f * scale, false);
+            } else {
+                float time = Math.abs(p.x - p.startX) / Math.max(1f, p.speed);
+                ProjetilVisual.Tipo tipo = ProjetilVisual.Tipo.valueOf(p.visual);
+                // A sombra se desenha a partir do chão; o projétil dela voa rente, logo acima.
+                float y = tipo == ProjetilVisual.Tipo.SOMBRA ? Arena.GROUND_Y : p.y;
+                ProjetilVisual.draw(rc, tipo, p.x, y, p.direction,
+                    p.startX, p.range, time, p.color);
+            }
+        }
     }
 
     void drawSuperProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {

@@ -62,7 +62,8 @@
           }
         }
       },
-      "nome": "Onda"
+      "nome": "Onda",
+      "visual": "ONDA"
     },
     "super": {
       "damage": 3200,

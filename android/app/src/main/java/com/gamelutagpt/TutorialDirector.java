@@ -221,8 +221,11 @@ final class TutorialDirector {
         if (character.fighter.energy != null) {
             int[] command = character.fighter.energyCommand;
             boolean hold = character.fighter.energyHold;
-            out.add(new Lesson("ESPECIAL DE ENERGIA", commandText(command, hold, false) + " + {L}, {M} ou {H}: lança energia", 1, false,
-                c -> c.placeApart(160f), null,
+            // O S1 de alguns é corpo a corpo (tapa do p07, investida do p12): treina de perto.
+            boolean melee = character.fighter.energy.attack.melee();
+            out.add(new Lesson("ESPECIAL DE ENERGIA", commandText(command, hold, false) + " + {L}, {M} ou {H}: "
+                + (melee ? "golpe especial de perto" : "lança energia"), 1, false,
+                melee ? close : c -> c.placeApart(160f), null,
                 c -> c.doing("S"),
                 (c, p1) -> special(c, p1, command, hold, false, "M")));
         }

@@ -56,7 +56,8 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Machadinho"
+      "nome": "Machadinho",
+      "visual": "MACHADINHO"
     },
     "super": {
       "damage": 2720,

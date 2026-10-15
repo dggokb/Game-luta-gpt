@@ -1252,7 +1252,8 @@ final class CombatEngine {
 
     private static boolean guardStops(int guard, AttackDefinition attack, boolean attackerAirborne, boolean projectile) {
         if (guard == CombatFighter.GUARD_NONE) return false;
-        if (projectile) return true;
+        // Projétil baixo (a sombra do p06, rente ao chão): só a defesa agachada para.
+        if (projectile) return guard != CombatFighter.GUARD_HIGH || !attack.low;
         if (guard == CombatFighter.GUARD_HIGH) return !attack.low;
         if (guard == CombatFighter.GUARD_LOW) return !attackerAirborne;
         return true;
@@ -1275,7 +1276,7 @@ final class CombatEngine {
 
     private static boolean projectileThreat(List<Projectile> projectiles, CombatFighter f, float margin) {
         for (Projectile p : projectiles) {
-            if (p.ownerIndex != f.index && (f.x - p.x) * p.direction >= -margin) return true;
+            if (p.ownerIndex != f.index && !p.returning && (f.x - p.x) * p.direction >= -margin) return true;
         }
         return false;
     }
@@ -1371,9 +1372,11 @@ final class CombatEngine {
             if (f.charged()) cues.add("CHARGED");
         }
         float height = superKind ? data.spawnHeight(false, !f.grounded) : data.spawnHeight(f.crouching, !f.grounded);
+        // Projétil baixo (sombra): corre colado no chão, mesmo lançado do alto.
+        float base = !superKind && f.attack.low ? Arena.GROUND_Y : f.y;
         Projectile p = new Projectile(
-            f.x + f.facing * data.spawnX, f.y - height, range, speed,
-            radius, damage, profile.color, f.index, f.facing, f.attack);
+            f.x + f.facing * data.spawnX, base - height, range, speed,
+            radius, damage, profile.color, f.index, f.facing, f.attack, superKind ? null : profile.energyVisual);
         (superKind ? superProjectiles : energyProjectiles).add(p);
     }
 
@@ -1386,13 +1389,25 @@ final class CombatEngine {
         moveProjectiles(superProjectiles, 180f);
     }
 
+    /** Velocidade da volta do chicote, em vezes a da ida. */
+    private static final float RETRACT_SPEED = 1.6f;
+
     private static void moveProjectiles(List<Projectile> projectiles, float margin) {
         Iterator<Projectile> it = projectiles.iterator();
         while (it.hasNext()) {
             Projectile p = it.next();
             p.previousX = p.x;
+            if (p.returning) {
+                // O chicote recolhe mais rápido do que estica e some ao chegar na mão.
+                p.x -= RETRACT_SPEED * p.speed * p.direction * CombatConfig.DT;
+                if ((p.x - p.startX) * p.direction <= 0f) it.remove();
+                continue;
+            }
             p.x += p.speed * p.direction * CombatConfig.DT;
-            if (Math.abs(p.x - p.startX) >= p.range ||
+            if (Math.abs(p.x - p.startX) >= p.range && p.retracts()) {
+                p.x = p.startX + p.direction * p.range;
+                p.returning = true;
+            } else if (Math.abs(p.x - p.startX) >= p.range ||
                 p.x > Arena.RIGHT_BOUND + margin || p.x < Arena.LEFT_BOUND - margin) {
                 it.remove();
             }
@@ -1439,13 +1454,14 @@ final class CombatEngine {
 
     /**
      * The defender's move slips this strike: a dodge under standing/air strikes and
-     * projectiles (HIGH), or a vanish that nothing touches (ANY). Low strikes still hit a HIGH dodge.
+     * projectiles (HIGH), or a vanish that nothing touches (ANY). Low strikes and low projectiles still hit a HIGH dodge.
      */
     private static boolean evades(CombatFighter d, AttackDefinition attack, boolean airborneAttacker, boolean projectile) {
         AttackDefinition.Mechanics m = d.mechanics();
         if (!m.evadeAt(d.attackFrame)) return false;
         if (m.evade == AttackDefinition.Reads.ANY) return true;
-        return projectile || airborneAttacker || !attack.low;
+        if (projectile) return !attack.low;
+        return airborneAttacker || !attack.low;
     }
 
     /** The counter stance reads this melee strike (high = standing and air strikes, low = low strikes). */
@@ -1477,12 +1493,14 @@ final class CombatEngine {
         Iterator<Projectile> it = projectiles.iterator();
         while (it.hasNext()) {
             Projectile p = it.next();
+            if (p.returning) continue;
             CombatFighter d = fighters[1 - p.ownerIndex];
             // An evading body lets the projectile fly on.
             if (!d.hittable() || evades(d, p.attack, false, true)) continue;
             if (CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), d.crouchingBody())) {
                 addContact(fighters[p.ownerIndex], d, p.attack, -1, p);
-                it.remove();
+                if (p.retracts()) p.returning = true;
+                else it.remove();
             }
         }
     }

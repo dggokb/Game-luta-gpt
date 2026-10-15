@@ -56,7 +56,8 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Soco de impacto"
+      "nome": "Soco de impacto",
+      "visual": "ESTOURO"
     },
     "super": {
       "damage": 3360,

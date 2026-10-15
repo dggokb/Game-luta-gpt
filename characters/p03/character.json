@@ -56,7 +56,8 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Onda curta"
+      "nome": "Onda curta",
+      "visual": "ONDA_CURTA"
     },
     "super": {
       "damage": 3200,

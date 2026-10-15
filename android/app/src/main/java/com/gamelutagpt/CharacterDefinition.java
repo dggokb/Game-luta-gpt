@@ -225,6 +225,9 @@ final class CharacterDefinition {
         String energyName;
         boolean energyHold;
         Fighter withEnergyCommand(String name,boolean hold) { energyName=name; energyHold=hold; return this; }
+        /** Desenho do projétil do S1 (ProjetilVisual.Tipo); null = a bola de energia padrão. */
+        String energyVisual;
+        Fighter withEnergyVisual(String visual) { energyVisual=visual; return this; }
         /** Fury: extra damage, in permille, when the life is all gone (it grows as life is lost). */
         int furyPermille;
         /** Air dashes per jump (the engine default is one). */

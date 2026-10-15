@@ -32,8 +32,8 @@
       "crouchSpawnY": 63,
       "attack": {
         "startupFrames": 10,
-        "activeFrames": 1,
-        "recoveryFrames": 18,
+        "activeFrames": 4,
+        "recoveryFrames": 15,
         "hitstunFrames": 31,
         "blockstunFrames": 25,
         "hitstopFrames": 6,
@@ -55,8 +55,26 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50,
         "mecanica": {
-          "custoVida": 150
-        }
+          "custoVida": 150,
+          "avanco": {
+            "velocidade": 520,
+            "frames": [
+              0,
+              13
+            ]
+          }
+        },
+        "corpoBase": {
+          "startupFrames": 10,
+          "activeFrames": 1,
+          "recoveryFrames": 18,
+          "hitstunFrames": 31,
+          "blockstunFrames": 25
+        },
+        "reach": 120,
+        "hitHeight": 130,
+        "launchType": "none",
+        "knockback": 80
       },
       "nome": "Investida",
       "segurar": true

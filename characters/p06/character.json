@@ -29,8 +29,8 @@
         5
       ],
       "spawnX": 66,
-      "spawnY": 86,
-      "crouchSpawnY": 68,
+      "spawnY": 14,
+      "crouchSpawnY": 14,
       "attack": {
         "startupFrames": 10,
         "activeFrames": 1,
@@ -54,9 +54,12 @@
         ],
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
-        "pushbackOnBlock": 50
+        "pushbackOnBlock": 50,
+        "low": true
       },
-      "nome": "Sombra rastejante"
+      "nome": "Sombra rastejante",
+      "airSpawnY": 14,
+      "visual": "SOMBRA"
     },
     "super": {
       "damage": 2720,

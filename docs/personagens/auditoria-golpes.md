@@ -163,8 +163,9 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 As animações dos Supers, Ultras e especiais **já mostram** o golpe da ficha (vieram dos prompts
 da ficha). O que falta é o jogo fazer o que a animação mostra:
 
-1. **S1 por tipo:** projétil com visual próprio (kunai, shuriken, machado girando, bisturi,
-   chicote, sombra rasteira, estouro no punho, palma) e S1 corpo a corpo no p07 e na p12.
+1. ~~**S1 por tipo:** projétil com visual próprio (kunai, shuriken, machado girando, bisturi,
+   chicote, sombra rasteira, estouro no punho, palma) e S1 corpo a corpo no p07 e na p12.~~
+   (feito 15/10, menos a shuriken, que é o S2 do p05 e fica com o item 5)
 2. **Golpes de vários acertos:** cada acerto onde a animação bate (rekka do p03, uppercut do
    p03, Supers de sequência).
 3. **Super por tipo:** sequência corpo a corpo que avança (a maioria), onda multi-hit (p01),
@@ -233,3 +234,27 @@ entre elas, as do meio só seguram o rival até a próxima e a última aplica o 
 
 Avançam como na animação: S4 do p01, p02, p04, p06, p08 e p12, e os Supers corpo a corpo.
 Continuam com onda: p01 (Onda), p09 (fogo pelo chão) e p11 (arremesso); o p07 chama os capangas.
+
+## S1 por tipo (15/10)
+
+Cada S1 tem o próprio desenho (`ProjetilVisual`, no ultra-core; o mesmo no PC com
+`gradle :pc-preview:runProjeteis`). Os dados ficam no bloco "s1" de `tools/sprites/mecanicas.json`.
+
+| | S1 no jogo |
+|---|---|
+| p01 | Onda (a bola de energia de antes) |
+| p02 | Palma translúcida, alcance curto |
+| p03 | Onda curta: bola menor, rastro curto |
+| p04 | Estouro em leque logo na frente do punho (alcance bem curto) |
+| p05 | Kunai |
+| p06 | Sombra que corre colada no chão: golpe **baixo**, só a defesa agachada segura (nem a esquiva alta passa) |
+| p07 | **Tapa de luva corpo a corpo**: bate de perto e derruba |
+| p08 | Chicote: estica da mão até o alcance e volta; acerta uma vez, na ida |
+| p09 | Machado de bombeiro girando |
+| p10 | Machadinha girando rápido |
+| p11 | Bisturi |
+| p12 | **Investida baixa corpo a corpo**: avança e bate, e continua custando vida |
+
+A CPU usa o S1 pelo alcance dele: os corpo a corpo só de perto, os curtos (p02, p04) só de meia
+distância.
+
