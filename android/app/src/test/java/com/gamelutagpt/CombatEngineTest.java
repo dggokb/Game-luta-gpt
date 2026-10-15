@@ -621,7 +621,8 @@ public class CombatEngineTest {
 
         Sim air = close();
         air.f(1).grounded = false;
-        air.f(1).y = Arena.GROUND_Y - 40f;
+        // Alto o bastante para ainda estar no ar quando o H (10 quadros de preparo) chega.
+        air.f(1).y = Arena.GROUND_Y - 120f;
         air.in[1].direction = 1;
         air.in[0].heavy = true;
         air.step();

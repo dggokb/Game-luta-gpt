@@ -26,6 +26,8 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'
+    // org.json de verdade nos testes sem Robolectric: o do android.jar é só esqueleto e dá erro.
+    testImplementation 'org.json:json:20240303'
     testImplementation 'org.robolectric:robolectric:4.14.1'
 }
 

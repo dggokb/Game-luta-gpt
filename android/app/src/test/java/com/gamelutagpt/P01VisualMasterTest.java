@@ -28,19 +28,34 @@ public class P01VisualMasterTest {
         checked.add(atlas);
     }
 
+    /**
+     * Calibração antes do ajuste de tamanho feito no app (8565e3e9): o gerador multiplica cada
+     * folha pelo fator {@code tuned}, e estas regras valem para o valor de antes do fator.
+     */
+    private static float[] base(String atlas,int frame) {
+        float[] v=P01SpriteCalibration.get(atlas,frame);
+        float f=P01SpriteCalibration.tuned(atlas);
+        return new float[]{v[0]/f,v[1]/f};
+    }
+
     @Test public void excessiveDashJumpAndVictorySizesAreReduced() {
         assertEquals("Dash visually grows by 15% from v0.97 in X",
-                     .8395f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
+                     .8395f,base("player_base_dash",0)[0],.001f);
         assertEquals("Dash visually grows by 15% from v0.97 in Y",
-                     1.10975f,P01SpriteCalibration.get("player_base_dash",0)[1],.001f);
-        assertTrue("Jump start must shrink",P01SpriteCalibration.get("player_base_jump",0)[1]<.90f);
+                     1.10975f,base("player_base_dash",0)[1],.001f);
+        assertTrue("Jump start must shrink",base("player_base_jump",0)[1]<.90f);
         assertEquals("Victory compromise between previous oversized and undersized",
-                     .880f,P01SpriteCalibration.get("player_base_victory",15)[1],.001f);
+                     .880f,base("player_base_victory",15)[1],.001f);
         assertTrue("2H raised pose must stay visibly tall",
-                   P01SpriteCalibration.get("player_base_crouch_heavy",4)[1]>.73f);
+                   base("player_base_crouch_heavy",4)[1]>.73f);
         assertTrue("2H torso must keep idle-like width",
-                   P01SpriteCalibration.get("player_base_crouch_heavy",4)[0]>.88f);
+                   base("player_base_crouch_heavy",4)[0]>.88f);
         assertTrue("Medium crouch must be scaled",
-                   P01SpriteCalibration.get("player_base_crouch_medium",6)[1]<.96f);
+                   base("player_base_crouch_medium",6)[1]<.96f);
+    }
+
+    @Test public void appSizeAdjustmentIsAppliedOnTopOfTheCalibration() {
+        float f=P01SpriteCalibration.tuned("player_base_dash");
+        assertEquals(.8395f*f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
     }
 }
