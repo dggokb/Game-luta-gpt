@@ -71,6 +71,8 @@ final class CombatFighter {
     int autoStep = -1;
     int hitsOnTarget;
     long hitboxMask;
+    /** Several-strike move: a strike already hit / was guarded / paid the juggle (once per move). */
+    boolean strikeLanded, strikeBlocked, strikeJuggled;
     /** Hits the current move's armor already absorbed. */
     int armorUsed;
     /** Frames the current move was charged, and whether it is charging right now. */
@@ -147,6 +149,9 @@ final class CombatFighter {
     int beamBlastDamage;
     /** Ultra em sequência: golpes já dados, distância e altura do rival preso no começo. */
     int ultraHitsDone;
+    /** Who the sequence caught (a partner coming in after a KO is not held or hit). */
+    CombatFighter ultraVictim;
+    FighterState ultraVictimState;
     float ultraHoldGap;
     float ultraHoldY;
 
@@ -291,6 +296,7 @@ final class CombatFighter {
         autoStep = -1;
         hitsOnTarget = 0;
         hitboxMask = 0L;
+        strikeLanded = strikeBlocked = strikeJuggled = false;
         armorUsed = 0;
         charge = 0;
         charging = false;

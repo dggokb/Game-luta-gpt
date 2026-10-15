@@ -833,7 +833,7 @@ public class GameView extends SurfaceView
         }
         engine.step(playerInput, opponentInput);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
-        flow.update(engine, ultraAttacker < 0);
+        flow.update(engine, ultraAttacker < 0 && !engine.ultraSequenceRunning());
         updateOpponentVisuals();
         if (flow.restartDue() && !historia.waitingFight() && !tutorial.active()) restartBattle();
         demo.afterStep();

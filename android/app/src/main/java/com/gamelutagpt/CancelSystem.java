@@ -52,7 +52,9 @@ final class CancelSystem {
                 return c.attack("S");
             case SUPER:
                 if (f.state.profile.superAttack == null || f.state.superMeter < CombatConfig.SUPER_COST) return null;
-                return c.attack("SUPER");
+                // A Super that strikes is a ground move (its strikes reach a standing opponent).
+                AttackDefinition sup = c.attack("SUPER");
+                return sup != null && sup.melee() && !f.grounded ? null : sup;
             case AUTO: {
                 String[] route = f.state.profile.autoCombo;
                 if (route.length == 0) return null;

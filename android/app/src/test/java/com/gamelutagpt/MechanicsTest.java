@@ -578,4 +578,85 @@ public class MechanicsTest {
         assertEquals("every strike but the last landed", strikes - 1, hits);
         assertTrue("held in front, not shoved across the stage: moved " + (s.f(1).x - start), s.f(1).x - start < 50f);
     }
+
+    // ------------------------------------------------------------ revisão: casos de borda
+
+    private static void startMove(CombatEngine e, int i, String id) throws Exception {
+        java.lang.reflect.Method start = CombatEngine.class.getDeclaredMethod("startAttack",
+            CombatFighter.class, AttackDefinition.class, String.class, int.class);
+        start.setAccessible(true);
+        CombatFighter f = e.fighter(i);
+        start.invoke(e, f, f.character().attack(id), null, -1);
+    }
+
+    @Test public void theUltraSequenceSparesThePartnerWhoComesInAfterTheKo() {
+        FighterState[] p1 = {new FighterState(GeneratedCharacters.get("p02"), "P1"),
+            new FighterState(GeneratedCharacters.get("player_two"), "P2")};
+        FighterState[] cpu = {new FighterState(BASE, "CPU"), new FighterState(GeneratedCharacters.get("player_two"), "CPU2")};
+        CombatEngine engine = new CombatEngine(p1[0], cpu[0], 500f, 610f, new CombatConfig());
+        engine.setTeam(0, p1);
+        engine.setTeam(1, cpu);
+        FighterInput[] in = {new FighterInput(), new FighterInput()};
+        cpu[0].life = 50;   // the first Ultra hit knocks the point out
+        engine.fighter(0).state.superMeter = CombatConfig.ULTRA_COST;
+        in[0].direction = 3; in[0].superAttack = true; in[0].ultra = true;
+        CombatFighter caught = engine.fighter(1);
+        int partnerLife = cpu[1].life;
+        boolean swapped = false;
+        for (int i = 0; i < 400; i++) {
+            engine.step(in[0], in[1]);
+            in[0].clearPresses(); in[1].clearPresses();
+            if (i > 2) in[0].direction = 0;
+            // The partner comes in while the sequence still plays (the engine allows it on its own).
+            if (!swapped && caught.ko() && engine.fighter(0).inUltraSequence()) swapped = engine.replaceFallenPoint(1);
+        }
+        assertTrue("the partner came in during the sequence", swapped);
+        assertEquals("the rest of the sequence does not hit the partner", partnerLife, cpu[1].life);
+    }
+
+    @Test public void aStrikingSuperIsAGroundMove() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 700f);
+        s.f(0).state.superMeter = CombatConfig.MAX_METER;
+        s.in[0].jump = true;
+        s.steps(10);
+        assertFalse(s.f(0).grounded);
+        s.in[0].superAttack = true;
+        s.step();
+        assertNotEquals("no striking Super in the air", "SUPER", s.attackId(0));
+        assertEquals(CombatConfig.MAX_METER, s.f(0).state.superMeter);
+    }
+
+    @Test public void aTradeOfSeveralStrikeMovesTreatsBothSidesAlike() throws Exception {
+        CharacterDefinition p03 = GeneratedCharacters.get("p03");
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(p03, p03, 500f, 650f);
+        s.step();
+        startMove(s.engine, 0, "S2");
+        startMove(s.engine, 1, "S2");
+        s.until(() -> !s.engine.events().isEmpty(), 60);
+        assertEquals("both strikes landed together", 2, s.engine.events().size());
+        assertEquals(s.f(0).status, s.f(1).status);
+        assertEquals(s.f(0).stunLeft, s.f(1).stunLeft);
+        assertEquals(s.f(0).state.life, s.f(1).state.life);
+    }
+
+    @Test public void theJuggleLimitStopsTheRestOfTheStrikes() throws Exception {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 620f);
+        s.step();
+        CombatFighter d = s.f(1);
+        d.status = CombatFighter.Status.AIR_HITSTUN; d.grounded = false; d.y = Arena.GROUND_Y - 60f; d.vy = -300f;
+        d.stunLeft = d.stunTotal = 60; d.launched = true;
+        java.lang.reflect.Field field = CombatEngine.class.getDeclaredField("sessions");
+        field.setAccessible(true);
+        ComboSession full = new ComboSession(0, 1);
+        full.hitCount = 5;
+        full.juggleCount = s.engine.config.juggleLimit;
+        ((ComboSession[]) field.get(s.engine))[1] = full;
+        startMove(s.engine, 0, "S2");
+        int hits = 0;
+        for (int i = 0; i < 60; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
+        }
+        assertEquals("a full juggle frees the defender from every strike of the move", 0, hits);
+    }
 }

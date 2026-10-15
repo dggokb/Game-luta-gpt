@@ -811,6 +811,11 @@ final class CombatEngine {
         f.x = Arena.clamp(f.x, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
     }
 
+    /** Some fighter is in the middle of an Ultra sequence (the fallen partner waits for it to end). */
+    boolean ultraSequenceRunning() {
+        return fighters[0].inUltraSequence() || fighters[1].inUltraSequence();
+    }
+
     /** The opponent's body is right in front (bodies touching): an advance stops there. */
     private boolean touchingAhead(CombatFighter f) {
         CombatFighter o = fighters[1 - f.index];
@@ -1668,6 +1673,8 @@ final class CombatEngine {
         if (sequence != null) {
             // Sem cinemática: a sequência do vídeo prende o rival onde encostou.
             a.ultraHitsDone = 0;
+            a.ultraVictim = d;
+            a.ultraVictimState = d.state;
             float bodies = a.body().halfWidth + d.body().halfWidth;
             a.ultraHoldGap = Math.max(bodies, Math.min((d.x - a.x) * a.facing, bodies + config.ultraReach));
             a.ultraHoldY = d.y;
@@ -1685,6 +1692,13 @@ final class CombatEngine {
     private void updateUltraSequence(CombatFighter a, CombatFighter d) {
         if (!a.inUltraSequence()) return;
         CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
+        boolean sameVictim = d == a.ultraVictim && d.state == a.ultraVictimState;
+        if (a.ultraHitsDone < seq.hits.length && (!sameVictim || d.ko())) {
+            // The victim fell (or a partner came in after the KO): the rest of the sequence is
+            // only the animation; a knocked-out victim is thrown now.
+            if (sameVictim) launchUltraVictim(a, d);
+            a.ultraHitsDone = seq.hits.length;
+        }
         if (a.ultraHitsDone < seq.hits.length) holdUltraVictim(a, d, seq);
         while (a.ultraHitsDone < seq.hits.length && a.ultraFrame >= seq.hits[a.ultraHitsDone]) {
             int i = a.ultraHitsDone++;
@@ -1902,14 +1916,17 @@ final class CombatEngine {
         // the ones before the last only hold the defender until the next, the last one lands
         // the move's effect (knockdown, launch, knockback).
         boolean multi = !projectile && attack.maxHits > 1;
-        boolean lastStrike = !multi || c.hitbox >= attack.hitboxCount() - 1;
-        // The move's first contact (hit or block): meter and juggle points are paid once per move.
-        boolean firstStrike = !multi || a.hitsOnTarget <= 1;
+        // A trade ends both moves: each strike then lands as the last one, on both sides alike
+        // (whichever contact is applied first).
+        boolean stillStriking = a.attacking() && a.attack == attack && !trades(c);
+        boolean lastStrike = !multi || !stillStriking || c.hitbox >= attack.hitboxCount() - 1;
         int holdUntil = lastStrike ? 0 : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame +
             attack.hitstopFrames + config.strikeHoldFrames;
 
-        if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && firstStrike &&
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && (!multi || !a.strikeLanded) &&
             session.juggleCount + attack.juggleCost > config.juggleLimit) {
+            // The rest of a several-strike move cannot catch the freed defender either.
+            if (multi) a.hitsOnTarget = attack.maxHits;
             // Juggle limit: the defender recovers in the air instead of taking the hit.
             d.status = CombatFighter.Status.NEUTRAL;
             d.stunLeft = 0;
@@ -1930,7 +1947,8 @@ final class CombatEngine {
 
         int guard = effectiveGuard(d);
         if (guardStops(guard, attack, !a.grounded, projectile)) {
-            block(a, d, attack, guard, direction, projectile, !lastStrike, firstStrike);
+            block(a, d, attack, guard, direction, projectile, !lastStrike, !multi || !a.strikeBlocked);
+            if (multi) a.strikeBlocked = true;
             if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
             return;
@@ -1955,7 +1973,12 @@ final class CombatEngine {
             return;
         }
 
+        boolean newSession = sessions[d.index] == null;
         session = sessionFor(a, d);
+        // The move's first strike that hits pays meter and sets the combo scale; the later
+        // strikes keep that scale (a new combo starts over as a first strike).
+        boolean firstStrike = !multi || !a.strikeLanded || newSession;
+        if (multi) a.strikeLanded = true;
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
@@ -2054,7 +2077,10 @@ final class CombatEngine {
             cues.add("PULL");
         }
         // Every hit that leaves the defender juggled costs juggle points (a several-strike move once).
-        if (d.status == CombatFighter.Status.AIR_HITSTUN && lastStrike) session.juggleCount += attack.juggleCost;
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && (!multi || !a.strikeJuggled)) {
+            session.juggleCount += attack.juggleCost;
+            a.strikeJuggled = true;
+        }
         if (!d.grounded) session.airCombo = true;
         freeze(a, d, lastStrike ? attack.hitstopFrames : holdingHitstop(attack), projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
@@ -2074,6 +2100,16 @@ final class CombatEngine {
         answer.attack = d.attack;
         answer.hitbox = 0;
         applyContact(answer);
+    }
+
+    /** The defender's own melee strike reaches the attacker in this same step (a trade). */
+    private boolean trades(Contact c) {
+        for (Contact other : contacts) {
+            if (other != c && other.projectile == null && other.attacker == c.defender && other.defender == c.attacker) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Hitstop of a strike before the last: shorter, the move keeps its rhythm. */
