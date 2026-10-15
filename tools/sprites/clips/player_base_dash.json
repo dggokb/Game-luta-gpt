@@ -3,7 +3,7 @@
   "javaName": "DASH_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_dash_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_dash.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_dash.webp",
   "report": "tools/sprites/reports/player_base_dash.report.json",
   "preview": "android/app/build/sprite-review/dash-import.png",
   "expectedFrames": 6,

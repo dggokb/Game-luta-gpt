@@ -3,7 +3,7 @@
   "javaName": "THROW_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_throw_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_throw.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_throw.webp",
   "report": "tools/sprites/reports/player_base_throw.report.json",
   "preview": "android/app/build/sprite-review/throw-import.png",
   "expectedFrames": 9,

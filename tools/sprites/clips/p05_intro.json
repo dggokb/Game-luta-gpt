@@ -3,7 +3,7 @@
   "javaName": "P05_INTRO",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_intro_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_intro.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_intro.webp",
   "report": "tools/sprites/reports/p05_intro.report.json",
   "preview": "android/app/build/sprite-review/p05_intro-import.png",
   "expectedFrames": 27,

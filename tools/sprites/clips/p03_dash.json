@@ -3,7 +3,7 @@
   "javaName": "P03_DASH",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_dash_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_dash.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_dash.webp",
   "report": "tools/sprites/reports/p03_dash.report.json",
   "preview": "android/app/build/sprite-review/p03_dash-import.png",
   "expectedFrames": 6,

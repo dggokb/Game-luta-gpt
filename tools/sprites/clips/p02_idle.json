@@ -3,7 +3,7 @@
   "javaName": "P02_IDLE",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_idle_sr_2x.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_idle.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_idle.webp",
   "report": "tools/sprites/reports/p02_idle.report.json",
   "preview": "android/app/build/sprite-review/p02_idle-import.png",
   "expectedFrames": 56,

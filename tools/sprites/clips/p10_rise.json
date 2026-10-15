@@ -3,7 +3,7 @@
   "javaName": "P10_RISE",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_rise_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_rise.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_rise.webp",
   "report": "tools/sprites/reports/p10_rise.report.json",
   "preview": "android/app/build/sprite-review/p10_rise-import.png",
   "expectedFrames": 6,

@@ -3,7 +3,7 @@
   "javaName": "P03_WALK_FORWARD",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_walk_forward_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_walk_forward.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_walk_forward.webp",
   "report": "tools/sprites/reports/p03_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p03_walk_forward-import.png",
   "expectedFrames": 36,

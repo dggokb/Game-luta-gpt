@@ -3,7 +3,7 @@
   "javaName": "P08_DEFEAT",
   "profile": "p08.json",
   "source": "art/sprites/source/p08_defeat_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p08_defeat.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_defeat.webp",
   "report": "tools/sprites/reports/p08_defeat.report.json",
   "preview": "android/app/build/sprite-review/p08_defeat-import.png",
   "expectedFrames": 33,

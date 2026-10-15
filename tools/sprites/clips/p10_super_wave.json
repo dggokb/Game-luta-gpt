@@ -3,7 +3,7 @@
   "javaName": "P10_SUPER_WAVE",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_super_wave_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_super_wave.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_super_wave.webp",
   "report": "tools/sprites/reports/p10_super_wave.report.json",
   "preview": "android/app/build/sprite-review/p10_super_wave-import.png",
   "expectedFrames": 22,

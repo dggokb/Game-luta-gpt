@@ -3,7 +3,7 @@
   "javaName": "P08_JUMP",
   "profile": "p08.json",
   "source": "art/sprites/source/p08_jump_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p08_jump.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p08_jump.webp",
   "report": "tools/sprites/reports/p08_jump.report.json",
   "preview": "android/app/build/sprite-review/p08_jump-import.png",
   "expectedFrames": 6,

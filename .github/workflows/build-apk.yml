@@ -59,7 +59,7 @@ jobs:
             android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
             android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
             android/app/src/main/java/com/gamelutagpt/SpriteStates.java
-            android/app/src/main/res/drawable-nodpi/*.png
+            android/app/src/main/res/drawable-nodpi/*.webp
             tools/sprites/reports/*.report.json
           if-no-files-found: warn
 

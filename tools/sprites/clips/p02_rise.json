@@ -3,7 +3,7 @@
   "javaName": "P02_RISE",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_rise_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_rise.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_rise.webp",
   "report": "tools/sprites/reports/p02_rise.report.json",
   "preview": "android/app/build/sprite-review/p02_rise-import.png",
   "expectedFrames": 6,

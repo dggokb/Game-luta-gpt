@@ -3,7 +3,7 @@
   "javaName": "P05_HIT_STAND",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_hit_stand_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_hit_stand.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_hit_stand.webp",
   "report": "tools/sprites/reports/p05_hit_stand.report.json",
   "preview": "android/app/build/sprite-review/p05_hit_stand-import.png",
   "expectedFrames": 9,

@@ -3,7 +3,7 @@
   "javaName": "P03_RISE",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_rise_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_rise.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_rise.webp",
   "report": "tools/sprites/reports/p03_rise.report.json",
   "preview": "android/app/build/sprite-review/p03_rise-import.png",
   "expectedFrames": 6,

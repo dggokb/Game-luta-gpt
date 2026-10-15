@@ -3,7 +3,7 @@
   "javaName": "P04_WALK_BACK",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_walk_back_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_walk_back.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_walk_back.webp",
   "report": "tools/sprites/reports/p04_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p04_walk_back-import.png",
   "expectedFrames": 27,

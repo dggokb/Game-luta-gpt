@@ -3,7 +3,7 @@
   "javaName": "ENERGY_CHARGED",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_energy_charged_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_energy_charged.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_energy_charged.webp",
   "report": "tools/sprites/reports/player_base_energy_charged.report.json",
   "preview": "android/app/build/sprite-review/player_base_energy_charged-import.png",
   "expectedFrames": 20,

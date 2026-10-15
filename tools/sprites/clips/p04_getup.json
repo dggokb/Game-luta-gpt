@@ -3,7 +3,7 @@
   "javaName": "P04_GETUP",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_getup_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_getup.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_getup.webp",
   "report": "tools/sprites/reports/p04_getup.report.json",
   "preview": "android/app/build/sprite-review/p04_getup-import.png",
   "expectedFrames": 12,

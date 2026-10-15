@@ -3,7 +3,7 @@
   "javaName": "P04_THROW",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_throw_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_throw.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_throw.webp",
   "report": "tools/sprites/reports/p04_throw.report.json",
   "preview": "android/app/build/sprite-review/p04_throw-import.png",
   "expectedFrames": 9,

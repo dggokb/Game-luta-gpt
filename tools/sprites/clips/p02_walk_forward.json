@@ -3,7 +3,7 @@
   "javaName": "P02_WALK_FORWARD",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_walk_forward_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_walk_forward.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_walk_forward.webp",
   "report": "tools/sprites/reports/p02_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p02_walk_forward-import.png",
   "expectedFrames": 20,

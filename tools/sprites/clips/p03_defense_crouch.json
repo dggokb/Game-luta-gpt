@@ -3,7 +3,7 @@
   "javaName": "P03_DEFENSE_CROUCH",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_defense_crouch_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_defense_crouch.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_defense_crouch.webp",
   "report": "tools/sprites/reports/p03_defense_crouch.report.json",
   "preview": "android/app/build/sprite-review/p03_defense_crouch-import.png",
   "expectedFrames": 6,

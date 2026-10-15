@@ -53,8 +53,8 @@ public final class RaioPreview {
         StagePack stagePack = StagePack.load(new FileRenderAssets(stageDir.getParentFile()), stageDir.getName());
         for (String warning : pack.warnings) System.out.println("aviso: " + warning);
         StageScene scene = new StageScene(stagePack, new StageWorld(GROUND_Y, 2600f, ZOOM, 700f, 552f));
-        BufferedImage beamSprite = ImageIO.read(new File(SPRITES + "player_base_ultra_beam.png"));
-        BufferedImage hitSprite = ImageIO.read(new File(SPRITES + "player_base_hit_stand.png"));
+        BufferedImage beamSprite = ImageIO.read(new File(SPRITES + "player_base_ultra_beam.webp"));
+        BufferedImage hitSprite = ImageIO.read(new File(SPRITES + "player_base_hit_stand.webp"));
         RaioFinal raio = new RaioFinal();
         RaioFinal.Frame f = new RaioFinal.Frame();
         UltraDefinition.Beam beam = pack.definition.beam;

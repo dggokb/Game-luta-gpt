@@ -3,7 +3,7 @@
   "javaName": "P02_SUPER_WAVE",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_super_wave_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_super_wave.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_super_wave.webp",
   "report": "tools/sprites/reports/p02_super_wave.report.json",
   "preview": "android/app/build/sprite-review/p02_super_wave-import.png",
   "expectedFrames": 22,

@@ -3,7 +3,7 @@
   "javaName": "P12_SPECIAL_S3",
   "profile": "p12.json",
   "source": "art/sprites/source/p12_special_s3_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p12_special_s3.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p12_special_s3.webp",
   "report": "tools/sprites/reports/p12_special_s3.report.json",
   "preview": "android/app/build/sprite-review/p12_special_s3-import.png",
   "expectedFrames": 21,

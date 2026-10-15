@@ -9,6 +9,8 @@ dependencies {
     implementation project(':ultra-core')
     implementation project(':story-core')
     implementation project(':stage-core')
+    // Os atlas dos lutadores são WEBP, que o ImageIO do Java não lê sozinho.
+    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.12.0'
 }
 
 application {

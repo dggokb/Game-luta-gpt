@@ -3,7 +3,7 @@
   "javaName": "P10_IDLE",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_idle_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_idle.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_idle.webp",
   "report": "tools/sprites/reports/p10_idle.report.json",
   "preview": "android/app/build/sprite-review/p10_idle-import.png",
   "expectedFrames": 67,

@@ -3,7 +3,7 @@
   "javaName": "P03_INTRO",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_intro_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_intro.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_intro.webp",
   "report": "tools/sprites/reports/p03_intro.report.json",
   "preview": "android/app/build/sprite-review/p03_intro-import.png",
   "expectedFrames": 27,

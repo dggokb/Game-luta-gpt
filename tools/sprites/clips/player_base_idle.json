@@ -3,7 +3,7 @@
   "javaName": "IDLE",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_idle_sr_2x.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.webp",
   "report": "tools/sprites/reports/player_base_idle.report.json",
   "preview": "android/app/build/sprite-review/idle-import.png",
   "expectedFrames": 76,

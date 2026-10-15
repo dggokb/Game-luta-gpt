@@ -3,7 +3,7 @@
   "javaName": "P10_DEFEAT",
   "profile": "p10.json",
   "source": "art/sprites/source/p10_defeat_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p10_defeat.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p10_defeat.webp",
   "report": "tools/sprites/reports/p10_defeat.report.json",
   "preview": "android/app/build/sprite-review/p10_defeat-import.png",
   "expectedFrames": 33,

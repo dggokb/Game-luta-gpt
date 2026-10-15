@@ -3,7 +3,7 @@
   "javaName": "FALL_DOWN",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_fall_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_fall.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_fall.webp",
   "report": "tools/sprites/reports/player_base_fall.report.json",
   "preview": "android/app/build/sprite-review/fall-import.png",
   "expectedFrames": 11,

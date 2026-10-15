@@ -3,7 +3,7 @@
   "javaName": "P09_SPECIAL_S4",
   "profile": "p09.json",
   "source": "art/sprites/source/p09_special_s4_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p09_special_s4.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p09_special_s4.webp",
   "report": "tools/sprites/reports/p09_special_s4.report.json",
   "preview": "android/app/build/sprite-review/p09_special_s4-import.png",
   "expectedFrames": 20,

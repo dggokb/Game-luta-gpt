@@ -3,7 +3,7 @@
   "javaName": "P12_THROW",
   "profile": "p12.json",
   "source": "art/sprites/source/p12_throw_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p12_throw.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p12_throw.webp",
   "report": "tools/sprites/reports/p12_throw.report.json",
   "preview": "android/app/build/sprite-review/p12_throw-import.png",
   "expectedFrames": 9,

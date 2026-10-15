@@ -3,7 +3,7 @@
   "javaName": "P02_JUMP_MEDIUM",
   "profile": "p02.json",
   "source": "art/sprites/source/p02_jump_medium_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p02_jump_medium.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p02_jump_medium.webp",
   "report": "tools/sprites/reports/p02_jump_medium.report.json",
   "preview": "android/app/build/sprite-review/p02_jump_medium-import.png",
   "expectedFrames": 7,

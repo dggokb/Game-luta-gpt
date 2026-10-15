@@ -3,7 +3,7 @@
   "javaName": "P03_SUPER",
   "profile": "player_base.json",
   "source": "art/sprites/source/p03_super_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p03_super.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p03_super.webp",
   "report": "tools/sprites/reports/p03_super.report.json",
   "preview": "android/app/build/sprite-review/p03_super-import.png",
   "expectedFrames": 22,

@@ -3,7 +3,7 @@
   "javaName": "P04_DEFENSE_AIR",
   "profile": "p04.json",
   "source": "art/sprites/source/p04_defense_air_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p04_defense_air.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p04_defense_air.webp",
   "report": "tools/sprites/reports/p04_defense_air.report.json",
   "preview": "android/app/build/sprite-review/p04_defense_air-import.png",
   "expectedFrames": 7,

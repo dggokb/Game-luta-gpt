@@ -110,7 +110,7 @@ def clip_for(cid, count, quadros):
     clip.update({
         'id': f'{cid}_ultra_seq', 'javaName': f'{cid.upper()}_ULTRA_SEQ', 'profile': profile(cid),
         'source': f'art/sprites/source/{cid}_ultra_seq_video_normalized.png',
-        'output': f'android/app/src/main/res/drawable-nodpi/{cid}_ultra_seq.png',
+        'output': f'android/app/src/main/res/drawable-nodpi/{cid}_ultra_seq.webp',
         'report': f'tools/sprites/reports/{cid}_ultra_seq.report.json',
         'preview': f'android/app/build/sprite-review/{cid}_ultra_seq-import.png',
         'expectedFrames': count, 'segmentation': 'prepared-grid', 'rootMode': 'authored',

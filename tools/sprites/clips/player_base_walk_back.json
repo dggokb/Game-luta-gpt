@@ -3,7 +3,7 @@
   "javaName": "WALK_BACK_SET",
   "profile": "player_base.json",
   "source": "art/sprites/source/player_base_walk_back_sr_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/player_base_walk_back.png",
+  "output": "android/app/src/main/res/drawable-nodpi/player_base_walk_back.webp",
   "report": "tools/sprites/reports/player_base_walk_back.report.json",
   "preview": "android/app/build/sprite-review/walk_back-import.png",
   "expectedFrames": 17,

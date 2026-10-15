@@ -3,7 +3,7 @@
   "javaName": "P11_FALL",
   "profile": "p11.json",
   "source": "art/sprites/source/p11_fall_video_normalized.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p11_fall.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p11_fall.webp",
   "report": "tools/sprites/reports/p11_fall.report.json",
   "preview": "android/app/build/sprite-review/p11_fall-import.png",
   "expectedFrames": 6,

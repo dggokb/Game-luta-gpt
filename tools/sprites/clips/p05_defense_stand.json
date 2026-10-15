@@ -3,7 +3,7 @@
   "javaName": "P05_DEFENSE_STAND",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_defense_stand_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_defense_stand.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_defense_stand.webp",
   "report": "tools/sprites/reports/p05_defense_stand.report.json",
   "preview": "android/app/build/sprite-review/p05_defense_stand-import.png",
   "expectedFrames": 8,

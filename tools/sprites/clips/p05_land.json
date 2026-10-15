@@ -3,7 +3,7 @@
   "javaName": "P05_LAND",
   "profile": "p05.json",
   "source": "art/sprites/source/p05_land_video_hd.png",
-  "output": "android/app/src/main/res/drawable-nodpi/p05_land.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p05_land.webp",
   "report": "tools/sprites/reports/p05_land.report.json",
   "preview": "android/app/build/sprite-review/p05_land-import.png",
   "expectedFrames": 4,
