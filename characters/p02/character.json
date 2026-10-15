@@ -56,7 +56,8 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Palma"
+      "nome": "Palma",
+      "visual": "PALMA"
     },
     "super": {
       "damage": 2880,

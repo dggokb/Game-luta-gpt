@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md.",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco).",
   "base": {
     "frames": {
       "L": [3, 3, 7],
@@ -89,6 +89,9 @@
           "nome": "Chute giratório",
           "comando": "↓↙←"
         }
+      },
+      "s1": {
+        "visual": "ONDA"
       }
     },
     "p02": {
@@ -128,6 +131,9 @@
           "nome": "Chute rodopiante",
           "comando": "[←] →"
         }
+      },
+      "s1": {
+        "visual": "PALMA"
       }
     },
     "p03": {
@@ -180,6 +186,9 @@
           "comando": "↓↘→",
           "noAr": true
         }
+      },
+      "s1": {
+        "visual": "ONDA_CURTA"
       }
     },
     "p04": {
@@ -237,6 +246,9 @@
           "nome": "Ombrada",
           "comando": "←↙↓↘→"
         }
+      },
+      "s1": {
+        "visual": "ESTOURO"
       }
     },
     "p05": {
@@ -286,6 +298,9 @@
           "nome": "Corte de mão",
           "comando": "←↙↓↘→"
         }
+      },
+      "s1": {
+        "visual": "KUNAI"
       }
     },
     "p06": {
@@ -338,6 +353,11 @@
           "nome": "Passo-sombra",
           "comando": "↓↘→"
         }
+      },
+      "s1": {
+        "visual": "SOMBRA",
+        "baixo": true,
+        "rente": true
       }
     },
     "p07": {
@@ -380,6 +400,15 @@
           "nome": "Chute giratório baixo",
           "comando": "↓↓"
         }
+      },
+      "s1": {
+        "corpoACorpo": {
+          "alcance": 165,
+          "altura": 250,
+          "piso": 62,
+          "derruba": true,
+          "empurrao": 100
+        }
       }
     },
     "p08": {
@@ -419,6 +448,9 @@
           "nome": "Salto-agulha",
           "comando": "↓↘→"
         }
+      },
+      "s1": {
+        "visual": "CHICOTE"
       }
     },
     "p09": {
@@ -474,6 +506,9 @@
           "nome": "Ombrada",
           "comando": "[←] →"
         }
+      },
+      "s1": {
+        "visual": "MACHADO"
       }
     },
     "p10": {
@@ -523,6 +558,9 @@
           "nome": "Voadora em parafuso",
           "comando": "↓↘→"
         }
+      },
+      "s1": {
+        "visual": "MACHADINHO"
       }
     },
     "p11": {
@@ -578,6 +616,9 @@
           "nome": "Passo cirúrgico",
           "comando": "[←] →"
         }
+      },
+      "s1": {
+        "visual": "BISTURI"
       }
     },
     "p12": {
@@ -629,6 +670,14 @@
         "S4": {
           "nome": "Contorção",
           "comando": "↓↙←"
+        }
+      },
+      "s1": {
+        "corpoACorpo": {
+          "alcance": 120,
+          "altura": 130,
+          "empurrao": 80,
+          "avanco": 520
         }
       }
     }

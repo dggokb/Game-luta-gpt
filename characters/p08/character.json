@@ -58,7 +58,8 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Chicote"
+      "nome": "Chicote",
+      "visual": "CHICOTE"
     },
     "super": {
       "damage": 3040,

@@ -70,6 +70,9 @@ def safe(root, value):
         raise ValueError(f'Path escapes project: {value}')
     return p
 
+# Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
+ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI')
+
 def validate_projectile(data, name, body):
     positive_int(data['damage'], name+'.damage')
     positive(data['range'], name+'.range');positive(data['speed'], name+'.speed')
@@ -106,6 +109,8 @@ def validate_fighter(pack):
         if not command or any(type(d) is not int or not 1 <= d <= 8 for d in command):
             raise ValueError(f'{name}.energy: command uses D-pad directions 1..8')
         validate_command_extras(f'{name}.energy', f['energy'], False)
+        if 'visual' in f['energy'] and f['energy']['visual'] not in ENERGY_VISUALS:
+            raise ValueError(f'{name}.energy.visual: expected one of {list(ENERGY_VISUALS)}')
     if 'super' in f: validate_projectile(f['super'], name+'.super', body)
     for key in ('energy','super'):
         if key in f:
@@ -257,7 +262,14 @@ def validate_attack(name, m, projectile):
             raise ValueError(f'{name}.golpes: increasing frames from the first active frame to the last')
         if projectile and not ('reach' in m and 'hitHeight' in m):
             raise ValueError(f'{name}.golpes: a striking Super needs reach and hitHeight')
-    if projectile and 'golpes' not in m:
+    if projectile and 'golpes' not in m and name.endswith('.energy.attack') and 'reach' in m:
+        # S corpo a corpo (tapa, investida): bate com a caixa padrão em vez de lançar.
+        if 'hitHeight' not in m or m.get('hitboxes'):
+            raise ValueError(f'{name}: a melee S needs hitHeight and uses the default strike box')
+        positive(m['reach'], name+'.reach');positive(m['hitHeight'], name+'.hitHeight')
+        if 'hitFloor' in m and not 0 < m['hitFloor'] < m['hitHeight']:
+            raise ValueError(f'{name}.hitFloor: must stay between the ground and hitHeight')
+    elif projectile and 'golpes' not in m:
         if m['activeFrames'] != 1 or m.get('hitboxes'):
             raise ValueError(f'{name}: projectile throws spawn on one active frame and have no hitboxes')
         if 'maxHits' in m: raise ValueError(f'{name}: maxHits does not apply to projectile throws')
@@ -570,6 +582,7 @@ def compile_packs(root, results):
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
                      if energy and ('nome' in energy or energy.get('segurar')) else '')
+                   +('.withEnergyVisual('+q(energy['visual'])+')' if energy and 'visual' in energy else '')
                    +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else '')
                    +(ultra_sequence(fi['ultra']) if 'ultra' in fi else ''))
         stand,crouch = pack['_visual']

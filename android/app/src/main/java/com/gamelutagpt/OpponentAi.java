@@ -87,8 +87,7 @@ final class OpponentAi {
         ) {
             actions.superAttack();
         } else if (
-            s.distance >= 230f &&
-            s.distance <= 620f &&
+            energyInRange(s.self, s.distance) &&
             !s.projectileActive &&
             random.nextDouble() < 0.24
         ) {
@@ -137,6 +136,23 @@ final class OpponentAi {
     int wakeupDirection() {
         double r = random.nextDouble();
         return r < 0.30 ? 7 : r < 0.50 ? 5 : r < 0.62 ? 1 : r < 0.72 ? 3 : 0;
+    }
+
+    /**
+     * O S1 que voa sai de meia distância até onde ele chega; o S1 corpo a corpo (tapa, investida)
+     * só de perto: o alcance dele mais o que o avanço anda.
+     */
+    static boolean energyInRange(CharacterDefinition self, float distance) {
+        AttackDefinition s = self.attack("S");
+        if (s == null) return false;
+        if (s.melee()) {
+            AttackDefinition.Mechanics m = s.mechanics;
+            float advance = m.advanceSpeed > 0f ? m.advanceSpeed * (m.advanceEnd - m.advanceStart + 1) * CombatConfig.DT : 0f;
+            return distance <= s.reach + advance;
+        }
+        CharacterDefinition.Projectile energy = self.fighter.energy;
+        float far = Math.min(620f, energy.spawnX + energy.range);
+        return distance >= Math.min(230f, far * 0.5f) && distance <= far;
     }
 
     /** A wave Super goes from afar; a Super that strikes only up close (its reach plus the advance). */

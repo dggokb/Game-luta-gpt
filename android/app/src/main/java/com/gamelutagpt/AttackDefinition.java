@@ -190,7 +190,7 @@ final class AttackDefinition {
                 hitboxes[i] = new Box(b.strikes[i], Math.min(last, b.strikes[i] + STRIKE_WINDOW - 1),
                     0f, reach, hitFloor, hitHeight + CombatRules.VERTICAL_SLACK);
             }
-        } else if (b.hitboxes.isEmpty() && kind == Kind.NORMAL) {
+        } else if (b.hitboxes.isEmpty() && (kind == Kind.NORMAL || kind == Kind.PROJECTILE && b.reach > 0f)) {
             // Default strike: from the root to the reach, from hitFloor up to hitHeight + slack, on every active frame.
             hitboxes = new Box[] { new Box(
                 startupFrames, startupFrames + activeFrames - 1,
@@ -379,6 +379,11 @@ final class AttackDefinition {
             } else if (kind == Kind.SUPER && strikes.length > 0) {
                 if (reach <= 0f || hitHeight <= 0f) {
                     throw new IllegalArgumentException(name + "a striking Super needs reach and hitHeight");
+                }
+            } else if (kind == Kind.PROJECTILE && reach > 0f) {
+                // S corpo a corpo (tapa, investida): bate com a caixa padrão em vez de lançar.
+                if (hitHeight <= 0f || !hitboxes.isEmpty()) {
+                    throw new IllegalArgumentException(name + "a melee S needs hitHeight and uses the default strike box");
                 }
             } else if (active != 1 || !hitboxes.isEmpty()) {
                 throw new IllegalArgumentException(name + "projectile moves spawn on one active frame and have no hitboxes");

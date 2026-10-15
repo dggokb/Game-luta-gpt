@@ -178,6 +178,55 @@ def commands(pack, spec):
             target['noAr'] = True
 
 
+VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
+           'MACHADINHO', 'BISTURI')
+RENTE = 14        # altura da saída do projétil rente ao chão (px acima do pé)
+MELEE_ACTIVE = 4  # quadros ativos do S1 corpo a corpo (o projétil tem 1)
+MELEE_KEYS = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback', 'low')
+
+
+def restore_s1(attack):
+    """Desfaz o S1 corpo a corpo gravado antes (refazer dá sempre o mesmo resultado)."""
+    base = attack.pop('corpoBase', None)
+    if base is not None:
+        attack.update(base)
+        for key in MELEE_KEYS:
+            attack.pop(key, None)
+    attack.pop('low', None)
+
+
+def s1(pack, spec):
+    """O S1 (bloco "s1"): o desenho do projétil (visual), baixo (defende só agachado), rente (sai
+    no chão) ou corpoACorpo (sem projétil: o golpe bate com caixa, como o Super corpo a corpo)."""
+    energy = pack['fighter']['energy']
+    attack = energy['attack']
+    energy.pop('visual', None)
+    s = spec.get('s1', {})
+    if s.get('baixo'):
+        attack['low'] = True
+    if s.get('rente'):
+        energy.pop('airSpawnY', None)   # sempre no mesmo lugar do arquivo
+        energy['spawnY'] = energy['crouchSpawnY'] = energy['airSpawnY'] = RENTE
+    melee = s.get('corpoACorpo')
+    if melee:
+        attack['corpoBase'] = {k: attack[k] for k in BASE_KEYS}
+        if attack['activeFrames'] < MELEE_ACTIVE:
+            attack['recoveryFrames'] -= MELEE_ACTIVE - attack['activeFrames']
+            attack['activeFrames'] = MELEE_ACTIVE
+        attack['reach'] = melee['alcance']
+        attack['hitHeight'] = melee['altura']
+        if 'piso' in melee:
+            attack['hitFloor'] = melee['piso']   # base da caixa (golpe que pega do peito à cabeça)
+        attack['launchType'] = 'knockdown' if melee.get('derruba') else 'none'
+        attack['knockback'] = melee.get('empurrao', 60)
+        if melee.get('avanco'):
+            advance(attack, melee['avanco'])
+    if 'visual' in s:
+        if s['visual'] not in VISUALS:
+            raise SystemExit(f"s1.visual {s['visual']}: um de {VISUALS}")
+        energy['visual'] = s['visual']
+
+
 def strike_frames(anim, total, startup, pancadas):
     """Quadro do golpe em que cada pancada acerta: o tempo da animação até o quadro dela
     (a animação estica sobre o golpe). A primeira é o fim da preparação."""
@@ -256,6 +305,7 @@ def apply(cid, spec, base):
         restore(m)
     sup = fighter['super']['attack']
     restore(sup)
+    restore_s1(fighter['energy']['attack'])
     for k in ('reach', 'hitHeight', 'launchType', 'knockback', 'mecanica'):
         sup.pop(k, None)
     fighter['maxLife'] = spec['vida']
@@ -285,6 +335,7 @@ def apply(cid, spec, base):
     fighter['super']['damage'] = damage('SUPER')
     unique(pack, spec)
     commands(pack, spec)
+    s1(pack, spec)
     hits = json.loads(PANCADAS.read_text(encoding='utf-8'))['personagens'].get(cid, {})
     specials = pack.get('specialMoves', {})
     for key, h in hits.items():

@@ -370,7 +370,7 @@ final class TeamSystem {
             }
         } else if (s.assistPhase == ASSIST_ATTACK) {
             a.attackFrame++;
-            if (a.attack.kind != AttackDefinition.Kind.NORMAL && a.attackFrame == a.attack.startupFrames) {
+            if (!a.attack.melee() && a.attackFrame == a.attack.startupFrames) {
                 engine.spawnAssistProjectile(a);
             }
             if (a.attackFrame >= a.attack.totalFrames - 1) {

@@ -103,8 +103,8 @@ public class GameView extends SurfaceView
     /** DEBUG > AJUSTAR CAIXAS: hitbox, hurtbox e empurrão no olho, exportados para o Drive. */
     private final TelaAjusteCaixas ajusteCaixas;
     private final AndroidRenderAssets ultraAssets;
-    private final SpriteFighterRenderer spriteFighterRenderer;
-    private final SpriteFighterRenderer opponentSpriteRenderer;
+    private SpriteFighterRenderer spriteFighterRenderer;
+    private SpriteFighterRenderer opponentSpriteRenderer;
     private final StageRenderer stage = new StageRenderer();
     private final EffectsRenderer effects = new EffectsRenderer();
     /** Hit and guard sparks at the real contact point (presentation only). */
@@ -258,14 +258,14 @@ public class GameView extends SurfaceView
     private int shownTagSeconds = -2;
     private int shownPoint = 0;
     /** Partner on screen: the assist, or the former point running off after Assist → Tag. */
-    private final SpriteFighterRenderer partnerSpriteRenderer;
+    private SpriteFighterRenderer partnerSpriteRenderer;
     /** Sombra do eco (p06): cópia roxa e translúcida dos golpes, desenhada atrás do lutador. */
-    private final SpriteFighterRenderer echoRenderer;
+    private SpriteFighterRenderer echoRenderer;
     /** Capangas do Super (p07): as animações CAPANGA_* ficam no pacote de quem os chama. */
-    private final SpriteFighterRenderer henchmanRenderer;
+    private SpriteFighterRenderer henchmanRenderer;
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
     /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag). */
-    private final SpriteFighterRenderer opponentPartnerRenderer;
+    private SpriteFighterRenderer opponentPartnerRenderer;
     private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
     /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
     private final java.util.Map<String, UltraPack> cpuUltraPacks = new java.util.HashMap<>();
@@ -340,25 +340,23 @@ public class GameView extends SurfaceView
     }
 
     public GameView(Context context) {
+        this(context, false);
+    }
+
+    /**
+     * {@code emSegundoPlano}: a arte pesada (folhas dos lutadores, seleção, cenário, ultras) é
+     * decodificada na thread "Carregando", com a tela de carregamento na frente. Decodificar
+     * isso na thread principal levava vários segundos, e um toque nesse meio-tempo virava
+     * "não está respondendo" (ANR). Testes e PC continuam carregando tudo na hora.
+     */
+    public GameView(Context context, boolean emSegundoPlano) {
         super(context);
-        hud.loadArt(context);
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
         storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
-        // One decode per atlas for the whole match: team packs (tag never decodes
-        // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
-        for (FighterState fighter : team) atlases.preload(fighter.character);
-        spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
-        // O adversário aparece com as cores normais da arte (sem o filtro pálido de antes).
-        opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
-        partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
-        echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
-        echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
-        henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
-        opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
             @Override public void manterAtlas(CharacterDefinition... manter) {
                 // Só as folhas do personagem em ajuste e da referência: a luta está parada e volta a
@@ -382,13 +380,35 @@ public class GameView extends SurfaceView
         conversa = new ConversaLuta(ultraAssets);
         cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
         stageId = DEFAULT_STAGE;
-        stageScene = loadStage(ultraAssets, stageId);
-        characterSelectRenderer = new CharacterSelectRenderer(context);
-        loadTeamUltras();
         holder = getHolder();
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
+        if (emSegundoPlano) {
+            // O loop do jogo começa por esta fila: tela de carregamento e a thread "Carregando".
+            loadQueue.add(() -> carregarArte(context));
+        } else {
+            carregarArte(context);
+        }
+    }
+
+    /** A parte pesada da montagem: só decodifica arte e sons, nada que a thread da UI leia. */
+    private void carregarArte(Context context) {
+        hud.loadArt(context);
+        // One decode per atlas for the whole match: team packs (tag never decodes
+        // mid-fight) and the opponent share the same cache.
+        for (FighterState fighter : team) atlases.preload(fighter.character);
+        spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        // O adversário aparece com as cores normais da arte (sem o filtro pálido de antes).
+        opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
+        echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
+        henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        stageScene = loadStage(ultraAssets, stageId);
+        characterSelectRenderer = new CharacterSelectRenderer(context);
+        loadTeamUltras();
     }
 
     private static String[] selectionRoster() {
@@ -772,9 +792,15 @@ public class GameView extends SurfaceView
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (!introPlayed) {
             introPlayed = true;
-            startIntro();
-            // O app abre no menu inicial: MODO HISTÓRIA ou MODO TESTE (a luta de teste de antes).
-            openMainMenu();
+            Runnable abrir = () -> {
+                startIntro();
+                // O app abre no menu inicial: MODO HISTÓRIA ou MODO TESTE (a luta de teste de antes).
+                openMainMenu();
+            };
+            // Arte ainda na fila (o loop ainda não começou): o menu abre depois dela, na mesma
+            // thread de carregamento, e não aqui na thread da UI.
+            if (!running && !loadQueue.isEmpty()) loadQueue.add(abrir);
+            else abrir.run();
         }
         surfaceReady = true;
         startLoopIfReady();
@@ -1789,7 +1815,7 @@ public class GameView extends SurfaceView
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
             drawDamageDummy(canvas);
-            effects.drawEnergyProjectiles(canvas, paint, engine.energyProjectiles);
+            effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
             effects.drawSuperProjectiles(canvas, paint, engine.superProjectiles);
             if (isSuperCinematicActive()) {
                 effects.drawWorldOverlay(canvas, paint, superDarkAlpha, 0, 0, 8);

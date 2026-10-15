@@ -33,8 +33,8 @@
       "crouchSpawnY": 68,
       "attack": {
         "startupFrames": 12,
-        "activeFrames": 1,
-        "recoveryFrames": 22,
+        "activeFrames": 4,
+        "recoveryFrames": 19,
         "hitstunFrames": 31,
         "blockstunFrames": 25,
         "hitstopFrames": 6,
@@ -54,7 +54,19 @@
         ],
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
-        "pushbackOnBlock": 50
+        "pushbackOnBlock": 50,
+        "corpoBase": {
+          "startupFrames": 12,
+          "activeFrames": 1,
+          "recoveryFrames": 22,
+          "hitstunFrames": 31,
+          "blockstunFrames": 25
+        },
+        "reach": 165,
+        "hitHeight": 250,
+        "hitFloor": 62,
+        "launchType": "knockdown",
+        "knockback": 100
       },
       "nome": "Tapa de luva"
     },

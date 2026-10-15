@@ -190,6 +190,10 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['fighter']['energy'].update(crouchSpawnY=400))
         with self.assertRaisesRegex(ValueError,'inside the body'):pipeline.build(self.root)
 
+    def test_energy_visual_must_be_a_known_drawing(self):
+        self.edit(lambda d:d['fighter']['energy'].update(visual='LASER'))
+        with self.assertRaisesRegex(ValueError,'energy.visual'):pipeline.build(self.root)
+
     def test_pushbox_must_fit_inside_hurtbox(self):
         self.edit(lambda d:d['fighter']['body'].update(pushHalfWidth=80))
         with self.assertRaisesRegex(ValueError,'pushbox'):pipeline.build(self.root)

@@ -58,7 +58,8 @@
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
       },
-      "nome": "Machado"
+      "nome": "Machado",
+      "visual": "MACHADO"
     },
     "super": {
       "damage": 4000,
@@ -88,12 +89,6 @@
       "move": "S"
     },
     "wakeupFrames": 34,
-    "mecanica": {
-      "agarrao": {
-        "dano": 2200,
-        "alcance": 40
-      }
-    },
     "ultra": {
       "preparo": 44,
       "golpes": [
@@ -186,6 +181,12 @@
         90,
         96
       ]
+    },
+    "mecanica": {
+      "agarrao": {
+        "dano": 2200,
+        "alcance": 40
+      }
     }
   },
   "animations": {
