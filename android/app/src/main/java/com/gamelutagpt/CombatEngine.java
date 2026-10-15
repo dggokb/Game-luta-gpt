@@ -1165,6 +1165,7 @@ final class CombatEngine {
         }
         f.ultraFall = false;
         f.hardFall = false;
+        f.spinning = false;
         f.bounce = CombatFighter.BOUNCE_NONE;
         if (f.status == CombatFighter.Status.NEUTRAL) f.crouching = ControlsLayout.isDownDirection(f.input.direction);
     }
@@ -1191,6 +1192,7 @@ final class CombatEngine {
         f.slammed = false;
         f.ultraFall = false;
         f.hardFall = false;
+        f.spinning = false;
         f.bounce = CombatFighter.BOUNCE_NONE;
         f.vx = 0f;
         f.superJumping = false;
@@ -2004,6 +2006,7 @@ final class CombatEngine {
             d.slammed = false;
             d.ultraFall = false;
             d.hardFall = false;
+            d.spinning = false;
             d.bounce = CombatFighter.BOUNCE_NONE;
             d.vx = 0f;
             return;
@@ -2064,6 +2067,10 @@ final class CombatEngine {
         }
 
         boolean wasCrouching = d.crouchingBody();
+        // Punish counter: a standing heavy normal caught the defender in its own move.
+        boolean punish = lastStrike && !projectile && a.grounded && d.grounded && d.attacking() &&
+            attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY &&
+            attack.launch != AttackDefinition.Launch.LAUNCH;
         d.clearAttack();
         d.forwardDashing = false;
         d.backdashFrames = 0;
@@ -2074,13 +2081,31 @@ final class CombatEngine {
         d.freeFallFrames = 0;
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
+        d.spinning = false;
         // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
         boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && session.hitCount >= 2 &&
             session.wallBounces < config.maxWallBounces;
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
 
-        if (wallBounce) {
+        if (punish) {
+            // Spinning knockdown: flies away in a medium arc, still open to a juggle, and
+            // lands lying down (no air tech).
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y -= 2f;
+            d.vx = direction * config.spinSpeed;
+            d.vy = -config.spinLift;
+            d.spinning = true;
+            d.launched = true;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, config.spinHitstunFrames);
+            d.pushRemaining = 0f;
+            d.pushFramesLeft = 0;
+            cues.add("PUNISH");
+        } else if (wallBounce) {
             // Sent flying to the wall (arena edge or screen edge); it bounces in moveHorizontally.
             session.wallBounces++;
             d.status = CombatFighter.Status.AIR_HITSTUN;

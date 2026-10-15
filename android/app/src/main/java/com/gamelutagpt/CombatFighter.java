@@ -142,6 +142,8 @@ final class CombatFighter {
     float bounceWallX;
     /** Bounced: lands knocked down instead of recovering in the air. */
     boolean hardFall;
+    /** Punish counter: flying away spinning in the air (lands knocked down). */
+    boolean spinning;
     /** Beam: hits it deals, hits dealt so far, damage left for the hits and for the blast. */
     int beamHits;
     int beamHitsDone;

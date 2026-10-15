@@ -218,6 +218,13 @@ final class CombatConfig {
 
     // Wall bounce and ground bounce: once each per combo (the next one is a plain hit).
     int maxWallBounces = 1;
+    /**
+     * Punish counter (como no SF6): um H em pé que acerta o rival no meio do golpe dele
+     * (início ou recuperação) o joga girando no ar a média distância (~360 px), e ele cai deitado.
+     */
+    float spinSpeed = 360f;
+    float spinLift = 820f;
+    int spinHitstunFrames = 30;
     int maxGroundBounces = 1;
     /** The defender flies toward the wall: the arena edge or this far from the attacker (screen edge). */
     float wallBounceSpeed = 1500f;

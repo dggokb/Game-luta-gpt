@@ -230,6 +230,14 @@ têm air tech (caem derrubados).
 - O levantar dura no máximo `maxWakeupFrames` (30): um clipe GETUP mais longo toca mais
   rápido, inteiro, no tempo do motor. Queda + chão + levantar normal ≈ 1,2 s.
 
+**Punish counter (giro no ar, como no SF6):** o H em pé que acerta o rival **no meio do golpe
+dele** (início, ativo ou recuperação) o joga girando no ar a média distância (~360 px, ~1 s
+de voo) e ele cai deitado, sem air tech. Ainda dá para emendar golpes nele no ar (conta no
+limite de juggle). A tela treme e aparece "PUNISH COUNTER!". O 2H (lançador) não conta, nem
+golpes leves/médios, especiais ou projéteis. Valores em `CombatConfig.spin*`; o giro é só
+visual (o sprite gira em torno do próprio eixo, inclinado, em `GameView.spinTransform`).
+Testes em `PunishCounterTest`.
+
 **KO e derrota:** quem é nocauteado deitado (ou no ar, que cai deitado) não levanta mais.
 Quem cai de pé (o último golpe não derruba) toca o clipe `DEFEAT` do pack uma vez, 2× mais
 rápido (~2 s), e fica na última pose; packs sem `DEFEAT` ficam na guarda.

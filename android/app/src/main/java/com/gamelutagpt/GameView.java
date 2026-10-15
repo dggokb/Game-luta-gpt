@@ -1131,7 +1131,9 @@ public class GameView extends SurfaceView
             String banner = bannerFor(cue);
             if (banner != null) showBanner(banner);
             // Bounces shake the screen like the beam's hits.
-            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) beamShake = Math.max(beamShake, 14f);
+            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue)) {
+                beamShake = Math.max(beamShake, 14f);
+            }
             if ("ULTRA_FINISH".equals(cue)) beamShake = Math.max(beamShake, 22f);
         }
         updateUltraBeam();
@@ -1588,6 +1590,7 @@ public class GameView extends SurfaceView
             case "DHC": return "TEAM SUPER!";
             case "OVERDRIVE": return "OVERDRIVE!";
             case "COUNTER": return "CONTRA-GOLPE!";
+            case "PUNISH": return "PUNISH COUNTER!";
             case "ARMOR": return "ARMADURA!";
             case "POISON": return "VENENO!";
             case "CHARGED": return "ONDA CARREGADA!";
@@ -2468,6 +2471,7 @@ public class GameView extends SurfaceView
         float angle = knockdownAngle(renderer, f);
         c.save();
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
+        if (f.spinning && !f.grounded) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
         float visualY = f.y;
         if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
@@ -2475,6 +2479,26 @@ public class GameView extends SurfaceView
         }
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
         c.restore();
+    }
+
+    /** Graus por frame do giro do punish counter (~3 voltas no voo). */
+    private static final float SPIN_DEGREES_PER_FRAME = 20f;
+    /** Inclinação do corpo no voo: a cabeça vai na frente, para o lado em que ele voa. */
+    private static final float SPIN_TILT = 38f;
+
+    /**
+     * Punish counter: o corpo gira em torno do próprio eixo (como um parafuso) enquanto voa,
+     * inclinado para trás. O giro é a largura do desenho indo e voltando (cos), que vira o
+     * sprite do avesso a cada meia volta, com o centro do corpo como pivô.
+     */
+    private void spinTransform(Canvas c, CombatFighter f) {
+        float pivotY = f.y - f.character().visualStandHeight * 0.5f;
+        float lean = clamp(f.stunElapsed / 8f, 0f, 1f);
+        c.rotate(Math.signum(f.vx) * SPIN_TILT * lean, f.x, pivotY);
+        float turn = (float)Math.cos(Math.toRadians(f.stunElapsed * SPIN_DEGREES_PER_FRAME));
+        // Nunca some de vez de perfil: fica uma lâmina fina.
+        float width = Math.copySign(Math.max(0.12f, Math.abs(turn)), turn);
+        c.scale(width, 1f, f.x, pivotY);
     }
 
     /** Glow and sparks around a fighter whose team is in Overdrive. */
