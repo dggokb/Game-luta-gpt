@@ -159,7 +159,7 @@ no PC.
 | `PaginaHistoria.TYPE_SPEED` | 48 letras/s | velocidade da digitação |
 | `MAX_SCALE` | 3× | zoom máximo sobre a imagem |
 | `PAN_SPEED` | 110 px/s | velocidade do passeio em quadros altos |
-| `DIM_ALPHA` | 185 | quanto o resto da página escurece (0 a 255) |
+| `DIM_ALPHA` | 220 | quanto o resto da página escurece (0 a 255): o resto fica quase apagado, mas ainda dá para ver os quadros |
 
 ## Limites conhecidos
 
