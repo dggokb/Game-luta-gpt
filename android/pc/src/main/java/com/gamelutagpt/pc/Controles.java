@@ -34,6 +34,8 @@ final class Controles implements Runnable {
     private ControllerManager sdl;
     private Thread thread;
     private volatile boolean rodando;
+    /** Tipo do controle que mandou por último (o tutorial mostra os botões dele). */
+    private String tipo;
 
     Controles(GameView jogo) { this.jogo = jogo; }
 
@@ -81,14 +83,26 @@ final class Controles implements Runnable {
                 sdl.update();
                 java.util.Arrays.fill(agora, false);
                 int conectados = 0;
+                String primeiro = null;
                 for (int i = 0; i < MAX_CONTROLES; i++) {
                     ControllerState s = sdl.getState(i);
                     if (!s.isConnected) continue;
                     conectados++;
-                    ler(s, agora);
+                    if (primeiro == null) primeiro = s.controllerType;
+                    boolean[] deste = new boolean[CODIGOS.length];
+                    ler(s, deste);
+                    for (int b = 0; b < deste.length; b++) {
+                        if (!deste[b]) continue;
+                        agora[b] = true;
+                        tipo = s.controllerType;
+                    }
                 }
                 if (conectados != conectadosAntes) {
-                    if (conectadosAntes >= 0 || conectados > 0) Log.i(TAG, conectados + " controle(s) conectado(s)");
+                    if (conectadosAntes >= 0 || conectados > 0) Log.i(TAG, conectados + " controle(s) conectado(s): " + primeiro);
+                    // Controle plugado: o tutorial já mostra os botões dele; tirado, volta ao teclado.
+                    if (conectados > 0 && tipo == null) tipo = primeiro;
+                    if (conectados == 0) tipo = null;
+                    jogo.setControleConectado(conectados > 0 ? (tipo != null ? tipo : "XBOX") : null);
                     conectadosAntes = conectados;
                 }
                 aplicar(agora, System.currentTimeMillis());
@@ -106,6 +120,7 @@ final class Controles implements Runnable {
         }
     }
 
+    /** Estado de um controle nos botões; {@code b} recebe OU (vários controles valem juntos). */
     private static void ler(ControllerState s, boolean[] b) {
         // O analógico esquerdo (Y para cima é positivo) soma ao D-pad.
         b[0] |= s.dpadUp || s.leftStickY > ZONA_MORTA;
@@ -132,7 +147,7 @@ final class Controles implements Runnable {
             if (agora[i] && !antes[i]) {
                 desde[i] = ms;
                 repeticoes[i] = 0;
-                jogo.onKeyDown(codigo, new KeyEvent(KeyEvent.ACTION_DOWN, codigo, 0));
+                jogo.onKeyDown(codigo, new KeyEvent(KeyEvent.ACTION_DOWN, codigo, 0, tipo != null ? tipo : "XBOX"));
             } else if (!agora[i] && antes[i]) {
                 jogo.onKeyUp(codigo, new KeyEvent(KeyEvent.ACTION_UP, codigo));
             } else if (agora[i] && i < 4) {
@@ -140,7 +155,7 @@ final class Controles implements Runnable {
                 int devidas = segurando < REPETIR_APOS_MS ? 0 : 1 + (int) ((segurando - REPETIR_APOS_MS) / REPETIR_A_CADA_MS);
                 while (repeticoes[i] < devidas) {
                     repeticoes[i]++;
-                    jogo.onKeyDown(codigo, new KeyEvent(KeyEvent.ACTION_DOWN, codigo, repeticoes[i]));
+                    jogo.onKeyDown(codigo, new KeyEvent(KeyEvent.ACTION_DOWN, codigo, repeticoes[i], tipo));
                 }
             }
             antes[i] = agora[i];

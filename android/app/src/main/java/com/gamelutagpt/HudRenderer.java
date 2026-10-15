@@ -696,7 +696,7 @@ final class HudRenderer {
      * Painel da lição do tutorial: em que lição está, o nome, o que fazer, quantas vezes já
      * fez e o PULAR. Entre as lições, "MUITO BEM!"; no fim, "TREINO COMPLETO!".
      */
-    void drawTutorial(Canvas c, TutorialDirector tutorial) {
+    void drawTutorial(Canvas c, TutorialDirector tutorial, Comandos.Esquema esquema) {
         if (!tutorial.active()) return;
         reset();
         if (tutorial.completing()) {
@@ -716,7 +716,8 @@ final class HudRenderer {
         c.drawText("TREINO  " + (tutorial.lessonIndex() + 1) + "/" + tutorial.lessonCount(), left + 26f, top + 24f, paint);
         paint.setFakeBoldText(false);
         text(c, lesson.title, cx, top + 46f, 26f, Color.WHITE);
-        text(c, lesson.how, cx, top + 74f, 19f, 0xFFFFE6B8);
+        // Os botões do texto no que o jogador está usando (toque, teclado ou controle).
+        text(c, Comandos.texto(lesson.how, esquema), cx, top + 74f, 19f, 0xFFFFE6B8);
         // Quantas vezes: uma bolinha por repetição, cheia quando já fez.
         float pip = 7f, gap = 22f;
         float px = cx - (lesson.times - 1) * gap * 0.5f;

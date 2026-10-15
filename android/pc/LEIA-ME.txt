@@ -27,6 +27,9 @@ Overdrive       P  (ou I + O)        LT
 Pausa           Esc                  Start
 Seleção         F2                   Back  (no modo história: a pausa)
 
+O tutorial mostra os botões do que você está usando: teclado ([J], [K]...) ou
+controle (padrão Xbox; PlayStation e Nintendo são reconhecidos pelo nome).
+
 Menus e seleção: setas/WASD andam, J/Enter/Espaço confirma, K/Esc volta,
 R sorteia, Tab abre as opções, Q/E/O troca o time.
 

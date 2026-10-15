@@ -614,6 +614,11 @@ public class Canvas {
             g.drawImage(source, dx0, dy0, dx1, dy1, sx0, sy0, sx1, sy1, null);
         } else {
             Resampler.Scaled scaled = Resampler.get(source, sx0, sy0, sx1, sy1, dw, dh, flipX, flipY);
+            if (scaled == null) {
+                // Tamanho mudando a cada quadro: o caminho normal do Java2D.
+                g.setTransform(t);
+                return false;
+            }
             BufferedImage si = scaled.image;
             if (!blendDirect(si, dx0 + scaled.dx, dy0 + scaled.dy, si.getWidth(), si.getHeight(), alpha)) {
                 g.drawImage(si, dx0 + scaled.dx, dy0 + scaled.dy, null);
@@ -837,11 +842,12 @@ public class Canvas {
         };
 
         private static final class Key {
-            final BufferedImage image;
+            /** {@link ImageIds}: a chave não segura o atlas (ele sai da memória na troca de dupla). */
+            final int image;
             final int x0, y0, x1, y1;
             final ColorFilter filter;
 
-            Key(BufferedImage image, int x0, int y0, int x1, int y1, ColorFilter filter) {
+            Key(int image, int x0, int y0, int x1, int y1, ColorFilter filter) {
                 this.image = image;
                 this.x0 = x0;
                 this.y0 = y0;
@@ -857,12 +863,12 @@ public class Canvas {
             }
 
             @Override public int hashCode() {
-                return ((System.identityHashCode(image) * 31 + x0) * 31 + y0) * 31 + x1 * 17 + y1 + filter.hashCode() * 7;
+                return ((image * 31 + x0) * 31 + y0) * 31 + x1 * 17 + y1 + filter.hashCode() * 7;
             }
         }
 
         static synchronized BufferedImage get(BufferedImage image, int x0, int y0, int x1, int y1, ColorFilter filter) {
-            Key key = new Key(image, x0, y0, x1, y1, filter);
+            Key key = new Key(ImageIds.of(image), x0, y0, x1, y1, filter);
             BufferedImage out = CACHE.get(key);
             if (out != null) return out;
             out = new BufferedImage(x1 - x0, y1 - y0, BufferedImage.TYPE_INT_ARGB_PRE);

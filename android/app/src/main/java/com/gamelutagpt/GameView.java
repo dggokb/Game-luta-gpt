@@ -292,6 +292,11 @@ public class GameView extends SurfaceView
     private final TelaCarregando telaCarregando = new TelaCarregando();
     /** Controle virtual (D-pad e botões de golpe) na tela; o PC desliga, lá é teclado/controle. */
     private volatile boolean touchControls = true;
+    /**
+     * O que o jogador está usando, para o tutorial mostrar os botões certos: o último entre
+     * toque, teclado e controle (o controle pelo tipo: Xbox, PlayStation, Nintendo).
+     */
+    private volatile Comandos.Esquema esquema = Comandos.Esquema.TOQUE;
 
     /** Teclado/controle físico na luta (PC e Android): +código ao apertar, -código ao soltar. */
     private final ConcurrentLinkedQueue<Integer> hardwareKeys = new ConcurrentLinkedQueue<>();
@@ -507,6 +512,7 @@ public class GameView extends SurfaceView
     }
 
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        notarEsquema(keyCode, event);
         if (menuInicial.isOpen()) {
             // No menu inicial a tecla voltar fecha o app, como em toda tela raiz do Android.
             if (keyCode == KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
@@ -899,6 +905,29 @@ public class GameView extends SurfaceView
     /** PC: sem o controle virtual na tela (o mouse também não aperta onde ele ficaria). */
     public void setTouchControlsVisible(boolean visible) {
         touchControls = visible;
+        if (!visible && esquema == Comandos.Esquema.TOQUE) esquema = Comandos.Esquema.TECLADO;
+    }
+
+    /**
+     * Controle conectado (o nome ou o tipo dele) ou desconectado (null). Conectado, o tutorial
+     * já mostra os botões dele; desconectado, volta ao teclado (ou ao toque).
+     */
+    public void setControleConectado(String nomeOuTipo) {
+        if (nomeOuTipo != null) {
+            esquema = Comandos.doControle(nomeOuTipo);
+        } else if (esquema != Comandos.Esquema.TOQUE && esquema != Comandos.Esquema.TECLADO) {
+            esquema = touchControls ? Comandos.Esquema.TOQUE : Comandos.Esquema.TECLADO;
+        }
+    }
+
+    /** A tecla mostra o que o jogador usa: botão de controle, ou tecla que só teclado tem. */
+    private void notarEsquema(int keyCode, KeyEvent event) {
+        if (Comandos.isBotaoDeControle(keyCode)) {
+            android.view.InputDevice device = event.getDevice();
+            esquema = Comandos.doControle(device != null ? device.getName() : null);
+        } else if (Comandos.isTeclaDeTeclado(keyCode)) {
+            esquema = Comandos.Esquema.TECLADO;
+        }
     }
 
     /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
@@ -1860,7 +1889,7 @@ public class GameView extends SurfaceView
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
-        hud.drawTutorial(c, tutorial);
+        hud.drawTutorial(c, tutorial, esquema);
         if (debugOverlay) {
             debug.drawPanel(c, engine);
             drawSizeTunerButton(c);
@@ -2448,6 +2477,8 @@ public class GameView extends SurfaceView
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!activityActive) return true;
+        // Tocou na tela com o controle virtual à vista: o tutorial volta a falar do toque.
+        if (touchControls && event.getActionMasked() == MotionEvent.ACTION_DOWN) esquema = Comandos.Esquema.TOQUE;
         pendingInput.offer(MotionEvent.obtain(event));
         return true;
     }

@@ -33,6 +33,10 @@ android/pc/src/main/java    ─┘
 - **Controle virtual**: o PC chama `GameView.setTouchControlsVisible(false)`: o D-pad e os
   botões de golpe não são desenhados nem respondem ao mouse. Botões de teste e SELEÇÃO
   continuam.
+- **Botões no tutorial**: `Comandos` (no app) troca as marcas das lições ({L}, {SUPER}...)
+  pelo que o jogador usa por último: toque, teclado ([J]...) ou controle ([X] Xbox, [□]
+  PlayStation, [Y] Nintendo, pelo nome do controle). No PC o `Controles` informa o controle
+  plugado (o tutorial já muda) e o tipo de cada aperto; no Android vem do `KeyEvent.getDevice()`.
 - **Carregamento**: `TelaCarregando` (no app) aparece no APK e no PC ao abrir o jogo e sempre
   que o `GameView` carrega arte pesada (duplas novas, lutas da história): o trabalho roda numa
   thread à parte e o loop só desenha a tela, com o anel girando.
@@ -49,6 +53,10 @@ mudar o resultado na tela:
 - **Mistura alfa**: `Blender` mistura as imagens grandes em todos os núcleos.
 - **Texto**: cada texto (com contorno) é rasterizado uma vez e reaproveitado.
 - **Redução forte** (retratos grandes em caixas pequenas): mipmaps.
+- **Botões no tutorial**: `Comandos` (no app) troca as marcas das lições ({L}, {SUPER}...)
+  pelo que o jogador usa por último: toque, teclado ([J]...) ou controle ([X] Xbox, [□]
+  PlayStation, [Y] Nintendo, pelo nome do controle). No PC o `Controles` informa o controle
+  plugado (o tutorial já muda) e o tipo de cada aperto; no Android vem do `KeyEvent.getDevice()`.
 - **Carregamento**: ao pedir o primeiro atlas de um personagem, os outros dele são
   decodificados em paralelo (`Resources`).
 

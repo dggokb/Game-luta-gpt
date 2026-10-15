@@ -23,11 +23,12 @@ final class Resampler {
     private static final long BUDGET = Long.getLong("gameluta.cacheEscala", 24_000_000L);
 
     private static final class Key {
-        final BufferedImage image;
+        /** {@link ImageIds}: a chave não segura a imagem original. */
+        final int image;
         final int sx0, sy0, sx1, sy1, dw, dh;
         final boolean flipX, flipY;
 
-        Key(BufferedImage image, int sx0, int sy0, int sx1, int sy1, int dw, int dh, boolean flipX, boolean flipY) {
+        Key(int image, int sx0, int sy0, int sx1, int sy1, int dw, int dh, boolean flipX, boolean flipY) {
             this.image = image;
             this.sx0 = sx0;
             this.sy0 = sy0;
@@ -47,7 +48,7 @@ final class Resampler {
         }
 
         @Override public int hashCode() {
-            int h = System.identityHashCode(image);
+            int h = image;
             h = h * 31 + sx0; h = h * 31 + sy0; h = h * 31 + sx1; h = h * 31 + sy1;
             h = h * 31 + dw; h = h * 31 + dh;
             return h * 4 + (flipX ? 2 : 0) + (flipY ? 1 : 0);
@@ -67,26 +68,46 @@ final class Resampler {
     }
 
     private static long cachedPixels;
-    private static final Map<Key, Scaled> CACHE = new LinkedHashMap<Key, Scaled>(256, 0.75f, true) {
-        @Override protected boolean removeEldestEntry(Map.Entry<Key, Scaled> eldest) {
-            if (cachedPixels <= BUDGET) return false;
-            BufferedImage img = eldest.getValue().image;
-            cachedPixels -= (long) img.getWidth() * img.getHeight();
-            return true;
-        }
-    };
+    private static final LinkedHashMap<Key, Scaled> CACHE = new LinkedHashMap<>(256, 0.75f, true);
+    /**
+     * Imagem que muda de tamanho quadro após quadro (zoom das páginas da história): quantas
+     * vezes seguidas não achou no cache. Acima do limite ela vai direto pelo Java2D.
+     */
+    private static final Map<Integer, Integer> MISSES = new java.util.HashMap<>();
+    private static final int ANIMATING = 3;
 
     private Resampler() {}
 
     /** O recorte {@code [sx0,sx1) x [sy0,sy1)} de {@code image} com {@code dw}x{@code dh} pixels. */
+    /**
+     * A imagem escalada, ou null quando ela está sendo animada (cada quadro num tamanho):
+     * aí quem chama desenha pelo Java2D, sem encher o cache.
+     */
     static synchronized Scaled get(BufferedImage image, int sx0, int sy0, int sx1, int sy1,
                                    int dw, int dh, boolean flipX, boolean flipY) {
-        Key key = new Key(image, sx0, sy0, sx1, sy1, dw, dh, flipX, flipY);
+        int id = ImageIds.of(image);
+        Key key = new Key(id, sx0, sy0, sx1, sy1, dw, dh, flipX, flipY);
         Scaled out = CACHE.get(key);
-        if (out != null) return out;
+        if (out != null) {
+            MISSES.remove(id);
+            return out;
+        }
+        if (MISSES.size() > 4096) MISSES.clear();
+        int misses = MISSES.merge(id, 1, Integer::sum);
+        // Animando: tenta o cache de novo só de vez em quando (pode ter parado).
+        if (misses > ANIMATING && misses % 30 != 0) return null;
         out = compact(scale(image, sx0, sy0, sx1, sy1, dw, dh, flipX, flipY));
         cachedPixels += (long) out.image.getWidth() * out.image.getHeight();
         CACHE.put(key, out);
+        // Despeja as mais antigas até caber (uma imagem grande pode valer por muitas pequenas).
+        java.util.Iterator<Map.Entry<Key, Scaled>> it = CACHE.entrySet().iterator();
+        while (cachedPixels > BUDGET && it.hasNext()) {
+            Map.Entry<Key, Scaled> eldest = it.next();
+            if (eldest.getKey().equals(key)) continue;
+            BufferedImage img = eldest.getValue().image;
+            cachedPixels -= (long) img.getWidth() * img.getHeight();
+            it.remove();
+        }
         return out;
     }
 

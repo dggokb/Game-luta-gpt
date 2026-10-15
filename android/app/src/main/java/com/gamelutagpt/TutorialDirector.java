@@ -105,7 +105,10 @@ final class TutorialDirector {
         /** Nome fixo da lição ("golpe-fraco", "especial-s2"...), usado pelos quadros entre as lições. */
         final String id;
         final String title;
-        /** O que fazer, com as setas do direcional (virado para a direita). */
+        /**
+         * O que fazer, com as setas do direcional (virado para a direita) e os botões como
+         * marcas ({L}, {SUPER}...) que o {@link Comandos} troca pelo toque, teclado ou controle.
+         */
         final String how;
         final int times;
         /** O boneco ao alcance: se ficar longe, volta para perto. */
@@ -166,27 +169,27 @@ final class TutorialDirector {
             (c, p1) -> p1.direction = c.t < 3 || (c.t >= 6 && c.t < 9) ? 5 : 0));
 
         // Golpes no chão, agachado e no ar.
-        out.add(hit(character, "GOLPE FRACO", "Perto do boneco, aperte L", "L", 2));
-        out.add(hit(character, "GOLPE MÉDIO", "Aperte M", "M", 2));
-        out.add(hit(character, "GOLPE FORTE", "Aperte H", "H", 1));
-        out.add(hit(character, "FRACO AGACHADO", "Segure ↓ e aperte L", "2L", 2));
-        out.add(hit(character, "MÉDIO AGACHADO", "Segure ↓ e aperte M", "2M", 1));
-        out.add(hit(character, "FORTE AGACHADO", "Segure ↓ e aperte H", "2H", 1));
+        out.add(hit(character, "GOLPE FRACO", "Perto do boneco, aperte {L}", "L", 2));
+        out.add(hit(character, "GOLPE MÉDIO", "Aperte {M}", "M", 2));
+        out.add(hit(character, "GOLPE FORTE", "Aperte {H}", "H", 1));
+        out.add(hit(character, "FRACO AGACHADO", "Segure ↓ e aperte {L}", "2L", 2));
+        out.add(hit(character, "MÉDIO AGACHADO", "Segure ↓ e aperte {M}", "2M", 1));
+        out.add(hit(character, "FORTE AGACHADO", "Segure ↓ e aperte {H}", "2H", 1));
         if (character.moves.containsKey("jH")) {
-            out.add(new Lesson("GOLPE NO AR", "Pule para frente (↗) e aperte H no ar", 1, true,
+            out.add(new Lesson("GOLPE NO AR", "Pule para frente (↗) e aperte {H} no ar", 1, true,
                 c -> c.placeApart(70f), null,
                 c -> c.landed("jH"),
                 (c, p1) -> jumpIn(c, p1, false)));
         }
         if (character.moves.containsKey("j2H")) {
-            out.add(new Lesson("CRAVADA", "No ar, segure ↓ e aperte H: crava o rival no chão", 1, true,
+            out.add(new Lesson("CRAVADA", "No ar, segure ↓ e aperte {H}: crava o rival no chão", 1, true,
                 c -> c.placeApart(70f), null,
                 c -> c.landed("j2H"),
                 (c, p1) -> jumpIn(c, p1, true)));
         }
 
         // Combos.
-        out.add(new Lesson("COMBO", "L, M e H, um logo depois do outro enquanto acerta", 1, true, close, null,
+        out.add(new Lesson("COMBO", "{L}, {M} e {H}, um logo depois do outro enquanto acerta", 1, true, close, null,
             c -> c.engine.session(1) != null && c.engine.session(1).hitCount >= 3,
             (c, p1) -> {
                 if (c.t == 0) p1.light = true;
@@ -195,7 +198,7 @@ final class TutorialDirector {
                 if (id.equals("M") && c.p1().outcome != CombatFighter.Outcome.NONE) p1.heavy = true;
             }));
         if (character.fighter.autoCombo.length >= 3) {
-            out.add(new Lesson("BOTÃO COMBO", "Aperte COMBO várias vezes: os golpes saem em sequência", 1, true,
+            out.add(new Lesson("BOTÃO COMBO", "Aperte {COMBO} várias vezes: os golpes saem em sequência", 1, true,
                 close, null,
                 c -> c.p1().attacking() && c.p1().autoStep >= 2,
                 (c, p1) -> p1.auto = c.t % 8 == 0));
@@ -217,7 +220,7 @@ final class TutorialDirector {
         // Especiais: os comandos vêm do próprio personagem.
         if (character.fighter.energy != null) {
             int[] command = character.fighter.energyCommand;
-            out.add(new Lesson("ESPECIAL DE ENERGIA", arrows(command) + " + L, M ou H: lança energia", 1, false,
+            out.add(new Lesson("ESPECIAL DE ENERGIA", arrows(command) + " + {L}, {M} ou {H}: lança energia", 1, false,
                 c -> c.placeApart(160f), null,
                 c -> c.doing("S"),
                 (c, p1) -> special(c, p1, command, "M")));
@@ -235,15 +238,15 @@ final class TutorialDirector {
         }
 
         // Agarrão, Super e Ultra.
-        out.add(new Lesson("AGARRÃO", "Colado no boneco, aperte L + M juntos (o botão entre eles)", 1, true,
+        out.add(new Lesson("AGARRÃO", "Colado no boneco, aperte {AGARRAO}", 1, true,
             c -> c.placeApart(8f), null,
             c -> c.event("THROW"),
             (c, p1) -> p1.grab = c.t == 2));
-        out.add(new Lesson("SUPER", "Com 1 barra cheia, aperte SUPER", 1, false,
+        out.add(new Lesson("SUPER", "Com 1 barra cheia, aperte {SUPER}", 1, false,
             c -> { c.placeApart(140f); c.team[0].superMeter = Math.max(c.team[0].superMeter, BAR); }, null,
             c -> c.doing("SUPER"),
             (c, p1) -> p1.superAttack = c.t == 2));
-        out.add(new Lesson("ULTRA", "Com 3 barras, segure ↓ e aperte SUPER", 1, true,
+        out.add(new Lesson("ULTRA", "Com 3 barras, segure ↓ e aperte {SUPER}", 1, true,
             c -> { c.placeApart(60f); c.team[0].superMeter = Math.max(c.team[0].superMeter, CombatConfig.ULTRA_COST); },
             null,
             c -> c.p1().status == CombatFighter.Status.ULTRA,
@@ -312,12 +315,12 @@ final class TutorialDirector {
         return sb.toString();
     }
 
+    /** "LMH" → "{L}, {M} ou {H}" (as marcas viram os botões do toque, teclado ou controle). */
     private static String orList(String buttons) {
-        if (buttons.length() == 1) return buttons;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < buttons.length(); i++) {
             if (i > 0) sb.append(i == buttons.length() - 1 ? " ou " : ", ");
-            sb.append(buttons.charAt(i));
+            sb.append('{').append(buttons.charAt(i)).append('}');
         }
         return sb.toString();
     }
