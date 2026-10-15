@@ -275,6 +275,53 @@ public class TorneioTest {
         assertEquals("p02", lutas.get(5)[1][0]);
     }
 
+    /** As páginas prontas que o ep01 mostra, na ordem, para quem escolheu esse irmão. */
+    private static List<String> paginasDoEp01(String irmao) throws IOException {
+        GameAssets assets = new GameAssets();
+        Temporada temporada = Temporada.load(assets);
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, assets);
+        p.setCampanha(Campanha.load(assets, 1L));
+        p.start(temporada, temporada.loadEpisodio(assets, "ep01"));
+        List<String> paginas = new ArrayList<>();
+        for (int i = 0; i < 20000 && rec.ended == null; i++) {
+            if (p.waitingFight()) {
+                paginas.add("LUTA");
+                p.resultadoLuta(true);
+                continue;
+            }
+            Episodio.Passo passo = p.passo();
+            if (passo.tipo == Episodio.TipoPasso.ESCOLHA) {
+                run(p, 0.5f);
+                p.moverEscolha(Torneio.KOGA.equals(irmao) ? 1 : -1);
+                p.confirmarEscolha();
+                run(p, 1f);
+                continue;
+            }
+            if (passo.imagem != null && (paginas.isEmpty() || !passo.imagem.equals(paginas.get(paginas.size() - 1)))) {
+                paginas.add(passo.imagem);
+            }
+            run(p, 0.6f);
+            p.tap(640f, 360f);
+        }
+        assertNotNull("o ep01 não terminou", rec.ended);
+        return paginas;
+    }
+
+    @Test
+    public void ep01TemComecoEFimDeCadaIrmao() throws IOException {
+        List<String> meio = java.util.Arrays.asList("pag4.jpg", "pag5.jpg", "pag6.jpg", "LUTA",
+            "pag7.jpg", "pag8.jpg", "pag9.jpg", "pag10.jpg");
+        List<String> ryuga = new ArrayList<>(java.util.Arrays.asList("pag1.jpg", "pag2.jpg", "pag3.jpg"));
+        ryuga.addAll(meio);
+        ryuga.add("pag11.jpg");
+        List<String> koga = new ArrayList<>(java.util.Arrays.asList("pag1_koga.jpg", "pag2_koga.jpg", "pag3_koga.jpg"));
+        koga.addAll(meio);
+        koga.add("pag11_koga.jpg");
+        assertEquals(ryuga, paginasDoEp01(Torneio.RYUGA));
+        assertEquals(koga, paginasDoEp01(Torneio.KOGA));
+    }
+
     @Test
     public void semCampanhaAsEtapasDoTorneioSaoPuladas() throws IOException {
         GameAssets assets = new GameAssets();
