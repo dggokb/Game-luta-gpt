@@ -36,7 +36,8 @@ def main():
         page.check('#ghost')
         page.wait_for_function("document.querySelector('#normalInfo').textContent.includes('jab_half')")
         page.uncheck('#ghost')
-        for action in ('jab','dash','crouch'):
+        for action in ('jab','dash','crouch','walk_forward','walk_back','back_dash'):
+            if page.locator('#'+action).is_disabled():continue
             page.click('#'+action)
             page.wait_for_function('playing === true && sequence !== null')
             # Advance deterministically across the full sequence using frame controls.
@@ -48,6 +49,13 @@ def main():
                 page.evaluate('frame=60;render()')
                 page.wait_for_function("document.querySelector('#normalInfo').textContent.includes('correção anatômica anotada') && document.querySelector('#position').textContent.startsWith('61/')")
                 page.screenshot(path=str(args.screenshots/'crouch-corrected.png'),full_page=True)
+            if action in ('walk_forward','walk_back','back_dash'):
+                index=100 if action=='walk_forward' else 50
+                page.evaluate(f'frame={index};render()')
+                page.wait_for_function(f"document.querySelector('#normalInfo').textContent.startsWith('{action} ·') && document.querySelector('#position').textContent.startsWith('{index+1}/')")
+                if action in ('walk_forward','back_dash'):
+                    assert page.locator('#clipNote').is_visible()
+                page.screenshot(path=str(args.screenshots/f'{action}-action.png'),full_page=True)
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function("document.querySelector('#normalInfo').textContent.startsWith('idle ·')")
             report['checks'].append('idle_'+action+'_idle_sequence')

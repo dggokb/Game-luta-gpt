@@ -22,10 +22,14 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='New validation directory')
     parser.add_argument('--without-scale-correction', action='store_true',
                         help='Reproduce the constant-scale baseline for before/after comparison')
+    parser.add_argument('--include-movement', action='store_true',
+                        help='Include the forward walk, backward walk and airborne backdash sources')
     args = parser.parse_args()
     source, output = args.inputs.resolve(), args.output.resolve()
     required = ['inicio_centro.png','inicio_agachado.png','idle.mp4','L(jab).mp4',
                 'dash.mp4','jump.mp4','crounch.mp4','l2(jab).mp4','dano_baixo.mp4']
+    if args.include_movement:
+        required += ['walk_fward.mp4','walk_back.mp4','back_dash.mp4']
     for name in required:
         if not (source/name).is_file():
             parser.error(f'Arquivo real ausente: {source/name}')
@@ -47,6 +51,16 @@ def main():
         {'name':'crouch','video':'crounch.mp4','role':'crouch','animation_type':'crouched'},
         {'name':'crouch_jab','video':'l2(jab).mp4','animation_type':'crouched'},
         {'name':'crouch_small','video':'dano_baixo.mp4','reference_pose':'crouch','animation_type':'crouched'}]
+    if args.include_movement:
+        clips += [
+            {'name':'walk_forward','video':'walk_fward.mp4','role':'walk_forward',
+             'animation_type':'translation','detect_loop':True,
+             'loop_start_frame':85,
+             'note':'O vídeo começa parado; os passos aparecem no trecho final.'},
+            {'name':'walk_back','video':'walk_back.mp4','role':'walk_back',
+             'animation_type':'translation','detect_loop':True},
+            {'name':'back_dash','video':'back_dash.mp4','role':'back_dash','animation_type':'airborne',
+             'note':'A fonte tem uma fase aérea e corte no topo em 9 frames; o movimento original foi preservado.'}]
     corrections = {} if args.without_scale_correction else json.loads(
         (Path(__file__).resolve().parents[1]/'examples/real-scale-corrections.json').read_text())
     for c in clips:
@@ -67,7 +81,8 @@ def main():
                'derived_video':{'file':derived.name,'sha256':digest(derived),'command':command,
                    'note':'Controlled geometric resampling of an existing complete video; no poses or motion synthesized.'},
                'manual_landmarks':'Approximate crown/chin points, not a trained anatomical detector.',
-               'source_repository_base':'6ec6b10e3d9d20dd09b0e8ef6a11043d727acf70'})
+               'source_repository_base':'251767e991ba6c740ee83a2dce7bed2dd9ff7d43' if args.include_movement else '6ec6b10e3d9d20dd09b0e8ef6a11043d727acf70',
+               'validation_profile':'movement_extension' if args.include_movement else 'idle_crouch'})
     print(json.dumps({'status':result['status'],'report':str(output/'run'/'index.html')},indent=2))
 
 

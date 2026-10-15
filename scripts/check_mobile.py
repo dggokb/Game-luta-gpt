@@ -50,11 +50,15 @@ def main():
         page.locator('.mobileOptions>summary').tap()
         page.check('#ghost');page.wait_for_function("document.getElementById('normalInfo').textContent.startsWith('jab_half ·')");page.uncheck('#ghost')
         result['checks'].append('master_overlay')
-        for action in ('jab','dash','crouch'):
+        for action in ('jab','dash','crouch','walk_forward','walk_back','back_dash'):
+            if page.locator('#'+action).is_disabled():continue
             page.tap('#'+action);page.tap('#play')
             assert page.evaluate('sequence!==null')
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function(f"document.getElementById('normalInfo').textContent.startsWith('{action} ·')")
+            if action in ('walk_forward','back_dash'):
+                assert page.locator('#clipNote').is_visible()
+                assert page.locator('#clipNote').inner_text()
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function("document.getElementById('normalInfo').textContent.startsWith('idle ·')")
             result['checks'].append('idle_'+action+'_idle')

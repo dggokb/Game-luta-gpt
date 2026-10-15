@@ -90,7 +90,8 @@ def process(config_path, output):
         dest = output/name
         dest.mkdir()
         info = {'name': name, 'status': 'rejected', 'animation_type': clip.get('animation_type', 'stationary'),
-                'role': clip.get('role'), 'reference_pose': clip.get('reference_pose', 'idle'), 'frames': []}
+                'role': clip.get('role'), 'note': clip.get('note', ''),
+                'reference_pose': clip.get('reference_pose', 'idle'), 'frames': []}
         manifest['clips'].append(info)
         if info['animation_type'] not in ('stationary', 'translation', 'airborne', 'crouched'):
             raise CalibrationError('animation_type inválido')
@@ -124,7 +125,8 @@ def process(config_path, output):
         if correction:
             info['scale_correction'] = correction
         info['status'] = 'requires_visual_review'
-        info['loops'] = loop_candidates(frames, int(clip.get('loop_minimum_period', 6))) if clip.get('detect_loop') else []
+        info['loops'] = loop_candidates(frames, int(clip.get('loop_minimum_period', 6)),
+                                       start_frame=clip.get('loop_start_frame', 0)) if clip.get('detect_loop') else []
         boxes = [[b[0]*m[0][0]+m[0][2], b[1]*m[1][1]+m[1][2],
                   b[2]*m[0][0]+m[0][2], b[3]*m[1][1]+m[1][2]]
                  for b, m in zip((f['bbox'] for f in frames), transforms)]

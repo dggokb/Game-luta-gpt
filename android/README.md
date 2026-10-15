@@ -4,9 +4,9 @@
 
 Android 8.0 ou superior, com Android System WebView atualizado. Baixe o arquivo pelo navegador do celular, abra-o e toque em **Instalar**. Se o Android pedir, permita a instalação pelo navegador utilizado.
 
-O app abre com as 8 animações e os 944 frames do lote de validação já incluídos. Não exige login, internet, acesso a arquivos, câmera ou microfone. A aba **Depois** abre primeiro; **Antes** mostra a fonte e **Comparar** coloca duas animações no mesmo zoom. Os botões de reprodução e avanço ficam abaixo da imagem. Em **Sequências, ciclos, mestre e zoom**, estão as transições Idle → Jab → Idle, Idle → Dash → Idle e **Idle → Crouch → Idle**, os ciclos propostos e a sobreposição do mestre. Gire o celular para comparar lado a lado com mais espaço.
+O app abre com os 11 clips e os 1.307 frames dos lotes de teste e movimentação já incluídos. Não exige login, internet, acesso a arquivos, câmera ou microfone. A aba **Depois** abre primeiro; **Antes** mostra a fonte e **Comparar** coloca duas animações no mesmo zoom. Os botões de reprodução e avanço ficam abaixo da imagem. Em **Sequências, ciclos, mestre e zoom**, estão as transições Idle → ação → Idle para Jab, Dash, Crouch, andar para frente, andar para trás e Backdash, os ciclos propostos e a sobreposição do mestre. Gire o celular para comparar lado a lado com mais espaço.
 
-A versão **1.2-preview** inclui a [correção de escala do Crouch](../docs/CORRECAO-CROUCH.md) e a comparação com reprodução dos dois lados. Usa a mesma assinatura da versão 1.1 e pode atualizá-la diretamente. Quem ainda usa a versão 1.0 precisa desinstalá-la antes, pois essa versão tinha outra assinatura. O app não guarda projetos pessoais.
+A versão **1.3-preview** acrescenta o [lote de movimentação](../docs/MOVIMENTACAO.md), mantendo a [correção de escala do Crouch](../docs/CORRECAO-CROUCH.md) e a comparação com reprodução dos dois lados. Usa a mesma assinatura das versões 1.1 e 1.2 e pode atualizá-las diretamente. Quem ainda usa a versão 1.0 precisa desinstalá-la antes, pois essa versão tinha outra assinatura. O app não guarda projetos pessoais.
 
 ## Como comparar
 
@@ -44,8 +44,8 @@ O manifesto não declara permissões. O WebView bloqueia rede, arquivos externos
 
 ## Verificações desta entrega
 
-- 14 verificações por toque em Chromium com tela 390 × 844 e rotação para 844 × 390: reprodução/pausa, avanço, antes/depois, escala comum, mestre, sequências, ciclo e comparação com duas animações, frame direito fixo e durações distintas. O teste reproduz Jab no frame 98 com Crouch à direita e confere a mudança da imagem exibida.
-- 944 frames de antes e 944 de depois presentes no pacote, mantendo os PTS e duração.
+- 17 verificações por toque em Chromium com tela 390 × 844 e rotação para 844 × 390: reprodução/pausa, avanço, antes/depois, escala comum, mestre, seis sequências, ciclo e comparação com duas animações, frame direito fixo e durações distintas. O teste reproduz Jab no frame 98 com Crouch à direita e confere a mudança da imagem exibida.
+- 1.307 frames de antes e 1.307 de depois presentes no pacote, mantendo os PTS e duração.
 - Nenhum erro JavaScript, requisição externa ou rolagem horizontal da página no teste de celular.
 - APK inspecionado com `aapt`, ZIP íntegro, alinhamento válido e assinatura verificada com `apksigner`.
 - Nenhuma permissão Android solicitada.

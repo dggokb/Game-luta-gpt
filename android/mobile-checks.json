@@ -9,6 +9,9 @@
     "idle_jab_idle",
     "idle_dash_idle",
     "idle_crouch_idle",
+    "idle_walk_forward_idle",
+    "idle_walk_back_idle",
+    "idle_back_dash_idle",
     "cycle_preview_without_frame_discard",
     "jab_crouch_comparison_changes_the_actual_right_image",
     "right_pose_can_be_fixed_scrubbed_and_stepped_independently",
@@ -17,7 +20,7 @@
   ],
   "page_errors": [],
   "external_requests": [],
-  "frames": 944,
-  "preview_images": 1888,
+  "frames": 1307,
+  "preview_images": 2614,
   "status": "passed"
 }

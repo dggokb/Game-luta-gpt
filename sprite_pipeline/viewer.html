@@ -11,11 +11,12 @@
 <button id="play">Reproduzir</button><button id="prev">◀ frame</button><button id="next">frame ▶</button>
 <input id="seek" type="range" min="0" value="0" aria-label="Frame"><span id="position"></span><br>
 <button id="jab">Idle → Jab → Idle</button><button id="dash">Idle → Dash → Idle</button><button id="crouch">Idle → Crouch → Idle</button>
+<button id="walk_forward">Idle → Andar para frente → Idle</button><button id="walk_back">Idle → Andar para trás → Idle</button><button id="back_dash">Idle → Backdash → Idle</button>
 <button id="single">Animação completa</button><label>Ciclo proposto <select id="loop"><option value="">Todos os frames</option></select></label>
 <label><input id="ghost" type="checkbox">Sobrepor mestre</label><label><input id="guides" type="checkbox" checked>Chão, root e limites</label>
 <label>Zoom comum <input id="zoom" type="number" value="1" min="0.1" max="4" step="0.1" style="width:65px"></label>
 </div>
-<p id="sequenceNote" class="note"></p>
+<p id="clipNote" class="note" hidden></p><p id="sequenceNote" class="note"></p>
 <div class="panes">
 <div class="pane"><b>Antes — frame original integral</b><div class="stage"><canvas id="before"></canvas></div><pre id="rawInfo"></pre></div>
 <div class="pane"><b id="leftTitle">Depois</b><span class="paneMeta" id="leftPosition"></span><div class="stage"><canvas id="after"></canvas></div><pre id="normalInfo"></pre></div>
@@ -74,6 +75,7 @@ function fixComparison(index){
 }
 async function render(){
  const token=++renderToken,c=clips[current],f=c.frames[frame];if(!f)return;
+ $('clipNote').textContent=c.note||'';$('clipNote').hidden=!c.note;
  const compare=clips[Number($('compare').value)]||c;comparisonFrame=comparisonIndex();const cf=compare.frames[comparisonFrame];
  $('seek').max=c.frame_count-1;$('seek').value=frame;$('position').textContent=`${frame+1}/${c.frame_count} · ${f.time_s.toFixed(4)} s`;
  $('leftTitle').textContent=`${document.body.dataset.view==='compare'?'Esquerda':'Depois'} · ${c.name}`;
@@ -98,7 +100,7 @@ function range(){const l=$('loop').value,c=clips[current];if(l!==''&&c.loops[Num
 function advance(){const [start,end]=range();if(frame+1<end){frame++;return}if(sequence){const c=clips[current],last=c.frames[frame],first=c.frames[0];pendingCarry=[carry[0]+last.visual_displacement_from_reference[0]-first.visual_displacement_from_reference[0],carry[1]+last.visual_displacement_from_reference[1]-first.visual_displacement_from_reference[1]];sequenceIndex++;if(sequenceIndex>=sequence.length){sequenceIndex=0;pendingCarry=[0,0]}current=sequence[sequenceIndex];carry=pendingCarry;change()}else frame=start}
 function role(r){return clips.findIndex(c=>(c.role===r||c.name.toLowerCase()===r)&&c.status!=='rejected')}
 function startSequence(r){const idle=role('idle'),action=role(r);if(idle<0||action<0)return;sequence=[idle,action,idle];sequenceIndex=0;carry=[0,0];current=idle;playing=true;$('play').textContent='Pausar';$('sequenceNote').textContent=`Sequência: ${clips[idle].name} → ${clips[action].name} → ${clips[idle].name}. Encadeamento da prévia usa o apoio da silhueta; PNGs e metadados permanecem nas coordenadas comuns.`;change()}
-for(const r of ['jab','dash','crouch']){$(r).disabled=role('idle')<0||role(r)<0;$(r).onclick=()=>startSequence(r)}
+for(const r of ['jab','dash','crouch','walk_forward','walk_back','back_dash']){$(r).disabled=role('idle')<0||role(r)<0;$(r).onclick=()=>startSequence(r)}
 $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir';render()};
 $('prev').onclick=()=>{pausePlayback();frame=Math.max(range()[0],frame-1);render()};$('next').onclick=()=>{pausePlayback();advance();render()};
 $('seek').oninput=()=>{pausePlayback();frame=Number($('seek').value);render()};

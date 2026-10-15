@@ -116,6 +116,17 @@ class Tests(unittest.TestCase):
         frames = [{'feature': feature, 'bbox': [40, 35, 100, 130], 'warnings': []} for _ in range(40)]
         self.assertEqual(loop_candidates(frames), [])
 
+    def test_long_idle_leadin_is_not_reported_as_a_walk_cycle(self):
+        feature = shape_feature(raster(), bounds(raster()))
+        features = [feature]*50
+        for width in (8, 20, 35, 50, 65, 80):
+            moving = np.zeros((96, 96), np.uint8)
+            moving[20:70, 8:8+width] = 1
+            features.append(moving)
+        frames = [{'feature': f, 'bbox': [20, 20, 70, 80], 'warnings': []} for f in features]
+        found = loop_candidates(frames)
+        self.assertFalse(any(c['start_frame']+2*c['period_frames'] <= 50 for c in found))
+
     def test_cycle_sequence_with_leadin_and_small_noise(self):
         # Feature masks only, no generated video/animation fixture.
         features = []
@@ -127,6 +138,11 @@ class Tests(unittest.TestCase):
         self.assertTrue(any(c['period_frames'] == 6 and c['start_frame'] >= 2 for c in found))
         self.assertTrue(all(c['advisory_only'] for c in found))
         self.assertEqual(len(frames), 20)
+        restricted = loop_candidates(frames, minimum_period=6, start_frame=2)
+        self.assertTrue(any(c['period_frames'] == 6 and c['start_frame'] == 2 for c in restricted))
+        self.assertTrue(all(c['start_frame'] >= 2 and c['repeat_frame'] < len(frames) for c in restricted))
+        with self.assertRaises(CalibrationError):
+            loop_candidates(frames, start_frame=len(frames))
 
     def test_html_escapes_script_injection(self):
         with tempfile.TemporaryDirectory() as tmp:

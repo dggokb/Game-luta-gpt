@@ -1,9 +1,15 @@
 """Approximate sequence comparison; proposals never discard any frame."""
 import numpy as np
 from .imaging import similarity
+from .errors import CalibrationError
 
 
-def loop_candidates(frames, minimum_period=6, threshold=.90):
+def loop_candidates(frames, minimum_period=6, threshold=.90, *, start_frame=0):
+    if not frames and start_frame == 0:
+        return []
+    if type(start_frame) is not int or not 0 <= start_frame < len(frames):
+        raise CalibrationError('Início da busca de ciclos fora do vídeo')
+    frames = frames[start_frame:]
     features = [f.get('feature') for f in frames]
     n = len(features)
     if n < minimum_period*2 or any(f['warnings'] for f in frames):
@@ -17,6 +23,11 @@ def loop_candidates(frames, minimum_period=6, threshold=.90):
         scores = np.array([similarity(features[i], features[i+period]) for i in range(n-period)])
         # Require two complete cycles, allow nonrepeating lead-in/out.
         for start in range(n-2*period+1):
+            # A long Idle lead-in is not a walk cycle, even if later frames move.
+            # Both proposed cycles must contain observable temporal variation.
+            if any(max(changes[a:a+period-1], default=0) < .015
+                   for a in (start, start+period)):
+                continue
             confidence = float(np.mean(scores[start:start+period]))
             if confidence < threshold or float(np.quantile(scores[start:start+period], .1)) < threshold-.07:
                 continue
@@ -26,8 +37,8 @@ def loop_candidates(frames, minimum_period=6, threshold=.90):
             # Shape features are translation invariant. Record positional closure too.
             a, b = frames[start]['bbox'], frames[start+period]['bbox']
             displacement = [(b[0]+b[2]-a[0]-a[2])/2, b[3]-a[3]]
-            candidates.append({'start_frame': start, 'period_frames': period, 'end_frame_exclusive': start+period,
-                               'repeat_frame': start+period, 'confidence': round(confidence, 5),
+            candidates.append({'start_frame': start+start_frame, 'period_frames': period, 'end_frame_exclusive': start+period+start_frame,
+                               'repeat_frame': start+period+start_frame, 'confidence': round(confidence, 5),
                                'seam_similarity': round(seam, 5), 'typical_adjacent_similarity': round(normal, 5),
                                'seam_relative_quality': round(min(1, seam/max(normal, 1e-9)), 5),
                                'cycle_displacement_source_px': displacement,

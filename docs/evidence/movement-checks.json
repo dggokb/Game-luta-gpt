@@ -1,0 +1,208 @@
+{
+  "clips_in_viewer": 11,
+  "frames_in_viewer": 1307,
+  "new_source_frames": 363,
+  "canvas": [
+    1080,
+    699
+  ],
+  "root": [
+    417,
+    654
+  ],
+  "clips": {
+    "walk_forward": {
+      "source_name": "walk_fward.mp4",
+      "source_sha256": "221fe80382fc8268f060fdac5e66c12166d3699d804446fb7d83ac1f988bf590",
+      "frame_count": 121,
+      "reference_frame": 0,
+      "reference_similarity": 0.9438339862712496,
+      "reference_height_source_px": 700,
+      "reference_height_output_px": 429,
+      "constant_scale": 0.6128571428571429,
+      "peer_height_spread": 0.002857142857142857,
+      "animation_type": "translation",
+      "loops": [
+        {
+          "start_frame": 95,
+          "period_frames": 13,
+          "end_frame_exclusive": 108,
+          "repeat_frame": 108,
+          "confidence": 0.93313,
+          "seam_similarity": 0.87437,
+          "typical_adjacent_similarity": 0.89261,
+          "seam_relative_quality": 0.97957,
+          "cycle_displacement_source_px": [
+            1.0,
+            -2
+          ],
+          "method": "all_frame_silhouette_sequence_comparison",
+          "advisory_only": true
+        },
+        {
+          "start_frame": 93,
+          "period_frames": 14,
+          "end_frame_exclusive": 107,
+          "repeat_frame": 107,
+          "confidence": 0.90658,
+          "seam_similarity": 0.81686,
+          "typical_adjacent_similarity": 0.91959,
+          "seam_relative_quality": 0.88828,
+          "cycle_displacement_source_px": [
+            -5.0,
+            -2
+          ],
+          "method": "all_frame_silhouette_sequence_comparison",
+          "advisory_only": true
+        }
+      ],
+      "output_support_range_px": [
+        22.0,
+        3.0
+      ],
+      "output_first_to_last_support_delta_px": [
+        -1.0,
+        -1.0
+      ],
+      "frame_warnings": [],
+      "note": "O vídeo começa parado; os passos aparecem no trecho final."
+    },
+    "walk_back": {
+      "source_name": "walk_back.mp4",
+      "source_sha256": "835049cacd2315fc8475f1d527db29b168c2c697186effd0a3f9d9e4113ffe08",
+      "frame_count": 121,
+      "reference_frame": 2,
+      "reference_similarity": 0.8483234012412638,
+      "reference_height_source_px": 700,
+      "reference_height_output_px": 429,
+      "constant_scale": 0.6128571428571429,
+      "peer_height_spread": 0.005710206995003569,
+      "animation_type": "translation",
+      "loops": [
+        {
+          "start_frame": 11,
+          "period_frames": 22,
+          "end_frame_exclusive": 33,
+          "repeat_frame": 33,
+          "confidence": 0.92856,
+          "seam_similarity": 0.91647,
+          "typical_adjacent_similarity": 0.92345,
+          "seam_relative_quality": 0.99244,
+          "cycle_displacement_source_px": [
+            -100.0,
+            -2
+          ],
+          "method": "all_frame_silhouette_sequence_comparison",
+          "advisory_only": true
+        },
+        {
+          "start_frame": 10,
+          "period_frames": 23,
+          "end_frame_exclusive": 33,
+          "repeat_frame": 33,
+          "confidence": 0.916,
+          "seam_similarity": 0.90993,
+          "typical_adjacent_similarity": 0.92778,
+          "seam_relative_quality": 0.98076,
+          "cycle_displacement_source_px": [
+            -106.0,
+            -2
+          ],
+          "method": "all_frame_silhouette_sequence_comparison",
+          "advisory_only": true
+        }
+      ],
+      "output_support_range_px": [
+        133.5,
+        3.0
+      ],
+      "output_first_to_last_support_delta_px": [
+        -133.5,
+        -3.0
+      ],
+      "frame_warnings": [],
+      "note": ""
+    },
+    "back_dash": {
+      "source_name": "back_dash.mp4",
+      "source_sha256": "ffec0a04a592615fa8e4c11301756da5b4924c3ad2733e6d79c79b912b721893",
+      "frame_count": 121,
+      "reference_frame": 0,
+      "reference_similarity": 0.9356128459589219,
+      "reference_height_source_px": 700,
+      "reference_height_output_px": 429,
+      "constant_scale": 0.6128571428571429,
+      "peer_height_spread": 0.008571428571428572,
+      "animation_type": "airborne",
+      "loops": [],
+      "output_support_range_px": [
+        69.0,
+        125.0
+      ],
+      "output_first_to_last_support_delta_px": [
+        0.5,
+        1.0
+      ],
+      "frame_warnings": [
+        {
+          "index": 22,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 23,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 24,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 25,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 26,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 27,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 28,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 29,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        },
+        {
+          "index": 30,
+          "warnings": [
+            "source_touches_edge_possible_clipping"
+          ]
+        }
+      ],
+      "note": "A fonte tem uma fase aérea e corte no topo em 9 frames; o movimento original foi preservado."
+    }
+  },
+  "source_files_unchanged_at_processing": true,
+  "support_note": "Foreground bbox support proxy; changes in pose and feet can move it without locomotion. Not skeletal root motion.",
+  "visual_approval": false
+}

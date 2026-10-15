@@ -6,7 +6,7 @@ A escala de referência é calculada a partir de uma pose equivalente ao Idle Ma
 
 ## Ver no celular
 
-[Baixar o APK Android](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-visualizador.apk). Ele já inclui as 8 animações e os 944 frames do lote, funciona offline e tem controles por toque. Android 8.0+, com WebView atualizado. [Uso e compilação](android/README.md).
+[Baixar o APK Android](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-visualizador.apk). Ele já inclui os 11 clips e os 1.307 frames dos lotes de teste e movimentação, funciona offline e tem controles por toque. Android 8.0+, com WebView atualizado. [Uso e compilação](android/README.md) · [Lote de movimentação](docs/MOVIMENTACAO.md).
 
 ## Instalação e execução
 
@@ -91,6 +91,8 @@ python -m unittest discover -s tests -v
 
 A [validação documentada](docs/VALIDACAO.md) inclui uma [prévia portátil](docs/evidence/preview.html), que pode ser aberta localmente após baixar o repositório.
 
+A [extensão de movimentação](docs/MOVIMENTACAO.md) acrescenta `walk_fward.mp4`, `walk_back.mp4` e `back_dash.mp4` ao comando `scripts/validate_real.py` com `--include-movement`. Em clips com um início parado, `loop_start_frame` limita a busca de ciclos ao trecho animado, preservando todos os frames e os índices originais.
+
 Os testes unitários usam matrizes genéricas, sem gerar personagens, poses ou vídeos artificiais. Os testes reais são separados e ficam explicitamente ignorados quando não há um lote real. Para reproduzir o lote documentado, baixe as entradas existentes listadas em [docs/VALIDACAO.md](docs/VALIDACAO.md) para uma pasta local:
 
 ```bash
@@ -107,4 +109,4 @@ O teste controlado de meia resolução transforma geometricamente todos os frame
 
 Um score alto não comprova identidade anatômica universal. Silhuetas semelhantes podem esconder proporções internas diferentes. Segmentos anotados, comparação visual, metadados e testes medem aspectos distintos; nenhum deles sozinho aprova um lote. O manifesto sempre começa com `visual_approval: false`.
 
-A ferramenta não promete eliminar trepidação nem corrigir arte deformada. Interpolação pode mudar a borda em 1–2 pixels. Perspectiva, zoom dentro do clip, reflexos, sombras, detalhes verdes e rotação/cortes da fonte podem exigir preparação externa ou rejeição. A detecção de loops apresenta sugestões por sequência e qualidade de emenda; não descarta frames e não garante que a melhor hipótese seja o ciclo artisticamente correto.
+A ferramenta não promete eliminar trepidação nem corrigir arte deformada. Interpolação muda as bordas e pode deslocar a bbox quando extremidades muito finas desaparecem na reamostragem. Perspectiva, zoom dentro do clip, reflexos, sombras, detalhes verdes e rotação/cortes da fonte podem exigir preparação externa ou rejeição. A detecção de loops apresenta sugestões por sequência e qualidade de emenda; não descarta frames e não garante que a melhor hipótese seja o ciclo artisticamente correto.
