@@ -46,6 +46,7 @@ Opções (linha de comando / --java-options)
 -Dgameluta.resolucao=1280x720 desenha em resolução menor (PCs mais fracos)
 -Dgameluta.semSom=true        sem som
 -Dgameluta.log=debug          mostra todo o log no terminal
+-Dgameluta.d3d=true           Windows: copia o quadro para a tela pelo Direct3D (padrão: GDI)
 
 As preferências (ajustes do DEBUG) ficam em %APPDATA%\GameLutaGPT (Windows)
 ou ~/.config/GameLutaGPT (Linux/macOS).

@@ -70,6 +70,11 @@ public final class JogoPc {
 
     public static void main(String[] args) throws Exception {
         System.setProperty("sun.java2d.noddraw", "true");
+        // Windows: o quadro já sai pronto do desenho por software e o Direct3D do Java2D só o
+        // copia para a tela; com alguns drivers essa cópia estraga a imagem até a janela ser
+        // recriada (F11 duas vezes). Pelo GDI a cópia é a mesma, sem esse problema.
+        // -Dgameluta.d3d=true volta ao Direct3D.
+        if (!Boolean.getBoolean("gameluta.d3d")) System.setProperty("sun.java2d.d3d", "false");
         DadosDoJogo dados;
         try {
             dados = DadosDoJogo.localizar();
