@@ -30,7 +30,7 @@ final class PaginaGuiada {
     static final float MAX_SCALE = 3.0f;
     /** Velocidade do passeio da câmera em quadros mais altos que a tela, em px de tela por segundo. */
     static final float PAN_SPEED = 110f;
-    static final int DIM_ALPHA = 185;
+    static final int DIM_ALPHA = 220;
     static final float PUNCH = 0.30f;
     private static final int CAPTION_BG = 0xD9000000;
     private static final int PAPER = 0xFFFFFFFF;

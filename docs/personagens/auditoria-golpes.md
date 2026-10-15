@@ -49,7 +49,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S1 | Onda curta e rápida | bola de alcance curto | ✅ |
 | S2 | Uppercut que avança e acerta **várias vezes** | avança, **1 acerto** | ⚠️ falta multi-hit |
 | S3 | Rekka: 3 investidas, cada uma com novo comando | cada comando toca o vídeo das **3** investidas e dá 1 acerto | ❌ |
-| S4 | Chute em mergulho **no ar** | sai no chão | ❌ |
+| S4 | Chute em mergulho **no ar** | só no ar: desce na diagonal e bate até o chão (15/10) | ✅ |
 | Super | Rajada de Chutes avançando, chute final que lança | animação + **onda** | ❌ |
 | Ultra | Fúria da Casa (sequência + soco de energia) | sequência do vídeo, 9 golpes nos quadros da animação | ✅ |
 
@@ -113,7 +113,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S4 | Investida de ombro | avança + armadura | ✅ |
 | Agarrão | Carregar e jogar | agarrão mais forte e longo | ✅ |
 | Super | Tempestade de Fogo (soca o chão, fogo) | animação + **onda** | ❌ |
-| Ultra | Resgate Final (**agarra**, salta e arremessa) | **raio** | ❌ |
+| Ultra | Resgate Final (**agarra**, salta e arremessa) | sequência do vídeo: agarra, ergue acima da cabeça no pulo e arremessa (3 golpes, rival preso à pose) | ✅ |
 
 ### p10 — bombeira ágil
 | | Ficha | Jogo hoje | |
@@ -134,7 +134,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Bloqueio de nervos (contra-golpe) | contra-golpe + veneno | ✅ |
 | S4 | Passo cirúrgico (desliza e estoca) | avança | ✅ |
 | Super | Cirurgia (5 golpes exatos + estocada) | animação + **onda** | ❌ |
-| Ultra | Autópsia (chave no pulso, golpes, arremesso) | **raio** | ❌ |
+| Ultra | Autópsia (chave no pulso, golpes, arremesso) | sequência do vídeo, 5 golpes nos quadros da animação | ✅ |
 
 ### p12 — criatura feral
 | | Ficha | Jogo hoje | |
@@ -172,11 +172,13 @@ da ficha). O que falta é o jogo fazer o que a animação mostra:
 4. **Ultra por tipo:** investida que vira sequência de golpes (a maioria), agarrão (p09, p11) e
    raio (p01, p06).
 5. **Ajustes pequenos:** avanço nos S4 que andam (p01, p02, p04, p06, p08, p12), S4 baixo do p07,
-   S4 do p03 no ar, S2 projétil do p05 e da p11, vapor da p10.
+   ~~S4 do p03 no ar~~ (feito 15/10), S2 projétil do p05 e da p11, vapor da p10.
 6. **Comandos:** decidir se cada personagem tem comandos próprios ou se fica o padrão de jogo de
    luta (todos iguais), mas com S3 e S4 em movimentos diferentes.
 
-## Comandos por personagem (proposta, 14/10)
+## Comandos por personagem (aprovado 14/10, no jogo 15/10)
+
+No jogo desde 15/10, com a lista na pausa (COMANDOS): detalhes em `comandos.md`.
 
 Decidido: cada personagem tem comandos próprios (o jogo vai para PC). Setas com o personagem
 virado para a direita. `[←] →` = segura ← um instante e aperta →; `[↓] ↑` = segura ↓ e aperta ↑.
@@ -210,8 +212,10 @@ golpe lança. Não tem mais cinemática nem raio para esses oito. Errou ou foi d
 como antes.
 
 - p01 e p06 continuam com o raio (é o golpe deles).
-- p09 e p11: o vídeo mostra o rival junto (agarrão), e ele ficaria colado na arte. Faltam
-  vídeos novos sem o rival; até lá eles continuam com o raio.
+- p09 e p11 (vídeos novos, 15/10): seguem o vídeo como os outros. No do p09 o Seedance desenhou
+  um saco no lugar do rival (três tentativas); ele sai pela cor antes da conversão
+  (`tools/sprites/apagar_saco.py`) e o rival fica preso onde o saco estava ("rival" em
+  `ultras.json`: agarra na frente, sobe acima da cabeça no pulo e cai no arremesso).
 
 ## Golpes com várias pancadas (15/10)
 
@@ -224,7 +228,7 @@ entre elas, as do meio só seguram o rival até a próxima e a última aplica o 
 |---|---|
 | S2 | p03 uppercut 3, p07 chutes 3, p08 chicotadas 2 |
 | S3 | p03 rekka: as 3 investidas num comando só, 3 pancadas |
-| S4 | p01 chutes giratórios 3, p02 2, p03 2, p05 2, p12 2 |
+| S4 | p01 chutes giratórios 3, p02 2, p05 2, p12 2 (o mergulho do p03 bate a descida inteira, comandos.md) |
 | Super corpo a corpo (sem onda) | p02 5, p03 3, p04 3, p05 3, p06 6, p08 4 (chicote, alcance longo), p10 4, p12 4 |
 
 Avançam como na animação: S4 do p01, p02, p04, p06, p08 e p12, e os Supers corpo a corpo.

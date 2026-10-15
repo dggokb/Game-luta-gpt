@@ -89,6 +89,11 @@ final class AttackDefinition {
         int echoFrames;
         /** Delay of the shadow's copy and its share of the damage (permille). */
         int echoDelay, echoDamagePermille;
+        /**
+         * Mergulho (golpe no ar): parado no ar durante a preparação, depois desce na diagonal,
+         * nestas velocidades (frente e para baixo), até o chão.
+         */
+        float diveForward, diveDescent;
 
         Mechanics armor(int hits, int start, int end) { armorHits = hits; armorStart = start; armorEnd = end; return this; }
         Mechanics counter(Reads reads, int start, int end) { counter = reads; counterStart = start; counterEnd = end; return this; }
@@ -101,6 +106,8 @@ final class AttackDefinition {
         Mechanics poison(int damage, int frames) { poisonDamage = damage; poisonFrames = frames; return this; }
         Mechanics lifeCost(int value) { lifeCost = value; return this; }
         Mechanics charge(int frames, int bonusPermille) { chargeFrames = frames; chargeBonusPermille = bonusPermille; return this; }
+        Mechanics dive(float forward, float descent) { diveForward = forward; diveDescent = descent; return this; }
+        boolean dives() { return diveDescent > 0f; }
         Mechanics echo(int frames, int delay, int damagePermille) {
             echoFrames = frames; echoDelay = delay; echoDamagePermille = damagePermille; return this;
         }

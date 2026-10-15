@@ -16,6 +16,19 @@ final class CombatConfig {
     int motionWindowFrames = 15;
     /** ...and its button pressed at most this many frames after the last direction. */
     int motionPressFrames = 15;
+    /** Frames a mais na janela para cada passo além de dois (meia-lua: ← ↓ → tem 3 passos). */
+    int motionWindowPerStep = 6;
+    /** Comando de segurar ([←] →, [↓] ↑): tempo segurando para carregar... */
+    int chargeFrames = 30;
+    /** ...e quanto a carga dura depois de soltar. */
+    int chargeKeepFrames = 10;
+    /**
+     * Com a carga para baixo pronta, o pulo espera estes frames: o botão do [↓] ↑ que chega
+     * junto vira o especial em vez do pulo.
+     */
+    int chargeJumpGraceFrames = 3;
+    /** Golpe em mergulho: frames de recuperação que sobram ao tocar o chão. */
+    int diveLandingFrames = 8;
     int doubleTapFrames = 18;
     /** Down entered at most this many frames before up makes a super jump. */
     int superJumpFrames = 22;

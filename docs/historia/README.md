@@ -39,7 +39,7 @@ salvar progresso e um menu de episódios.
 | Episódio | Conteúdo | Luta |
 |---|---|---|
 | 0 — O Pai que Partiu | Infância no dojo Shūshinkan, o treino (tutorial), o convite, a divisão dos irmãos, o pai parte e não volta. **Pronto** (11 páginas) | Treino Ryūga × Kōga (tutorial) |
-| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um | Treino jogador × rival, interrompido pela campainha numa cinemática |
+| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um. **Pronto**: começo e fim separados por irmão (veja abaixo) | Treino jogador × rival, interrompido pela campainha numa cinemática |
 | 2 — O Sorteio | O templo, a regra dos capitães, a formação das duplas, o chaveamento em lados opostos | 1ª luta de cada lado |
 | 3 a 6 | Episódios alternando o lado do Ryūga e o lado do Kōga (lutas fixas de história + lutas variáveis) | uma por episódio |
 | meio da temporada | A revelação de que o desejo é real e pode ressuscitar a mãe | luta fixa |
@@ -127,6 +127,22 @@ uma página nova (gerar, recortar, preencher, traduzir, revisar):
 
 As páginas com painéis montados pelo jogo (`layout`, `paineis`, arte provisória) continuam
 funcionando e servem de rascunho até a página pronta existir.
+
+### Páginas de cada irmão
+
+A história se ramifica pela campanha: uma página com `"irmao": "ryuga"` só aparece para quem
+escolheu o Ryūga, e uma com `"irmao": "koga"`, só para quem escolheu o Kōga. Página sem
+`irmao` é comum aos dois. A versão do Kōga leva o sufixo `_koga` no arquivo e fica logo
+depois da versão do Ryūga no `episodio.json`.
+
+Numeração da temporada: as páginas são contadas em sequência desde o Prólogo (ep00 = 1 a 11,
+ep01 = 12 a 22).
+
+| ep01 | Global | Ryūga | Kōga |
+|---|---|---|---|
+| começo | 12, 13, 14 | `pag1`, `pag2`, `pag3` (treino no dojo, Dafu) | `pag1_koga`, `pag2_koga`, `pag3_koga` (volta a Tóquio, briga no beco, chega ao dojo e ouve o Ryūga lá dentro) |
+| meio | 15 a 21 | `pag4` a `pag10` (comuns) | iguais |
+| fim | 22 | `pag11` (conversa com o Dafu) | `pag11_koga` (sai do dojo pensando na dupla) |
 
 ## Revisar no PC
 

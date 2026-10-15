@@ -64,6 +64,25 @@ public final class MenuPreview {
             pagina.render(c);
             pausa.render(c);
         }, new File(outDir, "menu_" + idioma + "_pausa.png"));
+        // COMANDOS da pausa, com a ficha do P01 (o jogo monta as fichas de todos a partir dos dados).
+        java.util.List<com.gamelutagpt.historia.TelaComandos.Linha> linhas = java.util.Arrays.asList(
+            new com.gamelutagpt.historia.TelaComandos.Linha("Onda", "↓ ↘ → + [J]/[K]/[L]", false),
+            new com.gamelutagpt.historia.TelaComandos.Linha("Punho ascendente", "→ ↓ ↘ + [J]/[K]/[L]", false),
+            new com.gamelutagpt.historia.TelaComandos.Linha("Aparar", "↓ ↓ + [J]/[K]/[L]", false),
+            new com.gamelutagpt.historia.TelaComandos.Linha("Mergulho", "↓ ↘ → + [J]/[K]/[L]", true),
+            new com.gamelutagpt.historia.TelaComandos.Linha("Super", "[I]", false),
+            new com.gamelutagpt.historia.TelaComandos.Linha("Ultra", "↓ + [I]", false),
+            new com.gamelutagpt.historia.TelaComandos.Linha("Agarrão", "[H] / [J] + [K]", false));
+        pausa.comandos().setFichas(java.util.Arrays.asList(
+            new com.gamelutagpt.historia.TelaComandos.Ficha("p01", linhas),
+            new com.gamelutagpt.historia.TelaComandos.Ficha("p02", linhas)), 0);
+        for (int i = 0; i < 2; i++) pausa.mover(1);
+        pausa.confirmar();
+        for (float t = 0f; t < 0.5f; t += DT) pausa.update(DT);
+        save(c -> {
+            pagina.render(c);
+            pausa.render(c);
+        }, new File(outDir, "menu_" + idioma + "_comandos.png"));
         // Capítulos: um save no começo do ep03 (Prólogo, ep01 e ep02 feitos).
         java.util.List<com.gamelutagpt.historia.MenuCapitulos.Capitulo> caps = new java.util.ArrayList<>();
         for (String id : temporada.episodios) {

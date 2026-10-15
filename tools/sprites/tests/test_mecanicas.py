@@ -34,6 +34,16 @@ class MecanicasTest(unittest.TestCase):
             current = json.loads(path.read_text(encoding='utf-8'))
             self.assertEqual(current, pack, f'{cid}: rode tools/sprites/mecanicas.py --write')
 
+    def test_commands_in_arrows(self):
+        self.assertEqual(mecanicas.parse_command('↓↘→'), ([3, 2, 1], False))
+        self.assertEqual(mecanicas.parse_command('←↙↓↘→'), ([5, 4, 3, 2, 1], False))
+        self.assertEqual(mecanicas.parse_command('[←] →'), ([5, 1], True))
+        self.assertEqual(mecanicas.parse_command('[↓] ↑'), ([3, 7], True))
+        with self.assertRaises(SystemExit):
+            mecanicas.parse_command('↓ x →')
+        for cid, spec in self.data['personagens'].items():
+            self.assertEqual(sorted(spec['comandos']), ['S1', 'S2', 'S3', 'S4'], cid)
+
     def test_impact_frame_is_on_screen_when_the_move_hits(self):
         for cid, spec in self.data['personagens'].items():
             if spec.get('manterTempo'):

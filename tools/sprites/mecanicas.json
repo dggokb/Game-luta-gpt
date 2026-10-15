@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS.",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md.",
   "base": {
     "frames": {
       "L": [3, 3, 7],
@@ -71,6 +71,24 @@
             }
           }
         }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Onda",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Punho ascendente",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Aparar",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Chute giratório",
+          "comando": "↓↙←"
+        }
       }
     },
     "p02": {
@@ -91,6 +109,24 @@
               "janela": "startup"
             }
           }
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Palma",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Chute da garça",
+          "comando": "[↓] ↑"
+        },
+        "S3": {
+          "nome": "Contra-golpe",
+          "comando": "←↙↓"
+        },
+        "S4": {
+          "nome": "Chute rodopiante",
+          "comando": "[←] →"
         }
       }
     },
@@ -117,7 +153,32 @@
               "velocidade": 300,
               "janela": "ate_ativo"
             }
+          },
+          "S4": {
+            "mergulho": {
+              "frente": 420,
+              "descida": 900
+            }
           }
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Onda curta",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Punho em sequência",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Avanço em três",
+          "comando": "↓↙←"
+        },
+        "S4": {
+          "nome": "Mergulho",
+          "comando": "↓↘→",
+          "noAr": true
         }
       }
     },
@@ -158,6 +219,24 @@
             "noVazio": true
           }
         }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Soco de impacto",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Cabeçada",
+          "comando": "[←] →"
+        },
+        "S3": {
+          "nome": "Esquiva",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Ombrada",
+          "comando": "←↙↓↘→"
+        }
       }
     },
     "p05": {
@@ -188,6 +267,24 @@
         },
         "lutador": {
           "wallJump": true
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Kunai",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Shuriken",
+          "comando": "↓↙←"
+        },
+        "S3": {
+          "nome": "Selo e mudança",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Corte de mão",
+          "comando": "←↙↓↘→"
         }
       }
     },
@@ -223,6 +320,24 @@
       },
       "ritmoGolpe": {
         "S2": 1.6
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Sombra rastejante",
+          "comando": "↓↙←"
+        },
+        "S2": {
+          "nome": "Eco de sombra",
+          "comando": "↓↓"
+        },
+        "S3": {
+          "nome": "Puxar",
+          "comando": "→↘↓↙←"
+        },
+        "S4": {
+          "nome": "Passo-sombra",
+          "comando": "↓↘→"
+        }
       }
     },
     "p07": {
@@ -247,6 +362,24 @@
         "lutador": {
           "capangas": 2
         }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Tapa de luva",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Chute ascendente",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Contra-golpe",
+          "comando": "↓↙←"
+        },
+        "S4": {
+          "nome": "Chute giratório baixo",
+          "comando": "↓↓"
+        }
       }
     },
     "p08": {
@@ -267,6 +400,24 @@
               "janela": "startup"
             }
           }
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Chicote",
+          "comando": "←↙↓↘→"
+        },
+        "S2": {
+          "nome": "Giro ascendente",
+          "comando": "[↓] ↑"
+        },
+        "S3": {
+          "nome": "Contra-golpe",
+          "comando": "↓↙←"
+        },
+        "S4": {
+          "nome": "Salto-agulha",
+          "comando": "↓↘→"
         }
       }
     },
@@ -305,6 +456,24 @@
             "alcance": 40
           }
         }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Machado",
+          "comando": "→↘↓↙←"
+        },
+        "S2": {
+          "nome": "Cotovelada",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Escudo",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Ombrada",
+          "comando": "[←] →"
+        }
       }
     },
     "p10": {
@@ -335,6 +504,24 @@
         },
         "lutador": {
           "airDashes": 2
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Machadinho",
+          "comando": "↓↙←"
+        },
+        "S2": {
+          "nome": "Jato de vapor",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Esquiva acrobática",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Voadora em parafuso",
+          "comando": "↓↘→"
         }
       }
     },
@@ -373,6 +560,24 @@
             }
           }
         }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Bisturi",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Seringa",
+          "comando": "↓↙←"
+        },
+        "S3": {
+          "nome": "Bloqueio de nervos",
+          "comando": "→↘↓↙←"
+        },
+        "S4": {
+          "nome": "Passo cirúrgico",
+          "comando": "[←] →"
+        }
       }
     },
     "p12": {
@@ -406,6 +611,24 @@
         },
         "lutador": {
           "furia": 400
+        }
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Investida",
+          "comando": "[←] →"
+        },
+        "S2": {
+          "nome": "Salto de garras",
+          "comando": "[↓] ↑"
+        },
+        "S3": {
+          "nome": "Fúria",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Contorção",
+          "comando": "↓↙←"
         }
       }
     }

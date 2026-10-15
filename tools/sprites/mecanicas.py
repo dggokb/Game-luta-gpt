@@ -11,6 +11,9 @@
     (receita do clipe, saltos acima de 2x a mediana limitados) e o quadro do impacto é
     encaixado no começo da janela ativa.
 
+  * comandos de S1 a S4 (bloco "comandos": nome e comando em setas, "[←] →" para segurar,
+    noAr para só no ar), que a pausa mostra em COMANDOS (docs/personagens/comandos.md).
+
 Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam.
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
 o tempo e a animação (só o dano muda). Depois rode build_characters.py --write.
@@ -139,6 +142,42 @@ def unique(pack, spec):
         fighter['mecanica'] = dict(u['lutador'])
 
 
+ARROWS = {'→': 1, '↘': 2, '↓': 3, '↙': 4, '←': 5, '↖': 6, '↑': 7, '↗': 8}
+
+
+def parse_command(text):
+    """"↓↘→" → ([3, 2, 1], False); "[←] →" → ([5, 1], True): segura a primeira direção e aperta
+    a segunda. Direções relativas ao personagem virado para a direita (1 = frente, 5 = trás)."""
+    hold = text.lstrip().startswith('[')
+    steps = [ARROWS[ch] for ch in text if ch in ARROWS]
+    if any(ch not in ARROWS and ch not in '[] ' for ch in text) or not steps:
+        raise SystemExit(f'comando "{text}": use só setas, espaços e [ ]')
+    if hold and len(steps) != 2:
+        raise SystemExit(f'comando "{text}": segurar é [direção] direção')
+    return steps, hold
+
+
+def commands(pack, spec):
+    """Comandos próprios (bloco "comandos"): S1 é a energia, S2 a S4 os especiais. Qualquer
+    botão (L, M ou H) solta o especial; o botão dá a força da energia."""
+    fighter, specials = pack['fighter'], pack.get('specialMoves', {})
+    for key, c in spec.get('comandos', {}).items():
+        target = fighter['energy'] if key == 'S1' else specials[key]
+        # Sempre na mesma ordem no fim do golpe: refazer dá o mesmo arquivo.
+        for field in ('buttons', 'nome', 'segurar', 'noAr'):
+            target.pop(field, None)
+        target['command'], hold = parse_command(c['comando'])
+        if key != 'S1':
+            target['buttons'] = ['L', 'M', 'H']
+        target['nome'] = c['nome']
+        if hold:
+            target['segurar'] = True
+        if c.get('noAr'):
+            if key == 'S1':
+                raise SystemExit('S1 sai no chão e no ar; noAr é para S2 a S4')
+            target['noAr'] = True
+
+
 def strike_frames(anim, total, startup, pancadas):
     """Quadro do golpe em que cada pancada acerta: o tempo da animação até o quadro dela
     (a animação estica sobre o golpe). A primeira é o fim da preparação."""
@@ -245,6 +284,7 @@ def apply(cid, spec, base):
     attacks.append(('S', pack.get('specialAnimations', {}).get('S'), energy['attack']))
     fighter['super']['damage'] = damage('SUPER')
     unique(pack, spec)
+    commands(pack, spec)
     hits = json.loads(PANCADAS.read_text(encoding='utf-8'))['personagens'].get(cid, {})
     specials = pack.get('specialMoves', {})
     for key, h in hits.items():

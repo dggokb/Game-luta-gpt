@@ -25,6 +25,7 @@
       "speed": 760,
       "command": [
         3,
+        2,
         1
       ],
       "spawnX": 87,
@@ -60,7 +61,8 @@
             "bonus": 800
           }
         }
-      }
+      },
+      "nome": "Onda"
     },
     "super": {
       "damage": 3200,
@@ -1984,16 +1986,18 @@
       "launchType": "knockdown",
       "knockback": 60,
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Punho ascendente"
     },
     "S3": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "L",
-        "M"
+        3
       ],
       "animation": "SPECIAL_S3",
       "damage": 900,
@@ -2017,15 +2021,19 @@
         "SUPER"
       ],
       "pushbackOnHit": 40,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Aparar"
     },
     "S4": {
       "command": [
         3,
+        4,
         5
-      ],
-      "buttons": [
-        "H"
       ],
       "animation": "SPECIAL_S4",
       "damage": 1000,
@@ -2052,6 +2060,12 @@
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Chute giratório",
       "golpesBase": {
         "startupFrames": 10,
         "activeFrames": 20,

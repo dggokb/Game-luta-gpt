@@ -338,6 +338,11 @@ final class CombatEngine {
 
         if (f.motion.enteredNow(clock) && ControlsLayout.isUpDirection(relative)) {
             requestJump(f, f.motion.downThenUp(clock, config.superJumpFrames));
+            // [↓] ↑: com a carga para baixo pronta o pulo espera um instante pelo botão.
+            if (f.grounded && hasDownCharge(f.character()) &&
+                f.motion.charged(true, clock, config.chargeFrames, config.chargeKeepFrames)) {
+                f.jumpGrace = config.chargeJumpGraceFrames;
+            }
         }
         if (in.jump || in.superJump) requestJump(f, in.superJump);
         if (f.motion.doubleTap(1, clock, config.doubleTapFrames) || in.dash) f.dashRequest = true;
@@ -346,15 +351,16 @@ final class CombatEngine {
         boolean crouch = ControlsLayout.isDownDirection(in.direction);
         if (in.light || in.medium || in.heavy) {
             String button = in.heavy ? "H" : in.medium ? "M" : "L";
-            // Command specials first (longest motion wins), then the energy command.
-            String commandSpecial = f.character().matchSpecial(f.motion, button, clock,
-                config.motionWindowFrames, config.motionPressFrames);
-            int[] command = f.state.profile.energyCommand;
-            boolean special = commandSpecial == null && f.state.profile.energy != null &&
-                f.motion.matchCommand(command, clock, config.motionWindowFrames, config.motionPressFrames);
-            if (commandSpecial != null) {
-                f.buffer.push(InputBuffer.Button.SPECIAL, commandSpecial, false);
-            } else if (special) {
+            // O comando de cada personagem: S2..S4 ou a energia (S1); o mais longo ganha.
+            String command = f.character().matchCommand(f.motion, button, f.grounded, clock, config);
+            if (command != null) {
+                // O especial de [↓] ↑ cancela o pulo que o ↑ pediu.
+                f.pendingJumpAge = -1;
+                f.jumpGrace = 0;
+            }
+            if (command != null && !"S".equals(command)) {
+                f.buffer.push(InputBuffer.Button.SPECIAL, command, false);
+            } else if (command != null) {
                 // The command only arms the special; the strongest button pressed picks its strength.
                 f.buffer.push(InputBuffer.Button.SPECIAL, button, false);
             } else {
@@ -378,6 +384,14 @@ final class CombatEngine {
         } else if (in.superAttack) {
             f.buffer.push(InputBuffer.Button.SUPER, null, false);
         }
+    }
+
+    /** O personagem tem um especial de segurar baixo ([↓] ↑)? */
+    private static boolean hasDownCharge(CharacterDefinition c) {
+        for (CharacterDefinition.Special s : c.specials.values()) {
+            if (s.hold && s.command()[0] == 3) return true;
+        }
+        return c.fighter.energyHold && c.fighter.energyCommand.length > 0 && c.fighter.energyCommand[0] == 3;
     }
 
     private void requestJump(CombatFighter f, boolean superJump) {
@@ -422,7 +436,8 @@ final class CombatEngine {
         }
 
         if (f.pendingJumpAge >= 0 && !f.grounded && canWallJump(f)) wallJump(f);
-        if (f.pendingJumpAge >= 0 && f.grounded) {
+        if (f.jumpGrace > 0) f.jumpGrace--;
+        else if (f.pendingJumpAge >= 0 && f.grounded) {
             boolean superJump = f.pendingSuperJump || f.launcherChase > 0;
             if (f.status == CombatFighter.Status.NEUTRAL) {
                 jump(f, superJump);
@@ -626,6 +641,7 @@ final class CombatEngine {
         if (attack.kind == AttackDefinition.Kind.PROJECTILE && !f.grounded) {
             f.vy *= config.projectileAirVelocityScale;
         }
+        if (attack.mechanics.dives()) f.vy = 0f;
         if (attack.kind == AttackDefinition.Kind.SUPER) {
             f.state.spendSuperMeter(CombatConfig.SUPER_COST);
             f.vy = 0f;
@@ -1050,6 +1066,11 @@ final class CombatEngine {
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
+        } else if (f.attacking() && !f.grounded && f.attack.mechanics.dives()) {
+            // Mergulho: parado durante a preparação, depois desce na diagonal (moveVertically).
+            if (f.attackFrame >= f.attack.startupFrames) {
+                f.x += f.facing * f.attack.mechanics.diveForward * CombatConfig.DT;
+            }
         } else if (f.attacking() && f.attack.mechanics.advanceAt(f.attackFrame)) {
             // Rushing special (shoulder charge, flying kick, slide): it carries the body forward
             // until it reaches the opponent (it does not shove it across the stage), or through it.
@@ -1087,6 +1108,10 @@ final class CombatEngine {
             scale = 0f;
             f.vy = 0f;
         }
+        if (f.attacking() && f.attack.mechanics.dives()) {
+            scale = 0f;
+            f.vy = f.attackFrame >= f.attack.startupFrames ? f.attack.mechanics.diveDescent : 0f;
+        }
         f.vy += config.gravity * scale * CombatConfig.DT;
         f.y += f.vy * CombatConfig.DT;
         if (f.y >= Arena.GROUND_Y) land(f);
@@ -1114,6 +1139,9 @@ final class CombatEngine {
             // Landing ends an air normal.
             f.status = CombatFighter.Status.NEUTRAL;
             f.clearAttack();
+        } else if (f.attacking() && f.attack.mechanics.dives()) {
+            // O mergulho para no chão: sobra só um pouco da recuperação.
+            f.attackFrame = Math.max(f.attackFrame, f.attack.totalFrames - config.diveLandingFrames);
         }
         f.vx = 0f;
         f.freeFallFrames = 0;
@@ -1385,19 +1413,28 @@ final class CombatEngine {
 
     private void detectMelee(CombatFighter a, CombatFighter d) {
         if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
-        if (!a.attack.isActive(a.attackFrame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
+        int frame = hitFrame(a);
+        if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
         CharacterDefinition.Body body = d.body();
         boolean crouch = d.crouchingBody();
         for (int i = 0; i < a.attack.hitboxCount(); i++) {
             AttackDefinition.Box box = a.attack.hitbox(i);
-            if (!box.activeAt(a.attackFrame) || (a.hitboxMask & (1L << i)) != 0) continue;
+            if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
             if (CombatRules.hitboxTouches(a.x, a.y, a.facing, box, d.x, d.y, body, crouch) ||
                 touchesMoveHurtbox(a, box, d)) {
                 addContact(a, d, a.attack, i, null);
                 return;
             }
         }
+    }
+
+    /** Quadro que vale para o acerto: no mergulho, o golpe bate a descida inteira até o chão. */
+    private static int hitFrame(CombatFighter a) {
+        if (a.attack.mechanics.dives() && !a.grounded && a.attackFrame >= a.attack.startupFrames) {
+            return Math.min(a.attackFrame, a.attack.lastActiveFrame());
+        }
+        return a.attackFrame;
     }
 
     /**

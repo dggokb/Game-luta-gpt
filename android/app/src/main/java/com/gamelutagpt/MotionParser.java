@@ -12,12 +12,21 @@ final class MotionParser {
     private final int[] frames = new int[SIZE];
     private int count;
 
+    // Carga ([←] → e [↓] ↑): desde quando o grupo está segurado (-1 solto), quanto durou a
+    // última vez e quando foi solto.
+    private int backSince = -1, downSince = -1;
+    private int backHeld, downHeld;
+    private int backReleased = Integer.MIN_VALUE / 2, downReleased = Integer.MIN_VALUE / 2;
+
     void clear() {
         count = 0;
+        backSince = downSince = -1;
+        backHeld = downHeld = 0;
     }
 
     /** Records the held direction; only changes enter the history. */
     void record(int relativeDirection, int clock) {
+        trackCharge(relativeDirection, clock);
         if (count > 0 && directions[count - 1] == relativeDirection) return;
         if (count >= SIZE) {
             System.arraycopy(directions, 1, directions, 0, SIZE - 1);
@@ -27,6 +36,111 @@ final class MotionParser {
         directions[count] = relativeDirection;
         frames[count] = clock;
         count++;
+    }
+
+    private void trackCharge(int d, int clock) {
+        if (isBack(d)) {
+            if (backSince < 0) backSince = clock;
+        } else if (backSince >= 0) {
+            backHeld = clock - backSince;
+            backReleased = clock;
+            backSince = -1;
+        }
+        if (isDown(d)) {
+            if (downSince < 0) downSince = clock;
+        } else if (downSince >= 0) {
+            downHeld = clock - downSince;
+            downReleased = clock;
+            downSince = -1;
+        }
+    }
+
+    static boolean isBack(int d) { return d == 4 || d == 5 || d == 6; }
+    static boolean isDown(int d) { return d == 2 || d == 3 || d == 4; }
+    static boolean isForward(int d) { return d == 8 || d == 1 || d == 2; }
+    static boolean isUp(int d) { return d == 6 || d == 7 || d == 8; }
+
+    /** Direção segurada agora (0 sem história). */
+    int current() {
+        return count > 0 ? directions[count - 1] : 0;
+    }
+
+    /**
+     * Carga pronta: trás (ou baixo) segurado por {@code chargeFrames}, ainda segurado ou solto há
+     * no máximo {@code keepFrames}.
+     */
+    boolean charged(boolean down, int clock, int chargeFrames, int keepFrames) {
+        int since = down ? downSince : backSince;
+        if (since >= 0) return clock - since >= chargeFrames;
+        int held = down ? downHeld : backHeld, released = down ? downReleased : backReleased;
+        return held >= chargeFrames && clock - released <= keepFrames;
+    }
+
+    /**
+     * Passos que o jogador precisa fazer: a diagonal entre duas direções vizinhas é opcional
+     * (↓ ↘ → vale como ↓ →, a meia-lua ← ↙ ↓ ↘ → como ← ↓ →). A diagonal no fim conta (→ ↓ ↘).
+     */
+    static int[] requiredSteps(int[] command) {
+        int[] out = new int[command.length];
+        int n = 0;
+        for (int i = 0; i < command.length; i++) {
+            int d = command[i];
+            boolean diagonal = d % 2 == 0;
+            if (diagonal && i > 0 && i < command.length - 1 && neighbours(d, command[i - 1]) &&
+                neighbours(d, command[i + 1]) && command[i - 1] != command[i + 1]) continue;
+            out[n++] = d;
+        }
+        return java.util.Arrays.copyOf(out, n);
+    }
+
+    private static boolean neighbours(int a, int b) {
+        int diff = Math.abs(a - b);
+        return diff == 1 || diff == 7;
+    }
+
+    /**
+     * Onde termina o comando na história, sem consumir: 0 quando o último passo é a direção mais
+     * recente, 1 a anterior..., ou -1 se não bate. {@code steps} vem de {@link #requiredSteps};
+     * os passos ficam a até {@code motionWindow} quadros entre o primeiro e o último, e o último
+     * a até {@code pressWindow} quadros do botão.
+     */
+    int commandEnd(int[] steps, int clock, int motionWindow, int pressWindow) {
+        if (steps.length == 0) return -1;
+        int step = steps.length - 1;
+        int lastIndex = -1, lastFrame = -1, firstFrame = -1;
+        for (int i = count - 1; i >= 0 && step >= 0; i--) {
+            if (directions[i] != steps[step]) continue;
+            if (lastIndex < 0) {
+                lastIndex = i;
+                lastFrame = frames[i];
+            }
+            firstFrame = frames[i];
+            step--;
+        }
+        if (step >= 0) return -1;
+        if (clock - lastFrame > pressWindow) return -1;
+        if (lastFrame - firstFrame > motionWindow) return -1;
+        return count - 1 - lastIndex;
+    }
+
+    /**
+     * Comando de segurar: {@code [5, 1]} = segura trás e aperta frente, {@code [3, 7]} = segura
+     * baixo e aperta cima (diagonais valem). Verdadeiro com a carga pronta e a direção de soltar
+     * segurada agora.
+     */
+    boolean holdCommand(int[] command, int clock, int chargeFrames, int keepFrames) {
+        boolean down = command[0] == 3;
+        int now = current();
+        boolean release = down ? isUp(now) : isForward(now);
+        return release && charged(down, clock, chargeFrames, keepFrames);
+    }
+
+    /** Um comando saiu: a história e as cargas recomeçam (a mesma entrada não solta outro). */
+    void consume(int clock) {
+        count = 0;
+        backHeld = downHeld = 0;
+        if (backSince >= 0) backSince = clock;
+        if (downSince >= 0) downSince = clock;
     }
 
     /** Whether the direction was entered on this very frame. */

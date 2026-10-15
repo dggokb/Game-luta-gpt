@@ -101,6 +101,7 @@ def validate_fighter(pack):
         command = f['energy']['command']
         if not command or any(type(d) is not int or not 1 <= d <= 8 for d in command):
             raise ValueError(f'{name}.energy: command uses D-pad directions 1..8')
+        validate_command_extras(f'{name}.energy', f['energy'], False)
     if 'super' in f: validate_projectile(f['super'], name+'.super', body)
     for key in ('energy','super'):
         if key in f:
@@ -125,7 +126,7 @@ def validate_mechanics(name, mech, m, projectile):
     if not isinstance(mech, dict):
         raise ValueError(f'{name}.mecanica: expected an object')
     total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
-    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco'}
+    known = {'armadura','contra','esquiva','avanco','teleporte','puxar','veneno','custoVida','carga','eco','mergulho'}
     if set(mech) - known:
         raise ValueError(f'{name}.mecanica: unknown {sorted(set(mech) - known)}')
     def frames(key, value):
@@ -155,6 +156,22 @@ def validate_mechanics(name, mech, m, projectile):
         if not projectile: raise ValueError(f'{name}.mecanica.carga: only the projectile (S) charges')
     if 'eco' in mech:
         for key in ('frames','atraso','dano'): positive_int(mech['eco'].get(key), f'{name}.mecanica.eco.{key}')
+    if 'mergulho' in mech:
+        for key in ('frente','descida'): positive((mech['mergulho'] or {}).get(key), f'{name}.mecanica.mergulho.{key}')
+
+def validate_command_extras(name, m, special):
+    """Nome do golpe (lista de comandos), segurar ([←] → / [↓] ↑) e noAr (só no ar)."""
+    if 'nome' in m and (not isinstance(m['nome'], str) or not m['nome'].strip()):
+        raise ValueError(f'{name}.nome: expected the move name')
+    for key in ('segurar', 'noAr'):
+        if key in m and m[key] is not True:
+            raise ValueError(f'{name}.{key}: true or absent')
+    if m.get('noAr') and not special:
+        raise ValueError(f'{name}.noAr: only S2..S9 are air-only')
+    if m.get('segurar'):
+        c = m['command']
+        if len(c) != 2 or c not in ([5, 1], [3, 7]):
+            raise ValueError(f'{name}.segurar: [5, 1] (segura trás, frente) or [3, 7] (segura baixo, cima)')
 
 def validate_ultra(name, u, animations):
     """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
@@ -309,11 +326,14 @@ def validate_special_moves(pack):
         buttons = m.get('buttons', list(BUTTONS))
         if not (isinstance(buttons,list) and buttons and all(b in BUTTONS for b in buttons)):
             raise ValueError(f'{pack["id"]}/{key}.buttons: expected a list of L, M, H')
-        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons')})
+        validate_command_extras(f'{pack["id"]}/{key}', m, True)
+        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons','nome','segurar','noAr')})
+        if 'mergulho' in m.get('mecanica', {}) and not m.get('noAr'):
+            raise ValueError(f'{pack["id"]}/{key}.mecanica.mergulho: only an air special (noAr) dives')
     seen = {}
     for key,m in pack.get('specialMoves', {}).items():
         for b in m.get('buttons', BUTTONS):
-            other = seen.setdefault((tuple(m['command']), b), key)
+            other = seen.setdefault((tuple(m['command']), bool(m.get('segurar')), bool(m.get('noAr')), b), key)
             if other != key:
                 raise ValueError(f'{pack["id"]}: {other} and {key} share command and button {b}')
 
@@ -476,6 +496,7 @@ def compile_packs(root, results):
         if 'custoVida' in mech: code += '.lifeCost('+str(mech['custoVida'])+')'
         if 'carga' in mech: code += '.charge('+str(mech['carga']['frames'])+','+str(mech['carga']['bonus'])+')'
         if 'eco' in mech: code += '.echo('+','.join(str(mech['eco'][k]) for k in ('frames','atraso','dano'))+')'
+        if 'mergulho' in mech: code += '.dive('+f(mech['mergulho']['frente'])+','+f(mech['mergulho']['descida'])+')'
         return code
     def fighter_mechanics(mech):
         grab = mech.get('agarrao', {})
@@ -530,7 +551,7 @@ def compile_packs(root, results):
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
             pose = q(m['pose']) if 'pose' in m else 'null'
             move = 'new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+attack(key,m,'NORMAL',m['damage'],m['reach'],m.get('hitHeight',78))+')'
-            lines += [' sm.put('+q(key)+',new CharacterDefinition.Special('+move+',new int[]{'+','.join(map(str,m['command']))+'},'+q(''.join(m.get('buttons',BUTTONS)))+'));']
+            lines += [' sm.put('+q(key)+',new CharacterDefinition.Special('+move+',new int[]{'+','.join(map(str,m['command']))+'},'+q(''.join(m.get('buttons',BUTTONS)))+','+(q(m['nome']) if 'nome' in m else 'null')+','+str(bool(m.get('segurar'))).lower()+','+str(bool(m.get('noAr'))).lower()+'));']
         for key,animation in pack.get('specialAnimations',{}).items():
             lines += [' s.put('+q(key)+',a.get('+q(animation)+'));']
         p = pack['_profile'];fi = pack['fighter'];body = fi['body']
@@ -543,6 +564,8 @@ def compile_packs(root, results):
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
+                   +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
+                     if energy and ('nome' in energy or energy.get('segurar')) else '')
                    +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else '')
                    +(ultra_sequence(fi['ultra']) if 'ultra' in fi else ''))
         stand,crouch = pack['_visual']

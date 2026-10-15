@@ -82,9 +82,18 @@ Páginas de mangá prontas (`pag1.jpg` a `pag6.jpg`), lidas pelo motor de págin
 depois, Ryūga treina sozinho no dojo, Dafu observa, Kōga volta e provoca o irmão, e os dois
 partem para a luta. Não precisam de mais nenhuma imagem.
 
-> Depois delas vem a luta de treino (Ryūga contra Kōga). A arte não muda nada nela.
+> Depois delas vem a luta de treino (Ryūga contra Kōga), que termina na cinemática da
+> campainha ([motor-cinematicas.md](motor-cinematicas.md)).
 
-### Página 7 (quatro quadros)
+### Páginas 7 a 11 (depois da luta): prontas
+
+Páginas de mangá prontas (`pag7.jpg` a `pag11.jpg`): a corrida e o DING DONG, o mensageiro
+entrega as duas cartas, a regra das equipes (cada convidado é um líder), Kōga vai embora
+prometendo vingança e Ryūga, depois da conversa com Dafu, decide participar e já sabe quem vai
+convidar. Elas tomaram o lugar das páginas provisórias abaixo, que ficam só como registro (o
+episódio não usa mais esses prompts).
+
+### Página 7 provisória (quatro quadros, substituída)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
@@ -93,14 +102,14 @@ partem para a luta. Não precisam de mais nenhuma imagem.
 | `pag7_q3.jpg` | horizontal 1536×1024 (vira faixa larga) | — | Detalhe: dois envelopes iguais, lado a lado no chão de madeira da entrada, pretos, cada um com o lacre de cera vermelha com o dragão (o mesmo do convite do Prólogo). Cada um tem um nome escrito com pincel (o texto pode ser ilegível). Envelopes no centro exato da imagem. |
 | `pag7_q4.jpg` | horizontal 1536×1024 (vira faixa larga) | dafu | Close do rosto de Dafu olhando para baixo, para os envelopes fora de quadro: pela primeira vez os olhos estão abertos, arregalados, o sorriso sumiu, suor frio, sombra cobrindo a testa. Rosto no terço direito da imagem, numa faixa no meio da altura; à esquerda só sombra. |
 
-### Página 8 (duas colunas)
+### Página 8 (duas colunas, substituída)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
 | `pag8_q1.jpg` | quadrado 1024×1024 | p01 | Ryūga de pé lendo a carta aberta nas mãos, do peito para cima, expressão séria e determinada, luz da janela atrás. Ele fica no meio da altura da imagem; o quarto de cima e o quarto de baixo são livres para dois balões. |
 | `pag8_q2.jpg` | quadrado 1024×1024 | p03 | Kōga amassando a carta no punho fechado, dentes cerrados, olhar de raiva, veias saltando, energia escura e vermelha subindo em volta, dojo à noite ao fundo. Do peito para cima, no meio da altura; o terço de cima livre para o balão de grito. |
 
-### Página 9 (dois quadros no alto, faixa embaixo)
+### Página 9 (dois quadros no alto, faixa embaixo, substituída)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
@@ -108,7 +117,7 @@ partem para a luta. Não precisam de mais nenhuma imagem.
 | `pag9_q2.jpg` | horizontal 1536×1024 | p03 | Kōga segurando a carta aberta e apontando uma linha do texto com o dedo, de lado para a câmera, olhar sério. Ele fica no meio da altura; o quarto de cima e o quarto de baixo são livres para dois balões. |
 | `pag9_q3.jpg` | horizontal 1536×1024 (vira faixa larga) | p01, p03 | Ryūga e Kōga de costas um para o outro na porta do dojo, ao pôr do sol, cada um olhando para um lado (Ryūga para a esquerda, Kōga para a direita), mochilas no ombro. Céu laranja e roxo enorme. Os dois numa faixa horizontal no meio da imagem; o terço de cima é céu livre para a narração. |
 
-### Página 10 (quadro único)
+### Página 10 (quadro único, substituída)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|

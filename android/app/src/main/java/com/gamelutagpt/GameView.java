@@ -2950,6 +2950,9 @@ public class GameView extends SurfaceView
     private void openPause() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         loadTemporada();
+        // COMANDOS: os golpes de cada personagem, começando pelo do jogador.
+        int[] atual = new int[1];
+        pausa.comandos().setFichas(ListaComandos.fichas(selectionRoster(), player().character(), esquema, atual), atual[0]);
         // O aviso de progresso perdido só vale para um episódio do modo história.
         pausa.abrir(temporada, storyMode && historia.isActive());
         selectionKeys.clear();

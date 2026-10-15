@@ -25,7 +25,8 @@
       "speed": 900,
       "command": [
         3,
-        1
+        4,
+        5
       ],
       "spawnX": 121,
       "spawnY": 181,
@@ -54,7 +55,8 @@
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
-      }
+      },
+      "nome": "Machadinho"
     },
     "super": {
       "damage": 2720,
@@ -2001,16 +2003,18 @@
       "launchType": "knockdown",
       "knockback": 60,
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Jato de vapor"
     },
     "S3": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "L",
-        "M"
+        3
       ],
       "animation": "SPECIAL_S3",
       "damage": 760,
@@ -2043,15 +2047,19 @@
             14
           ]
         }
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Esquiva acrobática"
     },
     "S4": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "H"
+        2,
+        1
       ],
       "animation": "SPECIAL_S4",
       "damage": 850,
@@ -2088,7 +2096,13 @@
             19
           ]
         }
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Voadora em parafuso"
     }
   }
 }

@@ -437,6 +437,33 @@ public class MechanicsTest {
         assertTrue("the last hit throws the rival", s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
     }
 
+    /** p09 e p11: os Ultras dos vídeos novos batem nos quadros e somam o dano. */
+    @Test public void theP09AndP11UltrasHitOnTheirFrames() {
+        for (String id : new String[]{"p09", "p11"}) {
+            CombatEngineTest.Sim s = ultraSequence(id, 110f);
+            CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
+            CombatConfig config = s.engine.config;
+            s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
+            int life = s.f(1).state.life, hits = 0, guard = 0;
+            float highest = 0f;
+            while (s.f(0).inUltraSequence() && guard++ < 2000) {
+                s.step();
+                for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && "ULTRA".equals(e.moveId)) hits++;
+                if (s.f(0).ultraHitsDone < seq.hits.length) highest = Math.max(highest, Arena.GROUND_Y - s.f(1).y);
+            }
+            assertEquals(id + ": one hit per strike", seq.hits.length, hits);
+            assertEquals(id + ": the hits add up to the Ultra damage", seq.damage, life - s.f(1).state.life);
+            if (id.equals("p09")) {
+                // O rival fica onde o saco estava no vídeo: erguido acima da cabeça no pulo.
+                assertTrue("p09 lifts the rival over his head: " + highest, highest > 200f);
+                float[] slam = seq.holdAt(seq.hits[seq.hits.length - 1]);
+                assertEquals("the slam puts it back on the ground", 0f, slam[1], 0.5f);
+            } else {
+                assertEquals("p11 strikes in place, without lifting", 0f, highest, 0.5f);
+            }
+        }
+    }
+
     @Test public void theUltraWhiffsFromFarWithoutStartingTheSequence() {
         CombatEngineTest.Sim s = ultraSequence("p03", 900f);
         CombatConfig config = s.engine.config;
@@ -451,7 +478,7 @@ public class MechanicsTest {
     }
 
     @Test public void onlyTheBeamFightersKeepTheBeam() {
-        for (String id : new String[]{"p02", "p03", "p04", "p05", "p07", "p08", "p10", "p12"}) {
+        for (String id : new String[]{"p02", "p03", "p04", "p05", "p07", "p08", "p09", "p10", "p11", "p12"}) {
             CharacterDefinition c = GeneratedCharacters.get(id);
             assertNotNull(id + " Ultra follows its video", c.fighter.ultraSequence);
             assertNotNull(id + " has the Ultra sheet", c.animations.get(SpriteStates.ULTRA_SEQ));

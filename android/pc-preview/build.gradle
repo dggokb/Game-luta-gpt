@@ -66,6 +66,16 @@ tasks.register('runHistoria', JavaExec) {
     systemProperty 'sorteio', project.findProperty('sorteio') ?: '1'
 }
 
+// S1 de cada personagem (projéteis) em PNG: gradle :pc-preview:runProjeteis
+tasks.register('runProjeteis', JavaExec) {
+    group = 'application'
+    description = 'Grava o desenho do S1 de cada personagem em build/projeteis/.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.preview.ProjetilPreview'
+    workingDir = rootProject.projectDir
+    args 'build/projeteis'
+}
+
 // Menu inicial e pausa em PNG: gradle :pc-preview:runMenu (-Pidioma=en para outro idioma)
 tasks.register('runMenu', JavaExec) {
     group = 'application'
