@@ -113,7 +113,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S4 | Investida de ombro | avança + armadura | ✅ |
 | Agarrão | Carregar e jogar | agarrão mais forte e longo | ✅ |
 | Super | Tempestade de Fogo (soca o chão, fogo) | animação + **onda** | ❌ |
-| Ultra | Resgate Final (**agarra**, salta e arremessa) | **raio** | ❌ |
+| Ultra | Resgate Final (**agarra**, salta e arremessa) | sequência do vídeo: agarra, ergue acima da cabeça no pulo e arremessa (3 golpes, rival preso à pose) | ✅ |
 
 ### p10 — bombeira ágil
 | | Ficha | Jogo hoje | |
@@ -134,7 +134,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Bloqueio de nervos (contra-golpe) | contra-golpe + veneno | ✅ |
 | S4 | Passo cirúrgico (desliza e estoca) | avança | ✅ |
 | Super | Cirurgia (5 golpes exatos + estocada) | animação + **onda** | ❌ |
-| Ultra | Autópsia (chave no pulso, golpes, arremesso) | **raio** | ❌ |
+| Ultra | Autópsia (chave no pulso, golpes, arremesso) | sequência do vídeo, 5 golpes nos quadros da animação | ✅ |
 
 ### p12 — criatura feral
 | | Ficha | Jogo hoje | |
@@ -212,8 +212,10 @@ golpe lança. Não tem mais cinemática nem raio para esses oito. Errou ou foi d
 como antes.
 
 - p01 e p06 continuam com o raio (é o golpe deles).
-- p09 e p11: o vídeo mostra o rival junto (agarrão), e ele ficaria colado na arte. Faltam
-  vídeos novos sem o rival; até lá eles continuam com o raio.
+- p09 e p11 (vídeos novos, 15/10): seguem o vídeo como os outros. No do p09 o Seedance desenhou
+  um saco no lugar do rival (três tentativas); ele sai pela cor antes da conversão
+  (`tools/sprites/apagar_saco.py`) e o rival fica preso onde o saco estava ("rival" em
+  `ultras.json`: agarra na frente, sobe acima da cabeça no pulo e cai no arremesso).
 
 ## Golpes com várias pancadas (15/10)
 
