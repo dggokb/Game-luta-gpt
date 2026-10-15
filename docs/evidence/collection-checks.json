@@ -1,0 +1,882 @@
+{
+  "characters": [
+    {
+      "character": "p01",
+      "videos": 28,
+      "frames": 3290,
+      "converted": 25,
+      "rejected": [
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.769, silhueta=0.770, aparência=0.701, proporções=0.856; nenhuma escala aprovada"
+        },
+        {
+          "clip": "gemini_generated_video_0ec226c4",
+          "reason": "idle: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "gemini_generated_video_a80ea984",
+          "reason": "idle: Frame sem silhueta mensurável"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_back",
+        "walk_forward"
+      ],
+      "source_warnings": 17,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2713,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.0010121471774482416
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": -0.08909161932774623
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": -0.06430712397730076
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": -0.11701894170676042
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.6312151551246643
+    },
+    {
+      "character": "p02",
+      "videos": 34,
+      "frames": 3298,
+      "converted": 29,
+      "rejected": [
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.818, silhueta=0.804, aparência=0.811, proporções=0.884; nenhuma escala aprovada; crouch: Pose incerta: score=0.653, silhueta=0.657, aparência=0.392, proporções=0.983; nenhuma escala aprovada"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.720, silhueta=0.689, aparência=0.704, proporções=0.872; nenhuma escala aprovada; crouch: Pose incerta: score=0.569, silhueta=0.531, aparência=0.595, proporções=0.697; nenhuma escala aprovada"
+        },
+        {
+          "clip": "medium_kick",
+          "reason": "idle: Pose incerta: score=0.604, silhueta=0.580, aparência=0.640, proporções=0.657; nenhuma escala aprovada; crouch: Pose incerta: score=0.697, silhueta=0.654, aparência=0.652, proporções=0.942; nenhuma escala aprovada"
+        },
+        {
+          "clip": "taunt",
+          "reason": "idle: Pose incerta: score=0.724, silhueta=0.712, aparência=0.692, proporções=0.819; nenhuma escala aprovada; crouch: Pose incerta: score=0.586, silhueta=0.546, aparência=0.583, proporções=0.763; nenhuma escala aprovada"
+        },
+        {
+          "clip": "victory",
+          "reason": "idle: Pose incerta: score=0.746, silhueta=0.717, aparência=0.741, proporções=0.874; nenhuma escala aprovada; crouch: Pose incerta: score=0.572, silhueta=0.545, aparência=0.569, proporções=0.696; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 25,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2813,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.047777844540860315
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": 0.06104186563698022
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": -0.2622561760119879
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": -0.13540098737826156
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.17435133457183838
+    },
+    {
+      "character": "p03",
+      "videos": 34,
+      "frames": 3298,
+      "converted": 28,
+      "rejected": [
+        {
+          "clip": "crouch_jab",
+          "reason": "idle: Pose incerta: score=0.654, silhueta=0.613, aparência=0.566, proporções=0.948; nenhuma escala aprovada; crouch: Poses equivalentes com variação de escala de 9.6% dentro do vídeo; escala única não resolve zoom/deformação"
+        },
+        {
+          "clip": "crouch_small",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "hit_air",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "dash",
+          "reason": "idle: Pose incerta: score=0.767, silhueta=0.736, aparência=0.777, proporções=0.886; nenhuma escala aprovada; crouch: Pose incerta: score=0.618, silhueta=0.560, aparência=0.663, proporções=0.807; nenhuma escala aprovada"
+        },
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.797, silhueta=0.780, aparência=0.809, proporções=0.851; nenhuma escala aprovada; crouch: Pose incerta: score=0.702, silhueta=0.669, aparência=0.715, proporções=0.831; nenhuma escala aprovada"
+        },
+        {
+          "clip": "heavy_straight",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 30,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2716,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.003888277683472552
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": 0.056982638888371184
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": -0.0873318497673381
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.2804739475250244
+    },
+    {
+      "character": "p04",
+      "videos": 35,
+      "frames": 3395,
+      "converted": 28,
+      "rejected": [
+        {
+          "clip": "defense_crouch",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "defense_stand",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "defense_air",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.787, silhueta=0.777, aparência=0.752, proporções=0.876; nenhuma escala aprovada; crouch: Pose incerta: score=0.650, silhueta=0.607, aparência=0.669, proporções=0.811; nenhuma escala aprovada"
+        },
+        {
+          "clip": "jump_light",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "jump_heavy_down",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "super_wave",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        }
+      ],
+      "in_place_clips": [
+        "walk_back",
+        "back_dash",
+        "dash",
+        "walk_forward"
+      ],
+      "source_warnings": 26,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2716,
+      "raster_anchor_checks": [
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": 0.09927664024496607
+        },
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": 0.09122153751798123
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": 0.31949077698300243
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": 0.0035833541918464107
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.12688705325126648
+    },
+    {
+      "character": "p05",
+      "videos": 35,
+      "frames": 3395,
+      "converted": 21,
+      "rejected": [
+        {
+          "clip": "idle",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "crouch_jab",
+          "reason": "idle: Pose incerta: score=0.672, silhueta=0.662, aparência=0.584, proporções=0.833; nenhuma escala aprovada; crouch: Pose incerta: score=0.585, silhueta=0.518, aparência=0.664, proporções=0.770; nenhuma escala aprovada"
+        },
+        {
+          "clip": "crouch_medium",
+          "reason": "idle: Pose incerta: score=0.586, silhueta=0.565, aparência=0.629, proporções=0.620; nenhuma escala aprovada; crouch: Pose incerta: score=0.602, silhueta=0.538, aparência=0.658, proporções=0.802; nenhuma escala aprovada"
+        },
+        {
+          "clip": "walk_forward",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "back_dash",
+          "reason": "idle: Pose incerta: score=0.816, silhueta=0.801, aparência=0.805, proporções=0.897; nenhuma escala aprovada; crouch: Pose incerta: score=0.589, silhueta=0.560, aparência=0.632, proporções=0.657; nenhuma escala aprovada"
+        },
+        {
+          "clip": "hit_stand",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "dash",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "defeat",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "heavy_straight",
+          "reason": "idle: Pose incerta: score=0.703, silhueta=0.657, aparência=0.772, proporções=0.808; nenhuma escala aprovada; crouch: Pose incerta: score=0.632, silhueta=0.576, aparência=0.636, proporções=0.870; nenhuma escala aprovada"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.655, silhueta=0.610, aparência=0.730, proporções=0.747; nenhuma escala aprovada; crouch: Pose incerta: score=0.612, silhueta=0.543, aparência=0.636, proporções=0.877; nenhuma escala aprovada"
+        },
+        {
+          "clip": "taunt",
+          "reason": "idle: Pose incerta: score=0.797, silhueta=0.786, aparência=0.759, proporções=0.891; nenhuma escala aprovada; crouch: Pose incerta: score=0.595, silhueta=0.522, aparência=0.702, proporções=0.766; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_s2",
+          "reason": "idle: Pose incerta: score=0.766, silhueta=0.729, aparência=0.819, proporções=0.855; nenhuma escala aprovada; crouch: Pose incerta: score=0.543, silhueta=0.514, aparência=0.608, proporções=0.587; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_s4",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "super_wave",
+          "reason": "idle: Pose incerta: score=0.803, silhueta=0.778, aparência=0.820, proporções=0.890; nenhuma escala aprovada; crouch: Pose incerta: score=0.674, silhueta=0.629, aparência=0.676, proporções=0.869; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "walk_back"
+      ],
+      "source_warnings": 35,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2037,
+      "raster_anchor_checks": [
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": 0.23615862422548162
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.1804177463054657
+    },
+    {
+      "character": "p06",
+      "videos": 35,
+      "frames": 3395,
+      "converted": 31,
+      "rejected": [
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.679, silhueta=0.656, aparência=0.731, proporções=0.714; nenhuma escala aprovada; crouch: Pose incerta: score=0.690, silhueta=0.659, aparência=0.644, proporções=0.883; nenhuma escala aprovada"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.709, silhueta=0.648, aparência=0.740, proporções=0.927; nenhuma escala aprovada; crouch: Pose incerta: score=0.591, silhueta=0.488, aparência=0.623, proporções=0.997; nenhuma escala aprovada"
+        },
+        {
+          "clip": "taunt",
+          "reason": "idle: Pose incerta: score=0.827, silhueta=0.810, aparência=0.847, proporções=0.876; nenhuma escala aprovada; crouch: Pose incerta: score=0.579, silhueta=0.529, aparência=0.623, proporções=0.733; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_s4",
+          "reason": "idle: Pose incerta: score=0.713, silhueta=0.671, aparência=0.752, proporções=0.841; nenhuma escala aprovada; crouch: Pose incerta: score=0.614, silhueta=0.523, aparência=0.634, proporções=0.981; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 21,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 3007,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.10502472726898304
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": 0.08640041670059873
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": -0.049307561371392694
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": -0.021071431300470067
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.1432115137577057
+    },
+    {
+      "character": "p07",
+      "videos": 34,
+      "frames": 3298,
+      "converted": 31,
+      "rejected": [
+        {
+          "clip": "knockdown",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.798, silhueta=0.755, aparência=0.811, proporções=0.968; nenhuma escala aprovada; crouch: Pose incerta: score=0.603, silhueta=0.493, aparência=0.695, proporções=0.956; nenhuma escala aprovada"
+        },
+        {
+          "clip": "victory",
+          "reason": "idle: Pose incerta: score=0.755, silhueta=0.695, aparência=0.809, proporções=0.945; nenhuma escala aprovada; crouch: Pose incerta: score=0.514, silhueta=0.462, aparência=0.720, proporções=0.464; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 23,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 3007,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.28077829558606027
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": -0.08370205913342943
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": 0.34476450880333687
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": 0.10203671249087165
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.20595234632492065
+    },
+    {
+      "character": "p08",
+      "videos": 33,
+      "frames": 3201,
+      "converted": 21,
+      "rejected": [
+        {
+          "clip": "crouch_jab",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "hit_air",
+          "reason": "idle: Pose incerta: score=0.590, silhueta=0.560, aparência=0.622, proporções=0.674; nenhuma escala aprovada; crouch: Pose incerta: score=0.596, silhueta=0.552, aparência=0.698, proporções=0.651; nenhuma escala aprovada"
+        },
+        {
+          "clip": "hit_stand",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "dash",
+          "reason": "idle: Pose incerta: score=0.805, silhueta=0.768, aparência=0.858, proporções=0.899; nenhuma escala aprovada; crouch: Pose incerta: score=0.582, silhueta=0.556, aparência=0.677, proporções=0.569; nenhuma escala aprovada"
+        },
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.799, silhueta=0.757, aparência=0.863, proporções=0.897; nenhuma escala aprovada; crouch: Pose incerta: score=0.705, silhueta=0.651, aparência=0.669, proporções=0.987; nenhuma escala aprovada"
+        },
+        {
+          "clip": "walk_forward",
+          "reason": "idle: Pose incerta: score=0.579, silhueta=0.524, aparência=0.670, proporções=0.694; nenhuma escala aprovada; crouch: Pose incerta: score=0.565, silhueta=0.517, aparência=0.718, proporções=0.574; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_s2",
+          "reason": "idle: Pose incerta: score=0.777, silhueta=0.749, aparência=0.760, proporções=0.919; nenhuma escala aprovada; crouch: Pose incerta: score=0.507, silhueta=0.467, aparência=0.611, proporções=0.537; nenhuma escala aprovada"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.736, silhueta=0.697, aparência=0.692, proporções=0.967; nenhuma escala aprovada; crouch: Pose incerta: score=0.416, silhueta=0.367, aparência=0.560, proporções=0.436; nenhuma escala aprovada"
+        },
+        {
+          "clip": "jab",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "special_s3",
+          "reason": "idle: Pose incerta: score=0.531, silhueta=0.480, aparência=0.649, proporções=0.598; nenhuma escala aprovada; crouch: Pose incerta: score=0.643, silhueta=0.614, aparência=0.697, proporções=0.697; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_s4",
+          "reason": "idle: Pose incerta: score=0.561, silhueta=0.503, aparência=0.677, proporções=0.660; nenhuma escala aprovada; crouch: Pose incerta: score=0.780, silhueta=0.753, aparência=0.722, proporções=0.975; nenhuma escala aprovada"
+        },
+        {
+          "clip": "victory",
+          "reason": "idle: Pose incerta: score=0.678, silhueta=0.623, aparência=0.703, proporções=0.884; nenhuma escala aprovada; crouch: Pose incerta: score=0.564, silhueta=0.532, aparência=0.680, proporções=0.550; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 25,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2037,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.012087932528970668
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": -0.17492308288115055
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.2249511480331421
+    },
+    {
+      "character": "Dafu",
+      "videos": 5,
+      "frames": 485,
+      "converted": 5,
+      "rejected": [],
+      "in_place_clips": [],
+      "source_warnings": 1,
+      "originals_unchanged": true,
+      "reference_provenance": {
+        "method": "first_decoded_frame_of_existing_video",
+        "video": "parado.mp4",
+        "source_sha256": "4bbeb563befccfd392b4e727d7af4ab5db0d13c9d580d8f2a421899146fcdb99",
+        "frame": 0,
+        "note": "Derived pose reference; body size across different characters still requires visual review."
+      },
+      "normalized_pngs": 485,
+      "raster_anchor_checks": [],
+      "preview_vs_full_png_mean_rgb_error": 0.9192400574684143
+    },
+    {
+      "character": "p09",
+      "videos": 34,
+      "frames": 3298,
+      "converted": 27,
+      "rejected": [
+        {
+          "clip": "throw",
+          "reason": "idle: Pose incerta: score=0.513, silhueta=0.474, aparência=0.470, proporções=0.739; nenhuma escala aprovada; crouch: Pose incerta: score=0.690, silhueta=0.683, aparência=0.559, proporções=0.897; nenhuma escala aprovada"
+        },
+        {
+          "clip": "hit_air",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.734, silhueta=0.704, aparência=0.765, proporções=0.825; nenhuma escala aprovada; crouch: Pose incerta: score=0.695, silhueta=0.661, aparência=0.680, proporções=0.862; nenhuma escala aprovada"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.665, silhueta=0.619, aparência=0.654, proporções=0.879; nenhuma escala aprovada; crouch: Pose incerta: score=0.755, silhueta=0.740, aparência=0.714, proporções=0.877; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_energy",
+          "reason": "idle: Pose incerta: score=0.707, silhueta=0.654, aparência=0.832, proporções=0.775; nenhuma escala aprovada; crouch: Pose incerta: score=0.734, silhueta=0.709, aparência=0.680, proporções=0.914; nenhuma escala aprovada"
+        },
+        {
+          "clip": "walk_back",
+          "reason": "idle: Pose incerta: score=0.730, silhueta=0.678, aparência=0.704, proporções=0.992; nenhuma escala aprovada; crouch: Pose incerta: score=0.577, silhueta=0.511, aparência=0.645, proporções=0.775; nenhuma escala aprovada"
+        },
+        {
+          "clip": "victory",
+          "reason": "idle: Pose incerta: score=0.820, silhueta=0.798, aparência=0.777, proporções=0.973; nenhuma escala aprovada; crouch: Pose incerta: score=0.693, silhueta=0.671, aparência=0.671, proporções=0.819; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_back"
+      ],
+      "source_warnings": 24,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2619,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.12287559667674941
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": 0.16325520303314534
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.20765791833400726
+    },
+    {
+      "character": "p10",
+      "videos": 34,
+      "frames": 3298,
+      "converted": 30,
+      "rejected": [
+        {
+          "clip": "crouch_jab",
+          "reason": "idle: Pose incerta: score=0.559, silhueta=0.513, aparência=0.563, proporções=0.754; nenhuma escala aprovada; crouch: Pose incerta: score=0.764, silhueta=0.769, aparência=0.653, proporções=0.890; nenhuma escala aprovada"
+        },
+        {
+          "clip": "crouch_small",
+          "reason": "idle: Pose incerta: score=0.489, silhueta=0.440, aparência=0.576, proporções=0.590; nenhuma escala aprovada; crouch: Pose incerta: score=0.738, silhueta=0.747, aparência=0.627, proporções=0.851; nenhuma escala aprovada"
+        },
+        {
+          "clip": "hit_stand",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.764, silhueta=0.751, aparência=0.655, proporções=0.966; nenhuma escala aprovada; crouch: Pose incerta: score=0.632, silhueta=0.616, aparência=0.546, proporções=0.818; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 33,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2910,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.1318026685901259
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": 0.04508924030983508
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": 0.18206432069632683
+        },
+        {
+          "clip": "walk_back",
+          "raster_first_last_torso_dx_px": -0.13041957229290801
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.201646089553833
+    },
+    {
+      "character": "p11",
+      "videos": 34,
+      "frames": 3298,
+      "converted": 26,
+      "rejected": [
+        {
+          "clip": "hit_stand",
+          "reason": "idle: Pose incerta: score=0.388, silhueta=0.424, aparência=0.197, proporções=0.490; nenhuma escala aprovada; crouch: Pose incerta: score=0.440, silhueta=0.376, aparência=0.235, proporções=0.990; nenhuma escala aprovada"
+        },
+        {
+          "clip": "defense_crouch",
+          "reason": "idle: Pose incerta: score=0.495, silhueta=0.503, aparência=0.507, proporções=0.445; nenhuma escala aprovada; crouch: Pose incerta: score=0.828, silhueta=0.838, aparência=0.679, proporções=0.986; nenhuma escala aprovada"
+        },
+        {
+          "clip": "defense_air",
+          "reason": "idle: Pose incerta: score=0.579, silhueta=0.556, aparência=0.520, proporções=0.758; nenhuma escala aprovada; crouch: Pose incerta: score=0.704, silhueta=0.702, aparência=0.536, proporções=0.936; nenhuma escala aprovada"
+        },
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.806, silhueta=0.823, aparência=0.661, proporções=0.925; nenhuma escala aprovada; crouch: Pose incerta: score=0.714, silhueta=0.725, aparência=0.533, proporções=0.906; nenhuma escala aprovada"
+        },
+        {
+          "clip": "intro",
+          "reason": "idle: Pose incerta: score=0.707, silhueta=0.731, aparência=0.532, proporções=0.837; nenhuma escala aprovada; crouch: Pose incerta: score=0.421, silhueta=0.432, aparência=0.234, proporções=0.625; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_energy",
+          "reason": "idle: Pose incerta: score=0.845, silhueta=0.859, aparência=0.694, proporções=0.988; nenhuma escala aprovada; crouch: Pose incerta: score=0.371, silhueta=0.423, aparência=0.133, proporções=0.466; nenhuma escala aprovada"
+        },
+        {
+          "clip": "special_s3",
+          "reason": "idle: Nenhuma pose de referência com silhueta íntegra; crouch: Nenhuma pose de referência com silhueta íntegra"
+        },
+        {
+          "clip": "walk_back",
+          "reason": "idle: Pose incerta: score=0.719, silhueta=0.712, aparência=0.552, proporções=0.973; nenhuma escala aprovada; crouch: Pose incerta: score=0.535, silhueta=0.538, aparência=0.516, proporções=0.545; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "back_dash",
+        "dash",
+        "walk_forward",
+        "walk_back"
+      ],
+      "source_warnings": 21,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 2522,
+      "raster_anchor_checks": [
+        {
+          "clip": "back_dash",
+          "raster_first_last_torso_dx_px": -0.14710595983581243
+        },
+        {
+          "clip": "dash",
+          "raster_first_last_torso_dx_px": 0.25965583981974305
+        },
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": -0.01747435486845461
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.1856982260942459
+    },
+    {
+      "character": "p12",
+      "videos": 33,
+      "frames": 3201,
+      "converted": 19,
+      "rejected": [
+        {
+          "clip": "idle",
+          "reason": "idle: Pose incerta: score=0.585, silhueta=0.559, aparência=0.583, proporções=0.700; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "crouch_heavy",
+          "reason": "idle: Pose incerta: score=0.581, silhueta=0.567, aparência=0.472, proporções=0.790; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "crouch_jab",
+          "reason": "idle: Pose incerta: score=0.434, silhueta=0.425, aparência=0.465, proporções=0.430; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "crouch_medium",
+          "reason": "idle: Pose incerta: score=0.465, silhueta=0.422, aparência=0.553, proporções=0.531; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "back_dash",
+          "reason": "idle: Pose incerta: score=0.610, silhueta=0.584, aparência=0.572, proporções=0.770; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "danoBaixo",
+          "reason": "idle: Pose incerta: score=0.446, silhueta=0.431, aparência=0.489, proporções=0.450; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "dash",
+          "reason": "idle: Frame sem silhueta mensurável; crouch: Frame sem silhueta mensurável"
+        },
+        {
+          "clip": "crouch_small",
+          "reason": "idle: Pose incerta: score=0.473, silhueta=0.449, aparência=0.547, proporções=0.481; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "defense_air",
+          "reason": "idle: Pose incerta: score=0.633, silhueta=0.605, aparência=0.637, proporções=0.752; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "defeat",
+          "reason": "idle: Pose incerta: score=0.508, silhueta=0.488, aparência=0.511, proporções=0.590; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "heavy_straight",
+          "reason": "idle: Pose incerta: score=0.713, silhueta=0.668, aparência=0.764, proporções=0.844; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "jump",
+          "reason": "idle: Pose incerta: score=0.708, silhueta=0.683, aparência=0.634, proporções=0.916; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "jab",
+          "reason": "idle: Pose incerta: score=0.522, silhueta=0.486, aparência=0.561, proporções=0.625; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        },
+        {
+          "clip": "walk_back",
+          "reason": "idle: Pose incerta: score=0.623, silhueta=0.606, aparência=0.496, proporções=0.866; nenhuma escala aprovada; crouch: Referência agachada precisa de conferência anatômica"
+        }
+      ],
+      "in_place_clips": [
+        "walk_forward"
+      ],
+      "source_warnings": 28,
+      "originals_unchanged": true,
+      "reference_provenance": null,
+      "normalized_pngs": 1843,
+      "raster_anchor_checks": [
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": 0.20155744773671813
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.23346269130706787
+    },
+    {
+      "character": "p13",
+      "videos": 2,
+      "frames": 157,
+      "converted": 2,
+      "rejected": [],
+      "in_place_clips": [
+        "walk_forward"
+      ],
+      "source_warnings": 0,
+      "originals_unchanged": true,
+      "reference_provenance": {
+        "method": "first_decoded_frame_of_existing_video",
+        "video": "idle.mp4",
+        "source_sha256": "5200e74160518af6534ab605675f30a289659917a8595421dd788e1a62fac109",
+        "frame": 0,
+        "note": "Derived pose reference; body size across different characters still requires visual review."
+      },
+      "normalized_pngs": 157,
+      "raster_anchor_checks": [
+        {
+          "clip": "walk_forward",
+          "raster_first_last_torso_dx_px": 0.11524742432266066
+        }
+      ],
+      "preview_vs_full_png_mean_rgb_error": 0.6989307999610901
+    },
+    {
+      "character": "p14",
+      "videos": 0,
+      "frames": 0,
+      "converted": 0,
+      "rejected": [],
+      "note": "Sem vídeo: somente concept disponível; nenhum movimento foi inventado."
+    },
+    {
+      "character": "p15",
+      "videos": 0,
+      "frames": 0,
+      "converted": 0,
+      "rejected": [],
+      "note": "Sem vídeo: somente concept disponível; nenhum movimento foi inventado."
+    },
+    {
+      "character": "p16",
+      "videos": 0,
+      "frames": 0,
+      "converted": 0,
+      "rejected": [],
+      "note": "Sem vídeo: somente concept disponível; nenhum movimento foi inventado."
+    },
+    {
+      "character": "Takatoshi",
+      "videos": 5,
+      "frames": 485,
+      "converted": 5,
+      "rejected": [],
+      "in_place_clips": [],
+      "source_warnings": 0,
+      "originals_unchanged": true,
+      "reference_provenance": {
+        "method": "first_decoded_frame_of_existing_video",
+        "video": "parado.mp4",
+        "source_sha256": "e9e1a9cb1deea880dabb84c86628c4731cfdc30085225fb16c2b08cb07b7ba66",
+        "frame": 0,
+        "note": "Derived pose reference; body size across different characters still requires visual review."
+      },
+      "normalized_pngs": 485,
+      "raster_anchor_checks": [],
+      "preview_vs_full_png_mean_rgb_error": 0.9633777737617493
+    },
+    {
+      "character": "capangas",
+      "videos": 3,
+      "frames": 291,
+      "converted": 2,
+      "rejected": [
+        {
+          "clip": "walk_forward",
+          "reason": "idle: Pose incerta: score=0.652, silhueta=0.593, aparência=0.710, proporções=0.830; nenhuma escala aprovada"
+        }
+      ],
+      "in_place_clips": [
+        "walk_forward"
+      ],
+      "source_warnings": 1,
+      "originals_unchanged": true,
+      "reference_provenance": {
+        "method": "first_decoded_frame_of_existing_video",
+        "video": "ombrada.mp4",
+        "source_sha256": "0cc6893b587c58867e474985f641de82fb4949bc90fb6a8909774166b181d18a",
+        "frame": 0,
+        "note": "Derived pose reference; body size across different characters still requires visual review."
+      },
+      "normalized_pngs": 194,
+      "raster_anchor_checks": [],
+      "preview_vs_full_png_mean_rgb_error": 0.359078049659729
+    }
+  ],
+  "page_errors": [],
+  "external_requests": [],
+  "checks": [
+    "every_inventoried_video_accounted_for",
+    "original_video_hashes_unchanged",
+    "all_original_frame_counts_and_increasing_timestamps",
+    "all_preview_tiles_present_and_in_bounds",
+    "all_normalized_png_headers_match_common_canvas",
+    "sampled_png_pixels_match_recorded_bounds",
+    "locomotion_torso_x_fixed_in_every_frame",
+    "every_converted_clip_opens_on_phone",
+    "every_character_play_pause_and_comparison",
+    "rejected_sources_remain_accessible",
+    "portrait_has_no_horizontal_overflow",
+    "no_javascript_errors_or_network_requests"
+  ],
+  "status": "passed",
+  "totals": {
+    "videos": 418,
+    "frames": 41083,
+    "converted": 330,
+    "normalized_pngs": 32261
+  }
+}

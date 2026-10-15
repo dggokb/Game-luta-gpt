@@ -4,6 +4,26 @@ import numpy as np
 from .errors import CalibrationError
 
 
+def border_rgb_color(rgb):
+    border = np.concatenate((rgb[0], rgb[-1], rgb[:, 0], rgb[:, -1]))
+    return np.rint(np.median(border, axis=0)).astype(int).tolist()
+
+
+def exterior_color_alpha(rgb, options):
+    color = np.asarray(options.get('color', border_rgb_color(rgb)), dtype=float)
+    tolerance = options.get('tolerance', 40)
+    if (color.shape != (3,) or not np.isfinite(color).all() or np.any(color < 0)
+            or np.any(color > 255) or type(tolerance) is not int or not 1 <= tolerance <= 64):
+        raise CalibrationError('Cor ou tolerância do fundo uniforme inválida')
+    candidate = (np.max(np.abs(rgb.astype(np.int16)-color), axis=2) <= tolerance).astype(np.uint8)
+    _, labels = cv2.connectedComponents(candidate, 8)
+    exterior = np.unique(np.concatenate((labels[0], labels[-1], labels[:, 0], labels[:, -1])))
+    exterior = exterior[exterior != 0]
+    # Only remove matching color connected to the outside. Matching cream/white
+    # clothing enclosed by the figure's outline must remain opaque.
+    return np.where(np.isin(labels, exterior), 0, 255).astype(np.uint8)
+
+
 def image_rgba(frame, options=None):
     options = options or {}
     if frame is None or frame.ndim != 3 or frame.dtype != np.uint8:
@@ -15,14 +35,44 @@ def image_rgba(frame, options=None):
         mode = options.get("mode", "green")
         if mode == "alpha":
             raise CalibrationError("Modo alpha exige transparência existente")
-        if mode != "green":
+        if mode not in ('green', 'border_color'):
             raise CalibrationError("Fundo não suportado; forneça alpha ou chroma verde")
-        hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
-        dominance = cv2.subtract(rgb[:, :, 1], cv2.max(rgb[:, :, 0], rgb[:, :, 2]))
-        green = (cv2.inRange(hsv, (34, 41, 0), (94, 255, 255)) != 0) & (dominance > 12)
-        alpha = np.full(green.shape, 255, np.uint8)
-        alpha_curve = np.clip((24-np.arange(256, dtype=np.int32))*255//12, 0, 255).astype(np.uint8)
-        alpha[green] = alpha_curve[dominance[green]]
+        if mode == 'border_color':
+            alpha = exterior_color_alpha(rgb, options)
+        else:
+            minimum = options.get('minimum_green_dominance', 12)
+            edge_mode = options.get('edge_mode', 'soft')
+            if type(minimum) is not int or not 1 <= minimum <= 32 or edge_mode not in ('soft', 'hard'):
+                raise CalibrationError('Limiar de verde ou modo de borda inválido')
+            hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+            dominance = cv2.subtract(rgb[:, :, 1], cv2.max(rgb[:, :, 0], rgb[:, :, 2]))
+            green = (cv2.inRange(hsv, (34, 41, 0), (94, 255, 255)) != 0) & (dominance > minimum)
+            alpha = np.full(green.shape, 255, np.uint8)
+            if edge_mode == 'hard':
+                alpha[green] = 0
+            else:
+                alpha_curve = np.clip((2*minimum-np.arange(256, dtype=np.int32))*255//minimum, 0, 255).astype(np.uint8)
+                alpha[green] = alpha_curve[dominance[green]]
+            if options.get('protect_green_art', False):
+                tolerance = options.get('green_chroma_tolerance', .12)
+                inset = options.get('green_art_inset', 2)
+                reference = np.asarray(options.get('green_reference_rgb', border_rgb_color(rgb)), float)
+                if (reference.shape != (3,) or not np.isfinite(reference).all()
+                        or np.any(reference < 0) or np.any(reference > 255)
+                        or isinstance(tolerance, bool) or not isinstance(tolerance, (int,float))
+                        or not .01 <= tolerance <= .5 or type(inset) is not int or not 1 <= inset <= 4):
+                    raise CalibrationError('Proteção de arte verde inválida')
+                level = np.maximum(rgb[:, :, 1].astype(np.float32), 1)
+                distance = np.maximum(np.abs(rgb[:, :, 0]/level-reference[0]/max(reference[1],1)),
+                                      np.abs(rgb[:, :, 2]/level-reference[2]/max(reference[1],1)))
+                artwork = green & (distance > tolerance)
+                candidate = alpha.copy()
+                candidate[artwork] = 255
+                interior = cv2.erode((candidate > 32).astype(np.uint8),
+                                     np.ones((3,3), np.uint8), iterations=inset)
+                # Restore only the interior: keeping the original matte at the
+                # contour avoids turning green spill into an opaque outline.
+                alpha[artwork & (interior != 0)] = 255
         rgba = np.dstack((rgb, alpha))
     # Optional, user-visible exclusion regions, e.g. a watermark. Recorded in manifest.
     for rect in options.get("exclude_rectangles", []):

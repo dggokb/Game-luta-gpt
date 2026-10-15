@@ -11,20 +11,22 @@ from urllib.parse import quote
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from sprite_pipeline.exporting import write_json
+from prepare_mobile import render_mobile
 
 
-def bundle(processed, output):
+def bundle(processed, output, inventory):
     if output.exists() and any(output.iterdir()):
         raise ValueError('Use uma pasta de assets nova ou vazia')
     output.mkdir(parents=True,exist_ok=True)
     summaries=[json.loads(p.read_text()) for p in sorted(processed.glob('*/complete.json'))]
     summaries.sort(key=lambda s:(0 if s['character'].startswith('p') and s['character'][1:].isdigit() else 1,s['character']))
-    expected=19
-    if len(summaries)!=expected:
-        raise ValueError(f'Coleção incompleta: {len(summaries)}/{expected} pastas concluídas')
+    expected={c['id'] for c in json.loads(inventory.read_text())}
+    actual={s['character'] for s in summaries}
+    if actual!=expected:
+        raise ValueError(f'Coleção incompleta: faltam {sorted(expected-actual)}; extras {sorted(actual-expected)}')
     root_manifest={'format_version':4,'status':'needs_review','clips':[], 'characters':summaries,
                    'mobile_preview':{'all_frames_retained':True,'timestamps_changed':False,
-                       'format':'WebP quality 85 atlas tiles','maximum_image_width':320,
+                       'format':'WebP quality 85 atlas tiles','maximum_image_width':720,
                        'full_resolution_pngs_included':False}}
     cards=[]
     for summary in summaries:
@@ -35,6 +37,7 @@ def bundle(processed, output):
         source=processed/cid/'assets';dest=output/'characters'/cid
         shutil.copytree(source,dest,copy_function=shutil.copy2)
         manifest=json.loads((dest/'manifest.json').read_text())
+        render_mobile(manifest,dest)
         page=(dest/'index.html').read_text()
         page=page.replace('<h1>Sprites — Visualizador</h1>',
              f'<p><a href="../../index.html">← Personagens</a></p><h1>Sprites — {html.escape(cid)}</h1>')
@@ -72,7 +75,8 @@ def bundle(processed, output):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('processed',type=Path);p.add_argument('--output',type=Path,required=True)
-    args=p.parse_args();print(json.dumps(bundle(args.processed,args.output),indent=2))
+    p.add_argument('--inventory',type=Path,required=True)
+    args=p.parse_args();print(json.dumps(bundle(args.processed,args.output,args.inventory),indent=2))
 
 
 if __name__=='__main__':main()

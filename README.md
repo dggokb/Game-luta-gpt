@@ -6,7 +6,7 @@ A escala de referência é calculada a partir de uma pose equivalente ao Idle Ma
 
 ## Ver no celular
 
-[Baixar o APK Android](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-visualizador.apk). Ele já inclui os 11 clips e os 1.307 frames dos lotes de teste e movimentação, funciona offline e tem controles por toque. Android 8.0+, com WebView atualizado. [Uso e compilação](android/README.md) · [Lote de movimentação](docs/MOVIMENTACAO.md).
+[Baixar o APK com todos os personagens](https://github.com/dggokb/Game-luta-gpt/releases/download/sprites-preview-1.5-20261015/sprites-todos-personagens.apk). A versão 1.5 inclui os 418 vídeos disponíveis: 330 movimentos convertidos para revisão e 88 com calibração pendente, acessíveis em Antes. São 41.083 frames em 16 pastas com animações; P14, P15 e P16 têm somente imagens. Funciona offline no Android 8.0+, com WebView atualizado. [Resultados e pendências](docs/COLECAO.md) · [Uso e compilação](android/README.md). O [APK menor do lote inicial](dist/sprites-visualizador.apk) continua disponível.
 
 ## Instalação e execução
 
@@ -50,7 +50,7 @@ O manifesto v3 registra `transform_source_to_output` e `scale_applied` em cada f
 
 `animation_type` aceita `stationary`, `translation`, `airborne` e `crouched`. O resumo de movimento também propõe uma classificação conservadora baseada no apoio observado. Distinguir movimento de câmera, mudança de pose e locomoção exige revisão. A classificação não modifica pixels.
 
-No visualizador, `role: "idle"`, `"jab"`, `"dash"` e `"crouch"` habilitam as respectivas sequências. A comparação usa o mesmo zoom nos dois painéis normalizados. Ao encadear clips, a prévia conserva o apoio final para posicionar a próxima pose; essa translação é apenas da prévia e não altera os PNGs.
+No visualizador, `role: "idle"`, `"jab"`, `"dash"` e `"crouch"` habilitam as respectivas sequências. A comparação usa o mesmo zoom nos dois painéis normalizados. Nas sequências de andar/dash registrados no lugar, a prévia mantém a posição. Para os demais clips, conserva o apoio final para posicionar a próxima pose; essa translação é apenas da prévia e não altera os PNGs.
 
 Em **Comparar com**, a animação da direita acompanha a reprodução pelos timestamps originais. Sua barra própria permite escolher e fixar qualquer frame para comparar poses diferentes; **Junto com a esquerda** retoma a reprodução conjunta. Os dois lados mostram nome e número do frame. A comparação apenas exibe os resultados já normalizados. [Uso no celular](android/README.md#como-comparar).
 
@@ -58,7 +58,7 @@ Em **Comparar com**, a animação da direita acompanha a reprodução pelos time
 
 O tratamento aceita transparência existente ou chroma verde. O redimensionamento usa alpha pré-multiplicado para evitar halos verdes de interpolação. Corpos/efeitos desconectados são preservados e sinalizados; não são apagados automaticamente.
 
-`background.exclude_rectangles` permite excluir explicitamente regiões do fundo, como uma marca d'água, somente nos derivados. A configuração e o manifesto registram essas regiões. Use-as apenas onde não há arte a preservar. Não há remoção automática de marcas, cenários arbitrários ou reconstrução de membros cortados. Personagens com detalhes verdes devem usar transparência existente.
+`background.exclude_rectangles` permite excluir explicitamente regiões do fundo, como uma marca d'água, somente nos derivados. A configuração e o manifesto registram essas regiões. Use-as apenas onde não há arte a preservar. Não há remoção automática de marcas, cenários arbitrários ou reconstrução de membros cortados. Para detalhes verdes, `protect_green_art` pode preservar pixels interiores cuja cromaticidade difere do fundo; exige conferência da arte. A transparência existente continua sendo a entrada preferível. O modo explícito `border_color` remove somente regiões da cor configurada conectadas à borda e foi usado em fontes com fundo cinza.
 
 ## Extração integral e exportação
 

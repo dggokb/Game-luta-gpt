@@ -109,6 +109,11 @@ def render_mobile(manifest, output):
       document.getElementById('mobileHint').textContent=button.dataset.view==='compare'?'Reproduzir move os dois lados no mesmo zoom. A barra da direita, abaixo, permite fixar uma pose.':'Use o zoom para aproximar e arraste a imagem. Prévia reduzida; metadados nas coordenadas originais.';
       render();
     });
+    const selectClip=document.getElementById('clip').onchange;
+    document.getElementById('clip').onchange=()=>{
+      selectClip();
+      if(clips[current].status==='rejected')document.querySelector('#mobileTabs button[data-view="before"]').click();
+    };
     const selectComparison=document.getElementById('compare').onchange;
     document.getElementById('compare').onchange=()=>{
       if(document.body.dataset.view!=='compare')document.querySelector('#mobileTabs button[data-view="compare"]').click();

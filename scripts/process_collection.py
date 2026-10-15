@@ -22,7 +22,7 @@ sys.path.insert(0, str(ROOT))
 from sprite_pipeline.calibration import load_master, master_coherence, compare_pose, calibrate
 from sprite_pipeline.corrections import frame_transforms
 from sprite_pipeline.root_motion import torso_anchor_x, register_anchors
-from sprite_pipeline.imaging import image_rgba, bounds, quality, affine_rgba_region as affine_rgba, save_rgba
+from sprite_pipeline.imaging import image_rgba, bounds, quality, affine_rgba_region as affine_rgba, save_rgba, border_rgb_color
 from sprite_pipeline.extraction import digest
 from sprite_pipeline.streaming import probe_video, decode_frames
 from sprite_pipeline.exporting import write_json, contact_sheet
@@ -44,36 +44,51 @@ P01_NAMES = {'IDLE':'idle', 'LIGHT_JAB':'jab', 'CROUCH':'crouch',
 
 
 class PreviewPages:
+    """Pack native-detail cropped sprites, retaining logical canvas positions."""
     def __init__(self, folder, relative, field, shape):
         self.folder, self.relative, self.field = folder, relative, field
-        self.scale = min(320/shape[0], 512/shape[1], 1)
-        self.size = tuple(max(1, round(v*self.scale)) for v in shape)
+        factor = min(320/shape[0], 512/shape[1], 1)
+        self.size = tuple(max(1, round(v*factor)) for v in shape)
         self.pending, self.page = [], 0
+        self.x = self.y = self.row_height = 0
 
     def add(self, rgba, entry):
-        image = Image.fromarray(rgba).resize(self.size, Image.Resampling.LANCZOS)
-        self.pending.append((image, entry))
-        if len(self.pending) == 16:
+        image = Image.fromarray(rgba)
+        if self.field == 'normalized':
+            crop = image.getchannel('A').getbbox()
+            if crop is None:
+                raise CalibrationError('Frame normalizado vazio')
+            left, top, right, bottom = crop
+            left, top = max(0,left-2), max(0,top-2)
+            right, bottom = min(image.width,right+2), min(image.height,bottom+2)
+            image = image.crop((left,top,right,bottom))
+            entry['normalized_destination_rect'] = [left,top,right-left,bottom-top]
+            image.thumbnail((720,720),Image.Resampling.LANCZOS)
+        else:
+            image = image.resize(self.size,Image.Resampling.LANCZOS)
+        w,h=image.size
+        if self.x+w > 2048:
+            self.x=0;self.y+=self.row_height+2;self.row_height=0
+        if self.y+h > 2048 or len(self.pending)>=32:
             self.flush()
+        self.pending.append((image,entry,self.x,self.y))
+        self.x+=w+2;self.row_height=max(self.row_height,h)
 
     def flush(self):
         if not self.pending:
             return
-        w, h = self.size
-        columns = min(4, len(self.pending))
-        rows = math.ceil(len(self.pending)/columns)
-        sheet = Image.new('RGBA', (columns*w, rows*h))
-        relative = f'{self.relative}/{self.page:04d}.webp'
-        dest = self.folder/relative
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        for i, (image, entry) in enumerate(self.pending):
-            x, y = i%columns*w, i//columns*h
-            sheet.paste(image, (x, y))
-            entry[self.field+'_file'] = relative
-            entry[self.field+'_rect'] = [x, y, w, h]
-        sheet.save(dest, 'WEBP', quality=85, method=0)
-        self.pending.clear()
-        self.page += 1
+        width=max(x+image.width for image,_,x,_ in self.pending)
+        height=max(y+image.height for image,_,_,y in self.pending)
+        sheet=Image.new('RGBA',(width,height))
+        relative=f'{self.relative}/{self.page:04d}.webp'
+        dest=self.folder/relative;dest.parent.mkdir(parents=True,exist_ok=True)
+        for image,entry,x,y in self.pending:
+            sheet.paste(image,(x,y))
+            entry[self.field+'_file']=relative
+            entry[self.field+'_rect']=[x,y,image.width,image.height]
+        sheet.save(dest,'WEBP',quality=85,method=0)
+        self.pending.clear();self.page+=1
+        self.x=self.y=self.row_height=0
 
 
 def clip_spec(character, file, mapping):
@@ -89,7 +104,7 @@ def clip_spec(character, file, mapping):
     animation_type = 'airborne' if airborne else ('translation' if state in MOVEMENT else ('crouched' if state and 'CROUCH' in state else 'stationary'))
     spec = {'name':name, 'video':file['name'], 'state':state, 'role':role,
             'animation_type':animation_type, 'source_drive_id':file['id'],
-            'note':'' if state else 'Nome original: '+file['name']+'. Ação ainda sem identificação confirmada.'}
+            'note':'Nome original: '+file['name']+'. Ação ainda sem identificação confirmada.' if not state and stem.startswith(('dreamina-','gemini_generated_')) else ''}
     if state in MOVEMENT:
         spec['root_motion'] = {'mode':'in_place_x', 'anchor':'torso_band'}
         spec['note'] += ' Movimento horizontal no lugar; a posição fica a cargo do jogo.'
@@ -139,7 +154,12 @@ def process_character(character, source_root, output_root, mappings, annotations
         summary = {'character':cid, 'videos':0, 'frames':0, 'converted':0, 'rejected':[], 'note':reference_note}
         write_json(marker, summary)
         return summary
-    masters = {pose:load_master(path, BACKGROUND) for pose, path in refs.items()}
+    character_background=copy.deepcopy(BACKGROUND)
+    if cid in ('Dafu','Takatoshi'):
+        character_background.update(edge_mode='hard',minimum_green_dominance=6)
+    if cid in ('p05','p10','p12'):
+        character_background.update(protect_green_art=True,green_chroma_tolerance=.12,green_art_inset=2)
+    masters = {pose:load_master(path, character_background) for pose, path in refs.items()}
     for master in masters.values():
         x0,y0,x1,y1 = master['bbox']
         master['root'] = [(x0+x1)/2,y1]
@@ -148,7 +168,7 @@ def process_character(character, source_root, output_root, mappings, annotations
     elif (mappings/f'{cid}.json').exists():
         mapping = {v:k for k,v in json.loads((mappings/f'{cid}.json').read_text()).items()}
     else:
-        mapping = {'idle':'IDLE','parado':'IDLE'}
+        mapping = {'idle':'IDLE','parado':'IDLE','frente':'WALK_FORWARD','tras':'WALK_BACK','walk_back':'WALK_BACK','walk_forward':'WALK_FORWARD','dash':'DASH','backDash':'BACKDASH','correr':'WALK_FORWARD'}
     annotation_doc = json.loads((annotations/f'{cid}.json').read_text()) if (annotations/f'{cid}.json').exists() else None
     segments = annotation_doc.get('segments') if isinstance(annotation_doc,dict) else annotation_doc
     if isinstance(annotation_doc,dict):
@@ -183,7 +203,7 @@ def process_character(character, source_root, output_root, mappings, annotations
     for pose,m in masters.items():
         save_rgba(assets/'masters'/f'{pose}.png', m['rgba'])
         manifest['references'][pose] = {'file':f'masters/{pose}.png','bbox':m['bbox'],
-            'root_source':m['root'],'scale_to_output':master_scales[pose],'sha256':digest(refs[pose])}
+            'root_source':m['root'],'scale_to_output':master_scales[pose],'sha256':digest(refs[pose]),'background_treatment':character_background}
     jobs, all_boxes = [], []
     ordered_files = sorted(files, key=lambda f: (mapping.get(Path(f['name']).stem) != 'IDLE', f['name'].casefold()))
     for f in ordered_files:
@@ -194,9 +214,11 @@ def process_character(character, source_root, output_root, mappings, annotations
         metadata = probe_video(source)
         info = {**spec, **metadata, 'status':'rejected', 'frame_warnings':[], 'loops':[]}
         manifest['clips'].append(info)
-        background = copy.deepcopy(BACKGROUND)
+        background = copy.deepcopy(character_background)
         if metadata['resolution'][0] < 64 or metadata['resolution'][1] < 50:
             background = {'mode':'green'}
+        if cid == 'Dafu' and source.stem in ('aprovar','rir','surpreso'):
+            background={'mode':'border_color','tolerance':60 if source.stem=='rir' else 40,'exclude_rectangles':[[0,0,64,50]]}
         info['background_treatment'] = background
         scans = {pose:[] for pose in masters}
         anchors = []
@@ -204,6 +226,10 @@ def process_character(character, source_root, output_root, mappings, annotations
         for index, raw in enumerate(decode_frames(source, metadata)):
             entry = metadata['frames'][index]
             before.add(cv2.cvtColor(raw, cv2.COLOR_BGRA2RGBA), entry)
+            if background.get('mode')=='border_color' and 'color' not in background:
+                background['color']=border_rgb_color(cv2.cvtColor(raw,cv2.COLOR_BGRA2RGB))
+            if background.get('protect_green_art') and 'green_reference_rgb' not in background:
+                background['green_reference_rgb']=border_rgb_color(cv2.cvtColor(raw,cv2.COLOR_BGRA2RGB))
             rgba = image_rgba(raw, background)
             try:
                 bbox = bounds(rgba)
@@ -305,7 +331,7 @@ def process_character(character, source_root, output_root, mappings, annotations
         raise CalibrationError('Fonte original foi alterada')
     manifest['originals_unchanged'] = True
     manifest['mobile_preview'] = {'frame_count':sum(c['frame_count'] for c in manifest['clips']),
-        'maximum_image_width':320,'format':'WebP quality 85 atlas tiles','all_frames_retained':True,
+        'maximum_image_width':720,'raw_maximum_image_width':320,'layout':'cropped_tiles_v1','format':'WebP quality 85 atlas tiles','all_frames_retained':True,
         'timestamps_changed':False,'full_resolution_pngs_included':False}
     write_json(assets/'manifest.json',manifest)
     write_json(assets/'calibration-report.json',{k:manifest[k] for k in ('character','status','master_coherence','reference_provenance')})
@@ -316,7 +342,7 @@ def process_character(character, source_root, output_root, mappings, annotations
     summary = {'character':cid,'videos':len(manifest['clips']),
         'frames':sum(c['frame_count'] for c in manifest['clips']),
         'converted':len(jobs),'rejected':[{'clip':c['name'],'reason':c['rejection_reason']} for c in manifest['clips'] if c['status']=='rejected'],
-        'in_place_clips':[c['name'] for c in manifest['clips'] if c.get('root_motion')],
+        'in_place_clips':[c['name'] for c in manifest['clips'] if c['status']!='rejected' and c.get('root_motion')],
         'source_warnings':sum(bool(c['frame_warnings']) for c in manifest['clips']),
         'originals_unchanged':True,'reference_provenance':reference_note}
     write_json(marker,summary)

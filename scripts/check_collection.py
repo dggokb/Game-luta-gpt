@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Audit source coverage, original hashes, timestamps, rasters and phone viewers."""
 import argparse
+import base64
+import io
 import json
 from pathlib import Path
 import sys
@@ -15,6 +17,28 @@ from sprite_pipeline.extraction import digest
 from sprite_pipeline.imaging import bounds
 from sprite_pipeline.root_motion import torso_anchor_x
 from sprite_pipeline.exporting import write_json
+
+
+def check_preview_pixels(page, folder, clip):
+    """Compare the displayed atlas crop with an independent full PNG draw."""
+    page.evaluate("$('guides').checked=false;$('ghost').checked=false;frame=0;render()")
+    stage=page.locator('#after').locator('..')
+    actual=stage.screenshot()
+    original=folder/clip['frames'][0]['normalized_png']
+    url='data:image/png;base64,'+base64.b64encode(original.read_bytes()).decode()
+    page.evaluate("""async url=>{
+      const image=new Image();image.src=url;await image.decode();
+      const canvas=$('after'),ctx=canvas.getContext('2d'),k=commonZoom();
+      ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.setTransform(k,0,0,k,0,0);ctx.drawImage(image,0,0,...data.canvas);
+    }""",url)
+    expected=stage.screenshot()
+    a=np.asarray(Image.open(io.BytesIO(actual)).convert('RGB'),np.float32)
+    b=np.asarray(Image.open(io.BytesIO(expected)).convert('RGB'),np.float32)
+    error=float(np.mean(np.abs(a-b)))
+    assert error<3,(folder.name,clip['name'],'atlas differs from independent full PNG',error)
+    page.evaluate("$('guides').checked=true;render()")
+    return error
 
 
 def audit(inventory, sources, processed, evidence):
@@ -60,6 +84,11 @@ def audit(inventory, sources, processed, evidence):
                 with Image.open(png) as im:
                     assert list(im.size)==manifest['canvas']
                 normalized_count+=1
+                if 'normalized_destination_rect' in f:
+                    dx,dy,dw,dh=f['normalized_destination_rect']
+                    assert dx>=0 and dy>=0 and dx+dw<=manifest['canvas'][0] and dy+dh<=manifest['canvas'][1]
+                    b=f['bbox_output']
+                    assert dx<=b[0] and dy<=b[1] and dx+dw>=b[2] and dy+dh>=b[3]
                 matrix=np.asarray(f['transform_source_to_output'])
                 assert matrix[0,0]==matrix[1,1] and matrix[0,1]==matrix[1,0]==0
             if not rejected:
@@ -111,6 +140,7 @@ def audit(inventory, sources, processed, evidence):
                 walk=next(((i,c) for i,c in usable if c.get('role')=='walk_back'),usable[0])
                 page.select_option('#clip',str(walk[0]))
                 page.wait_for_function("document.getElementById('normalInfo').textContent.startsWith(clips[current].name+' ·')")
+                summary['preview_vs_full_png_mean_rgb_error']=check_preview_pixels(page,processed/cid,walk[1])
                 page.screenshot(path=str(evidence/f'{cid}-phone.png'),full_page=True)
                 page.tap('#play');page.wait_for_function('frame>1');page.tap('#play')
                 page.select_option('#compare',str(usable[0][0]))
@@ -123,7 +153,8 @@ def audit(inventory, sources, processed, evidence):
             if rejected:
                 page.select_option('#clip',str(rejected[0]))
                 page.wait_for_function("document.getElementById('normalInfo').textContent===clips[current].rejection_reason")
-                page.tap('#mobileTabs button[data-view="before"]')
+                assert page.evaluate("document.body.dataset.view==='before'")
+                assert page.locator('#clipNote').is_visible()
                 assert page.locator('#before').is_visible()
         browser.close()
     assert not report['page_errors'],report['page_errors']

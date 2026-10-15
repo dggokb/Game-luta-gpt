@@ -1,0 +1,114 @@
+[
+  {
+    "character": "Dafu",
+    "file": "sprites-Dafu.zip",
+    "bytes": 163735416,
+    "sha256": "3bbe921d4a805eb98f2740ac095fd63c759749df6cb80615a8a4b5fa3ffdbf8a",
+    "normalized_frames": 485
+  },
+  {
+    "character": "Takatoshi",
+    "file": "sprites-Takatoshi.zip",
+    "bytes": 162322048,
+    "sha256": "d1dc811c6fdb4d3ade60f835d0990c59ee1de684199dbae060cc808692e05a54",
+    "normalized_frames": 485
+  },
+  {
+    "character": "capangas",
+    "file": "sprites-capangas.zip",
+    "bytes": 41485038,
+    "sha256": "3eaffedd72b064f4f2e791332b3dabf138d8fb6866edda1579adbbda3c3f9be0",
+    "normalized_frames": 194
+  },
+  {
+    "character": "p01",
+    "file": "sprites-p01.zip",
+    "bytes": 434008910,
+    "sha256": "51e5c02cf7391834b584f4a78240cc51812f5f8d2e0a4a90eaca69a32b64e281",
+    "normalized_frames": 2713
+  },
+  {
+    "character": "p02",
+    "file": "sprites-p02.zip",
+    "bytes": 370728982,
+    "sha256": "60218bf7cf4587c2426d76179e51ad485692de7a08419d49fc779e4ee8fe3dba",
+    "normalized_frames": 2813
+  },
+  {
+    "character": "p03",
+    "file": "sprites-p03.zip",
+    "bytes": 389691600,
+    "sha256": "d39d0b7c5ce02b62d524d289ebc0ad41a6f9deb52fe8540800f6678406246942",
+    "normalized_frames": 2716
+  },
+  {
+    "character": "p04",
+    "file": "sprites-p04.zip",
+    "bytes": 332184815,
+    "sha256": "488d6ff06c52851378b60e21ea4643446cf8955e5ebbc098dce0bed5ee066e26",
+    "normalized_frames": 2716
+  },
+  {
+    "character": "p05",
+    "file": "sprites-p05.zip",
+    "bytes": 403276336,
+    "sha256": "d894c10d2fc47c5c9c97604efaa496a02e1cf8a92deb332206aa299fc333274c",
+    "normalized_frames": 2037
+  },
+  {
+    "character": "p06",
+    "file": "sprites-p06.zip",
+    "bytes": 434519804,
+    "sha256": "858fafe4b1d2d7e8f0951fba082685f0f14c1a8276aa937420fd6de544ddba59",
+    "normalized_frames": 3007
+  },
+  {
+    "character": "p07",
+    "file": "sprites-p07.zip",
+    "bytes": 413349232,
+    "sha256": "be80536dd10c97cdffce0ca0067b5881c38ac3f5056fe42e2ba1f70b0e454795",
+    "normalized_frames": 3007
+  },
+  {
+    "character": "p08",
+    "file": "sprites-p08.zip",
+    "bytes": 324641366,
+    "sha256": "5ac08237c764318da9a30f55ecdb4c4228ba2ee236f4b18c8a56bbc4d0fa85c3",
+    "normalized_frames": 2037
+  },
+  {
+    "character": "p09",
+    "file": "sprites-p09.zip",
+    "bytes": 357229715,
+    "sha256": "4b2bfb55a0b6ea57d81b1e24542a4e7fdb68f4745f978838fd645b2b0d778a33",
+    "normalized_frames": 2619
+  },
+  {
+    "character": "p10",
+    "file": "sprites-p10.zip",
+    "bytes": 418326385,
+    "sha256": "7ccbc545e3cd6258efe2b852446d1984436c88fdd0683b7ca4697a3922e9e5ae",
+    "normalized_frames": 2910
+  },
+  {
+    "character": "p11",
+    "file": "sprites-p11.zip",
+    "bytes": 411623087,
+    "sha256": "3ca5eeeaad283ef3f72d5e61f9f81716e418c3d2d7baabc307374e047be0a5ad",
+    "normalized_frames": 2522
+  },
+  {
+    "character": "p12",
+    "file": "sprites-p12.zip",
+    "bytes": 275891899,
+    "sha256": "d6337007e5df6c61f57c0f6b15945ee6d60508f87ec074edeb6a8db82ad4f32c",
+    "normalized_frames": 1843
+  },
+  {
+    "character": "p13",
+    "file": "sprites-p13.zip",
+    "bytes": 48858601,
+    "sha256": "584c1d7ecb24ff4ed84bd3fe9144e9dbd1a8d1238a85b1f73f0ea6efb69f036b",
+    "normalized_frames": 157
+  }
+]

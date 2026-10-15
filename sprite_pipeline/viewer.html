@@ -40,7 +40,7 @@ const data=JSON.parse(document.querySelector('#data').textContent), $=id=>docume
 const clips=data.clips, usable=clips.filter(c=>c.frames.some(f=>f.normalized_file)), cache=new Map();
 let current=0, frame=0, comparisonFrame=0, playing=false, lastTime=0, elapsed=0, sequence=null, sequenceIndex=0, carry=[0,0], pendingCarry=[0,0], renderToken=0;
 function option(select,value,text){const o=document.createElement('option');o.value=value;o.textContent=text;select.append(o)}
-clips.forEach((c,i)=>option($('clip'),i,c.name+(c.status==='rejected'?' — REJEITADO':'')));
+clips.forEach((c,i)=>option($('clip'),i,c.name+(c.status==='rejected'?' — revisar fonte':'')));
 usable.forEach(c=>option($('compare'),clips.indexOf(c),c.name));
 $('summary').textContent=`${clips.length} vídeos · ${clips.reduce((a,c)=>a+c.frame_count,0)} frames brutos · estado: ${data.status} · canvas: ${data.canvas?.join(' × ')||'sem calibração'} · nenhuma aprovação visual automática`;
 $('coherence').textContent=JSON.stringify(data.master_coherence,null,2);
@@ -53,7 +53,7 @@ for(const row of [['Animação','Pose / frame','Escala de referência / correç�
 }$('table').append(table);
 function load(src){if(!cache.has(src)){cache.set(src,new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src}));if(cache.size>80)cache.delete(cache.keys().next().value)}return cache.get(src)}
 function resize(canvas,shape,k){canvas.width=Math.ceil(shape[0]*k);canvas.height=Math.ceil(shape[1]*k);const ctx=canvas.getContext('2d');ctx.setTransform(k,0,0,k,0,0);return ctx}
-function drawFrame(ctx,im,rect,shape,x=0,y=0){if(!im)return;if(rect)ctx.drawImage(im,...rect,x,y,...shape);else ctx.drawImage(im,x,y,...shape)}
+function drawFrame(ctx,im,rect,shape,x=0,y=0,destination=null){if(!im)return;if(destination){const [dx,dy,w,h]=destination;ctx.drawImage(im,...rect,dx+x,dy+y,w,h)}else if(rect)ctx.drawImage(im,...rect,x,y,...shape);else ctx.drawImage(im,x,y,...shape)}
 function outline(ctx,root,bbox,shape){if(!$('guides').checked)return;ctx.lineWidth=1;ctx.strokeStyle='#63e7be';ctx.beginPath();ctx.moveTo(0,root[1]);ctx.lineTo(shape[0],root[1]);ctx.stroke();ctx.strokeStyle='#ffc76b';ctx.beginPath();ctx.moveTo(root[0]-9,root[1]);ctx.lineTo(root[0]+9,root[1]);ctx.moveTo(root[0],root[1]-9);ctx.lineTo(root[0],root[1]+9);ctx.stroke();if(bbox){ctx.strokeStyle='#8ab9ff';ctx.strokeRect(bbox[0],bbox[1],bbox[2]-bbox[0],bbox[3]-bbox[1])}}
 function commonZoom(){const width=Math.min($('after').parentElement.clientWidth,$('comparison').parentElement.clientWidth);return Math.min(width/data.canvas[0],460/data.canvas[1])*Number($('zoom').value||1)}
 function frameAtTime(clip,time){
@@ -76,7 +76,7 @@ function fixComparison(index){
 }
 async function render(){
  const token=++renderToken,c=clips[current],f=c.frames[frame];if(!f)return;
- $('clipNote').textContent=c.note||'';$('clipNote').hidden=!c.note;
+ const reviewNote=c.status==='rejected'?'Este vídeo precisa de revisão para ser padronizado. Confira o original em Antes.':c.frame_warnings?.length?'Este vídeo tem frames com alertas de imagem. Confira o original em Antes.':'';const clipNote=[reviewNote,c.note].filter(Boolean).join(' ');$('clipNote').textContent=clipNote;$('clipNote').hidden=!clipNote;
  const compare=clips[Number($('compare').value)]||c;comparisonFrame=comparisonIndex();const cf=compare.frames[comparisonFrame];
  $('seek').max=c.frame_count-1;$('seek').value=frame;$('position').textContent=`${frame+1}/${c.frame_count} · ${f.time_s.toFixed(4)} s`;
  $('leftTitle').textContent=`${document.body.dataset.view==='compare'?'Esquerda':'Depois'} · ${c.name}`;
@@ -91,8 +91,8 @@ async function render(){
  const [im,ci,ghost]=await Promise.all([load(f.normalized_file),load(cf.normalized_file),$('ghost').checked?load(data.references[c.reference_pose].aligned_file):Promise.resolve(null)]);if(token!==renderToken)return;
  const k=commonZoom(),ctx=resize($('after'),data.canvas,k),cc=resize($('comparison'),data.canvas,k);
  if(ghost){ctx.globalAlpha=.35;ctx.drawImage(ghost,0,0);ctx.globalAlpha=1}
- drawFrame(ctx,im,f.normalized_rect,data.canvas,...carry);outline(ctx,[data.root[0]+carry[0],data.root[1]+carry[1]],f.bbox_output?.map((v,i)=>v+carry[i%2]),data.canvas);
- drawFrame(cc,ci,cf.normalized_rect,data.canvas);outline(cc,data.root,cf.bbox_output,data.canvas);
+ drawFrame(ctx,im,f.normalized_rect,data.canvas,...carry,f.normalized_destination_rect);outline(ctx,[data.root[0]+carry[0],data.root[1]+carry[1]],f.bbox_output?.map((v,i)=>v+carry[i%2]),data.canvas);
+ drawFrame(cc,ci,cf.normalized_rect,data.canvas,0,0,cf.normalized_destination_rect);outline(cc,data.root,cf.bbox_output,data.canvas);
  $('normalInfo').textContent=`${c.name} · fator ${(f.scale_applied??c.scale_per_video).toFixed(7)}${c.scale_correction?' · correção anatômica anotada':''}${c.root_motion?' · movimento no lugar':''}\nroot ${JSON.stringify(data.root)} · bbox ${JSON.stringify(f.bbox_output)}\noffset ${JSON.stringify(f.offset_from_root)}\n${f.warnings.join(', ')||'Sem alerta de silhueta neste frame'}\nDeslocamento de prévia: ${carry.map(v=>v.toFixed(2))}`;
  $('compareInfo').textContent=`${compare.name} · frame ${comparisonFrame+1}/${compare.frame_count}\nfator ${(cf.scale_applied??compare.scale_per_video).toFixed(7)} · bbox ${JSON.stringify(cf.bbox_output)}\nZoom comum: ${k.toFixed(4)} px de tela / px de saída`;
 }
