@@ -32,6 +32,7 @@ public final class HistoriaPreview implements HistoriaListener {
     private boolean fightRequested;
     private boolean finished;
     private String irmao = "ryuga";
+    private boolean perdeu;
 
     private HistoriaPreview(FileRenderAssets assets, File outDir) {
         this.pagina = new PaginaHistoria(this, assets);
@@ -67,7 +68,11 @@ public final class HistoriaPreview implements HistoriaListener {
         while (!finished && guard++ < 200_000) {
             if (fightRequested) {
                 fightRequested = false;
-                pagina.resultadoLuta(true);
+                // -Drepescagem=true: perde as quartas para ver o caminho pela repescagem.
+                boolean perde = Boolean.getBoolean("repescagem") && !perdeu &&
+                    "QUARTAS DE FINAL".equals(pagina.rotulo(pagina.passo()));
+                if (perde) perdeu = true;
+                pagina.resultadoLuta(!perde);
                 continue;
             }
             Episodio.Passo passo = pagina.passo();

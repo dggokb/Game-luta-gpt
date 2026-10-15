@@ -78,6 +78,13 @@ public final class Episodio {
         public final String cpuRef;
         /** Só toca para quem escolheu este irmão ("ryuga" / "koga"); null = para os dois. */
         public final String irmao;
+        /** Duelo 1x1 da regra escondida: o capitão da dupla do jogador contra o próprio parceiro. */
+        public final boolean duelo;
+        /**
+         * Só toca por esse caminho na chave: "direto" (venceu as quartas) ou "repescagem"
+         * (perdeu as quartas); null = nos dois.
+         */
+        public final String caminho;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -88,8 +95,10 @@ public final class Episodio {
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
               String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
-              String duplaRef, String cpuRef, String irmao) {
+              String duplaRef, String cpuRef, String irmao, boolean duelo, String caminho) {
             this.tipo = tipo;
+            this.duelo = duelo;
+            this.caminho = caminho;
             this.torneio = torneio;
             this.duplaRef = duplaRef;
             this.cpuRef = cpuRef;
@@ -167,11 +176,17 @@ public final class Episodio {
         /** Onde o texto cabe: {esquerda, topo, direita, base} em frações da página. */
         public final float[] caixa;
         public final String texto;
+        /**
+         * Contorno preto em volta da área branca: quadro de legenda novo, posto por cima de um
+         * texto pintado na arte (a arte não tem balão para apagar).
+         */
+        public final boolean moldura;
 
-        BalaoPronto(float[] area, float[] caixa, String texto) {
+        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura) {
             this.area = area;
             this.caixa = caixa;
             this.texto = texto;
+            this.moldura = moldura;
         }
     }
 
@@ -278,6 +293,10 @@ public final class Episodio {
         if (irmao != null && !irmao.equals("ryuga") && !irmao.equals("koga")) {
             throw new IllegalArgumentException("irmao desconhecido: " + irmao + " (use ryuga ou koga)");
         }
+        String caminho = string(map, "caminho", null);
+        if (caminho != null && !caminho.equals("direto") && !caminho.equals("repescagem")) {
+            throw new IllegalArgumentException("caminho desconhecido: " + caminho + " (use direto ou repescagem)");
+        }
         String duplaRef = ref(map, "dupla");
         String cpuRef = ref(map, "cpu");
         return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
@@ -286,7 +305,8 @@ public final class Episodio {
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
             string(map, "conversa", null), string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
-            Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao);
+            Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
+            Boolean.TRUE.equals(map.get("duelo")), caminho);
     }
 
     /** {@code "dupla": "jogador"} ou {@code "rival"} (dupla fixa de um irmão); null se for uma lista. */
@@ -316,7 +336,8 @@ public final class Episodio {
             if (texto.isEmpty()) throw new IllegalArgumentException("balão da página pronta sem texto");
             float[] caixa = fractions(b, "caixa", 4, "caixa do balão");
             if (caixa.length != 4) throw new IllegalArgumentException("caixa do balão precisa ser [esquerda, topo, direita, base]");
-            baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto));
+            baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto,
+                Boolean.TRUE.equals(b.get("moldura"))));
         }
         boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
         return new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),

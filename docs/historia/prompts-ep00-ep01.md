@@ -1,8 +1,8 @@
 # Prompts das imagens: Prólogo e Episódio 1
 
-Faltam 14 imagens, todas do Episódio 1 (`ep01`): o Prólogo já está completo em páginas prontas. Se o Episódio 1 também for feito em páginas inteiras (o padrão agora, veja [motor-paginas.md](motor-paginas.md)), use os prompts abaixo só como roteiro das cenas. Para trocar a arte
+Faltam 10 imagens, todas do Episódio 1 (`ep01`, as páginas depois da luta): o Prólogo já está completo em páginas prontas. Se o Episódio 1 também for feito em páginas inteiras (o padrão agora, veja [motor-paginas.md](motor-paginas.md)), use os prompts abaixo só como roteiro das cenas. Para trocar a arte
 provisória, salve cada imagem como **JPG** com o nome da tabela em
-`android/app/src/main/assets/historia/<episódio>/` (ex.: `historia/ep01/pag2_q1.jpg`). Não
+`android/app/src/main/assets/historia/<episódio>/` (ex.: `historia/ep01/pag7_q1.jpg`). Não
 precisa recortar: o jogo enquadra a imagem no painel sozinho. Se o recorte cortar uma parte
 importante, ajuste o `"foco"` do painel no `episodio.json` (0 = mostra o topo, 1 = mostra a base).
 
@@ -60,7 +60,7 @@ suave, leve granulado de papel antigo.
 
 O **convite do torneio** é como na página 6 do Prólogo: envelope preto com um lacre de cera
 vermelha com um dragão, entregue pelo mensageiro de chapéu e sobretudo pretos. Use as páginas
-6 e 7 do Prólogo como referência nos prompts das cartas (`pag3_q3` do Episódio 1).
+6 e 7 do Prólogo como referência nos prompts das cartas (`pag7_q3` do Episódio 1).
 
 ---
 
@@ -76,50 +76,42 @@ páginas ([motor-paginas.md](motor-paginas.md)). Não precisa de mais nenhuma im
 Tempo presente (sem o complemento de flashback). Os irmãos têm 18 anos: são exatamente os
 concepts p01 (Ryūga) e p03 (Kōga). Dafu usa o concept `dafu.png`.
 
-### Página 1 (faixa no alto, dois quadros embaixo)
+### Páginas 1 a 6 (antes da luta): prontas
+
+Páginas de mangá prontas (`pag1.jpg` a `pag6.jpg`), lidas pelo motor de páginas: dez anos
+depois, Ryūga treina sozinho no dojo, Dafu observa, Kōga volta e provoca o irmão, e os dois
+partem para a luta. Não precisam de mais nenhuma imagem.
+
+> Depois delas vem a luta de treino (Ryūga contra Kōga). A arte não muda nada nela.
+
+### Página 7 (quatro quadros)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
-| `pag1_q1.jpg` | horizontal 1536×1024 (vira faixa larga) | p01, p03, dafu | O mesmo dojo de madeira do Prólogo, dez anos depois, um pouco mais gasto, de manhã. Plano geral: Ryūga à esquerda e Kōga à direita, frente a frente em guarda de luta; Dafu sentado no chão ao fundo, no meio, comendo daifuku. Todos numa faixa horizontal no meio da imagem; o terço de cima é a parede do dojo. |
-| `pag1_q2.jpg` | horizontal 1536×1024 | p03 | Close de Kōga com um sorriso provocador de canto de boca, estalando os dedos, olhando para a direita, capuz do colete caído nas costas. Rosto na metade de baixo da imagem; a de cima livre para o balão. |
-| `pag1_q3.jpg` | horizontal 1536×1024 | p01 | Close de Ryūga, expressão calma e neutra, olhos semicerrados, ajustando a luva, olhando para a esquerda. Rosto na metade de baixo da imagem; a de cima livre para o balão. |
+| `pag7_q1.jpg` | horizontal 1536×1024 (vira faixa bem larga) | p01, p03, dafu | Depois do treino: Ryūga e Kōga sentados no chão do dojo, suados e ofegantes, rindo um para o outro; Dafu de pé no meio, com as mãos na cintura, dando bronca de brincadeira. Todos numa faixa horizontal no meio da imagem; o resto é chão e parede de madeira. |
+| `pag7_q2.jpg` | quadrado 1024×1024 | — | A porta de entrada da casa vista de dentro, de madeira e papel, com a sombra de uma mão batendo do lado de fora projetada no papel. Corredor escuro e silencioso. Centro da imagem livre para a onomatopeia. |
+| `pag7_q3.jpg` | horizontal 1536×1024 (vira faixa larga) | — | Detalhe: dois envelopes iguais, lado a lado no chão de madeira da entrada, pretos, cada um com o lacre de cera vermelha com o dragão (o mesmo do convite do Prólogo). Cada um tem um nome escrito com pincel (o texto pode ser ilegível). Envelopes no centro exato da imagem. |
+| `pag7_q4.jpg` | horizontal 1536×1024 (vira faixa larga) | dafu | Close do rosto de Dafu olhando para baixo, para os envelopes fora de quadro: pela primeira vez os olhos estão abertos, arregalados, o sorriso sumiu, suor frio, sombra cobrindo a testa. Rosto no terço direito da imagem, numa faixa no meio da altura; à esquerda só sombra. |
 
-### Página 2 (quadro único)
-
-| Arquivo | Formato | Anexos | Prompt |
-|---|---|---|---|
-| `pag2_q1.jpg` | horizontal 1536×1024 | p01, p03, dafu | Splash de abertura de luta: Ryūga (à esquerda) e Kōga (à direita) em guarda, prontos para avançar um no outro, poeira subindo do chão do dojo, linhas de velocidade convergindo para o centro. Dafu no meio, ao fundo, com o braço erguido como juiz, gritando de boca aberta. Câmera baixa, composição simétrica. O quinto de cima é livre para o balão de grito. |
-
-> Depois desta página vem a luta de treino (Ryūga + p02 contra Kōga). A arte não muda nada nela.
-
-### Página 3 (quatro quadros)
+### Página 8 (duas colunas)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
-| `pag3_q1.jpg` | horizontal 1536×1024 (vira faixa bem larga) | p01, p03, dafu | Depois do treino: Ryūga e Kōga sentados no chão do dojo, suados e ofegantes, rindo um para o outro; Dafu de pé no meio, com as mãos na cintura, dando bronca de brincadeira. Todos numa faixa horizontal no meio da imagem; o resto é chão e parede de madeira. |
-| `pag3_q2.jpg` | quadrado 1024×1024 | — | A porta de entrada da casa vista de dentro, de madeira e papel, com a sombra de uma mão batendo do lado de fora projetada no papel. Corredor escuro e silencioso. Centro da imagem livre para a onomatopeia. |
-| `pag3_q3.jpg` | horizontal 1536×1024 (vira faixa larga) | — | Detalhe: dois envelopes iguais, lado a lado no chão de madeira da entrada, pretos, cada um com o lacre de cera vermelha com o dragão (o mesmo do convite do Prólogo). Cada um tem um nome escrito com pincel (o texto pode ser ilegível). Envelopes no centro exato da imagem. |
-| `pag3_q4.jpg` | horizontal 1536×1024 (vira faixa larga) | dafu | Close do rosto de Dafu olhando para baixo, para os envelopes fora de quadro: pela primeira vez os olhos estão abertos, arregalados, o sorriso sumiu, suor frio, sombra cobrindo a testa. Rosto no terço direito da imagem, numa faixa no meio da altura; à esquerda só sombra. |
+| `pag8_q1.jpg` | quadrado 1024×1024 | p01 | Ryūga de pé lendo a carta aberta nas mãos, do peito para cima, expressão séria e determinada, luz da janela atrás. Ele fica no meio da altura da imagem; o quarto de cima e o quarto de baixo são livres para dois balões. |
+| `pag8_q2.jpg` | quadrado 1024×1024 | p03 | Kōga amassando a carta no punho fechado, dentes cerrados, olhar de raiva, veias saltando, energia escura e vermelha subindo em volta, dojo à noite ao fundo. Do peito para cima, no meio da altura; o terço de cima livre para o balão de grito. |
 
-### Página 4 (duas colunas)
+### Página 9 (dois quadros no alto, faixa embaixo)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
-| `pag4_q1.jpg` | quadrado 1024×1024 | p01 | Ryūga de pé lendo a carta aberta nas mãos, do peito para cima, expressão séria e determinada, luz da janela atrás. Ele fica no meio da altura da imagem; o quarto de cima e o quarto de baixo são livres para dois balões. |
-| `pag4_q2.jpg` | quadrado 1024×1024 | p03 | Kōga amassando a carta no punho fechado, dentes cerrados, olhar de raiva, veias saltando, energia escura e vermelha subindo em volta, dojo à noite ao fundo. Do peito para cima, no meio da altura; o terço de cima livre para o balão de grito. |
+| `pag9_q1.jpg` | horizontal 1536×1024 | dafu, p01 | Na sala da casa, Dafu à esquerda, sem o sorriso de sempre, olhando preocupado para Ryūga à direita, que responde com um aceno firme de cabeça. Os dois da cintura para cima, no meio da altura; o terço de cima livre para dois balões. |
+| `pag9_q2.jpg` | horizontal 1536×1024 | p03 | Kōga segurando a carta aberta e apontando uma linha do texto com o dedo, de lado para a câmera, olhar sério. Ele fica no meio da altura; o quarto de cima e o quarto de baixo são livres para dois balões. |
+| `pag9_q3.jpg` | horizontal 1536×1024 (vira faixa larga) | p01, p03 | Ryūga e Kōga de costas um para o outro na porta do dojo, ao pôr do sol, cada um olhando para um lado (Ryūga para a esquerda, Kōga para a direita), mochilas no ombro. Céu laranja e roxo enorme. Os dois numa faixa horizontal no meio da imagem; o terço de cima é céu livre para a narração. |
 
-### Página 5 (dois quadros no alto, faixa embaixo)
-
-| Arquivo | Formato | Anexos | Prompt |
-|---|---|---|---|
-| `pag5_q1.jpg` | horizontal 1536×1024 | dafu, p01 | Na sala da casa, Dafu à esquerda, sem o sorriso de sempre, olhando preocupado para Ryūga à direita, que responde com um aceno firme de cabeça. Os dois da cintura para cima, no meio da altura; o terço de cima livre para dois balões. |
-| `pag5_q2.jpg` | horizontal 1536×1024 | p03 | Kōga segurando a carta aberta e apontando uma linha do texto com o dedo, de lado para a câmera, olhar sério. Ele fica no meio da altura; o quarto de cima e o quarto de baixo são livres para dois balões. |
-| `pag5_q3.jpg` | horizontal 1536×1024 (vira faixa larga) | p01, p03 | Ryūga e Kōga de costas um para o outro na porta do dojo, ao pôr do sol, cada um olhando para um lado (Ryūga para a esquerda, Kōga para a direita), mochilas no ombro. Céu laranja e roxo enorme. Os dois numa faixa horizontal no meio da imagem; o terço de cima é céu livre para a narração. |
-
-### Página 6 (quadro único)
+### Página 10 (quadro único)
 
 | Arquivo | Formato | Anexos | Prompt |
 |---|---|---|---|
-| `pag6_q1.jpg` | horizontal 1536×1024 | dafu, takatoshi_45, ryuga_8, koga_8 | Noite. Dafu sozinho no dojo vazio e escuro, sentado no chão de costas para a câmera, ombros caídos, iluminado só pela lua que entra pela janela. Nas mãos, uma foto antiga emoldurada: Takatoshi (como no concept de 45 anos) com os dois filhos de 8 anos. Clima de culpa e silêncio. Ele fica no terço esquerdo da imagem; a parte de cima à direita é sombra livre para o balão de pensamento. |
+| `pag10_q1.jpg` | horizontal 1536×1024 | dafu, takatoshi_45, ryuga_8, koga_8 | Noite. Dafu sozinho no dojo vazio e escuro, sentado no chão de costas para a câmera, ombros caídos, iluminado só pela lua que entra pela janela. Nas mãos, uma foto antiga emoldurada: Takatoshi (como no concept de 45 anos) com os dois filhos de 8 anos. Clima de culpa e silêncio. Ele fica no terço esquerdo da imagem; a parte de cima à direita é sombra livre para o balão de pensamento. |
 
 ---

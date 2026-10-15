@@ -1,6 +1,7 @@
 package com.gamelutagpt;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -48,7 +49,7 @@ public class GameView extends SurfaceView
     private final ConcurrentLinkedQueue<Integer> selectionKeys = new ConcurrentLinkedQueue<>();
     private CharacterSelectRenderer characterSelectRenderer;
 
-    // Training opponent: our point character (same body and moves), drawn washed out.
+    // Training opponent: our point character (same body and moves), in its normal colors.
     // É o titular escolhido para o CPU; quem está em campo agora é opponentPoint().
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
     // O parceiro do CPU: no treino (IA OFF) só aparece no seletor; no modo batalha (IA ON) luta.
@@ -65,6 +66,9 @@ public class GameView extends SurfaceView
 
     /** Fixed simulation step; rendering runs at whatever rate the device manages. */
     static final float FIXED_STEP = CombatConfig.DT;
+    /** Onde fica a VELOCIDADE escolhida na pausa (vale para a próxima vez que o app abrir). */
+    private static final String SPEED_PREFS = "jogo_v1";
+    private static final String SPEED_KEY = "velocidade";
 
     final CombatEngine engine = new CombatEngine(
         team[0], opponentFighter, PLAYER_START_X, OPPONENT_START_X, new CombatConfig());
@@ -185,6 +189,8 @@ public class GameView extends SurfaceView
      * construtor): se a seleção for cancelada, a luta de teste começa com {@link #testPicks}.
      */
     private boolean testFightPending;
+    /** Duelo 1x1 da história: um lutador por lado (sem parceiro no motor nem no HUD). */
+    private boolean duel;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
@@ -231,7 +237,7 @@ public class GameView extends SurfaceView
     /** Capangas do Super (p07): as animações CAPANGA_* ficam no pacote de quem os chama. */
     private final SpriteFighterRenderer henchmanRenderer;
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
-    /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag), pálido. */
+    /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag). */
     private final SpriteFighterRenderer opponentPartnerRenderer;
     private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
     /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
@@ -264,6 +270,7 @@ public class GameView extends SurfaceView
     private volatile boolean surfaceReady;
     private volatile boolean activityActive = true;
     private float accumulatedTime;
+    private SharedPreferences speedPrefs;
 
     private void clearInput() {
         clearPendingInput();
@@ -286,19 +293,20 @@ public class GameView extends SurfaceView
         hud.loadArt(context);
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
+        speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
+        pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
         for (FighterState fighter : team) atlases.preload(fighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        // O adversário aparece com as cores normais da arte (sem o filtro pálido de antes).
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
-        opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
         echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
         henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
-        opponentPartnerRenderer.setTint(SpriteFighterRenderer.washedOut());
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
             @Override public void manterAtlas(CharacterDefinition... manter) {
                 // Só as folhas do personagem em ajuste e da referência: a luta está parada e volta a
@@ -377,12 +385,26 @@ public class GameView extends SurfaceView
 
     /** A seleção muda a dupla P1 e o titular do adversário de treino. */
     private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
+        selectTeams(point, partner, cpuPoint, cpuPartner, false);
+    }
+
+    /**
+     * Duelo 1x1 (a regra escondida do torneio): um lutador de cada lado, sem tag nem assist.
+     * O "parceiro" guardado no time do jogador é o próprio adversário, só para a arte e o ultra
+     * dele já estarem carregados; o motor recebe um membro por lado.
+     */
+    private void selectDuel(String player, String cpu) {
+        selectTeams(player, cpu, cpu, player, true);
+    }
+
+    private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
         hud.resetEffects();
+        duel = solo;
         team = membersOf(point, partner);
         opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
         opponentTagId = cpuPartner;
         CharacterDefinition cpuPartnerCharacter = GeneratedCharacters.get(cpuPartner);
-        if (flow.battle()) {
+        if (flow.battle() && !duel) {
             // Batalha 2x2: o parceiro do CPU entra de assist, na troca e quando o titular cai,
             // então a arte dele fica carregada (sem decodificar no meio da luta).
             atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
@@ -393,8 +415,8 @@ public class GameView extends SurfaceView
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
-        engine.setTeam(PLAYER, team);
-        if (flow.battle()) {
+        engine.setTeam(PLAYER, duel ? new FighterState[] {team[0]} : team);
+        if (flow.battle() && !duel) {
             engine.setTeam(OPPONENT, opponentFighter, new FighterState(cpuPartnerCharacter, "CPU"));
         } else {
             engine.setTeam(OPPONENT, opponentFighter);
@@ -688,11 +710,22 @@ public class GameView extends SurfaceView
     // Render cadence can vary; the simulation always advances in whole 60 Hz frames.
     private void advanceSimulation(float elapsedSeconds) {
         processPendingInput();
-        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f);
+        // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
+        // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
+        // pausa, seleção, páginas da história e a Página Final ficam na velocidade normal.
+        float speed = fightClockRunning() ? pausa.velocidade() : 1f;
+        accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
             update();
             accumulatedTime = Math.max(0f, accumulatedTime - FIXED_STEP);
         }
+    }
+
+    /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
+    private boolean fightClockRunning() {
+        return !menuInicial.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
+            !ajusteCaixas.isOpen() && !characterSelect.isOpen() && !historia.coversScreen() &&
+            !paginaFinal.isActive();
     }
 
     /** One simulation frame: inputs, engine step, then presentation state. */
@@ -897,6 +930,7 @@ public class GameView extends SurfaceView
         @Override public FighterState reserve() { return reserveFighter(); }
         @Override public FighterState opponent() { return opponentPoint(); }
         @Override public CharacterDefinition opponentReserveCharacter() {
+            if (duel) return null;
             FighterState partner = engine.team(OPPONENT).partner();
             return partner != null ? partner.character : GeneratedCharacters.get(opponentTagId);
         }
@@ -2531,12 +2565,17 @@ public class GameView extends SurfaceView
     private void handlePauseKey(int keyCode) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
-            case KeyEvent.KEYCODE_DPAD_LEFT:
                 pausa.mover(-1);
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
                 pausa.mover(1);
+                break;
+            // ◀ ▶ mudam a VELOCIDADE quando o cursor está nela; fora dela, andam como ▲▼.
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (!pausa.ajustar(-1)) pausa.mover(-1);
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (!pausa.ajustar(1)) pausa.mover(1);
                 break;
             case KeyEvent.KEYCODE_BUTTON_A:
             case KeyEvent.KEYCODE_ENTER:
@@ -2556,6 +2595,10 @@ public class GameView extends SurfaceView
 
     private void applyPause(MenuPausa.Opcao opcao) {
         if (opcao == null) return;
+        // A pausa fechou: guarda a VELOCIDADE para a próxima vez que o app abrir.
+        if (speedPrefs != null && speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO) != pausa.velocidade()) {
+            speedPrefs.edit().putFloat(SPEED_KEY, pausa.velocidade()).apply();
+        }
         pad.reset();
         releaseAllPointers();
         if (opcao == MenuPausa.Opcao.MENU) openMainMenu();
@@ -2719,7 +2762,10 @@ public class GameView extends SurfaceView
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
         // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
         String[][] lados = historia.lados(luta);
-        if (lados != null && fightersExist(lados[0][0], lados[0][1], lados[1][0], lados[1][1])) {
+        if (lados != null && lados[0].length == 1 && fightersExist(lados[0][0], lados[1][0])) {
+            // Duelo 1x1: um de cada lado.
+            selectDuel(lados[0][0], lados[1][0]);
+        } else if (lados != null && lados[0].length == 2 && fightersExist(lados[0][0], lados[0][1], lados[1][0], lados[1][1])) {
             selectTeams(lados[0][0], lados[0][1], lados[1][0], lados[1][1]);
         } else {
             if (lados != null) Log.w(LOG_TAG, "dupla da história sem golpes ainda; usando as duplas atuais");

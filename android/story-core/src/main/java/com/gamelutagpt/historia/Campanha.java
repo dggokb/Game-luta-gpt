@@ -80,6 +80,12 @@ public final class Campanha {
     public String[][] lados(Episodio.Passo luta) {
         String[] jogador;
         String[] cpu;
+        if (luta.duelo) {
+            // 1x1: o capitão da dupla do jogador contra o próprio parceiro.
+            Torneio.Dupla dupla = duplaDo(irmao());
+            if (dupla == null) return null;
+            return new String[][] {{dupla.lutadores[0]}, {dupla.lutadores[1]}};
+        }
         if (luta.torneio) {
             Torneio t = torneio();
             Torneio.Dupla adversario = t != null ? t.adversario() : null;
@@ -101,13 +107,38 @@ public final class Campanha {
 
     /** Rótulo da luta: o do passo ou, numa luta do torneio, o nome da rodada. */
     public String rotulo(Episodio.Passo luta) {
-        if (luta.rotulo != null || !luta.torneio) return luta.rotulo;
+        if (luta.rotulo != null) return luta.rotulo;
+        if (luta.duelo) return DUELO;
+        if (!luta.torneio) return null;
         Torneio t = torneio();
         return t != null ? t.rodadaAtual() : null;
     }
 
-    /** O passo vale para o irmão escolhido (passos com {@code "irmao"} só tocam para ele). */
+    /** Rótulo padrão do duelo 1x1. */
+    public static final String DUELO = "DUELO FINAL";
+
+    /**
+     * O passo vale para esta partida: passos com {@code "irmao"} só para quem escolheu esse
+     * irmão; com {@code "caminho"}, só para quem venceu as quartas ("direto") ou perdeu
+     * ("repescagem"); o duelo, só para a dupla campeã.
+     */
     public boolean vale(Episodio.Passo passo) {
-        return passo.irmao == null || passo.irmao.equals(irmao());
+        if (passo.irmao != null && !passo.irmao.equals(irmao())) return false;
+        if (passo.caminho != null) {
+            Torneio t = torneioSorteado();
+            if (t == null || t.disputadas() == 0) return false;
+            if (t.pelaRepescagem() != passo.caminho.equals("repescagem")) return false;
+        }
+        if (passo.duelo) {
+            Torneio t = torneioSorteado();
+            if (t == null || t.campeao() == null || t.campeao() != t.jogador()) return false;
+        }
+        return true;
+    }
+
+    /** Uma derrota nesta luta não repete: nas quartas, quem perde vai para a repescagem. */
+    public boolean derrotaSegue(Episodio.Passo luta) {
+        Torneio t = torneioSorteado();
+        return luta.torneio && t != null && t.derrotaTemSegundaChance();
     }
 }

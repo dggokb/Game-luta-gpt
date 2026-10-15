@@ -6,7 +6,7 @@ subindo, e duas opções em faixas de mangá:
 
 | Opção | O que faz |
 |---|---|
-| **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep04 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
+| **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep06 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
 | **MODO TESTE** | O que o app abria antes: a seleção de dupla e a luta de teste no Templo da Lua (`DEFAULT_STAGE`), com os botões de teste, o DEBUG (AJUSTAR TAMANHOS / AJUSTAR CAIXAS), o modo batalha (IA ON) etc. A seleção abre com a última dupla escolhida no teste. |
 
 ## Controles

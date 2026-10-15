@@ -1,0 +1,30 @@
+{
+  "id": "ep05",
+  "numero": 5,
+  "titulo": "A Final",
+  "passos": [
+    { "tipo": "titulo" },
+
+    { "tipo": "chave" },
+
+    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
+      { "imagem": "pag1_q1.jpg", "cena": "templo", "personagens": ["ryuga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "ryuga", "texto": "Kōga. Não precisava ser assim.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag1_q2.jpg", "cena": "templo", "personagens": ["koga"], "enquadramento": "close", "efeito": "impacto",
+        "baloes": [
+          { "tipo": "grito", "quem": "koga", "texto": "Precisava sim! Só um de nós chega ao fim!", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "luta", "torneio": true },
+
+    { "tipo": "chave" },
+
+    { "tipo": "proximo", "titulo": "A Regra Escondida", "linhas": [
+      "A final da chave terminou...",
+      "...mas o torneio ainda guarda um segredo."
+    ] }
+  ]
+}
