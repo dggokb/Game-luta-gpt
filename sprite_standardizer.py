@@ -66,7 +66,7 @@ def similarity(a, b):
     kernel = np.ones((3, 3), np.uint8)
     aa = cv2.dilate(a, kernel)
     bb = cv2.dilate(b, kernel)
-    overlap = np.count_nonzero((a & bb) | (b & aa))
+    overlap = np.count_nonzero(aa & bb)
     union = np.count_nonzero(aa | bb)
     return float(min(1.0, overlap / union)) if union else 0.0
 
