@@ -294,8 +294,8 @@ class BuiltPackTests(unittest.TestCase):
     def test_frame_data_is_compiled_into_attack_definitions(self):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('sm.put("S2",new CharacterDefinition.Special(new CharacterDefinition.Move("S2",a.get("SPECIAL_S2")',java)
-        self.assertIn('new int[]{1,3,2},"LMH"));',java)
-        self.assertIn('new int[]{3,5},"H"));',java)
+        self.assertIn('new int[]{1,3,2},"LMH","Punho ascendente",false,false));',java)
+        self.assertIn('new int[]{3,4,5},"LMH","Chute girat\\u00f3rio",false,false));',java)
         self.assertIn('new AttackDefinition.Builder("2H",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9)',java)
         self.assertIn('.launch(AttackDefinition.Launch.LAUNCH)',java)
         self.assertIn('new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER)',java)
