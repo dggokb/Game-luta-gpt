@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import tempfile
+import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 import PIL
@@ -693,6 +694,7 @@ def cache_load(cache, key, stage):
     entry = cache / key if cache else None
     if entry is None or not (entry / 'meta.json').is_file(): return None
     meta = json.loads((entry / 'meta.json').read_text(encoding='utf-8'))
+    os.utime(entry)  # marks the entry as used: CI drops the ones no build touched
     cfg = meta['cfg']
     (stage / cfg['report']).parent.mkdir(parents=True, exist_ok=True)
     for name, rel in (('output', cfg['output']), ('preview', cfg['preview'])):
@@ -725,8 +727,15 @@ def process(stage, path):
 def process_all(stage, paths):
     """Processes the clips in parallel (one per CPU, SPRITE_BUILD_JOBS overrides); results keep their order."""
     jobs = min(len(paths), int(os.environ.get('SPRITE_BUILD_JOBS') or os.cpu_count() or 1))
-    if jobs <= 1:
-        return [process(stage, path) for path in paths]
+    if not paths: return []
+    started = time.monotonic()
+    try:
+        if jobs <= 1: return [process(stage, path) for path in paths]
+        return process_parallel(stage, paths, jobs)
+    finally:
+        print(f'Sprite atlases processed: {len(paths)} in {time.monotonic() - started:.0f}s with {max(jobs, 1)} worker(s)')
+
+def process_parallel(stage, paths, jobs):
     pool = ProcessPoolExecutor(max_workers=jobs, initializer=init_worker, initargs=(stage,))
     try:
         futures = [pool.submit(process, stage, path) for path in paths]
@@ -768,6 +777,7 @@ def build(root=ROOT, check=False):
                 clips.append((path,clip_key(stage,path,cfg,fingerprint,digests)))
             processed=[cache_load(cache,key,stage) for _,key in clips]
             missing=[i for i,hit in enumerate(processed) if hit is None]
+            if cache: print(f'Sprite cache: {len(clips)-len(missing)} of {len(clips)} atlases reused')
             for i,result in zip(missing,process_all(stage,[clips[i][0] for i in missing])):
                 processed[i]=result;cache_store(cache,clips[i][1],stage,*result)
             for (path,_),(cfg,report) in zip(clips,processed):
