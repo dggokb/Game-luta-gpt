@@ -1,6 +1,7 @@
 package com.gamelutagpt;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -65,12 +66,9 @@ public class GameView extends SurfaceView
 
     /** Fixed simulation step; rendering runs at whatever rate the device manages. */
     static final float FIXED_STEP = CombatConfig.DT;
-    /**
-     * Velocidade global da luta (1 = original). O relógio da simulação anda mais devagar,
-     * então golpes, pulos, IA, timer e efeitos desaceleram juntos sem mexer no frame data
-     * dos packs. Menus, pausa, seleção, páginas da história e a Página Final ficam em 1.
-     */
-    static final float GAME_SPEED = 0.8f;
+    /** Onde fica a VELOCIDADE escolhida na pausa (vale para a próxima vez que o app abrir). */
+    private static final String SPEED_PREFS = "jogo_v1";
+    private static final String SPEED_KEY = "velocidade";
 
     final CombatEngine engine = new CombatEngine(
         team[0], opponentFighter, PLAYER_START_X, OPPONENT_START_X, new CombatConfig());
@@ -270,6 +268,7 @@ public class GameView extends SurfaceView
     private volatile boolean surfaceReady;
     private volatile boolean activityActive = true;
     private float accumulatedTime;
+    private SharedPreferences speedPrefs;
 
     private void clearInput() {
         clearPendingInput();
@@ -292,6 +291,8 @@ public class GameView extends SurfaceView
         hud.loadArt(context);
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
+        speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
+        pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         atlases = new SpriteAtlasCache(context);
@@ -708,7 +709,10 @@ public class GameView extends SurfaceView
     // Render cadence can vary; the simulation always advances in whole 60 Hz frames.
     private void advanceSimulation(float elapsedSeconds) {
         processPendingInput();
-        float speed = fightClockRunning() ? GAME_SPEED : 1f;
+        // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
+        // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
+        // pausa, seleção, páginas da história e a Página Final ficam na velocidade normal.
+        float speed = fightClockRunning() ? pausa.velocidade() : 1f;
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
             update();
@@ -2534,12 +2538,17 @@ public class GameView extends SurfaceView
     private void handlePauseKey(int keyCode) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
-            case KeyEvent.KEYCODE_DPAD_LEFT:
                 pausa.mover(-1);
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
                 pausa.mover(1);
+                break;
+            // ◀ ▶ mudam a VELOCIDADE quando o cursor está nela; fora dela, andam como ▲▼.
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                if (!pausa.ajustar(-1)) pausa.mover(-1);
+                break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                if (!pausa.ajustar(1)) pausa.mover(1);
                 break;
             case KeyEvent.KEYCODE_BUTTON_A:
             case KeyEvent.KEYCODE_ENTER:
@@ -2559,6 +2568,10 @@ public class GameView extends SurfaceView
 
     private void applyPause(MenuPausa.Opcao opcao) {
         if (opcao == null) return;
+        // A pausa fechou: guarda a VELOCIDADE para a próxima vez que o app abrir.
+        if (speedPrefs != null && speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO) != pausa.velocidade()) {
+            speedPrefs.edit().putFloat(SPEED_KEY, pausa.velocidade()).apply();
+        }
         pad.reset();
         releaseAllPointers();
         if (opcao == MenuPausa.Opcao.MENU) openMainMenu();

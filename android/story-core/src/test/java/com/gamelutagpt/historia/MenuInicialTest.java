@@ -105,7 +105,7 @@ public class MenuInicialTest {
         MenuPausa p = new MenuPausa();
         p.abrir(null, true);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.cursor());
-        float[] menu = MenuPausa.CAIXAS[1];
+        float[] menu = MenuPausa.CAIXAS[2];
         assertNull("o toque que abriu a pausa não escolhe", p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         for (int i = 0; i < 20; i++) p.update(DT);
         assertNull(p.tap(640f, 650f));
@@ -121,7 +121,41 @@ public class MenuInicialTest {
         p.abrir(null, false);
         for (int i = 0; i < 20; i++) p.update(DT);
         p.mover(1);
+        p.mover(1);
         assertEquals(MenuPausa.Opcao.MENU, p.confirmar());
         assertNull(p.confirmar());
+    }
+
+    @Test
+    public void pausaMudaAVelocidadeSemFechar() {
+        MenuPausa p = new MenuPausa();
+        assertEquals(MenuPausa.VELOCIDADE_PADRAO, p.velocidade(), 1e-6f);
+        p.abrir(null, false);
+        for (int i = 0; i < 20; i++) p.update(DT);
+        assertFalse("◀ ▶ fora da VELOCIDADE não mudam nada", p.ajustar(1));
+        p.mover(1);
+        assertEquals(MenuPausa.Opcao.VELOCIDADE, p.cursor());
+        assertTrue(p.ajustar(1));
+        assertEquals(0.9f, p.velocidade(), 1e-6f);
+        p.ajustar(1);
+        p.ajustar(1);
+        assertEquals("para na ponta", 1f, p.velocidade(), 1e-6f);
+        assertNull("A na VELOCIDADE não fecha a pausa", p.confirmar());
+        assertTrue(p.isOpen());
+        assertEquals("e dá a volta", 0.5f, p.velocidade(), 1e-6f);
+        p.render(new PaginaHistoriaTest.NullCanvas());
+
+        float[] caixa = MenuPausa.CAIXAS[1];
+        float cy = (caixa[1] + caixa[3]) * 0.5f;
+        assertNull(p.tap(caixa[2] - 20f, cy));
+        assertEquals("metade direita: mais rápido", 0.6f, p.velocidade(), 1e-6f);
+        assertNull(p.tap(caixa[0] + 20f, cy));
+        assertEquals("metade esquerda: mais devagar", 0.5f, p.velocidade(), 1e-6f);
+        assertTrue(p.isOpen());
+
+        p.setVelocidade(0.77f);
+        assertEquals("salva fora da lista vira a mais próxima", 0.8f, p.velocidade(), 1e-6f);
+        p.abrir(null, false);
+        assertEquals("reabrir não volta ao padrão", 0.8f, p.velocidade(), 1e-6f);
     }
 }
