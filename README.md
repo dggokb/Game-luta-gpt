@@ -39,6 +39,12 @@ gradle testDebugUnitTest assembleDebug --stacktrace
 `--write` é o único passo que altera saídas versionadas. O Gradle só roda `--check`
 (aviso se faltar Python localmente; erro na CI com `-PrequireSpriteCheck=true`).
 
+O build processa os atlas em paralelo (um por núcleo; `SPRITE_BUILD_JOBS=N` muda) e guarda
+cada atlas pronto em `android/app/build/sprite-cache/`, pela hash do clip, do perfil, das
+imagens que eles citam, do código do pipeline e da versão do Pillow. Atlas com as mesmas
+entradas não são refeitos (por isso os testes e o `--check` do Gradle ficam rápidos);
+`SPRITE_BUILD_CACHE=0` desliga o cache, `gradle clean` o apaga.
+
 Aplicativo **Game Luta Sprite GPT**, pacote `com.gamelutagpt`.
 Preview técnico: `android/app/build/sprite-review/index.html`.
 

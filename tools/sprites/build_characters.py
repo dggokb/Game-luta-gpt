@@ -5,11 +5,14 @@ import base64
 import json
 import hashlib
 import math
+import os
 import re
 import shutil
 import tempfile
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from PIL import Image
+import PIL
+from PIL import Image, features
 import import_sprites as importer
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -654,6 +657,97 @@ def orphans(root, outputs, results):
     unused = [p.relative_to(root).as_posix() for p in sorted((root/'art/sprites/source').iterdir()) if p.is_file() and p.relative_to(root).as_posix() not in sources]
     return stale, unused
 
+# Processing an atlas (decode, normalize, crop, lossless WEBP) is the slow part of the
+# build. Its result depends only on the clip config, its profile, the image files they
+# point to and this code, so it is cached by the hash of exactly those inputs. --check
+# stays a byte comparison against the committed files; the cache only skips recomputing
+# an atlas whose inputs are identical. SPRITE_BUILD_CACHE=0 disables it.
+CACHE_DIR = ROOT / 'android/app/build/sprite-cache'
+
+def cache_dir():
+    value = os.environ.get('SPRITE_BUILD_CACHE')
+    if value == '0': return None
+    return Path(value) if value else CACHE_DIR
+
+def code_fingerprint():
+    h = hashlib.sha256()
+    for path in (Path(importer.__file__), Path(__file__)):
+        h.update(path.read_bytes())
+    h.update(f'{PIL.__version__}/{features.version("webp")}'.encode())
+    return h.hexdigest()
+
+def referenced_files(stage, *documents):
+    """Every file under the stage that a clip config or profile names (sources, anatomy references)."""
+    found = set()
+    def walk(value):
+        if isinstance(value, dict):
+            for v in value.values(): walk(v)
+        elif isinstance(value, list):
+            for v in value: walk(v)
+        elif isinstance(value, str) and '/' in value and (stage / value).is_file():
+            found.add(value)
+    for document in documents: walk(document)
+    return sorted(found)
+
+def clip_key(stage, path, cfg, fingerprint, digests):
+    def digest(rel):
+        if rel not in digests: digests[rel] = hashlib.sha256((stage / rel).read_bytes()).hexdigest()
+        return digests[rel]
+    profile_path = importer.PROFILES_DIR / cfg['profile']
+    h = hashlib.sha256(fingerprint.encode())
+    h.update(hashlib.sha256(path.read_bytes()).digest())
+    h.update(hashlib.sha256(profile_path.read_bytes()).digest())
+    # The source is always part of the key: a missing one fails here, as it would when processed.
+    for rel in sorted({cfg['source'], *referenced_files(stage, cfg, read(profile_path))}):
+        h.update(f'{rel}\0{digest(rel)}\0'.encode())
+    return h.hexdigest()
+
+def cache_load(cache, key, stage):
+    entry = cache / key if cache else None
+    if entry is None or not (entry / 'meta.json').is_file(): return None
+    meta = json.loads((entry / 'meta.json').read_text(encoding='utf-8'))
+    cfg = meta['cfg']
+    (stage / cfg['report']).parent.mkdir(parents=True, exist_ok=True)
+    for name, rel in (('output', cfg['output']), ('preview', cfg['preview'])):
+        (stage / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(entry / name, stage / rel)
+    return cfg, meta['report']
+
+def cache_store(cache, key, stage, cfg, report):
+    if cache is None or (cache / key).exists(): return
+    cache.mkdir(parents=True, exist_ok=True)
+    partial = Path(tempfile.mkdtemp(prefix='.partial-', dir=cache))
+    try:
+        shutil.copyfile(stage / cfg['output'], partial / 'output')
+        shutil.copyfile(stage / cfg['preview'], partial / 'preview')
+        (partial / 'meta.json').write_text(json.dumps({'cfg': cfg, 'report': report}), encoding='utf-8')
+        os.replace(partial, cache / key)
+    except OSError:
+        shutil.rmtree(partial, ignore_errors=True)
+
+def init_worker(stage):
+    importer.ROOT = stage
+    importer.PROFILES_DIR = stage / 'tools/sprites/profiles'
+    importer.GENERATED_JAVA = stage / JAVA / 'GeneratedSpriteLayouts.java'
+
+def process(stage, path):
+    cfg, report = importer.process_clip(path)
+    pack_atlas(stage, cfg, report)
+    return cfg, report
+
+def process_all(stage, paths):
+    """Processes the clips in parallel (one per CPU, SPRITE_BUILD_JOBS overrides); results keep their order."""
+    jobs = min(len(paths), int(os.environ.get('SPRITE_BUILD_JOBS') or os.cpu_count() or 1))
+    if jobs <= 1:
+        return [process(stage, path) for path in paths]
+    pool = ProcessPoolExecutor(max_workers=jobs, initializer=init_worker, initargs=(stage,))
+    try:
+        futures = [pool.submit(process, stage, path) for path in paths]
+        # The first failing clip in sorted order is reported, as in a sequential build.
+        return [future.result() for future in futures]
+    finally:
+        pool.shutdown(wait=True, cancel_futures=True)
+
 def build(root=ROOT, check=False):
     # Isolated staging: no partial assets/Java are published if any pack fails.
     with tempfile.TemporaryDirectory(prefix='sprite-build-') as directory:
@@ -664,7 +758,8 @@ def build(root=ROOT, check=False):
         old=(importer.ROOT,importer.PROFILES_DIR,importer.GENERATED_JAVA)
         importer.ROOT=stage;importer.PROFILES_DIR=stage/'tools/sprites/profiles';importer.GENERATED_JAVA=stage/JAVA/'GeneratedSpriteLayouts.java'
         try:
-            results=[];outputs=set();ids=set();names=set()
+            results=[];outputs=set();ids=set();names=set();clips=[]
+            cache=cache_dir();fingerprint=code_fingerprint();digests={}
             for path in sorted((stage/'tools/sprites/clips').glob('*.json')):
                 cfg=read(path)
                 if not re.fullmatch('[a-z][a-z0-9_]*',cfg['id']) or not re.fullmatch('[A-Z][A-Z0-9_]*',cfg['javaName']): raise ValueError(f'{path.name}: invalid atlas id/javaName')
@@ -683,15 +778,20 @@ def build(root=ROOT, check=False):
                     expected=OUTPUT_FOLDERS[key]
                     if not target.startswith(expected) or target in outputs: raise ValueError(f'Invalid or duplicate output {target}')
                     outputs.add(target)
-                cfg,report=importer.process_clip(path)
-                pack_atlas(stage,cfg,report)
+                clips.append((path,clip_key(stage,path,cfg,fingerprint,digests)))
+            processed=[cache_load(cache,key,stage) for _,key in clips]
+            missing=[i for i,hit in enumerate(processed) if hit is None]
+            for i,result in zip(missing,process_all(stage,[clips[i][0] for i in missing])):
+                processed[i]=result;cache_store(cache,clips[i][1],stage,*result)
+            for (path,_),(cfg,report) in zip(clips,processed):
                 report['provenance']={'pipelineVersion':2,'sha256':{
-                    'source':hashlib.sha256((stage/cfg['source']).read_bytes()).hexdigest(),
+                    'source':digests[cfg['source']],
                     'config':hashlib.sha256(path.read_bytes()).hexdigest(),
                     'profile':hashlib.sha256((importer.PROFILES_DIR/cfg['profile']).read_bytes()).hexdigest()}}
+                references = cfg.get('sourceReferences', [])
                 if references:
                     report['provenance']['referenceSources'] = {
-                        p: hashlib.sha256((stage/p).read_bytes()).hexdigest() for p in references}
+                        p: digests.get(p) or hashlib.sha256((stage/p).read_bytes()).hexdigest() for p in references}
                 (stage/cfg['report']).write_text(json.dumps(report,indent=2)+'\n', encoding='utf-8')
                 results.append((cfg,report))
             importer.write_generated_java(results)
