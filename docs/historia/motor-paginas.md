@@ -113,6 +113,7 @@ Cole o passo onde a página entra no episódio e complete:
 | `quadros[].baloes[].texto` | a fala em português (a chave da tradução) |
 | `quadros[].baloes[].caixa` | onde o texto é escrito: `[esquerda, topo, direita, base]` |
 | `quadros[].baloes[].area` | contorno do miolo branco que o jogo pinta |
+| `quadros[].baloes[].moldura` | `true` desenha um contorno preto em volta da área branca: um quadro de legenda novo por cima de um texto pintado na arte (ex.: "10 anos se passaram" na página 1 do ep01), para traduzir texto que não está num balão |
 
 ### 4. Traduzir
 

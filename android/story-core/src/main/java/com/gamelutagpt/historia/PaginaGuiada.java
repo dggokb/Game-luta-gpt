@@ -326,6 +326,7 @@ final class PaginaGuiada {
             for (int j = 0; j < baloes.size(); j++) {
                 Episodio.BalaoPronto b = baloes.get(j);
                 c.fillPolygon(screen(b.area), PAPER);
+                if (b.moldura) c.strokePolygon(screen(b.area), 3f * camS, Baloes.INK);
                 int visible = visibleChars(i, j, temporada.t(b.texto));
                 if (visible > 0) drawBalloonText(c, b, visible);
             }

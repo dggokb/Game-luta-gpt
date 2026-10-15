@@ -176,11 +176,17 @@ public final class Episodio {
         /** Onde o texto cabe: {esquerda, topo, direita, base} em frações da página. */
         public final float[] caixa;
         public final String texto;
+        /**
+         * Contorno preto em volta da área branca: quadro de legenda novo, posto por cima de um
+         * texto pintado na arte (a arte não tem balão para apagar).
+         */
+        public final boolean moldura;
 
-        BalaoPronto(float[] area, float[] caixa, String texto) {
+        BalaoPronto(float[] area, float[] caixa, String texto, boolean moldura) {
             this.area = area;
             this.caixa = caixa;
             this.texto = texto;
+            this.moldura = moldura;
         }
     }
 
@@ -330,7 +336,8 @@ public final class Episodio {
             if (texto.isEmpty()) throw new IllegalArgumentException("balão da página pronta sem texto");
             float[] caixa = fractions(b, "caixa", 4, "caixa do balão");
             if (caixa.length != 4) throw new IllegalArgumentException("caixa do balão precisa ser [esquerda, topo, direita, base]");
-            baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto));
+            baloes.add(new BalaoPronto(fractions(b, "area", 6, "area do balão"), caixa, texto,
+                Boolean.TRUE.equals(b.get("moldura"))));
         }
         boolean impacto = efeitos.contains("impacto") || Boolean.TRUE.equals(map.get("impacto"));
         return new Quadro(area, impacto, efeitos.contains("tremor"), efeitos.contains("velocidade"),
