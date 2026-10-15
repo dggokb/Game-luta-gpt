@@ -1,20 +1,25 @@
 {
   "id": "ep04",
   "numero": 4,
-  "titulo": "Final da Chave",
+  "titulo": "Semifinal",
   "passos": [
     { "tipo": "titulo" },
 
     { "tipo": "chave" },
 
-    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
-      { "imagem": "pag1_q1.jpg", "cena": "templo", "foco": 0.4,
+    { "tipo": "pagina", "irmao": "ryuga", "layout": "splash", "paineis": [
+      { "imagem": "pag1_ryuga.jpg", "cena": "templo", "personagens": ["ryuga"], "foco": 0.4,
         "baloes": [
-          { "tipo": "narracao", "texto": "Final da chave. Quem vencer vai para a final do torneio.", "pos": [0.5, 0.18] }
-        ] },
-      { "imagem": "pag1_q2.jpg", "cena": "templo", "personagens": ["mensageiro"], "enquadramento": "close",
+          { "tipo": "narracao", "texto": "Semifinal.", "pos": [0.15, 0.15] },
+          { "tipo": "fala", "quem": "ryuga", "texto": "Kōga também está avançando. Eu sinto.", "pos": [0.55, 0.3], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "pagina", "irmao": "koga", "layout": "splash", "paineis": [
+      { "imagem": "pag1_koga.jpg", "cena": "templo", "personagens": ["koga"], "foco": 0.4, "efeito": "velocidade",
         "baloes": [
-          { "tipo": "fala", "quem": "mensageiro", "texto": "Do outro lado, a dupla do seu irmão já espera.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "narracao", "texto": "Semifinal.", "pos": [0.15, 0.15] },
+          { "tipo": "grito", "quem": "koga", "texto": "Ryūga, me espera na final!", "pos": [0.55, 0.3], "rabo": [0.5, 0.5] }
         ] }
     ] },
 

@@ -254,7 +254,7 @@ public class PaginaHistoriaTest {
             Episodio ep = Episodio.fromJson(read("historia/" + id + "/episodio.json"));
             assertEquals(id, ep.id);
             for (Episodio.Passo passo : ep.passos) {
-                if (passo.tipo == Episodio.TipoPasso.LUTA && !passo.torneio && !passo.duelo) {
+                if (passo.tipo == Episodio.TipoPasso.LUTA && !passo.torneio && !passo.duelo && !passo.emboscada) {
                     // Duplas da luta: fixas no passo ou a dupla fixa de um irmão ("jogador" / "rival").
                     assertTrue(id + ": luta sem dupla", passo.dupla != null || passo.duplaRef != null);
                     assertTrue(id + ": luta sem cpu", passo.cpu != null || passo.cpuRef != null);

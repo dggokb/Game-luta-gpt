@@ -40,9 +40,9 @@
 
     { "tipo": "chave" },
 
-    { "tipo": "proximo", "titulo": "Segunda Rodada", "linhas": [
-      "Quem venceu segue para a semifinal.",
-      "Quem perdeu ainda tem a repescagem: uma luta a mais, a mesma distância até a final."
+    { "tipo": "proximo", "titulo": "Fora da Arena", "linhas": [
+      "A vitória garantiu a vaga na semifinal.",
+      "Mas nem todo mundo aceita perder."
     ] }
   ]
 }

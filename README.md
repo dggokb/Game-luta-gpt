@@ -316,9 +316,9 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
 - **Torneio** (ep01–ep06, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
   **Kōga (p03)**; o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
-  opostas. Em cada lado: quartas → semifinal (vencedores) e **repescagem** (perdedores) →
-  final da chave; depois a final 2x2 contra o outro irmão e o **duelo 1x1** contra o próprio
-  parceiro (a regra escondida). O rival sempre avança; CPU × CPU é sorteado.
+  opostas: quartas → **emboscada fora da arena** (a dupla que perdeu a outra quarta do seu
+  lado quer a sua vaga) → semifinal → final 2x2 contra o outro irmão → **duelo 1x1** contra o
+  próprio parceiro (a regra escondida). O rival sempre avança; CPU × CPU é sorteado.
   `docs/historia/torneio.md`.
 - Motor em `android/story-core` (Java puro); episódios em JSON em
   `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do

@@ -2,6 +2,7 @@ package com.gamelutagpt.historia;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
@@ -59,19 +60,18 @@ public class TorneioTest {
         for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
             for (long seed = 0; seed < 200; seed++) {
                 Torneio t = Torneio.sortear(duplas(), irmao, new Random(seed));
-                assertEquals(Torneio.RYUGA, t.vaga(0).irmao);
-                assertEquals(Torneio.KOGA, t.vaga(7).irmao);
+                assertEquals(Torneio.RYUGA, t.participante(0, 0).irmao);
+                assertEquals(Torneio.KOGA, t.participante(0, 7).irmao);
                 assertEquals(irmao, t.jogador().irmao);
                 Set<Torneio.Dupla> todas = new HashSet<>();
                 for (int v = 0; v < Torneio.VAGAS; v++) {
-                    Torneio.Dupla d = t.vaga(v);
+                    Torneio.Dupla d = t.participante(0, v);
                     assertNotNull(d);
                     todas.add(d);
                     boolean ladoDoJogador = (v < 4) == Torneio.RYUGA.equals(irmao);
                     if (!d.pronta) assertFalse("dupla sem golpes no lado do jogador", ladoDoJogador);
                 }
                 assertEquals(Torneio.VAGAS, todas.size());
-                assertEquals(4, t.rodada(0).size());
             }
         }
     }
@@ -82,93 +82,73 @@ public class TorneioTest {
         for (long seed = 0; seed < 30; seed++) {
             Torneio t = Torneio.sortear(duplas(), Torneio.RYUGA, new Random(seed));
             StringBuilder sb = new StringBuilder();
-            for (int v = 0; v < Torneio.VAGAS; v++) sb.append(t.vaga(v).id).append(',');
+            for (int v = 0; v < Torneio.VAGAS; v++) sb.append(t.participante(0, v).id).append(',');
             chaves.add(sb.toString());
         }
         assertTrue("o sorteio sempre deu a mesma chave", chaves.size() > 5);
     }
 
-    /** Joga a chave inteira; perdeQuartas: o jogador perde a primeira luta. Devolve os nomes das lutas dele. */
-    private static List<String> jogar(Torneio t, boolean perdeQuartas) {
-        List<String> lutas = new ArrayList<>();
-        boolean primeira = true;
-        while (t.adversario() != null) {
-            lutas.add(t.rodadaAtual());
-            assertTrue("o jogador não pega dupla sem golpes", t.adversario().pronta);
-            if (!Torneio.FINAL.equals(t.rodadaAtual())) assertNotSame(t.rival(), t.adversario());
-            t.registrar(!(primeira && perdeQuartas));
-            primeira = false;
-            // O rival nunca perde para o CPU.
-            for (int r = 0; r < t.disputadas(); r++) {
-                for (Torneio.Confronto c : t.rodada(r)) {
-                    if (c.tem(t.rival()) && !c.tem(t.jogador())) assertSame(t.rival(), c.vencedor());
-                }
-            }
-        }
-        return lutas;
-    }
-
     @Test
-    public void caminhoDiretoTemQuatroLutasAteSerCampeao() throws IOException {
+    public void jogadorVaiAteAFinalContraORival() throws IOException {
         for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
             for (long seed = 0; seed < 50; seed++) {
                 Torneio t = Torneio.sortear(duplas(), irmao, new Random(seed));
-                List<String> lutas = jogar(t, false);
-                assertEquals(java.util.Arrays.asList(Torneio.QUARTAS, Torneio.SEMIFINAL, Torneio.FINAL_DA_CHAVE, Torneio.FINAL), lutas);
-                assertFalse(t.pelaRepescagem());
+                assertEquals(Torneio.QUARTAS, t.rodadaAtual());
+                assertNull("a emboscada só existe depois das quartas", t.emboscada());
+                Torneio.Dupla quartas = t.adversario();
+                assertNotSame(t.rival(), quartas);
+                assertTrue("o jogador não pega dupla sem golpes", quartas.pronta);
+                t.registrar(true);
+                assertEquals(Torneio.SEMIFINAL, t.rodadaAtual());
+                assertTrue(t.adversario().pronta);
+                boolean rivalNaSemi = false;
+                for (int i = 0; i < 4; i++) rivalNaSemi |= t.participante(1, i) == t.rival();
+                assertTrue("o rival sempre avança", rivalNaSemi);
+                t.registrar(true);
+                assertEquals(Torneio.FINAL, t.rodadaAtual());
+                assertSame(t.rival(), t.adversario());
+                assertNull(t.emboscada());
+                t.registrar(true);
                 assertTrue(t.acabou());
                 assertSame(t.jogador(), t.campeao());
-                Torneio.Confronto fin = t.confronto(3, -1, Torneio.FINAL);
-                assertTrue("a final é contra o rival", fin.tem(t.rival()));
+                assertNull(t.adversario());
             }
         }
     }
 
     @Test
-    public void quemPerdeNasQuartasVaiPelaRepescagemComAsMesmasLutas() throws IOException {
+    public void emboscadaEhQuemPerdeuAOutraQuartaDoLadoDoJogador() throws IOException {
         for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
             for (long seed = 0; seed < 50; seed++) {
                 Torneio t = Torneio.sortear(duplas(), irmao, new Random(seed));
-                assertTrue(t.derrotaTemSegundaChance());
-                List<String> lutas = jogar(t, true);
-                assertEquals(java.util.Arrays.asList(Torneio.QUARTAS, Torneio.REPESCAGEM, Torneio.FINAL_DA_CHAVE, Torneio.FINAL), lutas);
-                assertTrue(t.pelaRepescagem());
-                assertFalse(t.jogadorEliminado());
-                assertSame(t.jogador(), t.campeao());
-                // Na final da chave, o vencedor da repescagem pega o vencedor da semifinal.
-                int lado = Torneio.RYUGA.equals(irmao) ? 0 : 1;
-                Torneio.Confronto fc = t.confronto(2, lado, Torneio.FINAL_DA_CHAVE);
-                assertSame(t.confronto(1, lado, Torneio.SEMIFINAL).vencedor(), fc.a);
-                assertSame(t.jogador(), fc.b);
+                t.registrar(true);
+                Torneio.Dupla emboscada = t.emboscada();
+                assertNotNull(emboscada);
+                assertTrue("a emboscada é de uma dupla que luta", emboscada.pronta);
+                assertNotSame(t.jogador(), emboscada);
+                assertNotSame(t.rival(), emboscada);
+                // Perdeu as quartas: não está na semifinal.
+                for (int i = 0; i < 4; i++) assertNotSame(emboscada, t.participante(1, i));
+                // É do lado do jogador e não foi o adversário dele nas quartas.
+                int vaga = -1;
+                for (int v = 0; v < Torneio.VAGAS; v++) if (t.participante(0, v) == emboscada) vaga = v;
+                boolean ladoEsquerdo = vaga < 4;
+                assertEquals(Torneio.RYUGA.equals(irmao), ladoEsquerdo);
+                int vagaJogador = Torneio.RYUGA.equals(irmao) ? 0 : 7;
+                assertNotEquals("não é quem o jogador derrotou", vagaJogador / 2, vaga / 2);
             }
         }
     }
 
     @Test
-    public void cadaLadoTemSemifinalERepescagemComOsPerdedores() throws IOException {
-        Torneio t = Torneio.sortear(duplas(), Torneio.RYUGA, new Random(9));
-        t.registrar(true);
-        for (int lado = 0; lado < 2; lado++) {
-            Torneio.Confronto q1 = t.rodada(0).get(2 * lado), q2 = t.rodada(0).get(2 * lado + 1);
-            Torneio.Confronto semi = t.confronto(1, lado, Torneio.SEMIFINAL);
-            Torneio.Confronto rep = t.confronto(1, lado, Torneio.REPESCAGEM);
-            assertSame(q1.vencedor(), semi.a);
-            assertSame(q2.vencedor(), semi.b);
-            assertSame(q1.perdedor(), rep.a);
-            assertSame(q2.perdedor(), rep.b);
-        }
-        assertFalse("depois das quartas, perder não tem segunda chance", t.derrotaTemSegundaChance());
-    }
-
-    @Test
-    public void derrotaDepoisDasQuartasEliminaOJogador() throws IOException {
+    public void derrotaEliminaOJogador() throws IOException {
         Torneio t = Torneio.sortear(duplas(), Torneio.RYUGA, new Random(1));
-        t.registrar(true);
         Torneio.Dupla adversario = t.adversario();
         t.registrar(false);
         assertTrue(t.jogadorEliminado());
         assertNull(t.adversario());
-        assertSame(adversario, t.confronto(1, 0, Torneio.SEMIFINAL).vencedor());
+        assertNull(t.emboscada());
+        assertSame(adversario, t.participante(1, 0));
     }
 
     @Test
@@ -217,22 +197,16 @@ public class TorneioTest {
         }
     }
 
-    /**
-     * Toca a temporada inteira do jogo como o GameView: escolha, sorteio, lutas e chave. Com
-     * perdeQuartas, o jogador perde a primeira luta do torneio e segue pela repescagem.
-     */
-    private static List<String[][]> temporada(String irmao, boolean perdeQuartas, List<String> rotulos,
-                                               List<String> episodiosTocados) throws IOException {
+    /** Toca a temporada inteira do jogo como o GameView: escolha, sorteio, lutas e chave. */
+    private static List<String[][]> temporada(String irmao, List<String> rotulos, Campanha campanha) throws IOException {
         GameAssets assets = new GameAssets();
         Temporada temporada = Temporada.load(assets);
-        Campanha campanha = Campanha.load(assets, new Random(7));
         Recorder rec = new Recorder();
         PaginaHistoria p = new PaginaHistoria(rec, assets);
         p.setCampanha(campanha);
         List<String[][]> lutas = new ArrayList<>();
         int lutasAntesDaEscolha = -1;
         boolean viuSorteio = false;
-        boolean perdeu = false;
         for (String id : temporada.episodios) {
             rec.ended = null;
             p.start(temporada, temporada.loadEpisodio(assets, id));
@@ -241,12 +215,7 @@ public class TorneioTest {
                     Episodio.Passo luta = p.passo();
                     lutas.add(p.lados(luta));
                     rotulos.add(p.rotulo(luta));
-                    boolean venceu = true;
-                    if (perdeQuartas && !perdeu && Torneio.QUARTAS.equals(p.rotulo(luta))) {
-                        perdeu = true;
-                        venceu = false;
-                    }
-                    p.resultadoLuta(venceu);
+                    p.resultadoLuta(true);
                     continue;
                 }
                 Episodio.Passo passo = p.passo();
@@ -264,26 +233,31 @@ public class TorneioTest {
                 p.tap(640f, 360f);
             }
             assertNotNull(id + " não terminou", rec.ended);
-            episodiosTocados.add(id);
         }
         assertTrue(viuSorteio);
         assertEquals(irmao, campanha.irmao());
         // O treino do Prólogo é antes da escolha (o jogador é o Ryūga criança).
         assertEquals(1, lutasAntesDaEscolha);
-        assertEquals(perdeQuartas, campanha.torneio().pelaRepescagem());
+        rotulos.remove(0);
         assertSame(campanha.torneio().jogador(), campanha.torneio().campeao());
         return lutas.subList(lutasAntesDaEscolha, lutas.size());
     }
 
     @Test
-    public void temporadaDoKogaPelaRepescagemTerminaNoDueloContraOParceiro() throws IOException {
+    public void temporadaDoKogaComEmboscadaETerminaNoDueloContraOParceiro() throws IOException {
         List<String> rotulos = new ArrayList<>();
-        List<String[][]> lutas = temporada(Torneio.KOGA, true, rotulos, new ArrayList<String>());
-        // Treino do ep01, quartas (perdida, sem repetir), repescagem, final da chave, final, duelo.
-        assertEquals(6, lutas.size());
-        assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Torneio.REPESCAGEM, Torneio.FINAL_DA_CHAVE,
-            Torneio.FINAL, Campanha.DUELO), rotulos.subList(1, rotulos.size()));
+        Campanha campanha = Campanha.load(new GameAssets(), new Random(7));
+        List<String[][]> lutas = temporada(Torneio.KOGA, rotulos, campanha);
+        // Treino do ep01, quartas, emboscada fora da arena, semifinal, final, duelo.
+        assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Campanha.EMBOSCADA, Torneio.SEMIFINAL,
+            Torneio.FINAL, Campanha.DUELO), rotulos);
         for (int i = 0; i < 5; i++) assertEquals("p03", lutas.get(i)[0][0]);
+        // A emboscada é a dupla que perdeu a outra quarta do lado do Kōga (vagas 4 e 5).
+        String[] emboscada = lutas.get(2)[1];
+        Torneio t = campanha.torneio();
+        Torneio.Dupla outraQuartaA = t.participante(0, 4), outraQuartaB = t.participante(0, 5);
+        Torneio.Dupla perdedora = t.participante(1, 2) == outraQuartaA ? outraQuartaB : outraQuartaA;
+        assertEquals(perdedora.lutadores[0], emboscada[0]);
         assertEquals("player_base", lutas.get(4)[1][0]);
         String[][] duelo = lutas.get(5);
         assertEquals("p03", duelo[0][0]);
@@ -292,11 +266,11 @@ public class TorneioTest {
     }
 
     @Test
-    public void temporadaDoRyugaPeloCaminhoDireto() throws IOException {
+    public void temporadaDoRyuga() throws IOException {
         List<String> rotulos = new ArrayList<>();
-        List<String[][]> lutas = temporada(Torneio.RYUGA, false, rotulos, new ArrayList<String>());
-        assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Torneio.SEMIFINAL, Torneio.FINAL_DA_CHAVE,
-            Torneio.FINAL, Campanha.DUELO), rotulos.subList(1, rotulos.size()));
+        List<String[][]> lutas = temporada(Torneio.RYUGA, rotulos, Campanha.load(new GameAssets(), new Random(3)));
+        assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Campanha.EMBOSCADA, Torneio.SEMIFINAL,
+            Torneio.FINAL, Campanha.DUELO), rotulos);
         assertEquals("p03", lutas.get(4)[1][0]);
         assertEquals("p02", lutas.get(5)[1][0]);
     }

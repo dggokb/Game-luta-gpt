@@ -81,10 +81,10 @@ public final class Episodio {
         /** Duelo 1x1 da regra escondida: o capitão da dupla do jogador contra o próprio parceiro. */
         public final boolean duelo;
         /**
-         * Só toca por esse caminho na chave: "direto" (venceu as quartas) ou "repescagem"
-         * (perdeu as quartas); null = nos dois.
+         * Luta fora da arena: a dupla que perdeu a outra quarta do lado do jogador embosca o
+         * jogador entre as quartas e a semifinal ({@link Torneio#emboscada()}).
          */
-        public final String caminho;
+        public final boolean emboscada;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -95,10 +95,10 @@ public final class Episodio {
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
               String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
-              String duplaRef, String cpuRef, String irmao, boolean duelo, String caminho) {
+              String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada) {
             this.tipo = tipo;
             this.duelo = duelo;
-            this.caminho = caminho;
+            this.emboscada = emboscada;
             this.torneio = torneio;
             this.duplaRef = duplaRef;
             this.cpuRef = cpuRef;
@@ -293,10 +293,6 @@ public final class Episodio {
         if (irmao != null && !irmao.equals("ryuga") && !irmao.equals("koga")) {
             throw new IllegalArgumentException("irmao desconhecido: " + irmao + " (use ryuga ou koga)");
         }
-        String caminho = string(map, "caminho", null);
-        if (caminho != null && !caminho.equals("direto") && !caminho.equals("repescagem")) {
-            throw new IllegalArgumentException("caminho desconhecido: " + caminho + " (use direto ou repescagem)");
-        }
         String duplaRef = ref(map, "dupla");
         String cpuRef = ref(map, "cpu");
         return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
@@ -306,7 +302,7 @@ public final class Episodio {
             string(map, "conversa", null), string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
             Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
-            Boolean.TRUE.equals(map.get("duelo")), caminho);
+            Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")));
     }
 
     /** {@code "dupla": "jogador"} ou {@code "rival"} (dupla fixa de um irmão); null se for uma lista. */

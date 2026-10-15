@@ -62,8 +62,6 @@ tasks.register('runHistoria', JavaExec) {
     // Campanha do Kōga e outra chave: -Pirmao=koga -Psorteio=3
     systemProperty 'irmao', project.findProperty('irmao') ?: 'ryuga'
     systemProperty 'sorteio', project.findProperty('sorteio') ?: '1'
-    // Perde as quartas e segue pela repescagem: -Prepescagem=true
-    systemProperty 'repescagem', project.findProperty('repescagem') ?: 'false'
 }
 
 // Menu inicial e pausa em PNG: gradle :pc-preview:runMenu (-Pidioma=en para outro idioma)
