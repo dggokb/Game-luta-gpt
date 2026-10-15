@@ -124,8 +124,8 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
   - **Guard Cancel Tag** e **pushblock** quando está defendendo;
   - **Overdrive** no meio do combo ou com a vida baixa; **Ultra** com 3 barras e perto.
   - Chances e distâncias: constantes no topo do `AiController`.
-- O parceiro do CPU em campo (assist, ou saindo depois do Assist → Tag) é desenhado pálido
-  como o titular; a arte dele já vem carregada na batalha. O Ultra do CPU usa o pack do
+- O parceiro do CPU em campo (assist, ou saindo depois do Assist → Tag) é desenhado com as
+  cores normais, como o titular; a arte dele já vem carregada na batalha. O Ultra do CPU usa o pack do
   personagem dele (ou o provisório) e o toque do jogador não dá bônus nele.
 
 Testes: `BattleFlowTest`, `AiFullKitTest`.
@@ -163,8 +163,8 @@ Testes: `BattleFlowTest`, `AiFullKitTest`.
   estavam e os dois voltam às posições iniciais. Não inicia durante um ultra.
 - `DemoDirectorTest` roda todas as demos no motor real e exige que cada passo mostre o que
   promete (cue/evento), e que a luta volte igual.
-- CPU de treino: `GameView` usa `TEAM[0]` (player_base) para o CPU, com
-  `SpriteFighterRenderer.washedOut()` (saturação 0.35, clareado e levemente azul).
+- CPU de treino: `GameView` usa `TEAM[0]` (player_base) para o CPU, com as cores normais da
+  arte (o filtro pálido `washedOut()` foi removido: o adversário não fica mais esbranquiçado).
   `GeneratedCharacters.OPPONENT` (monster_npc) continua no pack para os testes.
 - Correção achada pela demo: o voo do **wall bounce** agora calcula a altura para chegar à
   parede antes de pousar (com o defensor colado ele caía antes dela e não quicava).

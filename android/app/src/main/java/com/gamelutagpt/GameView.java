@@ -48,7 +48,7 @@ public class GameView extends SurfaceView
     private final ConcurrentLinkedQueue<Integer> selectionKeys = new ConcurrentLinkedQueue<>();
     private CharacterSelectRenderer characterSelectRenderer;
 
-    // Training opponent: our point character (same body and moves), drawn washed out.
+    // Training opponent: our point character (same body and moves), in its normal colors.
     // É o titular escolhido para o CPU; quem está em campo agora é opponentPoint().
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
     // O parceiro do CPU: no treino (IA OFF) só aparece no seletor; no modo batalha (IA ON) luta.
@@ -231,7 +231,7 @@ public class GameView extends SurfaceView
     /** Capangas do Super (p07): as animações CAPANGA_* ficam no pacote de quem os chama. */
     private final SpriteFighterRenderer henchmanRenderer;
     private final CombatFighter leavingBody = new CombatFighter(PLAYER, null, 0f, 1);
-    /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag), pálido. */
+    /** O parceiro do CPU em campo (assist, ou o titular saindo depois do Assist → Tag). */
     private final SpriteFighterRenderer opponentPartnerRenderer;
     private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
     /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
@@ -291,14 +291,13 @@ public class GameView extends SurfaceView
         atlases = new SpriteAtlasCache(context);
         for (FighterState fighter : team) atlases.preload(fighter.character);
         spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        // O adversário aparece com as cores normais da arte (sem o filtro pálido de antes).
         opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
-        opponentSpriteRenderer.setTint(SpriteFighterRenderer.washedOut());
         partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
         echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
         henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
-        opponentPartnerRenderer.setTint(SpriteFighterRenderer.washedOut());
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
             @Override public void manterAtlas(CharacterDefinition... manter) {
                 // Só as folhas do personagem em ajuste e da referência: a luta está parada e volta a
