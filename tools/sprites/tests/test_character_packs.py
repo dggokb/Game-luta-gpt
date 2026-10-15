@@ -348,6 +348,21 @@ class BuiltPackTests(unittest.TestCase):
         self.assertIn(',8,20,2.00000000f)',java)
         self.assertIn('art/sprites/source/player_base_walk_forward_video_normalized.png',report['provenance']['referenceSources'])
 
+    def assert_hd_follows_reference(self,sheet,columns,width,height,count,tuning):
+        """Every HD cell is its video cell at 2x times the size tuning applied in the app
+        (docs/personagens/regua/ajustes-tamanho-20261014-0532.json), measured by body height."""
+        from PIL import Image
+        import numpy as np
+        original=Image.open(self.root/f'art/sprites/source/{sheet}_video_normalized.png').convert('RGBA')
+        hd=Image.open(self.root/f'art/sprites/source/{sheet}_sr_2x.png').convert('RGBA')
+        def tall(img):
+            rows=np.nonzero((np.asarray(img.getchannel('A'))>128).any(1))[0]
+            return rows[-1]-rows[0]+1
+        for i in range(count):
+            src=original.crop((i%columns*width,i//columns*height,(i%columns+1)*width,(i//columns+1)*height))
+            cell=hd.crop((i%columns*width*2,i//columns*height*2,(i%columns+1)*width*2,(i//columns+1)*height*2))
+            self.assertAlmostEqual(tuning,tall(cell)/(2*tall(src)),delta=0.01,msg=f'{sheet} cell {i}')
+
     def test_p02_hd_idle_preserves_proportions_root_timing_and_budget(self):
         from PIL import Image
         char=json.loads((self.root/'characters/p02/character.json').read_text())
@@ -365,12 +380,8 @@ class BuiltPackTests(unittest.TestCase):
         self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
         self.assertEqual(194,packed['rootX']+packed['cropOffset'][0])
         self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
-        original=Image.open(self.root/'art/sprites/source/p02_idle_video_normalized.png').convert('RGBA')
-        hd=Image.open(self.root/'art/sprites/source/p02_idle_sr_2x.png').convert('RGBA')
-        for i in range(56):
-            src=original.crop((i%11*192,i//11*256,(i%11+1)*192,(i//11+1)*256))
-            cell=hd.crop((i%11*384,i//11*512,(i%11+1)*384,(i//11+1)*512))
-            self.assertEqual(src.getchannel('A').resize((384,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
+        # The HD sheet is the video sheet at 2x, resized by the in-app size tuning (97%).
+        self.assert_hd_follows_reference('p02_idle',11,192,256,56,0.97)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn(',11,56,2.00000000f)',java)
         self.assertIn('art/sprites/source/p02_idle_video_normalized.png',report['provenance']['referenceSources'])
@@ -383,20 +394,17 @@ class BuiltPackTests(unittest.TestCase):
         self.assertEqual([41]*60,idle['durationsMs'])
         self.assertTrue(idle['loop'])
         report=json.loads((self.root/'tools/sprites/reports/p03_idle.report.json').read_text())
-        self.assertEqual([512,512,256,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        # The 104% size tuning grew the cell by 2 px (root kept on the feet).
+        self.assertEqual([512,514,256,478],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         packed=report['packed']
         self.assertEqual(2,packed['pixelScale'])
         self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
         self.assertLessEqual(packed['frameHeight']*8,4096)
         self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
         self.assertEqual(256,packed['rootX']+packed['cropOffset'][0])
-        self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
-        original=Image.open(self.root/'art/sprites/source/p03_idle_video_normalized.png').convert('RGBA')
-        hd=Image.open(self.root/'art/sprites/source/p03_idle_sr_2x.png').convert('RGBA')
-        for i in range(60):
-            src=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
-            cell=hd.crop((i%8*512,i//8*512,(i%8+1)*512,(i//8+1)*512))
-            self.assertEqual(src.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
+        self.assertEqual(478,packed['rootY']+packed['cropOffset'][1])
+        # The HD sheet is the video sheet at 2x, resized by the in-app size tuning (104%).
+        self.assert_hd_follows_reference('p03_idle',8,256,256,60,1.04)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn(',8,60,2.00000000f)',java)
         self.assertIn('art/sprites/source/p03_idle_video_normalized.png',report['provenance']['referenceSources'])
