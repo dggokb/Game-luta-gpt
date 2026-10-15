@@ -217,7 +217,8 @@ def imagemNativa = tasks.register('imagemNativa', Exec) {
     def args = [jpackage.absolutePath,
                 '--type', 'app-image',
                 '--name', 'GameLutaGPT',
-                '--app-version', version.toString(),
+                // O macOS não aceita versão começando em 0 ("0.102"): lá vai 1.0.<versionCode>.
+                '--app-version', osLabel == 'macos' ? "1.0.${versionCode.get()}" : version.toString(),
                 '--vendor', 'Game Luta GPT',
                 '--input', jpackageInput.get().asFile.absolutePath,
                 '--main-jar', jarName.get(),
