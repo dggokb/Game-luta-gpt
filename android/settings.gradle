@@ -1,7 +1,22 @@
-pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+pluginManagement {
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+    // Versão do plugin Android declarada aqui (e não no build.gradle da raiz): assim ele só
+    // é baixado quando o :app entra no build, e o jogo para PC compila sem o SDK Android.
+    plugins { id 'com.android.application' version '8.5.2' }
+}
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name = 'GameLutaGPT'
-include ':app'
+
+// O app Android só entra quando há SDK (local.properties com sdk.dir, ou ANDROID_HOME /
+// ANDROID_SDK_ROOT). Sem SDK, o build segue só com os módulos Java puros e o jogo de PC.
+def localProperties = new File(settingsDir, 'local.properties')
+def hasAndroidSdk = System.getenv('ANDROID_HOME') || System.getenv('ANDROID_SDK_ROOT') ||
+    (localProperties.isFile() && localProperties.text.contains('sdk.dir'))
+if (hasAndroidSdk) {
+    include ':app'
+} else {
+    logger.lifecycle('SDK Android não encontrado: :app fora do build (o jogo para PC continua disponível).')
+}
 // Motores visuais em Java puro: o mesmo código roda no Android e no PC.
 include ':render-core'
 include ':ultra-core'
@@ -9,3 +24,5 @@ include ':story-core'
 include ':stage-core'
 // Visualizador no PC (gradle :pc-preview:run, :pc-preview:runStage).
 include ':pc-preview'
+// Jogo completo no PC e exportação para Windows/Linux/macOS (gradle :pc:run, :pc:exportarPc).
+include ':pc'

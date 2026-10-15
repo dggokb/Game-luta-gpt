@@ -1,0 +1,257 @@
+plugins { id 'application' }
+
+// Jogo de PC: compila o MESMO código do app Android (app/src/main/java) sobre uma camada
+// de compatibilidade (android.* em Java2D, em src/main/java/android). O jogo não tem um
+// "port": cada mudança no Android já sai no PC. Só a MainActivity fica de fora; quem
+// abre a janela é o com.gamelutagpt.pc.JogoPc.
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+def osName = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+def osLabel = osName.contains('win') ? 'windows' : osName.contains('mac') ? 'macos' : 'linux'
+// Python (com Pillow) só para gerar a calibração do P01 no build, como o app faz.
+// No Windows o comando costuma ser "python"; -Ppython=<caminho> escolhe outro.
+def python = providers.gradleProperty('python').getOrElse(osLabel == 'windows' ? 'python' : 'python3')
+def appMain = rootProject.file('app/src/main')
+def appTest = rootProject.file('app/src/test/java')
+def repoRoot = rootProject.projectDir.parentFile
+def generatedSource = layout.buildDirectory.dir('generated/source/pc')
+def substituicoes = file('src/substituicoes/java')
+
+// Código do app que o PC usa: tudo menos a MainActivity e as classes que o PC substitui por
+// uma versão própria em src/substituicoes (mesmo nome e pacote; ex.: ArquivosCompartilhados,
+// que no Android é o menu Compartilhar e no PC salva numa pasta).
+def fontesDoApp = tasks.register('fontesDoApp', Sync) {
+    description = 'Copia o código do app Android que o jogo de PC compila.'
+    from(new File(appMain, 'java')) {
+        exclude 'com/gamelutagpt/MainActivity.java'
+        exclude { element ->
+            !element.isDirectory() && new File(substituicoes, element.relativePath.pathString).isFile()
+        }
+    }
+    into layout.buildDirectory.dir('generated/source/app')
+}
+
+// Os testes do app que são JUnit puro (sem Robolectric) rodam também no build de PC:
+// gradle :pc:testarMotor. Ficam fora do :pc:test para uma falha do motor (que a CI do
+// Android já aponta) não travar a exportação.
+def testesDoApp = tasks.register('testesDoApp', Sync) {
+    description = 'Copia os testes do app que não dependem do Robolectric.'
+    from(appTest) {
+        exclude { element -> !element.isDirectory() && element.file.text.contains('org.robolectric') }
+    }
+    into layout.buildDirectory.dir('generated/test/app')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir fontesDoApp
+            srcDir substituicoes
+            srcDir generatedSource
+        }
+    }
+    motorTest {
+        java { srcDir testesDoApp }
+        compileClasspath += main.output + test.compileClasspath
+        runtimeClasspath += main.output + test.runtimeClasspath
+    }
+}
+
+configurations {
+    motorTestImplementation.extendsFrom testImplementation
+    motorTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.register('testarMotor', Test) {
+    group = 'verification'
+    description = 'Roda os testes JUnit do app (motor de luta, time, seleção...) contra o build de PC.'
+    testClassesDirs = sourceSets.motorTest.output.classesDirs
+    classpath = sourceSets.motorTest.runtimeClasspath
+    systemProperty 'java.awt.headless', 'true'
+    maxHeapSize = '2g'
+}
+
+dependencies {
+    implementation project(':ultra-core')
+    implementation project(':story-core')
+    implementation project(':stage-core')
+    // Os retratos do HUD são WEBP, que o ImageIO do Java não lê sozinho.
+    implementation 'com.twelvemonkeys.imageio:imageio-webp:3.12.0'
+    // org.json vem dentro do Android; no PC, o artefato com a mesma API.
+    implementation 'org.json:json:20240303'
+    // Controles (gamepad) pelo SDL, com as bibliotecas nativas de Windows, Linux e macOS.
+    implementation 'com.badlogicgames.jamepad:jamepad:2.30.0.0'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+// Versão única: o versionName do app/build.gradle vira o BuildConfig do PC.
+def appGradle = rootProject.file('app/build.gradle')
+def versionName = providers.fileContents(rootProject.layout.projectDirectory.file('app/build.gradle')).asText.map { text ->
+    def m = text =~ /versionName\s+'([^']+)'/
+    if (!m.find()) throw new GradleException('versionName não encontrado em app/build.gradle')
+    m.group(1)
+}
+def versionCode = providers.fileContents(rootProject.layout.projectDirectory.file('app/build.gradle')).asText.map { text ->
+    def m = text =~ /versionCode\s+(\d+)/
+    m.find() ? m.group(1) : '0'
+}
+version = versionName.get().split('-')[0]
+
+def generateBuildConfig = tasks.register('generateBuildConfig') {
+    description = 'BuildConfig do PC com a versão do app Android.'
+    inputs.file(appGradle)
+    def out = generatedSource.map { it.file('com/gamelutagpt/BuildConfig.java') }
+    outputs.file(out)
+    def name = versionName
+    def code = versionCode
+    doLast {
+        def f = out.get().asFile
+        f.parentFile.mkdirs()
+        f.text = """package com.gamelutagpt;
+
+/** Gerado pelo :pc a partir do app/build.gradle. */
+public final class BuildConfig {
+    public static final boolean DEBUG = true;
+    public static final String APPLICATION_ID = "com.gamelutagpt";
+    public static final String BUILD_TYPE = "pc";
+    public static final int VERSION_CODE = ${code.get()};
+    public static final String VERSION_NAME = "${name.get()}";
+    private BuildConfig() {}
+}
+"""
+    }
+}
+
+// Mesma calibração visual do P01 que o app gera no build (tools/sprites, Python + Pillow).
+def generateP01Calibration = tasks.register('generateP01Calibration', Exec) {
+    description = 'Gera a calibração quadro a quadro do P01 (igual ao app).'
+    def out = generatedSource.map { it.file('com/gamelutagpt/P01SpriteCalibration.java') }
+    inputs.files(fileTree(new File(repoRoot, 'tools/sprites/reports')) { include 'player_base_*.report.json' },
+        new File(appMain, 'res/drawable-nodpi/player_base_victory.png'),
+        new File(repoRoot, 'tools/sprites/generate_p01_calibration.py'))
+    outputs.file(out)
+    workingDir repoRoot
+    commandLine python, 'tools/sprites/generate_p01_calibration.py', '--output', out.get().asFile.absolutePath
+}
+
+tasks.named('compileJava') {
+    dependsOn generateBuildConfig, generateP01Calibration
+    options.encoding = 'UTF-8'
+    // O código do app é Java 8 de propósito; avisos de API antiga não interessam aqui.
+    options.compilerArgs += ['-Xlint:-options']
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+application {
+    mainClass = 'com.gamelutagpt.pc.JogoPc'
+    applicationName = 'GameLutaGPT'
+    // Os atlas decodificados de uma partida passam de 400 MB.
+    applicationDefaultJvmArgs = ['-Xmx3g', '-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8']
+}
+
+// gradle :pc:run joga lendo os arquivos direto do repositório (sem copiar nada).
+tasks.named('run') {
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+}
+
+// ---------------------------------------------------------------- dados do jogo exportado
+// data/assets   = app/src/main/assets + selection/portraits (art/concepts, como no APK)
+// data/drawable = app/src/main/res/drawable-nodpi (atlas dos lutadores)
+def portraits = ['p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'p07', 'p08',
+                 'p09', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15', 'p16'].collect { it + '.png' }
+distributions {
+    main {
+        distributionBaseName = 'GameLutaGPT'
+        contents {
+            from(new File(appMain, 'assets')) { into 'data/assets' }
+            from(new File(repoRoot, 'art/concepts')) {
+                include portraits
+                into 'data/assets/selection/portraits'
+            }
+            from(new File(appMain, 'res/drawable-nodpi')) { into 'data/drawable' }
+            from(file('LEIA-ME.txt'))
+        }
+    }
+}
+
+tasks.named('test') {
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    maxHeapSize = '3g'
+}
+
+// ---------------------------------------------------------------- exportação nativa
+// gradle :pc:exportarPc → build/exportar/GameLutaGPT-<versão>-<sistema>.zip
+// Pasta pronta para jogar com o Java embutido (jpackage): GameLutaGPT.exe no Windows,
+// GameLutaGPT.app no macOS, bin/GameLutaGPT no Linux. Cada sistema exporta o seu.
+def javaHome = providers.systemProperty('java.home')
+def exportDir = layout.buildDirectory.dir('exportar')
+def jpackageInput = layout.buildDirectory.dir('jpackage/entrada')
+
+def prepararJpackage = tasks.register('prepararJpackage', Sync) {
+    description = 'Junta jars e dados numa pasta para o jpackage.'
+    from(tasks.named('jar'))
+    from(configurations.runtimeClasspath)
+    from(new File(appMain, 'assets')) { into 'data/assets' }
+    from(new File(repoRoot, 'art/concepts')) {
+        include portraits
+        into 'data/assets/selection/portraits'
+    }
+    from(new File(appMain, 'res/drawable-nodpi')) { into 'data/drawable' }
+    into jpackageInput
+}
+
+def imagemNativa = tasks.register('imagemNativa', Exec) {
+    description = 'Monta a pasta do jogo com o Java embutido (jpackage --type app-image).'
+    dependsOn prepararJpackage
+    def dest = layout.buildDirectory.dir('jpackage/imagem')
+    inputs.dir(jpackageInput)
+    outputs.dir(dest)
+    def jarName = tasks.named('jar').flatMap { it.archiveFileName }
+    doFirst { delete dest }
+    def jpackage = new File(javaHome.get(), 'bin/jpackage' + (osLabel == 'windows' ? '.exe' : ''))
+    def args = [jpackage.absolutePath,
+                '--type', 'app-image',
+                '--name', 'GameLutaGPT',
+                '--app-version', version.toString(),
+                '--vendor', 'Game Luta GPT',
+                '--input', jpackageInput.get().asFile.absolutePath,
+                '--main-jar', jarName.get(),
+                '--main-class', application.mainClass.get(),
+                '--dest', dest.get().asFile.absolutePath,
+                // Java embutido só com o que o jogo usa (jdeps): AWT/Java2D/som/ImageIO e o loader do SDL.
+                '--add-modules', 'java.base,java.desktop,java.sql,jdk.unsupported',
+                '--jlink-options', '--strip-debug --no-man-pages --no-header-files']
+    application.applicationDefaultJvmArgs.each { args += ['--java-options', it] }
+    // Janela sem console no Windows; --win-console mostra o log ao depurar.
+    commandLine args
+}
+
+tasks.register('exportarPc', Zip) {
+    group = 'distribution'
+    description = 'Exporta o jogo para este sistema (Windows, Linux ou macOS) com o Java embutido.'
+    dependsOn imagemNativa
+    from(layout.buildDirectory.dir('jpackage/imagem'))
+    from(file('LEIA-ME.txt'))
+    archiveFileName = "GameLutaGPT-${version}-${osLabel}.zip"
+    destinationDirectory = exportDir
+}
+
+// Joga sozinho sem janela e salva PNGs (seleção, luta, golpes, Super) + tempos de quadro.
+// gradle :pc:capturar   (ou --args="pasta 1920x1080")
+tasks.register('capturar', JavaExec) {
+    group = 'verification'
+    description = 'Roda o jogo sem tela e salva quadros em pc/build/captura.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.pc.CapturaPc'
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    maxHeapSize = '3g'
+    args layout.buildDirectory.dir('captura').get().asFile.absolutePath
+}

@@ -279,6 +279,9 @@ public class GameView extends SurfaceView
 
     private final ConcurrentLinkedQueue<MotionEvent> pendingInput =
         new ConcurrentLinkedQueue<>();
+    /** Teclado/controle físico na luta (PC e Android): +código ao apertar, -código ao soltar. */
+    private final ConcurrentLinkedQueue<Integer> hardwareKeys = new ConcurrentLinkedQueue<>();
+    private final HardwareInput hardware = new HardwareInput();
     private volatile boolean surfaceReady;
     private volatile boolean activityActive = true;
     private float accumulatedTime;
@@ -286,6 +289,8 @@ public class GameView extends SurfaceView
 
     private void clearInput() {
         clearPendingInput();
+        hardwareKeys.clear();
+        hardware.reset();
         pad.reset();
         releaseAllPointers();
     }
@@ -486,21 +491,99 @@ public class GameView extends SurfaceView
         if (menuInicial.isOpen()) {
             // No menu inicial a tecla voltar fecha o app, como em toda tela raiz do Android.
             if (keyCode == KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
-            selectionKeys.offer(keyCode);
+            offerMenuKey(keyCode, event);
             return true;
         }
         if (capitulos.isOpen()) {
             // Nos capítulos, voltar leva ao menu inicial.
-            selectionKeys.offer(keyCode);
+            offerMenuKey(keyCode, event);
             return true;
         }
         // Na luta, voltar/START abre a pausa (o loop do jogo lê a fila).
         if (pausa.isOpen() || ajusteTamanho.isOpen() || ajusteCaixas.isOpen() || characterSelect.isOpen() ||
             historia.coversScreen() || isPauseKey(keyCode)) {
-            selectionKeys.offer(keyCode);
+            offerMenuKey(keyCode, event);
+            return true;
+        }
+        if (HardwareInput.handles(keyCode)) {
+            // Teclado/controle na luta. Segurar repete o evento: só o primeiro aperta o botão.
+            // Direção repetida passa (vale como "segurando", mesmo se apertou ainda num menu).
+            if (event.getRepeatCount() == 0 || HardwareInput.isDirectionKey(keyCode)) hardwareKeys.offer(keyCode);
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override public boolean onKeyUp(int keyCode, KeyEvent event) {
+        // Soltar sempre chega, até com um menu aberto, para nada ficar segurado.
+        if (HardwareInput.handles(keyCode)) {
+            hardwareKeys.offer(-keyCode);
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    /**
+     * Teclas dos menus: as letras do teclado viram os botões do controle (WASD, J, K...).
+     * Segurar uma direção anda o cursor; os botões valem uma vez por aperto.
+     */
+    private void offerMenuKey(int keyCode, KeyEvent event) {
+        int key = HardwareInput.menuKey(keyCode);
+        if (event.getRepeatCount() == 0 || HardwareInput.isDpad(key)) selectionKeys.offer(key);
+    }
+
+    /** Teclado/controle na thread do jogo: direção segurada, botões e comandos de teste. */
+    private void processHardwareKeys() {
+        Integer queued;
+        while ((queued = hardwareKeys.poll()) != null) {
+            boolean pressed = queued > 0;
+            int keyCode = Math.abs(queued);
+            hardware.setButtonHeld(keyCode, pressed);
+            if (hardware.setHeld(keyCode, pressed)) {
+                // O D-pad da tela, quando segurado, continua mandando na direção.
+                if (dpadPointer == -1) pad.setDirection(hardware.direction());
+                continue;
+            }
+            if (!pressed) continue;
+            PadInput.Button button = HardwareInput.button(keyCode);
+            if (button != null) {
+                // Na "Página Final" do jogador qualquer botão vale como o toque no tempo certo.
+                if (paginaFinal.isActive()) {
+                    if (ultraAttacker == PLAYER) paginaFinal.tap();
+                } else {
+                    pad.press(button);
+                }
+                continue;
+            }
+            // Os comandos de teste seguem os botões de teste: fora do modo história.
+            HardwareInput.Action action = HardwareInput.action(keyCode);
+            if (action == HardwareInput.Action.CHARACTER_SELECT) {
+                if (storyMode) openPause();
+                else openCharacterSelect();
+            } else if (!storyMode) {
+                switch (action) {
+                    case DEBUG: debugOverlay = !debugOverlay; break;
+                    case AI: setOpponentAiEnabled(!ai.enabled()); break;
+                    case HEAL_PLAYER: healPlayerTeam(); break;
+                    case HEAL_OPPONENT: healOpponentTeam(); break;
+                    default: break;
+                }
+            }
+        }
+    }
+
+    /** VIDA P1: os dois do time, para o reserva também estar pronto depois do tag. */
+    private void healPlayerTeam() {
+        hud.resetEffects();
+        for (FighterState member : team) member.restoreLife();
+        engine.refreshOverdrive(PLAYER);
+    }
+
+    /** VIDA CPU: a dupla inteira do CPU no 2x2 (só o titular no treino). */
+    private void healOpponentTeam() {
+        hud.resetEffects();
+        for (FighterState member : engine.team(OPPONENT).members) member.restoreLife();
+        engine.refreshOverdrive(OPPONENT);
     }
 
     private static boolean isPauseKey(int keyCode) {
@@ -2195,7 +2278,7 @@ public class GameView extends SurfaceView
 
     /** Algum botão de ataque continua sob um dedo (carrega a Onda do p01). */
     private boolean attackHeld() {
-        return lightPointer != -1 || mediumPointer != -1 || heavyPointer != -1;
+        return lightPointer != -1 || mediumPointer != -1 || heavyPointer != -1 || hardware.attackHeld();
     }
 
     /** Eco de sombra: cada cópia de golpe que já começou, roxa e translúcida, onde a dona estava. */
@@ -2287,6 +2370,7 @@ public class GameView extends SurfaceView
     }
 
     private void processPendingInput() {
+        processHardwareKeys();
         MotionEvent latestMove = null;
         MotionEvent event;
         while ((event = pendingInput.poll()) != null) {
@@ -2417,9 +2501,7 @@ public class GameView extends SurfaceView
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
                     healPlayerPointer = pointerId;
-                    hud.resetEffects();
-                    for (FighterState member : team) member.restoreLife();
-                    engine.refreshOverdrive(PLAYER);
+                    healPlayerTeam();
                     break;
                 case TEAM_SELECT:
                     openCharacterSelect();
@@ -2432,10 +2514,7 @@ public class GameView extends SurfaceView
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
-                    hud.resetEffects();
-                    // A dupla inteira do CPU no 2x2 (só o titular no treino).
-                    for (FighterState member : engine.team(OPPONENT).members) member.restoreLife();
-                    engine.refreshOverdrive(OPPONENT);
+                    healOpponentTeam();
                     break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it.

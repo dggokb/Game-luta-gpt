@@ -1,0 +1,45 @@
+GAME LUTA GPT — versão para PC
+==============================
+
+Como abrir
+----------
+Windows: GameLutaGPT\GameLutaGPT.exe
+macOS:   GameLutaGPT.app (na primeira vez: botão direito > Abrir, o app não é assinado)
+Linux:   GameLutaGPT/bin/GameLutaGPT
+
+O Java já vem dentro da pasta; não precisa instalar nada.
+Pacote "distZip" (sem Java embutido): precisa de Java 17 ou mais novo; rode bin/GameLutaGPT
+(Linux/macOS) ou bin\GameLutaGPT.bat (Windows).
+
+Controles
+---------
+                teclado              controle (padrão Xbox)
+Direção         WASD ou setas        D-pad / analógico esquerdo
+Soco/chute L    J                    X
+Médio M         K                    Y
+Forte H         L                    B
+Auto-combo      U                    A
+SUPER           I                    LB
+TAG / assist    O                    RB
+Agarrão         H  (ou J + K)        RT
+Pushblock       Ç ou ;  (ou K + L)   R3
+Overdrive       P  (ou I + O)        LT
+Pausa           Esc                  Start
+Seleção         F2                   Back  (no modo história: a pausa)
+
+Menus e seleção: setas/WASD andam, J/Enter/Espaço confirma, K/Esc volta,
+R sorteia, Tab abre as opções, Q/E/O troca o time.
+
+Modo teste: F1 DEBUG, F3 liga/desliga a IA, F5 enche a vida do P1, F6 a da CPU.
+Arquivos do DEBUG ("salvar no Drive") vão para Documentos/GameLutaGPT.
+F11 ou Alt+Enter: tela cheia. O mouse também aperta os botões da tela.
+
+Opções (linha de comando / --java-options)
+------------------------------------------
+--tela-cheia                  abre em tela cheia
+-Dgameluta.resolucao=1280x720 desenha em resolução menor (PCs mais fracos)
+-Dgameluta.semSom=true        sem som
+-Dgameluta.log=debug          mostra todo o log no terminal
+
+As preferências (ajustes do DEBUG) ficam em %APPDATA%\GameLutaGPT (Windows)
+ou ~/.config/GameLutaGPT (Linux/macOS).

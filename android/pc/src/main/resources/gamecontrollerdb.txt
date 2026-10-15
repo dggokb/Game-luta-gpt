@@ -1,0 +1,4 @@
+# Mapeamentos extras de controle para o SDL (formato do SDL_GameControllerDB).
+# O SDL já reconhece sozinho os controles comuns (Xbox, PlayStation, Switch Pro).
+# Para um controle genérico que não funciona, cole aqui a linha dele, de
+# https://github.com/mdqinc/SDL_GameControllerDB/blob/master/gamecontrollerdb.txt

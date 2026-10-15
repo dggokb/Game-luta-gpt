@@ -350,3 +350,24 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   do torneio (parceiro de tag e adversário esperando): `docs/historia/motor-conversas.md`.
   Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
   vídeos: `tools/stage/video_para_ator.py`.
+
+## Jogo no PC e exportação (Windows, Linux, macOS)
+
+O jogo inteiro roda no PC — menu, modo história, seleção, luta, HUD, pausa, DEBUG — com o
+**mesmo código do app Android**, sem port: o módulo `android/pc/` compila
+`app/src/main/java` sobre uma camada de compatibilidade (`android.graphics.Canvas`,
+`Paint`, `Bitmap`... em Java2D). Toda mudança no Android já sai no PC.
+
+- Jogar: `gradle :pc:run` (lê os arquivos direto do repositório; não precisa do SDK Android).
+- Exportar: `gradle :pc:exportarPc` → `pc/build/exportar/GameLutaGPT-<versão>-<sistema>.zip`,
+  pasta pronta com o Java embutido (`GameLutaGPT.exe` no Windows). Cada sistema exporta o
+  seu; a CI (`.github/workflows/build-pc.yml`) gera os três.
+- Sem Java embutido: `gradle :pc:distZip` (precisa de Java 17+ instalado).
+- Controles: teclado (WASD/setas, J K L = L M H, U auto-combo, I Super, O Tag, Esc pausa) e
+  controle pelo SDL (padrão Xbox); o mouse aperta os botões da tela. Teclado/controle também
+  valem no Android (`HardwareInput`). Lista completa em `android/pc/LEIA-ME.txt`.
+- Conferir sem tela: `gradle :pc:capturar` (PNGs e tempo de quadro), `gradle :pc:test`,
+  e `gradle :pc:testarMotor` roda os testes JUnit do app contra o build de PC.
+
+Como funciona por dentro, o que muda por plataforma e como adicionar o que faltar:
+[docs/exportacao-pc.md](docs/exportacao-pc.md).

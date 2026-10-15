@@ -1,0 +1,97 @@
+name: Exportar jogo para PC
+
+# Jogo de PC: o mesmo código do app Android sobre a camada de compatibilidade do módulo
+# :pc. Cada sistema exporta a sua pasta com o Java embutido (jpackage). No Linux também
+# roda o jogo sem tela e guarda as capturas (menu, seleção, luta, pausa).
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+      - game-luta-sprite-gpt
+      - 'claude/**'
+    paths:
+      - 'android/**'
+      - 'art/concepts/**'
+      - 'tools/sprites/**'
+      - '.github/workflows/build-pc.yml'
+  pull_request:
+    paths:
+      - 'android/**'
+      - '.github/workflows/build-pc.yml'
+  workflow_dispatch:
+
+jobs:
+  exportar:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            sistema: linux
+          - os: windows-latest
+            sistema: windows
+          - os: macos-latest
+            sistema: macos
+    runs-on: ${{ matrix.os }}
+    env:
+      # Sem SDK Android o settings.gradle deixa o :app de fora (o PC não precisa dele).
+      ANDROID_HOME: ''
+      ANDROID_SDK_ROOT: ''
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Python (calibração do P01 no build)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pillow
+        run: python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+
+      - name: Testes do PC (camada gráfica e o jogo sem tela)
+        working-directory: android
+        run: gradle :pc:test -Ppython=python --stacktrace
+
+      - name: Testes do motor no build de PC (informativo)
+        if: matrix.sistema == 'linux'
+        continue-on-error: true
+        working-directory: android
+        run: gradle :pc:testarMotor -Ppython=python
+
+      - name: Capturas do jogo sem tela
+        if: matrix.sistema == 'linux'
+        working-directory: android
+        run: gradle :pc:capturar -Ppython=python
+
+      - name: Exportar
+        working-directory: android
+        run: gradle :pc:exportarPc -Ppython=python --stacktrace
+
+      - name: Enviar o jogo exportado
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-PC-${{ matrix.sistema }}
+          path: android/pc/build/exportar/*.zip
+          if-no-files-found: error
+          compression-level: 0
+
+      - name: Enviar capturas
+        if: matrix.sistema == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-PC-capturas
+          path: |
+            android/pc/build/captura/*.png
+            android/pc/build/captura/tempos.txt
+          if-no-files-found: warn
