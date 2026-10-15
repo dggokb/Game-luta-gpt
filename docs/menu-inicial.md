@@ -9,6 +9,25 @@ subindo, e duas opções em faixas de mangá:
 | **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep06 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
 | **MODO TESTE** | O que o app abria antes: a seleção de dupla e a luta de teste no Templo da Lua (`DEFAULT_STAGE`), com os botões de teste, o DEBUG (AJUSTAR TAMANHOS / AJUSTAR CAIXAS), o modo batalha (IA ON) etc. A seleção abre com a última dupla escolhida no teste. |
 
+## Save e capítulos do modo história
+
+O modo história grava sozinho (no aparelho, `SharedPreferences` "historia_v1"), no começo e no
+fim de cada episódio:
+
+- Na primeira vez, MODO HISTÓRIA começa direto no Prólogo.
+- Depois disso, MODO HISTÓRIA abre a tela **MODO HISTÓRIA** com **CONTINUAR** (do começo
+  do episódio onde o jogador parou, com o irmão escolhido e a chave do torneio como estavam
+  ali) e os **capítulos**: os já terminados (CONCLUÍDO) e o seguinte (ATUAL) podem ser
+  escolhidos; os outros aparecem **BLOQUEADOS** (o toque só faz o card tremer).
+- Escolher um capítulo antigo toca a temporada a partir dele; os capítulos já liberados
+  continuam liberados. Terminada a temporada, a tela mostra TEMPORADA COMPLETA no lugar do
+  CONTINUAR.
+- Sair no meio de um episódio (MENU INICIAL na pausa, ou fechar o app) volta ao começo dele.
+- O save guarda a semente da chave e, para cada episódio, o irmão e as rodadas já
+  disputadas; a chave é refeita igual ao carregar (`ProgressoHistoria`, `Campanha.restaurar`).
+
+Controle na tela: direcional move, A escolhe, B (ou voltar) volta ao menu inicial.
+
 ## Controles
 
 - **Toque**: tocar numa opção escolhe. A opção pisca, a tela escurece e o modo começa.
@@ -44,6 +63,8 @@ algum texto do menu ou de qualquer episódio da temporada ficar sem tradução.
 |---|---|
 | `android/story-core/.../MenuInicial.java` | o menu: logo, opções, cursor, toque, animações |
 | `android/story-core/.../MenuPausa.java` | a pausa (CONTINUAR / MENU INICIAL) |
+| `android/story-core/.../MenuCapitulos.java` | CONTINUAR e os capítulos do modo história (trancados os não liberados) |
+| `android/story-core/.../ProgressoHistoria.java` | o save do modo história (episódio atual, concluídos, campanha por episódio) |
 | `android/story-core/.../BotaoMenu.java` | o desenho das opções (faixa inclinada, cursor, brilho) |
 | `android/story-core/.../PaginaHistoria.java` | o botão ◀ MENU das páginas (`setBotaoMenu`, `menuAt`) |
 | `android/app/.../GameView.java` | abre o menu no primeiro lançamento, `startStoryMode`, `startTestMode`, `openPause`, `openMainMenu` |

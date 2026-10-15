@@ -302,6 +302,8 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 
 ## Menu inicial
 
+- **Save do modo história**: CONTINUAR do começo do episódio onde parou e escolha dos
+  capítulos já feitos (os outros ficam trancados). `docs/menu-inicial.md`.
 - O app abre no **menu inicial** (logo + duas opções, toque ou controle):
   **MODO HISTÓRIA** (o jogo de verdade: Prólogo e Episódio 1, sem botões de teste; ◀ MENU e a
   tecla voltar abrem a pausa e levam de volta ao menu) e **MODO TESTE** (a luta de teste de

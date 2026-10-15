@@ -14,8 +14,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- * Grava em PNG o menu inicial (com o cursor em cada opção) e a pausa por cima da primeira
- * página do Prólogo, para revisar o visual e as traduções sem abrir o jogo.
+ * Grava em PNG o menu inicial (com o cursor em cada opção), a pausa por cima da primeira
+ * página do Prólogo e a tela de capítulos do modo história, para revisar o visual e as traduções sem abrir o jogo.
  *
  * <pre>gradle :pc-preview:runMenu</pre>
  * ou, com argumentos: {@code <pasta assets> <pasta de saída>}; {@code -Didioma=en} troca o idioma.
@@ -64,6 +64,18 @@ public final class MenuPreview {
             pagina.render(c);
             pausa.render(c);
         }, new File(outDir, "menu_" + idioma + "_pausa.png"));
+        // Capítulos: um save no começo do ep03 (Prólogo, ep01 e ep02 feitos).
+        java.util.List<com.gamelutagpt.historia.MenuCapitulos.Capitulo> caps = new java.util.ArrayList<>();
+        for (String id : temporada.episodios) {
+            Episodio ep = temporada.loadEpisodio(assets, id);
+            caps.add(new com.gamelutagpt.historia.MenuCapitulos.Capitulo(ep.numero, ep.titulo));
+        }
+        com.gamelutagpt.historia.ProgressoHistoria save = new com.gamelutagpt.historia.ProgressoHistoria(1L);
+        for (int i = 0; i < 3; i++) save.terminou(i, null);
+        com.gamelutagpt.historia.MenuCapitulos menuCaps = new com.gamelutagpt.historia.MenuCapitulos();
+        menuCaps.abrir(temporada, caps, save);
+        for (float t = 0f; t < 1.2f; t += DT) menuCaps.update(DT);
+        save(menuCaps::render, new File(outDir, "menu_" + idioma + "_capitulos.png"));
         System.out.println("Menu gravado em " + outDir.getAbsolutePath());
     }
 

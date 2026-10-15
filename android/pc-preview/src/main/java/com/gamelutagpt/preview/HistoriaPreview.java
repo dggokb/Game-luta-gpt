@@ -50,7 +50,7 @@ public final class HistoriaPreview implements HistoriaListener {
         HistoriaPreview preview = new HistoriaPreview(assets, outDir);
         // -Dirmao=koga joga a campanha do Kōga; -Dsorteio=N troca a semente da chave.
         preview.irmao = System.getProperty("irmao", "ryuga");
-        preview.pagina.setCampanha(Campanha.load(assets, new java.util.Random(Long.getLong("sorteio", 1L))));
+        preview.pagina.setCampanha(Campanha.load(assets, Long.getLong("sorteio", 1L)));
         for (String id : temporada.episodios) {
             if (args.length > 2 && !args[2].equals(id)) continue;
             preview.play(temporada, temporada.loadEpisodio(assets, id));

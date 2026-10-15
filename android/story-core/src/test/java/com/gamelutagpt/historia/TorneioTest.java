@@ -153,7 +153,7 @@ public class TorneioTest {
 
     @Test
     public void campanhaResolveJogadorRivalETorneio() throws IOException {
-        Campanha c = new Campanha(duplas(), new Random(3));
+        Campanha c = new Campanha(duplas(), 3L);
         assertEquals(Torneio.RYUGA, c.irmao());
         assertFalse(c.escolheu());
         Episodio ep = Episodio.fromJson("{\"id\":\"e\",\"passos\":[" +
@@ -246,7 +246,7 @@ public class TorneioTest {
     @Test
     public void temporadaDoKogaComEmboscadaETerminaNoDueloContraOParceiro() throws IOException {
         List<String> rotulos = new ArrayList<>();
-        Campanha campanha = Campanha.load(new GameAssets(), new Random(7));
+        Campanha campanha = Campanha.load(new GameAssets(), 7L);
         List<String[][]> lutas = temporada(Torneio.KOGA, rotulos, campanha);
         // Treino do ep01, quartas, emboscada fora da arena, semifinal, final, duelo.
         assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Campanha.EMBOSCADA, Torneio.SEMIFINAL,
@@ -268,7 +268,7 @@ public class TorneioTest {
     @Test
     public void temporadaDoRyuga() throws IOException {
         List<String> rotulos = new ArrayList<>();
-        List<String[][]> lutas = temporada(Torneio.RYUGA, rotulos, Campanha.load(new GameAssets(), new Random(3)));
+        List<String[][]> lutas = temporada(Torneio.RYUGA, rotulos, Campanha.load(new GameAssets(), 3L));
         assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Campanha.EMBOSCADA, Torneio.SEMIFINAL,
             Torneio.FINAL, Campanha.DUELO), rotulos);
         assertEquals("p03", lutas.get(4)[1][0]);
@@ -299,7 +299,7 @@ public class TorneioTest {
         GameAssets assets = new GameAssets();
         Temporada temporada = Temporada.load(assets);
         PaginaHistoria p = new PaginaHistoria(new Recorder(), assets);
-        Campanha campanha = Campanha.load(assets, new Random(1));
+        Campanha campanha = Campanha.load(assets, 1L);
         p.setCampanha(campanha);
         p.start(temporada, temporada.loadEpisodio(assets, "ep01"));
         assertEquals(Episodio.TipoPasso.ESCOLHA, p.passo().tipo);

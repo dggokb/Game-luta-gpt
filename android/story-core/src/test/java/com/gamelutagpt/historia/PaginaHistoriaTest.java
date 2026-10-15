@@ -299,6 +299,7 @@ public class PaginaHistoriaTest {
         textos.addAll(java.util.Arrays.asList(MenuInicial.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuPausa.TEXTOS));
         textos.addAll(java.util.Arrays.asList(EscolhaIrmao.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(MenuCapitulos.TEXTOS));
         textos.addAll(java.util.Arrays.asList(ChaveTorneio.TEXTOS));
         textos.addAll(java.util.Arrays.asList(Torneio.NOMES_RODADAS));
         File[] idiomas = new File(ASSETS, "historia/idiomas").listFiles();

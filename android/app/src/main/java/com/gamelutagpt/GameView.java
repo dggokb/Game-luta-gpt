@@ -15,9 +15,12 @@ import com.gamelutagpt.historia.Campanha;
 import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
+import com.gamelutagpt.historia.MenuCapitulos;
 import com.gamelutagpt.historia.MenuInicial;
 import com.gamelutagpt.historia.MenuPausa;
 import com.gamelutagpt.historia.PaginaHistoria;
+import com.gamelutagpt.historia.ProgressoHistoria;
+import com.gamelutagpt.historia.Torneio;
 import com.gamelutagpt.historia.ConversaLuta;
 import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
@@ -173,6 +176,13 @@ public class GameView extends SurfaceView
     private boolean conversaKo;
     /** Menu inicial (abre com o app): MODO HISTÓRIA ou MODO TESTE. */
     private final MenuInicial menuInicial;
+    /** MODO HISTÓRIA com save: CONTINUAR e os capítulos já liberados. */
+    private final MenuCapitulos capitulos = new MenuCapitulos();
+    /** O save do modo história (lido na primeira vez que o modo abre). */
+    private ProgressoHistoria progresso;
+    private SharedPreferences storyPrefs;
+    private static final String STORY_PREFS = "historia_v1";
+    private static final String STORY_SAVE_KEY = "progresso";
     /** Pausa (botão MENU ou tecla voltar): continuar ou voltar ao menu inicial. */
     private final MenuPausa pausa = new MenuPausa();
     /**
@@ -296,6 +306,7 @@ public class GameView extends SurfaceView
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
+        storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
@@ -475,6 +486,11 @@ public class GameView extends SurfaceView
         if (menuInicial.isOpen()) {
             // No menu inicial a tecla voltar fecha o app, como em toda tela raiz do Android.
             if (keyCode == KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
+            selectionKeys.offer(keyCode);
+            return true;
+        }
+        if (capitulos.isOpen()) {
+            // Nos capítulos, voltar leva ao menu inicial.
             selectionKeys.offer(keyCode);
             return true;
         }
@@ -741,6 +757,13 @@ public class GameView extends SurfaceView
             MenuInicial.Opcao escolha = menuInicial.update(FIXED_STEP);
             if (escolha == MenuInicial.Opcao.HISTORIA) startStoryMode();
             else if (escolha == MenuInicial.Opcao.TESTE) startTestMode();
+            return;
+        }
+        if (capitulos.isOpen()) {
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while (capitulos.isOpen() && (key = selectionKeys.poll()) != null) handleChaptersKey(key);
+            capitulos.update(FIXED_STEP);
             return;
         }
         if (pausa.isOpen()) {
@@ -1456,6 +1479,12 @@ public class GameView extends SurfaceView
             if (menuInicial.isOpen()) {
                 renderCanvas.begin(canvas);
                 menuInicial.render(renderCanvas);
+                canvas.restore();
+                return;
+            }
+            if (capitulos.isOpen()) {
+                renderCanvas.begin(canvas);
+                capitulos.render(renderCanvas);
                 canvas.restore();
                 return;
             }
@@ -2304,6 +2333,12 @@ public class GameView extends SurfaceView
             }
             return;
         }
+        if (capitulos.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                applyChapter(capitulos.tap(event.getX(index) / sx, event.getY(index) / sy));
+            }
+            return;
+        }
         if (pausa.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 applyPause(pausa.tap(event.getX(index) / sx, event.getY(index) / sy));
@@ -2496,6 +2531,7 @@ public class GameView extends SurfaceView
         tutorial.stop();
         conversa.descarregar();
         pausa.fechar();
+        capitulos.fechar();
         characterSelect.close();
         testFightPending = false;
         hud.resetEffects();
@@ -2538,7 +2574,104 @@ public class GameView extends SurfaceView
         selectButtonLabel = "◀ " + temporada.t(MenuPausa.MENU);
         debugOverlay = false;
         historia.setBotaoMenu(true);
-        startStory();
+        loadProgresso();
+        if (progresso.temSave()) {
+            // Já jogou: CONTINUAR de onde parou ou escolher um capítulo liberado.
+            openChapters();
+        } else {
+            startStoryAt(0);
+        }
+    }
+
+    /** O save do modo história; sem save (ou estragado), um novo com uma sorte nova para a chave. */
+    private void loadProgresso() {
+        if (progresso != null) return;
+        progresso = ProgressoHistoria.fromJson(storyPrefs.getString(STORY_SAVE_KEY, ""), new Random().nextLong());
+        if (temporada != null) progresso.limitar(temporada.episodios.size());
+    }
+
+    private void saveProgresso() {
+        if (progresso == null) return;
+        storyPrefs.edit().putString(STORY_SAVE_KEY, progresso.toJson()).apply();
+    }
+
+    /** Tela dos capítulos: CONTINUAR e os episódios (os não liberados ficam trancados). */
+    private void openChapters() {
+        java.util.List<MenuCapitulos.Capitulo> lista = new java.util.ArrayList<>();
+        for (int i = 0; i < temporada.episodios.size(); i++) {
+            String id = temporada.episodios.get(i);
+            try {
+                Episodio ep = temporada.loadEpisodio(ultraAssets, id);
+                lista.add(new MenuCapitulos.Capitulo(ep.numero, ep.titulo));
+            } catch (IOException | RuntimeException ex) {
+                Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
+                lista.add(new MenuCapitulos.Capitulo(i, id));
+            }
+        }
+        capitulos.abrir(temporada, lista, progresso);
+        selectionKeys.clear();
+        pad.reset();
+        releaseAllPointers();
+    }
+
+    private void handleChaptersKey(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT: capitulos.mover(-1, 0); break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT: capitulos.mover(1, 0); break;
+            case KeyEvent.KEYCODE_DPAD_UP: capitulos.mover(0, -1); break;
+            case KeyEvent.KEYCODE_DPAD_DOWN: capitulos.mover(0, 1); break;
+            case KeyEvent.KEYCODE_BUTTON_A:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_BUTTON_START:
+                applyChapter(capitulos.confirmar());
+                break;
+            case KeyEvent.KEYCODE_BUTTON_B:
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.KEYCODE_ESCAPE:
+                applyChapter(capitulos.voltar());
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void applyChapter(Integer escolha) {
+        if (escolha == null) return;
+        if (escolha == MenuCapitulos.VOLTAR) {
+            openMainMenu();
+        } else if (escolha == MenuCapitulos.CONTINUAR) {
+            startStoryAt(progresso.atual());
+        } else {
+            startStoryAt(escolha);
+        }
+    }
+
+    /**
+     * MODO HISTÓRIA a partir do episódio {@code index}, com a campanha (irmão e chave) como
+     * estava no começo dele no save. Daí em diante a temporada segue normalmente.
+     */
+    private void startStoryAt(int index) {
+        if (!loadTemporada()) {
+            openMainMenu();
+            return;
+        }
+        loadProgresso();
+        tutorial.stop();
+        conversa.descarregar();
+        sceneAfter = null;
+        hud.resetEffects();
+        pad.reset();
+        releaseAllPointers();
+        selectionKeys.clear();
+        Campanha campanha = null;
+        try {
+            campanha = progresso.campanhaNoInicio(index, Torneio.duplasFromJson(ultraAssets.readText(Torneio.ARQUIVO)));
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "torneio indisponível", ex);
+        }
+        historia.setCampanha(campanha);
+        playStoryEpisode(Math.max(0, Math.min(index, temporada.episodios.size() - 1)));
     }
 
     /**
@@ -2630,7 +2763,7 @@ public class GameView extends SurfaceView
     /** Campanha nova com as duplas do torneio; sem o torneio.json, a história pula a escolha e a chave. */
     private Campanha newCampanha() {
         try {
-            return Campanha.load(ultraAssets, new Random());
+            return Campanha.load(ultraAssets, new Random().nextLong());
         } catch (IOException | RuntimeException ex) {
             Log.w(LOG_TAG, "torneio indisponível", ex);
             return null;
@@ -2692,6 +2825,11 @@ public class GameView extends SurfaceView
 
     private void playStoryEpisode(int index) {
         storyEpisode = index;
+        if (storyMode && progresso != null) {
+            // Save: quem sair no meio volta ao começo deste episódio, com a campanha de agora.
+            progresso.comecou(index, historia.campanha());
+            saveProgresso();
+        }
         String id = temporada.episodios.get(index);
         try {
             historia.start(temporada, temporada.loadEpisodio(ultraAssets, id));
@@ -2875,6 +3013,11 @@ public class GameView extends SurfaceView
             sceneAfter = null;
             after.run();
             return;
+        }
+        if (storyMode && progresso != null && storyEpisode >= 0) {
+            // Episódio terminado: o próximo capítulo fica liberado.
+            progresso.terminou(storyEpisode, historia.campanha());
+            saveProgresso();
         }
         // Depois do "Próximo episódio" a temporada emenda no episódio seguinte (ep00 → ep01).
         int next = storyEpisode + 1;

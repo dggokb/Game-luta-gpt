@@ -9,22 +9,53 @@ import java.util.Random;
 /**
  * O que o jogador já decidiu numa partida do modo história: com qual irmão joga (escolhido
  * depois do Prólogo) e a chave do torneio (sorteada no passo "sorteio" ou, se ele foi pulado,
- * na primeira luta do torneio). Vive enquanto a história toca; ainda não é salvo.
+ * na primeira luta do torneio).
+ *
+ * A sorte da chave vem de uma semente: a mesma semente, o mesmo irmão e o mesmo número de
+ * rodadas disputadas refazem exatamente a mesma chave. É assim que o save
+ * ({@link ProgressoHistoria}) guarda a campanha sem guardar a chave inteira.
  */
 public final class Campanha {
     private final List<Torneio.Dupla> duplas;
-    private final Random random;
+    private final long semente;
     private String irmao;
     private Torneio torneio;
 
-    public Campanha(List<Torneio.Dupla> duplas, Random random) {
+    public Campanha(List<Torneio.Dupla> duplas, long semente) {
         this.duplas = duplas == null ? Collections.<Torneio.Dupla>emptyList() : duplas;
-        this.random = random;
+        this.semente = semente;
     }
 
     /** Campanha nova com as duplas de {@code historia/torneio/torneio.json}. */
-    public static Campanha load(RenderAssets assets, Random random) throws IOException {
-        return new Campanha(Torneio.duplasFromJson(assets.readText(Torneio.ARQUIVO)), random);
+    public static Campanha load(RenderAssets assets, long semente) throws IOException {
+        return new Campanha(Torneio.duplasFromJson(assets.readText(Torneio.ARQUIVO)), semente);
+    }
+
+    public long semente() {
+        return semente;
+    }
+
+    /** O irmão escolhido, ou null antes da escolha. */
+    public String irmaoEscolhido() {
+        return irmao;
+    }
+
+    /** Rodadas do torneio já disputadas, ou -1 se a chave ainda não foi sorteada. */
+    public int disputadas() {
+        return torneio == null ? -1 : torneio.disputadas();
+    }
+
+    /**
+     * Volta ao ponto salvo: o irmão escolhido (ou null) e quantas rodadas da chave já foram
+     * disputadas (-1 = chave ainda não sorteada). O jogador venceu todas (a derrota repete a luta).
+     */
+    public void restaurar(String irmao, int disputadas) {
+        this.irmao = null;
+        torneio = null;
+        if (irmao != null) escolher(irmao);
+        if (disputadas < 0 || !temTorneio()) return;
+        Torneio t = torneio();
+        for (int i = 0; i < disputadas && !t.acabou(); i++) t.registrar(true);
     }
 
     /** O irmão do jogador ({@link Torneio#RYUGA} ou {@link Torneio#KOGA}); Ryūga até a escolha. */
@@ -54,7 +85,8 @@ public final class Campanha {
 
     /** A chave, sorteada na primeira vez que é pedida; null sem {@code torneio.json}. */
     public Torneio torneio() {
-        if (torneio == null && temTorneio()) torneio = Torneio.sortear(duplas, irmao(), random);
+        // Random novo com a semente a cada sorteio: a mesma chave sempre que for refeita.
+        if (torneio == null && temTorneio()) torneio = Torneio.sortear(duplas, irmao(), new Random(semente));
         return torneio;
     }
 
