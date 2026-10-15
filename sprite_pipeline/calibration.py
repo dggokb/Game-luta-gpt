@@ -1,4 +1,4 @@
-"""Master-grounded calibration; no per-frame scaling or anatomical assumptions."""
+"""Master-grounded reference calibration without inferred anatomical proportions."""
 import cv2
 import numpy as np
 from .errors import CalibrationError
@@ -66,7 +66,7 @@ def scan(raw, master, background):
     return frames
 
 
-def calibrate(frames, master, target_height, clip, threshold=.82):
+def calibrate(frames, master, target_height, clip, threshold=.82, *, allow_scale_drift=False):
     explicit = clip.get('reference_frame')
     if explicit is not None and (not isinstance(explicit, int) or not 0 <= explicit < len(frames)):
         raise CalibrationError('Frame de referência fora do vídeo')
@@ -89,7 +89,7 @@ def calibrate(frames, master, target_height, clip, threshold=.82):
              and f.get('dimension_agreement', 0) >= .88]
     peer_heights = [f['bbox'][3]-f['bbox'][1] for f in peers]
     spread = (max(peer_heights)-min(peer_heights))/np.median(peer_heights) if peer_heights else 0
-    if spread > .06:
+    if spread > .06 and not allow_scale_drift:
         raise CalibrationError(f'Poses equivalentes com variação de escala de {spread:.1%} dentro do vídeo; escala única não resolve zoom/deformação')
     mx0, my0, mx1, my1 = master['bbox']
     master_root = master.get('root', [(mx0+mx1)/2, my1])

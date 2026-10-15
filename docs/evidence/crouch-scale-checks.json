@@ -1,0 +1,98 @@
+{
+  "source_batch_frames": 944,
+  "corrected_batch_frames": 944,
+  "canvas": [
+    1080,
+    699
+  ],
+  "root": [
+    417,
+    654
+  ],
+  "clips": {
+    "crouch": {
+      "manual_segment": "crown_to_chin_manual_approximate",
+      "measurement_scope": "annotated keyframes, not an automatic anatomical proof",
+      "before_segment_range_px": [
+        82.11599651513382,
+        92.79879538275158
+      ],
+      "before_growth_fraction": 0.1300940050779138,
+      "after_segment_range_px": [
+        82.11599651513382,
+        82.11599651513383
+      ],
+      "factor_range": [
+        0.8848821385713443,
+        1.0
+      ],
+      "actual_output_floor_range_px": [
+        652,
+        654
+      ]
+    },
+    "crouch_jab": {
+      "manual_segment": "crown_to_chin_manual_approximate",
+      "measurement_scope": "annotated keyframes, not an automatic anatomical proof",
+      "before_segment_range_px": [
+        80.64558735457183,
+        87.51711865168508
+      ],
+      "before_growth_fraction": 0.08366556430159688,
+      "after_segment_range_px": [
+        80.76026546814589,
+        80.7602654681459
+      ],
+      "factor_range": [
+        0.9227939254898093,
+        1.0014220010956068
+      ],
+      "actual_output_floor_range_px": [
+        654,
+        655
+      ]
+    }
+  },
+  "unchanged_clips": [
+    "idle",
+    "jab",
+    "jab_half",
+    "dash",
+    "jump",
+    "crouch_small"
+  ],
+  "held_out_crouch_checkpoints": [
+    {
+      "frame": 40,
+      "manual_points": [
+        [
+          584,
+          146
+        ],
+        [
+          618,
+          291
+        ]
+      ],
+      "length_output_px": 82.4706173300319,
+      "relative_error": 0.0043185351204102496
+    },
+    {
+      "frame": 80,
+      "manual_points": [
+        [
+          584,
+          147
+        ],
+        [
+          620,
+          291
+        ]
+      ],
+      "length_output_px": 82.4705960065356,
+      "relative_error": 0.004318275445106989
+    }
+  ],
+  "visual_approval": false,
+  "status": "checks_passed_requires_visual_review"
+}

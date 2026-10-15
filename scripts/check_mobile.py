@@ -49,7 +49,7 @@ def main():
         page.locator('.mobileOptions>summary').tap()
         page.check('#ghost');page.wait_for_function("document.getElementById('normalInfo').textContent.startsWith('jab_half ·')");page.uncheck('#ghost')
         result['checks'].append('master_overlay')
-        for action in ('jab','dash'):
+        for action in ('jab','dash','crouch'):
             page.tap('#'+action);page.tap('#play')
             assert page.evaluate('sequence!==null')
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')

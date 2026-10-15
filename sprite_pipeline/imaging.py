@@ -80,7 +80,7 @@ def similarity(a, b):
 
 
 def affine_rgba(rgba, scale, translation, canvas):
-    """One similarity transform for the ENTIRE clip, with premultiplied alpha."""
+    """Uniform similarity transform with premultiplied alpha."""
     data = rgba.astype(np.float32) / 255
     data[:, :, :3] *= data[:, :, 3:]
     matrix = np.array([[scale, 0, translation[0]], [0, scale, translation[1]]], np.float64)

@@ -1,5 +1,7 @@
 # Validação com entradas reais — 15/10/2026
 
+**Registro do lote original.** A correção posterior da diferença de escala durante Idle → Crouch está em [CORRECAO-CROUCH.md](CORRECAO-CROUCH.md). O script de reprodução e a prévia portátil agora incluem essa correção explícita nos dois clips que mudam de escala; as medições abaixo documentam a execução anterior, com fator constante.
+
 Base remota inspecionada antes do trabalho: `padronizacao-sprites` em `6ec6b10e3d9d20dd09b0e8ef6a11043d727acf70`. Nenhuma outra branch foi incorporada. Código, configuração principal e módulos são independentes de qualquer jogo. Os arquivos abaixo são entradas externas de teste, não personagens ou dependências da ferramenta.
 
 ## Evidência principal

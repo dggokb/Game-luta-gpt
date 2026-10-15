@@ -34,8 +34,10 @@ def main():
             im=Image.open(args.result/f['normalized_file']).convert('RGBA').resize(size,Image.Resampling.LANCZOS)
             stream=io.BytesIO();im.save(stream,format='WEBP',quality=80,method=4)
             frames.append({'image':'data:image/webp;base64,'+base64.b64encode(stream.getvalue()).decode(),
-                           'duration_s':f['duration_s'],'time_s':f['time_s']})
+                           'duration_s':f['duration_s'],'time_s':f['time_s'],
+                           'scale_applied':f.get('scale_applied',c['scale_per_video'])})
         clips.append({'name':c['name'],'scale':c['scale_per_video'],'reference_frame':c['reference_frame'],
+                      'scale_mode':c.get('scale_mode','constant_per_video'),
                       'source_height':c['frames'][c['reference_frame']]['bbox_source'][3]-c['frames'][c['reference_frame']]['bbox_source'][1],
                       'frames':frames})
     by_name={c['name']:c for c in m['clips']}
@@ -84,7 +86,7 @@ for(const id of ['view','other']){$(id).width=data.size[0];$(id).height=data.siz
 function image(src){if(!images.has(src))images.set(src,new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(im);im.src=src}));return images.get(src)}
 async function render(){const n=++token,c=data.clips[current],other=data.clips[Number($('compare').value)],f=c.frames[index];$('seek').max=c.frames.length-1;$('seek').value=index;$('time').textContent=`${index+1}/${c.frames.length} · ${f.time_s.toFixed(4)} s`;
 const [a,b]=await Promise.all([image(f.image),image(other.frames[other.reference_frame].image)]);if(n!==token)return;for(const [id,im] of [['view',a],['other',b]]){const ctx=$(id).getContext('2d');ctx.clearRect(0,0,...data.size);ctx.drawImage(im,0,0);ctx.strokeStyle='#66dfb5';ctx.beginPath();ctx.moveTo(0,data.root[1]);ctx.lineTo(data.size[0],data.root[1]);ctx.stroke()}
-$('info').textContent=`${c.name}: fonte ${c.source_height} px; fator único ${c.scale.toFixed(7)}. Comparação: ${other.name}, fonte ${other.source_height} px; fator ${other.scale.toFixed(7)}. Canvas original ${data.original_canvas.join(' × ')} px.`}
+$('info').textContent=`${c.name}: fonte de referência ${c.source_height} px; fator deste frame ${f.scale_applied.toFixed(7)}${c.scale_mode==='annotated_segment_curve'?' · correção anatômica anotada':''}. Comparação: ${other.name}, fonte ${other.source_height} px; fator de referência ${other.scale.toFixed(7)}. Canvas original ${data.original_canvas.join(' × ')} px.`}
 $('clip').onchange=()=>{current=Number($('clip').value);index=0;elapsed=0;render()};$('compare').onchange=render;$('play').onclick=()=>{play=!play;$('play').textContent=play?'Pausar':'Reproduzir'};
 $('next').onclick=()=>{play=false;index=(index+1)%data.clips[current].frames.length;render()};$('prev').onclick=()=>{play=false;index=Math.max(0,index-1);render()};$('seek').oninput=()=>{play=false;index=Number($('seek').value);render()};
 function tick(t){if(play){elapsed+=Math.min((t-last)/1000,.2);let changed=false;while(elapsed>=data.clips[current].frames[index].duration_s){elapsed-=data.clips[current].frames[index].duration_s;index=(index+1)%data.clips[current].frames.length;changed=true}if(changed)render()}last=t;requestAnimationFrame(tick)}render();requestAnimationFrame(tick);

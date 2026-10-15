@@ -1,3 +1,16 @@
+test_annotated_floor_stays_fixed_without_recentering_horizontal_motion (test_corrections.ScaleCorrectionTests.test_annotated_floor_stays_fixed_without_recentering_horizontal_motion) ... ok
+test_annotated_scale_drift_does_not_bypass_pose_quality (test_corrections.ScaleCorrectionTests.test_annotated_scale_drift_does_not_bypass_pose_quality) ... ok
+test_another_source_video_is_rejected (test_corrections.ScaleCorrectionTests.test_another_source_video_is_rejected) ... ok
+test_excessive_correction_is_rejected (test_corrections.ScaleCorrectionTests.test_excessive_correction_is_rejected) ... ok
+test_floor_correction_cannot_flatten_a_jump_or_dash (test_corrections.ScaleCorrectionTests.test_floor_correction_cannot_flatten_a_jump_or_dash) ... ok
+test_inputs_are_preserved (test_corrections.ScaleCorrectionTests.test_inputs_are_preserved) ... ok
+test_invalid_or_tiny_landmarks_are_rejected (test_corrections.ScaleCorrectionTests.test_invalid_or_tiny_landmarks_are_rejected) ... ok
+test_no_silent_extrapolation_or_duplicate_keyframes (test_corrections.ScaleCorrectionTests.test_no_silent_extrapolation_or_duplicate_keyframes) ... ok
+test_partial_invalid_or_incompatible_floor_annotations_are_rejected (test_corrections.ScaleCorrectionTests.test_partial_invalid_or_incompatible_floor_annotations_are_rejected) ... ok
+test_reference_pose_must_be_measured (test_corrections.ScaleCorrectionTests.test_reference_pose_must_be_measured) ... ok
+test_scale_only_correction_preserves_vertical_motion (test_corrections.ScaleCorrectionTests.test_scale_only_correction_preserves_vertical_motion) ... ok
+test_segment_output_size_is_constant_even_when_pose_height_changes (test_corrections.ScaleCorrectionTests.test_segment_output_size_is_constant_even_when_pose_height_changes) ... ok
+test_unannotated_clips_keep_the_original_constant_transform (test_corrections.ScaleCorrectionTests.test_unannotated_clips_keep_the_original_constant_transform) ... ok
 test_alpha_resampling_does_not_add_green_fringe (test_pipeline.Tests.test_alpha_resampling_does_not_add_green_fringe) ... ok
 test_background_failure_never_approved (test_pipeline.Tests.test_background_failure_never_approved) ... ok
 test_cycle_sequence_with_leadin_and_small_noise (test_pipeline.Tests.test_cycle_sequence_with_leadin_and_small_noise) ... ok
@@ -6,15 +19,20 @@ test_horizontal_and_vertical_displacement_preserved (test_pipeline.Tests.test_ho
 test_html_escapes_script_injection (test_pipeline.Tests.test_html_escapes_script_injection) ... ok
 test_in_video_zoom_ambiguity_rejected (test_pipeline.Tests.test_in_video_zoom_ambiguity_rejected) ... ok
 test_master_coherence_requires_anatomical_evidence (test_pipeline.Tests.test_master_coherence_requires_anatomical_evidence) ... ok
+test_master_directory_name_is_reserved (test_pipeline.Tests.test_master_directory_name_is_reserved) ... ok
 test_master_scale_mismatch_is_not_repaired_by_pose_height (test_pipeline.Tests.test_master_scale_mismatch_is_not_repaired_by_pose_height) ... ok
 test_missing_idle (test_pipeline.Tests.test_missing_idle) ... ok
 test_negative_landmarks_rejected (test_pipeline.Tests.test_negative_landmarks_rejected) ... ok
+test_nonempty_output_is_preserved (test_pipeline.Tests.test_nonempty_output_is_preserved) ... ok
+test_output_cannot_contain_original_inputs (test_pipeline.Tests.test_output_cannot_contain_original_inputs) ... ok
 test_similarity_self (test_pipeline.Tests.test_similarity_self) ... ok
 test_static_hold_is_not_claimed_as_a_cycle (test_pipeline.Tests.test_static_hold_is_not_claimed_as_a_cycle) ... ok
 test_visual_scale_and_uniform_transform (test_pipeline.Tests.test_visual_scale_and_uniform_transform) ... ok
 test_wrong_pose_and_explicit_out_of_range_rejected (test_pipeline.Tests.test_wrong_pose_and_explicit_out_of_range_rejected) ... ok
 test_all_frames_timestamps_and_original_resolution (test_real.RealFootageTests.test_all_frames_timestamps_and_original_resolution) ... ok
 test_atlas_round_trip_and_shared_coordinates (test_real.RealFootageTests.test_atlas_round_trip_and_shared_coordinates) ... ok
+test_crouch_does_not_grow_during_the_transition (test_real.RealFootageTests.test_crouch_does_not_grow_during_the_transition) ... ok
+test_crouch_head_measurements_on_frames_not_used_for_calibration (test_real.RealFootageTests.test_crouch_head_measurements_on_frames_not_used_for_calibration) ... ok
 test_no_per_frame_scale_or_recenter_and_movement_preserved (test_real.RealFootageTests.test_no_per_frame_scale_or_recenter_and_movement_preserved) ... ok
 test_pose_starting_crouched_uses_crouch_master (test_real.RealFootageTests.test_pose_starting_crouched_uses_crouch_master) ... ok
 test_problem_silhouettes_are_reported (test_real.RealFootageTests.test_problem_silhouettes_are_reported) ... ok
@@ -24,6 +42,6 @@ test_switching_reference_poses_has_same_floor_and_visual_size (test_real.RealFoo
 test_visual_scale_across_different_video_sizes (test_real.RealFootageTests.test_visual_scale_across_different_video_sizes) ... ok
 
 ----------------------------------------------------------------------
-Ran 24 tests in 25.918s
+Ran 42 tests in 57.567s
 
 OK

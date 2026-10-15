@@ -19,7 +19,7 @@
       "-v",
       "error",
       "-i",
-      "/workspace/real-inputs/L(jab).mp4",
+      "/workspace/sprite-originals/L(jab).mp4",
       "-vf",
       "scale=iw/2:ih/2:flags=lanczos",
       "-fps_mode",
@@ -30,7 +30,7 @@
       "ffv1",
       "-level",
       "3",
-      "/workspace/validated-delivery/jab-half.nut"
+      "/workspace/idle-crouch-corrected/jab-half.nut"
     ],
     "note": "Controlled geometric resampling of an existing complete video; no poses or motion synthesized."
   },

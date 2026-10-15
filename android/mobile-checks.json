@@ -8,6 +8,7 @@
     "master_overlay",
     "idle_jab_idle",
     "idle_dash_idle",
+    "idle_crouch_idle",
     "cycle_preview_without_frame_discard"
   ],
   "page_errors": [],

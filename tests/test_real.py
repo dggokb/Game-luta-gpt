@@ -147,6 +147,45 @@ class RealFootageTests(unittest.TestCase):
             self.assertLessEqual(abs(b[3]-c['root'][1]), 1)
         self.assertLessEqual(max(heights)-min(heights), 2)
 
+    def test_crouch_does_not_grow_during_the_transition(self):
+        for name in ('crouch', 'crouch_jab'):
+            c = self.clips[name]
+            with self.subTest(clip=name):
+                self.assertEqual(c['scale_mode'], 'annotated_segment_curve')
+                self.assertNotIn('transform_source_to_output', c)
+                measured = c['scale_correction']['keyframes']
+                source_lengths = [key['length_px'] for key in measured]
+                corrected_lengths = []
+                for key in measured:
+                    f = c['frames'][key['frame']]
+                    matrix = np.asarray(f['transform_source_to_output'])
+                    points = np.asarray(key['points'])
+                    transformed = points@matrix[:, :2].T+matrix[:, 2]
+                    corrected_lengths.append(np.linalg.norm(transformed[1]-transformed[0]))
+                    self.assertAlmostEqual(key['ground_y']*matrix[1, 1]+matrix[1, 2], c['root'][1])
+                self.assertGreater(max(source_lengths)/min(source_lengths), 1.05)
+                self.assertLess(max(corrected_lengths)-min(corrected_lengths), .001)
+                floors = []
+                for f in c['frames']:
+                    actual = bounds(self.read(f))
+                    floors.append(actual[3])
+                    matrix = np.asarray(f['transform_source_to_output'])
+                    expected = np.asarray(f['bbox_source'][:2])*matrix[0, 0]+matrix[:, 2]
+                    np.testing.assert_allclose(actual[:2], expected, atol=2)
+                self.assertLessEqual(max(floors)-min(floors), 4)
+
+    def test_crouch_head_measurements_on_frames_not_used_for_calibration(self):
+        c = self.clips['crouch']
+        # Independent manual checkpoints, deliberately absent from the curve.
+        held_out = [(40, [[584, 146], [618, 291]]), (80, [[584, 147], [620, 291]])]
+        target = c['scale_correction']['keyframes'][0]['segment_length_output_px']
+        calibrated = {key['frame'] for key in c['scale_correction']['keyframes']}
+        for index, points in held_out:
+            self.assertNotIn(index, calibrated)
+            length = np.linalg.norm(np.subtract(points[1], points[0]))
+            corrected = length*c['frames'][index]['scale_applied']
+            self.assertLess(abs(corrected/target-1), .025)
+
 
 if __name__ == '__main__':
     unittest.main()

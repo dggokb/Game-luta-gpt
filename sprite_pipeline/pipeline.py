@@ -1,4 +1,4 @@
-"""Traceable project processing. Only matching reference poses determine scale."""
+"""Traceable reference calibration and optional annotated scale-drift correction."""
 import json
 import math
 import re
@@ -9,6 +9,7 @@ from .errors import CalibrationError
 from .extraction import extract_video, digest
 from .imaging import image_rgba, bounds, affine_rgba, save_rgba
 from .calibration import load_master, master_coherence, scan, calibrate
+from .corrections import frame_transforms
 from .loops import loop_candidates
 from .motion import motion_summary
 from .exporting import write_json, export_sheets, contact_sheet
@@ -75,9 +76,9 @@ def process(config_path, output):
                 cv2.circle(annotated, pt, 4, (80, 230, 220, 255), -1)
         save_rgba(output/'masters'/f'{pose}-landmarks.png', annotated)
         reference_meta[pose]['landmarks_file'] = f'masters/{pose}-landmarks.png'
-    manifest = {'format_version': 2, 'status': 'requires_visual_review', 'canvas': None, 'root': None,
+    manifest = {'format_version': 3, 'status': 'requires_visual_review', 'canvas': None, 'root': None,
                 'coordinate_system': {'x': 'right', 'y': 'down', 'unit': 'output_pixel',
-                                      'motion': 'one constant affine transform per clip; visual displacement preserved; do not apply it twice'},
+                                      'motion': 'constant affine transform unless an explicit annotated scale curve is supplied; each frame records its matrix; do not apply it twice'},
                 'references': reference_meta, 'master_coherence': coherence, 'clips': [],
                 'limitations': ['Matching is measured, not proof of anatomical identity.',
                                'Support anchors are silhouette measurements, not tracked skeleton roots.',
@@ -111,22 +112,25 @@ def process(config_path, output):
             if any(f['bbox'] is None for f in frames):
                 raise CalibrationError('Frame sem silhueta mensurável; extração bruta preservada para revisão')
             height = (masters[pose]['bbox'][3]-masters[pose]['bbox'][1])*master_scale
-            cal = calibrate(frames, masters[pose], height, clip, threshold)
+            cal = calibrate(frames, masters[pose], height, clip, threshold,
+                            allow_scale_drift=clip.get('scale_correction') is not None)
+            transforms, correction = frame_transforms(clip, metadata, cal)
         except CalibrationError as error:
             info['rejection_reason'] = str(error)
             write_json(dest/'metadata.json', info)
             continue
         info.update(cal)
-        info['motion'] = motion_summary(frames, cal['scale_per_video'], cal['reference_frame'], info['animation_type'])
+        info['scale_mode'] = 'annotated_segment_curve' if correction else 'constant_per_video'
+        if correction:
+            info['scale_correction'] = correction
         info['status'] = 'requires_visual_review'
         info['loops'] = loop_candidates(frames, int(clip.get('loop_minimum_period', 6))) if clip.get('detect_loop') else []
-        ox, oy = cal['source_root']
-        master_offset = [0, 0]
-        scale = cal['scale_per_video']
-        boxes = [[(b[0]-ox)*scale+master_offset[0], (b[1]-oy)*scale+master_offset[1],
-                  (b[2]-ox)*scale+master_offset[0], (b[3]-oy)*scale+master_offset[1]] for b in (f['bbox'] for f in frames)]
+        boxes = [[b[0]*m[0][0]+m[0][2], b[1]*m[1][1]+m[1][2],
+                  b[2]*m[0][0]+m[0][2], b[3]*m[1][1]+m[1][2]]
+                 for b, m in zip((f['bbox'] for f in frames), transforms)]
+        info['motion'] = motion_summary([{'bbox': b} for b in boxes], 1, cal['reference_frame'], info['animation_type'])
         all_boxes.extend(boxes)
-        jobs.append((clip, info, frames, boxes, master_offset))
+        jobs.append((clip, info, frames, boxes, transforms))
     # A shared project extent, expanded by actual motion and attacks, never a
     # per-animation fit. Include both master reference extents as well.
     for m in masters.values():
@@ -146,29 +150,32 @@ def process(config_path, output):
             translation = [root[i]-m['root'][i]*master_scale for i in (0, 1)]
             save_rgba(output/'masters'/f'{pose}-aligned.png', affine_rgba(m['rgba'], master_scale, translation, canvas))
             reference_meta[pose]['aligned_file'] = f'masters/{pose}-aligned.png'
-        for clip, info, frames, boxes, master_offset in jobs:
+        for clip, info, frames, boxes, transforms in jobs:
             dest = output/info['name']
             normalized = dest/'normalized'
             normalized.mkdir()
-            scale = info['scale_per_video']
-            translation = [root[i]-info['source_root'][i]*scale+master_offset[i] for i in (0, 1)]
-            info['transform_source_to_output'] = [[scale, 0, translation[0]], [0, scale, translation[1]]]
+            absolute = [[[m[0][0], 0, m[0][2]+root[0]], [0, m[1][1], m[1][2]+root[1]]] for m in transforms]
+            key = 'calibration_transform_source_to_output' if 'scale_correction' in info else 'transform_source_to_output'
+            info[key] = absolute[info['reference_frame']]
             info['root'] = root
             info['canvas'] = canvas
-            ref_box = frames[info['reference_frame']]['bbox']
+            ref_box = boxes[info['reference_frame']]
             for i, (frame, entry) in enumerate(zip(frames, info['frames'])):
                 rgba = image_rgba(cv2.imread(str(dest/'raw'/entry['file']), cv2.IMREAD_UNCHANGED), info['background_treatment'])
+                matrix = absolute[i]
+                scale, translation = matrix[0][0], [matrix[0][2], matrix[1][2]]
                 result = affine_rgba(rgba, scale, translation, canvas)
                 file = f'{i:06d}.png'
                 save_rgba(normalized/file, result)
                 b = frame['bbox']
                 observed = bounds(result)
                 entry.update(normalized_file=f"{info['name']}/normalized/{file}", bbox_source=b,
+                             scale_applied=scale, transform_source_to_output=matrix,
                              bbox_output=observed, offset_from_root=[observed[0]-root[0], observed[1]-root[1]],
                              support_proxy_source=[(b[0]+b[2])/2, b[3]],
-                             visual_displacement_from_reference=[((b[0]+b[2]-ref_box[0]-ref_box[2])/2)*scale, (b[3]-ref_box[3])*scale],
+                             visual_displacement_from_reference=[(boxes[i][0]+boxes[i][2]-ref_box[0]-ref_box[2])/2, boxes[i][3]-ref_box[3]],
                              warnings=frame['warnings'])
-            info['visual_displacement_note'] = 'BBox support proxy, not skeleton root. Includes pose changes; no stabilization or independent frame recentering.'
+            info['visual_displacement_note'] = 'Output bbox support proxy, not skeleton root. Includes pose changes. Explicit anatomical scale and ground corrections, if configured, are recorded in each frame matrix.'
             info['spritesheets'] = export_sheets(dest, info['frame_count'], canvas, root, atlas_size)
             write_json(dest/'metadata.json', info)
         evidence = [cv2.cvtColor(cv2.imread(str(output/'masters'/'idle-aligned.png'), -1), cv2.COLOR_BGRA2RGBA)]
@@ -183,7 +190,7 @@ def process(config_path, output):
     manifest['review'] = {'visual_approval': False, 'reason': 'Aprovação visual externa obrigatória; execução de testes não aprova arte.'}
     write_json(output/'manifest.json', manifest)
     write_json(output/'calibration-report.json', {k: manifest[k] for k in ('status', 'references', 'master_coherence', 'review')} | {
-        'clips': [{k: c.get(k) for k in ('name', 'status', 'reference_frame', 'reference_similarity', 'metrics', 'scale_per_video', 'source_root', 'peer_height_spread', 'rejection_reason', 'frame_warnings')} for c in manifest['clips']]})
+        'clips': [{k: c.get(k) for k in ('name', 'status', 'reference_frame', 'reference_similarity', 'metrics', 'scale_per_video', 'scale_mode', 'scale_correction', 'source_root', 'peer_height_spread', 'rejection_reason', 'frame_warnings')} for c in manifest['clips']]})
     write_json(output/'project.snapshot.json', cfg)
     write_viewer(output, manifest)
     return manifest

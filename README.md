@@ -2,7 +2,7 @@
 
 Ferramenta local e independente para calibrar vídeos existentes por imagens mestres. Não depende de jogo, motor, personagem, serviço pago ou geração por IA. Nenhuma pose ou movimento é sintetizado.
 
-A escala é calculada **uma vez por vídeo**, a partir de uma pose equivalente ao Idle Master ou Crouch Master. Uma transformação uniforme e constante é aplicada a todos os frames. O canvas global cresce para acomodar golpes e deslocamentos; o personagem não encolhe para caber nele.
+A escala de referência é calculada a partir de uma pose equivalente ao Idle Master ou Crouch Master. Por padrão, uma transformação uniforme e constante é aplicada a todos os frames. Vídeos que mudam de tamanho durante a animação podem receber uma **correção explícita por segmentos anatômicos anotados**, interpolada pelos timestamps originais. O canvas global cresce para acomodar golpes e deslocamentos; o personagem não encolhe para caber nele.
 
 ## Ver no celular
 
@@ -25,22 +25,32 @@ Abra `resultado-novo/index.html` no navegador. Funciona por `file://`, sem servi
 2. Para verificar a coerência entre mestres de poses diferentes, marque os extremos de segmentos anatômicos rígidos equivalentes, por exemplo o eixo da cabeça. `anatomical_segments` contém dois pontos `[x,y]` por mestre, em pixels originais. Use vários segmentos quando puder. O relatório mede seus comprimentos e mostra as marcações; a qualidade dessa verificação depende da qualidade das anotações.
 3. Diferenças acima de `master_scale_tolerance` (8% por padrão) ou ausência de anotações bloqueiam a calibração por Crouch. Nenhuma correção entre mestres é inventada. Fornecer apenas Idle é permitido para um lote exclusivamente em pé.
 4. Declare a **pose que realmente está no vídeo** em `reference_pose`. Um vídeo que começa em Idle e depois agacha pode usar Idle para a calibração. O programa inspeciona todos os frames; prefere o primeiro entre candidatos com qualidade próxima à melhor. `reference_frame` fixa um candidato, mas não contorna os critérios de qualidade.
-5. Silhueta, aparência RGB e concordância das escalas horizontal/vertical precisam concordar. Candidatos com corte ou fundo residual não calibram. Poses equivalentes que variam mais de 6% de altura dentro do mesmo vídeo bloqueiam o clip: uma escala fixa não corrige zoom/deformação.
+5. Silhueta, aparência RGB e concordância das escalas horizontal/vertical precisam concordar. Candidatos com corte ou fundo residual não calibram. Poses equivalentes que variam mais de 6% de altura dentro do mesmo vídeo bloqueiam o clip sem correção anotada: uma escala fixa não corrige zoom/deformação. Uma correção explícita não dispensa os critérios de qualidade da pose.
 6. O fator vem da altura da **pose equivalente**, preservando proporções. Não se usa a maior altura durante um golpe, nem a resolução do vídeo. A proporção Idle/Crouch só é utilizada depois de verificar os segmentos anatômicos.
 
 `minimum_similarity` (padrão 0.82) ajusta o score agregado. Há também limites mínimos conservadores para silhueta (0.78), aparência (0.70) e concordância dimensional (0.88). Diminuir o score não ignora esses limites. Clips rejeitados conservam todos os frames brutos e candidatos medidos para revisão. O CLI retorna código 2 quando há rejeição; o HTML continua disponível. Não use limiares baixos para forçar uma pose incompatível.
 
 `target_heights` da versão anterior foi removido: alturas independentes para Idle/Crouch não comprovam escala anatômica. Migre para mestres coerentes e segmentos anotados.
 
+## Diferença de tamanho durante Idle → Crouch
+
+Calibrar somente o Idle inicial não verifica o restante do movimento. No lote real, a medida anotada da cabeça crescia até cerca de 13% durante o Crouch. Esse crescimento passava para os frames exportados e para o APK.
+
+`scale_correction` em um clip permite anotar o **mesmo segmento anatômico** em keyframes, incluindo início, fim e a pose de calibração. Consulte [as marcações reais](examples/real-scale-corrections.json) e [a comparação antes/depois](docs/CORRECAO-CROUCH.md). A curva interpola o comprimento do segmento pelo tempo original e aplica uma escala uniforme ao frame inteiro. A medida da pose inicial é conservada; a altura total do corpo não é igualada entre Idle e Crouch. Redução por postura continua visível.
+
+`ground_y` opcional anota o apoio vertical em todos os keyframes de clips `stationary` ou `crouched`. Ele mantém o chão indicado sem recentralizar X. É recusado para Jump e Dash. As marcações reais incluem o SHA-256 da fonte, impedindo seu uso em outro vídeo. Variações acima de `maximum_change_fraction` (20% por padrão, máximo configurável de 50%) são rejeitadas.
+
+Esse modo é opt-in. Não detecta anatomia automaticamente, não redesenha membros e não corrige diferenças internas de proporção. A precisão depende das marcações; pontos intermediários devem ser conferidos fora dos keyframes utilizados.
+
 ## Coordenadas, root e movimento
 
 O projeto tem um canvas, uma origem, X para a direita e Y para baixo. Por padrão o root é o centro inferior da silhueta da pose de referência. Esse ponto é uma **referência de apoio mensurável**, não uma articulação esquelética detectada. `master_roots` permite anotar outro root em cada mestre; `source_root` pode especificar o ponto equivalente no clip. Esses valores ficam nos metadados.
 
-Cada clip registra uma única matriz `transform_source_to_output`. Não há escala, centralização, estabilização ou remoção de translação por frame. Dash mantém movimento horizontal; Jump mantém movimento vertical. Os offsets medem o desenho em relação ao root comum. A trajetória do apoio da silhueta é um indicador visual e também muda quando braços/pernas mudam a bbox; não deve ser tratada como root motion esquelético.
+O manifesto v3 registra `transform_source_to_output` e `scale_applied` em cada frame. Clips constantes também mantêm a matriz única no nível do clip. Clips corrigidos registram `scale_mode: "annotated_segment_curve"`, a curva medida e `calibration_transform_source_to_output`; consumidores devem usar a matriz de cada frame. Não há recentralização horizontal por frame. Dash mantém movimento horizontal; Jump mantém movimento vertical. Os offsets medem o desenho em relação ao root comum. A trajetória do apoio da silhueta é um indicador visual e também muda quando braços/pernas mudam a bbox; não deve ser tratada como root motion esquelético.
 
 `animation_type` aceita `stationary`, `translation`, `airborne` e `crouched`. O resumo de movimento também propõe uma classificação conservadora baseada no apoio observado. Distinguir movimento de câmera, mudança de pose e locomoção exige revisão. A classificação não modifica pixels.
 
-No visualizador, `role: "idle"`, `"jab"` e `"dash"` habilitam as respectivas sequências. A comparação usa o mesmo zoom nos dois painéis normalizados. Ao encadear clips, a prévia conserva o apoio final para posicionar a próxima pose; essa translação é apenas da prévia e não altera os PNGs.
+No visualizador, `role: "idle"`, `"jab"`, `"dash"` e `"crouch"` habilitam as respectivas sequências. A comparação usa o mesmo zoom nos dois painéis normalizados. Ao encadear clips, a prévia conserva o apoio final para posicionar a próxima pose; essa translação é apenas da prévia e não altera os PNGs.
 
 ## Fundo e qualidade
 

@@ -9,7 +9,7 @@
 <label>Animação <select id="clip"></select></label><label>Comparar <select id="compare"></select></label>
 <button id="play">Reproduzir</button><button id="prev">◀ frame</button><button id="next">frame ▶</button>
 <input id="seek" type="range" min="0" value="0" aria-label="Frame"><span id="position"></span><br>
-<button id="jab">Idle → Jab → Idle</button><button id="dash">Idle → Dash → Idle</button>
+<button id="jab">Idle → Jab → Idle</button><button id="dash">Idle → Dash → Idle</button><button id="crouch">Idle → Crouch → Idle</button>
 <button id="single">Animação completa</button><label>Ciclo proposto <select id="loop"><option value="">Todos os frames</option></select></label>
 <label><input id="ghost" type="checkbox">Sobrepor mestre</label><label><input id="guides" type="checkbox" checked>Chão, root e limites</label>
 <label>Zoom comum <input id="zoom" type="number" value="1" min="0.1" max="4" step="0.1" style="width:65px"></label>
@@ -29,7 +29,7 @@
 <script>
 'use strict';
 const data=JSON.parse(document.querySelector('#data').textContent), $=id=>document.getElementById(id);
-const clips=data.clips, usable=clips.filter(c=>c.normalized_file||c.transform_source_to_output), cache=new Map();
+const clips=data.clips, usable=clips.filter(c=>c.frames.some(f=>f.normalized_file)), cache=new Map();
 let current=0, frame=0, playing=false, lastTime=0, elapsed=0, sequence=null, sequenceIndex=0, carry=[0,0], pendingCarry=[0,0], renderToken=0;
 function option(select,value,text){const o=document.createElement('option');o.value=value;o.textContent=text;select.append(o)}
 clips.forEach((c,i)=>option($('clip'),i,c.name+(c.status==='rejected'?' — REJEITADO':'')));
@@ -40,7 +40,7 @@ for(const [pose,ref] of Object.entries(data.references)){
  const a=document.createElement('a');a.href=ref.file;a.textContent=pose+' master';a.style.marginRight='20px';$('masterImages').append(a);const im=document.createElement('img');im.src=ref.landmarks_file||ref.file;im.alt=pose+' — segmentos anatômicos anotados';im.style.width='45%';im.style.display='inline-block';$('masterImages').append(im);
 }
 const table=document.createElement('table');
-for(const row of [['Animação','Pose / frame','Escala única','Qualidade / alertas'],...clips.map(c=>[c.name,`${c.reference_pose} / ${c.reference_frame??'—'}`,c.scale_per_video?.toFixed(7)||'REJEITADO',c.rejection_reason||`${JSON.stringify(c.metrics)}; ${c.frame_warnings.length} frames com alertas`])]){
+for(const row of [['Animação','Pose / frame','Escala de referência / correção','Qualidade / alertas'],...clips.map(c=>[c.name,`${c.reference_pose} / ${c.reference_frame??'—'}`,(c.scale_per_video?.toFixed(7)||'REJEITADO')+(c.scale_correction?' · curva anatômica anotada':''),c.rejection_reason||`${JSON.stringify(c.metrics)}; ${c.frame_warnings.length} frames com alertas`])]){
  const tr=document.createElement('tr');for(const value of row){const td=document.createElement('td');td.textContent=value;tr.append(td)}table.append(tr);
 }$('table').append(table);
 function load(src){if(!cache.has(src)){cache.set(src,new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src}));if(cache.size>80)cache.delete(cache.keys().next().value)}return cache.get(src)}
@@ -60,7 +60,7 @@ async function render(){
  if(ghost){ctx.globalAlpha=.35;ctx.drawImage(ghost,0,0);ctx.globalAlpha=1}
  if(im)ctx.drawImage(im,carry[0],carry[1]);outline(ctx,[data.root[0]+carry[0],data.root[1]+carry[1]],f.bbox_output?.map((v,i)=>v+carry[i%2]),data.canvas);
  if(ci)cc.drawImage(ci,0,0);outline(cc,data.root,cf.bbox_output,data.canvas);
- $('normalInfo').textContent=`${c.name} · fator ${c.scale_per_video.toFixed(7)}\nroot ${JSON.stringify(data.root)} · bbox ${JSON.stringify(f.bbox_output)}\noffset ${JSON.stringify(f.offset_from_root)}\n${f.warnings.join(', ')||'Sem alerta de silhueta neste frame'}\nDeslocamento de prévia: ${carry.map(v=>v.toFixed(2))}`;
+ $('normalInfo').textContent=`${c.name} · fator ${(f.scale_applied??c.scale_per_video).toFixed(7)}${c.scale_correction?' · correção anatômica anotada':''}\nroot ${JSON.stringify(data.root)} · bbox ${JSON.stringify(f.bbox_output)}\noffset ${JSON.stringify(f.offset_from_root)}\n${f.warnings.join(', ')||'Sem alerta de silhueta neste frame'}\nDeslocamento de prévia: ${carry.map(v=>v.toFixed(2))}`;
  $('compareInfo').textContent=`${compare.name} · frame equivalente ${compare.reference_frame}\nfator ${compare.scale_per_video.toFixed(7)} · bbox ${JSON.stringify(cf.bbox_output)}\nZoom comum: ${k.toFixed(4)} px de tela / px de saída`;
 }
 function change(){const c=clips[current];$('clip').value=current;frame=0;elapsed=0;$('loop').replaceChildren();option($('loop'),'','Todos os frames');(c.loops||[]).forEach((l,i)=>option($('loop'),i,`início ${l.start_frame}, ${l.period_frames} frames, ${(l.confidence*100).toFixed(1)}%`));$('loopInfo').textContent=JSON.stringify(c.loops||[],null,2);render()}
@@ -68,7 +68,7 @@ function range(){const l=$('loop').value,c=clips[current];if(l!==''&&c.loops[Num
 function advance(){const [start,end]=range();if(frame+1<end){frame++;return}if(sequence){const c=clips[current],last=c.frames[frame],first=c.frames[0];pendingCarry=[carry[0]+last.visual_displacement_from_reference[0]-first.visual_displacement_from_reference[0],carry[1]+last.visual_displacement_from_reference[1]-first.visual_displacement_from_reference[1]];sequenceIndex++;if(sequenceIndex>=sequence.length){sequenceIndex=0;pendingCarry=[0,0]}current=sequence[sequenceIndex];carry=pendingCarry;change()}else frame=start}
 function role(r){return clips.findIndex(c=>(c.role===r||c.name.toLowerCase()===r)&&c.status!=='rejected')}
 function startSequence(r){const idle=role('idle'),action=role(r);if(idle<0||action<0)return;sequence=[idle,action,idle];sequenceIndex=0;carry=[0,0];current=idle;playing=true;$('play').textContent='Pausar';$('sequenceNote').textContent=`Sequência: ${clips[idle].name} → ${clips[action].name} → ${clips[idle].name}. Encadeamento da prévia usa o apoio da silhueta; PNGs e metadados permanecem nas coordenadas comuns.`;change()}
-for(const r of ['jab','dash']){$(r).disabled=role('idle')<0||role(r)<0;$(r).onclick=()=>startSequence(r)}
+for(const r of ['jab','dash','crouch']){$(r).disabled=role('idle')<0||role(r)<0;$(r).onclick=()=>startSequence(r)}
 $('play').onclick=()=>{playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir';elapsed=0};
 $('prev').onclick=()=>{playing=false;$('play').textContent='Reproduzir';frame=Math.max(range()[0],frame-1);render()};$('next').onclick=()=>{playing=false;$('play').textContent='Reproduzir';advance();render()};
 $('seek').oninput=()=>{playing=false;$('play').textContent='Reproduzir';frame=Number($('seek').value);render()};

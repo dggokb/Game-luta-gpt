@@ -4,6 +4,7 @@
     "before_after_and_common_comparison_zoom",
     "idle_jab_idle_sequence",
     "idle_dash_idle_sequence",
+    "idle_crouch_idle_sequence",
     "seek_and_airborne_frame",
     "advisory_loop_selection_and_timestamp_playback"
   ],

@@ -20,6 +20,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--inputs', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True, help='New validation directory')
+    parser.add_argument('--without-scale-correction', action='store_true',
+                        help='Reproduce the constant-scale baseline for before/after comparison')
     args = parser.parse_args()
     source, output = args.inputs.resolve(), args.output.resolve()
     required = ['inicio_centro.png','inicio_agachado.png','idle.mp4','L(jab).mp4',
@@ -42,10 +44,14 @@ def main():
         {'name':'dash','video':'dash.mp4','role':'dash','animation_type':'translation'},
         {'name':'jump','video':'jump.mp4','animation_type':'airborne'},
         # These two sources actually start standing; use their real Idle pose.
-        {'name':'crouch','video':'crounch.mp4','animation_type':'crouched'},
+        {'name':'crouch','video':'crounch.mp4','role':'crouch','animation_type':'crouched'},
         {'name':'crouch_jab','video':'l2(jab).mp4','animation_type':'crouched'},
         {'name':'crouch_small','video':'dano_baixo.mp4','reference_pose':'crouch','animation_type':'crouched'}]
+    corrections = {} if args.without_scale_correction else json.loads(
+        (Path(__file__).resolve().parents[1]/'examples/real-scale-corrections.json').read_text())
     for c in clips:
+        if c['name'] in corrections:
+            c['scale_correction'] = corrections[c['name']]
         c['video'] = str(source/c['video'])
     clips.insert(2,{'name':'jab_half','video':str(derived),
                     'background':{'mode':'green','exclude_rectangles':[[0,0,32,25]]}})

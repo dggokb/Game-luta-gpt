@@ -35,7 +35,7 @@ def main():
         page.check('#ghost')
         page.wait_for_function("document.querySelector('#normalInfo').textContent.includes('jab_half')")
         page.uncheck('#ghost')
-        for action in ('jab','dash'):
+        for action in ('jab','dash','crouch'):
             page.click('#'+action)
             page.wait_for_function('playing === true && sequence !== null')
             # Advance deterministically across the full sequence using frame controls.
@@ -43,6 +43,10 @@ def main():
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function(f"document.querySelector('#normalInfo').textContent.startsWith('{action} ·')")
             page.screenshot(path=str(args.screenshots/f'idle-{action}-idle.png'),full_page=True)
+            if action == 'crouch':
+                page.evaluate('frame=60;render()')
+                page.wait_for_function("document.querySelector('#normalInfo').textContent.includes('correção anatômica anotada') && document.querySelector('#position').textContent.startsWith('61/')")
+                page.screenshot(path=str(args.screenshots/'crouch-corrected.png'),full_page=True)
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function("document.querySelector('#normalInfo').textContent.startsWith('idle ·')")
             report['checks'].append('idle_'+action+'_idle_sequence')
