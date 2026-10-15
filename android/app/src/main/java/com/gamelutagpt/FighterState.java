@@ -15,6 +15,11 @@ final class FighterState {
     int recoverableLife;
     /** Super meter in thousandths of a bar (0..CombatConfig.MAX_METER); integer for determinism. */
     int superMeter;
+    /**
+     * Vida que nenhum golpe tira (0 = pode cair). A cinemática da luta segura 1 enquanto espera
+     * o gatilho de vida baixa e enquanto roda, para nenhum golpe pular a cena indo direto ao KO.
+     */
+    int lifeFloor;
     String lifeHudLabel;
     String superHudLabel;
     String superLevelHudLabel;
@@ -43,7 +48,7 @@ final class FighterState {
      */
     void takeDamage(int damage, int recoverablePermille) {
         if (damage <= 0) return;
-        life = Math.max(0, life - damage);
+        life = Math.max(Math.min(lifeFloor, life), life - damage);
         recoverableLife += damage * recoverablePermille / 1000;
         if (life == 0) recoverableLife = 0;
         recoverableLife = Math.min(recoverableLife, profile.maxLife - life);

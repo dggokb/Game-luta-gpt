@@ -295,7 +295,16 @@ public class PaginaHistoriaTest {
     public void traducoesCobremOsEpisodiosEOMenu() throws IOException {
         Temporada temporada = Temporada.fromJson(read("historia/temporada.json"));
         List<String> textos = new ArrayList<>();
-        for (String id : temporada.episodios) textos.addAll(textosDoEpisodio(Episodio.fromJson(read("historia/" + id + "/episodio.json"))));
+        for (String id : temporada.episodios) {
+            Episodio ep = Episodio.fromJson(read("historia/" + id + "/episodio.json"));
+            textos.addAll(textosDoEpisodio(ep));
+            // As falas e onomatopeias das cinemáticas das lutas também.
+            for (Episodio.Passo passo : ep.passos) {
+                if (passo.cinematica != null) {
+                    textos.addAll(CinematicaLuta.ler(temporada, read("historia/" + passo.cinematica)).textos());
+                }
+            }
+        }
         textos.addAll(java.util.Arrays.asList(MenuInicial.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuPausa.TEXTOS));
         textos.addAll(java.util.Arrays.asList(EscolhaIrmao.TEXTOS));

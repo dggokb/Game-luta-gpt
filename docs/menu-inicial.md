@@ -43,7 +43,7 @@ No **modo história**:
 - a tecla **voltar** (ou ESC, ou START no controle) em qualquer ponto.
 
 Todos abrem a **pausa**: **CONTINUAR** ou **MENU INICIAL**, com o aviso de que o progresso do
-episódio se perde (ainda não há save). Na pausa tudo para (página, luta, treino, conversa).
+episódio se perde (ainda não há save). Na pausa tudo para (página, luta, treino, conversa, cinemática).
 Voltar de novo (ou B) continua. Com controle, B nas páginas continua pulando, como antes.
 
 No **modo teste** a tecla voltar na luta também abre a pausa (sem o aviso), e dali dá para

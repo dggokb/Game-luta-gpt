@@ -71,6 +71,11 @@ public final class Episodio {
         public final String cenario;
         /** Conversa nos quadros laterais durante a luta (caminho dentro de historia/), ou null. */
         public final String conversa;
+        /**
+         * Cinemática dentro da luta (caminho dentro de historia/), ou null: num gatilho (vida
+         * baixa, começo, tempo, KO) a luta vira cena ({@link CinematicaLuta}).
+         */
+        public final String cinematica;
         /** Luta do torneio: o jogador contra o próximo adversário da chave. */
         public final boolean torneio;
         /** {@code "dupla": "jogador"} ou {@code "rival"}: a dupla fixa do irmão escolhido ou do outro. */
@@ -94,7 +99,7 @@ public final class Episodio {
 
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
-              String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
+              String cinematica, String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
               String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada) {
             this.tipo = tipo;
             this.duelo = duelo;
@@ -114,6 +119,7 @@ public final class Episodio {
             this.modo = modo;
             this.cenario = cenario;
             this.conversa = conversa;
+            this.cinematica = cinematica;
             this.titulo = titulo;
             this.linhas = linhas;
             this.imagem = imagem;
@@ -299,7 +305,7 @@ public final class Episodio {
             Collections.unmodifiableList(paineis), duplaRef != null ? null : pair(map, "dupla"),
             cpuRef != null ? null : pair(map, "cpu"), string(map, "rotulo", null),
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
-            string(map, "conversa", null), string(map, "titulo", null),
+            string(map, "conversa", null), string(map, "cinematica", null), string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
             Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
             Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")));

@@ -28,9 +28,17 @@ import java.util.Map;
  * só quando ninguém está falando. Os rostos são do elenco inteiro e ficam em
  * {@code historia/retratos/<quem>_<expressao>.png}; uma expressão sem imagem usa a "normal".
  * Padrão completo: docs/historia/motor-conversas.md.
+ *
+ * A cinemática da luta ({@link CinematicaLuta}) também fala por aqui, com {@link #dizer}: o
+ * lado vem dela, não do arquivo da conversa.
  */
 public final class ConversaLuta {
     public static final String RETRATOS = Temporada.PASTA + "/retratos";
+    /**
+     * Para onde olha cada rosto que não é de frente ({@code "<quem>_<expressao>": "esquerda"}
+     * ou {@code "direita"} da imagem). O quadro espelha o rosto que olharia para fora da tela.
+     */
+    public static final String OLHAR = RETRATOS + "/olhar.json";
 
     // Quadros nas laterais, entre a barra de vida e os controles (coordenadas 1280x720).
     static final float[] QUADRO_ESQ = {14f, 198f, 150f, 192f, 146f, 330f, 10f, 338f};
@@ -71,12 +79,22 @@ public final class ConversaLuta {
         public final String expressao;
         public final String texto;
         final boolean reacao;
+        /** Lado escolhido por quem pediu a fala (a cinemática); null = o lado do arquivo. */
+        final Boolean naDireita;
+        /** Segundos na tela depois de digitada; negativo = a conta padrão pelo tamanho. */
+        final float segura;
 
         Fala(String quem, String expressao, String texto, boolean reacao) {
+            this(quem, expressao, texto, reacao, null, -1f);
+        }
+
+        Fala(String quem, String expressao, String texto, boolean reacao, Boolean naDireita, float segura) {
             this.quem = quem;
             this.expressao = expressao;
             this.texto = texto;
             this.reacao = reacao;
+            this.naDireita = naDireita;
+            this.segura = segura;
         }
     }
 
@@ -99,6 +117,8 @@ public final class ConversaLuta {
     private final Rand rand = new Rand(41);
     /** Rostos já lidos (o elenco se repete de luta em luta); null = não existe. */
     private final Map<String, RenderImage> imagens = new HashMap<>();
+    /** {@link #OLHAR}, lido uma vez; null = ainda não lido. */
+    private Map<String, Boolean> olhaEsquerda;
     private Map<String, Boolean> direita = Collections.emptyMap();
     private Map<String, List<Fala>> momentos = Collections.emptyMap();
     private Map<String, List<Fala>> reacoes = Collections.emptyMap();
@@ -136,6 +156,13 @@ public final class ConversaLuta {
     }
 
     private void carregarRostos(List<Fala> falas) {
+        if (olhaEsquerda == null) {
+            try {
+                olhaEsquerda = olharFromJson(assets.readText(OLHAR));
+            } catch (IOException | RuntimeException ex) {
+                olhaEsquerda = Collections.emptyMap();
+            }
+        }
         for (Fala f : falas) {
             for (String nome : new String[] {f.quem + "_normal", f.quem + "_" + f.expressao}) {
                 if (imagens.containsKey(nome)) continue;
@@ -148,6 +175,20 @@ public final class ConversaLuta {
                 imagens.put(nome, img);
             }
         }
+    }
+
+    /** Lê o {@link #OLHAR}: rosto → olha para a esquerda da imagem. */
+    static Map<String, Boolean> olharFromJson(String json) {
+        Map<String, Boolean> out = new HashMap<>();
+        for (Map.Entry<String, Object> e : Episodio.asMap(MiniJson.parse(json)).entrySet()) {
+            if (e.getKey().startsWith("_")) continue;
+            String lado = String.valueOf(e.getValue());
+            if (!lado.equals("esquerda") && !lado.equals("direita")) {
+                throw new IllegalArgumentException(e.getKey() + ": olhar " + lado + " (use esquerda ou direita)");
+            }
+            out.put(e.getKey(), lado.equals("esquerda"));
+        }
+        return out;
     }
 
     /** Lê e valida a conversa (quem fala tem lado e está no elenco; toda fala tem texto). */
@@ -248,6 +289,36 @@ public final class ConversaLuta {
         proxima();
     }
 
+    /**
+     * Uma fala avulsa, com o lado escolhido por quem pede (a cinemática da luta): entra na fila
+     * depois do que já foi pedido assim. {@code segura}: segundos na tela depois de digitada
+     * (negativo = a conta padrão). Funciona sem arquivo de conversa carregado.
+     */
+    public void dizer(Temporada temporada, String quem, boolean naDireita, String expressao, String texto, float segura) {
+        if (this.temporada == null) this.temporada = temporada;
+        Fala f = new Fala(quem, expressao == null ? "normal" : expressao, texto, false, naDireita, segura);
+        carregarRostos(Collections.singletonList(f));
+        if (atual != null && atual.naDireita == null) {
+            // Fala da conversa no meio: a da cinemática toma o lugar.
+            calar();
+        }
+        fila.add(f);
+        if (atual == null) proxima();
+    }
+
+    /**
+     * Para a conversa sem arrancar os quadros: a fila esvazia, a fala atual some e os quadros
+     * saem deslizando (a cinemática começou, a luta acabou...).
+     */
+    public void calar() {
+        fila.clear();
+        if (atual != null) {
+            atual = null;
+            caladoDesde = time;
+        }
+        for (Lado l : new Lado[] {esq, dir}) l.ultimaFala = Math.min(l.ultimaFala, time - SAIR_DEPOIS);
+    }
+
     public boolean tem(String momento) {
         return momentos.containsKey(momento);
     }
@@ -300,7 +371,7 @@ public final class ConversaLuta {
         if (fila.isEmpty()) return;
         atual = fila.remove(0);
         falaDesde = time;
-        Lado l = Boolean.TRUE.equals(direita.get(atual.quem)) ? dir : esq;
+        Lado l = naDireita(atual) ? dir : esq;
         if (!atual.quem.equals(l.quem) || l.entrou < 0f || l.saiu >= 0f) {
             // Outra pessoa do mesmo lado: o quadro entra de novo com o rosto dela.
             l.quem = atual.quem;
@@ -313,9 +384,13 @@ public final class ConversaLuta {
         l.ultimaFala = time + duracao(atual);
     }
 
+    private boolean naDireita(Fala f) {
+        return f.naDireita != null ? f.naDireita : Boolean.TRUE.equals(direita.get(f.quem));
+    }
+
     private float duracao(Fala f) {
         int letras = texto(f).length();
-        float segura = f.reacao ? SEGURA_REACAO
+        float segura = f.segura >= 0f ? f.segura : f.reacao ? SEGURA_REACAO
             : Math.max(SEGURA_MIN, Math.min(SEGURA_MAX, SEGURA_MIN + letras * SEGURA_POR_LETRA));
         return ENTRA + letras / DIGITA + segura;
     }
@@ -373,7 +448,15 @@ public final class ConversaLuta {
             float iw = img.width() * s, ih = img.height() * s;
             float x = caixa[0] + (w - iw) * 0.5f;
             float y = caixa[1] + (h - ih) * 0.15f;
-            c.drawImage(img, x, y, x + iw, y + ih, 255);
+            if (espelhar(l.quem, l.expressao, direita)) {
+                // O rosto olharia para fora da tela: vira para o centro.
+                c.save();
+                c.scale(-1f, 1f, cx, cy);
+                c.drawImage(img, x, y, x + iw, y + ih, 255);
+                c.restore();
+            } else {
+                c.drawImage(img, x, y, x + iw, y + ih, 255);
+            }
         } else {
             c.drawText(nome(l.quem), cx, cy + 8f, 22f, WHITE, INK, 4f, true);
         }
@@ -404,13 +487,21 @@ public final class ConversaLuta {
         return temporada != null ? temporada.personagem(id).cor : 0xFF2B3F8F;
     }
 
+    /** O rosto desenhado ({@link #imagem}) olha para fora da tela neste lado. */
+    private boolean espelhar(String quem, String expressao, boolean direita) {
+        if (olhaEsquerda == null) return false;
+        String nome = imagens.get(quem + "_" + expressao) != null ? quem + "_" + expressao : quem + "_normal";
+        Boolean esquerda = olhaEsquerda.get(nome);
+        return esquerda != null && esquerda != direita;
+    }
+
     private RenderImage imagem(String quem, String expressao) {
         RenderImage img = imagens.get(quem + "_" + expressao);
         return img != null ? img : imagens.get(quem + "_normal");
     }
 
     private void drawLegenda(RenderCanvas c) {
-        boolean naDireita = Boolean.TRUE.equals(direita.get(atual.quem));
+        boolean naDireita = naDireita(atual);
         float idade = time - falaDesde - ENTRA * 0.6f;
         if (idade <= 0f) return;
         String texto = texto(atual);

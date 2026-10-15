@@ -54,14 +54,15 @@
       {"area": [0.0, 0.5736, 0.999, 0.5924, 0.999, 0.9993, 0.0, 0.9993], "efeitos": ["impacto", "velocidade"]}
     ] },
 
-    { "tipo": "luta", "rotulo": "TREINO", "dupla": "jogador", "cpu": "rival", "repetirSeDerrota": false },
+    { "tipo": "luta", "rotulo": "TREINO", "dupla": "jogador", "cpu": "rival", "repetirSeDerrota": false,
+      "cinematica": "ep01/cinematica_treino.json" },
 
     { "tipo": "pagina", "layout": "quatro", "paineis": [
       { "imagem": "pag7_q1.jpg", "cena": "dojo", "personagens": ["ryuga", "dafu", "koga"], "foco": 0.55,
         "baloes": [
           { "tipo": "fala", "quem": "dafu", "texto": "Chega, chega! Do jeito que vocês lutam, a casa não aguenta mais um mês!", "pos": [0.5, 0.35], "rabo": [0.5, 0.6] }
         ] },
-      { "imagem": "pag7_q2.jpg", "cena": "casa", "sfx": "TOC TOC", "posicaoSfx": [0.5, 0.5] },
+      { "imagem": "pag7_q2.jpg", "cena": "casa", "sfx": "DING DONG!", "posicaoSfx": [0.5, 0.5] },
       { "imagem": "pag7_q3.jpg", "cena": "carta", "enquadramento": "detalhe",
         "baloes": [
           { "tipo": "narracao", "texto": "Duas cartas. O mesmo selo negro de dez anos atrás.", "pos": [0.3, 0.18] }

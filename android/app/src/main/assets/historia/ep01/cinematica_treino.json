@@ -1,0 +1,23 @@
+{
+  "_comentario": "Treino do Episódio 1 (jogador × rival). Quando um dos dois chega a 25% de vida, a luta vira cena: faixas, quem estiver na vez troca com o irmão (2x2), os dois saltam para trás, gritam o nome um do outro, correm e a campainha (as cartas chegando) interrompe. Motor e formato: docs/historia/motor-cinematicas.md.",
+  "gatilho": { "vida": 0.25 },
+  "acoes": [
+    { "acao": "controle", "travar": true },
+    { "acao": "faixas", "entrar": true, "semEsperar": true },
+    { "acao": "mover", "quem": "ambos", "movimento": "titular" },
+    { "acao": "mover", "quem": "ambos", "movimento": "pular-tras" },
+    { "acao": "mover", "quem": "ambos", "movimento": "recuar" },
+    { "acao": "esperar", "segundos": 0.3 },
+    { "acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "KOGAAAAA!", "segura": 0.5 },
+    { "acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "RYŪGAAAAA!", "segura": 0.5 },
+    { "acao": "mover", "quem": "ambos", "movimento": "correr", "distancia": 110 },
+    { "acao": "onomatopeia", "texto": "DING DONG!", "pos": [0.5, 0.34], "tamanho": 140, "tremor": 12, "rotacao": -8, "segundos": 2.2, "semEsperar": true },
+    { "acao": "mover", "quem": "ambos", "movimento": "parar" },
+    { "acao": "camera", "zoom": 1.12, "segundos": 0.2, "semEsperar": true },
+    { "acao": "esperar", "segundos": 1.0 },
+    { "acao": "camera", "zoom": 1.0, "segundos": 0.8, "semEsperar": true },
+    { "acao": "esperar", "segundos": 0.8 },
+    { "acao": "faixas", "entrar": false },
+    { "acao": "terminarLuta", "vencedor": "interrompida" }
+  ]
+}

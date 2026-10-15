@@ -2,6 +2,7 @@
 
 > Motor das páginas (padrão do jogo inteiro): [motor-paginas.md](motor-paginas.md).
 > Motor das conversas durante as lutas (parceiro de tag, adversário esperando): [motor-conversas.md](motor-conversas.md).
+> Motor das cinemáticas dentro da luta (faixas de cinema, o roteiro guia os lutadores, falas, onomatopeias, fim da luta): [motor-cinematicas.md](motor-cinematicas.md).
 > Torneio (escolha do irmão, sorteio, chave de 8 duplas fixas, emboscada fora da arena, duelo 1x1): [torneio.md](torneio.md).
 
 A história vem do documento "História Base — Torneio dos Irmãos" (Drive, pasta
@@ -38,7 +39,7 @@ salvar progresso e um menu de episódios.
 | Episódio | Conteúdo | Luta |
 |---|---|---|
 | 0 — O Pai que Partiu | Infância no dojo Shūshinkan, o treino (tutorial), o convite, a divisão dos irmãos, o pai parte e não volta. **Pronto** (11 páginas) | Treino Ryūga × Kōga (tutorial) |
-| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um | Treino jogador × rival |
+| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um | Treino jogador × rival, interrompido pela campainha numa cinemática |
 | 2 — O Sorteio | O templo, a regra dos capitães, a formação das duplas, o chaveamento em lados opostos | 1ª luta de cada lado |
 | 3 a 6 | Episódios alternando o lado do Ryūga e o lado do Kōga (lutas fixas de história + lutas variáveis) | uma por episódio |
 | meio da temporada | A revelação de que o desejo é real e pode ressuscitar a mãe | luta fixa |
@@ -108,6 +109,7 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 | `pos`, `rabo`, `posicaoSfx` | frações da caixa do painel: `[0, 0]` topo esquerdo, `[1, 1]` base direita. `rabo` é para onde aponta o bico do balão (a boca de quem fala) |
 | `foco` | 0 a 1: que parte da imagem aparece quando o painel é mais largo que ela |
 | `conversa` (passo de luta) | arquivo da conversa durante a luta, dentro de `historia/` (ex.: `ep00/conversa_treino.json`). Veja [motor-conversas.md](motor-conversas.md) |
+| `cinematica` (passo de luta) | arquivo da cinemática dentro da luta, dentro de `historia/` (ex.: `ep01/cinematica_treino.json`): num gatilho (vida baixa, começo, tempo, KO) a luta vira cena. Veja [motor-cinematicas.md](motor-cinematicas.md) |
 
 Sem a imagem, o painel mostra a arte provisória (cenário, silhuetas nas cores do elenco e
 o nome do arquivo esperado). Assim dá para escrever e testar o ritmo antes da arte.
@@ -132,4 +134,5 @@ funcionando e servem de rascunho até a página pronta existir.
 cd android
 gradle :pc-preview:runHistoria   # grava cada página montada em build/historia/
 gradle :story-core:test          # valida os episódios (layouts, elenco, lutadores)
+gradle :pc-preview:runCinematica # grava a cinemática do treino do ep01 em build/cinematica/
 ```

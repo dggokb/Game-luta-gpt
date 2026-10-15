@@ -7,7 +7,8 @@ efeitos de ação e os balões escritos no idioma do aparelho.
 
 A história em si (episódios, cartões de título, lutas no meio) está em [README.md](README.md).
 O que se fala **durante** as lutas (quadros laterais, sem parar a luta) é o
-[motor de conversas](motor-conversas.md).
+[motor de conversas](motor-conversas.md). A luta que vira cena (faixas de cinema, roteiro, fim da luta) é o
+[motor de cinemáticas](motor-cinematicas.md).
 Os prompts antigos, quadro a quadro, ficam em [prompts-ep00-ep01.md](prompts-ep00-ep01.md)
 só para as páginas provisórias que ainda não viraram páginas prontas.
 

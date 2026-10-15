@@ -21,6 +21,7 @@ import com.gamelutagpt.historia.MenuPausa;
 import com.gamelutagpt.historia.PaginaHistoria;
 import com.gamelutagpt.historia.ProgressoHistoria;
 import com.gamelutagpt.historia.Torneio;
+import com.gamelutagpt.historia.CinematicaLuta;
 import com.gamelutagpt.historia.ConversaLuta;
 import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
@@ -174,6 +175,18 @@ public class GameView extends SurfaceView
     private int conversaLicao = -1;
     /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
     private boolean conversaKo;
+    /**
+     * Cinemática dentro da luta da história (o "cinematica" do passo de luta): num gatilho
+     * (vida baixa, começo, tempo, KO) faixas pretas entram, o controle trava e um roteiro guia
+     * os dois lutadores e fala nos quadros da conversa. Padrão: docs/historia/motor-cinematicas.md.
+     */
+    private CinematicaLuta cinematica;
+    /** Os comandos dos dois lutadores enquanto a cinemática tem o controle. */
+    private final CinematicaDirector cinematicaDirector = new CinematicaDirector();
+    /** A cinemática terminou a luta ("jogador", "rival" ou "interrompida"); null = não terminou. */
+    private String cinematicaFim;
+    /** Quadros de luta desde o "LUTEM!" (gatilho de tempo da cinemática). */
+    private int storyFightFrames;
     /** Menu inicial (abre com o app): MODO HISTÓRIA ou MODO TESTE. */
     private final MenuInicial menuInicial;
     /** MODO HISTÓRIA com save: CONTINUAR e os capítulos já liberados. */
@@ -360,6 +373,7 @@ public class GameView extends SurfaceView
         menuInicial = new MenuInicial(ultraAssets);
         menuInicial.setVersao(VERSION_HUD_LABEL);
         conversa = new ConversaLuta(ultraAssets);
+        cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
         stageId = DEFAULT_STAGE;
         stageScene = loadStage(ultraAssets, stageId);
         characterSelectRenderer = new CharacterSelectRenderer(context);
@@ -496,7 +510,7 @@ public class GameView extends SurfaceView
         storyEpisode = -1;
         sceneAfter = null;
         tutorial.stop();
-        conversa.descarregar();
+        descarregarConversa();
         useStage(null);
         hud.resetEffects();
         characterSelect.open(team[0].character.id, team[1].character.id,
@@ -997,6 +1011,10 @@ public class GameView extends SurfaceView
             // Touches never reach the fight during a demo.
             pad.drainInto(ignoredInput);
             demo.fill(playerInput, opponentInput);
+        } else if (cinematica.controleTravado()) {
+            // Cinemática: o roteiro move os dois; o pad e a IA ficam de fora.
+            pad.drainInto(ignoredInput);
+            cinematicaDirector.fill(engine, playerInput, opponentInput);
         } else if (tutorial.active()) {
             // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
             pad.setHolding(attackHeld());
@@ -1016,6 +1034,8 @@ public class GameView extends SurfaceView
             playerInput.clear();
             opponentInput.clear();
         }
+        // Com a cinemática esperando a vida baixa (ou rodando), ninguém cai antes da cena.
+        protegerVida(cinematica.protegeVida());
         engine.step(playerInput, opponentInput);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
         flow.update(engine, ultraAttacker < 0 && !engine.ultraSequenceRunning());
@@ -1030,6 +1050,7 @@ public class GameView extends SurfaceView
             for (String reaction : tutorial.reactions()) stageScene.react(reaction);
         }
         updateConversa();
+        updateCinematica(intro);
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
@@ -1678,11 +1699,14 @@ public class GameView extends SurfaceView
                 return;
             }
 
-            float baseZoom = camera.zoom * superCameraZoom;
+            float cinematicZoom = cinematica.zoom();
+            float baseZoom = camera.zoom * superCameraZoom * cinematicZoom;
             float renderZoom = baseZoom * ultraCameraZoom;
             float visibleWorldWidth = VW / renderZoom;
             float renderCameraX = camera.x;
             float renderCameraTop = camera.top;
+            // O zoom da cinemática segura o chão no mesmo lugar da tela (os pés não somem na faixa).
+            if (cinematicZoom != 1f) renderCameraTop = GROUND_Y - (GROUND_Y - camera.top) / cinematicZoom;
             if (ultraCameraZoom != 1f) {
                 // Ultra activation zooms into whoever does it, keeping it on the same screen spot.
                 CombatFighter p = ultraFighter();
@@ -1776,9 +1800,18 @@ public class GameView extends SurfaceView
 
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
-                drawHud(canvas);
-                if (touchControls) drawControls(canvas);
+                // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.
+                float faixas = cinematica.faixas();
+                if (faixas < 0.999f) {
+                    int layer = faixas > 0.001f
+                        ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
+                    drawHud(canvas);
+                    if (layer >= 0) canvas.restoreToCount(layer);
+                }
+                if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
+                cinematica.renderFaixas(renderCanvas);
                 conversa.render(renderCanvas);
+                cinematica.renderEfeitos(renderCanvas);
             }
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
@@ -2703,7 +2736,7 @@ public class GameView extends SurfaceView
         storyMode = false;
         selectButtonLabel = SELECT_LABEL;
         tutorial.stop();
-        conversa.descarregar();
+        descarregarConversa();
         pausa.fechar();
         capitulos.fechar();
         characterSelect.close();
@@ -2832,7 +2865,7 @@ public class GameView extends SurfaceView
         }
         loadProgresso();
         tutorial.stop();
-        conversa.descarregar();
+        descarregarConversa();
         sceneAfter = null;
         hud.resetEffects();
         pad.reset();
@@ -2923,7 +2956,7 @@ public class GameView extends SurfaceView
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         if (!loadTemporada()) return;
         tutorial.stop();
-        conversa.descarregar();
+        descarregarConversa();
         sceneAfter = null;
         hud.resetEffects();
         pad.reset();
@@ -2948,7 +2981,7 @@ public class GameView extends SurfaceView
     private void startTutorialMode() {
         if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
         tutorial.stop();
-        conversa.descarregar();
+        descarregarConversa();
         playScene("tutorial", this::openCharacterSelect);
     }
 
@@ -3049,9 +3082,21 @@ public class GameView extends SurfaceView
     /** Luta de um episódio: depois do KO e da comemoração, a história continua. */
     private void updateStoryFight() {
         if (!historia.waitingFight()) return;
+        if (cinematicaFim != null) {
+            // A cinemática encerrou a luta: "rival" conta como derrota; "jogador" e
+            // "interrompida", a história segue.
+            boolean won = !"rival".equals(cinematicaFim);
+            storyKoFrames = 0;
+            descarregarConversa();
+            pad.reset();
+            releaseAllPointers();
+            historia.resultadoLuta(won);
+            return;
+        }
         // No 2x2 a luta só acaba quando uma dupla inteira cai.
         boolean ended = flow.battle() ? flow.over() : player().ko() || opponent().ko();
-        if (!ended) {
+        if (!ended || cinematica.seguraFimDaLuta()) {
+            // A cena do KO (gatilho "ko") toca antes do resultado.
             storyKoFrames = 0;
             return;
         }
@@ -3063,7 +3108,7 @@ public class GameView extends SurfaceView
         }
         if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0 || conversa.falando()) return;
         storyKoFrames = 0;
-        conversa.descarregar();
+        descarregarConversa();
         pad.reset();
         releaseAllPointers();
         historia.resultadoLuta(won);
@@ -3096,13 +3141,18 @@ public class GameView extends SurfaceView
         String rotulo = historia.rotulo(luta);
         if (rotulo != null && temporada != null) rotulo = temporada.t(rotulo);
         // A conversa da luta (nos quadros laterais, sem parar a luta) começa com o "inicio".
-        conversa.descarregar();
+        descarregarConversa();
         conversaLicao = -1;
         conversaKo = false;
         if (luta.conversa != null && temporada != null && !conversa.carregar(temporada, luta.conversa)) {
             Log.w(LOG_TAG, "conversa " + luta.conversa + " não abriu");
         }
         conversa.momento("inicio");
+        storyFightFrames = 0;
+        String irmao = historia.campanha() != null ? historia.campanha().irmao() : null;
+        if (luta.cinematica != null && temporada != null && !cinematica.carregar(temporada, luta.cinematica, irmao)) {
+            Log.w(LOG_TAG, "cinemática " + luta.cinematica + " não abriu");
+        }
         if (luta.tutorial()) {
             // As lições não esperam quadro nenhum: a conversa fala por cima da luta.
             tutorial.setPanels(false);
@@ -3156,7 +3206,7 @@ public class GameView extends SurfaceView
                     conversa.reacao(reaction);
                 }
             }
-        } else if (conversa.ativa() && !player().ko() && !opponent().ko()) {
+        } else if (conversa.ativa() && !cinematica.rodando() && !player().ko() && !opponent().ko()) {
             // Golpe forte do jogador que entrou ("impacto") e golpe do adversário que pegou ("levou").
             for (CombatEngine.HitEvent e : engine.events()) {
                 if (e.blocked) continue;
@@ -3167,18 +3217,88 @@ public class GameView extends SurfaceView
         conversa.update(FIXED_STEP);
     }
 
+    /** Fim da conversa e da cinemática da luta (luta nova, fim da luta, saída da história). */
+    private void descarregarConversa() {
+        conversa.descarregar();
+        cinematica.descarregar();
+        cinematicaDirector.parar();
+        cinematicaFim = null;
+    }
+
+    /**
+     * A cinemática da luta: confere o gatilho (vida de quem está lutando de cada lado, tempo
+     * desde o "LUTEM!", KO) quando nada mais está tocando e anda a linha do tempo.
+     */
+    private void updateCinematica(boolean intro) {
+        if (!cinematica.ativa()) return;
+        boolean ko = flow.battle() ? flow.over() : player().ko() || opponent().ko();
+        boolean lutando = !intro && !flow.holdsFighters();
+        if (lutando && !ko) storyFightFrames++;
+        // Não começa por cima de um Super, de um Ultra, de uma troca ou da Página Final.
+        boolean livre = lutando && historia.waitingFight() && ultraAttacker < 0 && !engine.ultraSequenceRunning() &&
+            !isSuperCinematicActive() && !isTagAnimationActive() && !paginaFinal.isActive();
+        if (cinematica.armada() && livre) {
+            cinematica.gatilho(vida(player()), vida(opponent()), storyFightFrames * FIXED_STEP, ko);
+        }
+        cinematica.update(FIXED_STEP);
+    }
+
+    private static float vida(CombatFighter f) {
+        return f.state.life / (float)Math.max(1, f.state.profile.maxLife);
+    }
+
+    /** Segura (ou solta) o último ponto de vida de todos os lutadores dos dois lados. */
+    private void protegerVida(boolean proteger) {
+        int piso = proteger ? 1 : 0;
+        for (int side = 0; side < 2; side++) {
+            for (FighterState member : engine.team(side).members) member.lifeFloor = piso;
+        }
+    }
+
+    /** O que a cinemática pede à luta. */
+    private final CinematicaLuta.Palco palcoCinematica = new CinematicaLuta.Palco() {
+        @Override public void travarControle(boolean travar) {
+            pad.reset();
+            releaseAllPointers();
+            playerInput.clear();
+            opponentInput.clear();
+            if (travar) {
+                // Golpes à distância ainda no ar não atropelam a cena, e um TAG apertado no
+                // último quadro (a IA trocando com a vida baixa) não sai depois.
+                engine.energyProjectiles.clear();
+                engine.superProjectiles.clear();
+                engine.teams.dropRequests();
+            } else {
+                cinematicaDirector.parar();
+            }
+        }
+
+        @Override public void mover(int lado, CinematicaLuta.Movimento movimento) {
+            cinematicaDirector.mover(lado, movimento);
+        }
+
+        @Override public boolean movendo(int lado) {
+            return cinematicaDirector.movendo(lado);
+        }
+
+        @Override public void terminarLuta(String vencedor) {
+            cinematicaDirector.parar();
+            cinematicaFim = vencedor;
+        }
+    };
+
     /**
      * Botões de teste escondidos: no modo história (o jogo de verdade), no tutorial e nas lutas
      * com conversa (o canto é dos quadros).
      */
     private boolean testButtonsHidden() {
-        return storyMode || tutorial.active() || conversa.ativa();
+        return storyMode || tutorial.active() || conversa.ativa() || cinematica.ativa();
     }
 
     /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
     private void finishTutorial() {
         tutorial.stop();
-        conversa.descarregar();
+        descarregarConversa();
         pad.reset();
         releaseAllPointers();
         if (historia.waitingFight()) historia.resultadoLuta(true);

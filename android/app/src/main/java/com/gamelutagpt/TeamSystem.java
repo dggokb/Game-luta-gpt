@@ -241,6 +241,37 @@ final class TeamSystem {
         return s.partner() != null && inReleasedSuper(point) && dhcReady(s, point);
     }
 
+    /**
+     * Cinemática da história: o titular (o primeiro da dupla) volta para a vez com a troca de
+     * verdade (o da vez sai correndo, o titular entra e posa), sem esperar a recarga da troca.
+     * Falso se já está na vez ou se agora não dá (titular caído, troca ou assist no meio, ou o
+     * da vez ainda não pode agir).
+     */
+    boolean tagToStarter(int side, CombatFighter point) {
+        Side s = sides[side];
+        if (s.point == 0 || !s.partnerStanding() || s.tagging() || s.assistOut() || s.leavingFrame >= 0 ||
+            !point.canAct()) {
+            return false;
+        }
+        s.tagPhase = TAG_EXIT;
+        s.tagFrame = 0;
+        s.tagDirection = -point.facing;
+        s.tagRequestAge = -1;
+        point.locked = true;
+        return true;
+    }
+
+    /** O titular da dupla está na vez, sem troca acontecendo nem pedida. */
+    boolean starterOnPoint(int side) {
+        Side s = sides[side];
+        return s.point == 0 && !s.tagging() && s.tagRequestAge < 0;
+    }
+
+    /** Esquece os TAG apertados que ainda não saíram, dos dois lados (a cinemática tomou o controle). */
+    void dropRequests() {
+        for (Side s : sides) s.assistRequestAge = s.tagRequestAge = -1;
+    }
+
     private boolean canRawTag(Side s, CombatFighter point) {
         return s.partnerStanding() && !s.tagging() && s.tagCooldown == 0 && !s.assistOut() &&
             s.leavingFrame < 0 && point.canAct();

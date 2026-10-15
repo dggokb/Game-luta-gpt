@@ -1,6 +1,7 @@
 # Motor de conversas na luta — padrão do modo história
 
-Este é o segundo motor da história, ao lado do [motor de páginas](motor-paginas.md). As páginas
+Este é o segundo motor da história, ao lado do [motor de páginas](motor-paginas.md) e do
+[motor de cinemáticas](motor-cinematicas.md) (que também fala por estes quadros). As páginas
 contam a história **entre** as lutas; as conversas contam **durante** a luta, sem parar nada:
 o parceiro de tag esperando a vez, o adversário que aguarda do outro lado, o mestre assistindo
 o treino. A estreia é o treino do Prólogo (Takatoshi e Dafu); nas lutas do torneio é o mesmo
@@ -106,6 +107,17 @@ Os rostos são **do elenco inteiro**, não de cada luta: o mesmo personagem fala
 episódios. Ficam em `android/app/src/main/assets/historia/retratos/<quem>_<expressao>.png`.
 Uma expressão sem imagem usa a `normal`; sem nem a `normal`, o quadro mostra o nome.
 
+Prontos: `dafu_normal`, `takatoshi_normal` e os irmãos adultos `ryuga_normal`, `ryuga_bravo`,
+`koga_normal`, `koga_bravo`, recortados dos close-ups dos concepts `art/concepts/p01.png` e
+`p03.png` (de frente = `normal`, de lado com cara fechada = `bravo`) com o fundo cinza tirado:
+`python3 tools/historia/retratos_irmaos.py` refaz os quatro quando um concept muda.
+
+**Rosto de lado**: o rosto que não é de frente diz para onde olha em
+`historia/retratos/olhar.json` (`"ryuga_bravo": "esquerda"` = olha para a esquerda da
+imagem). O quadro espelha o rosto que olharia para fora da tela, então a mesma imagem serve
+dos dois lados (o Ryūga fica à esquerda na campanha dele e à direita na do Kōga). Rosto de
+frente não entra no arquivo.
+
 Expressões padrão (use estas quando der, para reaproveitar as imagens):
 
 | Expressão | Para |
@@ -161,6 +173,8 @@ na intro e nos primeiros segundos da luta; mais que isso, o jogador já está ap
 | O quê | Onde |
 |---|---|
 | Motor (fila de falas, quadros, legenda, desenho) | `android/story-core/.../historia/ConversaLuta.java` |
+| Falas pedidas pela cinemática (`dizer`, com o lado dela) e a conversa calada no começo da cena (`calar`) | `ConversaLuta.dizer`, `ConversaLuta.calar` ([motor-cinematicas.md](motor-cinematicas.md)) |
+| Rosto espelhado pelo lado do olhar | `historia/retratos/olhar.json`, `ConversaLuta.espelhar` |
 | Campo `conversa` do passo de luta | `Episodio.Passo.conversa` |
 | Quando chama cada momento e reação | `GameView.onHistoriaLuta` (`inicio`), `GameView.updateConversa` (lições, `fim`, reações), `GameView.updateStoryFight` (`vitoria`/`derrota`) |
 | Botões de teste escondidos | `GameView.testButtonsHidden`, `HudRenderer.State.hideTestButtons` |
