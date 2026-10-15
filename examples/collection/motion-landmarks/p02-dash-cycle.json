@@ -1,0 +1,12 @@
+{
+  "character": "p02",
+  "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+  "start_inclusive": 14,
+  "stop_exclusive": 38,
+  "reference_source_frame": 16,
+  "face_polygon_source": [[753,299],[791,296],[802,314],[798,332],[778,348],[757,333],[749,313]],
+  "minimum_correlation": 0.8,
+  "global_scale_factor": 0.85,
+  "global_scale_note": "One constant for the whole dash, reviewed against the initial Idle head axis and shoulder span. Projected anatomy differs by pose; this is an approximate visual match, not per-frame Idle fitting.",
+  "selection_note": "Action-only running cycle, source frames 14 through 37 inclusive. Anticipation, settling and Idle remain in the unchanged original. No internal frame removed or synthesized. Source gait and artwork are preserved; no perfect seam is claimed."
+}

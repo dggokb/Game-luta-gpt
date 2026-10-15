@@ -6,7 +6,7 @@ A escala de referência é calculada a partir de uma pose equivalente ao Idle Ma
 
 ## Ver no celular
 
-**Revisão de tamanho da P02:** foi confirmado aumento durante o dash que a comparação com Idle não detectava. Há um [APK pequeno de teste e comparação antes/depois](docs/REVISAO-P02-DASH.md), com medidas ao longo da ação. O APK completo 1.5 abaixo ainda contém esse problema e não foi revalidado entre todas as poses.
+**Revisão de tamanho da P02:** foi confirmado aumento durante o dash que a comparação com Idle não detectava. Há um [APK pequeno de teste com um ciclo só de dash](docs/REVISAO-P02-DASH.md), estabilizado pela própria corrida e comparado ao teste anterior; o Idle serve apenas para a escala geral. O APK completo 1.5 abaixo ainda contém esse problema e não foi revalidado entre todas as poses.
 
 [Baixar o APK com todos os personagens](https://github.com/dggokb/Game-luta-gpt/releases/download/sprites-preview-1.5-20261015/sprites-todos-personagens.apk). A versão 1.5 inclui os 418 vídeos disponíveis: 330 movimentos convertidos para revisão e 88 com calibração pendente, acessíveis em Antes. São 41.083 frames em 16 pastas com animações; P14, P15 e P16 têm somente imagens. Funciona offline no Android 8.0+, com WebView atualizado. [Resultados e pendências](docs/COLECAO.md) · [Uso e compilação](android/README.md). O [APK menor do lote inicial](dist/sprites-visualizador.apk) continua disponível.
 

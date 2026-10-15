@@ -1,6 +1,6 @@
 # Visualizador offline para Android
 
-Há um [APK separado de revisão do dash da P02](../docs/REVISAO-P02-DASH.md), com comparação antes/depois de uma correção experimental de tamanho durante a ação. O visualizador completo 1.5 ainda contém a variação confirmada nesse movimento.
+Há um [APK separado de revisão do dash da P02](../docs/REVISAO-P02-DASH.md), agora com um recorte de 24 frames só de corrida, ajuste interno independente do Idle e comparação com o teste anterior. O APK separado está na versão `1.6-dash-ciclo` (versionCode 7). O visualizador completo 1.5 ainda contém a variação confirmada nesse movimento.
 
 [Baixar o APK com todos os personagens](https://github.com/dggokb/Game-luta-gpt/releases/download/sprites-preview-1.5-20261015/sprites-todos-personagens.apk).
 

@@ -106,21 +106,24 @@ def write_review_viewer(data,assets,output):
     // Inspect a fixed body-sized viewport; both versions share this zoom and pan.
     // This changes only the camera, never the sprite scale or per-frame geometry.
     commonZoom=function(){const stages=[$('after').parentElement,$('comparison').parentElement].filter(s=>s.clientWidth>0);
-      return Math.min(Math.min(...stages.map(s=>s.clientWidth))/480,
+      return Math.min(Math.min(...stages.map(s=>s.clientWidth))/(data.inspection_width||480),
                       Math.min(...stages.map(s=>s.clientHeight))/520)*Number($('zoom').value||1)};
     let diagnosticViewport='';
     window.addEventListener('spriteframe',()=>{
-      $('clipNote').hidden=false;$('clipNote').textContent='Comparação experimental por amostras: corrigido e versão anterior, no mesmo zoom.';
+      $('clipNote').hidden=false;$('clipNote').textContent=data.inspection_note||'Comparação experimental por amostras: corrigido e versão anterior, no mesmo zoom.';
       const k=commonZoom(),key=[k,innerWidth,document.body.dataset.view].join('/');
       if(key!==diagnosticViewport){diagnosticViewport=key;for(const id of ['after','comparison']){
-        const stage=$(id).parentElement;stage.scrollLeft=data.root[0]*k-stage.clientWidth/2;
-        stage.scrollTop=(data.root[1]-195)*k-stage.clientHeight/2;
+        const stage=$(id).parentElement,center=data.inspection_camera_center||[data.root[0],data.root[1]-195];stage.scrollLeft=center[0]*k-stage.clientWidth/2;
+        stage.scrollTop=center[1]*k-stage.clientHeight/2;
       }}
     });
-    $('zoom').value='1.25';current=1;$('clip').value='1';$('compare').value='0';frame=26;
+    $('zoom').value=String(data.inspection_zoom||1.25);current=1;$('clip').value='1';$('compare').value='0';frame=data.inspection_start_frame??26;
     document.querySelector('[data-view=compare]').click();render();
     </script>"""
     page=page.replace('</html>',start+'</html>');(assets/'index.html').write_text(page)
+    if data.get('status')=='action_only_experimental_review':
+        page=page.replace('correção anatômica anotada','ajuste de escala do ciclo').replace('curva anatômica anotada','ajuste de escala do ciclo')
+        (assets/'index.html').write_text(page)
     images={}
     for path in assets.rglob('*'):
         if path.suffix.lower() in ('.webp','.png','.json'):

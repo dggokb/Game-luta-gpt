@@ -27,7 +27,7 @@ def run(command, env=None):
 
 
 def build(assets, android_jar, build_tools, output, work, *, signing_key=None, signing_password_file=None,
-          application_id=None, application_label=None):
+          application_id=None, application_label=None, version_code=None, version_name=None):
     assets,android_jar,build_tools,output,work=[Path(p).resolve() for p in (assets,android_jar,build_tools,output,work)]
     if output.exists():raise ValueError('Use um nome de APK ainda inexistente')
     if work.exists() and any(work.iterdir()):raise ValueError('Use uma pasta de compilação nova ou vazia')
@@ -51,6 +51,13 @@ def build(assets, android_jar, build_tools, output, work, *, signing_key=None, s
     document=ET.parse(manifest_path);root=document.getroot()
     original_package=root.attrib['package']
     namespace='{http://schemas.android.com/apk/res/android}'
+    if version_code is not None:
+        if type(version_code) is not int or version_code < 1:
+            raise ValueError('version_code deve ser inteiro positivo')
+        root.set(namespace+'versionCode',str(version_code))
+    if version_name is not None:
+        if not version_name.strip():raise ValueError('version_name vazio')
+        root.set(namespace+'versionName',version_name)
     if application_id is not None:
         if not re.fullmatch(r'[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+',application_id):
             raise ValueError('application_id inválido')
@@ -64,7 +71,7 @@ def build(assets, android_jar, build_tools, output, work, *, signing_key=None, s
         if not application_label.strip():raise ValueError('application_label vazio')
         root.find('application').set(namespace+'label',application_label)
     package_name=root.attrib['package']
-    if application_id is not None or application_label is not None:
+    if any(v is not None for v in (application_id,application_label,version_code,version_name)):
         manifest_path=work/'AndroidManifest.xml'
         document.write(manifest_path,encoding='utf-8',xml_declaration=True)
     run([build_tools/'aapt2','compile','--dir',ROOT/'android/res','-o',work/'resources.zip'])
@@ -124,9 +131,11 @@ def main():
     p.add_argument('--build-tools',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--work',type=Path,required=True)
     p.add_argument('--signing-key',type=Path);p.add_argument('--signing-password-file',type=Path)
     p.add_argument('--application-id');p.add_argument('--application-label')
+    p.add_argument('--version-code',type=int);p.add_argument('--version-name')
     args=p.parse_args();build(args.assets,args.android_jar,args.build_tools,args.output,args.work,
                             signing_key=args.signing_key,signing_password_file=args.signing_password_file,
-                            application_id=args.application_id,application_label=args.application_label)
+                            application_id=args.application_id,application_label=args.application_label,
+                            version_code=args.version_code,version_name=args.version_name)
 
 
 if __name__=='__main__':main()

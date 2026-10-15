@@ -1,0 +1,31 @@
+{
+  "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+  "source_frames": 97,
+  "selected_source_frames": [
+    14,
+    37
+  ],
+  "dash_frames": 24,
+  "exported_pngs": 49,
+  "pts_preserved": true,
+  "playback_times_rebased": true,
+  "local_patch_peak_to_peak_relative_median": {
+    "dash_teste_anterior": 0.08497551273404076,
+    "dash_ciclo_ajustado": 0.01543577533323559
+  },
+  "local_fit_minimum_correlation": 0.8237558901309967,
+  "independent_shoulder_control_difference_fraction": 0.020903275639571502,
+  "horizontal_anchor_spread_px": 0.0,
+  "preview_vs_png_mean_rgb_errors": {
+    "False/dash_teste_anterior": 0.33034196496009827,
+    "False/dash_ciclo_ajustado": 0.32862141728401184,
+    "False/idle_escala": 0.17272792756557465,
+    "True/dash_teste_anterior": 0.33034196496009827,
+    "True/dash_ciclo_ajustado": 0.32862141728401184,
+    "True/idle_escala": 0.17272792756557465
+  },
+  "page_errors": [],
+  "external_or_failed_requests": [],
+  "full_frame_anatomical_validation": false,
+  "perfect_gait_loop_claimed": false
+}

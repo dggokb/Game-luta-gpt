@@ -1,0 +1,3 @@
+-r requirements.txt
+scipy>=1.10,<2
+playwright>=1.40,<2

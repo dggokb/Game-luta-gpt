@@ -1,0 +1,22 @@
+{
+  "apk": {
+    "path": "dist/sprites-p02-dash-teste.apk",
+    "bytes": 4331630,
+    "sha256": "450baf2c2a996e6a8e1c06db749a8adb28685d5e92954dc9577b12c58fb82e59",
+    "application_id": "org.spriteviewer.p02review",
+    "version_code": 7,
+    "version_name": "1.6-dash-ciclo",
+    "same_signing_certificate": true,
+    "bundled_html_matches_tested": true,
+    "physical_device_tested": false
+  },
+  "zip": {
+    "file_id": "140XUC0HMgNkquz-D4Ud_waspUPthJvE9",
+    "url": "https://drive.google.com/file/d/140XUC0HMgNkquz-D4Ud_waspUPthJvE9/view",
+    "bytes": 17358793,
+    "remote_size_verified": true,
+    "sha256": "56af45c52a6a66268dad8ed1fe16eef88d0c06de2795b08afc581532f051818a"
+  },
+  "scope": "P02 dash action-only experimental cycle; full collection APK unchanged",
+  "tests_passed": 73
+}
