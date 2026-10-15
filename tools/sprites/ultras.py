@@ -40,7 +40,11 @@ SHEET = {
     'p05': dict(celula=352, largura=576, raiz='210,330', densidade=1, peNoChao=True, minOpaco=400),
     'p07': dict(celula=352, largura=576, raiz='230,330', densidade=1, peNoChao=True),
     'p08': dict(celula=352, largura=768, raiz='220,330', densidade=1, peNoChao=True),
+    # p09: pula com o rival acima da cabeça (célula mais alta) e avança no agarrão.
+    'p09': dict(celula=416, largura=640, raiz='230,394', densidade=1, peNoChao=True),
     'p10': dict(celula=384, largura=576, raiz='230,362', densidade=1),
+    # p11: o jaleco abre para trás e a estocada estica com o clarão para a frente.
+    'p11': dict(celula=384, largura=640, raiz='250,362', densidade=1, peNoChao=True),
     'p12': dict(celula=352, largura=576, raiz='210,330', densidade=1, peNoChao=True),
 }
 

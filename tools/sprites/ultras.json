@@ -1,5 +1,5 @@
 {
-  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio.",
+  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio. p09: o vídeo desenhou um saco no lugar do rival; ele sai pela cor antes de converter (tools/sprites/apagar_saco.py).",
   "velocidade": 2,
   "dano": 4200,
   "personagens": {
@@ -9,7 +9,11 @@
     "p05": {"nome": "Eclipse", "inicio": 0, "preparo": 8, "golpes": [14, 18, 22, 26, 35, 44, 66], "fim": 92},
     "p07": {"nome": "Herança", "inicio": 8, "preparo": 26, "golpes": [29, 38, 47, 63], "fim": 90},
     "p08": {"nome": "Sinfonia Escarlate", "inicio": 8, "preparo": 22, "golpes": [25, 29, 46, 62, 67], "fim": 92},
+    "p09": {"nome": "Resgate Final", "inicio": 0, "preparo": 22, "golpes": [30, 40, 62], "fim": 96,
+            "rival": [[30, 115, 0], [34, 115, 0], [38, 75, 30], [40, 70, 60], [44, 9, 252], [54, 14, 230],
+                      [58, 54, 261], [60, 95, 150], [62, 130, 0]]},
     "p10": {"nome": "Resgate Aéreo", "inicio": 6, "preparo": 18, "golpes": [23, 35, 45, 48, 60], "fim": 92},
+    "p11": {"nome": "Autópsia", "inicio": 0, "preparo": 22, "golpes": [28, 32, 40, 44, 54], "fim": 96},
     "p12": {"nome": "Último Suspiro", "inicio": 10, "preparo": 40, "golpes": [44, 50, 56, 72], "fim": 92}
   }
 }
