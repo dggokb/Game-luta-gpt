@@ -21,6 +21,9 @@ def report(inventory, inputs, processed, output):
         summary=json.loads((folder/'complete.json').read_text())
         characters.append(summary)
         manifest=json.loads((folder/'assets/manifest.json').read_text()) if summary['videos'] else None
+        if manifest:
+            summary['in_place_clips']=[c['name'] for c in manifest['clips']
+                if c['status']!='rejected' and c.get('root_motion')]
         for source in character['files']:
             if not source['mime_type'].startswith(('video/','image/')):continue
             path=inputs/cid/source['name'];sha=digest(path)

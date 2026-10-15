@@ -110,7 +110,6 @@
       ],
       "in_place_clips": [
         "back_dash",
-        "dash",
         "walk_forward",
         "walk_back"
       ],
@@ -352,8 +351,6 @@
       ],
       "in_place_clips": [
         "back_dash",
-        "dash",
-        "walk_forward",
         "walk_back"
       ],
       "source_warnings": 25,
@@ -414,8 +411,7 @@
       ],
       "in_place_clips": [
         "back_dash",
-        "dash",
-        "walk_back"
+        "dash"
       ],
       "source_warnings": 24,
       "originals_unchanged": true,
@@ -496,8 +492,7 @@
       "in_place_clips": [
         "back_dash",
         "dash",
-        "walk_forward",
-        "walk_back"
+        "walk_forward"
       ],
       "source_warnings": 21,
       "originals_unchanged": true,
@@ -644,9 +639,7 @@
           "reason": "idle: Pose incerta: score=0.652, silhueta=0.593, aparência=0.710, proporções=0.830; nenhuma escala aprovada"
         }
       ],
-      "in_place_clips": [
-        "walk_forward"
-      ],
+      "in_place_clips": [],
       "source_warnings": 1,
       "originals_unchanged": true,
       "reference_provenance": {

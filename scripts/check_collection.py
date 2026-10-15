@@ -54,6 +54,8 @@ def audit(inventory, sources, processed, evidence):
             report['characters'].append(summary)
             continue
         manifest=json.loads((folder/'assets/manifest.json').read_text())
+        summary['in_place_clips']=[c['name'] for c in manifest['clips']
+            if c['status']!='rejected' and c.get('root_motion')]
         assert set(videos)=={c['source_drive_id'] for c in manifest['clips']}, cid
         assert len(videos)==len(manifest['clips']),cid
         dimensions={}

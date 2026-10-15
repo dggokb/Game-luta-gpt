@@ -1,0 +1,624 @@
+{
+  "folder_url": "https://drive.google.com/drive/folders/1l7rSJn2JHKcjqGGO33R1ybsfHVDaNTMa",
+  "apk_url": "https://github.com/dggokb/Game-luta-gpt/releases/download/sprites-preview-1.5-20261015/sprites-todos-personagens.apk",
+  "verified_remote_file_sizes": true,
+  "volume_count": 59,
+  "characters": [
+    {
+      "character": "Dafu",
+      "file": "sprites-Dafu.zip",
+      "bytes": 163735416,
+      "sha256": "3bbe921d4a805eb98f2740ac095fd63c759749df6cb80615a8a4b5fa3ffdbf8a",
+      "normalized_frames": 485,
+      "volumes": [
+        {
+          "name": "sprites-Dafu.zip.001",
+          "bytes": 99614720,
+          "sha256": "b568198943484846b24a57ef6d7d374b0cd85c1b66211b63c25763662f4faa51",
+          "md5": "4d233eb62b551c7187b67271745fffeb",
+          "drive_file_id": "1TnB20_1Y_TgsAL4sZ5bmFZ0dBCMPiy6L",
+          "url": "https://drive.google.com/file/d/1TnB20_1Y_TgsAL4sZ5bmFZ0dBCMPiy6L/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-Dafu.zip.002",
+          "bytes": 64120696,
+          "sha256": "3d7db6a5054f333aecadeb9d9af08b2015495c5e910e8f66690630805e85612d",
+          "md5": "b9e245573ab6e6345501ddf0b78600aa",
+          "drive_file_id": "1bEEpHYpzf2smDBqpLDW-uuIDatHupMkM",
+          "url": "https://drive.google.com/file/d/1bEEpHYpzf2smDBqpLDW-uuIDatHupMkM/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "Takatoshi",
+      "file": "sprites-Takatoshi.zip",
+      "bytes": 162322048,
+      "sha256": "d1dc811c6fdb4d3ade60f835d0990c59ee1de684199dbae060cc808692e05a54",
+      "normalized_frames": 485,
+      "volumes": [
+        {
+          "name": "sprites-Takatoshi.zip.001",
+          "bytes": 99614720,
+          "sha256": "c4474b9eb8951790ff61940167db848feb9289159512faf14889470859a3210a",
+          "md5": "85db3e61730ab811559861b5cd829665",
+          "drive_file_id": "1VF__vF4_9wQksd841dnQ9Zo9Ec4SsyxW",
+          "url": "https://drive.google.com/file/d/1VF__vF4_9wQksd841dnQ9Zo9Ec4SsyxW/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-Takatoshi.zip.002",
+          "bytes": 62707328,
+          "sha256": "3a90cf0c396fc7ced8ff805640e87789e852c9f766a6b7a09bed3458c1a3b9f7",
+          "md5": "63f6c1a0d8f840131d028d15690bb6f8",
+          "drive_file_id": "10IsaFQC8srPrpcXyk4JysEyda0A__abF",
+          "url": "https://drive.google.com/file/d/10IsaFQC8srPrpcXyk4JysEyda0A__abF/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "capangas",
+      "file": "sprites-capangas.zip",
+      "bytes": 41485038,
+      "sha256": "3eaffedd72b064f4f2e791332b3dabf138d8fb6866edda1579adbbda3c3f9be0",
+      "normalized_frames": 194,
+      "volumes": [
+        {
+          "name": "sprites-capangas.zip",
+          "bytes": 41485038,
+          "sha256": "3eaffedd72b064f4f2e791332b3dabf138d8fb6866edda1579adbbda3c3f9be0",
+          "md5": "634f72b8b040ff1ad31601f1b101d50a",
+          "drive_file_id": "1FTpd04Uu3RHGDbeMl2onZbluk1U6Sl82",
+          "url": "https://drive.google.com/file/d/1FTpd04Uu3RHGDbeMl2onZbluk1U6Sl82/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p01",
+      "file": "sprites-p01.zip",
+      "bytes": 434008910,
+      "sha256": "51e5c02cf7391834b584f4a78240cc51812f5f8d2e0a4a90eaca69a32b64e281",
+      "normalized_frames": 2713,
+      "volumes": [
+        {
+          "name": "sprites-p01.zip.001",
+          "bytes": 99614720,
+          "sha256": "2359d3a098516e17aba914547f6ac5b12b560753f45c1aac23d914f50787ea26",
+          "md5": "a5d499f2f421353aaf85395e0e09efc3",
+          "drive_file_id": "13h8zOHyowHH7ijhOiHP-jIzXtoJudhOb",
+          "url": "https://drive.google.com/file/d/13h8zOHyowHH7ijhOiHP-jIzXtoJudhOb/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p01.zip.002",
+          "bytes": 99614720,
+          "sha256": "3e118b350255ff1202dc2145fe1b98e3bfa5720a3cf1a94d8c0124bebed7654d",
+          "md5": "90b7f0a16c30ec27e828e84a13941170",
+          "drive_file_id": "17r75ANZymC9FhqjQWXd8vllCgVEjf8rP",
+          "url": "https://drive.google.com/file/d/17r75ANZymC9FhqjQWXd8vllCgVEjf8rP/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p01.zip.003",
+          "bytes": 99614720,
+          "sha256": "65ff6d44eadabdcabad5eceb3974a6abc34207be5b4c710dbdfcc0c20950135b",
+          "md5": "0635e3fee300f0359fff1ac30174db9a",
+          "drive_file_id": "10b_YH_mSIt1lH0BGuLTmCYzpGNsFcyZY",
+          "url": "https://drive.google.com/file/d/10b_YH_mSIt1lH0BGuLTmCYzpGNsFcyZY/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p01.zip.004",
+          "bytes": 99614720,
+          "sha256": "c9b03697e71ab4d009d3fac07fd1df57fdee253aa45c442160d4aaee1ec4c71a",
+          "md5": "f311ca78690068eedd81cce266766779",
+          "drive_file_id": "1uCldxDt5fV0yH6twyCOrjo6a34Px0Y-m",
+          "url": "https://drive.google.com/file/d/1uCldxDt5fV0yH6twyCOrjo6a34Px0Y-m/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p01.zip.005",
+          "bytes": 35550030,
+          "sha256": "c2534200e9ddaf9f659a5aef0ed2b3f7fa726595f37a0fd19f64cf88294fa134",
+          "md5": "8aef9a78f464a9d7cc91c626f0462e11",
+          "drive_file_id": "1En6wRDWcuLnXhija6GC-RWXr-hdVwV13",
+          "url": "https://drive.google.com/file/d/1En6wRDWcuLnXhija6GC-RWXr-hdVwV13/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p02",
+      "file": "sprites-p02.zip",
+      "bytes": 370728982,
+      "sha256": "60218bf7cf4587c2426d76179e51ad485692de7a08419d49fc779e4ee8fe3dba",
+      "normalized_frames": 2813,
+      "volumes": [
+        {
+          "name": "sprites-p02.zip.001",
+          "bytes": 99614720,
+          "sha256": "8ada88ac77f52344e042c0b0e7bc2cc7d44893ee98f37f2518bfe1ec7644917a",
+          "md5": "de3132c62006cb0b99a6e2f16946989f",
+          "drive_file_id": "1Qa7AHUOGfVr15_58wKl_qMOt4CZunViu",
+          "url": "https://drive.google.com/file/d/1Qa7AHUOGfVr15_58wKl_qMOt4CZunViu/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p02.zip.002",
+          "bytes": 99614720,
+          "sha256": "f20a5a58eccbd1884c573d95b12031b4aa469cd8ddea56b66678db8b00be008c",
+          "md5": "e27de40573eae06a3e88d5f5095d30b1",
+          "drive_file_id": "1Ec0RNMqxSFo9uto9fnwLs482Bi2xjhXs",
+          "url": "https://drive.google.com/file/d/1Ec0RNMqxSFo9uto9fnwLs482Bi2xjhXs/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p02.zip.003",
+          "bytes": 99614720,
+          "sha256": "10c2741a923751f7d885b5a45c34ff11f469da508794b0035579767cc0bfdbac",
+          "md5": "190b4c7c4bfd7f226f77b6156cc10d3f",
+          "drive_file_id": "1P-ieMrnbrw27pB07QpNnIEgk2xpj9jrY",
+          "url": "https://drive.google.com/file/d/1P-ieMrnbrw27pB07QpNnIEgk2xpj9jrY/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p02.zip.004",
+          "bytes": 71884822,
+          "sha256": "19bc3c3640b7c406357ecf630769fff8d9fa87935ce3a2bde6fc447c6c4d2082",
+          "md5": "965535b115f087505691011c1bbda291",
+          "drive_file_id": "1vLWUB8JONo2-WJ7sV8z-ZWNsGDhilCCZ",
+          "url": "https://drive.google.com/file/d/1vLWUB8JONo2-WJ7sV8z-ZWNsGDhilCCZ/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p03",
+      "file": "sprites-p03.zip",
+      "bytes": 389691600,
+      "sha256": "d39d0b7c5ce02b62d524d289ebc0ad41a6f9deb52fe8540800f6678406246942",
+      "normalized_frames": 2716,
+      "volumes": [
+        {
+          "name": "sprites-p03.zip.001",
+          "bytes": 99614720,
+          "sha256": "7d237153d87361f9648bd926441f66445ad004fa1c737b48194c2785b3b25bc8",
+          "md5": "9d0784dfccd2b9ad789b7ad73e7c75c1",
+          "drive_file_id": "18HUcXuaE509nU34BKYMuBJLgOOIzWwu0",
+          "url": "https://drive.google.com/file/d/18HUcXuaE509nU34BKYMuBJLgOOIzWwu0/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p03.zip.002",
+          "bytes": 99614720,
+          "sha256": "cc9500190b6d7f86b5497e008baacc95a26cc58aed619c34d1cfc7f4fea0ea36",
+          "md5": "28611eef846bf6f1d766023fa6325639",
+          "drive_file_id": "1mSw7D3OiPNCXS_cgoxkUqzUM6U6l7rw4",
+          "url": "https://drive.google.com/file/d/1mSw7D3OiPNCXS_cgoxkUqzUM6U6l7rw4/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p03.zip.003",
+          "bytes": 99614720,
+          "sha256": "933688e9e0525d2779512ca5676ec0aafdb0235e52ce4785a47c612ce52924e1",
+          "md5": "a79c7adcb6c27b53c4d48f4ca6487f7f",
+          "drive_file_id": "1bV_SCbKn6mE-XPXBF7p9mCpf6Mk_LFvQ",
+          "url": "https://drive.google.com/file/d/1bV_SCbKn6mE-XPXBF7p9mCpf6Mk_LFvQ/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p03.zip.004",
+          "bytes": 90847440,
+          "sha256": "977418ba29bd37a1b8c30fa05a02dc7fe34eb244c0edd74a1ca265c258f44514",
+          "md5": "8441697947dee790a1244d74cb219e21",
+          "drive_file_id": "15y9maaQOr_RPRkj6KFtnfqp2FjapAx-G",
+          "url": "https://drive.google.com/file/d/15y9maaQOr_RPRkj6KFtnfqp2FjapAx-G/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p04",
+      "file": "sprites-p04.zip",
+      "bytes": 332184815,
+      "sha256": "488d6ff06c52851378b60e21ea4643446cf8955e5ebbc098dce0bed5ee066e26",
+      "normalized_frames": 2716,
+      "volumes": [
+        {
+          "name": "sprites-p04.zip.001",
+          "bytes": 99614720,
+          "sha256": "6233d7d50007da5d96d9b4cdb11973b65ebdce0c0fbeb06cabd1fb9e2a09f93a",
+          "md5": "a87e396d3c656afc95b5a924edef0832",
+          "drive_file_id": "17_hxS0fXR_AgEZeaXaQRgrKjaKoq6SMA",
+          "url": "https://drive.google.com/file/d/17_hxS0fXR_AgEZeaXaQRgrKjaKoq6SMA/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p04.zip.002",
+          "bytes": 99614720,
+          "sha256": "180fd4a18228935983e3d12a8f49674c2672a00b4c3f6d791badd2ec04732733",
+          "md5": "8e7bd5e8ae6aaec40b8de7d21f898838",
+          "drive_file_id": "1lHlV1NE_300OywEbEXBcI0asZTkhZC-O",
+          "url": "https://drive.google.com/file/d/1lHlV1NE_300OywEbEXBcI0asZTkhZC-O/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p04.zip.003",
+          "bytes": 99614720,
+          "sha256": "3b2e6adc9a8c06fdb87c0f0a3a63d7fd9dedb7a71b11c454863b2bc117c66644",
+          "md5": "45dcc5b18a25bbfdb7074b1d1473bd1d",
+          "drive_file_id": "1fWbzZZACvrWRDEDuf1P7uHjyu9XUVfIo",
+          "url": "https://drive.google.com/file/d/1fWbzZZACvrWRDEDuf1P7uHjyu9XUVfIo/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p04.zip.004",
+          "bytes": 33340655,
+          "sha256": "7811fc0dc082015be93150caf0dc014c89fa09ac6e47e1b92c896bd9a8cac27c",
+          "md5": "22307cb932648abbe3c53187af695e37",
+          "drive_file_id": "1Mei9tlLcpSFVSjEUPO8G0_NZw5CQytIe",
+          "url": "https://drive.google.com/file/d/1Mei9tlLcpSFVSjEUPO8G0_NZw5CQytIe/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p05",
+      "file": "sprites-p05.zip",
+      "bytes": 403276336,
+      "sha256": "d894c10d2fc47c5c9c97604efaa496a02e1cf8a92deb332206aa299fc333274c",
+      "normalized_frames": 2037,
+      "volumes": [
+        {
+          "name": "sprites-p05.zip.001",
+          "bytes": 99614720,
+          "sha256": "b3b6536064c33e7129782b2cc421dcb8d19a1e96bf53290286f22144495ace05",
+          "md5": "e86378255f761b4729b759a4f78aa8f0",
+          "drive_file_id": "1qgj8DoQ9OPcsjuUPvTQOGHV6MaWyXiu1",
+          "url": "https://drive.google.com/file/d/1qgj8DoQ9OPcsjuUPvTQOGHV6MaWyXiu1/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p05.zip.002",
+          "bytes": 99614720,
+          "sha256": "cc32bb22d8f37c4a47ef74112ee6da3af492ccaa97685deac846647d8fe9096e",
+          "md5": "873cbe0c9fe6ac3ce09901c861c6cd37",
+          "drive_file_id": "1HFvXti2LN6tVEwB4xyHKPgeJXfC0-A7I",
+          "url": "https://drive.google.com/file/d/1HFvXti2LN6tVEwB4xyHKPgeJXfC0-A7I/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p05.zip.003",
+          "bytes": 99614720,
+          "sha256": "c7f32518e0091aa9eba39933d2001c63ab09af73b0dcd99fc3659886d35a7a5d",
+          "md5": "a1c363426799ec956984e015fce4e3fc",
+          "drive_file_id": "1dxKehIqLftrC7xk-I_OE5l6MBxZ6hSLz",
+          "url": "https://drive.google.com/file/d/1dxKehIqLftrC7xk-I_OE5l6MBxZ6hSLz/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p05.zip.004",
+          "bytes": 99614720,
+          "sha256": "9860b3e33f8cd4aa5c4614adf1c278642fe61173464b184dd3c51ec375a6ad7d",
+          "md5": "7683a0c5f391b5b2abb02646e4c85adb",
+          "drive_file_id": "1xSUzWeopu6LBEaB4_wiXEtNfEgqHII9w",
+          "url": "https://drive.google.com/file/d/1xSUzWeopu6LBEaB4_wiXEtNfEgqHII9w/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p05.zip.005",
+          "bytes": 4817456,
+          "sha256": "359a8a476b6aa7b49efa0d768df19c6b6a19858e89b66f426e8522b41018680f",
+          "md5": "d23ad87c5c4f4b8e1ffdb362492ed1be",
+          "drive_file_id": "1YzgXD0eBrsvHduWk0sM8Ri3TBS4umWA0",
+          "url": "https://drive.google.com/file/d/1YzgXD0eBrsvHduWk0sM8Ri3TBS4umWA0/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p06",
+      "file": "sprites-p06.zip",
+      "bytes": 434519804,
+      "sha256": "858fafe4b1d2d7e8f0951fba082685f0f14c1a8276aa937420fd6de544ddba59",
+      "normalized_frames": 3007,
+      "volumes": [
+        {
+          "name": "sprites-p06.zip.001",
+          "bytes": 99614720,
+          "sha256": "47117e566cac1d181b7743762a72baaf3848e1113c1eb1958f5e7234613803eb",
+          "md5": "e29dc4510c5dd4af3be90db86b99932c",
+          "drive_file_id": "1M1E9jjFuKR_TWbCGUBrh-r5VZNZk1hzM",
+          "url": "https://drive.google.com/file/d/1M1E9jjFuKR_TWbCGUBrh-r5VZNZk1hzM/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p06.zip.002",
+          "bytes": 99614720,
+          "sha256": "a2ab4e91ada22bc16c60371a1cbb0d9e37ab1bd5ba2ca4a9b4655bf461da0bc4",
+          "md5": "2cdfb7b852775da047b5f67a98722237",
+          "drive_file_id": "1L1egrFi0Q0VSCpjZvH9RZ0uUH_Vl6pcK",
+          "url": "https://drive.google.com/file/d/1L1egrFi0Q0VSCpjZvH9RZ0uUH_Vl6pcK/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p06.zip.003",
+          "bytes": 99614720,
+          "sha256": "b4f6543ebc6501feda6afb0060ead5087a63177b19ba9cecfba318eef4bbc74a",
+          "md5": "e6e96f0da17b97a68fd7eccba6d1e39c",
+          "drive_file_id": "12v4GZ5NFKDz6ki9q3KvGMW0e-W1dc2qB",
+          "url": "https://drive.google.com/file/d/12v4GZ5NFKDz6ki9q3KvGMW0e-W1dc2qB/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p06.zip.004",
+          "bytes": 99614720,
+          "sha256": "f01c08b659b6b824fafcf30ccd0affaa326c13185903d4f28ae023ba8c1938af",
+          "md5": "f459636a26d70a0ad11f3d67462658bf",
+          "drive_file_id": "1BFS7zDt-qksB_DYwmIHl6Xhtw9SA8NzE",
+          "url": "https://drive.google.com/file/d/1BFS7zDt-qksB_DYwmIHl6Xhtw9SA8NzE/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p06.zip.005",
+          "bytes": 36060924,
+          "sha256": "58124b8414e32ba590446870863b7493ed16607b444b07c3b9d5104ca1fb4ea4",
+          "md5": "0ca5840d6f2f012d659dd96ef49efb66",
+          "drive_file_id": "1vrL1adJVTeTy4_XOxcAsXJIto_-JhZfS",
+          "url": "https://drive.google.com/file/d/1vrL1adJVTeTy4_XOxcAsXJIto_-JhZfS/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p07",
+      "file": "sprites-p07.zip",
+      "bytes": 413349232,
+      "sha256": "be80536dd10c97cdffce0ca0067b5881c38ac3f5056fe42e2ba1f70b0e454795",
+      "normalized_frames": 3007,
+      "volumes": [
+        {
+          "name": "sprites-p07.zip.001",
+          "bytes": 99614720,
+          "sha256": "c27cfad62f44d7620a7037647804c010a69e869915088dc38e22832701f4714f",
+          "md5": "36187404a2014f5994f40899624bf3f1",
+          "drive_file_id": "1Qpn1bx_jDmx8fZejCZBjBoMpwCRQ8Q9E",
+          "url": "https://drive.google.com/file/d/1Qpn1bx_jDmx8fZejCZBjBoMpwCRQ8Q9E/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p07.zip.002",
+          "bytes": 99614720,
+          "sha256": "91c3ab96c4f6f2f1fed84a4b6f3e84d17cfb2e7b6afd29c1e13819371cb712fb",
+          "md5": "f21cb2b9361f3f49f44a42776a963a32",
+          "drive_file_id": "154gJEOwbWCvIM0DHufZXSYdLyHemmtC3",
+          "url": "https://drive.google.com/file/d/154gJEOwbWCvIM0DHufZXSYdLyHemmtC3/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p07.zip.003",
+          "bytes": 99614720,
+          "sha256": "9e0607c8954f850924ae2c046501d712ed8d3a7171a68e4977f1838be81a9235",
+          "md5": "a8f78e5a7090906f273b18a47b2adb22",
+          "drive_file_id": "1FvEGdkZ1vyYUoiXGS69HL4ZeqdMrFCuM",
+          "url": "https://drive.google.com/file/d/1FvEGdkZ1vyYUoiXGS69HL4ZeqdMrFCuM/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p07.zip.004",
+          "bytes": 99614720,
+          "sha256": "65c513b8e110671b2a96ff5e7885a7687d9214da47b38310aee063a16f0b8f8f",
+          "md5": "51dec4199561794822a804fa079b1d54",
+          "drive_file_id": "1C-YlCsLEqGS5YDoARSVflK2RLrdqgQYA",
+          "url": "https://drive.google.com/file/d/1C-YlCsLEqGS5YDoARSVflK2RLrdqgQYA/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p07.zip.005",
+          "bytes": 14890352,
+          "sha256": "b297f3fc147acbf3be2be37c3181c0b28076341618b4c986dd68ecd3abef9423",
+          "md5": "090889cd050453018aa4d41c5b90e3de",
+          "drive_file_id": "1e2IcbH2nz0ibyEqRre7jVAFKCYiy_aw9",
+          "url": "https://drive.google.com/file/d/1e2IcbH2nz0ibyEqRre7jVAFKCYiy_aw9/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p08",
+      "file": "sprites-p08.zip",
+      "bytes": 324641366,
+      "sha256": "5ac08237c764318da9a30f55ecdb4c4228ba2ee236f4b18c8a56bbc4d0fa85c3",
+      "normalized_frames": 2037,
+      "volumes": [
+        {
+          "name": "sprites-p08.zip.001",
+          "bytes": 99614720,
+          "sha256": "9970415d914b171f177c49ecc0fd908d1317d8183285af20b370622fa2dce9cd",
+          "md5": "b35e9a5a592e10a796322a3863daeaf2",
+          "drive_file_id": "1fjRa976aupdx2zwkZeiEcd2bPtp0aEyS",
+          "url": "https://drive.google.com/file/d/1fjRa976aupdx2zwkZeiEcd2bPtp0aEyS/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p08.zip.002",
+          "bytes": 99614720,
+          "sha256": "3fa9ecf8e5a11ff287d7d6b67f175cdbfea7b57d6a74a4760e351716e06401b2",
+          "md5": "cb63da32b8645baeb9f8f24cd8ef2f41",
+          "drive_file_id": "1zlfeVrPM-nqyn57ZdknSzoUmECIAVY-Q",
+          "url": "https://drive.google.com/file/d/1zlfeVrPM-nqyn57ZdknSzoUmECIAVY-Q/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p08.zip.003",
+          "bytes": 99614720,
+          "sha256": "df7e884779342bd5bdaf3aae0d704b8e87324cd74570b4646dfbab4a9db754cf",
+          "md5": "5abde210fb12f37407ed56eeae0ddd94",
+          "drive_file_id": "1vzRFDS8hYvRSeH2wMARPNAvwyRYPK-80",
+          "url": "https://drive.google.com/file/d/1vzRFDS8hYvRSeH2wMARPNAvwyRYPK-80/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p08.zip.004",
+          "bytes": 25797206,
+          "sha256": "a67b5e4dc85ca4508009b6f6e67325685207828c5597b05d7a1e678115d6ca46",
+          "md5": "64038cc6de7aeb48a25496c0f603c804",
+          "drive_file_id": "1CbUk5fn-jn_Ut70F7yR5vZeQYpHvZGIY",
+          "url": "https://drive.google.com/file/d/1CbUk5fn-jn_Ut70F7yR5vZeQYpHvZGIY/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p09",
+      "file": "sprites-p09.zip",
+      "bytes": 357229715,
+      "sha256": "4b2bfb55a0b6ea57d81b1e24542a4e7fdb68f4745f978838fd645b2b0d778a33",
+      "normalized_frames": 2619,
+      "volumes": [
+        {
+          "name": "sprites-p09.zip.001",
+          "bytes": 99614720,
+          "sha256": "1a7dafdddc9dc179e00e1a9f46f2cfd1859f92eb189df7e001aabdb3ec86cd4e",
+          "md5": "072c77ad63777d1b928191630287a3ce",
+          "drive_file_id": "17sjFXtnUT8RiEt7AmxwhJCZdOiGzS3Ln",
+          "url": "https://drive.google.com/file/d/17sjFXtnUT8RiEt7AmxwhJCZdOiGzS3Ln/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p09.zip.002",
+          "bytes": 99614720,
+          "sha256": "d75a9314db08467e73f76de2f36944bbcc50f8174c467802a0b7529345bd251a",
+          "md5": "c8c544ef35c50a4b059fbe8b2f475c76",
+          "drive_file_id": "1blXzQaoaLRqjVdsnAF-Igov8ryqvVQSV",
+          "url": "https://drive.google.com/file/d/1blXzQaoaLRqjVdsnAF-Igov8ryqvVQSV/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p09.zip.003",
+          "bytes": 99614720,
+          "sha256": "ccfef849cc50cb839bfd989e16b59888e0ff1ff7ca91982134d11f6881b52f6d",
+          "md5": "b25826f0b76e6ac695bbae5fbb4c3203",
+          "drive_file_id": "1eDzodXh8eDdGcGzfFo7Lh608u-yTc2Jo",
+          "url": "https://drive.google.com/file/d/1eDzodXh8eDdGcGzfFo7Lh608u-yTc2Jo/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p09.zip.004",
+          "bytes": 58385555,
+          "sha256": "0c37c3a4302f4eb1424e2d3ebfe3df5940c6d2214fe262564fbd6056ca8a49eb",
+          "md5": "54b5b2c09b97a3bc9466838272ace45c",
+          "drive_file_id": "1CplLAep_wAr8dI7M7mxQcVbMFuu7QE7W",
+          "url": "https://drive.google.com/file/d/1CplLAep_wAr8dI7M7mxQcVbMFuu7QE7W/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p10",
+      "file": "sprites-p10.zip",
+      "bytes": 418326385,
+      "sha256": "7ccbc545e3cd6258efe2b852446d1984436c88fdd0683b7ca4697a3922e9e5ae",
+      "normalized_frames": 2910,
+      "volumes": [
+        {
+          "name": "sprites-p10.zip.001",
+          "bytes": 99614720,
+          "sha256": "4dd8f832b41ae126c321a623978a24816b8a401e86c6864844acb65cd094ba48",
+          "md5": "e3568317a8dc2a3e2d31068814ba83e7",
+          "drive_file_id": "1mOUNtKd9rOVyButqSfpft0efyUkS1c92",
+          "url": "https://drive.google.com/file/d/1mOUNtKd9rOVyButqSfpft0efyUkS1c92/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p10.zip.002",
+          "bytes": 99614720,
+          "sha256": "90f7d4ac37e572261ea9a5e8e0f7e3da50974f20cd76c41497cea3d0f03290c1",
+          "md5": "3c8e98af336434fa0c6846de85abdba1",
+          "drive_file_id": "1ZWFXokIuZNxoNdtPnJde2dAEd-_jjWgA",
+          "url": "https://drive.google.com/file/d/1ZWFXokIuZNxoNdtPnJde2dAEd-_jjWgA/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p10.zip.003",
+          "bytes": 99614720,
+          "sha256": "3baa36d828c2c541b5176c5931fc898249bd54be861f221181615ec9919d7a4f",
+          "md5": "43aa927526ffb1fccb02288cbf52fe33",
+          "drive_file_id": "1lF0VWto_cpy0HcmPKT4PjHFs0lQEfdcn",
+          "url": "https://drive.google.com/file/d/1lF0VWto_cpy0HcmPKT4PjHFs0lQEfdcn/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p10.zip.004",
+          "bytes": 99614720,
+          "sha256": "9c6334dd8a0d260d7c6b4deabb27e765b3db1e3145f7652b12f78cd8995d7c04",
+          "md5": "66b8bd83a698e9907081be32ab70e399",
+          "drive_file_id": "1uOm9GbXlh5qdPEOw8HRWqd6qrqnlkwDn",
+          "url": "https://drive.google.com/file/d/1uOm9GbXlh5qdPEOw8HRWqd6qrqnlkwDn/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p10.zip.005",
+          "bytes": 19867505,
+          "sha256": "bd6161f34bb4bdff1ff9f13d47d032521c0b08e9cd6a7ac81c47aee8aaf87721",
+          "md5": "89d7ffea6909ffb5bd70e71558bbd459",
+          "drive_file_id": "1RnGfBr3crHFQxbo2R9X3fvpZxywfg_q3",
+          "url": "https://drive.google.com/file/d/1RnGfBr3crHFQxbo2R9X3fvpZxywfg_q3/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p11",
+      "file": "sprites-p11.zip",
+      "bytes": 411623087,
+      "sha256": "3ca5eeeaad283ef3f72d5e61f9f81716e418c3d2d7baabc307374e047be0a5ad",
+      "normalized_frames": 2522,
+      "volumes": [
+        {
+          "name": "sprites-p11.zip.001",
+          "bytes": 99614720,
+          "sha256": "52058e98451f739bf903ffedcc337fa99438741367377da87d9a089c31e9e08b",
+          "md5": "14710754ff2fee7488f6abbc5797f84e",
+          "drive_file_id": "1DlClbjbloV3Kd2jc3jZTbRGJz7O98Am4",
+          "url": "https://drive.google.com/file/d/1DlClbjbloV3Kd2jc3jZTbRGJz7O98Am4/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p11.zip.002",
+          "bytes": 99614720,
+          "sha256": "c80876530d80c2e48ff0b334475d181f2a5f82dff2704de2981144ea9711701f",
+          "md5": "b07ab124fab3e01b958995ac2f179ec7",
+          "drive_file_id": "1uy40eqJzThtOM7l3Nca5Pi0rTqRozyBI",
+          "url": "https://drive.google.com/file/d/1uy40eqJzThtOM7l3Nca5Pi0rTqRozyBI/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p11.zip.003",
+          "bytes": 99614720,
+          "sha256": "10c66ec6b9017c4ca8c580d03bd7cd8fae5deb2dcc9f995e185f99d92298dba3",
+          "md5": "99e9f1fae7edc150007bfe47e557731d",
+          "drive_file_id": "1GKUsLTjT8lU-JKrh1aJElM8uyaJrH9VJ",
+          "url": "https://drive.google.com/file/d/1GKUsLTjT8lU-JKrh1aJElM8uyaJrH9VJ/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p11.zip.004",
+          "bytes": 99614720,
+          "sha256": "a33104fd68e220c92e1b59c47303fb56718aa171c8873672e65e4351b4ba7200",
+          "md5": "9f187229bfb95dc8dc632ccdfc0c9728",
+          "drive_file_id": "10rlOK_L4Jd_ZK-6L1oMAcCUyXVobEzlf",
+          "url": "https://drive.google.com/file/d/10rlOK_L4Jd_ZK-6L1oMAcCUyXVobEzlf/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p11.zip.005",
+          "bytes": 13164207,
+          "sha256": "f03a2fab5cb0df46e26fe5709954abd74eee2cddca1fe8926dc27727c4a158d0",
+          "md5": "4879370553eb6a5f5844d0cd577f5e7e",
+          "drive_file_id": "19WsP3FGnGoCX5PtLS3KppOpKeEK4iJnJ",
+          "url": "https://drive.google.com/file/d/19WsP3FGnGoCX5PtLS3KppOpKeEK4iJnJ/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p12",
+      "file": "sprites-p12.zip",
+      "bytes": 275891899,
+      "sha256": "d6337007e5df6c61f57c0f6b15945ee6d60508f87ec074edeb6a8db82ad4f32c",
+      "normalized_frames": 1843,
+      "volumes": [
+        {
+          "name": "sprites-p12.zip.001",
+          "bytes": 99614720,
+          "sha256": "8cd213f749c5b6920ed5ab9490ca23bf39323a6a31b21acf82a9f6aa2b2dc0b2",
+          "md5": "56183703247766992f2e4227bd50bc9f",
+          "drive_file_id": "1-oQZJwmbkGFumNT7GE4Tg_J7kXKn6mIr",
+          "url": "https://drive.google.com/file/d/1-oQZJwmbkGFumNT7GE4Tg_J7kXKn6mIr/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p12.zip.002",
+          "bytes": 99614720,
+          "sha256": "42ad5b4a611322397208beed765a6a70537a03b6a47cf46622dc8c84e0ceaeb3",
+          "md5": "e898f945441256e31841f6030f6b894b",
+          "drive_file_id": "1za1MbSIieOwjjVp8FOWi8Y6lxCfhkOjz",
+          "url": "https://drive.google.com/file/d/1za1MbSIieOwjjVp8FOWi8Y6lxCfhkOjz/view?usp=drivesdk"
+        },
+        {
+          "name": "sprites-p12.zip.003",
+          "bytes": 76662459,
+          "sha256": "57bc0e9e26a4755ee3128e36d171754a06fcc6f8f8cfb497231af92a14802833",
+          "md5": "29af2223fa4ebe41d3fda9f74f64f8e2",
+          "drive_file_id": "1dbtDKNYwo8xpKSXQfeYsmIWPLAIchfCf",
+          "url": "https://drive.google.com/file/d/1dbtDKNYwo8xpKSXQfeYsmIWPLAIchfCf/view?usp=drivesdk"
+        }
+      ]
+    },
+    {
+      "character": "p13",
+      "file": "sprites-p13.zip",
+      "bytes": 48858601,
+      "sha256": "584c1d7ecb24ff4ed84bd3fe9144e9dbd1a8d1238a85b1f73f0ea6efb69f036b",
+      "normalized_frames": 157,
+      "volumes": [
+        {
+          "name": "sprites-p13.zip",
+          "bytes": 48858601,
+          "sha256": "584c1d7ecb24ff4ed84bd3fe9144e9dbd1a8d1238a85b1f73f0ea6efb69f036b",
+          "md5": "8978c39f831e272cc3b959c1f1fb0e46",
+          "drive_file_id": "1iX28lbQEJQV0FyyU_vh9HNMUX1mDqgnw",
+          "url": "https://drive.google.com/file/d/1iX28lbQEJQV0FyyU_vh9HNMUX1mDqgnw/view?usp=drivesdk"
+        }
+      ]
+    }
+  ]
+}

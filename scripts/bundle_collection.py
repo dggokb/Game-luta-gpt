@@ -24,6 +24,10 @@ def bundle(processed, output, inventory):
     actual={s['character'] for s in summaries}
     if actual!=expected:
         raise ValueError(f'Coleção incompleta: faltam {sorted(expected-actual)}; extras {sorted(actual-expected)}')
+    for summary in summaries:
+        if summary['videos']:
+            clips=json.loads((processed/summary['character']/'assets/manifest.json').read_text())['clips']
+            summary['in_place_clips']=[c['name'] for c in clips if c['status']!='rejected' and c.get('root_motion')]
     root_manifest={'format_version':4,'status':'needs_review','clips':[], 'characters':summaries,
                    'mobile_preview':{'all_frames_retained':True,'timestamps_changed':False,
                        'format':'WebP quality 85 atlas tiles','maximum_image_width':720,
