@@ -32,11 +32,14 @@ R sorteia, Tab abre as opções, Q/E/O troca o time.
 
 Modo teste: F1 DEBUG, F3 liga/desliga a IA, F5 enche a vida do P1, F6 a da CPU.
 Arquivos do DEBUG ("salvar no Drive") vão para Documentos/GameLutaGPT.
-F11 ou Alt+Enter: tela cheia. O mouse também aperta os botões da tela.
+F11 ou Alt+Enter: tela cheia (o jogo lembra da escolha na próxima vez).
+O controle virtual de toque (D-pad e botões de golpe) não aparece no PC; o mouse
+continua apertando os botões de teste (IA, DEBUG, VIDA...) e a SELEÇÃO.
 
 Opções (linha de comando / --java-options)
 ------------------------------------------
---tela-cheia                  abre em tela cheia
+--tela-cheia / --janela       abre em tela cheia / em janela
+-Dgameluta.controleNaTela=true mostra o controle virtual de toque
 -Dgameluta.resolucao=1280x720 desenha em resolução menor (PCs mais fracos)
 -Dgameluta.semSom=true        sem som
 -Dgameluta.log=debug          mostra todo o log no terminal

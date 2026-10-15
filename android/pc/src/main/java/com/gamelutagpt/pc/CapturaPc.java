@@ -50,6 +50,7 @@ public final class CapturaPc {
     public GameView jogo() { return jogo; }
 
     public void comecar() {
+        jogo.setTouchControlsVisible(Boolean.getBoolean("gameluta.controleNaTela"));
         jogo.attach(quadro, quadro.largura(), quadro.altura());
     }
 

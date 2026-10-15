@@ -364,10 +364,15 @@ O jogo inteiro roda no PC — menu, modo história, seleção, luta, HUD, pausa,
   seu; a CI (`.github/workflows/build-pc.yml`) gera os três.
 - Sem Java embutido: `gradle :pc:distZip` (precisa de Java 17+ instalado).
 - Controles: teclado (WASD/setas, J K L = L M H, U auto-combo, I Super, O Tag, Esc pausa) e
-  controle pelo SDL (padrão Xbox); o mouse aperta os botões da tela. Teclado/controle também
+  controle pelo SDL (padrão Xbox); no PC o controle virtual de toque some (o mouse ainda
+  aperta os botões de teste). F11/Alt+Enter: tela cheia. Teclado/controle também
   valem no Android (`HardwareInput`). Lista completa em `android/pc/LEIA-ME.txt`.
 - Conferir sem tela: `gradle :pc:capturar` (PNGs e tempo de quadro), `gradle :pc:test`,
   e `gradle :pc:testarMotor` roda os testes JUnit do app contra o build de PC.
+
+**Tela de carregamento** (APK e PC): ao abrir o jogo e sempre que ele carrega arte pesada
+(duplas novas, lutas da história) aparece "CARREGANDO" com o anel girando, em vez da tela
+parada.
 
 Como funciona por dentro, o que muda por plataforma e como adicionar o que faltar:
 [docs/exportacao-pc.md](docs/exportacao-pc.md).

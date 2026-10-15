@@ -279,6 +279,20 @@ public class GameView extends SurfaceView
 
     private final ConcurrentLinkedQueue<MotionEvent> pendingInput =
         new ConcurrentLinkedQueue<>();
+    /**
+     * Carregamento pesado (atlas das duplas, cenário, ultras): roda numa thread à parte enquanto
+     * o loop só desenha a {@link TelaCarregando}, para o jogo nunca parecer travado. Durante o
+     * carregamento o loop não lê toque nem tecla e não roda a luta: só o carregador mexe no
+     * estado. Fila e thread são da thread do jogo.
+     */
+    private final java.util.ArrayList<Runnable> loadQueue = new java.util.ArrayList<>();
+    private volatile Thread loader;
+    private volatile Throwable loadError;
+    private long loadingSince;
+    private final TelaCarregando telaCarregando = new TelaCarregando();
+    /** Controle virtual (D-pad e botões de golpe) na tela; o PC desliga, lá é teclado/controle. */
+    private volatile boolean touchControls = true;
+
     /** Teclado/controle físico na luta (PC e Android): +código ao apertar, -código ao soltar. */
     private final ConcurrentLinkedQueue<Integer> hardwareKeys = new ConcurrentLinkedQueue<>();
     private final HardwareInput hardware = new HardwareInput();
@@ -416,6 +430,11 @@ public class GameView extends SurfaceView
     }
 
     private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
+        // Duplas novas decodificam a arte delas (segundos): com a tela de carregamento.
+        carregando(() -> selectTeamsNow(point, partner, cpuPoint, cpuPartner, solo));
+    }
+
+    private void selectTeamsNow(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
         hud.resetEffects();
         duel = solo;
         team = membersOf(point, partner);
@@ -810,6 +829,7 @@ public class GameView extends SurfaceView
 
     // Render cadence can vary; the simulation always advances in whole 60 Hz frames.
     private void advanceSimulation(float elapsedSeconds) {
+        if (updateLoading()) return;
         processPendingInput();
         // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
         // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
@@ -817,9 +837,68 @@ public class GameView extends SurfaceView
         float speed = fightClockRunning() ? pausa.velocidade() : 1f;
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
+            // Pediu carregamento: para aqui; o próximo quadro já é a tela de carregamento.
+            if (!loadQueue.isEmpty()) {
+                accumulatedTime = 0f;
+                return;
+            }
             update();
             accumulatedTime = Math.max(0f, accumulatedTime - FIXED_STEP);
         }
+    }
+
+    /**
+     * Pede um carregamento pesado. Roda no próximo quadro, fora do loop, com a tela de
+     * carregamento na frente; chamado de dentro de outro carregamento, roda na hora.
+     */
+    private void carregando(Runnable work) {
+        Thread current = Thread.currentThread();
+        // Fora do loop do jogo (testes que chamam advanceSimulation, construção) roda na hora,
+        // como sempre rodou.
+        if (current == loader || current != gameThread) {
+            work.run();
+        } else {
+            loadQueue.add(work);
+        }
+    }
+
+    private boolean loadingActive() {
+        return loader != null || !loadQueue.isEmpty();
+    }
+
+    /** True enquanto carrega (o loop não simula nem lê entrada). Começa e termina carregamentos. */
+    private boolean updateLoading() {
+        Thread running = loader;
+        if (running != null) {
+            if (running.isAlive()) return true;
+            loader = null;
+            accumulatedTime = 0f;
+            Throwable error = loadError;
+            loadError = null;
+            if (error instanceof RuntimeException) throw (RuntimeException) error;
+            if (error instanceof Error) throw (Error) error;
+            if (error != null) throw new IllegalStateException(error);
+        }
+        if (loadQueue.isEmpty()) return false;
+        final java.util.ArrayList<Runnable> works = new java.util.ArrayList<>(loadQueue);
+        loadQueue.clear();
+        loadingSince = android.os.SystemClock.uptimeMillis();
+        Thread thread = new Thread(() -> {
+            try {
+                for (Runnable work : works) work.run();
+            } catch (Throwable t) {
+                loadError = t;
+            }
+        }, "Carregando");
+        thread.setDaemon(true);
+        loader = thread;
+        thread.start();
+        return true;
+    }
+
+    /** PC: sem o controle virtual na tela (o mouse também não aperta onde ele ficaria). */
+    public void setTouchControlsVisible(boolean visible) {
+        touchControls = visible;
     }
 
     /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
@@ -1551,6 +1630,10 @@ public class GameView extends SurfaceView
 
     /** Whole frame into any canvas: the surface in production, a bitmap in visual review tests. */
     private void renderFrame(Canvas canvas) {
+        if (loadingActive()) {
+            telaCarregando.draw(canvas, android.os.SystemClock.uptimeMillis() - loadingSince);
+            return;
+        }
         {
             resetPaintForFrame();
 
@@ -1694,7 +1777,7 @@ public class GameView extends SurfaceView
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
                 drawHud(canvas);
-                drawControls(canvas);
+                if (touchControls) drawControls(canvas);
                 conversa.render(renderCanvas);
             }
             if (paginaFinal.isActive()) {
@@ -2369,6 +2452,17 @@ public class GameView extends SurfaceView
         return true;
     }
 
+    /** Partes do controle virtual (o resto, como IA/DEBUG/SELEÇÃO, continua clicável). */
+    private static boolean isPadControl(ControlsLayout.Control control) {
+        switch (control) {
+            case DPAD: case SUPER: case LIGHT: case MEDIUM: case HEAVY: case COMBO:
+            case TAG: case THROW: case PUSHBLOCK: case OVERDRIVE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private void processPendingInput() {
         processHardwareKeys();
         MotionEvent latestMove = null;
@@ -2479,6 +2573,7 @@ public class GameView extends SurfaceView
             }
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
+            if (!touchControls && isPadControl(control)) control = ControlsLayout.Control.NONE;
             // No tutorial e nas lutas com conversa os botões de teste não aparecem nem respondem.
             if (testButtonsHidden() && ControlsLayout.isTestButton(control)) control = ControlsLayout.Control.NONE;
             switch (control) {
@@ -2976,6 +3071,11 @@ public class GameView extends SurfaceView
 
     @Override
     public void onHistoriaLuta(Episodio.Passo luta) {
+        // Cenário e duplas da luta carregam com a tela de carregamento; o resto vem depois deles.
+        carregando(() -> startStoryFight(luta));
+    }
+
+    private void startStoryFight(Episodio.Passo luta) {
         // Cada luta pode pedir o seu cenário (o treino é no dojo).
         useStage(luta.cenario);
         // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA

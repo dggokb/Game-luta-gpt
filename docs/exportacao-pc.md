@@ -25,6 +25,18 @@ android/pc/src/main/java    ─┘
 | `pc/src/main/java/com/gamelutagpt/pc` | `JogoPc` (janela 16:9 com faixas, tela cheia F11/Alt+Enter, "Carregando…"), `Teclas` (AWT → Android), `Controles` (SDL/Jamepad → botões do Android), `DadosDoJogo` (onde estão os arquivos), `QuadroPc`, `CapturaPc`. |
 | `app/.../HardwareInput.java` | Mapa de teclado/controle **compartilhado**: o `GameView` entende teclas físicas na luta e nos menus, no PC e no Android (teclado/controle Bluetooth). |
 
+## Tela cheia, controle na tela e carregamento
+
+- **Tela cheia**: F11 ou Alt+Enter, pegos antes de qualquer componente (no Windows o Alt
+  mexia no menu da janela). Usa a tela cheia do sistema (`GraphicsDevice.setFullScreenWindow`)
+  e lembra a escolha (`pc_janela.properties` nas preferências).
+- **Controle virtual**: o PC chama `GameView.setTouchControlsVisible(false)`: o D-pad e os
+  botões de golpe não são desenhados nem respondem ao mouse. Botões de teste e SELEÇÃO
+  continuam.
+- **Carregamento**: `TelaCarregando` (no app) aparece no APK e no PC ao abrir o jogo e sempre
+  que o `GameView` carrega arte pesada (duplas novas, lutas da história): o trabalho roda numa
+  thread à parte e o loop só desenha a tela, com o anel girando.
+
 ## Desempenho
 
 O Java2D por software é lento em dois pontos que o jogo usa muito; a camada resolve sem

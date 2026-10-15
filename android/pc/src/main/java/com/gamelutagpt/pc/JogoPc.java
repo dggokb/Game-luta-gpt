@@ -58,6 +58,11 @@ public final class JogoPc {
     private boolean telaCheia;
     private Rectangle janelaNormal;
     private boolean mouseApertado;
+    /** "CARREGANDO" animado enquanto o GameView é montado (thread da janela). */
+    private javax.swing.Timer animacaoCarregando;
+    private android.content.SharedPreferences preferencias;
+    /** Alt+Enter/F11 segurados não ficam alternando a tela cheia. */
+    private boolean atalhoTelaCheia;
 
     private JogoPc() {
         quadro = new QuadroPc(1280, 720, this::apresentar);
@@ -77,8 +82,13 @@ public final class JogoPc {
         Log.i(TAG, "Game Luta GPT " + BuildConfig.VERSION_NAME + " — dados em " + dados.origem);
         Context contexto = dados.contexto(DadosDoJogo.pastaDePreferencias());
         JogoPc pc = new JogoPc();
-        boolean cheia = false;
-        for (String a : args) if (a.equals("--tela-cheia")) cheia = true;
+        // Tela cheia: a última escolha (Alt+Enter/F11) ou --tela-cheia / --janela.
+        pc.preferencias = contexto.getSharedPreferences("pc_janela", Context.MODE_PRIVATE);
+        boolean cheia = pc.preferencias.getBoolean("telaCheia", false);
+        for (String a : args) {
+            if (a.equals("--tela-cheia")) cheia = true;
+            if (a.equals("--janela")) cheia = false;
+        }
         boolean telaCheiaInicial = cheia;
         EventQueue.invokeAndWait(() -> pc.abrir(contexto, telaCheiaInicial));
         // Carrega fora da thread da janela; ela já mostra "Carregando…".
@@ -113,6 +123,31 @@ public final class JogoPc {
         janela.toFront();
         tela.createBufferStrategy(2);
         tela.requestFocus();
+
+        // Alt+Enter e F11 antes de qualquer componente (e com qualquer foco): no Windows o Alt
+        // mexe no menu da janela e o atalho podia nem chegar ao jogo.
+        java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            boolean atalho = e.getKeyCode() == KeyEvent.VK_F11 || (e.getKeyCode() == KeyEvent.VK_ENTER && e.isAltDown());
+            if (e.getID() == KeyEvent.KEY_PRESSED && atalho) {
+                if (!atalhoTelaCheia) {
+                    atalhoTelaCheia = true;
+                    alternarTelaCheia();
+                }
+                e.consume();
+                return true;
+            }
+            if (e.getID() == KeyEvent.KEY_RELEASED && (e.getKeyCode() == KeyEvent.VK_F11 || e.getKeyCode() == KeyEvent.VK_ENTER)) {
+                boolean eraAtalho = atalhoTelaCheia;
+                atalhoTelaCheia = false;
+                if (eraAtalho) {
+                    e.consume();
+                    return true;
+                }
+            }
+            // Alt sozinho não abre o menu da janela no Windows (roubaria as próximas teclas).
+            if (e.getKeyCode() == KeyEvent.VK_ALT) e.consume();
+            return false;
+        });
 
         tela.addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) { teclaApertada(e); }
@@ -149,11 +184,16 @@ public final class JogoPc {
 
         if (comecarEmTelaCheia) alternarTelaCheia();
         redimensionar();
-        carregando();
+        long inicio = System.currentTimeMillis();
+        animacaoCarregando = new javax.swing.Timer(33, ev -> carregando(System.currentTimeMillis() - inicio));
+        animacaoCarregando.start();
     }
 
     /** Liga o jogo carregado à janela (thread da janela). */
     private void comecar(GameView carregado) {
+        if (animacaoCarregando != null) animacaoCarregando.stop();
+        // No PC o controle virtual da tela some: é teclado/controle (-Dgameluta.controleNaTela=true mostra).
+        carregado.setTouchControlsVisible(Boolean.getBoolean("gameluta.controleNaTela"));
         jogo = carregado;
         controles = new Controles(carregado);
         redimensionar();
@@ -161,23 +201,19 @@ public final class JogoPc {
         controles.iniciar();
     }
 
-    /** Tela de espera enquanto os atlas carregam. */
-    private void carregando() {
+    private final com.gamelutagpt.TelaCarregando telaCarregando = new com.gamelutagpt.TelaCarregando();
+    private final android.graphics.Canvas canvasCarregando = new android.graphics.Canvas();
+
+    /** A mesma tela de carregamento do jogo, enquanto os atlas carregam. */
+    private void carregando(long ms) {
+        if (jogo != null) return;
         BufferedImage img = new BufferedImage(quadro.largura(), quadro.altura(), BufferedImage.TYPE_INT_RGB);
         Graphics2D g = img.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setColor(new Color(6, 11, 28));
-        g.fillRect(0, 0, img.getWidth(), img.getHeight());
-        g.setColor(Color.WHITE);
-        g.setFont(new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.BOLD | java.awt.Font.ITALIC, img.getHeight() / 18));
-        String texto = "CARREGANDO…";
-        int w = g.getFontMetrics().stringWidth(texto);
-        g.drawString(texto, (img.getWidth() - w) / 2, img.getHeight() / 2);
-        g.dispose();
+        canvasCarregando.begin(g, img, img.getWidth(), img.getHeight());
+        telaCarregando.draw(canvasCarregando, ms);
+        canvasCarregando.end().dispose();
         apresentar(img);
     }
-
-    // ------------------------------------------------------------------ imagem
 
     private void redimensionar() {
         if (jogo == null) {
@@ -228,25 +264,38 @@ public final class JogoPc {
         }
     }
 
+    /**
+     * Tela cheia de verdade (GraphicsDevice.setFullScreenWindow), sem borda e por cima da barra
+     * de tarefas; sem suporte, janela sem borda do tamanho do monitor. A escolha fica salva.
+     */
     private void alternarTelaCheia() {
-        GraphicsConfiguration gc = janela.getGraphicsConfiguration();
+        java.awt.GraphicsDevice monitor = janela.getGraphicsConfiguration().getDevice();
         if (jogo != null) jogo.pauseGame();
-        janela.dispose();
         telaCheia = !telaCheia;
         if (telaCheia) {
             janelaNormal = janela.getBounds();
+            janela.dispose();
             janela.setUndecorated(true);
-            janela.setBounds(gc.getBounds());
+            if (monitor.isFullScreenSupported()) {
+                janela.setVisible(true);
+                monitor.setFullScreenWindow(janela);
+            } else {
+                janela.setBounds(monitor.getDefaultConfiguration().getBounds());
+                janela.setVisible(true);
+            }
         } else {
+            if (monitor.getFullScreenWindow() == janela) monitor.setFullScreenWindow(null);
+            janela.dispose();
             janela.setUndecorated(false);
             if (janelaNormal != null) janela.setBounds(janelaNormal);
+            janela.setVisible(true);
         }
-        janela.setVisible(true);
+        janela.toFront();
         tela.createBufferStrategy(2);
         tela.requestFocus();
         redimensionar();
+        if (preferencias != null) preferencias.edit().putBoolean("telaCheia", telaCheia).apply();
         if (jogo != null) jogo.resumeGame();
-        else carregando();
     }
 
     private void fechar() {
@@ -264,11 +313,6 @@ public final class JogoPc {
     // ------------------------------------------------------------------ entrada
 
     private void teclaApertada(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_F11 || (e.getKeyCode() == KeyEvent.VK_ENTER && e.isAltDown())) {
-            if (!repeticoes.containsKey(-1)) alternarTelaCheia();
-            repeticoes.put(-1, 0);
-            return;
-        }
         if (jogo == null) return;
         int codigo = Teclas.paraAndroid(e.getKeyCode(), e.getExtendedKeyCode());
         Log.d(TAG, "tecla " + KeyEvent.getKeyText(e.getKeyCode()) + " ext=" + e.getExtendedKeyCode() + " → " + codigo);
@@ -280,7 +324,6 @@ public final class JogoPc {
     }
 
     private void teclaSolta(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_F11 || e.getKeyCode() == KeyEvent.VK_ENTER) repeticoes.remove(-1);
         if (jogo == null) return;
         int codigo = Teclas.paraAndroid(e.getKeyCode(), e.getExtendedKeyCode());
         if (codigo == 0 || repeticoes.remove(codigo) == null) return;
