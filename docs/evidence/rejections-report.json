@@ -1,0 +1,121 @@
+{
+  "status": "needs_review",
+  "references": {
+    "idle": {
+      "file": "masters/idle.png",
+      "source_name": "inicio_centro.png",
+      "sha256": "ab3e017c10b66d30ecb2797142e06dbd061ded502beea62b76b4ce8a18c7850f",
+      "bbox": [
+        497,
+        220,
+        783,
+        649
+      ],
+      "root_source": [
+        640.0,
+        649
+      ],
+      "scale_to_output": 1.0,
+      "landmarks_file": "masters/idle-landmarks.png"
+    },
+    "crouch": {
+      "file": "masters/crouch.png",
+      "source_name": "inicio_agachado.png",
+      "sha256": "a40102baa08f014dc71367804d8ce04e589182444c0ac7734bd166520aa63a79",
+      "bbox": [
+        499,
+        351,
+        782,
+        649
+      ],
+      "root_source": [
+        640.5,
+        649
+      ],
+      "scale_to_output": 1.0,
+      "landmarks_file": "masters/crouch-landmarks.png"
+    }
+  },
+  "master_coherence": {
+    "status": "coherent_within_annotation_tolerance",
+    "method": "user_annotated_rigid_anatomical_segments",
+    "tolerance_fraction": 0.08,
+    "measurements": [
+      {
+        "name": "crown_to_chin_approximate_manual",
+        "points": {
+          "idle": [
+            [
+              665,
+              224
+            ],
+            [
+              686,
+              310
+            ]
+          ],
+          "crouch": [
+            [
+              663,
+              354
+            ],
+            [
+              684,
+              438
+            ]
+          ]
+        },
+        "lengths_px": {
+          "idle": 88.52683209061533,
+          "crouch": 86.58521813797087
+        },
+        "crouch_to_idle_ratio": 0.9780675089485068
+      }
+    ],
+    "correction_applied": false,
+    "reason": "Medições anatômicas aproximadas; revisar marcações na prévia. Nenhuma correção oculta entre mestres."
+  },
+  "review": {
+    "visual_approval": false,
+    "reason": "Aprovação visual externa obrigatória; execução de testes não aprova arte."
+  },
+  "clips": [
+    {
+      "name": "wrong_crouch",
+      "status": "rejected",
+      "reference_frame": null,
+      "reference_similarity": null,
+      "metrics": null,
+      "scale_per_video": null,
+      "source_root": null,
+      "peer_height_spread": null,
+      "rejection_reason": "Pose incerta: score=0.728, silhueta=0.754, aparência=0.452, proporções=0.986; nenhuma escala aprovada",
+      "frame_warnings": []
+    },
+    {
+      "name": "wrong_jab_frame",
+      "status": "rejected",
+      "reference_frame": null,
+      "reference_similarity": null,
+      "metrics": null,
+      "scale_per_video": null,
+      "source_root": null,
+      "peer_height_spread": null,
+      "rejection_reason": "Pose incerta: score=0.541, silhueta=0.552, aparência=0.363, proporções=0.726; nenhuma escala aprovada",
+      "frame_warnings": [
+        {
+          "index": 17,
+          "warnings": [
+            "disconnected_silhouette_or_background"
+          ]
+        },
+        {
+          "index": 18,
+          "warnings": [
+            "disconnected_silhouette_or_background"
+          ]
+        }
+      ]
+    }
+  ]
+}

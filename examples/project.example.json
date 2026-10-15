@@ -3,12 +3,16 @@
     "idle": "../entradas/idle_master.png",
     "crouch": "../entradas/crouch_master.png"
   },
-  "idle_target_height": 256,
   "padding": 24,
-  "minimum_similarity": 0.62,
+  "minimum_similarity": 0.82,
+  "master_scale_tolerance": 0.08,
+  "anatomical_segments": [],
+  "background": {"mode": "green"},
   "clips": [
-    {"name": "idle", "video": "../entradas/idle.mp4", "reference_pose": "idle", "detect_loop": true},
-    {"name": "dash", "video": "../entradas/dash.mp4", "reference_pose": "idle"},
-    {"name": "crouch", "video": "../entradas/crouch.mp4", "reference_pose": "crouch"}
+    {"name": "idle", "role": "idle", "video": "../entradas/idle.mp4", "reference_pose": "idle", "detect_loop": true},
+    {"name": "jab", "role": "jab", "video": "../entradas/jab.mp4", "reference_pose": "idle"},
+    {"name": "dash", "role": "dash", "video": "../entradas/dash.mp4", "reference_pose": "idle", "animation_type": "translation"},
+    {"name": "jump", "video": "../entradas/jump.mp4", "reference_pose": "idle", "animation_type": "airborne"},
+    {"name": "crouch", "video": "../entradas/crouch.mp4", "reference_pose": "crouch", "animation_type": "crouched"}
   ]
 }

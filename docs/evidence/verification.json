@@ -1,0 +1,24 @@
+{
+  "checks": {
+    "real_footage_suite": 24,
+    "additional_output_safety_unit_checks": 3,
+    "browser_interactions": 6,
+    "browser_errors": 0,
+    "real_rejection_cases": 2,
+    "raw_frames_rejection_cases": 242,
+    "source_files_unchanged": true
+  },
+  "implementation_sha256": {
+    "sprite_pipeline/__init__.py": "15fdd1977b044258eacd17901bd21f33b7630e6137b9f13510bd6e09f42c63fa",
+    "sprite_pipeline/calibration.py": "aa081e5dda5dc942c2f972be41fcc4fedcc332943228c0765b6ecebea5019456",
+    "sprite_pipeline/errors.py": "041f65cfe9b8bdc873502b67a5c431fad84730df14096ca92117826e1915aa00",
+    "sprite_pipeline/exporting.py": "6f19cedb15032e830ae1adac873f75efb26e56d793f06d415651d2b6d6c1a0f7",
+    "sprite_pipeline/extraction.py": "a4fc1cbd9ac33bc8a17b5e52afd2b401ee004c353d575eb2408ae9d2d2cfb6f5",
+    "sprite_pipeline/imaging.py": "5e8fbe2583b14679fa9f5d01b76a70066f08ca67531b82395f6b2601ffa5fe19",
+    "sprite_pipeline/loops.py": "81830dd8e12940e484484ec0cbb7924f4cf1ac965464355610b31c7959a3a841",
+    "sprite_pipeline/motion.py": "85f908bfa9912fcde6bd4781972f36dcd67d1d67f1d4b519428b376f377f6ed4",
+    "sprite_pipeline/pipeline.py": "bbe83791e5f8712993c5c13c7e71339b65d49daf8e76e4260b81bb455b3db39d",
+    "sprite_pipeline/viewer.html": "879f3acdbcb37687ccbbaadeac1ed89881cccdf43e29ee817a496839fb48bb47",
+    "sprite_pipeline/viewer.py": "b9eda771e5edf161e2a8b4cca13e792e928c53123673e27ddb58dacb4b9e5e34"
+  }
+}

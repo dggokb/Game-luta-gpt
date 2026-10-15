@@ -1,0 +1,39 @@
+{
+  "original_sha256": {
+    "inicio_centro.png": "ab3e017c10b66d30ecb2797142e06dbd061ded502beea62b76b4ce8a18c7850f",
+    "inicio_agachado.png": "a40102baa08f014dc71367804d8ce04e589182444c0ac7734bd166520aa63a79",
+    "idle.mp4": "0a31fcde8312e719fb703b76e815b512edce573dae509848fa033afa1f55c8cf",
+    "L(jab).mp4": "1bb4b1ab2a6321db91a96a34f72141b85ead925c609ed27ef083721d00ebacb8",
+    "dash.mp4": "c8ecbe2b1aa04be5c19c62339f3d277a1410cfa8c65ba7e8e4cb7df64f6cb90b",
+    "jump.mp4": "5ca138c755623cf7c1d5bc7cb23da3d0d74423d0748db91b152348464471bcd6",
+    "crounch.mp4": "c1cf955e9217350ea0d31cc3d8f0d5a9396b479b9cf73fc67246d6c874f433eb",
+    "l2(jab).mp4": "f7e5f1bc618d402a81d4b98ef00b06f59f8a3f44153615460f0c174e5dcd7afa",
+    "dano_baixo.mp4": "0265cf88c804e919a4885b3994ee4ec2178dba2f760e63f3c987f184996f0639"
+  },
+  "originals_unchanged": true,
+  "derived_video": {
+    "file": "jab-half.nut",
+    "sha256": "360b0da9eca03c42d379095fa7487c7e2e1e848f9bf8ac436586159cf31e8f48",
+    "command": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "/workspace/real-inputs/L(jab).mp4",
+      "-vf",
+      "scale=iw/2:ih/2:flags=lanczos",
+      "-fps_mode",
+      "passthrough",
+      "-enc_time_base",
+      "demux",
+      "-c:v",
+      "ffv1",
+      "-level",
+      "3",
+      "/workspace/validated-delivery/jab-half.nut"
+    ],
+    "note": "Controlled geometric resampling of an existing complete video; no poses or motion synthesized."
+  },
+  "manual_landmarks": "Approximate crown/chin points, not a trained anatomical detector.",
+  "source_repository_base": "6ec6b10e3d9d20dd09b0e8ef6a11043d727acf70"
+}

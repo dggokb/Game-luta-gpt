@@ -1,0 +1,23 @@
+test_alpha_resampling_does_not_add_green_fringe (test_pipeline.Tests.test_alpha_resampling_does_not_add_green_fringe) ... ok
+test_background_failure_never_approved (test_pipeline.Tests.test_background_failure_never_approved) ... ok
+test_cycle_sequence_with_leadin_and_small_noise (test_pipeline.Tests.test_cycle_sequence_with_leadin_and_small_noise) ... ok
+test_green_residuals_removed_without_deleting_detached_art (test_pipeline.Tests.test_green_residuals_removed_without_deleting_detached_art) ... ok
+test_horizontal_and_vertical_displacement_preserved (test_pipeline.Tests.test_horizontal_and_vertical_displacement_preserved) ... ok
+test_html_escapes_script_injection (test_pipeline.Tests.test_html_escapes_script_injection) ... ok
+test_in_video_zoom_ambiguity_rejected (test_pipeline.Tests.test_in_video_zoom_ambiguity_rejected) ... ok
+test_master_coherence_requires_anatomical_evidence (test_pipeline.Tests.test_master_coherence_requires_anatomical_evidence) ... ok
+test_master_directory_name_is_reserved (test_pipeline.Tests.test_master_directory_name_is_reserved) ... ok
+test_master_scale_mismatch_is_not_repaired_by_pose_height (test_pipeline.Tests.test_master_scale_mismatch_is_not_repaired_by_pose_height) ... ok
+test_missing_idle (test_pipeline.Tests.test_missing_idle) ... ok
+test_negative_landmarks_rejected (test_pipeline.Tests.test_negative_landmarks_rejected) ... ok
+test_nonempty_output_is_preserved (test_pipeline.Tests.test_nonempty_output_is_preserved) ... ok
+test_output_cannot_contain_original_inputs (test_pipeline.Tests.test_output_cannot_contain_original_inputs) ... ok
+test_similarity_self (test_pipeline.Tests.test_similarity_self) ... ok
+test_static_hold_is_not_claimed_as_a_cycle (test_pipeline.Tests.test_static_hold_is_not_claimed_as_a_cycle) ... ok
+test_visual_scale_and_uniform_transform (test_pipeline.Tests.test_visual_scale_and_uniform_transform) ... ok
+test_wrong_pose_and_explicit_out_of_range_rejected (test_pipeline.Tests.test_wrong_pose_and_explicit_out_of_range_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.039s
+
+OK

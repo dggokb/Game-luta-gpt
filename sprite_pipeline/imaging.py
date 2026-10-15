@@ -1,0 +1,96 @@
+"""Explicit background treatment. Never changes raw files or recenters poses."""
+import cv2
+import numpy as np
+from .errors import CalibrationError
+
+
+def image_rgba(frame, options=None):
+    options = options or {}
+    if frame is None or frame.ndim != 3 or frame.dtype != np.uint8:
+        raise CalibrationError("Imagem inválida; use RGB/RGBA de 8 bits")
+    if frame.shape[2] == 4 and np.any(frame[:, :, 3] < 255):
+        rgba = cv2.cvtColor(frame, cv2.COLOR_BGRA2RGBA)
+    else:
+        rgb = cv2.cvtColor(frame[:, :, :3], cv2.COLOR_BGR2RGB)
+        mode = options.get("mode", "green")
+        if mode == "alpha":
+            raise CalibrationError("Modo alpha exige transparência existente")
+        if mode != "green":
+            raise CalibrationError("Fundo não suportado; forneça alpha ou chroma verde")
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+        channels = rgb.astype(np.float32)
+        dominance = channels[:, :, 1] - np.maximum(channels[:, :, 0], channels[:, :, 2])
+        green = ((hsv[:, :, 0] >= 34) & (hsv[:, :, 0] <= 94)
+                 & (hsv[:, :, 1] > 40) & (dominance > 12))
+        alpha = np.full(green.shape, 255, np.uint8)
+        alpha[green] = np.clip((24 - dominance[green]) * 255 / 12, 0, 255).astype(np.uint8)
+        rgba = np.dstack((rgb, alpha))
+    # Optional, user-visible exclusion regions, e.g. a watermark. Recorded in manifest.
+    for rect in options.get("exclude_rectangles", []):
+        x0, y0, x1, y1 = map(int, rect)
+        if not (0 <= x0 < x1 <= rgba.shape[1] and 0 <= y0 < y1 <= rgba.shape[0]):
+            raise CalibrationError("Retângulo de exclusão fora da imagem")
+        rgba[y0:y1, x0:x1, 3] = 0
+    return rgba
+
+
+def bounds(rgba):
+    y, x = np.nonzero(rgba[:, :, 3] > 32)
+    if not len(x) or len(x) > rgba.shape[0] * rgba.shape[1] * .90:
+        raise CalibrationError("Não foi possível separar personagem e fundo")
+    return [int(x.min()), int(y.min()), int(x.max()) + 1, int(y.max()) + 1]
+
+
+def quality(rgba, bbox):
+    mask = (rgba[:, :, 3] > 32).astype(np.uint8)
+    n, _, stats, _ = cv2.connectedComponentsWithStats(mask, 8)
+    areas = sorted(stats[1:, cv2.CC_STAT_AREA], reverse=True)
+    warnings = []
+    if len(areas) > 1 and sum(areas[1:]) > max(32, sum(areas) * .005):
+        warnings.append("disconnected_silhouette_or_background")
+    x0, y0, x1, y1 = bbox
+    if x0 == 0 or y0 == 0 or x1 == rgba.shape[1] or y1 == rgba.shape[0]:
+        warnings.append("source_touches_edge_possible_clipping")
+    return warnings
+
+
+def shape_feature(rgba, bbox, size=96):
+    x0, y0, x1, y1 = bbox
+    mask = (rgba[y0:y1, x0:x1, 3] > 64).astype(np.uint8)
+    h, w = mask.shape
+    k = (size - 4) / max(w, h)
+    nw, nh = max(1, round(w * k)), max(1, round(h * k))
+    result = np.zeros((size, size), dtype=np.uint8)
+    x, y = (size - nw) // 2, (size - nh) // 2
+    result[y:y+nh, x:x+nw] = cv2.resize(mask, (nw, nh), interpolation=cv2.INTER_NEAREST)
+    return result
+
+
+def appearance_feature(rgba, bbox):
+    x0, y0, x1, y1 = bbox
+    crop = rgba[y0:y1, x0:x1].astype(np.float32) / 255
+    return cv2.resize(crop[:, :, :3] * crop[:, :, 3:], (48, 64), interpolation=cv2.INTER_AREA)
+
+
+def similarity(a, b):
+    aa = cv2.dilate(a, np.ones((3, 3), np.uint8))
+    bb = cv2.dilate(b, np.ones((3, 3), np.uint8))
+    union = np.count_nonzero(aa | bb)
+    return float(np.count_nonzero(aa & bb) / union) if union else 0.0
+
+
+def affine_rgba(rgba, scale, translation, canvas):
+    """One similarity transform for the ENTIRE clip, with premultiplied alpha."""
+    data = rgba.astype(np.float32) / 255
+    data[:, :, :3] *= data[:, :, 3:]
+    matrix = np.array([[scale, 0, translation[0]], [0, scale, translation[1]]], np.float64)
+    result = cv2.warpAffine(data, matrix, tuple(canvas), flags=cv2.INTER_LINEAR,
+                            borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    alpha = result[:, :, 3:]
+    result[:, :, :3] /= np.maximum(alpha, 1e-8)
+    return np.clip(np.rint(result * 255), 0, 255).astype(np.uint8)
+
+
+def save_rgba(path, rgba):
+    if not cv2.imwrite(str(path), cv2.cvtColor(rgba, cv2.COLOR_RGBA2BGRA)):
+        raise OSError(f"Falha ao gravar PNG: {path}")
