@@ -125,6 +125,8 @@ public class GameView extends SurfaceView
     // the "Página Final" cinematic (ultra-core) plays while the engine waits.
     private static final String LOG_TAG = "GameView";
     private static final float ULTRA_STARTUP_ZOOM = 0.30f;
+    /** Zoom da câmera durante a sequência do Ultra (personagens sem raio). */
+    private static final float SEQUENCE_ZOOM = 0.12f;
     /** Point of the heavy straight (fraction of the move) where the arm is fully extended. */
     private static final float BEAM_POSE = 0.5625f;
     /** Point of the heavy straight where the arm is pulled back (charge, without own art). */
@@ -828,6 +830,7 @@ public class GameView extends SurfaceView
             if (banner != null) showBanner(banner);
             // Bounces shake the screen like the beam's hits.
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue)) beamShake = Math.max(beamShake, 14f);
+            if ("ULTRA_FINISH".equals(cue)) beamShake = Math.max(beamShake, 22f);
         }
         updateUltraBeam();
         impacts.update(FIXED_STEP);
@@ -1024,6 +1027,13 @@ public class GameView extends SurfaceView
             float t = clamp(p.ultraFrame / (float)engine.config.ultraRushFrames, 0f, 1f);
             ultraDarkAlpha = Math.round(205f * (1f - t));
             ultraCameraZoom = 1f + ULTRA_STARTUP_ZOOM * (1f - t);
+        } else if (phase == CombatFighter.ULTRA_SEQUENCE) {
+            // Sequência do vídeo: fundo escuro e câmera perto, abrindo no fim da animação.
+            CharacterDefinition.UltraSequence seq = p.state.profile.ultraSequence;
+            float t = seq != null ? clamp(p.ultraFrame / (float)seq.length, 0f, 1f) : 1f;
+            float open = 1f - t * t * t * t;
+            ultraDarkAlpha = Math.round(150f * open);
+            ultraCameraZoom = 1f + SEQUENCE_ZOOM * open;
         } else if (phase == CombatFighter.ULTRA_BEAM) {
             // Charge: the camera closes in on the player; the shot opens it back fast.
             int fire = engine.config.ultraBeamFireFrame();
@@ -1486,6 +1496,9 @@ public class GameView extends SurfaceView
                     activeFighter().profile.color
                 );
                 canvas.restore();
+            }
+            if (ultraFighter().inUltraSequence()) {
+                effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
             }
             if (ultraWindupActive()) {
                 effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
@@ -1966,6 +1979,21 @@ public class GameView extends SurfaceView
                 config.ultraBeamBlastFrame(f.beamHits), config.ultraBeamFadeFrames);
             animation = beamPose.id;
             animationElapsed = beamPose.timeOfFrame(pose);
+        }
+        CharacterDefinition.UltraSequence sequence = f.state.profile.ultraSequence;
+        CharacterDefinition.Animation sequenceArt =
+            sequence != null ? character.animations.get(SpriteStates.ULTRA_SEQ) : null;
+        if (animation == null && f.status == CombatFighter.Status.ULTRA && sequenceArt != null &&
+            f.ultraPhase != CombatFighter.ULTRA_RECOVERY) {
+            // Ultra do vídeo: a ativação toca até a pose da investida, a investida segura essa
+            // pose e a sequência anda no relógio do motor (os golpes caem nos quadros dela).
+            CombatConfig config = engine.config;
+            float frames = f.ultraPhase == CombatFighter.ULTRA_STARTUP
+                ? sequence.startupFrame * clamp(f.ultraFrame / (float)config.ultraStartupFrames, 0f, 1f)
+                : f.ultraPhase == CombatFighter.ULTRA_SEQUENCE ? sequence.startupFrame + f.ultraFrame
+                : sequence.startupFrame;
+            animation = sequenceArt.id;
+            animationElapsed = Math.min(sequenceArt.duration - 0.0001f, frames * FIXED_STEP);
         }
         if (animation == null && f.status == CombatFighter.Status.ULTRA) {
             // Activation uses the Super charge clip; rush and recovery reuse the heavy strike.

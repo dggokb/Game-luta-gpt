@@ -220,6 +220,12 @@ final class GeneratedSpriteLayouts {
     static final int P02_ULTRA_BEAM_ROOT_Y = 421;
     static final int P02_ULTRA_BEAM_FRAME_COUNT = 9;
 
+    static final int P02_ULTRA_SEQ_FRAME_WIDTH = 292;
+    static final int P02_ULTRA_SEQ_FRAME_HEIGHT = 241;
+    static final int P02_ULTRA_SEQ_ROOT_X = 94;
+    static final int P02_ULTRA_SEQ_ROOT_Y = 229;
+    static final int P02_ULTRA_SEQ_FRAME_COUNT = 35;
+
     static final int P02_VICTORY_FRAME_WIDTH = 370;
     static final int P02_VICTORY_FRAME_HEIGHT = 457;
     static final int P02_VICTORY_ROOT_X = 158;
@@ -441,6 +447,12 @@ final class GeneratedSpriteLayouts {
     static final int P03_ULTRA_BEAM_ROOT_X = 156;
     static final int P03_ULTRA_BEAM_ROOT_Y = 470;
     static final int P03_ULTRA_BEAM_FRAME_COUNT = 9;
+
+    static final int P03_ULTRA_SEQ_FRAME_WIDTH = 380;
+    static final int P03_ULTRA_SEQ_FRAME_HEIGHT = 260;
+    static final int P03_ULTRA_SEQ_ROOT_X = 80;
+    static final int P03_ULTRA_SEQ_ROOT_Y = 248;
+    static final int P03_ULTRA_SEQ_FRAME_COUNT = 38;
 
     static final int P03_VICTORY_FRAME_WIDTH = 436;
     static final int P03_VICTORY_FRAME_HEIGHT = 495;
@@ -670,6 +682,12 @@ final class GeneratedSpriteLayouts {
     static final int P04_ULTRA_BEAM_ROOT_Y = 564;
     static final int P04_ULTRA_BEAM_FRAME_COUNT = 9;
 
+    static final int P04_ULTRA_SEQ_FRAME_WIDTH = 297;
+    static final int P04_ULTRA_SEQ_FRAME_HEIGHT = 256;
+    static final int P04_ULTRA_SEQ_ROOT_X = 109;
+    static final int P04_ULTRA_SEQ_ROOT_Y = 244;
+    static final int P04_ULTRA_SEQ_FRAME_COUNT = 32;
+
     static final int P04_VICTORY_FRAME_WIDTH = 396;
     static final int P04_VICTORY_FRAME_HEIGHT = 720;
     static final int P04_VICTORY_ROOT_X = 174;
@@ -897,6 +915,12 @@ final class GeneratedSpriteLayouts {
     static final int P05_ULTRA_BEAM_ROOT_X = 218;
     static final int P05_ULTRA_BEAM_ROOT_Y = 400;
     static final int P05_ULTRA_BEAM_FRAME_COUNT = 9;
+
+    static final int P05_ULTRA_SEQ_FRAME_WIDTH = 385;
+    static final int P05_ULTRA_SEQ_FRAME_HEIGHT = 233;
+    static final int P05_ULTRA_SEQ_ROOT_X = 208;
+    static final int P05_ULTRA_SEQ_ROOT_Y = 222;
+    static final int P05_ULTRA_SEQ_FRAME_COUNT = 45;
 
     static final int P05_VICTORY_FRAME_WIDTH = 393;
     static final int P05_VICTORY_FRAME_HEIGHT = 472;
@@ -1384,6 +1408,12 @@ final class GeneratedSpriteLayouts {
     static final int P07_ULTRA_BEAM_ROOT_Y = 280;
     static final int P07_ULTRA_BEAM_FRAME_COUNT = 9;
 
+    static final int P07_ULTRA_SEQ_FRAME_WIDTH = 447;
+    static final int P07_ULTRA_SEQ_FRAME_HEIGHT = 303;
+    static final int P07_ULTRA_SEQ_ROOT_X = 190;
+    static final int P07_ULTRA_SEQ_ROOT_Y = 291;
+    static final int P07_ULTRA_SEQ_FRAME_COUNT = 41;
+
     static final int P07_VICTORY_FRAME_WIDTH = 185;
     static final int P07_VICTORY_FRAME_HEIGHT = 248;
     static final int P07_VICTORY_ROOT_X = 103;
@@ -1611,6 +1641,12 @@ final class GeneratedSpriteLayouts {
     static final int P08_ULTRA_BEAM_ROOT_X = 234;
     static final int P08_ULTRA_BEAM_ROOT_Y = 254;
     static final int P08_ULTRA_BEAM_FRAME_COUNT = 9;
+
+    static final int P08_ULTRA_SEQ_FRAME_WIDTH = 714;
+    static final int P08_ULTRA_SEQ_FRAME_HEIGHT = 340;
+    static final int P08_ULTRA_SEQ_ROOT_X = 218;
+    static final int P08_ULTRA_SEQ_ROOT_Y = 328;
+    static final int P08_ULTRA_SEQ_FRAME_COUNT = 39;
 
     static final int P08_VICTORY_FRAME_WIDTH = 242;
     static final int P08_VICTORY_FRAME_HEIGHT = 256;
@@ -2068,6 +2104,12 @@ final class GeneratedSpriteLayouts {
     static final int P10_ULTRA_BEAM_ROOT_Y = 318;
     static final int P10_ULTRA_BEAM_FRAME_COUNT = 9;
 
+    static final int P10_ULTRA_SEQ_FRAME_WIDTH = 409;
+    static final int P10_ULTRA_SEQ_FRAME_HEIGHT = 358;
+    static final int P10_ULTRA_SEQ_ROOT_X = 178;
+    static final int P10_ULTRA_SEQ_ROOT_Y = 337;
+    static final int P10_ULTRA_SEQ_FRAME_COUNT = 36;
+
     static final int P10_VICTORY_FRAME_WIDTH = 145;
     static final int P10_VICTORY_FRAME_HEIGHT = 305;
     static final int P10_VICTORY_ROOT_X = 68;
@@ -2523,6 +2565,12 @@ final class GeneratedSpriteLayouts {
     static final int P12_ULTRA_BEAM_ROOT_X = 73;
     static final int P12_ULTRA_BEAM_ROOT_Y = 222;
     static final int P12_ULTRA_BEAM_FRAME_COUNT = 9;
+
+    static final int P12_ULTRA_SEQ_FRAME_WIDTH = 312;
+    static final int P12_ULTRA_SEQ_FRAME_HEIGHT = 284;
+    static final int P12_ULTRA_SEQ_ROOT_X = 110;
+    static final int P12_ULTRA_SEQ_ROOT_Y = 272;
+    static final int P12_ULTRA_SEQ_FRAME_COUNT = 34;
 
     static final int P12_VICTORY_FRAME_WIDTH = 161;
     static final int P12_VICTORY_FRAME_HEIGHT = 261;

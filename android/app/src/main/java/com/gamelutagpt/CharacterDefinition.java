@@ -127,6 +127,49 @@ final class CharacterDefinition {
         }
     }
     /** Gameplay hurtbox in world units, independent of the PNG canvas. */
+    /**
+     * Ultra que segue o vídeo (tools/sprites/ultras.py): a ativação toca a animação até
+     * {@code startupFrame}; a investida segura essa pose até encostar; daí a sequência anda no
+     * relógio da animação e cada golpe acerta no quadro dele. Tempos em quadros do jogo.
+     */
+    static final class UltraSequence {
+        /** Tempo da animação em que a ativação termina (a pose da investida). */
+        final int startupFrame;
+        /** Quadros, contados do começo da sequência, em que cada golpe acerta; o último lança. */
+        final int[] hits;
+        /** Quadros da sequência até o fim da animação. */
+        final int length;
+        /** Dano total (sem escalonamento), dividido igualmente entre os golpes. */
+        final int damage;
+        /** Posição do rival presa à pose: {quadro, frente, altura}, interpolada (agarrão); vazio = fica onde encostou. */
+        final float[][] hold;
+        UltraSequence(int startupFrame,int[] hits,int length,int damage,float[][] hold) {
+            if(startupFrame<0||hits.length==0||damage<=0)throw new IllegalArgumentException("ultra sequence: startup, hits and damage");
+            for(int i=0;i<hits.length;i++)
+                if(hits[i]<1||hits[i]>=length||(i>0&&hits[i]<=hits[i-1]))throw new IllegalArgumentException("ultra sequence: hits must grow inside the length");
+            this.startupFrame=startupFrame;this.hits=hits.clone();this.length=length;this.damage=damage;
+            this.hold=hold==null?new float[0][]:hold;
+        }
+        /** Dano do golpe i: partes iguais, o resto no último. */
+        int hitDamage(int i) {
+            int each=damage/hits.length;
+            return i==hits.length-1?damage-each*(hits.length-1):each;
+        }
+        /** Frente (x) e altura (y) do rival no quadro dado da sequência, ou null sem agarrão. */
+        float[] holdAt(float frame) {
+            if(hold.length==0)return null;
+            if(frame<=hold[0][0])return new float[]{hold[0][1],hold[0][2]};
+            for(int i=1;i<hold.length;i++){
+                if(frame<=hold[i][0]){
+                    float t=(frame-hold[i-1][0])/Math.max(1f,hold[i][0]-hold[i-1][0]);
+                    return new float[]{hold[i-1][1]+(hold[i][1]-hold[i-1][1])*t,hold[i-1][2]+(hold[i][2]-hold[i-1][2])*t};
+                }
+            }
+            float[] last=hold[hold.length-1];
+            return new float[]{last[1],last[2]};
+        }
+    }
+
     static final class Body {
         final float halfWidth,standHeight,crouchHeight;
         /** Pushbox: keeps two bodies from overlapping; low enough to be jumped over. */
@@ -182,6 +225,9 @@ final class CharacterDefinition {
         /** Henchmen the Super calls in instead of its wave (0 = the wave). */
         int henchmen;
         Fighter withHenchmen(int count) { henchmen=count; return this; }
+        /** Ultra que segue a animação do vídeo (null: investida + cinemática + raio). */
+        UltraSequence ultraSequence;
+        Fighter withUltraSequence(UltraSequence value) { ultraSequence=value; return this; }
         /** Damage multiplier (permille) of this fighter's hits at the given life. */
         int furyScale(int life) {
             if(furyPermille<=0||maxLife<=0)return 1000;

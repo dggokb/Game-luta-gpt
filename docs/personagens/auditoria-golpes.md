@@ -41,7 +41,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Contra-golpe com palma | contra-golpe alto | ✅ |
 | S4 | Chute rodopiante que avança no ar | gira no lugar | ⚠️ falta avançar |
 | Super | Rajada da Garça (sequência de palmas e chutes) | animação de sequência + **onda** | ❌ |
-| Ultra | Dança da Garça (enxurrada de golpes) | **raio** | ❌ |
+| Ultra | Dança da Garça (enxurrada de golpes) | sequência do vídeo, 6 golpes nos quadros da animação | ✅ |
 
 ### p03 — irmão explosivo (golpe)
 | | Ficha | Jogo hoje | |
@@ -51,7 +51,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Rekka: 3 investidas, cada uma com novo comando | cada comando toca o vídeo das **3** investidas e dá 1 acerto | ❌ |
 | S4 | Chute em mergulho **no ar** | sai no chão | ❌ |
 | Super | Rajada de Chutes avançando, chute final que lança | animação + **onda** | ❌ |
-| Ultra | Fúria da Casa (sequência + soco de energia) | **raio** | ❌ |
+| Ultra | Fúria da Casa (sequência + soco de energia) | sequência do vídeo, 9 golpes nos quadros da animação | ✅ |
 
 ### p04 — lutador de rua
 | | Ficha | Jogo hoje | |
@@ -61,7 +61,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Esquiva e contra-soco, cancela em soco | esquiva alta + cancela em L/M/H | ✅ |
 | S4 | Ombrada (investida baixa) | no lugar | ⚠️ falta avançar |
 | Super | Chuva de Socos | animação + **onda** | ❌ |
-| Ultra | Soco de Rua (sequência + cabeçada) | **raio** | ❌ |
+| Ultra | Soco de Rua (sequência + cabeçada) | sequência do vídeo, 6 golpes nos quadros da animação | ✅ |
 
 ### p05 — ninja
 | | Ficha | Jogo hoje | |
@@ -71,7 +71,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Selo e teleporte | some e reaparece atrás | ✅ |
 | S4 | Corte de mão que avança | avança | ✅ |
 | Super | Dança das Lâminas | animação + **onda** | ❌ |
-| Ultra | Eclipse (some e ataca em enxurrada) | **raio** | ❌ |
+| Ultra | Eclipse (some e ataca em enxurrada) | sequência do vídeo, 7 golpes nos quadros da animação | ✅ |
 | Extra | wall jump | wall jump com animação | ✅ |
 
 ### p06 — sombra e ilusão
@@ -92,7 +92,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Contra-golpe com calcanhar | contra-golpe (lê tudo) | ✅ |
 | S4 | Chute giratório **baixo** | golpe alto (defende em pé) | ⚠️ falta ser baixo |
 | Super | Estala, capangas entram, ele fecha com sequência pesada | capangas; a sequência dele não acerta | ⚠️ |
-| Ultra | Herança (enxurrada de chutes e tapas) | **raio** | ❌ |
+| Ultra | Herança (enxurrada de chutes e tapas) | sequência do vídeo, 4 golpes nos quadros da animação | ✅ |
 
 ### p08 — chicote
 | | Ficha | Jogo hoje | |
@@ -102,7 +102,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Contra-golpe com joelhada | contra-golpe (lê golpe baixo) | ✅ |
 | S4 | Salto-agulha (salta à frente e cai agachada) | no lugar | ⚠️ falta avançar |
 | Super | Tempestade de Chicotes | animação + **onda** | ❌ |
-| Ultra | Sinfonia Escarlate (chutes, tapas, chicotada final) | **raio** | ❌ |
+| Ultra | Sinfonia Escarlate (chutes, tapas, chicotada final) | sequência do vídeo, 5 golpes nos quadros da animação | ✅ |
 
 ### p09 — bombeiro grappler
 | | Ficha | Jogo hoje | |
@@ -124,7 +124,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S4 | Voadora em parafuso que avança | avança e atravessa | ✅ |
 | Extra | — | 2 air dashes | ✅ |
 | Super | Cortina de Vapor (chutes acrobáticos) | animação + **onda** | ❌ |
-| Ultra | Resgate Aéreo (combo aéreo) | **raio** | ❌ |
+| Ultra | Resgate Aéreo (combo aéreo) | sequência do vídeo, 5 golpes nos quadros da animação | ✅ |
 
 ### p11 — cirurgião
 | | Ficha | Jogo hoje | |
@@ -145,7 +145,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S4 | Contorção que avança de lado | no lugar | ⚠️ falta avançar |
 | Extra | Força cresce com a vida perdida | fúria | ✅ |
 | Super | Frenesi (garras, mordida, joelhada, cabeçada) | animação + **onda** | ❌ |
-| Ultra | Último Suspiro (berserker total) | **raio** | ❌ |
+| Ultra | Último Suspiro (berserker total) | sequência do vídeo, 4 golpes nos quadros da animação | ✅ |
 
 ## Contagem
 
@@ -199,3 +199,16 @@ Super e Ultra continuam no botão SUPER (Ultra = ↓ + SUPER).
 
 Ideia: quem é "de carga" (p02 garça, p04 boxe, p12 fera) segura para trás ou para baixo; o
 grappler (p09) tem meias-luas longas; os irmãos (p01, p03) usam os comandos clássicos.
+
+## Ultras refeitos (15/10)
+
+Os Ultras do p02, p03, p04, p05, p07, p08, p10 e p12 deixaram de ser o raio. Agora cada um
+segue o próprio vídeo (`tools/sprites/ultras.json` + `ultras.py`): a ativação toca o começo do
+vídeo, a investida segura a pose até encostar e, se pega, a sequência roda inteira. Cada pancada
+do vídeo é um golpe no jogo, no quadro em que ela acerta, com uma parte do dano, e o último
+golpe lança. Não tem mais cinemática nem raio para esses oito. Errou ou foi defendido: recupera
+como antes.
+
+- p01 e p06 continuam com o raio (é o golpe deles).
+- p09 e p11: o vídeo mostra o rival junto (agarrão), e ele ficaria colado na arte. Faltam
+  vídeos novos sem o rival; até lá eles continuam com o raio.

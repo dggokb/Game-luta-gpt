@@ -119,6 +119,9 @@ final class CombatConfig {
     /** End of the cinematic: the defender flies away and lands knocked down. */
     float ultraLaunchSpeed = 1150f;
     float ultraKnockback = 420f;
+    /** Ultra em sequência: pausa de impacto de cada golpe e do último (o que lança). */
+    int ultraSequenceHitstop = 4;
+    int ultraSequenceFinalHitstop = 12;
     // Final beam (after the cinematic): a charge ("ka-me-ha-me"), then the beam reaches the
     // defender, hits every few frames (the combo counter climbs) and the blast throws the
     // defender like the cinematic end.

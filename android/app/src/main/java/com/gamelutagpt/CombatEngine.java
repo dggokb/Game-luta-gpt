@@ -302,6 +302,8 @@ final class CombatEngine {
         updateThrow(fighters[1], fighters[0]);
         updateUltraBeam(fighters[0], fighters[1]);
         updateUltraBeam(fighters[1], fighters[0]);
+        updateUltraSequence(fighters[0], fighters[1]);
+        updateUltraSequence(fighters[1], fighters[0]);
 
         // 6. Combo sessions and the team meter.
         updateSessions();
@@ -1631,7 +1633,8 @@ final class CombatEngine {
 
         ComboSession session = sessionFor(a, d);
         a.ultraScale = session.scaleFor(ultraAttack, config);
-        a.ultraPhase = CombatFighter.ULTRA_CINEMATIC;
+        CharacterDefinition.UltraSequence sequence = a.state.profile.ultraSequence;
+        a.ultraPhase = sequence != null ? CombatFighter.ULTRA_SEQUENCE : CombatFighter.ULTRA_CINEMATIC;
         a.ultraFrame = 0;
 
         boolean wasCrouching = d.crouchingBody();
@@ -1647,7 +1650,67 @@ final class CombatEngine {
         d.hitCrouching = wasCrouching;
         d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
         d.stunElapsed = 0;
+        if (sequence != null) {
+            // Sem cinemática: a sequência do vídeo prende o rival onde encostou.
+            a.ultraHitsDone = 0;
+            float bodies = a.body().halfWidth + d.body().halfWidth;
+            a.ultraHoldGap = Math.max(bodies, Math.min((d.x - a.x) * a.facing, bodies + config.ultraReach));
+            a.ultraHoldY = d.y;
+            d.stunLeft = d.stunTotal = sequence.length + ultraAttack.hitstunFrames;
+            return;
+        }
         ultraConnected = a.index;
+    }
+
+    /**
+     * Ultra em sequência: o rival fica preso na frente (ou onde a pose o segura, no agarrão),
+     * cada golpe acerta no quadro da animação com uma parte do dano, o último lança, e o
+     * atacante termina a animação antes de voltar.
+     */
+    private void updateUltraSequence(CombatFighter a, CombatFighter d) {
+        if (!a.inUltraSequence()) return;
+        CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
+        if (a.ultraHitsDone < seq.hits.length) holdUltraVictim(a, d, seq);
+        while (a.ultraHitsDone < seq.hits.length && a.ultraFrame >= seq.hits[a.ultraHitsDone]) {
+            int i = a.ultraHitsDone++;
+            int damage = ComboSession.DamageScaling.apply(seq.hitDamage(i), a.ultraScale);
+            int before = events.size();
+            dealUltraDamage(a, d, damage);
+            for (int e = before; e < events.size(); e++) {
+                HitEvent event = events.get(e);
+                event.impactX = d.x - a.facing * d.body().halfWidth * 0.5f;
+                event.impactY = d.y - d.body().height(false) * 0.6f;
+                event.strength = i == seq.hits.length - 1 ? AttackDefinition.Strength.HEAVY : AttackDefinition.Strength.MEDIUM;
+            }
+            boolean last = i == seq.hits.length - 1;
+            int stop = last ? config.ultraSequenceFinalHitstop : config.ultraSequenceHitstop;
+            a.hitstop = Math.max(a.hitstop, stop);
+            d.hitstop = Math.max(d.hitstop, stop);
+            if (last) {
+                launchUltraVictim(a, d);
+                cues.add("ULTRA_FINISH");
+            }
+        }
+        if (a.ultraFrame >= seq.length) {
+            a.status = CombatFighter.Status.NEUTRAL;
+            a.ultraFrame = 0;
+        }
+    }
+
+    /** Segura o rival na pose do Ultra; contra a parede quem recua é o atacante. */
+    private void holdUltraVictim(CombatFighter a, CombatFighter d, CharacterDefinition.UltraSequence seq) {
+        float[] pose = seq.holdAt(a.ultraFrame);
+        float gap = pose != null ? pose[0] : a.ultraHoldGap;
+        float wanted = a.x + a.facing * gap;
+        d.x = Arena.clamp(wanted, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        if (d.x != wanted) a.x = Arena.clamp(d.x - a.facing * gap, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        d.y = pose != null ? Arena.GROUND_Y - pose[1] : a.ultraHoldY;
+        d.grounded = d.y >= Arena.GROUND_Y;
+        d.vx = 0f;
+        d.vy = 0f;
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        d.stunLeft = Math.max(d.stunLeft, 2);
     }
 
     /**

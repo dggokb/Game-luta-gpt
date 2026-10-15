@@ -1,0 +1,15 @@
+{
+  "_doc": "Ultra de cada personagem seguindo o vídeo (tools/sprites/ultras.py). Quadros contados no vídeo do Ultra (24 fps, pasta animations/<id>/ultra.mp4 do Drive). preparo: onde termina a ativação e começa a investida (a pose segura até encostar); golpes: quadro em que cada pancada acerta (o último lança); fim: último quadro. rival: posição do rival presa à pose [quadro, frente, altura] em px do jogo (agarrão). Quem não está aqui (p01, p06) usa o Raio.",
+  "velocidade": 2,
+  "dano": 4200,
+  "personagens": {
+    "p02": {"nome": "Dança da Garça", "inicio": 0, "preparo": 6, "golpes": [8, 18, 26, 36, 43, 63], "fim": 92},
+    "p03": {"nome": "Fúria da Casa", "inicio": 0, "preparo": 6, "golpes": [8, 12, 16, 20, 24, 28, 37, 44, 52], "fim": 92},
+    "p04": {"nome": "Soco de Rua", "inicio": 4, "preparo": 16, "golpes": [18, 22, 26, 30, 37, 51], "fim": 88},
+    "p05": {"nome": "Eclipse", "inicio": 0, "preparo": 8, "golpes": [14, 18, 22, 26, 35, 44, 66], "fim": 92},
+    "p07": {"nome": "Herança", "inicio": 8, "preparo": 26, "golpes": [29, 38, 47, 63], "fim": 90},
+    "p08": {"nome": "Sinfonia Escarlate", "inicio": 8, "preparo": 22, "golpes": [25, 29, 46, 62, 67], "fim": 92},
+    "p10": {"nome": "Resgate Aéreo", "inicio": 6, "preparo": 18, "golpes": [23, 35, 45, 48, 60], "fim": 92},
+    "p12": {"nome": "Último Suspiro", "inicio": 10, "preparo": 40, "golpes": [44, 50, 56, 72], "fim": 92}
+  }
+}

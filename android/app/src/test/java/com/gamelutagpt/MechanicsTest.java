@@ -395,4 +395,69 @@ public class MechanicsTest {
         assertEquals(0, wave[2]);
         assertTrue(GeneratedCharacters.get("p07").fighter.henchmen > 0);
     }
+
+    // ------------------------------------------------------------ Ultra em sequência
+
+    /** p02 encosta no boneco base e solta o Ultra (↓ + SUPER com 3 barras). */
+    private static CombatEngineTest.Sim ultraSequence(String who, float gap) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(who), BASE, 500f, 500f + gap);
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        return s;
+    }
+
+    @Test public void theUltraFollowsTheVideoHitByHit() {
+        CombatEngineTest.Sim s = ultraSequence("p02", 110f);
+        CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
+        assertNotNull("p02 has its own Ultra", seq);
+        CombatConfig config = s.engine.config;
+        s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
+        assertTrue("no cinematic and no beam", s.engine.ultraConnected() < 0 && !s.engine.inUltraCinematic(0));
+        int life = s.f(1).state.life, hits = 0, hitstopFrames = 0;
+        java.util.List<Integer> hitFrames = new java.util.ArrayList<>();
+        float gap = (s.f(1).x - s.f(0).x) * s.f(0).facing;
+        while (s.f(0).inUltraSequence() && hitstopFrames < 2000) {
+            int frame = s.f(0).ultraFrame;
+            s.step();
+            hitstopFrames++;
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker == 0 && "ULTRA".equals(e.moveId)) { hits++; hitFrames.add(s.f(0).ultraFrame); }
+            }
+            if (s.f(0).ultraHitsDone < seq.hits.length) {
+                assertEquals("the defender stays held in front", gap, (s.f(1).x - s.f(0).x) * s.f(0).facing, 0.5f);
+                assertFalse("nothing interrupts the sequence", s.f(0).hittable());
+            }
+        }
+        assertEquals("one hit per strike of the animation", seq.hits.length, hits);
+        for (int i = 0; i < seq.hits.length; i++) assertEquals("hit " + i + " lands on its frame", seq.hits[i], (int)hitFrames.get(i));
+        assertEquals("the hits add up to the Ultra damage", seq.damage, life - s.f(1).state.life);
+        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
+        assertTrue("the last hit throws the rival", s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
+    }
+
+    @Test public void theUltraWhiffsFromFarWithoutStartingTheSequence() {
+        CombatEngineTest.Sim s = ultraSequence("p03", 900f);
+        CombatConfig config = s.engine.config;
+        boolean sequence = false;
+        for (int i = 0; i < config.ultraStartupFrames + config.ultraRushFrames + config.ultraRecoveryFrames + 10; i++) {
+            s.step();
+            sequence |= s.f(0).inUltraSequence();
+        }
+        assertFalse(sequence);
+        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
+        assertEquals(s.f(1).state.profile.maxLife, s.f(1).state.life);
+    }
+
+    @Test public void onlyTheBeamFightersKeepTheBeam() {
+        for (String id : new String[]{"p02", "p03", "p04", "p05", "p07", "p08", "p10", "p12"}) {
+            CharacterDefinition c = GeneratedCharacters.get(id);
+            assertNotNull(id + " Ultra follows its video", c.fighter.ultraSequence);
+            assertNotNull(id + " has the Ultra sheet", c.animations.get(SpriteStates.ULTRA_SEQ));
+        }
+        for (String id : new String[]{"player_base", "p06"}) {
+            assertNull(id + " keeps the beam", GeneratedCharacters.get(id).fighter.ultraSequence);
+        }
+    }
 }

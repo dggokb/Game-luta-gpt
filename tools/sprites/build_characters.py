@@ -21,7 +21,9 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # Mecânicas próprias: carga da Onda (loop e disparo carregado) e wall jump.
             'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',
             # Capangas do Super (p07): correm, socam ou dão ombrada e saem.
-            'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER')
+            'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER',
+            # Ultra em sequência (tools/sprites/ultras.py): a folha do vídeo com os golpes.
+            'ULTRA_SEQ')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
@@ -105,6 +107,7 @@ def validate_fighter(pack):
             if 'attack' not in f[key]: raise ValueError(f'{name}.{key}: attack frame data is required')
             validate_attack(f'{name}.{key}.attack', f[key]['attack'], True)
     if 'mecanica' in f: validate_fighter_mechanics(name, f['mecanica'])
+    if 'ultra' in f: validate_ultra(name, f['ultra'], pack['animations'])
     if 'inputPriority' in f and sorted(f['inputPriority']) != sorted(STRENGTHS):
         raise ValueError(f'{name}.inputPriority: order all of {", ".join(STRENGTHS)}')
     if 'assist' in f:
@@ -152,6 +155,24 @@ def validate_mechanics(name, mech, m, projectile):
         if not projectile: raise ValueError(f'{name}.mecanica.carga: only the projectile (S) charges')
     if 'eco' in mech:
         for key in ('frames','atraso','dano'): positive_int(mech['eco'].get(key), f'{name}.mecanica.eco.{key}')
+
+def validate_ultra(name, u, animations):
+    """Ultra em sequência (tools/sprites/ultras.py): golpes crescentes dentro da animação."""
+    known = {'preparo','golpes','duracao','dano','rival','quadrosVideo'}
+    if not isinstance(u, dict) or set(u) - known:
+        raise ValueError(f'{name}.ultra: expected some of {sorted(known)}')
+    non_negative_int(u.get('preparo'), name+'.ultra.preparo')
+    positive_int(u.get('duracao'), name+'.ultra.duracao')
+    positive_int(u.get('dano'), name+'.ultra.dano')
+    hits = u.get('golpes')
+    if not isinstance(hits, list) or not hits or any(type(h) is not int for h in hits) \
+            or hits != sorted(set(hits)) or hits[0] < 1 or hits[-1] >= u['duracao']:
+        raise ValueError(f'{name}.ultra.golpes: increasing frames inside 1..duracao-1')
+    for k in u.get('rival', []):
+        if not isinstance(k, list) or len(k) != 3:
+            raise ValueError(f'{name}.ultra.rival: [quadro, frente, altura]')
+    if 'ULTRA_SEQ' not in animations:
+        raise ValueError(f'{name}.ultra: needs the ULTRA_SEQ animation')
 
 def validate_fighter_mechanics(name, mech):
     known = {'furia','airDashes','agarrao','wallJump','capangas'}
@@ -453,6 +474,11 @@ def compile_packs(root, results):
                 +str(grab.get('dano',0))+','+f(grab.get('alcance',0))+')'
                 +('.withWallJump(true)' if mech.get('wallJump') else '')
                 +(f".withHenchmen({mech['capangas']})" if mech.get('capangas') else ''))
+    def ultra_sequence(u):
+        hold = ','.join('{'+','.join(f(v) for v in k)+'}' for k in u.get('rival', []))
+        return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
+                +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
+                +',new float[][]{'+hold+'}))')
     def projectile(data, binding):
         if data is None: return 'null'
         return ('new CharacterDefinition.Projectile('+attack(binding,data['attack'],'PROJECTILE' if binding=='S' else 'SUPER',data['damage'])+','+f(data['range'])+','+f(data['speed'])+','+f(data['spawnX'])
@@ -507,7 +533,8 @@ def compile_packs(root, results):
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
-                   +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else ''))
+                   +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else '')
+                   +(ultra_sequence(fi['ultra']) if 'ultra' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']
     lines += ['}','']

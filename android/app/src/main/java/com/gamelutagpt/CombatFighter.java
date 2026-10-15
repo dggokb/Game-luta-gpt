@@ -16,6 +16,8 @@ final class CombatFighter {
     static final int ULTRA_CINEMATIC = 3;
     /** After the cinematic: the final beam, many small hits and a last blast. */
     static final int ULTRA_BEAM = 4;
+    /** Ultra que segue o vídeo: a sequência de golpes nos quadros da animação. */
+    static final int ULTRA_SEQUENCE = 5;
 
     /** Phases of {@link Status#THROW} (L + M). */
     static final int THROW_STARTUP = 0;
@@ -143,6 +145,10 @@ final class CombatFighter {
     int beamHitsDone;
     int beamDamageLeft;
     int beamBlastDamage;
+    /** Ultra em sequência: golpes já dados, distância e altura do rival preso no começo. */
+    int ultraHitsDone;
+    float ultraHoldGap;
+    float ultraHoldY;
 
     // Air dash.
     /** Frames of air dash left (0 when not dashing). */
@@ -224,7 +230,7 @@ final class CombatFighter {
     }
 
     boolean hittable() {
-        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam() && !inThrowExchange() &&
+        return !ko() && status != Status.KNOCKDOWN && status != Status.WAKEUP && !firingBeam() && !inUltraSequence() && !inThrowExchange() &&
             invulnFrames == 0;
     }
 
@@ -237,6 +243,11 @@ final class CombatFighter {
     /** Firing the ultra beam: nothing interrupts it. */
     boolean firingBeam() {
         return status == Status.ULTRA && ultraPhase == ULTRA_BEAM;
+    }
+
+    /** Dando a sequência do Ultra: nada interrompe. */
+    boolean inUltraSequence() {
+        return status == Status.ULTRA && ultraPhase == ULTRA_SEQUENCE;
     }
 
     /** Crouching hurtbox: crouch stance, crouching attack or crouching hit reaction. */
@@ -265,7 +276,8 @@ final class CombatFighter {
             return ultraPhase == ULTRA_STARTUP ? "ULTRA_STARTUP"
                 : ultraPhase == ULTRA_RUSH ? "ULTRA_RUSH"
                 : ultraPhase == ULTRA_RECOVERY ? "ULTRA_RECOVERY"
-                : ultraPhase == ULTRA_BEAM ? "ULTRA_BEAM" : "ULTRA_CINEMATIC";
+                : ultraPhase == ULTRA_BEAM ? "ULTRA_BEAM"
+                : ultraPhase == ULTRA_SEQUENCE ? "ULTRA_SEQUENCE" : "ULTRA_CINEMATIC";
         }
         return status.name();
     }
