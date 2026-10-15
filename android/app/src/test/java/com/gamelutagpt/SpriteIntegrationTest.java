@@ -159,7 +159,7 @@ public class SpriteIntegrationTest {
         assertEquals("the training CPU uses the base character","player_base",((CharacterDefinition)field.get(opponent)).id);
         Field tint=SpriteFighterRenderer.class.getDeclaredField("tint");
         tint.setAccessible(true);
-        assertNotNull("drawn washed out",tint.get(opponent));
+        assertNull("drawn in its normal colors",tint.get(opponent));
         frames(2);
         assertEquals(SpriteMotion.Clip.IDLE,opponent.motion.clip);
     }
@@ -583,7 +583,7 @@ public class SpriteIntegrationTest {
             assertEquals(pair[0],team[0].character.id);
             assertEquals(pair[1],team[1].character.id);
             assertEquals(pair[0],rendererCharacterId());
-            // Training CPU: the point character, washed out.
+            // Training CPU: the point character, in its normal colors.
             assertEquals(pair[0],npc().character().id);
             frames(1);
             assertEquals("INTRO",motion().clip);

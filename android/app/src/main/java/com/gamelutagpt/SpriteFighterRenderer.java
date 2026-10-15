@@ -13,7 +13,7 @@ final class SpriteFighterRenderer {
     private final Paint spritePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final ColorFilter hitFlash=new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
     private final ColorFilter blockFlash=new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
-    /** Base color filter when no flash is showing (the washed-out training opponent), or null. */
+    /** Base color filter when no flash is showing (the p06 shadow echo), or null. */
     private ColorFilter tint;
 
     /** Standalone renderer with its own cache (tools and tests). */
@@ -162,17 +162,6 @@ final class SpriteFighterRenderer {
 
     private static float clamp01(float v){return Math.max(0f,Math.min(1f,v));}
     void setTint(ColorFilter tint){this.tint=tint;}
-    /** Pale, cooler copy of the art: the same character as the opponent still reads apart. */
-    static ColorFilter washedOut() {
-        ColorMatrix m=new ColorMatrix();
-        m.setSaturation(0.35f);
-        m.postConcat(new ColorMatrix(new float[]{
-            0.70f,0f,0f,0f,64f,
-            0f,0.70f,0f,0f,70f,
-            0f,0f,0.70f,0f,84f,
-            0f,0f,0f,1f,0f}));
-        return new ColorMatrixColorFilter(m);
-    }
     /** Sombra roxa e translúcida do próprio lutador (o eco de sombra da p06). */
     static ColorFilter shadowEcho() {
         return new ColorMatrixColorFilter(new ColorMatrix(new float[]{
