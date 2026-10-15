@@ -26,7 +26,7 @@ def image_rgba(frame):
     green = ((hsv[:, :, 0] >= 34) & (hsv[:, :, 0] <= 94)
              & (hsv[:, :, 1] > 65) & (diff > 18))
     alpha = np.full(diff.shape, 255, np.uint8)
-    alpha[green] = np.clip(255 - (diff[green] - 18) * 255 / 42, 0, 255).astype(np.uint8)
+    alpha[green] = np.clip(255 - (diff[green].astype(np.float32) - 18.0) * (255.0 / 42.0), 0, 255).astype(np.uint8)
     edge = green & (alpha < 255)
     rgb[:, :, 1][edge] = np.minimum(
         channels[:, :, 1][edge],
