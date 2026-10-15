@@ -25,6 +25,7 @@
       "speed": 1000,
       "command": [
         3,
+        2,
         1
       ],
       "spawnX": 120,
@@ -54,7 +55,8 @@
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
-      }
+      },
+      "nome": "Kunai"
     },
     "super": {
       "damage": 2880,
@@ -1999,9 +2001,9 @@
   "specialMoves": {
     "S2": {
       "command": [
-        1,
         3,
-        2
+        4,
+        5
       ],
       "animation": "SPECIAL_S2",
       "damage": 990,
@@ -2027,16 +2029,18 @@
       "launchType": "knockdown",
       "knockback": 60,
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Shuriken"
     },
     "S3": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "L",
-        "M"
+        3
       ],
       "animation": "SPECIAL_S3",
       "damage": 810,
@@ -2070,15 +2074,21 @@
             14
           ]
         }
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Selo e mudança"
     },
     "S4": {
       "command": [
+        5,
+        4,
         3,
-        5
-      ],
-      "buttons": [
-        "H"
+        2,
+        1
       ],
       "animation": "SPECIAL_S4",
       "damage": 900,
@@ -2114,6 +2124,12 @@
           ]
         }
       },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Corte de mão",
       "golpesBase": {
         "startupFrames": 8,
         "activeFrames": 12,

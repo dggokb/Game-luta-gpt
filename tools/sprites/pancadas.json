@@ -11,7 +11,6 @@
     "p03": {
       "S2": {"pancadas": [6, 9, 12]},
       "S3": {"pancadas": [2, 6, 14]},
-      "S4": {"pancadas": [6, 9]},
       "SUPER": {"pancadas": [7, 11, 16], "avanco": 260}
     },
     "p04": {

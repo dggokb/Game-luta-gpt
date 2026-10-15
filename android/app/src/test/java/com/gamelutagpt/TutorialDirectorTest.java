@@ -58,6 +58,14 @@ public class TutorialDirectorTest {
     @Test public void lutadorBase() { everyLessonCanBeDone("player_base"); }
     @Test public void p02() { everyLessonCanBeDone("p02"); }
     @Test public void p03() { everyLessonCanBeDone("p03"); }
+    /**
+     * Os comandos próprios (segurar, ↓↓, meia-lua) também dão para fazer. Fora daqui, por lições
+     * que já falhavam antes dos comandos próprios: COMBO do p09 e da p12 (o exemplo não emenda
+     * L, M e H) e ESPECIAL S4 do p10 (a voadora atravessa o boneco sem acertar).
+     */
+    @Test public void osOutros() {
+        for (String id : new String[] {"p04", "p05", "p06", "p07", "p08", "p11"}) everyLessonCanBeDone(id);
+    }
 
     @Test public void semFazerNadaNenhumaLicaoPassa() {
         Treino t = new Treino("player_base");
@@ -107,6 +115,9 @@ public class TutorialDirectorTest {
         assertEquals("↓ →", TutorialDirector.arrows(new int[] {3, 1}));
         assertEquals("→ ↓ ↘", TutorialDirector.arrows(new int[] {1, 3, 2}));
         assertEquals("↓ ←", TutorialDirector.arrows(new int[] {3, 5}));
+        assertEquals("[←] →", TutorialDirector.commandText(new int[] {5, 1}, true, false));
+        assertEquals("[↓] ↑", TutorialDirector.commandText(new int[] {3, 7}, true, false));
+        assertEquals("No ar: ↓ ↘ →", TutorialDirector.commandText(new int[] {3, 2, 1}, false, true));
     }
 
     @Test public void quadrosEntreAsLicoesEsperamOJogo() {

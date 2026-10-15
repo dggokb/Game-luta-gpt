@@ -105,7 +105,7 @@ public class MenuInicialTest {
         MenuPausa p = new MenuPausa();
         p.abrir(null, true);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.cursor());
-        float[] menu = MenuPausa.CAIXAS[2];
+        float[] menu = MenuPausa.CAIXAS[3];
         assertNull("o toque que abriu a pausa não escolhe", p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         for (int i = 0; i < 20; i++) p.update(DT);
         assertNull(p.tap(640f, 650f));
@@ -122,8 +122,61 @@ public class MenuInicialTest {
         for (int i = 0; i < 20; i++) p.update(DT);
         p.mover(1);
         p.mover(1);
+        p.mover(1);
         assertEquals(MenuPausa.Opcao.MENU, p.confirmar());
         assertNull(p.confirmar());
+    }
+
+    private static TelaComandos.Ficha ficha(String nome) {
+        return new TelaComandos.Ficha(nome, java.util.Arrays.asList(
+            new TelaComandos.Linha("Onda", "↓ ↘ → + L/M/H", false),
+            new TelaComandos.Linha("Mergulho", "↓ ↘ → + L/M/H", true)));
+    }
+
+    @Test
+    public void pausaMostraOsComandosDeCadaPersonagem() {
+        MenuPausa p = new MenuPausa();
+        p.comandos().setFichas(java.util.Arrays.asList(ficha("p01"), ficha("p02"), ficha("p03")), 1);
+        p.abrir(null, false);
+        for (int i = 0; i < 20; i++) p.update(DT);
+        p.mover(1);
+        p.mover(1);
+        assertEquals(MenuPausa.Opcao.COMANDOS, p.cursor());
+        assertNull("COMANDOS não fecha a pausa", p.confirmar());
+        assertTrue(p.isOpen());
+        assertTrue(p.comandos().isOpen());
+        assertEquals("começa no personagem do jogador", "p02", p.comandos().ficha().personagem);
+        p.mover(1);
+        assertEquals("▲▼ não andam na lista", MenuPausa.Opcao.COMANDOS, p.cursor());
+        assertTrue(p.ajustar(1));
+        assertEquals("p03", p.comandos().ficha().personagem);
+        p.ajustar(1);
+        assertEquals("dá a volta", "p01", p.comandos().ficha().personagem);
+        p.ajustar(-1);
+        assertEquals("p03", p.comandos().ficha().personagem);
+        p.render(new PaginaHistoriaTest.NullCanvas());
+        assertNull("voltar sai da lista e fica na pausa", p.voltar());
+        assertTrue(p.isOpen());
+        assertFalse(p.comandos().isOpen());
+
+        // Pelo toque: a faixa COMANDOS abre, as setas trocam e VOLTAR fecha.
+        float[] caixa = MenuPausa.CAIXAS[2];
+        assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
+        assertTrue(p.comandos().isOpen());
+        for (int i = 0; i < 20; i++) p.update(DT);
+        float[] anterior = TelaComandos.ANTERIOR;
+        assertNull(p.tap((anterior[0] + anterior[2]) * 0.5f, (anterior[1] + anterior[3]) * 0.5f));
+        assertEquals("p02", p.comandos().ficha().personagem);
+        float[] voltar = TelaComandos.BOTAO_VOLTAR;
+        assertNull(p.tap((voltar[0] + voltar[2]) * 0.5f, (voltar[1] + voltar[3]) * 0.5f));
+        assertFalse(p.comandos().isOpen());
+        assertTrue("o toque do VOLTAR não escolhe nada na pausa", p.isOpen());
+        assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
+        assertFalse(p.comandos().isOpen());
+
+        p.fechar();
+        p.abrir(null, false);
+        assertFalse("reabrir a pausa não abre a lista", p.comandos().isOpen());
     }
 
     @Test

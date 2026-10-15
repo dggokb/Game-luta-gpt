@@ -83,6 +83,18 @@ final class Comandos {
         }
     }
 
+    /** Agarrão sem palavras (lista de comandos, em qualquer idioma): "[H] / [J] + [K]". */
+    static String agarraoCurto(Esquema e) {
+        String juntos = botao(e, "L") + " + " + botao(e, "M");
+        switch (e) {
+            case TECLADO: return "[H] / " + juntos;
+            case XBOX: return "[RT] / " + juntos;
+            case PLAYSTATION: return "[R2] / " + juntos;
+            case NINTENDO: return "[ZR] / " + juntos;
+            default: return juntos;
+        }
+    }
+
     /** Teclas do HardwareInput: J K L = L M H, U = COMBO, I = SUPER. */
     private static String tecla(String id) {
         switch (id) {

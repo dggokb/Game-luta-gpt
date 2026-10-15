@@ -187,6 +187,8 @@ final class CombatFighter {
     /** Local frame clock: it does not advance while frozen. */
     int clock;
     int pendingJumpAge = -1;
+    /** Frames que o pulo pedido ainda espera (o botão do [↓] ↑ pode chegar). */
+    int jumpGrace;
     boolean pendingSuperJump;
     /** Frames since ↓ + SUPER asked for an ultra, or -1 (kept for the input buffer). */
     int ultraRequestAge = -1;
