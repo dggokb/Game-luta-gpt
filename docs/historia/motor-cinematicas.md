@@ -27,8 +27,9 @@ luta é o mesmo motor com outro arquivo.
 6. Antes de se encontrarem, a campainha: **"DING DONG!"** estoura grande no meio da tela
    (linhas de som, tremor, as palavras em escada) e a luta **congela** com um tranco de zoom;
    depois os dois param e a câmera volta devagar.
-7. As faixas saem devagar e a luta termina **interrompida**: a história segue na página
-   seguinte (Dafu: "Chega, chega!"; o quadro da porta com o DING DONG das cartas chegando).
+7. As faixas saem devagar e a luta termina **interrompida**: a história segue nas páginas
+   prontas `pag7` a `pag11` do episódio (a corrida e o DING DONG em mangá, o mensageiro com as
+   duas cartas, a regra das equipes, o Kōga indo embora e o Ryūga decidindo participar).
 
 A cena toda leva uns 15 segundos.
 
