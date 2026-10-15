@@ -67,11 +67,11 @@
       "spawnY": 183,
       "airSpawnY": 80,
       "attack": {
-        "startupFrames": 70,
-        "activeFrames": 1,
-        "recoveryFrames": 50,
-        "hitstunFrames": 55,
-        "blockstunFrames": 45,
+        "startupFrames": 39,
+        "activeFrames": 60,
+        "recoveryFrames": 22,
+        "hitstunFrames": 10,
+        "blockstunFrames": 15,
         "hitstopFrames": 12,
         "cancelWindows": {
           "hit": null,
@@ -80,14 +80,37 @@
         },
         "cancelInto": [],
         "pushbackOnHit": 60,
-        "pushbackOnBlock": 60
+        "pushbackOnBlock": 60,
+        "golpesBase": {
+          "startupFrames": 70,
+          "activeFrames": 1,
+          "recoveryFrames": 50,
+          "hitstunFrames": 55,
+          "blockstunFrames": 45
+        },
+        "golpes": [
+          39,
+          69,
+          84,
+          96
+        ],
+        "reach": 134,
+        "hitHeight": 166,
+        "launchType": "knockdown",
+        "knockback": 120,
+        "mecanica": {
+          "avanco": {
+            "velocidade": 220,
+            "frames": [
+              0,
+              98
+            ]
+          }
+        }
       }
     },
     "assist": {
       "move": "S"
-    },
-    "mecanica": {
-      "furia": 400
     },
     "ultra": {
       "preparo": 60,
@@ -135,6 +158,9 @@
         90,
         92
       ]
+    },
+    "mecanica": {
+      "furia": 400
     }
   },
   "animations": {
@@ -1234,7 +1260,7 @@
         34,
         34
       ],
-      "impactFrame": 10
+      "impactFrame": 6
     },
     "INTRO": {
       "atlas": "p12_intro",
@@ -2014,10 +2040,10 @@
       "reach": 136,
       "hitHeight": 167,
       "startupFrames": 10,
-      "activeFrames": 14,
-      "recoveryFrames": 14,
-      "hitstunFrames": 37,
-      "blockstunFrames": 21,
+      "activeFrames": 16,
+      "recoveryFrames": 12,
+      "hitstunFrames": 24,
+      "blockstunFrames": 8,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -2035,8 +2061,26 @@
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
       "mecanica": {
-        "custoVida": 250
-      }
+        "custoVida": 250,
+        "avanco": {
+          "velocidade": 350,
+          "frames": [
+            0,
+            25
+          ]
+        }
+      },
+      "golpesBase": {
+        "startupFrames": 10,
+        "activeFrames": 14,
+        "recoveryFrames": 14,
+        "hitstunFrames": 37,
+        "blockstunFrames": 21
+      },
+      "golpes": [
+        10,
+        23
+      ]
     }
   }
 }

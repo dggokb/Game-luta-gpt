@@ -64,11 +64,11 @@
       "spawnY": 92,
       "airSpawnY": 168,
       "attack": {
-        "startupFrames": 70,
-        "activeFrames": 1,
-        "recoveryFrames": 50,
-        "hitstunFrames": 55,
-        "blockstunFrames": 45,
+        "startupFrames": 41,
+        "activeFrames": 53,
+        "recoveryFrames": 27,
+        "hitstunFrames": 10,
+        "blockstunFrames": 20,
         "hitstopFrames": 12,
         "cancelWindows": {
           "hit": null,
@@ -77,7 +77,32 @@
         },
         "cancelInto": [],
         "pushbackOnHit": 60,
-        "pushbackOnBlock": 60
+        "pushbackOnBlock": 60,
+        "golpesBase": {
+          "startupFrames": 70,
+          "activeFrames": 1,
+          "recoveryFrames": 50,
+          "hitstunFrames": 55,
+          "blockstunFrames": 45
+        },
+        "golpes": [
+          41,
+          66,
+          91
+        ],
+        "reach": 159,
+        "hitHeight": 244,
+        "launchType": "knockdown",
+        "knockback": 120,
+        "mecanica": {
+          "avanco": {
+            "velocidade": 260,
+            "frames": [
+              0,
+              93
+            ]
+          }
+        }
       }
     },
     "assist": {
@@ -1093,28 +1118,28 @@
       ],
       "loop": false,
       "durationsMs": [
-        35,
-        35,
-        24,
         23,
-        20,
-        25,
+        23,
+        16,
+        15,
+        13,
+        17,
         40,
-        40,
-        42,
-        60,
         45,
-        30,
-        30,
-        30,
-        30,
-        30,
-        35,
-        35,
-        40,
-        35
+        47,
+        67,
+        50,
+        33,
+        33,
+        33,
+        33,
+        33,
+        39,
+        39,
+        45,
+        39
       ],
-      "impactFrame": 4
+      "impactFrame": 6
     },
     "SPECIAL_S3": {
       "atlas": "p03_special_s3",
@@ -1143,29 +1168,29 @@
       ],
       "loop": false,
       "durationsMs": [
+        151,
+        151,
         34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        34,
-        17,
-        18,
-        18,
-        18,
-        43,
-        43,
-        43,
-        37,
-        37,
-        37,
-        37,
-        43
+        21,
+        21,
+        21,
+        21,
+        21,
+        21,
+        10,
+        11,
+        11,
+        11,
+        26,
+        26,
+        26,
+        22,
+        22,
+        22,
+        22,
+        26
       ],
-      "impactFrame": 9
+      "impactFrame": 2
     },
     "SPECIAL_S4": {
       "atlas": "p03_special_s4",
@@ -1267,7 +1292,7 @@
         42,
         40
       ],
-      "impactFrame": 12
+      "impactFrame": 7
     },
     "INTRO": {
       "atlas": "p03_intro",
@@ -1976,10 +2001,10 @@
       "reach": 108,
       "hitHeight": 180,
       "startupFrames": 6,
-      "activeFrames": 8,
-      "recoveryFrames": 21,
-      "hitstunFrames": 38,
-      "blockstunFrames": 16,
+      "activeFrames": 17,
+      "recoveryFrames": 12,
+      "hitstunFrames": 24,
+      "blockstunFrames": 4,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
@@ -2001,10 +2026,22 @@
           "velocidade": 300,
           "frames": [
             0,
-            13
+            22
           ]
         }
-      }
+      },
+      "golpesBase": {
+        "startupFrames": 6,
+        "activeFrames": 8,
+        "recoveryFrames": 21,
+        "hitstunFrames": 38,
+        "blockstunFrames": 16
+      },
+      "golpes": [
+        6,
+        12,
+        20
+      ]
     },
     "S3": {
       "command": [
@@ -2020,10 +2057,10 @@
       "reach": 118,
       "hitHeight": 147,
       "startupFrames": 17,
-      "activeFrames": 4,
-      "recoveryFrames": 17,
-      "hitstunFrames": 24,
-      "blockstunFrames": 16,
+      "activeFrames": 15,
+      "recoveryFrames": 6,
+      "hitstunFrames": 12,
+      "blockstunFrames": 4,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
@@ -2037,8 +2074,7 @@
         "whiff": null
       },
       "cancelInto": [
-        "SUPER",
-        "S3"
+        "SUPER"
       ],
       "pushbackOnHit": 40,
       "pushbackOnBlock": 50,
@@ -2047,11 +2083,22 @@
           "velocidade": 520,
           "frames": [
             0,
-            20
+            31
           ]
         }
       },
-      "maxUsesPerCombo": 3
+      "golpesBase": {
+        "startupFrames": 17,
+        "activeFrames": 4,
+        "recoveryFrames": 17,
+        "hitstunFrames": 24,
+        "blockstunFrames": 16
+      },
+      "golpes": [
+        17,
+        22,
+        29
+      ]
     },
     "S4": {
       "command": [
@@ -2066,10 +2113,10 @@
       "reach": 160,
       "hitHeight": 228,
       "startupFrames": 10,
-      "activeFrames": 13,
-      "recoveryFrames": 13,
-      "hitstunFrames": 35,
-      "blockstunFrames": 19,
+      "activeFrames": 7,
+      "recoveryFrames": 19,
+      "hitstunFrames": 31,
+      "blockstunFrames": 15,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -2086,7 +2133,18 @@
       "knockback": 70,
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
-      "hitFloor": 98
+      "hitFloor": 98,
+      "golpesBase": {
+        "startupFrames": 10,
+        "activeFrames": 13,
+        "recoveryFrames": 13,
+        "hitstunFrames": 35,
+        "blockstunFrames": 19
+      },
+      "golpes": [
+        10,
+        14
+      ]
     }
   }
 }

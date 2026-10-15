@@ -64,11 +64,11 @@
       "spawnY": 83,
       "airSpawnY": 149,
       "attack": {
-        "startupFrames": 70,
-        "activeFrames": 1,
-        "recoveryFrames": 50,
-        "hitstunFrames": 55,
-        "blockstunFrames": 45,
+        "startupFrames": 11,
+        "activeFrames": 72,
+        "recoveryFrames": 38,
+        "hitstunFrames": 10,
+        "blockstunFrames": 31,
         "hitstopFrames": 12,
         "cancelWindows": {
           "hit": null,
@@ -77,14 +77,36 @@
         },
         "cancelInto": [],
         "pushbackOnHit": 60,
-        "pushbackOnBlock": 60
+        "pushbackOnBlock": 60,
+        "golpesBase": {
+          "startupFrames": 70,
+          "activeFrames": 1,
+          "recoveryFrames": 50,
+          "hitstunFrames": 55,
+          "blockstunFrames": 45
+        },
+        "golpes": [
+          11,
+          40,
+          80
+        ],
+        "reach": 213,
+        "hitHeight": 155,
+        "launchType": "knockdown",
+        "knockback": 120,
+        "mecanica": {
+          "avanco": {
+            "velocidade": 240,
+            "frames": [
+              0,
+              82
+            ]
+          }
+        }
       }
     },
     "assist": {
       "move": "S"
-    },
-    "mecanica": {
-      "wallJump": true
     },
     "ultra": {
       "preparo": 16,
@@ -146,6 +168,9 @@
         90,
         92
       ]
+    },
+    "mecanica": {
+      "wallJump": true
     }
   },
   "animations": {
@@ -1159,28 +1184,28 @@
       ],
       "loop": false,
       "durationsMs": [
-        34,
-        34,
-        34,
+        27,
+        27,
+        27,
+        20,
+        1,
+        27,
         25,
+        35,
+        35,
+        70,
+        1,
+        1,
+        35,
         17,
-        56,
-        28,
-        28,
-        28,
-        56,
-        1,
-        1,
-        28,
-        14,
-        28,
-        28,
-        28,
-        14,
-        28,
-        28
+        35,
+        35,
+        35,
+        17,
+        35,
+        35
       ],
-      "impactFrame": 4
+      "impactFrame": 6
     },
     "SUPER_WAVE": {
       "atlas": "p05_super_wave",
@@ -1233,7 +1258,7 @@
         34,
         34
       ],
-      "impactFrame": 10
+      "impactFrame": 2
     },
     "INTRO": {
       "atlas": "p05_intro",
@@ -2060,10 +2085,10 @@
       "reach": 175,
       "hitHeight": 136,
       "startupFrames": 8,
-      "activeFrames": 12,
-      "recoveryFrames": 12,
-      "hitstunFrames": 33,
-      "blockstunFrames": 17,
+      "activeFrames": 20,
+      "recoveryFrames": 4,
+      "hitstunFrames": 16,
+      "blockstunFrames": 4,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -2085,10 +2110,21 @@
           "velocidade": 520,
           "frames": [
             0,
-            19
+            27
           ]
         }
-      }
+      },
+      "golpesBase": {
+        "startupFrames": 8,
+        "activeFrames": 12,
+        "recoveryFrames": 12,
+        "hitstunFrames": 33,
+        "blockstunFrames": 17
+      },
+      "golpes": [
+        8,
+        25
+      ]
     }
   }
 }

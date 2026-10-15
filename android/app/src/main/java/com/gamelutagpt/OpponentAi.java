@@ -82,8 +82,7 @@ final class OpponentAi {
             // nothing to do
         } else if (
             s.superReady &&
-            s.distance >= 250f &&
-            s.distance <= 720f &&
+            superInRange(s.self, s.distance) &&
             random.nextDouble() < 0.18
         ) {
             actions.superAttack();
@@ -138,5 +137,12 @@ final class OpponentAi {
     int wakeupDirection() {
         double r = random.nextDouble();
         return r < 0.30 ? 7 : r < 0.50 ? 5 : r < 0.62 ? 1 : r < 0.72 ? 3 : 0;
+    }
+
+    /** A wave Super goes from afar; a Super that strikes only up close (its reach plus the advance). */
+    private static boolean superInRange(CharacterDefinition self, float distance) {
+        AttackDefinition sup = self.attack("SUPER");
+        if (sup != null && sup.melee()) return distance <= sup.reach + 90f;
+        return distance >= 250f && distance <= 720f;
     }
 }

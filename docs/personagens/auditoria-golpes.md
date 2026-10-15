@@ -212,3 +212,20 @@ como antes.
 - p01 e p06 continuam com o raio (é o golpe deles).
 - p09 e p11: o vídeo mostra o rival junto (agarrão), e ele ficaria colado na arte. Faltam
   vídeos novos sem o rival; até lá eles continuam com o raio.
+
+## Golpes com várias pancadas (15/10)
+
+Os golpes agora batem onde a animação bate (`tools/sprites/pancadas.json` → `mecanicas.py`):
+cada pancada do desenho é um acerto, no quadro em que ela encosta; o dano do golpe se divide
+entre elas, as do meio só seguram o rival até a próxima e a última aplica o efeito do golpe
+(derrubar, lançar). O golpe mantém a vantagem que tinha com um acerto só.
+
+| | Pancadas |
+|---|---|
+| S2 | p03 uppercut 3, p07 chutes 3, p08 chicotadas 2 |
+| S3 | p03 rekka: as 3 investidas num comando só, 3 pancadas |
+| S4 | p01 chutes giratórios 3, p02 2, p03 2, p05 2, p12 2 |
+| Super corpo a corpo (sem onda) | p02 5, p03 3, p04 3, p05 3, p06 6, p08 4 (chicote, alcance longo), p10 4, p12 4 |
+
+Avançam como na animação: S4 do p01, p02, p04, p06, p08 e p12, e os Supers corpo a corpo.
+Continuam com onda: p01 (Onda), p09 (fogo pelo chão) e p11 (arremesso); o p07 chama os capangas.

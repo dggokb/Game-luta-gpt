@@ -236,7 +236,7 @@ public class MechanicsTest {
     @Test public void everyCharacterCarriesItsOwnMechanic() {
         AttackDefinition.Reads high = AttackDefinition.Reads.HIGH, any = AttackDefinition.Reads.ANY;
         assertEquals(high, mech("p02", "S3").counter);
-        assertTrue(GeneratedCharacters.get("p03").attack("S3").cancelsInto("S3"));
+        assertEquals("rekka: three thrusts, like its animation", 3, GeneratedCharacters.get("p03").attack("S3").maxHits);
         assertTrue(mech("p03", "S3").advanceSpeed > 0f);
         assertEquals(high, mech("p04", "S3").evade);
         assertTrue(GeneratedCharacters.get("p04").attack("S3").cancelsInto("L"));
@@ -458,6 +458,83 @@ public class MechanicsTest {
         }
         for (String id : new String[]{"player_base", "p06"}) {
             assertNull(id + " keeps the beam", GeneratedCharacters.get(id).fighter.ultraSequence);
+        }
+    }
+
+    // ------------------------------------------------------------ golpes de várias pancadas
+
+    /** Runs {@code move} of {@code who} against the base dummy, returning the frames each hit landed. */
+    private static java.util.List<Integer> strikesOf(String who, String move, boolean superMove, float gap, int[] damage) {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get(who), BASE, 500f, 500f + gap);
+        if (superMove) {
+            s.f(0).state.superMeter = CombatConfig.MAX_METER;
+            s.in[0].superAttack = true;
+        } else {
+            s.in[0].special = move;
+        }
+        java.util.List<Integer> frames = new java.util.ArrayList<>();
+        int life = s.f(1).state.life;
+        for (int i = 0; i < 200; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) {
+                if (e.attacker == 0 && !e.blocked && move.equals(e.moveId)) frames.add(s.f(0).attackFrame);
+            }
+            if (i > 10 && !s.f(0).attacking()) break;
+        }
+        damage[0] = life - s.f(1).state.life;
+        return frames;
+    }
+
+    @Test public void aSeveralStrikeSpecialHitsOnEachStrikeOfItsAnimation() {
+        AttackDefinition up = GeneratedCharacters.get("p03").attack("S2");
+        assertEquals("the uppercut hits three times like its animation", 3, up.maxHits);
+        int[] damage = new int[1];
+        java.util.List<Integer> frames = strikesOf("p03", "S2", false, 100f, damage);
+        assertEquals(3, frames.size());
+        for (int i = 0; i < 3; i++) {
+            assertTrue("strike " + i + " lands in its window",
+                up.hitbox(i).activeAt(frames.get(i)) || up.hitbox(i).activeAt(frames.get(i) - 1));
+        }
+        assertEquals("the strikes add up to the move's damage", up.damage, damage[0]);
+    }
+
+    @Test public void onlyTheLastStrikeKnocksDown() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 600f);
+        s.in[0].special = "S2";
+        int hits = 0;
+        boolean downEarly = false;
+        for (int i = 0; i < 120 && hits < 3; i++) {
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
+            if (hits > 0 && hits < 3 && s.f(1).status == CombatFighter.Status.KNOCKDOWN) downEarly = true;
+            if (hits > 0 && hits < 3) {
+                assertTrue("held between strikes",
+                    s.f(1).status == CombatFighter.Status.HITSTUN || s.f(1).status == CombatFighter.Status.AIR_HITSTUN);
+            }
+        }
+        assertEquals(3, hits);
+        assertFalse(downEarly);
+    }
+
+    @Test public void aStrikingSuperHitsWithoutAWave() {
+        AttackDefinition sup = GeneratedCharacters.get("p04").attack("SUPER");
+        assertTrue("p04's Super strikes", sup.melee());
+        int[] damage = new int[1];
+        java.util.List<Integer> frames = strikesOf("p04", "SUPER", true, 110f, damage);
+        assertEquals("three punches like the animation", sup.maxHits, frames.size());
+        assertEquals(sup.damage, damage[0]);
+        // Control: the Super of p09 (fire on the ground) still throws its wave.
+        assertFalse(GeneratedCharacters.get("p09").attack("SUPER").melee());
+        assertFalse(GeneratedCharacters.get("player_base").attack("SUPER").melee());
+    }
+
+    @Test public void theStrikingSuperDoesNotSpawnAProjectile() {
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 610f);
+        s.f(0).state.superMeter = CombatConfig.MAX_METER;
+        s.in[0].superAttack = true;
+        for (int i = 0; i < 150; i++) {
+            s.step();
+            assertTrue("no wave", s.engine.superProjectiles.isEmpty());
         }
     }
 }

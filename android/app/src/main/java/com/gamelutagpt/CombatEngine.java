@@ -629,10 +629,13 @@ final class CombatEngine {
         if (attack.kind == AttackDefinition.Kind.SUPER) {
             f.state.spendSuperMeter(CombatConfig.SUPER_COST);
             f.vy = 0f;
-            // Super freeze: the opponent and the projectiles wait for the release.
+            // Super freeze: the opponent and the projectiles wait for the release. A Super that
+            // strikes freezes only for the flash; its strikes come later in the animation.
+            int freeze = attack.melee() ? Math.min(attack.startupFrames, config.strikingSuperFreezeFrames)
+                                        : attack.startupFrames;
             CombatFighter other = fighters[1 - f.index];
-            other.hitstop = Math.max(other.hitstop, attack.startupFrames);
-            superFreeze = Math.max(superFreeze, attack.startupFrames);
+            other.hitstop = Math.max(other.hitstop, freeze);
+            superFreeze = Math.max(superFreeze, freeze);
         }
     }
 
@@ -773,7 +776,7 @@ final class CombatEngine {
                 }
                 f.charging = false;
                 f.attackFrame++;
-                if (f.attack.kind != AttackDefinition.Kind.NORMAL && f.attackFrame == f.attack.startupFrames) {
+                if (!f.attack.melee() && f.attackFrame == f.attack.startupFrames) {
                     spawnProjectile(f);
                 }
                 if (f.attackFrame == f.attack.mechanics.teleportFrame) teleportBehind(f);
@@ -1215,7 +1218,7 @@ final class CombatEngine {
         int guard = guardFromInput(f);
         if (guard == CombatFighter.GUARD_NONE) return guard;
         CombatFighter other = fighters[1 - f.index];
-        if (other.attacking() && other.attack.kind == AttackDefinition.Kind.NORMAL &&
+        if (other.attacking() && other.attack.melee() &&
             other.attack.threatening(Math.max(0, other.attackFrame)) &&
             guardStops(guard, other.attack, !other.grounded, false)) {
             float horizontal = (f.x - other.x) * other.facing;
@@ -1364,7 +1367,7 @@ final class CombatEngine {
     // ---------------------------------------------------------------- collisions
 
     private void detectMelee(CombatFighter a, CombatFighter d) {
-        if (a.frozen() || !a.attacking() || a.attack.kind != AttackDefinition.Kind.NORMAL) return;
+        if (a.frozen() || !a.attacking() || !a.attack.melee()) return;
         if (!a.attack.isActive(a.attackFrame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
         CharacterDefinition.Body body = d.body();
@@ -1883,7 +1886,15 @@ final class CombatEngine {
         boolean ownerMove = !c.echo && (!projectile || (a.attacking() && a.attack == attack));
         ComboSession session = sessions[d.index];
 
-        if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null &&
+        // Several strikes (the animation hits more than once): the damage is split between them,
+        // the ones before the last only hold the defender until the next, the last one lands
+        // the move's effect (knockdown, launch, knockback).
+        boolean multi = !projectile && attack.maxHits > 1;
+        boolean lastStrike = !multi || c.hitbox >= attack.hitboxCount() - 1;
+        int holdUntil = lastStrike ? 0 : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame +
+            attack.hitstopFrames + config.strikeHoldFrames;
+
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && (!multi || a.hitsOnTarget <= 1) &&
             session.juggleCount + attack.juggleCost > config.juggleLimit) {
             // Juggle limit: the defender recovers in the air instead of taking the hit.
             d.status = CombatFighter.Status.NEUTRAL;
@@ -1906,12 +1917,18 @@ final class CombatEngine {
         int guard = effectiveGuard(d);
         if (guardStops(guard, attack, !a.grounded, projectile)) {
             block(a, d, attack, guard, direction, projectile);
+            if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
             return;
         }
 
         // Fury: the attacker hits harder the less life it has left.
-        int raw = (projectile ? c.projectile.damage : attack.damage) * a.state.profile.furyScale(a.state.life) / 1000;
+        int base = projectile ? c.projectile.damage : attack.damage;
+        if (multi) {
+            int each = base / attack.maxHits;
+            base = lastStrike ? base - each * (attack.maxHits - 1) : each;
+        }
+        int raw = base * a.state.profile.furyScale(a.state.life) / 1000;
         if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
             // Super armor: the damage goes through, the stun does not; the move carries on.
             d.armorUsed++;
@@ -1926,7 +1943,12 @@ final class CombatEngine {
 
         session = sessionFor(a, d);
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
-        int damage = session.registerHit(attack, raw, config);
+        if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
+        AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
+        float hitPush = lastStrike ? attack.pushbackOnHit : attack.pushbackOnHit * config.strikeHoldPushback;
+        float airPush = lastStrike ? attack.knockback : attack.knockback * config.strikeHoldPushback;
+        // Later strikes of the same move keep the scale of its first strike.
+        int damage = multi && a.hitsOnTarget > 1 ? session.registerFollowUp(raw) : session.registerHit(attack, raw, config);
         d.state.takeDamage(damage, config.recoverableLifePermille);
         gainMeter(a, CombatRules.superGainOnHit(attack.strength));
         if (attack.mechanics.poisonDamage > 0) {
@@ -1946,9 +1968,9 @@ final class CombatEngine {
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
         // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
-        boolean wallBounce = attack.launch == AttackDefinition.Launch.WALL_BOUNCE && session.hitCount >= 2 &&
+        boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && session.hitCount >= 2 &&
             session.wallBounces < config.maxWallBounces;
-        boolean groundBounce = attack.launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
+        boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
 
         if (wallBounce) {
@@ -1980,18 +2002,18 @@ final class CombatEngine {
             d.slammed = false;
             d.hardFall = true;
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
-        } else if ((attack.launch == AttackDefinition.Launch.SLAM ||
-                    attack.launch == AttackDefinition.Launch.GROUND_BOUNCE) && !d.grounded && a.superJumping) {
+        } else if ((launch == AttackDefinition.Launch.SLAM ||
+                    launch == AttackDefinition.Launch.GROUND_BOUNCE) && !d.grounded && a.superJumping) {
             // Slam (also a ground bounce already used): from a super jump, a forced dive.
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.slammed = true;
             d.launched = false;
             d.vy = config.slamSpeed;
             push(d, a, direction * attack.knockback * 0.35f);
-        } else if (attack.launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
+        } else if (launch == AttackDefinition.Launch.KNOCKDOWN && d.grounded) {
             knockDown(d);
             push(d, a, direction * attack.knockback);
-        } else if (attack.launch == AttackDefinition.Launch.LAUNCH) {
+        } else if (launch == AttackDefinition.Launch.LAUNCH) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.grounded = false;
             d.y -= 2f;
@@ -2003,11 +2025,11 @@ final class CombatEngine {
             push(d, a, direction * attack.knockback);
         } else if (!d.grounded) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
-            push(d, a, direction * attack.knockback);
+            push(d, a, direction * airPush);
         } else {
             d.status = CombatFighter.Status.HITSTUN;
             d.hitCrouching = wasCrouching;
-            push(d, a, direction * attack.pushbackOnHit);
+            push(d, a, direction * hitPush);
         }
         if (attack.mechanics.pull > 0f && d.grounded && !projectile) {
             // Pull: the defender is dragged to the attacker instead of pushed away.
@@ -2015,10 +2037,10 @@ final class CombatEngine {
             push(d, a, -direction * Math.min(attack.mechanics.pull, Math.max(0f, gap)));
             cues.add("PULL");
         }
-        // Every hit that leaves the defender juggled costs juggle points.
-        if (d.status == CombatFighter.Status.AIR_HITSTUN) session.juggleCount += attack.juggleCost;
+        // Every hit that leaves the defender juggled costs juggle points (a several-strike move once).
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && lastStrike) session.juggleCount += attack.juggleCost;
         if (!d.grounded) session.airCombo = true;
-        freeze(a, d, attack.hitstopFrames, projectile);
+        freeze(a, d, lastStrike ? attack.hitstopFrames : Math.max(3, attack.hitstopFrames * 2 / 3), projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
     }

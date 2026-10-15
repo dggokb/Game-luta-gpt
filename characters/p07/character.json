@@ -83,9 +83,6 @@
     "assist": {
       "move": "S"
     },
-    "mecanica": {
-      "capangas": 2
-    },
     "ultra": {
       "preparo": 36,
       "golpes": [
@@ -139,6 +136,9 @@
         88,
         90
       ]
+    },
+    "mecanica": {
+      "capangas": 2
     }
   },
   "animations": {
@@ -1101,28 +1101,28 @@
       ],
       "loop": false,
       "durationsMs": [
-        27,
-        27,
-        27,
-        27,
-        17,
+        31,
+        31,
+        31,
+        31,
+        20,
         61,
-        32,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42,
-        42
+        31,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41,
+        41
       ],
-      "impactFrame": 5
+      "impactFrame": 4
     },
     "SPECIAL_S3": {
       "atlas": "p07_special_s3",
@@ -2113,10 +2113,10 @@
       "reach": 185,
       "hitHeight": 236,
       "startupFrames": 8,
-      "activeFrames": 10,
-      "recoveryFrames": 28,
-      "hitstunFrames": 47,
-      "blockstunFrames": 25,
+      "activeFrames": 21,
+      "recoveryFrames": 17,
+      "hitstunFrames": 29,
+      "blockstunFrames": 7,
       "hitstopFrames": 10,
       "cancelWindows": {
         "hit": [
@@ -2133,7 +2133,19 @@
       "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
-      "hitFloor": 116
+      "hitFloor": 116,
+      "golpesBase": {
+        "startupFrames": 8,
+        "activeFrames": 10,
+        "recoveryFrames": 28,
+        "hitstunFrames": 47,
+        "blockstunFrames": 25
+      },
+      "golpes": [
+        8,
+        12,
+        26
+      ]
     },
     "S3": {
       "command": [

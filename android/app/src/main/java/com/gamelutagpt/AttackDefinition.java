@@ -168,13 +168,22 @@ final class AttackDefinition {
         pushbackOnHit = b.pushbackOnHit;
         pushbackOnBlock = b.pushbackOnBlock;
         juggleCost = b.juggleCost;
-        maxHits = b.maxHits;
+        maxHits = b.strikes.length > 0 ? b.strikes.length : b.maxHits;
         maxUsesPerCombo = b.maxUses;
         low = b.low;
         reach = b.reach;
         hitHeight = b.hitHeight;
         hitFloor = Math.min(b.hitFloor > 0f ? b.hitFloor : Float.MAX_VALUE, hitHeight - CombatRules.VERTICAL_SLACK);
-        if (b.hitboxes.isEmpty() && kind == Kind.NORMAL) {
+        if (b.hitboxes.isEmpty() && b.strikes.length > 0) {
+            // Several strikes (the animation hits more than once): one box per strike, open
+            // from its frame for STRIKE_WINDOW frames or until the next one, default geometry.
+            hitboxes = new Box[b.strikes.length];
+            for (int i = 0; i < b.strikes.length; i++) {
+                int last = i + 1 < b.strikes.length ? b.strikes[i + 1] - 1 : startupFrames + activeFrames - 1;
+                hitboxes[i] = new Box(b.strikes[i], Math.min(last, b.strikes[i] + STRIKE_WINDOW - 1),
+                    0f, reach, hitFloor, hitHeight + CombatRules.VERTICAL_SLACK);
+            }
+        } else if (b.hitboxes.isEmpty() && kind == Kind.NORMAL) {
             // Default strike: from the root to the reach, from hitFloor up to hitHeight + slack, on every active frame.
             hitboxes = new Box[] { new Box(
                 startupFrames, startupFrames + activeFrames - 1,
@@ -186,6 +195,12 @@ final class AttackDefinition {
         }
         hurtboxes = b.hurtboxes.toArray(new Box[0]);
     }
+
+    /** Frames each strike of a several-strike move can connect. */
+    static final int STRIKE_WINDOW = 3;
+
+    /** Hits with boxes (normal moves, and a Super that strikes instead of throwing a wave). */
+    boolean melee() { return hitboxes.length > 0; }
 
     int lastActiveFrame() { return startupFrames + activeFrames - 1; }
     boolean isActive(int frame) { return frame >= startupFrames && frame <= lastActiveFrame(); }
@@ -259,6 +274,7 @@ final class AttackDefinition {
         private boolean low;
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
+        private int[] strikes = new int[0];
         private final List<Box> hurtboxes = new ArrayList<>();
         private Mechanics mechanics = NO_MECHANICS;
 
@@ -284,6 +300,8 @@ final class AttackDefinition {
         Builder pushback(float onHit, float onBlock) { pushbackOnHit = onHit; pushbackOnBlock = onBlock; return this; }
         Builder juggleCost(int value) { juggleCost = value; return this; }
         Builder maxHits(int value) { maxHits = value; return this; }
+        /** Frames where each strike of the animation lands; the first is the end of the startup. */
+        Builder strikes(int... frames) { strikes = frames.clone(); return this; }
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
         Builder reach(float reachValue, float hitHeightValue) { reach = reachValue; hitHeight = hitHeightValue; return this; }
@@ -320,6 +338,16 @@ final class AttackDefinition {
                 throw new IllegalArgumentException(name + "juggleCost and maxUsesPerCombo cannot be negative");
             }
             int lastActive = startup + active - 1;
+            if (strikes.length > 0) {
+                if (!hitboxes.isEmpty()) throw new IllegalArgumentException(name + "strikes build their own hitboxes");
+                if (strikes[0] != startup || strikes[strikes.length - 1] > lastActive) {
+                    throw new IllegalArgumentException(name + "strikes start at the first active frame and stay inside the active frames");
+                }
+                for (int i = 1; i < strikes.length; i++) {
+                    if (strikes[i] <= strikes[i - 1]) throw new IllegalArgumentException(name + "strikes must grow");
+                }
+                if (kind == Kind.PROJECTILE) throw new IllegalArgumentException(name + "a projectile move cannot strike");
+            }
             for (Box box : hitboxes) {
                 if (box.firstFrame < startup || box.lastFrame > lastActive || box.firstFrame > box.lastFrame) {
                     throw new IllegalArgumentException(name + "hitbox frames must stay inside the active frames");
@@ -340,6 +368,10 @@ final class AttackDefinition {
                 int boxes = hitboxes.isEmpty() ? 1 : hitboxes.size();
                 if (maxHits < 1 || maxHits > boxes) {
                     throw new IllegalArgumentException(name + "maxHits must be between 1 and the number of hitboxes");
+                }
+            } else if (kind == Kind.SUPER && strikes.length > 0) {
+                if (reach <= 0f || hitHeight <= 0f) {
+                    throw new IllegalArgumentException(name + "a striking Super needs reach and hitHeight");
                 }
             } else if (active != 1 || !hitboxes.isEmpty()) {
                 throw new IllegalArgumentException(name + "projectile moves spawn on one active frame and have no hitboxes");

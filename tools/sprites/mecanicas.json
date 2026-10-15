@@ -104,7 +104,7 @@
         "alcance": 380
       },
       "unica": {
-        "descricao": "Rekka: o S3 avança e encadeia até 3 vezes (novo comando a cada investida); o S2 sobe avançando.",
+        "descricao": "Rekka: o S3 avança em três investidas seguidas (três pancadas, como na animação); o S2 sobe avançando e bate várias vezes.",
         "golpes": {
           "S3": {
             "avanco": {
@@ -117,12 +117,6 @@
               "velocidade": 300,
               "janela": "ate_ativo"
             }
-          }
-        },
-        "rotas": {
-          "S3": {
-            "cancelaEm": ["S3"],
-            "maxUsos": 3
           }
         }
       }

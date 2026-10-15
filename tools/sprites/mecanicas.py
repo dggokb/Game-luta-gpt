@@ -30,6 +30,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import auditoria as A  # noqa: E402
 
 DATA = Path(__file__).with_name('mecanicas.json')
+PANCADAS = Path(__file__).with_name('pancadas.json')
+STRIKE_WINDOW = 3   # quadros em que cada pancada pode acertar (AttackDefinition.STRIKE_WINDOW)
 GAP_CAP = 2.0   # um quadro fica no máximo 2x o tempo mediano do clipe
 
 
@@ -137,6 +139,68 @@ def unique(pack, spec):
         fighter['mecanica'] = dict(u['lutador'])
 
 
+def strike_frames(anim, total, startup, pancadas):
+    """Quadro do golpe em que cada pancada acerta: o tempo da animação até o quadro dela
+    (a animação estica sobre o golpe). A primeira é o fim da preparação."""
+    d = anim['durationsMs']
+    whole, frames = sum(d), [startup]
+    for i in pancadas[1:]:
+        frames.append(max(round(sum(d[:i]) / whole * total), frames[-1] + 2))
+    return frames
+
+
+BASE_KEYS = ('startupFrames', 'activeFrames', 'recoveryFrames', 'hitstunFrames', 'blockstunFrames')
+
+
+def restore(m):
+    """Desfaz as pancadas gravadas antes (refazer dá sempre o mesmo resultado)."""
+    m.update(m.pop('golpesBase', {}))
+    m.pop('golpes', None)
+
+
+def strike(m, anim, pancadas):
+    """Golpe de várias pancadas: janela ativa cobre todas, mesma duração total. Guarda o
+    tempo de antes em "golpesBase"."""
+    m.setdefault('golpesBase', {k: m[k] for k in BASE_KEYS})
+    total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+    frames = strike_frames(anim, total, m['startupFrames'], pancadas)
+    if frames[-1] > total - 2:
+        raise SystemExit(f"pancadas {pancadas}: a última cai no quadro {frames[-1]} de {total}")
+    m['activeFrames'] = min(frames[-1] - m['startupFrames'] + STRIKE_WINDOW, total - 1 - m['startupFrames'])
+    m['recoveryFrames'] = total - m['startupFrames'] - m['activeFrames']
+    m['golpes'] = frames
+    # A última pancada vem depois do impacto: o atordoamento dela desconta esse atraso, e o
+    # golpe fica com a mesma vantagem na defesa e no acerto que tinha com uma pancada só.
+    late = frames[-1] - m['startupFrames']
+    m['blockstunFrames'] = max(4, m['blockstunFrames'] - late)
+    m['hitstunFrames'] = max(10, m['hitstunFrames'] - late)
+
+
+def advance(m, speed):
+    m.setdefault('mecanica', {})['avanco'] = {'velocidade': speed, 'frames': window('ate_ativo', m)}
+
+
+def striking_super(pack, spec):
+    """Super que bate corpo a corpo seguindo a animação (em vez de soltar a onda)."""
+    a = pack['fighter']['super']['attack']
+    anim = pack['animations'][pack['specialAnimations']['SUPER']]
+    a['golpesBase'] = {k: a[k] for k in BASE_KEYS}
+    total = a['startupFrames'] + a['activeFrames'] + a['recoveryFrames']
+    d, first = anim['durationsMs'], spec['pancadas'][0]
+    a['startupFrames'] = int(sum(d[:first]) / sum(d) * total)
+    a['activeFrames'], a['recoveryFrames'] = 1, total - a['startupFrames'] - 1
+    strike(a, anim, spec['pancadas'])
+    anim['impactFrame'] = first
+    heavy = pack['moves']['H']
+    a['reach'] = spec.get('alcance', heavy['reach'] + 30)
+    a['hitHeight'] = spec.get('altura', heavy['hitHeight'])
+    a['launchType'], a['knockback'] = 'knockdown', spec.get('empurrao', 120)
+    # Defendido, o Super corpo a corpo fica -10 (a onda era segura por ser de longe).
+    a['blockstunFrames'] = max(4, total - a['golpes'][-1] - 10)
+    if spec.get('avanco'):
+        advance(a, spec['avanco'])
+
+
 def scaled(base, f, air=False):
     """Startup e recuperação seguem o ritmo; no ar a janela ativa fica a da base (golpe
     aéreo precisa de tempo ativo para encostar na descida)."""
@@ -149,6 +213,12 @@ def apply(cid, spec, base):
     pack = json.loads(path.read_text(encoding='utf-8'))
     _, clips = A.load_pack(cid)
     fighter, report = pack['fighter'], []
+    for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values()):
+        restore(m)
+    sup = fighter['super']['attack']
+    restore(sup)
+    for k in ('reach', 'hitHeight', 'launchType', 'knockback', 'mecanica'):
+        sup.pop(k, None)
     fighter['maxLife'] = spec['vida']
     keep = spec.get('manterTempo', False)   # arte própria calibrada golpe a golpe (p01)
 
@@ -175,6 +245,11 @@ def apply(cid, spec, base):
     attacks.append(('S', pack.get('specialAnimations', {}).get('S'), energy['attack']))
     fighter['super']['damage'] = damage('SUPER')
     unique(pack, spec)
+    hits = json.loads(PANCADAS.read_text(encoding='utf-8'))['personagens'].get(cid, {})
+    specials = pack.get('specialMoves', {})
+    for key, h in hits.items():
+        if key != 'SUPER' and 'pancadas' in h:
+            pack['animations'][specials[key]['animation']]['impactFrame'] = h['pancadas'][0]
 
     for key, anim_id, m in attacks:
         anim_id = m.get('animation', anim_id)   # a mecânica pode trocar a animação do golpe
@@ -188,9 +263,22 @@ def apply(cid, spec, base):
             else:
                 cadence = 'mantida'
             fit_impact(anim, m)
+        h = hits.get(key, {})
+        if 'pancadas' in h:
+            strike(m, anim, h['pancadas'])
+            cadence += f", {len(h['pancadas'])} pancadas {m['golpes']}"
+            if 'avanco' in m.get('mecanica', {}):
+                m['mecanica']['avanco']['frames'] = window('ate_ativo', m)   # a janela ativa cresceu
+        if 'avanco' in h:
+            advance(m, h['avanco'])
         dmg = energy['damage'] if key == 'S' else m['damage']
         report.append(f"  {key:4} {dmg:5}  {m['startupFrames']:2}/{m['activeFrames']:2}/{m['recoveryFrames']:2}"
                       f"  {total / 60:.2f}s  cadência {cadence}")
+    if 'SUPER' in hits:
+        striking_super(pack, hits['SUPER'])
+        a = fighter['super']['attack']
+        report.append(f"  SUPER corpo a corpo: {len(a['golpes'])} pancadas {a['golpes']}, "
+                      f"{a['startupFrames']}/{a['activeFrames']}/{a['recoveryFrames']}, alcance {a['reach']}")
     return pack, path, report
 
 

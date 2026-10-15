@@ -56,6 +56,17 @@ final class ComboSession {
     }
 
     /**
+     * A later strike of the move that just hit (several strikes in one animation): same scale
+     * as its first strike, so the move deals its whole damage like a one-strike move would.
+     */
+    int registerFollowUp(int baseDamage) {
+        int damage = DamageScaling.apply(baseDamage, damageScale);
+        hitCount++;
+        comboDamage += damage;
+        return damage;
+    }
+
+    /**
      * Ultra: the scale is fixed when the rush connects and its damage then arrives in
      * parts during the cinematic ({@link #addHit}). Counts as one use of the move.
      */

@@ -64,11 +64,11 @@
       "spawnY": 173,
       "airSpawnY": 80,
       "attack": {
-        "startupFrames": 70,
-        "activeFrames": 1,
-        "recoveryFrames": 50,
-        "hitstunFrames": 55,
-        "blockstunFrames": 45,
+        "startupFrames": 18,
+        "activeFrames": 90,
+        "recoveryFrames": 13,
+        "hitstunFrames": 10,
+        "blockstunFrames": 6,
         "hitstopFrames": 12,
         "cancelWindows": {
           "hit": null,
@@ -77,7 +77,34 @@
         },
         "cancelInto": [],
         "pushbackOnHit": 60,
-        "pushbackOnBlock": 60
+        "pushbackOnBlock": 60,
+        "golpesBase": {
+          "startupFrames": 70,
+          "activeFrames": 1,
+          "recoveryFrames": 50,
+          "hitstunFrames": 55,
+          "blockstunFrames": 45
+        },
+        "golpes": [
+          18,
+          33,
+          69,
+          88,
+          105
+        ],
+        "reach": 214,
+        "hitHeight": 206,
+        "launchType": "knockdown",
+        "knockback": 120,
+        "mecanica": {
+          "avanco": {
+            "velocidade": 220,
+            "frames": [
+              0,
+              107
+            ]
+          }
+        }
       }
     },
     "assist": {
@@ -1119,28 +1146,28 @@
       ],
       "loop": false,
       "durationsMs": [
+        70,
+        70,
+        40,
         35,
+        17,
         35,
+        17,
+        17,
         35,
+        17,
+        17,
         35,
-        20,
-        42,
-        21,
-        21,
-        42,
-        21,
-        21,
-        42,
-        21,
-        21,
-        42,
-        21,
-        21,
-        42,
-        21,
-        21
+        17,
+        17,
+        35,
+        17,
+        17,
+        35,
+        17,
+        17
       ],
-      "impactFrame": 4
+      "impactFrame": 2
     },
     "SUPER_WAVE": {
       "atlas": "p02_super_wave",
@@ -1193,7 +1220,7 @@
         34,
         34
       ],
-      "impactFrame": 10
+      "impactFrame": 3
     },
     "INTRO": {
       "atlas": "p02_intro",
@@ -1971,10 +1998,10 @@
       "reach": 216,
       "hitHeight": 207,
       "startupFrames": 9,
-      "activeFrames": 13,
-      "recoveryFrames": 13,
-      "hitstunFrames": 35,
-      "blockstunFrames": 19,
+      "activeFrames": 7,
+      "recoveryFrames": 19,
+      "hitstunFrames": 31,
+      "blockstunFrames": 15,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -1990,7 +2017,27 @@
       "launchType": "knockdown",
       "knockback": 70,
       "pushbackOnHit": 30,
-      "pushbackOnBlock": 60
+      "pushbackOnBlock": 60,
+      "golpesBase": {
+        "startupFrames": 9,
+        "activeFrames": 13,
+        "recoveryFrames": 13,
+        "hitstunFrames": 35,
+        "blockstunFrames": 19
+      },
+      "golpes": [
+        9,
+        13
+      ],
+      "mecanica": {
+        "avanco": {
+          "velocidade": 380,
+          "frames": [
+            0,
+            15
+          ]
+        }
+      }
     }
   }
 }

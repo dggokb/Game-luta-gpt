@@ -64,11 +64,11 @@
       "spawnY": 90,
       "airSpawnY": 176,
       "attack": {
-        "startupFrames": 70,
-        "activeFrames": 1,
-        "recoveryFrames": 50,
-        "hitstunFrames": 55,
-        "blockstunFrames": 45,
+        "startupFrames": 11,
+        "activeFrames": 97,
+        "recoveryFrames": 13,
+        "hitstunFrames": 10,
+        "blockstunFrames": 6,
         "hitstopFrames": 12,
         "cancelWindows": {
           "hit": null,
@@ -77,7 +77,35 @@
         },
         "cancelInto": [],
         "pushbackOnHit": 60,
-        "pushbackOnBlock": 60
+        "pushbackOnBlock": 60,
+        "golpesBase": {
+          "startupFrames": 70,
+          "activeFrames": 1,
+          "recoveryFrames": 50,
+          "hitstunFrames": 55,
+          "blockstunFrames": 45
+        },
+        "golpes": [
+          11,
+          33,
+          69,
+          84,
+          92,
+          105
+        ],
+        "reach": 175,
+        "hitHeight": 192,
+        "launchType": "knockdown",
+        "knockback": 120,
+        "mecanica": {
+          "avanco": {
+            "velocidade": 180,
+            "frames": [
+              0,
+              107
+            ]
+          }
+        }
       }
     },
     "assist": {
@@ -1154,7 +1182,7 @@
         34,
         34
       ],
-      "impactFrame": 10
+      "impactFrame": 2
     },
     "INTRO": {
       "atlas": "p06_intro",
@@ -1929,7 +1957,16 @@
       "launchType": "knockdown",
       "knockback": 70,
       "pushbackOnHit": 30,
-      "pushbackOnBlock": 60
+      "pushbackOnBlock": 60,
+      "mecanica": {
+        "avanco": {
+          "velocidade": 400,
+          "frames": [
+            0,
+            23
+          ]
+        }
+      }
     }
   }
 }
