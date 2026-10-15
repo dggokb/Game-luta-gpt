@@ -98,10 +98,22 @@ final class CharacterDefinition {
     static final class Special {
         final Move move;
         private final int[] command;
+        private final int[] steps;
         /** Buttons that fire it ("LMH" = any). */
         final String buttons;
+        /** Nome do golpe na lista de comandos (null: sem nome). */
+        final String name;
+        /** Comando de segurar: [5, 1] = [←] →, [3, 7] = [↓] ↑. */
+        final boolean hold;
+        /** Só sai no ar (e não no chão). */
+        final boolean air;
         Special(Move move,int[] command,String buttons) {
+            this(move,command,buttons,null,false,false);
+        }
+        Special(Move move,int[] command,String buttons,String name,boolean hold,boolean air) {
             this.move=move;this.command=command.clone();this.buttons=buttons;
+            this.name=name;this.hold=hold;this.air=air;
+            this.steps=MotionParser.requiredSteps(command);
         }
         int commandLength() { return command.length; }
         /** The motion, in relative directions (tutorial text and examples). */
@@ -209,6 +221,10 @@ final class CharacterDefinition {
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
+        /** Nome da energia (S1) na lista de comandos, e se o comando dela é de segurar. */
+        String energyName;
+        boolean energyHold;
+        Fighter withEnergyCommand(String name,boolean hold) { energyName=name; energyHold=hold; return this; }
         /** Fury: extra damage, in permille, when the life is all gone (it grows as life is lost). */
         int furyPermille;
         /** Air dashes per jump (the engine default is one). */
@@ -290,6 +306,45 @@ final class CharacterDefinition {
             if(s.acceptsButton(button)&&s.matches(motion,clock,motionWindow,pressWindow))return e.getKey();
         }
         return null;
+    }
+
+    /**
+     * O especial que o botão solta agora: "S2".."S9", "S" (a energia, S1) ou null (golpe normal).
+     * No chão só os especiais de chão, no ar só os de ar (e a energia, que sai nos dois). Se mais
+     * de um comando bate, ganha o de mais passos (um movimento ganha de um segurar); empatado, o
+     * que terminou por último; e então os especiais antes da energia, na ordem da ficha. O comando
+     * escolhido consome a história e as cargas.
+     */
+    String matchCommand(MotionParser motion,String button,boolean grounded,int clock,CombatConfig config) {
+        String best=null;
+        int bestLength=-1,bestEnd=Integer.MAX_VALUE;
+        for(Map.Entry<String,Special> e:specials.entrySet()) {
+            Special s=e.getValue();
+            if(!s.acceptsButton(button)||s.air==grounded)continue;
+            int end=commandEnd(motion,s.command,s.steps,s.hold,clock,config);
+            int length=weight(s.steps,s.hold);
+            if(end>=0&&(length>bestLength||(length==bestLength&&end<bestEnd))) {
+                best=e.getKey();bestLength=length;bestEnd=end;
+            }
+        }
+        if(fighter.energy!=null&&fighter.energyCommand.length>0) {
+            int[] steps=MotionParser.requiredSteps(fighter.energyCommand);
+            int end=commandEnd(motion,fighter.energyCommand,steps,fighter.energyHold,clock,config);
+            int length=weight(steps,fighter.energyHold);
+            if(end>=0&&(length>bestLength||(length==bestLength&&end<bestEnd)))best="S";
+        }
+        if(best!=null)motion.consume(clock);
+        return best;
+    }
+
+    /** Peso no desempate: cada passo vale 2; segurar vale 3 (perde de qualquer movimento). */
+    private static int weight(int[] steps,boolean hold) { return hold?3:steps.length*2; }
+
+    private static int commandEnd(MotionParser motion,int[] command,int[] steps,boolean hold,int clock,CombatConfig config) {
+        if(hold)return motion.holdCommand(command,clock,config.chargeFrames,config.chargeKeepFrames)?0:-1;
+        // Comandos longos (meia-lua) ganham mais tempo para ser feitos.
+        int window=config.motionWindowFrames+config.motionWindowPerStep*Math.max(0,steps.length-2);
+        return motion.commandEnd(steps,clock,window,config.motionPressFrames);
     }
     /**
      * Load-time validation of the combat data: every cancel route points to an existing

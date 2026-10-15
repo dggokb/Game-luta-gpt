@@ -24,7 +24,7 @@
       "range": 150,
       "speed": 700,
       "command": [
-        3,
+        5,
         1
       ],
       "spawnX": 121,
@@ -57,7 +57,9 @@
         "mecanica": {
           "custoVida": 150
         }
-      }
+      },
+      "nome": "Investida",
+      "segurar": true
     },
     "super": {
       "damage": 3520,
@@ -1951,9 +1953,8 @@
   "specialMoves": {
     "S2": {
       "command": [
-        1,
         3,
-        2
+        7
       ],
       "animation": "SPECIAL_S2",
       "damage": 1210,
@@ -1982,16 +1983,19 @@
       "pushbackOnBlock": 50,
       "mecanica": {
         "custoVida": 250
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Salto de garras",
+      "segurar": true
     },
     "S3": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "L",
-        "M"
+        3
       ],
       "animation": "SPECIAL_S3",
       "damage": 990,
@@ -2025,15 +2029,19 @@
             17
           ]
         }
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Fúria"
     },
     "S4": {
       "command": [
         3,
+        4,
         5
-      ],
-      "buttons": [
-        "H"
       ],
       "animation": "SPECIAL_S4",
       "damage": 1100,
@@ -2070,6 +2078,12 @@
           ]
         }
       },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Contorção",
       "golpesBase": {
         "startupFrames": 10,
         "activeFrames": 14,

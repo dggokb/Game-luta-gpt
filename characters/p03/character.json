@@ -25,6 +25,7 @@
       "speed": 950,
       "command": [
         3,
+        2,
         1
       ],
       "spawnX": 127,
@@ -54,7 +55,8 @@
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
-      }
+      },
+      "nome": "Onda curta"
     },
     "super": {
       "damage": 3200,
@@ -2030,6 +2032,12 @@
           ]
         }
       },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Punho em sequência",
       "golpesBase": {
         "startupFrames": 6,
         "activeFrames": 8,
@@ -2046,11 +2054,8 @@
     "S3": {
       "command": [
         3,
+        4,
         5
-      ],
-      "buttons": [
-        "L",
-        "M"
       ],
       "animation": "SPECIAL_S3",
       "damage": 900,
@@ -2087,6 +2092,12 @@
           ]
         }
       },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Avanço em três",
       "golpesBase": {
         "startupFrames": 17,
         "activeFrames": 4,
@@ -2103,20 +2114,18 @@
     "S4": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "H"
+        2,
+        1
       ],
       "animation": "SPECIAL_S4",
       "damage": 1000,
       "reach": 160,
       "hitHeight": 228,
       "startupFrames": 10,
-      "activeFrames": 7,
-      "recoveryFrames": 19,
-      "hitstunFrames": 31,
-      "blockstunFrames": 15,
+      "activeFrames": 13,
+      "recoveryFrames": 13,
+      "hitstunFrames": 35,
+      "blockstunFrames": 19,
       "hitstopFrames": 8,
       "cancelWindows": {
         "hit": [
@@ -2134,17 +2143,19 @@
       "pushbackOnHit": 30,
       "pushbackOnBlock": 60,
       "hitFloor": 98,
-      "golpesBase": {
-        "startupFrames": 10,
-        "activeFrames": 13,
-        "recoveryFrames": 13,
-        "hitstunFrames": 35,
-        "blockstunFrames": 19
+      "mecanica": {
+        "mergulho": {
+          "frente": 420,
+          "descida": 900
+        }
       },
-      "golpes": [
-        10,
-        14
-      ]
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Mergulho",
+      "noAr": true
     }
   }
 }

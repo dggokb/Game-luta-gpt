@@ -60,8 +60,14 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['fighter'].update(autoCombo=['H','L']))
         with self.assertRaisesRegex(ValueError,'autoCombo H -> L is not a declared cancel route'):pipeline.build(self.root)
     def test_command_specials_must_not_share_command_and_button(self):
-        self.edit(lambda d:d['specialMoves']['S4'].update(buttons=['M','H']))
-        with self.assertRaisesRegex(ValueError,'S3 and S4 share command and button M'):pipeline.build(self.root)
+        self.edit(lambda d:d['specialMoves']['S4'].update(command=d['specialMoves']['S3']['command']))
+        with self.assertRaisesRegex(ValueError,'S3 and S4 share command and button L'):pipeline.build(self.root)
+    def test_segurar_and_air_only_are_validated(self):
+        self.edit(lambda d:d['specialMoves']['S2'].update(segurar=True))
+        with self.assertRaisesRegex(ValueError,'S2.segurar'):pipeline.build(self.root)
+    def test_dive_needs_an_air_special(self):
+        self.edit(lambda d:d['specialMoves']['S2'].update(mecanica={'mergulho':{'frente':300,'descida':800}}))
+        with self.assertRaisesRegex(ValueError,'S2.mecanica.mergulho'):pipeline.build(self.root)
     def test_command_special_needs_a_valid_command(self):
         self.edit(lambda d:d['specialMoves']['S2'].update(command=[1,9]))
         with self.assertRaisesRegex(ValueError,'S2.command'):pipeline.build(self.root)

@@ -277,7 +277,9 @@ final class DemoDirector {
                         // After the flash: a fresh route the M could not cancel into.
                         if (c.mark >= 0 && c.t > c.mark + 2 && c.t < c.mark + 60) {
                             String id = c.attackId(c.p1());
-                            if (id.isEmpty() && c.p1().canAct()) { p1.direction = 3; p1.light = true; }
+                            // ↓ segurado de 2L a 2M: soltar e apertar de novo seria o ↓↓ de um especial.
+                            p1.direction = 3;
+                            if (id.isEmpty() && c.p1().canAct()) p1.light = true;
                             if (id.equals("2L") && c.p1().outcome != CombatFighter.Outcome.NONE) Ctx.press(p1, "2M");
                         }
                     },

@@ -24,8 +24,11 @@
       "range": 900,
       "speed": 600,
       "command": [
+        1,
+        2,
         3,
-        1
+        4,
+        5
       ],
       "spawnX": 165,
       "spawnY": 176,
@@ -54,7 +57,8 @@
         "maxUsesPerCombo": 2,
         "pushbackOnHit": 40,
         "pushbackOnBlock": 50
-      }
+      },
+      "nome": "Machado"
     },
     "super": {
       "damage": 4000,
@@ -1852,16 +1856,18 @@
       "launchType": "knockdown",
       "knockback": 60,
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Cotovelada"
     },
     "S3": {
       "command": [
         3,
-        5
-      ],
-      "buttons": [
-        "L",
-        "M"
+        3
       ],
       "animation": "SPECIAL_S3",
       "damage": 1120,
@@ -1895,15 +1901,18 @@
             22
           ]
         }
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Escudo"
     },
     "S4": {
       "command": [
-        3,
-        5
-      ],
-      "buttons": [
-        "H"
+        5,
+        1
       ],
       "animation": "SPECIAL_S4",
       "damage": 1250,
@@ -1945,7 +1954,14 @@
             30
           ]
         }
-      }
+      },
+      "buttons": [
+        "L",
+        "M",
+        "H"
+      ],
+      "nome": "Ombrada",
+      "segurar": true
     }
   }
 }

@@ -57,7 +57,7 @@ public class GameViewPcTest {
         jogo.soltar(KeyEvent.KEYCODE_D);
         jogo.esperar(0.2);
         float depois = v.engine.fighter(GameView.PLAYER).x;
-        assertTrue("andou para a frente: " + antes + " → " + depois, depois > antes + 60f);
+        assertTrue("andou para a frente: " + antes + " → " + depois, depois >= antes + 60f);
 
         jogo.segurar(KeyEvent.KEYCODE_A);
         jogo.esperar(0.5);

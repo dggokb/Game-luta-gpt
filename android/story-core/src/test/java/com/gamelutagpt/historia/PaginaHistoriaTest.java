@@ -307,6 +307,7 @@ public class PaginaHistoriaTest {
         }
         textos.addAll(java.util.Arrays.asList(MenuInicial.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuPausa.TEXTOS));
+        textos.addAll(java.util.Arrays.asList(TelaComandos.TEXTOS));
         textos.addAll(java.util.Arrays.asList(EscolhaIrmao.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuCapitulos.TEXTOS));
         textos.addAll(java.util.Arrays.asList(ChaveTorneio.TEXTOS));

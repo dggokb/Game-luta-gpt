@@ -220,10 +220,11 @@ final class TutorialDirector {
         // Especiais: os comandos vêm do próprio personagem.
         if (character.fighter.energy != null) {
             int[] command = character.fighter.energyCommand;
-            out.add(new Lesson("ESPECIAL DE ENERGIA", arrows(command) + " + {L}, {M} ou {H}: lança energia", 1, false,
+            boolean hold = character.fighter.energyHold;
+            out.add(new Lesson("ESPECIAL DE ENERGIA", commandText(command, hold, false) + " + {L}, {M} ou {H}: lança energia", 1, false,
                 c -> c.placeApart(160f), null,
                 c -> c.doing("S"),
-                (c, p1) -> special(c, p1, command, "M")));
+                (c, p1) -> special(c, p1, command, hold, false, "M")));
         }
         String[] names = {"S2", "S3", "S4"};
         for (String id : names) {
@@ -232,9 +233,10 @@ final class TutorialDirector {
             int[] command = special.command();
             String buttons = special.buttons;
             String button = buttons.substring(0, 1);
-            out.add(new Lesson("ESPECIAL " + id, arrows(command) + " + " + orList(buttons), 1, true, close, null,
+            boolean hold = special.hold, air = special.air;
+            out.add(new Lesson("ESPECIAL " + id, commandText(command, hold, air) + " + " + orList(buttons), 1, true, close, null,
                 c -> c.landed(id),
-                (c, p1) -> special(c, p1, command, button)));
+                (c, p1) -> special(c, p1, command, hold, air, button)));
         }
 
         // Agarrão, Super e Ultra.
@@ -294,15 +296,54 @@ final class TutorialDirector {
         if (frame == press) p1.heavy = true;
     }
 
-    /** Faz o comando (direções relativas, 1 = frente) e aperta o botão no fim. */
-    private static void special(Ctx c, FighterInput p1, int[] command, String button) {
-        int step = c.t / 3;
-        if (step < command.length) {
-            p1.direction = MotionParser.relative(command[step], c.p1().facing);
-        } else if (step == command.length) {
-            p1.direction = MotionParser.relative(command[command.length - 1], c.p1().facing);
+    /**
+     * Faz o comando (direções relativas, 1 = frente) e aperta o botão no fim, de novo a cada
+     * tentativa. Segurar: segura a primeira direção até carregar e aperta na segunda. No ar: pula
+     * antes e faz o comando na subida.
+     */
+    private static void special(Ctx c, FighterInput p1, int[] command, boolean hold, boolean air, String button) {
+        int charge = c.engine.config.chargeFrames + 4;
+        int lead = air ? AIR_LEAD : 0;
+        int length = hold ? charge + 1 : command.length * 6 + 1;
+        int t = c.t % (lead + length + 50);
+        if (air && t < 2) {
+            p1.direction = 7;
+            return;
+        }
+        if (t < lead) return;
+        t -= lead;
+        int facing = c.p1().facing;
+        if (hold) {
+            if (t < charge) p1.direction = MotionParser.relative(command[0], facing);
+            else if (t == charge) {
+                p1.direction = MotionParser.relative(command[1], facing);
+                DemoDirector.Ctx.press(p1, button);
+            }
+            return;
+        }
+        // Entre duas direções iguais (↓ ↓) solta o direcional.
+        int[] steps = new int[command.length * 2];
+        int n = 0;
+        for (int d : command) {
+            if (n > 0 && steps[n - 1] == d) steps[n++] = 0;
+            steps[n++] = d;
+        }
+        int step = t / 3;
+        if (step < n) {
+            p1.direction = MotionParser.relative(steps[step], facing);
+        } else if (step == n) {
+            p1.direction = MotionParser.relative(steps[n - 1], facing);
             DemoDirector.Ctx.press(p1, button);
         }
+    }
+
+    /** Frames do pulo antes do comando de um especial no ar. */
+    private static final int AIR_LEAD = 8;
+
+    /** O comando em setas: "↓ ↘ →", "[←] →" (segurar) ou "No ar: ↓ ↘ →". */
+    static String commandText(int[] command, boolean hold, boolean air) {
+        String text = hold ? "[" + arrows(new int[] {command[0]}) + "] " + arrows(new int[] {command[1]}) : arrows(command);
+        return air ? "No ar: " + text : text;
     }
 
     /** Direções relativas (1 = frente) em setas, virado para a direita. */
