@@ -1,0 +1,43 @@
+{
+  "segments": [
+    {
+      "name": "approximate_manual_cranium_to_chin",
+      "idle": [
+        [
+          671,
+          245
+        ],
+        [
+          692,
+          307
+        ]
+      ],
+      "crouch": [
+        [
+          1095,
+          438
+        ],
+        [
+          1107,
+          595
+        ]
+      ]
+    }
+  ],
+  "source_sha256": {
+    "idle": "6bce4d3a7018356f5aa39ce68bfdd211390f4d3a674b81e2fe8ebe01529cc13b",
+    "crouch": "8a81bb062b58f805dba1b5f2f4a2cd645317c6375831432085efda1739a5370f"
+  },
+  "note": "Approximate manual head landmarks; keep source hashes bound. Visual review required.",
+  "master_roots": {
+    "idle": [
+      658.5546082949309,
+      648
+    ],
+    "crouch": [
+      1031.0775593086028,
+      1057
+    ]
+  },
+  "root_measurement": "Torso-band alpha centroid in X; silhouette support in Y. Prevents the extended whip from moving the horizontal root."
+}

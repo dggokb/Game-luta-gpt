@@ -60,12 +60,14 @@ def main():
             {'name':'walk_back','video':'walk_back.mp4','role':'walk_back',
              'animation_type':'translation','detect_loop':True},
             {'name':'back_dash','video':'back_dash.mp4','role':'back_dash','animation_type':'airborne',
-             'note':'A fonte tem uma fase aérea e corte no topo em 9 frames; o movimento original foi preservado.'}]
+             'note':'A fonte tem uma fase aérea e corte no topo em 9 frames; a fase aérea é preservada; o deslocamento horizontal fica a cargo do jogo.'}]
     corrections = {} if args.without_scale_correction else json.loads(
         (Path(__file__).resolve().parents[1]/'examples/real-scale-corrections.json').read_text())
     for c in clips:
         if c['name'] in corrections:
             c['scale_correction'] = corrections[c['name']]
+        if c['name'] in ('walk_forward', 'walk_back', 'dash', 'back_dash'):
+            c['root_motion'] = {'mode': 'in_place_x', 'anchor': 'torso_band'}
         c['video'] = str(source/c['video'])
     clips.insert(2,{'name':'jab_half','video':str(derived),
                     'background':{'mode':'green','exclude_rectangles':[[0,0,32,25]]}})

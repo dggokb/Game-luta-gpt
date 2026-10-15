@@ -42,14 +42,16 @@ class MovementTests(unittest.TestCase):
                     self.assertLessEqual(abs(b[3]-b[1]-idle_height), 2)
                     self.assertLessEqual(abs(b[3]-c['root'][1]), 1)
 
-    def test_displacement_is_preserved_in_actual_pngs_without_frame_recentering(self):
+    def test_recorded_transforms_match_actual_pngs_and_extract_only_horizontal_motion(self):
         for name in NAMES:
             c = self.clips[name]
             source_centroids, actual_centroids = [], []
-            matrix = np.asarray(c['transform_source_to_output'])
+            removed = c.get('root_motion', {}).get('removed_x_output_px', [0]*c['frame_count'])
             for f in c['frames']:
                 with self.subTest(name=name, frame=f['index']):
-                    self.assertEqual(f['transform_source_to_output'], c['transform_source_to_output'])
+                    matrix = np.asarray(f['transform_source_to_output'])
+                    self.assertEqual(matrix[0, 0], c['scale_per_video'])
+                    self.assertEqual(matrix[1, 2], c['frames'][0]['transform_source_to_output'][1][2])
                     raw = image_rgba(cv2.imread(str(self.root/f['raw_file']), -1), c['background_treatment'])
                     actual = self.read(f)[:, :, 3]
                     # Sparse extremities can disappear between downsampled pixels;
@@ -66,13 +68,18 @@ class MovementTests(unittest.TestCase):
                     np.testing.assert_allclose(b, a*matrix[0, 0]+matrix[:, 2], atol=.5)
                     source_centroids.append(a);actual_centroids.append(b)
             expected_motion = (np.asarray(source_centroids)-source_centroids[0])*matrix[0, 0]
+            expected_motion[:, 0] -= np.asarray(removed)-removed[0]
             observed_motion = np.asarray(actual_centroids)-actual_centroids[0]
             np.testing.assert_allclose(observed_motion, expected_motion, atol=.5)
 
-    def test_backward_walk_and_airborne_backdash_keep_their_real_movement(self):
+    def test_backward_walk_is_in_place_and_backdash_keeps_its_vertical_pose(self):
         walk = self.clips['walk_back']
         first, last = [bounds(self.read(walk['frames'][index])) for index in (0, -1)]
-        self.assertLess((last[0]+last[2]-first[0]-first[2])/2, -100)
+        self.assertLess(abs((last[0]+last[2]-first[0]-first[2])/2), 10)
+        self.assertLess(walk['root_motion']['first_to_last_removed_x_px'], -100)
+        from sprite_pipeline.root_motion import torso_anchor_x
+        anchors = [torso_anchor_x(self.read(f)) for f in walk['frames']]
+        self.assertLess(max(anchors)-min(anchors), 1)
         backdash = self.clips['back_dash']
         self.assertEqual(backdash['animation_type'], 'airborne')
         supports = [bounds(self.read(f))[3] for f in backdash['frames']]
@@ -93,21 +100,34 @@ class MovementTests(unittest.TestCase):
                     self.assertTrue(any(not np.array_equal(first, self.read(f)) for f in sequence[1:]))
                 self.assertTrue(candidate['advisory_only'])
 
-    def test_original_approved_clips_have_identical_pngs_and_timestamps(self):
+    def test_approved_nonlocomotion_geometry_and_timestamps_are_preserved(self):
         baseline = os.environ.get('SPRITE_MOVEMENT_BASELINE')
         if not baseline:
             self.skipTest('Defina SPRITE_MOVEMENT_BASELINE para comparar o lote aprovado')
         baseline = Path(baseline)
         old = json.loads((baseline/'manifest.json').read_text())
-        self.assertEqual(old['canvas'], self.manifest['canvas'])
-        self.assertEqual(old['root'], self.manifest['root'])
+        delta = np.subtract(self.manifest['root'], old['root'])
         for previous in old['clips']:
             c = self.clips[previous['name']]
             self.assertEqual([f['pts'] for f in previous['frames']], [f['pts'] for f in c['frames']])
+            if c.get('root_motion'):continue
             for a, b in zip(previous['frames'], c['frames']):
                 expected = cv2.imread(str(baseline/a['normalized_file']), -1)
                 actual = cv2.imread(str(self.root/b['normalized_file']), -1)
-                np.testing.assert_array_equal(actual, expected)
+                expected = cv2.warpAffine(expected, np.array([[1.,0.,delta[0]],[0.,1.,delta[1]]]), tuple(self.manifest['canvas']))
+                matrix = np.asarray(a['transform_source_to_output']).copy()
+                matrix[:, 2] += delta
+                np.testing.assert_allclose(b['transform_source_to_output'], matrix, atol=1e-12)
+                # Moving the shared canvas origin can change OpenCV's global
+                # fixed-point interpolation rounding by 1/32 source pixel.
+                # Geometry stays identical; compare visible premultiplied pixels.
+                def premultiplied(im):
+                    im = im.astype(np.float32)/255
+                    im[:, :, :3] *= im[:, :, 3:]
+                    return im
+                visible = (actual[:, :, 3] > 0) | (expected[:, :, 3] > 0)
+                error = premultiplied(actual)-premultiplied(expected)
+                self.assertLess(float(np.sqrt(np.mean(error[visible]**2))), 1/255)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,32 @@
+{
+  "segments": [
+    {
+      "name": "approximate_manual_cranium_to_chin",
+      "idle": [
+        [
+          659,
+          248
+        ],
+        [
+          676,
+          320
+        ]
+      ],
+      "crouch": [
+        [
+          670,
+          385
+        ],
+        [
+          692,
+          451
+        ]
+      ]
+    }
+  ],
+  "source_sha256": {
+    "idle": "5b1ea71284234fe3192554747ede2b53c4d63d00cdeed5e282284c451c8f57b1",
+    "crouch": "5ffd38a528b87a118721f7ab1a16e88afc519b6e396c9f353474f2ad67968e41"
+  },
+  "note": "Approximate manual head landmarks; keep source hashes bound. Visual review required."
+}

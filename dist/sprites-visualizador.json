@@ -1,7 +1,7 @@
 {
   "apk": "sprites-visualizador.apk",
-  "bytes": 48247018,
-  "sha256": "4098bcd2e5c473b172b7789d1095e2c7e0d9ea22ce55ca156f16f6bf762e6217",
+  "bytes": 47476970,
+  "sha256": "80913e17c19210fc140fe789ee231bd681be0396bd8c6c9d808d43d72f78b48f",
   "application_id": "org.spriteviewer.offline",
   "minimum_android": "8.0 (API 26)",
   "offline": true,
@@ -9,7 +9,7 @@
   "clips": 11,
   "frames": 1307,
   "signature_verification": "Verifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nSigner #1 certificate DN: CN=Sprite Viewer Preview\nSigner #1 certificate SHA-256 digest: 788da6bd2ed5a1a3bf3ba9c9878cb2216346527616f293b2d35a32abf0bed0bc\nSigner #1 certificate SHA-1 digest: 1a9b6e1f045e298475dc6ad4e929f269995d0db2\nSigner #1 certificate MD5 digest: 3aea7e0a4520067c254452ce62b7616a\nSigner #1 key algorithm: RSA\nSigner #1 key size (bits): 2048\nSigner #1 public key SHA-256 digest: 707cad3ff3d7ccf9c21ed2df8cf420e60d4c85d783ebdcbe9fee2357ab76070d\nSigner #1 public key SHA-1 digest: eb135015496bebbef51a033ccff08bc32bd2082c\nSigner #1 public key MD5 digest: cd5bf5efa68179fa8ed41328c8878221\n",
-  "badging": "package: name='org.spriteviewer.offline' versionCode='4' versionName='1.3-preview' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'\nsdkVersion:'26'\ntargetSdkVersion:'34'\napplication-label:'Sprites — Visualizador'\napplication-icon-160:'res/drawable/ic_sprite.xml'\napplication: label='Sprites — Visualizador' icon='res/drawable/ic_sprite.xml'\nlaunchable-activity: name='org.spriteviewer.offline.MainActivity'  label='' icon=''\nfeature-group: label=''\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160'\n",
+  "badging": "package: name='org.spriteviewer.offline' versionCode='5' versionName='1.4-preview' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'\nsdkVersion:'26'\ntargetSdkVersion:'34'\napplication-label:'Sprites — Visualizador'\napplication-icon-160:'res/drawable/ic_sprite.xml'\napplication: label='Sprites — Visualizador' icon='res/drawable/ic_sprite.xml'\nlaunchable-activity: name='org.spriteviewer.offline.MainActivity'  label='' icon=''\nfeature-group: label=''\n  uses-feature: name='android.hardware.faketouch'\n  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'\nmain\nsupports-screens: 'small' 'normal' 'large' 'xlarge'\nsupports-any-density: 'true'\nlocales: '--_--'\ndensities: '160'\n",
   "compiler_notes": "warning: [options] source value 8 is obsolete and will be removed in a future release\nwarning: [options] target value 8 is obsolete and will be removed in a future release\nwarning: [options] To suppress warnings about obsolete options, use -Xlint:-options.\nNote: /workspace/Game-luta-gpt/android/src/org/spriteviewer/offline/MainActivity.java uses or overrides a deprecated API.\nNote: Recompile with -Xlint:deprecation for details.\n3 warnings\n",
   "tested_on_physical_device": false,
   "mobile_browser_tested_separately": true,
@@ -23,27 +23,34 @@
     "full_resolution_pngs_included": false,
     "note": "Only display derivatives; original coordinate metadata, scale factors and PNG outputs are unchanged."
   },
-  "version_name": "1.3-preview",
-  "version_code": 4,
-  "upgrade_compatible_with": [
-    "1.1-preview",
-    "1.2-preview"
-  ],
-  "installation_note": "Direct update from 1.1-preview or 1.2-preview: identical signing certificate.",
-  "scale_corrected_clips": [
-    "crouch",
-    "crouch_jab"
-  ],
-  "movement_clips": [
-    "walk_forward",
-    "walk_back",
-    "back_dash"
-  ],
-  "unchanged_preview_images_verified": 1888,
-  "viewer_checks": {
-    "desktop": 14,
-    "mobile": 17,
-    "javascript_errors": 0,
-    "external_requests": 0
+  "version_name": "1.4-preview",
+  "version_code": 5,
+  "compatible_with_previous_preview": true,
+  "automated_tests": 53,
+  "mobile_checks": {
+    "checks": [
+      "portrait_390px_no_overflow_and_play_visible",
+      "touch_play_pause_and_frame_steps",
+      "original_preview_tab",
+      "different_source_sizes_common_display_zoom",
+      "landscape_retains_frame_and_common_zoom",
+      "master_overlay",
+      "idle_jab_idle",
+      "idle_dash_idle",
+      "idle_crouch_idle",
+      "idle_walk_forward_idle",
+      "idle_walk_back_idle",
+      "idle_back_dash_idle",
+      "cycle_preview_without_frame_discard",
+      "jab_crouch_comparison_changes_the_actual_right_image",
+      "right_pose_can_be_fixed_scrubbed_and_stepped_independently",
+      "playback_animates_both_panes",
+      "comparison_uses_original_timestamps_and_individual_clip_durations"
+    ],
+    "page_errors": [],
+    "external_requests": [],
+    "frames": 1307,
+    "preview_images": 2614,
+    "status": "passed"
   }
 }

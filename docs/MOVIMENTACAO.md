@@ -1,3 +1,38 @@
+# Movimentação no lugar — 15/10/2026
+
+O lote atual retira o deslocamento horizontal de `walk_forward`, `walk_back`, `dash` e `back_dash`. A posição no cenário fica a cargo do jogo. Os originais, poses, proporções e PTS são conservados.
+
+O registro mede o centro da faixa do tronco entre 15% e 45% da altura da silhueta. Cada frame recebe somente uma translação horizontal adicional, depois da calibração de escala. A ferramenta não usa o centro da bbox inteira: um pé estendido não deve empurrar a raiz. A fase vertical de saltos continua nesta prévia; a integração com a física do motor deve tratá-la explicitamente.
+
+```json
+"root_motion": {"mode": "in_place_x", "anchor": "torso_band"}
+```
+
+O manifesto registra a medida em `root_motion.anchor_x_source_px`, a trajetória retirada em `root_motion.removed_x_output_px` e a matriz final em cada frame. A trajetória retirada serve para auditoria e não é aplicada automaticamente pelo visualizador. Na sequência Walk Back → Idle, a posição não acompanha o recuo que foi retirado.
+
+A revisão mede o tronco nos PNGs efetivamente exportados, além de conferir canal alpha, tempos e escala. Um teste específico cobre o compartilhamento da matriz constante entre frames, evitando acumular offsets.
+
+![Walk Back antes e depois, em janela fixa e na mesma escala](evidence/walk-back-in-place.png)
+
+O tronco nos 121 PNGs exportados varia **0,28 px** em X, contra **128,68 px** antes. O deslocamento entre primeiro e último frame passou de −128,58 px para −0,06 px. Foram aprovados **53 testes**, **14 verificações desktop** e **17 verificações móveis**, incluindo retorno ao Idle sem acumular deslocamento.
+
+[Medidas nos PNGs](evidence/in-place-checks.json) · [Testes](evidence/in-place-test-results.txt) · [Interface desktop](evidence/in-place-browser-checks.json)
+
+## Reprodução
+
+```bash
+python scripts/validate_real.py --inputs /caminho/originais --output /caminho/movimentacao --include-movement
+SPRITE_REAL_RESULT=/caminho/movimentacao/run SPRITE_MOVEMENT_BASELINE=/caminho/lote-anterior/run python -m unittest discover -s tests -v
+python scripts/prepare_mobile.py /caminho/movimentacao/run --output /caminho/assets
+python scripts/check_mobile.py /caminho/assets --screenshots /caminho/checks
+```
+
+O andar para frente mantém o início parado e os passos finais. Backdash mantém o aviso de corte da fonte nos frames 22 a 30; nenhuma parte cortada é reconstruída. As correções anotadas do Crouch continuam presentes. A extensão a todas as fontes está descrita em [COLECAO.md](COLECAO.md).
+
+## Histórico: prévia 1.3
+
+O relatório abaixo documenta a versão anterior, que conservava a translação. Seus gráficos e números de deslocamento descrevem a fonte e aquela versão; a configuração atual usa registro no lugar.
+
 # Lote de movimentação — 15/10/2026
 
 O visualizador passa a incluir **andar para frente**, **andar para trás** e **backdash**, junto com os oito clips do lote anterior. São **11 clips e 1.307 frames** no total, com os 363 frames das três fontes novas preservados.

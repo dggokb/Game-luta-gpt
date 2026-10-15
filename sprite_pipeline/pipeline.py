@@ -10,6 +10,7 @@ from .extraction import extract_video, digest
 from .imaging import image_rgba, bounds, affine_rgba, save_rgba
 from .calibration import load_master, master_coherence, scan, calibrate
 from .corrections import frame_transforms
+from .root_motion import register_in_place
 from .loops import loop_candidates
 from .motion import motion_summary
 from .exporting import write_json, export_sheets, contact_sheet
@@ -78,7 +79,7 @@ def process(config_path, output):
         reference_meta[pose]['landmarks_file'] = f'masters/{pose}-landmarks.png'
     manifest = {'format_version': 3, 'status': 'requires_visual_review', 'canvas': None, 'root': None,
                 'coordinate_system': {'x': 'right', 'y': 'down', 'unit': 'output_pixel',
-                                      'motion': 'constant affine transform unless an explicit annotated scale curve is supplied; each frame records its matrix; do not apply it twice'},
+                                      'motion': 'each frame records its matrix; explicit scale curves and in_place_x registration may vary the transform; root_motion records removed translation for the engine, never automatically replay it'},
                 'references': reference_meta, 'master_coherence': coherence, 'clips': [],
                 'limitations': ['Matching is measured, not proof of anatomical identity.',
                                'Support anchors are silhouette measurements, not tracked skeleton roots.',
@@ -116,6 +117,7 @@ def process(config_path, output):
             cal = calibrate(frames, masters[pose], height, clip, threshold,
                             allow_scale_drift=clip.get('scale_correction') is not None)
             transforms, correction = frame_transforms(clip, metadata, cal)
+            transforms, root_motion = register_in_place(clip, metadata, cal, transforms, dest/'raw', background)
         except CalibrationError as error:
             info['rejection_reason'] = str(error)
             write_json(dest/'metadata.json', info)
@@ -124,6 +126,8 @@ def process(config_path, output):
         info['scale_mode'] = 'annotated_segment_curve' if correction else 'constant_per_video'
         if correction:
             info['scale_correction'] = correction
+        if root_motion:
+            info['root_motion'] = root_motion
         info['status'] = 'requires_visual_review'
         info['loops'] = loop_candidates(frames, int(clip.get('loop_minimum_period', 6)),
                                        start_frame=clip.get('loop_start_frame', 0)) if clip.get('detect_loop') else []
@@ -131,6 +135,8 @@ def process(config_path, output):
                   b[2]*m[0][0]+m[0][2], b[3]*m[1][1]+m[1][2]]
                  for b, m in zip((f['bbox'] for f in frames), transforms)]
         info['motion'] = motion_summary([{'bbox': b} for b in boxes], 1, cal['reference_frame'], info['animation_type'])
+        if root_motion:
+            info['motion'].update(automatic_motion_removal=True, removal_mode='in_place_x', anchor='torso_band')
         all_boxes.extend(boxes)
         jobs.append((clip, info, frames, boxes, transforms))
     # A shared project extent, expanded by actual motion and attacks, never a
@@ -157,7 +163,7 @@ def process(config_path, output):
             normalized = dest/'normalized'
             normalized.mkdir()
             absolute = [[[m[0][0], 0, m[0][2]+root[0]], [0, m[1][1], m[1][2]+root[1]]] for m in transforms]
-            key = 'calibration_transform_source_to_output' if 'scale_correction' in info else 'transform_source_to_output'
+            key = 'calibration_transform_source_to_output' if 'scale_correction' in info or 'root_motion' in info else 'transform_source_to_output'
             info[key] = absolute[info['reference_frame']]
             info['root'] = root
             info['canvas'] = canvas
@@ -177,6 +183,8 @@ def process(config_path, output):
                              support_proxy_source=[(b[0]+b[2])/2, b[3]],
                              visual_displacement_from_reference=[(boxes[i][0]+boxes[i][2]-ref_box[0]-ref_box[2])/2, boxes[i][3]-ref_box[3]],
                              warnings=frame['warnings'])
+                if 'root_motion' in info:
+                    entry['removed_root_motion_output_px'] = [info['root_motion']['removed_x_output_px'][i], 0]
             info['visual_displacement_note'] = 'Output bbox support proxy, not skeleton root. Includes pose changes. Explicit anatomical scale and ground corrections, if configured, are recorded in each frame matrix.'
             info['spritesheets'] = export_sheets(dest, info['frame_count'], canvas, root, atlas_size)
             write_json(dest/'metadata.json', info)
@@ -192,7 +200,7 @@ def process(config_path, output):
     manifest['review'] = {'visual_approval': False, 'reason': 'Aprovação visual externa obrigatória; execução de testes não aprova arte.'}
     write_json(output/'manifest.json', manifest)
     write_json(output/'calibration-report.json', {k: manifest[k] for k in ('status', 'references', 'master_coherence', 'review')} | {
-        'clips': [{k: c.get(k) for k in ('name', 'status', 'reference_frame', 'reference_similarity', 'metrics', 'scale_per_video', 'scale_mode', 'scale_correction', 'source_root', 'peer_height_spread', 'rejection_reason', 'frame_warnings')} for c in manifest['clips']]})
+        'clips': [{k: c.get(k) for k in ('name', 'status', 'reference_frame', 'reference_similarity', 'metrics', 'scale_per_video', 'scale_mode', 'scale_correction', 'root_motion', 'source_root', 'peer_height_spread', 'rejection_reason', 'frame_warnings')} for c in manifest['clips']]})
     write_json(output/'project.snapshot.json', cfg)
     write_viewer(output, manifest)
     return manifest

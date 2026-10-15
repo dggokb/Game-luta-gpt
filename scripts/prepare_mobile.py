@@ -65,7 +65,8 @@ def render_mobile(manifest, output):
     template=template.replace('<details open>', '<details>')
     template=template.replace('Antes — frame original integral','Antes — prévia do frame original')
     template=template.replace('frames brutos · estado:', 'frames disponíveis · estado:')
-    template=template.replace('if(cache.size>80)', 'if(cache.size>32)')
+    cache_limit = 4 if 'atlas' in manifest.get('mobile_preview', {}).get('format', '') else 32
+    template=template.replace('if(cache.size>80)', f'if(cache.size>{cache_limit})')
     template=template.replace('if(raw)br.drawImage(raw,0,0)', 'if(raw)br.drawImage(raw,0,0,c.resolution[0],c.resolution[1])')
     template=template.replace('ctx.drawImage(ghost,0,0)', 'ctx.drawImage(ghost,0,0,data.canvas[0],data.canvas[1])')
     template=template.replace('ctx.drawImage(im,carry[0],carry[1])', 'ctx.drawImage(im,carry[0],carry[1],data.canvas[0],data.canvas[1])')

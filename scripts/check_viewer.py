@@ -58,6 +58,8 @@ def main():
                 page.screenshot(path=str(args.screenshots/f'{action}-action.png'),full_page=True)
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function("document.querySelector('#normalInfo').textContent.startsWith('idle ·')")
+            if action in ('walk_forward','walk_back','dash','back_dash'):
+                assert page.evaluate('carry.every(v=>v===0)'), 'In-place action must return to the same Idle position'
             report['checks'].append('idle_'+action+'_idle_sequence')
         page.click('#single')
         page.select_option('#clip',label='jump')

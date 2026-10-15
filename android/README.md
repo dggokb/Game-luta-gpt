@@ -6,7 +6,7 @@ Android 8.0 ou superior, com Android System WebView atualizado. Baixe o arquivo 
 
 O app abre com os 11 clips e os 1.307 frames dos lotes de teste e movimentação já incluídos. Não exige login, internet, acesso a arquivos, câmera ou microfone. A aba **Depois** abre primeiro; **Antes** mostra a fonte e **Comparar** coloca duas animações no mesmo zoom. Os botões de reprodução e avanço ficam abaixo da imagem. Em **Sequências, ciclos, mestre e zoom**, estão as transições Idle → ação → Idle para Jab, Dash, Crouch, andar para frente, andar para trás e Backdash, os ciclos propostos e a sobreposição do mestre. Gire o celular para comparar lado a lado com mais espaço.
 
-A versão **1.3-preview** acrescenta o [lote de movimentação](../docs/MOVIMENTACAO.md), mantendo a [correção de escala do Crouch](../docs/CORRECAO-CROUCH.md) e a comparação com reprodução dos dois lados. Usa a mesma assinatura das versões 1.1 e 1.2 e pode atualizá-las diretamente. Quem ainda usa a versão 1.0 precisa desinstalá-la antes, pois essa versão tinha outra assinatura. O app não guarda projetos pessoais.
+A versão **1.4-preview** corrige o registro horizontal de andar e dash no lugar, incluindo a volta para Idle. Conserva o [lote de movimentação](../docs/MOVIMENTACAO.md), mantendo a [correção de escala do Crouch](../docs/CORRECAO-CROUCH.md) e a comparação com reprodução dos dois lados. Usa a mesma assinatura das versões 1.1, 1.2 e 1.3 e pode atualizá-las diretamente. Quem ainda usa a versão 1.0 precisa desinstalá-la antes, pois essa versão tinha outra assinatura. O app não guarda projetos pessoais.
 
 ## Como comparar
 
@@ -41,6 +41,8 @@ python scripts/build_android.py \
 Use diretórios novos ou vazios. O script recusa sobrescrever um APK existente. Ele cria uma chave de assinatura de prévia na pasta privada de compilação, compila recursos/classes/DEX, alinha o ZIP e assina/verifica o APK. Para reutilizar uma assinatura existente, passe `--signing-key /pasta/privada/preview-signing.p12 --signing-password-file /pasta/privada/signing-password`. A senha é lida diretamente pelo assinador, sem ser exibida. A chave e sua senha ficam fora do Git. Builds com outra chave não podem atualizar uma instalação anterior sem reinstalá-la.
 
 O manifesto não declara permissões. O WebView bloqueia rede, arquivos externos, content URIs e navegação fora dos assets. Não existe ponte JavaScript para APIs nativas. As imagens e relatórios são recursos locais do app.
+
+O registro no lugar foi verificado em 53 testes automatizados, incluindo os PNGs reais de todos os frames do andar para trás. [Comparação visual e medidas](../docs/MOVIMENTACAO.md).
 
 ## Verificações desta entrega
 

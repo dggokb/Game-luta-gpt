@@ -96,17 +96,21 @@ class RealFootageTests(unittest.TestCase):
         self.assertLessEqual(abs((actual[3]-actual[1])-(target[3]-target[1])), 2)
         self.assertNotEqual(actual[3]-actual[1], self.manifest['references']['idle']['bbox'][3]-self.manifest['references']['idle']['bbox'][1])
 
-    def test_no_per_frame_scale_or_recenter_and_movement_preserved(self):
+    def test_constant_scale_and_vertical_movement_preserved(self):
         for name, axis, minimum_motion in [('dash', 0, 40), ('jump', 1, 60)]:
             c = self.clips[name]
-            matrix = np.array(c['transform_source_to_output'])
+            matrix = np.array(c.get('transform_source_to_output', c.get('calibration_transform_source_to_output')))
             support = []
             for f in c['frames']:
+                matrix = np.array(f['transform_source_to_output'])
                 b = f['bbox_source']; actual = bounds(self.read(f))
                 expected = np.array([b[0], b[1]])*c['scale_per_video']+matrix[:, 2]
                 np.testing.assert_allclose(actual[:2], expected, atol=2)
                 support.append((actual[0]+actual[2])/2 if axis == 0 else actual[3])
-            self.assertGreater(max(support)-min(support), minimum_motion)
+            if axis == 0 and c.get('root_motion'):
+                self.assertTrue(c['root_motion']['game_applies_displacement'])
+            else:
+                self.assertGreater(max(support)-min(support), minimum_motion)
 
     def test_repeated_idle_has_advisory_sequence_candidates(self):
         c = self.clips['idle']

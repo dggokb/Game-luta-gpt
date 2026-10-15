@@ -61,6 +61,8 @@ def main():
                 assert page.locator('#clipNote').inner_text()
             page.evaluate('frame=clips[current].frame_count-1;advance();render()')
             page.wait_for_function("document.getElementById('normalInfo').textContent.startsWith('idle ·')")
+            if action in ('walk_forward','walk_back','dash','back_dash'):
+                assert page.evaluate('carry.every(v=>v===0)'), 'In-place action must not replay extracted movement'
             result['checks'].append('idle_'+action+'_idle')
         page.tap('#single');page.select_option('#clip',label='idle');page.select_option('#loop',index=1)
         page.tap('#play');page.wait_for_function('frame>range()[0]+2');page.tap('#play')
