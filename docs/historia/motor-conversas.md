@@ -115,7 +115,7 @@ Prontos: `dafu_normal`, `takatoshi_normal` e os irmãos adultos `ryuga_normal`, 
 **Rosto de lado**: o rosto que não é de frente diz para onde olha em
 `historia/retratos/olhar.json` (`"ryuga_bravo": "esquerda"` = olha para a esquerda da
 imagem). O quadro espelha o rosto que olharia para fora da tela, então a mesma imagem serve
-dos dois lados (o Ryūga fica à esquerda na campanha dele e à direita na do Kōga). Rosto de
+dos dois lados (na cinemática, cada irmão fala do lado da tela onde está o lutador dele). Rosto de
 frente não entra no arquivo.
 
 Expressões padrão (use estas quando der, para reaproveitar as imagens):

@@ -187,6 +187,8 @@ public class GameView extends SurfaceView
     private String cinematicaFim;
     /** Quadros de luta desde o "LUTEM!" (gatilho de tempo da cinemática). */
     private int storyFightFrames;
+    /** Câmera lenta da cinemática: quanto da próxima passada da luta já se acumulou. */
+    private float cinematicaPassada;
     /** Menu inicial (abre com o app): MODO HISTÓRIA ou MODO TESTE. */
     private final MenuInicial menuInicial;
     /** MODO HISTÓRIA com save: CONTINUAR e os capítulos já liberados. */
@@ -1028,6 +1030,7 @@ public class GameView extends SurfaceView
                 if (pausa.isOpen()) return;
             }
         }
+        if (cinematicaLenta()) return;
         boolean tagging = isTagAnimationActive();
 
         boolean intro = introFrame >= 0;
@@ -1662,6 +1665,11 @@ public class GameView extends SurfaceView
         return f.y - (f.crouchingBody() ? c.visualCrouchHeight : c.visualStandHeight);
     }
 
+    /** Altura do peito de um lutador (onde o close da cinemática se apoia). */
+    private static float chestY(CombatFighter f) {
+        return f.y - 0.6f * (f.y - visualTop(f));
+    }
+
     private float opponentVisualTop() {
         return visualTop(opponent());
     }
@@ -1734,8 +1742,19 @@ public class GameView extends SurfaceView
             float visibleWorldWidth = VW / renderZoom;
             float renderCameraX = camera.x;
             float renderCameraTop = camera.top;
-            // O zoom da cinemática segura o chão no mesmo lugar da tela (os pés não somem na faixa).
-            if (cinematicZoom != 1f) renderCameraTop = GROUND_Y - (GROUND_Y - camera.top) / cinematicZoom;
+            // Zoom e foco da cinemática. Sem foco, o zoom segura o chão no mesmo lugar da tela (os
+            // pés não somem na faixa); focando alguém (quem fala), segura o peito dele: um plano
+            // médio, com o rosto na tela e os pés podendo sair. O centro vai até ele.
+            float focoJogador = cinematica.foco(CinematicaLuta.JOGADOR);
+            float focoRival = cinematica.foco(CinematicaLuta.RIVAL);
+            if (cinematicZoom != 1f || focoJogador > 0f || focoRival > 0f) {
+                float pivotY = GROUND_Y + focoJogador * (chestY(player()) - GROUND_Y) +
+                    focoRival * (chestY(opponent()) - GROUND_Y);
+                float pivotScreenY = (pivotY - camera.top) * camera.zoom * superCameraZoom;
+                renderCameraTop = pivotY - pivotScreenY / baseZoom;
+                renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
+                    focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
+            }
             if (ultraCameraZoom != 1f) {
                 // Ultra activation zooms into whoever does it, keeping it on the same screen spot.
                 CombatFighter p = ultraFighter();
@@ -3274,6 +3293,29 @@ public class GameView extends SurfaceView
         cinematica.update(FIXED_STEP);
     }
 
+    /**
+     * Câmera lenta (ou luta congelada) da cinemática: a luta só dá um passo quando a velocidade
+     * acumulada chega a um quadro; nos outros quadros só a cena, as falas e as onomatopeias
+     * andam. Verdadeiro se este quadro não tem passo da luta.
+     */
+    private boolean cinematicaLenta() {
+        float velocidade = cinematica.velocidade();
+        if (velocidade >= 1f) {
+            cinematicaPassada = 0f;
+            return false;
+        }
+        cinematicaPassada += velocidade;
+        if (cinematicaPassada >= 1f) {
+            cinematicaPassada -= 1f;
+            return false;
+        }
+        cinematica.update(FIXED_STEP);
+        conversa.update(FIXED_STEP);
+        impacts.update(FIXED_STEP * velocidade);
+        updateStoryFight();
+        return true;
+    }
+
     private static float vida(CombatFighter f) {
         return f.state.life / (float)Math.max(1, f.state.profile.maxLife);
     }
@@ -3315,6 +3357,10 @@ public class GameView extends SurfaceView
         @Override public void terminarLuta(String vencedor) {
             cinematicaDirector.parar();
             cinematicaFim = vencedor;
+        }
+
+        @Override public boolean aDireita(int lado) {
+            return engine.fighter(lado).x > engine.fighter(1 - lado).x;
         }
     };
 

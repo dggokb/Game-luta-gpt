@@ -10,26 +10,34 @@ luta é o mesmo motor com outro arquivo.
 
 ## Como aparece na tela (o treino do Episódio 1)
 
-1. Um dos dois chega a **25% de vida**: a cena começa. O controle trava, as **faixas pretas**
-   entram em cima e embaixo (o quadro vira um 2,39:1 de cinema) e o HUD e o controle de toque
-   somem junto.
+1. Um dos dois chega a **25% de vida**: a cena começa. O controle trava, o golpe que levou
+   aos 25% termina em **câmera lenta** com a câmera chegando perto, e as **faixas pretas**
+   entram devagar em cima e embaixo (o quadro vira um 2,39:1 de cinema); o HUD e o controle de
+   toque somem junto.
 2. No 2x2, quem estiver na vez **troca com o irmão** (a troca de verdade, sai um e entra o
    outro), para a cena ser entre Ryūga e Kōga.
-3. Os dois **pulam para trás** e **recuam**, se afastando.
-4. Ryūga grita **"KOGAAAAA!"** e Kōga responde **"RYŪGAAAAA!"** nos quadros da conversa (o
-   irmão do jogador no quadro da esquerda, o rival no da direita; nas duas campanhas).
-5. Os dois **saem correndo** um na direção do outro.
+3. Os dois **pulam para trás** e **recuam**, se afastando, e **se encaram** em silêncio.
+4. A câmera faz um **close no Ryūga** (plano médio, o rosto na tela) e ele grita
+   **"KOGAAAAA!"**; desliza até o **Kōga**, que responde **"RYŪGAAAAA!"**. Cada um fala no
+   quadro do **lado da tela onde está**: se o Ryūga está à esquerda, o quadro dele é o da
+   esquerda; se os dois trocaram de lado na luta, os quadros trocam junto (e o rosto espelha
+   para olhar o centro). Vale para as duas campanhas.
+5. A câmera abre e os dois **saem correndo** um na direção do outro; perto do encontro, a
+   corrida entra em **câmera lenta**.
 6. Antes de se encontrarem, a campainha: **"DING DONG!"** estoura grande no meio da tela
-   (linhas de som, tremor, as palavras em escada), os dois param e a câmera dá um tranco de zoom.
-7. As faixas saem e a luta termina **interrompida**: a história segue na página seguinte
-   (Dafu: "Chega, chega!"; o quadro da porta com o DING DONG das cartas chegando).
+   (linhas de som, tremor, as palavras em escada) e a luta **congela** com um tranco de zoom;
+   depois os dois param e a câmera volta devagar.
+7. As faixas saem devagar e a luta termina **interrompida**: a história segue na página
+   seguinte (Dafu: "Chega, chega!"; o quadro da porta com o DING DONG das cartas chegando).
+
+A cena toda leva uns 15 segundos.
 
 Quem está apanhando, caído ou no meio de um golpe quando a cena começa termina isso antes de
 obedecer (o pulo sai quando o lutador pode agir). Enquanto o gatilho de vida espera e enquanto
 a cena roda, **ninguém cai**: o jogo segura o último ponto de vida, para um golpe grande não
 pular a cena indo direto ao KO.
 
-![Treino do Episódio 1 (gravado no Templo da Lua, antes de a luta passar para o dojo)](cinematica-treino.png)
+![Treino do Episódio 1: close no Ryūga, close no Kōga, a corrida e o DING DONG](cinematica-treino.png)
 
 ## O arquivo da cinemática
 
@@ -50,22 +58,39 @@ juntas). O treino do Episódio 1, pronto, é `historia/ep01/cinematica_treino.js
   "gatilho": { "vida": 0.25 },
   "acoes": [
     { "acao": "controle", "travar": true },
-    { "acao": "faixas", "entrar": true, "semEsperar": true },
+    { "acao": "velocidade", "valor": 0.3, "segundos": 0.2, "semEsperar": true },
+    { "acao": "faixas", "entrar": true, "segundos": 1.0, "semEsperar": true },
+    { "acao": "camera", "zoom": 1.1, "segundos": 1.0, "semEsperar": true },
+    { "acao": "esperar", "segundos": 1.1 },
+    { "acao": "velocidade", "valor": 1.0, "segundos": 0.5, "semEsperar": true },
+    { "acao": "camera", "zoom": 1.0, "segundos": 0.8, "semEsperar": true },
     { "acao": "mover", "quem": "ambos", "movimento": "titular" },
     { "acao": "mover", "quem": "ambos", "movimento": "pular-tras" },
     { "acao": "mover", "quem": "ambos", "movimento": "recuar" },
-    { "acao": "esperar", "segundos": 0.3 },
-    { "acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "KOGAAAAA!", "segura": 0.5 },
-    { "acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "RYŪGAAAAA!", "segura": 0.5 },
-    { "acao": "mover", "quem": "ambos", "movimento": "correr", "distancia": 110 },
-    { "acao": "onomatopeia", "texto": "DING DONG!", "pos": [0.5, 0.34], "tamanho": 140, "tremor": 12,
-      "rotacao": -8, "segundos": 2.2, "semEsperar": true },
+    { "acao": "esperar", "segundos": 1.2 },
+
+    { "acao": "camera", "zoom": 1.7, "foco": "ryuga", "segundos": 0.7 },
+    { "acao": "fala", "quem": "ryuga", "expressao": "bravo", "texto": "KOGAAAAA!", "segura": 1.1 },
+    { "acao": "esperar", "segundos": 0.25 },
+    { "acao": "camera", "zoom": 1.7, "foco": "koga", "segundos": 0.8 },
+    { "acao": "fala", "quem": "koga", "expressao": "bravo", "texto": "RYŪGAAAAA!", "segura": 1.1 },
+    { "acao": "esperar", "segundos": 0.25 },
+    { "acao": "camera", "zoom": 1.0, "foco": "centro", "segundos": 0.6 },
+    { "acao": "esperar", "segundos": 0.5 },
+
+    { "acao": "mover", "quem": "ambos", "movimento": "correr", "distancia": 420 },
+    { "acao": "velocidade", "valor": 0.3, "segundos": 0.25, "semEsperar": true },
+    { "acao": "camera", "zoom": 1.15, "segundos": 1.2, "semEsperar": true },
+    { "acao": "mover", "quem": "ambos", "movimento": "correr", "distancia": 120, "segundos": 6 },
+    { "acao": "velocidade", "valor": 0.0, "segundos": 0.0, "semEsperar": true },
+    { "acao": "onomatopeia", "texto": "DING DONG!", "pos": [0.5, 0.34], "tamanho": 150, "tremor": 14, "rotacao": -8, "segundos": 3.2, "semEsperar": true },
+    { "acao": "camera", "zoom": 1.12, "segundos": 0.15 },
+    { "acao": "esperar", "segundos": 1.1 },
     { "acao": "mover", "quem": "ambos", "movimento": "parar" },
-    { "acao": "camera", "zoom": 1.12, "segundos": 0.2, "semEsperar": true },
-    { "acao": "esperar", "segundos": 1.0 },
-    { "acao": "camera", "zoom": 1.0, "segundos": 0.8, "semEsperar": true },
-    { "acao": "esperar", "segundos": 0.8 },
-    { "acao": "faixas", "entrar": false },
+    { "acao": "velocidade", "valor": 1.0, "segundos": 0.3, "semEsperar": true },
+    { "acao": "camera", "zoom": 1.0, "segundos": 1.2, "semEsperar": true },
+    { "acao": "esperar", "segundos": 1.4 },
+    { "acao": "faixas", "entrar": false, "segundos": 0.9 },
     { "acao": "terminarLuta", "vencedor": "interrompida" }
   ]
 }
@@ -89,12 +114,13 @@ novo).
 | `acao` | Campos | O que faz | Espera |
 |---|---|---|---|
 | `controle` | `travar` (true/false) | trava ou devolve o controle do jogador; travado, o pad e a IA ficam de fora e só o roteiro move os lutadores | — |
-| `faixas` | `entrar` (true/false), `altura` (px, padrão 92) | as faixas pretas entram ou saem (0,45 s); com elas o HUD e o controle de toque somem | a animação |
-| `mover` | `quem` (`jogador`, `rival`, `ambos`), `movimento`, `distancia`, `segundos` | um movimento dos lutadores (tabela abaixo) | os dois terminarem |
+| `faixas` | `entrar` (true/false), `altura` (px, padrão 92), `segundos` (padrão 0,45) | as faixas pretas entram ou saem; com elas o HUD e o controle de toque somem | a animação |
+| `mover` | `quem` (`jogador`, `rival`, `ambos`, `ryuga`, `koga`), `movimento`, `distancia`, `segundos` | um movimento dos lutadores (tabela abaixo); um irmão é o time dele na campanha | os dois terminarem |
 | `fala` | `quem`, `expressao`, `texto`, `lado`, `segura` | uma fala nos quadros da conversa ([motor-conversas.md](motor-conversas.md)) | a fala sair da tela |
 | `onomatopeia` | `texto`, `pos`, `tamanho`, `tremor`, `rotacao`, `cor`, `segundos` | um letreiro de mangá grande na tela (abaixo) | `segundos` |
 | `esperar` | `segundos` | só o tempo passa (a luta segue parada no roteiro) | `segundos` |
-| `camera` | `zoom` (0,8 a 1,6; 1 = o da luta), `segundos` | zoom extra da câmera, ancorado no chão (os pés não somem na faixa) | a transição |
+| `camera` | `zoom` (0,8 a 2; 1 = o da luta), `foco` (`centro`, `jogador`, `rival`, `ryuga`, `koga`), `segundos` | zoom extra sobre a câmera da luta. Sem foco, ancorado no chão (os pés não somem na faixa); com foco, o centro vai até o lutador e o zoom se apoia no peito dele (close: o rosto fica, os pés podem sair). `foco` fica até outra `camera` mudar (`centro` volta) | a transição |
+| `velocidade` | `valor` (0 a 1), `segundos` (padrão 0,25) | velocidade da luta: 1 normal, 0,3 câmera lenta, 0 congela. Só a luta muda: a cena, as falas, as faixas e as onomatopeias andam no tempo normal. Volta a 1 sozinha no fim da cena | a transição |
 | `terminarLuta` | `vencedor` (`interrompida`, `jogador`, `rival`) | encerra a luta pela cena: `interrompida` e `jogador`, a história segue; `rival` conta como derrota (repete a luta se o passo pedir) | — |
 
 Toda ação aceita `"semEsperar": true`. Um movimento ou uma fala nunca seguram a cena mais de
@@ -114,7 +140,7 @@ física e as paredes são as da luta.
 | `titular` | no 2x2, quem estiver na vez troca com o titular da dupla (o primeiro do passo de luta, o irmão nas duplas da história), sem esperar a recarga da troca | o titular está na vez (logo, se já estava) |
 | `pular-tras` | pulo para trás, segurando para trás no ar (~155 px cada um) | pousar |
 | `recuar` | backdash (~175 px cada um) | o recuo acabar |
-| `correr` | dash para frente, segurando | o vão entre os dois corpos chegar a `distancia` (px) ou passar `segundos` (padrão 3) |
+| `correr` | dash para frente, segurando | o vão entre os dois corpos chegar a `distancia` (px) ou passar `segundos` (padrão 3, contados no tempo da luta: a câmera lenta estica) |
 | `andar` | anda para frente | igual a `correr` |
 | `parar` | solta tudo (cancela o movimento em andamento) | na hora |
 
@@ -124,9 +150,13 @@ Usam os quadros laterais da conversa, com a mesma legenda digitada, os mesmos ro
 mesmas expressões (`historia/retratos/<quem>_<expressao>.png`). A luta não precisa ter arquivo
 de conversa.
 
-- **Lado**: os irmãos (`ryuga`, `koga`) não dizem o lado: o irmão do jogador fala no quadro da
-  esquerda e o rival no da direita, nas duas campanhas. Qualquer outro personagem precisa de
-  `"lado": "esquerda"` ou `"direita"`.
+- **Lado**: os irmãos (`ryuga`, `koga`) não dizem o lado: cada um fala no quadro do **lado da
+  tela onde o lutador do time dele está** na hora da fala (se os dois trocaram de lado na luta,
+  os quadros trocam junto), nas duas campanhas. Qualquer outro personagem diz o lado:
+  `"lado": "jogador"` ou `"rival"` (segue o lutador desse time na tela) ou `"esquerda"` /
+  `"direita"` (fixo).
+- **Rosto**: o rosto de lado espelha para olhar o centro da tela (`historia/retratos/olhar.json`,
+  [motor-conversas.md](motor-conversas.md)), então a mesma imagem serve dos dois lados.
 - `segura`: segundos na tela depois de digitada (padrão: a conta da conversa, 1,6 s ou mais
   para fala longa). Grito curto fica bem com 0,5.
 - Quando a cena começa, a conversa da luta se cala (os quadros saem deslizando) e nenhuma
@@ -181,7 +211,9 @@ avisam a que falta). Onomatopeia pode ficar igual em todos (`"DING DONG!": "DING
 | Motor (leitura, gatilho, linha do tempo, faixas, onomatopeias, zoom) | `android/story-core/.../historia/CinematicaLuta.java` |
 | Falas da cena nos quadros (`dizer`, `calar`, rosto espelhado pelo `olhar.json`) | `android/story-core/.../historia/ConversaLuta.java` |
 | Campo `cinematica` do passo de luta | `Episodio.Passo.cinematica` |
-| O que a cena pede à luta (`CinematicaLuta.Palco`) e quando confere o gatilho | `GameView.palcoCinematica`, `GameView.updateCinematica` |
+| O que a cena pede à luta (`CinematicaLuta.Palco`: controle, movimentos, lado na tela, fim) e quando confere o gatilho | `GameView.palcoCinematica`, `GameView.updateCinematica` |
+| Câmera lenta e luta congelada | `GameView.cinematicaLenta` |
+| Zoom e foco da câmera (chão ou peito de quem está em foco) | `GameView.renderFrame` (`cinematicZoom`, `chestY`) |
 | Comandos dos lutadores (pulo, backdash, dash, troca) | `android/app/.../CinematicaDirector.java` |
 | Troca para o titular sem recarga | `TeamSystem.tagToStarter` |
 | Último ponto de vida seguro | `FighterState.lifeFloor`, `GameView.protegerVida` |

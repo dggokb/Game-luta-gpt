@@ -37,6 +37,8 @@ public class CinematicaLutaTest {
         int quadrosPorMovimento = 30;
         boolean travado;
         String vencedor;
+        /** O lutador do jogador está à direita do rival na tela (os dois trocaram de lado). */
+        boolean jogadorADireita;
 
         @Override public void travarControle(boolean travar) {
             travado = travar;
@@ -50,6 +52,9 @@ public class CinematicaLutaTest {
         @Override public void terminarLuta(String vencedor) {
             this.vencedor = vencedor;
             pedidos.add("fim " + vencedor);
+        }
+        @Override public boolean aDireita(int lado) {
+            return lado == CinematicaLuta.JOGADOR ? jogadorADireita : !jogadorADireita;
         }
         void quadro() {
             for (int i = 0; i < 2; i++) if (restante[i] > 0) restante[i]--;
@@ -114,10 +119,13 @@ public class CinematicaLutaTest {
      */
     @Test
     public void treinoDoEpisodio1() throws IOException {
-        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+        for (int caso = 0; caso < 4; caso++) {
+            String irmao = caso % 2 == 0 ? Torneio.RYUGA : Torneio.KOGA;
+            boolean trocaram = caso >= 2;
             Temporada temporada = Temporada.load(FILES);
             ConversaLuta conversa = new ConversaLuta(FILES);
             Palco palco = new Palco();
+            palco.jogadorADireita = trocaram;
             CinematicaLuta cena = new CinematicaLuta(FILES, conversa, palco);
             assertTrue(cena.carregar(temporada, TREINO_EP01, irmao));
             assertTrue(cena.armada());
@@ -130,15 +138,18 @@ public class CinematicaLutaTest {
             assertTrue(palco.travado);
             assertTrue(cena.controleTravado());
             assertTrue(cena.protegeVida());
-            assertEquals("travar", palco.pedidos.get(0));
-            // No 2x2, os irmãos voltam para a vez antes de tudo.
-            assertEquals("jogador TITULAR", palco.pedidos.get(1));
-            assertEquals("rival TITULAR", palco.pedidos.get(2));
+            // Primeiro só trava: o golpe que levou aos 25% termina em câmera lenta.
+            assertEquals("[travar]", palco.pedidos.toString());
+            assertTrue("câmera lenta", cena.velocidade() <= 1f);
 
             List<String> falas = new ArrayList<>();
             List<Boolean> direita = new ArrayList<>();
             float maxFaixas = 0f;
             float maxZoom = 1f;
+            float minVelocidade = 1f;
+            float maxFocoRyuga = 0f;
+            int ladoRyuga = irmao.equals(Torneio.RYUGA) ? CinematicaLuta.JOGADOR : CinematicaLuta.RIVAL;
+            float duracao = 0f;
             boolean campainha = false;
             boolean correuAntes = false;
             PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
@@ -150,6 +161,11 @@ public class CinematicaLutaTest {
                 conversa.render(canvas);
                 maxFaixas = Math.max(maxFaixas, cena.faixas());
                 maxZoom = Math.max(maxZoom, cena.zoom());
+                minVelocidade = Math.min(minVelocidade, cena.velocidade());
+                if ("KOGAAAAA!".equals(conversa.atual() != null ? conversa.atual().texto : null)) {
+                    maxFocoRyuga = Math.max(maxFocoRyuga, cena.foco(ladoRyuga));
+                }
+                duracao += DT;
                 ConversaLuta.Fala f = conversa.atual();
                 if (f != null && (falas.isEmpty() || !falas.get(falas.size() - 1).equals(f.texto))) {
                     falas.add(f.texto);
@@ -166,7 +182,7 @@ public class CinematicaLutaTest {
             for (String p : palco.pedidos) {
                 if (p.startsWith("jogador ")) ordem.add(p.substring(8));
             }
-            assertEquals("[TITULAR, PULAR_TRAS, RECUAR, CORRER, PARAR]", ordem.toString());
+            assertEquals("correm, a corrida fica lenta, a campainha para tudo", "[TITULAR, PULAR_TRAS, RECUAR, CORRER, CORRER, PARAR]", ordem.toString());
             assertEquals("interrompida", palco.vencedor);
             assertEquals("fim interrompida", palco.pedidos.get(palco.pedidos.size() - 1));
             assertEquals(1f, maxFaixas, 1e-3f);
@@ -177,9 +193,14 @@ public class CinematicaLutaTest {
             assertEquals(2, falas.size());
             assertEquals("KOGAAAAA!", falas.get(0));
             assertEquals("RYŪGAAAAA!", falas.get(1));
-            // Ryūga grita primeiro: à esquerda na campanha dele, à direita na do Kōga.
-            assertEquals(irmao + ": lado do Ryūga", !irmao.equals(Torneio.RYUGA), direita.get(0));
-            assertEquals(irmao + ": lado do Kōga", irmao.equals(Torneio.RYUGA), direita.get(1));
+            // Cada irmão fala no quadro do lado da tela onde o lutador dele está.
+            boolean ryugaADireita = palco.aDireita(ladoRyuga);
+            assertEquals(irmao + "/" + trocaram + ": lado do Ryūga", ryugaADireita, direita.get(0));
+            assertEquals(irmao + "/" + trocaram + ": lado do Kōga", !ryugaADireita, direita.get(1));
+            assertTrue("a câmera vai no Ryūga enquanto ele grita", maxFocoRyuga > 0.9f);
+            assertEquals("a campainha congela a luta", 0f, minVelocidade, 1e-3f);
+            assertEquals("a luta volta à velocidade normal", 1f, cena.velocidade(), 1e-3f);
+            assertTrue("dá tempo de sentir a cena: " + duracao, duracao > 12f);
             assertFalse(cena.protegeVida());
             assertFalse(cena.controleTravado());
         }
@@ -271,6 +292,10 @@ public class CinematicaLutaTest {
             "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"camera\",\"zoom\":5}]}",
             "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"onomatopeia\",\"texto\":\"PÁ\",\"pos\":[2,0]}]}",
             "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"terminarLuta\",\"vencedor\":\"empate\"}]}",
+            "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"camera\",\"foco\":\"dafu\"}]}",
+            "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"velocidade\"}]}",
+            "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"velocidade\",\"valor\":2}]}",
+            "{\"gatilho\":\"inicio\",\"acoes\":[{\"acao\":\"fala\",\"quem\":\"dafu\",\"lado\":\"cima\",\"texto\":\"Oi\"}]}",
         };
         for (String json : ruins) {
             try {

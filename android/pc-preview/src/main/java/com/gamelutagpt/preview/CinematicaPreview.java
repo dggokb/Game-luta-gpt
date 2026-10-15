@@ -60,7 +60,10 @@ public final class CinematicaPreview {
     }
 
     private final Boneco[] bonecos = new Boneco[2];
+    /** Tempo real (a cena) e tempo da luta (os bonecos, que a câmera lenta segura). */
     private float time;
+    private float tempoLuta;
+    private float passada;
     private float zoom = CAMERA_ZOOM;
     private float left;
     private float top;
@@ -73,7 +76,7 @@ public final class CinematicaPreview {
         @Override public void mover(int lado, CinematicaLuta.Movimento m) {
             Boneco b = bonecos[lado];
             b.movimento = m.tipo == CinematicaLuta.Movimento.Tipo.PARAR ? null : m;
-            b.desde = time;
+            b.desde = tempoLuta;
             b.inicioX = b.x;
             System.out.printf("%5.2fs %s: %s%n", time, lado == 0 ? "jogador" : "rival", m.tipo);
         }
@@ -85,12 +88,16 @@ public final class CinematicaPreview {
         @Override public void terminarLuta(String vencedor) {
             System.out.printf("%5.2fs fim da luta: %s%n", time, vencedor);
         }
+
+        @Override public boolean aDireita(int lado) {
+            return bonecos[lado].x > bonecos[1 - lado].x;
+        }
     };
 
     private void mexer(Boneco b, Boneco outro) {
         CinematicaLuta.Movimento m = b.movimento;
         if (m == null) return;
-        float t = time - b.desde;
+        float t = tempoLuta - b.desde;
         boolean acabou = t >= m.segundos;
         switch (m.tipo) {
             case TITULAR:
@@ -128,14 +135,16 @@ public final class CinematicaPreview {
         }
     }
 
-    /** O enquadramento do CameraRig (sem suavização), com o zoom da cena ancorado no chão. */
-    private void camera(float extra) {
+    /** O enquadramento do CameraRig (sem suavização), com o zoom e o foco da cena, ancorado no chão. */
+    private void camera(float extra, float focoJogador, float focoRival) {
         float separation = Math.abs(bonecos[0].x - bonecos[1].x);
         float zoomX = VW / Math.max(VW / CAMERA_ZOOM, separation + 520f);
         float base = Math.max(CAMERA_MIN_ZOOM, Math.min(CAMERA_ZOOM, zoomX));
         zoom = base * extra;
         float visible = VW / zoom;
-        float center = Math.max(visible / 2f, Math.min(WORLD_WIDTH - visible / 2f, (bonecos[0].x + bonecos[1].x) / 2f));
+        float meio = (bonecos[0].x + bonecos[1].x) / 2f;
+        meio += focoJogador * (bonecos[0].x - meio) + focoRival * (bonecos[1].x - meio);
+        float center = Math.max(visible / 2f, Math.min(WORLD_WIDTH - visible / 2f, meio));
         left = center - visible / 2f;
         top = GROUND_Y - GROUND_SCREEN_Y / zoom;
     }
@@ -171,15 +180,21 @@ public final class CinematicaPreview {
         int depois = -1;
         while (frame < 60 * 40 && (depois < 0 || frame < depois)) {
             if (frame == 30) cena.comecar();
-            mexer(bonecos[0], bonecos[1]);
-            mexer(bonecos[1], bonecos[0]);
+            // Câmera lenta da cena: os bonecos só andam quando a velocidade acumula um quadro.
+            passada += cena.velocidade();
+            if (passada >= 1f) {
+                passada -= 1f;
+                mexer(bonecos[0], bonecos[1]);
+                mexer(bonecos[1], bonecos[0]);
+                tempoLuta += DT;
+            }
             cena.update(DT);
             conversa.update(DT);
             time += DT;
             // Depois do fim, mais um segundo para as faixas e a onomatopeia saírem.
             if (cena.acabou() && depois < 0) depois = frame + 60;
             if (frame % 6 == 0) {
-                camera(cena.zoom());
+                camera(cena.zoom(), cena.foco(CinematicaLuta.JOGADOR), cena.foco(CinematicaLuta.RIVAL));
                 scene.setCamera(zoom, left, top);
                 scene.update(DT * 6);
                 BufferedImage img = desenhar(scene, cena, conversa);

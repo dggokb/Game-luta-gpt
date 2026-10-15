@@ -34,7 +34,7 @@ public final class CinematicaLuta {
     static final float FAIXA_ALTURA = 92f;
     static final float FAIXA_DURACAO = 0.45f;
     static final float ZOOM_MIN = 0.8f;
-    static final float ZOOM_MAX = 1.6f;
+    static final float ZOOM_MAX = 2.0f;
     /** Cada palavra da onomatopeia estoura um pouco depois da anterior ("DING"... "DONG!"). */
     static final float PALAVRA_INTERVALO = 0.14f;
     static final float POP = 0.16f;
@@ -57,6 +57,13 @@ public final class CinematicaLuta {
 
         /** Fim da luta pela cinemática: {@code "jogador"}, {@code "rival"} ou {@code "interrompida"}. */
         void terminarLuta(String vencedor);
+
+        /**
+         * O lutador do lado {@link #JOGADOR} ou {@link #RIVAL} está agora à direita do outro na
+         * tela. A fala dele aparece no quadro desse lado (se os dois trocaram de lado na luta,
+         * os quadros trocam junto).
+         */
+        boolean aDireita(int lado);
     }
 
     /** Quando a cinemática começa. */
@@ -95,20 +102,23 @@ public final class CinematicaLuta {
 
     /** Uma ação do roteiro, já lida e validada. */
     static final class Acao {
-        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, TERMINAR_LUTA }
+        enum Tipo { FAIXAS, CONTROLE, MOVER, FALA, ONOMATOPEIA, ESPERAR, CAMERA, VELOCIDADE, TERMINAR_LUTA }
 
         final Tipo tipo;
         boolean semEsperar;
         /** FAIXAS: entrar; CONTROLE: travar. */
         boolean ligar;
         float altura = FAIXA_ALTURA;
-        int[] lados = new int[0];
+        /** MOVER: quem se move ("jogador", "rival", "ambos" ou um irmão), resolvido na hora. */
+        String quemMove = "ambos";
         Movimento movimento;
         String quem;
         String expressao = "normal";
         String texto;
-        /** FALA: lado escolhido no arquivo; null = pelo irmão (o do jogador à esquerda). */
+        /** FALA: lado fixo do arquivo; null = o lado da tela onde está o lutador de {@link #time}. */
         Boolean naDireita;
+        /** FALA sem lado fixo: de que time é quem fala ("jogador", "rival" ou um irmão). */
+        String time;
         float segura = -1f;
         float x = 0.5f;
         float y = 0.42f;
@@ -118,6 +128,10 @@ public final class CinematicaLuta {
         int cor = 0xFFFFD23F;
         float segundos;
         float zoom = 1f;
+        /** CAMERA: em quem a câmera foca ("jogador", "rival", "centro" ou um irmão); null = não muda. */
+        String foco;
+        /** VELOCIDADE: velocidade da luta (1 = normal, 0,3 = câmera lenta, 0 = congela). */
+        float valor = 1f;
         String vencedor;
 
         Acao(Tipo tipo) {
@@ -187,14 +201,48 @@ public final class CinematicaLuta {
     private float acaoDesde;
     private float time;
     private boolean travado;
-    private float faixasDe;
-    private float faixasPara;
-    private float faixasDesde = -999f;
+    private final Transicao faixas = new Transicao(0f);
     private float faixaAltura = FAIXA_ALTURA;
-    private float zoomDe = 1f;
-    private float zoomPara = 1f;
-    private float zoomDesde = -999f;
-    private float zoomDuracao;
+    private final Transicao zoom = new Transicao(1f);
+    /** Peso do foco da câmera em cada lutador (0 = no centro da luta, 1 = nele). */
+    private final Transicao focoJogador = new Transicao(0f);
+    private final Transicao focoRival = new Transicao(0f);
+    private final Transicao velocidade = new Transicao(1f);
+
+    /** Um valor que vai suavemente de um ponto a outro num tempo (faixas, zoom, foco, velocidade). */
+    private final class Transicao {
+        private final float repouso;
+        private float de;
+        private float para;
+        private float desde = -999f;
+        private float duracao;
+
+        Transicao(float repouso) {
+            this.repouso = de = para = repouso;
+        }
+
+        float valor() {
+            float k = duracao <= 0f ? 1f : Tinta.clamp01((time - desde) / duracao);
+            return de + (para - de) * suave(k);
+        }
+
+        void ir(float alvo, float segundos) {
+            de = valor();
+            para = alvo;
+            desde = time;
+            duracao = segundos;
+        }
+
+        float alvo() {
+            return para;
+        }
+
+        void zerar() {
+            de = para = repouso;
+            desde = -999f;
+            duracao = 0f;
+        }
+    }
     private final List<Estouro> estouros = new ArrayList<>();
 
     /**
@@ -233,11 +281,12 @@ public final class CinematicaLuta {
         acao = null;
         indice = 0;
         travado = false;
-        faixasDe = faixasPara = 0f;
-        faixasDesde = -999f;
+        faixas.zerar();
         faixaAltura = FAIXA_ALTURA;
-        zoomDe = zoomPara = 1f;
-        zoomDesde = -999f;
+        zoom.zerar();
+        focoJogador.zerar();
+        focoRival.zerar();
+        velocidade.zerar();
         estouros.clear();
     }
 
@@ -297,6 +346,7 @@ public final class CinematicaLuta {
                 a = new Acao(Acao.Tipo.FAIXAS);
                 a.ligar = booleano(m, "entrar");
                 a.altura = numero(m, "altura", FAIXA_ALTURA, 0f, VH * 0.3f);
+                a.segundos = numero(m, "segundos", FAIXA_DURACAO, 0f, 5f);
                 break;
             case "controle":
                 a = new Acao(Acao.Tipo.CONTROLE);
@@ -304,7 +354,10 @@ public final class CinematicaLuta {
                 break;
             case "mover":
                 a = new Acao(Acao.Tipo.MOVER);
-                a.lados = lados(Episodio.string(m, "quem", "ambos"));
+                a.quemMove = Episodio.string(m, "quem", "ambos");
+                if (!a.quemMove.equals("ambos") && !time(a.quemMove)) {
+                    throw new IllegalArgumentException("quem se move: " + a.quemMove + " (use jogador, rival, ambos, ryuga ou koga)");
+                }
                 a.movimento = movimento(m);
                 break;
             case "fala":
@@ -318,14 +371,17 @@ public final class CinematicaLuta {
                 a.expressao = Episodio.string(m, "expressao", "normal");
                 if (!a.expressao.matches("[a-z]+")) throw new IllegalArgumentException("expressão " + a.expressao);
                 String lado = Episodio.string(m, "lado", null);
-                if (lado != null) {
-                    if (!lado.equals("esquerda") && !lado.equals("direita")) {
-                        throw new IllegalArgumentException("lado " + lado + " (use esquerda ou direita)");
-                    }
+                if (lado == null && time(a.quem)) {
+                    // Os irmãos falam do lado da tela onde está o lutador do time deles.
+                    a.time = a.quem;
+                } else if (lado == null) {
+                    throw new IllegalArgumentException(a.quem + " fala sem \"lado\" (esquerda, direita, jogador ou rival)");
+                } else if (lado.equals("esquerda") || lado.equals("direita")) {
                     a.naDireita = lado.equals("direita");
-                } else if (!a.quem.equals(Torneio.RYUGA) && !a.quem.equals(Torneio.KOGA)) {
-                    // Só os irmãos têm lado pela campanha: o do jogador à esquerda, o rival à direita.
-                    throw new IllegalArgumentException(a.quem + " fala sem \"lado\" (esquerda ou direita)");
+                } else if (lado.equals("jogador") || lado.equals("rival")) {
+                    a.time = lado;
+                } else {
+                    throw new IllegalArgumentException("lado " + lado + " (use esquerda, direita, jogador ou rival)");
                 }
                 a.segura = numero(m, "segura", -1f, -1f, 10f);
                 break;
@@ -357,6 +413,17 @@ public final class CinematicaLuta {
                 a = new Acao(Acao.Tipo.CAMERA);
                 a.zoom = numero(m, "zoom", 1f, ZOOM_MIN, ZOOM_MAX);
                 a.segundos = numero(m, "segundos", 0.5f, 0f, 10f);
+                a.foco = Episodio.string(m, "foco", null);
+                if (a.foco != null && !a.foco.equals("centro") && !time(a.foco)) {
+                    throw new IllegalArgumentException("foco " + a.foco + " (use centro, jogador, rival, ryuga ou koga)");
+                }
+                break;
+            case "velocidade":
+                a = new Acao(Acao.Tipo.VELOCIDADE);
+                Object v = m.get("valor");
+                if (!(v instanceof Number)) throw new IllegalArgumentException("velocidade sem \"valor\" (1 = normal, 0,3 = lenta, 0 = congela)");
+                a.valor = numero(m, "valor", 1f, 0f, 1f);
+                a.segundos = numero(m, "segundos", 0.25f, 0f, 10f);
                 break;
             case "terminarLuta":
                 a = new Acao(Acao.Tipo.TERMINAR_LUTA);
@@ -367,7 +434,7 @@ public final class CinematicaLuta {
                 break;
             default:
                 throw new IllegalArgumentException("ação desconhecida: " + nome +
-                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, terminarLuta)");
+                    " (use faixas, controle, mover, fala, onomatopeia, esperar, camera, velocidade, terminarLuta)");
         }
         a.semEsperar = Boolean.TRUE.equals(m.get("semEsperar"));
         return a;
@@ -401,11 +468,20 @@ public final class CinematicaLuta {
         return new Movimento(tipo, numero(m, "distancia", -1f, -1f, 2000f), numero(m, "segundos", segundos, 0f, 10f));
     }
 
-    private static int[] lados(String quem) {
-        if (quem.equals("ambos")) return new int[] {JOGADOR, RIVAL};
-        if (quem.equals("jogador")) return new int[] {JOGADOR};
-        if (quem.equals("rival")) return new int[] {RIVAL};
-        throw new IllegalArgumentException("quem se move: " + quem + " (use jogador, rival ou ambos)");
+    /** Nome de um time: "jogador", "rival" ou um irmão (o time dele depende da campanha). */
+    private static boolean time(String quem) {
+        return quem.equals("jogador") || quem.equals("rival") || quem.equals(Torneio.RYUGA) || quem.equals(Torneio.KOGA);
+    }
+
+    /** O lado ({@link #JOGADOR} ou {@link #RIVAL}) de um time; o irmão escolhido é o jogador. */
+    private int lado(String time) {
+        if (time.equals("jogador")) return JOGADOR;
+        if (time.equals("rival")) return RIVAL;
+        return time.equals(irmao) ? JOGADOR : RIVAL;
+    }
+
+    private int[] lados(String quem) {
+        return quem.equals("ambos") ? new int[] {JOGADOR, RIVAL} : new int[] {lado(quem)};
     }
 
     private static String texto(Map<String, Object> m) {
@@ -544,9 +620,7 @@ public final class CinematicaLuta {
     private void executar(Acao a) {
         switch (a.tipo) {
             case FAIXAS:
-                faixasDe = faixas();
-                faixasPara = a.ligar ? 1f : 0f;
-                faixasDesde = time;
+                faixas.ir(a.ligar ? 1f : 0f, a.segundos);
                 if (a.ligar) faixaAltura = a.altura;
                 break;
             case CONTROLE:
@@ -554,7 +628,7 @@ public final class CinematicaLuta {
                 palco.travarControle(a.ligar);
                 break;
             case MOVER:
-                for (int lado : a.lados) palco.mover(lado, a.movimento);
+                for (int lado : lados(a.quemMove)) palco.mover(lado, a.movimento);
                 break;
             case FALA:
                 if (conversa != null) conversa.dizer(temporada, a.quem, naDireita(a), a.expressao, a.texto, a.segura);
@@ -563,10 +637,15 @@ public final class CinematicaLuta {
                 estouros.add(new Estouro(a, time));
                 break;
             case CAMERA:
-                zoomDe = zoom();
-                zoomPara = a.zoom;
-                zoomDesde = time;
-                zoomDuracao = a.segundos;
+                zoom.ir(a.zoom, a.segundos);
+                if (a.foco != null) {
+                    int alvo = a.foco.equals("centro") ? -1 : lado(a.foco);
+                    focoJogador.ir(alvo == JOGADOR ? 1f : 0f, a.segundos);
+                    focoRival.ir(alvo == RIVAL ? 1f : 0f, a.segundos);
+                }
+                break;
+            case VELOCIDADE:
+                velocidade.ir(a.valor, a.segundos);
                 break;
             case TERMINAR_LUTA:
                 estado = Estado.ACABOU;
@@ -582,10 +661,10 @@ public final class CinematicaLuta {
         float idade = time - acaoDesde;
         switch (a.tipo) {
             case FAIXAS:
-                return idade >= FAIXA_DURACAO;
+                return idade >= a.segundos;
             case MOVER:
                 if (idade >= LIMITE_ESPERA) return true;
-                for (int lado : a.lados) {
+                for (int lado : lados(a.quemMove)) {
                     if (palco.movendo(lado)) return false;
                 }
                 return true;
@@ -594,6 +673,7 @@ public final class CinematicaLuta {
             case ONOMATOPEIA:
             case ESPERAR:
             case CAMERA:
+            case VELOCIDADE:
                 return idade >= a.segundos;
             default:
                 return true;
@@ -608,34 +688,42 @@ public final class CinematicaLuta {
             travado = false;
             palco.travarControle(false);
         }
-        if (faixasPara > 0f) {
-            faixasDe = faixas();
-            faixasPara = 0f;
-            faixasDesde = time;
-        }
-        if (zoomPara != 1f) {
-            zoomDe = zoom();
-            zoomPara = 1f;
-            zoomDesde = time;
-            zoomDuracao = 0.4f;
-        }
+        if (faixas.alvo() > 0f) faixas.ir(0f, FAIXA_DURACAO);
+        if (zoom.alvo() != 1f) zoom.ir(1f, 0.4f);
+        focoJogador.ir(0f, 0.4f);
+        focoRival.ir(0f, 0.4f);
+        velocidade.zerar();
     }
 
-    /** A fala vai para a direita: o lado do arquivo ou, nos irmãos, o rival. */
+    /** A fala vai para a direita: o lado fixo do arquivo ou o lado da tela do lutador do time. */
     private boolean naDireita(Acao a) {
-        return a.naDireita != null ? a.naDireita : !a.quem.equals(irmao);
+        return a.naDireita != null ? a.naDireita : palco.aDireita(lado(a.time));
     }
 
     /** Quanto as faixas entraram (0 = fora, 1 = inteiras). */
     public float faixas() {
-        float k = Tinta.clamp01((time - faixasDesde) / FAIXA_DURACAO);
-        return faixasDe + (faixasPara - faixasDe) * suave(k);
+        return faixas.valor();
     }
 
     /** Zoom extra da câmera pedido pela cena (1 = o da luta). */
     public float zoom() {
-        float k = zoomDuracao <= 0f ? 1f : Tinta.clamp01((time - zoomDesde) / zoomDuracao);
-        return zoomDe + (zoomPara - zoomDe) * suave(k);
+        return zoom.valor();
+    }
+
+    /**
+     * Foco da câmera em cada lutador: {@code [jogador, rival]}, de 0 (a câmera fica no centro
+     * da luta) a 1 (centrada nele). O jogo leva o centro da câmera até lá.
+     */
+    public float foco(int lado) {
+        return lado == JOGADOR ? focoJogador.valor() : focoRival.valor();
+    }
+
+    /**
+     * Velocidade da luta pedida pela cena: 1 = normal, menos que 1 = câmera lenta, 0 = a luta
+     * congela. A cena, as falas e as onomatopeias andam no tempo normal.
+     */
+    public float velocidade() {
+        return estado == Estado.RODANDO ? velocidade.valor() : 1f;
     }
 
     private static float suave(float k) {
