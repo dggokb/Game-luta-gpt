@@ -58,6 +58,8 @@ class Tests(unittest.TestCase):
                 self.assertEqual(len(sprites), 4)
                 image = cv2.imread(str(sprites[0]), cv2.IMREAD_UNCHANGED)
                 self.assertEqual([image.shape[1], image.shape[0]], data["canvas"])
+                yy = np.where(image[:, :, 3] > 32)[0]
+                self.assertLessEqual(abs(int(yy.max() - yy.min() + 1) - 128), 3)
 
     def test_missing_idle(self):
         with tempfile.TemporaryDirectory() as tmp:
