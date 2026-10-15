@@ -213,9 +213,9 @@ têm air tech (caem derrubados).
 
 | Direção | Resultado |
 | --- | --- |
-| ↑ | **Levantar rápido**: fica só 14 frames no chão (em vez de 72) |
+| ↑ | **Levantar rápido**: fica só 6 frames no chão (em vez de 30) |
 | ← | **Rolar para trás**: 24 frames invulnerável, ~220 px para longe |
-| → | **Rolar para a frente**: passa por baixo do oponente (atravessa o corpo) |
+| → | **Rolar para a frente**: passa por baixo do oponente (atravessa o corpo) e levanta já virado para ele |
 | ↓ | **Levantar atrasado**: +30 frames no chão (quebra o tempo do oki) |
 | nada | levanta no tempo normal |
 
@@ -225,6 +225,14 @@ têm air tech (caem derrubados).
 - **CPU**: faz air tech em ~70% das vezes (neutro, para trás ou para a frente) e escolhe
   levantar rápido, rolar, atrasar ou normal ao acaso.
 - Sem arte própria ainda: o rolamento usa o clipe de levantar.
+- Quem levanta sempre fica de frente para o oponente (vira quando o rolamento passa por
+  baixo dele), em vez de só virar quando volta ao neutro.
+- O levantar dura no máximo `maxWakeupFrames` (30): um clipe GETUP mais longo toca mais
+  rápido, inteiro, no tempo do motor. Queda + chão + levantar normal ≈ 1,2 s.
+
+**KO e derrota:** quem é nocauteado deitado (ou no ar, que cai deitado) não levanta mais.
+Quem cai de pé (o último golpe não derruba) toca o clipe `DEFEAT` do pack uma vez, 2× mais
+rápido (~2 s), e fica na última pose; packs sem `DEFEAT` ficam na guarda.
 
 Testes em `RecoveryTest`.
 

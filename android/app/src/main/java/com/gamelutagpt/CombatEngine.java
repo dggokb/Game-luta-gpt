@@ -552,8 +552,10 @@ final class CombatEngine {
                 }
                 break;
             case KNOCKDOWN: {
+                // Defeated: stays down (the KO is the defeat pose).
+                if (f.ko()) break;
                 if (f.knockdownFrame >= config.knockdownFallFrames && f.wakeup == CombatFighter.WAKE_NORMAL &&
-                    !f.hardKnockdown && !f.ko()) {
+                    !f.hardKnockdown) {
                     chooseWakeup(f);
                 }
                 int down = config.knockdownDownFrames;
@@ -572,6 +574,8 @@ final class CombatEngine {
                 break;
             }
             case WAKEUP:
+                // Gets up facing the opponent: a forward roll turns around as it passes under it.
+                faceOpponent(f);
                 if (f.rollFrames == 0 && f.knockdownFrame >= wakeupFrames(f)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.throwProtect = config.throwProtectFrames;
@@ -714,14 +718,17 @@ final class CombatEngine {
         cues.add("AIR_TECH");
     }
 
-    /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
-    /** Wake-up length of a fighter: its own (timed to its GETUP art) or the engine default. */
-    private int wakeupFrames(CombatFighter f) {
+    /**
+     * Wake-up length of a fighter: its own (timed to its GETUP art) or the engine default,
+     * never longer than {@link CombatConfig#maxWakeupFrames}.
+     */
+    int wakeupFrames(CombatFighter f) {
         CharacterDefinition c = f.character();
         int own = c == null ? 0 : c.fighter.wakeupFrames;
-        return own > 0 ? own : config.wakeupFrames;
+        return Math.min(own > 0 ? own : config.wakeupFrames, config.maxWakeupFrames);
     }
 
+    /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
     private void chooseWakeup(CombatFighter f) {
         switch (MotionParser.relative(f.input.direction, f.facing)) {
             case 6: case 7: case 8: f.wakeup = CombatFighter.WAKE_QUICK; break;
@@ -1146,7 +1153,8 @@ final class CombatEngine {
         f.vx = 0f;
         f.freeFallFrames = 0;
         if (f.status == CombatFighter.Status.AIR_HITSTUN) {
-            if (f.slammed || f.ultraFall || f.hardFall) {
+            // A fighter KO'd in the air lands lying down, not on its feet.
+            if (f.slammed || f.ultraFall || f.hardFall || f.ko()) {
                 knockDown(f);
             } else {
                 // Remaining hitstun is spent on the ground.
@@ -1212,6 +1220,13 @@ final class CombatEngine {
     private static boolean passingThrough(CombatFighter f) {
         AttackDefinition.Mechanics m = f.mechanics();
         return m.passThrough && m.advanceAt(f.attackFrame);
+    }
+
+    /** Turns toward the opponent, without the command cleanup of {@link #updateFacing}. */
+    private void faceOpponent(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        if (f.x < other.x - config.facingEpsilon) f.facing = 1;
+        else if (f.x > other.x + config.facingEpsilon) f.facing = -1;
     }
 
     private void updateFacing(CombatFighter f) {

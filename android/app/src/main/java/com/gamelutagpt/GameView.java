@@ -235,6 +235,9 @@ public class GameView extends SurfaceView
     private boolean introPlayed;
     /** Frames the winner has been celebrating (player, opponent); 0 while nobody is KO. */
     private final int[] victoryFrames = new int[2];
+    private final int[] defeatFrames = new int[2];
+    /** A DEFEAT do vídeo dura ~4 s: tocada mais rápida, termina antes do resultado sair da tela. */
+    private static final float DEFEAT_SPEED = 2f;
     /** Ultra playing now (cinematic, then the final beam). */
     private UltraPack ultraPack;
     // Final beam: drawn from the engine state, with its own clock (keeps flickering in hitstop).
@@ -2156,7 +2159,10 @@ public class GameView extends SurfaceView
                 break;
             case WAKEUP:
                 state = SpriteStates.GETUP;
-                reactionElapsed = f.knockdownFrame * FIXED_STEP;
+                // The whole clip spread over the engine's wake-up (a long one plays faster).
+                CharacterDefinition.Animation getup = f.character().animations.get(state);
+                reactionElapsed = getup == null ? f.knockdownFrame * FIXED_STEP
+                    : Math.min(getup.duration - 0.0001f, getup.timeFor(f.knockdownFrame, engine.wakeupFrames(f)));
                 break;
             case AIR_HITSTUN:
                 state = SpriteStates.HIT_AIR;
@@ -2207,7 +2213,7 @@ public class GameView extends SurfaceView
         if (f.status == CombatFighter.Status.KNOCKDOWN) {
             lean = clamp(f.knockdownFrame / (float)config.knockdownFallFrames, 0f, 1f);
         } else if (f.status == CombatFighter.Status.WAKEUP) {
-            lean = 1f - clamp(f.knockdownFrame / (float)config.wakeupFrames, 0f, 1f);
+            lean = 1f - clamp(f.knockdownFrame / (float)engine.wakeupFrames(f), 0f, 1f);
         } else {
             return 0f;
         }
@@ -2310,6 +2316,17 @@ public class GameView extends SurfaceView
                 start + victoryFrames[side]++ * FIXED_STEP);
         } else if (onPoint) {
             victoryFrames[side] = 0;
+        }
+        // KO de pé (o golpe final não derrubou): toca a DEFEAT uma vez e fica na última pose.
+        // Quem foi nocauteado no chão ou no ar continua deitado (o motor não o levanta).
+        boolean defeated = animation == null && onPoint && f.ko() && f.grounded &&
+            f.status == CombatFighter.Status.NEUTRAL && renderer.hasAnimation(SpriteStates.DEFEAT);
+        if (defeated) {
+            CharacterDefinition.Animation lose = character.animations.get(SpriteStates.DEFEAT);
+            animation = SpriteStates.DEFEAT;
+            animationElapsed = Math.min(lose.duration - 0.0001f, defeatFrames[side]++ * FIXED_STEP * DEFEAT_SPEED);
+        } else if (onPoint) {
+            defeatFrames[side] = 0;
         }
         CharacterDefinition.Animation beamPose =
             animation == null && f.firingBeam() ? character.specialAnimations.get("ULTRA") : null;
