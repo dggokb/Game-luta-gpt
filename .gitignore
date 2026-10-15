@@ -6,3 +6,8 @@ resultado/
 entradas/
 *.mp4
 .DS_Store
+android-build/
+*.keystore
+*.jks
+*.p12
+*.idsig

@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "portrait_390px_no_overflow_and_play_visible",
+    "touch_play_pause_and_frame_steps",
+    "original_preview_tab",
+    "different_source_sizes_common_display_zoom",
+    "landscape_retains_frame_and_common_zoom",
+    "master_overlay",
+    "idle_jab_idle",
+    "idle_dash_idle",
+    "cycle_preview_without_frame_discard"
+  ],
+  "page_errors": [],
+  "external_requests": [],
+  "frames": 944,
+  "preview_images": 1888,
+  "status": "passed"
+}

@@ -4,6 +4,10 @@ Ferramenta local e independente para calibrar vídeos existentes por imagens mes
 
 A escala é calculada **uma vez por vídeo**, a partir de uma pose equivalente ao Idle Master ou Crouch Master. Uma transformação uniforme e constante é aplicada a todos os frames. O canvas global cresce para acomodar golpes e deslocamentos; o personagem não encolhe para caber nele.
 
+## Ver no celular
+
+[Baixar o APK Android](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-visualizador.apk). Ele já inclui as 8 animações e os 944 frames do lote, funciona offline e tem controles por toque. Android 8.0+, com WebView atualizado. [Uso e compilação](android/README.md).
+
 ## Instalação e execução
 
 Python 3.10+, FFmpeg e FFprobe no PATH. Testado com Python 3.12 e FFmpeg 7.1.5.
