@@ -1,6 +1,8 @@
 # Visualizador offline para Android
 
-A entrega atual é a [triagem seletiva](../docs/TRIAGEM-SELETIVA.md), versão `1.8-triagem` (versionCode 9). Atualiza o app de teste, compara os 13 casos e mantém um link local para os quatro personagens já aceitos. O APK completo 1.5 permanece separado.
+A [revisão localizada de P04](../docs/P04-CORRIDA-REVISADA.md) tem um APK separado de 4,1 MB, **Sprites — P04 corrida** (`org.spriteviewer.p04review`). Inclui câmera lenta, emenda e seis frames consecutivos. É um candidato manual para revisão visual. A triagem abaixo continua reprovada para ampliar o lote.
+
+A entrega anterior é a [triagem seletiva](../docs/TRIAGEM-SELETIVA.md), versão `1.8-triagem` (versionCode 9). Atualiza o app de teste, compara os 13 casos e mantém um link local para os quatro personagens já aceitos. O APK completo 1.5 permanece separado.
 
 O ensaio anterior é o [APK com P02, P06, P08 e P11](../docs/ENSAIO-DASH-4-PERSONAGENS.md), versão `1.7-dash-4personagens` (versionCode 8). Atualiza o app de teste da P02 e permite rodar a sequência dos quatro. P06 e P08 ainda não passam nos controles.
 

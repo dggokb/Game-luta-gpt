@@ -6,7 +6,9 @@ A escala de referência é calculada a partir de uma pose equivalente ao Idle Ma
 
 ## Ver no celular
 
-**Entrega mais recente:** [triagem seletiva: 8 casos corrigidos, 2 mantidos e 3 pendentes](docs/TRIAGEM-SELETIVA.md). Inclui APK de comparação e 531 PNGs candidatos; preserva P02, P06, P08 e P11 como referência visual aceita.
+**Revisão localizada de P04:** [vídeo, APK pequeno e PNGs da passada revisada](docs/P04-CORRIDA-REVISADA.md). Seis frames consecutivos, poeira separada manualmente e escala constante. Candidato para avaliação visual; a triagem anterior continua sem aprovação para ampliar o lote.
+
+**Triagem anterior, reprovada na revisão visual:** [triagem seletiva: 8 casos corrigidos, 2 mantidos e 3 pendentes](docs/TRIAGEM-SELETIVA.md). Inclui APK de comparação e 531 PNGs candidatos; preserva P02, P06, P08 e P11 como referência visual aceita.
 
 **Ensaio anterior:** [dash de P02, P06, P08 e P11, com sequência Idle → dash → Idle](docs/ENSAIO-DASH-4-PERSONAGENS.md). P02/P11 passam nos controles; P06/P08 ainda impedem adotar o método como padrão para todos. [APK de teste — 8,1 MB](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-dash-4-personagens.apk).
 
