@@ -2,6 +2,13 @@
   "nome": "Soco de Rua",
   "cor": "#E0A526",
   "corSecundaria": "#FFE6A0",
+  "estilo": {
+    "pagina": "diagonal",
+    "abertura": "faixa",
+    "camera": "pesada",
+    "impacto": "vermelho",
+    "camaraLenta": 0.3
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

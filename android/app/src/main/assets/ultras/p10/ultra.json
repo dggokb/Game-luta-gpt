@@ -2,6 +2,13 @@
   "nome": "Resgate Aéreo",
   "cor": "#4FC3F7",
   "corSecundaria": "#D8F6FF",
+  "estilo": {
+    "pagina": "leque",
+    "abertura": "faixa",
+    "camera": "agil",
+    "impacto": "vazio",
+    "camaraLenta": 0.5
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

@@ -2,6 +2,13 @@
   "nome": "Autópsia",
   "cor": "#7CFF4F",
   "corSecundaria": "#E2FFD0",
+  "estilo": {
+    "pagina": "quebrada",
+    "abertura": "dividida",
+    "camera": "sombria",
+    "impacto": "vazio",
+    "camaraLenta": 0.4
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

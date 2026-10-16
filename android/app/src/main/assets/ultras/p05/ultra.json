@@ -2,6 +2,13 @@
   "nome": "Eclipse",
   "cor": "#7A5CFF",
   "corSecundaria": "#D6CCFF",
+  "estilo": {
+    "pagina": "quebrada",
+    "abertura": "vertical",
+    "camera": "agil",
+    "impacto": "vazio",
+    "camaraLenta": 0.5
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

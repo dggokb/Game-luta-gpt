@@ -123,6 +123,45 @@ public final class UltraDefinition {
         }
     }
 
+    /**
+     * A direção de cena do Ultra, no bloco {@code "estilo"} do ultra.json: o modelo da página
+     * de mangá, o estilo da abertura, o roteiro de câmera da sequência e o impacto do golpe
+     * final. Tudo opcional; o que falta (ou não existe) fica no padrão. Os nomes valem para
+     * qualquer personagem, então trocar é só mudar a palavra:
+     *
+     * <pre>
+     * "estilo": {
+     *   "pagina":   "classica" | "diagonal" | "leque" | "quebrada",
+     *   "abertura": "faixa" | "vertical" | "dividida" | "racha",
+     *   "camera":   "padrao" | "agil" | "pesada" | "sombria"  (ou uma lista de planos:
+     *               ["lado", "baixo", "aberto", "medio", "close"]),
+     *   "impacto":  "vazio" | "vermelho",
+     *   "camaraLenta": 0.4
+     * }
+     * </pre>
+     */
+    public static final class Style {
+        public final String page;
+        public final String opening;
+        public final String camera;
+        /** Planos da câmera escritos um a um (no lugar do {@link #camera}), ou null. */
+        public final String[] shots;
+        public final String impact;
+        /** Velocidade da câmera lenta do golpe final (0.4 = 40%), ou 0 para o padrão. */
+        public final float slowMotion;
+
+        public static final Style DEFAULT = new Style(null, null, null, null, null, 0f);
+
+        public Style(String page, String opening, String camera, String[] shots, String impact, float slowMotion) {
+            this.page = page;
+            this.opening = opening;
+            this.camera = camera;
+            this.shots = shots;
+            this.impact = impact;
+            this.slowMotion = slowMotion;
+        }
+    }
+
     /** Uma folha de animação: {@code frames} quadros do mesmo tamanho, lado a lado. */
     public static final class Sheet {
         public final String path;
@@ -143,6 +182,7 @@ public final class UltraDefinition {
     private final Panel[] panels;
     public final Beam beam;
     public final Opening opening;
+    public final Style style;
 
     public static final int DEFAULT_DAMAGE = 4000;
 
@@ -156,6 +196,11 @@ public final class UltraDefinition {
 
     public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels, Beam beam,
                            Opening opening) {
+        this(name, color, accentColor, damage, panels, beam, opening, Style.DEFAULT);
+    }
+
+    public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels, Beam beam,
+                           Opening opening, Style style) {
         if (panels.length != UltraSlot.values().length) {
             throw new IllegalArgumentException("um ultra tem exatamente 5 painéis");
         }
@@ -167,6 +212,7 @@ public final class UltraDefinition {
         this.panels = panels.clone();
         this.beam = beam != null ? beam : Beam.DEFAULT;
         this.opening = opening != null ? opening : Opening.DEFAULT;
+        this.style = style != null ? style : Style.DEFAULT;
     }
 
     public Panel panel(UltraSlot slot) {
@@ -247,8 +293,22 @@ public final class UltraDefinition {
             opening = new Opening(stringField(abertura, "corte", null), stringField(abertura, "palco", null),
                 shout != null && !shout.trim().isEmpty() ? shout.trim() : null);
         }
+        Style style = Style.DEFAULT;
+        if (map.get("estilo") instanceof Map) {
+            Map<String, Object> estilo = (Map<String, Object>)map.get("estilo");
+            Object camera = estilo.get("camera");
+            String[] shots = null;
+            if (camera instanceof java.util.List) {
+                java.util.List<?> list = (java.util.List<?>)camera;
+                shots = new String[list.size()];
+                for (int i = 0; i < shots.length; i++) shots[i] = String.valueOf(list.get(i));
+            }
+            style = new Style(stringField(estilo, "pagina", null), stringField(estilo, "abertura", null),
+                camera instanceof String ? (String)camera : null, shots, stringField(estilo, "impacto", null),
+                numberField(estilo, "camaraLenta", 0f).floatValue());
+        }
         return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels, beam,
-            opening);
+            opening, style);
     }
 
     @SuppressWarnings("unchecked")

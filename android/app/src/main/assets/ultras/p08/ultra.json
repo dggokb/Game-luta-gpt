@@ -2,6 +2,13 @@
   "nome": "Sinfonia Escarlate",
   "cor": "#E0245E",
   "corSecundaria": "#FFB3C9",
+  "estilo": {
+    "pagina": "leque",
+    "abertura": "vertical",
+    "camera": "agil",
+    "impacto": "vermelho",
+    "camaraLenta": 0.5
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

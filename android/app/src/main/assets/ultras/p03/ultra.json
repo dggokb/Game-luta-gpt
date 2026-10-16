@@ -2,6 +2,13 @@
   "nome": "Fúria da Casa",
   "cor": "#F4B73B",
   "corSecundaria": "#FFE7A3",
+  "estilo": {
+    "pagina": "diagonal",
+    "abertura": "racha",
+    "camera": "pesada",
+    "impacto": "vermelho",
+    "camaraLenta": 0.3
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

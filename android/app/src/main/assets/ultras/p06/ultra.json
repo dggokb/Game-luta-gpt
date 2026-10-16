@@ -2,6 +2,13 @@
   "nome": "Abismo",
   "cor": "#8E3BD6",
   "corSecundaria": "#E2B8FF",
+  "estilo": {
+    "pagina": "quebrada",
+    "abertura": "racha",
+    "camera": "sombria",
+    "impacto": "vazio",
+    "camaraLenta": 0.4
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

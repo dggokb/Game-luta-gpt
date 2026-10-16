@@ -2,6 +2,13 @@
   "nome": "Dança da Garça",
   "cor": "#3FA7D6",
   "corSecundaria": "#BFF3FF",
+  "estilo": {
+    "pagina": "leque",
+    "abertura": "vertical",
+    "camera": "agil",
+    "impacto": "vazio",
+    "camaraLenta": 0.5
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

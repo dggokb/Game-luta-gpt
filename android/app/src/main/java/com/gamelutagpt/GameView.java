@@ -168,6 +168,10 @@ public class GameView extends SurfaceView
     private final AberturaUltra abertura = new AberturaUltra();
     /** Plano de câmera do Ultra em sequência, e se ele está valendo agora. */
     private final UltraDirector.Shot ultraShot = new UltraDirector.Shot();
+    /** Direção do Ultra em andamento (do "estilo" do ultra.json), escolhida na ativação. */
+    private UltraDirector.Script ultraScript = UltraDirector.PADRAO;
+    private int ultraFinalImpact = ImpactFeel.VOID;
+    private float ultraSlowScale = ImpactFeel.ULTRA_SLOW_SCALE;
     private boolean ultraShotActive;
     private float ultraTilt;
     /** Faixas pretas de cinema do Ultra (0 = fora, 1 = inteiras; o HUD some junto). */
@@ -1201,9 +1205,9 @@ public class GameView extends SurfaceView
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
                 // Último dano do Ultra em sequência: impact frame em quem apanhou e câmera lenta.
-                feel.slow(ImpactFeel.ULTRA_SLOW_FRAMES, ImpactFeel.ULTRA_SLOW_SCALE);
+                feel.slow(ImpactFeel.ULTRA_SLOW_FRAMES, ultraSlowScale);
                 CombatFighter hit = ultraVictim();
-                if (pausa.impacto() && hit != null) feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
+                if (pausa.impacto() && hit != null) feel.impactFrame(ultraFinalImpact, hit.x, chestY(hit));
             }
         }
         updateUltraBeam();
@@ -1417,12 +1421,13 @@ public class GameView extends SurfaceView
             CharacterDefinition.UltraSequence seq = p.state.profile.ultraSequence;
             if (seq != null) {
                 CombatFighter v = engine.fighter(1 - p.index);
-                UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing);
+                UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing,
+                    ultraScript);
                 ultraShotActive = ultraShot.kind != UltraDirector.FINAL;
             } else {
                 ultraShotActive = false;
             }
-            ultraDarkAlpha = ultraShotActive ? 120 : 0;
+            ultraDarkAlpha = ultraShotActive ? ultraScript.darkAlpha : 0;
             ultraCameraZoom = ultraShotActive ? ultraShot.zoom : 1f;
             ultraTilt = ultraShotActive ? ultraShot.tilt : 0f;
         } else if (phase == CombatFighter.ULTRA_BEAM) {
@@ -1441,10 +1446,25 @@ public class GameView extends SurfaceView
 
     /** Começa a abertura do Ultra de quem acabou de ativar (a luta para até ela acabar). */
     private void startUltraOpening(CombatFighter p) {
-        UltraPack pack = p == engine.fighter(PLAYER) ? ultraPacks[engine.team(PLAYER).point] : cpuUltraPack(p.state);
+        UltraPack pack = ultraPackOf(p);
+        ultraScript = UltraDirector.PADRAO;
+        ultraFinalImpact = ImpactFeel.VOID;
+        ultraSlowScale = ImpactFeel.ULTRA_SLOW_SCALE;
         if (pack == null) return;
-        abertura.start(pack, p.facing);
+        // A direção de cena deste Ultra: câmera da sequência e impacto do golpe final.
+        com.gamelutagpt.ultra.UltraDefinition.Style style = pack.definition.style;
+        ultraScript = UltraDirector.script(style.camera, style.shots);
+        if ("vermelho".equalsIgnoreCase(style.impact)) ultraFinalImpact = ImpactFeel.RED;
+        if (style.slowMotion > 0f) ultraSlowScale = Math.max(0.1f, Math.min(1f, style.slowMotion));
+        // Na abertura dividida o rival aparece do outro lado: o corte dele (ou a arte de seleção).
+        UltraPack rival = ultraPackOf(engine.fighter(1 - p.index));
+        abertura.start(pack, p.facing, rival != null ? rival.cutIn : null);
         ultraSounds.playFight("punish", 1f, 0.9f);
+    }
+
+    /** O pack do Ultra de quem está na luta (o do time do jogador ou o do CPU). */
+    private UltraPack ultraPackOf(CombatFighter f) {
+        return f == engine.fighter(PLAYER) ? ultraPacks[engine.team(PLAYER).point] : cpuUltraPack(f.state);
     }
 
     /** Faixas pretas do Ultra: entram rápido na ativação e saem quando a luta volta. */
@@ -1550,7 +1570,7 @@ public class GameView extends SurfaceView
                 ultraSounds.play(ultraAttackerFolder(), "explosao");
                 // A explosão do raio é o último dano do Ultra: impact frame em quem apanhou.
                 CombatFighter d = engine.fighter(1 - ultraAttacker);
-                if (pausa.impacto()) feel.impactFrame(ImpactFeel.VOID, d.x, chestY(d));
+                if (pausa.impacto()) feel.impactFrame(ultraFinalImpact, d.x, chestY(d));
             } else {
                 beamLastHitClock = beamClock;
                 beamShake = Math.max(beamShake, 5f);

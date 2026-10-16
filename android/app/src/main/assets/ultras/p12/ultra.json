@@ -2,6 +2,13 @@
   "nome": "Último Suspiro",
   "cor": "#B3122E",
   "corSecundaria": "#FF9AA8",
+  "estilo": {
+    "pagina": "quebrada",
+    "abertura": "racha",
+    "camera": "sombria",
+    "impacto": "vermelho",
+    "camaraLenta": 0.4
+  },
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",

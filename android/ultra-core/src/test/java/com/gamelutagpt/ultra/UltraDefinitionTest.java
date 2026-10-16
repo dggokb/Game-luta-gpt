@@ -30,7 +30,26 @@ public class UltraDefinitionTest {
             assertEquals(id + ": corte da abertura", "corte.png", d.opening.cutInPath);
             assertEquals(id + ": palco da abertura", "palco.jpg", d.opening.stagePath);
             assertNotNull(id + ": grito", d.opening.shout);
+            assertTrue(id + ": página " + d.style.page, d.style.page != null && PaginaLayout.isKnown(d.style.page));
+            assertTrue(id + ": abertura " + d.style.opening,
+                d.style.opening != null && AberturaUltra.isKnownStyle(d.style.opening));
+            assertNotNull(id + ": câmera", d.style.camera);
+            assertTrue(id + ": impacto " + d.style.impact,
+                "vazio".equals(d.style.impact) || "vermelho".equals(d.style.impact));
+            assertTrue(id + ": câmera lenta", d.style.slowMotion > 0f && d.style.slowMotion <= 1f);
         }
+    }
+
+    @Test public void theStyleIsOptionalAndTheCameraCanBeAListOfShots() {
+        UltraDefinition plain = UltraDefinition.fromJson("{\"nome\": \"Teste\"}");
+        assertSame(UltraDefinition.Style.DEFAULT, plain.style);
+        UltraDefinition d = UltraDefinition.fromJson("{\"nome\": \"Teste\", \"estilo\": {\"pagina\": \"leque\", "
+            + "\"camera\": [\"baixo\", \"close\"], \"camaraLenta\": 0.25}}");
+        assertEquals("leque", d.style.page);
+        assertNull(d.style.camera);
+        assertArrayEquals(new String[] {"baixo", "close"}, d.style.shots);
+        assertEquals(0.25f, d.style.slowMotion, 0f);
+        assertNull(d.style.opening);
     }
 
     @Test public void theOpeningIsOptional() {

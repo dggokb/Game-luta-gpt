@@ -57,23 +57,9 @@ public final class PaginaFinal {
 
     // ---------------------------------------------------------- layout
 
-    private static final float[][] PANELS = {
-        {28f, 28f, 1252f, 28f, 1252f, 206f, 28f, 246f},
-        {28f, 266f, 470f, 256f, 420f, 692f, 28f, 692f},
-        {490f, 255f, 1252f, 226f, 1252f, 452f, 462f, 470f},
-        {460f, 490f, 1252f, 472f, 1252f, 692f, 440f, 692f},
-        {-40f, -40f, VW + 40f, -40f, VW + 40f, VH + 40f, -40f, VH + 40f}
-    };
-    /** Onde cada onomatopeia aparece (x, y, rotação, tamanho). */
-    private static final float[][] SFX_SPOT = {
-        {0f, 0f, 0f, 0f},
-        {250f, 650f, -10f, 64f},
-        {960f, 395f, -8f, 104f},
-        {1010f, 610f, 7f, 86f},
-        {640f, 210f, -6f, 150f}
-    };
+    /** Onde ficam os painéis e a faixa do nome: o modelo de página do ultra.json. */
+    private PaginaLayout layout = PaginaLayout.CLASSICA_LAYOUT;
 
-    private static final int PAPER = 0xFFF1ECE1;
     private static final int INK = ArteProvisoria.INK;
     private static final int WHITE = ArteProvisoria.WHITE;
 
@@ -106,6 +92,10 @@ public final class PaginaFinal {
     private final float[] panelBuffer = new float[8];
     private final float[] shadowBuffer = new float[8];
     private final float[] stripBuffer = new float[8];
+    private final float[] backBuffer = new float[8];
+    private final PaginaLayout.Frame frameBuffer = new PaginaLayout.Frame();
+    private final PaginaLayout.Frame fullFrame = PaginaLayout.frame(
+        new float[] {-40f, -40f, VW + 40f, -40f, VW + 40f, VH + 40f, -40f, VH + 40f}, new PaginaLayout.Frame());
     private static final UltraSlot[] SLOTS = UltraSlot.values();
 
     private UltraPack pack;
@@ -136,6 +126,7 @@ public final class PaginaFinal {
     public void start(UltraPack pack, int facing) {
         this.pack = pack;
         this.facing = facing >= 0 ? 1 : -1;
+        layout = PaginaLayout.byName(pack.definition.style.page);
         active = true;
         time = 0f;
         hitStop = 0f;
@@ -345,13 +336,14 @@ public final class PaginaFinal {
 
     private void drawPage(RenderCanvas c) {
         int paperAlpha = (int)(255f * ArteProvisoria.clamp01(time / PAGE_FADE));
-        c.fillRect(-60f, -60f, VW + 60f, VH + 60f, ArteProvisoria.withAlpha(PAPER, paperAlpha));
+        c.fillRect(-60f, -60f, VW + 60f, VH + 60f, ArteProvisoria.withAlpha(layout.paper, paperAlpha));
 
         boolean finalCoversAll = time >= SLAM_AT[4] + FINAL_EXPAND;
         if (!finalCoversAll) {
+            drawBackdrop(c, paperAlpha);
             for (int i = 0; i < 4; i++) {
                 UltraSlot slot = SLOTS[i];
-                if (time >= SLAM_AT[i]) drawPanel(c, slot, PANELS[i], time - SLAM_AT[i]);
+                if (time >= SLAM_AT[i]) drawPanel(c, slot, layout.panels[i], time - SLAM_AT[i]);
             }
             drawName(c);
             drawSfx(c, UltraSlot.CARGA, SLAM_AT[1] + 0.10f);
@@ -362,8 +354,8 @@ public final class PaginaFinal {
         if (time >= SLAM_AT[4]) {
             float age = time - SLAM_AT[4];
             float e = ArteProvisoria.easeOutCubic(ArteProvisoria.clamp01(age / FINAL_EXPAND));
-            float[] from = PANELS[3];
-            float[] to = PANELS[4];
+            float[] from = layout.panels[3];
+            float[] to = layout.panels[4];
             for (int i = 0; i < 8; i++) panelBuffer[i] = from[i] + (to[i] - from[i]) * e;
             drawPanelBody(c, UltraSlot.FINAL, panelBuffer, age);
             drawRing(c);
@@ -378,8 +370,22 @@ public final class PaginaFinal {
         float cy = (poly[1] + poly[3] + poly[5] + poly[7]) * 0.25f;
 
         c.save();
-        c.scale(1f + 0.30f * u * u, 1f + 0.30f * u * u, cx, cy);
-        c.rotate((slot.ordinal() % 2 == 0 ? 6f : -6f) * u * u, cx, cy);
+        float side = slot.ordinal() % 2 == 0 ? 1f : -1f;
+        if (layout.slam == PaginaLayout.SLAM_SLIDE) {
+            // Entra deslizando ao longo da tira, como um corte de espada.
+            PaginaLayout.Frame f = PaginaLayout.frame(poly, frameBuffer);
+            double a = Math.toRadians(f.angle);
+            float d = 520f * u * u * u * side;
+            c.translate((float)Math.cos(a) * d, (float)Math.sin(a) * d);
+        } else if (layout.slam == PaginaLayout.SLAM_SPIN) {
+            // Cai girando, como uma foto jogada na mesa.
+            c.scale(1f + 0.18f * u * u, 1f + 0.18f * u * u, cx, cy);
+            c.rotate(22f * side * u * u, cx, cy);
+            c.translate(0f, -60f * u * u);
+        } else {
+            c.scale(1f + 0.30f * u * u, 1f + 0.30f * u * u, cx, cy);
+            c.rotate(6f * side * u * u, cx, cy);
+        }
 
         float[] shadow = shadowBuffer;
         for (int i = 0; i < 8; i += 2) {
@@ -398,22 +404,23 @@ public final class PaginaFinal {
     }
 
     private void drawPanelBody(RenderCanvas c, UltraSlot slot, float[] poly, float age) {
-        float l = Math.min(Math.min(poly[0], poly[2]), Math.min(poly[4], poly[6]));
-        float r = Math.max(Math.max(poly[0], poly[2]), Math.max(poly[4], poly[6]));
-        float t = Math.min(Math.min(poly[1], poly[3]), Math.min(poly[5], poly[7]));
-        float b = Math.max(Math.max(poly[1], poly[3]), Math.max(poly[5], poly[7]));
-
         c.save();
         c.clipPolygon(poly);
-        drawSlotContent(c, slot, l, t, r, b, age);
+        drawSlotContent(c, slot, PaginaLayout.frame(poly, frameBuffer), age);
         c.restore();
-        c.strokePolygon(poly, slot == UltraSlot.FINAL ? 10f : 8f, INK);
+        float width = slot == UltraSlot.FINAL ? layout.borderWidth + 2f : layout.borderWidth;
+        if (layout.border != INK) c.strokePolygon(poly, width + 4f, INK);
+        c.strokePolygon(poly, width, slot == UltraSlot.FINAL ? INK : layout.border);
     }
 
-    /** Conteúdo do painel com movimento de câmera lento (zoom contínuo). */
-    private void drawSlotContent(RenderCanvas c, UltraSlot slot, float l, float t, float r, float b, float age) {
-        float cx = (l + r) * 0.5f;
-        float cy = (t + b) * 0.5f;
+    /**
+     * Conteúdo do painel com movimento de câmera lento (zoom contínuo), alinhado com o painel:
+     * se ele é inclinado, a imagem também é.
+     */
+    private void drawSlotContent(RenderCanvas c, UltraSlot slot, PaginaLayout.Frame f, float age) {
+        float cx = f.cx;
+        float cy = f.cy;
+        float l = cx - f.w * 0.5f, r = cx + f.w * 0.5f, t = cy - f.h * 0.5f, b = cy + f.h * 0.5f;
         float zoom = slot == UltraSlot.FINAL
             ? 1.02f + 0.10f * ArteProvisoria.clamp01(age / 1.2f)
             : 1.03f + 0.09f * ArteProvisoria.clamp01(age / 1.6f);
@@ -423,6 +430,7 @@ public final class PaginaFinal {
         float fx = slotFx(slot);
 
         c.save();
+        if (f.angle != 0f) c.rotate(f.angle, cx, cy);
         c.scale(zoom, zoom, cx, cy);
         if (facing < 0) c.scale(-1f, 1f, cx, cy);
 
@@ -456,26 +464,78 @@ public final class PaginaFinal {
     private void drawName(RenderCanvas c) {
         if (time < NAME_AT) return;
         float t = ArteProvisoria.easeOutCubic(ArteProvisoria.clamp01((time - NAME_AT) / 0.18f));
-        float offset = (1f - t) * 900f;
+        float offset = (1f - t) * 900f * layout.nameSide;
 
         // A faixa atravessa a borda de baixo do primeiro painel, como nos mangás.
+        c.save();
+        c.translate(layout.nameX + offset, layout.nameY);
+        if (layout.nameAngle != 0f) c.rotate(layout.nameAngle, 0f, 0f);
         float[] strip = stripBuffer;
-        strip[0] = 650f + offset;  strip[1] = 206f;
-        strip[2] = 1266f + offset; strip[3] = 188f;
-        strip[4] = 1266f + offset; strip[5] = 262f;
-        strip[6] = 616f + offset;  strip[7] = 280f;
-        c.fillPolygon(strip, INK);
+        strip[0] = -291f; strip[1] = -28f;
+        strip[2] = 325f;  strip[3] = -46f;
+        strip[4] = 325f;  strip[5] = 28f;
+        strip[6] = -325f; strip[7] = 46f;
+        boolean colored = layout.strip == PaginaLayout.STRIP_COLOR;
+        c.fillPolygon(strip, colored ? pack.definition.color : INK);
+        if (colored) c.strokePolygon(strip, 5f, INK);
         c.drawText(
             pack.definition.name,
-            945f + offset,
-            255f,
+            4f,
+            21f,
             fitTextSize(pack.definition.name, 58f, 580f),
-            pack.definition.color,
-            WHITE,
+            colored ? WHITE : pack.definition.color,
+            colored ? INK : WHITE,
             5f,
             true
         );
-        c.drawText("ULTRA", 708f + offset, 204f, 26f, WHITE, INK, 8f, true);
+        c.drawText("ULTRA", -233f, -30f, 26f, WHITE, INK, 8f, true);
+        c.restore();
+    }
+
+    /** O desenho atrás dos painéis, que dá o clima de cada modelo de página. */
+    private void drawBackdrop(RenderCanvas c, int alpha) {
+        int color = pack.definition.color;
+        if (layout.backdrop == PaginaLayout.BACK_SLASH) {
+            // Um rasgo largo na cor do Ultra, na diagonal das tiras, com bordas de tinta.
+            float[] p = backBuffer;
+            float a = (float)Math.tan(Math.toRadians(layout.nameAngle));
+            float y0 = VH * 0.58f, half = 150f;
+            p[0] = -60f; p[1] = y0 - half - a * (VW * 0.5f + 60f);
+            p[2] = VW + 60f; p[3] = y0 - half + a * (VW * 0.5f + 60f);
+            p[4] = VW + 60f; p[5] = y0 + half + a * (VW * 0.5f + 60f);
+            p[6] = -60f; p[7] = y0 + half - a * (VW * 0.5f + 60f);
+            c.fillPolygon(p, ArteProvisoria.withAlpha(color, alpha));
+            c.strokePolygon(p, 6f, ArteProvisoria.withAlpha(INK, alpha));
+        } else if (layout.backdrop == PaginaLayout.BACK_RAYS) {
+            // Raios suaves saindo do centro da página.
+            float cx = VW * 0.5f, cy = VH * 0.62f;
+            for (int i = 0; i < 28; i++) {
+                double a0 = i * Math.PI * 2 / 28 + time * 0.08;
+                double a1 = a0 + Math.PI / 56;
+                float[] p = backBuffer;
+                p[0] = cx; p[1] = cy;
+                p[2] = cx + (float)Math.cos(a0) * 1500f; p[3] = cy + (float)Math.sin(a0) * 1500f;
+                p[4] = cx + (float)Math.cos(a1) * 1500f; p[5] = cy + (float)Math.sin(a1) * 1500f;
+                p[6] = cx; p[7] = cy;
+                if ((i & 1) == 0) c.fillPolygon(p, ArteProvisoria.withAlpha(color, alpha * 2 / 5));
+            }
+        } else if (layout.backdrop == PaginaLayout.BACK_CRACKS) {
+            // Rachaduras brancas pela página preta, saindo de trás dos painéis.
+            rand.reset(4242);
+            for (int i = 0; i < 14; i++) {
+                float x = rand.range(0f, VW), y = rand.range(0f, VH);
+                float angle = rand.range(0f, (float)(Math.PI * 2));
+                for (int s = 0; s < 5; s++) {
+                    angle += rand.range(-0.6f, 0.6f);
+                    float step = rand.range(40f, 110f);
+                    float nx = x + (float)Math.cos(angle) * step, ny = y + (float)Math.sin(angle) * step;
+                    c.drawLine(x, y, nx, ny, 3.5f - s * 0.5f, ArteProvisoria.withAlpha(WHITE, alpha * 2 / 3));
+                    x = nx;
+                    y = ny;
+                }
+            }
+            c.fillRadialGlow(VW * 0.5f, VH * 0.55f, 700f, ArteProvisoria.withAlpha(color, alpha / 4));
+        }
     }
 
     private static float fitTextSize(String text, float max, float width) {
@@ -491,18 +551,18 @@ public final class PaginaFinal {
 
         float age = time - at;
         if (slot != UltraSlot.FINAL && time >= SLAM_AT[4] + FINAL_EXPAND) return;
-        float[] spot = SFX_SPOT[slot.ordinal()];
+        float[] spot = layout.sfx[slot.ordinal()];
         float x = spot[0];
         float y = spot[1];
         float[] custom = pack.definition.panel(slot).onomatopoeiaPosition;
         if (custom != null) {
-            float[] poly = PANELS[slot.ordinal()];
-            float l = Math.max(0f, Math.min(Math.min(poly[0], poly[2]), Math.min(poly[4], poly[6])));
-            float r = Math.min(VW, Math.max(Math.max(poly[0], poly[2]), Math.max(poly[4], poly[6])));
-            float t = Math.max(0f, Math.min(Math.min(poly[1], poly[3]), Math.min(poly[5], poly[7])));
-            float b = Math.min(VH, Math.max(Math.max(poly[1], poly[3]), Math.max(poly[5], poly[7])));
-            x = l + (r - l) * custom[0];
-            y = t + (b - t) * custom[1];
+            // Fração do painel (no quadro dele), presa dentro da tela.
+            PaginaLayout.Frame f = slot == UltraSlot.FINAL ? fullFrame
+                : PaginaLayout.frame(layout.panels[slot.ordinal()], frameBuffer);
+            double a = Math.toRadians(f.angle);
+            float lx = (custom[0] - 0.5f) * f.w, ly = (custom[1] - 0.5f) * f.h;
+            x = Math.max(40f, Math.min(VW - 40f, f.cx + lx * (float)Math.cos(a) - ly * (float)Math.sin(a)));
+            y = Math.max(60f, Math.min(VH - 10f, f.cy + lx * (float)Math.sin(a) + ly * (float)Math.cos(a)));
         }
         float pop = ArteProvisoria.clamp01(age / 0.10f);
         float scale = 1.7f - 0.7f * ArteProvisoria.easeOutCubic(pop);
@@ -578,7 +638,7 @@ public final class PaginaFinal {
             c.scale(shrink, shrink, shard.cx, shard.cy);
             c.save();
             c.clipPolygon(shard.poly);
-            drawSlotContent(c, UltraSlot.FINAL, -40f, -40f, VW + 40f, VH + 40f, detonationAge + 0.8f);
+            drawSlotContent(c, UltraSlot.FINAL, fullFrame, detonationAge + 0.8f);
             c.restore();
             c.strokePolygon(shard.poly, 5f, INK);
             c.restore();
