@@ -12,11 +12,13 @@
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",
-    "grito": "Segura essa!"
+    "grito": "Segura essa!",
+    "focoPalco": 0.5
   },
   "paineis": {
     "olhos": {
-      "imagem": "olhos.jpg"
+      "imagem": "olhos.jpg",
+      "foco": 0.47
     },
     "carga": {
       "imagem": "carga.jpg",
@@ -28,7 +30,8 @@
     },
     "golpe": {
       "imagem": "golpe.jpg",
-      "onomatopeia": "POW!"
+      "onomatopeia": "POW!",
+      "foco": 0.5
     },
     "final": {
       "imagem": "final.jpg",
