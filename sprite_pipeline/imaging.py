@@ -70,6 +70,18 @@ def image_rgba(frame, options=None):
                 candidate[artwork] = 255
                 interior = cv2.erode((candidate > 32).astype(np.uint8),
                                      np.ones((3,3), np.uint8), iterations=inset)
+                enclosed_only = options.get('green_art_enclosed_only', False)
+                if type(enclosed_only) is not bool:
+                    raise CalibrationError('green_art_enclosed_only deve ser booleano')
+                if enclosed_only:
+                    # Compression/spill around hair, dust and the floor can be
+                    # green but differ from the nominal chroma. Such pixels are
+                    # still connected to the exterior screen; do not restore
+                    # them as clothing. Enclosed green details keep protection.
+                    _, labels = cv2.connectedComponents(green.astype(np.uint8), 8)
+                    exterior = np.unique(np.concatenate((labels[0], labels[-1], labels[:,0], labels[:,-1])))
+                    exterior = exterior[exterior != 0]
+                    interior[np.isin(labels, exterior)] = 0
                 # Restore only the interior: keeping the original matte at the
                 # contour avoids turning green spill into an opaque outline.
                 alpha[artwork & (interior != 0)] = 255

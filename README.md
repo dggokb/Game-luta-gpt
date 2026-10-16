@@ -6,7 +6,9 @@ A escala de referência é calculada a partir de uma pose equivalente ao Idle Ma
 
 ## Ver no celular
 
-**Ensaio mais recente:** [dash de P02, P06, P08 e P11, com sequência Idle → dash → Idle](docs/ENSAIO-DASH-4-PERSONAGENS.md). P02/P11 passam nos controles; P06/P08 ainda impedem adotar o método como padrão para todos. [APK de teste — 8,1 MB](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-dash-4-personagens.apk).
+**Entrega mais recente:** [triagem seletiva: 8 casos corrigidos, 2 mantidos e 3 pendentes](docs/TRIAGEM-SELETIVA.md). Inclui APK de comparação e 531 PNGs candidatos; preserva P02, P06, P08 e P11 como referência visual aceita.
+
+**Ensaio anterior:** [dash de P02, P06, P08 e P11, com sequência Idle → dash → Idle](docs/ENSAIO-DASH-4-PERSONAGENS.md). P02/P11 passam nos controles; P06/P08 ainda impedem adotar o método como padrão para todos. [APK de teste — 8,1 MB](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-dash-4-personagens.apk).
 
 **Revisão de tamanho da P02:** foi confirmado aumento durante o dash que a comparação com Idle não detectava. Há um [APK pequeno de teste com um ciclo só de dash](docs/REVISAO-P02-DASH.md), estabilizado pela própria corrida e comparado ao teste anterior; o Idle serve apenas para a escala geral. O APK completo 1.5 abaixo ainda contém esse problema e não foi revalidado entre todas as poses.
 

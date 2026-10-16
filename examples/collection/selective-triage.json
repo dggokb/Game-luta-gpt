@@ -1,0 +1,223 @@
+{
+  "description": "Selective triage: preserve existing scale and vertical pose, change only confirmed X drift and exterior chroma restoration.",
+  "minimum_patch_correlation": 0.8,
+  "search_radius_px": 600,
+  "approved_visual_reference": {
+    "characters": [
+      "p02",
+      "p06",
+      "p08",
+      "p11"
+    ],
+    "user_message": "Deu certo",
+    "apk_sha256": "986c622f44b972550c4213e34dd795a082535214020776258b4fd9abf02f8f14",
+    "technical_gates_not_overridden": true
+  },
+  "cases": [
+    {
+      "id": "p01_dash",
+      "character": "p01",
+      "clip": "dash",
+      "source_sha256": "c8ecbe2b1aa04be5c19c62339f3d277a1410cfa8c65ba7e8e4cb7df64f6cb90b",
+      "decision": "preserved",
+      "label": "P01 — dash",
+      "matte_enclosed_only": false
+    },
+    {
+      "id": "p03_dash",
+      "character": "p03",
+      "clip": "dash",
+      "source_sha256": "27fa0dbf3c7d9ee162230b811fcf9364e344fb7c7868254ca77552817ca0ddbd",
+      "decision": "pending",
+      "label": "P03 — dash",
+      "matte_enclosed_only": false
+    },
+    {
+      "id": "p04_dash",
+      "character": "p04",
+      "clip": "dash",
+      "source_sha256": "07c59b0b3b3d209ff6b10ce98854ee5f07afc971bb65375c358b2f4bb140c776",
+      "decision": "corrected",
+      "label": "P04 — dash",
+      "matte_enclosed_only": false,
+      "start": 35,
+      "stop": 47,
+      "reference_source_frame": 40,
+      "polygon": [
+        [
+          939,
+          359
+        ],
+        [
+          965,
+          359
+        ],
+        [
+          981,
+          373
+        ],
+        [
+          973,
+          390
+        ],
+        [
+          959,
+          401
+        ],
+        [
+          942,
+          387
+        ],
+        [
+          932,
+          372
+        ]
+      ],
+      "source_hip_x": 830,
+      "root_correction": "registered_patch_x"
+    },
+    {
+      "id": "p05_dash",
+      "character": "p05",
+      "clip": "dash",
+      "source_sha256": "2f896c08a18c7840090973235cb31286d9f0c9163d5a04be35ac937495892b03",
+      "decision": "pending",
+      "label": "P05 — dash",
+      "matte_enclosed_only": false
+    },
+    {
+      "id": "p07_dash",
+      "character": "p07",
+      "clip": "dash",
+      "source_sha256": "e91fed69f2829ac7748754b2385639cbfbe32a704f85fd7d3fe8ae804d001f2e",
+      "decision": "corrected",
+      "label": "P07 — dash",
+      "matte_enclosed_only": false,
+      "start": 32,
+      "stop": 52,
+      "reference_source_frame": 40,
+      "polygon": [
+        [
+          920,
+          282
+        ],
+        [
+          966,
+          284
+        ],
+        [
+          988,
+          308
+        ],
+        [
+          986,
+          323
+        ],
+        [
+          935,
+          314
+        ],
+        [
+          913,
+          299
+        ]
+      ],
+      "source_hip_x": 850,
+      "root_correction": "registered_patch_x"
+    },
+    {
+      "id": "p09_dash",
+      "character": "p09",
+      "clip": "dash",
+      "source_sha256": "6c5e02ac90d97dec652f25ad77966c4c6bc5cd7f4b47413d728f5e2b517c5571",
+      "decision": "preserved",
+      "label": "P09 — dash",
+      "matte_enclosed_only": false
+    },
+    {
+      "id": "p10_dash",
+      "character": "p10",
+      "clip": "dash",
+      "source_sha256": "697f95f93ab44e0ff464fbdccce0b7c9b6b5da69805b8bd8ac627f47fc42a485",
+      "decision": "corrected",
+      "label": "P10 — dash",
+      "matte_enclosed_only": true,
+      "start": 45,
+      "stop": 59,
+      "reference_source_frame": 51,
+      "source_hip_x": 730,
+      "root_correction": "annotated_eye_x",
+      "source_eye_x": [
+        784,
+        797,
+        799,
+        802,
+        807,
+        816,
+        817,
+        817,
+        825,
+        829,
+        830,
+        833,
+        846,
+        850
+      ],
+      "annotation_note": "Approximate visible-eye centre X annotated in every selected source frame; horizontal registration only, no scale fitting. Estimated marking precision 2–3 source pixels. Original timestamps retained."
+    },
+    {
+      "id": "p12_dash",
+      "character": "p12",
+      "clip": "dash",
+      "source_sha256": "7442f378d8b1bb1d02639832de714f988bed7b1fe9928a24ad7f6dd054e3e086",
+      "decision": "pending",
+      "label": "P12 — dash",
+      "matte_enclosed_only": false
+    },
+    {
+      "id": "p05_walk_back",
+      "character": "p05",
+      "clip": "walk_back",
+      "label": "P05 — andar para trás",
+      "source_sha256": "05df03ceb354e4a951c3260cf0b7b51043896369636cc06aaf897bd3b28dbdf0",
+      "decision": "corrected",
+      "matte_enclosed_only": true
+    },
+    {
+      "id": "p10_back_dash",
+      "character": "p10",
+      "clip": "back_dash",
+      "label": "P10 — back dash",
+      "source_sha256": "b87e5f7f1998fc8e7cca2dce0a88f57d781896e443fcc59b36a73ccb6cc4c5d9",
+      "decision": "corrected",
+      "matte_enclosed_only": true
+    },
+    {
+      "id": "p10_walk_forward",
+      "character": "p10",
+      "clip": "walk_forward",
+      "label": "P10 — andar para frente",
+      "source_sha256": "438397921cf8fe01c33cd2bb184d1c2c99fe937d863c381378b568a0a2684c9e",
+      "decision": "corrected",
+      "matte_enclosed_only": true
+    },
+    {
+      "id": "p10_walk_back",
+      "character": "p10",
+      "clip": "walk_back",
+      "label": "P10 — andar para trás",
+      "source_sha256": "f096fb9eccffb9f445016637fc3baf060685242ded924cf19925f114451d8bdb",
+      "decision": "corrected",
+      "matte_enclosed_only": true
+    },
+    {
+      "id": "p12_walk_forward",
+      "character": "p12",
+      "clip": "walk_forward",
+      "label": "P12 — andar para frente",
+      "source_sha256": "e4a0a9b5a91b9ee4166b04dfa7a574aa6989cd11446948c36821a26cc40ce8f8",
+      "decision": "corrected",
+      "matte_enclosed_only": true
+    }
+  ]
+}

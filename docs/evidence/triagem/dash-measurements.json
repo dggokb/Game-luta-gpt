@@ -1,0 +1,2178 @@
+{
+  "p01": {
+    "start": 32,
+    "stop": 56,
+    "ref": 44,
+    "polygon": [
+      [
+        814,
+        345
+      ],
+      [
+        853,
+        348
+      ],
+      [
+        879,
+        371
+      ],
+      [
+        868,
+        398
+      ],
+      [
+        854,
+        419
+      ],
+      [
+        824,
+        397
+      ],
+      [
+        810,
+        369
+      ]
+    ],
+    "source_sha256": "c8ecbe2b1aa04be5c19c62339f3d277a1410cfa8c65ba7e8e4cb7df64f6cb90b",
+    "baseline_status": "requires_visual_review",
+    "fits": [
+      {
+        "scale_to_action_reference": 1.011775610101478,
+        "rotation_radians": 0.01753779193436048,
+        "patch_center_source_px": [
+          819.9272137282693,
+          377.85155190935893
+        ],
+        "correlation": 0.9392520971596241
+      },
+      {
+        "scale_to_action_reference": 1.010181672565759,
+        "rotation_radians": 0.012502981504480756,
+        "patch_center_source_px": [
+          821.6682680485774,
+          377.32300638051686
+        ],
+        "correlation": 0.93770806863904
+      },
+      {
+        "scale_to_action_reference": 1.0091001984064656,
+        "rotation_radians": 0.02057349190680908,
+        "patch_center_source_px": [
+          823.3407770958963,
+          378.1428979085694
+        ],
+        "correlation": 0.9383296966552734
+      },
+      {
+        "scale_to_action_reference": 1.0084315697146304,
+        "rotation_radians": 0.028591319749752857,
+        "patch_center_source_px": [
+          824.6186869362627,
+          379.21577024708256
+        ],
+        "correlation": 0.9438749440014362
+      },
+      {
+        "scale_to_action_reference": 1.0106956627086876,
+        "rotation_radians": 0.03072417111603624,
+        "patch_center_source_px": [
+          826.1491863537011,
+          379.95205131563296
+        ],
+        "correlation": 0.9373563006520271
+      },
+      {
+        "scale_to_action_reference": 1.0048603849256137,
+        "rotation_radians": 0.029069048142140307,
+        "patch_center_source_px": [
+          829.3293677283915,
+          378.3797985772143
+        ],
+        "correlation": 0.9486867785453796
+      },
+      {
+        "scale_to_action_reference": 1.0004638072930983,
+        "rotation_radians": 0.010497137860830055,
+        "patch_center_source_px": [
+          832.6583450463638,
+          376.8229522428184
+        ],
+        "correlation": 0.9647818058729172
+      },
+      {
+        "scale_to_action_reference": 0.9996260074594255,
+        "rotation_radians": 0.010235200853991513,
+        "patch_center_source_px": [
+          833.9574031285432,
+          376.9459087354353
+        ],
+        "correlation": 0.9445807114243507
+      },
+      {
+        "scale_to_action_reference": 1.00155241451868,
+        "rotation_radians": 0.010078001932488215,
+        "patch_center_source_px": [
+          834.6819244301287,
+          378.0160482180025
+        ],
+        "correlation": 0.9477033577859402
+      },
+      {
+        "scale_to_action_reference": 0.9994357225409488,
+        "rotation_radians": 0.008733939278961452,
+        "patch_center_source_px": [
+          836.7332510469167,
+          378.6574782379811
+        ],
+        "correlation": 0.9655449986457825
+      },
+      {
+        "scale_to_action_reference": 0.9932614060268755,
+        "rotation_radians": 0.0060972592907761565,
+        "patch_center_source_px": [
+          840.0603334776367,
+          378.0211154380974
+        ],
+        "correlation": 0.9666706137359142
+      },
+      {
+        "scale_to_action_reference": 0.9963957726175375,
+        "rotation_radians": 0.001755439590287463,
+        "patch_center_source_px": [
+          842.4478972199462,
+          377.08493068717996
+        ],
+        "correlation": 0.9874238362535834
+      },
+      {
+        "scale_to_action_reference": 1.0,
+        "rotation_radians": 0.0,
+        "patch_center_source_px": [
+          843.2261127596439,
+          376.9673590504451
+        ],
+        "correlation": 1.0
+      },
+      {
+        "scale_to_action_reference": 1.0017072085065226,
+        "rotation_radians": -0.005607333620399155,
+        "patch_center_source_px": [
+          844.4177278789124,
+          376.5927112053276
+        ],
+        "correlation": 0.9700316525995731
+      },
+      {
+        "scale_to_action_reference": 0.9983619791857238,
+        "rotation_radians": -0.007400587843772051,
+        "patch_center_source_px": [
+          845.469535224053,
+          377.46056266041234
+        ],
+        "correlation": 0.9591269567608833
+      },
+      {
+        "scale_to_action_reference": 0.9945413263170034,
+        "rotation_radians": -0.010703747117770654,
+        "patch_center_source_px": [
+          846.6262455626618,
+          378.0310397917367
+        ],
+        "correlation": 0.9626225009560585
+      },
+      {
+        "scale_to_action_reference": 0.9937368246352541,
+        "rotation_radians": -0.006188724695169965,
+        "patch_center_source_px": [
+          847.6795735561277,
+          378.69708834992133
+        ],
+        "correlation": 0.9626578912138939
+      },
+      {
+        "scale_to_action_reference": 0.991394320584725,
+        "rotation_radians": 0.003898504370453406,
+        "patch_center_source_px": [
+          850.8771061341979,
+          377.4123666748587
+        ],
+        "correlation": 0.9704903364181519
+      },
+      {
+        "scale_to_action_reference": 0.9939347116833425,
+        "rotation_radians": 0.0065342312696383,
+        "patch_center_source_px": [
+          853.754757519772,
+          376.2355105731449
+        ],
+        "correlation": 0.9550194256007671
+      },
+      {
+        "scale_to_action_reference": 1.0000030653422034,
+        "rotation_radians": 0.006101373463670571,
+        "patch_center_source_px": [
+          855.3372340577066,
+          376.4513881699469
+        ],
+        "correlation": 0.9576800800859928
+      },
+      {
+        "scale_to_action_reference": 1.0014447887814586,
+        "rotation_radians": 0.0059381521280819916,
+        "patch_center_source_px": [
+          855.7758205286319,
+          377.38287823721595
+        ],
+        "correlation": 0.9612127430737019
+      },
+      {
+        "scale_to_action_reference": 1.00115451300654,
+        "rotation_radians": 0.005946880097439722,
+        "patch_center_source_px": [
+          857.4735807087843,
+          378.13395307943875
+        ],
+        "correlation": 0.9610719047486782
+      },
+      {
+        "scale_to_action_reference": 0.9961457036671565,
+        "rotation_radians": 0.0036982345710751823,
+        "patch_center_source_px": [
+          859.6874581265422,
+          376.72865792376064
+        ],
+        "correlation": 0.9677061699330807
+      },
+      {
+        "scale_to_action_reference": 0.995452047006552,
+        "rotation_radians": 0.004755794615371197,
+        "patch_center_source_px": [
+          861.0024626217379,
+          376.0811125189349
+        ],
+        "correlation": 0.9610431529581547
+      }
+    ],
+    "scale_spread": 0.02038125827898753,
+    "minimum_correlation": 0.9373563006520271,
+    "output_x_spread": 6.028899502172749
+  },
+  "p03": {
+    "start": 18,
+    "stop": 38,
+    "ref": 25,
+    "polygon": [
+      [
+        883,
+        270
+      ],
+      [
+        920,
+        271
+      ],
+      [
+        941,
+        291
+      ],
+      [
+        931,
+        309
+      ],
+      [
+        918,
+        328
+      ],
+      [
+        889,
+        307
+      ],
+      [
+        877,
+        283
+      ]
+    ],
+    "source_sha256": "27fa0dbf3c7d9ee162230b811fcf9364e344fb7c7868254ca77552817ca0ddbd",
+    "baseline_status": "rejected",
+    "fits": [
+      {
+        "scale_to_action_reference": 1.0041723182464972,
+        "rotation_radians": 0.007127387918012001,
+        "patch_center_source_px": [
+          908.0549885293003,
+          293.29156976039434
+        ],
+        "correlation": 0.9417900778353214
+      },
+      {
+        "scale_to_action_reference": 1.007272468570078,
+        "rotation_radians": -0.0013618623017218562,
+        "patch_center_source_px": [
+          911.5966508625486,
+          293.24906621626076
+        ],
+        "correlation": 0.9406976699829102
+      },
+      {
+        "scale_to_action_reference": 1.0025717192253338,
+        "rotation_radians": -0.003151639399892259,
+        "patch_center_source_px": [
+          912.3168735875803,
+          293.46899821927167
+        ],
+        "correlation": 0.9417730756103992
+      },
+      {
+        "scale_to_action_reference": 0.9961350893872083,
+        "rotation_radians": -0.010161766856362333,
+        "patch_center_source_px": [
+          908.9136646727222,
+          294.03990666649054
+        ],
+        "correlation": 0.9486432075500488
+      },
+      {
+        "scale_to_action_reference": 0.9842929566135293,
+        "rotation_radians": 0.0072156316896442715,
+        "patch_center_source_px": [
+          903.571531361963,
+          295.2602940128919
+        ],
+        "correlation": 0.9666793383657932
+      },
+      {
+        "scale_to_action_reference": 0.9933567190502103,
+        "rotation_radians": 0.015103567582021605,
+        "patch_center_source_px": [
+          903.9081357045746,
+          295.0708254215071
+        ],
+        "correlation": 0.9797301199287176
+      },
+      {
+        "scale_to_action_reference": 0.9904721872234145,
+        "rotation_radians": 0.019306171979913706,
+        "patch_center_source_px": [
+          905.1812113961003,
+          294.92380788102366
+        ],
+        "correlation": 0.9828652571886778
+      },
+      {
+        "scale_to_action_reference": 1.0,
+        "rotation_radians": 0.0,
+        "patch_center_source_px": [
+          908.5945159950145,
+          293.9700872455339
+        ],
+        "correlation": 1.0
+      },
+      {
+        "scale_to_action_reference": 0.9960878184170704,
+        "rotation_radians": -0.003166242002538362,
+        "patch_center_source_px": [
+          909.6187913484131,
+          294.6567195967453
+        ],
+        "correlation": 0.979601189494133
+      },
+      {
+        "scale_to_action_reference": 0.9919188248396106,
+        "rotation_radians": -0.007716706111688101,
+        "patch_center_source_px": [
+          907.207569973624,
+          295.76630724387945
+        ],
+        "correlation": 0.9722240976989269
+      },
+      {
+        "scale_to_action_reference": 0.9860238854489983,
+        "rotation_radians": -0.00921904270173163,
+        "patch_center_source_px": [
+          905.4990982287561,
+          296.20885190399736
+        ],
+        "correlation": 0.963808611035347
+      },
+      {
+        "scale_to_action_reference": 0.9901618780304786,
+        "rotation_radians": -0.00011578463575686617,
+        "patch_center_source_px": [
+          908.1287035244145,
+          294.7946088718282
+        ],
+        "correlation": 0.9643840342760086
+      },
+      {
+        "scale_to_action_reference": 0.9972116492720258,
+        "rotation_radians": 0.013106934254206466,
+        "patch_center_source_px": [
+          912.8253268038534,
+          293.2200332846513
+        ],
+        "correlation": 0.9460490047931671
+      },
+      {
+        "scale_to_action_reference": 0.9946273339061034,
+        "rotation_radians": 0.011388469713245643,
+        "patch_center_source_px": [
+          912.7100215017477,
+          293.3517194837688
+        ],
+        "correlation": 0.9431920796632767
+      },
+      {
+        "scale_to_action_reference": 0.9897679603335053,
+        "rotation_radians": 0.011019415502908182,
+        "patch_center_source_px": [
+          911.3588189646837,
+          293.9050392648002
+        ],
+        "correlation": 0.939129501581192
+      },
+      {
+        "scale_to_action_reference": 0.9928308011077629,
+        "rotation_radians": 0.017494293890572887,
+        "patch_center_source_px": [
+          909.7157163243703,
+          294.179531567612
+        ],
+        "correlation": 0.9482547789812088
+      },
+      {
+        "scale_to_action_reference": 0.9873130253249557,
+        "rotation_radians": 0.019682852533451974,
+        "patch_center_source_px": [
+          912.0309892894963,
+          293.53773016316757
+        ],
+        "correlation": 0.9447800479829311
+      },
+      {
+        "scale_to_action_reference": 0.9758566838709246,
+        "rotation_radians": 0.019411796819265758,
+        "patch_center_source_px": [
+          917.0118109330494,
+          292.871919621996
+        ],
+        "correlation": 0.9504647739231586
+      },
+      {
+        "scale_to_action_reference": 0.978500478253287,
+        "rotation_radians": 0.01366717959264607,
+        "patch_center_source_px": [
+          919.5816872286073,
+          293.0367021008966
+        ],
+        "correlation": 0.9440458603203297
+      },
+      {
+        "scale_to_action_reference": 0.9642115726528063,
+        "rotation_radians": 0.017467153883846204,
+        "patch_center_source_px": [
+          920.841106457094,
+          293.20769394257087
+        ],
+        "correlation": 0.9257050380110741
+      }
+    ],
+    "scale_spread": 0.043391766250332545,
+    "minimum_correlation": 0.9257050380110741
+  },
+  "p04": {
+    "start": 35,
+    "stop": 47,
+    "ref": 40,
+    "polygon": [
+      [
+        939,
+        359
+      ],
+      [
+        965,
+        359
+      ],
+      [
+        981,
+        373
+      ],
+      [
+        973,
+        390
+      ],
+      [
+        959,
+        401
+      ],
+      [
+        942,
+        387
+      ],
+      [
+        932,
+        372
+      ]
+    ],
+    "source_sha256": "07c59b0b3b3d209ff6b10ce98854ee5f07afc971bb65375c358b2f4bb140c776",
+    "baseline_status": "requires_visual_review",
+    "fits": [
+      {
+        "scale_to_action_reference": 1.0375324343015606,
+        "rotation_radians": 0.002494364610826215,
+        "patch_center_source_px": [
+          955.4377896098931,
+          375.50725980419134
+        ],
+        "correlation": 0.879193902015686
+      },
+      {
+        "scale_to_action_reference": 1.03930892102711,
+        "rotation_radians": 0.0030432352731924474,
+        "patch_center_source_px": [
+          955.482501480794,
+          375.57236313086986
+        ],
+        "correlation": 0.8824585825204849
+      },
+      {
+        "scale_to_action_reference": 1.0354101966249685,
+        "rotation_radians": 0.008610230718279044,
+        "patch_center_source_px": [
+          955.672179662716,
+          373.7072597312602
+        ],
+        "correlation": 0.9366112872958183
+      },
+      {
+        "scale_to_action_reference": 1.009382652652747,
+        "rotation_radians": 0.0070114122059171165,
+        "patch_center_source_px": [
+          956.1892612126825,
+          374.7729679560871
+        ],
+        "correlation": 0.9650245048105717
+      },
+      {
+        "scale_to_action_reference": 1.0005809210897245,
+        "rotation_radians": 0.004038564876198873,
+        "patch_center_source_px": [
+          956.5525357932273,
+          375.98254283997704
+        ],
+        "correlation": 0.9808227028697729
+      },
+      {
+        "scale_to_action_reference": 1.0,
+        "rotation_radians": 0.0,
+        "patch_center_source_px": [
+          956.536917562724,
+          376.61075268817206
+        ],
+        "correlation": 1.0
+      },
+      {
+        "scale_to_action_reference": 0.9975360057097379,
+        "rotation_radians": -0.0015153563315807078,
+        "patch_center_source_px": [
+          957.3067219967828,
+          376.4440954119537
+        ],
+        "correlation": 0.9579464830458164
+      },
+      {
+        "scale_to_action_reference": 1.019757517090924,
+        "rotation_radians": 0.0037741777850056175,
+        "patch_center_source_px": [
+          956.7200599471682,
+          374.77088090924184
+        ],
+        "correlation": 0.9263492673635483
+      },
+      {
+        "scale_to_action_reference": 1.0253403090036868,
+        "rotation_radians": 0.0018434971020211404,
+        "patch_center_source_px": [
+          958.2994679117289,
+          373.4208134821211
+        ],
+        "correlation": 0.8971676602959633
+      },
+      {
+        "scale_to_action_reference": 1.035259260736587,
+        "rotation_radians": 0.003473887464496769,
+        "patch_center_source_px": [
+          958.4955567361338,
+          374.45239338114754
+        ],
+        "correlation": 0.8861382156610489
+      },
+      {
+        "scale_to_action_reference": 1.0092130923307523,
+        "rotation_radians": 0.0005621817088847679,
+        "patch_center_source_px": [
+          957.1809532263416,
+          376.47715000101203
+        ],
+        "correlation": 0.8899584338068962
+      },
+      {
+        "scale_to_action_reference": 0.9979857011991589,
+        "rotation_radians": -0.011159128567511396,
+        "patch_center_source_px": [
+          955.213305307092,
+          377.89351195759093
+        ],
+        "correlation": 0.8698044270277023
+      }
+    ],
+    "scale_spread": 0.04117302090830824,
+    "minimum_correlation": 0.8698044270277023,
+    "output_x_spread": 255.00872678485905
+  },
+  "p05": {
+    "start": 0,
+    "stop": 97,
+    "ref": 25,
+    "polygon": [
+      [
+        759,
+        299
+      ],
+      [
+        795,
+        296
+      ],
+      [
+        817,
+        313
+      ],
+      [
+        810,
+        334
+      ],
+      [
+        797,
+        352
+      ],
+      [
+        774,
+        339
+      ],
+      [
+        754,
+        316
+      ]
+    ],
+    "source_sha256": "2f896c08a18c7840090973235cb31286d9f0c9163d5a04be35ac937495892b03",
+    "baseline_status": "rejected",
+    "fits": [
+      {
+        "scale_to_action_reference": 0.9964073114147,
+        "rotation_radians": -0.013555807852390417,
+        "patch_center_source_px": [
+          786.7502432984672,
+          317.8540519664772
+        ],
+        "correlation": 0.9474914707243443
+      },
+      {
+        "scale_to_action_reference": 1.0079793659755736,
+        "rotation_radians": -0.0052557371280712,
+        "patch_center_source_px": [
+          786.3330937767421,
+          319.70982548437496
+        ],
+        "correlation": 0.9612267389893532
+      },
+      {
+        "scale_to_action_reference": 1.0075493274553948,
+        "rotation_radians": -0.0016248093869038697,
+        "patch_center_source_px": [
+          785.0249646865045,
+          323.2663331335738
+        ],
+        "correlation": 0.9454574175179005
+      },
+      {
+        "scale_to_action_reference": 1.006777752396393,
+        "rotation_radians": 0.00022324834371184425,
+        "patch_center_source_px": [
+          784.6649193926304,
+          324.60324360436266
+        ],
+        "correlation": 0.9453525692224503
+      },
+      {
+        "scale_to_action_reference": 1.0006042756868967,
+        "rotation_radians": -0.004982461577594282,
+        "patch_center_source_px": [
+          784.7201265222202,
+          324.66436928123375
+        ],
+        "correlation": 0.9444533921778202
+      },
+      {
+        "scale_to_action_reference": 0.982145598834913,
+        "rotation_radians": -0.0153620024998099,
+        "patch_center_source_px": [
+          786.215845713756,
+          321.35548242920186
+        ],
+        "correlation": 0.9470673501491547
+      },
+      {
+        "scale_to_action_reference": 0.992669508531492,
+        "rotation_radians": -0.0013361466861272556,
+        "patch_center_source_px": [
+          787.0378635482965,
+          319.18541236029375
+        ],
+        "correlation": 0.9360994398593903
+      },
+      {
+        "scale_to_action_reference": 1.0168139602999766,
+        "rotation_radians": 0.004815248637048561,
+        "patch_center_source_px": [
+          786.8112276675469,
+          319.7023505135758
+        ],
+        "correlation": 0.9247501119971275
+      },
+      {
+        "scale_to_action_reference": 1.028415173857417,
+        "rotation_radians": 0.01806385255362844,
+        "patch_center_source_px": [
+          786.4027352619044,
+          320.9857470308529
+        ],
+        "correlation": 0.9211356192827225
+      },
+      {
+        "scale_to_action_reference": 1.0279586367631384,
+        "rotation_radians": 0.004892843764152653,
+        "patch_center_source_px": [
+          785.5274907817924,
+          322.0969213338963
+        ],
+        "correlation": 0.9269248247146606
+      },
+      {
+        "scale_to_action_reference": 0.9645062890980021,
+        "rotation_radians": -0.0273722272197998,
+        "patch_center_source_px": [
+          785.4999865190956,
+          319.85057086859416
+        ],
+        "correlation": 0.9448729641735554
+      },
+      {
+        "scale_to_action_reference": 0.9457307589323473,
+        "rotation_radians": -0.028054941679925623,
+        "patch_center_source_px": [
+          786.5010020581943,
+          317.5040831565376
+        ],
+        "correlation": 0.9273540303111076
+      },
+      {
+        "scale_to_action_reference": 0.9559751765437573,
+        "rotation_radians": -0.022117413348742784,
+        "patch_center_source_px": [
+          786.7456435255068,
+          317.61135525609217
+        ],
+        "correlation": 0.9386826641857624
+      },
+      {
+        "scale_to_action_reference": 0.9908550128549385,
+        "rotation_radians": -0.007839272701174791,
+        "patch_center_source_px": [
+          786.265870593653,
+          319.84600467376856
+        ],
+        "correlation": 0.9646394439041615
+      },
+      {
+        "scale_to_action_reference": 1.0208680380099915,
+        "rotation_radians": 0.006501961161054619,
+        "patch_center_source_px": [
+          784.9455769687129,
+          323.5519428587529
+        ],
+        "correlation": 0.9553421847522259
+      },
+      {
+        "scale_to_action_reference": 1.0135822365529064,
+        "rotation_radians": -0.0003584879202428834,
+        "patch_center_source_px": [
+          784.8096614579805,
+          324.6922631354398
+        ],
+        "correlation": 0.9491073824465275
+      },
+      {
+        "scale_to_action_reference": 0.9906820498938835,
+        "rotation_radians": -0.018320447015725508,
+        "patch_center_source_px": [
+          785.5014647129486,
+          323.67874899020126
+        ],
+        "correlation": 0.9302469566464424
+      },
+      {
+        "scale_to_action_reference": 0.9815078006439908,
+        "rotation_radians": -0.01897782354517201,
+        "patch_center_source_px": [
+          786.4709224356043,
+          320.053502063281
+        ],
+        "correlation": 0.939084630459547
+      },
+      {
+        "scale_to_action_reference": 1.00788751318274,
+        "rotation_radians": 0.0025537782101620787,
+        "patch_center_source_px": [
+          786.7827540387623,
+          318.6786720739486
+        ],
+        "correlation": 0.9316070154309273
+      },
+      {
+        "scale_to_action_reference": 1.0226552348756153,
+        "rotation_radians": 0.014202324332777343,
+        "patch_center_source_px": [
+          786.4678688068497,
+          319.9448867049125
+        ],
+        "correlation": 0.9215536415576935
+      },
+      {
+        "scale_to_action_reference": 1.0227853711100723,
+        "rotation_radians": 0.0042488465595583915,
+        "patch_center_source_px": [
+          786.3653112368531,
+          321.6002744826428
+        ],
+        "correlation": 0.9243432134389877
+      },
+      {
+        "scale_to_action_reference": 1.0060000279530719,
+        "rotation_radians": -0.01123511119856254,
+        "patch_center_source_px": [
+          785.8876976828641,
+          322.49104939272377
+        ],
+        "correlation": 0.9523900523781776
+      },
+      {
+        "scale_to_action_reference": 0.9654325305448632,
+        "rotation_radians": -0.02210089338587603,
+        "patch_center_source_px": [
+          786.192710629338,
+          318.7849331994065
+        ],
+        "correlation": 0.9681553542613983
+      },
+      {
+        "scale_to_action_reference": 0.9673445774934698,
+        "rotation_radians": -0.015869015244995087,
+        "patch_center_source_px": [
+          786.8904171938646,
+          317.0410977231479
+        ],
+        "correlation": 0.9714243970811367
+      },
+      {
+        "scale_to_action_reference": 0.981177937339508,
+        "rotation_radians": -0.012498074341303294,
+        "patch_center_source_px": [
+          786.9105486871289,
+          317.7664502452591
+        ],
+        "correlation": 0.9795864317566156
+      },
+      {
+        "scale_to_action_reference": 1.0,
+        "rotation_radians": 0.0,
+        "patch_center_source_px": [
+          786.2979175520612,
+          319.95665108372293
+        ],
+        "correlation": 1.0
+      },
+      {
+        "scale_to_action_reference": 0.9999757377370105,
+        "rotation_radians": 0.006545375581405345,
+        "patch_center_source_px": [
+          784.7229445569358,
+          324.00780357430904
+        ],
+        "correlation": 0.9730591643601656
+      },
+      {
+        "scale_to_action_reference": 0.9852840601078737,
+        "rotation_radians": -0.007580348141047216,
+        "patch_center_source_px": [
+          784.7294543783628,
+          324.8368054595837
+        ],
+        "correlation": 0.9583318307995796
+      },
+      {
+        "scale_to_action_reference": 0.9684541530699485,
+        "rotation_radians": -0.014344551582280835,
+        "patch_center_source_px": [
+          785.3954668264032,
+          323.76474283182097
+        ],
+        "correlation": 0.9401170015335083
+      },
+      {
+        "scale_to_action_reference": 0.973961804572937,
+        "rotation_radians": -0.017358321712529934,
+        "patch_center_source_px": [
+          786.4492957675054,
+          320.41930204939234
+        ],
+        "correlation": 0.9449831619858742
+      },
+      {
+        "scale_to_action_reference": 1.0137691269103595,
+        "rotation_radians": 0.004166373207946938,
+        "patch_center_source_px": [
+          786.2137123636593,
+          319.6701728762981
+        ],
+        "correlation": 0.9252236485481262
+      },
+      {
+        "scale_to_action_reference": 1.0234326245967822,
+        "rotation_radians": 0.016481906936516418,
+        "patch_center_source_px": [
+          785.8965262428392,
+          321.0346528571899
+        ],
+        "correlation": 0.908519558608532
+      },
+      {
+        "scale_to_action_reference": 1.011611228426215,
+        "rotation_radians": 0.008188611442394585,
+        "patch_center_source_px": [
+          785.7329361014541,
+          322.5686249680858
+        ],
+        "correlation": 0.9169860482215881
+      },
+      {
+        "scale_to_action_reference": 0.9994132713786347,
+        "rotation_radians": -0.0077016181384811635,
+        "patch_center_source_px": [
+          785.5171835455734,
+          323.2612331887211
+        ],
+        "correlation": 0.9468469209969044
+      },
+      {
+        "scale_to_action_reference": 0.9535237467470459,
+        "rotation_radians": -0.02829817763667983,
+        "patch_center_source_px": [
+          785.9591903830906,
+          318.9498179817035
+        ],
+        "correlation": 0.9424579925835133
+      },
+      {
+        "scale_to_action_reference": 0.9595405043616011,
+        "rotation_radians": -0.02748681536117901,
+        "patch_center_source_px": [
+          786.7332476662913,
+          317.0102128258456
+        ],
+        "correlation": 0.9523683898150921
+      },
+      {
+        "scale_to_action_reference": 0.9645898033750315,
+        "rotation_radians": -0.023096851484067944,
+        "patch_center_source_px": [
+          786.9789599325617,
+          317.59654313937534
+        ],
+        "correlation": 0.9536282084882259
+      },
+      {
+        "scale_to_action_reference": 0.9878405099121471,
+        "rotation_radians": -0.012313739074707926,
+        "patch_center_source_px": [
+          786.4101213262959,
+          320.1196731939562
+        ],
+        "correlation": 0.9720032829791307
+      },
+      {
+        "scale_to_action_reference": 0.9943563442279967,
+        "rotation_radians": -0.002266037964686723,
+        "patch_center_source_px": [
+          785.0609587474487,
+          323.99148324760756
+        ],
+        "correlation": 0.9594073109328747
+      },
+      {
+        "scale_to_action_reference": 0.9802342897619541,
+        "rotation_radians": -0.010868981041621838,
+        "patch_center_source_px": [
+          785.0779009084002,
+          324.95319341876086
+        ],
+        "correlation": 0.9392997585237026
+      },
+      {
+        "scale_to_action_reference": 0.966928686664344,
+        "rotation_radians": -0.026008533889228354,
+        "patch_center_source_px": [
+          785.8522419989138,
+          323.3873047887749
+        ],
+        "correlation": 0.9124694243073463
+      },
+      {
+        "scale_to_action_reference": 0.9843122561651717,
+        "rotation_radians": -0.016865455368087458,
+        "patch_center_source_px": [
+          786.7990195168132,
+          320.0550059399376
+        ],
+        "correlation": 0.9348624795675278
+      },
+      {
+        "scale_to_action_reference": 1.0099796321211005,
+        "rotation_radians": 0.00034544027520783376,
+        "patch_center_source_px": [
+          786.8272827971815,
+          319.43886512589825
+        ],
+        "correlation": 0.9126522094011307
+      },
+      {
+        "scale_to_action_reference": 1.0144581614394237,
+        "rotation_radians": 0.007320440409224597,
+        "patch_center_source_px": [
+          786.7666956133834,
+          320.626830516188
+        ],
+        "correlation": 0.9058733060956001
+      },
+      {
+        "scale_to_action_reference": 1.0307801152938325,
+        "rotation_radians": 0.01800321581929224,
+        "patch_center_source_px": [
+          786.2258303904429,
+          322.06283438764956
+        ],
+        "correlation": 0.9089265987277031
+      },
+      {
+        "scale_to_action_reference": 1.0060847054873547,
+        "rotation_radians": -0.014536169225950905,
+        "patch_center_source_px": [
+          785.8393810775544,
+          323.00466169572223
+        ],
+        "correlation": 0.9305750504136086
+      },
+      {
+        "scale_to_action_reference": 0.9568237480107274,
+        "rotation_radians": -0.02570368201090935,
+        "patch_center_source_px": [
+          786.2769801345543,
+          318.7941390920693
+        ],
+        "correlation": 0.94454175978899
+      },
+      {
+        "scale_to_action_reference": 0.9581265478609312,
+        "rotation_radians": -0.013013252116414764,
+        "patch_center_source_px": [
+          786.8917589529872,
+          316.9392077634408
+        ],
+        "correlation": 0.9515752866864204
+      },
+      {
+        "scale_to_action_reference": 0.9722402021618405,
+        "rotation_radians": -0.004597627221322171,
+        "patch_center_source_px": [
+          786.949547234653,
+          317.5054283284364
+        ],
+        "correlation": 0.9584138542413712
+      },
+      {
+        "scale_to_action_reference": 0.999622156092948,
+        "rotation_radians": 0.011226680315471724,
+        "patch_center_source_px": [
+          786.2524500729075,
+          319.7933828521619
+        ],
+        "correlation": 0.9718854669481516
+      },
+      {
+        "scale_to_action_reference": 1.0034463213148956,
+        "rotation_radians": 0.016931209060265958,
+        "patch_center_source_px": [
+          784.7296223953574,
+          324.0518134180037
+        ],
+        "correlation": 0.9590108394622803
+      },
+      {
+        "scale_to_action_reference": 0.9968250046256916,
+        "rotation_radians": 0.0014144389158504708,
+        "patch_center_source_px": [
+          784.629344879396,
+          325.3455413257168
+        ],
+        "correlation": 0.9471200257539749
+      },
+      {
+        "scale_to_action_reference": 0.9807443339853583,
+        "rotation_radians": -0.004460086842447806,
+        "patch_center_source_px": [
+          785.0602960838584,
+          324.28320916814874
+        ],
+        "correlation": 0.934010773897171
+      },
+      {
+        "scale_to_action_reference": 0.98417351901481,
+        "rotation_radians": -0.005503998527132185,
+        "patch_center_source_px": [
+          786.1264540155563,
+          320.36758947388245
+        ],
+        "correlation": 0.944032046943903
+      },
+      {
+        "scale_to_action_reference": 1.018375191666986,
+        "rotation_radians": 0.012666120071481185,
+        "patch_center_source_px": [
+          786.2924160852427,
+          318.784904890658
+        ],
+        "correlation": 0.9284626096487045
+      },
+      {
+        "scale_to_action_reference": 1.029787117076507,
+        "rotation_radians": 0.019173898627370126,
+        "patch_center_source_px": [
+          786.2839351565682,
+          320.1141921738778
+        ],
+        "correlation": 0.9184477627277374
+      },
+      {
+        "scale_to_action_reference": 1.0283483602734345,
+        "rotation_radians": 0.013571605859777196,
+        "patch_center_source_px": [
+          786.1251552819314,
+          321.71584609437156
+        ],
+        "correlation": 0.9204016625881195
+      },
+      {
+        "scale_to_action_reference": 1.0160591345179601,
+        "rotation_radians": 0.002385871039105749,
+        "patch_center_source_px": [
+          785.6294518571693,
+          322.8144404369995
+        ],
+        "correlation": 0.9403563812375069
+      },
+      {
+        "scale_to_action_reference": 0.9551397610028775,
+        "rotation_radians": -0.02842815730145802,
+        "patch_center_source_px": [
+          786.2373196733405,
+          319.57531963382985
+        ],
+        "correlation": 0.9502738453447819
+      },
+      {
+        "scale_to_action_reference": 0.9646266932871289,
+        "rotation_radians": -0.02034247573852893,
+        "patch_center_source_px": [
+          786.8991908362945,
+          317.13638703330656
+        ],
+        "correlation": 0.9569421112537384
+      },
+      {
+        "scale_to_action_reference": 0.9743606118755724,
+        "rotation_radians": -0.015909599355598294,
+        "patch_center_source_px": [
+          787.0778777194404,
+          317.3629305411177
+        ],
+        "correlation": 0.9616908617317677
+      },
+      {
+        "scale_to_action_reference": 1.0061684387749676,
+        "rotation_radians": 1.4390515931421557e-05,
+        "patch_center_source_px": [
+          786.3780247901403,
+          319.70969242838396
+        ],
+        "correlation": 0.9735666271299124
+      },
+      {
+        "scale_to_action_reference": 1.0185383871548443,
+        "rotation_radians": 0.00426291908664582,
+        "patch_center_source_px": [
+          785.0782979192537,
+          323.6939652825606
+        ],
+        "correlation": 0.947950467467308
+      },
+      {
+        "scale_to_action_reference": 1.0025079228142688,
+        "rotation_radians": 0.0025676253441526044,
+        "patch_center_source_px": [
+          784.8021931695952,
+          325.2115330920356
+        ],
+        "correlation": 0.9395711347460747
+      },
+      {
+        "scale_to_action_reference": 0.9872815419208651,
+        "rotation_radians": -0.009057586554750021,
+        "patch_center_source_px": [
+          785.2409126732492,
+          324.51484493228344
+        ],
+        "correlation": 0.9166750982403755
+      },
+      {
+        "scale_to_action_reference": 0.9645898033750315,
+        "rotation_radians": -0.024714732693311495,
+        "patch_center_source_px": [
+          787.1729190959512,
+          321.0737811932704
+        ],
+        "correlation": 0.9298655241727829
+      },
+      {
+        "scale_to_action_reference": 0.9807423166158744,
+        "rotation_radians": -0.010953037722988938,
+        "patch_center_source_px": [
+          788.0223021070965,
+          319.06935809859743
+        ],
+        "correlation": 0.9358697682619095
+      },
+      {
+        "scale_to_action_reference": 1.0187028504519884,
+        "rotation_radians": 0.013531878227421284,
+        "patch_center_source_px": [
+          787.3750118119805,
+          319.941646578815
+        ],
+        "correlation": 0.9339349195361137
+      },
+      {
+        "scale_to_action_reference": 1.0211361674043187,
+        "rotation_radians": 0.006831533899904776,
+        "patch_center_source_px": [
+          787.1528502573758,
+          321.5215993040367
+        ],
+        "correlation": 0.92526775598526
+      },
+      {
+        "scale_to_action_reference": 1.0208567809878197,
+        "rotation_radians": -2.637141307798715e-05,
+        "patch_center_source_px": [
+          786.1366845207295,
+          322.6226155281329
+        ],
+        "correlation": 0.925019733607769
+      },
+      {
+        "scale_to_action_reference": 0.9643301808298096,
+        "rotation_radians": -0.015627048718810585,
+        "patch_center_source_px": [
+          785.8443926138461,
+          319.7742837170671
+        ],
+        "correlation": 0.9432430751621723
+      },
+      {
+        "scale_to_action_reference": 0.9565753894208402,
+        "rotation_radians": -0.021115280829769382,
+        "patch_center_source_px": [
+          786.7089267548919,
+          317.3175311265009
+        ],
+        "correlation": 0.9339059069752693
+      },
+      {
+        "scale_to_action_reference": 0.9612546463918181,
+        "rotation_radians": -0.012689039528422383,
+        "patch_center_source_px": [
+          786.8816521777898,
+          317.6758746744812
+        ],
+        "correlation": 0.9372324198484421
+      },
+      {
+        "scale_to_action_reference": 0.9955605695095684,
+        "rotation_radians": 0.0003914031384988889,
+        "patch_center_source_px": [
+          786.3562935182758,
+          319.38365010001957
+        ],
+        "correlation": 0.9678176566958427
+      },
+      {
+        "scale_to_action_reference": 1.0170454582206618,
+        "rotation_radians": 0.010131141853942588,
+        "patch_center_source_px": [
+          785.2414762083511,
+          323.6600759235969
+        ],
+        "correlation": 0.9494366347789764
+      },
+      {
+        "scale_to_action_reference": 1.003206503908992,
+        "rotation_radians": 0.007670970388799607,
+        "patch_center_source_px": [
+          784.8994550390698,
+          325.1276142462314
+        ],
+        "correlation": 0.9367221295833588
+      },
+      {
+        "scale_to_action_reference": 0.9856571059380447,
+        "rotation_radians": -0.007031390446946339,
+        "patch_center_source_px": [
+          785.2938807245826,
+          324.50467403535094
+        ],
+        "correlation": 0.914843738079071
+      },
+      {
+        "scale_to_action_reference": 0.9707469840919888,
+        "rotation_radians": -0.017579351642209362,
+        "patch_center_source_px": [
+          786.8381133296085,
+          321.18560437847526
+        ],
+        "correlation": 0.9333746656775475
+      },
+      {
+        "scale_to_action_reference": 0.9957471879463567,
+        "rotation_radians": -0.004587724549324104,
+        "patch_center_source_px": [
+          787.130077602391,
+          318.58998986293886
+        ],
+        "correlation": 0.9341580793261528
+      },
+      {
+        "scale_to_action_reference": 1.0090181003608663,
+        "rotation_radians": -3.1316674587081714e-05,
+        "patch_center_source_px": [
+          786.8391120366034,
+          319.6575818824368
+        ],
+        "correlation": 0.9225846379995346
+      },
+      {
+        "scale_to_action_reference": 1.014741355794641,
+        "rotation_radians": -7.887299327292413e-05,
+        "patch_center_source_px": [
+          786.5707386044647,
+          321.3298810378667
+        ],
+        "correlation": 0.9188180044293404
+      },
+      {
+        "scale_to_action_reference": 1.0105981659149144,
+        "rotation_radians": -0.006168796214673615,
+        "patch_center_source_px": [
+          785.5839230277056,
+          322.47549776730267
+        ],
+        "correlation": 0.9337547495961189
+      },
+      {
+        "scale_to_action_reference": 0.9685086978712998,
+        "rotation_radians": -0.018879609204513693,
+        "patch_center_source_px": [
+          785.8399068383216,
+          320.9402957428289
+        ],
+        "correlation": 0.965585432946682
+      },
+      {
+        "scale_to_action_reference": 0.9628003724032895,
+        "rotation_radians": -0.02552663641200607,
+        "patch_center_source_px": [
+          786.7606976915708,
+          318.19385625524745
+        ],
+        "correlation": 0.9563456661999226
+      },
+      {
+        "scale_to_action_reference": 0.9712598640413581,
+        "rotation_radians": -0.017949995052931433,
+        "patch_center_source_px": [
+          787.1326819975981,
+          317.6023040957822
+        ],
+        "correlation": 0.9578889459371567
+      },
+      {
+        "scale_to_action_reference": 0.9979622203661509,
+        "rotation_radians": 0.005034226989218218,
+        "patch_center_source_px": [
+          786.7429653061096,
+          318.97159454981954
+        ],
+        "correlation": 0.971106231212616
+      },
+      {
+        "scale_to_action_reference": 1.0114155859187786,
+        "rotation_radians": 0.011213958338166642,
+        "patch_center_source_px": [
+          785.7480906612224,
+          322.5941705343169
+        ],
+        "correlation": 0.9571040980517864
+      },
+      {
+        "scale_to_action_reference": 1.003823945594016,
+        "rotation_radians": 0.002890712126544272,
+        "patch_center_source_px": [
+          785.6011595690255,
+          324.4948600021923
+        ],
+        "correlation": 0.9504398480057716
+      },
+      {
+        "scale_to_action_reference": 0.9873947415870435,
+        "rotation_radians": -0.005557716538787021,
+        "patch_center_source_px": [
+          785.3589515549983,
+          325.27641553438394
+        ],
+        "correlation": 0.934733472764492
+      },
+      {
+        "scale_to_action_reference": 0.9712072904991218,
+        "rotation_radians": -0.02811310982362289,
+        "patch_center_source_px": [
+          786.3001641372548,
+          322.6996715274269
+        ],
+        "correlation": 0.9280711933970451
+      },
+      {
+        "scale_to_action_reference": 0.9662312924904611,
+        "rotation_radians": -0.03766852002264716,
+        "patch_center_source_px": [
+          787.3745985065316,
+          318.3453772618163
+        ],
+        "correlation": 0.9374477714300156
+      },
+      {
+        "scale_to_action_reference": 0.9839559378056737,
+        "rotation_radians": -0.018512974895747054,
+        "patch_center_source_px": [
+          787.2303450522095,
+          317.81801821299825
+        ],
+        "correlation": 0.9514197967946529
+      },
+      {
+        "scale_to_action_reference": 0.9974631463802027,
+        "rotation_radians": -0.01606499656897402,
+        "patch_center_source_px": [
+          787.0019273123362,
+          319.06429288952944
+        ],
+        "correlation": 0.9551431685686111
+      },
+      {
+        "scale_to_action_reference": 1.0159147683549095,
+        "rotation_radians": -0.006244376022232142,
+        "patch_center_source_px": [
+          786.1601437101925,
+          321.3461519588193
+        ],
+        "correlation": 0.9559144414961338
+      },
+      {
+        "scale_to_action_reference": 1.0108018543405992,
+        "rotation_radians": -0.0059428264302972805,
+        "patch_center_source_px": [
+          785.1384376764817,
+          323.7131696516558
+        ],
+        "correlation": 0.9581795744597912
+      },
+      {
+        "scale_to_action_reference": 0.997564400217823,
+        "rotation_radians": -0.004516203053007706,
+        "patch_center_source_px": [
+          786.0544706722646,
+          323.53215537787463
+        ],
+        "correlation": 0.9545286074280739
+      },
+      {
+        "scale_to_action_reference": 0.9768235071894678,
+        "rotation_radians": -0.012758546522667362,
+        "patch_center_source_px": [
+          787.2709633976784,
+          322.06535344219475
+        ],
+        "correlation": 0.9379048869013786
+      }
+    ],
+    "scale_spread": 0.08535601393844863,
+    "minimum_correlation": 0.9058733060956001
+  },
+  "p07": {
+    "start": 32,
+    "stop": 52,
+    "ref": 40,
+    "polygon": [
+      [
+        920,
+        282
+      ],
+      [
+        966,
+        284
+      ],
+      [
+        988,
+        308
+      ],
+      [
+        986,
+        323
+      ],
+      [
+        935,
+        314
+      ],
+      [
+        913,
+        299
+      ]
+    ],
+    "source_sha256": "e91fed69f2829ac7748754b2385639cbfbe32a704f85fd7d3fe8ae804d001f2e",
+    "baseline_status": "requires_visual_review",
+    "initial_polygon": [
+      [
+        934,
+        308
+      ],
+      [
+        962,
+        311
+      ],
+      [
+        974,
+        325
+      ],
+      [
+        961,
+        342
+      ],
+      [
+        949,
+        345
+      ],
+      [
+        934,
+        333
+      ]
+    ],
+    "initial_failure": "Registro local incerto no frame da a\u00e7\u00e3o 1: correla\u00e7\u00e3o 0.738",
+    "fits": [
+      {
+        "scale_to_action_reference": 0.9945391336833488,
+        "rotation_radians": 0.023728183495634016,
+        "patch_center_source_px": [
+          810.2279791446125,
+          300.89376197040303
+        ],
+        "correlation": 0.9130609184503555
+      },
+      {
+        "scale_to_action_reference": 0.9931807662373544,
+        "rotation_radians": 0.034020647294577266,
+        "patch_center_source_px": [
+          825.7060243491485,
+          304.42622891339516
+        ],
+        "correlation": 0.8895488455891609
+      },
+      {
+        "scale_to_action_reference": 1.0170689886698352,
+        "rotation_radians": -0.028328157299974767,
+        "patch_center_source_px": [
+          867.7791131298648,
+          299.0772381994019
+        ],
+        "correlation": 0.8589711487293243
+      },
+      {
+        "scale_to_action_reference": 0.9944010900738486,
+        "rotation_radians": 0.032010900224730535,
+        "patch_center_source_px": [
+          895.2498951847209,
+          292.41032526276246
+        ],
+        "correlation": 0.9180360585451126
+      },
+      {
+        "scale_to_action_reference": 0.9949632593144515,
+        "rotation_radians": 0.029619691209416404,
+        "patch_center_source_px": [
+          898.4236875201346,
+          291.72583704388455
+        ],
+        "correlation": 0.9124884158372879
+      },
+      {
+        "scale_to_action_reference": 0.9903448146444316,
+        "rotation_radians": 0.03384171506151532,
+        "patch_center_source_px": [
+          909.0444035744924,
+          292.19524722259234
+        ],
+        "correlation": 0.9160299599170685
+      },
+      {
+        "scale_to_action_reference": 0.9880664823613697,
+        "rotation_radians": -0.0019520842362745318,
+        "patch_center_source_px": [
+          926.2649981571926,
+          296.7656075477031
+        ],
+        "correlation": 0.9283156022429466
+      },
+      {
+        "scale_to_action_reference": 0.9915876178710542,
+        "rotation_radians": -0.004398868323771293,
+        "patch_center_source_px": [
+          942.2539857776812,
+          299.4471708451601
+        ],
+        "correlation": 0.9472927488386631
+      },
+      {
+        "scale_to_action_reference": 1.0,
+        "rotation_radians": 0.0,
+        "patch_center_source_px": [
+          951.5796356842596,
+          301.03082671648764
+        ],
+        "correlation": 1.0
+      },
+      {
+        "scale_to_action_reference": 1.0150190516202626,
+        "rotation_radians": 0.010363117041455053,
+        "patch_center_source_px": [
+          971.3051771141321,
+          300.173120443235
+        ],
+        "correlation": 0.8505603969097137
+      },
+      {
+        "scale_to_action_reference": 0.9824594705717868,
+        "rotation_radians": -0.00034183981991310164,
+        "patch_center_source_px": [
+          1015.4802076277472,
+          293.45065792096256
+        ],
+        "correlation": 0.9242563396692276
+      },
+      {
+        "scale_to_action_reference": 0.9956981600133367,
+        "rotation_radians": 0.0042560687656536,
+        "patch_center_source_px": [
+          1024.0705033570248,
+          294.295168483547
+        ],
+        "correlation": 0.9314303994178772
+      },
+      {
+        "scale_to_action_reference": 1.0005238190227177,
+        "rotation_radians": 0.0026310423192743254,
+        "patch_center_source_px": [
+          1026.9610992292057,
+          295.49713608703524
+        ],
+        "correlation": 0.9253246113657951
+      },
+      {
+        "scale_to_action_reference": 0.9594966679257915,
+        "rotation_radians": -0.002459372126229917,
+        "patch_center_source_px": [
+          1037.5714686822846,
+          301.104263092169
+        ],
+        "correlation": 0.8861906826496124
+      },
+      {
+        "scale_to_action_reference": 0.9578343066169414,
+        "rotation_radians": -0.002501765618014017,
+        "patch_center_source_px": [
+          1056.9556129834693,
+          320.5766410309249
+        ],
+        "correlation": 0.9076374471187592
+      },
+      {
+        "scale_to_action_reference": 0.9573401703835522,
+        "rotation_radians": 0.0007625427065376501,
+        "patch_center_source_px": [
+          1058.7388656041055,
+          322.0356921953399
+        ],
+        "correlation": 0.9020658880472183
+      },
+      {
+        "scale_to_action_reference": 0.9629495365782876,
+        "rotation_radians": 0.002151618759526337,
+        "patch_center_source_px": [
+          1058.6609094043024,
+          322.0355288267833
+        ],
+        "correlation": 0.9001217409968376
+      },
+      {
+        "scale_to_action_reference": 0.9535504948059308,
+        "rotation_radians": 0.004821782428699191,
+        "patch_center_source_px": [
+          1058.4246872443396,
+          321.63059760837086
+        ],
+        "correlation": 0.9098346680402756
+      },
+      {
+        "scale_to_action_reference": 0.9496731916696717,
+        "rotation_radians": 0.004414631987887539,
+        "patch_center_source_px": [
+          1058.2383450043526,
+          321.14735044279684
+        ],
+        "correlation": 0.9103324487805367
+      },
+      {
+        "scale_to_action_reference": 0.9632803649383348,
+        "rotation_radians": 0.006758355009984404,
+        "patch_center_source_px": [
+          1057.8304412928926,
+          320.97526176646096
+        ],
+        "correlation": 0.9100570231676102
+      }
+    ],
+    "scale_spread": 0.06801018631560934,
+    "minimum_correlation": 0.8505603969097137,
+    "output_x_spread": 40.84265361125449
+  },
+  "p09": {
+    "start": 20,
+    "stop": 44,
+    "ref": 25,
+    "polygon": [
+      [
+        774,
+        258
+      ],
+      [
+        813,
+        258
+      ],
+      [
+        830,
+        277
+      ],
+      [
+        823,
+        296
+      ],
+      [
+        800,
+        301
+      ],
+      [
+        774,
+        286
+      ]
+    ],
+    "source_sha256": "6c5e02ac90d97dec652f25ad77966c4c6bc5cd7f4b47413d728f5e2b517c5571",
+    "baseline_status": "requires_visual_review",
+    "initial_polygon": [
+      [
+        775,
+        273
+      ],
+      [
+        807,
+        272
+      ],
+      [
+        825,
+        288
+      ],
+      [
+        817,
+        310
+      ],
+      [
+        801,
+        322
+      ],
+      [
+        778,
+        305
+      ],
+      [
+        767,
+        286
+      ]
+    ],
+    "initial_failure": "Registro local incerto no frame da a\u00e7\u00e3o 0: correla\u00e7\u00e3o 0.778",
+    "fits": [
+      {
+        "scale_to_action_reference": 1.0129325495655064,
+        "rotation_radians": -0.016368595018471235,
+        "patch_center_source_px": [
+          803.0685830209901,
+          274.1416708865651
+        ],
+        "correlation": 0.8912794515490532
+      },
+      {
+        "scale_to_action_reference": 1.0077555408125751,
+        "rotation_radians": -0.016163058529501558,
+        "patch_center_source_px": [
+          801.5719589073265,
+          275.6936063635175
+        ],
+        "correlation": 0.9209701865911484
+      },
+      {
+        "scale_to_action_reference": 1.0134158786954182,
+        "rotation_radians": -0.004680812486421207,
+        "patch_center_source_px": [
+          798.6924909957431,
+          278.980580924686
+        ],
+        "correlation": 0.9664404205977917
+      },
+      {
+        "scale_to_action_reference": 1.0132812452376763,
+        "rotation_radians": -0.00463314311324417,
+        "patch_center_source_px": [
+          797.6249853379518,
+          280.34354361065135
+        ],
+        "correlation": 0.9612636789679527
+      },
+      {
+        "scale_to_action_reference": 1.0182485779599801,
+        "rotation_radians": -0.006791857713674302,
+        "patch_center_source_px": [
+          797.2469729532056,
+          281.2874478172791
+        ],
+        "correlation": 0.9584770984947681
+      },
+      {
+        "scale_to_action_reference": 1.0,
+        "rotation_radians": 0.0,
+        "patch_center_source_px": [
+          800.2756345177665,
+          277.7527918781726
+        ],
+        "correlation": 1.0
+      },
+      {
+        "scale_to_action_reference": 1.0028252189868232,
+        "rotation_radians": -0.016684851419307624,
+        "patch_center_source_px": [
+          802.414893121011,
+          274.74917010441385
+        ],
+        "correlation": 0.9494528509676456
+      },
+      {
+        "scale_to_action_reference": 1.0064370819786912,
+        "rotation_radians": -0.021441247481613055,
+        "patch_center_source_px": [
+          802.4538026846751,
+          274.82846108567605
+        ],
+        "correlation": 0.9315775707364082
+      },
+      {
+        "scale_to_action_reference": 1.0106142296787646,
+        "rotation_radians": -0.013758845264739075,
+        "patch_center_source_px": [
+          801.7978360913556,
+          275.48281420056924
+        ],
+        "correlation": 0.929160088300705
+      },
+      {
+        "scale_to_action_reference": 1.022049859460403,
+        "rotation_radians": -0.021975315544412705,
+        "patch_center_source_px": [
+          799.6706881540119,
+          277.3270498764995
+        ],
+        "correlation": 0.9311560615897179
+      },
+      {
+        "scale_to_action_reference": 1.0240429611705957,
+        "rotation_radians": -0.020433200824567864,
+        "patch_center_source_px": [
+          797.5187194360171,
+          279.0769031689033
+        ],
+        "correlation": 0.9073236137628555
+      },
+      {
+        "scale_to_action_reference": 1.018754115035998,
+        "rotation_radians": -0.015905312770913272,
+        "patch_center_source_px": [
+          800.0028705975246,
+          277.15106659972037
+        ],
+        "correlation": 0.9072167128324509
+      },
+      {
+        "scale_to_action_reference": 1.0085431939677674,
+        "rotation_radians": -0.008692673479428455,
+        "patch_center_source_px": [
+          801.6337199223989,
+          275.46422717908143
+        ],
+        "correlation": 0.8957491815090179
+      },
+      {
+        "scale_to_action_reference": 1.0165221522043677,
+        "rotation_radians": -0.013144656136016251,
+        "patch_center_source_px": [
+          801.6762548939263,
+          275.0175217162227
+        ],
+        "correlation": 0.9191737771034241
+      },
+      {
+        "scale_to_action_reference": 1.0159466124707983,
+        "rotation_radians": -0.009219928610063521,
+        "patch_center_source_px": [
+          800.0111962341016,
+          276.1208040497526
+        ],
+        "correlation": 0.9209092035889626
+      },
+      {
+        "scale_to_action_reference": 1.015234873531389,
+        "rotation_radians": -0.012078491723186532,
+        "patch_center_source_px": [
+          798.8568715558264,
+          277.27228259062014
+        ],
+        "correlation": 0.9220096692442894
+      },
+      {
+        "scale_to_action_reference": 1.022672442118349,
+        "rotation_radians": -0.016431358203340754,
+        "patch_center_source_px": [
+          798.1730122678534,
+          278.6531978598855
+        ],
+        "correlation": 0.9175611957907677
+      },
+      {
+        "scale_to_action_reference": 1.005834906328395,
+        "rotation_radians": -0.007600792609509147,
+        "patch_center_source_px": [
+          797.7444209303351,
+          279.40506007009134
+        ],
+        "correlation": 0.9356218576431274
+      },
+      {
+        "scale_to_action_reference": 1.0024896009805986,
+        "rotation_radians": -0.012428483554718575,
+        "patch_center_source_px": [
+          800.6600998211557,
+          276.7613129916408
+        ],
+        "correlation": 0.926108792424202
+      },
+      {
+        "scale_to_action_reference": 0.9998269120205411,
+        "rotation_radians": -0.006694110796129751,
+        "patch_center_source_px": [
+          802.4143715260999,
+          275.25956160719653
+        ],
+        "correlation": 0.9166300520300865
+      },
+      {
+        "scale_to_action_reference": 0.9987801138246145,
+        "rotation_radians": -0.01777453788366171,
+        "patch_center_source_px": [
+          802.4839485102871,
+          274.84098716381254
+        ],
+        "correlation": 0.912876158952713
+      },
+      {
+        "scale_to_action_reference": 1.0020587357908053,
+        "rotation_radians": -0.009873679335740732,
+        "patch_center_source_px": [
+          801.68957938738,
+          275.3531973801762
+        ],
+        "correlation": 0.9387385211884975
+      },
+      {
+        "scale_to_action_reference": 1.0067910450790973,
+        "rotation_radians": -0.022868859033296492,
+        "patch_center_source_px": [
+          799.4980395238923,
+          277.61908075826136
+        ],
+        "correlation": 0.9409065917134285
+      },
+      {
+        "scale_to_action_reference": 1.017732330505774,
+        "rotation_radians": -0.030822504722483185,
+        "patch_center_source_px": [
+          798.2682638569961,
+          279.1980168125451
+        ],
+        "correlation": 0.9349142387509346
+      }
+    ],
+    "scale_spread": 0.024968879005027023,
+    "minimum_correlation": 0.8912794515490532,
+    "output_x_spread": 24.319232187847888
+  },
+  "p10": {
+    "start": 42,
+    "stop": 60,
+    "ref": 51,
+    "polygon": [
+      [
+        792,
+        284
+      ],
+      [
+        822,
+        282
+      ],
+      [
+        837,
+        298
+      ],
+      [
+        828,
+        313
+      ],
+      [
+        805,
+        316
+      ],
+      [
+        790,
+        303
+      ]
+    ],
+    "source_sha256": "697f95f93ab44e0ff464fbdccce0b7c9b6b5da69805b8bd8ac627f47fc42a485",
+    "baseline_status": "requires_visual_review",
+    "initial_polygon": [
+      [
+        793,
+        283
+      ],
+      [
+        822,
+        284
+      ],
+      [
+        840,
+        303
+      ],
+      [
+        832,
+        324
+      ],
+      [
+        813,
+        338
+      ],
+      [
+        793,
+        317
+      ],
+      [
+        783,
+        299
+      ]
+    ],
+    "initial_failure": "Registro local incerto no frame da a\u00e7\u00e3o 2: correla\u00e7\u00e3o 0.797",
+    "failure": "Registro local incerto no frame da a\u00e7\u00e3o 0: correla\u00e7\u00e3o 0.743"
+  },
+  "p12": {
+    "start": 28,
+    "stop": 62,
+    "ref": 40,
+    "polygon": [
+      [
+        797,
+        444
+      ],
+      [
+        819,
+        448
+      ],
+      [
+        837,
+        467
+      ],
+      [
+        826,
+        486
+      ],
+      [
+        815,
+        500
+      ],
+      [
+        802,
+        480
+      ],
+      [
+        790,
+        460
+      ]
+    ],
+    "source_sha256": "7442f378d8b1bb1d02639832de714f988bed7b1fe9928a24ad7f6dd054e3e086",
+    "baseline_status": "rejected",
+    "failure": "Registro local incerto no frame da a\u00e7\u00e3o 33: correla\u00e7\u00e3o 0.738"
+  }
+}

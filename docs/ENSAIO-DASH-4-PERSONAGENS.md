@@ -1,5 +1,7 @@
 # Dash — ensaio com P02, P06, P08 e P11
 
+**Atualização:** o usuário aceitou visualmente este ensaio (“Deu certo”). A [triagem seletiva seguinte](TRIAGEM-SELETIVA.md) preserva estes quatro personagens sem alterar seus arquivos. Os resultados técnicos abaixo continuam registrados.
+
 O mesmo método foi aplicado aos quatro personagens pedidos, antes de ampliar o lote. **O resultado ainda não permite adotar a técnica como padrão automático para todos:** P02 e P11 passam nos controles definidos; P06 tem um frame sem registro confiável e P08 mantém oscilação acima do limite.
 
 [APK do ensaio — 8,1 MB](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-dash-4-personagens.apk). Atualiza o app de teste da P02, com o mesmo pacote e certificado: **Sprites — Dash (4 personagens)**, versão `1.7-dash-4personagens`, versionCode 8. O visualizador completo permanece sem alterações.

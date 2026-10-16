@@ -1,6 +1,8 @@
 # Visualizador offline para Android
 
-O ensaio mais recente é o [APK com P02, P06, P08 e P11](../docs/ENSAIO-DASH-4-PERSONAGENS.md), versão `1.7-dash-4personagens` (versionCode 8). Atualiza o app de teste da P02 e permite rodar a sequência dos quatro. P06 e P08 ainda não passam nos controles.
+A entrega atual é a [triagem seletiva](../docs/TRIAGEM-SELETIVA.md), versão `1.8-triagem` (versionCode 9). Atualiza o app de teste, compara os 13 casos e mantém um link local para os quatro personagens já aceitos. O APK completo 1.5 permanece separado.
+
+O ensaio anterior é o [APK com P02, P06, P08 e P11](../docs/ENSAIO-DASH-4-PERSONAGENS.md), versão `1.7-dash-4personagens` (versionCode 8). Atualiza o app de teste da P02 e permite rodar a sequência dos quatro. P06 e P08 ainda não passam nos controles.
 
 Há um [APK separado de revisão do dash da P02](../docs/REVISAO-P02-DASH.md), agora com um recorte de 24 frames só de corrida, ajuste interno independente do Idle e comparação com o teste anterior. O APK separado está na versão `1.6-dash-ciclo` (versionCode 7). O visualizador completo 1.5 ainda contém a variação confirmada nesse movimento.
 

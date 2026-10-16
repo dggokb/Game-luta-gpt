@@ -1,0 +1,62 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sprites — triagem</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui;background:#10151d;color:#e7ecf5}body{max-width:1200px;margin:auto;padding:16px}h1{font-size:25px}p{line-height:1.45;color:#bccada}button,select,input{font:inherit;min-height:44px;padding:9px;background:#233146;color:#fff;border:1px solid #58708c;border-radius:8px}button{cursor:pointer}a{color:#8bd6d3}.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0}.controls select{flex:1;min-width:180px}#status{padding:12px;border-left:4px solid #dab56c;background:#1b2634}.panes{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pane>b{display:block;line-height:1.3;min-height:2.6em}.pane{min-width:0;border:1px solid #41536b;border-radius:9px;padding:9px}.stage{position:relative;aspect-ratio:4/3;background:repeating-conic-gradient(#26323f 0 25%,#1c2630 0 50%) 0/24px 24px}.stage canvas{position:absolute;inset:0;width:100%;height:100%}.position{display:block;min-height:32px;font-size:12px;color:#bccada;margin:7px 0}.single .panes{grid-template-columns:1fr}.single #beforePane{display:none}#seek{flex:1;min-width:120px;padding:0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}summary{cursor:pointer;margin:18px 0}#renderState{display:none}@media(max-width:600px){body{padding:12px;font-size:14px}.panes{gap:7px}.pane{padding:7px}h1{font-size:22px}.controls button{flex:1}}
+</style>
+<h1>Sprites — triagem seletiva</h1><p>Só os problemas confirmados receberam ajuste. Os casos consistentes foram mantidos.</p>
+<p><a href="approved/index.html" id="approved">Abrir os 4 personagens já aprovados</a></p>
+<div class="controls"><select id="case" aria-label="Caso da triagem"></select><button id="runAll">Rodar triagem</button><button id="layout">Ampliar depois</button></div>
+<p id="status"></p><p id="scope"></p>
+<div class="panes"><div class="pane"><b>Depois</b><span class="position" id="afterPosition"></span><div class="stage"><canvas id="after"></canvas></div></div><div class="pane" id="beforePane"><b>Antes · coleção anterior</b><span class="position" id="beforePosition"></span><div class="stage"><canvas id="before"></canvas></div></div></div>
+<div class="controls"><button id="play">Reproduzir</button><button id="prev" aria-label="Frame anterior">◀</button><button id="next" aria-label="Próximo frame">▶</button><input type="range" id="seek" min="0" value="0" aria-label="Frame"><span id="position"></span></div>
+<p>Os painéis seguem os mesmos frames e usam o mesmo zoom. Nos casos pendentes, ambos mostram a fonte, sem uma normalização aprovada. As correções de dash são ciclos separados; o vídeo original permanece inteiro.</p>
+<details><summary>Medidas deste caso</summary><pre id="metrics"></pre></details>
+<p><a href="triage-report.json">Relatório da triagem</a> · <a href="manifest.json">Manifesto</a></p><span id="renderState"></span>
+<script id="data" type="application/json">__MANIFEST__</script><script>
+'use strict';
+const data=JSON.parse(document.getElementById('data').textContent),$=id=>document.getElementById(id),clips=new Map(data.clips.map(c=>[c.name,c])),cache=new Map();
+let current=0,frame=0,playing=false,elapsed=0,lastTime=0,all=false,finished=false,token=0;
+const history=[];
+function selected(){return data.cases[current]}
+function clip(side='after'){return clips.get(selected().clips[side])}
+function load(src){if(!cache.has(src)){cache.set(src,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Imagem ausente: '+src));image.src=src}));if(cache.size>8)cache.delete(cache.keys().next().value)}return cache.get(src)}
+function pause(){playing=false;elapsed=0;$('play').textContent='Reproduzir'}
+function advance(){if(frame+1<clip().frame_count){frame++;return}frame=0;if(all){if(current+1<data.cases.length){current++;$('case').value=current;history.push(selected().id)}else{frame=clip().frame_count-1;finished=true;pause()}}}
+function labels(){const c=selected();let text;
+ if(c.decision==='pending')text='Pendente: falta uma calibração confiável. Nenhum PNG normalizado novo foi criado.';
+ else if(c.decision==='preserved')text='Mantido: sem problema confirmado nesta triagem. Os PNGs anteriores foram preservados.';
+ else text='Corrigido: '+[c.root_changed?'posição horizontal':'',c.matte_changed?'manchas verdes do recorte':''].filter(Boolean).join(' e ')+'. Escala e movimento vertical preservados.';
+ $('status').textContent=c.label+' · '+text;
+ $('scope').textContent=c.root_changed?`Ciclo da fonte: frames ${c.selection.start_inclusive+1}–${c.selection.stop_exclusive}.`:'Todos os frames deste vídeo estão na prévia.';
+ $('metrics').textContent=JSON.stringify(c,null,2);
+}
+async function draw(id,entry,image){const c=selected(),canvas=$(id),box=canvas.getBoundingClientRect(),density=devicePixelRatio||1;
+ if(!box.width||!box.height)return;canvas.width=Math.round(box.width*density);canvas.height=Math.round(box.height*density);const ctx=canvas.getContext('2d');
+ if(c.render_kind==='raw'){
+  const k=Math.min(box.width/c.canvas[0],box.height/c.canvas[1]);ctx.setTransform(density*k,0,0,density*k,density*(box.width-c.canvas[0]*k)/2,density*(box.height-c.canvas[1]*k)/2);
+  ctx.drawImage(image,...entry.raw_rect,0,0,...c.canvas);
+ }else{
+  const k=Math.min(box.width/760,box.height/570);ctx.setTransform(density*k,0,0,density*k,density*(box.width/2-c.root[0]*k),density*(box.height/2-(c.root[1]-220)*k));
+  ctx.strokeStyle='#64bdab';ctx.lineWidth=1/k;ctx.beginPath();ctx.moveTo(0,c.root[1]);ctx.lineTo(c.canvas[0],c.root[1]);ctx.stroke();
+  ctx.drawImage(image,...entry.normalized_rect,...entry.normalized_destination_rect);
+ }
+}
+async function render(){const t=++token,c=selected(),a=clip().frames[frame],b=clip('before').frames[frame],field=c.render_kind==='raw'?'raw_file':'normalized_file';labels();
+ $('seek').max=clip().frame_count-1;$('seek').value=frame;$('position').textContent=`${frame+1}/${clip().frame_count}`;
+ $('afterPosition').textContent=$('beforePosition').textContent=`Fonte ${a.source_frame_index+1} · ${frame+1}/${clip().frame_count}`;
+ const [ai,bi]=await Promise.all([load(a[field]),load(b[field])]);if(t!==token)return;
+ await draw('after',a,ai);await draw('before',b,bi);if(t!==token)return;
+ $('renderState').textContent=c.id+'/'+frame;window.dispatchEvent(new Event('triageframe'));
+}
+data.cases.forEach((c,i)=>{const o=document.createElement('option');o.value=i;o.textContent=c.label+' · '+({corrected:'corrigido',preserved:'mantido',pending:'pendente'}[c.decision]);$('case').append(o)});
+$('case').onchange=()=>{pause();all=false;finished=false;current=Number($('case').value);frame=0;render()};
+$('play').onclick=()=>{if(finished){finished=false;all=false;frame=0}playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir';render()};
+$('runAll').onclick=()=>{pause();current=0;$('case').value='0';frame=0;all=true;finished=false;history.length=0;history.push(selected().id);playing=true;$('play').textContent='Pausar';render()};
+$('prev').onclick=()=>{pause();frame=Math.max(0,frame-1);render()};$('next').onclick=()=>{pause();advance();render()};
+$('seek').oninput=()=>{pause();frame=Number($('seek').value);render()};
+$('layout').onclick=()=>{document.body.classList.toggle('single');$('layout').textContent=document.body.classList.contains('single')?'Mostrar comparação':'Ampliar depois';render()};
+window.addEventListener('resize',render);
+function tick(time){if(playing){elapsed+=Math.min((time-lastTime)/1000,.25);let changed=false;
+ while(playing&&elapsed>=clip().frames[frame].duration_s){elapsed-=clip().frames[frame].duration_s;advance();changed=true}if(changed)render();}
+ lastTime=time;requestAnimationFrame(tick)}
+render();requestAnimationFrame(tick);
+</script></html>
