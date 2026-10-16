@@ -285,6 +285,99 @@ public class TorneioTest {
         assertEquals("p02", lutas.get(6)[1][0]);
     }
 
+    /**
+     * Como o CONTINUAR: cada episódio começa com a campanha refeita pelo save
+     * ({@link ProgressoHistoria#campanhaNoInicio}), não com a do episódio anterior.
+     */
+    @Test
+    public void temporadaRetomadaPeloSaveACadaEpisodioTemAEmboscada() throws IOException {
+        GameAssets assets = new GameAssets();
+        Temporada temporada = Temporada.load(assets);
+        ProgressoHistoria progresso = new ProgressoHistoria(3L);
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, assets);
+        List<String> rotulos = new ArrayList<>();
+        for (int ep = 0; ep < temporada.episodios.size(); ep++) {
+            // Grava e relê o save, como o app entre uma sessão e outra.
+            progresso = ProgressoHistoria.fromJson(progresso.toJson(), 99L);
+            p.setCampanha(progresso.campanhaNoInicio(ep, duplas()));
+            progresso.comecou(ep, p.campanha());
+            rec.ended = null;
+            p.start(temporada, temporada.loadEpisodio(assets, temporada.episodios.get(ep)));
+            for (int i = 0; i < 20000 && rec.ended == null; i++) {
+                if (p.waitingFight()) {
+                    rotulos.add(p.rotulo(p.passo()));
+                    p.resultadoLuta(true);
+                    continue;
+                }
+                if (p.passo().tipo == Episodio.TipoPasso.ESCOLHA) {
+                    run(p, 0.5f);
+                    p.moverEscolha(-1);
+                    p.confirmarEscolha();
+                    run(p, 1f);
+                    continue;
+                }
+                run(p, 0.6f);
+                p.tap(640f, 360f);
+            }
+            assertNotNull(temporada.episodios.get(ep) + " não terminou", rec.ended);
+            progresso.terminou(ep, p.campanha());
+        }
+        rotulos.remove(0); // o treino do Prólogo
+        assertEquals(java.util.Arrays.asList("TREINO", "CONVITE", Torneio.QUARTAS, Campanha.EMBOSCADA,
+            Torneio.SEMIFINAL, Torneio.FINAL, Campanha.DUELO), rotulos);
+    }
+
+    /** As lutas da temporada a partir do CONTINUAR de um save, com o rótulo de cada uma. */
+    private static List<String> lutasDoSave(String json) throws IOException {
+        GameAssets assets = new GameAssets();
+        Temporada temporada = Temporada.load(assets);
+        ProgressoHistoria progresso = ProgressoHistoria.fromJson(json, 9L);
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, assets);
+        p.setCampanha(progresso.campanhaNoInicio(progresso.atual(), duplas()));
+        List<String> lutas = new ArrayList<>();
+        for (int ep = progresso.atual(); ep < temporada.episodios.size(); ep++) {
+            rec.ended = null;
+            p.start(temporada, temporada.loadEpisodio(assets, temporada.episodios.get(ep)));
+            for (int i = 0; i < 20000 && rec.ended == null; i++) {
+                if (p.waitingFight()) {
+                    lutas.add(temporada.episodios.get(ep) + " " + p.rotulo(p.passo()));
+                    p.resultadoLuta(true);
+                    continue;
+                }
+                run(p, 0.6f);
+                p.tap(640f, 360f);
+            }
+            assertNotNull(temporada.episodios.get(ep) + " não terminou", rec.ended);
+        }
+        return lutas;
+    }
+
+    @Test
+    public void saveDeAntesDoParceiroContinuaNoMesmoPontoDoTorneio() throws IOException {
+        // Versão 1: terminou o antigo ep02 (O Sorteio, com as quartas) e ia para Fora da Arena.
+        List<String> lutas = lutasDoSave("{\"versao\":1,\"semente\":\"3\",\"atual\":3,\"concluidos\":3,\"fotos\":{"
+            + "\"2\":{\"irmao\":\"ryuga\",\"disputadas\":-1},\"3\":{\"irmao\":\"ryuga\",\"disputadas\":1}}}");
+        assertEquals(java.util.Arrays.asList("ep04 " + Campanha.EMBOSCADA, "ep05 " + Torneio.SEMIFINAL,
+            "ep06 " + Torneio.FINAL, "ep07 " + Campanha.DUELO), lutas);
+    }
+
+    @Test
+    public void saveDeAntesDoParceiroParadoNoSorteioJogaOParceiro() throws IOException {
+        // Versão 1: terminou o ep01 e ia para o antigo ep02 (O Sorteio).
+        ProgressoHistoria p = ProgressoHistoria.fromJson("{\"versao\":1,\"semente\":\"3\",\"atual\":2,\"concluidos\":2,"
+            + "\"fotos\":{\"2\":{\"irmao\":\"koga\",\"disputadas\":-1}}}", 9L);
+        assertEquals(2, p.atual());
+        assertEquals(Torneio.KOGA, p.campanhaNoInicio(2, duplas()).irmaoEscolhido());
+        assertEquals(Torneio.KOGA, p.campanhaNoInicio(3, duplas()).irmaoEscolhido());
+        // Gravado de novo, é versão 2 e não anda mais.
+        assertEquals(2, ProgressoHistoria.fromJson(p.toJson(), 9L).atual());
+        assertEquals(java.util.Arrays.asList("ep02 CONVITE", "ep03 " + Torneio.QUARTAS, "ep04 " + Campanha.EMBOSCADA,
+            "ep05 " + Torneio.SEMIFINAL, "ep06 " + Torneio.FINAL, "ep07 " + Campanha.DUELO),
+            lutasDoSave(p.toJson()));
+    }
+
     /** As páginas prontas que o ep01 mostra, na ordem, para quem escolheu esse irmão. */
     private static List<String> paginasDoEp01(String irmao) throws IOException {
         GameAssets assets = new GameAssets();

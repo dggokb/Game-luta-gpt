@@ -25,6 +25,11 @@ fim de cada episódio:
 - Sair no meio de um episódio (MENU INICIAL na pausa, ou fechar o app) volta ao começo dele.
 - O save guarda a semente da chave e, para cada episódio, o irmão e as rodadas já
   disputadas; a chave é refeita igual ao carregar (`ProgressoHistoria`, `Campanha.restaurar`).
+- O save tem versão (`ProgressoHistoria.VERSAO`). Quando um episódio novo entra no meio da
+  temporada, os saves antigos precisam ser convertidos na leitura: a versão 1 é de antes do
+  ep02 "O Parceiro" e tem os episódios do torneio empurrados uma posição
+  (`migrarDaVersao1`). Sem isso, o CONTINUAR caía no episódio errado com a campanha de
+  outro (a emboscada sumia e as rodadas chegavam adiantadas).
 
 Controle na tela: direcional move, A escolhe, B (ou voltar) volta ao menu inicial.
 

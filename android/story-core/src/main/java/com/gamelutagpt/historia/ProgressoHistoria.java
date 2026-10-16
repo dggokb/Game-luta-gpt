@@ -33,6 +33,11 @@ public final class ProgressoHistoria {
         }
     }
 
+    /** Versão do save. A 1 é de antes do ep02 "O Parceiro" (o torneio começava no ep02). */
+    static final int VERSAO = 2;
+    /** Onde o ep02 "O Parceiro" entrou: nos saves da versão 1, daqui em diante os índices andam um. */
+    static final int EPISODIO_NOVO_V2 = 2;
+
     private final long semente;
     private int atual;
     private int concluidos;
@@ -103,7 +108,7 @@ public final class ProgressoHistoria {
 
     public String toJson() {
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"versao\":1,\"semente\":\"").append(semente).append("\",\"atual\":").append(atual)
+        sb.append("{\"versao\":").append(VERSAO).append(",\"semente\":\"").append(semente).append("\",\"atual\":").append(atual)
             .append(",\"concluidos\":").append(concluidos).append(",\"fotos\":{");
         boolean primeira = true;
         for (Map.Entry<Integer, Foto> e : fotos.entrySet()) {
@@ -133,10 +138,36 @@ public final class ProgressoHistoria {
                         Episodio.number(f, "disputadas", -1).intValue()));
                 }
             }
+            if (Episodio.number(map, "versao", 1).intValue() < 2) p.migrarDaVersao1();
             return p;
         } catch (RuntimeException ex) {
             return new ProgressoHistoria(sementeNova);
         }
+    }
+
+    /**
+     * Save da versão 1: o ep02 "O Parceiro" ainda não existia, e O Sorteio e o resto do torneio
+     * eram um episódio antes. Sem isso, a campanha restaurada no "O Sorteio" já viria com as
+     * quartas disputadas (a emboscada some e as rodadas chegam adiantadas). Quem parou no
+     * começo do antigo ep02 joga O Parceiro (a campanha é a mesma: irmão escolhido, chave sem
+     * rodadas); quem já estava no torneio continua no mesmo episódio de antes.
+     */
+    private void migrarDaVersao1() {
+        int novo = EPISODIO_NOVO_V2;
+        Map<Integer, Foto> antigas = new TreeMap<>(fotos);
+        fotos.clear();
+        for (Map.Entry<Integer, Foto> e : antigas.entrySet()) {
+            int ep = e.getKey();
+            if (ep < novo) {
+                fotos.put(ep, e.getValue());
+            } else {
+                fotos.put(ep + 1, e.getValue());
+                // O começo do Parceiro é igual ao começo do antigo ep02.
+                if (ep == novo) fotos.put(ep, e.getValue());
+            }
+        }
+        if (atual > novo) atual++;
+        if (concluidos > novo) concluidos++;
     }
 
     /** Não deixa o save apontar para além da temporada (episódios removidos numa versão nova). */
