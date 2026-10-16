@@ -190,7 +190,8 @@ public class MenuInicialTest {
         assertFalse("◀ ▶ fora da VELOCIDADE não mudam nada", p.ajustar(1));
         p.mover(1);
         assertEquals(MenuPausa.Opcao.VELOCIDADE, p.cursor());
-        assertTrue(p.ajustar(1));
+        assertEquals("o padrão é a velocidade normal", 1f, p.velocidade(), 1e-6f);
+        assertTrue(p.ajustar(-1));
         assertEquals(0.9f, p.velocidade(), 1e-6f);
         p.ajustar(1);
         p.ajustar(1);

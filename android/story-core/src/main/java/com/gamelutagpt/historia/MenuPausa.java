@@ -28,7 +28,7 @@ public final class MenuPausa {
 
     /** Velocidades da luta (1 = original); quem usa a pausa lê e guarda a escolhida. */
     public static final float[] VELOCIDADES = {0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f};
-    public static final float VELOCIDADE_PADRAO = 0.8f;
+    public static final float VELOCIDADE_PADRAO = 1f;
 
     static final float[][] CAIXAS = {
         {420f, 296f, 860f, 352f},
