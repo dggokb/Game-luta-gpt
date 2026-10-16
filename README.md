@@ -357,6 +357,17 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
   vídeos: `tools/stage/video_para_ator.py`.
 
+## Correntes de combo
+
+- **Base igual para todos**, como no FighterZ: a corrente só sobe de força (L > M > H), cada
+  golpe uma vez por corrente, e agora **chega no lançador**: L > M > 2H > super pulo.
+- **Pulo no ar**: jM que acertou + ↑ dá um novo impulso (uma vez por voo) e a corrente aérea
+  recomeça: jL > jM > ↑ > jL > jM > j2H.
+- **Estilo de cada lutador**: pressão (p03, p04, p10: M > M e M cancela em pulo), chutes (p02),
+  aéreo (p05), alcance (p06, p08, p11: golpe fraco termina no S1), tanque (p07, p09: H > H) e
+  imprevisível (p12: volta para golpes mais fracos, H > L).
+- Tabela completa: `docs/personagens/mecanicas.md` (seção 4b).
+
 ## Anulação de projéteis
 
 - Onda contra onda **se anulam** no meio do caminho, com uma faísca nas duas cores. Vale para

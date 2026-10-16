@@ -92,6 +92,8 @@ final class CombatConfig {
     float normalJumpRisingGravityScale = 2.463f;
     float normalJumpFallingGravityScale = 2.897f;
     float superJumpSpeed = 1450f;
+    /** Cancelamento de pulo no ar (jM → pulo, uma vez por voo): impulso para cima. */
+    float airJumpSpeed = 900f;
     float gravity = 1650f;
     float launchSpeed = 1450f;
     float slamSpeed = 1850f;

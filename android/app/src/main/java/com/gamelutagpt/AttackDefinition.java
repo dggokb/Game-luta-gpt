@@ -141,6 +141,12 @@ final class AttackDefinition {
     final float knockback;
     final float pushbackOnHit, pushbackOnBlock;
     final int juggleCost, maxHits, maxUsesPerCombo;
+    /**
+     * Usos do golpe numa mesma corrente de cancelamentos (desde o último golpe que saiu do
+     * neutro), acertando ou na defesa; 0 = livre. Diferente de maxUsesPerCombo, zera depois de
+     * uma ligação: L > M > H, parede, dash, L > M vale.
+     */
+    final int maxUsesPerChain;
     /** Must be guarded crouching. Airborne attackers are always overheads. */
     final boolean low;
     final float reach, hitHeight;
@@ -177,6 +183,7 @@ final class AttackDefinition {
         juggleCost = b.juggleCost;
         maxHits = b.strikes.length > 0 ? b.strikes.length : b.maxHits;
         maxUsesPerCombo = b.maxUses;
+        maxUsesPerChain = b.maxChainUses;
         low = b.low;
         reach = b.reach;
         hitHeight = b.hitHeight;
@@ -277,7 +284,7 @@ final class AttackDefinition {
         private Launch launch = Launch.NONE;
         private float knockback = -1f;
         private float pushbackOnHit, pushbackOnBlock;
-        private int juggleCost = 1, maxHits = 1, maxUses = 0;
+        private int juggleCost = 1, maxHits = 1, maxUses = 0, maxChainUses = 0;
         private boolean low;
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
@@ -310,6 +317,7 @@ final class AttackDefinition {
         /** Frames where each strike of the animation lands; the first is the end of the startup. */
         Builder strikes(int... frames) { strikes = frames.clone(); return this; }
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
+        Builder maxUsesPerChain(int value) { maxChainUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
         Builder reach(float reachValue, float hitHeightValue) { reach = reachValue; hitHeight = hitHeightValue; return this; }
         /** Reach with the box stretched down to {@code floor} (fist path of an uppercut). */
@@ -341,8 +349,8 @@ final class AttackDefinition {
             if (pushbackOnHit < 0f || pushbackOnBlock < 0f) {
                 throw new IllegalArgumentException(name + "pushback cannot be negative");
             }
-            if (juggleCost < 0 || maxUses < 0) {
-                throw new IllegalArgumentException(name + "juggleCost and maxUsesPerCombo cannot be negative");
+            if (juggleCost < 0 || maxUses < 0 || maxChainUses < 0) {
+                throw new IllegalArgumentException(name + "juggleCost, maxUsesPerCombo and maxUsesPerChain cannot be negative");
             }
             int lastActive = startup + active - 1;
             if (strikes.length > 0) {

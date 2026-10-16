@@ -464,6 +464,8 @@ final class CombatEngine {
         }
 
         if (f.pendingJumpAge >= 0 && !f.grounded && canWallJump(f)) wallJump(f);
+        else if (f.pendingJumpAge >= 0 && !f.grounded && f.attacking() &&
+            CancelSystem.canCancel(f, AttackDefinition.JUMP, null)) airJump(f);
         if (f.jumpGrace > 0) f.jumpGrace--;
         else if (f.pendingJumpAge >= 0 && f.grounded) {
             boolean superJump = f.pendingSuperJump || f.launcherChase > 0;
@@ -647,6 +649,9 @@ final class CombatEngine {
     }
 
     private void startAttack(CombatFighter f, AttackDefinition attack, String strength, int step) {
+        // Golpe que sai de outro golpe continua a corrente; saindo do neutro, começa outra.
+        if (!f.attacking()) f.chain.clear();
+        f.chain.add(attack.id);
         f.status = CombatFighter.Status.ATTACK;
         f.clearAttack();
         f.attack = attack;
@@ -820,6 +825,19 @@ final class CombatEngine {
         f.y -= 2f;
         f.backdashFrames = 0;
         if (superJump) f.launcherChase = 0;
+    }
+
+    /**
+     * Cancelamento de pulo no ar: o golpe aéreo que acertou (jM) vira um novo impulso para cima,
+     * uma vez por voo, e a corrente aérea recomeça (jL → jM → pulo → jL → jM → j2H).
+     */
+    private void airJump(CombatFighter f) {
+        f.pendingJumpAge = -1;
+        f.status = CombatFighter.Status.NEUTRAL;
+        f.clearAttack();
+        f.airJumpUsed = true;
+        f.vy = -config.airJumpSpeed;
+        cues.add("AIR_JUMP");
     }
 
     // ---------------------------------------------------------------- advance
@@ -1198,6 +1216,7 @@ final class CombatEngine {
         f.grounded = true;
         f.airDashFrames = 0;
         f.airDashUsed = false;
+        f.airJumpUsed = false;
         f.airDashCount = 0;
         f.wallJumpUsed = false;
         f.wallJumpFrames = 0;
@@ -1243,6 +1262,7 @@ final class CombatEngine {
         f.grounded = true;
         f.airDashFrames = 0;
         f.airDashUsed = false;
+        f.airJumpUsed = false;
         f.airDashCount = 0;
         f.wallJumpUsed = false;
         f.wallJumpFrames = 0;

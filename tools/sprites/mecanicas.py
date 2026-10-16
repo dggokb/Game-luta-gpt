@@ -145,6 +145,38 @@ def unique(pack, spec):
 ARROWS = {'→': 1, '↘': 2, '↓': 3, '↙': 4, '←': 5, '↖': 6, '↑': 7, '↗': 8}
 
 
+def combos(pack, spec, data):
+    """Correntes de combo (bloco "combos" e "estiloCombo" do personagem): soma no cancelInto de
+    cada golpe as rotas da base e do estilo e grava maxUsesPerChain. As rotas que o golpe já
+    tinha ficam em "rotasProprias", então refazer (ou trocar o estilo) dá sempre o mesmo
+    resultado. Alvo que o personagem não tem (j2H, S) fica de fora."""
+    style = data['estilos'][spec['estiloCombo']]
+    fighter = pack['fighter']
+    ids = set(pack['moves']) | set(pack.get('specialMoves', {})) | {'JUMP'}
+    ids |= {k for k, v in (('S', 'energy'), ('SUPER', 'super')) if v in fighter}
+    uses = {**data['base']['maxUsosCorrente'], **style['maxUsosCorrente']}
+    for key, m in pack['moves'].items():
+        if 'rotasProprias' in m:
+            m['cancelInto'] = m.pop('rotasProprias')
+        m.pop('maxUsesPerChain', None)
+        wanted = data['base']['rotas'].get(key, []) + style['rotas'].get(key, [])
+        extra = [t for t in dict.fromkeys(wanted) if t in ids and t not in m['cancelInto']]
+        if extra:
+            m['rotasProprias'] = list(m['cancelInto'])
+            m['cancelInto'] = m['cancelInto'] + extra
+        if uses.get(key):
+            m['maxUsesPerChain'] = uses[key]
+    fighter['comboStyle'] = spec['estiloCombo']
+
+
+def combos_only(cid, style, data):
+    """Pacote que só recebe as correntes de combo (bloco combos.soCombos)."""
+    path = A.ROOT / f'characters/{cid}/character.json'
+    pack = json.loads(path.read_text(encoding='utf-8'))
+    combos(pack, {'estiloCombo': style}, data)
+    return pack, path
+
+
 def parse_command(text):
     """"↓↘→" → ([3, 2, 1], False); "[←] →" → ([5, 1], True): segura a primeira direção e aperta
     a segunda. Direções relativas ao personagem virado para a direita (1 = frente, 5 = trás)."""
@@ -396,7 +428,7 @@ def scaled(base, f, air=False):
     return [s, base[1] if air else a, r]
 
 
-def apply(cid, spec, base):
+def apply(cid, spec, base, combos_data):
     path = A.ROOT / f'characters/{cid}/character.json'
     pack = json.loads(path.read_text(encoding='utf-8'))
     _, clips = A.load_pack(cid)
@@ -437,6 +469,7 @@ def apply(cid, spec, base):
     attacks.append(('S', pack.get('specialAnimations', {}).get('S'), energy['attack']))
     fighter['super']['damage'] = damage('SUPER')
     unique(pack, spec)
+    combos(pack, spec, combos_data)
     commands(pack, spec)
     s1(pack, spec)
     especiais(pack, spec)
@@ -486,10 +519,17 @@ def main():
     data = json.loads(DATA.read_text(encoding='utf-8'))
     for cid in args.personagens or list(data['personagens']):
         spec = data['personagens'][cid]
-        pack, path, report = apply(cid, spec, data['base'])
+        pack, path, report = apply(cid, spec, data['base'], data['combos'])
         print(f"{cid} ({spec['molde']}): vida {spec['vida']}, dano {spec['dano']}x, ritmo {spec['ritmo']}x, "
-              f"Super {pack['fighter']['super']['damage']}")
+              f"Super {pack['fighter']['super']['damage']}, combo {spec['estiloCombo']}")
         print('\n'.join(report))
+        if args.write:
+            path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    for cid, style in data['combos']['soCombos'].items():
+        if cid.startswith('_') or (args.personagens and cid not in args.personagens):
+            continue
+        pack, path = combos_only(cid, style, data['combos'])
+        print(f'{cid}: só combo {style}')
         if args.write:
             path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
 

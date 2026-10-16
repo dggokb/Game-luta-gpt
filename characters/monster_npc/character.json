@@ -74,7 +74,8 @@
         "pushbackOnHit": 60,
         "pushbackOnBlock": 60
       }
-    }
+    },
+    "comboStyle": "equilibrado"
   },
   "animations": {
     "IDLE": {
@@ -341,12 +342,21 @@
       "cancelInto": [
         "L",
         "M",
-        "2L"
+        "2L",
+        "2M",
+        "H",
+        "2H"
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 24,
       "pushbackOnBlock": 30,
-      "maxUsesPerCombo": 3
+      "maxUsesPerCombo": 3,
+      "rotasProprias": [
+        "L",
+        "M",
+        "2L"
+      ],
+      "maxUsesPerChain": 3
     },
     "M": {
       "animation": "MEDIUM_SWIPE",
@@ -372,10 +382,17 @@
       "cancelInto": [
         "H",
         "2M",
-        "S"
+        "S",
+        "2H"
       ],
       "pushbackOnHit": 32,
-      "pushbackOnBlock": 38
+      "pushbackOnBlock": 38,
+      "rotasProprias": [
+        "H",
+        "2M",
+        "S"
+      ],
+      "maxUsesPerChain": 1
     },
     "H": {
       "animation": "HEAVY_SMASH",
@@ -403,7 +420,8 @@
         "SUPER"
       ],
       "pushbackOnHit": 44,
-      "pushbackOnBlock": 50
+      "pushbackOnBlock": 50,
+      "maxUsesPerChain": 1
     },
     "2L": {
       "animation": "LOW_CLAW",
@@ -429,11 +447,20 @@
       },
       "cancelInto": [
         "M",
-        "2M"
+        "2M",
+        "L",
+        "2L",
+        "H",
+        "2H"
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 22,
-      "pushbackOnBlock": 28
+      "pushbackOnBlock": 28,
+      "rotasProprias": [
+        "M",
+        "2M"
+      ],
+      "maxUsesPerChain": 2
     },
     "2M": {
       "animation": "LOW_LUNGE",
@@ -463,7 +490,8 @@
       "launchType": "knockdown",
       "knockback": 40,
       "pushbackOnHit": 0,
-      "pushbackOnBlock": 36
+      "pushbackOnBlock": 36,
+      "maxUsesPerChain": 1
     },
     "2H": {
       "animation": "RISING_SMASH",
@@ -490,7 +518,8 @@
       "knockback": 20,
       "pushbackOnHit": 0,
       "pushbackOnBlock": 48,
-      "juggleCost": 2
+      "juggleCost": 2,
+      "maxUsesPerChain": 1
     },
     "jL": {
       "pose": "AIR",
@@ -519,7 +548,8 @@
       ],
       "damageProration": 0.9,
       "pushbackOnHit": 14,
-      "pushbackOnBlock": 20
+      "pushbackOnBlock": 20,
+      "maxUsesPerChain": 1
     },
     "jM": {
       "pose": "AIR",
@@ -543,10 +573,15 @@
         "whiff": null
       },
       "cancelInto": [
-        "jH"
+        "jH",
+        "JUMP"
       ],
       "pushbackOnHit": 20,
-      "pushbackOnBlock": 26
+      "pushbackOnBlock": 26,
+      "rotasProprias": [
+        "jH"
+      ],
+      "maxUsesPerChain": 1
     },
     "jH": {
       "pose": "AIR",
@@ -568,7 +603,8 @@
       "knockback": 30,
       "pushbackOnHit": 28,
       "pushbackOnBlock": 34,
-      "juggleCost": 2
+      "juggleCost": 2,
+      "maxUsesPerChain": 1
     }
   },
   "specialAnimations": {

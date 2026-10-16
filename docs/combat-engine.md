@@ -58,6 +58,23 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
 - **Super freeze**: o Super congela o oponente e os projéteis durante o próprio startup
   (o que permite H → SUPER combar).
 
+## Correntes de combo
+
+As rotas de cada golpe vêm do estilo de combo do personagem (bloco `combos` de
+`tools/sprites/mecanicas.json`, tabela em `docs/personagens/mecanicas.md`, seção 4b). O motor
+só lê o `cancelInto` e os limites que ficam no `character.json`.
+
+- **Limite por corrente** (`maxUsesPerChain`, em `CancelSystem.chainAllows`): o lutador guarda
+  os golpes da corrente atual (`CombatFighter.chain`). Um golpe que sai do neutro começa outra
+  corrente; um cancelamento continua a mesma. Vale também na defesa, onde não há combo para
+  contar: é o que faz uma corrente que volta para trás (H > L do p12) ou repete (M > M) sempre
+  acabar. `maxUsesPerCombo` continua contando no combo inteiro.
+- **Cancelamento de pulo no ar**: `JUMP` no `cancelInto` de um golpe aéreo. Na janela do golpe,
+  apertar para cima dá um impulso para cima (`CombatConfig.airJumpSpeed`), uma vez por voo
+  (`airJumpUsed`, volta ao tocar o chão), e a corrente aérea recomeça. Cue `AIR_JUMP`.
+
+Testes: `CorrentesComboTest`.
+
 ## Anulação de projéteis
 
 Projéteis de lados opostos que se tocam se anulam antes de chegar em alguém
@@ -406,6 +423,7 @@ Cada golpe em `moves` e o bloco `attack` de `fighter.energy` (S) e `fighter.supe
 | `juggleCost` | não (1) | Pontos de juggle gastos em alvo no ar |
 | `maxHits` | não (1) | Acertos por execução no mesmo alvo (≤ número de hitboxes) |
 | `maxUsesPerCombo` | não (0 = livre) | Acima disso o CancelSystem recusa a rota |
+| `maxUsesPerChain` | não (0 = livre) | Usos do golpe numa mesma corrente (desde o último golpe que saiu do neutro), acertando ou na defesa. Zera depois de uma ligação |
 | `low` | não (false) | Precisa de defesa agachada |
 | `hitboxes`, `hurtboxes` | não | `{"frames":[a,b],"x":[x0,x1],"y":[y0,y1]}` por frame, relativos à raiz |
 

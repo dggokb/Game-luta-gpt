@@ -212,6 +212,42 @@ parede invisível e sai de voadora), tocada enquanto dura o empurrão da parede.
 
 Todas as mecânicas planejadas estão no jogo.
 
+## 4b. Correntes de combo (16/10)
+
+Bloco `combos` de `tools/sprites/mecanicas.json`, aplicado pelo mesmo `mecanicas.py`: soma as
+rotas no `cancelInto` de cada golpe e grava `maxUsesPerChain` (usos do golpe numa corrente).
+As rotas que o golpe já tinha ficam guardadas em `rotasProprias`; refazer dá sempre o mesmo
+resultado. Cada personagem escolhe o estilo em `estiloCombo`; o lutador de teste
+(`player_two`) e o boneco de treino (`monster_npc`) recebem só as correntes, pela lista
+`combos.soCombos`.
+
+**Base (todos):** a corrente só sobe de força, como no FighterZ.
+
+| Golpe | Cancela em | Usos na corrente |
+|---|---|---|
+| L, 2L | L, 2L, M, 2M, H, 2H | L 3, 2L 2 |
+| M | 2M, H, 2H | 1 |
+| 2M | H (é rasteira: derruba) | 1 |
+| H | só especial e Super (joga na parede) | 1 |
+| 2H | pulo (lançador → super pulo) | 1 |
+| jL | jM, jH, j2H | 1 |
+| jM | jH, j2H, **pulo no ar** | 1 |
+
+Rota de exemplo: L > M > 2H > super pulo > jL > jM > pulo no ar > jL > jM > j2H (chão) > Super.
+
+| Estilo | Quem | Soma à base |
+|---|---|---|
+| equilibrado | p01 | nada |
+| pressao | p03, p04, p10 | M > M; M cancela em pulo (no acerto e na defesa) |
+| chutes | p02 | M > M (três chutes: M > M > H); jM > jM |
+| aereo | p05 | jL > jL; jL cancela em pulo no ar; M cancela em pulo (sobe sem lançador) |
+| alcance | p06, p08, p11 | L, 2L e 2M terminam no S1 |
+| tanque | p07, p09 | H > H |
+| imprevisivel | p12 | volta para trás: M > L/2L, H > L/2L/M; cada golpe até 2 vezes |
+
+Trocar o estilo de alguém: mudar `estiloCombo`, rodar `mecanicas.py --write` e
+`build_characters.py --write`. Testes: `CorrentesComboTest` e `test_mecanicas.py`.
+
 ## 5. Perguntas em aberto
 
 1. **Os moldes fazem sentido?** Algum personagem está no molde errado? (ex.: p02 é mais
