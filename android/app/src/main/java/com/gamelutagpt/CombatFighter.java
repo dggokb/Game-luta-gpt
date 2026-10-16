@@ -51,6 +51,12 @@ final class CombatFighter {
     boolean superJumping;
     boolean crouching;
     boolean forwardDashing;
+    /**
+     * Pulo saído da corrida (dash jump, como no KOF): o embalo do dash leva o pulo para frente,
+     * mais longe que o pulo normal, na direção em que ele saiu do chão. Acaba ao tocar o chão.
+     */
+    boolean dashJumping;
+    int dashJumpDirection;
     int backdashFrames;
     /** Prevent repeated retreats while the previous hop/recovery has not reset. */
     int backdashCooldown;

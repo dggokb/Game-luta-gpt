@@ -75,6 +75,11 @@ final class CombatConfig {
     /** Walking (or drifting in the air) away is slower, so retreating cannot outrun a chase. */
     float walkBackSpeed = 220f;
     float dashSpeed = 620f;
+    /**
+     * Pulo saído da corrida (dash jump): velocidade para frente no ar. O pulo normal anda
+     * walkSpeed (~210 de distância); este leva o embalo do dash e vai ~1,8x mais longe.
+     */
+    float dashJumpSpeed = 540f;
     float backdashSpeed = 978f;
     int backdashFrames = 15;
     int backdashRecoveryFrames = 12; // extra grounded neutral frames before another hop

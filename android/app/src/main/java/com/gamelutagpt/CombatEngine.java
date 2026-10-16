@@ -818,6 +818,10 @@ final class CombatEngine {
 
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
+        // Saindo da corrida, o pulo leva o embalo (dash jump).
+        f.dashJumping = f.forwardDashing && f.grounded;
+        f.dashJumpDirection = f.facing;
+        f.forwardDashing = false;
         f.grounded = false;
         f.crouching = false;
         f.superJumping = superJump;
@@ -1141,7 +1145,7 @@ final class CombatEngine {
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
             if (!f.grounded) {
-                f.x += horizontal * walk * CombatConfig.DT;
+                airDrift(f, horizontal, walk, boost);
             } else if (f.backdashFrames > 0) {
                 f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
                 f.backdashFrames--;
@@ -1164,6 +1168,15 @@ final class CombatEngine {
             }
         } else if (f.attacking() && !f.grounded && f.attack.kind == AttackDefinition.Kind.NORMAL) {
             // Air normals keep the jump's steering; ground attacks and specials lock it.
+            airDrift(f, horizontal, walk, boost);
+        }
+    }
+
+    /** No ar: o embalo do dash jump (fixo, para onde saiu) ou o controle do pulo normal. */
+    private void airDrift(CombatFighter f, int horizontal, float walk, float boost) {
+        if (f.dashJumping) {
+            f.x += f.dashJumpDirection * config.dashJumpSpeed * boost * CombatConfig.DT;
+        } else {
             f.x += horizontal * walk * CombatConfig.DT;
         }
     }
@@ -1214,6 +1227,7 @@ final class CombatEngine {
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.grounded = true;
+        f.dashJumping = false;
         f.airDashFrames = 0;
         f.airDashUsed = false;
         f.airJumpUsed = false;
@@ -1260,6 +1274,7 @@ final class CombatEngine {
         f.knockdownFrame = 0;
         f.stunLeft = 0;
         f.grounded = true;
+        f.dashJumping = false;
         f.airDashFrames = 0;
         f.airDashUsed = false;
         f.airJumpUsed = false;

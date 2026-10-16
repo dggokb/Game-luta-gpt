@@ -330,6 +330,21 @@ no chão). Valores em `CombatConfig.airDash*`.
 
 Testes em `AirDashTest`.
 
+## Pulo da corrida (dash jump)
+
+Como no KOF: pular **durante o dash para frente** leva o embalo da corrida. Valor em
+`CombatConfig.dashJumpSpeed`.
+
+- No ar ele anda 540 u/s para frente (o pulo normal anda `walkSpeed`, 300 u/s): mais ou
+  menos 380 de distância contra 210, a mesma altura e o mesmo tempo no ar.
+- Vale com ↑ ou ↗ (soltar a frente no mesmo quadro do pulo não perde o embalo).
+- O pulo é comprometido: a direção é a da saída e o stick não freia nem vira no ar. Os
+  golpes aéreos saem com o mesmo embalo. Air dash e wall jump funcionam como sempre.
+- Acaba ao tocar o chão (ou ao cair derrubado); a corrida também acaba no pulo.
+- Sem arte própria: usa o clipe de pulo.
+
+Testes em `DashJumpTest`.
+
 ## Defesa ativa: pushblock e Guard Cancel Tag — v0.81
 
 Defender passa a ter decisões que gastam a barra do time. Valores em `CombatConfig.pushblock*`
