@@ -97,16 +97,17 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 
 | Episódio | Conteúdo |
 |---|---|
-| ep01 — Duas Cartas | escolha do irmão, páginas provisórias, treino jogador × rival |
-| ep02 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
-| ep03 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
-| ep04 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
-| ep05 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
-| ep06 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
+| ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
+| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: páginas do irmão (Ryūga: 4 páginas prontas indo atrás da Yin-lu), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × p04; perdendo ou ganhando, a história segue), o parceiro aceita |
+| ep03 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
+| ep04 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
+| ep05 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
+| ep06 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
+| ep07 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
 
-As páginas do ep01 ao ep04 são provisórias (painéis montados pelo jogo, com a arte
+As páginas do ep02 ao ep07 são provisórias (painéis montados pelo jogo, com a arte
 provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md). Depois do
-ep06 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
+ep07 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
 existe).
 
 ## Retratos

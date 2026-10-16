@@ -47,6 +47,8 @@ final class CombatEngine {
         Projectile projectile;
         /** The owner's shadow struck (the owner's own move is not touched). */
         boolean echo;
+        /** Qual acerto do projétil de vários acertos é este (0 = o primeiro). */
+        int strike;
     }
 
     /**
@@ -61,6 +63,8 @@ final class CombatEngine {
         final float x, y;
         final int facing;
         final int damagePermille;
+        /** Só desenho (os clones do Super do p06): não acerta ninguém. */
+        boolean ghost;
         /** Frame of the copied move; negative while it waits for its delay. */
         int frame;
         int hitsOnTarget;
@@ -625,7 +629,8 @@ final class CombatEngine {
         f.status = CombatFighter.Status.ATTACK;
         f.clearAttack();
         f.attack = attack;
-        f.move = attack.kind == AttackDefinition.Kind.NORMAL ? f.character().moveFor(attack.id) : null;
+        // Normais e especiais (também os que lançam, como a shuriken) tocam a própria animação.
+        f.move = attack.kind == AttackDefinition.Kind.SUPER ? null : f.character().moveFor(attack.id);
         f.specialStrength = strength;
         f.autoStep = step;
         f.forwardDashing = false;
@@ -651,6 +656,7 @@ final class CombatEngine {
         if (attack.mechanics.dives()) f.vy = 0f;
         if (attack.kind == AttackDefinition.Kind.SUPER) {
             f.state.spendSuperMeter(CombatConfig.SUPER_COST);
+            callClones(f, attack);
             f.vy = 0f;
             // Super freeze: the opponent and the projectiles wait for the release. A Super that
             // strikes leaves a few frames to react after the flash (holding guard still blocks).
@@ -660,6 +666,36 @@ final class CombatEngine {
             other.hitstop = Math.max(other.hitstop, freeze);
             superFreeze = Math.max(superFreeze, freeze);
         }
+    }
+
+    /** Quadros de atraso entre um clone de sombra e o próximo. */
+    private static final int CLONE_DELAY = 10;
+
+    /**
+     * Legião de Sombras (p06): clones roxos dela surgem atrás do rival e repetem o Super, um
+     * depois do outro. Só desenho: o dano continua o dos golpes dela.
+     */
+    private void callClones(CombatFighter f, AttackDefinition attack) {
+        CharacterDefinition.Projectile sup = f.state.profile.superAttack;
+        CharacterDefinition.Animation clip = f.character().specialAnimations.get("SUPER");
+        if (sup == null || sup.clones <= 0 || clip == null) return;
+        CombatFighter d = fighters[1 - f.index];
+        CharacterDefinition.Move move = new CharacterDefinition.Move("SUPER", clip, null, attack);
+        float gap = f.body().halfWidth + d.body().halfWidth + 40f;
+        for (int i = 0; i < sup.clones; i++) {
+            // Atrás do rival, virados para ele; encostado na parede, o clone fica do lado dela.
+            float behind = d.x + f.facing * (gap + i * 110f);
+            int facing = -f.facing;
+            if (behind < Arena.LEFT_BOUND || behind > Arena.RIGHT_BOUND) {
+                behind = f.x - f.facing * (60f + i * 110f);
+                facing = f.facing;
+            }
+            Echo clone = new Echo(f.index, attack, move, Arena.clamp(behind, Arena.LEFT_BOUND, Arena.RIGHT_BOUND),
+                Arena.GROUND_Y, facing, CLONE_DELAY * (i + 1), 0);
+            clone.ghost = true;
+            echoes.add(clone);
+        }
+        cues.add("CLONES");
     }
 
     private void startUltra(CombatFighter f) {
@@ -948,7 +984,7 @@ final class CombatEngine {
     /** The shadow's strike, with the attack's own hitboxes from where the shadow stands. */
     private void detectEchoes() {
         for (Echo e : echoes) {
-            if (!e.visible() || !e.attack.isActive(e.frame) || e.hitsOnTarget >= e.attack.maxHits) continue;
+            if (e.ghost || !e.visible() || !e.attack.isActive(e.frame) || e.hitsOnTarget >= e.attack.maxHits) continue;
             CombatFighter a = fighters[e.owner], d = fighters[1 - e.owner];
             if (!d.hittable() || evades(d, e.attack, false, true)) continue;
             for (int i = 0; i < e.attack.hitboxCount(); i++) {
@@ -1401,8 +1437,10 @@ final class CombatEngine {
         Projectile p = new Projectile(
             f.x + f.facing * data.spawnX, base - height, range, speed,
             radius, damage, profile.color, f.index, f.facing, f.attack,
-            superKind ? null : energy ? profile.energyVisual : data.visual);
+            energy ? profile.energyVisual : data.visual);
         p.vy = data.vertical;
+        p.totalHits = data.hits;
+        p.hitInterval = data.hitInterval;
         if (data.puddleFrames > 0) p.puddle = data;
         (superKind ? superProjectiles : energyProjectiles).add(p);
     }
@@ -1454,6 +1492,7 @@ final class CombatEngine {
         while (it.hasNext()) {
             Projectile p = it.next();
             p.previousX = p.x;
+            if (p.holding) continue;   // parado no rival entre um acerto e o próximo
             if (p.returning) {
                 // O chicote recolhe mais rápido do que estica e some ao chegar na mão.
                 p.x -= RETRACT_SPEED * p.speed * p.direction * CombatConfig.DT;
@@ -1564,13 +1603,27 @@ final class CombatEngine {
         while (it.hasNext()) {
             Projectile p = it.next();
             if (p.returning) continue;
+            if (p.hitCooldown > 0) {
+                p.hitCooldown--;
+                continue;
+            }
             CombatFighter d = fighters[1 - p.ownerIndex];
             // An evading body lets the projectile fly on.
-            if (!d.hittable() || evades(d, p.attack, false, true)) continue;
-            if (CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), d.crouchingBody())) {
-                addContact(fighters[p.ownerIndex], d, p.attack, -1, p);
-                if (p.retracts()) p.returning = true;
-                else it.remove();
+            boolean hits = d.hittable() && !evades(d, p.attack, false, true) &&
+                CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), d.crouchingBody());
+            if (!hits) {
+                p.holding = false;   // o rival saiu de baixo: a onda segue voando com os acertos que sobraram
+                continue;
+            }
+            addContact(fighters[p.ownerIndex], d, p.attack, -1, p);
+            contacts.get(contacts.size() - 1).strike = p.hitsDone;
+            if (++p.hitsDone < p.totalHits) {
+                p.holding = true;
+                p.hitCooldown = p.hitInterval;
+            } else if (p.retracts()) {
+                p.returning = true;
+            } else {
+                it.remove();
             }
         }
     }
@@ -2073,13 +2126,18 @@ final class CombatEngine {
         // Several strikes (the animation hits more than once): the damage is split between them,
         // the ones before the last only hold the defender until the next, the last one lands
         // the move's effect (knockdown, launch, knockback).
+        // O projétil de vários acertos faz o mesmo, contando os acertos dele.
+        int projectileHits = projectile ? c.projectile.totalHits : 1;
+        boolean multiProjectile = projectileHits > 1;
         boolean multi = !projectile && attack.maxHits > 1;
         // A trade ends both moves: each strike then lands as the last one, on both sides alike
         // (whichever contact is applied first).
         boolean stillStriking = a.attacking() && a.attack == attack && !trades(c);
-        boolean lastStrike = !multi || !stillStriking || c.hitbox >= attack.hitboxCount() - 1;
-        int holdUntil = lastStrike ? 0 : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame +
-            attack.hitstopFrames + config.strikeHoldFrames;
+        boolean lastStrike = multiProjectile ? c.strike >= projectileHits - 1
+            : !multi || !stillStriking || c.hitbox >= attack.hitboxCount() - 1;
+        int holdUntil = lastStrike ? 0 : multiProjectile
+            ? c.projectile.hitInterval + attack.hitstopFrames + config.strikeHoldFrames
+            : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame + attack.hitstopFrames + config.strikeHoldFrames;
 
         if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && (!multi || !a.strikeLanded) &&
             session.juggleCount + attack.juggleCost > config.juggleLimit) {
@@ -2106,7 +2164,8 @@ final class CombatEngine {
 
         int guard = effectiveGuard(d);
         if (guardStops(guard, attack, !a.grounded, projectile)) {
-            block(a, d, attack, guard, direction, projectile, !lastStrike, !multi || !a.strikeBlocked);
+            block(a, d, attack, guard, direction, projectile, !lastStrike,
+                multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked);
             if (multi) a.strikeBlocked = true;
             if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
@@ -2115,9 +2174,10 @@ final class CombatEngine {
 
         // Fury: the attacker hits harder the less life it has left.
         int base = projectile ? c.projectile.damage : attack.damage;
-        if (multi) {
-            int each = base / attack.maxHits;
-            base = lastStrike ? base - each * (attack.maxHits - 1) : each;
+        if (multi || multiProjectile) {
+            int count = multi ? attack.maxHits : projectileHits;
+            int each = base / count;
+            base = lastStrike ? base - each * (count - 1) : each;
         }
         int raw = base * a.state.profile.furyScale(a.state.life) / 1000;
         if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
@@ -2136,7 +2196,7 @@ final class CombatEngine {
         session = sessionFor(a, d);
         // The move's first strike that hits pays meter and sets the combo scale; the later
         // strikes keep that scale (a new combo starts over as a first strike).
-        boolean firstStrike = !multi || !a.strikeLanded || newSession;
+        boolean firstStrike = multiProjectile ? c.strike == 0 || newSession : !multi || !a.strikeLanded || newSession;
         if (multi) a.strikeLanded = true;
         int hitstun = session.decayedHitstun(attack.hitstunFrames, config);
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);

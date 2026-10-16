@@ -53,6 +53,22 @@ public class PaginaHistoriaTest {
     }
 
     @Test
+    public void lutaUmContraUmComUmLutadorDeCadaLado() {
+        Episodio e = Episodio.fromJson("{\"id\":\"x\",\"numero\":1,\"titulo\":\"X\",\"passos\":[" +
+            "{\"tipo\":\"luta\",\"dupla\":[\"player_base\"],\"cpu\":[\"p02\"]}]}");
+        assertEquals(1, e.passos.get(0).dupla.length);
+        assertEquals("p02", e.passos.get(0).cpu[0]);
+        for (String lados : new String[] {"\"dupla\":[\"a\"],\"cpu\":[\"b\",\"c\"]", "\"dupla\":\"jogador\",\"cpu\":[\"b\"]"}) {
+            try {
+                Episodio.fromJson("{\"id\":\"x\",\"numero\":1,\"titulo\":\"X\",\"passos\":[{\"tipo\":\"luta\"," + lados + "}]}");
+                fail("1x1 de um lado só: " + lados);
+            } catch (IllegalArgumentException esperado) {
+                // os dois lados precisam ter o mesmo tamanho
+            }
+        }
+    }
+
+    @Test
     public void tocaPaginaLutaEProximo() {
         Recorder rec = new Recorder();
         PaginaHistoria p = new PaginaHistoria(rec, new NoImages());

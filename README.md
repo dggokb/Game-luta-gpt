@@ -322,8 +322,8 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
   11 páginas prontas lidas quadro a quadro (com o treino/tutorial depois da página 4), o
   Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
-- **Torneio** (ep01–ep06, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
-  **Kōga (p03)**; o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
+- **Torneio** (ep01–ep07, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
+  **Kōga (p03)**; no ep02 cada um convence o parceiro numa luta 1x1 (P01 × P02, p03 × p04); o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
   opostas: quartas → **emboscada fora da arena** (a dupla que perdeu a outra quarta do seu
   lado quer a sua vaga) → semifinal → final 2x2 contra o outro irmão → **duelo 1x1** contra o
   próprio parceiro (a regra escondida). O rival sempre avança; CPU × CPU é sorteado.

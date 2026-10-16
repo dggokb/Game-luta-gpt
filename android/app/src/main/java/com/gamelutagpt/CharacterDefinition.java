@@ -157,6 +157,16 @@ final class CharacterDefinition {
         /** Desenho e velocidade vertical (projétil de especial; o S1 usa Fighter.energyVisual). */
         String visual;
         float vertical;
+        /** Acertos (vários: para no rival entre eles) e o intervalo, em quadros. */
+        int hits=1,hitInterval;
+        /** Clones de sombra que repetem o Super em volta do rival (p06); só desenho. */
+        int clones;
+        Projectile withVisual(String name) { visual=name; return this; }
+        Projectile withHits(int count,int interval) {
+            if(count<1||count>1&&interval<1)throw new IllegalArgumentException("projectile hits need an interval");
+            hits=count;hitInterval=interval;return this;
+        }
+        Projectile withClones(int count) { clones=count; return this; }
         /** Poça que fica onde o projétil cai (0 quadros: some no chão). */
         int puddleFrames,puddleDamage,puddlePoisonFrames;
         float puddleHalfWidth;

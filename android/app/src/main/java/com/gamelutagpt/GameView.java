@@ -1804,6 +1804,7 @@ public class GameView extends SurfaceView
             case "CHARGED": return "ONDA CARREGADA!";
             case "ECHO": return "ECO DE SOMBRA!";
             case "HENCHMEN": return "COBRANÇA!";
+            case "CLONES": return "LEGIÃO DE SOMBRAS!";
             default: return null;
         }
     }
@@ -2060,7 +2061,7 @@ public class GameView extends SurfaceView
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
-            effects.drawSuperProjectiles(canvas, paint, engine.superProjectiles);
+            effects.drawSuperProjectiles(canvas, renderCanvas, engine.superProjectiles);
             if (isSuperCinematicActive()) {
                 effects.drawWorldOverlay(canvas, paint, superDarkAlpha, 0, 0, 8);
                 canvas.save();

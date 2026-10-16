@@ -248,18 +248,23 @@ public class TorneioTest {
         List<String> rotulos = new ArrayList<>();
         Campanha campanha = Campanha.load(new GameAssets(), 7L);
         List<String[][]> lutas = temporada(Torneio.KOGA, rotulos, campanha);
-        // Treino do ep01, quartas, emboscada fora da arena, semifinal, final, duelo.
-        assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Campanha.EMBOSCADA, Torneio.SEMIFINAL,
-            Torneio.FINAL, Campanha.DUELO), rotulos);
-        for (int i = 0; i < 5; i++) assertEquals("p03", lutas.get(i)[0][0]);
+        // Treino do ep01, convite do parceiro (ep02), quartas, emboscada fora da arena, semifinal,
+        // final, duelo.
+        assertEquals(java.util.Arrays.asList("TREINO", "CONVITE", Torneio.QUARTAS, Campanha.EMBOSCADA,
+            Torneio.SEMIFINAL, Torneio.FINAL, Campanha.DUELO), rotulos);
+        for (int i = 0; i < 6; i++) assertEquals("p03", lutas.get(i)[0][0]);
+        // O convite é 1x1: Kōga contra o p04, que vira o parceiro dele.
+        assertEquals(1, lutas.get(1)[0].length);
+        assertEquals("p04", lutas.get(1)[1][0]);
+        assertEquals(1, lutas.get(1)[1].length);
         // A emboscada é a dupla que perdeu a outra quarta do lado do Kōga (vagas 4 e 5).
-        String[] emboscada = lutas.get(2)[1];
+        String[] emboscada = lutas.get(3)[1];
         Torneio t = campanha.torneio();
         Torneio.Dupla outraQuartaA = t.participante(0, 4), outraQuartaB = t.participante(0, 5);
         Torneio.Dupla perdedora = t.participante(1, 2) == outraQuartaA ? outraQuartaB : outraQuartaA;
         assertEquals(perdedora.lutadores[0], emboscada[0]);
-        assertEquals("player_base", lutas.get(4)[1][0]);
-        String[][] duelo = lutas.get(5);
+        assertEquals("player_base", lutas.get(5)[1][0]);
+        String[][] duelo = lutas.get(6);
         assertEquals("p03", duelo[0][0]);
         assertEquals("p04", duelo[1][0]);
         assertEquals(1, duelo[0].length);
@@ -269,10 +274,15 @@ public class TorneioTest {
     public void temporadaDoRyuga() throws IOException {
         List<String> rotulos = new ArrayList<>();
         List<String[][]> lutas = temporada(Torneio.RYUGA, rotulos, Campanha.load(new GameAssets(), 3L));
-        assertEquals(java.util.Arrays.asList("TREINO", Torneio.QUARTAS, Campanha.EMBOSCADA, Torneio.SEMIFINAL,
-            Torneio.FINAL, Campanha.DUELO), rotulos);
-        assertEquals("p03", lutas.get(4)[1][0]);
-        assertEquals("p02", lutas.get(5)[1][0]);
+        assertEquals(java.util.Arrays.asList("TREINO", "CONVITE", Torneio.QUARTAS, Campanha.EMBOSCADA,
+            Torneio.SEMIFINAL, Torneio.FINAL, Campanha.DUELO), rotulos);
+        // O convite é 1x1: Ryūga (P01) contra o P02, que vira o parceiro dele.
+        assertEquals("player_base", lutas.get(1)[0][0]);
+        assertEquals(1, lutas.get(1)[0].length);
+        assertEquals("p02", lutas.get(1)[1][0]);
+        assertEquals(1, lutas.get(1)[1].length);
+        assertEquals("p03", lutas.get(5)[1][0]);
+        assertEquals("p02", lutas.get(6)[1][0]);
     }
 
     /** As páginas prontas que o ep01 mostra, na ordem, para quem escolheu esse irmão. */
@@ -328,7 +338,7 @@ public class TorneioTest {
         Temporada temporada = Temporada.load(assets);
         Recorder rec = new Recorder();
         PaginaHistoria p = new PaginaHistoria(rec, assets);
-        p.start(temporada, temporada.loadEpisodio(assets, "ep02"));
+        p.start(temporada, temporada.loadEpisodio(assets, "ep03"));
         for (int i = 0; i < 5000 && rec.ended == null; i++) {
             Episodio.Passo passo = p.passo();
             if (passo != null) {

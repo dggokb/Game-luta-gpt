@@ -71,7 +71,7 @@ def safe(root, value):
     return p
 
 # Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
-ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA')
+ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA','FOGO')
 # Efeitos desenhados durante um especial (ProjetilVisual).
 SPECIAL_EFFECTS = ('VAPOR',)
 
@@ -113,7 +113,15 @@ def validate_fighter(pack):
         validate_command_extras(f'{name}.energy', f['energy'], False)
         if 'visual' in f['energy'] and f['energy']['visual'] not in ENERGY_VISUALS:
             raise ValueError(f'{name}.energy.visual: expected one of {list(ENERGY_VISUALS)}')
-    if 'super' in f: validate_projectile(f['super'], name+'.super', body)
+    if 'super' in f:
+        validate_projectile(f['super'], name+'.super', body)
+        sup = f['super']
+        if 'visual' in sup and sup['visual'] not in ENERGY_VISUALS:
+            raise ValueError(f'{name}.super.visual: expected one of {list(ENERGY_VISUALS)}')
+        if 'hits' in sup:
+            # Onda de vários acertos: para no rival entre um e outro.
+            positive_int(sup['hits'], name+'.super.hits');positive_int(sup.get('hitInterval'), name+'.super.hitInterval')
+        if 'clones' in sup: positive_int(sup['clones'], name+'.super.clones')
     for key in ('energy','super'):
         if key in f:
             if 'attack' not in f[key]: raise ValueError(f'{name}.{key}: attack frame data is required')
@@ -555,6 +563,12 @@ def compile_packs(root, results):
         return ('.withUltraSequence(new CharacterDefinition.UltraSequence('+str(u['preparo'])
                 +',new int[]{'+','.join(map(str,u['golpes']))+'},'+str(u['duracao'])+','+str(u['dano'])
                 +',new float[][]{'+hold+'}))')
+    def super_extras(data):
+        if data is None: return ''
+        code = '.withVisual('+q(data['visual'])+')' if 'visual' in data else ''
+        if 'hits' in data: code += '.withHits('+str(data['hits'])+','+str(data['hitInterval'])+')'
+        if 'clones' in data: code += '.withClones('+str(data['clones'])+')'
+        return code
     def projectile(data, binding):
         if data is None: return 'null'
         a = data['attack']
@@ -614,7 +628,7 @@ def compile_packs(root, results):
         energy = fi.get('energy')
         fighter = ('new CharacterDefinition.Fighter(0xFF'+fi['color'][1:].upper()+','+str(fi['maxLife'])
                    +',new String[]{'+','.join(q(b) for b in fi['autoCombo'])+'},'+projectile(energy,'S')
-                   +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'),'SUPER')
+                   +',new int[]{'+(','.join(map(str,energy['command'])) if energy else '')+'},'+projectile(fi.get('super'),'SUPER')+super_extras(fi.get('super'))
                    +',new CharacterDefinition.Body('+','.join(f(body[k]) for k in ('halfWidth','standHeight','crouchHeight','pushHalfWidth','pushHeight'))+')'
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'

@@ -64,10 +64,8 @@
     "super": {
       "damage": 4000,
       "range": 1450,
-      "speed": 1180,
+      "speed": 760,
       "spawnX": 82,
-      "spawnY": 150,
-      "airSpawnY": 86,
       "attack": {
         "startupFrames": 65,
         "activeFrames": 1,
@@ -83,7 +81,19 @@
         "cancelInto": [],
         "pushbackOnHit": 60,
         "pushbackOnBlock": 60
-      }
+      },
+      "spawnY": 58,
+      "crouchSpawnY": 58,
+      "airSpawnY": 58,
+      "superBase": {
+        "speed": 1180,
+        "spawnY": 150,
+        "crouchSpawnY": null,
+        "airSpawnY": 86
+      },
+      "visual": "FOGO",
+      "hits": 3,
+      "hitInterval": 10
     },
     "assist": {
       "move": "S"

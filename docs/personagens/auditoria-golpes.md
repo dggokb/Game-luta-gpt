@@ -30,7 +30,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S2 | Punho ascendente | uppercut, 1 acerto, derruba | ✅ |
 | S3 | Aparar: deflete e responde com um soco | golpe comum, não deflete nada | ❌ |
 | S4 | Chute giratório que avança | gira no lugar | ⚠️ falta avançar |
-| Super | Onda Máxima, projétil grande multi-hit | onda grande, 1 acerto | ⚠️ falta multi-hit |
+| Super | Onda Máxima, projétil grande multi-hit | onda grande, 5 acertos (16/10) | ✅ |
 | Ultra | Raio da Casa | investida + cinemática + raio (arte própria) | ✅ |
 
 ### p02 — kung fu (garça)
@@ -81,7 +81,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S2 | Clone que avança com palma | eco de sombra (decidido no lugar do clone) | ⚠️ decisão |
 | S3 | Puxar | alcança longe e puxa | ✅ |
 | S4 | Passo-sombra (desliza e palma) | no lugar | ⚠️ falta avançar |
-| Super | Legião de Sombras (clones atacando) | animação + **onda** | ❌ |
+| Super | Legião de Sombras (clones atacando) | sequência corpo a corpo + 2 clones de sombra repetindo atrás do rival (16/10) | ✅ |
 | Ultra | Abismo (raio de sombra e puxa) | raio genérico, cinemática provisória | ⚠️ |
 
 ### p07 — cavalheiro pesado
@@ -112,7 +112,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S3 | Escudo (aguenta e responde com cabeçada) | armadura de 1 golpe | ✅ |
 | S4 | Investida de ombro | avança + armadura | ✅ |
 | Agarrão | Carregar e jogar | agarrão mais forte e longo | ✅ |
-| Super | Tempestade de Fogo (soca o chão, fogo) | animação + **onda** | ❌ |
+| Super | Tempestade de Fogo (soca o chão, fogo) | fogo que corre pelo chão, 3 acertos (16/10) | ✅ |
 | Ultra | Resgate Final (**agarra**, salta e arremessa) | sequência do vídeo: agarra, ergue acima da cabeça no pulo e arremessa (3 golpes, rival preso à pose) | ✅ |
 
 ### p10 — bombeira ágil
@@ -168,8 +168,8 @@ da ficha). O que falta é o jogo fazer o que a animação mostra:
    (feito 15/10, menos a shuriken, que é o S2 do p05 e fica com o item 5)
 2. **Golpes de vários acertos:** cada acerto onde a animação bate (rekka do p03, uppercut do
    p03, Supers de sequência).
-3. **Super por tipo:** sequência corpo a corpo que avança (a maioria), onda multi-hit (p01),
-   capangas (p07), soco no chão com fogo (p09), clones (p06).
+3. ~~**Super por tipo:** sequência corpo a corpo que avança (a maioria), onda multi-hit (p01),
+   capangas (p07), soco no chão com fogo (p09), clones (p06).~~ (feito 15 e 16/10)
 4. **Ultra por tipo:** investida que vira sequência de golpes (a maioria), agarrão (p09, p11) e
    raio (p01, p06).
 5. ~~**Ajustes pequenos:** avanço nos S4 que andam (p01, p02, p04, p06, p08, p12), S4 baixo do p07,
@@ -274,4 +274,20 @@ Pelo bloco "especiais" de `tools/sprites/mecanicas.json` (S2 a S4 de cada um):
   cima enquanto ele acontece.
 
 Desenhos (seringa, poça e vapor) também no visualizador: `gradle :pc-preview:runProjeteis`.
+
+## Supers do p01, p06 e p09 (16/10)
+
+Pelo bloco "super" de `tools/sprites/mecanicas.json`:
+
+- **p01, Onda Máxima:** a onda grande acerta 5 vezes. Ela para no rival entre um acerto e
+  outro (pulsando) e o dano do Super se divide entre os acertos; defendida, são 5 defesas. Se
+  o rival sai da frente, ela segue voando com os acertos que sobraram.
+- **p09, Tempestade de Fogo:** depois do soco no chão sai uma parede de fogo que corre pelo chão
+  (mais devagar que a onda), com 3 acertos. Pulando, dá para passar por cima.
+- **p06, Legião de Sombras:** a sequência dela continua igual; dois clones de sombra roxos
+  aparecem atrás do rival e repetem o Super, um depois do outro. Os clones são só desenho: o
+  dano continua o dos golpes dela.
+
+Também corrigido: os especiais que lançam (shuriken do p05, seringa da p11) tocavam a animação
+do S1; agora tocam a própria.
 

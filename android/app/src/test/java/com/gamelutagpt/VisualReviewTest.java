@@ -122,7 +122,7 @@ public class VisualReviewTest {
         orbs.clear();
         Projectile big=new Projectile(p.x-200f,npc.y-300f,900f,600f,58f,10,0xFFFF4FA0,0,1,null);
         big.x+=260f;orbs.add(big);
-        effects.drawSuperProjectiles(c,new Paint(),orbs);
+        effects.drawSuperProjectiles(c,rc,orbs);
         c.save();c.translate(-200f,0f);
         effects.drawSuperCharge(c,new Paint(),900f,npc.y,.37f,0xFF22BFFF);
         c.restore();
