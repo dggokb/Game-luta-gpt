@@ -55,8 +55,11 @@ final class CombatConfig {
     /** After a LAUNCH hit, a jump becomes a super jump for this many frames. */
     int launcherChaseFrames = 54;
     int knockdownFallFrames = 13;
-    int knockdownDownFrames = 72;
+    /** Lying on the ground before the normal wake-up (was 72: too long to watch). */
+    int knockdownDownFrames = 30;
     int wakeupFrames = 21;
+    /** Longest wake-up: a longer GETUP clip plays faster to fit it. */
+    int maxWakeupFrames = 30;
 
     /** Default input priority when a character does not declare its own. */
     static final AttackDefinition.Strength[] DEFAULT_PRIORITY = {
@@ -206,7 +209,7 @@ final class CombatConfig {
     float airTechNeutralPop = 380f;
     // Wake-up options, chosen with the direction while lying down (relative to facing).
     /** ↑: quick rise, after at least this long on the ground. */
-    int quickRiseDownFrames = 14;
+    int quickRiseDownFrames = 6;
     /** ← / →: roll (invulnerable, passes through the other body), then up. */
     int rollFrames = 24;
     float rollSpeed = 560f;
@@ -215,6 +218,23 @@ final class CombatConfig {
 
     // Wall bounce and ground bounce: once each per combo (the next one is a plain hit).
     int maxWallBounces = 1;
+    /**
+     * Punish counter (como no SF6): um H em pé que acerta o rival no meio do golpe dele
+     * (início ou recuperação) o joga girando no ar a média distância (~360 px), e ele cai deitado.
+     */
+    float spinSpeed = 360f;
+    /** Congelamento extra do acerto no punish counter e no golpe que nocauteia (peso do impacto). */
+    int punishHitstopBonus = 8;
+    /**
+     * Pose do impacto (como no FighterZ): golpes médios e fortes que acertam congelam um pouco
+     * mais, para a pose esticada "grudar" na tela. Os dois lutadores congelam juntos, então a
+     * vantagem e os combos não mudam. Defesa não ganha.
+     */
+    int mediumHitHoldFrames = 3;
+    int heavyHitHoldFrames = 4;
+    int koHitstopBonus = 16;
+    float spinLift = 820f;
+    int spinHitstunFrames = 30;
     int maxGroundBounces = 1;
     /** The defender flies toward the wall: the arena edge or this far from the attacker (screen edge). */
     float wallBounceSpeed = 1500f;

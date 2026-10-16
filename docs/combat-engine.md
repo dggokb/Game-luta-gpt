@@ -213,9 +213,9 @@ têm air tech (caem derrubados).
 
 | Direção | Resultado |
 | --- | --- |
-| ↑ | **Levantar rápido**: fica só 14 frames no chão (em vez de 72) |
+| ↑ | **Levantar rápido**: fica só 6 frames no chão (em vez de 30) |
 | ← | **Rolar para trás**: 24 frames invulnerável, ~220 px para longe |
-| → | **Rolar para a frente**: passa por baixo do oponente (atravessa o corpo) |
+| → | **Rolar para a frente**: passa por baixo do oponente (atravessa o corpo) e levanta já virado para ele |
 | ↓ | **Levantar atrasado**: +30 frames no chão (quebra o tempo do oki) |
 | nada | levanta no tempo normal |
 
@@ -225,6 +225,22 @@ têm air tech (caem derrubados).
 - **CPU**: faz air tech em ~70% das vezes (neutro, para trás ou para a frente) e escolhe
   levantar rápido, rolar, atrasar ou normal ao acaso.
 - Sem arte própria ainda: o rolamento usa o clipe de levantar.
+- Quem levanta sempre fica de frente para o oponente (vira quando o rolamento passa por
+  baixo dele), em vez de só virar quando volta ao neutro.
+- O levantar dura no máximo `maxWakeupFrames` (30): um clipe GETUP mais longo toca mais
+  rápido, inteiro, no tempo do motor. Queda + chão + levantar normal ≈ 1,2 s.
+
+**Punish counter (giro no ar, como no SF6):** o H em pé que acerta o rival **no meio do golpe
+dele** (início, ativo ou recuperação) o joga girando no ar a média distância (~360 px, ~1 s
+de voo) e ele cai deitado, sem air tech. Ainda dá para emendar golpes nele no ar (conta no
+limite de juggle). A tela treme e aparece "PUNISH COUNTER!". O 2H (lançador) não conta, nem
+golpes leves/médios, especiais ou projéteis. Valores em `CombatConfig.spin*`; o giro é só
+visual (o sprite gira em torno do próprio eixo, inclinado, em `GameView.spinTransform`).
+Testes em `PunishCounterTest`.
+
+**KO e derrota:** quem é nocauteado deitado (ou no ar, que cai deitado) não levanta mais.
+Quem cai de pé (o último golpe não derruba) toca o clipe `DEFEAT` do pack uma vez, 2× mais
+rápido (~2 s), e fica na última pose; packs sem `DEFEAT` ficam na guarda.
 
 Testes em `RecoveryTest`.
 
@@ -499,3 +515,49 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 - (Fase 10 feita na v0.83: wall bounce e ground bounce.)
 - Os packs usam a hitbox padrão; nenhuma hitbox/hurtbox por frame foi desenhada ainda,
   embora o formato e o motor suportem.
+
+## Peso dos golpes (som, tremida, câmera)
+
+Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
+
+- **Sons de luta** (`assets/sons/luta`, gerados por síntese em `tools/sons/gerar_sons.py`):
+  "vush" do golpe no ar pouco antes de ele bater (leve/médio/pesado), acerto leve/médio/
+  pesado/especial, defesa, queda no chão, punish counter e KO. Cada um toca com o tom
+  variando um pouco, para dois socos seguidos não soarem iguais.
+- **Tremida**: quem apanha treme de um lado para o outro durante o congelamento do acerto
+  (hitstop); na defesa, bem menos (`ImpactFeel.hitShake`).
+- **Soco de câmera**: médio, pesado e especial aproximam a câmera um pouco (1,2%, 2,5% e 5%) no ponto do
+  impacto e ela volta sozinha (`ImpactFeel.ZOOM`).
+- **Impact frames**: pesado, especial e punish counter escurecem o cenário por 3–6 quadros,
+  com os lutadores na frente (`ImpactFeel.DARK`).
+- **KO**: o golpe que nocauteia congela mais (`koHitstopBonus`, +16), a tela treme forte,
+  um clarão branco e câmera lenta (~0,7 s de luta a 35%).
+- **Punish counter**: congela +8 quadros (`punishHitstopBonus`).
+- **Impact frames** (a técnica dos animes): por 2 quadros a cena vira silhueta, com linhas
+  de velocidade saindo do impacto, e 1 quadro de cores invertidas antes de voltar.
+  - Vermelho e preto (fundo vermelho, silhuetas pretas com contorno branco): punish counter
+    e o golpe que fecha um combo de 5+ acertos jogando o rival longe (queda, parede, chão, giro).
+  - Branco no vazio (tudo preto, silhuetas brancas): KO, acerto do Super e o último dano do
+    Ultra (o último golpe do Ultra em sequência e a explosão final do Ultra de raio).
+  - No máximo um a cada 30 quadros (só o branco passa na frente do vermelho), para a tela não
+    ficar piscando. A pausa tem **IMPACTO: LIGADO/DESLIGADO** (salvo no aparelho), para quem
+    é sensível a luz piscando.
+
+- **Raios de luz** (referência: FighterZ): todo acerto solta lanças de luz que saem do ponto
+  do golpe e abrem até cruzar a tela (1 no leve, 2 no médio, 3 no pesado, 4 no especial),
+  finas no impacto e largas na ponta, com brilho em volta (`ImpactEffects.SPEAR_*`).
+- **Close de cinema**: no lançador, no golpe que joga o rival na parede/no chão e no KO, a
+  câmera corta para um close de ~1,8× no impacto, inclinado 8° a favor do golpe, com o fundo
+  escurecendo e a luta a 45% por 12 quadros, e volta com corte seco (`ImpactFeel.CINEMA_*`).
+  O H que joga na parede ganha um close mais aberto (~1,5×, `CINEMA_ZOOM_WALL`).
+  Um por combo (90 quadros de intervalo); o KO sempre ganha o seu.
+- **Poeira e pedrinhas** quando um corpo bate no chão (mais forte vindo do alto) e no quique.
+
+- **Pose do impacto** (medido no FighterZ: o golpe fica parado esticado 0,12–0,2 s e volta
+  à guarda em 1–2 quadros): golpes médios e fortes que acertam congelam +3/+4 quadros
+  (`mediumHitHoldFrames`, `heavyHitHoldFrames`; os dois congelam juntos, então a vantagem e os
+  combos não mudam) e, depois da janela ativa, o desenho volta à guarda em 3 quadros e fica
+  nela no resto da recuperação (`ImpactFeel.snapBackTime`). Golpe que erra volta devagar,
+  como antes. Defesa e golpes de vários acertos não mudam.
+
+Testes em `ImpactFeelTest` e `PunishCounterTest`.

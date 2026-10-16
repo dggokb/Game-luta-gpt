@@ -559,8 +559,10 @@ final class CombatEngine {
                 }
                 break;
             case KNOCKDOWN: {
+                // Defeated: stays down (the KO is the defeat pose).
+                if (f.ko()) break;
                 if (f.knockdownFrame >= config.knockdownFallFrames && f.wakeup == CombatFighter.WAKE_NORMAL &&
-                    !f.hardKnockdown && !f.ko()) {
+                    !f.hardKnockdown) {
                     chooseWakeup(f);
                 }
                 int down = config.knockdownDownFrames;
@@ -579,6 +581,8 @@ final class CombatEngine {
                 break;
             }
             case WAKEUP:
+                // Gets up facing the opponent: a forward roll turns around as it passes under it.
+                faceOpponent(f);
                 if (f.rollFrames == 0 && f.knockdownFrame >= wakeupFrames(f)) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.throwProtect = config.throwProtectFrames;
@@ -753,14 +757,17 @@ final class CombatEngine {
         cues.add("AIR_TECH");
     }
 
-    /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
-    /** Wake-up length of a fighter: its own (timed to its GETUP art) or the engine default. */
-    private int wakeupFrames(CombatFighter f) {
+    /**
+     * Wake-up length of a fighter: its own (timed to its GETUP art) or the engine default,
+     * never longer than {@link CombatConfig#maxWakeupFrames}.
+     */
+    int wakeupFrames(CombatFighter f) {
         CharacterDefinition c = f.character();
         int own = c == null ? 0 : c.fighter.wakeupFrames;
-        return own > 0 ? own : config.wakeupFrames;
+        return Math.min(own > 0 ? own : config.wakeupFrames, config.maxWakeupFrames);
     }
 
+    /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
     private void chooseWakeup(CombatFighter f) {
         switch (MotionParser.relative(f.input.direction, f.facing)) {
             case 6: case 7: case 8: f.wakeup = CombatFighter.WAKE_QUICK; break;
@@ -1185,7 +1192,8 @@ final class CombatEngine {
         f.vx = 0f;
         f.freeFallFrames = 0;
         if (f.status == CombatFighter.Status.AIR_HITSTUN) {
-            if (f.slammed || f.ultraFall || f.hardFall) {
+            // A fighter KO'd in the air lands lying down, not on its feet.
+            if (f.slammed || f.ultraFall || f.hardFall || f.ko()) {
                 knockDown(f);
             } else {
                 // Remaining hitstun is spent on the ground.
@@ -1196,6 +1204,7 @@ final class CombatEngine {
         }
         f.ultraFall = false;
         f.hardFall = false;
+        f.spinning = false;
         f.bounce = CombatFighter.BOUNCE_NONE;
         if (f.status == CombatFighter.Status.NEUTRAL) f.crouching = ControlsLayout.isDownDirection(f.input.direction);
     }
@@ -1222,6 +1231,7 @@ final class CombatEngine {
         f.slammed = false;
         f.ultraFall = false;
         f.hardFall = false;
+        f.spinning = false;
         f.bounce = CombatFighter.BOUNCE_NONE;
         f.vx = 0f;
         f.superJumping = false;
@@ -1251,6 +1261,13 @@ final class CombatEngine {
     private static boolean passingThrough(CombatFighter f) {
         AttackDefinition.Mechanics m = f.mechanics();
         return m.passThrough && m.advanceAt(f.attackFrame);
+    }
+
+    /** Turns toward the opponent, without the command cleanup of {@link #updateFacing}. */
+    private void faceOpponent(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        if (f.x < other.x - config.facingEpsilon) f.facing = 1;
+        else if (f.x > other.x + config.facingEpsilon) f.facing = -1;
     }
 
     private void updateFacing(CombatFighter f) {
@@ -2100,6 +2117,7 @@ final class CombatEngine {
             d.slammed = false;
             d.ultraFall = false;
             d.hardFall = false;
+            d.spinning = false;
             d.bounce = CombatFighter.BOUNCE_NONE;
             d.vx = 0f;
             return;
@@ -2162,6 +2180,10 @@ final class CombatEngine {
         }
 
         boolean wasCrouching = d.crouchingBody();
+        // Punish counter: a standing heavy normal caught the defender in its own move.
+        boolean punish = lastStrike && !projectile && a.grounded && d.grounded && d.attacking() &&
+            attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY &&
+            attack.launch != AttackDefinition.Launch.LAUNCH;
         d.clearAttack();
         d.forwardDashing = false;
         d.backdashFrames = 0;
@@ -2172,13 +2194,31 @@ final class CombatEngine {
         d.freeFallFrames = 0;
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
+        d.spinning = false;
         // The wall bounce is a combo tool: a lone hit in neutral is a plain hit.
         boolean wallBounce = launch == AttackDefinition.Launch.WALL_BOUNCE && session.hitCount >= 2 &&
             session.wallBounces < config.maxWallBounces;
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
 
-        if (wallBounce) {
+        if (punish) {
+            // Spinning knockdown: flies away in a medium arc, still open to a juggle, and
+            // lands lying down (no air tech).
+            d.status = CombatFighter.Status.AIR_HITSTUN;
+            d.grounded = false;
+            d.y -= 2f;
+            d.vx = direction * config.spinSpeed;
+            d.vy = -config.spinLift;
+            d.spinning = true;
+            d.launched = true;
+            d.slammed = false;
+            d.superJumping = false;
+            d.hardFall = true;
+            d.stunLeft = d.stunTotal = Math.max(hitstun, config.spinHitstunFrames);
+            d.pushRemaining = 0f;
+            d.pushFramesLeft = 0;
+            cues.add("PUNISH");
+        } else if (wallBounce) {
             // Sent flying to the wall (arena edge or screen edge); it bounces in moveHorizontally.
             session.wallBounces++;
             d.status = CombatFighter.Status.AIR_HITSTUN;
@@ -2250,7 +2290,11 @@ final class CombatEngine {
             a.strikeJuggled = true;
         }
         if (!d.grounded) session.airCombo = true;
-        freeze(a, d, lastStrike ? attack.hitstopFrames : holdingHitstop(attack), projectile);
+        int stop = lastStrike ? attack.hitstopFrames : holdingHitstop(attack);
+        if (lastStrike && !projectile) stop += hitHold(attack);
+        if (punish) stop += config.punishHitstopBonus;
+        if (d.ko()) stop += config.koHitstopBonus;
+        freeze(a, d, stop, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
     }
@@ -2330,6 +2374,13 @@ final class CombatEngine {
     }
 
     /** Hitstop: both bodies on a melee contact, only the defender for a projectile. */
+    /** Congelamento extra que segura a pose do impacto nos acertos médios e fortes. */
+    int hitHold(AttackDefinition attack) {
+        if (attack.strength == AttackDefinition.Strength.MEDIUM) return config.mediumHitHoldFrames;
+        if (attack.strength == AttackDefinition.Strength.HEAVY) return config.heavyHitHoldFrames;
+        return 0;
+    }
+
     private static void freeze(CombatFighter a, CombatFighter d, int frames, boolean projectile) {
         d.hitstop = Math.max(d.hitstop, frames);
         if (!projectile) a.hitstop = Math.max(a.hitstop, frames);

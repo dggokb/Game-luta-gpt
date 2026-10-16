@@ -4,33 +4,38 @@ import com.gamelutagpt.render.RenderCanvas;
 
 /**
  * Pausa por cima da história ou da luta (botão MENU ou a tecla voltar): CONTINUAR, a VELOCIDADE
- * da luta, a lista de COMANDOS de cada personagem ({@link TelaComandos}) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
+ * da luta, o IMPACTO (impact frames ligados ou não: a tela pisca nos golpes grandes), a lista de COMANDOS de cada personagem ({@link TelaComandos}) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
  * o jogo enquanto a pausa está aberta e desenha a pausa por cima da tela parada.
  *
  * Não depende de plataforma e não é thread-safe: chame tudo da thread do loop do jogo.
  */
 public final class MenuPausa {
-    public enum Opcao { CONTINUAR, VELOCIDADE, COMANDOS, MENU }
+    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, COMANDOS, MENU }
 
     public static final String PAUSA = "PAUSA";
     public static final String CONTINUAR = "CONTINUAR";
     public static final String VELOCIDADE = "VELOCIDADE";
+    public static final String IMPACTO = "IMPACTO";
+    public static final String LIGADO = "LIGADO";
+    public static final String DESLIGADO = "DESLIGADO";
     public static final String COMANDOS = "COMANDOS";
     public static final String MENU_INICIAL = "MENU INICIAL";
     public static final String AVISO = "Voltar ao menu perde o progresso deste episódio.";
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
-    public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, COMANDOS, MENU_INICIAL, AVISO, MENU};
+    public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, COMANDOS,
+        MENU_INICIAL, AVISO, MENU};
 
     /** Velocidades da luta (1 = original); quem usa a pausa lê e guarda a escolhida. */
     public static final float[] VELOCIDADES = {0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f};
     public static final float VELOCIDADE_PADRAO = 0.8f;
 
     static final float[][] CAIXAS = {
-        {420f, 300f, 860f, 362f},
-        {420f, 380f, 860f, 442f},
-        {420f, 460f, 860f, 522f},
-        {420f, 540f, 860f, 602f},
+        {420f, 296f, 860f, 352f},
+        {420f, 366f, 860f, 422f},
+        {420f, 436f, 860f, 492f},
+        {420f, 506f, 860f, 562f},
+        {420f, 576f, 860f, 632f},
     };
     /** O mesmo toque que abriu a pausa não pode escolher nada. */
     static final float TAP_DELAY = 0.2f;
@@ -41,6 +46,7 @@ public final class MenuPausa {
     private int cursor;
     private float time;
     private int velocidade = nivel(VELOCIDADE_PADRAO);
+    private boolean impacto = true;
     private final TelaComandos comandos = new TelaComandos();
 
     /** Abre com o cursor em CONTINUAR. {@code aviso}: mostra que o episódio se perde. */
@@ -76,6 +82,15 @@ public final class MenuPausa {
         return VELOCIDADES[velocidade];
     }
 
+    /** Impact frames ligados (a tela vira silhueta por 2–3 quadros nos golpes grandes). */
+    public boolean impacto() {
+        return impacto;
+    }
+
+    public void setImpacto(boolean ligado) {
+        impacto = ligado;
+    }
+
     /** Restaura uma velocidade salva (a mais próxima da lista). */
     public void setVelocidade(float valor) {
         velocidade = nivel(valor);
@@ -97,6 +112,10 @@ public final class MenuPausa {
         if (open && comandos.isOpen()) {
             // Na lista de comandos, ◀ ▶ trocam o personagem.
             comandos.trocar(direcao);
+            return true;
+        }
+        if (open && cursor() == Opcao.IMPACTO) {
+            if (direcao != 0) impacto = !impacto;
             return true;
         }
         if (!open || cursor() != Opcao.VELOCIDADE) return false;
@@ -127,6 +146,10 @@ public final class MenuPausa {
         }
         if (cursor() == Opcao.VELOCIDADE) {
             velocidade = (velocidade + 1) % VELOCIDADES.length;
+            return null;
+        }
+        if (cursor() == Opcao.IMPACTO) {
+            impacto = !impacto;
             return null;
         }
         if (cursor() == Opcao.COMANDOS) {
@@ -166,6 +189,10 @@ public final class MenuPausa {
                     ajustar(x < (CAIXAS[i][0] + CAIXAS[i][2]) * 0.5f ? -1 : 1);
                     return null;
                 }
+                if (cursor() == Opcao.IMPACTO) {
+                    impacto = !impacto;
+                    return null;
+                }
                 if (cursor() == Opcao.COMANDOS) {
                     comandos.abrir(temporada);
                     return null;
@@ -197,13 +224,14 @@ public final class MenuPausa {
         float size = BotaoMenu.fit(c, titulo, 64f, 600f, true);
         c.drawText(titulo, cx, 252f, size, Tinta.withAlpha(BotaoMenu.WHITE, (int)(255f * in)),
             Tinta.withAlpha(BotaoMenu.INK, (int)(255f * in)), size * 0.14f, true);
-        String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(COMANDOS), t(MENU_INICIAL)};
+        String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(IMPACTO) + ":  " + t(impacto ? LIGADO : DESLIGADO),
+            t(COMANDOS), t(MENU_INICIAL)};
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
         }
         if (aviso) {
             String texto = t(AVISO);
-            c.drawText(texto, cx, 650f, BotaoMenu.fit(c, texto, 20f, 900f, false),
+            c.drawText(texto, cx, 668f, BotaoMenu.fit(c, texto, 20f, 900f, false),
                 Tinta.withAlpha(0xFFB9C0D0, (int)(255f * in)), 0, 0f, false);
         }
     }

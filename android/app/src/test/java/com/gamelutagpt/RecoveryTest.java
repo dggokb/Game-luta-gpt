@@ -100,7 +100,7 @@ public class RecoveryTest {
         quick.knockedDown();
         quick.in[0].direction = 7;          // ↑
         int quickFrames = quick.framesUntilFree(300);
-        assertTrue(quickFrames + 40 < normalFrames);
+        assertTrue(quickFrames + 20 < normalFrames);
 
         Sim late = new Sim();
         late.knockedDown();
@@ -126,6 +126,53 @@ public class RecoveryTest {
         forward.in[0].direction = 1;
         forward.framesUntilFree(200);
         assertTrue("rolled through to the other side", forward.p().x > 1100f);
+        assertEquals("free facing the opponent", -1, forward.p().facing);
+    }
+
+    @Test public void forwardRollGetsUpFacingTheOpponent() {
+        Sim s = new Sim();
+        s.p().x = 1000f;                    // right next to the opponent at 1100
+        s.knockedDown();
+        s.in[0].direction = 1;
+        for (int i = 0; i < 200 && s.p().status != CombatFighter.Status.NEUTRAL; i++) {
+            s.step();
+            if (s.p().status == CombatFighter.Status.WAKEUP && !s.p().rolling()) {
+                assertTrue(s.p().x > 1100f);
+                assertEquals("the rise after the roll already faces the opponent", -1, s.p().facing);
+            }
+        }
+        assertEquals(CombatFighter.Status.NEUTRAL, s.p().status);
+    }
+
+    @Test public void wakeUpIsQuickToWatch() {
+        Sim s = new Sim();
+        s.knockedDown();
+        int frames = s.framesUntilFree(300);
+        assertTrue("down and up in about a second: " + frames, frames <= 75);
+        // A long GETUP clip (p04: 47 frames) plays faster instead of holding the fighter down.
+        for (String id : new String[] {"p02", "p03", "p04", "p11"}) {
+            CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get(id), "P1"),
+                new FighterState(NPC, "CPU"), 800f, 1100f, new CombatConfig());
+            assertTrue(id, e.wakeupFrames(e.fighter(0)) <= e.config.maxWakeupFrames);
+        }
+    }
+
+    @Test public void knockedOutFighterStaysDown() {
+        Sim s = new Sim();
+        s.p().state.life = 0;
+        s.knockedDown();
+        s.in[0].direction = 7;              // ↑ does not bring it up either
+        s.steps(300);
+        assertEquals(CombatFighter.Status.KNOCKDOWN, s.p().status);
+    }
+
+    @Test public void knockedOutInTheAirLandsLyingDown() {
+        Sim s = new Sim();
+        s.airborneHitstun(200);
+        s.p().state.life = 0;
+        for (int i = 0; i < 120 && !s.p().grounded; i++) s.step();
+        assertTrue(s.p().grounded);
+        assertEquals(CombatFighter.Status.KNOCKDOWN, s.p().status);
     }
 
     @Test public void ultraKnockdownHasNoOptions() {

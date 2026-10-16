@@ -492,12 +492,14 @@ public class CombatEngineTest {
         s.step();
         s.until(() -> s.f(0).outcome == CombatFighter.Outcome.HIT, 30);
         AttackDefinition heavy = BASE.attack("H");
-        assertEquals(heavy.hitstopFrames, s.f(0).hitstop);
-        assertEquals(heavy.hitstopFrames, s.f(1).hitstop);
+        // The pack's hitstop plus the hold that keeps the impact pose on screen.
+        int frozen = heavy.hitstopFrames + s.engine.config.heavyHitHoldFrames;
+        assertEquals(frozen, s.f(0).hitstop);
+        assertEquals(frozen, s.f(1).hitstop);
         assertEquals("HITSTOP", s.f(1).stateName());
         int attackFrame = s.f(0).attackFrame, stun = s.f(1).stunLeft;
         float x = s.f(1).x;
-        s.steps(heavy.hitstopFrames);
+        s.steps(frozen);
         assertEquals(attackFrame, s.f(0).attackFrame);
         assertEquals(stun, s.f(1).stunLeft);
         assertEquals("No pushback during hitstop", x, s.f(1).x, 0.001f);

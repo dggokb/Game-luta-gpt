@@ -425,6 +425,10 @@ public class MechanicsTest {
             for (CombatEngine.HitEvent e : s.engine.events()) {
                 if (e.attacker == 0 && "ULTRA".equals(e.moveId)) { hits++; hitFrames.add(s.f(0).ultraFrame); }
             }
+            if (s.engine.cues().contains("ULTRA_FINISH")) {
+                // The screen puts the impact frame on whoever stands across from the Ultra.
+                assertEquals("still in the Ultra on its last hit", CombatFighter.Status.ULTRA, s.f(0).status);
+            }
             if (s.f(0).ultraHitsDone < seq.hits.length) {
                 assertEquals("the defender stays held in front", gap, (s.f(1).x - s.f(0).x) * s.f(0).facing, 0.5f);
                 assertFalse("nothing interrupts the sequence", s.f(0).hittable());
