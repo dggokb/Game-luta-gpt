@@ -1,0 +1,112 @@
+{
+  "status": "not_accepted_for_batch_rollout",
+  "feedback_date": "2026-10-16",
+  "delivery_commit": "77d1d7d1762b14a79702ac14212b12dc752387f7",
+  "findings": [
+    {
+      "character": "p03",
+      "movement": "dash",
+      "user_feedback": "Aparentemente só repetiu o vídeo.",
+      "delivery_decision": "pending",
+      "source_interval": {
+        "start_inclusive": 0,
+        "stop_exclusive": 97,
+        "original_frame_count": 97,
+        "playback_origin_source_time_s": 0.0,
+        "source_pts_preserved": true,
+        "playback_times_rebased": true,
+        "frames_synthesized": false
+      },
+      "scale_correction_applied": false,
+      "scale_changed_in_triage": false,
+      "loop_annotations": [],
+      "visual_approval": false
+    },
+    {
+      "character": "p04",
+      "movement": "dash",
+      "user_feedback": "Frames quebram na corrida.",
+      "delivery_decision": "corrected",
+      "source_interval": {
+        "start_inclusive": 35,
+        "stop_exclusive": 47,
+        "original_frame_count": 97,
+        "playback_origin_source_time_s": 1.4666666666666666,
+        "source_pts_preserved": true,
+        "playback_times_rebased": true,
+        "frames_synthesized": false
+      },
+      "scale_correction_applied": false,
+      "scale_changed_in_triage": false,
+      "loop_annotations": [],
+      "visual_approval": false
+    },
+    {
+      "character": "p07",
+      "movement": "dash",
+      "user_feedback": "Para no frame final e a corrida quebra.",
+      "delivery_decision": "corrected",
+      "source_interval": {
+        "start_inclusive": 32,
+        "stop_exclusive": 52,
+        "original_frame_count": 97,
+        "playback_origin_source_time_s": 1.3333333333333333,
+        "source_pts_preserved": true,
+        "playback_times_rebased": true,
+        "frames_synthesized": false
+      },
+      "scale_correction_applied": false,
+      "scale_changed_in_triage": false,
+      "loop_annotations": [],
+      "visual_approval": false
+    },
+    {
+      "character": "p09",
+      "movement": "dash",
+      "user_feedback": "Amplia na corrida e a sequência quebra.",
+      "delivery_decision": "preserved",
+      "source_interval": {
+        "start_inclusive": 0,
+        "stop_exclusive": 97,
+        "original_frame_count": 97,
+        "playback_origin_source_time_s": 0.0,
+        "source_pts_preserved": true,
+        "playback_times_rebased": true,
+        "frames_synthesized": false
+      },
+      "scale_correction_applied": false,
+      "scale_changed_in_triage": false,
+      "loop_annotations": [],
+      "visual_approval": false
+    },
+    {
+      "character": "p10",
+      "movement": "dash",
+      "user_feedback": "Amplia na corrida e a sequência quebra.",
+      "delivery_decision": "corrected",
+      "source_interval": {
+        "start_inclusive": 45,
+        "stop_exclusive": 59,
+        "original_frame_count": 97,
+        "playback_origin_source_time_s": 1.8833333333333333,
+        "source_pts_preserved": true,
+        "playback_times_rebased": true,
+        "frames_synthesized": false
+      },
+      "scale_correction_applied": false,
+      "scale_changed_in_triage": false,
+      "loop_annotations": [],
+      "visual_approval": false
+    },
+    {
+      "character": "p11",
+      "movement": "dash",
+      "user_feedback": "Amplia um pouco na corrida.",
+      "previous_visual_acceptance_superseded": true,
+      "visual_approval": false,
+      "note": "Earlier technical patch/torso gates remain historical evidence, not approval of the complete animation."
+    }
+  ],
+  "conclusion": "Position/matte fixes and valid metadata do not establish stable body size or a fluid loop. Do not extend the current method automatically to all movements.",
+  "source_frame_order": "The selected source frames are consecutive; fluency across the loop seam was not validated. No missing-frame diagnosis is inferred."
+}

@@ -1,5 +1,7 @@
 # Triagem seletiva dos movimentos
 
+> **Revisão do usuário em 2026-10-16: resultado insuficiente para ampliar o lote.** P03 repete a fonte; P04/P07 apresentam quebra na corrida; P09/P10 apresentam aumento e quebra; P11 ainda amplia. A triagem abaixo registra ajustes de X/recorte, sem correção da escala nesses casos e sem validação da emenda do ciclo. A aprovação visual anterior de P11 foi superada por esse retorno. [Registro por caso](evidence/triagem/user-review.json) · [Fim → início dos recortes](evidence/triagem/review-seams.jpg).
+
 A triagem encontrou problemas de posição horizontal e recorte verde em oito casos. Esta entrega acrescenta **531 PNGs candidatos**, sem reprocessar a coleção inteira. P02, P06, P08 e P11 permanecem como a referência visual aceita pelo usuário (“Deu certo”); seus 29 arquivos de prévia foram copiados sem alterar um byte. A aceitação visual não altera os controles técnicos documentados no ensaio anterior.
 
 [Baixar APK de triagem, cerca de 40 MB](https://github.com/dggokb/Game-luta-gpt/raw/refs/heads/padronizacao-sprites/dist/sprites-triagem.apk). Versão `1.8-triagem`, versionCode 9, Android 8+, mesmo aplicativo e assinatura do teste dos quatro personagens. Atualiza esse teste; o APK completo 1.5 continua separado.

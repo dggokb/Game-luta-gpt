@@ -1,5 +1,7 @@
 # Dash — ensaio com P02, P06, P08 e P11
 
+**Retorno posterior do usuário (2026-10-16): P11 ainda amplia durante a corrida.** A aceitação visual anterior desse personagem foi superada; passar nos controles locais abaixo não aprova a animação completa. [Revisão da entrega seguinte](TRIAGEM-SELETIVA.md).
+
 **Atualização:** o usuário aceitou visualmente este ensaio (“Deu certo”). A [triagem seletiva seguinte](TRIAGEM-SELETIVA.md) preserva estes quatro personagens sem alterar seus arquivos. Os resultados técnicos abaixo continuam registrados.
 
 O mesmo método foi aplicado aos quatro personagens pedidos, antes de ampliar o lote. **O resultado ainda não permite adotar a técnica como padrão automático para todos:** P02 e P11 passam nos controles definidos; P06 tem um frame sem registro confiável e P08 mantém oscilação acima do limite.
