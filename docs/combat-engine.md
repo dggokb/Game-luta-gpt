@@ -31,7 +31,7 @@ decisão da IA, dá um passo no motor e desenha.
 2. encerrar estados vencidos e resolver inícios/cancelamentos (CancelSystem), depois
    troca e assist (`TeamSystem.resolve`);
 3. avançar máquinas de estado, movimento, o time (troca, corpo e golpe do assist) e
-   projéteis;
+   projéteis (com o choque entre projéteis, antes de eles acertarem alguém);
 4. detectar colisões (simultâneas: trocas de golpe acontecem), inclusive do assist;
 5. aplicar reações, hitstop e pushback;
 6. atualizar as ComboSessions e juntar a barra do time.
@@ -57,6 +57,33 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
   cancelamento acontece no primeiro frame após ele.
 - **Super freeze**: o Super congela o oponente e os projéteis durante o próprio startup
   (o que permite H → SUPER combar).
+
+## Anulação de projéteis
+
+Projéteis de lados opostos que se tocam se anulam antes de chegar em alguém
+(`CombatEngine.clashProjectiles`, no passo 3, logo depois de os projéteis andarem).
+
+- **Força** de cada projétil = acertos que ainda faltam (`Projectile.durability`). No choque
+  cada um perde a força do outro e some quando ela chega a zero: onda contra onda somem as
+  duas; a Onda Máxima (5 acertos) contra a Onda Máxima também.
+- **Super contra especial**: o Super não perde nada, a onda do rival some e o Super segue
+  inteiro até o rival. O especial nunca para um Super.
+- **Quem entra**: ondas de energia, especiais lançados (kunai, shuriken, bisturi, seringa,
+  machado) e Supers em projétil. **Não entram**: o chicote da p08 (é o braço, não energia),
+  projétil voltando ou parado no rival entre dois acertos, capangas e ecos de sombra.
+- **Altura conta**: só se tocam se as alturas se cruzam (soma dos raios). A sombra baixa do
+  p06 passa por baixo da onda na altura do peito.
+- **Teste contínuo** (`CombatRules.projectilesMeet`): a distância entre os centros muda em
+  linha reta dentro do quadro, então um par rápido que se cruzou dentro de um único quadro
+  também se choca.
+- Depois do choque o lançador pode soltar outra onda na hora (a regra de uma por vez libera).
+- Nada de barra, hitstop ou dano no choque. O motor avisa com o cue `PROJECTILE_CLASH` e a
+  lista `clashes()` (ponto, Super ou não, cor e sentido de cada lado); o `GameView` solta uma
+  faísca de cada lado na cor de quem lançou, treme a tela de leve e toca o som de acerto.
+- Base para o Beam Clash do roadmap: hoje o choque é instantâneo; a disputa jogável entre
+  dois Supers pode nascer daqui.
+
+Testes: `AnulacaoProjeteisTest`.
 
 ## Ultra (↓ + SUPER) — v0.75
 

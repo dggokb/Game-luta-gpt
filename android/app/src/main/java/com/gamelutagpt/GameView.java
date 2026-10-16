@@ -1210,6 +1210,7 @@ public class GameView extends SurfaceView
                 if (pausa.impacto() && hit != null) feel.impactFrame(ultraFinalImpact, hit.x, chestY(hit));
             }
         }
+        for (CombatEngine.ProjectileClash clash : engine.clashes()) spawnClash(clash);
         updateUltraBeam();
         impacts.update(FIXED_STEP);
         feel.step();
@@ -1734,6 +1735,18 @@ public class GameView extends SurfaceView
             : punish && size >= ImpactEffects.HEAVY ? "punish"
             : HIT_SOUNDS[Math.max(0, Math.min(HIT_SOUNDS.length - 1, size))];
         ultraSounds.playFight(sound, knockout ? 1f : 0.85f, 0.94f + soundRandom.nextFloat() * 0.12f);
+    }
+
+    /**
+     * Dois projéteis se anularam: uma faísca de cada lado, cada uma na cor de quem lançou e
+     * voando no sentido do próprio projétil, como se as duas energias se empurrassem.
+     */
+    private void spawnClash(CombatEngine.ProjectileClash clash) {
+        int size = clash.big ? ImpactEffects.SPECIAL : ImpactEffects.MEDIUM;
+        impacts.spawn(ImpactEffects.HIT, clash.x, clash.y, clash.firstDirection, size, clash.firstColor);
+        impacts.spawn(ImpactEffects.HIT, clash.x, clash.y, -clash.firstDirection, size, clash.secondColor);
+        beamShake = Math.max(beamShake, clash.big ? 7f : 3f);
+        ultraSounds.playFight(clash.big ? "acerto_s" : "acerto_m", 0.8f, 0.94f + soundRandom.nextFloat() * 0.12f);
     }
 
     /**

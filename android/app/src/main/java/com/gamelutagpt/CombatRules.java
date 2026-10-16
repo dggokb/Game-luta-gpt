@@ -105,6 +105,23 @@ final class CombatRules {
         return horizontal && vertical;
     }
 
+    /**
+     * Swept test of two projectiles: whether they touched at any moment of this step. Both move
+     * in a straight line during the step, so the gap between their centers changes linearly from
+     * the previous one to the current one; they touched if that range reaches within the sum of
+     * the radii (a fast pair that crossed inside one step is caught too).
+     */
+    static boolean projectilesMeet(
+        float previousA, float nextA, float yA, float radiusA,
+        float previousB, float nextB, float yB, float radiusB
+    ) {
+        float reach = radiusA + radiusB;
+        if (Math.abs(yA - yB) > reach) return false;
+        float before = previousA - previousB;
+        float after = nextA - nextB;
+        return Math.min(before, after) <= reach && Math.max(before, after) >= -reach;
+    }
+
     /** Largest center-to-center distance at which {@code move} can touch {@code target}. */
     static float maxCenterDistance(CharacterDefinition.Move move, CharacterDefinition.Body target) {
         return move.reach + target.halfWidth;

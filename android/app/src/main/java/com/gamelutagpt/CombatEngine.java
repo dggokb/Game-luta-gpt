@@ -90,6 +90,22 @@ final class CombatEngine {
     /** Henchmen called by a Super (p07): they run in, strike once and run off. */
     final List<Henchman> henchmen = new ArrayList<>();
 
+    /** Dois projéteis de lados opostos que se encontraram neste passo (o shell desenha a faísca). */
+    static final class ProjectileClash {
+        final float x, y;
+        /** Um Super entrou no choque (faísca maior). */
+        final boolean big;
+        /** Cor de cada lado (lado 0 e lado 1), para a faísca misturar as duas energias. */
+        final int firstColor, secondColor;
+        /** Para onde ia o projétil do lado 0 (+1 direita); o do lado 1 vinha do outro lado. */
+        final int firstDirection;
+        ProjectileClash(float x, float y, boolean big, int firstColor, int secondColor, int firstDirection) {
+            this.x = x; this.y = y; this.big = big; this.firstColor = firstColor; this.secondColor = secondColor;
+            this.firstDirection = firstDirection;
+        }
+    }
+    private final List<ProjectileClash> clashes = new ArrayList<>();
+
     static final class Henchman {
         static final int RUN_IN = 0, STRIKE = 1, RUN_OUT = 2;
         final int owner;
@@ -118,7 +134,8 @@ final class CombatEngine {
     private final List<HitEvent> events = new ArrayList<>();
     /**
      * System notices of the last step, for the shell's call-outs and screen shake: "TECH",
-     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE", "OVERDRIVE", "OD_CANCEL".
+     * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE", "OVERDRIVE", "OD_CANCEL",
+     * "PROJECTILE_CLASH".
      * Not hits (no damage).
      */
     private final List<String> cues = new ArrayList<>();
@@ -167,6 +184,8 @@ final class CombatEngine {
     int frame() { return frame; }
     List<HitEvent> events() { return events; }
     List<String> cues() { return cues; }
+    /** Choques de projéteis do último passo (onde, e se um Super entrou). */
+    List<ProjectileClash> clashes() { return clashes; }
     /** Active combo against {@code defender}, or null. */
     ComboSession session(int defender) { return sessions[defender]; }
     /** Last finished combo against {@code defender}, or null. */
@@ -216,6 +235,7 @@ final class CombatEngine {
         henchmen.clear();
         events.clear();
         cues.clear();
+        clashes.clear();
         superFreeze = 0;
         ultraConnected = -1;
         teams.calm();
@@ -255,6 +275,7 @@ final class CombatEngine {
         frame++;
         events.clear();
         cues.clear();
+        clashes.clear();
         ultraConnected = -1;
         for (int i = 0; i < 2; i++) startX[i] = fighters[i].x;
 
@@ -1452,7 +1473,50 @@ final class CombatEngine {
         }
         moveProjectiles(energyProjectiles, 120f);
         moveProjectiles(superProjectiles, 180f);
+        clashProjectiles();
         advancePuddles();
+    }
+
+    /**
+     * Projéteis de lados opostos que se tocam se anulam antes de chegar em alguém. A força de
+     * cada um são os acertos que ainda faltam: no choque cada um perde a força do outro e some
+     * quando ela acaba (iguais somem os dois; um de 3 acertos contra um de 1 segue com 2). O Super
+     * não perde força contra especial: atravessa e segue inteiro. O chicote da p08 não entra (é o
+     * braço, não energia).
+     */
+    private void clashProjectiles() {
+        boolean any = false;
+        int energyCount = energyProjectiles.size();
+        int total = energyCount + superProjectiles.size();
+        for (int i = 0; i < total; i++) {
+            Projectile a = i < energyCount ? energyProjectiles.get(i) : superProjectiles.get(i - energyCount);
+            for (int j = i + 1; j < total && a.clashes(); j++) {
+                Projectile b = j < energyCount ? energyProjectiles.get(j) : superProjectiles.get(j - energyCount);
+                if (b.ownerIndex == a.ownerIndex || !b.clashes() || !CombatRules.projectilesMeet(
+                    a.previousX, a.x, a.y, a.radius, b.previousX, b.x, b.y, b.radius)) continue;
+                int strengthA = a.durability(), strengthB = b.durability();
+                boolean superA = a.superKind(), superB = b.superKind();
+                if (!(superA && !superB)) a.hitsDone += strengthB;
+                if (!(superB && !superA)) b.hitsDone += strengthA;
+                a.cancelled = a.durability() == 0;
+                b.cancelled = b.durability() == 0;
+                // O choque fica onde os dois se tocaram, na borda de cada um.
+                float x = (a.x * b.radius + b.x * a.radius) / (a.radius + b.radius);
+                float y = (a.y + b.y) * .5f;
+                Projectile first = a.ownerIndex == 0 ? a : b, second = first == a ? b : a;
+                clashes.add(new ProjectileClash(x, y, superA || superB, first.color, second.color, first.direction));
+                any = true;
+            }
+        }
+        if (!any) return;
+        cues.add("PROJECTILE_CLASH");
+        removeCancelled(energyProjectiles);
+        removeCancelled(superProjectiles);
+    }
+
+    private static void removeCancelled(List<Projectile> projectiles) {
+        Iterator<Projectile> it = projectiles.iterator();
+        while (it.hasNext()) if (it.next().cancelled) it.remove();
     }
 
     /** Quem pisa numa poça sem estar envenenado fica envenenado; a poça some com o tempo. */

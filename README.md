@@ -357,6 +357,15 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
   vídeos: `tools/stage/video_para_ator.py`.
 
+## Anulação de projéteis
+
+- Onda contra onda **se anulam** no meio do caminho, com uma faísca nas duas cores. Vale para
+  todo projétil lançado (energia, kunai, shuriken, bisturi, seringa, machado).
+- O **Super passa por cima** de um especial e segue até o rival; Super contra Super de mesma
+  força somem os dois.
+- O **chicote da p08** não entra no choque, e a **sombra baixa do p06** passa por baixo.
+- Detalhes: `docs/combat-engine.md` (seção Anulação de projéteis).
+
 ## Jogo no PC e exportação (Windows, Linux, macOS)
 
 O jogo inteiro roda no PC — menu, modo história, seleção, luta, HUD, pausa, DEBUG — com o
