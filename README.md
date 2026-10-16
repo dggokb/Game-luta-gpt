@@ -6,6 +6,8 @@ A escala de referência é calculada a partir de uma pose equivalente ao Idle Ma
 
 ## Ver no celular
 
+**Prova de conceito de escala automática (16/10/2026):** [P02 e P10 sem marcação manual](docs/ESCALA-AUTOMATICA.md), com corpo entre 0,95 e 1,05 do mestre em Idle e dash. Direção proposta para substituir a calibração por silhueta e as anotações por clip.
+
 **Revisão localizada de P04:** [vídeo, APK pequeno e PNGs da passada revisada](docs/P04-CORRIDA-REVISADA.md). Seis frames consecutivos, poeira separada manualmente e escala constante. Candidato para avaliação visual; a triagem anterior continua sem aprovação para ampliar o lote.
 
 **Triagem anterior, reprovada na revisão visual:** [triagem seletiva: 8 casos corrigidos, 2 mantidos e 3 pendentes](docs/TRIAGEM-SELETIVA.md). Inclui APK de comparação e 531 PNGs candidatos; preserva P02, P06, P08 e P11 como referência visual aceita.

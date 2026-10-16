@@ -1,0 +1,4 @@
+-r requirements.txt
+scipy>=1.10,<2
+mediapipe>=1.1,<2
+Pillow>=10.1,<13

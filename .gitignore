@@ -11,3 +11,4 @@ android-build/
 *.jks
 *.p12
 *.idsig
+models/
