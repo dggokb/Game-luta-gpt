@@ -98,7 +98,7 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 | Episódio | Conteúdo |
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
-| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: página do irmão, **luta 1x1 CONVITE** (Ryūga/P01 × P02 ou Kōga/p03 × p04; perdendo ou ganhando, a história segue), o parceiro aceita |
+| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: páginas do irmão (Ryūga: 4 páginas prontas indo atrás da Yin-lu), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × p04; perdendo ou ganhando, a história segue), o parceiro aceita |
 | ep03 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
 | ep04 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep05 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
