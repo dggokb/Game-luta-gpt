@@ -40,7 +40,7 @@ salvar progresso e um menu de episódios.
 |---|---|---|
 | 0 — O Pai que Partiu | Infância no dojo Shūshinkan, o treino (tutorial), o convite, a divisão dos irmãos, o pai parte e não volta. **Pronto** (11 páginas) | Treino Ryūga × Kōga (tutorial) |
 | 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um. **Pronto**: começo e fim separados por irmão (veja abaixo) | Treino jogador × rival, interrompido pela campainha numa cinemática |
-| 2 — O Parceiro | Antes do torneio, cada irmão convence o parceiro a lutar com ele | 1x1: Ryūga × Yin-lu (p02) ou Kōga × Brucy (p04). Antes da luta, páginas prontas de cada irmão: `pag1_ryuga` a `pag4_ryuga` e `pag1_koga` a `pag4_koga` |
+| 2 — O Parceiro | Antes do torneio, cada irmão convence o parceiro a lutar com ele | 1x1: Ryūga × Yin-lu (p02) ou Kōga × Brucy (p04). Páginas prontas: Ryūga `pag1_ryuga` a `pag4_ryuga` antes da luta e `pag5_ryuga` depois; Kōga `pag1_koga` a `pag4_koga` antes da luta |
 | 3 — O Sorteio | O templo, a regra dos capitães, a formação das duplas, o chaveamento em lados opostos | 1ª luta de cada lado |
 | 4 a 7 | Episódios alternando o lado do Ryūga e o lado do Kōga (lutas fixas de história + lutas variáveis) | uma por episódio |
 | meio da temporada | A revelação de que o desejo é real e pode ressuscitar a mãe | luta fixa |
