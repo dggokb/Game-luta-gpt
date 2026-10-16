@@ -33,6 +33,7 @@ import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
 import com.gamelutagpt.stage.StageWorld;
+import com.gamelutagpt.ultra.AberturaUltra;
 import com.gamelutagpt.ultra.PaginaFinal;
 import com.gamelutagpt.ultra.RaioFinal;
 import com.gamelutagpt.ultra.UltraDefinition;
@@ -156,7 +157,6 @@ public class GameView extends SurfaceView
     private static final String LOG_TAG = "GameView";
     private static final float ULTRA_STARTUP_ZOOM = 0.30f;
     /** Zoom da câmera durante a sequência do Ultra (personagens sem raio). */
-    private static final float SEQUENCE_ZOOM = 0.12f;
     /** Point of the heavy straight (fraction of the move) where the arm is fully extended. */
     private static final float BEAM_POSE = 0.5625f;
     /** Point of the heavy straight where the arm is pulled back (charge, without own art). */
@@ -164,6 +164,14 @@ public class GameView extends SurfaceView
     private static final float BEAM_CHARGE_ZOOM = 0.18f;
     private final UltraPack[] ultraPacks = new UltraPack[2];
     private final PaginaFinal paginaFinal = new PaginaFinal(this);
+    /** Abertura cinematográfica do Ultra (a luta fica parada enquanto ela roda). */
+    private final AberturaUltra abertura = new AberturaUltra();
+    /** Plano de câmera do Ultra em sequência, e se ele está valendo agora. */
+    private final UltraDirector.Shot ultraShot = new UltraDirector.Shot();
+    private boolean ultraShotActive;
+    private float ultraTilt;
+    /** Faixas pretas de cinema do Ultra (0 = fora, 1 = inteiras; o HUD some junto). */
+    private float ultraBars;
     /** Pincel do Canvas do quadro atual para os motores visuais (cenário e ultra). */
     private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
 
@@ -398,6 +406,8 @@ public class GameView extends SurfaceView
         engine.setTeam(PLAYER, team);
         ultraSounds = new UltraSounds(context.getAssets());
         ultraAssets = new AndroidRenderAssets(context.getAssets());
+        // Ultra cinematográfico: a sequência do vídeo espera a página de mangá antes do golpe final.
+        engine.config.ultraSequencePage = true;
         historia = new PaginaHistoria(this, ultraAssets);
         menuInicial = new MenuInicial(ultraAssets);
         menuInicial.setVersao(VERSION_HUD_LABEL);
@@ -555,7 +565,7 @@ public class GameView extends SurfaceView
 
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
     private void openCharacterSelect() {
-        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
         // Voltar à seleção abandona o episódio, a cena e o treino que estiverem tocando.
         historia.stop();
         storyEpisode = -1;
@@ -782,11 +792,25 @@ public class GameView extends SurfaceView
         try {
             UltraPack pack = UltraPack.load(assets, ultraFolder(fighter));
             for (String warning : pack.warnings) Log.w(LOG_TAG, ultraFolder(fighter) + ": " + warning);
-            return pack;
+            return pack.withCutIn(selectionArt(assets, fighter));
         } catch (IOException | RuntimeException ex) {
             // Without a valid ultra.json the ultra still works, with the placeholder art.
             Log.w(LOG_TAG, "ultra de " + fighter.character.id + " usando arte provisória", ex);
             return UltraPack.placeholder("ULTRA " + fighter.character.displayName, fighter.profile.color);
+        }
+    }
+
+    /**
+     * Arte de seleção do personagem (fundo transparente): faz o papel do corte da abertura do
+     * Ultra enquanto o pack não tem o seu. Null quando não existe.
+     */
+    private static com.gamelutagpt.render.RenderImage selectionArt(AndroidRenderAssets assets, FighterState fighter) {
+        String id = fighter.character.id;
+        String art = "player_base".equals(id) || "p01_training".equals(id) ? "p01" : id;
+        try {
+            return assets.loadImage("selection/art/hero_" + art + ".png");
+        } catch (IOException | RuntimeException ex) {
+            return null;
         }
     }
 
@@ -1061,12 +1085,19 @@ public class GameView extends SurfaceView
             historia.update(FIXED_STEP);
             return;
         }
+        updateUltraBars();
+        if (abertura.isActive()) {
+            // Abertura do Ultra: a luta espera parada (sem pausa no meio).
+            selectionKeys.clear();
+            abertura.update(FIXED_STEP);
+            return;
+        }
         if (paginaFinal.isActive()) {
             // The engine waits: the cinematic deals the damage and ends with the final beam.
             // Sem pausa no meio da Página Final.
             selectionKeys.clear();
             paginaFinal.update(FIXED_STEP);
-            if (paginaFinal.isShattering() && ultraAttacker >= 0) {
+            if (paginaFinal.isShattering() && ultraAttacker >= 0 && !engine.ultraWaitingPage(ultraAttacker)) {
                 // Through the breaking page the fight is already in place for the beam.
                 engine.placeForUltraBeam(ultraAttacker);
                 updateFightCamera(FIXED_STEP);
@@ -1169,7 +1200,8 @@ public class GameView extends SurfaceView
             }
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
-                // Último dano do Ultra em sequência: impact frame em quem apanhou.
+                // Último dano do Ultra em sequência: impact frame em quem apanhou e câmera lenta.
+                feel.slow(ImpactFeel.ULTRA_SLOW_FRAMES, ImpactFeel.ULTRA_SLOW_SCALE);
                 CombatFighter hit = ultraVictim();
                 if (pausa.impacto() && hit != null) feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
             }
@@ -1358,10 +1390,15 @@ public class GameView extends SurfaceView
     }
 
     private void updateUltraVisuals() {
+        ultraShotActive = false;
+        ultraTilt = 0f;
         CombatFighter p = ultraFighter();
         int phase = p.status == CombatFighter.Status.ULTRA ? p.ultraPhase : -1;
         if (phase != ultraPhaseSeen) {
-            if (phase == CombatFighter.ULTRA_STARTUP) ultraSounds.play(ultraFolder(p.state), "ativacao");
+            if (phase == CombatFighter.ULTRA_STARTUP) {
+                ultraSounds.play(ultraFolder(p.state), "ativacao");
+                startUltraOpening(p);
+            }
             if (phase == CombatFighter.ULTRA_RUSH) ultraSounds.play(ultraFolder(p.state), "investida");
             ultraPhaseSeen = phase;
         }
@@ -1375,12 +1412,19 @@ public class GameView extends SurfaceView
             ultraDarkAlpha = Math.round(205f * (1f - t));
             ultraCameraZoom = 1f + ULTRA_STARTUP_ZOOM * (1f - t);
         } else if (phase == CombatFighter.ULTRA_SEQUENCE) {
-            // Sequência do vídeo: fundo escuro e câmera perto, abrindo no fim da animação.
+            // Sequência do vídeo: um plano de câmera por golpe (UltraDirector), corte seco a cada
+            // acerto, fundo escuro; depois do golpe final a câmera da luta volta.
             CharacterDefinition.UltraSequence seq = p.state.profile.ultraSequence;
-            float t = seq != null ? clamp(p.ultraFrame / (float)seq.length, 0f, 1f) : 1f;
-            float open = 1f - t * t * t * t;
-            ultraDarkAlpha = Math.round(150f * open);
-            ultraCameraZoom = 1f + SEQUENCE_ZOOM * open;
+            if (seq != null) {
+                CombatFighter v = engine.fighter(1 - p.index);
+                UltraDirector.shot(ultraShot, seq.hits, p.ultraFrame, p.x, chestY(p), v.x, chestY(v), p.facing);
+                ultraShotActive = ultraShot.kind != UltraDirector.FINAL;
+            } else {
+                ultraShotActive = false;
+            }
+            ultraDarkAlpha = ultraShotActive ? 120 : 0;
+            ultraCameraZoom = ultraShotActive ? ultraShot.zoom : 1f;
+            ultraTilt = ultraShotActive ? ultraShot.tilt : 0f;
         } else if (phase == CombatFighter.ULTRA_BEAM) {
             // Charge: the camera closes in on the player; the shot opens it back fast.
             int fire = engine.config.ultraBeamFireFrame();
@@ -1393,6 +1437,25 @@ public class GameView extends SurfaceView
             ultraDarkAlpha = 0;
             ultraCameraZoom = 1f;
         }
+    }
+
+    /** Começa a abertura do Ultra de quem acabou de ativar (a luta para até ela acabar). */
+    private void startUltraOpening(CombatFighter p) {
+        UltraPack pack = p == engine.fighter(PLAYER) ? ultraPacks[engine.team(PLAYER).point] : cpuUltraPack(p.state);
+        if (pack == null) return;
+        abertura.start(pack, p.facing);
+        ultraSounds.playFight("punish", 1f, 0.9f);
+    }
+
+    /** Faixas pretas do Ultra: entram rápido na ativação e saem quando a luta volta. */
+    private void updateUltraBars() {
+        boolean ultra = false;
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase != CombatFighter.ULTRA_RECOVERY) ultra = true;
+        }
+        boolean on = ultra || abertura.isActive() || paginaFinal.isActive();
+        ultraBars = on ? Math.min(1f, ultraBars + FIXED_STEP / 0.15f) : Math.max(0f, ultraBars - FIXED_STEP / 0.3f);
     }
 
     private void beginUltraCinematic(int attacker) {
@@ -1433,6 +1496,13 @@ public class GameView extends SurfaceView
 
     @Override
     public void onUltraFinished(UltraGrade grade) {
+        if (ultraAttacker >= 0 && engine.ultraWaitingPage(ultraAttacker)) {
+            // Ultra em sequência: a página quebra e o golpe final sai na luta, com a nota.
+            engine.resumeUltraSequence(ultraAttacker, grade.finalBonus);
+            ultraAttacker = -1;
+            ultraPack = null;
+            return;
+        }
         // The page breaks into the fight with the attacker firing the final beam.
         int beamDamage = Math.round(ultraTotalDamage() * PaginaFinal.beamFraction(grade));
         engine.startUltraBeam(ultraAttacker, beamDamage, ultraPack.definition.beam.hits);
@@ -1926,7 +1996,11 @@ public class GameView extends SurfaceView
                 renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
                     focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
             }
-            if (ultraCameraZoom != 1f) {
+            if (ultraShotActive) {
+                // Plano do Ultra em sequência: o ponto escolhido vai para o seu lugar na tela.
+                renderCameraX = ultraShot.focusX - VW * ultraShot.anchorX / renderZoom + visibleWorldWidth / 2f;
+                renderCameraTop = ultraShot.focusY - VH * ultraShot.anchorY / renderZoom;
+            } else if (ultraCameraZoom != 1f) {
                 // Ultra activation zooms into whoever does it, keeping it on the same screen spot.
                 CombatFighter p = ultraFighter();
                 float baseLeft = clamp(camera.x - VW / baseZoom / 2f, 0f, WORLD_WIDTH - VW / baseZoom);
@@ -1956,9 +2030,10 @@ public class GameView extends SurfaceView
             renderCanvas.begin(canvas);
             // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
             int cinemaLayer = -1;
-            if (feel.tilt() != 0f) {
+            float tilt = feel.tilt() + ultraTilt;
+            if (tilt != 0f) {
                 cinemaLayer = canvas.save();
-                canvas.rotate(feel.tilt(), VW * 0.5f, VH * 0.5f);
+                canvas.rotate(tilt, VW * 0.5f, VH * 0.5f);
                 canvas.scale(ImpactFeel.CINEMA_OVERSCAN, ImpactFeel.CINEMA_OVERSCAN, VW * 0.5f, VH * 0.5f);
             }
             // Impact frame, último quadro: a cena com as cores invertidas.
@@ -2044,11 +2119,19 @@ public class GameView extends SurfaceView
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
+            if (ultraBars > 0.001f) {
+                // Faixas pretas de cinema durante o Ultra.
+                float bar = AberturaUltra.BAR * ultraBars;
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(0xFF0B0E16);
+                canvas.drawRect(-40f, -40f, VW + 40f, bar, paint);
+                canvas.drawRect(-40f, VH - bar, VW + 40f, VH + 40f, paint);
+            }
 
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
                 // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.
-                float faixas = cinematica.faixas();
+                float faixas = Math.max(cinematica.faixas(), ultraBars);
                 if (faixas < 0.999f) {
                     int layer = faixas > 0.001f
                         ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
@@ -2060,6 +2143,7 @@ public class GameView extends SurfaceView
                 conversa.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
             }
+            if (abertura.isActive()) abertura.render(renderCanvas);
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
             }
@@ -2183,7 +2267,7 @@ public class GameView extends SurfaceView
         if (x<TUNE_LEFT || x>TUNE_RIGHT || y<TUNE_TOP || y>BOXES_BOTTOM) return false;
         boolean boxes = y >= BOXES_TOP;
         if (!boxes && y > TUNE_BOTTOM) return true;
-        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return true;
+        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return true;
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
@@ -3292,7 +3376,7 @@ public class GameView extends SurfaceView
 
     /** Pausa (MENU ou voltar) por cima da página ou da luta. Não abre no meio de um ultra. */
     private void openPause() {
-        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
         loadTemporada();
         // COMANDOS: os golpes de cada personagem, começando pelo do jogador.
         int[] atual = new int[1];
@@ -3353,7 +3437,7 @@ public class GameView extends SurfaceView
 
     /** HISTÓRIA: toca a temporada desde o primeiro episódio. */
     private void startStory() {
-        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
         if (!loadTemporada()) return;
         tutorial.stop();
         descarregarConversa();
@@ -3379,7 +3463,7 @@ public class GameView extends SurfaceView
 
     /** TUTORIAL: a cena "tutorial" (a intro do Prólogo e o treino no dojo); no fim, a seleção. */
     private void startTutorialMode() {
-        if (demo.active() || paginaFinal.isActive() || ultraAttacker >= 0) return;
+        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
         tutorial.stop();
         descarregarConversa();
         playScene("tutorial", this::openCharacterSelect);

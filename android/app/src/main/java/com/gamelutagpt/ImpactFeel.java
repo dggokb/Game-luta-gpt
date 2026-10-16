@@ -20,6 +20,9 @@ final class ImpactFeel {
     static final int KO_FLASH = 210;
     static final int KO_SLOW_FRAMES = 42;
     static final float KO_SLOW_SCALE = 0.35f;
+    /** Golpe final do Ultra: câmera lenta mais curta que a do KO. */
+    static final int ULTRA_SLOW_FRAMES = 30;
+    static final float ULTRA_SLOW_SCALE = 0.4f;
 
     /**
      * Impact frame (a técnica dos animes): por 2 quadros a cena vira silhueta, com linhas de
@@ -52,6 +55,7 @@ final class ImpactFeel {
     private int dark, darkFrames, darkTotal;
     private float flash;
     private int slowFrames;
+    private float slowScale = KO_SLOW_SCALE;
     private int impactStyle = NONE, impactLeft, impactCooldown, impactSeed;
     private float impactX, impactY;
     private int cinemaFrames, cinemaCooldown;
@@ -127,8 +131,15 @@ final class ImpactFeel {
         }
         if (ko) {
             flash = KO_FLASH;
-            slowFrames = KO_SLOW_FRAMES;
+            slow(KO_SLOW_FRAMES, KO_SLOW_SCALE);
         }
+    }
+
+    /** Câmera lenta por {@code frames} quadros da luta a {@code scale}; a mais longa vale. */
+    void slow(int frames, float scale) {
+        if (frames < slowFrames) return;
+        slowFrames = frames;
+        slowScale = scale;
     }
 
     /** Um passo da luta. */
@@ -178,7 +189,7 @@ final class ImpactFeel {
 
     /** Velocidade do relógio da luta: abaixo de 1 na câmera lenta do KO. */
     float timeScale() {
-        float scale = slowFrames > 0 ? KO_SLOW_SCALE : 1f;
+        float scale = slowFrames > 0 ? slowScale : 1f;
         return cinemaFrames > 0 ? Math.min(scale, CINEMA_SCALE) : scale;
     }
 

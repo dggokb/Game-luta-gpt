@@ -821,7 +821,7 @@ final class CombatEngine {
                 f.throwFrame++;
                 break;
             case ULTRA:
-                if (f.ultraPhase != CombatFighter.ULTRA_CINEMATIC) f.ultraFrame++;
+                if (f.ultraPhase != CombatFighter.ULTRA_CINEMATIC && !f.ultraPaused) f.ultraFrame++;
                 if (f.ultraPhase == CombatFighter.ULTRA_STARTUP && f.ultraFrame >= config.ultraStartupFrames) {
                     f.ultraPhase = CombatFighter.ULTRA_RUSH;
                     f.ultraFrame = 0;
@@ -1798,6 +1798,9 @@ final class CombatEngine {
         if (sequence != null) {
             // Sem cinemática: a sequência do vídeo prende o rival onde encostou.
             a.ultraHitsDone = 0;
+            a.ultraPaused = false;
+            a.ultraPageDone = false;
+            a.ultraFinalBonus = 0f;
             a.ultraVictim = d;
             a.ultraVictimState = d.state;
             float bodies = a.body().halfWidth + d.body().halfWidth;
@@ -1825,9 +1828,22 @@ final class CombatEngine {
             a.ultraHitsDone = seq.hits.length;
         }
         if (a.ultraHitsDone < seq.hits.length) holdUltraVictim(a, d, seq);
+        int finalHit = seq.hits.length - 1;
+        if (config.ultraSequencePage && !a.ultraPageDone && a.ultraHitsDone == finalHit &&
+            a.ultraFrame >= seq.hits[finalHit] - config.ultraPageLeadFrames) {
+            // Antes do golpe final: a página de mangá entra (a tela segura a luta enquanto ela roda).
+            a.ultraPageDone = true;
+            a.ultraPaused = true;
+            ultraConnected = a.index;
+        }
+        if (a.ultraPaused) {
+            d.stunLeft = Math.max(d.stunLeft, seq.length - a.ultraFrame + ultraAttack.hitstunFrames);
+            return;
+        }
         while (a.ultraHitsDone < seq.hits.length && a.ultraFrame >= seq.hits[a.ultraHitsDone]) {
             int i = a.ultraHitsDone++;
             int damage = ComboSession.DamageScaling.apply(seq.hitDamage(i), a.ultraScale);
+            if (i == finalHit) damage = Math.round(damage * (1f + a.ultraFinalBonus));
             int before = events.size();
             dealUltraDamage(a, d, damage);
             for (int e = before; e < events.size(); e++) {
@@ -1875,6 +1891,23 @@ final class CombatEngine {
         if (!inUltraCinematic(attacker)) return 0;
         CombatFighter a = fighters[attacker];
         return dealUltraDamage(a, fighters[1 - attacker], ComboSession.DamageScaling.apply(baseDamage, a.ultraScale));
+    }
+
+    /**
+     * Fim da página de mangá de um Ultra em sequência: a animação volta a andar e o último
+     * golpe sai com o bônus da nota do toque ({@code bonus}: 0, 0,10 ou 0,25).
+     */
+    void resumeUltraSequence(int attacker, float bonus) {
+        CombatFighter a = fighters[attacker];
+        if (!a.inUltraSequence() || !a.ultraPaused) return;
+        a.ultraPaused = false;
+        a.ultraFinalBonus = Math.max(0f, bonus);
+    }
+
+    /** Ultra em sequência parado esperando a página de mangá. */
+    boolean ultraWaitingPage(int attacker) {
+        CombatFighter a = fighters[attacker];
+        return a.inUltraSequence() && a.ultraPaused;
     }
 
     /** Damage already scaled; one more hit on the combo counter. */

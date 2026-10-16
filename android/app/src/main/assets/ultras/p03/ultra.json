@@ -1,0 +1,31 @@
+{
+  "nome": "Fúria da Casa",
+  "cor": "#F4B73B",
+  "corSecundaria": "#FFE7A3",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Isso é pela família!"
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "GRRRAA"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "DOOM!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "KRAK!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "BOOOOM!"
+    }
+  }
+}

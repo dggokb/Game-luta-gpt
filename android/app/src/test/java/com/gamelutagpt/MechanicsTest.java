@@ -408,6 +408,46 @@ public class MechanicsTest {
         return s;
     }
 
+    /** A tela liga a página de mangá: a sequência para antes do último golpe e retoma com a nota. */
+    private static int ultraDamage(boolean page, float bonus) {
+        CombatConfig config = new CombatConfig();
+        config.ultraSequencePage = page;
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 610f, config);
+        s.f(0).state.superMeter = CombatConfig.ULTRA_COST;
+        s.in[0].direction = 3;
+        s.in[0].superAttack = true;
+        s.in[0].ultra = true;
+        s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
+        int life = s.f(1).state.life;
+        CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
+        boolean asked = false;
+        for (int i = 0; i < 2000 && s.f(0).inUltraSequence(); i++) {
+            s.step();
+            if (s.engine.ultraConnected() == 0) {
+                asked = true;
+                assertTrue(s.engine.ultraWaitingPage(0));
+                assertEquals("stops right before the final blow", seq.hits.length - 1, s.f(0).ultraHitsDone);
+                int frame = s.f(0).ultraFrame, before = s.f(1).state.life;
+                for (int k = 0; k < 90; k++) s.step();
+                assertEquals("the sequence waits for the page", frame, s.f(0).ultraFrame);
+                assertEquals(before, s.f(1).state.life);
+                assertFalse("the victim stays held", s.f(1).canAct());
+                s.engine.resumeUltraSequence(0, bonus);
+                assertFalse(s.engine.ultraWaitingPage(0));
+            }
+        }
+        assertEquals("only with the page on", page, asked);
+        return life - s.f(1).state.life;
+    }
+
+    @Test public void theCinematicUltraWaitsForTheMangaPageAndTheGradeBoostsTheLastBlow() {
+        int plain = ultraDamage(false, 0f);
+        assertEquals("a page without a grade changes nothing", plain, ultraDamage(true, 0f));
+        int perfect = ultraDamage(true, 0.25f);
+        assertTrue("PERFEITO hits harder: " + perfect + " vs " + plain, perfect > plain);
+        assertTrue("only the last blow gets the bonus", perfect - plain < plain / 4);
+    }
+
     @Test public void theUltraFollowsTheVideoHitByHit() {
         CombatEngineTest.Sim s = ultraSequence("p02", 110f);
         CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;

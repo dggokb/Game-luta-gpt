@@ -1,0 +1,31 @@
+{
+  "nome": "Dança da Garça",
+  "cor": "#3FA7D6",
+  "corSecundaria": "#BFF3FF",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Você não vai me alcançar!"
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "FUUUSH"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "PAH!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "DOM!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "HAAAA!"
+    }
+  }
+}

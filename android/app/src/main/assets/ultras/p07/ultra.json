@@ -1,0 +1,31 @@
+{
+  "nome": "Herança",
+  "cor": "#C9A227",
+  "corSecundaria": "#FFF0B0",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Isso tem preço."
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "TIC"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "PAF!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "THOOM!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "KRAAASH!"
+    }
+  }
+}

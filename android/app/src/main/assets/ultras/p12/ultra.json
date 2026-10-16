@@ -1,0 +1,31 @@
+{
+  "nome": "Último Suspiro",
+  "cor": "#B3122E",
+  "corSecundaria": "#FF9AA8",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "GRRRAAAAH!"
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "GRRRR"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "RAAH!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "CRUNCH!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "GRAAAAAH!"
+    }
+  }
+}

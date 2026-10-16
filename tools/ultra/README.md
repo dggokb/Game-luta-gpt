@@ -1,5 +1,11 @@
 # Página Final: como criar um ultra
 
+> **Ultra cinematográfico:** todo Ultra agora tem abertura (corte + palco + nome), câmera por
+> golpe e esta página. O fluxo completo está em [`docs/ultras/cinematico.md`](../../docs/ultras/cinematico.md)
+> e os prompts prontos por personagem em [`docs/ultras/prompts.md`](../../docs/ultras/prompts.md)
+> (gerados de `personagens.json` por `gerar_prompts.py`). Este script também prepara as duas
+> imagens da abertura: `corte` (mantém a transparência; tira o fundo liso se vier sem) e `palco`.
+
 O ultra é ativado com **baixo + SUPER** e custa **3 barras**. A regra fica no `CombatEngine` (veja `docs/combat-engine.md`). O lutador faz uma investida:
 
 - se **errar**, as barras são gastas e o lutador fica 0,5 s vulnerável;

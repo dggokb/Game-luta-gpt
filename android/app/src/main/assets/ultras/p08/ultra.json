@@ -1,0 +1,31 @@
+{
+  "nome": "Sinfonia Escarlate",
+  "cor": "#E0245E",
+  "corSecundaria": "#FFB3C9",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Dance pra mim!"
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "SWISH"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "CRAK!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "SLASH!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "KRAAAK!"
+    }
+  }
+}

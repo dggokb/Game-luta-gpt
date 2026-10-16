@@ -1,0 +1,31 @@
+{
+  "nome": "Abismo",
+  "cor": "#8E3BD6",
+  "corSecundaria": "#E2B8FF",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Afunde comigo."
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "VOOOM"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "GAAH!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "DOOM"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "VRAAAAM!"
+    }
+  }
+}

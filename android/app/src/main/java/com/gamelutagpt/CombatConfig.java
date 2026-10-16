@@ -147,6 +147,13 @@ final class CombatConfig {
     /** An advancing move stops this close to the opponent's body (px past the pushboxes). */
     float advanceContactSlack = 6f;
     int ultraSequenceFinalHitstop = 12;
+    /**
+     * Ultra cinematográfico (a tela liga): a sequência do vídeo para este tanto de quadros
+     * antes do último golpe e espera a página de mangá com o toque no tempo; o último golpe
+     * sai depois, com o bônus da nota. Desligado, a sequência corre direto (motor puro, IA).
+     */
+    boolean ultraSequencePage = false;
+    int ultraPageLeadFrames = 4;
     // Final beam (after the cinematic): a charge ("ka-me-ha-me"), then the beam reaches the
     // defender, hits every few frames (the combo counter climbs) and the blast throws the
     // defender like the cinematic end.

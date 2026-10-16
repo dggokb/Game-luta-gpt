@@ -1,0 +1,31 @@
+{
+  "nome": "Soco de Rua",
+  "cor": "#E0A526",
+  "corSecundaria": "#FFE6A0",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Segura essa!"
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "HEH!"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "POW!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "BAM!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "KA-POW!"
+    }
+  }
+}

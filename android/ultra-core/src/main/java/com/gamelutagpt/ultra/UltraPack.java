@@ -22,6 +22,9 @@ public final class UltraPack {
     public final RenderImage beamAura;
     public final RenderImage beamWind;
     public final RenderImage beamDust;
+    /** Abertura: o personagem recortado e o fundo do Ultra (podem ser null). */
+    public final RenderImage cutIn;
+    public final RenderImage stage;
     /** Problemas não fatais encontrados ao carregar (imagem faltando etc.). */
     public final List<String> warnings;
 
@@ -32,7 +35,15 @@ public final class UltraPack {
     /** @param beamImages corpo, ponta, início, impacto, aura, vento e poeira do raio, nessa ordem */
     public UltraPack(UltraDefinition definition, RenderImage[] images, RenderImage[] beamImages,
                      List<String> warnings) {
+        this(definition, images, beamImages, null, null, warnings);
+    }
+
+    /** @param cutIn personagem recortado da abertura; @param stage fundo do Ultra (podem ser null) */
+    public UltraPack(UltraDefinition definition, RenderImage[] images, RenderImage[] beamImages,
+                     RenderImage cutIn, RenderImage stage, List<String> warnings) {
         this.definition = definition;
+        this.cutIn = cutIn;
+        this.stage = stage;
         this.images = images.clone();
         beamBody = beamImages[0];
         beamTip = beamImages[1];
@@ -89,6 +100,23 @@ public final class UltraPack {
                 warnings.add("raio: não carregou " + beamPaths[i] + " (" + ex.getMessage() + ")");
             }
         }
-        return new UltraPack(definition, images, beamImages, warnings);
+        RenderImage[] opening = new RenderImage[2];
+        String[] openingPaths = {definition.opening.cutInPath, definition.opening.stagePath};
+        for (int i = 0; i < openingPaths.length; i++) {
+            if (openingPaths[i] == null) continue;
+            try {
+                opening[i] = assets.loadImage(base + openingPaths[i]);
+            } catch (IOException | RuntimeException ex) {
+                warnings.add("abertura: não carregou " + openingPaths[i] + " (" + ex.getMessage() + ")");
+            }
+        }
+        return new UltraPack(definition, images, beamImages, opening[0], opening[1], warnings);
+    }
+
+    /** O mesmo ultra com outro corte (a arte de seleção quando o pack não tem o seu). */
+    public UltraPack withCutIn(RenderImage image) {
+        if (cutIn != null || image == null) return this;
+        RenderImage[] beam = {beamBody, beamTip, beamStart, beamImpact, beamAura, beamWind, beamDust};
+        return new UltraPack(definition, images, beam, image, stage, warnings);
     }
 }

@@ -21,7 +21,8 @@ import java.util.Map;
  *     "final":    { "imagem": "final.png", "onomatopeia": "KABUUUM!" }
  *   },
  *   "raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
- *             "centroInicio": [0.44, 0.48], "impacto": "raio_impacto.png", "hits": 20 }
+ *             "centroInicio": [0.44, 0.48], "impacto": "raio_impacto.png", "hits": 20 },
+ *   "abertura": { "corte": "corte.png", "palco": "palco.jpg", "grito": "AQUI ACABA!" }
  * }
  * </pre>
  *
@@ -99,6 +100,29 @@ public final class UltraDefinition {
         }
     }
 
+    /**
+     * A abertura cinematográfica do Ultra: com a luta parada, o palco do Ultra toma a tela e
+     * o corte (o personagem de corpo inteiro, fundo transparente) atravessa numa faixa com o
+     * nome do golpe. Sem imagem, o jogo desenha o palco com a cor do ultra e usa a arte de
+     * seleção do personagem no lugar do corte.
+     */
+    public static final class Opening {
+        /** Personagem recortado (PNG com transparência), virado para a direita, ou null. */
+        public final String cutInPath;
+        /** Fundo do Ultra (16:9), ou null para o fundo desenhado com a cor do ultra. */
+        public final String stagePath;
+        /** Frase curta embaixo do nome (o grito do personagem), ou null. */
+        public final String shout;
+
+        static final Opening DEFAULT = new Opening(null, null, null);
+
+        Opening(String cutInPath, String stagePath, String shout) {
+            this.cutInPath = cutInPath;
+            this.stagePath = stagePath;
+            this.shout = shout;
+        }
+    }
+
     /** Uma folha de animação: {@code frames} quadros do mesmo tamanho, lado a lado. */
     public static final class Sheet {
         public final String path;
@@ -118,6 +142,7 @@ public final class UltraDefinition {
     public final int damage;
     private final Panel[] panels;
     public final Beam beam;
+    public final Opening opening;
 
     public static final int DEFAULT_DAMAGE = 4000;
 
@@ -126,6 +151,11 @@ public final class UltraDefinition {
     }
 
     public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels, Beam beam) {
+        this(name, color, accentColor, damage, panels, beam, Opening.DEFAULT);
+    }
+
+    public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels, Beam beam,
+                           Opening opening) {
         if (panels.length != UltraSlot.values().length) {
             throw new IllegalArgumentException("um ultra tem exatamente 5 painéis");
         }
@@ -136,6 +166,7 @@ public final class UltraDefinition {
         this.damage = damage;
         this.panels = panels.clone();
         this.beam = beam != null ? beam : Beam.DEFAULT;
+        this.opening = opening != null ? opening : Opening.DEFAULT;
     }
 
     public Panel panel(UltraSlot slot) {
@@ -209,7 +240,15 @@ public final class UltraDefinition {
                 handsField(raio, "disparo")
             );
         }
-        return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels, beam);
+        Opening opening = Opening.DEFAULT;
+        if (map.get("abertura") instanceof Map) {
+            Map<String, Object> abertura = (Map<String, Object>)map.get("abertura");
+            String shout = stringField(abertura, "grito", null);
+            opening = new Opening(stringField(abertura, "corte", null), stringField(abertura, "palco", null),
+                shout != null && !shout.trim().isEmpty() ? shout.trim() : null);
+        }
+        return new UltraDefinition(name.trim().toUpperCase(Locale.ROOT), color, accentColor, damage, panels, beam,
+            opening);
     }
 
     @SuppressWarnings("unchecked")

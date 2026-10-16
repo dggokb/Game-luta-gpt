@@ -1,0 +1,31 @@
+{
+  "nome": "Autópsia",
+  "cor": "#7CFF4F",
+  "corSecundaria": "#E2FFD0",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Fique quietinho."
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "SNIP"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "TSK!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "CRACK!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "SHHK!"
+    }
+  }
+}

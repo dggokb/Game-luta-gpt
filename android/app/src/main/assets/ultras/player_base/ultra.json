@@ -61,5 +61,10 @@
         174
       ]
     }
+  },
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Toda a força da casa!"
   }
 }

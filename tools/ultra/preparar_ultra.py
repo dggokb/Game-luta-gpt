@@ -7,8 +7,11 @@ Uso básico, com imagens que você já gerou:
         --cor "#F4B73B" --entrada minhas_imagens/player_base
 
 A pasta de entrada deve ter arquivos com o nome do painel (qualquer extensão
-de imagem): olhos, carga, golpe, atingido, final. Painel sem imagem continua
-com a arte provisória do jogo.
+de imagem): olhos, carga, golpe, atingido, final, e os dois da abertura do Ultra:
+corte (o personagem recortado, PNG com fundo transparente) e palco (o fundo do
+Ultra). Imagem que falta continua com a arte provisória do jogo.
+
+Nome e cor já ficam no ultra.json de cada personagem; --nome e --cor só trocam.
 
 Gerando as 5 imagens direto pela API da OpenAI (precisa de OPENAI_API_KEY e
 do pacote `openai`):
@@ -46,6 +49,11 @@ PAINEIS = {
     "golpe": {"proporcao": 3.2, "largura": 1400, "tamanho_api": "1536x1024"},
     "atingido": {"proporcao": 3.6, "largura": 1400, "tamanho_api": "1536x1024"},
     "final": {"proporcao": 16 / 9, "largura": 1600, "tamanho_api": "1536x1024"},
+}
+# Abertura do Ultra: o personagem recortado (mantém a transparência) e o fundo.
+ABERTURA = {
+    "corte": {"altura": 1400, "arquivo": "corte.png", "tamanho_api": "1024x1536"},
+    "palco": {"proporcao": 16 / 9, "largura": 1600, "arquivo": "palco.jpg", "tamanho_api": "1536x1024"},
 }
 
 
@@ -106,6 +114,47 @@ def preparar(arquivo, painel, estilo, foco, intensidade):
     return imagem
 
 
+def tirar_fundo(imagem, tolerancia=38):
+    """Fundo liso (branco, verde...) vira transparente: parte dos cantos e espalha pelos
+    pixels parecidos. Só para quando a imagem gerada veio sem transparência."""
+    rgb = imagem.convert("RGB")
+    mascara = Image.new("L", rgb.size, 255)
+    largura, altura = rgb.size
+    for canto in ((0, 0), (largura - 1, 0), (0, altura - 1), (largura - 1, altura - 1)):
+        ImageDraw.floodfill(rgb, canto, (255, 0, 255), thresh=tolerancia)
+    pixels = rgb.load()
+    alfa = mascara.load()
+    for y in range(altura):
+        for x in range(largura):
+            if pixels[x, y] == (255, 0, 255):
+                alfa[x, y] = 0
+    mascara = mascara.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.2))
+    saida = imagem.convert("RGBA")
+    saida.putalpha(mascara)
+    return saida
+
+
+def preparar_corte(arquivo):
+    """Personagem recortado: transparência (ou fundo removido), aparado e na altura certa."""
+    imagem = ImageOps.exif_transpose(Image.open(arquivo))
+    if imagem.mode != "RGBA" or imagem.getchannel("A").getextrema()[0] > 250:
+        imagem = tirar_fundo(imagem)
+    caixa = imagem.getchannel("A").point(lambda v: 255 if v > 16 else 0).getbbox()
+    if caixa:
+        imagem = imagem.crop(caixa)
+    altura = min(ABERTURA["corte"]["altura"], imagem.height)
+    largura = round(imagem.width * altura / imagem.height)
+    return imagem.resize((largura, altura), Image.LANCZOS)
+
+
+def preparar_palco(arquivo, foco):
+    config = ABERTURA["palco"]
+    imagem = ImageOps.exif_transpose(Image.open(arquivo)).convert("RGB")
+    imagem = recortar(imagem, config["proporcao"], foco)
+    largura = min(config["largura"], imagem.width)
+    return imagem.resize((largura, round(largura / config["proporcao"])), Image.LANCZOS)
+
+
 def achar_imagem(pasta, painel):
     for extensao in EXTENSOES:
         candidato = pasta / (painel + extensao)
@@ -148,10 +197,10 @@ def gerar_imagens(pasta, descricao, cor_nome, referencia, modelo, paineis):
 # ------------------------------------------------------------------ main
 
 def ler_foco(valores):
-    foco = {painel: 0.5 for painel in PAINEIS}
+    foco = {painel: 0.5 for painel in list(PAINEIS) + list(ABERTURA)}
     for valor in valores or []:
         painel, _, numero = valor.partition("=")
-        if painel not in PAINEIS:
+        if painel not in foco:
             sys.exit(f"--foco: painel desconhecido '{painel}'")
         foco[painel] = min(1.0, max(0.0, float(numero)))
     return foco
@@ -160,8 +209,8 @@ def ler_foco(valores):
 def main():
     parser = argparse.ArgumentParser(description="Prepara as imagens de um ultra da Página Final.")
     parser.add_argument("--id", required=True, help="pasta do ultra, ex.: player_base (id do personagem)")
-    parser.add_argument("--nome", required=True, help="nome do golpe, ex.: \"Explosão Solar\"")
-    parser.add_argument("--cor", required=True, help="cor principal, ex.: #F4B73B")
+    parser.add_argument("--nome", help="troca o nome do golpe, ex.: \"Explosão Solar\" (padrão: o do ultra.json)")
+    parser.add_argument("--cor", help="troca a cor principal, ex.: #F4B73B (padrão: a do ultra.json)")
     parser.add_argument("--cor-secundaria", help="cor do brilho, ex.: #FFE7A3")
     parser.add_argument("--entrada", type=Path, help="pasta com olhos/carga/golpe/atingido/final")
     parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO, help="pasta ultras/ dos assets")
@@ -197,8 +246,12 @@ def main():
     destino.mkdir(parents=True, exist_ok=True)
     arquivo_json = destino / "ultra.json"
     definicao = json.loads(arquivo_json.read_text(encoding="utf-8")) if arquivo_json.exists() else {}
-    definicao["nome"] = args.nome
-    definicao["cor"] = args.cor
+    if args.nome:
+        definicao["nome"] = args.nome
+    if args.cor:
+        definicao["cor"] = args.cor
+    if not definicao.get("nome"):
+        sys.exit("o ultra.json ainda não tem nome: passe --nome")
     if args.cor_secundaria:
         definicao["corSecundaria"] = args.cor_secundaria
     paineis_json = definicao.setdefault("paineis", {})
@@ -215,6 +268,21 @@ def main():
         imagem.save(destino / nome_final, quality=88)
         entrada_json["imagem"] = nome_final
         print(f"{painel}: {arquivo.name} -> {nome_final} ({imagem.width}x{imagem.height})")
+
+    abertura = definicao.setdefault("abertura", {})
+    for parte, config in ABERTURA.items():
+        arquivo = achar_imagem(entrada, parte)
+        if arquivo is None:
+            print(f"{parte}: sem imagem, fica o visual provisório da abertura")
+            continue
+        if parte == "corte":
+            imagem = preparar_corte(arquivo)
+            imagem.save(destino / config["arquivo"], optimize=True)
+        else:
+            imagem = preparar_palco(arquivo, foco[parte])
+            imagem.save(destino / config["arquivo"], quality=88)
+        abertura[parte] = config["arquivo"]
+        print(f"{parte}: {arquivo.name} -> {config['arquivo']} ({imagem.width}x{imagem.height})")
 
     arquivo_json.write_text(json.dumps(definicao, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"pronto: {destino}")

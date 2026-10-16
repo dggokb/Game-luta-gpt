@@ -1,0 +1,31 @@
+{
+  "nome": "Resgate Aéreo",
+  "cor": "#4FC3F7",
+  "corSecundaria": "#D8F6FF",
+  "abertura": {
+    "corte": "corte.png",
+    "palco": "palco.jpg",
+    "grito": "Pra cima!"
+  },
+  "paineis": {
+    "olhos": {
+      "imagem": "olhos.jpg"
+    },
+    "carga": {
+      "imagem": "carga.jpg",
+      "onomatopeia": "FSSSH"
+    },
+    "golpe": {
+      "imagem": "golpe.jpg",
+      "onomatopeia": "WHAM!"
+    },
+    "atingido": {
+      "imagem": "atingido.jpg",
+      "onomatopeia": "BAM!"
+    },
+    "final": {
+      "imagem": "final.jpg",
+      "onomatopeia": "SPLAAASH!"
+    }
+  }
+}

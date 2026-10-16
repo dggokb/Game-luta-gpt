@@ -151,6 +151,12 @@ final class CombatFighter {
     int beamBlastDamage;
     /** Ultra em sequência: golpes já dados, distância e altura do rival preso no começo. */
     int ultraHitsDone;
+    /**
+     * Ultra cinematográfico: a sequência parou antes do último golpe para a página de mangá
+     * (já pediu uma vez nesta sequência), e o bônus da nota do toque para o último golpe.
+     */
+    boolean ultraPaused, ultraPageDone;
+    float ultraFinalBonus;
     /** Who the sequence caught (a partner coming in after a KO is not held or hit). */
     CombatFighter ultraVictim;
     FighterState ultraVictimState;
