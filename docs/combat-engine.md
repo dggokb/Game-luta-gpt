@@ -58,6 +58,60 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
 - **Super freeze**: o Super congela o oponente e os projéteis durante o próprio startup
   (o que permite H → SUPER combar).
 
+## CPU: níveis, percepção, defesa e caderno de combos
+
+A CPU aperta botões como um jogador (`AiController` enche um `FighterInput`; o motor não sabe
+quem é CPU). A regra principal: **nada do que ela faz em resposta ao rival é mais rápido que um
+humano**.
+
+- **Percepção com atraso** (`CpuPerception`): guarda os últimos 64 quadros do que o rival
+  *mostra* (posição, velocidade, animação, golpe e quadro dele, pulo, projéteis vindo) e entrega
+  o de `CpuLevel.reactionFrames` quadros atrás. Nunca o botão apertado nem o quadro atual. No
+  começo da luta, antes de ter a reação inteira de história, ela não sabe nada (`seen` = null).
+- **Piso humano**: `CpuLevel.HUMAN_REACTION_FRAMES` = 13 quadros (~217 ms a 60 fps). Nenhum
+  nível fica abaixo (o construtor recusa) e os testes medem: a CPU nunca reage a um pulo nem
+  pune um golpe errado antes disso.
+- **8 níveis** (`CpuLevel`): reação (30 → 13 quadros), hábito de defender colada, chance de
+  defender o que viu e de acertar a altura, tamanho do combo, chance de confirmar, de errar o
+  combo, de punir, de tirar do ar, de pular projétil, de tech de agarrão e de air tech, ritmo
+  das decisões e escala do kit da batalha. O dano é o mesmo em todos.
+- **Estilo** (`CpuStyle`, do `fighter.comboStyle` do pacote): distância preferida, agressão,
+  vontade de soltar projétil, de agarrar, de pular e paciência na defesa. O zoner (alcance)
+  recua para a distância dele; o pressão fica colado; o tanque agarra; o imprevisível às vezes
+  larga o plano.
+
+Ordem de cada quadro (`AiController.fill`):
+
+1. agarrada: tech **por palpite** (a janela do tech, 12 quadros, é menor que a reação): só se
+   ela já esperava o agarrão (o rival estava colado no que ela viu antes dele agarrar);
+2. no ar apanhando / caída: air tech e opções de levantar, com a chance do nível;
+3. kit da batalha (assist, DHC, Overdrive, troca, Ultra, pushblock, Guard Cancel); o assist e o
+   Overdrive no meio do combo só depois de *ver* que acertou;
+4. o próprio golpe: o **caderno de combos** segue a rota;
+5. **defesa por reação**: golpe vindo (agachada contra golpe baixo; em pé contra pulo), pulo
+   vindo (em pé) ou projétil (defende ou pula por cima, para frente). Segura a defesa enquanto
+   está em blockstun;
+6. **cartas**: punir (viu o rival errar, calcula a recuperação que sobra e entra com o golpe de
+   abertura mais rápido que chega) e anti-aéreo (viu o pulo vindo, acompanha a trajetória e sobe
+   com o 2H, que lança);
+7. **defesa por hábito**: colada no rival, espera defendendo agachada (agachada segura qualquer
+   golpe no chão). Forte quando ela acabou de ver o rival atacar (respeita a pressão), fraca
+   contra quem está parado. Punir e tirar do ar passam na frente dela;
+8. **neutro** (`OpponentAi.think`, com a posição *vista* do rival): andar, recuar até a
+   distância do estilo, dash, projétil, agarrão, golpe ao alcance, pulo.
+
+**Caderno de combos** (`ComboBook`): a rota principal de cada lutador sai do próprio pacote
+(`cancelInto`, `maxUsesPerChain`) e do estilo, sem combo escrito à mão. Ex.: p01
+`L M 2H super-pulo jL jM pulo-no-ar jL jM j2H`; p04 `L M M 2H ...`; p09 `L M H H SUPER`;
+p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas (no acerto ou na defesa, como um jogador
+encadeia); lançador, especial, Super e super pulo só depois de ver que acertou. Se o empurrão
+tirou o próximo golpe do alcance, ela fecha com o que ainda alcança (H, ou o S1). Golpe agachado
+sai com ↘ (não fecha comando de especial com a defesa ← ↙ que veio antes).
+
+Nível na pausa: **NÍVEL CPU ◀ 5 ▶** (1 a 8, salvo no aparelho; padrão 5). Testes: `CpuTest`
+(piso humano, percepção, defesa por nível, punição, combo por nível, rotas por estilo, zoner
+mais longe que pressão, nível 8 vence o nível 2).
+
 ## Correntes de combo
 
 As rotas de cada golpe vêm do estilo de combo do personagem (bloco `combos` de

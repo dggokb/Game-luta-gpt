@@ -105,10 +105,10 @@ public class MenuInicialTest {
         MenuPausa p = new MenuPausa();
         p.abrir(null, true);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.cursor());
-        float[] menu = MenuPausa.CAIXAS[4];
+        float[] menu = MenuPausa.CAIXAS[5];
         assertNull("o toque que abriu a pausa não escolhe", p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         for (int i = 0; i < 20; i++) p.update(DT);
-        assertNull(p.tap(640f, 650f));
+        assertNull(p.tap(640f, 675f));
         assertTrue(p.isOpen());
         p.render(new PaginaHistoriaTest.NullCanvas());
         assertEquals(MenuPausa.Opcao.MENU, p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
@@ -120,6 +120,7 @@ public class MenuInicialTest {
 
         p.abrir(null, false);
         for (int i = 0; i < 20; i++) p.update(DT);
+        p.mover(1);
         p.mover(1);
         p.mover(1);
         p.mover(1);
@@ -143,6 +144,7 @@ public class MenuInicialTest {
         p.mover(1);
         p.mover(1);
         p.mover(1);
+        p.mover(1);
         assertEquals(MenuPausa.Opcao.COMANDOS, p.cursor());
         assertNull("COMANDOS não fecha a pausa", p.confirmar());
         assertTrue(p.isOpen());
@@ -162,7 +164,7 @@ public class MenuInicialTest {
         assertFalse(p.comandos().isOpen());
 
         // Pelo toque: a faixa COMANDOS abre, as setas trocam e VOLTAR fecha.
-        float[] caixa = MenuPausa.CAIXAS[3];
+        float[] caixa = MenuPausa.CAIXAS[4];
         assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
         assertTrue(p.comandos().isOpen());
         for (int i = 0; i < 20; i++) p.update(DT);
@@ -235,5 +237,37 @@ public class MenuInicialTest {
         p.render(new PaginaHistoriaTest.NullCanvas());
         p.setImpacto(true);
         assertTrue(p.impacto());
+    }
+
+    @Test
+    public void pausaMudaONivelDaCpuSemFechar() {
+        MenuPausa p = new MenuPausa();
+        assertEquals("o padrão é o 5", 5, p.nivelCpu());
+        p.abrir(null, false);
+        for (int i = 0; i < 20; i++) p.update(DT);
+        p.mover(1);
+        p.mover(1);
+        p.mover(1);
+        assertEquals(MenuPausa.Opcao.NIVEL_CPU, p.cursor());
+        assertTrue(p.ajustar(1));
+        assertEquals(6, p.nivelCpu());
+        p.ajustar(1);
+        p.ajustar(1);
+        p.ajustar(1);
+        assertEquals("para no 8", 8, p.nivelCpu());
+        assertNull("A no NÍVEL não fecha a pausa", p.confirmar());
+        assertEquals("e dá a volta", 1, p.nivelCpu());
+        p.ajustar(-1);
+        assertEquals("para no 1", 1, p.nivelCpu());
+        float[] caixa = MenuPausa.CAIXAS[3];
+        float cy = (caixa[1] + caixa[3]) * 0.5f;
+        assertNull(p.tap(caixa[2] - 20f, cy));
+        assertEquals("metade direita: sobe", 2, p.nivelCpu());
+        assertNull(p.tap(caixa[0] + 20f, cy));
+        assertEquals("metade esquerda: desce", 1, p.nivelCpu());
+        assertTrue(p.isOpen());
+        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.setNivelCpu(12);
+        assertEquals("salvo fora da faixa vira o mais próximo", 8, p.nivelCpu());
     }
 }

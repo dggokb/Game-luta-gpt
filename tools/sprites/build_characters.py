@@ -43,6 +43,8 @@ BUTTONS = ('L','M','H')
 ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
+# Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
+COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
             'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
 STRENGTHS = ('SUPER','SPECIAL','HEAVY','MEDIUM','LIGHT')
@@ -96,6 +98,8 @@ def validate_fighter(pack):
         raise ValueError(f'{name}: color must be #RRGGBB')
     positive_int(f['maxLife'], name+'.maxLife')
     if 'wakeupFrames' in f: positive_int(f['wakeupFrames'], name+'.wakeupFrames')
+    if 'comboStyle' in f and f['comboStyle'] not in COMBO_STYLES:
+        raise ValueError(f'{name}.comboStyle: expected one of {list(COMBO_STYLES)}')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
         raise ValueError(f'{name}: autoCombo accepts only L, M and H')
     body = f['body']
@@ -633,6 +637,7 @@ def compile_packs(root, results):
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
+                   +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
                      if energy and ('nome' in energy or energy.get('segurar')) else '')
                    +('.withEnergyVisual('+q(energy['visual'])+')' if energy and 'visual' in energy else '')

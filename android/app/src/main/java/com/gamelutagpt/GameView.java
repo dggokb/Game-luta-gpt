@@ -82,6 +82,8 @@ public class GameView extends SurfaceView
     private static final String SPEED_KEY = "velocidade";
     /** IMPACTO da pausa (impact frames ligados), salvo junto com a velocidade. */
     private static final String IMPACT_KEY = "impacto";
+    /** Nível da CPU (1 a 8) escolhido na pausa. */
+    private static final String CPU_LEVEL_KEY = "nivel_cpu";
 
     final CombatEngine engine = new CombatEngine(
         team[0], opponentFighter, PLAYER_START_X, OPPONENT_START_X, new CombatConfig());
@@ -392,6 +394,8 @@ public class GameView extends SurfaceView
         storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
+        pausa.setNivelCpu(speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO));
+        ai.setLevel(pausa.nivelCpu());
         atlases = new SpriteAtlasCache(context);
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
             @Override public void manterAtlas(CharacterDefinition... manter) {
@@ -3461,6 +3465,11 @@ public class GameView extends SurfaceView
         }
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
+        }
+        // O NÍVEL da CPU vale já na luta que continua, e fica salvo.
+        ai.setLevel(pausa.nivelCpu());
+        if (speedPrefs != null && speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO) != pausa.nivelCpu()) {
+            speedPrefs.edit().putInt(CPU_LEVEL_KEY, pausa.nivelCpu()).apply();
         }
         pad.reset();
         releaseAllPointers();

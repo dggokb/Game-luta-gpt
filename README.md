@@ -357,6 +357,20 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   Vídeos e imagens que faltam, com os prompts: `docs/tutorial-plateia.md`. Conversão dos
   vídeos: `tools/stage/video_para_ator.py`.
 
+## CPU com níveis e reação humana
+
+- **8 níveis** na pausa (**NÍVEL CPU ◀ 5 ▶**, fica salvo). O nível muda a reação, a defesa, o
+  tamanho dos combos e o quanto ela pune e tira do ar; o dano é o mesmo.
+- **Nunca reage mais rápido que um humano**: a CPU só vê a luta de 13 quadros atrás ou mais
+  (nível 8: 13; nível 1: 30) e nunca o botão do jogador.
+- **Defende**: agachada contra golpe no chão, em pé contra pulo; espera defendendo quando você
+  pressiona. **Pune** golpe errado, **tira do ar** com o 2H e **pula** projétil.
+- **Faz combo de verdade**, montado das rotas de cada lutador (ex.: L > M > 2H > super pulo >
+  jL > jM > pulo no ar > jL > jM > j2H), confirmando antes do lançador e do Super.
+- **Joga conforme o estilo**: o zoner fica longe soltando projétil, o pressão fica colado, o
+  tanque agarra, o imprevisível muda de plano.
+- Detalhes: `docs/combat-engine.md` (seção CPU).
+
 ## Correntes de combo
 
 - **Base igual para todos**, como no FighterZ: a corrente só sobe de força (L > M > H), cada

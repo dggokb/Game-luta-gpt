@@ -245,6 +245,9 @@ Rota de exemplo: L > M > 2H > super pulo > jL > jM > pulo no ar > jL > jM > j2H 
 | tanque | p07, p09 | H > H |
 | imprevisivel | p12 | volta para trás: M > L/2L, H > L/2L/M; cada golpe até 2 vezes |
 
+O estilo também guia a CPU (`CpuStyle`): distância, agressão, projétil, agarrão e paciência,
+e o caderno de combos dela sai destas mesmas rotas (`docs/combat-engine.md`, seção CPU).
+
 Trocar o estilo de alguém: mudar `estiloCombo`, rodar `mecanicas.py --write` e
 `build_characters.py --write`. Testes: `CorrentesComboTest` e `test_mecanicas.py`.
 

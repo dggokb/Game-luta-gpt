@@ -4,13 +4,14 @@ import com.gamelutagpt.render.RenderCanvas;
 
 /**
  * Pausa por cima da história ou da luta (botão MENU ou a tecla voltar): CONTINUAR, a VELOCIDADE
- * da luta, o IMPACTO (impact frames ligados ou não: a tela pisca nos golpes grandes), a lista de COMANDOS de cada personagem ({@link TelaComandos}) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
+ * da luta, o IMPACTO (impact frames ligados ou não: a tela pisca nos golpes grandes), o NÍVEL da CPU
+ * (1 a 8), a lista de COMANDOS de cada personagem ({@link TelaComandos}) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
  * o jogo enquanto a pausa está aberta e desenha a pausa por cima da tela parada.
  *
  * Não depende de plataforma e não é thread-safe: chame tudo da thread do loop do jogo.
  */
 public final class MenuPausa {
-    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, COMANDOS, MENU }
+    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, MENU }
 
     public static final String PAUSA = "PAUSA";
     public static final String CONTINUAR = "CONTINUAR";
@@ -19,23 +20,27 @@ public final class MenuPausa {
     public static final String LIGADO = "LIGADO";
     public static final String DESLIGADO = "DESLIGADO";
     public static final String COMANDOS = "COMANDOS";
+    public static final String NIVEL_CPU = "NÍVEL CPU";
     public static final String MENU_INICIAL = "MENU INICIAL";
     public static final String AVISO = "Voltar ao menu perde o progresso deste episódio.";
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
-    public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, COMANDOS,
-        MENU_INICIAL, AVISO, MENU};
+    public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, NIVEL_CPU,
+        COMANDOS, MENU_INICIAL, AVISO, MENU};
 
     /** Velocidades da luta (1 = original); quem usa a pausa lê e guarda a escolhida. */
     public static final float[] VELOCIDADES = {0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f};
     public static final float VELOCIDADE_PADRAO = 1f;
+    /** Níveis da CPU (o motor tem de 1 a 8); quem usa a pausa lê e guarda o escolhido. */
+    public static final int NIVEL_MIN = 1, NIVEL_MAX = 8, NIVEL_PADRAO = 5;
 
     static final float[][] CAIXAS = {
-        {420f, 296f, 860f, 352f},
-        {420f, 366f, 860f, 422f},
-        {420f, 436f, 860f, 492f},
-        {420f, 506f, 860f, 562f},
-        {420f, 576f, 860f, 632f},
+        {420f, 290f, 860f, 340f},
+        {420f, 352f, 860f, 402f},
+        {420f, 414f, 860f, 464f},
+        {420f, 476f, 860f, 526f},
+        {420f, 538f, 860f, 588f},
+        {420f, 600f, 860f, 650f},
     };
     /** O mesmo toque que abriu a pausa não pode escolher nada. */
     static final float TAP_DELAY = 0.2f;
@@ -47,6 +52,7 @@ public final class MenuPausa {
     private float time;
     private int velocidade = nivel(VELOCIDADE_PADRAO);
     private boolean impacto = true;
+    private int nivelCpu = NIVEL_PADRAO;
     private final TelaComandos comandos = new TelaComandos();
 
     /** Abre com o cursor em CONTINUAR. {@code aviso}: mostra que o episódio se perde. */
@@ -91,6 +97,16 @@ public final class MenuPausa {
         impacto = ligado;
     }
 
+    /** Nível da CPU, de 1 a 8. */
+    public int nivelCpu() {
+        return nivelCpu;
+    }
+
+    /** Restaura um nível salvo (fora de 1 a 8 vira o mais próximo). */
+    public void setNivelCpu(int nivel) {
+        nivelCpu = Math.max(NIVEL_MIN, Math.min(NIVEL_MAX, nivel));
+    }
+
     /** Restaura uma velocidade salva (a mais próxima da lista). */
     public void setVelocidade(float valor) {
         velocidade = nivel(valor);
@@ -116,6 +132,10 @@ public final class MenuPausa {
         }
         if (open && cursor() == Opcao.IMPACTO) {
             if (direcao != 0) impacto = !impacto;
+            return true;
+        }
+        if (open && cursor() == Opcao.NIVEL_CPU) {
+            if (direcao != 0) setNivelCpu(nivelCpu + (direcao > 0 ? 1 : -1));
             return true;
         }
         if (!open || cursor() != Opcao.VELOCIDADE) return false;
@@ -150,6 +170,10 @@ public final class MenuPausa {
         }
         if (cursor() == Opcao.IMPACTO) {
             impacto = !impacto;
+            return null;
+        }
+        if (cursor() == Opcao.NIVEL_CPU) {
+            nivelCpu = nivelCpu % NIVEL_MAX + 1;   // dá a volta: 8 → 1
             return null;
         }
         if (cursor() == Opcao.COMANDOS) {
@@ -193,6 +217,10 @@ public final class MenuPausa {
                     impacto = !impacto;
                     return null;
                 }
+                if (cursor() == Opcao.NIVEL_CPU) {
+                    ajustar(x < (CAIXAS[i][0] + CAIXAS[i][2]) * 0.5f ? -1 : 1);
+                    return null;
+                }
                 if (cursor() == Opcao.COMANDOS) {
                     comandos.abrir(temporada);
                     return null;
@@ -225,7 +253,7 @@ public final class MenuPausa {
         c.drawText(titulo, cx, 252f, size, Tinta.withAlpha(BotaoMenu.WHITE, (int)(255f * in)),
             Tinta.withAlpha(BotaoMenu.INK, (int)(255f * in)), size * 0.14f, true);
         String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(IMPACTO) + ":  " + t(impacto ? LIGADO : DESLIGADO),
-            t(COMANDOS), t(MENU_INICIAL)};
+            rotuloNivel(), t(COMANDOS), t(MENU_INICIAL)};
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
         }
@@ -234,6 +262,13 @@ public final class MenuPausa {
             c.drawText(texto, cx, 668f, BotaoMenu.fit(c, texto, 20f, 900f, false),
                 Tinta.withAlpha(0xFFB9C0D0, (int)(255f * in)), 0, 0f, false);
         }
+    }
+
+    /** "NÍVEL CPU  ◀ 5 ▶": as setas somem na ponta em que não dá mais para ir. */
+    private String rotuloNivel() {
+        String esq = nivelCpu > NIVEL_MIN ? "◀ " : "   ";
+        String dir = nivelCpu < NIVEL_MAX ? " ▶" : "   ";
+        return t(NIVEL_CPU) + "  " + esq + nivelCpu + dir;
     }
 
     /** "VELOCIDADE  ◀ 80% ▶": as setas somem na ponta em que não dá mais para ir. */

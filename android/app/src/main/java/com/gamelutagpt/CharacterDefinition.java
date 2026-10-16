@@ -257,6 +257,9 @@ final class CharacterDefinition {
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
+        /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
+        String comboStyle="equilibrado";
+        Fighter withComboStyle(String style) { comboStyle=style; return this; }
         /** Nome da energia (S1) na lista de comandos, e se o comando dela é de segurar. */
         String energyName;
         boolean energyHold;
