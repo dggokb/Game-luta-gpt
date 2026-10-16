@@ -31,6 +31,9 @@ public class DashJumpTest {
             assertTrue("correndo", p().forwardDashing);
         }
 
+        /** Modo do último pulo, lido logo depois de sair do chão. */
+        int modo = -1;
+
         /** Pula segurando {@code direcao} e devolve quanto andou para frente no ar. */
         float jump(int direcao) {
             in[0].direction = direcao;
@@ -38,6 +41,7 @@ public class DashJumpTest {
             float x = p().x;
             step();
             assertFalse("saiu do chão", p().grounded);
+            modo = p().jumpMode;
             for (int i = 0; i < 200 && !p().grounded; i++) step();
             assertTrue("voltou ao chão", p().grounded);
             in[0].direction = 0;
@@ -48,11 +52,12 @@ public class DashJumpTest {
     @Test public void puloDaCorridaVaiMaisLongeQueOPuloNormal() {
         Sim normal = new Sim();
         float andou = normal.jump(CIMA_FRENTE);
-        assertFalse(normal.p().dashJumping);
+        assertEquals(CombatFighter.PULO_COMPROMETIDO, normal.modo);
 
         Sim correndo = new Sim();
         correndo.run(8);
         float longe = correndo.jump(CIMA_FRENTE);
+        assertEquals(CombatFighter.PULO_CORRIDA, correndo.modo);
         assertTrue("pulo da corrida " + longe + " x normal " + andou, longe > andou * 1.6f);
         assertTrue("mas não atravessa a tela: " + longe, longe < 500f);
     }
@@ -70,7 +75,7 @@ public class DashJumpTest {
         Sim s = new Sim();
         s.run(8);
         s.jump(CIMA_FRENTE);
-        assertFalse(s.p().dashJumping);
+        assertEquals(CombatFighter.PULO_LIVRE, s.p().jumpMode);
         assertFalse("a corrida também acabou", s.p().forwardDashing);
         // O próximo pulo, parado, é o normal.
         float andou = s.jump(CIMA_FRENTE);

@@ -80,6 +80,16 @@ final class CombatConfig {
      * walkSpeed (~210 de distância); este leva o embalo do dash e vai ~1,8x mais longe.
      */
     float dashJumpSpeed = 540f;
+    /**
+     * Pulo normal comprometido: nos primeiros quadros no ar a direção ainda pode ser escolhida
+     * (o "pré-pulo" dos jogos de luta), depois fica fixa.
+     */
+    int jumpDirectionFrames = 3;
+    /**
+     * Super pulo: aceleração do drift (u/s²) até a velocidade de andar do lado segurado. Dá
+     * para frear e virar no meio do super pulo, mas não de uma vez.
+     */
+    float superJumpDriftAccel = 900f;
     float backdashSpeed = 978f;
     int backdashFrames = 15;
     int backdashRecoveryFrames = 12; // extra grounded neutral frames before another hop

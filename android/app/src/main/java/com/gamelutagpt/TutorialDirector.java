@@ -179,13 +179,13 @@ final class TutorialDirector {
         out.add(hit(character, "FORTE AGACHADO", "Segure ↓ e aperte {H}", "2H", 1));
         if (character.moves.containsKey("jH")) {
             out.add(new Lesson("GOLPE NO AR", "Pule para frente (↗) e aperte {H} no ar", 1, true,
-                c -> c.placeApart(70f), null,
+                c -> c.placeApart(JUMP_IN_GAP), null,
                 c -> c.landed("jH"),
                 (c, p1) -> jumpIn(c, p1, false)));
         }
         if (character.moves.containsKey("j2H")) {
             out.add(new Lesson("CRAVADA", "No ar, segure ↓ e aperte {H}: crava o rival no chão", 1, true,
-                c -> c.placeApart(70f), null,
+                c -> c.placeApart(JUMP_IN_GAP), null,
                 c -> c.landed("j2H"),
                 (c, p1) -> jumpIn(c, p1, true)));
         }
@@ -292,16 +292,37 @@ final class TutorialDirector {
     }
 
     /**
-     * Pulo para frente e H na descida; a cada tentativa aperta um pouco mais tarde, até
-     * achar o ponto em que o golpe aéreo alcança o boneco.
+     * Espaço entre os corpos nas lições de pulo: o pulo para frente é comprometido (anda ~210
+     * até cair), então o boneco fica longe o bastante para o golpe aéreo pegar na descida, sem
+     * passar por cima dele.
+     */
+    static final float JUMP_IN_GAP = 140f;
+
+    /**
+     * Pulo para frente e H na descida; a cada tentativa aperta num ponto diferente, até achar o
+     * ponto em que o golpe aéreo alcança o boneco.
      */
     private static void jumpIn(Ctx c, FighterInput p1, boolean down) {
         int tryIndex = c.t / 70, frame = c.t % 70;
+        if (frame >= 46) {
+            // Entre as tentativas: o pulo para frente é comprometido e leva o lutador longe;
+            // ele anda de volta até a distância da lição antes de pular de novo.
+            float gap = c.gap();
+            if (c.p1().grounded && Math.abs(gap - JUMP_IN_GAP) > 12f) {
+                boolean dummyRight = c.dummy().x > c.p1().x;
+                boolean closer = gap > JUMP_IN_GAP;
+                p1.direction = dummyRight == closer ? 1 : 5;
+            }
+            return;
+        }
         if (frame < 3) p1.direction = 8;
-        int press = 8 + (tryIndex % 6) * 4;
+        int press = JUMP_IN_PRESS[tryIndex % JUMP_IN_PRESS.length];
         if (down && frame >= press - 2 && frame <= press + 2) p1.direction = 3;
         if (frame == press) p1.heavy = true;
     }
+
+    /** Quadro do pulo em que o exemplo aperta H, uma tentativa de cada vez: na descida primeiro. */
+    private static final int[] JUMP_IN_PRESS = {24, 28, 20, 32, 16, 12};
 
     /**
      * Faz o comando (direções relativas, 1 = frente) e aperta o botão no fim, de novo a cada

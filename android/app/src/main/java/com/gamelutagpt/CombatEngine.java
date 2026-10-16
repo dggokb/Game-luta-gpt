@@ -767,6 +767,7 @@ final class CombatEngine {
         int relative = MotionParser.relative(f.input.direction, f.facing);
         f.status = CombatFighter.Status.NEUTRAL;
         f.launched = false;
+        f.jumpMode = CombatFighter.PULO_LIVRE;
         f.techRequestAge = -1;
         f.freeFallFrames = 0;
         f.invulnFrames = config.airTechInvulnFrames;
@@ -818,9 +819,19 @@ final class CombatEngine {
 
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
-        // Saindo da corrida, o pulo leva o embalo (dash jump).
-        f.dashJumping = f.forwardDashing && f.grounded;
-        f.dashJumpDirection = f.facing;
+        int horizontal = horizontal(f.input.direction);
+        if (f.forwardDashing && f.grounded) {
+            // Saindo da corrida, o pulo leva o embalo (dash jump).
+            f.jumpMode = CombatFighter.PULO_CORRIDA;
+            f.jumpDirection = f.facing;
+        } else if (superJump) {
+            f.jumpMode = CombatFighter.PULO_SUPER;
+            f.jumpDriftVx = horizontal * airSpeed(f, horizontal);
+        } else {
+            f.jumpMode = CombatFighter.PULO_COMPROMETIDO;
+            f.jumpDirection = horizontal;
+        }
+        f.jumpFrames = 0;
         f.forwardDashing = false;
         f.grounded = false;
         f.crouching = false;
@@ -841,6 +852,12 @@ final class CombatEngine {
         f.clearAttack();
         f.airJumpUsed = true;
         f.vy = -config.airJumpSpeed;
+        if (f.jumpMode != CombatFighter.PULO_SUPER) {
+            // O pulo no ar escolhe a direção de novo (comprometido).
+            f.jumpMode = CombatFighter.PULO_COMPROMETIDO;
+            f.jumpDirection = horizontal(f.input.direction);
+            f.jumpFrames = 0;
+        }
         cues.add("AIR_JUMP");
     }
 
@@ -943,6 +960,10 @@ final class CombatEngine {
         f.airDashFrames = 0;
         f.superJumping = false;
         f.vy = -config.jumpSpeed * config.wallJumpLift;
+        // Depois do empurrão, o pulo segue para longe da parede (comprometido).
+        f.jumpMode = CombatFighter.PULO_COMPROMETIDO;
+        f.jumpDirection = f.wallJumpDirection;
+        f.jumpFrames = config.jumpDirectionFrames;
         cues.add("WALL_JUMP");
     }
 
@@ -1099,6 +1120,10 @@ final class CombatEngine {
             f.rollFrames--;
             return;
         }
+        // Apanhar (ou ser agarrado) no ar acaba com o pulo: dali em diante o ar é livre.
+        if (!f.grounded && f.status != CombatFighter.Status.NEUTRAL && !f.attacking()) {
+            f.jumpMode = CombatFighter.PULO_LIVRE;
+        }
         // Overdrive: the team moves faster.
         float boost = teams.overdriveActive(f.index) ? config.overdriveSpeed : 1f;
         if (f.vx != 0f && f.status == CombatFighter.Status.AIR_HITSTUN) {
@@ -1136,9 +1161,7 @@ final class CombatEngine {
                 return;
             }
         }
-        int direction = f.input.direction;
-        int horizontal = direction == 4 || direction == 5 || direction == 6 ? -1
-            : direction == 1 || direction == 2 || direction == 8 ? 1 : 0;
+        int horizontal = horizontal(f.input.direction);
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         if (!holdingForward) f.forwardDashing = false;
         float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
@@ -1172,13 +1195,44 @@ final class CombatEngine {
         }
     }
 
-    /** No ar: o embalo do dash jump (fixo, para onde saiu) ou o controle do pulo normal. */
+    /** Lado na tela (-1, 0, 1) de uma direção do stick (0 neutro, depois → ↘ ↓ ↙ ← ↖ ↑ ↗). */
+    private static int horizontal(int direction) {
+        return direction == 4 || direction == 5 || direction == 6 ? -1
+            : direction == 1 || direction == 2 || direction == 8 ? 1 : 0;
+    }
+
+    /** Velocidade de lado no ar: a de andar para frente, ou a de andar para trás. */
+    private float airSpeed(CombatFighter f, int horizontal) {
+        if (horizontal == 0) return 0f;
+        return horizontal == f.facing ? config.walkSpeed : config.walkBackSpeed;
+    }
+
+    /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
     private void airDrift(CombatFighter f, int horizontal, float walk, float boost) {
-        if (f.dashJumping) {
-            f.x += f.dashJumpDirection * config.dashJumpSpeed * boost * CombatConfig.DT;
-        } else {
-            f.x += horizontal * walk * CombatConfig.DT;
+        switch (f.jumpMode) {
+            case CombatFighter.PULO_CORRIDA:
+                f.x += f.jumpDirection * config.dashJumpSpeed * boost * CombatConfig.DT;
+                break;
+            case CombatFighter.PULO_COMPROMETIDO:
+                // Logo depois de sair do chão ainda dá para escolher a direção; depois, fixa.
+                if (f.jumpFrames < config.jumpDirectionFrames && horizontal != 0) f.jumpDirection = horizontal;
+                f.x += f.jumpDirection * airSpeed(f, f.jumpDirection) * boost * CombatConfig.DT;
+                break;
+            case CombatFighter.PULO_SUPER: {
+                // Drift: o stick puxa aos poucos; solto, o embalo continua.
+                if (horizontal != 0) {
+                    float alvo = horizontal * airSpeed(f, horizontal);
+                    float passo = config.superJumpDriftAccel * CombatConfig.DT;
+                    f.jumpDriftVx += Math.max(-passo, Math.min(passo, alvo - f.jumpDriftVx));
+                }
+                f.x += f.jumpDriftVx * boost * CombatConfig.DT;
+                break;
+            }
+            default:
+                f.x += horizontal * walk * CombatConfig.DT;
+                break;
         }
+        f.jumpFrames++;
     }
 
     private void moveVertically(CombatFighter f) {
@@ -1227,7 +1281,7 @@ final class CombatEngine {
         f.y = Arena.GROUND_Y;
         f.vy = 0f;
         f.grounded = true;
-        f.dashJumping = false;
+        f.jumpMode = CombatFighter.PULO_LIVRE;
         f.airDashFrames = 0;
         f.airDashUsed = false;
         f.airJumpUsed = false;
@@ -1274,7 +1328,7 @@ final class CombatEngine {
         f.knockdownFrame = 0;
         f.stunLeft = 0;
         f.grounded = true;
-        f.dashJumping = false;
+        f.jumpMode = CombatFighter.PULO_LIVRE;
         f.airDashFrames = 0;
         f.airDashUsed = false;
         f.airJumpUsed = false;

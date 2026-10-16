@@ -51,12 +51,27 @@ final class CombatFighter {
     boolean superJumping;
     boolean crouching;
     boolean forwardDashing;
+    /** Como o lutador se move de lado no ar (veja {@link #jumpMode}). */
+    static final int PULO_LIVRE = 0, PULO_COMPROMETIDO = 1, PULO_SUPER = 2, PULO_CORRIDA = 3;
     /**
-     * Pulo saído da corrida (dash jump, como no KOF): o embalo do dash leva o pulo para frente,
-     * mais longe que o pulo normal, na direção em que ele saiu do chão. Acaba ao tocar o chão.
+     * Controle de lado no ar, decidido na saída do chão (como no FighterZ e no MvC):
+     * <ul>
+     *   <li>{@link #PULO_COMPROMETIDO}: pulo normal; a direção (↖ ↑ ↗) fica fixa.</li>
+     *   <li>{@link #PULO_SUPER}: super pulo; o stick puxa aos poucos (drift) e o embalo fica.</li>
+     *   <li>{@link #PULO_CORRIDA}: pulo saído da corrida (dash jump, do KOF); vai mais longe
+     *       para frente, fixo.</li>
+     *   <li>{@link #PULO_LIVRE}: no ar sem ter pulado (recuperação, depois de apanhar): o
+     *       stick dirige como antes.</li>
+     * </ul>
+     * Volta a livre ao tocar o chão ou ao apanhar no ar.
      */
-    boolean dashJumping;
-    int dashJumpDirection;
+    int jumpMode;
+    /** Direção na tela (-1, 0, 1) do pulo comprometido ou da corrida. */
+    int jumpDirection;
+    /** Velocidade de lado do super pulo (o drift muda aos poucos). */
+    float jumpDriftVx;
+    /** Quadros no ar desde a saída: nos primeiros ainda dá para escolher a direção. */
+    int jumpFrames;
     int backdashFrames;
     /** Prevent repeated retreats while the previous hop/recovery has not reset. */
     int backdashCooldown;

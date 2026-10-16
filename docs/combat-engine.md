@@ -384,6 +384,25 @@ no chão). Valores em `CombatConfig.airDash*`.
 
 Testes em `AirDashTest`.
 
+## Controle no ar: pulo comprometido e drift do super pulo
+
+Como no FighterZ e no MvC. O jeito de mover de lado no ar é decidido na saída do chão
+(`CombatFighter.jumpMode`):
+
+| Modo | Quando | No ar |
+|---|---|---|
+| `PULO_COMPROMETIDO` | pulo normal (↖ ↑ ↗), pulo no ar (jM → pulo), depois do wall jump | a direção fica fixa: para frente `walkSpeed`, para trás `walkBackSpeed`, para cima parado. Nos primeiros `jumpDirectionFrames` (3) ainda dá para escolher a direção (o "pré-pulo") |
+| `PULO_SUPER` | super pulo (↓ ↑, ou a perseguição do launcher) | drift: o stick puxa aos poucos (`superJumpDriftAccel`, 900 u/s²) até a velocidade de andar daquele lado; solto, o embalo continua. Dá para frear e virar no meio, mas não de uma vez |
+| `PULO_CORRIDA` | pulo saído do dash para frente | veja abaixo |
+| `PULO_LIVRE` | no ar sem ter pulado: recuperação no ar, depois de apanhar | o stick dirige direto, como antes |
+
+- Golpes aéreos seguem o mesmo modo do pulo.
+- Apanhar no ar e tocar o chão voltam o modo a livre.
+- O tutorial (lições GOLPE NO AR e CRAVADA) põe o boneco a `JUMP_IN_GAP` (140) para o pulo
+  para frente pegar na descida; o exemplo anda de volta entre as tentativas.
+
+Testes em `ControleNoArTest`.
+
 ## Pulo da corrida (dash jump)
 
 Como no KOF: pular **durante o dash para frente** leva o embalo da corrida. Valor em
@@ -394,7 +413,8 @@ Como no KOF: pular **durante o dash para frente** leva o embalo da corrida. Valo
 - Vale com ↑ ou ↗ (soltar a frente no mesmo quadro do pulo não perde o embalo).
 - O pulo é comprometido: a direção é a da saída e o stick não freia nem vira no ar. Os
   golpes aéreos saem com o mesmo embalo. Air dash e wall jump funcionam como sempre.
-- Acaba ao tocar o chão (ou ao cair derrubado); a corrida também acaba no pulo.
+- Acaba ao tocar o chão, ao apanhar no ar ou ao cair derrubado; a corrida também acaba no
+  pulo.
 - Sem arte própria: usa o clipe de pulo.
 
 Testes em `DashJumpTest`.
