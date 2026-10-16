@@ -2178,6 +2178,7 @@ final class CombatEngine {
         }
         if (!d.grounded) session.airCombo = true;
         int stop = lastStrike ? attack.hitstopFrames : holdingHitstop(attack);
+        if (lastStrike && !projectile) stop += hitHold(attack);
         if (punish) stop += config.punishHitstopBonus;
         if (d.ko()) stop += config.koHitstopBonus;
         freeze(a, d, stop, projectile);
@@ -2260,6 +2261,13 @@ final class CombatEngine {
     }
 
     /** Hitstop: both bodies on a melee contact, only the defender for a projectile. */
+    /** Congelamento extra que segura a pose do impacto nos acertos médios e fortes. */
+    int hitHold(AttackDefinition attack) {
+        if (attack.strength == AttackDefinition.Strength.MEDIUM) return config.mediumHitHoldFrames;
+        if (attack.strength == AttackDefinition.Strength.HEAVY) return config.heavyHitHoldFrames;
+        return 0;
+    }
+
     private static void freeze(CombatFighter a, CombatFighter d, int frames, boolean projectile) {
         d.hitstop = Math.max(d.hitstop, frames);
         if (!projectile) a.hitstop = Math.max(a.hitstop, frames);

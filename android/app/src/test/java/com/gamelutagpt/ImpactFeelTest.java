@@ -105,4 +105,30 @@ public class ImpactFeelTest {
         f.cinema(0f, 0f, 1, true);
         assertTrue("the knockout always gets its own", f.cinema());
     }
+
+    @Test public void aConnectedBlowSnapsBackToGuardButAWhiffRecoversSlowly() {
+        CharacterDefinition.Move heavy = GeneratedCharacters.get("player_base").moves.get("H");
+        AttackDefinition a = heavy.attack;
+        float step = 1f / 60f;
+        int activeEnd = a.startupFrames + a.activeFrames;
+        float end = heavy.animation.duration - 0.0001f;
+        // Until the end of the active window nothing changes.
+        assertEquals(heavy.animationTime((a.startupFrames + 0.5f) * step),
+            ImpactFeel.snapBackTime(heavy, a.startupFrames, true, step), 1e-6f);
+        // Connected: back in guard a few frames after the active window.
+        assertEquals(end, ImpactFeel.snapBackTime(heavy, activeEnd + ImpactFeel.SNAP_BACK_FRAMES - 1, true, step), 1e-6f);
+        assertEquals(end, ImpactFeel.snapBackTime(heavy, a.totalFrames - 1, true, step), 1e-6f);
+        // Whiffed: the slow recovery of before.
+        float whiff = ImpactFeel.snapBackTime(heavy, activeEnd + ImpactFeel.SNAP_BACK_FRAMES - 1, false, step);
+        assertTrue(whiff < end - 0.05f);
+    }
+
+    @Test public void mediumAndHeavyHitsHoldTheImpactPoseLongerThanAGuard() {
+        CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get("player_base"), "P1"),
+            new FighterState(GeneratedCharacters.opponentCharacter(), "P2"), 500f, 640f, new CombatConfig());
+        CharacterDefinition c = GeneratedCharacters.get("player_base");
+        assertEquals(0, e.hitHold(c.attack("L")));
+        assertEquals(e.config.mediumHitHoldFrames, e.hitHold(c.attack("M")));
+        assertEquals(e.config.heavyHitHoldFrames, e.hitHold(c.attack("H")));
+    }
 }

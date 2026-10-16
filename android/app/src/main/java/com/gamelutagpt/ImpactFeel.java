@@ -174,6 +174,27 @@ final class ImpactFeel {
         return cinemaFrames > 0 ? Math.min(scale, CINEMA_SCALE) : scale;
     }
 
+    /** Quadros que o golpe leva para voltar à guarda depois de conectar (a "volta seca"). */
+    static final int SNAP_BACK_FRAMES = 3;
+
+    /**
+     * Tempo do clipe de um golpe normal no quadro {@code attackFrame}. Até o fim da janela
+     * ativa, o mesmo de sempre; depois, se o golpe conectou (acerto ou defesa), a volta do
+     * desenho acontece em {@link #SNAP_BACK_FRAMES} quadros e o resto da recuperação fica na
+     * última pose (a guarda). Golpe que errou volta devagar, como antes: o erro continua
+     * parecendo arriscado. Golpes de vários acertos ficam como estão. Só o desenho muda.
+     */
+    static float snapBackTime(CharacterDefinition.Move move, int attackFrame, boolean connected, float step) {
+        float plain = move.animationTime((attackFrame + 0.5f) * step);
+        AttackDefinition a = move.attack;
+        int activeEnd = a.startupFrames + a.activeFrames;
+        if (!connected || a.maxHits > 1 || attackFrame < activeEnd || move.animation == null) return plain;
+        float from = move.animationTime(activeEnd * step);
+        float end = move.animation.duration - 0.0001f;
+        float k = Math.min(1f, (attackFrame - activeEnd + 1) / (float)SNAP_BACK_FRAMES);
+        return Math.max(Math.min(plain, end), Math.min(end, from + (end - from) * k));
+    }
+
     /**
      * Tremida de quem apanhou durante o congelamento do acerto (hitstop), alternando de lado a
      * cada quadro; menor na defesa. 0 fora dele.

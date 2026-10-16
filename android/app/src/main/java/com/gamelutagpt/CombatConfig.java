@@ -225,6 +225,13 @@ final class CombatConfig {
     float spinSpeed = 360f;
     /** Congelamento extra do acerto no punish counter e no golpe que nocauteia (peso do impacto). */
     int punishHitstopBonus = 8;
+    /**
+     * Pose do impacto (como no FighterZ): golpes médios e fortes que acertam congelam um pouco
+     * mais, para a pose esticada "grudar" na tela. Os dois lutadores congelam juntos, então a
+     * vantagem e os combos não mudam. Defesa não ganha.
+     */
+    int mediumHitHoldFrames = 3;
+    int heavyHitHoldFrames = 4;
     int koHitstopBonus = 16;
     float spinLift = 820f;
     int spinHitstunFrames = 30;

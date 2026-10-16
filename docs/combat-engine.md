@@ -551,4 +551,11 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   Um por combo (90 quadros de intervalo); o KO sempre ganha o seu.
 - **Poeira e pedrinhas** quando um corpo bate no chão (mais forte vindo do alto) e no quique.
 
+- **Pose do impacto** (medido no FighterZ: o golpe fica parado esticado 0,12–0,2 s e volta
+  à guarda em 1–2 quadros): golpes médios e fortes que acertam congelam +3/+4 quadros
+  (`mediumHitHoldFrames`, `heavyHitHoldFrames`; os dois congelam juntos, então a vantagem e os
+  combos não mudam) e, depois da janela ativa, o desenho volta à guarda em 3 quadros e fica
+  nela no resto da recuperação (`ImpactFeel.snapBackTime`). Golpe que erra volta devagar,
+  como antes. Defesa e golpes de vários acertos não mudam.
+
 Testes em `ImpactFeelTest` e `PunishCounterTest`.
