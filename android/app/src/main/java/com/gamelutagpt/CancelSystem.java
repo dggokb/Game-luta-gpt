@@ -27,9 +27,18 @@ final class CancelSystem {
     /** Whether the current attack may become {@code target} on this frame. */
     static boolean canCancel(CombatFighter f, String target, ComboSession session) {
         if (!f.attacking() || !windowOpen(f) || !f.attack.cancelsInto(target)) return false;
-        if (AttackDefinition.JUMP.equals(target)) return f.grounded;
+        // No chão é o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo).
+        if (AttackDefinition.JUMP.equals(target)) return f.grounded || !f.airJumpUsed;
         AttackDefinition next = f.character().attack(target);
-        return next != null && (session == null || session.allows(next));
+        return next != null && chainAllows(f, next) && (session == null || session.allows(next));
+    }
+
+    /** Limite de usos do golpe dentro da corrente atual, acertando ou na defesa. */
+    static boolean chainAllows(CombatFighter f, AttackDefinition next) {
+        if (next.maxUsesPerChain <= 0) return true;
+        int uses = 0;
+        for (String used : f.chain) if (used.equals(next.id)) uses++;
+        return uses < next.maxUsesPerChain;
     }
 
     /**

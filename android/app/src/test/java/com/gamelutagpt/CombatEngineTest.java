@@ -168,14 +168,14 @@ public class CombatEngineTest {
 
     @Test public void invalidRouteIsIgnoredAndExpiresWithoutBreakingTheAttack() {
         Sim s = close();
-        s.in[0].light = true;
+        s.in[0].medium = true;
         s.step();
         s.until(() -> s.f(0).outcome == CombatFighter.Outcome.HIT, 30);
         s.until(() -> s.f(0).hitstop == 0, 30);
-        s.in[0].heavy = true;           // L does not cancel into H
+        s.in[0].light = true;           // M does not go back to L (only the p12 style does)
         int before = s.f(0).attackFrame;
         s.step();
-        assertEquals("L", s.attackId(0));
+        assertEquals("M", s.attackId(0));
         assertEquals(before + 1, s.f(0).attackFrame);
         s.steps(CombatConfig.FPS / 10);
         assertEquals("Invalid press expired in the buffer", 0, s.f(0).buffer.size());

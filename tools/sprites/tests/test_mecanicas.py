@@ -30,7 +30,13 @@ class MecanicasTest(unittest.TestCase):
 
     def test_packs_follow_mecanicas_json(self):
         for cid, spec in self.data['personagens'].items():
-            pack, path, _ = mecanicas.apply(cid, spec, self.data['base'])
+            pack, path, _ = mecanicas.apply(cid, spec, self.data['base'], self.data['combos'])
+            current = json.loads(path.read_text(encoding='utf-8'))
+            self.assertEqual(current, pack, f'{cid}: rode tools/sprites/mecanicas.py --write')
+        for cid, style in self.data['combos']['soCombos'].items():
+            if cid.startswith('_'):
+                continue
+            pack, path = mecanicas.combos_only(cid, style, self.data['combos'])
             current = json.loads(path.read_text(encoding='utf-8'))
             self.assertEqual(current, pack, f'{cid}: rode tools/sprites/mecanicas.py --write')
 

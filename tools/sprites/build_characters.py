@@ -253,7 +253,7 @@ def validate_attack(name, m, projectile):
         raise ValueError(f'{name}.damageProration: expected a value in (0, 1]')
     if m.get('launchType','none') not in LAUNCHES:
         raise ValueError(f'{name}.launchType: expected one of {sorted(LAUNCHES)}')
-    for key in ('juggleCost','maxUsesPerCombo'):
+    for key in ('juggleCost','maxUsesPerCombo','maxUsesPerChain'):
         if key in m: non_negative_int(m[key], f'{name}.{key}')
     if 'low' in m and type(m['low']) is not bool:
         raise ValueError(f'{name}.low: expected true or false')
@@ -305,8 +305,7 @@ def validate_routes(pack):
         air = source.startswith('j')
         for target in m['cancelInto']:
             if target == JUMP:
-                if air: raise ValueError(f'{pack["id"]}/{source}: an air move cannot jump-cancel')
-                continue
+                continue   # no chão, o pulo do cancelamento; no ar, o cancelamento de pulo (uma vez por voo)
             if target not in ids:
                 raise ValueError(f'{pack["id"]}/{source}: cancelInto {target} does not exist')
             if target not in SPECIALS and target not in pack.get('specialMoves', {}) and target.startswith('j') != air:
@@ -529,6 +528,7 @@ def compile_packs(root, results):
         if 'maxHits' in m: code += '.maxHits('+str(m['maxHits'])+')'
         if 'golpes' in m: code += '.strikes('+','.join(map(str,m['golpes']))+')'
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
+        if 'maxUsesPerChain' in m: code += '.maxUsesPerChain('+str(m['maxUsesPerChain'])+')'
         if m.get('low'): code += '.low(true)'
         if reach is not None: code += '.reach('+f(reach)+','+f(height)+(','+f(m['hitFloor']) if 'hitFloor' in m else '')+')'
         for key in ('hitboxes','hurtboxes'):

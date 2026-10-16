@@ -399,10 +399,8 @@ final class CharacterDefinition {
             if(!a.id.equals(id))throw new IllegalArgumentException(this.id+"/"+id+": attack id mismatch "+a.id);
             boolean air=id.startsWith("j");
             for(String target:a.cancelInto()) {
-                if(AttackDefinition.JUMP.equals(target)) {
-                    if(air)throw new IllegalArgumentException(this.id+"/"+id+": an air move cannot jump-cancel");
-                    continue;
-                }
+                // No chão: pulo do cancelamento. No ar: o cancelamento de pulo (uma vez por voo).
+                if(AttackDefinition.JUMP.equals(target))continue;
                 if(attack(target)==null)
                     throw new IllegalArgumentException(this.id+"/"+id+": cancelInto "+target+" does not exist");
                 boolean special="S".equals(target)||"SUPER".equals(target)||specials.containsKey(target);

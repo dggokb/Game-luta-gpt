@@ -171,6 +171,14 @@ final class CombatFighter {
     boolean airDashBack;
     /** The air dash of this jump was spent; landing gives it back. */
     boolean airDashUsed;
+    /** Já usou o cancelamento de pulo no ar (jM → pulo) neste voo; volta ao tocar o chão. */
+    boolean airJumpUsed;
+    /**
+     * Golpes da corrente atual (desde o último golpe que saiu do neutro). O limite de usos do
+     * golpe vale aqui também, acertando ou na defesa: assim uma corrente que volta para trás
+     * (H → L do p12) ou repete um golpe (M → M) sempre acaba.
+     */
+    final java.util.ArrayList<String> chain = new java.util.ArrayList<>();
     /** Air dashes done in this jump (a fighter may have more than one). */
     int airDashCount;
 
