@@ -284,11 +284,10 @@ final class HudRenderer {
         int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
         float pop = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
         float levelX = right ? Arena.VW - 51f : 51f;
-        drawLevelFire(c, levelX, 684f, level, 1f);
+        drawLevelFire(c, levelX, 684f, level, right, 1f);
         if (level > 0) {
-            // Charged level: soft halo behind the digit, brighter when it just went up (fire
-            // colored once the Ultra is ready, so it does not tint the flames).
-            fxPaint.setColor(level >= CombatConfig.ULTRA_COST / CombatConfig.METER_PER_BAR ? FIRE_MID : right ? RED : BLUE);
+            // Charged level: soft halo behind the digit, brighter when it just went up.
+            fxPaint.setColor(right ? RED : BLUE);
             fxPaint.setAlpha(Math.round(70 + 120 * pop + (level == 5 ? 40 * (float)Math.sin(effects.now * 6) + 40 : 0)));
             c.drawCircle(levelX, 686f, 20f + 8f * pop, fxPaint);
             fxPaint.setAlpha(255);
@@ -504,22 +503,23 @@ final class HudRenderer {
         paint.setStyle(Paint.Style.FILL);
         c.restore();
         int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
-        drawLevelFire(c, right ? Arena.VW - 52f : 52f, 694f, level, .85f);
+        drawLevelFire(c, right ? Arena.VW - 52f : 52f, 694f, level, right, .85f);
         text(c, LEVELS[level], right ? Arena.VW - 52f : 52f, 707f, 31f, Color.WHITE);
         text(c, "SUPER", right ? Arena.VW - 377f : 377f, 706f, 18f, Color.WHITE);
     }
 
     private final Paint fxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path flame = new Path();
-    /** Cores do fogo do número do super: borda, meio e miolo. */
-    private static final int FIRE_OUTER = 0xFFFF4A12, FIRE_MID = 0xFFFF9A1F, FIRE_CORE = 0xFFFFE27A;
+    /** Cores do fogo do número do super, na cor da barra de cada lado: borda, meio e miolo. */
+    private static final int[] FIRE_BLUE = {BLUE, 0xFF8FE6FF, 0xFFE8FCFF};
+    private static final int[] FIRE_RED = {RED, 0xFFFF8C98, 0xFFFFE6E9};
 
     /**
      * Fogo atrás do número do super: quanto mais carregado, mais labaredas, mais altas e mais
-     * quentes. 1 e 2: chama baixa e vermelha; 3 (o Ultra liberado): fogo laranja com miolo
-     * amarelo; 5: labareda grande com centro branco e brasas subindo. Sem alocação.
+     * claras, na cor da barra. 1 e 2: chama baixa; 3 (o Ultra liberado): fogo com miolo claro;
+     * 5: labareda grande com centro branco e brasas subindo. Sem alocação.
      */
-    private void drawLevelFire(Canvas c, float cx, float baseY, int level, float scale) {
+    private void drawLevelFire(Canvas c, float cx, float baseY, int level, boolean right, float scale) {
         if (level <= 0) return;
         float t = (float)effects.now;
         int tongues = 3 + level;
@@ -533,7 +533,7 @@ final class HudRenderer {
         for (int layer = 0; layer < 3; layer++) {
             if (layer == 2 && !ultra) break;
             float k = 1f - layer * .28f;
-            int color = layer == 0 ? FIRE_OUTER : layer == 1 ? FIRE_MID : FIRE_CORE;
+            int color = (right ? FIRE_RED : FIRE_BLUE)[layer];
             fxPaint.setColor(color);
             fxPaint.setAlpha(layer == 0 ? (ultra ? 210 : 150 + 25 * level) : layer == 1 ? (ultra ? 220 : 110) : 235);
             for (int i = 0; i < tongues; i++) {
@@ -560,7 +560,7 @@ final class HudRenderer {
             fxPaint.setColor(Color.WHITE);
             fxPaint.setAlpha(Math.round(120 + 60 * (float)Math.sin(t * 10f)));
             c.drawCircle(cx, baseY - 6f * scale, 9f * scale, fxPaint);
-            fxPaint.setColor(FIRE_CORE);
+            fxPaint.setColor((right ? FIRE_RED : FIRE_BLUE)[2]);
             for (int i = 0; i < 7; i++) {
                 float p = (t * .9f + i / 7f) % 1f;
                 float ex = cx + (float)Math.sin(i * 2.4f + t * 3f) * spread * .9f;
