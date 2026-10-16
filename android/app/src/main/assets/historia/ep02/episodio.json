@@ -1,48 +1,61 @@
 {
   "id": "ep02",
   "numero": 2,
-  "titulo": "O Sorteio",
+  "titulo": "O Parceiro",
   "passos": [
     { "tipo": "titulo" },
 
-    { "tipo": "pagina", "layout": "faixa-e-dois", "paineis": [
-      { "imagem": "pag1_q1.jpg", "cena": "templo", "personagens": ["ryuga", "koga"], "foco": 0.4,
+    { "tipo": "pagina", "irmao": "ryuga", "layout": "faixa-e-dois", "paineis": [
+      { "imagem": "pag1_ryuga_q1.jpg", "cena": "estrada", "personagens": ["ryuga", "p02"], "foco": 0.4,
         "baloes": [
-          { "tipo": "narracao", "texto": "O templo do torneio. Oito duplas. Um único desejo.", "pos": [0.3, 0.18] }
+          { "tipo": "narracao", "texto": "O torneio é em duplas. Ryūga foi atrás de quem ele quer ao seu lado.", "pos": [0.3, 0.18] }
         ] },
-      { "imagem": "pag1_q2.jpg", "cena": "templo", "personagens": ["mensageiro"], "enquadramento": "close",
+      { "imagem": "pag1_ryuga_q2.jpg", "cena": "estrada", "personagens": ["ryuga"], "enquadramento": "close",
         "baloes": [
-          { "tipo": "fala", "quem": "mensageiro", "texto": "Cada convite é um capitão. A chave será sorteada agora.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "fala", "quem": "ryuga", "texto": "Fui convidado para o torneio do meu pai. Quero você comigo.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
         ] },
-      { "imagem": "pag1_q3.jpg", "cena": "templo", "personagens": ["koga"], "enquadramento": "close",
+      { "imagem": "pag1_ryuga_q3.jpg", "cena": "estrada", "personagens": ["p02"], "enquadramento": "close",
         "baloes": [
-          { "tipo": "fala", "quem": "koga", "texto": "Nos vemos na final, Ryūga.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "fala", "quem": "p02", "texto": "Lutar do seu lado? Então me mostre que vale a pena.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
         ] }
     ] },
 
-    { "tipo": "sorteio" },
+    { "tipo": "pagina", "irmao": "koga", "layout": "faixa-e-dois", "paineis": [
+      { "imagem": "pag1_koga_q1.jpg", "cena": "chuva", "personagens": ["koga", "p04"], "foco": 0.4,
+        "baloes": [
+          { "tipo": "narracao", "texto": "O torneio é em duplas. Kōga foi buscar a pessoa exata para lutar com ele.", "pos": [0.3, 0.18] }
+        ] },
+      { "imagem": "pag1_koga_q2.jpg", "cena": "chuva", "personagens": ["koga"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "koga", "texto": "Tenho um convite para você. Um torneio... e uma vingança.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag1_koga_q3.jpg", "cena": "chuva", "personagens": ["p04"], "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "quem": "p04", "texto": "Eu não luto com quem é mais fraco que eu. Prove.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "luta", "irmao": "ryuga", "rotulo": "CONVITE", "dupla": ["player_base"], "cpu": ["p02"], "repetirSeDerrota": false },
+
+    { "tipo": "luta", "irmao": "koga", "rotulo": "CONVITE", "dupla": ["p03"], "cpu": ["p04"], "repetirSeDerrota": false },
 
     { "tipo": "pagina", "irmao": "ryuga", "layout": "splash", "paineis": [
-      { "imagem": "pag2_ryuga.jpg", "cena": "templo", "personagens": ["ryuga"], "efeito": "brilho",
+      { "imagem": "pag2_ryuga.jpg", "cena": "estrada", "personagens": ["ryuga", "p02"], "efeito": "brilho",
         "baloes": [
-          { "tipo": "pensamento", "quem": "ryuga", "texto": "Três lutas até a final. Pai... eu vou chegar até você.", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
+          { "tipo": "fala", "quem": "p02", "texto": "Você é teimoso, Ryūga... Tá bom. Eu vou com você.", "pos": [0.5, 0.2], "rabo": [0.6, 0.45] }
         ] }
     ] },
 
     { "tipo": "pagina", "irmao": "koga", "layout": "splash", "paineis": [
-      { "imagem": "pag2_koga.jpg", "cena": "templo", "personagens": ["koga"], "efeito": "impacto",
+      { "imagem": "pag2_koga.jpg", "cena": "chuva", "personagens": ["koga", "p04"], "efeito": "impacto",
         "baloes": [
-          { "tipo": "grito", "quem": "koga", "texto": "Quem estiver no meu caminho vai cair!", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
+          { "tipo": "fala", "quem": "p04", "texto": "Hmph... Você tem fogo nos olhos. Tá certo, eu vou.", "pos": [0.5, 0.2], "rabo": [0.6, 0.45] }
         ] }
     ] },
 
-    { "tipo": "luta", "torneio": true },
-
-    { "tipo": "chave" },
-
-    { "tipo": "proximo", "titulo": "Fora da Arena", "linhas": [
-      "A vitória garantiu a vaga na semifinal.",
-      "Mas nem todo mundo aceita perder."
+    { "tipo": "proximo", "titulo": "O Sorteio", "linhas": [
+      "O templo abre as portas para os convidados.",
+      "O chaveamento coloca os irmãos em lados opostos."
     ] }
   ]
 }

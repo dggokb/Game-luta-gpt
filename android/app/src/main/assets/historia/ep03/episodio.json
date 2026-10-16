@@ -1,57 +1,48 @@
 {
   "id": "ep03",
   "numero": 3,
-  "titulo": "Fora da Arena",
+  "titulo": "O Sorteio",
   "passos": [
     { "tipo": "titulo" },
 
-    { "tipo": "chave" },
-
     { "tipo": "pagina", "layout": "faixa-e-dois", "paineis": [
-      { "imagem": "pag1_q1.jpg", "cena": "chuva", "efeito": "chuva", "foco": 0.4,
+      { "imagem": "pag1_q1.jpg", "cena": "templo", "personagens": ["ryuga", "koga"], "foco": 0.4,
         "baloes": [
-          { "tipo": "narracao", "texto": "Noite. Longe da arena, no caminho de volta ao alojamento.", "pos": [0.3, 0.18] }
+          { "tipo": "narracao", "texto": "O templo do torneio. Oito duplas. Um único desejo.", "pos": [0.3, 0.18] }
         ] },
-      { "imagem": "pag1_q2.jpg", "cena": "chuva", "efeito": "impacto", "sfx": "TUM!", "posicaoSfx": [0.78, 0.78],
+      { "imagem": "pag1_q2.jpg", "cena": "templo", "personagens": ["mensageiro"], "enquadramento": "close",
         "baloes": [
-          { "tipo": "grito", "texto": "Ei! A vaga de vocês na semifinal... é nossa!", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "fala", "quem": "mensageiro", "texto": "Cada convite é um capitão. A chave será sorteada agora.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
         ] },
-      { "imagem": "pag1_q3.jpg", "cena": "chuva", "enquadramento": "close",
+      { "imagem": "pag1_q3.jpg", "cena": "templo", "personagens": ["koga"], "enquadramento": "close",
         "baloes": [
-          { "tipo": "fala", "texto": "Se a gente derrubar vocês aqui, os organizadores vão ter que trocar a chave!", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+          { "tipo": "fala", "quem": "koga", "texto": "Nos vemos na final, Ryūga.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
         ] }
     ] },
 
+    { "tipo": "sorteio" },
+
     { "tipo": "pagina", "irmao": "ryuga", "layout": "splash", "paineis": [
-      { "imagem": "pag2_ryuga.jpg", "cena": "chuva", "personagens": ["ryuga"], "efeito": "chuva",
+      { "imagem": "pag2_ryuga.jpg", "cena": "templo", "personagens": ["ryuga"], "efeito": "brilho",
         "baloes": [
-          { "tipo": "fala", "quem": "ryuga", "texto": "Vocês perderam na arena. Vão perder aqui também.", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
+          { "tipo": "pensamento", "quem": "ryuga", "texto": "Três lutas até a final. Pai... eu vou chegar até você.", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
         ] }
     ] },
 
     { "tipo": "pagina", "irmao": "koga", "layout": "splash", "paineis": [
-      { "imagem": "pag2_koga.jpg", "cena": "chuva", "personagens": ["koga"], "efeito": "impacto",
+      { "imagem": "pag2_koga.jpg", "cena": "templo", "personagens": ["koga"], "efeito": "impacto",
         "baloes": [
-          { "tipo": "grito", "quem": "koga", "texto": "Finalmente uma briga de verdade!", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
+          { "tipo": "grito", "quem": "koga", "texto": "Quem estiver no meu caminho vai cair!", "pos": [0.5, 0.2], "rabo": [0.5, 0.45] }
         ] }
     ] },
 
-    { "tipo": "luta", "emboscada": true },
+    { "tipo": "luta", "torneio": true },
 
-    { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
-      { "imagem": "pag3_q1.jpg", "cena": "templo", "personagens": ["mensageiro"], "enquadramento": "close",
-        "baloes": [
-          { "tipo": "fala", "quem": "mensageiro", "texto": "Os organizadores assistiram a tudo. Adoraram o espetáculo.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
-        ] },
-      { "imagem": "pag3_q2.jpg", "cena": "templo",
-        "baloes": [
-          { "tipo": "narracao", "texto": "A chave não muda. A vaga na semifinal continua sua.", "pos": [0.5, 0.2] }
-        ] }
-    ] },
+    { "tipo": "chave" },
 
-    { "tipo": "proximo", "titulo": "Semifinal", "linhas": [
-      "A emboscada só deixou tudo mais pessoal.",
-      "Do outro lado da chave, o irmão também avança."
+    { "tipo": "proximo", "titulo": "Fora da Arena", "linhas": [
+      "A vitória garantiu a vaga na semifinal.",
+      "Mas nem todo mundo aceita perder."
     ] }
   ]
 }

@@ -61,6 +61,7 @@ public final class Episodio {
         public final String tom;
         public final List<Painel> paineis;
         // LUTA
+        /** {@code [titular, parceiro]}, ou {@code [lutador]} numa luta 1x1 (os dois lados do mesmo tamanho). */
         public final String[] dupla;
         public final String[] cpu;
         public final String rotulo;
@@ -301,9 +302,16 @@ public final class Episodio {
         }
         String duplaRef = ref(map, "dupla");
         String cpuRef = ref(map, "cpu");
+        String[] dupla = duplaRef != null ? null : pair(map, "dupla");
+        String[] cpu = cpuRef != null ? null : pair(map, "cpu");
+        if (dupla != null && cpu != null && dupla.length != cpu.length) {
+            throw new IllegalArgumentException("dupla e cpu precisam ter o mesmo tamanho (2x2 ou 1x1)");
+        }
+        if ((dupla != null && dupla.length == 1 && cpu == null) || (cpu != null && cpu.length == 1 && dupla == null)) {
+            throw new IllegalArgumentException("luta 1x1 precisa de um lutador em dupla e em cpu");
+        }
         return new Passo(tipo, string(map, "marca", null), layout, string(map, "tom", "papel"),
-            Collections.unmodifiableList(paineis), duplaRef != null ? null : pair(map, "dupla"),
-            cpuRef != null ? null : pair(map, "cpu"), string(map, "rotulo", null),
+            Collections.unmodifiableList(paineis), dupla, cpu, string(map, "rotulo", null),
             !Boolean.FALSE.equals(map.get("repetirSeDerrota")), modo, string(map, "cenario", null),
             string(map, "conversa", null), string(map, "cinematica", null), string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
@@ -316,7 +324,7 @@ public final class Episodio {
         Object value = map.get(key);
         if (!(value instanceof String)) return null;
         if (!value.equals("jogador") && !value.equals("rival")) {
-            throw new IllegalArgumentException(key + " precisa ser [titular, parceiro], \"jogador\" ou \"rival\"");
+            throw new IllegalArgumentException(key + " precisa ser [titular, parceiro], [lutador], \"jogador\" ou \"rival\"");
         }
         return (String)value;
     }
@@ -426,10 +434,12 @@ public final class Episodio {
         return new float[] {((Number)values.get(0)).floatValue(), ((Number)values.get(1)).floatValue()};
     }
 
+    /** {@code [titular, parceiro]} ou, numa luta 1x1, {@code [lutador]}. */
     private static String[] pair(Map<String, Object> map, String key) {
         List<Object> values = list(map, key);
         if (values.isEmpty()) return null;
-        if (values.size() != 2) throw new IllegalArgumentException(key + " precisa ser [titular, parceiro]");
+        if (values.size() == 1) return new String[] {String.valueOf(values.get(0))};
+        if (values.size() != 2) throw new IllegalArgumentException(key + " precisa ser [titular, parceiro] ou [lutador]");
         return new String[] {String.valueOf(values.get(0)), String.valueOf(values.get(1))};
     }
 }
