@@ -87,7 +87,9 @@
         "cancelInto": [],
         "pushbackOnHit": 60,
         "pushbackOnBlock": 60
-      }
+      },
+      "hits": 5,
+      "hitInterval": 8
     },
     "assist": {
       "move": "S"

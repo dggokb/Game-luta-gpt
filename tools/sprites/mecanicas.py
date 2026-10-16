@@ -179,7 +179,7 @@ def commands(pack, spec):
 
 
 VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
-           'MACHADINHO', 'BISTURI', 'SERINGA')
+           'MACHADINHO', 'BISTURI', 'SERINGA', 'FOGO')
 RENTE = 14        # altura da saída do projétil rente ao chão (px acima do pé)
 MELEE_ACTIVE = 4  # quadros ativos do S1 corpo a corpo (o projétil tem 1)
 MELEE_KEYS = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback', 'low')
@@ -282,6 +282,51 @@ def especiais(pack, spec):
             m['especialBase'] = base
 
 
+SUPER_KEYS = ('visual', 'hits', 'hitInterval', 'clones')
+SPAWN_KEYS = ('spawnY', 'crouchSpawnY', 'airSpawnY')
+
+
+def restore_super(sup):
+    """Desfaz o bloco "super" gravado antes (refazer dá sempre o mesmo resultado)."""
+    for key, value in sup.pop('superBase', {}).items():
+        if value is None:
+            sup.pop(key, None)
+        else:
+            sup[key] = value
+    for key in SUPER_KEYS:
+        sup.pop(key, None)
+
+
+def super_extras(pack, spec):
+    """O Super (bloco "super"): acertos e intervalo da onda (a do p01 acerta várias vezes),
+    o desenho dela (fogo do p09), velocidade, rente = altura da saída perto do chão, e clones de sombra
+    que repetem o Super corpo a corpo (p06, só desenho)."""
+    s = spec.get('super')
+    if not s:
+        return
+    sup = pack['fighter']['super']
+    base = {}
+    if 'velocidade' in s:
+        base['speed'] = sup['speed']
+        sup['speed'] = s['velocidade']
+    if 'rente' in s:
+        base.update({k: sup.get(k) for k in SPAWN_KEYS})
+        for k in SPAWN_KEYS:
+            sup.pop(k, None)   # sempre no mesmo lugar do arquivo
+            sup[k] = s['rente']
+    if base:
+        sup['superBase'] = base
+    if 'visual' in s:
+        if s['visual'] not in VISUALS:
+            raise SystemExit(f"super.visual {s['visual']}: um de {VISUALS}")
+        sup['visual'] = s['visual']
+    if s.get('acertos', 1) > 1:
+        sup['hits'] = s['acertos']
+        sup['hitInterval'] = s['intervalo']
+    if s.get('clones'):
+        sup['clones'] = s['clones']
+
+
 def strike_frames(anim, total, startup, pancadas):
     """Quadro do golpe em que cada pancada acerta: o tempo da animação até o quadro dela
     (a animação estica sobre o golpe). A primeira é o fim da preparação."""
@@ -363,6 +408,7 @@ def apply(cid, spec, base):
     sup = fighter['super']['attack']
     restore(sup)
     restore_s1(fighter['energy']['attack'])
+    restore_super(fighter['super'])
     for k in ('reach', 'hitHeight', 'launchType', 'knockback', 'mecanica'):
         sup.pop(k, None)
     fighter['maxLife'] = spec['vida']
@@ -394,6 +440,7 @@ def apply(cid, spec, base):
     commands(pack, spec)
     s1(pack, spec)
     especiais(pack, spec)
+    super_extras(pack, spec)
     hits = json.loads(PANCADAS.read_text(encoding='utf-8'))['personagens'].get(cid, {})
     specials = pack.get('specialMoves', {})
     for key, h in hits.items():

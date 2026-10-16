@@ -71,6 +71,16 @@ class MecanicasTest(unittest.TestCase):
                 self.assertEqual(bool(e.get('baixo')), bool(m.get('low')), f'{cid}/{key}')
                 self.assertEqual(e.get('efeito'), m.get('efeito'), f'{cid}/{key}')
 
+    def test_super_follows_the_super_block(self):
+        for cid, spec in self.data['personagens'].items():
+            sup = json.loads((ROOT / f'characters/{cid}/character.json').read_text(encoding='utf-8'))['fighter']['super']
+            s = spec.get('super', {})
+            self.assertEqual(s.get('acertos', 1), sup.get('hits', 1), cid)
+            self.assertEqual(s.get('visual'), sup.get('visual'), cid)
+            self.assertEqual(s.get('clones'), sup.get('clones'), cid)
+            if 'rente' in s:
+                self.assertEqual(s['rente'], sup['spawnY'], cid)
+
     def test_character_numbers(self):
         for cid, spec in self.data['personagens'].items():
             pack = json.loads((ROOT / f'characters/{cid}/character.json').read_text(encoding='utf-8'))

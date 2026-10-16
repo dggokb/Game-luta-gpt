@@ -743,7 +743,8 @@ public class CombatEngineTest {
         s.until(() -> !s.engine.superProjectiles.isEmpty() || s.engine.lastSession(1) != null
             && s.engine.lastSession(1).hitCount >= 2, 80);
         s.until(() -> s.engine.session(1) == null, 200);
-        assertEquals("H > SUPER is one combo", 2, s.engine.lastSession(1).hitCount);
+        // O H e cada acerto da Onda Máxima (vários) no mesmo combo.
+        assertEquals("H > SUPER is one combo", 1 + BASE.fighter.superAttack.hits, s.engine.lastSession(1).hitCount);
     }
 
     @Test public void launcherConfirmCancelsIntoSuperJumpChase() {

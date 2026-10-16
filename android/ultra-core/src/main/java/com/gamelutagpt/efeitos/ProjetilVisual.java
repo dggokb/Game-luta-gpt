@@ -37,7 +37,9 @@ public final class ProjetilVisual {
         /** p11: lâmina prateada fina e muito rápida. */
         BISTURI,
         /** p11 (S2): seringa com veneno verde, cai em diagonal no chão. */
-        SERINGA
+        SERINGA,
+        /** p09 (Super): parede de fogo que corre pelo chão depois do soco no chão. */
+        FOGO
     }
 
     private static final int WHITE = 0xFFFFFFFF;
@@ -76,6 +78,7 @@ public final class ProjetilVisual {
             case MACHADINHO: hatchet(c, travelled); break;
             case BISTURI: scalpel(c, travelled, time); break;
             case SERINGA: syringe(c, time); break;
+            case FOGO: fire(c, travelled, time); break;
             default: break;
         }
         c.restore();
@@ -228,6 +231,35 @@ public final class ProjetilVisual {
         c.drawLine(11f, 0f, 24f, 0f, 1.2f, SILVER);
         float drop = 1.6f + 0.6f * (float)Math.abs(Math.sin(time * 14f));
         c.fillCircle(25f, 0f, drop, 0xFF7CFF6A);
+    }
+
+    /**
+     * Fogo pelo chão (y é o chão): línguas de fogo altas na frente que baixam para trás, brasas
+     * subindo e o chão em brasa por onde passou.
+     */
+    private static void fire(RenderCanvas c, float travelled, float time) {
+        float length = Math.min(200f, 60f + travelled * 0.5f);
+        c.fillRadialGlow(-length * 0.3f, -50f, length * 0.9f, 0x90FF7A1A);
+        c.fillRect(-length - 20f, -5f, 30f, 3f, 0xB0FF9A30);
+        int n = 11;
+        for (int layer = 0; layer < 3; layer++) {
+            int color = layer == 0 ? 0xE0C8200A : layer == 1 ? 0xF0FF7A10 : 0xF8FFE070;
+            float scale = layer == 0 ? 1f : layer == 1 ? 0.72f : 0.42f;
+            for (int i = 0; i < n; i++) {
+                float t = i / (float)(n - 1);
+                float cx = 24f - (length + 24f) * t;
+                float tall = (150f * (1f - 0.65f * t) + 22f * (float)Math.sin(time * 13f + i * 2.1f)) * scale;
+                float w = (24f - 8f * t) * (0.6f + 0.4f * scale);
+                float lean = -10f * (float)Math.sin(time * 9f + i);
+                c.fillPolygon(new float[] {cx - w, 0f, cx - w * 0.5f, -tall * 0.55f, cx + lean, -tall,
+                    cx + w * 0.5f, -tall * 0.5f, cx + w, 0f}, color);
+            }
+        }
+        for (int i = 0; i < 7; i++) {
+            float t = (time * 1.4f + i * 0.17f) % 1f;
+            float ex = -length * (i / 7f) + 8f * (float)Math.sin(time * 6f + i);
+            c.fillCircle(ex, -40f - t * 140f, 3f * (1f - t) + 1f, alpha(0xFFFFC040, (int)(230 * (1f - t))));
+        }
     }
 
     /**

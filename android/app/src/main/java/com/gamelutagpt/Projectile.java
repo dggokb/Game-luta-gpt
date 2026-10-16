@@ -24,6 +24,13 @@ final class Projectile {
     final String visual;
     /** O chicote já esticou e volta para a mão: não acerta mais. */
     boolean returning;
+    /** Acertos do projétil (a Onda Máxima do p01 acerta várias vezes) e quantos já deu. */
+    int totalHits = 1;
+    int hitsDone;
+    /** Quadros entre um acerto e o próximo; enquanto conta, ele fica parado no rival. */
+    int hitInterval;
+    int hitCooldown;
+    boolean holding;
 
     Projectile(
         float x,

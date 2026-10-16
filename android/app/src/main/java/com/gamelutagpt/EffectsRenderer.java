@@ -85,8 +85,20 @@ final class EffectsRenderer {
         ProjetilVisual.steam(rc, handX, handY, f.facing, progress, time);
     }
 
-    void drawSuperProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {
-        for (Projectile projectile : projectiles) drawOrb(c, projectile, 40f, true);
+    /** Onda do Super (a do p01 acerta várias vezes) ou o desenho próprio dele (o fogo do p09, no chão). */
+    void drawSuperProjectiles(Canvas c, RenderCanvas rc, List<Projectile> projectiles) {
+        for (Projectile p : projectiles) {
+            if (p.visual == null || "ONDA".equals(p.visual)) {
+                // Parada no rival entre um acerto e outro, a onda pulsa.
+                float pulse = p.holding ? 1f + 0.12f * (float)Math.sin(p.hitCooldown * 1.3f) : 1f;
+                drawOrb(c, p, 40f * pulse, true);
+                continue;
+            }
+            ProjetilVisual.Tipo tipo = ProjetilVisual.Tipo.valueOf(p.visual);
+            float y = tipo == ProjetilVisual.Tipo.FOGO || tipo == ProjetilVisual.Tipo.SOMBRA ? Arena.GROUND_Y : p.y;
+            float time = Math.abs(p.x - p.startX) / Math.max(1f, p.speed);
+            ProjetilVisual.draw(rc, tipo, p.x, y, p.direction, p.startX, p.range, time, p.color);
+        }
     }
 
     /** Energy orb: comet tail, soft glow, hot core and spinning rings. Canvas faces the travel. */

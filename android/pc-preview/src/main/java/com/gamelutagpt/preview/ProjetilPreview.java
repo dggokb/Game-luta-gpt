@@ -34,6 +34,7 @@ public final class ProjetilPreview {
         {"p10", "Machadinho", ProjetilVisual.Tipo.MACHADINHO, 150f, 720f, 0x40B070, 229f},
         {"p11", "Bisturi", ProjetilVisual.Tipo.BISTURI, 170f, 900f, 0x60C0D0, 245f},
         {"p11", "Seringa (S2)", ProjetilVisual.Tipo.SERINGA, 160f, 400f, 0x60C0D0, 245f},
+        {"p09", "Fogo (Super)", ProjetilVisual.Tipo.FOGO, 0f, 900f, 0xE0A526, 242f},
     };
 
     public static void main(String[] args) throws IOException {
@@ -64,7 +65,7 @@ public final class ProjetilPreview {
             rc.translate(cx + (tipo == ProjetilVisual.Tipo.SOMBRA || tipo == ProjetilVisual.Tipo.BISTURI ? 60f : 0f), cy);
             rc.scale(2.4f, 2.4f, 0f, 0f);
             float originX = tipo == ProjetilVisual.Tipo.CHICOTE ? -60f : -alcance * 0.3f;
-            float y = tipo == ProjetilVisual.Tipo.SOMBRA ? 12f : 0f;
+            float y = tipo == ProjetilVisual.Tipo.SOMBRA || tipo == ProjetilVisual.Tipo.FOGO ? 12f : 0f;
             ProjetilVisual.draw(rc, tipo, 0f, y, 1, originX, alcance, 0.35f, cor);
             rc.restore();
             rc.drawText(id + " · " + nome, cx, row * 240f + 226f, 20f, 0xFFFFFFFF, 0xFF000000, 2f, false);
@@ -110,7 +111,8 @@ public final class ProjetilPreview {
         c.drawLine(420f, 0f, 420f, H, 2f, 0xFF3A4050);
 
         // Close 3x, no meio do voo.
-        boolean chicote = tipo == ProjetilVisual.Tipo.CHICOTE, sombra = tipo == ProjetilVisual.Tipo.SOMBRA;
+        boolean chicote = tipo == ProjetilVisual.Tipo.CHICOTE,
+            sombra = tipo == ProjetilVisual.Tipo.SOMBRA || tipo == ProjetilVisual.Tipo.FOGO;
         c.save();
         c.translate(chicote ? 330f : 230f, sombra ? GROUND - 20f : 220f);
         c.scale(3f, 3f, 0f, 0f);
