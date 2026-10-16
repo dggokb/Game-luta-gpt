@@ -10,7 +10,8 @@
     },
     "carga": {
       "onomatopeia": "VRUUUUM",
-      "imagem": "carga.jpg"
+      "imagem": "carga.jpg",
+      "foco": 0.0
     },
     "golpe": {
       "onomatopeia": "KRAAK!",
@@ -69,6 +70,7 @@
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",
-    "grito": "Toda a força da casa!"
+    "grito": "Toda a força da casa!",
+    "focoPalco": 0.5
   }
 }
