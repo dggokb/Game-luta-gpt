@@ -32,6 +32,19 @@ final class ImpactFeel {
     /** Quadros sem outro impact frame do mesmo peso (a tela não fica piscando num combo). */
     static final int IMPACT_COOLDOWN = 30;
 
+    /**
+     * Câmera de cinema (FighterZ): no lançador, no golpe que joga o rival no chão/parede e no
+     * KO, a câmera corta para um close inclinado no impacto, com o fundo escurecendo e a luta
+     * em câmera lenta, e volta com corte seco. O zoom total é CINEMA_ZOOM × CINEMA_OVERSCAN; a
+     * sobra do overscan cobre os cantos que a inclinação descobre.
+     */
+    static final float CINEMA_ZOOM = 1.45f, CINEMA_OVERSCAN = 1.25f, CINEMA_TILT = 8f;
+    static final int CINEMA_FRAMES = 12;
+    static final float CINEMA_SCALE = 0.45f;
+    static final int CINEMA_DARK_FROM = 60, CINEMA_DARK_TO = 170;
+    /** Entre dois closes: num combo só o primeiro golpe grande ganha a câmera. */
+    static final int CINEMA_COOLDOWN = 90;
+
     private float zoom;
     private float focusX, focusY;
     private int dark, darkFrames, darkTotal;
@@ -39,6 +52,8 @@ final class ImpactFeel {
     private int slowFrames;
     private int impactStyle = NONE, impactLeft, impactCooldown, impactSeed;
     private float impactX, impactY;
+    private int cinemaFrames, cinemaCooldown;
+    private float cinemaTilt;
 
     void clear() {
         zoom = 0f;
@@ -47,7 +62,26 @@ final class ImpactFeel {
         slowFrames = 0;
         impactStyle = NONE;
         impactLeft = impactCooldown = 0;
+        cinemaFrames = cinemaCooldown = 0;
     }
+
+    /**
+     * Close de cinema no ponto (x, y). {@code direction}: para onde o golpe empurra (+1 direita);
+     * a câmera inclina a favor dele. O KO passa por cima do intervalo.
+     */
+    void cinema(float x, float y, int direction, boolean knockout) {
+        if (cinemaCooldown > 0 && !knockout) return;
+        cinemaFrames = CINEMA_FRAMES;
+        cinemaCooldown = CINEMA_COOLDOWN;
+        cinemaTilt = (direction >= 0 ? 1f : -1f) * CINEMA_TILT;
+        focusX = x;
+        focusY = y;
+    }
+
+    boolean cinema() { return cinemaFrames > 0; }
+
+    /** Inclinação da câmera em graus (0 fora do close). */
+    float tilt() { return cinemaFrames > 0 ? cinemaTilt : 0f; }
 
     /**
      * Pede um impact frame no ponto (x, y) do mundo. Durante o intervalo, só um estilo mais
@@ -99,6 +133,8 @@ final class ImpactFeel {
         if (slowFrames > 0) slowFrames--;
         if (impactLeft > 0) impactLeft--;
         if (impactCooldown > 0) impactCooldown--;
+        if (cinemaCooldown > 0) cinemaCooldown--;
+        if (cinemaFrames > 0 && --cinemaFrames == 0) zoom = 0f;  // corte seco de volta
     }
 
     /** Estilo do impact frame que aparece agora ({@link #NONE} fora dele e no quadro negativo). */
@@ -113,7 +149,7 @@ final class ImpactFeel {
     int impactSeed() { return impactSeed; }
 
     /** Multiplicador do zoom da câmera (1 = normal). */
-    float zoom() { return 1f + zoom; }
+    float zoom() { return cinemaFrames > 0 ? CINEMA_ZOOM : 1f + zoom; }
 
     /** Ponto do mundo que o soco de câmera segura no mesmo lugar da tela. */
     float focusX() { return focusX; }
@@ -121,6 +157,10 @@ final class ImpactFeel {
 
     /** Alfa do escurecimento do cenário agora (atrás dos lutadores). */
     int darkAlpha() {
+        if (cinemaFrames > 0) {
+            float k = 1f - cinemaFrames / (float)CINEMA_FRAMES;
+            return Math.round(CINEMA_DARK_FROM + (CINEMA_DARK_TO - CINEMA_DARK_FROM) * k);
+        }
         if (darkFrames <= 0 || darkTotal <= 0) return 0;
         return Math.round(dark * darkFrames / (float)darkTotal);
     }
@@ -129,7 +169,10 @@ final class ImpactFeel {
     int flashAlpha() { return Math.round(flash); }
 
     /** Velocidade do relógio da luta: abaixo de 1 na câmera lenta do KO. */
-    float timeScale() { return slowFrames > 0 ? KO_SLOW_SCALE : 1f; }
+    float timeScale() {
+        float scale = slowFrames > 0 ? KO_SLOW_SCALE : 1f;
+        return cinemaFrames > 0 ? Math.min(scale, CINEMA_SCALE) : scale;
+    }
 
     /**
      * Tremida de quem apanhou durante o congelamento do acerto (hitstop), alternando de lado a

@@ -11,11 +11,19 @@ import android.graphics.Shader;
  * spawning reuses slots, drawing allocates nothing and nothing here touches combat state.
  */
 final class ImpactEffects {
-    static final int HIT = 0, GUARD = 1;
+    static final int HIT = 0, GUARD = 1, DUST = 2;
     /** Size class of a contact: 0 light, 1 medium, 2 heavy, 3 special/super. */
     static final int LIGHT = 0, MEDIUM = 1, HEAVY = 2, SPECIAL = 3;
 
-    private static final int BURSTS = 12, DEBRIS = 96;
+    private static final int BURSTS = 12, DEBRIS = 96, SPEARS = 16;
+    /**
+     * Raios de luz (como no FighterZ): lanças finas e longas que atravessam a tela pelo ponto
+     * do acerto. Quantas por tamanho de golpe, a largura máxima e o comprimento (mundo).
+     */
+    private static final int[] SPEAR_COUNT = {1, 2, 3, 4};
+    /** Largura na ponta de fora (no impacto o raio nasce fino). */
+    private static final float[] SPEAR_WIDTH = {16f, 24f, 32f, 40f};
+    private static final float SPEAR_LENGTH = 1100f, SPEAR_LIFE = .16f;
     private static final float[] BURST_LIFE = {.20f, .24f, .30f, .36f};
     private static final float[] BURST_SIZE = {46f, 62f, 84f, 104f};
     private static final int[] DEBRIS_COUNT = {7, 10, 15, 20};
@@ -31,6 +39,12 @@ final class ImpactEffects {
     private final float[] dAge = new float[DEBRIS], dLife = new float[DEBRIS], dWidth = new float[DEBRIS];
     private final int[] dColor = new int[DEBRIS];
     private int nextDebris;
+
+    // Spears: centre, direction, how far the bright point sits along it, age and width.
+    private final float[] sx = new float[SPEARS], sy = new float[SPEARS], sAngle = new float[SPEARS];
+    private final float[] sAge = new float[SPEARS], sWidth = new float[SPEARS], sShift = new float[SPEARS];
+    private final int[] sColor = new int[SPEARS];
+    private int nextSpear;
     private int seed = 0x2F6E2B1;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -42,6 +56,7 @@ final class ImpactEffects {
         java.util.Arrays.fill(bLife, 1f);
         java.util.Arrays.fill(dAge, 99f);
         java.util.Arrays.fill(dLife, 1f);
+        java.util.Arrays.fill(sAge, 99f);
         // Unit-radius cores, scaled per burst through the canvas: no shader per frame.
         cores[HIT] = new RadialGradient(0f, 0f, 1f,
             new int[]{0xFFFFFFFF, 0xFFFFF4C2, 0xCCFFB23A, 0x00FF5A1E}, new float[]{0f, .28f, .6f, 1f},
@@ -54,11 +69,13 @@ final class ImpactEffects {
     void clear() {
         java.util.Arrays.fill(bAge, 99f);
         java.util.Arrays.fill(dAge, 99f);
+        java.util.Arrays.fill(sAge, 99f);
     }
 
     boolean active() {
         for (int i = 0; i < BURSTS; i++) if (bAge[i] < bLife[i]) return true;
         for (int i = 0; i < DEBRIS; i++) if (dAge[i] < dLife[i]) return true;
+        for (int i = 0; i < SPEARS; i++) if (sAge[i] < SPEAR_LIFE) return true;
         return false;
     }
 
@@ -85,6 +102,7 @@ final class ImpactEffects {
         bSize[b] = BURST_SIZE[size] * (kind == GUARD ? .85f : 1f);
         bAngle[b] = random() * 6.2832f;
         bColor[b] = kind == GUARD ? 0xFF6FD8FF : accent;
+        if (kind == HIT) spawnSpears(x, y, size, accent);
         int count = DEBRIS_COUNT[size];
         for (int n = 0; n < count; n++) {
             int d = nextDebris;
@@ -106,7 +124,60 @@ final class ImpactEffects {
         }
     }
 
+    /**
+     * Raios de um acerto, espalhados em ângulos diferentes e nunca deitados demais: diagonais
+     * que cruzam a tela, como as do FighterZ.
+     */
+    private void spawnSpears(float x, float y, int size, int accent) {
+        int count = SPEAR_COUNT[size];
+        float base = random() * 3.1416f;
+        for (int n = 0; n < count; n++) {
+            int s = nextSpear;
+            nextSpear = (nextSpear + 1) % SPEARS;
+            // Cada raio sai do impacto para um lado; juntos formam um V ou um leque aberto.
+            float a = base + n * 6.2832f / count * (.75f + .25f * random()) + (random() - .5f) * .35f;
+            // Pelo menos ~12° fora da horizontal.
+            float sin = (float)Math.sin(a);
+            if (Math.abs(sin) < .2f) a += sin >= 0 ? .25f : -.25f;
+            sx[s] = x; sy[s] = y; sAngle[s] = a; sAge[s] = 0f;
+            sWidth[s] = SPEAR_WIDTH[size] * (.7f + .5f * random());
+            sShift[s] = .8f + .4f * random();
+            sColor[s] = n % 3 == 2 ? (accent | 0xFF000000) : 0xFFFFA62B;
+        }
+    }
+
+    /**
+     * Poeira e pedrinhas quando um corpo bate no chão com força (queda, quique). {@code power}
+     * 0..1.
+     */
+    void spawnDust(float x, float groundY, float power) {
+        power = Math.max(0f, Math.min(1f, power));
+        int b = nextBurst;
+        nextBurst = (nextBurst + 1) % BURSTS;
+        bx[b] = x; by[b] = groundY; bAge[b] = 0f; bKind[b] = DUST; bDir[b] = 1;
+        bLife[b] = .45f + .25f * power;
+        bSize[b] = 70f + 70f * power;
+        bAngle[b] = 0f;
+        bColor[b] = 0xFFCDBFA6;
+        int count = 10 + Math.round(14 * power);
+        for (int n = 0; n < count; n++) {
+            int d = nextDebris;
+            nextDebris = (nextDebris + 1) % DEBRIS;
+            float angle = -3.1416f * (.12f + .76f * random());
+            float speed = (220f + 520f * random()) * (.7f + .5f * power);
+            dx[d] = x + (random() - .5f) * 60f; dy[d] = groundY - 4f;
+            dvx[d] = (float)Math.cos(angle) * speed;
+            dvy[d] = (float)Math.sin(angle) * speed;
+            dAge[d] = 0f;
+            dLife[d] = .28f + .3f * random();
+            dWidth[d] = 4f + random() * 6f;
+            int pick = (int)(random() * 3);
+            dColor[d] = pick == 0 ? 0xFF8E8172 : pick == 1 ? 0xFFB8A88F : 0xFF6B6157;
+        }
+    }
+
     void update(float dt) {
+        for (int i = 0; i < SPEARS; i++) if (sAge[i] < SPEAR_LIFE) sAge[i] += dt;
         for (int i = 0; i < BURSTS; i++) if (bAge[i] < bLife[i]) bAge[i] += dt;
         for (int i = 0; i < DEBRIS; i++) {
             if (dAge[i] >= dLife[i]) continue;
@@ -120,6 +191,7 @@ final class ImpactEffects {
     }
 
     void draw(Canvas c) {
+        drawSpears(c);
         paint.setStrokeCap(Paint.Cap.ROUND);
         for (int i = 0; i < DEBRIS; i++) {
             if (dAge[i] >= dLife[i]) continue;
@@ -144,7 +216,46 @@ final class ImpactEffects {
         paint.setAlpha(255);
     }
 
+    /**
+     * Raio saindo do impacto: nasce fino no ponto do golpe e abre até a ponta, com um brilho
+     * largo e translúcido em volta e o miolo claro. Cresce rápido e afina sumindo.
+     */
+    private void drawSpears(Canvas c) {
+        paint.setShader(null);
+        paint.setStyle(Paint.Style.FILL);
+        for (int i = 0; i < SPEARS; i++) {
+            if (sAge[i] >= SPEAR_LIFE) continue;
+            float k = sAge[i] / SPEAR_LIFE;
+            float reach = Math.min(1f, k / .25f);
+            float len = SPEAR_LENGTH * sShift[i] * (.4f + .6f * reach);
+            float width = sWidth[i] * (1f - .7f * k * k);
+            float ux = (float)Math.cos(sAngle[i]), uy = (float)Math.sin(sAngle[i]);
+            float x0 = sx[i] + ux * 18f, y0 = sy[i] + uy * 18f;
+            float x1 = sx[i] + ux * len, y1 = sy[i] + uy * len;
+            float fade = 1f - k;
+            for (int layer = 0; layer < 3; layer++) {
+                float w = layer == 0 ? width * 1.9f : layer == 1 ? width : width * .36f;
+                float w0 = layer == 0 ? 6f : layer == 1 ? 2.5f : 1f;
+                star.reset();
+                star.moveTo(x0 - uy * w0, y0 + ux * w0);
+                star.lineTo(x1 - uy * w, y1 + ux * w);
+                star.lineTo(x1 + ux * w * 1.5f, y1 + uy * w * 1.5f);
+                star.lineTo(x1 + uy * w, y1 - ux * w);
+                star.lineTo(x0 + uy * w0, y0 - ux * w0);
+                star.close();
+                paint.setColor(layer == 0 ? 0xFFFF6A10 : layer == 1 ? sColor[i] : 0xFFFFF8DA);
+                paint.setAlpha(Math.round((layer == 0 ? 80 : layer == 1 ? 225 : 255) * fade));
+                c.drawPath(star, paint);
+            }
+        }
+        paint.setAlpha(255);
+    }
+
     private void drawBurst(Canvas c, int i, float k) {
+        if (bKind[i] == DUST) {
+            drawDust(c, i, k);
+            return;
+        }
         float size = bSize[i];
         float grow = 1f - (1f - k) * (1f - k) * (1f - k);
         float fade = 1f - k;
@@ -178,25 +289,6 @@ final class ImpactEffects {
             }
             star.close();
             c.drawPath(star, paint);
-        }
-
-        if (bKind[i] == HIT && size >= BURST_SIZE[HEAVY]) {
-            // Heavy blows: two long slash streaks crossing the contact point.
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            float len = size * (1.1f + 1.1f * grow);
-            for (int s = 0; s < 2; s++) {
-                double a = bAngle[i] * .15 + (s == 0 ? -.42 : .5);
-                float ex = (float)Math.cos(a) * len, ey = (float)Math.sin(a) * len * .7f;
-                paint.setStrokeWidth(size * .11f * fade + 1f);
-                paint.setColor(bColor[i]);
-                paint.setAlpha(Math.round(200 * fade));
-                c.drawLine(-ex, -ey, ex, ey, paint);
-                paint.setStrokeWidth(size * .045f * fade + 1f);
-                paint.setColor(0xFFFFFFFF);
-                paint.setAlpha(Math.round(255 * fade));
-                c.drawLine(-ex * .9f, -ey * .9f, ex * .9f, ey * .9f, paint);
-            }
         }
 
         // Star spikes: long rays, longest along the blow direction.
@@ -233,6 +325,22 @@ final class ImpactEffects {
             c.restore();
         }
         c.restore();
+    }
+
+    /** Nuvem de poeira: elipses baixas que se abrem para os lados e somem. */
+    private void drawDust(Canvas c, int i, float k) {
+        float size = bSize[i];
+        float grow = 1f - (1f - k) * (1f - k);
+        paint.setShader(null);
+        paint.setStyle(Paint.Style.FILL);
+        for (int puff = 0; puff < 3; puff++) {
+            float spread = size * (.6f + 1.6f * grow) * (1f + .25f * puff);
+            float height = size * (.22f + .35f * grow) * (1f - .2f * puff);
+            paint.setColor(bColor[i]);
+            paint.setAlpha(Math.round(150 * (1f - k) * (1f - .25f * puff)));
+            c.drawOval(bx[i] - spread, by[i] - height * 1.6f, bx[i] + spread, by[i] + height * .4f, paint);
+        }
+        paint.setAlpha(255);
     }
 
     /** Small deterministic LCG: no Random object, reproducible review frames. */

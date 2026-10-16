@@ -542,4 +542,13 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
     ficar piscando. A pausa tem **IMPACTO: LIGADO/DESLIGADO** (salvo no aparelho), para quem
     é sensível a luz piscando.
 
+- **Raios de luz** (referência: FighterZ): todo acerto solta lanças de luz que saem do ponto
+  do golpe e abrem até cruzar a tela (1 no leve, 2 no médio, 3 no pesado, 4 no especial),
+  finas no impacto e largas na ponta, com brilho em volta (`ImpactEffects.SPEAR_*`).
+- **Close de cinema**: no lançador, no golpe que joga o rival na parede/no chão e no KO, a
+  câmera corta para um close de ~1,8× no impacto, inclinado 8° a favor do golpe, com o fundo
+  escurecendo e a luta a 45% por 12 quadros, e volta com corte seco (`ImpactFeel.CINEMA_*`).
+  Um por combo (90 quadros de intervalo); o KO sempre ganha o seu.
+- **Poeira e pedrinhas** quando um corpo bate no chão (mais forte vindo do alto) e no quique.
+
 Testes em `ImpactFeelTest` e `PunishCounterTest`.

@@ -85,4 +85,24 @@ public class ImpactFeelTest {
         f.step();
         assertEquals(ImpactFeel.RED, f.impactStyle());
     }
+
+    @Test public void cinemaCutsInTiltedAndSlowThenCutsBack() {
+        ImpactFeel f = new ImpactFeel();
+        f.cinema(700f, 320f, -1, false);
+        assertTrue(f.cinema());
+        assertEquals(ImpactFeel.CINEMA_ZOOM, f.zoom(), 0f);
+        assertEquals("leans with the blow", -ImpactFeel.CINEMA_TILT, f.tilt(), 0f);
+        assertTrue(f.timeScale() < 1f);
+        int first = f.darkAlpha();
+        for (int i = 0; i < ImpactFeel.CINEMA_FRAMES - 1; i++) f.step();
+        assertTrue("the stage keeps darkening", f.darkAlpha() > first);
+        f.step();
+        assertFalse(f.cinema());
+        assertEquals("hard cut back", 1f, f.zoom(), 0f);
+        assertEquals(0f, f.tilt(), 0f);
+        f.cinema(0f, 0f, 1, false);
+        assertFalse("one close-up per combo", f.cinema());
+        f.cinema(0f, 0f, 1, true);
+        assertTrue("the knockout always gets its own", f.cinema());
+    }
 }

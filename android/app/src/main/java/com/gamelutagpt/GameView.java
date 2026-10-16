@@ -125,6 +125,8 @@ public class GameView extends SurfaceView
     private final int[] swingFrame = new int[2];
     private final boolean[] swingPlayed = new boolean[2];
     private final boolean[] lyingSeen = new boolean[2];
+    private final boolean[] downSeen = new boolean[2];
+    private final boolean[] wasAirborne = new boolean[2];
     /** Quem já levou o golpe do KO (o clarão e a câmera lenta saem uma vez por nocaute). */
     private CombatFighter koVictim;
     private final HudRenderer hud = new HudRenderer();
@@ -1157,6 +1159,14 @@ public class GameView extends SurfaceView
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 14f);
             }
+            if ("GROUND_BOUNCE".equals(cue)) {
+                for (int side = 0; side < 2; side++) {
+                    CombatFighter f = engine.fighter(side);
+                    if (f.bounce == CombatFighter.BOUNCE_NONE && f.hardFall && f.y > GROUND_Y - 40f) {
+                        impacts.spawnDust(f.x, GROUND_Y, 1f);
+                    }
+                }
+            }
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
                 if (pausa.impacto() && ultraAttacker >= 0) {
@@ -1612,11 +1622,28 @@ public class GameView extends SurfaceView
         if (knockout) beamShake = Math.max(beamShake, 18f);
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
         if (!event.blocked && pausa.impacto()) feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y);
+        if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
+            (knockout || bigBlow(attacker, defender))) {
+            feel.cinema(x, y, direction, knockout);
+        }
         String sound = event.blocked ? "defesa"
             : knockout ? "ko"
             : punish && size >= ImpactEffects.HEAVY ? "punish"
             : HIT_SOUNDS[Math.max(0, Math.min(HIT_SOUNDS.length - 1, size))];
         ultraSounds.playFight(sound, knockout ? 1f : 0.85f, 0.94f + soundRandom.nextFloat() * 0.12f);
+    }
+
+    /**
+     * Golpe que ganha o close de cinema: o lançador (manda o rival para o alto) e o que o joga
+     * na parede ou no chão.
+     */
+    private static boolean bigBlow(CombatFighter attacker, CombatFighter defender) {
+        if (!attacker.attacking() || attacker.attack == null) return false;
+        AttackDefinition.Launch launch = attacker.attack.launch;
+        if (launch == AttackDefinition.Launch.LAUNCH) return !defender.grounded && !defender.spinning;
+        boolean smash = launch == AttackDefinition.Launch.WALL_BOUNCE || launch == AttackDefinition.Launch.GROUND_BOUNCE ||
+            launch == AttackDefinition.Launch.SLAM;
+        return smash && (defender.bounce != CombatFighter.BOUNCE_NONE || defender.slammed);
     }
 
     /** Combo a partir deste tamanho: o golpe que o encerra derrubando ganha o impact frame. */
@@ -1658,6 +1685,14 @@ public class GameView extends SurfaceView
             } else {
                 swingAttack[i] = null;
             }
+            boolean down = f.status == CombatFighter.Status.KNOCKDOWN;
+            if (down && !downSeen[i]) {
+                // Bateu no chão: poeira e pedrinhas, mais forte quando vem do alto.
+                impacts.spawnDust(f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)), GROUND_Y,
+                    wasAirborne[i] ? 1f : 0.45f);
+            }
+            downSeen[i] = down;
+            wasAirborne[i] = !f.grounded;
             boolean lying = f.status == CombatFighter.Status.KNOCKDOWN &&
                 f.knockdownFrame >= engine.config.knockdownFallFrames;
             if (lying && !lyingSeen[i]) ultraSounds.playFight("queda", 0.8f, 0.95f + soundRandom.nextFloat() * 0.1f);
@@ -1891,10 +1926,11 @@ public class GameView extends SurfaceView
             float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
             if (punchZoom != 1f) {
                 // Soco de câmera: aproxima segurando o ponto do impacto no mesmo lugar da tela.
+                // No close de cinema o impacto vai para o meio da tela.
                 float plainZoom = renderZoom / punchZoom;
                 float plainLeft = clamp(renderCameraX - VW / plainZoom / 2f, 0f, WORLD_WIDTH - VW / plainZoom);
-                float screenX = (feel.focusX() - plainLeft) * plainZoom;
-                float screenY = (feel.focusY() - renderCameraTop) * plainZoom;
+                float screenX = feel.cinema() ? VW * 0.5f : (feel.focusX() - plainLeft) * plainZoom;
+                float screenY = feel.cinema() ? VH * 0.5f : (feel.focusY() - renderCameraTop) * plainZoom;
                 cameraLeft = clamp(feel.focusX() - screenX / renderZoom, 0f, WORLD_WIDTH - visibleWorldWidth);
                 renderCameraTop = feel.focusY() - screenY / renderZoom;
             }
@@ -1905,6 +1941,13 @@ public class GameView extends SurfaceView
             boolean beam = ultraBeamActive();
 
             renderCanvas.begin(canvas);
+            // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
+            int cinemaLayer = -1;
+            if (feel.tilt() != 0f) {
+                cinemaLayer = canvas.save();
+                canvas.rotate(feel.tilt(), VW * 0.5f, VH * 0.5f);
+                canvas.scale(ImpactFeel.CINEMA_OVERSCAN, ImpactFeel.CINEMA_OVERSCAN, VW * 0.5f, VH * 0.5f);
+            }
             // Impact frame, último quadro: a cena com as cores invertidas.
             int negativeLayer = feel.negative() ? canvas.saveLayer(0f, 0f, VW, VH, negativePaint) : -1;
             if (stageScene != null) {
@@ -1984,6 +2027,7 @@ public class GameView extends SurfaceView
             if (stageScene != null) stageScene.drawForeground(renderCanvas);
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
+            if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
 
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
