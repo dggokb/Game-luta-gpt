@@ -9,10 +9,10 @@
       "energia": "dourada e alaranjada, como o sol",
       "pose": "de pé em base larga, punhos fechados, aura dourada subindo, olhar sério e determinado",
       "palco": "um céu de entardecer em chamas douradas atrás de um templo de pedra, sol gigante no horizonte, pedras flutuando",
-      "carga": "",
-      "golpe": "",
-      "final": "",
-      "so_abertura": true
+      "carga": "em base larga com as duas mãos em concha puxadas até o quadril de trás, uma esfera de energia dourada crescendo e girando entre as palmas, a aura dourada subindo como labaredas de sol, pedras do chão flutuando em volta",
+      "golpe": "as duas palmas abertas dele empurradas direto na direção da câmera em escorço exagerado, o raio dourado começando a sair das mãos, o rosto concentrado e gritando ao fundo, linhas de velocidade",
+      "final": "de perfil olhando para a direita, numa base larga com o corpo todo inclinado para a frente, as duas palmas empurradas disparando um raio contínuo gigante de energia dourada e alaranjada que atravessa a imagem, o chão rachando e voando atrás dele",
+      "so_abertura": false
     },
     {
       "id": "p02",

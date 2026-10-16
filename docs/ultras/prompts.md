@@ -37,7 +37,6 @@ pedaço, e o resto continua funcionando.
 
 ## player_base — Explosão Solar
 Concept para anexar: `art/concepts/p01.png`. Energia: dourada e alaranjada, como o sol.
-A página de mangá deste Ultra já tem as 5 imagens; faltam só as da abertura.
 
 **`corte.png`** (retrato 2:3, fundo transparente)
 
@@ -49,6 +48,36 @@ Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty
 
 ```
 Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty Gear Strive e Garou: Mark of the Wolves. Traço de tinta grosso e preto, cores vibrantes e saturadas, sombras duras com cel shading, iluminação dramática de cinema, muito contraste, linhas de velocidade e energia desenhadas à mão. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água, sem logotipo. Cenário de fundo, SEM nenhum personagem e sem pessoas: um céu de entardecer em chamas douradas atrás de um templo de pedra, sol gigante no horizonte, pedras flutuando. Composição centralizada e dramática, com linhas de energia irradiando do centro, na cor da energia do Ultra (dourada e alaranjada, como o sol). Formato horizontal.
+```
+
+**`olhos.png`** (paisagem 3:2)
+
+```
+Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty Gear Strive e Garou: Mark of the Wolves. Traço de tinta grosso e preto, cores vibrantes e saturadas, sombras duras com cel shading, iluminação dramática de cinema, muito contraste, linhas de velocidade e energia desenhadas à mão. O personagem é EXATAMENTE o do concept anexado: mesmo rosto, cabelo, roupa, cores e proporções. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água, sem logotipo. Close extremo nos olhos de lutador jovem de cabelo castanho espetado, colete azul e branco sem mangas, regata preta, faixa preta e vermelha na cintura, luvas pretas e vermelhas, tênis azul, vermelho e branco, olhar furioso e determinado. Os dois olhos ocupam uma faixa horizontal fina no centro exato da imagem; acima e abaixo, só sombra. Na íris, o reflexo da energia do personagem (dourada e alaranjada, como o sol). Fundo escuro.
+```
+
+**`carga.png`** (quadrado)
+
+```
+Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty Gear Strive e Garou: Mark of the Wolves. Traço de tinta grosso e preto, cores vibrantes e saturadas, sombras duras com cel shading, iluminação dramática de cinema, muito contraste, linhas de velocidade e energia desenhadas à mão. O personagem é EXATAMENTE o do concept anexado: mesmo rosto, cabelo, roupa, cores e proporções. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água, sem logotipo. Personagem: lutador jovem de cabelo castanho espetado, colete azul e branco sem mangas, regata preta, faixa preta e vermelha na cintura, luvas pretas e vermelhas, tênis azul, vermelho e branco. Cena: em base larga com as duas mãos em concha puxadas até o quadril de trás, uma esfera de energia dourada crescendo e girando entre as palmas, a aura dourada subindo como labaredas de sol, pedras do chão flutuando em volta. Corpo inteiro, de frente para a câmera, câmera de baixo para cima.
+```
+
+**`golpe.png`** (paisagem 3:2)
+
+```
+Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty Gear Strive e Garou: Mark of the Wolves. Traço de tinta grosso e preto, cores vibrantes e saturadas, sombras duras com cel shading, iluminação dramática de cinema, muito contraste, linhas de velocidade e energia desenhadas à mão. O personagem é EXATAMENTE o do concept anexado: mesmo rosto, cabelo, roupa, cores e proporções. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água, sem logotipo. Personagem: lutador jovem de cabelo castanho espetado, colete azul e branco sem mangas, regata preta, faixa preta e vermelha na cintura, luvas pretas e vermelhas, tênis azul, vermelho e branco. Cena: as duas palmas abertas dele empurradas direto na direção da câmera em escorço exagerado, o raio dourado começando a sair das mãos, o rosto concentrado e gritando ao fundo, linhas de velocidade. Composição horizontal com o golpe no centro, linhas de velocidade radiais.
+```
+
+**`atingido.png`** (paisagem 3:2)
+
+```
+Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty Gear Strive e Garou: Mark of the Wolves. Traço de tinta grosso e preto, cores vibrantes e saturadas, sombras duras com cel shading, iluminação dramática de cinema, muito contraste, linhas de velocidade e energia desenhadas à mão. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água, sem logotipo. Um lutador genérico de roupa escura, em silhueta e sem rosto definido, sendo atingido por um golpe e arremessado para a direita, corpo dobrado para trás, estrela de impacto branca no peito, a energia do golpe (dourada e alaranjada, como o sol) explodindo no ponto do impacto, saliva e suor voando, linhas de velocidade horizontais. Composição horizontal com o corpo no centro.
+```
+
+**`final.png`** (paisagem 16:9)
+
+```
+Ilustração de anime de luta moderno, no nível de Dragon Ball FighterZ, Guilty Gear Strive e Garou: Mark of the Wolves. Traço de tinta grosso e preto, cores vibrantes e saturadas, sombras duras com cel shading, iluminação dramática de cinema, muito contraste, linhas de velocidade e energia desenhadas à mão. O personagem é EXATAMENTE o do concept anexado: mesmo rosto, cabelo, roupa, cores e proporções. Sem texto, sem letras, sem balões de fala, sem molduras de quadrinho, sem marca d'água, sem logotipo. Personagem: lutador jovem de cabelo castanho espetado, colete azul e branco sem mangas, regata preta, faixa preta e vermelha na cintura, luvas pretas e vermelhas, tênis azul, vermelho e branco. Cena: de perfil olhando para a direita, numa base larga com o corpo todo inclinado para a frente, as duas palmas empurradas disparando um raio contínuo gigante de energia dourada e alaranjada que atravessa a imagem, o chão rachando e voando atrás dele. Cenário: um céu de entardecer em chamas douradas atrás de um templo de pedra, sol gigante no horizonte, pedras flutuando. Câmera dramática de cinema, a imagem mais épica do Ultra.
 ```
 
 ## p02 — Dança da Garça
