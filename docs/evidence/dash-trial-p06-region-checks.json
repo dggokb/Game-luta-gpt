@@ -1,0 +1,60 @@
+{
+  "eye_temple": {
+    "error": "Registro local incerto no frame da a\u00e7\u00e3o 0: correla\u00e7\u00e3o 0.728",
+    "polygon": [
+      [
+        926,
+        267
+      ],
+      [
+        949,
+        267
+      ],
+      [
+        961,
+        278
+      ],
+      [
+        954,
+        297
+      ],
+      [
+        934,
+        294
+      ],
+      [
+        922,
+        280
+      ]
+    ]
+  },
+  "upper_head": {
+    "error": "Registro local incerto no frame da a\u00e7\u00e3o 0: correla\u00e7\u00e3o 0.667",
+    "polygon": [
+      [
+        920,
+        251
+      ],
+      [
+        948,
+        245
+      ],
+      [
+        966,
+        262
+      ],
+      [
+        957,
+        284
+      ],
+      [
+        938,
+        293
+      ],
+      [
+        919,
+        278
+      ]
+    ]
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "characters": [
+    {
+      "character": "p02",
+      "result": "trial_gates_passed",
+      "patch_before_fraction": 0.02495784366234048,
+      "patch_after_fraction": 0.015435775333235532,
+      "body_control_difference_fraction": 0.046285267370735
+    },
+    {
+      "character": "p06",
+      "result": "blocked_registration",
+      "failed_source_frames": [
+        44
+      ],
+      "uncertain_curve_not_applied": true
+    },
+    {
+      "character": "p08",
+      "result": "trial_gates_failed",
+      "patch_before_fraction": 0.041132754895417935,
+      "patch_after_fraction": 0.03566835610314549,
+      "body_control_difference_fraction": 0.016201939773175744
+    },
+    {
+      "character": "p11",
+      "result": "trial_gates_passed",
+      "patch_before_fraction": 0.023762781766003275,
+      "patch_after_fraction": 0.006428661342360344,
+      "body_control_difference_fraction": 0.028357766217366746
+    }
+  ],
+  "exported_pngs": 228,
+  "source_pts_preserved": true,
+  "all_selected_frames_preserved": true,
+  "sequence": {
+    "False": {
+      "all_four_completed": true,
+      "phase_history": [
+        [
+          "p02",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p06",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p08",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p11",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p02",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p02",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p02",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p02",
+          "all",
+          3,
+          "idle"
+        ],
+        [
+          "p06",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p06",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p06",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p06",
+          "all",
+          3,
+          "idle"
+        ],
+        [
+          "p08",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p08",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p08",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p08",
+          "all",
+          3,
+          "idle"
+        ],
+        [
+          "p11",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p11",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p11",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p11",
+          "all",
+          3,
+          "idle"
+        ]
+      ]
+    },
+    "True": {
+      "all_four_completed": true,
+      "phase_history": [
+        [
+          "p02",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p06",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p08",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p11",
+          "cycle",
+          0,
+          "adjusted"
+        ],
+        [
+          "p02",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p02",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p02",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p02",
+          "all",
+          3,
+          "idle"
+        ],
+        [
+          "p06",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p06",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p06",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p06",
+          "all",
+          3,
+          "idle"
+        ],
+        [
+          "p08",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p08",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p08",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p08",
+          "all",
+          3,
+          "idle"
+        ],
+        [
+          "p11",
+          "all",
+          0,
+          "idle"
+        ],
+        [
+          "p11",
+          "all",
+          1,
+          "adjusted"
+        ],
+        [
+          "p11",
+          "all",
+          2,
+          "adjusted"
+        ],
+        [
+          "p11",
+          "all",
+          3,
+          "idle"
+        ]
+      ]
+    }
+  },
+  "preview_vs_png_mean_rgb_errors": {
+    "False/p02/left": 0.5858646316524515,
+    "False/p02/right": 0.7525229853525529,
+    "False/p02/idle": 0.49408948077210835,
+    "False/p06/left": 0.463198497015645,
+    "False/p06/right": 0.463198497015645,
+    "False/p06/idle": 0.4271368480555971,
+    "False/p08/left": 1.242788501504647,
+    "False/p08/right": 1.242322975376993,
+    "False/p08/idle": 0.41225663790380235,
+    "False/p11/left": 1.8162169351754867,
+    "False/p11/right": 1.544865080552646,
+    "False/p11/idle": 0.6421101634329227,
+    "True/p02/left": 0.5858646316524515,
+    "True/p02/right": 0.7525229853525529,
+    "True/p02/idle": 0.49408948077210835,
+    "True/p06/left": 0.463198497015645,
+    "True/p06/right": 0.463198497015645,
+    "True/p06/idle": 0.4271368480555971,
+    "True/p08/left": 1.242788501504647,
+    "True/p08/right": 1.242322975376993,
+    "True/p08/idle": 0.41225663790380235,
+    "True/p11/left": 1.8162169351754867,
+    "True/p11/right": 1.544865080552646,
+    "True/p11/idle": 0.6421101634329227
+  },
+  "page_errors": [],
+  "external_or_failed_requests": [],
+  "full_frame_anatomical_validation": false,
+  "approved_as_universal_standard": false
+}

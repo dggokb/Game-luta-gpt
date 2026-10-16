@@ -1,0 +1,94 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dash — teste com quatro personagens</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui;background:#10151d;color:#e7ecf5}body{max-width:1250px;margin:auto;padding:16px}h1{font-size:25px;margin:8px 0}p{line-height:1.45;color:#b9c7d9}button,select,input{font:inherit;background:#223044;color:#f3f7ff;border:1px solid #55708f;border-radius:8px;padding:10px;min-height:44px}button{cursor:pointer}.toolbar,.playback{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.toolbar label{display:flex;gap:8px;align-items:center}.primary{background:#286b5a;border-color:#67bea4}.panes{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pane{border:1px solid #405169;border-radius:10px;padding:10px;min-width:0}.pane>b{display:block;min-height:40px;line-height:20px}.stage{aspect-ratio:4/3;background:repeating-conic-gradient(#26313d 0 25%,#1c2630 0 50%) 0/24px 24px;overflow:hidden;position:relative}.stage canvas{width:100%;height:100%;display:block;position:absolute;inset:0}.position{display:block;color:#b9c7d9;font-size:12px;margin:6px 0;min-height:30px}#seek{flex:1;min-width:120px;padding:0}#status{padding:10px;border-left:4px solid #dfb465;background:#1b2532;font-size:14px}#sequenceNote{min-height:24px}.single .panes{grid-template-columns:1fr}.single #rightPane{display:none}.single .stage{max-height:560px}a{color:#8fcfff}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}summary{cursor:pointer;margin:18px 0}#renderState{display:none}@media(max-width:600px){body{padding:12px;font-size:14px}h1{font-size:22px}.panes{gap:8px}.pane{padding:7px}.toolbar button{flex:1}.toolbar label{width:100%}.toolbar select{flex:1}#leftTitle,#rightTitle{font-size:13px}.single .stage{max-height:420px}}
+</style>
+<h1>Dash — teste com 4 personagens</h1>
+<p>Confira a corrida e a troca Idle → dash → Idle, sempre no mesmo zoom.</p>
+<div class="toolbar">
+<label>Personagem <select id="character"></select></label>
+<button id="cycle">Só dash</button><button id="sequence" class="primary">Idle → dash → Idle</button><button id="all">Rodar os 4</button>
+</div>
+<p id="status"></p><p id="sequenceNote"></p>
+<div class="toolbar"><label>Direita <select id="comparison"><option value="fixed">Escala fixa, sem ajuste interno</option><option value="idle">Idle para comparar o tamanho</option></select></label><button id="layout">Ampliar novo</button></div>
+<div class="panes">
+<div class="pane"><b id="leftTitle">Novo ajuste</b><span class="position" id="leftPosition"></span><div class="stage"><canvas id="left"></canvas></div></div>
+<div class="pane" id="rightPane"><b id="rightTitle">Escala fixa</b><span class="position" id="rightPosition"></span><div class="stage"><canvas id="right"></canvas></div></div>
+</div>
+<div class="playback"><button id="play">Reproduzir</button><button id="previous" aria-label="Frame anterior">◀</button><button id="next" aria-label="Próximo frame">▶</button><input id="seek" type="range" min="0" value="0" aria-label="Frame da fase atual"><span id="position"></span></div>
+<p>Esquerda: tentativa de estabilização. Direita: o mesmo recorte e a mesma escala geral, sem a curva interna. O teste usa cortes diretos entre Idle e corrida; ainda não contém uma animação de entrada ou saída.</p>
+<p id="limits">Este é um ensaio. Passar nas medidas não aprova a anatomia inteira nem todos os personagens. O jogo continua responsável pelo deslocamento.</p>
+<details><summary>Medidas e resultado deste personagem</summary><pre id="metrics"></pre></details>
+<p><a href="manifest.json">Manifesto</a> · <a href="trial-report.json">Resultados dos quatro</a></p>
+<span id="renderState"></span>
+<script id="data" type="application/json">__MANIFEST__</script>
+<script>
+'use strict';
+const data=JSON.parse(document.getElementById('data').textContent),$=id=>document.getElementById(id);
+const clips=new Map(data.clips.map(c=>[c.name,c])),cache=new Map();
+let characterIndex=0,frameIndex=0,phaseIndex=0,mode='cycle',playing=false,elapsed=0,lastTime=0,renderToken=0,finishedAll=false;
+const phaseNames=['idle','adjusted','adjusted','idle'];
+const stateHistory=[];
+const labels={trial_gates_passed:'Passou nos controles deste ensaio; falta revisão visual.',trial_gates_failed:'Não passou: a oscilação residual ficou acima do limite.',blocked_registration:'Não passou no registro. Os dois lados mostram a escala fixa; nenhuma curva incerta foi aplicada.'};
+function character(){return data.characters[characterIndex]}
+function role(){return mode==='cycle'?'adjusted':phaseNames[phaseIndex]}
+function clip(r=role()){return clips.get(character().clips[r])}
+function load(src){if(!cache.has(src)){cache.set(src,new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Imagem ausente: '+src));image.src=src}));if(cache.size>6)cache.delete(cache.keys().next().value)}return cache.get(src)}
+function pause(){playing=false;elapsed=0;$('play').textContent='Reproduzir'}
+function describe(){const c=character(),q=c.quality;$('status').textContent=c.id.toUpperCase()+' · '+labels[q.status];
+ $('metrics').textContent=JSON.stringify({resultado:q,escala_geral:c.global_axis_match},null,2);
+ $('sequenceNote').textContent=mode==='cycle'?'Somente o ciclo de corrida.':`${mode==='all'?'Sequência dos 4 · ':''}${c.id.toUpperCase()} · ${phaseIndex===0?'Idle antes':phaseIndex===3?'Idle depois':'dash · volta '+phaseIndex+'/2'}`;
+ $('leftTitle').textContent=q.status==='blocked_registration'?'Ajuste bloqueado — escala fixa':'Novo ajuste';
+}
+async function draw(canvas,entry){const image=await load(entry.normalized_file),rect=canvas.getBoundingClientRect(),density=devicePixelRatio||1;
+ canvas.width=Math.round(rect.width*density);canvas.height=Math.round(rect.height*density);
+ if(rect.width<=0||rect.height<=0)return;
+ const ctx=canvas.getContext('2d'),k=Math.min(rect.width/760,rect.height/570);
+ ctx.setTransform(density*k,0,0,density*k,density*(rect.width/2-data.root[0]*k),density*(rect.height/2-(data.root[1]-220)*k));
+ ctx.strokeStyle='#65bda7';ctx.lineWidth=1/k;ctx.beginPath();ctx.moveTo(0,data.root[1]);ctx.lineTo(data.canvas[0],data.root[1]);ctx.stroke();
+ ctx.drawImage(image,...entry.normalized_rect,...entry.normalized_destination_rect);
+}
+async function render(){const token=++renderToken,c=clip(),f=c.frames[frameIndex];
+ let rightRole=$('comparison').value==='idle'?'idle':role()==='idle'?'idle':'fixed';
+ const right=clip(rightRole),rightIndex=rightRole==='idle'?(role()==='idle'?frameIndex:right.reference_frame):frameIndex;
+ const rf=right.frames[rightIndex];describe();
+ $('rightTitle').textContent=rightRole==='idle'?'Idle · escala geral':'Sem ajuste interno';
+ $('leftPosition').textContent=`${role()==='idle'?'Idle':'Dash'} · fonte ${f.source_frame_index+1} · ${frameIndex+1}/${c.frame_count}`;
+ $('rightPosition').textContent=`${rightRole==='idle'?'Idle':'Dash'} · fonte ${rf.source_frame_index+1} · ${rightIndex+1}/${right.frame_count}`;
+ $('seek').max=c.frame_count-1;$('seek').value=frameIndex;$('position').textContent=`${frameIndex+1}/${c.frame_count}`;
+ // Await images before drawing. A stale request cannot overwrite a newer frame.
+ await Promise.all([load(f.normalized_file),load(rf.normalized_file)]);if(token!==renderToken)return;
+ await Promise.all([draw($('left'),f),draw($('right'),rf)]);if(token!==renderToken)return;
+ $('renderState').textContent=[character().id,mode,phaseIndex,frameIndex,rightRole,rightIndex].join('/');
+ window.dispatchEvent(new Event('dashframe'));
+}
+function advance(){const c=clip();if(frameIndex+1<c.frame_count){frameIndex++;return}
+ frameIndex=0;
+ if(mode!=='cycle'){
+  phaseIndex++;
+  if(phaseIndex>=phaseNames.length){phaseIndex=0;
+   if(mode==='all'){
+    if(characterIndex+1<data.characters.length){characterIndex++;$('character').value=characterIndex}
+    else {phaseIndex=3;frameIndex=clip().frame_count-1;finishedAll=true;pause()}
+   }
+  }
+ }
+ if(!finishedAll)stateHistory.push([character().id,mode,phaseIndex,role()]);
+}
+function start(newMode){pause();mode=newMode;phaseIndex=0;frameIndex=0;finishedAll=false;
+ if(mode==='all'){characterIndex=0;$('character').value='0'}
+ stateHistory.push([character().id,mode,phaseIndex,role()]);playing=true;$('play').textContent='Pausar';render();
+}
+for(const [i,c] of data.characters.entries()){const o=document.createElement('option');o.value=i;o.textContent=c.id.toUpperCase();$('character').append(o)}
+$('character').onchange=()=>{pause();characterIndex=Number($('character').value);mode='cycle';phaseIndex=0;frameIndex=0;finishedAll=false;render()};
+$('cycle').onclick=()=>start('cycle');$('sequence').onclick=()=>start('sequence');$('all').onclick=()=>start('all');
+$('play').onclick=()=>{if(finishedAll){start('all');return}playing=!playing;$('play').textContent=playing?'Pausar':'Reproduzir';render()};
+$('previous').onclick=()=>{pause();frameIndex=Math.max(0,frameIndex-1);render()};$('next').onclick=()=>{pause();advance();render()};
+$('seek').oninput=()=>{pause();frameIndex=Number($('seek').value);render()};$('comparison').onchange=render;
+$('layout').onclick=()=>{document.body.classList.toggle('single');$('layout').textContent=document.body.classList.contains('single')?'Mostrar comparação':'Ampliar novo';render()};
+window.addEventListener('resize',render);
+function tick(time){if(playing){elapsed+=Math.min((time-lastTime)/1000,.25);let changed=false;
+ while(playing&&elapsed>=clip().frames[frameIndex].duration_s){elapsed-=clip().frames[frameIndex].duration_s;advance();changed=true}
+ if(changed)render();}lastTime=time;requestAnimationFrame(tick)}
+render();requestAnimationFrame(tick);
+</script></html>

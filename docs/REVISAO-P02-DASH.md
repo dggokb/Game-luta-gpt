@@ -1,5 +1,7 @@
 # P02 — ciclo de dash com escala independente do Idle
 
+**Ensaio posterior:** [P02, P06, P08 e P11 com sequência de teste](ENSAIO-DASH-4-PERSONAGENS.md). O novo APK atualiza o app separado da P02. O método ainda não foi aprovado como padrão para todos.
+
 ## Revisão 2: somente corrida
 
 A primeira tentativa melhorou o tamanho geral, mas ainda oscilava. A curva ligava marcações aproximadas do crânio entre Idle, preparação e corrida; parte da mudança na forma do cabelo e da orientação virava uma mudança artificial de escala.

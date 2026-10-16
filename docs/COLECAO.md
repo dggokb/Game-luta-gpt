@@ -1,5 +1,7 @@
 # Todos os personagens — processamento das fontes existentes
 
+**Ensaio antes de ampliar o lote:** [dash em quatro personagens](ENSAIO-DASH-4-PERSONAGENS.md). P02 e P11 passam nos controles medidos; P06 e P08 ainda não. A coleção completa permanece sem essa revisão.
+
 **Pendência confirmada após a entrega 1.5:** o [dash da P02 aumenta de tamanho durante a ação](REVISAO-P02-DASH.md). A calibração por Idle não verificava as demais poses. Os 330 convertidos continuam sendo saídas para revisão; esse número não comprova tamanho corporal estável durante todos os movimentos.
 
 Inventário da pasta de animações do Drive em 15/10/2026: **418 vídeos** nas pastas P01–P13, Dafu, Takatoshi e capangas. P14, P15 e P16 têm somente imagens. Nenhuma animação é criada para preencher essas ausências.

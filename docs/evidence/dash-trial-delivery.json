@@ -1,0 +1,23 @@
+{
+  "apk": {
+    "path": "dist/sprites-dash-4-personagens.apk",
+    "bytes": 8149681,
+    "sha256": "986c622f44b972550c4213e34dd795a082535214020776258b4fd9abf02f8f14",
+    "application_id": "org.spriteviewer.p02review",
+    "version_code": 8,
+    "version_name": "1.7-dash-4personagens",
+    "same_certificate_as_p02_test": true,
+    "html_and_manifest_match_browser_tested": true,
+    "physical_device_tested": false
+  },
+  "zip": {
+    "file_id": "1rJCRvPQlrmBHeZzJ-0bbXsve263VkNbk",
+    "url": "https://drive.google.com/file/d/1rJCRvPQlrmBHeZzJ-0bbXsve263VkNbk/view",
+    "bytes": 71371123,
+    "remote_size_verified": true,
+    "sha256": "c2f8fc7290e8243be1889a4e959e2297d4795754374570bdcb846c1bc970473d"
+  },
+  "tests_passed": 77,
+  "full_collection_apk_changed": false,
+  "approved_as_universal_standard": false
+}

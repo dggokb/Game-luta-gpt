@@ -1,0 +1,366 @@
+{
+  "method": "action_patch_similarity_registration",
+  "minimum_correlation": 0.8,
+  "search_radius_px": 600,
+  "maximum_patch_residual_fraction": 0.02,
+  "maximum_body_control_difference_fraction": 0.06,
+  "note": "Same algorithm and gates for all four. Region/range and approximate anatomical landmarks are manual per character. No automatic approval of other movements or whole-body anatomy.",
+  "characters": [
+    {
+      "id": "p02",
+      "source_sha256": "b13f6706f1791b38428dac29fae0a93922172a778e0e97bf41327f46017ea72b",
+      "start": 14,
+      "stop": 38,
+      "reference_source_frame": 16,
+      "polygon": [
+        [
+          753,
+          299
+        ],
+        [
+          791,
+          296
+        ],
+        [
+          802,
+          314
+        ],
+        [
+          798,
+          332
+        ],
+        [
+          778,
+          348
+        ],
+        [
+          757,
+          333
+        ],
+        [
+          749,
+          313
+        ]
+      ],
+      "source_ground_y": 648,
+      "source_hip_x": 650,
+      "idle_head_axis": [
+        [
+          643,
+          257
+        ],
+        [
+          653,
+          330
+        ]
+      ],
+      "dash_head_axis": [
+        [
+          752,
+          261
+        ],
+        [
+          782,
+          347
+        ]
+      ],
+      "body_controls": [
+        {
+          "frame": 16,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              743,
+              348
+            ],
+            [
+              669,
+              410
+            ]
+          ]
+        },
+        {
+          "frame": 28,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              745,
+              349
+            ],
+            [
+              674,
+              408
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p06",
+      "source_sha256": "6740438a0756f05b428a39d0818e372d912deb8e6454b28bb01ef47462cc1004",
+      "start": 44,
+      "stop": 62,
+      "reference_source_frame": 48,
+      "polygon": [
+        [
+          920,
+          276
+        ],
+        [
+          953,
+          270
+        ],
+        [
+          967,
+          287
+        ],
+        [
+          958,
+          307
+        ],
+        [
+          945,
+          318
+        ],
+        [
+          927,
+          306
+        ],
+        [
+          916,
+          292
+        ]
+      ],
+      "source_ground_y": 656,
+      "source_hip_x": 810,
+      "idle_head_axis": [
+        [
+          706,
+          84
+        ],
+        [
+          704,
+          197
+        ]
+      ],
+      "dash_head_axis": [
+        [
+          940,
+          235
+        ],
+        [
+          946,
+          319
+        ]
+      ],
+      "body_controls": [
+        {
+          "frame": 48,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              922,
+              318
+            ],
+            [
+              843,
+              402
+            ]
+          ]
+        },
+        {
+          "frame": 60,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              924,
+              309
+            ],
+            [
+              839,
+              400
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p08",
+      "source_sha256": "453ab753fb6e495fcb84bad56170b3cb9de4740d32c4ca3ae33cda05037b78ff",
+      "start": 20,
+      "stop": 44,
+      "reference_source_frame": 24,
+      "polygon": [
+        [
+          847,
+          168
+        ],
+        [
+          883,
+          158
+        ],
+        [
+          906,
+          181
+        ],
+        [
+          901,
+          204
+        ],
+        [
+          882,
+          221
+        ],
+        [
+          858,
+          203
+        ],
+        [
+          840,
+          184
+        ]
+      ],
+      "source_ground_y": 680,
+      "source_hip_x": 710,
+      "idle_head_axis": [
+        [
+          679,
+          242
+        ],
+        [
+          692,
+          290
+        ]
+      ],
+      "dash_head_axis": [
+        [
+          875,
+          127
+        ],
+        [
+          889,
+          219
+        ]
+      ],
+      "body_controls": [
+        {
+          "frame": 24,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              850,
+              222
+            ],
+            [
+              736,
+              321
+            ]
+          ]
+        },
+        {
+          "frame": 36,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              851,
+              220
+            ],
+            [
+              738,
+              320
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p11",
+      "source_sha256": "bf728ddc50b3a6da21324ae424b203f5efae7593329d94a0099fcf243e59ed08",
+      "start": 40,
+      "stop": 64,
+      "reference_source_frame": 44,
+      "polygon": [
+        [
+          783,
+          363
+        ],
+        [
+          811,
+          354
+        ],
+        [
+          833,
+          372
+        ],
+        [
+          825,
+          393
+        ],
+        [
+          813,
+          409
+        ],
+        [
+          791,
+          391
+        ],
+        [
+          777,
+          376
+        ]
+      ],
+      "source_ground_y": 650,
+      "source_hip_x": 630,
+      "idle_head_axis": [
+        [
+          740,
+          97
+        ],
+        [
+          741,
+          177
+        ]
+      ],
+      "dash_head_axis": [
+        [
+          805,
+          331
+        ],
+        [
+          806,
+          408
+        ]
+      ],
+      "body_controls": [
+        {
+          "frame": 44,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              740,
+              403
+            ],
+            [
+              614,
+              448
+            ]
+          ]
+        },
+        {
+          "frame": 56,
+          "segment": "approximate_torso_axis",
+          "points": [
+            [
+              740,
+              400
+            ],
+            [
+              613,
+              448
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
