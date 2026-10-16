@@ -7,12 +7,13 @@ import static org.junit.Assert.*;
 public class P01HeavyLaunchRegressionTest {
     private static final CharacterDefinition P01=GeneratedCharacters.get("player_base");
 
-    @Test public void impactFrameStaysInSyncWithGameplayAndMoveRemainsSlower() {
+    @Test public void impactFrameStaysInSyncWithGameplay() {
         AttackDefinition h=P01.attack("H");
         CharacterDefinition.Animation art=P01.animation("HEAVY_STRAIGHT");
         assertEquals(10,h.startupFrames);
         assertEquals(5,h.activeFrames);
-        assertEquals(52,h.totalFrames);
+        // Same recovery as the other fighters' H (it was 52 frames and left P01 stuck at the end).
+        assertEquals(32,h.totalFrames);
         assertEquals(AttackDefinition.Launch.WALL_BOUNCE,h.launch);
         assertEquals(h.startupFrames/(float)h.totalFrames,
             art.timeOfFrame(10)/art.duration,0.03f);

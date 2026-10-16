@@ -573,19 +573,19 @@
         18,
         19,
         17,
-        62,
-        62,
-        58,
-        58,
-        62,
-        62,
-        62,
-        62,
-        58,
-        62,
-        58,
-        62,
-        58
+        34,
+        34,
+        32,
+        32,
+        34,
+        34,
+        34,
+        34,
+        32,
+        34,
+        32,
+        34,
+        32
       ],
       "impactFrame": 10
     },
@@ -1748,18 +1748,18 @@
       "reach": 169,
       "startupFrames": 10,
       "activeFrames": 5,
-      "recoveryFrames": 37,
-      "hitstunFrames": 18,
-      "blockstunFrames": 11,
+      "recoveryFrames": 17,
+      "hitstunFrames": 26,
+      "blockstunFrames": 19,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
           10,
-          17
+          19
         ],
         "block": [
           10,
-          17
+          19
         ],
         "whiff": null
       },

@@ -27,6 +27,16 @@ public class CorrentesComboTest {
         }
     }
 
+    @Test public void theHeavyLeavesEveryoneFreeToFollowUp() {
+        // O H do P01 tinha 37 quadros de recuperação (-23 no acerto): o lutador ficava parado no
+        // fim do golpe sem conseguir combar nem dar dash. Todo H acerta com vantagem.
+        for (String id : FIGHTERS) {
+            AttackDefinition h = GeneratedCharacters.get(id).attack("H");
+            int advantage = h.hitstunFrames - (h.activeFrames - 1 + h.recoveryFrames);
+            assertTrue(id + " H no acerto: " + advantage, advantage >= 0);
+        }
+    }
+
     @Test public void eachStyleAddsItsOwnRoutes() {
         assertTrue("pressão: M > M", route("p04", "M", "M"));
         assertTrue("pressão: M cancela em pulo", route("p03", "M", AttackDefinition.JUMP));
