@@ -75,6 +75,20 @@ final class Projectile {
         this.visual = visual;
     }
 
+    /** Anulado por um projétil do rival: sai da tela sem acertar ninguém. */
+    boolean cancelled;
+
     /** Volta para a mão ao chegar no alcance (ou ao acertar), em vez de sumir. */
     boolean retracts() { return "CHICOTE".equals(visual); }
+
+    boolean superKind() { return attack.kind == AttackDefinition.Kind.SUPER; }
+
+    /**
+     * Pode bater num projétil do rival: o chicote é o braço da p08, não energia, e o projétil
+     * que volta ou que está parado no rival entre dois acertos já não está no caminho.
+     */
+    boolean clashes() { return !cancelled && !retracts() && !returning && !holding; }
+
+    /** Força no choque: os acertos que ainda faltam (a Onda Máxima de 5 aguenta 5). */
+    int durability() { return Math.max(0, totalHits - hitsDone); }
 }
