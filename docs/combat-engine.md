@@ -533,5 +533,13 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
 - **KO**: o golpe que nocauteia congela mais (`koHitstopBonus`, +16), a tela treme forte,
   um clarão branco e câmera lenta (~0,7 s de luta a 35%).
 - **Punish counter**: congela +8 quadros (`punishHitstopBonus`).
+- **Impact frames** (a técnica dos animes): por 2 quadros a cena vira silhueta, com linhas
+  de velocidade saindo do impacto, e 1 quadro de cores invertidas antes de voltar.
+  - Vermelho e preto (fundo vermelho, silhuetas pretas com contorno branco): punish counter
+    e o golpe que fecha um combo de 5+ acertos jogando o rival longe (queda, parede, chão, giro).
+  - Branco no vazio (tudo preto, silhuetas brancas): KO, acerto do Super e o fim do Ultra.
+  - No máximo um a cada 30 quadros (só o branco passa na frente do vermelho), para a tela não
+    ficar piscando. A pausa tem **IMPACTO: LIGADO/DESLIGADO** (salvo no aparelho), para quem
+    é sensível a luz piscando.
 
 Testes em `ImpactFeelTest` e `PunishCounterTest`.

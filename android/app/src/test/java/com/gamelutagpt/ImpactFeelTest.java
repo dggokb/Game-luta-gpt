@@ -53,4 +53,36 @@ public class ImpactFeelTest {
         d.framesSinceBlock = 0;
         assertTrue("a guard shakes less", Math.abs(ImpactFeel.hitShake(d, 0)) < Math.abs(a));
     }
+
+    @Test public void impactFrameShowsTheSilhouetteThenOneNegativeFrame() {
+        ImpactFeel f = new ImpactFeel();
+        f.impactFrame(ImpactFeel.RED, 600f, 300f);
+        f.step();                           // the fight step that asked for it
+        for (int i = 0; i < ImpactFeel.STYLE_FRAMES; i++) {
+            assertEquals(ImpactFeel.RED, f.impactStyle());
+            assertFalse(f.negative());
+            f.step();
+        }
+        assertEquals(ImpactFeel.NONE, f.impactStyle());
+        assertTrue("one inverted frame", f.negative());
+        f.step();
+        assertFalse(f.negative());
+        assertEquals(600f, f.impactX(), 0f);
+    }
+
+    @Test public void impactFramesDoNotFlashOneAfterAnother() {
+        ImpactFeel f = new ImpactFeel();
+        f.impactFrame(ImpactFeel.RED, 0f, 0f);
+        for (int i = 0; i < 5; i++) f.step();
+        f.impactFrame(ImpactFeel.RED, 0f, 0f);
+        f.step();
+        assertEquals("a second red one waits for the cooldown", ImpactFeel.NONE, f.impactStyle());
+        f.impactFrame(ImpactFeel.VOID, 0f, 0f);
+        f.step();
+        assertEquals("a knockout still gets its own", ImpactFeel.VOID, f.impactStyle());
+        for (int i = 0; i < ImpactFeel.IMPACT_COOLDOWN; i++) f.step();
+        f.impactFrame(ImpactFeel.RED, 0f, 0f);
+        f.step();
+        assertEquals(ImpactFeel.RED, f.impactStyle());
+    }
 }

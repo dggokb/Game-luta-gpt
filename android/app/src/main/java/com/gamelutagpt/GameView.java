@@ -4,7 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -73,6 +79,8 @@ public class GameView extends SurfaceView
     /** Onde fica a VELOCIDADE escolhida na pausa (vale para a próxima vez que o app abrir). */
     private static final String SPEED_PREFS = "jogo_v1";
     private static final String SPEED_KEY = "velocidade";
+    /** IMPACTO da pausa (impact frames ligados), salvo junto com a velocidade. */
+    private static final String IMPACT_KEY = "impacto";
 
     final CombatEngine engine = new CombatEngine(
         team[0], opponentFighter, PLAYER_START_X, OPPONENT_START_X, new CombatConfig());
@@ -369,6 +377,7 @@ public class GameView extends SurfaceView
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
         storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
+        pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
         atlases = new SpriteAtlasCache(context);
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
             @Override public void manterAtlas(CharacterDefinition... manter) {
@@ -1148,7 +1157,13 @@ public class GameView extends SurfaceView
             if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 14f);
             }
-            if ("ULTRA_FINISH".equals(cue)) beamShake = Math.max(beamShake, 22f);
+            if ("ULTRA_FINISH".equals(cue)) {
+                beamShake = Math.max(beamShake, 22f);
+                if (pausa.impacto() && ultraAttacker >= 0) {
+                    CombatFighter hit = engine.fighter(1 - ultraAttacker);
+                    feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
+                }
+            }
         }
         updateUltraBeam();
         impacts.update(FIXED_STEP);
@@ -1596,11 +1611,31 @@ public class GameView extends SurfaceView
         else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
         if (knockout) beamShake = Math.max(beamShake, 18f);
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
+        if (!event.blocked && pausa.impacto()) feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y);
         String sound = event.blocked ? "defesa"
             : knockout ? "ko"
             : punish && size >= ImpactEffects.HEAVY ? "punish"
             : HIT_SOUNDS[Math.max(0, Math.min(HIT_SOUNDS.length - 1, size))];
         ultraSounds.playFight(sound, knockout ? 1f : 0.85f, 0.94f + soundRandom.nextFloat() * 0.12f);
+    }
+
+    /** Combo a partir deste tamanho: o golpe que o encerra derrubando ganha o impact frame. */
+    private static final int IMPACT_COMBO_HITS = 5;
+
+    /**
+     * Impact frame de um acerto: VOID no KO e no Super, RED no punish counter e no golpe que
+     * fecha um combo longo jogando o rival longe (queda, parede, chão, giro); NONE no resto.
+     */
+    private int impactStyleFor(CombatEngine.HitEvent event, CombatFighter defender, int size,
+                               boolean punish, boolean knockout) {
+        if (knockout || event.strength == AttackDefinition.Strength.SUPER) return ImpactFeel.VOID;
+        if (punish && size >= ImpactEffects.HEAVY) return ImpactFeel.RED;
+        boolean sentFlying = defender.status == CombatFighter.Status.KNOCKDOWN || defender.hardFall ||
+            defender.spinning || defender.bounce != CombatFighter.BOUNCE_NONE;
+        if (!sentFlying) return ImpactFeel.NONE;
+        ComboSession combo = engine.session(event.defender);
+        if (combo == null && engine.framesSinceSessionEnd(event.defender) == 0) combo = engine.lastSession(event.defender);
+        return combo != null && combo.hitCount >= IMPACT_COMBO_HITS ? ImpactFeel.RED : ImpactFeel.NONE;
     }
 
     private static final String[] HIT_SOUNDS = {"acerto_l", "acerto_m", "acerto_h", "acerto_s"};
@@ -1870,6 +1905,8 @@ public class GameView extends SurfaceView
             boolean beam = ultraBeamActive();
 
             renderCanvas.begin(canvas);
+            // Impact frame, último quadro: a cena com as cores invertidas.
+            int negativeLayer = feel.negative() ? canvas.saveLayer(0f, 0f, VW, VH, negativePaint) : -1;
             if (stageScene != null) {
                 // The stage projects every layer with the same camera the fighters use.
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
@@ -1945,6 +1982,8 @@ public class GameView extends SurfaceView
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
             if (stageScene != null) stageScene.drawForeground(renderCanvas);
+            if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
+            if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
 
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
@@ -2572,6 +2611,111 @@ public class GameView extends SurfaceView
         c.scale(width, 1f, f.x, pivotY);
     }
 
+    // Impact frame: cores dos dois estilos e o que se reaproveita entre quadros.
+    private static final int IMPACT_RED = 0xFFCD1220, IMPACT_RED_LINES = 0xFF78000C;
+    private static final int IMPACT_VOID = 0xFF060608, IMPACT_VOID_LINES = 0xFFEBEBF0;
+    private final ColorFilter inkSilhouette = new PorterDuffColorFilter(0xFF08080A, PorterDuff.Mode.SRC_IN);
+    private final ColorFilter whiteSilhouette = new PorterDuffColorFilter(0xFFFAFAFC, PorterDuff.Mode.SRC_IN);
+    private final Paint negativePaint = new Paint();
+    {
+        negativePaint.setColorFilter(new ColorMatrixColorFilter(new ColorMatrix(new float[] {
+            -1f, 0f, 0f, 0f, 255f,
+            0f, -1f, 0f, 0f, 255f,
+            0f, 0f, -1f, 0f, 255f,
+            0f, 0f, 0f, 1f, 0f})));
+    }
+    private final Path impactPath = new Path();
+    /** Contorno branco das silhuetas pretas (RED), em pixels do mundo. */
+    private static final float IMPACT_OUTLINE = 5f;
+
+    /**
+     * Impact frame: a cena vira um quadro de mangá por um instante. Fundo chapado, linhas de
+     * velocidade saindo do impacto, os dois lutadores em silhueta (preta com contorno branco no
+     * RED, branca no VOID) e a estrela do impacto. Mesma câmera da luta (com o soco de zoom).
+     */
+    private void drawImpactFrame(Canvas canvas, float zoom, float left, float top) {
+        boolean red = feel.impactStyle() == ImpactFeel.RED;
+        float x = feel.impactX(), y = feel.impactY();
+        canvas.drawColor(red ? IMPACT_RED : IMPACT_VOID);
+        canvas.save();
+        canvas.scale(zoom, zoom);
+        canvas.translate(-left, -top);
+        drawSpeedLines(canvas, x, y, red ? IMPACT_RED_LINES : IMPACT_VOID_LINES, red ? 80 : 70, red ? 9f : 5f);
+        drawImpactSilhouettes(canvas, red);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        drawStar(canvas, x, y, red ? 120f : 125f);
+        if (!red) {
+            // VOID: estrela vazada, com o miolo branco.
+            paint.setColor(IMPACT_VOID);
+            drawStar(canvas, x, y, 100f);
+            paint.setColor(Color.WHITE);
+            canvas.drawCircle(x, y, 34f, paint);
+        } else {
+            canvas.drawCircle(x, y, 38f, paint);
+        }
+        canvas.restore();
+    }
+
+    /** Linhas finas no centro e largas na borda, apontando para o impacto. */
+    private void drawSpeedLines(Canvas canvas, float x, float y, int color, int count, float maxWidth) {
+        Random lines = new Random(feel.impactSeed() * 7919L);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        for (int i = 0; i < count; i++) {
+            double a = lines.nextDouble() * Math.PI * 2;
+            float r0 = 150f + lines.nextFloat() * 160f, r1 = 2200f;
+            float w = (1f + lines.nextFloat() * (maxWidth - 1f)) * 3f;
+            float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
+            impactPath.reset();
+            impactPath.moveTo(x + cos * r0, y + sin * r0);
+            impactPath.lineTo(x + cos * r1 - sin * w, y + sin * r1 + cos * w);
+            impactPath.lineTo(x + cos * r1 + sin * w, y + sin * r1 - cos * w);
+            impactPath.close();
+            canvas.drawPath(impactPath, paint);
+        }
+    }
+
+    private void drawStar(Canvas canvas, float x, float y, float size) {
+        Random jitter = new Random(feel.impactSeed() * 31L + Math.round(size));
+        int spikes = 14;
+        impactPath.reset();
+        for (int i = 0; i < spikes * 2; i++) {
+            double a = i * Math.PI / spikes + (jitter.nextFloat() - 0.5f) * 0.16f;
+            float r = i % 2 == 0 ? size * (0.75f + jitter.nextFloat() * 0.5f) : size * 0.32f;
+            float px = x + (float)Math.cos(a) * r, py = y + (float)Math.sin(a) * r;
+            if (i == 0) impactPath.moveTo(px, py); else impactPath.lineTo(px, py);
+        }
+        impactPath.close();
+        canvas.drawPath(impactPath, paint);
+    }
+
+    /** Os dois lutadores em campo como silhueta, na mesma pose deste quadro. */
+    private void drawImpactSilhouettes(Canvas canvas, boolean red) {
+        SpriteFighterRenderer[] renderers = {opponentSpriteRenderer, spriteFighterRenderer};
+        CombatFighter[] fighters = {opponent(), player()};
+        float[] offsets = {engine.teams.tagOffset(OPPONENT), tagOffset()};
+        for (int i = 0; i < 2; i++) {
+            canvas.save();
+            canvas.translate(offsets[i], 0f);
+            if (red) {
+                // Contorno: a silhueta branca deslocada em volta, a preta por cima.
+                renderers[i].setOverride(whiteSilhouette);
+                for (int k = 0; k < 8; k++) {
+                    double a = k * Math.PI / 4;
+                    float dx = (float)Math.cos(a) * IMPACT_OUTLINE, dy = (float)Math.sin(a) * IMPACT_OUTLINE;
+                    canvas.translate(dx, dy);
+                    drawFighter(canvas, renderers[i], fighters[i], false, false);
+                    canvas.translate(-dx, -dy);
+                }
+            }
+            renderers[i].setOverride(red ? inkSilhouette : whiteSilhouette);
+            drawFighter(canvas, renderers[i], fighters[i], false, false);
+            renderers[i].setOverride(null);
+            canvas.restore();
+        }
+    }
+
     /** Glow and sparks around a fighter whose team is in Overdrive. */
     private void drawOverdriveAura(Canvas c, CombatFighter f, float offset) {
         if (!engine.teams.overdriveActive(f.index)) return;
@@ -3134,6 +3278,9 @@ public class GameView extends SurfaceView
         // A pausa fechou: guarda a VELOCIDADE para a próxima vez que o app abrir.
         if (speedPrefs != null && speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO) != pausa.velocidade()) {
             speedPrefs.edit().putFloat(SPEED_KEY, pausa.velocidade()).apply();
+        }
+        if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
+            speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
         }
         pad.reset();
         releaseAllPointers();

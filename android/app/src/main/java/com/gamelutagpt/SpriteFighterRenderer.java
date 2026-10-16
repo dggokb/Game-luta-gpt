@@ -79,11 +79,16 @@ final class SpriteFighterRenderer {
         2.1f,0.0f,-4.1f,-4.1f,-3.4f,-3.14f,-3.14f
     };
 
+    /** Filtro que vale por cima de tudo (a silhueta do impact frame), ou null. */
+    private ColorFilter override;
+
+    void setOverride(ColorFilter filter) {override=filter;}
+
     /** Sprite artwork coordinates, not fighter hitboxes or simulation sizes. */
     void draw(Canvas canvas,float x,float baseY,int facing,boolean damageFlash,boolean guardFlash) {
         CharacterDefinition.Animation anim=character.animation(motion.clip);
         int frame=motion.frame();
-        spritePaint.setColorFilter(damageFlash?hitFlash:guardFlash?blockFlash:tint);
+        spritePaint.setColorFilter(override!=null?override:damageFlash?hitFlash:guardFlash?blockFlash:tint);
         boolean mirror=facing*character.artFacing<0;
         if(mirror) {canvas.save();canvas.scale(-1f,1f,x,0f);}
         boolean p01="player_base".equals(character.id)||"p01_training".equals(character.id);

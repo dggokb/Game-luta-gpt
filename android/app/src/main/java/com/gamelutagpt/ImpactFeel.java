@@ -21,17 +21,48 @@ final class ImpactFeel {
     static final int KO_SLOW_FRAMES = 42;
     static final float KO_SLOW_SCALE = 0.35f;
 
+    /**
+     * Impact frame (a técnica dos animes): por 2 quadros a cena vira silhueta, com linhas de
+     * velocidade saindo do impacto, e 1 quadro de cores invertidas antes de voltar ao normal.
+     * RED: fundo vermelho e silhuetas pretas com contorno branco (punish counter, fim de combo
+     * longo). VOID: tudo preto e silhuetas brancas (KO, Super e Ultra).
+     */
+    static final int NONE = 0, RED = 1, VOID = 2;
+    static final int STYLE_FRAMES = 2, NEGATIVE_FRAMES = 1;
+    /** Quadros sem outro impact frame do mesmo peso (a tela não fica piscando num combo). */
+    static final int IMPACT_COOLDOWN = 30;
+
     private float zoom;
     private float focusX, focusY;
     private int dark, darkFrames, darkTotal;
     private float flash;
     private int slowFrames;
+    private int impactStyle = NONE, impactLeft, impactCooldown, impactSeed;
+    private float impactX, impactY;
 
     void clear() {
         zoom = 0f;
         dark = darkFrames = darkTotal = 0;
         flash = 0f;
         slowFrames = 0;
+        impactStyle = NONE;
+        impactLeft = impactCooldown = 0;
+    }
+
+    /**
+     * Pede um impact frame no ponto (x, y) do mundo. Durante o intervalo, só um estilo mais
+     * forte (VOID sobre RED) toma o lugar.
+     */
+    void impactFrame(int style, float x, float y) {
+        if (style == NONE) return;
+        if (impactCooldown > 0 && style <= impactStyle) return;
+        impactStyle = style;
+        // +1: o passo da luta que pediu ainda conta um quadro antes de desenhar.
+        impactLeft = STYLE_FRAMES + NEGATIVE_FRAMES + 1;
+        impactCooldown = IMPACT_COOLDOWN;
+        impactX = x;
+        impactY = y;
+        impactSeed++;
     }
 
     /**
@@ -66,7 +97,20 @@ final class ImpactFeel {
         flash *= 0.88f;
         if (flash < 2f) flash = 0f;
         if (slowFrames > 0) slowFrames--;
+        if (impactLeft > 0) impactLeft--;
+        if (impactCooldown > 0) impactCooldown--;
     }
+
+    /** Estilo do impact frame que aparece agora ({@link #NONE} fora dele e no quadro negativo). */
+    int impactStyle() { return impactLeft > NEGATIVE_FRAMES ? impactStyle : NONE; }
+
+    /** O quadro de cores invertidas logo depois da silhueta. */
+    boolean negative() { return impactLeft > 0 && impactLeft <= NEGATIVE_FRAMES; }
+
+    float impactX() { return impactX; }
+    float impactY() { return impactY; }
+    /** Muda a cada impact frame: as linhas de velocidade não saem sempre iguais. */
+    int impactSeed() { return impactSeed; }
 
     /** Multiplicador do zoom da câmera (1 = normal). */
     float zoom() { return 1f + zoom; }
