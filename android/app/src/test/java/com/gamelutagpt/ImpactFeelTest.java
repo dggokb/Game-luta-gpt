@@ -131,4 +131,12 @@ public class ImpactFeelTest {
         assertEquals(e.config.mediumHitHoldFrames, e.hitHold(c.attack("M")));
         assertEquals(e.config.heavyHitHoldFrames, e.hitHold(c.attack("H")));
     }
+
+    @Test public void theWallSmashGetsAWiderCloseUpThanTheLauncher() {
+        ImpactFeel wall = new ImpactFeel(), launcher = new ImpactFeel();
+        wall.cinema(0f, 0f, 1, false, ImpactFeel.CINEMA_ZOOM_WALL);
+        launcher.cinema(0f, 0f, 1, false);
+        assertTrue(wall.zoom() < launcher.zoom());
+        assertTrue("still a close-up", wall.zoom() > 1f);
+    }
 }

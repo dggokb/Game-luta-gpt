@@ -1169,10 +1169,9 @@ public class GameView extends SurfaceView
             }
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
-                if (pausa.impacto() && ultraAttacker >= 0) {
-                    CombatFighter hit = engine.fighter(1 - ultraAttacker);
-                    feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
-                }
+                // Último dano do Ultra em sequência: impact frame em quem apanhou.
+                CombatFighter hit = ultraVictim();
+                if (pausa.impacto() && hit != null) feel.impactFrame(ImpactFeel.VOID, hit.x, chestY(hit));
             }
         }
         updateUltraBeam();
@@ -1479,6 +1478,9 @@ public class GameView extends SurfaceView
                 beamBlastClock = beamClock;
                 beamShake = 26f;
                 ultraSounds.play(ultraAttackerFolder(), "explosao");
+                // A explosão do raio é o último dano do Ultra: impact frame em quem apanhou.
+                CombatFighter d = engine.fighter(1 - ultraAttacker);
+                if (pausa.impacto()) feel.impactFrame(ImpactFeel.VOID, d.x, chestY(d));
             } else {
                 beamLastHitClock = beamClock;
                 beamShake = Math.max(beamShake, 5f);
@@ -1488,6 +1490,14 @@ public class GameView extends SurfaceView
             CombatFighter d = engine.fighter(1 - ultraAttacker);
             beamTargetX = d.x - a.facing * d.body().halfWidth * 0.4f;
         }
+    }
+
+    /** Quem apanha do Ultra em andamento (o outro de quem está no Ultra), ou null. */
+    private CombatFighter ultraVictim() {
+        for (int side = 0; side < 2; side++) {
+            if (engine.fighter(side).status == CombatFighter.Status.ULTRA) return engine.fighter(1 - side);
+        }
+        return null;
     }
 
     private boolean ultraBeamActive() {
@@ -1624,7 +1634,10 @@ public class GameView extends SurfaceView
         if (!event.blocked && pausa.impacto()) feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y);
         if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
             (knockout || bigBlow(attacker, defender))) {
-            feel.cinema(x, y, direction, knockout);
+            // O H que joga na parede ganha um close mais aberto que o lançador e o KO.
+            boolean wall = !knockout && attacker.attack != null &&
+                attacker.attack.launch == AttackDefinition.Launch.WALL_BOUNCE;
+            feel.cinema(x, y, direction, knockout, wall ? ImpactFeel.CINEMA_ZOOM_WALL : ImpactFeel.CINEMA_ZOOM);
         }
         String sound = event.blocked ? "defesa"
             : knockout ? "ko"

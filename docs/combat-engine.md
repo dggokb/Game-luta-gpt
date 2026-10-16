@@ -526,7 +526,7 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   variando um pouco, para dois socos seguidos não soarem iguais.
 - **Tremida**: quem apanha treme de um lado para o outro durante o congelamento do acerto
   (hitstop); na defesa, bem menos (`ImpactFeel.hitShake`).
-- **Soco de câmera**: médio, pesado e especial aproximam a câmera um pouco no ponto do
+- **Soco de câmera**: médio, pesado e especial aproximam a câmera um pouco (1,2%, 2,5% e 5%) no ponto do
   impacto e ela volta sozinha (`ImpactFeel.ZOOM`).
 - **Impact frames**: pesado, especial e punish counter escurecem o cenário por 3–6 quadros,
   com os lutadores na frente (`ImpactFeel.DARK`).
@@ -537,7 +537,8 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   de velocidade saindo do impacto, e 1 quadro de cores invertidas antes de voltar.
   - Vermelho e preto (fundo vermelho, silhuetas pretas com contorno branco): punish counter
     e o golpe que fecha um combo de 5+ acertos jogando o rival longe (queda, parede, chão, giro).
-  - Branco no vazio (tudo preto, silhuetas brancas): KO, acerto do Super e o fim do Ultra.
+  - Branco no vazio (tudo preto, silhuetas brancas): KO, acerto do Super e o último dano do
+    Ultra (o último golpe do Ultra em sequência e a explosão final do Ultra de raio).
   - No máximo um a cada 30 quadros (só o branco passa na frente do vermelho), para a tela não
     ficar piscando. A pausa tem **IMPACTO: LIGADO/DESLIGADO** (salvo no aparelho), para quem
     é sensível a luz piscando.
@@ -548,6 +549,7 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
 - **Close de cinema**: no lançador, no golpe que joga o rival na parede/no chão e no KO, a
   câmera corta para um close de ~1,8× no impacto, inclinado 8° a favor do golpe, com o fundo
   escurecendo e a luta a 45% por 12 quadros, e volta com corte seco (`ImpactFeel.CINEMA_*`).
+  O H que joga na parede ganha um close mais aberto (~1,5×, `CINEMA_ZOOM_WALL`).
   Um por combo (90 quadros de intervalo); o KO sempre ganha o seu.
 - **Poeira e pedrinhas** quando um corpo bate no chão (mais forte vindo do alto) e no quique.
 

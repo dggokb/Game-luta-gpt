@@ -8,7 +8,7 @@ package com.gamelutagpt;
  */
 final class ImpactFeel {
     /** Zoom extra por tamanho de golpe (LIGHT, MEDIUM, HEAVY, SPECIAL), punish counter e KO. */
-    static final float[] ZOOM = {0f, 0.012f, 0.035f, 0.05f};
+    static final float[] ZOOM = {0f, 0.012f, 0.025f, 0.05f};
     static final float PUNISH_ZOOM = 0.07f, KO_ZOOM = 0.09f;
     /** Quanto do zoom sobra a cada quadro (volta suave para o enquadramento normal). */
     static final float ZOOM_DECAY = 0.86f;
@@ -39,6 +39,8 @@ final class ImpactFeel {
      * sobra do overscan cobre os cantos que a inclinação descobre.
      */
     static final float CINEMA_ZOOM = 1.45f, CINEMA_OVERSCAN = 1.25f, CINEMA_TILT = 8f;
+    /** Close mais aberto para o H que joga na parede (~1,5× no total, em vez de ~1,8×). */
+    static final float CINEMA_ZOOM_WALL = 1.2f;
     static final int CINEMA_FRAMES = 12;
     static final float CINEMA_SCALE = 0.45f;
     static final int CINEMA_DARK_FROM = 60, CINEMA_DARK_TO = 170;
@@ -53,7 +55,7 @@ final class ImpactFeel {
     private int impactStyle = NONE, impactLeft, impactCooldown, impactSeed;
     private float impactX, impactY;
     private int cinemaFrames, cinemaCooldown;
-    private float cinemaTilt;
+    private float cinemaTilt, cinemaZoom = CINEMA_ZOOM;
 
     void clear() {
         zoom = 0f;
@@ -70,7 +72,13 @@ final class ImpactFeel {
      * a câmera inclina a favor dele. O KO passa por cima do intervalo.
      */
     void cinema(float x, float y, int direction, boolean knockout) {
+        cinema(x, y, direction, knockout, CINEMA_ZOOM);
+    }
+
+    /** Close com o zoom pedido (antes do overscan): {@link #CINEMA_ZOOM} ou {@link #CINEMA_ZOOM_WALL}. */
+    void cinema(float x, float y, int direction, boolean knockout, float zoomLevel) {
         if (cinemaCooldown > 0 && !knockout) return;
+        cinemaZoom = zoomLevel;
         cinemaFrames = CINEMA_FRAMES;
         cinemaCooldown = CINEMA_COOLDOWN;
         cinemaTilt = (direction >= 0 ? 1f : -1f) * CINEMA_TILT;
@@ -149,7 +157,7 @@ final class ImpactFeel {
     int impactSeed() { return impactSeed; }
 
     /** Multiplicador do zoom da câmera (1 = normal). */
-    float zoom() { return cinemaFrames > 0 ? CINEMA_ZOOM : 1f + zoom; }
+    float zoom() { return cinemaFrames > 0 ? cinemaZoom : 1f + zoom; }
 
     /** Ponto do mundo que o soco de câmera segura no mesmo lugar da tela. */
     float focusX() { return focusX; }
