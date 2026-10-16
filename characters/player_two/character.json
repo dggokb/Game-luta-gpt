@@ -367,18 +367,18 @@
       "reach": 148,
       "startupFrames": 10,
       "activeFrames": 5,
-      "recoveryFrames": 37,
-      "hitstunFrames": 18,
-      "blockstunFrames": 11,
+      "recoveryFrames": 17,
+      "hitstunFrames": 26,
+      "blockstunFrames": 19,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
           10,
-          17
+          19
         ],
         "block": [
           10,
-          17
+          19
         ],
         "whiff": null
       },
