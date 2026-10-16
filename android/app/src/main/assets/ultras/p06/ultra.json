@@ -12,23 +12,31 @@
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",
-    "grito": "Afunde comigo."
+    "grito": "Afunde comigo.",
+    "focoPalco": 0.5
   },
   "paineis": {
     "olhos": {
-      "imagem": "olhos.jpg"
+      "imagem": "olhos.jpg",
+      "foco": 0.5
     },
     "carga": {
       "imagem": "carga.jpg",
-      "onomatopeia": "VOOOM"
+      "onomatopeia": "VOOOM",
+      "foco": [
+        0.45,
+        0.5
+      ]
     },
     "golpe": {
       "imagem": "golpe.jpg",
-      "onomatopeia": "GAAH!"
+      "onomatopeia": "GAAH!",
+      "foco": 0.5
     },
     "final": {
       "imagem": "final.jpg",
-      "onomatopeia": "VRAAAAM!"
+      "onomatopeia": "VRAAAAM!",
+      "foco": 0.5
     }
   }
 }
