@@ -69,6 +69,20 @@ public class PunishCounterTest {
         assertFalse(s.d().spinning);
     }
 
+    @Test public void punishAndKnockoutFreezeTheImpactLonger() {
+        Sim plain = new Sim();
+        assertTrue(plain.strike(true));
+        int normal = plain.d().hitstop;
+        Sim punish = new Sim();
+        punish.rivalBusy = true;
+        assertTrue(punish.strike(true));
+        assertEquals(normal + punish.engine.config.punishHitstopBonus, punish.d().hitstop);
+        Sim ko = new Sim();
+        ko.d().state.life = 1;
+        assertTrue(ko.strike(true));
+        assertEquals(normal + ko.engine.config.koHitstopBonus, ko.d().hitstop);
+    }
+
     @Test public void heavyOnAnIdleRivalIsAPlainHit() {
         Sim s = new Sim();
         assertTrue(s.strike(true));

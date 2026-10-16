@@ -109,6 +109,16 @@ public class GameView extends SurfaceView
     private final EffectsRenderer effects = new EffectsRenderer();
     /** Hit and guard sparks at the real contact point (presentation only). */
     private final ImpactEffects impacts = new ImpactEffects();
+    /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
+    private final ImpactFeel feel = new ImpactFeel();
+    private final Random soundRandom = new Random(11);
+    /** Golpe no ar: o golpe de cada lado que já tocou o "vush", e o quadro em que estava. */
+    private final AttackDefinition[] swingAttack = new AttackDefinition[2];
+    private final int[] swingFrame = new int[2];
+    private final boolean[] swingPlayed = new boolean[2];
+    private final boolean[] lyingSeen = new boolean[2];
+    /** Quem já levou o golpe do KO (o clarão e a câmera lenta saem uma vez por nocaute). */
+    private CombatFighter koVictim;
     private final HudRenderer hud = new HudRenderer();
     private final DebugOverlay debug = new DebugOverlay();
     private final HudRenderer.OpponentPanel opponentPanel = new HudRenderer.OpponentPanel();
@@ -885,7 +895,7 @@ public class GameView extends SurfaceView
         // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
         // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
         // pausa, seleção, páginas da história e a Página Final ficam na velocidade normal.
-        float speed = fightClockRunning() ? pausa.velocidade() : 1f;
+        float speed = fightClockRunning() ? pausa.velocidade() * feel.timeScale() : 1f;
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
             // Pediu carregamento: para aqui; o próximo quadro já é a tela de carregamento.
@@ -1116,12 +1126,16 @@ public class GameView extends SurfaceView
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
+        boolean punishNow = engine.cues().contains("PUNISH");
         for (CombatEngine.HitEvent event : engine.events()) {
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
-            spawnImpact(event, ultraHit);
+            CombatFighter hitFighter = engine.fighter(event.defender);
+            boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter;
+            if (knockout) koVictim = hitFighter;
+            spawnImpact(event, ultraHit, punishNow, knockout);
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
                 dummyDamageLabelFrames = DAMAGE_LABEL_FRAMES;
@@ -1138,6 +1152,8 @@ public class GameView extends SurfaceView
         }
         updateUltraBeam();
         impacts.update(FIXED_STEP);
+        feel.step();
+        playMotionSounds();
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
         if (throwBannerFrames > 0) throwBannerFrames--;
 
@@ -1185,6 +1201,8 @@ public class GameView extends SurfaceView
     void startIntro() {
         hud.resetEffects();
         impacts.clear();
+        feel.clear();
+        koVictim = null;
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -1556,8 +1574,11 @@ public class GameView extends SurfaceView
         }
     }
 
-    /** Spark, ring and debris at the contact point; heavier blows also nudge the camera. */
-    private void spawnImpact(CombatEngine.HitEvent event, boolean ultraHit) {
+    /**
+     * Spark, ring and debris at the contact point, the hit sound, and for heavier blows the
+     * camera punch and shake; the KO blow adds the flash and the slow motion.
+     */
+    private void spawnImpact(CombatEngine.HitEvent event, boolean ultraHit, boolean punish, boolean knockout) {
         CombatFighter attacker = engine.fighter(event.attacker), defender = engine.fighter(event.defender);
         float x = event.impactX, y = event.impactY;
         if (Float.isNaN(x) || Float.isNaN(y)) {
@@ -1573,6 +1594,40 @@ public class GameView extends SurfaceView
         impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 7f : 10f);
         else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
+        if (knockout) beamShake = Math.max(beamShake, 18f);
+        if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
+        String sound = event.blocked ? "defesa"
+            : knockout ? "ko"
+            : punish && size >= ImpactEffects.HEAVY ? "punish"
+            : HIT_SOUNDS[Math.max(0, Math.min(HIT_SOUNDS.length - 1, size))];
+        ultraSounds.playFight(sound, knockout ? 1f : 0.85f, 0.94f + soundRandom.nextFloat() * 0.12f);
+    }
+
+    private static final String[] HIT_SOUNDS = {"acerto_l", "acerto_m", "acerto_h", "acerto_s"};
+    private static final String[] SWING_SOUNDS = {"ar_l", "ar_m", "ar_h"};
+
+    /** O "vush" de cada golpe pouco antes de ele bater, e o baque de quem cai no chão. */
+    private void playMotionSounds() {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            if (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL) {
+                if (f.attack != swingAttack[i] || f.attackFrame < swingFrame[i]) swingPlayed[i] = false;
+                swingAttack[i] = f.attack;
+                swingFrame[i] = f.attackFrame;
+                if (!swingPlayed[i] && f.attackFrame >= Math.max(0, f.attack.startupFrames - 2)) {
+                    swingPlayed[i] = true;
+                    int weight = f.attack.strength == AttackDefinition.Strength.LIGHT ? 0
+                        : f.attack.strength == AttackDefinition.Strength.MEDIUM ? 1 : 2;
+                    ultraSounds.playFight(SWING_SOUNDS[weight], 0.5f, 0.92f + soundRandom.nextFloat() * 0.16f);
+                }
+            } else {
+                swingAttack[i] = null;
+            }
+            boolean lying = f.status == CombatFighter.Status.KNOCKDOWN &&
+                f.knockdownFrame >= engine.config.knockdownFallFrames;
+            if (lying && !lyingSeen[i]) ultraSounds.playFight("queda", 0.8f, 0.95f + soundRandom.nextFloat() * 0.1f);
+            lyingSeen[i] = lying;
+        }
     }
 
     private void showBanner(String text) {
@@ -1770,7 +1825,8 @@ public class GameView extends SurfaceView
 
             float cinematicZoom = cinematica.zoom();
             float baseZoom = camera.zoom * superCameraZoom * cinematicZoom;
-            float renderZoom = baseZoom * ultraCameraZoom;
+            float punchZoom = feel.zoom();
+            float renderZoom = baseZoom * ultraCameraZoom * punchZoom;
             float visibleWorldWidth = VW / renderZoom;
             float renderCameraX = camera.x;
             float renderCameraTop = camera.top;
@@ -1798,6 +1854,15 @@ public class GameView extends SurfaceView
                 renderCameraTop = focusY - playerScreenY / renderZoom;
             }
             float cameraLeft = clamp(renderCameraX - visibleWorldWidth / 2f, 0f, WORLD_WIDTH - visibleWorldWidth);
+            if (punchZoom != 1f) {
+                // Soco de câmera: aproxima segurando o ponto do impacto no mesmo lugar da tela.
+                float plainZoom = renderZoom / punchZoom;
+                float plainLeft = clamp(renderCameraX - VW / plainZoom / 2f, 0f, WORLD_WIDTH - VW / plainZoom);
+                float screenX = (feel.focusX() - plainLeft) * plainZoom;
+                float screenY = (feel.focusY() - renderCameraTop) * plainZoom;
+                cameraLeft = clamp(feel.focusX() - screenX / renderZoom, 0f, WORLD_WIDTH - visibleWorldWidth);
+                renderCameraTop = feel.focusY() - screenY / renderZoom;
+            }
             if (beamShake > 0f) {
                 cameraLeft += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
                 renderCameraTop += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
@@ -1816,6 +1881,8 @@ public class GameView extends SurfaceView
             canvas.translate(-cameraLeft, -renderCameraTop);
             if (stageScene == null) drawScenario(canvas);
             drawFloorReflections(canvas);
+            // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
+            effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
             if (beam) {
                 drawUltraBeamOverlay(canvas, false);
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
@@ -1867,6 +1934,7 @@ public class GameView extends SurfaceView
             drawPlayer(canvas);
             canvas.restore();
             impacts.draw(canvas);
+            effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
                 drawUltraBeamOverlay(canvas, true);
@@ -2470,6 +2538,9 @@ public class GameView extends SurfaceView
                              boolean damageFlash, boolean guardFlash) {
         float angle = knockdownAngle(renderer, f);
         c.save();
+        // Quem apanhou treme durante o congelamento do acerto.
+        float shake = ImpactFeel.hitShake(f, engine.frame());
+        if (shake != 0f) c.translate(shake, 0f);
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
         if (f.spinning && !f.grounded) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.

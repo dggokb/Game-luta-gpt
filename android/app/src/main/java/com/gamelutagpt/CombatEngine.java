@@ -2177,7 +2177,10 @@ final class CombatEngine {
             a.strikeJuggled = true;
         }
         if (!d.grounded) session.airCombo = true;
-        freeze(a, d, lastStrike ? attack.hitstopFrames : holdingHitstop(attack), projectile);
+        int stop = lastStrike ? attack.hitstopFrames : holdingHitstop(attack);
+        if (punish) stop += config.punishHitstopBonus;
+        if (d.ko()) stop += config.koHitstopBonus;
+        freeze(a, d, stop, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
     }

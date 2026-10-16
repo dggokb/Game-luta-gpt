@@ -515,3 +515,23 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 - (Fase 10 feita na v0.83: wall bounce e ground bounce.)
 - Os packs usam a hitbox padrão; nenhuma hitbox/hurtbox por frame foi desenhada ainda,
   embora o formato e o motor suportem.
+
+## Peso dos golpes (som, tremida, câmera)
+
+Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
+
+- **Sons de luta** (`assets/sons/luta`, gerados por síntese em `tools/sons/gerar_sons.py`):
+  "vush" do golpe no ar pouco antes de ele bater (leve/médio/pesado), acerto leve/médio/
+  pesado/especial, defesa, queda no chão, punish counter e KO. Cada um toca com o tom
+  variando um pouco, para dois socos seguidos não soarem iguais.
+- **Tremida**: quem apanha treme de um lado para o outro durante o congelamento do acerto
+  (hitstop); na defesa, bem menos (`ImpactFeel.hitShake`).
+- **Soco de câmera**: médio, pesado e especial aproximam a câmera um pouco no ponto do
+  impacto e ela volta sozinha (`ImpactFeel.ZOOM`).
+- **Impact frames**: pesado, especial e punish counter escurecem o cenário por 3–6 quadros,
+  com os lutadores na frente (`ImpactFeel.DARK`).
+- **KO**: o golpe que nocauteia congela mais (`koHitstopBonus`, +16), a tela treme forte,
+  um clarão branco e câmera lenta (~0,7 s de luta a 35%).
+- **Punish counter**: congela +8 quadros (`punishHitstopBonus`).
+
+Testes em `ImpactFeelTest` e `PunishCounterTest`.

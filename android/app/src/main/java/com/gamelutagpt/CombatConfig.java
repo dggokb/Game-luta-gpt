@@ -223,6 +223,9 @@ final class CombatConfig {
      * (início ou recuperação) o joga girando no ar a média distância (~360 px), e ele cai deitado.
      */
     float spinSpeed = 360f;
+    /** Congelamento extra do acerto no punish counter e no golpe que nocauteia (peso do impacto). */
+    int punishHitstopBonus = 8;
+    int koHitstopBonus = 16;
     float spinLift = 820f;
     int spinHitstunFrames = 30;
     int maxGroundBounces = 1;

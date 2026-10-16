@@ -19,6 +19,8 @@ import java.util.Set;
  */
 final class UltraSounds {
     static final String SHARED_FOLDER = "ultras/sons";
+    /** Sons da luta comum (golpe no ar, acerto, defesa, queda, KO): tools/sons/gerar_sons.py. */
+    static final String FIGHT_FOLDER = "sons/luta";
     private static final String TAG = "UltraSounds";
 
     private final AssetManager assets;
@@ -29,13 +31,23 @@ final class UltraSounds {
     UltraSounds(AssetManager assets) {
         this.assets = assets;
         pool = new SoundPool.Builder()
-            .setMaxStreams(6)
+            .setMaxStreams(10)
             .setAudioAttributes(new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build())
             .build();
         loadFolder(SHARED_FOLDER);
+        loadFolder(FIGHT_FOLDER);
+    }
+
+    /**
+     * Som da luta comum. {@code rate} varia um pouco a cada golpe para dois socos seguidos
+     * não soarem iguais.
+     */
+    void playFight(String soundId, float volume, float rate) {
+        Integer sound = loaded.get(FIGHT_FOLDER + "/" + soundId);
+        if (sound != null) pool.play(sound, volume, volume, 1, 0, Math.max(0.5f, Math.min(2f, rate)));
     }
 
     /** Carrega a pasta de sons de um ultra (ex.: "ultras/player1"). */
