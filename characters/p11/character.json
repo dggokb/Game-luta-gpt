@@ -1933,11 +1933,9 @@
       ],
       "animation": "SPECIAL_S2",
       "damage": 880,
-      "reach": 127,
-      "hitHeight": 229,
       "startupFrames": 6,
-      "activeFrames": 8,
-      "recoveryFrames": 22,
+      "activeFrames": 1,
+      "recoveryFrames": 29,
       "hitstunFrames": 39,
       "blockstunFrames": 17,
       "hitstopFrames": 10,
@@ -1952,11 +1950,8 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
-      "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
-      "hitFloor": 119,
       "mecanica": {
         "veneno": {
           "dano": 900,
@@ -1968,7 +1963,30 @@
         "M",
         "H"
       ],
-      "nome": "Seringa"
+      "nome": "Seringa",
+      "projectile": {
+        "visual": "SERINGA",
+        "range": 400,
+        "speed": 650,
+        "spawnX": 90,
+        "spawnY": 160,
+        "vertical": 420,
+        "puddle": {
+          "frames": 180,
+          "halfWidth": 60.0,
+          "damage": 450,
+          "poisonFrames": 150
+        }
+      },
+      "especialBase": {
+        "activeFrames": 8,
+        "recoveryFrames": 22,
+        "reach": 127,
+        "hitHeight": 229,
+        "hitFloor": 119,
+        "launchType": "knockdown",
+        "knockback": 60
+      }
     },
     "S3": {
       "command": [

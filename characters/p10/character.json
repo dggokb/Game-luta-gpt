@@ -2010,7 +2010,8 @@
         "M",
         "H"
       ],
-      "nome": "Jato de vapor"
+      "nome": "Jato de vapor",
+      "efeito": "VAPOR"
     },
     "S3": {
       "command": [

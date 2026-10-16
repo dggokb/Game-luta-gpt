@@ -58,6 +58,19 @@ class MecanicasTest(unittest.TestCase):
                 if 'impactFrame' in anim:
                     self.assertEqual(anim['impactFrame'], shown_at_contact(anim, m), f'{cid}/{key}')
 
+    def test_specials_follow_the_especiais_block(self):
+        for cid, spec in self.data['personagens'].items():
+            pack = json.loads((ROOT / f'characters/{cid}/character.json').read_text(encoding='utf-8'))
+            for key, e in spec.get('especiais', {}).items():
+                m = pack['specialMoves'][key]
+                if 'projetil' in e:
+                    # Lança num quadro só e não tem caixa de golpe: quem acerta é o projétil.
+                    self.assertEqual(1, m['activeFrames'], f'{cid}/{key}')
+                    self.assertNotIn('reach', m, f'{cid}/{key}')
+                    self.assertEqual(e['projetil']['visual'], m['projectile']['visual'], f'{cid}/{key}')
+                self.assertEqual(bool(e.get('baixo')), bool(m.get('low')), f'{cid}/{key}')
+                self.assertEqual(e.get('efeito'), m.get('efeito'), f'{cid}/{key}')
+
     def test_character_numbers(self):
         for cid, spec in self.data['personagens'].items():
             pack = json.loads((ROOT / f'characters/{cid}/character.json').read_text(encoding='utf-8'))

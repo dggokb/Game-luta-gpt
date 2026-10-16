@@ -2220,7 +2220,7 @@
       "animation": "SPECIAL_S4",
       "damage": 1200,
       "reach": 276,
-      "hitHeight": 185,
+      "hitHeight": 70,
       "startupFrames": 12,
       "activeFrames": 18,
       "recoveryFrames": 18,
@@ -2247,7 +2247,12 @@
         "M",
         "H"
       ],
-      "nome": "Chute giratório baixo"
+      "nome": "Chute giratório baixo",
+      "low": true,
+      "especialBase": {
+        "low": null,
+        "hitHeight": 185
+      }
     }
   }
 }

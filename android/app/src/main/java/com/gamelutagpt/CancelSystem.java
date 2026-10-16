@@ -48,7 +48,11 @@ final class CancelSystem {
             case SPECIAL:
                 // Command specials (S2, S3...): ground moves, or air-only ones; the strength names them.
                 CharacterDefinition.Special special = c.specials.get(entry.strength);
-                if (special != null) return special.air != f.grounded ? c.attack(entry.strength) : null;
+                if (special != null) {
+                    // Especial que lança: um projétil por vez, como a energia.
+                    if (special.projectile != null && projectileAlive) return null;
+                    return special.air != f.grounded ? c.attack(entry.strength) : null;
+                }
                 if (projectileAlive || f.state.profile.energy == null) return null;
                 return c.attack("S");
             case SUPER:

@@ -1815,7 +1815,10 @@ public class GameView extends SurfaceView
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
             drawDamageDummy(canvas);
+            float effectTime = engine.frame() * FIXED_STEP;
+            effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
+            for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
             effects.drawSuperProjectiles(canvas, paint, engine.superProjectiles);
             if (isSuperCinematicActive()) {
                 effects.drawWorldOverlay(canvas, paint, superDarkAlpha, 0, 0, 8);
@@ -3369,6 +3372,7 @@ public class GameView extends SurfaceView
                 // último quadro (a IA trocando com a vida baixa) não sai depois.
                 engine.energyProjectiles.clear();
                 engine.superProjectiles.clear();
+                engine.puddles.clear();
                 engine.teams.dropRequests();
             } else {
                 cinematicaDirector.parar();

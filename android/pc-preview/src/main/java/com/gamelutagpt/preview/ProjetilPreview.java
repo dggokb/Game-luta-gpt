@@ -33,6 +33,7 @@ public final class ProjetilPreview {
         {"p09", "Machado", ProjetilVisual.Tipo.MACHADO, 176f, 900f, 0xE0A526, 242f},
         {"p10", "Machadinho", ProjetilVisual.Tipo.MACHADINHO, 150f, 720f, 0x40B070, 229f},
         {"p11", "Bisturi", ProjetilVisual.Tipo.BISTURI, 170f, 900f, 0x60C0D0, 245f},
+        {"p11", "Seringa (S2)", ProjetilVisual.Tipo.SERINGA, 160f, 400f, 0x60C0D0, 245f},
     };
 
     public static void main(String[] args) throws IOException {
@@ -70,7 +71,32 @@ public final class ProjetilPreview {
         }
         gr.dispose();
         ImageIO.write(resumo, "png", new File(out, "resumo.png"));
+        efeitos(out);
         System.out.println("Projéteis gravados em " + out.getAbsolutePath());
+    }
+
+    /** Poça de veneno da seringa (p11) e jato de vapor da p10, em três momentos cada. */
+    private static void efeitos(File out) throws IOException {
+        BufferedImage img = new BufferedImage(W, H, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        Java2DRenderCanvas c = new Java2DRenderCanvas(g, W, H);
+        c.fillVerticalGradient(0f, 0f, W, H, 0xFF1B2030, 0xFF0B0D14);
+        c.fillRect(0f, GROUND, W, H, 0xFF2A2420);
+        c.drawLine(0f, GROUND, W, GROUND, 2f, 0xFF5A4A3A);
+        c.drawText("p11 · poça de veneno (recém-caída, metade, sumindo)", 320f, 34f, 20f, 0xFFFFFFFF, 0xFF000000, 2f, false);
+        float[] vidas = {1f, 0.5f, 0.12f};
+        for (int i = 0; i < 3; i++) {
+            ProjetilVisual.puddle(c, 120f + i * 200f, GROUND, 60f, vidas[i], 0.3f + i * 0.4f, 0xFF60C0D0);
+        }
+        c.drawText("p10 · jato de vapor", 960f, 34f, 20f, 0xFFFFFFFF, 0xFF000000, 2f, false);
+        float[] momentos = {0.15f, 0.45f, 0.85f};
+        for (int i = 0; i < 3; i++) {
+            float x = 720f + i * 190f;
+            c.fillRect(x - 60f, GROUND - 229f, x - 10f, GROUND, 0x60B9C0D0);
+            ProjetilVisual.steam(c, x, GROUND - 160f, 1, momentos[i], 0.2f + i * 0.3f);
+        }
+        g.dispose();
+        ImageIO.write(img, "png", new File(out, "efeitos_poca_vapor.png"));
     }
 
     private static void desenhar(RenderCanvas c, String id, String nome, ProjetilVisual.Tipo tipo, float altura,
