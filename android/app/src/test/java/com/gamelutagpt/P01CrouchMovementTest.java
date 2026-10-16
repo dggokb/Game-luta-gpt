@@ -12,7 +12,7 @@ public class P01CrouchMovementTest {
     @Test public void lowAttacksKeepTheirContactAndAllSourceFrames() {
         String[] moves={"2L","2M","2H"};
         String[] clips={"CROUCH_LIGHT","CROUCH_MEDIUM","CROUCH_HEAVY"};
-        int[][] expected={{2,4,6},{12,4,24},{9,6,14}};
+        int[][] expected={{2,4,6},{12,4,18},{9,6,14}};
         int[] impact={2,6,4};
         for(int i=0;i<moves.length;i++){
             AttackDefinition a=P01.attack(moves[i]);
@@ -41,7 +41,7 @@ public class P01CrouchMovementTest {
     @Test public void crouchMediumShowsAllSixteenPosesAtThirtyFpsWithEitherRenderPhase() {
         CharacterDefinition.Move move=P01.moves.get("2M");
         CharacterDefinition.Animation art=move.animation;
-        assertEquals(40,move.attack.totalFrames);
+        assertEquals(34,move.attack.totalFrames);
         assertEquals(16,art.atlas.count);
         for(int phase=0;phase<2;phase++){
             List<Integer> shown=new ArrayList<>();
