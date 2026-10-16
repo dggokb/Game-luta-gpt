@@ -194,3 +194,54 @@ python tools/stage/montar_dojo.py --entrada pasta/com/as/imagens
   do piso (flor de cerejeira). Para corrigir, gere o `pilar.png` de novo pedindo "o mesmo
   brasão das outras imagens: flor de cerejeira de cinco pétalas dentro de um círculo".
 
+
+## Prompts do Dojo da Yin-Lu (連武館)
+
+Terceiro cenário (`dojo_yinlu`), baseado nas duas páginas de mangá da Yin-Lu. Ao contrário
+do Shūshinkan, a luta é **ao ar livre, de dia**, no pátio de pedra em frente ao dojo: ao
+fundo o portão de madeira do 連武館 com duas lanternas de papel (página 1), muros de reboco
+branco com telhado de telhas escuras, árvores atrás dos muros e, bem longe, os arranha-céus
+da cidade (página 2). Mais perto ficam os terraços e degraus de pedra, os pilares vermelhos
+com o estandarte bordô da lótus e, na frente dos lutadores, pedras e degraus quebrados
+(o canto de baixo da página 1). As folhas verdes caindo da página 1 são as `petalas` do
+jogo, em verde.
+
+Regra geral: cole antes de cada prompt. No ChatGPT, anexe as duas páginas e diga "use as
+imagens anexadas só como referência de estilo, clima e arquitetura".
+
+```
+Arte de cenário para jogo de luta 2D em estilo anime, mesmo traço de um mangá de luta
+moderno (estilo SNK / King of Fighters), dia ensolarado de céu azul com nuvens brancas,
+luz do sol quente vindo da esquerda, sombras suaves, cores vivas e saturadas, contorno
+limpo e sombreamento em cel-shading. Arquitetura de dojo tradicional chinês de madeira
+escura, telhas cinza-azuladas, paredes de reboco branco e pedra cinza-clara. Sem
+personagens, sem pessoas, sem animais, sem texto, sem marca d'água.
+```
+
+O **emblema do dojo** aparece nas lanternas, no estandarte e no piso. Use sempre a mesma
+descrição: "o mesmo emblema da referência: uma flor de lótus estilizada de oito pétalas
+dentro de um círculo".
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `ceu.jpg` | horizontal | opaco | Céu diurno de verão: azul intenso no topo clareando para azul-claro perto do horizonte, grandes nuvens cúmulos brancas e fofas na metade de baixo, algumas nuvens finas no alto. Só o céu: sem prédios, sem montanhas, sem árvores, sem chão, sem sol visível. |
+| `montanhas.png` | horizontal | **transparente** | Silhueta de morros distantes cobertos de floresta, azul-esverdeado claro e desbotado pela distância, com névoa clara no pé, ocupando só a metade de baixo da imagem. As bordas esquerda e direita continuam no mesmo nível, para a imagem poder se repetir. |
+| `cidade.png` | horizontal | **transparente** | Skyline distante de uma metrópole moderna asiática: arranha-céus de vidro de alturas variadas, azul-acinzentados e desbotados pela distância, alguns guindastes. Prédios mais altos nas pontas e mais baixos no centro (o centro fica atrás do portão). A base é uma linha reta embaixo. Sem céu: tudo acima dos prédios é transparente. |
+| `arvores.png` | horizontal | **transparente** | Faixa contínua de copas de árvores vista de frente: pinheiros orientais e árvores frondosas de folhas verde-vivo iluminadas pelo sol da esquerda, alturas variadas. A base é uma faixa reta e densa de folhagem, sem troncos. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `portao.png` | horizontal | **transparente** | Portão de entrada de um dojo tradicional chinês, vista **exatamente de frente** e simétrica, sem perspectiva: portal de madeira escura com telhado de telhas cinza-azuladas de beirais curvos, duas portas grossas de madeira com cravos de ferro abertas, mostrando lá dentro um pátio de pedra e o salão principal do dojo. Acima das portas, uma placa de madeira horizontal com os ideogramas **連武館** entalhados em dourado. Nos dois lados, uma lanterna de papel cilíndrica cor de pêssego pendurada, com o emblema do dojo em vermelho. Base de pedra reta embaixo. Só o portão, sem muros dos lados e sem piso na frente. Fundo transparente. |
+| `muro.png` | horizontal | **transparente** | Trecho de muro de dojo, vista frontal, em linha reta: paredes de reboco branco divididas em painéis por postes de madeira escura, base de blocos de pedra cinza-clara, coberto no alto por um telhadinho de telhas cinza-azuladas com beiral. Base reta embaixo. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `terraco.png` | horizontal | **transparente** | Borda de um terraço de pedra de templo, vista frontal, em linha reta: balaustrada baixa de pedra cinza-clara com colunas quadradas e corrimão de pedra, sobre um muro de arrimo de blocos de pedra com três degraus largos embaixo, tufos de grama e arbustos verdes nas juntas. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `pilar.png` | **vertical** | **transparente** | Vista frontal de um pilar redondo de madeira laqueada vermelha, alto, à esquerda da imagem, sobre uma base de pedra quadrada, com um pedaço de viga escura e telhas no topo. Pendurado na viga, ao lado do pilar, um estandarte comprido de tecido bordô com o emblema do dojo em branco. À direita, uma lanterna de papel cor de pêssego pendurada, com o emblema do dojo em vermelho. O pilar toca a borda de baixo da imagem. Fundo transparente. |
+| `lanterna_pedra.png` | **vertical** | **transparente** | Lanterna de pedra tradicional de granito cinza, vista de frente, sobre uma base de pedra, com o compartimento de luz aberto e **vazio, sem chama** (o jogo desenha a luz), musgo verde nas bordas, ao lado de duas pedras arredondadas e um arbusto baixo. A base toca a borda de baixo. Fundo transparente. |
+| `frente.png` | horizontal | **transparente** | Primeiro plano do pátio de um dojo, muito perto da câmera, só nos cantos de baixo da imagem: à esquerda, blocos de pedra quebrados e um pedaço de degrau de pedra rachado; à direita, uma pedra grande arredondada com um arbusto. Todo o meio da imagem é transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de pátio de dojo visto **exatamente de cima** (vista ortográfica, sem perspectiva): grandes lajotas retangulares de pedra cinza-bege, gastas pelo uso, todas do mesmo tamanho, em fileiras retas, com juntas escuras finas e um pouco de musgo nas juntas. No centro, um grande círculo de pedra mais clara com o emblema do dojo entalhado em baixo-relevo. Iluminação uniforme, sem sombras de objetos. As bordas esquerda e direita continuam o padrão das lajotas. |
+| `chao_lajotas.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o círculo e sem o emblema do centro, com as lajotas continuando no lugar deles". Assim as lajotas saem do mesmo tamanho nas duas imagens. |
+
+Dicas do dojo da Yin-Lu:
+- A placa com **連武館** é a única exceção ao "sem texto". Se os ideogramas vierem errados,
+  gere de novo; se insistir no erro, peça a placa lisa e o texto é aplicado depois.
+- O `portao.png` precisa vir de frente e sem piso: o portão da página 1 está em ângulo, mas
+  no cenário ele fica no fundo, encarando a câmera.
+- O `frente.png` pode vir nítido: o desfoque é aplicado na preparação, como no Shūshinkan.
+- O brilho das lanternas, a neblina clara da distância e as folhas caindo são feitos pelo
+  jogo. Não precisa pôr na arte.
