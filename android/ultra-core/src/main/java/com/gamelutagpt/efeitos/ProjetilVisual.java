@@ -35,7 +35,9 @@ public final class ProjetilVisual {
         /** p10: machadinha girando rápido. */
         MACHADINHO,
         /** p11: lâmina prateada fina e muito rápida. */
-        BISTURI
+        BISTURI,
+        /** p11 (S2): seringa com veneno verde, cai em diagonal no chão. */
+        SERINGA
     }
 
     private static final int WHITE = 0xFFFFFFFF;
@@ -73,6 +75,7 @@ public final class ProjetilVisual {
             case MACHADO: axe(c, travelled, accent); break;
             case MACHADINHO: hatchet(c, travelled); break;
             case BISTURI: scalpel(c, travelled, time); break;
+            case SERINGA: syringe(c, time); break;
             default: break;
         }
         c.restore();
@@ -206,6 +209,76 @@ public final class ProjetilVisual {
         c.drawLine(22f, 0f, 4f, -3.2f, 1.2f, WHITE);
         float glint = 5f + 3f * (float)Math.abs(Math.sin(time * 18f + travelled * 0.05f));
         c.fillPolygon(star(4, glint, glint * 0.22f, 45f, 22f, 0f), WHITE);
+    }
+
+    /** Seringa: corpo de vidro com o veneno verde, êmbolo atrás e a agulha na frente. */
+    private static void syringe(RenderCanvas c, float time) {
+        for (int i = 0; i < 4; i++) {
+            float x0 = -24f - i * 10f;
+            c.drawLine(x0, 0f, x0 - 10f, 0f, 1.4f, alpha(0xFF7CFF6A, 150 - i * 35));
+        }
+        c.fillRect(-14f, -4.5f, 8f, 4.5f, 0xC0E8F4F0);
+        c.fillRect(-12f, -3.2f, 6f, 3.2f, 0xFF4CD43A);
+        c.fillRadialGlow(-3f, 0f, 14f, 0x707CFF6A);
+        for (int i = 0; i < 4; i++) c.drawLine(-9f + i * 4.5f, -4.5f, -9f + i * 4.5f, -2f, 1f, 0xFF2A5A30);
+        c.strokePolygon(new float[] {-14f, -4.5f, 8f, -4.5f, 8f, 4.5f, -14f, 4.5f}, 1.2f, 0xFFB8C2D0);
+        c.fillRect(-20f, -1.4f, -14f, 1.4f, 0xFFB8C2D0);
+        c.fillRect(-23f, -5f, -20f, 5f, 0xFF8A929C);
+        c.fillRect(8f, -2.2f, 11f, 2.2f, 0xFF8A929C);
+        c.drawLine(11f, 0f, 24f, 0f, 1.2f, SILVER);
+        float drop = 1.6f + 0.6f * (float)Math.abs(Math.sin(time * 14f));
+        c.fillCircle(25f, 0f, drop, 0xFF7CFF6A);
+    }
+
+    /**
+     * Poça de veneno no chão (y é o chão): mancha verde rasa que borbulha e encolhe ao sumir.
+     *
+     * @param life quanto resta da poça (1 recém-caída, 0 sumindo)
+     */
+    public static void puddle(RenderCanvas c, float x, float groundY, float halfWidth, float life, float time,
+                              int accent) {
+        float w = halfWidth * (0.55f + 0.45f * Math.min(1f, life * 3f));
+        int a = (int)(235f * Math.min(1f, life * 4f));
+        c.fillRadialGlow(x, groundY - 6f, w * 1.3f, alpha(0xFF5CFF4A, a / 3));
+        c.fillOval(x - w, groundY - 9f, x + w, groundY + 5f, alpha(0xFF1E6A1E, a));
+        c.fillOval(x - w * 0.8f, groundY - 7f, x + w * 0.75f, groundY + 2f, alpha(0xFF3FBF34, a));
+        c.fillOval(x - w * 0.45f, groundY - 6f, x + w * 0.2f, groundY - 2f, alpha(0xFFA8FF9A, a * 2 / 3));
+        for (int i = 0; i < 4; i++) {
+            float t = (time * 0.9f + i * 0.27f) % 1f;
+            float bx = x + w * 0.7f * (float)Math.sin(i * 2.3f + 1f);
+            float by = groundY - 6f - t * 26f;
+            c.strokeCircle(bx, by, 2f + 3f * t, 1.3f, alpha(0xFF8CFF7A, (int)(a * (1f - t))));
+        }
+        c.drawLine(x - w * 0.6f, groundY - 1f, x + w * 0.6f, groundY - 1f, 1.5f, alpha(accent, a / 3));
+    }
+
+    /**
+     * Jato de vapor saindo da palma em diagonal para cima e para a frente (S2 da p10): nuvens
+     * brancas que sobem pelo jato, crescem e se desfazem.
+     *
+     * @param progress 0 quando a palma abre, 1 quando o jato termina de se desfazer
+     */
+    public static void steam(RenderCanvas c, float x, float y, int direction, float progress, float time) {
+        float grow = Math.min(1f, progress * 3f);
+        float fade = progress < 0.6f ? 1f : Math.max(0f, 1f - (progress - 0.6f) / 0.4f);
+        float length = 190f * grow;
+        c.save();
+        c.translate(x, y);
+        if (direction < 0) c.scale(-1f, 1f, 0f, 0f);
+        c.rotate(-50f, 0f, 0f);
+        c.fillRadialGlow(length * 0.4f, 0f, length * 0.6f + 10f, alpha(0xFFE8F4FF, (int)(110 * fade)));
+        for (int i = 0; i < 9; i++) {
+            float t = ((time * 2.2f + i / 9f) % 1f) * grow;
+            float px = length * t;
+            float r = 8f + 26f * t;
+            float sway = 6f * (float)Math.sin(time * 9f + i * 1.7f) * t;
+            int a = (int)(210f * (1f - t * 0.75f) * fade);
+            c.fillCircle(px, sway, r, alpha(i % 3 == 0 ? 0xFFFFFFFF : 0xFFD8E6F0, a));
+        }
+        for (int k = -1; k <= 1; k++) {
+            c.drawLine(4f, k * 4f, length * 0.85f, k * 14f, 2f, alpha(WHITE, (int)(150 * fade)));
+        }
+        c.restore();
     }
 
     // ------------------------------------------------------------ armas que giram

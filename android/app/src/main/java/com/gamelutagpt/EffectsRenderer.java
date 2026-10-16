@@ -49,10 +49,40 @@ final class EffectsRenderer {
                 ProjetilVisual.Tipo tipo = ProjetilVisual.Tipo.valueOf(p.visual);
                 // A sombra se desenha a partir do chão; o projétil dela voa rente, logo acima.
                 float y = tipo == ProjetilVisual.Tipo.SOMBRA ? Arena.GROUND_Y : p.y;
+                // Em diagonal (shuriken, seringa): o desenho aponta para onde ele vai.
+                float tilt = p.vy == 0f ? 0f : (float)Math.toDegrees(Math.atan2(p.vy, p.speed)) * p.direction;
+                if (tilt != 0f) {
+                    rc.save();
+                    rc.rotate(tilt, p.x, y);
+                }
                 ProjetilVisual.draw(rc, tipo, p.x, y, p.direction,
                     p.startX, p.range, time, p.color);
+                if (tilt != 0f) rc.restore();
             }
         }
+    }
+
+    /** Poças de veneno no chão (seringa da p11). */
+    void drawPuddles(RenderCanvas rc, List<Puddle> puddles, float time) {
+        for (Puddle pd : puddles) {
+            ProjetilVisual.puddle(rc, pd.x, Arena.GROUND_Y, pd.halfWidth, pd.life(), time, pd.color);
+        }
+    }
+
+    /**
+     * Efeito do especial enquanto ele sai (o vapor da palma da p10): da preparação até um
+     * pouco depois dos quadros ativos, saindo da mão (frente do alcance, na altura do golpe).
+     */
+    void drawSpecialEffect(RenderCanvas rc, CombatFighter f, float time) {
+        if (!f.attacking() || f.attack == null) return;
+        CharacterDefinition.Special special = f.character().specials.get(f.attack.id);
+        if (special == null || !"VAPOR".equals(special.effect)) return;
+        int start = f.attack.startupFrames - 1;
+        float progress = (f.attackFrame - start) / (float)(f.attack.activeFrames + 14);
+        if (progress < 0f || progress > 1f) return;
+        float handX = f.x + f.facing * f.attack.reach * 0.55f;
+        float handY = f.y - f.attack.hitHeight * 0.85f;
+        ProjetilVisual.steam(rc, handX, handY, f.facing, progress, time);
     }
 
     void drawSuperProjectiles(Canvas c, Paint paint, List<Projectile> projectiles) {

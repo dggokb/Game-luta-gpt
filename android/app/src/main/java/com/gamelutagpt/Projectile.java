@@ -1,11 +1,15 @@
 package com.gamelutagpt;
 
-/** Energy or Super projectile in flight; owned and moved by the CombatEngine. */
+/** Energy, special or Super projectile in flight; owned and moved by the CombatEngine. */
 final class Projectile {
     float x;
     /** Position before the last advance, for the swept hit test. */
     float previousX;
-    final float y;
+    float y;
+    /** Velocidade vertical (projétil de especial em diagonal): negativa sobe, positiva desce. */
+    float vy;
+    /** Poça que fica onde ele cai (seringa da p11); null: some no chão. */
+    CharacterDefinition.Projectile puddle;
     final float startX;
     final float range;
     final float speed;
@@ -16,7 +20,7 @@ final class Projectile {
     final int direction;
     /** S or SUPER definition of the thrower: stun, hitstop and pushback of the hit. */
     final AttackDefinition attack;
-    /** Desenho do S1 (nome de ProjetilVisual.Tipo), ou null para a bola de energia padrão. */
+    /** Desenho (nome de ProjetilVisual.Tipo), ou null para a bola de energia padrão. */
     final String visual;
     /** O chicote já esticou e volta para a mão: não acerta mais. */
     boolean returning;

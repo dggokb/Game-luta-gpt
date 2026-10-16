@@ -194,6 +194,16 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['fighter']['energy'].update(visual='LASER'))
         with self.assertRaisesRegex(ValueError,'energy.visual'):pipeline.build(self.root)
 
+    def test_special_projectile_needs_a_known_drawing_and_no_strike_box(self):
+        def throw(d):
+            s2=d['specialMoves']['S2']
+            for k in ('reach','hitHeight','hitFloor'): s2.pop(k,None)
+            s2['recoveryFrames']+=s2['activeFrames']-1;s2['activeFrames']=1
+            for k in ('hitboxes',): s2.pop(k,None)
+            s2['projectile']={'visual':'LASER','range':400,'speed':600,'spawnX':80,'spawnY':120,'vertical':0}
+        self.edit(throw)
+        with self.assertRaisesRegex(ValueError,'projectile.visual'):pipeline.build(self.root)
+
     def test_pushbox_must_fit_inside_hurtbox(self):
         self.edit(lambda d:d['fighter']['body'].update(pushHalfWidth=80))
         with self.assertRaisesRegex(ValueError,'pushbox'):pipeline.build(self.root)

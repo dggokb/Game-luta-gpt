@@ -8,13 +8,17 @@ import harmony
 class SpriteHarmonyTests(unittest.TestCase):
     """Shipped atlases must animate without jumps, floating feet or size pops."""
 
+    @classmethod
+    def setUpClass(cls):
+        # The audit decodes every shipped atlas (minutes); both tests read the same result.
+        cls.rows, cls.problems = harmony.audit()
+
     def test_checked_in_packs_are_harmonious(self):
-        rows, problems = harmony.audit()
-        self.assertTrue(rows)
-        self.assertEqual([], problems)
+        self.assertTrue(self.rows)
+        self.assertEqual([], self.problems)
 
     def test_reaction_poses_match_idle_body_size(self):
-        rows, _ = harmony.audit()
+        rows = self.rows
         idle = [r['height'] for r in rows if r['character'] == 'player_base' and r['state'] == 'IDLE']
         defense = [r['height'] for r in rows if r['character'] == 'player_base' and r['state'] == 'DEFENSE_STAND']
         self.assertGreater(defense[0] / (sum(idle) / len(idle)), harmony.REACTION_MIN_RATIO)

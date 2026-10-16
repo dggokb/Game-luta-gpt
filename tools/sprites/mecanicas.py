@@ -179,7 +179,7 @@ def commands(pack, spec):
 
 
 VISUALS = ('ONDA', 'ONDA_CURTA', 'PALMA', 'ESTOURO', 'KUNAI', 'SHURIKEN', 'SOMBRA', 'CHICOTE', 'MACHADO',
-           'MACHADINHO', 'BISTURI')
+           'MACHADINHO', 'BISTURI', 'SERINGA')
 RENTE = 14        # altura da saída do projétil rente ao chão (px acima do pé)
 MELEE_ACTIVE = 4  # quadros ativos do S1 corpo a corpo (o projétil tem 1)
 MELEE_KEYS = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback', 'low')
@@ -225,6 +225,61 @@ def s1(pack, spec):
         if s['visual'] not in VISUALS:
             raise SystemExit(f"s1.visual {s['visual']}: um de {VISUALS}")
         energy['visual'] = s['visual']
+
+
+EFEITOS = ('VAPOR',)   # efeito desenhado durante o especial (ProjetilVisual)
+SPECIAL_MELEE = ('reach', 'hitHeight', 'hitFloor', 'launchType', 'knockback')
+
+
+def restore_special(m):
+    """Desfaz o bloco "especiais" gravado antes (refazer dá sempre o mesmo resultado)."""
+    for key, value in m.pop('especialBase', {}).items():
+        if value is None:
+            m.pop(key, None)
+        else:
+            m[key] = value
+    m.pop('projectile', None)
+    m.pop('efeito', None)
+
+
+def especiais(pack, spec):
+    """Ajustes dos especiais S2 a S4 (bloco "especiais"): baixo (defende só agachado), altura, projetil
+    (lança em vez de bater: desenho, alcance, velocidade, saída, vertical e a poça de veneno
+    onde cai) e efeito (desenhado durante o golpe). Guarda o que mudou em "especialBase"."""
+    specials = pack.get('specialMoves', {})
+    for key, e in spec.get('especiais', {}).items():
+        m = specials[key]
+        base = {}
+        if e.get('baixo'):
+            base['low'] = m.get('low')
+            m['low'] = True
+        if 'altura' in e:   # altura do golpe (o chute baixo pega a canela)
+            base['hitHeight'] = m.get('hitHeight')
+            m['hitHeight'] = e['altura']
+        p = e.get('projetil')
+        if p:
+            if p['visual'] not in VISUALS:
+                raise SystemExit(f"especiais.{key}.projetil.visual {p['visual']}: um de {VISUALS}")
+            for k in ('activeFrames', 'recoveryFrames') + SPECIAL_MELEE:
+                base[k] = m.get(k)
+            # Lança num quadro só (como o S1); o resto do tempo ativo vira recuperação.
+            m['recoveryFrames'] += m['activeFrames'] - 1
+            m['activeFrames'] = 1
+            for k in SPECIAL_MELEE:
+                m.pop(k, None)
+            proj = {'visual': p['visual'], 'range': p['alcance'], 'speed': p['velocidade'],
+                    'spawnX': p['saidaX'], 'spawnY': p['saidaY'], 'vertical': p.get('vertical', 0)}
+            if 'poca' in p:
+                q = p['poca']
+                proj['puddle'] = {'frames': q['frames'], 'halfWidth': q['largura'] / 2,
+                                  'damage': q['veneno'], 'poisonFrames': q['venenoFrames']}
+            m['projectile'] = proj
+        if 'efeito' in e:
+            if e['efeito'] not in EFEITOS:
+                raise SystemExit(f"especiais.{key}.efeito {e['efeito']}: um de {EFEITOS}")
+            m['efeito'] = e['efeito']
+        if base:
+            m['especialBase'] = base
 
 
 def strike_frames(anim, total, startup, pancadas):
@@ -303,6 +358,8 @@ def apply(cid, spec, base):
     fighter, report = pack['fighter'], []
     for m in list(pack['moves'].values()) + list(pack.get('specialMoves', {}).values()):
         restore(m)
+    for m in pack.get('specialMoves', {}).values():
+        restore_special(m)
     sup = fighter['super']['attack']
     restore(sup)
     restore_s1(fighter['energy']['attack'])
@@ -336,6 +393,7 @@ def apply(cid, spec, base):
     unique(pack, spec)
     commands(pack, spec)
     s1(pack, spec)
+    especiais(pack, spec)
     hits = json.loads(PANCADAS.read_text(encoding='utf-8'))['personagens'].get(cid, {})
     specials = pack.get('specialMoves', {})
     for key, h in hits.items():

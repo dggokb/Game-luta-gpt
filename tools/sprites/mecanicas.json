@@ -1,5 +1,5 @@
 {
-  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco).",
+  "_doc": "Mecânicas por personagem (docs/personagens/mecanicas.md). Aplicar: python3 tools/sprites/mecanicas.py --write e depois build_characters.py --write. ritmo multiplica o tempo dos golpes (1,3 = 30% mais lentos), dano multiplica o dano base. Alcance e caixas não mudam aqui: vêm do AJUSTAR CAIXAS. comandos: S1 a S4 de cada um em setas, com o personagem virado para a direita (\"[←] →\" = segura ← e aperta →; noAr = só sai no ar); docs/personagens/comandos.md. s1: o desenho do projétil (visual: ONDA, ONDA_CURTA, PALMA, ESTOURO, KUNAI, SOMBRA, CHICOTE, MACHADO, MACHADINHO, BISTURI; baixo = defende só agachado; rente = sai no chão) ou corpoACorpo (sem projétil: alcance, altura, piso = base da caixa, derruba, empurrao, avanco). especiais: ajustes de S2 a S4 (baixo; altura do golpe; projetil = lança em vez de bater: visual, alcance, velocidade, saidaX, saidaY, vertical negativa sobe e positiva desce, poca = poça de veneno onde cai; efeito: VAPOR).",
   "base": {
     "frames": {
       "L": [3, 3, 7],
@@ -301,6 +301,18 @@
       },
       "s1": {
         "visual": "KUNAI"
+      },
+      "especiais": {
+        "S2": {
+          "projetil": {
+            "visual": "SHURIKEN",
+            "alcance": 650,
+            "velocidade": 950,
+            "saidaX": 95,
+            "saidaY": 130,
+            "vertical": -420
+          }
+        }
       }
     },
     "p06": {
@@ -408,6 +420,12 @@
           "piso": 62,
           "derruba": true,
           "empurrao": 100
+        }
+      },
+      "especiais": {
+        "S4": {
+          "baixo": true,
+          "altura": 70
         }
       }
     },
@@ -561,6 +579,11 @@
       },
       "s1": {
         "visual": "MACHADINHO"
+      },
+      "especiais": {
+        "S2": {
+          "efeito": "VAPOR"
+        }
       }
     },
     "p11": {
@@ -619,6 +642,24 @@
       },
       "s1": {
         "visual": "BISTURI"
+      },
+      "especiais": {
+        "S2": {
+          "projetil": {
+            "visual": "SERINGA",
+            "alcance": 400,
+            "velocidade": 650,
+            "saidaX": 90,
+            "saidaY": 160,
+            "vertical": 420,
+            "poca": {
+              "frames": 180,
+              "largura": 120,
+              "veneno": 450,
+              "venenoFrames": 150
+            }
+          }
+        }
       }
     },
     "p12": {

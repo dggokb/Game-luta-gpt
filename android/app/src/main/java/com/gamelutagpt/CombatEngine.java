@@ -79,6 +79,8 @@ final class CombatEngine {
     final TeamSystem teams;
     final List<Projectile> energyProjectiles = new ArrayList<>();
     final List<Projectile> superProjectiles = new ArrayList<>();
+    /** Poças de veneno no chão (seringa da p11). */
+    final List<Puddle> puddles = new ArrayList<>();
     /** Shadow copies of moves (p06's echo) waiting or playing. */
     final List<Echo> echoes = new ArrayList<>();
     /** Henchmen called by a Super (p07): they run in, strike once and run off. */
@@ -205,6 +207,7 @@ final class CombatEngine {
         }
         energyProjectiles.clear();
         superProjectiles.clear();
+        puddles.clear();
         echoes.clear();
         henchmen.clear();
         events.clear();
@@ -1364,10 +1367,14 @@ final class CombatEngine {
             callHenchmen(f);
             return;
         }
-        CharacterDefinition.Projectile data = superKind ? profile.superAttack : profile.energy;
+        // Especial que lança (shuriken do p05, seringa da p11): o projétil vem do especial.
+        CharacterDefinition.Special special = superKind ? null : f.character().specials.get(f.attack.id);
+        CharacterDefinition.Projectile data = superKind ? profile.superAttack
+            : special != null && special.projectile != null ? special.projectile : profile.energy;
+        boolean energy = !superKind && data == profile.energy;
         float speed = data.speed;
         int damage = data.damage;
-        if (!superKind) {
+        if (energy) {
             if ("L".equals(f.specialStrength)) {
                 speed *= 0.65f;
                 damage = Math.round(damage * 0.60f);
@@ -1378,7 +1385,7 @@ final class CombatEngine {
         }
         float radius = superKind ? 58f : 24f;
         float range = data.range;
-        if (!superKind && f.charge > 0) {
+        if (energy && f.charge > 0) {
             // Charged shot: bigger, faster, further and harder, up to the full charge.
             AttackDefinition.Mechanics m = f.attack.mechanics;
             float full = Math.min(1f, f.charge / (float)Math.max(1, m.chargeFrames));
@@ -1393,7 +1400,10 @@ final class CombatEngine {
         float base = !superKind && f.attack.low ? Arena.GROUND_Y : f.y;
         Projectile p = new Projectile(
             f.x + f.facing * data.spawnX, base - height, range, speed,
-            radius, damage, profile.color, f.index, f.facing, f.attack, superKind ? null : profile.energyVisual);
+            radius, damage, profile.color, f.index, f.facing, f.attack,
+            superKind ? null : energy ? profile.energyVisual : data.visual);
+        p.vy = data.vertical;
+        if (data.puddleFrames > 0) p.puddle = data;
         (superKind ? superProjectiles : energyProjectiles).add(p);
     }
 
@@ -1404,12 +1414,42 @@ final class CombatEngine {
         }
         moveProjectiles(energyProjectiles, 120f);
         moveProjectiles(superProjectiles, 180f);
+        advancePuddles();
+    }
+
+    /** Quem pisa numa poça sem estar envenenado fica envenenado; a poça some com o tempo. */
+    private void advancePuddles() {
+        Iterator<Puddle> it = puddles.iterator();
+        while (it.hasNext()) {
+            Puddle pd = it.next();
+            if (--pd.framesLeft <= 0) {
+                it.remove();
+                continue;
+            }
+            CombatFighter d = fighters[1 - pd.ownerIndex];
+            if (d.grounded && d.hittable() && !d.state.poisoned() &&
+                Math.abs(d.x - pd.x) <= pd.halfWidth + d.body().halfWidth) {
+                d.state.poison(pd.poisonDamage, pd.poisonFrames);
+                cues.add("POISON");
+            }
+        }
+    }
+
+    /** O projétil que cai (seringa) chega ao chão: vira poça (uma por dono) ou some. */
+    private void land(Projectile p) {
+        if (p.puddle == null) return;
+        for (Iterator<Puddle> it = puddles.iterator(); it.hasNext();) {
+            if (it.next().ownerIndex == p.ownerIndex) it.remove();
+        }
+        CharacterDefinition.Projectile d = p.puddle;
+        puddles.add(new Puddle(p.x, d.puddleHalfWidth, p.ownerIndex, p.color, d.puddleFrames,
+            d.puddleDamage, d.puddlePoisonFrames));
     }
 
     /** Velocidade da volta do chicote, em vezes a da ida. */
     private static final float RETRACT_SPEED = 1.6f;
 
-    private static void moveProjectiles(List<Projectile> projectiles, float margin) {
+    private void moveProjectiles(List<Projectile> projectiles, float margin) {
         Iterator<Projectile> it = projectiles.iterator();
         while (it.hasNext()) {
             Projectile p = it.next();
@@ -1421,6 +1461,19 @@ final class CombatEngine {
                 continue;
             }
             p.x += p.speed * p.direction * CombatConfig.DT;
+            if (p.vy != 0f) {
+                p.y += p.vy * CombatConfig.DT;
+                if (p.y >= Arena.GROUND_Y) {
+                    p.y = Arena.GROUND_Y;
+                    land(p);
+                    it.remove();
+                    continue;
+                }
+                if (p.y < Arena.GROUND_Y - 1200f) {
+                    it.remove();
+                    continue;
+                }
+            }
             if (Math.abs(p.x - p.startX) >= p.range && p.retracts()) {
                 p.x = p.startX + p.direction * p.range;
                 p.returning = true;

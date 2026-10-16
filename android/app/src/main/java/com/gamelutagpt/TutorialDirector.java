@@ -87,8 +87,10 @@ final class TutorialDirector {
             lastAttack = p.attacking() ? p.attack : null;
             lastAttackFrame = p.attackFrame;
             for (CombatEngine.HitEvent e : engine.events()) {
-                if (e.attacker == 0 && !e.projectile && p.attacking() && p.attack != null &&
-                    p.attack.id.equals(e.moveId)) {
+                if (e.attacker != 0) continue;
+                // O especial que lança (shuriken, seringa) acerta pelo projétil, depois de o golpe acabar.
+                boolean thrown = e.projectile && p.character().specials.containsKey(e.moveId);
+                if (thrown || !e.projectile && p.attacking() && p.attack != null && p.attack.id.equals(e.moveId)) {
                     landed = e.moveId;
                 }
             }
@@ -237,7 +239,9 @@ final class TutorialDirector {
             String buttons = special.buttons;
             String button = buttons.substring(0, 1);
             boolean hold = special.hold, air = special.air;
-            out.add(new Lesson("ESPECIAL " + id, commandText(command, hold, air) + " + " + orList(buttons), 1, true, close, null,
+            // O que lança treina a meia distância, como a energia.
+            Setup where = special.projectile != null ? c -> c.placeApart(160f) : close;
+            out.add(new Lesson("ESPECIAL " + id, commandText(command, hold, air) + " + " + orList(buttons), 1, true, where, null,
                 c -> c.landed(id),
                 (c, p1) -> special(c, p1, command, hold, air, button)));
         }

@@ -115,6 +115,26 @@ final class CharacterDefinition {
             this.name=name;this.hold=hold;this.air=air;
             this.steps=MotionParser.requiredSteps(command);
         }
+        /** Projétil que o especial lança no fim da preparação (null: golpe corpo a corpo). */
+        Projectile projectile;
+        /** Efeito desenhado durante o golpe ("VAPOR"); null: nenhum. */
+        String effect;
+        /**
+         * O especial lança um projétil: desenho (ProjetilVisual.Tipo), alcance e velocidade na
+         * horizontal, saída (frente, altura) e velocidade vertical (negativa sobe, positiva desce).
+         */
+        Special withProjectile(String visual,float range,float speed,float spawnX,float spawnY,float vertical) {
+            projectile=new Projectile(move.attack,range,speed,spawnX,spawnY,spawnY,spawnY);
+            projectile.visual=visual;projectile.vertical=vertical;
+            return this;
+        }
+        /** Ao cair no chão, o projétil vira uma poça de veneno: quadros, meia largura e o veneno de quem pisa. */
+        Special withPuddle(int frames,float halfWidth,int damage,int poisonFrames) {
+            projectile.puddleFrames=frames;projectile.puddleHalfWidth=halfWidth;
+            projectile.puddleDamage=damage;projectile.puddlePoisonFrames=poisonFrames;
+            return this;
+        }
+        Special withEffect(String name) { effect=name; return this; }
         int commandLength() { return command.length; }
         /** The motion, in relative directions (tutorial text and examples). */
         int[] command() { return command.clone(); }
@@ -134,6 +154,12 @@ final class CharacterDefinition {
             this.attack=attack;this.damage=attack.damage;this.range=range;this.speed=speed;
             this.spawnX=spawnX;this.spawnY=spawnY;this.crouchSpawnY=crouchSpawnY;this.airSpawnY=airSpawnY;
         }
+        /** Desenho e velocidade vertical (projétil de especial; o S1 usa Fighter.energyVisual). */
+        String visual;
+        float vertical;
+        /** Poça que fica onde o projétil cai (0 quadros: some no chão). */
+        int puddleFrames,puddleDamage,puddlePoisonFrames;
+        float puddleHalfWidth;
         float spawnHeight(boolean crouching,boolean airborne) {
             return crouching ? crouchSpawnY : airborne ? airSpawnY : spawnY;
         }

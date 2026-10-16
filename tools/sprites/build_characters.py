@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import tempfile
+import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 import PIL
@@ -70,7 +71,9 @@ def safe(root, value):
     return p
 
 # Desenhos do S1 (ProjetilVisual.Tipo no ultra-core).
-ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI')
+ENERGY_VISUALS = ('ONDA','ONDA_CURTA','PALMA','ESTOURO','KUNAI','SHURIKEN','SOMBRA','CHICOTE','MACHADO','MACHADINHO','BISTURI','SERINGA')
+# Efeitos desenhados durante um especial (ProjetilVisual).
+SPECIAL_EFFECTS = ('VAPOR',)
 
 def validate_projectile(data, name, body):
     positive_int(data['damage'], name+'.damage')
@@ -305,7 +308,23 @@ def validate_routes(pack):
         if b not in attacks[a]['cancelInto']:
             raise ValueError(f'{pack["id"]}: autoCombo {a} -> {b} is not a declared cancel route')
 
-def validate_move(pack, binding, m):
+def validate_special_projectile(name, p, body):
+    """Projétil que um especial lança (S2 a S4): desenho, voo e a poça onde cai."""
+    if not isinstance(p, dict) or p.get('visual') not in ENERGY_VISUALS:
+        raise ValueError(f'{name}.projectile.visual: expected one of {list(ENERGY_VISUALS)}')
+    for key in ('range','speed','spawnX','spawnY'): positive(p.get(key), f'{name}.projectile.{key}')
+    if p['spawnY'] > body['standHeight']:
+        raise ValueError(f'{name}.projectile.spawnY: projectile must spawn inside the body height ({body["standHeight"]})')
+    if isinstance(p.get('vertical'),bool) or not isinstance(p.get('vertical'),(int,float)):
+        raise ValueError(f'{name}.projectile.vertical: expected a number (negative goes up)')
+    if 'puddle' in p:
+        q = p['puddle']
+        if p['vertical'] <= 0:
+            raise ValueError(f'{name}.projectile.puddle: only a falling projectile lands')
+        for key in ('frames','damage','poisonFrames'): positive_int(q.get(key), f'{name}.projectile.puddle.{key}')
+        positive(q.get('halfWidth'), f'{name}.projectile.puddle.halfWidth')
+
+def validate_move(pack, binding, m, projectile=False):
     animations = pack['animations']
     if ('animation' in m) == ('pose' in m):
         raise ValueError(f'{binding}: declare exactly one of animation or pose')
@@ -319,7 +338,14 @@ def validate_move(pack, binding, m):
         raise ValueError(f'{binding}: pose {m["pose"]} is not valid for this input')
     if any(k in m for k in ('totalMs','activeStartMs','activeEndMs')):
         raise ValueError(f'{binding}: totalMs/activeStartMs/activeEndMs were replaced by frame data (schema 3)')
-    validate_attack(binding, m, False)
+    validate_attack(binding, m, projectile)
+    if projectile:
+        # Especial que lança: sem caixa de golpe (quem acerta é o projétil).
+        if any(k in m for k in ('reach','hitHeight','hitFloor')):
+            raise ValueError(f'{binding}: a special that throws has no reach, hitHeight or hitFloor')
+        if type(m['damage']) is not int or m['damage'] <= 0:
+            raise ValueError(f'{binding}: damage must be a positive integer')
+        return
     positive(m['reach'], binding)
     if 'hitHeight' in m: positive(m['hitHeight'], binding)
     # Base of the strike box, below hitHeight - 19.5 for a sweeping hit (uppercut): fist path, low to high.
@@ -342,7 +368,12 @@ def validate_special_moves(pack):
         if not (isinstance(buttons,list) and buttons and all(b in BUTTONS for b in buttons)):
             raise ValueError(f'{pack["id"]}/{key}.buttons: expected a list of L, M, H')
         validate_command_extras(f'{pack["id"]}/{key}', m, True)
-        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons','nome','segurar','noAr')})
+        if 'projectile' in m:
+            validate_special_projectile(f'{pack["id"]}/{key}', m['projectile'], pack['fighter']['body'])
+        if 'efeito' in m and m['efeito'] not in SPECIAL_EFFECTS:
+            raise ValueError(f'{pack["id"]}/{key}.efeito: expected one of {list(SPECIAL_EFFECTS)}')
+        validate_move(pack, key, {k:v for k,v in m.items() if k not in ('command','buttons','nome','segurar','noAr','projectile','efeito','especialBase')},
+                      'projectile' in m)
         if 'mergulho' in m.get('mecanica', {}) and not m.get('noAr'):
             raise ValueError(f'{pack["id"]}/{key}.mecanica.mergulho: only an air special (noAr) dives')
     seen = {}
@@ -565,8 +596,17 @@ def compile_packs(root, results):
         for key,m in pack.get('specialMoves',{}).items():
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
             pose = q(m['pose']) if 'pose' in m else 'null'
-            move = 'new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+attack(key,m,'NORMAL',m['damage'],m['reach'],m.get('hitHeight',78))+')'
-            lines += [' sm.put('+q(key)+',new CharacterDefinition.Special('+move+',new int[]{'+','.join(map(str,m['command']))+'},'+q(''.join(m.get('buttons',BUTTONS)))+','+(q(m['nome']) if 'nome' in m else 'null')+','+str(bool(m.get('segurar'))).lower()+','+str(bool(m.get('noAr'))).lower()+'));']
+            proj = m.get('projectile')
+            strike = attack(key,m,'PROJECTILE',m['damage']) if proj else attack(key,m,'NORMAL',m['damage'],m['reach'],m.get('hitHeight',78))
+            move = 'new CharacterDefinition.Move('+q(key)+','+animation+','+pose+','+strike+')'
+            extra = ''
+            if proj:
+                extra += ('.withProjectile('+q(proj['visual'])+','+','.join(f(proj[k]) for k in ('range','speed','spawnX','spawnY','vertical'))+')')
+                if 'puddle' in proj:
+                    pd = proj['puddle']
+                    extra += '.withPuddle('+str(pd['frames'])+','+f(pd['halfWidth'])+','+str(pd['damage'])+','+str(pd['poisonFrames'])+')'
+            if 'efeito' in m: extra += '.withEffect('+q(m['efeito'])+')'
+            lines += [' sm.put('+q(key)+',new CharacterDefinition.Special('+move+',new int[]{'+','.join(map(str,m['command']))+'},'+q(''.join(m.get('buttons',BUTTONS)))+','+(q(m['nome']) if 'nome' in m else 'null')+','+str(bool(m.get('segurar'))).lower()+','+str(bool(m.get('noAr'))).lower()+')'+extra+');']
         for key,animation in pack.get('specialAnimations',{}).items():
             lines += [' s.put('+q(key)+',a.get('+q(animation)+'));']
         p = pack['_profile'];fi = pack['fighter'];body = fi['body']
@@ -706,6 +746,7 @@ def cache_load(cache, key, stage):
     entry = cache / key if cache else None
     if entry is None or not (entry / 'meta.json').is_file(): return None
     meta = json.loads((entry / 'meta.json').read_text(encoding='utf-8'))
+    os.utime(entry)  # marks the entry as used: CI drops the ones no build touched
     cfg = meta['cfg']
     (stage / cfg['report']).parent.mkdir(parents=True, exist_ok=True)
     for name, rel in (('output', cfg['output']), ('preview', cfg['preview'])):
@@ -738,8 +779,15 @@ def process(stage, path):
 def process_all(stage, paths):
     """Processes the clips in parallel (one per CPU, SPRITE_BUILD_JOBS overrides); results keep their order."""
     jobs = min(len(paths), int(os.environ.get('SPRITE_BUILD_JOBS') or os.cpu_count() or 1))
-    if jobs <= 1:
-        return [process(stage, path) for path in paths]
+    if not paths: return []
+    started = time.monotonic()
+    try:
+        if jobs <= 1: return [process(stage, path) for path in paths]
+        return process_parallel(stage, paths, jobs)
+    finally:
+        print(f'Sprite atlases processed: {len(paths)} in {time.monotonic() - started:.0f}s with {max(jobs, 1)} worker(s)')
+
+def process_parallel(stage, paths, jobs):
     pool = ProcessPoolExecutor(max_workers=jobs, initializer=init_worker, initargs=(stage,))
     try:
         futures = [pool.submit(process, stage, path) for path in paths]
@@ -781,6 +829,7 @@ def build(root=ROOT, check=False):
                 clips.append((path,clip_key(stage,path,cfg,fingerprint,digests)))
             processed=[cache_load(cache,key,stage) for _,key in clips]
             missing=[i for i,hit in enumerate(processed) if hit is None]
+            if cache: print(f'Sprite cache: {len(clips)-len(missing)} of {len(clips)} atlases reused')
             for i,result in zip(missing,process_all(stage,[clips[i][0] for i in missing])):
                 processed[i]=result;cache_store(cache,clips[i][1],stage,*result)
             for (path,_),(cfg,report) in zip(clips,processed):

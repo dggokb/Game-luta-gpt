@@ -2008,11 +2008,9 @@
       ],
       "animation": "SPECIAL_S2",
       "damage": 990,
-      "reach": 137,
-      "hitHeight": 156,
       "startupFrames": 5,
-      "activeFrames": 7,
-      "recoveryFrames": 19,
+      "activeFrames": 1,
+      "recoveryFrames": 25,
       "hitstunFrames": 35,
       "blockstunFrames": 13,
       "hitstopFrames": 10,
@@ -2027,8 +2025,6 @@
       "cancelInto": [
         "SUPER"
       ],
-      "launchType": "knockdown",
-      "knockback": 60,
       "pushbackOnHit": 20,
       "pushbackOnBlock": 50,
       "buttons": [
@@ -2036,7 +2032,24 @@
         "M",
         "H"
       ],
-      "nome": "Shuriken"
+      "nome": "Shuriken",
+      "projectile": {
+        "visual": "SHURIKEN",
+        "range": 650,
+        "speed": 950,
+        "spawnX": 95,
+        "spawnY": 130,
+        "vertical": -420
+      },
+      "especialBase": {
+        "activeFrames": 7,
+        "recoveryFrames": 19,
+        "reach": 137,
+        "hitHeight": 156,
+        "hitFloor": null,
+        "launchType": "knockdown",
+        "knockback": 60
+      }
     },
     "S3": {
       "command": [

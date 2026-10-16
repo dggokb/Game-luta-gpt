@@ -46,6 +46,19 @@ jobs:
       - name: Install sprite pipeline dependency
         run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
 
+      # Processed atlases from earlier runs. Entries are keyed by the hash of their own
+      # inputs (build_characters.py), so a restored entry is only used when identical; an
+      # older cache still serves every clip that did not change.
+      - name: Restore sprite atlas cache
+        id: sprite-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/sprite-cache
+          key: sprite-cache-v1-${{ hashFiles('art/sprites/source/**', 'tools/sprites/clips/**', 'tools/sprites/profiles/**', 'tools/sprites/*.py', 'tools/sprites/tests/**', 'tools/sprites/requirements.txt') }}
+          restore-keys: sprite-cache-v1-
+      - name: Mark sprite cache start
+        run: touch "$RUNNER_TEMP/sprite-cache-start"
+
       - name: Normalize and validate sprite assets
         run: |
           python3 -m unittest discover -s tools/sprites/tests -v
@@ -72,6 +85,20 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+
+      # Saved even when a check fails: the atlases already processed stay valid.
+      - name: Drop sprite cache entries this run did not use
+        if: always() && steps.sprite-cache.outputs.cache-hit != 'true'
+        run: |
+          test -d android/app/build/sprite-cache || exit 0
+          find android/app/build/sprite-cache -mindepth 1 -maxdepth 1 ! -newer "$RUNNER_TEMP/sprite-cache-start" -exec rm -rf {} +
+          du -sh android/app/build/sprite-cache
+      - name: Save sprite atlas cache
+        if: always() && steps.sprite-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: android/app/build/sprite-cache
+          key: ${{ steps.sprite-cache.outputs.cache-primary-key }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

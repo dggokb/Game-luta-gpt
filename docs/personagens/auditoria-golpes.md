@@ -67,7 +67,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | | Ficha | Jogo hoje | |
 |---|---|---|---|
 | S1 | Kunai reto e rápido | **bola** | ❌ |
-| S2 | Shuriken em diagonal (projétil) | **golpe corpo a corpo** | ❌ |
+| S2 | Shuriken em diagonal (projétil) | shuriken que sobe em diagonal (16/10) | ✅ |
 | S3 | Selo e teleporte | some e reaparece atrás | ✅ |
 | S4 | Corte de mão que avança | avança | ✅ |
 | Super | Dança das Lâminas | animação + **onda** | ❌ |
@@ -90,7 +90,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | S1 | Tapa de luva (**sem projétil**) | **bola** | ❌ |
 | S2 | Chute ascendente (anti-aéreo) | chute, 1 acerto | ✅ |
 | S3 | Contra-golpe com calcanhar | contra-golpe (lê tudo) | ✅ |
-| S4 | Chute giratório **baixo** | golpe alto (defende em pé) | ⚠️ falta ser baixo |
+| S4 | Chute giratório **baixo** | baixo: só defende agachado (16/10) | ✅ |
 | Super | Estala, capangas entram, ele fecha com sequência pesada | capangas; a sequência dele não acerta | ⚠️ |
 | Ultra | Herança (enxurrada de chutes e tapas) | sequência do vídeo, 4 golpes nos quadros da animação | ✅ |
 
@@ -119,7 +119,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | | Ficha | Jogo hoje | |
 |---|---|---|---|
 | S1 | Machadinho arremessado | **bola** | ❌ |
-| S2 | Jato de vapor (anti-aéreo) | 1 acerto, sem vapor | ⚠️ falta o efeito |
+| S2 | Jato de vapor (anti-aéreo) | 1 acerto, com o jato de vapor desenhado (16/10) | ✅ |
 | S3 | Esquiva acrobática e chute | esquiva alta | ✅ |
 | S4 | Voadora em parafuso que avança | avança e atravessa | ✅ |
 | Extra | — | 2 air dashes | ✅ |
@@ -130,7 +130,7 @@ no ar) ficam de fora: aqui entram os especiais (S1 a S4), Super, Ultra e agarrã
 | | Ficha | Jogo hoje | |
 |---|---|---|---|
 | S1 | Bisturi reto e rápido | **bola** | ❌ |
-| S2 | Seringa arremessada no chão à frente, deixa veneno | **golpe corpo a corpo** que envenena | ❌ |
+| S2 | Seringa arremessada no chão à frente, deixa veneno | seringa que cai em diagonal e deixa poça de veneno (16/10) | ✅ |
 | S3 | Bloqueio de nervos (contra-golpe) | contra-golpe + veneno | ✅ |
 | S4 | Passo cirúrgico (desliza e estoca) | avança | ✅ |
 | Super | Cirurgia (5 golpes exatos + estocada) | animação + **onda** | ❌ |
@@ -172,8 +172,8 @@ da ficha). O que falta é o jogo fazer o que a animação mostra:
    capangas (p07), soco no chão com fogo (p09), clones (p06).
 4. **Ultra por tipo:** investida que vira sequência de golpes (a maioria), agarrão (p09, p11) e
    raio (p01, p06).
-5. **Ajustes pequenos:** avanço nos S4 que andam (p01, p02, p04, p06, p08, p12), S4 baixo do p07,
-   ~~S4 do p03 no ar~~ (feito 15/10), S2 projétil do p05 e da p11, vapor da p10.
+5. ~~**Ajustes pequenos:** avanço nos S4 que andam (p01, p02, p04, p06, p08, p12), S4 baixo do p07,
+   S4 do p03 no ar, S2 projétil do p05 e da p11, vapor da p10.~~ (feito 15 e 16/10)
 6. **Comandos:** decidir se cada personagem tem comandos próprios ou se fica o padrão de jogo de
    luta (todos iguais), mas com S3 e S4 em movimentos diferentes.
 
@@ -257,4 +257,21 @@ Cada S1 tem o próprio desenho (`ProjetilVisual`, no ultra-core; o mesmo no PC c
 
 A CPU usa o S1 pelo alcance dele: os corpo a corpo só de perto, os curtos (p02, p04) só de meia
 distância.
+
+## Especiais que lançam, S4 baixo e vapor (16/10)
+
+Pelo bloco "especiais" de `tools/sprites/mecanicas.json` (S2 a S4 de cada um):
+
+- **p05, S2 Shuriken:** lança em vez de bater. Sobe em diagonal para a frente: pega quem pula e
+  quem está perto; de longe passa por cima de quem está no chão. Um projétil por vez (divide com
+  a kunai).
+- **p11, S2 Seringa:** cai em diagonal à frente. Se acerta, envenena como antes; se cai no chão,
+  vira uma poça de veneno por 3 segundos e envenena (mais fraco) quem pisa nela sem estar
+  envenenado. Uma poça por vez.
+- **p07, S4 Chute giratório baixo:** agora é golpe baixo, na altura da canela (antes batia na
+  cintura): só a defesa agachada segura.
+- **p10, S2 Jato de vapor:** o golpe é o mesmo; o jato de vapor sai da palma em diagonal para
+  cima enquanto ele acontece.
+
+Desenhos (seringa, poça e vapor) também no visualizador: `gradle :pc-preview:runProjeteis`.
 
