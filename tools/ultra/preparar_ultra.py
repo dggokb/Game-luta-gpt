@@ -59,14 +59,16 @@ ABERTURA = {
 # --------------------------------------------------------------- imagens
 
 def recortar(imagem, proporcao, foco):
-    """Corta no formato do painel. foco = posição vertical (0 topo, 1 base)."""
+    """Corta no formato do painel. foco = (x, y): onde fica o recorte quando sobra imagem
+    dos lados (0 esquerda, 1 direita) ou em cima e embaixo (0 topo, 1 base)."""
+    foco_x, foco_y = foco
     largura, altura = imagem.size
     if largura / altura > proporcao:
         nova_largura = round(altura * proporcao)
-        esquerda = (largura - nova_largura) // 2
+        esquerda = round((largura - nova_largura) * foco_x)
         return imagem.crop((esquerda, 0, esquerda + nova_largura, altura))
     nova_altura = round(largura / proporcao)
-    topo = round((altura - nova_altura) * foco)
+    topo = round((altura - nova_altura) * foco_y)
     return imagem.crop((0, topo, largura, topo + nova_altura))
 
 
@@ -195,18 +197,34 @@ def gerar_imagens(pasta, descricao, cor_nome, referencia, modelo, paineis):
 
 # ------------------------------------------------------------------ main
 
+def foco_de(valor):
+    """Foco gravado no ultra.json: um número (só a altura) ou [x, y]."""
+    if valor is None:
+        return (0.5, 0.5)
+    if isinstance(valor, (list, tuple)):
+        return (float(valor[0]), float(valor[1]))
+    return (0.5, float(valor))
+
+
+def foco_para_json(foco):
+    x, y = foco
+    return y if x == 0.5 else [x, y]
+
+
 def ler_foco(valores, definicao):
     """Foco de cada recorte: o --foco da linha de comando, senão o que ficou gravado no
     ultra.json da última vez ("foco" no painel, "focoPalco" na abertura), senão o meio."""
     paineis = definicao.get("paineis", {})
-    foco = {painel: float(paineis.get(painel, {}).get("foco", 0.5)) for painel in PAINEIS}
-    foco["corte"] = 0.5
-    foco["palco"] = float(definicao.get("abertura", {}).get("focoPalco", 0.5))
+    foco = {painel: foco_de(paineis.get(painel, {}).get("foco")) for painel in PAINEIS}
+    foco["corte"] = (0.5, 0.5)
+    foco["palco"] = foco_de(definicao.get("abertura", {}).get("focoPalco"))
     for valor in valores or []:
         painel, _, numero = valor.partition("=")
         if painel not in foco:
             sys.exit(f"--foco: painel desconhecido '{painel}'")
-        foco[painel] = min(1.0, max(0.0, float(numero)))
+        partes = [min(1.0, max(0.0, float(n))) for n in numero.split(",")]
+        # "golpe=0.2" mexe só na altura; "golpe=0.3,0.2" é x,y.
+        foco[painel] = (partes[0], partes[1]) if len(partes) == 2 else (foco[painel][0], partes[0])
     return foco
 
 
@@ -228,8 +246,8 @@ def main():
     )
     parser.add_argument(
         "--foco", action="append",
-        help="posição vertical do recorte por painel, ex.: --foco golpe=0.2 (0 topo, 1 base); "
-             "fica gravado no ultra.json para as próximas vezes",
+        help="posição do recorte por painel: --foco golpe=0.2 (só a altura: 0 topo, 1 base) ou "
+             "--foco carga=0.3,0.5 (x,y: 0 esquerda, 1 direita); fica gravado no ultra.json",
     )
     parser.add_argument("--gerar", action="store_true", help="gera as imagens pela API da OpenAI antes")
     parser.add_argument("--descricao", help="descrição do personagem (para --gerar)")
@@ -272,7 +290,7 @@ def main():
         nome_final = f"{painel}.jpg"
         imagem.save(destino / nome_final, quality=88)
         entrada_json["imagem"] = nome_final
-        entrada_json["foco"] = foco[painel]
+        entrada_json["foco"] = foco_para_json(foco[painel])
         print(f"{painel}: {arquivo.name} -> {nome_final} ({imagem.width}x{imagem.height})")
 
     abertura = definicao.setdefault("abertura", {})
@@ -287,7 +305,7 @@ def main():
         else:
             imagem = preparar_palco(arquivo, foco[parte])
             imagem.save(destino / config["arquivo"], quality=88)
-            abertura["focoPalco"] = foco[parte]
+            abertura["focoPalco"] = foco_para_json(foco[parte])
         abertura[parte] = config["arquivo"]
         print(f"{parte}: {arquivo.name} -> {config['arquivo']} ({imagem.width}x{imagem.height})")
 

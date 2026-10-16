@@ -12,23 +12,31 @@
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",
-    "grito": "Você não vai me alcançar!"
+    "grito": "Você não vai me alcançar!",
+    "focoPalco": 0.5
   },
   "paineis": {
     "olhos": {
-      "imagem": "olhos.jpg"
+      "imagem": "olhos.jpg",
+      "foco": 0.52
     },
     "carga": {
       "imagem": "carga.jpg",
-      "onomatopeia": "FUUUSH"
+      "onomatopeia": "FUUUSH",
+      "foco": 0.5
     },
     "golpe": {
       "imagem": "golpe.jpg",
-      "onomatopeia": "PAH!"
+      "onomatopeia": "PAH!",
+      "foco": [
+        0.15,
+        0.5
+      ]
     },
     "final": {
       "imagem": "final.jpg",
-      "onomatopeia": "HAAAA!"
+      "onomatopeia": "HAAAA!",
+      "foco": 0.5
     }
   }
 }

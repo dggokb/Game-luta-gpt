@@ -12,23 +12,34 @@
   "abertura": {
     "corte": "corte.png",
     "palco": "palco.jpg",
-    "grito": "Isso é pela família!"
+    "grito": "Isso é pela família!",
+    "focoPalco": 0.5
   },
   "paineis": {
     "olhos": {
-      "imagem": "olhos.jpg"
+      "imagem": "olhos.jpg",
+      "foco": 0.5
     },
     "carga": {
       "imagem": "carga.jpg",
-      "onomatopeia": "GRRRAA"
+      "onomatopeia": "GRRRAA",
+      "foco": [
+        0.42,
+        0.5
+      ]
     },
     "golpe": {
       "imagem": "golpe.jpg",
-      "onomatopeia": "DOOM!"
+      "onomatopeia": "DOOM!",
+      "foco": [
+        0.3,
+        0.5
+      ]
     },
     "final": {
       "imagem": "final.jpg",
-      "onomatopeia": "BOOOOM!"
+      "onomatopeia": "BOOOOM!",
+      "foco": 0.5
     }
   }
 }

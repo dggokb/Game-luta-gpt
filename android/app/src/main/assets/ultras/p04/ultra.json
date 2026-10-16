@@ -20,7 +20,11 @@
     },
     "carga": {
       "imagem": "carga.jpg",
-      "onomatopeia": "HEH!"
+      "onomatopeia": "HEH!",
+      "foco": [
+        0.38,
+        0.5
+      ]
     },
     "golpe": {
       "imagem": "golpe.jpg",
@@ -28,7 +32,8 @@
     },
     "final": {
       "imagem": "final.jpg",
-      "onomatopeia": "KA-POW!"
+      "onomatopeia": "KA-POW!",
+      "foco": 0.5
     }
   }
 }
