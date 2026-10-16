@@ -284,9 +284,11 @@ final class HudRenderer {
         int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
         float pop = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
         float levelX = right ? Arena.VW - 51f : 51f;
+        drawLevelFire(c, levelX, 684f, level, 1f);
         if (level > 0) {
-            // Charged level: soft halo behind the digit, brighter when it just went up.
-            fxPaint.setColor(right ? RED : BLUE);
+            // Charged level: soft halo behind the digit, brighter when it just went up (fire
+            // colored once the Ultra is ready, so it does not tint the flames).
+            fxPaint.setColor(level >= CombatConfig.ULTRA_COST / CombatConfig.METER_PER_BAR ? FIRE_MID : right ? RED : BLUE);
             fxPaint.setAlpha(Math.round(70 + 120 * pop + (level == 5 ? 40 * (float)Math.sin(effects.now * 6) + 40 : 0)));
             c.drawCircle(levelX, 686f, 20f + 8f * pop, fxPaint);
             fxPaint.setAlpha(255);
@@ -502,11 +504,73 @@ final class HudRenderer {
         paint.setStyle(Paint.Style.FILL);
         c.restore();
         int level = Math.max(0, Math.min(5, fighter.superMeter / CombatConfig.METER_PER_BAR));
+        drawLevelFire(c, right ? Arena.VW - 52f : 52f, 694f, level, .85f);
         text(c, LEVELS[level], right ? Arena.VW - 52f : 52f, 707f, 31f, Color.WHITE);
         text(c, "SUPER", right ? Arena.VW - 377f : 377f, 706f, 18f, Color.WHITE);
     }
 
     private final Paint fxPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Path flame = new Path();
+    /** Cores do fogo do número do super: borda, meio e miolo. */
+    private static final int FIRE_OUTER = 0xFFFF4A12, FIRE_MID = 0xFFFF9A1F, FIRE_CORE = 0xFFFFE27A;
+
+    /**
+     * Fogo atrás do número do super: quanto mais carregado, mais labaredas, mais altas e mais
+     * quentes. 1 e 2: chama baixa e vermelha; 3 (o Ultra liberado): fogo laranja com miolo
+     * amarelo; 5: labareda grande com centro branco e brasas subindo. Sem alocação.
+     */
+    private void drawLevelFire(Canvas c, float cx, float baseY, int level, float scale) {
+        if (level <= 0) return;
+        float t = (float)effects.now;
+        int tongues = 3 + level;
+        boolean ultra = level >= CombatConfig.ULTRA_COST / CombatConfig.METER_PER_BAR;
+        // Começa na borda de cima do anel do número (raio ~24) e sobe acima dele.
+        float height = (30f + 11f * level) * scale;
+        float width = (12f + 2f * level) * scale;
+        float spread = (13f + 2.4f * level) * scale;
+        fxPaint.setStyle(Paint.Style.FILL);
+        // Três camadas, de fora para dentro: cada uma mais baixa, mais fina e mais quente.
+        for (int layer = 0; layer < 3; layer++) {
+            if (layer == 2 && !ultra) break;
+            float k = 1f - layer * .28f;
+            int color = layer == 0 ? FIRE_OUTER : layer == 1 ? FIRE_MID : FIRE_CORE;
+            fxPaint.setColor(color);
+            fxPaint.setAlpha(layer == 0 ? (ultra ? 210 : 150 + 25 * level) : layer == 1 ? (ultra ? 220 : 110) : 235);
+            for (int i = 0; i < tongues; i++) {
+                float u = tongues == 1 ? 0f : i / (tongues - 1f) * 2f - 1f;
+                // Labaredas do meio mais altas; cada uma tremula no seu ritmo.
+                float flick = .78f + .22f * (float)Math.sin(t * (9f + i * 1.3f) + i * 2.1f + layer);
+                float h = height * k * (1f - .45f * u * u) * flick;
+                float w = width * k;
+                float bx = cx + u * spread * k;
+                float tip = bx + u * 6f * scale + (float)Math.sin(t * 7f + i * 1.7f) * w * .45f;
+                // Gota de fogo com a base redonda, nascendo dentro do anel (mais embaixo nas
+                // pontas do leque).
+                float by = baseY + 8f * scale * Math.abs(u);
+                flame.reset();
+                flame.moveTo(bx, by + w * .3f);
+                flame.cubicTo(bx - w * .95f, by, bx - w * .6f, by - h * .55f, tip, by - h);
+                flame.cubicTo(bx + w * .6f, by - h * .55f, bx + w * .95f, by, bx, by + w * .3f);
+                flame.close();
+                c.drawPath(flame, fxPaint);
+            }
+        }
+        if (level >= 5) {
+            // No máximo: centro branco pulsando e brasas subindo.
+            fxPaint.setColor(Color.WHITE);
+            fxPaint.setAlpha(Math.round(120 + 60 * (float)Math.sin(t * 10f)));
+            c.drawCircle(cx, baseY - 6f * scale, 9f * scale, fxPaint);
+            fxPaint.setColor(FIRE_CORE);
+            for (int i = 0; i < 7; i++) {
+                float p = (t * .9f + i / 7f) % 1f;
+                float ex = cx + (float)Math.sin(i * 2.4f + t * 3f) * spread * .9f;
+                float ey = baseY - height * (.4f + 1.1f * p);
+                fxPaint.setAlpha(Math.round(230 * (1f - p)));
+                c.drawCircle(ex, ey, (2.6f - 1.6f * p) * scale, fxPaint);
+            }
+        }
+        fxPaint.setAlpha(255);
+    }
 
     private void drawLifeEffects(Canvas c, HudEffects.Meter fx, float x, float y, float w, float h) {
         // Amber lower stripe is the impact tail. Red recoverable health above stays visible.
