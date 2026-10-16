@@ -41,6 +41,10 @@ ACCEPTED = {
     # Small offsets that grew with the size tuned in the app (8565e3e9): 117%, 123% and 113%
     # of the sheet, the same pose before (-19 px, +32 px spike, -42 px spike).
     'p07/DEFENSE_AIR[3]', 'p07/SPECIAL_S3[14]', 'p08/DEFENSE_AIR[2]',
+    # Impact of the final finger thrust (Autópsia): the flash and the beam drawn in front of
+    # the hand fill the torso band and pull its middle forward. The body lines up with
+    # frames 23 and 25 (silhouettes overlaid); only the effect is new in this frame.
+    'p11/ULTRA_SEQ[24]',
 }
 
 
