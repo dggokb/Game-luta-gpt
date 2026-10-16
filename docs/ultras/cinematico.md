@@ -18,7 +18,7 @@ visual provisório desenhado pelo jogo: dá para jogar antes de ter qualquer art
    preparação antes do golpe final.
    Cada golpe tem os raios, a tremida e o som de sempre.
 4. **Página de mangá com o toque no tempo** (`PaginaFinal`): logo antes do golpe final a luta
-   para e a página se monta no modelo do Ultra (`olhos`, `carga`, `golpe`, `atingido`, `final`); tocar quando o
+   para e a página se monta no modelo do Ultra (`olhos`, `carga`, `golpe`, que bate duas vezes, e `final`); tocar quando o
    anel fecha dá PERFEITO (+25%) ou BOM (+10%) no golpe final. A página estilhaça de volta.
 5. **Golpe final**: nos Ultras em sequência, o último golpe da animação sai com o bônus, com o
    impact frame e a câmera lenta do estilo; no P01 e no p06, o raio final (como antes).
@@ -84,7 +84,6 @@ Tudo no `ultra.json` de cada personagem:
     "olhos":    { "imagem": "olhos.jpg" },
     "carga":    { "imagem": "carga.jpg", "onomatopeia": "FUUUSH" },
     "golpe":    { "imagem": "golpe.jpg", "onomatopeia": "PAH!" },
-    "atingido": { "imagem": "atingido.jpg", "onomatopeia": "DOM!" },
     "final":    { "imagem": "final.jpg", "onomatopeia": "HAAAA!" }
   }
 }

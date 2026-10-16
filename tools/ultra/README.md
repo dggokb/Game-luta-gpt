@@ -10,9 +10,9 @@ O ultra é ativado com **baixo + SUPER** e custa **3 barras**. A regra fica no `
 
 - se **errar**, as barras são gastas e o lutador fica 0,5 s vulnerável;
 - se o oponente **defender**, ele toma blockstun e o atacante fica vulnerável do mesmo jeito;
-- se **acertar**, começa a cinemática "Página Final": uma página de mangá se monta em 5 painéis e um anel vai fechando no centro da tela. **Tocar quando o anel fecha** dá bônus de dano: PERFEITO dá +25% e BOM dá +10% no golpe final e no raio. Depois a página estilhaça e a luta volta com o personagem disparando o **raio final**: vários hits seguidos e uma explosão que arremessa o oponente.
+- se **acertar**, começa a cinemática "Página Final": uma página de mangá se monta em 4 painéis e um anel vai fechando no centro da tela. **Tocar quando o anel fecha** dá bônus de dano: PERFEITO dá +25% e BOM dá +10% no golpe final e no raio. Depois a página estilhaça e a luta volta com o personagem disparando o **raio final**: vários hits seguidos e uma explosão que arremessa o oponente.
 
-## Os 5 painéis
+## Os 4 painéis
 
 Todo ultra tem a mesma estrutura. Só mudam as imagens, os textos e os sons.
 
@@ -20,8 +20,7 @@ Todo ultra tem a mesma estrutura. Só mudam as imagens, os textos e os sons.
 |---|---|---|
 | `olhos` | close nos olhos do atacante + nome do golpe | faixa bem larga (5,6:1) |
 | `carga` | atacante de corpo inteiro carregando energia | quadrado |
-| `golpe` | o golpe vindo na direção da câmera | faixa larga (3,2:1) |
-| `atingido` | o oponente sendo atingido | faixa larga (3,6:1) |
+| `golpe` | o golpe vindo na direção da câmera (bate duas vezes) | paisagem (1,75:1) |
 | `final` | o disparo final, tela cheia | 16:9 |
 
 Painel sem imagem usa a **arte provisória** desenhada pelo próprio jogo. Dá pra testar o ritmo antes de ter qualquer arte.
@@ -31,7 +30,7 @@ As imagens devem mostrar o atacante **virado para a direita**. Quando ele luta v
 ## Passo a passo com a IA
 
 1. **Ficha do personagem**: gere uma vez, com o prompt `ficha` de [`prompts.json`](prompts.json). Ela é usada como referência em todas as outras imagens, para o personagem sair sempre igual.
-2. **As 5 imagens**: use os prompts fixos de `prompts.json`, trocando `{descricao}` pela descrição do personagem e `{cor}` pela cor da energia. Salve como `olhos.png`, `carga.png`, `golpe.png`, `atingido.png` e `final.png` numa pasta. A imagem `atingido` pode ser a mesma para todos os personagens.
+2. **As 4 imagens**: use os prompts fixos de `prompts.json`, trocando `{descricao}` pela descrição do personagem e `{cor}` pela cor da energia. Salve como `olhos.png`, `carga.png`, `golpe.png` e `final.png` numa pasta.
 3. **Prepare**:
 
    ```bash
@@ -72,13 +71,12 @@ Dá pra gerar só alguns painéis de novo com `--paineis golpe final`.
     "olhos":    { "imagem": "olhos.jpg" },
     "carga":    { "imagem": "carga.jpg", "onomatopeia": "VRUUUUM" },
     "golpe":    { "imagem": "golpe.jpg", "onomatopeia": "KRAAK!", "som": "soco", "posicaoOnomatopeia": [0.6, 0.92] },
-    "atingido": { "imagem": "atingido.jpg", "onomatopeia": "TUMM!" },
     "final":    { "imagem": "final.jpg", "onomatopeia": "KABUUUM!" }
   }
 }
 ```
 
-Cada ultra fica na pasta com o **id do personagem** (`player_base`, `player_two`...). `dano` é o dano total antes da escala de combo (padrão 4000): metade nos 3 acertos da cinemática (15%, 15% e 20%) e metade no raio final.
+Cada ultra fica na pasta com o **id do personagem** (`player_base`, `player_two`...). `dano` é o dano total antes da escala de combo (padrão 4000): metade nos 3 acertos da cinemática (15% e 15% no golpe, 20% no final) e metade no raio final.
 
 Tudo é opcional, menos `nome`. O script preserva as onomatopeias, sons e posições que você editou à mão.
 
@@ -198,7 +196,7 @@ Coloque arquivos `.ogg`, `.wav` ou `.mp3` em `assets/ultras/sons/` (valem para t
 | `pagina` | a cinemática começa |
 | `painel` | cada painel bate na página |
 | `carga` | painel de carga (ou o `som` do painel) e a carga do raio final |
-| `impacto` | golpe e atingido (ou o `som` do painel) |
+| `impacto` | os dois acertos do golpe (ou o `som` do painel) |
 | `explosao` | detonação final (ou o `som` do painel) e explosão do raio |
 | `quebra` | a página estilhaça |
 | `raio` | o raio final sai das mãos ("HA!") |

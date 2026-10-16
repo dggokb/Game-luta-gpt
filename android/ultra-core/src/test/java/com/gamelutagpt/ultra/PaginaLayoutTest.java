@@ -7,14 +7,14 @@ import org.junit.Test;
 /** Modelos da página de mangá: todos aceitam as mesmas imagens e cabem na tela. */
 public class PaginaLayoutTest {
     /** Formato (largura / altura) que o tools/ultra/preparar_ultra.py recorta para cada painel. */
-    private static final float[] IMAGE_ASPECT = {5.6f, 1f, 3.2f, 3.6f};
+    private static final float[] IMAGE_ASPECT = {5.6f, 1f, 1.75f};
 
     @Test public void everyLayoutKeepsThePanelShapesOfTheImages() {
         for (String name : PaginaLayout.NAMES) {
             PaginaLayout layout = PaginaLayout.byName(name);
             assertEquals(name, layout.name);
-            assertEquals(5, layout.panels.length);
-            for (int i = 0; i < 4; i++) {
+            assertEquals(UltraSlot.values().length, layout.panels.length);
+            for (int i = 0; i < IMAGE_ASPECT.length; i++) {
                 PaginaLayout.Frame f = PaginaLayout.frame(layout.panels[i], new PaginaLayout.Frame());
                 float aspect = f.w / f.h;
                 assertEquals(name + " painel " + i + " no formato da imagem", IMAGE_ASPECT[i], aspect,
@@ -22,7 +22,7 @@ public class PaginaLayoutTest {
                 assertTrue(name + " painel " + i + " na tela", f.cx > 0f && f.cx < PaginaLayout.VW
                     && f.cy > 0f && f.cy < PaginaLayout.VH);
             }
-            PaginaLayout.Frame full = PaginaLayout.frame(layout.panels[4], new PaginaLayout.Frame());
+            PaginaLayout.Frame full = PaginaLayout.frame(layout.panels[UltraSlot.FINAL.ordinal()], new PaginaLayout.Frame());
             assertTrue(name + ": o painel final cobre a tela", full.w > PaginaLayout.VW && full.h > PaginaLayout.VH);
         }
     }

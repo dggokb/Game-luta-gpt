@@ -24,15 +24,18 @@ public final class PaginaFinal {
 
     static final float PAGE_FADE = 0.16f;
     /** Quando cada painel bate na página, na ordem de {@link UltraSlot}. */
-    static final float[] SLAM_AT = {0.10f, 0.66f, 1.22f, 1.80f, 2.38f};
+    static final float[] SLAM_AT = {0.10f, 0.66f, 1.22f, 1.88f};
+    /** Índice do painel final (os de antes dele montam a página). */
+    static final int LAST = 3;
     static final float SLAM_DURATION = 0.13f;
     static final float NAME_AT = 0.26f;
+    /** Os dois acertos do painel do golpe: o golpe entra e bate de novo. */
     static final float HIT1_AT = SLAM_AT[2] + 0.12f;
-    static final float HIT2_AT = SLAM_AT[3] + 0.08f;
+    static final float HIT2_AT = SLAM_AT[2] + 0.44f;
     static final float FINAL_EXPAND = 0.20f;
-    static final float RING_START = SLAM_AT[4] + 0.12f;
+    static final float RING_START = SLAM_AT[LAST] + 0.12f;
     /** Instante (no relógio da cinemática) em que o anel fecha: o toque perfeito. */
-    public static final float TARGET_AT = 3.18f;
+    public static final float TARGET_AT = 2.68f;
     static final float PERFECT_WINDOW = 0.075f;
     static final float GOOD_WINDOW = 0.17f;
     static final float SHATTER_DELAY = 0.34f;
@@ -201,7 +204,7 @@ public final class PaginaFinal {
             if (crossed(previous, SLAM_AT[slot.ordinal()])) onSlam(slot);
         }
         if (crossed(previous, HIT1_AT)) impact(0, UltraSlot.GOLPE);
-        if (crossed(previous, HIT2_AT)) impact(1, UltraSlot.ATINGIDO);
+        if (crossed(previous, HIT2_AT)) impact(1, UltraSlot.GOLPE);
 
         if (detonateAt < 0f) {
             boolean lateMiss = grade == UltraGrade.ERROU && time >= TARGET_AT;
@@ -338,24 +341,24 @@ public final class PaginaFinal {
         int paperAlpha = (int)(255f * ArteProvisoria.clamp01(time / PAGE_FADE));
         c.fillRect(-60f, -60f, VW + 60f, VH + 60f, ArteProvisoria.withAlpha(layout.paper, paperAlpha));
 
-        boolean finalCoversAll = time >= SLAM_AT[4] + FINAL_EXPAND;
+        boolean finalCoversAll = time >= SLAM_AT[LAST] + FINAL_EXPAND;
         if (!finalCoversAll) {
             drawBackdrop(c, paperAlpha);
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < LAST; i++) {
                 UltraSlot slot = SLOTS[i];
                 if (time >= SLAM_AT[i]) drawPanel(c, slot, layout.panels[i], time - SLAM_AT[i]);
             }
             drawName(c);
             drawSfx(c, UltraSlot.CARGA, SLAM_AT[1] + 0.10f);
-            drawSfx(c, UltraSlot.GOLPE, hitAt[0]);
-            drawSfx(c, UltraSlot.ATINGIDO, hitAt[1]);
+            // O segundo acerto faz a onomatopeia do golpe bater de novo.
+            drawSfx(c, UltraSlot.GOLPE, hitAt[1] >= 0f && time >= hitAt[1] ? hitAt[1] : hitAt[0]);
         }
 
-        if (time >= SLAM_AT[4]) {
-            float age = time - SLAM_AT[4];
+        if (time >= SLAM_AT[LAST]) {
+            float age = time - SLAM_AT[LAST];
             float e = ArteProvisoria.easeOutCubic(ArteProvisoria.clamp01(age / FINAL_EXPAND));
-            float[] from = layout.panels[3];
-            float[] to = layout.panels[4];
+            float[] from = layout.panels[LAST - 1];
+            float[] to = layout.panels[LAST];
             for (int i = 0; i < 8; i++) panelBuffer[i] = from[i] + (to[i] - from[i]) * e;
             drawPanelBody(c, UltraSlot.FINAL, panelBuffer, age);
             drawRing(c);
@@ -445,7 +448,10 @@ public final class PaginaFinal {
     }
 
     private float slotFx(UltraSlot slot) {
-        if (slot == UltraSlot.GOLPE) return hitAt[0] >= 0f ? time - hitAt[0] : -1f;
+        if (slot == UltraSlot.GOLPE) {
+            float last = hitAt[1] >= 0f ? hitAt[1] : hitAt[0];
+            return last >= 0f ? time - last : -1f;
+        }
         if (slot == UltraSlot.FINAL) return detonateAt >= 0f ? time - detonateAt : -1f;
         return -1f;
     }
@@ -550,7 +556,7 @@ public final class PaginaFinal {
         if (text == null || text.isEmpty()) return;
 
         float age = time - at;
-        if (slot != UltraSlot.FINAL && time >= SLAM_AT[4] + FINAL_EXPAND) return;
+        if (slot != UltraSlot.FINAL && time >= SLAM_AT[LAST] + FINAL_EXPAND) return;
         float[] spot = layout.sfx[slot.ordinal()];
         float x = spot[0];
         float y = spot[1];

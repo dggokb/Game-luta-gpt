@@ -7,7 +7,7 @@ Uso básico, com imagens que você já gerou:
         --cor "#F4B73B" --entrada minhas_imagens/player_base
 
 A pasta de entrada deve ter arquivos com o nome do painel (qualquer extensão
-de imagem): olhos, carga, golpe, atingido, final, e os dois da abertura do Ultra:
+de imagem): olhos, carga, golpe, final, e os dois da abertura do Ultra:
 corte (o personagem recortado, PNG com fundo transparente) e palco (o fundo do
 Ultra). Imagem que falta continua com a arte provisória do jogo.
 
@@ -46,8 +46,7 @@ EXTENSOES = (".png", ".jpg", ".jpeg", ".webp")
 PAINEIS = {
     "olhos": {"proporcao": 5.6, "largura": 1600, "tamanho_api": "1536x1024"},
     "carga": {"proporcao": 1.0, "largura": 900, "tamanho_api": "1024x1024"},
-    "golpe": {"proporcao": 3.2, "largura": 1400, "tamanho_api": "1536x1024"},
-    "atingido": {"proporcao": 3.6, "largura": 1400, "tamanho_api": "1536x1024"},
+    "golpe": {"proporcao": 1.75, "largura": 1400, "tamanho_api": "1536x1024"},
     "final": {"proporcao": 16 / 9, "largura": 1600, "tamanho_api": "1536x1024"},
 }
 # Abertura do Ultra: o personagem recortado (mantém a transparência) e o fundo.
@@ -184,7 +183,7 @@ def gerar_imagens(pasta, descricao, cor_nome, referencia, modelo, paineis):
         )
         tamanho = PAINEIS[painel]["tamanho_api"]
         print(f"gerando {painel}...")
-        if referencia and painel != "atingido":
+        if referencia:
             # A ficha do personagem entra como referência para manter ele igual.
             with open(referencia, "rb") as ref:
                 resposta = cliente.images.edit(model=modelo, image=[ref], prompt=prompt, size=tamanho)
@@ -217,7 +216,7 @@ def main():
     parser.add_argument("--nome", help="troca o nome do golpe, ex.: \"Explosão Solar\" (padrão: o do ultra.json)")
     parser.add_argument("--cor", help="troca a cor principal, ex.: #F4B73B (padrão: a do ultra.json)")
     parser.add_argument("--cor-secundaria", help="cor do brilho, ex.: #FFE7A3")
-    parser.add_argument("--entrada", type=Path, help="pasta com olhos/carga/golpe/atingido/final")
+    parser.add_argument("--entrada", type=Path, help="pasta com olhos/carga/golpe/final, corte e palco")
     parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO, help="pasta ultras/ dos assets")
     parser.add_argument(
         "--estilo", choices=["manga", "nenhum"], default="nenhum",

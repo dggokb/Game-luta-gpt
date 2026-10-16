@@ -26,10 +26,6 @@
       "imagem": "golpe.jpg",
       "onomatopeia": "POW!"
     },
-    "atingido": {
-      "imagem": "atingido.jpg",
-      "onomatopeia": "BAM!"
-    },
     "final": {
       "imagem": "final.jpg",
       "onomatopeia": "KA-POW!"

@@ -26,10 +26,6 @@
       "imagem": "golpe.jpg",
       "onomatopeia": "WHAM!"
     },
-    "atingido": {
-      "imagem": "atingido.jpg",
-      "onomatopeia": "BAM!"
-    },
     "final": {
       "imagem": "final.jpg",
       "onomatopeia": "SPLAAASH!"

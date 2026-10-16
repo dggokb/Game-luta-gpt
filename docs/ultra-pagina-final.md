@@ -46,9 +46,9 @@ essas pausas.
 | 0,26 | Faixa com o nome do golpe entra (`NAME_AT`) |
 | 0,66 | Painel `carga` |
 | 1,22 → 1,34 | Painel `golpe`; impacto 1: 15% do dano, quadro invertido, hitstop 0,07 s |
-| 1,80 → 1,88 | Painel `atingido`; impacto 2: 15% do dano |
-| 2,38 | Painel `final` se expande até cobrir a tela (0,20 s) |
-| 2,50 → 3,18 | O anel fecha até o alvo (`TARGET_AT`) |
+| 1,66 | O golpe bate de novo; impacto 2: 15% do dano |
+| 1,88 | Painel `final` se expande até cobrir a tela (0,20 s) |
+| 2,00 → 2,68 | O anel fecha até o alvo (`TARGET_AT`) |
 | toque | Detonação: 20% do dano + bônus (PERFEITO ±0,075 s = +25%, BOM ±0,17 s = +10%) |
 | detonação + 0,34 | A página quebra em 48 cacos; por trás, os lutadores já se afastam para o raio |
 | + 0,62 | Fim: `onUltraFinished`; o raio final dá os outros 50% do dano (com o mesmo bônus) |

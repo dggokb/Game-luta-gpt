@@ -26,10 +26,6 @@
       "imagem": "golpe.jpg",
       "onomatopeia": "TSK!"
     },
-    "atingido": {
-      "imagem": "atingido.jpg",
-      "onomatopeia": "CRACK!"
-    },
     "final": {
       "imagem": "final.jpg",
       "onomatopeia": "SHHK!"

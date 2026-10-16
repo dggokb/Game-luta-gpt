@@ -29,11 +29,6 @@
       ],
       "foco": 0.2
     },
-    "atingido": {
-      "onomatopeia": "TUMM!",
-      "imagem": "atingido.jpg",
-      "foco": 0.4
-    },
     "final": {
       "onomatopeia": "KABUUUM!",
       "imagem": "final.jpg",

@@ -40,7 +40,6 @@ final class ArteProvisoria {
             case OLHOS: drawOlhos(c, l, t, r, b, age, color, accent); break;
             case CARGA: drawCarga(c, l, t, r, b, age, color, accent); break;
             case GOLPE: drawGolpe(c, l, t, r, b, age, fx, color, accent); break;
-            case ATINGIDO: drawAtingido(c, l, t, r, b, age, color); break;
             case FINAL: drawFinal(c, l, t, r, b, age, fx, color, accent); break;
         }
     }
@@ -72,10 +71,8 @@ final class ArteProvisoria {
                 risingParticles(c, l, t, r, b, age, accent, 26);
                 break;
             case GOLPE:
-                if (fx >= 0f) impactBurst(c, cx, cy, fx, (b - t) * 0.9f, accent);
-                break;
-            case ATINGIDO:
-                horizontalSpeedLines(c, l, t, r, b, age, withAlpha(INK, 70), 14);
+                // Estouro do tamanho de uma mão, um pouco abaixo do centro, para não cobrir o rosto.
+                if (fx >= 0f) impactBurst(c, cx + (r - l) * 0.08f, cy + (b - t) * 0.14f, fx, Math.min(b - t, 230f) * 0.9f, accent);
                 break;
             case FINAL:
                 if (!lite) radialLines(c, cx, cy, Math.max(r - l, b - t), 36, withAlpha(WHITE, 90), 0.18f);
@@ -183,35 +180,6 @@ final class ArteProvisoria {
             c.strokeCircle(kx, cy - fist * 0.55f, fist * 0.28f, 4f * k, 0xFF55555C);
         }
         c.drawLine(cx - fist * 0.8f, cy + fist * 0.15f, cx + fist * 0.7f, cy + fist * 0.05f, 4f * k, 0xFF55555C);
-    }
-
-    private void drawAtingido(RenderCanvas c, float l, float t, float r, float b, float age, int color) {
-        c.fillRect(l, t, r, b, 0xFFE9E5DA);
-        float cx = (l + r) * 0.5f;
-        float cy = (t + b) * 0.5f;
-        float k = (b - t) / 220f;
-        horizontalSpeedLines(c, l, t, r, b, age, withAlpha(INK, 150), 26);
-
-        // Oponente dobrado para trás, arremessado para a direita.
-        float drift = age * 60f * k;
-        float x = cx + 40f * k + drift;
-        float y = cy + 10f * k;
-        int body = 0xFF2A3446;
-        c.drawLine(x - 70f * k, y + 10f * k, x + 30f * k, y - 30f * k, 40f * k, body);
-        c.fillCircle(x + 64f * k, y - 52f * k, 27f * k, body);
-        limb(c, x + 20f * k, y - 26f * k, x + 60f * k, y + 30f * k, x + 110f * k, y + 50f * k, 20f * k, body);
-        limb(c, x + 10f * k, y - 30f * k, x + 40f * k, y - 90f * k, x + 100f * k, y - 110f * k, 20f * k, body);
-        limb(c, x - 70f * k, y + 10f * k, x - 140f * k, y + 40f * k, x - 220f * k, y + 30f * k, 24f * k, body);
-        limb(c, x - 70f * k, y + 10f * k, x - 150f * k, y - 20f * k, x - 230f * k, y - 10f * k, 24f * k, body);
-
-        // Ponto de contato.
-        float[] contact = spikyStar(c, x - 20f * k, y - 8f * k, 70f * k, 26f * k, 12, 0f, WHITE);
-        c.strokePolygon(contact, 5f * k, INK);
-        for (int i = 0; i < 6; i++) {
-            float a = rand.range(-0.8f, 0.8f);
-            float d = rand.range(70f, 160f) * k + age * 200f * k;
-            c.fillCircle(x + (float)Math.cos(a) * d, y - 8f * k + (float)Math.sin(a) * d, rand.range(3f, 7f) * k, withAlpha(color, 230));
-        }
     }
 
     private void drawFinal(RenderCanvas c, float l, float t, float r, float b, float age, float burst, int color, int accent) {

@@ -26,10 +26,6 @@
       "imagem": "golpe.jpg",
       "onomatopeia": "ZAN!"
     },
-    "atingido": {
-      "imagem": "atingido.jpg",
-      "onomatopeia": "SHK!"
-    },
     "final": {
       "imagem": "final.jpg",
       "onomatopeia": "ZANNN!"

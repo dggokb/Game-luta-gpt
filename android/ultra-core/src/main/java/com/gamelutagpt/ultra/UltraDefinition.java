@@ -17,7 +17,6 @@ import java.util.Map;
  *     "olhos":    { "imagem": "olhos.png" },
  *     "carga":    { "imagem": "carga.png", "onomatopeia": "VRUUUM" },
  *     "golpe":    { "imagem": "golpe.png", "som": "soco", "posicaoOnomatopeia": [0.6, 0.9] },
- *     "atingido": { "imagem": "atingido.png" },
  *     "final":    { "imagem": "final.png", "onomatopeia": "KABUUUM!" }
  *   },
  *   "raio": { "corpo": "raio_corpo.png", "ponta": "raio_ponta.png", "inicio": "raio_inicio.png",
@@ -202,7 +201,7 @@ public final class UltraDefinition {
     public UltraDefinition(String name, int color, int accentColor, int damage, Panel[] panels, Beam beam,
                            Opening opening, Style style) {
         if (panels.length != UltraSlot.values().length) {
-            throw new IllegalArgumentException("um ultra tem exatamente 5 painéis");
+            throw new IllegalArgumentException("um ultra tem exatamente " + UltraSlot.values().length + " painéis");
         }
         this.name = name;
         this.color = color;
