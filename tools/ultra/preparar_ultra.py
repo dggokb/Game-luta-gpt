@@ -196,8 +196,13 @@ def gerar_imagens(pasta, descricao, cor_nome, referencia, modelo, paineis):
 
 # ------------------------------------------------------------------ main
 
-def ler_foco(valores):
-    foco = {painel: 0.5 for painel in list(PAINEIS) + list(ABERTURA)}
+def ler_foco(valores, definicao):
+    """Foco de cada recorte: o --foco da linha de comando, senão o que ficou gravado no
+    ultra.json da última vez ("foco" no painel, "focoPalco" na abertura), senão o meio."""
+    paineis = definicao.get("paineis", {})
+    foco = {painel: float(paineis.get(painel, {}).get("foco", 0.5)) for painel in PAINEIS}
+    foco["corte"] = 0.5
+    foco["palco"] = float(definicao.get("abertura", {}).get("focoPalco", 0.5))
     for valor in valores or []:
         painel, _, numero = valor.partition("=")
         if painel not in foco:
@@ -224,7 +229,8 @@ def main():
     )
     parser.add_argument(
         "--foco", action="append",
-        help="posição vertical do recorte por painel, ex.: --foco olhos=0.4 (0 topo, 1 base)",
+        help="posição vertical do recorte por painel, ex.: --foco golpe=0.2 (0 topo, 1 base); "
+             "fica gravado no ultra.json para as próximas vezes",
     )
     parser.add_argument("--gerar", action="store_true", help="gera as imagens pela API da OpenAI antes")
     parser.add_argument("--descricao", help="descrição do personagem (para --gerar)")
@@ -256,7 +262,7 @@ def main():
         definicao["corSecundaria"] = args.cor_secundaria
     paineis_json = definicao.setdefault("paineis", {})
 
-    foco = ler_foco(args.foco)
+    foco = ler_foco(args.foco, definicao)
     for painel in PAINEIS:
         arquivo = achar_imagem(entrada, painel)
         entrada_json = paineis_json.setdefault(painel, {})
@@ -267,6 +273,7 @@ def main():
         nome_final = f"{painel}.jpg"
         imagem.save(destino / nome_final, quality=88)
         entrada_json["imagem"] = nome_final
+        entrada_json["foco"] = foco[painel]
         print(f"{painel}: {arquivo.name} -> {nome_final} ({imagem.width}x{imagem.height})")
 
     abertura = definicao.setdefault("abertura", {})
@@ -281,6 +288,7 @@ def main():
         else:
             imagem = preparar_palco(arquivo, foco[parte])
             imagem.save(destino / config["arquivo"], quality=88)
+            abertura["focoPalco"] = foco[parte]
         abertura[parte] = config["arquivo"]
         print(f"{parte}: {arquivo.name} -> {config['arquivo']} ({imagem.width}x{imagem.height})")
 

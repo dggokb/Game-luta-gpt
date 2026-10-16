@@ -5,7 +5,8 @@
   "dano": 4200,
   "paineis": {
     "olhos": {
-      "imagem": "olhos.jpg"
+      "imagem": "olhos.jpg",
+      "foco": 0.45
     },
     "carga": {
       "onomatopeia": "VRUUUUM",
@@ -17,15 +18,18 @@
       "posicaoOnomatopeia": [
         0.6,
         0.92
-      ]
+      ],
+      "foco": 0.2
     },
     "atingido": {
       "onomatopeia": "TUMM!",
-      "imagem": "atingido.jpg"
+      "imagem": "atingido.jpg",
+      "foco": 0.4
     },
     "final": {
       "onomatopeia": "KABUUUM!",
-      "imagem": "final.jpg"
+      "imagem": "final.jpg",
+      "foco": 0.5
     }
   },
   "raio": {

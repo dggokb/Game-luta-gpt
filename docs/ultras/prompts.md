@@ -12,7 +12,9 @@ rode de novo). O nome de cada Ultra fica no `ultra.json` do personagem
 2. Gere **primeiro o `corte`**. Se ficar bom, anexe o corte junto com o concept nos pedidos seguintes:
    ajuda o personagem a sair igual em todas.
 3. Cole cada prompt como está. O formato vem no começo de cada item (retrato, quadrado ou
-   paisagem): se o ChatGPT perguntar, escolha esse.
+   paisagem): se o ChatGPT perguntar, escolha esse. Se vier em outro tamanho, tudo bem: na
+   hora de colocar no jogo eu escolho o recorte de cada uma (o que importa é o personagem e a
+   ação não ficarem colados na borda).
 4. Salve com o **nome exato** de cada item (`corte.png`, `palco.png`, `olhos.png`, `carga.png`,
    `golpe.png`, `atingido.png`, `final.png`) numa pasta com o id do personagem, por exemplo
    `game-luta-gpt/ultras/p02/` no Drive, e me avise. Eu recorto e coloco no jogo

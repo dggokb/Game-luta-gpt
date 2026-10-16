@@ -69,3 +69,7 @@ no jogo como "Explosão Solar" (a ficha diz "Raio da Casa").
 Prompts prontos para o ChatGPT, por personagem: [prompts.md](prompts.md). Com as imagens
 numa pasta, `tools/ultra/preparar_ultra.py --id <id> --entrada <pasta>` recorta cada uma no
 formato certo, tira o fundo do corte se precisar e atualiza o `ultra.json`.
+
+O ChatGPT escolhe o tamanho da imagem por conta própria, então o recorte se ajusta a cada uma:
+`--foco golpe=0.2` sobe o recorte do painel (0 = topo, 1 = base). O foco escolhido fica gravado
+no `ultra.json` (`"foco"` no painel, `"focoPalco"` na abertura) e vale nas próximas vezes.
