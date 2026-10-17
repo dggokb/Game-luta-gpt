@@ -130,6 +130,8 @@ public class GameView extends SurfaceView
     private final boolean[] lyingSeen = new boolean[2];
     private final boolean[] downSeen = new boolean[2];
     private final boolean[] wasAirborne = new boolean[2];
+    /** Já mostrou o efeito de saída deste super pulo (um por pulo). */
+    private final boolean[] superJumpSeen = new boolean[2];
     /** Quem já levou o golpe do KO (o clarão e a câmera lenta saem uma vez por nocaute). */
     private CombatFighter koVictim;
     private final HudRenderer hud = new HudRenderer();
@@ -1813,6 +1815,12 @@ public class GameView extends SurfaceView
             }
             downSeen[i] = down;
             wasAirborne[i] = !f.grounded;
+            if (f.superJumping && !superJumpSeen[i]) {
+                // Saída do super pulo: anel de choque e poeira nos pés, na cor do lutador.
+                impacts.spawnSuperJump(f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)),
+                    GROUND_Y, f.state.profile.color);
+            }
+            superJumpSeen[i] = f.superJumping;
             boolean lying = f.status == CombatFighter.Status.KNOCKDOWN &&
                 f.knockdownFrame >= engine.config.knockdownFallFrames;
             if (lying && !lyingSeen[i]) ultraSounds.playFight("queda", 0.8f, 0.95f + soundRandom.nextFloat() * 0.1f);
@@ -1944,6 +1952,49 @@ public class GameView extends SurfaceView
     }
 
     /** Altura do peito de um lutador (onde o close da cinemática se apoia). */
+    /**
+     * No super pulo a câmera sobe com quem pulou e quem ficou no chão some por baixo: uma seta
+     * na borda de baixo da tela, na cor dele, marca onde ele está (e acompanha quando anda).
+     */
+    private void drawGroundMarkers(Canvas canvas, float zoom, float left, float top) {
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            CombatFighter other = engine.fighter(1 - i);
+            if (!other.superJumping || !f.grounded || f.ko()) continue;
+            // Só quando o peito dele já saiu da tela por baixo.
+            float chestScreenY = (chestY(f) - top) * zoom;
+            if (chestScreenY < VH - 8f) continue;
+            float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+            float sx = clamp((x - left) * zoom, 44f, VW - 44f);
+            float pulse = 0.5f + 0.5f * (float)Math.sin(engine.frame() * 0.25f);
+            // Logo acima da faixa das barras de super (embaixo da tela).
+            float tipY = VH - GROUND_MARKER_BOTTOM - 6f * pulse, size = 26f;
+            int color = f.state.profile.color | 0xFF000000;
+            groundMarker.reset();
+            groundMarker.moveTo(sx - size, tipY - size * 1.15f);
+            groundMarker.lineTo(sx + size, tipY - size * 1.15f);
+            groundMarker.lineTo(sx, tipY);
+            groundMarker.close();
+            paint.setShader(null);
+            // Brilho em volta, a seta na cor dele e o contorno branco.
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(color);
+            paint.setAlpha(Math.round(70 + 60 * pulse));
+            canvas.drawCircle(sx, tipY - size * 0.6f, size * 1.6f, paint);
+            paint.setAlpha(255);
+            canvas.drawPath(groundMarker, paint);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(4f);
+            paint.setColor(0xFFFFFFFF);
+            canvas.drawPath(groundMarker, paint);
+            paint.setStyle(Paint.Style.FILL);
+        }
+    }
+
+    private final Path groundMarker = new Path();
+    /** Distância da ponta da seta até a borda de baixo: acima das barras de super do HUD. */
+    private static final float GROUND_MARKER_BOTTOM = 88f;
+
     private static float chestY(CombatFighter f) {
         return f.y - 0.6f * (f.y - visualTop(f));
     }
@@ -2157,6 +2208,9 @@ public class GameView extends SurfaceView
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
+            if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
+                drawGroundMarkers(canvas, renderZoom, cameraLeft, renderCameraTop);
+            }
             if (ultraBars > 0.001f) {
                 // Faixas pretas de cinema durante o Ultra.
                 float bar = AberturaUltra.BAR * ultraBars;

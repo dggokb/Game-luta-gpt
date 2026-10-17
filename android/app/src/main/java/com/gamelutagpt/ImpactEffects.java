@@ -11,7 +11,7 @@ import android.graphics.Shader;
  * spawning reuses slots, drawing allocates nothing and nothing here touches combat state.
  */
 final class ImpactEffects {
-    static final int HIT = 0, GUARD = 1, DUST = 2;
+    static final int HIT = 0, GUARD = 1, DUST = 2, LAUNCH = 3;
     /** Size class of a contact: 0 light, 1 medium, 2 heavy, 3 special/super. */
     static final int LIGHT = 0, MEDIUM = 1, HEAVY = 2, SPECIAL = 3;
 
@@ -176,6 +176,33 @@ final class ImpactEffects {
         }
     }
 
+    /**
+     * Saída do super pulo: um anel de choque achatado no chão que se abre, uma coluna de luz
+     * curta subindo dos pés, riscos de velocidade para cima e a poeira do chão. {@code accent}
+     * é a cor do lutador.
+     */
+    void spawnSuperJump(float x, float groundY, int accent) {
+        spawnDust(x, groundY, .5f);
+        int b = nextBurst;
+        nextBurst = (nextBurst + 1) % BURSTS;
+        bx[b] = x; by[b] = groundY; bAge[b] = 0f; bKind[b] = LAUNCH; bDir[b] = 1;
+        bLife[b] = .42f;
+        bSize[b] = 120f;
+        bAngle[b] = 0f;
+        bColor[b] = accent | 0xFF000000;
+        for (int n = 0; n < 9; n++) {
+            int d = nextDebris;
+            nextDebris = (nextDebris + 1) % DEBRIS;
+            dx[d] = x + (random() - .5f) * 110f; dy[d] = groundY - 10f - random() * 30f;
+            dvx[d] = (random() - .5f) * 120f;
+            dvy[d] = -(1300f + 700f * random());
+            dAge[d] = 0f;
+            dLife[d] = .16f + .12f * random();
+            dWidth[d] = 3f + random() * 4f;
+            dColor[d] = n % 3 == 0 ? (accent | 0xFF000000) : 0xFFF4F8FF;
+        }
+    }
+
     void update(float dt) {
         for (int i = 0; i < SPEARS; i++) if (sAge[i] < SPEAR_LIFE) sAge[i] += dt;
         for (int i = 0; i < BURSTS; i++) if (bAge[i] < bLife[i]) bAge[i] += dt;
@@ -256,6 +283,10 @@ final class ImpactEffects {
             drawDust(c, i, k);
             return;
         }
+        if (bKind[i] == LAUNCH) {
+            drawLaunch(c, i, k);
+            return;
+        }
         float size = bSize[i];
         float grow = 1f - (1f - k) * (1f - k) * (1f - k);
         float fade = 1f - k;
@@ -325,6 +356,37 @@ final class ImpactEffects {
             c.restore();
         }
         c.restore();
+    }
+
+    /** Saída do super pulo: anel achatado no chão que se abre e coluna de luz que sobe e some. */
+    private void drawLaunch(Canvas c, int i, float k) {
+        float size = bSize[i];
+        float grow = 1f - (1f - k) * (1f - k) * (1f - k);
+        float fade = 1f - k;
+        paint.setShader(null);
+        // Coluna de luz: sobe dos pés no começo e some rápido.
+        float column = Math.max(0f, 1f - k * 2.2f);
+        if (column > 0f) {
+            paint.setStyle(Paint.Style.FILL);
+            float h = size * (1.2f + 1.6f * grow);
+            for (int layer = 0; layer < 2; layer++) {
+                float w = size * (layer == 0 ? .42f : .16f) * (1f - .5f * k);
+                paint.setColor(layer == 0 ? bColor[i] : 0xFFFFFFFF);
+                paint.setAlpha(Math.round((layer == 0 ? 90 : 170) * column));
+                c.drawOval(bx[i] - w, by[i] - h, bx[i] + w, by[i] + 6f, paint);
+            }
+        }
+        // Anéis de choque achatados no chão (perspectiva), o de fora na cor do lutador.
+        paint.setStyle(Paint.Style.STROKE);
+        for (int ring = 0; ring < 2; ring++) {
+            float r = size * (.35f + (ring == 0 ? 1.5f : 1.05f) * grow);
+            paint.setStrokeWidth((ring == 0 ? 9f : 5f) * (1f - .6f * k));
+            paint.setColor(ring == 0 ? bColor[i] : 0xFFFFFFFF);
+            paint.setAlpha(Math.round((ring == 0 ? 210 : 240) * fade));
+            c.drawOval(bx[i] - r, by[i] - r * .22f, bx[i] + r, by[i] + r * .22f, paint);
+        }
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(255);
     }
 
     /** Nuvem de poeira: elipses baixas que se abrem para os lados e somem. */

@@ -403,6 +403,14 @@ Como no FighterZ e no MvC. O jeito de mover de lado no ar é decidido na saída 
 
 Testes em `ControleNoArTest`.
 
+Na tela (`GameView`), o super pulo tem dois efeitos:
+
+- **Saída:** anel de choque achatado no chão, coluna de luz curta, riscos subindo e poeira
+  nos pés, na cor do lutador (`ImpactEffects.spawnSuperJump`).
+- **Quem ficou no chão:** a câmera sobe com quem pulou e o outro some por baixo; quando o
+  peito dele sai da tela, uma seta na cor dele aparece na borda de baixo, acima das barras de
+  super, na posição dele (`drawGroundMarkers`). Some no Ultra, no Super e nas cinemáticas.
+
 ## Pulo da corrida (dash jump)
 
 Como no KOF: pular **durante o dash para frente** leva o embalo da corrida. Valor em
