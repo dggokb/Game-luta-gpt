@@ -78,6 +78,16 @@ final class CharacterSelectRenderer {
         for(String id:GeneratedCharacters.SELECTABLE) face(id);
     }
 
+    /** Decodifica já, nesta thread, os retratos desses lutadores (PC e testes: tudo na hora). */
+    void carregarHerois(String... ids) {
+        for(String id:ids) {
+            if(id==null||heroes.containsKey(id))continue;
+            heroesPedidos.put(id,Boolean.TRUE);
+            Bitmap b=read("selection/art/tela/hero_"+assetId(id)+".webp",1);
+            heroes.put(id,b!=null?b:SEM_ARTE);
+        }
+    }
+
     /** Começa a decodificar os retratos desses lutadores (a seleção vai abrir com eles). */
     void prepararHerois(String... ids) {
         for(String id:ids) if(id!=null) pedirHeroi(id);
