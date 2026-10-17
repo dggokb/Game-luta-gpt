@@ -424,6 +424,14 @@ final class CombatEngine {
         return c.fighter.energyHold && c.fighter.energyCommand.length > 0 && c.fighter.energyCommand[0] == 3;
     }
 
+    /**
+     * Depois do H que bate na parede no combo, segurar → já sai correndo (sem o → →), como o
+     * 2H que acerta já transforma o pulo em super pulo.
+     */
+    private static boolean wallChaseRun(CombatFighter f) {
+        return f.wallChase > 0 && !f.forwardDashing && MotionParser.relative(f.input.direction, f.facing) == 1;
+    }
+
     private void requestJump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = 0;
         f.pendingSuperJump = superJump;
@@ -487,9 +495,10 @@ final class CombatEngine {
                 f.backdashCooldown = config.backdashFrames + config.backdashRecoveryFrames;
                 f.backdashArmed = false;
                 f.forwardDashing = false;
-            } else if (f.dashRequest && f.backdashFrames == 0) {
+            } else if ((f.dashRequest || wallChaseRun(f)) && f.backdashFrames == 0) {
                 f.forwardDashing = true;
                 f.backdashFrames = 0;
+                f.wallChase = 0;
             }
         } else if (f.status == CombatFighter.Status.NEUTRAL && !f.grounded && !f.airDashUsed &&
             Arena.GROUND_Y - f.y >= config.airDashMinHeight && (f.dashRequest || f.backdashRequest)) {
@@ -887,6 +896,7 @@ final class CombatEngine {
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
         if (f.guardBroken && !f.inHitstun()) f.guardBroken = false;
         if (f.launcherChase > 0) f.launcherChase--;
+        if (f.wallChase > 0) f.wallChase--;
         if (f.state.poisoned() && f.state.tickPoison() > 0 && f.state.poisonLeft == 0) cues.add("POISON_END");
 
         if (f.echoLeft > 0) f.echoLeft--;
@@ -1531,6 +1541,7 @@ final class CombatEngine {
         point.pushFramesLeft = 0;
         point.hitstop = 0;
         point.launcherChase = 0;
+        point.wallChase = 0;
         point.locked = false;
         // The new point did not walk there: no walk animation from the jump in position.
         startX[point.index] = point.x;
@@ -2458,6 +2469,7 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.bounceHitstunFrames);
             d.pushRemaining = 0f;
             d.pushFramesLeft = 0;
+            a.wallChase = config.wallChaseFrames;
         } else if (groundBounce) {
             // Driven into the floor; it pops back up in land().
             session.groundBounces++;
@@ -2481,9 +2493,13 @@ final class CombatEngine {
             push(d, a, direction * attack.knockback);
         } else if (launch == AttackDefinition.Launch.LAUNCH) {
             d.status = CombatFighter.Status.AIR_HITSTUN;
+            // Pego no ar (ex.: voltando da parede), sobe só até a altura de um lançamento do
+            // chão: senão sai na frente e o super pulo de quem lançou não alcança.
+            float altura = Math.max(0f, Arena.GROUND_Y - d.y);
             d.grounded = false;
             d.y -= 2f;
-            d.vy = -config.launchSpeed;
+            d.vy = -(float) Math.sqrt(Math.max(0f,
+                config.launchSpeed * config.launchSpeed - 2f * config.gravity * altura));
             d.launched = true;
             d.slammed = false;
             d.superJumping = false;

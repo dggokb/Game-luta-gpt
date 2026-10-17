@@ -54,6 +54,11 @@ final class CombatConfig {
     int pushbackFrames = 8;
     /** After a LAUNCH hit, a jump becomes a super jump for this many frames. */
     int launcherChaseFrames = 54;
+    /**
+     * After an H that wall-bounces in a combo, holding → starts the run (dash) for this many
+     * frames, without the → → (like the launcher turns the jump into a super jump).
+     */
+    int wallChaseFrames = 54;
     int knockdownFallFrames = 13;
     /** Lying on the ground before the normal wake-up (was 72: too long to watch). */
     int knockdownDownFrames = 30;

@@ -125,6 +125,8 @@ final class CombatFighter {
     int pushFramesLeft;
     CombatFighter pushSource;
     int launcherChase;
+    /** Frames left in which holding → after a wall bounce starts the run (see wallChaseFrames). */
+    int wallChase;
     int framesSinceHit = 999;
     int framesSinceBlock = 999;
     /**

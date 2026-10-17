@@ -383,6 +383,13 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 - O motor avisa `WALL_BOUNCE` e `GROUND_BOUNCE` em `cues()` e a tela treme.
 - Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH
   (ground bounce) → ... ; com a barra, Super ou ultra no fim.
+- **Corrida automática depois da parede** (`CombatConfig.wallChaseFrames`, 54): depois do H que
+  quicou na parede, segurar **→** já sai correndo quando o golpe acaba, sem o → →. É o mesmo
+  atalho do 2H, que transforma o pulo em super pulo sem o ↓ ↑.
+- **Lançador no ar**: o 2H que pega o defensor já no ar (voltando da parede, por exemplo) o lança
+  só até a altura de um lançamento do chão (`launchSpeed²/2·gravity`). Antes ele saía com a
+  velocidade cheia de onde estava, ficava ~150 px acima de quem lançou durante todo o super
+  pulo, e o ↓ + jH (ou o jL) não alcançava.
 
 Avisos do motor (v0.83): os avisos que não são dano (`TECH`, `PUSHBLOCK`, `GUARD_CANCEL`,
 `WALL_BOUNCE`, `GROUND_BOUNCE`) saíram dos `events()` (que agora só têm acertos e bloqueios)

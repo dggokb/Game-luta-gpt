@@ -154,4 +154,53 @@ public class BounceTest {
         assertFalse(d.slammed);
         assertEquals(CombatFighter.Status.AIR_HITSTUN, d.status);
     }
+
+    /** Segura → depois do H que bateu na parede: sai correndo sem o → → (como o 2H dá o super pulo). */
+    @Test public void holdingForwardAfterAWallBounceRunsWithoutTheDoubleTap() {
+        Sim s = new Sim(500f, 600f);
+        s.chainToHeavy();
+        assertEquals(CombatFighter.BOUNCE_WALL, s.f(1).bounce);
+        s.in[0].direction = 1;
+        boolean correu = false;
+        for (int i = 0; i < 60 && !correu; i++) {
+            s.step();
+            correu = s.f(0).forwardDashing;
+        }
+        assertTrue("segurando → depois da parede, corre", correu);
+        assertEquals("a janela foi usada", 0, s.f(0).wallChase);
+    }
+
+    @Test public void holdingForwardInNeutralOnlyWalks() {
+        Sim s = new Sim(500f, 900f);
+        s.in[0].direction = 1;
+        for (int i = 0; i < 40; i++) s.step();
+        assertFalse("sem parede no combo, segurar → só anda", s.f(0).forwardDashing);
+    }
+
+    /**
+     * O 2H que pega o adversário no ar (voltando da parede) não lança mais alto que um 2H do
+     * chão: senão ele sai na frente e o super pulo não alcança para o ↓ + jH.
+     */
+    @Test public void launcherOnAnAirborneDefenderPeaksAtTheGroundLaunchHeight() {
+        Sim s = new Sim(500f, 580f);
+        CombatFighter d = s.f(1);
+        d.grounded = false;
+        d.y = Arena.GROUND_Y - 160f;
+        d.vy = 0f;
+        d.status = CombatFighter.Status.AIR_HITSTUN;
+        d.stunLeft = d.stunTotal = 60;
+        s.in[0].direction = 3;
+        s.in[0].heavy = true;
+        s.step();
+        for (int i = 0; i < 40 && !d.launched; i++) s.step();
+        assertTrue("lançou", d.launched);
+        float topo = 0f;
+        for (int i = 0; i < 120 && !d.grounded; i++) {
+            topo = Math.max(topo, Arena.GROUND_Y - d.y);
+            s.step();
+        }
+        CombatConfig c = s.config();
+        float doChao = c.launchSpeed * c.launchSpeed / (2f * c.gravity);
+        assertEquals("o topo é o de um lançamento do chão", doChao, topo, 30f);
+    }
 }
