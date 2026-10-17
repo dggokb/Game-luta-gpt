@@ -284,6 +284,13 @@ tasks.register('medirCarregamento', JavaExec) {
     systemProperty 'gameluta.semPrecarga', 'true'
     maxHeapSize = providers.gradleProperty('heap').getOrElse('5g')
     if (providers.gradleProperty('quem').isPresent()) args providers.gradleProperty('quem').get()
+    // -Pcelular=menu,paginas,a,b,c,d: o caminho do celular (segundos no menu e nas páginas, luta 2x2).
+    if (providers.gradleProperty('celular').isPresent()) {
+        def c = providers.gradleProperty('celular').get().split(',')
+        args 'celular', c[0], c[1], c[2..5].join(',')
+    }
+    // -Pfolhas=N: N threads de decodificação além da que espera (0 = uma de cada vez).
+    if (providers.gradleProperty('folhas').isPresent()) systemProperty 'gameluta.folhas', providers.gradleProperty('folhas').get()
     // -Ptela=1280x720: decide a definição da arte como num celular com essa tela.
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
 }
@@ -302,6 +309,8 @@ tasks.register('conferirQuadros', JavaExec) {
     systemProperty 'gameluta.semPrecarga', 'true'
     maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+    // -Pjava2d: escala pelo próprio Java2D (sem o cache de escala do PC, que arredonda o destino).
+    if (providers.gradleProperty('java2d').isPresent()) systemProperty 'gameluta.escalaJava2d', 'true'
     args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.file('quadros.txt').get().asFile.absolutePath),
         providers.gradleProperty('quem').getOrElse(''),
         providers.gradleProperty('zoom').getOrElse('1'),

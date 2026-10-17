@@ -24,8 +24,16 @@ final class SpriteFighterRenderer {
 
     /** Match renderer: the owner preloads every pack it may show into the shared cache. */
     SpriteFighterRenderer(SpriteAtlasCache atlases,CharacterDefinition character) {
+        this(atlases,character,true);
+    }
+
+    /**
+     * {@code carregar} false: só monta o renderer; as folhas ficam para quem montar a luta
+     * ({@link SpriteAtlasCache#preload}), que pode estar antecipando em segundo plano.
+     */
+    SpriteFighterRenderer(SpriteAtlasCache atlases,CharacterDefinition character,boolean carregar) {
         this.atlases=atlases;this.character=character;
-        atlases.preload(character);
+        if(carregar)atlases.preload(character);
         motion=new SpriteMotion(character);
     }
     void setCharacter(String id) {
@@ -152,7 +160,7 @@ final class SpriteFighterRenderer {
                            float baseY,float sizeX,float sizeY,int alpha) {
         if(alpha<=0)return;
         if(!a.frame(frame,box))return;
-        SpriteAtlasCache.Folha folha=atlases.get(a);
+        SpriteAtlasCache.Folha folha=atlases.get(character,a);
         // A caixa do quadro na folha (pixels da folha original) e onde ela fica na célula; com a
         // folha reduzida, a fonte é a mesma caixa no bitmap menor (arredondada para pixels
         // inteiros) e o destino é o que essa fonte cobre.

@@ -107,6 +107,32 @@ public final class PaginaHistoria {
         return new String[][] {luta.dupla.clone(), luta.cpu.clone()};
     }
 
+    /**
+     * A próxima luta do episódio a partir do passo atual (ele incluído), para o jogo ir
+     * preparando as duplas enquanto o jogador lê. Null se não há luta à frente ou se antes dela
+     * vem algo que ainda decide quem luta (escolha do irmão, sorteio, chave, próximo episódio).
+     * Não sorteia nada.
+     */
+    public Episodio.Passo proximaLuta() {
+        if (!active || episodio == null) return null;
+        for (int i = Math.max(stepIndex, 0); i < episodio.passos.size(); i++) {
+            Episodio.Passo p = episodio.passos.get(i);
+            switch (p.tipo) {
+                case ESCOLHA:
+                case SORTEIO:
+                case CHAVE:
+                case PROXIMO:
+                    return null;
+                default:
+                    break;
+            }
+            if (p.torneio && (campanha == null || campanha.torneioSorteado() == null)) return null;
+            if (!toca(p)) continue;
+            if (p.tipo == Episodio.TipoPasso.LUTA) return p;
+        }
+        return null;
+    }
+
     /** O rótulo da luta (no torneio, o nome da rodada). */
     public String rotulo(Episodio.Passo luta) {
         return campanha != null ? campanha.rotulo(luta) : luta.rotulo;

@@ -109,6 +109,24 @@ public class PaginaHistoriaTest {
     }
 
     @Test
+    public void proximaLutaEstaANaFrenteDasPaginas() {
+        PaginaHistoria p = new PaginaHistoria(new Recorder(), new NoImages());
+        assertEquals(null, p.proximaLuta());
+        p.start(Temporada.fromJson(TEMPORADA), Episodio.fromJson(EPISODIO));
+        // Do título já se sabe quem luta depois das páginas: dá para ir preparando as duplas.
+        Episodio.Passo luta = p.proximaLuta();
+        assertNotNull(luta);
+        assertEquals(Episodio.TipoPasso.LUTA, luta.tipo);
+        assertEquals("p3", p.lados(luta)[1][0]);
+        // Uma escolha (ou sorteio) antes da luta ainda decide quem luta: nada a preparar.
+        PaginaHistoria escolha = new PaginaHistoria(new Recorder(), new NoImages());
+        escolha.start(Temporada.fromJson(TEMPORADA), Episodio.fromJson("{\"id\":\"e1\",\"numero\":1,\"titulo\":\"T\",\"passos\":[" +
+            "{\"tipo\":\"titulo\"},{\"tipo\":\"escolha\"}," +
+            "{\"tipo\":\"luta\",\"dupla\":[\"p1\",\"p2\"],\"cpu\":[\"p3\",\"p4\"]}]}"));
+        assertEquals(null, escolha.proximaLuta());
+    }
+
+    @Test
     public void toqueDuranteADigitacaoMostraOTextoInteiro() {
         PaginaHistoria p = new PaginaHistoria(new Recorder(), new NoImages());
         p.start(Temporada.fromJson(TEMPORADA), Episodio.fromJson(EPISODIO));

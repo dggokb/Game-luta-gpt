@@ -29,7 +29,12 @@ public final class CapturaPc {
     private volatile boolean medindo;
 
     public CapturaPc(Context contexto, int largura, int altura) {
-        jogo = new GameView(contexto);
+        this(contexto, largura, altura, false);
+    }
+
+    /** {@code celular}: a GameView como no celular (menu na hora, arte em segundo plano). */
+    public CapturaPc(Context contexto, int largura, int altura, boolean celular) {
+        jogo = new GameView(contexto, celular);
         quadro = new QuadroPc(largura, altura, this::recebido);
     }
 

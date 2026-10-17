@@ -158,7 +158,19 @@ public class GameView extends SurfaceView
     /** Point of the heavy straight where the arm is pulled back (charge, without own art). */
     private static final float BEAM_CHARGE_POSE = 0.25f;
     private static final float BEAM_CHARGE_ZOOM = 0.18f;
-    private final UltraPack[] ultraPacks = new UltraPack[2];
+    /**
+     * Packs do Ultra por personagem, prontos ou carregando numa thread à parte. No celular só
+     * começam quando alguém chega a {@link #ULTRA_PREPARO} de barra (o Ultra pede 3): a luta não
+     * espera por eles, e a memória só vai para quem pode usar.
+     */
+    private final java.util.Map<String, java.util.concurrent.FutureTask<UltraPack>> ultras =
+        new java.util.concurrent.ConcurrentHashMap<>();
+    private java.util.concurrent.ExecutorService carregadorDeUltras;
+    /** Barra a partir da qual o pack do Ultra começa a carregar em segundo plano. */
+    static final int ULTRA_PREPARO = 2 * CombatConfig.METER_PER_BAR;
+    /** Ativou o Ultra antes do pack ficar pronto: a luta espera parada (sem travar a tela). */
+    private CombatFighter ultraEsperando;
+    private long ultraEsperandoDesde;
     private final PaginaFinal paginaFinal = new PaginaFinal(this);
     /** Abertura cinematográfica do Ultra (a luta fica parada enquanto ela roda). */
     private final AberturaUltra abertura = new AberturaUltra();
@@ -307,7 +319,6 @@ public class GameView extends SurfaceView
     private SpriteFighterRenderer opponentPartnerRenderer;
     private final CombatFighter opponentLeavingBody = new CombatFighter(OPPONENT, null, 0f, -1);
     /** Ultra do CPU: os packs dos personagens dele que não estão no time do jogador. */
-    private final java.util.Map<String, UltraPack> cpuUltraPacks = new java.util.HashMap<>();
 
     // Single version source: versionName in app/build.gradle.
     private static final String VERSION_HUD_LABEL =
@@ -432,7 +443,99 @@ public class GameView extends SurfaceView
         setFocusable(true);
         setKeepScreenOn(true);
         contextoArte = context;
+        carregarFolhasNaHora = !emSegundoPlano;
         if (!emSegundoPlano) carregarArte(context);
+        else anteciparArteDaLuta(context);
+    }
+
+    /**
+     * PC e testes: a arte inteira na construção, folhas da dupla inicial incluídas. No celular
+     * as folhas de cada luta são decodificadas (ou já foram antecipadas) quando ela é montada.
+     */
+    private boolean carregarFolhasNaHora;
+    /** Seleção e cenário montados em segundo plano enquanto o menu está na tela. */
+    private java.util.concurrent.FutureTask<CharacterSelectRenderer> selecaoAntecipada;
+    private java.util.concurrent.FutureTask<StageScene> cenarioAntecipado;
+    private String cenarioAntecipadoId;
+    /** A última combinação de lutadores antecipada (não repete a cada quadro). */
+    private String lutadoresAntecipados = "";
+    /** A luta da história cujas duplas já foram antecipadas. */
+    private Episodio.Passo lutaAntecipada;
+
+    /**
+     * Começa, em segundo plano e sem travar o menu, o que a primeira saída dele vai pedir: a
+     * tela de seleção, o cenário e as folhas da dupla de teste. O carregamento depois só espera
+     * o que ainda faltar.
+     */
+    private void anteciparArteDaLuta(Context context) {
+        final String[] picks = testPicks.clone();
+        selecaoAntecipada = new java.util.concurrent.FutureTask<>(() -> {
+            CharacterSelectRenderer selecao = new CharacterSelectRenderer(context);
+            selecao.prepararHerois(picks);
+            return selecao;
+        });
+        final String id = stageId;
+        cenarioAntecipadoId = id;
+        cenarioAntecipado = new java.util.concurrent.FutureTask<>(() -> loadStage(ultraAssets, id));
+        Thread t = new Thread(() -> {
+            selecaoAntecipada.run();
+            cenarioAntecipado.run();
+        }, "Antecipando");
+        t.setDaemon(true);
+        t.setPriority(Math.max(Thread.MIN_PRIORITY, Thread.NORM_PRIORITY - 2));
+        t.start();
+        anteciparLutadores(testPicks);
+    }
+
+    /** O resultado de um trabalho antecipado (esperando o que faltar), ou null se ele falhou. */
+    private static <T> T resultado(java.util.concurrent.FutureTask<T> tarefa) {
+        if (tarefa == null) return null;
+        try {
+            return tarefa.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (java.util.concurrent.ExecutionException e) {
+            Log.w(LOG_TAG, "carregamento antecipado falhou; carregando de novo", e.getCause());
+            return null;
+        }
+    }
+
+    /** Começa a decodificar as folhas desses lutadores em segundo plano (sem esperar). */
+    private void anteciparLutadores(String... ids) {
+        String chave = String.join(",", ids);
+        if (chave.equals(lutadoresAntecipados)) return;
+        lutadoresAntecipados = chave;
+        java.util.ArrayList<CharacterDefinition> lutadores = new java.util.ArrayList<>();
+        for (String id : ids) {
+            if (id == null) continue;
+            try {
+                lutadores.add(GeneratedCharacters.get(id));
+            } catch (IllegalArgumentException e) {
+                // Lutador sem pack (ainda): nada para antecipar.
+            }
+        }
+        if (!atlases.antecipar(lutadores.toArray(new CharacterDefinition[0])))
+            Log.i(MedicaoCarregamento.TAG, "antecipação parcial (memória): " + chave);
+    }
+
+    /** Na seleção: as escolhas da tela (as que ainda vão mudar também; o orçamento segura). */
+    private void anteciparSelecao() {
+        if (characterSelect.solo()) anteciparLutadores(characterSelect.point(), characterSelect.partner());
+        else anteciparLutadores(characterSelect.point(), characterSelect.partner(),
+            characterSelect.opponentPoint(), characterSelect.opponentPartner());
+    }
+
+    /** Nas páginas da história (e do Arcade): as duplas da próxima luta, enquanto o jogador lê. */
+    private void anteciparHistoria() {
+        Episodio.Passo luta = historia.proximaLuta();
+        if (luta == null || luta == lutaAntecipada) return;
+        lutaAntecipada = luta;
+        String[][] lados = historia.lados(luta);
+        if (lados == null) return;
+        java.util.ArrayList<String> ids = new java.util.ArrayList<>();
+        for (String[] lado : lados) for (String id : lado) ids.add(id);
+        anteciparLutadores(ids.toArray(new String[0]));
     }
 
     /** Contexto para a arte da luta, carregada na primeira saída do menu inicial. */
@@ -461,20 +564,26 @@ public class GameView extends SurfaceView
         hud.loadArt(context);
         medicao.parte("hud");
         // One decode per atlas for the whole match: team packs (tag never decodes
-        // mid-fight) and the opponent share the same cache.
-        for (FighterState fighter : team) atlases.preload(fighter.character);
-        spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        // mid-fight) and the opponent share the same cache. No celular só os renderers: as
+        // folhas vêm com a luta (selectTeamsNow), muitas vezes já antecipadas.
+        boolean folhas = carregarFolhasNaHora;
+        if (folhas) atlases.preload(team[0].character, team[1].character, opponentFighter.character);
+        spriteFighterRenderer = new SpriteFighterRenderer(atlases, team[0].character, folhas);
         // O adversário aparece com as cores normais da arte (sem o filtro pálido de antes).
-        opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
-        partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character);
-        echoRenderer = new SpriteFighterRenderer(atlases, team[0].character);
+        opponentSpriteRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character, folhas);
+        partnerSpriteRenderer = new SpriteFighterRenderer(atlases, team[1].character, folhas);
+        echoRenderer = new SpriteFighterRenderer(atlases, team[0].character, folhas);
         echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
-        henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
-        opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character, folhas);
+        opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character, folhas);
         medicao.parte("folhas");
-        stageScene = loadStage(ultraAssets, stageId);
+        StageScene cenario = stageId.equals(cenarioAntecipadoId) ? resultado(cenarioAntecipado) : null;
+        stageScene = cenario != null ? cenario : loadStage(ultraAssets, stageId);
+        cenarioAntecipado = null;
         medicao.parte("cenario");
-        characterSelectRenderer = new CharacterSelectRenderer(context);
+        CharacterSelectRenderer selecao = resultado(selecaoAntecipada);
+        characterSelectRenderer = selecao != null ? selecao : new CharacterSelectRenderer(context);
+        selecaoAntecipada = null;
         medicao.parte("selecao");
         loadTeamUltras();
         medicao.parte("ultras");
@@ -504,10 +613,93 @@ public class GameView extends SurfaceView
     }
 
     private void loadTeamUltras() {
-        for (int i = 0; i < team.length; i++) {
-            ultraPacks[i] = loadUltraPack(ultraAssets, team[i]);
-            ultraSounds.loadUltra(ultraFolder(team[i]));
+        for (FighterState member : team) {
+            // PC e testes: na hora, como sempre; no celular, quando chegar perto do Ultra.
+            if (carregarFolhasNaHora) pedirUltra(member, true);
+            ultraSounds.loadUltra(ultraFolder(member));
         }
+        manterUltras();
+    }
+
+    /** O pack do Ultra do personagem: pedido agora (bloqueando) ou numa thread à parte. */
+    private java.util.concurrent.FutureTask<UltraPack> pedirUltra(FighterState fighter, boolean agora) {
+        String id = fighter.character.id;
+        java.util.concurrent.FutureTask<UltraPack> tarefa = ultras.get(id);
+        if (tarefa == null) {
+            final FighterState quem = fighter;
+            tarefa = new java.util.concurrent.FutureTask<>(() -> loadUltraPack(ultraAssets, quem));
+            ultras.put(id, tarefa);
+            if (agora) {
+                tarefa.run();
+            } else {
+                synchronized (ultras) {
+                    if (carregadorDeUltras == null) {
+                        carregadorDeUltras = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+                            Thread t = new Thread(r, "Ultras");
+                            t.setDaemon(true);
+                            t.setPriority(Math.max(Thread.MIN_PRIORITY, Thread.NORM_PRIORITY - 2));
+                            return t;
+                        });
+                    }
+                }
+                carregadorDeUltras.execute(tarefa);
+            }
+        } else if (agora && !tarefa.isDone()) {
+            resultado(tarefa);
+        }
+        return tarefa;
+    }
+
+    /** O pack pronto do personagem, ou null se ainda não foi pedido ou está carregando. */
+    private UltraPack ultraPronto(String characterId) {
+        java.util.concurrent.FutureTask<UltraPack> tarefa = ultras.get(characterId);
+        return tarefa != null && tarefa.isDone() ? resultado(tarefa) : null;
+    }
+
+    /** Solta os packs de quem saiu da luta. */
+    private void manterUltras() {
+        java.util.Set<String> ficam = new java.util.HashSet<>();
+        for (FighterState member : team) ficam.add(member.character.id);
+        if (flow.battle()) for (FighterState member : engine.team(OPPONENT).members) ficam.add(member.character.id);
+        ultras.keySet().retainAll(ficam);
+    }
+
+    /**
+     * No celular: quem tem {@link #ULTRA_PREPARO} de barra pode chegar ao Ultra, então o pack
+     * dele (e o do rival em campo, que aparece na abertura dividida) começa a carregar agora.
+     */
+    private void anteciparUltras() {
+        for (int side = 0; side < 2; side++) {
+            for (FighterState member : engine.team(side).members) {
+                if (member.superMeter < ULTRA_PREPARO) continue;
+                if (usaPackReal(member, side)) pedirUltra(member, false);
+                FighterState rival = engine.team(1 - side).pointState();
+                if (usaPackReal(rival, 1 - side)) pedirUltra(rival, false);
+            }
+        }
+    }
+
+    /**
+     * O personagem usa o pack de verdade: o jogador sempre; o CPU na batalha, ou no treino se for
+     * alguém da dupla do jogador (fora disso, o Ultra do CPU de treino usa o provisório).
+     */
+    private boolean usaPackReal(FighterState f, int side) {
+        return side == PLAYER || flow.battle() || teamHas(f.character.id);
+    }
+
+    private boolean teamHas(String characterId) {
+        for (FighterState member : team) if (member.character.id.equals(characterId)) return true;
+        return false;
+    }
+
+    /** Os packs que a abertura do Ultra de {@code p} mostra (o dele e o do rival) estão prontos. */
+    private boolean ultraProntoParaAbertura(CombatFighter p) {
+        return prontoOuSemPack(p.state) && prontoOuSemPack(engine.fighter(1 - p.index).state);
+    }
+
+    private boolean prontoOuSemPack(FighterState f) {
+        java.util.concurrent.FutureTask<UltraPack> tarefa = ultras.get(f.character.id);
+        return tarefa == null || tarefa.isDone();
     }
 
     /**
@@ -548,6 +740,7 @@ public class GameView extends SurfaceView
 
     private void selectTeamsNow(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
         MedicaoCarregamento medicao = new MedicaoCarregamento("dupla " + point + "+" + partner + " x " + cpuPoint + "+" + cpuPartner);
+        ultraEsperando = null;
         hud.resetEffects();
         duel = solo;
         team = membersOf(point, partner);
@@ -558,10 +751,13 @@ public class GameView extends SurfaceView
             // Batalha 2x2: o parceiro do CPU entra de assist, na troca e quando o titular cai,
             // então a arte dele fica carregada (sem decodificar no meio da luta).
             atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
-            atlases.preload(cpuPartnerCharacter);
+            atlases.preload(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
         } else {
             atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character);
+            // As folhas dos três de uma vez, em paralelo; as antecipadas só são esperadas.
+            atlases.preload(team[0].character, team[1].character, opponentFighter.character);
         }
+        lutadoresAntecipados = "";
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
@@ -584,24 +780,18 @@ public class GameView extends SurfaceView
 
     /**
      * O Ultra do CPU usa a arte do personagem dele. Quem também está no time do jogador
-     * reaproveita o pack já carregado; os outros carregam aqui, antes da luta.
+     * reaproveita o pack já carregado; os outros carregam aqui (PC e testes) ou perto do Ultra.
      */
     private void loadCpuUltras() {
-        cpuUltraPacks.clear();
         if (!flow.battle()) return;
         for (FighterState member : engine.team(OPPONENT).members) {
-            String id = member.character.id;
-            if (teamUltraPack(id) != null || cpuUltraPacks.containsKey(id)) continue;
-            cpuUltraPacks.put(id, loadUltraPack(ultraAssets, member));
+            if (carregarFolhasNaHora) pedirUltra(member, true);
             ultraSounds.loadUltra(ultraFolder(member));
         }
     }
 
     private UltraPack teamUltraPack(String characterId) {
-        for (int i = 0; i < team.length; i++) {
-            if (team[i].character.id.equals(characterId)) return ultraPacks[i];
-        }
-        return null;
+        return teamHas(characterId) ? ultraPronto(characterId) : null;
     }
 
     /** DUPLA (and the first launch): pause the fight and pick the pair. */
@@ -1131,6 +1321,7 @@ public class GameView extends SurfaceView
             pad.drainInto(ignoredInput);
             Integer key;
             while ((key = selectionKeys.poll()) != null) handleSelectionKey(key);
+            if (characterSelect.isOpen()) anteciparSelecao();
             return;
         }
         if (historia.coversScreen()) {
@@ -1139,9 +1330,23 @@ public class GameView extends SurfaceView
             Integer key;
             while ((key = selectionKeys.poll()) != null) handleStoryKey(key);
             historia.update(FIXED_STEP);
+            if (historia.coversScreen()) anteciparHistoria();
             return;
         }
         updateUltraBars();
+        if (ultraEsperando != null) {
+            // Ultra ativado antes do pack ficar pronto: a tela segue (faixas, escurecido) e a
+            // luta espera, sem travar, até ele chegar.
+            selectionKeys.clear();
+            if (!ultraProntoParaAbertura(ultraEsperando)) return;
+            CombatFighter quem = ultraEsperando;
+            ultraEsperando = null;
+            Log.i(MedicaoCarregamento.TAG, "ultra de " + quem.state.character.id + " esperou o pack "
+                + (android.os.SystemClock.uptimeMillis() - ultraEsperandoDesde) + "ms");
+            startUltraOpening(quem);
+            return;
+        }
+        if (!carregarFolhasNaHora) anteciparUltras();
         if (abertura.isActive()) {
             // Abertura do Ultra: a luta espera parada (sem pausa no meio).
             selectionKeys.clear();
@@ -1309,7 +1514,7 @@ public class GameView extends SurfaceView
             if (member.life > 0 || member == opponentPoint()) keep.add(member.character);
         }
         atlases.retainOnly(keep.toArray(new CharacterDefinition[0]));
-        for (CharacterDefinition character : keep) atlases.preload(character);
+        atlases.preload(keep.toArray(new CharacterDefinition[0]));
     }
 
     /** Modo batalha: depois do resultado, uma luta nova com as mesmas duplas. */
@@ -1463,7 +1668,16 @@ public class GameView extends SurfaceView
         if (phase != ultraPhaseSeen) {
             if (phase == CombatFighter.ULTRA_STARTUP) {
                 ultraSounds.play(ultraFolder(p.state), "ativacao");
-                startUltraOpening(p);
+                if (usaPackReal(p.state, p.index)) pedirUltra(p.state, false);
+                FighterState rival = engine.fighter(1 - p.index).state;
+                if (usaPackReal(rival, 1 - p.index)) pedirUltra(rival, false);
+                // Pack ainda carregando: a luta espera parada no começo do Ultra (update).
+                if (ultraProntoParaAbertura(p)) {
+                    startUltraOpening(p);
+                } else {
+                    ultraEsperando = p;
+                    ultraEsperandoDesde = android.os.SystemClock.uptimeMillis();
+                }
             }
             if (phase == CombatFighter.ULTRA_RUSH) ultraSounds.play(ultraFolder(p.state), "investida");
             ultraPhaseSeen = phase;
@@ -1526,7 +1740,7 @@ public class GameView extends SurfaceView
 
     /** O pack do Ultra de quem está na luta (o do time do jogador ou o do CPU). */
     private UltraPack ultraPackOf(CombatFighter f) {
-        return f == engine.fighter(PLAYER) ? ultraPacks[engine.team(PLAYER).point] : cpuUltraPack(f.state);
+        return f == engine.fighter(PLAYER) ? ultraPronto(f.state.character.id) : cpuUltraPack(f.state);
     }
 
     /** Faixas pretas do Ultra: entram rápido na ativação e saem quando a luta volta. */
@@ -1546,14 +1760,16 @@ public class GameView extends SurfaceView
         ultraDarkAlpha = 0;
         ultraCameraZoom = 1f;
         FighterState state = attacker == PLAYER ? activeFighter() : opponentPoint();
-        ultraPack = attacker == PLAYER ? ultraPacks[engine.team(PLAYER).point] : cpuUltraPack(state);
+        // A abertura já esperou o pack; sem abertura (raro), espera aqui.
+        if (usaPackReal(state, attacker)) resultado(pedirUltra(state, true));
+        ultraPack = attacker == PLAYER ? ultraPronto(state.character.id) : cpuUltraPack(state);
         paginaFinal.start(ultraPack, engine.fighter(attacker).facing);
     }
 
     /** O pack do Ultra do CPU: o do time do jogador se é o mesmo personagem, o carregado na luta, ou o provisório. */
     private UltraPack cpuUltraPack(FighterState state) {
         UltraPack pack = teamUltraPack(state.character.id);
-        if (pack == null) pack = cpuUltraPacks.get(state.character.id);
+        if (pack == null && flow.battle()) pack = ultraPronto(state.character.id);
         return pack != null ? pack : UltraPack.placeholder("ULTRA " + state.character.displayName, state.profile.color);
     }
 

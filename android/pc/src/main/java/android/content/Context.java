@@ -17,6 +17,8 @@ import java.util.Properties;
  */
 public class Context {
     public static final int MODE_PRIVATE = 0;
+    public static final String ACTIVITY_SERVICE = "activity";
+    private final android.app.ActivityManager activityManager = new android.app.ActivityManager();
 
     private final AssetManager assets;
     private final Resources resources;
@@ -34,6 +36,8 @@ public class Context {
     public Resources getResources() { return resources; }
 
     public String getPackageName() { return "com.gamelutagpt"; }
+
+    public Object getSystemService(String name) { return ACTIVITY_SERVICE.equals(name) ? activityManager : null; }
 
     public Context getApplicationContext() { return this; }
 
