@@ -14,6 +14,8 @@ public class SurfaceView extends View {
     public interface Target {
         Canvas beginFrame();
         void endFrame(Canvas canvas);
+        /** Tamanho fixo do buffer (0 = o da tela): o jogo desenha menor e quem mostra amplia. */
+        default void setTamanhoFixo(int width, int height) {}
     }
 
     private final Holder holder = new Holder();
@@ -26,6 +28,7 @@ public class SurfaceView extends View {
     public void attach(Target target, int width, int height) {
         setSize(width, height);
         holder.target = target;
+        target.setTamanhoFixo(holder.fixedWidth, holder.fixedHeight);
         holder.surface.setValid(true);
         for (SurfaceHolder.Callback c : holder.callbacks) c.surfaceCreated(holder);
         for (SurfaceHolder.Callback c : holder.callbacks) c.surfaceChanged(holder, 1, width, height);
@@ -66,5 +69,16 @@ public class SurfaceView extends View {
             Target t = target;
             if (t != null && canvas != null) t.endFrame(canvas);
         }
+
+        private volatile int fixedWidth, fixedHeight;
+
+        @Override public void setFixedSize(int width, int height) {
+            fixedWidth = width;
+            fixedHeight = height;
+            Target t = target;
+            if (t != null) t.setTamanhoFixo(width, height);
+        }
+
+        @Override public void setSizeFromLayout() { setFixedSize(0, 0); }
     }
 }

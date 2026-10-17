@@ -171,6 +171,7 @@ public final class StageScene {
 
     /** Opacidade do reflexo dos lutadores no piso (0 = sem reflexo). */
     public float fighterReflection() {
+        if (!detalhe) return 0f;
         return pack.definition.floor != null && floorImage != null ? pack.definition.floor.fighterReflection : 0f;
     }
 
@@ -355,6 +356,21 @@ public final class StageScene {
 
     // ------------------------------------------------------------- render
 
+    /**
+     * Detalhe completo (padrão) ou leve: no leve ficam de fora os efeitos que só enfeitam e
+     * custam encher a tela de novo — reflexos das camadas e das luzes no piso, neblina, brilhos
+     * na água, pétalas e o halo das luzes (o fogo dos braseiros continua).
+     */
+    public void setDetalhe(boolean completo) {
+        detalhe = completo;
+    }
+
+    public boolean detalhe() {
+        return detalhe;
+    }
+
+    private boolean detalhe = true;
+
     /** Tudo o que fica atrás dos lutadores, inclusive o piso. */
     public void drawBackground(RenderCanvas c) {
         c.fillRect(-10f, -10f, VW + 10f, VH + 10f, pack.definition.backgroundColor);
@@ -414,7 +430,7 @@ public final class StageScene {
             if (r < 0f || l > VW) continue;
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
-            if (layer.reflection > 0f) {
+            if (layer.reflection > 0f && detalhe) {
                 c.save();
                 c.scale(1f, -1f, 0f, bottom);
                 drawImage(c, p.image, l, top, r, bottom, mirrored, Math.round(alpha * layer.reflection));
@@ -450,7 +466,8 @@ public final class StageScene {
             float lx = l + (mirrored ? 1f - light.x : light.x) * (r - l);
             float ly = t + light.y * h;
             float pulse = 1f + light.pulse * (float)Math.sin(time * 6.5f + instance * 1.7f + i * 2.3f);
-            c.fillRadialGlow(lx, ly, light.radius * h * 2.2f, withAlpha(light.color, Math.round(150 * pulse)));
+            // O halo largo é o que mais enche a tela; o miolo da luz fica no leve.
+            if (detalhe) c.fillRadialGlow(lx, ly, light.radius * h * 2.2f, withAlpha(light.color, Math.round(150 * pulse)));
             c.fillRadialGlow(lx, ly, light.radius * h * 0.8f, withAlpha(light.color, Math.round(235 * pulse)));
         }
         for (int i = 0; i < layer.fires.size(); i++) {
@@ -516,6 +533,7 @@ public final class StageScene {
 
     /** Luzes e fogos que estão sobre o piso viram faixas de brilho no chão molhado. */
     private void drawFloorReflections(RenderCanvas c) {
+        if (!detalhe) return;
         StageDefinition.Floor floor = pack.definition.floor;
         if (floor == null || floorImage == null || floor.lightReflection <= 0f) return;
         for (Placed p : placed) {
@@ -569,6 +587,7 @@ public final class StageScene {
         c.fillVerticalGradient(-10f, yFar, VW + 10f, yNear + 1f,
             withAlpha(layer.color, alpha), withAlpha(layer.colorBottom, alpha));
 
+        if (!detalhe) return;
         // Brilhos que piscam na superfície, presos ao mundo (andam com a câmera).
         rand.reset(4242);
         float span = 2400f;
@@ -591,6 +610,7 @@ public final class StageScene {
     }
 
     private void drawFog(RenderCanvas c, Placed p) {
+        if (!detalhe) return;
         float top = camera.screenY(p.top, p.z);
         float bottom = camera.screenY(p.bottom, p.z);
         if (bottom < 0f || top > VH) return;
@@ -601,6 +621,7 @@ public final class StageScene {
     // ------------------------------------------------------------ efeitos
 
     private void drawPetals(RenderCanvas c, boolean behind) {
+        if (!detalhe) return;
         StageDefinition.Petals petals = pack.definition.petals;
         if (petals == null) return;
         for (int i = 0; i < petalX.length; i++) {

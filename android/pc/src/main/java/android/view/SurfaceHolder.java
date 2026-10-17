@@ -15,4 +15,8 @@ public interface SurfaceHolder {
     Canvas lockCanvas();
     Canvas lockHardwareCanvas();
     void unlockCanvasAndPost(Canvas canvas);
+    /** Desenha num buffer desse tamanho (a tela amplia); como no Android. */
+    void setFixedSize(int width, int height);
+    /** Volta ao tamanho da tela. */
+    void setSizeFromLayout();
 }

@@ -409,10 +409,21 @@ public class GameView extends SurfaceView
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
+        qualidade = new QualidadeGrafica(speedPrefs);
         storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
         pausa.setNivelCpu(speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO));
+        pausa.setGraficos(new MenuPausa.Graficos() {
+            @Override public String rotulo(java.util.function.UnaryOperator<String> traduzir) {
+                return qualidade.rotulo(traduzir);
+            }
+
+            @Override public void mudar(int direcao) {
+                qualidade.proximoModo(direcao);
+                aplicarQualidade();
+            }
+        });
         ai.setLevel(pausa.nivelCpu());
         atlases = new SpriteAtlasCache(context);
         ajusteTamanho = new TelaAjusteTamanho(atlases, new TelaAjusteTamanho.Host() {
@@ -588,6 +599,7 @@ public class GameView extends SurfaceView
         medicao.parte("cenario");
         CharacterSelectRenderer selecao = resultado(selecaoAntecipada);
         characterSelectRenderer = selecao != null ? selecao : new CharacterSelectRenderer(context);
+        prepararRostosDoHud(team[0].character, team[1].character, opponentFighter.character);
         // PC e testes: os retratos na hora, como antes (a seleção desenhada já sai completa).
         if (carregarFolhasNaHora) characterSelectRenderer.carregarHerois(GeneratedCharacters.SELECTABLE);
         selecaoAntecipada = null;
@@ -765,6 +777,9 @@ public class GameView extends SurfaceView
             atlases.preload(team[0].character, team[1].character, opponentFighter.character);
         }
         lutadoresAntecipados = "";
+        // Os rostos do HUD saem de folhas de conceito grandes: decodificados aqui, e não no
+        // primeiro quadro da luta (que engasgava).
+        prepararRostosDoHud(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
@@ -1116,6 +1131,7 @@ public class GameView extends SurfaceView
             openMainMenu();
         }
         surfaceReady = true;
+        if (qualidade.escala() < 0.999f) aplicarQualidade();
         startLoopIfReady();
     }
 
@@ -1174,9 +1190,16 @@ public class GameView extends SurfaceView
             long frameStart = System.nanoTime();
             float elapsedSeconds = (frameStart - previous) / 1_000_000_000f;
             previous = frameStart;
+            perfil.inicio();
             advanceSimulation(elapsedSeconds);
+            perfil.marca(PerfilQuadros.ATUALIZA);
             if (!running) break;
             drawFrame();
+            if (perfil.fim() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
+                Log.i(PerfilQuadros.TAG, "gráficos desceram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
+                    + " (luta abaixo de " + Math.round(QualidadeGrafica.FPS_MINIMO) + " fps)");
+                aplicarQualidade();
+            }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
             if (remaining > 0) {
                 try {
@@ -2429,13 +2452,43 @@ public class GameView extends SurfaceView
     private void drawFrame() {
         if (!holder.getSurface().isValid()) return;
         Canvas canvas = lockFrameCanvas();
+        perfil.marca(PerfilQuadros.TRAVA);
         if (canvas == null) return;
 
         try {
             renderFrame(canvas);
+            perfil.marca(PerfilQuadros.TELA);
         } finally {
             holder.unlockCanvasAndPost(canvas);
+            perfil.marca(PerfilQuadros.ENVIO);
         }
+    }
+
+    private void prepararRostosDoHud(CharacterDefinition... lutadores) {
+        if (characterSelectRenderer == null) return;
+        for (CharacterDefinition c : lutadores) characterSelectRenderer.hudPortrait(c);
+    }
+
+    /** Tempo de cada parte do quadro (log "Quadros"). */
+    final PerfilQuadros perfil = new PerfilQuadros();
+    /** Nível gráfico (AUTO aprende o do aparelho; a pausa troca). */
+    private final QualidadeGrafica qualidade;
+
+    /**
+     * Desenha no tamanho do nível gráfico: abaixo do ALTO o buffer da superfície fica menor que a
+     * tela e o sistema (ou a janela do PC) amplia, sem custo para o jogo. Toque e layout não mudam
+     * (seguem o tamanho da view). Os efeitos leves valem a partir do próximo quadro.
+     */
+    private void aplicarQualidade() {
+        final float escala = qualidade.escala();
+        post(() -> {
+            int w = getWidth(), h = getHeight();
+            if (escala >= 0.999f || w <= 0 || h <= 0) {
+                holder.setSizeFromLayout();
+            } else {
+                holder.setFixedSize(Math.max(320, Math.round(w * escala)), Math.max(180, Math.round(h * escala)));
+            }
+        });
     }
 
     /** Whole frame into any canvas: the surface in production, a bitmap in visual review tests. */
@@ -2574,6 +2627,8 @@ public class GameView extends SurfaceView
             int negativeLayer = feel.negative() ? canvas.saveLayer(0f, 0f, VW, VH, negativePaint) : -1;
             if (stageScene != null) {
                 // The stage projects every layer with the same camera the fighters use.
+                perfil.marca(PerfilQuadros.TELA);
+                stageScene.setDetalhe(!qualidade.efeitosLeves());
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
                 stageScene.drawBackground(renderCanvas);
             }
@@ -2583,6 +2638,7 @@ public class GameView extends SurfaceView
             canvas.translate(-cameraLeft, -renderCameraTop);
             if (stageScene == null) drawScenario(canvas);
             drawFloorReflections(canvas);
+            perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
             if (beam) {
@@ -2638,7 +2694,9 @@ public class GameView extends SurfaceView
             }
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
+            perfil.marca(PerfilQuadros.LUTA);
             if (stageScene != null) stageScene.drawForeground(renderCanvas);
+            perfil.marca(PerfilQuadros.FRENTE);
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
@@ -2679,6 +2737,7 @@ public class GameView extends SurfaceView
 
             canvas.restore();
             characterSelectRenderer.drawFightTransition(canvas);
+            perfil.marca(PerfilQuadros.HUD);
         }
     }
 
@@ -2712,9 +2771,12 @@ public class GameView extends SurfaceView
         c.save();
         c.translate(offsetX, 0f);
         c.scale(1f, -1f, 0f, GROUND_Y);
-        int layer = c.saveLayerAlpha(f.x - 280f, f.y - 520f, f.x + 280f, f.y + 30f, alpha);
+        // Transparência direto no desenho do sprite (sem saveLayer: uma camada fora da tela por
+        // lutador por quadro pesa na GPU de celular fraco). Só muda onde dois quadros se cruzam
+        // (a troca suave do P01), e num reflexo apagado isso não aparece.
+        renderer.setAlphaGlobal(alpha);
         drawFighter(c, renderer, f, false, false);
-        c.restoreToCount(layer);
+        renderer.setAlphaGlobal(255);
         c.restore();
     }
 
@@ -2753,7 +2815,7 @@ public class GameView extends SurfaceView
             engine.framesSinceSessionEnd(PLAYER), false);
         hud.drawTutorial(c, tutorial, esquema);
         if (debugOverlay) {
-            debug.drawPanel(c, engine);
+            debug.drawPanel(c, engine, perfil.ultima());
             drawSizeTunerButton(c);
         }
     }

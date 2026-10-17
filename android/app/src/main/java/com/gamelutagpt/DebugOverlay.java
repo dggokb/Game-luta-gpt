@@ -64,7 +64,10 @@ final class DebugOverlay {
         paint.setStyle(Paint.Style.FILL);
     }
 
-    void drawPanel(Canvas c, CombatEngine engine) {
+    void drawPanel(Canvas c, CombatEngine engine) { drawPanel(c, engine, ""); }
+
+    /** {@code quadros}: a última linha do {@link PerfilQuadros} (fps e tempo de cada parte). */
+    void drawPanel(Canvas c, CombatEngine engine, String quadros) {
         float left = 572f, top = 28f, right = 936f;
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.argb(200, 8, 12, 22));
@@ -77,6 +80,16 @@ final class DebugOverlay {
             engine.superFreezeActive() ? "  •  SUPER FREEZE" : ""), x, y, paint);
         paint.setFakeBoldText(false);
         y += line;
+        if (quadros != null && !quadros.isEmpty()) {
+            paint.setColor(Color.rgb(140, 230, 160));
+            paint.setTextSize(11f);
+            for (String parte : quadros.split(" \\| ")) {
+                c.drawText(parte, x, y, paint);
+                y += 13f;
+            }
+            paint.setTextSize(13f);
+            paint.setColor(Color.WHITE);
+        }
         for (int i = 0; i < 2; i++) {
             CombatFighter f = engine.fighter(i);
             paint.setColor(i == 0 ? Color.rgb(255, 214, 92) : Color.rgb(255, 120, 130));

@@ -89,6 +89,11 @@ final class SpriteFighterRenderer {
         2.1f,0.0f,-4.1f,-4.1f,-3.4f,-3.14f,-3.14f
     };
 
+    /** Transparência de tudo o que este renderer desenha (o reflexo no chão), 0..255. */
+    private int alphaGlobal = 255;
+
+    void setAlphaGlobal(int alpha) {alphaGlobal=Math.max(0,Math.min(255,alpha));}
+
     /** Filtro que vale por cima de tudo (a silhueta do impact frame), ou null. */
     private ColorFilter override;
 
@@ -158,7 +163,7 @@ final class SpriteFighterRenderer {
 
     private void drawAtlas(Canvas canvas,CharacterDefinition.Atlas a,int frame,float x,
                            float baseY,float sizeX,float sizeY,int alpha) {
-        if(alpha<=0)return;
+        if(alpha<=0||alphaGlobal<=0)return;
         if(!a.frame(frame,box))return;
         SpriteAtlasCache.Folha folha=atlases.get(character,a);
         // A caixa do quadro na folha (pixels da folha original) e onde ela fica na célula; com a
@@ -181,7 +186,7 @@ final class SpriteFighterRenderer {
         float top=baseY+fix.dy*scale-a.rootY*heightScale;
         destination.set(left+srcLeft*widthScale,top+srcTop*heightScale,
             left+srcRight*widthScale,top+srcBottom*heightScale);
-        spritePaint.setAlpha(alpha);
+        spritePaint.setAlpha(alphaGlobal==255?alpha:alpha*alphaGlobal/255);
         canvas.drawBitmap(folha.bitmap,source,destination,spritePaint);
     }
 

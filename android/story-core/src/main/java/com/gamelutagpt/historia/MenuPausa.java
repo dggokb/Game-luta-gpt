@@ -5,13 +5,14 @@ import com.gamelutagpt.render.RenderCanvas;
 /**
  * Pausa por cima da história ou da luta (botão MENU ou a tecla voltar): CONTINUAR, a VELOCIDADE
  * da luta, o IMPACTO (impact frames ligados ou não: a tela pisca nos golpes grandes), o NÍVEL da CPU
- * (1 a 8), a lista de COMANDOS de cada personagem ({@link TelaComandos}) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
+ * (1 a 8), a lista de COMANDOS de cada personagem ({@link TelaComandos}), os GRÁFICOS (quem usa a
+ * pausa diz o rótulo e o que muda, {@link Graficos}) ou voltar ao MENU INICIAL. No modo história avisa que o progresso do episódio se perde. Quem chama para
  * o jogo enquanto a pausa está aberta e desenha a pausa por cima da tela parada.
  *
  * Não depende de plataforma e não é thread-safe: chame tudo da thread do loop do jogo.
  */
 public final class MenuPausa {
-    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, MENU }
+    public enum Opcao { CONTINUAR, VELOCIDADE, IMPACTO, NIVEL_CPU, COMANDOS, GRAFICOS, MENU }
 
     public static final String PAUSA = "PAUSA";
     public static final String CONTINUAR = "CONTINUAR";
@@ -21,13 +22,24 @@ public final class MenuPausa {
     public static final String DESLIGADO = "DESLIGADO";
     public static final String COMANDOS = "COMANDOS";
     public static final String NIVEL_CPU = "NÍVEL CPU";
+    public static final String GRAFICOS = "GRÁFICOS";
+    /** Níveis dos gráficos (quem usa a pausa monta o rótulo com eles). */
+    public static final String[] NIVEIS_GRAFICOS = {"AUTO", "ALTO", "MÉDIO", "LEVE"};
     public static final String MENU_INICIAL = "MENU INICIAL";
     public static final String AVISO = "Voltar ao menu perde o progresso deste episódio.";
     public static final String AVISO_ARCADE = "Voltar ao menu encerra o Arcade.";
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
     public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, NIVEL_CPU,
-        COMANDOS, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
+        COMANDOS, GRAFICOS, "AUTO", "ALTO", "MÉDIO", "LEVE", MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
+
+    /** A opção GRÁFICOS: quem usa a pausa diz o que mostrar e o que fazer ao trocar. */
+    public interface Graficos {
+        /** O valor ao lado de GRÁFICOS ({@code traduzir} usa o idioma da temporada). */
+        String rotulo(java.util.function.UnaryOperator<String> traduzir);
+        /** ◀ ▶ (ou A, que vai para a frente): o próximo nível. */
+        void mudar(int direcao);
+    }
 
     /** Velocidades da luta (1 = original); quem usa a pausa lê e guarda a escolhida. */
     public static final float[] VELOCIDADES = {0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f};
@@ -36,12 +48,13 @@ public final class MenuPausa {
     public static final int NIVEL_MIN = 1, NIVEL_MAX = 8, NIVEL_PADRAO = 5;
 
     static final float[][] CAIXAS = {
-        {420f, 290f, 860f, 340f},
-        {420f, 352f, 860f, 402f},
-        {420f, 414f, 860f, 464f},
-        {420f, 476f, 860f, 526f},
-        {420f, 538f, 860f, 588f},
-        {420f, 600f, 860f, 650f},
+        {420f, 290f, 860f, 336f},
+        {420f, 344f, 860f, 390f},
+        {420f, 398f, 860f, 444f},
+        {420f, 452f, 860f, 498f},
+        {420f, 506f, 860f, 552f},
+        {420f, 560f, 860f, 606f},
+        {420f, 614f, 860f, 660f},
     };
     /** O mesmo toque que abriu a pausa não pode escolher nada. */
     static final float TAP_DELAY = 0.2f;
@@ -56,6 +69,11 @@ public final class MenuPausa {
     private boolean impacto = true;
     private int nivelCpu = NIVEL_PADRAO;
     private final TelaComandos comandos = new TelaComandos();
+    private Graficos graficos;
+
+    public void setGraficos(Graficos graficos) {
+        this.graficos = graficos;
+    }
 
     /** Abre com o cursor em CONTINUAR. {@code aviso}: mostra que o episódio se perde. */
     public void abrir(Temporada temporada, boolean aviso) {
@@ -145,6 +163,10 @@ public final class MenuPausa {
             if (direcao != 0) setNivelCpu(nivelCpu + (direcao > 0 ? 1 : -1));
             return true;
         }
+        if (open && cursor() == Opcao.GRAFICOS) {
+            if (direcao != 0 && graficos != null) graficos.mudar(direcao);
+            return true;
+        }
         if (!open || cursor() != Opcao.VELOCIDADE) return false;
         if (direcao != 0) velocidade = Math.max(0, Math.min(VELOCIDADES.length - 1, velocidade + (direcao > 0 ? 1 : -1)));
         return true;
@@ -185,6 +207,10 @@ public final class MenuPausa {
         }
         if (cursor() == Opcao.COMANDOS) {
             comandos.abrir(temporada);
+            return null;
+        }
+        if (cursor() == Opcao.GRAFICOS) {
+            if (graficos != null) graficos.mudar(1);
             return null;
         }
         open = false;
@@ -232,6 +258,10 @@ public final class MenuPausa {
                     comandos.abrir(temporada);
                     return null;
                 }
+                if (cursor() == Opcao.GRAFICOS) {
+                    if (graficos != null) graficos.mudar(x < (CAIXAS[i][0] + CAIXAS[i][2]) * 0.5f ? -1 : 1);
+                    return null;
+                }
                 open = false;
                 return Opcao.values()[i];
             }
@@ -260,15 +290,21 @@ public final class MenuPausa {
         c.drawText(titulo, cx, 252f, size, Tinta.withAlpha(BotaoMenu.WHITE, (int)(255f * in)),
             Tinta.withAlpha(BotaoMenu.INK, (int)(255f * in)), size * 0.14f, true);
         String[] labels = {t(CONTINUAR), rotuloVelocidade(), t(IMPACTO) + ":  " + t(impacto ? LIGADO : DESLIGADO),
-            rotuloNivel(), t(COMANDOS), t(MENU_INICIAL)};
+            rotuloNivel(), t(COMANDOS), rotuloGraficos(), t(MENU_INICIAL)};
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
         }
         if (aviso != null) {
             String texto = t(aviso);
-            c.drawText(texto, cx, 668f, BotaoMenu.fit(c, texto, 20f, 900f, false),
+            c.drawText(texto, cx, 690f, BotaoMenu.fit(c, texto, 20f, 900f, false),
                 Tinta.withAlpha(0xFFB9C0D0, (int)(255f * in)), 0, 0f, false);
         }
+    }
+
+    /** "GRÁFICOS  ◀ AUTO (ALTO) ▶" (sem quem diga o valor, só o nome). */
+    private String rotuloGraficos() {
+        if (graficos == null) return t(GRAFICOS);
+        return t(GRAFICOS) + "  ◀ " + graficos.rotulo(this::t) + " ▶";
     }
 
     /** "NÍVEL CPU  ◀ 5 ▶": as setas somem na ponta em que não dá mais para ir. */
