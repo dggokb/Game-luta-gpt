@@ -457,7 +457,9 @@ public class GameView extends SurfaceView
 
     /** A parte pesada da montagem: só decodifica arte e sons, nada que a thread da UI leia. */
     private void carregarArte(Context context) {
+        MedicaoCarregamento medicao = new MedicaoCarregamento("arte");
         hud.loadArt(context);
+        medicao.parte("hud");
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache.
         for (FighterState fighter : team) atlases.preload(fighter.character);
@@ -469,9 +471,14 @@ public class GameView extends SurfaceView
         echoRenderer.setTint(SpriteFighterRenderer.shadowEcho());
         henchmanRenderer = new SpriteFighterRenderer(atlases, team[0].character);
         opponentPartnerRenderer = new SpriteFighterRenderer(atlases, opponentFighter.character);
+        medicao.parte("folhas");
         stageScene = loadStage(ultraAssets, stageId);
+        medicao.parte("cenario");
         characterSelectRenderer = new CharacterSelectRenderer(context);
+        medicao.parte("selecao");
         loadTeamUltras();
+        medicao.parte("ultras");
+        medicao.fim(atlases);
         arteCarregada = true;
     }
 
@@ -540,6 +547,7 @@ public class GameView extends SurfaceView
     }
 
     private void selectTeamsNow(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
+        MedicaoCarregamento medicao = new MedicaoCarregamento("dupla " + point + "+" + partner + " x " + cpuPoint + "+" + cpuPartner);
         hud.resetEffects();
         duel = solo;
         team = membersOf(point, partner);
@@ -565,9 +573,12 @@ public class GameView extends SurfaceView
         }
         engine.refreshOverdrive(PLAYER);
         engine.refreshOverdrive(OPPONENT);
+        medicao.parte("folhas");
         engine.restage(PLAYER_START_X, OPPONENT_START_X);
         loadTeamUltras();
         loadCpuUltras();
+        medicao.parte("ultras");
+        medicao.fim(atlases);
         startIntro();
     }
 

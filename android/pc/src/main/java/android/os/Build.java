@@ -1,6 +1,6 @@
 package android.os;
 
-/** PC: comporta-se como um Android 8 (o GameView pede o Canvas "pela GPU", que aqui é o Java2D). */
+/** PC: comporta-se como um Android 9 (o GameView pede o Canvas "pela GPU", que aqui é o Java2D). */
 public final class Build {
     public static final String MODEL = "PC";
     public static final String MANUFACTURER = System.getProperty("os.name", "PC");
@@ -8,8 +8,8 @@ public final class Build {
     private Build() {}
 
     public static final class VERSION {
-        public static final int SDK_INT = 26;
-        public static final String RELEASE = "8.0";
+        public static final int SDK_INT = 28;
+        public static final String RELEASE = "9";
         private VERSION() {}
     }
 

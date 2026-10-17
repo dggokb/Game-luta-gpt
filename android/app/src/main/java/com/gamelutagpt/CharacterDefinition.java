@@ -8,17 +8,55 @@ import java.util.Map;
 final class CharacterDefinition {
     static final class Atlas {
         final String resource;
+        /** Logical cell (the generator's packed cell): size, root and grid of frames. */
         final int width, height, rootX, rootY, columns, count;
         /** Texture pixels per canonical art pixel; gameplay/profile units stay unchanged. */
         final float pixelScale;
+        /**
+         * Size of the shipped image. Trimmed sheets keep only the box around each frame's
+         * drawing (tools/sprites/folhas.py); without a frame table the image is the grid.
+         */
+        final int sheetWidth, sheetHeight;
+        /** Per frame: sheetX, sheetY, width, height, cellX, cellY (width 0 = empty), or null. */
+        private final int[] frames;
         Atlas(String resource,int width,int height,int rootX,int rootY,int columns,int count) {
             this(resource,width,height,rootX,rootY,columns,count,1f);
         }
         Atlas(String resource,int width,int height,int rootX,int rootY,int columns,int count,float pixelScale) {
+            this(resource,width,height,rootX,rootY,columns,count,pixelScale,
+                columns*width,((count+columns-1)/columns)*height,null);
+        }
+        Atlas(String resource,int width,int height,int rootX,int rootY,int columns,int count,float pixelScale,
+              int sheetWidth,int sheetHeight,String frames) {
             if(!Float.isFinite(pixelScale)||pixelScale<=0f)throw new IllegalArgumentException("Invalid atlas pixelScale");
             this.resource=resource;this.width=width;this.height=height;
             this.rootX=rootX;this.rootY=rootY;this.columns=columns;this.count=count;
-            this.pixelScale=pixelScale;
+            this.pixelScale=pixelScale;this.sheetWidth=sheetWidth;this.sheetHeight=sheetHeight;
+            this.frames=frames==null?null:parseFrames(resource,frames,count,sheetWidth,sheetHeight);
+        }
+        private static int[] parseFrames(String resource,String text,int count,int sheetWidth,int sheetHeight) {
+            String[] parts=text.split(",");
+            if(parts.length!=count*6)throw new IllegalArgumentException("Invalid frame table: "+resource);
+            int[] out=new int[parts.length];
+            for(int i=0;i<parts.length;i++)out[i]=Integer.parseInt(parts[i]);
+            for(int i=0;i<count;i++) {
+                int x=out[i*6],y=out[i*6+1],w=out[i*6+2],h=out[i*6+3];
+                if(w<0||h<0||x<0||y<0||x+w>sheetWidth||y+h>sheetHeight)
+                    throw new IllegalArgumentException("Frame outside the sheet: "+resource+" #"+i);
+            }
+            return out;
+        }
+        /**
+         * Where frame {@code frame} is: {@code out} = {sheetX, sheetY, width, height, cellX,
+         * cellY}, the last two inside the logical cell. Returns false for an empty frame.
+         */
+        boolean frame(int frame,int[] out) {
+            if(frames==null) {
+                out[0]=frame%columns*width;out[1]=frame/columns*height;out[2]=width;out[3]=height;out[4]=0;out[5]=0;
+                return true;
+            }
+            System.arraycopy(frames,frame*6,out,0,6);
+            return out[2]>0&&out[3]>0;
         }
     }
     static final class Animation {

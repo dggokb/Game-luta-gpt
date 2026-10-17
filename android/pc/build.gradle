@@ -266,4 +266,44 @@ tasks.register('capturar', JavaExec) {
     systemProperty 'gameluta.semSom', 'true'
     maxHeapSize = '3g'
     args layout.buildDirectory.dir('captura').get().asFile.absolutePath
+    // -Ptela=1280x720: arte decidida como num celular com essa tela (padrão: sem redução).
+    if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+}
+
+// Mede o carregarArte por parte e as folhas de cada lutador (tempo e memória decodificada).
+// gradle :pc:medirCarregamento   (ou -Pquem=p02,p03 para escolher os lutadores)
+tasks.register('medirCarregamento', JavaExec) {
+    group = 'verification'
+    description = 'Mede tempo e memória dos carregamentos pesados (sem a pré-carga paralela do PC).'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.MedirCarregamento'
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    systemProperty 'gameluta.semPrecarga', 'true'
+    maxHeapSize = providers.gradleProperty('heap').getOrElse('5g')
+    if (providers.gradleProperty('quem').isPresent()) args providers.gradleProperty('quem').get()
+    // -Ptela=1280x720: decide a definição da arte como num celular com essa tela.
+    if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+}
+
+// Assinatura dos pixels de cada quadro de cada folha, desenhado pelo renderer da luta: duas
+// rodadas mostram quais quadros mudaram (folhas regeradas, decodificação reduzida...).
+// gradle :pc:conferirQuadros -Psaida=antes.txt [-Pquem=p02,p03] [-Pzoom=1.24] [-Ppng=pasta] [-Ptela=1280x720]
+tasks.register('conferirQuadros', JavaExec) {
+    group = 'verification'
+    description = 'Desenha cada quadro das folhas e grava a assinatura dos pixels.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.ConferirQuadros'
+    workingDir = rootProject.projectDir
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semPrecarga', 'true'
+    maxHeapSize = providers.gradleProperty('heap').getOrElse('4g')
+    if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+    args providers.gradleProperty('saida').getOrElse(layout.buildDirectory.file('quadros.txt').get().asFile.absolutePath),
+        providers.gradleProperty('quem').getOrElse(''),
+        providers.gradleProperty('zoom').getOrElse('1'),
+        providers.gradleProperty('png').getOrElse('')
 }

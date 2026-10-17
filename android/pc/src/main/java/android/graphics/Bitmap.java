@@ -12,11 +12,28 @@ public final class Bitmap {
     BufferedImage image;
     private int density = DENSITY_NONE;
     private final Config config;
+    /** Bytes deste bitmap na conta de {@link #bytesVivos()} (zera ao reciclar ou ser coletado). */
+    private final Conta conta;
+
+    /** Pixels decodificados que ainda existem (o "heap nativo" do Android, onde ficam os bitmaps). */
+    private static final java.util.concurrent.atomic.AtomicLong VIVOS = new java.util.concurrent.atomic.AtomicLong();
+    private static final java.lang.ref.Cleaner COLETOR = java.lang.ref.Cleaner.create();
+
+    private static final class Conta implements Runnable {
+        private final java.util.concurrent.atomic.AtomicLong bytes;
+        Conta(long bytes) { this.bytes = new java.util.concurrent.atomic.AtomicLong(bytes); VIVOS.addAndGet(bytes); }
+        @Override public void run() { VIVOS.addAndGet(-bytes.getAndSet(0)); }
+    }
 
     Bitmap(BufferedImage image) {
         this.image = toPremultiplied(image);
         this.config = Config.ARGB_8888;
+        conta = new Conta((long) this.image.getWidth() * this.image.getHeight() * 4L);
+        COLETOR.register(this, conta);
     }
+
+    /** Extensão do PC: bytes de todos os bitmaps ainda vivos (para medir carregamentos). */
+    public static long bytesVivos() { return VIVOS.get(); }
 
     /** Extensão do PC: a imagem do Java2D (somente leitura para quem desenha). */
     public BufferedImage image() {
@@ -41,7 +58,7 @@ public final class Bitmap {
 
     public boolean isRecycled() { return image == null; }
 
-    public void recycle() { image = null; }
+    public void recycle() { image = null; conta.run(); }
 
     public int getByteCount() { return getWidth() * getHeight() * 4; }
 

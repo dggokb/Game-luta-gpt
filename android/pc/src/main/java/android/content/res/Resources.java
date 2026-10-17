@@ -46,9 +46,13 @@ public class Resources {
     private final Map<String, Prefetched> prefetched = new HashMap<>();
     private ExecutorService pool;
 
+    private final android.util.DisplayMetrics metrics = android.util.DisplayMetrics.doPc();
+
     public Resources(File drawableDir) {
         this.drawableDir = drawableDir;
     }
+
+    public android.util.DisplayMetrics getDisplayMetrics() { return metrics; }
 
     public int getIdentifier(String name, String defType, String defPackage) {
         if (!"drawable".equals(defType) || name == null) return 0;

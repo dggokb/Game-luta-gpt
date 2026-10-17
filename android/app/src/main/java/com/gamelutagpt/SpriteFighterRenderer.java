@@ -9,6 +9,8 @@ final class SpriteFighterRenderer {
     private final SpriteAtlasCache atlases;
     private CharacterDefinition character;
     private final Rect source=new Rect();
+    /** Caixa do quadro atual na folha (CharacterDefinition.Atlas#frame). */
+    private final int[] box=new int[6];
     private final RectF destination=new RectF();
     private final Paint spritePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final ColorFilter hitFlash=new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
@@ -149,8 +151,16 @@ final class SpriteFighterRenderer {
     private void drawAtlas(Canvas canvas,CharacterDefinition.Atlas a,int frame,float x,
                            float baseY,float sizeX,float sizeY,int alpha) {
         if(alpha<=0)return;
-        int col=frame%a.columns,row=frame/a.columns;
-        source.set(col*a.width,row*a.height,(col+1)*a.width,(row+1)*a.height);
+        if(!a.frame(frame,box))return;
+        SpriteAtlasCache.Folha folha=atlases.get(a);
+        // A caixa do quadro na folha (pixels da folha original) e onde ela fica na célula; com a
+        // folha reduzida, a fonte é a mesma caixa no bitmap menor (arredondada para pixels
+        // inteiros) e o destino é o que essa fonte cobre.
+        float boxLeft=box[0],boxTop=box[1];
+        source.set(Math.round(boxLeft*folha.escalaX),Math.round(boxTop*folha.escalaY),
+            Math.round((boxLeft+box[2])*folha.escalaX),Math.round((boxTop+box[3])*folha.escalaY));
+        float srcLeft=box[4]+source.left/folha.escalaX-boxLeft,srcTop=box[5]+source.top/folha.escalaY-boxTop;
+        float srcRight=box[4]+source.right/folha.escalaX-boxLeft,srcBottom=box[5]+source.bottom/folha.escalaY-boxTop;
         float scale=character.profile.worldScale/a.pixelScale;
         // Accepted corrections are applied AFTER legacy calibrations and
         // debug tuning, so the engine really renders the corrected image.
@@ -161,9 +171,16 @@ final class SpriteFighterRenderer {
         float heightScale=scale*sizeY*fix.size*tuned;
         float left=x+fix.dx*scale-a.rootX*widthScale;
         float top=baseY+fix.dy*scale-a.rootY*heightScale;
-        destination.set(left,top,left+a.width*widthScale,top+a.height*heightScale);
+        destination.set(left+srcLeft*widthScale,top+srcTop*heightScale,
+            left+srcRight*widthScale,top+srcBottom*heightScale);
         spritePaint.setAlpha(alpha);
-        canvas.drawBitmap(atlases.get(a),source,destination,spritePaint);
+        canvas.drawBitmap(folha.bitmap,source,destination,spritePaint);
+    }
+
+    /** Um quadro de uma folha com a raiz em (x, baseY), sem calibração nem flash (ferramentas de conferência). */
+    void drawAtlasFrame(Canvas canvas,CharacterDefinition.Atlas atlas,int frame,float x,float baseY) {
+        spritePaint.setColorFilter(null);
+        drawAtlas(canvas,atlas,frame,x,baseY,1f,1f,255);
     }
 
     private static float clamp01(float v){return Math.max(0f,Math.min(1f,v));}
