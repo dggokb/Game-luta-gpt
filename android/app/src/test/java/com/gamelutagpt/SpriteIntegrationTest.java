@@ -314,7 +314,7 @@ public class SpriteIntegrationTest {
      */
     private static float[] drawnSpan(SpriteFighterRenderer renderer,CharacterDefinition.Atlas atlas,int frame)throws Exception {
         Field cache=SpriteFighterRenderer.class.getDeclaredField("atlases");cache.setAccessible(true);
-        SpriteAtlasCache.Folha folha=((SpriteAtlasCache)cache.get(renderer)).get(atlas);
+        SpriteAtlasCache.Folha folha=((SpriteAtlasCache)cache.get(renderer)).get(renderer.character(),atlas);
         int[] box=new int[6];
         assertTrue(atlas.frame(frame,box));
         float ex=folha.escalaX,ey=folha.escalaY;
