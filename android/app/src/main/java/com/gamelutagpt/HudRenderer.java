@@ -166,7 +166,7 @@ final class HudRenderer {
         panel(c, 187, 140, 355, 43, 9, 0xE8081427, BLUE, 1.5f);
         text(c, s.assistStatusLabel(), 364, 157, 16, effects.assistRatio >= 1 ? 0xFF9BEEFF : Color.WHITE);
         text(c, s.swapStatusLabel(), 364, 175, 14, Color.WHITE);
-        // Batalha: 99 segundos; treino e cenas da história: ∞ (nunca um relógio inventado).
+        // Batalha: 120 segundos; treino e cenas da história: ∞ (nunca um relógio inventado).
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
         drawClock(c, s);
         text(c, s.battleActive() ? "BATALHA" : "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
@@ -182,8 +182,10 @@ final class HudRenderer {
     /** Relógio da luta; nos últimos segundos fica vermelho e pulsa uma vez por segundo. */
     private void drawClock(Canvas c, State s) {
         String label = s.clockLabel();
+        // Três algarismos (120 no começo) ficam um pouco menores para caber entre as barras.
+        float size = label.length() >= 3 ? 48f : 58f;
         if (!s.clockUrgent()) {
-            text(c, label, 640f, 70f, 58f, Color.WHITE);
+            text(c, label, 640f, 70f, size, Color.WHITE);
             return;
         }
         // Pulso a cada segundo: cresce e volta, sem mudar o centro.
@@ -193,7 +195,7 @@ final class HudRenderer {
         c.translate(640f, 52f);
         c.scale(pulse, pulse);
         c.translate(-640f, -52f);
-        text(c, label, 640f, 70f, 58f, RED);
+        text(c, label, 640f, 70f, size, RED);
         c.restore();
     }
 

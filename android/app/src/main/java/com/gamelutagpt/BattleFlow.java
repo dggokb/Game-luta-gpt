@@ -27,7 +27,7 @@ final class BattleFlow {
     /** Resultado na tela antes de a luta recomeçar (fora da história). */
     static final int RESULT_FRAMES = 150;
     /** Duração da batalha, em segundos do relógio. */
-    static final int TIME_LIMIT_SECONDS = 99;
+    static final int TIME_LIMIT_SECONDS = 120;
     /** Quadros por segundo do relógio (o motor roda a 60). */
     static final int FRAMES_PER_SECOND = 60;
     static final int TIME_LIMIT_FRAMES = TIME_LIMIT_SECONDS * FRAMES_PER_SECOND;
@@ -108,7 +108,7 @@ final class BattleFlow {
     /** A luta tem relógio agora (batalha e nenhuma cena segurando). */
     boolean timed() { return battle && !clockHeld; }
 
-    /** Segundos no relógio (arredonda para cima: 99 no começo, 0 só quando acabou). */
+    /** Segundos no relógio (arredonda para cima: 120 no começo, 0 só quando acabou). */
     int clockSeconds() { return (clockFrames + FRAMES_PER_SECOND - 1) / FRAMES_PER_SECOND; }
 
     /** Texto do relógio da HUD: os segundos na batalha, ∞ no treino ou com a cena segurando. */

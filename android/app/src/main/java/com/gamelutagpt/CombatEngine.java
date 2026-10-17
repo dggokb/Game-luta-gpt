@@ -1444,6 +1444,65 @@ final class CombatEngine {
         return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= config.justDefenseFrames;
     }
 
+    /**
+     * Combo breaker: o golpe que fecha a sequência (forte ou especial, corpo a corpo, a última
+     * batida dele) num combo que já tem {@code comboBreakerMinHits} acertos, com trás apertado
+     * em cima da hora e barra para pagar.
+     */
+    private boolean comboBreaks(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile,
+                                boolean echo, boolean lastStrike) {
+        if (projectile || echo || !lastStrike || !d.inHitstun()) return false;
+        if (attack.strength != AttackDefinition.Strength.HEAVY && attack.strength != AttackDefinition.Strength.SPECIAL) {
+            return false;
+        }
+        ComboSession session = sessions[d.index];
+        if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return false;
+        if (d.state.superMeter < config.comboBreakerCost) return false;
+        return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= config.comboBreakerFrames;
+    }
+
+    /**
+     * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre;
+     * no chão, avança até ficar colado) e quem batia fica atordoado, sem o golpe, ao alcance do troco.
+     */
+    private void comboBreaker(CombatFighter a, CombatFighter d) {
+        d.state.spendSuperMeter(config.comboBreakerCost);
+        d.guardPressCounts = false;
+        endSession(d.index);
+        d.status = CombatFighter.Status.NEUTRAL;
+        d.stunLeft = d.stunTotal = 0;
+        d.stunElapsed = 0;
+        d.launched = false;
+        d.slammed = false;
+        d.ultraFall = false;
+        d.hardFall = false;
+        d.spinning = false;
+        d.bounce = CombatFighter.BOUNCE_NONE;
+        d.vx = 0f;
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        d.comboBroke = true;
+
+        a.comboBroke = false;
+        a.clearAttack();
+        if (a.grounded) a.vx = 0f;
+        a.status = a.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        a.hitCrouching = false;
+        a.stunLeft = a.stunTotal = config.comboBreakerStunFrames;
+        a.stunElapsed = 0;
+        a.pushRemaining = 0f;
+        a.pushFramesLeft = 0;
+        a.forwardDashing = false;
+        // O combo empurrou quem apanhava para longe: no estalo ele avança até ficar colado.
+        if (a.grounded && d.grounded) {
+            float wanted = a.body().halfWidth + d.body().halfWidth + config.comboBreakerCloseGap;
+            float gap = Math.abs(a.x - d.x);
+            if (gap > wanted) push(d, a, Math.signum(a.x - d.x) * (gap - wanted));
+        }
+        freeze(a, d, config.comboBreakerHitstopFrames, false);
+        cues.add("COMBO_BREAKER");
+    }
+
     /** Arranhão de uma batida defendida: só especial e Super/Ultra. */
     private int chipFor(AttackDefinition attack, int strikeDamage) {
         int permille = attack.strength == AttackDefinition.Strength.SUPER ? config.chipSuperPermille
@@ -2350,6 +2409,11 @@ final class CombatEngine {
             d.spinning = false;
             d.bounce = CombatFighter.BOUNCE_NONE;
             d.vx = 0f;
+            return;
+        }
+
+        if (comboBreaks(a, d, attack, projectile, c.echo, lastStrike)) {
+            comboBreaker(a, d);
             return;
         }
 

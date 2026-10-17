@@ -328,6 +328,20 @@ final class CombatConfig {
     /** Vida que volta (por mil da vida máxima): primeiro a vermelha. */
     int justDefenseHealPermille = 12;
 
+    // Combo breaker: no golpe que fecha a sequência (o forte ou o especial) de um combo que já
+    // está entrando, o mesmo gesto da defesa perfeita (trás em cima da hora) quebra o combo:
+    // o golpe não entra, quem batia fica atordoado e quem apanhava emenda o próprio combo.
+    // Custa barra (sem barra, nada acontece) e vale uma vez por combo.
+    int comboBreakerFrames = 5;
+    /** Acertos que o combo já tem antes do golpe que fecha (o breaker não vale no 1º golpe). */
+    int comboBreakerMinHits = 2;
+    int comboBreakerCost = METER_PER_BAR;
+    /** Atordoamento de quem teve o combo quebrado: tempo de entrar um combo de volta. */
+    int comboBreakerStunFrames = 30;
+    int comboBreakerHitstopFrames = 16;
+    /** No estalo, quem quebrou avança até ficar a esta folga do corpo do outro (ao alcance do L). */
+    float comboBreakerCloseGap = 30f;
+
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.
     int guardCancelCost = METER_PER_BAR;
     /** The opponent freezes for the cross-counter flash. */

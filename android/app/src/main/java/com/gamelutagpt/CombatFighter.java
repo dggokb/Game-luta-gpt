@@ -144,6 +144,8 @@ final class CombatFighter {
     boolean guardDirectionHeld;
     /** A última defesa foi perfeita (para a tela; some na próxima defesa). */
     boolean justDefended;
+    /** Quem quebrou o último combo quebrado (para a tela; o outro lado zera quando quebra). */
+    boolean comboBroke;
     /** Set by the shell while a tag animation owns the fighter. */
     boolean locked;
 

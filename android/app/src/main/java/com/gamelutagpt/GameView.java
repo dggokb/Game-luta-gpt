@@ -1472,6 +1472,7 @@ public class GameView extends SurfaceView
             }
             if ("GUARD_BREAK".equals(cue)) spawnGuardBreak();
             if ("JUST_DEFENSE".equals(cue)) spawnJustDefense();
+            if ("COMBO_BREAKER".equals(cue)) spawnComboBreaker();
             if ("OVERHEAD".equals(cue)) spawnOverheadWarning();
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
@@ -2074,6 +2075,23 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("defesa", 1f, 1.45f);
     }
 
+    /**
+     * Combo breaker: brilho na cor de quem quebrou no peito dele, estalo em quem teve o combo
+     * quebrado, tremida e o som do punish.
+     */
+    private void spawnComboBreaker() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter breaker = engine.fighter(side), broken = engine.fighter(1 - side);
+            if (!breaker.comboBroke || !broken.inHitstun() || broken.stunElapsed > 0) continue;
+            int accent = breaker.state.profile.color;
+            impacts.spawnSuperGlint(breaker.x, chestY(breaker), accent);
+            int direction = broken.x >= breaker.x ? 1 : -1;
+            impacts.spawn(ImpactEffects.HIT, broken.x, chestY(broken), direction, ImpactEffects.SPECIAL, accent);
+        }
+        beamShake = Math.max(beamShake, 16f);
+        ultraSounds.playFight("punish", 1f, 1.15f);
+    }
+
     /** Golpe alto saindo: o brilho de aviso na cabeça de quem bate (dá para ler e ficar em pé). */
     private void spawnOverheadWarning() {
         for (int side = 0; side < 2; side++) {
@@ -2178,6 +2196,7 @@ public class GameView extends SurfaceView
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             case "GUARD_BREAK": return "GUARD BREAK!";
             case "JUST_DEFENSE": return "DEFESA PERFEITA!";
+            case "COMBO_BREAKER": return "COMBO BREAKER!";
             case "DHC": return "TEAM SUPER!";
             case "OVERDRIVE": return "OVERDRIVE!";
             case "COUNTER": return "CONTRA-GOLPE!";

@@ -219,7 +219,7 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
   - Parceiro caído não vem mais de assist, troca, Guard Cancel nem DHC.
   - Fim: K.O. (`KO_FRAMES`), o resultado (VITÓRIA / DERROTA / EMPATE, `RESULT_FRAMES`) e a
     luta recomeça com as mesmas duplas. Só o vencedor final comemora.
-- **Tempo: 99 segundos** (`TIME_LIMIT_SECONDS`, 60 quadros por segundo) só na batalha; no treino
+- **Tempo: 120 segundos** (`TIME_LIMIT_SECONDS`, 60 quadros por segundo) só na batalha; no treino
   a HUD mostra ∞.
   - O relógio começa a contar no GO e **para** no congelamento do Super e do Ultra (cinemática,
     Página Final, raio), na pausa e enquanto uma cena da história tem o controle. Hitstop
@@ -531,6 +531,28 @@ SF6/FighterZ, no chip de especial de todos e no Just Defense do Garou).
   linhas elas ficam mais baixas para caber acima do rodapé.
 
 Testes em `DefesaEGolpeAltoTest`.
+
+### Combo breaker
+
+Contra combo sem fim: quem está apanhando pode quebrar o combo **no golpe que fecha a
+sequência** — o forte ou o especial, corpo a corpo, na última batida dele — com o **mesmo
+gesto da defesa perfeita** (trás apertado até `comboBreakerFrames` = 5 quadros antes do contato;
+bater trás sem parar não vale). L e M no meio da sequência não quebram.
+
+- Só num combo que já tem `comboBreakerMinHits` (2) acertos antes desse golpe e com **1 barra**
+  de Super (`comboBreakerCost`); sem barra, o golpe entra normal. Uma vez por combo (o combo acaba).
+- **Efeito** (cue `COMBO_BREAKER`): o golpe não entra; quem apanhava fica livre na hora (no ar,
+  cai livre) e, no chão, avança até ficar colado (`comboBreakerCloseGap`); quem batia perde o
+  golpe e fica atordoado `comboBreakerStunFrames` (30) depois de um congelamento de 16 — tempo de
+  emendar o próprio combo. "COMBO BREAKER!", brilho na cor de quem quebrou, estalo e tremida.
+- **Não vira luta infinita**: cada quebra custa uma barra, e a barra só volta batendo e
+  apanhando; o troco também pode ser quebrado, mas só por quem ainda tiver barra.
+- **CPU**: a partir do nível 4, apanhando num combo e com barra, a cada golpe novo que ela vê às
+  vezes aposta no tempo (`CpuLevel.comboBreaker`: 12% por nível acima do 3): espera um pouco e
+  aperta trás. Só quebra se a aposta cair na janela de um golpe forte/especial.
+- Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) ←".
+
+Testes em `ComboBreakerTest`.
 
 ## Agarrão e tech — v0.80
 

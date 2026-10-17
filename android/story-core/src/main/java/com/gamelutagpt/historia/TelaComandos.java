@@ -23,8 +23,9 @@ public final class TelaComandos {
     public static final String AGARRAO = "Agarrão";
     public static final String GOLPE_ALTO = "Golpe alto";
     public static final String DEFESA_PERFEITA = "Defesa perfeita (no último instante)";
+    public static final String COMBO_BREAKER = "Combo breaker (no golpe forte, 1 barra)";
     public static final String[] TEXTOS = {TITULO, NO_AR, LEGENDA, DICA, VOLTAR, SUPER, ULTRA, AGARRAO,
-        GOLPE_ALTO, DEFESA_PERFEITA};
+        GOLPE_ALTO, DEFESA_PERFEITA, COMBO_BREAKER};
 
     /** Um golpe: nome, comando (setas e botões) e se só sai no ar. */
     public static final class Linha {

@@ -80,6 +80,14 @@ final class CpuLevel {
         return number <= 4 ? 0.0 : 0.08 * (number - 4);
     }
 
+    /**
+     * Chance de apostar no combo breaker a cada golpe novo do combo que está levando (com barra):
+     * nada até o 3, depois sobe com o nível. A aposta é no tempo: só quebra se acertar a janela.
+     */
+    double comboBreaker() {
+        return number <= 3 ? 0.0 : 0.12 * (number - 3);
+    }
+
     static CpuLevel of(int number) {
         return LEVELS[Math.max(MIN, Math.min(MAX, number)) - 1];
     }

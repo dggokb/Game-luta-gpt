@@ -40,7 +40,7 @@ mais rápido que na história.
 O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um episódio com
 `sorteio`, `luta` + `"torneio": true`, `chave`, `luta` + `"duelo": true` e cartões `titulo`):
 
-- **Cada luta tem 99 segundos**; no TIME OVER vence a dupla com mais vida (regra em
+- **Cada luta tem 120 segundos**; no TIME OVER vence a dupla com mais vida (regra em
   `docs/combat-engine.md`). **Empate conta como derrota.**
 - **Perder repete a luta** (o "continuar" do Arcade). A pausa (◀ MENU ou voltar) tem MENU INICIAL,
   com o aviso "Voltar ao menu encerra o Arcade."

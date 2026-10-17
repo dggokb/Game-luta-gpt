@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 /**
  * As fichas da lista de COMANDOS (pausa) a partir dos dados de cada personagem: S1 (a energia),
- * S2 a S4, Super, Ultra, agarrão e o que vale para todos (golpe alto e defesa perfeita), com os
+ * S2 a S4, Super, Ultra, agarrão e o que vale para todos (golpe alto, defesa perfeita e combo breaker), com os
  * botões no esquema do jogador (toque, teclado ou controle).
  */
 final class ListaComandos {
@@ -38,6 +38,7 @@ final class ListaComandos {
             linhas.add(new TelaComandos.Linha(TelaComandos.GOLPE_ALTO, Comandos.texto("→ + {M}", esquema), false));
         }
         linhas.add(new TelaComandos.Linha(TelaComandos.DEFESA_PERFEITA, "←", false));
+        linhas.add(new TelaComandos.Linha(TelaComandos.COMBO_BREAKER, "←", false));
         return new TelaComandos.Ficha(c.displayName, linhas);
     }
 
