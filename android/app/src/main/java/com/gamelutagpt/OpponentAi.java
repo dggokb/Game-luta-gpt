@@ -42,6 +42,21 @@ final class OpponentAi {
         /** Nível e personalidade; null = nível 5, equilibrado. */
         CpuLevel level;
         CpuStyle style;
+        /**
+         * Pressa do fim do tempo (0 = calma, 1 = últimos segundos): ela quer terminar a luta,
+         * não deixar o tempo acabar. Ver {@link #urgency(int)}.
+         */
+        float urgency;
+    }
+
+    /** A pressa começa com este tanto de segundos no relógio e chega ao máximo neste outro. */
+    static final int URGENCY_START_SECONDS = 45, URGENCY_FULL_SECONDS = 10;
+
+    /** Pressa pelos segundos que faltam (negativo = sem relógio: nenhuma). */
+    static float urgency(int secondsLeft) {
+        if (secondsLeft < 0 || secondsLeft >= URGENCY_START_SECONDS) return 0f;
+        float u = (URGENCY_START_SECONDS - secondsLeft) / (float)(URGENCY_START_SECONDS - URGENCY_FULL_SECONDS);
+        return Math.min(1f, Math.max(0f, u));
     }
 
     static final float DECISION_MIN = 0.12f;
@@ -85,9 +100,13 @@ final class OpponentAi {
         if (decisionTimer > 0f) return false;
         CpuLevel level = s.level != null ? s.level : CpuLevel.of(CpuLevel.DEFAULT);
         CpuStyle style = s.style != null ? s.style : CpuStyle.EQUILIBRADO;
+        float u = s.urgency;
         float min = Math.max(DECISION_MIN, level.decisionMin);
         float max = Math.max(min, level.decisionMax);
-        decisionTimer = min + random.nextFloat() * (max - min);
+        // Com pressa ela decide mais rápido (até 35% menos tempo entre as decisões).
+        decisionTimer = (min + random.nextFloat() * (max - min)) * (1f - 0.35f * u);
+        // E luta como o estilo agressivo: no fim do tempo todo mundo vai para cima.
+        double aggression = style.aggression + (1.0 - style.aggression) * u;
         actions.stop();
         // O imprevisível às vezes larga o plano e faz qualquer coisa.
         if (style.erratic() && !s.selfAirborne && s.targetAlive && random.nextDouble() < 0.12) {
@@ -109,7 +128,7 @@ final class OpponentAi {
 
         // Quem luta de longe recua para a distância dele em vez de bater colado.
         boolean keepAway = !s.selfAirborne && s.distance < style.preferredDistance - 60f &&
-            style.aggression < 0.5 && random.nextDouble() < 0.5;
+            aggression < 0.5 && random.nextDouble() < 0.5 * (1.0 - u);
 
         if (s.selfAirborne) {
             if (airAttack != null) actions.attack(airAttack);
@@ -119,29 +138,30 @@ final class OpponentAi {
         } else if (
             s.superReady &&
             superInRange(s.self, s.distance) &&
-            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2)
+            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u)
         ) {
             actions.superAttack();
         } else if (
             energyInRange(s.self, s.distance) &&
             !s.projectileActive &&
-            random.nextDouble() < Math.min(0.6, 0.24 * style.zoning)
+            random.nextDouble() < Math.min(0.6, 0.24 * style.zoning) * (1.0 - 0.5 * u)
         ) {
             double r = random.nextDouble();
             actions.energy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
         } else if (s.targetGrounded && s.attackReady && s.distance <= s.throwReach &&
-            random.nextDouble() < THROW_CHANCE * style.throwing) {
+            random.nextDouble() < THROW_CHANCE * style.throwing * (1.0 + 0.5 * u)) {
             actions.grab();
         } else if (groundAttack != null && s.attackReady && !keepAway) {
             actions.attack(groundAttack);
         } else if (keepAway) {
             actions.moveBack();
-        } else if (s.distance < 82f && random.nextDouble() < 0.38 * (1.5 - style.aggression)) {
+        } else if (s.distance < 82f && random.nextDouble() < 0.38 * (1.5 - aggression) * (1.0 - u)) {
             actions.backdash();
-        } else if (s.distance > 360f && random.nextDouble() < 0.38 * (0.5 + style.aggression)) {
+        } else if (s.distance > 360f * (1f - 0.4f * u) && random.nextDouble() < 0.38 * (0.5 + aggression)) {
+            // Longe: corre. Com pressa corre já de mais perto.
             actions.moveForward(true);
         } else if (groundAttack == null && s.distance > CombatRules.MIN_MELEE_DISTANCE &&
-            (s.distance > style.preferredDistance - 60f || random.nextDouble() < style.aggression)) {
+            (s.distance > style.preferredDistance - 60f || random.nextDouble() < aggression)) {
             // Approach until at least one ground move can reach the target (inside the preferred
             // distance only as often as the style is aggressive).
             actions.moveForward(false);
