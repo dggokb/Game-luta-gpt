@@ -7,9 +7,9 @@ import com.gamelutagpt.render.RenderImage;
 import java.io.IOException;
 
 /**
- * Menu inicial do jogo: o logo da temporada e as duas entradas, MODO HISTÓRIA (o jogo de
- * verdade, do Prólogo em diante) e MODO TESTE (a luta de teste com a seleção de dupla, os
- * botões de teste e o DEBUG). Os textos passam pela tradução da temporada
+ * Menu inicial do jogo: o logo da temporada e as entradas MODO HISTÓRIA (o jogo de verdade, do
+ * Prólogo em diante), ARCADE (o torneio de 16 duplas, veja {@link Arcade}) e MODO TESTE (a luta
+ * de teste com a seleção de dupla, os botões de teste e o DEBUG). Os textos passam pela tradução da temporada
  * ({@code historia/idiomas/<código>.json}), como as falas da história.
  *
  * Toque: a opção tocada é escolhida. Controle: {@link #mover} e {@link #confirmar}. A escolha
@@ -18,7 +18,7 @@ import java.io.IOException;
  * Não depende de plataforma e não é thread-safe: chame tudo da thread do loop do jogo.
  */
 public final class MenuInicial {
-    public enum Opcao { HISTORIA, TESTE }
+    public enum Opcao { HISTORIA, ARCADE, TESTE }
 
     public static final float VW = PaginaHistoria.VW;
     public static final float VH = PaginaHistoria.VH;
@@ -26,19 +26,24 @@ public final class MenuInicial {
     /** Textos do menu (chaves da tradução). */
     public static final String HISTORIA = "MODO HISTÓRIA";
     public static final String HISTORIA_SUB = "A jornada dos irmãos Komyo, desde o Prólogo";
+    public static final String ARCADE = "ARCADE";
+    public static final String ARCADE_SUB = "Torneio de 16 duplas: oficiais ou do seu jeito";
     public static final String TESTE = "MODO TESTE";
     public static final String TESTE_SUB = "Luta livre para testar golpes, sprites e ajustes";
     public static final String DICA = "Toque numa opção  •  Controle: ▲▼ e A";
     /** Todos os textos que precisam de tradução. */
-    public static final String[] TEXTOS = {HISTORIA, HISTORIA_SUB, TESTE, TESTE_SUB, DICA};
+    public static final String[] TEXTOS = {HISTORIA, HISTORIA_SUB, ARCADE, ARCADE_SUB, TESTE, TESTE_SUB, DICA};
+    private static final String[] ROTULOS = {HISTORIA, ARCADE, TESTE};
+    private static final String[] SUBTITULOS = {HISTORIA_SUB, ARCADE_SUB, TESTE_SUB};
 
     /** Caixas das opções: {esquerda, topo, direita, base}, na ordem de {@link Opcao}. */
     static final float[][] CAIXAS = {
-        {370f, 466f, 910f, 538f},
-        {370f, 556f, 910f, 628f},
+        {370f, 436f, 910f, 504f},
+        {370f, 514f, 910f, 582f},
+        {370f, 592f, 910f, 660f},
     };
-    static final float LOGO_TOP = 26f;
-    static final float LOGO_HEIGHT = 418f;
+    static final float LOGO_TOP = 20f;
+    static final float LOGO_HEIGHT = 400f;
 
     /** Antes disso nem o toque nem o controle escolhem (o toque que abriu o menu não pode valer). */
     static final float TAP_DELAY = 0.3f;
@@ -174,7 +179,7 @@ public final class MenuInicial {
             float flash = chosen ? 1f - Tinta.clamp01((time - escolhaAt) / FLASH) : 0f;
             c.save();
             c.translate(-(1f - in) * 260f, 0f);
-            BotaoMenu.draw(c, CAIXAS[i], t(i == 0 ? HISTORIA : TESTE), t(i == 0 ? HISTORIA_SUB : TESTE_SUB),
+            BotaoMenu.draw(c, CAIXAS[i], t(ROTULOS[i]), t(SUBTITULOS[i]),
                 i == cursor, time, flash, (int)(255f * in));
             c.restore();
         }
@@ -182,7 +187,7 @@ public final class MenuInicial {
         float hintIn = Tinta.clamp01((time - 0.8f) / 0.4f);
         if (hintIn > 0f) {
             String dica = t(DICA);
-            c.drawText(dica, VW * 0.5f, 682f, BotaoMenu.fit(c, dica, 18f, 900f, false),
+            c.drawText(dica, VW * 0.5f, 692f, BotaoMenu.fit(c, dica, 18f, 900f, false),
                 Tinta.withAlpha(GRAY, (int)(255f * hintIn)), 0, 0f, false);
         }
         if (!versao.isEmpty()) c.drawText(versao, VW - 120f, VH - 12f, 13f, 0xFF4E5568, 0, 0f, false);

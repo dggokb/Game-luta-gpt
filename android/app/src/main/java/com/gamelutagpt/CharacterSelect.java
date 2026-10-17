@@ -4,7 +4,8 @@ import java.util.Random;
 
 /**
  * Character selection for two independent TAG teams. Screen space is 1280x720
- * and deliberately matches the approved Moon Temple layout.
+ * and deliberately matches the approved Moon Temple layout. {@link #openSolo} picks only the
+ * player's team (the Arcade's free team: the opponents come from the bracket draw).
  */
 final class CharacterSelect {
     enum Result { NONE, CHANGED, CONFIRM, CANCEL }
@@ -23,6 +24,8 @@ final class CharacterSelect {
     private final Random random = new Random();
     private boolean open, showHelp;
     private int focusSide, focusSlot, cursorIndex, confirmedSteps;
+    /** Picks to confirm: 4 (both teams) or 2 (only the player's, {@link #openSolo}). */
+    private int steps = 4;
 
     CharacterSelect(String[] ids) {
         if (ids == null || ids.length < 2) throw new IllegalArgumentException("need at least two fighters");
@@ -32,6 +35,7 @@ final class CharacterSelect {
         setTeam(0, p1, tag1);
         setTeam(1, p2, tag2);
         focusSide = focusSlot = confirmedSteps = 0;
+        steps = 4;
         cursorIndex = indexOf(picks[0][0]);
         showHelp = false;
         open = true;
@@ -39,6 +43,12 @@ final class CharacterSelect {
     void open(String point, String tag) {
         open(point, tag, ids[1], ids.length > 2 ? ids[2] : ids[0]);
     }
+    /** Only the player's team: point and tag (the other side stays hidden). */
+    void openSolo(String point, String tag) {
+        open(point, tag);
+        steps = 2;
+    }
+    boolean solo() { return steps == 2; }
     private void setTeam(int side, String point, String tag) {
         picks[side][0] = contains(point) ? point : ids[0];
         picks[side][1] = contains(tag) && !tag.equals(picks[side][0]) ? tag : firstDifferent(picks[side][0]);
@@ -55,10 +65,19 @@ final class CharacterSelect {
     void close() { open = false; }
     boolean isOpen() { return open; }
     boolean settingsOpen() { return showHelp; }
-    boolean ready() { return confirmedSteps==4 && !picks[0][0].equals(picks[0][1]) && !picks[1][0].equals(picks[1][1]); }
+    boolean ready() {
+        return confirmedSteps==steps && !picks[0][0].equals(picks[0][1]) && (solo() || !picks[1][0].equals(picks[1][1]));
+    }
     int step() { return confirmedSteps; }
     boolean chosen(int side,int slot) { return side*2+slot<confirmedSteps; }
     String stepLabel() {
+        if (solo()) {
+            switch(confirmedSteps) {
+                case 0:return "1/2  ESCOLHA SEU LUTADOR";
+                case 1:return "2/2  ESCOLHA SEU PARCEIRO";
+                default:return "DUPLA PRONTA — CONFIRMAR";
+            }
+        }
         switch(confirmedSteps) {
             case 0:return "1/4  ESCOLHA PLAYER 1";
             case 1:return "2/4  ESCOLHA TAG DO PLAYER 1";
@@ -67,7 +86,7 @@ final class CharacterSelect {
             default:return "EQUIPES PRONTAS — CONFIRMAR";
         }
     }
-    String preview(int side) {return confirmedSteps<4&&focusSide==side?ids[cursorIndex]:pick(side,0);}
+    String preview(int side) {return confirmedSteps<steps&&focusSide==side?ids[cursorIndex]:pick(side,0);}
     Result back() {
         if(showHelp) {showHelp=false;return Result.CHANGED;}
         if(confirmedSteps==0)return Result.CANCEL;
@@ -129,7 +148,7 @@ final class CharacterSelect {
     }
     boolean selectCursor() {return choose(ids[cursorIndex]);}
     private boolean choose(String id) {
-        if(confirmedSteps>=4 || !contains(id))return false;
+        if(confirmedSteps>=steps || !contains(id))return false;
         if(focusSlot==1&&id.equals(picks[focusSide][0]))return false;
         assign(focusSide,focusSlot,id);advanceFocus();return true;
     }
@@ -142,7 +161,7 @@ final class CharacterSelect {
         return true;
     }
     boolean randomFocused() {
-        if(confirmedSteps>=4)return false;
+        if(confirmedSteps>=steps)return false;
         int next = random.nextInt(ids.length);
         if (ids[next].equals(picks[focusSide][1-focusSlot])) next = (next+1)%ids.length;
         return choose(ids[next]);
@@ -156,7 +175,7 @@ final class CharacterSelect {
     }
     private void advanceFocus() {
         confirmedSteps++;
-        if(confirmedSteps<4) {focusSide=confirmedSteps/2;focusSlot=confirmedSteps%2;}
+        if(confirmedSteps<steps) {focusSide=confirmedSteps/2;focusSlot=confirmedSteps%2;}
         cursorIndex=indexOf(picks[focusSide][focusSlot]);
     }
     Result tap(float x,float y) {

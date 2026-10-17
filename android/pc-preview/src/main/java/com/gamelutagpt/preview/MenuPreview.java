@@ -15,7 +15,9 @@ import javax.imageio.ImageIO;
 
 /**
  * Grava em PNG o menu inicial (com o cursor em cada opção), a pausa por cima da primeira
- * página do Prólogo e a tela de capítulos do modo história, para revisar o visual e as traduções sem abrir o jogo.
+ * página do Prólogo, a tela de capítulos do modo história e as telas do Arcade (a escolha da
+ * dupla, o sorteio e a chave de 16, o cartão do Takatoshi), para revisar o visual e as traduções
+ * sem abrir o jogo.
  *
  * <pre>gradle :pc-preview:runMenu</pre>
  * ou, com argumentos: {@code <pasta assets> <pasta de saída>}; {@code -Didioma=en} troca o idioma.
@@ -43,6 +45,9 @@ public final class MenuPreview {
         menu.abrir(temporada);
         step(menu, 1.6f);
         save(menu::render, new File(outDir, "menu_" + idioma + "_historia.png"));
+        menu.mover(1);
+        step(menu, 0.3f);
+        save(menu::render, new File(outDir, "menu_" + idioma + "_arcade.png"));
         menu.mover(1);
         step(menu, 0.3f);
         save(menu::render, new File(outDir, "menu_" + idioma + "_teste.png"));
@@ -95,7 +100,53 @@ public final class MenuPreview {
         menuCaps.abrir(temporada, caps, save);
         for (float t = 0f; t < 1.2f; t += DT) menuCaps.update(DT);
         save(menuCaps::render, new File(outDir, "menu_" + idioma + "_capitulos.png"));
+        arcade(assets, temporada, idioma, outDir);
         System.out.println("Menu gravado em " + outDir.getAbsolutePath());
+    }
+
+    /** As telas do Arcade: a escolha da dupla, o sorteio, a chave depois de 2 rodadas e o fim. */
+    private static void arcade(FileRenderAssets assets, Temporada temporada, String idioma, File outDir) throws IOException {
+        java.util.List<com.gamelutagpt.historia.Torneio.Dupla> oficiais = com.gamelutagpt.historia.Arcade.oficiais(
+            com.gamelutagpt.historia.Torneio.duplasFromJson(assets.readText(com.gamelutagpt.historia.Torneio.ARQUIVO)));
+        com.gamelutagpt.historia.MenuArcade escolha = new com.gamelutagpt.historia.MenuArcade(assets);
+        escolha.abrir(temporada, oficiais);
+        for (float t = 0f; t < 1f; t += DT) escolha.update(DT);
+        save(escolha::render, new File(outDir, "arcade_" + idioma + "_dupla.png"));
+
+        java.util.List<String> lutadores = java.util.Arrays.asList("player_base", "p02", "p03", "p04", "p05", "p06",
+            "p07", "p08", "p09", "p10", "p11", "p12");
+        com.gamelutagpt.historia.Campanha campanha = com.gamelutagpt.historia.Campanha.arcade(com.gamelutagpt.historia.Arcade.chave(
+            com.gamelutagpt.historia.Arcade.livre("p05", "p12"), oficiais, lutadores, new java.util.Random(4)));
+        PaginaHistoria pagina = new PaginaHistoria(new HistoriaListener() {
+            @Override public void onHistoriaLuta(Episodio.Passo luta) {}
+            @Override public void onHistoriaSom(String id) {}
+            @Override public void onHistoriaFim(Episodio episodio) {}
+        }, assets);
+        pagina.setCampanha(campanha);
+        pagina.start(temporada, Episodio.fromJson(assets.readText(com.gamelutagpt.historia.Arcade.EPISODIO)));
+        for (float t = 0f; t < 1.2f; t += DT) pagina.update(DT);
+        save(pagina::render, new File(outDir, "arcade_" + idioma + "_titulo.png"));
+        // Cada passo: espera a animação, grava os que interessam e toca para seguir; as lutas
+        // são vencidas na hora.
+        for (int guard = 0; guard < 200 && pagina.isActive(); guard++) {
+            if (pagina.waitingFight()) {
+                pagina.resultadoLuta(true);
+                continue;
+            }
+            Episodio.Passo passo = pagina.passo();
+            float espera = passo.tipo == Episodio.TipoPasso.TITULO ? 1.2f : 5f;
+            for (float t = 0f; t < espera && pagina.passo() == passo; t += DT) pagina.update(DT);
+            if (pagina.passo() != passo) continue;
+            int disputadas = campanha.torneio().disputadas();
+            String nome = null;
+            if (passo.tipo == Episodio.TipoPasso.SORTEIO) nome = "sorteio";
+            else if (passo.tipo == Episodio.TipoPasso.CHAVE && disputadas == 2) nome = "chave";
+            else if (passo.tipo == Episodio.TipoPasso.CHAVE && campanha.torneio().acabou()) nome = "campeao";
+            else if (passo.tipo == Episodio.TipoPasso.TITULO && "TAKATOSHI".equals(passo.titulo)) nome = "takatoshi";
+            if (nome != null) save(pagina::render, new File(outDir, "arcade_" + idioma + "_" + nome + ".png"));
+            pagina.tap(640f, 360f);
+            for (float t = 0f; t < 1f && pagina.passo() == passo && pagina.isActive(); t += DT) pagina.update(DT);
+        }
     }
 
     private static void step(MenuInicial menu, float seconds) {

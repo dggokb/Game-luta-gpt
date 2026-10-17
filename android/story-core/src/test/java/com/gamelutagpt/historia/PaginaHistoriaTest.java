@@ -321,6 +321,9 @@ public class PaginaHistoriaTest {
                 }
             }
         }
+        // O episódio do Arcade fica fora da temporada.
+        textos.addAll(textosDoEpisodio(Episodio.fromJson(read(Arcade.EPISODIO))));
+        textos.addAll(java.util.Arrays.asList(MenuArcade.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuInicial.TEXTOS));
         textos.addAll(java.util.Arrays.asList(MenuPausa.TEXTOS));
         textos.addAll(java.util.Arrays.asList(TelaComandos.TEXTOS));

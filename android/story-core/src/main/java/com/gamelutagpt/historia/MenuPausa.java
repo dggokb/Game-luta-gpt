@@ -23,10 +23,11 @@ public final class MenuPausa {
     public static final String NIVEL_CPU = "NÍVEL CPU";
     public static final String MENU_INICIAL = "MENU INICIAL";
     public static final String AVISO = "Voltar ao menu perde o progresso deste episódio.";
+    public static final String AVISO_ARCADE = "Voltar ao menu encerra o Arcade.";
     /** O botão que abre a pausa na história e nas lutas dela. */
     public static final String MENU = "MENU";
     public static final String[] TEXTOS = {PAUSA, CONTINUAR, VELOCIDADE, IMPACTO, LIGADO, DESLIGADO, NIVEL_CPU,
-        COMANDOS, MENU_INICIAL, AVISO, MENU};
+        COMANDOS, MENU_INICIAL, AVISO, AVISO_ARCADE, MENU};
 
     /** Velocidades da luta (1 = original); quem usa a pausa lê e guarda a escolhida. */
     public static final float[] VELOCIDADES = {0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f};
@@ -47,7 +48,8 @@ public final class MenuPausa {
 
     private Temporada temporada;
     private boolean open;
-    private boolean aviso;
+    /** O aviso embaixo das opções, ou null. */
+    private String aviso;
     private int cursor;
     private float time;
     private int velocidade = nivel(VELOCIDADE_PADRAO);
@@ -57,6 +59,11 @@ public final class MenuPausa {
 
     /** Abre com o cursor em CONTINUAR. {@code aviso}: mostra que o episódio se perde. */
     public void abrir(Temporada temporada, boolean aviso) {
+        abrir(temporada, aviso ? AVISO : null);
+    }
+
+    /** Abre com o cursor em CONTINUAR e o {@code aviso} embaixo (null = sem aviso). */
+    public void abrir(Temporada temporada, String aviso) {
         this.temporada = temporada;
         this.aviso = aviso;
         open = true;
@@ -257,8 +264,8 @@ public final class MenuPausa {
         for (int i = 0; i < CAIXAS.length; i++) {
             BotaoMenu.draw(c, CAIXAS[i], labels[i], null, i == cursor, time, 0f, (int)(255f * in));
         }
-        if (aviso) {
-            String texto = t(AVISO);
+        if (aviso != null) {
+            String texto = t(aviso);
             c.drawText(texto, cx, 668f, BotaoMenu.fit(c, texto, 20f, 900f, false),
                 Tinta.withAlpha(0xFFB9C0D0, (int)(255f * in)), 0, 0f, false);
         }

@@ -223,8 +223,8 @@ public final class PaginaHistoria {
                 break;
             case SORTEIO:
                 // Toque no meio do sorteio mostra a chave inteira; depois, segue.
-                if (time < ChaveTorneio.duracaoSorteio()) {
-                    time = ChaveTorneio.duracaoSorteio();
+                if (time < ChaveTorneio.duracaoSorteio(campanha.torneio())) {
+                    time = ChaveTorneio.duracaoSorteio(campanha.torneio());
                 } else {
                     exit();
                 }
@@ -479,7 +479,7 @@ public final class PaginaHistoria {
         if (!coversScreen() || exitAt >= 0f) return false;
         Episodio.Passo p = passo();
         if (p.tipo == Episodio.TipoPasso.PROXIMO) return time >= NEXT_MIN_TAP;
-        if (p.tipo == Episodio.TipoPasso.SORTEIO) return time >= ChaveTorneio.duracaoSorteio() + 0.3f;
+        if (p.tipo == Episodio.TipoPasso.SORTEIO) return time >= ChaveTorneio.duracaoSorteio(campanha.torneio()) + 0.3f;
         if (p.tipo == Episodio.TipoPasso.CHAVE) {
             return time >= Math.max(TITLE_MIN_TAP, ChaveTorneio.duracaoRevelacao(campanha.torneio()));
         }
@@ -656,7 +656,14 @@ public final class PaginaHistoria {
         c.drawLine(offset - 60f, 486f, offset + 1340f, 436f, 6f, 0xFF7A0F17);
 
         float pop = Tinta.clamp01((time - 0.25f) / 0.25f);
-        if (logo != null && time >= 0.4f) {
+        // Com "linhas": a primeira vai em cima do título (no lugar de "EPISÓDIO N") e a segunda
+        // embaixo da pincelada, no lugar do logo (o Arcade usa para os cartões entre as lutas).
+        String embaixo = p.linhas.size() > 1 ? temporada.t(p.linhas.get(1)) : null;
+        if (embaixo != null && time >= 0.4f) {
+            float alpha = Tinta.clamp01((time - 0.4f) / 0.35f);
+            c.drawText(embaixo, VW * 0.5f, 560f, fit(c, embaixo, 34f, 1100f, false),
+                Tinta.withAlpha(WHITE, (int)(255f * alpha)), 0, 0f, false);
+        } else if (logo != null && time >= 0.4f) {
             // Logo do jogo embaixo da pincelada, aparecendo depois do título.
             float alpha = Tinta.clamp01((time - 0.4f) / 0.35f);
             float h = 200f;
@@ -664,7 +671,8 @@ public final class PaginaHistoria {
             c.drawImage(logo, VW * 0.5f - w * 0.5f, 500f, VW * 0.5f + w * 0.5f, 500f + h, (int)(255f * alpha));
         }
         if (pop > 0f) {
-            String label = episodio.numero == 0 ? temporada.t("PRÓLOGO") : temporada.t("EPISÓDIO") + " " + episodio.numero;
+            String label = !p.linhas.isEmpty() ? temporada.t(p.linhas.get(0))
+                : episodio.numero == 0 ? temporada.t("PRÓLOGO") : temporada.t("EPISÓDIO") + " " + episodio.numero;
             c.drawText(label, VW * 0.5f, 220f, 40f, WHITE, INK, 6f, true);
             String title = temporada.t(p.titulo != null ? p.titulo : episodio.titulo);
             float scale = 1.5f - 0.5f * Tinta.easeOutCubic(pop);
@@ -674,7 +682,7 @@ public final class PaginaHistoria {
             c.drawText(title, VW * 0.5f, 400f, size, WHITE, INK, size * 0.14f, true);
             c.restore();
         }
-        if (logo == null && time >= 0.6f) {
+        if (logo == null && embaixo == null && time >= 0.6f) {
             c.drawText(temporada.titulo, VW - 250f, VH - 60f, 30f, WHITE, INK, 5f, true);
             if (!temporada.subtitulo.isEmpty()) c.drawText(temporada.subtitulo, VW - 250f, VH - 22f, 26f, RED, INK, 4f, false);
         }
@@ -727,6 +735,13 @@ public final class PaginaHistoria {
         float bob = (float)Math.sin(time * 7f) * 5f;
         float x = VW - 52f;
         float y = VH - 50f + bob;
+        Episodio.TipoPasso tipo = passo().tipo;
+        if ((tipo == Episodio.TipoPasso.SORTEIO || tipo == Episodio.TipoPasso.CHAVE) && campanha != null &&
+            campanha.torneio() != null && campanha.torneio().vagas() > Torneio.VAGAS) {
+            // Chave de 16: o canto de baixo tem card; a seta vai para o meio, embaixo da FINAL.
+            x = VW * 0.5f;
+            y = 560f + bob;
+        }
         float[] tri = {x - 18f, y - 14f, x + 18f, y - 14f, x, y + 14f};
         c.strokePolygon(tri, 6f, INK);
         c.fillPolygon(tri, WHITE);

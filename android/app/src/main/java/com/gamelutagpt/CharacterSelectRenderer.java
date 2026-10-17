@@ -82,12 +82,14 @@ final class CharacterSelectRenderer {
         }
         ambient(c);
         hero(c,s.preview(0),0);
-        hero(c,s.preview(1),1);
-        namePlate(c,s.preview(0),0);namePlate(c,s.preview(1),1);
-        playerTitle(c,0);playerTitle(c,1);
+        // Arcade (só a dupla do jogador): o lado do CPU vem do sorteio da chave.
+        if(!s.solo())hero(c,s.preview(1),1);
+        namePlate(c,s.preview(0),0);if(!s.solo())namePlate(c,s.preview(1),1);
+        playerTitle(c,0);if(!s.solo())playerTitle(c,1);
         progress(c,s);
         grid(c,s);
-        team(c,s,0);team(c,s,1);
+        team(c,s,0);
+        if(s.solo())drawDrawNotice(c,s);else team(c,s,1);
         stage(c);
         if(s.ready()) readyStamps(c,s);
         footer(c,s);
@@ -177,7 +179,7 @@ final class CharacterSelectRenderer {
         if(readyAt<0)readyAt=now;
         float k=Math.min(1f,(now-readyAt)/260f);
         float scale=1.8f-.8f*(1f-(1f-k)*(1f-k));
-        for(int side=0;side<2;side++) {
+        for(int side=0;side<(s.solo()?1:2);side++) {
             float cx=s.slotLeft(side)+CharacterSelect.TEAM_W/2, cy=CharacterSelect.TEAM_TOP+CharacterSelect.SLOT_H+17;
             c.save();c.rotate(-8f,cx,cy);c.scale(scale,scale,cx,cy);
             box.set(cx-92,cy-22,cx+92,cy+22);
@@ -196,6 +198,20 @@ final class CharacterSelectRenderer {
         p.setStyle(Paint.Style.FILL);p.setColor(0xEE040B1B);c.drawRoundRect(375,89,905,123,6,6,p);
         path.reset();path.addRoundRect(375,89,905,123,6,6,Path.Direction.CW);glow(c,color,.8f);
         text(c,s.stepLabel(),640,114,18,WHITE,true);
+    }
+
+    /** No lugar do time do CPU: os adversários saem do sorteio da chave do Arcade. */
+    private void drawDrawNotice(Canvas c,CharacterSelect s) {
+        float l=s.slotLeft(1),r=l+CharacterSelect.TEAM_W,top=350,bottom=624;
+        path.reset();path.moveTo(l-11,top+18);path.lineTo(l+4,top);
+        path.lineTo(r-5,top);path.lineTo(r+11,top+18);
+        path.lineTo(r+11,bottom-9);path.lineTo(r+2,bottom);
+        path.lineTo(l-4,bottom);path.lineTo(l-11,bottom-9);path.close();
+        fill(c,0xEF040B1B);glow(c,RED,.85f);stroke(c,RED,2.5f);
+        text(c,"CPU",(l+r)/2,375,23,WHITE,true);
+        text(c,"?",(l+r)/2,500,90,0xFF8D99B0,true);
+        text(c,"SORTEIO",(l+r)/2,560,18,WHITE,true);
+        text(c,"DA CHAVE",(l+r)/2,584,18,WHITE,true);
     }
 
     private void playerTitle(Canvas c,int side) {

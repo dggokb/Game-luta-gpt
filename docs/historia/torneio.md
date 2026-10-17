@@ -127,6 +127,8 @@ foram marcados à mão). Rode de novo quando um concept mudar.
 | `story-core/.../PaginaHistoria.java` | toca os passos novos (`setCampanha`, `lados`, `rotulo`) |
 | `app/.../GameView.java` | cria a campanha no começo da história e monta as duplas de cada luta |
 
+A mesma chave, com 16 vagas, é a do modo Arcade ([arcade.md](arcade.md)).
+
 A campanha vive enquanto a história toca: voltar ao menu (ou fechar o app) perde a escolha
 e a chave. Ainda não há save.
 

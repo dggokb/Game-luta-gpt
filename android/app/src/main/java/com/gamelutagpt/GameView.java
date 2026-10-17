@@ -17,10 +17,12 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import com.gamelutagpt.historia.Arcade;
 import com.gamelutagpt.historia.Campanha;
 import com.gamelutagpt.historia.Cenas;
 import com.gamelutagpt.historia.Episodio;
 import com.gamelutagpt.historia.HistoriaListener;
+import com.gamelutagpt.historia.MenuArcade;
 import com.gamelutagpt.historia.MenuCapitulos;
 import com.gamelutagpt.historia.MenuInicial;
 import com.gamelutagpt.historia.MenuPausa;
@@ -219,6 +221,14 @@ public class GameView extends SurfaceView
     private final MenuInicial menuInicial;
     /** MODO HISTÓRIA com save: CONTINUAR e os capítulos já liberados. */
     private final MenuCapitulos capitulos = new MenuCapitulos();
+    /** ARCADE: a escolha da dupla (oficial ou livre). */
+    private final MenuArcade menuArcade;
+    /** As duplas oficiais que lutam (os cards do {@link #menuArcade} e o resto da chave). */
+    private final java.util.List<Torneio.Dupla> arcadeOficiais = new java.util.ArrayList<>();
+    /** A dupla livre do Arcade está sendo montada na seleção (só a dupla do jogador). */
+    private boolean arcadeSelectPending;
+    /** Um Arcade em andamento: a CPU sobe de nível a cada rodada. */
+    private boolean arcadeMode;
     /** O save do modo história (lido na primeira vez que o modo abre). */
     private ProgressoHistoria progresso;
     private SharedPreferences storyPrefs;
@@ -413,6 +423,7 @@ public class GameView extends SurfaceView
         historia = new PaginaHistoria(this, ultraAssets);
         menuInicial = new MenuInicial(ultraAssets);
         menuInicial.setVersao(VERSION_HUD_LABEL);
+        menuArcade = new MenuArcade(ultraAssets);
         conversa = new ConversaLuta(ultraAssets);
         cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
         stageId = DEFAULT_STAGE;
@@ -608,8 +619,8 @@ public class GameView extends SurfaceView
             offerMenuKey(keyCode, event);
             return true;
         }
-        if (capitulos.isOpen()) {
-            // Nos capítulos, voltar leva ao menu inicial.
+        if (capitulos.isOpen() || menuArcade.isOpen()) {
+            // Nos capítulos e na escolha da dupla do Arcade, voltar leva ao menu inicial.
             offerMenuKey(keyCode, event);
             return true;
         }
@@ -751,6 +762,12 @@ public class GameView extends SurfaceView
         if(!characterSelect.ready())return;
         characterSelectRenderer.beginFightTransition();
         characterSelect.close();
+        if (arcadeSelectPending) {
+            // Dupla livre do Arcade: os adversários vêm do sorteio da chave.
+            arcadeSelectPending = false;
+            startArcade(Arcade.livre(characterSelect.point(), characterSelect.partner()));
+            return;
+        }
         testFightPending = false;
         testPicks = new String[] {characterSelect.point(), characterSelect.partner(),
             characterSelect.opponentPoint(), characterSelect.opponentPartner()};
@@ -760,6 +777,11 @@ public class GameView extends SurfaceView
     /** Seleção cancelada: volta para a luta (a de teste do zero, se veio do menu inicial). */
     private void closeCharacterSelect() {
         characterSelect.close();
+        if (arcadeSelectPending) {
+            arcadeSelectPending = false;
+            openArcadeMenu();
+            return;
+        }
         if (testFightPending) {
             testFightPending = false;
             selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
@@ -1036,7 +1058,7 @@ public class GameView extends SurfaceView
 
     /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
     private boolean fightClockRunning() {
-        return !menuInicial.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
+        return !menuInicial.isOpen() && !menuArcade.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
             !ajusteCaixas.isOpen() && !characterSelect.isOpen() && !historia.coversScreen() &&
             !paginaFinal.isActive();
     }
@@ -1052,7 +1074,15 @@ public class GameView extends SurfaceView
             MenuInicial.Opcao escolha = menuInicial.update(FIXED_STEP);
             // A arte da luta só carrega aqui, na primeira saída do menu (o menu abre na hora).
             if (escolha == MenuInicial.Opcao.HISTORIA) comArteDaLuta(this::startStoryMode);
+            else if (escolha == MenuInicial.Opcao.ARCADE) comArteDaLuta(this::openArcadeMenu);
             else if (escolha == MenuInicial.Opcao.TESTE) comArteDaLuta(this::startTestMode);
+            return;
+        }
+        if (menuArcade.isOpen()) {
+            pad.drainInto(ignoredInput);
+            Integer key;
+            while (menuArcade.isOpen() && (key = selectionKeys.poll()) != null) handleArcadeMenuKey(key);
+            menuArcade.update(FIXED_STEP);
             return;
         }
         if (capitulos.isOpen()) {
@@ -2067,6 +2097,12 @@ public class GameView extends SurfaceView
             if (capitulos.isOpen()) {
                 renderCanvas.begin(canvas);
                 capitulos.render(renderCanvas);
+                canvas.restore();
+                return;
+            }
+            if (menuArcade.isOpen()) {
+                renderCanvas.begin(canvas);
+                menuArcade.render(renderCanvas);
                 canvas.restore();
                 return;
             }
@@ -3141,6 +3177,12 @@ public class GameView extends SurfaceView
             }
             return;
         }
+        if (menuArcade.isOpen()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
+                applyArcadeChoice(menuArcade.tap(event.getX(index) / sx, event.getY(index) / sy));
+            }
+            return;
+        }
         if (pausa.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 applyPause(pausa.tap(event.getX(index) / sx, event.getY(index) / sy));
@@ -3325,6 +3367,11 @@ public class GameView extends SurfaceView
         storyEpisode = -1;
         sceneAfter = null;
         storyMode = false;
+        // Fora do Arcade a CPU volta ao nível da pausa.
+        arcadeMode = false;
+        arcadeSelectPending = false;
+        menuArcade.fechar();
+        ai.setLevel(pausa.nivelCpu());
         selectButtonLabel = SELECT_LABEL;
         tutorial.stop();
         descarregarConversa();
@@ -3494,8 +3541,9 @@ public class GameView extends SurfaceView
         // COMANDOS: os golpes de cada personagem, começando pelo do jogador.
         int[] atual = new int[1];
         pausa.comandos().setFichas(ListaComandos.fichas(selectionRoster(), player().character(), esquema, atual), atual[0]);
-        // O aviso de progresso perdido só vale para um episódio do modo história.
-        pausa.abrir(temporada, storyMode && historia.isActive());
+        // O aviso de progresso perdido só vale para um episódio do modo história ou um Arcade.
+        if (arcadeMode && historia.isActive()) pausa.abrir(temporada, MenuPausa.AVISO_ARCADE);
+        else pausa.abrir(temporada, storyMode && historia.isActive());
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
@@ -3541,8 +3589,9 @@ public class GameView extends SurfaceView
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
         }
-        // O NÍVEL da CPU vale já na luta que continua, e fica salvo.
-        ai.setLevel(pausa.nivelCpu());
+        // O NÍVEL da CPU vale já na luta que continua, e fica salvo. No Arcade ele é a base da
+        // rodada (a CPU sobe a cada rodada a partir dele).
+        ai.setLevel(arcadeMode && historia.waitingFight() ? arcadeLevel(historia.passo()) : pausa.nivelCpu());
         if (speedPrefs != null && speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO) != pausa.nivelCpu()) {
             speedPrefs.edit().putInt(CPU_LEVEL_KEY, pausa.nivelCpu()).apply();
         }
@@ -3728,6 +3777,7 @@ public class GameView extends SurfaceView
         // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA
         // e as lições dizem o que ele faz.
         setOpponentAiEnabled(!luta.tutorial());
+        if (arcadeMode) ai.setLevel(arcadeLevel(luta));
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
         // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
         String[][] lados = historia.lados(luta);
@@ -3770,6 +3820,109 @@ public class GameView extends SurfaceView
         pad.reset();
         releaseAllPointers();
         if (rotulo != null) showBanner(rotulo);
+    }
+
+    // ------------------------------------------------------------ arcade
+
+    /** ARCADE: a escolha da dupla (oficial ou livre); depois, a chave de 16 e as lutas. */
+    private void openArcadeMenu() {
+        if (!loadTemporada()) {
+            openMainMenu();
+            return;
+        }
+        storyMode = false;
+        arcadeMode = false;
+        arcadeSelectPending = false;
+        arcadeOficiais.clear();
+        try {
+            for (Torneio.Dupla d : Arcade.oficiais(Torneio.duplasFromJson(ultraAssets.readText(Torneio.ARQUIVO)))) {
+                if (fightersExist(d.lutadores)) arcadeOficiais.add(d);
+            }
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "torneio indisponível; o Arcade fica só com a dupla livre", ex);
+        }
+        menuArcade.abrir(temporada, arcadeOficiais);
+        selectionKeys.clear();
+        pad.reset();
+        releaseAllPointers();
+    }
+
+    private void handleArcadeMenuKey(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_LEFT: menuArcade.mover(-1, 0); break;
+            case KeyEvent.KEYCODE_DPAD_RIGHT: menuArcade.mover(1, 0); break;
+            case KeyEvent.KEYCODE_DPAD_UP: menuArcade.mover(0, -1); break;
+            case KeyEvent.KEYCODE_DPAD_DOWN: menuArcade.mover(0, 1); break;
+            case KeyEvent.KEYCODE_BUTTON_A:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_BUTTON_START:
+                applyArcadeChoice(menuArcade.confirmar());
+                break;
+            case KeyEvent.KEYCODE_BUTTON_B:
+            case KeyEvent.KEYCODE_BACK:
+            case KeyEvent.KEYCODE_ESCAPE:
+                applyArcadeChoice(menuArcade.voltar());
+                break;
+            default:
+                break;
+        }
+    }
+
+    /** Dupla oficial: o Arcade começa; DUPLA LIVRE: a seleção só da dupla do jogador. */
+    private void applyArcadeChoice(Integer escolha) {
+        if (escolha == null) return;
+        if (escolha == MenuArcade.VOLTAR) {
+            openMainMenu();
+        } else if (escolha == MenuArcade.LIVRE) {
+            openCharacterSelect();
+            characterSelect.openSolo(testPicks[0], testPicks[1]);
+            arcadeSelectPending = true;
+        } else {
+            startArcade(arcadeOficiais.get(escolha));
+        }
+    }
+
+    /**
+     * O Arcade com a dupla escolhida: a chave de 16 (as oficiais que sobraram e duplas livres do
+     * CPU) e o episódio do Arcade (sorteio, as 4 rodadas, o duelo e o Takatoshi), tocado como
+     * as cenas da história. No fim volta ao menu inicial.
+     */
+    private void startArcade(Torneio.Dupla dupla) {
+        Episodio arcade;
+        try {
+            if (!loadTemporada()) throw new IOException("sem temporada");
+            arcade = Episodio.fromJson(ultraAssets.readText(Arcade.EPISODIO));
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "Arcade indisponível", ex);
+            openMainMenu();
+            return;
+        }
+        Torneio chave = Arcade.chave(dupla, arcadeOficiais, java.util.Arrays.asList(characterSelect.ids), new Random());
+        // Como o modo história: o botão do topo é o MENU (pausa) e não há botões de teste.
+        storyMode = true;
+        arcadeMode = true;
+        selectButtonLabel = "◀ " + temporada.t(MenuPausa.MENU);
+        debugOverlay = false;
+        tutorial.stop();
+        descarregarConversa();
+        storyEpisode = -1;
+        sceneAfter = this::openMainMenu;
+        historia.setCampanha(Campanha.arcade(chave));
+        historia.setBotaoMenu(true);
+        hud.resetEffects();
+        pad.reset();
+        releaseAllPointers();
+        selectionKeys.clear();
+        historia.start(temporada, arcade);
+    }
+
+    /** Nível da CPU na luta do Arcade: o da pausa como base, subindo a cada rodada. */
+    private int arcadeLevel(Episodio.Passo luta) {
+        Campanha campanha = historia.campanha();
+        Torneio chave = campanha != null ? campanha.torneioSorteado() : null;
+        int rodada = luta != null && luta.duelo ? Arcade.DUELO : chave != null ? chave.disputadas() : 0;
+        return Arcade.nivelCpu(pausa.nivelCpu(), rodada);
     }
 
     /** Todos têm pack de luta (p13–p16 ainda não têm). */

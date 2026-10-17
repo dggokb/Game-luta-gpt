@@ -14,6 +14,9 @@ import java.util.Random;
  * A sorte da chave vem de uma semente: a mesma semente, o mesmo irmão e o mesmo número de
  * rodadas disputadas refazem exatamente a mesma chave. É assim que o save
  * ({@link ProgressoHistoria}) guarda a campanha sem guardar a chave inteira.
+ *
+ * No modo Arcade ({@link #arcade}) a campanha só leva a chave de 16, já montada com a dupla
+ * escolhida pelo jogador: não tem irmão nem save.
  */
 public final class Campanha {
     private final List<Torneio.Dupla> duplas;
@@ -29,6 +32,19 @@ public final class Campanha {
     /** Campanha nova com as duplas de {@code historia/torneio/torneio.json}. */
     public static Campanha load(RenderAssets assets, long semente) throws IOException {
         return new Campanha(Torneio.duplasFromJson(assets.readText(Torneio.ARQUIVO)), semente);
+    }
+
+    /** Campanha do Arcade: a chave pronta (veja {@link Arcade#chave}). */
+    public static Campanha arcade(Torneio chave) {
+        if (chave == null) throw new IllegalArgumentException("o Arcade precisa da chave");
+        Campanha c = new Campanha(null, 0L);
+        c.torneio = chave;
+        return c;
+    }
+
+    /** É a campanha do Arcade (a chave não veio do sorteio da história). */
+    public boolean arcade() {
+        return duplas.isEmpty() && torneio != null;
     }
 
     public long semente() {
@@ -114,7 +130,8 @@ public final class Campanha {
         String[] cpu;
         if (luta.duelo) {
             // 1x1: o capitão da dupla do jogador contra o próprio parceiro.
-            Torneio.Dupla dupla = duplaDo(irmao());
+            Torneio t = torneioSorteado();
+            Torneio.Dupla dupla = t != null ? t.jogador() : duplaDo(irmao());
             if (dupla == null) return null;
             return new String[][] {{dupla.lutadores[0]}, {dupla.lutadores[1]}};
         }

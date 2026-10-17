@@ -4,6 +4,7 @@
 > Motor das conversas durante as lutas (parceiro de tag, adversário esperando): [motor-conversas.md](motor-conversas.md).
 > Motor das cinemáticas dentro da luta (faixas de cinema, o roteiro guia os lutadores, falas, onomatopeias, fim da luta): [motor-cinematicas.md](motor-cinematicas.md).
 > Torneio (escolha do irmão, sorteio, chave de 8 duplas fixas, emboscada fora da arena, duelo 1x1): [torneio.md](torneio.md).
+> Modo Arcade (16 duplas, oficiais ou livres, o duelo 1x1 e o Takatoshi): [arcade.md](arcade.md).
 
 A história vem do documento "História Base — Torneio dos Irmãos" (Drive, pasta
 game-luta-gpt). Este documento descreve **como ela é contada no jogo**. Os episódios

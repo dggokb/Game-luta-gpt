@@ -24,16 +24,23 @@ import java.util.Random;
  * vencerem, ficam com a vaga dele. Não muda a chave (os organizadores só assistem). As outras são sorteadas nas vagas 1 a 6. Dupla que ainda não luta
  * ({@link Dupla#pronta} falso) vai para o lado do rival, para nunca cruzar com o jogador.
  * O rival sempre avança; as lutas entre duas duplas do CPU têm o vencedor sorteado.
+ *
+ * O modo Arcade usa a mesma chave com 16 vagas ({@link #arcade}): oitavas, quartas, semifinal e
+ * final, a dupla do jogador na vaga 0 e as outras 15 sorteadas; não há rival fixo.
  */
 public final class Torneio {
     public static final String ARQUIVO = Temporada.PASTA + "/torneio/torneio.json";
+    /** Vagas da chave do modo história. */
     public static final int VAGAS = 8;
-    /** Quartas, semifinal e final. */
+    /** Quartas, semifinal e final (modo história). */
     public static final int RODADAS = 3;
+    /** Vagas da chave do Arcade: oitavas, quartas, semifinal e final. */
+    public static final int VAGAS_ARCADE = 16;
+    public static final String OITAVAS = "OITAVAS DE FINAL";
     public static final String QUARTAS = "QUARTAS DE FINAL";
     public static final String SEMIFINAL = "SEMIFINAL";
     public static final String FINAL = "FINAL";
-    public static final String[] NOMES_RODADAS = {QUARTAS, SEMIFINAL, FINAL};
+    public static final String[] NOMES_RODADAS = {OITAVAS, QUARTAS, SEMIFINAL, FINAL};
     public static final String RYUGA = "ryuga";
     public static final String KOGA = "koga";
 
@@ -76,8 +83,12 @@ public final class Torneio {
         return out;
     }
 
-    /** Participantes de cada rodada: [0] = as 8 vagas, [1] = 4 semifinalistas, [2] = 2 finalistas, [3] = campeão. */
-    private final Dupla[][] rodadas = new Dupla[RODADAS + 1][];
+    /**
+     * Participantes de cada rodada: [0] = todas as vagas, depois a metade a cada rodada até
+     * [rodadas()] = o campeão. Na história, 8 → 4 semifinalistas → 2 finalistas → campeão.
+     */
+    private final Dupla[][] rodadas;
+    private final int vagas;
     private final Dupla jogador;
     private final Dupla rival;
     private final Random random;
@@ -88,8 +99,12 @@ public final class Torneio {
     private boolean eliminado;
 
     private Torneio(Dupla[] vagas, Dupla jogador, Dupla rival, int[] ordemSorteio, Random random) {
-        for (int r = 0; r <= RODADAS; r++) rodadas[r] = new Dupla[VAGAS >> r];
-        System.arraycopy(vagas, 0, rodadas[0], 0, VAGAS);
+        this.vagas = vagas.length;
+        int n = Integer.numberOfTrailingZeros(this.vagas);
+        if (this.vagas != 1 << n || n < 1) throw new IllegalArgumentException("a chave precisa de 2, 4, 8, 16... vagas");
+        rodadas = new Dupla[n + 1][];
+        for (int r = 0; r <= n; r++) rodadas[r] = new Dupla[this.vagas >> r];
+        System.arraycopy(vagas, 0, rodadas[0], 0, this.vagas);
         this.jogador = jogador;
         this.rival = rival;
         this.ordemSorteio = ordemSorteio;
@@ -146,10 +161,51 @@ public final class Torneio {
         return new Torneio(vagas, jogaRyuga ? ryuga : koga, jogaRyuga ? koga : ryuga, ordemSorteio, random);
     }
 
+    /**
+     * A chave do Arcade: a dupla do jogador na vaga 0 e as outras 15 sorteadas nas vagas 1 a 15
+     * (sem rival fixo: entre duas duplas do CPU, vencedor sorteado).
+     *
+     * @param outras as 15 duplas do CPU
+     */
+    public static Torneio arcade(Dupla jogador, List<Dupla> outras, Random random) {
+        if (jogador == null) throw new IllegalArgumentException("o Arcade precisa da dupla do jogador");
+        if (outras.size() != VAGAS_ARCADE - 1) {
+            throw new IllegalArgumentException("o Arcade precisa de " + (VAGAS_ARCADE - 1) + " duplas do CPU, tem " + outras.size());
+        }
+        List<Dupla> embaralhadas = new ArrayList<>(outras);
+        Collections.shuffle(embaralhadas, random);
+        Dupla[] vagas = new Dupla[VAGAS_ARCADE];
+        vagas[0] = jogador;
+        for (int i = 0; i < embaralhadas.size(); i++) vagas[i + 1] = embaralhadas.get(i);
+        List<Integer> ordem = new ArrayList<>();
+        for (int v = 1; v < VAGAS_ARCADE; v++) ordem.add(v);
+        Collections.shuffle(ordem, random);
+        int[] ordemSorteio = new int[ordem.size()];
+        for (int i = 0; i < ordemSorteio.length; i++) ordemSorteio[i] = ordem.get(i);
+        return new Torneio(vagas, jogador, null, ordemSorteio, random);
+    }
+
+    /** Quantas duplas a chave tem (8 na história, 16 no Arcade). */
+    public int vagas() {
+        return vagas;
+    }
+
+    /** Quantas rodadas até o campeão (3 na história, 4 no Arcade). */
+    public int rodadas() {
+        return rodadas.length - 1;
+    }
+
+    /** Nome da rodada {@code r}: a final é a última, antes dela semifinal, quartas e oitavas. */
+    public String nomeRodada(int r) {
+        int faltam = rodadas() - r;
+        return NOMES_RODADAS[Math.max(0, NOMES_RODADAS.length - faltam)];
+    }
+
     public Dupla jogador() {
         return jogador;
     }
 
+    /** O outro irmão (história), ou null no Arcade. */
     public Dupla rival() {
         return rival;
     }
@@ -159,18 +215,18 @@ public final class Torneio {
         return rodadas[rodada][i];
     }
 
-    /** Rodadas já disputadas: 0 antes das quartas, 3 com o campeão decidido. */
+    /** Rodadas já disputadas: 0 antes da primeira, {@link #rodadas()} com o campeão decidido. */
     public int disputadas() {
         return disputadas;
     }
 
-    /** Ordem das vagas 1 a 6 no sorteio. */
+    /** Ordem das vagas sorteadas (as fixas ficam fora). */
     public int[] ordemSorteio() {
         return ordemSorteio.clone();
     }
 
     public boolean acabou() {
-        return disputadas >= RODADAS;
+        return disputadas >= rodadas();
     }
 
     public boolean jogadorEliminado() {
@@ -178,12 +234,12 @@ public final class Torneio {
     }
 
     public Dupla campeao() {
-        return rodadas[RODADAS][0];
+        return rodadas[rodadas()][0];
     }
 
     /** Nome da próxima rodada do jogador, ou null se acabou para ele. */
     public String rodadaAtual() {
-        return adversario() != null ? NOMES_RODADAS[disputadas] : null;
+        return adversario() != null ? nomeRodada(disputadas) : null;
     }
 
     /** Posição do jogador na rodada em disputa, ou -1 se ele saiu (ou o torneio acabou). */
@@ -198,11 +254,12 @@ public final class Torneio {
 
     /**
      * A emboscada fora da arena: depois que o jogador passou das quartas, a dupla que perdeu a
-     * outra quarta do lado dele. Null antes das quartas, se o jogador perdeu, ou depois.
+     * outra quarta do lado dele. Null antes das quartas, se o jogador perdeu, depois, ou no
+     * Arcade (só a história tem emboscada).
      */
     public Dupla emboscada() {
-        if (disputadas != 1 || eliminado) return null;
-        int lado = posicaoInicial(jogador) < VAGAS / 2 ? 0 : 1;
+        if (disputadas != 1 || eliminado || rival == null) return null;
+        int lado = posicaoInicial(jogador) < vagas / 2 ? 0 : 1;
         int minha = posicaoInicial(jogador) / 2;
         int outra = lado * 2 + (minha % 2 == 0 ? 1 : 0);
         Dupla vencedor = rodadas[1][outra];
@@ -211,7 +268,7 @@ public final class Torneio {
     }
 
     private int posicaoInicial(Dupla d) {
-        for (int i = 0; i < VAGAS; i++) {
+        for (int i = 0; i < vagas; i++) {
             if (rodadas[0][i] == d) return i;
         }
         return -1;
@@ -238,7 +295,7 @@ public final class Torneio {
                 Dupla outro = a == jogador ? b : a;
                 vencedor = jogadorVenceu ? jogador : outro;
                 if (!jogadorVenceu) eliminado = true;
-            } else if (a == rival || b == rival) {
+            } else if (rival != null && (a == rival || b == rival)) {
                 vencedor = rival;
             } else {
                 vencedor = random.nextBoolean() ? a : b;

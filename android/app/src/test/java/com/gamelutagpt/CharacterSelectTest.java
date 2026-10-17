@@ -85,4 +85,20 @@ public class CharacterSelectTest {
         s.cardCorners(12,q);assertTrue(q[0]<CharacterSelect.GRID_X);assertEquals(12,s.cardAt(q[6]+4,q[5]-4));
         s.cardCorners(0,q);assertEquals(-1,s.cardAt(q[2]+4,q[3]+1));assertEquals(1,s.stageCount());
     }
+    @Test public void soloPicksOnlyThePlayersTeamForTheArcade() {
+        CharacterSelect s=make();
+        s.openSolo("p01","p08");
+        assertTrue(s.solo());
+        assertEquals("1/2  ESCOLHA SEU LUTADOR",s.stepLabel());
+        pick(s,4);assertEquals("p05",s.point());assertFalse(s.ready());
+        assertEquals("2/2  ESCOLHA SEU PARCEIRO",s.stepLabel());
+        pick(s,4);assertFalse("the same fighter twice is refused",s.ready());
+        pick(s,2);assertEquals("p03",s.partner());assertTrue(s.ready());
+        assertEquals("no CPU picks",CharacterSelect.Result.NONE,pick(s,6));
+        assertEquals(CharacterSelect.Result.CONFIRM,s.tap(370,700));
+        // The usual open() goes back to both teams.
+        s.open("p01","p08","p03","p06");
+        assertFalse(s.solo());
+        finish(s);assertTrue(s.ready());
+    }
 }

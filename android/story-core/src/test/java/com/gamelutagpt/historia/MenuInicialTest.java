@@ -46,7 +46,7 @@ public class MenuInicialTest {
         MenuInicial m = new MenuInicial(new GameAssets());
         m.abrir(null);
         assertTrue(m.isOpen());
-        float[] teste = centro(1);
+        float[] teste = centro(2);
         m.tap(teste[0], teste[1]); // cedo demais: o toque que abriu o menu não vale
         assertNull(run(m, MenuInicial.TAP_DELAY + 0.05f));
         m.tap(640f, 60f); // no logo: nada
@@ -64,12 +64,14 @@ public class MenuInicialTest {
         m.abrir(null);
         assertEquals(MenuInicial.Opcao.HISTORIA, m.cursor());
         m.mover(1);
+        assertEquals(MenuInicial.Opcao.ARCADE, m.cursor());
+        m.mover(1);
         assertEquals(MenuInicial.Opcao.TESTE, m.cursor());
         m.mover(1); // dá a volta
         assertEquals(MenuInicial.Opcao.HISTORIA, m.cursor());
         m.mover(-1);
         assertEquals(MenuInicial.Opcao.TESTE, m.cursor());
-        m.mover(-1);
+        m.mover(1);
         run(m, MenuInicial.TAP_DELAY + 0.05f);
         m.confirmar();
         m.mover(1); // depois de escolher, o cursor não anda

@@ -310,9 +310,11 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 
 - **Save do modo história**: CONTINUAR do começo do episódio onde parou e escolha dos
   capítulos já feitos (os outros ficam trancados). `docs/menu-inicial.md`.
-- O app abre no **menu inicial** (logo + duas opções, toque ou controle):
+- O app abre no **menu inicial** (logo + três opções, toque ou controle):
   **MODO HISTÓRIA** (o jogo de verdade: Prólogo e Episódio 1, sem botões de teste; ◀ MENU e a
-  tecla voltar abrem a pausa e levam de volta ao menu) e **MODO TESTE** (a luta de teste de
+  tecla voltar abrem a pausa e levam de volta ao menu), **ARCADE** (torneio de 16 duplas,
+  oficiais ou livres, com a CPU subindo de nível a cada rodada, o duelo 1x1 da dupla campeã e
+  o Takatoshi, ainda por fazer; `docs/historia/arcade.md`) e **MODO TESTE** (a luta de teste de
   sempre, com seleção de dupla, botões de teste e DEBUG). Textos traduzidos pelos idiomas da
   história. `docs/menu-inicial.md`; prévia no PC: `gradle :pc-preview:runMenu`.
 

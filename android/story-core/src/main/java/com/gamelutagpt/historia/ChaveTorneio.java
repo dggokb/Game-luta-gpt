@@ -3,29 +3,73 @@ package com.gamelutagpt.historia;
 import com.gamelutagpt.render.RenderCanvas;
 
 /**
- * Desenha a chave do torneio (passos "sorteio" e "chave"): as 8 duplas nas quartas dos dois
- * lados, as semifinais, a final no meio e o campeão em cima. A dupla do jogador tem borda
- * azul, a do rival vermelha; quem perdeu fica apagado e riscado.
+ * Desenha a chave do torneio (passos "sorteio" e "chave"): as duplas da primeira rodada dos
+ * dois lados, as rodadas seguintes indo para o meio, a final no meio e o campeão em cima. Na
+ * história são 8 duplas (quartas, semi, final); no Arcade, 16 (oitavas antes), em cards
+ * menores. A dupla do jogador tem borda azul, a do rival vermelha; quem perdeu fica apagado e
+ * riscado.
  *
- * No sorteio, as duplas dos irmãos aparecem nas pontas e as outras caem uma a uma nas vagas,
- * na ordem sorteada. Na chave, a rodada que acabou de ser decidida aparece por último.
+ * No sorteio, as duplas fixas (os irmãos; no Arcade, a do jogador) aparecem primeiro e as
+ * outras caem uma a uma nas vagas, na ordem sorteada. Na chave, a rodada que acabou de ser
+ * decidida aparece por último.
  */
 final class ChaveTorneio {
     /** Textos da chave que passam pela tradução (mais os nomes das rodadas, em {@link Torneio}). */
+    /** Rodapé do sorteio do Arcade. */
+    static final String ARCADE_SORTEIO = "Quatro vitórias até o título. Depois, a regra escondida.";
     static final String[] TEXTOS = {"O SORTEIO", "CHAVE DO TORNEIO", "FINAL", "CAMPEÕES", "PRÓXIMA LUTA",
-        "Os irmãos ficam em lados opostos: só se encontram na final.", "Fim do torneio para a sua dupla."};
+        "Os irmãos ficam em lados opostos: só se encontram na final.", "Fim do torneio para a sua dupla.",
+        ARCADE_SORTEIO};
 
     static final float VW = PaginaHistoria.VW;
     static final float VH = PaginaHistoria.VH;
 
-    static final float CARD_W = 170f, CARD_H = 100f;
-    /** Colunas: quartas, semifinal e finalista de cada lado. */
-    private static final float[] COL_ESQ = {30f, 240f, 450f};
-    private static final float[] COL_DIR = {1080f, 870f, 660f};
-    private static final float[] TOPO_QUARTAS = {120f, 230f, 400f, 510f};
-    private static final float[] TOPO_SEMI = {175f, 455f};
-    private static final float TOPO_FINAL = 315f;
-    private static final float CAMPEAO_X = (VW - CARD_W) * 0.5f, CAMPEAO_Y = 160f;
+    /**
+     * Medidas de uma chave: o card, os retratos, as colunas de cada lado (uma por rodada, da
+     * primeira à final) e o topo dos cards da primeira rodada de um lado (as rodadas seguintes
+     * ficam no meio das duas que se enfrentaram).
+     */
+    static final class Layout {
+        final float cardW, cardH, rosto, nome;
+        final float[] colEsq, colDir, topo;
+        final float campeaoY, rodapeY;
+
+        Layout(float cardW, float cardH, float rosto, float nome, float[] colEsq, float[] colDir, float[] topo,
+               float campeaoY, float rodapeY) {
+            this.cardW = cardW;
+            this.cardH = cardH;
+            this.rosto = rosto;
+            this.nome = nome;
+            this.colEsq = colEsq;
+            this.colDir = colDir;
+            this.topo = topo;
+            this.campeaoY = campeaoY;
+            this.rodapeY = rodapeY;
+        }
+
+        float campeaoX() {
+            return (VW - cardW) * 0.5f;
+        }
+
+        /** Topo do card {@code k} de um lado na rodada {@code r}. */
+        float topo(int r, int k) {
+            if (r == 0) return topo[k];
+            return (topo(r - 1, 2 * k) + topo(r - 1, 2 * k + 1)) * 0.5f;
+        }
+    }
+
+    /** A chave da história: 8 duplas, cards grandes. */
+    static final Layout OITO = new Layout(170f, 100f, 76f, 14f,
+        new float[] {30f, 240f, 450f}, new float[] {1080f, 870f, 660f},
+        new float[] {120f, 230f, 400f, 510f}, 160f, 668f);
+    /** A chave do Arcade: 16 duplas, 8 de cada lado. */
+    static final Layout DEZESSEIS = new Layout(112f, 66f, 50f, 11f,
+        new float[] {12f, 146f, 280f, 414f}, new float[] {1156f, 1022f, 888f, 754f},
+        new float[] {100f, 170f, 240f, 310f, 400f, 470f, 540f, 610f}, 200f, 706f);
+
+    static Layout layout(Torneio t) {
+        return t.vagas() > Torneio.VAGAS ? DEZESSEIS : OITO;
+    }
 
     /** Animação do sorteio: as pontas, depois uma dupla por vez. */
     static final float SORTEIO_INICIO = 0.9f;
@@ -47,26 +91,30 @@ final class ChaveTorneio {
         this.rostos = rostos;
     }
 
-    /** Quanto dura a animação do sorteio (as 6 duplas sorteadas). */
-    static float duracaoSorteio() {
-        return SORTEIO_INICIO + (Torneio.VAGAS - 2) * SORTEIO_PASSO + SLAM;
+    /** Intervalo entre duas duplas sorteadas: 0,45 s na história; mais rápido com 15 vagas. */
+    static float passoSorteio(Torneio t) {
+        return Math.min(SORTEIO_PASSO, 2.7f / Math.max(1, t.ordemSorteio().length));
+    }
+
+    /** Quanto dura a animação do sorteio (as duplas sorteadas, uma a uma). */
+    static float duracaoSorteio(Torneio t) {
+        return SORTEIO_INICIO + t.ordemSorteio().length * passoSorteio(t) + SLAM;
     }
 
     /** Quanto dura a revelação da rodada que acabou de ser decidida. */
     static float duracaoRevelacao(Torneio t) {
         int d = t.disputadas();
-        return d == 0 ? 0f : 0.3f + (Torneio.VAGAS >> d) * REVELA_PASSO + SLAM;
+        return d == 0 ? 0f : 0.3f + (t.vagas() >> d) * REVELA_PASSO + SLAM;
     }
 
-    /** Topo esquerdo do card da posição {@code i} na rodada {@code r} (3 = campeão). */
-    static float[] posicao(int r, int i) {
-        if (r >= Torneio.RODADAS) return new float[] {CAMPEAO_X, CAMPEAO_Y};
-        int porLado = (Torneio.VAGAS >> r) / 2;
+    /** Topo esquerdo do card da posição {@code i} na rodada {@code r} ({@code rodadas()} = campeão). */
+    static float[] posicao(Torneio t, int r, int i) {
+        Layout l = layout(t);
+        if (r >= t.rodadas()) return new float[] {l.campeaoX(), l.campeaoY};
+        int porLado = (t.vagas() >> r) / 2;
         boolean esquerda = i < porLado;
         int k = i % porLado;
-        float x = esquerda ? COL_ESQ[r] : COL_DIR[r];
-        float y = r == 0 ? TOPO_QUARTAS[k] : r == 1 ? TOPO_SEMI[k] : TOPO_FINAL;
-        return new float[] {x, y};
+        return new float[] {esquerda ? l.colEsq[r] : l.colDir[r], l.topo(r, k)};
     }
 
     /**
@@ -89,38 +137,39 @@ final class ChaveTorneio {
         float revelaDesde = 0.3f;
         drawLinhas(c, t, sorteio, time, revelada, revelaDesde);
 
-        // Quartas: no sorteio, cada vaga na sua hora.
-        for (int i = 0; i < Torneio.VAGAS; i++) {
+        // Primeira rodada: no sorteio, cada vaga na sua hora.
+        Layout l = layout(t);
+        for (int i = 0; i < t.vagas(); i++) {
             float aparece = 0f;
             if (sorteio) aparece = horaDaVaga(t, i);
             drawCard(c, temporada, t, 0, i, time - aparece, sorteio && time < aparece);
         }
         if (!sorteio) {
-            for (int r = 1; r <= Torneio.RODADAS; r++) {
-                int n = Torneio.VAGAS >> r;
+            for (int r = 1; r <= t.rodadas(); r++) {
+                int n = t.vagas() >> r;
                 for (int i = 0; i < n; i++) {
                     float idade = r < revelada ? 99f : r == revelada ? time - revelaDesde - i * REVELA_PASSO : -1f;
-                    if (r == Torneio.RODADAS && t.campeao() == null) continue;
+                    if (r == t.rodadas() && t.campeao() == null) continue;
                     drawCard(c, temporada, t, r, i, idade, idade < 0f);
                 }
             }
             if (t.campeao() != null) {
-                c.drawText(temporada.t("CAMPEÕES"), VW * 0.5f, CAMPEAO_Y - 10f, 22f, GOLD, 0xFF0A0A0A, 4f, true);
+                c.drawText(temporada.t("CAMPEÕES"), VW * 0.5f, l.campeaoY - 10f, 22f, GOLD, 0xFF0A0A0A, 4f, true);
             }
         }
-        c.drawText(temporada.t("FINAL"), VW * 0.5f, TOPO_FINAL + CARD_H + 30f, 24f, GOLD, 0xFF0A0A0A, 4f, true);
-        c.drawText("×", VW * 0.5f, TOPO_FINAL + CARD_H * 0.5f + 12f, 34f, 0xFFFFFFFF, 0xFF0A0A0A, 4f, true);
+        float topoFinal = l.topo(t.rodadas() - 1, 0);
+        c.drawText(temporada.t("FINAL"), VW * 0.5f, topoFinal + l.cardH + 30f, 24f, GOLD, 0xFF0A0A0A, 4f, true);
+        c.drawText("×", VW * 0.5f, topoFinal + l.cardH * 0.5f + 12f, 34f, 0xFFFFFFFF, 0xFF0A0A0A, 4f, true);
         drawRodape(c, temporada, t, sorteio, time);
     }
 
-    /** Quando a vaga aparece no sorteio: as pontas logo, as outras na ordem sorteada. */
+    /** Quando a vaga aparece no sorteio: as fixas logo, as outras na ordem sorteada. */
     private static float horaDaVaga(Torneio t, int vaga) {
-        if (vaga == 0 || vaga == Torneio.VAGAS - 1) return 0.25f;
         int[] ordem = t.ordemSorteio();
         for (int k = 0; k < ordem.length; k++) {
-            if (ordem[k] == vaga) return SORTEIO_INICIO + k * SORTEIO_PASSO;
+            if (ordem[k] == vaga) return SORTEIO_INICIO + k * passoSorteio(t);
         }
-        return SORTEIO_INICIO;
+        return 0.25f;
     }
 
     /**
@@ -128,66 +177,72 @@ final class ChaveTorneio {
      * @param vazio desenha a vaga com "?"
      */
     private void drawCard(RenderCanvas c, Temporada temporada, Torneio t, int r, int i, float idade, boolean vazio) {
-        float[] p = posicao(r, i);
+        Layout lay = layout(t);
+        float cardW = lay.cardW, cardH = lay.cardH;
+        float[] p = posicao(t, r, i);
         float l = p[0], top = p[1];
         Torneio.Dupla d = vazio ? null : t.participante(r, i);
-        float[] caixa = {l, top, l + CARD_W, top, l + CARD_W, top + CARD_H, l, top + CARD_H};
+        float[] caixa = {l, top, l + cardW, top, l + cardW, top + cardH, l, top + cardH};
         if (d == null) {
             c.fillPolygon(caixa, 0x99101320);
             c.strokePolygon(caixa, 2f, 0x885A6275);
-            c.drawText("?", l + CARD_W * 0.5f, top + CARD_H * 0.66f, 46f, 0x885A6275, 0, 0f, true);
+            c.drawText("?", l + cardW * 0.5f, top + cardH * 0.66f, cardH * 0.46f, 0x885A6275, 0, 0f, true);
             return;
         }
         float pop = Tinta.clamp01(idade / SLAM);
         float scale = 1.45f - 0.45f * Tinta.easeOutCubic(pop);
-        boolean perdeu = r < t.disputadas() && r < Torneio.RODADAS && t.participante(r + 1, i / 2) != d;
+        boolean perdeu = r < t.disputadas() && r < t.rodadas() && t.participante(r + 1, i / 2) != d;
         int alpha = perdeu ? 105 : 255;
         int borda = d == t.jogador() ? BLUE : d == t.rival() ? RED : GRAY;
-        float cx = l + CARD_W * 0.5f, cy = top + CARD_H * 0.5f;
+        float cx = l + cardW * 0.5f, cy = top + cardH * 0.5f;
         c.save();
         c.scale(scale, scale, cx, cy);
-        c.fillPolygon(new float[] {l + 6f, top + 7f, l + CARD_W + 6f, top + 7f, l + CARD_W + 6f, top + CARD_H + 7f, l + 6f, top + CARD_H + 7f},
+        c.fillPolygon(new float[] {l + 6f, top + 7f, l + cardW + 6f, top + 7f, l + cardW + 6f, top + cardH + 7f, l + 6f, top + cardH + 7f},
             Tinta.withAlpha(0xFF000000, alpha / 2));
         c.fillPolygon(caixa, Tinta.withAlpha(CARD, alpha));
-        rostos.draw(c, d.lutadores[0], l + 6f, top + 6f, 76f, 0xFF0A0A0A, 2f, alpha);
-        rostos.draw(c, d.lutadores[1], l + 88f, top + 6f, 76f, 0xFF0A0A0A, 2f, alpha);
+        // Os dois retratos lado a lado, com a mesma margem nas bordas e no meio.
+        float margem = (cardW - 2f * lay.rosto) / 3f;
+        rostos.draw(c, d.lutadores[0], l + margem, top + margem, lay.rosto, 0xFF0A0A0A, 2f, alpha);
+        rostos.draw(c, d.lutadores[1], l + 2f * margem + lay.rosto, top + margem, lay.rosto, 0xFF0A0A0A, 2f, alpha);
         String nome = Rostos.nomeDupla(temporada, d);
-        c.drawText(nome, cx, top + CARD_H - 4f, BotaoMenu.fit(c, nome, 14f, CARD_W - 10f, false),
+        c.drawText(nome, cx, top + cardH - 4f, BotaoMenu.fit(c, nome, lay.nome, cardW - 10f, false),
             Tinta.withAlpha(TEXT, alpha), 0, 0f, false);
         boolean destaque = d == t.jogador() || d == t.rival();
         c.strokePolygon(caixa, destaque ? 4f : 2f, Tinta.withAlpha(borda, alpha));
-        if (perdeu) c.drawLine(l + 10f, top + CARD_H - 10f, l + CARD_W - 10f, top + 10f, 5f, 0xC0E5404C);
+        if (perdeu) c.drawLine(l + 10f, top + cardH - 10f, l + cardW - 10f, top + 10f, 5f, 0xC0E5404C);
         if (pop < 1f) c.fillPolygon(caixa, Tinta.withAlpha(0xFFFFFFFF, (int)(200f * (1f - pop))));
         c.restore();
     }
 
     /** Linhas da chave; o caminho de quem avançou fica dourado. */
     private void drawLinhas(RenderCanvas c, Torneio t, boolean sorteio, float time, int revelada, float revelaDesde) {
-        for (int r = 0; r < Torneio.RODADAS; r++) {
-            int n = Torneio.VAGAS >> r;
+        Layout l = layout(t);
+        float cardW = l.cardW, cardH = l.cardH;
+        for (int r = 0; r < t.rodadas(); r++) {
+            int n = t.vagas() >> r;
             for (int i = 0; i < n; i++) {
-                float[] filho = posicao(r, i);
-                float[] pai = posicao(r + 1, i / 2);
+                float[] filho = posicao(t, r, i);
+                float[] pai = posicao(t, r + 1, i / 2);
                 boolean esquerda = filho[0] < VW * 0.5f;
-                float fy = filho[1] + CARD_H * 0.5f;
+                float fy = filho[1] + cardH * 0.5f;
                 boolean decidido = !sorteio && r + 1 <= revelada &&
                     (r + 1 < revelada || time - revelaDesde - (i / 2) * REVELA_PASSO >= 0f);
                 boolean venceu = decidido && t.participante(r + 1, i / 2) == t.participante(r, i);
                 int cor = venceu ? GOLD : 0x996E7689;
                 float w = venceu ? 4f : 2.5f;
-                if (r == Torneio.RODADAS - 1) {
+                if (r == t.rodadas() - 1) {
                     // Finalistas: sobe do meio da final até o campeão (só depois da final).
                     if (sorteio || t.campeao() == null) continue;
-                    float fx = esquerda ? filho[0] + CARD_W : filho[0];
+                    float fx = esquerda ? filho[0] + cardW : filho[0];
                     float mx = VW * 0.5f;
-                    c.drawLine(fx, fy - CARD_H * 0.5f + 12f, mx, fy - CARD_H * 0.5f + 12f, w, cor);
-                    c.drawLine(mx, fy - CARD_H * 0.5f + 12f, mx, CAMPEAO_Y + CARD_H, w, cor);
+                    c.drawLine(fx, fy - cardH * 0.5f + 12f, mx, fy - cardH * 0.5f + 12f, w, cor);
+                    c.drawLine(mx, fy - cardH * 0.5f + 12f, mx, l.campeaoY + cardH, w, cor);
                     continue;
                 }
-                float fx = esquerda ? filho[0] + CARD_W : filho[0];
-                float px = esquerda ? pai[0] : pai[0] + CARD_W;
+                float fx = esquerda ? filho[0] + cardW : filho[0];
+                float px = esquerda ? pai[0] : pai[0] + cardW;
                 float mx = (fx + px) * 0.5f;
-                float py = pai[1] + CARD_H * 0.5f;
+                float py = pai[1] + cardH * 0.5f;
                 c.drawLine(fx, fy, mx, fy, w, cor);
                 c.drawLine(mx, fy, mx, py, w, cor);
                 c.drawLine(mx, py, px, py, w, cor);
@@ -196,11 +251,12 @@ final class ChaveTorneio {
     }
 
     private void drawRodape(RenderCanvas c, Temporada temporada, Torneio t, boolean sorteio, float time) {
-        float y = 668f;
+        float y = layout(t).rodapeY;
         if (sorteio) {
-            if (time < duracaoSorteio()) return;
-            float a = Tinta.clamp01((time - duracaoSorteio()) / 0.3f);
-            String texto = temporada.t("Os irmãos ficam em lados opostos: só se encontram na final.");
+            if (time < duracaoSorteio(t)) return;
+            float a = Tinta.clamp01((time - duracaoSorteio(t)) / 0.3f);
+            String texto = temporada.t(t.rival() == null ? ARCADE_SORTEIO
+                : "Os irmãos ficam em lados opostos: só se encontram na final.");
             c.drawText(texto, VW * 0.5f, y, BotaoMenu.fit(c, texto, 24f, 1100f, false), Tinta.withAlpha(TEXT, (int)(255 * a)), 0, 0f, false);
             return;
         }
