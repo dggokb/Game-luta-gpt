@@ -83,6 +83,7 @@ final class SpriteFighterRenderer {
     private ColorFilter override;
 
     void setOverride(ColorFilter filter) {override=filter;}
+    ColorFilter override() {return override;}
 
     /** Sprite artwork coordinates, not fighter hitboxes or simulation sizes. */
     void draw(Canvas canvas,float x,float baseY,int facing,boolean damageFlash,boolean guardFlash) {

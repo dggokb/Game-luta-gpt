@@ -11,7 +11,7 @@ import android.graphics.Shader;
  * spawning reuses slots, drawing allocates nothing and nothing here touches combat state.
  */
 final class ImpactEffects {
-    static final int HIT = 0, GUARD = 1, DUST = 2, LAUNCH = 3;
+    static final int HIT = 0, GUARD = 1, DUST = 2, LAUNCH = 3, GLINT = 4;
     /** Size class of a contact: 0 light, 1 medium, 2 heavy, 3 special/super. */
     static final int LIGHT = 0, MEDIUM = 1, HEAVY = 2, SPECIAL = 3;
 
@@ -203,6 +203,36 @@ final class ImpactEffects {
         }
     }
 
+    /** Quanto dura o brilho de ativação do Super (s). */
+    static final float GLINT_LIFE = .42f;
+
+    /**
+     * Ativação do Super: o brilho de estrela no peito (como nos jogos de luta clássicos), um
+     * anel na cor do lutador e faíscas que saem para todos os lados. {@code accent} é a cor dele.
+     */
+    void spawnSuperGlint(float x, float y, int accent) {
+        int b = nextBurst;
+        nextBurst = (nextBurst + 1) % BURSTS;
+        bx[b] = x; by[b] = y; bAge[b] = 0f; bKind[b] = GLINT; bDir[b] = 1;
+        bLife[b] = GLINT_LIFE;
+        bSize[b] = 110f;
+        bAngle[b] = (random() - .5f) * .3f;
+        bColor[b] = accent | 0xFF000000;
+        for (int n = 0; n < 14; n++) {
+            int d = nextDebris;
+            nextDebris = (nextDebris + 1) % DEBRIS;
+            float angle = n * 6.2832f / 14 + (random() - .5f) * .3f;
+            float speed = 700f + 500f * random();
+            dx[d] = x; dy[d] = y;
+            dvx[d] = (float)Math.cos(angle) * speed;
+            dvy[d] = (float)Math.sin(angle) * speed;
+            dAge[d] = 0f;
+            dLife[d] = .14f + .1f * random();
+            dWidth[d] = 3f + random() * 3f;
+            dColor[d] = n % 2 == 0 ? (accent | 0xFF000000) : 0xFFFFFFFF;
+        }
+    }
+
     void update(float dt) {
         for (int i = 0; i < SPEARS; i++) if (sAge[i] < SPEAR_LIFE) sAge[i] += dt;
         for (int i = 0; i < BURSTS; i++) if (bAge[i] < bLife[i]) bAge[i] += dt;
@@ -285,6 +315,10 @@ final class ImpactEffects {
         }
         if (bKind[i] == LAUNCH) {
             drawLaunch(c, i, k);
+            return;
+        }
+        if (bKind[i] == GLINT) {
+            drawGlint(c, i, k);
             return;
         }
         float size = bSize[i];
@@ -387,6 +421,50 @@ final class ImpactEffects {
         }
         paint.setStyle(Paint.Style.FILL);
         paint.setAlpha(255);
+    }
+
+    /**
+     * Brilho de estrela: quatro pontas finas (a horizontal mais longa) que abrem num estalo e
+     * encolhem, com um halo na cor do lutador e um anel que se abre.
+     */
+    private void drawGlint(Canvas c, int i, float k) {
+        float size = bSize[i];
+        // Abre rápido até ~15% da vida e depois encolhe devagar.
+        float open = k < .15f ? k / .15f : 1f - (k - .15f) / .85f * .75f;
+        float fade = 1f - k * k;
+        c.save();
+        c.translate(bx[i], by[i]);
+        c.rotate((float)Math.toDegrees(bAngle[i]) + 25f * k);
+        paint.setShader(null);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(bColor[i]);
+        paint.setAlpha(Math.round(110 * fade));
+        float halo = size * (.45f + .25f * open);
+        c.drawCircle(0f, 0f, halo, paint);
+        for (int layer = 0; layer < 2; layer++) {
+            float scale = layer == 0 ? 1f : .55f;
+            float w = size * (layer == 0 ? .16f : .07f) * open;
+            float h = size * 2.4f * open * scale, v = size * 1.5f * open * scale;
+            star.reset();
+            star.moveTo(-h, 0f); star.lineTo(-w, -w); star.lineTo(0f, -v); star.lineTo(w, -w);
+            star.lineTo(h, 0f); star.lineTo(w, w); star.lineTo(0f, v); star.lineTo(-w, w);
+            star.close();
+            paint.setColor(layer == 0 ? bColor[i] : 0xFFFFFFFF);
+            paint.setAlpha(Math.round((layer == 0 ? 230 : 255) * fade));
+            c.drawPath(star, paint);
+        }
+        paint.setColor(0xFFFFFFFF);
+        paint.setAlpha(Math.round(255 * fade));
+        c.drawCircle(0f, 0f, size * .16f * open, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(8f * (1f - k));
+        paint.setColor(bColor[i]);
+        paint.setAlpha(Math.round(200 * (1f - k)));
+        float ring = size * (.3f + 1.5f * (1f - (1f - k) * (1f - k)));
+        c.drawCircle(0f, 0f, ring, paint);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(255);
+        c.restore();
     }
 
     /** Nuvem de poeira: elipses baixas que se abrem para os lados e somem. */

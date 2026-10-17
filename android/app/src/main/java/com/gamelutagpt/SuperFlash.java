@@ -1,0 +1,147 @@
+package com.gamelutagpt;
+
+/**
+ * Apresentação do Super de quem o ativou: o jogador, a CPU ou o parceiro que entra num DHC.
+ * O cenário escurece, a câmera aproxima, a aura de carga cresce e a liberação pisca branco.
+ * Nos primeiros quadros vem o aviso de ativação (o corpo de quem ativou brilha na cor dele; quem
+ * desenha põe o brilho no peito e toca o som em {@link #started}). Quem ficou parado no
+ * congelamento escurece, para não parecer jogo travado.
+ *
+ * Só lê o motor: nada aqui muda a luta. Um {@link #update} por passo de 60 Hz.
+ */
+final class SuperFlash {
+    // Fases da cinemática, em segundos do Super (o tempo vem dos quadros do golpe).
+    static final float DARKEN = 0.16f, POSE = 0.30f, FLASH = 0.12f, RELEASE = 0.20f, RECOVER = 0.22f;
+    /** A cinemática do Super corpo a corpo toca mais rápido (as pancadas vêm logo depois do flash). */
+    static final float STRIKING_SPEED = 2.4f;
+    /** Escuro máximo do cenário (0–255). */
+    static final int DARK = 190;
+    /** Quadros do aviso de ativação: o corpo de quem ativou brilha e apaga. */
+    static final int SIGNAL_FRAMES = 8;
+    /** Quanto o congelado escurece por passo, entrando e saindo (sem pular de uma vez). */
+    static final float DIM_IN = 0.2f, DIM_OUT = 0.12f;
+    private static final float STEP = 1f / 60f;
+
+    /** Quem faz o Super agora (0 ou 1), ou -1. */
+    int user = -1;
+    /** Um Super começou neste passo (o lutador está em {@link #user}). */
+    boolean started;
+    float zoom = 1f, chargeTime;
+    int darkAlpha, flashAlpha;
+    /** Brilho do corpo de quem ativou, de 0 a 1 (só no aviso). */
+    float signal;
+    /** Escurecido de quem está congelado pelo Super, de 0 a 1. */
+    float frozenDim;
+    /** O lutador escurecido (o que não fez o Super), ou -1. */
+    int frozen = -1;
+
+    private final AttackDefinition[] seenAttack = new AttackDefinition[2];
+    private final int[] seenFrame = new int[2];
+
+    void reset() {
+        user = -1;
+        started = false;
+        zoom = 1f;
+        chargeTime = 0f;
+        darkAlpha = flashAlpha = 0;
+        signal = frozenDim = 0f;
+        frozen = -1;
+        seenAttack[0] = seenAttack[1] = null;
+    }
+
+    boolean active() {
+        return user >= 0;
+    }
+
+    private static boolean doingSuper(CombatFighter f) {
+        return f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER;
+    }
+
+    void update(CombatEngine engine) {
+        started = false;
+        int now = -1;
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            if (!doingSuper(f)) {
+                seenAttack[i] = null;
+                continue;
+            }
+            // Começou agora: outro golpe antes, ou o mesmo Super de novo do quadro zero.
+            if (seenAttack[i] != f.attack || f.attackFrame < seenFrame[i]) {
+                started = true;
+                now = i;
+            }
+            seenAttack[i] = f.attack;
+            seenFrame[i] = f.attackFrame;
+        }
+        // Os dois em Super: vale o mais recente.
+        if (now >= 0) {
+            user = now;
+        } else if (user < 0 || !doingSuper(engine.fighter(user))) {
+            user = -1;
+            for (int i = 0; i < 2; i++) if (doingSuper(engine.fighter(i))) user = i;
+        }
+        updateFrozen(engine);
+        if (user < 0) {
+            zoom = 1f;
+            darkAlpha = flashAlpha = 0;
+            chargeTime = 0f;
+            signal = 0f;
+            return;
+        }
+        CombatFighter f = engine.fighter(user);
+        int frame = f.attackFrame;
+        signal = frame < SIGNAL_FRAMES ? 1f - frame / (float)SIGNAL_FRAMES : 0f;
+        float t = (frame + 1) * STEP;
+        if (f.attack.melee()) t *= STRIKING_SPEED;
+        float poseStart = DARKEN;
+        float flashStart = poseStart + POSE;
+        float releaseStart = flashStart + FLASH;
+        float recoverStart = releaseStart + RELEASE;
+        chargeTime = Math.max(0f, t - poseStart);
+        if (t < poseStart) {
+            float k = clamp(t / DARKEN);
+            darkAlpha = Math.round(DARK * k);
+            zoom = 1f + 0.18f * k;
+            flashAlpha = 0;
+        } else if (t < flashStart) {
+            float k = clamp((t - poseStart) / POSE);
+            darkAlpha = DARK;
+            zoom = 1.18f + 0.18f * k;
+            flashAlpha = 0;
+        } else if (t < releaseStart) {
+            float k = clamp((t - flashStart) / FLASH);
+            darkAlpha = DARK;
+            zoom = 1.36f;
+            flashAlpha = Math.round(235f * (1f - Math.abs(0.5f - k) * 2f));
+        } else if (t < recoverStart) {
+            float k = clamp((t - releaseStart) / RELEASE);
+            darkAlpha = Math.round(DARK * (1f - 0.40f * k));
+            flashAlpha = Math.round(255f * (1f - k));
+            zoom = 1.36f - 0.16f * k;
+        } else {
+            float k = clamp((t - recoverStart) / RECOVER);
+            darkAlpha = Math.round(DARK * 0.6f * (1f - k));
+            flashAlpha = 0;
+            zoom = 1.20f - 0.20f * k;
+        }
+    }
+
+    /** Quem o Super segurou escurece enquanto está parado e volta aos poucos depois. */
+    private void updateFrozen(CombatEngine engine) {
+        boolean held = false;
+        if (user >= 0 && engine.superFreezeActive()) {
+            CombatFighter other = engine.fighter(1 - user);
+            if (other.hitstop > 0) {
+                held = true;
+                frozen = other.index;
+            }
+        }
+        frozenDim = held ? Math.min(1f, frozenDim + DIM_IN) : Math.max(0f, frozenDim - DIM_OUT);
+        if (frozenDim == 0f) frozen = -1;
+    }
+
+    private static float clamp(float v) {
+        return Math.max(0f, Math.min(1f, v));
+    }
+}

@@ -143,18 +143,8 @@ public class GameView extends SurfaceView
 
     private final CameraRig camera = new CameraRig();
 
-    // Super cinematic (presentation of the SUPER move; timing comes from its frames).
-    private static final float SUPER_DARKEN_DURATION = 0.16f;
-    private static final float SUPER_POSE_DURATION = 0.30f;
-    private static final float SUPER_FLASH_DURATION = 0.12f;
-    private static final float SUPER_RELEASE_DURATION = 0.20f;
-    private static final float SUPER_RECOVER_DURATION = 0.22f;
-    /** A cinemática do Super corpo a corpo toca mais rápido (as pancadas vêm logo depois do flash). */
-    private static final float STRIKING_SUPER_CINEMATIC_SPEED = 2.4f;
-    private float superCameraZoom = 1f;
-    private int superDarkAlpha = 0;
-    private int superFlashAlpha = 0;
-    private float superChargeTime = 0f;
+    // Super cinematic of whoever activates it (presentation only; timing comes from its frames).
+    private final SuperFlash superFlash = new SuperFlash();
 
     // Ultra (↓ + SUPER): the engine runs activation, rush and hit confirm; when it connects
     // the "Página Final" cinematic (ultra-core) plays while the engine waits.
@@ -1651,59 +1641,83 @@ public class GameView extends SurfaceView
         }
     }
 
+    /**
+     * Super: the stage darkens behind both fighters (they stay lit; the one held by the freeze
+     * dims in {@link #drawFighter}) and the charge aura grows behind whoever activated it.
+     */
+    private void drawSuperDarkness(Canvas canvas) {
+        effects.drawWorldOverlay(canvas, paint, superFlash.darkAlpha, 0, 0, 8);
+        CombatFighter u = engine.fighter(superFlash.user);
+        float x = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+        canvas.save();
+        if (u.facing < 0) canvas.scale(-1f, 1f, x, 0f);
+        effects.drawSuperCharge(canvas, paint, x, u.y, superFlash.chargeTime, u.state.profile.color);
+        canvas.restore();
+    }
+
+    /** Levels of the two Super looks: the activation glow and the dim of whoever is held. */
+    private static final int SUPER_LOOK_LEVELS = 8;
+    private final ColorFilter[] frozenLooks = new ColorFilter[SUPER_LOOK_LEVELS + 1];
+    private final ColorFilter[] signalLooks = new ColorFilter[SUPER_LOOK_LEVELS + 1];
+    private int signalLookColor;
+
+    /**
+     * Super look of a fighter body, or null. Who activated glows in its color for the first
+     * frames; who is held by the freeze turns darker and colder (still readable, not stuck).
+     */
+    private ColorFilter superLook(CombatFighter f) {
+        if (f == null || !superFlash.active() && superFlash.frozen < 0) return null;
+        if (superFlash.active() && f == engine.fighter(superFlash.user) && superFlash.signal > 0f) {
+            int color = f.state.profile.color;
+            if (color != signalLookColor) {
+                java.util.Arrays.fill(signalLooks, null);
+                signalLookColor = color;
+            }
+            int level = Math.round(superFlash.signal * SUPER_LOOK_LEVELS);
+            if (level == 0) return null;
+            if (signalLooks[level] == null) {
+                // Lighter toward the fighter's color: the body flares, the art still shows.
+                int a = Math.round(200f * level / SUPER_LOOK_LEVELS);
+                int glow = Color.argb(a, (Color.red(color) + 255 * 2) / 3, (Color.green(color) + 255 * 2) / 3,
+                    (Color.blue(color) + 255 * 2) / 3);
+                signalLooks[level] = new PorterDuffColorFilter(glow, PorterDuff.Mode.SRC_ATOP);
+            }
+            return signalLooks[level];
+        }
+        if (superFlash.frozen >= 0 && f == engine.fighter(superFlash.frozen)) {
+            int level = Math.round(superFlash.frozenDim * SUPER_LOOK_LEVELS);
+            if (level == 0) return null;
+            if (frozenLooks[level] == null) {
+                float k = level / (float)SUPER_LOOK_LEVELS;
+                float keep = 1f - 0.5f * k, grey = 0.35f * k;
+                // Half the light and a third of the color gone, with a cold tint.
+                float r = keep * (1f - grey), o = keep * grey / 2f;
+                frozenLooks[level] = new ColorMatrixColorFilter(new ColorMatrix(new float[] {
+                    r, o, o, 0f, 0f,
+                    o, r, o, 0f, 4f * k,
+                    o, o, r, 0f, 18f * k,
+                    0f, 0f, 0f, 1f, 0f}));
+            }
+            return frozenLooks[level];
+        }
+        return null;
+    }
+
     private boolean isSuperCinematicActive() {
-        CombatFighter p = player();
-        return p.attacking() && p.attack.kind == AttackDefinition.Kind.SUPER;
+        return superFlash.active();
     }
 
-    /** Seconds since the player's Super started (its cinematic clock). */
-    private float superElapsed() {
-        return (player().attackFrame + 1) * FIXED_STEP;
-    }
-
+    /**
+     * The Super cinematic follows whoever activated it. On activation: the glint at the chest and
+     * the sound, the warning that the Super is coming before the screen holds still.
+     */
     private void updateSuperVisuals() {
-        if (!isSuperCinematicActive()) {
-            superCameraZoom = 1f;
-            superDarkAlpha = 0;
-            superFlashAlpha = 0;
-            superChargeTime = 0f;
-            return;
-        }
-        float t = superElapsed();
-        // Super que bate corpo a corpo: a cinemática passa no tempo do flash (o rival já está
-        // livre) e a câmera abre para a sequência de pancadas aparecer inteira.
-        if (player().attack.melee()) t *= STRIKING_SUPER_CINEMATIC_SPEED;
-        float poseStart = SUPER_DARKEN_DURATION;
-        float flashStart = poseStart + SUPER_POSE_DURATION;
-        float releaseStart = flashStart + SUPER_FLASH_DURATION;
-        float recoverStart = releaseStart + SUPER_RELEASE_DURATION;
-        superChargeTime = Math.max(0f, t - poseStart);
-        if (t < poseStart) {
-            float k = clamp(t / SUPER_DARKEN_DURATION, 0f, 1f);
-            superDarkAlpha = Math.round(190f * k);
-            superCameraZoom = 1f + 0.18f * k;
-            superFlashAlpha = 0;
-        } else if (t < flashStart) {
-            float k = clamp((t - poseStart) / SUPER_POSE_DURATION, 0f, 1f);
-            superDarkAlpha = 190;
-            superCameraZoom = 1.18f + 0.18f * k;
-            superFlashAlpha = 0;
-        } else if (t < releaseStart) {
-            float k = clamp((t - flashStart) / SUPER_FLASH_DURATION, 0f, 1f);
-            superDarkAlpha = 190;
-            superCameraZoom = 1.36f;
-            superFlashAlpha = Math.round(235f * (1f - Math.abs(0.5f - k) * 2f));
-        } else if (t < recoverStart) {
-            float k = clamp((t - releaseStart) / SUPER_RELEASE_DURATION, 0f, 1f);
-            superDarkAlpha = Math.round(190f * (1f - 0.40f * k));
-            superFlashAlpha = Math.round(255f * (1f - k));
-            superCameraZoom = 1.36f - 0.16f * k;
-        } else {
-            float k = clamp((t - recoverStart) / SUPER_RECOVER_DURATION, 0f, 1f);
-            superDarkAlpha = Math.round(114f * (1f - k));
-            superFlashAlpha = 0;
-            superCameraZoom = 1.20f - 0.20f * k;
-        }
+        superFlash.update(engine);
+        if (!superFlash.started) return;
+        CombatFighter f = engine.fighter(superFlash.user);
+        float x = f.x + (f.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+        impacts.spawnSuperGlint(x, chestY(f), f.state.profile.color);
+        ultraSounds.playFight("super", 1f, 1f);
     }
 
     /**
@@ -2066,7 +2080,7 @@ public class GameView extends SurfaceView
             }
 
             float cinematicZoom = cinematica.zoom();
-            float baseZoom = camera.zoom * superCameraZoom * cinematicZoom;
+            float baseZoom = camera.zoom * superFlash.zoom * cinematicZoom;
             float punchZoom = feel.zoom();
             float renderZoom = baseZoom * ultraCameraZoom * punchZoom;
             float visibleWorldWidth = VW / renderZoom;
@@ -2080,7 +2094,7 @@ public class GameView extends SurfaceView
             if (cinematicZoom != 1f || focoJogador > 0f || focoRival > 0f) {
                 float pivotY = GROUND_Y + focoJogador * (chestY(player()) - GROUND_Y) +
                     focoRival * (chestY(opponent()) - GROUND_Y);
-                float pivotScreenY = (pivotY - camera.top) * camera.zoom * superCameraZoom;
+                float pivotScreenY = (pivotY - camera.top) * camera.zoom * superFlash.zoom;
                 renderCameraTop = pivotY - pivotScreenY / baseZoom;
                 renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
                     focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
@@ -2144,24 +2158,13 @@ public class GameView extends SurfaceView
                 drawUltraBeamOverlay(canvas, false);
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
+            if (isSuperCinematicActive()) drawSuperDarkness(canvas);
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
             effects.drawEnergyProjectiles(canvas, renderCanvas, engine.energyProjectiles);
             for (int i = 0; i < 2; i++) effects.drawSpecialEffect(renderCanvas, engine.fighter(i), effectTime);
             effects.drawSuperProjectiles(canvas, renderCanvas, engine.superProjectiles);
-            if (isSuperCinematicActive()) {
-                effects.drawWorldOverlay(canvas, paint, superDarkAlpha, 0, 0, 8);
-                canvas.save();
-                if (player().facing < 0) {
-                    canvas.scale(-1f, 1f, player().x, 0f);
-                }
-                effects.drawSuperCharge(
-                    canvas, paint, player().x, player().y, superChargeTime,
-                    activeFighter().profile.color
-                );
-                canvas.restore();
-            }
             if (ultraFighter().inUltraSequence()) {
                 effects.drawWorldOverlay(canvas, paint, ultraDarkAlpha, 0, 0, 8);
             }
@@ -2200,7 +2203,7 @@ public class GameView extends SurfaceView
                 drawUltraBeamOverlay(canvas, true);
             }
             if (isSuperCinematicActive()) {
-                effects.drawWorldOverlay(canvas, paint, superFlashAlpha, 255, 255, 255);
+                effects.drawWorldOverlay(canvas, paint, superFlash.flashAlpha, 255, 255, 255);
             }
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
@@ -2825,7 +2828,10 @@ public class GameView extends SurfaceView
         if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
             visualY -= engine.config.backdashVisualLift(f.backdashFrames);
         }
+        ColorFilter look = renderer.override() == null ? superLook(f) : null;
+        if (look != null) renderer.setOverride(look);
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
+        if (look != null) renderer.setOverride(null);
         c.restore();
     }
 

@@ -57,6 +57,13 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
   cancelamento acontece no primeiro frame após ele.
 - **Super freeze**: o Super congela o oponente e os projéteis durante o próprio startup
   (o que permite H → SUPER combar).
+- **Cinemática do Super** (`SuperFlash`, só apresentação): segue quem ativou, o jogador, a
+  CPU ou o parceiro de um DHC. Na ativação vem o aviso: o corpo brilha na cor do lutador por
+  8 quadros, um brilho de estrela no peito (`ImpactEffects.spawnSuperGlint`) e o som `super`.
+  Depois o cenário escurece atrás dos dois, a câmera aproxima, a aura de carga cresce e a
+  liberação pisca branco. Quem está congelado escurece e esfria a cor (não parece jogo
+  travado) e volta aos poucos. Na barra, o gasto de uma barra inteira pisca por 0,75 s
+  (`HudEffects.SUPER_FLASH`).
 
 ## CPU: níveis, percepção, defesa e caderno de combos
 
@@ -664,7 +671,7 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
 
 - **Sons de luta** (`assets/sons/luta`, gerados por síntese em `tools/sons/gerar_sons.py`):
   "vush" do golpe no ar pouco antes de ele bater (leve/médio/pesado), acerto leve/médio/
-  pesado/especial, defesa, queda no chão, punish counter e KO. Cada um toca com o tom
+  pesado/especial, defesa, queda no chão, punish counter, KO e a ativação do Super. Cada um toca com o tom
   variando um pouco, para dois socos seguidos não soarem iguais.
 - **Tremida**: quem apanha treme de um lado para o outro durante o congelamento do acerto
   (hitstop); na defesa, bem menos (`ImpactFeel.hitShake`).
