@@ -288,9 +288,13 @@ public class SpriteIntegrationTest {
             // O idle do P01 é desenhado no tamanho fixo do idle (P01_IDLE_SCALE), em volta da raiz.
             Field idleSize=SpriteFighterRenderer.class.getDeclaredField("P01_IDLE_SCALE");idleSize.setAccessible(true);
             float scale=character.profile.worldScale/2f*idleSize.getFloat(null);
-            assertEquals(idle.atlas.width*scale,destination.width(),.001f);
-            assertEquals(300f,destination.left+idle.atlas.rootX*scale,.001f);
-            assertEquals(300f,destination.top+idle.atlas.rootY*scale,.001f);
+            // A folha pode vir reduzida para a tela (SpriteAtlasCache): o destino cobre a caixa do
+            // quadro arredondada em pixels inteiros da folha menor, em volta da mesma raiz.
+            float[] span=drawnSpan(renderer,idle.atlas,renderer.motion.frame());
+            assertEquals((span[1]-span[0])*scale,destination.width(),.001f);
+            assertEquals((span[3]-span[2])*scale,destination.height(),.001f);
+            assertEquals(300f,destination.left-span[0]*scale+idle.atlas.rootX*scale,.001f);
+            assertEquals(300f,destination.top-span[2]*scale+idle.atlas.rootY*scale,.001f);
         }
         renderer.motion.clip="LIGHT_JAB";renderer.motion.time=0f;
         renderer.draw(canvas,300f,300f,1,false,false);
@@ -298,8 +302,25 @@ public class SpriteIntegrationTest {
         CharacterDefinition.Atlas jab=character.animation("LIGHT_JAB").atlas;
         float[] k=P01SpriteCalibration.get(jab.resource,renderer.motion.frame());
         RectF destination=(RectF)field.get(renderer);
-        assertEquals(jab.width*character.profile.worldScale/jab.pixelScale*k[0],destination.width(),.001f);
+        float[] jabSpan=drawnSpan(renderer,jab,renderer.motion.frame());
+        assertEquals((jabSpan[1]-jabSpan[0])*character.profile.worldScale/jab.pixelScale*k[0],destination.width(),.001f);
         screen.recycle();
+    }
+
+    /**
+     * Onde o quadro desenhado começa e acaba na célula (pixels da folha original): {esquerda,
+     * direita, topo, base}. Com a folha inteira é a célula toda; reduzida, a caixa arredondada
+     * em pixels da folha menor, como o SpriteFighterRenderer faz.
+     */
+    private static float[] drawnSpan(SpriteFighterRenderer renderer,CharacterDefinition.Atlas atlas,int frame)throws Exception {
+        Field cache=SpriteFighterRenderer.class.getDeclaredField("atlases");cache.setAccessible(true);
+        SpriteAtlasCache.Folha folha=((SpriteAtlasCache)cache.get(renderer)).get(atlas);
+        int[] box=new int[6];
+        assertTrue(atlas.frame(frame,box));
+        float ex=folha.escalaX,ey=folha.escalaY;
+        float left=box[4]+Math.round(box[0]*ex)/ex-box[0],right=box[4]+Math.round((box[0]+box[2])*ex)/ex-box[0];
+        float top=box[5]+Math.round(box[1]*ey)/ey-box[1],bottom=box[5]+Math.round((box[1]+box[3])*ey)/ey-box[1];
+        return new float[]{left,right,top,bottom};
     }
     /** Every packed cell of the attack atlas holds one whole pose with a safety margin. */
     private void assertAttackAtlasCellsAreWhole(String animation) {
