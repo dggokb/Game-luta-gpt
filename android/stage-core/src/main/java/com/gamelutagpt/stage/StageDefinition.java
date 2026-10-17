@@ -27,7 +27,8 @@ import java.util.Map;
  *   ],
  *   "chao": { "imagem": "chao.jpg", "imagemLajotas": "chao_lajotas.jpg", "perto": -420, "longe": 560,
  *             "centroX": 700, "reflexoLutadores": 0.25 },
- *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" }
+ *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" },
+ *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 }
  * }
  * </pre>
  */
@@ -202,6 +203,34 @@ public final class StageDefinition {
         }
     }
 
+    /** Chuva: riscos caindo em 3D, com respingos no piso. */
+    public static final class Rain {
+        public final int count;
+        public final int color;
+        public final float near, far;
+        /** Queda e vento em unidades do mundo por segundo. */
+        public final float speed, wind;
+        /** Comprimento do risco em unidades do mundo e espessura em px na profundidade 0. */
+        public final float length, width;
+        public final float alpha;
+        /** Quantos respingos podem estar no piso ao mesmo tempo (0 = sem respingos). */
+        public final int splashes;
+
+        Rain(int count, int color, float near, float far, float speed, float wind,
+             float length, float width, float alpha, int splashes) {
+            this.count = count;
+            this.color = color;
+            this.near = near;
+            this.far = far;
+            this.speed = speed;
+            this.wind = wind;
+            this.length = length;
+            this.width = width;
+            this.alpha = alpha;
+            this.splashes = splashes;
+        }
+    }
+
     public final String name;
     public final float cameraDistance;
     /** Altura do horizonte na tela (fração). */
@@ -211,9 +240,11 @@ public final class StageDefinition {
     public final Floor floor;
     /** Null quando o cenário não tem pétalas. */
     public final Petals petals;
+    /** Null quando o cenário não tem chuva. */
+    public final Rain rain;
 
     private StageDefinition(String name, float cameraDistance, float horizon, int backgroundColor,
-                            List<Layer> layers, Floor floor, Petals petals) {
+                            List<Layer> layers, Floor floor, Petals petals, Rain rain) {
         this.name = name;
         this.cameraDistance = cameraDistance;
         this.horizon = horizon;
@@ -221,6 +252,7 @@ public final class StageDefinition {
         this.layers = Collections.unmodifiableList(layers);
         this.floor = floor;
         this.petals = petals;
+        this.rain = rain;
     }
 
     // ------------------------------------------------------------- leitura
@@ -276,8 +308,27 @@ public final class StageDefinition {
                 number(petalsMap, "tamanho", 7f));
         }
 
+        Rain rain = null;
+        Map<String, Object> rainMap = object(map, "chuva");
+        if (rainMap != null) {
+            float near = number(rainMap, "perto", -300f);
+            float far = number(rainMap, "longe", 2500f);
+            if (far <= near) throw new IllegalArgumentException("chuva: \"longe\" deve ser maior que \"perto\"");
+            float speed = number(rainMap, "velocidade", 1500f);
+            if (speed <= 0f) throw new IllegalArgumentException("chuva: \"velocidade\" deve ser positiva");
+            rain = new Rain(
+                Math.max(0, Math.round(number(rainMap, "quantidade", 240f))),
+                color(rainMap, "cor", 0xFFB8CCFF),
+                near, far, speed,
+                number(rainMap, "vento", -120f),
+                Math.max(1f, number(rainMap, "comprimento", 70f)),
+                Math.max(0.3f, number(rainMap, "espessura", 1.6f)),
+                clamp01(number(rainMap, "alfa", 0.5f)),
+                Math.max(0, Math.round(number(rainMap, "respingos", 30f))));
+        }
+
         return new StageDefinition(name.trim(), distance, horizon,
-            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals);
+            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain);
     }
 
     @SuppressWarnings("unchecked")

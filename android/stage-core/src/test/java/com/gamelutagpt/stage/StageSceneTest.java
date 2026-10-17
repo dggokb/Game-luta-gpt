@@ -89,6 +89,43 @@ public class StageSceneTest {
     }
 
     @Test
+    public void chuvaCaiRespingaNoPisoESomeNoModoLeve() {
+        String json = "{\"nome\": \"Chuva\", \"chao\": {\"imagem\": \"chao.jpg\", \"perto\": -400, \"longe\": 600},"
+            + "\"chuva\": {\"quantidade\": 200, \"velocidade\": 1800, \"vento\": -150, \"respingos\": 20}}";
+        StageDefinition def = StageDefinition.fromJson(json);
+        assertEquals(200, def.rain.count);
+        assertEquals(-150f, def.rain.wind, 0f);
+        assertEquals(20, def.rain.splashes);
+        assertNull("sem o campo, sem chuva", StageDefinition.fromJson("{\"nome\": \"S\"}").rain);
+
+        StagePack pack = new StagePack(def, new java.util.HashMap<String, RenderImage>(),
+            java.util.Collections.<String>emptyList());
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        CountingCanvas canvas = new CountingCanvas();
+        for (int frame = 0; frame < 120; frame++) {
+            scene.update(1f / 60f);
+            scene.drawBackground(canvas);
+            scene.drawForeground(canvas);
+            assertEquals(0, canvas.depth);
+        }
+        assertTrue("os riscos de chuva são desenhados", canvas.lines > 120 * 50);
+        assertTrue("as gotas que batem no piso respingam", canvas.rings > 0);
+
+        scene.setDetalhe(false);
+        CountingCanvas leve = new CountingCanvas();
+        scene.update(1f / 60f);
+        scene.drawBackground(leve);
+        scene.drawForeground(leve);
+        assertEquals("no modo leve não chove", 0, leve.lines + leve.rings);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void chuvaComLongeAntesDePertoEhErro() {
+        StageDefinition.fromJson("{\"nome\": \"X\", \"chuva\": {\"perto\": 500, \"longe\": 100}}");
+    }
+
+    @Test
     public void sceneDrawsWithAndWithoutImagesAndKeepsTheCanvasBalanced() throws IOException {
         String json = "{\"nome\": \"T\", \"camadas\": ["
             + "{\"imagem\": \"ceu.jpg\", \"profundidade\": 100000, \"topo\": -0.1, \"base\": 0.6, \"repetir\": \"espelhar\","
@@ -162,7 +199,7 @@ public class StageSceneTest {
     }
 
     private static final class CountingCanvas implements RenderCanvas {
-        int depth, images, regions;
+        int depth, images, regions, lines, rings;
 
         @Override public void save() { depth++; }
         @Override public void restore() { depth--; assertTrue(depth >= 0); }
@@ -172,10 +209,10 @@ public class StageSceneTest {
         @Override public void clipPolygon(float[] xy) {}
         @Override public void fillRect(float l, float t, float r, float b, int argb) {}
         @Override public void fillPolygon(float[] xy, int argb) { assertTrue(xy.length >= 6); }
-        @Override public void strokePolygon(float[] xy, float width, int argb) {}
+        @Override public void strokePolygon(float[] xy, float width, int argb) { rings++; }
         @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
         @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
-        @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) {}
+        @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) { lines++; }
         @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) { images++; }
         @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
                                               float l, float t, float r, float b, int alpha) {

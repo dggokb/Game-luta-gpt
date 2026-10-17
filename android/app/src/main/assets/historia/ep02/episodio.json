@@ -69,7 +69,7 @@
 
     { "tipo": "luta", "irmao": "ryuga", "rotulo": "CONVITE", "cenario": "dojo_yinlu", "dupla": ["player_base"], "cpu": ["p02"], "repetirSeDerrota": false },
 
-    { "tipo": "luta", "irmao": "koga", "rotulo": "CONVITE", "dupla": ["p03"], "cpu": ["p04"], "repetirSeDerrota": false },
+    { "tipo": "luta", "irmao": "koga", "rotulo": "CONVITE", "cenario": "beco_brucy", "dupla": ["p03"], "cpu": ["p04"], "repetirSeDerrota": false },
 
     { "tipo": "pagina", "irmao": "ryuga", "imagem": "pag5_ryuga.jpg", "quadros": [
       {"area": [0.9824, 0.0, 0.9824, 0.3268, 0.0176, 0.3262, 0.0186, 0.0], "efeitos": ["zoom", "tremor"]},

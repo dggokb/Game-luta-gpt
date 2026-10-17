@@ -60,10 +60,10 @@ não em unidades do mundo.
    3. piso;
    4. reflexo das luzes e fogos no piso;
    5. camadas entre o fim do piso e os lutadores (grade, pilares, braseiros);
-   6. pétalas atrás dos lutadores.
+   6. respingos, chuva e pétalas atrás dos lutadores.
 3. No mundo da luta: reflexo dos lutadores (espelhados no chão, com transparência), os
    lutadores, projéteis e efeitos.
-4. `drawForeground`: camadas com `z ≤ 0` e pétalas na frente.
+4. `drawForeground`: camadas com `z ≤ 0` e respingos, chuva e pétalas na frente.
 5. HUD, controles e a cinemática do ultra.
 
 ## O piso
@@ -99,6 +99,13 @@ repetem com as cópias da camada.
   lutador espelhado em torno da linha do chão com essa opacidade (`saveLayerAlpha`).
 - **Pétalas**: partículas em 3D (x, y, z) caindo com vento. As de longe são pequenas e
   apagadas, as da frente (`z < 0`) passam grandes na frente dos lutadores.
+- **Chuva** (`"chuva"` no stage.json): riscos em 3D caindo, inclinados pelo vento, finos e
+  apagados no fundo e grossos na frente dos lutadores. Cada gota que bate no chão dentro
+  do piso deixa um **respingo** (anel achatado que abre e duas gotinhas que pulam, 0,32 s).
+  Campos: `quantidade` (240), `cor`, `perto`/`longe` (−300/2500), `velocidade` (queda, 1500
+  unidades/s), `vento` (−120), `comprimento` do risco (70), `espessura` (1,6 px), `alfa`
+  (0,5) e `respingos` (quantos ao mesmo tempo, 30; 0 desliga). No modo leve
+  (`setDetalhe(false)`) não chove, como as pétalas. Primeiro uso: Beco do Brucy.
 
 ## Desempenho
 

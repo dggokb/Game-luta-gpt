@@ -98,7 +98,7 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 | Episódio | Conteúdo |
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
-| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
+| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`, e a do Kōga no Beco do Brucy, `beco_brucy`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
 | ep03 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
 | ep04 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep05 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |

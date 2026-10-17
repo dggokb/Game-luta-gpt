@@ -88,6 +88,14 @@ public final class StageScene {
 
     // Pétalas (posições no mundo 3D).
     private final float[] petalX, petalY, petalZ, petalPhase, petalSpin;
+    // Chuva: gotas no mundo 3D (y é a ponta de baixo do risco) e respingos no piso.
+    private final float[] rainX, rainY, rainZ, rainSpeed;
+    private final float[] splashX, splashZ, splashAge;
+    private int nextSplash;
+    private final Rand rainRand = new Rand(31);
+    private static final float SPLASH_LIFE = 0.32f;
+    /** Pontos do anel do respingo, reaproveitados a cada desenho (sem alocar por quadro). */
+    private final float[] splashRing = new float[16];
     private float time;
 
     public StageScene(StagePack pack, StageWorld world) {
@@ -163,6 +171,25 @@ public final class StageScene {
             petalPhase[i] = rand.range(0f, 6.283f);
             petalSpin[i] = rand.range(-200f, 200f);
         }
+
+        StageDefinition.Rain rain = def.rain;
+        int drops = rain != null ? rain.count : 0;
+        rainX = new float[drops];
+        rainY = new float[drops];
+        rainZ = new float[drops];
+        rainSpeed = new float[drops];
+        for (int i = 0; i < drops; i++) {
+            rainZ[i] = rainRand.range(rain.near, rain.far);
+            float half = VW * 0.6f / camera.scale(rainZ[i]);
+            rainX[i] = world.restCenterX + rainRand.range(-half, half);
+            rainY[i] = camera.worldY(rainRand.range(-0.1f, 1f) * VH, rainZ[i]);
+            rainSpeed[i] = rain.speed * rainRand.range(0.85f, 1.15f);
+        }
+        int splashes = rain != null ? rain.splashes : 0;
+        splashX = new float[splashes];
+        splashZ = new float[splashes];
+        splashAge = new float[splashes];
+        java.util.Arrays.fill(splashAge, SPLASH_LIFE);
     }
 
     public StageDefinition definition() {
@@ -338,6 +365,7 @@ public final class StageScene {
     public void update(float dt) {
         time += dt;
         updateActors(dt);
+        updateRain(dt);
         StageDefinition.Petals petals = pack.definition.petals;
         if (petals == null) return;
         for (int i = 0; i < petalX.length; i++) {
@@ -350,6 +378,35 @@ public final class StageScene {
             if (petalX[i] > center + half) petalX[i] -= 2f * half;
             if (petalY[i] > world.groundY || camera.screenY(petalY[i], z) > VH + 20f) {
                 petalY[i] = camera.worldY(-20f, z);
+            }
+        }
+    }
+
+    private void updateRain(float dt) {
+        StageDefinition.Rain rain = pack.definition.rain;
+        if (rain == null) return;
+        for (int i = 0; i < splashAge.length; i++) splashAge[i] += dt;
+        StageDefinition.Floor floor = pack.definition.floor;
+        float center = camera.centerX();
+        for (int i = 0; i < rainX.length; i++) {
+            float z = rainZ[i];
+            rainY[i] += rainSpeed[i] * dt;
+            rainX[i] += rain.wind * dt;
+            float half = VW * 0.6f / camera.scale(z);
+            if (rainX[i] < center - half) rainX[i] += 2f * half;
+            if (rainX[i] > center + half) rainX[i] -= 2f * half;
+            if (rainY[i] >= world.groundY) {
+                // A gota bateu no chão: respinga se cair no piso e volta para cima da tela.
+                if (splashX.length > 0 && floor != null && z >= floor.near && z <= floor.far) {
+                    splashX[nextSplash] = rainX[i];
+                    splashZ[nextSplash] = z;
+                    splashAge[nextSplash] = 0f;
+                    nextSplash = (nextSplash + 1) % splashX.length;
+                }
+                rainY[i] = camera.worldY(rainRand.range(-0.25f, -0.02f) * VH, z);
+                rainX[i] = center + rainRand.range(-half, half);
+            } else if (camera.screenY(rainY[i], z) > VH + 40f) {
+                rainY[i] = camera.worldY(rainRand.range(-0.25f, -0.02f) * VH, z);
             }
         }
     }
@@ -386,6 +443,8 @@ public final class StageScene {
             float depth = p.layer.sortDepth();
             if (depth <= floorFar && depth > 0f) drawLayer(c, p);
         }
+        drawSplashes(c, true);
+        drawRain(c, true);
         drawPetals(c, true);
     }
 
@@ -394,6 +453,8 @@ public final class StageScene {
         for (Placed p : placed) {
             if (p.layer.sortDepth() <= 0f) drawLayer(c, p);
         }
+        drawSplashes(c, false);
+        drawRain(c, false);
         drawPetals(c, false);
     }
 
@@ -641,6 +702,57 @@ public final class StageScene {
             c.fillOval(sx - size, sy - size * (0.25f + 0.35f * flip), sx + size, sy + size * (0.25f + 0.35f * flip),
                 withAlpha(petals.color, alpha));
             c.restore();
+        }
+    }
+
+    /** Riscos de chuva inclinados pelo vento; os de longe são finos e apagados. */
+    private void drawRain(RenderCanvas c, boolean behind) {
+        if (!detalhe) return;
+        StageDefinition.Rain rain = pack.definition.rain;
+        if (rain == null) return;
+        float slant = rain.wind / rain.speed;
+        for (int i = 0; i < rainX.length; i++) {
+            float z = rainZ[i];
+            if ((z > 0f) != behind || z <= camera.nearestDepth() + 50f) continue;
+            float scale = camera.scale(z);
+            float sx = camera.screenX(rainX[i], z);
+            float sy = camera.screenY(rainY[i], z);
+            float len = rain.length * scale * (rainSpeed[i] / rain.speed);
+            if (sx < -60f || sx > VW + 60f || sy < -10f || sy - len > VH + 10f) continue;
+            int alpha = Math.round(255f * rain.alpha * clamp(scale / camera.zoom() * 1.1f, 0.3f, 1f));
+            c.drawLine(sx - slant * len, sy - len, sx, sy, Math.max(0.6f, rain.width * scale),
+                withAlpha(rain.color, alpha));
+        }
+    }
+
+    /** Respingo: um anel achatado que abre e some, e duas gotinhas que pulam. */
+    private void drawSplashes(RenderCanvas c, boolean behind) {
+        if (!detalhe) return;
+        StageDefinition.Rain rain = pack.definition.rain;
+        if (rain == null) return;
+        for (int i = 0; i < splashX.length; i++) {
+            float age = splashAge[i];
+            float z = splashZ[i];
+            if (age >= SPLASH_LIFE || (z > 0f) != behind || z <= camera.nearestDepth() + 50f) continue;
+            float k = age / SPLASH_LIFE;
+            float scale = camera.scale(z);
+            float sx = camera.screenX(splashX[i], z);
+            float sy = camera.screenY(world.groundY, z);
+            if (sx < -30f || sx > VW + 30f || sy > VH + 10f) continue;
+            float r = (3f + 14f * k) * scale;
+            int alpha = Math.round(255f * rain.alpha * (1f - k));
+            int color = withAlpha(rain.color, alpha);
+            float w = Math.max(0.6f, 1.4f * scale);
+            float[] ring = splashRing;
+            for (int j = 0; j < 8; j++) {
+                double a = j * Math.PI / 4.0;
+                ring[2 * j] = sx + (float)Math.cos(a) * r;
+                ring[2 * j + 1] = sy + (float)Math.sin(a) * r * 0.28f;
+            }
+            c.strokePolygon(ring, w, color);
+            float hop = (float)Math.sin(k * Math.PI) * 9f * scale;
+            c.fillCircle(sx - r * 0.5f, sy - hop, w, color);
+            c.fillCircle(sx + r * 0.4f, sy - hop * 0.8f, w, color);
         }
     }
 

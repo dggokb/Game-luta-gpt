@@ -331,3 +331,35 @@ Dicas do beco:
 - Grafite e letreiros **sem letras legíveis**. Se vier com palavras, gere de novo.
 - O `viaduto.png` e o `cerca.png` têm partes vazadas (embaixo da pista, os furos da tela):
   confira se vieram transparentes e não pintadas de preto.
+
+## Notas do Beco do Brucy
+
+As imagens do GPT passam pelo `montar_brucy.py`:
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_brucy.py --entrada pasta/com/as/imagens
+```
+
+- **Chuva** é do jogo (`"chuva"` no stage.json, veja `docs/stage-engine.md`): riscos
+  caindo em profundidade, inclinados pelo vento, e respingos no asfalto. As imagens vêm
+  sem chuva, senão ela ficaria parada.
+- **Piso**: o GPT refez o asfalto inteiro ao tirar o bueiro, então as bordas do
+  `chao.png` e do `chao_asfalto.png` não batiam. O script funde as bordas do asfalto (a
+  repetição fica sem emenda) e cola a tampa de bueiro do `chao.png` no centro dele, com
+  borda suave. O piso vai de −600 a 750 e o bueiro fica entre os lutadores.
+- **Faixa de chão pintada**: os prédios, a cerca e o lixo vieram com uma faixa de chão
+  molhado com reflexo embaixo. O script corta essa faixa (o jogo faz o piso e o reflexo).
+- **Primeiro plano**: o `frente.png` veio como um beco inteiro em perspectiva, com paredes
+  até o topo da imagem, e ficou de fora. No lugar dele, o `lixo.png` desfocado
+  (`frente_lixo.png`) passa na frente dos lutadores a −250. Para ter um primeiro plano
+  próprio, gere de novo pedindo "só os objetos, sem paredes, sem chão, sem céu".
+- **Composição** (profundidades): lixo 170, vapor 300, prédios 380 (o de grafite à esquerda
+  e o da porta de enrolar à direita, alternando a cada 0,9 tela), cerca 750 (fim do piso),
+  viaduto 1500, cidade 4500, céu. A cidade desce até 0,66 da tela: no super pulo o rio
+  dela aparece entre o viaduto e a cerca, em vez de um vazio.
+- Asfalto molhado: `reflexoLutadores` 0,35 e `reflexoLuzes` 0,7. Luzes: as luminárias do
+  viaduto, a luminária e a porta do prédio de grafite, o neon vermelho (pulsando) e as
+  lâmpadas do prédio da porta de enrolar.
+- O ep02 usa este cenário na luta CONVITE do Kōga × Brucy (`"cenario": "beco_brucy"`), e
+  ele entra no sorteio do Arcade.
