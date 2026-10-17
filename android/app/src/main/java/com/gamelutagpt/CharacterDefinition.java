@@ -68,7 +68,8 @@ final class CharacterDefinition {
         final float distancePerFrame, duration;
         /** Loop with an entry: frames before loopFrom play once, then frames from loopFrom repeat. */
         final int loopFrom;
-        private final float entry;
+        /** Time of the entry (frames before loopFrom); 0 for a plain loop. */
+        final float entry;
         Animation(String id,Atlas atlas,int[] frames,float[] durations,boolean loop,float distancePerFrame) {
             this(id,atlas,frames,durations,loop,distancePerFrame,0);
         }
