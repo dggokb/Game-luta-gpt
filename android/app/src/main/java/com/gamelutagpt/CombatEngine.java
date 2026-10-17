@@ -135,7 +135,7 @@ final class CombatEngine {
     /**
      * System notices of the last step, for the shell's call-outs and screen shake: "TECH",
      * "PUSHBLOCK", "GUARD_CANCEL", "WALL_BOUNCE", "GROUND_BOUNCE", "OVERDRIVE", "OD_CANCEL",
-     * "PROJECTILE_CLASH".
+     * "PROJECTILE_CLASH", "GUARD_BREAK".
      * Not hits (no damage).
      */
     private final List<String> cues = new ArrayList<>();
@@ -293,6 +293,7 @@ final class CombatEngine {
         for (CombatFighter f : fighters) advance(f);
         teams.advance(this, fighters[0]);
         teams.advance(this, fighters[1]);
+        regenerateGuard();
         resolveBodies();
         for (CombatFighter f : fighters) updateFacing(f);
         advanceProjectiles();
@@ -881,6 +882,7 @@ final class CombatEngine {
         if (f.backdashCooldown > 0) f.backdashCooldown--;
         if (f.framesSinceHit < 999) f.framesSinceHit++;
         if (f.framesSinceBlock < 999) f.framesSinceBlock++;
+        if (f.guardBroken && !f.inHitstun()) f.guardBroken = false;
         if (f.launcherChase > 0) f.launcherChase--;
         if (f.state.poisoned() && f.state.tickPoison() > 0 && f.state.poisonLeft == 0) cues.add("POISON_END");
 
@@ -2540,6 +2542,48 @@ final class CombatEngine {
         if (meter) gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
         freeze(a, d, holding ? holdingHitstop(attack) : attack.hitstopFrames, projectile);
         events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
+        int drain = attack.blockstunFrames * config.guardDrainPerBlockstunFrame;
+        if (holding) drain = drain * config.guardHoldingDrainPermille / 1000;
+        d.state.guard = Math.max(0, d.state.guard - drain);
+        if (d.state.guard == 0) guardBreak(a, d, projectile);
+    }
+
+    /**
+     * Guard break: a defesa que zerou a guarda quebra. Quem defendia fica aberto (um hitstun
+     * longo, sem poder defender nem agir; no ar, cai e termina no chão), sem o empurrão da
+     * defesa (fica ao alcance), e a guarda volta cheia.
+     * O golpe que quebrou não tira vida: o castigo é o combo que vem depois.
+     */
+    private void guardBreak(CombatFighter a, CombatFighter d, boolean projectile) {
+        d.state.guard = CombatConfig.GUARD_MAX;
+        d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.hitCrouching = false;
+        d.stunLeft = d.stunTotal = config.guardBreakStunFrames;
+        d.stunElapsed = 0;
+        d.guardBroken = true;
+        d.pushblockRequestAge = -1;
+        // Sem o empurrão da defesa: fica colado em quem quebrou, ao alcance do castigo.
+        d.pushRemaining = 0f;
+        d.pushFramesLeft = 0;
+        freeze(a, d, config.guardBreakHitstopFrames, projectile);
+        cues.add("GUARD_BREAK");
+    }
+
+    /**
+     * A guarda volta sozinha: de quem não está defendendo há {@code guardRegenDelayFrames}
+     * (e de quem está fora de campo). Parada no congelamento do Super/Ultra.
+     */
+    private void regenerateGuard() {
+        if (superFreeze > 0) return;
+        for (TeamSystem.Side side : teams.sides) {
+            CombatFighter point = fighters[side.index];
+            for (FighterState m : side.members) {
+                if (m.guard >= CombatConfig.GUARD_MAX || m.life <= 0) continue;
+                if (m == point.state && (point.status == CombatFighter.Status.BLOCKSTUN ||
+                    point.framesSinceBlock < config.guardRegenDelayFrames)) continue;
+                m.guard = Math.min(CombatConfig.GUARD_MAX, m.guard + config.guardRegenPerFrame);
+            }
+        }
     }
 
     /** The defender's running combo, or a new one when it was able to act. */

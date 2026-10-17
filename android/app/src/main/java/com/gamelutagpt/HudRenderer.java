@@ -32,6 +32,10 @@ final class HudRenderer {
         default FighterState opponentReserve() { return null; }
         /** Modo batalha (IA ON): a luta de verdade, 2x2. */
         default boolean battleActive() { return false; }
+        /** Relógio no centro do topo: os segundos da batalha, ou ∞ (treino, cena da história). */
+        default String clockLabel() { return "\u221E"; }
+        /** Últimos segundos da batalha: o relógio fica vermelho e pulsa. */
+        default boolean clockUrgent() { return false; }
         /** Assist do CPU no 2x2: 0 em uso, subindo até 1 quando está pronto. */
         default float opponentTagReadyRatio() { return 0f; }
         String versionLabel();
@@ -162,9 +166,9 @@ final class HudRenderer {
         panel(c, 187, 140, 355, 43, 9, 0xE8081427, BLUE, 1.5f);
         text(c, s.assistStatusLabel(), 364, 157, 16, effects.assistRatio >= 1 ? 0xFF9BEEFF : Color.WHITE);
         text(c, s.swapStatusLabel(), 364, 175, 14, Color.WHITE);
-        // Training has no round clock: never display a fabricated countdown.
+        // Batalha: 99 segundos; treino e cenas da história: ∞ (nunca um relógio inventado).
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
-        text(c, "∞", 640f, 70f, 58f, Color.WHITE);
+        drawClock(c, s);
         text(c, s.battleActive() ? "BATALHA" : "TREINO", 640f, 87f, 12f, 0xFFB9C7E5);
         if (s.debugEnabled()) {
             text(c, s.versionLabel() + " • " + s.stateLabel(), 640f, 194f, 14f, Color.WHITE);
@@ -173,6 +177,24 @@ final class HudRenderer {
         if (!s.hideTestButtons()) drawTestButtons(c, s);
         drawToggle(c, s.pressed(Control.CHARACTER_SELECT), s.selectButtonLabel(),
             SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM, 17f);
+    }
+
+    /** Relógio da luta; nos últimos segundos fica vermelho e pulsa uma vez por segundo. */
+    private void drawClock(Canvas c, State s) {
+        String label = s.clockLabel();
+        if (!s.clockUrgent()) {
+            text(c, label, 640f, 70f, 58f, Color.WHITE);
+            return;
+        }
+        // Pulso a cada segundo: cresce e volta, sem mudar o centro.
+        float beat = (float)(effects.now - Math.floor(effects.now));
+        float pulse = 1f + 0.18f * Math.max(0f, 1f - beat * 4f);
+        c.save();
+        c.translate(640f, 52f);
+        c.scale(pulse, pulse);
+        c.translate(-640f, -52f);
+        text(c, label, 640f, 70f, 58f, RED);
+        c.restore();
     }
 
     private void drawTestButtons(Canvas c, State s) {

@@ -286,6 +286,25 @@ final class CombatConfig {
     float pushblockDistance = 190f;
     /** Blockstun left after a pushblock (at most). */
     int pushblockStunFrames = 8;
+    // Guard break: cada defesa gasta a guarda (FighterState.guard, 0..GUARD_MAX) pelo blockstun
+    // do golpe; zerou, a defesa quebra e quem defendia fica aberto. Ela volta sozinha um pouco
+    // depois de parar de defender (e cheia depois de quebrar).
+    static final int GUARD_MAX = 1000;
+    /** Guarda gasta por quadro de blockstun do golpe defendido (um leve ~60, um forte ~110). */
+    int guardDrainPerBlockstunFrame = 6;
+    /** Batida de um golpe de várias batidas antes da última: gasta só esta fração (por mil). */
+    int guardHoldingDrainPermille = 500;
+    /** Quadros sem defender antes de a guarda começar a voltar. */
+    int guardRegenDelayFrames = 90;
+    /** Guarda que volta por quadro (cheia em ~5,5 s). */
+    int guardRegenPerFrame = 3;
+    /** Atordoamento do guard break: aberto, sem defesa, tempo de entrar um combo. */
+    int guardBreakStunFrames = 50;
+    /** Congelamento do estalo da quebra (os dois, como um golpe forte). */
+    int guardBreakHitstopFrames = 18;
+    /** Abaixo disto (por mil da guarda) o aviso da guarda fica vermelho e pisca. */
+    int guardWarningPermille = 300;
+
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.
     int guardCancelCost = METER_PER_BAR;
     /** The opponent freezes for the cross-counter flash. */

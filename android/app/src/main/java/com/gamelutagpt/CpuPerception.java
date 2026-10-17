@@ -22,6 +22,9 @@ final class CpuPerception {
         CombatFighter.Outcome outcome;
         /** Muda a cada golpe novo do rival; e a cada pulo novo. */
         int attackSerial, jumpSerial;
+        /** O rival está com a guarda quebrada (aberto); a contagem muda a cada quebra nova. */
+        boolean guardBroken;
+        int guardBreakSerial;
         /** Projétil do rival vindo na direção da CPU: quanto falta para chegar (MAX_VALUE = nenhum). */
         float projectileGap = Float.MAX_VALUE;
         float projectileSpeed;
@@ -43,7 +46,7 @@ final class CpuPerception {
 
     private final Snapshot[] ring = new Snapshot[HISTORY];
     private int count, last = -1, lastFrame = Integer.MIN_VALUE;
-    private int attackSerial, jumpSerial, projectileSerial;
+    private int attackSerial, jumpSerial, projectileSerial, guardBreakSerial;
     private Projectile lastProjectile;
 
     CpuPerception() {
@@ -83,6 +86,9 @@ final class CpuPerception {
         if (!s.grounded && prev != null && prev.grounded) jumpSerial++;
         s.attackSerial = attackSerial;
         s.jumpSerial = jumpSerial;
+        s.guardBroken = t.guardBroken;
+        if (s.guardBroken && (prev == null || !prev.guardBroken)) guardBreakSerial++;
+        s.guardBreakSerial = guardBreakSerial;
         nearestProjectile(engine, me, t.index, s);
     }
 

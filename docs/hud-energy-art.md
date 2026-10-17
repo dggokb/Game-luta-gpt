@@ -4,7 +4,7 @@ Branch: ui/hud-barras-referencia-20261012.
 
 A moldura é uma imagem RGBA em assets/ui/hud/energy-frame.png, gerada a partir da referência enviada pelo autor. O atlas mede 1672×941. A região superior (0,0)-(1672,280) ocupa (0,0)-(1280,170) na tela virtual. Cada moldura inferior usa uma região de 750×206 e ocupa 400×95. O restante do atlas é transparente.
 
-Vida, vida recuperável, medidores e retratos continuam sendo desenhados pelo HudRenderer a partir do estado real. As barras de vida ficam atrás da moldura e os medidores sobre a arte para cobrir os segmentos ilustrados. O número inferior mostra o nível real (0 a 5); os quatro segmentos ornamentais representam proporcionalmente a capacidade total de cinco barras. No treino, o relógio continua infinito.
+Vida, vida recuperável, medidores e retratos continuam sendo desenhados pelo HudRenderer a partir do estado real. As barras de vida ficam atrás da moldura e os medidores sobre a arte para cobrir os segmentos ilustrados. O número inferior mostra o nível real (0 a 5); os quatro segmentos ornamentais representam proporcionalmente a capacidade total de cinco barras. No treino, o relógio continua infinito (∞); na batalha ele conta 99 segundos e fica vermelho, pulsando, nos últimos 10.
 
 O atlas é decodificado uma vez no construtor de GameView. Ausência do arquivo mantém o renderer vetorial anterior. Não há alterações de combate, sprites ou cenário.
 

@@ -434,6 +434,23 @@ final class TeamSystem {
         return true;
     }
 
+    /**
+     * Fim do tempo: o lado com mais vida, comparando a proporção da vida total de cada dupla
+     * (soma da vida sobre a soma da vida máxima; o vermelho recuperável não conta). -1 quando
+     * as duas proporções são iguais (empate). Conta em inteiros para ser determinístico.
+     */
+    int moreLife() {
+        long[] life = new long[2], max = new long[2];
+        for (int side = 0; side < 2; side++) {
+            for (FighterState m : sides[side].members) {
+                life[side] += Math.max(0, m.life);
+                max[side] += m.profile.maxLife;
+            }
+        }
+        long first = life[0] * max[1], second = life[1] * max[0];
+        return first > second ? 0 : second > first ? 1 : -1;
+    }
+
     /** O próximo membro com vida depois do titular, ou -1. */
     private static int nextStanding(Side s) {
         for (int i = 1; i < s.members.length; i++) {

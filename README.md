@@ -228,6 +228,10 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **TAG bloqueando** (no chão, assist pronto): **Guard Cancel Tag**. O parceiro entra no
   seu lugar atacando, invulnerável, e o oponente congela no clarão. Custa 1 barra; o
   botão mostra "CANCEL" quando dá.
+- **Guard break**: cada defesa gasta a guarda (barrinha amarela embaixo dos pés, só aparece
+  quando não está cheia). Zerou: **GUARD BREAK!**, o golpe não tira vida mas quem defendia
+  fica aberto, sem defesa, tempo de entrar um combo. Ela volta sozinha 1,5 s depois de parar
+  de defender. Umas 3 sequências seguidas defendidas quebram.
 - Regras e tempos: `docs/combat-engine.md` (seção Defesa ativa).
 
 ## Air dash — v0.82
@@ -302,7 +306,9 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - **IA OFF** continua sendo o treino (no Templo da Lua): CPU só com o titular, KO não encerra.
 - **IA ON** é a **batalha de verdade, 2x2**: ligar a IA começa uma luta nova; o CPU luta com a
   dupla dele, o titular que cai é substituído pelo parceiro e **o time só perde quando os dois
-  da dupla caem**. Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
+  da dupla caem**. Cada batalha tem **99 segundos**: se o tempo zerar sem K.O., TIME OVER e
+  vence a dupla com mais vida (proporção da vida total; igual é empate). O treino segue com
+  tempo infinito (∞). Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
   também usam essa regra. Na batalha o CPU usa tudo: assist, troca, Assist → Tag, Super,
   DHC, Guard Cancel, pushblock, Overdrive e Ultra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
 
@@ -328,7 +334,7 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   **Kōga (p03)**; no ep02 cada um convence o parceiro numa luta 1x1 (P01 × P02, p03 × p04); o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
   opostas: quartas → **emboscada fora da arena** (a dupla que perdeu a outra quarta do seu
   lado quer a sua vaga) → semifinal → final 2x2 contra o outro irmão → **duelo 1x1** contra o
-  próprio parceiro (a regra escondida). O rival sempre avança; CPU × CPU é sorteado.
+  próprio parceiro (a regra escondida; o jogador fica com quem estava em campo ao vencer a final). O rival sempre avança; CPU × CPU é sorteado.
   `docs/historia/torneio.md`.
 - Motor em `android/story-core` (Java puro); episódios em JSON em
   `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do

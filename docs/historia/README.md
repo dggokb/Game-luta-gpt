@@ -101,7 +101,7 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 | `dupla` / `cpu` | `[titular, parceiro]`, ou `"jogador"` / `"rival"` (a dupla fixa do irmão escolhido / do outro) |
 | `irmao` (qualquer passo) | `ryuga` ou `koga`: o passo só toca na campanha desse irmão |
 | `emboscada` (passo de luta) | `true`: a emboscada fora da arena, contra quem perdeu a outra quarta do lado do jogador |
-| `duelo` (passo de luta) | `true`: o 1x1 da regra escondida, capitão × parceiro |
+| `duelo` (passo de luta) | `true`: o 1x1 da regra escondida, quem venceu a final × o parceiro |
 | `layout` | `splash` (1), `duas-colunas` (2), `tres-colunas`, `tres-faixas`, `faixa-e-dois`, `dois-e-faixa` (3), `quatro`, `grade` (4). Sem `layout`, vale o padrão pela quantidade de painéis |
 | `tom` | `papel` (normal) ou `flashback` (página preta, cores sépia) |
 | `cena` (arte provisória) | `dojo`, `dojo-noite`, `casa`, `estrada`, `templo`, `ceu`, `chuva`, `carta` |

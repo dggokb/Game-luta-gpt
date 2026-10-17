@@ -60,8 +60,9 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
 - **Cinemática do Super** (`SuperFlash`, só apresentação): segue quem ativou, o jogador, a
   CPU ou o parceiro de um DHC. Na ativação vem o aviso: o corpo brilha na cor do lutador por
   8 quadros, um brilho de estrela no peito (`ImpactEffects.spawnSuperGlint`) e o som `super`.
-  Depois o cenário escurece atrás dos dois, a câmera aproxima, a aura de carga cresce e a
-  liberação pisca branco. Quem está congelado escurece e esfria a cor (não parece jogo
+  Depois o cenário escurece atrás dos dois, a câmera aproxima **em quem ativou** (o peito dele
+  vai de onde estava na tela até perto do meio conforme o zoom cresce, e volta junto), a aura
+  de carga cresce e a liberação pisca branco. Quem está congelado escurece e esfria a cor (não parece jogo
   travado) e volta aos poucos. Na barra, o gasto de uma barra inteira pisca por 0,75 s
   (`HudEffects.SUPER_FLASH`).
 
@@ -218,6 +219,22 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
   - Parceiro caído não vem mais de assist, troca, Guard Cancel nem DHC.
   - Fim: K.O. (`KO_FRAMES`), o resultado (VITÓRIA / DERROTA / EMPATE, `RESULT_FRAMES`) e a
     luta recomeça com as mesmas duplas. Só o vencedor final comemora.
+- **Tempo: 99 segundos** (`TIME_LIMIT_SECONDS`, 60 quadros por segundo) só na batalha; no treino
+  a HUD mostra ∞.
+  - O relógio começa a contar no GO e **para** no congelamento do Super e do Ultra (cinemática,
+    Página Final, raio), na pausa e enquanto uma cena da história tem o controle. Hitstop
+    normal não para o relógio.
+  - Nos últimos 10 segundos (`URGENT_SECONDS`) o número fica vermelho e pulsa.
+  - **Zerou sem K.O.: TIME OVER** no lugar do K.O. e vence a dupla com **mais vida, em
+    proporção da vida total da dupla** (soma da vida dos dois sobre a soma da vida máxima;
+    o vermelho recuperável não conta; `TeamSystem.moreLife`, em inteiros). Vida igual: EMPATE.
+    K.O. no mesmo quadro do zero vale como K.O.
+  - Depois do TIME OVER ninguém se mexe nem cai mais (os comandos são ignorados e a vida tem
+    piso 1); o vencedor comemora com o rival de pé.
+  - História: enquanto uma cena espera a vida baixar ou o K.O. (ou está rodando), o relógio
+    fica parado e a HUD mostra ∞ (`BattleFlow.setClockHeld`) — a cena decide o fim, não o
+    tempo. Na história e no Arcade o EMPATE conta como derrota (no Arcade, e nas lutas com
+    `repetirSeDerrota`, a luta se repete).
 - As lutas da história são batalhas (o treino do tutorial não): a página volta quando uma
   dupla inteira cai.
 - **O CPU usa o kit inteiro na batalha** (`AiController.setFullKit`), com sorteios próprios
@@ -451,6 +468,31 @@ e `CombatConfig.guardCancel*`.
 - Invulnerabilidade: `CombatFighter.invulnFrames` (nada acerta enquanto > 0).
 
 Testes em `ActiveDefenseTest`.
+
+### Guard break
+
+Defender para sempre não funciona: cada defesa gasta a **guarda** (`FighterState.guard`,
+0..`CombatConfig.GUARD_MAX` = 1000), e quando ela zera a defesa **quebra**.
+
+- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (6). Um leve gasta ~60, um
+  forte ~100–150, um Super 100–270. Batidas de um golpe de várias batidas antes da última
+  gastam metade. Uma sequência L-M-H defendida gasta ~230–350: **umas 3 sequências seguidas**
+  (2 com especial) quebram; os pesados (p07, p09) quebram mais rápido.
+- **Volta**: depois de `guardRegenDelayFrames` (90, 1,5 s) sem defender, 3 por quadro (cheia
+  em ~5,5 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
+- **Quebrou** (cue `GUARD_BREAK`): o golpe que quebrou não tira vida, mas quem defendia fica
+  **aberto** por `guardBreakStunFrames` (50) depois de um congelamento de 18 — um hitstun longo,
+  sem defesa e sem o empurrão da defesa (fica ao alcance do castigo). No ar, cai e termina no
+  chão. A guarda volta cheia. `CombatFighter.guardBroken` marca o atordoamento.
+- **Tela**: "GUARD BREAK!", tremida, estalo amarelo no peito e o som `guarda_quebrada`
+  (`tools/sons/gerar_sons.py`). A guarda aparece numa barrinha embaixo dos pés só quando não
+  está cheia: amarela, vermelha piscando abaixo de 30% (`guardWarningPermille`).
+- **CPU**: vê a quebra com a reação do nível e, com a chance de punir dele, corre e abre o
+  combo do caderno. Com a própria guarda no vermelho, faz bem mais pushblock/Guard Cancel e
+  espera menos defendendo por hábito.
+- A vida cheia (treino, VIDA P1/CPU) devolve a guarda cheia.
+
+Testes em `GuardBreakTest`.
 
 ## Agarrão e tech — v0.80
 
