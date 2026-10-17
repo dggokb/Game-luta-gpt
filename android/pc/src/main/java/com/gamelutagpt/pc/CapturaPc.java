@@ -125,8 +125,8 @@ public final class CapturaPc {
         c.comecar();
         c.esperar(1.5);
         salvar(c.quadro(), saida, "01-menu");
-        // MODO TESTE (o segundo item) abre a seleção de duplas.
-        c.tecla(KeyEvent.KEYCODE_S);
+        // MODO TESTE (o último item: cima dá a volta até ele) abre a seleção de duplas.
+        c.tecla(KeyEvent.KEYCODE_W);
         c.tecla(KeyEvent.KEYCODE_J);
         c.esperar(1.5);
         salvar(c.quadro(), saida, "02-selecao");

@@ -36,8 +36,8 @@ public class GameViewPcTest {
     public void selecaoLutaEControles() throws Exception {
         GameView v = jogo.jogo();
         assertFalse("menu inicial desenhado", uniforme(jogo.quadro()));
-        // MODO TESTE: baixo + A no menu inicial.
-        jogo.tecla(KeyEvent.KEYCODE_S);
+        // MODO TESTE (o último item): cima dá a volta até ele, depois A.
+        jogo.tecla(KeyEvent.KEYCODE_W);
         jogo.tecla(KeyEvent.KEYCODE_J);
         jogo.esperar(1.5);
         assertFalse("seleção desenhada", uniforme(jogo.quadro()));
