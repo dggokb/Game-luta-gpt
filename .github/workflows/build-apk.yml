@@ -84,7 +84,33 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
-        run: gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
+
+      # Falhou: cada teste que caiu e o "What went wrong" do Gradle viram anotações do job, que
+      # dá para ler pela API do GitHub (sem baixar o log inteiro).
+      - name: Report build failures as annotations
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob, os, re, xml.etree.ElementTree as ET
+          def clean(text):
+              return re.sub(r'\s+', ' ', text or '').strip()[:400]
+          for path in glob.glob('android/**/build/test-results/**/*.xml', recursive=True):
+              for case in ET.parse(path).getroot().iter('testcase'):
+                  for bad in case.findall('failure') + case.findall('error'):
+                      msg = clean(bad.get('message') or (bad.text or '').splitlines()[0] if (bad.get('message') or bad.text) else '')
+                      print(f"::error title=Teste {case.get('classname')}.{case.get('name')}::{msg}")
+          log = os.path.join(os.environ.get('RUNNER_TEMP', '.'), 'gradle-apk.log')
+          if os.path.exists(log):
+              lines = open(log, encoding='utf-8', errors='replace').read().splitlines()
+              for i, line in enumerate(lines):
+                  if 'What went wrong' in line or re.search(r'\.java:\d+: error', line):
+                      print('::error title=Gradle::' + clean(' '.join(lines[i:i + 4])))
+          PY
 
       # Saved even when a check fails: the atlases already processed stay valid.
       - name: Drop sprite cache entries this run did not use

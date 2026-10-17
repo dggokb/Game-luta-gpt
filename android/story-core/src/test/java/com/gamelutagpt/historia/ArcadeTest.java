@@ -171,9 +171,20 @@ public class ArcadeTest {
         for (int r = 0; r < 4; r++) c.torneio().registrar(true);
         assertTrue(c.vale(duelo));
         String[][] duelLados = c.lados(duelo);
-        assertEquals("1x1: o titular contra o parceiro", "p07", duelLados[0][0]);
+        assertEquals("sem registro: o titular contra o parceiro", "p07", duelLados[0][0]);
         assertEquals("p03", duelLados[1][0]);
         assertEquals(Campanha.DUELO, c.rotulo(duelo));
+        // A final foi vencida com o parceiro em campo: o duelo é com ele.
+        c.venceuCom("p03");
+        duelLados = c.lados(duelo);
+        assertEquals("quem venceu a final joga o duelo", "p03", duelLados[0][0]);
+        assertEquals("contra o outro da dupla", "p07", duelLados[1][0]);
+        c.venceuCom("p07");
+        assertEquals("p07", c.lados(duelo)[0][0]);
+        assertEquals("p03", c.lados(duelo)[1][0]);
+        // Lutador de fora da dupla (não deve acontecer): volta ao titular.
+        c.venceuCom("p99");
+        assertEquals("p07", c.lados(duelo)[0][0]);
     }
 
     @Test

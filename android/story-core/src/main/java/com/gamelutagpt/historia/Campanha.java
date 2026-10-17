@@ -23,6 +23,8 @@ public final class Campanha {
     private final long semente;
     private String irmao;
     private Torneio torneio;
+    /** Quem da dupla do jogador estava em campo quando ele venceu a última luta (ou null). */
+    private String vencedor;
 
     public Campanha(List<Torneio.Dupla> duplas, long semente) {
         this.duplas = duplas == null ? Collections.<Torneio.Dupla>emptyList() : duplas;
@@ -68,10 +70,24 @@ public final class Campanha {
     public void restaurar(String irmao, int disputadas) {
         this.irmao = null;
         torneio = null;
+        vencedor = null;
         if (irmao != null) escolher(irmao);
         if (disputadas < 0 || !temTorneio()) return;
         Torneio t = torneio();
         for (int i = 0; i < disputadas && !t.acabou(); i++) t.registrar(true);
+    }
+
+    /**
+     * O jogador venceu uma luta com {@code lutador} (id do personagem) em campo. O duelo 1x1
+     * da regra escondida usa esse lutador contra o parceiro (não sempre o primeiro da dupla).
+     */
+    public void venceuCom(String lutador) {
+        vencedor = lutador;
+    }
+
+    /** Quem estava em campo na última vitória do jogador, ou null (nenhuma ainda, ou save). */
+    public String vencedor() {
+        return vencedor;
     }
 
     /** O irmão do jogador ({@link Torneio#RYUGA} ou {@link Torneio#KOGA}); Ryūga até a escolha. */
@@ -129,11 +145,14 @@ public final class Campanha {
         String[] jogador;
         String[] cpu;
         if (luta.duelo) {
-            // 1x1: o capitão da dupla do jogador contra o próprio parceiro.
+            // 1x1: quem venceu a final (estava em campo no fim) contra o próprio parceiro; sem
+            // esse registro (save antigo), o capitão da dupla.
             Torneio t = torneioSorteado();
             Torneio.Dupla dupla = t != null ? t.jogador() : duplaDo(irmao());
             if (dupla == null) return null;
-            return new String[][] {{dupla.lutadores[0]}, {dupla.lutadores[1]}};
+            String[] l = dupla.lutadores;
+            int quem = l.length > 1 && l[1].equals(vencedor) ? 1 : 0;
+            return new String[][] {{l[quem]}, {l[1 - quem]}};
         }
         if (luta.emboscada) {
             // Fora da arena: a dupla que perdeu a outra quarta do lado do jogador.

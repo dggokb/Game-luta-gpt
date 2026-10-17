@@ -162,6 +162,19 @@ def build():
     rise = envelope(highpass(lowpass(noise(0.32, rng), lambda t: 900 + 7000 * t / 0.32), 500), 0.22, 0.06, 4.0)
     hum = envelope(thump(0.3, 160, 70, 9), 0.002, 0.14, 2.4)
     sounds['super'] = normalize(mix(gain(ring, 0.8), gain(rise, 0.45), gain(hum, 0.55)), 0.85)
+    # Guard break: a defesa estilhaça. O golpe pesado, um estalo seco de rachadura e cacos de
+    # vidro (tons agudos curtos espalhados) caindo depois. Sempre no fim: a mesma semente
+    # continua dando os mesmos sons de antes.
+    crack = envelope(highpass(noise(0.08, rng), 2500), 0.0004, 0.03)
+    shards = silence(0.5)
+    for _ in range(14):
+        start = int(RATE * rng.uniform(0.02, 0.32))
+        hz = rng.uniform(2800, 6800)
+        piece = envelope(tone(0.09, hz), 0.0005, rng.uniform(0.02, 0.06), 2.5)
+        for i, v in enumerate(piece):
+            if start + i < len(shards):
+                shards[start + i] += v * rng.uniform(0.25, 0.5)
+    sounds['guarda_quebrada'] = normalize(saturate(mix(hit(rng, 1.2), gain(crack, 0.8), gain(shards, 0.6)), 1.4))
     return sounds
 
 

@@ -228,6 +228,10 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **TAG bloqueando** (no chão, assist pronto): **Guard Cancel Tag**. O parceiro entra no
   seu lugar atacando, invulnerável, e o oponente congela no clarão. Custa 1 barra; o
   botão mostra "CANCEL" quando dá.
+- **Guard break**: cada defesa gasta a guarda (barrinha amarela embaixo dos pés, só aparece
+  quando não está cheia). Zerou: **GUARD BREAK!**, o golpe não tira vida mas quem defendia
+  fica aberto, sem defesa, tempo de entrar um combo. Ela volta sozinha 1,5 s depois de parar
+  de defender. Umas 3 sequências seguidas defendidas quebram.
 - Regras e tempos: `docs/combat-engine.md` (seção Defesa ativa).
 
 ## Air dash — v0.82
@@ -330,7 +334,7 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   **Kōga (p03)**; no ep02 cada um convence o parceiro numa luta 1x1 (P01 × P02, p03 × p04); o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
   opostas: quartas → **emboscada fora da arena** (a dupla que perdeu a outra quarta do seu
   lado quer a sua vaga) → semifinal → final 2x2 contra o outro irmão → **duelo 1x1** contra o
-  próprio parceiro (a regra escondida). O rival sempre avança; CPU × CPU é sorteado.
+  próprio parceiro (a regra escondida; o jogador fica com quem estava em campo ao vencer a final). O rival sempre avança; CPU × CPU é sorteado.
   `docs/historia/torneio.md`.
 - Motor em `android/story-core` (Java puro); episódios em JSON em
   `assets/historia/`. Sem as imagens, cada painel mostra uma arte provisória com o nome do

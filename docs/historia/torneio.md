@@ -85,7 +85,7 @@ luta do jogador (ou os campeões).
 | `{ "tipo": "chave" }` | a chave com os resultados até aqui e a próxima luta |
 | `{ "tipo": "luta", "torneio": true }` | luta contra o próximo adversário da chave; o rótulo é o nome da rodada (QUARTAS DE FINAL, SEMIFINAL, FINAL). No fim, a rodada inteira se resolve |
 | `{ "tipo": "luta", "emboscada": true }` | a emboscada fora da arena: o jogador contra a dupla que perdeu a outra quarta do lado dele (rótulo EMBOSCADA). Só toca entre as quartas e a semifinal |
-| `{ "tipo": "luta", "duelo": true }` | o duelo 1x1 da regra escondida: o capitão da dupla do jogador contra o próprio parceiro (rótulo DUELO FINAL). Só toca se a dupla do jogador for campeã |
+| `{ "tipo": "luta", "duelo": true }` | o duelo 1x1 da regra escondida: quem da dupla do jogador estava em campo ao vencer a final contra o outro (rótulo DUELO FINAL; sem registro, o capitão). Só toca se a dupla do jogador for campeã |
 | `"dupla": "jogador", "cpu": "rival"` | numa luta comum: a dupla fixa do irmão escolhido contra a do outro (o treino do ep01) |
 | `"irmao": "ryuga"` ou `"koga"` | em qualquer passo: só toca na campanha desse irmão (páginas diferentes para cada lado) |
 

@@ -94,6 +94,8 @@ public class CorrentesComboTest {
             s.in[0].medium = b.equals("M");
             s.in[0].heavy = b.equals("H");
             s.f(0).x = s.f(1).x - 105f;
+            // A guarda fica cheia: aqui só conta o limite da corrente (o guard break tem teste próprio).
+            s.f(1).state.guard = CombatConfig.GUARD_MAX;
             s.step();
             assertFalse("nunca acerta quem defende", s.engine.session(1) != null);
             longest = Math.max(longest, s.f(0).chain.size());

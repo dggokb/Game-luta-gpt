@@ -127,6 +127,11 @@ final class CombatFighter {
     int launcherChase;
     int framesSinceHit = 999;
     int framesSinceBlock = 999;
+    /**
+     * Guard break: a defesa quebrou e ele está aberto (o atordoamento é um hitstun longo, sem
+     * defesa). Some quando o hitstun acaba.
+     */
+    boolean guardBroken;
     /** Set by the shell while a tag animation owns the fighter. */
     boolean locked;
 

@@ -1249,6 +1249,7 @@ public class GameView extends SurfaceView
                     }
                 }
             }
+            if ("GUARD_BREAK".equals(cue)) spawnGuardBreak();
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
                 // Último dano do Ultra em sequência: impact frame em quem apanhou e câmera lenta.
@@ -1814,6 +1815,21 @@ public class GameView extends SurfaceView
      * Dois projéteis se anularam: uma faísca de cada lado, cada uma na cor de quem lançou e
      * voando no sentido do próprio projétil, como se as duas energias se empurrassem.
      */
+    /** A defesa estilhaçou: estalo no peito de quem quebrou, tremida e o som dos cacos. */
+    private void spawnGuardBreak() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter broken = engine.fighter(side);
+            if (!broken.guardBroken || broken.stunElapsed > 0) continue;
+            CombatFighter other = engine.fighter(1 - side);
+            int direction = broken.x >= other.x ? 1 : -1;
+            float x = broken.x - direction * broken.body().halfWidth * .4f, y = chestY(broken);
+            impacts.spawn(ImpactEffects.GUARD, x, y, direction, ImpactEffects.SPECIAL, 0xFFFFD84A);
+            impacts.spawn(ImpactEffects.HIT, x, y, direction, ImpactEffects.HEAVY, other.state.profile.color);
+        }
+        beamShake = Math.max(beamShake, 14f);
+        ultraSounds.playFight("guarda_quebrada", 1f, 1f);
+    }
+
     private void spawnClash(CombatEngine.ProjectileClash clash) {
         int size = clash.big ? ImpactEffects.SPECIAL : ImpactEffects.MEDIUM;
         impacts.spawn(ImpactEffects.HIT, clash.x, clash.y, clash.firstDirection, size, clash.firstColor);
@@ -1907,6 +1923,7 @@ public class GameView extends SurfaceView
             case "AIR_TECH": return "AIR TECH!";
             case "PUSHBLOCK": return "PUSHBLOCK!";
             case "GUARD_CANCEL": return "GUARD CANCEL!";
+            case "GUARD_BREAK": return "GUARD BREAK!";
             case "DHC": return "TEAM SUPER!";
             case "OVERDRIVE": return "OVERDRIVE!";
             case "COUNTER": return "CONTRA-GOLPE!";
@@ -2057,6 +2074,44 @@ public class GameView extends SurfaceView
             paint.setStyle(Paint.Style.FILL);
         }
     }
+
+    /**
+     * Guarda de cada lutador, uma barrinha embaixo dos pés: só aparece quando ela não está cheia.
+     * Amarela; vermelha e piscando quando está quase quebrando; no guard break, o contorno
+     * vermelho vazio piscando.
+     */
+    private void drawGuardGauges(Canvas canvas, float zoom, float left, float top) {
+        if (demo.active() || tutorial.active()) return;
+        int warning = engine.config.guardWarningPermille * CombatConfig.GUARD_MAX / 1000;
+        boolean blink = (engine.frame() / 4) % 2 == 0;
+        for (int i = 0; i < 2; i++) {
+            CombatFighter f = engine.fighter(i);
+            int guard = f.state.guard;
+            if (f.ko() || (guard >= CombatConfig.GUARD_MAX && !f.guardBroken)) continue;
+            float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+            float sx = clamp((x - left) * zoom, GUARD_GAUGE_W, VW - GUARD_GAUGE_W);
+            float groundY = Math.max(f.y, GROUND_Y);
+            float sy = Math.min((groundY - top) * zoom + 14f, VH - GROUND_MARKER_BOTTOM - 4f);
+            float l = sx - GUARD_GAUGE_W * .5f, r = sx + GUARD_GAUGE_W * .5f, b = sy + GUARD_GAUGE_H;
+            paint.setShader(null);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(0xCC070B19);
+            canvas.drawRoundRect(l - 2f, sy - 2f, r + 2f, b + 2f, 5f, 5f, paint);
+            boolean danger = f.guardBroken || guard <= warning;
+            if (!f.guardBroken) {
+                float ratio = guard / (float)CombatConfig.GUARD_MAX;
+                paint.setColor(danger ? (blink ? 0xFFFF354D : 0xFFB0122A) : 0xFFFFD84A);
+                canvas.drawRoundRect(l, sy, l + (r - l) * ratio, b, 3f, 3f, paint);
+            }
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(2f);
+            paint.setColor(danger && blink ? 0xFFFF354D : 0xFFFFFFFF);
+            canvas.drawRoundRect(l - 2f, sy - 2f, r + 2f, b + 2f, 5f, 5f, paint);
+            paint.setStyle(Paint.Style.FILL);
+        }
+    }
+
+    private static final float GUARD_GAUGE_W = 96f, GUARD_GAUGE_H = 7f;
 
     private final Path groundMarker = new Path();
     /** Distância da ponta da seta até a borda de baixo: acima das barras de super do HUD. */
@@ -2272,6 +2327,7 @@ public class GameView extends SurfaceView
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
             if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
                 drawGroundMarkers(canvas, renderZoom, cameraLeft, renderCameraTop);
+                drawGuardGauges(canvas, renderZoom, cameraLeft, renderCameraTop);
             }
             if (ultraBars > 0.001f) {
                 // Faixas pretas de cinema durante o Ultra.
@@ -3772,7 +3828,22 @@ public class GameView extends SurfaceView
         descarregarConversa();
         pad.reset();
         releaseAllPointers();
+        if (won) registrarVencedor();
         historia.resultadoLuta(won);
+    }
+
+    /**
+     * A campanha guarda quem da dupla do jogador estava em campo na vitória: o duelo 1x1 depois
+     * da final é com ele (contra o parceiro), não sempre com o primeiro da dupla.
+     */
+    private void registrarVencedor() {
+        Campanha campanha = historia.campanha();
+        if (campanha == null) return;
+        FighterState point = engine.team(PLAYER).pointState();
+        FighterState partner = engine.team(PLAYER).partner();
+        // O titular caído esperando a troca não venceu: quem está de pé leva o crédito.
+        FighterState winner = point.life <= 0 && partner != null && partner.life > 0 ? partner : point;
+        campanha.venceuCom(winner.character.id);
     }
 
     @Override

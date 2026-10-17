@@ -47,8 +47,10 @@ O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um
 - **A CPU sobe de nível a cada rodada**, a partir do NÍVEL CPU da pausa (`Arcade.nivelCpu`): 2
   abaixo nas oitavas e +1 por rodada, entre 1 e 8. Com o nível 5: 3, 4, 5, 6 na final e 7 no
   duelo. Mudar o nível na pausa muda a base na hora.
-- **A regra escondida**: depois da final, a dupla campeã luta entre si, **1x1**: o titular (o
-  primeiro escolhido) com o jogador, o parceiro com a CPU (rótulo DUELO FINAL).
+- **A regra escondida**: depois da final, a dupla campeã luta entre si, **1x1**: o jogador fica
+  com **quem estava em campo quando a final foi vencida** e a CPU com o outro (rótulo DUELO
+  FINAL). A campanha guarda isso a cada vitória (`Campanha.venceuCom`, chamado pelo jogo
+  antes de `resultadoLuta`); sem registro (save antigo), vale o titular.
 - **O Campeão, Takatoshi**, ainda não tem personagem: por enquanto o Arcade termina no cartão
   "TAKATOSHI — Em breve: a luta contra o Takatoshi." e volta ao menu inicial. Quando ele existir,
   é só trocar o último passo do `arcade.json` por uma luta 1x1 contra ele.

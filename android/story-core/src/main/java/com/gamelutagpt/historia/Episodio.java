@@ -84,7 +84,10 @@ public final class Episodio {
         public final String cpuRef;
         /** Só toca para quem escolheu este irmão ("ryuga" / "koga"); null = para os dois. */
         public final String irmao;
-        /** Duelo 1x1 da regra escondida: o capitão da dupla do jogador contra o próprio parceiro. */
+        /**
+         * Duelo 1x1 da regra escondida: quem da dupla do jogador venceu a final (estava em campo
+         * no fim dela) contra o próprio parceiro ({@link Campanha#venceuCom}).
+         */
         public final boolean duelo;
         /**
          * Luta fora da arena: a dupla que perdeu a outra quarta do lado do jogador embosca o

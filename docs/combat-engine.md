@@ -468,6 +468,31 @@ e `CombatConfig.guardCancel*`.
 
 Testes em `ActiveDefenseTest`.
 
+### Guard break
+
+Defender para sempre não funciona: cada defesa gasta a **guarda** (`FighterState.guard`,
+0..`CombatConfig.GUARD_MAX` = 1000), e quando ela zera a defesa **quebra**.
+
+- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (6). Um leve gasta ~60, um
+  forte ~100–150, um Super 100–270. Batidas de um golpe de várias batidas antes da última
+  gastam metade. Uma sequência L-M-H defendida gasta ~230–350: **umas 3 sequências seguidas**
+  (2 com especial) quebram; os pesados (p07, p09) quebram mais rápido.
+- **Volta**: depois de `guardRegenDelayFrames` (90, 1,5 s) sem defender, 3 por quadro (cheia
+  em ~5,5 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
+- **Quebrou** (cue `GUARD_BREAK`): o golpe que quebrou não tira vida, mas quem defendia fica
+  **aberto** por `guardBreakStunFrames` (50) depois de um congelamento de 18 — um hitstun longo,
+  sem defesa e sem o empurrão da defesa (fica ao alcance do castigo). No ar, cai e termina no
+  chão. A guarda volta cheia. `CombatFighter.guardBroken` marca o atordoamento.
+- **Tela**: "GUARD BREAK!", tremida, estalo amarelo no peito e o som `guarda_quebrada`
+  (`tools/sons/gerar_sons.py`). A guarda aparece numa barrinha embaixo dos pés só quando não
+  está cheia: amarela, vermelha piscando abaixo de 30% (`guardWarningPermille`).
+- **CPU**: vê a quebra com a reação do nível e, com a chance de punir dele, corre e abre o
+  combo do caderno. Com a própria guarda no vermelho, faz bem mais pushblock/Guard Cancel e
+  espera menos defendendo por hábito.
+- A vida cheia (treino, VIDA P1/CPU) devolve a guarda cheia.
+
+Testes em `GuardBreakTest`.
+
 ## Agarrão e tech — v0.80
 
 A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. Estado próprio

@@ -43,6 +43,9 @@ final class AiController {
     /** Defendendo: Guard Cancel Tag ou pushblock na sequência de bloqueio. */
     static final double GUARD_CANCEL_CHANCE = 0.25;
     static final double PUSHBLOCK_CHANCE = 0.35;
+    /** Com a própria guarda quase quebrando ela foge da pressão bem mais (e espera menos defendendo). */
+    static final double GUARD_CANCEL_LOW_GUARD_CHANCE = 0.5;
+    static final double PUSHBLOCK_LOW_GUARD_CHANCE = 0.8;
 
     private static final int GUARD_NONE = 0, GUARD_HIGH = 1, GUARD_LOW = 2, GUARD_ANY = 3;
 
@@ -94,6 +97,11 @@ final class AiController {
 
     // Cartas: punir e anti-aéreo.
     private int lastPunishSerial = -1, lastAntiAirSerial = -1;
+    /** Guard break do rival: a última quebra que ela viu e se decidiu castigar. */
+    private int lastBreakSerial = -1;
+    private boolean breakPlan;
+    /** A própria guarda está no aviso neste quadro. */
+    private boolean lowGuard;
     private boolean antiAirPlan;
     private boolean jumpOverProjectile;
 
@@ -193,6 +201,8 @@ final class AiController {
         lastOpponentAttackSerial = -1;
         lastOpponentAttackFrame = Integer.MIN_VALUE / 2;
         lastPunishSerial = lastAntiAirSerial = -1;
+        lastBreakSerial = -1;
+        breakPlan = false;
         antiAirPlan = false;
         ownHitFrame = -1;
     }
@@ -205,6 +215,7 @@ final class AiController {
         CombatFighter me = engine.fighter(self);
         CombatFighter target = engine.fighter(1 - self);
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
+        lowGuard = guardLow(engine, me);
         if (me.status == CombatFighter.Status.THROWN) {
             if (techDelay == -2) techDelay = ai.techDelay(expectingThrow(engine, me, target, seen) ? level.techGuess : 0);
             if (techDelay >= 0 && techDelay-- == 0) out.grab = true;
@@ -267,6 +278,7 @@ final class AiController {
             return;
         }
         if (seen == null || seen.ko) return;   // ainda não viu nada: espera
+        if (punishGuardBreak(me, target, seen, out)) return;
         if (punish(engine, me, target, seen, out)) return;
         if (antiAir(engine, me, target, seen, out)) return;
         if (habitGuard(me, target, seen, out)) return;
@@ -381,6 +393,8 @@ final class AiController {
         boolean pressured = seen.frame - lastOpponentAttackFrame < 60;
         double p = level.guardAnticipation * CpuStyle.of(me.character()).patience;
         p = pressured ? p + 0.25 * level.reactGuard : p * 0.35;
+        // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
+        if (lowGuard) p *= 0.4;
         if (roll(Math.min(0.95, p))) {
             guardFrames = 18 + reactRandom.nextInt(18);
             guardLow = true;
@@ -444,6 +458,41 @@ final class AiController {
     }
 
     // ---------------------------------------------------------------- cartas
+
+    /** A própria guarda está no aviso (quase quebrando). */
+    private static boolean guardLow(CombatEngine engine, CombatFighter me) {
+        return me.state.guard * 1000 <= engine.config.guardWarningPermille * CombatConfig.GUARD_MAX;
+    }
+
+    /**
+     * Viu (com a reação do nível) a guarda do rival quebrar: com a chance de punir do nível,
+     * vai para cima dele e abre o combo do caderno enquanto ele está aberto.
+     */
+    private boolean punishGuardBreak(CombatFighter me, CombatFighter target, CpuPerception.Snapshot seen,
+                                     FighterInput out) {
+        if (!seen.guardBroken || !me.grounded || target.ko()) return false;
+        if (seen.guardBreakSerial != lastBreakSerial) {
+            lastBreakSerial = seen.guardBreakSerial;
+            breakPlan = roll(level.punish);
+        }
+        if (!breakPlan) return false;
+        float gap = Math.abs(seen.x - me.x);
+        CharacterDefinition c = me.character();
+        for (String starter : new String[] {"M", "L", "2L"}) {
+            if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            startRoute(c, starter);
+            press(starter, me, out);
+            lastReason = "guard break";
+            breakPlan = false;
+            return true;
+        }
+        // Longe: corre até ele enquanto a quebra dura.
+        movingBack = false;
+        movingForward = dashing = true;
+        out.direction = seen.x > me.x ? 1 : 5;
+        out.dash = true;
+        return true;
+    }
 
     /**
      * Viu o rival errar um golpe ao alcance: se a recuperação que ela calcula que sobra dá para o
@@ -750,8 +799,10 @@ final class AiController {
         // Defendendo: Guard Cancel Tag (o parceiro entra batendo) ou pushblock.
         boolean blocking = me.status == CombatFighter.Status.BLOCKSTUN;
         if (blocking && !wasBlocking) {
-            guardCancelPlan = chance(GUARD_CANCEL_CHANCE);
-            pushblockPlan = chance(PUSHBLOCK_CHANCE);
+            // Guarda quase quebrando: tenta sair da pressão com mais vontade.
+            boolean low = guardLow(engine, me);
+            guardCancelPlan = chance(low ? GUARD_CANCEL_LOW_GUARD_CHANCE : GUARD_CANCEL_CHANCE);
+            pushblockPlan = chance(low ? PUSHBLOCK_LOW_GUARD_CHANCE : PUSHBLOCK_CHANCE);
         }
         wasBlocking = blocking;
         if (blocking) {
