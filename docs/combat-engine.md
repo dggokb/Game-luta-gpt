@@ -87,6 +87,14 @@ humano**.
   vontade de soltar projétil, de agarrar, de pular e paciência na defesa. O zoner (alcance)
   recua para a distância dele; o pressão fica colado; o tanque agarra; o imprevisível às vezes
   larga o plano.
+- **Pressa do fim do tempo** (`OpponentAi.urgency`, `AiController.setSecondsLeft`): ela quer
+  terminar a luta, não deixar o tempo acabar (mesmo ganhando na vida). A pressa começa com 45 s
+  no relógio e chega ao máximo nos últimos 10 s. Com pressa: decide até 35% mais rápido, luta
+  como o estilo agressivo (o zoner para de recuar), corre de mais perto, quase não dá backdash,
+  solta menos projétil e mais Super e agarrão, o respiro entre golpes encurta até a metade e o
+  hábito de esperar defendendo cai até 60%. A reação continua humana. Sem relógio (treino,
+  cenas) não há pressa. No teste de 8 lutas: ~40% mais golpes, ~60% mais dano, ~70% menos tempo
+  defendendo (`PressaDoTempoTest`).
 
 Ordem de cada quadro (`AiController.fill`):
 

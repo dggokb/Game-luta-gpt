@@ -171,6 +171,18 @@ final class AiController {
         level = CpuLevel.of(number);
     }
 
+    /**
+     * Segundos que faltam no relógio da luta (negativo = sem relógio: treino, cena). Perto do fim
+     * ela fica com pressa ({@link OpponentAi#urgency}): ataca mais, recua e espera menos.
+     */
+    void setSecondsLeft(int seconds) {
+        urgency = OpponentAi.urgency(seconds);
+    }
+
+    float urgency() { return urgency; }
+
+    private float urgency, hurry;
+
     int level() { return level.number; }
 
     private void resetKit() {
@@ -259,6 +271,12 @@ final class AiController {
         if (fullKit && !target.ko() && fillKit(engine, me, target, seen, out)) return;
 
         if (cooldown > 0) cooldown--;
+        // Com pressa o respiro entre golpes encurta (até o dobro de rápido).
+        hurry += urgency;
+        if (hurry >= 1f) {
+            hurry -= 1f;
+            if (cooldown > 0) cooldown--;
+        }
         if (me.framesSinceHit == 0) {
             cooldown = Math.max(cooldown, HIT_COOLDOWN);
             endRoute();
@@ -305,6 +323,7 @@ final class AiController {
         situation.throwReach = throwReach(engine, me, target);
         situation.level = level;
         situation.style = CpuStyle.of(me.character());
+        situation.urgency = urgency;
         clearRequests();
         ai.think(CombatConfig.DT, situation, actions);
 
@@ -415,6 +434,8 @@ final class AiController {
         p = pressured ? p + 0.25 * level.reactGuard : p * 0.35;
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
+        // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.
+        p *= 1.0 - 0.6 * urgency;
         if (roll(Math.min(0.95, p))) {
             guardFrames = 18 + reactRandom.nextInt(18);
             guardLow = true;

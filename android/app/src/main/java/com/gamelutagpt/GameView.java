@@ -1451,6 +1451,7 @@ public class GameView extends SurfaceView
             if (tagging) {
                 opponentInput.clear();
             } else {
+                ai.setSecondsLeft(flow.timed() ? flow.clockSeconds() : -1);
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }

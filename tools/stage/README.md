@@ -283,3 +283,51 @@ python tools/stage/montar_yinlu.py --entrada pasta/com/as/imagens
   margem transparente em volta. O mesmo foi feito no pilar do Templo da Lua. Ao gerar
   pilares, peça sempre o topo completo, sem tocar as bordas de cima e dos lados.
 - O ep02 usa este cenário na luta CONVITE do Ryūga × Yin-lu (`"cenario": "dojo_yinlu"`).
+
+## Prompts do Beco do Brucy
+
+Quarto cenário (`beco_brucy`), baseado na arte do beco do Brucy: **noite de chuva** num beco
+de cidade grande, asfalto molhado espelhando tudo, paredes de tijolo com grafite colorido
+(laranja, roxo, vermelho, rosa), escada de incêndio de ferro, canos, lixeiras e sacos de
+lixo, vapor saindo do chão. No fundo do beco, um viaduto de concreto com lâmpadas
+laranja embaixo, uma cerca de alambrado e, bem longe, os arranha-céus com letreiros neon
+vermelhos e azuis.
+
+A arte é de um beco visto **ao longo** (as paredes fogem para o fundo). No jogo a câmera
+olha de frente, então o corredor vira camadas: os prédios ficam dos lados, como os pilares
+dos outros cenários, e pelo vão do meio aparecem a cerca, o viaduto e a cidade.
+
+Regra geral: cole antes de cada prompt. No ChatGPT, anexe a arte do beco e diga "use a
+imagem anexada só como referência de estilo, clima e cores".
+
+```
+Arte de cenário para jogo de luta 2D em estilo anime, mesmo traço de um mangá de luta
+moderno (estilo SNK / King of Fighters), noite de chuva numa cidade grande, iluminação
+dramática de postes de luz laranja e letreiros neon vermelhos, rosa e azuis, superfícies
+molhadas e brilhantes, cores saturadas, contorno limpo e sombreamento em cel-shading. Sem
+personagens, sem pessoas, sem animais, sem raios ou faíscas de energia, sem texto legível,
+sem marca d'água.
+```
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `ceu.jpg` | horizontal | opaco | Céu noturno de chuva sobre uma cidade grande: nuvens pesadas azul-marinho e roxas, a parte de baixo das nuvens iluminada de leve em laranja e magenta pelas luzes da cidade. Só o céu: sem prédios, sem lua, sem chão. |
+| `cidade.png` | horizontal | **transparente** | Skyline distante de uma metrópole à noite, vista de frente: arranha-céus escuros com muitas janelas acesas, alguns letreiros neon verticais vermelhos e azuis (sem letras legíveis), névoa de chuva desbotando os prédios. Prédios mais altos no centro. A base é uma linha reta embaixo. Sem céu: tudo acima dos prédios é transparente. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `viaduto.png` | horizontal | **transparente** | Viaduto ferroviário elevado de concreto escuro visto **exatamente de frente**, em linha reta: a pista de concreto com um guarda-corpo de metal no alto, apoiada em colunas grossas de concreto a intervalos iguais, com luminárias de luz laranja penduradas embaixo da pista. Entre as colunas, embaixo da pista, é transparente. A base das colunas é uma linha reta embaixo. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `cerca.png` | horizontal | **transparente** | Cerca de alambrado vista de frente, em linha reta: tela de arame trançado em losango entre postes de metal, com uma faixa de blocos de concreto manchados embaixo, alguns pedaços amassados da tela e uma placa de aviso listrada de amarelo e preto (sem texto). Pela tela dá para ver através (os buracos da tela são transparentes). Base reta embaixo. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `predio_esq.png` | **vertical** | **transparente** | Fachada estreita de um prédio velho de tijolos vista **exatamente de frente**, sem perspectiva: parede coberta de grafite colorido grande (formas e letras estilizadas ilegíveis em laranja, roxo e vermelho), canos de metal descendo pela parede, uma luminária de parede com luz laranja acesa, uma escada de incêndio de ferro em zigue-zague e duas lixeiras de metal encostadas embaixo. O **topo do prédio aparece inteiro** (a borda do telhado com uma caixa d'água), com margem transparente acima e dos lados. A base toca a borda de baixo. Fundo transparente. |
+| `predio_dir.png` | **vertical** | **transparente** | Fachada estreita de outro prédio velho de tijolos, vista **exatamente de frente**, sem perspectiva: uma porta de enrolar de aço coberta de grafite rosa, vermelho e branco (ilegível), ao lado uma porta de serviço com luz amarela acesa em cima, um pequeno letreiro neon vermelho sem texto e canos na parede. O **topo do prédio aparece inteiro** (a borda do telhado com antenas), com margem transparente acima e dos lados. A base toca a borda de baixo. Fundo transparente. |
+| `lixo.png` | horizontal | **transparente** | Grupo de coisas de beco vistas de frente, apoiadas no chão: duas lixeiras de metal amassadas, uma pilha de sacos de lixo pretos brilhando de molhados, uma caixa de madeira e um barril enferrujado. A base toca a borda de baixo. Fundo transparente. |
+| `frente.png` | horizontal | **transparente** | Primeiro plano de um beco, muito perto da câmera, só nos cantos de baixo da imagem: à esquerda, sacos de lixo pretos molhados e uma caixa de madeira; à direita, um cavalete de obra listrado de amarelo e preto e um barril. Quase em silhueta, contornados pela luz laranja. Todo o meio da imagem é transparente. |
+| `chao.jpg` | quadrado | opaco | Asfalto de beco visto **exatamente de cima** (vista ortográfica, sem perspectiva): asfalto escuro, velho e rachado, com remendos e poças rasas, e no centro uma grande tampa de bueiro redonda de ferro com desenho em relevo. Iluminação uniforme, sem reflexos de luzes e sem sombras de objetos (o jogo faz os reflexos). As bordas esquerda e direita continuam o padrão. |
+| `chao_asfalto.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem a tampa de bueiro do centro, com o asfalto continuando no lugar dela". Assim as rachaduras e as poças saem do mesmo tamanho nas duas imagens. |
+
+Dicas do beco:
+- **Sem os raios laranja da arte**: são a energia do Brucy, quem desenha é o jogo. Também
+  não precisa de chuva, vapor nem reflexo forte nas imagens: o jogo faz a chuva, o vapor,
+  o brilho das luzes e o reflexo no asfalto molhado.
+- Os **prédios precisam do topo inteiro** e de margem transparente acima: senão aparece o
+  corte reto no super pulo, como aconteceu com os pilares.
+- Grafite e letreiros **sem letras legíveis**. Se vier com palavras, gere de novo.
+- O `viaduto.png` e o `cerca.png` têm partes vazadas (embaixo da pista, os furos da tela):
+  confira se vieram transparentes e não pintadas de preto.
