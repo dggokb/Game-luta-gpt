@@ -23,6 +23,8 @@ JAVA = 'android/app/src/main/java/com/gamelutagpt/'
 REQUIRED = ('IDLE','COMBAT','WALK_FORWARD','WALK_BACK','CROUCH','RISE','JUMP','FALL','DASH','BACKDASH','LAND')
 OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROUCH','HIT_AIR','KNOCKDOWN','GROUNDED','GETUP',
             'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT',
+            # Freada da corrida: toca uma vez entre o DASH e o IDLE.
+            'DASH_STOP',
             # Mecânicas próprias: carga da Onda (loop e disparo carregado) e wall jump.
             'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',
             # Capangas do Super (p07): correm, socam ou dão ombrada e saem.
@@ -470,6 +472,13 @@ def compile_packs(root, results):
                 if len(a['durationsMs']) != len(frames):
                     raise ValueError(f'{key}: one duration per frame is required')
                 for d in a['durationsMs']: positive(d, key)
+            if 'loopFrom' in a:
+                # Entrada que toca uma vez (arrancada da corrida) antes do trecho em loop.
+                lf = a['loopFrom']
+                if type(lf) is not int or not a['loop'] or 'durationsMs' not in a or not 0 < lf < len(frames):
+                    raise ValueError(f'{key}: loopFrom must be a frame index inside a timed loop (entry before it)')
+        if 'DASH_STOP' in animations and (animations['DASH_STOP']['loop'] or 'durationsMs' not in animations['DASH_STOP']):
+            raise ValueError(f"{pack['id']}: DASH_STOP must be a timed one-shot")
         moves = pack['moves']
         unknown = set(moves) - set(BINDINGS) - set(AIR_DOWN_BINDINGS)
         if unknown:
@@ -607,7 +616,7 @@ def compile_packs(root, results):
             atlas = ('new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]
                      +[str(l.get('columns',l['frameCount'])),str(l['frameCount']),f(cfg.get('pixelScale', 1)),str(l['sheetWidth']),str(l['sheetHeight'])]
                      +[q(','.join(str(v) for frame in l['frames'] for v in frame))])+')')
-            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
+            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+(','+str(a['loopFrom']) if a.get('loopFrom') else '')+'));']
         for key in [b for b in BINDINGS + AIR_DOWN_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'

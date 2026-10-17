@@ -59,10 +59,10 @@ jobs:
       - name: Mark sprite cache start
         run: touch "$RUNNER_TEMP/sprite-cache-start"
 
+      # Os testes do pipeline de sprites (tools/sprites/tests, ~6 min) rodam no job
+      # sprite-tests, em paralelo: o APK não espera por eles.
       - name: Normalize and validate sprite assets
-        run: |
-          python3 -m unittest discover -s tools/sprites/tests -v
-          python3 tools/sprites/build_characters.py --check
+        run: python3 tools/sprites/build_characters.py --check
 
       # Diagnostic only: shows the author what --write would produce. Nothing is committed.
       - name: Materialize generated sprite outputs after stale check
@@ -82,12 +82,28 @@ jobs:
             tools/sprites/reports/*.report.json
           if-no-files-found: warn
 
+      # O APK sai antes dos testes de unidade: o artefato fica disponível assim que é enviado,
+      # e um teste que falha continua deixando o job vermelho.
       - name: Build debug APK
         working-directory: android
         shell: bash
         run: |
           set -o pipefail
-          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
+          gradle assembleDebug -PrequireSpriteCheck=true --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameLutaGPT-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Unit tests
+        working-directory: android
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test -PrequireSpriteCheck=true --stacktrace 2>&1 | tee -a "$RUNNER_TEMP/gradle-apk.log"
 
       # Falhou: cada teste que caiu e o "What went wrong" do Gradle viram anotações do job, que
       # dá para ler pela API do GitHub (sem baixar o log inteiro).
@@ -125,13 +141,6 @@ jobs:
         with:
           path: android/app/build/sprite-cache
           key: ${{ steps.sprite-cache.outputs.cache-primary-key }}
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: GameLutaGPT-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
 
       # Without KVM the emulator runs in software and takes ~15 min just to boot.
       - name: Enable emulator hardware acceleration
@@ -180,3 +189,22 @@ jobs:
           path: |
             android/app/build/sprite-review/
             android/app/build/reports/tests/
+
+  # Testes do pipeline de sprites (tools/sprites/tests): ~6 min, em paralelo com o APK.
+  sprite-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install sprite pipeline dependency
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      # Só lê o cache de atlas; quem grava é o job do APK.
+      - name: Restore sprite atlas cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/sprite-cache
+          key: sprite-cache-v1-${{ hashFiles('art/sprites/source/**', 'tools/sprites/clips/**', 'tools/sprites/profiles/**', 'tools/sprites/*.py', 'tools/sprites/tests/**', 'tools/sprites/requirements.txt') }}
+          restore-keys: sprite-cache-v1-
+      - name: Sprite pipeline tests
+        run: python3 -m unittest discover -s tools/sprites/tests -v

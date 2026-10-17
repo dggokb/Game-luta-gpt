@@ -250,6 +250,19 @@ python3 tools/sprites/video_para_sprite.py <vídeo> --clipe tools/sprites/clips/
 
 Custo por personagem HD (p05): PNG 27 → 84 MB no APK, memória decodificada 151 → 566 MB.
 
+## Troca de animação: usar a passagem que o vídeo já tem
+
+A régua marca "troca: pose diferente da guarda" quando a ponta do clipe é outra pose. Antes de
+mexer em tamanho, conferir se o vídeo passa pela guarda do IDLE fora do trecho usado:
+
+- **Passa** (ex.: `dash.mp4` da p02: guarda q0–2, arrancada q3–17, freada q42–47): a ponte é
+  real. Golpe: entrada comprimida em 2–3 quadros dentro do startup e volta dentro da
+  recuperação. Corrida: `loopFrom` para a arrancada e `DASH_STOP` para a freada
+  (`docs/sprite-standard.md`). Não compensar salto de pose com tamanho (o DASH da p02 estava
+  em 86% por isso; com a ponte voltou ao tamanho da guarda).
+- **Não passa** (ex.: `M.mp4` da p02: base larga do q0 ao q96): nenhum corte resolve, e em
+  17/10/2026 nenhum dos 34 vídeos da p02 tinha um quadro dessa pose saindo da guarda.
+
 ## Um vídeo pode virar vários clipes
 
 | Vídeo | Clipes do jogo |
@@ -257,4 +270,4 @@ Custo por personagem HD (p05): PNG 27 → 84 MB no APK, memória decodificada 15
 | pulo | subida (`JUMP`), descida (`FALL`), aterrissagem (`LAND`) |
 | agachar | abaixar (`CROUCH`), agachado parado, levantar (`RISE`) |
 | derrubado | queda (`KNOCKDOWN`), no chão (`GROUNDED`), levantar (`GETUP`) |
-| dash | arrancada, corrida em loop (`DASH`), freada |
+| dash | arrancada + corrida em loop (`DASH` com `loopFrom`), freada (`DASH_STOP`) |

@@ -66,15 +66,25 @@ final class CharacterDefinition {
         private final float[] durations;
         final boolean loop;
         final float distancePerFrame, duration;
+        /** Loop with an entry: frames before loopFrom play once, then frames from loopFrom repeat. */
+        final int loopFrom;
+        private final float entry;
         Animation(String id,Atlas atlas,int[] frames,float[] durations,boolean loop,float distancePerFrame) {
+            this(id,atlas,frames,durations,loop,distancePerFrame,0);
+        }
+        Animation(String id,Atlas atlas,int[] frames,float[] durations,boolean loop,float distancePerFrame,int loopFrom) {
             this.id=id;this.atlas=atlas;this.frames=frames.clone();this.durations=durations.clone();
             this.loop=loop;this.distancePerFrame=distancePerFrame;
             float sum=0;for(float d:durations)sum+=d;this.duration=sum;
+            if(loopFrom<0||loopFrom>0&&(!loop||loopFrom>=durations.length))
+                throw new IllegalArgumentException(id+": loopFrom needs a timed loop with frames after it");
+            this.loopFrom=loopFrom;
+            float e=0;for(int i=0;i<loopFrom;i++)e+=durations[i];this.entry=e;
         }
         int frame(float time,float distance) {
             if(distancePerFrame>0) return frames[(int)(Math.max(0,distance)/distancePerFrame)%frames.length];
             float t=Math.max(0,time);
-            if(loop)t%=duration;
+            if(loop&&t>=entry)t=entry+(t-entry)%(duration-entry);
             for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return frames[i];t-=durations[i]; }
             return frames[frames.length-1];
         }
@@ -460,6 +470,7 @@ final class CharacterDefinition {
                     +fighter.autoCombo[i+1]+" is not a declared cancel route");
         }
     }
+    boolean hasAnimation(String id) { return animations.containsKey(id); }
     Animation animation(String id) {
         Animation value=animations.get(id);
         if(value==null)throw new IllegalArgumentException("Unknown animation "+this.id+"/"+id);

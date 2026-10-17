@@ -62,7 +62,7 @@ NO_SEAM = {('LAND', 'ini'), ('KNOCKDOWN', 'ini'), ('KNOCKDOWN', 'fim'), ('GROUND
            ('GROUNDED', 'fim'), ('GETUP', 'ini'), ('THROW_GRAB', 'fim'), ('THROW_TOSS', 'ini'),
            ('VICTORY', 'fim'), ('DEFEAT', 'fim'), ('INTRO', 'ini'), ('CROUCH', 'fim'),
            ('RISE', 'ini'), ('WALK_FORWARD', 'fim'), ('WALK_BACK', 'fim'), ('DASH', 'fim'),
-           ('HIT_STAND', 'fim'), ('HIT_CROUCH', 'fim')}
+           ('HIT_STAND', 'fim'), ('HIT_CROUCH', 'fim'), ('DASH_STOP', 'ini')}
 
 
 def read_json(path):

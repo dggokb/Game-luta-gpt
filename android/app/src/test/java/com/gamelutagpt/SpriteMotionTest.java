@@ -42,6 +42,43 @@ public class SpriteMotionTest {
         assertEquals(SpriteMotion.Clip.BACKDASH,m.clip);
         assertEquals(clip(SpriteMotion.Clip.BACKDASH).frame(m.time,m.distance),m.frame());
     }
+    @Test public void loopFromPlaysTheEntryOnceThenRepeatsOnlyTheLoop() {
+        CharacterDefinition.Animation a=new CharacterDefinition.Animation("RUN",clip(SpriteMotion.Clip.DASH).atlas,
+            new int[]{7,8,1,2,3},new float[]{.1f,.1f,.1f,.1f,.1f},true,0,2);
+        assertEquals(7,a.frame(.05f,0));assertEquals(8,a.frame(.15f,0));
+        assertEquals(1,a.frame(.25f,0));assertEquals(3,a.frame(.45f,0));
+        // After the loop part ends it returns to frame loopFrom, never to the entry.
+        assertEquals(1,a.frame(.55f,0));assertEquals(2,a.frame(.65f,0));assertEquals(1,a.frame(.85f,0));
+    }
+    @Test public void runEntersFromGuardAndBrakesBeforeTheIdle() {
+        CharacterDefinition p02=GeneratedCharacters.get("p02");
+        CharacterDefinition.Animation dash=p02.animation(SpriteMotion.Clip.DASH);
+        CharacterDefinition.Animation stop=p02.animation(SpriteMotion.Clip.DASH_STOP);
+        assertTrue("p02 run has an entry",dash.loopFrom>0);
+        SpriteMotion m=new SpriteMotion(p02);
+        tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH,m.clip);assertEquals(dash.frame(0,0),m.frame());
+        for(int i=0;i<120;i++)tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        assertEquals(dash.frame(m.time,0),m.frame());
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH_STOP,m.clip);assertEquals(stop.frame(0,0),m.frame());
+        // Moving again cuts the brake; standing still lets it finish into the idle.
+        tick(m,.016f,true,false,0,3,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.WALK_FORWARD,m.clip);
+        tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH_STOP,m.clip);
+        for(int i=0;i<Math.ceil(stop.duration/.016f)+1;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+    }
+    @Test public void packWithoutABrakeGoesFromRunStraightToIdle() {
+        CharacterDefinition base=GeneratedCharacters.defaultCharacter();
+        assertFalse(base.hasAnimation(SpriteMotion.Clip.DASH_STOP));
+        SpriteMotion m=new SpriteMotion(base);
+        tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+    }
     @Test public void crouchEntryHoldAndExitDoNotChangeScaleOrLoopStandup() {
         SpriteMotion m=new SpriteMotion();
         CharacterDefinition.Animation crouch=clip(SpriteMotion.Clip.CROUCH);

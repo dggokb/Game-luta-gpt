@@ -402,11 +402,13 @@ def audit(cid):
                     add(state, 'ritmo', 'erro' if f >= PACE_ERROR or f <= 1 / PACE_ERROR else 'aviso',
                         f'anima {how} que a do p01 no mesmo tempo de jogo')
         # Loop: o último quadro emenda no primeiro; corrida e andar não passam pela guarda.
-        if anim.get('loop') and len(ms) > 2:
-            ch = changes(ms, True)
+        # Com loopFrom, a entrada toca uma vez e o loop volta para o quadro loopFrom.
+        lf = anim.get('loopFrom', 0)
+        if anim.get('loop') and len(ms) - lf > 2:
+            ch = changes(ms[lf:], True)
             if len(ch) > 2 and ch[-1] > LOOP_JUMP * max(np.median(ch[:-1]), 0.02):
-                add(state, 'ciclo', 'aviso', f'loop não fecha: o último quadro pula para o primeiro '
-                    f'({ch[-1]:.2f} contra {np.median(ch[:-1]):.2f} nas outras trocas)', [len(ms) - 1, 0])
+                add(state, 'ciclo', 'aviso', f'loop não fecha: o último quadro pula para o primeiro do loop '
+                    f'({ch[-1]:.2f} contra {np.median(ch[:-1]):.2f} nas outras trocas)', [len(ms) - 1, lf])
         if state == 'DASH':
             still = [i for i, m in enumerate(ms)
                      if max(iou(silhouette(m), rs) for n, _, rs in refs if n == 'guarda') >= POSE_MATCH]
