@@ -5,7 +5,7 @@
 
 Para cada imagem da pasta de entrada:
 - PNG com transparência: corta as margens transparentes (senão uma camada "noChao"
-  fica flutuando acima do piso) e mantém o PNG;
+  fica flutuando acima do piso), deixa opaco o que veio com alfa 250-254 e mantém o PNG;
 - imagens sem transparência (céu, piso): grava como JPG;
 - reduz para no máximo 2048 px no lado maior.
 
@@ -40,6 +40,8 @@ def preparar(arquivo, destino):
     nome = arquivo.stem
     if tem_transparencia(img):
         img = img.convert("RGBA")
+        # O GPT às vezes grava o alfa em 254: a imagem toda fica levemente transparente.
+        img.putalpha(img.getchannel("A").point(lambda a: 255 if a >= 250 else a))
         caixa = img.getchannel("A").point(lambda a: 255 if a > 8 else 0).getbbox()
         if caixa:
             img = img.crop(caixa)

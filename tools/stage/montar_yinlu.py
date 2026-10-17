@@ -15,7 +15,8 @@ Além do que o preparar_cenario.py faz (cortar margens transparentes, JPG, 2048 
   aparecem no meio do piso.
 - Lanterna de pedra: o nicho da luz veio vazado (transparente) e mostrava o cenário de
   trás. O vão é preenchido com o interior escuro da pedra; a luz é do jogo.
-- Portão: o GPT gravou o alfa em 254, o portão inteiro ficava um pouco transparente.
+- Portão e pilar: o GPT gravou o alfa em 254 (ficavam um pouco transparentes); o
+  preparar_cenario.py agora deixa opaco.
 - Nomes: "lanterna de pedra.png" vira lanterna_pedra.png.
 
 Grava em android/app/src/main/assets/stages/dojo_yinlu/ sem mexer no stage.json.
@@ -142,12 +143,6 @@ def esfumar_borda(arquivo, lado, fracao=0.18):
     Image.fromarray(px.clip(0, 255).astype(np.uint8)).save(arquivo)
 
 
-def alfa_opaco(img, limite=250):
-    px = np.asarray(img.convert("RGBA")).copy()
-    px[..., 3][px[..., 3] >= limite] = 255
-    return Image.fromarray(px)
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--entrada", required=True, type=Path)
@@ -177,8 +172,6 @@ def main():
                 continue
             if nome == "lanterna_pedra":
                 preencher_vaos(Image.open(arquivo), COR_NICHO).save(tmp / f"{nome}.png")
-            elif nome == "portao":
-                alfa_opaco(Image.open(arquivo)).save(tmp / f"{nome}.png")
             else:
                 shutil.copy(arquivo, tmp / f"{nome}{arquivo.suffix.lower()}")
         for arquivo in sorted(tmp.iterdir()):
