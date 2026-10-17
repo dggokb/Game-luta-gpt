@@ -2139,12 +2139,15 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("punish", 1f, 1.15f);
     }
 
-    /** Golpe alto saindo: o brilho de aviso na cabeça de quem bate (dá para ler e ficar em pé). */
+    /**
+     * Golpe alto saindo: um brilho pequeno e curto perto da cabeça de quem bate (dá para ler e
+     * ficar em pé). O aviso principal é a pose de preparo segurada.
+     */
     private void spawnOverheadWarning() {
         for (int side = 0; side < 2; side++) {
             CombatFighter f = engine.fighter(side);
             if (!f.attacking() || !f.attack.overhead || f.attackFrame > 1) continue;
-            impacts.spawnSuperGlint(f.x + f.facing * f.body().halfWidth * .5f, visualTop(f) + 16f, 0xFFFFD84A);
+            impacts.spawnWarningGlint(f.x + f.facing * f.body().halfWidth * .4f, visualTop(f) + 24f, 0xFFFFE9A0);
         }
     }
 

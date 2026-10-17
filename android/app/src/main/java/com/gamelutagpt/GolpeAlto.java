@@ -9,9 +9,10 @@ import java.util.List;
  * cancela nos especiais e no Super como o H. Sai só do neutro: dentro de um combo o → + M
  * continua sendo o M.
  *
- * O golpe é montado a partir do M de cada personagem (a mesma animação, esticada para a
- * duração nova) até cada um ganhar a animação própria; o pack pode declarar o seu "6M" e
- * então esse vale.
+ * O golpe é montado a partir do M de cada personagem até cada um ganhar a animação própria (o
+ * pack pode declarar o seu "6M" e então esse vale). O desenho do M não é esticado (ficaria em
+ * câmera lenta): a preparação roda no ritmo do M até a pose de antes do impacto, segura essa
+ * pose (o "carregar" do golpe alto, que dá para ler) e a batida e a volta seguem no ritmo do M.
  */
 final class GolpeAlto {
     private GolpeAlto() {}
@@ -58,6 +59,39 @@ final class GolpeAlto {
             .maxUsesPerCombo(1)
             .overhead(true)
             .reach(m.reach, HIT_HEIGHT, HIT_FLOOR);
-        return new CharacterDefinition.Move(BINDING, medium.animation, medium.pose, b.build());
+        AttackDefinition overhead = b.build();
+        float[][] knots = holdKnots(medium, overhead);
+        return new CharacterDefinition.Move(BINDING, medium.animation, medium.pose, overhead,
+            knots == null ? null : knots[0], knots == null ? null : knots[1]);
+    }
+
+    /**
+     * Trechos do clipe do M no 6M: a preparação do M no ritmo dele até 2 quadros antes do
+     * impacto, a pose segurada até o impacto do 6M e daí em diante o resto do M no ritmo dele
+     * (a volta, se o 6M for mais longo, um pouco mais lenta). Null se o M não tem desenho.
+     */
+    static float[][] holdKnots(CharacterDefinition.Move medium, AttackDefinition overhead) {
+        if (medium.animation == null) return null;
+        AttackDefinition m = medium.attack;
+        int windUp = Math.max(0, Math.min(m.startupFrames - 2, overhead.startupFrames - 2));
+        float[] frames = {
+            0f,
+            windUp,
+            overhead.startupFrames,
+            overhead.startupFrames + overhead.activeFrames,
+            overhead.totalFrames
+        };
+        float[] times = {
+            0f,
+            medium.animationTime(windUp / (float) CombatConfig.FPS),
+            medium.animationTime(m.startupFrames / (float) CombatConfig.FPS),
+            medium.animationTime((m.startupFrames + m.activeFrames) / (float) CombatConfig.FPS),
+            medium.animation.duration - 0.0001f
+        };
+        for (int i = 1; i < frames.length; i++) {
+            if (frames[i] < frames[i - 1]) frames[i] = frames[i - 1];
+            if (times[i] < times[i - 1]) times[i] = times[i - 1];
+        }
+        return new float[][] {frames, times};
     }
 }

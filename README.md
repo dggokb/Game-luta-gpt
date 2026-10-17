@@ -232,7 +232,7 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   quando não está cheia). Zerou: **GUARD BREAK!**, o golpe não tira vida mas quem defendia
   fica aberto, sem defesa, tempo de entrar um combo. Ela volta sozinha 1,5 s depois de parar
   de defender. Umas 3 sequências seguidas defendidas quebram.
-- **→ + M**: **golpe alto** (todos têm). Lento e com brilho de aviso, mas pega quem defende
+- **→ + M**: **golpe alto** (todos têm). Segura a pose de preparo antes de bater, mas pega quem defende
   agachado: tem que defender em pé. No acerto cancela em especial e Super.
 - **Chip**: especial e Super defendidos arranham um pouco (1/8 e 1/4 do dano). Vira vida
   vermelha (volta na reserva) e nunca derruba.
