@@ -2113,6 +2113,11 @@ public class GameView extends SurfaceView
 
     private static final float GUARD_GAUGE_W = 96f, GUARD_GAUGE_H = 7f;
 
+    /** Zoom do Super em que o foco já chegou inteiro em quem ativou (o máximo do SuperFlash). */
+    private static final float SUPER_FOCUS_ZOOM = 0.36f;
+    /** Altura na tela (fração) onde fica o peito de quem fez o Super: o corpo inteiro cabe. */
+    private static final float SUPER_FOCUS_Y = 0.52f;
+
     private final Path groundMarker = new Path();
     /** Distância da ponta da seta até a borda de baixo: acima das barras de super do HUD. */
     private static final float GROUND_MARKER_BOTTOM = 88f;
@@ -2212,6 +2217,22 @@ public class GameView extends SurfaceView
                 renderCameraTop = pivotY - pivotScreenY / baseZoom;
                 renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
                     focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
+            }
+            if (superFlash.active() && superFlash.zoom > 1f) {
+                // Super: o zoom vai para quem ativou. O peito dele sai de onde estava na tela e
+                // chega perto do meio conforme o zoom cresce (e volta junto quando ele solta).
+                CombatFighter u = engine.fighter(superFlash.user);
+                float ux = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+                float uy = chestY(u);
+                float plainZoom = camera.zoom * cinematicZoom;
+                float plainLeft = clamp(renderCameraX - VW / plainZoom / 2f, 0f, WORLD_WIDTH - VW / plainZoom);
+                float fromX = (ux - plainLeft) * plainZoom, fromY = (uy - renderCameraTop) * plainZoom;
+                float k = clamp((superFlash.zoom - 1f) / SUPER_FOCUS_ZOOM, 0f, 1f);
+                k = k * k * (3f - 2f * k);
+                float screenX = fromX + (VW * 0.5f - fromX) * k;
+                float screenY = fromY + (VH * SUPER_FOCUS_Y - fromY) * k;
+                renderCameraX = ux - screenX / renderZoom + visibleWorldWidth / 2f;
+                renderCameraTop = uy - screenY / renderZoom;
             }
             if (ultraShotActive) {
                 // Plano do Ultra em sequência: o ponto escolhido vai para o seu lugar na tela.

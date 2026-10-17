@@ -60,8 +60,9 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
 - **Cinemática do Super** (`SuperFlash`, só apresentação): segue quem ativou, o jogador, a
   CPU ou o parceiro de um DHC. Na ativação vem o aviso: o corpo brilha na cor do lutador por
   8 quadros, um brilho de estrela no peito (`ImpactEffects.spawnSuperGlint`) e o som `super`.
-  Depois o cenário escurece atrás dos dois, a câmera aproxima, a aura de carga cresce e a
-  liberação pisca branco. Quem está congelado escurece e esfria a cor (não parece jogo
+  Depois o cenário escurece atrás dos dois, a câmera aproxima **em quem ativou** (o peito dele
+  vai de onde estava na tela até perto do meio conforme o zoom cresce, e volta junto), a aura
+  de carga cresce e a liberação pisca branco. Quem está congelado escurece e esfria a cor (não parece jogo
   travado) e volta aos poucos. Na barra, o gasto de uma barra inteira pisca por 0,75 s
   (`HudEffects.SUPER_FLASH`).
 
