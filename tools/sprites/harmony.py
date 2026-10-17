@@ -10,8 +10,12 @@ Run `python3 tools/sprites/harmony.py` for a per-frame report.
 """
 import json
 import statistics
+import sys
 from pathlib import Path
 from PIL import Image, ImageFilter
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import folhas  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 # Poses that should keep the torso over the root. Attacks lunge on purpose.
@@ -59,9 +63,7 @@ def frame_cell(root, atlas_id, frame, cache):
         packed = _read(root / f'tools/sprites/reports/{atlas_id}.report.json')['packed']
         cache[atlas_id] = (Image.open(root / clip['output']).convert('RGBA'), packed)
     image, packed = cache[atlas_id]
-    col, row = frame % packed['columns'], frame // packed['columns']
-    w, h = packed['frameWidth'], packed['frameHeight']
-    return image.crop((col * w, row * h, col * w + w, row * h + h)), packed
+    return folhas.cell(image, packed, frame), packed
 
 
 def measure(cell, packed, scale):

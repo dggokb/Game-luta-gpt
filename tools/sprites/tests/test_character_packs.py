@@ -164,6 +164,7 @@ class CharacterPackTests(unittest.TestCase):
 
     def test_packing_crops_empty_border_without_moving_pixels(self):
         from PIL import Image
+        import folhas
         stage=self.root/'stage';(stage/'out').mkdir(parents=True)
         img=Image.new('RGBA',(200,100))
         for i,(x,y) in enumerate(((40,30),(150,50))):img.putpixel((x,y),(255,0,0,255))
@@ -174,9 +175,39 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual([32,22],[ox,oy])
         self.assertEqual((50-32,90-22),(packed['rootX'],packed['rootY']))
         out=Image.open(stage/'out/a.png');pw,ph=packed['frameWidth'],packed['frameHeight']
-        self.assertEqual((2*pw,ph),out.size)
-        self.assertEqual((255,0,0,255),out.getpixel((40-ox,30-oy)))
-        self.assertEqual((255,0,0,255),out.getpixel((pw+50-ox,50-oy)))
+        self.assertEqual((packed['sheetWidth'],packed['sheetHeight']),out.size)
+        # Each frame keeps only the box around its drawing; rebuilt, the cell is unchanged.
+        self.assertLess(out.size[0]*out.size[1],2*pw*ph)
+        for frame,(x,y) in enumerate(((40,30),(50,50))):
+            cell=folhas.cell(out,packed,frame)
+            self.assertEqual((pw,ph),cell.size)
+            self.assertEqual((255,0,0,255),cell.getpixel((x-ox,y-oy)))
+            self.assertEqual(1,sum(1 for p in cell.getdata() if p[3]))
+        for sx,sy,w,h,cx,cy in packed['frames']:
+            self.assertEqual([0,0,0,0],[sx%4,sy%4,w%4,h%4],'boxes stay on whole pixels at 1/2 and 3/4')
+
+    def test_trimmed_sheet_rebuilds_every_cell_exactly(self):
+        import random
+        from PIL import Image
+        import folhas
+        rnd=random.Random(7);cells=[]
+        for i in range(9):
+            cell=Image.new('RGBA',(61,47))
+            if i!=4:  # one empty frame
+                x0,y0=rnd.randrange(0,50),rnd.randrange(0,40)
+                for _ in range(40):
+                    cell.putpixel((min(60,x0+rnd.randrange(0,12)),min(46,y0+rnd.randrange(0,8))),(rnd.randrange(256),rnd.randrange(256),rnd.randrange(256),rnd.randrange(1,256)))
+            cells.append(cell)
+        sheet,frames,(w,h)=folhas.trim_sheet(cells)
+        self.assertEqual((w,h),sheet.size)
+        packed={'frameWidth':61,'frameHeight':47,'columns':3,'frameCount':9,'frames':frames}
+        for i,cell in enumerate(cells):
+            self.assertEqual(list(cell.getdata()) if i!=4 else [(0,0,0,0)]*61*47,list(folhas.cell(sheet,packed,i).getdata()),f'frame {i}')
+        self.assertEqual([0,0,0,0,0,0],frames[4])
+        boxes=[(f[0],f[1],f[0]+f[2],f[1]+f[3]) for f in frames if f[2]]
+        for a in boxes:
+            for b in boxes:
+                if a is not b: self.assertFalse(a[0]<b[2] and b[0]<a[2] and a[1]<b[3] and b[1]<a[3],'boxes overlap')
 
     def test_hud_name_is_rejected_in_favor_of_display_name(self):
         self.edit(lambda d:d['fighter'].update(hudName='P1'))
@@ -318,9 +349,17 @@ class BuiltPackTests(unittest.TestCase):
         java=(self.root/pipeline.JAVA/'GeneratedSpriteLayouts.java').read_text()
         report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
         self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['canonical'])
+        self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['grid'])
+        self.assertEqual(report['packed']['frameCount'],len(report['packed']['frames']))
         self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
         self.assertEqual(512,report['layout']['frameWidth'])
         self.assertEqual(2,report['packed']['pixelScale'])
+
+    def test_shipped_sheets_fit_old_gpu_textures(self):
+        import folhas
+        for path in sorted((pipeline.ROOT/'tools/sprites/reports').glob('*.report.json')):
+            packed=json.loads(path.read_text())['packed']
+            self.assertLessEqual(max(packed['sheetWidth'],packed['sheetHeight']),folhas.PREFERRED_SIDE,path.name)
 
     def test_hd_idle_preserves_timing_registration_and_runtime_budget(self):
         from PIL import Image
@@ -342,7 +381,7 @@ class BuiltPackTests(unittest.TestCase):
             new=master.crop((i%10*512,i//10*512,(i%10+1)*512,(i//10+1)*512))
             self.assertEqual(old.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),new.getchannel('A').tobytes(),i)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',10,76,2.00000000f)',java)
+        self.assertIn(',10,76,2.00000000f,',java)
         self.assertIn('art/sprites/source/player_base_idle_video_normalized.png',report['provenance']['referenceSources'])
 
     def test_hd_walk_forward_preserves_distance_root_and_runtime_budget(self):
@@ -366,7 +405,7 @@ class BuiltPackTests(unittest.TestCase):
             cell=hd.crop((i%8*512,i//8*512,(i%8+1)*512,(i//8+1)*512))
             self.assertEqual(src.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',8,20,2.00000000f)',java)
+        self.assertIn(',8,20,2.00000000f,',java)
         self.assertIn('art/sprites/source/player_base_walk_forward_video_normalized.png',report['provenance']['referenceSources'])
 
     def assert_hd_follows_reference(self,sheet,columns,width,height,count,tuning):
@@ -403,7 +442,7 @@ class BuiltPackTests(unittest.TestCase):
         # The HD sheet is the video sheet at 2x, resized by the in-app size tuning (97%).
         self.assert_hd_follows_reference('p02_idle',11,192,256,56,0.97)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',11,56,2.00000000f)',java)
+        self.assertIn(',11,56,2.00000000f,',java)
         self.assertIn('art/sprites/source/p02_idle_video_normalized.png',report['provenance']['referenceSources'])
 
     def test_p03_hd_idle_preserves_registration_timing_and_budget(self):
@@ -426,7 +465,7 @@ class BuiltPackTests(unittest.TestCase):
         # The HD sheet is the video sheet at 2x, resized by the in-app size tuning (104%).
         self.assert_hd_follows_reference('p03_idle',8,256,256,60,1.04)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',8,60,2.00000000f)',java)
+        self.assertIn(',8,60,2.00000000f,',java)
         self.assertIn('art/sprites/source/p03_idle_video_normalized.png',report['provenance']['referenceSources'])
 
     def test_visual_heights_and_stats_are_generated(self):

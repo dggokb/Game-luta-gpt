@@ -15,6 +15,7 @@ from pathlib import Path
 import PIL
 from PIL import Image, features
 import import_sprites as importer
+import folhas
 
 ROOT = Path(__file__).resolve().parents[2]
 JAVA = 'android/app/src/main/java/com/gamelutagpt/'
@@ -601,9 +602,11 @@ def compile_packs(root, results):
                   ' Map<String,CharacterDefinition.Special> sm=new LinkedHashMap<>();']
         for key,a in pack['animations'].items():
             cfg,report = atlases[a['atlas']]; l = report['packed']
-            atlas = 'new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]+[str(l.get('columns',l['frameCount'])),str(l['frameCount'])])+')'
-            if cfg.get('pixelScale', 1) != 1:
-                atlas = atlas[:-1] + ',' + f(cfg['pixelScale']) + ')'
+            # The frames table is a string literal: it lives in the constant pool, so the
+            # per-character method stays far below the JVM's 64 KB bytecode limit.
+            atlas = ('new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]
+                     +[str(l.get('columns',l['frameCount'])),str(l['frameCount']),f(cfg.get('pixelScale', 1)),str(l['sheetWidth']),str(l['sheetHeight'])]
+                     +[q(','.join(str(v) for frame in l['frames'] for v in frame))])+')')
             lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
         for key in [b for b in BINDINGS + AIR_DOWN_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
@@ -662,19 +665,22 @@ def write_states(root):
 PACK_MARGIN = 8
 
 def pack_atlas(stage, cfg, report):
-    """Crops the empty border shared by every cell of an atlas.
+    """Crops the empty space of an atlas: the border shared by every cell, then each frame.
 
     The canonical cell (report['layout']) stays the authoring/validation geometry; the
-    packed cell (report['packed']) is what ships in the APK and what the runtime reads.
-    The crop keeps PACK_MARGIN px around any non-transparent pixel and always contains
-    the root, so drawing at the root lands every pixel exactly where it was.
+    packed cell (report['packed']) is the logical cell the runtime reads: the shared crop
+    keeps PACK_MARGIN px around any non-transparent pixel and always contains the root, so
+    drawing at the root lands every pixel exactly where it was. The shipped image then keeps
+    only the box around each frame's drawing, packed in one sheet (folhas.py); the frames
+    table says where each box sits in the sheet and inside the packed cell.
     """
     l = report['layout']
     w, h, n = l['frameWidth'], l['frameHeight'], l['frameCount']
-    cols = l.get('columns', n);rows = (n + cols - 1) // cols
+    cols = l.get('columns', n)
     path = stage / cfg['output']
     image = Image.open(path);image.load()
-    alpha = image.convert('RGBA').getchannel('A')
+    image = image.convert('RGBA')
+    alpha = image.getchannel('A')
     boxes = [alpha.crop((i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)).getbbox() for i in range(n)]
     boxes = [b for b in boxes if b]
     x0 = max(0, min(min(b[0] for b in boxes) - PACK_MARGIN, l['rootX']))
@@ -682,24 +688,18 @@ def pack_atlas(stage, cfg, report):
     x1 = min(w, max(max(b[2] for b in boxes) + PACK_MARGIN, l['rootX'] + 1))
     y1 = min(h, max(max(b[3] for b in boxes) + PACK_MARGIN, l['rootY'] + 1))
     pw, ph = x1 - x0, y1 - y0
-    options = {}
-    if image.mode == 'P':
-        background = image.info.get('transparency', 0)
-        packed = Image.new('P', (pw * cols, ph * rows), background if isinstance(background, int) else 0)
-        packed.putpalette(image.getpalette())
-        if 'transparency' in image.info: options['transparency'] = image.info['transparency']
-    else:
-        packed = Image.new(image.mode, (pw * cols, ph * rows))
-    for i in range(n):
-        sx, sy = i % cols * w + x0, i // cols * h + y0
-        packed.paste(image.crop((sx, sy, sx + pw, sy + ph)), (i % cols * pw, i // cols * ph))
+    cells = [image.crop((i % cols * w + x0, i // cols * h + y0, i % cols * w + x1, i // cols * h + y1)) for i in range(n)]
+    sheet, frames, (sw, sh) = folhas.trim_sheet(cells)
     if path.suffix == '.webp':
-        importer.save_atlas(packed, path)
+        importer.save_atlas(sheet, path)
     else:
-        packed.save(path, format='PNG', **options)
+        sheet.save(path, format='PNG', optimize=True)
+    rows = (n + cols - 1) // cols
     report['packed'] = {'frameWidth': pw, 'frameHeight': ph, 'rootX': l['rootX'] - x0, 'rootY': l['rootY'] - y0,
                         'columns': cols, 'frameCount': n, 'cropOffset': [x0, y0],
-                        'decodedBytes': {'canonical': w * h * cols * rows * 4, 'packed': pw * ph * cols * rows * 4}}
+                        'sheetWidth': sw, 'sheetHeight': sh, 'frames': frames,
+                        'decodedBytes': {'canonical': w * h * cols * rows * 4, 'grid': pw * ph * cols * rows * 4,
+                                         'packed': sw * sh * 4}}
     if cfg.get('pixelScale', 1) != 1:
         report['pixelScale'] = report['packed']['pixelScale'] = cfg['pixelScale']
 
@@ -730,7 +730,7 @@ def cache_dir():
 
 def code_fingerprint():
     h = hashlib.sha256()
-    for path in (Path(importer.__file__), Path(__file__)):
+    for path in (Path(importer.__file__), Path(folhas.__file__), Path(__file__)):
         h.update(path.read_bytes())
     h.update(f'{PIL.__version__}/{features.version("webp")}'.encode())
     return h.hexdigest()

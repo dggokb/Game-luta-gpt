@@ -36,6 +36,7 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import folhas  # noqa: E402
 
 SIZE_WARN, SIZE_ERROR = 0.03, 0.06   # diferença de tamanho: aviso / erro
 ZOOM_SPREAD = 0.08                   # cabeça cresce/diminui mais que isso no clipe: zoom de câmera
@@ -114,8 +115,7 @@ class Pack:
         l = read_json(ROOT / cfg['report'])['packed']
         if atlas not in self.sheets:
             self.sheets[atlas] = Image.open(ROOT / cfg['output']).convert('RGBA')
-        x, y = frame % l['columns'] * l['frameWidth'], frame // l['columns'] * l['frameHeight']
-        cell = self.sheets[atlas].crop((x, y, x + l['frameWidth'], y + l['frameHeight']))
+        cell = folhas.cell(self.sheets[atlas], l, frame)
         size, dx, dy = self.fix.get((self.id, atlas, frame), (1.0, 0.0, 0.0))
         base = self.profile['worldScale'] / cfg.get('pixelScale', 1)
         k = base * size

@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from statistics import median
 from PIL import Image
+import folhas
 
 ROOT = Path(__file__).resolve().parents[2]
 REPORTS = ROOT / "tools/sprites/reports"
@@ -32,13 +33,12 @@ def victory_foot_track(report):
     top = max(0, packed["rootY"] - 56)
     atlas = ROOT / "android/app/src/main/res/drawable-nodpi/player_base_victory.webp"
     with Image.open(atlas) as image:
-        if image.size[0] != width * columns:
-            raise ValueError("Victory atlas width changed; foot calibration invalid")
+        image = image.convert("RGBA")
+        if image.size != (packed.get("sheetWidth", width * columns), packed.get("sheetHeight", image.size[1])):
+            raise ValueError("Victory atlas size changed; foot calibration invalid")
         centers = []
         for i in range(packed["frameCount"]):
-            x0 = (i % columns) * width
-            y0 = (i // columns) * height
-            alpha = image.crop((x0, y0 + top, x0 + width, y0 + bottom)).getchannel("A")
+            alpha = folhas.cell(image, packed, i).crop((0, top, width, bottom)).getchannel("A")
             x_coords = [idx % width for idx, opacity in enumerate(alpha.getdata())
                         if opacity > 80]
             if not x_coords:

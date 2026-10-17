@@ -33,11 +33,10 @@ public final class RaioPreview {
     // CombatConfig: ultraBeam*.
     private static final int CHARGE = 36, EXTEND = 8, INTERVAL = 4, GAP = 6, FADE = 18, BLAST_HITSTOP = 12;
     private static final float PUSH_PER_HIT = 7f, RECOIL_PER_HIT = 1.5f, STAND_HEIGHT = 240.8f;
-    // Atlas gerados (tools/sprites/reports/*.report.json, "packed"): largura, altura e raiz de
-    // cada quadro. Copie de novo quando a folha mudar.
+    // Folhas geradas e o relatório delas (tools/sprites/reports/*.report.json, "packed"): a
+    // célula lógica, a raiz e onde cada quadro está na folha (tools/sprites/folhas.py).
     private static final String SPRITES = "app/src/main/res/drawable-nodpi/";
-    private static final int[] BEAM_ATLAS = {274, 251, 130, 236};
-    private static final int[] HIT_ATLAS = {213, 269, 95, 254};
+    private static final String REPORTS = "../tools/sprites/reports/";
 
     public static void main(String[] args) throws IOException {
         if (args.length != 4 || !"--quadros".equals(args[2])) {
@@ -53,8 +52,8 @@ public final class RaioPreview {
         StagePack stagePack = StagePack.load(new FileRenderAssets(stageDir.getParentFile()), stageDir.getName());
         for (String warning : pack.warnings) System.out.println("aviso: " + warning);
         StageScene scene = new StageScene(stagePack, new StageWorld(GROUND_Y, 2600f, ZOOM, 700f, 552f));
-        BufferedImage beamSprite = ImageIO.read(new File(SPRITES + "player_base_ultra_beam.webp"));
-        BufferedImage hitSprite = ImageIO.read(new File(SPRITES + "player_base_hit_stand.webp"));
+        Folha beamSprite = Folha.ler("player_base_ultra_beam");
+        Folha hitSprite = Folha.ler("player_base_hit_stand");
         RaioFinal raio = new RaioFinal();
         RaioFinal.Frame f = new RaioFinal.Frame();
         UltraDefinition.Beam beam = pack.definition.beam;
@@ -137,8 +136,8 @@ public final class RaioPreview {
             f.strength = strength;
 
             raio.drawBehind(canvas, pack, f);
-            sprite(g, hitSprite, HIT_ATLAS, 9, blast >= 0f ? 3 : 1 + (done % 2), dx, dy, -1);
-            sprite(g, beamSprite, BEAM_ATLAS, 9, RaioFinal.poseFrame(beamFrame, fireFrame, blastFrame, FADE), ax, GROUND_Y, 1);
+            sprite(g, hitSprite, blast >= 0f ? 3 : 1 + (done % 2), dx, dy, -1);
+            sprite(g, beamSprite, RaioFinal.poseFrame(beamFrame, fireFrame, blastFrame, FADE), ax, GROUND_Y, 1);
             raio.drawFront(canvas, pack, f);
             if (blast >= 0f && clock - blast < 0.22f) {
                 g.setColor(new Color(255, 250, 225, Math.round(230 * (1f - (clock - blast) / 0.22f))));
@@ -160,15 +159,63 @@ public final class RaioPreview {
         System.out.println("quadros em " + out.getPath());
     }
 
-    /** Um quadro do atlas com a raiz em (x, chão), virado para {@code facing} (a arte olha para a direita). */
-    private static void sprite(Graphics2D g, BufferedImage atlas, int[] cell, int columns, int frame, float x, float y,
-                               int facing) {
-        int w = cell[0], h = cell[1];
-        int sx = (frame % columns) * w, sy = (frame / columns) * h;
+    /** Um quadro da folha com a raiz em (x, chão), virado para {@code facing} (a arte olha para a direita). */
+    private static void sprite(Graphics2D g, Folha folha, int frame, float x, float y, int facing) {
+        int[] q = folha.quadro(frame);
+        if (q[2] == 0) return;
         AffineTransform saved = g.getTransform();
         g.translate(x, y);
         if (facing < 0) g.scale(-1, 1);
-        g.drawImage(atlas, -cell[2], -cell[3], w - cell[2], h - cell[3], sx, sy, sx + w, sy + h, null);
+        int left = q[4] - folha.raizX, top = q[5] - folha.raizY;
+        g.drawImage(folha.imagem, left, top, left + q[2], top + q[3], q[0], q[1], q[0] + q[2], q[1] + q[3], null);
         g.setTransform(saved);
+    }
+
+    /** Uma folha gerada: a imagem e, do relatório, a raiz e a caixa de cada quadro. */
+    private static final class Folha {
+        final BufferedImage imagem;
+        final int largura, altura, raizX, raizY, colunas;
+        /** Por quadro: x, y, largura, altura na folha; x, y dentro da célula (null: folha em grade). */
+        final int[] quadros;
+
+        private Folha(BufferedImage imagem, int largura, int altura, int raizX, int raizY, int colunas, int[] quadros) {
+            this.imagem = imagem;
+            this.largura = largura;
+            this.altura = altura;
+            this.raizX = raizX;
+            this.raizY = raizY;
+            this.colunas = colunas;
+            this.quadros = quadros;
+        }
+
+        static Folha ler(String id) throws IOException {
+            String json = new String(java.nio.file.Files.readAllBytes(new File(REPORTS + id + ".report.json").toPath()),
+                java.nio.charset.StandardCharsets.UTF_8);
+            String packed = json.substring(json.indexOf("\"packed\""));
+            int[] quadros = null;
+            int f = packed.indexOf("\"frames\"");
+            if (f >= 0) {
+                String tabela = packed.substring(packed.indexOf('[', f), packed.indexOf("]]", f) + 2);
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("-?\\d+").matcher(tabela);
+                java.util.List<Integer> v = new java.util.ArrayList<>();
+                while (m.find()) v.add(Integer.parseInt(m.group()));
+                quadros = new int[v.size()];
+                for (int i = 0; i < quadros.length; i++) quadros[i] = v.get(i);
+            }
+            return new Folha(ImageIO.read(new File(SPRITES + id + ".webp")), numero(packed, "frameWidth"),
+                numero(packed, "frameHeight"), numero(packed, "rootX"), numero(packed, "rootY"),
+                numero(packed, "columns"), quadros);
+        }
+
+        private static int numero(String json, String chave) {
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"" + chave + "\":\\s*(-?\\d+)").matcher(json);
+            if (!m.find()) throw new IllegalArgumentException("sem " + chave);
+            return Integer.parseInt(m.group(1));
+        }
+
+        int[] quadro(int frame) {
+            if (quadros != null) return java.util.Arrays.copyOfRange(quadros, frame * 6, frame * 6 + 6);
+            return new int[] {frame % colunas * largura, frame / colunas * altura, largura, altura, 0, 0};
+        }
     }
 }
