@@ -10,6 +10,7 @@ on:
     branches:
       - main
       - game-luta-sprite-gpt
+      - teste-de-sprites-gpt
       - game-luta-sprite-astra
       - 'claude/**'
   pull_request:

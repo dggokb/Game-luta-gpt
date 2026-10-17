@@ -61,7 +61,11 @@ def tuned(key):
 
 def compute():
     idle = json.loads((REPORTS / "player_base_idle.report.json").read_text())
-    left, top, right, bottom = idle["frames"][0]["outputBbox"]
+    idle_clip = json.loads((CLIPS / "player_base_idle.json").read_text())
+    # A replacement idle can have a different native pixel density. Preserve the
+    # reviewed reference for the other P01 atlases rather than resizing all moves.
+    left, top, right, bottom = idle_clip.get(
+        "calibrationReferenceBbox", idle["frames"][0]["outputBbox"])
     idle_height = (bottom - top) * STAND_SCALE
     idle_width = (right - left) * STAND_SCALE
     data, audit, factors = {}, {}, {}
@@ -85,6 +89,7 @@ def compute():
         heights = []
         feet = []
         factor = tuned(key)
+        clip = json.loads((CLIPS / f"{key}.json").read_text())
         if factor != 1.0:
             factors[key] = factor
         for entry in report["frames"]:
@@ -95,7 +100,7 @@ def compute():
             foot = box[3] - root_y
             # A crouch or an aerial tuck is meant to be SHORTER than idle.
             # Normalizing it to a full upright figure would magnify it.
-            if key == "player_base_idle":
+            if key == "player_base_idle" or clip.get("calibrationMode") == "idle-scale":
                 sx = sy = STAND_SCALE
             elif key == "player_base_dash":
                 # v0.98: P01's low running pose was SMALLER than the idle

@@ -2632,11 +2632,11 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_MEDIUM_ROOT_Y = 337;
     static final int CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int DASH_SET_FRAME_WIDTH = 566;
-    static final int DASH_SET_FRAME_HEIGHT = 300;
-    static final int DASH_SET_ROOT_X = 365;
-    static final int DASH_SET_ROOT_Y = 283;
-    static final int DASH_SET_FRAME_COUNT = 6;
+    static final int DASH_SET_FRAME_WIDTH = 355;
+    static final int DASH_SET_FRAME_HEIGHT = 336;
+    static final int DASH_SET_ROOT_X = 182;
+    static final int DASH_SET_ROOT_Y = 327;
+    static final int DASH_SET_FRAME_COUNT = 121;
 
     static final int DEFEAT_FRAME_WIDTH = 304;
     static final int DEFEAT_FRAME_HEIGHT = 498;
@@ -2722,11 +2722,11 @@ final class GeneratedSpriteLayouts {
     static final int HIT_STAND_ROOT_Y = 501;
     static final int HIT_STAND_FRAME_COUNT = 9;
 
-    static final int IDLE_FRAME_WIDTH = 331;
-    static final int IDLE_FRAME_HEIGHT = 476;
-    static final int IDLE_ROOT_X = 165;
-    static final int IDLE_ROOT_Y = 462;
-    static final int IDLE_FRAME_COUNT = 76;
+    static final int IDLE_FRAME_WIDTH = 336;
+    static final int IDLE_FRAME_HEIGHT = 336;
+    static final int IDLE_ROOT_X = 163;
+    static final int IDLE_ROOT_Y = 327;
+    static final int IDLE_FRAME_COUNT = 121;
 
     static final int INTRO_SET_FRAME_WIDTH = 347;
     static final int INTRO_SET_FRAME_HEIGHT = 569;

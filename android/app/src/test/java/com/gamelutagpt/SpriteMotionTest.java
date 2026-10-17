@@ -9,6 +9,19 @@ public class SpriteMotionTest {
     private static CharacterDefinition.Animation clip(String id) {
         return GeneratedCharacters.defaultCharacter().animation(id);
     }
+    @Test public void redrawnDashStartsFromIdleAndReachesTheStrideImmediately() {
+        CharacterDefinition p01=GeneratedCharacters.get("player_base");
+        assertEquals(121,p01.animation(SpriteStates.IDLE).atlas.count);
+        assertEquals(121,p01.animation(SpriteStates.DASH).atlas.count);
+        SpriteMotion m=new SpriteMotion(p01);
+        tick(m,1f/60,true,false,0,10,true,true,false,false,false);
+        assertEquals(SpriteStates.DASH,m.clip);
+        assertEquals("The dash enters on the approved idle pose",0,m.frame());
+        for(int i=0;i<3;i++)tick(m,1f/60,true,false,0,10,true,true,false,false,false);
+        assertTrue("A short dash must reach the running pose",m.frame()>=8);
+        tick(m,1f/60,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteStates.IDLE,m.clip);
+    }
     @Test public void walkStepsAdvanceWithDistanceRatherThanDrawCalls() {
         CharacterDefinition.Animation walk=clip(SpriteMotion.Clip.WALK_FORWARD);
         assertTrue(walk.distancePerFrame>0);

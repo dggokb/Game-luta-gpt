@@ -38,11 +38,11 @@ public class P01VisualMasterTest {
         return new float[]{v[0]/f,v[1]/f};
     }
 
-    @Test public void excessiveDashJumpAndVictorySizesAreReduced() {
-        assertEquals("Dash visually grows by 15% from v0.97 in X",
-                     .8395f,base("player_base_dash",0)[0],.001f);
-        assertEquals("Dash visually grows by 15% from v0.97 in Y",
-                     1.10975f,base("player_base_dash",0)[1],.001f);
+    @Test public void redrawnDashMatchesIdleAndLegacyMovesKeepTheirSizes() {
+        assertEquals("The redrawn dash shares the idle's uniform scale",
+                     base("player_base_idle",0)[0],base("player_base_dash",0)[0],.001f);
+        assertEquals("The redrawn dash must not stretch on the Y axis",
+                     base("player_base_idle",0)[1],base("player_base_dash",0)[1],.001f);
         assertTrue("Jump start must shrink",base("player_base_jump",0)[1]<.90f);
         assertEquals("Victory compromise between previous oversized and undersized",
                      .880f,base("player_base_victory",15)[1],.001f);
@@ -56,6 +56,6 @@ public class P01VisualMasterTest {
 
     @Test public void appSizeAdjustmentIsAppliedOnTopOfTheCalibration() {
         float f=P01SpriteCalibration.tuned("player_base_dash");
-        assertEquals(.8395f*f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
+        assertEquals(.980f*f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
     }
 }

@@ -352,8 +352,8 @@ class BuiltPackTests(unittest.TestCase):
         self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['grid'])
         self.assertEqual(report['packed']['frameCount'],len(report['packed']['frames']))
         self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
-        self.assertEqual(512,report['layout']['frameWidth'])
-        self.assertEqual(2,report['packed']['pixelScale'])
+        self.assertEqual(384,report['layout']['frameWidth'])
+        self.assertAlmostEqual(317/225,report['packed']['pixelScale'])
 
     def test_shipped_sheets_fit_old_gpu_textures(self):
         import folhas
@@ -361,28 +361,39 @@ class BuiltPackTests(unittest.TestCase):
             packed=json.loads(path.read_text())['packed']
             self.assertLessEqual(max(packed['sheetWidth'],packed['sheetHeight']),folhas.PREFERRED_SIDE,path.name)
 
-    def test_hd_idle_preserves_timing_registration_and_runtime_budget(self):
+    def test_redrawn_idle_and_dash_preserve_registration_and_runtime_budget(self):
         from PIL import Image
+        import folhas
         character=json.loads(self.path.read_text())
         idle=character['animations']['IDLE']
-        self.assertEqual(list(range(76)),idle['frames'])
-        self.assertEqual([42]*76,idle['durationsMs'])
+        self.assertEqual(list(range(121)),idle['frames'])
+        self.assertAlmostEqual(5016.667,sum(idle['durationsMs']),places=2)
         self.assertTrue(idle['loop'])
-        report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
-        self.assertEqual([512,512,256,476], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        packed=report['packed']
-        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
-        self.assertLessEqual(packed['frameHeight']*8,4096)
-        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
-        original=Image.open(self.root/'art/sprites/source/player_base_idle_video_normalized.png').convert('RGBA')
-        master=Image.open(self.root/'art/sprites/source/player_base_idle_sr_2x.png').convert('RGBA')
-        for i in range(76):
-            old=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
-            new=master.crop((i%10*512,i//10*512,(i%10+1)*512,(i//10+1)*512))
-            self.assertEqual(old.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),new.getchannel('A').tobytes(),i)
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',10,76,2.00000000f,',java)
-        self.assertIn('art/sprites/source/player_base_idle_video_normalized.png',report['provenance']['referenceSources'])
+        reports={}
+        for name in ('idle','dash'):
+            report=json.loads((self.root/f'tools/sprites/reports/player_base_{name}.report.json').read_text())
+            reports[name]=report
+            self.assertEqual(121,report['packed']['frameCount'])
+            self.assertEqual([384,352,192,335], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+            self.assertAlmostEqual(317/225,report['packed']['pixelScale'])
+            self.assertLess(report['packed']['decodedBytes']['packed'],64*1024*1024)
+            self.assertLessEqual(max(report['packed']['sheetWidth'],report['packed']['sheetHeight']),4096)
+            self.assertTrue(all(f['minimumMargin']>=8 for f in report['frames']))
+            self.assertTrue(all(f['outputBbox'][3]==336 for f in report['frames']))
+        idle_image=Image.open(self.root/'android/app/src/main/res/drawable-nodpi/player_base_idle.webp').convert('RGBA')
+        dash_image=Image.open(self.root/'android/app/src/main/res/drawable-nodpi/player_base_dash.webp').convert('RGBA')
+        # Compare registered sprites, not sheet positions: the packer trims each atlas differently.
+        for frame in (0,120):
+            a=folhas.cell(idle_image,reports['idle']['packed'],frame)
+            b=folhas.cell(dash_image,reports['dash']['packed'],frame)
+            a=a.crop(a.getchannel('A').getbbox());b=b.crop(b.getchannel('A').getbbox())
+            self.assertEqual(a.size,b.size)
+            # Lossless WEBP may discard hidden RGB where alpha is zero.
+            self.assertEqual(a.convert('RGBa').tobytes(),b.convert('RGBa').tobytes())
+        dash=character['animations']['DASH']
+        self.assertEqual(0,dash['frames'][0])
+        self.assertLessEqual(sum(dash['durationsMs']),300)
+        self.assertTrue(any(8<=f<80 for f in dash['frames']))
 
     def test_hd_walk_forward_preserves_distance_root_and_runtime_budget(self):
         from PIL import Image
