@@ -58,4 +58,16 @@ public class P01VisualMasterTest {
         float f=P01SpriteCalibration.tuned("player_base_dash");
         assertEquals(.980f*f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
     }
+
+    @Test public void redrawnIntroEndsAtTheSameScaleAndOffsetAsIdle() {
+        float[] idle=P01SpriteCalibration.get("player_base_idle",0);
+        CharacterDefinition.Animation intro=p01.animation(SpriteStates.INTRO);
+        assertEquals(27,intro.atlas.count);
+        assertEquals(2.4f,intro.duration,.0001f);
+        assertFalse(intro.loop);
+        for(int frame=22;frame<=26;frame++) {
+            assertArrayEquals("Intro/idle handoff frame "+frame,idle,
+                P01SpriteCalibration.get("player_base_intro",frame),.0001f);
+        }
+    }
 }

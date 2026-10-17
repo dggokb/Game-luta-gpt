@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
  */
 @RunWith(RobolectricTestRunner.class)
 public class P01IntroRealAssetTest {
-    @Test public void introCorrectionsLoadOnlyForP01IntroAndPreserveApprovedVictory()
+    @Test public void redrawnIntroNeedsNoLegacyCorrectionsAndPreservesApprovedVictory()
             throws Exception {
         Context ctx=RuntimeEnvironment.getApplication();
         ByteArrayOutputStream bytes=new ByteArrayOutputStream();
@@ -26,7 +26,7 @@ public class P01IntroRealAssetTest {
         }
         try {
             SpriteAutoFix.replaceFromJson(new String(bytes.toByteArray(),StandardCharsets.UTF_8));
-            assertEquals("Victory 33 frames + INTRO 27 frames",60,SpriteAutoFix.count());
+            assertEquals("Only the approved Victory corrections remain",33,SpriteAutoFix.count());
             int active=0;
             for(int frame=0;frame<27;frame++) {
                 SpriteAutoFix.Adjustment a=SpriteAutoFix.get(
@@ -40,11 +40,11 @@ public class P01IntroRealAssetTest {
                 assertEquals("Other characters untouched",0f,
                     SpriteAutoFix.get("p02","player_base_intro",frame).dx,.00001f);
             }
-            assertEquals(26,active);
+            assertEquals("The replacement intro uses its authored registration",0,active);
             assertEquals(0f,SpriteAutoFix.get("player_base","player_base_intro",0).dx,.00001f);
-            assertEquals(-44.6512f,SpriteAutoFix.get("player_base","player_base_intro",16).dx,.0002f);
-            assertEquals(9.3023f,SpriteAutoFix.get("player_base","player_base_intro",22).dx,.0002f);
-            assertEquals(9.3023f,SpriteAutoFix.get("player_base","player_base_intro",26).dx,.0002f);
+            assertEquals(0f,SpriteAutoFix.get("player_base","player_base_intro",16).dx,.0002f);
+            assertEquals(0f,SpriteAutoFix.get("player_base","player_base_intro",22).dx,.0002f);
+            assertEquals(0f,SpriteAutoFix.get("player_base","player_base_intro",26).dx,.0002f);
             CharacterDefinition.Animation intro=GeneratedCharacters.get("player_base")
                 .animation(SpriteStates.INTRO);
             assertEquals("same original frame count",27,intro.atlas.count);

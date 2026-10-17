@@ -2,7 +2,7 @@
   "id": "player_base_intro",
   "javaName": "INTRO_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_intro_sr_hd.png",
+  "source": "art/sprites/source/player_base_intro_gpt_redrawn.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_intro.webp",
   "report": "tools/sprites/reports/player_base_intro.report.json",
   "preview": "android/app/build/sprite-review/intro-import.png",
@@ -10,17 +10,163 @@
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
-  "frameWidth": 576,
-  "frameHeight": 640,
-  "rootX": 280,
-  "rootY": 600,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Respira, ajeita a faixa e entra na guarda; escala da guarda do fim do video (o personagem comeca em pe, mais alto).",
+  "frameWidth": 384,
+  "frameHeight": 448,
+  "rootX": 192,
+  "rootY": 419,
+  "sourceNote": "P01 GPT redraw test: new intro poses, held frames, and the exact approved idle pose in frames 22..26. Original 27-frame, 2.4-second timing retained. Native artwork; shared body scale and foot registration with the approved idle.",
   "sourceReferences": [
+    "art/sprites/source/player_base_intro_sr_hd.png",
     "art/sprites/source/player_base_intro_video_normalized.png"
   ],
-  "pixelScale": 2.0,
-  "ajusteTamanho": 0.99,
-  "regua": [
-    "ajuste no app 20261014-0532: 99% (INTRO)"
-  ]
+  "pixelScale": 1.4088888888888889,
+  "calibrationMode": "idle-scale",
+  "transform": {
+    "scale": 1,
+    "outputFrameWidth": 416,
+    "outputFrameHeight": 480,
+    "outputRootX": 208,
+    "outputRootY": 435,
+    "columns": 9,
+    "groundFrames": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "offsets": {
+      "0": [
+        5,
+        0
+      ],
+      "1": [
+        5,
+        0
+      ],
+      "2": [
+        5,
+        0
+      ],
+      "3": [
+        5,
+        0
+      ],
+      "4": [
+        5,
+        0
+      ],
+      "5": [
+        5,
+        0
+      ],
+      "6": [
+        5,
+        0
+      ],
+      "7": [
+        5,
+        0
+      ],
+      "8": [
+        5,
+        0
+      ],
+      "9": [
+        5,
+        0
+      ],
+      "10": [
+        5,
+        0
+      ],
+      "11": [
+        5,
+        0
+      ],
+      "12": [
+        5,
+        0
+      ],
+      "13": [
+        5,
+        0
+      ],
+      "14": [
+        5,
+        0
+      ],
+      "15": [
+        5,
+        0
+      ],
+      "16": [
+        5,
+        0
+      ],
+      "17": [
+        5,
+        0
+      ],
+      "18": [
+        5,
+        0
+      ],
+      "19": [
+        5,
+        0
+      ],
+      "20": [
+        5,
+        0
+      ],
+      "21": [
+        5,
+        0
+      ],
+      "22": [
+        5,
+        0
+      ],
+      "23": [
+        5,
+        0
+      ],
+      "24": [
+        5,
+        0
+      ],
+      "25": [
+        5,
+        0
+      ],
+      "26": [
+        5,
+        0
+      ]
+    },
+    "reason": "16px safety padding and the same 5px X registration as the approved idle; no image resampling. Final five frames match idle frame 0."
+  }
 }

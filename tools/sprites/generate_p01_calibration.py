@@ -154,7 +154,8 @@ def compute():
                 # skating as arms moved. Keep the *shoe* world anchor constant.
                 foot_in_packed = shoe_track[entry["index"]] - packed["rootX"]
                 dx = shoe_anchor_px * sx - foot_in_packed * sx
-            elif key in ("player_base_intro", "player_base_victory"):
+            elif (key in ("player_base_intro", "player_base_victory")
+                  and clip.get("calibrationMode") != "idle-scale"):
                 dx = -cx * sx
             else:
                 dx = 0.0  # animation extensions must NOT shift the fighter root

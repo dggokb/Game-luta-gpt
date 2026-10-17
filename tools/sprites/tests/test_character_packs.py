@@ -395,6 +395,33 @@ class BuiltPackTests(unittest.TestCase):
         self.assertLessEqual(sum(dash['durationsMs']),300)
         self.assertTrue(any(8<=f<80 for f in dash['frames']))
 
+    def test_redrawn_intro_ends_on_the_registered_idle_pixels(self):
+        from PIL import Image
+        import folhas
+        character=json.loads(self.path.read_text())
+        intro=character['animations']['INTRO']
+        self.assertEqual(list(range(27)),intro['frames'])
+        self.assertEqual(2400,sum(intro['durationsMs']))
+        self.assertFalse(intro['loop'])
+        def load(name):
+            report=json.loads((self.root/f'tools/sprites/reports/player_base_{name}.report.json').read_text())
+            image=Image.open(self.root/f'android/app/src/main/res/drawable-nodpi/player_base_{name}.webp').convert('RGBA')
+            return image,report['packed']
+        idle,ip=load('idle');sheet,sp=load('intro')
+        self.assertEqual(ip['pixelScale'],sp['pixelScale'])
+        reference=folhas.cell(idle,ip,0)
+        ib=reference.getchannel('A').getbbox()
+        for frame in range(22,27):
+            actual=folhas.cell(sheet,sp,frame)
+            ab=actual.getchannel('A').getbbox()
+            self.assertEqual((ib[0]-ip['rootX'],ib[1]-ip['rootY']),
+                             (ab[0]-sp['rootX'],ab[1]-sp['rootY']))
+            self.assertEqual(reference.crop(ib).convert('RGBa').tobytes(),
+                             actual.crop(ab).convert('RGBa').tobytes())
+        fixes=json.loads((pipeline.ROOT/'android/app/src/main/assets/sprite-autofix.json').read_text())
+        self.assertFalse(any(c['character']=='player_base' and c['atlas']=='player_base_intro'
+                             for c in fixes['corrections']))
+
     def test_hd_walk_forward_preserves_distance_root_and_runtime_budget(self):
         from PIL import Image
         walk=json.loads(self.path.read_text())['animations']['WALK_FORWARD']

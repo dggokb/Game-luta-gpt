@@ -26,3 +26,22 @@ Fontes aprovadas no Drive:
 
 - [Idle](https://drive.google.com/file/d/1nvUpLJDbUjU4n2NqZc4mBW3J5ooGy8Mi/view)
 - [Dash](https://drive.google.com/file/d/1hssS1YHv3hKqJE1isnbiA5RTph2NTuty/view)
+
+## Segundo teste: intro para idle
+
+A intro foi redesenhada a partir da sequência já usada pelo jogo: respiração,
+ajuste da faixa e entrada na guarda. O master tem 27 quadros, com poses repetidas,
+e mantém os 2,4 segundos da animação anterior. As células de 384 × 448 dão espaço
+à postura em pé sem reduzir o personagem; o idle continua com o master aprovado.
+
+Os quadros 22 a 26 reutilizam exatamente o primeiro idle, com a mesma densidade,
+escala uniforme e posição dos pés. Isso também mantém a transição suave que o
+renderer já faz nesses quadros. Os offsets do `sprite-autofix.json` pertencentes
+à intro anterior foram removidos; os 33 ajustes aprovados da vitória continuam.
+
+As verificações comparam os pixels visíveis e sua posição em relação à raiz,
+além do tamanho, duração e calibração da animação. Os demais movimentos e os
+atlases de idle e dash do primeiro teste permanecem iguais.
+
+- [Master da intro, 27 quadros](https://drive.google.com/file/d/1QNiDrLnikc7Lyiv46jnmAuQcQa8wXvrD/view)
+- [Prévia animada da intro seguida do idle](https://drive.google.com/file/d/1FcvgrVvb23IEOkpsmxG813gNX8fC-qfJ/view)
