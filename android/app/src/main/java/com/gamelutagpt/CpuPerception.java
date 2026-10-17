@@ -14,6 +14,8 @@ final class CpuPerception {
     static final class Snapshot {
         int frame;
         float x, y, vx, vy;
+        /** Quanto o empurrão que está levando ainda vai deslizar (px, com o lado). */
+        float push;
         boolean grounded, ko;
         /** Agachado (na tela): o golpe alto pega. */
         boolean crouching;
@@ -76,6 +78,7 @@ final class CpuPerception {
         Snapshot s = ring[last];
         s.frame = frame;
         s.x = t.x; s.y = t.y; s.vx = t.vx; s.vy = t.vy;
+        s.push = t.pushRemaining;
         s.grounded = t.grounded;
         s.crouching = t.grounded && t.crouching;
         s.ko = t.ko();

@@ -280,4 +280,24 @@ public class CpuTest {
         }
         assertTrue("nível 8 vence o nível 2: " + wins + "/8", wins >= 6);
     }
+    /**
+     * Contra um jogador parado, nenhum golpe começa fora do alcance: nem o próximo do combo
+     * (o empurrão que ainda falta afasta o alvo até a janela abrir) nem o do neutro com o alvo
+     * deslizando de um empurrão. Mesmo cenário do SpriteIntegrationTest, com sementes fixas.
+     */
+    @Test public void attacksOnlyStartWithinReach() {
+        for (int level = CpuLevel.MIN; level <= CpuLevel.MAX; level++) {
+            for (long seed = 1; seed <= 20; seed++) {
+                Fight f = new Fight(BASE, BASE, 170f, level, seed);
+                for (int i = 0; i < 900; i++) {
+                    f.step();
+                    CombatFighter c = f.c();
+                    if (!c.attacking() || c.attackFrame != 0 || c.move == null) continue;
+                    float distance = Math.abs(f.p().x - c.x);
+                    assertTrue("nível " + level + " semente " + seed + ": " + c.attack.id + " começou a " + distance,
+                        distance <= CombatRules.maxCenterDistance(c.move, BASE.fighter.body) + 0.5f);
+                }
+            }
+        }
+    }
 }

@@ -563,13 +563,18 @@ final class AiController {
     private float predictedX(CombatEngine engine, CpuPerception.Snapshot seen) {
         float x = seen.x;
         CpuPerception.Snapshot before = perception.seen(level.reactionFrames + MOTION_SAMPLE);
-        if (before != null && seen.grounded && before.grounded) {
+        if (seen.push != 0f) {
+            // Empurrado (no chão ou lançado): ela viu o corpo deslizando e conta com o fim do
+            // deslize, em vez de esticar a velocidade do deslize como se fosse um passo.
+            x += seen.push;
+        } else if (before != null && seen.grounded && before.grounded) {
             x += (seen.x - before.x) / MOTION_SAMPLE * level.reactionFrames;
         }
         // O próprio golpe ela sente na hora: sabe onde o rival estava quando encostou e quanto
         // aquele golpe empurra. Até ver o empurrão acontecer (ele pode atrasar num congelamento),
-        // conta com o rival lá onde o empurrão leva.
-        if (contactPush > 0f && engine.frame() - contactFrame <= CONTACT_MEMORY_FRAMES && seen.grounded) {
+        // conta com o rival lá onde o empurrão leva. Vale também com o rival no ar (lançado pelo
+        // golpe): o empurrão é o mesmo.
+        if (contactPush > 0f && engine.frame() - contactFrame <= CONTACT_MEMORY_FRAMES) {
             float pushedTo = contactTargetX + contactSide * contactPush;
             x = contactSide > 0 ? Math.max(x, pushedTo) : Math.min(x, pushedTo);
         }
@@ -793,7 +798,7 @@ final class AiController {
         }
         if (ComboBook.JUMP.equals(next)) return;   // o super pulo sai do neutro, depois do lançador
         if (me.grounded && !next.startsWith("j") && !"S".equals(next) && !"SUPER".equals(next) &&
-            !CombatRules.reaches(me.character(), next, false, Math.abs(target.x - me.x), target.body())) {
+            !CombatRules.reaches(me.character(), next, false, gapAfterPush(me, target), target.body())) {
             // O empurrão do golpe tirou o próximo do alcance: fecha com o que ainda alcança.
             next = closer(engine, me, target);
             if (next == null) return;
@@ -868,7 +873,7 @@ final class AiController {
      */
     private String closer(CombatEngine engine, CombatFighter me, CombatFighter target) {
         CharacterDefinition c = me.character();
-        float gap = Math.abs(target.x - me.x);
+        float gap = gapAfterPush(me, target);
         for (String option : new String[] {"2H", "H", "S"}) {
             if (!me.attack.cancelsInto(option) || option.equals(route.get(step + 1))) continue;
             AttackDefinition a = c.attack(option);
@@ -886,6 +891,14 @@ final class AiController {
             return option;
         }
         return null;
+    }
+
+    /**
+     * Distância quando o próximo golpe do combo sair: o cancelamento espera a janela abrir, e
+     * até lá o empurrão do acerto (ou da defesa) que ainda falta afasta os dois.
+     */
+    static float gapAfterPush(CombatFighter me, CombatFighter target) {
+        return Math.abs((target.x + target.pushRemaining) - (me.x + me.pushRemaining));
     }
 
     /** Viu (com a reação do nível) que o golpe atual acertou. */
