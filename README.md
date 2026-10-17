@@ -37,7 +37,11 @@ gradle testDebugUnitTest assembleDebug --stacktrace
 ```
 
 `--write` é o único passo que altera saídas versionadas. O Gradle só roda `--check`
-(aviso se faltar Python localmente; erro na CI com `-PrequireSpriteCheck=true`).
+(aviso se faltar Python localmente; erro com `-PrequireSpriteCheck=true`).
+O workflow do APK usa os sprites já versionados e pula essa validação com
+`-x :app:verifySpritePacks`, além de não executar a suíte Python de animações nem
+enviar os atlas e a revisão visual como artefatos. A calibração do P01 e os
+demais testes continuam no build; os comandos acima permitem validar sprites à parte.
 
 O build processa os atlas em paralelo (um por núcleo; `SPRITE_BUILD_JOBS=N` muda) e guarda
 cada atlas pronto em `android/app/build/sprite-cache/`, pela hash do clip, do perfil, das
