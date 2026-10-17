@@ -98,15 +98,15 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 | Episódio | Conteúdo |
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
-| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue), o parceiro aceita |
+| ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
 | ep03 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
 | ep04 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep05 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
 | ep06 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
 | ep07 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
 
-As páginas do ep02 ao ep07 são provisórias (painéis montados pelo jogo, com a arte
-provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md). Depois do
+As páginas do ep03 ao ep07 são provisórias (painéis montados pelo jogo, com a arte
+provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md) (o ep02 já está todo em páginas prontas). Depois do
 ep07 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
 existe).
 

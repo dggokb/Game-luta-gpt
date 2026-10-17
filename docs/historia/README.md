@@ -40,8 +40,8 @@ salvar progresso e um menu de episódios.
 | Episódio | Conteúdo | Luta |
 |---|---|---|
 | 0 — O Pai que Partiu | Infância no dojo Shūshinkan, o treino (tutorial), o convite, a divisão dos irmãos, o pai parte e não volta. **Pronto** (11 páginas) | Treino Ryūga × Kōga (tutorial) |
-| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um. **Pronto**: começo e fim separados por irmão (veja abaixo) | Treino jogador × rival, interrompido pela campainha numa cinemática |
-| 2 — O Parceiro | Antes do torneio, cada irmão convence o parceiro a lutar com ele | 1x1: Ryūga × Yin-lu (p02) ou Kōga × Brucy (p04). Páginas prontas: Ryūga `pag1_ryuga` a `pag4_ryuga` antes da luta e `pag5_ryuga` depois; Kōga `pag1_koga` a `pag4_koga` antes da luta |
+| 1 — Duas Cartas | A escolha do irmão (Ryūga ou Kōga), dez anos depois, treino, as duas cartas, motivos de cada um. **Pronto**: começo e fim separados por irmão (veja abaixo) | Treino 1x1 jogador × rival (só os irmãos, sem tag), interrompido pela campainha numa cinemática |
+| 2 — O Parceiro | Antes do torneio, cada irmão convence o parceiro a lutar com ele | 1x1: Ryūga × Yin-lu (p02) ou Kōga × Brucy (p04). Páginas prontas: Ryūga `pag1_ryuga` a `pag4_ryuga` antes da luta e `pag5_ryuga` depois; Kōga `pag1_koga` a `pag4_koga` antes da luta e `pag5_koga` depois |
 | 3 — O Sorteio | O templo, a regra dos capitães, a formação das duplas, o chaveamento em lados opostos | 1ª luta de cada lado |
 | 4 a 7 | Episódios alternando o lado do Ryūga e o lado do Kōga (lutas fixas de história + lutas variáveis) | uma por episódio |
 | meio da temporada | A revelação de que o desejo é real e pode ressuscitar a mãe | luta fixa |
@@ -102,6 +102,7 @@ aponta a imagem do cartão de título (sem ele, o cartão escreve o nome do jogo
 | `irmao` (qualquer passo) | `ryuga` ou `koga`: o passo só toca na campanha desse irmão |
 | `emboscada` (passo de luta) | `true`: a emboscada fora da arena, contra quem perdeu a outra quarta do lado do jogador |
 | `duelo` (passo de luta) | `true`: o 1x1 da regra escondida, quem venceu a final × o parceiro |
+| `solo` (passo de luta) | `true`: 1x1 sem troca (sem modo tag), só o titular de cada lado (o irmão em `"jogador"` / `"rival"`). Usado no treino do ep01, quando os parceiros ainda não entraram na história |
 | `layout` | `splash` (1), `duas-colunas` (2), `tres-colunas`, `tres-faixas`, `faixa-e-dois`, `dois-e-faixa` (3), `quatro`, `grade` (4). Sem `layout`, vale o padrão pela quantidade de painéis |
 | `tom` | `papel` (normal) ou `flashback` (página preta, cores sépia) |
 | `cena` (arte provisória) | `dojo`, `dojo-noite`, `casa`, `estrada`, `templo`, `ceu`, `chuva`, `carta` |

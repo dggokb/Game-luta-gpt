@@ -245,3 +245,39 @@ Dicas do dojo da Yin-Lu:
 - O `frente.png` pode vir nítido: o desfoque é aplicado na preparação, como no Shūshinkan.
 - O brilho das lanternas, a neblina clara da distância e as folhas caindo são feitos pelo
   jogo. Não precisa pôr na arte.
+
+## Notas do Dojo da Yin-Lu
+
+As imagens do GPT passam pelo `montar_yinlu.py`:
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_yinlu.py --entrada pasta/com/as/imagens
+```
+
+- **Piso**: o `chao.png` e o `chao_lajotas.png` vieram certos (de cima, colunas retas, as
+  mesmas juntas nas duas). Só a largura não era um número inteiro de colunas: na repetição
+  a emenda ficava com uma coluna larga demais. O script corta as duas nas juntas, em
+  volta do emblema (10 colunas de ~131 px). O piso vai de −600 a 700; cada coluna tem
+  ~165 unidades do mundo e o círculo do emblema ~800, entre os dois lutadores.
+- **Primeiro plano**: o `frente.png` é dividido em `frente_esq.png` (degraus quebrados) e
+  `frente_dir.png` (pedra com arbusto), desfocados, a −250. O lado que o GPT cortou na
+  borda da imagem é esfumado: com a câmera afastada, essas pedras aparecem no meio do piso
+  e o corte reto ficava à mostra.
+- **Lanterna de pedra** (`lanterna de pedra.png` vira `lanterna_pedra.png`): o nicho da luz
+  veio vazado e mostrava o cenário de trás. O script pinta o vão com o interior escuro da
+  pedra; o brilho que pulsa é do jogo.
+- **Portão**: o alfa veio em 254, o portão inteiro ficava levemente transparente. O
+  script deixa opaco.
+- **Composição** (profundidades): lanternas de pedra 130, pilares 300, terraço 700 (fim do
+  piso; os degraus do meio sobem para o portão), portão 1000, muro 1060, árvores 1700,
+  montanhas 9000, céu. O portão fica atrás do terraço, como se estivesse num nível acima
+  do pátio. Duas neblinas claras (1400 e 5000) dão a distância do dia.
+- Sem reflexo no chão (pedra seca de dia): `reflexoLutadores` e `reflexoLuzes` em 0. As
+  folhas caindo são as `petalas` em verde (`#7FC24A`).
+- **Falta o `cidade.png`** (o skyline ao longe). O cenário funciona sem ele: entre as
+  árvores e as montanhas. Quando vier, entra como camada a ~4200, atrás das árvores e na
+  frente das montanhas, com `x` 0.5 (o centro mais baixo fica atrás do portão).
+- No super pulo aparece o corte reto no alto do `pilar.png` (o telhado termina na borda
+  da imagem), igual aos pilares do Templo da Lua.
+- O ep02 usa este cenário na luta CONVITE do Ryūga × Yin-lu (`"cenario": "dojo_yinlu"`).

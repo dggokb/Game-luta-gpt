@@ -138,7 +138,8 @@ public final class Campanha {
     /**
      * As duplas da luta: {jogador, CPU}, cada uma {titular, parceiro}. Resolve
      * {@code "dupla": "jogador"} / {@code "cpu": "rival"} pelo irmão escolhido e
-     * {@code "torneio": true} pelo próximo adversário da chave. Null: a luta usa as duplas que já
+     * {@code "torneio": true} pelo próximo adversário da chave; com {@code "solo": true}, só o
+     * titular de cada lado (1x1, sem troca). Null: a luta usa as duplas que já
      * estão no jogo (ou a referência não pôde ser resolvida).
      */
     public String[][] lados(Episodio.Passo luta) {
@@ -171,7 +172,12 @@ public final class Campanha {
             jogador = resolver(luta.duplaRef, luta.dupla);
             cpu = resolver(luta.cpuRef, luta.cpu);
         }
-        return jogador != null && cpu != null ? new String[][] {jogador.clone(), cpu.clone()} : null;
+        if (jogador == null || cpu == null) return null;
+        if (luta.solo) {
+            // 1x1 sem troca: só os titulares (os irmãos).
+            return new String[][] {{jogador[0]}, {cpu[0]}};
+        }
+        return new String[][] {jogador.clone(), cpu.clone()};
     }
 
     private String[] resolver(String ref, String[] fixo) {

@@ -94,6 +94,12 @@ public final class Episodio {
          * jogador entre as quartas e a semifinal ({@link Torneio#emboscada()}).
          */
         public final boolean emboscada;
+        /**
+         * {@code "solo": true}: luta 1x1 sem troca (sem modo tag), cada lado só com o titular da
+         * dupla (o irmão nas duplas de {@code "jogador"} / {@code "rival"}). Para as partes da
+         * história em que os parceiros ainda não entraram.
+         */
+        public final boolean solo;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -104,8 +110,9 @@ public final class Episodio {
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
               String cinematica, String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
-              String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada) {
+              String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada, boolean solo) {
             this.tipo = tipo;
+            this.solo = solo;
             this.duelo = duelo;
             this.emboscada = emboscada;
             this.torneio = torneio;
@@ -319,7 +326,8 @@ public final class Episodio {
             string(map, "conversa", null), string(map, "cinematica", null), string(map, "titulo", null),
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
             Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
-            Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")));
+            Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")),
+            Boolean.TRUE.equals(map.get("solo")));
     }
 
     /** {@code "dupla": "jogador"} ou {@code "rival"} (dupla fixa de um irmão); null se for uma lista. */

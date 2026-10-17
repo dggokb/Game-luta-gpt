@@ -104,6 +104,7 @@ public final class PaginaHistoria {
     public String[][] lados(Episodio.Passo luta) {
         if (campanha != null) return campanha.lados(luta);
         if (luta.dupla == null || luta.cpu == null) return null;
+        if (luta.solo) return new String[][] {{luta.dupla[0]}, {luta.cpu[0]}};
         return new String[][] {luta.dupla.clone(), luta.cpu.clone()};
     }
 
