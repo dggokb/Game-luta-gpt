@@ -33,6 +33,15 @@
       "alfa": 0.45
     },
     {
+      "id": "cidade",
+      "imagem": "cidade.png",
+      "profundidade": 4200,
+      "topo": 0.17,
+      "base": 0.5,
+      "x": 0.5,
+      "repetir": "espelhar"
+    },
+    {
       "id": "arvores",
       "imagem": "arvores.png",
       "profundidade": 1700,
@@ -66,8 +75,22 @@
       "x": 0.5,
       "repetir": "nao",
       "luzes": [
-        { "x": 0.198, "y": 0.496, "raio": 0.07, "cor": "#FFD49A", "pulsar": 0.06, "reflexo": false },
-        { "x": 0.801, "y": 0.496, "raio": 0.07, "cor": "#FFD49A", "pulsar": 0.06, "reflexo": false }
+        {
+          "x": 0.198,
+          "y": 0.496,
+          "raio": 0.07,
+          "cor": "#FFD49A",
+          "pulsar": 0.06,
+          "reflexo": false
+        },
+        {
+          "x": 0.801,
+          "y": 0.496,
+          "raio": 0.07,
+          "cor": "#FFD49A",
+          "pulsar": 0.06,
+          "reflexo": false
+        }
       ]
     },
     {
@@ -88,7 +111,14 @@
       "repetir": "espelhar",
       "periodo": 0.84,
       "luzes": [
-        { "x": 0.636, "y": 0.35, "raio": 0.05, "cor": "#FFC98A", "pulsar": 0.08, "reflexo": false }
+        {
+          "x": 0.69,
+          "y": 0.476,
+          "raio": 0.05,
+          "cor": "#FFC98A",
+          "pulsar": 0.08,
+          "reflexo": false
+        }
       ]
     },
     {
@@ -101,7 +131,14 @@
       "repetir": "espelhar",
       "periodo": 0.86,
       "luzes": [
-        { "x": 0.484, "y": 0.455, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.12, "reflexo": false }
+        {
+          "x": 0.484,
+          "y": 0.455,
+          "raio": 0.06,
+          "cor": "#FFB45A",
+          "pulsar": 0.12,
+          "reflexo": false
+        }
       ]
     },
     {

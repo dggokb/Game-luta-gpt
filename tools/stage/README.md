@@ -267,17 +267,19 @@ python tools/stage/montar_yinlu.py --entrada pasta/com/as/imagens
 - **Lanterna de pedra** (`lanterna de pedra.png` vira `lanterna_pedra.png`): o nicho da luz
   veio vazado e mostrava o cenário de trás. O script pinta o vão com o interior escuro da
   pedra; o brilho que pulsa é do jogo.
-- **Portão**: o alfa veio em 254, o portão inteiro ficava levemente transparente. O
-  script deixa opaco.
+- **Alfa 254**: o portão e o pilar vieram com o alfa em 254 e ficavam levemente
+  transparentes. O `preparar_cenario.py` agora deixa opaco o que vem de 250 a 254.
 - **Composição** (profundidades): lanternas de pedra 130, pilares 300, terraço 700 (fim do
   piso; os degraus do meio sobem para o portão), portão 1000, muro 1060, árvores 1700,
-  montanhas 9000, céu. O portão fica atrás do terraço, como se estivesse num nível acima
+  cidade 4200, montanhas 9000, céu. O portão fica atrás do terraço, como se estivesse num nível acima
   do pátio. Duas neblinas claras (1400 e 5000) dão a distância do dia.
 - Sem reflexo no chão (pedra seca de dia): `reflexoLutadores` e `reflexoLuzes` em 0. As
   folhas caindo são as `petalas` em verde (`#7FC24A`).
-- **Falta o `cidade.png`** (o skyline ao longe). O cenário funciona sem ele: entre as
-  árvores e as montanhas. Quando vier, entra como camada a ~4200, atrás das árvores e na
-  frente das montanhas, com `x` 0.5 (o centro mais baixo fica atrás do portão).
-- No super pulo aparece o corte reto no alto do `pilar.png` (o telhado termina na borda
-  da imagem), igual aos pilares do Templo da Lua.
+- **Cidade**: o `cidade.png` fica a 4200, entre as árvores e as montanhas, com o centro
+  mais baixo atrás do portão. Quase todo escondido pelas árvores na câmera de repouso;
+  aparece quando a câmera afasta e no super pulo.
+- **Pilar**: o primeiro `pilar.png` tinha o telhado cortado pela borda de cima (o corte
+  aparecia no super pulo). Foi refeito no GPT editando o antigo, com o topo inteiro e
+  margem transparente em volta. O mesmo foi feito no pilar do Templo da Lua. Ao gerar
+  pilares, peça sempre o topo completo, sem tocar as bordas de cima e dos lados.
 - O ep02 usa este cenário na luta CONVITE do Ryūga × Yin-lu (`"cenario": "dojo_yinlu"`).
