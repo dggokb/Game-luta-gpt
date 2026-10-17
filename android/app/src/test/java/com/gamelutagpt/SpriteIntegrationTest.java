@@ -271,23 +271,24 @@ public class SpriteIntegrationTest {
         return BitmapFactory.decodeResource(r,id);
     }
 
-    @Test public void hdIdleDrawsAtCanonicalSizeAndKeepsRootInBothDirections()throws Exception {
+    @Test public void redrawnIdleDrawsAtCanonicalSizeAndKeepsRootInBothDirections()throws Exception {
         SpriteFighterRenderer renderer=(SpriteFighterRenderer)get("spriteFighterRenderer");
         CharacterDefinition character=renderer.character();
         CharacterDefinition.Animation idle=character.animation("IDLE");
-        assertEquals(2f,idle.atlas.pixelScale,0f);
-        assertEquals(76,idle.atlas.count);
-        assertEquals(76*.042f,idle.duration,.00001f);
+        assertEquals(317f/225f,idle.atlas.pixelScale,.000001f);
+        assertEquals(121,idle.atlas.count);
+        assertEquals(5.016667f,idle.duration,.00001f);
         Field field=SpriteFighterRenderer.class.getDeclaredField("destination");field.setAccessible(true);
         Bitmap screen=Bitmap.createBitmap(600,400,Bitmap.Config.ARGB_8888);
         Canvas canvas=new Canvas(screen);
         for(int facing:new int[]{1,-1}) {
-            renderer.motion.clip="IDLE";renderer.motion.time=75*.042f+.01f;
+            renderer.motion.clip="IDLE";renderer.motion.time=idle.timeOfFrame(120);
+            assertEquals("Render the last approved idle frame",120,renderer.motion.frame());
             renderer.draw(canvas,300f,300f,facing,false,false);
             RectF destination=(RectF)field.get(renderer);
             // O idle do P01 é desenhado no tamanho fixo do idle (P01_IDLE_SCALE), em volta da raiz.
             Field idleSize=SpriteFighterRenderer.class.getDeclaredField("P01_IDLE_SCALE");idleSize.setAccessible(true);
-            float scale=character.profile.worldScale/2f*idleSize.getFloat(null);
+            float scale=character.profile.worldScale/idle.atlas.pixelScale*idleSize.getFloat(null);
             // A folha pode vir reduzida para a tela (SpriteAtlasCache): o destino cobre a caixa do
             // quadro arredondada em pixels inteiros da folha menor, em volta da mesma raiz.
             float[] span=drawnSpan(renderer,idle.atlas,renderer.motion.frame());
@@ -538,10 +539,12 @@ public class SpriteIntegrationTest {
 
         float idleRatio=idleUpper/(float)walkUpper;
         float jabRatio=jabUpper/(float)walkUpper;
-        float heavyRatio=heavyUpper/(float)idleUpper;
+        // Heavy and walk still use the previous art master. Compare those legacy
+        // poses with each other; the approved redrawn idle has a new silhouette.
+        float heavyRatio=heavyUpper/(float)walkUpper;
         assertTrue("Idle off-model: "+idleRatio,idleRatio>=.94f && idleRatio<=1.12f);
         assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.14f);
-        assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
+        assertTrue("Heavy startup off walk model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
     }
     @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
         // The 4x4 movement grid of the drawn character (player_two); p01 uses one atlas per video clip.

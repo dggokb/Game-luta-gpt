@@ -97,7 +97,7 @@ public class P01CrouchMovementTest {
     @Test public void dashLoopIsSlowerWithoutAlteringSpeed() {
         CharacterDefinition.Animation dash=P01.animation(SpriteStates.DASH);
         assertEquals(.288f,dash.duration,.0001f);
-        assertEquals(6,dash.atlas.count);
+        assertEquals("The redrawn atlas keeps all approved frames",121,dash.atlas.count);
         assertEquals(620f,new CombatConfig().dashSpeed,.001f);
     }
 }
