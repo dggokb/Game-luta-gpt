@@ -45,6 +45,18 @@
       1.017
     ],
     "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_dash_video_normalized.png",
+      "celula": [
+        288,
+        256
+      ],
+      "raiz": [
+        143,
+        238
+      ],
+      "colunas": 6
+    },
     "regua": [
       "desfaz o fator óptico 0.880",
       "ajuste no app 20261014-0532: 86% (DASH)",
@@ -55,5 +67,8 @@
   "rootX": 286,
   "frameHeight": 512,
   "rootY": 476,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "sourceReferences": [
+    "art/sprites/source/p02_dash_video_normalized.png"
+  ]
 }
