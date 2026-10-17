@@ -78,8 +78,9 @@ public final class Campanha {
     }
 
     /**
-     * O jogador venceu uma luta com {@code lutador} (id do personagem) em campo. O duelo 1x1
-     * da regra escondida usa esse lutador contra o parceiro (não sempre o primeiro da dupla).
+     * O jogador venceu uma luta com {@code lutador} (id do personagem) em campo. No Arcade, o
+     * duelo 1x1 da regra escondida usa esse lutador contra o parceiro (não sempre o primeiro da
+     * dupla); na história, o duelo é sempre do líder (o irmão).
      */
     public void venceuCom(String lutador) {
         vencedor = lutador;
@@ -146,13 +147,14 @@ public final class Campanha {
         String[] jogador;
         String[] cpu;
         if (luta.duelo) {
-            // 1x1: quem venceu a final (estava em campo no fim) contra o próprio parceiro; sem
-            // esse registro (save antigo), o capitão da dupla.
+            // 1x1 contra o próprio parceiro. Na história, sempre o líder (o irmão escolhido,
+            // Ryūga ou Kōga), que é quem vai desafiar o Campeão. No Arcade, quem venceu a final
+            // (estava em campo no fim); sem esse registro (save antigo), o capitão da dupla.
             Torneio t = torneioSorteado();
             Torneio.Dupla dupla = t != null ? t.jogador() : duplaDo(irmao());
             if (dupla == null) return null;
             String[] l = dupla.lutadores;
-            int quem = l.length > 1 && l[1].equals(vencedor) ? 1 : 0;
+            int quem = arcade() && l.length > 1 && l[1].equals(vencedor) ? 1 : 0;
             return new String[][] {{l[quem]}, {l[1 - quem]}};
         }
         if (luta.emboscada) {

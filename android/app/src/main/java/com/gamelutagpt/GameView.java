@@ -4105,8 +4105,8 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * A campanha guarda quem da dupla do jogador estava em campo na vitória: o duelo 1x1 depois
-     * da final é com ele (contra o parceiro), não sempre com o primeiro da dupla.
+     * A campanha guarda quem da dupla do jogador estava em campo na vitória: no Arcade, o duelo
+     * 1x1 depois da final é com ele (contra o parceiro); na história é sempre com o líder.
      */
     private void registrarVencedor() {
         Campanha campanha = historia.campanha();

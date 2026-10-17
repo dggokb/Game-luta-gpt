@@ -85,8 +85,9 @@ public final class Episodio {
         /** Só toca para quem escolheu este irmão ("ryuga" / "koga"); null = para os dois. */
         public final String irmao;
         /**
-         * Duelo 1x1 da regra escondida: quem da dupla do jogador venceu a final (estava em campo
-         * no fim dela) contra o próprio parceiro ({@link Campanha#venceuCom}).
+         * Duelo 1x1 da regra escondida contra o próprio parceiro: na história, o líder (o irmão
+         * escolhido); no Arcade, quem da dupla do jogador venceu a final (estava em campo no fim
+         * dela, {@link Campanha#venceuCom}).
          */
         public final boolean duelo;
         /**

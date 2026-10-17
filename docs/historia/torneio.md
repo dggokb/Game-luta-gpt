@@ -85,8 +85,8 @@ luta do jogador (ou os campeões).
 | `{ "tipo": "chave" }` | a chave com os resultados até aqui e a próxima luta |
 | `{ "tipo": "luta", "torneio": true }` | luta contra o próximo adversário da chave; o rótulo é o nome da rodada (QUARTAS DE FINAL, SEMIFINAL, FINAL). No fim, a rodada inteira se resolve |
 | `{ "tipo": "luta", "emboscada": true }` | a emboscada fora da arena: o jogador contra a dupla que perdeu a outra quarta do lado dele (rótulo EMBOSCADA). Só toca entre as quartas e a semifinal |
-| `{ "tipo": "luta", "duelo": true }` | o duelo 1x1 da regra escondida: quem da dupla do jogador estava em campo ao vencer a final contra o outro (rótulo DUELO FINAL; sem registro, o capitão). Só toca se a dupla do jogador for campeã |
-| `"dupla": "jogador", "cpu": "rival"` | numa luta comum: a dupla fixa do irmão escolhido contra a do outro (o treino do ep01) |
+| `{ "tipo": "luta", "duelo": true }` | o duelo 1x1 da regra escondida: o líder da dupla do jogador (o irmão escolhido, Ryūga ou Kōga) contra o parceiro, seja quem for que estava em campo ao vencer a final (rótulo DUELO FINAL; no Arcade é quem venceu a final, veja [arcade.md](arcade.md)). Só toca se a dupla do jogador for campeã |
+| `"dupla": "jogador", "cpu": "rival"` | numa luta comum: a dupla fixa do irmão escolhido contra a do outro (com `"solo": true`, só os irmãos 1x1, como no treino do ep01) |
 | `"irmao": "ryuga"` ou `"koga"` | em qualquer passo: só toca na campanha desse irmão (páginas diferentes para cada lado) |
 
 Se o sorteio for pulado (PULAR), a chave é sorteada na primeira luta do torneio. Sem a
