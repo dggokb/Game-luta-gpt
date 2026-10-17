@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /** Reference-based selection: illustrated backdrop, isolated fighters and actual cropped faces. */
 final class CharacterSelectRenderer {
@@ -20,7 +23,18 @@ final class CharacterSelectRenderer {
     private final RectF box=new RectF();
     private final Matrix warp=new Matrix();
     private final float[] corners=new float[8], source=new float[8];
-    private final Map<String,Bitmap> faces=new HashMap<>(), heroes=new HashMap<>();
+    private final Map<String,Bitmap> faces=new HashMap<>();
+    /**
+     * Retratos em destaque, decodificados sob demanda numa thread à parte (só o que aparece e os
+     * vizinhos do cursor), para abrir a seleção sem decodificar os onze de uma vez. O valor
+     * {@link #SEM_ARTE} marca quem não tem arte.
+     */
+    private final Map<String,Bitmap> heroes=new ConcurrentHashMap<>();
+    private final Map<String,Boolean> heroesPedidos=new ConcurrentHashMap<>();
+    private static final Bitmap SEM_ARTE=Bitmap.createBitmap(1,1,Bitmap.Config.ARGB_8888);
+    private ExecutorService carregadorDeHerois;
+    /** O lado já estava mostrando a arte (senão, a entrada anima quando ela chegar). */
+    private final boolean[] heroVisible=new boolean[2];
     private final Typeface bold=Typeface.create("sans-serif-condensed",Typeface.BOLD_ITALIC);
     private final Typeface regular=Typeface.create("sans-serif-condensed",Typeface.NORMAL);
     private Bitmap backdrop,stageArt;
@@ -52,13 +66,6 @@ final class CharacterSelectRenderer {
         flashPaint.setColorFilter(new PorterDuffColorFilter(0xFFFFFFFF,PorterDuff.Mode.SRC_ATOP));
         backdrop=read("selection/art/backdrop.png",1);
         stageArt=read("selection/art/reference_stage.png",1);
-        // P05 already uses the exact upper-right action pose from its concept.
-        // P01 and the corrected P02/P03/P04/P08 now have their own isolated assets.
-        Bitmap atlas=read("selection/art/heroes_p02_p05.png",1);
-        if(atlas!=null) {
-            int w=atlas.getWidth()/2,h=atlas.getHeight()/2;
-            heroes.put("p05",Bitmap.createBitmap(atlas,w,h,w,h));atlas.recycle();
-        }
         // Locked slots show only the P09–P16 concepts that are not playable yet.
         java.util.List<String> playable=java.util.Arrays.asList(GeneratedCharacters.SELECTABLE);
         for(int n=9,i=0;n<=16&&i<8;n++) {
@@ -66,8 +73,14 @@ final class CharacterSelectRenderer {
             if(playable.contains(id))continue;
             futureIds[i]=id;futureFaces[i++]=face(id);
         }
-        // Decode before the render loop; changing a selection never loads a full model sheet.
-        for(String id:GeneratedCharacters.SELECTABLE) { face(id);heroArt(id); }
+        // Os rostos da grade aparecem todos juntos: pequenos, já recortados
+        // (tools/selection/gerar_selecao.py). Os retratos grandes vêm sob demanda (heroArt).
+        for(String id:GeneratedCharacters.SELECTABLE) face(id);
+    }
+
+    /** Começa a decodificar os retratos desses lutadores (a seleção vai abrir com eles). */
+    void prepararHerois(String... ids) {
+        for(String id:ids) if(id!=null) pedirHeroi(id);
     }
     /** HUD close-ups stay independent from the selection artwork. */
     Bitmap hudPortrait(CharacterDefinition character) {return hudConcepts.get(character.id);}
@@ -81,6 +94,9 @@ final class CharacterSelectRenderer {
             box.set(0,0,1280,720);c.drawBitmap(backdrop,null,box,imagePaint);
         }
         ambient(c);
+        // Os vizinhos do cursor já ficam prontos: andar pela grade não espera decodificação.
+        int cursor=s.cursorIndex(),n=s.ids.length;
+        pedirHeroi(s.ids[(cursor+1)%n]);pedirHeroi(s.ids[(cursor+n-1)%n]);
         hero(c,s.preview(0),0);
         // Arcade (só a dupla do jogador): o lado do CPU vem do sorteio da chave.
         if(!s.solo())hero(c,s.preview(1),1);
@@ -99,7 +115,10 @@ final class CharacterSelectRenderer {
 
     private void hero(Canvas c,String id,int side) {
         Bitmap b=heroArt(id);
-        if(b==null)return;
+        if(b==null) {heroVisible[side]=false;return;}
+        // A arte chegou depois da troca: a entrada anima a partir de agora (não aparece pronta).
+        if(!heroVisible[side]&&observedPicks&&now-heroChangedAt[side]>40)heroChangedAt[side]=now;
+        heroVisible[side]=true;
         c.save();
         c.clipRect(side==0?0:906,44,side==0?374:1280,687);
         // Wide action concepts need the same vertical presence as portrait art.
@@ -517,41 +536,34 @@ final class CharacterSelectRenderer {
     }
 
     private String assetId(String id) {return "player_base".equals(id)?"p01":id;}
+    /** O retrato pronto, ou null enquanto decodifica (ou se não existe); pede se ainda não pediu. */
     private Bitmap heroArt(String id) {
-        if(heroes.containsKey(id))return heroes.get(id);
-        Bitmap b=read("selection/art/hero_"+assetId(id)+".png",2);
-        heroes.put(id,b);return b;
+        if(id==null)return null;
+        Bitmap b=heroes.get(id);
+        if(b==null){pedirHeroi(id);return null;}
+        return b==SEM_ARTE?null:b;
+    }
+
+    private void pedirHeroi(String id) {
+        if(heroesPedidos.putIfAbsent(id,Boolean.TRUE)!=null)return;
+        synchronized(this) {
+            if(carregadorDeHerois==null) carregadorDeHerois=Executors.newSingleThreadExecutor(r->{
+                Thread t=new Thread(r,"Selecao");t.setDaemon(true);
+                t.setPriority(Math.max(Thread.MIN_PRIORITY,Thread.NORM_PRIORITY-1));
+                return t;
+            });
+        }
+        carregadorDeHerois.execute(()->{
+            // Metade do hero original, já reduzida (tools/selection/gerar_selecao.py).
+            Bitmap b=read("selection/art/tela/hero_"+assetId(id)+".webp",1);
+            heroes.put(id,b!=null?b:SEM_ARTE);
+        });
     }
 
     private Bitmap face(String id) {
         if(faces.containsKey(id))return faces.get(id);
-        Bitmap sheet=read("selection/portraits/"+assetId(id)+".png",1);
-        Bitmap b=null;
-        if(sheet!=null) {
-            // Exact source ROIs, normalized to the original sheet. Never show the whole sheet.
-            float l=.805f,t=.027f,r=.991f,bottom=.312f;
-            switch(assetId(id)) {
-                case "p02":l=.79f;t=.012f;r=.992f;bottom=.252f;break;
-                case "p03":l=.796f;t=.014f;r=.992f;bottom=.311f;break;
-                case "p04":l=.809f;t=.023f;r=.991f;bottom=.323f;break;
-                case "p05":l=.007f;t=.67f;r=.202f;bottom=.985f;break;
-                case "p06":l=.552f;t=.601f;r=.768f;bottom=.992f;break;
-                case "p07":l=.011f;t=.668f;r=.231f;bottom=.982f;break;
-                case "p08":l=.008f;t=.594f;r=.208f;bottom=.985f;break;
-                case "p09":l=.012f;t=.751f;r=.242f;bottom=.99f;break;
-                case "p10":l=.009f;t=.709f;r=.254f;bottom=.974f;break;
-                case "p11":l=.601f;t=.386f;r=.791f;bottom=.688f;break;
-                case "p12":l=.807f;t=.014f;r=.991f;bottom=.323f;break;
-                case "p13":l=.008f;t=.632f;r=.275f;bottom=.988f;break;
-                case "p14":l=.009f;t=.631f;r=.275f;bottom=.99f;break;
-                case "p15":l=.625f;t=.472f;r=.803f;bottom=.769f;break;
-                case "p16":l=.812f;t=.025f;r=.992f;bottom=.326f;break;
-            }
-            int x=Math.round(l*sheet.getWidth()),y=Math.round(t*sheet.getHeight());
-            int w=Math.round((r-l)*sheet.getWidth()),h=Math.round((bottom-t)*sheet.getHeight());
-            b=Bitmap.createBitmap(sheet,x,y,Math.max(1,w),Math.max(1,h));
-            if(b!=sheet)sheet.recycle();
-        }
+        // O recorte do rosto na folha de conceito, já pronto (tools/selection/gerar_selecao.py).
+        Bitmap b=read("selection/rostos/"+assetId(id)+".webp",1);
         faces.put(id,b);return b;
     }
 
