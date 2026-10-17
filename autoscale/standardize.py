@@ -239,7 +239,7 @@ def main():
     target_ppm = px_per_metre(pose)                      # every frame is scaled to the master's body size
     mh = rgba[:, :, 3] > 32; ys = np.nonzero(mh.any(axis=1))[0]
     log(f'master {a.master}: {target_ppm:.1f} px/m, silhouette height {ys[-1]-ys[0]} px')
-    report = {'sources': str(sources), 'master': {'file': a.master, 'px_per_metre': target_ppm}, 'clips': {}}
+    report = {'sources': str(sources), 'master': {'file': a.master, 'px_per_metre': target_ppm}, 'background': background, 'clips': {}}
     canvas, root = (1100, 800), (550, 740)
     results = {}
     for clip_name in a.clips:
