@@ -63,6 +63,23 @@ jobs:
         working-directory: android
         run: gradle :pc:test -Ppython=python --stacktrace
 
+      # Falhou: cada teste que caiu vira anotação do job (dá para ler pela API do GitHub, sem
+      # baixar o log inteiro), com a mensagem e o começo da pilha.
+      - name: Reportar testes que falharam
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob, re, xml.etree.ElementTree as ET
+          def clean(text):
+              return re.sub(r'\s+', ' ', text or '').strip()[:600]
+          for path in glob.glob('android/**/build/test-results/**/*.xml', recursive=True):
+              for case in ET.parse(path).getroot().iter('testcase'):
+                  for bad in case.findall('failure') + case.findall('error'):
+                      pilha = ' | '.join((bad.text or '').splitlines()[:6])
+                      print(f"::error title=Teste {case.get('classname')}.{case.get('name')} ({case.get('time')} s)::{clean(bad.get('message'))} || {clean(pilha)}")
+          PY
+
       - name: Testes do motor no build de PC (informativo)
         if: matrix.sistema == 'linux'
         continue-on-error: true
