@@ -179,6 +179,14 @@ public class TorneioTest {
         assertEquals("player_base", lados[0][0]);
         assertEquals("p02", lados[1][0]);
         assertEquals(Campanha.DUELO, c.rotulo(duelo.passos.get(0)));
+        // "solo": o treino do ep01 é 1x1, só os irmãos (sem troca).
+        Episodio solo = Episodio.fromJson("{\"id\":\"e\",\"passos\":[" +
+            "{\"tipo\":\"luta\",\"dupla\":\"jogador\",\"cpu\":\"rival\",\"solo\":true}]}");
+        String[][] irmaos = c.lados(solo.passos.get(0));
+        assertEquals(1, irmaos[0].length);
+        assertEquals(1, irmaos[1].length);
+        assertEquals("player_base", irmaos[0][0]);
+        assertEquals("p03", irmaos[1][0]);
         assertFalse("o duelo só vale para a dupla campeã", c.vale(duelo.passos.get(0)));
     }
 

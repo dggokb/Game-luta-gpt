@@ -1,5 +1,5 @@
 {
-  "_comentario": "Treino do Episódio 1 (jogador × rival). Quando um dos dois chega a 25% de vida, a luta vira cena: o golpe fica em câmera lenta enquanto as faixas entram, quem estiver na vez troca com o irmão (2x2), os dois saltam para trás, se encaram, a câmera vai em cada um quando grita o nome do outro, eles correm, a corrida entra em câmera lenta e a campainha (as cartas chegando) congela tudo. Cada irmão fala no quadro do lado da tela em que está. Motor e formato: docs/historia/motor-cinematicas.md.",
+  "_comentario": "Treino do Episódio 1 (jogador × rival). Quando um dos dois chega a 25% de vida, a luta vira cena: o golpe fica em câmera lenta enquanto as faixas entram, (a luta é 1x1, \"solo\" no episódio; num 2x2 quem estivesse na vez trocaria com o irmão) os dois saltam para trás, se encaram, a câmera vai em cada um quando grita o nome do outro, eles correm, a corrida entra em câmera lenta e a campainha (as cartas chegando) congela tudo. Cada irmão fala no quadro do lado da tela em que está. Motor e formato: docs/historia/motor-cinematicas.md.",
   "gatilho": { "vida": 0.25 },
   "acoes": [
     { "acao": "controle", "travar": true },
