@@ -383,10 +383,12 @@ public class GameView extends SurfaceView
     }
 
     /**
-     * {@code emSegundoPlano}: a arte pesada (folhas dos lutadores, seleção, cenário, ultras) é
-     * decodificada na thread "Carregando", com a tela de carregamento na frente. Decodificar
-     * isso na thread principal levava vários segundos, e um toque nesse meio-tempo virava
-     * "não está respondendo" (ANR). Testes e PC continuam carregando tudo na hora.
+     * {@code emSegundoPlano}: a arte pesada (folhas dos lutadores, seleção, cenário, ultras) só
+     * é decodificada quando o jogador sai do menu inicial ({@link #comArteDaLuta}), na thread
+     * "Carregando", com a tela de carregamento na frente. O menu não usa nada disso: carregar
+     * tudo antes dele deixava a abertura do app lenta (as folhas de dois lutadores sozinhas
+     * levam vários segundos), e decodificar na thread principal virava "não está respondendo"
+     * (ANR). Testes e PC continuam carregando tudo na hora.
      */
     public GameView(Context context, boolean emSegundoPlano) {
         super(context);
@@ -428,11 +430,27 @@ public class GameView extends SurfaceView
         holder.addCallback(this);
         setFocusable(true);
         setKeepScreenOn(true);
-        if (emSegundoPlano) {
-            // O loop do jogo começa por esta fila: tela de carregamento e a thread "Carregando".
-            loadQueue.add(() -> carregarArte(context));
+        contextoArte = context;
+        if (!emSegundoPlano) carregarArte(context);
+    }
+
+    /** Contexto para a arte da luta, carregada na primeira saída do menu inicial. */
+    private final Context contextoArte;
+    /** A arte da luta (HUD, folhas, cenário, seleção, ultras) já foi carregada. */
+    private volatile boolean arteCarregada;
+
+    /**
+     * Roda {@code acao} com a arte da luta pronta: na primeira vez, carrega antes (com a tela
+     * de carregamento); depois, na hora.
+     */
+    private void comArteDaLuta(Runnable acao) {
+        if (arteCarregada) {
+            acao.run();
         } else {
-            carregarArte(context);
+            carregando(() -> {
+                if (!arteCarregada) carregarArte(contextoArte);
+                acao.run();
+            });
         }
     }
 
@@ -453,6 +471,7 @@ public class GameView extends SurfaceView
         stageScene = loadStage(ultraAssets, stageId);
         characterSelectRenderer = new CharacterSelectRenderer(context);
         loadTeamUltras();
+        arteCarregada = true;
     }
 
     private static String[] selectionRoster() {
@@ -850,15 +869,10 @@ public class GameView extends SurfaceView
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (!introPlayed) {
             introPlayed = true;
-            Runnable abrir = () -> {
-                startIntro();
-                // O app abre no menu inicial: MODO HISTÓRIA ou MODO TESTE (a luta de teste de antes).
-                openMainMenu();
-            };
-            // Arte ainda na fila (o loop ainda não começou): o menu abre depois dela, na mesma
-            // thread de carregamento, e não aqui na thread da UI.
-            if (!running && !loadQueue.isEmpty()) loadQueue.add(abrir);
-            else abrir.run();
+            // O app abre no menu inicial: MODO HISTÓRIA ou MODO TESTE (a luta de teste de antes).
+            // O menu é leve; a arte da luta carrega quando o jogador sair dele.
+            startIntro();
+            openMainMenu();
         }
         surfaceReady = true;
         startLoopIfReady();
@@ -1046,8 +1060,9 @@ public class GameView extends SurfaceView
             Integer key;
             while ((key = selectionKeys.poll()) != null) handleMenuKey(key);
             MenuInicial.Opcao escolha = menuInicial.update(FIXED_STEP);
-            if (escolha == MenuInicial.Opcao.HISTORIA) startStoryMode();
-            else if (escolha == MenuInicial.Opcao.TESTE) startTestMode();
+            // A arte da luta só carrega aqui, na primeira saída do menu (o menu abre na hora).
+            if (escolha == MenuInicial.Opcao.HISTORIA) comArteDaLuta(this::startStoryMode);
+            else if (escolha == MenuInicial.Opcao.TESTE) comArteDaLuta(this::startTestMode);
             return;
         }
         if (capitulos.isOpen()) {
