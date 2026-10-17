@@ -182,13 +182,24 @@
       "periodo": 1.1
     },
     {
-      "id": "frente-lixo",
-      "imagem": "frente_lixo.png",
+      "id": "frente-sacos",
+      "imagem": "frente_esq.png",
       "profundidade": -250,
       "noChao": true,
-      "altura": 0.22,
-      "x": 0.04,
-      "repetir": "espelhar",
+      "altura": 0.3,
+      "x": 0.05,
+      "repetir": "repetir",
+      "periodo": 1.9,
+      "alfa": 0.95
+    },
+    {
+      "id": "frente-barril",
+      "imagem": "frente_dir.png",
+      "profundidade": -250,
+      "noChao": true,
+      "altura": 0.26,
+      "x": 0.96,
+      "repetir": "repetir",
       "periodo": 1.9,
       "alfa": 0.95
     }

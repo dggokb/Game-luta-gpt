@@ -13,9 +13,9 @@ Além do que o preparar_cenario.py faz (cortar margens transparentes, alfa opaco
 - Prédios, cerca e lixo: o GPT desenhou uma faixa de chão molhado com reflexos embaixo.
   Ela é cortada (o jogo faz o piso e o reflexo); senão a camada fica com um degrau de chão
   pintado embaixo. No predio_dir.png, o lixo encostado nas bordas é esfumado.
-- Primeiro plano: o frente.png veio como um beco inteiro em perspectiva (paredes até o
-  topo), que não serve de primeiro plano. No lugar dele, o lixo.png desfocado vira o
-  frente_lixo.png.
+- Primeiro plano: frente_esq.png (sacos de lixo e caixa) e frente_dir.png (cavalete e
+  barril) são desfocados, como no Shūshinkan. O frente.png antigo (um beco inteiro em
+  perspectiva) é ignorado.
 
 Grava em android/app/src/main/assets/stages/beco_brucy/ sem mexer no stage.json.
 """
@@ -90,14 +90,14 @@ def esfumar_bordas(img, fracao=0.05):
     return Image.fromarray(px.clip(0, 255).astype(np.uint8))
 
 
-def frente_lixo(lixo, pasta):
-    """lixo.png desfocado para o primeiro plano (o separar_frente desfoca as duas metades)."""
+def desfocar(img, pasta, nome):
+    """Desfoca um objeto de primeiro plano (o separar_frente desfoca as duas metades)."""
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
-        larga = Image.new("RGBA", (lixo.width * 2, lixo.height), (0, 0, 0, 0))
-        larga.paste(lixo, (0, 0))
+        larga = Image.new("RGBA", (img.width * 2, img.height), (0, 0, 0, 0))
+        larga.paste(img.convert("RGBA"), (0, 0))
         separar_frente(larga, tmp)
-        shutil.copy(tmp / "frente_esq.png", pasta / "frente_lixo.png")
+        shutil.copy(tmp / "frente_esq.png", pasta / f"{nome}.png")
 
 
 def main():
@@ -107,7 +107,7 @@ def main():
     args = parser.parse_args()
 
     entrada = {p.stem: p for p in args.entrada.iterdir() if p.suffix.lower() in EXTENSOES}
-    for falta in ("chao", "chao_asfalto", "lixo"):
+    for falta in ("chao", "chao_asfalto", "frente_esq", "frente_dir"):
         if falta not in entrada:
             sys.exit(f"faltou {falta}.png em {args.entrada}")
     args.saida.mkdir(parents=True, exist_ok=True)
@@ -120,13 +120,14 @@ def main():
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_asfalto", "frente"):
                 continue
+            if nome in ("frente_esq", "frente_dir"):
+                desfocar(Image.open(arquivo), tmp, nome)
+                continue
             img = Image.open(arquivo)
             if nome in CORTE_BASE:
                 img = cortar_base(img, CORTE_BASE[nome])
             if nome == "predio_dir":
                 img = esfumar_bordas(img)
-            if nome == "lixo":
-                frente_lixo(img, tmp)
             if img.mode in ("RGBA", "LA", "P"):
                 img.save(tmp / f"{nome}.png")
             else:
@@ -135,7 +136,7 @@ def main():
             saida, tamanho = preparar(arquivo, args.saida)
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
     if "frente" in entrada:
-        print("frente.png ignorado: veio como um beco inteiro em perspectiva (veja o README)")
+        print("frente.png ignorado: o primeiro plano agora é frente_esq.png e frente_dir.png")
 
 
 if __name__ == "__main__":

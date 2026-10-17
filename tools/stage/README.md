@@ -351,11 +351,10 @@ python tools/stage/montar_brucy.py --entrada pasta/com/as/imagens
   borda suave. O piso vai de −600 a 750 e o bueiro fica entre os lutadores.
 - **Faixa de chão pintada**: os prédios, a cerca e o lixo vieram com uma faixa de chão
   molhado com reflexo embaixo. O script corta essa faixa (o jogo faz o piso e o reflexo).
-- **Primeiro plano**: o `frente.png` veio como um beco inteiro em perspectiva, com paredes
-  até o topo da imagem, e ficou de fora. No lugar dele, o `lixo.png` desfocado
-  (`frente_lixo.png`) passa na frente dos lutadores a −250. O prompt foi refeito em duas
-  imagens separadas, `frente_esq.png` e `frente_dir.png`, só com os objetos: pedir um
-  "beco com o meio transparente" fazia o GPT desenhar a cena inteira em perspectiva.
+- **Primeiro plano**: `frente_esq.png` (sacos de lixo e caixa) e `frente_dir.png` (cavalete
+  e barril), desfocados, a −250 nos dois cantos. O primeiro `frente.png` veio como um beco
+  inteiro em perspectiva e ficou de fora: pedir um "beco com o meio transparente" fazia o
+  GPT desenhar a cena toda. Pedir só os objetos, em duas imagens, resolveu.
 - **Composição** (profundidades): lixo 170, vapor 300, prédios 380 (o de grafite à esquerda
   e o da porta de enrolar à direita, alternando a cada 0,9 tela), cerca 750 (fim do piso),
   viaduto 1500, cidade 4500, céu. A cidade desce até 0,66 da tela: no super pulo o rio
