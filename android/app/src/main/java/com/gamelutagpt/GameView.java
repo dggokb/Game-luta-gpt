@@ -460,6 +460,8 @@ public class GameView extends SurfaceView
     private java.util.concurrent.FutureTask<CharacterSelectRenderer> selecaoAntecipada;
     private java.util.concurrent.FutureTask<StageScene> cenarioAntecipado;
     private String cenarioAntecipadoId;
+    /** Sorteio do cenário de cada luta do Arcade. */
+    private final Random sorteioCenario = new Random();
     /** A última combinação de lutadores antecipada (não repete a cada quadro). */
     private String lutadoresAntecipados = "";
     /** A luta da história cujas duplas já foram antecipadas. */
@@ -1019,6 +1021,27 @@ public class GameView extends SurfaceView
         stageScene = null;
         stageId = wanted;
         stageScene = loadStage(ultraAssets, wanted);
+    }
+
+    /**
+     * Arcade: um cenário sorteado entre as pastas de assets/stages que têm stage.json, sem
+     * repetir o da luta anterior (quando há mais de um). Null (o padrão) se não achar nenhum.
+     */
+    private String sortearCenario() {
+        java.util.List<String> opcoes = new java.util.ArrayList<>();
+        try {
+            String[] pastas = getContext().getAssets().list("stages");
+            if (pastas != null) {
+                for (String id : pastas) {
+                    String[] arquivos = getContext().getAssets().list("stages/" + id);
+                    if (arquivos != null && java.util.Arrays.asList(arquivos).contains("stage.json")) opcoes.add(id);
+                }
+            }
+        } catch (IOException ex) {
+            Log.w(LOG_TAG, "sem a lista de cenários para o Arcade", ex);
+        }
+        if (opcoes.size() > 1) opcoes.remove(stageId);
+        return opcoes.isEmpty() ? null : opcoes.get(sorteioCenario.nextInt(opcoes.size()));
     }
 
     private static StageScene loadStage(AndroidRenderAssets assets, String id) {
@@ -4147,8 +4170,9 @@ public class GameView extends SurfaceView
     }
 
     private void startStoryFight(Episodio.Passo luta) {
-        // Cada luta pode pedir o seu cenário (o treino é no dojo).
-        useStage(luta.cenario);
+        // Cada luta pode pedir o seu cenário (o treino é no dojo). No Arcade, por enquanto,
+        // a luta sem cenário próprio sorteia um.
+        useStage(luta.cenario != null || !arcadeMode ? luta.cenario : sortearCenario());
         // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA
         // e as lições dizem o que ele faz.
         setOpponentAiEnabled(!luta.tutorial());

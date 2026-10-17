@@ -42,6 +42,10 @@ O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um
 
 - **Cada luta tem 120 segundos**; no TIME OVER vence a dupla com mais vida (regra em
   `docs/combat-engine.md`). **Empate conta como derrota.**
+- **Cenário sorteado** (por enquanto): cada luta sem `"cenario"` no passo sorteia uma pasta de
+  `assets/stages` com `stage.json` (hoje Templo da Lua, Dojo Shūshinkan e Dojo da Yin-Lu), sem
+  repetir o da luta anterior (`GameView.sortearCenario`). A luta repetida depois de uma derrota
+  sorteia de novo.
 - **Perder repete a luta** (o "continuar" do Arcade). A pausa (◀ MENU ou voltar) tem MENU INICIAL,
   com o aviso "Voltar ao menu encerra o Arcade."
 - **A CPU sobe de nível a cada luta** (`NivelCpu`, o mesmo do modo história): começa no NÍVEL
