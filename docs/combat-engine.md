@@ -218,6 +218,22 @@ O fluxo da luta fica em `BattleFlow` (Java puro, em frames), chamado depois de c
   - Parceiro caído não vem mais de assist, troca, Guard Cancel nem DHC.
   - Fim: K.O. (`KO_FRAMES`), o resultado (VITÓRIA / DERROTA / EMPATE, `RESULT_FRAMES`) e a
     luta recomeça com as mesmas duplas. Só o vencedor final comemora.
+- **Tempo: 99 segundos** (`TIME_LIMIT_SECONDS`, 60 quadros por segundo) só na batalha; no treino
+  a HUD mostra ∞.
+  - O relógio começa a contar no GO e **para** no congelamento do Super e do Ultra (cinemática,
+    Página Final, raio), na pausa e enquanto uma cena da história tem o controle. Hitstop
+    normal não para o relógio.
+  - Nos últimos 10 segundos (`URGENT_SECONDS`) o número fica vermelho e pulsa.
+  - **Zerou sem K.O.: TIME OVER** no lugar do K.O. e vence a dupla com **mais vida, em
+    proporção da vida total da dupla** (soma da vida dos dois sobre a soma da vida máxima;
+    o vermelho recuperável não conta; `TeamSystem.moreLife`, em inteiros). Vida igual: EMPATE.
+    K.O. no mesmo quadro do zero vale como K.O.
+  - Depois do TIME OVER ninguém se mexe nem cai mais (os comandos são ignorados e a vida tem
+    piso 1); o vencedor comemora com o rival de pé.
+  - História: enquanto uma cena espera a vida baixar ou o K.O. (ou está rodando), o relógio
+    fica parado e a HUD mostra ∞ (`BattleFlow.setClockHeld`) — a cena decide o fim, não o
+    tempo. Na história e no Arcade o EMPATE conta como derrota (no Arcade, e nas lutas com
+    `repetirSeDerrota`, a luta se repete).
 - As lutas da história são batalhas (o treino do tutorial não): a página volta quando uma
   dupla inteira cai.
 - **O CPU usa o kit inteiro na batalha** (`AiController.setFullKit`), com sorteios próprios

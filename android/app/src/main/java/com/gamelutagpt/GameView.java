@@ -1187,16 +1187,22 @@ public class GameView extends SurfaceView
                 ai.fill(engine, OPPONENT, opponentInput);
             }
         }
-        if (player().ko() || opponent().ko()) {
-            // Inputs must not start a new attack/move once the match is over.
+        if (player().ko() || opponent().ko() || flow.over()) {
+            // Inputs must not start a new attack/move once the match is over (K.O. or TIME OVER).
             playerInput.clear();
             opponentInput.clear();
         }
         // Com a cinemática esperando a vida baixa (ou rodando), ninguém cai antes da cena.
-        protegerVida(cinematica.protegeVida());
+        // Depois do TIME OVER o resultado já está decidido: ninguém cai mais.
+        protegerVida(cinematica.protegeVida() || flow.timeOver());
         engine.step(playerInput, opponentInput);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
-        flow.update(engine, ultraAttacker < 0 && !engine.ultraSequenceRunning());
+        boolean fightFree = ultraAttacker < 0 && !engine.ultraSequenceRunning();
+        // Cena da história esperando a vida baixar (ou o K.O.), ou rodando: o relógio espera.
+        flow.setClockHeld(cinematica.protegeVida() || cinematica.seguraFimDaLuta() || demo.active());
+        // O relógio para no congelamento do Super/Ultra e enquanto a cena tem o controle.
+        boolean clockRuns = fightFree && !engine.superFreezeActive() && !cinematica.controleTravado();
+        flow.update(engine, fightFree, clockRuns);
         updateOpponentVisuals();
         if (flow.restartDue() && !historia.waitingFight() && !tutorial.active()) restartBattle();
         demo.afterStep();
@@ -1327,6 +1333,8 @@ public class GameView extends SurfaceView
         }
         @Override public FighterState opponentReserve() { return engine.team(OPPONENT).partner(); }
         @Override public boolean battleActive() { return flow.battle(); }
+        @Override public String clockLabel() { return flow.clockLabel(); }
+        @Override public boolean clockUrgent() { return flow.clockUrgent(); }
         @Override public float opponentTagReadyRatio() {
             TeamSystem.Side cpu = engine.team(OPPONENT);
             if (!cpu.partnerStanding() || cpu.tagging() || cpu.assistOut()) return 0f;
@@ -2703,7 +2711,9 @@ public class GameView extends SurfaceView
         boolean onPoint = f == engine.fighter(side);
         // No 2x2 só se comemora quando a dupla inteira do outro lado caiu.
         boolean matchWon = !flow.battle() || flow.over();
-        boolean celebrating = animation == null && onPoint && matchWon && rival.ko() && !f.ko() && f.grounded &&
+        // No TIME OVER o rival fica de pé: comemora quem tinha mais vida.
+        boolean beatRival = rival.ko() || (flow.timeOver() && flow.winner() == side);
+        boolean celebrating = animation == null && onPoint && matchWon && beatRival && !f.ko() && f.grounded &&
             f.status == CombatFighter.Status.NEUTRAL && !f.attacking() && renderer.hasAnimation(SpriteStates.VICTORY);
         if (celebrating) {
             // Opponent KO: the winner plays VICTORY once and holds its last pose.

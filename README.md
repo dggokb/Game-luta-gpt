@@ -302,7 +302,9 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
 - **IA OFF** continua sendo o treino (no Templo da Lua): CPU só com o titular, KO não encerra.
 - **IA ON** é a **batalha de verdade, 2x2**: ligar a IA começa uma luta nova; o CPU luta com a
   dupla dele, o titular que cai é substituído pelo parceiro e **o time só perde quando os dois
-  da dupla caem**. Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
+  da dupla caem**. Cada batalha tem **99 segundos**: se o tempo zerar sem K.O., TIME OVER e
+  vence a dupla com mais vida (proporção da vida total; igual é empate). O treino segue com
+  tempo infinito (∞). Depois vem K.O., VITÓRIA/DERROTA e a luta recomeça. As lutas da história
   também usam essa regra. Na batalha o CPU usa tudo: assist, troca, Assist → Tag, Super,
   DHC, Guard Cancel, pushblock, Overdrive e Ultra. Detalhes: `docs/combat-engine.md` (seção Modo batalha 2x2).
 
