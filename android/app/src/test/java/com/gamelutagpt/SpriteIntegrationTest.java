@@ -322,23 +322,30 @@ public class SpriteIntegrationTest {
         float top=box[5]+Math.round(box[1]*ey)/ey-box[1],bottom=box[5]+Math.round((box[1]+box[3])*ey)/ey-box[1];
         return new float[]{left,right,top,bottom};
     }
-    /** Every packed cell of the attack atlas holds one whole pose with a safety margin. */
+    /**
+     * Every frame of the attack atlas holds one whole pose with a safety margin inside its
+     * logical cell. The shipped sheet keeps only the box around each drawing
+     * (tools/sprites/folhas.py): the box is read back into its place in the cell.
+     */
     private void assertAttackAtlasCellsAreWhole(String animation) {
         CharacterDefinition.Atlas a=GeneratedCharacters.defaultCharacter().animation(animation).atlas;
         Bitmap atlas=atlasBitmap(a);
         assertNotNull(atlas);
-        assertEquals(a.columns*a.width,atlas.getWidth());
-        assertEquals((a.count+a.columns-1)/a.columns*a.height,atlas.getHeight());
+        assertEquals(a.sheetWidth,atlas.getWidth());
+        assertEquals(a.sheetHeight,atlas.getHeight());
         assertTrue(a.rootX>0 && a.rootX<a.width);
         assertTrue(a.rootY>0 && a.rootY<a.height);
+        int[] box=new int[6];
         for(int i=0;i<a.count;i++) {
-            int left=(i%a.columns)*a.width,top=(i/a.columns)*a.height;
+            assertTrue("Empty "+animation+" frame "+i,a.frame(i,box));
             int count=0,minX=a.width,minY=a.height,maxX=-1,maxY=-1;
-            for(int y=0;y<a.height;y++)for(int x=0;x<a.width;x++) {
-                if(Color.alpha(atlas.getPixel(left+x,top+y))>10) {
+            for(int y=0;y<box[3];y++)for(int x=0;x<box[2];x++) {
+                int cx=box[4]+x,cy=box[5]+y;
+                if(cx>=a.width||cy>=a.height)continue;
+                if(Color.alpha(atlas.getPixel(box[0]+x,box[1]+y))>10) {
                     count++;
-                    minX=Math.min(minX,x);maxX=Math.max(maxX,x);
-                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);
+                    minX=Math.min(minX,cx);maxX=Math.max(maxX,cx);
+                    minY=Math.min(minY,cy);maxY=Math.max(maxY,cy);
                 }
             }
             assertTrue("Empty "+animation+" frame "+i,count>10000);
@@ -443,13 +450,17 @@ public class SpriteIntegrationTest {
         );
 
         assertNotNull(idle);assertNotNull(jab);
-        // The idle is a long video-derived loop: its grid follows the frame count.
-        assertEquals(0,idle.getWidth()%GeneratedSpriteLayouts.IDLE_FRAME_WIDTH);
-        assertEquals(0,idle.getHeight()%GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT);
-        assertTrue(idle.getWidth()/GeneratedSpriteLayouts.IDLE_FRAME_WIDTH
-            *(idle.getHeight()/GeneratedSpriteLayouts.IDLE_FRAME_HEIGHT)>=GeneratedSpriteLayouts.IDLE_FRAME_COUNT);
-        assertEquals(0,jab.getWidth()%GeneratedSpriteLayouts.JAB_FRAME_WIDTH);
-        assertEquals(0,jab.getHeight()%GeneratedSpriteLayouts.JAB_FRAME_HEIGHT);
+        // The shipped sheets keep one box per frame (tools/sprites/folhas.py): the image has the
+        // generated size and the frame table has every frame of the loop.
+        CharacterDefinition.Atlas idleAtlas=GeneratedCharacters.defaultCharacter().animation("IDLE").atlas;
+        CharacterDefinition.Atlas jabAtlas=GeneratedCharacters.defaultCharacter().animation("LIGHT_JAB").atlas;
+        assertEquals(idleAtlas.sheetWidth,idle.getWidth());
+        assertEquals(idleAtlas.sheetHeight,idle.getHeight());
+        assertEquals(GeneratedSpriteLayouts.IDLE_FRAME_WIDTH,idleAtlas.width);
+        assertTrue(idleAtlas.count>=GeneratedSpriteLayouts.IDLE_FRAME_COUNT);
+        assertEquals(jabAtlas.sheetWidth,jab.getWidth());
+        assertEquals(jabAtlas.sheetHeight,jab.getHeight());
+        assertEquals(GeneratedSpriteLayouts.JAB_FRAME_WIDTH,jabAtlas.width);
         // Packing never grows past the canonical 256x256 authoring cell (the HD idle has 2 atlas
         // pixels per cell pixel).
         float idleScale=GeneratedCharacters.defaultCharacter().animation("IDLE").atlas.pixelScale;
@@ -537,10 +548,19 @@ public class SpriteIntegrationTest {
         Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_two_movement);
         assertNotNull(atlas);assertTrue(atlas.hasAlpha());
         int fw=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_WIDTH,fh=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_HEIGHT;
-        assertEquals(4*fw,atlas.getWidth());assertEquals(4*fh,atlas.getHeight());
+        // One box per frame in the sheet (tools/sprites/folhas.py), read back inside its cell.
+        CharacterDefinition.Atlas a=GeneratedCharacters.get("player_two").animation("WALK_FORWARD").atlas;
+        assertEquals("player_two_movement",a.resource);
+        assertEquals(fw,a.width);assertEquals(fh,a.height);
+        assertEquals(a.sheetWidth,atlas.getWidth());assertEquals(a.sheetHeight,atlas.getHeight());
+        int[] box=new int[6];
         for(int i=0;i<16;i++) {
-            int left=(i%4)*fw,top=(i/4)*fh,count=0;
-            for(int y=top;y<top+fh;y++)for(int x=left;x<left+fw;x++)if(Color.alpha(atlas.getPixel(x,y))>128)count++;
+            assertTrue("Empty sprite "+i,a.frame(i,box));
+            int count=0;
+            for(int y=0;y<box[3];y++)for(int x=0;x<box[2];x++) {
+                if(box[4]+x>=fw||box[5]+y>=fh)continue;
+                if(Color.alpha(atlas.getPixel(box[0]+x,box[1]+y))>128)count++;
+            }
             assertTrue("Empty sprite "+i,count>4500);assertTrue("Opaque background "+i,count<fw*fh*.70f);
         }
     }

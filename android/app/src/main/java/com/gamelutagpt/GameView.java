@@ -583,6 +583,8 @@ public class GameView extends SurfaceView
         medicao.parte("cenario");
         CharacterSelectRenderer selecao = resultado(selecaoAntecipada);
         characterSelectRenderer = selecao != null ? selecao : new CharacterSelectRenderer(context);
+        // PC e testes: os retratos na hora, como antes (a seleção desenhada já sai completa).
+        if (carregarFolhasNaHora) characterSelectRenderer.carregarHerois(GeneratedCharacters.SELECTABLE);
         selecaoAntecipada = null;
         medicao.parte("selecao");
         loadTeamUltras();
