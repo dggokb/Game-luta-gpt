@@ -5,7 +5,8 @@ import java.util.List;
 /**
  * Nível da CPU nas lutas do modo história e do Arcade: começa no NÍVEL CPU da pausa (o padrão é
  * o 5) na primeira luta e sobe até o 8 na última, repartido pelas lutas que a campanha tem. Quem
- * tem menos lutas sobe mais rápido por luta; quem tem mais, mais devagar.
+ * tem menos lutas sobe mais rápido por luta; quem tem mais, mais devagar. A cada 2 derrotas
+ * seguidas a CPU desce 1 nível até o jogador vencer ({@link Campanha#alivio}).
  *
  * <p>Contam as lutas contra a CPU que valem para o irmão escolhido: o treino-tutorial do Prólogo
  * (sem IA) fica de fora, e nos episódios com uma luta para cada irmão só a dele conta.
@@ -25,6 +26,11 @@ public final class NivelCpu {
         if (total <= 1 || base >= TOPO) return base;
         feitas = Math.max(0, Math.min(total - 1, feitas));
         return base + (TOPO - base) * feitas / (total - 1);
+    }
+
+    /** O nível da luta menos o alívio das derrotas seguidas ({@link Campanha#alivio}), nunca abaixo de 1. */
+    public static int nivel(int base, int feitas, int total, int alivio) {
+        return Math.max(MenuPausa.NIVEL_MIN, nivel(base, feitas, total) - Math.max(0, alivio));
     }
 
     /** O passo é uma luta contra a CPU que conta para quem escolheu {@code irmao} (null = todas). */

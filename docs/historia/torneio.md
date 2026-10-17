@@ -109,7 +109,8 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 chega ao 8 na última, repartido pelas lutas da campanha do irmão escolhido. Hoje são 7 (treino
 do ep01, convite, quartas, emboscada, semifinal, final e duelo): 5, 5, 6, 6, 7, 7, 8. O
 treino-tutorial do Prólogo não conta (não tem IA). O Arcade usa a mesma regra
-([arcade.md](arcade.md)).
+([arcade.md](arcade.md)). A cada 2 derrotas seguidas a CPU desce 1 nível (nunca abaixo de 1); a
+vitória zera a contagem e a CPU volta ao nível da luta (`Campanha.registrarResultado`).
 
 As páginas do ep03 ao ep07 são provisórias (painéis montados pelo jogo, com a arte
 provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md) (o ep02 já está todo em páginas prontas). Depois do

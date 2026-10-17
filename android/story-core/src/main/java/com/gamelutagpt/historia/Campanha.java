@@ -25,6 +25,10 @@ public final class Campanha {
     private Torneio torneio;
     /** Quem da dupla do jogador estava em campo quando ele venceu a última luta (ou null). */
     private String vencedor;
+    /** Derrotas seguidas do jogador (zera na vitória). */
+    private int derrotasSeguidas;
+    /** Quantos níveis a CPU desce: 1 a cada 2 derrotas seguidas (zera na vitória). */
+    private int alivio;
 
     public Campanha(List<Torneio.Dupla> duplas, long semente) {
         this.duplas = duplas == null ? Collections.<Torneio.Dupla>emptyList() : duplas;
@@ -71,6 +75,8 @@ public final class Campanha {
         this.irmao = null;
         torneio = null;
         vencedor = null;
+        derrotasSeguidas = 0;
+        alivio = 0;
         if (irmao != null) escolher(irmao);
         if (disputadas < 0 || !temTorneio()) return;
         Torneio t = torneio();
@@ -84,6 +90,29 @@ public final class Campanha {
      */
     public void venceuCom(String lutador) {
         vencedor = lutador;
+    }
+
+    /**
+     * Resultado de uma luta contra a CPU: a cada 2 derrotas seguidas a CPU desce 1 nível
+     * ({@link #alivio}); a vitória zera a contagem e a CPU volta ao nível da luta.
+     */
+    public void registrarResultado(boolean venceu) {
+        if (venceu) {
+            derrotasSeguidas = 0;
+            alivio = 0;
+        } else if (++derrotasSeguidas % 2 == 0) {
+            alivio++;
+        }
+    }
+
+    /** Quantos níveis a CPU desce pelas derrotas seguidas (veja {@link #registrarResultado}). */
+    public int alivio() {
+        return alivio;
+    }
+
+    /** Derrotas seguidas do jogador até agora. */
+    public int derrotasSeguidas() {
+        return derrotasSeguidas;
     }
 
     /** Quem estava em campo na última vitória do jogador, ou null (nenhuma ainda, ou save). */

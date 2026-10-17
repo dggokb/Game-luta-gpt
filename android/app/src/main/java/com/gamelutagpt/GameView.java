@@ -4275,8 +4275,8 @@ public class GameView extends SurfaceView
 
     /**
      * Nível da CPU na luta da história ou do Arcade: do NÍVEL CPU da pausa (padrão 5) na primeira
-     * luta até o 8 na última, repartido pelas lutas da campanha ({@link NivelCpu}). Fora delas
-     * (uma cena solta, um episódio que não abriu), o da pausa.
+     * luta até o 8 na última, repartido pelas lutas da campanha ({@link NivelCpu}), menos 1 a
+     * cada 2 derrotas seguidas. Fora delas (uma cena solta, um episódio que não abriu), o da pausa.
      */
     private int nivelDaLuta(Episodio.Passo luta) {
         int base = pausa.nivelCpu();
@@ -4293,7 +4293,8 @@ public class GameView extends SurfaceView
             if (historia.campanha() != null) irmao = historia.campanha().irmao();
         }
         int[] pos = campanha == null || indice < 0 ? null : NivelCpu.posicao(campanha, ep.id, indice, irmao);
-        return pos == null ? base : NivelCpu.nivel(base, pos[0], pos[1]);
+        int alivio = historia.campanha() != null ? historia.campanha().alivio() : 0;
+        return pos == null ? Math.max(MenuPausa.NIVEL_MIN, base - alivio) : NivelCpu.nivel(base, pos[0], pos[1], alivio);
     }
 
     private java.util.List<Episodio> episodiosTemporada() {

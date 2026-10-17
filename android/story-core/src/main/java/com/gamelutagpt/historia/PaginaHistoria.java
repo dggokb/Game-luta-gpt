@@ -226,6 +226,8 @@ public final class PaginaHistoria {
     public void resultadoLuta(boolean venceu) {
         if (!waitingFight()) return;
         Episodio.Passo luta = passo();
+        // Derrotas seguidas baixam o nível da CPU (o treino-tutorial não tem IA: não conta).
+        if (campanha != null && !luta.tutorial()) campanha.registrarResultado(venceu);
         if (!venceu && luta.repetirSeDerrota) {
             listener.onHistoriaLuta(luta);
             return;

@@ -47,7 +47,8 @@ O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um
 - **A CPU sobe de nível a cada luta** (`NivelCpu`, o mesmo do modo história): começa no NÍVEL
   CPU da pausa (padrão 5) e chega ao 8 na última luta, repartido pelas lutas do Arcade (hoje 5:
   as 4 rodadas e o duelo → 5, 5, 6, 7, 8). Quando o Takatoshi entrar, ele vira a última luta e
-  a subida se reparte sozinha. Mudar o nível na pausa muda a base na hora.
+  a subida se reparte sozinha. Mudar o nível na pausa muda a base na hora. A cada 2 derrotas
+  seguidas a CPU desce 1 nível até o jogador vencer.
 - **A regra escondida**: depois da final, a dupla campeã luta entre si, **1x1**: o jogador fica
   com **quem estava em campo quando a final foi vencida** e a CPU com o outro (rótulo DUELO
   FINAL). A campanha guarda isso a cada vitória (`Campanha.venceuCom`, chamado pelo jogo

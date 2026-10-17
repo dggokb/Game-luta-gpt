@@ -61,4 +61,26 @@ public class NivelCpuTest {
             assertNull(NivelCpu.posicao(eps, prologo.id, i, Torneio.RYUGA));
         }
     }
+
+    @Test
+    public void aCadaDuasDerrotasSeguidasACpuDesceUmNivel() {
+        Campanha c = new Campanha(null, 1L);
+        c.registrarResultado(false);
+        assertEquals("1 derrota: nada", 0, c.alivio());
+        c.registrarResultado(false);
+        assertEquals("2 seguidas: -1", 1, c.alivio());
+        c.registrarResultado(false);
+        assertEquals(1, c.alivio());
+        c.registrarResultado(false);
+        assertEquals("4 seguidas: -2", 2, c.alivio());
+        assertEquals("a última luta (8) com -2", 6, NivelCpu.nivel(5, 6, 7, c.alivio()));
+        c.registrarResultado(true);
+        assertEquals("a vitória zera", 0, c.alivio());
+        assertEquals(0, c.derrotasSeguidas());
+        c.registrarResultado(false);
+        c.registrarResultado(true);
+        c.registrarResultado(false);
+        assertEquals("derrotas com vitória no meio não somam", 0, c.alivio());
+        assertEquals("nunca abaixo de 1", 1, NivelCpu.nivel(2, 0, 7, 5));
+    }
 }
