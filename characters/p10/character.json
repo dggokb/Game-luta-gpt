@@ -1989,7 +1989,7 @@
     "j2H": {
       "animation": "JUMP_HEAVY_DOWN",
       "damage": 680,
-      "reach": 106,
+      "reach": 144,
       "startupFrames": 8,
       "activeFrames": 6,
       "recoveryFrames": 8,

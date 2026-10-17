@@ -203,6 +203,8 @@ final class AiController {
         lastPunishSerial = lastAntiAirSerial = -1;
         lastBreakSerial = -1;
         breakPlan = false;
+        contactFrame = Integer.MIN_VALUE;
+        contactPush = 0f;
         antiAirPlan = false;
         ownHitFrame = -1;
     }
@@ -216,6 +218,7 @@ final class AiController {
         CombatFighter target = engine.fighter(1 - self);
         CpuPerception.Snapshot seen = perception.seen(level.reactionFrames);
         lowGuard = guardLow(engine, me);
+        feelContact(engine, self, me, target);
         if (me.status == CombatFighter.Status.THROWN) {
             if (techDelay == -2) techDelay = ai.techDelay(expectingThrow(engine, me, target, seen) ? level.techGuess : 0);
             if (techDelay >= 0 && techDelay-- == 0) out.grab = true;
@@ -285,7 +288,7 @@ final class AiController {
 
         situation.self = me.character();
         situation.target = target.body();
-        situation.distance = Math.abs(seen.x - me.x);
+        situation.distance = Math.abs(predictedX(engine, seen) - me.x);
         situation.verticalDistance = Math.abs(seen.y - me.y);
         situation.selfAirborne = !me.grounded;
         situation.targetGrounded = seen.grounded;
@@ -458,6 +461,50 @@ final class AiController {
     }
 
     // ---------------------------------------------------------------- cartas
+
+    /** Quadros entre os dois que ela compara para ver para onde o rival está indo. */
+    static final int MOTION_SAMPLE = 6;
+
+    /**
+     * Onde o rival deve estar agora pelo que ela viu: a posição vista mais o movimento que ela
+     * viu nos quadros anteriores, levado adiante pelo atraso da reação (como um humano que vê o
+     * rival recuar do empurrão e não bate no vazio). Só usa o que já viu, nunca o quadro atual.
+     */
+    private float predictedX(CombatEngine engine, CpuPerception.Snapshot seen) {
+        float x = seen.x;
+        CpuPerception.Snapshot before = perception.seen(level.reactionFrames + MOTION_SAMPLE);
+        if (before != null && seen.grounded && before.grounded) {
+            x += (seen.x - before.x) / MOTION_SAMPLE * level.reactionFrames;
+        }
+        // O próprio golpe ela sente na hora: sabe onde o rival estava quando encostou e quanto
+        // aquele golpe empurra. Até ver o empurrão acontecer (ele pode atrasar num congelamento),
+        // conta com o rival lá onde o empurrão leva.
+        if (contactPush > 0f && engine.frame() - contactFrame <= CONTACT_MEMORY_FRAMES && seen.grounded) {
+            float pushedTo = contactTargetX + contactSide * contactPush;
+            x = contactSide > 0 ? Math.max(x, pushedTo) : Math.min(x, pushedTo);
+        }
+        return x;
+    }
+
+    /** Até quanto tempo depois de encostar ela ainda conta com o empurrão do próprio golpe. */
+    static final int CONTACT_MEMORY_FRAMES = 90;
+
+    /** O próprio golpe que acabou de encostar (acerto ou defesa): quando, onde o rival estava, quanto empurra e para que lado. */
+    private int contactFrame = Integer.MIN_VALUE;
+    private float contactPush, contactTargetX;
+    private int contactSide;
+
+    /** Anota o encostar do próprio golpe neste passo (o que ela sente, não o que vê). */
+    private void feelContact(CombatEngine engine, int self, CombatFighter me, CombatFighter target) {
+        for (CombatEngine.HitEvent event : engine.events()) {
+            if (event.attacker != self || !me.attacking()) continue;
+            AttackDefinition attack = me.attack;
+            contactFrame = engine.frame();
+            contactPush = event.blocked ? attack.pushbackOnBlock : attack.pushbackOnHit;
+            contactSide = target.x >= me.x ? 1 : -1;
+            contactTargetX = target.x;
+        }
+    }
 
     /** A própria guarda está no aviso (quase quebrando). */
     private static boolean guardLow(CombatEngine engine, CombatFighter me) {
