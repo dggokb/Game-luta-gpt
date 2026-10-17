@@ -26,6 +26,7 @@ import com.gamelutagpt.historia.MenuArcade;
 import com.gamelutagpt.historia.MenuCapitulos;
 import com.gamelutagpt.historia.MenuInicial;
 import com.gamelutagpt.historia.MenuPausa;
+import com.gamelutagpt.historia.NivelCpu;
 import com.gamelutagpt.historia.PaginaHistoria;
 import com.gamelutagpt.historia.ProgressoHistoria;
 import com.gamelutagpt.historia.Torneio;
@@ -268,6 +269,8 @@ public class GameView extends SurfaceView
     private boolean duel;
     /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
     private int storyEpisode = -1;
+    /** Os episódios da temporada, carregados uma vez para contar as lutas (nível da CPU). */
+    private java.util.List<Episodio> episodiosTemporada;
     /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
     private int storyKoFrames;
     private static final int STORY_KO_FRAMES = 150;
@@ -3927,9 +3930,9 @@ public class GameView extends SurfaceView
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
         }
-        // O NÍVEL da CPU vale já na luta que continua, e fica salvo. No Arcade ele é a base da
-        // rodada (a CPU sobe a cada rodada a partir dele).
-        ai.setLevel(arcadeMode && historia.waitingFight() ? arcadeLevel(historia.passo()) : pausa.nivelCpu());
+        // O NÍVEL da CPU vale já na luta que continua, e fica salvo. Na história e no Arcade ele é
+        // a base: a CPU sobe dele até o 8 na última luta.
+        ai.setLevel(storyMode && historia.waitingFight() ? nivelDaLuta(historia.passo()) : pausa.nivelCpu());
         if (speedPrefs != null && speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO) != pausa.nivelCpu()) {
             speedPrefs.edit().putInt(CPU_LEVEL_KEY, pausa.nivelCpu()).apply();
         }
@@ -4130,7 +4133,7 @@ public class GameView extends SurfaceView
         // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA
         // e as lições dizem o que ele faz.
         setOpponentAiEnabled(!luta.tutorial());
-        if (arcadeMode) ai.setLevel(arcadeLevel(luta));
+        if (storyMode) ai.setLevel(nivelDaLuta(luta));
         // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
         // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
         String[][] lados = historia.lados(luta);
@@ -4270,12 +4273,40 @@ public class GameView extends SurfaceView
         historia.start(temporada, arcade);
     }
 
-    /** Nível da CPU na luta do Arcade: o da pausa como base, subindo a cada rodada. */
-    private int arcadeLevel(Episodio.Passo luta) {
-        Campanha campanha = historia.campanha();
-        Torneio chave = campanha != null ? campanha.torneioSorteado() : null;
-        int rodada = luta != null && luta.duelo ? Arcade.DUELO : chave != null ? chave.disputadas() : 0;
-        return Arcade.nivelCpu(pausa.nivelCpu(), rodada);
+    /**
+     * Nível da CPU na luta da história ou do Arcade: do NÍVEL CPU da pausa (padrão 5) na primeira
+     * luta até o 8 na última, repartido pelas lutas da campanha ({@link NivelCpu}). Fora delas
+     * (uma cena solta, um episódio que não abriu), o da pausa.
+     */
+    private int nivelDaLuta(Episodio.Passo luta) {
+        int base = pausa.nivelCpu();
+        Episodio ep = historia.episodio();
+        if (luta == null || ep == null) return base;
+        int indice = ep.passos.indexOf(luta);
+        java.util.List<Episodio> campanha;
+        String irmao = null;
+        if (arcadeMode) {
+            campanha = java.util.Collections.singletonList(ep);
+        } else {
+            if (storyEpisode < 0) return base;
+            campanha = episodiosTemporada();
+            if (historia.campanha() != null) irmao = historia.campanha().irmao();
+        }
+        int[] pos = campanha == null || indice < 0 ? null : NivelCpu.posicao(campanha, ep.id, indice, irmao);
+        return pos == null ? base : NivelCpu.nivel(base, pos[0], pos[1]);
+    }
+
+    private java.util.List<Episodio> episodiosTemporada() {
+        if (episodiosTemporada != null || temporada == null) return episodiosTemporada;
+        java.util.List<Episodio> lista = new java.util.ArrayList<>();
+        try {
+            for (String id : temporada.episodios) lista.add(temporada.loadEpisodio(ultraAssets, id));
+        } catch (IOException | RuntimeException ex) {
+            Log.w(LOG_TAG, "temporada sem a lista de lutas; a CPU fica no nível da pausa", ex);
+            return null;
+        }
+        episodiosTemporada = lista;
+        return lista;
     }
 
     /** Todos têm pack de luta (p13–p16 ainda não têm). */

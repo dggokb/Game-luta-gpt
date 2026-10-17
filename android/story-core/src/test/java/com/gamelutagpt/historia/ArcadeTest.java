@@ -1,5 +1,6 @@
 package com.gamelutagpt.historia;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -227,12 +228,20 @@ public class ArcadeTest {
     }
 
     @Test
-    public void cpuSobeUmNivelPorRodada() {
-        assertEquals(3, Arcade.nivelCpu(5, 0));
-        assertEquals(6, Arcade.nivelCpu(5, 3));
-        assertEquals("o duelo", 7, Arcade.nivelCpu(5, Arcade.DUELO));
-        assertEquals("nunca abaixo de 1", 1, Arcade.nivelCpu(1, 0));
-        assertEquals("nunca acima de 8", 8, Arcade.nivelCpu(8, Arcade.DUELO));
+    public void cpuSobeDoNivelDaPausaAteO8NaUltimaLutaDoArcade() throws IOException {
+        Episodio arcade = Episodio.fromJson(new GameAssets().readText(Arcade.EPISODIO));
+        int total = NivelCpu.lutas(arcade, null);
+        assertEquals("4 rodadas e o duelo", 5, total);
+        int[] niveis = new int[total];
+        int k = 0;
+        for (int i = 0; i < arcade.passos.size(); i++) {
+            int[] pos = NivelCpu.posicao(java.util.Collections.singletonList(arcade), arcade.id, i, null);
+            if (pos == null) continue;
+            assertEquals(k, pos[0]);
+            assertEquals(total, pos[1]);
+            niveis[k++] = NivelCpu.nivel(5, pos[0], pos[1]);
+        }
+        assertArrayEquals(new int[] {5, 5, 6, 7, 8}, niveis);
     }
 
     @Test

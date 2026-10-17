@@ -18,15 +18,13 @@ import java.util.Set;
  * completando as 15, duplas livres do CPU sorteadas entre os lutadores com golpes (um lutador
  * aparece em mais de uma dupla: são 12 lutadores para 32 lugares, espalhados por igual).
  *
- * A CPU fica mais forte a cada rodada a partir do nível escolhido na pausa ({@link #nivelCpu}).
+ * A CPU fica mais forte a cada luta, do nível escolhido na pausa até o 8 no duelo ({@link NivelCpu}).
  * As lutas são as do modo história: o episódio {@link #EPISODIO} toca o sorteio, a chave e as
  * lutas; perder repete a luta (o "continuar" do Arcade).
  */
 public final class Arcade {
     /** O episódio do Arcade: sorteio, as 4 rodadas, o duelo e o Takatoshi. */
     public static final String EPISODIO = Temporada.PASTA + "/arcade/arcade.json";
-    /** "Rodada" do duelo 1x1 depois da final (para o nível da CPU). */
-    public static final int DUELO = 4;
 
     private Arcade() {}
 
@@ -94,13 +92,5 @@ public final class Arcade {
     private static String par(Torneio.Dupla d) {
         String a = d.lutadores[0], b = d.lutadores[1];
         return a.compareTo(b) <= 0 ? a + "+" + b : b + "+" + a;
-    }
-
-    /**
-     * Nível da CPU na rodada (0 = oitavas … 3 = final, {@link #DUELO} = o 1x1): começa 2 abaixo
-     * do nível da pausa e sobe 1 por rodada, entre 1 e 8. Nível 5: 3, 4, 5, 6 e 7 no duelo.
-     */
-    public static int nivelCpu(int nivelPausa, int rodada) {
-        return Math.max(MenuPausa.NIVEL_MIN, Math.min(MenuPausa.NIVEL_MAX, nivelPausa - 2 + rodada));
     }
 }

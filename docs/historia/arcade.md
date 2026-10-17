@@ -44,9 +44,10 @@ O Arcade é tocado como as cenas da história (`historia/arcade/arcade.json`, um
   `docs/combat-engine.md`). **Empate conta como derrota.**
 - **Perder repete a luta** (o "continuar" do Arcade). A pausa (◀ MENU ou voltar) tem MENU INICIAL,
   com o aviso "Voltar ao menu encerra o Arcade."
-- **A CPU sobe de nível a cada rodada**, a partir do NÍVEL CPU da pausa (`Arcade.nivelCpu`): 2
-  abaixo nas oitavas e +1 por rodada, entre 1 e 8. Com o nível 5: 3, 4, 5, 6 na final e 7 no
-  duelo. Mudar o nível na pausa muda a base na hora.
+- **A CPU sobe de nível a cada luta** (`NivelCpu`, o mesmo do modo história): começa no NÍVEL
+  CPU da pausa (padrão 5) e chega ao 8 na última luta, repartido pelas lutas do Arcade (hoje 5:
+  as 4 rodadas e o duelo → 5, 5, 6, 7, 8). Quando o Takatoshi entrar, ele vira a última luta e
+  a subida se reparte sozinha. Mudar o nível na pausa muda a base na hora.
 - **A regra escondida**: depois da final, a dupla campeã luta entre si, **1x1**: o jogador fica
   com **quem estava em campo quando a final foi vencida** e a CPU com o outro (rótulo DUELO
   FINAL). A campanha guarda isso a cada vitória (`Campanha.venceuCom`, chamado pelo jogo
@@ -67,7 +68,8 @@ O Arcade não tem save. Os textos passam pela tradução da história (`historia
 
 | Classe | O que faz |
 |---|---|
-| `historia/Arcade` | duplas oficiais, dupla livre, a chave de 16 e o nível da CPU por rodada |
+| `historia/Arcade` | duplas oficiais, dupla livre e a chave de 16 |
+| `historia/NivelCpu` | o nível da CPU de cada luta (história e Arcade) |
 | `historia/MenuArcade` | a tela da escolha da dupla |
 | `historia/Torneio` | a chave com 8 (história) ou 16 vagas (`Torneio.arcade`) |
 | `historia/ChaveTorneio` | o desenho da chave, com o layout de 8 ou de 16 |

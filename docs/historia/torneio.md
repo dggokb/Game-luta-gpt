@@ -105,6 +105,12 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 | ep06 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
 | ep07 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
 
+**Nível da CPU** (`NivelCpu`): começa no NÍVEL CPU da pausa (padrão 5) na primeira luta e
+chega ao 8 na última, repartido pelas lutas da campanha do irmão escolhido. Hoje são 7 (treino
+do ep01, convite, quartas, emboscada, semifinal, final e duelo): 5, 5, 6, 6, 7, 7, 8. O
+treino-tutorial do Prólogo não conta (não tem IA). O Arcade usa a mesma regra
+([arcade.md](arcade.md)).
+
 As páginas do ep03 ao ep07 são provisórias (painéis montados pelo jogo, com a arte
 provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md) (o ep02 já está todo em páginas prontas). Depois do
 ep07 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
