@@ -80,6 +80,26 @@ public class DefesaEGolpeAltoTest {
         }
     }
 
+    @Test public void theOverheadHoldsTheWindUpInsteadOfSlowingTheWholeClip() {
+        for (String id : new String[] {"player_base", "p02", "p06", "p10"}) {
+            CharacterDefinition c = GeneratedCharacters.get(id);
+            CharacterDefinition.Move m = c.moves.get("M"), oh = c.moves.get(GolpeAlto.BINDING);
+            if (m.animation == null) continue;
+            float fps = CombatConfig.FPS;
+            int windUp = Math.max(0, m.attack.startupFrames - 2);
+            // A preparação roda no ritmo do M (sem câmera lenta)...
+            assertEquals(id + ": preparação no ritmo do M", m.animationTime(windUp / fps), oh.animationTime(windUp / fps), 1e-4f);
+            // ...a pose segura até o impacto do 6M, que cai no quadro do impacto do M...
+            assertEquals(id + ": impacto alinhado", m.animationTime(m.attack.startupFrames / fps),
+                oh.animationTime(GolpeAlto.STARTUP / fps), 1e-4f);
+            float meio = oh.animationTime((windUp + GolpeAlto.STARTUP) / 2f / fps);
+            assertTrue(id + ": pose segurada", meio >= m.animationTime(windUp / fps) - 1e-4f &&
+                meio <= m.animationTime(m.attack.startupFrames / fps) + 1e-4f);
+            // ...e termina no fim do clipe.
+            assertEquals(m.animation.duration, oh.animationTime(oh.attack.totalFrames / fps), 1e-3f);
+        }
+    }
+
     @Test public void forwardMediumFromNeutralIsTheOverheadButNotInsideACombo() {
         Match m = new Match(500f, 600f);
         m.in[0].direction = m.screen(0, 1);

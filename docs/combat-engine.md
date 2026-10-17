@@ -514,12 +514,15 @@ Testes em `GuardBreakTest`.
 Três peças para a defesa não ser de graça nem perfeita sem esforço (inspiradas no overhead do
 SF6/FighterZ, no chip de especial de todos e no Just Defense do Garou).
 
-- **Golpe alto (→ + M, `GolpeAlto`)**: universal. Montado do M de cada personagem (a mesma
-  animação, esticada) quando o pack não declara um `6M`: preparo 20, ativo 3, recuperação 14,
+- **Golpe alto (→ + M, `GolpeAlto`)**: universal. Montado do M de cada personagem quando o
+  pack não declara um `6M`. O desenho do M não é esticado (ficava em câmera lenta): a
+  preparação roda no ritmo do M, a pose de antes do impacto fica segurada até o impacto do 6M
+  e a batida segue no ritmo do M (`Move` com tempo por trechos, `GolpeAlto.holdKnots`): preparo 20, ativo 3, recuperação 14,
   dano 115% do M, +3 no acerto, −6 na defesa. Pega quem defende **agachado**; em pé defende
   (`AttackDefinition.overhead`, `guardStops`). No acerto cancela nos especiais e no Super (os
   do H). Sai só do neutro (`CancelSystem`: dentro de um combo o → + M continua sendo o M) e
-  uma vez por combo. Ao sair, cue `OVERHEAD`: brilho amarelo na cabeça para dar para ler.
+  uma vez por combo. Ao sair, cue `OVERHEAD`: um brilho pequeno e curto perto da cabeça
+  (`ImpactEffects.spawnWarningGlint`, não o brilho do Super); o aviso principal é a pose segurada.
 - **Chip**: especial defendido tira 1/8 do dano da batida (`chipSpecialPermille` 125), Super e
   Ultra 1/4 (`chipSuperPermille` 250). O arranhão vira **vida vermelha** inteira
   (`FighterState.chip`: volta fora de campo) e **nunca derruba** (para em 1). Normais não arranham.

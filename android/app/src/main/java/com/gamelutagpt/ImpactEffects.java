@@ -233,6 +233,22 @@ final class ImpactEffects {
         }
     }
 
+    /**
+     * Aviso pequeno (o golpe alto saindo): só um brilho curto, sem as faíscas nem o tamanho do
+     * brilho do Super, para não parecer outro efeito.
+     */
+    void spawnWarningGlint(float x, float y, int accent) {
+        int b = nextBurst;
+        nextBurst = (nextBurst + 1) % BURSTS;
+        bx[b] = x; by[b] = y; bAge[b] = 0f; bKind[b] = GLINT; bDir[b] = 1;
+        bLife[b] = WARNING_GLINT_LIFE;
+        bSize[b] = 38f;
+        bAngle[b] = 0f;
+        bColor[b] = accent | 0xFF000000;
+    }
+
+    static final float WARNING_GLINT_LIFE = .2f;
+
     void update(float dt) {
         for (int i = 0; i < SPEARS; i++) if (sAge[i] < SPEAR_LIFE) sAge[i] += dt;
         for (int i = 0; i < BURSTS; i++) if (bAge[i] < bLife[i]) bAge[i] += dt;
