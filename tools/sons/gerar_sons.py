@@ -155,6 +155,13 @@ def build():
         gain(envelope(lowpass(noise(1.3, rng), lambda t: 2400 * math.exp(-3 * t) + 120), 0.002, 0.6, 2.0), 0.8),
         gain(envelope(highpass(noise(0.06, rng), 1500), 0.0005, 0.02), 0.6))
     sounds['ko'] = normalize(saturate(boom, 2.4))
+    # Ativação do Super: um "shing" metálico (parciais desafinados que tocam juntos), o ar
+    # subindo atrás e um baque grave curto. Avisa antes de a tela parar.
+    ring = mix(*(gain(envelope(tone(0.7, hz, 0.003), 0.001, decay, 2.2), g)
+                 for hz, decay, g in ((1760, 0.42, 0.9), (2637, 0.34, 0.6), (3951, 0.24, 0.45), (5274, 0.16, 0.3))))
+    rise = envelope(highpass(lowpass(noise(0.32, rng), lambda t: 900 + 7000 * t / 0.32), 500), 0.22, 0.06, 4.0)
+    hum = envelope(thump(0.3, 160, 70, 9), 0.002, 0.14, 2.4)
+    sounds['super'] = normalize(mix(gain(ring, 0.8), gain(rise, 0.45), gain(hum, 0.55)), 0.85)
     return sounds
 
 

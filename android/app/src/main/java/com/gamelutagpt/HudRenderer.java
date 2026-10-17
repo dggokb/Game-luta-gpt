@@ -257,7 +257,7 @@ final class HudRenderer {
             paint.setColor(0xBBFFFFFF);
             c.drawRect(x, 680, x + width * fill, 683, paint);
             float gain = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
-            float spend = effects.fade(fx.spendAt, HudEffects.SPEND_FLASH);
+            float spend = Math.max(effects.fade(fx.spendAt, HudEffects.SPEND_FLASH), effects.superBlink(fx));
             if (i >= fx.gainFrom && i < fx.gainTo && gain > 0) {
                 fxPaint.setColor(Color.WHITE); fxPaint.setAlpha(Math.round(190 * gain));
                 c.drawRect(x, 679, x + width, 694, fxPaint);
@@ -592,7 +592,7 @@ final class HudRenderer {
                                   float x, float y, float w, float h) {
         c.save(); c.clipRect(x, y, x + w, y + h);
         float gain = effects.fade(fx.levelAt, HudEffects.LEVEL_FLASH);
-        float spend = effects.fade(fx.spendAt, HudEffects.SPEND_FLASH);
+        float spend = Math.max(effects.fade(fx.spendAt, HudEffects.SPEND_FLASH), effects.superBlink(fx));
         fxPaint.setStyle(Paint.Style.FILL);
         if (gain > 0) {
             fxPaint.setColor(0xFFDFFFFF); fxPaint.setAlpha(Math.round(160 * gain));

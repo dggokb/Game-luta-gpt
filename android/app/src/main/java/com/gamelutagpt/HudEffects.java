@@ -4,17 +4,19 @@ package com.gamelutagpt;
 final class HudEffects {
     static final float HIT_FLASH = .16f, HIT_HOLD = .18f, HIT_FOLLOW = .55f;
     static final float HEAL_FLASH = .38f, READY_FLASH = .9f, SPEND_FLASH = .30f, LEVEL_FLASH = .42f;
+    /** Um gasto de barra inteira (Super, Ultra, guard cancel) pisca por mais tempo que um gasto comum. */
+    static final float SUPER_FLASH = .75f;
     static final class Meter {
         FighterState fighter;
         float life, trail, healFrom, healTo;
-        double hitAt = -100, healAt = -100, levelAt = -100, spendAt = -100;
+        double hitAt = -100, healAt = -100, levelAt = -100, spendAt = -100, superAt = -100;
         float trailStart;
         int superMeter, gainFrom, gainTo, spentFrom, spentTo;
         void seed(FighterState f) {
             fighter = f;
             life = trail = f.life / (float) f.profile.maxLife;
             superMeter = f.superMeter;
-            hitAt = healAt = levelAt = spendAt = -100;
+            hitAt = healAt = levelAt = spendAt = superAt = -100;
         }
         void update(FighterState f, double now) {
             if (fighter != f) { seed(f); return; }
@@ -32,6 +34,7 @@ final class HudEffects {
             life = next;
             if (f.superMeter < superMeter) {
                 spentFrom = f.superMeter; spentTo = superMeter; spendAt = now;
+                if (superMeter - f.superMeter >= CombatConfig.SUPER_COST) superAt = now;
             } else if (f.superMeter / CombatConfig.METER_PER_BAR > superMeter / CombatConfig.METER_PER_BAR) {
                 gainFrom = superMeter / CombatConfig.METER_PER_BAR;
                 gainTo = f.superMeter / CombatConfig.METER_PER_BAR; levelAt = now;
@@ -70,6 +73,13 @@ final class HudEffects {
         epoch = s.presentationEpoch();
         recharging = enabled && !using && ratio > 0 && ratio < 1;
         assistEnabled = enabled; assistUsing = using; assistRatio = ratio;
+    }
+    /** O gasto de barra inteira piscando (12 vezes por segundo) e apagando; 0 sem ele. */
+    float superBlink(Meter m) {
+        float left = fade(m.superAt, SUPER_FLASH);
+        if (left <= 0f) return 0f;
+        boolean on = ((int)((now - m.superAt) * 12.0)) % 2 == 0;
+        return left * (on ? 1f : .35f);
     }
     float fade(double at, float duration) { return (float)Math.max(0, Math.min(1, 1 - (now - at) / duration)); }
 }
