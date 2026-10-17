@@ -196,6 +196,7 @@ final class AiController {
         resetKit();
         endRoute();
         guardFrames = 0;
+        justDefenseWait = 0;
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
         lastOpponentAttackSerial = -1;
@@ -292,6 +293,7 @@ final class AiController {
         situation.verticalDistance = Math.abs(seen.y - me.y);
         situation.selfAirborne = !me.grounded;
         situation.targetGrounded = seen.grounded;
+        situation.targetCrouching = seen.crouching;
         situation.targetAlive = !seen.ko;
         situation.superReady = me.state.superMeter >= CombatConfig.SUPER_COST;
         situation.projectileActive = engine.energyProjectileAlive(self);
@@ -331,6 +333,7 @@ final class AiController {
         boolean blockstun = me.status == CombatFighter.Status.BLOCKSTUN;
         if (!blockstun && !me.canAct()) {
             guardFrames = 0;
+            justDefenseWait = 0;
             return false;
         }
         CpuStyle style = CpuStyle.of(me.character());
@@ -340,7 +343,14 @@ final class AiController {
             if (seen.threatening() && seen.attack.melee() && seen.attackSerial != lastGuardSerial &&
                 gap <= seen.attack.reach + me.body().halfWidth + 60f) {
                 lastGuardSerial = seen.attackSerial;
-                decideGuard(!seen.grounded ? GUARD_HIGH : seen.attack.low ? GUARD_LOW : GUARD_ANY, 24);
+                // O golpe alto de chão só se defende em pé.
+                int required = !seen.grounded || seen.attack.overhead ? GUARD_HIGH
+                    : seen.attack.low ? GUARD_LOW : GUARD_ANY;
+                if (decideGuard(required, 24)) {
+                    // Quadros até o golpe ficar ativo, contando o que passou desde o que ela viu.
+                    int elapsed = engine.frame() - seen.frame;
+                    planJustDefense(me, seen.attack.startupFrames - seen.attackFrame - elapsed);
+                }
             } else if (!seen.grounded && seen.jumpSerial != lastJumpSerial && gap < 340f && !antiAirPlan &&
                 seen.status == CombatFighter.Status.NEUTRAL) {
                 // Pulo vindo e ela não vai tirar do ar: defende em pé (pulo só se defende em pé).
@@ -357,7 +367,10 @@ final class AiController {
                         // Pula por cima, para frente.
                         jumpOverProjectile = true;
                     } else {
-                        decideGuard(seen.projectileLow ? GUARD_LOW : GUARD_ANY, Math.round(Math.max(0f, now) / speed) + 20);
+                        int arrival = Math.round(Math.max(0f, now) / speed);
+                        if (decideGuard(seen.projectileLow ? GUARD_LOW : GUARD_ANY, arrival + 20)) {
+                            planJustDefense(me, arrival);
+                        }
                     }
                 }
             }
@@ -412,21 +425,44 @@ final class AiController {
         if (guardFrames <= 0) return false;
         guardFrames--;
         movingForward = movingBack = dashing = false;
+        if (justDefenseWait > 0) {
+            // Defesa perfeita: solta (parada) e aperta a defesa em cima da hora.
+            justDefenseWait--;
+            out.direction = 0;
+            return true;
+        }
         int back = me.facing > 0 ? 5 : 1;
         int downBack = me.facing > 0 ? 4 : 2;
         out.direction = guardLow ? downBack : back;
         return true;
     }
 
+    /**
+     * Defesa perfeita, com a chance do nível: fica parada até {@link #JUST_DEFENSE_LEAD} quadros
+     * antes do contato e só então aperta a defesa. Só se dá tempo de soltar e apertar de novo.
+     */
+    private void planJustDefense(CombatFighter me, int framesToContact) {
+        justDefenseWait = 0;
+        if (!me.grounded || framesToContact <= JUST_DEFENSE_LEAD + 1) return;
+        if (!roll(level.justDefense())) return;
+        justDefenseWait = framesToContact - JUST_DEFENSE_LEAD;
+        guardFrames = Math.max(guardFrames, justDefenseWait + 12);
+    }
+
+    /** Quantos quadros antes do contato ela aperta a defesa perfeita (dentro da janela). */
+    static final int JUST_DEFENSE_LEAD = 2;
+    private int justDefenseWait;
+
     /** Decide se defende o que viu e em que altura (errar a altura também é humano). */
-    private void decideGuard(int required, int frames) {
-        if (!roll(level.reactGuard)) return;
+    private boolean decideGuard(int required, int frames) {
+        if (!roll(level.reactGuard)) return false;
         guardHabit = false;
         boolean right = roll(level.guardHeight);
         if (required == GUARD_HIGH) guardLow = !right;
         else if (required == GUARD_LOW) guardLow = right;
         else guardLow = true;   // agachada segura qualquer golpe no chão
         guardFrames = Math.max(guardFrames, frames);
+        return true;
     }
 
     /** Até onde o rival alcança com um golpe no chão (mais uma folga): o "colado" da defesa. */
@@ -816,6 +852,9 @@ final class AiController {
         // Agachado com ↘ (para baixo e para frente): conta como agachado e não fecha comando de
         // especial com a defesa que veio antes (← ↙ ↓ + H vira o S3).
         if (ComboBook.crouching(step)) out.direction = me.facing > 0 ? 2 : 4;
+        int forward = me.facing > 0 ? 1 : 5;
+        if (GolpeAlto.BINDING.equals(step)) out.direction = forward;   // → + M: o golpe alto
+        else if (out.direction == forward) out.direction = 0;          // M andando não vira o 6M
         char button = ComboBook.button(step);
         out.light = button == 'L';
         out.medium = button == 'M';

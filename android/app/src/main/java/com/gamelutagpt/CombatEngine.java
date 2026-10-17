@@ -363,6 +363,7 @@ final class CombatEngine {
             in.direction == 0) f.backdashArmed = true;
         int relative = MotionParser.relative(in.direction, f.facing);
         f.motion.record(relative, f.clock);
+        trackGuardPress(f, relative);
         int clock = f.clock;
 
         if (f.motion.enteredNow(clock) && ControlsLayout.isUpDirection(relative)) {
@@ -394,7 +395,7 @@ final class CombatEngine {
                 f.buffer.push(InputBuffer.Button.SPECIAL, button, false);
             } else {
                 if (in.light) f.buffer.push(InputBuffer.Button.LIGHT, null, crouch);
-                if (in.medium) f.buffer.push(InputBuffer.Button.MEDIUM, null, crouch);
+                if (in.medium) f.buffer.push(InputBuffer.Button.MEDIUM, null, crouch, relative == 1);
                 if (in.heavy) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
             }
         }
@@ -656,6 +657,8 @@ final class CombatEngine {
         f.status = CombatFighter.Status.ATTACK;
         f.clearAttack();
         f.attack = attack;
+        // O golpe alto avisa na preparação (o brilho na tela), para dar para ler e defender em pé.
+        if (attack.overhead) cues.add("OVERHEAD");
         // Normais e especiais (também os que lançam, como a shuriken) tocam a própria animação.
         f.move = attack.kind == AttackDefinition.Kind.SUPER ? null : f.character().moveFor(attack.id);
         f.specialStrength = strength;
@@ -1411,6 +1414,33 @@ final class CombatEngine {
         return CombatFighter.GUARD_NONE;
     }
 
+    /**
+     * Defesa perfeita: conta os quadros desde o último aperto novo de trás (no ar, qualquer
+     * defesa do ar). O aperto só abre a janela se veio depois do bloqueio contra bater sem parar.
+     */
+    private void trackGuardPress(CombatFighter f, int relative) {
+        boolean back = relative == 4 || relative == 5 || (!f.grounded && relative == 6);
+        if (back && !f.guardDirectionHeld) {
+            f.guardPressCounts = f.guardPressAge >= config.justDefenseLockoutFrames;
+            f.guardPressAge = 0;
+        } else if (f.guardPressAge < 999) {
+            f.guardPressAge++;
+        }
+        f.guardDirectionHeld = back;
+    }
+
+    /** O aperto de trás está na janela da defesa perfeita. */
+    private boolean justDefense(CombatFighter d) {
+        return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= config.justDefenseFrames;
+    }
+
+    /** Arranhão de uma batida defendida: só especial e Super/Ultra. */
+    private int chipFor(AttackDefinition attack, int strikeDamage) {
+        int permille = attack.strength == AttackDefinition.Strength.SUPER ? config.chipSuperPermille
+            : attack.strength == AttackDefinition.Strength.SPECIAL ? config.chipSpecialPermille : 0;
+        return strikeDamage * permille / 1000;
+    }
+
     /** Guard actually used against an attack: in blockstun the last guard is kept. */
     private int effectiveGuard(CombatFighter f) {
         int guard = guardFromInput(f);
@@ -1423,7 +1453,8 @@ final class CombatEngine {
         // Projétil baixo (a sombra do p06, rente ao chão): só a defesa agachada para.
         if (projectile) return guard != CombatFighter.GUARD_HIGH || !attack.low;
         if (guard == CombatFighter.GUARD_HIGH) return !attack.low;
-        if (guard == CombatFighter.GUARD_LOW) return !attackerAirborne;
+        // Agachado não segura o golpe no ar nem o golpe alto de chão.
+        if (guard == CombatFighter.GUARD_LOW) return !attackerAirborne && !attack.overhead;
         return true;
     }
 
@@ -2317,10 +2348,18 @@ final class CombatEngine {
             return;
         }
 
+        // Dano desta batida (o golpe de várias batidas divide o dano entre elas).
+        int base = projectile ? c.projectile.damage : attack.damage;
+        if (multi || multiProjectile) {
+            int count = multi ? attack.maxHits : projectileHits;
+            int each = base / count;
+            base = lastStrike ? base - each * (count - 1) : each;
+        }
+
         int guard = effectiveGuard(d);
         if (guardStops(guard, attack, !a.grounded, projectile)) {
             block(a, d, attack, guard, direction, projectile, !lastStrike,
-                multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked);
+                multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(attack, base));
             if (multi) a.strikeBlocked = true;
             if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
@@ -2328,12 +2367,6 @@ final class CombatEngine {
         }
 
         // Fury: the attacker hits harder the less life it has left.
-        int base = projectile ? c.projectile.damage : attack.damage;
-        if (multi || multiProjectile) {
-            int count = multi ? attack.maxHits : projectileHits;
-            int each = base / count;
-            base = lastStrike ? base - each * (count - 1) : each;
-        }
         int raw = base * a.state.profile.furyScale(a.state.life) / 1000;
         if (stance.armorAt(d.attackFrame) && d.armorUsed < stance.armorHits) {
             // Super armor: the damage goes through, the stun does not; the move carries on.
@@ -2520,19 +2553,26 @@ final class CombatEngine {
     /** Guarded contact: blockstun, pushback, guard meter and hitstop. */
     private void block(CombatFighter a, CombatFighter d, AttackDefinition attack, int guard, int direction,
                        boolean projectile) {
-        block(a, d, attack, guard, direction, projectile, false, true);
+        block(a, d, attack, guard, direction, projectile, false, true, chipFor(attack, attack.damage));
     }
 
     /**
      * Guarded contact. {@code holding}: a strike before the last of a several-strike move (a
      * small push and a short hitstop, so the next strike still reaches); {@code meter}: the
-     * guard meter of the move, given once per move.
+     * guard meter of the move, given once per move; {@code chip}: o arranhão (vira vida vermelha).
+     *
+     * Defesa perfeita (trás apertado em cima da hora): sem gastar guarda nem chip, um pouco de
+     * vida de volta, mais barra e o blockstun curto.
      */
     private void block(CombatFighter a, CombatFighter d, AttackDefinition attack, int guard, int direction,
-                       boolean projectile, boolean holding, boolean meter) {
+                       boolean projectile, boolean holding, boolean meter, int chip) {
+        boolean just = justDefense(d);
         d.status = CombatFighter.Status.BLOCKSTUN;
         d.clearAttack();
-        d.stunLeft = d.stunTotal = attack.blockstunFrames;
+        d.stunLeft = d.stunTotal = just
+            ? Math.max(1, attack.blockstunFrames * config.justDefenseBlockstunPermille / 1000)
+            : attack.blockstunFrames;
+        d.justDefended = just;
         d.stunElapsed = 0;
         d.lastGuard = guard;
         d.framesSinceBlock = 0;
@@ -2542,6 +2582,15 @@ final class CombatEngine {
         if (meter) gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
         freeze(a, d, holding ? holdingHitstop(attack) : attack.hitstopFrames, projectile);
         events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
+        if (just) {
+            // A janela vale uma vez: a próxima batida pede outro aperto.
+            d.guardPressCounts = false;
+            d.state.heal(d.state.profile.maxLife * config.justDefenseHealPermille / 1000);
+            gainMeter(d, CombatRules.superGainOnGuard(attack.strength));
+            cues.add("JUST_DEFENSE");
+            return;
+        }
+        d.state.chip(chip);
         int drain = attack.blockstunFrames * config.guardDrainPerBlockstunFrame;
         if (holding) drain = drain * config.guardHoldingDrainPermille / 1000;
         d.state.guard = Math.max(0, d.state.guard - drain);

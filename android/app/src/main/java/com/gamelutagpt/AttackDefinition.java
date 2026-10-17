@@ -149,6 +149,8 @@ final class AttackDefinition {
     final int maxUsesPerChain;
     /** Must be guarded crouching. Airborne attackers are always overheads. */
     final boolean low;
+    /** Golpe alto de chão: só se defende em pé (pega quem defende agachado). */
+    final boolean overhead;
     final float reach, hitHeight;
     /** Base of the default strike box: hitHeight minus the slack, or lower for a sweeping hit (uppercut). */
     final float hitFloor;
@@ -185,6 +187,7 @@ final class AttackDefinition {
         maxUsesPerCombo = b.maxUses;
         maxUsesPerChain = b.maxChainUses;
         low = b.low;
+        overhead = b.overhead;
         reach = b.reach;
         hitHeight = b.hitHeight;
         hitFloor = Math.min(b.hitFloor > 0f ? b.hitFloor : Float.MAX_VALUE, hitHeight - CombatRules.VERTICAL_SLACK);
@@ -285,7 +288,7 @@ final class AttackDefinition {
         private float knockback = -1f;
         private float pushbackOnHit, pushbackOnBlock;
         private int juggleCost = 1, maxHits = 1, maxUses = 0, maxChainUses = 0;
-        private boolean low;
+        private boolean low, overhead;
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
         private int[] strikes = new int[0];
@@ -319,6 +322,7 @@ final class AttackDefinition {
         Builder maxUsesPerCombo(int value) { maxUses = value; return this; }
         Builder maxUsesPerChain(int value) { maxChainUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
+        Builder overhead(boolean value) { overhead = value; return this; }
         Builder reach(float reachValue, float hitHeightValue) { reach = reachValue; hitHeight = hitHeightValue; return this; }
         /** Reach with the box stretched down to {@code floor} (fist path of an uppercut). */
         Builder reach(float reachValue, float hitHeightValue, float floor) { reach(reachValue, hitHeightValue); hitFloor = floor; return this; }

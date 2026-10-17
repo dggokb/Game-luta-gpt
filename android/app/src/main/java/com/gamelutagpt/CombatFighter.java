@@ -132,6 +132,16 @@ final class CombatFighter {
      * defesa). Some quando o hitstun acaba.
      */
     boolean guardBroken;
+    /**
+     * Defesa perfeita: quadros desde que trás (a defesa) foi apertado de novo, se o aperto vale
+     * (não veio logo depois do anterior: quem fica batendo trás não ganha a janela) e se trás
+     * estava seguro no quadro anterior.
+     */
+    int guardPressAge = 999;
+    boolean guardPressCounts;
+    boolean guardDirectionHeld;
+    /** A última defesa foi perfeita (para a tela; some na próxima defesa). */
+    boolean justDefended;
     /** Set by the shell while a tag animation owns the fighter. */
     boolean locked;
 

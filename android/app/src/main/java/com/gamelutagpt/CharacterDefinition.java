@@ -350,7 +350,12 @@ final class CharacterDefinition {
         this.id=id;this.displayName=displayName;this.profile=profile;this.artFacing=artFacing;
         this.visualStandHeight=visualStandHeight;this.visualCrouchHeight=visualCrouchHeight;this.fighter=fighter;
         this.animations=Collections.unmodifiableMap(new LinkedHashMap<>(animations));
-        this.moves=Collections.unmodifiableMap(new LinkedHashMap<>(moves));
+        Map<String,Move> allMoves=new LinkedHashMap<>(moves);
+        // Golpe alto de chão (→ + M) de todos: o do pack, ou montado do M até ter animação própria.
+        if(!allMoves.containsKey(GolpeAlto.BINDING)&&allMoves.containsKey("M")) {
+            allMoves.put(GolpeAlto.BINDING,GolpeAlto.from(allMoves.get("M"),allMoves.get("H")));
+        }
+        this.moves=Collections.unmodifiableMap(allMoves);
         this.specialAnimations=Collections.unmodifiableMap(new LinkedHashMap<>(specialAnimations));
         // Longest command first, so →↓↘ wins over a shorter motion it contains.
         java.util.List<Map.Entry<String,Special>> sorted=new java.util.ArrayList<>(specials.entrySet());

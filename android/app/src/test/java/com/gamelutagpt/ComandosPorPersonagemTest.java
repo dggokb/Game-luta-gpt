@@ -167,7 +167,7 @@ public class ComandosPorPersonagemTest {
     @Test public void semCargaOSegurarEUmGolpeNormal() {
         Luta l = new Luta("p02");
         l.hold("M", 5, 1, l.config().chargeFrames / 3);
-        assertEquals("pouco tempo atrás: → + M é o M", "M", l.started());
+        assertEquals("pouco tempo atrás: → + M é o golpe alto, não o especial", GolpeAlto.BINDING, l.started());
         Luta solto = new Luta("p02");
         solto.in.direction = 5;
         solto.steps(solto.config().chargeFrames + 2);
@@ -176,7 +176,7 @@ public class ComandosPorPersonagemTest {
         solto.in.direction = 1;
         solto.press("M");
         solto.step();
-        assertEquals("a carga acaba um pouco depois de soltar", "M", solto.started());
+        assertEquals("a carga acaba um pouco depois de soltar", GolpeAlto.BINDING, solto.started());
     }
 
     @Test public void segurarBaixoECimaNaoPula() {

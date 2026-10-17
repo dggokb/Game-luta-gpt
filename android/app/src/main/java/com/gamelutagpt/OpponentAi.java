@@ -31,6 +31,8 @@ final class OpponentAi {
         float verticalDistance;
         boolean selfAirborne;
         boolean targetGrounded;
+        /** O rival (como ela viu) está agachado: o golpe alto (6M) entra na escolha. */
+        boolean targetCrouching;
         boolean targetAlive;
         boolean superReady;
         boolean projectileActive;
@@ -47,6 +49,9 @@ final class OpponentAi {
     // Attack preferences; the character pack decides which of them can reach.
     static final String[] GROUND_ATTACKS = {"2L", "2M", "2H", "L", "M", "H"};
     static final double[] GROUND_WEIGHTS = {0.18, 0.18, 0.17, 0.17, 0.16, 0.14};
+    /** Contra quem está agachado: o golpe alto (→ + M) para abrir a defesa baixa. */
+    static final String[] GROUND_ATTACKS_VS_CROUCH = {"2L", "2M", "2H", "L", "M", "H", GolpeAlto.BINDING};
+    static final double[] GROUND_WEIGHTS_VS_CROUCH = {0.15, 0.15, 0.14, 0.12, 0.12, 0.10, 0.22};
     static final String[] AIR_ATTACKS = {"L", "M", "H"};
     /** Chance of throwing when the target is right next to it, and of teching a throw. */
     static final double THROW_CHANCE = 0.16;
@@ -97,7 +102,9 @@ final class OpponentAi {
             ? CombatRules.pickInRange(AIR_ATTACKS, AIR_WEIGHTS,
                 s.self, true, s.distance, s.target, random.nextDouble())
             : null;
-        String groundAttack = CombatRules.pickInRange(GROUND_ATTACKS, GROUND_WEIGHTS,
+        boolean vsCrouch = s.targetCrouching && s.targetGrounded;
+        String groundAttack = CombatRules.pickInRange(vsCrouch ? GROUND_ATTACKS_VS_CROUCH : GROUND_ATTACKS,
+            vsCrouch ? GROUND_WEIGHTS_VS_CROUCH : GROUND_WEIGHTS,
             s.self, false, s.distance, s.target, random.nextDouble());
 
         // Quem luta de longe recua para a distância dele em vez de bater colado.

@@ -89,6 +89,28 @@ final class FighterState {
         return dealt;
     }
 
+    /**
+     * Chip (o arranhão do especial/Super defendido): sai da vida e vira toda vida vermelha
+     * (volta fora de campo). Nunca tira o último ponto.
+     */
+    void chip(int amount) {
+        int taken = Math.min(amount, Math.max(0, life - Math.max(1, lifeFloor)));
+        if (taken <= 0) return;
+        life -= taken;
+        recoverableLife = Math.min(recoverableLife + taken, profile.maxLife - life);
+        refreshLifeLabel();
+    }
+
+    /** Cura: primeiro a vida vermelha volta, depois o resto, até a máxima. */
+    void heal(int amount) {
+        if (life <= 0 || amount <= 0) return;
+        int fromRed = Math.min(amount, recoverableLife);
+        recoverableLife -= fromRed;
+        life = Math.min(profile.maxLife, life + amount);
+        recoverableLife = Math.min(recoverableLife, profile.maxLife - life);
+        refreshLifeLabel();
+    }
+
     /** Pays life for a move (no recoverable part); never the last point. */
     void payLife(int amount) {
         int paid = Math.min(amount, Math.max(0, life - 1));

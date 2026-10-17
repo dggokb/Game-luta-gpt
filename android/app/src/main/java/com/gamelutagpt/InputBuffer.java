@@ -18,14 +18,17 @@ final class InputBuffer {
         final String strength;
         /** Down was held when it was pressed (grounded presses become 2L/2M/2H). */
         final boolean crouch;
+        /** Só frente (→) estava segura: no chão e saindo do neutro, o M vira o golpe alto (6M). */
+        final boolean forward;
         /** Global press order; a higher value is more recent. */
         final long order;
         int age;
 
-        Entry(Button button, String strength, boolean crouch, long order) {
+        Entry(Button button, String strength, boolean crouch, boolean forward, long order) {
             this.button = button;
             this.strength = strength;
             this.crouch = crouch;
+            this.forward = forward;
             this.order = order;
         }
 
@@ -46,8 +49,12 @@ final class InputBuffer {
     private long nextOrder;
 
     void push(Button button, String strength, boolean crouch) {
+        push(button, strength, crouch, false);
+    }
+
+    void push(Button button, String strength, boolean crouch, boolean forward) {
         if (entries.size() >= CAPACITY) entries.remove(0);
-        entries.add(new Entry(button, strength, crouch, nextOrder++));
+        entries.add(new Entry(button, strength, crouch, forward, nextOrder++));
     }
 
     /** One unfrozen frame passed: everything ages and old presses expire. */

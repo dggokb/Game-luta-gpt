@@ -186,6 +186,7 @@ public class CombatEngineTest {
     @Test public void defenderCannotActDuringHitstunOrBlockstun() {
         for (boolean guard : new boolean[] {false, true}) {
             Sim s = close();
+            s.engine.config.justDefenseFrames = -1;   // a defesa comum (a perfeita encurta o blockstun)
             if (guard) s.in[1].direction = 1;   // monster faces left: right is back
             s.in[0].medium = true;
             s.step();
@@ -613,6 +614,7 @@ public class CombatEngineTest {
 
     @Test public void guardingBuildsMeterAndAirGuardBlocksGroundAttacks() {
         Sim s = close();
+        s.engine.config.justDefenseFrames = -1;   // a defesa comum (a perfeita dá mais barra)
         s.in[1].direction = 1;            // back for the monster
         s.in[0].light = true;
         s.step();
@@ -671,7 +673,8 @@ public class CombatEngineTest {
         slow.steps(new CombatConfig().motionPressFrames + 2);
         slow.in[0].medium = true;
         slow.step();
-        assertEquals("Late press is a plain M", "M", slow.attackId(0));
+        // Fora do comando, com → seguro: o M vira o golpe alto (→ + M), não o especial.
+        assertEquals("Late press is the forward M", GolpeAlto.BINDING, slow.attackId(0));
     }
 
     /** Holds each relative direction for one frame, then presses the button. */

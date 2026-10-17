@@ -494,6 +494,37 @@ Defender para sempre não funciona: cada defesa gasta a **guarda** (`FighterStat
 
 Testes em `GuardBreakTest`.
 
+### Golpe alto, chip e defesa perfeita
+
+Três peças para a defesa não ser de graça nem perfeita sem esforço (inspiradas no overhead do
+SF6/FighterZ, no chip de especial de todos e no Just Defense do Garou).
+
+- **Golpe alto (→ + M, `GolpeAlto`)**: universal. Montado do M de cada personagem (a mesma
+  animação, esticada) quando o pack não declara um `6M`: preparo 20, ativo 3, recuperação 14,
+  dano 115% do M, +3 no acerto, −6 na defesa. Pega quem defende **agachado**; em pé defende
+  (`AttackDefinition.overhead`, `guardStops`). No acerto cancela nos especiais e no Super (os
+  do H). Sai só do neutro (`CancelSystem`: dentro de um combo o → + M continua sendo o M) e
+  uma vez por combo. Ao sair, cue `OVERHEAD`: brilho amarelo na cabeça para dar para ler.
+- **Chip**: especial defendido tira 1/8 do dano da batida (`chipSpecialPermille` 125), Super e
+  Ultra 1/4 (`chipSuperPermille` 250). O arranhão vira **vida vermelha** inteira
+  (`FighterState.chip`: volta fora de campo) e **nunca derruba** (para em 1). Normais não arranham.
+- **Defesa perfeita**: apertar trás (a defesa, alta ou baixa; no ar, qualquer defesa do ar)
+  até `justDefenseFrames` (5) quadros antes do contato. Não gasta guarda, não leva chip, cura
+  1,2% da vida (`justDefenseHealPermille`, primeiro a vermelha), dá a barra de novo e o
+  blockstun cai a 40% (`justDefenseBlockstunPermille`): sai antes e pode punir. Quem bate trás
+  sem parar não ganha: um aperto até `justDefenseLockoutFrames` (20) depois do anterior não abre
+  a janela; segurar trás desde antes é a defesa comum. Cada batida pede um aperto novo.
+  Cue `JUST_DEFENSE`: "DEFESA PERFEITA!", brilho branco no peito e o som da defesa mais agudo.
+- **CPU**: contra quem está agachado entra o 6M na escolha (peso 0,22). Vendo um golpe alto,
+  defende em pé (errar a altura continua na chance do nível). Do nível 5 em diante tenta a
+  defesa perfeita (`CpuLevel.justDefense`: 8% por nível acima do 4) quando dá tempo: fica parada
+  e aperta a defesa 2 quadros antes do contato. Na prática sai mais contra projétil (contra
+  golpe rápido a reação não deixa tempo).
+- **COMANDOS** (pausa): "Golpe alto → + M" e "Defesa perfeita ←" em todas as fichas; com muitas
+  linhas elas ficam mais baixas para caber acima do rodapé.
+
+Testes em `DefesaEGolpeAltoTest`.
+
 ## Agarrão e tech — v0.80
 
 A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. Estado próprio

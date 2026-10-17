@@ -1468,6 +1468,8 @@ public class GameView extends SurfaceView
                 }
             }
             if ("GUARD_BREAK".equals(cue)) spawnGuardBreak();
+            if ("JUST_DEFENSE".equals(cue)) spawnJustDefense();
+            if ("OVERHEAD".equals(cue)) spawnOverheadWarning();
             if ("ULTRA_FINISH".equals(cue)) {
                 beamShake = Math.max(beamShake, 22f);
                 // Último dano do Ultra em sequência: impact frame em quem apanhou e câmera lenta.
@@ -2059,6 +2061,25 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("guarda_quebrada", 1f, 1f);
     }
 
+    /** Defesa perfeita: um brilho branco no peito de quem defendeu e o som da defesa mais agudo. */
+    private void spawnJustDefense() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (!f.justDefended || f.status != CombatFighter.Status.BLOCKSTUN || f.stunElapsed > 0) continue;
+            impacts.spawnSuperGlint(f.x, chestY(f), 0xFFFFFFFF);
+        }
+        ultraSounds.playFight("defesa", 1f, 1.45f);
+    }
+
+    /** Golpe alto saindo: o brilho de aviso na cabeça de quem bate (dá para ler e ficar em pé). */
+    private void spawnOverheadWarning() {
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (!f.attacking() || !f.attack.overhead || f.attackFrame > 1) continue;
+            impacts.spawnSuperGlint(f.x + f.facing * f.body().halfWidth * .5f, visualTop(f) + 16f, 0xFFFFD84A);
+        }
+    }
+
     private void spawnClash(CombatEngine.ProjectileClash clash) {
         int size = clash.big ? ImpactEffects.SPECIAL : ImpactEffects.MEDIUM;
         impacts.spawn(ImpactEffects.HIT, clash.x, clash.y, clash.firstDirection, size, clash.firstColor);
@@ -2153,6 +2174,7 @@ public class GameView extends SurfaceView
             case "PUSHBLOCK": return "PUSHBLOCK!";
             case "GUARD_CANCEL": return "GUARD CANCEL!";
             case "GUARD_BREAK": return "GUARD BREAK!";
+            case "JUST_DEFENSE": return "DEFESA PERFEITA!";
             case "DHC": return "TEAM SUPER!";
             case "OVERDRIVE": return "OVERDRIVE!";
             case "COUNTER": return "CONTRA-GOLPE!";

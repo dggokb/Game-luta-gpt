@@ -26,8 +26,14 @@ public class GuardBreakTest {
 
         void steps(int n) { for (int i = 0; i < n; i++) step(); }
 
-        /** P1 segura para trás (defesa em pé). */
-        void holdGuard() { in[0].direction = f(0).facing > 0 ? 5 : 1; }
+        /**
+         * P1 segura para trás (defesa em pé), já segurando de antes: a defesa comum, não a
+         * perfeita (essa fica em JustDefenseTest).
+         */
+        void holdGuard() {
+            in[0].direction = f(0).facing > 0 ? 5 : 1;
+            engine.config.justDefenseFrames = -1;
+        }
 
         /** O CPU aperta M e o motor anda até o golpe encostar. O contato (ou null). */
         CombatEngine.HitEvent attackUntilContact() {

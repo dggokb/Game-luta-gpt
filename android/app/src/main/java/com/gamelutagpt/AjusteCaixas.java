@@ -75,7 +75,11 @@ final class AjusteCaixas {
         out.add(new Item("AGACHADO", "CORPO AGACHADO", Item.Tipo.AGACHADO, c.animations.get(SpriteStates.CROUCH), null)
             .add("fighter.body.halfWidth", "largura (metade)", b.halfWidth, 2f)
             .add("fighter.body.crouchHeight", "altura agachado", b.crouchHeight, 2f));
-        for (Map.Entry<String,CharacterDefinition.Move> e : c.moves.entrySet()) golpe(out, "moves." + e.getKey(), e.getKey(), e.getValue());
+        for (Map.Entry<String,CharacterDefinition.Move> e : c.moves.entrySet()) {
+            // O golpe alto montado do M (sem entrada no pacote) não tem caixa própria para ajustar.
+            if (GolpeAlto.derived(c, e.getKey())) continue;
+            golpe(out, "moves." + e.getKey(), e.getKey(), e.getValue());
+        }
         for (Map.Entry<String,CharacterDefinition.Special> e : c.specials.entrySet())
             golpe(out, "specialMoves." + e.getKey(), e.getKey(), e.getValue().move);
         CharacterDefinition.Projectile energy = c.fighter.energy;

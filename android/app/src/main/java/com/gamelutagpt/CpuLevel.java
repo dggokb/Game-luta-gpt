@@ -72,6 +72,14 @@ final class CpuLevel {
         new CpuLevel(8, 13,  3, 0.72, 0.92, 0.97, 12, 0.95, 0.02, 0.90, 0.85, 0.65, 0.40, 0.92, 0.12f, 0.22f, 1.2),
     };
 
+    /**
+     * Chance de tentar a defesa perfeita (apertar a defesa em cima da hora) no que ela decidiu
+     * defender: nada até o 4, depois sobe com o nível.
+     */
+    double justDefense() {
+        return number <= 4 ? 0.0 : 0.08 * (number - 4);
+    }
+
     static CpuLevel of(int number) {
         return LEVELS[Math.max(MIN, Math.min(MAX, number)) - 1];
     }

@@ -15,6 +15,8 @@ final class CpuPerception {
         int frame;
         float x, y, vx, vy;
         boolean grounded, ko;
+        /** Agachado (na tela): o golpe alto pega. */
+        boolean crouching;
         CombatFighter.Status status;
         /** Golpe na tela (null = nenhum) e em que quadro dele. */
         AttackDefinition attack;
@@ -75,6 +77,7 @@ final class CpuPerception {
         s.frame = frame;
         s.x = t.x; s.y = t.y; s.vx = t.vx; s.vy = t.vy;
         s.grounded = t.grounded;
+        s.crouching = t.grounded && t.crouching;
         s.ko = t.ko();
         s.status = t.status;
         s.attack = t.attacking() ? t.attack : null;

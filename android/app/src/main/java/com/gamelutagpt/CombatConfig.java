@@ -305,6 +305,24 @@ final class CombatConfig {
     /** Abaixo disto (por mil da guarda) o aviso da guarda fica vermelho e pisca. */
     int guardWarningPermille = 300;
 
+    // Chip: especial e Super defendidos ainda arranham. O arranhão vira vida vermelha
+    // (recuperável fora de campo) e nunca derruba. A defesa perfeita não leva.
+    /** Do dano da batida de um especial defendido (por mil). */
+    int chipSpecialPermille = 125;
+    /** Do dano da batida de um Super/Ultra defendido (por mil). */
+    int chipSuperPermille = 250;
+
+    // Defesa perfeita: apertar trás (a defesa) em cima da hora, até estes quadros antes do
+    // contato. Não gasta guarda nem leva chip, cura um pouco, o blockstun encurta e a barra
+    // sobe mais. Bater trás sem parar não vale: um aperto até este tanto de quadros depois do
+    // anterior não abre a janela.
+    int justDefenseFrames = 5;
+    int justDefenseLockoutFrames = 20;
+    /** Blockstun que sobra (por mil do do golpe): sai antes e pode punir. */
+    int justDefenseBlockstunPermille = 400;
+    /** Vida que volta (por mil da vida máxima): primeiro a vermelha. */
+    int justDefenseHealPermille = 12;
+
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.
     int guardCancelCost = METER_PER_BAR;
     /** The opponent freezes for the cross-counter flash. */

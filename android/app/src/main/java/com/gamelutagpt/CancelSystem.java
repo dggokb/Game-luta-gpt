@@ -52,7 +52,14 @@ final class CancelSystem {
         if (autoStepOut != null) autoStepOut[0] = -1;
         switch (entry.button) {
             case LIGHT: return c.attack(binding(f, "L", entry.crouch));
-            case MEDIUM: return c.attack(binding(f, "M", entry.crouch));
+            case MEDIUM:
+                // → + M do neutro, no chão: o golpe alto. Dentro de um combo continua sendo o M
+                // (quem segura → durante L > M não perde a ligação).
+                if (entry.forward && !entry.crouch && f.grounded && !f.attacking() &&
+                    c.moves.containsKey(GolpeAlto.BINDING)) {
+                    return c.attack(GolpeAlto.BINDING);
+                }
+                return c.attack(binding(f, "M", entry.crouch));
             case HEAVY: return c.attack(binding(f, "H", entry.crouch));
             case SPECIAL:
                 // Command specials (S2, S3...): ground moves, or air-only ones; the strength names them.
