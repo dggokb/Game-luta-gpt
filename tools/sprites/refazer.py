@@ -128,6 +128,10 @@ def remap_animation(anim, where, total):
         if durs is not None:
             durations += split(int(round(durs[j])), len(group)) if len(group) > 1 else [durs[j]]
     out = dict(anim, frames=frames)
+    if durs is not None and len(set(durs)) == 1 and anim.get('impactFrame') is None:
+        # Ritmo uniforme (idle, corrida, vitória): uniforme na folha nova também, senão o quadro
+        # sem vizinho novo (fim do ciclo, efeito pulado) fica mais longo e a animação engasga.
+        durations = split(int(round(sum(durs))), len(frames))
     if durs is not None:
         out['durationsMs'] = durations
     if anim.get('impactFrame') is not None:
@@ -266,7 +270,9 @@ def redo(cid, videos, states, scratch, only_size=False):
         cfg.update(source=hd, sourceReferences=[ref], video=recipe,
                    sourceNote=f'{cid} em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: '
                               'todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.')
-        cfg.pop('minOpaquePixels', None)
+        # Ajustes da folha antiga (tamanho no app, régua) não valem para a folha nova.
+        for key in ('minOpaquePixels', 'ajusteTamanho', 'regua'):
+            cfg.pop(key, None)
         write(path, cfg)
         for state, anim in users.items():
             anims[state], starts = remap_animation(anim, where, len(new_q))
@@ -313,7 +319,7 @@ def head_zooms(regua_cabeca, video, quadros, scratch=None):
     import cabeca
     cache = Path(scratch) / 'cabeca.json' if scratch else None
     store = read(cache) if cache and cache.exists() else {}
-    key = f'{Path(video).name}:{",".join(map(str, quadros))}'
+    key = f'{Path(video).parent.name}/{Path(video).name}:{",".join(map(str, quadros))}'
     if key not in store:
         frames = video_frames(video)
         raw, guess = [], None
@@ -420,27 +426,89 @@ def size_pass(cid, done, scratch):
         changed = True
     if changed:
         build()
+    seam_level(cid, done, scratch)
     return [a for a, *_ in done]
 
 
-MAX_SIDE = 4096  # lado máximo de textura que todo aparelho aceita
+SEAM_TOL = 0.02  # emenda a ±2% do IDLE fica como está
 
 
-def fits_hd(cfg):
-    """A folha HD (densidade 2) cabe em MAX_SIDE nos dois lados?"""
+def seam_level(cid, done, scratch, apply=True):
+    """Ponta do clipe na mesma pose da guarda do IDLE (silhuetas encaixam, regua.POSE_IOU): o
+    jogo troca ali, então ela tem o tamanho do IDLE. Vale sobre a régua da cabeça: o Seedance às
+    vezes desenha o personagem com outra proporção num vídeo (vitoria.mp4 do p01: cabeça maior,
+    a cabeça encolhia o corpo 14%). O degrau de tamanho dentro do clipe continua o da cabeça.
+    Devolve {folha: fator} das emendas fora do IDLE."""
+    import regua
+    p = regua.Pack(cid)
+    atlases = {a for a, *_ in done}
+    idle_atlas = p.anim('IDLE')['atlas']
+    best = {}
+    for s in regua.seams(p):
+        atlas = p.anim(s['estado'])['atlas']
+        if s['ref'] != 'guarda' or not s['mesma_pose'] or atlas not in atlases or atlas == idle_atlas:
+            continue
+        if atlas not in best or s['iou'] > best[atlas]['iou']:
+            best[atlas] = s
+    out = {}
+    for atlas, s in best.items():
+        if abs(s['fator'] - 1) <= SEAM_TOL:
+            continue
+        out[atlas] = s['fator']
+        print(f"{atlas}: {s['estado']} {s['ponta']} na pose do IDLE (encaixe {s['iou']:.2f}) com "
+              f"{s['fator']:.0%} do tamanho dele", flush=True)
+        if not apply:
+            continue
+        _, path, video, _, _, ref, _ = next(d for d in done if d[0] == atlas)
+        v = read(path)['video']
+        base = float(v['escala']) / s['fator']
+        note = v.get('motivo', '') + (f"; emenda {s['estado']} {s['ponta']} na pose do IDLE: escala base "
+                                      f"{base:.4f} (o tamanho do IDLE)")
+        reescala = ','.join(f'{x:.4f}' for x in v['reescala'])
+        convert_pair(video, path, ['--escala', f'{base:.4f}', '--motivo', note, '--reescala', reescala], ref, scratch)
+    if out and apply:
+        build()
+    return out
+
+
+MAX_SIDE = 4096    # lado máximo da folha: a empacotada do jogo e a grade HD fonte (test_hd_video)
+PACKING = 1.25      # folga do empacotamento sobre a soma das caixas dos quadros
+
+
+def fits_hd(sheet, cfg):
+    """A folha HD (densidade 2) cabe? A grade fonte e a folha empacotada que o jogo carrega (só a
+    caixa desenhada de cada quadro, tools/sprites/folhas.py) têm de caber em MAX_SIDE; a
+    empacotada é estimada pela folha 1x da mesma receita. Célula larga demais para o corpo
+    tira a HD (idle do p01: 192 de largura cabe, 256 não)."""
+    from PIL import Image
     v = cfg['video']
-    w = v.get('largura', v.get('celula', 256)) * 2
-    h = v.get('celula', 256) * 2
-    n = len(str(v['quadros']).split(','))
-    cols = max(1, MAX_SIDE // w)
-    return -(-n // cols) * h <= MAX_SIDE
+    w, h = v.get('largura', v.get('celula', 256)), v.get('celula', 256)
+    cols, n = cfg['columns'], cfg['expectedFrames']
+    alpha = np.array(Image.open(sheet).convert('RGBA'))[..., 3] > 0
+    area = 0
+    for i in range(n):
+        cell = alpha[i // cols * h:(i // cols + 1) * h, i % cols * w:(i % cols + 1) * w]
+        ys, xs = np.nonzero(cell)
+        if len(ys):
+            area += (np.ptp(ys) + 9) * (np.ptp(xs) + 9)
+    rows = -(-n // max(1, MAX_SIDE // (2 * w)))
+    return area * 4 * PACKING <= MAX_SIDE * MAX_SIDE and rows * 2 * h <= MAX_SIDE
 
 
 def convert_pair(video, path, extra, ref, scratch, grow=3):
     """1x de referência e HD com a mesma receita; a HD guarda a 1x em referencia. Clipe com
     quadros demais para caber em HD (intro, vitória...) sai em 1x direto, sem referência."""
+    one = Path(scratch) / f'{path.stem}_1x.json'
     cfg = read(path)
-    if not fits_hd(cfg):
+    v = cfg['video']
+    # Colunas que a grade HD comporta em MAX_SIDE: menos linhas, a grade cabe na altura.
+    v['colunas'] = max(1, MAX_SIDE // (2 * v.get('largura', v.get('celula', 256))))
+    write(path, cfg)
+    v.pop('referencia', None)
+    write(one, cfg)
+    convert(video, one, extra + ['--densidade', '1'], out=ROOT / ref)
+    cfg = read(path)
+    if not fits_hd(ROOT / ref, read(one)):
         v = cfg['video']
         v.pop('referencia', None)
         v['colunas'] = max(1, MAX_SIDE // v.get('largura', v.get('celula', 256)))
@@ -462,11 +530,6 @@ def convert_pair(video, path, extra, ref, scratch, grow=3):
             write(path, cfg)
             return convert_pair(video, path, extra, ref, scratch, grow - 1)
         return read(path)['columns']
-    one = Path(scratch) / f'{path.stem}_1x.json'
-    cfg = read(path)
-    cfg['video'].pop('referencia', None)
-    write(one, cfg)
-    convert(video, one, extra + ['--densidade', '1'], out=ROOT / ref)
     columns = read(one)['columns']
     cell = read(one)['video']
     width = cell.get('largura', cell.get('celula', 256))

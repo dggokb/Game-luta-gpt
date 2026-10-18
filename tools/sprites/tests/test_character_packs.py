@@ -352,7 +352,7 @@ class BuiltPackTests(unittest.TestCase):
         self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['grid'])
         self.assertEqual(report['packed']['frameCount'],len(report['packed']['frames']))
         self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
-        self.assertEqual(512,report['layout']['frameWidth'])
+        self.assertEqual(384,report['layout']['frameWidth'])   # célula de 192 em HD (refazer.py)
         self.assertEqual(2,report['packed']['pixelScale'])
 
     def test_shipped_sheets_fit_old_gpu_textures(self):
@@ -369,17 +369,15 @@ class BuiltPackTests(unittest.TestCase):
         self.assertEqual([42]*76,idle['durationsMs'])
         self.assertTrue(idle['loop'])
         report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
-        self.assertEqual([512,512,256,476], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        # Célula de 192 de largura (o corpo tem ~170): a grade HD cabe em 4096 (10 colunas).
+        self.assertEqual([384,512,192,476], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         packed=report['packed']
         self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
         self.assertLessEqual(packed['frameHeight']*8,4096)
         self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
-        original=Image.open(self.root/'art/sprites/source/player_base_idle_video_normalized.png').convert('RGBA')
-        master=Image.open(self.root/'art/sprites/source/player_base_idle_sr_2x.png').convert('RGBA')
-        for i in range(76):
-            old=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
-            new=master.crop((i%10*512,i//10*512,(i%10+1)*512,(i//10+1)*512))
-            self.assertEqual(old.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),new.getchannel('A').tobytes(),i)
+        # Refeito do vídeo (refazer.py): a HD sai direto do vídeo com a 1x de referência, mesma
+        # receita, então cada célula é a 1x vezes 2.
+        self.assert_hd_follows_reference('player_base_idle',10,192,256,76,1.0,hd='video_hd')
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn(',10,76,2.00000000f,',java)
         self.assertIn('art/sprites/source/player_base_idle_video_normalized.png',report['provenance']['referenceSources'])

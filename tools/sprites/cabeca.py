@@ -51,7 +51,7 @@ def head_crop(rgba):
 
 class Regua:
     def __init__(self, cid):
-        keys = ROOT / 'art/keys' / cid
+        keys = ROOT / 'art/keys' / ('p01' if cid == 'player_base' else cid)
         self.key_scale = json.loads((keys / 'tamanho.json').read_text())['chaves']['inicio_centro']
         self.head = head_crop(vps.key(cv2.imread(str(keys / 'inicio_centro.png'))))
 

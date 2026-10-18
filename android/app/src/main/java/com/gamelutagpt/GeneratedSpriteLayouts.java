@@ -2632,11 +2632,11 @@ final class GeneratedSpriteLayouts {
     static final int CROUCH_MEDIUM_ROOT_Y = 337;
     static final int CROUCH_MEDIUM_FRAME_COUNT = 16;
 
-    static final int DASH_SET_FRAME_WIDTH = 566;
-    static final int DASH_SET_FRAME_HEIGHT = 300;
-    static final int DASH_SET_ROOT_X = 365;
-    static final int DASH_SET_ROOT_Y = 283;
-    static final int DASH_SET_FRAME_COUNT = 6;
+    static final int DASH_SET_FRAME_WIDTH = 561;
+    static final int DASH_SET_FRAME_HEIGHT = 292;
+    static final int DASH_SET_ROOT_X = 341;
+    static final int DASH_SET_ROOT_Y = 280;
+    static final int DASH_SET_FRAME_COUNT = 11;
 
     static final int DEFEAT_FRAME_WIDTH = 304;
     static final int DEFEAT_FRAME_HEIGHT = 498;
@@ -2723,9 +2723,9 @@ final class GeneratedSpriteLayouts {
     static final int HIT_STAND_FRAME_COUNT = 9;
 
     static final int IDLE_FRAME_WIDTH = 331;
-    static final int IDLE_FRAME_HEIGHT = 476;
-    static final int IDLE_ROOT_X = 165;
-    static final int IDLE_ROOT_Y = 462;
+    static final int IDLE_FRAME_HEIGHT = 475;
+    static final int IDLE_ROOT_X = 164;
+    static final int IDLE_ROOT_Y = 463;
     static final int IDLE_FRAME_COUNT = 76;
 
     static final int INTRO_SET_FRAME_WIDTH = 347;
@@ -2830,11 +2830,11 @@ final class GeneratedSpriteLayouts {
     static final int ULTRA_BEAM_ROOT_Y = 465;
     static final int ULTRA_BEAM_FRAME_COUNT = 9;
 
-    static final int VICTORY_FRAME_WIDTH = 326;
-    static final int VICTORY_FRAME_HEIGHT = 577;
-    static final int VICTORY_ROOT_X = 171;
-    static final int VICTORY_ROOT_Y = 556;
-    static final int VICTORY_FRAME_COUNT = 33;
+    static final int VICTORY_FRAME_WIDTH = 177;
+    static final int VICTORY_FRAME_HEIGHT = 307;
+    static final int VICTORY_ROOT_X = 87;
+    static final int VICTORY_ROOT_Y = 294;
+    static final int VICTORY_FRAME_COUNT = 97;
 
     static final int WALK_BACK_SET_FRAME_WIDTH = 327;
     static final int WALK_BACK_SET_FRAME_HEIGHT = 480;

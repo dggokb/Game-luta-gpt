@@ -38,14 +38,8 @@ public class P01VisualMasterTest {
         return new float[]{v[0]/f,v[1]/f};
     }
 
-    @Test public void excessiveDashJumpAndVictorySizesAreReduced() {
-        assertEquals("Dash visually grows by 15% from v0.97 in X",
-                     .8395f,base("player_base_dash",0)[0],.001f);
-        assertEquals("Dash visually grows by 15% from v0.97 in Y",
-                     1.10975f,base("player_base_dash",0)[1],.001f);
+    @Test public void excessiveJumpAndCrouchSizesAreReduced() {
         assertTrue("Jump start must shrink",base("player_base_jump",0)[1]<.90f);
-        assertEquals("Victory compromise between previous oversized and undersized",
-                     .880f,base("player_base_victory",15)[1],.001f);
         assertTrue("2H raised pose must stay visibly tall",
                    base("player_base_crouch_heavy",4)[1]>.73f);
         assertTrue("2H torso must keep idle-like width",
@@ -54,8 +48,25 @@ public class P01VisualMasterTest {
                    base("player_base_crouch_medium",6)[1]<.96f);
     }
 
-    @Test public void appSizeAdjustmentIsAppliedOnTopOfTheCalibration() {
-        float f=P01SpriteCalibration.tuned("player_base_dash");
-        assertEquals(.8395f*f,P01SpriteCalibration.get("player_base_dash",0)[0],.001f);
+    /**
+     * Folhas refeitas do vídeo (tools/sprites/refazer.py): tamanho e posição já vêm na folha, então
+     * são desenhadas como o IDLE (0,98), sem fator à mão (dash era 1,11; vitória 0,88) e sem
+     * recentrar quadro a quadro (o corpo deslizava com os braços).
+     */
+    @Test public void videoRedoneSheetsAreDrawnLikeTheIdle() {
+        for(String atlas:new String[]{"player_base_dash","player_base_victory"}) {
+            assertEquals(1f,P01SpriteCalibration.tuned(atlas),0f);
+            for(int i=0;i<P01SpriteCalibration.frames(atlas);i++) {
+                float[] k=P01SpriteCalibration.get(atlas,i);
+                assertEquals(atlas+" "+i,.98f,k[0],1e-4f);
+                assertEquals(atlas+" "+i,.98f,k[1],1e-4f);
+                assertEquals(atlas+" "+i,0f,k[2],0f);
+                assertEquals(atlas+" "+i,0f,k[3],0f);
+            }
+        }
+    }
+
+    @Test public void appSizeAdjustmentIsRecordedOnTheCalibration() {
+        assertEquals(.99f,P01SpriteCalibration.tuned("player_base_intro"),1e-4f);
     }
 }

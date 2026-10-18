@@ -59,6 +59,14 @@ def tuned(key):
     return float(json.loads(clip.read_text()).get("ajusteTamanho", 1.0)) if clip.exists() else 1.0
 
 
+def redone(key):
+    """Folha refeita do vídeo por tools/sprites/refazer.py: tamanho (régua da cabeça) e posição
+    (câmera parada) já vêm certos na folha; normalizar quadro a quadro pela caixa desfaria o
+    tamanho e faria o corpo deslizar com os braços."""
+    clip = CLIPS / f"{key}.json"
+    return clip.exists() and "refazer.py" in json.loads(clip.read_text()).get("sourceNote", "")
+
+
 def compute():
     idle = json.loads((REPORTS / "player_base_idle.report.json").read_text())
     left, top, right, bottom = idle["frames"][0]["outputBbox"]
@@ -70,6 +78,11 @@ def compute():
         key = report["id"]
         if key in SKIP:
             audit[key] = {"frames": len(report["frames"]), "mode": "existing calibrated transition"}
+            continue
+        if redone(key):
+            # Mesmo tamanho do IDLE desenhado (P01_IDLE_SCALE), sem mexer quadro a quadro.
+            data[key] = [(STAND_SCALE, STAND_SCALE, 0.0, 0.0)] * len(report["frames"])
+            audit[key] = {"frames": len(report["frames"]), "mode": "refeita do vídeo: folha como está"}
             continue
         root_x = report["layout"]["rootX"]
         root_y = report["layout"]["rootY"]
@@ -227,7 +240,8 @@ def main():
                 "player_base_crouch_medium", "player_base_crouch_heavy",
                 "player_base_jump", "player_base_victory", "player_base_intro"):
         assert key in data and data[key]
-    assert len(data["player_base_victory"]) == 33, "Victory must normalize every source frame"
+    assert redone("player_base_victory") or len(data["player_base_victory"]) == 33, \
+        "Victory must normalize every source frame"
     assert all(item["max_abs_ground_foot_error"] < .01 for key,item in audit.items()
                if "max_abs_ground_foot_error" in item and key not in
                ("player_base_jump", "player_base_fall_air", "player_base_backdash",

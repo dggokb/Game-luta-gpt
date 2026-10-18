@@ -2,25 +2,61 @@
   "id": "player_base_dash",
   "javaName": "DASH_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_dash_sr_hd.png",
+  "source": "art/sprites/source/player_base_dash_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_dash.webp",
   "report": "tools/sprites/reports/player_base_dash.report.json",
   "preview": "android/app/build/sprite-review/dash-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 11,
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
   "frameWidth": 1024,
   "rootX": 600,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "sourceNote": "player_base em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "sourceReferences": [
     "art/sprites/source/player_base_dash_video_normalized.png"
   ],
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p01",
+    "escala": 0.3214,
+    "motivo": "régua da cabeça discordou da receita (1.1061 x 0.3214): escala da receita, única",
+    "quadros": "27,28,29,30,31,32,33,34,35,36,37",
+    "largura": 512,
+    "raiz": "300,238",
+    "colunas": 4,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "deslocar": "6,0",
+    "sem_poeira": true,
+    "reescala": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/player_base_dash_video_normalized.png",
+      "celula": [
+        512,
+        256
+      ],
+      "raiz": [
+        300,
+        238
+      ],
+      "colunas": 4
+    }
+  },
   "frameHeight": 512,
   "rootY": 476,
-  "pixelScale": 2.0,
-  "ajusteTamanho": 0.95,
-  "regua": [
-    "ajuste no app 20261014-0532: 95% (DASH)"
-  ]
+  "pixelScale": 2.0
 }
