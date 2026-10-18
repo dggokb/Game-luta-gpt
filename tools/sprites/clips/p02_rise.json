@@ -15,7 +15,7 @@
     "arquivo": "agachar.mp4",
     "personagem": "p02",
     "escala": 0.3318,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial); esqueleto 93%: escala base na média das duas réguas 0.3318",
+    "motivo": "régua da cabeça: um tamanho só; nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial); esqueleto 93%: escala base na média das duas réguas 0.3318",
     "quadros": "69,71,73,75,77,79,81,83,85,87,89",
     "largura": 224,
     "raiz": "115,238",

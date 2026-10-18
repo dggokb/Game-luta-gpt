@@ -206,7 +206,7 @@ assim.
 
 ```
 python3 tools/sprites/refazer.py p02 <pasta dos vídeos>        # todos os clipes (menos ultras)
-python3 tools/sprites/refazer.py p02 <pasta> --so-tamanho       # retoma: só células e nível
+python3 tools/sprites/refazer.py p02 <pasta> --so-tamanho       # só o tamanho de novo
 ```
 
 Da receita antiga só ficam o trecho do vídeo de cada clipe e o tempo do jogo (frame data,
@@ -217,10 +217,14 @@ convertidos em HD direto do vídeo (em 1x quando os quadros não cabem em 4096 p
 O Seedance muda o tamanho do corpo dentro do vídeo (dash.mp4 da p02: correndo ~15% maior que
 em guarda) e entre vídeos (intro.mp4 em pé ~13% maior). A **régua da cabeça**
 (`tools/sprites/cabeca.py`) acha a cabeça da imagem inicial em cada quadro, em resolução
-cheia, e dá a curva de tamanho de cada vídeo, suavizada (no máximo 0,6% por quadro, sem
-tremer). O nível vem do quadro do vídeo que é a imagem inicial; nos vídeos que não começam
+cheia. Cada clipe fica com **um tamanho só** (a mediana da medida), com degrau só onde o
+vídeo muda de tamanho de verdade: trechos de 6 quadros medidos ou mais com 8% ou mais de
+diferença (`cabeca.degraus`). Nunca curva: a curva suavizada transformava o erro da medida
+(~4% por quadro, cabeça virada) num zoom lento, o corpo crescendo e diminuindo no jogo. O
+nível vem do começo (ou do fim) do vídeo, que é a imagem inicial; nos vídeos que não começam
 nem terminam nela, da média de duas réguas (cabeça e esqueleto, com erros para lados
-opostos). Deitado (KNOCKDOWN, GROUNDED, GETUP): escala única da receita.
+opostos). Deitado (KNOCKDOWN, GROUNDED, GETUP): escala única da receita. `--so-tamanho` refaz
+só o tamanho nos quadros que as folhas já têm (a medida da cabeça fica guardada no rascunho).
 
 ## Tamanho pelo esqueleto (qualquer pose)
 

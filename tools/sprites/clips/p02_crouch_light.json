@@ -15,7 +15,7 @@
     "arquivo": "2L.mp4",
     "personagem": "p02",
     "escala": 0.29,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial); esqueleto 86%: escala base na média das duas réguas 0.2900",
+    "motivo": "régua da cabeça: um tamanho só; nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial); esqueleto 86%: escala base na média das duas réguas 0.2900",
     "quadros": "29,34,41,43,46,50,53,56,60,63,66",
     "celula": 192,
     "largura": 224,

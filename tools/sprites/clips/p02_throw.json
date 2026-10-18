@@ -15,7 +15,7 @@
     "arquivo": "agarrao.mp4",
     "personagem": "p02",
     "escala": 0.525,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5250 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5250 medida pela receita)",
     "quadros": "16,19,22,25,28,32,35,38,41,47,51,54,57,60,63,66",
     "celula": 288,
     "largura": 288,
@@ -23,22 +23,22 @@
     "colunas": 7,
     "limpar_chao": true,
     "reescala": [
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011
     ],
     "limpar_quadros": [
       9
@@ -54,7 +54,7 @@
         110,
         270
       ],
-      "colunas": 9
+      "colunas": 7
     }
   },
   "frameWidth": 576,

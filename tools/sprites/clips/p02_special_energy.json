@@ -15,7 +15,7 @@
     "arquivo": "s1.mp4",
     "personagem": "p02",
     "escala": 0.3991,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial)",
+    "motivo": "régua da cabeça: um tamanho só; nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial)",
     "quadros": "9,11,14,17,20,23,26,33,37,42,46,49,53,57,60,64,67,71,74,78,81,85,89,92,96",
     "celula": 288,
     "largura": 256,
@@ -59,7 +59,7 @@
         136,
         270
       ],
-      "colunas": 11
+      "colunas": 8
     }
   },
   "frameHeight": 576,

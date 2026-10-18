@@ -15,7 +15,7 @@
     "arquivo": "levarGolpeEmPe.mp4",
     "personagem": "p02",
     "escala": 0.3034,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial)",
+    "motivo": "régua da cabeça: um tamanho só; nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial)",
     "quadros": "19,26,31,34,36,39,41,43,46,48,51,53,56,58,61,63,66,68,71,73,76,78",
     "largura": 352,
     "raiz": "108,238",
@@ -58,7 +58,7 @@
         108,
         238
       ],
-      "colunas": 9
+      "colunas": 5
     }
   },
   "frameWidth": 704,

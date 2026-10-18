@@ -15,20 +15,20 @@
     "arquivo": "pulo.mp4",
     "personagem": "p02",
     "escala": 0.5267,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
     "quadros": "58,59,60,61,62,63,64",
     "celula": 288,
     "largura": 224,
     "raiz": "103,270",
     "colunas": 4,
     "reescala": [
-      1.0941,
-      1.0876,
-      1.0811,
-      1.0747,
-      1.0683,
-      1.0619,
-      1.0556
+      1.0334,
+      1.0334,
+      1.0334,
+      1.0334,
+      1.0334,
+      1.0334,
+      1.0334
     ],
     "densidade": 2,
     "referencia": {

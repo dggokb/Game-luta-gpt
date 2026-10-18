@@ -15,9 +15,10 @@ Para cada folha (atlas):
 3. Conversão do vídeo em HD direto (densidade 2), com a escala da receita e as opções dela
    (recorte, fixar, chão...). As correções de tamanho antigas (reescala da régua) saem: o
    tamanho é refeito pelo esqueleto.
-4. Tamanho: tools/sprites/esqueleto.py, quadro a quadro com a curva suavizada, numa
-   reconversão só (uma reamostragem). Deitado (KNOCKDOWN, GROUNDED, GETUP) fica na escala
-   da receita: o esqueleto não é confiável.
+4. Tamanho: régua da cabeça (cabeca.py), por trecho: um tamanho só no clipe, com degrau só
+   onde o vídeo muda de tamanho de verdade (cabeca.degraus), nunca curva. Nível pela imagem
+   inicial do vídeo ou, sem ela, pela média da cabeça com o esqueleto. Deitado (KNOCKDOWN,
+   GROUNDED, GETUP) fica na escala da receita: a cabeça deitada não é achada direito.
 A folha 1x da mesma receita fica como referência da HD (sourceReferences).
 
 Os retoques à mão das folhas antigas se perdem (é do zero). Ultras ficam de fora.
@@ -107,28 +108,40 @@ def split(total, parts):
 
 def remap_animation(anim, where, total):
     """Animação na folha nova: quadros, durações, impacto e distância por quadro. `where[k]`
-    é a posição do quadro antigo k na folha nova; os novos entre k e k+1 vão com o k."""
+    é a posição do quadro antigo k na folha nova; os novos entre k e k+1 vão com o k.
+    `starts[j]`: onde o quadro j da animação antiga ficou na nova (impacto, pancadas)."""
     nxt_pos = lambda k: where[k + 1] if k + 1 < len(where) else total
-    frames, durations, impact = [], [], None
+    frames, durations, starts = [], [], []
     old = anim['frames']
     durs = anim.get('durationsMs')
     for j, f in enumerate(old):
         nxt = old[j + 1] if j + 1 < len(old) else None
         # Os novos depois deste quadro entram se o próximo da animação é o vizinho na folha.
         group = list(range(where[f], nxt_pos(f))) if nxt == f + 1 else [where[f]]
-        if anim.get('impactFrame') == j:
-            impact = len(frames)
+        starts.append(len(frames))
         frames += group
         if durs is not None:
             durations += split(int(round(durs[j])), len(group)) if len(group) > 1 else [durs[j]]
     out = dict(anim, frames=frames)
     if durs is not None:
         out['durationsMs'] = durations
-    if impact is not None:
-        out['impactFrame'] = impact
+    if anim.get('impactFrame') is not None:
+        out['impactFrame'] = starts[anim['impactFrame']]
     if 'distancePerFrame' in anim:
         out['distancePerFrame'] = round(anim['distancePerFrame'] * len(old) / len(frames), 2)
-    return out
+    return out, starts
+
+
+def remap_pancadas(cid, pack, state, starts):
+    """pancadas.json (mecanicas.py) guarda índices da animação: vão junto com ela."""
+    path = HERE / 'pancadas.json'
+    data = read(path)
+    for key, h in data['personagens'].get(cid, {}).items():
+        anim = (pack['specialAnimations'].get('SUPER') if key == 'SUPER'
+                else pack.get('specialMoves', {}).get(key, {}).get('animation'))
+        if anim == state and 'pancadas' in h:
+            h['pancadas'] = [starts[j] for j in h['pancadas']]
+            write(path, data)
 
 
 def remap_cells(cells, where, total):
@@ -159,12 +172,6 @@ def build():
         raise SystemExit('build falhou:\n' + r.stdout[-3000:] + r.stderr[-3000:])
 
 
-def scale_args(recipe):
-    if 'motivo' in recipe:
-        return ['--escala', str(recipe['escala']), '--motivo', recipe['motivo']]
-    return ['--escala-da-receita']
-
-
 def redone(cid, videos, states):
     """Folhas já refeitas por este script (para retomar só a etapa de tamanho)."""
     pack = read(ROOT / f'characters/{cid}/character.json')
@@ -177,11 +184,8 @@ def redone(cid, videos, states):
         users = [s for s, a in pack['animations'].items() if a['atlas'] == atlas]
         if states and not set(users) & states:
             continue
-        stem = Path(cfg['source']).name.replace('_video_hd.png', '')
-        motivo = cfg['video'].get('motivo', '')
-        fixed = any(s in LYING for s in users) or 'relativo ao quadro' in motivo or 'não achada' in motivo \
-            or 'duas réguas' in motivo
-        out.append((atlas, p, Path(videos) / cfg['video']['arquivo'], fixed, [],
+        stem = Path(cfg['source']).name.replace('_video_hd.png', '').replace('_video_normalized.png', '')
+        out.append((atlas, p, Path(videos) / cfg['video']['arquivo'], None, [],
                     f'art/sprites/source/{stem}_video_normalized.png', None))
     return out
 
@@ -195,11 +199,17 @@ def redo(cid, videos, states, scratch, only_size=False):
         cfg = read(p)
         clips[Path(cfg['output']).stem] = (p, cfg)
     if only_size:
-        done = redone(cid, videos, states)
-        for atlas, path, video, *_ , ref, _ in done:
-            cfg = read(path)
-            if regua_pad(cfg):
-                convert_pair(video, path, scale_args(cfg['video']), ref, scratch)
+        # Só o tamanho, de novo, nos quadros que a folha já tem.
+        done = []
+        for atlas, path, video, _, olds, ref, _ in redone(cid, videos, states):
+            recipe = read(path)['video']
+            lying = any(s in LYING for s, a in anims.items() if a['atlas'] == atlas)
+            quadros = old_frames(recipe, video_length(video))
+            base, reescala, anchored, note = head_scales(cid, video, recipe, quadros, lying, scratch)
+            print(f'{atlas}: {note}', flush=True)
+            convert_pair(video, path, ['--escala', f'{base:.4f}', '--motivo', note, '--reescala', reescala],
+                         ref, scratch)
+            done.append((atlas, path, video, lying or anchored, olds, ref, None))
         return size_pass(cid, done, scratch)
     atlases = []
     for state, anim in anims.items():
@@ -249,9 +259,10 @@ def redo(cid, videos, states, scratch, only_size=False):
         cfg.pop('minOpaquePixels', None)
         write(path, cfg)
         for state, anim in users.items():
-            anims[state] = remap_animation(anim, where, len(new_q))
+            anims[state], starts = remap_animation(anim, where, len(new_q))
+            remap_pancadas(cid, pack, state, starts)
         write(pack_path, pack)
-        base, reescala, anchored, note = head_scales(cid, video, recipe, new_q, lying)
+        base, reescala, anchored, note = head_scales(cid, video, recipe, new_q, lying, scratch)
         extra = ['--escala', f'{base:.4f}', '--motivo', note, '--reescala', reescala]
         columns = convert_pair(video, path, extra, ref, scratch)
         done.append((atlas, path, video, lying or anchored, old_sources, ref, columns))
@@ -263,11 +274,6 @@ def redo(cid, videos, states, scratch, only_size=False):
             if src not in keep and p.exists():
                 p.unlink()
     return size_pass(cid, done, scratch)
-
-
-def regua_pad(cfg):
-    import regua
-    return any(regua.margin_pad(regua.resolved(cfg)))
 
 
 _FRAMES = {}
@@ -288,51 +294,88 @@ def video_frames(video):
     return _FRAMES[video]
 
 
-def head_scales(cid, video, recipe, quadros, lying=False):
-    """(escala base, reescala por quadro, ancorado, motivo) pela régua da cabeça.
-    Dentro do vídeo: a curva da cabeça (o Seedance muda o tamanho entre as fases).
-    Nível: o quadro do vídeo que é a imagem inicial, quando a receita o achou (nota >= 0,9);
-    senão fica para o esqueleto (média do clipe), depois da conversão."""
+ANCHOR_SPAN = 7  # quadros do começo (ou do fim) do vídeo que medem a imagem inicial
+
+
+def head_zooms(regua_cabeca, video, quadros, scratch=None):
+    """Zoom cru da cabeça em cada quadro (None onde não achou), guardado no rascunho: medir é
+    o lento (uns segundos por quadro)."""
+    import cabeca
+    cache = Path(scratch) / 'cabeca.json' if scratch else None
+    store = read(cache) if cache and cache.exists() else {}
+    key = f'{Path(video).name}:{",".join(map(str, quadros))}'
+    if key not in store:
+        frames = video_frames(video)
+        raw, guess = [], None
+        for q in quadros:
+            z, nota = regua_cabeca.zoom(frames[q], guess)
+            raw.append(z if z and nota >= cabeca.MIN_NOTA else None)
+            if raw[-1]:
+                guess = raw[-1]
+        store[key] = raw
+        if cache:
+            write(cache, store)
+    return store[key]
+
+
+def anchor(recipe):
+    """'começo' ou 'fim': a ponta do vídeo que é a imagem inicial, onde a escala da receita foi
+    medida (medida com nota >= 0,9). Depois da primeira conversão a medida sai da receita (a
+    escala vira manual) e fica no motivo."""
     import re
+    medida = recipe.get('medida', '')
+    m = re.search(r'nota ([0-9.]+)', medida)
+    if 'inicio_' in medida and m and float(m.group(1)) >= 0.9:
+        return 'começo' if medida.startswith('1º') else 'fim'
+    m = re.search(r'relativo ao (começo|fim|quadro (\d+)) do vídeo', recipe.get('motivo', ''))
+    if m:
+        return m.group(1) if not m.group(2) else ('começo' if m.group(2) == '0' else 'fim')
+    return None
+
+
+def head_scales(cid, video, recipe, quadros, lying=False, scratch=None):
+    """(escala base, reescala por quadro, ancorado, motivo) pela régua da cabeça.
+    Dentro do vídeo: um tamanho só, com degrau onde o vídeo muda de tamanho de verdade
+    (cabeca.degraus; o Seedance aumenta a corrida do dash). Nível: o começo (ou o fim) do vídeo,
+    quando a receita achou nele a imagem inicial (nota >= 0,9); senão fica para o esqueleto
+    (média do clipe), depois da conversão."""
     import cabeca
     if lying:
         # Deitada a cabeça não é achada direito: escala única, a da receita.
         return float(recipe['escala']), ','.join(['1.0000'] * len(quadros)), True, \
             'deitada: escala da receita, única (a régua da cabeça não acha a cabeça deitada)'
-    frames = video_frames(video)
     regua_cabeca = cabeca.Regua(cid)
-    raw, guess = [], None
-    for q in quadros:
-        z, nota = regua_cabeca.zoom(frames[q], guess)
-        raw.append(z if z and nota >= cabeca.MIN_NOTA else None)
-        if raw[-1]:
-            guess = raw[-1]
+    raw = head_zooms(regua_cabeca, video, quadros, scratch)
     found = [z for z in raw if z]
     if len(found) < max(2, len(raw) // 4):
         # Cabeça quase nunca achada (deitada): tamanho único, o da receita.
         return float(recipe['escala']), ','.join(['1.0000'] * len(quadros)), True, \
             'cabeça não achada no clipe: escala da receita, única'
-    zooms = cabeca.suavizar(raw)
     # Trava: a cabeça achada no lugar errado dá escala absurda; a receita nunca erra 30%.
-    level = regua_cabeca.key_scale / float(np.median(found))
+    mid = float(np.median(found))
+    level = regua_cabeca.key_scale / mid
     if not 0.7 < level / float(recipe['escala']) < 1.3:
         return float(recipe['escala']), ','.join(['1.0000'] * len(quadros)), True, \
             f'régua da cabeça discordou da receita ({level:.4f} x {recipe["escala"]}): escala da receita, única'
-    zooms = list(np.clip(zooms, float(np.median(found)) / 1.33, float(np.median(found)) * 1.33))
-    medida = recipe.get('medida', '')
-    m = re.search(r'nota ([0-9.]+)', medida)
-    if 'inicio_' in medida and m and float(m.group(1)) >= 0.9:
-        anchor = 0 if medida.startswith('1º') else len(frames) - 1
-        za, nota = regua_cabeca.zoom(frames[anchor])
-        if za and nota >= 0.8:
+    zooms = list(np.clip(cabeca.degraus([z and float(np.clip(z, mid / 1.33, mid * 1.33)) for z in raw]),
+                         mid / 1.33, mid * 1.33))
+    phases = len(set(zooms))
+    inside = 'um tamanho só' if phases == 1 else f'{phases} trechos de tamanho (degrau onde o vídeo muda)'
+    end = anchor(recipe)
+    if end:
+        frames = video_frames(video)
+        span = range(ANCHOR_SPAN) if end == 'começo' else range(len(frames) - ANCHOR_SPAN, len(frames))
+        seen = [regua_cabeca.zoom(frames[i]) for i in span]
+        seen = [z for z, nota in seen if z and nota >= 0.8]
+        if seen:
+            za = float(np.median(seen))
             base = float(recipe['escala'])
-            note = (f'régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro {anchor} do vídeo '
-                    f'(a imagem inicial, escala {base:.4f} medida pela receita)')
+            note = (f'régua da cabeça: {inside}, relativo ao {end} do vídeo (a imagem inicial, escala '
+                    f'{base:.4f} medida pela receita)')
             return base, ','.join(f'{z / za:.4f}' for z in zooms), True, note
-    base = regua_cabeca.key_scale / float(np.median(found))
-    note = ('régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, '
-            'média do clipe (o vídeo não começa nem termina na imagem inicial)')
-    return base, ','.join(f'{z / float(np.median(found)):.4f}' for z in zooms), False, note
+    note = (f'régua da cabeça: {inside}; nível pelo esqueleto, média do clipe (o vídeo não começa nem '
+            'termina na imagem inicial)')
+    return level, ','.join(f'{z / mid:.4f}' for z in zooms), False, note
 
 
 def size_pass(cid, done, scratch):
@@ -446,7 +489,7 @@ def main():
     ap.add_argument('estados', nargs='*')
     ap.add_argument('--rascunho', default=str(ROOT / 'android/app/build/refazer'))
     ap.add_argument('--so-tamanho', action='store_true',
-                    help='retoma: só a etapa de tamanho nas folhas já refeitas (célula estourada é refeita)')
+                    help='só o tamanho de novo (régua da cabeça e esqueleto) nas folhas já refeitas')
     args = ap.parse_args()
     Path(args.rascunho).mkdir(parents=True, exist_ok=True)
     done = redo(args.personagem, args.videos, set(args.estados), args.rascunho, args.so_tamanho)

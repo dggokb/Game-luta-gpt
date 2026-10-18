@@ -15,24 +15,24 @@
     "arquivo": "L.mp4",
     "personagem": "p02",
     "escala": 0.5267,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
     "quadros": "29,31,31,36,41,42,46,49,52,55,58",
     "largura": 352,
     "raiz": "198,238",
     "colunas": 5,
     "limpar_chao": true,
     "reescala": [
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222,
-      1.0222
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011,
+      1.011
     ],
     "limpar_quadros": [
       3,
@@ -50,7 +50,7 @@
         198,
         238
       ],
-      "colunas": 11
+      "colunas": 5
     }
   },
   "frameWidth": 704,

@@ -408,19 +408,18 @@ class BuiltPackTests(unittest.TestCase):
         self.assertIn(',8,20,2.00000000f,',java)
         self.assertIn('art/sprites/source/player_base_walk_forward_video_normalized.png',report['provenance']['referenceSources'])
 
-    def assert_hd_follows_reference(self,sheet,columns,width,height,count,tuning,hd='sr_2x',hd_columns=None):
+    def assert_hd_follows_reference(self,sheet,columns,width,height,count,tuning,hd='sr_2x'):
         """Every HD cell is its video cell at 2x times the size tuning applied in the app
         (docs/personagens/regua/ajustes-tamanho-20261014-0532.json), measured by body height."""
         from PIL import Image
         original=Image.open(self.root/f'art/sprites/source/{sheet}_video_normalized.png').convert('RGBA')
         hd_sheet=Image.open(self.root/f'art/sprites/source/{sheet}_{hd}.png').convert('RGBA')
-        hd_columns=hd_columns or columns
         def tall(img):
             box=img.getchannel('A').point(lambda v:255 if v>128 else 0).getbbox()
             return box[3]-box[1]
         for i in range(count):
             src=original.crop((i%columns*width,i//columns*height,(i%columns+1)*width,(i//columns+1)*height))
-            cell=hd_sheet.crop((i%hd_columns*width*2,i//hd_columns*height*2,(i%hd_columns+1)*width*2,(i//hd_columns+1)*height*2))
+            cell=hd_sheet.crop((i%columns*width*2,i//columns*height*2,(i%columns+1)*width*2,(i//columns+1)*height*2))
             self.assertAlmostEqual(tuning,tall(cell)/(2*tall(src)),delta=0.01,msg=f'{sheet} cell {i}')
 
     def test_p02_hd_idle_preserves_proportions_root_timing_and_budget(self):
@@ -443,7 +442,7 @@ class BuiltPackTests(unittest.TestCase):
         self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
         # Redone from the video (refazer.py): the HD sheet is converted straight from the video
         # with the 1x sheet as its reference, same recipe, so every cell is the 1x cell at 2x.
-        self.assert_hd_follows_reference('p02_idle',11,192,256,56,1.0,hd='video_hd',hd_columns=10)
+        self.assert_hd_follows_reference('p02_idle',10,192,256,56,1.0,hd='video_hd')
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn(',10,56,2.00000000f,',java)
         self.assertIn('art/sprites/source/p02_idle_video_normalized.png',report['provenance']['referenceSources'])

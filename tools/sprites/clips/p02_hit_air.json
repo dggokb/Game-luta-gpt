@@ -15,7 +15,7 @@
     "arquivo": "levarGolpeNoAr.mp4",
     "personagem": "p02",
     "escala": 0.5267,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
     "quadros": "10,19,21,23,25,27,29,31,34,36",
     "celula": 320,
     "largura": 512,
@@ -23,16 +23,16 @@
     "colunas": 4,
     "pe_no_chao": true,
     "reescala": [
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857,
-      1.0857
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739,
+      1.0739
     ],
     "limpar_quadros": [
       1

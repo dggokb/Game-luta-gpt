@@ -15,7 +15,7 @@
     "arquivo": "tras.mp4",
     "personagem": "p02",
     "escala": 0.5232,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5232 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5232 medida pela receita)",
     "quadros": "58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86",
     "largura": 224,
     "raiz": "111,238",
@@ -63,7 +63,7 @@
         111,
         238
       ],
-      "colunas": 11
+      "colunas": 9
     }
   },
   "frameWidth": 448,

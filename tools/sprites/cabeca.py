@@ -94,6 +94,72 @@ class Regua:
         return [self.key_scale / z for z in zooms], raw
 
 
+STEP = 0.08         # diferença de tamanho entre trechos menor que isso é ruído da medida
+MIN_TRECHO = 6      # quadros medidos de cada lado para um degrau contar
+PASSAGEM = 0.03     # no degrau, quadro a mais que isso dos dois trechos é a passagem do vídeo
+
+
+def degraus(values):
+    """Tamanho por trecho: um valor só (a mediana) no clipe todo, com degrau só onde o vídeo
+    muda de tamanho de verdade (trechos de MIN_TRECHO quadros medidos cada, STEP ou mais de
+    diferença: a corrida do dash.mp4). Nunca curva: curva suavizada transforma o erro da
+    medida em zoom lento. Os poucos quadros em que o vídeo passa de um tamanho ao outro seguem a
+    medida. Quadro sem medida fica no trecho em que está."""
+    n = len(values)
+    if not any(v is not None for v in values):
+        raise SystemExit('cabeça não achada em nenhum quadro')
+    x = [None if v is None else float(np.log(v)) for v in values]
+    step = float(np.log(1 + STEP))
+
+    def level(lo, hi):
+        return float(np.median([v for v in x[lo:hi] if v is not None]))
+
+    def cut(lo, hi):
+        """Melhor ponto de corte de [lo, hi): o de menor erro absoluto dos dois lados."""
+        best = None
+        for c in range(lo + 1, hi):
+            a = [v for v in x[lo:c] if v is not None]
+            b = [v for v in x[c:hi] if v is not None]
+            if len(a) < MIN_TRECHO or len(b) < MIN_TRECHO:
+                continue
+            ma, mb = np.median(a), np.median(b)
+            cost = sum(abs(v - ma) for v in a) + sum(abs(v - mb) for v in b)
+            if best is None or cost < best[0]:
+                best = (cost, c)
+        return None if best is None else best[1]
+
+    def split(lo, hi):
+        c = cut(lo, hi)
+        if c is None or abs(level(lo, c) - level(c, hi)) < step:
+            return [(lo, hi)]
+        return split(lo, c) + split(c, hi)
+
+    parts = split(0, n)
+    merged = True
+    while merged:   # vizinhos que ficaram parecidos depois dos cortes viram um trecho só
+        merged = False
+        for k in range(len(parts) - 1):
+            if abs(level(*parts[k]) - level(*parts[k + 1])) < step:
+                parts[k:k + 2] = [(parts[k][0], parts[k + 1][1])]
+                merged = True
+                break
+    out = []
+    for lo, hi in parts:
+        out += [level(lo, hi)] * (hi - lo)
+    # O vídeo muda de tamanho em uns quadros (intro.mp4: 12% em 4): nesses, entre os dois
+    # trechos e longe dos dois, vale a medida do quadro, senão o degrau dá um tranco.
+    tol = float(np.log(1 + PASSAGEM))
+    for (_, b), _ in zip(parts, parts[1:]):
+        la, lb = out[b - 1], out[b]
+        lo, hi = min(la, lb) + tol, max(la, lb) - tol
+        for side in (range(b - 1, -1, -1), range(b, n)):
+            for k in side:
+                if x[k] is None or not lo < x[k] < hi:
+                    break
+                out[k] = x[k]
+    return [float(np.exp(v)) for v in out]
+
+
 def suavizar(values, weights=None):
     """Curva por trecho: mediana de 9, média de 15, no máximo RATE por quadro (ida e volta).
     Quadro sem medida pega o valor dos vizinhos; curva quase plana vira um valor só."""

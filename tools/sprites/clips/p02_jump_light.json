@@ -15,7 +15,7 @@
     "arquivo": "jL.mp4",
     "personagem": "p02",
     "escala": 0.525,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5250 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5250 medida pela receita)",
     "quadros": "17,21,25,29,34,36,39,42,45",
     "celula": 320,
     "largura": 320,
@@ -44,7 +44,7 @@
         106,
         302
       ],
-      "colunas": 7
+      "colunas": 6
     }
   },
   "frameWidth": 640,

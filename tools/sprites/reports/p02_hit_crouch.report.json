@@ -424,11 +424,11 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "1151c871cfaa85eb1533a4b43ca315191418369e0bdd06ddb43515981ead73cb",
-      "config": "6fd21cb37a6a7c41e0031bb4f6ccfac7d7222f78c6bd58342b4499fa34869b1a",
+      "config": "e66c3ad7f58444bd5fa670118d5a61a2526d39d0355262cd9fbdc111352c1a0e",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_hit_crouch_video_normalized.png": "8f7e24e607dfc823568c2625ac829964d8009c59865ff30b24d0e5aaf7ef1e11"
+      "art/sprites/source/p02_hit_crouch_video_normalized.png": "d333744ad4e6690a1284ae0a97e1e72b8b41abfcdb2bbb65536da5d4eec4f761"
     }
   }
 }

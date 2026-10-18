@@ -46,12 +46,21 @@ class ReguaTests(unittest.TestCase):
         _, _, iou = regua.fit(figure(), figure(legs=110))
         self.assertLess(iou, regua.POSE_IOU)
 
-    def test_checked_in_p02_recipe_kinds(self):
-        p = regua.Pack('p02')
-        self.assertEqual('forte', regua.recipe(p, 'LIGHT_JAB')[0])
-        self.assertEqual('manual', regua.recipe(p, 'MEDIUM_KICK')[0])
-        self.assertEqual('fraca', regua.recipe(p, 'INTRO')[0])
-        self.assertEqual(1.0, regua.recipe(p, 'DASH')[2])  # fator óptico 0,88 desfeito pela régua
+    def test_recipe_kinds(self):
+        # Receitas como as do p02 antes e depois do refazer.py (lá toda escala tem motivo).
+        class Pack:
+            def __init__(self, video):
+                self.video = video
+
+            def cfg(self, state):
+                return {'video': self.video}
+        kind = lambda video: regua.recipe(Pack(video), 'X')
+        self.assertEqual('forte', kind({'medida': '1º quadro = inicio_centro (nota 0.96)'})[0])
+        self.assertEqual('fraca', kind({'medida': 'quadros 0, 6, 12 = guarda do IDLE (nota 0.63)'})[0])
+        self.assertEqual('fraca', kind({'medida': '1º quadro = inicio_centro (nota 0.96)', 'reescala': [1.0, 1.1]})[0])
+        self.assertEqual('manual', kind({'escala': 0.52, 'motivo': 'régua da cabeça: um tamanho só'})[0])
+        self.assertEqual('manual', regua.recipe(regua.Pack('p02'), 'DASH')[0])
+        self.assertEqual(0.88, kind({'medida': 'x', 'normalizedOpticalScale': 0.88})[2])
 
 
 if __name__ == '__main__':

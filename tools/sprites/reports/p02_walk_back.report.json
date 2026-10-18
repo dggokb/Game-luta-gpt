@@ -595,11 +595,11 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "f2513b672fc45719ba6101c241290a49126fcf6b2aca5bbf9dff7c351e305827",
-      "config": "76883cb5f1f343291f26b874160841c7bb4ac01406ab90a275dfe7cfb051c4f3",
+      "config": "b8dd6699e8f5df6f226212e4ac31c739d3c73c10f445d5af9d5399557ae80fe8",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_walk_back_video_normalized.png": "2612b67649a31b2d2f184bc03f4451ec53f295c9219a96091006876345c87420"
+      "art/sprites/source/p02_walk_back_video_normalized.png": "e79d2c43550b72d6ea1719ecfb4696ed94456cd7f3ac0c2eb92facf4d098e5c3"
     }
   }
 }

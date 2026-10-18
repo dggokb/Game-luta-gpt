@@ -34,9 +34,10 @@ public class P02IdleRuntimeFixTest {
         CharacterDefinition.Atlas atlas=idle.atlas;
         assertEquals("p02_idle",atlas.resource);
         assertEquals(56,atlas.count); // Os 56 quadros do vídeo (17-72), refeitos do zero (refazer.py).
-        // HD direto do vídeo, tamanho pela régua da cabeça; antes 322x432 (folha SR reescalada no app).
-        assertEquals(318,atlas.width);
-        assertEquals(426,atlas.height);
+        // HD direto do vídeo, um tamanho só pela régua da cabeça; antes 322x432 (folha SR reescalada
+        // no app) e 318x426 (curva suavizada da cabeça).
+        assertEquals(320,atlas.width);
+        assertEquals(434,atlas.height);
         assertEquals(2.0f,atlas.pixelScale,0f);
         assertTrue(idle.loop);
         assertEquals(30*0.041f,idle.duration,0.0001f);

@@ -68,7 +68,10 @@ def retime(m, new, advantage=None):
 
 
 def video_cadence(anim, cfg, total_ms):
-    """durationsMs na proporção do vídeo; None se o clipe não tem receita de vídeo."""
+    """durationsMs na proporção do vídeo; None se o clipe não tem receita de vídeo ou foi
+    refeito pelo refazer.py (lá o tempo de cada quadro antigo já foi dividido entre os novos)."""
+    if 'refazer.py' in cfg.get('sourceNote', ''):
+        return None
     v = A.video_seconds(cfg, anim)
     if v is None or len(v) != len(anim['frames']) or v.sum() <= 0:
         return None

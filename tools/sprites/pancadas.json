@@ -5,8 +5,8 @@
       "S4": {"pancadas": [4, 8, 12], "avanco": 260}
     },
     "p02": {
-      "S4": {"pancadas": [2, 4], "avanco": 380},
-      "SUPER": {"pancadas": [3, 5, 10, 14, 18], "avanco": 220}
+      "S4": {"pancadas": [8, 13], "avanco": 380},
+      "SUPER": {"pancadas": [6, 10, 20, 34, 48], "avanco": 220}
     },
     "p03": {
       "S2": {"pancadas": [6, 9, 12]},

@@ -462,11 +462,11 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "47cd0414bf2da2a09e0b1e988897c48a835d434c905d371090575c8e89c69281",
-      "config": "e056076cd4b21dce088c809086d37a63fa9f5d99d743833b43564ac41cb85dc2",
+      "config": "826a884441837aebcd57789042166ec2e141c9276ef16dac2e6b9c5e8d9d0d88",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_hit_stand_video_normalized.png": "efe17f4423a05d1c6ecf48cf1a68d555324482461fdee3bea4beef8dad0cca4b"
+      "art/sprites/source/p02_hit_stand_video_normalized.png": "cacc68f8bc07f834f6fc8a242cd46e02a65b9120e73c296035fb978912296b10"
     }
   }
 }

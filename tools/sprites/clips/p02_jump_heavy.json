@@ -15,7 +15,7 @@
     "arquivo": "jH.mp4",
     "personagem": "p02",
     "escala": 0.5088,
-    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5088 medida pela receita)",
+    "motivo": "régua da cabeça: um tamanho só, relativo ao começo do vídeo (a imagem inicial, escala 0.5088 medida pela receita)",
     "quadros": "17,18,19,20,21,25,25,25,26,27",
     "celula": 320,
     "largura": 320,
@@ -23,16 +23,16 @@
     "colunas": 6,
     "pe_no_chao": true,
     "reescala": [
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406,
-      1.1406
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282,
+      1.1282
     ],
     "densidade": 2,
     "referencia": {
@@ -45,7 +45,7 @@
         132,
         302
       ],
-      "colunas": 7
+      "colunas": 6
     }
   },
   "frameWidth": 640,

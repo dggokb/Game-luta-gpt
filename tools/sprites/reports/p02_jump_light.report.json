@@ -215,11 +215,11 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "2a5b9feeb07560757e1758097609e2a78b5ad2c4d2e184e2b9838bdffe916ab3",
-      "config": "21f56fc75af42504a5ba376faa633e1e90f7a44b06d32a6581a3a81bf6c0ada1",
+      "config": "9f92b4ffa9ce84c973dfebdb7bea238aca0bab345380be81ed0ccf7271c3f600",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_jump_light_video_normalized.png": "14b4f902c6655884284e4a43477f4118f5847976f2f05bee899d2473bf763073"
+      "art/sprites/source/p02_jump_light_video_normalized.png": "80a6bde0cc62795817e088286fd98cb719ffad9f9b6d162b831414cc07bb0049"
     }
   }
 }
