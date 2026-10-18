@@ -31,8 +31,9 @@ debaixo de um canhão de luz. Por enquanto é um **placeholder animado**: um bon
 as cores do concept (terno preto, colete vermelho, dourado, microfone), articulado por código.
 Quando houver sprites dele, eles entram no lugar do boneco.
 
-- **Onde fica**: na profundidade 200 do palco (a régua do `stage.json`), em pé no chão. Fica
-  na frente das paredes e dos pilares e atrás das lanternas, braseiros e objetos do chão, com a
+- **Onde fica**: na profundidade 300 do palco (a régua do `stage.json`), em pé no chão. Fica
+  na frente das paredes, do muro e dos prédios e atrás dos pilares, lanternas, braseiros e
+  objetos do chão (os pilares passam na frente dele quando ele anda), com a
   mesma perspectiva do cenário (anda e cresce menos que os lutadores quando a câmera mexe).
 - **Acompanha a luta**: fica de fora da dupla, do lado com mais espaço na tela, olhando para
   eles. Anda junto quando a luta anda. Quando o lado dele aperta (a dupla chega no canto), ele

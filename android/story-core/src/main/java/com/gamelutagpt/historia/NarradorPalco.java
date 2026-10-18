@@ -4,7 +4,8 @@ import com.gamelutagpt.render.RenderCanvas;
 
 /**
  * O narrador em pessoa, no cenário: fica atrás dos lutadores (na profundidade
- * {@link #PROFUNDIDADE} do palco, na frente das paredes e atrás dos objetos do chão), anda
+ * {@link #PROFUNDIDADE} do palco, na frente das paredes e dos prédios, atrás dos pilares e dos
+ * objetos do chão), anda
  * junto com a luta de um lado para o outro, vira para a ação e gesticula com o microfone
  * enquanto a {@link Narracao} fala.
  *
@@ -28,11 +29,11 @@ import com.gamelutagpt.render.RenderCanvas;
  */
 public final class NarradorPalco {
     /** Profundidade no palco (a mesma régua do stage.json; os lutadores ficam no 0). */
-    public static final float PROFUNDIDADE = 200f;
+    public static final float PROFUNDIDADE = 300f;
     /** Altura do boneco em pé (unidades do mundo): o desenho tem 210 e cresce {@link #TAMANHO}. */
     static final float TAMANHO = 1.3f, ALTURA = 210f * TAMANHO;
     /** Distância de fora da dupla até onde ele fica. */
-    static final float AFASTA = 250f;
+    static final float AFASTA = 280f;
     /** Margem da borda da tela. */
     static final float BORDA = 80f;
     /**

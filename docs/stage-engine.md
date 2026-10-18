@@ -64,8 +64,8 @@ não em unidades do mundo.
 
    `drawBackground(canvas, z, desenho)` encaixa mais um desenho na profundidade `z`: depois
    das camadas mais fundas que ele e antes das mais rasas. É assim que o narrador fica no
-   palco (`z = 200`, na frente das paredes e dos pilares, atrás das lanternas e dos objetos
-   do chão; ver [historia/narrador.md](historia/narrador.md)). `screenX`, `groundScreenY`,
+   palco (`z = 300`, na frente das paredes e dos prédios, atrás dos pilares, das lanternas e
+   dos objetos do chão; ver [historia/narrador.md](historia/narrador.md)). `screenX`, `groundScreenY`,
    `scale` e `worldX` projetam um ponto naquela profundidade.
 3. No mundo da luta: reflexo dos lutadores (espelhados no chão, com transparência), os
    lutadores, projéteis e efeitos.
