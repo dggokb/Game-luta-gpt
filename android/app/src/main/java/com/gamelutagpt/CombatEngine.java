@@ -762,7 +762,11 @@ final class CombatEngine {
     private boolean throwOverridesJab(CombatFighter f) {
         if (!f.attacking() || f.move == null || f.attackFrame > PadInput.THROW_LENIENCY_FRAMES) return false;
         String binding = f.move.binding;
-        return ("L".equals(binding) || "M".equals(binding)) && f.attackFrame < f.attack.startupFrames;
+        // L ou M de qualquer jeito que saiu: em pé, agachado (↓) ou o golpe alto (→ + M, andando
+        // para frente). Antes só o L e o M em pé: andando ou agachado o L + M quase junto virava golpe.
+        boolean lightOrMedium = "L".equals(binding) || "M".equals(binding) || "2L".equals(binding) ||
+            "2M".equals(binding) || GolpeAlto.BINDING.equals(binding);
+        return lightOrMedium && f.attackFrame < f.attack.startupFrames;
     }
 
     /** Air dash: a fixed burst forward (or back) that holds the height; one per jump (an acrobat has more). */

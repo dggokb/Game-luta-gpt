@@ -586,8 +586,11 @@ A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. 
 
 - **Comando**: L + M (dois dedos) ou o **ponto entre L e M** na tela
   (`ControlsLayout.THROW_*`, desenhado como "L+M"). Dois dedos quase nunca caem no mesmo
-  frame: até `PadInput.THROW_LENIENCY_FRAMES` (2) de diferença ainda é agarrão, e o jab que
-  o primeiro botão começou vira o agarrão (ainda nos primeiros frames, antes de acertar).
+  frame: até `PadInput.THROW_LENIENCY_FRAMES` (2) de diferença ainda é agarrão, e o golpe que
+  o primeiro botão começou vira o agarrão (ainda nos primeiros frames, antes de acertar) — L ou
+  M em pé, agachado (2L/2M, segurando ↓) ou o golpe alto (6M, andando para frente). Quem está
+  **agachado é agarrado** como quem está em pé (o agarrão vence a defesa alta e a baixa).
+  Teste: `AgarraoToqueTest`.
 - **Quem pode ser agarrado**: no chão, em NEUTRAL, num golpe próprio (não no Super nem no
   ultra) ou num agarrão errado. Hitstun, blockstun e os `throwProtectFrames` (6) depois
   deles ou de levantar são invulneráveis a agarrão, então agarrão não continua combo e
