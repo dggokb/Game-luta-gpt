@@ -15,10 +15,12 @@ do quadro. O osso virado para a câmera encurta nas duas medidas, então o agach
 parece menor. A referência é a imagem inicial (art/keys/<id>/inicio_centro.png) no tamanho
 oficial do tamanho.json, a mesma de regua.py.
 
-Fator 100% = certo. O ruído é de uns 3% por quadro (no IDLE, 96-104%), por isso:
-loop (IDLE, corrida) e clipe curto recebem um fator só, a mediana; clipe longo recebe uma
-reta ao longo do clipe (zoom de câmera), sem os quadros que a medida errou. Fator quadro a
-quadro não: o ruído vira o corpo pulsando e a cabeça subindo e descendo. Clipe com mediana a ±2% (e nenhum quadro a mais de 4%) não muda.
+Fator 100% = certo. Todo clipe segue a mesma regra, sem escolha à mão: cada quadro vai ao
+tamanho oficial, pela curva da medida suavizada (mediana de 7 quadros, média de 9, no máximo
+1% de mudança por quadro), porque a medida tem uns 3% de ruído por quadro (no IDLE, 96-104%)
+e o próprio vídeo muda o tamanho do corpo entre as fases (a corrida do dash.mp4 ~12% maior
+que a guarda; a p02 em pé no intro.mp4 ~6% maior que na base). Curva com menos de 3% de
+variação vira um fator só; clipe que já está a ±2% do certo não muda.
 A correção reescala a folha do jogo em volta da raiz e grava na receita, como regua.py
 --corrigir (reescala, reguaFatores e o motivo em regua).
 
@@ -46,7 +48,8 @@ MIN_VIS = 0.5
 BONES = ((11, 12), (23, 24), (11, 23), (12, 24), (11, 13), (12, 14), (13, 15), (14, 16),
          (23, 25), (24, 26), (25, 27), (26, 28))
 TOLERANCE = 0.02    # clipe a ±2% do certo fica como está
-LONG = 16           # a partir de quantos quadros um clipe (não loop) acompanha o zoom
+RATE = 0.01         # o tamanho muda no máximo 1% por quadro (nunca pulsa)
+FLAT = 0.03         # curva com menos variação que isso no clipe: um fator só
 
 
 def detector():
@@ -102,40 +105,39 @@ def measure(det, p, atlas, ref):
     return out
 
 
+def smooth(values, loop):
+    """Mediana de 7 quadros, média de 9 e no máximo 1% de mudança por quadro (ida e volta):
+    acompanha o tamanho mudando entre as fases do vídeo sem passar o ruído da medida."""
+    n = len(values)
+    idx = np.arange(n)
+    ok = np.array([v is not None for v in values])
+    raw = np.interp(idx, idx[ok], np.array([v for v in values if v is not None]),
+                    period=n if loop else None)
+    pad = lambda a, k: np.concatenate([a[-k:], a, a[:k]]) if loop else np.pad(a, k, mode='edge')
+    med = np.array([np.median(pad(raw, 3)[i:i + 7]) for i in range(n)])
+    avg = np.convolve(pad(med, 4), np.ones(9) / 9, mode='valid')
+    out = avg.copy()
+    for _ in range(2):   # ida e volta: o limite vale para os dois lados
+        for i in range(1, n):
+            out[i] = np.clip(out[i], out[i - 1] - RATE, out[i - 1] + RATE)
+        for i in range(n - 2, -1, -1):
+            out[i] = np.clip(out[i], out[i + 1] - RATE, out[i + 1] + RATE)
+    return out
+
+
 def factors(values, loop):
-    """Fator a aplicar em cada quadro (o que a reescala divide): suavizado contra o ruído."""
+    """Fator a aplicar em cada quadro (o que a reescala divide). Todo clipe segue a mesma
+    regra: cada quadro vai ao tamanho oficial, com a curva suavizada; se a curva varia menos
+    que FLAT no clipe, um fator só (a mediana)."""
     known = [v for v in values if v is not None]
     if not known:
         return None
-    if loop or len(values) < LONG:
+    if len(known) < 3:
         return [float(np.median(known))] * len(values)
-    # Clipe longo: uma reta ao longo do clipe (zoom de câmera), nunca quadro a quadro. O
-    # ruído da medida (~3%) virava o corpo crescendo e encolhendo, e como cada quadro escala
-    # em volta dos pés, a cabeça subindo e descendo.
-    idx = np.array([i for i, v in enumerate(values) if v is not None], float)
-    vals = np.array([v for v in values if v is not None])
-    keep = np.ones(len(vals), bool)
-    for _ in range(3):   # tira os quadros que a medida errou (longe da reta) e ajusta de novo
-        slope, base = np.polyfit(idx[keep], vals[keep], 1)
-        resid = vals - (slope * idx + base)
-        keep = np.abs(resid) <= max(2.5 * np.median(np.abs(resid[keep])), 0.01)
-    return [float(slope * i + base) for i in range(len(values))]
-
-
-def straight_total(cfg, z):
-    """Clipe longo com reescala anterior (zoom corrigido pela régua): a correção total
-    (anterior x nova) vira uma reta, senão a emenda das duas aparece como o corpo encolhendo e
-    crescendo de novo."""
-    if len(set(z)) == 1:
-        return z
-    old = (cfg.get('video') or cfg).get('reescala') or [1.0] * len(z)
-    total = np.array(old) * np.array(z)
-    idx = np.arange(len(z))
-    line = np.polyval(np.polyfit(idx, total, 1), idx)
-    return [float(v) for v in line / np.array(old)]
-
-
-SINK = 6  # px da folha (3 do jogo): pé abaixo do chão a partir disso é corrigido
+    curve = smooth(values, loop)
+    if curve.max() - curve.min() < FLAT:
+        return [float(np.median(known))] * len(values)
+    return [float(v) for v in curve]
 
 
 def ground(cfg, atlas, show=False):
@@ -204,13 +206,11 @@ def main():
                     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
         if not args.corrigir:
             continue
-        # Mediana a ±2% e nenhum quadro a mais de 4%: o resto é ruído da medida.
-        if abs(float(np.median(z)) - 1) <= TOLERANCE and all(abs(f - 1) <= 2 * TOLERANCE for f in z):
+        if all(abs(f - 1) <= TOLERANCE for f in z):
             print('  dentro de ±2%: fica como está')
             continue
         reason = (f'esqueleto: {np.median(used) * 100:.0f}% da imagem inicial '
-                  f'({"mediana" if len(set(z)) == 1 else "reta ao longo do clipe"}), levado a 100%')
-        z = straight_total(p.clips[atlas], z)
+                  f'({"mediana" if len(set(z)) == 1 else "curva suavizada, quadro a quadro"}), levado a 100%')
         regua.bake(p.clips[atlas], atlas, z, reason)
         print('  gravado')
     if args.corrigir:

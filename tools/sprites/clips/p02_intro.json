@@ -22,6 +22,35 @@
     "raiz": "114,266",
     "colunas": 9,
     "pe_no_chao": true,
+    "reescala": [
+      1.07,
+      1.0719,
+      1.0739,
+      1.0736,
+      1.0733,
+      1.0727,
+      1.0715,
+      1.0703,
+      1.0691,
+      1.066,
+      1.0629,
+      1.0597,
+      1.0588,
+      1.0579,
+      1.053,
+      1.0461,
+      1.0391,
+      1.0322,
+      1.025,
+      1.0178,
+      1.0106,
+      1.0034,
+      0.9951,
+      0.9911,
+      0.9896,
+      0.9882,
+      0.9868
+    ],
     "densidade": 2,
     "referencia": {
       "folha": "art/sprites/source/p02_intro_video_normalized.png",
@@ -34,7 +63,10 @@
         266
       ],
       "colunas": 9
-    }
+    },
+    "regua": [
+      "esqueleto (tools/sprites/esqueleto.py): cada quadro no tamanho da imagem inicial pela curva suavizada da medida (duas medições juntas; em pé ~107% -> base ~99% no vídeo); a escala é a da pose final"
+    ]
   },
   "frameWidth": 448,
   "frameHeight": 576,
