@@ -311,12 +311,19 @@ final class CharacterDefinition {
                 String assistMove) {
             // Without a declared assist: the projectile when there is one, else the heavy normal.
             this.assistMove=assistMove!=null?assistMove:energy!=null?"S":"H";
-            this.color=color;this.maxLife=maxLife;
+            this.color=color;this.maxLife=scaledLife(maxLife);
             this.autoCombo=autoCombo.clone();this.energy=energy;this.energyCommand=energyCommand.clone();
             this.superAttack=superAttack;this.body=body;
             this.inputPriority=inputPriority==null?CombatConfig.DEFAULT_PRIORITY.clone():inputPriority.clone();
         }
         boolean hasSuperAttack() { return superAttack!=null; }
+        /**
+         * Vida de todo lutador vezes {@link CombatConfig#LIFE_SCALE_PERMILLE}: a luta dura mais sem
+         * mexer no dano de cada golpe (o mesmo que tirar ~29% do dano de tudo).
+         */
+        static int scaledLife(int packLife) {
+            return (int)((long)packLife * CombatConfig.LIFE_SCALE_PERMILLE / 1000);
+        }
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }

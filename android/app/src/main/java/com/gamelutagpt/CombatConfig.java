@@ -310,14 +310,22 @@ final class CombatConfig {
     // do golpe; zerou, a defesa quebra e quem defendia fica aberto. Ela volta sozinha um pouco
     // depois de parar de defender (e cheia depois de quebrar).
     static final int GUARD_MAX = 1000;
-    /** Guarda gasta por quadro de blockstun do golpe defendido (um leve ~60, um forte ~110). */
-    int guardDrainPerBlockstunFrame = 6;
+    /**
+     * Vida de todos os lutadores, por mil da vida do pacote. 1400: a luta acabava rápido demais
+     * (um combo com a parede e o ar tirava quase 30% da vida).
+     */
+    static final int LIFE_SCALE_PERMILLE = 1400;
+    /**
+     * Guarda gasta por quadro de blockstun do golpe defendido (um leve ~100, um forte ~180):
+     * umas 10 defesas seguidas quebram (eram 17, e quase nunca quebrava).
+     */
+    int guardDrainPerBlockstunFrame = 10;
     /** Batida de um golpe de várias batidas antes da última: gasta só esta fração (por mil). */
     int guardHoldingDrainPermille = 500;
     /** Quadros sem defender antes de a guarda começar a voltar. */
-    int guardRegenDelayFrames = 90;
-    /** Guarda que volta por quadro (cheia em ~5,5 s). */
-    int guardRegenPerFrame = 3;
+    int guardRegenDelayFrames = 120;
+    /** Guarda que volta por quadro (cheia em ~8 s, depois de 2 s sem defender). */
+    int guardRegenPerFrame = 2;
     /** Atordoamento do guard break: aberto, sem defesa, tempo de entrar um combo. */
     int guardBreakStunFrames = 50;
     /** Congelamento do estalo da quebra (os dois, como um golpe forte). */

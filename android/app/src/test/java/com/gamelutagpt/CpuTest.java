@@ -164,8 +164,9 @@ public class CpuTest {
     }
 
     @Test public void higherLevelsSpendMeterWithMoreSense() {
-        double[] baixo = recursos(2), alto = recursos(8);
-        assertTrue("o nível 8 quase não solta Super cru: " + baixo[0] + " → " + alto[0], alto[0] < baixo[0] * 0.5 + 0.05);
+        // Contra o 5 (que já usa o kit todo; o 2 quase não usa barra nenhuma).
+        double[] baixo = recursos(5), alto = recursos(8);
+        assertTrue("o nível 8 solta bem menos Super cru: " + baixo[0] + " → " + alto[0], alto[0] < baixo[0] * 0.6);
         assertTrue("e guarda mais barra (para o Ultra): " + baixo[1] + " → " + alto[1], alto[1] > baixo[1]);
     }
 

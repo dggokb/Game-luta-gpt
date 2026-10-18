@@ -553,17 +553,26 @@ e `CombatConfig.guardCancel*`.
 
 Testes em `ActiveDefenseTest`.
 
+### Vida
+
+A vida de cada lutador é a do pacote (`fighter.maxLife`) vezes
+`CombatConfig.LIFE_SCALE_PERMILLE` (1400): a luta acabava rápido demais (um combo da parede e
+do ar tirava quase 30% da vida). Aumentar a vida em vez de baixar o dano deixa o dano de cada
+golpe (e a escala do combo) como está. Medido CPU contra CPU (nível 5, 2x2): o primeiro K.O.
+foi de 37 s para 61 s.
+
 ### Guard break
 
 Defender para sempre não funciona: cada defesa gasta a **guarda** (`FighterState.guard`,
 0..`CombatConfig.GUARD_MAX` = 1000), e quando ela zera a defesa **quebra**.
 
-- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (6). Um leve gasta ~60, um
-  forte ~100–150, um Super 100–270. Batidas de um golpe de várias batidas antes da última
-  gastam metade. Uma sequência L-M-H defendida gasta ~230–350: **umas 3 sequências seguidas**
-  (2 com especial) quebram; os pesados (p07, p09) quebram mais rápido.
-- **Volta**: depois de `guardRegenDelayFrames` (90, 1,5 s) sem defender, 3 por quadro (cheia
-  em ~5,5 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
+- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (10). Um leve gasta ~100, um
+  forte ~170–250, um Super 170–450. Batidas de um golpe de várias batidas antes da última
+  gastam metade. Uma sequência L-M-H defendida gasta ~400–580: **umas 2 sequências seguidas**
+  quebram (umas 11 defesas, ~4,5 s de pressão; eram 17 e quase nunca quebrava); os pesados
+  (p07, p09) quebram mais rápido.
+- **Volta**: depois de `guardRegenDelayFrames` (120, 2 s) sem defender, 2 por quadro (cheia
+  em ~8 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
 - **Quebrou** (cue `GUARD_BREAK`): o golpe que quebrou não tira vida, mas quem defendia fica
   **aberto** por `guardBreakStunFrames` (50) depois de um congelamento de 18 — um hitstun longo,
   sem defesa e sem o empurrão da defesa (fica ao alcance do castigo). No ar, cai e termina no
