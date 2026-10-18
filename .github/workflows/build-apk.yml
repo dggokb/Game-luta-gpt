@@ -126,11 +126,15 @@ jobs:
           path: android/app/build/sprite-cache
           key: ${{ steps.sprite-cache.outputs.cache-primary-key }}
 
+      # O APK vai como .apk mesmo, sem zip (upload-artifact v7 com archive: false): baixa no
+      # celular e instala direto. Sem zip só vai um arquivo, e o nome dele vira o do artefato.
+      - name: Nome do APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/GameLutaGPT.apk"
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: GameLutaGPT-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ runner.temp }}/GameLutaGPT.apk
+          archive: false
           if-no-files-found: error
 
       # Without KVM the emulator runs in software and takes ~15 min just to boot.
