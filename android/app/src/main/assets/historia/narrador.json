@@ -1,7 +1,7 @@
 {
-  "_comentario": "Narrador do torneio (personagem ainda por fazer: por enquanto o retrato é um placeholder desenhado). Cada evento tem prioridade (3 = grande, interrompe; 2 = importante; 1 = comentário, só no silêncio), a expressão do retrato (historia/retratos/narrador_<expressao>.png quando existir) e as falas, sorteadas sem repetir a última. Variáveis entre chaves vêm do jogo. Padrão: docs/historia/narrador.md.",
+  "_comentario": "Narrador do torneio (o apresentador de terno preto e colete vermelho do concept art/concepts/narrador_concept.png; o nome ainda é provisório). Cada evento tem prioridade (3 = grande, interrompe; 2 = importante; 1 = comentário, só no silêncio), a expressão do retrato (historia/retratos/narrador_<expressao>.png: normal, empolgado ou serio) e as falas, sorteadas sem repetir a última. Variáveis entre chaves vêm do jogo. Padrão: docs/historia/narrador.md.",
   "nome": "NARRADOR",
-  "cor": "#B8202E",
+  "cor": "#9B2320",
   "eventos": {
     "inicio": {
       "prioridade": 3,
@@ -14,7 +14,7 @@
     },
     "primeiro_golpe": {
       "prioridade": 1,
-      "expressao": "empolgado",
+      "expressao": "normal",
       "falas": [
         "Primeiro sangue para {atacante}!",
         "{atacante} acerta primeiro!",
@@ -23,7 +23,7 @@
     },
     "combo": {
       "prioridade": 1,
-      "expressao": "empolgado",
+      "expressao": "normal",
       "falas": [
         "{n} golpes seguidos de {atacante}!",
         "Que sequência! {n} acertos!",
@@ -32,7 +32,7 @@
     },
     "combo_grande": {
       "prioridade": 2,
-      "expressao": "chocado",
+      "expressao": "empolgado",
       "falas": [
         "INACREDITÁVEL! {n} golpes sem parar!",
         "{atacante} está massacrando! {n} acertos!",
@@ -50,7 +50,7 @@
     },
     "ultra": {
       "prioridade": 3,
-      "expressao": "chocado",
+      "expressao": "empolgado",
       "falas": [
         "O ULTRA! {atacante} coloca tudo nesse golpe!",
         "Minha nossa! O golpe supremo de {atacante}!",
@@ -59,7 +59,7 @@
     },
     "guard_break": {
       "prioridade": 2,
-      "expressao": "chocado",
+      "expressao": "serio",
       "falas": [
         "A guarda de {defensor} quebrou!",
         "{defensor} está aberto!",
@@ -68,7 +68,7 @@
     },
     "combo_breaker": {
       "prioridade": 2,
-      "expressao": "chocado",
+      "expressao": "serio",
       "falas": [
         "COMBO BREAKER! {atacante} cortou a sequência!",
         "{atacante} quebrou o combo! Que leitura!",
@@ -77,7 +77,7 @@
     },
     "defesa_perfeita": {
       "prioridade": 1,
-      "expressao": "empolgado",
+      "expressao": "normal",
       "falas": [
         "Defesa perfeita de {defensor}!",
         "{defensor} leu tudo! Defesa perfeita!"
@@ -93,7 +93,7 @@
     },
     "punicao": {
       "prioridade": 1,
-      "expressao": "empolgado",
+      "expressao": "normal",
       "falas": [
         "{atacante} pune sem dó!",
         "Castigo de {atacante}!"
@@ -109,7 +109,7 @@
     },
     "apuros": {
       "prioridade": 2,
-      "expressao": "chocado",
+      "expressao": "serio",
       "falas": [
         "{nome} está por um fio!",
         "Cuidado, {nome}! A vida está acabando!",
@@ -134,7 +134,7 @@
     },
     "tempo": {
       "prioridade": 2,
-      "expressao": "empolgado",
+      "expressao": "serio",
       "falas": [
         "Dez segundos! Quem vai levar essa?",
         "O tempo está acabando!"
@@ -142,7 +142,7 @@
     },
     "ko": {
       "prioridade": 3,
-      "expressao": "chocado",
+      "expressao": "empolgado",
       "falas": [
         "K.O.! {perdedor} está no chão!",
         "Acabou para {perdedor}! {vencedor} derruba!"
@@ -150,7 +150,7 @@
     },
     "ko_ultra": {
       "prioridade": 3,
-      "expressao": "chocado",
+      "expressao": "empolgado",
       "falas": [
         "Que final! {vencedor} encerra com o Ultra!",
         "Com o golpe supremo! {perdedor} não teve chance!"
@@ -167,7 +167,7 @@
     },
     "perfeito": {
       "prioridade": 3,
-      "expressao": "chocado",
+      "expressao": "empolgado",
       "falas": [
         "PERFEITO! {vencedor} não levou um arranhão!"
       ]
@@ -181,7 +181,7 @@
     },
     "empate": {
       "prioridade": 3,
-      "expressao": "chocado",
+      "expressao": "serio",
       "falas": [
         "Empate! Ninguém cede nessa arena!"
       ]

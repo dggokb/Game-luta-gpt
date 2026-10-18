@@ -4,8 +4,9 @@ O torneio tem um narrador que anima o espetáculo, como a narradora do Torneio d
 fala o começo da luta, os golpes, os combos, o Super e o Ultra, quem está em apuros, quem domina
 e a virada, os 10 segundos finais, o K.O. e o vencedor. A luta não para enquanto ele fala.
 
-O personagem ainda vai ser criado. Por enquanto o retrato é um **placeholder**: uma silhueta de
-tinta com microfone e um "?". O nome também é provisório (`NARRADOR`).
+O personagem é o apresentador de terno preto, colete vermelho e dourado e microfone com o leão
+do concept `art/concepts/narrador_concept.png` (model sheet) e `art/concepts/narrador.png` (no
+palco da arena). O nome ainda é provisório (`NARRADOR`).
 
 ## Na tela
 
@@ -17,8 +18,7 @@ tinta e linhas de foco na cor do narrador.
 - O texto entra digitando. Uma fala grande (começo, Ultra, K.O., vitória) aparece em amarelo,
   maior e com um tranco.
 - Em cima da faixa fica uma plaquinha com o nome e uma luz vermelha de "no ar".
-- Quando o retrato real existir, ele balança enquanto o narrador fala. Na expressão "chocado"
-  o quadro também treme.
+- O retrato balança enquanto o narrador fala; gritando no microfone (`empolgado`) balança mais.
 - A faixa some por baixo das faixas de cinema (cinemática da luta, Ultra) e da Página Final.
 
 Código: `story-core` `historia/Narracao.java` (falas, fila, desenho) e `app` `NarradorLuta.java`
@@ -49,8 +49,11 @@ Fica calado no treino, no tutorial, nas demos e nas lutas da história fora do t
 - **`falas`**: em português. Uma é sorteada, sem repetir a última daquele evento.
 - **Variáveis entre chaves**: vêm do jogo. Os nomes saem do elenco da história (`nome` de quem
   tem aquele `lutador` em `temporada.json`); sem nome no elenco, vale o nome do pack.
-- **`expressao`**: escolhe o retrato `historia/retratos/narrador_<expressao>.png`. Sem a
-  imagem, usa `narrador_normal.png`; sem nenhuma das duas, o placeholder.
+- **`expressao`**: escolhe o retrato `historia/retratos/narrador_<expressao>.png`:
+  - `normal`: sorrindo de canto (comentários, agarrão, troca, tempo esgotado);
+  - `empolgado`: gritando no microfone (começo, Super, Ultra, combo grande, virada, K.O., vitória);
+  - `serio`: de cara fechada (guard break, combo breaker, apuros, 10 segundos, empate).
+  Sem a imagem, usa `narrador_normal.png`; sem nenhuma das duas, uma silhueta com microfone.
 - **Traduções**: em `historia/idiomas/en.json` e `es.json`, com a fala inteira como chave e as
   mesmas variáveis. O teste `NarracaoTest` cobra uma tradução para cada fala.
 
@@ -87,17 +90,23 @@ O mesmo evento só volta depois de 8 s (os de prioridade 3 não esperam).
 | `vitoria` / `perfeito` | 3 | fim da luta (o vencedor sem perder vida) | `vencedor` |
 | `tempo_esgotado` / `empate` | 3 | fim pelo tempo / empate | `vencedor` |
 
-## Para o personagem de verdade
+## Os retratos
 
-1. Escolher o nome e a cor: `nome` e `cor` no `narrador.json` (e a tradução do nome nos idiomas).
-2. Gerar os retratos em `historia/retratos/`:
-   - `narrador_normal.png`;
-   - `narrador_empolgado.png`;
-   - `narrador_chocado.png`.
-   O formato é o mesmo dos retratos das conversas. O quadro corta a imagem de cima, então o
-   rosto deve ficar no terço de cima.
-3. Revisar as falas com a voz dele: o jeito de falar, os bordões e como ele chama o público.
-4. Quando tiver voz gravada, cada evento pode ganhar um som (ainda não implementado).
+Os três rostos saem dos close-ups da coluna da direita do model sheet (de cima para baixo:
+`normal`, `empolgado`, `serio`), com o fundo tirado:
 
-Testes: `NarracaoTest` (story-core: falas, variáveis, prioridade, traduções) e
+```
+python3 tools/historia/retratos_narrador.py
+```
+
+Rode de novo quando o concept mudar (as caixas de recorte ficam no começo do script). O teste
+`NarracaoTest` cobra um retrato para cada expressão usada no `narrador.json`.
+
+## O que falta
+
+1. O nome: `nome` no `narrador.json` (e a tradução do nome nos idiomas).
+2. Revisar as falas com a voz dele: o jeito de falar, os bordões e como ele chama o público.
+3. Quando tiver voz gravada, cada evento pode ganhar um som (ainda não implementado).
+
+Testes: `NarracaoTest` (story-core: falas, variáveis, prioridade, traduções, retratos) e
 `NarradorLutaTest` (app: o que a luta conta ao narrador).

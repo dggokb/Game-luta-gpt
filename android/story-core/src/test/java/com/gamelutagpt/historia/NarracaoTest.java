@@ -62,6 +62,14 @@ public class NarracaoTest {
         }
     }
 
+    @Test public void everyExpressionHasItsPortrait() {
+        Narracao n = narrador();
+        for (Map.Entry<String, Narracao.Evento> e : n.eventos().entrySet()) {
+            File retrato = new File(ASSETS, ConversaLuta.RETRATOS + "/" + Narracao.QUEM + "_" + e.getValue().expressao + ".png");
+            assertTrue(e.getKey() + ": falta " + retrato, retrato.isFile());
+        }
+    }
+
     @Test public void aBigMomentCutsInAndACommentWaitsForSilence() {
         Narracao n = narrador();
         assertTrue(n.narrar("inicio", vars()));

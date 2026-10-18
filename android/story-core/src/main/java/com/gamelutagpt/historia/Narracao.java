@@ -26,8 +26,9 @@ import java.util.Map;
  * outra fala importante; 1 (primeiro golpe, combo, agarrão...) só sai depois de um silêncio,
  * para a narração não virar falatório. O mesmo evento não se repete logo em seguida.
  *
- * O personagem ainda vai ser criado: sem {@code historia/retratos/narrador_<expressao>.png} o
- * quadro mostra uma silhueta com microfone (o placeholder). Padrão: docs/historia/narrador.md.
+ * O retrato é {@code historia/retratos/narrador_<expressao>.png} (normal, empolgado, serio),
+ * recortado do concept; sem a imagem, o quadro mostra uma silhueta com microfone. Padrão:
+ * docs/historia/narrador.md.
  */
 public final class Narracao {
     public static final String ARQUIVO = Temporada.PASTA + "/narrador.json";
@@ -114,6 +115,8 @@ public final class Narracao {
             eventos.clear();
             return false;
         }
+        // Os retratos já na carga: a primeira fala da luta não espera a imagem abrir.
+        for (Evento e : eventos.values()) carregarRetrato(e.expressao);
         return true;
     }
 
@@ -233,7 +236,7 @@ public final class Narracao {
             try {
                 img = assets.loadImage(ConversaLuta.RETRATOS + "/" + chave + ".png");
             } catch (IOException | RuntimeException ex) {
-                // Personagem ainda por fazer: o placeholder desenhado.
+                // Sem o retrato: a silhueta desenhada.
             }
             retratos.put(chave, img);
         }
@@ -351,9 +354,10 @@ public final class Narracao {
         float[] caixa = Layouts.caixa(poly);
         float cx = (caixa[0] + caixa[2]) * 0.5f, cy = (caixa[1] + caixa[3]) * 0.5f;
         boolean falandoAgora = atual != null;
-        float amplitude = "chocado".equals(expressao) ? 2.2f : "empolgado".equals(expressao) ? 2f : 1.2f;
+        // Empolgado (gritando no microfone) balança mais.
+        float amplitude = "empolgado".equals(expressao) ? 2f : 1.2f;
         float bob = falandoAgora ? (float)Math.sin(time * 10f) * amplitude : 0f;
-        float tremor = falandoAgora && "chocado".equals(expressao) ? (float)Math.sin(time * 47f) * 1.2f : 0f;
+        float tremor = 0f;
 
         float[] sombra = new float[poly.length];
         for (int i = 0; i < poly.length; i += 2) {
@@ -384,7 +388,7 @@ public final class Narracao {
         c.restore();
     }
 
-    /** O placeholder: silhueta de tinta com o microfone na mão e um "?" no rosto. */
+    /** Sem retrato: silhueta de tinta com o microfone na mão e um "?" no rosto. */
     private void drawSilhueta(RenderCanvas c, float cx, float cy) {
         float hy = cy - 14f;
         // Ombros e tronco.
