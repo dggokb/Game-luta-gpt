@@ -63,10 +63,11 @@ final class OpponentAi {
     static final float DECISION_MAX = 0.28f;
     // Attack preferences; the character pack decides which of them can reach.
     static final String[] GROUND_ATTACKS = {"2L", "2M", "2H", "L", "M", "H"};
-    static final double[] GROUND_WEIGHTS = {0.18, 0.18, 0.17, 0.17, 0.16, 0.14};
+    // Os agachados (2L/2M/2H) pesam menos que os em pé: a CPU não fica o tempo todo abaixada.
+    static final double[] GROUND_WEIGHTS = {0.13, 0.13, 0.12, 0.22, 0.21, 0.19};
     /** Contra quem está agachado: o golpe alto (→ + M) para abrir a defesa baixa. */
     static final String[] GROUND_ATTACKS_VS_CROUCH = {"2L", "2M", "2H", "L", "M", "H", GolpeAlto.BINDING};
-    static final double[] GROUND_WEIGHTS_VS_CROUCH = {0.15, 0.15, 0.14, 0.12, 0.12, 0.10, 0.22};
+    static final double[] GROUND_WEIGHTS_VS_CROUCH = {0.12, 0.12, 0.11, 0.15, 0.15, 0.13, 0.22};
     static final String[] AIR_ATTACKS = {"L", "M", "H"};
     /** Chance of throwing when the target is right next to it, and of teching a throw. */
     static final double THROW_CHANCE = 0.16;
@@ -74,6 +75,8 @@ final class OpponentAi {
     /** Chance of an air tech when the air hitstun ends. */
     static final double AIR_TECH_CHANCE = 0.70;
     static final double[] AIR_WEIGHTS = {0.30, 0.34, 0.36};
+    /** Folga de alcance dos aéreos da CPU (ver {@link #think}). */
+    static final float AIR_REACH_MARGIN = 24f;
 
     private final Random random;
     private float decisionTimer;
@@ -117,9 +120,11 @@ final class OpponentAi {
             return true;
         }
 
+        // No ar a distância vista erra mais (os dois se mexem rápido, e o empurrão de quem passa
+        // por cima muda o lado): ela só solta o aéreo com uma folga de alcance.
         String airAttack = s.verticalDistance <= 115f
             ? CombatRules.pickInRange(AIR_ATTACKS, AIR_WEIGHTS,
-                s.self, true, s.distance, s.target, random.nextDouble())
+                s.self, true, s.distance + AIR_REACH_MARGIN, s.target, random.nextDouble())
             : null;
         boolean vsCrouch = s.targetCrouching && s.targetGrounded;
         String groundAttack = CombatRules.pickInRange(vsCrouch ? GROUND_ATTACKS_VS_CROUCH : GROUND_ATTACKS,

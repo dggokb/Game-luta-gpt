@@ -55,6 +55,9 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
   buffer, relógio de comandos). Golpe corpo a corpo congela os dois; projétil, só o
   defensor. A janela de cancelamento on hit fica aberta durante o hitstop e o
   cancelamento acontece no primeiro frame após ele.
+- **Pulo segurando ↑**: ↑ ou diagonal para cima segurada desde antes de poder agir (fim de um
+  golpe, da defesa, da queda) pula assim que o lutador fica livre, como nos jogos de luta; antes
+  só o instante de entrar no ↑ pedia o pulo e quem já segurava não pulava.
 - **Especial contra agachado**: especial e Super de chão (golpe, energia S1 e projéteis)
   pegam quem está agachado — contra eles o corpo agachado conta com a altura de em pé
   (`CombatEngine.hitsCrouching`). Muitos passavam por cima (o desenho bate na altura do peito,
@@ -93,6 +96,11 @@ humano**.
   vontade de soltar projétil, de agarrar, de pular e paciência na defesa. O zoner (alcance)
   recua para a distância dele; o pressão fica colado; o tanque agarra; o imprevisível às vezes
   larga o plano.
+- **Agachar menos**: sem pressão (o rival não atacou há pouco) o hábito de esperar agachada caiu
+  para 0,1 da chance (antes 0,35; `CALM_HABIT_SCALE`); pressionada, defende como antes. Os golpes
+  agachados (2L/2M/2H) pesam menos na escolha do neutro, e o projétil do meio ela defende em pé.
+  Não ataca quem está caído (o golpe se perdia de longe) e só solta aéreo com 24 de folga de
+  alcance (a distância vista no ar erra mais).
 - **Pressa do fim do tempo** (`OpponentAi.urgency`, `AiController.setSecondsLeft`): ela quer
   terminar a luta, não deixar o tempo acabar (mesmo ganhando na vida). A pressa começa com 45 s
   no relógio e chega ao máximo nos últimos 10 s. Com pressa: decide até 35% mais rápido, luta
@@ -566,7 +574,11 @@ bater trás sem parar não vale). L e M no meio da sequência não quebram.
   apanhando; o troco também pode ser quebrado, mas só por quem ainda tiver barra.
 - **CPU**: a partir do nível 4, apanhando num combo e com barra, a cada golpe novo que ela vê às
   vezes aposta no tempo (`CpuLevel.comboBreaker`: 12% por nível acima do 3): espera um pouco e
-  aperta trás. Só quebra se a aposta cair na janela de um golpe forte/especial.
+  aperta trás. Só quebra se a aposta cair na janela de um golpe forte/especial. Quando quebra,
+  **sempre emenda o combo** dela (`AiController.breakerFollowUp`: o próprio breaker ela sente na
+  hora; abre a rota com o primeiro golpe que alcança, ou corre até ele).
+- **Câmera lenta**: no estalo, 36 quadros a 50% (`GameView.BREAKER_SLOW_*`), para dar para ver
+  o golpe que não entrou e o troco começando.
 - Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) ←".
 
 Testes em `ComboBreakerTest`.
