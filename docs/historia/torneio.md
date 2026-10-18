@@ -60,9 +60,11 @@ emboscam o jogador à noite, longe da arena. Não é regra do torneio, mas os or
 
 - É sempre uma dupla com golpes: só as duplas prontas ficam no lado do jogador.
 - O rótulo da luta é **EMBOSCADA**; perder repete a luta, como as outras da história.
-- **Cenário**: por enquanto, o padrão (Templo da Lua). O plano é um cenário próprio, os
-  fundos do templo à noite (beco com lanternas, chuva), feito com o mesmo motor de cenários
-  ([../stage-engine.md](../stage-engine.md)); quando existir, é só pôr `"cenario"` no passo.
+- **Cenário**: por enquanto, o padrão (Templo da Lua). O plano é o **Caminho dos
+  Penhascos** (`caminho_penhascos`): passarelas e pontes suspensas sobre um abismo da ilha,
+  à noite, feito com o mesmo motor de cenários ([../stage-engine.md](../stage-engine.md));
+  prompts em [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md).
+  Quando existir, é só pôr `"cenario"` no passo.
 
 ### A regra escondida
 
@@ -75,6 +77,24 @@ final e o duelo 1x1.
 Na tela da chave: a dupla do jogador tem borda **azul**, a do rival **vermelha**; quem
 perdeu fica apagado e riscado; o caminho de quem avançou fica dourado; embaixo, a próxima
 luta do jogador (ou os campeões).
+
+## A Ilha do Torneio (cenários)
+
+O torneio é numa ilha de penhascos sobre o mar; cada rodada tem a sua arena, subindo a ilha
+do porto até o templo do pico. Mapa, concepts (`art/concepts/cenarios/`) e prompts de cada
+cenário: [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md).
+
+| Luta | Cenário |
+|---|---|
+| desafio da chegada (episódio novo) | Porto Secreto (`porto_secreto`) |
+| QUARTAS DE FINAL | Arena Costeira (`arena_costeira`) |
+| EMBOSCADA | Caminho dos Penhascos (`caminho_penhascos`) |
+| SEMIFINAL | Arena Imperial (`arena_imperial`) |
+| FINAL (2x2) | Arena Central (`arena_central`) |
+| DUELO FINAL (1x1, a "Final da Tag") | Arena VIP (`arena_vip`) |
+| O Campeão, Takatoshi | Arena do Templo (`arena_templo`) |
+
+Por enquanto nenhum existe: as lutas do torneio usam o Templo da Lua.
 
 ## Passos novos no `episodio.json`
 
@@ -99,6 +119,7 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
 | ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`, e a do Kōga no Beco do Brucy, `beco_brucy`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
+| *(novo)* — A Chegada | **planejado**: os irmãos chegam de barco à Ilha do Torneio, no Porto Secreto, e alguém desafia o jogador no cais antes do torneio começar (luta no `porto_secreto`). Entra entre o ep02 e o ep03; quem desafia ainda está para definir |
 | ep03 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
 | ep04 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep05 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |

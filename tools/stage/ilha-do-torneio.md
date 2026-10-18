@@ -1,0 +1,296 @@
+# Cenários da Ilha do Torneio: prompts
+
+O torneio acontece numa ilha: penhascos de pedra escura pontiagudos saindo do mar,
+cobertos de mata, com cachoeiras e névoa, iluminados por milhares de luzes douradas e
+estandartes vermelhos. Os concepts estão em `art/concepts/cenarios/` (vieram do Drive,
+`game-luta-gpt/concepts/cenarios`) e o mapa mostra onde fica cada cenário:
+
+![Mapa da Ilha do Torneio](../../art/concepts/cenarios/mapa_ilha.jpg)
+
+| Nº no mapa | Cenário (`id`) | Concept | Luta |
+| --- | --- | --- | --- |
+| 1 | Porto Secreto (`porto_secreto`) | `porto_secreto.jpg` | episódio novo da chegada à ilha: alguém desafia o jogador antes do torneio |
+| 2 | Arena Costeira (`arena_costeira`) | `arena_costeira.jpg` | QUARTAS DE FINAL (ep03) |
+| 3 | Arena Imperial (`arena_imperial`) | `arena_imperial.jpg` | SEMIFINAL (ep05) |
+| 4 | Caminho dos Penhascos (`caminho_penhascos`) | `caminho_penhascos.jpg` | EMBOSCADA (ep04) |
+| 5 | Arena Central (`arena_central`) | `arena_central.jpg` | FINAL 2x2 (ep06) |
+| 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep07) |
+| 7 | Arena do Templo (`arena_templo`) | `arena_templo.jpg` | o Campeão, Takatoshi (chefe final) |
+
+O caminho sobe a ilha: o porto fica no pé, as arenas vão subindo pelos penhascos e o
+templo do Takatoshi fica no pico. Por isso **a ilha toda aparece no fundo dos cenários**:
+do porto se vê o templo lá no alto; do templo se vê o mar e as outras arenas lá embaixo.
+
+Como montar cada um (preparar, visualizar no PC, ajustar o `stage.json`): `README.md`
+desta pasta. As regras são as mesmas dos outros cenários: tudo **de frente**, sem
+perspectiva, piso **visto de cima**, PNG com **fundo transparente** e topo inteiro com
+margem nas peças altas (senão o corte aparece no super pulo).
+
+## Regra geral
+
+Cole antes de cada prompt. No ChatGPT, anexe o concept do cenário (e o `mapa_ilha.jpg`
+nas peças de fundo) e diga "use a imagem anexada só como referência de estilo, clima,
+cores e arquitetura; a composição é a pedida no texto".
+
+```
+Arte de cenário para jogo de luta 2D em estilo anime, mesmo traço de um mangá de luta
+moderno (estilo SNK / King of Fighters), na Ilha do Torneio: uma ilha tropical de
+penhascos de pedra escura altos e pontiagudos (como as montanhas de Zhangjiajie e as
+pedras da baía de Ha Long), cobertos de mata verde-escura, com cachoeiras e névoa, no
+crepúsculo: o sol se pondo no mar, céu azul-marinho e roxo com nuvens, e a ilha iluminada
+por luzes quentes douradas, lanternas e holofotes. Arquitetura de luxo que mistura templo
+asiático e resort moderno: pedra escura, concreto, vidro, madeira escura, detalhes
+dourados e estandartes vermelhos com o emblema do torneio em dourado. Contraste entre o
+azul da noite e o dourado e vermelho das luzes, cores ricas, contorno limpo e sombreamento
+em cel-shading. Sem personagens, sem pessoas, sem animais, sem texto legível, sem marca
+d'água.
+```
+
+O **emblema do torneio** aparece nos estandartes e no piso das arenas. Use sempre a mesma
+descrição: "o emblema do torneio, como nos estandartes da referência: um medalhão
+redondo dourado com uma roda ornamentada de oito raios dentro de um anel duplo".
+
+**Plateia**: as arenas são lotadas nos concepts. A única exceção ao "sem pessoas" são as
+arquibancadas **distantes**: "plateia como uma massa de silhuetas pequenas e escuras
+contra as luzes, sem rostos e sem detalhes". Nada de gente nas peças perto da câmera
+(pilares, braseiros, primeiro plano): ficaria parada e grande demais. Se um dia a plateia
+de perto for animada, ela entra como `ator` (veja `docs/tutorial-plateia.md`).
+
+O jogo faz: fogo dos braseiros, brilho das lanternas e holofotes, reflexo no piso
+molhado, a água das piscinas e do mar (brilhos), neblina, folhas caindo. Não precisa (e é
+melhor não) pôr na arte. As **cachoeiras** são da arte (o jogo não anima cachoeira).
+
+## Peças comuns da ilha
+
+Geradas **uma vez** e copiadas para a pasta de cada cenário. Assim o céu, o mar e os
+penhascos são os mesmos em toda a ilha.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `ceu.jpg` | horizontal | opaco | Céu de crepúsculo sobre o mar: na faixa de baixo, perto do horizonte, laranja e dourado do pôr do sol, com o sol meio escondido tocando a borda de baixo, no terço esquerdo da imagem; subindo, nuvens roxas e azul-marinho com a borda de baixo iluminada de laranja; no alto, azul-noite escuro com algumas estrelas. Só o céu: sem mar, sem montanhas, sem chão. |
+| `ceu_lua.jpg` | horizontal | opaco | Peça para **editar o `ceu.jpg`**: "o mesmo céu, com uma lua cheia grande e brilhante no terço de cima, à direita, com halo azulado". Usado nos cenários do alto da ilha (Arena Central, Arena do Templo), como nos concepts. |
+| `mar.png` | horizontal, larga e baixa | **transparente** | O mar visto de frente até o horizonte, ocupando só a metade de baixo da imagem: água azul-escura com o reflexo dourado do sol poente fazendo um caminho de luz no terço esquerdo, e dezenas de rochedos de pedra escura altos e pontiagudos saindo da água, de vários tamanhos, mais apagados e azulados quanto mais longe, com névoa no pé. O horizonte é uma linha reta. Tudo acima do horizonte e dos rochedos é transparente. As bordas esquerda e direita continuam no mesmo nível, para a imagem poder se repetir. |
+| `penhascos.png` | horizontal | **transparente** | Faixa contínua de penhascos de pedra escura altos e pontiagudos vista de frente, cobertos de mata verde-escura, com duas ou três cachoeiras finas caindo, névoa branca no pé e, aqui e ali, pequenos caminhos de pedra e pontes iluminados por lanternas douradas e pavilhões com telhado asiático acesos. A base é uma faixa reta de névoa. Sem céu: tudo acima dos penhascos é transparente. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `estandarte.png` | **vertical** | **transparente** | Mastro alto de metal escuro com detalhes dourados, vista de frente, com um estandarte comprido de tecido vermelho pendurado numa travessa no alto, com o emblema do torneio grande em dourado no meio e borda dourada. Uma luminária dourada acesa no topo do mastro. O topo aparece inteiro, com margem transparente acima e dos lados. A base do mastro (um bloco de pedra escura) toca a borda de baixo. Fundo transparente. |
+
+## 1. Porto Secreto (`porto_secreto`)
+
+O episódio novo da chegada: os iates chegam à ilha à noite e, no cais, antes de entrar no
+torneio, alguém desafia o jogador. A luta é **no cais de concreto molhado**, entre caixas
+de equipamento e cordas, com a água do porto atrás, os iates e o junco de velas vermelhas
+e, lá no fundo, a ilha inteira acesa subindo até o templo.
+
+Composição (profundidades sugeridas): caixas 150, postes 300, terminal 420 (à esquerda),
+guindaste 900, grade do cais 650 (fim do piso), água 650 a 2600 (`agua`, com brilhos e o
+reflexo dos barcos), barcos 1400, ilha 5000, `mar.png` 9000, `ceu.jpg`. Piso molhado:
+`reflexoLutadores` ~0,3, `reflexoLuzes` ~0,6.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `ilha.png` | horizontal | **transparente** | A Ilha do Torneio vista do porto, de longe e de frente: penhascos de pedra escura altos e pontiagudos subindo da esquerda para a direita, cobertos de mata, cheios de névoa e cachoeiras, com caminhos e pontes acesos em zigue-zague subindo a encosta, um estádio redondo iluminado por holofotes na metade da subida e, no pico, à direita, um templo asiático dourado aceso com uma escadaria longa iluminada descendo dele. A base é uma linha reta de névoa (o pé da ilha na água). Sem céu: tudo acima da ilha é transparente. |
+| `barcos.png` | horizontal | **transparente** | Barcos ancorados vistos de lado, na mesma linha: à esquerda, dois iates de luxo brancos modernos com luzes acesas nas janelas e no casco; à direita, um junco chinês de madeira escura com três velas vermelhas grandes abertas. A linha d'água é uma linha reta embaixo, sem a água. Fundo transparente. |
+| `guindaste.png` | **vertical** | **transparente** | Guindaste de porto de metal escuro visto de frente, com a lança longa para a direita e um contêiner vermelho pendurado nos cabos, luzes de sinalização acesas na estrutura. O topo aparece inteiro, com margem transparente acima e dos lados. A base toca a borda de baixo. Fundo transparente. |
+| `terminal.png` | **vertical** | **transparente** | Fachada de um terminal de chegada de luxo de dois andares visto **exatamente de frente**, sem perspectiva: térreo de vidro com luz quente lá dentro e três pórticos de detector de metais iluminados na entrada, guarda-sóis vermelhos; no andar de cima uma varanda com corrimão de metal e lanternas de papel penduradas, palmeiras em vasos. Telhado plano de vigas escuras com o topo inteiro e margem transparente acima e dos lados. Sem pessoas. A base toca a borda de baixo. Fundo transparente. |
+| `grade.png` | horizontal | **transparente** | Borda de um cais de concreto vista de frente, em linha reta: guarda-corpo baixo de metal escuro com postes curtos, a cada intervalo um poste de amarração (cabeço) de ferro e uma luminária baixa de luz dourada; embaixo, a lateral de concreto do cais com pneus de proteção pendurados. Continua igual nas duas bordas, para se repetir lado a lado. Fundo transparente. |
+| `poste.png` | **vertical** | **transparente** | Poste de luz alto de metal escuro do cais, vista de frente, com uma luminária redonda de luz quente no topo e um estandarte vertical vermelho com o emblema do torneio em dourado preso no meio do poste. O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `caixas.png` | horizontal | **transparente** | Pilha de equipamento no cais vista de frente, apoiada no chão: caixas de transporte rígidas pretas e cinza-escuras com cantos de metal, empilhadas em alturas diferentes, um rolo grande de corda de navio e uma rede de pesca dobrada em cima. A base toca a borda de baixo. Fundo transparente. |
+| `frente_esq.png` | horizontal | **transparente** | Objetos soltos de cais, isolados, vistos de frente e um pouco de baixo, como se estivessem colados na câmera: duas caixas de transporte rígidas pretas empilhadas com cantos de metal. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. Contorno dourado das luzes do cais. |
+| `frente_dir.png` | horizontal | **transparente** | Objetos soltos de cais, isolados, vistos de frente e um pouco de baixo, como se estivessem colados na câmera: um cabeço de amarração de ferro com uma corda grossa enrolada e uma luminária baixa de cais apagada. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. Contorno dourado das luzes do cais. |
+| `chao.jpg` | quadrado | opaco | Piso de cais visto **exatamente de cima** (vista ortográfica, sem perspectiva): grandes placas de concreto cinza-escuro molhado, todas do mesmo tamanho, em fileiras retas, com juntas finas, duas faixas de pintura amarela gasta correndo de um lado ao outro e algumas grelhas de ferro de escoamento. No centro, o emblema do torneio pintado grande no concreto, em dourado gasto. Iluminação uniforme, sem reflexos de luzes e sem sombras de objetos. As bordas esquerda e direita continuam o padrão. |
+| `chao_cais.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o emblema do centro, com o concreto continuando no lugar dele". |
+
+Dicas do porto:
+- As faixas amarelas do piso precisam correr **da esquerda para a direita** (paralelas à
+  borda do cais): deitadas pelo jogo, elas viram as linhas do cais no concept.
+- Os barcos ficam sem a água: a água é a camada `agua` do jogo, que pisca e reflete os
+  barcos (`reflexo` na camada dos barcos).
+- O detector de metais do terminal é a "segurança" da chegada: combina com a cena do
+  desafio (o adversário pode estar esperando logo depois dos pórticos).
+
+## 2. Arena Costeira (`arena_costeira`): quartas
+
+A primeira arena, na encosta de baixo, à beira-mar: um ringue redondo claro com anéis
+vermelhos, arquibancada lotada em volta, torres de holofote com estandartes, e o mar com
+os rochedos ao lado. No jogo, a arquibancada fica atrás do ringue e é **baixa**: por cima
+dela se vê o mar até o horizonte com o pôr do sol, o que dá o "costeira". A encosta da ilha
+aparece só do lado direito.
+
+Composição: ringue (piso) até 600, barreira 600, holofotes 300, arquibancada 900,
+encosta 2200 (só à direita, sem repetir), `penhascos.png` 4000, `mar.png` 9000 (com
+`agua` entre 1500 e 8000 para os brilhos), `ceu.jpg`.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `arquibancada.png` | horizontal, larga e baixa | **transparente** | Arquibancada de uma arena de luta à beira-mar vista **exatamente de frente**, em linha reta: degraus de concreto claro subindo, lotados de plateia como uma massa de silhuetas pequenas e escuras contra as luzes, sem rostos e sem detalhes; embaixo, um muro com painéis de LED vermelhos acesos (sem texto) e portões escuros; no alto, um corrimão de vidro com luzes douradas. A arquibancada é baixa: ocupa só a metade de baixo da imagem, o resto é transparente. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `encosta.png` | horizontal | **transparente** | Encosta da ilha vista de frente, saindo do lado direito da imagem: penhasco de pedra escura com mata, uma escadaria de pedra iluminada subindo em zigue-zague, dois pavilhões de vidro e madeira acesos com estandartes vermelhos e, lá no alto, as luzes de outra arena. O lado esquerdo da imagem é transparente (ali aparece o mar). A base é uma faixa reta de névoa. Sem céu. |
+| `holofote.png` | **vertical** | **transparente** | Torre de holofote de arena vista de frente: estrutura de treliça de metal escuro alta, com uma grade de refletores retangulares acesos no topo e um estandarte vermelho comprido com o emblema do torneio em dourado preso na torre. O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `barreira.png` | horizontal | **transparente** | Mureta baixa em volta do ringue de uma arena, vista de frente, em linha reta: blocos de concreto escuro com uma faixa de painéis de LED vermelhos acesos (sem texto) e um friso dourado em cima. Continua igual nas duas bordas, para se repetir lado a lado. Fundo transparente. |
+| `frente_esq.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: a ponta de uma grua de câmera de TV de metal preto com a câmera, vista de baixo, em silhueta contornada pelas luzes douradas. **Só o objeto**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `frente_dir.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um trecho de corrimão de vidro com um poste de metal e uma luminária baixa acesa, e uma palmeira pequena num vaso de pedra, em silhueta contornada pelas luzes douradas. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de ringue de arena visto **exatamente de cima** (vista ortográfica, sem perspectiva): concreto polido claro, bege-acinzentado, com um grande círculo central desenhado por dois anéis vermelhos finos e um anel dourado, e o emblema do torneio discreto no centro, em dourado. Fora do círculo, o mesmo concreto com juntas retas finas. Iluminação uniforme, sem sombras de objetos. As bordas esquerda e direita continuam o padrão. |
+| `chao_liso.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o círculo, os anéis e o emblema do centro, com o concreto continuando no lugar deles". |
+
+## 3. Arena Imperial (`arena_imperial`): semifinal
+
+Uma grande praça de pedra polida com uma mandala vermelha e dourada no chão, em frente a um
+palácio de vidro e madeira com uma escadaria larga e cachoeiras caindo dos dois lados.
+Arquibancadas laterais, estandartes vermelhos em pórticos altos, lanternas e árvores de
+folhas vermelhas. Mais "imperial" e mais rica que a Costeira.
+
+Composição: lanternas 150, pórticos com estandarte 300, árvores vermelhas 500, praça
+(piso) até 700, arquibancadas 850 (esquerda e direita, alternando), palácio 1300 (centro,
+sem repetir), neblina 1400 (no pé das cachoeiras), `penhascos.png` 3500, `mar.png` 9000,
+`ceu.jpg`. Folhas vermelhas caindo: `petalas` em vermelho (`#C8202A`). Piso polido:
+`reflexoLutadores` ~0,3.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `palacio.png` | horizontal | **transparente** | Palácio de arena visto **exatamente de frente** e simétrico, sem perspectiva: um pavilhão grande de vidro e madeira escura com telhado asiático plano de beirais retos, aceso por dentro com luz dourada, sobre um terraço de pedra; descendo dele, uma escadaria larga de pedra clara iluminada, e dos dois lados da escadaria, cachoeiras caindo de um paredão de pedra escura com mata. Dois estandartes vermelhos altos com o emblema do torneio nas laterais. Duas árvores de folhas vermelhas no terraço. A base é uma linha reta embaixo. Sem céu: transparente acima do telhado. |
+| `arquibancada_lateral.png` | horizontal | **transparente** | Arquibancada coberta de uma arena vista de frente: degraus subindo, lotados de plateia como massa de silhuetas pequenas e escuras sem rostos, sob uma cobertura de madeira escura com beiral asiático, colunas com estandartes vermelhos e um camarote envidraçado aceso no alto. O topo aparece inteiro, com margem transparente acima e dos lados. A base é uma linha reta embaixo. |
+| `portico.png` | **vertical** | **transparente** | Pórtico alto de metal preto e moldura dourada visto de frente, com um estandarte vermelho comprido esticado dentro da moldura, com o emblema do torneio em dourado, e uma luminária dourada acesa no topo. O topo aparece inteiro, com margem transparente. A base (um pedestal de pedra escura) toca a borda de baixo. Fundo transparente. |
+| `arvore_vermelha.png` | quadrado | **transparente** | Árvore ornamental de copa larga com folhas vermelho-vivo (bordo japonês), tronco escuro retorcido, plantada num canteiro baixo de pedra escura, vista de frente. A base toca a borda de baixo. Fundo transparente. |
+| `lanterna.png` | **vertical** | **transparente** | Luminária de praça vista de frente: um pilar baixo e quadrado de pedra escura com uma lanterna de vidro e metal dourado no topo, **apagada** (o jogo acende). A base toca a borda de baixo. Fundo transparente. |
+| `frente_esq.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: a ponta de um telhado de madeira escura de um pavilhão de restaurante, com o beiral e uma viga, visto de baixo, em silhueta contornada por luz dourada. **Só o objeto**: sem chão, sem fundo. Margem transparente embaixo e dos lados; o telhado sai pela borda de cima. |
+| `frente_dir.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um galho de árvore de folhas vermelhas e um trecho de corrimão de pedra com uma lanterna baixa, em silhueta contornada por luz dourada. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de praça visto **exatamente de cima** (vista ortográfica, sem perspectiva): grandes placas quadradas de pedra polida cinza-escura, todas do mesmo tamanho, com juntas finas douradas. No centro, uma grande mandala circular incrustada: anéis vermelhos e dourados concêntricos, um padrão geométrico vermelho em volta e o emblema do torneio no meio. Iluminação uniforme, sem reflexos e sem sombras. As bordas esquerda e direita continuam o padrão das placas. |
+| `chao_placas.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem a mandala do centro, com as placas continuando no lugar dela". |
+
+## 4. Caminho dos Penhascos (`caminho_penhascos`): emboscada
+
+Fora das arenas, à noite: passarelas de metal e pontes suspensas sobre um abismo, presas
+em andaimes nos penhascos, com o mar batendo lá embaixo e névoa subindo. Ruínas de arcos
+de pedra antigos, postes com estandartes, caixas de equipamento abandonadas. É o lugar
+certo para uma emboscada: só tem a passarela, e em volta é o vazio. Substitui o plano
+antigo do "beco dos fundos do templo" (`docs/historia/torneio.md`).
+
+Composição: andaimes 250, guarda-corpo 450 (fim do piso, a passarela é estreita), névoa
+do abismo 600 a 900 (duas `neblina`, subindo de baixo), ponte suspensa 1500, ruínas 1100
+(à direita), penhascos com o abismo 2500, arena VIP acesa ao longe 6000 (só à direita),
+`mar.png` 9000, `ceu.jpg`. Sem reflexo forte (metal e madeira secos): `reflexoLutadores`
+~0,1. Vento: `petalas` em cinza-claro bem apagadas, como gotículas de névoa, é opcional.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `abismo.png` | horizontal | **transparente** | Abismo entre penhascos visto de frente: paredões de pedra escura pontiagudos dos dois lados e no fundo, com mata nas fendas e uma cachoeira caindo, descendo até o mar agitado com espuma branca bem lá embaixo, cheio de névoa branca subindo. Andaimes de metal com lâmpadas presos nos paredões. A borda de cima são os topos dos penhascos; acima deles é transparente. Ocupa a imagem de ponta a ponta. |
+| `ponte.png` | horizontal | **transparente** | Ponte suspensa estreita de metal escuro vista **exatamente de lado**, em linha reta, de uma borda à outra: piso de grade de metal com corrimão, duas torres de treliça com cabos de aço descendo em curva, lâmpadas douradas a intervalos iguais no corrimão e um estandarte vermelho em cada torre. Embaixo da ponte é transparente. Fundo transparente. |
+| `ruinas.png` | horizontal | **transparente** | Ruínas antigas de pedra cinza em cima de um penhasco, vista de frente: dois arcos grandes de pedra rachados, com musgo e trepadeiras, colunas quebradas, lanternas modernas e um estandarte vermelho do torneio presos nas pedras, luz dourada iluminando de baixo. A base é a borda reta do penhasco. Fundo transparente. |
+| `arena_longe.png` | horizontal | **transparente** | Ao longe, no alto de um penhasco à direita, um pavilhão de luxo de vidro e metal escuro todo aceso por dentro, com estandartes vermelhos gigantes com o emblema do torneio pendurados na fachada e holofotes no telhado. Pequeno e distante, com névoa no pé. O lado esquerdo da imagem é transparente. Sem céu. |
+| `andaime.png` | **vertical** | **transparente** | Torre de andaime de metal escuro vista de frente: tubos e travessas em X, uma plataforma no meio com uma caixa de equipamento, um poste com um holofote pequeno aceso e um estandarte vermelho do torneio amarrado. O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `guarda_corpo.png` | horizontal | **transparente** | Guarda-corpo de passarela de metal visto de frente, em linha reta: corrimão de metal escuro na altura da cintura, postes a intervalos iguais com uma lâmpada vertical dourada acesa em cada um, cabos de aço entre os postes e, embaixo do corrimão, uma placa de metal perfurado. Dá para ver através entre os cabos (transparente). Continua igual nas duas bordas, para se repetir lado a lado. |
+| `frente_esq.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: duas caixas de equipamento de metal empilhadas, com cantos reforçados, e um rolo de cabo elétrico, vistos de baixo, em silhueta contornada por luz dourada. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `frente_dir.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um poste de passarela de metal com uma lâmpada vertical dourada acesa e um pedaço de corrimão, visto de baixo, em silhueta. **Só o objeto**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de passarela visto **exatamente de cima** (vista ortográfica, sem perspectiva): placas de grade de metal escuro antiderrapante, todas do mesmo tamanho, em fileiras retas, presas por vigas de aço com parafusos, e algumas tábuas de madeira escura gastas entre as placas. No centro, uma placa de metal maior e lisa, redonda, com o emblema do torneio estampado em relevo. Iluminação uniforme, sem sombras de objetos. As bordas esquerda e direita continuam o padrão. |
+| `chao_grade.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem a placa redonda do centro, com a grade continuando no lugar dela". |
+
+Dicas do caminho:
+- No concept as pontes atravessam o abismo em perspectiva. No jogo a câmera olha de
+  frente: a luta é numa passarela que corre de lado a lado da tela, e a ponte suspensa do
+  fundo também precisa vir **de lado**, reta, para se repetir.
+- O `abismo.png` é o que dá o vazio. Ele fica logo atrás do guarda-corpo e desce abaixo
+  da linha do piso; confira no visualizador se o mar lá embaixo aparece quando a câmera
+  afasta.
+
+## 5. Arena Central (`arena_central`): final
+
+O estádio principal, no meio da ilha: um coliseu de pedra e concreto com arquibancadas em
+vários andares lotadas, uma estrutura de treliça de luzes por cima do ringue com
+estandartes enormes pendurados, holofotes cruzando o céu e, no alto, o templo do
+Takatoshi aceso sob a lua. É o maior palco: mais gente, mais luz, mais vermelho.
+
+Composição: pilastras 300, treliça 380 (faixa no alto, como o teto do dojo, com `luzes`
+de holofote), barreira 650 (fim do piso), arquibancada 1100 (repetida, com `corAcima`
+escuro para o super pulo mostrar o anel de cima), templo ao longe 7000 (centro-direita),
+`penhascos.png` 4000, `mar.png` 9000, `ceu_lua.jpg`. Primeiro plano: o camarote VIP na
+frente (corrimão de vidro, mesas), desfocado.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `arquibancada.png` | horizontal | **transparente** | Arquibancada principal de um coliseu moderno vista **exatamente de frente**, em linha reta: três andares de degraus lotados de plateia como massa de silhuetas pequenas e escuras sem rostos, separados por faixas de camarotes envidraçados acesos em dourado, grandes estandartes vermelhos com o emblema do torneio pendurados entre os andares, e no alto um anel de holofotes. Embaixo, a mureta do ringue com painéis de luz vermelha (sem texto). O topo aparece inteiro, com margem transparente. Continua igual nas duas bordas, para se repetir lado a lado. |
+| `trelica.png` | horizontal, larga e baixa | **transparente** | Estrutura de treliça de luzes de palco vista de frente e um pouco de baixo, no terço de cima da imagem: vigas de treliça de metal preto cruzando de lado a lado, com refletores de palco pendurados (apagados, o jogo acende) e dois estandartes vermelhos compridos com o emblema do torneio pendurados nela. A borda de baixo é irregular (os refletores e os estandartes) e o resto é transparente. Continua igual nas duas bordas. |
+| `pilastra.png` | **vertical** | **transparente** | Pilastra alta e quadrada de concreto escuro de estádio, vista de frente, com uma faixa de luz dourada vertical embutida e um estandarte vermelho comprido com o emblema do torneio em dourado preso na frente. No topo, uma luminária. O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `barreira.png` | horizontal | **transparente** | Mureta do ringue de um estádio, vista de frente, em linha reta: concreto escuro com friso dourado no alto e, a intervalos iguais, pequenos postes pretos com luzes douradas. Continua igual nas duas bordas, para se repetir lado a lado. Fundo transparente. |
+| `templo_longe.png` | horizontal | **transparente** | Bem ao longe, no pico de uma montanha de pedra pontiaguda, um templo asiático de vários telhados dourado e vermelho todo aceso, com uma escadaria longa iluminada descendo e cachoeiras dos lados, pequeno e com névoa em volta. O resto da imagem é transparente. Sem céu, sem lua. |
+| `camarote.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera, só na faixa de baixo da imagem: corrimão de vidro de um camarote VIP com postes de metal, uma mesa baixa com taças e uma luminária de vela, e um vaso de pedra com uma planta, vistos de baixo, em silhueta contornada por luz dourada. **Só os objetos**: sem pessoas, sem chão, sem fundo. A base toca a borda de baixo; acima, transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de ringue de estádio visto **exatamente de cima** (vista ortográfica, sem perspectiva): pedra polida bege-clara, com um grande círculo central: anel externo vermelho, anel dourado ornamentado com um padrão geométrico e, no centro, o emblema do torneio grande em vermelho e dourado. Fora do círculo, a mesma pedra com juntas retas finas. Iluminação uniforme, sem sombras. As bordas esquerda e direita continuam o padrão. |
+| `chao_liso.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o círculo e o emblema do centro, com a pedra continuando no lugar deles". |
+
+Dica: o `camarote.png` pode ser um só (não dividir em esquerda e direita): ele atravessa a
+parte de baixo da tela, como no concept, e é desfocado na preparação. Se tampar demais os
+pés dos lutadores, ele fica só a −250 com `periodo` grande, aparecendo quando a câmera anda.
+
+## 6. Arena VIP (`arena_vip`): a "Final da Tag", o duelo 1x1
+
+Um salão de luxo meio aberto, só para os magnatas: um ringue redondo de pedra preta polida
+com um friso dourado, o emblema vermelho e dourado no centro e uma faixa vermelha
+atravessando, cercado de **piscinas** com luz vermelha embaixo d'água, braseiros acesos,
+colunas pretas com estandartes vermelhos, camarotes de dois andares com cortinas
+vermelhas e, pelo lado aberto, o mar e os penhascos no pôr do sol. É o lugar da regra
+escondida: os parceiros lutam entre si para os magnatas assistirem.
+
+Composição: braseiros 150 (com `fogos`), colunas 330, ringue (piso) até 520, piscina 520
+a 820 (`agua` vermelha e escura, com brilhos e o reflexo do salão), salão do fundo 850,
+teto 300 e 700 (faixas no alto, com os spots como `luzes`), paisagem pelo vão 3000 (só à
+esquerda), `mar.png` 9000, `ceu.jpg`. Pedra preta polida: `reflexoLutadores` ~0,45,
+`reflexoLuzes` ~0,7.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `salao.png` | horizontal | **transparente** | Fundo de um salão de luxo visto **exatamente de frente**, em linha reta: dois andares de camarotes abertos com mesas, poltronas e luminárias de vela, cortinas de veludo vermelho e painéis de treliça vermelha, colunas pretas lisas e um friso dourado entre os andares, tudo aceso com luz quente dourada. Sem pessoas. No lado esquerdo da imagem, um vão aberto entre colunas (transparente) por onde se veria a paisagem. O topo aparece inteiro, com margem transparente acima. A base é uma linha reta (a borda da piscina). |
+| `teto.png` | horizontal, larga e baixa | **transparente** | Anel de teto de um salão de luxo visto de frente e de baixo, no terço de cima da imagem: uma viga circular de metal preto com um friso de luz vermelha e uma fileira de spots de luz pendurados (apagados, o jogo acende), estandartes vermelhos com o emblema do torneio pendurados dela. A borda de baixo é irregular e o resto é transparente. Continua igual nas duas bordas. |
+| `coluna.png` | **vertical** | **transparente** | Coluna alta e lisa de pedra preta polida, vista de frente, com um estandarte vermelho comprido com o emblema do torneio em dourado pendurado ao lado, de uma barra dourada no alto. O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `braseiro.png` | quadrado | **transparente** | Braseiro de luxo visto de frente: um pedestal quadrado e baixo de pedra preta polida com friso dourado e, em cima, uma tigela rasa de bronze escuro **vazia e sem fogo** (o jogo desenha o fogo). A base toca a borda de baixo. Fundo transparente. |
+| `paisagem.png` | horizontal | **transparente** | Vista pelo vão de um salão, ao longe: penhascos de pedra escura pontiagudos com mata e névoa, pavilhões acesos e uma ponte iluminada, com cachoeiras caindo para o mar. Ocupa só a metade esquerda da imagem; a metade direita é transparente. A base é uma faixa reta de névoa. Sem céu. |
+| `frente_esq.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um sofá baixo de couro escuro de camarote com uma mesinha com taças e uma luminária de vela, e um vaso com uma planta de folhas vermelhas, vistos de baixo, em silhueta contornada por luz dourada e vermelha. **Só os objetos**: sem pessoas, sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `frente_dir.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um trecho de corrimão de vidro com um poste de metal dourado e uma luminária de vela, visto de baixo, em silhueta. **Só o objeto**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de ringue de luxo visto **exatamente de cima** (vista ortográfica, sem perspectiva): pedra preta polida com veios cinza, em placas grandes com juntas finas douradas. No centro, um grande círculo com friso dourado duplo e, no meio, o emblema do torneio em vermelho e dourado; uma faixa vermelha reta atravessa o círculo de cima a baixo da imagem, passando pelo emblema. Iluminação uniforme, sem reflexos e sem sombras. As bordas esquerda e direita continuam o padrão das placas. |
+| `chao_placas.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o círculo, o emblema e a faixa vermelha, com as placas continuando no lugar deles". |
+
+Dicas da VIP:
+- A faixa vermelha do piso precisa correr **de cima para baixo** na imagem: deitada pelo
+  jogo, ela vira o caminho que vem do fundo até o centro do ringue, como no concept.
+- As piscinas são a camada `agua` (vermelho escuro perto, quase preto longe): o jogo faz a
+  água e o reflexo do salão (`reflexo` na camada `salao`). Não ponha água na arte.
+- Os magnatas assistindo podem entrar depois como `atores` nos camarotes do `salao.png`
+  (reação de aplaudir no K.O.), como o Dafu e o Takatoshi no Shūshinkan.
+
+## 7. Arena do Templo (`arena_templo`): o Campeão, Takatoshi
+
+O pico da ilha: uma praça de pedra molhada com um círculo dourado incrustado, em frente a
+um templo de vários telhados com uma porta redonda dourada, uma escadaria enorme subindo
+até ele e cachoeiras caindo dos terraços dos dois lados. Braseiros grandes acesos em
+pedestais com estandartes, árvores de folhas vermelhas e a lua cheia sobre o templo. É a
+última luta: o mais solene, menos "resort" e mais templo.
+
+Composição: pedestais com braseiro 200 (com `fogos`), árvores vermelhas 450, praça (piso)
+até 650, mureta 650, templo 1500 (centro, sem repetir), galerias laterais 1200 (esquerda e
+direita), neblina 1600 (cachoeiras), `penhascos.png` 3500, `mar.png` 9000, `ceu_lua.jpg`.
+Pedra molhada: `reflexoLutadores` ~0,3, `reflexoLuzes` ~0,6. Folhas vermelhas caindo:
+`petalas` em vermelho.
+
+| Arquivo | Formato | Fundo | Prompt |
+| --- | --- | --- | --- |
+| `templo.png` | horizontal | **transparente** | Templo no pico de uma montanha visto **exatamente de frente** e simétrico, sem perspectiva: um templo asiático de três telhados sobrepostos com beirais curvos dourados, colunas vermelhas, e no centro da fachada uma grande porta redonda dourada com um padrão de anéis; dos dois lados, estandartes vermelhos altos com o emblema do torneio. Descendo do templo, uma escadaria de pedra larga e longa iluminada por pequenas chamas nas laterais, e dos dois lados da escadaria, terraços de pedra de onde caem cachoeiras largas. Árvores de folhas vermelhas nos terraços. A base é uma linha reta embaixo (o pé da escadaria). Sem céu: transparente acima do telhado. |
+| `galeria.png` | horizontal | **transparente** | Galeria aberta de templo vista de frente: um pavilhão comprido de madeira escura e vidro aceso por dentro, com telhado plano de beiral reto, corrimão de madeira na frente e estandartes vermelhos, sobre um paredão de pedra com cachoeiras finas. O topo aparece inteiro, com margem transparente. A base é uma linha reta embaixo. |
+| `pedestal.png` | **vertical** | **transparente** | Pedestal alto e quadrado de pedra escura com friso dourado, visto de frente, com um estandarte vermelho comprido com o emblema do torneio em dourado na face da frente e, em cima, uma tigela grande de bronze dourado **vazia e sem fogo** (o jogo desenha o fogo). O topo aparece inteiro, com margem transparente. A base toca a borda de baixo. Fundo transparente. |
+| `arvore_vermelha.png` | quadrado | **transparente** | Árvore bonsai grande de folhas vermelho-vivo (bordo japonês), tronco escuro retorcido, num vaso largo de pedra escura, vista de frente. A base toca a borda de baixo. Fundo transparente. |
+| `mureta.png` | horizontal | **transparente** | Borda da praça de um templo vista de frente, em linha reta: mureta baixa de pedra escura com balaústres, pequenas lanternas de pedra com chamas a intervalos iguais e dois degraus de pedra no meio. Continua igual nas duas bordas, para se repetir lado a lado. Fundo transparente. |
+| `frente_esq.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um trecho de cerca de madeira escura com um poste e uma lanterna pequena acesa, e um galho de bonsai de folhas vermelhas, vistos de baixo, em silhueta contornada por luz dourada. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `frente_dir.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: a base de um pedestal de pedra escura com friso dourado e a ponta de um estandarte vermelho, vistos de baixo, em silhueta. **Só o objeto**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
+| `chao.jpg` | quadrado | opaco | Piso de praça de templo visto **exatamente de cima** (vista ortográfica, sem perspectiva): grandes lajotas de pedra cinza-escura molhada, todas do mesmo tamanho, em fileiras retas, com juntas finas. No centro, um grande emblema circular de anéis concêntricos dourados incrustado na pedra (como a porta redonda do templo), com o emblema do torneio no meio. Iluminação uniforme, sem reflexos e sem sombras de objetos. As bordas esquerda e direita continuam o padrão das lajotas. |
+| `chao_lajotas.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o emblema do centro, com as lajotas continuando no lugar dele". |
+
+Dica: os braseiros do concept são os pedestais com fogo. O fogo, as brasas e o reflexo
+deles no piso molhado são do jogo, então a tigela vem vazia. As pequenas chamas da
+escadaria do `templo.png` podem vir na arte (são pequenas e distantes, quase não se mexem).
+
+## Ordem sugerida
+
+1. As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.
+2. Arena Costeira e Caminho dos Penhascos: são as primeiras lutas da ilha (quartas e
+   emboscada) e trocam o Templo da Lua, que hoje é o cenário padrão do torneio.
+3. Porto Secreto, junto com o episódio da chegada.
+4. Imperial, Central e VIP, na ordem da chave.
+5. Arena do Templo, quando o Takatoshi virar lutador.
+
+Quando um cenário estiver pronto, é só pôr `"cenario": "<id>"` no passo da luta no
+`episodio.json` (como o `dojo_yinlu` e o `beco_brucy` no ep02).

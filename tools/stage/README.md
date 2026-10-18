@@ -10,6 +10,9 @@ imagens. O primeiro é o **Templo da Lua** (`templo_lua`), baseado no concept do
 noite, com a arte gerada no GPT. `gerar_provisorio.py` gera uma arte provisória no mesmo
 formato (em `tools/stage/provisorio/`), útil para testar ou como modelo.
 
+Os cenários da **Ilha do Torneio** (porto, as cinco arenas, o caminho da emboscada e o
+templo do Takatoshi) têm os prompts em [ilha-do-torneio.md](ilha-do-torneio.md).
+
 ## Passo a passo
 
 1. Gere as imagens no GPT com os prompts abaixo. Use os mesmos nomes de arquivo.
