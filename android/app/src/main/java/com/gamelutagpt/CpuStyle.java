@@ -26,15 +26,15 @@ final class CpuStyle {
         this.zoning = zoning; this.throwing = throwing; this.jumping = jumping; this.patience = patience;
     }
 
-    static final CpuStyle EQUILIBRADO = new CpuStyle("equilibrado", 260f, 0.50, 1.0, 1.0, 1.0, 1.1);
+    static final CpuStyle EQUILIBRADO = new CpuStyle("equilibrado", 240f, 0.70, 1.0, 1.0, 1.0, 0.8);
     private static final CpuStyle[] STYLES = {
         EQUILIBRADO,
-        new CpuStyle("pressao", 120f, 0.85, 0.5, 1.4, 1.0, 0.8),
-        new CpuStyle("chutes", 180f, 0.65, 0.7, 1.0, 1.2, 0.9),
-        new CpuStyle("aereo", 220f, 0.70, 0.8, 1.0, 2.0, 0.8),
-        new CpuStyle("alcance", 420f, 0.25, 1.8, 0.6, 0.7, 1.2),
-        new CpuStyle("tanque", 100f, 0.60, 0.4, 2.2, 0.6, 1.0),
-        new CpuStyle("imprevisivel", 160f, 0.75, 0.8, 1.2, 1.4, 0.6),
+        new CpuStyle("pressao", 120f, 0.95, 0.5, 1.4, 1.0, 0.6),
+        new CpuStyle("chutes", 180f, 0.80, 0.7, 1.0, 1.2, 0.7),
+        new CpuStyle("aereo", 220f, 0.85, 0.8, 1.0, 2.0, 0.6),
+        new CpuStyle("alcance", 340f, 0.50, 1.8, 0.6, 0.7, 0.9),
+        new CpuStyle("tanque", 100f, 0.80, 0.4, 2.2, 0.6, 0.8),
+        new CpuStyle("imprevisivel", 160f, 0.85, 0.8, 1.2, 1.4, 0.5),
     };
 
     static CpuStyle of(String name) {

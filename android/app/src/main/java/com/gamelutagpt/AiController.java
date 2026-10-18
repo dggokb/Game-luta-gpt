@@ -15,8 +15,8 @@ import java.util.Random;
  */
 final class AiController {
     /** Pause after the CPU's own attack ends and after it is hit, in frames. */
-    static final int ATTACK_COOLDOWN = 13;
-    static final int HIT_COOLDOWN = 21;
+    static final int ATTACK_COOLDOWN = 9;
+    static final int HIT_COOLDOWN = 15;
     static final int ENERGY_COOLDOWN = 24;
     static final int SUPER_COOLDOWN = 27;
 
@@ -54,10 +54,10 @@ final class AiController {
      * Na beira do jab do rival: chance (vezes a de defender) de parar em vez de entrar andando,
      * e a folga da beira.
      */
-    static final double EDGE_STOP = 0.9;
+    static final double EDGE_STOP = 0.45;
     static final float EDGE_MARGIN = 20f;
     /** Perto, no respiro entre os golpes dela: chance de segurar a defesa (vezes a de defender). */
-    static final double COOLDOWN_GUARD = 0.85;
+    static final double COOLDOWN_GUARD = 0.45;
     /** Quadros desde o último golpe do rival em que ela ainda se sente pressionada. */
     static final int PRESSURE_FRAMES = 30;
     /** Quadros que ela segura a defesa por hábito (de MIN a MIN + SPREAD - 1). */
@@ -364,7 +364,7 @@ final class AiController {
             // distância que ela vê é a de antes da reação, e os dois estão andando). Para ali
             // e espera defendendo; entra pelo dash, pelo pulo, pela punição ou pelo golpe dela.
             movingForward = false;
-            if (roll(level.reactGuard * 0.5)) {
+            if (roll(level.reactGuard * 0.25)) {
                 guardFrames = 8 + reactRandom.nextInt(8);
                 guardLow = true;
                 guardHabit = true;
@@ -489,7 +489,7 @@ final class AiController {
         // Sem pressão (o rival não atacou há pouco) ela quase não fica agachada esperando: era o
         // que mais a deixava parecendo grudada no chão. Pressionada, defende (o jab não dá para
         // defender reagindo), mas em janelas curtas: a pressão acabou, ela volta a atacar.
-        p = pressured ? p + 0.25 * level.reactGuard : p * CALM_HABIT_SCALE;
+        p = pressured ? p + 0.10 * level.reactGuard : p * CALM_HABIT_SCALE;
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
         // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.

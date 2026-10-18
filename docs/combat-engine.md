@@ -112,9 +112,14 @@ humano**.
     levava o jab (a distância que ela vê é a de antes da reação). Entra andando só às vezes
     (mais nos níveis baixos; `EDGE_STOP`); senão espera ali, cutuca, dá dash ou pula;
   - a defesa por hábito com o rival no ar é em pé (o pulo passava por cima da defesa agachada).
+- **Mais luta que defesa** (o que dá graça é a luta): a defesa por hábito é baixa em todos os
+  níveis (`CpuLevel.guardAnticipation` 0,05 a 0,35), o respiro entre os golpes é curto
+  (`ATTACK_COOLDOWN` 9, `HIT_COOLDOWN` 15), ela entra mais no alcance do rival e os estilos são
+  mais agressivos e menos pacientes (o de alcance fica a 340, não a 420).
   Medido contra um jogador simulado com reação humana (p03, 10 lutas por nível): no nível 8,
-  45 golpes por minuto (antes 35), 4% do tempo bloqueando (antes 9%), 21% segurando a defesa
-  (antes 28%); a curva ficou mais regular (vitórias da CPU por nível: 0, 0, 4, 5, 8, 10, 9, 10).
+  49 golpes por minuto (eram 35), 5% do tempo bloqueando e 17% segurando a defesa (eram 9% e
+  28%); vitórias da CPU por nível: 0, 3, 3, 6, 9, 10, 10, 10. Em todos os personagens o tempo
+  segurando a defesa ficou entre 11% e 24% (era de 19% a 40%).
 - **Agachar menos**: sem pressão (o rival não atacou há pouco) o hábito de esperar agachada caiu
   para 0,1 da chance (antes 0,35; `CALM_HABIT_SCALE`); pressionada, defende como antes. Os golpes
   agachados (2L/2M/2H) pesam menos na escolha do neutro, e o projétil do meio ela defende em pé.
