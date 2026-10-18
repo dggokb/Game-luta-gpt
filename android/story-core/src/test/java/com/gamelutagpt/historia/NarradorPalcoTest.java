@@ -55,7 +55,9 @@ public class NarradorPalcoTest {
         passa(n, 3f, null, null, 0);
         assertEquals(antes + 100f, n.x(), 3f);
         // Perto da borda da tela (ainda sem trocar de lado): para nela, não sai da tela.
-        n.alvo(1150f, 1300f, 0f, 1600f);
+        // (o lado dele com um pouco mais que o aperto: fica, mas não cabe na distância certa)
+        float hi = 1600f - NarradorPalco.APERTADO - 10f;
+        n.alvo(hi - 150f, hi, 0f, 1600f);
         passa(n, 6f, null, null, 0);
         assertEquals(1, n.lado());
         assertEquals(1600f - NarradorPalco.BORDA, n.x(), 3f);
