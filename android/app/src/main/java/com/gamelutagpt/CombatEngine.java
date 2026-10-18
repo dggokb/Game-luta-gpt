@@ -561,8 +561,9 @@ final class CombatEngine {
             case HITSTUN:
             case BLOCKSTUN:
                 if (f.stunLeft == 0) {
+                    f.throwProtect = f.status == CombatFighter.Status.BLOCKSTUN
+                        ? config.throwProtectAfterBlockFrames : config.throwProtectFrames;
                     f.status = CombatFighter.Status.NEUTRAL;
-                    f.throwProtect = config.throwProtectFrames;
                 }
                 break;
             case THROW:
@@ -762,7 +763,11 @@ final class CombatEngine {
     private boolean throwOverridesJab(CombatFighter f) {
         if (!f.attacking() || f.move == null || f.attackFrame > PadInput.THROW_LENIENCY_FRAMES) return false;
         String binding = f.move.binding;
-        return ("L".equals(binding) || "M".equals(binding)) && f.attackFrame < f.attack.startupFrames;
+        // L ou M de qualquer jeito que saiu: em pé, agachado (↓) ou o golpe alto (→ + M, andando
+        // para frente). Antes só o L e o M em pé: andando ou agachado o L + M quase junto virava golpe.
+        boolean lightOrMedium = "L".equals(binding) || "M".equals(binding) || "2L".equals(binding) ||
+            "2M".equals(binding) || GolpeAlto.BINDING.equals(binding);
+        return lightOrMedium && f.attackFrame < f.attack.startupFrames;
     }
 
     /** Air dash: a fixed burst forward (or back) that holds the height; one per jump (an acrobat has more). */
@@ -885,7 +890,7 @@ final class CombatEngine {
         f.buffer.age(config.bufferFrames);
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
-        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
+        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.throwBufferFrames) f.throwRequestAge = -1;
         if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
         if (f.techRequestAge >= 0 && ++f.techRequestAge > config.bufferFrames) f.techRequestAge = -1;
         if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
@@ -2007,7 +2012,8 @@ final class CombatEngine {
                 a.throwFrame = 0;
             }
         } else if (a.throwPhase == CombatFighter.THROW_HOLD) {
-            if (d.throwRequestAge >= 0) {
+            // Tech: só o L + M apertado há pouco (o buffer normal), não o pedido longo de agarrão.
+            if (d.throwRequestAge >= 0 && d.throwRequestAge <= config.bufferFrames) {
                 techThrow(a, d);
             } else if (a.throwFrame >= config.throwTechWindow) {
                 landThrow(a, d);
