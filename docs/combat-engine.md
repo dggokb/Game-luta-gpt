@@ -55,6 +55,12 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
   buffer, relógio de comandos). Golpe corpo a corpo congela os dois; projétil, só o
   defensor. A janela de cancelamento on hit fica aberta durante o hitstop e o
   cancelamento acontece no primeiro frame após ele.
+- **Especial contra agachado**: especial e Super de chão (golpe, energia S1 e projéteis)
+  pegam quem está agachado — contra eles o corpo agachado conta com a altura de em pé
+  (`CombatEngine.hitsCrouching`). Muitos passavam por cima (o desenho bate na altura do peito,
+  e a energia ia por cima dos que agacham mais baixo, como p12 e o player_two). Os especiais
+  que só saem no ar seguem a altura de verdade. Normais (L/M/H) continuam com a altura real:
+  o agachado ainda passa por baixo dos golpes altos. Teste: `EspeciaisContraAgachadoTest`.
 - **Super freeze**: o Super congela o oponente e os projéteis durante o próprio startup
   (o que permite H → SUPER combar).
 - **Cinemática do Super** (`SuperFlash`, só apresentação): segue quem ativou, o jogador, a
