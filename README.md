@@ -242,6 +242,11 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **Combo breaker**: apanhando num combo, o mesmo gesto (trás em cima da hora) **no golpe forte
   ou especial que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem
   batia fica atordoado e você emenda o seu combo. Sem barra não quebra.
+- **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
+- **Controle de toque**: o dedo que continua no direcional volta a valer sozinho depois de
+  uma cena, página ou troca de luta (não precisa tirar e apertar de novo); o direcional pega
+  o dedo um pouco além do desenho; e no Android com gestos as áreas do direcional e dos
+  botões não disparam o "voltar" do sistema.
 - Regras e tempos: `docs/combat-engine.md` (seção Defesa ativa).
 
 ## Air dash — v0.82

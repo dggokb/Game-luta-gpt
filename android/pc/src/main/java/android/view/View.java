@@ -38,6 +38,12 @@ public class View {
 
     public void invalidate() {}
 
+    /** No PC a janela avisa por setSize; fica para quem sobrescreve (o celular usa). */
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {}
+
+    /** No PC não há gesto de sistema na borda da tela. */
+    public void setSystemGestureExclusionRects(java.util.List<android.graphics.Rect> rects) {}
+
     public boolean post(Runnable action) {
         java.awt.EventQueue.invokeLater(action);
         return true;

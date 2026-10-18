@@ -139,7 +139,7 @@ final class ControlsLayout {
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;
         }
-        if (insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_RADIUS)) return Control.DPAD;
+        if (dpadCaptures(x, y)) return Control.DPAD;
         if (insideCircle(x, y, SUPER_X, SUPER_Y, SUPER_RADIUS)) return Control.SUPER;
         if (insideCircle(x, y, OVERDRIVE_X, OVERDRIVE_Y, OVERDRIVE_RADIUS)) return Control.OVERDRIVE;
         if (insideCircle(x, y, THROW_X, THROW_Y, THROW_RADIUS)) return Control.THROW;
@@ -171,6 +171,16 @@ final class ControlsLayout {
     /** O PULAR do painel do tutorial (só vale enquanto o treino roda). */
     static boolean tutorialSkipAt(float x, float y) {
         return insideRect(x, y, TUTORIAL_SKIP_LEFT, TUTORIAL_SKIP_TOP, TUTORIAL_SKIP_RIGHT, TUTORIAL_SKIP_BOTTOM);
+    }
+
+    /**
+     * O direcional pega o dedo um pouco além do desenho (o polegar escorrega para fora no meio
+     * da luta); não há outro controle perto dele.
+     */
+    static final float DPAD_CAPTURE_RADIUS = 170f;
+
+    static boolean dpadCaptures(float x, float y) {
+        return insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_CAPTURE_RADIUS);
     }
 
     /** D-pad direction 1..8 under the point, or 0 inside the dead zone. */

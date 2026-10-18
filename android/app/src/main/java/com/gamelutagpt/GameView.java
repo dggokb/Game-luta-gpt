@@ -387,6 +387,73 @@ public class GameView extends SurfaceView
         healPlayerPointer = healOpponentPointer = -1;
     }
 
+    // Dedos na tela agora (coordenadas virtuais), sempre atualizados, com qualquer tela aberta:
+    // o controle zera em várias horas (cena, página, troca de luta) e o dedo que continuou
+    // no direcional volta a valer sozinho, sem tirar e apertar de novo.
+    private static final int MAX_TOUCHES = 10;
+    private final int[] touchIds = new int[MAX_TOUCHES];
+    private final float[] touchX = new float[MAX_TOUCHES], touchY = new float[MAX_TOUCHES];
+    private int touchCount;
+
+    /** Anota onde está cada dedo (e quais saíram) a cada evento de toque. */
+    private void trackTouches(MotionEvent event, int action, int index, float sx, float sy) {
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            touchCount = 0;
+            return;
+        }
+        touchCount = 0;
+        for (int i = 0; i < event.getPointerCount() && touchCount < MAX_TOUCHES; i++) {
+            if (action == MotionEvent.ACTION_POINTER_UP && i == index) continue;
+            touchIds[touchCount] = event.getPointerId(i);
+            touchX[touchCount] = event.getX(i) / sx;
+            touchY[touchCount] = event.getY(i) / sy;
+            touchCount++;
+        }
+    }
+
+    private int touchSlot(int pointerId) {
+        for (int i = 0; i < touchCount; i++) if (touchIds[i] == pointerId) return i;
+        return -1;
+    }
+
+    private boolean ownedByButton(int pointerId) {
+        return pointerId == lightPointer || pointerId == mediumPointer || pointerId == heavyPointer ||
+            pointerId == comboPointer || pointerId == tagPointer || pointerId == throwPointer ||
+            pointerId == pushblockPointer || pointerId == overdrivePointer || pointerId == superPointer ||
+            pointerId == healPlayerPointer || pointerId == healOpponentPointer;
+    }
+
+    /**
+     * Uma vez por quadro: solta os botões e o direcional de dedos que já saíram da tela (a
+     * soltura pode ter chegado com uma tela por cima, que não repassa o toque) e, na luta,
+     * devolve o direcional ao dedo que está em cima dele sem dono (depois de o controle ter
+     * zerado, ou de um dedo que escorregou para dentro dele).
+     */
+    private void syncHeldTouches() {
+        if (dpadPointer != -1 && touchSlot(dpadPointer) < 0) {
+            dpadPointer = -1;
+            pad.setDirection(0);
+        }
+        if (lightPointer != -1 && touchSlot(lightPointer) < 0) lightPointer = -1;
+        if (mediumPointer != -1 && touchSlot(mediumPointer) < 0) mediumPointer = -1;
+        if (heavyPointer != -1 && touchSlot(heavyPointer) < 0) heavyPointer = -1;
+        if (comboPointer != -1 && touchSlot(comboPointer) < 0) comboPointer = -1;
+        if (tagPointer != -1 && touchSlot(tagPointer) < 0) tagPointer = -1;
+        if (throwPointer != -1 && touchSlot(throwPointer) < 0) throwPointer = -1;
+        if (pushblockPointer != -1 && touchSlot(pushblockPointer) < 0) pushblockPointer = -1;
+        if (overdrivePointer != -1 && touchSlot(overdrivePointer) < 0) overdrivePointer = -1;
+        if (superPointer != -1 && touchSlot(superPointer) < 0) superPointer = -1;
+        if (healPlayerPointer != -1 && touchSlot(healPlayerPointer) < 0) healPlayerPointer = -1;
+        if (healOpponentPointer != -1 && touchSlot(healOpponentPointer) < 0) healOpponentPointer = -1;
+        if (dpadPointer != -1 || !touchControls || !fightClockRunning()) return;
+        for (int i = 0; i < touchCount; i++) {
+            if (ownedByButton(touchIds[i]) || !ControlsLayout.dpadCaptures(touchX[i], touchY[i])) continue;
+            dpadPointer = touchIds[i];
+            pad.setDirection(ControlsLayout.dpadDirectionAt(touchX[i], touchY[i]));
+            return;
+        }
+    }
+
     /** Frees the sound pool when the Activity is destroyed. */
     public void release() {
         ultraSounds.release();
@@ -1137,6 +1204,24 @@ public class GameView extends SurfaceView
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {}
+
+    /**
+     * Direcional e botões ficam colados nas bordas da tela: no Android com navegação por
+     * gestos, o polegar que escorrega para a borda vira o gesto de voltar e o sistema cancela
+     * o toque (o dedo para de valer até sair e voltar). Essas áreas ficam fora dos gestos.
+     */
+    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (android.os.Build.VERSION.SDK_INT < 29 || w == 0 || h == 0) return;
+        float sx = w / VW, sy = h / VH;
+        float r = ControlsLayout.DPAD_CAPTURE_RADIUS;
+        java.util.List<android.graphics.Rect> rects = new java.util.ArrayList<>();
+        rects.add(new android.graphics.Rect(0, Math.round((ControlsLayout.DPAD_Y - r) * sy),
+            Math.round((ControlsLayout.DPAD_X + r) * sx), h));
+        rects.add(new android.graphics.Rect(Math.round((ControlsLayout.HEAVY_X - ControlsLayout.ATTACK_RADIUS - 20f) * sx),
+            Math.round((ControlsLayout.MEDIUM_Y - ControlsLayout.ATTACK_RADIUS - 20f) * sy), w, h));
+        setSystemGestureExclusionRects(rects);
+    }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
@@ -3596,6 +3681,7 @@ public class GameView extends SurfaceView
             handleTouch(latestMove);
             latestMove.recycle();
         }
+        syncHeldTouches();
     }
 
     private void clearPendingInput() {
@@ -3613,6 +3699,7 @@ public class GameView extends SurfaceView
         float sy = getHeight() / VH;
         int action = event.getActionMasked();
         int index = event.getActionIndex();
+        trackTouches(event, action, index, sx, sy);
 
         if (menuInicial.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
@@ -3727,7 +3814,9 @@ public class GameView extends SurfaceView
                     healOpponentTeam();
                     break;
                 case DPAD:
-                    // A second finger on the D-pad is ignored; the first one owns it.
+                    // A second finger on the D-pad is ignored; the first one owns it (a dono que
+                    // já saiu da tela não conta: syncHeldTouches o solta).
+                    if (dpadPointer != -1 && touchSlot(dpadPointer) < 0) dpadPointer = -1;
                     if (dpadPointer == -1) {
                         dpadPointer = pointerId;
                         pad.setDirection(ControlsLayout.dpadDirectionAt(x, y));

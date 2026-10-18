@@ -1069,7 +1069,8 @@ final class CombatEngine {
             for (int i = 0; i < e.attack.hitboxCount(); i++) {
                 AttackDefinition.Box box = e.attack.hitbox(i);
                 if (!box.activeAt(e.frame) || (e.hitboxMask & (1L << i)) != 0) continue;
-                if (CombatRules.hitboxTouches(e.x, e.y, e.facing, box, d.x, d.y, d.body(), d.crouchingBody())) {
+                if (CombatRules.hitboxTouches(e.x, e.y, e.facing, box, d.x, d.y, d.body(),
+                    d.crouchingBody() && !hitsCrouching(e.attack, a))) {
                     e.hitboxMask |= 1L << i;
                     e.hitsOnTarget++;
                     Contact c = new Contact();
@@ -1797,7 +1798,7 @@ final class CombatEngine {
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
         CharacterDefinition.Body body = d.body();
-        boolean crouch = d.crouchingBody();
+        boolean crouch = d.crouchingBody() && !hitsCrouching(a.attack, a);
         for (int i = 0; i < a.attack.hitboxCount(); i++) {
             AttackDefinition.Box box = a.attack.hitbox(i);
             if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
@@ -1807,6 +1808,21 @@ final class CombatEngine {
                 return;
             }
         }
+    }
+
+    /**
+     * Especial e Super de chão (golpe ou projétil) pegam quem está agachado: contra eles o corpo
+     * agachado conta com a altura de em pé (o desenho de muitos especiais e a energia passam
+     * na altura do peito e iam por cima de quem abaixava). Os especiais que só saem no ar
+     * seguem a altura de verdade.
+     */
+    private static boolean hitsCrouching(AttackDefinition attack, CombatFighter owner) {
+        if (attack == null) return false;
+        if (attack.strength != AttackDefinition.Strength.SPECIAL && attack.strength != AttackDefinition.Strength.SUPER) {
+            return false;
+        }
+        CharacterDefinition.Special special = owner.character().specials.get(attack.id);
+        return special == null || !special.air;
     }
 
     /** Quadro que vale para o acerto: no mergulho, o golpe bate a descida inteira até o chão. */
@@ -1866,7 +1882,8 @@ final class CombatEngine {
             CombatFighter d = fighters[1 - p.ownerIndex];
             // An evading body lets the projectile fly on.
             boolean hits = d.hittable() && !evades(d, p.attack, false, true) &&
-                CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), d.crouchingBody());
+                CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(),
+                    d.crouchingBody() && !hitsCrouching(p.attack, fighters[p.ownerIndex]));
             if (!hits) {
                 p.holding = false;   // o rival saiu de baixo: a onda segue voando com os acertos que sobraram
                 continue;
