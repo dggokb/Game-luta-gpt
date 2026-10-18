@@ -78,10 +78,10 @@ public class HudRuntimeTest {
         assertTrue("Real assist cooldown exists",team.assistCooldown>0);
         SystemClock.sleep(500);screenshot("hud-assist-cooldown.png");
         HudRenderer.State state=(HudRenderer.State)field(game,"hudState");
-        assertTrue(state.assistStatusLabel().contains("s"));
+        assertTrue(state.tagCooldownLabel().startsWith("ASSIST: ") && state.tagCooldownLabel().contains("s  "));
         await("Real assist becomes ready",()->team.assistCooldown==0,9000);
         SystemClock.sleep(500);screenshot("hud-assist-ready.png");
-        assertTrue(state.assistStatusLabel().contains("PRONTO"));
+        assertTrue(state.tagCooldownLabel().contains("PRONTO"));
         // Raw TAG is the exact same down + TAG multi-touch combination as a player.
         event(MotionEvent.ACTION_DOWN,ControlsLayout.DPAD_X,ControlsLayout.DPAD_Y+80);
         SystemClock.sleep(100);
@@ -98,7 +98,7 @@ public class HudRuntimeTest {
         await("Raw tag finishes",()->!team.tagging(),5000);
         assertTrue("Raw tag cooldown is independent",team.tagCooldown>0);
         SystemClock.sleep(1000);screenshot("hud-tag-countdown.png");
-        assertTrue(state.swapStatusLabel().contains("s"));
+        assertTrue(state.tagCooldownLabel().contains("TROCA: ") && state.tagCooldownLabel().endsWith("s"));
         assertEquals("Raw tag cooldown must not empty the ready ASSIST meter",1,state.tagReadyRatio(),.001);
         SystemClock.sleep(2000);
         // Leave the activity visible until the recorder has closed; instrumentation ends.

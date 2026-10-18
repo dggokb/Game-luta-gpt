@@ -50,8 +50,6 @@ final class HudRenderer {
         default int presentationEpoch() { return 0; }
         default boolean assistInUse() { return false; }
         String tagCooldownLabel();
-        default String assistStatusLabel() { return tagCooldownLabel(); }
-        default String swapStatusLabel() { return ""; }
         String tagButtonLabel();
         /** Text of the TAG button while it can be used: ASSIST, or TROCA during Assist → Tag. */
         String tagButtonTitle();
@@ -162,10 +160,6 @@ final class HudRenderer {
             text(c, s.opponentReserve() == null ? "TAG OFF" : "TAG", 1058f, 132f, 13f, 0xFFBCC4D8);
         }
         drawFrameEffects(c);
-        // Cached strings computed from independent real assist and raw-tag cooldowns.
-        panel(c, 187, 140, 355, 43, 9, 0xE8081427, BLUE, 1.5f);
-        text(c, s.assistStatusLabel(), 364, 157, 16, effects.assistRatio >= 1 ? 0xFF9BEEFF : Color.WHITE);
-        text(c, s.swapStatusLabel(), 364, 175, 14, Color.WHITE);
         // Batalha: 120 segundos; treino e cenas da história: ∞ (nunca um relógio inventado).
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
         drawClock(c, s);
