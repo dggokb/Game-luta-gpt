@@ -33,8 +33,12 @@ final class CombatConfig {
     /** Down entered at most this many frames before up makes a super jump. */
     int superJumpFrames = 22;
 
-    /** Maximum juggle points a defender in AIR_HITSTUN can take in one combo. */
-    int juggleLimit = 6;
+    /**
+     * Maximum juggle points a defender in AIR_HITSTUN can take in one combo. Sem limite: o
+     * combo no ar acaba pelo hitstun que diminui, pelo empurrão, pelos quiques (um de cada por
+     * combo) e pelo combo breaker do defensor. Os pontos continuam contados na sessão.
+     */
+    int juggleLimit = Integer.MAX_VALUE;
 
     /** Damage scaling, in permille of the base damage. */
     int damageStepPermille = 50;

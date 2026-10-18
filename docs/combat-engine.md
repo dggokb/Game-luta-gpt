@@ -348,7 +348,7 @@ A recuperação deixou de ser automática: quem apanha escolhe. Valores em
 | L/M/H + ← | **Air tech para trás**: controle na hora, 10 frames invulnerável, 160 px para longe |
 | L/M/H + → | Air tech para a frente (120 px) |
 | L/M/H sem direção | Air tech neutro: um pulinho para cima |
-| nada | **Cai solto** por até 12 frames (`airTechWindow`), ainda aberto a golpes (conta no combo, com o limite de juggle), e recupera sozinho, sem invulnerabilidade |
+| nada | **Cai solto** por até 12 frames (`airTechWindow`), ainda aberto a golpes (conta no combo), e recupera sozinho, sem invulnerabilidade |
 
 O botão do tech não sai como golpe aéreo. Quedas forçadas (slam), bounces e o ultra não
 têm air tech (caem derrubados).
@@ -376,8 +376,7 @@ têm air tech (caem derrubados).
 
 **Punish counter (giro no ar, como no SF6):** o H em pé que acerta o rival **no meio do golpe
 dele** (início, ativo ou recuperação) o joga girando no ar a média distância (~360 px, ~1 s
-de voo) e ele cai deitado, sem air tech. Ainda dá para emendar golpes nele no ar (conta no
-limite de juggle). A tela treme e aparece "PUNISH COUNTER!". O 2H (lançador) não conta, nem
+de voo) e ele cai deitado, sem air tech. Ainda dá para emendar golpes nele no ar. A tela treme e aparece "PUNISH COUNTER!". O 2H (lançador) não conta, nem
 golpes leves/médios, especiais ou projéteis. Valores em `CombatConfig.spin*`; o giro é só
 visual (o sprite gira em torno do próprio eixo, inclinado, em `GameView.spinTransform`).
 Testes em `PunishCounterTest`.
@@ -401,7 +400,7 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 
 - Depois de um bounce o defensor tem `bounceHitstunFrames` (48) de hitstun, pode ser
   juggleado e **cai derrubado** (não se recupera no ar: `hardFall`).
-- Qualquer golpe novo cancela o voo em andamento; o limite de juggle continua valendo.
+- Qualquer golpe novo cancela o voo em andamento.
 - O motor avisa `WALL_BOUNCE` e `GROUND_BOUNCE` em `cues()` e a tela treme.
 - Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH
   (ground bounce) → ... ; com a barra, Super ou ultra no fim.
@@ -662,7 +661,7 @@ Cada golpe em `moves` e o bloco `attack` de `fighter.energy` (S) e `fighter.supe
 | `damageProration` | não (1.0) | Escala aplicada ao resto de um combo que este golpe inicia |
 | `launchType` | não (`none`) | `knockdown`, `launch`, `slam` (slam exige super pulo e alvo no ar), `wallBounce`, `groundBounce` (v0.83) |
 | `knockback` | não (= pushbackOnHit) | Deslocamento quando o alvo fica no ar ou cai |
-| `juggleCost` | não (1) | Pontos de juggle gastos em alvo no ar |
+| `juggleCost` | não (1) | Pontos de juggle gastos em alvo no ar (contados na sessão; sem limite por padrão) |
 | `maxHits` | não (1) | Acertos por execução no mesmo alvo (≤ número de hitboxes) |
 | `maxUsesPerCombo` | não (0 = livre) | Acima disso o CancelSystem recusa a rota |
 | `maxUsesPerChain` | não (0 = livre) | Usos do golpe numa mesma corrente (desde o último golpe que saiu do neutro), acertando ou na defesa. Zera depois de uma ligação |
@@ -698,7 +697,10 @@ Buffer 4 frames; comando especial em até 15 frames e botão até 15 frames depo
 double tap 18; super pulo (↓ → ↑) 22. Escala: −5% por hit até 20% (SPECIAL 30%,
 SUPER 50%), −20% por repetição do mesmo golpe, dano arredondado para baixo e mínimo 1.
 Hitstun decay por número de hits (0,0,0,1,1,2,2,3,3,4,4,5 frames) ou por segundos de
-combo (0,0,1,2,4,6), o maior dos dois. Juggle limit 6. Pushback distribuído em 8
+combo (0,0,1,2,4,6), o maior dos dois. **Sem limite de juggle** (`juggleLimit` sem teto; os
+pontos continuam contados): o combo no ar acaba pelo hitstun que diminui, pela gravidade,
+pelos dois pulos no ar, pelos quiques (um de cada por combo) e pelo combo breaker do
+defensor. O H que joga na parede a partir do chão não gasta ponto. Pushback distribuído em 8
 frames.
 
 ## Ajustar caixas no celular (DEBUG > AJUSTAR CAIXAS)
@@ -771,7 +773,7 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 | Contador reflete ComboSession real | idem + `linkFormulaMatchesTheSimulation` |
 | DamageScaling e HitstunDecay | `damageScalingStepsDownToFloorsWithIntegerRounding`, `hitstunDecaysAsTheComboGrows`, `longComboInTheEngineIsScaled` |
 | maxHits | `overlappingHitboxHitsOnceAndMultiHitRespectsMaxHits` |
-| Nenhuma rota infinita | `everyRouteEndsByDecayJugglePointsOrPushback`, `lightLinkLoopEndsMidscreenAndInTheCorner`, `cornerPushbackMovesTheAttackerInstead`, `juggleLimitMakesTheDefenderRecoverInTheAir` |
+| Nenhuma rota infinita | `everyRouteEndsByDecayJugglePointsOrPushback`, `lightLinkLoopEndsMidscreenAndInTheCorner`, `cornerPushbackMovesTheAttackerInstead`, `withoutAJuggleLimitTheAirComboStillEnds`; com um limite configurado, `juggleLimitMakesTheDefenderRecoverInTheAir` |
 | Prioridade fixa no buffer | `simultaneousPressesFollowTheSamePriority`, `equalPriorityPicksTheMostRecentPress` |
 | Determinismo frame a frame | `sameInputsGiveTheSameFrames` |
 | Hitstop nos impactos | `hitstopFreezesBothFightersOnMeleeImpact` |
@@ -797,8 +799,8 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 ## Ainda não feito
 
 - Fase 9 (calibração) só tem a primeira passada: valores escolhidos para os links
-  L → L/M e H → L/M funcionarem e para a rota 2H → super pulo → jL → jM → jH caber nos
-  6 pontos de juggle. Falta jogar e ajustar no aparelho.
+  L → L/M e H → L/M funcionarem. O limite de juggle saiu (combo sem limite; o
+  combo breaker é a defesa). Falta jogar e ajustar no aparelho.
 - (Fase 10 feita na v0.83: wall bounce e ground bounce.)
 - Os packs usam a hitbox padrão; nenhuma hitbox/hurtbox por frame foi desenhada ainda,
   embora o formato e o motor suportem.

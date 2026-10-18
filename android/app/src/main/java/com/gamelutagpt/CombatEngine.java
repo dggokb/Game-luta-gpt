@@ -2425,7 +2425,7 @@ final class CombatEngine {
             : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame + attack.hitstopFrames + config.strikeHoldFrames;
 
         if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && (!multi || !a.strikeLanded) &&
-            session.juggleCount + attack.juggleCost > config.juggleLimit) {
+            (long)session.juggleCount + attack.juggleCost > config.juggleLimit) {
             // The rest of a several-strike move cannot catch the freed defender either.
             if (multi) a.hitsOnTarget = attack.maxHits;
             // Juggle limit: the defender recovers in the air instead of taking the hit.
@@ -2505,6 +2505,7 @@ final class CombatEngine {
         }
 
         boolean wasCrouching = d.crouchingBody();
+        boolean wasGrounded = d.grounded;
         // Punish counter: a standing heavy normal caught the defender in its own move.
         boolean punish = lastStrike && !projectile && a.grounded && d.grounded && d.attacking() &&
             attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY &&
@@ -2615,7 +2616,10 @@ final class CombatEngine {
             cues.add("PULL");
         }
         // Every hit that leaves the defender juggled costs juggle points (a several-strike move once).
-        if (d.status == CombatFighter.Status.AIR_HITSTUN && (!multi || !a.strikeJuggled)) {
+        // The H that sends a grounded defender to the wall is free: it hit on the ground, and the
+        // launcher after the bounce plus a full air string (jL > jM > jH) still fit the limit.
+        boolean groundWallBounce = wallBounce && wasGrounded;
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && !groundWallBounce && (!multi || !a.strikeJuggled)) {
             session.juggleCount += attack.juggleCost;
             a.strikeJuggled = true;
         }
