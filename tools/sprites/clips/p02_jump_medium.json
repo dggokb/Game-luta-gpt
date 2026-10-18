@@ -2,48 +2,53 @@
   "id": "p02_jump_medium",
   "javaName": "P02_JUMP_MEDIUM",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_jump_medium_sr_hd.png",
+  "source": "art/sprites/source/p02_jump_medium_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_jump_medium.webp",
   "report": "tools/sprites/reports/p02_jump_medium.report.json",
   "preview": "android/app/build/sprite-review/p02_jump_medium-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 5,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "jM.mp4",
     "personagem": "p02",
     "escala": 0.525,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "22,30,39,42,46,49,53",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5250 medida pela receita)",
+    "quadros": "22,25,27,30,32,34,39,42,46,49,51,53",
     "celula": 288,
     "largura": 352,
     "raiz": "134,270",
-    "colunas": 7,
+    "colunas": 5,
     "pe_no_chao": true,
     "reescala": [
-      1.1678,
-      1.1573,
-      1.1468,
-      1.1362,
-      1.1257,
-      1.1152,
-      1.1047
+      1.1015,
+      1.1048,
+      1.1072,
+      1.1096,
+      1.1035,
+      1.0975,
+      1.0914,
+      1.0854,
+      1.0792,
+      1.0728,
+      1.0664,
+      1.06
     ],
-    "reguaFatores": [
-      1.1678,
-      1.1573,
-      1.1468,
-      1.1362,
-      1.1257,
-      1.1152,
-      1.1047
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 95% (JUMP_MEDIUM)",
-      "esqueleto: 108% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_jump_medium_video_normalized.png",
+      "celula": [
+        352,
+        288
+      ],
+      "raiz": [
+        134,
+        270
+      ],
+      "colunas": 7
+    }
   },
   "frameWidth": 704,
   "frameHeight": 576,

@@ -2,40 +2,47 @@
   "id": "p02_land",
   "javaName": "P02_LAND",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_land_sr_hd.png",
+  "source": "art/sprites/source/p02_land_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_land.webp",
   "report": "tools/sprites/reports/p02_land.report.json",
   "preview": "android/app/build/sprite-review/p02_land-import.png",
-  "expectedFrames": 4,
+  "expectedFrames": 7,
   "segmentation": "prepared-grid",
   "columns": 4,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "pulo.mp4",
     "personagem": "p02",
     "escala": 0.5267,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "58,60,62,64",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
+    "quadros": "58,59,60,61,62,63,64",
     "celula": 288,
     "largura": 224,
     "raiz": "103,270",
     "colunas": 4,
     "reescala": [
-      1.0433,
-      1.0433,
-      1.0433,
-      1.0433
+      1.0941,
+      1.0876,
+      1.0811,
+      1.0747,
+      1.0683,
+      1.0619,
+      1.0556
     ],
-    "reguaFatores": [
-      1.0433,
-      1.0433,
-      1.0433,
-      1.0433
-    ],
-    "regua": [
-      "esqueleto: 104% da imagem inicial (mediana), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_land_video_normalized.png",
+      "celula": [
+        224,
+        288
+      ],
+      "raiz": [
+        103,
+        270
+      ],
+      "colunas": 4
+    }
   },
   "frameWidth": 448,
   "frameHeight": 576,

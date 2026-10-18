@@ -2,59 +2,56 @@
   "id": "p02_light_jab",
   "javaName": "P02_LIGHT_JAB",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_light_jab_sr_hd.png",
+  "source": "art/sprites/source/p02_light_jab_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_light_jab.webp",
   "report": "tools/sprites/reports/p02_light_jab.report.json",
   "preview": "android/app/build/sprite-review/p02_light_jab-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 5,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "L.mp4",
     "personagem": "p02",
     "escala": 0.5267,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
     "quadros": "29,31,31,36,41,42,46,49,52,55,58",
     "largura": 352,
     "raiz": "198,238",
-    "colunas": 11,
+    "colunas": 5,
     "limpar_chao": true,
+    "reescala": [
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222
+    ],
     "limpar_quadros": [
       3,
       4,
       5
     ],
-    "reescala": [
-      1.0465,
-      1.0565,
-      1.0653,
-      1.073,
-      1.0787,
-      1.0811,
-      1.0736,
-      1.066,
-      1.0581,
-      1.0485,
-      1.0385
-    ],
-    "reguaFatores": [
-      1.0465,
-      1.0565,
-      1.0653,
-      1.073,
-      1.0787,
-      1.0811,
-      1.0736,
-      1.066,
-      1.0581,
-      1.0485,
-      1.0385
-    ],
-    "regua": [
-      "esqueleto: 108% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_light_jab_video_normalized.png",
+      "celula": [
+        352,
+        256
+      ],
+      "raiz": [
+        198,
+        238
+      ],
+      "colunas": 11
+    }
   },
   "frameWidth": 704,
   "rootX": 396,

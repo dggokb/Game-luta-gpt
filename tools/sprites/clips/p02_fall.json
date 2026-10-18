@@ -2,46 +2,59 @@
   "id": "p02_fall",
   "javaName": "P02_FALL",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_fall_sr_hd.png",
+  "source": "art/sprites/source/p02_fall_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_fall.webp",
   "report": "tools/sprites/reports/p02_fall.report.json",
   "preview": "android/app/build/sprite-review/p02_fall-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 18,
   "segmentation": "prepared-grid",
   "columns": 6,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "pulo.mp4",
     "personagem": "p02",
     "escala": 0.5267,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "40,43,47,50,54,57",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5267 medida pela receita)",
+    "quadros": "40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57",
     "celula": 288,
     "largura": 192,
     "raiz": "106,270",
     "colunas": 6,
     "pe_no_chao": true,
     "reescala": [
-      1.1066,
-      1.1066,
-      1.1066,
-      1.1066,
-      1.1066,
-      1.1066
+      1.0917,
+      1.0917,
+      1.0917,
+      1.0917,
+      1.0917,
+      1.0917,
+      1.0917,
+      1.0917,
+      1.0925,
+      1.0933,
+      1.0974,
+      1.1015,
+      1.1056,
+      1.1097,
+      1.1138,
+      1.1179,
+      1.122,
+      1.1261
     ],
-    "reguaFatores": [
-      1.1066,
-      1.1066,
-      1.1066,
-      1.1066,
-      1.1066,
-      1.1066
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 95% (FALL)",
-      "esqueleto: 105% da imagem inicial (mediana), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_fall_video_normalized.png",
+      "celula": [
+        192,
+        288
+      ],
+      "raiz": [
+        106,
+        270
+      ],
+      "colunas": 6
+    }
   },
   "frameWidth": 384,
   "frameHeight": 576,

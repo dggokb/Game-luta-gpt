@@ -2,48 +2,58 @@
   "id": "p02_defense_air",
   "javaName": "P02_DEFENSE_AIR",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defense_air_sr_hd.png",
+  "source": "art/sprites/source/p02_defense_air_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defense_air.webp",
   "report": "tools/sprites/reports/p02_defense_air.report.json",
   "preview": "android/app/build/sprite-review/p02_defense_air-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 17,
   "segmentation": "prepared-grid",
   "columns": 7,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "defesaNoAr.mp4",
     "personagem": "p02",
     "escala": 0.5156,
-    "medida": "1º quadro = inicio_centro (nota 0.91)",
-    "quadros": "21,25,30,35,40,44,49",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5156 medida pela receita)",
+    "quadros": "21,22,24,25,30,32,33,35,37,38,40,41,43,44,46,47,49",
     "celula": 320,
     "largura": 224,
     "raiz": "99,302",
     "colunas": 7,
     "pe_no_chao": true,
     "reescala": [
-      1.1264,
-      1.1268,
-      1.1338,
-      1.1408,
-      1.1478,
-      1.1548,
-      1.1618
+      1.1367,
+      1.1409,
+      1.1451,
+      1.1493,
+      1.1535,
+      1.1577,
+      1.1627,
+      1.1678,
+      1.1728,
+      1.1763,
+      1.1797,
+      1.1831,
+      1.1848,
+      1.1857,
+      1.1865,
+      1.1874,
+      1.1883
     ],
-    "reguaFatores": [
-      1.1264,
-      1.1268,
-      1.1338,
-      1.1408,
-      1.1478,
-      1.1548,
-      1.1618
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 88% (DEFENSE_AIR)",
-      "esqueleto: 99% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_defense_air_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        99,
+        302
+      ],
+      "colunas": 7
+    }
   },
   "frameWidth": 448,
   "frameHeight": 640,

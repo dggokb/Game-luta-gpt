@@ -202,6 +202,26 @@ assim.
    perfil (o build avisa). Hurtbox, alcance e saída das magias não mudam sozinhos. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
    tamanho), porque o tamanho já está no desenho.
 
+## Refazer um personagem do zero (máximo de quadros, tamanho pela cabeça)
+
+```
+python3 tools/sprites/refazer.py p02 <pasta dos vídeos>        # todos os clipes (menos ultras)
+python3 tools/sprites/refazer.py p02 <pasta> --so-tamanho       # retoma: só células e nível
+```
+
+Da receita antiga só ficam o trecho do vídeo de cada clipe e o tempo do jogo (frame data,
+impacto, pausas). Cada clipe usa todos os quadros do trecho que o jogo mostra (60 por segundo
+no tempo do clipe), sem os quadros com efeito desenhado pelo vídeo (clarão, estrela, poeira),
+convertidos em HD direto do vídeo (em 1x quando os quadros não cabem em 4096 px).
+
+O Seedance muda o tamanho do corpo dentro do vídeo (dash.mp4 da p02: correndo ~15% maior que
+em guarda) e entre vídeos (intro.mp4 em pé ~13% maior). A **régua da cabeça**
+(`tools/sprites/cabeca.py`) acha a cabeça da imagem inicial em cada quadro, em resolução
+cheia, e dá a curva de tamanho de cada vídeo, suavizada (no máximo 0,6% por quadro, sem
+tremer). O nível vem do quadro do vídeo que é a imagem inicial; nos vídeos que não começam
+nem terminam nela, da média de duas réguas (cabeça e esqueleto, com erros para lados
+opostos). Deitado (KNOCKDOWN, GROUNDED, GETUP): escala única da receita.
+
 ## Tamanho pelo esqueleto (qualquer pose)
 
 ```

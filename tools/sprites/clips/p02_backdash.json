@@ -2,53 +2,51 @@
   "id": "p02_backdash",
   "javaName": "P02_BACKDASH",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_backdash_sr_hd.png",
+  "source": "art/sprites/source/p02_backdash_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_backdash.webp",
   "report": "tools/sprites/reports/p02_backdash.report.json",
   "preview": "android/app/build/sprite-review/p02_backdash-import.png",
   "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 9,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "backDash.mp4",
     "personagem": "p02",
-    "escala": 0.4843,
-    "medida": "1º quadro = inicio_centro (nota 0.86)",
+    "escala": 0.465,
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial); esqueleto 96%: escala base na média das duas réguas 0.4650",
     "quadros": "10,15,21,26,31,37,42,47,53,58",
     "celula": 320,
     "largura": 224,
     "raiz": "109,302",
-    "colunas": 10,
+    "colunas": 9,
     "fixar": "quadro",
     "reescala": [
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
     ],
-    "reguaFatores": [
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309,
-      1.0309
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 97% (BACKDASH)"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_backdash_video_normalized.png",
+      "celula": [
+        224,
+        320
+      ],
+      "raiz": [
+        109,
+        302
+      ],
+      "colunas": 9
+    }
   },
   "frameWidth": 448,
   "frameHeight": 640,

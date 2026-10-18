@@ -2,21 +2,21 @@
   "id": "p02_defense_crouch",
   "javaName": "P02_DEFENSE_CROUCH",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_defense_crouch_sr_hd.png",
+  "source": "art/sprites/source/p02_defense_crouch_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_defense_crouch.webp",
   "report": "tools/sprites/reports/p02_defense_crouch.report.json",
   "preview": "android/app/build/sprite-review/p02_defense_crouch-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 19,
   "segmentation": "prepared-grid",
   "columns": 7,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "defesaAgachado.mp4",
     "personagem": "p02",
-    "escala": 0.511,
-    "medida": "1º quadro = inicio_agachado (nota 0.96)",
-    "quadros": "8,19,31,43,55,66,78",
+    "escala": 0.5102,
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça (dentro do vídeo); nível pelo esqueleto, média do clipe (o vídeo não começa nem termina na imagem inicial); esqueleto 92%: escala base na média das duas réguas 0.5102",
+    "quadros": "8,12,15,19,23,27,31,35,39,43,47,51,55,59,62,66,70,74,78",
     "celula": 192,
     "largura": 256,
     "raiz": "133,174",
@@ -25,27 +25,39 @@
     "pe_no_chao": true,
     "limpar_chao": true,
     "reescala": [
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
     ],
-    "reguaFatores": [
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826,
-      0.9826
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 99% (DEFENSE_CROUCH)",
-      "esqueleto: 97% da imagem inicial (mediana), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_defense_crouch_video_normalized.png",
+      "celula": [
+        256,
+        192
+      ],
+      "raiz": [
+        133,
+        174
+      ],
+      "colunas": 7
+    }
   },
   "frameHeight": 384,
   "rootX": 266,

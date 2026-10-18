@@ -2,48 +2,51 @@
   "id": "p02_jump_heavy",
   "javaName": "P02_JUMP_HEAVY",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_jump_heavy_sr_hd.png",
+  "source": "art/sprites/source/p02_jump_heavy_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_jump_heavy.webp",
   "report": "tools/sprites/reports/p02_jump_heavy.report.json",
   "preview": "android/app/build/sprite-review/p02_jump_heavy-import.png",
-  "expectedFrames": 7,
+  "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 6,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "jH.mp4",
     "personagem": "p02",
     "escala": 0.5088,
-    "medida": "1º quadro = inicio_centro (nota 0.90)",
-    "quadros": "17,20,25,25,25,26,27",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5088 medida pela receita)",
+    "quadros": "17,18,19,20,21,25,25,25,26,27",
     "celula": 320,
     "largura": 320,
     "raiz": "132,302",
-    "colunas": 7,
+    "colunas": 6,
     "pe_no_chao": true,
     "reescala": [
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406,
+      1.1406
     ],
-    "reguaFatores": [
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613,
-      1.1613
-    ],
-    "regua": [
-      "ajuste no app 20261014-0532: 88% (JUMP_HEAVY / JUMP_HEAVY_DOWN)",
-      "esqueleto: 102% da imagem inicial (mediana), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_jump_heavy_video_normalized.png",
+      "celula": [
+        320,
+        320
+      ],
+      "raiz": [
+        132,
+        302
+      ],
+      "colunas": 7
+    }
   },
   "frameWidth": 640,
   "frameHeight": 640,

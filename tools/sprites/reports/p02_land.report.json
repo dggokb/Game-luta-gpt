@@ -1,8 +1,8 @@
 {
   "id": "p02_land",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_land_sr_hd.png",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "source": "art/sprites/source/p02_land_video_hd.png",
+  "sourceNote": "p02 em v\u00eddeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do v\u00eddeo, tamanho pela r\u00e9gua da cabe\u00e7a.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -12,106 +12,163 @@
     "rootX": 206,
     "rootY": 540,
     "columns": 4,
-    "frameCount": 4
+    "frameCount": 7
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        85,
-        63,
-        362,
-        539
+        92,
+        88,
+        356,
+        542
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 57162
+      "minimumMargin": 34,
+      "opaquePixels": 51491
     },
     {
       "index": 1,
       "outputBbox": [
-        53,
-        150,
-        393,
-        541
+        70,
+        154,
+        384,
+        543
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 54082
+      "minimumMargin": 33,
+      "opaquePixels": 48095
     },
     {
       "index": 2,
       "outputBbox": [
-        73,
-        156,
-        359,
-        541
+        60,
+        165,
+        387,
+        543
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 50601
+      "minimumMargin": 33,
+      "opaquePixels": 50004
     },
     {
       "index": 3,
       "outputBbox": [
-        71,
-        153,
-        357,
+        53,
+        172,
+        384,
+        543
+      ],
+      "minimumMargin": 33,
+      "opaquePixels": 49951
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        78,
+        166,
+        356,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 47797
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        75,
+        163,
+        355,
+        542
+      ],
+      "minimumMargin": 34,
+      "opaquePixels": 48091
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        72,
+        158,
+        353,
         541
       ],
       "minimumMargin": 35,
-      "opaquePixels": 50178
+      "opaquePixels": 48408
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 365,
-    "frameHeight": 504,
-    "rootX": 166,
-    "rootY": 490,
+    "frameWidth": 352,
+    "frameHeight": 476,
+    "rootX": 162,
+    "rootY": 462,
     "columns": 4,
-    "frameCount": 4,
+    "frameCount": 7,
     "cropOffset": [
-      40,
-      50
+      44,
+      78
     ],
-    "sheetWidth": 660,
-    "sheetHeight": 908,
+    "sheetWidth": 344,
+    "sheetHeight": 2848,
     "frames": [
       [
         0,
         0,
-        296,
-        496,
-        36,
+        276,
+        468,
+        42,
         4
       ],
       [
-        300,
         0,
-        360,
-        408,
-        4,
-        92
-      ],
-      [
-        308,
-        500,
-        304,
+        472,
+        328,
         404,
-        24,
-        98
+        21,
+        70
       ],
       [
         0,
-        500,
-        304,
-        408,
-        22,
-        94
+        1280,
+        340,
+        392,
+        11,
+        81
+      ],
+      [
+        0,
+        2464,
+        344,
+        384,
+        4,
+        87
+      ],
+      [
+        0,
+        2072,
+        288,
+        388,
+        30,
+        82
+      ],
+      [
+        0,
+        1676,
+        292,
+        392,
+        25,
+        80
+      ],
+      [
+        0,
+        880,
+        292,
+        396,
+        23,
+        74
       ]
     ],
     "decodedBytes": {
-      "canonical": 4128768,
-      "grid": 2943360,
-      "packed": 2397120
+      "canonical": 8257536,
+      "grid": 5361664,
+      "packed": 3918848
     },
     "pixelScale": 2.0
   },
@@ -119,12 +176,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "25d335e83a461e16b0db1311b8574539c5fbaf4c7eddba3ebf560aea1e415f95",
-      "config": "c2f5b75b70e4a4f06e6ace4f6d2b9ac020755cec4e37358dc0e88afc97d024ad",
+      "source": "59ab7ae053efe08bf008af8579bd2785e6e455426d33377f3ccbeb220486c83c",
+      "config": "115e176a7758c94a533a4e63c6adb3a5e092ffc81412a5403590d0d426ae7392",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_land_video_normalized.png": "bad1937c83d1cd7ac5ac4eb328f3eab237c26b2af522f4e429ae1f826cbd0c5f"
+      "art/sprites/source/p02_land_video_normalized.png": "314e8316dd23ba2b2c6a38eea0ace1e2194a37d29a48987c027f881c43304a13"
     }
   }
 }

@@ -33,10 +33,10 @@ public class P02IdleRuntimeFixTest {
         CharacterDefinition.Animation idle=GeneratedCharacters.get("p02").animation(SpriteStates.IDLE);
         CharacterDefinition.Atlas atlas=idle.atlas;
         assertEquals("p02_idle",atlas.resource);
-        assertEquals(56,atlas.count); // Original 56 physical HD cells are untouched.
-        // Célula reescalada a 97% pelo ajuste de tamanho feito no app (8565e3e9); era 332x445.
-        assertEquals(322,atlas.width);
-        assertEquals(432,atlas.height);
+        assertEquals(56,atlas.count); // Os 56 quadros do vídeo (17-72), refeitos do zero (refazer.py).
+        // HD direto do vídeo, tamanho pela régua da cabeça; antes 322x432 (folha SR reescalada no app).
+        assertEquals(318,atlas.width);
+        assertEquals(426,atlas.height);
         assertEquals(2.0f,atlas.pixelScale,0f);
         assertTrue(idle.loop);
         assertEquals(30*0.041f,idle.duration,0.0001f);

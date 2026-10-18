@@ -2,55 +2,60 @@
   "id": "p02_throw",
   "javaName": "P02_THROW",
   "profile": "p02.json",
-  "source": "art/sprites/source/p02_throw_sr_hd.png",
+  "source": "art/sprites/source/p02_throw_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p02_throw.webp",
   "report": "tools/sprites/reports/p02_throw.report.json",
   "preview": "android/app/build/sprite-review/p02_throw-import.png",
-  "expectedFrames": 9,
+  "expectedFrames": 16,
   "segmentation": "prepared-grid",
-  "columns": 8,
+  "columns": 7,
   "rootMode": "authored",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "sourceNote": "p02 em vídeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do vídeo, tamanho pela régua da cabeça.",
   "video": {
     "arquivo": "agarrao.mp4",
     "personagem": "p02",
     "escala": 0.525,
-    "medida": "1º quadro = inicio_centro (nota 0.95)",
-    "quadros": "16,22,28,35,41,47,54,60,66",
+    "motivo": "régua da cabeça: tamanho de cada quadro pela cabeça, relativo ao quadro 0 do vídeo (a imagem inicial, escala 0.5250 medida pela receita)",
+    "quadros": "16,19,22,25,28,32,35,38,41,47,51,54,57,60,63,66",
     "celula": 288,
     "largura": 288,
     "raiz": "110,270",
-    "colunas": 9,
+    "colunas": 7,
     "limpar_chao": true,
-    "limpar_quadros": [
-      5
-    ],
     "reescala": [
-      1.0404,
-      1.048,
-      1.0556,
-      1.0547,
-      1.0502,
-      1.0458,
-      1.0376,
-      1.0286,
-      1.0178
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222,
+      1.0222
     ],
-    "reguaFatores": [
-      1.0404,
-      1.048,
-      1.0556,
-      1.0547,
-      1.0502,
-      1.0458,
-      1.0376,
-      1.0286,
-      1.0178
+    "limpar_quadros": [
+      9
     ],
-    "regua": [
-      "ajuste no app 20261014-0532: 93% (THROW_GRAB / THROW_TOSS)",
-      "esqueleto: 98% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
-    ]
+    "densidade": 2,
+    "referencia": {
+      "folha": "art/sprites/source/p02_throw_video_normalized.png",
+      "celula": [
+        288,
+        288
+      ],
+      "raiz": [
+        110,
+        270
+      ],
+      "colunas": 9
+    }
   },
   "frameWidth": 576,
   "frameHeight": 576,

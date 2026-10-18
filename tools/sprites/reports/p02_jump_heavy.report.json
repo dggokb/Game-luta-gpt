@@ -1,8 +1,8 @@
 {
   "id": "p02_jump_heavy",
   "characterProfile": "p02",
-  "source": "art/sprites/source/p02_jump_heavy_sr_hd.png",
-  "sourceNote": "p02 gerado em video (Seedance, pasta animations/p02 do Drive), convertido por tools/sprites/video_para_sprite.py (receita em \"video\").",
+  "source": "art/sprites/source/p02_jump_heavy_video_hd.png",
+  "sourceNote": "p02 em v\u00eddeo (Seedance), refeito do zero por tools/sprites/refazer.py: todos os quadros que o jogo mostra, HD direto do v\u00eddeo, tamanho pela r\u00e9gua da cabe\u00e7a.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
@@ -11,164 +11,221 @@
     "frameHeight": 640,
     "rootX": 264,
     "rootY": 604,
-    "columns": 7,
-    "frameCount": 7
+    "columns": 6,
+    "frameCount": 10
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        162,
-        140,
-        375,
-        604
+        160,
+        132,
+        376,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 47475
+      "minimumMargin": 35,
+      "opaquePixels": 48904
     },
     {
       "index": 1,
       "outputBbox": [
         145,
-        140,
-        363,
-        604
+        132,
+        365,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 49592
+      "minimumMargin": 35,
+      "opaquePixels": 50708
     },
     {
       "index": 2,
       "outputBbox": [
-        114,
-        141,
-        546,
-        604
+        137,
+        132,
+        359,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61612
+      "minimumMargin": 35,
+      "opaquePixels": 50815
     },
     {
       "index": 3,
       "outputBbox": [
-        107,
-        141,
-        539,
-        604
+        131,
+        132,
+        353,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61630
+      "minimumMargin": 35,
+      "opaquePixels": 51056
     },
     {
       "index": 4,
       "outputBbox": [
-        100,
-        141,
-        532,
-        604
+        124,
+        130,
+        442,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61659
+      "minimumMargin": 35,
+      "opaquePixels": 57574
     },
     {
       "index": 5,
       "outputBbox": [
-        90,
-        141,
-        523,
-        604
+        98,
+        133,
+        537,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61556
+      "minimumMargin": 35,
+      "opaquePixels": 63336
     },
     {
       "index": 6,
       "outputBbox": [
-        81,
-        141,
-        513,
-        604
+        92,
+        133,
+        531,
+        605
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 61301
+      "minimumMargin": 35,
+      "opaquePixels": 63336
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        86,
+        133,
+        525,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63336
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        77,
+        134,
+        518,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63241
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        71,
+        134,
+        510,
+        605
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 63054
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 489,
-    "frameHeight": 489,
-    "rootX": 196,
-    "rootY": 476,
-    "columns": 7,
-    "frameCount": 7,
+    "frameWidth": 488,
+    "frameHeight": 495,
+    "rootX": 204,
+    "rootY": 484,
+    "columns": 6,
+    "frameCount": 10,
     "cropOffset": [
-      68,
-      128
+      60,
+      120
     ],
-    "sheetWidth": 1376,
-    "sheetHeight": 972,
+    "sheetWidth": 1824,
+    "sheetHeight": 976,
     "frames": [
+      [
+        1052,
+        0,
+        228,
+        484,
+        94,
+        7
+      ],
       [
         0,
         0,
         232,
-        484,
-        86,
-        4
+        488,
+        79,
+        6
       ],
       [
         236,
         0,
         236,
-        484,
-        69,
-        4
+        488,
+        71,
+        6
       ],
       [
         476,
         0,
-        448,
-        484,
-        38,
-        4
-      ],
-      [
-        928,
-        0,
-        448,
-        484,
-        31,
-        4
-      ],
-      [
-        0,
+        236,
         488,
-        448,
-        484,
-        24,
-        4
-      ],
-      [
-        452,
-        488,
-        452,
-        480,
-        13,
-        5
-      ],
-      [
-        908,
-        488,
-        452,
-        480,
-        4,
+        65,
         6
+      ],
+      [
+        716,
+        0,
+        332,
+        488,
+        59,
+        4
+      ],
+      [
+        1284,
+        0,
+        452,
+        484,
+        32,
+        7
+      ],
+      [
+        0,
+        492,
+        452,
+        484,
+        26,
+        7
+      ],
+      [
+        456,
+        492,
+        452,
+        484,
+        20,
+        7
+      ],
+      [
+        912,
+        492,
+        456,
+        484,
+        10,
+        7
+      ],
+      [
+        1372,
+        492,
+        452,
+        484,
+        4,
+        7
       ]
     ],
     "decodedBytes": {
-      "canonical": 11468800,
-      "grid": 6695388,
-      "packed": 5349888
+      "canonical": 19660800,
+      "grid": 11594880,
+      "packed": 7120896
     },
     "pixelScale": 2.0
   },
@@ -176,12 +233,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "9cdaee68c7e77f20f811f75cb0a510c0b37f0fbad1f7662d0933ea461f4576f7",
-      "config": "ede60ecc00c049e942a5056a79163c0514cfb37df2be766536230bd24d2172d5",
+      "source": "14172ea0fe0bb26c94516f5d29b78f3e679415f4b5fd049ab100c39b9ed5578e",
+      "config": "c236bcd383047bb9a8da82912a19b25d67c8aad85c76d454351ed54f7a790dbc",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {
-      "art/sprites/source/p02_jump_heavy_video_normalized.png": "e5db1f7d27b774c513e67d54a3081fec6e73a7fa814c5facfeefbc56037786f5"
+      "art/sprites/source/p02_jump_heavy_video_normalized.png": "cb82ef598e8c81b9df3f8a99130daee1f9675dc92529a7ac4028ea5d144d135c"
     }
   }
 }
