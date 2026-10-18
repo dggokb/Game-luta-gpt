@@ -3,9 +3,13 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import esqueleto  # noqa: E402
+try:  # numpy só vem com requirements-animar.txt; a CI instala apenas o Pillow
+    import esqueleto
+except ImportError:
+    esqueleto = None
 
 
+@unittest.skipIf(esqueleto is None, 'precisa de numpy (requirements-animar.txt)')
 class FactorTests(unittest.TestCase):
     """O fator do esqueleto é suavizado: loop e clipe curto num valor só, clipe longo na mediana móvel."""
 
