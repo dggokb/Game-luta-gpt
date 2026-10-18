@@ -20,7 +20,22 @@
     "celula": 288,
     "largura": 224,
     "raiz": "103,270",
-    "colunas": 4
+    "colunas": 4,
+    "reescala": [
+      1.0433,
+      1.0433,
+      1.0433,
+      1.0433
+    ],
+    "reguaFatores": [
+      1.0433,
+      1.0433,
+      1.0433,
+      1.0433
+    ],
+    "regua": [
+      "esqueleto: 104% da imagem inicial (mediana), levado a 100%"
+    ]
   },
   "frameWidth": 448,
   "frameHeight": 576,

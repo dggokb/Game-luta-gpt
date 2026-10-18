@@ -18,157 +18,157 @@
     {
       "index": 0,
       "outputBbox": [
-        115,
-        152,
+        114,
+        148,
         303,
-        606
+        607
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 48239
+      "minimumMargin": 33,
+      "opaquePixels": 49122
     },
     {
       "index": 1,
       "outputBbox": [
-        95,
-        248,
-        393,
+        94,
+        245,
+        395,
         604
       ],
       "minimumMargin": 36,
-      "opaquePixels": 44173
+      "opaquePixels": 44920
     },
     {
       "index": 2,
       "outputBbox": [
         55,
-        239,
-        324,
+        238,
+        325,
         605
       ],
       "minimumMargin": 35,
-      "opaquePixels": 45690
+      "opaquePixels": 45901
     },
     {
       "index": 3,
       "outputBbox": [
-        53,
-        264,
-        326,
+        54,
+        265,
+        325,
         606
       ],
       "minimumMargin": 34,
-      "opaquePixels": 44702
+      "opaquePixels": 44342
     },
     {
       "index": 4,
       "outputBbox": [
-        49,
-        265,
-        328,
+        51,
+        268,
+        327,
         606
       ],
       "minimumMargin": 34,
-      "opaquePixels": 44543
+      "opaquePixels": 43740
     },
     {
       "index": 5,
       "outputBbox": [
-        51,
-        263,
-        329,
-        606
+        53,
+        268,
+        327,
+        607
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 44374
+      "minimumMargin": 33,
+      "opaquePixels": 43009
     },
     {
       "index": 6,
       "outputBbox": [
-        73,
-        144,
-        331,
+        75,
+        154,
+        328,
         606
       ],
       "minimumMargin": 34,
-      "opaquePixels": 53339
+      "opaquePixels": 51059
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 369,
-    "frameHeight": 486,
-    "rootX": 161,
-    "rootY": 472,
+    "frameWidth": 368,
+    "frameHeight": 483,
+    "rootX": 159,
+    "rootY": 469,
     "columns": 7,
     "frameCount": 7,
     "cropOffset": [
-      37,
-      132
+      39,
+      135
     ],
     "sheetWidth": 1096,
-    "sheetHeight": 844,
+    "sheetHeight": 840,
     "frames": [
       [
-        280,
         0,
-        204,
-        472,
-        70,
-        11
+        0,
+        208,
+        476,
+        67,
+        4
       ],
       [
-        780,
+        776,
         0,
-        316,
+        320,
         376,
-        50,
-        108
+        47,
+        102
       ],
       [
-        488,
+        484,
         0,
         288,
         384,
-        9,
-        99
+        7,
+        95
       ],
       [
         0,
-        484,
-        292,
+        480,
+        288,
         360,
-        8,
-        124
-      ],
-      [
-        296,
-        484,
-        296,
-        360,
-        4,
-        125
-      ],
-      [
-        596,
-        484,
-        296,
-        360,
-        6,
+        7,
         122
       ],
       [
-        0,
-        0,
-        276,
+        292,
         480,
+        292,
+        356,
+        4,
+        126
+      ],
+      [
+        588,
+        480,
+        292,
+        356,
+        6,
+        125
+      ],
+      [
+        212,
+        0,
+        268,
+        468,
         28,
-        4
+        11
       ]
     ],
     "decodedBytes": {
       "canonical": 8028160,
-      "grid": 5021352,
-      "packed": 3700096
+      "grid": 4976832,
+      "packed": 3682560
     },
     "pixelScale": 2.0
   },
@@ -176,8 +176,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "039dcb80f6c19c8e9cc8d2c508608debea3c73c5b28824a30916ae0380e2d32d",
-      "config": "4610db75b29ebc5bfe66b265b9420e522c758d57ec14e1e54e7e677bdf783726",
+      "source": "4074a6e8ed12c8654b0fb65625f1fe1e305cc365895bfc7d61a4c9471af63f83",
+      "config": "47dedc9a19f9afb4a4307e9fc2f9ed6d3ddf4d8f8e5b899a5a653ffd02d36b93",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {

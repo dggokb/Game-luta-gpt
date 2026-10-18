@@ -18,100 +18,100 @@
     {
       "index": 0,
       "outputBbox": [
-        79,
-        43,
-        369,
-        540
+        85,
+        63,
+        362,
+        539
       ],
-      "minimumMargin": 36,
-      "opaquePixels": 62384
+      "minimumMargin": 37,
+      "opaquePixels": 57162
     },
     {
       "index": 1,
       "outputBbox": [
-        45,
-        133,
-        401,
-        542
+        53,
+        150,
+        393,
+        541
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 59051
+      "minimumMargin": 35,
+      "opaquePixels": 54082
     },
     {
       "index": 2,
       "outputBbox": [
-        67,
-        139,
-        365,
-        542
+        73,
+        156,
+        359,
+        541
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 55157
+      "minimumMargin": 35,
+      "opaquePixels": 50601
     },
     {
       "index": 3,
       "outputBbox": [
-        65,
-        137,
-        363,
-        542
+        71,
+        153,
+        357,
+        541
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 54674
+      "minimumMargin": 35,
+      "opaquePixels": 50178
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 380,
-    "frameHeight": 525,
-    "rootX": 173,
-    "rootY": 510,
+    "frameWidth": 365,
+    "frameHeight": 504,
+    "rootX": 166,
+    "rootY": 490,
     "columns": 4,
     "frameCount": 4,
     "cropOffset": [
-      33,
-      30
+      40,
+      50
     ],
-    "sheetWidth": 684,
-    "sheetHeight": 944,
+    "sheetWidth": 660,
+    "sheetHeight": 908,
     "frames": [
       [
         0,
         0,
-        308,
-        516,
-        37,
+        296,
+        496,
+        36,
         4
       ],
       [
-        312,
+        300,
         0,
-        372,
-        428,
+        360,
+        408,
         4,
-        95
+        92
       ],
       [
-        320,
-        520,
-        316,
-        420,
-        25,
-        101
+        308,
+        500,
+        304,
+        404,
+        24,
+        98
       ],
       [
         0,
-        520,
-        316,
-        424,
-        23,
-        97
+        500,
+        304,
+        408,
+        22,
+        94
       ]
     ],
     "decodedBytes": {
       "canonical": 4128768,
-      "grid": 3192000,
-      "packed": 2582784
+      "grid": 2943360,
+      "packed": 2397120
     },
     "pixelScale": 2.0
   },
@@ -119,8 +119,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "a8709518b2ec69eac0b14538281f5033f7e3ccd2fdee5a613ec9fc065b7fb8fb",
-      "config": "1c3d08645c93d08d9df1538f239a36dd7a63250b132eb657e114f63d58088b29",
+      "source": "25d335e83a461e16b0db1311b8574539c5fbaf4c7eddba3ebf560aea1e415f95",
+      "config": "c2f5b75b70e4a4f06e6ace4f6d2b9ac020755cec4e37358dc0e88afc97d024ad",
       "profile": "dbed55cbf6d3a9b664629a0a5d6d4c265b0a62601a22a6a24d487383f0170078"
     },
     "referenceSources": {

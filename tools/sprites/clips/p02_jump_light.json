@@ -23,25 +23,26 @@
     "colunas": 7,
     "pe_no_chao": true,
     "reescala": [
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204
+      1.1034,
+      1.1099,
+      1.1164,
+      1.1229,
+      1.1293,
+      1.1358,
+      1.1423
     ],
     "reguaFatores": [
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204,
-      1.0204
+      1.1034,
+      1.1099,
+      1.1164,
+      1.1229,
+      1.1293,
+      1.1358,
+      1.1423
     ],
     "regua": [
-      "ajuste no app 20261014-0532: 98% (JUMP_LIGHT)"
+      "ajuste no app 20261014-0532: 98% (JUMP_LIGHT)",
+      "esqueleto: 109% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
     ]
   },
   "frameWidth": 640,

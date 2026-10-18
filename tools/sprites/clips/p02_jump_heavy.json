@@ -23,25 +23,26 @@
     "colunas": 7,
     "pe_no_chao": true,
     "reescala": [
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613
     ],
     "reguaFatores": [
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364,
-      1.1364
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613,
+      1.1613
     ],
     "regua": [
-      "ajuste no app 20261014-0532: 88% (JUMP_HEAVY / JUMP_HEAVY_DOWN)"
+      "ajuste no app 20261014-0532: 88% (JUMP_HEAVY / JUMP_HEAVY_DOWN)",
+      "esqueleto: 102% da imagem inicial (mediana), levado a 100%"
     ]
   },
   "frameWidth": 640,

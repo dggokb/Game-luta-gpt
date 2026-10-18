@@ -21,23 +21,24 @@
     "raiz": "115,238",
     "colunas": 6,
     "reescala": [
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101
+      0.9794,
+      0.9879,
+      0.9964,
+      1.0048,
+      1.0133,
+      1.0217
     ],
     "reguaFatores": [
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101,
-      1.0101
+      0.9794,
+      0.9879,
+      0.9964,
+      1.0048,
+      1.0133,
+      1.0217
     ],
     "regua": [
-      "ajuste no app 20261014-0532: 99% (RISE)"
+      "ajuste no app 20261014-0532: 99% (RISE)",
+      "esqueleto: 97% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
     ]
   },
   "frameWidth": 448,

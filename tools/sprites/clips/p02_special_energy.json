@@ -22,7 +22,36 @@
     "raiz": "136,270",
     "colunas": 11,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "reescala": [
+      1.0166,
+      1.0266,
+      1.0366,
+      1.0466,
+      1.0566,
+      1.0666,
+      1.0766,
+      1.0866,
+      1.0966,
+      1.1066,
+      1.1136
+    ],
+    "reguaFatores": [
+      1.0166,
+      1.0266,
+      1.0366,
+      1.0466,
+      1.0566,
+      1.0666,
+      1.0766,
+      1.0866,
+      1.0966,
+      1.1066,
+      1.1136
+    ],
+    "regua": [
+      "esqueleto: 109% da imagem inicial (curva suavizada, quadro a quadro), levado a 100%"
+    ]
   },
   "frameHeight": 576,
   "rootX": 272,
