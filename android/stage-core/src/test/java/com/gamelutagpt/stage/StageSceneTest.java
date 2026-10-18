@@ -165,6 +165,34 @@ public class StageSceneTest {
         assertEquals("sem imagem do piso não há reflexo", 0f, noArt.fighterReflection(), 0f);
     }
 
+    @Test
+    public void anExtraDrawingGoesBetweenTheDeeperAndTheShallowerLayers() throws IOException {
+        final FakeImage parede = new FakeImage(800, 800), lanterna = new FakeImage(200, 400);
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"parede.png\", \"profundidade\": 400, \"noChao\": true, \"altura\": 0.8},"
+            + "{\"imagem\": \"lanterna.png\", \"profundidade\": 120, \"noChao\": true, \"altura\": 0.3}],"
+            + "\"chao\": {\"imagem\": \"chao.jpg\", \"longe\": 700}}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("parede.png") ? parede : path.endsWith("lanterna.png") ? lanterna : new FakeImage(512, 512);
+            }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 400f, 72f);
+        final CountingCanvas canvas = new CountingCanvas();
+        scene.drawBackground(canvas, 200f, () -> canvas.ordem.add("narrador"));
+        int p = canvas.ordem.indexOf(parede), n = canvas.ordem.indexOf("narrador"), l = canvas.ordem.indexOf(lanterna);
+        assertTrue("na frente da parede", p >= 0 && p < n);
+        assertTrue("atrás da lanterna", n < l);
+        assertEquals("uma vez só", 1, java.util.Collections.frequency(canvas.ordem, "narrador"));
+
+        // A projeção na profundidade dele: anda e cresce menos que o plano dos lutadores.
+        assertTrue(scene.scale(200f) < scene.scale(0f));
+        assertEquals(700f, scene.worldX(scene.screenX(700f, 200f), 200f), 0.01f);
+        assertTrue("o chão dele fica acima do chão dos lutadores", scene.groundScreenY(200f) < scene.groundScreenY(0f));
+    }
+
     private static final class FakeImage implements RenderImage {
         final int w, h;
 
@@ -200,6 +228,7 @@ public class StageSceneTest {
 
     private static final class CountingCanvas implements RenderCanvas {
         int depth, images, regions, lines, rings;
+        final java.util.List<Object> ordem = new java.util.ArrayList<>();
 
         @Override public void save() { depth++; }
         @Override public void restore() { depth--; assertTrue(depth >= 0); }
@@ -213,7 +242,10 @@ public class StageSceneTest {
         @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
         @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
         @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) { lines++; }
-        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) { images++; }
+        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+            images++;
+            ordem.add(image);
+        }
         @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
                                               float l, float t, float r, float b, int alpha) {
             regions++;

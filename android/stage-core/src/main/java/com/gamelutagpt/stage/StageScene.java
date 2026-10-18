@@ -207,6 +207,26 @@ public final class StageScene {
         camera.set(zoom, cameraLeft, top);
     }
 
+    /** Onde fica na tela o ponto {@code worldX} do mundo na profundidade {@code z}. */
+    public float screenX(float worldX, float z) {
+        return camera.screenX(worldX, z);
+    }
+
+    /** Altura do chão na tela na profundidade {@code z}. */
+    public float groundScreenY(float z) {
+        return camera.screenY(world.groundY, z);
+    }
+
+    /** Pixels de tela por unidade do mundo na profundidade {@code z}. */
+    public float scale(float z) {
+        return camera.scale(z);
+    }
+
+    /** O ponto do mundo na profundidade {@code z} que aparece em {@code screenX} da tela. */
+    public float worldX(float screenX, float z) {
+        return camera.worldX(screenX, z);
+    }
+
     // ------------------------------------------------------------- atores
 
     /** Ids (das camadas) dos atores em cena. */
@@ -430,19 +450,45 @@ public final class StageScene {
 
     /** Tudo o que fica atrás dos lutadores, inclusive o piso. */
     public void drawBackground(RenderCanvas c) {
+        drawBackground(c, Float.NaN, null);
+    }
+
+    /**
+     * Tudo o que fica atrás dos lutadores, com mais um desenho ({@code between}, como o
+     * narrador no palco) na profundidade {@code z}: na frente das camadas mais fundas que ele
+     * (e do piso, se {@code z} está dentro dele) e atrás das mais rasas.
+     */
+    public void drawBackground(RenderCanvas c, float z, Runnable between) {
+        boolean pending = between != null;
         c.fillRect(-10f, -10f, VW + 10f, VH + 10f, pack.definition.backgroundColor);
         StageDefinition.Floor floor = pack.definition.floor;
         float floorFar = floor != null ? floor.far : 0f;
 
         for (Placed p : placed) {
-            if (p.layer.sortDepth() > floorFar) drawLayer(c, p);
+            if (p.layer.sortDepth() <= floorFar) continue;
+            if (pending && p.layer.sortDepth() <= z) {
+                between.run();
+                pending = false;
+            }
+            drawLayer(c, p);
+        }
+        if (pending && z > floorFar) {
+            between.run();
+            pending = false;
         }
         drawFloor(c);
         drawFloorReflections(c);
         for (Placed p : placed) {
             float depth = p.layer.sortDepth();
-            if (depth <= floorFar && depth > 0f) drawLayer(c, p);
+            if (depth <= floorFar && depth > 0f) {
+                if (pending && depth <= z) {
+                    between.run();
+                    pending = false;
+                }
+                drawLayer(c, p);
+            }
         }
+        if (pending) between.run();
         drawSplashes(c, true);
         drawRain(c, true);
         drawPetals(c, true);

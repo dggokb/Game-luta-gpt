@@ -220,6 +220,13 @@ public class GameView extends SurfaceView
     private com.gamelutagpt.historia.Narracao narracao;
     private final NarradorLuta narradorLuta = new NarradorLuta();
     private boolean narracaoPronta;
+    /** O narrador em pessoa no cenário, atrás dos lutadores (placeholder animado). */
+    private final com.gamelutagpt.historia.NarradorPalco narradorPalco = new com.gamelutagpt.historia.NarradorPalco();
+    /** Luta narrada: o narrador está no palco. */
+    private boolean narradorNoPalco;
+    /** A câmera deste quadro é a da luta (sem close de Super, Ultra, soco de câmera ou cinemática). */
+    private boolean cameraDaLuta;
+    private final Runnable desenhaNarradorPalco = this::drawNarradorPalco;
     /** Lição do treino que já teve a fala da conversa (-1: nenhuma). */
     private int conversaLicao = -1;
     /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
@@ -1691,6 +1698,7 @@ public class GameView extends SurfaceView
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
         narradorLuta.reset();
+        narradorPalco.reset();
         if (narracao != null) narracao.stop();
     }
 
@@ -2722,6 +2730,7 @@ public class GameView extends SurfaceView
                 renderCameraTop += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
             }
             boolean beam = ultraBeamActive();
+            cameraDaLuta = !ultraShotActive && renderZoom == camera.zoom && focoJogador <= 0f && focoRival <= 0f;
 
             renderCanvas.begin(canvas);
             // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
@@ -2739,13 +2748,28 @@ public class GameView extends SurfaceView
                 perfil.marca(PerfilQuadros.TELA);
                 stageScene.setDetalhe(!qualidade.efeitosLeves());
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
-                stageScene.drawBackground(renderCanvas);
+                if (narradorNoPalco) {
+                    stageScene.drawBackground(renderCanvas, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
+                        desenhaNarradorPalco);
+                } else {
+                    stageScene.drawBackground(renderCanvas);
+                }
             }
 
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -renderCameraTop);
-            if (stageScene == null) drawScenario(canvas);
+            if (stageScene == null) {
+                drawScenario(canvas);
+                if (narradorNoPalco) {
+                    // Sem o palco 3D: um pouco acima do chão dos lutadores e menor.
+                    if (cameraDaLuta) {
+                        narradorPalco.alvo(player().x + tagOffset(), opponent().x + engine.teams.tagOffset(OPPONENT),
+                            cameraLeft, cameraLeft + visibleWorldWidth);
+                    }
+                    narradorPalco.render(renderCanvas, narradorPalco.x(), GROUND_Y - 28f, 0.75f);
+                }
+            }
             drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
@@ -4597,6 +4621,27 @@ public class GameView extends SurfaceView
             narradorLuta.update(engine, flow, narracao::narrar);
         }
         narracao.update(FIXED_STEP);
+        narradorNoPalco = narracaoAtiva();
+        if (narradorNoPalco) {
+            narradorPalco.update(FIXED_STEP, narracao.textoAtual(), narracao.expressaoAtual(),
+                narracao.prioridadeAtual(), narracao.digitando());
+        }
+    }
+
+    /**
+     * O narrador no palco, entre o fundo e os lutadores (chamado pelo cenário na profundidade
+     * dele). Escolhe o lado só com a câmera da luta: num close ele não sai correndo.
+     */
+    private void drawNarradorPalco() {
+        float z = com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE;
+        if (cameraDaLuta) {
+            float a = stageScene.worldX(stageScene.screenX(player().x + tagOffset(), 0f), z);
+            float b = stageScene.worldX(stageScene.screenX(opponent().x + engine.teams.tagOffset(OPPONENT), 0f), z);
+            narradorPalco.alvo(a, b, stageScene.worldX(0f, z), stageScene.worldX(VW, z));
+        }
+        float x = narradorPalco.x();
+        if (Float.isNaN(x)) return;
+        narradorPalco.render(renderCanvas, stageScene.screenX(x, z), stageScene.groundScreenY(z), stageScene.scale(z));
     }
 
     /** Luta narrada: a batalha (IA ON), o Arcade e as lutas do torneio da história. */

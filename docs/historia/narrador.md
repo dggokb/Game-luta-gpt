@@ -24,6 +24,34 @@ tinta e linhas de foco na cor do narrador.
 Código: `story-core` `historia/Narracao.java` (falas, fila, desenho) e `app` `NarradorLuta.java`
 (o que aconteceu na luta). Quem liga os dois é o `GameView` (`updateNarracao`).
 
+## No palco
+
+O narrador também aparece **em pessoa no cenário**, atrás dos lutadores e na frente do fundo,
+debaixo de um canhão de luz. Por enquanto é um **placeholder animado**: um boneco de tinta com
+as cores do concept (terno preto, colete vermelho, dourado, microfone), articulado por código.
+Quando houver sprites dele, eles entram no lugar do boneco.
+
+- **Onde fica**: na profundidade 200 do palco (a régua do `stage.json`), em pé no chão. Fica
+  na frente das paredes e dos pilares e atrás das lanternas, braseiros e objetos do chão, com a
+  mesma perspectiva do cenário (anda e cresce menos que os lutadores quando a câmera mexe).
+- **Acompanha a luta**: fica de fora da dupla, do lado com mais espaço na tela, olhando para
+  eles. Anda junto quando a luta anda. Quando o lado dele aperta (a dupla chega no canto), ele
+  troca de lado correndo por trás dos lutadores. Num close (Super, Ultra, soco de câmera,
+  cinemática) ele não escolhe lado novo, para não sair correndo à toa.
+- **Os gestos seguem a fala** da faixa:
+  - calado: microfone no peito, a outra mão na cintura, respirando, o peso trocando de perna;
+  - `normal`: microfone na boca, a mão aberta acenando para a luta;
+  - `empolgado`: o braço lá em cima; numa fala grande (começo, Ultra, K.O., vitória) ele pula;
+  - `serio`: inclinado para a frente, apontando para a luta.
+  A boca mexe e saem riscos de som enquanto o texto digita; o canhão de luz fica mais forte
+  quando ele fala.
+- Aparece só nas lutas narradas (as mesmas da faixa).
+
+Código: `story-core` `historia/NarradorPalco.java` (lado, andar, pose e desenho) e
+`stage-core` `StageScene.drawBackground(canvas, z, desenho)` (encaixa o desenho na
+profundidade). No `GameView`: `drawNarradorPalco`. Sem o palco 3D (cenário antigo), ele fica
+um pouco acima do chão dos lutadores, menor.
+
 ## Quando ele narra
 
 Ele narra só as lutas de verdade:
@@ -107,6 +135,10 @@ Rode de novo quando o concept mudar (as caixas de recorte ficam no começo do sc
 1. O nome: `nome` no `narrador.json` (e a tradução do nome nos idiomas).
 2. Revisar as falas com a voz dele: o jeito de falar, os bordões e como ele chama o público.
 3. Quando tiver voz gravada, cada evento pode ganhar um som (ainda não implementado).
+4. Os sprites dele no palco (parado, andando, correndo, falando, empolgado, apontando) no lugar
+   do boneco.
 
-Testes: `NarracaoTest` (story-core: falas, variáveis, prioridade, traduções, retratos) e
+Testes: `NarracaoTest` (story-core: falas, variáveis, prioridade, traduções, retratos),
+`NarradorPalcoTest` (story-core: lado, andar, pose de cada fala, pulo),
+`StageSceneTest.anExtraDrawingGoesBetweenTheDeeperAndTheShallowerLayers` (stage-core) e
 `NarradorLutaTest` (app: o que a luta conta ao narrador).

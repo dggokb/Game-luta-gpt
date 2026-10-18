@@ -98,8 +98,18 @@ public class GameViewCelularPcTest {
         // Espera a luta: as folhas da dupla decodificam (em paralelo) com a tela de carregamento.
         long limite = System.currentTimeMillis() + 240_000;
         float antes = v.engine.fighter(GameView.PLAYER).x;
+        // Segura a direita e repete o aperto de tempos em tempos, como a repetição do teclado:
+        // a entrada da luta limpa as teclas seguradas (um aperto só, antes do fim do
+        // carregamento, se perdia e o lutador nunca andava).
         jogo.segurar(KeyEvent.KEYCODE_D);
-        while (v.engine.fighter(GameView.PLAYER).x < antes + 60f && System.currentTimeMillis() < limite) jogo.esperar(0.1);
+        long repete = System.currentTimeMillis() + 1000;
+        while (v.engine.fighter(GameView.PLAYER).x < antes + 60f && System.currentTimeMillis() < limite) {
+            jogo.esperar(0.1);
+            if (System.currentTimeMillis() >= repete) {
+                jogo.segurar(KeyEvent.KEYCODE_D);
+                repete = System.currentTimeMillis() + 1000;
+            }
+        }
         jogo.soltar(KeyEvent.KEYCODE_D);
         assertTrue("a luta começou; " + estado(v, antes), v.engine.fighter(GameView.PLAYER).x >= antes + 60f);
         SpriteAtlasCache atlases = (SpriteAtlasCache) campo(v, "atlases");

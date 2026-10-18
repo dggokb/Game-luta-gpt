@@ -282,6 +282,21 @@ public final class Narracao {
         return atual != null ? atual.evento : null;
     }
 
+    /** Expressão da fala na tela (normal, empolgado, serio); null: calado. */
+    public String expressaoAtual() {
+        return atual != null ? atual.expressao : null;
+    }
+
+    /** Prioridade da fala na tela (3 grande, 2 importante, 1 comentário); 0: calado. */
+    public int prioridadeAtual() {
+        return atual != null ? atual.prioridade : 0;
+    }
+
+    /** O texto ainda está entrando (a boca do narrador no palco mexe enquanto isso). */
+    public boolean digitando() {
+        return atual != null && (time - falaDesde - ENTRA * 0.5f) * DIGITA < atual.texto.length();
+    }
+
     /** Some com a faixa e esquece a fila (luta nova, saída da luta). */
     public void stop() {
         atual = null;
