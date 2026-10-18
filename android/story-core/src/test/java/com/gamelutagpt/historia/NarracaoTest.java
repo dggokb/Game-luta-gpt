@@ -3,6 +3,7 @@ package com.gamelutagpt.historia;
 import static org.junit.Assert.*;
 
 import com.gamelutagpt.render.RenderAssets;
+import com.gamelutagpt.render.RenderCanvas;
 import com.gamelutagpt.render.RenderImage;
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +62,69 @@ public class NarracaoTest {
             }
         }
     }
+
+    @Test public void theBoxIsCenteredAndClearOfTheTouchButtons() {
+        float esq = Narracao.QUADRO[0];
+        for (int i = 0; i < Narracao.QUADRO.length; i += 2) esq = Math.min(esq, Narracao.QUADRO[i]);
+        float dir = Narracao.FAIXA_DIR + Narracao.PONTA;
+        assertEquals("centralizada na tela de 1280", 640f, (esq + dir) * 0.5f, 1f);
+        assertTrue("depois do direcional", esq > 375f);
+        // Botão SUPER (870, 628, raio 54): a ponta da faixa não entra nele.
+        float dy = 628f - Narracao.FAIXA_TOPO;
+        assertTrue("antes do SUPER", dir < 870f - (float)Math.sqrt(54f * 54f - dy * dy));
+    }
+
+    @Test public void longLinesShrinkInsteadOfLosingTheirEnd() throws IOException {
+        // O nome mais comprido do elenco em todas as variáveis, nos três idiomas.
+        Map<String, String> v = new HashMap<>();
+        for (String k : new String[] {"p1", "p2", "atacante", "defensor", "entra", "nome", "vencedor", "perdedor"}) {
+            v.put(k, "Takatoshi");
+        }
+        v.put("n", "12");
+        for (String idioma : new String[] {null, "en", "es"}) {
+            Narracao n = narrador();
+            if (idioma != null) {
+                Temporada t = Temporada.load(ARQUIVOS);
+                assertTrue(t.setIdioma(ARQUIVOS, idioma));
+                n.setTemporada(t);
+            }
+            for (Map.Entry<String, Narracao.Evento> e : n.eventos().entrySet()) {
+                for (int i = 0; i < e.getValue().falas.size() * 4; i++) {
+                    n.stop();
+                    passa(n, Narracao.REPETE_DEPOIS + 0.1f);
+                    assertTrue(n.narrar(e.getKey(), v));
+                    String texto = n.textoAtual();
+                    String junto = String.join(" ", n.linhasNaFaixa(MEDIDA));
+                    assertEquals(idioma + ": a fala inteira na faixa", texto.replaceAll("\\s+", " "), junto.replaceAll("\\s+", " "));
+                }
+            }
+        }
+    }
+
+    /** Mede o texto como a fonte do jogo, mais ou menos (0,56 da altura por letra). */
+    private static final RenderCanvas MEDIDA = new RenderCanvas() {
+        @Override public void save() {}
+        @Override public void restore() {}
+        @Override public void translate(float dx, float dy) {}
+        @Override public void scale(float sx, float sy, float px, float py) {}
+        @Override public void rotate(float degrees, float px, float py) {}
+        @Override public void clipPolygon(float[] xy) {}
+        @Override public void fillRect(float l, float t, float r, float b, int argb) {}
+        @Override public void fillPolygon(float[] xy, int argb) {}
+        @Override public void strokePolygon(float[] xy, float width, int argb) {}
+        @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
+        @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
+        @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) {}
+        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {}
+        @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                              float l, float t, float r, float b, int alpha) {}
+        @Override public void fillRadialGlow(float cx, float cy, float radius, int argb) {}
+        @Override public void fillVerticalGradient(float l, float t, float r, float b, int top, int bottom) {}
+        @Override public void fillOval(float l, float t, float r, float b, int argb) {}
+        @Override public void drawText(String text, float x, float y, float size, int fill, int stroke, float sw, boolean italic) {}
+        @Override public void beginInvert() {}
+        @Override public void endInvert() {}
+    };
 
     @Test public void everyExpressionHasItsPortrait() {
         Narracao n = narrador();

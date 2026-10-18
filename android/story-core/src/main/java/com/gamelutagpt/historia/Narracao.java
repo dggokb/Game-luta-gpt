@@ -34,11 +34,14 @@ public final class Narracao {
     public static final String ARQUIVO = Temporada.PASTA + "/narrador.json";
     public static final String QUEM = "narrador";
 
-    // Desenho (coordenadas 1280x720): quadro do retrato e faixa do texto no rodapé, no meio.
-    // A faixa termina antes do botão OD (borda esquerda em 750) e o quadro fica à direita do
-    // direcional (que pega o dedo até 375).
-    static final float[] QUADRO = {382f, 574f, 482f, 567f, 488f, 692f, 376f, 696f};
-    static final float FAIXA_ESQ = 474f, FAIXA_DIR = 728f, FAIXA_TOPO = 600f, FAIXA_BASE = 688f;
+    // Desenho (coordenadas 1280x720): quadro do retrato e faixa do texto no rodapé, o conjunto
+    // centralizado na tela (de 470 a 810, com a ponta da faixa). Fica embaixo do botão OD (que
+    // acaba em 595) e antes do anel do SUPER/ULTRA (perto de 818); o quadro fica
+    // à direita do direcional (que pega o dedo até 375).
+    static final float[] QUADRO = {476f, 574f, 576f, 567f, 582f, 692f, 470f, 696f};
+    static final float FAIXA_ESQ = 568f, FAIXA_DIR = 794f, FAIXA_TOPO = 600f, FAIXA_BASE = 688f;
+    /** Ponta inclinada da faixa à direita, em cima. */
+    static final float PONTA = 16f;
     static final float TEXTO = 18f, TEXTO_GRANDE = 20f, LINHA = 22f, NOME = 14f;
     private static final int FUNDO = 0xE80D1220;
     private static final int AMARELO = 0xFFFFE08A;
@@ -326,7 +329,7 @@ public final class Narracao {
 
     private void drawFaixa(RenderCanvas c, boolean grande) {
         float x0 = FAIXA_ESQ, x1 = FAIXA_DIR, top = FAIXA_TOPO, base = FAIXA_BASE;
-        float ponta = 16f;
+        float ponta = PONTA;
         float[] faixa = {x0, top, x1 + ponta, top, x1, base, x0, base};
         float[] sombra = {x0 + 5f, top + 6f, x1 + ponta + 5f, top + 6f, x1 + 5f, base + 6f, x0 + 5f, base + 6f};
         c.fillPolygon(sombra, 0x66000000);
@@ -348,11 +351,11 @@ public final class Narracao {
         if (atual == null) return;
         float idade = time - falaDesde - ENTRA * 0.5f;
         if (idade <= 0f) return;
-        float size = grande ? TEXTO_GRANDE : TEXTO;
-        List<String> linhas = Baloes.wrap(c, atual.texto, size, x1 - x0 - 26f);
-        if (linhas.size() > 3) linhas = linhas.subList(0, 3);
+        diagramar(c, atual, grande, x1 - x0 - 26f, base - top - 8f);
+        float size = layoutTamanho, linhaAltura = layoutLinha;
+        List<String> linhas = layoutLinhas;
         int visiveis = (int)Math.max(1f, idade * DIGITA);
-        float y = top + 6f + (base - top - 6f - linhas.size() * LINHA) * 0.5f + LINHA - 5f;
+        float y = top + 6f + (base - top - 6f - linhas.size() * linhaAltura) * 0.5f + linhaAltura - 5f;
         int corTexto = grande ? AMARELO : WHITE;
         for (String linha : linhas) {
             if (visiveis <= 0) break;
@@ -360,8 +363,43 @@ public final class Narracao {
             visiveis -= linha.length() + 1;
             float pw = c.measureText(parte, size, grande);
             c.drawText(parte, x0 + 22f + pw * 0.5f, y, size, corTexto, INK, 2.4f, grande);
-            y += LINHA;
+            y += linhaAltura;
         }
+    }
+
+    /** Menor tamanho do texto da faixa quando a fala é longa (nomes compridos). */
+    static final float TEXTO_MINIMO = 13f;
+    private Fala layoutDe;
+    private List<String> layoutLinhas = Collections.emptyList();
+    private float layoutTamanho = TEXTO, layoutLinha = LINHA;
+
+    /**
+     * Quebra a fala em linhas que cabem na faixa: no tamanho normal até 3 linhas; se não
+     * couber (nome comprido), o texto diminui até caber inteiro, em vez de cortar o fim.
+     * Calcula uma vez por fala.
+     */
+    private void diagramar(RenderCanvas c, Fala f, boolean grande, float largura, float altura) {
+        if (f == layoutDe) return;
+        layoutDe = f;
+        float normal = grande ? TEXTO_GRANDE : TEXTO;
+        for (float size = normal; ; size -= 1f) {
+            float linha = size == normal ? LINHA : size * 1.22f;
+            int cabem = Math.max(1, size == normal ? 3 : (int)(altura / linha));
+            List<String> linhas = Baloes.wrap(c, f.texto, size, largura);
+            if (linhas.size() <= cabem || size <= TEXTO_MINIMO) {
+                layoutLinhas = linhas.size() > cabem ? linhas.subList(0, cabem) : linhas;
+                layoutTamanho = size;
+                layoutLinha = linha;
+                return;
+            }
+        }
+    }
+
+    /** Linhas da fala na tela como saem na faixa (testes). */
+    List<String> linhasNaFaixa(RenderCanvas c) {
+        if (atual == null) return Collections.emptyList();
+        diagramar(c, atual, atual.prioridade >= 3, FAIXA_DIR - FAIXA_ESQ - 26f, FAIXA_BASE - FAIXA_TOPO - 8f);
+        return layoutLinhas;
     }
 
     private void drawQuadro(RenderCanvas c) {

@@ -10,12 +10,14 @@ palco da arena). O nome ainda é provisório (`NARRADOR`).
 
 ## Na tela
 
-Uma faixa de transmissão, o "terço de baixo" da TV, fica no rodapé, no meio, entre o direcional
-e os botões, antes do botão OD. Ao lado dela fica o retrato num quadro de mangá, com bordas de
-tinta e linhas de foco na cor do narrador.
+Uma faixa de transmissão, o "terço de baixo" da TV, fica no rodapé. O conjunto (retrato e
+faixa) fica centralizado na tela, entre o direcional e os botões: embaixo do botão OD e antes
+do anel do ULTRA. O retrato fica à esquerda da faixa, num quadro de mangá, com bordas de tinta e
+linhas de foco na cor do narrador.
 
 - A faixa sobe quando ele começa a falar e desce um pouco depois da última fala.
-- O texto entra digitando. Uma fala grande (começo, Ultra, K.O., vitória) aparece em amarelo,
+- O texto entra digitando, em até 3 linhas. Uma fala longa (nome comprido, tradução) diminui
+  a letra até caber inteira, em vez de cortar o fim. Uma fala grande (começo, Ultra, K.O., vitória) aparece em amarelo,
   maior e com um tranco.
 - Em cima da faixa fica uma plaquinha com o nome e uma luz vermelha de "no ar".
 - O retrato balança enquanto o narrador fala; gritando no microfone (`empolgado`) balança mais.
