@@ -50,6 +50,18 @@ final class AiController {
     private static final int GUARD_NONE = 0, GUARD_HIGH = 1, GUARD_LOW = 2, GUARD_ANY = 3;
     /** Hábito de esperar agachada quando o rival não está atacando (antes 0,35). */
     static final double CALM_HABIT_SCALE = 0.1;
+    /**
+     * Na beira do jab do rival: chance (vezes a de defender) de parar em vez de entrar andando,
+     * e a folga da beira.
+     */
+    static final double EDGE_STOP = 0.9;
+    static final float EDGE_MARGIN = 20f;
+    /** Perto, no respiro entre os golpes dela: chance de segurar a defesa (vezes a de defender). */
+    static final double COOLDOWN_GUARD = 0.85;
+    /** Quadros desde o último golpe do rival em que ela ainda se sente pressionada. */
+    static final int PRESSURE_FRAMES = 30;
+    /** Quadros que ela segura a defesa por hábito (de MIN a MIN + SPREAD - 1). */
+    static final int HABIT_GUARD_MIN = 10, HABIT_GUARD_SPREAD = 12;
     /** As duas alturas seguram, e ela defende em pé (o projétil do meio). */
     private static final int GUARD_HIGH_ONLY = 4;
 
@@ -309,6 +321,12 @@ final class AiController {
             movingForward = movingBack = dashing = false;
             return;
         }
+        boolean wasBlocking = blockedLastFrame;
+        blockedLastFrame = me.status == CombatFighter.Status.BLOCKSTUN;
+        if (wasBlocking && !blockedLastFrame && punishOnBlock(engine, me, target, seen, out)) return;
+        // Defendendo por reação e o golpe dele errou (já está na recuperação): solta a defesa e
+        // pune, em vez de segurar a defesa até o fim da janela.
+        if (seen != null && !seen.ko && me.canAct() && punish(engine, me, target, seen, out)) return;
         if (defend(engine, me, target, seen, out)) return;
         if (!me.canAct()) {
             movingForward = movingBack = dashing = false;
@@ -338,7 +356,22 @@ final class AiController {
         situation.style = CpuStyle.of(me.character());
         situation.urgency = urgency;
         clearRequests();
-        ai.think(CombatConfig.DT, situation, actions);
+        if (ai.think(CombatConfig.DT, situation, actions)) walkInPlan = !roll(level.reactGuard * EDGE_STOP);
+        if (movingForward && !dashing && attack == null && special == null && !superAttack && !grab && !jump &&
+            me.grounded && seen.grounded && seen.status == CombatFighter.Status.NEUTRAL && !seen.attacking() &&
+            situation.distance < jabRange(me, target) + EDGE_MARGIN && !walkInPlan) {
+            // Na beira do golpe rápido do rival: andando para dentro ela levava o jab (a
+            // distância que ela vê é a de antes da reação, e os dois estão andando). Para ali
+            // e espera defendendo; entra pelo dash, pelo pulo, pela punição ou pelo golpe dela.
+            movingForward = false;
+            if (roll(level.reactGuard * 0.5)) {
+                guardFrames = 8 + reactRandom.nextInt(8);
+                guardLow = true;
+                guardHabit = true;
+                holdGuard(me, out);
+                return;
+            }
+        }
 
         int forward = me.facing > 0 ? 1 : 5;
         if (movingForward) out.direction = forward;
@@ -443,18 +476,27 @@ final class AiController {
             return false;
         }
         if (Math.abs(seen.x - me.x) >= threatRange(me, target)) return false;
-        boolean pressured = seen.frame - lastOpponentAttackFrame < 60;
+        if (cooldown > 0 && roll(level.reactGuard * COOLDOWN_GUARD)) {
+            // Perto e ainda sem poder atacar (o respiro entre os golpes dela): parada ali ela
+            // levava o jab, rápido demais para defender reagindo. Segura a defesa até poder agir.
+            guardFrames = cooldown + 2;
+            guardLow = seen.grounded;   // rival no ar: o pulo só se defende em pé
+            guardHabit = true;
+            return holdGuard(me, out);
+        }
+        boolean pressured = seen.frame - lastOpponentAttackFrame < PRESSURE_FRAMES;
         double p = level.guardAnticipation * CpuStyle.of(me.character()).patience;
         // Sem pressão (o rival não atacou há pouco) ela quase não fica agachada esperando: era o
-        // que mais a deixava parecendo grudada no chão. Pressionada, defende como antes.
+        // que mais a deixava parecendo grudada no chão. Pressionada, defende (o jab não dá para
+        // defender reagindo), mas em janelas curtas: a pressão acabou, ela volta a atacar.
         p = pressured ? p + 0.25 * level.reactGuard : p * CALM_HABIT_SCALE;
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
         // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.
         p *= 1.0 - 0.6 * urgency;
         if (roll(Math.min(0.95, p))) {
-            guardFrames = 18 + reactRandom.nextInt(18);
-            guardLow = true;
+            guardFrames = HABIT_GUARD_MIN + reactRandom.nextInt(HABIT_GUARD_SPREAD);
+            guardLow = seen.grounded;   // rival no ar: o pulo só se defende em pé
             guardHabit = true;
             return holdGuard(me, out);
         }
@@ -566,6 +608,25 @@ final class AiController {
         else guardLow = true;   // golpe do meio: agachada segura ele e os baixos (o certo a fazer)
         guardFrames = Math.max(guardFrames, frames);
         return true;
+    }
+
+    /** Plano da última decisão do neutro: entrar andando no alcance do jab do rival. */
+    private boolean walkInPlan = true;
+    private CharacterDefinition jabFor;
+    private float jabRange;
+
+    /** Até onde chega o golpe rápido do rival (L ou 2L): a beira onde ela para de andar. */
+    private float jabRange(CombatFighter me, CombatFighter target) {
+        CharacterDefinition c = target.character();
+        if (c != jabFor) {
+            jabFor = c;
+            jabRange = 0f;
+            for (String b : new String[] {"L", "2L"}) {
+                CharacterDefinition.Move move = c.move(b, false);
+                if (move != null) jabRange = Math.max(jabRange, CombatRules.maxCenterDistance(move, me.body()));
+            }
+        }
+        return jabRange;
     }
 
     /** Até onde o rival alcança com um golpe no chão (mais uma folga): o "colado" da defesa. */
@@ -687,6 +748,34 @@ final class AiController {
      * Viu o rival errar um golpe ao alcance: se a recuperação que ela calcula que sobra dá para o
      * golpe de abertura do caderno, pune com o combo.
      */
+    private boolean blockedLastFrame;
+
+    /**
+     * Saiu da defesa e o golpe que ela defendeu ainda está na recuperação: pune com o golpe mais
+     * rápido que entra a tempo. Não é reação (a brecha é menor que a reação humana): é saber que
+     * aquele golpe é inseguro, como o jogador que decorou o frame data. Só golpe que ela viu.
+     */
+    private boolean punishOnBlock(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                  CpuPerception.Snapshot seen, FighterInput out) {
+        if (!me.canAct() || !me.grounded || !target.grounded || !target.attacking() || seen == null ||
+            !seen.attacking() || seen.attack != target.attack) return false;
+        if (!roll(level.punish)) return false;
+        int left = target.attack.totalFrames - target.attackFrame;
+        float gap = Math.abs(target.x - me.x);
+        CharacterDefinition c = me.character();
+        for (String starter : new String[] {"L", "2L", "M"}) {
+            AttackDefinition a = c.attack(starter);
+            if (a == null || a.startupFrames > left || c.move(starter, false) == null ||
+                !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            startRoute(c, starter);
+            press(starter, me, out);
+            guardFrames = 0;
+            lastReason = "punir na defesa";
+            return true;
+        }
+        return false;
+    }
+
     private boolean punish(CombatEngine engine, CombatFighter me, CombatFighter target,
                            CpuPerception.Snapshot seen, FighterInput out) {
         if (!me.grounded || !seen.grounded || !seen.attacking() || seen.threatening() ||
@@ -701,6 +790,7 @@ final class AiController {
             if (a == null || a.startupFrames > left || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
             startRoute(c, starter);
             press(starter, me, out);
+            guardFrames = 0;
             lastReason = "punir";
             return true;
         }

@@ -165,7 +165,8 @@ public class CpuTest {
     @Test public void theCpuNeverReactsToAJumpBeforeTheHumanReaction() {
         int reactions = 0;
         for (int level = 1; level <= 8; level++) {
-            for (long seed = 1; seed <= 6; seed++) {
+            // 10 sementes: a CPU ataca bastante no neutro e às vezes está ocupada quando ele pula.
+            for (long seed = 1; seed <= 10; seed++) {
                 Fight f = new Fight(BASE, BASE, 360f, level, seed);
                 int jumpAt = 40 + (int)(seed * 7);
                 int reaction = -1;
@@ -246,7 +247,10 @@ public class CpuTest {
         for (long seed = 1; seed <= 400; seed++) {
             Fight f = new Fight(WHIFFER, BASE, 110f, level, seed);
             for (int i = 0; i < 30; i++) f.step();   // a CPU passa a ver a luta
-            if (!f.p().canAct() || !f.c().canAct()) continue;
+            // Espera um momento em que a CPU está livre e parada perto (ela ataca bastante no
+            // neutro): o erro do jogador tem que aparecer com ela sem golpe na tela.
+            for (int i = 0; i < 240 && !livreParaPunir(f); i++) f.step();
+            if (!livreParaPunir(f)) continue;
             f.player.heavy = true;
             boolean valid = true;
             int started = -1;
@@ -267,6 +271,13 @@ public class CpuTest {
         }
         assertTrue("nível " + level + ": poucas tentativas válidas (" + tries + ")", tries >= 6);
         return new double[] {punished / (double)tries, delay / tries, fastest};
+    }
+
+    /** Os dois no chão, livres, a CPU sem golpe na tela e na distância do teste. */
+    private static boolean livreParaPunir(Fight f) {
+        float gap = Math.abs(f.c().x - f.p().x);
+        return f.p().canAct() && f.c().canAct() && f.p().grounded && f.c().grounded && !f.c().attacking() &&
+            gap >= 90f && gap <= 130f;
     }
 
     @Test public void level8PunishesAWhiffButNotFasterThanAHuman() {

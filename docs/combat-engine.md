@@ -96,6 +96,25 @@ humano**.
   vontade de soltar projétil, de agarrar, de pular e paciência na defesa. O zoner (alcance)
   recua para a distância dele; o pressão fica colado; o tanque agarra; o imprevisível às vezes
   larga o plano.
+- **Defende a sequência e volta a atacar** (a CPU dos níveis altos ficava agachada defendendo
+  enquanto o rival pressionava e não fazia nada):
+  - sob pressão (o rival atacou há menos de meio segundo, `PRESSURE_FRAMES` = 30) ela segura a
+    defesa por hábito, porque o jab é rápido demais para defender reagindo, mas em janelas
+    curtas (10 a 21 quadros, `HABIT_GUARD_*`); a pressão acabou, ela age;
+  - **pune na defesa** (`punishOnBlock`): saindo do bloqueio, se o golpe que ela defendeu ainda
+    está na recuperação, entra com o golpe mais rápido que chega a tempo (L, 2L, M), com a
+    chance de punir do nível. Não é reação (a brecha é menor que a reação humana): é saber que
+    o golpe é inseguro, como quem decorou o frame data;
+  - viu o golpe do rival errar: solta a defesa de reação e pune (a punição vem antes da defesa);
+  - perto e no respiro entre os golpes dela (`cooldown`): segura a defesa até poder agir
+    (`COOLDOWN_GUARD`), em vez de ficar parada levando o jab;
+  - **para na beira do jab do rival** (alcance do L/2L dele + 20): andando para dentro ela
+    levava o jab (a distância que ela vê é a de antes da reação). Entra andando só às vezes
+    (mais nos níveis baixos; `EDGE_STOP`); senão espera ali, cutuca, dá dash ou pula;
+  - a defesa por hábito com o rival no ar é em pé (o pulo passava por cima da defesa agachada).
+  Medido contra um jogador simulado com reação humana (p03, 10 lutas por nível): no nível 8,
+  45 golpes por minuto (antes 35), 4% do tempo bloqueando (antes 9%), 21% segurando a defesa
+  (antes 28%); a curva ficou mais regular (vitórias da CPU por nível: 0, 0, 4, 5, 8, 10, 9, 10).
 - **Agachar menos**: sem pressão (o rival não atacou há pouco) o hábito de esperar agachada caiu
   para 0,1 da chance (antes 0,35; `CALM_HABIT_SCALE`); pressionada, defende como antes. Os golpes
   agachados (2L/2M/2H) pesam menos na escolha do neutro, e o projétil do meio ela defende em pé.

@@ -19,7 +19,11 @@ final class CpuLevel {
     final int reactionFrames;
     /** Atraso extra sorteado a cada reação (0 a este valor): ninguém reage sempre igual. */
     final int reactionJitter;
-    /** Colada no rival, segura a defesa agachada por hábito (sem reagir a nada). */
+    /**
+     * Colada no rival, segura a defesa agachada por hábito (sem reagir a nada): o jab é rápido
+     * demais para defender reagindo. A janela é curta e acaba logo depois da pressão, e na saída
+     * da defesa ela pune o golpe inseguro: defende a sequência e volta a atacar.
+     */
     final double guardAnticipation;
     /** Viu o golpe (ou o pulo) chegando a tempo: chance de defender. */
     final double reactGuard;
