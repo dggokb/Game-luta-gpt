@@ -14,7 +14,9 @@ Para cada folha (atlas):
    acompanham.
 3. Conversão do vídeo em HD direto (densidade 2), com a escala da receita e as opções dela
    (recorte, fixar, chão...). As correções de tamanho antigas (reescala da régua) saem: o
-   tamanho é refeito pelo esqueleto.
+   tamanho é refeito no passo 4. Clipe parado no jogo (STANDING: intro, vitória, provocação,
+   agachar) fica na posição do vídeo (fixar pes): tirar a tendência do tronco num clipe com
+   um passo no meio fazia a personagem deslizar parada.
 4. Tamanho: régua da cabeça (cabeca.py), por trecho: um tamanho só no clipe, com degrau só
    onde o vídeo muda de tamanho de verdade (cabeca.degraus), nunca curva. Nível pela imagem
    inicial do vídeo ou, sem ela, pela média da cabeça com o esqueleto. Deitado (KNOCKDOWN,
@@ -38,6 +40,9 @@ sys.path.insert(0, str(HERE))
 FPS_JOGO = 60.0
 SKIP = {'ULTRA_SEQ', 'ULTRA_BEAM'}
 LYING = {'KNOCKDOWN', 'GROUNDED', 'GETUP'}
+# Parada no jogo e sem caixa de golpe: posição do vídeo (câmera parada, pé plantado não
+# desliza), raiz no quadro em guarda (o intro termina nela, os outros começam).
+STANDING = {'INTRO': 'fim', 'VICTORY': 'inicio', 'TAUNT': 'inicio', 'CROUCH': 'inicio'}
 
 
 def read(path):
@@ -249,6 +254,11 @@ def redo(cid, videos, states, scratch, only_size=False):
                     'ancorar_pe'):
             recipe.pop(key, None)
         recipe['quadros'] = ','.join(map(str, new_q))
+        standing = [STANDING[s] for s in users if s in STANDING]
+        if standing and recipe.get('fixar', 'tronco') == 'tronco':
+            recipe['fixar'] = 'pes'
+            if standing[0] == 'fim':
+                recipe['ancora'] = 'fim'
         if recipe.get('limpar_quadros'):
             recipe['limpar_quadros'] = remap_cells(recipe['limpar_quadros'], where, len(new_q))
         if recipe.get('limpar_area'):

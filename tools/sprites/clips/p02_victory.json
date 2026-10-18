@@ -21,6 +21,7 @@
     "largura": 256,
     "raiz": "112,270",
     "colunas": 16,
+    "fixar": "pes",
     "reescala": [
       0.906,
       0.906,

@@ -226,6 +226,14 @@ nem terminam nela, da média de duas réguas (cabeça e esqueleto, com erros par
 opostos). Deitado (KNOCKDOWN, GROUNDED, GETUP): escala única da receita. `--so-tamanho` refaz
 só o tamanho nos quadros que as folhas já têm (a medida da cabeça fica guardada no rascunho).
 
+Posição: a câmera dos vídeos é parada, então pé plantado no vídeo é pé plantado no jogo se a
+posição do vídeo fica. O padrão `fixar: tronco` tira a tendência do tronco no clipe inteiro;
+num clipe com um passo no meio (intro.mp4: ela anda até a guarda) a reta pega o passo e a
+personagem desliza parada (~12 px no INTRO da p02). INTRO, VICTORY, TAUNT e CROUCH usam
+`fixar: pes`: posição do vídeo, raiz no tronco do quadro em guarda (`ancora: fim` no intro,
+que termina nela) e o degrau de tamanho crescendo em volta dos pés desse quadro. Golpes
+ficam como estão (a posição do desenho é a das caixas ajustadas).
+
 ## Tamanho pelo esqueleto (qualquer pose)
 
 ```

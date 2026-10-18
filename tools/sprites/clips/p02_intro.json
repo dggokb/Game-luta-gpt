@@ -21,6 +21,8 @@
     "largura": 224,
     "raiz": "114,266",
     "colunas": 18,
+    "fixar": "pes",
+    "ancora": "fim",
     "pe_no_chao": true,
     "reescala": [
       1.011,

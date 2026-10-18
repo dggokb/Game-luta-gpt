@@ -152,7 +152,7 @@ def torso_x(rgba):
 
 # Opções gravadas na receita do clipe (nome do argumento -> padrão).
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
-              raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
+              raiz="128,238", colunas=8, fixar="tronco", ancora="inicio", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
               limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None)
 
@@ -179,10 +179,14 @@ def parser():
                    help="remove poeira cinza-esverdeada na faixa dos pés (seguro com cabelo claro e pele)")
     p.add_argument("--colunas", type=int, default=8)
     p.add_argument("--raiz", default="128,238")
-    p.add_argument("--fixar", choices=["tronco", "quadro", "registro", "video"], default="tronco",
+    p.add_argument("--fixar", choices=["tronco", "quadro", "registro", "video", "pes"], default="tronco",
                    help="tronco: anula o deslizamento lateral; quadro: cada quadro no próprio tronco "
                         "(o jogo é que empurra, ex.: defesa); registro: idem, com o tronco medido como "
-                        "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo")
+                        "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo; "
+                        "pes: mantém a posição do vídeo (câmera parada: pé plantado não desliza), com a "
+                        "raiz no tronco do quadro de --ancora (clipe parado no jogo: intro, vitória)")
+    p.add_argument("--ancora", choices=["inicio", "fim"], default="inicio",
+                   help="com --fixar pes: o quadro em guarda, que fica no lugar do IDLE (intro: fim)")
     p.add_argument("--pe-no-chao", action="store_true",
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
     p.add_argument("--reescala", type=lambda v: [float(x) for x in v.split(",")],
@@ -370,6 +374,18 @@ def main(argv=None):
     first = keyed_frame(0, args.sem_poeira)
     foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
     ref_x = torso_x(first) if args.fixar == "video" else xs[0]
+    if args.fixar == "pes":
+        # Tirar a tendência do tronco num clipe com um passo no meio (intro, vitória) faz a
+        # personagem deslizar parada; a câmera do vídeo é parada, então a posição do vídeo já
+        # deixa o pé plantado no lugar. A raiz vai no tronco do quadro em guarda.
+        anchor = -1 if args.ancora == "fim" else 0
+        ref_x = xs[anchor]
+        # O tamanho que muda no meio do clipe (degrau da reescala) cresce em volta dos pés do
+        # quadro em guarda, não do tronco: pé plantado não anda quando o tamanho muda.
+        m = keyed[anchor][..., 3] > 128
+        bottom = np.nonzero(m.any(1))[0].max()
+        pivot = float(np.nonzero(m[bottom - 6:bottom + 1].any(0))[0].mean())
+        s_anchor = scale / args.reescala[anchor] if args.reescala else scale
     # Densidade d: a folha sai d vezes maior em px (célula, raiz, borda), mesma geometria lógica.
     d = args.densidade
     rx, ry = (int(v) for v in args.raiz.split(","))
@@ -393,6 +409,8 @@ def main(argv=None):
         if args.nitidez:
             img = sharpen(img, d)
         x = rx - round((ref_x - off) * s)
+        if args.fixar == "pes":
+            x = rx + round((pivot - ref_x) * s_anchor * d - pivot * s)
         bottom = int(np.nonzero((k[..., 3] > 128).any(1))[0].max()) if args.pe_no_chao else foot_y
         y = ry - round(bottom * s)
         # Cada quadro fica na própria célula: o que passa da borda é cortado, não invade a vizinha.
