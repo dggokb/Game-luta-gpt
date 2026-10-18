@@ -48,8 +48,8 @@ final class UltraDirector {
     static final Script PADRAO = new Script(new int[] {SIDE, LOW, WIDE}, 1f, 1f, false, 120);
     /** Ágil: planos abertos e a câmera girando de um lado para o outro a cada golpe. */
     static final Script AGIL = new Script(new int[] {WIDE, SIDE, WIDE, LOW}, 1.9f, 0.92f, true, 110);
-    /** Pesada: câmera baixa e closes, quase reta, bem perto. */
-    static final Script PESADA = new Script(new int[] {LOW, SIDE, LOW, CLOSE}, 0.6f, 1.1f, false, 135);
+    /** Pesada: câmera baixa e closes, quase reta. */
+    static final Script PESADA = new Script(new int[] {LOW, SIDE, LOW, CLOSE}, 0.6f, 1f, false, 135);
     /** Sombria: planos abertos tortos e fundo bem escuro. */
     static final Script SOMBRIA = new Script(new int[] {WIDE, LOW, WIDE, SIDE}, 1.4f, 0.96f, true, 175);
 
@@ -84,8 +84,12 @@ final class UltraDirector {
         return false;
     }
 
-    /** Zoom (sobre o da luta), inclinação (graus, a favor de quem bate) e ponto na tela. */
-    static final float[] ZOOM = {1.25f, 1.65f, 1.9f, 1.3f, 2.15f, 1f};
+    /**
+     * Zoom (sobre o da luta), inclinação (graus, a favor de quem bate) e ponto na tela. Mais
+     * aberto que antes (era 1,25 / 1,65 / 1,9 / 1,3 / 2,15): o close do último golpe ficava
+     * colado demais e os outros planos cortavam os corpos.
+     */
+    static final float[] ZOOM = {1.15f, 1.4f, 1.55f, 1.15f, 1.45f, 1f};
     static final float[] TILT = {0f, -6f, 9f, -3f, 4f, 0f};
     /** Aproximação lenta dentro de cada plano (até +4%). */
     static final float PUSH = 0.04f, PUSH_FRAMES = 40f;
