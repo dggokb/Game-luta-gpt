@@ -380,6 +380,9 @@ public class GameView extends SurfaceView
         hardware.reset();
         pad.reset();
         releaseAllPointers();
+        // O app saiu da tela (pausa da Activity): os dedos de antes não contam mais; ao voltar,
+        // o direcional só vale com um toque novo (nada de andar sozinho).
+        touchCount = 0;
     }
 
     private void releaseAllPointers() {
