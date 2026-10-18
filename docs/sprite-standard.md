@@ -118,13 +118,6 @@ formas de avanço:
 - `durationsMs`: um tempo positivo por frame;
 - `distancePerFrame`: distância percorrida para avançar, com `loop: true`.
 
-Loop com entrada: `loopFrom` (índice em `frames`, só em loop com `durationsMs`) faz os
-quadros antes dele tocarem uma vez e o loop voltar para `loopFrom`, nunca para o começo. É
-assim que a corrida sai da guarda (arrancada do próprio vídeo) sem repetir a arrancada a
-cada passada. O estado opcional `DASH_STOP` (one-shot) é a freada: toca quando a corrida
-para e o personagem fica parado, antes do `IDLE`; andar, pular ou atacar corta a freada.
-Pacote sem `DASH_STOP` vai da corrida direto para o `IDLE`, como antes.
-
 Animação de golpe também marca `impactFrame`: o índice (em `frames`) do quadro em que o
 golpe encosta. A animação estica sobre o frame data, e o build recusa o pacote se esse
 quadro não cair na janela ativa (com 1 quadro de folga antes). Os lutadores do time são

@@ -7,8 +7,7 @@ final class SpriteMotion {
         static final String IDLE=SpriteStates.IDLE, WALK_FORWARD=SpriteStates.WALK_FORWARD,
             WALK_BACK=SpriteStates.WALK_BACK, DASH=SpriteStates.DASH, BACKDASH=SpriteStates.BACKDASH,
             CROUCH=SpriteStates.CROUCH, RISE=SpriteStates.RISE, JUMP=SpriteStates.JUMP,
-            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT,
-            DASH_STOP=SpriteStates.DASH_STOP;
+            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT;
     }
     String clip=Clip.IDLE;
     float time,distance;
@@ -31,9 +30,6 @@ final class SpriteMotion {
         else if(!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) next=Clip.LAND;
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
         else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
-        // Run stopped: the brake (when the pack has one) plays before the idle.
-        else if(character.hasAnimation(Clip.DASH_STOP) && (clip.equals(Clip.DASH)
-            || (clip.equals(Clip.DASH_STOP) && time<character.animation(Clip.DASH_STOP).duration))) next=Clip.DASH_STOP;
         else if(clip.equals(Clip.CROUCH) || (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
         else next=Clip.IDLE;
         wasGrounded=grounded;

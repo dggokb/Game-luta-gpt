@@ -392,17 +392,10 @@
         8,
         9,
         10,
-        11,
-        12,
-        13,
-        14
+        11
       ],
       "loop": true,
-      "loopFrom": 3,
       "durationsMs": [
-        35,
-        35,
-        35,
         22,
         21,
         22,
@@ -415,22 +408,6 @@
         22,
         21,
         22
-      ]
-    },
-    "DASH_STOP": {
-      "atlas": "p02_dash",
-      "frames": [
-        15,
-        16,
-        17,
-        18
-      ],
-      "loop": false,
-      "durationsMs": [
-        40,
-        40,
-        40,
-        50
       ]
     },
     "BACKDASH": {

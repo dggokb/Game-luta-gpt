@@ -28,7 +28,6 @@ final class SpriteStates {
  static final String VICTORY = "VICTORY";
  static final String DEFEAT = "DEFEAT";
  static final String TAUNT = "TAUNT";
- static final String DASH_STOP = "DASH_STOP";
  static final String SPECIAL_CHARGE = "SPECIAL_CHARGE";
  static final String SPECIAL_ENERGY_CHARGED = "SPECIAL_ENERGY_CHARGED";
  static final String WALL_JUMP = "WALL_JUMP";
