@@ -48,6 +48,10 @@ final class AiController {
     static final double PUSHBLOCK_LOW_GUARD_CHANCE = 0.8;
 
     private static final int GUARD_NONE = 0, GUARD_HIGH = 1, GUARD_LOW = 2, GUARD_ANY = 3;
+    /** Hábito de esperar agachada quando o rival não está atacando (antes 0,35). */
+    static final double CALM_HABIT_SCALE = 0.1;
+    /** As duas alturas seguram, e ela defende em pé (o projétil do meio). */
+    private static final int GUARD_HIGH_ONLY = 4;
 
     private final OpponentAi ai;
     private final OpponentAi.Situation situation = new OpponentAi.Situation();
@@ -89,6 +93,9 @@ final class AiController {
     private boolean guardLow;
     /** A defesa atual é hábito (não viu ameaça): punir e tirar do ar passam na frente dela. */
     private boolean guardHabit;
+
+    /** Está esperando defendendo por hábito (não reagindo a nada que viu). */
+    boolean guardingByHabit() { return guardHabit && guardFrames > 0; }
     private int anticipationTimer;
     private int lastGuardSerial = -1, lastJumpSerial = -1, lastProjectileSerial = -1;
     private int lastOpponentAttackSerial = -1, lastOpponentAttackFrame = Integer.MIN_VALUE / 2;
@@ -211,6 +218,7 @@ final class AiController {
         justDefenseWait = 0;
         breakerWait = breakerHold = 0;
         lastBreakerSerial = -1;
+        breakerCombo = false;
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
         lastOpponentAttackSerial = -1;
@@ -240,6 +248,8 @@ final class AiController {
             return;
         }
         techDelay = -2;
+        // O próprio combo breaker ela sente na hora: o troco vem garantido.
+        if (me.comboBroke && engine.cues().contains("COMBO_BREAKER")) breakerCombo = true;
         if (me.frozen()) return;
         if (me.inHitstun()) betOnComboBreaker(engine, me, seen, out);
         else breakerWait = breakerHold = 0;
@@ -268,6 +278,7 @@ final class AiController {
             ownHitFrame = -1;
         }
 
+        if (breakerFollowUp(me, target, out)) return;
         if (fullKit && !target.ko() && fillKit(engine, me, target, seen, out)) return;
 
         if (cooldown > 0) cooldown--;
@@ -319,7 +330,9 @@ final class AiController {
         situation.targetAlive = !seen.ko;
         situation.superReady = me.state.superMeter >= CombatConfig.SUPER_COST;
         situation.projectileActive = engine.energyProjectileAlive(self);
-        situation.attackReady = cooldown <= 0;
+        // Caído no chão não leva golpe: bater nele é golpe perdido (e de onde ela o viu cair, que
+        // já não é onde ele está). Ela chega perto e espera ele levantar.
+        situation.attackReady = cooldown <= 0 && seen.status != CombatFighter.Status.KNOCKDOWN;
         situation.throwReach = throwReach(engine, me, target);
         situation.level = level;
         situation.style = CpuStyle.of(me.character());
@@ -391,7 +404,8 @@ final class AiController {
                         jumpOverProjectile = true;
                     } else {
                         int arrival = Math.round(Math.max(0f, now) / speed);
-                        if (decideGuard(seen.projectileLow ? GUARD_LOW : GUARD_ANY, arrival + 20)) {
+                        // Projétil do meio: defende em pé (parada, sem ficar agachada esperando ele chegar).
+                        if (decideGuard(seen.projectileLow ? GUARD_LOW : GUARD_HIGH_ONLY, arrival + 20)) {
                             planJustDefense(me, arrival);
                         }
                     }
@@ -431,7 +445,9 @@ final class AiController {
         if (Math.abs(seen.x - me.x) >= threatRange(me, target)) return false;
         boolean pressured = seen.frame - lastOpponentAttackFrame < 60;
         double p = level.guardAnticipation * CpuStyle.of(me.character()).patience;
-        p = pressured ? p + 0.25 * level.reactGuard : p * 0.35;
+        // Sem pressão (o rival não atacou há pouco) ela quase não fica agachada esperando: era o
+        // que mais a deixava parecendo grudada no chão. Pressionada, defende como antes.
+        p = pressured ? p + 0.25 * level.reactGuard : p * CALM_HABIT_SCALE;
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
         // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.
@@ -499,9 +515,42 @@ final class AiController {
         }
     }
 
+    /**
+     * Depois de quebrar o combo, sempre emenda o dela: o rival fica atordoado e colado (o
+     * estalo a puxa para perto), então ela abre a rota do caderno com o primeiro golpe que
+     * alcança. Sem nenhum ao alcance, corre até ele enquanto o atordoamento dura.
+     */
+    private boolean breakerFollowUp(CombatFighter me, CombatFighter target, FighterInput out) {
+        if (!breakerCombo) return false;
+        if (!target.inHitstun() || target.ko() || !me.grounded) {
+            breakerCombo = false;
+            return false;
+        }
+        if (!me.canAct()) return true;
+        // Onde o rival vai estar quando o golpe sair: ele ainda desliza do estalo.
+        float gap = gapAfterPush(me, target);
+        CharacterDefinition c = me.character();
+        for (String starter : new String[] {"L", "2L", "M", "2M"}) {
+            if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            startRoute(c, starter);
+            press(starter, me, out);
+            lastReason = "combo breaker";
+            breakerCombo = false;
+            return true;
+        }
+        movingBack = false;
+        movingForward = dashing = true;
+        out.direction = target.x > me.x ? 1 : 5;
+        out.dash = true;
+        return true;
+    }
+
+    private boolean breakerCombo;
+
     /** Quanto ela espera (no máximo) para apertar depois de ver o golpe, e quanto segura. */
     static final int BREAKER_GUESS_FRAMES = 10, BREAKER_HOLD_FRAMES = 6;
     private int breakerWait, breakerHold, lastBreakerSerial = -1;
+
 
     /** Quantos quadros antes do contato ela aperta a defesa perfeita (dentro da janela). */
     static final int JUST_DEFENSE_LEAD = 2;
@@ -514,7 +563,8 @@ final class AiController {
         boolean right = roll(level.guardHeight);
         if (required == GUARD_HIGH) guardLow = !right;
         else if (required == GUARD_LOW) guardLow = right;
-        else guardLow = true;   // agachada segura qualquer golpe no chão
+        else if (required == GUARD_HIGH_ONLY) guardLow = false;
+        else guardLow = true;   // golpe do meio: agachada segura ele e os baixos (o certo a fazer)
         guardFrames = Math.max(guardFrames, frames);
         return true;
     }
@@ -567,7 +617,10 @@ final class AiController {
             // Empurrado (no chão ou lançado): ela viu o corpo deslizando e conta com o fim do
             // deslize, em vez de esticar a velocidade do deslize como se fosse um passo.
             x += seen.push;
-        } else if (before != null && seen.grounded && before.grounded) {
+        } else if (before != null && seen.grounded && before.grounded &&
+            seen.status == CombatFighter.Status.NEUTRAL && before.status == CombatFighter.Status.NEUTRAL) {
+            // Só o andar/correr do rival continua no mesmo ritmo: o deslizar de quem apanhou ou
+            // caiu freia e para (levar adiante passava do ponto e ela batia de longe).
             x += (seen.x - before.x) / MOTION_SAMPLE * level.reactionFrames;
         }
         // O próprio golpe ela sente na hora: sabe onde o rival estava quando encostou e quanto
@@ -592,10 +645,17 @@ final class AiController {
     /** Anota o encostar do próprio golpe neste passo (o que ela sente, não o que vê). */
     private void feelContact(CombatEngine engine, int self, CombatFighter me, CombatFighter target) {
         for (CombatEngine.HitEvent event : engine.events()) {
-            if (event.attacker != self || !me.attacking()) continue;
-            AttackDefinition attack = me.attack;
+            if (event.attacker != self) continue;
+            if (event.projectile) {
+                // O próprio projétil: ela já pode estar livre (não atacando), mas sabe quanto ele
+                // empurra, como sabe o dos golpes; o empurrão é o que o acerto deixou no rival.
+                contactPush = Math.abs(target.pushRemaining);
+            } else if (me.attacking()) {
+                contactPush = event.blocked ? me.attack.pushbackOnBlock : me.attack.pushbackOnHit;
+            } else {
+                continue;
+            }
             contactFrame = engine.frame();
-            contactPush = event.blocked ? attack.pushbackOnBlock : attack.pushbackOnHit;
             contactSide = target.x >= me.x ? 1 : -1;
             contactTargetX = target.x;
         }

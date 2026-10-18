@@ -79,7 +79,8 @@ public class CpuTest {
                     if (i == jumpAt) f.player.direction = 8;   // pulo para frente
                     if (i == jumpAt + 1) f.player.direction = 0;
                     f.step();
-                    boolean guardsHigh = f.out.direction == 1 && f.c().facing < 0;   // segurando para trás
+                    // Segurando para trás em reação (a espera em pé por hábito não é reação ao pulo).
+                    boolean guardsHigh = f.out.direction == 1 && f.c().facing < 0 && !f.cpu.guardingByHabit();
                     boolean antiAir = "antiaereo".equals(f.cpu.lastReason) && f.out.heavy;
                     if (i > jumpAt && (guardsHigh || antiAir)) reaction = i;
                 }
@@ -147,7 +148,8 @@ public class CpuTest {
         double delay = 0;
         AttackDefinition h = WHIFFER.attack("H");
         int recoveryStart = h.startupFrames + h.activeFrames;
-        for (long seed = 1; seed <= 96; seed++) {
+        // Muitas sementes: calma, a CPU muitas vezes ataca antes do erro (tentativa que não vale).
+        for (long seed = 1; seed <= 400; seed++) {
             Fight f = new Fight(WHIFFER, BASE, 110f, level, seed);
             for (int i = 0; i < 30; i++) f.step();   // a CPU passa a ver a luta
             if (!f.p().canAct() || !f.c().canAct()) continue;

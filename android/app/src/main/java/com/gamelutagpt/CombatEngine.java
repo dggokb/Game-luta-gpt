@@ -373,6 +373,12 @@ final class CombatEngine {
                 f.motion.charged(true, clock, config.chargeFrames, config.chargeKeepFrames)) {
                 f.jumpGrace = config.chargeJumpGraceFrames;
             }
+        } else if (ControlsLayout.isUpDirection(relative) && f.grounded && f.pendingJumpAge < 0 &&
+            f.jumpGrace == 0 && f.status == CombatFighter.Status.NEUTRAL) {
+            // ↑ (ou diagonal para cima) seguro desde antes de poder agir — no fim de um golpe, da
+            // defesa, da queda: pula assim que fica livre, como nos jogos de luta. Antes só o
+            // instante de entrar no ↑ valia, e quem já estava segurando não pulava.
+            requestJump(f, false);
         }
         if (in.jump || in.superJump) requestJump(f, in.superJump);
         if (f.motion.doubleTap(1, clock, config.doubleTapFrames) || in.dash) f.dashRequest = true;

@@ -2214,6 +2214,9 @@ public class GameView extends SurfaceView
      * Combo breaker: brilho na cor de quem quebrou no peito dele, estalo em quem teve o combo
      * quebrado, tremida e o som do punish.
      */
+    static final int BREAKER_SLOW_FRAMES = 36;
+    static final float BREAKER_SLOW_SCALE = 0.5f;
+
     private void spawnComboBreaker() {
         for (int side = 0; side < 2; side++) {
             CombatFighter breaker = engine.fighter(side), broken = engine.fighter(1 - side);
@@ -2225,6 +2228,8 @@ public class GameView extends SurfaceView
         }
         beamShake = Math.max(beamShake, 16f);
         ultraSounds.playFight("punish", 1f, 1.15f);
+        // Câmera lenta leve: dá para ver o que aconteceu (o golpe que não entrou e o estalo).
+        feel.slow(BREAKER_SLOW_FRAMES, BREAKER_SLOW_SCALE);
     }
 
     /**

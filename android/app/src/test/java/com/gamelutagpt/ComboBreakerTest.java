@@ -125,4 +125,42 @@ public class ComboBreakerTest {
         assertFalse(m.engine.cues().contains("COMBO_BREAKER"));
         assertEquals(3, m.engine.session(1).hitCount);
     }
+
+    /** A CPU que quebra o combo sempre emenda o dela no atordoado. */
+    @Test public void theCpuAlwaysCombosAfterItsBreaker() {
+        for (int level = 1; level <= 8; level++) {
+            int contact = Match.contactOf("H");
+            Match m = new Match();
+            m.cpu.superMeter = CombatConfig.METER_PER_BAR;
+            AiController ai = new AiController(new OpponentAi(new java.util.Random(level)), new java.util.Random(level * 7L));
+            ai.setEnabled(true);
+            ai.setLevel(level);
+            String[] seq = {"L", "M", "H"};
+            int k = 0;
+            m.in[0].light = true;
+            boolean broke = false;
+            for (int i = 0; i < 90 && !broke; i++) {
+                ai.fill(m.engine, 1, m.in[1]);
+                // O aperto em cima da hora (o que a CPU às vezes acerta no palpite), garantido aqui.
+                m.in[1].direction = i >= contact - 3 && i <= contact ? m.back(1) : 0;
+                m.in[1].light = m.in[1].medium = m.in[1].heavy = false;
+                m.step();
+                for (CombatEngine.HitEvent h : m.engine.events()) {
+                    if (h.attacker == 0 && !h.blocked && k < 2) {
+                        k++;
+                        if ("M".equals(seq[k])) m.in[0].medium = true; else m.in[0].heavy = true;
+                    }
+                }
+                broke = m.engine.cues().contains("COMBO_BREAKER");
+            }
+            assertTrue("nível " + level + ": quebrou", broke);
+            boolean counter = false;
+            for (int i = 0; i < 60 && !counter; i++) {
+                ai.fill(m.engine, 1, m.in[1]);
+                m.step();
+                for (CombatEngine.HitEvent h : m.engine.events()) if (h.attacker == 1 && !h.blocked) counter = true;
+            }
+            assertTrue("nível " + level + ": depois do breaker a CPU emenda o combo", counter);
+        }
+    }
 }
