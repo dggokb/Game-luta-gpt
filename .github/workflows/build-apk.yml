@@ -21,7 +21,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Só o APK, sem os testes: sai em poucos minutos para instalar e testar no celular. Os testes
+  # (job "build", em paralelo) continuam valendo: se algum cair, o run fica vermelho mesmo com
+  # o APK já disponível.
+  apk:
+    name: APK (rápido, sem testes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      # Python + Pillow: a calibração do P01 é gerada no build.
+      - name: Install sprite pipeline dependency
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+
+      # Sem verifySpritePacks: a conferência das folhas (a parte demorada) fica no job de testes.
+      - name: Build debug APK (sem testes)
+        working-directory: android
+        run: gradle assembleDebug -x verifySpritePacks --stacktrace
+
+      # O APK vai como .apk mesmo, sem zip (upload-artifact v7 com archive: false): baixa no
+      # celular e instala direto. Sem zip só vai um arquivo, e o nome dele vira o do artefato.
+      - name: Nome do APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/GameLutaGPT.apk"
+      - name: Upload APK
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ runner.temp }}/GameLutaGPT.apk
+          archive: false
+          if-no-files-found: error
+
   build:
+    name: Testes, folhas e smoke no emulador
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -82,7 +128,7 @@ jobs:
             tools/sprites/reports/*.report.json
           if-no-files-found: warn
 
-      - name: Build debug APK
+      - name: Tests and debug APK
         working-directory: android
         shell: bash
         run: |
@@ -126,17 +172,7 @@ jobs:
           path: android/app/build/sprite-cache
           key: ${{ steps.sprite-cache.outputs.cache-primary-key }}
 
-      # O APK vai como .apk mesmo, sem zip (upload-artifact v7 com archive: false): baixa no
-      # celular e instala direto. Sem zip só vai um arquivo, e o nome dele vira o do artefato.
-      - name: Nome do APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/GameLutaGPT.apk"
-      - name: Upload APK
-        uses: actions/upload-artifact@v7
-        with:
-          path: ${{ runner.temp }}/GameLutaGPT.apk
-          archive: false
-          if-no-files-found: error
-
+      # O APK para baixar sai do job "apk" (rápido); este aqui monta o seu só para o smoke.
       # Without KVM the emulator runs in software and takes ~15 min just to boot.
       - name: Enable emulator hardware acceleration
         if: github.ref == 'refs/heads/game-luta-sprite-gpt'
