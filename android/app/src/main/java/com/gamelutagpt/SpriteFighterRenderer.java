@@ -131,16 +131,11 @@ final class SpriteFighterRenderer {
             if(fade<1f)drawAtlas(canvas,anim.atlas,frame,x,baseY,
                 P01_RISE_X[i],P01_RISE_Y[i],Math.round(255*(1f-fade)));
             if(fade>0f)drawP01Idle(canvas,x,baseY,Math.round(255*fade));
-        } else if(p01 && SpriteStates.INTRO.equals(motion.clip)) {
-            // The intro's natural silhouette changes from narrow to a
-            // fighting stance: normalize every frame, then crossfade to idle.
-            float fade=clamp01((frame-22f)/4f);
-            if(fade<1f) drawP01Calibrated(canvas,anim,frame,x,baseY,
-                Math.round(255*(1f-fade)));
-            if(fade>0f) drawP01Idle(canvas,x,baseY,Math.round(255*fade));
         } else if(p01) {
-            // Every other P01 state, including all attacks, hit, air, guard,
-            // recovery, dash, throw, victory and taunt, uses the same master.
+            // Every other P01 state, including intro, attacks, hit, air, guard,
+            // recovery, dash, throw, victory and taunt, uses the same master. The intro
+            // has one size and ends where the IDLE starts (desenhoP01): a plain cut, no
+            // crossfade (it doubled the image).
             drawP01Calibrated(canvas,anim,frame,x,baseY,255);
         } else {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,1f,1f,255);

@@ -19,8 +19,13 @@
     "art/sprites/source/player_base_intro_video_normalized.png"
   ],
   "pixelScale": 2.0,
-  "ajusteTamanho": 0.99,
   "regua": [
-    "ajuste no app 20261014-0532: 99% (INTRO)"
-  ]
+    "ajuste no app 20261014-0532: 99% (INTRO)",
+    "20261018: calibração quadro a quadro trocada por desenhoP01 (tamanho único)"
+  ],
+  "desenhoP01": {
+    "escala": 0.9307,
+    "dx": -10.3,
+    "motivo": "tamanho único (régua da cabeça na própria folha: cabeça 5% maior que a do IDLE, igual em todos os quadros; 0,98 / 1,05) e um deslocamento só (o tronco do fim no do IDLE); antes era 0,81-1,05 quadro a quadro pela altura e recentrado pela caixa, o zoom e o deslize. O vídeo do intro do p01 não está no Drive."
+  }
 }

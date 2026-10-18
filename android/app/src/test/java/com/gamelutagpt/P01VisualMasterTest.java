@@ -67,6 +67,6 @@ public class P01VisualMasterTest {
     }
 
     @Test public void appSizeAdjustmentIsRecordedOnTheCalibration() {
-        assertEquals(.99f,P01SpriteCalibration.tuned("player_base_intro"),1e-4f);
+        assertEquals(.96f,P01SpriteCalibration.tuned("player_base_jump"),1e-4f);
     }
 }

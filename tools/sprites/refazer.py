@@ -426,49 +426,7 @@ def size_pass(cid, done, scratch):
         changed = True
     if changed:
         build()
-    seam_level(cid, done, scratch)
     return [a for a, *_ in done]
-
-
-SEAM_TOL = 0.02  # emenda a ±2% do IDLE fica como está
-
-
-def seam_level(cid, done, scratch, apply=True):
-    """Ponta do clipe na mesma pose da guarda do IDLE (silhuetas encaixam, regua.POSE_IOU): o
-    jogo troca ali, então ela tem o tamanho do IDLE. Vale sobre a régua da cabeça: o Seedance às
-    vezes desenha o personagem com outra proporção num vídeo (vitoria.mp4 do p01: cabeça maior,
-    a cabeça encolhia o corpo 14%). O degrau de tamanho dentro do clipe continua o da cabeça.
-    Devolve {folha: fator} das emendas fora do IDLE."""
-    import regua
-    p = regua.Pack(cid)
-    atlases = {a for a, *_ in done}
-    idle_atlas = p.anim('IDLE')['atlas']
-    best = {}
-    for s in regua.seams(p):
-        atlas = p.anim(s['estado'])['atlas']
-        if s['ref'] != 'guarda' or not s['mesma_pose'] or atlas not in atlases or atlas == idle_atlas:
-            continue
-        if atlas not in best or s['iou'] > best[atlas]['iou']:
-            best[atlas] = s
-    out = {}
-    for atlas, s in best.items():
-        if abs(s['fator'] - 1) <= SEAM_TOL:
-            continue
-        out[atlas] = s['fator']
-        print(f"{atlas}: {s['estado']} {s['ponta']} na pose do IDLE (encaixe {s['iou']:.2f}) com "
-              f"{s['fator']:.0%} do tamanho dele", flush=True)
-        if not apply:
-            continue
-        _, path, video, _, _, ref, _ = next(d for d in done if d[0] == atlas)
-        v = read(path)['video']
-        base = float(v['escala']) / s['fator']
-        note = v.get('motivo', '') + (f"; emenda {s['estado']} {s['ponta']} na pose do IDLE: escala base "
-                                      f"{base:.4f} (o tamanho do IDLE)")
-        reescala = ','.join(f'{x:.4f}' for x in v['reescala'])
-        convert_pair(video, path, ['--escala', f'{base:.4f}', '--motivo', note, '--reescala', reescala], ref, scratch)
-    if out and apply:
-        build()
-    return out
 
 
 MAX_SIDE = 4096    # lado máximo da folha: a empacotada do jogo e a grade HD fonte (test_hd_video)

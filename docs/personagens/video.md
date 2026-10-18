@@ -234,12 +234,6 @@ personagem desliza parada (~12 px no INTRO da p02). INTRO, VICTORY, TAUNT e CROU
 que termina nela) e o degrau de tamanho crescendo em volta dos pés desse quadro. Golpes
 ficam como estão (a posição do desenho é a das caixas ajustadas).
 
-Emenda com o IDLE: ponta do clipe na mesma pose da guarda do IDLE (silhuetas encaixam 0,85+)
-tem o tamanho do IDLE, porque o jogo troca ali; isso fixa o nível do clipe acima da régua da
-cabeça (o Seedance às vezes desenha o personagem com outra proporção num vídeo: no
-vitoria.mp4 do p01 a cabeça é maior e a régua encolhia o corpo 14%). Os degraus dentro do
-clipe continuam os da cabeça.
-
 Tempo: o tempo de cada quadro antigo é dividido entre os novos; animação de ritmo uniforme
 sem impacto (idle, corrida, vitória) fica uniforme na folha nova (senão o fim do ciclo fica
 com quadro dobrado e a animação engasga). HD ou 1x: HD quando a folha empacotada (a caixa
@@ -248,7 +242,9 @@ desenhada de cada quadro, a 2x) cabe em 4096 px; a grade fonte pode ser maior.
 p01 (`player_base`): as folhas refeitas não passam pela calibração quadro a quadro de
 `generate_p01_calibration.py` (fatores à mão e recentralização pela caixa, que fazia o corpo
 deslizar com os braços): são desenhadas como o IDLE (0,98). O vídeo do intro do p01 não está
-no Drive (pasta p01), então o INTRO dele ainda é a folha antiga.
+no Drive (pasta p01): o INTRO é a folha antiga, mas com um tamanho e um deslocamento só
+(`desenhoP01` na receita: a cabeça medida na própria folha, igual em todos os quadros) em vez
+da altura quadro a quadro (0,81 a 1,05: zoom no meio do intro), e corta direto para o IDLE.
 
 ## Tamanho pelo esqueleto (qualquer pose)
 

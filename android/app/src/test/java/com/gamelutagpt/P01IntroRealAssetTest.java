@@ -16,8 +16,12 @@ import static org.junit.Assert.*;
  */
 @RunWith(RobolectricTestRunner.class)
 public class P01IntroRealAssetTest {
-    @Test public void introCorrectionsLoadOnlyForP01IntroAndPreserveApprovedVictory()
-            throws Exception {
+    /**
+     * O intro do p01 tem um tamanho só e um deslocamento só (desenhoP01 na receita): as
+     * correções quadro a quadro do sprite-autofix e a normalização pela altura (0,81 a 1,05,
+     * o zoom no meio da animação) saíram. Tempo e quadros continuam os mesmos.
+     */
+    @Test public void introHasOneSizeAndNoPerFrameCorrection() throws Exception {
         Context ctx=RuntimeEnvironment.getApplication();
         ByteArrayOutputStream bytes=new ByteArrayOutputStream();
         try(InputStream stream=ctx.getAssets().open("sprite-autofix.json")) {
@@ -26,46 +30,25 @@ public class P01IntroRealAssetTest {
         }
         try {
             SpriteAutoFix.replaceFromJson(new String(bytes.toByteArray(),StandardCharsets.UTF_8));
-            assertEquals("Victory 33 frames + INTRO 27 frames",60,SpriteAutoFix.count());
-            int active=0;
-            for(int frame=0;frame<27;frame++) {
-                SpriteAutoFix.Adjustment a=SpriteAutoFix.get(
-                    "player_base","player_base_intro",frame);
-                assertEquals("Never resize artwork",1f,a.size,.00001f);
-                assertEquals("Never vertically shift artwork",0f,a.dy,.00001f);
-                assertTrue("Safe atlas pixel correction",Math.abs(a.dx)<=45f);
-                if(Math.abs(a.dx)>.00001f)active++;
-                assertEquals("Idle MUST stay untouched",0f,
-                    SpriteAutoFix.get("player_base","player_base_idle",frame).dx,.00001f);
-                assertEquals("Other characters untouched",0f,
-                    SpriteAutoFix.get("p02","player_base_intro",frame).dx,.00001f);
-            }
-            assertEquals(26,active);
-            assertEquals(0f,SpriteAutoFix.get("player_base","player_base_intro",0).dx,.00001f);
-            assertEquals(-44.6512f,SpriteAutoFix.get("player_base","player_base_intro",16).dx,.0002f);
-            assertEquals(9.3023f,SpriteAutoFix.get("player_base","player_base_intro",22).dx,.0002f);
-            assertEquals(9.3023f,SpriteAutoFix.get("player_base","player_base_intro",26).dx,.0002f);
             CharacterDefinition.Animation intro=GeneratedCharacters.get("player_base")
                 .animation(SpriteStates.INTRO);
             assertEquals("same original frame count",27,intro.atlas.count);
+            float[] first=P01SpriteCalibration.get("player_base_intro",0);
+            for(int frame=0;frame<27;frame++) {
+                SpriteAutoFix.Adjustment a=SpriteAutoFix.get("player_base","player_base_intro",frame);
+                assertEquals(1f,a.size,.00001f);
+                assertEquals(0f,a.dx,.00001f);
+                assertEquals(0f,a.dy,.00001f);
+                assertArrayEquals("um tamanho só, quadro "+frame,first,
+                    P01SpriteCalibration.get("player_base_intro",frame),0f);
+            }
+            assertEquals(.9307f,first[0],.0001f);
             assertEquals(0,intro.frame(0f,0f));
             assertEquals(26,intro.frame(intro.timeOfFrame(26),0f));
             assertEquals(.09f,intro.timeOfFrame(1)-intro.timeOfFrame(0),.0001f);
             assertEquals(.06f,intro.timeOfFrame(17)-intro.timeOfFrame(16),.0001f);
             assertEquals(.135f,intro.timeOfFrame(24)-intro.timeOfFrame(23),.0001f);
             assertEquals(2.4f,intro.duration,.0001f);
-            int changed=0;
-            for(int frame=0;frame<33;frame++) {
-                SpriteAutoFix.Adjustment v=SpriteAutoFix.get(
-                    "player_base","player_base_victory",frame);
-                assertEquals(1f,v.size,.00001f);
-                assertEquals(0f,v.dy,.00001f);
-                if(frame<7) assertEquals(0f,v.dx,.00001f);
-                if(Math.abs(v.dx)>.0001f)changed++;
-            }
-            assertEquals("VICTORY approved offsets must not change",22,changed);
-            assertEquals(-6.0577f,
-                SpriteAutoFix.get("player_base","player_base_victory",32).dx,.0001f);
         } finally {
             SpriteAutoFix.replaceFromJson("{\"schema\":1,\"corrections\":[]}");
         }

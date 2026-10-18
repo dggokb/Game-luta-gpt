@@ -2830,10 +2830,10 @@ final class GeneratedSpriteLayouts {
     static final int ULTRA_BEAM_ROOT_Y = 465;
     static final int ULTRA_BEAM_FRAME_COUNT = 9;
 
-    static final int VICTORY_FRAME_WIDTH = 177;
-    static final int VICTORY_FRAME_HEIGHT = 307;
-    static final int VICTORY_ROOT_X = 87;
-    static final int VICTORY_ROOT_Y = 294;
+    static final int VICTORY_FRAME_WIDTH = 156;
+    static final int VICTORY_FRAME_HEIGHT = 268;
+    static final int VICTORY_ROOT_X = 76;
+    static final int VICTORY_ROOT_Y = 255;
     static final int VICTORY_FRAME_COUNT = 97;
 
     static final int WALK_BACK_SET_FRAME_WIDTH = 327;

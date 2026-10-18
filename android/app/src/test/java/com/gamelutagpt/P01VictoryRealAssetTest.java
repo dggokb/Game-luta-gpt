@@ -38,8 +38,6 @@ public class P01VictoryRealAssetTest {
                 assertEquals(0f,fix.dy,0.00001f);
                 assertEquals(.98f,P01SpriteCalibration.get("player_base_victory",frame)[0],.0001f);
             }
-            // O intro (folha antiga, sem vídeo) continua com as correções publicadas.
-            assertEquals(-1.8605f,SpriteAutoFix.get("player_base","player_base_intro",1).dx,.0001f);
         } finally {
             SpriteAutoFix.replaceFromJson("{\"schema\":1,\"corrections\":[]}");
         }

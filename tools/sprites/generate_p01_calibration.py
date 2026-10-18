@@ -79,6 +79,13 @@ def compute():
         if key in SKIP:
             audit[key] = {"frames": len(report["frames"]), "mode": "existing calibrated transition"}
             continue
+        fixed = json.loads((CLIPS / f"{key}.json").read_text()).get("desenhoP01") if (CLIPS / f"{key}.json").exists() else None
+        if fixed:
+            # Um tamanho e um deslocamento para a folha toda (gravados na receita): normalizar
+            # cada quadro pela altura dava zoom no meio da animação.
+            data[key] = [(fixed["escala"], fixed["escala"], fixed["dx"], 0.0)] * len(report["frames"])
+            audit[key] = {"frames": len(report["frames"]), "mode": "tamanho único (desenhoP01)"}
+            continue
         if redone(key):
             # Mesmo tamanho do IDLE desenhado (P01_IDLE_SCALE), sem mexer quadro a quadro.
             data[key] = [(STAND_SCALE, STAND_SCALE, 0.0, 0.0)] * len(report["frames"])
