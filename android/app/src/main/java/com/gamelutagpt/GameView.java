@@ -1590,7 +1590,8 @@ public class GameView extends SurfaceView
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
-        boolean punishNow = engine.cues().contains("PUNISH");
+        // A voadora da troca que acerta gira o rival como o punish: mesmo impacto e tremor.
+        boolean punishNow = engine.cues().contains("PUNISH") || engine.cues().contains("SPIN");
         for (CombatEngine.HitEvent event : engine.events()) {
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
@@ -1609,7 +1610,8 @@ public class GameView extends SurfaceView
             String banner = bannerFor(cue);
             if (banner != null) showBanner(banner);
             // Bounces shake the screen like the beam's hits.
-            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue)) {
+            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue) ||
+                "SPIN".equals(cue)) {
                 beamShake = Math.max(beamShake, 14f);
             }
             if ("GROUND_BOUNCE".equals(cue)) {
@@ -2370,8 +2372,9 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** A troca do jogador no desenho (a voadora da entrada já é luta: o CPU defende ou tira do ar). */
     private boolean isTagAnimationActive() {
-        return engine.team(PLAYER).tagging();
+        return engine.team(PLAYER).tagAnimating();
     }
 
     /** Sprite offset of the point during a raw tag (it runs off screen and back). */

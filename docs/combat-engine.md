@@ -693,7 +693,7 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
 | --- | --- |
 | **TAG** | Chama o parceiro como **assist**: ele entra correndo atrás do ponto (`assistBehind` 70 px, 8 frames), faz o golpe que o pack declara (`fighter.assist.move`) e sai (10 frames). Recarga de 240 frames (4 s). |
 | **TAG de novo** enquanto o assist entra ou golpeia | **Assist → Tag**: quando o golpe do assist termina, ele fica como o novo ponto onde está e o antigo sai correndo. O combo continua com o novo ponto. Recusado (o assist só sai) se o ponto estiver apanhando, defendendo, caído ou no ultra. Depois: 300 frames sem assist nem troca. |
-| **↓ + TAG** | **Troca direta**, igual à de antes: o ponto sai correndo (20 frames), o parceiro entra (23) e posa (27), sem poder agir. Só em NEUTRAL. Recarga de 600 frames (10 s). |
+| **↓ + TAG** | **Troca direta com voadora** (como no Marvel vs. Capcom): o ponto sai correndo (20 frames) e o parceiro entra pelo alto numa voadora até o rival (`VoadoraTroca`). Só em NEUTRAL. Recarga de 600 frames (10 s), contada quando a voadora acaba. |
 
 - Os botões são lidos sem precisar segurar: tocar e segurar se confundiriam e atrasariam o
   assist. O pedido fica no buffer por `bufferFrames`, então dá para chamar o assist
@@ -708,6 +708,24 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
   assist) vai para o ponto a cada frame, e na troca a barra vai com quem entra. O HUD e
   todos os custos leem a barra do ponto.
 - Um lado com um membro só (o boneco de treino) nunca troca nem chama assist.
+
+**A voadora da troca** (`VoadoraTroca`, fase `TeamSystem.TAG_KICK`):
+
+- Quem entra aparece `HEIGHT` (330) acima do chão e `BEHIND` (200) atrás de onde o ponto
+  estava, virado para o rival, e já está lutando: não fica travado, pode ser atingido, e o
+  rival pode defender ou dar anti-aéreo (`tagAnimating()` é falso nessa fase).
+- É um mergulho (`Mechanics.dive`): 4 frames parado no alto, depois desce a 900/s na
+  diagonal batendo a descida inteira. A velocidade para frente sai na hora para chegar no
+  rival quando toca o chão, entre 250 e 1500/s (rival muito longe: cai antes).
+- Montada do chute no ar de cada lutador (jH, ou jM): dano 110% do chute, hitstun 30,
+  blockstun 16, sem cancelamento. O desenho segura a pose do chute durante a descida.
+- **Acertou: o rival sai girando** (`AttackDefinition.spin`), o mesmo giro do punish
+  counter: voa num arco médio, ainda pode levar juggle e cai deitado, sem tech no ar. Cue
+  `SPIN`, com o impacto e o tremor de tela do punish. **Defendida ou no vento**: só cai com
+  a recuperação do mergulho.
+- A troca acaba quando a voadora acaba (no chão, ou apanhando no caminho); aí conta a recarga.
+- A troca da cinemática (`tagToStarter`, devolve o titular) e a entrada depois de um K.O.
+  continuam entrando correndo. Lutador sem chute no ar também entra correndo.
 
 Valores em `CombatConfig.tag*` e `CombatConfig.assist*`. Testes em `TeamSystemTest`.
 

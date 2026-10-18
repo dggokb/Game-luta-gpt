@@ -61,6 +61,78 @@ public class TeamSystemTest {
         assertFalse("cooldown", m.team().tagging());
     }
 
+    /** ↓ + TAG: quem entra vem do alto, atrás de quem saiu, numa voadora até o rival. */
+    @Test public void rawTagEntersWithAFlyingKickThatSpinsTheRival() {
+        Match m = new Match(500f, 800f);
+        int life = m.f(1).state.life;
+        m.rawTag();
+        m.steps(m.config().tagExitFrames);
+        assertSame(m.second, m.f(0).state);
+        assertEquals(TeamSystem.TAG_KICK, m.team().tagPhase);
+        assertTrue("já está na voadora", m.f(0).attacking());
+        assertEquals(VoadoraTroca.ID, m.f(0).attack.id);
+        assertFalse("é luta de verdade, não desenho", m.f(0).locked);
+        assertFalse(m.team().tagAnimating());
+        assertFalse("vem do alto", m.f(0).grounded);
+        assertEquals(Arena.GROUND_Y - VoadoraTroca.HEIGHT, m.f(0).y, 0.5f);
+        assertTrue("vem de trás", m.f(0).x < 500f);
+
+        boolean spun = false;
+        for (int i = 0; i < 120 && m.f(1).state.life == life; i++) {
+            m.step();
+            spun |= m.engine.cues().contains("SPIN");
+        }
+        assertTrue("a voadora acertou", m.f(1).state.life < life);
+        assertTrue("cue do giro", spun);
+        assertEquals("sai girando no ar", CombatFighter.Status.AIR_HITSTUN, m.f(1).status);
+        assertTrue(m.f(1).spinning);
+        assertTrue("cai deitado", m.f(1).hardFall);
+
+        m.until(() -> !m.team().tagging(), 120);
+        assertTrue("a troca acaba no chão", m.f(0).grounded);
+        assertEquals(m.config().tagCooldownFrames, m.team().tagCooldown, 2);
+    }
+
+    @Test public void aBlockedFlyingKickDoesNotSpin() {
+        Match m = new Match(500f, 800f);
+        m.in[1].direction = 1; // o rival olha para a esquerda: → é para trás, defendendo
+        m.rawTag();
+        boolean blocked = false, spun = false;
+        for (int i = 0; i < 160 && m.team().tagging(); i++) {
+            m.in[1].direction = 1;
+            m.step();
+            spun |= m.engine.cues().contains("SPIN");
+            for (CombatEngine.HitEvent e : m.engine.events()) {
+                if (e.attacker == 0 && VoadoraTroca.ID.equals(e.moveId)) blocked |= e.blocked;
+            }
+        }
+        assertTrue("defendida", blocked);
+        assertFalse("defendida não gira", spun);
+        assertFalse(m.f(1).spinning);
+        assertFalse(m.team().tagging());
+    }
+
+    @Test public void theKickReachesARivalFarAwayButNotAcrossTheWholeScreen() {
+        float near = VoadoraTroca.forwardSpeed(300f, 600f, 40f);
+        float far = VoadoraTroca.forwardSpeed(300f, 900f, 40f);
+        assertTrue("mais longe, mais rápida", far > near);
+        assertEquals(VoadoraTroca.MAX_FORWARD, VoadoraTroca.forwardSpeed(0f, 5000f, 40f), 0.01f);
+        assertEquals(VoadoraTroca.MIN_FORWARD, VoadoraTroca.forwardSpeed(300f, 310f, 40f), 0.01f);
+    }
+
+    /** A troca da cinemática (quem começou a luta) continua entrando correndo. */
+    @Test public void theCinematicTagStillRunsIn() {
+        Match m = new Match(500f, 1100f);
+        // Quem está na luta não é quem começou: a cinemática devolve o titular.
+        m.team().point = 1;
+        m.engine.setFighterState(0, m.second);
+        assertTrue(m.engine.teams.tagToStarter(0, m.f(0)));
+        m.steps(m.config().tagExitFrames);
+        assertEquals(TeamSystem.TAG_ENTER, m.team().tagPhase);
+        assertTrue(m.team().tagAnimating());
+        assertTrue(m.f(0).grounded);
+    }
+
     @Test public void assistComesInHitsTheOpponentAndLeaves() {
         Match m = new Match(500f, 600f);
         float pointX = m.f(0).x;

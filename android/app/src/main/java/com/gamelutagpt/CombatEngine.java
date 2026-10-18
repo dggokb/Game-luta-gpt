@@ -260,6 +260,34 @@ final class CombatEngine {
         return true;
     }
 
+    /**
+     * Troca com voadora ({@link VoadoraTroca}): quem acabou de entrar sai do alto, atrás de onde
+     * estava quem saiu, e desce em diagonal até o rival. Falso se o lutador não tem chute no ar
+     * (a troca então entra correndo, como antes).
+     */
+    boolean startTagKick(CombatFighter f) {
+        CombatFighter rival = fighters[1 - f.index];
+        int toward = rival.x >= f.x ? 1 : -1;
+        float startX = Arena.clamp(f.x - toward * VoadoraTroca.BEHIND, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        int facing = rival.x >= startX ? 1 : -1;
+        float close = (f.body().halfWidth + rival.body().halfWidth) * 0.5f;
+        CharacterDefinition.Move kick = VoadoraTroca.from(f.character(),
+            VoadoraTroca.forwardSpeed(startX, rival.x, close));
+        if (kick == null) return false;
+        f.x = startX;
+        f.y = Arena.GROUND_Y - VoadoraTroca.HEIGHT;
+        f.grounded = false;
+        f.vx = f.vy = 0f;
+        f.facing = facing;
+        f.superJumping = false;
+        f.jumpMode = CombatFighter.PULO_LIVRE;
+        f.locked = false;
+        startAttack(f, kick.attack, "H", 0);
+        f.move = kick;
+        cues.add("TAG_KICK");
+        return true;
+    }
+
     /** Tag: the slot now plays another team member. Any action in progress is dropped. */
     void setFighterState(int index, FighterState state) {
         CombatFighter f = fighters[index];
@@ -2527,9 +2555,10 @@ final class CombatEngine {
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
 
-        if (punish) {
+        boolean spinHit = attack.spin && lastStrike && !projectile;
+        if (punish || spinHit) {
             // Spinning knockdown: flies away in a medium arc, still open to a juggle, and
-            // lands lying down (no air tech).
+            // lands lying down (no air tech). Also the tag's flying kick (VoadoraTroca).
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.grounded = false;
             d.y -= 2f;
@@ -2543,7 +2572,7 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.spinHitstunFrames);
             d.pushRemaining = 0f;
             d.pushFramesLeft = 0;
-            cues.add("PUNISH");
+            cues.add(punish ? "PUNISH" : "SPIN");
         } else if (wallBounce) {
             // Sent flying to the wall (arena edge or screen edge); it bounces in moveHorizontally.
             session.wallBounces++;

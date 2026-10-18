@@ -10,6 +10,8 @@ package com.gamelutagpt;
  */
 final class TeamSystem {
     static final int TAG_NONE = 0, TAG_EXIT = 1, TAG_ENTER = 2, TAG_POSE = 3;
+    /** Quem entra vem numa voadora (VoadoraTroca), lutando de verdade até ela acabar. */
+    static final int TAG_KICK = 4;
     static final int ASSIST_NONE = 0, ASSIST_ENTER = 1, ASSIST_ATTACK = 2, ASSIST_LEAVE = 3;
 
     /** One side's team. */
@@ -21,6 +23,8 @@ final class TeamSystem {
 
         // Raw tag: the point runs off screen, the partner runs in and poses.
         int tagPhase = TAG_NONE;
+        /** A troca em andamento entra com a voadora (↓ + TAG); a da cinemática entra correndo. */
+        boolean kickEntry;
         int tagFrame;
         /** Direction the point runs off to (behind it). */
         int tagDirection = -1;
@@ -66,6 +70,8 @@ final class TeamSystem {
         }
 
         boolean tagging() { return tagPhase != TAG_NONE; }
+        /** A troca ainda no desenho (sai, entra correndo, posa); na voadora já é luta de verdade. */
+        boolean tagAnimating() { return tagPhase != TAG_NONE && tagPhase != TAG_KICK; }
 
         boolean assistOut() { return assistPhase != ASSIST_NONE; }
 
@@ -191,6 +197,7 @@ final class TeamSystem {
         }
         if (s.tagRequestAge >= 0 && canRawTag(s, point)) {
             s.tagPhase = TAG_EXIT;
+            s.kickEntry = true;
             s.tagFrame = 0;
             s.tagDirection = -point.facing;
             s.tagRequestAge = -1;
@@ -254,6 +261,7 @@ final class TeamSystem {
             return false;
         }
         s.tagPhase = TAG_EXIT;
+        s.kickEntry = false;
         s.tagFrame = 0;
         s.tagDirection = -point.facing;
         s.tagRequestAge = -1;
@@ -330,11 +338,25 @@ final class TeamSystem {
     private void advanceTag(CombatEngine engine, Side s, CombatFighter point) {
         if (s.tagPhase == TAG_NONE) return;
         s.tagFrame++;
+        if (s.tagPhase == TAG_KICK) {
+            // Lutando de verdade: acaba quando a voadora acaba (no chão, defendida ou levando um
+            // golpe no caminho).
+            if (!point.attacking() || !VoadoraTroca.ID.equals(point.attack.id)) {
+                s.tagPhase = TAG_NONE;
+                s.tagFrame = 0;
+                s.tagCooldown = config.tagCooldownFrames;
+            }
+            return;
+        }
         point.locked = true;
         if (s.tagPhase == TAG_EXIT && s.tagFrame >= config.tagExitFrames) {
             swapPoint(engine, s, point);
-            s.tagPhase = TAG_ENTER;
             s.tagFrame = 0;
+            if (s.kickEntry && engine.startTagKick(point)) {
+                s.tagPhase = TAG_KICK;
+            } else {
+                s.tagPhase = TAG_ENTER;
+            }
         } else if (s.tagPhase == TAG_ENTER && s.tagFrame >= config.tagEnterFrames) {
             s.tagPhase = TAG_POSE;
             s.tagFrame = 0;
