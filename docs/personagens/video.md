@@ -202,6 +202,21 @@ assim.
    perfil (o build avisa). Hurtbox, alcance e saída das magias não mudam sozinhos. No APK seguinte o ajuste do aparelho volta a 100% sozinho (a folha mudou de
    tamanho), porque o tamanho já está no desenho.
 
+## Tamanho pelo esqueleto (qualquer pose)
+
+```
+python3 tools/sprites/esqueleto.py p02 IDLE DASH INTRO CROUCH             # mede
+python3 tools/sprites/esqueleto.py p02 IDLE DASH INTRO CROUCH --corrigir  # grava nas folhas
+python3 tools/sprites/build_characters.py --write
+```
+
+A régua de silhueta não vê tamanho quando a pose muda (corrida, guarda larga, agachado), e o
+mesmo vídeo pode ter a personagem maior correndo do que parada (dash.mp4 da p02: ~12%). O
+`esqueleto.py` mede os ossos de cada quadro (MediaPipe, com o esqueleto em 3D para descontar
+o osso virado para a câmera) contra a imagem inicial oficial. Loop e clipe curto recebem um
+fator só; clipe longo, a mediana móvel (zoom de câmera). Clipe a ±2% fica como está. Agachado
+e pose em pé medem igual; deitado ainda não é confiável.
+
 ## Ritmo: animação e movimento do jogo
 
 O motor dá o mesmo tempo a todos (frame data, velocidade de andar e dash, hitstun). A arte
