@@ -39,6 +39,8 @@ final class OpponentAi {
         boolean attackReady;
         /** Center distance within which a throw reaches the target. */
         float throwReach;
+        /** O rival defendeu há pouco (ficou na defesa): o agarrão abre quem só defende. */
+        boolean rivalBlocked;
         /** Nível e personalidade; null = nível 5, equilibrado. */
         CpuLevel level;
         CpuStyle style;
@@ -156,7 +158,9 @@ final class OpponentAi {
         } else if (
             s.superReady &&
             superInRange(s.self, s.distance) &&
-            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u)
+            // O Super cru (sem ter acertado nada) é dos níveis baixos: os altos guardam a barra
+            // para fechar combo, punir e para o Ultra.
+            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u) * (1.0 - 0.85 * smart(level))
         ) {
             actions.superAttack();
         } else if (
@@ -167,7 +171,8 @@ final class OpponentAi {
             double r = random.nextDouble();
             actions.energy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
         } else if (s.targetGrounded && s.attackReady && s.distance <= s.throwReach &&
-            random.nextDouble() < THROW_CHANCE * style.throwing * (1.0 + 0.5 * u)) {
+            random.nextDouble() < THROW_CHANCE * style.throwing * (1.0 + 0.5 * u) *
+                (s.rivalBlocked ? 1.0 + 2.5 * smart(level) : 1.0)) {
             actions.grab();
         } else if (groundAttack != null && s.attackReady && !keepAway) {
             actions.attack(groundAttack);
@@ -191,6 +196,14 @@ final class OpponentAi {
 
     /** Folga de alcance do L de abertura (a distância vista pode ter mudado desde então). */
     static final float STARTER_REACH_MARGIN = 30f;
+
+    /**
+     * Quanto a CPU usa os recursos com cabeça (0 no nível 1, 1 no 8): o Super e o Ultra crus
+     * somem, a barra fica para fechar combo, punir e para o Ultra no momento certo.
+     */
+    static double smart(CpuLevel level) {
+        return (level.number - CpuLevel.MIN) / (double)(CpuLevel.MAX - CpuLevel.MIN);
+    }
 
     /** Chance de trocar a cutucada pelo L que abre o combo (nível 1: 15%; nível 8: 50%). */
     static double starterChance(CpuLevel level) {

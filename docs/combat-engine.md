@@ -120,6 +120,21 @@ humano**.
   49 golpes por minuto (eram 35), 5% do tempo bloqueando e 17% segurando a defesa (eram 9% e
   28%); vitórias da CPU por nível: 0, 3, 3, 6, 9, 10, 10, 10. Em todos os personagens o tempo
   segurando a defesa ficou entre 11% e 24% (era de 19% a 40%).
+- **Recursos com cabeça** (`OpponentAi.smart`: 0 no nível 1, 1 no 8). Os níveis baixos gastam
+  a barra no que der; os altos:
+  - quase não soltam **Super cru** no neutro (`× (1 − 0,85·smart)`); fecham o combo
+    confirmado com o Super, mas sem quebrar a reserva das 3 barras do Ultra (a não ser que o
+    Super mate: `spendSuper`, `KILL_SCALE`);
+  - o **Ultra** cru do neutro some (`ULTRA_CHANCE × (1 − smart)`); ele sai para punir (golpe
+    errado ou defendido inseguro, guarda quebrada: `ultraPunish`) e emendado no combo quando
+    o golpe dela deixa o rival atordoado até ela poder apertar (`ultraLinks`, o frame data do
+    golpe; o Ultra só começa do neutro, para todo mundo);
+  - **Overdrive** para esticar o combo que acertou (mais nos altos) em vez do sorteio de vida
+    baixa; **pushblock** (gasta barra) só com a guarda perto de quebrar;
+  - **agarram** mais quem ficou na defesa há pouco (`rivalBlocked`, 1,5 s de memória).
+  Medido em batalha 2x2 contra o jogador simulado (nível 8): Super de 1,0/min com 38% de
+  acerto para 0,4/min com 57%, barra média de 1,3 para 2,5 barras, todo Ultra acertando.
+  O combo breaker continua uma aposta de tempo (com a chance do nível).
 - **Agachar menos**: sem pressão (o rival não atacou há pouco) o hábito de esperar agachada caiu
   para 0,1 da chance (antes 0,35; `CALM_HABIT_SCALE`); pressionada, defende como antes. Os golpes
   agachados (2L/2M/2H) pesam menos na escolha do neutro, e o projétil do meio ela defende em pé.

@@ -37,6 +37,14 @@ final class AiController {
     static final double ULTRA_CHANCE = 0.35;
     /** Distância até onde a investida do Ultra alcança (com folga). */
     static final float ULTRA_REACH = 380f;
+    /** Ultra emendado no fim do combo e na punição: chance (vezes a inteligência do nível). */
+    static final double ULTRA_LINK_CHANCE = 0.8, ULTRA_PUNISH_CHANCE = 0.7;
+    /** Quadros de rival preso a partir dos quais o Ultra pune com certeza. */
+    static final int ULTRA_PUNISH_MIN = 10;
+    /** O Super mata se o dano dele (com a escala do combo, por baixo) passa da vida que sobra. */
+    static final double KILL_SCALE = 0.6;
+    /** Quadros que ela lembra que o rival ficou na defesa (para agarrar quem só defende). */
+    static final int RIVAL_BLOCK_MEMORY = 90;
     /** Overdrive no meio do combo, ou no neutro com a vida baixa. */
     static final double OVERDRIVE_COMBO_CHANCE = 0.15;
     static final double OVERDRIVE_LOW_LIFE_CHANCE = 0.08;
@@ -304,6 +312,7 @@ final class AiController {
             cooldown = Math.max(cooldown, HIT_COOLDOWN);
             endRoute();
         }
+        if (fullKit && ultraLink(engine, me, target, out)) return;
         if (me.attacking()) {
             lastAttack = me.attack;
             runCombo(engine, me, out);
@@ -353,6 +362,8 @@ final class AiController {
         situation.attackReady = cooldown <= 0 && seen.status != CombatFighter.Status.KNOCKDOWN;
         situation.throwReach = throwReach(engine, me, target);
         situation.level = level;
+        if (seen.status == CombatFighter.Status.BLOCKSTUN) lastRivalBlockFrame = seen.frame;
+        situation.rivalBlocked = seen.frame - lastRivalBlockFrame < RIVAL_BLOCK_MEMORY;
         situation.style = CpuStyle.of(me.character());
         situation.urgency = urgency;
         clearRequests();
@@ -727,6 +738,10 @@ final class AiController {
         }
         if (!breakPlan) return false;
         float gap = Math.abs(seen.x - me.x);
+        if (ultraPunish(me, target, ULTRA_PUNISH_MIN, gap, out)) {
+            breakPlan = false;
+            return true;
+        }
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"M", "L", "2L"}) {
             if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
@@ -749,6 +764,7 @@ final class AiController {
      * golpe de abertura do caderno, pune com o combo.
      */
     private boolean blockedLastFrame;
+    private int lastRivalBlockFrame = Integer.MIN_VALUE / 2;
 
     /**
      * Saiu da defesa e o golpe que ela defendeu ainda está na recuperação: pune com o golpe mais
@@ -762,6 +778,7 @@ final class AiController {
         if (!roll(level.punish)) return false;
         int left = target.attack.totalFrames - target.attackFrame;
         float gap = Math.abs(target.x - me.x);
+        if (ultraPunish(me, target, left, gap, out)) return true;
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"L", "2L", "M"}) {
             AttackDefinition a = c.attack(starter);
@@ -784,6 +801,7 @@ final class AiController {
         if (!roll(level.punish)) return false;
         int left = seen.recoveryLeft() - level.reactionFrames;
         float gap = Math.abs(seen.x - me.x);
+        if (ultraPunish(me, target, left, gap, out)) return true;
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"M", "L", "2L"}) {
             AttackDefinition a = c.attack(starter);
@@ -931,10 +949,18 @@ final class AiController {
             if (!commitDecided) {
                 commitDecided = true;
                 commitGo = roll(level.confirm);
+                // Com as 3 barras e o combo confirmado no chão: em vez do passo arriscado, deixa o
+                // golpe terminar e emenda o Ultra com o rival ainda atordoado (ultraLink).
+                if (commitGo && fullKit && me.grounded && !next.startsWith("j") && ultraLinks(engine, me, target) &&
+                    me.state.superMeter >= CombatConfig.ULTRA_COST && roll(smart() * ULTRA_LINK_CHANCE)) {
+                    ultraLinkSession = engine.session(target.index);
+                    ultraLinkPlan = true;
+                    commitGo = false;
+                }
             }
             if (!commitGo) return;
         }
-        if ("SUPER".equals(next) && me.state.superMeter < CombatConfig.SUPER_COST) {
+        if ("SUPER".equals(next) && !spendSuper(me, target)) {
             // Sem barra: fecha com o especial, se o golpe deixar.
             if (me.attack.cancelsInto("S") && me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)) {
                 next = "S";
@@ -1067,10 +1093,7 @@ final class AiController {
     private String ender(CombatEngine engine, CombatFighter me) {
         AttackDefinition a = me.attack;
         if (a == null || !me.grounded || a.kind != AttackDefinition.Kind.NORMAL) return null;
-        if (a.cancelsInto("SUPER") && me.state.superMeter >= CombatConfig.SUPER_COST &&
-            me.character().fighter.hasSuperAttack()) {
-            return "SUPER";
-        }
+        if (a.cancelsInto("SUPER") && spendSuper(me, engine.fighter(1 - me.index))) return "SUPER";
         if (a.cancelsInto("S") && me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)) return "S";
         return null;
     }
@@ -1129,7 +1152,8 @@ final class AiController {
             // Guarda quase quebrando: tenta sair da pressão com mais vontade.
             boolean low = guardLow(engine, me);
             guardCancelPlan = chance(low ? GUARD_CANCEL_LOW_GUARD_CHANCE : GUARD_CANCEL_CHANCE);
-            pushblockPlan = chance(low ? PUSHBLOCK_LOW_GUARD_CHANCE : PUSHBLOCK_CHANCE);
+            // O pushblock gasta barra: os níveis altos só usam com a guarda perto de quebrar.
+            pushblockPlan = chance(low ? PUSHBLOCK_LOW_GUARD_CHANCE : PUSHBLOCK_CHANCE * (1.0 - 0.8 * smart()));
         }
         wasBlocking = blocking;
         if (blocking) {
@@ -1149,7 +1173,8 @@ final class AiController {
                 plannedAttack = me.attack;
                 assistPlan = chance(ASSIST_COMBO_CHANCE);
                 dhcPlan = chance(DHC_CHANCE);
-                overdrivePlan = chance(OVERDRIVE_COMBO_CHANCE);
+                // Os níveis altos usam o Overdrive para esticar o combo que acertou.
+                overdrivePlan = chance(OVERDRIVE_COMBO_CHANCE * (0.5 + 1.5 * smart()));
             }
             plannedAttackFrame = me.attackFrame;
             if (teams.dhcReady(self, me)) {
@@ -1174,7 +1199,7 @@ final class AiController {
         float life = me.state.life / (float)me.state.profile.maxLife;
         FighterState partner = team.partner();
         if (me.grounded && target.grounded && distance <= ULTRA_REACH &&
-            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE)) {
+            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE * (1.0 - smart()))) {
             out.ultra = true;
             return true;
         }
@@ -1184,7 +1209,8 @@ final class AiController {
             out.tag = true;
             return true;
         }
-        if (!team.overdriveUsed && life < 0.5f && teams.canOverdrive(me) && chance(OVERDRIVE_LOW_LIFE_CHANCE)) {
+        if (!team.overdriveUsed && life < 0.5f && teams.canOverdrive(me) &&
+            chance(OVERDRIVE_LOW_LIFE_CHANCE * (1.0 - 0.7 * smart()))) {
             out.overdrive = true;
             return true;
         }
@@ -1193,6 +1219,79 @@ final class AiController {
             out.assist = true;
         }
         return false;
+    }
+
+    // ---------------------------------------------------------------- recursos com cabeça
+
+    /** Quanto ela usa os recursos com cabeça: 0 no nível 1, 1 no 8 ({@link OpponentAi#smart}). */
+    private double smart() {
+        return OpponentAi.smart(level);
+    }
+
+    /**
+     * Gastar a barra no Super que fecha o combo confirmado? Os níveis baixos gastam sempre que
+     * têm; os altos só não quebram a reserva das 3 barras do Ultra (a não ser que o Super mate).
+     */
+    private boolean spendSuper(CombatFighter me, CombatFighter target) {
+        int meter = me.state.superMeter;
+        if (meter < CombatConfig.SUPER_COST || !me.character().fighter.hasSuperAttack()) return false;
+        if (smart() < 0.5 || !fullKit) return true;
+        AttackDefinition sup = me.character().attack("SUPER");
+        boolean kills = sup != null && sup.damage * KILL_SCALE >= target.state.life;
+        boolean keepsReserve = meter < CombatConfig.ULTRA_COST || meter - CombatConfig.SUPER_COST >= CombatConfig.ULTRA_COST;
+        return kills || keepsReserve;
+    }
+
+    /**
+     * O combo dela acabou e o rival ainda está atordoado (no chão, perto): emenda o Ultra (a
+     * preparação congela o rival e o avanço chega com ele ainda preso). Um sorteio por combo.
+     */
+    private boolean ultraLink(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        ComboSession session = engine.session(target.index);
+        if (session == null || session.attacker != me.index || session.hitCount < 2) {
+            ultraLinkSession = null;
+            return false;
+        }
+        // No fim da recuperação do golpe dela já aperta (o jogo guarda o comando e o Ultra sai no
+        // primeiro quadro livre, com o rival ainda atordoado).
+        boolean ending = me.attacking() && me.attack.totalFrames - me.attackFrame < engine.config.bufferFrames;
+        if (!(me.canAct() || ending) || !me.grounded || !target.grounded || !target.inHitstun() ||
+            me.state.superMeter < CombatConfig.ULTRA_COST || Math.abs(target.x - me.x) > ULTRA_REACH) return false;
+        if (session != ultraLinkSession) {
+            ultraLinkSession = session;
+            ultraLinkPlan = roll(smart() * ULTRA_LINK_CHANCE);
+        }
+        if (!ultraLinkPlan) return false;
+        ultraLinkPlan = false;
+        endRoute();
+        out.ultra = true;
+        lastReason = "ultra no combo";
+        return true;
+    }
+
+    private ComboSession ultraLinkSession;
+    private boolean ultraLinkPlan;
+
+    /**
+     * O golpe dela deixa o rival atordoado até ela poder apertar o Ultra (o fim da recuperação,
+     * com o comando guardado)? É o frame data do golpe (vantagem no acerto), que o jogador que
+     * conhece o personagem sabe.
+     */
+    private static boolean ultraLinks(CombatEngine engine, CombatFighter me, CombatFighter target) {
+        if (!me.attacking() || !target.inHitstun()) return false;
+        int free = me.attack.totalFrames - me.attackFrame - engine.config.bufferFrames;
+        return target.stunLeft > Math.max(0, free);
+    }
+
+    /** Pune com o Ultra (com a chance do nível): o rival preso por pelo menos {@code left} quadros. */
+    private boolean ultraPunish(CombatFighter me, CombatFighter target, int left, float gap, FighterInput out) {
+        if (!fullKit || left < ULTRA_PUNISH_MIN || me.state.superMeter < CombatConfig.ULTRA_COST || !me.grounded ||
+            gap > ULTRA_REACH || !roll(smart() * ULTRA_PUNISH_CHANCE)) return false;
+        endRoute();
+        guardFrames = 0;
+        out.ultra = true;
+        lastReason = "punir com ultra";
+        return true;
     }
 
     /** Sorteio do kit, na escala do nível (o nível 1 não usa o kit). */

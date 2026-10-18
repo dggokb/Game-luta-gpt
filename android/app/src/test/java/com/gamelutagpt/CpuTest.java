@@ -126,6 +126,49 @@ public class CpuTest {
         assertTrue("fora do alcance: " + fora + " de " + inicios, fora * 200 <= inicios);
     }
 
+    /**
+     * Batalha 2x2 (kit completo) contra uma CPU nível 5: {Supers crus por minuto (saídos do
+     * neutro, sem ter acertado nada), barra média em milésimos}.
+     */
+    private static double[] recursos(int level) {
+        long frames = 0, barra = 0;
+        int crus = 0;
+        for (long seed = 1; seed <= 4; seed++) {
+            FighterState[] t0 = {new FighterState(BASE, "P1"), new FighterState(GeneratedCharacters.get("p02"), "P2")};
+            FighterState[] t1 = {new FighterState(GeneratedCharacters.get("p03"), "C1"), new FighterState(GeneratedCharacters.get("p05"), "C2")};
+            CombatEngine e = new CombatEngine(t0[0], t1[0], 600f, 900f, new CombatConfig());
+            e.setTeam(0, t0);
+            e.setTeam(1, t1);
+            AiController rival = new AiController(new OpponentAi(new Random(seed + 50)), new Random(seed * 13 + 1));
+            rival.setEnabled(true);
+            rival.setFullKit(true);
+            rival.setLevel(5);
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setFullKit(true);
+            cpu.setLevel(level);
+            FighterInput a = new FighterInput(), b = new FighterInput();
+            for (int f = 0; f < 90 * 60; f++) {
+                rival.fill(e, 0, a);
+                cpu.fill(e, 1, b);
+                e.step(a, b);
+                CombatFighter c = e.fighter(1);
+                // Cru: sai com o rival livre (fechando combo, o rival está atordoado).
+                if (c.attacking() && c.attackFrame == 0 && c.attack.kind == AttackDefinition.Kind.SUPER &&
+                    !e.fighter(0).inHitstun()) crus++;
+                barra += c.state.superMeter;
+                frames++;
+            }
+        }
+        return new double[] {crus / (frames / 3600.0), barra / (double)frames};
+    }
+
+    @Test public void higherLevelsSpendMeterWithMoreSense() {
+        double[] baixo = recursos(2), alto = recursos(8);
+        assertTrue("o nível 8 quase não solta Super cru: " + baixo[0] + " → " + alto[0], alto[0] < baixo[0] * 0.5 + 0.05);
+        assertTrue("e guarda mais barra (para o Ultra): " + baixo[1] + " → " + alto[1], alto[1] > baixo[1]);
+    }
+
     @Test public void theNeutralPokePrefersTheComboStarterUpClose() {
         assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) > OpponentAi.starterChance(CpuLevel.of(1)));
         assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) <= 0.5);
