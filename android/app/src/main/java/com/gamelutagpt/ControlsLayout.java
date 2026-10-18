@@ -9,10 +9,10 @@ final class ControlsLayout {
 
     enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
 
-    static final float DPAD_X = 175f;
-    static final float DPAD_Y = 555f;
-    static final float DPAD_RADIUS = 122f;
-    static final float DPAD_DEADZONE = 28f;
+    static final float DPAD_X = 185f;
+    static final float DPAD_Y = 545f;
+    static final float DPAD_RADIUS = 142f;
+    static final float DPAD_DEADZONE = 30f;
     private static final float DPAD_DIAGONAL = 0.70710677f;
     // Directions 1..8 clockwise from right: → ↘ ↓ ↙ ← ↖ ↑ ↗ (0 = neutral).
     static final String[] DPAD_LABELS = {
@@ -27,13 +27,13 @@ final class ControlsLayout {
         0f, -DPAD_DIAGONAL, -1f, -DPAD_DIAGONAL
     };
 
-    static final float ATTACK_RADIUS = 54f;
-    static final float LIGHT_X = 1005f;
-    static final float LIGHT_Y = 598f;
+    static final float ATTACK_RADIUS = 64f;
+    static final float LIGHT_X = 990f;
+    static final float LIGHT_Y = 602f;
     static final float MEDIUM_X = 1100f;
-    static final float MEDIUM_Y = 515f;
-    static final float HEAVY_X = 1195f;
-    static final float HEAVY_Y = 598f;
+    static final float MEDIUM_Y = 508f;
+    static final float HEAVY_X = 1210f;
+    static final float HEAVY_Y = 602f;
 
     // Throw: the spot between L and M counts as both (one thumb cannot press two buttons).
     static final float THROW_X = (LIGHT_X + MEDIUM_X) * 0.5f;
@@ -45,20 +45,20 @@ final class ControlsLayout {
 
     static final float COMBO_X = 1100f;
     static final float COMBO_Y = 650f;
-    static final float COMBO_RADIUS = 43f;
+    static final float COMBO_RADIUS = 46f;
 
-    static final float TAG_X = 930f;
-    static final float TAG_Y = 505f;
-    static final float TAG_RADIUS = 43f;
+    static final float TAG_X = 915f;
+    static final float TAG_Y = 500f;
+    static final float TAG_RADIUS = 50f;
 
-    static final float SUPER_X = 905f;
-    static final float SUPER_Y = 620f;
-    static final float SUPER_RADIUS = 46f;
+    static final float SUPER_X = 870f;
+    static final float SUPER_Y = 628f;
+    static final float SUPER_RADIUS = 54f;
 
     // Overdrive (v0.87): its own button left of SUPER and TAG (SUPER + TAG together also works).
-    static final float OVERDRIVE_X = 820f;
-    static final float OVERDRIVE_Y = 560f;
-    static final float OVERDRIVE_RADIUS = 34f;
+    static final float OVERDRIVE_X = 790f;
+    static final float OVERDRIVE_Y = 555f;
+    static final float OVERDRIVE_RADIUS = 40f;
 
     static final float AI_BUTTON_LEFT = 1082f;
     static final float AI_BUTTON_TOP = 176f;
@@ -177,7 +177,7 @@ final class ControlsLayout {
      * O direcional pega o dedo um pouco além do desenho (o polegar escorrega para fora no meio
      * da luta); não há outro controle perto dele.
      */
-    static final float DPAD_CAPTURE_RADIUS = 170f;
+    static final float DPAD_CAPTURE_RADIUS = 190f;
 
     static boolean dpadCaptures(float x, float y) {
         return insideCircle(x, y, DPAD_X, DPAD_Y, DPAD_CAPTURE_RADIUS);
