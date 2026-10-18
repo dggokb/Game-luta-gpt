@@ -134,13 +134,27 @@ Ordem de cada quadro (`AiController.fill`):
 (`cancelInto`, `maxUsesPerChain`) e do estilo, sem combo escrito à mão. Ex.: p01
 `L M 2H super-pulo jL jM pulo-no-ar jL jM j2H`; p04 `L M M 2H ...`; p09 `L M H H SUPER`;
 p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas (no acerto ou na defesa, como um jogador
-encadeia); lançador, especial, Super e super pulo só depois de ver que acertou. Se o empurrão
-tirou o próximo golpe do alcance, ela fecha com o que ainda alcança (H, ou o S1). Golpe agachado
-sai com ↘ (não fecha comando de especial com a defesa ← ↙ que veio antes).
+encadeia); lançador, especial, Super e super pulo só depois de ver que acertou.
+
+- **Alcance com o empurrão**: o próximo golpe só sai se alcança o rival *depois* do empurrão que
+  ainda vai acontecer (`projectedGap`). Um 2L na ponta empurra o rival para fora do M, e antes o
+  M saía no vento.
+- **Se não alcança**, procura outro que alcance e que o golpe atual cancele: 2H, H, M, 2M,
+  Super (com barra) ou o S1 (`CLOSER`), e segue a rota a partir dele.
+- **Golpe solto que acertou** (um H do neutro, o fim de uma rota curta): fecha cancelando no
+  Super (com barra) ou no S1, depois de ver que acertou (`ender`).
+- **Abertura**: perto o bastante para o L (o começo da rota), troca a cutucada pelo L com
+  `OpponentAi.starterChance` (nível 1: 15%, nível 8: 50%). A cutucada na ponta não emenda.
+
+Contra um jogador que não defende, por 1 minuto, dos acertos corpo a corpo da CPU os que viram
+combo de 3+ hits subiram, por exemplo, de 9% para 37% (p01, nível 5) e de 5% para 48% (p02,
+nível 8). Golpe agachado sai com ↘ (não fecha comando de especial com a defesa ← ↙ que veio
+antes).
 
 Nível na pausa: **NÍVEL CPU ◀ 5 ▶** (1 a 8, salvo no aparelho; padrão 5). Testes: `CpuTest`
 (piso humano, percepção, defesa por nível, punição, combo por nível, rotas por estilo, zoner
-mais longe que pressão, nível 8 vence o nível 2).
+mais longe que pressão, nível 8 vence o nível 2, o nível 8 emenda 40%+ dos acertos e nenhum
+pacote quebra a busca do golpe que alcança).
 
 ## Correntes de combo
 

@@ -131,6 +131,13 @@ final class OpponentAi {
             vsCrouch ? GROUND_WEIGHTS_VS_CROUCH : GROUND_WEIGHTS,
             s.self, false, s.distance, s.target, random.nextDouble());
 
+        // Perto o bastante para o L (o começo do combo do caderno): prefere abrir com ele a
+        // cutucar com um golpe solto, mais quanto maior o nível. A cutucada na ponta não emenda.
+        if (groundAttack != null && !vsCrouch && !"L".equals(groundAttack) &&
+            CombatRules.reaches(s.self, "L", false, s.distance, s.target) &&
+            random.nextDouble() < starterChance(level)) {
+            groundAttack = "L";
+        }
         // Quem luta de longe recua para a distância dele em vez de bater colado.
         boolean keepAway = !s.selfAirborne && s.distance < style.preferredDistance - 60f &&
             aggression < 0.5 && random.nextDouble() < 0.5 * (1.0 - u);
@@ -174,6 +181,11 @@ final class OpponentAi {
             actions.jump(random.nextDouble() < 0.32);
         }
         return true;
+    }
+
+    /** Chance de trocar a cutucada pelo L que abre o combo (nível 1: 15%; nível 8: 50%). */
+    static double starterChance(CpuLevel level) {
+        return 0.10 + 0.05 * level.number;
     }
 
     /**

@@ -819,7 +819,16 @@ final class AiController {
                 return;
             }
         }
-        if (awaitingStart || step + 1 >= route.size()) return;
+        if (awaitingStart) return;
+        if (step + 1 >= route.size()) {
+            // A rota acabou num golpe comum (um H solto que acertou, o fim de uma rota curta):
+            // fecha cancelando no Super ou no especial, se o golpe deixar.
+            String ender = ender(engine, me);
+            if (ender == null) return;
+            java.util.List<String> longer = new java.util.ArrayList<>(route);
+            longer.add(ender);
+            route = longer;
+        }
         String next = route.get(step + 1);
         if (me.outcome == CombatFighter.Outcome.NONE) return;   // ainda não encostou
         if (!stepDecided) {
@@ -845,7 +854,7 @@ final class AiController {
         }
         if (ComboBook.JUMP.equals(next)) return;   // o super pulo sai do neutro, depois do lançador
         if (me.grounded && !next.startsWith("j") && !"S".equals(next) && !"SUPER".equals(next) &&
-            !CombatRules.reaches(me.character(), next, false, Math.abs(target.x - me.x), target.body())) {
+            !alcanca(me.character(), next, projectedGap(me, target), target)) {
             // O empurrão do golpe tirou o próximo do alcance: fecha com o que ainda alcança.
             next = closer(engine, me, target);
             if (next == null) return;
@@ -920,23 +929,59 @@ final class AiController {
      */
     private String closer(CombatEngine engine, CombatFighter me, CombatFighter target) {
         CharacterDefinition c = me.character();
-        float gap = Math.abs(target.x - me.x);
-        for (String option : new String[] {"2H", "H", "S"}) {
+        float gap = projectedGap(me, target);
+        for (String option : CLOSER) {
             if (!me.attack.cancelsInto(option) || option.equals(route.get(step + 1))) continue;
             AttackDefinition a = c.attack(option);
             if (a == null || a.maxUsesPerChain > 0 && me.chain.contains(option)) continue;
-            boolean reaches = "S".equals(option)
-                ? me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)
-                : CombatRules.reaches(c, option, false, gap, target.body());
+            // O que compromete (lançador, especial, Super) só depois de ver que acertou.
+            if (ComboBook.commits(option) && !hitSeen(engine)) continue;
+            boolean reaches;
+            if ("S".equals(option)) {
+                reaches = me.state.profile.energy != null && !engine.energyProjectileAlive(me.index) &&
+                    (!a.melee() || alcanca(c, option, gap, target));
+            } else if ("SUPER".equals(option)) {
+                reaches = me.state.superMeter >= CombatConfig.SUPER_COST && c.fighter.hasSuperAttack();
+            } else {
+                reaches = alcanca(c, option, gap, target);
+            }
             if (!reaches) continue;
             java.util.List<String> rest = new java.util.ArrayList<>(route.subList(0, step + 1));
             rest.add(option);
             List<String> book = ComboBook.route(c);
             int at = book.indexOf(option);
-            if (at >= 0 && !"S".equals(option)) rest.addAll(book.subList(at + 1, book.size()));
+            if (at >= 0 && !"S".equals(option) && !"SUPER".equals(option)) rest.addAll(book.subList(at + 1, book.size()));
             route = rest;
             return option;
         }
+        return null;
+    }
+
+    /** O golpe no chão alcança o rival dessa distância (golpe sem alcance no pacote: não). */
+    private static boolean alcanca(CharacterDefinition c, String option, float gap, CombatFighter target) {
+        return c.move(option, false) != null && CombatRules.reaches(c, option, false, gap, target.body());
+    }
+
+    /** O que tentar quando o próximo passo não alcança: o lançador, os fortes, os médios e o fecho. */
+    private static final String[] CLOSER = {"2H", "H", "M", "2M", "SUPER", "S"};
+
+    /**
+     * Distância até o rival depois do empurrão que ainda vai acontecer: o golpe seguinte sai
+     * com ele já longe (um 2L na ponta empurra o rival para fora do alcance do M).
+     */
+    static float projectedGap(CombatFighter me, CombatFighter target) {
+        return Math.abs(target.x - me.x) + Math.abs(target.pushRemaining) + Math.abs(me.pushRemaining);
+    }
+
+    /** Fecho de uma rota que acabou num golpe comum no chão: o Super (com barra) ou o especial. */
+    private String ender(CombatEngine engine, CombatFighter me) {
+        AttackDefinition a = me.attack;
+        if (a == null || !me.grounded || a.kind != AttackDefinition.Kind.NORMAL) return null;
+        if (a.cancelsInto("SUPER") && me.state.superMeter >= CombatConfig.SUPER_COST &&
+            me.character().fighter.hasSuperAttack()) {
+            return "SUPER";
+        }
+        if (a.cancelsInto("S") && me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)) return "S";
         return null;
     }
 

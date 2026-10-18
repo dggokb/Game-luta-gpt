@@ -37,6 +37,71 @@ public class CpuTest {
         }
     }
 
+    // ------------------------------------------------------------ combos da CPU
+
+    /**
+     * Um minuto contra um jogador que anda e às vezes ataca, sem defender: dos acertos corpo a
+     * corpo da CPU (sem contar o especial e o Super soltos), quantos viram combo de 3+ hits.
+     */
+    private static double emenda(CharacterDefinition cpuChar, int level, long seeds) {
+        int aberturas = 0, emendou = 0;
+        for (long seed = 1; seed <= seeds; seed++) {
+            CombatConfig cfg = new CombatConfig();
+            cfg.justDefenseFrames = -1;
+            CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"), new FighterState(cpuChar, "CPU"), 600f, 900f, cfg);
+            e.fighter(0).state.life = Integer.MAX_VALUE / 4;
+            e.fighter(1).state.life = Integer.MAX_VALUE / 4;
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setLevel(level);
+            FighterInput p = new FighterInput(), out = new FighterInput();
+            Random r = new Random(seed + 99);
+            Object ultima = null;
+            String abriu = null;
+            for (int fr = 0; fr < 60 * 60; fr++) {
+                if (fr % 20 == 0) {
+                    int d = r.nextInt(5);
+                    p.direction = d == 0 ? 1 : d == 1 ? 5 : 0;
+                }
+                if (r.nextInt(40) == 0) p.light = true; else if (r.nextInt(60) == 0) p.medium = true;
+                cpu.fill(e, 1, out);
+                e.step(p, out);
+                p.clearPresses();
+                for (CombatEngine.HitEvent h : e.events()) {
+                    ComboSession s = e.session(0);
+                    if (h.attacker == 1 && !h.blocked && s != null && s.hitCount == 1) abriu = h.projectile ? "proj" : h.moveId;
+                }
+                ComboSession s = e.lastSession(0);
+                if (s != null && s != ultima) {
+                    ultima = s;
+                    if (s.attacker == 1 && abriu != null && !"proj".equals(abriu) && !"S".equals(abriu) && !"SUPER".equals(abriu)) {
+                        aberturas++;
+                        if (s.hitCount >= 3) emendou++;
+                    }
+                    abriu = null;
+                }
+            }
+        }
+        return aberturas == 0 ? 0 : emendou / (double)aberturas;
+    }
+
+    @Test public void aHighLevelCpuTurnsItsHitsIntoCombos() {
+        double alto = emenda(BASE, 8, 4), baixo = emenda(BASE, 1, 4);
+        assertTrue("nível 8 emenda: " + alto, alto >= 0.4);
+        assertTrue("nível 1 emenda menos: " + baixo + " < " + alto, baixo < alto);
+    }
+
+    @Test public void everyCharactersCombosRunWithoutBreakingTheCpu() {
+        // O próximo golpe que não alcança faz a CPU procurar outro (H, M, especial, Super): nenhum
+        // pacote pode quebrar essa busca (golpe sem alcance cadastrado, por exemplo).
+        for (String id : GeneratedCharacters.SELECTABLE) emenda(GeneratedCharacters.get(id), 8, 1);
+    }
+
+    @Test public void theNeutralPokePrefersTheComboStarterUpClose() {
+        assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) > OpponentAi.starterChance(CpuLevel.of(1)));
+        assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) <= 0.5);
+    }
+
     // ------------------------------------------------------------ níveis e percepção
 
     @Test public void noLevelReactsFasterThanAHuman() {
