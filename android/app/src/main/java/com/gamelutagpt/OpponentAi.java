@@ -75,6 +75,11 @@ final class OpponentAi {
     /** Chance of an air tech when the air hitstun ends. */
     static final double AIR_TECH_CHANCE = 0.70;
     static final double[] AIR_WEIGHTS = {0.30, 0.34, 0.36};
+    /**
+     * Folga de alcance dos golpes no chão: a distância é a vista (com o atraso da reação), e o
+     * golpe na beira do alcance saía no vento por poucas unidades.
+     */
+    static final float GROUND_REACH_MARGIN = 8f;
     /** Folga de alcance dos aéreos da CPU (ver {@link #think}). */
     static final float AIR_REACH_MARGIN = 24f;
 
@@ -129,12 +134,13 @@ final class OpponentAi {
         boolean vsCrouch = s.targetCrouching && s.targetGrounded;
         String groundAttack = CombatRules.pickInRange(vsCrouch ? GROUND_ATTACKS_VS_CROUCH : GROUND_ATTACKS,
             vsCrouch ? GROUND_WEIGHTS_VS_CROUCH : GROUND_WEIGHTS,
-            s.self, false, s.distance, s.target, random.nextDouble());
+            s.self, false, s.distance + GROUND_REACH_MARGIN, s.target, random.nextDouble());
 
         // Perto o bastante para o L (o começo do combo do caderno): prefere abrir com ele a
         // cutucar com um golpe solto, mais quanto maior o nível. A cutucada na ponta não emenda.
+        // Com folga de alcance: a distância é a vista (com o atraso da reação), e o L é curto.
         if (groundAttack != null && !vsCrouch && !"L".equals(groundAttack) &&
-            CombatRules.reaches(s.self, "L", false, s.distance, s.target) &&
+            CombatRules.reaches(s.self, "L", false, s.distance + STARTER_REACH_MARGIN, s.target) &&
             random.nextDouble() < starterChance(level)) {
             groundAttack = "L";
         }
@@ -182,6 +188,9 @@ final class OpponentAi {
         }
         return true;
     }
+
+    /** Folga de alcance do L de abertura (a distância vista pode ter mudado desde então). */
+    static final float STARTER_REACH_MARGIN = 30f;
 
     /** Chance de trocar a cutucada pelo L que abre o combo (nível 1: 15%; nível 8: 50%). */
     static double starterChance(CpuLevel level) {

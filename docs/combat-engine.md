@@ -145,6 +145,9 @@ encadeia); lançador, especial, Super e super pulo só depois de ver que acertou
   Super (com barra) ou no S1, depois de ver que acertou (`ender`).
 - **Abertura**: perto o bastante para o L (o começo da rota), troca a cutucada pelo L com
   `OpponentAi.starterChance` (nível 1: 15%, nível 8: 50%). A cutucada na ponta não emenda.
+- **Folga de alcance**: ela decide com a distância *vista* (com o atraso da reação), então o
+  golpe do chão precisa alcançar com 8 de folga (`GROUND_REACH_MARGIN`) e o L de abertura com 30
+  (`STARTER_REACH_MARGIN`); o golpe na beira saía no vento por poucas unidades.
 
 Contra um jogador que não defende, por 1 minuto, dos acertos corpo a corpo da CPU os que viram
 combo de 3+ hits subiram, por exemplo, de 9% para 37% (p01, nível 5) e de 5% para 48% (p02,

@@ -97,6 +97,35 @@ public class CpuTest {
         for (String id : GeneratedCharacters.SELECTABLE) emenda(GeneratedCharacters.get(id), 8, 1);
     }
 
+    @Test public void theCpuAlmostNeverStartsAnAttackOutOfReach() {
+        // Ela decide com a distância vista (com o atraso da reação): a folga de alcance do chão e
+        // a do L de abertura seguram o golpe na beira, que saía no vento por poucas unidades.
+        CharacterDefinition.Body target = GeneratedCharacters.defaultCharacter().fighter.body;
+        int inicios = 0, fora = 0;
+        for (int level : new int[] {5, 8}) {
+            for (long seed = 1; seed <= 12; seed++) {
+                CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.defaultCharacter(), "P1"),
+                    new FighterState(GeneratedCharacters.opponentCharacter(), "CPU"), 420f, 590f, new CombatConfig());
+                AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+                cpu.setEnabled(true);
+                cpu.setFullKit(true);
+                cpu.setLevel(level);
+                FighterInput p = new FighterInput(), out = new FighterInput();
+                for (int i = 0; i < 900; i++) {
+                    cpu.fill(e, 1, out);
+                    e.step(p, out);
+                    CombatFighter c = e.fighter(1);
+                    if (c.attacking() && c.attackFrame == 0 && c.move != null) {
+                        inicios++;
+                        if (Math.abs(e.fighter(0).x - c.x) > CombatRules.maxCenterDistance(c.move, target) + 0.5f) fora++;
+                    }
+                }
+            }
+        }
+        assertTrue("começou golpes", inicios > 100);
+        assertTrue("fora do alcance: " + fora + " de " + inicios, fora * 200 <= inicios);
+    }
+
     @Test public void theNeutralPokePrefersTheComboStarterUpClose() {
         assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) > OpponentAi.starterChance(CpuLevel.of(1)));
         assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) <= 0.5);
