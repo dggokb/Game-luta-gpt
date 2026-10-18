@@ -1,0 +1,190 @@
+{
+  "_comentario": "Narrador do torneio (personagem ainda por fazer: por enquanto o retrato é um placeholder desenhado). Cada evento tem prioridade (3 = grande, interrompe; 2 = importante; 1 = comentário, só no silêncio), a expressão do retrato (historia/retratos/narrador_<expressao>.png quando existir) e as falas, sorteadas sem repetir a última. Variáveis entre chaves vêm do jogo. Padrão: docs/historia/narrador.md.",
+  "nome": "NARRADOR",
+  "cor": "#B8202E",
+  "eventos": {
+    "inicio": {
+      "prioridade": 3,
+      "expressao": "empolgado",
+      "falas": [
+        "Senhoras e senhores, a luta vai começar! {p1} contra {p2}!",
+        "Que comece o espetáculo! {p1} e {p2} no centro da arena!",
+        "O público vai à loucura! {p1} contra {p2}, valendo tudo!"
+      ]
+    },
+    "primeiro_golpe": {
+      "prioridade": 1,
+      "expressao": "empolgado",
+      "falas": [
+        "Primeiro sangue para {atacante}!",
+        "{atacante} acerta primeiro!",
+        "E {atacante} abre o placar!"
+      ]
+    },
+    "combo": {
+      "prioridade": 1,
+      "expressao": "empolgado",
+      "falas": [
+        "{n} golpes seguidos de {atacante}!",
+        "Que sequência! {n} acertos!",
+        "{atacante} não deixa respirar: {n} golpes!"
+      ]
+    },
+    "combo_grande": {
+      "prioridade": 2,
+      "expressao": "chocado",
+      "falas": [
+        "INACREDITÁVEL! {n} golpes sem parar!",
+        "{atacante} está massacrando! {n} acertos!",
+        "Alguém pare {atacante}! {n} golpes!"
+      ]
+    },
+    "super": {
+      "prioridade": 2,
+      "expressao": "empolgado",
+      "falas": [
+        "{atacante} solta o Super!",
+        "Olha a energia de {atacante}!",
+        "É agora! O Super de {atacante}!"
+      ]
+    },
+    "ultra": {
+      "prioridade": 3,
+      "expressao": "chocado",
+      "falas": [
+        "O ULTRA! {atacante} coloca tudo nesse golpe!",
+        "Minha nossa! O golpe supremo de {atacante}!",
+        "Segurem-se! {atacante} vai com o Ultra!"
+      ]
+    },
+    "guard_break": {
+      "prioridade": 2,
+      "expressao": "chocado",
+      "falas": [
+        "A guarda de {defensor} quebrou!",
+        "{defensor} está aberto!",
+        "Defendeu demais! A guarda de {defensor} não aguentou!"
+      ]
+    },
+    "combo_breaker": {
+      "prioridade": 2,
+      "expressao": "chocado",
+      "falas": [
+        "COMBO BREAKER! {atacante} cortou a sequência!",
+        "{atacante} quebrou o combo! Que leitura!",
+        "Não acredito! {atacante} virou o jogo no meio do combo!"
+      ]
+    },
+    "defesa_perfeita": {
+      "prioridade": 1,
+      "expressao": "empolgado",
+      "falas": [
+        "Defesa perfeita de {defensor}!",
+        "{defensor} leu tudo! Defesa perfeita!"
+      ]
+    },
+    "agarrao": {
+      "prioridade": 1,
+      "expressao": "normal",
+      "falas": [
+        "{atacante} agarra e arremessa!",
+        "Que agarrão de {atacante}!"
+      ]
+    },
+    "punicao": {
+      "prioridade": 1,
+      "expressao": "empolgado",
+      "falas": [
+        "{atacante} pune sem dó!",
+        "Castigo de {atacante}!"
+      ]
+    },
+    "troca": {
+      "prioridade": 2,
+      "expressao": "normal",
+      "falas": [
+        "{entra} entra na arena!",
+        "Troca! Agora é a vez de {entra}!"
+      ]
+    },
+    "apuros": {
+      "prioridade": 2,
+      "expressao": "chocado",
+      "falas": [
+        "{nome} está por um fio!",
+        "Cuidado, {nome}! A vida está acabando!",
+        "{nome} precisa de um milagre!"
+      ]
+    },
+    "dominando": {
+      "prioridade": 1,
+      "expressao": "normal",
+      "falas": [
+        "{nome} está dominando a luta!",
+        "Vantagem clara para {nome}!"
+      ]
+    },
+    "virada": {
+      "prioridade": 2,
+      "expressao": "empolgado",
+      "falas": [
+        "Virada! {nome} assume a liderança!",
+        "{nome} vira o jogo! Que reação!"
+      ]
+    },
+    "tempo": {
+      "prioridade": 2,
+      "expressao": "empolgado",
+      "falas": [
+        "Dez segundos! Quem vai levar essa?",
+        "O tempo está acabando!"
+      ]
+    },
+    "ko": {
+      "prioridade": 3,
+      "expressao": "chocado",
+      "falas": [
+        "K.O.! {perdedor} está no chão!",
+        "Acabou para {perdedor}! {vencedor} derruba!"
+      ]
+    },
+    "ko_ultra": {
+      "prioridade": 3,
+      "expressao": "chocado",
+      "falas": [
+        "Que final! {vencedor} encerra com o Ultra!",
+        "Com o golpe supremo! {perdedor} não teve chance!"
+      ]
+    },
+    "vitoria": {
+      "prioridade": 3,
+      "expressao": "empolgado",
+      "falas": [
+        "E o vencedor é {vencedor}!",
+        "{vencedor} vence! A arena explode!",
+        "Vitória de {vencedor}! Que espetáculo!"
+      ]
+    },
+    "perfeito": {
+      "prioridade": 3,
+      "expressao": "chocado",
+      "falas": [
+        "PERFEITO! {vencedor} não levou um arranhão!"
+      ]
+    },
+    "tempo_esgotado": {
+      "prioridade": 3,
+      "expressao": "normal",
+      "falas": [
+        "Tempo esgotado! {vencedor} vence na vida que sobrou!"
+      ]
+    },
+    "empate": {
+      "prioridade": 3,
+      "expressao": "chocado",
+      "falas": [
+        "Empate! Ninguém cede nessa arena!"
+      ]
+    }
+  }
+}

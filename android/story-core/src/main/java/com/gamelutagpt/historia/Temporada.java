@@ -106,6 +106,13 @@ public final class Temporada {
         return p != null ? p : new Personagem(id, id, 0xFF8A8F99, null);
     }
 
+    /** Nome do elenco de quem luta com o pack {@code lutador} (o narrador, o HUD), ou null. */
+    public String nomeDoLutador(String lutador) {
+        if (lutador == null) return null;
+        for (Personagem p : elenco.values()) if (lutador.equals(p.lutador)) return p.nome;
+        return null;
+    }
+
     public static Temporada fromJson(String json) {
         Map<String, Object> map = Episodio.asMap(MiniJson.parse(json));
         Map<String, Personagem> elenco = new LinkedHashMap<>();

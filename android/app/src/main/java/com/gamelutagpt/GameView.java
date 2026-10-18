@@ -212,6 +212,14 @@ public class GameView extends SurfaceView
      * adversário que espera. Não para a luta. Padrão: docs/historia/motor-conversas.md.
      */
     private ConversaLuta conversa;
+    /**
+     * O narrador do torneio: fala o que acontece na luta numa faixa de transmissão no rodapé
+     * (sem parar a luta). Só nas lutas de verdade (batalha, Arcade e as lutas do torneio na
+     * história). Padrão: docs/historia/narrador.md.
+     */
+    private com.gamelutagpt.historia.Narracao narracao;
+    private final NarradorLuta narradorLuta = new NarradorLuta();
+    private boolean narracaoPronta;
     /** Lição do treino que já teve a fala da conversa (-1: nenhuma). */
     private int conversaLicao = -1;
     /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
@@ -520,6 +528,7 @@ public class GameView extends SurfaceView
         menuInicial.setVersao(VERSION_HUD_LABEL);
         menuArcade = new MenuArcade(ultraAssets);
         conversa = new ConversaLuta(ultraAssets);
+        narracao = new com.gamelutagpt.historia.Narracao(ultraAssets);
         cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
         stageId = DEFAULT_STAGE;
         holder = getHolder();
@@ -1570,6 +1579,7 @@ public class GameView extends SurfaceView
             for (String reaction : tutorial.reactions()) stageScene.react(reaction);
         }
         updateConversa();
+        updateNarracao();
         updateCinematica(intro);
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
@@ -1680,6 +1690,8 @@ public class GameView extends SurfaceView
         introFrame = introTotalFrames > 0 ? 0 : -1;
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
+        narradorLuta.reset();
+        if (narracao != null) narracao.stop();
     }
 
     private final HudRenderer.State hudState = new HudRenderer.State() {
@@ -2823,6 +2835,7 @@ public class GameView extends SurfaceView
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
                 cinematica.renderFaixas(renderCanvas);
                 conversa.render(renderCanvas);
+                if (narracao != null && faixas < 0.5f) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
             }
             if (abertura.isActive()) abertura.render(renderCanvas);
@@ -4561,6 +4574,37 @@ public class GameView extends SurfaceView
             }
         }
         conversa.update(FIXED_STEP);
+    }
+
+    /**
+     * O narrador: nas lutas de verdade olha o que aconteceu e pede a fala; a faixa anda
+     * sempre (para sair da tela quando a luta deixa de ser narrada).
+     */
+    private void updateNarracao() {
+        if (narracao == null) return;
+        if (narracaoAtiva()) {
+            if (!narracaoPronta) {
+                narracaoPronta = true;
+                if (!narracao.carregar()) Log.w(LOG_TAG, "narrador.json não abriu");
+                if (loadTemporada()) {
+                    narracao.setTemporada(temporada);
+                    narradorLuta.setNomes(c -> {
+                        String nome = temporada != null ? temporada.nomeDoLutador(c.id) : null;
+                        return nome != null ? nome : c.displayName;
+                    });
+                }
+            }
+            narradorLuta.update(engine, flow, narracao::narrar);
+        }
+        narracao.update(FIXED_STEP);
+    }
+
+    /** Luta narrada: a batalha (IA ON), o Arcade e as lutas do torneio da história. */
+    private boolean narracaoAtiva() {
+        if (!flow.battle() || tutorial.active() || demo.active()) return false;
+        if (arcadeMode || !storyMode) return true;
+        Episodio.Passo passo = historia.waitingFight() ? historia.passo() : null;
+        return passo != null && passo.torneio;
     }
 
     /** Fim da conversa e da cinemática da luta (luta nova, fim da luta, saída da história). */
