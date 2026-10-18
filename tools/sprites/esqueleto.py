@@ -140,6 +140,9 @@ def factors(values, loop):
     return [float(v) for v in curve]
 
 
+SINK = 6  # px da folha (3 do jogo): pé abaixo do chão a partir disso é corrigido
+
+
 def ground(cfg, atlas, show=False):
     """Pé abaixo do chão (o quadro afunda e, na troca para o IDLE, ela pula para cima): sobe
     cada quadro até o pé encostar na raiz, como nos outros clipes. Devolve o quanto subiu cada
