@@ -214,8 +214,10 @@ A régua de silhueta não vê tamanho quando a pose muda (corrida, guarda larga,
 mesmo vídeo pode ter a personagem maior correndo do que parada (dash.mp4 da p02: ~12%). O
 `esqueleto.py` mede os ossos de cada quadro (MediaPipe, com o esqueleto em 3D para descontar
 o osso virado para a câmera) contra a imagem inicial oficial. Loop e clipe curto recebem um
-fator só; clipe longo, a mediana móvel (zoom de câmera). Clipe a ±2% fica como está. Agachado
-e pose em pé medem igual; deitado ainda não é confiável.
+fator só; clipe longo, uma reta ao longo do clipe (zoom de câmera) — nunca fator quadro a
+quadro: o ruído da medida (~3%) vira o corpo pulsando. Clipe a ±2% fica como está. Agachado e
+pose em pé medem igual; deitado ainda não é confiável. `--chao` sobe os quadros com o pé
+abaixo do chão (o INTRO da p02 afundava 7 px e pulava na troca para o IDLE).
 
 ## Ritmo: animação e movimento do jogo
 

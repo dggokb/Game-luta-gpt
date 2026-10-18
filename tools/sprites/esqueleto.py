@@ -3,6 +3,7 @@
 
     python3 tools/sprites/esqueleto.py p02 IDLE DASH INTRO CROUCH            # só mede
     python3 tools/sprites/esqueleto.py p02 IDLE DASH INTRO CROUCH --corrigir # grava nas folhas
+    python3 tools/sprites/esqueleto.py p02 INTRO --chao --corrigir           # + pé no chão
                                                        # (depois: build_characters.py --write)
 
 A régua de silhueta (regua.py) erra quando a pose muda: guarda larga, corrida e agachado
@@ -15,8 +16,9 @@ parece menor. A referência é a imagem inicial (art/keys/<id>/inicio_centro.png
 oficial do tamanho.json, a mesma de regua.py.
 
 Fator 100% = certo. O ruído é de uns 3% por quadro (no IDLE, 96-104%), por isso:
-loop (IDLE, corrida) e clipe curto recebem um fator só, a mediana; clipe longo recebe a
-mediana móvel de 7 quadros (zoom de câmera no meio do vídeo). Clipe dentro de ±2% não muda.
+loop (IDLE, corrida) e clipe curto recebem um fator só, a mediana; clipe longo recebe uma
+reta ao longo do clipe (zoom de câmera), sem os quadros que a medida errou. Fator quadro a
+quadro não: o ruído vira o corpo pulsando e a cabeça subindo e descendo. Clipe com mediana a ±2% (e nenhum quadro a mais de 4%) não muda.
 A correção reescala a folha do jogo em volta da raiz e grava na receita, como regua.py
 --corrigir (reescala, reguaFatores e o motivo em regua).
 
@@ -29,6 +31,7 @@ import urllib.request
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -43,7 +46,6 @@ MIN_VIS = 0.5
 BONES = ((11, 12), (23, 24), (11, 23), (12, 24), (11, 13), (12, 14), (13, 15), (14, 16),
          (23, 25), (24, 26), (25, 27), (26, 28))
 TOLERANCE = 0.02    # clipe a ±2% do certo fica como está
-WINDOW = 7          # mediana móvel nos clipes longos
 LONG = 16           # a partir de quantos quadros um clipe (não loop) acompanha o zoom
 
 
@@ -107,11 +109,57 @@ def factors(values, loop):
         return None
     if loop or len(values) < LONG:
         return [float(np.median(known))] * len(values)
-    idx = np.arange(len(values))
-    ok = np.array([v is not None for v in values])
-    filled = np.interp(idx, idx[ok], np.array([v for v in values if v is not None]))
-    half = WINDOW // 2
-    return [float(np.median(filled[max(0, i - half):i + half + 1])) for i in idx]
+    # Clipe longo: uma reta ao longo do clipe (zoom de câmera), nunca quadro a quadro. O
+    # ruído da medida (~3%) virava o corpo crescendo e encolhendo, e como cada quadro escala
+    # em volta dos pés, a cabeça subindo e descendo.
+    idx = np.array([i for i, v in enumerate(values) if v is not None], float)
+    vals = np.array([v for v in values if v is not None])
+    keep = np.ones(len(vals), bool)
+    for _ in range(3):   # tira os quadros que a medida errou (longe da reta) e ajusta de novo
+        slope, base = np.polyfit(idx[keep], vals[keep], 1)
+        resid = vals - (slope * idx + base)
+        keep = np.abs(resid) <= max(2.5 * np.median(np.abs(resid[keep])), 0.01)
+    return [float(slope * i + base) for i in range(len(values))]
+
+
+def straight_total(cfg, z):
+    """Clipe longo com reescala anterior (zoom corrigido pela régua): a correção total
+    (anterior x nova) vira uma reta, senão a emenda das duas aparece como o corpo encolhendo e
+    crescendo de novo."""
+    if len(set(z)) == 1:
+        return z
+    old = (cfg.get('video') or cfg).get('reescala') or [1.0] * len(z)
+    total = np.array(old) * np.array(z)
+    idx = np.arange(len(z))
+    line = np.polyval(np.polyfit(idx, total, 1), idx)
+    return [float(v) for v in line / np.array(old)]
+
+
+SINK = 6  # px da folha (3 do jogo): pé abaixo do chão a partir disso é corrigido
+
+
+def ground(cfg, atlas, show=False):
+    """Pé abaixo do chão (o quadro afunda e, na troca para o IDLE, ela pula para cima): sobe
+    cada quadro até o pé encostar na raiz, como nos outros clipes. Devolve o quanto subiu cada
+    quadro (px da folha)."""
+    cfg = regua.resolved(cfg)
+    img = Image.open(ROOT / cfg['source']).convert('RGBA')
+    w, h, cols, ry = cfg['frameWidth'], cfg['frameHeight'], cfg['columns'], cfg['rootY']
+    lifts = []
+    for i in range(cfg['expectedFrames']):
+        box = (i % cols * w, i // cols * h, i % cols * w + w, i // cols * h + h)
+        cell = img.crop(box)
+        rows = np.nonzero((np.array(cell)[..., 3] > 128).any(1))[0]
+        sink = int(rows[-1]) - ry if len(rows) else 0
+        lift = sink if sink >= SINK else 0
+        lifts.append(lift)
+        if lift and not show:
+            moved = Image.new('RGBA', (w, h))
+            moved.paste(cell, (0, -lift))
+            img.paste(moved, box[:2])
+    if not show and any(lifts):
+        img.save(ROOT / cfg['source'])
+    return lifts
 
 
 def main():
@@ -119,6 +167,8 @@ def main():
     ap.add_argument('personagem')
     ap.add_argument('estados', nargs='+')
     ap.add_argument('--corrigir', action='store_true', help='grava o tamanho nas folhas do jogo')
+    ap.add_argument('--chao', action='store_true',
+                    help='também sobe os quadros com o pé abaixo do chão (grava com --corrigir)')
     args = ap.parse_args()
     p = regua.Pack(args.personagem)
     det = detector()
@@ -139,13 +189,28 @@ def main():
         used = [values[i] for i in anim['frames'] if values[i] is not None]
         print(f"{state} ({atlas}): {np.median(used):.0%} (quadros {min(used):.0%}-{max(used):.0%}, "
               f"{len(used)}/{len(anim['frames'])} medidos); aplica {min(z):.0%}-{max(z):.0%}")
+        if args.chao:
+            lifts = ground(p.clips[atlas], atlas, show=not args.corrigir)
+            if any(lifts):
+                print('  pé abaixo do chão (px da folha): ' + ' '.join(str(v) for v in lifts)
+                      + ('  -> subiu' if args.corrigir else ''))
+                if args.corrigir:
+                    from ancorar import clip_path
+                    import json
+                    path = clip_path(atlas)
+                    data = json.loads(path.read_text(encoding='utf-8'))
+                    (data.get('video') or data).setdefault('regua', []).append(
+                        'esqueleto --chao: pé no chão, quadros subidos ' + ','.join(str(v) for v in lifts))
+                    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
         if not args.corrigir:
             continue
-        if all(abs(f - 1) <= TOLERANCE for f in z):
+        # Mediana a ±2% e nenhum quadro a mais de 4%: o resto é ruído da medida.
+        if abs(float(np.median(z)) - 1) <= TOLERANCE and all(abs(f - 1) <= 2 * TOLERANCE for f in z):
             print('  dentro de ±2%: fica como está')
             continue
         reason = (f'esqueleto: {np.median(used) * 100:.0f}% da imagem inicial '
-                  f'({"mediana" if len(set(z)) == 1 else "mediana móvel"}), levado a 100%')
+                  f'({"mediana" if len(set(z)) == 1 else "reta ao longo do clipe"}), levado a 100%')
+        z = straight_total(p.clips[atlas], z)
         regua.bake(p.clips[atlas], atlas, z, reason)
         print('  gravado')
     if args.corrigir:
