@@ -592,9 +592,13 @@ A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. 
   **agachado é agarrado** como quem está em pé (o agarrão vence a defesa alta e a baixa).
   Teste: `AgarraoToqueTest`.
 - **Quem pode ser agarrado**: no chão, em NEUTRAL, num golpe próprio (não no Super nem no
-  ultra) ou num agarrão errado. Hitstun, blockstun e os `throwProtectFrames` (6) depois
-  deles ou de levantar são invulneráveis a agarrão, então agarrão não continua combo e
-  um agarrão começado durante o stun do outro erra.
+  ultra) ou num agarrão errado. Hitstun e blockstun são invulneráveis a agarrão, e também
+  os `throwProtectFrames` (6) depois do hitstun ou de levantar (agarrão não continua combo)
+  e os `throwProtectAfterBlockFrames` (3) depois do blockstun: o **"soco defendido, agarra"**
+  (tick throw) entra logo depois do bloqueio, inclusive em quem defende agachado.
+- **Pedido de agarrão**: L + M fica guardado `throwBufferFrames` (10) quadros — apertado no
+  fim do próprio golpe, sai assim que ele acaba (antes sumia sem fazer nada). O tech de quem
+  é agarrado continua só com o `bufferFrames` (4) normal. Teste: `AgarraoToqueTest`.
 - **Os dois ao mesmo tempo**: tech automático.
 - **CPU**: agarra às vezes quando está colada (`OpponentAi.THROW_CHANCE`) e faz tech em
   ~40% dos agarrões, alguns frames depois de ser pega (`TECH_CHANCE`).

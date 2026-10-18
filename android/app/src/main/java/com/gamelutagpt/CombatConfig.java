@@ -226,8 +226,19 @@ final class CombatConfig {
     /** Tech: both fighters pushed this far apart and frozen out of action for this long. */
     float throwTechPush = 110f;
     int throwTechFrames = 16;
-    /** Throw invulnerability right after hitstun, blockstun or wake-up. */
+    /** Throw invulnerability right after hitstun or wake-up (a throw never continues a combo). */
     int throwProtectFrames = 6;
+    /**
+     * Depois do blockstun a proteção é menor (antes 6, igual à do hitstun): o "soco defendido,
+     * agarra" (tick throw) entra logo depois do bloqueio, como nos jogos de luta.
+     */
+    int throwProtectAfterBlockFrames = 3;
+    /**
+     * Quanto o pedido de agarrão (L + M) espera para sair. Maior que o buffer dos golpes: L + M
+     * apertado no fim do próprio golpe sai assim que ele acaba (antes sumia sem fazer nada).
+     * O tech de quem é agarrado continua com {@code bufferFrames}.
+     */
+    int throwBufferFrames = 10;
 
     // Air tech (attack button when the air hitstun ends; the direction picks where to go).
     /** Without a tech the fighter free-falls this long, then recovers on its own (no invulnerability). */

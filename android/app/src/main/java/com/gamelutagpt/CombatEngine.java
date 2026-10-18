@@ -561,8 +561,9 @@ final class CombatEngine {
             case HITSTUN:
             case BLOCKSTUN:
                 if (f.stunLeft == 0) {
+                    f.throwProtect = f.status == CombatFighter.Status.BLOCKSTUN
+                        ? config.throwProtectAfterBlockFrames : config.throwProtectFrames;
                     f.status = CombatFighter.Status.NEUTRAL;
-                    f.throwProtect = config.throwProtectFrames;
                 }
                 break;
             case THROW:
@@ -889,7 +890,7 @@ final class CombatEngine {
         f.buffer.age(config.bufferFrames);
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
-        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
+        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.throwBufferFrames) f.throwRequestAge = -1;
         if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
         if (f.techRequestAge >= 0 && ++f.techRequestAge > config.bufferFrames) f.techRequestAge = -1;
         if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
@@ -2011,7 +2012,8 @@ final class CombatEngine {
                 a.throwFrame = 0;
             }
         } else if (a.throwPhase == CombatFighter.THROW_HOLD) {
-            if (d.throwRequestAge >= 0) {
+            // Tech: só o L + M apertado há pouco (o buffer normal), não o pedido longo de agarrão.
+            if (d.throwRequestAge >= 0 && d.throwRequestAge <= config.bufferFrames) {
                 techThrow(a, d);
             } else if (a.throwFrame >= config.throwTechWindow) {
                 landThrow(a, d);
