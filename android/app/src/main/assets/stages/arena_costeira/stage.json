@@ -37,8 +37,8 @@
       "id": "penhascos",
       "imagem": "penhascos.png",
       "profundidade": 6500,
-      "topo": 0.17,
-      "base": 0.45,
+      "topo": 0.2,
+      "base": 0.446,
       "x": 1.1,
       "repetir": "nao"
     },
@@ -91,26 +91,13 @@
     {
       "id": "arquibancada",
       "imagem": "arquibancada.png",
-      "profundidade": 900,
+      "profundidade": 605,
       "noChao": true,
-      "altura": 0.2,
+      "altura": 0.27,
       "repetir": "espelhar",
       "luzes": [
         { "x": 0.25, "y": 0.726, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.06 },
         { "x": 0.749, "y": 0.726, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.06 }
-      ]
-    },
-    {
-      "id": "barreira",
-      "imagem": "barreira.png",
-      "profundidade": 600,
-      "noChao": true,
-      "altura": 0.075,
-      "repetir": "espelhar",
-      "luzes": [
-        { "x": 0.203, "y": 0.12, "raio": 0.25, "cor": "#FFB45A", "pulsar": 0.05 },
-        { "x": 0.795, "y": 0.121, "raio": 0.25, "cor": "#FFB45A", "pulsar": 0.05 },
-        { "x": 0.5, "y": 0.4, "raio": 0.3, "cor": "#FF3A3A", "pulsar": 0.25 }
       ]
     },
     {

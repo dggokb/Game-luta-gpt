@@ -29,8 +29,8 @@
       "id": "penhascos",
       "imagem": "penhascos.png",
       "profundidade": 6500,
-      "topo": 0.17,
-      "base": 0.45,
+      "topo": 0.24,
+      "base": 0.446,
       "x": 1.08,
       "repetir": "nao"
     },
@@ -47,9 +47,9 @@
       "id": "ilha",
       "imagem": "ilha.png",
       "profundidade": 5000,
-      "topo": -0.03,
-      "base": 0.46,
-      "x": 0.68,
+      "topo": 0.13,
+      "base": 0.462,
+      "x": 0.7,
       "repetir": "nao",
       "luzes": [
         { "x": 0.66, "y": 0.06, "raio": 0.05, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },

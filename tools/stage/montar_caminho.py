@@ -11,7 +11,8 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   viga vertical (`FAIXA`) ao centro da viga do mesmo tipo do outro lado ela se repete: a
   emenda cai no meio de uma viga e não aparece. O chao.png e o chao_grade.png têm a mesma
   grade e são cortados no mesmo lugar (sem fundir nada).
-- Ruínas e arena ao longe: as bordas cortadas são esfumadas (as duas não se repetem).
+- Ruínas e arena ao longe: as bordas cortadas são esfumadas (as duas não se repetem). A
+  arena ao longe e os penhascos recebem a névoa da distância (montar_porto.afastar).
 - Andaime: o estandarte vira bandeira_andaime.png, para balançar ao vento
   (separar_bandeiras.py).
 - Sem primeiro plano: frente_esq.png e frente_dir.png são ignorados (nos cenários abertos
@@ -32,7 +33,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import esfumar_ilha, imagens  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, peca_comum  # noqa: E402
 import separar_bandeiras  # noqa: E402
 
 ID = "caminho_penhascos"
@@ -68,7 +69,7 @@ def main():
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         for nome in COMUNS:
-            Image.open(comum[nome]).save(tmp / f"{nome}.png")
+            peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
         for nome, arquivo in entrada.items():
             img = Image.open(arquivo)
             if nome in ("frente_esq", "frente_dir"):
@@ -79,7 +80,7 @@ def main():
             elif nome == "ruinas":
                 img = esfumar_ilha(img, lados=0.06, baixo=0.0)
             elif nome == "arena_longe":
-                img = esfumar_ilha(img, lados=0.04, baixo=0.15)
+                img = afastar(esfumar_ilha(img, lados=0.04, baixo=0.02), 0.4)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)

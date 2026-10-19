@@ -61,6 +61,16 @@ de perto for animada, ela entra como `ator` (veja `docs/tutorial-plateia.md`).
 aparecem soltos no meio do piso. O porto e a Arena Costeira ficaram sem eles; nos próximos
 cenários não precisa gerar essas duas imagens.
 
+**Profundidade e apoio** (aprendido no porto e nas arenas):
+- O que está longe (a ilha, os penhascos, as arenas e o templo ao longe) recebe a névoa da
+  distância na montagem (`montar_porto.afastar`: menos cor e contraste, puxando para o
+  azul-arroxeado do céu) e fica pequeno. Com a mesma cor e nitidez das peças de perto, a
+  ilha parecia uma maquete.
+- A base de cada peça de longe fica na linha d'água da profundidade dela, com a névoa de
+  baixo opaca. Apagar essa névoa mostrava o mar por baixo e a peça parecia voar.
+- Arquibancadas e prédios ficam encostados no fim do piso: atrás dele só tem o mar, e
+  qualquer vão aparece no super pulo (a arquibancada voando sobre a água).
+
 O jogo faz: fogo dos braseiros, brilho das lanternas e holofotes, reflexo no piso
 molhado, a água das piscinas e do mar (brilhos), neblina, folhas caindo. Não precisa (e é
 melhor não) pôr na arte. As **cachoeiras** são da arte (o jogo não anima cachoeira).
@@ -129,9 +139,9 @@ python tools/stage/montar_porto.py --comum pasta/torneio --entrada pasta/torneio
   `chao.png` é colado no centro com borda suave. O piso vai de −600 a 650 (a grade).
 - **Grade**: veio com a lateral do cais (concreto e pneus) embaixo do guarda-corpo. Essa
   lateral fica de costas para a câmera e é cortada.
-- **Ilha**: não se repete (é uma só, à direita do sol). As bordas dos lados e a névoa de
-  baixo são esfumadas, senão o corte reto aparecia contra o mar. Atrás dela, à direita,
-  os `penhascos.png` continuam a ilha.
+- **Ilha**: não se repete (é uma só, à direita do sol). Pequena (de 0,13 a 0,46 da tela) e
+  com a névoa da distância; as bordas dos lados são esfumadas e a névoa de baixo fica
+  opaca, apoiada no mar. Atrás dela, à direita, os `penhascos.png` continuam a ilha.
 - **Mar e céu**: o `mar.png` desce até 0,8 da tela (no super pulo aparece mar, e não um
   vazio) com o horizonte em 0,40, e o reflexo do sol fica embaixo do sol do `ceu.jpg`.
   A água do porto (`agua`, de 660 a 9000) só põe os brilhos e o reflexo dos barcos.
@@ -188,10 +198,13 @@ python tools/stage/montar_costeira.py --comum pasta/torneio --entrada pasta/torn
   é dentro dele.
 - **Encosta**: a borda da direita e a névoa de baixo são esfumadas, como a ilha do porto.
 - **Composição** (profundidades): holofotes 320 (perto, a cabeça de luz fica acima da tela
-  na câmera de repouso), mureta 600 (fim do piso), arquibancada 900 (baixa, 0,2 da tela:
-  por cima dela aparecem o mar, os rochedos e o pôr do sol), holofotes 1050 (atrás da
-  arquibancada, com a cabeça de luz acesa), encosta 2600 (à direita, sem repetir),
-  penhascos 6500, mar 9000 (com brilhos), céu.
+  na câmera de repouso), arquibancada 605 (encostada no fim do piso, 0,27 da tela: por cima
+  dela aparecem o mar, os rochedos e o pôr do sol), holofotes 1050 (atrás da arquibancada,
+  com a cabeça de luz acesa), encosta 2600 (à direita, sem repetir), penhascos 6500, mar
+  9000 (com brilhos), céu.
+- **Sem a mureta**: a `barreira.png` repetia o muro de LED que a arquibancada já tem embaixo
+  (duas faixas vermelhas). O muro da arquibancada é a mureta do ringue. Antes ela ficava a
+  900, com um vão de mar até o piso: no super pulo ela voava sobre a água.
 - **Sem primeiro plano**: a grua de câmera e o vaso com o corrimão de vidro ficavam soltos
   no ar, borrados, e com a câmera afastada o corrimão aparecia no meio do ringue. Ficaram
   de fora (o script ignora `frente_esq` e `frente_dir`). Numa arena aberta, com o piso
@@ -240,10 +253,10 @@ python tools/stage/montar_imperial.py --comum pasta/torneio --entrada pasta/torn
   na emenda. O piso vai de −600 a 650.
 - **Palácio**: logo atrás do fim do piso (690), para a escadaria sair direto da praça (mais
   longe, aparecia uma faixa de mar entre a praça e a escada). Uma neblina clara das
-  cachoeiras (720) fica entre as arquibancadas e o palácio.
+  cachoeiras (720) fica logo atrás do palácio.
 - **Composição** (profundidades): lanternas de praça 150 (o jogo acende), pórticos com
-  estandarte 300, árvores vermelhas 520 (dos dois lados do palácio), palácio 690,
-  arquibancadas laterais 760 (nas pontas, a cada 0,84 tela), penhascos 6500, mar, céu do
+  estandarte 300, árvores vermelhas 520 (dos dois lados do palácio), arquibancadas
+  laterais 660 (nas pontas, a cada 0,84 tela, encostadas no fim da praça), palácio 690, penhascos 6500, mar, céu do
   pôr do sol. Folhas vermelhas caindo (`petalas` em `#C8202A`). Pedra polida:
   `reflexoLutadores` 0,25.
 - O ep06 usa este cenário na SEMIFINAL, e ele entra no sorteio do Arcade.
@@ -357,8 +370,8 @@ python tools/stage/montar_central.py --comum pasta/torneio --entrada pasta/torne
   −600 a 600 e o círculo ocupa quase toda a profundidade.
 - **Arquibancada**: o GPT pintou um pedaço do piso do ringue embaixo dela (cortado).
 - **Composição** (profundidades): pilastras com estandarte 300, treliça de luzes 420 (faixa
-  no alto, com os refletores acesos pelo jogo), mureta 600, arquibancada 1100 (alta, 0,42 da
-  tela), templo do Takatoshi ao longe 6000 (aparece por cima da arquibancada quando a
+  no alto, com os refletores acesos pelo jogo), mureta 600, arquibancada 640 (logo atrás da
+  mureta, alta, 0,42 da tela; mais longe ela voava no super pulo), templo do Takatoshi ao longe 6000 (aparece por cima da arquibancada quando a
   câmera afasta e no super pulo), penhascos, mar e o céu com a lua.
 - O ep07 usa este cenário na FINAL, e ele entra no sorteio do Arcade.
 

@@ -15,8 +15,10 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   fica de costas para a câmera e é cortada; sobra o guarda-corpo em cima da borda do cais.
 - Sem primeiro plano: o frente_esq.png (caixas) e o frente_dir.png (cabeço e luminária)
   apareciam soltos no meio do cais com a câmera afastada. São ignorados.
-- Ilha: as bordas dos lados e a faixa de névoa de baixo são esfumadas (a imagem não se
-  repete e o corte reto aparecia contra o mar).
+- Ilha e penhascos: recebem a névoa da distância (`afastar`: menos cor e contraste,
+  puxando para o azul-arroxeado do céu); sem ela pareciam uma maquete. As bordas dos lados
+  da ilha são esfumadas, mas a névoa de baixo fica opaca até a borda: apagada, ela mostrava
+  o mar por baixo e a ilha parecia voar.
 - Poste: o estandarte vira bandeira_poste.png, para balançar ao vento (separar_bandeiras.py).
 
 Grava em android/app/src/main/assets/stages/porto_secreto/ sem mexer no stage.json.
@@ -78,6 +80,32 @@ def esfumar_ilha(img, lados=0.12, baixo=0.14):
     return Image.fromarray(px.clip(0, 255).astype(np.uint8))
 
 
+# Cor da distância: o azul-arroxeado do céu perto do horizonte, à noite.
+NEVOA = (88, 80, 140)
+# Peças comuns que ficam longe e recebem a névoa da distância (força de 0 a 1).
+COMUNS_LONGE = {"penhascos": 0.45}
+
+
+def afastar(img, forca, cor=NEVOA):
+    """Profundidade atmosférica: o que está longe perde cor e contraste e puxa para a cor do
+    céu. Sem isso, as peças do fundo da ilha (cheias de cor e de detalhe, como as de perto)
+    pareciam uma maquete colada atrás do cenário."""
+    px = np.asarray(img.convert("RGBA")).astype(np.float32)
+    rgb = px[..., :3]
+    cinza = (rgb * np.array([0.299, 0.587, 0.114], np.float32)).sum(axis=2, keepdims=True)
+    rgb = rgb + (cinza - rgb) * (0.4 * forca)
+    rgb = rgb + (np.array(cor, np.float32) - rgb) * forca
+    px[..., :3] = rgb
+    return Image.fromarray(px.clip(0, 255).astype(np.uint8))
+
+
+def peca_comum(nome, img):
+    """Uma peça comum da ilha como ela entra no cenário (as de longe com a névoa)."""
+    if nome in COMUNS_LONGE:
+        return afastar(img, COMUNS_LONGE[nome])
+    return img
+
+
 def imagens(pasta):
     return {p.stem: p for p in pasta.iterdir() if p.suffix.lower() in EXTENSOES}
 
@@ -108,8 +136,7 @@ def main():
         com.save(tmp / "chao.png")
         sem.save(tmp / "chao_cais.png")
         for nome in COMUNS:
-            img = Image.open(comum[nome])
-            img.save(tmp / f"{nome}.png")
+            peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_cais"):
                 continue
@@ -118,7 +145,7 @@ def main():
                 continue
             img = Image.open(arquivo)
             if nome == "ilha":
-                img = esfumar_ilha(img)
+                img = afastar(esfumar_ilha(img, lados=0.12, baixo=0.02), 0.4)
             if nome == "grade":
                 img = img.convert("RGBA")
                 img = img.crop((0, 0, img.width, round(img.height * CORTE_GRADE)))

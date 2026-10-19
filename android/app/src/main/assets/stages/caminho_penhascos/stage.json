@@ -30,7 +30,7 @@
       "imagem": "penhascos.png",
       "profundidade": 7000,
       "topo": 0.17,
-      "base": 0.45,
+      "base": 0.445,
       "x": 1.05,
       "repetir": "nao"
     },
@@ -39,7 +39,7 @@
       "imagem": "arena_longe.png",
       "profundidade": 5000,
       "topo": -0.02,
-      "base": 0.47,
+      "base": 0.46,
       "x": 0.8,
       "repetir": "nao",
       "luzes": [

@@ -13,7 +13,11 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   `FAIXA`), repetida três vezes com o brilho nivelado (o GPT iluminou mais o centro; sem
   isso, cada emenda ficava com um degrau de luz): é o chao_liso.jpg. O chao.jpg é o mesmo, com o círculo vermelho e o emblema do
   chao.png colados no centro (as duas imagens têm a mesma grade de lajotas).
-- Encosta: a borda da direita e a névoa de baixo são esfumadas, como a ilha do porto.
+- Encosta: névoa da distância (mais fraca que a da ilha do porto, ela está mais perto) e a
+  borda da direita esfumada; a névoa de baixo fica opaca até a linha d'água.
+- Sem mureta: a barreira.png repetia o muro de LED que a arquibancada já tem embaixo (duas
+  faixas vermelhas, uma em cima da outra). A arquibancada fica encostada no fim do piso e
+  o muro dela é a mureta do ringue.
 - Sem primeiro plano: o frente_esq.png (grua de câmera) e o frente_dir.png (vaso e
   corrimão de vidro) ficavam soltos no ar, borrados, e com a câmera afastada o corrimão
   aparecia no meio do ringue. São ignorados.
@@ -34,7 +38,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, esfumar_ilha, imagens  # noqa: E402
+from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum  # noqa: E402
 
 ID = "arena_costeira"
 # Faixa de lajotas do chao_liso.png que se repete: da coluna depois de uma junta até a
@@ -110,7 +114,7 @@ def main():
         comum["mar"] = comum.pop("maar")
     if "frent_dir" in entrada:
         entrada["frente_dir"] = entrada.pop("frent_dir")
-    for falta in ("chao", "chao_liso", "arquibancada", "barreira", "holofote", "encosta"):
+    for falta in ("chao", "chao_liso", "arquibancada", "holofote", "encosta"):
         if falta not in entrada:
             sys.exit(f"faltou {falta}.png em {args.entrada}")
     for falta in COMUNS:
@@ -124,16 +128,19 @@ def main():
         com.save(tmp / "chao.png")
         sem.save(tmp / "chao_liso.png")
         for nome in COMUNS:
-            Image.open(comum[nome]).save(tmp / f"{nome}.png")
+            peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_liso"):
                 continue
             if nome in ("frente_esq", "frente_dir"):
                 print(f"{arquivo.name} ignorado: a arena fica sem primeiro plano")
                 continue
+            if nome == "barreira":
+                print(f"{arquivo.name} ignorado: o muro de LED da arquibancada já é a mureta")
+                continue
             img = Image.open(arquivo)
             if nome == "encosta":
-                img = esfumar_ilha(img, lados=0.04, baixo=0.12)
+                img = afastar(esfumar_ilha(img, lados=0.04, baixo=0.02), 0.2)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)

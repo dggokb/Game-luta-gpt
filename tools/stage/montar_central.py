@@ -14,6 +14,7 @@ transparentes, alfa opaco, JPG, 2048 px):
   da cruz, que entra pelas bordas, é coberta com as lajotas ao lado, e as poucas colunas da
   borda do chao vêm do chao_liso já limpo.
 - Arquibancada: o GPT pintou um pedaço do piso do ringue embaixo dela; é cortado.
+- Templo ao longe e penhascos: névoa da distância (montar_porto.afastar).
 - Sem primeiro plano: o camarote.png é ignorado (objetos colados na câmera ficavam soltos
   no meio do piso nos outros cenários da ilha).
 
@@ -32,7 +33,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import esfumar_ilha, imagens  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, peca_comum  # noqa: E402
 
 ID = "arena_central"
 COMUNS = ("ceu_lua", "mar", "penhascos")
@@ -88,7 +89,7 @@ def main():
         com.save(tmp / "chao.png")
         sem.save(tmp / "chao_liso.png")
         for nome in COMUNS:
-            Image.open(comum[nome]).save(tmp / f"{nome}.png")
+            peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_liso"):
                 continue
@@ -100,7 +101,7 @@ def main():
                 img = img.convert("RGBA")
                 img = img.crop((0, 0, img.width, round(img.height * CORTE_ARQUIBANCADA)))
             elif nome == "templo_longe":
-                img = esfumar_ilha(img, lados=0.03, baixo=0.12)
+                img = afastar(esfumar_ilha(img, lados=0.03, baixo=0.02), 0.4)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)

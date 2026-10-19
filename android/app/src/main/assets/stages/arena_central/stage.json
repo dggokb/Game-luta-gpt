@@ -30,7 +30,7 @@
       "imagem": "penhascos.png",
       "profundidade": 7000,
       "topo": 0.17,
-      "base": 0.45,
+      "base": 0.445,
       "x": 0.05,
       "repetir": "nao"
     },
@@ -39,7 +39,7 @@
       "imagem": "templo_longe.png",
       "profundidade": 6000,
       "topo": -0.06,
-      "base": 0.44,
+      "base": 0.45,
       "x": 0.66,
       "repetir": "nao",
       "luzes": [
@@ -60,7 +60,7 @@
     {
       "id": "arquibancada",
       "imagem": "arquibancada.png",
-      "profundidade": 1100,
+      "profundidade": 640,
       "noChao": true,
       "altura": 0.42,
       "repetir": "espelhar",
