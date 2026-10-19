@@ -26,10 +26,22 @@
       "repetir": "espelhar"
     },
     {
+      "id": "mar-plano",
+      "tipo": "agua",
+      "imagem": "mar_plano.jpg",
+      "perto": 655,
+      "longe": 8500,
+      "tamanho": 1300,
+      "corrente": 18,
+      "corLonge": "#2C344E",
+      "alfa": 1,
+      "brilhos": 60,
+      "sol": { "x": 0.202, "cor": "#FFC060", "alfa": 0.8 }
+    },
+    {
       "id": "penhascos",
       "imagem": "penhascos.png",
       "profundidade": 8800,
-      "apoio": 9000,
       "topo": 0.24,
       "base": 0.446,
       "x": 1.08,
@@ -48,7 +60,6 @@
       "id": "ilha",
       "imagem": "ilha.png",
       "profundidade": 8600,
-      "apoio": 9000,
       "topo": 0.13,
       "base": 0.462,
       "x": 0.95,
@@ -59,20 +70,9 @@
       ]
     },
     {
-      "id": "porto",
-      "tipo": "agua",
-      "perto": 660,
-      "longe": 9000,
-      "corPerto": "#081428",
-      "corLonge": "#1B2450",
-      "alfa": 0.35,
-      "brilhos": 70
-    },
-    {
       "id": "barcos",
       "imagem": "barcos.png",
       "profundidade": 1400,
-      "apoio": 9000,
       "noChao": true,
       "altura": 0.17,
       "x": 0.42,

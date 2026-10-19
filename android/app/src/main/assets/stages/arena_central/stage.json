@@ -26,10 +26,22 @@
       "repetir": "espelhar"
     },
     {
+      "id": "mar-plano",
+      "tipo": "agua",
+      "imagem": "mar_plano.jpg",
+      "perto": 645,
+      "longe": 8500,
+      "tamanho": 1300,
+      "corrente": 18,
+      "corLonge": "#2C344E",
+      "alfa": 1,
+      "brilhos": 60,
+      "sol": { "x": 0.202, "cor": "#FFC060", "alfa": 0.8 }
+    },
+    {
       "id": "penhascos",
       "imagem": "penhascos.png",
       "profundidade": 8800,
-      "apoio": 9000,
       "topo": 0.17,
       "base": 0.445,
       "x": 0.05,
@@ -39,7 +51,6 @@
       "id": "templo-longe",
       "imagem": "templo_longe.png",
       "profundidade": 8600,
-      "apoio": 9000,
       "topo": -0.06,
       "base": 0.45,
       "x": 0.66,

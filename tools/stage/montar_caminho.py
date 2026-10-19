@@ -33,7 +33,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar  # noqa: E402
 import separar_bandeiras  # noqa: E402
 
 ID = "caminho_penhascos"
@@ -70,6 +70,7 @@ def main():
         tmp = Path(tmp)
         for nome in COMUNS:
             peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
+        textura_mar(Image.open(comum["mar"])).save(tmp / "mar_plano.png")
         for nome, arquivo in entrada.items():
             img = Image.open(arquivo)
             if nome in ("frente_esq", "frente_dir"):

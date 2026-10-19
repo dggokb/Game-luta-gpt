@@ -38,7 +38,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar  # noqa: E402
+from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar  # noqa: E402
 
 ID = "arena_costeira"
 # Faixa de lajotas do chao_liso.png que se repete: da coluna depois de uma junta até a
@@ -129,6 +129,7 @@ def main():
         sem.save(tmp / "chao_liso.png")
         for nome in COMUNS:
             peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
+        textura_mar(Image.open(comum["mar"])).save(tmp / "mar_plano.png")
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_liso"):
                 continue

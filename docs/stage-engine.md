@@ -95,6 +95,15 @@ igual no Android e no Java2D.
 | `agua` | Plano horizontal entre as profundidades `perto` e `longe`, com degradê e brilhos que piscam presos ao mundo. Translúcida para mostrar o reflexo da camada atrás dela. |
 | `ator` | Personagem de fundo animado (`pasta` com `ator.json` e as folhas), apoiado no chão (`noChao` + `altura`), `virar` espelha. Fica na animação parada e toca as reações que o jogo pede (`StageScene.react("licao")`, `actorPlay`). Sem a folha de uma reação, usa a parada com um movimento provisório. Veja `docs/tutorial-plateia.md`. |
 
+**Mar deitado** (`agua` com `"imagem"`): a textura do mar vista de cima é desenhada em
+perspectiva entre `perto` e `longe`, em faixas, igual ao piso: ondas grandes perto e pequenas
+e juntas no horizonte, andando devagar (`corrente`, unidades por segundo; `tamanho` é a largura
+de uma cópia no mundo). No fundo a água some na `corLonge`. `"sol": {"x", "cor", "alfa"}`
+desenha o caminho de luz do sol (risquinhos que piscam embaixo dele; `x` em fração da tela na
+câmera de repouso). Sem isso o mar era uma foto em pé lá no fundo: as ondas grandes da parte de
+baixo da foto apareciam logo atrás do piso, enormes perto de tudo, e o que estava sobre a água
+deslizava em cima dela no super pulo. Primeiro uso: Ilha do Torneio (`mar_plano.jpg`).
+
 **Apoio** (`"apoio": 9000`): a camada está apoiada noutra mais funda (uma ilha ou um barco
 sobre o mar). O mar é uma imagem plana lá no fundo; sem o apoio, quando a câmera sobe no super
 pulo, o que está mais perto desce mais que ele e desliza por cima da água (parece voar). Com

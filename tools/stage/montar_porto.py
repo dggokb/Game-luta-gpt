@@ -136,6 +136,19 @@ def afinar_pontas(img, fracao=0.3):
     return Image.fromarray(saida)
 
 
+def textura_mar(mar):
+    """Textura do mar vista de cima (mar_plano.jpg), para a água deitada em perspectiva (a
+    camada "agua" com "imagem", veja docs/stage-engine.md). Provisória: as ondas de perto do
+    mar.png, do lado sem o caminho do sol, esticadas na vertical (na foto elas estão
+    achatadas pela perspectiva) e com as bordas fundidas nas duas direções, para repetir."""
+    from montar_brucy import sem_emenda
+    w, h = mar.size
+    faixa = mar.convert("RGB").crop((round(w * 0.42), round(h * 0.745), w, h))
+    faixa = faixa.resize((faixa.width, round(faixa.height * 2.2)), Image.BICUBIC)
+    faixa = sem_emenda(faixa)
+    return sem_emenda(faixa.transpose(Image.TRANSPOSE)).transpose(Image.TRANSPOSE)
+
+
 def peca_comum(nome, img):
     """Uma peça comum da ilha como ela entra no cenário (as de longe com a névoa)."""
     if nome == "penhascos":
@@ -176,6 +189,7 @@ def main():
         sem.save(tmp / "chao_cais.png")
         for nome in COMUNS:
             peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
+        textura_mar(Image.open(comum["mar"])).save(tmp / "mar_plano.png")
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_cais"):
                 continue

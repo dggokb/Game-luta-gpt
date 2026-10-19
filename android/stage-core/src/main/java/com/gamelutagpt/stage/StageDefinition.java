@@ -129,6 +129,15 @@ public final class StageDefinition {
         /** Água: faixa de profundidades e quantidade de brilhos. */
         public final float waterNear, waterFar;
         public final int shimmer;
+        /**
+         * Água com {@code "imagem"}: textura do mar vista de cima, deitada em perspectiva entre
+         * {@code perto} e {@code longe} como o piso. {@code tamanho} é a largura de uma cópia
+         * no mundo e {@code corrente} quantas unidades por segundo ela anda para o lado.
+         */
+        public final float waterTile, drift;
+        /** Reflexo do sol na água: x na tela (câmera de repouso, no céu), cor e opacidade; x NaN = sem. */
+        public final float sunX, sunAlpha;
+        public final int sunColor;
         public final List<Light> lights;
         public final List<Fire> fires;
         public final List<Banner> banners;
@@ -158,6 +167,11 @@ public final class StageDefinition {
             waterNear = b.waterNear;
             waterFar = b.waterFar;
             shimmer = b.shimmer;
+            waterTile = b.waterTile;
+            drift = b.drift;
+            sunX = b.sunX;
+            sunAlpha = b.sunAlpha;
+            sunColor = b.sunColor;
             lights = Collections.unmodifiableList(new ArrayList<>(b.lights));
             fires = Collections.unmodifiableList(new ArrayList<>(b.fires));
             banners = Collections.unmodifiableList(new ArrayList<>(b.banners));
@@ -189,6 +203,8 @@ public final class StageDefinition {
         float support = Float.NaN;
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
+        float waterTile = 1600f, drift, sunX = Float.NaN, sunAlpha;
+        int sunColor;
         final List<Light> lights = new ArrayList<>();
         final List<Fire> fires = new ArrayList<>();
         final List<Banner> banners = new ArrayList<>();
@@ -488,6 +504,16 @@ public final class StageDefinition {
                 b.color = color(map, "corLonge", 0xFF1A2550);
                 b.colorBottom = color(map, "corPerto", 0xFF0A1028);
                 b.shimmer = Math.max(0, Math.round(number(map, "brilhos", 40f)));
+                b.image = string(map, "imagem", null);
+                b.waterTile = Math.max(50f, number(map, "tamanho", 1600f));
+                b.drift = number(map, "corrente", 25f);
+                Object sun = map.get("sol");
+                if (sun instanceof Map) {
+                    Map<String, Object> sm = (Map<String, Object>)sun;
+                    b.sunX = number(sm, "x", 0.5f);
+                    b.sunColor = color(sm, "cor", 0xFFFFC060);
+                    b.sunAlpha = clamp01(number(sm, "alfa", 0.5f));
+                }
                 break;
         }
 

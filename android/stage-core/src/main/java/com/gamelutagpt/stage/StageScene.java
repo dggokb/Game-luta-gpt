@@ -29,6 +29,9 @@ public final class StageScene {
     private static final float BANNER_STRIP = 3f;
 
     /** Camada de imagem já convertida para o mundo 3D na sua profundidade. */
+    /** Profundidade do céu, para o reflexo do sol na água (o sol não anda com a câmera). */
+    private static final float SKY_DEPTH = 100000f;
+
     private static final class Placed {
         final StageDefinition.Layer layer;
         final RenderImage image;
@@ -36,6 +39,8 @@ public final class StageScene {
         final float top, bottom, width, firstCenterX, period;
         /** Com {@code apoio}: y do mundo, na profundidade do apoio, onde fica a base. */
         float supportBaseY = Float.NaN;
+        /** Água com reflexo do sol: x do sol no mundo, na profundidade do céu. */
+        float sunWorldX = Float.NaN;
         /** Imagens das bandeiras da camada, na ordem dela (null = não carregou). */
         final RenderImage[] banners;
 
@@ -158,6 +163,9 @@ public final class StageScene {
             RenderImage[] banners = new RenderImage[layer.banners.size()];
             for (int i = 0; i < banners.length; i++) banners[i] = pack.image(layer.banners.get(i).image);
             Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period), banners);
+            if (layer.kind == StageDefinition.Kind.WATER && !Float.isNaN(layer.sunX)) {
+                p.sunWorldX = rest.worldX(layer.sunX * VW, SKY_DEPTH);
+            }
             if (!Float.isNaN(layer.support)) {
                 p.supportBaseY = rest.worldY(rest.screenY(bottom, z), layer.support);
             }
@@ -883,8 +891,15 @@ public final class StageScene {
         float yNear = camera.screenY(world.groundY, layer.waterNear);
         if (yNear <= yFar) return;
         int alpha = Math.round(255f * layer.alpha);
-        c.fillVerticalGradient(-10f, yFar, VW + 10f, yNear + 1f,
-            withAlpha(layer.color, alpha), withAlpha(layer.colorBottom, alpha));
+        if (p.image != null) {
+            drawWaterSurface(c, p, Math.max(yFar, camera.horizonY() + 0.5f), Math.min(yNear, VH + 1f));
+            // Lá longe a água some na cor do horizonte.
+            float haze = yFar + (yNear - yFar) * 0.4f;
+            c.fillVerticalGradient(-10f, yFar - 1f, VW + 10f, haze, withAlpha(layer.color, 230), layer.color & 0x00FFFFFF);
+        } else {
+            c.fillVerticalGradient(-10f, yFar, VW + 10f, yNear + 1f,
+                withAlpha(layer.color, alpha), withAlpha(layer.colorBottom, alpha));
+        }
 
         if (!detalhe) return;
         // Brilhos que piscam na superfície, presos ao mundo (andam com a câmera).
@@ -905,6 +920,66 @@ public final class StageScene {
             float length = (18f + 30f * rand.next()) * scale;
             c.drawLine(sx - length, sy, sx + length, sy, Math.max(1f, 2.2f * scale),
                 withAlpha(0xFFFFE6C0, Math.round(150 * twinkle)));
+        }
+    }
+
+    /**
+     * Superfície da água deitada em perspectiva, em faixas como o piso: a textura (vista de
+     * cima) se repete nas duas direções, anda com a corrente e, no fundo, as ondas ficam
+     * pequenas e juntas. Sem isso o mar era uma foto em pé lá no fundo: as ondas grandes da
+     * parte de baixo da foto apareciam logo atrás do piso, enormes perto de tudo.
+     */
+    private void drawWaterSurface(RenderCanvas c, Placed p, float top, float bottom) {
+        StageDefinition.Layer layer = p.layer;
+        RenderImage image = p.image;
+        float imgW = image.width(), imgH = image.height();
+        float tileW = layer.waterTile;
+        float tileD = tileW * imgH / imgW;
+        int alpha = Math.round(255f * layer.alpha);
+        float shift = time * layer.drift;
+        for (float y0 = top; y0 < bottom; y0 += FLOOR_STRIP) {
+            float y1 = Math.min(bottom, y0 + FLOOR_STRIP);
+            float zTop = camera.floorDepthAt(y0), zBottom = camera.floorDepthAt(y1);
+            if (Float.isNaN(zTop) || Float.isNaN(zBottom)) continue;
+            zTop = Math.min(zTop, layer.waterFar);
+            zBottom = Math.max(zBottom, layer.waterNear);
+            float zMid = (zTop + zBottom) * 0.5f;
+            float d = (layer.waterFar - zTop) / tileD;
+            float v0 = (d - (float)Math.floor(d)) * imgH;
+            float v1 = Math.min(imgH, v0 + Math.max(1f, (zTop - zBottom) / tileD * imgH));
+            if (v1 - v0 < 1f) v0 = v1 - 1f;
+            float uLeft = (camera.worldX(0f, zMid) + shift) / tileW * imgW;
+            float uRight = (camera.worldX(VW, zMid) + shift) / tileW * imgW;
+            int tile = (int)Math.floor(uLeft / imgW);
+            float u = uLeft;
+            while (u < uRight) {
+                float tileEnd = Math.min(uRight, (tile + 1) * imgW);
+                float sx0 = (u - uLeft) / (uRight - uLeft) * VW;
+                float sx1 = (tileEnd - uLeft) / (uRight - uLeft) * VW;
+                c.drawImageRegion(image, u - tile * imgW, v0, tileEnd - tile * imgW, v1, sx0, y0, sx1 + 0.5f, y1, alpha);
+                u = tileEnd;
+                tile++;
+            }
+        }
+        if (Float.isNaN(p.sunWorldX) || !detalhe) return;
+        // Caminho de luz do sol: risquinhos que piscam embaixo dele na tela, poucos e juntos
+        // no horizonte, mais largos e espalhados perto.
+        float sx = camera.screenX(p.sunWorldX, SKY_DEPTH);
+        float horizon = camera.horizonY();
+        rand.reset(777);
+        for (float y = top; y < bottom; y += 2.5f) {
+            float k = Math.max(0f, (y - horizon) / Math.max(1f, VH - horizon));
+            float spread = 10f + 160f * k;
+            int dashes = 2 + (int)(5f * k);
+            for (int i = 0; i < dashes; i++) {
+                float off = (rand.next() + rand.next() - 1f) * spread;
+                float phase = rand.range(0f, 6.283f);
+                float twinkle = 0.5f + 0.5f * (float)Math.sin(time * (2f + 2f * rand.next()) + phase);
+                int a = Math.round(255f * layer.sunAlpha * twinkle * (1f - Math.abs(off) / (spread * 1.2f)));
+                if (a <= 4) continue;
+                float len = (3f + 22f * k) * (0.5f + rand.next());
+                c.drawLine(sx + off - len, y, sx + off + len, y, 1f + 2f * k, withAlpha(layer.sunColor, a));
+            }
         }
     }
 

@@ -28,7 +28,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, imagens, peca_comum  # noqa: E402
+from montar_porto import COMUNS, imagens, peca_comum, textura_mar  # noqa: E402
 
 ID = "arena_imperial"
 # Centro da perspectiva (fração da largura) e quanto as linhas abrem do topo à base.
@@ -80,6 +80,7 @@ def main():
         sem.save(tmp / "chao_placas.png")
         for nome in COMUNS:
             peca_comum(nome, Image.open(comum[nome])).save(tmp / f"{nome}.png")
+        textura_mar(Image.open(comum["mar"])).save(tmp / "mar_plano.png")
         for nome, arquivo in entrada.items():
             if nome in ("chao", "chao_placas"):
                 continue

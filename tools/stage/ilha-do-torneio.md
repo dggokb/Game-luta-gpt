@@ -62,11 +62,20 @@ aparecem soltos no meio do piso. O porto e a Arena Costeira ficaram sem eles; no
 cenários não precisa gerar essas duas imagens.
 
 **Profundidade e apoio** (aprendido no porto e nas arenas):
+- **O mar é deitado** (`agua` com `"imagem": "mar_plano.jpg"`, do fim do piso até 8500,
+  veja `docs/stage-engine.md`). O `mar.png` em pé fica só para a faixa do horizonte. Era a
+  diferença entre as arenas e os cenários que funcionavam: lá sempre há coisas entre o piso e
+  o fundo (portal, viaduto, muro, cidade); aqui, atrás do piso só tem água, e a água em pé
+  fazia a arquibancada parecer de brinquedo diante de ondas gigantes. A `mar_plano.jpg` é
+  provisória (`montar_porto.textura_mar`, das ondas de perto do `mar.png`); o ideal é gerar
+  uma no GPT: "mar à noite visto exatamente de cima, ondas pequenas com espuma, reflexos
+  dourados, sem horizonte, sem céu, as quatro bordas continuam o padrão".
 - **Paisagem gigante fica lá no fundo, junto do mar.** A ilha, a encosta, os penhascos, as
   arenas e o templo ao longe ficam a 8600–8800 (o mar a 9000), com `"apoio": 9000`, e o
   tamanho na tela vem do `topo`/`base`. Mais perto (a encosta estava a 2600), uma montanha
   enorme se mexia como um objeto pequeno e abria uma faixa de mar embaixo dela no pulo.
-  Coisas pequenas sobre a água (os barcos) podem ficar perto, sempre com o `apoio`.
+  Coisas pequenas sobre a água (os barcos) ficam na própria distância, em cima do mar
+  deitado; o `apoio` só é preciso onde o mar ainda for a imagem em pé.
 - O que está longe (a ilha, os penhascos, as arenas e o templo ao longe) recebe a névoa da
   distância na montagem (`montar_porto.afastar`: menos cor e contraste, puxando para o
   azul-arroxeado do céu) e fica pequeno. Com a mesma cor e nitidez das peças de perto, a
