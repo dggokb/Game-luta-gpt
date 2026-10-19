@@ -71,12 +71,14 @@ def esfumar_ilha(img, lados=0.12, baixo=0.14):
     """Apaga aos poucos as bordas esquerda e direita e a faixa de névoa de baixo."""
     px = np.asarray(img.convert("RGBA")).astype(np.float32)
     h, w = px.shape[:2]
-    n = max(1, int(w * lados))
-    rampa = np.linspace(0.0, 1.0, n) ** 1.5
-    px[:, :n, 3] *= rampa
-    px[:, w - n:, 3] *= rampa[::-1]
-    m = max(1, int(h * baixo))
-    px[h - m:, :, 3] *= np.linspace(1.0, 0.0, m)[:, None] ** 1.2
+    n = int(w * lados)
+    if n > 0:
+        rampa = np.linspace(0.0, 1.0, n) ** 1.5
+        px[:, :n, 3] *= rampa
+        px[:, w - n:, 3] *= rampa[::-1]
+    m = int(h * baixo)
+    if m > 0:
+        px[h - m:, :, 3] *= np.linspace(1.0, 0.0, m)[:, None] ** 1.2
     return Image.fromarray(px.clip(0, 255).astype(np.uint8))
 
 
@@ -99,8 +101,50 @@ def afastar(img, forca, cor=NEVOA):
     return Image.fromarray(px.clip(0, 255).astype(np.uint8))
 
 
+def fechar_lado(img):
+    """Peça de longe desenhada saindo por uma borda (a encosta, a ilha): no cenário ela não
+    se repete, e a borda virava um corte reto no meio do céu (um pedaço de montanha solto no
+    ar). Ganha uma cópia espelhada do lado que encosta na borda: vira um maciço que desce
+    dos dois lados. A peça original fica na metade de sempre (esquerda ou direita)."""
+    img = img.convert("RGBA")
+    a = np.asarray(img.getchannel("A"))
+    esq, dir = (a[:, 0] > 200).mean(), (a[:, -1] > 200).mean()
+    if max(esq, dir) < 0.2:
+        return img
+    w, h = img.size
+    dobro = Image.new("RGBA", (w * 2, h), (0, 0, 0, 0))
+    espelho = img.transpose(Image.FLIP_LEFT_RIGHT)
+    if dir >= esq:
+        dobro.paste(img, (0, 0))
+        dobro.paste(espelho, (w, 0))
+    else:
+        dobro.paste(espelho, (0, 0))
+        dobro.paste(img, (w, 0))
+    return dobro
+
+
+def afinar_pontas(img, fracao=0.3):
+    """Faixa de montanhas cortada nas duas bordas (os penhascos): nas pontas, cada coluna é
+    achatada em direção à base, e as montanhas vão baixando até sumir na água, em vez de
+    acabar num corte reto."""
+    px = np.asarray(img.convert("RGBA"))
+    h, w = px.shape[:2]
+    n = int(w * fracao)
+    saida = px.copy()
+    for x in list(range(n)) + list(range(w - n, w)):
+        k = (x + 0.5) / n if x < n else (w - x - 0.5) / n
+        k = 0.12 + 0.88 * (k * k * (3 - 2 * k))
+        alto = max(1, round(h * k))
+        coluna = Image.fromarray(px[:, x:x + 1]).resize((1, alto), Image.BILINEAR)
+        saida[:, x] = 0
+        saida[h - alto:, x:x + 1] = np.asarray(coluna)
+    return Image.fromarray(saida)
+
+
 def peca_comum(nome, img):
     """Uma peça comum da ilha como ela entra no cenário (as de longe com a névoa)."""
+    if nome == "penhascos":
+        img = afinar_pontas(img)
     if nome in COMUNS_LONGE:
         return afastar(img, COMUNS_LONGE[nome])
     return img
@@ -145,7 +189,7 @@ def main():
                 continue
             img = Image.open(arquivo)
             if nome == "ilha":
-                img = afastar(esfumar_ilha(img, lados=0.12, baixo=0.02), 0.4)
+                img = afastar(fechar_lado(esfumar_ilha(img, lados=0.0, baixo=0.02)), 0.4)
             if nome == "grade":
                 img = img.convert("RGBA")
                 img = img.crop((0, 0, img.width, round(img.height * CORTE_GRADE)))

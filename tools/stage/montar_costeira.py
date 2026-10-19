@@ -38,7 +38,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum  # noqa: E402
+from montar_porto import COMUNS, afastar, fechar_lado, esfumar_ilha, imagens, peca_comum  # noqa: E402
 
 ID = "arena_costeira"
 # Faixa de lajotas do chao_liso.png que se repete: da coluna depois de uma junta até a
@@ -140,7 +140,7 @@ def main():
                 continue
             img = Image.open(arquivo)
             if nome == "encosta":
-                img = afastar(esfumar_ilha(img, lados=0.04, baixo=0.02), 0.2)
+                img = afastar(fechar_lado(esfumar_ilha(img, lados=0.0, baixo=0.02)), 0.2)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)

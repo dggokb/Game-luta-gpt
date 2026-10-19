@@ -57,7 +57,7 @@
       "profundidade": 2600,
       "topo": -0.12,
       "base": 0.5,
-      "x": 0.86,
+      "x": 1.09,
       "repetir": "nao",
       "luzes": [
         { "x": 0.563, "y": 0.477, "raio": 0.025, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },

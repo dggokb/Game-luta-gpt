@@ -68,6 +68,11 @@ cenários não precisa gerar essas duas imagens.
   ilha parecia uma maquete.
 - A base de cada peça de longe fica na linha d'água da profundidade dela, com a névoa de
   baixo opaca. Apagar essa névoa mostrava o mar por baixo e a peça parecia voar.
+- Peça de longe que não se repete não pode terminar num corte reto: a borda vira um
+  pedaço de montanha solto no céu. Na montagem, a peça desenhada saindo por um lado (a
+  encosta, a ilha, a arena ao longe) ganha a cópia espelhada desse lado e vira um maciço
+  que desce dos dois lados (`montar_porto.fechar_lado`); a faixa de penhascos vai
+  baixando nas pontas até sumir na água (`afinar_pontas`).
 - Arquibancadas e prédios ficam encostados no fim do piso: atrás dele só tem o mar, e
   qualquer vão aparece no super pulo (a arquibancada voando sobre a água). Os lados também
   contam: uma peça que não se repete (o palácio) deixa o mar no nível da praça quando a
