@@ -36,7 +36,7 @@
         ] }
     ] },
 
-    { "tipo": "luta", "torneio": true },
+    { "tipo": "luta", "torneio": true, "cenario": "arena_costeira" },
 
     { "tipo": "chave" },
 

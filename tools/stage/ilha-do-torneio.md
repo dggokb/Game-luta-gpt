@@ -10,7 +10,7 @@ estandartes vermelhos. Os concepts estão em `art/concepts/cenarios/` (vieram do
 | Nº no mapa | Cenário (`id`) | Concept | Luta |
 | --- | --- | --- | --- |
 | 1 | Porto Secreto (`porto_secreto`), **pronto** | `porto_secreto.jpg` | DESAFIO (ep03, A Chegada): p07 + p08 desafiam o jogador no cais, antes do torneio |
-| 2 | Arena Costeira (`arena_costeira`) | `arena_costeira.jpg` | QUARTAS DE FINAL (ep04) |
+| 2 | Arena Costeira (`arena_costeira`), **pronto** | `arena_costeira.jpg` | QUARTAS DE FINAL (ep04) |
 | 3 | Arena Imperial (`arena_imperial`) | `arena_imperial.jpg` | SEMIFINAL (ep06) |
 | 4 | Caminho dos Penhascos (`caminho_penhascos`) | `caminho_penhascos.jpg` | EMBOSCADA (ep05) |
 | 5 | Arena Central (`arena_central`) | `arena_central.jpg` | FINAL 2x2 (ep07) |
@@ -160,6 +160,35 @@ encosta 2200 (só à direita, sem repetir), `penhascos.png` 4000, `mar.png` 9000
 | `frente_dir.png` | horizontal | **transparente** | Primeiro plano isolado, colado na câmera: um trecho de corrimão de vidro com um poste de metal e uma luminária baixa acesa, e uma palmeira pequena num vaso de pedra, em silhueta contornada pelas luzes douradas. **Só os objetos**: sem chão, sem fundo. A base toca a borda de baixo; acima e dos lados, margem transparente. |
 | `chao.jpg` | quadrado | opaco | Piso de ringue de arena visto **exatamente de cima** (vista ortográfica, sem perspectiva): concreto polido claro, bege-acinzentado, com um grande círculo central desenhado por dois anéis vermelhos finos e um anel dourado, e o emblema do torneio discreto no centro, em dourado. Fora do círculo, o mesmo concreto com juntas retas finas. Iluminação uniforme, sem sombras de objetos. As bordas esquerda e direita continuam o padrão. |
 | `chao_liso.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem o círculo, os anéis e o emblema do centro, com o concreto continuando no lugar deles". |
+
+### Notas da Arena Costeira
+
+As imagens do GPT passam pelo `montar_costeira.py` (o `frent_dir.png` do Drive é aceito
+como `frente_dir.png`):
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_costeira.py --comum pasta/torneio --entrada pasta/torneio/arena_costeira
+```
+
+- **Piso**: o GPT desenhou a arena inteira vista de cima, com a mureta curva e os
+  estandartes nas bordas da esquerda e da direita. Como o jogo repete o piso para os lados,
+  a mureta sairia pintada no chão. Fica só a faixa de lajotas do meio do `chao_liso.png`
+  (entre duas juntas com as mesmas fileiras), repetida três vezes. O GPT iluminou mais o
+  centro: a luz é medida no `chao_liso` (desfocada e, coluna a coluna, pela mediana) e
+  tirada das duas imagens, senão cada emenda ficava com um degrau de luz. O círculo
+  vermelho com o emblema do `chao.png` é colado no centro (as duas têm a mesma grade de
+  lajotas). O piso vai de −600 a 600 e o círculo ocupa quase toda a profundidade: a luta
+  é dentro dele.
+- **Encosta**: a borda da direita e a névoa de baixo são esfumadas, como a ilha do porto.
+- **Composição** (profundidades): holofotes 320 (perto, a cabeça de luz fica acima da tela
+  na câmera de repouso), mureta 600 (fim do piso), arquibancada 900 (baixa, 0,2 da tela:
+  por cima dela aparecem o mar, os rochedos e o pôr do sol), holofotes 1050 (atrás da
+  arquibancada, com a cabeça de luz acesa), encosta 2600 (à direita, sem repetir),
+  penhascos 6500, mar 9000 (com brilhos), céu. Primeiro plano: a grua de câmera e o vaso
+  com o corrimão de vidro, desfocados, a −250.
+- O ep04 usa este cenário nas QUARTAS DE FINAL (`"cenario": "arena_costeira"` no passo da
+  luta do torneio), e ele entra no sorteio do Arcade.
 
 ## 3. Arena Imperial (`arena_imperial`): semifinal
 
@@ -317,8 +346,8 @@ escadaria do `templo.png` podem vir na arte (são pequenas e distantes, quase n�
 ## Ordem sugerida
 
 1. ~~As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.~~ Prontas, no Drive.
-2. Arena Costeira e Caminho dos Penhascos: são as primeiras lutas da ilha (quartas e
-   emboscada) e trocam o Templo da Lua, que hoje é o cenário padrão do torneio.
+2. Arena Costeira (pronta, ep04) e Caminho dos Penhascos: são as primeiras lutas da ilha
+   (quartas e emboscada) e trocam o Templo da Lua, que hoje é o cenário padrão do torneio.
 3. ~~Porto Secreto, junto com o episódio da chegada.~~ Pronto (ep03).
 4. Imperial, Central e VIP, na ordem da chave.
 5. Arena do Templo, quando o Takatoshi virar lutador.

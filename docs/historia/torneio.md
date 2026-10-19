@@ -87,15 +87,16 @@ cenário: [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torne
 | Luta | Cenário |
 |---|---|
 | DESAFIO (ep03, A Chegada) | Porto Secreto (`porto_secreto`), **pronto** |
-| QUARTAS DE FINAL | Arena Costeira (`arena_costeira`) |
+| QUARTAS DE FINAL (ep04) | Arena Costeira (`arena_costeira`), **pronto** |
 | EMBOSCADA | Caminho dos Penhascos (`caminho_penhascos`) |
 | SEMIFINAL | Arena Imperial (`arena_imperial`) |
 | FINAL (2x2) | Arena Central (`arena_central`) |
 | DUELO FINAL (1x1, a "Final da Tag") | Arena VIP (`arena_vip`) |
 | O Campeão, Takatoshi | Arena do Templo (`arena_templo`) |
 
-O Porto Secreto já está no jogo (no ep03 e no sorteio de cenários do Arcade). Os outros
-ainda não existem: as lutas do torneio usam o Templo da Lua.
+O Porto Secreto e a Arena Costeira já estão no jogo (no ep03 e nas quartas do ep04, e no
+sorteio de cenários do Arcade). Os outros ainda não existem: as outras lutas do torneio
+usam o Templo da Lua.
 
 ## Passos novos no `episodio.json`
 

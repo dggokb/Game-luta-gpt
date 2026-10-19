@@ -1,0 +1,161 @@
+{
+  "nome": "Arena Costeira",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#0E1236",
+  "camadas": [
+    {
+      "id": "ceu",
+      "imagem": "ceu.jpg",
+      "profundidade": 100000,
+      "topo": -0.75,
+      "base": 0.42,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "corAcima": "#0E1236"
+    },
+    {
+      "id": "mar",
+      "imagem": "mar.png",
+      "profundidade": 9000,
+      "topo": 0.133,
+      "base": 0.8,
+      "x": 0.58,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "brilhos-mar",
+      "tipo": "agua",
+      "perto": 1600,
+      "longe": 9000,
+      "alfa": 0.0,
+      "brilhos": 50
+    },
+    {
+      "id": "penhascos",
+      "imagem": "penhascos.png",
+      "profundidade": 6500,
+      "topo": 0.17,
+      "base": 0.45,
+      "x": 1.1,
+      "repetir": "nao"
+    },
+    {
+      "id": "neblina-mar",
+      "tipo": "neblina",
+      "profundidade": 6000,
+      "topo": 0.34,
+      "base": 0.46,
+      "cor": "#4A3A78",
+      "alfa": 0.3
+    },
+    {
+      "id": "encosta",
+      "imagem": "encosta.png",
+      "profundidade": 2600,
+      "topo": -0.12,
+      "base": 0.5,
+      "x": 0.86,
+      "repetir": "nao",
+      "luzes": [
+        { "x": 0.563, "y": 0.477, "raio": 0.025, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.739, "y": 0.447, "raio": 0.025, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.772, "y": 0.716, "raio": 0.025, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.339, "y": 0.845, "raio": 0.025, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false }
+      ]
+    },
+    {
+      "id": "neblina-encosta",
+      "tipo": "neblina",
+      "profundidade": 2000,
+      "topo": 0.4,
+      "base": 0.55,
+      "cor": "#3A2C5E",
+      "alfa": 0.25
+    },
+    {
+      "id": "holofotes-longe",
+      "imagem": "holofote.png",
+      "profundidade": 1050,
+      "noChao": true,
+      "altura": 0.62,
+      "x": 0.27,
+      "repetir": "espelhar",
+      "periodo": 0.8,
+      "luzes": [
+        { "x": 0.5, "y": 0.078, "raio": 0.07, "cor": "#FFF0C8", "pulsar": 0.03, "reflexo": false }
+      ]
+    },
+    {
+      "id": "arquibancada",
+      "imagem": "arquibancada.png",
+      "profundidade": 900,
+      "noChao": true,
+      "altura": 0.2,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.25, "y": 0.726, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.749, "y": 0.726, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.06 }
+      ]
+    },
+    {
+      "id": "barreira",
+      "imagem": "barreira.png",
+      "profundidade": 600,
+      "noChao": true,
+      "altura": 0.075,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.203, "y": 0.12, "raio": 0.25, "cor": "#FFB45A", "pulsar": 0.05 },
+        { "x": 0.795, "y": 0.121, "raio": 0.25, "cor": "#FFB45A", "pulsar": 0.05 },
+        { "x": 0.5, "y": 0.4, "raio": 0.3, "cor": "#FF3A3A", "pulsar": 0.25 }
+      ]
+    },
+    {
+      "id": "holofotes",
+      "imagem": "holofote.png",
+      "profundidade": 320,
+      "noChao": true,
+      "altura": 1.0,
+      "x": 0.03,
+      "repetir": "espelhar",
+      "periodo": 1.15,
+      "luzes": [
+        { "x": 0.5, "y": 0.078, "raio": 0.07, "cor": "#FFF0C8", "pulsar": 0.03 }
+      ]
+    },
+    {
+      "id": "frente-grua",
+      "imagem": "frente_esq.png",
+      "profundidade": -250,
+      "noChao": true,
+      "altura": 0.4,
+      "x": 0.02,
+      "repetir": "repetir",
+      "periodo": 2.3,
+      "alfa": 0.95
+    },
+    {
+      "id": "frente-corrimao",
+      "imagem": "frente_dir.png",
+      "profundidade": -250,
+      "noChao": true,
+      "altura": 0.26,
+      "x": 0.97,
+      "repetir": "repetir",
+      "periodo": 2.3,
+      "alfa": 0.95
+    }
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "imagemLajotas": "chao_liso.jpg",
+    "perto": -600,
+    "longe": 600,
+    "centroX": 700,
+    "reflexoLutadores": 0.18,
+    "reflexoLuzes": 0.45
+  }
+}
