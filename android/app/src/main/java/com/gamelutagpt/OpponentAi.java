@@ -49,6 +49,8 @@ final class OpponentAi {
          * não deixar o tempo acabar. Ver {@link #urgency(int)}.
          */
         float urgency;
+        /** O rival anda soltando bola (várias há pouco): ela vai atrás, ou devolve com a dela. */
+        boolean rivalZoning;
     }
 
     /** A pressa começa com este tanto de segundos no relógio e chega ao máximo neste outro. */
@@ -160,9 +162,16 @@ final class OpponentAi {
             superInRange(s.self, s.distance) &&
             // O Super cru (sem ter acertado nada) é dos níveis baixos: os altos guardam a barra
             // para fechar combo, punir e para o Ultra.
-            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u) * (1.0 - 0.85 * smart(level))
+            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u) * (1.0 - 0.9 * smart(level))
         ) {
             actions.superAttack();
+        } else if (s.rivalZoning && energyInRange(s.self, s.distance) && !s.projectileActive &&
+            random.nextDouble() < 0.25 + 0.45 * smart(level)) {
+            // Contra quem fica soltando bola: devolve com a dela (as duas se anulam no meio).
+            actions.energy(random.nextDouble() < 0.5 ? "M" : "H");
+        } else if (s.rivalZoning && s.distance > 300f && random.nextDouble() < 0.45 + 0.4 * smart(level)) {
+            // Ou vai atrás: parada de longe ela só leva bola. Correndo quando está longe.
+            actions.moveForward(s.distance > 430f);
         } else if (
             energyInRange(s.self, s.distance) &&
             !s.projectileActive &&

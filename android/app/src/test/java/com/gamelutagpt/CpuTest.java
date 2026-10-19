@@ -133,7 +133,8 @@ public class CpuTest {
     private static double[] recursos(int level) {
         long frames = 0, barra = 0;
         int crus = 0;
-        for (long seed = 1; seed <= 4; seed++) {
+        // 12 lutas: com 4 o Super cru (poucos por minuto) variava demais com o sorteio.
+        for (long seed = 1; seed <= 12; seed++) {
             FighterState[] t0 = {new FighterState(BASE, "P1"), new FighterState(GeneratedCharacters.get("p02"), "P2")};
             FighterState[] t1 = {new FighterState(GeneratedCharacters.get("p03"), "C1"), new FighterState(GeneratedCharacters.get("p05"), "C2")};
             CombatEngine e = new CombatEngine(t0[0], t1[0], 600f, 900f, new CombatConfig());
@@ -168,6 +169,58 @@ public class CpuTest {
         double[] baixo = recursos(5), alto = recursos(8);
         assertTrue("o nível 8 solta bem menos Super cru: " + baixo[0] + " → " + alto[0], alto[0] < baixo[0] * 0.6);
         assertTrue("e guarda mais barra (para o Ultra): " + baixo[1] + " → " + alto[1], alto[1] > baixo[1]);
+    }
+
+    /**
+     * Quem fica no canto soltando bola (meia-lua + soco) sem parar: o nível alto pula por cima
+     * na hora certa e cai batendo, defende o resto sem recuar e tira bem mais vida do spammer
+     * que o nível baixo. Antes ele levava ~3 de cada 4 bolas e quase nunca chegava nele.
+     */
+    @Test public void aHighLevelCpuBeatsAFireballSpammer() {
+        double[] alto = spammer(8), baixo = spammer(3);
+        assertTrue("o nível 8 leva bem menos bolas: " + alto[1], alto[1] < 0.5);
+        assertTrue("e tira vida do spammer: " + alto[0], alto[0] > 0.6);
+        assertTrue("mais que o nível 3: " + baixo[1] + " → " + alto[1], alto[1] < baixo[1] - 0.15);
+    }
+
+    /** Média de {vida que o spammer perdeu, fração das bolas que acertaram a CPU}. */
+    private static double[] spammer(int level) {
+        double perdeu = 0, acertou = 0;
+        int lutas = 0;
+        for (String ch : new String[] {"p03", "player_two", "p05"}) {
+            for (long seed = 1; seed <= 3; seed++) {
+                CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"),
+                    new FighterState(GeneratedCharacters.get(ch), "CPU"), 250f, 1000f, new CombatConfig());
+                AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+                cpu.setEnabled(true);
+                cpu.setLevel(level);
+                FighterInput p = new FighterInput(), out = new FighterInput();
+                Random r = new Random(seed * 13 + 5);
+                int vida = e.fighter(0).state.life, hit = 0, blocked = 0, espera = 0;
+                for (int f = 0; f < 60 * 60 && !e.fighter(0).ko() && !e.fighter(1).ko(); f++) {
+                    CombatFighter me = e.fighter(0);
+                    p.clear();
+                    if (me.canAct() && me.grounded && !e.energyProjectileAlive(0) && espera-- <= 0) {
+                        p.special = "L";   // a bola de novo, assim que pode
+                        espera = 4 + r.nextInt(8);
+                    } else {
+                        p.direction = me.facing > 0 ? 5 : 1;   // entre uma e outra, segura trás
+                    }
+                    cpu.fill(e, 1, out);
+                    e.step(p, out);
+                    for (CombatEngine.HitEvent ev : e.events()) {
+                        if (ev.attacker == 0 && ev.projectile) {
+                            if (ev.blocked) blocked++;
+                            else hit++;
+                        }
+                    }
+                }
+                perdeu += 1.0 - e.fighter(0).state.life / (double)vida;
+                acertou += hit / (double)Math.max(1, hit + blocked);
+                lutas++;
+            }
+        }
+        return new double[] {perdeu / lutas, acertou / lutas};
     }
 
     @Test public void theNeutralPokePrefersTheComboStarterUpClose() {

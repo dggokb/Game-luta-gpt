@@ -158,8 +158,8 @@ Ordem de cada quadro (`AiController.fill`):
    Overdrive no meio do combo só depois de *ver* que acertou;
 4. o próprio golpe: o **caderno de combos** segue a rota;
 5. **defesa por reação**: golpe vindo (agachada contra golpe baixo; em pé contra pulo), pulo
-   vindo (em pé) ou projétil (defende ou pula por cima, para frente). Segura a defesa enquanto
-   está em blockstun;
+   vindo (em pé) ou projétil (defende quando ela chega ou pula por cima na hora certa; ver
+   "contra quem fica soltando bola"). Segura a defesa enquanto está em blockstun;
 6. **cartas**: punir (viu o rival errar, calcula a recuperação que sobra e entra com o golpe de
    abertura mais rápido que chega) e anti-aéreo (viu o pulo vindo, acompanha a trajetória e sobe
    com o 2H, que lança);
@@ -168,6 +168,30 @@ Ordem de cada quadro (`AiController.fill`):
    contra quem está parado. Punir e tirar do ar passam na frente dela;
 8. **neutro** (`OpponentAi.think`, com a posição *vista* do rival): andar, recuar até a
    distância do estilo, dash, projétil, agarrão, golpe ao alcance, pulo.
+
+**Contra quem fica soltando bola** (meia-lua + soco sem parar; `AiController`, "contra quem
+fica soltando bola"):
+
+- **Pulo na hora certa**: a bola pela frente dela, a CPU sabe a própria posição na hora e prevê
+  a da bola pelo que viu (`CpuPerception.Snapshot.projectileGapNow`). Medido para todas as bolas
+  do jogo, o pulo para frente passa por cima quando ela está a ~12,8–16,2 quadros de chegar: a
+  CPU espera esse tempo (`JUMP_OVER_LEAD` 14,5, com erro de mira até ±4 quadros no nível 1,
+  nenhum no 8) e pula. Só vale com o rival a até 560 (de mais longe ela cai na frente da próxima).
+  Os primeiros quadros do pulo seguram a direção (a defesa segurando trás virava o pulo para trás,
+  em cima da bola).
+- **Aéreo descendo**: nesse pulo para dentro o aéreo sai assim que ela começa a descer (do quadro
+  ~15 ao ~25 do pulo ele acerta quem está no chão de 160 a 340); esperando chegar perto do chão,
+  saía tarde.
+- **Defesa sem recuar**: segura a defesa só a 7 quadros da bola chegar, e enquanto aquela bola
+  existir; antes disso segue avançando. Segurar trás desde que via a bola era andar para trás, e
+  ela nunca chegava em quem spamma. Com a bola a menos de 30 quadros ela não começa golpe.
+- Saindo do atordoamento de uma bola, segura trás um instante (de perto a próxima sai antes de
+  qualquer reação).
+- **Rival zoneando** (2 bolas em 4 s): ela vai atrás (corre de longe) ou devolve com a própria
+  bola, mais quanto maior o nível; e pula mais por cima.
+- Medido contra um robô que só spamma do canto: o nível 8 levava ~77% das bolas e ganhava 0/12;
+  agora leva ~35% e ganha ~metade, tirando em média ~85% da vida do spammer. O nível 3 continua
+  levando a maioria. Teste: `CpuTest.aHighLevelCpuBeatsAFireballSpammer`.
 
 **Caderno de combos** (`ComboBook`): a rota principal de cada lutador sai do próprio pacote
 (`cancelInto`, `maxUsesPerChain`) e do estilo, sem combo escrito à mão. Ex.: p01

@@ -132,6 +132,59 @@ final class AiController {
     private boolean antiAirPlan;
     private boolean jumpOverProjectile;
 
+    // ------------------------------------------------- contra quem fica soltando bola
+
+    /**
+     * Quadros até a bola chegar (pela frente dela) em que o pulo para frente passa por cima:
+     * medido para todas as bolas do jogo, a janela comum é ~12,8–16,2 quadros. Ela espera a
+     * bola chegar a esse tempo e só então pula (pulando assim que via, levava a bola na subida
+     * ou na descida).
+     */
+    static final float JUMP_OVER_LEAD = 14.5f;
+    /** Erro de mira do pulo no nível 1 (some no 8), em quadros para cada lado. */
+    static final float JUMP_OVER_SLOP = 4f;
+    /** O quanto o pulo para frente anda por quadro (fecha a distância junto com a bola). */
+    static final float JUMP_FORWARD_STEP = 5.1f;
+    /** Pular por cima só vale com o rival a até isto: de mais longe ela cai na frente da próxima. */
+    static final float JUMP_OVER_RANGE = 560f;
+    /** Bolas do rival nos últimos {@link #ZONING_MEMORY} quadros para ela achar que ele está zoneando. */
+    static final int ZONING_SHOTS = 2, ZONING_MEMORY = 240;
+    /** Projétil do rival que ela está esperando para pular por cima (serial), ou -1. */
+    private int jumpPlanSerial = -1;
+    private float jumpPlanLead;
+    /** Quadros das últimas bolas do rival que ela viu. */
+    private final int[] rivalShots = new int[ZONING_SHOTS];
+    private int rivalShotCount;
+    /** Levou ou defendeu bola: quando o atordoamento acabar, segura a defesa (como um humano). */
+    private boolean projectileStunGuard;
+    /** Quadros em que ela ainda segura a direção do pulo que acabou de pedir. */
+    private int jumpHold, jumpHoldDirection;
+    /**
+     * Pulo para dentro (por cima da bola ou antecipando): o aéreo sai logo que ela começa a
+     * descer (medido: do quadro ~15 ao ~25 do pulo ele acerta quem está no chão de 160 a 340 de
+     * distância). Esperando chegar mais perto do chão, saía tarde e ela caía na bola seguinte.
+     */
+    private boolean jumpIn;
+    static final float JUMP_IN_REACH = 230f;
+    static final int JUMP_HOLD_FRAMES = 5;
+    /**
+     * Quadros antes da bola chegar em que ela começa a segurar a defesa. Antes disso ela segue
+     * (avançando): segurar trás com a bola longe era andar para trás, e ela nunca chegava em
+     * quem fica soltando bola.
+     */
+    static final float GUARD_PROJECTILE_LEAD = 7f;
+    /** Projétil do rival que ela vai defender (serial), ou -1; e se agachada. */
+    private int guardPlanSerial = -1;
+    private boolean guardPlanLow;
+    /** Quadros até a bola planejada chegar (para não começar golpe que não termina antes). */
+    private float guardPlanArrival;
+    /** A bola que ela já está defendendo (serial), ou -1. */
+    private int guardingSerial = -1;
+    /** Andar para frente, por quadro (fecha a distância com a bola). */
+    static final float WALK_STEP = 5f;
+    /** Com a bola a esta distância (em quadros), ela não começa golpe: só anda até defender. */
+    static final float PROJECTILE_BUSY_FRAMES = 30f;
+
     /** Por que a CPU apertou o último golpe ("neutro", "punir", "antiaereo"): para os testes. */
     String lastReason = "";
 
@@ -241,6 +294,11 @@ final class AiController {
         breakerCombo = false;
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
+        jumpPlanSerial = guardPlanSerial = guardingSerial = -1;
+        jumpHold = 0;
+        jumpIn = false;
+        rivalShotCount = 0;
+        projectileStunGuard = false;
         lastOpponentAttackSerial = -1;
         lastOpponentAttackFrame = Integer.MIN_VALUE / 2;
         lastPunishSerial = lastAntiAirSerial = -1;
@@ -270,6 +328,10 @@ final class AiController {
         techDelay = -2;
         // O próprio combo breaker ela sente na hora: o troco vem garantido.
         if (me.comboBroke && engine.cues().contains("COMBO_BREAKER")) breakerCombo = true;
+        for (CombatEngine.HitEvent ev : engine.events()) {
+            // O próprio atordoamento ela sente na hora (não é reação ao rival).
+            if (ev.defender == self && ev.projectile) projectileStunGuard = true;
+        }
         if (me.frozen()) return;
         if (me.inHitstun()) betOnComboBreaker(engine, me, seen, out);
         else breakerWait = breakerHold = 0;
@@ -346,6 +408,14 @@ final class AiController {
         if (punish(engine, me, target, seen, out)) return;
         if (antiAir(engine, me, target, seen, out)) return;
         if (habitGuard(me, target, seen, out)) return;
+        if (guardPlanSerial >= 0 && guardingSerial != guardPlanSerial &&
+            guardPlanArrival < PROJECTILE_BUSY_FRAMES && me.grounded) {
+            // A bola está chegando e ela vai defender: golpe agora não acaba a tempo. Anda até ela.
+            movingBack = dashing = false;
+            movingForward = Math.abs(seen.x - me.x) > 160f;
+            out.direction = movingForward ? (me.facing > 0 ? 1 : 5) : 0;
+            return;
+        }
 
         situation.self = me.character();
         situation.target = target.body();
@@ -366,6 +436,7 @@ final class AiController {
         situation.rivalBlocked = seen.frame - lastRivalBlockFrame < RIVAL_BLOCK_MEMORY;
         situation.style = CpuStyle.of(me.character());
         situation.urgency = urgency;
+        situation.rivalZoning = rivalZoning(seen.frame);
         clearRequests();
         if (ai.think(CombatConfig.DT, situation, actions)) walkInPlan = !roll(level.reactGuard * EDGE_STOP);
         if (movingForward && !dashing && attack == null && special == null && !superAttack && !grab && !jump &&
@@ -411,12 +482,47 @@ final class AiController {
     private boolean defend(CombatEngine engine, CombatFighter me, CombatFighter target,
                            CpuPerception.Snapshot seen, FighterInput out) {
         boolean blockstun = me.status == CombatFighter.Status.BLOCKSTUN;
+        if (jumpIn) {
+            if (me.grounded && jumpHold == 0 || !me.canAct() && !me.attacking()) {
+                jumpIn = false;
+            } else if (!me.grounded && me.canAct() && me.vy >= 0f && seen != null &&
+                Math.abs(seen.x - me.x) <= JUMP_IN_REACH) {
+                // Descendo: solta o aéreo agora (o mais forte que ela tiver).
+                jumpIn = false;
+                for (String b : new String[] {"H", "M", "L"}) {
+                    if (me.character().move(b, true) != null) {
+                        press(b, me, out);
+                        lastReason = "pulo para dentro";
+                        return true;
+                    }
+                }
+            }
+        }
+        if (jumpHold > 0) {
+            jumpHold--;
+            if (!blockstun && me.status != CombatFighter.Status.HITSTUN &&
+                me.status != CombatFighter.Status.AIR_HITSTUN) {
+                out.direction = jumpHoldDirection;
+                return true;
+            }
+            jumpHold = 0;
+        }
         if (!blockstun && !me.canAct()) {
             guardFrames = 0;
             justDefenseWait = 0;
             return false;
         }
         CpuStyle style = CpuStyle.of(me.character());
+        if (projectileStunGuard && !blockstun && me.canAct()) {
+            projectileStunGuard = false;
+            // Saindo do atordoamento da bola: a próxima pode já estar saindo, perto demais para
+            // defender reagindo. Segura trás um instante, como quem joga faz.
+            if (me.grounded && roll(level.reactGuard * (0.5 + 0.5 * smart()))) {
+                guardHabit = false;
+                guardLow = false;
+                guardFrames = Math.max(guardFrames, 14 + reactRandom.nextInt(10));
+            }
+        }
         if (seen != null && !seen.ko) {
             float gap = Math.abs(seen.x - me.x);
             // (a defesa por hábito fica em habitGuard, depois de punir e tirar do ar)
@@ -440,18 +546,58 @@ final class AiController {
             if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != lastProjectileSerial) {
                 float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
                 float now = seen.projectileGap - speed * level.reactionFrames;
-                if (now < 420f) {
+                if (now < 560f) {
                     lastProjectileSerial = seen.projectileSerial;
-                    if (!blockstun && me.grounded && !seen.projectileSuper && now > 120f &&
-                        roll(Math.min(0.9, level.jumpProjectile * style.jumping))) {
-                        // Pula por cima, para frente.
-                        jumpOverProjectile = true;
-                    } else {
-                        int arrival = Math.round(Math.max(0f, now) / speed);
-                        // Projétil do meio: defende em pé (parada, sem ficar agachada esperando ele chegar).
-                        if (decideGuard(seen.projectileLow ? GUARD_LOW : GUARD_HIGH_ONLY, arrival + 20)) {
-                            planJustDefense(me, arrival);
-                        }
+                    noteRivalShot(seen.frame);
+                    float leadNow = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + JUMP_FORWARD_STEP);
+                    boolean jumpWorth = Math.abs(seen.x - me.x) <= JUMP_OVER_RANGE;
+                    // Contra quem fica soltando bola ela pula mais (é o que vence a bola).
+                    double jumpChance = level.jumpProjectile * style.jumping * (rivalZoning(seen.frame) ? 1.6 : 1.0);
+                    if (!blockstun && me.grounded && !seen.projectileSuper && jumpWorth &&
+                        leadNow > JUMP_OVER_LEAD - 2f && roll(Math.min(0.92, jumpChance))) {
+                        // Pula por cima, para frente, quando a bola chegar no tempo certo.
+                        jumpPlanSerial = seen.projectileSerial;
+                        jumpPlanLead = JUMP_OVER_LEAD +
+                            (float)((1.0 - smart()) * JUMP_OVER_SLOP * (reactRandom.nextDouble() * 2.0 - 1.0));
+                    } else if (roll(level.reactGuard)) {
+                        // Defende quando ela chegar (projétil do meio: em pé, parada).
+                        guardPlanSerial = seen.projectileSerial;
+                        guardPlanLow = seen.projectileLow && roll(level.guardHeight);
+                    }
+                }
+            }
+            if (guardPlanSerial >= 0) {
+                if (seen.projectileGap == Float.MAX_VALUE || seen.projectileSerial != guardPlanSerial) {
+                    guardPlanSerial = guardingSerial = -1;
+                } else {
+                    float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
+                    // Ela pode estar andando para a bola: conta como se fosse (fecha mais rápido).
+                    float arrival = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + WALK_STEP);
+                    guardPlanArrival = arrival;
+                    if (arrival <= GUARD_PROJECTILE_LEAD || blockstun || guardingSerial == guardPlanSerial) {
+                        if (guardingSerial != guardPlanSerial) planJustDefense(me, Math.round(Math.max(0f, arrival)));
+                        // Segura enquanto essa bola existir (recuando ela demora mais a chegar).
+                        guardingSerial = guardPlanSerial;
+                        guardHabit = false;
+                        guardLow = guardPlanLow;
+                        guardFrames = Math.max(guardFrames, 6);
+                    }
+                }
+            }
+            if (jumpPlanSerial >= 0) {
+                if (seen.projectileGap == Float.MAX_VALUE || seen.projectileSerial != jumpPlanSerial || blockstun) {
+                    jumpPlanSerial = -1;   // a bola sumiu (bateu em algo) ou ela já está defendendo
+                } else {
+                    float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
+                    float lead = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + JUMP_FORWARD_STEP);
+                    if (lead <= jumpPlanLead) {
+                        jumpPlanSerial = -1;
+                        if (me.grounded && me.canAct()) jumpOverProjectile = true;
+                    } else if (me.grounded && me.canAct()) {
+                        // Esperando a hora: parada (andar para dentro da bola mudava a conta).
+                        movingForward = movingBack = dashing = false;
+                        out.direction = 0;
+                        return true;
                     }
                 }
             }
@@ -460,6 +606,14 @@ final class AiController {
             jumpOverProjectile = false;
             out.jump = true;
             out.direction = me.facing > 0 ? 8 : 6;
+            // A direção dos primeiros quadros decide o pulo: segura para frente (a defesa
+            // segurando trás logo depois virava o pulo para trás, em cima da bola).
+            jumpHold = JUMP_HOLD_FRAMES;
+            jumpHoldDirection = out.direction;
+            jumpIn = true;
+            guardFrames = 0;
+            guardPlanSerial = guardingSerial = -1;
+            justDefenseWait = 0;
             return true;
         }
         jumpOverProjectile = false;
@@ -1219,6 +1373,20 @@ final class AiController {
             out.assist = true;
         }
         return false;
+    }
+
+    // ------------------------------------------------- contra quem fica soltando bola
+
+    private void noteRivalShot(int frame) {
+        rivalShots[rivalShotCount % ZONING_SHOTS] = frame;
+        rivalShotCount++;
+    }
+
+    /** O rival soltou várias bolas há pouco: está zoneando (ela vai atrás dele). */
+    boolean rivalZoning(int frame) {
+        if (rivalShotCount < ZONING_SHOTS) return false;
+        for (int shot : rivalShots) if (frame - shot > ZONING_MEMORY) return false;
+        return true;
     }
 
     // ---------------------------------------------------------------- recursos com cabeça

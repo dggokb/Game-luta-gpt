@@ -32,6 +32,20 @@ final class CpuPerception {
         float projectileSpeed;
         boolean projectileLow, projectileSuper;
         int projectileSerial;
+        /** Onde a bola estava (centro), para onde vai (+1/-1) e o raio dela. */
+        float projectileX, projectileRadius;
+        int projectileDirection;
+
+        /**
+         * Quanto falta da frente da bola até o centro de quem está em {@code selfX} agora,
+         * {@code elapsed} quadros depois do que ela viu (a bola seguiu andando). A própria
+         * posição a CPU sabe na hora; só a bola é prevista. MAX_VALUE sem bola.
+         */
+        float projectileGapNow(float selfX, int elapsed) {
+            if (projectileGap == Float.MAX_VALUE) return Float.MAX_VALUE;
+            float x = projectileX + projectileDirection * projectileSpeed * CombatConfig.DT * elapsed;
+            return (selfX - x) * projectileDirection - projectileRadius;
+        }
 
         boolean attacking() { return attack != null; }
 
@@ -110,6 +124,9 @@ final class CpuPerception {
         if (best != null) {
             if (best != lastProjectile) projectileSerial++;
             s.projectileSpeed = best.speed;
+            s.projectileX = best.x;
+            s.projectileDirection = best.direction;
+            s.projectileRadius = best.radius;
             s.projectileLow = best.attack.low;
             s.projectileSuper = best.superKind();
         }
