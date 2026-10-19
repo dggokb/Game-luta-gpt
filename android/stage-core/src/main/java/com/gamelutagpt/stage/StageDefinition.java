@@ -72,6 +72,24 @@ public final class StageDefinition {
     }
 
     /**
+     * Uma faixa de plateia viva numa imagem ({@code "plateia"}, um objeto ou uma lista): entre
+     * {@code topo} e {@code base} (fração da altura da imagem), redesenhada em {@code colunas}
+     * colunas que pulam, cada uma no seu tempo; {@code pulo} é a altura do pulo em fração da
+     * altura da imagem. Pulam mais quando a luta esquenta ({@code StageScene.cheer}).
+     */
+    public static final class Crowd {
+        public final float top, bottom, jump;
+        public final int columns;
+
+        Crowd(float top, float bottom, float jump, int columns) {
+            this.top = top;
+            this.bottom = bottom;
+            this.jump = jump;
+            this.columns = columns;
+        }
+    }
+
+    /**
      * Bandeira presa na imagem, balançando ao vento. Posição e tamanho em fração da imagem
      * da camada (canto de cima à esquerda); a imagem da bandeira é o pano recortado da
      * própria imagem (tools/stage/separar_bandeiras.py), que fica sem ele.
@@ -126,6 +144,8 @@ public final class StageDefinition {
          * própria profundidade).
          */
         public final float support;
+        /** Faixas de plateia viva da imagem ({@code "plateia"}). */
+        public final List<Crowd> crowds;
         /** Água: faixa de profundidades e quantidade de brilhos. */
         public final float waterNear, waterFar;
         public final int shimmer;
@@ -164,6 +184,7 @@ public final class StageDefinition {
             fillAbove = b.fillAbove;
             reflection = b.reflection;
             support = b.support;
+            crowds = Collections.unmodifiableList(b.crowds);
             waterNear = b.waterNear;
             waterFar = b.waterFar;
             shimmer = b.shimmer;
@@ -201,6 +222,7 @@ public final class StageDefinition {
         int fillAbove;
         float reflection;
         float support = Float.NaN;
+        final List<Crowd> crowds = new ArrayList<>();
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
         float waterTile = 1600f, drift, sunX = Float.NaN, sunAlpha;
@@ -469,6 +491,17 @@ public final class StageDefinition {
         b.fillAbove = color(map, "corAcima", 0);
         b.reflection = clamp01(number(map, "reflexo", 0f));
         b.support = number(map, "apoio", Float.NaN);
+        Object crowd = map.get("plateia");
+        List<Object> crowdList = crowd instanceof List ? (List<Object>)crowd
+            : crowd instanceof Map ? Collections.<Object>singletonList(crowd) : Collections.emptyList();
+        for (Object item : crowdList) {
+            if (!(item instanceof Map)) continue;
+            Map<String, Object> cm = (Map<String, Object>)item;
+            Crowd cr = new Crowd(clamp01(number(cm, "topo", 0.3f)), clamp01(number(cm, "base", 0.9f)),
+                number(cm, "pulo", 0.012f), Math.max(8, Math.round(number(cm, "colunas", 140f))));
+            if (cr.bottom <= cr.top) throw new IllegalArgumentException(where + ": plateia precisa de base > topo");
+            b.crowds.add(cr);
+        }
 
         String repeat = string(map, "repetir", "nao");
         if ("nao".equals(repeat)) b.repeat = Repeat.NONE;

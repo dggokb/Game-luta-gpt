@@ -2266,6 +2266,10 @@ public class GameView extends SurfaceView
         else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
         if (knockout) beamShake = Math.max(beamShake, 18f);
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
+        // A plateia do cenário vibra com o golpe (forte no pesado, festa no KO).
+        if (!event.blocked && stageScene != null) {
+            stageScene.cheer(knockout ? 1f : size >= ImpactEffects.HEAVY ? 0.65f : size == ImpactEffects.MEDIUM ? 0.35f : 0.15f);
+        }
         if (!event.blocked && pausa.impacto()) feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y);
         if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
             (knockout || bigBlow(attacker, defender))) {

@@ -29,6 +29,9 @@ public final class StageScene {
     private static final float BANNER_STRIP = 3f;
 
     /** Camada de imagem já convertida para o mundo 3D na sua profundidade. */
+    /** Animação da plateia (0 = assistindo, 1 = festa do KO); {@link #cheer}. */
+    private float hype;
+
     /** Profundidade do céu, para o reflexo do sol na água (o sol não anda com a câmera). */
     private static final float SKY_DEPTH = 100000f;
 
@@ -289,6 +292,14 @@ public final class StageScene {
      * reação para ele escolhe uma das animações da lista e toca, com um atraso pequeno e
      * diferente para cada um, para não reagirem como robôs.
      */
+    /**
+     * A luta esquentou (um golpe que acertou, o KO): a plateia pula mais, de 0 a 1. Cai sozinho
+     * em uns dois segundos.
+     */
+    public void cheer(float amount) {
+        hype = Math.max(hype, Math.min(1f, amount));
+    }
+
     public void react(String event) {
         for (ActorState a : actors.values()) {
             List<String> options = a.actor.reactions.get(event);
@@ -417,6 +428,7 @@ public final class StageScene {
 
     public void update(float dt) {
         time += dt;
+        hype = Math.max(0f, hype - dt * 0.45f);
         updateActors(dt);
         updateRain(dt);
         updateLightning(dt);
@@ -584,6 +596,7 @@ public final class StageScene {
             if (r < 0f || l > VW) continue;
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
+            drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawBanners(c, p, l, top, r, bottom, mirrored, alpha, k);
             if (layer.reflection > 0f && detalhe) {
                 c.save();
@@ -601,6 +614,45 @@ public final class StageScene {
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawLights(c, layer, l, top, r, bottom, mirrored, k);
         }
+    }
+
+    /**
+     * Plateia viva: a faixa da plateia é redesenhada em colunas estreitas, e cada coluna pula
+     * um pouco no seu tempo (vizinhas parecidas, como gente em grupinhos). Pulando, ela cobre
+     * a mesma faixa desenhada embaixo; o pulo é de poucos pixels, então a emenda não aparece.
+     */
+    private void drawCrowd(RenderCanvas c, Placed p, float l, float t, float r, float b,
+                           boolean mirrored, int alpha, int instance) {
+        StageDefinition.Layer layer = p.layer;
+        if (layer.crowds.isEmpty() || !detalhe) return;
+        RenderImage image = p.image;
+        float imgW = image.width(), imgH = image.height();
+        float w = r - l, h = b - t;
+        if (mirrored) {
+            c.save();
+            c.scale(-1f, 1f, (l + r) * 0.5f, 0f);
+        }
+        float speed = 5f + 5f * hype;
+        for (int band = 0; band < layer.crowds.size(); band++) {
+            StageDefinition.Crowd crowd = layer.crowds.get(band);
+            float amp = crowd.jump * h * (0.35f + 1.4f * hype);
+            if (amp < 0.4f) continue;
+            float sy0 = crowd.top * imgH, sy1 = crowd.bottom * imgH;
+            float dy0 = t + crowd.top * h, dy1 = t + crowd.bottom * h;
+            int n = crowd.columns;
+            for (int i = 0; i < n; i++) {
+                // Fase suave ao longo da arquibancada (grupinhos) + um pouco de sorteio por coluna.
+                float phase = (float)Math.sin(i * 0.37f + instance * 1.7f + band * 2.3f) * 2.4f
+                    + ((i * 7919 + instance * 104729 + band * 31) % 97) * 0.05f;
+                float wave = (float)Math.sin(time * speed + phase);
+                if (wave <= 0f) continue;
+                float dy = -amp * wave * wave;
+                float sx0 = i * imgW / n, sx1 = (i + 1) * imgW / n;
+                float x0 = l + i * w / n, x1 = l + (i + 1) * w / n;
+                c.drawImageRegion(image, sx0, sy0, sx1, sy1, x0, dy0 + dy, x1 + 0.5f, dy1 + dy, alpha);
+            }
+        }
+        if (mirrored) c.restore();
     }
 
     private static void drawImage(RenderCanvas c, RenderImage image, float l, float t, float r, float b,
@@ -960,8 +1012,12 @@ public final class StageScene {
             float v0 = (d - (float)Math.floor(d)) * imgH;
             float v1 = Math.min(imgH, v0 + Math.max(1f, (zTop - zBottom) / tileD * imgH));
             if (v1 - v0 < 1f) v0 = v1 - 1f;
-            float uLeft = (camera.worldX(0f, zMid) + shift) / tileW * imgW;
-            float uRight = (camera.worldX(VW, zMid) + shift) / tileW * imgW;
+            // Ondulação: cada faixa da água vai e volta um pouco, defasada com a profundidade
+            // (ondas rolando em direção à praia), além da correnteza.
+            float swell = (float)Math.sin(time * 1.3f - zMid * 0.006f) * tileW * 0.025f
+                + (float)Math.sin(time * 0.7f + zMid * 0.0021f) * tileW * 0.015f;
+            float uLeft = (camera.worldX(0f, zMid) + shift + swell) / tileW * imgW;
+            float uRight = (camera.worldX(VW, zMid) + shift + swell) / tileW * imgW;
             int tile = (int)Math.floor(uLeft / imgW);
             float u = uLeft;
             while (u < uRight) {

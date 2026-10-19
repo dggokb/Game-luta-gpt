@@ -97,6 +97,9 @@
       "id": "arquibancada",
       "imagem": "arquibancada.png",
       "profundidade": 2500,
+      "plateia": [
+        { "topo": 0.37, "base": 0.52, "pulo": 0.014, "colunas": 160 }
+      ],
       "noChao": true,
       "altura": 0.27,
       "repetir": "espelhar",

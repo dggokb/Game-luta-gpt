@@ -60,6 +60,9 @@
       "id": "arquibancadas",
       "imagem": "arquibancada_lateral.png",
       "profundidade": 2520,
+      "plateia": [
+        { "topo": 0.56, "base": 0.77, "pulo": 0.01, "colunas": 90 }
+      ],
       "noChao": true,
       "altura": 0.38,
       "x": 0.5,

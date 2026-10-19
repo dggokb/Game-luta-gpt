@@ -95,6 +95,15 @@ igual no Android e no Java2D.
 | `agua` | Plano horizontal entre as profundidades `perto` e `longe`, com degradê e brilhos que piscam presos ao mundo. Translúcida para mostrar o reflexo da camada atrás dela. |
 | `ator` | Personagem de fundo animado (`pasta` com `ator.json` e as folhas), apoiado no chão (`noChao` + `altura`), `virar` espelha. Fica na animação parada e toca as reações que o jogo pede (`StageScene.react("licao")`, `actorPlay`). Sem a folha de uma reação, usa a parada com um movimento provisório. Veja `docs/tutorial-plateia.md`. |
 
+**Plateia viva** (`"plateia"` numa camada de imagem: um objeto ou uma lista de faixas
+`{"topo", "base", "pulo", "colunas"}`, em fração da altura da imagem): a faixa da plateia é
+redesenhada em colunas estreitas que pulam, cada uma no seu tempo (vizinhas parecidas, como
+grupinhos). O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
+KO) e a plateia pula mais e mais rápido, voltando ao normal em uns dois segundos.
+
+**Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado
+com a profundidade (ondas rolando).
+
 **Chão até o fundo** (`"ate"` no `chao`): atrás da borda de cima da imagem do piso, a imagem
 lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
 chão de uma arena ir do ringue até a arquibancada lá no fundo.

@@ -80,6 +80,8 @@ cenários não precisa gerar essas duas imagens.
   real deles: colados na câmera (a 150-320) pareciam enormes e perto demais.
   Com uma arquibancada desenhada de perto (poucas fileiras, gente grande), daria para ela
   voltar a ficar logo atrás do ringue.
+- **Nada parado.** Arquibancadas têm `"plateia"` (Central: os dois andares; Costeira e
+  Imperial: a faixa de gente), que pula sozinha e vibra com os golpes; o mar ondula.
 - **Estádio côncavo não se repete.** A arquibancada da Central é a tigela inteira do estádio:
   repetida lado a lado, virava uma onda de curvas. Fica uma só (`"repetir": "nao"`),
   centrada na arena (x 0,606 a 3500 de profundidade; o mundo vai de 0 a 2600) e esticada na largura na montagem

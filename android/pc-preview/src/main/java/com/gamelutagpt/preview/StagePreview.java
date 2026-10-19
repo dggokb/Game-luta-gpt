@@ -105,7 +105,10 @@ public final class StagePreview {
     private void update(float dt) {
         float before = time;
         time += dt;
-        if ((int)(time / 3f) != (int)(before / 3f)) scene.react(REACTIONS[(int)(time / 3f) % REACTIONS.length]);
+        if ((int)(time / 3f) != (int)(before / 3f)) {
+            scene.react(REACTIONS[(int)(time / 3f) % REACTIONS.length]);
+            scene.cheer(0.8f); // como um golpe pesado: a plateia vibra
+        }
         script(time);
         scene.setCamera(zoom, left, top);
         scene.update(dt);
@@ -231,18 +234,21 @@ public final class StagePreview {
      * Super pulo nos dois cantos e no meio: o lutador 1 sobe e desce (1,4 s, como no roteiro),
      * gravado em quadros PNG a 30 por segundo, um pulo atrás do outro.
      */
+    private static final int JUMP_FRAMES = 60;
+
     private void runJumps(File outDir) throws IOException {
         if (!outDir.isDirectory() && !outDir.mkdirs()) throw new IOException("não consegui criar " + outDir);
         float[] places = {300f, 1300f, 2300f};
         float dt = 1f / 30f;
         int frame = 0;
         for (float place : places) {
-            for (int i = 0; i < 60; i++) {
+            for (int i = 0; i < JUMP_FRAMES; i++) {
                 float t = i * dt;
                 float jump = t > 0.2f && t < 1.6f ? (float)Math.sin((t - 0.2f) / 1.4f * Math.PI) : 0f;
                 p1x = place - 150f;
                 p2x = place + 150f;
                 p1y = GROUND_Y - 520f * jump;
+                if (i == 50) scene.cheer(1f); // a aterrissagem do pulo vira um "KO"
                 camera(jump > 0f);
                 scene.setCamera(zoom, left, top);
                 scene.update(dt);
