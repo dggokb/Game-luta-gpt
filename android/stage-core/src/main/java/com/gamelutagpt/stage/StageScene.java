@@ -635,10 +635,16 @@ public final class StageScene {
         float speed = 5f + 5f * hype;
         for (int band = 0; band < layer.crowds.size(); band++) {
             StageDefinition.Crowd crowd = layer.crowds.get(band);
-            float amp = crowd.jump * h * (0.35f + 1.4f * hype);
+            // Só o miolo da faixa se mexe: a margem (o maior pulo) fica parada em cima e em
+            // baixo. Pulando, o miolo cobre a margem de cima (gente sobre gente) e deixa à
+            // mostra a margem de baixo, que é plateia também; nada fora da faixa é tocado.
+            float margin = crowd.jump * 1.75f;
+            float amp = Math.min(margin * h, crowd.jump * h * (0.35f + 1.4f * hype));
             if (amp < 0.4f) continue;
-            float sy0 = crowd.top * imgH, sy1 = crowd.bottom * imgH;
-            float dy0 = t + crowd.top * h, dy1 = t + crowd.bottom * h;
+            float inTop = crowd.top + margin, inBottom = crowd.bottom - margin;
+            if (inBottom <= inTop) continue;
+            float sy0 = inTop * imgH, sy1 = inBottom * imgH;
+            float dy0 = t + inTop * h, dy1 = t + inBottom * h;
             int n = crowd.columns;
             for (int i = 0; i < n; i++) {
                 // Fase suave ao longo da arquibancada (grupinhos) + um pouco de sorteio por coluna.

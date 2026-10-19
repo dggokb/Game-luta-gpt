@@ -98,7 +98,9 @@ igual no Android e no Java2D.
 **Plateia viva** (`"plateia"` numa camada de imagem: um objeto ou uma lista de faixas
 `{"topo", "base", "pulo", "colunas"}`, em fração da altura da imagem): a faixa da plateia é
 redesenhada em colunas estreitas que pulam, cada uma no seu tempo (vizinhas parecidas, como
-grupinhos). O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
+grupinhos). Só o miolo da faixa pula: uma margem do tamanho do maior pulo fica parada em cima e
+em baixo, então nada fora da faixa é coberto. A faixa precisa ficar toda dentro da plateia
+(sem pegar grade, sacada ou parapeito). O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
 KO) e a plateia pula mais e mais rápido, voltando ao normal em uns dois segundos.
 
 **Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado

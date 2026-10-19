@@ -75,7 +75,9 @@ public final class StageDefinition {
      * Uma faixa de plateia viva numa imagem ({@code "plateia"}, um objeto ou uma lista): entre
      * {@code topo} e {@code base} (fração da altura da imagem), redesenhada em {@code colunas}
      * colunas que pulam, cada uma no seu tempo; {@code pulo} é a altura do pulo em fração da
-     * altura da imagem. Pulam mais quando a luta esquenta ({@code StageScene.cheer}).
+     * altura da imagem. Pulam mais quando a luta esquenta ({@code StageScene.cheer}). Só o
+     * miolo da faixa pula: uma margem do tamanho do maior pulo fica parada em cima e em baixo,
+     * então a faixa precisa estar toda dentro da plateia (sem pegar grade ou parapeito).
      */
     public static final class Crowd {
         public final float top, bottom, jump;
