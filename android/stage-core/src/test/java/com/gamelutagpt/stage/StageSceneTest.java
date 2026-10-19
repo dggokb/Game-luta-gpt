@@ -276,6 +276,63 @@ public class StageSceneTest {
         }
     }
 
+    /**
+     * Cachoeiras: cada área sai da sua linha da folha, dentro de um quadro só (sem pegar o
+     * vizinho), em cima do lugar dela na imagem; com o tempo, o quadro muda.
+     */
+    @Test
+    public void waterfallsDrawTheirFrameOverTheirArea() throws IOException {
+        final FakeImage palacio = new FakeImage(1000, 500), agua = new FakeImage(8 * 200, 300);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"p.png\", \"profundidade\": 600, \"noChao\": true, \"altura\": 0.4,"
+            + " \"cachoeiras\": {\"imagem\": \"w.png\", \"quadros\": 8, \"fps\": 12,"
+            + " \"areas\": [[0.1, 0.2, 0.2, 0.4], [0.6, 0.5, 0.1, 0.2]]}}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) { return path.endsWith("w.png") ? agua : palacio; }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        java.util.Set<Integer> cells = new java.util.HashSet<>();
+        for (int frame = 0; frame < 30; frame++) {
+            scene.update(1f / 60f);
+            final float[] layer = new float[4];
+            final java.util.List<float[]> falls = new java.util.ArrayList<>();
+            scene.drawBackground(new CountingCanvas() {
+                @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                    if (image == palacio) {
+                        layer[0] = l; layer[1] = t; layer[2] = r; layer[3] = b;
+                    }
+                }
+
+                @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                      float l, float t, float r, float b, int alpha) {
+                    if (image == agua) falls.add(new float[] {sl, st, sr, sb, l, t, r, b});
+                }
+            });
+            assertTrue("o quadro da vez de cada área", falls.size() >= 2);
+            float w = layer[2] - layer[0], h = layer[3] - layer[1];
+            float[] a = falls.get(0);
+            int cell = (int)(a[0] / 200f);
+            cells.add(cell);
+            assertEquals("primeira área: largura inteira da coluna", cell * 200f + 200f, a[2], 0.01f);
+            assertEquals("primeira área: linha de cima", 0f, a[1], 0.01f);
+            assertEquals(200f, a[3], 0.01f);
+            assertEquals(layer[0] + 0.1f * w, a[4], 0.01f);
+            assertEquals(layer[1] + 0.6f * h, a[7], 0.01f);
+            for (float[] r : falls) {
+                int c = (int)(r[0] / 200f);
+                assertTrue("dentro de um quadro só", r[2] <= c * 200f + 200f + 0.01f);
+                if (r[1] > 0f) {
+                    assertEquals("segunda área: metade da coluna, linha de baixo", c * 200f + 100f, r[2], 0.01f);
+                    assertEquals(300f, r[3], 0.01f);
+                    assertEquals(layer[0] + 0.6f * w, r[4], 0.01f);
+                }
+            }
+        }
+        assertTrue("a água corre: o quadro muda com o tempo", cells.size() > 1);
+    }
+
     /** A bandeira é desenhada em faixas: presa em cima, a ponta de baixo balança com o tempo. */
     @Test
     public void bannersHangFromTheTopAndSwayAtTheBottom() throws IOException {

@@ -611,6 +611,7 @@ public final class StageScene {
             }
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
+            drawWaterfalls(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
             drawBanners(c, p, l, top, r, bottom, mirrored, alpha, k);
             if (layer.reflection > 0f && detalhe) {
@@ -634,6 +635,55 @@ public final class StageScene {
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawLights(c, layer, l, top, r, bottom, mirrored, k);
         }
+    }
+
+    /**
+     * Cachoeiras correndo: cada área é redesenhada por cima com o quadro da vez, que só
+     * difere da imagem na água; entre um quadro e o próximo, o próximo entra aos poucos (sem
+     * isso, 12 quadros por segundo davam trancos).
+     */
+    private void drawWaterfalls(RenderCanvas c, Placed p, float l, float t, float r, float b,
+                                boolean mirrored, int alpha, int instance) {
+        StageDefinition.Waterfalls falls = p.layer.waterfalls;
+        if (falls == null) return;
+        RenderImage sheet = pack.image(falls.image);
+        if (sheet == null) return;
+        float w = r - l, h = b - t;
+        float[] a = falls.areas;
+        int n = falls.count();
+        float maxW = 0f, sumH = 0f;
+        for (int j = 0; j < n; j++) {
+            maxW = Math.max(maxW, a[j * 4 + 2]);
+            sumH += a[j * 4 + 3];
+        }
+        float cellW = sheet.width() / (float)falls.frames;
+        float frame = time * falls.fps + instance * 3.3f;
+        int i0 = (int)Math.floor(frame);
+        float blend = frame - i0;
+        i0 = ((i0 % falls.frames) + falls.frames) % falls.frames;
+        int i1 = (i0 + 1) % falls.frames;
+        if (mirrored) {
+            c.save();
+            c.scale(-1f, 1f, (l + r) * 0.5f, 0f);
+        }
+        float rowTop = 0f;
+        for (int j = 0; j < n; j++) {
+            float ax = a[j * 4], ay = a[j * 4 + 1], aw = a[j * 4 + 2], ah = a[j * 4 + 3];
+            float sy0 = rowTop / sumH * sheet.height();
+            rowTop += ah;
+            float sy1 = rowTop / sumH * sheet.height();
+            float dl = l + ax * w, dt = t + ay * h, dr = dl + aw * w, db = dt + ah * h;
+            // Espelhada, a área aparece do outro lado da cópia.
+            float vl = mirrored ? l + r - dr : dl, vr = mirrored ? l + r - dl : dr;
+            if (vr < 0f || vl > VW || db < 0f || dt > VH) continue;
+            float srcW = cellW * aw / maxW;
+            c.drawImageRegion(sheet, i0 * cellW, sy0, i0 * cellW + srcW, sy1, dl, dt, dr, db, alpha);
+            int next = Math.round(alpha * blend);
+            if (detalhe && next > 0) {
+                c.drawImageRegion(sheet, i1 * cellW, sy0, i1 * cellW + srcW, sy1, dl, dt, dr, db, next);
+            }
+        }
+        if (mirrored) c.restore();
     }
 
     /**

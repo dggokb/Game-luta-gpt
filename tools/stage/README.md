@@ -37,6 +37,10 @@ templo do Takatoshi) têm os prompts em [ilha-do-torneio.md](ilha-do-torneio.md)
    linha de corte (embaixo da vara) do cenário em `separar_bandeiras.py`, rode
    `python3 tools/stage/separar_bandeiras.py <cenario>` uma vez e cole o trecho que ele
    imprime em `"bandeiras"` da camada do pilar (ver `docs/stage-engine.md`).
+6. **Faça a água correr**: cachoeira pintada parada fica estranha. Ponha a imagem na lista
+   `AREAS` do `tools/stage/cachoeiras.py` com um retângulo em volta de cada cachoeira e rode
+   `python3 tools/stage/cachoeiras.py android/app/src/main/assets/stages/<cenario>`: ele grava
+   `<imagem>_agua.png` e põe `"cachoeiras"` na camada (ver `docs/stage-engine.md`).
 
 ## Prompts do Templo da Lua
 

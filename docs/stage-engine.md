@@ -1,4 +1,4 @@
-# Motor de cenário com falso 3D — v0.76
+# Motor de cenário com falso 3D — v0.77
 
 O cenário deixou de ser um desenho único (`StageRenderer`) e virou **camadas com
 profundidade**, projetadas pela mesma câmera da luta. O que está longe anda e cresce menos
@@ -109,6 +109,19 @@ pula livre, sem margem; embaixo aparece assento vazio. `"flashes"` ([[x, y], ...
 `tools/stage/pontos_plateia.py` a partir da máscara) piscam flashes de câmera na plateia, muito
 mais quando a luta esquenta. O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
 KO) e a plateia pula mais e mais rápido, voltando ao normal em uns dois segundos.
+
+**Cachoeiras** (`"cachoeiras": {"imagem", "quadros", "fps", "areas": [[x, y, largura,
+altura], ...]}` numa camada de imagem, áreas em fração da imagem): a água pintada corre. A
+`imagem` é uma folha de quadros feita pelo `tools/stage/cachoeiras.py` (uma linha por área,
+com a altura proporcional à dela; uma coluna por quadro, da largura da área mais larga, com a
+área encostada à esquerda). Em cada quadro só a água muda: a máscara pega os pixels claros,
+sem cor e riscados na vertical (lanternas, estandartes e a névoa lisa ficam de fora), e por
+cima deles desce um ruído comprido (faixas claras e escuras, um pouco de espuma) que fecha o
+ciclo no último quadro. As pedras em volta ficam paradas, então nada escorre para fora da
+cachoeira. O jogo desenha o quadro da vez sobre a área e o próximo entrando aos poucos (sem
+trancos a 12 quadros por segundo); cópias espelhadas da camada ficam fora de fase. Custo: duas
+imagens pequenas por área (uma no modo leve). Primeiro uso: Ilha do Torneio (palácio da
+Imperial, abismo do Caminho, encosta da Costeira, templo ao longe e os penhascos de todas).
 
 **Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado
 com a profundidade (ondas rolando).

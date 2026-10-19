@@ -81,7 +81,9 @@ cenários não precisa gerar essas duas imagens.
   Com uma arquibancada desenhada de perto (poucas fileiras, gente grande), daria para ela
   voltar a ficar logo atrás do ringue.
 - **Nada parado.** Arquibancadas têm `"plateia"` (Central: os dois andares; Costeira e
-  Imperial: a faixa de gente), que pula sozinha e vibra com os golpes; o mar ondula.
+  Imperial: a faixa de gente), que pula sozinha e vibra com os golpes; o mar ondula; as
+  cachoeiras correm (`"cachoeiras"`, folhas feitas pelo `cachoeiras.py`: imagem nova com
+  cachoeira entra na lista `AREAS` dele, com um retângulo em volta de cada uma).
 - **Porto, mesma regra**: o cais vai até 1700 (`"ate"`), com o guarda-corpo na borda. O
   terminal (1500, à direita) e o guindaste (1700, à esquerda) ficam no fundo do cais em
   tamanho real (o terminal ~7 lutadores de altura, medido pelo detector de metais da entrada

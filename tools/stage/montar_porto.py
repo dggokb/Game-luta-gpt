@@ -39,6 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
 from montar_brucy import sem_emenda  # noqa: E402
 import separar_bandeiras  # noqa: E402
+import cachoeiras  # noqa: E402
 
 ID = "porto_secreto"
 COMUNS = ("ceu", "mar", "penhascos")
@@ -256,6 +257,8 @@ def main():
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
     separar_bandeiras.STAGES = args.saida.parent
     print("bandeira do poste", separar_bandeiras.separar(ID))
+    # Água das cachoeiras correndo (a folha de quadros sai da imagem já preparada).
+    cachoeiras.atualizar(args.saida)
 
 
 if __name__ == "__main__":

@@ -29,6 +29,7 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
 from montar_porto import COMUNS, imagens, peca_comum, textura_mar, plateia, tirar_plateia  # noqa: E402
+import cachoeiras  # noqa: E402
 
 # Faixas de plateia (topo, base em fração da altura), as mesmas do stage.json.
 PLATEIA = [(0.58, 0.76)]
@@ -101,6 +102,8 @@ def main():
         gente = plateia(base, PLATEIA)
         gente.save(args.saida / "arquibancada_lateral_plateia.png")
         tirar_plateia(base, gente).save(args.saida / "arquibancada_lateral.png")
+    # Água das cachoeiras correndo (a folha de quadros sai da imagem já preparada).
+    cachoeiras.atualizar(args.saida)
 
 
 if __name__ == "__main__":

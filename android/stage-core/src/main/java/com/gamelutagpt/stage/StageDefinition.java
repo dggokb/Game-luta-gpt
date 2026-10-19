@@ -139,6 +139,32 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * Cachoeiras pintadas na imagem ({@code "cachoeiras"}), com a água correndo. A
+     * {@code imagem} é uma grade de quadros feita na montagem (tools/stage/cachoeiras.py):
+     * cada linha é uma área e cada coluna um quadro; as linhas têm a altura proporcional à da
+     * área e todas as colunas a largura da área mais larga (a área fica encostada à esquerda).
+     * Só os pixels de água mudam entre os quadros, então as pedras em volta não se mexem.
+     */
+    public static final class Waterfalls {
+        public final String image;
+        public final int frames;
+        public final float fps;
+        /** Áreas: x, y, largura e altura em fração da imagem da camada (4 por área). */
+        public final float[] areas;
+
+        Waterfalls(String image, int frames, float fps, float[] areas) {
+            this.image = image;
+            this.frames = frames;
+            this.fps = fps;
+            this.areas = areas;
+        }
+
+        public int count() {
+            return areas.length / 4;
+        }
+    }
+
     public static final class Layer {
         public final String id;
         public final Kind kind;
@@ -178,6 +204,8 @@ public final class StageDefinition {
         public final float sail, bob;
         /** Faixas de plateia viva da imagem ({@code "plateia"}). */
         public final List<Crowd> crowds;
+        /** Cachoeiras animadas da imagem ({@code "cachoeiras"}), ou null. */
+        public final Waterfalls waterfalls;
         /** Água: faixa de profundidades e quantidade de brilhos. */
         public final float waterNear, waterFar;
         public final int shimmer;
@@ -219,6 +247,7 @@ public final class StageDefinition {
             sail = b.sail;
             bob = b.bob;
             crowds = Collections.unmodifiableList(b.crowds);
+            waterfalls = b.waterfalls;
             waterNear = b.waterNear;
             waterFar = b.waterFar;
             shimmer = b.shimmer;
@@ -258,6 +287,7 @@ public final class StageDefinition {
         float support = Float.NaN;
         float sail, bob;
         final List<Crowd> crowds = new ArrayList<>();
+        Waterfalls waterfalls;
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
         float waterTile = 1600f, drift, sunX = Float.NaN, sunAlpha;
@@ -540,6 +570,32 @@ public final class StageDefinition {
                 bool(cm, "recortada", false));
             if (cr.bottom <= cr.top) throw new IllegalArgumentException(where + ": plateia precisa de base > topo");
             b.crowds.add(cr);
+        }
+
+        Object falls = map.get("cachoeiras");
+        if (falls instanceof Map) {
+            Map<String, Object> fm = (Map<String, Object>)falls;
+            String fallsImage = string(fm, "imagem", null);
+            Object areaList = fm.get("areas");
+            if (fallsImage == null || !(areaList instanceof List)) {
+                throw new IllegalArgumentException(where + ": cachoeiras precisa de \"imagem\" e \"areas\"");
+            }
+            List<Object> list = (List<Object>)areaList;
+            float[] areas = new float[list.size() * 4];
+            for (int i = 0; i < list.size(); i++) {
+                Object item = list.get(i);
+                if (!(item instanceof List) || ((List<Object>)item).size() != 4) {
+                    throw new IllegalArgumentException(where + ": cada área das cachoeiras é [x, y, largura, altura]");
+                }
+                for (int k = 0; k < 4; k++) areas[i * 4 + k] = ((Number)((List<Object>)item).get(k)).floatValue();
+                if (areas[i * 4 + 2] <= 0f || areas[i * 4 + 3] <= 0f) {
+                    throw new IllegalArgumentException(where + ": área das cachoeiras sem tamanho");
+                }
+            }
+            if (areas.length > 0) {
+                b.waterfalls = new Waterfalls(fallsImage, Math.max(1, Math.round(number(fm, "quadros", 8f))),
+                    Math.max(0.1f, number(fm, "fps", 12f)), areas);
+            }
         }
 
         String repeat = string(map, "repetir", "nao");

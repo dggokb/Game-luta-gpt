@@ -28,6 +28,7 @@
     {
       "id": "penhascos",
       "imagem": "penhascos.png",
+      "cachoeiras": { "imagem": "penhascos_agua.png", "quadros": 8, "fps": 12, "areas": [[0.43, 0.42, 0.03, 0.2], [0.623, 0.47, 0.027, 0.24], [0.75, 0.56, 0.035, 0.33], [0.105, 0.8, 0.03, 0.15], [0.615, 0.82, 0.035, 0.14]] },
       "profundidade": 8800,
       "apoio": 9000,
       "topo": 0.17,
@@ -62,6 +63,7 @@
     {
       "id": "abismo",
       "imagem": "abismo.png",
+      "cachoeiras": { "imagem": "abismo_agua.png", "quadros": 8, "fps": 12, "areas": [[0.425, 0.28, 0.085, 0.43], [0.525, 0.35, 0.045, 0.15], [0.655, 0.29, 0.065, 0.24]] },
       "profundidade": 1500,
       "topo": -0.3,
       "base": 0.72,
