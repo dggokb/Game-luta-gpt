@@ -1218,7 +1218,8 @@ public class GameView extends SurfaceView
             openMainMenu();
         }
         surfaceReady = true;
-        if (qualidade.escala() < 0.999f) aplicarQualidade();
+        // Sempre: até no ALTO a resolução tem teto (tela 1440p+ desenhava 2–4× os pixels à toa).
+        aplicarQualidade();
         startLoopIfReady();
     }
 
@@ -1301,8 +1302,8 @@ public class GameView extends SurfaceView
             if (!running) break;
             drawFrame();
             if (perfil.fim() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
-                Log.i(PerfilQuadros.TAG, "gráficos desceram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
-                    + " (luta abaixo de " + Math.round(QualidadeGrafica.FPS_MINIMO) + " fps)");
+                Log.i(PerfilQuadros.TAG, "gráficos mudaram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
+                    + " (luta a " + Math.round(perfil.fps()) + " fps)");
                 aplicarQualidade();
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
@@ -2669,10 +2670,11 @@ public class GameView extends SurfaceView
         final float escala = qualidade.escala();
         post(() -> {
             int w = getWidth(), h = getHeight();
-            if (escala >= 0.999f || w <= 0 || h <= 0) {
+            float e = QualidadeGrafica.escalaDaTela(escala, Math.min(w, h));
+            if (e >= 0.999f || w <= 0 || h <= 0) {
                 holder.setSizeFromLayout();
             } else {
-                holder.setFixedSize(Math.max(320, Math.round(w * escala)), Math.max(180, Math.round(h * escala)));
+                holder.setFixedSize(Math.max(320, Math.round(w * e)), Math.max(180, Math.round(h * e)));
             }
         });
     }
@@ -3643,19 +3645,20 @@ public class GameView extends SurfaceView
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
         float outer = 1800f / zoom;
+        // Todas as cunhas num caminho só: um desenho por cor (antes, um por cunha: centenas).
+        impactPath.reset();
         for (int i = 0; i < count; i++) {
             double a = r.nextDouble() * Math.PI * 2;
             float inner = (170f + r.nextFloat() * r.nextFloat() * 260f) / zoom;
             float t = r.nextFloat();
             float half = (0.8f + t * t * maxWidth) / zoom;
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
-            impactPath.reset();
             impactPath.moveTo(x + cos * inner, y + sin * inner);
             impactPath.lineTo(x + cos * outer - sin * half, y + sin * outer + cos * half);
             impactPath.lineTo(x + cos * outer + sin * half, y + sin * outer - cos * half);
             impactPath.close();
-            canvas.drawPath(impactPath, paint);
         }
+        canvas.drawPath(impactPath, paint);
     }
 
     private static int comAlfa(int color, int alpha) {
@@ -3667,18 +3670,18 @@ public class GameView extends SurfaceView
         Random lines = new Random(feel.impactSeed() * 7919L);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
+        impactPath.reset();
         for (int i = 0; i < count; i++) {
             double a = lines.nextDouble() * Math.PI * 2;
             float r0 = 150f + lines.nextFloat() * 160f, r1 = 2200f;
             float w = (1f + lines.nextFloat() * (maxWidth - 1f)) * 3f;
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
-            impactPath.reset();
             impactPath.moveTo(x + cos * r0, y + sin * r0);
             impactPath.lineTo(x + cos * r1 - sin * w, y + sin * r1 + cos * w);
             impactPath.lineTo(x + cos * r1 + sin * w, y + sin * r1 - cos * w);
             impactPath.close();
-            canvas.drawPath(impactPath, paint);
         }
+        canvas.drawPath(impactPath, paint);
     }
 
     private void drawStar(Canvas canvas, float x, float y, float size) {

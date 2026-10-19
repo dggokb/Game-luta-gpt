@@ -24,6 +24,18 @@ final class AndroidRenderCanvas implements RenderCanvas {
     private final Rect srcRect = new Rect();
     private final Paint gradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Canvas canvas;
+    /**
+     * Gradientes guardados (um por cor, de raio/altura 1) e posicionados pela transformação do
+     * Canvas: antes cada brilho e cada degradê criava um gradiente novo por quadro (dezenas por
+     * quadro com as luzes do cenário: lixo de memória e trabalho na GPU a cada quadro).
+     */
+    private static final int CACHE = 96;
+    private final int[] glowKeys = new int[CACHE];
+    private final Shader[] glowShaders = new Shader[CACHE];
+    private int glowCount;
+    private final long[] fadeKeys = new long[CACHE];
+    private final Shader[] fadeShaders = new Shader[CACHE];
+    private int fadeCount;
 
     AndroidRenderCanvas() {
         invertPaint.setColorFilter(new ColorMatrixColorFilter(new ColorMatrix(new float[]{
@@ -136,18 +148,48 @@ final class AndroidRenderCanvas implements RenderCanvas {
 
     @Override
     public void fillRadialGlow(float cx, float cy, float radius, int argbCenter) {
-        if (radius <= 0f) return;
-        gradientPaint.setShader(new RadialGradient(
-            cx, cy, radius, argbCenter, argbCenter & 0x00FFFFFF, Shader.TileMode.CLAMP));
-        canvas.drawCircle(cx, cy, radius, gradientPaint);
+        int alpha = argbCenter >>> 24;
+        if (radius <= 0f || alpha == 0) return;
+        // O gradiente da cor, opaco no centro; a força do brilho vem do alfa do pincel.
+        gradientPaint.setShader(glow(argbCenter | 0xFF000000));
+        gradientPaint.setAlpha(alpha);
+        canvas.save();
+        canvas.translate(cx, cy);
+        canvas.scale(radius, radius);
+        canvas.drawCircle(0f, 0f, 1f, gradientPaint);
+        canvas.restore();
         gradientPaint.setShader(null);
+        gradientPaint.setAlpha(255);
+    }
+
+    private Shader glow(int rgb) {
+        for (int i = 0; i < glowCount; i++) if (glowKeys[i] == rgb) return glowShaders[i];
+        Shader shader = new RadialGradient(0f, 0f, 1f, rgb, rgb & 0x00FFFFFF, Shader.TileMode.CLAMP);
+        int slot = glowCount < CACHE ? glowCount++ : (rgb & 0x7FFFFFFF) % CACHE;
+        glowKeys[slot] = rgb;
+        glowShaders[slot] = shader;
+        return shader;
+    }
+
+    private Shader fade(int top, int bottom) {
+        long key = ((long)top << 32) | (bottom & 0xFFFFFFFFL);
+        for (int i = 0; i < fadeCount; i++) if (fadeKeys[i] == key) return fadeShaders[i];
+        Shader shader = new LinearGradient(0f, 0f, 0f, 1f, top, bottom, Shader.TileMode.CLAMP);
+        int slot = fadeCount < CACHE ? fadeCount++ : (int)((key & 0x7FFFFFFFL) % CACHE);
+        fadeKeys[slot] = key;
+        fadeShaders[slot] = shader;
+        return shader;
     }
 
     @Override
     public void fillVerticalGradient(float left, float top, float right, float bottom, int argbTop, int argbBottom) {
         if (bottom <= top) return;
-        gradientPaint.setShader(new LinearGradient(0f, top, 0f, bottom, argbTop, argbBottom, Shader.TileMode.CLAMP));
-        canvas.drawRect(left, top, right, bottom, gradientPaint);
+        gradientPaint.setShader(fade(argbTop, argbBottom));
+        canvas.save();
+        canvas.translate(0f, top);
+        canvas.scale(1f, bottom - top);
+        canvas.drawRect(left, 0f, right, 1f, gradientPaint);
+        canvas.restore();
         gradientPaint.setShader(null);
     }
 

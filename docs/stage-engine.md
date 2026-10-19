@@ -157,8 +157,23 @@ O `GameView` agora pede o Canvas pela GPU (`lockHardwareCanvas`, Android 8+) e v
 o Canvas por software se não conseguir. Várias imagens em tela cheia por quadro pesam
 demais por software em telas grandes. A GPU também deixa a cinemática do ultra mais leve.
 
-Ainda não medido em aparelho. Se precisar aliviar: aumentar `FLOOR_STRIP` (faixas do piso),
-reduzir pétalas e brilhos da água, ou usar imagens menores.
+- **Teto de resolução**: o jogo desenha em no máximo 1080 linhas (`QualidadeGrafica.ALTURA_MAXIMA`),
+  mesmo no ALTO; os níveis abaixo são frações desse teto. A arte é feita para 1280×720 e acima
+  de 1080 não ganha nada, só custa: celular bom tem tela 1440p+ e desenhava 1,8–2,2× os pixels.
+- **Gradientes guardados**: brilhos (`fillRadialGlow`) e degradês (`fillVerticalGradient`) usam um
+  gradiente por cor, de tamanho 1, posicionado pela transformação do Canvas
+  (`AndroidRenderCanvas`). Antes cada chamada criava um gradiente novo, dezenas por quadro com as
+  luzes dos cenários.
+- **Linhas de velocidade** (impact frame e finalização de mangá): todas as cunhas de uma cor num
+  caminho só, um desenho por cor em vez de um por cunha (centenas).
+- **Qualidade AUTO** (`QualidadeGrafica`): desce um nível quando a luta fica abaixo de 50 fps por
+  2 janelas de 2 s, e agora também **sobe** de novo depois de ~30 s de luta folgada (56+ fps). Se
+  sobe e logo não aguenta, não tenta de novo na mesma sessão. O nível aprendido fica salvo.
+- Para medir no aparelho: DEBUG ligado mostra a linha `Quadros` (fps, ms por quadro e por parte);
+  ou `adb logcat -s Quadros`.
+
+Se precisar aliviar mais: aumentar `FLOOR_STRIP` (faixas do piso), reduzir pétalas e brilhos
+da água, ou usar imagens menores.
 
 ## Testes
 

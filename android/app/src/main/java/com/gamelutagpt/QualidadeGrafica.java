@@ -25,6 +25,9 @@ final class QualidadeGrafica {
     /** Abaixo disso a luta está pesada demais para o nível atual. */
     static final float FPS_MINIMO = 50f;
     static final int JANELAS_RUINS = 2;
+    /** Folgado (quase os 60) por tantas janelas seguidas (~30 s de luta): o AUTO sobe um nível. */
+    static final float FPS_FOLGA = 56f;
+    static final int JANELAS_PARA_SUBIR = 15;
     /** Só conta janela em que quase todo quadro foi luta (não menu, carregamento ou pausa). */
     static final float FRACAO_LUTA = 0.8f;
 
@@ -34,7 +37,8 @@ final class QualidadeGrafica {
     private Modo modo = Modo.AUTO;
     /** O nível que o AUTO aprendeu para este aparelho. */
     private int nivelAuto = ALTO;
-    private int ruins;
+    private int ruins, boas, janelas, subiuNaJanela = -1;
+    private boolean subidaFalhou;
 
     QualidadeGrafica(SharedPreferences prefs) {
         this.prefs = prefs;
@@ -72,6 +76,19 @@ final class QualidadeGrafica {
 
     float escala() { return ESCALA[nivel()]; }
 
+    /**
+     * Teto da resolução em que o jogo desenha: a arte é feita para 1280×720, e acima de 1080
+     * linhas não ganha nada na tela do celular, só custa (uma tela 1440p desenha 1,8× os pixels
+     * de uma 1080p; 1600p, 2,2×). Celular bom tem tela grande e ficava "pesado" por isso.
+     */
+    static final int ALTURA_MAXIMA = 1080;
+
+    /** Fração da tela em que desenhar: a do nível, aplicada sobre o teto de {@link #ALTURA_MAXIMA}. */
+    static float escalaDaTela(float escalaDoNivel, int alturaDaTela) {
+        float teto = alturaDaTela > ALTURA_MAXIMA ? ALTURA_MAXIMA / (float)alturaDaTela : 1f;
+        return teto * escalaDoNivel;
+    }
+
     /** Os efeitos que só enfeitam ficam de fora. */
     boolean efeitosLeves() { return nivel() == LEVE; }
 
@@ -80,7 +97,9 @@ final class QualidadeGrafica {
         int n = Modo.values().length;
         modo = Modo.values()[((modo.ordinal() + (direcao >= 0 ? 1 : -1)) % n + n) % n];
         if (modo == Modo.AUTO) nivelAuto = ALTO;
-        ruins = 0;
+        ruins = boas = 0;
+        subiuNaJanela = -1;
+        subidaFalhou = false;
         salvar();
     }
 
@@ -97,11 +116,25 @@ final class QualidadeGrafica {
      */
     boolean janela(float fps, float fracaoLuta) {
         if (modo != Modo.AUTO || fracaoLuta < FRACAO_LUTA) return false;
+        janelas++;
         if (fps >= FPS_MINIMO) {
             ruins = 0;
+            // Folgado por um tempo num nível abaixo do ALTO: tenta subir (o nível guardado podia
+            // ser de um aperto passageiro ou de uma versão mais pesada, e ficava para sempre).
+            boas = fps >= FPS_FOLGA ? boas + 1 : 0;
+            if (boas >= JANELAS_PARA_SUBIR && nivelAuto > ALTO && !subidaFalhou) {
+                nivelAuto--;
+                boas = 0;
+                subiuNaJanela = janelas;
+                salvar();
+                return true;
+            }
             return false;
         }
+        boas = 0;
         if (++ruins < JANELAS_RUINS || nivelAuto >= LEVE) return false;
+        // Subiu e logo não aguentou: não sobe de novo nesta sessão (sem ficar indo e voltando).
+        if (subiuNaJanela >= 0 && janelas - subiuNaJanela <= JANELAS_PARA_SUBIR) subidaFalhou = true;
         nivelAuto++;
         ruins = 0;
         salvar();
