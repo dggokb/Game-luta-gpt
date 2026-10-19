@@ -123,6 +123,20 @@ public final class ConversaLuta {
     private Map<String, List<Fala>> momentos = Collections.emptyMap();
     private Map<String, List<Fala>> reacoes = Collections.emptyMap();
     private final Map<String, Integer> sorteio = new HashMap<>();
+    /** Quem fala sem estar no elenco ou sem rosto nos retratos (o parceiro de tag de qualquer luta). */
+    private final Map<String, Avulso> avulsos = new HashMap<>();
+
+    private static final class Avulso {
+        final String nome;
+        final int cor;
+        final String retrato;
+
+        Avulso(String nome, int cor, String retrato) {
+            this.nome = nome;
+            this.cor = cor;
+            this.retrato = retrato;
+        }
+    }
 
     private Temporada temporada;
     private final List<Fala> fila = new ArrayList<>();
@@ -166,15 +180,35 @@ public final class ConversaLuta {
         for (Fala f : falas) {
             for (String nome : new String[] {f.quem + "_normal", f.quem + "_" + f.expressao}) {
                 if (imagens.containsKey(nome)) continue;
-                RenderImage img = null;
-                try {
-                    img = assets.loadImage(RETRATOS + "/" + nome + ".png");
-                } catch (IOException | RuntimeException ex) {
-                    // Expressão ainda sem imagem: usa a normal (ou o nome, sem nenhuma).
+                RenderImage img = carregarImagem(RETRATOS + "/" + nome + ".png");
+                Avulso a = avulsos.get(f.quem);
+                if (img == null && a != null && a.retrato != null && nome.equals(f.quem + "_normal")) {
+                    // Sem retrato da história: o rosto de reserva (o da seleção de lutadores).
+                    img = carregarImagem(a.retrato);
                 }
                 imagens.put(nome, img);
             }
         }
+    }
+
+    private RenderImage carregarImagem(String caminho) {
+        try {
+            return assets.loadImage(caminho);
+        } catch (IOException | RuntimeException ex) {
+            // Expressão ainda sem imagem: usa a normal (ou o nome, sem nenhuma).
+            return null;
+        }
+    }
+
+    /**
+     * Alguém que pode falar fora do elenco da história (ou sem retrato nele): {@code nome} e
+     * {@code cor} valem quando o elenco não tem, {@code retrato} (caminho nos assets) quando
+     * não há {@code historia/retratos/<quem>_normal.png}.
+     */
+    public void avulso(String quem, String nome, int cor, String retrato) {
+        avulsos.put(quem, new Avulso(nome, cor, retrato));
+        // Um rosto que não abriu antes (sem o de reserva) tenta de novo com ele.
+        if (imagens.containsKey(quem + "_normal") && imagens.get(quem + "_normal") == null) imagens.remove(quem + "_normal");
     }
 
     /** Lê o {@link #OLHAR}: rosto → olha para a esquerda da imagem. */
@@ -477,13 +511,19 @@ public final class ConversaLuta {
         }
     }
 
-    private String nome(String id) {
-        Temporada.Personagem p = temporada != null ? temporada.personagem(id) : null;
-        return p != null ? p.nome : id;
+    String nome(String id) {
+        Temporada.Personagem p = temporada != null ? temporada.elenco.get(id) : null;
+        if (p != null) return p.nome;
+        Avulso a = avulsos.get(id);
+        return a != null ? a.nome : id;
     }
 
-    /** Cor do elenco: pinta o fundo do quadro e a plaquinha do nome. */
-    private int cor(String id) {
+    /** Cor do elenco (ou do avulso): pinta o fundo do quadro e a plaquinha do nome. */
+    int cor(String id) {
+        Temporada.Personagem p = temporada != null ? temporada.elenco.get(id) : null;
+        if (p != null) return p.cor;
+        Avulso a = avulsos.get(id);
+        if (a != null) return a.cor;
         return temporada != null ? temporada.personagem(id).cor : 0xFF2B3F8F;
     }
 

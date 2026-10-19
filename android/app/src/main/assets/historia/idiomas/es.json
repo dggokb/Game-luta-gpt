@@ -381,5 +381,7 @@
   "Vitória de {vencedor}! Que espetáculo!": "¡Victoria de {vencedor}! ¡Qué espectáculo!",
   "PERFEITO! {vencedor} não levou um arranhão!": "¡PERFECTO! ¡{vencedor} no recibió ni un rasguño!",
   "Tempo esgotado! {vencedor} vence na vida que sobrou!": "¡Se acabó el tiempo! ¡{vencedor} gana por la vida restante!",
-  "Empate! Ninguém cede nessa arena!": "¡Empate! ¡Nadie cede en esta arena!"
+  "Empate! Ninguém cede nessa arena!": "¡Empate! ¡Nadie cede en esta arena!",
+  "{nome}! Troca comigo!": "¡{nome}! ¡Cambia conmigo!",
+  "Troca comigo!": "¡Cambia conmigo!"
 }

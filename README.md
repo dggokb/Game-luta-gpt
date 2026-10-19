@@ -244,6 +244,9 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   para trás (arrastando o pé, com fumacinha) e fica atordoado, e você sai correndo sozinho até
   ele para emendar o seu combo. Sem barra não quebra.
 - **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
+- **Grito da troca**: em toda luta em dupla, quando a vida de quem luta entra no vermelho, o
+  parceiro aparece no quadro de mangá do lado do time e grita "Ryūga! Troca comigo!" (como nas
+  conversas do treino e do episódio 1).
 - **Narrador do torneio**: nas lutas de verdade (batalha, Arcade e torneio da história) um
   narrador anima a luta numa faixa de transmissão no rodapé — começo, combos, Super, Ultra,
   quem está em apuros, a virada, K.O. e vencedor. O personagem ainda vai ser criado (retrato

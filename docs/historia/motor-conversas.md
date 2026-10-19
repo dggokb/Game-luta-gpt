@@ -59,6 +59,26 @@ menos tempo na tela (0,9 s depois de digitada).
 Momentos e reações novos (ex.: `troca` quando o jogador troca de lutador, `vida-baixa`) são
 uma linha no `GameView.updateConversa` cada: o arquivo já aceita qualquer nome.
 
+### Grito da troca (toda luta em dupla)
+
+Sem arquivo nenhum, em **qualquer luta com dupla** (batalha, Arcade, torneio, história e
+treino; não no tutorial nem durante uma cinemática): quando a vida de quem está lutando **entra
+no vermelho** da barra (25%, a mesma linha do HUD), o parceiro que espera fora aparece no
+quadro do lado do time e grita **"Ryūga! Troca comigo!"** (expressão `bravo`, 1,2 s na tela).
+Vale para os dois lados e toda vez que a vida cruza a linha — não quando o titular já entra no
+vermelho pela troca, nem no golpe que derruba, nem sem parceiro de pé. O grito toma o lugar de
+uma fala da conversa que estiver no meio.
+
+- **Quem grita**: o id do elenco cujo `lutador` é o pack do parceiro (Ryūga, Kōga, Yin-lu,
+  Brucy: nome, cor e rostos da história); fora do elenco, o próprio pack com o código (P05...)
+  e a cor do lutador. Sem `historia/retratos/<quem>_normal.png`, o quadro usa o rosto da
+  seleção (`selection/rostos/<pNN>.webp`) — `ConversaLuta.avulso`.
+- **O nome gritado**: o do elenco de quem está lutando (`Temporada.nomeDoLutador`); quem ainda
+  não tem nome na história ganha só "Troca comigo!".
+- Textos em `GritoDaTroca.COM_NOME` / `SEM_NOME`, traduzidos em `historia/idiomas/`.
+- Código: `GritoDaTroca` (quem cruzou a linha), `GameView.updateGritoDaTroca`; testes em
+  `GritoDaTrocaTest` e `ConversaLutaTest.avulsoFalaComNomeCorERostoDeReserva`.
+
 ## O arquivo da conversa
 
 Cada luta da história aponta o arquivo dela no passo de luta do `episodio.json`, com o caminho

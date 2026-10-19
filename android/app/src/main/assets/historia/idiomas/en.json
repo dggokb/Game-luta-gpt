@@ -381,5 +381,7 @@
   "Vitória de {vencedor}! Que espetáculo!": "Victory for {vencedor}! What a show!",
   "PERFEITO! {vencedor} não levou um arranhão!": "PERFECT! {vencedor} didn't take a scratch!",
   "Tempo esgotado! {vencedor} vence na vida que sobrou!": "Time's up! {vencedor} wins on remaining life!",
-  "Empate! Ninguém cede nessa arena!": "A draw! Nobody gives an inch in this arena!"
+  "Empate! Ninguém cede nessa arena!": "A draw! Nobody gives an inch in this arena!",
+  "{nome}! Troca comigo!": "{nome}! Tag me in!",
+  "Troca comigo!": "Tag me in!"
 }

@@ -1605,6 +1605,7 @@ public class GameView extends SurfaceView
         if (stageScene != null) {
             for (String reaction : tutorial.reactions()) stageScene.react(reaction);
         }
+        updateGritoDaTroca();
         updateConversa();
         updateNarracao();
         updateCinematica(intro);
@@ -1728,6 +1729,7 @@ public class GameView extends SurfaceView
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
         narradorLuta.reset();
+        gritoDaTroca.reset();
         narradorPalco.reset();
         if (narracao != null) narracao.stop();
     }
@@ -4802,6 +4804,47 @@ public class GameView extends SurfaceView
             }
         }
         conversa.update(FIXED_STEP);
+    }
+
+    private final GritoDaTroca gritoDaTroca = new GritoDaTroca();
+
+    /**
+     * Vida de quem está lutando entrou no vermelho: o parceiro que espera grita o nome dele e
+     * "troca comigo!" no quadro da conversa do lado do time (não no tutorial nem na cena).
+     */
+    private void updateGritoDaTroca() {
+        int gritos = gritoDaTroca.update(engine);
+        if (gritos == 0 || tutorial.active() || cinematica.rodando() || demo.active() ||
+            flow.phase() != BattleFlow.Phase.FIGHT) {
+            return;
+        }
+        loadTemporada();
+        for (int side = 0; side < 2; side++) {
+            if ((gritos & (1 << side)) != 0) gritarTroca(side);
+        }
+    }
+
+    private void gritarTroca(int side) {
+        TeamSystem.Side team = engine.team(side);
+        FighterState parceiro = team.partner();
+        if (parceiro == null) return;
+        String quem = falante(parceiro.character.id);
+        String codigo = "player_base".equals(parceiro.character.id) ? "p01" : parceiro.character.id;
+        conversa.avulso(quem, codigo.toUpperCase(Locale.ROOT), parceiro.profile.color,
+            "selection/rostos/" + codigo + ".webp");
+        String nome = temporada != null ? temporada.nomeDoLutador(team.pointState().character.id) : null;
+        String texto = GritoDaTroca.texto(nome, t -> temporada != null ? temporada.t(t) : t);
+        conversa.dizer(temporada, quem, side == OPPONENT, "bravo", texto, GritoDaTroca.SEGURA);
+    }
+
+    /** Quem fala na conversa por um lutador: o id do elenco da história (com os rostos dele) ou o próprio pack. */
+    private String falante(String lutador) {
+        if (temporada != null) {
+            for (Temporada.Personagem p : temporada.elenco.values()) {
+                if (lutador.equals(p.lutador)) return p.id;
+            }
+        }
+        return lutador;
     }
 
     /**
