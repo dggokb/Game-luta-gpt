@@ -38,7 +38,7 @@ final class ControlsLayout {
     // Throw: the spot between L and M counts as both (one thumb cannot press two buttons).
     static final float THROW_X = (LIGHT_X + MEDIUM_X) * 0.5f;
     static final float THROW_Y = (LIGHT_Y + MEDIUM_Y) * 0.5f;
-    static final float THROW_RADIUS = 22f;
+    static final float THROW_RADIUS = 32f;
     // Pushblock: the spot between M and H (M + H).
     static final float PUSHBLOCK_X = (MEDIUM_X + HEAVY_X) * 0.5f;
     static final float PUSHBLOCK_Y = (MEDIUM_Y + HEAVY_Y) * 0.5f;

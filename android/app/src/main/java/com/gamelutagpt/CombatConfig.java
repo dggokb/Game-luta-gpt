@@ -218,7 +218,7 @@ final class CombatConfig {
     int throwStartupFrames = 5;
     int throwActiveFrames = 3;
     /** Gap between the two bodies within which the grab connects. */
-    float throwRange = 28f;
+    float throwRange = 40f;
     int throwWhiffFrames = 24;
     /** Frames after the grab during which the defender can tech. */
     int throwTechWindow = 12;

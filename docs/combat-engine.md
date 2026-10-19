@@ -678,14 +678,14 @@ A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. 
 
 | Fase | Frames | O que acontece |
 | --- | --- | --- |
-| `THROW_STARTUP` | 5 + 3 ativos | Pega se o corpo do outro estiver colado à frente (vão de até `throwRange` = 28) e no chão. |
+| `THROW_STARTUP` | 5 + 3 ativos | Pega se o corpo do outro estiver colado à frente (vão de até `throwRange` = 40) e no chão. |
 | `THROW_HOLD` | 12 | O defensor é puxado e fica `THROWN`; é a janela de **tech**. Ninguém acerta os dois. |
 | `THROW_EXECUTE` | 16 | Sem tech: 1200 de dano (começo de combo, sem escala), knockdown e empurrão. O atacante se recupera antes de o defensor levantar (oki). |
 | `THROW_WHIFF` | 24 | Ninguém ao alcance: recuperação punível (pode ser atingido e agarrado). |
 | `THROW_TECH` | 16 (os dois) | L + M do defensor na janela (ou até `bufferFrames` antes): sem dano, os dois são empurrados 110 px e ficam sem agir. |
 
 - **Comando**: L + M (dois dedos) ou o **ponto entre L e M** na tela
-  (`ControlsLayout.THROW_*`, desenhado como "L+M"). Dois dedos quase nunca caem no mesmo
+  (`ControlsLayout.THROW_*`, desenhado como "L+M", raio 32; o M+H do pushblock também). Dois dedos quase nunca caem no mesmo
   frame: até `PadInput.THROW_LENIENCY_FRAMES` (2) de diferença ainda é agarrão, e o golpe que
   o primeiro botão começou vira o agarrão (ainda nos primeiros frames, antes de acertar) — L ou
   M em pé, agachado (2L/2M, segurando ↓) ou o golpe alto (6M, andando para frente). Quem está
@@ -705,6 +705,12 @@ A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. 
 - O jogo mostra "AGARRÃO!" ou "TECH!" no centro da tela. Arte: `THROW_GRAB` (pegar e
   segurar) e `THROW_TOSS` (jogar) quando o pacote tem (p01); sem elas o atacante usa o jab
   para pegar e o soco forte para jogar. O defensor usa a reação de hit.
+
+- **Alcance** (era 28): medido com um robô que vive tentando agarrar, quase metade das
+  tentativas errava no vento; o jogador aperta "colado" pelo olho, com uns 30–40 de vão, e o
+  soco defendido deixa 22–31. Com 40 o agarrão depois de qualquer L defendido entra, e os que
+  entram subiram ~10 pontos em todos os níveis. O ponto L+M na tela era de raio 22 (uns 4 mm no
+  celular): agora 32.
 
 Testes em `ThrowTest`.
 
