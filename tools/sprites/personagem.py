@@ -357,7 +357,8 @@ def update_pack(char, rebuilt):
             anim['impactFrame'] = ref['impactFrame']
         if old is None or name in rebuilt or old.get('atlas') != anim['atlas']:
             pack['animations'][state] = anim
-    missing = set(P01['animations']) - set(pack['animations'])
+    # Arrancada e freada da corrida são opcionais: sem vídeo delas, o DASH faz tudo.
+    missing = set(P01['animations']) - set(pack['animations']) - {'DASH_START', 'DASH_STOP'}
     if missing:
         print(f'{char}: ainda sem vídeo para {sorted(missing)}; o pacote só é gravado quando tiver todos')
         return False

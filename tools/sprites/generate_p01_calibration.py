@@ -59,17 +59,30 @@ def tuned(key):
     return float(json.loads(clip.read_text()).get("ajusteTamanho", 1.0)) if clip.exists() else 1.0
 
 
+def native(key):
+    """Folha convertida já no tamanho oficial (vídeo medido por tamanho.py, clipe com
+    "desenhoNativo"): é desenhada 1:1, sem nenhuma calibração por quadro."""
+    clip = CLIPS / f"{key}.json"
+    return clip.exists() and bool(json.loads(clip.read_text()).get("desenhoNativo"))
+
+
 def compute():
     idle = json.loads((REPORTS / "player_base_idle.report.json").read_text())
     left, top, right, bottom = idle["frames"][0]["outputBbox"]
-    idle_height = (bottom - top) * STAND_SCALE
-    idle_width = (right - left) * STAND_SCALE
-    data, audit, factors = {}, {}, {}
+    # O idle nativo é a referência no tamanho em que é desenhado (1:1); o antigo, a .98.
+    stand = 1.0 if native("player_base_idle") else STAND_SCALE
+    idle_height = (bottom - top) * stand
+    idle_width = (right - left) * stand
+    data, audit, factors, natives = {}, {}, {}, []
     for filename in sorted(REPORTS.glob("player_base_*.report.json")):
         report = json.loads(filename.read_text())
         key = report["id"]
         if key in SKIP:
             audit[key] = {"frames": len(report["frames"]), "mode": "existing calibrated transition"}
+            continue
+        if native(key):
+            audit[key] = {"frames": len(report["frames"]), "mode": "native 1:1"}
+            natives.append(key)
             continue
         root_x = report["layout"]["rootX"]
         root_y = report["layout"]["rootY"]
@@ -172,10 +185,10 @@ def compute():
             "max_drawn_height": max(heights),
             "max_abs_ground_foot_error": max(abs(x) for x in feet)
         }
-    return data, audit, idle_height, idle_width, factors
+    return data, audit, idle_height, idle_width, factors, natives
 
 
-def make_java(data, factors=None):
+def make_java(data, factors=None, natives=()):
     out = [
         "package com.gamelutagpt;",
         "import java.util.HashMap;",
@@ -185,8 +198,11 @@ def make_java(data, factors=None):
         " private static final HashMap<String,float[][]> VALUES = new HashMap<>();",
         " private static final float[] DEFAULT = {1f,1f,0f,0f};",
         " private static final HashMap<String,Float> TUNED = new HashMap<>();",
+        " private static final java.util.HashSet<String> NATIVE = new java.util.HashSet<>();",
         " static {"
     ]
+    for name in sorted(natives):
+        out.append(f'  NATIVE.add("{name}");')
     for name, factor in sorted((factors or {}).items()):
         out.append(f'  TUNED.put("{name}",{factor:.4f}f);')
     for name, rows in sorted(data.items()):
@@ -206,6 +222,8 @@ def make_java(data, factors=None):
         " static float tuned(String atlas) {",
         "  Float value=TUNED.get(atlas);return value==null?1f:value;",
         " }",
+        " /** Folha no tamanho oficial: desenhada 1:1, fora da calibração. */",
+        " static boolean nativo(String atlas) {return NATIVE.contains(atlas);}",
         " static int frames(String atlas) {",
         "  float[][] entries=VALUES.get(atlas);return entries==null?0:entries.length;",
         " }",
@@ -219,14 +237,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    data, audit, stand_h, stand_w, factors = compute()
+    data, audit, stand_h, stand_w, factors, natives = compute()
     expected = len(list(REPORTS.glob("player_base_*.report.json")))
-    assert len(data) + len(SKIP) == expected, "Missing atlas calibration"
-    assert len(data) >= 35, "Missing P01 sprite states"
+    assert len(data) + len(SKIP) + len(natives) == expected, "Missing atlas calibration"
+    assert len(data) + len(natives) >= 35, "Missing P01 sprite states"
     for key in ("player_base_dash", "player_base_crouch_light",
                 "player_base_crouch_medium", "player_base_crouch_heavy",
                 "player_base_jump", "player_base_victory", "player_base_intro"):
-        assert key in data and data[key]
+        assert key in natives or (key in data and data[key])
     assert len(data["player_base_victory"]) == 33, "Victory must normalize every source frame"
     assert all(item["max_abs_ground_foot_error"] < .01 for key,item in audit.items()
                if "max_abs_ground_foot_error" in item and key not in
@@ -237,12 +255,12 @@ def main():
                 "player_base_special_s2", "player_base_special_s4")), "Ground foot drift"
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(make_java(data, factors), encoding="utf-8")
+    destination.write_text(make_java(data, factors, natives), encoding="utf-8")
     audit_file = ROOT / "android/app/build/sprite-review/p01-idle-master-audit.json"
     audit_file.parent.mkdir(parents=True, exist_ok=True)
     audit_file.write_text(json.dumps({"idle_visible_width":stand_w,"idle_visible_height":stand_h,
                                        "atlas_count":expected,"states":audit},indent=2))
-    print(f"P01 calibration PASS: {expected} sprite atlases, {sum(map(len,data.values()))} frames; idle {stand_w:.1f} x {stand_h:.1f}")
+    print(f"P01 calibration PASS: {expected} sprite atlases, {sum(map(len,data.values()))} frames, {len(natives)} native; idle {stand_w:.1f} x {stand_h:.1f}")
 
 
 if __name__ == "__main__":

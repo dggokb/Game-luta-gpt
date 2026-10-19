@@ -28,7 +28,9 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # Capangas do Super (p07): correm, socam ou dão ombrada e saem.
             'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER',
             # Ultra em sequência (tools/sprites/ultras.py): a folha do vídeo com os golpes.
-            'ULTRA_SEQ')
+            'ULTRA_SEQ',
+            # Corrida em três partes: arrancada (uma vez), o loop em DASH e a freada ao parar.
+            'DASH_START','DASH_STOP')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')

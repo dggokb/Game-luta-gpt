@@ -23,6 +23,7 @@ class CharacterPackTests(unittest.TestCase):
         data['animations']['CUSTOM_PUNCH']=copy.deepcopy(data['animations']['LIGHT_JAB'])
         data['animations']['CUSTOM_PUNCH']['frames']=[0,1,1,2]
         data['animations']['CUSTOM_PUNCH']['durationsMs']=[40,30,30,60]
+        data['animations']['CUSTOM_PUNCH']['impactFrame']=1  # 25% do golpe, na janela ativa do L
         data['moves']['L']['animation']='CUSTOM_PUNCH'
         del data['animations']['LIGHT_JAB']  # replaced; unused clips are rejected
         second=self.root/'characters/second_fighter';second.mkdir();(second/'character.json').write_text(json.dumps(data))
@@ -109,12 +110,15 @@ class CharacterPackTests(unittest.TestCase):
         self.assertTrue(set(second['animations']).issubset(set(first['animations'])))
         self.assertTrue(all(a['atlas'].startswith('player_two_') for a in second['animations'].values()))
         def shared(pack,binding):
-            # Cancels into the character's own command specials (S2...) are not shared data.
-            m=copy.deepcopy(pack['moves'][binding])
-            for key in ('cancelInto','rotasProprias'):
-                if key in m: m[key]=[t for t in m[key] if t not in pack.get('specialMoves',{})]
-            # Reach and hit height follow each character's art size (worldScale).
-            for k in ('reach','hitHeight'): m.pop(k,None)
+            # Cancels into specials (S2..., and S1 = S) are not shared data: they follow each
+            # character's own specials and timing (rotasPeloTempo).
+            # rotasProprias only records the routes before the base/style/timing (mecanicas.py).
+            m=copy.deepcopy(pack['moves'][binding]);m.pop('rotasProprias',None)
+            m['cancelInto']=[t for t in m['cancelInto'] if t not in pack.get('specialMoves',{}) and t!='S']
+            # Reach and hit height follow each character's art size (worldScale); the frame data
+            # follows each character's art timing (p01's L and M come from its videos).
+            for k in ('reach','hitHeight','startupFrames','activeFrames','recoveryFrames',
+                      'hitstunFrames','blockstunFrames','cancelWindows'): m.pop(k,None)
             return m
         for binding in ('L','M','H'):
             self.assertEqual(shared(first,binding),shared(second,binding))
@@ -282,7 +286,7 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual((0,0,255,255),images[1].getpixel((0,0)))
 
     def test_impact_frame_must_land_in_the_active_window(self):
-        # O último quadro do jab (fim da recuperação) nunca cai na janela ativa, seja qual for a arte.
+        # O último quadro do jab é a volta à guarda: fica na recuperação, nunca na janela ativa.
         last=len(json.loads(self.path.read_text())['animations']['LIGHT_JAB']['frames'])-1
         self.edit(lambda d:d['animations']['LIGHT_JAB'].update(impactFrame=last))
         with self.assertRaisesRegex(ValueError,f'L: impact frame {last} of LIGHT_JAB .* outside the active window'):pipeline.build(self.root)
@@ -354,7 +358,8 @@ class BuiltPackTests(unittest.TestCase):
         self.assertLess(report['packed']['decodedBytes']['packed'],report['packed']['decodedBytes']['grid'])
         self.assertEqual(report['packed']['frameCount'],len(report['packed']['frames']))
         self.assertIn(f"IDLE_FRAME_WIDTH = {report['packed']['frameWidth']};",java)
-        self.assertEqual(512,report['layout']['frameWidth'])
+        clip=json.loads((self.root/'tools/sprites/clips/player_base_idle.json').read_text())
+        self.assertEqual(clip['frameWidth'],report['layout']['frameWidth'])
         self.assertEqual(2,report['packed']['pixelScale'])
 
     def test_shipped_sheets_fit_old_gpu_textures(self):
@@ -363,28 +368,24 @@ class BuiltPackTests(unittest.TestCase):
             packed=json.loads(path.read_text())['packed']
             self.assertLessEqual(max(packed['sheetWidth'],packed['sheetHeight']),folhas.PREFERRED_SIDE,path.name)
 
-    def test_hd_idle_preserves_timing_registration_and_runtime_budget(self):
-        from PIL import Image
+    def test_p01_idle_is_the_video_cycle_drawn_one_to_one(self):
         character=json.loads(self.path.read_text())
         idle=character['animations']['IDLE']
-        self.assertEqual(list(range(76)),idle['frames'])
-        self.assertEqual([42]*76,idle['durationsMs'])
+        clip=json.loads((self.root/'tools/sprites/clips/player_base_idle.json').read_text())
+        n=clip['expectedFrames']
+        self.assertEqual(list(range(n)),idle['frames'])
         self.assertTrue(idle['loop'])
+        # O vídeo a 2x: cada desenho (1 a cada 2 quadros do vídeo) dura 2 x 1000/48 ms.
+        self.assertTrue(all(41<=d<=42 for d in idle['durationsMs']),idle['durationsMs'])
+        self.assertTrue(clip['desenhoNativo'])
+        self.assertEqual(2,clip['pixelScale'])
         report=json.loads((self.root/'tools/sprites/reports/player_base_idle.report.json').read_text())
-        self.assertEqual([512,512,256,476], [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         packed=report['packed']
-        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
-        self.assertLessEqual(packed['frameHeight']*8,4096)
+        self.assertLessEqual(packed['sheetWidth'],4096)
+        self.assertLessEqual(packed['sheetHeight'],4096)
         self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
-        original=Image.open(self.root/'art/sprites/source/player_base_idle_video_normalized.png').convert('RGBA')
-        master=Image.open(self.root/'art/sprites/source/player_base_idle_sr_2x.png').convert('RGBA')
-        for i in range(76):
-            old=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
-            new=master.crop((i%10*512,i//10*512,(i%10+1)*512,(i//10+1)*512))
-            self.assertEqual(old.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),new.getchannel('A').tobytes(),i)
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',10,76,2.00000000f,',java)
-        self.assertIn('art/sprites/source/player_base_idle_video_normalized.png',report['provenance']['referenceSources'])
+        self.assertIn(f',{n},2.00000000f,',java)
 
     def test_hd_walk_forward_preserves_distance_root_and_runtime_budget(self):
         from PIL import Image

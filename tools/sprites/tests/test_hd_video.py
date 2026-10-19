@@ -109,7 +109,8 @@ class HdRecipeTests(unittest.TestCase):
             self.assertEqual(d, cfg['pixelScale'], path.name)
             self.assertEqual(video.get('largura', video.get('celula', 256)) * d, cfg['frameWidth'], path.name)
             self.assertEqual(video.get('celula', 256) * d, cfg['frameHeight'], path.name)
-            self.assertIn(video['referencia']['folha'], cfg['sourceReferences'], path.name)
+            if not cfg.get('desenhoNativo'):   # HD refeito de uma folha 1x revisada
+                self.assertIn(video['referencia']['folha'], cfg['sourceReferences'], path.name)
             with Image.open(Path(__file__).resolve().parents[3] / cfg['source']) as img:
                 self.assertLessEqual(max(img.size), 4096, path.name)
 

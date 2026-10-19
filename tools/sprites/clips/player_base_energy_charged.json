@@ -2,21 +2,18 @@
   "id": "player_base_energy_charged",
   "javaName": "ENERGY_CHARGED",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_energy_charged_video_hd.png",
+  "source": "art/sprites/source/player_base_energy_charged_flick_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_energy_charged.webp",
   "report": "tools/sprites/reports/player_base_energy_charged.report.json",
   "preview": "android/app/build/sprite-review/player_base_energy_charged-import.png",
-  "expectedFrames": 12,
+  "expectedFrames": 11,
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 218,
-  "rootY": 476,
-  "pixelScale": 2.0,
+  "desenhoNativo": true,
+  "sourceNote": "p01 gerado em vídeo (Flick), montado quadro a quadro por p01_flick.py: ciclo do próprio vídeo (guarda a guarda), escala medida pela imagem inicial, desenhado 1:1.",
   "sourceReferences": [
+    "art/sprites/source/player_base_energy_charged_video_hd.png",
     "art/sprites/source/player_base_energy_charged_video_normalized.png"
   ],
   "video": {
@@ -24,13 +21,19 @@
     "personagem": "p01",
     "escala": 0.4924,
     "medida": "último quadro = inicio_centro (nota 0.96)",
-    "quadros": "54,56,59,60,62,66,76,86,92,94,96,98",
+    "quadros": "34,52,54,56,58,60,92,94,96,98,100",
+    "celula": 288,
     "largura": 256,
-    "raiz": "109,238",
+    "raiz": "102,270",
     "fixar": "video",
+    "deslocar": "6,0",
     "limpar_chao": true,
     "densidade": 2,
-    "nitidez": true,
-    "ancorar_pe": true
-  }
+    "nitidez": true
+  },
+  "frameWidth": 512,
+  "frameHeight": 576,
+  "rootX": 204,
+  "rootY": 540,
+  "pixelScale": 2.0
 }

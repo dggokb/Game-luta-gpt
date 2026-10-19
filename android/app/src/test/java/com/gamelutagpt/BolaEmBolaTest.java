@@ -63,7 +63,9 @@ public class BolaEmBolaTest {
 
     /** O golpe que cancela na bola ainda emenda: a regra é só bola em cima de bola. */
     @Test public void aNormalCancelledIntoTheFireballStillCombos() {
-        FighterState p = new FighterState(GeneratedCharacters.get("player_base"), "P1");
+        // Lutador de teste: o M dele cancela na bola e ela sai antes do fim do atordoamento (a
+        // Onda do p01, tirada do vídeo, é lenta demais para emendar e ele não tem essa rota).
+        FighterState p = new FighterState(GeneratedCharacters.get("player_two"), "P1");
         FighterState d = new FighterState(NPC, "D");
         CombatEngine e = new CombatEngine(p, d, 500f, 590f, new CombatConfig());
         FighterInput[] in = {new FighterInput(), new FighterInput()};

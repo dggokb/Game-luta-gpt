@@ -65,7 +65,10 @@ public class AgarraoToqueTest {
      * depois do contato (ainda no fim do próprio soco) sai assim que o soco acaba e pega.
      */
     @Test public void aBlockedJabThenThrowGrabsTheCrouchingBlocker() {
-        for (int delay = 2; delay <= 12; delay += 2) {
+        // Apertado nos últimos quadros do próprio soco (dentro do buffer), em qualquer personagem.
+        AttackDefinition jab = GeneratedCharacters.get("player_base").attack("L");
+        int end = jab.activeFrames + jab.recoveryFrames, buffer = new CombatConfig().bufferFrames;
+        for (int delay = Math.max(2, end - buffer - 1); delay <= end + 2; delay += 2) {
             FighterState a = new FighterState(GeneratedCharacters.get("player_base"), "P1");
             FighterState d = new FighterState(GeneratedCharacters.opponentCharacter(), "CPU");
             CombatEngine e = new CombatEngine(a, d, 500f, 900f, new CombatConfig());

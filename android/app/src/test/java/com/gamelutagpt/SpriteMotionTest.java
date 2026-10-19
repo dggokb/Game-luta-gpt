@@ -36,11 +36,44 @@ public class SpriteMotionTest {
         assertEquals(SpriteMotion.Clip.WALK_BACK,m.clip);
         assertEquals(clip(SpriteMotion.Clip.WALK_BACK).frame(m.time,m.distance),m.frame());
         tick(m,.016f,true,false,0,8,true,true,false,false,false);
-        assertEquals(SpriteMotion.Clip.DASH,m.clip);
-        assertEquals(clip(SpriteMotion.Clip.DASH).frame(m.time,m.distance),m.frame());
+        String run=GeneratedCharacters.defaultCharacter().animations.containsKey(SpriteMotion.Clip.DASH_START)
+            ? SpriteMotion.Clip.DASH_START : SpriteMotion.Clip.DASH;
+        assertEquals(run,m.clip);
+        assertEquals(clip(run).frame(m.time,m.distance),m.frame());
         tick(m,.016f,true,false,0,-8,false,false,true,false,false);
         assertEquals(SpriteMotion.Clip.BACKDASH,m.clip);
         assertEquals(clip(SpriteMotion.Clip.BACKDASH).frame(m.time,m.distance),m.frame());
+    }
+    @Test public void dashStartsOnceLoopsAndBrakesBeforeIdle() {
+        CharacterDefinition base=GeneratedCharacters.defaultCharacter();
+        java.util.Map<String,CharacterDefinition.Animation> a=new java.util.LinkedHashMap<>(base.animations);
+        CharacterDefinition.Animation run=base.animation(SpriteMotion.Clip.DASH);
+        a.put(SpriteMotion.Clip.DASH_START,new CharacterDefinition.Animation(SpriteMotion.Clip.DASH_START,run.atlas,
+            new int[]{0,1},new float[]{.05f,.05f},false,0));
+        a.put(SpriteMotion.Clip.DASH_STOP,new CharacterDefinition.Animation(SpriteMotion.Clip.DASH_STOP,run.atlas,
+            new int[]{0,1},new float[]{.05f,.05f},false,0));
+        SpriteMotion m=new SpriteMotion(base.withAnimations("test",a));
+        tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH_START,m.clip);
+        for(int i=0;i<8;i++)tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        assertEquals("After the start the run loops",SpriteMotion.Clip.DASH,m.clip);
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH_STOP,m.clip);
+        for(int i=0;i<8;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+        // Stopping during the start brakes too; walking cuts the brake.
+        tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH_STOP,m.clip);
+        tick(m,.016f,true,false,0,3,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.WALK_FORWARD,m.clip);
+        // Without start/stop art the run is the DASH loop alone.
+        a.remove(SpriteMotion.Clip.DASH_START);a.remove(SpriteMotion.Clip.DASH_STOP);
+        m=new SpriteMotion(base.withAnimations("plain",a));
+        tick(m,.016f,true,false,0,8,true,true,false,false,false);
+        assertEquals(SpriteMotion.Clip.DASH,m.clip);
+        tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
     @Test public void crouchEntryHoldAndExitDoNotChangeScaleOrLoopStandup() {
         SpriteMotion m=new SpriteMotion();

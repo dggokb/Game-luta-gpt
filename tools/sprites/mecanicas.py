@@ -15,6 +15,8 @@
     noAr para só no ar), que a pausa mostra em COMANDOS (docs/personagens/comandos.md).
 
 Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam.
+Com "rotasPeloTempo" as rotas de combo seguem o tempo do personagem: cancelar num especial só
+fica se ele sai antes de acabar o atordoamento do golpe (p01, tempo tirado do vídeo).
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
 o tempo e a animação (só o dano muda). Depois rode build_characters.py --write.
 
@@ -166,7 +168,26 @@ def combos(pack, spec, data):
             m['cancelInto'] = m['cancelInto'] + extra
         if uses.get(key):
             m['maxUsesPerChain'] = uses[key]
+    if spec.get('rotasPeloTempo'):
+        timed_routes(pack)
     fighter['comboStyle'] = spec['estiloCombo']
+
+
+def timed_routes(pack):
+    """Rotas que seguem o tempo do personagem ("rotasPeloTempo"): cancelar num especial só fica
+    se ele sai antes de acabar o atordoamento do golpe (senão não é combo, é golpe solto). A
+    lista completa continua em "rotasProprias"/base; refazer dá sempre o mesmo resultado."""
+    fighter = pack['fighter']
+    specials = dict(pack.get('specialMoves', {}))
+    if 'energy' in fighter:
+        specials['S'] = fighter['energy']['attack']
+    for m in pack['moves'].values():
+        if not (m.get('cancelWindows') or {}).get('hit'):
+            continue
+        slow = [t for t in m['cancelInto'] if t in specials and specials[t]['startupFrames'] >= m['hitstunFrames']]
+        if slow:
+            m.setdefault('rotasProprias', list(m['cancelInto']))
+            m['cancelInto'] = [t for t in m['cancelInto'] if t not in slow]
 
 
 def combos_only(cid, style, data):

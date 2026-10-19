@@ -1,155 +1,250 @@
 {
   "id": "player_base_dash",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_dash_video_hd.png",
-  "sourceNote": "p01 gerado em v\u00eddeo (Flick), quadros escolhidos \u00e0 m\u00e3o; convertido por video_para_sprite.py (receita em \"video\").",
+  "source": "art/sprites/source/player_base_dash_flick_hd.png",
+  "sourceNote": "p01 gerado em v\u00eddeo (Flick), montado quadro a quadro por p01_flick.py: ciclo do pr\u00f3prio v\u00eddeo (guarda a guarda), escala medida pela imagem inicial, desenhado 1:1.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 576,
     "frameHeight": 448,
-    "rootX": 362,
+    "rootX": 368,
     "rootY": 412,
-    "columns": 6,
-    "frameCount": 6
+    "columns": 7,
+    "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        37,
-        36,
-        531,
+        44,
+        32,
+        538,
         414
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 72278
+      "minimumMargin": 32,
+      "opaquePixels": 72373
     },
     {
       "index": 1,
       "outputBbox": [
-        210,
-        58,
-        515,
+        99,
+        56,
+        520,
         414
       ],
       "minimumMargin": 34,
-      "opaquePixels": 49584
+      "opaquePixels": 63512
     },
     {
       "index": 2,
       "outputBbox": [
-        56,
-        38,
-        538,
+        163,
+        58,
+        512,
         414
       ],
       "minimumMargin": 34,
-      "opaquePixels": 65561
+      "opaquePixels": 54445
     },
     {
       "index": 3,
       "outputBbox": [
-        42,
-        59,
-        540,
-        413
+        144,
+        52,
+        543,
+        414
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 68836
+      "minimumMargin": 33,
+      "opaquePixels": 56117
     },
     {
       "index": 4,
       "outputBbox": [
-        175,
-        73,
-        510,
-        413
+        69,
+        31,
+        545,
+        414
       ],
-      "minimumMargin": 35,
-      "opaquePixels": 52021
+      "minimumMargin": 31,
+      "opaquePixels": 66710
     },
     {
       "index": 5,
       "outputBbox": [
-        67,
-        46,
-        523,
+        28,
+        47,
+        548,
+        413
+      ],
+      "minimumMargin": 28,
+      "opaquePixels": 70621
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        51,
+        63,
+        541,
         413
       ],
       "minimumMargin": 35,
-      "opaquePixels": 68599
+      "opaquePixels": 66798
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        162,
+        69,
+        522,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 52474
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        194,
+        65,
+        515,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 52116
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        71,
+        44,
+        529,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 69074
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        32,
+        40,
+        532,
+        413
+      ],
+      "minimumMargin": 32,
+      "opaquePixels": 72791
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 519,
-    "frameHeight": 394,
-    "rootX": 333,
-    "rootY": 384,
-    "columns": 6,
-    "frameCount": 6,
+    "frameWidth": 536,
+    "frameHeight": 399,
+    "rootX": 348,
+    "rootY": 389,
+    "columns": 7,
+    "frameCount": 11,
     "cropOffset": [
-      29,
-      28
+      20,
+      23
     ],
-    "sheetWidth": 1468,
-    "sheetHeight": 756,
+    "sheetWidth": 1848,
+    "sheetHeight": 1144,
     "frames": [
       [
         0,
         0,
         504,
-        388,
-        4,
-        4
+        392,
+        20,
+        5
+      ],
+      [
+        1416,
+        396,
+        432,
+        368,
+        75,
+        29
       ],
       [
         0,
-        392,
-        316,
+        780,
+        360,
         364,
-        177,
-        26
-      ],
-      [
-        508,
-        0,
-        492,
-        384,
-        23,
-        6
-      ],
-      [
-        320,
-        392,
-        508,
-        364,
-        9,
-        27
-      ],
-      [
-        832,
-        392,
-        344,
-        348,
-        142,
-        41
+        139,
+        31
       ],
       [
         1004,
+        396,
+        408,
+        372,
+        120,
+        25
+      ],
+      [
+        508,
         0,
-        464,
+        484,
+        392,
+        45,
+        4
+      ],
+      [
+        472,
+        396,
+        528,
         376,
-        34,
-        14
+        4,
+        20
+      ],
+      [
+        364,
+        780,
+        500,
+        360,
+        27,
+        36
+      ],
+      [
+        1204,
+        780,
+        368,
+        352,
+        138,
+        42
+      ],
+      [
+        868,
+        780,
+        332,
+        356,
+        170,
+        38
+      ],
+      [
+        0,
+        396,
+        468,
+        380,
+        47,
+        17
+      ],
+      [
+        996,
+        0,
+        508,
+        384,
+        8,
+        13
       ]
     ],
     "decodedBytes": {
-      "canonical": 6193152,
-      "grid": 4907664,
-      "packed": 4439232
+      "canonical": 14450688,
+      "grid": 11976384,
+      "packed": 8456448
     },
     "pixelScale": 2.0
   },
@@ -157,13 +252,13 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "c828ded59e55c8f8f608800b0871dcd08c29794669769c8af36e2d93bbc9ed91",
-      "config": "509ec1c8f8217c55bc73e886c1332b4dcab29618bc560ae8e9a2f0a3b91dc34c",
+      "source": "335bda92f21709dab561523b870c9bb3e73cac2f8e30b029e1925a883b2c90e2",
+      "config": "90ba77341a8def844c47a4743d5c2807ad2b14ffebaccd3485df0b4c195c09f2",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
-      "art/sprites/source/player_base_dash_video_normalized.png": "8a6aed35c0b072d4d78d8d1234b5a86d7659042da8911b0b97b4d871aedf6fe7",
-      "art/sprites/source/player_base_dash_sr_hd.png": "6f006aaeffb58aaaaa0dd76acf1b316ed5b2960cba8499d53e116f19673950c5"
+      "art/sprites/source/player_base_dash_sr_hd.png": "6f006aaeffb58aaaaa0dd76acf1b316ed5b2960cba8499d53e116f19673950c5",
+      "art/sprites/source/player_base_dash_video_normalized.png": "8a6aed35c0b072d4d78d8d1234b5a86d7659042da8911b0b97b4d871aedf6fe7"
     }
   }
 }

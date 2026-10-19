@@ -94,10 +94,14 @@ public class P01CrouchMovementTest {
         assertTrue("2L > 2M should remain one combo, observed "+maxHits,maxHits>=2);
     }
 
-    @Test public void dashLoopIsSlowerWithoutAlteringSpeed() {
+    @Test public void dashLoopIsTheVideoStrideWithoutAlteringSpeed() {
+        // Video loop (11 drawings) at 2x: 11 x 1000/48 ms; start and brake around it.
         CharacterDefinition.Animation dash=P01.animation(SpriteStates.DASH);
-        assertEquals(.288f,dash.duration,.0001f);
-        assertEquals(6,dash.atlas.count);
+        assertEquals(11*1000f/48/1000,dash.duration,.002f);
+        assertEquals(11,dash.atlas.count);
+        assertTrue(dash.loop);
+        assertFalse(P01.animation(SpriteStates.DASH_START).loop);
+        assertFalse(P01.animation(SpriteStates.DASH_STOP).loop);
         assertEquals(620f,new CombatConfig().dashSpeed,.001f);
     }
 }

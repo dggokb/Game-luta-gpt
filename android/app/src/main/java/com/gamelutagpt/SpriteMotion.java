@@ -7,7 +7,8 @@ final class SpriteMotion {
         static final String IDLE=SpriteStates.IDLE, WALK_FORWARD=SpriteStates.WALK_FORWARD,
             WALK_BACK=SpriteStates.WALK_BACK, DASH=SpriteStates.DASH, BACKDASH=SpriteStates.BACKDASH,
             CROUCH=SpriteStates.CROUCH, RISE=SpriteStates.RISE, JUMP=SpriteStates.JUMP,
-            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT;
+            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT,
+            DASH_START=SpriteStates.DASH_START, DASH_STOP=SpriteStates.DASH_STOP;
     }
     String clip=Clip.IDLE;
     float time,distance;
@@ -29,8 +30,9 @@ final class SpriteMotion {
         else if(combat || locked) next=Clip.COMBAT;
         else if(!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) next=Clip.LAND;
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
-        else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
+        else if(Math.abs(travel)>.001f) next=dash && forward ? dashClip() : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
         else if(clip.equals(Clip.CROUCH) || (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
+        else if(stopping()) next=Clip.DASH_STOP;
         else next=Clip.IDLE;
         wasGrounded=grounded;
         if(!next.equals(clip)){
@@ -43,6 +45,18 @@ final class SpriteMotion {
         // Attacks use the combat clock, including a repeated attack of the same type.
         time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
         distance+=Math.abs(travel);
+    }
+    /** Corrida com arrancada (DASH_START, uma vez) antes do loop, quando o personagem tem. */
+    private String dashClip() {
+        if(clip.equals(Clip.DASH)) return Clip.DASH;
+        if(clip.equals(Clip.DASH_START)) return time<character.animation(Clip.DASH_START).duration ? Clip.DASH_START : Clip.DASH;
+        return character.animations.containsKey(Clip.DASH_START) ? Clip.DASH_START : Clip.DASH;
+    }
+    /** Parou de correr: a freada (DASH_STOP) toca até o fim antes da guarda; qualquer ação a corta. */
+    private boolean stopping() {
+        if(!character.animations.containsKey(Clip.DASH_STOP)) return false;
+        if(clip.equals(Clip.DASH_STOP)) return time<character.animation(Clip.DASH_STOP).duration;
+        return clip.equals(Clip.DASH) || clip.equals(Clip.DASH_START);
     }
     int frame(){return character.animation(clip).frame(time,distance);}
 }

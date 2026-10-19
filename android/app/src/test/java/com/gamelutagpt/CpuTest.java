@@ -12,6 +12,26 @@ import static org.junit.Assert.*;
  */
 public class CpuTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
+    /** Lutador de teste (frame data padrão): jab rápido, para medir só a defesa da CPU. */
+    private static final CharacterDefinition PADRAO = GeneratedCharacters.get("player_two");
+    /**
+     * Quem solta bola atrás de bola: o p01 com a bola rápida de antes (6/1/11, saída nas
+     * palmas da arte antiga). A Onda dele, tirada do vídeo, tem 29 frames de arranque e mede
+     * outra coisa; este teste mede a CPU contra bola rápida.
+     */
+    private static final CharacterDefinition BOLA = bolaRapida();
+
+    private static CharacterDefinition bolaRapida() {
+        CharacterDefinition.Fighter f = BASE.fighter;
+        AttackDefinition shot = new AttackDefinition.Builder("S", AttackDefinition.Kind.PROJECTILE).damage(850)
+            .frames(6, 1, 11).stun(20, 14, 6).windows(null, null, null).pushback(40f, 50f).build();
+        CharacterDefinition.Projectile energy = new CharacterDefinition.Projectile(shot, f.energy.range, f.energy.speed,
+            87f, 168f, f.energy.crouchSpawnY, f.energy.airSpawnY);
+        return new CharacterDefinition("bola_rapida", BASE.displayName, BASE.profile, BASE.artFacing,
+            BASE.visualStandHeight, BASE.visualCrouchHeight, new CharacterDefinition.Fighter(f.color, f.maxLife,
+            f.autoCombo, energy, f.energyCommand, f.superAttack, f.body, f.inputPriority),
+            BASE.animations, BASE.moves, BASE.specialAnimations, BASE.specials);
+    }
 
     /** Jogador roteirizado (lado 0) contra a CPU (lado 1). */
     private static final class Fight {
@@ -190,7 +210,7 @@ public class CpuTest {
         int lutas = 0;
         for (String ch : new String[] {"p03", "player_two", "p05"}) {
             for (long seed = 1; seed <= 3; seed++) {
-                CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"),
+                CombatEngine e = new CombatEngine(new FighterState(BOLA, "P1"),
                     new FighterState(GeneratedCharacters.get(ch), "CPU"), 250f, 1000f, new CombatConfig());
                 AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
                 cpu.setEnabled(true);
@@ -293,7 +313,7 @@ public class CpuTest {
     private static double blockRate(int level) {
         int blocked = 0, contacts = 0;
         for (long seed = 1; seed <= 8; seed++) {
-            Fight f = new Fight(BASE, BASE, 130f, level, seed);
+            Fight f = new Fight(PADRAO, PADRAO, 130f, level, seed);
             Random script = new Random(seed);
             for (int i = 0; i < 600; i++) {
                 if (i % 40 == 20) {

@@ -110,8 +110,8 @@ final class SpriteFighterRenderer {
         boolean p01="player_base".equals(character.id)||"p01_training".equals(character.id);
 
         if(p01 && SpriteStates.IDLE.equals(motion.clip)) {
-            drawAtlas(canvas,anim.atlas,frame,x,baseY,
-                P01_IDLE_SCALE,P01_IDLE_SCALE,255);
+            float k=p01IdleScale(anim.atlas);
+            drawAtlas(canvas,anim.atlas,frame,x,baseY,k,k,255);
         } else if(p01 && SpriteStates.DASH.equals(motion.clip)) {
             // The running pose can extend its limbs, but never enlarges
             // the fighter relative to the canonical idle body.
@@ -158,7 +158,13 @@ final class SpriteFighterRenderer {
 
     private void drawP01Idle(Canvas canvas,float x,float baseY,int alpha) {
         CharacterDefinition.Animation idle=character.animation(SpriteStates.IDLE);
-        drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,P01_IDLE_SCALE,P01_IDLE_SCALE,alpha);
+        float k=p01IdleScale(idle.atlas);
+        drawAtlas(canvas,idle.atlas,idle.frame(0f,0f),x,baseY,k,k,alpha);
+    }
+
+    /** O idle antigo era desenhado a .98; o convertido no tamanho oficial vai 1:1. */
+    private static float p01IdleScale(CharacterDefinition.Atlas atlas) {
+        return P01SpriteCalibration.nativo(atlas.resource)?1f:P01_IDLE_SCALE;
     }
 
     private void drawAtlas(Canvas canvas,CharacterDefinition.Atlas a,int frame,float x,

@@ -99,6 +99,12 @@ se muda um número; depois `build_characters.py --write`). O que foi aplicado:
   quadro e calibrada por testes (o 2M precisa de 40 frames para mostrar as 16 poses, o H tem
   52 frames). Só vida, dano e projétil seguem a tabela. ⚠ Por isso o H do p01 (0,87s) ficou
   mais lento que o do p09 (0,70s): a decidir se encurta (perdendo poses) ou fica.
+  J, M, S1 a S4 e a carga da Onda vêm dos vídeos do Flick: o frame data é o do vídeo a 2×
+  (startup até o quadro do impacto), com a vantagem no hit e na defesa de antes.
+- **Rotas pelo tempo** (`rotasPeloTempo`, p01): o combo se adapta ao personagem. Cancelar
+  num especial só fica na lista se ele sai antes de acabar o atordoamento do golpe; no p01
+  isso tira M > Onda/S2/S3/S4 e H > Onda (a Onda tem 29 frames de arranque) e deixa
+  H > S2/S3/S4: o combo dele é M > H > especial.
 - **Não muda:** alcance e caixas (vêm do DEBUG > AJUSTAR CAIXAS), andar/correr/pular, Super
   (só o dano) e as mecânicas únicas 🔧, que ainda precisam de código.
 - O `ritmo.py` não estica mais o tempo dos golpes pela arte (a mecânica decide).

@@ -51,7 +51,7 @@
     }
   },
   "combos": {
-    "_doc": "Correntes de combo (docs/combat-engine.md, seção Correntes de combo). base vale para todos; estiloCombo de cada personagem soma rotas à base. Só somam, nunca tiram: as rotas do character.json continuam. maxUsesPerChain = usos do golpe numa mesma corrente (zera depois de uma ligação), acertando ou na defesa; o estilo vence a base. Alvo que o personagem não tem (j2H, S) fica de fora. JUMP no ar = cancelamento de pulo (uma vez por voo).",
+    "_doc": "Correntes de combo (docs/combat-engine.md, seção Correntes de combo). base vale para todos; estiloCombo de cada personagem soma rotas à base. Só somam, nunca tiram: as rotas do character.json continuam (exceto com rotasPeloTempo no personagem: o cancelamento num especial que sai depois do fim do atordoamento sai da lista, porque não combaria). maxUsesPerChain = usos do golpe numa mesma corrente (zera depois de uma ligação), acertando ou na defesa; o estilo vence a base. Alvo que o personagem não tem (j2H, S) fica de fora. JUMP no ar = cancelamento de pulo (uma vez por voo).",
     "base": {
       "rotas": {
         "L": ["L", "2L", "M", "2M", "H", "2H"],
@@ -114,7 +114,7 @@
       "vida": 10000,
       "dano": 1.0,
       "ritmo": 1.0,
-      "manterTempo": true,
+      "manterTempo": true, "rotasPeloTempo": true,
       "projetil": {
         "velocidade": 760,
         "alcance": 720

@@ -566,7 +566,11 @@ public class CombatEngineTest {
                 assertEquals(binding, a.id);
                 assertEquals(a.hitstunFrames - (a.activeFrames - 1 + a.recoveryFrames), a.advantageOnHit());
             }
-            assertTrue(id + " L links into L", AttackDefinition.links(c.attack("L").advantageOnHit(), c.attack("L")));
+            // O combo segue o tempo de cada um: L emenda em L por link ou pela corrente (cancel no
+            // acerto, com o próximo L saindo antes de acabar o atordoamento).
+            AttackDefinition l = c.attack("L");
+            assertTrue(id + " L combos into L", AttackDefinition.links(l.advantageOnHit(), l)
+                || (l.cancelsInto("L") && l.startupFrames < l.hitstunFrames));
             assertFalse(id + " L does not link into H", AttackDefinition.links(c.attack("L").advantageOnHit(), c.attack("H")));
         }
     }
@@ -723,8 +727,9 @@ public class CombatEngineTest {
     }
 
     @Test public void normalsCancelIntoCommandSpecialsOnHit() {
+        // H > S2: rota que emenda no tempo do p01 (o S2 sai antes do fim do atordoamento do H).
         Sim s = close();
-        s.in[0].medium = true;
+        s.in[0].heavy = true;
         s.step();
         s.until(() -> s.f(0).outcome == CombatFighter.Outcome.HIT, 30);
         for (int d : new int[] {1, 3, 2}) {
