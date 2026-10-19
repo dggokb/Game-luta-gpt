@@ -75,6 +75,9 @@ cenários não precisa gerar essas duas imagens.
   atrás do ringue, mesmo aumentada, a arquibancada parecia maquete. Agora o chão da arena
   continua do ringue até ela (`"ate"` no `chao`) e ela fica lá no fundo (Central a 3500,
   Costeira e Imperial a 2500, com o palácio e as árvores), onde gente pequena faz sentido.
+  Os objetos do campo ficam no meio do caminho, a 1300 (pilastras e treliça da Central,
+  holofotes da Costeira, pórticos da Imperial; lanternas da Imperial a 800), com o tamanho
+  real deles: colados na câmera (a 150-320) pareciam enormes e perto demais.
   Com uma arquibancada desenhada de perto (poucas fileiras, gente grande), daria para ela
   voltar a ficar logo atrás do ringue.
 - **Estádio côncavo não se repete.** A arquibancada da Central é a tigela inteira do estádio:

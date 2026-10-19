@@ -103,9 +103,9 @@
     {
       "id": "trelica",
       "imagem": "trelica.png",
-      "profundidade": 300,
-      "topo": -0.04,
-      "base": 0.26,
+      "profundidade": 1300,
+      "topo": -0.03,
+      "base": 0.11,
       "x": 0.5,
       "repetir": "espelhar",
       "luzes": [
@@ -121,12 +121,12 @@
     {
       "id": "pilastras",
       "imagem": "pilastra.png",
-      "profundidade": 300,
+      "profundidade": 1300,
       "noChao": true,
-      "altura": 1.0,
+      "altura": 0.544,
       "x": 0.03,
       "repetir": "espelhar",
-      "periodo": 1.1,
+      "periodo": 0.598,
       "luzes": [
         { "x": 0.52, "y": 0.04, "raio": 0.04, "cor": "#FFE0A0", "pulsar": 0.04 },
         { "x": 0.54, "y": 0.84, "raio": 0.05, "cor": "#FFC070", "pulsar": 0.05 }

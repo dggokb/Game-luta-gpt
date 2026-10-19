@@ -108,12 +108,12 @@
     {
       "id": "holofotes",
       "imagem": "holofote.png",
-      "profundidade": 320,
+      "profundidade": 1300,
       "noChao": true,
-      "altura": 1.0,
+      "altura": 0.553,
       "x": 0.03,
       "repetir": "espelhar",
-      "periodo": 1.15,
+      "periodo": 0.636,
       "luzes": [
         { "x": 0.5, "y": 0.078, "raio": 0.07, "cor": "#FFF0C8", "pulsar": 0.03 }
       ]

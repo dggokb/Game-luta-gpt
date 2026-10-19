@@ -103,12 +103,12 @@
     {
       "id": "porticos",
       "imagem": "portico.png",
-      "profundidade": 300,
+      "profundidade": 1300,
       "noChao": true,
-      "altura": 0.95,
+      "altura": 0.517,
       "x": 0.03,
       "repetir": "espelhar",
-      "periodo": 1.0,
+      "periodo": 0.544,
       "luzes": [
         { "x": 0.5, "y": 0.1, "raio": 0.04, "cor": "#FFD08A", "pulsar": 0.05 },
         { "x": 0.21, "y": 0.41, "raio": 0.035, "cor": "#FFC070", "pulsar": 0.05 },
@@ -118,12 +118,12 @@
     {
       "id": "lanternas",
       "imagem": "lanterna.png",
-      "profundidade": 150,
+      "profundidade": 800,
       "noChao": true,
-      "altura": 0.17,
+      "altura": 0.105,
       "x": 0.14,
       "repetir": "espelhar",
-      "periodo": 0.72,
+      "periodo": 0.444,
       "luzes": [
         { "x": 0.47, "y": 0.33, "raio": 0.18, "cor": "#FFC878", "pulsar": 0.06 }
       ]
