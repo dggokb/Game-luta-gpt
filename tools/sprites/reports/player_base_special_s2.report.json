@@ -9,7 +9,7 @@
   "layout": {
     "frameWidth": 384,
     "frameHeight": 960,
-    "rootX": 184,
+    "rootX": 196,
     "rootY": 924,
     "columns": 10,
     "frameCount": 33
@@ -383,7 +383,7 @@
   "packed": {
     "frameWidth": 332,
     "frameHeight": 911,
-    "rootX": 159,
+    "rootX": 171,
     "rootY": 901,
     "columns": 10,
     "frameCount": 33,
@@ -671,7 +671,7 @@
     "pipelineVersion": 2,
     "sha256": {
       "source": "089984793e50d1e9fa5fe38ebc41e456b6801bd13cb263ca81dfb425bec0ad6d",
-      "config": "507f01793bc3a98038001b0d9b158145d96a7806ebd2225ec70adaa623f916e5",
+      "config": "a293df6f93e88ac1e5aee11c793c2f967ce102a841b4e8645a6d09ea9ecb0a0b",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {

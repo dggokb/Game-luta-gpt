@@ -23,16 +23,15 @@
     "medida": "último quadro = inicio_centro (nota 0.96)",
     "quadros": "3,4,5,6,7,12,22,24,26,27,28",
     "largura": 256,
-    "raiz": "95,238",
+    "raiz": "101,238",
     "fixar": "video",
-    "deslocar": "6,0",
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true
   },
   "frameWidth": 512,
   "frameHeight": 512,
-  "rootX": 190,
+  "rootX": 202,
   "rootY": 476,
   "pixelScale": 2.0
 }

@@ -373,11 +373,15 @@ final class CharacterDefinition {
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }
         /**
-         * Run from the art (block "corrida"): frames to reach dashSpeed from a standstill, and
-         * frames of the slide when the run is released (0 = instant, the engine default).
+         * Movimento próprio (bloco "movimento"): velocidades de andar, recuar e correr, em unidades
+         * do mundo por segundo (0 = a do motor, CombatConfig), frames da arrancada até a velocidade
+         * de corrida e do deslize da freada ao soltar (0 = na hora).
          */
+        float walkSpeed, walkBackSpeed, runSpeed;
         int runStartFrames, runBrakeFrames;
-        Fighter withRun(int start,int brake) { runStartFrames=start; runBrakeFrames=brake; return this; }
+        Fighter withMovement(float walk,float back,float run,int start,int brake) {
+            walkSpeed=walk; walkBackSpeed=back; runSpeed=run; runStartFrames=start; runBrakeFrames=brake; return this;
+        }
         /** Henchmen the Super calls in instead of its wave (0 = the wave). */
         int henchmen;
         Fighter withHenchmen(int count) { henchmen=count; return this; }

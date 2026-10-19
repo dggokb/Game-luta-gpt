@@ -105,6 +105,8 @@ se muda um número; depois `build_characters.py --write`). O que foi aplicado:
   num especial só fica na lista se ele sai antes de acabar o atordoamento do golpe; no p01
   isso tira M > Onda/S2/S3/S4 e H > Onda (a Onda tem 29 frames de arranque) e deixa
   H > S2/S3/S4: o combo dele é M > H > especial.
+- **Só as rotas dele** (`soRotasProprias`, p01): o personagem não herda as rotas comuns da
+  base nem do estilo; combina só pelas rotas próprias, filtradas pelo tempo dele.
 - **Não muda:** alcance e caixas (vêm do DEBUG > AJUSTAR CAIXAS), andar/correr/pular, Super
   (só o dano) e as mecânicas únicas 🔧, que ainda precisam de código.
 - O `ritmo.py` não estica mais o tempo dos golpes pela arte (a mecânica decide).

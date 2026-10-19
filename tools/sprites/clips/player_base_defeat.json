@@ -24,17 +24,16 @@
     "quadros": "92,94,96,98,100,103,105,108,110",
     "celula": 288,
     "largura": 192,
-    "raiz": "94,270",
+    "raiz": "100,270",
     "colunas": 9,
     "fixar": "video",
-    "deslocar": "6,0",
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true
   },
   "frameWidth": 384,
   "frameHeight": 576,
-  "rootX": 188,
+  "rootX": 200,
   "rootY": 540,
   "pixelScale": 2.0
 }

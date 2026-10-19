@@ -283,10 +283,8 @@ public class SpriteIntegrationTest {
             renderer.motion.clip="IDLE";renderer.motion.time=idle.timeOfFrame(last);
             renderer.draw(canvas,300f,300f,facing,false,false);
             RectF destination=(RectF)field.get(renderer);
-            // O idle do P01 vem do vídeo no tamanho oficial: desenhado 1:1 (o antigo ia a P01_IDLE_SCALE).
-            Field idleSize=SpriteFighterRenderer.class.getDeclaredField("P01_IDLE_SCALE");idleSize.setAccessible(true);
-            float k=P01SpriteCalibration.nativo(idle.atlas.resource)?1f:idleSize.getFloat(null);
-            float scale=character.profile.worldScale/2f*k;
+            // Todo personagem é desenhado 1:1: a folha no tamanho em que foi feita, em volta da raiz.
+            float scale=character.profile.worldScale/2f;
             // A folha pode vir reduzida para a tela (SpriteAtlasCache): o destino cobre a caixa do
             // quadro arredondada em pixels inteiros da folha menor, em volta da mesma raiz.
             float[] span=drawnSpan(renderer,idle.atlas,renderer.motion.frame());
@@ -297,12 +295,11 @@ public class SpriteIntegrationTest {
         }
         renderer.motion.clip="LIGHT_JAB";renderer.motion.time=0f;
         renderer.draw(canvas,300f,300f,1,false,false);
-        // Os golpes do P01 passam pela calibração quadro a quadro (P01SpriteCalibration).
+        // Os golpes também: sem calibração por quadro.
         CharacterDefinition.Atlas jab=character.animation("LIGHT_JAB").atlas;
-        float[] k=P01SpriteCalibration.get(jab.resource,renderer.motion.frame());
         RectF destination=(RectF)field.get(renderer);
         float[] jabSpan=drawnSpan(renderer,jab,renderer.motion.frame());
-        assertEquals((jabSpan[1]-jabSpan[0])*character.profile.worldScale/jab.pixelScale*k[0],destination.width(),.001f);
+        assertEquals((jabSpan[1]-jabSpan[0])*character.profile.worldScale/jab.pixelScale,destination.width(),.001f);
         screen.recycle();
     }
 

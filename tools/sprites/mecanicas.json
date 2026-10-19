@@ -114,7 +114,7 @@
       "vida": 10000,
       "dano": 1.0,
       "ritmo": 1.0,
-      "manterTempo": true, "rotasPeloTempo": true,
+      "manterTempo": true, "rotasPeloTempo": true, "soRotasProprias": true,
       "projetil": {
         "velocidade": 760,
         "alcance": 720

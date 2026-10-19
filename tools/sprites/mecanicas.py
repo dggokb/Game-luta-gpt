@@ -16,7 +16,8 @@
 
 Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam.
 Com "rotasPeloTempo" as rotas de combo seguem o tempo do personagem: cancelar num especial só
-fica se ele sai antes de acabar o atordoamento do golpe (p01, tempo tirado do vídeo).
+fica se ele sai antes de acabar o atordoamento do golpe (p01, tempo tirado do vídeo). Com
+"soRotasProprias" ele não recebe as rotas comuns da base nem do estilo: só as dele.
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
 o tempo e a animação (só o dano muda). Depois rode build_characters.py --write.
 
@@ -161,7 +162,8 @@ def combos(pack, spec, data):
         if 'rotasProprias' in m:
             m['cancelInto'] = m.pop('rotasProprias')
         m.pop('maxUsesPerChain', None)
-        wanted = data['base']['rotas'].get(key, []) + style['rotas'].get(key, [])
+        # soRotasProprias: o personagem combina só do jeito dele, sem as rotas comuns a todos
+        wanted = [] if spec.get('soRotasProprias') else data['base']['rotas'].get(key, []) + style['rotas'].get(key, [])
         extra = [t for t in dict.fromkeys(wanted) if t in ids and t not in m['cancelInto']]
         if extra:
             m['rotasProprias'] = list(m['cancelInto'])

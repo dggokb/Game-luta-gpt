@@ -32,6 +32,8 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             # Corrida em três partes: arrancada (uma vez), o loop em DASH e a freada ao parar.
             'DASH_START','DASH_STOP')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
+# Bloco "movimento" do lutador: o que é próprio de cada personagem no deslocamento.
+MOVEMENT_KEYS = {'andar','recuar','correr','arrancadaFrames','freadaFrames'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # Optional air inputs with down held (↓ + button in the air); without them jX is used.
@@ -134,12 +136,16 @@ def validate_fighter(pack):
             if 'attack' not in f[key]: raise ValueError(f'{name}.{key}: attack frame data is required')
             validate_attack(f'{name}.{key}.attack', f[key]['attack'], True)
     if 'mecanica' in f: validate_fighter_mechanics(name, f['mecanica'])
-    if 'corrida' in f:
-        # Corrida tirada do vídeo: frames para chegar à velocidade e da freada (0 = na hora).
-        run = f['corrida']
-        if not isinstance(run, dict) or set(run) - {'arrancadaFrames','freadaFrames'}:
-            raise ValueError(f'{name}.corrida: expected arrancadaFrames and/or freadaFrames')
-        for k in run: non_negative_int(run[k], f'{name}.corrida.{k}')
+    if 'movimento' in f:
+        # Movimento próprio do personagem (tirado dos vídeos dele): velocidades de andar, recuar
+        # e correr (unidades por segundo) e frames da arrancada e da freada. O que faltar é o do motor.
+        mov = f['movimento']
+        if not isinstance(mov, dict) or set(mov) - MOVEMENT_KEYS:
+            raise ValueError(f'{name}.movimento: expected some of {sorted(MOVEMENT_KEYS)}')
+        for k in ('andar','recuar','correr'):
+            if k in mov: positive(mov[k], f'{name}.movimento.{k}')
+        for k in ('arrancadaFrames','freadaFrames'):
+            if k in mov: non_negative_int(mov[k], f'{name}.movimento.{k}')
     if 'ultra' in f: validate_ultra(name, f['ultra'], pack['animations'])
     if 'inputPriority' in f and sorted(f['inputPriority']) != sorted(STRENGTHS):
         raise ValueError(f'{name}.inputPriority: order all of {", ".join(STRENGTHS)}')
@@ -659,8 +665,9 @@ def compile_packs(root, results):
                      if energy and ('nome' in energy or energy.get('segurar')) else '')
                    +('.withEnergyVisual('+q(energy['visual'])+')' if energy and 'visual' in energy else '')
                    +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else '')
-                   +('.withRun('+str(fi['corrida'].get('arrancadaFrames',0))+','+str(fi['corrida'].get('freadaFrames',0))+')'
-                     if 'corrida' in fi else '')
+                   +('.withMovement('+','.join(f(fi['movimento'].get(k,0)) for k in ('andar','recuar','correr'))+','
+                     +str(fi['movimento'].get('arrancadaFrames',0))+','+str(fi['movimento'].get('freadaFrames',0))+')'
+                     if 'movimento' in fi else '')
                    +(ultra_sequence(fi['ultra']) if 'ultra' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']

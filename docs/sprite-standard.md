@@ -124,10 +124,11 @@ formas de avanço:
 Corrida tirada de vídeo: a passada do desenho tem que bater com o deslocamento do corpo, ou o
 pé patina. Nos vídeos "na esteira" (a câmera segue o corpo) a medida é o pé de apoio, que
 anda para trás no chão. O desenho segue a velocidade de corrida do jogo: `DASH` e
-`DASH_START` avançam pela distância, e o bloco `corrida` do lutador
-(`{"arrancadaFrames": n, "freadaFrames": n}`) faz o corpo acelerar na arrancada e deslizar
-desacelerando na freada, no mesmo passo do desenho. Sem o bloco, a corrida sai e para na
-hora.
+`DASH_START` avançam pela distância, e o bloco `movimento` do lutador
+(`{"andar", "recuar", "correr", "arrancadaFrames", "freadaFrames"}`) dá a velocidade própria
+dele e faz o corpo acelerar na arrancada e deslizar desacelerando na freada, no mesmo passo do
+desenho. Cada personagem anda e corre do seu jeito; o que faltar no bloco é o do motor
+(`CombatConfig`), e sem arrancada/freada a corrida sai e para na hora.
 
 Animação de golpe também marca `impactFrame`: o índice (em `frames`) do quadro em que o
 golpe encosta. A animação estica sobre o frame data, e o build recusa o pacote se esse

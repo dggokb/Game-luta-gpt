@@ -922,7 +922,18 @@ final class CombatEngine {
         f.crouching = false;
     }
 
-    /** Arrancada: a corrida sai de 0 e chega à dashSpeed em runStartFrames (0 = na hora). */
+    /** Velocidade de corrida do lutador: a do bloco "movimento" dele, ou a do motor. */
+    private float runSpeed(CharacterDefinition.Fighter run) {
+        return run.runSpeed > 0f ? run.runSpeed : config.dashSpeed;
+    }
+
+    /** Velocidade de andar para frente ou para trás: a do lutador, ou a do motor. */
+    private float walkSpeed(CharacterDefinition.Fighter run, boolean forward) {
+        if (forward) return run.walkSpeed > 0f ? run.walkSpeed : config.walkSpeed;
+        return run.walkBackSpeed > 0f ? run.walkBackSpeed : config.walkBackSpeed;
+    }
+
+    /** Arrancada: a corrida sai de 0 e chega à velocidade dela em runStartFrames (0 = na hora). */
     private static float dashRamp(CombatFighter f, CharacterDefinition.Fighter run) {
         return run.runStartFrames > 0 ? Math.min(1f, f.dashFrames / (float)run.runStartFrames) : 1f;
     }
@@ -1288,14 +1299,14 @@ final class CombatEngine {
             if (run.runBrakeFrames > 0 && horizontal == 0 && f.grounded && !f.crouching &&
                 f.status == CombatFighter.Status.NEUTRAL && !f.attacking()) {
                 f.dashBrakeFrames = run.runBrakeFrames;
-                f.dashBrakeSpeed = config.dashSpeed * dashRamp(f, run);
+                f.dashBrakeSpeed = runSpeed(run) * dashRamp(f, run);
             }
         }
         // Qualquer outra coisa corta a freada: andar, abaixar, pular, golpe, apanhar.
         if (f.dashBrakeFrames > 0 && (horizontal != 0 || !f.grounded || f.crouching || f.locked ||
             f.attacking() || f.status != CombatFighter.Status.NEUTRAL || f.forwardDashing)) f.dashBrakeFrames = 0;
         f.dashFrames = f.forwardDashing ? f.dashFrames + 1 : 0;
-        float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
+        float walk = walkSpeed(run, holdingForward) * boost;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
             if (!f.grounded) {
@@ -1309,7 +1320,7 @@ final class CombatEngine {
                 f.dashBrakeFrames--;
                 f.dashBraked = true;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost * dashRamp(f, run) : walk;
+                float speed = f.forwardDashing && holdingForward ? runSpeed(run) * boost * dashRamp(f, run) : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
@@ -1340,7 +1351,7 @@ final class CombatEngine {
     /** Velocidade de lado no ar: a de andar para frente, ou a de andar para trás. */
     private float airSpeed(CombatFighter f, int horizontal) {
         if (horizontal == 0) return 0f;
-        return horizontal == f.facing ? config.walkSpeed : config.walkBackSpeed;
+        return walkSpeed(f.state.character.fighter, horizontal == f.facing);
     }
 
     /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
