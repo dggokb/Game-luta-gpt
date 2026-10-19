@@ -87,9 +87,7 @@ public class SpriteIntegrationTest {
             CharacterDefinition.Move a=first.moves.get(binding);
             CharacterDefinition.Move b=second.moves.get(binding);
             assertEquals(a.damage,b.damage);
-            assertEquals(a.activeStart,b.activeStart,.0001f);
-            assertEquals(a.activeEnd,b.activeEnd,.0001f);
-            assertEquals(a.totalTime,b.totalTime,.0001f);
+            // O tempo também não: cada um segue a própria arte (o L e o M do P01 vêm dos vídeos).
             // O alcance não é comparado: o do P01 foi ajustado no app (AJUSTAR CAIXAS, dc4056b8),
             // e o pacote de teste ficou com o de antes.
             assertEquals(a.animation.id,b.animation.id);
@@ -276,18 +274,19 @@ public class SpriteIntegrationTest {
         CharacterDefinition character=renderer.character();
         CharacterDefinition.Animation idle=character.animation("IDLE");
         assertEquals(2f,idle.atlas.pixelScale,0f);
-        assertEquals(76,idle.atlas.count);
-        assertEquals(76*.042f,idle.duration,.00001f);
+        int last=idle.atlas.count-1;
+        assertTrue("o idle do vídeo é um ciclo inteiro",idle.atlas.count>=60);
         Field field=SpriteFighterRenderer.class.getDeclaredField("destination");field.setAccessible(true);
         Bitmap screen=Bitmap.createBitmap(600,400,Bitmap.Config.ARGB_8888);
         Canvas canvas=new Canvas(screen);
         for(int facing:new int[]{1,-1}) {
-            renderer.motion.clip="IDLE";renderer.motion.time=75*.042f+.01f;
+            renderer.motion.clip="IDLE";renderer.motion.time=idle.timeOfFrame(last);
             renderer.draw(canvas,300f,300f,facing,false,false);
             RectF destination=(RectF)field.get(renderer);
-            // O idle do P01 é desenhado no tamanho fixo do idle (P01_IDLE_SCALE), em volta da raiz.
+            // O idle do P01 vem do vídeo no tamanho oficial: desenhado 1:1 (o antigo ia a P01_IDLE_SCALE).
             Field idleSize=SpriteFighterRenderer.class.getDeclaredField("P01_IDLE_SCALE");idleSize.setAccessible(true);
-            float scale=character.profile.worldScale/2f*idleSize.getFloat(null);
+            float k=P01SpriteCalibration.nativo(idle.atlas.resource)?1f:idleSize.getFloat(null);
+            float scale=character.profile.worldScale/2f*k;
             // A folha pode vir reduzida para a tela (SpriteAtlasCache): o destino cobre a caixa do
             // quadro arredondada em pixels inteiros da folha menor, em volta da mesma raiz.
             float[] span=drawnSpan(renderer,idle.atlas,renderer.motion.frame());

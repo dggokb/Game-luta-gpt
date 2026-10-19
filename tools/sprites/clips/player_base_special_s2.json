@@ -22,9 +22,9 @@
     "escala": 0.4924,
     "medida": "último quadro = inicio_centro (nota 0.96)",
     "quadros": "3,4,6,8,9,10,11,12,13,14,32,33,38,40,44,48,52,77,78,79,80,81,82,83,84,86,88,90,92,94,96,98,100",
-    "celula": 416,
+    "celula": 480,
     "largura": 192,
-    "raiz": "92,364",
+    "raiz": "92,462",
     "colunas": 10,
     "fixar": "video",
     "deslocar": "6,0",
@@ -33,8 +33,8 @@
     "nitidez": true
   },
   "frameWidth": 384,
-  "frameHeight": 832,
+  "frameHeight": 960,
   "rootX": 184,
-  "rootY": 728,
+  "rootY": 924,
   "pixelScale": 2.0
 }

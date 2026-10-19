@@ -922,6 +922,11 @@ final class CombatEngine {
         f.crouching = false;
     }
 
+    /** Arrancada: a corrida sai de 0 e chega à dashSpeed em runStartFrames (0 = na hora). */
+    private static float dashRamp(CombatFighter f, CharacterDefinition.Fighter run) {
+        return run.runStartFrames > 0 ? Math.min(1f, f.dashFrames / (float)run.runStartFrames) : 1f;
+    }
+
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
         f.breakerChase = 0;
@@ -1216,6 +1221,7 @@ final class CombatEngine {
     }
 
     private void moveHorizontally(CombatFighter f) {
+        f.dashBraked = false;
         // The winner has already won: no stale held direction, dash or air
         // momentum may translate the victory animation around the arena.
         // Keep the defeated fighter's knockdown and physics untouched.
@@ -1275,7 +1281,20 @@ final class CombatEngine {
         // A corrida do combo breaker anda sozinha, como se → estivesse seguro.
         if (breakerChasing(f)) horizontal = breakerFar(f) ? f.facing : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
-        if (!holdingForward) f.forwardDashing = false;
+        CharacterDefinition.Fighter run = f.state.character.fighter;
+        if (!holdingForward && f.forwardDashing) {
+            f.forwardDashing = false;
+            // Soltou a corrida: o corpo ainda desliza (freada do desenho) se nada mais foi pedido.
+            if (run.runBrakeFrames > 0 && horizontal == 0 && f.grounded && !f.crouching &&
+                f.status == CombatFighter.Status.NEUTRAL && !f.attacking()) {
+                f.dashBrakeFrames = run.runBrakeFrames;
+                f.dashBrakeSpeed = config.dashSpeed * dashRamp(f, run);
+            }
+        }
+        // Qualquer outra coisa corta a freada: andar, abaixar, pular, golpe, apanhar.
+        if (f.dashBrakeFrames > 0 && (horizontal != 0 || !f.grounded || f.crouching || f.locked ||
+            f.attacking() || f.status != CombatFighter.Status.NEUTRAL || f.forwardDashing)) f.dashBrakeFrames = 0;
+        f.dashFrames = f.forwardDashing ? f.dashFrames + 1 : 0;
         float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
@@ -1284,8 +1303,13 @@ final class CombatEngine {
             } else if (f.backdashFrames > 0) {
                 f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
                 f.backdashFrames--;
+            } else if (f.dashBrakeFrames > 0) {
+                // Desacelera até parar no fim da freada.
+                f.x += f.facing * f.dashBrakeSpeed * boost * f.dashBrakeFrames / (float)run.runBrakeFrames * CombatConfig.DT;
+                f.dashBrakeFrames--;
+                f.dashBraked = true;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost : walk;
+                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost * dashRamp(f, run) : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {

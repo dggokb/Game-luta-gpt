@@ -44,7 +44,12 @@ final class SpriteFighterRenderer {
     void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
                 float attackElapsed,boolean combat,boolean locked) {
-        motion.update(dt,grounded,crouching,velocityY,travel,forward,dash,backdash,attackAnimation,attackElapsed,combat,locked);
+        update(dt,grounded,crouching,velocityY,travel,forward,dash,backdash,attackAnimation,attackElapsed,combat,locked,false);
+    }
+    void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
+                boolean forward,boolean dash,boolean backdash,String attackAnimation,
+                float attackElapsed,boolean combat,boolean locked,boolean braking) {
+        motion.update(dt,grounded,crouching,velocityY,travel,forward,dash,backdash,attackAnimation,attackElapsed,combat,locked,braking);
     }
     /**
      * Draws the current frame with its root at (x, baseY). {@code facing} is the world

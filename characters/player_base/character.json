@@ -94,7 +94,11 @@
     "assist": {
       "move": "S"
     },
-    "comboStyle": "equilibrado"
+    "comboStyle": "equilibrado",
+    "corrida": {
+      "arrancadaFrames": 10,
+      "freadaFrames": 22
+    }
   },
   "animations": {
     "IDLE": {
@@ -389,20 +393,8 @@
         9,
         10
       ],
-      "durationsMs": [
-        21,
-        21,
-        20,
-        21,
-        21,
-        21,
-        21,
-        21,
-        21,
-        20,
-        21
-      ],
-      "loop": true
+      "loop": true,
+      "distancePerFrame": 44.46
     },
     "BACKDASH": {
       "atlas": "player_base_backdash",
@@ -1641,22 +1633,22 @@
         11,
         12
       ],
-      "durationsMs": [
-        21,
-        21,
-        20,
-        21,
-        42,
-        21,
-        21,
-        21,
-        20,
-        21,
-        21,
-        21,
-        21
-      ],
-      "loop": false
+      "loop": false,
+      "distancesPerFrame": [
+        27.0,
+        11.12,
+        6.88,
+        2.65,
+        1.59,
+        13.23,
+        21.17,
+        44.46,
+        44.46,
+        44.46,
+        44.46,
+        44.46,
+        44.46
+      ]
     },
     "DASH_STOP": {
       "atlas": "player_base_dash_stop",
@@ -1677,11 +1669,11 @@
         13
       ],
       "durationsMs": [
-        21,
-        21,
-        20,
-        21,
-        21,
+        73,
+        73,
+        73,
+        73,
+        73,
         42,
         42,
         41,
@@ -2049,7 +2041,7 @@
       "animation": "SPECIAL_S2",
       "damage": 1100,
       "reach": 72,
-      "hitHeight": 347,
+      "hitHeight": 462,
       "startupFrames": 19,
       "activeFrames": 12,
       "recoveryFrames": 47,

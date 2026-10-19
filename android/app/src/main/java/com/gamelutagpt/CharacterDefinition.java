@@ -66,13 +66,30 @@ final class CharacterDefinition {
         private final float[] durations;
         final boolean loop;
         final float distancePerFrame, duration;
+        /** Distance the body travels while each frame shows (null: frames follow time). */
+        private final float[] distances;
+        /** Sum of {@link #distances}: the clip is played once the body traveled this far. */
+        final float length;
         Animation(String id,Atlas atlas,int[] frames,float[] durations,boolean loop,float distancePerFrame) {
+            this(id,atlas,frames,durations,loop,distancePerFrame,null);
+        }
+        Animation(String id,Atlas atlas,int[] frames,float[] durations,boolean loop,float distancePerFrame,
+                  float[] distances) {
             this.id=id;this.atlas=atlas;this.frames=frames.clone();this.durations=durations.clone();
             this.loop=loop;this.distancePerFrame=distancePerFrame;
             float sum=0;for(float d:durations)sum+=d;this.duration=sum;
+            this.distances=distances==null?null:distances.clone();
+            float total=0;if(distances!=null)for(float d:distances)total+=d;this.length=total;
         }
         int frame(float time,float distance) {
             if(distancePerFrame>0) return frames[(int)(Math.max(0,distance)/distancePerFrame)%frames.length];
+            if(distances!=null) {
+                // Each frame shows while the body covers its own stretch (the run start of a video).
+                float s=Math.max(0,distance);
+                if(loop)s%=length;
+                for(int i=0;i<frames.length-1;i++) { if(s<distances[i])return frames[i];s-=distances[i]; }
+                return frames[frames.length-1];
+            }
             float t=Math.max(0,time);
             if(loop)t%=duration;
             for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return frames[i];t-=durations[i]; }
@@ -86,6 +103,11 @@ final class CharacterDefinition {
             if(!blocking||durations.length<2)return 0f;
             float hold=durations[0];
             return hold+Math.max(0f,Math.min(1f,progress))*(duration-hold-0.0001f);
+        }
+        /** A one-shot clip that already showed its last frame: by distance or by time. */
+        boolean finished(float time,float distance) {
+            if(loop||distancePerFrame>0)return false;
+            return distances!=null ? distance>=length : time>=duration;
         }
         /** Clip time that shows the given frame of the clip (its middle). */
         float timeOfFrame(int index) {
@@ -350,6 +372,12 @@ final class CharacterDefinition {
         /** Jumps off the arena's walls (once per jump). */
         boolean wallJump;
         Fighter withWallJump(boolean value) { wallJump=value; return this; }
+        /**
+         * Run from the art (block "corrida"): frames to reach dashSpeed from a standstill, and
+         * frames of the slide when the run is released (0 = instant, the engine default).
+         */
+        int runStartFrames, runBrakeFrames;
+        Fighter withRun(int start,int brake) { runStartFrames=start; runBrakeFrames=brake; return this; }
         /** Henchmen the Super calls in instead of its wave (0 = the wave). */
         int henchmen;
         Fighter withHenchmen(int count) { henchmen=count; return this; }

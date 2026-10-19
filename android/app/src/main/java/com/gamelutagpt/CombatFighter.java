@@ -51,6 +51,13 @@ final class CombatFighter {
     boolean superJumping;
     boolean crouching;
     boolean forwardDashing;
+    /** Frames since the run started (it accelerates over the fighter's runStartFrames). */
+    int dashFrames;
+    /** Slide left after the run was released, of runBrakeFrames, from dashBrakeSpeed. */
+    int dashBrakeFrames;
+    float dashBrakeSpeed;
+    /** Slid in this step (the brake art plays while the body moves, its last step included). */
+    boolean dashBraked;
     /** Como o lutador se move de lado no ar (veja {@link #jumpMode}). */
     static final int PULO_LIVRE = 0, PULO_COMPROMETIDO = 1, PULO_SUPER = 2, PULO_CORRIDA = 3;
     /**

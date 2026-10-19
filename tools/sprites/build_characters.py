@@ -134,6 +134,12 @@ def validate_fighter(pack):
             if 'attack' not in f[key]: raise ValueError(f'{name}.{key}: attack frame data is required')
             validate_attack(f'{name}.{key}.attack', f[key]['attack'], True)
     if 'mecanica' in f: validate_fighter_mechanics(name, f['mecanica'])
+    if 'corrida' in f:
+        # Corrida tirada do vídeo: frames para chegar à velocidade e da freada (0 = na hora).
+        run = f['corrida']
+        if not isinstance(run, dict) or set(run) - {'arrancadaFrames','freadaFrames'}:
+            raise ValueError(f'{name}.corrida: expected arrancadaFrames and/or freadaFrames')
+        for k in run: non_negative_int(run[k], f'{name}.corrida.{k}')
     if 'ultra' in f: validate_ultra(name, f['ultra'], pack['animations'])
     if 'inputPriority' in f and sorted(f['inputPriority']) != sorted(STRENGTHS):
         raise ValueError(f'{name}.inputPriority: order all of {", ".join(STRENGTHS)}')
@@ -468,6 +474,11 @@ def compile_packs(root, results):
                 positive(a['distancePerFrame'], key)
                 if not a['loop'] or 'durationsMs' in a:
                     raise ValueError(f'{key}: distance animation must loop and cannot have durations')
+            elif 'distancesPerFrame' in a:
+                # Cada quadro dura o trecho que o corpo anda nele (arrancada da corrida do vídeo).
+                if 'durationsMs' in a or len(a['distancesPerFrame']) != len(frames):
+                    raise ValueError(f'{key}: one distance per frame is required, and no durations')
+                for d in a['distancesPerFrame']: positive(d, key)
             else:
                 if len(a['durationsMs']) != len(frames):
                     raise ValueError(f'{key}: one duration per frame is required')
@@ -609,7 +620,8 @@ def compile_packs(root, results):
             atlas = ('new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]
                      +[str(l.get('columns',l['frameCount'])),str(l['frameCount']),f(cfg.get('pixelScale', 1)),str(l['sheetWidth']),str(l['sheetHeight'])]
                      +[q(','.join(str(v) for frame in l['frames'] for v in frame))])+')')
-            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
+            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))
+                  +(',new float[]{'+','.join(f(v) for v in a['distancesPerFrame'])+'}' if 'distancesPerFrame' in a else '')+'));']
         for key in [b for b in BINDINGS + AIR_DOWN_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
@@ -647,6 +659,8 @@ def compile_packs(root, results):
                      if energy and ('nome' in energy or energy.get('segurar')) else '')
                    +('.withEnergyVisual('+q(energy['visual'])+')' if energy and 'visual' in energy else '')
                    +(fighter_mechanics(fi['mecanica']) if 'mecanica' in fi else '')
+                   +('.withRun('+str(fi['corrida'].get('arrancadaFrames',0))+','+str(fi['corrida'].get('freadaFrames',0))+')'
+                     if 'corrida' in fi else '')
                    +(ultra_sequence(fi['ultra']) if 'ultra' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']

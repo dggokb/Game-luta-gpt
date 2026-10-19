@@ -75,6 +75,31 @@ public class SpriteMotionTest {
         tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
+    @Test public void distanceStartAndBrakingFollowTheBody() {
+        CharacterDefinition base=GeneratedCharacters.defaultCharacter();
+        java.util.Map<String,CharacterDefinition.Animation> a=new java.util.LinkedHashMap<>(base.animations);
+        CharacterDefinition.Animation run=base.animation(SpriteMotion.Clip.DASH);
+        // The start shows each drawing while the body covers its stretch: 10, then 30 units.
+        a.put(SpriteMotion.Clip.DASH_START,new CharacterDefinition.Animation(SpriteMotion.Clip.DASH_START,run.atlas,
+            new int[]{0,1},new float[0],false,0,new float[]{10f,30f}));
+        a.put(SpriteMotion.Clip.DASH_STOP,new CharacterDefinition.Animation(SpriteMotion.Clip.DASH_STOP,run.atlas,
+            new int[]{0,1},new float[]{.05f,.05f},false,0));
+        SpriteMotion m=new SpriteMotion(base.withAnimations("test",a));
+        m.update(.016f,true,false,0,4,true,true,false,null,0,false,false);
+        assertEquals(SpriteMotion.Clip.DASH_START,m.clip);assertEquals(0,m.frame());
+        m.update(.5f,true,false,0,8,true,true,false,null,0,false,false);
+        assertEquals("time alone does not advance it",1,m.frame());
+        m.update(.016f,true,false,0,30,true,true,false,null,0,false,false);
+        m.update(.016f,true,false,0,6,true,true,false,null,0,false,false);
+        assertEquals("40 units covered: the loop",SpriteMotion.Clip.DASH,m.clip);
+        // Released: the body still slides, and the slide plays the brake.
+        m.update(.016f,true,false,0,6,true,false,false,null,0,false,false,true);
+        assertEquals(SpriteMotion.Clip.DASH_STOP,m.clip);
+        m.update(.016f,true,false,0,3,true,false,false,null,0,false,false,true);
+        assertEquals(SpriteMotion.Clip.DASH_STOP,m.clip);
+        for(int i=0;i<8;i++)m.update(.016f,true,false,0,0,true,false,false,null,0,false,false,false);
+        assertEquals(SpriteMotion.Clip.IDLE,m.clip);
+    }
     @Test public void crouchEntryHoldAndExitDoNotChangeScaleOrLoopStandup() {
         SpriteMotion m=new SpriteMotion();
         CharacterDefinition.Animation crouch=clip(SpriteMotion.Clip.CROUCH);

@@ -107,7 +107,8 @@ Estados semânticos obrigatórios: `IDLE`, `COMBAT`, `WALK_FORWARD`, `WALK_BACK`
 
 Estados opcionais conhecidos: `DEFENSE_STAND`, `DEFENSE_CROUCH`, `DEFENSE_AIR`, `HIT_STAND`,
 `HIT_CROUCH`, `HIT_AIR`, `KNOCKDOWN`, `GROUNDED` e `GETUP` (os três últimos só em
-conjunto). O vocabulário vive em `build_characters.py` e é gerado em
+conjunto), e `DASH_START`/`DASH_STOP` (arrancada, uma vez, antes do loop `DASH`, e freada
+ao soltar a corrida; qualquer ação corta a freada). O vocabulário vive em `build_characters.py` e é gerado em
 `SpriteStates.java`. Qualquer outra animação precisa ser usada por um golpe ou por
 `specialAnimations`; um nome fora do vocabulário e sem uso (ex.: `HIT_STAN`) reprova o
 build em vez de cair silenciosamente no fallback.
@@ -116,7 +117,17 @@ Cada animação contém `atlas`, `frames` (índices a partir de zero), `loop` e 
 formas de avanço:
 
 - `durationsMs`: um tempo positivo por frame;
-- `distancePerFrame`: distância percorrida para avançar, com `loop: true`.
+- `distancePerFrame`: distância percorrida para avançar, com `loop: true`;
+- `distancesPerFrame`: a distância de cada frame (o trecho que o corpo anda enquanto ele
+  aparece), para a arrancada de uma corrida em que os primeiros passos são curtos.
+
+Corrida tirada de vídeo: a passada do desenho tem que bater com o deslocamento do corpo, ou o
+pé patina. Nos vídeos "na esteira" (a câmera segue o corpo) a medida é o pé de apoio, que
+anda para trás no chão. O desenho segue a velocidade de corrida do jogo: `DASH` e
+`DASH_START` avançam pela distância, e o bloco `corrida` do lutador
+(`{"arrancadaFrames": n, "freadaFrames": n}`) faz o corpo acelerar na arrancada e deslizar
+desacelerando na freada, no mesmo passo do desenho. Sem o bloco, a corrida sai e para na
+hora.
 
 Animação de golpe também marca `impactFrame`: o índice (em `frames`) do quadro em que o
 golpe encosta. A animação estica sobre o frame data, e o build recusa o pacote se esse

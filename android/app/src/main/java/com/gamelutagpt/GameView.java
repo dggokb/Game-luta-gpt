@@ -3526,7 +3526,8 @@ public class GameView extends SurfaceView
             animation,
             animationElapsed,
             combatPose,
-            locked
+            locked,
+            f.dashBraked
         );
     }
 
