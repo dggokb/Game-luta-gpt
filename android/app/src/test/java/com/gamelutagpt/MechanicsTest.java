@@ -481,6 +481,41 @@ public class MechanicsTest {
         assertTrue("the last hit throws the rival", s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
     }
 
+    /**
+     * O Ultra tira mais que a vida que sobra: o rival zera no primeiro golpe, mas continua preso
+     * levando os golpes (sem dano) e só voa no golpe final. Antes ele saía voando 6 quadros
+     * depois de zerar, e o golpe final e a finalização de mangá aconteciam no vento.
+     */
+    @Test public void aKnockedOutVictimStaysHeldUntilTheUltrasFinalBlow() {
+        for (String id : GeneratedCharacters.SELECTABLE) {
+            CharacterDefinition c = GeneratedCharacters.get(id);
+            if (c.fighter.ultraSequence == null) continue;
+            CombatEngineTest.Sim s = ultraSequence(id, 110f);
+            CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
+            CombatConfig config = s.engine.config;
+            s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
+            s.f(1).state.life = 1;
+            int hits = 0, guard = 0;
+            boolean finish = false, knockedOutEarly = false;
+            while (s.f(0).inUltraSequence() && guard++ < 2000) {
+                s.step();
+                for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && "ULTRA".equals(e.moveId)) hits++;
+                if (s.engine.cues().contains("ULTRA_FINISH")) finish = true;
+                if (s.f(1).ko() && s.f(0).ultraHitsDone < seq.hits.length) {
+                    knockedOutEarly = true;
+                    assertFalse(id + ": not thrown before the final blow", s.f(1).ultraFall);
+                    assertTrue(id + ": the Ultra still holds the KO", s.engine.ultraHoldsKo(1));
+                }
+            }
+            assertTrue(id + ": the first hit already knocked it out", knockedOutEarly);
+            assertEquals(id + ": every strike still lands", seq.hits.length, hits);
+            assertTrue(id + ": the final blow happens", finish);
+            assertTrue(id + ": the final blow throws it",
+                s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
+            assertFalse(s.engine.ultraHoldsKo(1));
+        }
+    }
+
     /** p09 e p11: os Ultras dos vídeos novos batem nos quadros e somam o dano. */
     @Test public void theP09AndP11UltrasHitOnTheirFrames() {
         for (String id : new String[]{"p09", "p11"}) {

@@ -24,6 +24,12 @@ visual provisório desenhado pelo jogo: dá para jogar antes de ter qualquer art
    impact frame e a câmera lenta do estilo; no P01 e no p06, o raio final (como antes).
 6. **Saída**: as faixas saem e o HUD volta.
 
+**Ultra que tira mais que a vida que sobra**: o rival zera no meio, mas continua preso no Ultra
+levando os golpes que faltam (com faísca e som, sem dano) e só voa no golpe final, onde entram o
+K.O., a câmera lenta e a finalização de mangá. O "K.O." da luta e o parceiro entrando esperam
+(`CombatEngine.ultraHoldsKo`). Antes ele saía voando 6 quadros depois de zerar, e o golpe final
+acontecia no vento.
+
 O tempo e o dano dos golpes não mudam; a abertura e a página param a luta enquanto rodam.
 No motor puro (testes, IA) a sequência corre direto: a tela liga a pausa da página com
 `CombatConfig.ultraSequencePage`.

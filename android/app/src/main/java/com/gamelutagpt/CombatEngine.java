@@ -196,6 +196,23 @@ final class CombatEngine {
     boolean superFreezeActive() { return superFreeze > 0; }
     /** Attacker whose ultra connected in the last step (start the cinematic), or -1. */
     int ultraConnected() { return ultraConnected; }
+    /**
+     * O lado {@code side} zerou no meio de um Ultra que ainda o segura (na página, nos golpes que
+     * faltam da sequência ou no raio antes da explosão): o K.O. só vale no golpe final.
+     */
+    boolean ultraHoldsKo(int side) {
+        CombatFighter d = fighters[side], a = fighters[1 - side];
+        if (!d.ko() || a.status != CombatFighter.Status.ULTRA) return false;
+        if (a.ultraPhase == CombatFighter.ULTRA_CINEMATIC) return true;
+        if (a.inUltraSequence()) {
+            CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
+            return seq != null && d == a.ultraVictim && d.state == a.ultraVictimState &&
+                a.ultraHitsDone < seq.hits.length;
+        }
+        if (a.firingBeam()) return a.beamHitsDone <= a.beamHits;
+        return false;
+    }
+
     /** The fighter's ultra connected and waits for the cinematic to finish. */
     boolean inUltraCinematic(int index) {
         CombatFighter f = fighters[index];
@@ -2187,12 +2204,13 @@ final class CombatEngine {
         if (!a.inUltraSequence()) return;
         CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
         boolean sameVictim = d == a.ultraVictim && d.state == a.ultraVictimState;
-        if (a.ultraHitsDone < seq.hits.length && (!sameVictim || d.ko())) {
-            // The victim fell (or a partner came in after the KO): the rest of the sequence is
-            // only the animation; a knocked-out victim is thrown now.
-            if (sameVictim) launchUltraVictim(a, d);
+        if (a.ultraHitsDone < seq.hits.length && !sameVictim) {
+            // Outro entrou no lugar: o resto da sequência é só a animação.
             a.ultraHitsDone = seq.hits.length;
         }
+        // Zerado no meio do Ultra, ele continua preso e levando os golpes (sem dano) até o golpe
+        // final, que é o que joga longe: voando antes, o golpe final e a finalização de mangá
+        // aconteciam no vento.
         if (a.ultraHitsDone < seq.hits.length) holdUltraVictim(a, d, seq);
         int finalHit = seq.hits.length - 1;
         if (config.ultraSequencePage && !a.ultraPageDone && a.ultraHitsDone == finalHit &&
@@ -2278,7 +2296,11 @@ final class CombatEngine {
 
     /** Damage already scaled; one more hit on the combo counter. */
     private int dealUltraDamage(CombatFighter a, CombatFighter d, int damage) {
-        if (d.ko()) return 0;
+        if (d.ko()) {
+            // Já zerado e ainda preso no Ultra: o golpe acerta (faísca, som), mas não tira nada.
+            events.add(new HitEvent(a.index, d.index, 0, false, false, ultraAttack.id));
+            return 0;
+        }
         d.state.takeDamage(damage, config.recoverableLifePermille);
         d.framesSinceHit = 0;
         ComboSession session = sessions[d.index];

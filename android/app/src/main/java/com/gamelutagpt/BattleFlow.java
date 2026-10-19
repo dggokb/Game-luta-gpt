@@ -142,6 +142,9 @@ final class BattleFlow {
             phaseFrame = 0;
         }
         if (!battle || (phase != Phase.GO && phase != Phase.FIGHT)) return;
+        // Zerado no meio de um Ultra que ainda o segura: o K.O. (e o parceiro entrando) esperam
+        // o golpe final.
+        if (engine.ultraHoldsKo(0) || engine.ultraHoldsKo(1)) return;
         boolean firstDown = engine.teams.defeated(0), secondDown = engine.teams.defeated(1);
         if (firstDown || secondDown) {
             winner = firstDown && secondDown ? DRAW : firstDown ? 1 : 0;

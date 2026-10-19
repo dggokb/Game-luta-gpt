@@ -1615,7 +1615,9 @@ public class GameView extends SurfaceView
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
             CombatFighter hitFighter = engine.fighter(event.defender);
-            boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter;
+            // Zerado no meio do Ultra: o K.O. (câmera lenta, close, finalização) fica para o golpe final.
+            boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter &&
+                !engine.ultraHoldsKo(event.defender);
             if (knockout) koVictim = hitFighter;
             if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
                 event.attacker, event.defender);
