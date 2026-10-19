@@ -18,6 +18,9 @@ primeiro. As pedras em volta ficam como estão, então nada escorre para fora da
 Mar agitado pintado (`"tipo": "ondas"`, o fundo do abismo) vira outra folha da mesma
 imagem (`<imagem>_ondas.png`): a máscara pega o azul e a espuma crespa (a névoa lisa fica
 de fora) e por cima dela vêm, devagar, manchas largas e baixas (veja `quadros_ondas`).
+
+`"espuma"` ([x, y, largura] em fração da imagem, no ponto em que a água bate) não entra na
+folha: vai para o stage.json, e o motor solta ali borrifos que sobem e somem.
 """
 
 import argparse
@@ -42,12 +45,18 @@ AREAS = {
     "palacio.png": {
         "tela": 0.39,
         "areas": [(0.095, 0.56, 0.185, 0.43), (0.72, 0.56, 0.185, 0.43)],
+        # O palácio é simétrico: os pés da direita são os da esquerda espelhados.
+        "espuma": [(0.162, 0.79, 0.06), (0.137, 0.96, 0.07), (0.199, 0.745, 0.04),
+                   (0.838, 0.79, 0.06), (0.863, 0.96, 0.07), (0.801, 0.745, 0.04)],
     },
     "abismo.png": [
         {
             "tela": 1.0,
             "sat": 0.5,
             "areas": [(0.425, 0.28, 0.085, 0.43), (0.525, 0.35, 0.045, 0.15), (0.655, 0.29, 0.065, 0.24)],
+            "espuma": [(0.464, 0.696, 0.08), (0.43, 0.9, 0.06), (0.551, 0.463, 0.05), (0.693, 0.52, 0.07)],
+            # A névoa do abismo é rosada (as tochas).
+            "corEspuma": "#F6DCEA",
         },
         # O mar batendo no fundo do abismo, embaixo das quedas.
         {"tipo": "ondas", "tela": 0.78, "areas": [(0.35, 0.66, 0.4, 0.27)]},
@@ -60,6 +69,9 @@ AREAS = {
             (0.815, 0.38, 0.05, 0.13), (0.515, 0.51, 0.05, 0.13), (0.355, 0.65, 0.045, 0.14),
             (0.515, 0.68, 0.035, 0.12), (0.335, 0.75, 0.035, 0.12), (0.765, 0.81, 0.07, 0.15),
         ],
+        "espuma": [(0.599, 0.38, 0.04), (0.841, 0.482, 0.04), (0.535, 0.61, 0.035), (0.37, 0.728, 0.03),
+                   (0.529, 0.754, 0.03), (0.351, 0.83, 0.03), (0.809, 0.915, 0.06)],
+        "corEspuma": "#D4CCEC",
     },
     "penhascos.png": {
         "luz": 0.3,
@@ -269,8 +281,14 @@ def anotar(pasta, nome, feitas):
     for arquivo, _, conf in feitas:
         areas = ", ".join("[" + ", ".join(f"{v:g}" for v in a) + "]" for a in conf["areas"])
         colunas = f'"colunas": {conf["colunas"]}, ' if conf["colunas"] != conf["quadros"] else ""
+        espuma = ""
+        if conf.get("espuma"):
+            pes = ", ".join("[" + ", ".join(f"{v:g}" for v in pe) + "]" for pe in conf["espuma"])
+            espuma = f', "espuma": [{pes}]'
+            if conf.get("corEspuma"):
+                espuma += f', "corEspuma": "{conf["corEspuma"]}"'
         itens.append(f'{{ "imagem": "{arquivo.name}", "quadros": {conf["quadros"]}, {colunas}"fps": {conf["fps"]}, '
-                     f'"areas": [{areas}] }}')
+                     f'"areas": [{areas}]{espuma} }}')
     campo = '"cachoeiras": ' + (itens[0] if len(itens) == 1 else "[" + ", ".join(itens) + "]") + ","
     linha = re.search(rf'\n(\s*)"imagem": "{re.escape(nome)}",(\n\s*"cachoeiras": [^\n]*,)?', texto)
     if not linha:

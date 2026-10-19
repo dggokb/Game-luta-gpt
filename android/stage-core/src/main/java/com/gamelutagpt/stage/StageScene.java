@@ -694,7 +694,34 @@ public final class StageScene {
                 c.drawImageRegion(sheet, x1, y1 + sy0, x1 + srcW, y1 + sy1, dl, dt, dr, db, next);
             }
         }
+        drawSpray(c, falls, l, t, w, h, alpha, instance);
         if (mirrored) c.restore();
+    }
+
+    /**
+     * Borrifos no pé de cada cachoeira: nuvens claras que nascem onde a água bate, sobem um
+     * pouco, crescem e somem, cada uma no seu tempo (a espuma pintada embaixo fica parada).
+     */
+    private void drawSpray(RenderCanvas c, StageDefinition.Waterfalls falls, float l, float t, float w, float h,
+                           int alpha, int instance) {
+        float[] f = falls.foam;
+        int puffs = detalhe ? 6 : 3;
+        for (int j = 0; j < f.length / 3; j++) {
+            float fx = l + f[j * 3] * w, fy = t + f[j * 3 + 1] * h, fw = f[j * 3 + 2] * w;
+            if (fx + fw < -VW || fx - fw > 2f * VW || fy - fw > VH || fy + fw < 0f) continue;
+            for (int i = 0; i < puffs; i++) {
+                int id = (instance * 131 + j) * 16 + i;
+                float period = 1.6f + 0.9f * hash01(id, 5);
+                float ph = time / period + hash01(id, 6);
+                ph -= (float)Math.floor(ph);
+                float side = hash01(id, 7) - 0.5f;
+                float cx = fx + side * fw * (0.7f + 0.5f * ph);
+                float cy = fy - ph * fw * 0.45f;
+                float radius = fw * (0.22f + 0.4f * ph);
+                float k = (float)Math.sin(Math.PI * ph);
+                c.fillRadialGlow(cx, cy, radius, withAlpha(falls.foamColor, Math.round(alpha * 0.65f * k * k)));
+            }
+        }
     }
 
     /**

@@ -372,6 +372,37 @@ public class StageSceneTest {
         assertEquals(200f, c[3], 0.01f);
     }
 
+    /** Espuma: no pé de cada cachoeira sobem borrifos (brilhos claros) perto do ponto em que a água bate. */
+    @Test
+    public void waterfallFoamPuffsRiseFromTheFoot() throws IOException {
+        String json = "{\"nome\": \"T\", \"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 600,"
+            + " \"noChao\": true, \"altura\": 0.4, \"cachoeiras\": {\"imagem\": \"w.png\","
+            + " \"areas\": [[0.1, 0.1, 0.2, 0.5]], \"espuma\": [[0.2, 0.6, 0.1]]}}]}";
+        StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        scene.update(0.5f);
+        final float[] layer = new float[4];
+        final java.util.List<float[]> puffs = new java.util.ArrayList<>();
+        scene.drawBackground(new CountingCanvas() {
+            @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                layer[0] = l; layer[1] = t; layer[2] = r; layer[3] = b;
+            }
+
+            @Override public void fillRadialGlow(float cx, float cy, float radius, int argb) {
+                puffs.add(new float[] {cx, cy, radius});
+            }
+        });
+        assertEquals("6 borrifos no pé", 6, puffs.size());
+        float w = layer[2] - layer[0], h = layer[3] - layer[1];
+        float footX = layer[0] + 0.2f * w, footY = layer[1] + 0.6f * h, footW = 0.1f * w;
+        for (float[] p : puffs) {
+            assertTrue("perto do pé na horizontal", Math.abs(p[0] - footX) <= footW * 0.61f);
+            assertTrue("do pé para cima", p[1] <= footY + 0.01f && p[1] >= footY - footW * 0.46f);
+            assertTrue(p[2] > 0f && p[2] <= footW * 0.63f);
+        }
+    }
+
     /** Neblina com fiapos: bancos de névoa (brilhos achatados) rente à base da faixa, andando. */
     @Test
     public void fogWispsDriftAlongTheBase() throws IOException {

@@ -154,11 +154,19 @@ public final class StageDefinition {
         public final float fps;
         /** Áreas: x, y, largura e altura em fração da imagem da camada (4 por área). */
         public final float[] areas;
+        /**
+         * Pés das cachoeiras ({@code "espuma"}: [[x, y, largura], ...] em fração da imagem; y é
+         * onde a água bate): ali sobem borrifos, nuvens claras que crescem e somem.
+         */
+        public final float[] foam;
+        public final int foamColor;
 
-        Waterfalls(String image, int frames, int columns, float fps, float[] areas) {
+        Waterfalls(String image, int frames, int columns, float fps, float[] areas, float[] foam, int foamColor) {
             this.image = image;
             this.frames = frames;
             this.columns = Math.max(1, Math.min(columns, frames));
+            this.foam = foam;
+            this.foamColor = foamColor;
             this.fps = fps;
             this.areas = areas;
         }
@@ -607,9 +615,19 @@ public final class StageDefinition {
                 }
             }
             if (areas.length == 0) continue;
+            Object foamList = fm.get("espuma");
+            List<Object> feet = foamList instanceof List ? (List<Object>)foamList : Collections.emptyList();
+            float[] foam = new float[feet.size() * 3];
+            for (int i = 0; i < feet.size(); i++) {
+                Object foot = feet.get(i);
+                if (!(foot instanceof List) || ((List<Object>)foot).size() != 3) {
+                    throw new IllegalArgumentException(where + ": cada espuma é [x, y, largura]");
+                }
+                for (int k = 0; k < 3; k++) foam[i * 3 + k] = ((Number)((List<Object>)foot).get(k)).floatValue();
+            }
             int frames = Math.max(1, Math.round(number(fm, "quadros", 8f)));
             b.waterfalls.add(new Waterfalls(fallsImage, frames, Math.round(number(fm, "colunas", frames)),
-                Math.max(0.1f, number(fm, "fps", 12f)), areas));
+                Math.max(0.1f, number(fm, "fps", 12f)), areas, foam, color(fm, "corEspuma", 0xFFEEF2FF)));
         }
 
         String repeat = string(map, "repetir", "nao");

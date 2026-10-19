@@ -130,6 +130,12 @@ câmera, a espuma acendendo; a névoa lisa e as pedras ficam de fora). Com `"col
 quebra os quadros em fileiras (`colunas` quadros por fileira, cada um um bloco com as áreas
 empilhadas), para não passar de uns 2500 px de largura.
 
+**Espuma no pé** (`"espuma": [[x, y, largura], ...]` e `"corEspuma"` num item de
+`"cachoeiras"`, em fração da imagem; y é onde a água bate): ali o motor solta borrifos,
+nuvens claras que nascem no pé, sobem um pouco, crescem e somem, cada uma no seu tempo (6 por
+pé; 3 no modo leve). A espuma pintada fica parada embaixo; os borrifos é que dão o movimento.
+No palácio, no abismo (rosada, das tochas) e na encosta (lilás, da distância).
+
 **Fiapos de neblina** (`"fiapos": N` numa `neblina`, com `"deriva"` em unidades do mundo por
 segundo): além do degradê, N bancos de névoa por largura de tela (brilhos redondos achatados,
 de tamanho e altura sorteados) rente à base da faixa, andando devagar e respirando. Na ilha,
