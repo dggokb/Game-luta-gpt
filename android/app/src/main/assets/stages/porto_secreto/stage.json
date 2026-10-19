@@ -29,7 +29,7 @@
       "id": "mar-plano",
       "tipo": "agua",
       "imagem": "mar_plano.jpg",
-      "perto": 655,
+      "perto": 1710,
       "longe": 8500,
       "tamanho": 1300,
       "corrente": 18,
@@ -72,12 +72,12 @@
     {
       "id": "barcos",
       "imagem": "barcos.png",
-      "profundidade": 1400,
+      "profundidade": 2700,
       "noChao": true,
-      "altura": 0.17,
-      "x": 0.42,
+      "altura": 0.282,
+      "x": 0.449,
       "repetir": "repetir",
-      "periodo": 1.4,
+      "periodo": 0.893,
       "reflexo": 0.35,
       "luzes": [
         { "x": 0.13, "y": 0.72, "raio": 0.12, "cor": "#FFD08A", "pulsar": 0.04 },
@@ -88,7 +88,7 @@
     {
       "id": "neblina-porto",
       "tipo": "neblina",
-      "profundidade": 1100,
+      "profundidade": 2300,
       "topo": 0.44,
       "base": 0.6,
       "cor": "#2C2450",
@@ -97,9 +97,9 @@
     {
       "id": "grade",
       "imagem": "grade.png",
-      "profundidade": 650,
+      "profundidade": 1700,
       "noChao": true,
-      "altura": 0.12,
+      "altura": 0.071,
       "repetir": "espelhar",
       "luzes": [
         { "x": 0.053, "y": 0.256, "raio": 0.35, "cor": "#FFB45A", "pulsar": 0.06 },
@@ -110,12 +110,11 @@
     {
       "id": "guindaste",
       "imagem": "guindaste.png",
-      "profundidade": 520,
+      "profundidade": 1700,
       "noChao": true,
-      "altura": 0.62,
-      "x": 0.84,
-      "repetir": "repetir",
-      "periodo": 2.6,
+      "altura": 0.946,
+      "x": 0.3,
+      "repetir": "nao",
       "luzes": [
         { "x": 0.884, "y": 0.2, "raio": 0.025, "cor": "#FFB050", "pulsar": 0.1, "reflexo": false },
         { "x": 0.673, "y": 0.251, "raio": 0.025, "cor": "#FFB050", "pulsar": 0.1, "reflexo": false },
@@ -126,12 +125,11 @@
     {
       "id": "terminal",
       "imagem": "terminal.png",
-      "profundidade": 430,
+      "profundidade": 1500,
       "noChao": true,
-      "altura": 0.5,
-      "x": -1.0,
-      "repetir": "repetir",
-      "periodo": 2.6,
+      "altura": 0.663,
+      "x": 0.86,
+      "repetir": "nao",
       "luzes": [
         { "x": 0.5, "y": 0.75, "raio": 0.14, "cor": "#FFC070", "pulsar": 0.04 },
         { "x": 0.238, "y": 0.233, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
@@ -174,6 +172,7 @@
     "imagemLajotas": "chao_cais.jpg",
     "perto": -600,
     "longe": 650,
+    "ate": 1700,
     "centroX": 700,
     "reflexoLutadores": 0.28,
     "reflexoLuzes": 0.6
