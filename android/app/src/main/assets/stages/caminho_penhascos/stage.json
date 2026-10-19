@@ -79,7 +79,7 @@
       "topo": 0.22,
       "base": 0.4,
       "x": 0.45,
-      "repetir": "nao",
+      "repetir": "espelhar",
       "luzes": [
         { "x": 0.117, "y": 0.762, "raio": 0.07, "cor": "#FFC060", "pulsar": 0.06, "reflexo": false },
         { "x": 0.321, "y": 0.762, "raio": 0.07, "cor": "#FFC060", "pulsar": 0.06, "reflexo": false },

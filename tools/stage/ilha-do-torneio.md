@@ -275,7 +275,8 @@ python tools/stage/montar_caminho.py --comum pasta/torneio --entrada pasta/torne
   guarda-corpo): a passarela é mais estreita que os outros pisos.
 - **Abismo**: a 1500, grande (de −0,3 a 0,72 da tela) e espelhado. A faixa de pedra que o
   GPT pôs embaixo fica escondida atrás do piso; o mar lá embaixo aparece logo acima do
-  guarda-corpo. A ponte suspensa fica na frente dele (1350), atravessando o vão, e uma
+  guarda-corpo. A ponte suspensa fica na frente dele (1350) e atravessa a tela inteira
+  (cópias encostadas e espelhadas: sozinha, ela terminava no ar dos dois lados), e uma
   neblina clara (1250) sobe do abismo. Atrás de tudo, a arena VIP ao longe (5000), os
   penhascos, o mar e o céu com a lua (`ceu_lua`: a emboscada é à noite).
 - **Composição** (profundidades): andaimes 330 (com o estandarte balançando:
