@@ -172,6 +172,46 @@ public class StageSceneTest {
         assertEquals("sem imagem do piso não há reflexo", 0f, noArt.fighterReflection(), 0f);
     }
 
+    /**
+     * Uma ilha apoiada no mar ({@code "apoio"}) não desliza sobre ele quando a câmera sobe no
+     * super pulo: a base fica no mesmo ponto do mar. Sem o apoio, ela se separa.
+     */
+    @Test
+    public void layerRestingOnTheSeaFollowsItWhenTheCameraRises() throws IOException {
+        final FakeImage mar = new FakeImage(1600, 600), ilha = new FakeImage(1600, 900);
+        for (boolean apoio : new boolean[] {true, false}) {
+            final String json = "{\"nome\": \"T\", \"camadas\": ["
+                + "{\"imagem\": \"mar.png\", \"profundidade\": 9000, \"topo\": 0.2, \"base\": 0.8},"
+                + "{\"imagem\": \"ilha.png\", \"profundidade\": 1500, \"topo\": 0.1, \"base\": 0.45"
+                + (apoio ? ", \"apoio\": 9000" : "") + "}]}";
+            StagePack pack = StagePack.load(new RenderAssets() {
+                @Override public String readText(String path) { return json; }
+                @Override public RenderImage loadImage(String path) { return path.endsWith("mar.png") ? mar : ilha; }
+            }, "stages/t");
+            StageScene scene = new StageScene(pack, WORLD);
+            float[] repouso = baseSobreOMar(scene, mar, ilha, 72f);
+            float[] pulo = baseSobreOMar(scene, mar, ilha, -400f);
+            // Onde a base da ilha cai dentro da imagem do mar (fração da altura dela).
+            float antes = (repouso[1] - repouso[0]) / (repouso[2] - repouso[0]);
+            float depois = (pulo[1] - pulo[0]) / (pulo[2] - pulo[0]);
+            if (apoio) assertEquals("a base fica no mesmo ponto do mar", antes, depois, 0.002f);
+            else assertTrue("sem apoio ela desliza", Math.abs(antes - depois) > 0.05f);
+        }
+    }
+
+    /** {topo do mar, base da ilha, base do mar} na tela, com a câmera no topo {@code top}. */
+    private static float[] baseSobreOMar(StageScene scene, final RenderImage mar, final RenderImage ilha, float top) {
+        scene.setCamera(1.12f, 140f, top);
+        final float[] out = new float[3];
+        scene.drawBackground(new CountingCanvas() {
+            @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                if (image == mar) { out[0] = t; out[2] = b; }
+                if (image == ilha) out[1] = b;
+            }
+        });
+        return out;
+    }
+
     /** A bandeira é desenhada em faixas: presa em cima, a ponta de baixo balança com o tempo. */
     @Test
     public void bannersHangFromTheTopAndSwayAtTheBottom() throws IOException {
@@ -324,7 +364,7 @@ public class StageSceneTest {
         }
     }
 
-    private static final class CountingCanvas implements RenderCanvas {
+    private static class CountingCanvas implements RenderCanvas {
         int depth, images, regions, lines, rings;
         final java.util.List<Object> ordem = new java.util.ArrayList<>();
         /** Recortes desenhados da imagem {@code watch}: topo e base no recorte, esquerda e direita na tela. */

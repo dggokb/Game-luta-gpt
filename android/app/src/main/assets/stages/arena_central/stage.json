@@ -28,7 +28,8 @@
     {
       "id": "penhascos",
       "imagem": "penhascos.png",
-      "profundidade": 7000,
+      "profundidade": 8800,
+      "apoio": 9000,
       "topo": 0.17,
       "base": 0.445,
       "x": 0.05,
@@ -37,7 +38,8 @@
     {
       "id": "templo-longe",
       "imagem": "templo_longe.png",
-      "profundidade": 6000,
+      "profundidade": 8600,
+      "apoio": 9000,
       "topo": -0.06,
       "base": 0.45,
       "x": 0.66,

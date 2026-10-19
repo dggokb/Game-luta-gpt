@@ -94,7 +94,8 @@ Dicas:
   cópia.
 - **Repetição**: `repetir: "repetir"` ou `"espelhar"` (cópias alternadas espelhadas,
   esconde emendas). `periodo` é a distância entre cópias em fração da largura da tela.
-- **Extras de camada**: `reflexo` (cópia espelhada embaixo, para a água), `corAcima` (pinta a
+- **Extras de camada**: `apoio` (profundidade da camada em que esta se apoia, como o mar: a
+  base acompanha ela na vertical no super pulo, veja `docs/stage-engine.md`), `reflexo` (cópia espelhada embaixo, para a água), `corAcima` (pinta a
   tela acima da camada, útil no céu durante o super pulo), `alfa`.
 - **`luzes`**: `x`, `y` (fração da imagem), `raio` (fração da altura da imagem), `cor`,
   `pulsar` e `reflexo` (aparece no piso molhado).

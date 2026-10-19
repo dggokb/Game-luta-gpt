@@ -28,7 +28,8 @@
     {
       "id": "penhascos",
       "imagem": "penhascos.png",
-      "profundidade": 6500,
+      "profundidade": 8800,
+      "apoio": 9000,
       "topo": 0.24,
       "base": 0.446,
       "x": 1.08,
@@ -46,7 +47,8 @@
     {
       "id": "ilha",
       "imagem": "ilha.png",
-      "profundidade": 5000,
+      "profundidade": 8600,
+      "apoio": 9000,
       "topo": 0.13,
       "base": 0.462,
       "x": 0.88,
@@ -70,6 +72,7 @@
       "id": "barcos",
       "imagem": "barcos.png",
       "profundidade": 1400,
+      "apoio": 9000,
       "noChao": true,
       "altura": 0.17,
       "x": 0.42,

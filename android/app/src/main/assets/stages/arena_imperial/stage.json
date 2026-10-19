@@ -28,7 +28,8 @@
     {
       "id": "penhascos",
       "imagem": "penhascos.png",
-      "profundidade": 6500,
+      "profundidade": 8800,
+      "apoio": 9000,
       "topo": 0.12,
       "base": 0.447,
       "x": 0.5,

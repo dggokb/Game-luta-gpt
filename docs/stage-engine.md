@@ -95,6 +95,12 @@ igual no Android e no Java2D.
 | `agua` | Plano horizontal entre as profundidades `perto` e `longe`, com degradê e brilhos que piscam presos ao mundo. Translúcida para mostrar o reflexo da camada atrás dela. |
 | `ator` | Personagem de fundo animado (`pasta` com `ator.json` e as folhas), apoiado no chão (`noChao` + `altura`), `virar` espelha. Fica na animação parada e toca as reações que o jogo pede (`StageScene.react("licao")`, `actorPlay`). Sem a folha de uma reação, usa a parada com um movimento provisório. Veja `docs/tutorial-plateia.md`. |
 
+**Apoio** (`"apoio": 9000`): a camada está apoiada noutra mais funda (uma ilha ou um barco
+sobre o mar). O mar é uma imagem plana lá no fundo; sem o apoio, quando a câmera sobe no super
+pulo, o que está mais perto desce mais que ele e desliza por cima da água (parece voar). Com
+o apoio, a base da camada acompanha na vertical o ponto do mar em que ela está na câmera de
+repouso; o tamanho e o movimento para os lados continuam os da própria profundidade.
+
 Camadas de imagem podem ter **luzes** (brilho que pulsa, com reflexo no piso) e **fogos**
 (chama em três camadas tremulando, brilho e brasas), presos a pontos da imagem; eles se
 repetem com as cópias da camada.

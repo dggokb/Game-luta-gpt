@@ -34,6 +34,8 @@ public final class StageScene {
         final RenderImage image;
         final float z;
         final float top, bottom, width, firstCenterX, period;
+        /** Com {@code apoio}: y do mundo, na profundidade do apoio, onde fica a base. */
+        float supportBaseY = Float.NaN;
         /** Imagens das bandeiras da camada, na ordem dela (null = não carregou). */
         final RenderImage[] banners;
 
@@ -156,6 +158,9 @@ public final class StageScene {
             RenderImage[] banners = new RenderImage[layer.banners.size()];
             for (int i = 0; i < banners.length; i++) banners[i] = pack.image(layer.banners.get(i).image);
             Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period), banners);
+            if (!Float.isNaN(layer.support)) {
+                p.supportBaseY = rest.worldY(rest.screenY(bottom, z), layer.support);
+            }
             placed.add(p);
             if (actor != null) actors.put(layer.id, new ActorState(p, actor, layer.actor, image));
         }
@@ -548,6 +553,11 @@ public final class StageScene {
         float scale = camera.scale(z);
         float top = camera.screenY(p.top, z);
         float bottom = camera.screenY(p.bottom, z);
+        if (!Float.isNaN(p.supportBaseY)) {
+            // Apoiada noutra camada (o mar): a base anda na vertical junto com ela.
+            bottom = camera.screenY(p.supportBaseY, layer.support);
+            top = bottom - (p.bottom - p.top) * scale;
+        }
         float halfWidth = p.width * 0.5f * scale;
         if (layer.fillAbove != 0 && top > -10f) c.fillRect(-10f, -10f, VW + 10f, top + 1f, layer.fillAbove);
         if (bottom < 0f || top > VH) return;

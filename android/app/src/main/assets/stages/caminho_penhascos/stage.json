@@ -28,7 +28,8 @@
     {
       "id": "penhascos",
       "imagem": "penhascos.png",
-      "profundidade": 7000,
+      "profundidade": 8800,
+      "apoio": 9000,
       "topo": 0.17,
       "base": 0.445,
       "x": 1.05,
@@ -37,7 +38,8 @@
     {
       "id": "arena-longe",
       "imagem": "arena_longe.png",
-      "profundidade": 5000,
+      "profundidade": 8600,
+      "apoio": 9000,
       "topo": -0.02,
       "base": 0.46,
       "x": 0.975,

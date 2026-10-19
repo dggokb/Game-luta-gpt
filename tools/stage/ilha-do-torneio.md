@@ -62,6 +62,11 @@ aparecem soltos no meio do piso. O porto e a Arena Costeira ficaram sem eles; no
 cenários não precisa gerar essas duas imagens.
 
 **Profundidade e apoio** (aprendido no porto e nas arenas):
+- **Paisagem gigante fica lá no fundo, junto do mar.** A ilha, a encosta, os penhascos, as
+  arenas e o templo ao longe ficam a 8600–8800 (o mar a 9000), com `"apoio": 9000`, e o
+  tamanho na tela vem do `topo`/`base`. Mais perto (a encosta estava a 2600), uma montanha
+  enorme se mexia como um objeto pequeno e abria uma faixa de mar embaixo dela no pulo.
+  Coisas pequenas sobre a água (os barcos) podem ficar perto, sempre com o `apoio`.
 - O que está longe (a ilha, os penhascos, as arenas e o templo ao longe) recebe a névoa da
   distância na montagem (`montar_porto.afastar`: menos cor e contraste, puxando para o
   azul-arroxeado do céu) e fica pequeno. Com a mesma cor e nitidez das peças de perto, a

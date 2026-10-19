@@ -118,6 +118,14 @@ public final class StageDefinition {
         public final int fillAbove;
         /** Opacidade da cópia espelhada embaixo da base (reflexo na água), 0 = sem. */
         public final float reflection;
+        /**
+         * Profundidade da camada em que esta se apoia ({@code "apoio"}), ou NaN. Uma ilha ou um
+         * barco desenhados sobre o mar (uma imagem bem mais funda) deslizavam em cima da água
+         * quando a câmera subia; com o apoio, a base acompanha na vertical o ponto do mar em que
+         * ela está na câmera de repouso (o tamanho e o movimento para os lados continuam os da
+         * própria profundidade).
+         */
+        public final float support;
         /** Água: faixa de profundidades e quantidade de brilhos. */
         public final float waterNear, waterFar;
         public final int shimmer;
@@ -146,6 +154,7 @@ public final class StageDefinition {
             alpha = b.alpha;
             fillAbove = b.fillAbove;
             reflection = b.reflection;
+            support = b.support;
             waterNear = b.waterNear;
             waterFar = b.waterFar;
             shimmer = b.shimmer;
@@ -177,6 +186,7 @@ public final class StageDefinition {
         float alpha = 1f;
         int fillAbove;
         float reflection;
+        float support = Float.NaN;
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
         final List<Light> lights = new ArrayList<>();
@@ -434,6 +444,7 @@ public final class StageDefinition {
         b.colorBottom = color(map, "corBase", b.color);
         b.fillAbove = color(map, "corAcima", 0);
         b.reflection = clamp01(number(map, "reflexo", 0f));
+        b.support = number(map, "apoio", Float.NaN);
 
         String repeat = string(map, "repetir", "nao");
         if ("nao".equals(repeat)) b.repeat = Repeat.NONE;
