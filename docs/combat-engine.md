@@ -924,6 +924,18 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   O H que joga na parede ganha um close mais aberto (~1,5×, `CINEMA_ZOOM_WALL`).
   Um por combo (90 quadros de intervalo); o KO sempre ganha o seu.
 - **Poeira e pedrinhas** quando um corpo bate no chão (mais forte vindo do alto) e no quique.
+- **Finalização de mangá** (`FinalizacaoManga`): o golpe que **mata e ganha a luta** (o time
+  do rival caiu inteiro) com **Super ou Ultra** vira um quadro de mangá. Depois do impact frame,
+  o cenário (fundo e frente) some atrás de um fundo chapado e linhas de concentração (集中線)
+  convergem em quem caiu, dentro da tela: muitos traços finos e algumas cunhas grossas,
+  redesenhados a cada 0,06 s, "fervendo" como animação de mangá. Os lutadores, o golpe e o
+  HUD continuam coloridos na frente.
+  - **Super**: papel claro e linhas pretas. **Ultra**: fundo preto, linhas brancas e linhas na
+    cor de quem finalizou.
+  - Entra em 0,08 s, fica 1,6 s e sai em 0,9 s, em tempo real (parado na pausa). A luta fica
+    em câmera lenta mais longa que a do KO (54 quadros a 30%), com tremida forte.
+  - K.O. dentro da página do Ultra: o pedido espera a página quebrar e o efeito entra com o raio.
+  - Só apresentação: o motor não sabe dela. Testes em `FinalizacaoMangaTest`.
 
 - **Pose do impacto** (medido no FighterZ: o golpe fica parado esticado 0,12–0,2 s e volta
   à guarda em 1–2 quadros): golpes médios e fortes que acertam congelam +3/+4 quadros

@@ -125,6 +125,9 @@ public class GameView extends SurfaceView
     private final ImpactEffects impacts = new ImpactEffects();
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
     private final ImpactFeel feel = new ImpactFeel();
+    /** Golpe que mata e ganha a luta com Super ou Ultra: o quadro de mangá com linhas de ação. */
+    private final FinalizacaoManga finalizacao = new FinalizacaoManga();
+    private final Random finalizacaoLinhas = new Random();
     private final Random soundRandom = new Random(11);
     /** Golpe no ar: o golpe de cada lado que já tocou o "vush", e o quadro em que estava. */
     private final AttackDefinition[] swingAttack = new AttackDefinition[2];
@@ -1320,6 +1323,15 @@ public class GameView extends SurfaceView
         // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
         // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
         // pausa, seleção, páginas da história e a Página Final ficam na velocidade normal.
+        if (fightClockRunning()) {
+            if (finalizacao.pendente()) {
+                // A tela ficou livre (a página do Ultra já quebrou): o quadro de mangá entra.
+                finalizacao.comecar();
+                feel.slow(FinalizacaoManga.LENTA_QUADROS, FinalizacaoManga.LENTA_ESCALA);
+                beamShake = Math.max(beamShake, FinalizacaoManga.TREMIDA);
+            }
+            finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade());
+        }
         float speed = fightClockRunning() ? pausa.velocidade() * feel.timeScale() : 1f;
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
@@ -1600,6 +1612,8 @@ public class GameView extends SurfaceView
             CombatFighter hitFighter = engine.fighter(event.defender);
             boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter;
             if (knockout) koVictim = hitFighter;
+            if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
+                event.attacker, event.defender);
             spawnImpact(event, ultraHit, punishNow, knockout);
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
@@ -1687,6 +1701,7 @@ public class GameView extends SurfaceView
         hud.resetEffects();
         impacts.clear();
         feel.clear();
+        finalizacao.limpar();
         koVictim = null;
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
@@ -1945,7 +1960,20 @@ public class GameView extends SurfaceView
 
     @Override
     public void onUltraHit(int hitIndex, float damageFraction) {
-        ultraDamageDealt += engine.applyUltraHit(ultraAttacker, Math.round(ultraTotalDamage() * damageFraction));
+        int dealt = engine.applyUltraHit(ultraAttacker, Math.round(ultraTotalDamage() * damageFraction));
+        ultraDamageDealt += dealt;
+        // Os acertos da página saem fora do passo da luta: o K.O. aqui não passa pelos eventos.
+        CombatFighter victim = engine.fighter(1 - ultraAttacker);
+        if (dealt > 0 && victim.ko()) pedirFinalizacao(FinalizacaoManga.ULTRA, ultraAttacker, victim.index);
+    }
+
+    /**
+     * O golpe {@code tipo} de {@code attacker} derrubou {@code defender}: se o time dele caiu
+     * inteiro (matou e ganhou a luta) com Super ou Ultra, a finalização de mangá.
+     */
+    private void pedirFinalizacao(int tipo, int attacker, int defender) {
+        if (tipo == FinalizacaoManga.NENHUM || !engine.teams.defeated(defender)) return;
+        finalizacao.pedir(tipo, defender, attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color);
     }
 
     @Override
@@ -2769,6 +2797,7 @@ public class GameView extends SurfaceView
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
+            if (finalizacao.ativo()) drawFinalizacao(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (beam) {
                 drawUltraBeamOverlay(canvas, false);
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
@@ -2823,7 +2852,8 @@ public class GameView extends SurfaceView
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
-            if (stageScene != null) stageScene.drawForeground(renderCanvas);
+            // Na finalização a frente do cenário some junto com o resto dele.
+            if (stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
             perfil.marca(PerfilQuadros.FRENTE);
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -3524,6 +3554,66 @@ public class GameView extends SurfaceView
             canvas.drawCircle(x, y, 38f, paint);
         }
         canvas.restore();
+    }
+
+    private static final int FINAL_PAPEL = 0xFFF1EBDA, FINAL_TINTA = 0xFF141218, FINAL_PRETO = 0xFF08080C;
+
+    /**
+     * Finalização de mangá ({@link FinalizacaoManga}): fundo chapado cobrindo o cenário e linhas
+     * de concentração convergindo em quem caiu, atrás dos lutadores. Desenhada no mundo, com
+     * os tamanhos em pixels de tela (divididos pelo zoom).
+     */
+    private void drawFinalizacao(Canvas canvas, float zoom, float left, float top) {
+        float k = finalizacao.forca();
+        int side = finalizacao.vitima();
+        if (k <= 0f || side < 0) return;
+        boolean ultra = finalizacao.tipo() == FinalizacaoManga.ULTRA;
+        int alpha = Math.round(255f * k);
+        float w = VW / zoom, h = VH / zoom;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(comAlfa(ultra ? FINAL_PRETO : FINAL_PAPEL, alpha));
+        // Sobra em volta para o close inclinado e a tremida.
+        canvas.drawRect(left - w * 0.4f, top - h * 0.4f, left + w * 1.4f, top + h * 1.4f, paint);
+        CombatFighter v = engine.fighter(side);
+        // No peito de quem caiu, mas dentro da tela (o raio do Ultra joga o rival para fora dela).
+        float x = clamp(v.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)),
+            left + w * 0.18f, left + w * 0.82f);
+        float y = clamp(chestY(v), top + h * 0.25f, top + h * 0.8f);
+        finalizacaoLinhas.setSeed(finalizacao.semente() * 7919L + 17L);
+        // Muitos traços finos e algumas cunhas grossas, como o 集中線 desenhado à mão.
+        int tinta = comAlfa(ultra ? Color.WHITE : FINAL_TINTA, alpha);
+        drawLinhasDeConcentracao(canvas, x, y, zoom, tinta, 190, 1.6f);
+        drawLinhasDeConcentracao(canvas, x, y, zoom, tinta, ultra ? 50 : 64, 14f);
+        if (ultra) drawLinhasDeConcentracao(canvas, x, y, zoom, comAlfa(finalizacao.cor(), alpha), 46, 9f);
+    }
+
+    /**
+     * Linhas de concentração do mangá: cunhas que vêm da borda da tela e afinam até a ponta,
+     * deixando um miolo vazio em volta de (x, y). Larguras e tamanhos em pixels de tela.
+     */
+    private void drawLinhasDeConcentracao(Canvas canvas, float x, float y, float zoom, int color, int count,
+                                          float maxWidth) {
+        Random r = finalizacaoLinhas;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        float outer = 1800f / zoom;
+        for (int i = 0; i < count; i++) {
+            double a = r.nextDouble() * Math.PI * 2;
+            float inner = (170f + r.nextFloat() * r.nextFloat() * 260f) / zoom;
+            float t = r.nextFloat();
+            float half = (0.8f + t * t * maxWidth) / zoom;
+            float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
+            impactPath.reset();
+            impactPath.moveTo(x + cos * inner, y + sin * inner);
+            impactPath.lineTo(x + cos * outer - sin * half, y + sin * outer + cos * half);
+            impactPath.lineTo(x + cos * outer + sin * half, y + sin * outer - cos * half);
+            impactPath.close();
+            canvas.drawPath(impactPath, paint);
+        }
+    }
+
+    private static int comAlfa(int color, int alpha) {
+        return (Math.max(0, Math.min(255, alpha)) << 24) | (color & 0x00FFFFFF);
     }
 
     /** Linhas finas no centro e largas na borda, apontando para o impacto. */
