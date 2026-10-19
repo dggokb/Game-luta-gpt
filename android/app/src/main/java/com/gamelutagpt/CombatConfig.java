@@ -352,17 +352,28 @@ final class CombatConfig {
     int justDefenseHealPermille = 12;
 
     // Combo breaker: no golpe que fecha a sequência (o forte ou o especial) de um combo que já
-    // está entrando, o mesmo gesto da defesa perfeita (trás em cima da hora) quebra o combo:
-    // o golpe não entra, quem batia fica atordoado e quem apanhava emenda o próprio combo.
-    // Custa barra (sem barra, nada acontece) e vale uma vez por combo.
+    // está entrando, M + H em cima da hora quebra o combo: o golpe não entra, quem batia é jogado
+    // para longe e fica atordoado, e quem apanhava sai correndo sozinho até ele para emendar o
+    // próprio combo. Custa barra (sem barra, nada acontece) e vale uma vez por combo.
     int comboBreakerFrames = 5;
+    /** Um M + H logo depois do outro não abre a janela (bater sem parar não quebra). */
+    int comboBreakerLockoutFrames = 20;
+    /** Quadros entre o M e o H (dois dedos) que ainda valem como apertados juntos. */
+    int comboBreakerPairFrames = 2;
     /** Acertos que o combo já tem antes do golpe que fecha (o breaker não vale no 1º golpe). */
     int comboBreakerMinHits = 2;
     int comboBreakerCost = METER_PER_BAR;
-    /** Atordoamento de quem teve o combo quebrado: tempo de entrar um combo de volta. */
-    int comboBreakerStunFrames = 30;
+    /** Atordoamento de quem teve o combo quebrado: a corrida até ele e o tempo de entrar um combo. */
+    int comboBreakerStunFrames = 44;
     int comboBreakerHitstopFrames = 16;
-    /** No estalo, quem quebrou avança até ficar a esta folga do corpo do outro (ao alcance do L). */
+    /** O estalo joga quem batia até esta folga do corpo de quem quebrou: longe, só correndo. */
+    float comboBreakerPushGap = 170f;
+    /** Quadros que ele desliza para trás, arrastando o pé (mais rápido que a corrida de quem quebrou). */
+    int comboBreakerPushFrames = 10;
+    /** No ar, a velocidade com que ele é jogado para trás. */
+    float comboBreakerAirPushSpeed = 260f;
+    /** Quem quebrou corre sozinho (sem → →) por até tantos quadros, até ficar a esta folga (ao alcance do L). */
+    int comboBreakerChaseFrames = 40;
     float comboBreakerCloseGap = 30f;
 
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.

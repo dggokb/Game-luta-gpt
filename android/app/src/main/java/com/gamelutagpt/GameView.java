@@ -1662,6 +1662,7 @@ public class GameView extends SurfaceView
                 if (pausa.impacto() && hit != null) feel.impactFrame(ultraFinalImpact, hit.x, chestY(hit));
             }
         }
+        updateBreakerSkid();
         for (CombatEngine.ProjectileClash clash : engine.clashes()) spawnClash(clash);
         updateUltraBeam();
         impacts.update(FIXED_STEP);
@@ -2318,6 +2319,7 @@ public class GameView extends SurfaceView
         for (int side = 0; side < 2; side++) {
             CombatFighter breaker = engine.fighter(side), broken = engine.fighter(1 - side);
             if (!breaker.comboBroke || !broken.inHitstun() || broken.stunElapsed > 0) continue;
+            breakerSkid = 1 - side;
             int accent = breaker.state.profile.color;
             impacts.spawnSuperGlint(breaker.x, chestY(breaker), accent);
             int direction = broken.x >= breaker.x ? 1 : -1;
@@ -2327,6 +2329,26 @@ public class GameView extends SurfaceView
         ultraSounds.playFight("punish", 1f, 1.15f);
         // Câmera lenta leve: dá para ver o que aconteceu (o golpe que não entrou e o estalo).
         feel.slow(BREAKER_SLOW_FRAMES, BREAKER_SLOW_SCALE);
+    }
+
+    /** Quem teve o combo quebrado e está deslizando para trás (fumacinha do pé), ou -1. */
+    private int breakerSkid = -1;
+
+    /** Enquanto o estalo do combo breaker o empurra no chão, o pé arrasta e solta fumacinha. */
+    private void updateBreakerSkid() {
+        if (breakerSkid < 0) return;
+        CombatFighter f = engine.fighter(breakerSkid);
+        if (f.frozen()) return;
+        if (f.pushFramesLeft <= 0 || !f.inHitstun()) {
+            breakerSkid = -1;
+            return;
+        }
+        if (!f.grounded || f.pushFramesLeft % 2 != 0) return;
+        float offset = breakerSkid == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT);
+        int direction = f.pushRemaining >= 0f ? 1 : -1;
+        // Os dois pés: o de trás vai na frente do deslize, o da frente fica para trás.
+        impacts.spawnSkid(f.x + offset + direction * 16f, GROUND_Y, direction);
+        impacts.spawnSkid(f.x + offset - direction * 18f, GROUND_Y, direction);
     }
 
     /**

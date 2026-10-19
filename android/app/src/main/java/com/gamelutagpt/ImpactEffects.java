@@ -11,7 +11,7 @@ import android.graphics.Shader;
  * spawning reuses slots, drawing allocates nothing and nothing here touches combat state.
  */
 final class ImpactEffects {
-    static final int HIT = 0, GUARD = 1, DUST = 2, LAUNCH = 3, GLINT = 4;
+    static final int HIT = 0, GUARD = 1, DUST = 2, LAUNCH = 3, GLINT = 4, SKID = 5;
     /** Size class of a contact: 0 light, 1 medium, 2 heavy, 3 special/super. */
     static final int LIGHT = 0, MEDIUM = 1, HEAVY = 2, SPECIAL = 3;
 
@@ -177,6 +177,31 @@ final class ImpactEffects {
     }
 
     /**
+     * Fumacinha do pé de quem é empurrado arrastando no chão (o combo breaker): uma nuvem baixa
+     * e pequena e uns grãos que sobem para trás da direção do deslize ({@code direction}).
+     */
+    void spawnSkid(float x, float groundY, int direction) {
+        int b = nextBurst;
+        nextBurst = (nextBurst + 1) % BURSTS;
+        bx[b] = x; by[b] = groundY; bAge[b] = 0f; bKind[b] = SKID; bDir[b] = direction >= 0 ? 1 : -1;
+        bLife[b] = .45f + .15f * random();
+        bSize[b] = 16f + 8f * random();
+        bAngle[b] = random() * 6.2832f;
+        bColor[b] = 0xFFE3D8C4;
+        for (int n = 0; n < 3; n++) {
+            int d = nextDebris;
+            nextDebris = (nextDebris + 1) % DEBRIS;
+            dx[d] = x + (random() - .5f) * 24f; dy[d] = groundY - 3f;
+            dvx[d] = -direction * (60f + 140f * random());
+            dvy[d] = -(90f + 160f * random());
+            dAge[d] = 0f;
+            dLife[d] = .2f + .18f * random();
+            dWidth[d] = 2.5f + random() * 3f;
+            dColor[d] = n == 0 ? 0xFF8E8172 : 0xFFB8A88F;
+        }
+    }
+
+    /**
      * Saída do super pulo: um anel de choque achatado no chão que se abre, uma coluna de luz
      * curta subindo dos pés, riscos de velocidade para cima e a poeira do chão. {@code accent}
      * é a cor do lutador.
@@ -333,6 +358,10 @@ final class ImpactEffects {
             drawLaunch(c, i, k);
             return;
         }
+        if (bKind[i] == SKID) {
+            drawSkid(c, i, k);
+            return;
+        }
         if (bKind[i] == GLINT) {
             drawGlint(c, i, k);
             return;
@@ -443,6 +472,27 @@ final class ImpactEffects {
      * Brilho de estrela: quatro pontas finas (a horizontal mais longa) que abrem num estalo e
      * encolhem, com um halo na cor do lutador e um anel que se abre.
      */
+    /**
+     * A fumacinha do pé: três bolinhas que incham, sobem um pouco e ficam para trás do deslize
+     * (o corpo segue, a fumaça fica), sumindo devagar.
+     */
+    private void drawSkid(Canvas c, int i, float k) {
+        float size = bSize[i];
+        float grow = 1f - (1f - k) * (1f - k);
+        paint.setShader(null);
+        paint.setStyle(Paint.Style.FILL);
+        for (int puff = 0; puff < 3; puff++) {
+            float side = (float)Math.sin(bAngle[i] + puff * 2.1f);
+            float r = size * (.45f + .2f * puff) * (.6f + .9f * grow);
+            float px = bx[i] - bDir[i] * (6f + 22f * grow) * (1f + .5f * puff) + side * 8f;
+            float py = by[i] - r * .7f - 26f * grow * (.5f + .4f * puff);
+            paint.setColor(bColor[i]);
+            paint.setAlpha(Math.round(175 * (1f - k) * (1f - .2f * puff)));
+            c.drawCircle(px, py, r, paint);
+        }
+        paint.setAlpha(255);
+    }
+
     private void drawGlint(Canvas c, int i, float k) {
         float size = bSize[i];
         // Abre rápido até ~15% da vida e depois encolhe devagar.

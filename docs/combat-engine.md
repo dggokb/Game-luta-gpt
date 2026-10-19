@@ -648,26 +648,36 @@ Testes em `DefesaEGolpeAltoTest`.
 ### Combo breaker
 
 Contra combo sem fim: quem está apanhando pode quebrar o combo **no golpe que fecha a
-sequência** — o forte ou o especial, corpo a corpo, na última batida dele — com o **mesmo
-gesto da defesa perfeita** (trás apertado até `comboBreakerFrames` = 5 quadros antes do contato;
-bater trás sem parar não vale). L e M no meio da sequência não quebram.
+sequência** — o forte ou o especial, corpo a corpo, na última batida dele — com **M + H**
+(os dois juntos, o ponto entre eles, ou um dedo até `comboBreakerPairFrames` = 2 quadros depois
+do outro) apertado até `comboBreakerFrames` = 5 quadros antes do contato. Bater M + H sem parar
+não vale (`comboBreakerLockoutFrames` = 20 entre um aperto e outro). L e M no meio da sequência
+não quebram. Apanhando, M + H não sai como H no buffer.
 
 - Só num combo que já tem `comboBreakerMinHits` (2) acertos antes desse golpe e com **1 barra**
   de Super (`comboBreakerCost`); sem barra, o golpe entra normal. Uma vez por combo (o combo acaba).
 - **Efeito** (cue `COMBO_BREAKER`): o golpe não entra; quem apanhava fica livre na hora (no ar,
-  cai livre) e, no chão, avança até ficar colado (`comboBreakerCloseGap`); quem batia perde o
-  golpe e fica atordoado `comboBreakerStunFrames` (30) depois de um congelamento de 16 — tempo de
-  emendar o próprio combo. "COMBO BREAKER!", brilho na cor de quem quebrou, estalo e tremida.
+  cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (44) depois de um
+  congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (170) do corpo de quem
+  quebrou, deslizando em `comboBreakerPushFrames` (10) quadros (no ar, `comboBreakerAirPushSpeed`;
+  encurralado, para na parede — quem quebrou não recua). "COMBO BREAKER!", brilho na cor de quem
+  quebrou, estalo e tremida; enquanto desliza, o pé arrasta e solta **fumacinha**
+  (`ImpactEffects.spawnSkid`, `GameView.updateBreakerSkid`).
+- **Corrida automática**: quem quebrou sai correndo sozinho até ele (sem o → →), na velocidade do
+  dash, por até `comboBreakerChaseFrames` (40) quadros, até ficar a `comboBreakerCloseGap` (30)
+  do corpo dele (ao alcance do L). Trás ou baixo desiste da corrida; pulo também. O golpe
+  apertado no meio da corrida (ou ainda no congelamento) **espera chegar perto** — o buffer não
+  envelhece enquanto corre — e sai no alcance; chegando, ainda sobram ~29 quadros de atordoamento.
 - **Não vira luta infinita**: cada quebra custa uma barra, e a barra só volta batendo e
   apanhando; o troco também pode ser quebrado, mas só por quem ainda tiver barra.
 - **CPU**: a partir do nível 4, apanhando num combo e com barra, a cada golpe novo que ela vê às
   vezes aposta no tempo (`CpuLevel.comboBreaker`: 12% por nível acima do 3): espera um pouco e
-  aperta trás. Só quebra se a aposta cair na janela de um golpe forte/especial. Quando quebra,
-  **sempre emenda o combo** dela (`AiController.breakerFollowUp`: o próprio breaker ela sente na
-  hora; abre a rota com o primeiro golpe que alcança, ou corre até ele).
+  aperta M + H. Só quebra se a aposta cair na janela de um golpe forte/especial. Quando quebra,
+  **sempre emenda o combo** dela (`AiController.breakerFollowUp`: deixa a corrida levar até ele e
+  abre a rota com o primeiro golpe que alcança).
 - **Câmera lenta**: no estalo, 36 quadros a 50% (`GameView.BREAKER_SLOW_*`), para dar para ver
   o golpe que não entrou e o troco começando.
-- Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) ←".
+- Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) M + H".
 
 Testes em `ComboBreakerTest`.
 

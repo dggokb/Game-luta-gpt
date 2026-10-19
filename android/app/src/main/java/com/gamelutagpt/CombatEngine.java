@@ -455,16 +455,43 @@ final class CombatEngine {
         if (in.grab) f.throwRequestAge = 0;
         if (in.overdrive) f.overdriveRequestAge = 0;
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
+        boolean breakerPress = trackBreakerPress(f, in);
         if (in.pushblock) {
-            // Only blocking turns M + H into a pushblock; otherwise it is the heavy.
+            // Blocking, M + H is the pushblock; being hit, the combo breaker; otherwise the heavy.
             if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
-            else f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+            else if (!breakerPress) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
         }
         if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
             f.buffer.push(InputBuffer.Button.SUPER, null, false);
         }
+    }
+
+    /**
+     * Combo breaker: conta os quadros desde o último M + H apertado apanhando (os dois juntos, o
+     * ponto entre eles, ou um dedo até {@code comboBreakerPairFrames} depois do outro). O aperto
+     * só abre a janela se veio depois do bloqueio contra bater sem parar.
+     */
+    private boolean trackBreakerPress(CombatFighter f, FighterInput in) {
+        boolean press = false;
+        if (f.inHitstun()) {
+            press = in.pushblock || (in.medium && in.heavy) ||
+                (in.medium && f.breakerHeavyAge >= 0) || (in.heavy && f.breakerMediumAge >= 0);
+        }
+        if (press) {
+            f.breakerPressCounts = f.breakerPressAge >= config.comboBreakerLockoutFrames;
+            f.breakerPressAge = 0;
+            f.breakerMediumAge = f.breakerHeavyAge = -1;
+            return true;
+        }
+        if (f.breakerPressAge < 999) f.breakerPressAge++;
+        boolean stunned = f.inHitstun();
+        f.breakerMediumAge = stunned && in.medium ? 0
+            : f.breakerMediumAge >= 0 && f.breakerMediumAge < config.comboBreakerPairFrames ? f.breakerMediumAge + 1 : -1;
+        f.breakerHeavyAge = stunned && in.heavy ? 0
+            : f.breakerHeavyAge >= 0 && f.breakerHeavyAge < config.comboBreakerPairFrames ? f.breakerHeavyAge + 1 : -1;
+        return false;
     }
 
     /** O personagem tem um especial de segurar baixo ([↓] ↑)? */
@@ -539,6 +566,14 @@ final class CombatEngine {
             }
         }
 
+        if (f.breakerChase > 0) {
+            // A corrida do combo breaker: trás ou baixo desiste; golpe, pulo ou chegar perto acaba.
+            boolean giveUp = horizontal(f.input.direction) == -f.facing || ControlsLayout.isDownDirection(f.input.direction);
+            if (giveUp || f.status != CombatFighter.Status.NEUTRAL) f.breakerChase = 0;
+            else if (breakerChasing(f)) f.forwardDashing = true;
+            else if (f.grounded) f.breakerChase = 0;
+        }
+
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
@@ -558,7 +593,8 @@ final class CombatEngine {
         f.dashRequest = f.backdashRequest = false;
 
         if (f.status == CombatFighter.Status.NEUTRAL) {
-            startFromBuffer(f, false);
+            // Correndo até o outro, o golpe apertado espera chegar perto (não sai de longe).
+            if (!breakerChasing(f)) startFromBuffer(f, false);
         } else if (f.attacking() && (CancelSystem.windowOpen(f) || overdriveCancelOpen(f))) {
             startFromBuffer(f, true);
         }
@@ -888,6 +924,7 @@ final class CombatEngine {
 
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
+        f.breakerChase = 0;
         int horizontal = horizontal(f.input.direction);
         if (f.forwardDashing && f.grounded) {
             // Saindo da corrida, o pulo leva o embalo (dash jump).
@@ -938,7 +975,8 @@ final class CombatEngine {
             return;
         }
         f.clock++;
-        f.buffer.age(config.bufferFrames);
+        if (!breakerChasing(f)) f.buffer.age(config.bufferFrames);
+        if (f.breakerChase > 0) f.breakerChase--;
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
         if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.throwBufferFrames) f.throwRequestAge = -1;
@@ -1234,6 +1272,8 @@ final class CombatEngine {
             }
         }
         int horizontal = horizontal(f.input.direction);
+        // A corrida do combo breaker anda sozinha, como se → estivesse seguro.
+        if (breakerChasing(f)) horizontal = breakerFar(f) ? f.facing : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         if (!holdingForward) f.forwardDashing = false;
         float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
@@ -1503,7 +1543,7 @@ final class CombatEngine {
 
     /**
      * Combo breaker: o golpe que fecha a sequência (forte ou especial, corpo a corpo, a última
-     * batida dele) num combo que já tem {@code comboBreakerMinHits} acertos, com trás apertado
+     * batida dele) num combo que já tem {@code comboBreakerMinHits} acertos, com M + H apertado
      * em cima da hora e barra para pagar.
      */
     private boolean comboBreaks(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile,
@@ -1515,15 +1555,17 @@ final class CombatEngine {
         ComboSession session = sessions[d.index];
         if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return false;
         if (d.state.superMeter < config.comboBreakerCost) return false;
-        return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= config.comboBreakerFrames;
+        return d.breakerPressCounts && d.breakerPressAge <= config.comboBreakerFrames;
     }
 
     /**
-     * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre;
-     * no chão, avança até ficar colado) e quem batia fica atordoado, sem o golpe, ao alcance do troco.
+     * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre) e
+     * quem batia é jogado para longe, arrastando o pé, e fica atordoado, sem o golpe. Quem quebrou
+     * sai correndo sozinho até ele (sem o → →) para dar o troco.
      */
     private void comboBreaker(CombatFighter a, CombatFighter d) {
         d.state.spendSuperMeter(config.comboBreakerCost);
+        d.breakerPressCounts = false;
         d.guardPressCounts = false;
         endSession(d.index);
         d.status = CombatFighter.Status.NEUTRAL;
@@ -1539,10 +1581,12 @@ final class CombatEngine {
         d.pushRemaining = 0f;
         d.pushFramesLeft = 0;
         d.comboBroke = true;
+        // O que sobrou do M e do H no buffer não sai de longe: o troco é apertado na corrida.
+        d.buffer.clear();
+        d.breakerChase = config.comboBreakerChaseFrames;
 
         a.comboBroke = false;
         a.clearAttack();
-        if (a.grounded) a.vx = 0f;
         a.status = a.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
         a.hitCrouching = false;
         a.stunLeft = a.stunTotal = config.comboBreakerStunFrames;
@@ -1550,14 +1594,41 @@ final class CombatEngine {
         a.pushRemaining = 0f;
         a.pushFramesLeft = 0;
         a.forwardDashing = false;
-        // O combo empurrou quem apanhava para longe: no estalo ele avança até ficar colado.
-        if (a.grounded && d.grounded) {
-            float wanted = a.body().halfWidth + d.body().halfWidth + config.comboBreakerCloseGap;
+        a.breakerChase = 0;
+        // O estalo joga quem batia para longe de quem quebrou: só correndo para alcançar.
+        float away = a.x == d.x ? -d.facing : Math.signum(a.x - d.x);
+        if (a.grounded) {
+            a.vx = 0f;
+            float wanted = a.body().halfWidth + d.body().halfWidth + config.comboBreakerPushGap;
             float gap = Math.abs(a.x - d.x);
-            if (gap > wanted) push(d, a, Math.signum(a.x - d.x) * (gap - wanted));
+            if (gap < wanted) {
+                // Sem quem empurra: encurralado, ele só para na parede (quem quebrou não recua).
+                push(a, null, away * (wanted - gap));
+                a.pushFramesLeft = config.comboBreakerPushFrames;
+            }
+        } else {
+            a.vx = away * config.comboBreakerAirPushSpeed;
         }
         freeze(a, d, config.comboBreakerHitstopFrames, false);
         cues.add("COMBO_BREAKER");
+    }
+
+    /**
+     * Depois do combo breaker, quem quebrou corre sozinho até o outro: livre e no chão, sem
+     * segurar trás nem baixo, enquanto ele ainda desliza ou está longe.
+     */
+    private boolean breakerChasing(CombatFighter f) {
+        if (f.breakerChase <= 0 || f.status != CombatFighter.Status.NEUTRAL || !f.grounded || f.locked || f.ko()) {
+            return false;
+        }
+        return fighters[1 - f.index].pushFramesLeft > 0 || breakerFar(f);
+    }
+
+    /** Ainda fora do alcance do L: a corrida anda. */
+    private boolean breakerFar(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        float close = f.body().halfWidth + other.body().halfWidth + config.comboBreakerCloseGap;
+        return Math.abs(other.x - f.x) > close;
     }
 
     /** Arranhão de uma batida defendida: só especial e Super/Ultra. */
@@ -1658,6 +1729,7 @@ final class CombatEngine {
         point.hitstop = 0;
         point.launcherChase = 0;
         point.wallChase = 0;
+        point.breakerChase = 0;
         point.locked = false;
         // The new point did not walk there: no walk animation from the jump in position.
         startX[point.index] = point.x;

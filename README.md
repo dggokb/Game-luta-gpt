@@ -239,9 +239,10 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
 - **Defesa perfeita**: aperte trás bem em cima do golpe (até 5 quadros antes). Não gasta a
   guarda, não leva chip, recupera um pouco de vida e sai antes do bloqueio. Ficar batendo
   trás não vale.
-- **Combo breaker**: apanhando num combo, o mesmo gesto (trás em cima da hora) **no golpe forte
-  ou especial que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem
-  batia fica atordoado e você emenda o seu combo. Sem barra não quebra.
+- **Combo breaker**: apanhando num combo, **M + H** em cima da hora **no golpe forte ou especial
+  que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem batia é jogado
+  para trás (arrastando o pé, com fumacinha) e fica atordoado, e você sai correndo sozinho até
+  ele para emendar o seu combo. Sem barra não quebra.
 - **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
 - **Narrador do torneio**: nas lutas de verdade (batalha, Arcade e torneio da história) um
   narrador anima a luta numa faixa de transmissão no rodapé — começo, combos, Super, Ultra,

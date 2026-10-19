@@ -289,7 +289,7 @@ final class AiController {
         endRoute();
         guardFrames = 0;
         justDefenseWait = 0;
-        breakerWait = breakerHold = 0;
+        breakerWait = 0;
         lastBreakerSerial = -1;
         breakerCombo = false;
         anticipationTimer = 0;
@@ -334,7 +334,7 @@ final class AiController {
         }
         if (me.frozen()) return;
         if (me.inHitstun()) betOnComboBreaker(engine, me, seen, out);
-        else breakerWait = breakerHold = 0;
+        else breakerWait = 0;
         if (me.status == CombatFighter.Status.AIR_HITSTUN) {
             // Air tech once the hitstun is over, sometimes, toward a random side.
             if (airTechPlan == -2) airTechPlan = ai.airTechDirection(level.airTech);
@@ -699,7 +699,7 @@ final class AiController {
 
     /**
      * Combo breaker: apanhando num combo (e com barra), a cada golpe novo que ela vê o rival
-     * soltar, às vezes aposta: espera um pouco e aperta trás. Quebra só se o aperto cair na
+     * soltar, às vezes aposta: espera um pouco e aperta M + H. Quebra só se o aperto cair na
      * janela de um golpe forte/especial (como um humano que tenta no ritmo do combo).
      */
     private void betOnComboBreaker(CombatEngine engine, CombatFighter me, CpuPerception.Snapshot seen,
@@ -708,24 +708,20 @@ final class AiController {
         CombatConfig config = engine.config;
         if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits ||
             me.state.superMeter < config.comboBreakerCost) {
-            breakerWait = breakerHold = 0;
+            breakerWait = 0;
             return;
         }
         if (seen != null && seen.attacking() && seen.attackSerial != lastBreakerSerial) {
             lastBreakerSerial = seen.attackSerial;
-            if (breakerHold == 0 && roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
+            if (breakerWait == 0 && roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
         }
-        if (breakerWait > 0 && --breakerWait == 0) breakerHold = BREAKER_HOLD_FRAMES;
-        if (breakerHold > 0) {
-            breakerHold--;
-            out.direction = me.facing > 0 ? 5 : 1;
-        }
+        if (breakerWait > 0 && --breakerWait == 0) out.pushblock = true;
     }
 
     /**
-     * Depois de quebrar o combo, sempre emenda o dela: o rival fica atordoado e colado (o
-     * estalo a puxa para perto), então ela abre a rota do caderno com o primeiro golpe que
-     * alcança. Sem nenhum ao alcance, corre até ele enquanto o atordoamento dura.
+     * Depois de quebrar o combo, sempre emenda o dela: o rival fica atordoado e longe (o estalo
+     * o joga para trás) e ela corre sozinha até ele; ao alcance, abre a rota do caderno com o
+     * primeiro golpe que alcança. Sem nenhum ao alcance, corre até ele enquanto o atordoamento dura.
      */
     private boolean breakerFollowUp(CombatFighter me, CombatFighter target, FighterInput out) {
         if (!breakerCombo) return false;
@@ -733,7 +729,8 @@ final class AiController {
             breakerCombo = false;
             return false;
         }
-        if (!me.canAct()) return true;
+        // O estalo ainda joga o rival para trás: a corrida sozinha leva até ele.
+        if (!me.canAct() || target.frozen() || target.pushFramesLeft > 0) return true;
         float gap = Math.abs(target.x - me.x);
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"L", "2L", "M", "2M"}) {
@@ -744,6 +741,7 @@ final class AiController {
             breakerCombo = false;
             return true;
         }
+        if (me.breakerChase > 0) return true;
         movingBack = false;
         movingForward = dashing = true;
         out.direction = target.x > me.x ? 1 : 5;
@@ -753,9 +751,9 @@ final class AiController {
 
     private boolean breakerCombo;
 
-    /** Quanto ela espera (no máximo) para apertar depois de ver o golpe, e quanto segura. */
-    static final int BREAKER_GUESS_FRAMES = 10, BREAKER_HOLD_FRAMES = 6;
-    private int breakerWait, breakerHold, lastBreakerSerial = -1;
+    /** Quanto ela espera (no máximo) para apertar depois de ver o golpe. */
+    static final int BREAKER_GUESS_FRAMES = 10;
+    private int breakerWait, lastBreakerSerial = -1;
 
 
     /** Quantos quadros antes do contato ela aperta a defesa perfeita (dentro da janela). */
