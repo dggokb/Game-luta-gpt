@@ -1,0 +1,131 @@
+{
+  "nome": "Arena Central",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#0C1030",
+  "camadas": [
+    {
+      "id": "ceu",
+      "imagem": "ceu_lua.jpg",
+      "profundidade": 100000,
+      "topo": -0.75,
+      "base": 0.42,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "corAcima": "#0C1030"
+    },
+    {
+      "id": "mar",
+      "imagem": "mar.png",
+      "profundidade": 9000,
+      "topo": 0.133,
+      "base": 0.8,
+      "x": 0.58,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "penhascos",
+      "imagem": "penhascos.png",
+      "profundidade": 7000,
+      "topo": 0.17,
+      "base": 0.45,
+      "x": 0.05,
+      "repetir": "nao"
+    },
+    {
+      "id": "templo-longe",
+      "imagem": "templo_longe.png",
+      "profundidade": 6000,
+      "topo": -0.06,
+      "base": 0.44,
+      "x": 0.66,
+      "repetir": "nao",
+      "luzes": [
+        { "x": 0.405, "y": 0.897, "raio": 0.03, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.629, "y": 0.879, "raio": 0.03, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.458, "y": 0.644, "raio": 0.03, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false }
+      ]
+    },
+    {
+      "id": "neblina-longe",
+      "tipo": "neblina",
+      "profundidade": 5000,
+      "topo": 0.3,
+      "base": 0.46,
+      "cor": "#4A3A78",
+      "alfa": 0.3
+    },
+    {
+      "id": "arquibancada",
+      "imagem": "arquibancada.png",
+      "profundidade": 1100,
+      "noChao": true,
+      "altura": 0.42,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.094, "y": 0.792, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.378, "y": 0.817, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.62, "y": 0.818, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.907, "y": 0.792, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    },
+    {
+      "id": "barreira",
+      "imagem": "barreira.png",
+      "profundidade": 600,
+      "noChao": true,
+      "altura": 0.075,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.033, "y": 0.296, "raio": 0.25, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.269, "y": 0.293, "raio": 0.25, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.5, "y": 0.292, "raio": 0.25, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.732, "y": 0.289, "raio": 0.25, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.965, "y": 0.295, "raio": 0.25, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    },
+    {
+      "id": "trelica",
+      "imagem": "trelica.png",
+      "profundidade": 420,
+      "topo": -0.02,
+      "base": 0.3,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.057, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false },
+        { "x": 0.28, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false },
+        { "x": 0.4, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false },
+        { "x": 0.5, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false },
+        { "x": 0.593, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false },
+        { "x": 0.716, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false },
+        { "x": 0.939, "y": 0.34, "raio": 0.06, "cor": "#FFF0D0", "pulsar": 0.04, "reflexo": false }
+      ]
+    },
+    {
+      "id": "pilastras",
+      "imagem": "pilastra.png",
+      "profundidade": 300,
+      "noChao": true,
+      "altura": 1.0,
+      "x": 0.03,
+      "repetir": "espelhar",
+      "periodo": 1.1,
+      "luzes": [
+        { "x": 0.52, "y": 0.04, "raio": 0.04, "cor": "#FFE0A0", "pulsar": 0.04 },
+        { "x": 0.54, "y": 0.84, "raio": 0.05, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    }
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "imagemLajotas": "chao_liso.jpg",
+    "perto": -600,
+    "longe": 600,
+    "centroX": 700,
+    "reflexoLutadores": 0.2,
+    "reflexoLuzes": 0.5
+  }
+}

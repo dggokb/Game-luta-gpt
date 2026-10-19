@@ -1,0 +1,147 @@
+{
+  "nome": "Arena Imperial",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#0E1236",
+  "camadas": [
+    {
+      "id": "ceu",
+      "imagem": "ceu.jpg",
+      "profundidade": 100000,
+      "topo": -0.75,
+      "base": 0.42,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "corAcima": "#0E1236"
+    },
+    {
+      "id": "mar",
+      "imagem": "mar.png",
+      "profundidade": 9000,
+      "topo": 0.133,
+      "base": 0.8,
+      "x": 0.58,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "penhascos",
+      "imagem": "penhascos.png",
+      "profundidade": 6500,
+      "topo": 0.12,
+      "base": 0.46,
+      "x": 0.5,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "neblina-longe",
+      "tipo": "neblina",
+      "profundidade": 4000,
+      "topo": 0.32,
+      "base": 0.48,
+      "cor": "#4A3A78",
+      "alfa": 0.3
+    },
+    {
+      "id": "arquibancadas",
+      "imagem": "arquibancada_lateral.png",
+      "profundidade": 760,
+      "noChao": true,
+      "altura": 0.34,
+      "x": 0.08,
+      "repetir": "repetir",
+      "periodo": 0.84,
+      "luzes": [
+        { "x": 0.079, "y": 0.767, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.5, "y": 0.752, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.92, "y": 0.766, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    },
+    {
+      "id": "neblina-cachoeiras",
+      "tipo": "neblina",
+      "profundidade": 720,
+      "topo": 0.45,
+      "base": 0.6,
+      "cor": "#D8E0F0",
+      "alfa": 0.12
+    },
+    {
+      "id": "palacio",
+      "imagem": "palacio.png",
+      "profundidade": 690,
+      "noChao": true,
+      "altura": 0.46,
+      "x": 0.5,
+      "repetir": "nao",
+      "luzes": [
+        { "x": 0.169, "y": 0.866, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.826, "y": 0.872, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.313, "y": 0.884, "raio": 0.035, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.687, "y": 0.885, "raio": 0.035, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.5, "y": 0.2, "raio": 0.06, "cor": "#FFD08A", "pulsar": 0.04, "reflexo": false }
+      ]
+    },
+    {
+      "id": "arvores",
+      "imagem": "arvore_vermelha.png",
+      "profundidade": 520,
+      "noChao": true,
+      "altura": 0.42,
+      "x": 0.27,
+      "repetir": "espelhar",
+      "periodo": 0.46,
+      "luzes": [
+        { "x": 0.123, "y": 0.939, "raio": 0.025, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.873, "y": 0.936, "raio": 0.025, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    },
+    {
+      "id": "porticos",
+      "imagem": "portico.png",
+      "profundidade": 300,
+      "noChao": true,
+      "altura": 0.95,
+      "x": 0.03,
+      "repetir": "espelhar",
+      "periodo": 1.0,
+      "luzes": [
+        { "x": 0.5, "y": 0.1, "raio": 0.04, "cor": "#FFD08A", "pulsar": 0.05 },
+        { "x": 0.21, "y": 0.41, "raio": 0.035, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.79, "y": 0.41, "raio": 0.035, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    },
+    {
+      "id": "lanternas",
+      "imagem": "lanterna.png",
+      "profundidade": 150,
+      "noChao": true,
+      "altura": 0.17,
+      "x": 0.14,
+      "repetir": "espelhar",
+      "periodo": 0.72,
+      "luzes": [
+        { "x": 0.47, "y": 0.33, "raio": 0.18, "cor": "#FFC878", "pulsar": 0.06 }
+      ]
+    }
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "imagemLajotas": "chao_placas.jpg",
+    "perto": -600,
+    "longe": 650,
+    "centroX": 700,
+    "reflexoLutadores": 0.25,
+    "reflexoLuzes": 0.55
+  },
+  "petalas": {
+    "quantidade": 45,
+    "cor": "#C8202A",
+    "perto": -350,
+    "longe": 2400,
+    "vento": 40,
+    "queda": 60,
+    "tamanho": 7
+  }
+}

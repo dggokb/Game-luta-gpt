@@ -11,9 +11,9 @@ estandartes vermelhos. Os concepts estão em `art/concepts/cenarios/` (vieram do
 | --- | --- | --- | --- |
 | 1 | Porto Secreto (`porto_secreto`), **pronto** | `porto_secreto.jpg` | DESAFIO (ep03, A Chegada): p07 + p08 desafiam o jogador no cais, antes do torneio |
 | 2 | Arena Costeira (`arena_costeira`), **pronto** | `arena_costeira.jpg` | QUARTAS DE FINAL (ep04) |
-| 3 | Arena Imperial (`arena_imperial`) | `arena_imperial.jpg` | SEMIFINAL (ep06) |
+| 3 | Arena Imperial (`arena_imperial`), **pronto** | `arena_imperial.jpg` | SEMIFINAL (ep06) |
 | 4 | Caminho dos Penhascos (`caminho_penhascos`), **pronto** | `caminho_penhascos.jpg` | EMBOSCADA (ep05) |
-| 5 | Arena Central (`arena_central`) | `arena_central.jpg` | FINAL 2x2 (ep07) |
+| 5 | Arena Central (`arena_central`), **pronto** | `arena_central.jpg` | FINAL 2x2 (ep07) |
 | 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep08) |
 | 7 | Arena do Templo (`arena_templo`) | `arena_templo.jpg` | o Campeão, Takatoshi (chefe final) |
 
@@ -224,6 +224,30 @@ sem repetir), neblina 1400 (no pé das cachoeiras), `penhascos.png` 3500, `mar.p
 | `chao.jpg` | quadrado | opaco | Piso de praça visto **exatamente de cima** (vista ortográfica, sem perspectiva): grandes placas quadradas de pedra polida cinza-escura, todas do mesmo tamanho, com juntas finas douradas. No centro, uma grande mandala circular incrustada: anéis vermelhos e dourados concêntricos, um padrão geométrico vermelho em volta e o emblema do torneio no meio. Iluminação uniforme, sem reflexos e sem sombras. As bordas esquerda e direita continuam o padrão das placas. |
 | `chao_placas.jpg` | quadrado | opaco | Peça para **editar o `chao.jpg`**: "a mesma imagem, só sem a mandala do centro, com as placas continuando no lugar dela". |
 
+### Notas da Arena Imperial
+
+As imagens do GPT passam pelo `montar_imperial.py`:
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_imperial.py --comum pasta/torneio --entrada pasta/torneio/arena_imperial
+```
+
+- **Piso**: o `chao.png` e o `chao_placas.png` vieram levemente em perspectiva (as linhas
+  verticais abrem 6,4% de cima para baixo). As duas são endireitadas (transformação
+  bilinear em volta do centro) e cortadas entre duas linhas com losango (x 240 e 1431 na
+  imagem endireitada): a mandala cabe inteira e os losangos cortados ao meio se completam
+  na emenda. O piso vai de −600 a 650.
+- **Palácio**: logo atrás do fim do piso (690), para a escadaria sair direto da praça (mais
+  longe, aparecia uma faixa de mar entre a praça e a escada). Uma neblina clara das
+  cachoeiras (720) fica entre as arquibancadas e o palácio.
+- **Composição** (profundidades): lanternas de praça 150 (o jogo acende), pórticos com
+  estandarte 300, árvores vermelhas 520 (dos dois lados do palácio), palácio 690,
+  arquibancadas laterais 760 (nas pontas, a cada 0,84 tela), penhascos 6500, mar, céu do
+  pôr do sol. Folhas vermelhas caindo (`petalas` em `#C8202A`). Pedra polida:
+  `reflexoLutadores` 0,25.
+- O ep06 usa este cenário na SEMIFINAL, e ele entra no sorteio do Arcade.
+
 ## 4. Caminho dos Penhascos (`caminho_penhascos`): emboscada
 
 Fora das arenas, à noite: passarelas de metal e pontes suspensas sobre um abismo, presas
@@ -315,6 +339,29 @@ Dica: o `camarote.png` pode ser um só (não dividir em esquerda e direita): ele
 parte de baixo da tela, como no concept, e é desfocado na preparação. Se tampar demais os
 pés dos lutadores, ele fica só a −250 com `periodo` grande, aparecendo quando a câmera anda.
 
+### Notas da Arena Central
+
+As imagens do GPT passam pelo `montar_central.py` (o `camarote.png` é ignorado: objeto
+colado na câmera):
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_central.py --comum pasta/torneio --entrada pasta/torneio/arena_central
+```
+
+- **Piso**: o `chao_liso.png` não veio liso: tem o círculo grande saindo pelas bordas e as
+  linhas vermelhas em cruz, como o `chao.png`. As duas imagens têm a mesma grade de
+  lajotas; entre as juntas x 341 e 1331 só há lajotas e o círculo do emblema inteiro, e é
+  ali que as duas são cortadas (o padrão de lajotas fecha com a cópia do lado). A ponta da
+  linha vermelha que entra pelas bordas é coberta com as lajotas ao lado. O piso vai de
+  −600 a 600 e o círculo ocupa quase toda a profundidade.
+- **Arquibancada**: o GPT pintou um pedaço do piso do ringue embaixo dela (cortado).
+- **Composição** (profundidades): pilastras com estandarte 300, treliça de luzes 420 (faixa
+  no alto, com os refletores acesos pelo jogo), mureta 600, arquibancada 1100 (alta, 0,42 da
+  tela), templo do Takatoshi ao longe 6000 (aparece por cima da arquibancada quando a
+  câmera afasta e no super pulo), penhascos, mar e o céu com a lua.
+- O ep07 usa este cenário na FINAL, e ele entra no sorteio do Arcade.
+
 ## 6. Arena VIP (`arena_vip`): a "Final da Tag", o duelo 1x1
 
 Um salão de luxo meio aberto, só para os magnatas: um ringue redondo de pedra preta polida
@@ -385,7 +432,7 @@ escadaria do `templo.png` podem vir na arte (são pequenas e distantes, quase n�
 1. ~~As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.~~ Prontas, no Drive.
 2. ~~Arena Costeira e Caminho dos Penhascos~~ Prontos (quartas do ep04 e emboscada do ep05).
 3. ~~Porto Secreto, junto com o episódio da chegada.~~ Pronto (ep03).
-4. Imperial, Central e VIP, na ordem da chave.
+4. ~~Imperial e Central~~ Prontas (semifinal do ep06 e final do ep07). Falta a VIP.
 5. Arena do Templo, quando o Takatoshi virar lutador.
 
 Quando um cenário estiver pronto, é só pôr `"cenario": "<id>"` no passo da luta no

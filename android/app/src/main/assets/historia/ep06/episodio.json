@@ -23,7 +23,7 @@
         ] }
     ] },
 
-    { "tipo": "luta", "torneio": true },
+    { "tipo": "luta", "torneio": true, "cenario": "arena_imperial" },
 
     { "tipo": "chave" },
 
