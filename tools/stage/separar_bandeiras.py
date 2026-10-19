@@ -50,6 +50,15 @@ BANDEIRAS = {
         "corte": ((190, 466), (350, 466)),
         "fora": [],
     },
+    # O estandarte do andaime (o andaime.png já cortado pelo montar_caminho.py). O cano
+    # vertical atrás do canto de baixo à esquerda fica no andaime.
+    "caminho_penhascos": {
+        "arquivo": "andaime.png",
+        "bandeira": "bandeira_andaime.png",
+        "retangulo": (568, 180, 726, 730),
+        "corte": ((575, 205), (720, 205)),
+        "fora": [(560, 640, 608, 730)],
+    },
 }
 
 

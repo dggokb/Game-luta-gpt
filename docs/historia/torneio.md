@@ -60,11 +60,9 @@ emboscam o jogador à noite, longe da arena. Não é regra do torneio, mas os or
 
 - É sempre uma dupla com golpes: só as duplas prontas ficam no lado do jogador.
 - O rótulo da luta é **EMBOSCADA**; perder repete a luta, como as outras da história.
-- **Cenário**: por enquanto, o padrão (Templo da Lua). O plano é o **Caminho dos
-  Penhascos** (`caminho_penhascos`): passarelas e pontes suspensas sobre um abismo da ilha,
-  à noite, feito com o mesmo motor de cenários ([../stage-engine.md](../stage-engine.md));
-  prompts em [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md).
-  Quando existir, é só pôr `"cenario"` no passo.
+- **Cenário**: o **Caminho dos Penhascos** (`caminho_penhascos`): uma passarela de metal
+  sobre um abismo da ilha, à noite, com pontes suspensas, ruínas e andaimes
+  ([../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md)).
 
 ### A regra escondida
 
@@ -88,15 +86,15 @@ cenário: [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torne
 |---|---|
 | DESAFIO (ep03, A Chegada) | Porto Secreto (`porto_secreto`), **pronto** |
 | QUARTAS DE FINAL (ep04) | Arena Costeira (`arena_costeira`), **pronto** |
-| EMBOSCADA | Caminho dos Penhascos (`caminho_penhascos`) |
+| EMBOSCADA (ep05) | Caminho dos Penhascos (`caminho_penhascos`), **pronto** |
 | SEMIFINAL | Arena Imperial (`arena_imperial`) |
 | FINAL (2x2) | Arena Central (`arena_central`) |
 | DUELO FINAL (1x1, a "Final da Tag") | Arena VIP (`arena_vip`) |
 | O Campeão, Takatoshi | Arena do Templo (`arena_templo`) |
 
-O Porto Secreto e a Arena Costeira já estão no jogo (no ep03 e nas quartas do ep04, e no
-sorteio de cenários do Arcade). Os outros ainda não existem: as outras lutas do torneio
-usam o Templo da Lua.
+O Porto Secreto, a Arena Costeira e o Caminho dos Penhascos já estão no jogo (no ep03, nas
+quartas do ep04 e na emboscada do ep05, e no sorteio de cenários do Arcade). Os outros ainda
+não existem: as outras lutas do torneio usam o Templo da Lua.
 
 ## Passos novos no `episodio.json`
 

@@ -1,0 +1,164 @@
+{
+  "nome": "Caminho dos Penhascos",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#0C1030",
+  "camadas": [
+    {
+      "id": "ceu",
+      "imagem": "ceu_lua.jpg",
+      "profundidade": 100000,
+      "topo": -0.75,
+      "base": 0.42,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "corAcima": "#0C1030"
+    },
+    {
+      "id": "mar",
+      "imagem": "mar.png",
+      "profundidade": 9000,
+      "topo": 0.133,
+      "base": 0.8,
+      "x": 0.58,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "penhascos",
+      "imagem": "penhascos.png",
+      "profundidade": 7000,
+      "topo": 0.17,
+      "base": 0.45,
+      "x": 1.05,
+      "repetir": "nao"
+    },
+    {
+      "id": "arena-longe",
+      "imagem": "arena_longe.png",
+      "profundidade": 5000,
+      "topo": -0.02,
+      "base": 0.47,
+      "x": 0.8,
+      "repetir": "nao",
+      "luzes": [
+        { "x": 0.737, "y": 0.489, "raio": 0.03, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.805, "y": 0.474, "raio": 0.03, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.641, "y": 0.69, "raio": 0.03, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false }
+      ]
+    },
+    {
+      "id": "neblina-longe",
+      "tipo": "neblina",
+      "profundidade": 4000,
+      "topo": 0.32,
+      "base": 0.48,
+      "cor": "#4A3A78",
+      "alfa": 0.3
+    },
+    {
+      "id": "abismo",
+      "imagem": "abismo.png",
+      "profundidade": 1500,
+      "topo": -0.3,
+      "base": 0.72,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.09, "y": 0.31, "raio": 0.03, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.147, "y": 0.462, "raio": 0.03, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.847, "y": 0.555, "raio": 0.03, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.925, "y": 0.281, "raio": 0.03, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false }
+      ]
+    },
+    {
+      "id": "ponte",
+      "imagem": "ponte.png",
+      "profundidade": 1350,
+      "topo": 0.22,
+      "base": 0.4,
+      "x": 0.45,
+      "repetir": "nao",
+      "luzes": [
+        { "x": 0.117, "y": 0.762, "raio": 0.07, "cor": "#FFC060", "pulsar": 0.06, "reflexo": false },
+        { "x": 0.321, "y": 0.762, "raio": 0.07, "cor": "#FFC060", "pulsar": 0.06, "reflexo": false },
+        { "x": 0.535, "y": 0.762, "raio": 0.07, "cor": "#FFC060", "pulsar": 0.06, "reflexo": false },
+        { "x": 0.785, "y": 0.761, "raio": 0.07, "cor": "#FFC060", "pulsar": 0.06, "reflexo": false }
+      ]
+    },
+    {
+      "id": "neblina-abismo",
+      "tipo": "neblina",
+      "profundidade": 1250,
+      "topo": 0.42,
+      "base": 0.64,
+      "cor": "#C8C0E0",
+      "alfa": 0.25
+    },
+    {
+      "id": "ruinas",
+      "imagem": "ruinas.png",
+      "profundidade": 1100,
+      "topo": 0.1,
+      "base": 0.72,
+      "x": 0.92,
+      "repetir": "repetir",
+      "periodo": 2.4,
+      "luzes": [
+        { "x": 0.853, "y": 0.418, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.558, "y": 0.51, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.347, "y": 0.501, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false }
+      ]
+    },
+    {
+      "id": "guarda-corpo",
+      "imagem": "guarda_corpo.png",
+      "profundidade": 520,
+      "noChao": true,
+      "altura": 0.14,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.033, "y": 0.284, "raio": 0.3, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.345, "y": 0.284, "raio": 0.3, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.655, "y": 0.285, "raio": 0.3, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.966, "y": 0.284, "raio": 0.3, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
+    },
+    {
+      "id": "andaimes",
+      "imagem": "andaime.png",
+      "profundidade": 330,
+      "noChao": true,
+      "altura": 0.85,
+      "x": 0.06,
+      "repetir": "espelhar",
+      "periodo": 1.1,
+      "luzes": [
+        { "x": 0.262, "y": 0.434, "raio": 0.04, "cor": "#FFC878", "pulsar": 0.05 },
+        { "x": 0.089, "y": 0.141, "raio": 0.035, "cor": "#FFF0C8", "pulsar": 0.03 }
+      ],
+      "bandeiras": [
+        { "imagem": "bandeira_andaime.png", "x": 0.7454, "y": 0.1296, "largura": 0.2073, "altura": 0.3457 }
+      ]
+    }
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "imagemLajotas": "chao_grade.jpg",
+    "perto": -600,
+    "longe": 520,
+    "centroX": 700,
+    "reflexoLutadores": 0.08,
+    "reflexoLuzes": 0.3
+  },
+  "petalas": {
+    "quantidade": 40,
+    "cor": "#D8D4E8",
+    "perto": -300,
+    "longe": 2200,
+    "vento": 140,
+    "queda": 20,
+    "tamanho": 3
+  }
+}

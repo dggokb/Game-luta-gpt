@@ -36,7 +36,7 @@
         ] }
     ] },
 
-    { "tipo": "luta", "emboscada": true },
+    { "tipo": "luta", "emboscada": true, "cenario": "caminho_penhascos" },
 
     { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
       { "imagem": "pag3_q1.jpg", "cena": "templo", "personagens": ["mensageiro"], "enquadramento": "close",

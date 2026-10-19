@@ -12,7 +12,7 @@ estandartes vermelhos. Os concepts estão em `art/concepts/cenarios/` (vieram do
 | 1 | Porto Secreto (`porto_secreto`), **pronto** | `porto_secreto.jpg` | DESAFIO (ep03, A Chegada): p07 + p08 desafiam o jogador no cais, antes do torneio |
 | 2 | Arena Costeira (`arena_costeira`), **pronto** | `arena_costeira.jpg` | QUARTAS DE FINAL (ep04) |
 | 3 | Arena Imperial (`arena_imperial`) | `arena_imperial.jpg` | SEMIFINAL (ep06) |
-| 4 | Caminho dos Penhascos (`caminho_penhascos`) | `caminho_penhascos.jpg` | EMBOSCADA (ep05) |
+| 4 | Caminho dos Penhascos (`caminho_penhascos`), **pronto** | `caminho_penhascos.jpg` | EMBOSCADA (ep05) |
 | 5 | Arena Central (`arena_central`) | `arena_central.jpg` | FINAL 2x2 (ep07) |
 | 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep08) |
 | 7 | Arena do Templo (`arena_templo`) | `arena_templo.jpg` | o Campeão, Takatoshi (chefe final) |
@@ -259,6 +259,33 @@ Dicas do caminho:
   da linha do piso; confira no visualizador se o mar lá embaixo aparece quando a câmera
   afasta.
 
+### Notas do Caminho dos Penhascos
+
+As imagens do GPT passam pelo `montar_caminho.py`:
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_caminho.py --comum pasta/torneio --entrada pasta/torneio/caminho_penhascos
+```
+
+- **Piso**: a grade da passarela veio simétrica em volta da placa do emblema, e o
+  `chao_grade.png` com a mesma grade. Do centro da viga com placa de rebites em x 189 ao
+  centro da viga igual em x 1484 o padrão se repete: as duas imagens são cortadas ali e a
+  emenda cai no meio de uma viga (nada é fundido). O piso vai de −600 a 520 (o
+  guarda-corpo): a passarela é mais estreita que os outros pisos.
+- **Abismo**: a 1500, grande (de −0,3 a 0,72 da tela) e espelhado. A faixa de pedra que o
+  GPT pôs embaixo fica escondida atrás do piso; o mar lá embaixo aparece logo acima do
+  guarda-corpo. A ponte suspensa fica na frente dele (1350), atravessando o vão, e uma
+  neblina clara (1250) sobe do abismo. Atrás de tudo, a arena VIP ao longe (5000), os
+  penhascos, o mar e o céu com a lua (`ceu_lua`: a emboscada é à noite).
+- **Composição** (profundidades): andaimes 330 (com o estandarte balançando:
+  `bandeira_andaime.png`, separado pelo `separar_bandeiras.py`), guarda-corpo 520, ruínas
+  1100 (à direita, a cada 2,4 telas), ponte 1350, abismo 1500. Gotinhas de névoa passam com
+  o vento (`petalas` claras e pequenas). Sem reflexo forte (metal e madeira secos).
+- Sem primeiro plano: o `frente_esq` e o `frente_dir` são ignorados.
+- O ep05 usa este cenário na EMBOSCADA (`"cenario": "caminho_penhascos"`), e ele entra no
+  sorteio do Arcade.
+
 ## 5. Arena Central (`arena_central`): final
 
 O estádio principal, no meio da ilha: um coliseu de pedra e concreto com arquibancadas em
@@ -355,8 +382,7 @@ escadaria do `templo.png` podem vir na arte (são pequenas e distantes, quase n�
 ## Ordem sugerida
 
 1. ~~As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.~~ Prontas, no Drive.
-2. Arena Costeira (pronta, ep04) e Caminho dos Penhascos: são as primeiras lutas da ilha
-   (quartas e emboscada) e trocam o Templo da Lua, que hoje é o cenário padrão do torneio.
+2. ~~Arena Costeira e Caminho dos Penhascos~~ Prontos (quartas do ep04 e emboscada do ep05).
 3. ~~Porto Secreto, junto com o episódio da chegada.~~ Pronto (ep03).
 4. Imperial, Central e VIP, na ordem da chave.
 5. Arena do Templo, quando o Takatoshi virar lutador.
