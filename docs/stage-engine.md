@@ -113,6 +113,11 @@ KO) e a plateia pula mais e mais rápido, voltando ao normal em uns dois segundo
 **Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado
 com a profundidade (ondas rolando).
 
+**Deriva e balanço** (`"deriva"`: unidades do mundo por segundo, negativo = para a esquerda;
+`"balanco"`: sobe e desce em fração da altura): a camada anda sozinha e balança nas ondas, como
+os barcos do porto. Com `repetir`, os que saem de um lado voltam pelo outro. Custo: o mesmo de
+uma camada parada (só muda a posição).
+
 **Chão até o fundo** (`"ate"` no `chao`): atrás da borda de cima da imagem do piso, a imagem
 lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
 chão de uma arena ir do ringue até a arquibancada lá no fundo.

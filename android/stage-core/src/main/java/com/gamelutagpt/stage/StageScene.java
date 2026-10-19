@@ -583,17 +583,32 @@ public final class StageScene {
         if (bottom < 0f || top > VH) return;
         int alpha = Math.round(255f * layer.alpha);
 
+        // Deriva: a camada anda sozinha (barcos); com repetição, dá a volta.
+        float startX = p.firstCenterX + time * layer.sail;
+        int wraps = 0;
+        if (layer.repeat != StageDefinition.Repeat.NONE && layer.sail != 0f) {
+            double travel = (double)time * layer.sail;
+            wraps = (int)Math.floor(travel / (2.0 * p.period));
+            startX = p.firstCenterX + (float)(travel - wraps * 2.0 * p.period);
+        }
         int first = 0, last = 0;
         if (layer.repeat != StageDefinition.Repeat.NONE) {
             float left = camera.worldX(0f, z) - p.width;
             float right = camera.worldX(VW, z) + p.width;
-            first = (int)Math.floor((left - p.firstCenterX) / p.period);
-            last = (int)Math.ceil((right - p.firstCenterX) / p.period);
+            first = (int)Math.floor((left - startX) / p.period);
+            last = (int)Math.ceil((right - startX) / p.period);
         }
+        float bobH = layer.bob * (bottom - top);
+        float baseTop = top, baseBottom = bottom;
         for (int k = first; k <= last; k++) {
-            float cx = camera.screenX(p.firstCenterX + k * p.period, z);
+            float cx = camera.screenX(startX + k * p.period, z);
             float l = cx - halfWidth, r = cx + halfWidth;
             if (r < 0f || l > VW) continue;
+            if (bobH != 0f) {
+                float dy = (float)Math.sin(time * 1.6f + (k - 2 * wraps) * 2.1f) * bobH;
+                top = baseTop + dy;
+                bottom = baseBottom + dy;
+            }
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
             drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
@@ -608,9 +623,14 @@ public final class StageScene {
             }
         }
         for (int k = first; k <= last; k++) {
-            float cx = camera.screenX(p.firstCenterX + k * p.period, z);
+            float cx = camera.screenX(startX + k * p.period, z);
             float l = cx - halfWidth, r = cx + halfWidth;
             if (r < -200f || l > VW + 200f) continue;
+            if (bobH != 0f) {
+                float dy = (float)Math.sin(time * 1.6f + (k - 2 * wraps) * 2.1f) * bobH;
+                top = baseTop + dy;
+                bottom = baseBottom + dy;
+            }
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawLights(c, layer, l, top, r, bottom, mirrored, k);
         }

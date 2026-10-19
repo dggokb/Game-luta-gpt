@@ -169,6 +169,13 @@ public final class StageDefinition {
          * própria profundidade).
          */
         public final float support;
+        /**
+         * Camada que anda sozinha ({@code "deriva"}: unidades do mundo por segundo, negativo =
+         * para a esquerda), como barcos na água; com {@code repetir} os que saem de um lado
+         * voltam pelo outro. {@code "balanco"}: quanto ela sobe e desce nas ondas, em fração
+         * da altura dela.
+         */
+        public final float sail, bob;
         /** Faixas de plateia viva da imagem ({@code "plateia"}). */
         public final List<Crowd> crowds;
         /** Água: faixa de profundidades e quantidade de brilhos. */
@@ -209,6 +216,8 @@ public final class StageDefinition {
             fillAbove = b.fillAbove;
             reflection = b.reflection;
             support = b.support;
+            sail = b.sail;
+            bob = b.bob;
             crowds = Collections.unmodifiableList(b.crowds);
             waterNear = b.waterNear;
             waterFar = b.waterFar;
@@ -247,6 +256,7 @@ public final class StageDefinition {
         int fillAbove;
         float reflection;
         float support = Float.NaN;
+        float sail, bob;
         final List<Crowd> crowds = new ArrayList<>();
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
@@ -516,6 +526,8 @@ public final class StageDefinition {
         b.fillAbove = color(map, "corAcima", 0);
         b.reflection = clamp01(number(map, "reflexo", 0f));
         b.support = number(map, "apoio", Float.NaN);
+        b.sail = number(map, "deriva", 0f);
+        b.bob = number(map, "balanco", 0f);
         Object crowd = map.get("plateia");
         List<Object> crowdList = crowd instanceof List ? (List<Object>)crowd
             : crowd instanceof Map ? Collections.<Object>singletonList(crowd) : Collections.emptyList();

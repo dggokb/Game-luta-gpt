@@ -73,6 +73,8 @@
       "id": "barcos",
       "imagem": "barcos.png",
       "profundidade": 2700,
+      "deriva": -14,
+      "balanco": 0.012,
       "noChao": true,
       "altura": 0.282,
       "x": 0.449,
