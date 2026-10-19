@@ -57,7 +57,9 @@ public final class StagePack {
             for (StageDefinition.Banner banner : layer.banners) {
                 if (!names.contains(banner.image)) names.add(banner.image);
             }
-            if (layer.waterfalls != null && !names.contains(layer.waterfalls.image)) names.add(layer.waterfalls.image);
+            for (StageDefinition.Waterfalls falls : layer.waterfalls) {
+                if (!names.contains(falls.image)) names.add(falls.image);
+            }
             for (StageDefinition.Crowd crowd : layer.crowds) {
                 // A máscara só é usada no jogo para a plateia que pula; com os flashes, não.
                 if (crowd.mask != null && (crowd.jump > 0f || crowd.cutout) && !names.contains(crowd.mask)) {

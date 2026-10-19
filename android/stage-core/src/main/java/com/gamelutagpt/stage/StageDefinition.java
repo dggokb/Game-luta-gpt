@@ -140,22 +140,25 @@ public final class StageDefinition {
     }
 
     /**
-     * Cachoeiras pintadas na imagem ({@code "cachoeiras"}), com a água correndo. A
-     * {@code imagem} é uma grade de quadros feita na montagem (tools/stage/cachoeiras.py):
-     * cada linha é uma área e cada coluna um quadro; as linhas têm a altura proporcional à da
-     * área e todas as colunas a largura da área mais larga (a área fica encostada à esquerda).
-     * Só os pixels de água mudam entre os quadros, então as pedras em volta não se mexem.
+     * Água pintada na imagem que se mexe ({@code "cachoeiras"}: um objeto ou uma lista, um por
+     * folha): cachoeiras correndo ou mar agitado. A {@code imagem} é uma folha de quadros
+     * feita na montagem (tools/stage/cachoeiras.py), em blocos de {@code colunas} quadros por
+     * fileira (todos, se não disser). Cada bloco é um quadro: as áreas empilhadas, cada uma
+     * com a altura proporcional à dela e todas na largura da área mais larga (a área fica
+     * encostada à esquerda). Só os pixels de água mudam entre os quadros, então as pedras em
+     * volta não se mexem.
      */
     public static final class Waterfalls {
         public final String image;
-        public final int frames;
+        public final int frames, columns;
         public final float fps;
         /** Áreas: x, y, largura e altura em fração da imagem da camada (4 por área). */
         public final float[] areas;
 
-        Waterfalls(String image, int frames, float fps, float[] areas) {
+        Waterfalls(String image, int frames, int columns, float fps, float[] areas) {
             this.image = image;
             this.frames = frames;
+            this.columns = Math.max(1, Math.min(columns, frames));
             this.fps = fps;
             this.areas = areas;
         }
@@ -204,8 +207,14 @@ public final class StageDefinition {
         public final float sail, bob;
         /** Faixas de plateia viva da imagem ({@code "plateia"}). */
         public final List<Crowd> crowds;
-        /** Cachoeiras animadas da imagem ({@code "cachoeiras"}), ou null. */
-        public final Waterfalls waterfalls;
+        /** Água animada da imagem ({@code "cachoeiras"}), uma por folha. */
+        public final List<Waterfalls> waterfalls;
+        /**
+         * Neblina com {@code "fiapos"}: quantos bancos de névoa (manchas largas e baixas) cabem
+         * na largura da tela de repouso, rente à base da faixa, andando com a {@code deriva} e
+         * respirando devagar. Cobrem a linha em que ilhas e montanhas encontram o mar.
+         */
+        public final int wisps;
         /** Água: faixa de profundidades e quantidade de brilhos. */
         public final float waterNear, waterFar;
         public final int shimmer;
@@ -247,7 +256,8 @@ public final class StageDefinition {
             sail = b.sail;
             bob = b.bob;
             crowds = Collections.unmodifiableList(b.crowds);
-            waterfalls = b.waterfalls;
+            waterfalls = Collections.unmodifiableList(new ArrayList<>(b.waterfalls));
+            wisps = b.wisps;
             waterNear = b.waterNear;
             waterFar = b.waterFar;
             shimmer = b.shimmer;
@@ -287,7 +297,8 @@ public final class StageDefinition {
         float support = Float.NaN;
         float sail, bob;
         final List<Crowd> crowds = new ArrayList<>();
-        Waterfalls waterfalls;
+        final List<Waterfalls> waterfalls = new ArrayList<>();
+        int wisps;
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
         float waterTile = 1600f, drift, sunX = Float.NaN, sunAlpha;
@@ -573,8 +584,11 @@ public final class StageDefinition {
         }
 
         Object falls = map.get("cachoeiras");
-        if (falls instanceof Map) {
-            Map<String, Object> fm = (Map<String, Object>)falls;
+        List<Object> fallsList = falls instanceof List ? (List<Object>)falls
+            : falls instanceof Map ? Collections.<Object>singletonList(falls) : Collections.emptyList();
+        for (Object item : fallsList) {
+            if (!(item instanceof Map)) continue;
+            Map<String, Object> fm = (Map<String, Object>)item;
             String fallsImage = string(fm, "imagem", null);
             Object areaList = fm.get("areas");
             if (fallsImage == null || !(areaList instanceof List)) {
@@ -583,19 +597,19 @@ public final class StageDefinition {
             List<Object> list = (List<Object>)areaList;
             float[] areas = new float[list.size() * 4];
             for (int i = 0; i < list.size(); i++) {
-                Object item = list.get(i);
-                if (!(item instanceof List) || ((List<Object>)item).size() != 4) {
+                Object area = list.get(i);
+                if (!(area instanceof List) || ((List<Object>)area).size() != 4) {
                     throw new IllegalArgumentException(where + ": cada área das cachoeiras é [x, y, largura, altura]");
                 }
-                for (int k = 0; k < 4; k++) areas[i * 4 + k] = ((Number)((List<Object>)item).get(k)).floatValue();
+                for (int k = 0; k < 4; k++) areas[i * 4 + k] = ((Number)((List<Object>)area).get(k)).floatValue();
                 if (areas[i * 4 + 2] <= 0f || areas[i * 4 + 3] <= 0f) {
                     throw new IllegalArgumentException(where + ": área das cachoeiras sem tamanho");
                 }
             }
-            if (areas.length > 0) {
-                b.waterfalls = new Waterfalls(fallsImage, Math.max(1, Math.round(number(fm, "quadros", 8f))),
-                    Math.max(0.1f, number(fm, "fps", 12f)), areas);
-            }
+            if (areas.length == 0) continue;
+            int frames = Math.max(1, Math.round(number(fm, "quadros", 8f)));
+            b.waterfalls.add(new Waterfalls(fallsImage, frames, Math.round(number(fm, "colunas", frames)),
+                Math.max(0.1f, number(fm, "fps", 12f)), areas));
         }
 
         String repeat = string(map, "repetir", "nao");
@@ -629,6 +643,7 @@ public final class StageDefinition {
                 if (Float.isNaN(b.top) || Float.isNaN(b.bottom) || b.bottom <= b.top) {
                     throw new IllegalArgumentException(where + ": neblina precisa de \"topo\" e \"base\"");
                 }
+                b.wisps = Math.max(0, Math.round(number(map, "fiapos", 0f)));
                 break;
             case WATER:
                 b.waterNear = number(map, "perto", Float.NaN);

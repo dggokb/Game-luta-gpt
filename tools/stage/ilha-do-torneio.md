@@ -83,8 +83,10 @@ cenários não precisa gerar essas duas imagens.
 - **Nada parado.** Arquibancadas têm `"plateia"` (Central: os dois andares; Costeira e
   Imperial: a faixa de gente), que pula sozinha e vibra com os golpes; o mar ondula; as
   estandartes balançam (`soltar_bandeiras.py`: imagem nova com estandarte entra na lista
-  `BANDEIRAS` dele, com um retângulo em volta de cada um); as cachoeiras correm (`"cachoeiras"`, folhas feitas pelo `cachoeiras.py`: imagem nova com
-  cachoeira entra na lista `AREAS` dele, com um retângulo em volta de cada uma).
+  `BANDEIRAS` dele, com um retângulo em volta de cada um); a névoa anda no pé das ilhas
+  (`neblina-ilhas`, com `fiapos`, escondendo o recorte delas no mar); as cachoeiras correm (`"cachoeiras"`, folhas feitas pelo `cachoeiras.py`: imagem nova com
+  cachoeira entra na lista `AREAS` dele, com um retângulo em volta de cada uma; mar
+  agitado pintado, com `"tipo": "ondas"`).
 - **Porto, mesma regra**: o cais vai até 1700 (`"ate"`), com o guarda-corpo na borda. O
   terminal (1500, à direita) e o guindaste (1700, à esquerda) ficam no fundo do cais em
   tamanho real (o terminal ~7 lutadores de altura, medido pelo detector de metais da entrada

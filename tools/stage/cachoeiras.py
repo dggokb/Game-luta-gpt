@@ -14,6 +14,10 @@ Em cada quadro, só a água muda: a máscara pega os pixels claros e pouco satur
 (a névoa, lisa, fica de fora). Sobre a água corre um ruído esticado na vertical (faixas
 claras e escuras descendo), que repete a cada `QUADROS` passos: o último quadro emenda no
 primeiro. As pedras em volta ficam como estão, então nada escorre para fora da cachoeira.
+
+Mar agitado pintado (`"tipo": "ondas"`, o fundo do abismo) vira outra folha da mesma
+imagem (`<imagem>_ondas.png`): a máscara pega o azul e a espuma crespa (a névoa lisa fica
+de fora) e por cima dela vêm, devagar, manchas largas e baixas (veja `quadros_ondas`).
 """
 
 import argparse
@@ -39,11 +43,15 @@ AREAS = {
         "tela": 0.39,
         "areas": [(0.095, 0.56, 0.185, 0.43), (0.72, 0.56, 0.185, 0.43)],
     },
-    "abismo.png": {
-        "tela": 1.0,
-        "sat": 0.5,
-        "areas": [(0.425, 0.28, 0.085, 0.43), (0.525, 0.35, 0.045, 0.15), (0.655, 0.29, 0.065, 0.24)],
-    },
+    "abismo.png": [
+        {
+            "tela": 1.0,
+            "sat": 0.5,
+            "areas": [(0.425, 0.28, 0.085, 0.43), (0.525, 0.35, 0.045, 0.15), (0.655, 0.29, 0.065, 0.24)],
+        },
+        # O mar batendo no fundo do abismo, embaixo das quedas.
+        {"tipo": "ondas", "tela": 0.78, "areas": [(0.35, 0.66, 0.4, 0.27)]},
+    ],
     "encosta.png": {
         "luz": 0.3,
         "tela": 0.41,
@@ -76,6 +84,26 @@ AREAS = {
 # vertical, como os fios da água).
 QUEDA = 7.0
 GRAO_X, GRAO_Y = 1.2, 7.0
+
+# Mar agitado ("tipo": "ondas"): mais quadros, mais devagar, em blocos de 4 por fileira
+# (a folha não passa de uns 2500 px de largura). As manchas são largas e baixas (cristas)
+# e vêm devagar na direção da câmera, `ONDA` pixels da tela por ciclo.
+ONDAS_QUADROS, ONDAS_FPS, ONDAS_COLUNAS = 16, 8, 4
+ONDA = 10.0
+GRAO_ONDA_X, GRAO_ONDA_Y = 6.0, 1.6
+
+
+def grupos(nome):
+    """As folhas de uma imagem: uma por tipo de água (queda, ondas)."""
+    conf = AREAS[nome]
+    lista = conf if isinstance(conf, list) else [conf]
+    for g in lista:
+        ondas = g.get("tipo") == "ondas"
+        g.setdefault("quadros", ONDAS_QUADROS if ondas else QUADROS)
+        g.setdefault("fps", ONDAS_FPS if ondas else FPS)
+        g.setdefault("colunas", ONDAS_COLUNAS if ondas else g["quadros"])
+        g.setdefault("sufixo", "_ondas" if ondas else "_agua")
+    return lista
 
 
 def suave(a, b, x):
@@ -125,6 +153,60 @@ def ruido(w, periodo, gx, gy, semente):
     return 1 / (1 + np.exp(-tmp * 1.6))
 
 
+def mascara_ondas(rgb):
+    """0..1 por pixel: mar (azul) e espuma (clara, sem cor, crespa). A pedra escura e a névoa
+    (clara mas lisa, ficaria listrada) ficam de fora."""
+    mx, mn = rgb.max(axis=2), rgb.min(axis=2)
+    luz = rgb.mean(axis=2)
+    sat = (mx - mn) / np.maximum(mx, 1e-3)
+    azul = suave(-0.02, 0.06, rgb[..., 2] - rgb[..., 0]) * suave(0.14, 0.26, luz)
+    grad = np.abs(np.diff(luz, axis=1, append=luz[:, -1:])) + np.abs(np.diff(luz, axis=0, append=luz[-1:]))
+    crespa = np.asarray(Image.fromarray((grad * 255).clip(0, 255).astype(np.uint8))
+                        .filter(ImageFilter.BoxBlur(4))).astype(np.float32) / 255
+    espuma = suave(0.45, 0.65, luz) * (1.0 - suave(0.3, 0.45, sat)) * suave(0.03, 0.07, crespa)
+    m = np.maximum(azul, espuma)
+    m = np.asarray(Image.fromarray((m * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.5)))
+    return m.astype(np.float32) / 255
+
+
+def ruido_solto(h, w, gx, gy, semente):
+    """Ruído (0..1) sem repetir, com grão `gx` na horizontal e `gy` na vertical."""
+    rng = np.random.default_rng(semente)
+    img = Image.fromarray((rng.random((h, w)) * 255).astype(np.uint8))
+    sx = max(1, round(w * gy / max(gx, 0.5)))
+    tmp = img.resize((sx, h), Image.BILINEAR).filter(ImageFilter.GaussianBlur(gy))
+    tmp = np.asarray(tmp.resize((w, h), Image.BILINEAR)).astype(np.float32) / 255
+    tmp = (tmp - tmp.mean()) / max(tmp.std(), 1e-3)
+    return 1 / (1 + np.exp(-tmp * 1.6))
+
+
+def quadros_ondas(rgb, alfa, conf, semente):
+    """Mar agitado: dois ruídos descem devagar, cada um vai sumindo enquanto o outro
+    aparece (meio ciclo de diferença), então o ciclo fecha sem a imagem pular e sem o
+    ruído precisar se repetir no espaço."""
+    h, w = alfa.shape
+    tela = conf["tela"]
+    m = mascara_ondas(rgb) * borda(h, w, 0.08)
+    queda = max(2, round(ONDA / tela))
+    fontes = [ruido_solto(h + queda, w, GRAO_ONDA_X / tela, GRAO_ONDA_Y / tela, semente + k) for k in (0, 7)]
+    espuma = suave(0.4, 0.7, rgb.mean(axis=2))
+    saida = []
+    total = conf["quadros"]
+    for q in range(total):
+        fases = (q / total, (q / total + 0.5) % 1.0)
+        pesos = [1 - abs(1 - 2 * f) for f in fases]
+        n = np.zeros((h, w), np.float32)
+        for fonte, f, peso in zip(fontes, fases, pesos):
+            desl = round(f * queda)  # desce `queda` linhas por ciclo
+            n += peso * fonte[queda - desl:queda - desl + h]
+        # Misturar dois ruídos tira contraste no meio do caminho: devolve.
+        n = 0.5 + (n - 0.5) / max(np.hypot(*pesos), 1e-3)
+        novo = rgb * (0.8 + 0.4 * n)[..., None] + (suave(0.62, 0.9, n) * espuma * 0.22)[..., None]
+        mix = rgb + (novo.clip(0, 1) - rgb) * m[..., None]
+        saida.append(np.dstack([mix, alfa]))
+    return saida
+
+
 def quadros(img, area, conf, semente):
     tela = conf["tela"]
     W, H = img.size
@@ -133,13 +215,15 @@ def quadros(img, area, conf, semente):
     pedaco = np.asarray(img.crop((x0, y0, x1, y1)).convert("RGBA")).astype(np.float32) / 255
     rgb, alfa = pedaco[..., :3], pedaco[..., 3]
     h, w = alfa.shape
+    if conf.get("tipo") == "ondas":
+        return quadros_ondas(rgb, alfa, conf, semente), (x1 - x0, y1 - y0)
     m = mascara(rgb, conf.get("luz", 0.38), conf.get("sat", 0.28)) * borda(h, w)
     passo = max(1, round(QUEDA / tela))
-    periodo = passo * QUADROS
+    periodo = passo * conf["quadros"]
     n = ruido(w, periodo, GRAO_X / tela, GRAO_Y / tela, semente)
     n = np.tile(n, (h // periodo + 2, 1))
     saida = []
-    for q in range(QUADROS):
+    for q in range(conf["quadros"]):
         desl = periodo - q * passo  # o ruído desce `passo` linhas por quadro
         nq = n[desl:desl + h]
         # Faixas claras e escuras correndo; nas claras, um pouco de espuma branca.
@@ -151,33 +235,44 @@ def quadros(img, area, conf, semente):
 
 
 def montar(pasta, nome):
-    conf = AREAS[nome]
+    """Grava as folhas da imagem; devolve [(arquivo, (altura, largura), grupo)]."""
     img = Image.open(pasta / nome).convert("RGBA")
-    linhas = []
-    for i, area in enumerate(conf["areas"]):
-        linhas.append(quadros(img, area, conf, sum(nome.encode()) * 31 + i)[0])
-    largura = max(q[0].shape[1] for q in linhas)
-    altura = sum(q[0].shape[0] for q in linhas)
-    folha = np.zeros((altura, largura * QUADROS, 4), np.float32)
-    y = 0
-    for qs in linhas:
-        h, w = qs[0].shape[:2]
-        for c, q in enumerate(qs):
-            folha[y:y + h, c * largura:c * largura + w] = q
-        y += h
-    saida = pasta / (Path(nome).stem + "_agua.png")
-    Image.fromarray((folha * 255).round().astype(np.uint8)).save(saida, optimize=True)
-    return saida, folha.shape
+    feitas = []
+    for g_i, conf in enumerate(grupos(nome)):
+        linhas = []
+        for i, area in enumerate(conf["areas"]):
+            linhas.append(quadros(img, area, conf, sum(nome.encode()) * 31 + g_i * 1000 + i)[0])
+        largura = max(q[0].shape[1] for q in linhas)
+        altura = sum(q[0].shape[0] for q in linhas)
+        colunas = conf["colunas"]
+        blocos = -(-conf["quadros"] // colunas)
+        # Cada bloco é um quadro (as áreas empilhadas); `colunas` blocos por fileira.
+        folha = np.zeros((altura * blocos, largura * colunas, 4), np.float32)
+        y = 0
+        for qs in linhas:
+            h, w = qs[0].shape[:2]
+            for c, q in enumerate(qs):
+                bx, by = (c % colunas) * largura, (c // colunas) * altura
+                folha[by + y:by + y + h, bx:bx + w] = q
+            y += h
+        saida = pasta / (Path(nome).stem + conf["sufixo"] + ".png")
+        Image.fromarray((folha * 255).round().astype(np.uint8)).save(saida, optimize=True)
+        feitas.append((saida, folha.shape, conf))
+    return feitas
 
 
-def anotar(pasta, nome, arquivo):
+def anotar(pasta, nome, feitas):
     """Põe (ou troca) o campo "cachoeiras" logo depois do "imagem" da camada."""
     json_path = pasta / "stage.json"
     texto = json_path.read_text(encoding="utf-8")
-    areas = ", ".join("[" + ", ".join(f"{v:g}" for v in a) + "]" for a in AREAS[nome]["areas"])
-    campo = (f'"cachoeiras": {{ "imagem": "{arquivo}", "quadros": {QUADROS}, "fps": {FPS}, '
-             f'"areas": [{areas}] }},')
-    linha = re.search(rf'\n(\s*)"imagem": "{re.escape(nome)}",(\n\s*"cachoeiras": \{{[^\n]*\}},)?', texto)
+    itens = []
+    for arquivo, _, conf in feitas:
+        areas = ", ".join("[" + ", ".join(f"{v:g}" for v in a) + "]" for a in conf["areas"])
+        colunas = f'"colunas": {conf["colunas"]}, ' if conf["colunas"] != conf["quadros"] else ""
+        itens.append(f'{{ "imagem": "{arquivo.name}", "quadros": {conf["quadros"]}, {colunas}"fps": {conf["fps"]}, '
+                     f'"areas": [{areas}] }}')
+    campo = '"cachoeiras": ' + (itens[0] if len(itens) == 1 else "[" + ", ".join(itens) + "]") + ","
+    linha = re.search(rf'\n(\s*)"imagem": "{re.escape(nome)}",(\n\s*"cachoeiras": [^\n]*,)?', texto)
     if not linha:
         return False
     texto = texto[:linha.end(1) + len(f'"imagem": "{nome}",')] + "\n" + linha.group(1) + campo + texto[linha.end():]
@@ -190,8 +285,8 @@ def atualizar(pasta):
     """Refaz as folhas de água das imagens da pasta (os montar_*.py chamam no fim)."""
     for nome in AREAS:
         if (pasta / nome).exists():
-            saida, forma = montar(pasta, nome)
-            print(f"cachoeiras de {nome} -> {saida.name} {forma[1]}x{forma[0]}")
+            for saida, forma, _ in montar(pasta, nome):
+                print(f"água de {nome} -> {saida.name} {forma[1]}x{forma[0]}")
 
 
 def main():
@@ -202,9 +297,10 @@ def main():
         for nome in AREAS:
             if not (pasta / nome).exists():
                 continue
-            saida, forma = montar(pasta, nome)
-            anotado = anotar(pasta, nome, saida.name)
-            print(f"{pasta.name}/{saida.name} {forma[1]}x{forma[0]}" + ("" if anotado else " (camada não achada)"))
+            feitas = montar(pasta, nome)
+            anotado = anotar(pasta, nome, feitas)
+            for saida, forma, _ in feitas:
+                print(f"{pasta.name}/{saida.name} {forma[1]}x{forma[0]}" + ("" if anotado else " (camada não achada)"))
 
 
 if __name__ == "__main__":

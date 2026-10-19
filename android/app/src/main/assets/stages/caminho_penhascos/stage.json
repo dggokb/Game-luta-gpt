@@ -63,7 +63,7 @@
     {
       "id": "abismo",
       "imagem": "abismo.png",
-      "cachoeiras": { "imagem": "abismo_agua.png", "quadros": 8, "fps": 12, "areas": [[0.425, 0.28, 0.085, 0.43], [0.525, 0.35, 0.045, 0.15], [0.655, 0.29, 0.065, 0.24]] },
+      "cachoeiras": [{ "imagem": "abismo_agua.png", "quadros": 8, "fps": 12, "areas": [[0.425, 0.28, 0.085, 0.43], [0.525, 0.35, 0.045, 0.15], [0.655, 0.29, 0.065, 0.24]] }, { "imagem": "abismo_ondas.png", "quadros": 16, "colunas": 4, "fps": 8, "areas": [[0.35, 0.66, 0.4, 0.27]] }],
       "bandeiras": [{"imagem": "abismo_bandeira1.png", "x": 0.0359, "y": 0.0457, "largura": 0.0449, "altura": 0.2816, "balanco": 0.06}, {"imagem": "abismo_bandeira2.png", "x": 0.1615, "y": 0.0925, "largura": 0.0209, "altura": 0.0935, "balanco": 0.06}, {"imagem": "abismo_bandeira3.png", "x": 0.305, "y": 0.2285, "largura": 0.0197, "altura": 0.0829, "balanco": 0.06}, {"imagem": "abismo_bandeira4.png", "x": 0.9402, "y": 0.0499, "largura": 0.0425, "altura": 0.2827, "balanco": 0.06}, {"imagem": "abismo_bandeira5.png", "x": 0.8224, "y": 0.1169, "largura": 0.0215, "altura": 0.0691, "balanco": 0.06}, {"imagem": "abismo_bandeira6.png", "x": 0.7889, "y": 0.3114, "largura": 0.0203, "altura": 0.101, "balanco": 0.06}],
       "profundidade": 1500,
       "topo": -0.3,

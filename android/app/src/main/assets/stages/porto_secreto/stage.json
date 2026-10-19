@@ -49,6 +49,17 @@
       "repetir": "nao"
     },
     {
+      "id": "neblina-ilhas",
+      "tipo": "neblina",
+      "profundidade": 8450,
+      "topo": 0.37,
+      "base": 0.455,
+      "cor": "#9C84B4",
+      "alfa": 0.55,
+      "fiapos": 7,
+      "deriva": 60
+    },
+    {
       "id": "neblina-mar",
       "tipo": "neblina",
       "profundidade": 6000,

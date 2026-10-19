@@ -1,4 +1,4 @@
-# Motor de cenário com falso 3D — v0.77
+# Motor de cenário com falso 3D — v0.78
 
 O cenário deixou de ser um desenho único (`StageRenderer`) e virou **camadas com
 profundidade**, projetadas pela mesma câmera da luta. O que está longe anda e cresce menos
@@ -122,6 +122,20 @@ cachoeira. O jogo desenha o quadro da vez sobre a área e o próximo entrando ao
 trancos a 12 quadros por segundo); cópias espelhadas da camada ficam fora de fase. Custo: duas
 imagens pequenas por área (uma no modo leve). Primeiro uso: Ilha do Torneio (palácio da
 Imperial, abismo do Caminho, encosta da Costeira, templo ao longe e os penhascos de todas).
+
+`"cachoeiras"` também aceita uma lista, uma folha por item: o abismo do Caminho tem as quedas
+e o **mar agitado** lá embaixo (`abismo_ondas.png`, feito com `"tipo": "ondas"` no
+`cachoeiras.py`: 16 quadros a 8 por segundo, manchas largas e baixas vindo devagar para a
+câmera, a espuma acendendo; a névoa lisa e as pedras ficam de fora). Com `"colunas"`, a folha
+quebra os quadros em fileiras (`colunas` quadros por fileira, cada um um bloco com as áreas
+empilhadas), para não passar de uns 2500 px de largura.
+
+**Fiapos de neblina** (`"fiapos": N` numa `neblina`, com `"deriva"` em unidades do mundo por
+segundo): além do degradê, N bancos de névoa por largura de tela (brilhos redondos achatados,
+de tamanho e altura sorteados) rente à base da faixa, andando devagar e respirando. Na ilha,
+a `neblina-ilhas` (a 8450, logo na frente da borda do mar a 8500) cobre a linha em que as
+ilhas e os penhascos encontram a água, que aparecia como um recorte reto. Custo: uns oito
+brilhos por quadro; no modo leve não desenha.
 
 **Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado
 com a profundidade (ondas rolando).

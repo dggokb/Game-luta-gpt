@@ -39,6 +39,17 @@
       "sol": { "x": 0.202, "cor": "#FFC060", "alfa": 0.8 }
     },
     {
+      "id": "neblina-ilhas",
+      "tipo": "neblina",
+      "profundidade": 8450,
+      "topo": 0.37,
+      "base": 0.455,
+      "cor": "#9C84B4",
+      "alfa": 0.55,
+      "fiapos": 7,
+      "deriva": 60
+    },
+    {
       "id": "penhascos",
       "imagem": "penhascos.png",
       "cachoeiras": { "imagem": "penhascos_agua.png", "quadros": 8, "fps": 12, "areas": [[0.43, 0.42, 0.03, 0.2], [0.623, 0.47, 0.027, 0.24], [0.75, 0.56, 0.035, 0.33], [0.105, 0.8, 0.03, 0.15], [0.615, 0.82, 0.035, 0.14]] },

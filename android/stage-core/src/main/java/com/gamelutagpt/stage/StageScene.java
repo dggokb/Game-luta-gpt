@@ -163,6 +163,8 @@ public final class StageScene {
             float width = (bottom - top) * aspect;
             float centerX = rest.worldX(layer.x * VW, z);
             float period = Float.isNaN(layer.period) ? width : layer.period * VW / scale;
+            // Fiapos de neblina: o espaço entre eles no mundo, fixo (não muda com o zoom).
+            if (layer.kind == StageDefinition.Kind.FOG && layer.wisps > 0) period = VW / scale / layer.wisps;
             RenderImage[] banners = new RenderImage[layer.banners.size()];
             for (int i = 0; i < banners.length; i++) banners[i] = pack.image(layer.banners.get(i).image);
             Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period), banners);
@@ -644,8 +646,13 @@ public final class StageScene {
      */
     private void drawWaterfalls(RenderCanvas c, Placed p, float l, float t, float r, float b,
                                 boolean mirrored, int alpha, int instance) {
-        StageDefinition.Waterfalls falls = p.layer.waterfalls;
-        if (falls == null) return;
+        for (StageDefinition.Waterfalls falls : p.layer.waterfalls) {
+            drawWaterSheet(c, falls, l, t, r, b, mirrored, alpha, instance);
+        }
+    }
+
+    private void drawWaterSheet(RenderCanvas c, StageDefinition.Waterfalls falls, float l, float t, float r, float b,
+                                boolean mirrored, int alpha, int instance) {
         RenderImage sheet = pack.image(falls.image);
         if (sheet == null) return;
         float w = r - l, h = b - t;
@@ -656,7 +663,9 @@ public final class StageScene {
             maxW = Math.max(maxW, a[j * 4 + 2]);
             sumH += a[j * 4 + 3];
         }
-        float cellW = sheet.width() / (float)falls.frames;
+        int blockRows = (falls.frames + falls.columns - 1) / falls.columns;
+        float cellW = sheet.width() / (float)falls.columns;
+        float blockH = sheet.height() / (float)blockRows;
         float frame = time * falls.fps + instance * 3.3f;
         int i0 = (int)Math.floor(frame);
         float blend = frame - i0;
@@ -669,18 +678,20 @@ public final class StageScene {
         float rowTop = 0f;
         for (int j = 0; j < n; j++) {
             float ax = a[j * 4], ay = a[j * 4 + 1], aw = a[j * 4 + 2], ah = a[j * 4 + 3];
-            float sy0 = rowTop / sumH * sheet.height();
+            float sy0 = rowTop / sumH * blockH;
             rowTop += ah;
-            float sy1 = rowTop / sumH * sheet.height();
+            float sy1 = rowTop / sumH * blockH;
             float dl = l + ax * w, dt = t + ay * h, dr = dl + aw * w, db = dt + ah * h;
             // Espelhada, a área aparece do outro lado da cópia.
             float vl = mirrored ? l + r - dr : dl, vr = mirrored ? l + r - dl : dr;
             if (vr < 0f || vl > VW || db < 0f || dt > VH) continue;
             float srcW = cellW * aw / maxW;
-            c.drawImageRegion(sheet, i0 * cellW, sy0, i0 * cellW + srcW, sy1, dl, dt, dr, db, alpha);
+            float x0 = (i0 % falls.columns) * cellW, y0 = (i0 / falls.columns) * blockH;
+            c.drawImageRegion(sheet, x0, y0 + sy0, x0 + srcW, y0 + sy1, dl, dt, dr, db, alpha);
             int next = Math.round(alpha * blend);
             if (detalhe && next > 0) {
-                c.drawImageRegion(sheet, i1 * cellW, sy0, i1 * cellW + srcW, sy1, dl, dt, dr, db, next);
+                float x1 = (i1 % falls.columns) * cellW, y1 = (i1 / falls.columns) * blockH;
+                c.drawImageRegion(sheet, x1, y1 + sy0, x1 + srcW, y1 + sy1, dl, dt, dr, db, next);
             }
         }
         if (mirrored) c.restore();
@@ -1169,6 +1180,47 @@ public final class StageScene {
         if (bottom < 0f || top > VH) return;
         int color = withAlpha(p.layer.color, Math.round(255f * p.layer.alpha));
         c.fillVerticalGradient(-10f, top, VW + 10f, bottom, color & 0x00FFFFFF, color);
+        if (p.layer.wisps > 0) drawWisps(c, p, top, bottom);
+    }
+
+    /**
+     * Bancos de névoa rente à base da faixa: manchas largas e baixas (um brilho redondo
+     * achatado), cada uma com tamanho e altura sorteados, andando com a deriva e respirando.
+     */
+    private void drawWisps(RenderCanvas c, Placed p, float top, float bottom) {
+        StageDefinition.Layer layer = p.layer;
+        float h = bottom - top;
+        float scale = camera.scale(p.z);
+        float spacing = p.period;
+        double travel = (double)time * layer.sail;
+        int wraps = (int)Math.floor(travel / spacing);
+        float offset = (float)(travel - wraps * (double)spacing);
+        int first = (int)Math.floor((camera.worldX(0f, p.z) - offset) / spacing) - 2;
+        int last = (int)Math.ceil((camera.worldX(VW, p.z) - offset) / spacing) + 2;
+        for (int k = first; k <= last; k++) {
+            int id = k - wraps;
+            float r1 = hash01(id, 1), r2 = hash01(id, 2), r3 = hash01(id, 3), r4 = hash01(id, 4);
+            float cx = camera.screenX(offset + (k + (r1 - 0.5f) * 0.7f) * spacing, p.z);
+            float rx = spacing * scale * (0.7f + 0.5f * r2);
+            float ry = h * (0.28f + 0.2f * r3);
+            float cy = bottom - h * (0.18f + 0.22f * r4);
+            if (cx + rx < 0f || cx - rx > VW || cy + ry < 0f || cy - ry > VH) continue;
+            float breath = 0.6f + 0.4f * (float)Math.sin(time * 0.35f + id * 1.7f);
+            int color = withAlpha(layer.color, Math.round(255f * layer.alpha * breath));
+            c.save();
+            c.scale(1f, ry / rx, cx, cy);
+            c.fillRadialGlow(cx, cy, rx, color);
+            c.restore();
+        }
+    }
+
+    /** Número de 0 a 1 fixo para cada (n, canal), negativo ou não. */
+    private static float hash01(int n, int channel) {
+        long x = (n * 0x9E3779B97F4A7C15L) ^ (channel * 0xC2B2AE3D27D4EB4FL);
+        x ^= x >>> 31;
+        x *= 0xBF58476D1CE4E5B9L;
+        x ^= x >>> 29;
+        return (x >>> 40) / (float)(1L << 24);
     }
 
     // ------------------------------------------------------------ efeitos
