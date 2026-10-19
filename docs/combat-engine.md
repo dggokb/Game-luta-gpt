@@ -934,7 +934,8 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
     cor de quem finalizou.
   - Entra em 0,08 s, fica 1,6 s e sai em 0,9 s, em tempo real (parado na pausa). A luta fica
     em câmera lenta mais longa que a do KO (54 quadros a 30%), com tremida forte.
-  - K.O. dentro da página do Ultra: o pedido espera a página quebrar e o efeito entra com o raio.
+  - K.O. no meio do Ultra (na página, num acerto do raio ou da sequência): o efeito espera o
+    golpe final dele, a explosão do raio ou o último golpe da sequência (`segurar`/`liberar`).
   - Só apresentação: o motor não sabe dela. Testes em `FinalizacaoMangaTest`.
 
 - **Pose do impacto** (medido no FighterZ: o golpe fica parado esticado 0,12–0,2 s e volta

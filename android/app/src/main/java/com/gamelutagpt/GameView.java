@@ -1324,8 +1324,10 @@ public class GameView extends SurfaceView
         // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
         // pausa, seleção, páginas da história e a Página Final ficam na velocidade normal.
         if (fightClockRunning()) {
-            if (finalizacao.pendente()) {
-                // A tela ficou livre (a página do Ultra já quebrou): o quadro de mangá entra.
+            // Rede de segurança: o Ultra acabou sem passar pelo golpe final.
+            if (finalizacao.segurando() && !ultraEmAndamento()) finalizacao.liberar();
+            if (finalizacao.pronta()) {
+                // A tela ficou livre e chegou o golpe final: o quadro de mangá entra.
                 finalizacao.comecar();
                 feel.slow(FinalizacaoManga.LENTA_QUADROS, FinalizacaoManga.LENTA_ESCALA);
                 beamShake = Math.max(beamShake, FinalizacaoManga.TREMIDA);
@@ -1641,6 +1643,8 @@ public class GameView extends SurfaceView
             if ("COMBO_BREAKER".equals(cue)) spawnComboBreaker();
             if ("OVERHEAD".equals(cue)) spawnOverheadWarning();
             if ("ULTRA_FINISH".equals(cue)) {
+                // O último golpe do Ultra em sequência: a finalização de mangá entra aqui.
+                finalizacao.liberar();
                 beamShake = Math.max(beamShake, 22f);
                 // Último dano do Ultra em sequência: impact frame em quem apanhou e câmera lenta.
                 feel.slow(ImpactFeel.ULTRA_SLOW_FRAMES, ultraSlowScale);
@@ -1974,6 +1978,19 @@ public class GameView extends SurfaceView
     private void pedirFinalizacao(int tipo, int attacker, int defender) {
         if (tipo == FinalizacaoManga.NENHUM || !engine.teams.defeated(defender)) return;
         finalizacao.pedir(tipo, defender, attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color);
+        // K.O. no meio do Ultra (na página, num golpe da sequência, num acerto do raio): espera
+        // o golpe final dele, que é o que fecha a luta na tela.
+        if (tipo == FinalizacaoManga.ULTRA && ultraEmAndamento()) finalizacao.segurar();
+    }
+
+    /** Algum lado está no Ultra: na página, no raio ou nos golpes da sequência. */
+    private boolean ultraEmAndamento() {
+        if (ultraAttacker >= 0 || paginaFinal.isActive()) return true;
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (f.status == CombatFighter.Status.ULTRA || f.firingBeam() || f.inUltraSequence()) return true;
+        }
+        return false;
     }
 
     @Override
@@ -2033,6 +2050,8 @@ public class GameView extends SurfaceView
             beamHitsSeen = a.beamHitsDone;
             if (beamHitsSeen > a.beamHits) {
                 beamBlastClock = beamClock;
+                // A explosão do raio é o golpe final: a finalização de mangá entra aqui.
+                finalizacao.liberar();
                 beamShake = 26f;
                 ultraSounds.play(ultraAttackerFolder(), "explosao");
                 // A explosão do raio é o último dano do Ultra: impact frame em quem apanhou.

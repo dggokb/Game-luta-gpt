@@ -10,6 +10,8 @@ package com.gamelutagpt;
  * <p>Só apresentação: o motor não lê nada daqui. Anda no tempo real (a câmera lenta da
  * finalização não estica o efeito), parado quando a luta está parada (pausa, menus, página do
  * Ultra). Se o K.O. sai com a página do Ultra cobrindo a tela, o pedido espera ela acabar.
+ * O K.O. no meio do Ultra espera o golpe final dele (a explosão do raio, o último golpe da
+ * sequência): {@link #segurar()} e {@link #liberar()}.
  */
 final class FinalizacaoManga {
     static final int NENHUM = 0, SUPER = 1, ULTRA = 2;
@@ -28,6 +30,8 @@ final class FinalizacaoManga {
     private int tipo = NENHUM, pedido = NENHUM;
     private int vitima = -1, cor;
     private float tempo;
+    /** O pedido espera o golpe final do Ultra. */
+    private boolean segurando;
 
     /**
      * Tipo de finalização para o golpe {@code moveId} (força {@code strength}): Ultra, Super ou
@@ -50,12 +54,25 @@ final class FinalizacaoManga {
         this.cor = cor;
     }
 
+    /** O pedido só começa depois de {@link #liberar()} (o K.O. saiu no meio do Ultra). */
+    void segurar() {
+        if (pedido != NENHUM) segurando = true;
+    }
+
+    /** Chegou o golpe final do Ultra (ou ele acabou): o pedido pode começar. */
+    void liberar() { segurando = false; }
+
+    boolean segurando() { return segurando && pedido != NENHUM; }
+
     /** Há uma finalização esperando a tela ficar livre. */
     boolean pendente() { return pedido != NENHUM; }
 
+    /** Pode começar agora: pedida e não esperando o golpe final do Ultra. */
+    boolean pronta() { return pedido != NENHUM && !segurando; }
+
     /** A tela está livre: o efeito começa agora. */
     void comecar() {
-        if (pedido == NENHUM) return;
+        if (pedido == NENHUM || segurando) return;
         tipo = pedido;
         pedido = NENHUM;
         tempo = 0f;
@@ -70,6 +87,7 @@ final class FinalizacaoManga {
 
     void limpar() {
         tipo = pedido = NENHUM;
+        segurando = false;
         vitima = -1;
         tempo = 0f;
     }

@@ -45,6 +45,24 @@ public class FinalizacaoMangaTest {
         assertEquals(0f, f.forca(), 0f);
     }
 
+    /** K.O. no meio do Ultra: só entra no golpe final dele. */
+    @Test public void aHeldRequestWaitsForTheUltrasFinalBlow() {
+        FinalizacaoManga f = new FinalizacaoManga();
+        f.segurar();
+        assertFalse("sem pedido não segura nada", f.segurando());
+        f.pedir(FinalizacaoManga.ULTRA, 1, 0);
+        f.segurar();
+        assertTrue(f.segurando());
+        assertFalse(f.pronta());
+        f.comecar();
+        assertFalse("segurado não começa", f.ativo());
+        f.liberar();
+        assertTrue(f.pronta());
+        f.comecar();
+        assertTrue(f.ativo());
+        assertEquals(FinalizacaoManga.ULTRA, f.tipo());
+    }
+
     @Test public void ultraWinsOverSuperAndClearResets() {
         FinalizacaoManga f = new FinalizacaoManga();
         f.pedir(FinalizacaoManga.ULTRA, 0, 0xFF00FF00);
