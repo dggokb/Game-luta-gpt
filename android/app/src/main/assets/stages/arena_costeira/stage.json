@@ -29,7 +29,7 @@
       "id": "mar-plano",
       "tipo": "agua",
       "imagem": "mar_plano.jpg",
-      "perto": 610,
+      "perto": 2520,
       "longe": 8500,
       "tamanho": 1300,
       "corrente": 18,
@@ -74,7 +74,7 @@
     {
       "id": "neblina-encosta",
       "tipo": "neblina",
-      "profundidade": 2000,
+      "profundidade": 4000,
       "topo": 0.4,
       "base": 0.55,
       "cor": "#3A2C5E",
@@ -83,9 +83,9 @@
     {
       "id": "holofotes-longe",
       "imagem": "holofote.png",
-      "profundidade": 615,
+      "profundidade": 2510,
       "noChao": true,
-      "altura": 0.95,
+      "altura": 0.55,
       "x": 0.27,
       "repetir": "espelhar",
       "periodo": 0.8,
@@ -96,9 +96,9 @@
     {
       "id": "arquibancada",
       "imagem": "arquibancada.png",
-      "profundidade": 605,
+      "profundidade": 2500,
       "noChao": true,
-      "altura": 0.5,
+      "altura": 0.27,
       "repetir": "espelhar",
       "luzes": [
         { "x": 0.25, "y": 0.726, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.06 },
@@ -124,6 +124,7 @@
     "imagemLajotas": "chao_liso.jpg",
     "perto": -600,
     "longe": 600,
+    "ate": 2500,
     "centroX": 700,
     "reflexoLutadores": 0.18,
     "reflexoLuzes": 0.45

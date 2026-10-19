@@ -789,7 +789,7 @@ public final class StageScene {
 
     private void drawFloor(RenderCanvas c) {
         StageDefinition.Floor floor = pack.definition.floor;
-        float groundTop = camera.screenY(world.groundY, floor != null ? floor.far : 0f);
+        float groundTop = camera.screenY(world.groundY, floor != null ? floor.extent : 0f);
         if (floorImage == null) {
             // Sem imagem: um chão liso, para o cenário continuar jogável.
             float y = Math.max(groundTop, camera.horizonY());
@@ -804,11 +804,23 @@ public final class StageScene {
             float zTop = camera.floorDepthAt(y0);
             float zBottom = camera.floorDepthAt(y1);
             if (Float.isNaN(zTop) || Float.isNaN(zBottom)) continue;
+            zTop = Math.min(zTop, floor.extent);
             float zMid = (zTop + zBottom) * 0.5f;
+            boolean beyond = zMid > floor.far;
 
-            // Linha da textura: a borda de cima da imagem é a profundidade "longe".
-            float v0 = clamp((floor.far - zTop) / (floor.far - floor.near), 0f, 1f) * imgH;
-            float v1 = clamp((floor.far - zBottom) / (floor.far - floor.near), 0f, 1f) * imgH;
+            // Linha da textura: a borda de cima da imagem é a profundidade "longe". Atrás dela
+            // (até "ate") a imagem lisa se repete na profundidade, uma cópia em cima da outra.
+            float depth = floor.far - floor.near;
+            float v0, v1;
+            if (beyond) {
+                float a = (floor.far - zTop) / depth, b = (floor.far - zBottom) / depth;
+                float base = (float)Math.floor(a);
+                v0 = (a - base) * imgH;
+                v1 = Math.min(1f, b - base) * imgH;
+            } else {
+                v0 = clamp((floor.far - zTop) / depth, 0f, 1f) * imgH;
+                v1 = clamp((floor.far - zBottom) / depth, 0f, 1f) * imgH;
+            }
             if (v1 - v0 < 1f) {
                 float mid = Math.min(imgH - 0.5f, Math.max(0.5f, (v0 + v1) * 0.5f));
                 v0 = mid - 0.5f;
@@ -827,7 +839,7 @@ public final class StageScene {
                 float sx0 = (u - uLeft) / (uRight - uLeft) * VW;
                 float sx1 = (tileEnd - uLeft) / (uRight - uLeft) * VW;
                 // A cópia do centro tem o emblema; as outras usam só lajotas, se houver.
-                RenderImage image = tile == 0 ? floorImage : floorPlainImage;
+                RenderImage image = tile == 0 && !beyond ? floorImage : floorPlainImage;
                 float kx = image.width() / imgW;
                 float ky = image.height() / imgH;
                 c.drawImageRegion(image, (u - tile * imgW) * kx, v0 * ky, (tileEnd - tile * imgW) * kx, v1 * ky,
@@ -844,7 +856,7 @@ public final class StageScene {
         StageDefinition.Floor floor = pack.definition.floor;
         if (floor == null || floorImage == null || floor.lightReflection <= 0f) return;
         for (Placed p : placed) {
-            if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.far) continue;
+            if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.extent) continue;
             if (p.layer.lights.isEmpty() && p.layer.fires.isEmpty()) continue;
             int first = 0, last = 0;
             if (p.layer.repeat != StageDefinition.Repeat.NONE) {

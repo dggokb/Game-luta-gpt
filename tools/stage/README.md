@@ -106,6 +106,8 @@ Dicas:
 - **Piso**: textura vista de cima. A borda de cima é a profundidade `longe` e a de baixo é
   `perto`. `centroX` é o x do mundo do centro da imagem (os lutadores começam em 420 e 980).
   `reflexoLutadores` é a opacidade do reflexo dos lutadores no chão (0 = sem reflexo).
+  `ate` (opcional) faz o chão continuar atrás do piso, repetindo a `imagemLajotas`, até essa
+  profundidade (o campo de uma arena até a arquibancada lá no fundo).
   `imagemLajotas` (opcional) é a mesma textura **sem o emblema**, usada nas repetições fora
   do centro, para o emblema não aparecer duas vezes quando a câmera anda.
 

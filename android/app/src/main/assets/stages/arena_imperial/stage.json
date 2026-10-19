@@ -29,7 +29,7 @@
       "id": "mar-plano",
       "tipo": "agua",
       "imagem": "mar_plano.jpg",
-      "perto": 705,
+      "perto": 2530,
       "longe": 8500,
       "tamanho": 1300,
       "corrente": 18,
@@ -59,9 +59,9 @@
     {
       "id": "arquibancadas",
       "imagem": "arquibancada_lateral.png",
-      "profundidade": 700,
+      "profundidade": 2520,
       "noChao": true,
-      "altura": 0.45,
+      "altura": 0.38,
       "x": 0.5,
       "repetir": "espelhar",
       "luzes": [
@@ -73,9 +73,9 @@
     {
       "id": "palacio",
       "imagem": "palacio.png",
-      "profundidade": 690,
+      "profundidade": 2500,
       "noChao": true,
-      "altura": 0.62,
+      "altura": 0.5,
       "x": 0.5,
       "repetir": "nao",
       "luzes": [
@@ -89,9 +89,9 @@
     {
       "id": "arvores",
       "imagem": "arvore_vermelha.png",
-      "profundidade": 520,
+      "profundidade": 2450,
       "noChao": true,
-      "altura": 0.42,
+      "altura": 0.3,
       "x": 0.27,
       "repetir": "espelhar",
       "periodo": 0.46,
@@ -134,6 +134,7 @@
     "imagemLajotas": "chao_placas.jpg",
     "perto": -600,
     "longe": 700,
+    "ate": 2500,
     "centroX": 700,
     "reflexoLutadores": 0.25,
     "reflexoLuzes": 0.55

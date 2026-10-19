@@ -29,7 +29,7 @@
       "id": "mar-plano",
       "tipo": "agua",
       "imagem": "mar_plano.jpg",
-      "perto": 645,
+      "perto": 3520,
       "longe": 8500,
       "tamanho": 1300,
       "corrente": 18,
@@ -73,10 +73,10 @@
     {
       "id": "arquibancada",
       "imagem": "arquibancada.png",
-      "profundidade": 640,
+      "profundidade": 3500,
       "noChao": true,
-      "altura": 0.75,
-      "x": 0.806,
+      "altura": 0.5,
+      "x": 0.606,
       "repetir": "nao",
       "luzes": [
         { "x": 0.5, "y": 0.792, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
@@ -88,9 +88,9 @@
     {
       "id": "barreira",
       "imagem": "barreira.png",
-      "profundidade": 600,
+      "profundidade": 3490,
       "noChao": true,
-      "altura": 0.075,
+      "altura": 0.035,
       "repetir": "espelhar",
       "luzes": [
         { "x": 0.033, "y": 0.296, "raio": 0.25, "cor": "#FFC070", "pulsar": 0.05 },
@@ -138,6 +138,7 @@
     "imagemLajotas": "chao_liso.jpg",
     "perto": -600,
     "longe": 600,
+    "ate": 3500,
     "centroX": 700,
     "reflexoLutadores": 0.2,
     "reflexoLuzes": 0.5

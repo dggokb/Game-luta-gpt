@@ -95,6 +95,10 @@ igual no Android e no Java2D.
 | `agua` | Plano horizontal entre as profundidades `perto` e `longe`, com degradê e brilhos que piscam presos ao mundo. Translúcida para mostrar o reflexo da camada atrás dela. |
 | `ator` | Personagem de fundo animado (`pasta` com `ator.json` e as folhas), apoiado no chão (`noChao` + `altura`), `virar` espelha. Fica na animação parada e toca as reações que o jogo pede (`StageScene.react("licao")`, `actorPlay`). Sem a folha de uma reação, usa a parada com um movimento provisório. Veja `docs/tutorial-plateia.md`. |
 
+**Chão até o fundo** (`"ate"` no `chao`): atrás da borda de cima da imagem do piso, a imagem
+lisa (`imagemLajotas`) se repete na profundidade até `ate`, na mesma escala de lajota. Para o
+chão de uma arena ir do ringue até a arquibancada lá no fundo.
+
 **Mar deitado** (`agua` com `"imagem"`): a textura do mar vista de cima é desenhada em
 perspectiva entre `perto` e `longe`, em faixas, igual ao piso: ondas grandes perto e pequenas
 e juntas no horizonte, andando devagar (`corrente`, unidades por segundo; `tamanho` é a largura

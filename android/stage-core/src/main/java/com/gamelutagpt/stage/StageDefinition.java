@@ -227,9 +227,16 @@ public final class StageDefinition {
         public final float fighterReflection;
         /** Opacidade do reflexo das luzes no piso. */
         public final float lightReflection;
+        /**
+         * Até onde o chão continua atrás do piso ({@code "ate"}), repetindo a imagem lisa na
+         * profundidade; igual a {@code far} = o piso acaba na borda de cima da imagem. Para
+         * o chão de uma arena ir do ringue até a arquibancada, lá no fundo.
+         */
+        public final float extent;
 
         Floor(String image, String plainImage, float near, float far, float centerX,
-              float fighterReflection, float lightReflection) {
+              float fighterReflection, float lightReflection, float extent) {
+            this.extent = Math.max(far, extent);
             this.image = image;
             this.plainImage = plainImage;
             this.near = near;
@@ -380,7 +387,8 @@ public final class StageDefinition {
             if (far <= near) throw new IllegalArgumentException("chao: \"longe\" deve ser maior que \"perto\"");
             floor = new Floor(image, string(floorMap, "imagemLajotas", null), near, far,
                 number(floorMap, "centroX", Float.NaN),
-                number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f));
+                number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f),
+                number(floorMap, "ate", far));
         }
 
         Petals petals = null;
