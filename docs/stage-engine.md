@@ -100,7 +100,10 @@ igual no Android e no Java2D.
 redesenhada em colunas estreitas que pulam, cada uma no seu tempo (vizinhas parecidas, como
 grupinhos). Só o miolo da faixa pula: uma margem do tamanho do maior pulo fica parada em cima e
 em baixo, então nada fora da faixa é coberto. A faixa precisa ficar toda dentro da plateia
-(sem pegar grade, sacada ou parapeito). O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
+(sem pegar grade, sacada ou parapeito). Com `"mascara"` (imagem só com a gente, do mesmo tamanho
+da camada; `montar_porto.plateia` gera), só os pixels de gente pulam: estandartes, luzes e
+escadas que cruzam a faixa ficam parados (sem a máscara, a coluna inteira pulava e cortava
+os estandartes). O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
 KO) e a plateia pula mais e mais rápido, voltando ao normal em uns dois segundos.
 
 **Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado

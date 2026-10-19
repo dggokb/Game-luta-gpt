@@ -149,6 +149,37 @@ def textura_mar(mar):
     return sem_emenda(faixa.transpose(Image.TRANSPOSE)).transpose(Image.TRANSPOSE)
 
 
+def plateia(img, faixas):
+    """Só a gente da arquibancada (o resto transparente), para a plateia viva do motor
+    ("plateia" com "mascara" no stage.json): o pulo mexe só esses pixels, e os estandartes,
+    as luzes e as grades que passam pela faixa ficam parados. Gente = textura miúda (muita
+    variação de um pixel para o outro) e escura, fora do vermelho liso dos estandartes; só
+    dentro das faixas (topo, base em fração da altura)."""
+    from PIL import ImageFilter
+    img = img.convert("RGBA")
+    px = np.asarray(img).astype(np.float32)
+    r, g, b, a = px[..., 0], px[..., 1], px[..., 2], px[..., 3]
+    lum = 0.3 * r + 0.59 * g + 0.11 * b
+    mx, mn = px[..., :3].max(axis=2), px[..., :3].min(axis=2)
+    sat = (mx - mn) / np.maximum(mx, 1)
+    borrar = lambda m, raio: np.asarray(Image.fromarray(m.clip(0, 255).astype(np.uint8)).filter(
+        ImageFilter.BoxBlur(raio))).astype(np.float32)
+    media = borrar(lum, 3)
+    var = np.sqrt(np.maximum(borrar(lum * lum / 255, 3) * 255 - media * media, 0))
+    estandarte = (r > 110) & (sat > 0.55) & (g < 90)
+    gente = (var > 13) & (borrar(lum, 6) < 120) & ~estandarte & (a > 200)
+    h = px.shape[0]
+    dentro = np.zeros_like(gente)
+    for topo, base in faixas:
+        dentro[int(topo * h):int(base * h)] = True
+    m = Image.fromarray(((gente & dentro) * 255).astype(np.uint8))
+    m = m.filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.MinFilter(9)).filter(ImageFilter.MedianFilter(5))
+    m = m.filter(ImageFilter.GaussianBlur(0.8))
+    saida = img.copy()
+    saida.putalpha(Image.fromarray(np.minimum(np.asarray(m), a.astype(np.uint8))))
+    return saida
+
+
 def peca_comum(nome, img):
     """Uma peça comum da ilha como ela entra no cenário (as de longe com a névoa)."""
     if nome == "penhascos":

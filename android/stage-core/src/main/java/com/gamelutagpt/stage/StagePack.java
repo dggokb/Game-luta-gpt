@@ -57,6 +57,9 @@ public final class StagePack {
             for (StageDefinition.Banner banner : layer.banners) {
                 if (!names.contains(banner.image)) names.add(banner.image);
             }
+            for (StageDefinition.Crowd crowd : layer.crowds) {
+                if (crowd.mask != null && !names.contains(crowd.mask)) names.add(crowd.mask);
+            }
         }
         if (definition.floor != null) {
             if (!names.contains(definition.floor.image)) names.add(definition.floor.image);

@@ -98,7 +98,7 @@
       "imagem": "arquibancada.png",
       "profundidade": 2500,
       "plateia": [
-        { "topo": 0.38, "base": 0.51, "pulo": 0.014, "colunas": 160 }
+        { "topo": 0.38, "base": 0.51, "pulo": 0.014, "colunas": 160, "mascara": "arquibancada_plateia.png" }
       ],
       "noChao": true,
       "altura": 0.27,

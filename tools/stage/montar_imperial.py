@@ -28,8 +28,10 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, imagens, peca_comum, textura_mar  # noqa: E402
+from montar_porto import COMUNS, imagens, peca_comum, textura_mar, plateia  # noqa: E402
 
+# Faixas de plateia (topo, base em fração da altura), as mesmas do stage.json.
+PLATEIA = [(0.57, 0.75)]
 ID = "arena_imperial"
 # Centro da perspectiva (fração da largura) e quanto as linhas abrem do topo à base.
 CENTRO, ABRE = 835 / 1672, 0.0835
@@ -91,6 +93,8 @@ def main():
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
+    # Plateia viva: só a gente da arquibancada, do mesmo tamanho dela (sem cortar margens).
+    plateia(Image.open(args.saida / "arquibancada_lateral.png"), PLATEIA).save(args.saida / "arquibancada_lateral_plateia.png")
 
 
 if __name__ == "__main__":

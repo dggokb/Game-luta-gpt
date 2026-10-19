@@ -38,8 +38,10 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar  # noqa: E402
+from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar, plateia  # noqa: E402
 
+# Faixas de plateia (topo, base em fração da altura), as mesmas do stage.json.
+PLATEIA = [(0.38, 0.51)]
 ID = "arena_costeira"
 # Faixa de lajotas do chao_liso.png que se repete: da coluna depois de uma junta até a
 # próxima junta com as mesmas fileiras (em fração da largura).
@@ -146,6 +148,8 @@ def main():
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
+    # Plateia viva: só a gente da arquibancada, do mesmo tamanho dela (sem cortar margens).
+    plateia(Image.open(args.saida / "arquibancada.png"), PLATEIA).save(args.saida / "arquibancada_plateia.png")
 
 
 if __name__ == "__main__":

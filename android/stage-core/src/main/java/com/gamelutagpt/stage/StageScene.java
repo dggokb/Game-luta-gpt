@@ -643,7 +643,10 @@ public final class StageScene {
             if (amp < 0.4f) continue;
             float inTop = crowd.top + margin, inBottom = crowd.bottom - margin;
             if (inBottom <= inTop) continue;
-            float sy0 = inTop * imgH, sy1 = inBottom * imgH;
+            RenderImage source = crowd.mask != null ? pack.image(crowd.mask) : null;
+            if (source == null) source = image;
+            float kx = source.width() / imgW, ky = source.height() / imgH;
+            float sy0 = inTop * imgH * ky, sy1 = inBottom * imgH * ky;
             float dy0 = t + inTop * h, dy1 = t + inBottom * h;
             int n = crowd.columns;
             for (int i = 0; i < n; i++) {
@@ -653,9 +656,9 @@ public final class StageScene {
                 float wave = (float)Math.sin(time * speed + phase);
                 if (wave <= 0f) continue;
                 float dy = -amp * wave * wave;
-                float sx0 = i * imgW / n, sx1 = (i + 1) * imgW / n;
+                float sx0 = i * imgW / n * kx, sx1 = (i + 1) * imgW / n * kx;
                 float x0 = l + i * w / n, x1 = l + (i + 1) * w / n;
-                c.drawImageRegion(image, sx0, sy0, sx1, sy1, x0, dy0 + dy, x1 + 0.5f, dy1 + dy, alpha);
+                c.drawImageRegion(source, sx0, sy0, sx1, sy1, x0, dy0 + dy, x1 + 0.5f, dy1 + dy, alpha);
             }
         }
         if (mirrored) c.restore();

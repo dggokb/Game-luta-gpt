@@ -82,8 +82,15 @@ public final class StageDefinition {
     public static final class Crowd {
         public final float top, bottom, jump;
         public final int columns;
+        /**
+         * Imagem só com a gente ({@code "mascara"}, do mesmo tamanho da camada; o resto
+         * transparente): o pulo mexe só esses pixels, e os estandartes, luzes e grades que
+         * passam pela faixa ficam parados. Null = a faixa inteira pula.
+         */
+        public final String mask;
 
-        Crowd(float top, float bottom, float jump, int columns) {
+        Crowd(float top, float bottom, float jump, int columns, String mask) {
+            this.mask = mask;
             this.top = top;
             this.bottom = bottom;
             this.jump = jump;
@@ -500,7 +507,8 @@ public final class StageDefinition {
             if (!(item instanceof Map)) continue;
             Map<String, Object> cm = (Map<String, Object>)item;
             Crowd cr = new Crowd(clamp01(number(cm, "topo", 0.3f)), clamp01(number(cm, "base", 0.9f)),
-                number(cm, "pulo", 0.012f), Math.max(8, Math.round(number(cm, "colunas", 140f))));
+                number(cm, "pulo", 0.012f), Math.max(8, Math.round(number(cm, "colunas", 140f))),
+                string(cm, "mascara", null));
             if (cr.bottom <= cr.top) throw new IllegalArgumentException(where + ": plateia precisa de base > topo");
             b.crowds.add(cr);
         }

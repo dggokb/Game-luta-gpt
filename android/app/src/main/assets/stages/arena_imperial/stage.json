@@ -61,7 +61,7 @@
       "imagem": "arquibancada_lateral.png",
       "profundidade": 2520,
       "plateia": [
-        { "topo": 0.57, "base": 0.75, "pulo": 0.01, "colunas": 90 }
+        { "topo": 0.57, "base": 0.75, "pulo": 0.01, "colunas": 90, "mascara": "arquibancada_lateral_plateia.png" }
       ],
       "noChao": true,
       "altura": 0.38,
