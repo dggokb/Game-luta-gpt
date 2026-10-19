@@ -89,9 +89,9 @@
     {
       "id": "trelica",
       "imagem": "trelica.png",
-      "profundidade": 420,
-      "topo": -0.02,
-      "base": 0.3,
+      "profundidade": 300,
+      "topo": -0.04,
+      "base": 0.26,
       "x": 0.5,
       "repetir": "espelhar",
       "luzes": [

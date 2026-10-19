@@ -69,7 +69,14 @@ cenários não precisa gerar essas duas imagens.
 - A base de cada peça de longe fica na linha d'água da profundidade dela, com a névoa de
   baixo opaca. Apagar essa névoa mostrava o mar por baixo e a peça parecia voar.
 - Arquibancadas e prédios ficam encostados no fim do piso: atrás dele só tem o mar, e
-  qualquer vão aparece no super pulo (a arquibancada voando sobre a água).
+  qualquer vão aparece no super pulo (a arquibancada voando sobre a água). Os lados também
+  contam: uma peça que não se repete (o palácio) deixa o mar no nível da praça quando a
+  câmera anda; atrás dela vai uma peça contínua (as arquibancadas).
+- Peças penduradas (a treliça de refletores) ficam na mesma profundidade de quem as segura
+  (as pilastras); em profundidades diferentes elas se separam e flutuam no pulo.
+- Para conferir: `gradle :pc-preview:runStage --args="app/src/main/assets/stages/<id>
+  --varredura folha.png"` grava os dois cantos e o meio, com a câmera perto, afastada e no
+  alto do super pulo.
 
 O jogo faz: fogo dos braseiros, brilho das lanternas e holofotes, reflexo no piso
 molhado, a água das piscinas e do mar (brilhos), neblina, folhas caindo. Não precisa (e é
@@ -199,8 +206,8 @@ python tools/stage/montar_costeira.py --comum pasta/torneio --entrada pasta/torn
 - **Encosta**: a borda da direita e a névoa de baixo são esfumadas, como a ilha do porto.
 - **Composição** (profundidades): holofotes 320 (perto, a cabeça de luz fica acima da tela
   na câmera de repouso), arquibancada 605 (encostada no fim do piso, 0,27 da tela: por cima
-  dela aparecem o mar, os rochedos e o pôr do sol), holofotes 1050 (atrás da arquibancada,
-  com a cabeça de luz acesa), encosta 2600 (à direita, sem repetir), penhascos 6500, mar
+  dela aparecem o mar, os rochedos e o pôr do sol), holofotes 615 (logo atrás da
+  arquibancada, a base escondida por ela; a 1050 eles ficavam plantados no mar), encosta 2600 (à direita, sem repetir), penhascos 6500, mar
   9000 (com brilhos), céu.
 - **Sem a mureta**: a `barreira.png` repetia o muro de LED que a arquibancada já tem embaixo
   (duas faixas vermelhas). O muro da arquibancada é a mureta do ringue. Antes ela ficava a
@@ -250,13 +257,13 @@ python tools/stage/montar_imperial.py --comum pasta/torneio --entrada pasta/torn
   verticais abrem 6,4% de cima para baixo). As duas são endireitadas (transformação
   bilinear em volta do centro) e cortadas entre duas linhas com losango (x 240 e 1431 na
   imagem endireitada): a mandala cabe inteira e os losangos cortados ao meio se completam
-  na emenda. O piso vai de −600 a 650.
-- **Palácio**: logo atrás do fim do piso (690), para a escadaria sair direto da praça (mais
-  longe, aparecia uma faixa de mar entre a praça e a escada). Uma neblina clara das
-  cachoeiras (720) fica logo atrás do palácio.
+  na emenda. O piso vai de −600 a 700.
+- **Palácio**: no fim da praça (690), para a escadaria sair direto dela (mais
+  longe, aparecia uma faixa de mar entre a praça e a escada).
 - **Composição** (profundidades): lanternas de praça 150 (o jogo acende), pórticos com
-  estandarte 300, árvores vermelhas 520 (dos dois lados do palácio), arquibancadas
-  laterais 660 (nas pontas, a cada 0,84 tela, encostadas no fim da praça), palácio 690, penhascos 6500, mar, céu do
+  estandarte 300, árvores vermelhas 520 (dos dois lados do palácio), palácio 690,
+  arquibancadas 700 (contínuas, espelhadas, atrás do palácio e no fim da praça, que vai
+  até 700: sozinho, o palácio deixava o mar no nível da praça dos lados), penhascos 6500, mar, céu do
   pôr do sol. Folhas vermelhas caindo (`petalas` em `#C8202A`). Pedra polida:
   `reflexoLutadores` 0,25.
 - O ep06 usa este cenário na SEMIFINAL, e ele entra no sorteio do Arcade.
@@ -369,8 +376,8 @@ python tools/stage/montar_central.py --comum pasta/torneio --entrada pasta/torne
   linha vermelha que entra pelas bordas é coberta com as lajotas ao lado. O piso vai de
   −600 a 600 e o círculo ocupa quase toda a profundidade.
 - **Arquibancada**: o GPT pintou um pedaço do piso do ringue embaixo dela (cortado).
-- **Composição** (profundidades): pilastras com estandarte 300, treliça de luzes 420 (faixa
-  no alto, com os refletores acesos pelo jogo), mureta 600, arquibancada 640 (logo atrás da
+- **Composição** (profundidades): pilastras com estandarte 300 e a treliça de luzes na mesma
+  profundidade (presa nas pilastras; a 420 ela flutuava no super pulo), mureta 600, arquibancada 640 (logo atrás da
   mureta, alta, 0,42 da tela; mais longe ela voava no super pulo), templo do Takatoshi ao longe 6000 (aparece por cima da arquibancada quando a
   câmera afasta e no super pulo), penhascos, mar e o céu com a lua.
 - O ep07 usa este cenário na FINAL, e ele entra no sorteio do Arcade.

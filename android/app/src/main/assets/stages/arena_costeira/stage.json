@@ -78,9 +78,9 @@
     {
       "id": "holofotes-longe",
       "imagem": "holofote.png",
-      "profundidade": 1050,
+      "profundidade": 615,
       "noChao": true,
-      "altura": 0.62,
+      "altura": 0.7,
       "x": 0.27,
       "repetir": "espelhar",
       "periodo": 0.8,

@@ -44,13 +44,18 @@
       "alfa": 0.3
     },
     {
-      "id": "neblina-cachoeiras",
-      "tipo": "neblina",
-      "profundidade": 720,
-      "topo": 0.45,
-      "base": 0.6,
-      "cor": "#D8E0F0",
-      "alfa": 0.12
+      "id": "arquibancadas",
+      "imagem": "arquibancada_lateral.png",
+      "profundidade": 700,
+      "noChao": true,
+      "altura": 0.3,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.079, "y": 0.767, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.5, "y": 0.752, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.92, "y": 0.766, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 }
+      ]
     },
     {
       "id": "palacio",
@@ -66,21 +71,6 @@
         { "x": 0.313, "y": 0.884, "raio": 0.035, "cor": "#FFB45A", "pulsar": 0.06 },
         { "x": 0.687, "y": 0.885, "raio": 0.035, "cor": "#FFB45A", "pulsar": 0.06 },
         { "x": 0.5, "y": 0.2, "raio": 0.06, "cor": "#FFD08A", "pulsar": 0.04, "reflexo": false }
-      ]
-    },
-    {
-      "id": "arquibancadas",
-      "imagem": "arquibancada_lateral.png",
-      "profundidade": 660,
-      "noChao": true,
-      "altura": 0.34,
-      "x": 0.08,
-      "repetir": "repetir",
-      "periodo": 0.84,
-      "luzes": [
-        { "x": 0.079, "y": 0.767, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
-        { "x": 0.5, "y": 0.752, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
-        { "x": 0.92, "y": 0.766, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 }
       ]
     },
     {
@@ -130,7 +120,7 @@
     "imagem": "chao.jpg",
     "imagemLajotas": "chao_placas.jpg",
     "perto": -600,
-    "longe": 650,
+    "longe": 700,
     "centroX": 700,
     "reflexoLutadores": 0.25,
     "reflexoLuzes": 0.55
