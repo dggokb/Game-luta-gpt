@@ -210,6 +210,47 @@ public class StageSceneTest {
         assertTrue("menos faixas no modo leve", leve.watched.size() < strips);
     }
 
+    /** Relâmpagos: caem de tempos em tempos, piscam duas vezes, clareiam o céu e o cenário. */
+    @Test
+    public void lightningStrikesFromTimeToTimeAndFlashes() throws IOException {
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"ceu.jpg\", \"profundidade\": 100000, \"topo\": -0.1, \"base\": 0.6},"
+            + "{\"imagem\": \"pilar.png\", \"profundidade\": 300, \"noChao\": true, \"altura\": 1}],"
+            + "\"chao\": {\"imagem\": \"chao.jpg\"},"
+            + "\"relampagos\": {\"intervaloMinimo\": 2, \"intervaloMaximo\": 3, \"profundidade\": 9000}}";
+        StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
+        assertEquals(9000f, pack.definition.lightning.depth, 0f);
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        int lit = 0, lines = 0;
+        float lastFlash = 0f;
+        for (int frame = 0; frame < 60 * 10; frame++) {
+            scene.update(1f / 60f);
+            CountingCanvas canvas = new CountingCanvas();
+            scene.drawBackground(canvas);
+            assertEquals(0, canvas.depth);
+            if (scene.lightningFlash() > 0f) {
+                lit++;
+                lines += canvas.lines;
+            }
+            lastFlash = scene.lightningFlash();
+        }
+        assertTrue("caíram uns relâmpagos em 10 s: " + scene.strikes(), scene.strikes() >= 3 && scene.strikes() <= 5);
+        assertTrue("o clarão dura um pouco", lit > scene.strikes() * 10);
+        assertTrue("o raio é desenhado", lines > lit * 10);
+        // Pisca: forte, quase apaga, forte de novo e some.
+        assertEquals(1f, StageScene.lightningEnvelope(0.02f), 0f);
+        assertTrue(StageScene.lightningEnvelope(0.09f) < 0.5f);
+        assertTrue(StageScene.lightningEnvelope(0.15f) > 0.5f);
+        assertEquals(0f, StageScene.lightningEnvelope(2f), 0f);
+        assertEquals(0f, StageScene.lightningEnvelope(-1f), 0f);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void lightningWithTheMaximumBelowTheMinimumIsAnError() {
+        StageDefinition.fromJson("{\"nome\": \"X\", \"relampagos\": {\"intervaloMinimo\": 8, \"intervaloMaximo\": 3}}");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void aBannerWithoutSizeIsAnError() {
         StageDefinition.fromJson("{\"nome\": \"X\", \"camadas\": [{\"imagem\": \"p.png\", \"profundidade\": 300,"

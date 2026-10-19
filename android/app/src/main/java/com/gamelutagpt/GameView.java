@@ -1433,7 +1433,10 @@ public class GameView extends SurfaceView
 
     /** One simulation frame: inputs, engine step, then presentation state. */
     private void update() {
-        if (stageScene != null) stageScene.update(FIXED_STEP);
+        if (stageScene != null) {
+            stageScene.update(FIXED_STEP);
+            updateTrovao();
+        }
         if (menuInicial.isOpen()) {
             // A luta fica parada (e escondida) atrás do menu.
             pad.drainInto(ignoredInput);
@@ -1981,6 +1984,28 @@ public class GameView extends SurfaceView
         // K.O. no meio do Ultra (na página, num golpe da sequência, num acerto do raio): espera
         // o golpe final dele, que é o que fecha a luta na tela.
         if (tipo == FinalizacaoManga.ULTRA && ultraEmAndamento()) finalizacao.segurar();
+    }
+
+    /** Relâmpagos do cenário já ouvidos e quadros até o trovão do último. */
+    private int relampagosOuvidos, trovaoEm = -1;
+    private com.gamelutagpt.stage.StageScene trovaoCena;
+
+    /** Relâmpago novo no cenário: o trovão chega um pouco depois do clarão, como de verdade. */
+    private void updateTrovao() {
+        int strikes = stageScene.strikes();
+        if (stageScene != trovaoCena) {
+            // Cenário novo: a contagem dele começa de novo, sem trovão atrasado do anterior.
+            trovaoCena = stageScene;
+            relampagosOuvidos = strikes;
+            trovaoEm = -1;
+        }
+        if (strikes != relampagosOuvidos) {
+            relampagosOuvidos = strikes;
+            trovaoEm = 12 + soundRandom.nextInt(36);
+        }
+        if (trovaoEm >= 0 && trovaoEm-- == 0) {
+            ultraSounds.playFight("trovao", 0.55f, 0.9f + soundRandom.nextFloat() * 0.2f);
+        }
     }
 
     /** Algum lado está no Ultra: na página, no raio ou nos golpes da sequência. */

@@ -136,6 +136,18 @@ dela (`x`, `y` do canto de cima à esquerda, `largura`, `altura`):
   (0,5) e `respingos` (quantos ao mesmo tempo, 30; 0 desliga). No modo leve
   (`setDetalhe(false)`) não chove, como as pétalas. Primeiro uso: Beco do Brucy.
 
+## Relâmpagos
+
+`"relampagos"` no stage.json (primeiro uso: Beco do Brucy). De vez em quando
+(`intervaloMinimo`/`intervaloMaximo`, 5–12 s) um raio cai em zigue-zague, com um ou dois
+galhos, na `profundidade` dele (9000: atrás da cidade, que fica recortada contra o clarão),
+entre `topo` e `base` da tela de repouso. O céu atrás dele clareia (`claraoCeu`, 0,45) e o
+cenário todo um pouco (`claraoCena`, 0,12), piscando como relâmpago de verdade: forte, quase
+apaga, forte de novo e some em ~0,5 s (`StageScene.lightningEnvelope`). O raio fica preso no
+mundo, então anda com a câmera como o resto daquela profundidade. No modo leve, sem o brilho
+largo em volta do raio. `StageScene.strikes()` conta os relâmpagos: o `GameView` toca o
+trovão (`sons/luta/trovao.wav`, gerado em `tools/sons/gerar_sons.py`) 0,2–0,8 s depois.
+
 ## Desempenho
 
 O `GameView` agora pede o Canvas pela GPU (`lockHardwareCanvas`, Android 8+) e volta para

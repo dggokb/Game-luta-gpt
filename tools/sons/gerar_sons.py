@@ -175,6 +175,20 @@ def build():
             if start + i < len(shards):
                 shards[start + i] += v * rng.uniform(0.25, 0.5)
     sounds['guarda_quebrada'] = normalize(saturate(mix(hit(rng, 1.2), gain(crack, 0.8), gain(shards, 0.6)), 1.4))
+    # Trovão (relâmpagos do cenário): estalo rasgado, depois o ronco grave rolando e voltando
+    # (rajadas de ruído bem filtrado umas sobre as outras), sumindo devagar.
+    tear = envelope(lowpass(highpass(noise(0.35, rng), 700), 5200), 0.002, 0.12, 2.6)
+    roll = silence(2.6)
+    for _ in range(7):
+        start = int(RATE * rng.uniform(0.05, 1.3))
+        cut = rng.uniform(140, 320)
+        burst = envelope(lowpass(lowpass(noise(rng.uniform(0.6, 1.2), rng), cut), cut), rng.uniform(0.03, 0.12),
+                         rng.uniform(0.4, 0.8), 2.2)
+        g = rng.uniform(0.5, 1.0)
+        for i, v in enumerate(burst):
+            if start + i < len(roll):
+                roll[start + i] += v * g
+    sounds['trovao'] = normalize(saturate(mix(gain(tear, 0.45), gain(roll, 1.0)), 1.6), 0.8)
     return sounds
 
 

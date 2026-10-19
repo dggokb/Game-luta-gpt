@@ -342,5 +342,15 @@
     "espessura": 1.6,
     "alfa": 0.5,
     "respingos": 40
+  },
+  "relampagos": {
+    "intervaloMinimo": 5,
+    "intervaloMaximo": 11,
+    "profundidade": 9000,
+    "topo": -0.02,
+    "base": 0.4,
+    "cor": "#D6DEFF",
+    "claraoCeu": 0.5,
+    "claraoCena": 0.1
   }
 }

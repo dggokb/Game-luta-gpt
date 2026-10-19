@@ -29,7 +29,8 @@ import java.util.Map;
  *   "chao": { "imagem": "chao.jpg", "imagemLajotas": "chao_lajotas.jpg", "perto": -420, "longe": 560,
  *             "centroX": 700, "reflexoLutadores": 0.25 },
  *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" },
- *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 }
+ *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
+ *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 }
  * }
  * </pre>
  */
@@ -260,6 +261,35 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * Relâmpagos: de vez em quando um raio em zigue-zague cai no céu numa profundidade (atrás da
+     * cidade, que fica recortada contra o clarão), o céu clareia piscando duas vezes e o
+     * cenário todo clareia um pouco.
+     */
+    public static final class Lightning {
+        /** Intervalo entre relâmpagos, em segundos (sorteado entre os dois). */
+        public final float minInterval, maxInterval;
+        /** Profundidade do raio: o clarão do céu cobre o que está atrás dela. */
+        public final float depth;
+        /** Topo e base do raio na tela de repouso (frações). */
+        public final float top, bottom;
+        public final int color;
+        /** Opacidade do clarão no céu e no cenário todo (0 a 1). */
+        public final float skyFlash, sceneFlash;
+
+        Lightning(float minInterval, float maxInterval, float depth, float top, float bottom, int color,
+                  float skyFlash, float sceneFlash) {
+            this.minInterval = minInterval;
+            this.maxInterval = maxInterval;
+            this.depth = depth;
+            this.top = top;
+            this.bottom = bottom;
+            this.color = color;
+            this.skyFlash = skyFlash;
+            this.sceneFlash = sceneFlash;
+        }
+    }
+
     public final String name;
     public final float cameraDistance;
     /** Altura do horizonte na tela (fração). */
@@ -271,9 +301,11 @@ public final class StageDefinition {
     public final Petals petals;
     /** Null quando o cenário não tem chuva. */
     public final Rain rain;
+    /** Null quando o cenário não tem relâmpagos. */
+    public final Lightning lightning;
 
     private StageDefinition(String name, float cameraDistance, float horizon, int backgroundColor,
-                            List<Layer> layers, Floor floor, Petals petals, Rain rain) {
+                            List<Layer> layers, Floor floor, Petals petals, Rain rain, Lightning lightning) {
         this.name = name;
         this.cameraDistance = cameraDistance;
         this.horizon = horizon;
@@ -282,6 +314,7 @@ public final class StageDefinition {
         this.floor = floor;
         this.petals = petals;
         this.rain = rain;
+        this.lightning = lightning;
     }
 
     // ------------------------------------------------------------- leitura
@@ -356,8 +389,24 @@ public final class StageDefinition {
                 Math.max(0, Math.round(number(rainMap, "respingos", 30f))));
         }
 
+        Lightning lightning = null;
+        Map<String, Object> lightningMap = object(map, "relampagos");
+        if (lightningMap != null) {
+            float min = number(lightningMap, "intervaloMinimo", 5f);
+            float max = number(lightningMap, "intervaloMaximo", 12f);
+            if (min <= 0f || max < min) {
+                throw new IllegalArgumentException("relampagos: intervalos devem ser positivos e o máximo >= o mínimo");
+            }
+            float top = number(lightningMap, "topo", -0.02f), bottom = number(lightningMap, "base", 0.42f);
+            if (bottom <= top) throw new IllegalArgumentException("relampagos: \"base\" deve ficar abaixo do \"topo\"");
+            lightning = new Lightning(min, max, number(lightningMap, "profundidade", 9000f), top, bottom,
+                color(lightningMap, "cor", 0xFFD8E4FF),
+                clamp01(number(lightningMap, "claraoCeu", 0.45f)),
+                clamp01(number(lightningMap, "claraoCena", 0.12f)));
+        }
+
         return new StageDefinition(name.trim(), distance, horizon,
-            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain);
+            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning);
     }
 
     @SuppressWarnings("unchecked")

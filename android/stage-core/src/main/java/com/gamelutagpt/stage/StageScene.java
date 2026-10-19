@@ -103,6 +103,16 @@ public final class StageScene {
     private final float[] splashRing = new float[16];
     private float time;
 
+    // Relâmpagos: o raio de agora (pontos no mundo, na profundidade dele), quando caiu e quando
+    // cai o próximo.
+    private static final int BOLT_POINTS = 14, BRANCH_POINTS = 6, BRANCHES = 2;
+    private final float[] boltX = new float[BOLT_POINTS], boltY = new float[BOLT_POINTS];
+    private final float[][] branchX = new float[BRANCHES][BRANCH_POINTS], branchY = new float[BRANCHES][BRANCH_POINTS];
+    private final int[] branchLength = new int[BRANCHES];
+    private float strikeTime = -100f, nextStrike;
+    private int strikes;
+    private final Rand lightningRand = new Rand(57);
+
     public StageScene(StagePack pack, StageWorld world) {
         this.pack = pack;
         this.world = world;
@@ -197,6 +207,7 @@ public final class StageScene {
         splashZ = new float[splashes];
         splashAge = new float[splashes];
         java.util.Arrays.fill(splashAge, SPLASH_LIFE);
+        if (def.lightning != null) nextStrike = lightningRand.range(1.5f, def.lightning.minInterval);
     }
 
     public StageDefinition definition() {
@@ -393,6 +404,7 @@ public final class StageScene {
         time += dt;
         updateActors(dt);
         updateRain(dt);
+        updateLightning(dt);
         StageDefinition.Petals petals = pack.definition.petals;
         if (petals == null) return;
         for (int i = 0; i < petalX.length; i++) {
@@ -471,14 +483,21 @@ public final class StageScene {
         StageDefinition.Floor floor = pack.definition.floor;
         float floorFar = floor != null ? floor.far : 0f;
 
+        StageDefinition.Lightning lightning = pack.definition.lightning;
+        boolean bolt = lightning != null;
         for (Placed p : placed) {
             if (p.layer.sortDepth() <= floorFar) continue;
+            if (bolt && p.layer.sortDepth() <= lightning.depth) {
+                drawLightning(c);
+                bolt = false;
+            }
             if (pending && p.layer.sortDepth() <= z) {
                 between.run();
                 pending = false;
             }
             drawLayer(c, p);
         }
+        if (bolt) drawLightning(c);
         if (pending && z > floorFar) {
             between.run();
             pending = false;
@@ -496,6 +515,7 @@ public final class StageScene {
             }
         }
         if (pending) between.run();
+        drawSceneFlash(c);
         drawSplashes(c, true);
         drawRain(c, true);
         drawPetals(c, true);
@@ -640,6 +660,109 @@ public final class StageScene {
             float fy = t + fire.y * h;
             drawFire(c, fx, fy, fire.size * h, instance * 31 + i);
         }
+    }
+
+    // --------------------------------------------------------- relâmpagos
+
+    /** Quantos relâmpagos já caíram (para o jogo tocar o trovão, por exemplo). */
+    public int strikes() {
+        return strikes;
+    }
+
+    /** Força do clarão agora: pisca forte, quase apaga, pisca de novo e some (0 fora dele). */
+    public float lightningFlash() {
+        return lightningEnvelope(time - strikeTime);
+    }
+
+    static float lightningEnvelope(float t) {
+        if (t < 0f) return 0f;
+        if (t < 0.06f) return 1f;
+        if (t < 0.12f) return 0.25f;
+        if (t < 0.18f) return 0.85f;
+        float k = 0.85f * (float)Math.exp(-(t - 0.18f) * 7f);
+        return k < 0.02f ? 0f : k;
+    }
+
+    private void updateLightning(float dt) {
+        StageDefinition.Lightning l = pack.definition.lightning;
+        if (l == null) return;
+        nextStrike -= dt;
+        if (nextStrike > 0f) return;
+        nextStrike = lightningRand.range(l.minInterval, l.maxInterval);
+        strike(l);
+    }
+
+    /**
+     * Um raio novo: cai de cima, em zigue-zague, num ponto da tela de agora (guardado no
+     * mundo, então anda com a câmera como o resto da profundidade dele), com um ou dois galhos.
+     */
+    private void strike(StageDefinition.Lightning l) {
+        strikeTime = time;
+        strikes++;
+        Rand r = lightningRand;
+        float z = l.depth;
+        float scale = camera.scale(z);
+        float startX = camera.worldX(r.range(0.12f, 0.88f) * VW, z);
+        float top = camera.worldY(l.top * VH, z), bottom = camera.worldY(l.bottom * VH, z);
+        float step = 26f / scale;
+        float x = startX;
+        for (int i = 0; i < BOLT_POINTS; i++) {
+            boltX[i] = x;
+            boltY[i] = top + (bottom - top) * i / (BOLT_POINTS - 1f);
+            x += r.range(-1f, 1f) * step;
+        }
+        for (int b = 0; b < BRANCHES; b++) {
+            // O segundo galho só às vezes.
+            branchLength[b] = b == 0 || r.next() < 0.5f ? BRANCH_POINTS : 0;
+            if (branchLength[b] == 0) continue;
+            int from = 3 + (int)(r.next() * (BOLT_POINTS - 7));
+            float side = r.next() < 0.5f ? -1f : 1f;
+            float bx = boltX[from], by = boltY[from];
+            float segment = (bottom - top) / (BOLT_POINTS - 1f);
+            for (int i = 0; i < BRANCH_POINTS; i++) {
+                branchX[b][i] = bx;
+                branchY[b][i] = by;
+                bx += side * r.range(0.4f, 1.3f) * step;
+                by += segment * r.range(0.5f, 0.9f);
+            }
+        }
+    }
+
+    /** Clarão do céu e o raio, na profundidade do raio (o que está na frente cobre). */
+    private void drawLightning(RenderCanvas c) {
+        StageDefinition.Lightning l = pack.definition.lightning;
+        float k = lightningFlash();
+        if (k <= 0f) return;
+        c.fillRect(-10f, -10f, VW + 10f, VH + 10f, withAlpha(l.color, Math.round(255f * l.skyFlash * k)));
+        float z = l.depth;
+        float scale = camera.scale(z);
+        drawBoltPath(c, boltX, boltY, BOLT_POINTS, z, l.color, k, Math.max(1.6f, 3.2f * scale * 1.6f));
+        for (int b = 0; b < BRANCHES; b++) {
+            if (branchLength[b] > 0) {
+                drawBoltPath(c, branchX[b], branchY[b], branchLength[b], z, l.color, k * 0.8f,
+                    Math.max(1f, 1.8f * scale * 1.6f));
+            }
+        }
+    }
+
+    private void drawBoltPath(RenderCanvas c, float[] xs, float[] ys, int n, float z, int color, float k, float width) {
+        for (int i = 0; i + 1 < n; i++) {
+            float x1 = camera.screenX(xs[i], z), y1 = camera.screenY(ys[i], z);
+            float x2 = camera.screenX(xs[i + 1], z), y2 = camera.screenY(ys[i + 1], z);
+            // Brilho largo em volta (só no modo completo) e o miolo quase branco.
+            if (detalhe) c.drawLine(x1, y1, x2, y2, width * 5f, withAlpha(color, Math.round(70f * k)));
+            c.drawLine(x1, y1, x2, y2, width * 2f, withAlpha(color, Math.round(170f * k)));
+            c.drawLine(x1, y1, x2, y2, width, withAlpha(0xFFFFFFFF, Math.round(255f * k)));
+        }
+    }
+
+    /** O cenário todo clareia um pouco no relâmpago (atrás dos lutadores). */
+    private void drawSceneFlash(RenderCanvas c) {
+        StageDefinition.Lightning l = pack.definition.lightning;
+        if (l == null || l.sceneFlash <= 0f) return;
+        float k = lightningFlash();
+        if (k <= 0f) return;
+        c.fillRect(-10f, -10f, VW + 10f, VH + 10f, withAlpha(l.color, Math.round(255f * l.sceneFlash * k)));
     }
 
     // -------------------------------------------------------------- piso
