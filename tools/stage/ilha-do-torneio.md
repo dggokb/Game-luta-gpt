@@ -84,7 +84,8 @@ cenários não precisa gerar essas duas imagens.
   Imperial: a faixa de gente), que pula sozinha e vibra com os golpes; o mar ondula.
 - **Porto, mesma regra**: o cais vai até 1700 (`"ate"`), com o guarda-corpo na borda. O
   terminal (1500, à direita) e o guindaste (1700, à esquerda) ficam no fundo do cais em
-  tamanho real (o terminal ~5 lutadores de altura, o guindaste ~8), um de cada, sem
+  tamanho real (o terminal ~7 lutadores de altura, medido pelo detector de metais da entrada
+  contra um lutador de ~210 no mundo; o guindaste ~8), um de cada, sem
   repetir; os iates e o junco ficam na água, a 2700. Antes o terminal estava a 430 com 2
   lutadores de altura e parecia casa de brinquedo.
 - **Estádio côncavo não se repete.** A arquibancada da Central é a tigela inteira do estádio:
