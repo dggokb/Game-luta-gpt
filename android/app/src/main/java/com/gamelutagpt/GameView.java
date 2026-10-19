@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -85,6 +87,7 @@ public class GameView extends SurfaceView
     private static final String SPEED_KEY = "velocidade";
     /** IMPACTO da pausa (impact frames ligados), salvo junto com a velocidade. */
     private static final String IMPACT_KEY = "impacto";
+    private static final String FPS_KEY = "contadorFps";
     /** Nível da CPU (1 a 8) escolhido na pausa. */
     private static final String CPU_LEVEL_KEY = "nivel_cpu";
 
@@ -499,6 +502,7 @@ public class GameView extends SurfaceView
         storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
+        pausa.setFps(speedPrefs.getBoolean(FPS_KEY, true));
         pausa.setNivelCpu(speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO));
         pausa.setGraficos(new MenuPausa.Graficos() {
             @Override public String rotulo(java.util.function.UnaryOperator<String> traduzir) {
@@ -2644,11 +2648,52 @@ public class GameView extends SurfaceView
 
         try {
             renderFrame(canvas);
+            if (pausa.fps()) drawFpsCounter(canvas);
             perfil.marca(PerfilQuadros.TELA);
         } finally {
             holder.unlockCanvasAndPost(canvas);
             perfil.marca(PerfilQuadros.ENVIO);
         }
+    }
+
+    // Contador de FPS (pausa > FPS): quadros desenhados por segundo, o nível de gráficos e a
+    // altura em que o jogo está desenhando. Conta a cada 0,5 s; o texto só muda aí (sem alocar
+    // por quadro).
+    private static final long FPS_JANELA_NS = 500_000_000L;
+    private long fpsInicio = System.nanoTime();
+    private int fpsQuadros;
+    private float fpsAtual = -1f;
+    private String fpsTexto = "";
+    private final Paint fpsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF fpsCaixa = new RectF();
+
+    private void drawFpsCounter(Canvas canvas) {
+        fpsQuadros++;
+        long agora = System.nanoTime();
+        if (agora - fpsInicio >= FPS_JANELA_NS) {
+            fpsAtual = fpsQuadros * 1e9f / (agora - fpsInicio);
+            fpsQuadros = 0;
+            fpsInicio = agora;
+            String nivel = QualidadeGrafica.NOMES[qualidade.nivel()];
+            if (qualidade.modo() == QualidadeGrafica.Modo.AUTO) nivel = "AUTO " + nivel;
+            fpsTexto = Math.round(fpsAtual) + " FPS  ·  " + nivel + "  ·  " + canvas.getHeight() + "p";
+        }
+        if (fpsAtual < 0f) return;
+        canvas.save();
+        canvas.scale(canvas.getWidth() / VW, canvas.getHeight() / VH);
+        fpsPaint.setTextSize(17f);
+        fpsPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        fpsPaint.setTextAlign(Paint.Align.CENTER);
+        float w = fpsPaint.measureText(fpsTexto) + 22f;
+        float cx = VW * 0.5f, top = VH - 34f;
+        fpsCaixa.set(cx - w * 0.5f, top, cx + w * 0.5f, top + 26f);
+        fpsPaint.setStyle(Paint.Style.FILL);
+        fpsPaint.setColor(0xB0000000);
+        canvas.drawRoundRect(fpsCaixa, 8f, 8f, fpsPaint);
+        // Verde a 55+, amarelo a 45+, vermelho abaixo.
+        fpsPaint.setColor(fpsAtual >= 55f ? 0xFF6CFF7A : fpsAtual >= 45f ? 0xFFFFD84A : 0xFFFF5A5A);
+        canvas.drawText(fpsTexto, cx, top + 19f, fpsPaint);
+        canvas.restore();
     }
 
     private void prepararRostosDoHud(CharacterDefinition... lutadores) {
@@ -4302,6 +4347,9 @@ public class GameView extends SurfaceView
         // A pausa fechou: guarda a VELOCIDADE para a próxima vez que o app abrir.
         if (speedPrefs != null && speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO) != pausa.velocidade()) {
             speedPrefs.edit().putFloat(SPEED_KEY, pausa.velocidade()).apply();
+        }
+        if (speedPrefs != null && speedPrefs.getBoolean(FPS_KEY, true) != pausa.fps()) {
+            speedPrefs.edit().putBoolean(FPS_KEY, pausa.fps()).apply();
         }
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();

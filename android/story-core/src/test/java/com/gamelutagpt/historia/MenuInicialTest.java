@@ -107,7 +107,7 @@ public class MenuInicialTest {
         MenuPausa p = new MenuPausa();
         p.abrir(null, true);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.cursor());
-        float[] menu = MenuPausa.CAIXAS[6];
+        float[] menu = MenuPausa.CAIXAS[7];
         assertNull("o toque que abriu a pausa não escolhe", p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         for (int i = 0; i < 20; i++) p.update(DT);
         assertNull(p.tap(640f, 675f));
@@ -122,9 +122,28 @@ public class MenuInicialTest {
 
         p.abrir(null, false);
         for (int i = 0; i < 20; i++) p.update(DT);
-        for (int i = 0; i < 6; i++) p.mover(1);
+        for (int i = 0; i < 7; i++) p.mover(1);
         assertEquals(MenuPausa.Opcao.MENU, p.confirmar());
         assertNull(p.confirmar());
+    }
+
+    @Test
+    public void pausaLigaEDesligaOContadorDeFps() {
+        MenuPausa p = new MenuPausa();
+        p.abrir(null, false);
+        for (int i = 0; i < 20; i++) p.update(DT);
+        assertTrue("ligado de começo", p.fps());
+        for (int i = 0; i < 6; i++) p.mover(1);
+        assertEquals(MenuPausa.Opcao.FPS, p.cursor());
+        assertNull("troca e a pausa continua", p.confirmar());
+        assertFalse(p.fps());
+        assertTrue(p.ajustar(1));
+        assertTrue(p.fps());
+        float[] caixa = MenuPausa.CAIXAS[6];
+        assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
+        assertFalse(p.fps());
+        assertTrue(p.isOpen());
+        p.render(new PaginaHistoriaTest.NullCanvas());
     }
 
     @Test

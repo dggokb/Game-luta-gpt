@@ -169,8 +169,11 @@ demais por software em telas grandes. A GPU também deixa a cinemática do ultra
 - **Qualidade AUTO** (`QualidadeGrafica`): desce um nível quando a luta fica abaixo de 50 fps por
   2 janelas de 2 s, e agora também **sobe** de novo depois de ~30 s de luta folgada (56+ fps). Se
   sobe e logo não aguenta, não tenta de novo na mesma sessão. O nível aprendido fica salvo.
-- Para medir no aparelho: DEBUG ligado mostra a linha `Quadros` (fps, ms por quadro e por parte);
-  ou `adb logcat -s Quadros`.
+- **Contador de FPS** (pausa > FPS, ligado de começo e salvo): no rodapé, os quadros desenhados por
+  segundo (medidos a cada 0,5 s), o nível de gráficos (AUTO e o nível que ele escolheu, ou o fixo)
+  e a altura em que o jogo está desenhando. Verde a 55+, amarelo a 45+, vermelho abaixo.
+- Para medir no aparelho por partes: DEBUG ligado mostra a linha `Quadros` (fps, ms por quadro e
+  por parte); ou `adb logcat -s Quadros`.
 
 Se precisar aliviar mais: aumentar `FLOOR_STRIP` (faixas do piso), reduzir pétalas e brilhos
 da água, ou usar imagens menores.
