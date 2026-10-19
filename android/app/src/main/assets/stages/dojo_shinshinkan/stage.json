@@ -59,6 +59,22 @@
           "raio": 0.07,
           "cor": "#FFC060",
           "pulsar": 0.08
+        },
+        {
+          "x": 0.259,
+          "y": 0.818,
+          "raio": 0.03,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.739,
+          "y": 0.818,
+          "raio": 0.03,
+          "cor": "#FFC060",
+          "pulsar": 0.08,
+          "reflexo": false
         }
       ]
     },
