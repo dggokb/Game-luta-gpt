@@ -134,7 +134,10 @@ dela (`x`, `y` do canto de cima à esquerda, `largura`, `altura`):
   Campos: `quantidade` (240), `cor`, `perto`/`longe` (−300/2500), `velocidade` (queda, 1500
   unidades/s), `vento` (−120), `comprimento` do risco (70), `espessura` (1,6 px), `alfa`
   (0,5) e `respingos` (quantos ao mesmo tempo, 30; 0 desliga). No modo leve
-  (`setDetalhe(false)`) não chove, como as pétalas. Primeiro uso: Beco do Brucy.
+  (`setDetalhe(false)`) chove menos (uma gota em cada 3, `LIGHT_RAIN_STEP`) e sem respingos:
+  os riscos são linhas finas e pesam pouco, e o cenário de chuva sem chuva perdia a cara (antes
+  o leve tirava a chuva toda, e o AUTO da qualidade descendo para o leve sumia com ela).
+  Primeiro uso: Beco do Brucy.
 
 ## Relâmpagos
 

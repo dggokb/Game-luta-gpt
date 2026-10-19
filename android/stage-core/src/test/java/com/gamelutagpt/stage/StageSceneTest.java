@@ -112,12 +112,18 @@ public class StageSceneTest {
         assertTrue("os riscos de chuva são desenhados", canvas.lines > 120 * 50);
         assertTrue("as gotas que batem no piso respingam", canvas.rings > 0);
 
+        CountingCanvas cheio = new CountingCanvas();
+        scene.update(1f / 60f);
+        scene.drawBackground(cheio);
+        scene.drawForeground(cheio);
         scene.setDetalhe(false);
         CountingCanvas leve = new CountingCanvas();
-        scene.update(1f / 60f);
         scene.drawBackground(leve);
         scene.drawForeground(leve);
-        assertEquals("no modo leve não chove", 0, leve.lines + leve.rings);
+        // No leve chove menos (o cenário de chuva sem chuva perdia a cara), sem respingos.
+        assertTrue("no modo leve ainda chove", leve.lines > 0);
+        assertTrue("mas bem menos: " + leve.lines + " de " + cheio.lines, leve.lines * 2 < cheio.lines);
+        assertEquals("sem respingos", 0, leve.rings);
     }
 
     @Test(expected = IllegalArgumentException.class)

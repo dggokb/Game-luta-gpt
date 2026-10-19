@@ -99,6 +99,8 @@ public final class StageScene {
     private int nextSplash;
     private final Rand rainRand = new Rand(31);
     private static final float SPLASH_LIFE = 0.32f;
+    /** No modo leve só uma gota em cada tantas é desenhada. */
+    static final int LIGHT_RAIN_STEP = 3;
     /** Pontos do anel do respingo, reaproveitados a cada desenho (sem alocar por quadro). */
     private final float[] splashRing = new float[16];
     private float time;
@@ -933,11 +935,13 @@ public final class StageScene {
 
     /** Riscos de chuva inclinados pelo vento; os de longe são finos e apagados. */
     private void drawRain(RenderCanvas c, boolean behind) {
-        if (!detalhe) return;
         StageDefinition.Rain rain = pack.definition.rain;
         if (rain == null) return;
         float slant = rain.wind / rain.speed;
-        for (int i = 0; i < rainX.length; i++) {
+        // No modo leve chove menos (uma gota em cada LIGHT_RAIN_STEP), sem respingos: os riscos
+        // são linhas finas e pesam pouco, e o cenário de chuva sem chuva perdia a cara.
+        int step = detalhe ? 1 : LIGHT_RAIN_STEP;
+        for (int i = 0; i < rainX.length; i += step) {
             float z = rainZ[i];
             if ((z > 0f) != behind || z <= camera.nearestDepth() + 50f) continue;
             float scale = camera.scale(z);
