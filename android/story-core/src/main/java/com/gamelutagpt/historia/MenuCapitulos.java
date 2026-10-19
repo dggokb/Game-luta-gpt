@@ -40,8 +40,8 @@ public final class MenuCapitulos {
 
     static final float VW = PaginaHistoria.VW;
     static final float VH = PaginaHistoria.VH;
-    static final float CARD_W = 270f, CARD_H = 140f, GAP = 30f;
-    static final int POR_LINHA = 4;
+    static final float CARD_W = 228f, CARD_H = 140f, GAP = 18f;
+    static final int POR_LINHA = 5;
     static final float[] CONTINUAR_BOX = {350f, 116f, 930f, 188f};
     static final float[] VOLTAR_BOX = {30f, 640f, 230f, 694f};
     static final float TAP_DELAY = 0.25f;

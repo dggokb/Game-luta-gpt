@@ -26,6 +26,7 @@ final class ArteHistoria {
             case "ceu": top = 0xFF9ED0F0; bottom = 0xFFE8F4FA; break;
             case "chuva": top = 0xFF4B5563; bottom = 0xFF1F2933; break;
             case "carta": top = 0xFF8A5A32; bottom = 0xFF3E2513; break;
+            case "porto": top = 0xFF2A2350; bottom = 0xFFE07A3A; break;
             default: top = 0xFFD9D4C7; bottom = 0xFFA9A49A; break;
         }
         c.fillVerticalGradient(l, t, r, b, top, bottom);
@@ -44,6 +45,15 @@ final class ArteHistoria {
         } else if ("estrada".equals(cena)) {
             c.fillCircle(l + w * 0.5f, t + h * 0.62f, h * 0.18f, 0xFFFFD58A);
             c.fillRect(l, t + h * 0.64f, r, b, 0xFF3B2A40);
+        } else if ("porto".equals(cena)) {
+            // Pôr do sol no mar, a ilha escura à direita e o cais embaixo.
+            float mar = t + h * 0.62f;
+            c.fillCircle(l + w * 0.25f, mar, h * 0.08f, 0xFFFFD58A);
+            float[] ilha = {l + w * 0.45f, mar, l + w * 0.62f, t + h * 0.30f, l + w * 0.72f, t + h * 0.18f,
+                l + w * 0.82f, t + h * 0.28f, r, t + h * 0.36f, r, mar};
+            c.fillPolygon(ilha, 0xFF1A1630);
+            c.fillRect(l, mar, r, b, 0xFF14213D);
+            c.fillRect(l, t + h * 0.82f, r, b, 0xFF2B2B38);
         } else if ("chuva".equals(cena)) {
             rand.reset(11);
             for (int i = 0; i < 60; i++) {

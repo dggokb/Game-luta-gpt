@@ -1,0 +1,200 @@
+{
+  "nome": "Porto Secreto",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#0E1236",
+  "camadas": [
+    {
+      "id": "ceu",
+      "imagem": "ceu.jpg",
+      "profundidade": 100000,
+      "topo": -0.75,
+      "base": 0.42,
+      "x": 0.5,
+      "repetir": "espelhar",
+      "corAcima": "#0E1236"
+    },
+    {
+      "id": "mar",
+      "imagem": "mar.png",
+      "profundidade": 9000,
+      "topo": 0.133,
+      "base": 0.8,
+      "x": 0.58,
+      "repetir": "espelhar"
+    },
+    {
+      "id": "penhascos",
+      "imagem": "penhascos.png",
+      "profundidade": 6500,
+      "topo": 0.17,
+      "base": 0.45,
+      "x": 1.08,
+      "repetir": "nao"
+    },
+    {
+      "id": "neblina-mar",
+      "tipo": "neblina",
+      "profundidade": 6000,
+      "topo": 0.34,
+      "base": 0.46,
+      "cor": "#4A3A78",
+      "alfa": 0.3
+    },
+    {
+      "id": "ilha",
+      "imagem": "ilha.png",
+      "profundidade": 5000,
+      "topo": -0.03,
+      "base": 0.46,
+      "x": 0.68,
+      "repetir": "nao",
+      "luzes": [
+        { "x": 0.66, "y": 0.06, "raio": 0.05, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.45, "y": 0.33, "raio": 0.06, "cor": "#FFB050", "pulsar": 0.06, "reflexo": false }
+      ]
+    },
+    {
+      "id": "porto",
+      "tipo": "agua",
+      "perto": 660,
+      "longe": 9000,
+      "corPerto": "#081428",
+      "corLonge": "#1B2450",
+      "alfa": 0.35,
+      "brilhos": 70
+    },
+    {
+      "id": "barcos",
+      "imagem": "barcos.png",
+      "profundidade": 1400,
+      "noChao": true,
+      "altura": 0.17,
+      "x": 0.42,
+      "repetir": "repetir",
+      "periodo": 1.4,
+      "reflexo": 0.35,
+      "luzes": [
+        { "x": 0.13, "y": 0.72, "raio": 0.12, "cor": "#FFD08A", "pulsar": 0.04 },
+        { "x": 0.45, "y": 0.73, "raio": 0.1, "cor": "#FFD08A", "pulsar": 0.04 },
+        { "x": 0.68, "y": 0.88, "raio": 0.1, "cor": "#FFB060", "pulsar": 0.06 }
+      ]
+    },
+    {
+      "id": "neblina-porto",
+      "tipo": "neblina",
+      "profundidade": 1100,
+      "topo": 0.44,
+      "base": 0.6,
+      "cor": "#2C2450",
+      "alfa": 0.25
+    },
+    {
+      "id": "grade",
+      "imagem": "grade.png",
+      "profundidade": 650,
+      "noChao": true,
+      "altura": 0.12,
+      "repetir": "espelhar",
+      "luzes": [
+        { "x": 0.053, "y": 0.256, "raio": 0.35, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.5, "y": 0.253, "raio": 0.35, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.949, "y": 0.252, "raio": 0.35, "cor": "#FFB45A", "pulsar": 0.06 }
+      ]
+    },
+    {
+      "id": "guindaste",
+      "imagem": "guindaste.png",
+      "profundidade": 520,
+      "noChao": true,
+      "altura": 0.62,
+      "x": 0.84,
+      "repetir": "repetir",
+      "periodo": 2.6,
+      "luzes": [
+        { "x": 0.884, "y": 0.2, "raio": 0.025, "cor": "#FFB050", "pulsar": 0.1, "reflexo": false },
+        { "x": 0.673, "y": 0.251, "raio": 0.025, "cor": "#FFB050", "pulsar": 0.1, "reflexo": false },
+        { "x": 0.48, "y": 0.298, "raio": 0.025, "cor": "#FFB050", "pulsar": 0.1, "reflexo": false },
+        { "x": 0.298, "y": 0.687, "raio": 0.03, "cor": "#FF5A3C", "pulsar": 0.3 }
+      ]
+    },
+    {
+      "id": "terminal",
+      "imagem": "terminal.png",
+      "profundidade": 430,
+      "noChao": true,
+      "altura": 0.5,
+      "x": -1.0,
+      "repetir": "repetir",
+      "periodo": 2.6,
+      "luzes": [
+        { "x": 0.5, "y": 0.75, "raio": 0.14, "cor": "#FFC070", "pulsar": 0.04 },
+        { "x": 0.238, "y": 0.233, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.762, "y": 0.233, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.08, "reflexo": false },
+        { "x": 0.115, "y": 0.733, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.884, "y": 0.734, "raio": 0.04, "cor": "#FFB45A", "pulsar": 0.06 },
+        { "x": 0.435, "y": 0.68, "raio": 0.04, "cor": "#4AA8FF", "pulsar": 0.2, "reflexo": false },
+        { "x": 0.565, "y": 0.68, "raio": 0.04, "cor": "#4AA8FF", "pulsar": 0.2, "reflexo": false }
+      ]
+    },
+    {
+      "id": "postes",
+      "imagem": "poste.png",
+      "profundidade": 300,
+      "noChao": true,
+      "altura": 0.66,
+      "x": 0.04,
+      "repetir": "repetir",
+      "periodo": 0.95,
+      "luzes": [
+        { "x": 0.34, "y": 0.15, "raio": 0.05, "cor": "#FFC878", "pulsar": 0.05 }
+      ],
+      "bandeiras": [
+        { "imagem": "bandeira_poste.png", "x": 0.4793, "y": 0.2999, "largura": 0.4275, "altura": 0.41 }
+      ]
+    },
+    {
+      "id": "caixas",
+      "imagem": "caixas.png",
+      "profundidade": 170,
+      "noChao": true,
+      "altura": 0.17,
+      "x": 0.8,
+      "repetir": "espelhar",
+      "periodo": 1.6
+    },
+    {
+      "id": "frente-caixas",
+      "imagem": "frente_esq.png",
+      "profundidade": -250,
+      "noChao": true,
+      "altura": 0.3,
+      "x": 0.04,
+      "repetir": "repetir",
+      "periodo": 1.9,
+      "alfa": 0.95
+    },
+    {
+      "id": "frente-cabeco",
+      "imagem": "frente_dir.png",
+      "profundidade": -250,
+      "noChao": true,
+      "altura": 0.24,
+      "x": 0.97,
+      "repetir": "repetir",
+      "periodo": 1.9,
+      "alfa": 0.95
+    }
+  ],
+  "chao": {
+    "imagem": "chao.jpg",
+    "imagemLajotas": "chao_cais.jpg",
+    "perto": -600,
+    "longe": 650,
+    "centroX": 700,
+    "reflexoLutadores": 0.28,
+    "reflexoLuzes": 0.6
+  }
+}

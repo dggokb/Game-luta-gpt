@@ -86,7 +86,7 @@ dentro de `historia/`. A conversa fica na pasta do episódio:
 
 ```json
 { "tipo": "luta", "rotulo": "SEMIFINAL", "dupla": ["player_base", "p02"], "cpu": ["p05", "p06"],
-  "conversa": "ep05/conversa_semifinal.json" }
+  "conversa": "ep06/conversa_semifinal.json" }
 ```
 
 ```json

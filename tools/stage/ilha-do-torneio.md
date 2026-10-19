@@ -9,12 +9,12 @@ estandartes vermelhos. Os concepts estão em `art/concepts/cenarios/` (vieram do
 
 | Nº no mapa | Cenário (`id`) | Concept | Luta |
 | --- | --- | --- | --- |
-| 1 | Porto Secreto (`porto_secreto`) | `porto_secreto.jpg` | episódio novo da chegada à ilha: alguém desafia o jogador antes do torneio |
-| 2 | Arena Costeira (`arena_costeira`) | `arena_costeira.jpg` | QUARTAS DE FINAL (ep03) |
-| 3 | Arena Imperial (`arena_imperial`) | `arena_imperial.jpg` | SEMIFINAL (ep05) |
-| 4 | Caminho dos Penhascos (`caminho_penhascos`) | `caminho_penhascos.jpg` | EMBOSCADA (ep04) |
-| 5 | Arena Central (`arena_central`) | `arena_central.jpg` | FINAL 2x2 (ep06) |
-| 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep07) |
+| 1 | Porto Secreto (`porto_secreto`), **pronto** | `porto_secreto.jpg` | DESAFIO (ep03, A Chegada): p07 + p08 desafiam o jogador no cais, antes do torneio |
+| 2 | Arena Costeira (`arena_costeira`) | `arena_costeira.jpg` | QUARTAS DE FINAL (ep04) |
+| 3 | Arena Imperial (`arena_imperial`) | `arena_imperial.jpg` | SEMIFINAL (ep06) |
+| 4 | Caminho dos Penhascos (`caminho_penhascos`) | `caminho_penhascos.jpg` | EMBOSCADA (ep05) |
+| 5 | Arena Central (`arena_central`) | `arena_central.jpg` | FINAL 2x2 (ep07) |
+| 6 | Arena VIP (`arena_vip`) | `arena_vip.jpg` | "Final da Tag": o DUELO FINAL 1x1 entre os parceiros, a regra escondida (ep08) |
 | 7 | Arena do Templo (`arena_templo`) | `arena_templo.jpg` | o Campeão, Takatoshi (chefe final) |
 
 O caminho sobe a ilha: o porto fica no pé, as arenas vão subindo pelos penhascos e o
@@ -63,7 +63,8 @@ melhor não) pôr na arte. As **cachoeiras** são da arte (o jogo não anima cac
 ## Peças comuns da ilha
 
 Geradas **uma vez** e copiadas para a pasta de cada cenário. Assim o céu, o mar e os
-penhascos são os mesmos em toda a ilha.
+penhascos são os mesmos em toda a ilha. No Drive ficam em `cenarios/torneio/` (soltas na
+pasta; cada cenário tem a sua subpasta, como `cenarios/torneio/porto_secreto/`).
 
 | Arquivo | Formato | Fundo | Prompt |
 | --- | --- | --- | --- |
@@ -83,7 +84,8 @@ e, lá no fundo, a ilha inteira acesa subindo até o templo.
 Composição (profundidades sugeridas): caixas 150, postes 300, terminal 420 (à esquerda),
 guindaste 900, grade do cais 650 (fim do piso), água 650 a 2600 (`agua`, com brilhos e o
 reflexo dos barcos), barcos 1400, ilha 5000, `mar.png` 9000, `ceu.jpg`. Piso molhado:
-`reflexoLutadores` ~0,3, `reflexoLuzes` ~0,6.
+`reflexoLutadores` ~0,3, `reflexoLuzes` ~0,6. Como ficou de verdade: veja as notas no fim
+desta seção.
 
 | Arquivo | Formato | Fundo | Prompt |
 | --- | --- | --- | --- |
@@ -106,6 +108,35 @@ Dicas do porto:
   barcos (`reflexo` na camada dos barcos).
 - O detector de metais do terminal é a "segurança" da chegada: combina com a cena do
   desafio (o adversário pode estar esperando logo depois dos pórticos).
+
+### Notas do Porto Secreto
+
+As imagens do GPT passam pelo `montar_porto.py`, com a pasta das peças comuns e a do porto:
+
+```bash
+pip install pillow numpy
+python tools/stage/montar_porto.py --comum pasta/torneio --entrada pasta/torneio/porto_secreto
+```
+
+- **Piso**: o `chao.png` e o `chao_cais.png` vieram certos (de cima, as faixas amarelas
+  nas mesmas linhas nas duas), mas o GPT refez o concreto na edição. Como no Beco do
+  Brucy, o `chao_cais` vira a peça que se repete, com as bordas fundidas, e o emblema do
+  `chao.png` é colado no centro com borda suave. O piso vai de −600 a 650 (a grade).
+- **Grade**: veio com a lateral do cais (concreto e pneus) embaixo do guarda-corpo. Essa
+  lateral fica de costas para a câmera e é cortada.
+- **Ilha**: não se repete (é uma só, à direita do sol). As bordas dos lados e a névoa de
+  baixo são esfumadas, senão o corte reto aparecia contra o mar. Atrás dela, à direita,
+  os `penhascos.png` continuam a ilha.
+- **Mar e céu**: o `mar.png` desce até 0,8 da tela (no super pulo aparece mar, e não um
+  vazio) com o horizonte em 0,40, e o reflexo do sol fica embaixo do sol do `ceu.jpg`.
+  A água do porto (`agua`, de 660 a 9000) só põe os brilhos e o reflexo dos barcos.
+- **Composição** (profundidades): caixas 170, postes 300 (com o estandarte balançando:
+  `bandeira_poste.png`, separado pelo `separar_bandeiras.py`), terminal 430 e guindaste
+  520 em cima do cais (alternando a cada 2,6 telas: o guindaste à direita na câmera de
+  repouso, o terminal aparece quando a câmera anda), grade 650, barcos 1400 (com reflexo),
+  ilha 5000, penhascos 6500, mar 9000, céu. Primeiro plano: as caixas e o cabeço com a
+  luminária, desfocados, a −250.
+- O ep03 (A Chegada) usa este cenário na luta DESAFIO, e ele entra no sorteio do Arcade.
 
 ## 2. Arena Costeira (`arena_costeira`): quartas
 
@@ -285,10 +316,10 @@ escadaria do `templo.png` podem vir na arte (são pequenas e distantes, quase n�
 
 ## Ordem sugerida
 
-1. As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.
+1. ~~As peças comuns (céu, mar, penhascos, estandarte): aparecem em todos.~~ Prontas, no Drive.
 2. Arena Costeira e Caminho dos Penhascos: são as primeiras lutas da ilha (quartas e
    emboscada) e trocam o Templo da Lua, que hoje é o cenário padrão do torneio.
-3. Porto Secreto, junto com o episódio da chegada.
+3. ~~Porto Secreto, junto com o episódio da chegada.~~ Pronto (ep03).
 4. Imperial, Central e VIP, na ordem da chave.
 5. Arena do Templo, quando o Takatoshi virar lutador.
 

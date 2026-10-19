@@ -35,7 +35,7 @@ public class NivelCpuTest {
     }
 
     @Test
-    public void historiaDeCadaIrmaoTemSeteLutasDo5Ao8() throws IOException {
+    public void historiaDeCadaIrmaoTemOitoLutasDo5Ao8() throws IOException {
         GameAssets assets = new GameAssets();
         Temporada t = Temporada.load(assets);
         List<Episodio> eps = new ArrayList<>();
@@ -52,8 +52,8 @@ public class NivelCpuTest {
             }
             int[] got = new int[niveis.size()];
             for (int i = 0; i < got.length; i++) got[i] = niveis.get(i);
-            // Treino do ep01, convite, quartas, emboscada, semifinal, final e o duelo.
-            assertArrayEquals(irmao, new int[] {5, 5, 6, 6, 7, 7, 8}, got);
+            // Treino do ep01, convite, desafio no porto, quartas, emboscada, semifinal, final e o duelo.
+            assertArrayEquals(irmao, new int[] {5, 5, 5, 6, 6, 7, 7, 8}, got);
         }
         // O treino-tutorial do Prólogo não conta (não tem IA).
         Episodio prologo = eps.get(0);

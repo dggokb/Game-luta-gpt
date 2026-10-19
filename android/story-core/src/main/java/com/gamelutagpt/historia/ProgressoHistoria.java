@@ -33,10 +33,15 @@ public final class ProgressoHistoria {
         }
     }
 
-    /** Versão do save. A 1 é de antes do ep02 "O Parceiro" (o torneio começava no ep02). */
-    static final int VERSAO = 2;
+    /**
+     * Versão do save. A 1 é de antes do ep02 "O Parceiro" (o torneio começava no ep02); a 2,
+     * de antes do ep03 "A Chegada" (o torneio começava no ep03).
+     */
+    static final int VERSAO = 3;
     /** Onde o ep02 "O Parceiro" entrou: nos saves da versão 1, daqui em diante os índices andam um. */
     static final int EPISODIO_NOVO_V2 = 2;
+    /** Onde o ep03 "A Chegada" entrou: nos saves até a versão 2, daqui em diante os índices andam um. */
+    static final int EPISODIO_NOVO_V3 = 3;
 
     private final long semente;
     private int atual;
@@ -138,7 +143,9 @@ public final class ProgressoHistoria {
                         Episodio.number(f, "disputadas", -1).intValue()));
                 }
             }
-            if (Episodio.number(map, "versao", 1).intValue() < 2) p.migrarDaVersao1();
+            int versao = Episodio.number(map, "versao", 1).intValue();
+            if (versao < 2) p.inserirEpisodio(EPISODIO_NOVO_V2);
+            if (versao < 3) p.inserirEpisodio(EPISODIO_NOVO_V3);
             return p;
         } catch (RuntimeException ex) {
             return new ProgressoHistoria(sementeNova);
@@ -146,14 +153,18 @@ public final class ProgressoHistoria {
     }
 
     /**
-     * Save da versão 1: o ep02 "O Parceiro" ainda não existia, e O Sorteio e o resto do torneio
-     * eram um episódio antes. Sem isso, a campanha restaurada no "O Sorteio" já viria com as
-     * quartas disputadas (a emboscada some e as rodadas chegam adiantadas). Quem parou no
-     * começo do antigo ep02 joga O Parceiro (a campanha é a mesma: irmão escolhido, chave sem
-     * rodadas); quem já estava no torneio continua no mesmo episódio de antes.
+     * Save de antes de um episódio novo entrar no meio da temporada, na posição {@code novo}:
+     * daí em diante os episódios eram um antes. Sem isso, a campanha restaurada já viria com
+     * rodadas adiantadas (a emboscada some). Quem parou no começo do episódio que agora vem
+     * depois do novo joga o novo (a campanha no começo dos dois é a mesma); quem já tinha
+     * passado dele continua no mesmo episódio de antes.
+     *
+     * <ul>
+     *   <li>Versão 1: o ep02 "O Parceiro" ainda não existia ({@link #EPISODIO_NOVO_V2}).</li>
+     *   <li>Versão 2: o ep03 "A Chegada" ainda não existia ({@link #EPISODIO_NOVO_V3}).</li>
+     * </ul>
      */
-    private void migrarDaVersao1() {
-        int novo = EPISODIO_NOVO_V2;
+    private void inserirEpisodio(int novo) {
         Map<Integer, Foto> antigas = new TreeMap<>(fotos);
         fotos.clear();
         for (Map.Entry<Integer, Foto> e : antigas.entrySet()) {
@@ -162,7 +173,7 @@ public final class ProgressoHistoria {
                 fotos.put(ep, e.getValue());
             } else {
                 fotos.put(ep + 1, e.getValue());
-                // O começo do Parceiro é igual ao começo do antigo ep02.
+                // O começo do episódio novo é igual ao começo do que veio depois dele.
                 if (ep == novo) fotos.put(ep, e.getValue());
             }
         }
