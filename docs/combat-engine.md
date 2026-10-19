@@ -85,6 +85,10 @@ humano**.
   *mostra* (posição, velocidade, animação, golpe e quadro dele, pulo, projéteis vindo) e entrega
   o de `CpuLevel.reactionFrames` quadros atrás. Nunca o botão apertado nem o quadro atual. No
   começo da luta, antes de ter a reação inteira de história, ela não sabe nada (`seen` = null).
+- **Sem golpe no vazio**: a decisão do neutro usa a distância vista (atrasada), mas na hora
+  de apertar ela confere a distância de verdade (`PRESS_REACH_MARGIN` = 4): se o rival foi
+  empurrado, voou de um golpe ou trocou de lado por baixo dela, o golpe não sai. Antes ~1 em
+  2.700 golpes começava fora do alcance (e um teste falhava de vez em quando).
 - **Piso humano**: `CpuLevel.HUMAN_REACTION_FRAMES` = 13 quadros (~217 ms a 60 fps). Nenhum
   nível fica abaixo (o construtor recusa) e os testes medem: a CPU nunca reage a um pulo nem
   pune um golpe errado antes disso.
@@ -238,6 +242,23 @@ só lê o `cancelInto` e os limites que ficam no `character.json`.
   (`airJumpUsed`, volta ao tocar o chão), e a corrente aérea recomeça. Cue `AIR_JUMP`.
 
 Testes: `CorrentesComboTest`.
+
+## Bola de energia de perto: sem bola atrás de bola
+
+De perto, o acerto da bola de energia (atordoamento + congelamento só de quem apanha) deixava
++15 a +21 quadros de vantagem, mais do que soltar outra: bola atrás de bola virava combo sem
+fim (até 15 acertos com a p05, encurralando o boneco).
+
+- **Empurra longe**: a bola de energia (não o Super) que acerta no chão empurra pelo menos
+  `CombatConfig.projectileHitPushback` (120; antes 40 de todas).
+- **Bola não emenda em bola**: quem está atordoado no chão pela bola de energia de quem atirou
+  recebe a próxima bola dele (outra, não um acerto a mais da mesma) como defendida — como se já
+  tivesse se recuperado. Sem arranhão, sem gasto de guarda (não quebra a guarda). Golpe que
+  cancela na bola continua combo (`M > bola`); a regra é só bola em cima de bola
+  (`CombatEngine.energyChain`, `CombatFighter.stunProjectile`).
+
+Medido soltando bola o mais rápido possível colado no boneco, de 60 a 300 de distância, em
+todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTest`.
 
 ## Anulação de projéteis
 

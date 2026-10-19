@@ -349,7 +349,7 @@ public class CpuTest {
             for (int i = 0; i < 30; i++) f.step();   // a CPU passa a ver a luta
             // Espera um momento em que a CPU está livre e parada perto (ela ataca bastante no
             // neutro): o erro do jogador tem que aparecer com ela sem golpe na tela.
-            for (int i = 0; i < 240 && !livreParaPunir(f); i++) f.step();
+            for (int i = 0; i < 600 && !livreParaPunir(f); i++) f.step();
             if (!livreParaPunir(f)) continue;
             f.player.heavy = true;
             boolean valid = true;

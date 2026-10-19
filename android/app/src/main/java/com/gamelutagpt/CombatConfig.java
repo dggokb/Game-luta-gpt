@@ -56,6 +56,12 @@ final class CombatConfig {
 
     /** Pushback and knockback are spread over this many frames. */
     int pushbackFrames = 8;
+    /**
+     * Bola de energia que acerta no chão empurra pelo menos isto: de perto, a vantagem do
+     * acerto (atordoamento + congelamento só de quem apanha) passava do tempo de soltar outra,
+     * e bola atrás de bola virava combo infinito. Longe, a próxima precisa viajar e não entra.
+     */
+    float projectileHitPushback = 120f;
     /** After a LAUNCH hit, a jump becomes a super jump for this many frames. */
     int launcherChaseFrames = 54;
     /**

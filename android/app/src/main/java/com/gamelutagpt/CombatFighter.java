@@ -156,6 +156,8 @@ final class CombatFighter {
     int breakerMediumAge = -1, breakerHeavyAge = -1;
     /** Quadros em que quem quebrou o combo ainda corre sozinho até quem foi jogado para longe. */
     int breakerChase;
+    /** A bola de energia (não Super) cujo acerto o segura no atordoamento agora, ou null. */
+    Projectile stunProjectile;
     /** Set by the shell while a tag animation owns the fighter. */
     boolean locked;
 

@@ -465,12 +465,22 @@ final class AiController {
         out.superAttack = superAttack;
         out.grab = grab;
         if (special != null) out.special = special;
+        // O dedo já está no botão: com o rival de fato fora do alcance (a distância que ela viu
+        // é a de antes da reação, e nesse meio tempo ele foi empurrado, voou de um golpe ou
+        // trocou de lado por baixo dela), ela não solta o golpe no vazio.
+        if (attack != null && !CombatRules.reaches(me.character(), attack, !me.grounded,
+            Math.abs(target.x - me.x) + PRESS_REACH_MARGIN, target.body())) {
+            attack = null;
+        }
         if (attack != null) {
             startRoute(me.character(), attack);
             press(attack, me, out);
             lastReason = "neutro";
         }
     }
+
+    /** Folga da conferência na hora de apertar: o quadro que o golpe leva para começar, andando. */
+    static final float PRESS_REACH_MARGIN = 4f;
 
     // ---------------------------------------------------------------- defesa
 

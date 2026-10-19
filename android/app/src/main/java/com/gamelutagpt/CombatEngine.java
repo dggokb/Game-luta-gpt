@@ -1418,6 +1418,7 @@ final class CombatEngine {
             } else {
                 // Remaining hitstun is spent on the ground.
                 f.status = CombatFighter.Status.HITSTUN;
+                f.stunProjectile = null;
                 f.hitCrouching = false;
                 f.launched = false;
             }
@@ -1588,6 +1589,7 @@ final class CombatEngine {
         a.comboBroke = false;
         a.clearAttack();
         a.status = a.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        a.stunProjectile = null;
         a.hitCrouching = false;
         a.stunLeft = a.stunTotal = config.comboBreakerStunFrames;
         a.stunElapsed = 0;
@@ -2247,6 +2249,7 @@ final class CombatEngine {
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.hitCrouching = wasCrouching;
         d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
         d.stunElapsed = 0;
@@ -2463,6 +2466,7 @@ final class CombatEngine {
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.vy = 0f;
         int untilBlast = config.ultraBeamBlastFrame(a.beamHits) - a.ultraFrame;
         d.stunLeft = d.stunTotal = Math.max(d.stunLeft, untilBlast + config.ultraBeamHitInterval * 2);
@@ -2472,6 +2476,7 @@ final class CombatEngine {
     /** The defender flies away and lands knocked down. */
     private void launchUltraVictim(CombatFighter a, CombatFighter d) {
         d.status = CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.grounded = false;
         d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
         d.vy = -config.ultraLaunchSpeed;
@@ -2583,6 +2588,23 @@ final class CombatEngine {
         }
 
         int guard = effectiveGuard(d);
+        if (energyChain(c, d)) {
+            // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
+            // a próxima bola dele chega como se ele já tivesse se recuperado e defendido (sem
+            // arranhão nem gasto de guarda: ele não escolheu defender).
+            d.status = CombatFighter.Status.BLOCKSTUN;
+            d.clearAttack();
+            d.stunLeft = d.stunTotal = attack.blockstunFrames;
+            d.stunElapsed = 0;
+            d.lastGuard = d.crouchingBody() ? CombatFighter.GUARD_LOW : CombatFighter.GUARD_HIGH;
+            d.framesSinceBlock = 0;
+            d.stunProjectile = null;
+            push(d, a, direction * attack.pushbackOnBlock);
+            freeze(a, d, attack.hitstopFrames, projectile);
+            events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
+            if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
+            return;
+        }
         if (guardStops(guard, attack, !a.grounded, projectile)) {
             block(a, d, attack, guard, direction, projectile, !lastStrike,
                 multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(attack, base));
@@ -2616,6 +2638,9 @@ final class CombatEngine {
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
         float hitPush = lastStrike ? attack.pushbackOnHit : attack.pushbackOnHit * config.strikeHoldPushback;
+        if (projectile && lastStrike && attack.kind != AttackDefinition.Kind.SUPER) {
+            hitPush = Math.max(hitPush, config.projectileHitPushback);
+        }
         float airPush = lastStrike ? attack.knockback : attack.knockback * config.strikeHoldPushback;
         // Later strikes of the same move keep the scale of its first strike.
         int damage = firstStrike ? session.registerHit(attack, raw, config) : session.registerFollowUp(raw);
@@ -2638,6 +2663,7 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
+        d.stunProjectile = projectile && attack.kind != AttackDefinition.Kind.SUPER && !c.echo ? c.projectile : null;
         // A new hit takes over any flight in progress (and any free fall after the hitstun).
         d.freeFallFrames = 0;
         d.vx = 0f;
@@ -2781,6 +2807,20 @@ final class CombatEngine {
         return false;
     }
 
+    /**
+     * Bola de energia de quem atirou chegando em quem ainda está atordoado por outra bola dele
+     * (não a mesma, que pode ter vários acertos): não emenda. De perto o acerto da bola deixava
+     * tempo de soltar outra, e bola atrás de bola era um combo sem fim.
+     */
+    private static boolean energyChain(Contact c, CombatFighter d) {
+        if (c.projectile == null || c.echo || c.attack.kind == AttackDefinition.Kind.SUPER ||
+            d.status != CombatFighter.Status.HITSTUN || !d.grounded) {
+            return false;
+        }
+        Projectile before = d.stunProjectile;
+        return before != null && before != c.projectile && before.ownerIndex == c.projectile.ownerIndex;
+    }
+
     /** Hitstop of a strike before the last: shorter, the move keeps its rhythm. */
     private static int holdingHitstop(AttackDefinition attack) {
         return Math.max(3, attack.hitstopFrames * 2 / 3);
@@ -2842,6 +2882,7 @@ final class CombatEngine {
     private void guardBreak(CombatFighter a, CombatFighter d, boolean projectile) {
         d.state.guard = CombatConfig.GUARD_MAX;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.hitCrouching = false;
         d.stunLeft = d.stunTotal = config.guardBreakStunFrames;
         d.stunElapsed = 0;
