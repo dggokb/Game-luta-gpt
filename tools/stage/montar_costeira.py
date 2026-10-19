@@ -14,8 +14,9 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   isso, cada emenda ficava com um degrau de luz): é o chao_liso.jpg. O chao.jpg é o mesmo, com o círculo vermelho e o emblema do
   chao.png colados no centro (as duas imagens têm a mesma grade de lajotas).
 - Encosta: a borda da direita e a névoa de baixo são esfumadas, como a ilha do porto.
-- Primeiro plano: frente_esq.png (grua de câmera) e frente_dir.png (vaso e corrimão de
-  vidro) são desfocados, como no Beco do Brucy.
+- Sem primeiro plano: o frente_esq.png (grua de câmera) e o frente_dir.png (vaso e
+  corrimão de vidro) ficavam soltos no ar, borrados, e com a câmera afastada o corrimão
+  aparecia no meio do ringue. São ignorados.
 
 Grava em android/app/src/main/assets/stages/arena_costeira/ sem mexer no stage.json.
 """
@@ -33,7 +34,6 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_brucy import desfocar  # noqa: E402
 from montar_porto import COMUNS, esfumar_ilha, imagens  # noqa: E402
 
 ID = "arena_costeira"
@@ -108,9 +108,9 @@ def main():
     # Nomes como vieram do Drive.
     if "mar" not in comum and "maar" in comum:
         comum["mar"] = comum.pop("maar")
-    if "frente_dir" not in entrada and "frent_dir" in entrada:
+    if "frent_dir" in entrada:
         entrada["frente_dir"] = entrada.pop("frent_dir")
-    for falta in ("chao", "chao_liso", "frente_esq", "frente_dir", "arquibancada", "barreira", "holofote", "encosta"):
+    for falta in ("chao", "chao_liso", "arquibancada", "barreira", "holofote", "encosta"):
         if falta not in entrada:
             sys.exit(f"faltou {falta}.png em {args.entrada}")
     for falta in COMUNS:
@@ -129,7 +129,7 @@ def main():
             if nome in ("chao", "chao_liso"):
                 continue
             if nome in ("frente_esq", "frente_dir"):
-                desfocar(Image.open(arquivo), tmp, nome)
+                print(f"{arquivo.name} ignorado: a arena fica sem primeiro plano")
                 continue
             img = Image.open(arquivo)
             if nome == "encosta":

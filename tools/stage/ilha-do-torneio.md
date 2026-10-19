@@ -56,6 +56,11 @@ contra as luzes, sem rostos e sem detalhes". Nada de gente nas peças perto da c
 (pilares, braseiros, primeiro plano): ficaria parada e grande demais. Se um dia a plateia
 de perto for animada, ela entra como `ator` (veja `docs/tutorial-plateia.md`).
 
+**Primeiro plano**: nos cenários abertos da ilha, objetos colados na câmera (`frente_esq`,
+`frente_dir`) não funcionaram: borrados e sem onde se apoiar, com a câmera afastada eles
+aparecem soltos no meio do piso. O porto e a Arena Costeira ficaram sem eles; nos próximos
+cenários não precisa gerar essas duas imagens.
+
 O jogo faz: fogo dos braseiros, brilho das lanternas e holofotes, reflexo no piso
 molhado, a água das piscinas e do mar (brilhos), neblina, folhas caindo. Não precisa (e é
 melhor não) pôr na arte. As **cachoeiras** são da arte (o jogo não anima cachoeira).
@@ -134,8 +139,10 @@ python tools/stage/montar_porto.py --comum pasta/torneio --entrada pasta/torneio
   `bandeira_poste.png`, separado pelo `separar_bandeiras.py`), terminal 430 e guindaste
   520 em cima do cais (alternando a cada 2,6 telas: o guindaste à direita na câmera de
   repouso, o terminal aparece quando a câmera anda), grade 650, barcos 1400 (com reflexo),
-  ilha 5000, penhascos 6500, mar 9000, céu. Primeiro plano: as caixas e o cabeço com a
-  luminária, desfocados, a −250.
+  ilha 5000, penhascos 6500, mar 9000, céu.
+- **Sem primeiro plano**: as caixas e o cabeço com a luminária (`frente_esq`, `frente_dir`)
+  ficavam a −250, desfocados, mas com a câmera afastada apareciam soltos no meio do cais.
+  O script ignora os dois; as caixas de trás (a 170) continuam.
 - O ep03 (A Chegada) usa este cenário na luta DESAFIO, e ele entra no sorteio do Arcade.
 
 ## 2. Arena Costeira (`arena_costeira`): quartas
@@ -163,8 +170,7 @@ encosta 2200 (só à direita, sem repetir), `penhascos.png` 4000, `mar.png` 9000
 
 ### Notas da Arena Costeira
 
-As imagens do GPT passam pelo `montar_costeira.py` (o `frent_dir.png` do Drive é aceito
-como `frente_dir.png`):
+As imagens do GPT passam pelo `montar_costeira.py`:
 
 ```bash
 pip install pillow numpy
@@ -185,8 +191,11 @@ python tools/stage/montar_costeira.py --comum pasta/torneio --entrada pasta/torn
   na câmera de repouso), mureta 600 (fim do piso), arquibancada 900 (baixa, 0,2 da tela:
   por cima dela aparecem o mar, os rochedos e o pôr do sol), holofotes 1050 (atrás da
   arquibancada, com a cabeça de luz acesa), encosta 2600 (à direita, sem repetir),
-  penhascos 6500, mar 9000 (com brilhos), céu. Primeiro plano: a grua de câmera e o vaso
-  com o corrimão de vidro, desfocados, a −250.
+  penhascos 6500, mar 9000 (com brilhos), céu.
+- **Sem primeiro plano**: a grua de câmera e o vaso com o corrimão de vidro ficavam soltos
+  no ar, borrados, e com a câmera afastada o corrimão aparecia no meio do ringue. Ficaram
+  de fora (o script ignora `frente_esq` e `frente_dir`). Numa arena aberta, com o piso
+  inteiro à mostra, objeto colado na câmera não tem onde se apoiar.
 - O ep04 usa este cenário nas QUARTAS DE FINAL (`"cenario": "arena_costeira"` no passo da
   luta do torneio), e ele entra no sorteio do Arcade.
 

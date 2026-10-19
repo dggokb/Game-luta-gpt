@@ -125,28 +125,6 @@
       "luzes": [
         { "x": 0.5, "y": 0.078, "raio": 0.07, "cor": "#FFF0C8", "pulsar": 0.03 }
       ]
-    },
-    {
-      "id": "frente-grua",
-      "imagem": "frente_esq.png",
-      "profundidade": -250,
-      "noChao": true,
-      "altura": 0.4,
-      "x": 0.02,
-      "repetir": "repetir",
-      "periodo": 2.3,
-      "alfa": 0.95
-    },
-    {
-      "id": "frente-corrimao",
-      "imagem": "frente_dir.png",
-      "profundidade": -250,
-      "noChao": true,
-      "altura": 0.26,
-      "x": 0.97,
-      "repetir": "repetir",
-      "periodo": 2.3,
-      "alfa": 0.95
     }
   ],
   "chao": {

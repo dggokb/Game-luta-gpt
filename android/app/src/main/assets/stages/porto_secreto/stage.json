@@ -164,28 +164,6 @@
       "x": 0.8,
       "repetir": "espelhar",
       "periodo": 1.6
-    },
-    {
-      "id": "frente-caixas",
-      "imagem": "frente_esq.png",
-      "profundidade": -250,
-      "noChao": true,
-      "altura": 0.3,
-      "x": 0.04,
-      "repetir": "repetir",
-      "periodo": 1.9,
-      "alfa": 0.95
-    },
-    {
-      "id": "frente-cabeco",
-      "imagem": "frente_dir.png",
-      "profundidade": -250,
-      "noChao": true,
-      "altura": 0.24,
-      "x": 0.97,
-      "repetir": "repetir",
-      "periodo": 1.9,
-      "alfa": 0.95
     }
   ],
   "chao": {

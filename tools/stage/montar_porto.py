@@ -13,8 +13,8 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   emblema vem do chao.png (as faixas amarelas ficaram nas mesmas linhas nas duas).
 - Grade: o GPT desenhou a lateral do cais (concreto e pneus) embaixo do guarda-corpo. Ela
   fica de costas para a câmera e é cortada; sobra o guarda-corpo em cima da borda do cais.
-- Primeiro plano: frente_esq.png (caixas) e frente_dir.png (cabeço e luminária) são
-  desfocados, como no Beco do Brucy.
+- Sem primeiro plano: o frente_esq.png (caixas) e o frente_dir.png (cabeço e luminária)
+  apareciam soltos no meio do cais com a câmera afastada. São ignorados.
 - Ilha: as bordas dos lados e a faixa de névoa de baixo são esfumadas (a imagem não se
   repete e o corte reto aparecia contra o mar).
 - Poste: o estandarte vira bandeira_poste.png, para balançar ao vento (separar_bandeiras.py).
@@ -35,7 +35,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_brucy import desfocar, sem_emenda  # noqa: E402
+from montar_brucy import sem_emenda  # noqa: E402
 import separar_bandeiras  # noqa: E402
 
 ID = "porto_secreto"
@@ -94,7 +94,7 @@ def main():
     # No Drive o mar veio como "maar.png".
     if "mar" not in comum and "maar" in comum:
         comum["mar"] = comum.pop("maar")
-    for falta in ("chao", "chao_cais", "frente_esq", "frente_dir", "grade", "poste"):
+    for falta in ("chao", "chao_cais", "grade", "poste"):
         if falta not in entrada:
             sys.exit(f"faltou {falta}.png em {args.entrada}")
     for falta in COMUNS:
@@ -114,7 +114,7 @@ def main():
             if nome in ("chao", "chao_cais"):
                 continue
             if nome in ("frente_esq", "frente_dir"):
-                desfocar(Image.open(arquivo), tmp, nome)
+                print(f"{arquivo.name} ignorado: o porto fica sem primeiro plano")
                 continue
             img = Image.open(arquivo)
             if nome == "ilha":
