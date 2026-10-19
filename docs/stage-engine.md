@@ -175,7 +175,16 @@ dela (`x`, `y` do canto de cima à esquerda, `largura`, `altura`):
   do `pilar.png` (o topo, preso na vara, fica) e salva `bandeira.png`, com 6 px de sobra
   acima do corte para a emenda não aparecer; ele imprime o trecho do stage.json. Rode uma
   vez depois de trocar o pilar.
-- Hoje: os pilares do Templo da Lua e do Dojo Yinlu.
+- Na Ilha do Torneio são dezenas de estandartes (pórticos, pilastras, holofotes,
+  arquibancadas, ponte, ruínas, palácio, abismo, encosta, terminal do porto):
+  `tools/stage/soltar_bandeiras.py` recebe só um retângulo com folga em volta de cada um e
+  acha o pano pela cor (o vermelho de cada linha, com o emblema e a borda dourada). O
+  lugar dele na imagem fica transparente quando ele pendia no vão, ou é tapado com a parede
+  dos lados, lisa e na sombra; assim, quando a ponta balança, aparece o fundo e não um
+  recorte. Ele grava `<imagem>_bandeiraN.png` e a linha de `"bandeiras"` das camadas.
+  Presas na parede balançam menos (`balanco` 0,06; soltas no vão, 0,12).
+- Hoje: os pilares do Templo da Lua e do Dojo Yinlu, o poste do porto, o andaime do
+  Caminho e os estandartes da Ilha do Torneio.
 
 ## Efeitos do jogo
 

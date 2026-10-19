@@ -22,7 +22,8 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   corrimão de vidro) ficavam soltos no ar, borrados, e com a câmera afastada o corrimão
   aparecia no meio do ringue. São ignorados.
 
-Grava em android/app/src/main/assets/stages/arena_costeira/ sem mexer no stage.json.
+Grava em android/app/src/main/assets/stages/arena_costeira/. No stage.json só refaz a linha de
+"bandeiras" das camadas com estandartes (soltar_bandeiras.py).
 """
 
 import argparse
@@ -40,6 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
 from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar, plateia, tirar_plateia  # noqa: E402
 import cachoeiras  # noqa: E402
+import soltar_bandeiras  # noqa: E402
 
 # Faixas de plateia (topo, base em fração da altura), as mesmas do stage.json.
 PLATEIA = [(0.4, 0.57)]
@@ -157,6 +159,9 @@ def main():
         gente = plateia(base, PLATEIA)
         gente.save(args.saida / "arquibancada_plateia.png")
         tirar_plateia(base, gente).save(args.saida / "arquibancada.png")
+    # Estandartes pintados soltos para balançar (antes das cachoeiras: a folha de água sai
+    # da imagem já sem eles).
+    soltar_bandeiras.soltar(args.saida, anotar_json=True)
     # Água das cachoeiras correndo (a folha de quadros sai da imagem já preparada).
     cachoeiras.atualizar(args.saida)
 

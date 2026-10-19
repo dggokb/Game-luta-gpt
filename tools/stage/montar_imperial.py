@@ -13,7 +13,8 @@ o preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 p
   losangos cortados ao meio se completam na emenda).
 - Sem primeiro plano: frente_esq.png e frente_dir.png, se houver, são ignorados.
 
-Grava em android/app/src/main/assets/stages/arena_imperial/ sem mexer no stage.json.
+Grava em android/app/src/main/assets/stages/arena_imperial/. No stage.json só refaz a linha de
+"bandeiras" das camadas com estandartes (soltar_bandeiras.py).
 """
 
 import argparse
@@ -30,6 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
 from montar_porto import COMUNS, imagens, peca_comum, textura_mar, plateia, tirar_plateia  # noqa: E402
 import cachoeiras  # noqa: E402
+import soltar_bandeiras  # noqa: E402
 
 # Faixas de plateia (topo, base em fração da altura), as mesmas do stage.json.
 PLATEIA = [(0.58, 0.76)]
@@ -102,6 +104,9 @@ def main():
         gente = plateia(base, PLATEIA)
         gente.save(args.saida / "arquibancada_lateral_plateia.png")
         tirar_plateia(base, gente).save(args.saida / "arquibancada_lateral.png")
+    # Estandartes pintados soltos para balançar (antes das cachoeiras: a folha de água sai
+    # da imagem já sem eles).
+    soltar_bandeiras.soltar(args.saida, anotar_json=True)
     # Água das cachoeiras correndo (a folha de quadros sai da imagem já preparada).
     cachoeiras.atualizar(args.saida)
 

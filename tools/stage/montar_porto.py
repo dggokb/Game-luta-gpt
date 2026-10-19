@@ -21,7 +21,8 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   ilha não é espelhada: o lado cortado dela fica sempre fora da tela (x no stage.json).
 - Poste: o estandarte vira bandeira_poste.png, para balançar ao vento (separar_bandeiras.py).
 
-Grava em android/app/src/main/assets/stages/porto_secreto/ sem mexer no stage.json.
+Grava em android/app/src/main/assets/stages/porto_secreto/. No stage.json só refaz a linha de
+"bandeiras" das camadas com estandartes (soltar_bandeiras.py).
 """
 
 import argparse
@@ -40,6 +41,7 @@ from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
 from montar_brucy import sem_emenda  # noqa: E402
 import separar_bandeiras  # noqa: E402
 import cachoeiras  # noqa: E402
+import soltar_bandeiras  # noqa: E402
 
 ID = "porto_secreto"
 COMUNS = ("ceu", "mar", "penhascos")
@@ -257,6 +259,9 @@ def main():
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
     separar_bandeiras.STAGES = args.saida.parent
     print("bandeira do poste", separar_bandeiras.separar(ID))
+    # Estandartes pintados soltos para balançar (antes das cachoeiras: a folha de água sai
+    # da imagem já sem eles).
+    soltar_bandeiras.soltar(args.saida, anotar_json=True)
     # Água das cachoeiras correndo (a folha de quadros sai da imagem já preparada).
     cachoeiras.atualizar(args.saida)
 

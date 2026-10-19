@@ -75,6 +75,7 @@
     {
       "id": "arquibancada",
       "imagem": "arquibancada.png",
+      "bandeiras": [{"imagem": "arquibancada_bandeira1.png", "x": 0.0347, "y": 0.2565, "largura": 0.0347, "altura": 0.5506, "balanco": 0.06}, {"imagem": "arquibancada_bandeira2.png", "x": 0.2998, "y": 0.4518, "largura": 0.0332, "altura": 0.36, "balanco": 0.06}, {"imagem": "arquibancada_bandeira3.png", "x": 0.6675, "y": 0.4518, "largura": 0.0337, "altura": 0.36, "balanco": 0.06}, {"imagem": "arquibancada_bandeira4.png", "x": 0.9312, "y": 0.2565, "largura": 0.0352, "altura": 0.5506, "balanco": 0.06}, {"imagem": "arquibancada_bandeira5.png", "x": 0.1978, "y": 0.1506, "largura": 0.0176, "altura": 0.1365, "balanco": 0.06}, {"imagem": "arquibancada_bandeira6.png", "x": 0.23, "y": 0.1435, "largura": 0.02, "altura": 0.1553, "balanco": 0.06}, {"imagem": "arquibancada_bandeira7.png", "x": 0.3271, "y": 0.1812, "largura": 0.02, "altura": 0.1176, "balanco": 0.06}, {"imagem": "arquibancada_bandeira8.png", "x": 0.6523, "y": 0.1812, "largura": 0.0225, "altura": 0.12, "balanco": 0.06}, {"imagem": "arquibancada_bandeira9.png", "x": 0.7515, "y": 0.1435, "largura": 0.0205, "altura": 0.1553, "balanco": 0.06}, {"imagem": "arquibancada_bandeira10.png", "x": 0.7861, "y": 0.1482, "largura": 0.02, "altura": 0.1388, "balanco": 0.06}, {"imagem": "arquibancada_bandeira11.png", "x": 0.1279, "y": 0.0847, "largura": 0.0225, "altura": 0.1506, "balanco": 0.06}, {"imagem": "arquibancada_bandeira12.png", "x": 0.8496, "y": 0.0847, "largura": 0.0229, "altura": 0.1506, "balanco": 0.06}, {"imagem": "arquibancada_bandeira13.png", "x": 0.3789, "y": 0.1906, "largura": 0.0239, "altura": 0.2212, "balanco": 0.06}, {"imagem": "arquibancada_bandeira14.png", "x": 0.5972, "y": 0.1906, "largura": 0.0254, "altura": 0.2212, "balanco": 0.06}, {"imagem": "arquibancada_bandeira15.png", "x": 0.2715, "y": 0.1812, "largura": 0.0239, "altura": 0.2141, "balanco": 0.06}, {"imagem": "arquibancada_bandeira16.png", "x": 0.7061, "y": 0.1812, "largura": 0.0244, "altura": 0.2141, "balanco": 0.06}],
       "profundidade": 3500,
       "plateia": [
         { "topo": 0.39, "base": 0.48, "mascara": "arquibancada_plateia.png", "pulo": 0.012, "colunas": 220, "recortada": true,
@@ -129,6 +130,7 @@
     {
       "id": "pilastras",
       "imagem": "pilastra.png",
+      "bandeiras": [{"imagem": "pilastra_bandeira1.png", "x": 0.3878, "y": 0.1343, "largura": 0.3633, "altura": 0.5861, "balanco": 0.06}],
       "profundidade": 1300,
       "noChao": true,
       "altura": 0.544,

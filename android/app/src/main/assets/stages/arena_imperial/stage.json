@@ -60,6 +60,7 @@
     {
       "id": "arquibancadas",
       "imagem": "arquibancada_lateral.png",
+      "bandeiras": [{"imagem": "arquibancada_lateral_bandeira1.png", "x": 0.1151, "y": 0.2238, "largura": 0.0719, "altura": 0.4012, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira2.png", "x": 0.813, "y": 0.225, "largura": 0.0698, "altura": 0.4, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira3.png", "x": 0.0433, "y": 0.4929, "largura": 0.037, "altura": 0.1869, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira4.png", "x": 0.9191, "y": 0.4929, "largura": 0.0377, "altura": 0.1869, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira5.png", "x": 0.3489, "y": 0.4083, "largura": 0.0391, "altura": 0.1738, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira6.png", "x": 0.6106, "y": 0.4083, "largura": 0.0391, "altura": 0.1738, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira7.png", "x": 0.3364, "y": 0.75, "largura": 0.0405, "altura": 0.1607, "balanco": 0.06}, {"imagem": "arquibancada_lateral_bandeira8.png", "x": 0.6225, "y": 0.75, "largura": 0.0405, "altura": 0.1607, "balanco": 0.06}],
       "profundidade": 2520,
       "plateia": [
         { "topo": 0.58, "base": 0.76, "mascara": "arquibancada_lateral_plateia.png", "pulo": 0.012, "colunas": 110, "recortada": true,
@@ -79,6 +80,7 @@
       "id": "palacio",
       "imagem": "palacio.png",
       "cachoeiras": { "imagem": "palacio_agua.png", "quadros": 8, "fps": 12, "areas": [[0.095, 0.56, 0.185, 0.43], [0.72, 0.56, 0.185, 0.43]] },
+      "bandeiras": [{"imagem": "palacio_bandeira1.png", "x": 0.029, "y": 0.0603, "largura": 0.0628, "altura": 0.3793, "balanco": 0.06}, {"imagem": "palacio_bandeira2.png", "x": 0.9081, "y": 0.0603, "largura": 0.0642, "altura": 0.3761, "balanco": 0.06}, {"imagem": "palacio_bandeira3.png", "x": 0.1001, "y": 0.2694, "largura": 0.0242, "altura": 0.0894, "balanco": 0.06}, {"imagem": "palacio_bandeira4.png", "x": 0.8771, "y": 0.264, "largura": 0.0235, "altura": 0.0948, "balanco": 0.06}],
       "profundidade": 2500,
       "noChao": true,
       "altura": 0.5,
@@ -109,6 +111,7 @@
     {
       "id": "porticos",
       "imagem": "portico.png",
+      "bandeiras": [{"imagem": "portico_bandeira1.png", "x": 0.2898, "y": 0.2255, "largura": 0.4217, "altura": 0.631, "balanco": 0.12}],
       "profundidade": 1300,
       "noChao": true,
       "altura": 0.517,

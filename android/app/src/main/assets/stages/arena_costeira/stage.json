@@ -61,6 +61,7 @@
       "id": "encosta",
       "imagem": "encosta.png",
       "cachoeiras": { "imagem": "encosta_agua.png", "quadros": 8, "fps": 12, "areas": [[0.755, 0.16, 0.05, 0.07], [0.87, 0.14, 0.03, 0.08], [0.57, 0.3, 0.065, 0.11], [0.815, 0.38, 0.05, 0.13], [0.515, 0.51, 0.05, 0.13], [0.355, 0.65, 0.045, 0.14], [0.515, 0.68, 0.035, 0.12], [0.335, 0.75, 0.035, 0.12], [0.765, 0.81, 0.07, 0.15]] },
+      "bandeiras": [{"imagem": "encosta_bandeira1.png", "x": 0.6975, "y": 0.2072, "largura": 0.0262, "altura": 0.1041, "balanco": 0.06}, {"imagem": "encosta_bandeira2.png", "x": 0.951, "y": 0.1777, "largura": 0.0318, "altura": 0.1363, "balanco": 0.06}, {"imagem": "encosta_bandeira3.png", "x": 0.5698, "y": 0.3886, "largura": 0.0276, "altura": 0.0958, "balanco": 0.06}, {"imagem": "encosta_bandeira4.png", "x": 0.8681, "y": 0.4687, "largura": 0.0477, "altura": 0.2891, "balanco": 0.06}, {"imagem": "encosta_bandeira5.png", "x": 0.4482, "y": 0.5727, "largura": 0.0373, "altura": 0.2035, "balanco": 0.06}],
       "profundidade": 8600,
       "topo": -0.12,
       "base": 0.5,
@@ -85,6 +86,7 @@
     {
       "id": "holofotes-longe",
       "imagem": "holofote.png",
+      "bandeiras": [{"imagem": "holofote_bandeira1.png", "x": 0.3293, "y": 0.2799, "largura": 0.3415, "altura": 0.4818, "balanco": 0.12}],
       "profundidade": 2510,
       "noChao": true,
       "altura": 0.55,
@@ -98,6 +100,7 @@
     {
       "id": "arquibancada",
       "imagem": "arquibancada.png",
+      "bandeiras": [{"imagem": "arquibancada_bandeira1.png", "x": 0.0171, "y": 0.0648, "largura": 0.0356, "altura": 0.3831, "balanco": 0.06}, {"imagem": "arquibancada_bandeira2.png", "x": 0.3389, "y": 0.1257, "largura": 0.0332, "altura": 0.277, "balanco": 0.06}, {"imagem": "arquibancada_bandeira3.png", "x": 0.6265, "y": 0.1238, "largura": 0.0337, "altura": 0.279, "balanco": 0.06}, {"imagem": "arquibancada_bandeira4.png", "x": 0.9448, "y": 0.0629, "largura": 0.0366, "altura": 0.3851, "balanco": 0.06}, {"imagem": "arquibancada_bandeira5.png", "x": 0.1763, "y": 0.3065, "largura": 0.0249, "altura": 0.1906, "balanco": 0.06}, {"imagem": "arquibancada_bandeira6.png", "x": 0.4888, "y": 0.3065, "largura": 0.0234, "altura": 0.1906, "balanco": 0.06}, {"imagem": "arquibancada_bandeira7.png", "x": 0.7988, "y": 0.3065, "largura": 0.0264, "altura": 0.1906, "balanco": 0.06}, {"imagem": "arquibancada_bandeira8.png", "x": 0.0161, "y": 0.5619, "largura": 0.0273, "altura": 0.3281, "balanco": 0.06}, {"imagem": "arquibancada_bandeira9.png", "x": 0.3237, "y": 0.5776, "largura": 0.0298, "altura": 0.3163, "balanco": 0.06}, {"imagem": "arquibancada_bandeira10.png", "x": 0.6479, "y": 0.5737, "largura": 0.0288, "altura": 0.3202, "balanco": 0.06}, {"imagem": "arquibancada_bandeira11.png", "x": 0.957, "y": 0.5619, "largura": 0.0278, "altura": 0.3281, "balanco": 0.06}, {"imagem": "arquibancada_bandeira12.png", "x": 0.0986, "y": 0.5599, "largura": 0.0161, "altura": 0.1395, "balanco": 0.06}, {"imagem": "arquibancada_bandeira13.png", "x": 0.2422, "y": 0.5619, "largura": 0.0161, "altura": 0.1336, "balanco": 0.06}, {"imagem": "arquibancada_bandeira14.png", "x": 0.4204, "y": 0.5619, "largura": 0.0156, "altura": 0.1375, "balanco": 0.06}, {"imagem": "arquibancada_bandeira15.png", "x": 0.564, "y": 0.5599, "largura": 0.0161, "altura": 0.1356, "balanco": 0.06}, {"imagem": "arquibancada_bandeira16.png", "x": 0.7437, "y": 0.5599, "largura": 0.0166, "altura": 0.1395, "balanco": 0.06}, {"imagem": "arquibancada_bandeira17.png", "x": 0.8862, "y": 0.5599, "largura": 0.0166, "altura": 0.1356, "balanco": 0.06}],
       "profundidade": 2500,
       "plateia": [
         { "topo": 0.4, "base": 0.57, "mascara": "arquibancada_plateia.png", "pulo": 0.016, "colunas": 170, "recortada": true,
@@ -114,6 +117,7 @@
     {
       "id": "holofotes",
       "imagem": "holofote.png",
+      "bandeiras": [{"imagem": "holofote_bandeira1.png", "x": 0.3293, "y": 0.2799, "largura": 0.3415, "altura": 0.4818, "balanco": 0.12}],
       "profundidade": 1300,
       "noChao": true,
       "altura": 0.553,

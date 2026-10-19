@@ -18,7 +18,8 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
 - Sem primeiro plano: frente_esq.png e frente_dir.png são ignorados (nos cenários abertos
   da ilha eles apareciam soltos no meio do piso).
 
-Grava em android/app/src/main/assets/stages/caminho_penhascos/ sem mexer no stage.json.
+Grava em android/app/src/main/assets/stages/caminho_penhascos/. No stage.json só refaz a linha de
+"bandeiras" das camadas com estandartes (soltar_bandeiras.py).
 """
 
 import argparse
@@ -36,6 +37,7 @@ from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
 from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar  # noqa: E402
 import separar_bandeiras  # noqa: E402
 import cachoeiras  # noqa: E402
+import soltar_bandeiras  # noqa: E402
 
 ID = "caminho_penhascos"
 COMUNS = ("ceu_lua", "mar", "penhascos")
@@ -89,6 +91,9 @@ def main():
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
     separar_bandeiras.STAGES = args.saida.parent
     print("bandeira do andaime", separar_bandeiras.separar(ID))
+    # Estandartes pintados soltos para balançar (antes das cachoeiras: a folha de água sai
+    # da imagem já sem eles).
+    soltar_bandeiras.soltar(args.saida, anotar_json=True)
     # Água das cachoeiras correndo (a folha de quadros sai da imagem já preparada).
     cachoeiras.atualizar(args.saida)
 

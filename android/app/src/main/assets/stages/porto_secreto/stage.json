@@ -128,6 +128,7 @@
     {
       "id": "terminal",
       "imagem": "terminal.png",
+      "bandeiras": [{"imagem": "terminal_bandeira1.png", "x": 0.4683, "y": 0.0738, "largura": 0.0634, "altura": 0.3783, "balanco": 0.06}, {"imagem": "terminal_bandeira2.png", "x": 0.0127, "y": 0.3783, "largura": 0.0606, "altura": 0.3253, "balanco": 0.06}, {"imagem": "terminal_bandeira3.png", "x": 0.9282, "y": 0.3783, "largura": 0.0592, "altura": 0.3253, "balanco": 0.06}],
       "profundidade": 1500,
       "noChao": true,
       "altura": 0.862,
