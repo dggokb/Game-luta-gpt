@@ -13,8 +13,8 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   `FAIXA`), repetida três vezes com o brilho nivelado (o GPT iluminou mais o centro; sem
   isso, cada emenda ficava com um degrau de luz): é o chao_liso.jpg. O chao.jpg é o mesmo, com o círculo vermelho e o emblema do
   chao.png colados no centro (as duas imagens têm a mesma grade de lajotas).
-- Encosta: névoa da distância (mais fraca que a da ilha do porto, ela está mais perto) e a
-  borda da direita esfumada; a névoa de baixo fica opaca até a linha d'água.
+- Encosta: névoa da distância e base sólida (montar_porto.solidificar). O lado cortado (a
+  direita) fica sempre fora da tela (x no stage.json).
 - Sem mureta: a barreira.png repetia o muro de LED que a arquibancada já tem embaixo (duas
   faixas vermelhas, uma em cima da outra). A arquibancada fica encostada no fim do piso e
   o muro dela é a mureta do ringue.
@@ -38,7 +38,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, afastar, fechar_lado, esfumar_ilha, imagens, peca_comum  # noqa: E402
+from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar  # noqa: E402
 
 ID = "arena_costeira"
 # Faixa de lajotas do chao_liso.png que se repete: da coluna depois de uma junta até a
@@ -140,7 +140,7 @@ def main():
                 continue
             img = Image.open(arquivo)
             if nome == "encosta":
-                img = afastar(fechar_lado(esfumar_ilha(img, lados=0.0, baixo=0.02)), 0.2)
+                img = afastar(solidificar(img), 0.2)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)

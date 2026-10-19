@@ -16,9 +16,9 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
 - Sem primeiro plano: o frente_esq.png (caixas) e o frente_dir.png (cabeço e luminária)
   apareciam soltos no meio do cais com a câmera afastada. São ignorados.
 - Ilha e penhascos: recebem a névoa da distância (`afastar`: menos cor e contraste,
-  puxando para o azul-arroxeado do céu); sem ela pareciam uma maquete. As bordas dos lados
-  da ilha são esfumadas, mas a névoa de baixo fica opaca até a borda: apagada, ela mostrava
-  o mar por baixo e a ilha parecia voar.
+  puxando para o azul-arroxeado do céu); sem ela pareciam uma maquete. A base fica sólida
+  (`solidificar`): a névoa do pé, meio transparente, deixava ver os rochedos do fundo. A
+  ilha não é espelhada: o lado cortado dela fica sempre fora da tela (x no stage.json).
 - Poste: o estandarte vira bandeira_poste.png, para balançar ao vento (separar_bandeiras.py).
 
 Grava em android/app/src/main/assets/stages/porto_secreto/ sem mexer no stage.json.
@@ -101,26 +101,21 @@ def afastar(img, forca, cor=NEVOA):
     return Image.fromarray(px.clip(0, 255).astype(np.uint8))
 
 
-def fechar_lado(img):
-    """Peça de longe desenhada saindo por uma borda (a encosta, a ilha): no cenário ela não
-    se repete, e a borda virava um corte reto no meio do céu (um pedaço de montanha solto no
-    ar). Ganha uma cópia espelhada do lado que encosta na borda: vira um maciço que desce
-    dos dois lados. A peça original fica na metade de sempre (esquerda ou direita)."""
-    img = img.convert("RGBA")
-    a = np.asarray(img.getchannel("A"))
-    esq, dir = (a[:, 0] > 200).mean(), (a[:, -1] > 200).mean()
-    if max(esq, dir) < 0.2:
-        return img
-    w, h = img.size
-    dobro = Image.new("RGBA", (w * 2, h), (0, 0, 0, 0))
-    espelho = img.transpose(Image.FLIP_LEFT_RIGHT)
-    if dir >= esq:
-        dobro.paste(img, (0, 0))
-        dobro.paste(espelho, (w, 0))
-    else:
-        dobro.paste(espelho, (0, 0))
-        dobro.paste(img, (w, 0))
-    return dobro
+def solidificar(img):
+    """Base sólida: abaixo do contorno de cada coluna, a névoa do pé da montanha vira opaca
+    (misturada com a cor da própria névoa). Meio transparente, ela deixava ver os rochedos
+    do fundo por baixo da montanha da frente."""
+    px = np.asarray(img.convert("RGBA")).astype(np.float32)
+    h, w = px.shape[:2]
+    a = px[..., 3] / 255.0
+    base = px[int(h * 0.85):]
+    opaco = base[..., 3] > 200
+    nevoa = np.median(base[opaco][:, :3], axis=0) if opaco.any() else np.array(NEVOA, np.float32)
+    dentro = np.cumsum(a > 0.5, axis=0) > 0
+    rgb = px[..., :3] * a[..., None] + nevoa * (1 - a[..., None])
+    px[..., :3] = np.where(dentro[..., None], rgb, px[..., :3])
+    px[..., 3] = np.where(dentro, 255.0, px[..., 3])
+    return Image.fromarray(px.clip(0, 255).astype(np.uint8))
 
 
 def afinar_pontas(img, fracao=0.3):
@@ -144,7 +139,7 @@ def afinar_pontas(img, fracao=0.3):
 def peca_comum(nome, img):
     """Uma peça comum da ilha como ela entra no cenário (as de longe com a névoa)."""
     if nome == "penhascos":
-        img = afinar_pontas(img)
+        img = solidificar(afinar_pontas(img))
     if nome in COMUNS_LONGE:
         return afastar(img, COMUNS_LONGE[nome])
     return img
@@ -189,7 +184,7 @@ def main():
                 continue
             img = Image.open(arquivo)
             if nome == "ilha":
-                img = afastar(fechar_lado(esfumar_ilha(img, lados=0.0, baixo=0.02)), 0.4)
+                img = afastar(solidificar(img), 0.4)
             if nome == "grade":
                 img = img.convert("RGBA")
                 img = img.crop((0, 0, img.width, round(img.height * CORTE_GRADE)))

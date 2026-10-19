@@ -33,7 +33,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import afastar, fechar_lado, esfumar_ilha, imagens, peca_comum  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar  # noqa: E402
 import separar_bandeiras  # noqa: E402
 
 ID = "caminho_penhascos"
@@ -80,7 +80,7 @@ def main():
             elif nome == "ruinas":
                 img = esfumar_ilha(img, lados=0.06, baixo=0.0)
             elif nome == "arena_longe":
-                img = afastar(fechar_lado(esfumar_ilha(img, lados=0.0, baixo=0.02)), 0.4)
+                img = afastar(solidificar(img), 0.4)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)

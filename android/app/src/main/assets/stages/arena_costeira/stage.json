@@ -59,7 +59,7 @@
       "apoio": 9000,
       "topo": -0.12,
       "base": 0.5,
-      "x": 1.09,
+      "x": 0.9,
       "repetir": "nao",
       "luzes": [
         { "x": 0.563, "y": 0.477, "raio": 0.025, "cor": "#FFC060", "pulsar": 0.08, "reflexo": false },

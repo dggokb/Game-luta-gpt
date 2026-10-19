@@ -33,7 +33,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import afastar, esfumar_ilha, imagens, peca_comum  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar  # noqa: E402
 
 ID = "arena_central"
 COMUNS = ("ceu_lua", "mar", "penhascos")
@@ -101,7 +101,7 @@ def main():
                 img = img.convert("RGBA")
                 img = img.crop((0, 0, img.width, round(img.height * CORTE_ARQUIBANCADA)))
             elif nome == "templo_longe":
-                img = afastar(esfumar_ilha(img, lados=0.03, baixo=0.02), 0.4)
+                img = afastar(solidificar(esfumar_ilha(img, lados=0.03, baixo=0.0)), 0.4)
             img.save(tmp / f"{nome}.png")
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)
