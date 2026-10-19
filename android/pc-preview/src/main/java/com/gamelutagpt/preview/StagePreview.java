@@ -26,6 +26,7 @@ import javax.swing.Timer;
  * Janela:   StagePreview pasta-do-cenario
  * Quadros:  StagePreview pasta-do-cenario --quadros saida/
  * Varredura: StagePreview pasta-do-cenario --varredura folha.png
+ * Pulos:     StagePreview pasta-do-cenario --pulos saida/   (super pulo nos cantos e no meio)
  * </pre>
  *
  * A varredura grava uma folha com nove fotos: os dois cantos e o meio do cenário, cada um
@@ -226,26 +227,59 @@ public final class StagePreview {
         System.out.println("varredura em " + out.getPath());
     }
 
+    /**
+     * Super pulo nos dois cantos e no meio: o lutador 1 sobe e desce (1,4 s, como no roteiro),
+     * gravado em quadros PNG a 30 por segundo, um pulo atrás do outro.
+     */
+    private void runJumps(File outDir) throws IOException {
+        if (!outDir.isDirectory() && !outDir.mkdirs()) throw new IOException("não consegui criar " + outDir);
+        float[] places = {300f, 1300f, 2300f};
+        float dt = 1f / 30f;
+        int frame = 0;
+        for (float place : places) {
+            for (int i = 0; i < 60; i++) {
+                float t = i * dt;
+                float jump = t > 0.2f && t < 1.6f ? (float)Math.sin((t - 0.2f) / 1.4f * Math.PI) : 0f;
+                p1x = place - 150f;
+                p2x = place + 150f;
+                p1y = GROUND_Y - 520f * jump;
+                camera(jump > 0f);
+                scene.setCamera(zoom, left, top);
+                scene.update(dt);
+                time += dt;
+                BufferedImage image = new BufferedImage(960, 540, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = image.createGraphics();
+                render(g, image.getWidth(), image.getHeight());
+                g.dispose();
+                ImageIO.write(image, "png", new File(outDir, String.format(Locale.ROOT, "pulo_%03d.png", frame++)));
+            }
+        }
+        System.out.println(frame + " quadros de pulo em " + outDir.getPath());
+    }
+
     public static void main(String[] args) throws Exception {
         String folder = null;
         File framesDir = null;
         File sweep = null;
+        File jumps = null;
         float seconds = 12f;
         for (int i = 0; i < args.length; i++) {
             if ("--quadros".equals(args[i]) && i + 1 < args.length) framesDir = new File(args[++i]);
             else if ("--segundos".equals(args[i]) && i + 1 < args.length) seconds = Float.parseFloat(args[++i]);
             else if ("--varredura".equals(args[i]) && i + 1 < args.length) sweep = new File(args[++i]);
+            else if ("--pulos".equals(args[i]) && i + 1 < args.length) jumps = new File(args[++i]);
             else folder = args[i];
         }
         if (folder == null) {
-            System.err.println("uso: StagePreview pasta-do-cenario [--quadros saida/] [--segundos 12] [--varredura folha.png]");
+            System.err.println("uso: StagePreview pasta-do-cenario [--quadros saida/] [--segundos 12] [--varredura folha.png] [--pulos saida/]");
             System.exit(2);
         }
         File dir = new File(folder).getAbsoluteFile();
         StagePack pack = StagePack.load(new FileRenderAssets(dir.getParentFile()), dir.getName());
         for (String warning : pack.warnings) System.out.println("aviso: " + warning);
         StagePreview preview = new StagePreview(pack);
-        if (sweep != null) preview.runSweep(sweep);
+        if (jumps != null) preview.runJumps(jumps);
+        else if (sweep != null) preview.runSweep(sweep);
         else if (framesDir != null) preview.runFrames(framesDir, seconds);
         else SwingUtilities.invokeLater(preview::runWindow);
     }
