@@ -33,6 +33,10 @@ templo do Takatoshi) têm os prompts em [ilha-do-torneio.md](ilha-do-torneio.md)
 4. **Ajuste as luzes e os fogos**: as posições (`x`, `y` em fração da imagem) dependem de
    onde a IA desenhou a lanterna ou a tigela do braseiro. Depois de trocar `pilar.png` ou
    `braseiro.png`, confira no visualizador. Se preferir, me mande as imagens que eu ajusto.
+5. **Solte as bandeiras**: estandarte pintado no pilar não se mexe. Acerte o retângulo e a
+   linha de corte (embaixo da vara) do cenário em `separar_bandeiras.py`, rode
+   `python3 tools/stage/separar_bandeiras.py <cenario>` uma vez e cole o trecho que ele
+   imprime em `"bandeiras"` da camada do pilar (ver `docs/stage-engine.md`).
 
 ## Prompts do Templo da Lua
 

@@ -22,7 +22,8 @@ import java.util.Map;
  *     { "imagem": "ceu.jpg", "profundidade": 100000, "topo": -0.2, "base": 0.62, "repetir": "espelhar" },
  *     { "imagem": "pilares.png", "profundidade": 300, "noChao": true, "altura": 0.9,
  *       "x": 0.06, "repetir": "espelhar", "periodo": 0.88,
- *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ] },
+ *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ],
+ *       "bandeiras": [ { "imagem": "bandeira.png", "x": 0.3, "y": 0.29, "largura": 0.31, "altura": 0.53 } ] },
  *     { "tipo": "neblina", "profundidade": 2600, "topo": 0.45, "base": 0.62, "cor": "#3A2A66", "alfa": 0.5 }
  *   ],
  *   "chao": { "imagem": "chao.jpg", "imagemLajotas": "chao_lajotas.jpg", "perto": -420, "longe": 560,
@@ -69,6 +70,31 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * Bandeira presa na imagem, balançando ao vento. Posição e tamanho em fração da imagem
+     * da camada (canto de cima à esquerda); a imagem da bandeira é o pano recortado da
+     * própria imagem (tools/stage/separar_bandeiras.py), que fica sem ele.
+     */
+    public static final class Banner {
+        public final String image;
+        public final float x, y, width, height;
+        /** Quanto a ponta de baixo vai para o lado, em fração da largura da bandeira. */
+        public final float sway;
+        /** Ondas que descem pelo pano e a força do vento (1 = normal). */
+        public final float waves, speed;
+
+        Banner(String image, float x, float y, float width, float height, float sway, float waves, float speed) {
+            this.image = image;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.sway = sway;
+            this.waves = waves;
+            this.speed = speed;
+        }
+    }
+
     public static final class Layer {
         public final String id;
         public final Kind kind;
@@ -96,6 +122,7 @@ public final class StageDefinition {
         public final int shimmer;
         public final List<Light> lights;
         public final List<Fire> fires;
+        public final List<Banner> banners;
         /** Ator: pasta dele, relativa ao cenário (com o ator.json e as folhas). */
         public final String actor;
         /** Ator: espelhado (olhando para o outro lado). */
@@ -123,6 +150,7 @@ public final class StageDefinition {
             shimmer = b.shimmer;
             lights = Collections.unmodifiableList(new ArrayList<>(b.lights));
             fires = Collections.unmodifiableList(new ArrayList<>(b.fires));
+            banners = Collections.unmodifiableList(new ArrayList<>(b.banners));
             actor = b.actor;
             flip = b.flip;
         }
@@ -152,6 +180,7 @@ public final class StageDefinition {
         int shimmer;
         final List<Light> lights = new ArrayList<>();
         final List<Fire> fires = new ArrayList<>();
+        final List<Banner> banners = new ArrayList<>();
         String actor;
         boolean flip;
     }
@@ -417,6 +446,20 @@ public final class StageDefinition {
                 if (!(item instanceof Map)) continue;
                 Map<String, Object> f = (Map<String, Object>)item;
                 b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f)));
+            }
+        }
+        Object banners = map.get("bandeiras");
+        if (banners instanceof List) {
+            for (Object item : (List<Object>)banners) {
+                if (!(item instanceof Map)) continue;
+                Map<String, Object> f = (Map<String, Object>)item;
+                String image = string(f, "imagem", null);
+                float width = number(f, "largura", 0f), height = number(f, "altura", 0f);
+                if (image == null || width <= 0f || height <= 0f) {
+                    throw new IllegalArgumentException(where + ": bandeira precisa de \"imagem\", \"largura\" e \"altura\"");
+                }
+                b.banners.add(new Banner(image, number(f, "x", 0f), number(f, "y", 0f), width, height,
+                    number(f, "balanco", 0.12f), number(f, "ondas", 1.2f), number(f, "velocidade", 1f)));
             }
         }
         return new Layer(b);

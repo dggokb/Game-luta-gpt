@@ -91,6 +91,15 @@
           "cor": "#FFB45A",
           "pulsar": 0.1
         }
+      ],
+      "bandeiras": [
+        {
+          "imagem": "bandeira.png",
+          "x": 0.2984,
+          "y": 0.2844,
+          "largura": 0.3066,
+          "altura": 0.5341
+        }
       ]
     },
     {

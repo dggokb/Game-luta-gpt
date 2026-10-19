@@ -25,6 +25,8 @@ public final class StageScene {
     private static final float VH = StageWorld.VH;
     /** Altura de cada faixa do piso na tela; menor = perspectiva mais lisa, mais desenhos. */
     private static final float FLOOR_STRIP = 3f;
+    /** Altura de cada faixa da bandeira na tela (o dobro no modo leve). */
+    private static final float BANNER_STRIP = 3f;
 
     /** Camada de imagem já convertida para o mundo 3D na sua profundidade. */
     private static final class Placed {
@@ -32,11 +34,14 @@ public final class StageScene {
         final RenderImage image;
         final float z;
         final float top, bottom, width, firstCenterX, period;
+        /** Imagens das bandeiras da camada, na ordem dela (null = não carregou). */
+        final RenderImage[] banners;
 
         Placed(StageDefinition.Layer layer, RenderImage image, float z,
-               float top, float bottom, float width, float firstCenterX, float period) {
+               float top, float bottom, float width, float firstCenterX, float period, RenderImage[] banners) {
             this.layer = layer;
             this.image = image;
+            this.banners = banners;
             this.z = z;
             this.top = top;
             this.bottom = bottom;
@@ -136,7 +141,9 @@ public final class StageScene {
             float width = (bottom - top) * aspect;
             float centerX = rest.worldX(layer.x * VW, z);
             float period = Float.isNaN(layer.period) ? width : layer.period * VW / scale;
-            Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period));
+            RenderImage[] banners = new RenderImage[layer.banners.size()];
+            for (int i = 0; i < banners.length; i++) banners[i] = pack.image(layer.banners.get(i).image);
+            Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period), banners);
             placed.add(p);
             if (actor != null) actors.put(layer.id, new ActorState(p, actor, layer.actor, image));
         }
@@ -537,10 +544,13 @@ public final class StageScene {
             if (r < 0f || l > VW) continue;
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
+            drawBanners(c, p, l, top, r, bottom, mirrored, alpha, k);
             if (layer.reflection > 0f && detalhe) {
                 c.save();
                 c.scale(1f, -1f, 0f, bottom);
-                drawImage(c, p.image, l, top, r, bottom, mirrored, Math.round(alpha * layer.reflection));
+                int reflected = Math.round(alpha * layer.reflection);
+                drawImage(c, p.image, l, top, r, bottom, mirrored, reflected);
+                drawBanners(c, p, l, top, r, bottom, mirrored, reflected, k);
                 c.restore();
             }
         }
@@ -562,6 +572,53 @@ public final class StageScene {
             c.restore();
         } else {
             c.drawImage(image, l, t, r, b, alpha);
+        }
+    }
+
+    /**
+     * Bandeiras da camada balançando: o pano é desenhado em faixas horizontais e cada faixa
+     * vai para o lado conforme o vento. Presa em cima (a faixa do topo não sai do lugar),
+     * a ponta de baixo é a que mais anda; uma onda desce pelo pano e as faixas estreitam um
+     * pouco onde ele dobra. Cada cópia da camada balança num tempo diferente.
+     */
+    private void drawBanners(RenderCanvas c, Placed p, float l, float t, float r, float b,
+                             boolean mirrored, int alpha, int instance) {
+        List<StageDefinition.Banner> list = p.layer.banners;
+        float w = r - l, h = b - t;
+        for (int i = 0; i < list.size(); i++) {
+            RenderImage image = p.banners[i];
+            if (image == null) continue;
+            StageDefinition.Banner banner = list.get(i);
+            float bw = banner.width * w, bh = banner.height * h;
+            float bl = l + (mirrored ? 1f - banner.x - banner.width : banner.x) * w;
+            float bt = t + banner.y * h;
+            float amp = banner.sway * bw;
+            if (bl - amp > VW || bl + bw + amp < 0f || bt > VH || bt + bh < 0f) continue;
+
+            float seed = instance * 1.9f + i * 2.7f;
+            float gust = 0.8f + 0.2f * (float)Math.sin(time * 0.41f + seed);
+            float swing = (float)Math.sin(time * 1.25f * banner.speed + seed);
+            int rows = Math.round(clamp(bh / (detalhe ? BANNER_STRIP : BANNER_STRIP * 2f), 6f, 120f));
+            float srcW = image.width(), srcH = image.height();
+            float centerX = bl + bw * 0.5f;
+            // Espelhada, a cópia vira em torno do próprio centro; o vento continua do mesmo lado.
+            float side = mirrored ? -1f : 1f;
+            if (mirrored) {
+                c.save();
+                c.scale(-1f, 1f, centerX, 0f);
+            }
+            for (int j = 0; j < rows; j++) {
+                float v0 = j / (float)rows, v1 = (j + 1) / (float)rows;
+                float v = (v0 + v1) * 0.5f;
+                float weight = v * (float)Math.sqrt(v);
+                float phase = 6.2832f * banner.waves * v - time * 3f * banner.speed + seed * 1.3f;
+                float dx = side * amp * gust * weight * (0.6f * swing + 0.4f * (float)Math.sin(phase));
+                float half = bw * 0.5f * (1f - 0.05f * weight * (float)Math.cos(phase));
+                float cx = centerX + dx;
+                c.drawImageRegion(image, 0f, v0 * srcH, srcW, v1 * srcH,
+                    cx - half, bt + v0 * bh, cx + half, bt + v1 * bh + 0.75f, alpha);
+            }
+            if (mirrored) c.restore();
         }
     }
 

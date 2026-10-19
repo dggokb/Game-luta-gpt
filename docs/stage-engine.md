@@ -99,6 +99,29 @@ Camadas de imagem podem ter **luzes** (brilho que pulsa, com reflexo no piso) e 
 (chama em três camadas tremulando, brilho e brasas), presos a pontos da imagem; eles se
 repetem com as cópias da camada.
 
+### Bandeiras ao vento
+
+Camadas de imagem também podem ter **bandeiras** (`"bandeiras"`), que balançam. O pano é
+uma imagem separada (`bandeira.png`) presa num retângulo da imagem da camada, em frações
+dela (`x`, `y` do canto de cima à esquerda, `largura`, `altura`):
+
+```json
+"bandeiras": [ { "imagem": "bandeira.png", "x": 0.2984, "y": 0.2844, "largura": 0.3066, "altura": 0.5341 } ]
+```
+
+- O motor desenha o pano em faixas horizontais de 3 px de tela (6 no modo leve) e cada
+  faixa vai para o lado: presa em cima, a ponta de baixo é a que mais anda (`balanco`,
+  fração da largura, 0,12). Um balanço lento soma com uma onda que desce pelo pano
+  (`ondas` ao longo dele, 1,2) e com rajadas; onde o pano dobra a faixa estreita um pouco.
+  `velocidade` (1) acelera tudo.
+- Cada cópia da camada balança num tempo diferente; nas cópias espelhadas o pano vira junto
+  e o vento continua do mesmo lado.
+- O GPT pinta o estandarte junto com o pilar. `tools/stage/separar_bandeiras.py` tira o pano
+  do `pilar.png` (o topo, preso na vara, fica) e salva `bandeira.png`, com 6 px de sobra
+  acima do corte para a emenda não aparecer; ele imprime o trecho do stage.json. Rode uma
+  vez depois de trocar o pilar.
+- Hoje: os pilares do Templo da Lua e do Dojo Yinlu.
+
 ## Efeitos do jogo
 
 - **Reflexo dos lutadores**: `chao.reflexoLutadores` (0 a 1). O `GameView` desenha cada
@@ -126,5 +149,5 @@ reduzir pétalas e brilhos da água, ou usar imagens menores.
 
 `gradle :stage-core:test` (`StageSceneTest`): o plano dos lutadores bate com o desenho do
 jogo, o fundo anda e cresce menos, a profundidade do piso é invertida corretamente, a
-validação do stage.json, e o desenho completo com e sem imagens em várias câmeras sem
-deixar o Canvas desbalanceado.
+validação do stage.json, o desenho completo com e sem imagens em várias câmeras sem
+deixar o Canvas desbalanceado e a bandeira presa em cima balançando embaixo.

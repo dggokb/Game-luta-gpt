@@ -133,7 +133,8 @@ public class StageSceneTest {
             + "{\"tipo\": \"neblina\", \"profundidade\": 2000, \"topo\": 0.3, \"base\": 0.5, \"cor\": \"#334455\"},"
             + "{\"tipo\": \"agua\", \"perto\": 1400, \"longe\": 4000},"
             + "{\"imagem\": \"pilar.png\", \"profundidade\": 300, \"noChao\": true, \"altura\": 1, \"repetir\": \"espelhar\","
-            + " \"periodo\": 0.8, \"reflexo\": 0.3, \"luzes\": [{\"x\": 0.9, \"y\": 0.3}], \"fogos\": [{\"x\": 0.5}]},"
+            + " \"periodo\": 0.8, \"reflexo\": 0.3, \"luzes\": [{\"x\": 0.9, \"y\": 0.3}], \"fogos\": [{\"x\": 0.5}],"
+            + " \"bandeiras\": [{\"imagem\": \"bandeira.png\", \"x\": 0.3, \"y\": 0.3, \"largura\": 0.3, \"altura\": 0.5}]},"
             + "{\"imagem\": \"frente.png\", \"profundidade\": -200, \"topo\": 0.8, \"base\": 1.1},"
             + "{\"imagem\": \"falta.png\", \"profundidade\": 50, \"topo\": 0.1, \"base\": 0.2}],"
             + "\"chao\": {\"imagem\": \"chao.jpg\", \"imagemLajotas\": \"lajotas.jpg\", \"reflexoLutadores\": 0.2},"
@@ -163,6 +164,56 @@ public class StageSceneTest {
         noArt.drawBackground(canvas);
         noArt.drawForeground(canvas);
         assertEquals("sem imagem do piso não há reflexo", 0f, noArt.fighterReflection(), 0f);
+    }
+
+    /** A bandeira é desenhada em faixas: presa em cima, a ponta de baixo balança com o tempo. */
+    @Test
+    public void bannersHangFromTheTopAndSwayAtTheBottom() throws IOException {
+        final FakeImage pilar = new FakeImage(1000, 1500), bandeira = new FakeImage(300, 800);
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"pilar.png\", \"profundidade\": 300, \"noChao\": true, \"altura\": 1, \"x\": 0.4,"
+            + " \"bandeiras\": [{\"imagem\": \"bandeira.png\", \"x\": 0.3, \"y\": 0.25, \"largura\": 0.3, \"altura\": 0.53}]}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("bandeira.png") ? bandeira : pilar;
+            }
+        }, "stages/t");
+        assertEquals(1, pack.definition.layers.get(0).banners.size());
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+
+        float topMin = Float.MAX_VALUE, topMax = -Float.MAX_VALUE, tipMin = Float.MAX_VALUE, tipMax = -Float.MAX_VALUE;
+        int strips = 0;
+        for (int frame = 0; frame < 240; frame++) {
+            scene.update(1f / 60f);
+            CountingCanvas canvas = new CountingCanvas();
+            canvas.watch = bandeira;
+            scene.drawBackground(canvas);
+            assertTrue("desenhada em faixas", canvas.watched.size() >= 6);
+            float[] top = canvas.watched.get(0), tip = canvas.watched.get(canvas.watched.size() - 1);
+            assertEquals("a primeira faixa começa no topo do pano", 0f, top[0], 0.01f);
+            assertEquals("a última termina na ponta", bandeira.height(), tip[1], 0.01f);
+            topMin = Math.min(topMin, (top[2] + top[3]) / 2);
+            topMax = Math.max(topMax, (top[2] + top[3]) / 2);
+            tipMin = Math.min(tipMin, (tip[2] + tip[3]) / 2);
+            tipMax = Math.max(tipMax, (tip[2] + tip[3]) / 2);
+            strips = canvas.watched.size();
+        }
+        assertTrue("presa em cima", topMax - topMin < 1.5f);
+        assertTrue("a ponta balança: " + (tipMax - tipMin), tipMax - tipMin > 8f);
+
+        scene.setDetalhe(false);
+        CountingCanvas leve = new CountingCanvas();
+        leve.watch = bandeira;
+        scene.drawBackground(leve);
+        assertTrue("menos faixas no modo leve", leve.watched.size() < strips);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aBannerWithoutSizeIsAnError() {
+        StageDefinition.fromJson("{\"nome\": \"X\", \"camadas\": [{\"imagem\": \"p.png\", \"profundidade\": 300,"
+            + " \"noChao\": true, \"altura\": 1, \"bandeiras\": [{\"imagem\": \"b.png\"}]}]}");
     }
 
     @Test
@@ -229,6 +280,9 @@ public class StageSceneTest {
     private static final class CountingCanvas implements RenderCanvas {
         int depth, images, regions, lines, rings;
         final java.util.List<Object> ordem = new java.util.ArrayList<>();
+        /** Recortes desenhados da imagem {@code watch}: topo e base no recorte, esquerda e direita na tela. */
+        RenderImage watch;
+        final java.util.List<float[]> watched = new java.util.ArrayList<>();
 
         @Override public void save() { depth++; }
         @Override public void restore() { depth--; assertTrue(depth >= 0); }
@@ -249,6 +303,7 @@ public class StageSceneTest {
         @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
                                               float l, float t, float r, float b, int alpha) {
             regions++;
+            if (image == watch) watched.add(new float[] {st, sb, l, r});
             assertTrue("recorte dentro da imagem", sl >= -0.01f && sr <= image.width() + 0.01f && sr > sl);
             assertTrue(st >= -0.01f && sb <= image.height() + 0.01f && sb > st);
         }

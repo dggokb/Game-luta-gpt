@@ -23,6 +23,7 @@ public class StagesDoJogoTest {
                 new String(Files.readAllBytes(json.toPath()), StandardCharsets.UTF_8));
             for (StageDefinition.Layer layer : def.layers) {
                 if (layer.image != null) existe(pasta, layer.image);
+                for (StageDefinition.Banner b : layer.banners) existe(pasta, b.image);
             }
             if (def.floor != null) {
                 existe(pasta, def.floor.image);
