@@ -2,21 +2,37 @@
   "id": "player_base_idle",
   "javaName": "IDLE",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_idle_sr_2x.png",
+  "source": "art/sprites/source/player_base_idle_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_idle.webp",
   "report": "tools/sprites/reports/player_base_idle.report.json",
   "preview": "android/app/build/sprite-review/idle-import.png",
-  "expectedFrames": 76,
+  "expectedFrames": 41,
   "segmentation": "prepared-grid",
   "columns": 10,
   "rootMode": "authored",
-  "sourceNote": "P01 idle: Real-ESRGAN AnimeVideo-v3 4x master, uniformly reduced to 2x for runtime memory. 76 frames, authored root, 42 ms; originals preserved. No per-frame alignment or temporal smoothing.",
+  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
   "sourceReferences": [
-    "art/sprites/source/player_base_idle_video_normalized.png"
+    "art/sprites/source/player_base_idle_video_normalized.png",
+    "art/sprites/source/player_base_idle_sr_2x.png"
   ],
-  "frameWidth": 512,
-  "frameHeight": 512,
-  "rootX": 256,
-  "rootY": 476,
-  "pixelScale": 2
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 202,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "idle.mp4",
+    "personagem": "p01",
+    "escala": 0.4924,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "101,270",
+    "colunas": 10,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

@@ -2,21 +2,35 @@
   "id": "player_base_medium_kick",
   "javaName": "MEDIUM_KICK",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_medium_kick_sr_hd.png",
+  "source": "art/sprites/source/player_base_medium_kick_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_medium_kick.webp",
   "report": "tools/sprites/reports/player_base_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/medium_kick-import.png",
-  "expectedFrames": 14,
+  "expectedFrames": 12,
   "segmentation": "prepared-grid",
-  "columns": 7,
+  "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 768,
-  "rootX": 280,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "frameWidth": 512,
+  "rootX": 202,
+  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
   "sourceReferences": [
-    "art/sprites/source/player_base_medium_video_normalized.png"
+    "art/sprites/source/player_base_medium_video_normalized.png",
+    "art/sprites/source/player_base_medium_kick_sr_hd.png"
   ],
   "frameHeight": 512,
   "rootY": 476,
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p01",
+    "escala": 0.4924,
+    "medida": "último quadro = inicio_centro (nota 0.96)",
+    "quadros": "4,6,7,10,14,20,22,23,24,25,26,28",
+    "largura": 256,
+    "raiz": "101,238",
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

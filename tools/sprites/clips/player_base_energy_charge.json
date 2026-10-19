@@ -6,45 +6,31 @@
   "output": "android/app/src/main/res/drawable-nodpi/player_base_energy_charge.webp",
   "report": "tools/sprites/reports/player_base_energy_charge.report.json",
   "preview": "android/app/build/sprite-review/player_base_energy_charge-import.png",
-  "expectedFrames": 14,
+  "expectedFrames": 8,
   "segmentation": "prepared-grid",
-  "columns": 5,
+  "columns": 8,
   "rootMode": "authored",
-  "sourceNote": "p01: carga da Onda (loop), vídeo Seedance carga.mp4, convertido por video_para_sprite.py.",
-  "video": {
-    "arquivo": "carga.mp4",
-    "personagem": "p01",
-    "escala": 0.525,
-    "medida": "1º quadro = inicio_centro (nota 0.95)",
-    "inicio": 42,
-    "fim": 70,
-    "passo": 2,
-    "largura": 384,
-    "raiz": "140,238",
-    "colunas": 5,
-    "sem_efeitos": true,
-    "limpar_chao": true,
-    "densidade": 2,
-    "nitidez": true,
-    "referencia": {
-      "folha": "art/sprites/source/player_base_energy_charge_video_normalized.png",
-      "celula": [
-        384,
-        256
-      ],
-      "raiz": [
-        140,
-        238
-      ],
-      "colunas": 5
-    }
-  },
-  "frameWidth": 768,
-  "frameHeight": 512,
-  "rootX": 280,
-  "rootY": 476,
+  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 202,
+  "rootY": 540,
   "pixelScale": 2.0,
   "sourceReferences": [
     "art/sprites/source/player_base_energy_charge_video_normalized.png"
-  ]
+  ],
+  "video": {
+    "arquivo": "s1.mp4",
+    "personagem": "p01",
+    "escala": 0.4924,
+    "medida": "último quadro = inicio_centro (nota 0.96)",
+    "quadros": "35,37,39,41,43,45,47,49",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "101,270",
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

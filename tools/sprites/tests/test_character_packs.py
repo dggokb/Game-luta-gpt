@@ -282,8 +282,10 @@ class CharacterPackTests(unittest.TestCase):
         self.assertEqual((0,0,255,255),images[1].getpixel((0,0)))
 
     def test_impact_frame_must_land_in_the_active_window(self):
-        self.edit(lambda d:d['animations']['LIGHT_JAB'].update(impactFrame=9))
-        with self.assertRaisesRegex(ValueError,'L: impact frame 9 of LIGHT_JAB .* outside the active window'):pipeline.build(self.root)
+        # O último quadro do jab (fim da recuperação) nunca cai na janela ativa, seja qual for a arte.
+        last=len(json.loads(self.path.read_text())['animations']['LIGHT_JAB']['frames'])-1
+        self.edit(lambda d:d['animations']['LIGHT_JAB'].update(impactFrame=last))
+        with self.assertRaisesRegex(ValueError,f'L: impact frame {last} of LIGHT_JAB .* outside the active window'):pipeline.build(self.root)
 
     def test_fixed_scale_requires_a_reason(self):
         path=self.root/'tools/sprites/clips/player_base_hit_crouch.json';d=json.loads(path.read_text())

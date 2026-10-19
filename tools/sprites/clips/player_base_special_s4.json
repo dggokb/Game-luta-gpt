@@ -2,21 +2,37 @@
   "id": "player_base_special_s4",
   "javaName": "SPECIAL_S4_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_special_s4_sr_hd.png",
+  "source": "art/sprites/source/player_base_special_s4_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_special_s4.webp",
   "report": "tools/sprites/reports/player_base_special_s4.report.json",
   "preview": "android/app/build/sprite-review/special_s4-import.png",
-  "expectedFrames": 20,
+  "expectedFrames": 23,
   "segmentation": "prepared-grid",
   "columns": 7,
   "rootMode": "authored",
-  "frameWidth": 704,
-  "rootX": 300,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Salto e giro no proprio desenho; anel de energia removido (--sem-efeitos).",
-  "frameHeight": 704,
-  "rootY": 664,
+  "frameWidth": 576,
+  "rootX": 196,
+  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
+  "frameHeight": 640,
+  "rootY": 604,
   "sourceReferences": [
-    "art/sprites/source/player_base_special_s4_video_normalized.png"
+    "art/sprites/source/player_base_special_s4_video_normalized.png",
+    "art/sprites/source/player_base_special_s4_sr_hd.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "s4.mp4",
+    "personagem": "p01",
+    "escala": 0.494,
+    "medida": "1º quadro = inicio_centro (nota 0.95)",
+    "quadros": "6,8,12,17,20,22,26,28,30,32,34,44,47,49,50,52,54,106,110,112,114,117,120",
+    "celula": 320,
+    "largura": 288,
+    "raiz": "98,302",
+    "colunas": 7,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

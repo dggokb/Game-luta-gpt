@@ -2,21 +2,37 @@
   "id": "player_base_defeat",
   "javaName": "DEFEAT",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_defeat_sr_hd.png",
+  "source": "art/sprites/source/player_base_defeat_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_defeat.webp",
   "report": "tools/sprites/reports/player_base_defeat.report.json",
   "preview": "android/app/build/sprite-review/defeat-import.png",
-  "expectedFrames": 33,
+  "expectedFrames": 25,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
-  "frameWidth": 640,
-  "frameHeight": 640,
-  "rootX": 280,
-  "rootY": 600,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. Derrota: cansado, curva o corpo com a mao no joelho. Um a cada 3 quadros.",
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 200,
+  "rootY": 540,
+  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
   "sourceReferences": [
-    "art/sprites/source/player_base_defeat_video_normalized.png"
+    "art/sprites/source/player_base_defeat_video_normalized.png",
+    "art/sprites/source/player_base_defeat_sr_hd.png"
   ],
-  "pixelScale": 2.0
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "derrota.mp4",
+    "personagem": "p01",
+    "escala": 0.4924,
+    "medida": "1º quadro = inicio_centro (nota 0.94)",
+    "quadros": "88,94,96,97,98,99,100,101,102,104,108,114,120,126,132,138,144,150,156,162,168,174,180,186,191",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "100,270",
+    "colunas": 10,
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }

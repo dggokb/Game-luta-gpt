@@ -2,7 +2,7 @@
   "_doc": "Golpes que batem mais de uma vez, seguindo a animação (tools/sprites/mecanicas.py). pancadas: quadros da animação (índice na lista de frames) em que cada pancada acerta; a primeira vira o impacto do golpe. avanco: velocidade do corpo para a frente até o último quadro ativo (a animação anda). SUPER com pancadas deixa de soltar a onda e bate corpo a corpo: alcance e altura da caixa, lancar no último golpe. Quem não está aqui fica como está (um acerto; Super de onda).",
   "personagens": {
     "player_base": {
-      "S4": {"pancadas": [4, 8, 12], "avanco": 260}
+      "S4": {"pancadas": [4, 9, 14], "avanco": 260}
     },
     "p02": {
       "S4": {"pancadas": [2, 4], "avanco": 380},

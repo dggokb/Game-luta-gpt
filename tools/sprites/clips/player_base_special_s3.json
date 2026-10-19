@@ -2,22 +2,37 @@
   "id": "player_base_special_s3",
   "javaName": "SPECIAL_S3_SET",
   "profile": "player_base.json",
-  "source": "art/sprites/source/player_base_special_s3_sr_hd.png",
+  "source": "art/sprites/source/player_base_special_s3_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/player_base_special_s3.webp",
   "report": "tools/sprites/reports/player_base_special_s3.report.json",
   "preview": "android/app/build/sprite-review/special_s3-import.png",
-  "expectedFrames": 21,
+  "expectedFrames": 18,
   "segmentation": "prepared-grid",
   "columns": 8,
   "rootMode": "authored",
-  "frameWidth": 768,
-  "rootX": 280,
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "frameWidth": 512,
+  "rootX": 198,
+  "sourceNote": "p01 gerado em vídeo (Flick), quadros escolhidos à mão; convertido por video_para_sprite.py (receita em \"video\").",
   "ancoradoPe": "pé de apoio fixado por tools/sprites/ancorar.py",
   "sourceReferences": [
-    "art/sprites/source/player_base_special_s3_video_normalized.png"
+    "art/sprites/source/player_base_special_s3_video_normalized.png",
+    "art/sprites/source/player_base_special_s3_sr_hd.png"
   ],
-  "frameHeight": 512,
-  "rootY": 476,
-  "pixelScale": 2.0
+  "frameHeight": 576,
+  "rootY": 540,
+  "pixelScale": 2.0,
+  "video": {
+    "arquivo": "s3.mp4",
+    "personagem": "p01",
+    "escala": 0.4924,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "24,26,30,38,44,46,47,48,49,51,53,66,80,82,83,84,86,88",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "99,270",
+    "fixar": "video",
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
+  }
 }
