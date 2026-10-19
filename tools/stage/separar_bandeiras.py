@@ -38,8 +38,9 @@ BANDEIRAS = {
     "dojo_yinlu": {
         "retangulo": (380, 440, 652, 1125),
         "corte": ((390, 512), (600, 555)),
-        # A lanterna à direita encosta no retângulo até a altura do pingente.
-        "fora": [(636, 440, 652, 820)],
+        # A lanterna à direita (com o brilho do papel) entra no retângulo até o pingente;
+        # embaixo dela só as pontas da bandeira chegam tão longe.
+        "fora": [(582, 440, 652, 830)],
     },
 }
 
