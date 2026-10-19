@@ -180,6 +180,23 @@ def plateia(img, faixas):
     return saida
 
 
+def tirar_plateia(img, mascara):
+    """A arquibancada sem a gente: onde a máscara é gente, fica o fundo escuro dos assentos
+    (a própria plateia borrada e bem escurecida). A gente vai para a camada recortada
+    ("recortada" no stage.json) e, quando um grupo pula, embaixo aparece assento vazio, não
+    uma cópia da plateia."""
+    from PIL import ImageFilter
+    base = img.convert("RGBA")
+    m = np.asarray(mascara.convert("RGBA").getchannel("A")).astype(np.float32)[..., None] / 255.0
+    # Assento vazio: a cor da própria plateia bem borrada (some a textura de gente) e um pouco
+    # mais escura, para o grupo que pula se destacar sem abrir um buraco preto.
+    assentos = np.asarray(base.filter(ImageFilter.GaussianBlur(14))).astype(np.float32)
+    assentos[..., :3] *= 0.6
+    px = np.asarray(base).astype(np.float32)
+    px[..., :3] = px[..., :3] * (1 - m) + assentos[..., :3] * m
+    return Image.fromarray(px.clip(0, 255).astype(np.uint8))
+
+
 def peca_comum(nome, img):
     """Uma peça comum da ilha como ela entra no cenário (as de longe com a névoa)."""
     if nome == "penhascos":

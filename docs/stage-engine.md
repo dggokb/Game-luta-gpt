@@ -103,7 +103,11 @@ em baixo, então nada fora da faixa é coberto. A faixa precisa ficar toda dentr
 (sem pegar grade, sacada ou parapeito). Com `"mascara"` (imagem só com a gente, do mesmo tamanho
 da camada; `montar_porto.plateia` gera), só os pixels de gente pulam: estandartes, luzes e
 escadas que cruzam a faixa ficam parados (sem a máscara, a coluna inteira pulava e cortava
-os estandartes). O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
+os estandartes). Com `"recortada": true` a gente foi tirada da imagem da camada (no lugar,
+assentos escuros) e só existe na máscara: ela é desenhada inteira em todo quadro e cada grupo
+pula livre, sem margem; embaixo aparece assento vazio. `"flashes"` ([[x, y], ...], gerados pelo
+`tools/stage/pontos_plateia.py` a partir da máscara) piscam flashes de câmera na plateia, muito
+mais quando a luta esquenta. O jogo chama `StageScene.cheer(0..1)` a cada golpe que acerta (forte no pesado, 1 no
 KO) e a plateia pula mais e mais rápido, voltando ao normal em uns dois segundos.
 
 **Ondulação do mar**: o mar deitado, além da `corrente`, vai e volta em cada faixa, defasado

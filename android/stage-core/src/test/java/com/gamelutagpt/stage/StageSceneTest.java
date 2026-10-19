@@ -249,6 +249,33 @@ public class StageSceneTest {
         }
     }
 
+    /** Plateia recortada: a gente (só na máscara) é desenhada inteira em todo quadro, pulando ou não. */
+    @Test
+    public void cutoutCrowdIsAlwaysDrawnWhole() throws IOException {
+        final FakeImage arquibancada = new FakeImage(2000, 500), gente = new FakeImage(2000, 500);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"a.png\", \"profundidade\": 600, \"noChao\": true, \"altura\": 0.4,"
+            + " \"plateia\": [{\"topo\": 0.3, \"base\": 0.6, \"pulo\": 0.02, \"colunas\": 50,"
+            + " \"mascara\": \"g.png\", \"recortada\": true}]}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) { return path.endsWith("g.png") ? gente : arquibancada; }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        for (int frame = 0; frame < 20; frame++) {
+            scene.update(1f / 60f);
+            final int[] columns = {0};
+            scene.drawBackground(new CountingCanvas() {
+                @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                      float l, float t, float r, float b, int alpha) {
+                    if (image == gente) columns[0]++;
+                }
+            });
+            assertEquals("todas as colunas da plateia, em todo quadro", 50, columns[0]);
+        }
+    }
+
     /** A bandeira é desenhada em faixas: presa em cima, a ponta de baixo balança com o tempo. */
     @Test
     public void bannersHangFromTheTopAndSwayAtTheBottom() throws IOException {

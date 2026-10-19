@@ -58,7 +58,10 @@ public final class StagePack {
                 if (!names.contains(banner.image)) names.add(banner.image);
             }
             for (StageDefinition.Crowd crowd : layer.crowds) {
-                if (crowd.mask != null && !names.contains(crowd.mask)) names.add(crowd.mask);
+                // A máscara só é usada no jogo para a plateia que pula; com os flashes, não.
+                if (crowd.mask != null && (crowd.jump > 0f || crowd.cutout) && !names.contains(crowd.mask)) {
+                    names.add(crowd.mask);
+                }
             }
         }
         if (definition.floor != null) {

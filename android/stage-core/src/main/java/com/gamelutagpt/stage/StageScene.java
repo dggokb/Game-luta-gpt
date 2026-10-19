@@ -638,9 +638,11 @@ public final class StageScene {
             // Só o miolo da faixa se mexe: a margem (o maior pulo) fica parada em cima e em
             // baixo. Pulando, o miolo cobre a margem de cima (gente sobre gente) e deixa à
             // mostra a margem de baixo, que é plateia também; nada fora da faixa é tocado.
-            float margin = crowd.jump * 1.75f;
-            float amp = Math.min(margin * h, crowd.jump * h * (0.35f + 1.4f * hype));
-            if (amp < 0.4f) continue;
+            // Recortada: a gente está só na máscara e pula livre (sem margem), sempre desenhada.
+            float margin = crowd.cutout ? 0f : crowd.jump * 1.75f;
+            float amp = crowd.jump * h * (0.35f + 1.4f * hype);
+            if (!crowd.cutout) amp = Math.min(margin * h, amp);
+            if (amp < 0.4f && !crowd.cutout) continue;
             float inTop = crowd.top + margin, inBottom = crowd.bottom - margin;
             if (inBottom <= inTop) continue;
             RenderImage source = crowd.mask != null ? pack.image(crowd.mask) : null;
@@ -654,14 +656,44 @@ public final class StageScene {
                 float phase = (float)Math.sin(i * 0.37f + instance * 1.7f + band * 2.3f) * 2.4f
                     + ((i * 7919 + instance * 104729 + band * 31) % 97) * 0.05f;
                 float wave = (float)Math.sin(time * speed + phase);
-                if (wave <= 0f) continue;
-                float dy = -amp * wave * wave;
+                if (wave <= 0f && !crowd.cutout) continue;
+                float dy = wave > 0f ? -amp * wave * wave : 0f;
                 float sx0 = i * imgW / n * kx, sx1 = (i + 1) * imgW / n * kx;
                 float x0 = l + i * w / n, x1 = l + (i + 1) * w / n;
                 c.drawImageRegion(source, sx0, sy0, sx1, sy1, x0, dy0 + dy, x1 + 0.5f, dy1 + dy, alpha);
             }
         }
         if (mirrored) c.restore();
+        drawFlashes(c, layer, l, t, r, b, mirrored, instance);
+    }
+
+    /**
+     * Flashes de câmera e celular na plateia: cada ponto de gente pisca de vez em quando (um
+     * clarão rápido); com a luta quente ({@link #cheer}) eles piscam muito mais. A plateia em
+     * si não se mexe, então nada da pintura é cortado.
+     */
+    private void drawFlashes(RenderCanvas c, StageDefinition.Layer layer, float l, float t, float r, float b,
+                             boolean mirrored, int instance) {
+        float w = r - l, h = b - t;
+        float radius = Math.max(1.1f, h * 0.0055f);
+        float period = 5.5f - 4.8f * hype;
+        for (int band = 0; band < layer.crowds.size(); band++) {
+            StageDefinition.Crowd crowd = layer.crowds.get(band);
+            for (int i = 0; i < crowd.flashX.length; i++) {
+                int seed = i * 7919 + instance * 104729 + band * 31337;
+                float offset = ((seed * 2654435761L) >>> 8 & 0xFFFF) / 65536f;
+                float speed = 0.7f + 0.6f * (((seed * 40503L) >>> 4 & 0xFFFF) / 65536f);
+                float cycle = time / (period * speed) + offset;
+                cycle -= (float)Math.floor(cycle);
+                if (cycle > 0.045f) continue;
+                float k = 1f - cycle / 0.045f;
+                float fx = mirrored ? 1f - crowd.flashX[i] : crowd.flashX[i];
+                float x = l + fx * w, y = t + crowd.flashY[i] * h;
+                if (x < -10f || x > VW + 10f || y < -10f || y > VH + 10f) continue;
+                c.fillRadialGlow(x, y, radius * 4f, withAlpha(0xFFFFFFFF, Math.round(150 * k)));
+                c.fillCircle(x, y, radius, withAlpha(0xFFFFFFFF, Math.round(255 * k)));
+            }
+        }
     }
 
     private static void drawImage(RenderCanvas c, RenderImage image, float l, float t, float r, float b,

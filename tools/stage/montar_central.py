@@ -35,10 +35,10 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar, plateia  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar, plateia, tirar_plateia  # noqa: E402
 
 # Faixas de plateia (topo, base em fração da altura), as mesmas do stage.json.
-PLATEIA = [(0.31, 0.45), (0.6, 0.79)]
+PLATEIA = [(0.39, 0.48), (0.63, 0.8)]
 ID = "arena_central"
 COMUNS = ("ceu_lua", "mar", "penhascos")
 # Juntas das lajotas que fecham o padrão, em volta do círculo do emblema.
@@ -74,6 +74,7 @@ def main():
     parser.add_argument("--entrada", required=True, type=Path, help="pasta da arena_central")
     parser.add_argument("--comum", required=True, type=Path, help="pasta das peças comuns da ilha")
     parser.add_argument("--saida", type=Path, default=SAIDA_PADRAO / ID)
+    parser.add_argument("--sem-plateia", action="store_true", help="não recorta a plateia (para medir as faixas)")
     args = parser.parse_args()
 
     entrada = imagens(args.entrada)
@@ -115,8 +116,13 @@ def main():
         for arquivo in sorted(tmp.iterdir()):
             saida, tamanho = preparar(arquivo, args.saida)
             print(f"{arquivo.name} -> {saida.name} {tamanho[0]}x{tamanho[1]}")
-    # Plateia viva: só a gente da arquibancada, do mesmo tamanho dela (sem cortar margens).
-    plateia(Image.open(args.saida / "arquibancada.png"), PLATEIA).save(args.saida / "arquibancada_plateia.png")
+    # Plateia recortada: a gente vai para uma imagem só dela (do mesmo tamanho, sem cortar
+    # margens) e a arquibancada fica com os assentos escuros no lugar.
+    if not args.sem_plateia:
+        base = Image.open(args.saida / "arquibancada.png")
+        gente = plateia(base, PLATEIA)
+        gente.save(args.saida / "arquibancada_plateia.png")
+        tirar_plateia(base, gente).save(args.saida / "arquibancada.png")
 
 
 if __name__ == "__main__":

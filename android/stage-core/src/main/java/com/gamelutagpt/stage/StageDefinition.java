@@ -88,9 +88,25 @@ public final class StageDefinition {
          * passam pela faixa ficam parados. Null = a faixa inteira pula.
          */
         public final String mask;
+        /**
+         * Pontos de gente da faixa ({@code "flashes"}: [[x, y], ...] em fração da imagem), onde
+         * piscam flashes de câmera e celular; muitos mais quando a luta esquenta. Saem da
+         * máscara na montagem (tools/stage/pontos_plateia.py), então nunca caem num estandarte.
+         */
+        public final float[] flashX, flashY;
+        /**
+         * {@code "recortada"}: a gente foi tirada da imagem da camada (no lugar ficaram os
+         * assentos escuros) e só existe na {@code mascara}. Ela é desenhada sempre, inteira,
+         * e cada grupo pula livre: embaixo aparece assento vazio, não uma cópia da plateia.
+         */
+        public final boolean cutout;
 
-        Crowd(float top, float bottom, float jump, int columns, String mask) {
+        Crowd(float top, float bottom, float jump, int columns, String mask, float[] flashX, float[] flashY,
+              boolean cutout) {
+            this.cutout = cutout && mask != null;
             this.mask = mask;
+            this.flashX = flashX;
+            this.flashY = flashY;
             this.top = top;
             this.bottom = bottom;
             this.jump = jump;
@@ -507,8 +523,9 @@ public final class StageDefinition {
             if (!(item instanceof Map)) continue;
             Map<String, Object> cm = (Map<String, Object>)item;
             Crowd cr = new Crowd(clamp01(number(cm, "topo", 0.3f)), clamp01(number(cm, "base", 0.9f)),
-                number(cm, "pulo", 0.012f), Math.max(8, Math.round(number(cm, "colunas", 140f))),
-                string(cm, "mascara", null));
+                number(cm, "pulo", 0f), Math.max(8, Math.round(number(cm, "colunas", 140f))),
+                string(cm, "mascara", null), pontos(cm, "flashes", 0), pontos(cm, "flashes", 1),
+                bool(cm, "recortada", false));
             if (cr.bottom <= cr.top) throw new IllegalArgumentException(where + ": plateia precisa de base > topo");
             b.crowds.add(cr);
         }
@@ -600,6 +617,21 @@ public final class StageDefinition {
             }
         }
         return new Layer(b);
+    }
+
+    /** Coordenada {@code k} (0 = x, 1 = y) de uma lista de pontos [[x, y], ...]. */
+    private static float[] pontos(Map<String, Object> map, String key, int k) {
+        Object field = map.get(key);
+        List<Object> list = field instanceof List ? (List<Object>)field : Collections.emptyList();
+        float[] out = new float[list.size()];
+        for (int i = 0; i < out.length; i++) {
+            Object item = list.get(i);
+            if (!(item instanceof List) || ((List<Object>)item).size() < 2) {
+                throw new IllegalArgumentException(key + " precisa de pontos [x, y]");
+            }
+            out[i] = ((Number)((List<Object>)item).get(k)).floatValue();
+        }
+        return out;
     }
 
     private static void requireDepth(Builder b, String where) {
