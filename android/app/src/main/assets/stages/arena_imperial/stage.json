@@ -61,7 +61,7 @@
       "imagem": "arquibancada_lateral.png",
       "profundidade": 700,
       "noChao": true,
-      "altura": 0.3,
+      "altura": 0.45,
       "x": 0.5,
       "repetir": "espelhar",
       "luzes": [
@@ -75,7 +75,7 @@
       "imagem": "palacio.png",
       "profundidade": 690,
       "noChao": true,
-      "altura": 0.46,
+      "altura": 0.62,
       "x": 0.5,
       "repetir": "nao",
       "luzes": [

@@ -70,6 +70,14 @@ cenários não precisa gerar essas duas imagens.
   provisória (`montar_porto.textura_mar`, das ondas de perto do `mar.png`); o ideal é gerar
   uma no GPT: "mar à noite visto exatamente de cima, ondas pequenas com espuma, reflexos
   dourados, sem horizonte, sem céu, as quatro bordas continuam o padrão".
+- **Escala: os lutadores são a régua.** Logo atrás do piso, uma arquibancada de estádio tem
+  várias vezes a altura de uma pessoa: Costeira 0,5 da tela, Central 0,75, as laterais da
+  Imperial 0,45 e o palácio 0,62 (antes eram 0,27 a 0,42 e pareciam maquetes). O que é grande
+  e está perto ocupa a tela; pequeno só o que está longe de verdade.
+- **Estádio côncavo não se repete.** A arquibancada da Central é a tigela inteira do estádio:
+  repetida lado a lado, virava uma onda de curvas. Fica uma só (`"repetir": "nao"`),
+  centrada na arena (x 0,806, o mundo vai de 0 a 2600) e esticada na largura na montagem
+  (`LARGURA_ESTADIO`) para cobrir a câmera em qualquer posição. Só repete o que é reto.
 - **Paisagem gigante fica lá no fundo, junto do mar.** A ilha, a encosta, os penhascos, as
   arenas e o templo ao longe ficam a 8600–8800 (o mar a 9000), com `"apoio": 9000`, e o
   tamanho na tela vem do `topo`/`base`. Mais perto (a encosta estava a 2600), uma montanha

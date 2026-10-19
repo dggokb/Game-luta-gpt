@@ -85,7 +85,7 @@
       "imagem": "holofote.png",
       "profundidade": 615,
       "noChao": true,
-      "altura": 0.7,
+      "altura": 0.95,
       "x": 0.27,
       "repetir": "espelhar",
       "periodo": 0.8,
@@ -98,7 +98,7 @@
       "imagem": "arquibancada.png",
       "profundidade": 605,
       "noChao": true,
-      "altura": 0.27,
+      "altura": 0.5,
       "repetir": "espelhar",
       "luzes": [
         { "x": 0.25, "y": 0.726, "raio": 0.06, "cor": "#FFB45A", "pulsar": 0.06 },

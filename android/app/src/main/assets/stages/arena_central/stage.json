@@ -75,10 +75,11 @@
       "imagem": "arquibancada.png",
       "profundidade": 640,
       "noChao": true,
-      "altura": 0.42,
-      "repetir": "espelhar",
+      "altura": 0.75,
+      "x": 0.806,
+      "repetir": "nao",
       "luzes": [
-        { "x": 0.094, "y": 0.792, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
+        { "x": 0.5, "y": 0.792, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
         { "x": 0.378, "y": 0.817, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
         { "x": 0.62, "y": 0.818, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 },
         { "x": 0.907, "y": 0.792, "raio": 0.04, "cor": "#FFC070", "pulsar": 0.05 }

@@ -13,7 +13,9 @@ transparentes, alfa opaco, JPG, 2048 px):
   cortadas ali, e o padrão de lajotas fecha com a cópia do lado. A ponta da linha vermelha
   da cruz, que entra pelas bordas, é coberta com as lajotas ao lado, e as poucas colunas da
   borda do chao vêm do chao_liso já limpo.
-- Arquibancada: o GPT pintou um pedaço do piso do ringue embaixo dela; é cortado.
+- Arquibancada: o GPT pintou um pedaço do piso do ringue embaixo dela; é cortado. É uma
+  tigela côncava (o estádio inteiro): repetida, virava uma onda de curvas. Fica uma só,
+  esticada na largura (`LARGURA_ESTADIO`) para cobrir a câmera.
 - Templo ao longe e penhascos: névoa da distância (montar_porto.afastar).
 - Sem primeiro plano: o camarote.png é ignorado (objetos colados na câmera ficavam soltos
   no meio do piso nos outros cenários da ilha).
@@ -44,6 +46,7 @@ BORDA = 14
 LINHA = (405 / 941, 495 / 941)
 # Fração da altura da arquibancada.png onde começa o piso pintado.
 CORTE_ARQUIBANCADA = 655 / 724
+LARGURA_ESTADIO = 1.4
 
 
 def montar_piso(chao, liso):
@@ -101,6 +104,9 @@ def main():
             if nome == "arquibancada":
                 img = img.convert("RGBA")
                 img = img.crop((0, 0, img.width, round(img.height * CORTE_ARQUIBANCADA)))
+                # O estádio é uma tigela só (côncava): não se repete, e esticado na largura
+                # cobre a câmera em qualquer posição na altura de um estádio de verdade.
+                img = img.resize((round(img.width * LARGURA_ESTADIO), img.height), Image.LANCZOS)
             elif nome == "templo_longe":
                 img = afastar(solidificar(esfumar_ilha(img, lados=0.03, baixo=0.0)), 0.4)
             img.save(tmp / f"{nome}.png")
