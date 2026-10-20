@@ -22,9 +22,13 @@ e a fórmula de prompt que funcionou. Os prompts aprovados do p15 estão na [fic
 | andar para trás, backdash | `inicio_direita` | `inicio_centro` |
 | dash | `inicio_esquerda` | `inicio_direita` |
 | jab (L de soco reto) | `inicio_centro` | pose do jab esticado (ver abaixo) |
+| golpe agachado reto (2L) | `inicio_agachado` | pose do golpe, agachada |
+| golpe que gira (rasteira) | `inicio_agachado` | `inicio_agachado` (giro por faixas, ver abaixo) |
 
 Movimento que muda de lugar **não** usa a mesma imagem nas duas pontas: o modelo recua e volta,
-desliza ou move a câmera para terminar no mesmo ponto.
+desliza ou move a câmera para terminar no mesmo ponto. O fim tem de ficar **onde o corpo termina**:
+o vídeo de volta do S4 com fim em `inicio_direita` (300 px longe do pé do impacto) fez a
+personagem levantar, virar e andar; com `inicio_centro` (o pé de trás já no lugar) ela só levanta.
 
 ## Fórmula do prompt
 
@@ -107,6 +111,46 @@ O braço da frente já começa quase esticado na guarda; sem curso, o modelo soc
    com o `impactFrame` no quadro esticado.
 
 Vale para todos os jabs (L de soco reto de qualquer personagem).
+
+## Poses-chave (golpes que o texto não acerta)
+
+Perna e braço por texto falham: no H do p15 o vídeo e o modelo de imagem chutaram com a perna
+da frente quando o prompt pedia a de trás, e com a de trás quando pedia a da frente. O membro
+certo vem de uma **pose** (ChatGPT/Nano Banana), e o vídeo só vai até ela.
+
+- **Não nomear a perna** na pose: descrever o golpe, gerar várias e escolher a boa. No vídeo, "the
+  leg that is raised in the end frame".
+- **Cada vídeo faz uma coisa só, entre duas poses fixas.** Com cinco fases num vídeo (voadora,
+  pisão, volta) o modelo fez a principal e pulou o resto.
+- **Volta pelo inverso** quando o caminho é reto (soco, jab, upper, agachar). **Vídeo de volta
+  próprio** quando gira ou pousa (o inverso fica rebobinado ou "sobe de volta" para o ar).
+- **A pose tem de ler como golpe parada.** O impacto do pisão é alguém em pé (o modelo desenhou os
+  dois pés no chão); o do machado virou base baixa e comprida, perna da frente reta só no
+  calcanhar, joelho de trás quase no chão. "Stomp" puxa os dois pés no chão.
+- **Escala e posição**: o modelo de imagem devolve a pose maior ou menor (1,65× e 2,05× no p15).
+  Antes do vídeo, medir pela cabeça (casamento em escalas contra o `inicio_centro`), pela luva ou
+  pelo prendedor do cabelo quando a cabeça está de perfil, reescalar e pôr os pés na linha do chão
+  (y ≈ 645 a 1280×720). Conferir sobrepondo à guarda. Editar a pose a partir de outra já na
+  escala (`pose_carga` → `pose_upper`) ajuda, mas não garante.
+- Um quadro do próprio vídeo serve de pose de partida para o trecho seguinte (`pose_voo_fim` = o
+  quadro 40 da voadora do S4): a emenda fica perfeita.
+
+### Giro: mesma imagem nas duas pontas
+
+Com pose de fim, o modelo vai pelo caminho mais curto e o giro some (a rasteira só escorregava o pé
+para a frente, mesmo com pose do meio do giro). O que funcionou: **início = fim = a guarda** e o giro
+dividido em faixas, com o "de costas para a câmera" numa faixa própria e "ONE full 360-degree
+spin". Prompt na ficha do p15 (2M).
+
+## Efeito de anime no desenho (smear)
+
+Braços múltiplos de rajada (Zanretsuken do S3) são desenho do sprite, não efeito do jogo, e podem
+vir do vídeo **se forem sólidos**: "smear frames, a fan of three or four solid fists", "solid, fully
+opaque... never transparent, never ghostly, never tinted", "the smear is only the extra solid fists".
+Fantasma transparente vira mancha esverdeada no recorte, e risco branco ("swoosh") é efeito: nesses
+quadros só sobra o que o `limpar.py` salvar. "Exactly two arms, no copies, no afterimages" desliga o
+efeito. Referência de estilo sem nome de personagem/marca: "like the hundred-fist rush of 1990s anime
+fighting games".
 
 ## Se der errado
 
