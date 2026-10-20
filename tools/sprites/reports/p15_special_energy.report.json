@@ -11,7 +11,7 @@
     "frameHeight": 576,
     "rootX": 222,
     "rootY": 516,
-    "columns": 9,
+    "columns": 8,
     "frameCount": 27
   },
   "frames": [
@@ -319,7 +319,7 @@
     "frameHeight": 482,
     "rootX": 174,
     "rootY": 471,
-    "columns": 9,
+    "columns": 8,
     "frameCount": 27,
     "cropOffset": [
       48,
@@ -546,8 +546,8 @@
       ]
     ],
     "decodedBytes": {
-      "canonical": 28740096,
-      "grid": 20978568,
+      "canonical": 34062336,
+      "grid": 24863488,
       "packed": 15546432
     },
     "pixelScale": 2.0
@@ -556,8 +556,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "df63e5efa82a353e4259f016364ed5ea00b1bca1b57f3f1cd2569ef619f5126e",
-      "config": "8c885fa0cea6aaa32dff17f0546819a70ead954048f63c668820e827fe2e252b",
+      "source": "85256daa914b435f5a44e6c06fe0bd55d82737fe77dda9811239233bd552f8eb",
+      "config": "d3e6c9e4f85879297c55b555acead17456484825c55fa1c06aa96ae5a8d634b5",
       "profile": "ae5cb927c2eddb9d6b2fbd36257eb0f57c9509d14be10c0073ec5a684829d44c"
     }
   }

@@ -326,10 +326,10 @@ def plan(char, folder):
     rise = (apex - t0 + 1) / VIDEO_FPS / f
     f_fall = acc('FALL')
     fall = (t1 + 1 - apex) / VIDEO_FPS / f_fall
-    mv['jumpSpeed'] = round(2 * height / rise, 1)
-    mv['jumpRisingGravity'] = round(mv['jumpSpeed'] / rise, 1)
-    mv['jumpFallingGravity'] = round(2 * height / fall ** 2, 1)
-    report['JUMP'] = f'{height:.0f} u de altura, {rise:.2f} s subindo e {fall:.2f} s descendo (fator {f}/{f_fall})'
+    # A altura e a física do pulo são as do motor (iguais para todos): o vídeo dá o tempo das
+    # animações de subida e descida. O pulo do vídeo do Omni é um pulinho (metade da altura dela).
+    report['JUMP'] = (f'física do motor; no vídeo {height:.0f} u de altura, {rise:.2f} s subindo e '
+                      f'{fall:.2f} s descendo (fator {f}/{f_fall})')
     for state, name in (('JUMP', 'jump'), ('FALL', 'fall'), ('LAND', 'land'), ('CROUCH', 'crouch'), ('RISE', 'rise'),
                         ('IDLE', 'idle'), ('IDLE2', 'idle2')):
         c = clip(name)

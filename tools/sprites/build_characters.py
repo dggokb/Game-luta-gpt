@@ -52,8 +52,9 @@ ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
 # Movimento próprio medido no vídeo (tools/sprites/comportamento.py); sem ele, o do motor.
-MOVEMENT_FLOATS = ('walkSpeed','walkBackSpeed','dashSpeed','backdashSpeed','backdashHopHeight',
-                   'jumpSpeed','jumpRisingGravity','jumpFallingGravity')
+MOVEMENT_FLOATS = ('walkSpeed','walkBackSpeed','dashSpeed','backdashSpeed','backdashHopHeight')
+# Pulo próprio (opcional): sem ele, a física de pulo do motor, que é a mesma para todos.
+MOVEMENT_JUMP = ('jumpSpeed','jumpRisingGravity','jumpFallingGravity')
 MOVEMENT_INTS = ('backdashFrames','backdashRecoveryFrames')
 COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
@@ -115,6 +116,8 @@ def validate_fighter(pack):
             if key == 'backdashHopHeight' and mv.get(key) == 0: continue  # salto já desenhado na arte
             positive(mv.get(key), f'{name}.movimento.{key}')
         for key in MOVEMENT_INTS: positive_int(mv.get(key), f'{name}.movimento.{key}')
+        if any(k in mv for k in MOVEMENT_JUMP):
+            for key in MOVEMENT_JUMP: positive(mv.get(key), f'{name}.movimento.{key}')
         for key, state in (('walkStepSeconds','WALK_FORWARD'), ('walkBackStepSeconds','WALK_BACK')):
             if key in mv:
                 steps = pack['animations'][state].get('distancias')
@@ -572,7 +575,8 @@ def compile_packs(root, results):
         return code+'.build()'
     def movement(mv):
         if not mv: return ''
-        v = {k: f(mv[k]) for k in MOVEMENT_FLOATS} | {k: str(mv[k]) for k in MOVEMENT_INTS}
+        v = {k: f(mv[k]) for k in MOVEMENT_FLOATS} | {k: str(mv[k]) for k in MOVEMENT_INTS} | \
+            {k: f(mv.get(k, 0)) for k in MOVEMENT_JUMP}  # 0 = o pulo do motor
         order = ('walkSpeed','walkBackSpeed','dashSpeed','backdashSpeed','backdashFrames','backdashRecoveryFrames',
                  'backdashHopHeight','jumpSpeed','jumpRisingGravity','jumpFallingGravity')
         arr = lambda k: 'new float[]{'+','.join(f(x) for x in mv[k])+'}' if k in mv else 'null'  # noqa: E731

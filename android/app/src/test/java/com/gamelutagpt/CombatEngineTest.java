@@ -663,7 +663,8 @@ public class CombatEngineTest {
         back.in[0].direction = 5;
         back.steps(30);
         assertTrue("anda para trás", back.f(0).x < 1000f);
-        // Pulo: sobe até a altura do vídeo dele (v² / 2g na subida).
+        // Pulo: a física do motor, a mesma de todos (o vídeo só dá o tempo da animação).
+        assertEquals(0f, own.jumpSpeed, 0f);
         Sim jump = new Sim(p15, NPC, 500f, 1500f);
         jump.in[0].direction = 7;
         float top = Arena.GROUND_Y;
@@ -672,7 +673,8 @@ public class CombatEngineTest {
             top = Math.min(top, jump.f(0).y);
             if (i > 5) jump.in[0].direction = 0;
         }
-        float height = own.jumpSpeed * own.jumpSpeed / (2f * own.jumpRisingGravity);
+        CombatConfig base = new CombatConfig();
+        float height = base.jumpSpeed * base.jumpSpeed / (2f * base.gravity * base.normalJumpRisingGravityScale);
         assertEquals(height, Arena.GROUND_Y - top, 0.08f * height);
     }
 

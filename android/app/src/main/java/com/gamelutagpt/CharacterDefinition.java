@@ -312,7 +312,7 @@ final class CharacterDefinition {
     static final class Movement {
         final float walkSpeed, walkBackSpeed, dashSpeed, backdashSpeed, backdashHopHeight;
         final int backdashFrames, backdashRecoveryFrames;
-        /** Pulo normal: velocidade de saída e gravidade (u/s²) na subida e na descida. */
+        /** Pulo normal: velocidade de saída e gravidade (u/s²) na subida e na descida; 0 = o do motor. */
         final float jumpSpeed, jumpRisingGravity, jumpFallingGravity;
         /** Tempo de cada quadro do andar no vídeo (s, já acelerado): o motor anda a distância
          *  daquele quadro nesse tempo, em arrancadas como no vídeo. null = velocidade constante. */

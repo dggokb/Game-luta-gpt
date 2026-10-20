@@ -2710,11 +2710,11 @@ final class GeneratedSpriteLayouts {
     static final int P15_SPECIAL_S2_ROOT_Y = 508;
     static final int P15_SPECIAL_S2_FRAME_COUNT = 25;
 
-    static final int P15_SPECIAL_S3_FRAME_WIDTH = 455;
-    static final int P15_SPECIAL_S3_FRAME_HEIGHT = 504;
-    static final int P15_SPECIAL_S3_ROOT_X = 216;
-    static final int P15_SPECIAL_S3_ROOT_Y = 492;
-    static final int P15_SPECIAL_S3_FRAME_COUNT = 55;
+    static final int P15_SPECIAL_S3_FRAME_WIDTH = 444;
+    static final int P15_SPECIAL_S3_FRAME_HEIGHT = 501;
+    static final int P15_SPECIAL_S3_ROOT_X = 202;
+    static final int P15_SPECIAL_S3_ROOT_Y = 489;
+    static final int P15_SPECIAL_S3_FRAME_COUNT = 49;
 
     static final int P15_SPECIAL_S4_FRAME_WIDTH = 313;
     static final int P15_SPECIAL_S4_FRAME_HEIGHT = 354;

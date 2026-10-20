@@ -1362,7 +1362,7 @@ final class CombatEngine {
         return movement(f) != null ? movement(f).backdashRecoveryFrames : config.backdashRecoveryFrames;
     }
     private float jumpSpeed(CombatFighter f) {
-        return movement(f) != null ? movement(f).jumpSpeed : config.jumpSpeed;
+        return movement(f) != null && movement(f).jumpSpeed > 0 ? movement(f).jumpSpeed : config.jumpSpeed;
     }
     /** Altura do pulinho do backdash agora (só no desenho; a caixa fica no chão). */
     float backdashVisualLift(CombatFighter f) {
@@ -1436,7 +1436,7 @@ final class CombatEngine {
         }
         float gravity = config.gravity * scale;
         CharacterDefinition.Movement own = movement(f);
-        if (normalJump && own != null) {  // o pulo do vídeo do personagem
+        if (normalJump && own != null && own.jumpSpeed > 0) {  // pulo próprio do personagem
             gravity = f.vy < 0f ? own.jumpRisingGravity : own.jumpFallingGravity;
         }
         f.vy += gravity * CombatConfig.DT;

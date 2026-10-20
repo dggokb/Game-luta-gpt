@@ -28,7 +28,7 @@
         2,
         1
       ],
-      "spawnX": 105,
+      "spawnX": 118,
       "spawnY": 198,
       "crouchSpawnY": 94,
       "attack": {
@@ -128,10 +128,7 @@
       "backdashFrames": 35,
       "backdashSpeed": 274.9,
       "backdashRecoveryFrames": 1,
-      "backdashHopHeight": 0.0,
-      "jumpSpeed": 578.2,
-      "jumpRisingGravity": 1541.9,
-      "jumpFallingGravity": 867.3
+      "backdashHopHeight": 0.0
     }
   },
   "animations": {
@@ -1178,13 +1175,7 @@
         45,
         46,
         47,
-        48,
-        49,
-        50,
-        51,
-        52,
-        53,
-        54
+        48
       ],
       "loop": false,
       "durationsMs": [
@@ -1221,28 +1212,22 @@
         41.667,
         41.667,
         41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667,
-        41.667
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556,
+        55.556
       ],
       "impactFrame": 3
     },
@@ -2123,15 +2108,15 @@
       "reach": 154,
       "hitHeight": 195,
       "startupFrames": 8,
-      "activeFrames": 85,
-      "recoveryFrames": 45,
-      "hitstunFrames": 50,
-      "blockstunFrames": 42,
+      "activeFrames": 82,
+      "recoveryFrames": 47,
+      "hitstunFrames": 55,
+      "blockstunFrames": 47,
       "hitstopFrames": 9,
       "cancelWindows": {
         "hit": [
           8,
-          105
+          103
         ],
         "block": null,
         "whiff": null
@@ -2153,7 +2138,7 @@
         60,
         65,
         78,
-        88
+        82
       ]
     },
     "S4": {
@@ -2268,7 +2253,7 @@
       "WALK_BACK": "228.6 u/s em média, de 21 a 456 u/s (arrancadas do vídeo; fator 3.0)",
       "DASH": "435.2 u/s, ciclo de 0.25 s (fator 3.0)",
       "BACKDASH": "160 u em 35 quadros (274.9 u/s), recupera 1, salto de 20 u na arte (fator 3.0)",
-      "JUMP": "108 u de altura, 0.38 s subindo e 0.50 s descendo (fator 1.0/1.0)",
+      "JUMP": "física do motor; no vídeo 108 u de altura, 0.38 s subindo e 0.50 s descendo (fator 1.0/1.0)",
       "L": "4/7/8 quadros (startup/ativo/recuperação), impacto no q25 (fator 3.0)",
       "M": "12/5/18 quadros (startup/ativo/recuperação), impacto no q26 (fator 3.0)",
       "H": "12/7/17 quadros (startup/ativo/recuperação), impacto no q31 (fator 3.0)",
@@ -2277,9 +2262,9 @@
       "2M": "18/3/23 quadros, impacto no q27 (fator 3.0)",
       "2H": "11/8/17 quadros, impacto no q25 (fator 3.0)",
       "S2": "40/2/40 quadros, impacto no q25 (fator 3.0)",
-      "S3": "8/85/45 quadros, 6 pancadas nos quadros [8, 48, 60, 65, 78, 88] (fator 3.0)",
+      "S3": "8/82/47 quadros, 6 pancadas nos quadros [8, 48, 60, 65, 78, 82] (fator 3.0)",
       "S4": "15/50/60 quadros, 3 pancadas nos quadros [15, 47, 62], avança 188 u em 82 quadros (fator 3.0)",
-      "S": "42/1/46 quadros, o raio sai no q27 do s1, da mão (105, 198) (fator 3.0)"
+      "S": "42/1/46 quadros, o raio sai no q27 do s1, da mão (118, 198) (fator 3.0)"
     }
   }
 }

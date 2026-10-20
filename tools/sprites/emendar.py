@@ -113,7 +113,8 @@ def main():
     h = min(BIG['celula'], -(-(up + down) // 32) * 32)
     left = min(left + (w - left - right) // 2, w)
     root = (left, min(h, up + (h - up - down) // 2))
-    cols = max(1, min(len(frames), MAX_SIDE // (w * d)))
+    # Folga de 8 px na largura: o ancorar.py (pé de apoio) alarga um pouco a célula depois.
+    cols = max(1, min(len(frames), MAX_SIDE // ((w + 8) * d)))
     rows = -(-len(frames) // cols)
     if rows * h * d > MAX_SIDE:
         raise SystemExit(f'{len(frames)} quadros não cabem numa folha de {MAX_SIDE} px: use passo maior')
