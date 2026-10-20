@@ -3,6 +3,8 @@
   "acelerar": 3.0,
   "acelerarPorEstado": {
     "JUMP": 1.0,
-    "FALL": 1.0
+    "FALL": 1.0,
+    "IDLE": 1.0,
+    "IDLE2": 1.0
   }
 }

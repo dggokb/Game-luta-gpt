@@ -399,10 +399,10 @@ def audit(cid):
                         f'toca {f:.1f}x a velocidade do vídeo ({vs.sum():.1f}s no vídeo, {gs.sum():.1f}s no jogo)')
         elif state in pack.get('comportamento', {}).get('acelerar', {}) or \
                 any(m.get('animation') == state and k in pack.get('comportamento', {}).get('acelerar', {})
-                    for k, m in pack['moves'].items()):
+                    for k, m in own_moves(pack)):
             # Comportamento do próprio vídeo: o clipe toca na velocidade do vídeo × o fator dele.
             acc = pack['comportamento']['acelerar']
-            want = acc.get(state) or next(acc[k] for k, m in pack['moves'].items()
+            want = acc.get(state) or next(acc[k] for k, m in own_moves(pack)
                                           if m.get('animation') == state and k in acc)
             vs = video_seconds(cfg, anim)
             gs = game_seconds(pack, state, timing)
@@ -461,6 +461,14 @@ def audit(cid):
             if fl:
                 add(state, 'quebrado', 'aviso', 'flutuando acima do chão', fl)
     return found
+
+
+def own_moves(pack):
+    """(tecla, golpe) dos normais e especiais; o S1 (energia) pela animação do S."""
+    out = list(pack['moves'].items()) + list(pack.get('specialMoves', {}).items())
+    if 'S' in pack.get('specialAnimations', {}):
+        out.append(('S', {'animation': pack['specialAnimations']['S']}))
+    return out
 
 
 def contact_sheet(cid, state, issues, out):

@@ -129,6 +129,10 @@ Vale para todos os jabs (L de soco reto de qualquer personagem).
   todos no que fica no tempo do vídeo (24 qps); poucos quadros espalhados ficam travados.
 - **Comportamento:** depois de converter, `comportamento.py` mede velocidades, pulo e tempo dos
   golpes no vídeo (o andar em shuffle vira andar em arrancadas, quadro a quadro).
+- **Golpe em vários vídeos (apoios):** o golpe que não cabe em 4 s continua em `<golpe>_apoio1`,
+  `_apoio2`... (o 1º quadro de cada um é o último do anterior). `tools/sprites/emendar.py p15
+  <pasta> special_s4 s4:10-39:2 s4_apoio1:0-29:2 ...` junta tudo num clipe, com a escala e o chão
+  do 1º vídeo; `comportamento.py` mede as pancadas e o avanço no clipe emendado.
 - **Arco branco:** o Omni desenha rastro no golpe rápido (M_BAIXO q39–q42). Pular esses quadros.
 - **Corpo alinhado pelo tronco desloca os pés** quando ela se inclina no golpe (L, H, 6M):
   `ancorar.py` depois da conversão.

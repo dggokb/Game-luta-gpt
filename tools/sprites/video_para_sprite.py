@@ -165,7 +165,7 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, contorno=False)
+              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, contorno=False, chao=None)
 
 
 def parser():
@@ -218,6 +218,9 @@ def parser():
                         "outra densidade sem mudar o tamanho)")
     p.add_argument("--nitidez", action="store_true",
                    help="unsharp mask leve e borda sem verde (franja do recorte) depois de escalar")
+    p.add_argument("--chao", type=int,
+                   help="linha do chão no vídeo (px). Padrão: o pé no 1º quadro; vídeo que continua outro "
+                        "(começa no ar) usa o chão do vídeo anterior (tools/sprites/emendar.py)")
     p.add_argument("--contorno", action="store_true",
                    help="mantém o contorno escuro do desenho que o vídeo tinge de verde (Omni Flash); "
                         "sem isso a borda sai branca, sem traço")
@@ -382,7 +385,7 @@ def main(argv=None):
     # Chão e posição de referência vêm do 1º quadro do vídeo (a imagem inicial): poses no
     # ar ficam acima do chão e todos os clipes do personagem se alinham entre si.
     first = keyed_frame(0, args.sem_poeira)
-    foot_y = int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
+    foot_y = args.chao if args.chao is not None else int(np.nonzero((first[..., 3] > 128).any(1))[0].max())
     ref_x = torso_x(first) if args.fixar == "video" else xs[0]
     # Densidade d: a folha sai d vezes maior em px (célula, raiz, borda), mesma geometria lógica.
     d = args.densidade

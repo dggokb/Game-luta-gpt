@@ -30,7 +30,7 @@ public class SpriteMotionTest {
         int loops=Math.round(SpriteMotion.IDLE_LOOPS_BEFORE_IDLE2*idle/dt);
         for(int i=0;i<loops-2;i++)tick(m,dt,true,false,0,0,false,false,false,false,false);
         assertEquals("duas voltas inteiras do IDLE",SpriteStates.IDLE,m.clip);
-        for(int i=0;i<4;i++)tick(m,dt,true,false,0,0,false,false,false,false,false);
+        for(int i=0;i<4&&!SpriteStates.IDLE2.equals(m.clip);i++)tick(m,dt,true,false,0,0,false,false,false,false,false);
         assertEquals(SpriteStates.IDLE2,m.clip);
         assertEquals("o IDLE2 começa do 1º quadro",0,m.frame());
         for(int i=0;i<Math.round(idle2/dt)+2;i++)tick(m,dt,true,false,0,0,false,false,false,false,false);

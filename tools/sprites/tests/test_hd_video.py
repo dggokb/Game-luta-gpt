@@ -96,7 +96,8 @@ class HandTouchTransferTests(unittest.TestCase):
 
 
 class HdRecipeTests(unittest.TestCase):
-    """Every HD clip keeps its reviewed 1x sheet and logical geometry in the recipe."""
+    """Every HD clip keeps its logical geometry, and its reviewed 1x sheet when it had one (a clip
+    born in HD straight from the video, like p15, has none)."""
 
     def test_hd_video_clips_keep_the_reviewed_reference(self):
         clips = Path(__file__).resolve().parents[1] / 'clips'
@@ -109,7 +110,8 @@ class HdRecipeTests(unittest.TestCase):
             self.assertEqual(d, cfg['pixelScale'], path.name)
             self.assertEqual(video.get('largura', video.get('celula', 256)) * d, cfg['frameWidth'], path.name)
             self.assertEqual(video.get('celula', 256) * d, cfg['frameHeight'], path.name)
-            self.assertIn(video['referencia']['folha'], cfg['sourceReferences'], path.name)
+            if 'referencia' in video:  # personagem que já estava em 1x: a folha revisada continua
+                self.assertIn(video['referencia']['folha'], cfg['sourceReferences'], path.name)
             with Image.open(Path(__file__).resolve().parents[3] / cfg['source']) as img:
                 self.assertLessEqual(max(img.size), 4096, path.name)
 
