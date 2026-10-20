@@ -40,6 +40,8 @@ def plan(cid):
     """{estado: (fator, motivo)}: fator multiplica o tempo de cada quadro."""
     pack, clips = A.load_pack(cid)
     out = {}
+    if 'comportamento' in pack:  # tempos e movimento medidos no próprio vídeo (comportamento.py)
+        return out
     if cid != A.REFERENCE:
         for state in VISUAL:
             mine, ref = A.pace(cid, state), A.pace(A.REFERENCE, state)

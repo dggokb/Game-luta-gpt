@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_heavy_straight-import.png",
   "expectedFrames": 11,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,13 +20,14 @@
     "celula": 288,
     "largura": 256,
     "raiz": "118,270",
-    "colunas": 11,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameHeight": 288,
-  "rootX": 118,
-  "rootY": 270,
+  "frameHeight": 576,
+  "rootX": 236,
+  "rootY": 540,
   "quadrosAMao": "Omni Flash: o vídeo vai da guarda ao chute esticado (q36, = pose_chute) e fica parado até o fim. Ida q16..q36 (11 quadros) e a volta pelos mesmos quadros invertidos; impacto no esticado.",
   "animacao": {
     "frames": [
@@ -55,5 +56,7 @@
       0
     ],
     "impactFrame": 10
-  }
+  },
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

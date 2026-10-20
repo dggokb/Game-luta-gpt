@@ -577,8 +577,8 @@ final class CombatEngine {
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
-                f.backdashFrames = config.backdashFrames;
-                f.backdashCooldown = config.backdashFrames + config.backdashRecoveryFrames;
+                f.backdashFrames = backdashFrames(f);
+                f.backdashCooldown = backdashFrames(f) + backdashRecoveryFrames(f);
                 f.backdashArmed = false;
                 f.forwardDashing = false;
             } else if ((f.dashRequest || wallChaseRun(f)) && f.backdashFrames == 0) {
@@ -942,7 +942,7 @@ final class CombatEngine {
         f.grounded = false;
         f.crouching = false;
         f.superJumping = superJump;
-        f.vy = -(superJump ? config.superJumpSpeed : config.jumpSpeed);
+        f.vy = -(superJump ? config.superJumpSpeed : jumpSpeed(f));
         f.y -= 2f;
         f.backdashFrames = 0;
         if (superJump) f.launcherChase = 0;
@@ -1276,16 +1276,16 @@ final class CombatEngine {
         if (breakerChasing(f)) horizontal = breakerFar(f) ? f.facing : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         if (!holdingForward) f.forwardDashing = false;
-        float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
+        float walk = (holdingForward ? walkSpeed(f) : walkBackSpeed(f)) * boost;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
             if (!f.grounded) {
                 airDrift(f, horizontal, walk, boost);
             } else if (f.backdashFrames > 0) {
-                f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
+                f.x -= f.facing * backdashSpeed(f) * boost * CombatConfig.DT;
                 f.backdashFrames--;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost : walk;
+                float speed = f.forwardDashing && holdingForward ? dashSpeed(f) * boost : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
@@ -1316,7 +1316,39 @@ final class CombatEngine {
     /** Velocidade de lado no ar: a de andar para frente, ou a de andar para trás. */
     private float airSpeed(CombatFighter f, int horizontal) {
         if (horizontal == 0) return 0f;
-        return horizontal == f.facing ? config.walkSpeed : config.walkBackSpeed;
+        return horizontal == f.facing ? walkSpeed(f) : walkBackSpeed(f);
+    }
+
+    // Movimento próprio do personagem (medido no vídeo dele) ou, sem ele, o do motor.
+    private static CharacterDefinition.Movement movement(CombatFighter f) {
+        return f.character().fighter.movement;
+    }
+    private float walkSpeed(CombatFighter f) {
+        return movement(f) != null ? movement(f).walkSpeed : config.walkSpeed;
+    }
+    private float walkBackSpeed(CombatFighter f) {
+        return movement(f) != null ? movement(f).walkBackSpeed : config.walkBackSpeed;
+    }
+    private float dashSpeed(CombatFighter f) {
+        return movement(f) != null ? movement(f).dashSpeed : config.dashSpeed;
+    }
+    private float backdashSpeed(CombatFighter f) {
+        return movement(f) != null ? movement(f).backdashSpeed : config.backdashSpeed;
+    }
+    int backdashFrames(CombatFighter f) {
+        return movement(f) != null ? movement(f).backdashFrames : config.backdashFrames;
+    }
+    private int backdashRecoveryFrames(CombatFighter f) {
+        return movement(f) != null ? movement(f).backdashRecoveryFrames : config.backdashRecoveryFrames;
+    }
+    private float jumpSpeed(CombatFighter f) {
+        return movement(f) != null ? movement(f).jumpSpeed : config.jumpSpeed;
+    }
+    /** Altura do pulinho do backdash agora (só no desenho; a caixa fica no chão). */
+    float backdashVisualLift(CombatFighter f) {
+        CharacterDefinition.Movement m = movement(f);
+        return m == null ? config.backdashVisualLift(f.backdashFrames)
+            : CombatConfig.hopLift(f.backdashFrames, m.backdashFrames, m.backdashHopHeight);
     }
 
     /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
@@ -1362,21 +1394,32 @@ final class CombatEngine {
         float scale = 1f;
         // Ordinary neutral jumps now rise/fall briskly; preserve the superjump
         // arc, juggle/launch physics and specialized projectile trajectories.
-        if (!f.superJumping && (f.status == CombatFighter.Status.NEUTRAL ||
-            (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL))) {
+        boolean normalJump = !f.superJumping && (f.status == CombatFighter.Status.NEUTRAL ||
+            (f.attacking() && f.attack.kind == AttackDefinition.Kind.NORMAL));
+        if (normalJump) {
             scale = f.vy < 0f ? config.normalJumpRisingGravityScale
                               : config.normalJumpFallingGravityScale;
         }
-        if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) scale = config.projectileAirGravityScale;
+        if (f.attacking() && f.attack.kind == AttackDefinition.Kind.PROJECTILE) {
+            scale = config.projectileAirGravityScale;
+            normalJump = false;
+        }
         if (f.attacking() && f.attack.kind == AttackDefinition.Kind.SUPER) {
             scale = 0f;
             f.vy = 0f;
+            normalJump = false;
         }
         if (f.attacking() && f.attack.mechanics.dives()) {
             scale = 0f;
             f.vy = f.attackFrame >= f.attack.startupFrames ? f.attack.mechanics.diveDescent : 0f;
+            normalJump = false;
         }
-        f.vy += config.gravity * scale * CombatConfig.DT;
+        float gravity = config.gravity * scale;
+        CharacterDefinition.Movement own = movement(f);
+        if (normalJump && own != null) {  // o pulo do vídeo do personagem
+            gravity = f.vy < 0f ? own.jumpRisingGravity : own.jumpFallingGravity;
+        }
+        f.vy += gravity * CombatConfig.DT;
         f.y += f.vy * CombatConfig.DT;
         if (f.y >= Arena.GROUND_Y) land(f);
     }

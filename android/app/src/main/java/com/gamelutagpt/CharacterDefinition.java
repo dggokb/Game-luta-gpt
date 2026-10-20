@@ -292,6 +292,24 @@ final class CharacterDefinition {
         float height(boolean crouching) { return crouching?crouchHeight:standHeight; }
     }
     /** Fighter rules: life, auto-combo, projectiles, body and input priority. */
+    /**
+     * Andar, correr, backdash e pulo de um personagem, tirados do vídeo dele (acelerado por um
+     * fator gravado no pacote) para o pé não deslizar: tools/sprites/comportamento.py.
+     */
+    static final class Movement {
+        final float walkSpeed, walkBackSpeed, dashSpeed, backdashSpeed, backdashHopHeight;
+        final int backdashFrames, backdashRecoveryFrames;
+        /** Pulo normal: velocidade de saída e gravidade (u/s²) na subida e na descida. */
+        final float jumpSpeed, jumpRisingGravity, jumpFallingGravity;
+        Movement(float walkSpeed,float walkBackSpeed,float dashSpeed,float backdashSpeed,int backdashFrames,
+                 int backdashRecoveryFrames,float backdashHopHeight,float jumpSpeed,float jumpRisingGravity,
+                 float jumpFallingGravity) {
+            this.walkSpeed=walkSpeed;this.walkBackSpeed=walkBackSpeed;this.dashSpeed=dashSpeed;
+            this.backdashSpeed=backdashSpeed;this.backdashFrames=backdashFrames;
+            this.backdashRecoveryFrames=backdashRecoveryFrames;this.backdashHopHeight=backdashHopHeight;
+            this.jumpSpeed=jumpSpeed;this.jumpRisingGravity=jumpRisingGravity;this.jumpFallingGravity=jumpFallingGravity;
+        }
+    }
     static final class Fighter {
         final int color,maxLife;
         final String[] autoCombo;
@@ -327,6 +345,9 @@ final class CharacterDefinition {
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
+        /** Movimento próprio, medido no vídeo do personagem; null = o do motor (CombatConfig). */
+        Movement movement;
+        Fighter withMovement(Movement value) { movement=value; return this; }
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }

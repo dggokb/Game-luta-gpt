@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_walk_forward-import.png",
   "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,12 +20,15 @@
     "celula": 288,
     "largura": 224,
     "raiz": "110,270",
-    "colunas": 11,
-    "pe_no_chao": true
+    "colunas": 9,
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 110,
-  "rootY": 270,
-  "quadrosAMao": "Omni Flash (vai de inicio_esquerda a inicio_centro): o trecho que difere do 1º quadro é o vídeo inteiro, então o loop automático pegava a largada e a chegada. Loop de 2 passadas q48-q74 (best_loop entre q20 e q84), um quadro sim, um não."
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 220,
+  "rootY": 540,
+  "quadrosAMao": "Omni Flash (vai de inicio_esquerda a inicio_centro): o trecho que difere do 1º quadro é o vídeo inteiro, então o loop automático pegava a largada e a chegada. Loop de 2 passadas q48-q74 (best_loop entre q20 e q84), um quadro sim, um não.",
+  "pixelScale": 2.0
 }

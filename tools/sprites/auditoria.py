@@ -241,7 +241,9 @@ def game_seconds(pack, state, timing):
     anim = pack['animations'][state]
     n = len(anim['frames'])
     if 'distancePerFrame' in anim:
-        speed = ENGINE['walkBackSpeed'] if state == 'WALK_BACK' else ENGINE['walkSpeed']
+        own = pack['fighter'].get('movimento', {})  # andar próprio do personagem (comportamento.py)
+        speed = own.get('walkBackSpeed', ENGINE['walkBackSpeed']) if state == 'WALK_BACK' \
+            else own.get('walkSpeed', ENGINE['walkSpeed'])
         return np.full(n, anim['distancePerFrame'] / speed)
     d = np.array(anim.get('durationsMs', [100] * n), float) / 1000
     total, hit, block = timing
@@ -395,6 +397,20 @@ def audit(cid):
                 if f >= PACE_WARN or f <= 1 / PACE_WARN:
                     add(state, 'ritmo', 'erro' if f >= PACE_ERROR or f <= 1 / PACE_ERROR else 'aviso',
                         f'toca {f:.1f}x a velocidade do vídeo ({vs.sum():.1f}s no vídeo, {gs.sum():.1f}s no jogo)')
+        elif state in pack.get('comportamento', {}).get('acelerar', {}) or \
+                any(m.get('animation') == state and k in pack.get('comportamento', {}).get('acelerar', {})
+                    for k, m in pack['moves'].items()):
+            # Comportamento do próprio vídeo: o clipe toca na velocidade do vídeo × o fator dele.
+            acc = pack['comportamento']['acelerar']
+            want = acc.get(state) or next(acc[k] for k, m in pack['moves'].items()
+                                          if m.get('animation') == state and k in acc)
+            vs = video_seconds(cfg, anim)
+            gs = game_seconds(pack, state, timing)
+            if vs is not None and gs.sum() > 0:
+                f = vs.sum() / gs.sum() / want
+                if f >= PACE_WARN or f <= 1 / PACE_WARN:
+                    add(state, 'ritmo', 'erro' if f >= PACE_ERROR or f <= 1 / PACE_ERROR else 'aviso',
+                        f'toca {f * want:.1f}x a velocidade do vídeo (o fator dele é {want:g})')
         elif cid != REFERENCE:
             mine, ref = pace(cid, state), pace(REFERENCE, state)
             if mine and ref:

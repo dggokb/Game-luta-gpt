@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_idle2-import.png",
   "expectedFrames": 64,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,11 +20,14 @@
     "celula": 288,
     "largura": 192,
     "raiz": "96,269",
-    "colunas": 11,
-    "limpar_chao": true
+    "colunas": 10,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 192,
-  "frameHeight": 288,
-  "rootX": 96,
-  "rootY": 269
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 192,
+  "rootY": 538,
+  "pixelScale": 2.0
 }

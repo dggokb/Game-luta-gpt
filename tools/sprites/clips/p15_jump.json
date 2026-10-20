@@ -21,10 +21,13 @@
     "largura": 192,
     "raiz": "88,270",
     "colunas": 6,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 192,
-  "frameHeight": 288,
-  "rootX": 88,
-  "rootY": 270
+  "frameWidth": 384,
+  "frameHeight": 576,
+  "rootX": 176,
+  "rootY": 540,
+  "pixelScale": 2.0
 }

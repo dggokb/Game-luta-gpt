@@ -19,8 +19,13 @@
     "quadros": "12,14,16,18,19,21,23,25",
     "largura": 192,
     "raiz": "87,238",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 192,
-  "rootX": 87
+  "frameWidth": 384,
+  "rootX": 174,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

@@ -1,0 +1,8 @@
+{
+  "_doc": "Fator de aceleração dos vídeos deste personagem (tools/sprites/comportamento.py). velocidade/tempo no jogo = vídeo × fator. acelerarPorEstado: exceções.",
+  "acelerar": 3.0,
+  "acelerarPorEstado": {
+    "JUMP": 1.0,
+    "FALL": 1.0
+  }
+}

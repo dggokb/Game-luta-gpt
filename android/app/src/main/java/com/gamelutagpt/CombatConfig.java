@@ -111,9 +111,12 @@ final class CombatConfig {
     /** Visual retreat hop is shared by all fighters; ground collision remains unchanged. */
     float backdashHopHeight = 40f;
     float backdashVisualLift(int framesLeft) {
-        if (framesLeft <= 0 || framesLeft > backdashFrames) return 0f;
-        float fraction = (backdashFrames - framesLeft) / (float)backdashFrames;
-        return backdashHopHeight * (float)Math.sin(Math.PI * fraction);
+        return hopLift(framesLeft, backdashFrames, backdashHopHeight);
+    }
+    static float hopLift(int framesLeft, int frames, float height) {
+        if (framesLeft <= 0 || framesLeft > frames) return 0f;
+        float fraction = (frames - framesLeft) / (float)frames;
+        return height * (float)Math.sin(Math.PI * fraction);
     }
     // 60 FPS normal jump: ~42 airborne frames, apex ~1.16x P01's standing hurtbox.
     // Sized for the 226-unit P01 (the 156-unit version used 1030 / 1.70 / 2.00, apex ~182):

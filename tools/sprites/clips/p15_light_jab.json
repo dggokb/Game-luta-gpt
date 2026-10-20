@@ -18,16 +18,18 @@
     "medida": "1º quadro = inicio_centro (nota 0.96)",
     "quadros": "20,23,24,25,30",
     "celula": 288,
-    "largura": 228,
+    "largura": 229,
     "raiz": "103,270",
     "colunas": 5,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 228,
-  "frameHeight": 288,
-  "rootX": 103,
-  "rootY": 270,
+  "frameWidth": 458,
+  "frameHeight": 576,
+  "rootX": 206,
+  "rootY": 540,
   "quadrosAMao": "Omni Flash: o vídeo vai da guarda (q20) ao jab esticado (q30, = pose_jab) e fica parado até o fim. Ida q20,q23,q24,q25,q30 e a volta pelos mesmos quadros invertidos; impacto no esticado.",
   "animacao": {
     "frames": [
@@ -44,5 +46,6 @@
       0
     ],
     "impactFrame": 2
-  }
+  },
+  "pixelScale": 2.0
 }

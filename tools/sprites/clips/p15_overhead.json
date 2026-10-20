@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_overhead-import.png",
   "expectedFrames": 15,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 10,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,16 +20,19 @@
     "celula": 320,
     "largura": 192,
     "raiz": "97,302",
-    "colunas": 11,
+    "colunas": 10,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 192,
-  "frameHeight": 320,
-  "rootX": 97,
-  "rootY": 302,
+  "frameWidth": 384,
+  "frameHeight": 640,
+  "rootX": 194,
+  "rootY": 604,
   "quadrosAMao": "→ + M (M_BAIXO.mp4): q39-q42 têm o arco branco desenhado pelo vídeo; a batida vai de q38 (punho em cima) direto a q43 (punho na cintura, impacto).",
   "animacao": {
     "impactFrame": 8
-  }
+  },
+  "pixelScale": 2.0
 }

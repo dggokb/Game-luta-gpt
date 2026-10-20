@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_medium_kick-import.png",
   "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,12 +20,15 @@
     "celula": 288,
     "largura": 224,
     "raiz": "88,270",
-    "colunas": 11,
+    "colunas": 9,
     "limpar_chao": true,
-    "ancorar_pe": true
+    "ancorar_pe": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 88,
-  "rootY": 270
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 176,
+  "rootY": 540,
+  "pixelScale": 2.0
 }

@@ -86,14 +86,12 @@ public class DefesaEGolpeAltoTest {
         assertFalse("o 6M do p15 vem do pacote, não do M", GolpeAlto.derived(c, GolpeAlto.BINDING));
         assertEquals("OVERHEAD", oh.animation.id);
         assertNotSame(m.animation, oh.animation);
-        // Mesmo golpe que o motor montaria do M: só a animação é a do vídeo.
-        AttackDefinition built = GolpeAlto.from(m, c.moves.get("H")).attack;
+        // Golpe alto como o do motor (pega agachado, uma vez por combo, cancela só em especial),
+        // com o tempo contado no vídeo dela (tools/sprites/comportamento.py).
         assertTrue(oh.attack.overhead);
-        assertEquals(built.startupFrames, oh.attack.startupFrames);
-        assertEquals(built.activeFrames, oh.attack.activeFrames);
-        assertEquals(built.recoveryFrames, oh.attack.recoveryFrames);
-        assertEquals(built.damage, oh.attack.damage);
+        assertFalse(oh.attack.low);
         assertEquals(1, oh.attack.maxUsesPerCombo);
+        for (String t : oh.attack.cancelInto()) assertTrue(t, t.equals("SUPER") || t.startsWith("S"));
     }
 
     @Test public void theOverheadHoldsTheWindUpInsteadOfSlowingTheWholeClip() {

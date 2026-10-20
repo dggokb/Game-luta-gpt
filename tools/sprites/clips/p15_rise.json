@@ -20,8 +20,13 @@
     "largura": 192,
     "raiz": "91,238",
     "colunas": 6,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 192,
-  "rootX": 91
+  "frameWidth": 384,
+  "rootX": 182,
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

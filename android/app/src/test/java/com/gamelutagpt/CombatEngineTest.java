@@ -635,6 +635,32 @@ public class CombatEngineTest {
         assertEquals(CombatFighter.GUARD_AIR, air.f(1).lastGuard);
     }
 
+    @Test public void aFighterWithItsOwnMovementWalksAndDashesAtItsOwnSpeed() {
+        CharacterDefinition p15 = GeneratedCharacters.get("p15");
+        CharacterDefinition.Movement own = p15.fighter.movement;
+        assertNotNull("o p15 tem o movimento medido no vídeo dele", own);
+        assertNull("quem não declara usa o do motor", BASE.fighter.movement);
+        Sim forward = new Sim(p15, NPC, 500f, 1500f);
+        forward.in[0].direction = 1;
+        forward.steps(30);
+        assertEquals(own.walkSpeed * 30 * CombatConfig.DT, forward.f(0).x - 500f, 0.5f);
+        Sim back = new Sim(p15, NPC, 1000f, 1500f);
+        back.in[0].direction = 5;
+        back.steps(30);
+        assertEquals(own.walkBackSpeed * 30 * CombatConfig.DT, 1000f - back.f(0).x, 0.5f);
+        // Pulo: sobe até a altura do vídeo dele (v² / 2g na subida).
+        Sim jump = new Sim(p15, NPC, 500f, 1500f);
+        jump.in[0].direction = 7;
+        float top = Arena.GROUND_Y;
+        for (int i = 0; i < 120; i++) {
+            jump.step();
+            top = Math.min(top, jump.f(0).y);
+            if (i > 5) jump.in[0].direction = 0;
+        }
+        float height = own.jumpSpeed * own.jumpSpeed / (2f * own.jumpRisingGravity);
+        assertEquals(height, Arena.GROUND_Y - top, 0.08f * height);
+    }
+
     @Test public void walkingBackIsSlowerThanWalkingForward() {
         CombatConfig config = new CombatConfig();
         Sim forward = new Sim(BASE, NPC, 500f, 1500f);

@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_backdash-import.png",
   "expectedFrames": 10,
   "segmentation": "prepared-grid",
-  "columns": 10,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,13 +20,16 @@
     "celula": 288,
     "largura": 224,
     "raiz": "107,270",
-    "colunas": 10,
+    "colunas": 9,
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 107,
-  "rootY": 270,
-  "quadrosAMao": "Omni Flash: o vídeo segura a guarda de 2 s a 4 s; o automático espalhava os quadros até o fim. Só o salto q14-q53."
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 214,
+  "rootY": 540,
+  "quadrosAMao": "Omni Flash: o vídeo segura a guarda de 2 s a 4 s; o automático espalhava os quadros até o fim. Só o salto q14-q53.",
+  "pixelScale": 2.0
 }

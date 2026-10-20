@@ -51,6 +51,10 @@ ASSIST_MOVES = ('L','M','H','2L','2M','2H','S')
 # Combat definitions (frame data at 60 frames per second; see docs/combat-engine.md).
 JUMP = 'JUMP'
 # Estilos de combo (tools/sprites/mecanicas.json, bloco combos); a CPU joga conforme o estilo.
+# Movimento próprio medido no vídeo (tools/sprites/comportamento.py); sem ele, o do motor.
+MOVEMENT_FLOATS = ('walkSpeed','walkBackSpeed','dashSpeed','backdashSpeed','backdashHopHeight',
+                   'jumpSpeed','jumpRisingGravity','jumpFallingGravity')
+MOVEMENT_INTS = ('backdashFrames','backdashRecoveryFrames')
 COMBO_STYLES = ('equilibrado','pressao','chutes','aereo','alcance','tanque','imprevisivel')
 LAUNCHES = {'none':'NONE','knockdown':'KNOCKDOWN','launch':'LAUNCH','slam':'SLAM',
             'wallBounce':'WALL_BOUNCE','groundBounce':'GROUND_BOUNCE'}
@@ -105,6 +109,12 @@ def validate_fighter(pack):
         raise ValueError(f'{name}: color must be #RRGGBB')
     positive_int(f['maxLife'], name+'.maxLife')
     if 'wakeupFrames' in f: positive_int(f['wakeupFrames'], name+'.wakeupFrames')
+    if 'movimento' in f:
+        mv = f['movimento']
+        for key in MOVEMENT_FLOATS:
+            if key == 'backdashHopHeight' and mv.get(key) == 0: continue  # salto já desenhado na arte
+            positive(mv.get(key), f'{name}.movimento.{key}')
+        for key in MOVEMENT_INTS: positive_int(mv.get(key), f'{name}.movimento.{key}')
     if 'comboStyle' in f and f['comboStyle'] not in COMBO_STYLES:
         raise ValueError(f'{name}.comboStyle: expected one of {list(COMBO_STYLES)}')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
@@ -550,6 +560,12 @@ def compile_packs(root, results):
                 code += '.'+key[:-2]+'('+','.join([str(box['frames'][0]),str(box['frames'][1])]+[f(v) for v in box['x']+box['y']])+')'
         if 'mecanica' in m: code += '.mechanics('+mechanics(m['mecanica'])+')'
         return code+'.build()'
+    def movement(mv):
+        if not mv: return ''
+        v = {k: f(mv[k]) for k in MOVEMENT_FLOATS} | {k: str(mv[k]) for k in MOVEMENT_INTS}
+        order = ('walkSpeed','walkBackSpeed','dashSpeed','backdashSpeed','backdashFrames','backdashRecoveryFrames',
+                 'backdashHopHeight','jumpSpeed','jumpRisingGravity','jumpFallingGravity')
+        return '.withMovement(new CharacterDefinition.Movement('+','.join(v[k] for k in order)+'))'
     def mechanics(mech):
         code = 'new AttackDefinition.Mechanics()'
         if 'armadura' in mech: code += '.armor('+str(mech['armadura']['golpes'])+','+','.join(map(str,mech['armadura']['frames']))+')'
@@ -649,6 +665,7 @@ def compile_packs(root, results):
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
+                   +movement(fi.get('movimento'))
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
                      if energy and ('nome' in energy or energy.get('segurar')) else '')

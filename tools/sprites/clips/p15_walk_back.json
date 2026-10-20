@@ -8,7 +8,7 @@
   "preview": "android/app/build/sprite-review/p15_walk_back-import.png",
   "expectedFrames": 14,
   "segmentation": "prepared-grid",
-  "columns": 11,
+  "columns": 9,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -20,14 +20,17 @@
     "celula": 288,
     "largura": 224,
     "raiz": "107,270",
-    "colunas": 11,
+    "colunas": 9,
     "fixar": "registro",
     "pe_no_chao": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 107,
-  "rootY": 270,
-  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q47, alinhados por registro."
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 214,
+  "rootY": 540,
+  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q47, alinhados por registro.",
+  "pixelScale": 2.0
 }

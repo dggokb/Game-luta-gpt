@@ -3602,7 +3602,7 @@ public class GameView extends SurfaceView
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
         float visualY = f.y;
         if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
-            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
+            visualY -= engine.backdashVisualLift(f);
         }
         ColorFilter look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
