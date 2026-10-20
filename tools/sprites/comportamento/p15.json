@@ -5,6 +5,9 @@
     "JUMP": 1.0,
     "FALL": 1.0,
     "IDLE": 1.0,
-    "IDLE2": 1.0
+    "IDLE2": 1.0,
+    "WALK_FORWARD": 1.0,
+    "WALK_BACK": 1.0,
+    "DASH": 1.0
   }
 }
