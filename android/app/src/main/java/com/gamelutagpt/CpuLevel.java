@@ -19,7 +19,11 @@ final class CpuLevel {
     final int reactionFrames;
     /** Atraso extra sorteado a cada reação (0 a este valor): ninguém reage sempre igual. */
     final int reactionJitter;
-    /** Colada no rival, segura a defesa agachada por hábito (sem reagir a nada). */
+    /**
+     * Colada no rival, segura a defesa agachada por hábito (sem reagir a nada): o jab é rápido
+     * demais para defender reagindo. Baixo de propósito (o que dá graça é a luta, não a defesa):
+     * a janela é curta e acaba logo depois da pressão, e na saída da defesa ela pune.
+     */
     final double guardAnticipation;
     /** Viu o golpe (ou o pulo) chegando a tempo: chance de defender. */
     final double reactGuard;
@@ -63,13 +67,13 @@ final class CpuLevel {
     //                                 reação  hábito defesa altura combo confirma cai  pune  anti  pula  tech  air  decisão     kit
     private static final CpuLevel[] LEVELS = {
         new CpuLevel(1, 30, 10, 0.05, 0.10, 0.50,  1, 0.00, 0.50, 0.00, 0.00, 0.05, 0.05, 0.20, 0.35f, 0.60f, 0.0),
-        new CpuLevel(2, 26,  9, 0.15, 0.25, 0.60,  2, 0.10, 0.40, 0.10, 0.10, 0.10, 0.10, 0.35, 0.30f, 0.50f, 0.2),
-        new CpuLevel(3, 22,  8, 0.25, 0.40, 0.70,  3, 0.25, 0.30, 0.25, 0.20, 0.15, 0.15, 0.45, 0.25f, 0.45f, 0.4),
-        new CpuLevel(4, 19,  7, 0.35, 0.55, 0.78,  4, 0.40, 0.20, 0.40, 0.35, 0.25, 0.20, 0.55, 0.20f, 0.40f, 0.6),
-        new CpuLevel(5, 16,  6, 0.45, 0.65, 0.85,  6, 0.55, 0.12, 0.55, 0.50, 0.35, 0.25, 0.65, 0.16f, 0.34f, 0.8),
-        new CpuLevel(6, 15,  5, 0.55, 0.75, 0.90,  8, 0.70, 0.08, 0.68, 0.62, 0.45, 0.30, 0.75, 0.14f, 0.30f, 1.0),
-        new CpuLevel(7, 14,  4, 0.65, 0.85, 0.94, 10, 0.85, 0.04, 0.80, 0.75, 0.55, 0.35, 0.85, 0.12f, 0.26f, 1.1),
-        new CpuLevel(8, 13,  3, 0.72, 0.92, 0.97, 12, 0.95, 0.02, 0.90, 0.85, 0.65, 0.40, 0.92, 0.12f, 0.22f, 1.2),
+        new CpuLevel(2, 26,  9, 0.10, 0.25, 0.60,  2, 0.10, 0.40, 0.10, 0.10, 0.10, 0.10, 0.35, 0.30f, 0.50f, 0.2),
+        new CpuLevel(3, 22,  8, 0.15, 0.40, 0.70,  3, 0.25, 0.30, 0.25, 0.20, 0.15, 0.15, 0.45, 0.25f, 0.45f, 0.4),
+        new CpuLevel(4, 19,  7, 0.20, 0.55, 0.78,  4, 0.40, 0.20, 0.40, 0.35, 0.25, 0.20, 0.55, 0.20f, 0.40f, 0.6),
+        new CpuLevel(5, 16,  6, 0.25, 0.65, 0.85,  6, 0.55, 0.12, 0.55, 0.50, 0.35, 0.25, 0.65, 0.16f, 0.34f, 0.8),
+        new CpuLevel(6, 15,  5, 0.30, 0.75, 0.90,  8, 0.70, 0.08, 0.68, 0.62, 0.45, 0.30, 0.75, 0.14f, 0.30f, 1.0),
+        new CpuLevel(7, 14,  4, 0.33, 0.85, 0.94, 10, 0.85, 0.04, 0.80, 0.75, 0.55, 0.35, 0.85, 0.12f, 0.26f, 1.1),
+        new CpuLevel(8, 13,  3, 0.35, 0.92, 0.97, 12, 0.95, 0.02, 0.90, 0.85, 0.65, 0.40, 0.92, 0.12f, 0.22f, 1.2),
     };
 
     /**

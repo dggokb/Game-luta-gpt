@@ -39,6 +39,8 @@ final class OpponentAi {
         boolean attackReady;
         /** Center distance within which a throw reaches the target. */
         float throwReach;
+        /** O rival defendeu há pouco (ficou na defesa): o agarrão abre quem só defende. */
+        boolean rivalBlocked;
         /** Nível e personalidade; null = nível 5, equilibrado. */
         CpuLevel level;
         CpuStyle style;
@@ -47,6 +49,8 @@ final class OpponentAi {
          * não deixar o tempo acabar. Ver {@link #urgency(int)}.
          */
         float urgency;
+        /** O rival anda soltando bola (várias há pouco): ela vai atrás, ou devolve com a dela. */
+        boolean rivalZoning;
     }
 
     /** A pressa começa com este tanto de segundos no relógio e chega ao máximo neste outro. */
@@ -63,10 +67,11 @@ final class OpponentAi {
     static final float DECISION_MAX = 0.28f;
     // Attack preferences; the character pack decides which of them can reach.
     static final String[] GROUND_ATTACKS = {"2L", "2M", "2H", "L", "M", "H"};
-    static final double[] GROUND_WEIGHTS = {0.18, 0.18, 0.17, 0.17, 0.16, 0.14};
+    // Os agachados (2L/2M/2H) pesam menos que os em pé: a CPU não fica o tempo todo abaixada.
+    static final double[] GROUND_WEIGHTS = {0.13, 0.13, 0.12, 0.22, 0.21, 0.19};
     /** Contra quem está agachado: o golpe alto (→ + M) para abrir a defesa baixa. */
     static final String[] GROUND_ATTACKS_VS_CROUCH = {"2L", "2M", "2H", "L", "M", "H", GolpeAlto.BINDING};
-    static final double[] GROUND_WEIGHTS_VS_CROUCH = {0.15, 0.15, 0.14, 0.12, 0.12, 0.10, 0.22};
+    static final double[] GROUND_WEIGHTS_VS_CROUCH = {0.12, 0.12, 0.11, 0.15, 0.15, 0.13, 0.22};
     static final String[] AIR_ATTACKS = {"L", "M", "H"};
     /** Chance of throwing when the target is right next to it, and of teching a throw. */
     static final double THROW_CHANCE = 0.16;
@@ -74,6 +79,13 @@ final class OpponentAi {
     /** Chance of an air tech when the air hitstun ends. */
     static final double AIR_TECH_CHANCE = 0.70;
     static final double[] AIR_WEIGHTS = {0.30, 0.34, 0.36};
+    /**
+     * Folga de alcance dos golpes no chão: a distância é a vista (com o atraso da reação), e o
+     * golpe na beira do alcance saía no vento por poucas unidades.
+     */
+    static final float GROUND_REACH_MARGIN = 8f;
+    /** Folga de alcance dos aéreos da CPU (ver {@link #think}). */
+    static final float AIR_REACH_MARGIN = 24f;
 
     private final Random random;
     private float decisionTimer;
@@ -117,15 +129,25 @@ final class OpponentAi {
             return true;
         }
 
+        // No ar a distância vista erra mais (os dois se mexem rápido, e o empurrão de quem passa
+        // por cima muda o lado): ela só solta o aéreo com uma folga de alcance.
         String airAttack = s.verticalDistance <= 115f
             ? CombatRules.pickInRange(AIR_ATTACKS, AIR_WEIGHTS,
-                s.self, true, s.distance, s.target, random.nextDouble())
+                s.self, true, s.distance + AIR_REACH_MARGIN, s.target, random.nextDouble())
             : null;
         boolean vsCrouch = s.targetCrouching && s.targetGrounded;
         String groundAttack = CombatRules.pickInRange(vsCrouch ? GROUND_ATTACKS_VS_CROUCH : GROUND_ATTACKS,
             vsCrouch ? GROUND_WEIGHTS_VS_CROUCH : GROUND_WEIGHTS,
-            s.self, false, s.distance, s.target, random.nextDouble());
+            s.self, false, s.distance + GROUND_REACH_MARGIN, s.target, random.nextDouble());
 
+        // Perto o bastante para o L (o começo do combo do caderno): prefere abrir com ele a
+        // cutucar com um golpe solto, mais quanto maior o nível. A cutucada na ponta não emenda.
+        // Com folga de alcance: a distância é a vista (com o atraso da reação), e o L é curto.
+        if (groundAttack != null && !vsCrouch && !"L".equals(groundAttack) &&
+            CombatRules.reaches(s.self, "L", false, s.distance + STARTER_REACH_MARGIN, s.target) &&
+            random.nextDouble() < starterChance(level)) {
+            groundAttack = "L";
+        }
         // Quem luta de longe recua para a distância dele em vez de bater colado.
         boolean keepAway = !s.selfAirborne && s.distance < style.preferredDistance - 60f &&
             aggression < 0.5 && random.nextDouble() < 0.5 * (1.0 - u);
@@ -138,9 +160,18 @@ final class OpponentAi {
         } else if (
             s.superReady &&
             superInRange(s.self, s.distance) &&
-            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u)
+            // O Super cru (sem ter acertado nada) é dos níveis baixos: os altos guardam a barra
+            // para fechar combo, punir e para o Ultra.
+            random.nextDouble() < 0.18 * Math.min(1.0, level.kitScale + 0.2) * (1.0 + u) * (1.0 - 0.9 * smart(level))
         ) {
             actions.superAttack();
+        } else if (s.rivalZoning && energyInRange(s.self, s.distance) && !s.projectileActive &&
+            random.nextDouble() < 0.25 + 0.45 * smart(level)) {
+            // Contra quem fica soltando bola: devolve com a dela (as duas se anulam no meio).
+            actions.energy(random.nextDouble() < 0.5 ? "M" : "H");
+        } else if (s.rivalZoning && s.distance > 300f && random.nextDouble() < 0.45 + 0.4 * smart(level)) {
+            // Ou vai atrás: parada de longe ela só leva bola. Correndo quando está longe.
+            actions.moveForward(s.distance > 430f);
         } else if (
             energyInRange(s.self, s.distance) &&
             !s.projectileActive &&
@@ -149,7 +180,8 @@ final class OpponentAi {
             double r = random.nextDouble();
             actions.energy(r < 0.33 ? "L" : (r < 0.72 ? "M" : "H"));
         } else if (s.targetGrounded && s.attackReady && s.distance <= s.throwReach &&
-            random.nextDouble() < THROW_CHANCE * style.throwing * (1.0 + 0.5 * u)) {
+            random.nextDouble() < THROW_CHANCE * style.throwing * (1.0 + 0.5 * u) *
+                (s.rivalBlocked ? 1.0 + 2.5 * smart(level) : 1.0)) {
             actions.grab();
         } else if (groundAttack != null && s.attackReady && !keepAway) {
             actions.attack(groundAttack);
@@ -169,6 +201,22 @@ final class OpponentAi {
             actions.jump(random.nextDouble() < 0.32);
         }
         return true;
+    }
+
+    /** Folga de alcance do L de abertura (a distância vista pode ter mudado desde então). */
+    static final float STARTER_REACH_MARGIN = 30f;
+
+    /**
+     * Quanto a CPU usa os recursos com cabeça (0 no nível 1, 1 no 8): o Super e o Ultra crus
+     * somem, a barra fica para fechar combo, punir e para o Ultra no momento certo.
+     */
+    static double smart(CpuLevel level) {
+        return (level.number - CpuLevel.MIN) / (double)(CpuLevel.MAX - CpuLevel.MIN);
+    }
+
+    /** Chance de trocar a cutucada pelo L que abre o combo (nível 1: 15%; nível 8: 50%). */
+    static double starterChance(CpuLevel level) {
+        return 0.10 + 0.05 * level.number;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 > Motor das páginas (padrão do jogo inteiro): [motor-paginas.md](motor-paginas.md).
 > Motor das conversas durante as lutas (parceiro de tag, adversário esperando): [motor-conversas.md](motor-conversas.md).
+> Narrador do torneio (narra golpes, combos, K.O. e vitória numa faixa de transmissão): [narrador.md](narrador.md).
 > Motor das cinemáticas dentro da luta (faixas de cinema, o roteiro guia os lutadores, falas, onomatopeias, fim da luta): [motor-cinematicas.md](motor-cinematicas.md).
 > Torneio (escolha do irmão, sorteio, chave de 8 duplas fixas, emboscada fora da arena, duelo 1x1): [torneio.md](torneio.md).
 > Modo Arcade (16 duplas, oficiais ou livres, o duelo 1x1 e o Takatoshi): [arcade.md](arcade.md).

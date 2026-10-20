@@ -34,6 +34,45 @@ public class GameViewCelularPcTest {
         if (jogo != null) jogo.parar();
     }
 
+    /**
+     * Onde o jogo estava quando a luta não começou (a falha só aparece no runner Linux da CI):
+     * telas abertas, carregamento, o lutador e o que as threads do jogo estavam fazendo.
+     */
+    private static String estado(GameView v, float antes) {
+        StringBuilder sb = new StringBuilder();
+        CombatFighter p = v.engine.fighter(GameView.PLAYER);
+        sb.append("x ").append(antes).append(" -> ").append(p.x).append(", status ").append(p.status)
+            .append(", locked ").append(p.locked);
+        for (String nome : new String[] {"menuInicial", "characterSelect", "pausa", "menuArcade", "capitulos"}) {
+            try {
+                Object o = campo(v, nome);
+                java.lang.reflect.Method aberto = o.getClass().getDeclaredMethod("isOpen");
+                aberto.setAccessible(true);
+                sb.append(", ").append(nome).append(aberto.invoke(o));
+            } catch (Exception e) {
+                sb.append(", ").append(nome).append("?");
+            }
+        }
+        try {
+            java.lang.reflect.Method m = GameView.class.getDeclaredMethod("loadingActive");
+            m.setAccessible(true);
+            sb.append(", carregando ").append(m.invoke(v));
+            sb.append(", arteCarregada ").append(campo(v, "arteCarregada"));
+            sb.append(", folhas pendentes ").append(((SpriteAtlasCache) campo(v, "atlases")).pendentes());
+        } catch (Exception e) {
+            sb.append(", carregamento ?");
+        }
+        for (java.util.Map.Entry<Thread, StackTraceElement[]> t : Thread.getAllStackTraces().entrySet()) {
+            String nome = t.getKey().getName();
+            if (!nome.equals("GameLoop") && !nome.equals("Carregando") && !nome.equals("Folhas") &&
+                !nome.equals("Antecipando")) continue;
+            sb.append(" | ").append(nome).append(' ').append(t.getKey().getState());
+            StackTraceElement[] pilha = t.getValue();
+            for (int i = 0; i < Math.min(6, pilha.length); i++) sb.append(" < ").append(pilha[i]);
+        }
+        return sb.toString();
+    }
+
     private static Object campo(GameView v, String nome) throws Exception {
         Field f = GameView.class.getDeclaredField(nome);
         f.setAccessible(true);
@@ -59,10 +98,20 @@ public class GameViewCelularPcTest {
         // Espera a luta: as folhas da dupla decodificam (em paralelo) com a tela de carregamento.
         long limite = System.currentTimeMillis() + 240_000;
         float antes = v.engine.fighter(GameView.PLAYER).x;
+        // Segura a direita e repete o aperto de tempos em tempos, como a repetição do teclado:
+        // a entrada da luta limpa as teclas seguradas (um aperto só, antes do fim do
+        // carregamento, se perdia e o lutador nunca andava).
         jogo.segurar(KeyEvent.KEYCODE_D);
-        while (v.engine.fighter(GameView.PLAYER).x < antes + 60f && System.currentTimeMillis() < limite) jogo.esperar(0.1);
+        long repete = System.currentTimeMillis() + 1000;
+        while (v.engine.fighter(GameView.PLAYER).x < antes + 60f && System.currentTimeMillis() < limite) {
+            jogo.esperar(0.1);
+            if (System.currentTimeMillis() >= repete) {
+                jogo.segurar(KeyEvent.KEYCODE_D);
+                repete = System.currentTimeMillis() + 1000;
+            }
+        }
         jogo.soltar(KeyEvent.KEYCODE_D);
-        assertTrue("a luta começou", v.engine.fighter(GameView.PLAYER).x >= antes + 60f);
+        assertTrue("a luta começou; " + estado(v, antes), v.engine.fighter(GameView.PLAYER).x >= antes + 60f);
         SpriteAtlasCache atlases = (SpriteAtlasCache) campo(v, "atlases");
         assertTrue("folhas da luta prontas", atlases.size() > 0);
 

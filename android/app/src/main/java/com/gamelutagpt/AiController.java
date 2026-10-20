@@ -15,8 +15,8 @@ import java.util.Random;
  */
 final class AiController {
     /** Pause after the CPU's own attack ends and after it is hit, in frames. */
-    static final int ATTACK_COOLDOWN = 13;
-    static final int HIT_COOLDOWN = 21;
+    static final int ATTACK_COOLDOWN = 9;
+    static final int HIT_COOLDOWN = 15;
     static final int ENERGY_COOLDOWN = 24;
     static final int SUPER_COOLDOWN = 27;
 
@@ -37,6 +37,14 @@ final class AiController {
     static final double ULTRA_CHANCE = 0.35;
     /** Distância até onde a investida do Ultra alcança (com folga). */
     static final float ULTRA_REACH = 380f;
+    /** Ultra emendado no fim do combo e na punição: chance (vezes a inteligência do nível). */
+    static final double ULTRA_LINK_CHANCE = 0.8, ULTRA_PUNISH_CHANCE = 0.7;
+    /** Quadros de rival preso a partir dos quais o Ultra pune com certeza. */
+    static final int ULTRA_PUNISH_MIN = 10;
+    /** O Super mata se o dano dele (com a escala do combo, por baixo) passa da vida que sobra. */
+    static final double KILL_SCALE = 0.6;
+    /** Quadros que ela lembra que o rival ficou na defesa (para agarrar quem só defende). */
+    static final int RIVAL_BLOCK_MEMORY = 90;
     /** Overdrive no meio do combo, ou no neutro com a vida baixa. */
     static final double OVERDRIVE_COMBO_CHANCE = 0.15;
     static final double OVERDRIVE_LOW_LIFE_CHANCE = 0.08;
@@ -48,6 +56,22 @@ final class AiController {
     static final double PUSHBLOCK_LOW_GUARD_CHANCE = 0.8;
 
     private static final int GUARD_NONE = 0, GUARD_HIGH = 1, GUARD_LOW = 2, GUARD_ANY = 3;
+    /** Hábito de esperar agachada quando o rival não está atacando (antes 0,35). */
+    static final double CALM_HABIT_SCALE = 0.1;
+    /**
+     * Na beira do jab do rival: chance (vezes a de defender) de parar em vez de entrar andando,
+     * e a folga da beira.
+     */
+    static final double EDGE_STOP = 0.45;
+    static final float EDGE_MARGIN = 20f;
+    /** Perto, no respiro entre os golpes dela: chance de segurar a defesa (vezes a de defender). */
+    static final double COOLDOWN_GUARD = 0.45;
+    /** Quadros desde o último golpe do rival em que ela ainda se sente pressionada. */
+    static final int PRESSURE_FRAMES = 30;
+    /** Quadros que ela segura a defesa por hábito (de MIN a MIN + SPREAD - 1). */
+    static final int HABIT_GUARD_MIN = 10, HABIT_GUARD_SPREAD = 12;
+    /** As duas alturas seguram, e ela defende em pé (o projétil do meio). */
+    private static final int GUARD_HIGH_ONLY = 4;
 
     private final OpponentAi ai;
     private final OpponentAi.Situation situation = new OpponentAi.Situation();
@@ -89,6 +113,9 @@ final class AiController {
     private boolean guardLow;
     /** A defesa atual é hábito (não viu ameaça): punir e tirar do ar passam na frente dela. */
     private boolean guardHabit;
+
+    /** Está esperando defendendo por hábito (não reagindo a nada que viu). */
+    boolean guardingByHabit() { return guardHabit && guardFrames > 0; }
     private int anticipationTimer;
     private int lastGuardSerial = -1, lastJumpSerial = -1, lastProjectileSerial = -1;
     private int lastOpponentAttackSerial = -1, lastOpponentAttackFrame = Integer.MIN_VALUE / 2;
@@ -104,6 +131,59 @@ final class AiController {
     private boolean lowGuard;
     private boolean antiAirPlan;
     private boolean jumpOverProjectile;
+
+    // ------------------------------------------------- contra quem fica soltando bola
+
+    /**
+     * Quadros até a bola chegar (pela frente dela) em que o pulo para frente passa por cima:
+     * medido para todas as bolas do jogo, a janela comum é ~12,8–16,2 quadros. Ela espera a
+     * bola chegar a esse tempo e só então pula (pulando assim que via, levava a bola na subida
+     * ou na descida).
+     */
+    static final float JUMP_OVER_LEAD = 14.5f;
+    /** Erro de mira do pulo no nível 1 (some no 8), em quadros para cada lado. */
+    static final float JUMP_OVER_SLOP = 4f;
+    /** O quanto o pulo para frente anda por quadro (fecha a distância junto com a bola). */
+    static final float JUMP_FORWARD_STEP = 5.1f;
+    /** Pular por cima só vale com o rival a até isto: de mais longe ela cai na frente da próxima. */
+    static final float JUMP_OVER_RANGE = 560f;
+    /** Bolas do rival nos últimos {@link #ZONING_MEMORY} quadros para ela achar que ele está zoneando. */
+    static final int ZONING_SHOTS = 2, ZONING_MEMORY = 240;
+    /** Projétil do rival que ela está esperando para pular por cima (serial), ou -1. */
+    private int jumpPlanSerial = -1;
+    private float jumpPlanLead;
+    /** Quadros das últimas bolas do rival que ela viu. */
+    private final int[] rivalShots = new int[ZONING_SHOTS];
+    private int rivalShotCount;
+    /** Levou ou defendeu bola: quando o atordoamento acabar, segura a defesa (como um humano). */
+    private boolean projectileStunGuard;
+    /** Quadros em que ela ainda segura a direção do pulo que acabou de pedir. */
+    private int jumpHold, jumpHoldDirection;
+    /**
+     * Pulo para dentro (por cima da bola ou antecipando): o aéreo sai logo que ela começa a
+     * descer (medido: do quadro ~15 ao ~25 do pulo ele acerta quem está no chão de 160 a 340 de
+     * distância). Esperando chegar mais perto do chão, saía tarde e ela caía na bola seguinte.
+     */
+    private boolean jumpIn;
+    static final float JUMP_IN_REACH = 230f;
+    static final int JUMP_HOLD_FRAMES = 5;
+    /**
+     * Quadros antes da bola chegar em que ela começa a segurar a defesa. Antes disso ela segue
+     * (avançando): segurar trás com a bola longe era andar para trás, e ela nunca chegava em
+     * quem fica soltando bola.
+     */
+    static final float GUARD_PROJECTILE_LEAD = 7f;
+    /** Projétil do rival que ela vai defender (serial), ou -1; e se agachada. */
+    private int guardPlanSerial = -1;
+    private boolean guardPlanLow;
+    /** Quadros até a bola planejada chegar (para não começar golpe que não termina antes). */
+    private float guardPlanArrival;
+    /** A bola que ela já está defendendo (serial), ou -1. */
+    private int guardingSerial = -1;
+    /** Andar para frente, por quadro (fecha a distância com a bola). */
+    static final float WALK_STEP = 5f;
+    /** Com a bola a esta distância (em quadros), ela não começa golpe: só anda até defender. */
+    static final float PROJECTILE_BUSY_FRAMES = 30f;
 
     /** Por que a CPU apertou o último golpe ("neutro", "punir", "antiaereo"): para os testes. */
     String lastReason = "";
@@ -209,10 +289,16 @@ final class AiController {
         endRoute();
         guardFrames = 0;
         justDefenseWait = 0;
-        breakerWait = breakerHold = 0;
+        breakerWait = 0;
         lastBreakerSerial = -1;
+        breakerCombo = false;
         anticipationTimer = 0;
         lastGuardSerial = lastJumpSerial = lastProjectileSerial = -1;
+        jumpPlanSerial = guardPlanSerial = guardingSerial = -1;
+        jumpHold = 0;
+        jumpIn = false;
+        rivalShotCount = 0;
+        projectileStunGuard = false;
         lastOpponentAttackSerial = -1;
         lastOpponentAttackFrame = Integer.MIN_VALUE / 2;
         lastPunishSerial = lastAntiAirSerial = -1;
@@ -240,9 +326,15 @@ final class AiController {
             return;
         }
         techDelay = -2;
+        // O próprio combo breaker ela sente na hora: o troco vem garantido.
+        if (me.comboBroke && engine.cues().contains("COMBO_BREAKER")) breakerCombo = true;
+        for (CombatEngine.HitEvent ev : engine.events()) {
+            // O próprio atordoamento ela sente na hora (não é reação ao rival).
+            if (ev.defender == self && ev.projectile) projectileStunGuard = true;
+        }
         if (me.frozen()) return;
         if (me.inHitstun()) betOnComboBreaker(engine, me, seen, out);
-        else breakerWait = breakerHold = 0;
+        else breakerWait = 0;
         if (me.status == CombatFighter.Status.AIR_HITSTUN) {
             // Air tech once the hitstun is over, sometimes, toward a random side.
             if (airTechPlan == -2) airTechPlan = ai.airTechDirection(level.airTech);
@@ -268,6 +360,7 @@ final class AiController {
             ownHitFrame = -1;
         }
 
+        if (breakerFollowUp(me, target, out)) return;
         if (fullKit && !target.ko() && fillKit(engine, me, target, seen, out)) return;
 
         if (cooldown > 0) cooldown--;
@@ -281,6 +374,7 @@ final class AiController {
             cooldown = Math.max(cooldown, HIT_COOLDOWN);
             endRoute();
         }
+        if (fullKit && ultraLink(engine, me, target, out)) return;
         if (me.attacking()) {
             lastAttack = me.attack;
             runCombo(engine, me, out);
@@ -298,6 +392,12 @@ final class AiController {
             movingForward = movingBack = dashing = false;
             return;
         }
+        boolean wasBlocking = blockedLastFrame;
+        blockedLastFrame = me.status == CombatFighter.Status.BLOCKSTUN;
+        if (wasBlocking && !blockedLastFrame && punishOnBlock(engine, me, target, seen, out)) return;
+        // Defendendo por reação e o golpe dele errou (já está na recuperação): solta a defesa e
+        // pune, em vez de segurar a defesa até o fim da janela.
+        if (seen != null && !seen.ko && me.canAct() && punish(engine, me, target, seen, out)) return;
         if (defend(engine, me, target, seen, out)) return;
         if (!me.canAct()) {
             movingForward = movingBack = dashing = false;
@@ -308,6 +408,14 @@ final class AiController {
         if (punish(engine, me, target, seen, out)) return;
         if (antiAir(engine, me, target, seen, out)) return;
         if (habitGuard(me, target, seen, out)) return;
+        if (guardPlanSerial >= 0 && guardingSerial != guardPlanSerial &&
+            guardPlanArrival < PROJECTILE_BUSY_FRAMES && me.grounded) {
+            // A bola está chegando e ela vai defender: golpe agora não acaba a tempo. Anda até ela.
+            movingBack = dashing = false;
+            movingForward = Math.abs(seen.x - me.x) > 160f;
+            out.direction = movingForward ? (me.facing > 0 ? 1 : 5) : 0;
+            return;
+        }
 
         situation.self = me.character();
         situation.target = target.body();
@@ -319,13 +427,33 @@ final class AiController {
         situation.targetAlive = !seen.ko;
         situation.superReady = me.state.superMeter >= CombatConfig.SUPER_COST;
         situation.projectileActive = engine.energyProjectileAlive(self);
-        situation.attackReady = cooldown <= 0;
+        // Caído no chão não leva golpe: bater nele é golpe perdido (e de onde ela o viu cair, que
+        // já não é onde ele está). Ela chega perto e espera ele levantar.
+        situation.attackReady = cooldown <= 0 && seen.status != CombatFighter.Status.KNOCKDOWN;
         situation.throwReach = throwReach(engine, me, target);
         situation.level = level;
+        if (seen.status == CombatFighter.Status.BLOCKSTUN) lastRivalBlockFrame = seen.frame;
+        situation.rivalBlocked = seen.frame - lastRivalBlockFrame < RIVAL_BLOCK_MEMORY;
         situation.style = CpuStyle.of(me.character());
         situation.urgency = urgency;
+        situation.rivalZoning = rivalZoning(seen.frame);
         clearRequests();
-        ai.think(CombatConfig.DT, situation, actions);
+        if (ai.think(CombatConfig.DT, situation, actions)) walkInPlan = !roll(level.reactGuard * EDGE_STOP);
+        if (movingForward && !dashing && attack == null && special == null && !superAttack && !grab && !jump &&
+            me.grounded && seen.grounded && seen.status == CombatFighter.Status.NEUTRAL && !seen.attacking() &&
+            situation.distance < jabRange(me, target) + EDGE_MARGIN && !walkInPlan) {
+            // Na beira do golpe rápido do rival: andando para dentro ela levava o jab (a
+            // distância que ela vê é a de antes da reação, e os dois estão andando). Para ali
+            // e espera defendendo; entra pelo dash, pelo pulo, pela punição ou pelo golpe dela.
+            movingForward = false;
+            if (roll(level.reactGuard * 0.25)) {
+                guardFrames = 8 + reactRandom.nextInt(8);
+                guardLow = true;
+                guardHabit = true;
+                holdGuard(me, out);
+                return;
+            }
+        }
 
         int forward = me.facing > 0 ? 1 : 5;
         if (movingForward) out.direction = forward;
@@ -337,12 +465,22 @@ final class AiController {
         out.superAttack = superAttack;
         out.grab = grab;
         if (special != null) out.special = special;
+        // O dedo já está no botão: com o rival de fato fora do alcance (a distância que ela viu
+        // é a de antes da reação, e nesse meio tempo ele foi empurrado, voou de um golpe ou
+        // trocou de lado por baixo dela), ela não solta o golpe no vazio.
+        if (attack != null && !CombatRules.reaches(me.character(), attack, !me.grounded,
+            Math.abs(target.x - me.x) + PRESS_REACH_MARGIN, target.body())) {
+            attack = null;
+        }
         if (attack != null) {
             startRoute(me.character(), attack);
             press(attack, me, out);
             lastReason = "neutro";
         }
     }
+
+    /** Folga da conferência na hora de apertar: o quadro que o golpe leva para começar, andando. */
+    static final float PRESS_REACH_MARGIN = 4f;
 
     // ---------------------------------------------------------------- defesa
 
@@ -354,12 +492,47 @@ final class AiController {
     private boolean defend(CombatEngine engine, CombatFighter me, CombatFighter target,
                            CpuPerception.Snapshot seen, FighterInput out) {
         boolean blockstun = me.status == CombatFighter.Status.BLOCKSTUN;
+        if (jumpIn) {
+            if (me.grounded && jumpHold == 0 || !me.canAct() && !me.attacking()) {
+                jumpIn = false;
+            } else if (!me.grounded && me.canAct() && me.vy >= 0f && seen != null &&
+                Math.abs(seen.x - me.x) <= JUMP_IN_REACH) {
+                // Descendo: solta o aéreo agora (o mais forte que ela tiver).
+                jumpIn = false;
+                for (String b : new String[] {"H", "M", "L"}) {
+                    if (me.character().move(b, true) != null) {
+                        press(b, me, out);
+                        lastReason = "pulo para dentro";
+                        return true;
+                    }
+                }
+            }
+        }
+        if (jumpHold > 0) {
+            jumpHold--;
+            if (!blockstun && me.status != CombatFighter.Status.HITSTUN &&
+                me.status != CombatFighter.Status.AIR_HITSTUN) {
+                out.direction = jumpHoldDirection;
+                return true;
+            }
+            jumpHold = 0;
+        }
         if (!blockstun && !me.canAct()) {
             guardFrames = 0;
             justDefenseWait = 0;
             return false;
         }
         CpuStyle style = CpuStyle.of(me.character());
+        if (projectileStunGuard && !blockstun && me.canAct()) {
+            projectileStunGuard = false;
+            // Saindo do atordoamento da bola: a próxima pode já estar saindo, perto demais para
+            // defender reagindo. Segura trás um instante, como quem joga faz.
+            if (me.grounded && roll(level.reactGuard * (0.5 + 0.5 * smart()))) {
+                guardHabit = false;
+                guardLow = false;
+                guardFrames = Math.max(guardFrames, 14 + reactRandom.nextInt(10));
+            }
+        }
         if (seen != null && !seen.ko) {
             float gap = Math.abs(seen.x - me.x);
             // (a defesa por hábito fica em habitGuard, depois de punir e tirar do ar)
@@ -383,17 +556,58 @@ final class AiController {
             if (seen.projectileGap != Float.MAX_VALUE && seen.projectileSerial != lastProjectileSerial) {
                 float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
                 float now = seen.projectileGap - speed * level.reactionFrames;
-                if (now < 420f) {
+                if (now < 560f) {
                     lastProjectileSerial = seen.projectileSerial;
-                    if (!blockstun && me.grounded && !seen.projectileSuper && now > 120f &&
-                        roll(Math.min(0.9, level.jumpProjectile * style.jumping))) {
-                        // Pula por cima, para frente.
-                        jumpOverProjectile = true;
-                    } else {
-                        int arrival = Math.round(Math.max(0f, now) / speed);
-                        if (decideGuard(seen.projectileLow ? GUARD_LOW : GUARD_ANY, arrival + 20)) {
-                            planJustDefense(me, arrival);
-                        }
+                    noteRivalShot(seen.frame);
+                    float leadNow = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + JUMP_FORWARD_STEP);
+                    boolean jumpWorth = Math.abs(seen.x - me.x) <= JUMP_OVER_RANGE;
+                    // Contra quem fica soltando bola ela pula mais (é o que vence a bola).
+                    double jumpChance = level.jumpProjectile * style.jumping * (rivalZoning(seen.frame) ? 1.6 : 1.0);
+                    if (!blockstun && me.grounded && !seen.projectileSuper && jumpWorth &&
+                        leadNow > JUMP_OVER_LEAD - 2f && roll(Math.min(0.92, jumpChance))) {
+                        // Pula por cima, para frente, quando a bola chegar no tempo certo.
+                        jumpPlanSerial = seen.projectileSerial;
+                        jumpPlanLead = JUMP_OVER_LEAD +
+                            (float)((1.0 - smart()) * JUMP_OVER_SLOP * (reactRandom.nextDouble() * 2.0 - 1.0));
+                    } else if (roll(level.reactGuard)) {
+                        // Defende quando ela chegar (projétil do meio: em pé, parada).
+                        guardPlanSerial = seen.projectileSerial;
+                        guardPlanLow = seen.projectileLow && roll(level.guardHeight);
+                    }
+                }
+            }
+            if (guardPlanSerial >= 0) {
+                if (seen.projectileGap == Float.MAX_VALUE || seen.projectileSerial != guardPlanSerial) {
+                    guardPlanSerial = guardingSerial = -1;
+                } else {
+                    float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
+                    // Ela pode estar andando para a bola: conta como se fosse (fecha mais rápido).
+                    float arrival = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + WALK_STEP);
+                    guardPlanArrival = arrival;
+                    if (arrival <= GUARD_PROJECTILE_LEAD || blockstun || guardingSerial == guardPlanSerial) {
+                        if (guardingSerial != guardPlanSerial) planJustDefense(me, Math.round(Math.max(0f, arrival)));
+                        // Segura enquanto essa bola existir (recuando ela demora mais a chegar).
+                        guardingSerial = guardPlanSerial;
+                        guardHabit = false;
+                        guardLow = guardPlanLow;
+                        guardFrames = Math.max(guardFrames, 6);
+                    }
+                }
+            }
+            if (jumpPlanSerial >= 0) {
+                if (seen.projectileGap == Float.MAX_VALUE || seen.projectileSerial != jumpPlanSerial || blockstun) {
+                    jumpPlanSerial = -1;   // a bola sumiu (bateu em algo) ou ela já está defendendo
+                } else {
+                    float speed = Math.max(1f, seen.projectileSpeed * CombatConfig.DT);
+                    float lead = seen.projectileGapNow(me.x, engine.frame() - seen.frame) / (speed + JUMP_FORWARD_STEP);
+                    if (lead <= jumpPlanLead) {
+                        jumpPlanSerial = -1;
+                        if (me.grounded && me.canAct()) jumpOverProjectile = true;
+                    } else if (me.grounded && me.canAct()) {
+                        // Esperando a hora: parada (andar para dentro da bola mudava a conta).
+                        movingForward = movingBack = dashing = false;
+                        out.direction = 0;
+                        return true;
                     }
                 }
             }
@@ -402,6 +616,14 @@ final class AiController {
             jumpOverProjectile = false;
             out.jump = true;
             out.direction = me.facing > 0 ? 8 : 6;
+            // A direção dos primeiros quadros decide o pulo: segura para frente (a defesa
+            // segurando trás logo depois virava o pulo para trás, em cima da bola).
+            jumpHold = JUMP_HOLD_FRAMES;
+            jumpHoldDirection = out.direction;
+            jumpIn = true;
+            guardFrames = 0;
+            guardPlanSerial = guardingSerial = -1;
+            justDefenseWait = 0;
             return true;
         }
         jumpOverProjectile = false;
@@ -429,16 +651,27 @@ final class AiController {
             return false;
         }
         if (Math.abs(seen.x - me.x) >= threatRange(me, target)) return false;
-        boolean pressured = seen.frame - lastOpponentAttackFrame < 60;
+        if (cooldown > 0 && roll(level.reactGuard * COOLDOWN_GUARD)) {
+            // Perto e ainda sem poder atacar (o respiro entre os golpes dela): parada ali ela
+            // levava o jab, rápido demais para defender reagindo. Segura a defesa até poder agir.
+            guardFrames = cooldown + 2;
+            guardLow = seen.grounded;   // rival no ar: o pulo só se defende em pé
+            guardHabit = true;
+            return holdGuard(me, out);
+        }
+        boolean pressured = seen.frame - lastOpponentAttackFrame < PRESSURE_FRAMES;
         double p = level.guardAnticipation * CpuStyle.of(me.character()).patience;
-        p = pressured ? p + 0.25 * level.reactGuard : p * 0.35;
+        // Sem pressão (o rival não atacou há pouco) ela quase não fica agachada esperando: era o
+        // que mais a deixava parecendo grudada no chão. Pressionada, defende (o jab não dá para
+        // defender reagindo), mas em janelas curtas: a pressão acabou, ela volta a atacar.
+        p = pressured ? p + 0.10 * level.reactGuard : p * CALM_HABIT_SCALE;
         // Guarda quase quebrando: ficar parada defendendo é pedir o guard break.
         if (lowGuard) p *= 0.4;
         // Com pressa ela não fica esperando: quem espera deixa o tempo acabar.
         p *= 1.0 - 0.6 * urgency;
         if (roll(Math.min(0.95, p))) {
-            guardFrames = 18 + reactRandom.nextInt(18);
-            guardLow = true;
+            guardFrames = HABIT_GUARD_MIN + reactRandom.nextInt(HABIT_GUARD_SPREAD);
+            guardLow = seen.grounded;   // rival no ar: o pulo só se defende em pé
             guardHabit = true;
             return holdGuard(me, out);
         }
@@ -476,7 +709,7 @@ final class AiController {
 
     /**
      * Combo breaker: apanhando num combo (e com barra), a cada golpe novo que ela vê o rival
-     * soltar, às vezes aposta: espera um pouco e aperta trás. Quebra só se o aperto cair na
+     * soltar, às vezes aposta: espera um pouco e aperta M + H. Quebra só se o aperto cair na
      * janela de um golpe forte/especial (como um humano que tenta no ritmo do combo).
      */
     private void betOnComboBreaker(CombatEngine engine, CombatFighter me, CpuPerception.Snapshot seen,
@@ -485,23 +718,53 @@ final class AiController {
         CombatConfig config = engine.config;
         if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits ||
             me.state.superMeter < config.comboBreakerCost) {
-            breakerWait = breakerHold = 0;
+            breakerWait = 0;
             return;
         }
         if (seen != null && seen.attacking() && seen.attackSerial != lastBreakerSerial) {
             lastBreakerSerial = seen.attackSerial;
-            if (breakerHold == 0 && roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
+            if (breakerWait == 0 && roll(level.comboBreaker())) breakerWait = 1 + reactRandom.nextInt(BREAKER_GUESS_FRAMES);
         }
-        if (breakerWait > 0 && --breakerWait == 0) breakerHold = BREAKER_HOLD_FRAMES;
-        if (breakerHold > 0) {
-            breakerHold--;
-            out.direction = me.facing > 0 ? 5 : 1;
-        }
+        if (breakerWait > 0 && --breakerWait == 0) out.pushblock = true;
     }
 
-    /** Quanto ela espera (no máximo) para apertar depois de ver o golpe, e quanto segura. */
-    static final int BREAKER_GUESS_FRAMES = 10, BREAKER_HOLD_FRAMES = 6;
-    private int breakerWait, breakerHold, lastBreakerSerial = -1;
+    /**
+     * Depois de quebrar o combo, sempre emenda o dela: o rival fica atordoado e longe (o estalo
+     * o joga para trás) e ela corre sozinha até ele; ao alcance, abre a rota do caderno com o
+     * primeiro golpe que alcança. Sem nenhum ao alcance, corre até ele enquanto o atordoamento dura.
+     */
+    private boolean breakerFollowUp(CombatFighter me, CombatFighter target, FighterInput out) {
+        if (!breakerCombo) return false;
+        if (!target.inHitstun() || target.ko() || !me.grounded) {
+            breakerCombo = false;
+            return false;
+        }
+        // O estalo ainda joga o rival para trás: a corrida sozinha leva até ele.
+        if (!me.canAct() || target.frozen() || target.pushFramesLeft > 0) return true;
+        float gap = Math.abs(target.x - me.x);
+        CharacterDefinition c = me.character();
+        for (String starter : new String[] {"L", "2L", "M", "2M"}) {
+            if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            startRoute(c, starter);
+            press(starter, me, out);
+            lastReason = "combo breaker";
+            breakerCombo = false;
+            return true;
+        }
+        if (me.breakerChase > 0) return true;
+        movingBack = false;
+        movingForward = dashing = true;
+        out.direction = target.x > me.x ? 1 : 5;
+        out.dash = true;
+        return true;
+    }
+
+    private boolean breakerCombo;
+
+    /** Quanto ela espera (no máximo) para apertar depois de ver o golpe. */
+    static final int BREAKER_GUESS_FRAMES = 10;
+    private int breakerWait, lastBreakerSerial = -1;
+
 
     /** Quantos quadros antes do contato ela aperta a defesa perfeita (dentro da janela). */
     static final int JUST_DEFENSE_LEAD = 2;
@@ -514,9 +777,29 @@ final class AiController {
         boolean right = roll(level.guardHeight);
         if (required == GUARD_HIGH) guardLow = !right;
         else if (required == GUARD_LOW) guardLow = right;
-        else guardLow = true;   // agachada segura qualquer golpe no chão
+        else if (required == GUARD_HIGH_ONLY) guardLow = false;
+        else guardLow = true;   // golpe do meio: agachada segura ele e os baixos (o certo a fazer)
         guardFrames = Math.max(guardFrames, frames);
         return true;
+    }
+
+    /** Plano da última decisão do neutro: entrar andando no alcance do jab do rival. */
+    private boolean walkInPlan = true;
+    private CharacterDefinition jabFor;
+    private float jabRange;
+
+    /** Até onde chega o golpe rápido do rival (L ou 2L): a beira onde ela para de andar. */
+    private float jabRange(CombatFighter me, CombatFighter target) {
+        CharacterDefinition c = target.character();
+        if (c != jabFor) {
+            jabFor = c;
+            jabRange = 0f;
+            for (String b : new String[] {"L", "2L"}) {
+                CharacterDefinition.Move move = c.move(b, false);
+                if (move != null) jabRange = Math.max(jabRange, CombatRules.maxCenterDistance(move, me.body()));
+            }
+        }
+        return jabRange;
     }
 
     /** Até onde o rival alcança com um golpe no chão (mais uma folga): o "colado" da defesa. */
@@ -563,7 +846,10 @@ final class AiController {
     private float predictedX(CombatEngine engine, CpuPerception.Snapshot seen) {
         float x = seen.x;
         CpuPerception.Snapshot before = perception.seen(level.reactionFrames + MOTION_SAMPLE);
-        if (before != null && seen.grounded && before.grounded) {
+        // Só o andar/correr do rival continua no mesmo ritmo: o deslizar de quem apanhou ou caiu
+        // freia e para (levar adiante passava do ponto e ela batia de longe).
+        if (before != null && seen.grounded && before.grounded &&
+            seen.status == CombatFighter.Status.NEUTRAL && before.status == CombatFighter.Status.NEUTRAL) {
             x += (seen.x - before.x) / MOTION_SAMPLE * level.reactionFrames;
         }
         // O próprio golpe ela sente na hora: sabe onde o rival estava quando encostou e quanto
@@ -614,6 +900,10 @@ final class AiController {
         }
         if (!breakPlan) return false;
         float gap = Math.abs(seen.x - me.x);
+        if (ultraPunish(me, target, ULTRA_PUNISH_MIN, gap, out)) {
+            breakPlan = false;
+            return true;
+        }
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"M", "L", "2L"}) {
             if (c.attack(starter) == null || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
@@ -635,6 +925,36 @@ final class AiController {
      * Viu o rival errar um golpe ao alcance: se a recuperação que ela calcula que sobra dá para o
      * golpe de abertura do caderno, pune com o combo.
      */
+    private boolean blockedLastFrame;
+    private int lastRivalBlockFrame = Integer.MIN_VALUE / 2;
+
+    /**
+     * Saiu da defesa e o golpe que ela defendeu ainda está na recuperação: pune com o golpe mais
+     * rápido que entra a tempo. Não é reação (a brecha é menor que a reação humana): é saber que
+     * aquele golpe é inseguro, como o jogador que decorou o frame data. Só golpe que ela viu.
+     */
+    private boolean punishOnBlock(CombatEngine engine, CombatFighter me, CombatFighter target,
+                                  CpuPerception.Snapshot seen, FighterInput out) {
+        if (!me.canAct() || !me.grounded || !target.grounded || !target.attacking() || seen == null ||
+            !seen.attacking() || seen.attack != target.attack) return false;
+        if (!roll(level.punish)) return false;
+        int left = target.attack.totalFrames - target.attackFrame;
+        float gap = Math.abs(target.x - me.x);
+        if (ultraPunish(me, target, left, gap, out)) return true;
+        CharacterDefinition c = me.character();
+        for (String starter : new String[] {"L", "2L", "M"}) {
+            AttackDefinition a = c.attack(starter);
+            if (a == null || a.startupFrames > left || c.move(starter, false) == null ||
+                !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
+            startRoute(c, starter);
+            press(starter, me, out);
+            guardFrames = 0;
+            lastReason = "punir na defesa";
+            return true;
+        }
+        return false;
+    }
+
     private boolean punish(CombatEngine engine, CombatFighter me, CombatFighter target,
                            CpuPerception.Snapshot seen, FighterInput out) {
         if (!me.grounded || !seen.grounded || !seen.attacking() || seen.threatening() ||
@@ -643,12 +963,14 @@ final class AiController {
         if (!roll(level.punish)) return false;
         int left = seen.recoveryLeft() - level.reactionFrames;
         float gap = Math.abs(seen.x - me.x);
+        if (ultraPunish(me, target, left, gap, out)) return true;
         CharacterDefinition c = me.character();
         for (String starter : new String[] {"M", "L", "2L"}) {
             AttackDefinition a = c.attack(starter);
             if (a == null || a.startupFrames > left || !CombatRules.reaches(c, starter, false, gap, target.body())) continue;
             startRoute(c, starter);
             press(starter, me, out);
+            guardFrames = 0;
             lastReason = "punir";
             return true;
         }
@@ -767,7 +1089,16 @@ final class AiController {
                 return;
             }
         }
-        if (awaitingStart || step + 1 >= route.size()) return;
+        if (awaitingStart) return;
+        if (step + 1 >= route.size()) {
+            // A rota acabou num golpe comum (um H solto que acertou, o fim de uma rota curta):
+            // fecha cancelando no Super ou no especial, se o golpe deixar.
+            String ender = ender(engine, me);
+            if (ender == null) return;
+            java.util.List<String> longer = new java.util.ArrayList<>(route);
+            longer.add(ender);
+            route = longer;
+        }
         String next = route.get(step + 1);
         if (me.outcome == CombatFighter.Outcome.NONE) return;   // ainda não encostou
         if (!stepDecided) {
@@ -780,10 +1111,18 @@ final class AiController {
             if (!commitDecided) {
                 commitDecided = true;
                 commitGo = roll(level.confirm);
+                // Com as 3 barras e o combo confirmado no chão: em vez do passo arriscado, deixa o
+                // golpe terminar e emenda o Ultra com o rival ainda atordoado (ultraLink).
+                if (commitGo && fullKit && me.grounded && !next.startsWith("j") && ultraLinks(engine, me, target) &&
+                    me.state.superMeter >= CombatConfig.ULTRA_COST && roll(smart() * ULTRA_LINK_CHANCE)) {
+                    ultraLinkSession = engine.session(target.index);
+                    ultraLinkPlan = true;
+                    commitGo = false;
+                }
             }
             if (!commitGo) return;
         }
-        if ("SUPER".equals(next) && me.state.superMeter < CombatConfig.SUPER_COST) {
+        if ("SUPER".equals(next) && !spendSuper(me, target)) {
             // Sem barra: fecha com o especial, se o golpe deixar.
             if (me.attack.cancelsInto("S") && me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)) {
                 next = "S";
@@ -793,7 +1132,7 @@ final class AiController {
         }
         if (ComboBook.JUMP.equals(next)) return;   // o super pulo sai do neutro, depois do lançador
         if (me.grounded && !next.startsWith("j") && !"S".equals(next) && !"SUPER".equals(next) &&
-            !CombatRules.reaches(me.character(), next, false, Math.abs(target.x - me.x), target.body())) {
+            !alcanca(me.character(), next, projectedGap(me, target), target)) {
             // O empurrão do golpe tirou o próximo do alcance: fecha com o que ainda alcança.
             next = closer(engine, me, target);
             if (next == null) return;
@@ -868,23 +1207,56 @@ final class AiController {
      */
     private String closer(CombatEngine engine, CombatFighter me, CombatFighter target) {
         CharacterDefinition c = me.character();
-        float gap = Math.abs(target.x - me.x);
-        for (String option : new String[] {"2H", "H", "S"}) {
+        float gap = projectedGap(me, target);
+        for (String option : CLOSER) {
             if (!me.attack.cancelsInto(option) || option.equals(route.get(step + 1))) continue;
             AttackDefinition a = c.attack(option);
             if (a == null || a.maxUsesPerChain > 0 && me.chain.contains(option)) continue;
-            boolean reaches = "S".equals(option)
-                ? me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)
-                : CombatRules.reaches(c, option, false, gap, target.body());
+            // O que compromete (lançador, especial, Super) só depois de ver que acertou.
+            if (ComboBook.commits(option) && !hitSeen(engine)) continue;
+            boolean reaches;
+            if ("S".equals(option)) {
+                reaches = me.state.profile.energy != null && !engine.energyProjectileAlive(me.index) &&
+                    (!a.melee() || alcanca(c, option, gap, target));
+            } else if ("SUPER".equals(option)) {
+                reaches = me.state.superMeter >= CombatConfig.SUPER_COST && c.fighter.hasSuperAttack();
+            } else {
+                reaches = alcanca(c, option, gap, target);
+            }
             if (!reaches) continue;
             java.util.List<String> rest = new java.util.ArrayList<>(route.subList(0, step + 1));
             rest.add(option);
             List<String> book = ComboBook.route(c);
             int at = book.indexOf(option);
-            if (at >= 0 && !"S".equals(option)) rest.addAll(book.subList(at + 1, book.size()));
+            if (at >= 0 && !"S".equals(option) && !"SUPER".equals(option)) rest.addAll(book.subList(at + 1, book.size()));
             route = rest;
             return option;
         }
+        return null;
+    }
+
+    /** O golpe no chão alcança o rival dessa distância (golpe sem alcance no pacote: não). */
+    private static boolean alcanca(CharacterDefinition c, String option, float gap, CombatFighter target) {
+        return c.move(option, false) != null && CombatRules.reaches(c, option, false, gap, target.body());
+    }
+
+    /** O que tentar quando o próximo passo não alcança: o lançador, os fortes, os médios e o fecho. */
+    private static final String[] CLOSER = {"2H", "H", "M", "2M", "SUPER", "S"};
+
+    /**
+     * Distância até o rival depois do empurrão que ainda vai acontecer: o golpe seguinte sai
+     * com ele já longe (um 2L na ponta empurra o rival para fora do alcance do M).
+     */
+    static float projectedGap(CombatFighter me, CombatFighter target) {
+        return Math.abs(target.x - me.x) + Math.abs(target.pushRemaining) + Math.abs(me.pushRemaining);
+    }
+
+    /** Fecho de uma rota que acabou num golpe comum no chão: o Super (com barra) ou o especial. */
+    private String ender(CombatEngine engine, CombatFighter me) {
+        AttackDefinition a = me.attack;
+        if (a == null || !me.grounded || a.kind != AttackDefinition.Kind.NORMAL) return null;
+        if (a.cancelsInto("SUPER") && spendSuper(me, engine.fighter(1 - me.index))) return "SUPER";
+        if (a.cancelsInto("S") && me.state.profile.energy != null && !engine.energyProjectileAlive(me.index)) return "S";
         return null;
     }
 
@@ -942,7 +1314,8 @@ final class AiController {
             // Guarda quase quebrando: tenta sair da pressão com mais vontade.
             boolean low = guardLow(engine, me);
             guardCancelPlan = chance(low ? GUARD_CANCEL_LOW_GUARD_CHANCE : GUARD_CANCEL_CHANCE);
-            pushblockPlan = chance(low ? PUSHBLOCK_LOW_GUARD_CHANCE : PUSHBLOCK_CHANCE);
+            // O pushblock gasta barra: os níveis altos só usam com a guarda perto de quebrar.
+            pushblockPlan = chance(low ? PUSHBLOCK_LOW_GUARD_CHANCE : PUSHBLOCK_CHANCE * (1.0 - 0.8 * smart()));
         }
         wasBlocking = blocking;
         if (blocking) {
@@ -962,7 +1335,8 @@ final class AiController {
                 plannedAttack = me.attack;
                 assistPlan = chance(ASSIST_COMBO_CHANCE);
                 dhcPlan = chance(DHC_CHANCE);
-                overdrivePlan = chance(OVERDRIVE_COMBO_CHANCE);
+                // Os níveis altos usam o Overdrive para esticar o combo que acertou.
+                overdrivePlan = chance(OVERDRIVE_COMBO_CHANCE * (0.5 + 1.5 * smart()));
             }
             plannedAttackFrame = me.attackFrame;
             if (teams.dhcReady(self, me)) {
@@ -987,7 +1361,7 @@ final class AiController {
         float life = me.state.life / (float)me.state.profile.maxLife;
         FighterState partner = team.partner();
         if (me.grounded && target.grounded && distance <= ULTRA_REACH &&
-            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE)) {
+            me.state.superMeter >= CombatConfig.ULTRA_COST && chance(ULTRA_CHANCE * (1.0 - smart()))) {
             out.ultra = true;
             return true;
         }
@@ -997,7 +1371,8 @@ final class AiController {
             out.tag = true;
             return true;
         }
-        if (!team.overdriveUsed && life < 0.5f && teams.canOverdrive(me) && chance(OVERDRIVE_LOW_LIFE_CHANCE)) {
+        if (!team.overdriveUsed && life < 0.5f && teams.canOverdrive(me) &&
+            chance(OVERDRIVE_LOW_LIFE_CHANCE * (1.0 - 0.7 * smart()))) {
             out.overdrive = true;
             return true;
         }
@@ -1006,6 +1381,93 @@ final class AiController {
             out.assist = true;
         }
         return false;
+    }
+
+    // ------------------------------------------------- contra quem fica soltando bola
+
+    private void noteRivalShot(int frame) {
+        rivalShots[rivalShotCount % ZONING_SHOTS] = frame;
+        rivalShotCount++;
+    }
+
+    /** O rival soltou várias bolas há pouco: está zoneando (ela vai atrás dele). */
+    boolean rivalZoning(int frame) {
+        if (rivalShotCount < ZONING_SHOTS) return false;
+        for (int shot : rivalShots) if (frame - shot > ZONING_MEMORY) return false;
+        return true;
+    }
+
+    // ---------------------------------------------------------------- recursos com cabeça
+
+    /** Quanto ela usa os recursos com cabeça: 0 no nível 1, 1 no 8 ({@link OpponentAi#smart}). */
+    private double smart() {
+        return OpponentAi.smart(level);
+    }
+
+    /**
+     * Gastar a barra no Super que fecha o combo confirmado? Os níveis baixos gastam sempre que
+     * têm; os altos só não quebram a reserva das 3 barras do Ultra (a não ser que o Super mate).
+     */
+    private boolean spendSuper(CombatFighter me, CombatFighter target) {
+        int meter = me.state.superMeter;
+        if (meter < CombatConfig.SUPER_COST || !me.character().fighter.hasSuperAttack()) return false;
+        if (smart() < 0.5 || !fullKit) return true;
+        AttackDefinition sup = me.character().attack("SUPER");
+        boolean kills = sup != null && sup.damage * KILL_SCALE >= target.state.life;
+        boolean keepsReserve = meter < CombatConfig.ULTRA_COST || meter - CombatConfig.SUPER_COST >= CombatConfig.ULTRA_COST;
+        return kills || keepsReserve;
+    }
+
+    /**
+     * O combo dela acabou e o rival ainda está atordoado (no chão, perto): emenda o Ultra (a
+     * preparação congela o rival e o avanço chega com ele ainda preso). Um sorteio por combo.
+     */
+    private boolean ultraLink(CombatEngine engine, CombatFighter me, CombatFighter target, FighterInput out) {
+        ComboSession session = engine.session(target.index);
+        if (session == null || session.attacker != me.index || session.hitCount < 2) {
+            ultraLinkSession = null;
+            return false;
+        }
+        // No fim da recuperação do golpe dela já aperta (o jogo guarda o comando e o Ultra sai no
+        // primeiro quadro livre, com o rival ainda atordoado).
+        boolean ending = me.attacking() && me.attack.totalFrames - me.attackFrame < engine.config.bufferFrames;
+        if (!(me.canAct() || ending) || !me.grounded || !target.grounded || !target.inHitstun() ||
+            me.state.superMeter < CombatConfig.ULTRA_COST || Math.abs(target.x - me.x) > ULTRA_REACH) return false;
+        if (session != ultraLinkSession) {
+            ultraLinkSession = session;
+            ultraLinkPlan = roll(smart() * ULTRA_LINK_CHANCE);
+        }
+        if (!ultraLinkPlan) return false;
+        ultraLinkPlan = false;
+        endRoute();
+        out.ultra = true;
+        lastReason = "ultra no combo";
+        return true;
+    }
+
+    private ComboSession ultraLinkSession;
+    private boolean ultraLinkPlan;
+
+    /**
+     * O golpe dela deixa o rival atordoado até ela poder apertar o Ultra (o fim da recuperação,
+     * com o comando guardado)? É o frame data do golpe (vantagem no acerto), que o jogador que
+     * conhece o personagem sabe.
+     */
+    private static boolean ultraLinks(CombatEngine engine, CombatFighter me, CombatFighter target) {
+        if (!me.attacking() || !target.inHitstun()) return false;
+        int free = me.attack.totalFrames - me.attackFrame - engine.config.bufferFrames;
+        return target.stunLeft > Math.max(0, free);
+    }
+
+    /** Pune com o Ultra (com a chance do nível): o rival preso por pelo menos {@code left} quadros. */
+    private boolean ultraPunish(CombatFighter me, CombatFighter target, int left, float gap, FighterInput out) {
+        if (!fullKit || left < ULTRA_PUNISH_MIN || me.state.superMeter < CombatConfig.ULTRA_COST || !me.grounded ||
+            gap > ULTRA_REACH || !roll(smart() * ULTRA_PUNISH_CHANCE)) return false;
+        endRoute();
+        guardFrames = 0;
+        out.ultra = true;
+        lastReason = "punir com ultra";
+        return true;
     }
 
     /** Sorteio do kit, na escala do nível (o nível 1 não usa o kit). */

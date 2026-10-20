@@ -33,8 +33,12 @@ final class CombatConfig {
     /** Down entered at most this many frames before up makes a super jump. */
     int superJumpFrames = 22;
 
-    /** Maximum juggle points a defender in AIR_HITSTUN can take in one combo. */
-    int juggleLimit = 6;
+    /**
+     * Maximum juggle points a defender in AIR_HITSTUN can take in one combo. Sem limite: o
+     * combo no ar acaba pelo hitstun que diminui, pelo empurrão, pelos quiques (um de cada por
+     * combo) e pelo combo breaker do defensor. Os pontos continuam contados na sessão.
+     */
+    int juggleLimit = Integer.MAX_VALUE;
 
     /** Damage scaling, in permille of the base damage. */
     int damageStepPermille = 50;
@@ -52,6 +56,12 @@ final class CombatConfig {
 
     /** Pushback and knockback are spread over this many frames. */
     int pushbackFrames = 8;
+    /**
+     * Bola de energia que acerta no chão empurra pelo menos isto: de perto, a vantagem do
+     * acerto (atordoamento + congelamento só de quem apanha) passava do tempo de soltar outra,
+     * e bola atrás de bola virava combo infinito. Longe, a próxima precisa viajar e não entra.
+     */
+    float projectileHitPushback = 120f;
     /** After a LAUNCH hit, a jump becomes a super jump for this many frames. */
     int launcherChaseFrames = 54;
     /**
@@ -214,7 +224,7 @@ final class CombatConfig {
     int throwStartupFrames = 5;
     int throwActiveFrames = 3;
     /** Gap between the two bodies within which the grab connects. */
-    float throwRange = 28f;
+    float throwRange = 40f;
     int throwWhiffFrames = 24;
     /** Frames after the grab during which the defender can tech. */
     int throwTechWindow = 12;
@@ -226,8 +236,19 @@ final class CombatConfig {
     /** Tech: both fighters pushed this far apart and frozen out of action for this long. */
     float throwTechPush = 110f;
     int throwTechFrames = 16;
-    /** Throw invulnerability right after hitstun, blockstun or wake-up. */
+    /** Throw invulnerability right after hitstun or wake-up (a throw never continues a combo). */
     int throwProtectFrames = 6;
+    /**
+     * Depois do blockstun a proteção é menor (antes 6, igual à do hitstun): o "soco defendido,
+     * agarra" (tick throw) entra logo depois do bloqueio, como nos jogos de luta.
+     */
+    int throwProtectAfterBlockFrames = 3;
+    /**
+     * Quanto o pedido de agarrão (L + M) espera para sair. Maior que o buffer dos golpes: L + M
+     * apertado no fim do próprio golpe sai assim que ele acaba (antes sumia sem fazer nada).
+     * O tech de quem é agarrado continua com {@code bufferFrames}.
+     */
+    int throwBufferFrames = 10;
 
     // Air tech (attack button when the air hitstun ends; the direction picks where to go).
     /** Without a tech the fighter free-falls this long, then recovers on its own (no invulnerability). */
@@ -295,14 +316,22 @@ final class CombatConfig {
     // do golpe; zerou, a defesa quebra e quem defendia fica aberto. Ela volta sozinha um pouco
     // depois de parar de defender (e cheia depois de quebrar).
     static final int GUARD_MAX = 1000;
-    /** Guarda gasta por quadro de blockstun do golpe defendido (um leve ~60, um forte ~110). */
-    int guardDrainPerBlockstunFrame = 6;
+    /**
+     * Vida de todos os lutadores, por mil da vida do pacote. 1400: a luta acabava rápido demais
+     * (um combo com a parede e o ar tirava quase 30% da vida).
+     */
+    static final int LIFE_SCALE_PERMILLE = 1400;
+    /**
+     * Guarda gasta por quadro de blockstun do golpe defendido (um leve ~100, um forte ~180):
+     * umas 10 defesas seguidas quebram (eram 17, e quase nunca quebrava).
+     */
+    int guardDrainPerBlockstunFrame = 10;
     /** Batida de um golpe de várias batidas antes da última: gasta só esta fração (por mil). */
     int guardHoldingDrainPermille = 500;
     /** Quadros sem defender antes de a guarda começar a voltar. */
-    int guardRegenDelayFrames = 90;
-    /** Guarda que volta por quadro (cheia em ~5,5 s). */
-    int guardRegenPerFrame = 3;
+    int guardRegenDelayFrames = 120;
+    /** Guarda que volta por quadro (cheia em ~8 s, depois de 2 s sem defender). */
+    int guardRegenPerFrame = 2;
     /** Atordoamento do guard break: aberto, sem defesa, tempo de entrar um combo. */
     int guardBreakStunFrames = 50;
     /** Congelamento do estalo da quebra (os dois, como um golpe forte). */
@@ -329,17 +358,28 @@ final class CombatConfig {
     int justDefenseHealPermille = 12;
 
     // Combo breaker: no golpe que fecha a sequência (o forte ou o especial) de um combo que já
-    // está entrando, o mesmo gesto da defesa perfeita (trás em cima da hora) quebra o combo:
-    // o golpe não entra, quem batia fica atordoado e quem apanhava emenda o próprio combo.
-    // Custa barra (sem barra, nada acontece) e vale uma vez por combo.
+    // está entrando, M + H em cima da hora quebra o combo: o golpe não entra, quem batia é jogado
+    // para longe e fica atordoado, e quem apanhava sai correndo sozinho até ele para emendar o
+    // próprio combo. Custa barra (sem barra, nada acontece) e vale uma vez por combo.
     int comboBreakerFrames = 5;
+    /** Um M + H logo depois do outro não abre a janela (bater sem parar não quebra). */
+    int comboBreakerLockoutFrames = 20;
+    /** Quadros entre o M e o H (dois dedos) que ainda valem como apertados juntos. */
+    int comboBreakerPairFrames = 2;
     /** Acertos que o combo já tem antes do golpe que fecha (o breaker não vale no 1º golpe). */
     int comboBreakerMinHits = 2;
     int comboBreakerCost = METER_PER_BAR;
-    /** Atordoamento de quem teve o combo quebrado: tempo de entrar um combo de volta. */
-    int comboBreakerStunFrames = 30;
+    /** Atordoamento de quem teve o combo quebrado: a corrida até ele e o tempo de entrar um combo. */
+    int comboBreakerStunFrames = 44;
     int comboBreakerHitstopFrames = 16;
-    /** No estalo, quem quebrou avança até ficar a esta folga do corpo do outro (ao alcance do L). */
+    /** O estalo joga quem batia até esta folga do corpo de quem quebrou: longe, só correndo. */
+    float comboBreakerPushGap = 170f;
+    /** Quadros que ele desliza para trás, arrastando o pé (mais rápido que a corrida de quem quebrou). */
+    int comboBreakerPushFrames = 10;
+    /** No ar, a velocidade com que ele é jogado para trás. */
+    float comboBreakerAirPushSpeed = 260f;
+    /** Quem quebrou corre sozinho (sem → →) por até tantos quadros, até ficar a esta folga (ao alcance do L). */
+    int comboBreakerChaseFrames = 40;
     float comboBreakerCloseGap = 30f;
 
     // Guard Cancel Tag (TAG while blocking on the ground): the partner comes in attacking.

@@ -112,12 +112,18 @@ public class StageSceneTest {
         assertTrue("os riscos de chuva são desenhados", canvas.lines > 120 * 50);
         assertTrue("as gotas que batem no piso respingam", canvas.rings > 0);
 
+        CountingCanvas cheio = new CountingCanvas();
+        scene.update(1f / 60f);
+        scene.drawBackground(cheio);
+        scene.drawForeground(cheio);
         scene.setDetalhe(false);
         CountingCanvas leve = new CountingCanvas();
-        scene.update(1f / 60f);
         scene.drawBackground(leve);
         scene.drawForeground(leve);
-        assertEquals("no modo leve não chove", 0, leve.lines + leve.rings);
+        // No leve chove menos (o cenário de chuva sem chuva perdia a cara), sem respingos.
+        assertTrue("no modo leve ainda chove", leve.lines > 0);
+        assertTrue("mas bem menos: " + leve.lines + " de " + cheio.lines, leve.lines * 2 < cheio.lines);
+        assertEquals("sem respingos", 0, leve.rings);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -133,7 +139,8 @@ public class StageSceneTest {
             + "{\"tipo\": \"neblina\", \"profundidade\": 2000, \"topo\": 0.3, \"base\": 0.5, \"cor\": \"#334455\"},"
             + "{\"tipo\": \"agua\", \"perto\": 1400, \"longe\": 4000},"
             + "{\"imagem\": \"pilar.png\", \"profundidade\": 300, \"noChao\": true, \"altura\": 1, \"repetir\": \"espelhar\","
-            + " \"periodo\": 0.8, \"reflexo\": 0.3, \"luzes\": [{\"x\": 0.9, \"y\": 0.3}], \"fogos\": [{\"x\": 0.5}]},"
+            + " \"periodo\": 0.8, \"reflexo\": 0.3, \"luzes\": [{\"x\": 0.9, \"y\": 0.3}], \"fogos\": [{\"x\": 0.5}],"
+            + " \"bandeiras\": [{\"imagem\": \"bandeira.png\", \"x\": 0.3, \"y\": 0.3, \"largura\": 0.3, \"altura\": 0.5}]},"
             + "{\"imagem\": \"frente.png\", \"profundidade\": -200, \"topo\": 0.8, \"base\": 1.1},"
             + "{\"imagem\": \"falta.png\", \"profundidade\": 50, \"topo\": 0.1, \"base\": 0.2}],"
             + "\"chao\": {\"imagem\": \"chao.jpg\", \"imagemLajotas\": \"lajotas.jpg\", \"reflexoLutadores\": 0.2},"
@@ -163,6 +170,384 @@ public class StageSceneTest {
         noArt.drawBackground(canvas);
         noArt.drawForeground(canvas);
         assertEquals("sem imagem do piso não há reflexo", 0f, noArt.fighterReflection(), 0f);
+    }
+
+    /**
+     * Uma ilha apoiada no mar ({@code "apoio"}) não desliza sobre ele quando a câmera sobe no
+     * super pulo: a base fica no mesmo ponto do mar. Sem o apoio, ela se separa.
+     */
+    @Test
+    public void layerRestingOnTheSeaFollowsItWhenTheCameraRises() throws IOException {
+        final FakeImage mar = new FakeImage(1600, 600), ilha = new FakeImage(1600, 900);
+        for (boolean apoio : new boolean[] {true, false}) {
+            final String json = "{\"nome\": \"T\", \"camadas\": ["
+                + "{\"imagem\": \"mar.png\", \"profundidade\": 9000, \"topo\": 0.2, \"base\": 0.8},"
+                + "{\"imagem\": \"ilha.png\", \"profundidade\": 1500, \"topo\": 0.1, \"base\": 0.45"
+                + (apoio ? ", \"apoio\": 9000" : "") + "}]}";
+            StagePack pack = StagePack.load(new RenderAssets() {
+                @Override public String readText(String path) { return json; }
+                @Override public RenderImage loadImage(String path) { return path.endsWith("mar.png") ? mar : ilha; }
+            }, "stages/t");
+            StageScene scene = new StageScene(pack, WORLD);
+            float[] repouso = baseSobreOMar(scene, mar, ilha, 72f);
+            float[] pulo = baseSobreOMar(scene, mar, ilha, -400f);
+            // Onde a base da ilha cai dentro da imagem do mar (fração da altura dela).
+            float antes = (repouso[1] - repouso[0]) / (repouso[2] - repouso[0]);
+            float depois = (pulo[1] - pulo[0]) / (pulo[2] - pulo[0]);
+            if (apoio) assertEquals("a base fica no mesmo ponto do mar", antes, depois, 0.002f);
+            else assertTrue("sem apoio ela desliza", Math.abs(antes - depois) > 0.05f);
+        }
+    }
+
+    /** {topo do mar, base da ilha, base do mar} na tela, com a câmera no topo {@code top}. */
+    private static float[] baseSobreOMar(StageScene scene, final RenderImage mar, final RenderImage ilha, float top) {
+        scene.setCamera(1.12f, 140f, top);
+        final float[] out = new float[3];
+        scene.drawBackground(new CountingCanvas() {
+            @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                if (image == mar) { out[0] = t; out[2] = b; }
+                if (image == ilha) out[1] = b;
+            }
+        });
+        return out;
+    }
+
+    /** A plateia pula só dentro da faixa: nem na festa do KO ela invade o que está em volta. */
+    @Test
+    public void crowdJumpsOnlyInsideItsBand() throws IOException {
+        final FakeImage arquibancada = new FakeImage(2000, 500);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"a.png\", \"profundidade\": 600, \"noChao\": true, \"altura\": 0.4,"
+            + " \"plateia\": [{\"topo\": 0.3, \"base\": 0.6, \"pulo\": 0.02, \"colunas\": 50}]}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) { return arquibancada; }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        scene.cheer(1f);
+        final float[] layer = new float[2];
+        final java.util.List<float[]> columns = new java.util.ArrayList<>();
+        for (int frame = 0; frame < 30; frame++) {
+            scene.update(1f / 60f);
+            scene.drawBackground(new CountingCanvas() {
+                @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                    layer[0] = t;
+                    layer[1] = b;
+                }
+                @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                      float l, float t, float r, float b, int alpha) {
+                    if (image == arquibancada) columns.add(new float[] {t, b});
+                }
+            });
+        }
+        assertTrue("a plateia se mexe", columns.size() > 100);
+        float h = layer[1] - layer[0];
+        for (float[] col : columns) {
+            assertTrue("não invade o que está acima", col[0] >= layer[0] + 0.3f * h - 0.01f);
+            assertTrue("não invade o que está abaixo", col[1] <= layer[0] + 0.6f * h + 0.01f);
+        }
+    }
+
+    /** Plateia recortada: a gente (só na máscara) é desenhada inteira em todo quadro, pulando ou não. */
+    @Test
+    public void cutoutCrowdIsAlwaysDrawnWhole() throws IOException {
+        final FakeImage arquibancada = new FakeImage(2000, 500), gente = new FakeImage(2000, 500);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"a.png\", \"profundidade\": 600, \"noChao\": true, \"altura\": 0.4,"
+            + " \"plateia\": [{\"topo\": 0.3, \"base\": 0.6, \"pulo\": 0.02, \"colunas\": 50,"
+            + " \"mascara\": \"g.png\", \"recortada\": true}]}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) { return path.endsWith("g.png") ? gente : arquibancada; }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        for (int frame = 0; frame < 20; frame++) {
+            scene.update(1f / 60f);
+            final int[] columns = {0};
+            scene.drawBackground(new CountingCanvas() {
+                @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                      float l, float t, float r, float b, int alpha) {
+                    if (image == gente) columns[0]++;
+                }
+            });
+            assertEquals("todas as colunas da plateia, em todo quadro", 50, columns[0]);
+        }
+    }
+
+    /**
+     * Cachoeiras: cada área sai da sua linha da folha, dentro de um quadro só (sem pegar o
+     * vizinho), em cima do lugar dela na imagem; com o tempo, o quadro muda.
+     */
+    @Test
+    public void waterfallsDrawTheirFrameOverTheirArea() throws IOException {
+        final FakeImage palacio = new FakeImage(1000, 500), agua = new FakeImage(8 * 200, 300);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"p.png\", \"profundidade\": 600, \"noChao\": true, \"altura\": 0.4,"
+            + " \"cachoeiras\": {\"imagem\": \"w.png\", \"quadros\": 8, \"fps\": 12,"
+            + " \"areas\": [[0.1, 0.2, 0.2, 0.4], [0.6, 0.5, 0.1, 0.2]]}}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) { return path.endsWith("w.png") ? agua : palacio; }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        java.util.Set<Integer> cells = new java.util.HashSet<>();
+        for (int frame = 0; frame < 30; frame++) {
+            scene.update(1f / 60f);
+            final float[] layer = new float[4];
+            final java.util.List<float[]> falls = new java.util.ArrayList<>();
+            scene.drawBackground(new CountingCanvas() {
+                @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                    if (image == palacio) {
+                        layer[0] = l; layer[1] = t; layer[2] = r; layer[3] = b;
+                    }
+                }
+
+                @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                      float l, float t, float r, float b, int alpha) {
+                    if (image == agua) falls.add(new float[] {sl, st, sr, sb, l, t, r, b});
+                }
+            });
+            assertTrue("o quadro da vez de cada área", falls.size() >= 2);
+            float w = layer[2] - layer[0], h = layer[3] - layer[1];
+            float[] a = falls.get(0);
+            int cell = (int)(a[0] / 200f);
+            cells.add(cell);
+            assertEquals("primeira área: largura inteira da coluna", cell * 200f + 200f, a[2], 0.01f);
+            assertEquals("primeira área: linha de cima", 0f, a[1], 0.01f);
+            assertEquals(200f, a[3], 0.01f);
+            assertEquals(layer[0] + 0.1f * w, a[4], 0.01f);
+            assertEquals(layer[1] + 0.6f * h, a[7], 0.01f);
+            for (float[] r : falls) {
+                int c = (int)(r[0] / 200f);
+                assertTrue("dentro de um quadro só", r[2] <= c * 200f + 200f + 0.01f);
+                if (r[1] > 0f) {
+                    assertEquals("segunda área: metade da coluna, linha de baixo", c * 200f + 100f, r[2], 0.01f);
+                    assertEquals(300f, r[3], 0.01f);
+                    assertEquals(layer[0] + 0.6f * w, r[4], 0.01f);
+                }
+            }
+        }
+        assertTrue("a água corre: o quadro muda com o tempo", cells.size() > 1);
+    }
+
+    /**
+     * Mar agitado numa segunda folha, em blocos de 2 quadros por fileira: o quadro 3 fica na
+     * segunda coluna da segunda fileira.
+     */
+    @Test
+    public void waterSheetsInBlocksPickTheRightCell() throws IOException {
+        final FakeImage abismo = new FakeImage(1000, 500), ondas = new FakeImage(2 * 400, 2 * 100);
+        final String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"a.png\", \"profundidade\": 600, \"noChao\": true, \"altura\": 0.4,"
+            + " \"cachoeiras\": [{\"imagem\": \"w.png\", \"quadros\": 8, \"areas\": [[0.1, 0.1, 0.1, 0.1]]},"
+            + " {\"imagem\": \"o.png\", \"quadros\": 4, \"colunas\": 2, \"fps\": 1,"
+            + " \"areas\": [[0.3, 0.6, 0.4, 0.2]]}]}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("o.png") ? ondas : path.endsWith("w.png") ? new FakeImage(800, 50) : abismo;
+            }
+        }, "stages/t");
+        assertEquals(2, pack.definition.layers.get(0).waterfalls.size());
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        // Quadro 3 (de 0 a 3) a 1 por segundo; a cópia 0 não tem atraso.
+        for (int i = 0; i < 30; i++) scene.update(0.1f);
+        scene.update(0.05f);
+        final java.util.List<float[]> cells = new java.util.ArrayList<>();
+        scene.drawBackground(new CountingCanvas() {
+            @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                                  float l, float t, float r, float b, int alpha) {
+                if (image == ondas) cells.add(new float[] {sl, st, sr, sb});
+            }
+        });
+        assertTrue(cells.size() >= 1);
+        float[] c = cells.get(0);
+        assertEquals("segunda coluna", 400f, c[0], 0.01f);
+        assertEquals(800f, c[2], 0.01f);
+        assertEquals("segunda fileira", 100f, c[1], 0.01f);
+        assertEquals(200f, c[3], 0.01f);
+    }
+
+    /** Espuma: no pé de cada cachoeira sobem borrifos (brilhos claros) perto do ponto em que a água bate. */
+    @Test
+    public void waterfallFoamPuffsRiseFromTheFoot() throws IOException {
+        String json = "{\"nome\": \"T\", \"camadas\": [{\"imagem\": \"a.png\", \"profundidade\": 600,"
+            + " \"noChao\": true, \"altura\": 0.4, \"cachoeiras\": {\"imagem\": \"w.png\","
+            + " \"areas\": [[0.1, 0.1, 0.2, 0.5]], \"espuma\": [[0.2, 0.6, 0.1]]}}]}";
+        StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        scene.update(0.5f);
+        final float[] layer = new float[4];
+        final java.util.List<float[]> puffs = new java.util.ArrayList<>();
+        scene.drawBackground(new CountingCanvas() {
+            @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+                layer[0] = l; layer[1] = t; layer[2] = r; layer[3] = b;
+            }
+
+            @Override public void fillRadialGlow(float cx, float cy, float radius, int argb) {
+                puffs.add(new float[] {cx, cy, radius});
+            }
+        });
+        assertEquals("6 borrifos no pé", 6, puffs.size());
+        float w = layer[2] - layer[0], h = layer[3] - layer[1];
+        float footX = layer[0] + 0.2f * w, footY = layer[1] + 0.6f * h, footW = 0.1f * w;
+        for (float[] p : puffs) {
+            assertTrue("perto do pé na horizontal", Math.abs(p[0] - footX) <= footW * 0.61f);
+            assertTrue("do pé para cima", p[1] <= footY + 0.01f && p[1] >= footY - footW * 0.46f);
+            assertTrue(p[2] > 0f && p[2] <= footW * 0.63f);
+        }
+    }
+
+    /** Neblina com fiapos: bancos de névoa (brilhos achatados) rente à base da faixa, andando. */
+    @Test
+    public void fogWispsDriftAlongTheBase() throws IOException {
+        String json = "{\"nome\": \"T\", \"camadas\": [{\"tipo\": \"neblina\", \"profundidade\": 8000,"
+            + " \"topo\": 0.35, \"base\": 0.45, \"cor\": \"#9C84B4\", \"alfa\": 0.5, \"fiapos\": 6, \"deriva\": 200}]}";
+        StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        final java.util.List<Float> xs = new java.util.ArrayList<>();
+        final float[] band = {Float.MAX_VALUE, -Float.MAX_VALUE};
+        RenderCanvas canvas = new CountingCanvas() {
+            @Override public void fillRadialGlow(float cx, float cy, float radius, int argb) {
+                xs.add(cx);
+                band[0] = Math.min(band[0], cy);
+                band[1] = Math.max(band[1], cy);
+            }
+        };
+        scene.update(0.016f);
+        scene.drawBackground(canvas);
+        assertTrue("uns 6 bancos na tela (mais os das bordas)", xs.size() >= 5 && xs.size() <= 12);
+        assertTrue("rente à base da faixa", band[0] > 0.35f * 720f && band[1] < 0.47f * 720f);
+        float first = xs.get(0);
+        xs.clear();
+        scene.update(1f);
+        scene.drawBackground(canvas);
+        assertTrue("andam com a deriva", Math.abs(xs.get(0) - first) > 1f);
+    }
+
+    /** A bandeira é desenhada em faixas: presa em cima, a ponta de baixo balança com o tempo. */
+    @Test
+    public void bannersHangFromTheTopAndSwayAtTheBottom() throws IOException {
+        final FakeImage pilar = new FakeImage(1000, 1500), bandeira = new FakeImage(300, 800);
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"pilar.png\", \"profundidade\": 300, \"noChao\": true, \"altura\": 1, \"x\": 0.4,"
+            + " \"bandeiras\": [{\"imagem\": \"bandeira.png\", \"x\": 0.3, \"y\": 0.25, \"largura\": 0.3, \"altura\": 0.53}]}]}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("bandeira.png") ? bandeira : pilar;
+            }
+        }, "stages/t");
+        assertEquals(1, pack.definition.layers.get(0).banners.size());
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+
+        float topMin = Float.MAX_VALUE, topMax = -Float.MAX_VALUE, tipMin = Float.MAX_VALUE, tipMax = -Float.MAX_VALUE;
+        int strips = 0;
+        for (int frame = 0; frame < 240; frame++) {
+            scene.update(1f / 60f);
+            CountingCanvas canvas = new CountingCanvas();
+            canvas.watch = bandeira;
+            scene.drawBackground(canvas);
+            assertTrue("desenhada em faixas", canvas.watched.size() >= 6);
+            float[] top = canvas.watched.get(0), tip = canvas.watched.get(canvas.watched.size() - 1);
+            assertEquals("a primeira faixa começa no topo do pano", 0f, top[0], 0.01f);
+            assertEquals("a última termina na ponta", bandeira.height(), tip[1], 0.01f);
+            topMin = Math.min(topMin, (top[2] + top[3]) / 2);
+            topMax = Math.max(topMax, (top[2] + top[3]) / 2);
+            tipMin = Math.min(tipMin, (tip[2] + tip[3]) / 2);
+            tipMax = Math.max(tipMax, (tip[2] + tip[3]) / 2);
+            strips = canvas.watched.size();
+        }
+        assertTrue("presa em cima", topMax - topMin < 1.5f);
+        assertTrue("a ponta balança: " + (tipMax - tipMin), tipMax - tipMin > 8f);
+
+        scene.setDetalhe(false);
+        CountingCanvas leve = new CountingCanvas();
+        leve.watch = bandeira;
+        scene.drawBackground(leve);
+        assertTrue("menos faixas no modo leve", leve.watched.size() < strips);
+    }
+
+    /** Relâmpagos: caem de tempos em tempos, piscam duas vezes, clareiam o céu e o cenário. */
+    @Test
+    public void lightningStrikesFromTimeToTimeAndFlashes() throws IOException {
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"ceu.jpg\", \"profundidade\": 100000, \"topo\": -0.1, \"base\": 0.6},"
+            + "{\"imagem\": \"pilar.png\", \"profundidade\": 300, \"noChao\": true, \"altura\": 1}],"
+            + "\"chao\": {\"imagem\": \"chao.jpg\"},"
+            + "\"relampagos\": {\"intervaloMinimo\": 2, \"intervaloMaximo\": 3, \"profundidade\": 9000}}";
+        StagePack pack = StagePack.load(new FakeAssets(json), "stages/t");
+        assertEquals(9000f, pack.definition.lightning.depth, 0f);
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 140f, 72f);
+        int lit = 0, lines = 0;
+        float lastFlash = 0f;
+        for (int frame = 0; frame < 60 * 10; frame++) {
+            scene.update(1f / 60f);
+            CountingCanvas canvas = new CountingCanvas();
+            scene.drawBackground(canvas);
+            assertEquals(0, canvas.depth);
+            if (scene.lightningFlash() > 0f) {
+                lit++;
+                lines += canvas.lines;
+            }
+            lastFlash = scene.lightningFlash();
+        }
+        assertTrue("caíram uns relâmpagos em 10 s: " + scene.strikes(), scene.strikes() >= 3 && scene.strikes() <= 5);
+        assertTrue("o clarão dura um pouco", lit > scene.strikes() * 10);
+        assertTrue("o raio é desenhado", lines > lit * 10);
+        // Pisca: forte, quase apaga, forte de novo e some.
+        assertEquals(1f, StageScene.lightningEnvelope(0.02f), 0f);
+        assertTrue(StageScene.lightningEnvelope(0.09f) < 0.5f);
+        assertTrue(StageScene.lightningEnvelope(0.15f) > 0.5f);
+        assertEquals(0f, StageScene.lightningEnvelope(2f), 0f);
+        assertEquals(0f, StageScene.lightningEnvelope(-1f), 0f);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void lightningWithTheMaximumBelowTheMinimumIsAnError() {
+        StageDefinition.fromJson("{\"nome\": \"X\", \"relampagos\": {\"intervaloMinimo\": 8, \"intervaloMaximo\": 3}}");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void aBannerWithoutSizeIsAnError() {
+        StageDefinition.fromJson("{\"nome\": \"X\", \"camadas\": [{\"imagem\": \"p.png\", \"profundidade\": 300,"
+            + " \"noChao\": true, \"altura\": 1, \"bandeiras\": [{\"imagem\": \"b.png\"}]}]}");
+    }
+
+    @Test
+    public void anExtraDrawingGoesBetweenTheDeeperAndTheShallowerLayers() throws IOException {
+        final FakeImage parede = new FakeImage(800, 800), lanterna = new FakeImage(200, 400);
+        String json = "{\"nome\": \"T\", \"camadas\": ["
+            + "{\"imagem\": \"parede.png\", \"profundidade\": 400, \"noChao\": true, \"altura\": 0.8},"
+            + "{\"imagem\": \"lanterna.png\", \"profundidade\": 120, \"noChao\": true, \"altura\": 0.3}],"
+            + "\"chao\": {\"imagem\": \"chao.jpg\", \"longe\": 700}}";
+        StagePack pack = StagePack.load(new RenderAssets() {
+            @Override public String readText(String path) { return json; }
+            @Override public RenderImage loadImage(String path) {
+                return path.endsWith("parede.png") ? parede : path.endsWith("lanterna.png") ? lanterna : new FakeImage(512, 512);
+            }
+        }, "stages/t");
+        StageScene scene = new StageScene(pack, WORLD);
+        scene.setCamera(1.12f, 400f, 72f);
+        final CountingCanvas canvas = new CountingCanvas();
+        scene.drawBackground(canvas, 200f, () -> canvas.ordem.add("narrador"));
+        int p = canvas.ordem.indexOf(parede), n = canvas.ordem.indexOf("narrador"), l = canvas.ordem.indexOf(lanterna);
+        assertTrue("na frente da parede", p >= 0 && p < n);
+        assertTrue("atrás da lanterna", n < l);
+        assertEquals("uma vez só", 1, java.util.Collections.frequency(canvas.ordem, "narrador"));
+
+        // A projeção na profundidade dele: anda e cresce menos que o plano dos lutadores.
+        assertTrue(scene.scale(200f) < scene.scale(0f));
+        assertEquals(700f, scene.worldX(scene.screenX(700f, 200f), 200f), 0.01f);
+        assertTrue("o chão dele fica acima do chão dos lutadores", scene.groundScreenY(200f) < scene.groundScreenY(0f));
     }
 
     private static final class FakeImage implements RenderImage {
@@ -198,8 +583,12 @@ public class StageSceneTest {
         }
     }
 
-    private static final class CountingCanvas implements RenderCanvas {
+    private static class CountingCanvas implements RenderCanvas {
         int depth, images, regions, lines, rings;
+        final java.util.List<Object> ordem = new java.util.ArrayList<>();
+        /** Recortes desenhados da imagem {@code watch}: topo e base no recorte, esquerda e direita na tela. */
+        RenderImage watch;
+        final java.util.List<float[]> watched = new java.util.ArrayList<>();
 
         @Override public void save() { depth++; }
         @Override public void restore() { depth--; assertTrue(depth >= 0); }
@@ -213,10 +602,14 @@ public class StageSceneTest {
         @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
         @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
         @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) { lines++; }
-        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) { images++; }
+        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {
+            images++;
+            ordem.add(image);
+        }
         @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
                                               float l, float t, float r, float b, int alpha) {
             regions++;
+            if (image == watch) watched.add(new float[] {st, sb, l, r});
             assertTrue("recorte dentro da imagem", sl >= -0.01f && sr <= image.width() + 0.01f && sr > sl);
             assertTrue(st >= -0.01f && sb <= image.height() + 0.01f && sb > st);
         }

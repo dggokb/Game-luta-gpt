@@ -12,7 +12,17 @@
       "profundidade": 100000,
       "topo": -0.08,
       "base": 1.02,
-      "corAcima": "#0B163F"
+      "corAcima": "#0B163F",
+      "luzes": [
+        {
+          "x": 0.652,
+          "y": 0.243,
+          "raio": 0.12,
+          "cor": "#CFE0FF",
+          "pulsar": 0.03,
+          "reflexo": false
+        }
+      ]
     },
     {
       "id": "montanhas",
@@ -38,7 +48,73 @@
       "topo": 0.13,
       "base": 0.63,
       "x": 0.62,
-      "repetir": "espelhar"
+      "repetir": "espelhar",
+      "luzes": [
+        {
+          "x": 0.167,
+          "y": 0.243,
+          "raio": 0.06,
+          "cor": "#FFB45A",
+          "pulsar": 0.05,
+          "reflexo": false
+        },
+        {
+          "x": 0.706,
+          "y": 0.27,
+          "raio": 0.05,
+          "cor": "#B070FF",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.767,
+          "y": 0.365,
+          "raio": 0.05,
+          "cor": "#60B0FF",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.544,
+          "y": 0.46,
+          "raio": 0.045,
+          "cor": "#60B0FF",
+          "pulsar": 0.08,
+          "reflexo": false
+        },
+        {
+          "x": 0.053,
+          "y": 0.652,
+          "raio": 0.03,
+          "cor": "#FFB45A",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.176,
+          "y": 0.657,
+          "raio": 0.03,
+          "cor": "#FFB45A",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.367,
+          "y": 0.652,
+          "raio": 0.03,
+          "cor": "#FFB45A",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.939,
+          "y": 0.652,
+          "raio": 0.03,
+          "cor": "#FFB45A",
+          "pulsar": 0.1,
+          "reflexo": false
+        }
+      ]
     },
     {
       "id": "rio",
@@ -64,7 +140,49 @@
       "noChao": true,
       "altura": 0.34,
       "x": 0.5,
-      "repetir": "nao"
+      "repetir": "nao",
+      "luzes": [
+        {
+          "x": 0.09,
+          "y": 0.68,
+          "raio": 0.035,
+          "cor": "#FFC870",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.136,
+          "y": 0.683,
+          "raio": 0.035,
+          "cor": "#FFC870",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.165,
+          "y": 0.752,
+          "raio": 0.03,
+          "cor": "#FFC870",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.837,
+          "y": 0.751,
+          "raio": 0.03,
+          "cor": "#FFC870",
+          "pulsar": 0.1,
+          "reflexo": false
+        },
+        {
+          "x": 0.91,
+          "y": 0.68,
+          "raio": 0.035,
+          "cor": "#FFC870",
+          "pulsar": 0.1,
+          "reflexo": false
+        }
+      ]
     },
     {
       "id": "grade",
@@ -90,6 +208,15 @@
           "raio": 0.04,
           "cor": "#FFB45A",
           "pulsar": 0.1
+        }
+      ],
+      "bandeiras": [
+        {
+          "imagem": "bandeira.png",
+          "x": 0.2984,
+          "y": 0.2844,
+          "largura": 0.3066,
+          "altura": 0.5341
         }
       ]
     },

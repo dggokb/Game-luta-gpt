@@ -55,6 +55,15 @@ estado produz os mesmos frames (testado), base para rollback no futuro.
   buffer, relógio de comandos). Golpe corpo a corpo congela os dois; projétil, só o
   defensor. A janela de cancelamento on hit fica aberta durante o hitstop e o
   cancelamento acontece no primeiro frame após ele.
+- **Pulo segurando ↑**: ↑ ou diagonal para cima segurada desde antes de poder agir (fim de um
+  golpe, da defesa, da queda) pula assim que o lutador fica livre, como nos jogos de luta; antes
+  só o instante de entrar no ↑ pedia o pulo e quem já segurava não pulava.
+- **Especial contra agachado**: especial e Super de chão (golpe, energia S1 e projéteis)
+  pegam quem está agachado — contra eles o corpo agachado conta com a altura de em pé
+  (`CombatEngine.hitsCrouching`). Muitos passavam por cima (o desenho bate na altura do peito,
+  e a energia ia por cima dos que agacham mais baixo, como p12 e o player_two). Os especiais
+  que só saem no ar seguem a altura de verdade. Normais (L/M/H) continuam com a altura real:
+  o agachado ainda passa por baixo dos golpes altos. Teste: `EspeciaisContraAgachadoTest`.
 - **Super freeze**: o Super congela o oponente e os projéteis durante o próprio startup
   (o que permite H → SUPER combar).
 - **Cinemática do Super** (`SuperFlash`, só apresentação): segue quem ativou, o jogador, a
@@ -76,6 +85,10 @@ humano**.
   *mostra* (posição, velocidade, animação, golpe e quadro dele, pulo, projéteis vindo) e entrega
   o de `CpuLevel.reactionFrames` quadros atrás. Nunca o botão apertado nem o quadro atual. No
   começo da luta, antes de ter a reação inteira de história, ela não sabe nada (`seen` = null).
+- **Sem golpe no vazio**: a decisão do neutro usa a distância vista (atrasada), mas na hora
+  de apertar ela confere a distância de verdade (`PRESS_REACH_MARGIN` = 4): se o rival foi
+  empurrado, voou de um golpe ou trocou de lado por baixo dela, o golpe não sai. Antes ~1 em
+  2.700 golpes começava fora do alcance (e um teste falhava de vez em quando).
 - **Piso humano**: `CpuLevel.HUMAN_REACTION_FRAMES` = 13 quadros (~217 ms a 60 fps). Nenhum
   nível fica abaixo (o construtor recusa) e os testes medem: a CPU nunca reage a um pulo nem
   pune um golpe errado antes disso.
@@ -87,6 +100,50 @@ humano**.
   vontade de soltar projétil, de agarrar, de pular e paciência na defesa. O zoner (alcance)
   recua para a distância dele; o pressão fica colado; o tanque agarra; o imprevisível às vezes
   larga o plano.
+- **Defende a sequência e volta a atacar** (a CPU dos níveis altos ficava agachada defendendo
+  enquanto o rival pressionava e não fazia nada):
+  - sob pressão (o rival atacou há menos de meio segundo, `PRESSURE_FRAMES` = 30) ela segura a
+    defesa por hábito, porque o jab é rápido demais para defender reagindo, mas em janelas
+    curtas (10 a 21 quadros, `HABIT_GUARD_*`); a pressão acabou, ela age;
+  - **pune na defesa** (`punishOnBlock`): saindo do bloqueio, se o golpe que ela defendeu ainda
+    está na recuperação, entra com o golpe mais rápido que chega a tempo (L, 2L, M), com a
+    chance de punir do nível. Não é reação (a brecha é menor que a reação humana): é saber que
+    o golpe é inseguro, como quem decorou o frame data;
+  - viu o golpe do rival errar: solta a defesa de reação e pune (a punição vem antes da defesa);
+  - perto e no respiro entre os golpes dela (`cooldown`): segura a defesa até poder agir
+    (`COOLDOWN_GUARD`), em vez de ficar parada levando o jab;
+  - **para na beira do jab do rival** (alcance do L/2L dele + 20): andando para dentro ela
+    levava o jab (a distância que ela vê é a de antes da reação). Entra andando só às vezes
+    (mais nos níveis baixos; `EDGE_STOP`); senão espera ali, cutuca, dá dash ou pula;
+  - a defesa por hábito com o rival no ar é em pé (o pulo passava por cima da defesa agachada).
+- **Mais luta que defesa** (o que dá graça é a luta): a defesa por hábito é baixa em todos os
+  níveis (`CpuLevel.guardAnticipation` 0,05 a 0,35), o respiro entre os golpes é curto
+  (`ATTACK_COOLDOWN` 9, `HIT_COOLDOWN` 15), ela entra mais no alcance do rival e os estilos são
+  mais agressivos e menos pacientes (o de alcance fica a 340, não a 420).
+  Medido contra um jogador simulado com reação humana (p03, 10 lutas por nível): no nível 8,
+  49 golpes por minuto (eram 35), 5% do tempo bloqueando e 17% segurando a defesa (eram 9% e
+  28%); vitórias da CPU por nível: 0, 3, 3, 6, 9, 10, 10, 10. Em todos os personagens o tempo
+  segurando a defesa ficou entre 11% e 24% (era de 19% a 40%).
+- **Recursos com cabeça** (`OpponentAi.smart`: 0 no nível 1, 1 no 8). Os níveis baixos gastam
+  a barra no que der; os altos:
+  - quase não soltam **Super cru** no neutro (`× (1 − 0,85·smart)`); fecham o combo
+    confirmado com o Super, mas sem quebrar a reserva das 3 barras do Ultra (a não ser que o
+    Super mate: `spendSuper`, `KILL_SCALE`);
+  - o **Ultra** cru do neutro some (`ULTRA_CHANCE × (1 − smart)`); ele sai para punir (golpe
+    errado ou defendido inseguro, guarda quebrada: `ultraPunish`) e emendado no combo quando
+    o golpe dela deixa o rival atordoado até ela poder apertar (`ultraLinks`, o frame data do
+    golpe; o Ultra só começa do neutro, para todo mundo);
+  - **Overdrive** para esticar o combo que acertou (mais nos altos) em vez do sorteio de vida
+    baixa; **pushblock** (gasta barra) só com a guarda perto de quebrar;
+  - **agarram** mais quem ficou na defesa há pouco (`rivalBlocked`, 1,5 s de memória).
+  Medido em batalha 2x2 contra o jogador simulado (nível 8): Super de 1,0/min com 38% de
+  acerto para 0,4/min com 57%, barra média de 1,3 para 2,5 barras, todo Ultra acertando.
+  O combo breaker continua uma aposta de tempo (com a chance do nível).
+- **Agachar menos**: sem pressão (o rival não atacou há pouco) o hábito de esperar agachada caiu
+  para 0,1 da chance (antes 0,35; `CALM_HABIT_SCALE`); pressionada, defende como antes. Os golpes
+  agachados (2L/2M/2H) pesam menos na escolha do neutro, e o projétil do meio ela defende em pé.
+  Não ataca quem está caído (o golpe se perdia de longe) e só solta aéreo com 24 de folga de
+  alcance (a distância vista no ar erra mais).
 - **Pressa do fim do tempo** (`OpponentAi.urgency`, `AiController.setSecondsLeft`): ela quer
   terminar a luta, não deixar o tempo acabar (mesmo ganhando na vida). A pressa começa com 45 s
   no relógio e chega ao máximo nos últimos 10 s. Com pressa: decide até 35% mais rápido, luta
@@ -105,8 +162,8 @@ Ordem de cada quadro (`AiController.fill`):
    Overdrive no meio do combo só depois de *ver* que acertou;
 4. o próprio golpe: o **caderno de combos** segue a rota;
 5. **defesa por reação**: golpe vindo (agachada contra golpe baixo; em pé contra pulo), pulo
-   vindo (em pé) ou projétil (defende ou pula por cima, para frente). Segura a defesa enquanto
-   está em blockstun;
+   vindo (em pé) ou projétil (defende quando ela chega ou pula por cima na hora certa; ver
+   "contra quem fica soltando bola"). Segura a defesa enquanto está em blockstun;
 6. **cartas**: punir (viu o rival errar, calcula a recuperação que sobra e entra com o golpe de
    abertura mais rápido que chega) e anti-aéreo (viu o pulo vindo, acompanha a trajetória e sobe
    com o 2H, que lança);
@@ -116,17 +173,58 @@ Ordem de cada quadro (`AiController.fill`):
 8. **neutro** (`OpponentAi.think`, com a posição *vista* do rival): andar, recuar até a
    distância do estilo, dash, projétil, agarrão, golpe ao alcance, pulo.
 
+**Contra quem fica soltando bola** (meia-lua + soco sem parar; `AiController`, "contra quem
+fica soltando bola"):
+
+- **Pulo na hora certa**: a bola pela frente dela, a CPU sabe a própria posição na hora e prevê
+  a da bola pelo que viu (`CpuPerception.Snapshot.projectileGapNow`). Medido para todas as bolas
+  do jogo, o pulo para frente passa por cima quando ela está a ~12,8–16,2 quadros de chegar: a
+  CPU espera esse tempo (`JUMP_OVER_LEAD` 14,5, com erro de mira até ±4 quadros no nível 1,
+  nenhum no 8) e pula. Só vale com o rival a até 560 (de mais longe ela cai na frente da próxima).
+  Os primeiros quadros do pulo seguram a direção (a defesa segurando trás virava o pulo para trás,
+  em cima da bola).
+- **Aéreo descendo**: nesse pulo para dentro o aéreo sai assim que ela começa a descer (do quadro
+  ~15 ao ~25 do pulo ele acerta quem está no chão de 160 a 340); esperando chegar perto do chão,
+  saía tarde.
+- **Defesa sem recuar**: segura a defesa só a 7 quadros da bola chegar, e enquanto aquela bola
+  existir; antes disso segue avançando. Segurar trás desde que via a bola era andar para trás, e
+  ela nunca chegava em quem spamma. Com a bola a menos de 30 quadros ela não começa golpe.
+- Saindo do atordoamento de uma bola, segura trás um instante (de perto a próxima sai antes de
+  qualquer reação).
+- **Rival zoneando** (2 bolas em 4 s): ela vai atrás (corre de longe) ou devolve com a própria
+  bola, mais quanto maior o nível; e pula mais por cima.
+- Medido contra um robô que só spamma do canto: o nível 8 levava ~77% das bolas e ganhava 0/12;
+  agora leva ~35% e ganha ~metade, tirando em média ~85% da vida do spammer. O nível 3 continua
+  levando a maioria. Teste: `CpuTest.aHighLevelCpuBeatsAFireballSpammer`.
+
 **Caderno de combos** (`ComboBook`): a rota principal de cada lutador sai do próprio pacote
 (`cancelInto`, `maxUsesPerChain`) e do estilo, sem combo escrito à mão. Ex.: p01
 `L M 2H super-pulo jL jM pulo-no-ar jL jM j2H`; p04 `L M M 2H ...`; p09 `L M H H SUPER`;
 p12 `L M H L M 2H ...`. Golpes comuns seguem às cegas (no acerto ou na defesa, como um jogador
-encadeia); lançador, especial, Super e super pulo só depois de ver que acertou. Se o empurrão
-tirou o próximo golpe do alcance, ela fecha com o que ainda alcança (H, ou o S1). Golpe agachado
-sai com ↘ (não fecha comando de especial com a defesa ← ↙ que veio antes).
+encadeia); lançador, especial, Super e super pulo só depois de ver que acertou.
+
+- **Alcance com o empurrão**: o próximo golpe só sai se alcança o rival *depois* do empurrão que
+  ainda vai acontecer (`projectedGap`). Um 2L na ponta empurra o rival para fora do M, e antes o
+  M saía no vento.
+- **Se não alcança**, procura outro que alcance e que o golpe atual cancele: 2H, H, M, 2M,
+  Super (com barra) ou o S1 (`CLOSER`), e segue a rota a partir dele.
+- **Golpe solto que acertou** (um H do neutro, o fim de uma rota curta): fecha cancelando no
+  Super (com barra) ou no S1, depois de ver que acertou (`ender`).
+- **Abertura**: perto o bastante para o L (o começo da rota), troca a cutucada pelo L com
+  `OpponentAi.starterChance` (nível 1: 15%, nível 8: 50%). A cutucada na ponta não emenda.
+- **Folga de alcance**: ela decide com a distância *vista* (com o atraso da reação), então o
+  golpe do chão precisa alcançar com 8 de folga (`GROUND_REACH_MARGIN`) e o L de abertura com 30
+  (`STARTER_REACH_MARGIN`); o golpe na beira saía no vento por poucas unidades.
+
+Contra um jogador que não defende, por 1 minuto, dos acertos corpo a corpo da CPU os que viram
+combo de 3+ hits subiram, por exemplo, de 9% para 37% (p01, nível 5) e de 5% para 48% (p02,
+nível 8). Golpe agachado sai com ↘ (não fecha comando de especial com a defesa ← ↙ que veio
+antes).
 
 Nível na pausa: **NÍVEL CPU ◀ 5 ▶** (1 a 8, salvo no aparelho; padrão 5). Testes: `CpuTest`
 (piso humano, percepção, defesa por nível, punição, combo por nível, rotas por estilo, zoner
-mais longe que pressão, nível 8 vence o nível 2).
+mais longe que pressão, nível 8 vence o nível 2, o nível 8 emenda 40%+ dos acertos e nenhum
+pacote quebra a busca do golpe que alcança).
 
 ## Correntes de combo
 
@@ -144,6 +242,23 @@ só lê o `cancelInto` e os limites que ficam no `character.json`.
   (`airJumpUsed`, volta ao tocar o chão), e a corrente aérea recomeça. Cue `AIR_JUMP`.
 
 Testes: `CorrentesComboTest`.
+
+## Bola de energia de perto: sem bola atrás de bola
+
+De perto, o acerto da bola de energia (atordoamento + congelamento só de quem apanha) deixava
++15 a +21 quadros de vantagem, mais do que soltar outra: bola atrás de bola virava combo sem
+fim (até 15 acertos com a p05, encurralando o boneco).
+
+- **Empurra longe**: a bola de energia (não o Super) que acerta no chão empurra pelo menos
+  `CombatConfig.projectileHitPushback` (120; antes 40 de todas).
+- **Bola não emenda em bola**: quem está atordoado no chão pela bola de energia de quem atirou
+  recebe a próxima bola dele (outra, não um acerto a mais da mesma) como defendida — como se já
+  tivesse se recuperado. Sem arranhão, sem gasto de guarda (não quebra a guarda). Golpe que
+  cancela na bola continua combo (`M > bola`); a regra é só bola em cima de bola
+  (`CombatEngine.energyChain`, `CombatFighter.stunProjectile`).
+
+Medido soltando bola o mais rápido possível colado no boneco, de 60 a 300 de distância, em
+todos com bola: antes 4 a 15 acertos seguidos; agora 1. Testes em `BolaEmBolaTest`.
 
 ## Anulação de projéteis
 
@@ -334,7 +449,7 @@ A recuperação deixou de ser automática: quem apanha escolhe. Valores em
 | L/M/H + ← | **Air tech para trás**: controle na hora, 10 frames invulnerável, 160 px para longe |
 | L/M/H + → | Air tech para a frente (120 px) |
 | L/M/H sem direção | Air tech neutro: um pulinho para cima |
-| nada | **Cai solto** por até 12 frames (`airTechWindow`), ainda aberto a golpes (conta no combo, com o limite de juggle), e recupera sozinho, sem invulnerabilidade |
+| nada | **Cai solto** por até 12 frames (`airTechWindow`), ainda aberto a golpes (conta no combo), e recupera sozinho, sem invulnerabilidade |
 
 O botão do tech não sai como golpe aéreo. Quedas forçadas (slam), bounces e o ultra não
 têm air tech (caem derrubados).
@@ -362,8 +477,7 @@ têm air tech (caem derrubados).
 
 **Punish counter (giro no ar, como no SF6):** o H em pé que acerta o rival **no meio do golpe
 dele** (início, ativo ou recuperação) o joga girando no ar a média distância (~360 px, ~1 s
-de voo) e ele cai deitado, sem air tech. Ainda dá para emendar golpes nele no ar (conta no
-limite de juggle). A tela treme e aparece "PUNISH COUNTER!". O 2H (lançador) não conta, nem
+de voo) e ele cai deitado, sem air tech. Ainda dá para emendar golpes nele no ar. A tela treme e aparece "PUNISH COUNTER!". O 2H (lançador) não conta, nem
 golpes leves/médios, especiais ou projéteis. Valores em `CombatConfig.spin*`; o giro é só
 visual (o sprite gira em torno do próprio eixo, inclinado, em `GameView.spinTransform`).
 Testes em `PunishCounterTest`.
@@ -387,7 +501,7 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 
 - Depois de um bounce o defensor tem `bounceHitstunFrames` (48) de hitstun, pode ser
   juggleado e **cai derrubado** (não se recupera no ar: `hardFall`).
-- Qualquer golpe novo cancela o voo em andamento; o limite de juggle continua valendo.
+- Qualquer golpe novo cancela o voo em andamento.
 - O motor avisa `WALL_BOUNCE` e `GROUND_BOUNCE` em `cues()` e a tela treme.
 - Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH
   (ground bounce) → ... ; com a barra, Super ou ultra no fim.
@@ -484,17 +598,26 @@ e `CombatConfig.guardCancel*`.
 
 Testes em `ActiveDefenseTest`.
 
+### Vida
+
+A vida de cada lutador é a do pacote (`fighter.maxLife`) vezes
+`CombatConfig.LIFE_SCALE_PERMILLE` (1400): a luta acabava rápido demais (um combo da parede e
+do ar tirava quase 30% da vida). Aumentar a vida em vez de baixar o dano deixa o dano de cada
+golpe (e a escala do combo) como está. Medido CPU contra CPU (nível 5, 2x2): o primeiro K.O.
+foi de 37 s para 61 s.
+
 ### Guard break
 
 Defender para sempre não funciona: cada defesa gasta a **guarda** (`FighterState.guard`,
 0..`CombatConfig.GUARD_MAX` = 1000), e quando ela zera a defesa **quebra**.
 
-- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (6). Um leve gasta ~60, um
-  forte ~100–150, um Super 100–270. Batidas de um golpe de várias batidas antes da última
-  gastam metade. Uma sequência L-M-H defendida gasta ~230–350: **umas 3 sequências seguidas**
-  (2 com especial) quebram; os pesados (p07, p09) quebram mais rápido.
-- **Volta**: depois de `guardRegenDelayFrames` (90, 1,5 s) sem defender, 3 por quadro (cheia
-  em ~5,5 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
+- **Gasto**: blockstun do golpe × `guardDrainPerBlockstunFrame` (10). Um leve gasta ~100, um
+  forte ~170–250, um Super 170–450. Batidas de um golpe de várias batidas antes da última
+  gastam metade. Uma sequência L-M-H defendida gasta ~400–580: **umas 2 sequências seguidas**
+  quebram (umas 11 defesas, ~4,5 s de pressão; eram 17 e quase nunca quebrava); os pesados
+  (p07, p09) quebram mais rápido.
+- **Volta**: depois de `guardRegenDelayFrames` (120, 2 s) sem defender, 2 por quadro (cheia
+  em ~8 s). Quem está fora de campo recupera também. Para no congelamento do Super/Ultra.
 - **Quebrou** (cue `GUARD_BREAK`): o golpe que quebrou não tira vida, mas quem defendia fica
   **aberto** por `guardBreakStunFrames` (50) depois de um congelamento de 18 — um hitstun longo,
   sem defesa e sem o empurrão da defesa (fica ao alcance do castigo). No ar, cai e termina no
@@ -514,12 +637,15 @@ Testes em `GuardBreakTest`.
 Três peças para a defesa não ser de graça nem perfeita sem esforço (inspiradas no overhead do
 SF6/FighterZ, no chip de especial de todos e no Just Defense do Garou).
 
-- **Golpe alto (→ + M, `GolpeAlto`)**: universal. Montado do M de cada personagem (a mesma
-  animação, esticada) quando o pack não declara um `6M`: preparo 20, ativo 3, recuperação 14,
+- **Golpe alto (→ + M, `GolpeAlto`)**: universal. Montado do M de cada personagem quando o
+  pack não declara um `6M`. O desenho do M não é esticado (ficava em câmera lenta): a
+  preparação roda no ritmo do M, a pose de antes do impacto fica segurada até o impacto do 6M
+  e a batida segue no ritmo do M (`Move` com tempo por trechos, `GolpeAlto.holdKnots`): preparo 20, ativo 3, recuperação 14,
   dano 115% do M, +3 no acerto, −6 na defesa. Pega quem defende **agachado**; em pé defende
   (`AttackDefinition.overhead`, `guardStops`). No acerto cancela nos especiais e no Super (os
   do H). Sai só do neutro (`CancelSystem`: dentro de um combo o → + M continua sendo o M) e
-  uma vez por combo. Ao sair, cue `OVERHEAD`: brilho amarelo na cabeça para dar para ler.
+  uma vez por combo. Ao sair, cue `OVERHEAD`: um brilho pequeno e curto perto da cabeça
+  (`ImpactEffects.spawnWarningGlint`, não o brilho do Super); o aviso principal é a pose segurada.
 - **Chip**: especial defendido tira 1/8 do dano da batida (`chipSpecialPermille` 125), Super e
   Ultra 1/4 (`chipSuperPermille` 250). O arranhão vira **vida vermelha** inteira
   (`FighterState.chip`: volta fora de campo) e **nunca derruba** (para em 1). Normais não arranham.
@@ -543,22 +669,36 @@ Testes em `DefesaEGolpeAltoTest`.
 ### Combo breaker
 
 Contra combo sem fim: quem está apanhando pode quebrar o combo **no golpe que fecha a
-sequência** — o forte ou o especial, corpo a corpo, na última batida dele — com o **mesmo
-gesto da defesa perfeita** (trás apertado até `comboBreakerFrames` = 5 quadros antes do contato;
-bater trás sem parar não vale). L e M no meio da sequência não quebram.
+sequência** — o forte ou o especial, corpo a corpo, na última batida dele — com **M + H**
+(os dois juntos, o ponto entre eles, ou um dedo até `comboBreakerPairFrames` = 2 quadros depois
+do outro) apertado até `comboBreakerFrames` = 5 quadros antes do contato. Bater M + H sem parar
+não vale (`comboBreakerLockoutFrames` = 20 entre um aperto e outro). L e M no meio da sequência
+não quebram. Apanhando, M + H não sai como H no buffer.
 
 - Só num combo que já tem `comboBreakerMinHits` (2) acertos antes desse golpe e com **1 barra**
   de Super (`comboBreakerCost`); sem barra, o golpe entra normal. Uma vez por combo (o combo acaba).
 - **Efeito** (cue `COMBO_BREAKER`): o golpe não entra; quem apanhava fica livre na hora (no ar,
-  cai livre) e, no chão, avança até ficar colado (`comboBreakerCloseGap`); quem batia perde o
-  golpe e fica atordoado `comboBreakerStunFrames` (30) depois de um congelamento de 16 — tempo de
-  emendar o próprio combo. "COMBO BREAKER!", brilho na cor de quem quebrou, estalo e tremida.
+  cai livre). Quem batia perde o golpe, fica atordoado `comboBreakerStunFrames` (44) depois de um
+  congelamento de 16 e é **jogado para trás** até `comboBreakerPushGap` (170) do corpo de quem
+  quebrou, deslizando em `comboBreakerPushFrames` (10) quadros (no ar, `comboBreakerAirPushSpeed`;
+  encurralado, para na parede — quem quebrou não recua). "COMBO BREAKER!", brilho na cor de quem
+  quebrou, estalo e tremida; enquanto desliza, o pé arrasta e solta **fumacinha**
+  (`ImpactEffects.spawnSkid`, `GameView.updateBreakerSkid`).
+- **Corrida automática**: quem quebrou sai correndo sozinho até ele (sem o → →), na velocidade do
+  dash, por até `comboBreakerChaseFrames` (40) quadros, até ficar a `comboBreakerCloseGap` (30)
+  do corpo dele (ao alcance do L). Trás ou baixo desiste da corrida; pulo também. O golpe
+  apertado no meio da corrida (ou ainda no congelamento) **espera chegar perto** — o buffer não
+  envelhece enquanto corre — e sai no alcance; chegando, ainda sobram ~29 quadros de atordoamento.
 - **Não vira luta infinita**: cada quebra custa uma barra, e a barra só volta batendo e
   apanhando; o troco também pode ser quebrado, mas só por quem ainda tiver barra.
 - **CPU**: a partir do nível 4, apanhando num combo e com barra, a cada golpe novo que ela vê às
   vezes aposta no tempo (`CpuLevel.comboBreaker`: 12% por nível acima do 3): espera um pouco e
-  aperta trás. Só quebra se a aposta cair na janela de um golpe forte/especial.
-- Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) ←".
+  aperta M + H. Só quebra se a aposta cair na janela de um golpe forte/especial. Quando quebra,
+  **sempre emenda o combo** dela (`AiController.breakerFollowUp`: deixa a corrida levar até ele e
+  abre a rota com o primeiro golpe que alcança).
+- **Câmera lenta**: no estalo, 36 quadros a 50% (`GameView.BREAKER_SLOW_*`), para dar para ver
+  o golpe que não entrou e o troco começando.
+- Na lista de COMANDOS: "Combo breaker (no golpe forte, 1 barra) M + H".
 
 Testes em `ComboBreakerTest`.
 
@@ -569,26 +709,39 @@ A terceira ameaça contra quem só defende: o agarrão não pode ser bloqueado. 
 
 | Fase | Frames | O que acontece |
 | --- | --- | --- |
-| `THROW_STARTUP` | 5 + 3 ativos | Pega se o corpo do outro estiver colado à frente (vão de até `throwRange` = 28) e no chão. |
+| `THROW_STARTUP` | 5 + 3 ativos | Pega se o corpo do outro estiver colado à frente (vão de até `throwRange` = 40) e no chão. |
 | `THROW_HOLD` | 12 | O defensor é puxado e fica `THROWN`; é a janela de **tech**. Ninguém acerta os dois. |
 | `THROW_EXECUTE` | 16 | Sem tech: 1200 de dano (começo de combo, sem escala), knockdown e empurrão. O atacante se recupera antes de o defensor levantar (oki). |
 | `THROW_WHIFF` | 24 | Ninguém ao alcance: recuperação punível (pode ser atingido e agarrado). |
 | `THROW_TECH` | 16 (os dois) | L + M do defensor na janela (ou até `bufferFrames` antes): sem dano, os dois são empurrados 110 px e ficam sem agir. |
 
 - **Comando**: L + M (dois dedos) ou o **ponto entre L e M** na tela
-  (`ControlsLayout.THROW_*`, desenhado como "L+M"). Dois dedos quase nunca caem no mesmo
-  frame: até `PadInput.THROW_LENIENCY_FRAMES` (2) de diferença ainda é agarrão, e o jab que
-  o primeiro botão começou vira o agarrão (ainda nos primeiros frames, antes de acertar).
+  (`ControlsLayout.THROW_*`, desenhado como "L+M", raio 32; o M+H do pushblock também). Dois dedos quase nunca caem no mesmo
+  frame: até `PadInput.THROW_LENIENCY_FRAMES` (2) de diferença ainda é agarrão, e o golpe que
+  o primeiro botão começou vira o agarrão (ainda nos primeiros frames, antes de acertar) — L ou
+  M em pé, agachado (2L/2M, segurando ↓) ou o golpe alto (6M, andando para frente). Quem está
+  **agachado é agarrado** como quem está em pé (o agarrão vence a defesa alta e a baixa).
+  Teste: `AgarraoToqueTest`.
 - **Quem pode ser agarrado**: no chão, em NEUTRAL, num golpe próprio (não no Super nem no
-  ultra) ou num agarrão errado. Hitstun, blockstun e os `throwProtectFrames` (6) depois
-  deles ou de levantar são invulneráveis a agarrão, então agarrão não continua combo e
-  um agarrão começado durante o stun do outro erra.
+  ultra) ou num agarrão errado. Hitstun e blockstun são invulneráveis a agarrão, e também
+  os `throwProtectFrames` (6) depois do hitstun ou de levantar (agarrão não continua combo)
+  e os `throwProtectAfterBlockFrames` (3) depois do blockstun: o **"soco defendido, agarra"**
+  (tick throw) entra logo depois do bloqueio, inclusive em quem defende agachado.
+- **Pedido de agarrão**: L + M fica guardado `throwBufferFrames` (10) quadros — apertado no
+  fim do próprio golpe, sai assim que ele acaba (antes sumia sem fazer nada). O tech de quem
+  é agarrado continua só com o `bufferFrames` (4) normal. Teste: `AgarraoToqueTest`.
 - **Os dois ao mesmo tempo**: tech automático.
 - **CPU**: agarra às vezes quando está colada (`OpponentAi.THROW_CHANCE`) e faz tech em
   ~40% dos agarrões, alguns frames depois de ser pega (`TECH_CHANCE`).
 - O jogo mostra "AGARRÃO!" ou "TECH!" no centro da tela. Arte: `THROW_GRAB` (pegar e
   segurar) e `THROW_TOSS` (jogar) quando o pacote tem (p01); sem elas o atacante usa o jab
   para pegar e o soco forte para jogar. O defensor usa a reação de hit.
+
+- **Alcance** (era 28): medido com um robô que vive tentando agarrar, quase metade das
+  tentativas errava no vento; o jogador aperta "colado" pelo olho, com uns 30–40 de vão, e o
+  soco defendido deixa 22–31. Com 40 o agarrão depois de qualquer L defendido entra, e os que
+  entram subiram ~10 pontos em todos os níveis. O ponto L+M na tela era de raio 22 (uns 4 mm no
+  celular): agora 32.
 
 Testes em `ThrowTest`.
 
@@ -601,7 +754,7 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
 | --- | --- |
 | **TAG** | Chama o parceiro como **assist**: ele entra correndo atrás do ponto (`assistBehind` 70 px, 8 frames), faz o golpe que o pack declara (`fighter.assist.move`) e sai (10 frames). Recarga de 240 frames (4 s). |
 | **TAG de novo** enquanto o assist entra ou golpeia | **Assist → Tag**: quando o golpe do assist termina, ele fica como o novo ponto onde está e o antigo sai correndo. O combo continua com o novo ponto. Recusado (o assist só sai) se o ponto estiver apanhando, defendendo, caído ou no ultra. Depois: 300 frames sem assist nem troca. |
-| **↓ + TAG** | **Troca direta**, igual à de antes: o ponto sai correndo (20 frames), o parceiro entra (23) e posa (27), sem poder agir. Só em NEUTRAL. Recarga de 600 frames (10 s). |
+| **↓ + TAG** | **Troca direta com voadora** (como no Marvel vs. Capcom): o ponto sai correndo (20 frames) e o parceiro entra pelo alto numa voadora até o rival (`VoadoraTroca`). Só em NEUTRAL. Recarga de 600 frames (10 s), contada quando a voadora acaba. |
 
 - Os botões são lidos sem precisar segurar: tocar e segurar se confundiriam e atrasariam o
   assist. O pedido fica no buffer por `bufferFrames`, então dá para chamar o assist
@@ -616,6 +769,24 @@ A regra do time saiu do `GameView` e foi para o motor (`TeamSystem`, dono e pass
   assist) vai para o ponto a cada frame, e na troca a barra vai com quem entra. O HUD e
   todos os custos leem a barra do ponto.
 - Um lado com um membro só (o boneco de treino) nunca troca nem chama assist.
+
+**A voadora da troca** (`VoadoraTroca`, fase `TeamSystem.TAG_KICK`):
+
+- Quem entra aparece `HEIGHT` (330) acima do chão e `BEHIND` (200) atrás de onde o ponto
+  estava, virado para o rival, e já está lutando: não fica travado, pode ser atingido, e o
+  rival pode defender ou dar anti-aéreo (`tagAnimating()` é falso nessa fase).
+- É um mergulho (`Mechanics.dive`): 4 frames parado no alto, depois desce a 900/s na
+  diagonal batendo a descida inteira. A velocidade para frente sai na hora para chegar no
+  rival quando toca o chão, entre 250 e 1500/s (rival muito longe: cai antes).
+- Montada do chute no ar de cada lutador (jH, ou jM): dano 110% do chute, hitstun 30,
+  blockstun 16, sem cancelamento. O desenho segura a pose do chute durante a descida.
+- **Acertou: o rival sai girando** (`AttackDefinition.spin`), o mesmo giro do punish
+  counter: voa num arco médio, ainda pode levar juggle e cai deitado, sem tech no ar. Cue
+  `SPIN`, com o impacto e o tremor de tela do punish. **Defendida ou no vento**: só cai com
+  a recuperação do mergulho.
+- A troca acaba quando a voadora acaba (no chão, ou apanhando no caminho); aí conta a recarga.
+- A troca da cinemática (`tagToStarter`, devolve o titular) e a entrada depois de um K.O.
+  continuam entrando correndo. Lutador sem chute no ar também entra correndo.
 
 Valores em `CombatConfig.tag*` e `CombatConfig.assist*`. Testes em `TeamSystemTest`.
 
@@ -634,7 +805,7 @@ Cada golpe em `moves` e o bloco `attack` de `fighter.energy` (S) e `fighter.supe
 | `damageProration` | não (1.0) | Escala aplicada ao resto de um combo que este golpe inicia |
 | `launchType` | não (`none`) | `knockdown`, `launch`, `slam` (slam exige super pulo e alvo no ar), `wallBounce`, `groundBounce` (v0.83) |
 | `knockback` | não (= pushbackOnHit) | Deslocamento quando o alvo fica no ar ou cai |
-| `juggleCost` | não (1) | Pontos de juggle gastos em alvo no ar |
+| `juggleCost` | não (1) | Pontos de juggle gastos em alvo no ar (contados na sessão; sem limite por padrão) |
 | `maxHits` | não (1) | Acertos por execução no mesmo alvo (≤ número de hitboxes) |
 | `maxUsesPerCombo` | não (0 = livre) | Acima disso o CancelSystem recusa a rota |
 | `maxUsesPerChain` | não (0 = livre) | Usos do golpe numa mesma corrente (desde o último golpe que saiu do neutro), acertando ou na defesa. Zera depois de uma ligação |
@@ -670,7 +841,10 @@ Buffer 4 frames; comando especial em até 15 frames e botão até 15 frames depo
 double tap 18; super pulo (↓ → ↑) 22. Escala: −5% por hit até 20% (SPECIAL 30%,
 SUPER 50%), −20% por repetição do mesmo golpe, dano arredondado para baixo e mínimo 1.
 Hitstun decay por número de hits (0,0,0,1,1,2,2,3,3,4,4,5 frames) ou por segundos de
-combo (0,0,1,2,4,6), o maior dos dois. Juggle limit 6. Pushback distribuído em 8
+combo (0,0,1,2,4,6), o maior dos dois. **Sem limite de juggle** (`juggleLimit` sem teto; os
+pontos continuam contados): o combo no ar acaba pelo hitstun que diminui, pela gravidade,
+pelos dois pulos no ar, pelos quiques (um de cada por combo) e pelo combo breaker do
+defensor. O H que joga na parede a partir do chão não gasta ponto. Pushback distribuído em 8
 frames.
 
 ## Ajustar caixas no celular (DEBUG > AJUSTAR CAIXAS)
@@ -743,7 +917,7 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 | Contador reflete ComboSession real | idem + `linkFormulaMatchesTheSimulation` |
 | DamageScaling e HitstunDecay | `damageScalingStepsDownToFloorsWithIntegerRounding`, `hitstunDecaysAsTheComboGrows`, `longComboInTheEngineIsScaled` |
 | maxHits | `overlappingHitboxHitsOnceAndMultiHitRespectsMaxHits` |
-| Nenhuma rota infinita | `everyRouteEndsByDecayJugglePointsOrPushback`, `lightLinkLoopEndsMidscreenAndInTheCorner`, `cornerPushbackMovesTheAttackerInstead`, `juggleLimitMakesTheDefenderRecoverInTheAir` |
+| Nenhuma rota infinita | `everyRouteEndsByDecayJugglePointsOrPushback`, `lightLinkLoopEndsMidscreenAndInTheCorner`, `cornerPushbackMovesTheAttackerInstead`, `withoutAJuggleLimitTheAirComboStillEnds`; com um limite configurado, `juggleLimitMakesTheDefenderRecoverInTheAir` |
 | Prioridade fixa no buffer | `simultaneousPressesFollowTheSamePriority`, `equalPriorityPicksTheMostRecentPress` |
 | Determinismo frame a frame | `sameInputsGiveTheSameFrames` |
 | Hitstop nos impactos | `hitstopFreezesBothFightersOnMeleeImpact` |
@@ -769,8 +943,8 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
 ## Ainda não feito
 
 - Fase 9 (calibração) só tem a primeira passada: valores escolhidos para os links
-  L → L/M e H → L/M funcionarem e para a rota 2H → super pulo → jL → jM → jH caber nos
-  6 pontos de juggle. Falta jogar e ajustar no aparelho.
+  L → L/M e H → L/M funcionarem. O limite de juggle saiu (combo sem limite; o
+  combo breaker é a defesa). Falta jogar e ajustar no aparelho.
 - (Fase 10 feita na v0.83: wall bounce e ground bounce.)
 - Os packs usam a hitbox padrão; nenhuma hitbox/hurtbox por frame foi desenhada ainda,
   embora o formato e o motor suportem.
@@ -811,6 +985,19 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   O H que joga na parede ganha um close mais aberto (~1,5×, `CINEMA_ZOOM_WALL`).
   Um por combo (90 quadros de intervalo); o KO sempre ganha o seu.
 - **Poeira e pedrinhas** quando um corpo bate no chão (mais forte vindo do alto) e no quique.
+- **Finalização de mangá** (`FinalizacaoManga`): o golpe que **mata e ganha a luta** (o time
+  do rival caiu inteiro) com **Super ou Ultra** vira um quadro de mangá. Depois do impact frame,
+  o cenário (fundo e frente) some atrás de um fundo chapado e linhas de concentração (集中線)
+  convergem em quem caiu, dentro da tela: muitos traços finos e algumas cunhas grossas,
+  redesenhados a cada 0,06 s, "fervendo" como animação de mangá. Os lutadores, o golpe e o
+  HUD continuam coloridos na frente.
+  - **Super**: papel claro e linhas pretas. **Ultra**: fundo preto, linhas brancas e linhas na
+    cor de quem finalizou.
+  - Entra em 0,08 s, fica 1,6 s e sai em 0,9 s, em tempo real (parado na pausa). A luta fica
+    em câmera lenta mais longa que a do KO (54 quadros a 30%), com tremida forte.
+  - K.O. no meio do Ultra (na página, num acerto do raio ou da sequência): o efeito espera o
+    golpe final dele, a explosão do raio ou o último golpe da sequência (`segurar`/`liberar`).
+  - Só apresentação: o motor não sabe dela. Testes em `FinalizacaoMangaTest`.
 
 - **Pose do impacto** (medido no FighterZ: o golpe fica parado esticado 0,12–0,2 s e volta
   à guarda em 1–2 quadros): golpes médios e fortes que acertam congelam +3/+4 quadros

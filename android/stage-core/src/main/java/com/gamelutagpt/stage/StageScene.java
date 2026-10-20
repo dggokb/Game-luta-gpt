@@ -25,18 +25,33 @@ public final class StageScene {
     private static final float VH = StageWorld.VH;
     /** Altura de cada faixa do piso na tela; menor = perspectiva mais lisa, mais desenhos. */
     private static final float FLOOR_STRIP = 3f;
+    /** Altura de cada faixa da bandeira na tela (o dobro no modo leve). */
+    private static final float BANNER_STRIP = 3f;
 
     /** Camada de imagem já convertida para o mundo 3D na sua profundidade. */
+    /** Animação da plateia (0 = assistindo, 1 = festa do KO); {@link #cheer}. */
+    private float hype;
+
+    /** Profundidade do céu, para o reflexo do sol na água (o sol não anda com a câmera). */
+    private static final float SKY_DEPTH = 100000f;
+
     private static final class Placed {
         final StageDefinition.Layer layer;
         final RenderImage image;
         final float z;
         final float top, bottom, width, firstCenterX, period;
+        /** Com {@code apoio}: y do mundo, na profundidade do apoio, onde fica a base. */
+        float supportBaseY = Float.NaN;
+        /** Água com reflexo do sol: x do sol no mundo, na profundidade do céu. */
+        float sunWorldX = Float.NaN;
+        /** Imagens das bandeiras da camada, na ordem dela (null = não carregou). */
+        final RenderImage[] banners;
 
         Placed(StageDefinition.Layer layer, RenderImage image, float z,
-               float top, float bottom, float width, float firstCenterX, float period) {
+               float top, float bottom, float width, float firstCenterX, float period, RenderImage[] banners) {
             this.layer = layer;
             this.image = image;
+            this.banners = banners;
             this.z = z;
             this.top = top;
             this.bottom = bottom;
@@ -94,9 +109,21 @@ public final class StageScene {
     private int nextSplash;
     private final Rand rainRand = new Rand(31);
     private static final float SPLASH_LIFE = 0.32f;
+    /** No modo leve só uma gota em cada tantas é desenhada. */
+    static final int LIGHT_RAIN_STEP = 3;
     /** Pontos do anel do respingo, reaproveitados a cada desenho (sem alocar por quadro). */
     private final float[] splashRing = new float[16];
     private float time;
+
+    // Relâmpagos: o raio de agora (pontos no mundo, na profundidade dele), quando caiu e quando
+    // cai o próximo.
+    private static final int BOLT_POINTS = 14, BRANCH_POINTS = 6, BRANCHES = 2;
+    private final float[] boltX = new float[BOLT_POINTS], boltY = new float[BOLT_POINTS];
+    private final float[][] branchX = new float[BRANCHES][BRANCH_POINTS], branchY = new float[BRANCHES][BRANCH_POINTS];
+    private final int[] branchLength = new int[BRANCHES];
+    private float strikeTime = -100f, nextStrike;
+    private int strikes;
+    private final Rand lightningRand = new Rand(57);
 
     public StageScene(StagePack pack, StageWorld world) {
         this.pack = pack;
@@ -136,7 +163,17 @@ public final class StageScene {
             float width = (bottom - top) * aspect;
             float centerX = rest.worldX(layer.x * VW, z);
             float period = Float.isNaN(layer.period) ? width : layer.period * VW / scale;
-            Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period));
+            // Fiapos de neblina: o espaço entre eles no mundo, fixo (não muda com o zoom).
+            if (layer.kind == StageDefinition.Kind.FOG && layer.wisps > 0) period = VW / scale / layer.wisps;
+            RenderImage[] banners = new RenderImage[layer.banners.size()];
+            for (int i = 0; i < banners.length; i++) banners[i] = pack.image(layer.banners.get(i).image);
+            Placed p = new Placed(layer, image, z, top, bottom, width, centerX, Math.max(1f, period), banners);
+            if (layer.kind == StageDefinition.Kind.WATER && !Float.isNaN(layer.sunX)) {
+                p.sunWorldX = rest.worldX(layer.sunX * VW, SKY_DEPTH);
+            }
+            if (!Float.isNaN(layer.support)) {
+                p.supportBaseY = rest.worldY(rest.screenY(bottom, z), layer.support);
+            }
             placed.add(p);
             if (actor != null) actors.put(layer.id, new ActorState(p, actor, layer.actor, image));
         }
@@ -190,6 +227,7 @@ public final class StageScene {
         splashZ = new float[splashes];
         splashAge = new float[splashes];
         java.util.Arrays.fill(splashAge, SPLASH_LIFE);
+        if (def.lightning != null) nextStrike = lightningRand.range(1.5f, def.lightning.minInterval);
     }
 
     public StageDefinition definition() {
@@ -205,6 +243,26 @@ public final class StageScene {
     /** Copia a câmera da luta: zoom final, esquerda e topo visíveis no mundo. */
     public void setCamera(float zoom, float cameraLeft, float top) {
         camera.set(zoom, cameraLeft, top);
+    }
+
+    /** Onde fica na tela o ponto {@code worldX} do mundo na profundidade {@code z}. */
+    public float screenX(float worldX, float z) {
+        return camera.screenX(worldX, z);
+    }
+
+    /** Altura do chão na tela na profundidade {@code z}. */
+    public float groundScreenY(float z) {
+        return camera.screenY(world.groundY, z);
+    }
+
+    /** Pixels de tela por unidade do mundo na profundidade {@code z}. */
+    public float scale(float z) {
+        return camera.scale(z);
+    }
+
+    /** O ponto do mundo na profundidade {@code z} que aparece em {@code screenX} da tela. */
+    public float worldX(float screenX, float z) {
+        return camera.worldX(screenX, z);
     }
 
     // ------------------------------------------------------------- atores
@@ -236,6 +294,14 @@ public final class StageScene {
      * reação para ele escolhe uma das animações da lista e toca, com um atraso pequeno e
      * diferente para cada um, para não reagirem como robôs.
      */
+    /**
+     * A luta esquentou (um golpe que acertou, o KO): a plateia pula mais, de 0 a 1. Cai sozinho
+     * em uns dois segundos.
+     */
+    public void cheer(float amount) {
+        hype = Math.max(hype, Math.min(1f, amount));
+    }
+
     public void react(String event) {
         for (ActorState a : actors.values()) {
             List<String> options = a.actor.reactions.get(event);
@@ -364,8 +430,10 @@ public final class StageScene {
 
     public void update(float dt) {
         time += dt;
+        hype = Math.max(0f, hype - dt * 0.45f);
         updateActors(dt);
         updateRain(dt);
+        updateLightning(dt);
         StageDefinition.Petals petals = pack.definition.petals;
         if (petals == null) return;
         for (int i = 0; i < petalX.length; i++) {
@@ -430,19 +498,53 @@ public final class StageScene {
 
     /** Tudo o que fica atrás dos lutadores, inclusive o piso. */
     public void drawBackground(RenderCanvas c) {
+        drawBackground(c, Float.NaN, null);
+    }
+
+    /**
+     * Tudo o que fica atrás dos lutadores, com mais um desenho ({@code between}, como o
+     * narrador no palco) na profundidade {@code z}: na frente das camadas mais fundas que ele
+     * (e do piso, se {@code z} está dentro dele) e atrás das mais rasas.
+     */
+    public void drawBackground(RenderCanvas c, float z, Runnable between) {
+        boolean pending = between != null;
         c.fillRect(-10f, -10f, VW + 10f, VH + 10f, pack.definition.backgroundColor);
         StageDefinition.Floor floor = pack.definition.floor;
         float floorFar = floor != null ? floor.far : 0f;
 
+        StageDefinition.Lightning lightning = pack.definition.lightning;
+        boolean bolt = lightning != null;
         for (Placed p : placed) {
-            if (p.layer.sortDepth() > floorFar) drawLayer(c, p);
+            if (p.layer.sortDepth() <= floorFar) continue;
+            if (bolt && p.layer.sortDepth() <= lightning.depth) {
+                drawLightning(c);
+                bolt = false;
+            }
+            if (pending && p.layer.sortDepth() <= z) {
+                between.run();
+                pending = false;
+            }
+            drawLayer(c, p);
+        }
+        if (bolt) drawLightning(c);
+        if (pending && z > floorFar) {
+            between.run();
+            pending = false;
         }
         drawFloor(c);
         drawFloorReflections(c);
         for (Placed p : placed) {
             float depth = p.layer.sortDepth();
-            if (depth <= floorFar && depth > 0f) drawLayer(c, p);
+            if (depth <= floorFar && depth > 0f) {
+                if (pending && depth <= z) {
+                    between.run();
+                    pending = false;
+                }
+                drawLayer(c, p);
+            }
         }
+        if (pending) between.run();
+        drawSceneFlash(c);
         drawSplashes(c, true);
         drawRain(c, true);
         drawPetals(c, true);
@@ -473,37 +575,232 @@ public final class StageScene {
         float scale = camera.scale(z);
         float top = camera.screenY(p.top, z);
         float bottom = camera.screenY(p.bottom, z);
+        if (!Float.isNaN(p.supportBaseY)) {
+            // Apoiada noutra camada (o mar): a base anda na vertical junto com ela.
+            bottom = camera.screenY(p.supportBaseY, layer.support);
+            top = bottom - (p.bottom - p.top) * scale;
+        }
         float halfWidth = p.width * 0.5f * scale;
         if (layer.fillAbove != 0 && top > -10f) c.fillRect(-10f, -10f, VW + 10f, top + 1f, layer.fillAbove);
         if (bottom < 0f || top > VH) return;
         int alpha = Math.round(255f * layer.alpha);
 
+        // Deriva: a camada anda sozinha (barcos); com repetição, dá a volta.
+        float startX = p.firstCenterX + time * layer.sail;
+        int wraps = 0;
+        if (layer.repeat != StageDefinition.Repeat.NONE && layer.sail != 0f) {
+            double travel = (double)time * layer.sail;
+            wraps = (int)Math.floor(travel / (2.0 * p.period));
+            startX = p.firstCenterX + (float)(travel - wraps * 2.0 * p.period);
+        }
         int first = 0, last = 0;
         if (layer.repeat != StageDefinition.Repeat.NONE) {
             float left = camera.worldX(0f, z) - p.width;
             float right = camera.worldX(VW, z) + p.width;
-            first = (int)Math.floor((left - p.firstCenterX) / p.period);
-            last = (int)Math.ceil((right - p.firstCenterX) / p.period);
+            first = (int)Math.floor((left - startX) / p.period);
+            last = (int)Math.ceil((right - startX) / p.period);
         }
+        float bobH = layer.bob * (bottom - top);
+        float baseTop = top, baseBottom = bottom;
         for (int k = first; k <= last; k++) {
-            float cx = camera.screenX(p.firstCenterX + k * p.period, z);
+            float cx = camera.screenX(startX + k * p.period, z);
             float l = cx - halfWidth, r = cx + halfWidth;
             if (r < 0f || l > VW) continue;
+            if (bobH != 0f) {
+                float dy = (float)Math.sin(time * 1.6f + (k - 2 * wraps) * 2.1f) * bobH;
+                top = baseTop + dy;
+                bottom = baseBottom + dy;
+            }
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawImage(c, p.image, l, top, r, bottom, mirrored, alpha);
+            drawWaterfalls(c, p, l, top, r, bottom, mirrored, alpha, k);
+            drawCrowd(c, p, l, top, r, bottom, mirrored, alpha, k);
+            drawBanners(c, p, l, top, r, bottom, mirrored, alpha, k);
             if (layer.reflection > 0f && detalhe) {
                 c.save();
                 c.scale(1f, -1f, 0f, bottom);
-                drawImage(c, p.image, l, top, r, bottom, mirrored, Math.round(alpha * layer.reflection));
+                int reflected = Math.round(alpha * layer.reflection);
+                drawImage(c, p.image, l, top, r, bottom, mirrored, reflected);
+                drawBanners(c, p, l, top, r, bottom, mirrored, reflected, k);
                 c.restore();
             }
         }
         for (int k = first; k <= last; k++) {
-            float cx = camera.screenX(p.firstCenterX + k * p.period, z);
+            float cx = camera.screenX(startX + k * p.period, z);
             float l = cx - halfWidth, r = cx + halfWidth;
             if (r < -200f || l > VW + 200f) continue;
+            if (bobH != 0f) {
+                float dy = (float)Math.sin(time * 1.6f + (k - 2 * wraps) * 2.1f) * bobH;
+                top = baseTop + dy;
+                bottom = baseBottom + dy;
+            }
             boolean mirrored = layer.repeat == StageDefinition.Repeat.MIRROR && (k & 1) != 0;
             drawLights(c, layer, l, top, r, bottom, mirrored, k);
+        }
+    }
+
+    /**
+     * Cachoeiras correndo: cada área é redesenhada por cima com o quadro da vez, que só
+     * difere da imagem na água; entre um quadro e o próximo, o próximo entra aos poucos (sem
+     * isso, 12 quadros por segundo davam trancos).
+     */
+    private void drawWaterfalls(RenderCanvas c, Placed p, float l, float t, float r, float b,
+                                boolean mirrored, int alpha, int instance) {
+        for (StageDefinition.Waterfalls falls : p.layer.waterfalls) {
+            drawWaterSheet(c, falls, l, t, r, b, mirrored, alpha, instance);
+        }
+    }
+
+    private void drawWaterSheet(RenderCanvas c, StageDefinition.Waterfalls falls, float l, float t, float r, float b,
+                                boolean mirrored, int alpha, int instance) {
+        RenderImage sheet = pack.image(falls.image);
+        if (sheet == null) return;
+        float w = r - l, h = b - t;
+        float[] a = falls.areas;
+        int n = falls.count();
+        float maxW = 0f, sumH = 0f;
+        for (int j = 0; j < n; j++) {
+            maxW = Math.max(maxW, a[j * 4 + 2]);
+            sumH += a[j * 4 + 3];
+        }
+        int blockRows = (falls.frames + falls.columns - 1) / falls.columns;
+        float cellW = sheet.width() / (float)falls.columns;
+        float blockH = sheet.height() / (float)blockRows;
+        float frame = time * falls.fps + instance * 3.3f;
+        int i0 = (int)Math.floor(frame);
+        float blend = frame - i0;
+        i0 = ((i0 % falls.frames) + falls.frames) % falls.frames;
+        int i1 = (i0 + 1) % falls.frames;
+        if (mirrored) {
+            c.save();
+            c.scale(-1f, 1f, (l + r) * 0.5f, 0f);
+        }
+        float rowTop = 0f;
+        for (int j = 0; j < n; j++) {
+            float ax = a[j * 4], ay = a[j * 4 + 1], aw = a[j * 4 + 2], ah = a[j * 4 + 3];
+            float sy0 = rowTop / sumH * blockH;
+            rowTop += ah;
+            float sy1 = rowTop / sumH * blockH;
+            float dl = l + ax * w, dt = t + ay * h, dr = dl + aw * w, db = dt + ah * h;
+            // Espelhada, a área aparece do outro lado da cópia.
+            float vl = mirrored ? l + r - dr : dl, vr = mirrored ? l + r - dl : dr;
+            if (vr < 0f || vl > VW || db < 0f || dt > VH) continue;
+            float srcW = cellW * aw / maxW;
+            float x0 = (i0 % falls.columns) * cellW, y0 = (i0 / falls.columns) * blockH;
+            c.drawImageRegion(sheet, x0, y0 + sy0, x0 + srcW, y0 + sy1, dl, dt, dr, db, alpha);
+            int next = Math.round(alpha * blend);
+            if (detalhe && next > 0) {
+                float x1 = (i1 % falls.columns) * cellW, y1 = (i1 / falls.columns) * blockH;
+                c.drawImageRegion(sheet, x1, y1 + sy0, x1 + srcW, y1 + sy1, dl, dt, dr, db, next);
+            }
+        }
+        drawSpray(c, falls, l, t, w, h, alpha, instance);
+        if (mirrored) c.restore();
+    }
+
+    /**
+     * Borrifos no pé de cada cachoeira: nuvens claras que nascem onde a água bate, sobem um
+     * pouco, crescem e somem, cada uma no seu tempo (a espuma pintada embaixo fica parada).
+     */
+    private void drawSpray(RenderCanvas c, StageDefinition.Waterfalls falls, float l, float t, float w, float h,
+                           int alpha, int instance) {
+        float[] f = falls.foam;
+        int puffs = detalhe ? 6 : 3;
+        for (int j = 0; j < f.length / 3; j++) {
+            float fx = l + f[j * 3] * w, fy = t + f[j * 3 + 1] * h, fw = f[j * 3 + 2] * w;
+            if (fx + fw < -VW || fx - fw > 2f * VW || fy - fw > VH || fy + fw < 0f) continue;
+            for (int i = 0; i < puffs; i++) {
+                int id = (instance * 131 + j) * 16 + i;
+                float period = 1.6f + 0.9f * hash01(id, 5);
+                float ph = time / period + hash01(id, 6);
+                ph -= (float)Math.floor(ph);
+                float side = hash01(id, 7) - 0.5f;
+                float cx = fx + side * fw * (0.7f + 0.5f * ph);
+                float cy = fy - ph * fw * 0.45f;
+                float radius = fw * (0.22f + 0.4f * ph);
+                float k = (float)Math.sin(Math.PI * ph);
+                c.fillRadialGlow(cx, cy, radius, withAlpha(falls.foamColor, Math.round(alpha * 0.65f * k * k)));
+            }
+        }
+    }
+
+    /**
+     * Plateia viva: a faixa da plateia é redesenhada em colunas estreitas, e cada coluna pula
+     * um pouco no seu tempo (vizinhas parecidas, como gente em grupinhos). Pulando, ela cobre
+     * a mesma faixa desenhada embaixo; o pulo é de poucos pixels, então a emenda não aparece.
+     */
+    private void drawCrowd(RenderCanvas c, Placed p, float l, float t, float r, float b,
+                           boolean mirrored, int alpha, int instance) {
+        StageDefinition.Layer layer = p.layer;
+        if (layer.crowds.isEmpty() || !detalhe) return;
+        RenderImage image = p.image;
+        float imgW = image.width(), imgH = image.height();
+        float w = r - l, h = b - t;
+        if (mirrored) {
+            c.save();
+            c.scale(-1f, 1f, (l + r) * 0.5f, 0f);
+        }
+        float speed = 5f + 5f * hype;
+        for (int band = 0; band < layer.crowds.size(); band++) {
+            StageDefinition.Crowd crowd = layer.crowds.get(band);
+            // Só o miolo da faixa se mexe: a margem (o maior pulo) fica parada em cima e em
+            // baixo. Pulando, o miolo cobre a margem de cima (gente sobre gente) e deixa à
+            // mostra a margem de baixo, que é plateia também; nada fora da faixa é tocado.
+            // Recortada: a gente está só na máscara e pula livre (sem margem), sempre desenhada.
+            float margin = crowd.cutout ? 0f : crowd.jump * 1.75f;
+            float amp = crowd.jump * h * (0.35f + 1.4f * hype);
+            if (!crowd.cutout) amp = Math.min(margin * h, amp);
+            if (amp < 0.4f && !crowd.cutout) continue;
+            float inTop = crowd.top + margin, inBottom = crowd.bottom - margin;
+            if (inBottom <= inTop) continue;
+            RenderImage source = crowd.mask != null ? pack.image(crowd.mask) : null;
+            if (source == null) source = image;
+            float kx = source.width() / imgW, ky = source.height() / imgH;
+            float sy0 = inTop * imgH * ky, sy1 = inBottom * imgH * ky;
+            float dy0 = t + inTop * h, dy1 = t + inBottom * h;
+            int n = crowd.columns;
+            for (int i = 0; i < n; i++) {
+                // Fase suave ao longo da arquibancada (grupinhos) + um pouco de sorteio por coluna.
+                float phase = (float)Math.sin(i * 0.37f + instance * 1.7f + band * 2.3f) * 2.4f
+                    + ((i * 7919 + instance * 104729 + band * 31) % 97) * 0.05f;
+                float wave = (float)Math.sin(time * speed + phase);
+                if (wave <= 0f && !crowd.cutout) continue;
+                float dy = wave > 0f ? -amp * wave * wave : 0f;
+                float sx0 = i * imgW / n * kx, sx1 = (i + 1) * imgW / n * kx;
+                float x0 = l + i * w / n, x1 = l + (i + 1) * w / n;
+                c.drawImageRegion(source, sx0, sy0, sx1, sy1, x0, dy0 + dy, x1 + 0.5f, dy1 + dy, alpha);
+            }
+        }
+        if (mirrored) c.restore();
+        drawFlashes(c, layer, l, t, r, b, mirrored, instance);
+    }
+
+    /**
+     * Flashes de câmera e celular na plateia: cada ponto de gente pisca de vez em quando (um
+     * clarão rápido); com a luta quente ({@link #cheer}) eles piscam muito mais. A plateia em
+     * si não se mexe, então nada da pintura é cortado.
+     */
+    private void drawFlashes(RenderCanvas c, StageDefinition.Layer layer, float l, float t, float r, float b,
+                             boolean mirrored, int instance) {
+        float w = r - l, h = b - t;
+        float radius = Math.max(1.1f, h * 0.0055f);
+        float period = 5.5f - 4.8f * hype;
+        for (int band = 0; band < layer.crowds.size(); band++) {
+            StageDefinition.Crowd crowd = layer.crowds.get(band);
+            for (int i = 0; i < crowd.flashX.length; i++) {
+                int seed = i * 7919 + instance * 104729 + band * 31337;
+                float offset = ((seed * 2654435761L) >>> 8 & 0xFFFF) / 65536f;
+                float speed = 0.7f + 0.6f * (((seed * 40503L) >>> 4 & 0xFFFF) / 65536f);
+                float cycle = time / (period * speed) + offset;
+                cycle -= (float)Math.floor(cycle);
+                if (cycle > 0.045f) continue;
+                float k = 1f - cycle / 0.045f;
+                float fx = mirrored ? 1f - crowd.flashX[i] : crowd.flashX[i];
+                float x = l + fx * w, y = t + crowd.flashY[i] * h;
+                if (x < -10f || x > VW + 10f || y < -10f || y > VH + 10f) continue;
+                c.fillRadialGlow(x, y, radius * 4f, withAlpha(0xFFFFFFFF, Math.round(150 * k)));
+                c.fillCircle(x, y, radius, withAlpha(0xFFFFFFFF, Math.round(255 * k)));
+            }
         }
     }
 
@@ -516,6 +813,53 @@ public final class StageScene {
             c.restore();
         } else {
             c.drawImage(image, l, t, r, b, alpha);
+        }
+    }
+
+    /**
+     * Bandeiras da camada balançando: o pano é desenhado em faixas horizontais e cada faixa
+     * vai para o lado conforme o vento. Presa em cima (a faixa do topo não sai do lugar),
+     * a ponta de baixo é a que mais anda; uma onda desce pelo pano e as faixas estreitam um
+     * pouco onde ele dobra. Cada cópia da camada balança num tempo diferente.
+     */
+    private void drawBanners(RenderCanvas c, Placed p, float l, float t, float r, float b,
+                             boolean mirrored, int alpha, int instance) {
+        List<StageDefinition.Banner> list = p.layer.banners;
+        float w = r - l, h = b - t;
+        for (int i = 0; i < list.size(); i++) {
+            RenderImage image = p.banners[i];
+            if (image == null) continue;
+            StageDefinition.Banner banner = list.get(i);
+            float bw = banner.width * w, bh = banner.height * h;
+            float bl = l + (mirrored ? 1f - banner.x - banner.width : banner.x) * w;
+            float bt = t + banner.y * h;
+            float amp = banner.sway * bw;
+            if (bl - amp > VW || bl + bw + amp < 0f || bt > VH || bt + bh < 0f) continue;
+
+            float seed = instance * 1.9f + i * 2.7f;
+            float gust = 0.8f + 0.2f * (float)Math.sin(time * 0.41f + seed);
+            float swing = (float)Math.sin(time * 1.25f * banner.speed + seed);
+            int rows = Math.round(clamp(bh / (detalhe ? BANNER_STRIP : BANNER_STRIP * 2f), 6f, 120f));
+            float srcW = image.width(), srcH = image.height();
+            float centerX = bl + bw * 0.5f;
+            // Espelhada, a cópia vira em torno do próprio centro; o vento continua do mesmo lado.
+            float side = mirrored ? -1f : 1f;
+            if (mirrored) {
+                c.save();
+                c.scale(-1f, 1f, centerX, 0f);
+            }
+            for (int j = 0; j < rows; j++) {
+                float v0 = j / (float)rows, v1 = (j + 1) / (float)rows;
+                float v = (v0 + v1) * 0.5f;
+                float weight = v * (float)Math.sqrt(v);
+                float phase = 6.2832f * banner.waves * v - time * 3f * banner.speed + seed * 1.3f;
+                float dx = side * amp * gust * weight * (0.6f * swing + 0.4f * (float)Math.sin(phase));
+                float half = bw * 0.5f * (1f - 0.05f * weight * (float)Math.cos(phase));
+                float cx = centerX + dx;
+                c.drawImageRegion(image, 0f, v0 * srcH, srcW, v1 * srcH,
+                    cx - half, bt + v0 * bh, cx + half, bt + v1 * bh + 0.75f, alpha);
+            }
+            if (mirrored) c.restore();
         }
     }
 
@@ -539,11 +883,114 @@ public final class StageScene {
         }
     }
 
+    // --------------------------------------------------------- relâmpagos
+
+    /** Quantos relâmpagos já caíram (para o jogo tocar o trovão, por exemplo). */
+    public int strikes() {
+        return strikes;
+    }
+
+    /** Força do clarão agora: pisca forte, quase apaga, pisca de novo e some (0 fora dele). */
+    public float lightningFlash() {
+        return lightningEnvelope(time - strikeTime);
+    }
+
+    static float lightningEnvelope(float t) {
+        if (t < 0f) return 0f;
+        if (t < 0.06f) return 1f;
+        if (t < 0.12f) return 0.25f;
+        if (t < 0.18f) return 0.85f;
+        float k = 0.85f * (float)Math.exp(-(t - 0.18f) * 7f);
+        return k < 0.02f ? 0f : k;
+    }
+
+    private void updateLightning(float dt) {
+        StageDefinition.Lightning l = pack.definition.lightning;
+        if (l == null) return;
+        nextStrike -= dt;
+        if (nextStrike > 0f) return;
+        nextStrike = lightningRand.range(l.minInterval, l.maxInterval);
+        strike(l);
+    }
+
+    /**
+     * Um raio novo: cai de cima, em zigue-zague, num ponto da tela de agora (guardado no
+     * mundo, então anda com a câmera como o resto da profundidade dele), com um ou dois galhos.
+     */
+    private void strike(StageDefinition.Lightning l) {
+        strikeTime = time;
+        strikes++;
+        Rand r = lightningRand;
+        float z = l.depth;
+        float scale = camera.scale(z);
+        float startX = camera.worldX(r.range(0.12f, 0.88f) * VW, z);
+        float top = camera.worldY(l.top * VH, z), bottom = camera.worldY(l.bottom * VH, z);
+        float step = 26f / scale;
+        float x = startX;
+        for (int i = 0; i < BOLT_POINTS; i++) {
+            boltX[i] = x;
+            boltY[i] = top + (bottom - top) * i / (BOLT_POINTS - 1f);
+            x += r.range(-1f, 1f) * step;
+        }
+        for (int b = 0; b < BRANCHES; b++) {
+            // O segundo galho só às vezes.
+            branchLength[b] = b == 0 || r.next() < 0.5f ? BRANCH_POINTS : 0;
+            if (branchLength[b] == 0) continue;
+            int from = 3 + (int)(r.next() * (BOLT_POINTS - 7));
+            float side = r.next() < 0.5f ? -1f : 1f;
+            float bx = boltX[from], by = boltY[from];
+            float segment = (bottom - top) / (BOLT_POINTS - 1f);
+            for (int i = 0; i < BRANCH_POINTS; i++) {
+                branchX[b][i] = bx;
+                branchY[b][i] = by;
+                bx += side * r.range(0.4f, 1.3f) * step;
+                by += segment * r.range(0.5f, 0.9f);
+            }
+        }
+    }
+
+    /** Clarão do céu e o raio, na profundidade do raio (o que está na frente cobre). */
+    private void drawLightning(RenderCanvas c) {
+        StageDefinition.Lightning l = pack.definition.lightning;
+        float k = lightningFlash();
+        if (k <= 0f) return;
+        c.fillRect(-10f, -10f, VW + 10f, VH + 10f, withAlpha(l.color, Math.round(255f * l.skyFlash * k)));
+        float z = l.depth;
+        float scale = camera.scale(z);
+        drawBoltPath(c, boltX, boltY, BOLT_POINTS, z, l.color, k, Math.max(1.6f, 3.2f * scale * 1.6f));
+        for (int b = 0; b < BRANCHES; b++) {
+            if (branchLength[b] > 0) {
+                drawBoltPath(c, branchX[b], branchY[b], branchLength[b], z, l.color, k * 0.8f,
+                    Math.max(1f, 1.8f * scale * 1.6f));
+            }
+        }
+    }
+
+    private void drawBoltPath(RenderCanvas c, float[] xs, float[] ys, int n, float z, int color, float k, float width) {
+        for (int i = 0; i + 1 < n; i++) {
+            float x1 = camera.screenX(xs[i], z), y1 = camera.screenY(ys[i], z);
+            float x2 = camera.screenX(xs[i + 1], z), y2 = camera.screenY(ys[i + 1], z);
+            // Brilho largo em volta (só no modo completo) e o miolo quase branco.
+            if (detalhe) c.drawLine(x1, y1, x2, y2, width * 5f, withAlpha(color, Math.round(70f * k)));
+            c.drawLine(x1, y1, x2, y2, width * 2f, withAlpha(color, Math.round(170f * k)));
+            c.drawLine(x1, y1, x2, y2, width, withAlpha(0xFFFFFFFF, Math.round(255f * k)));
+        }
+    }
+
+    /** O cenário todo clareia um pouco no relâmpago (atrás dos lutadores). */
+    private void drawSceneFlash(RenderCanvas c) {
+        StageDefinition.Lightning l = pack.definition.lightning;
+        if (l == null || l.sceneFlash <= 0f) return;
+        float k = lightningFlash();
+        if (k <= 0f) return;
+        c.fillRect(-10f, -10f, VW + 10f, VH + 10f, withAlpha(l.color, Math.round(255f * l.sceneFlash * k)));
+    }
+
     // -------------------------------------------------------------- piso
 
     private void drawFloor(RenderCanvas c) {
         StageDefinition.Floor floor = pack.definition.floor;
-        float groundTop = camera.screenY(world.groundY, floor != null ? floor.far : 0f);
+        float groundTop = camera.screenY(world.groundY, floor != null ? floor.extent : 0f);
         if (floorImage == null) {
             // Sem imagem: um chão liso, para o cenário continuar jogável.
             float y = Math.max(groundTop, camera.horizonY());
@@ -558,11 +1005,23 @@ public final class StageScene {
             float zTop = camera.floorDepthAt(y0);
             float zBottom = camera.floorDepthAt(y1);
             if (Float.isNaN(zTop) || Float.isNaN(zBottom)) continue;
+            zTop = Math.min(zTop, floor.extent);
             float zMid = (zTop + zBottom) * 0.5f;
+            boolean beyond = zMid > floor.far;
 
-            // Linha da textura: a borda de cima da imagem é a profundidade "longe".
-            float v0 = clamp((floor.far - zTop) / (floor.far - floor.near), 0f, 1f) * imgH;
-            float v1 = clamp((floor.far - zBottom) / (floor.far - floor.near), 0f, 1f) * imgH;
+            // Linha da textura: a borda de cima da imagem é a profundidade "longe". Atrás dela
+            // (até "ate") a imagem lisa se repete na profundidade, uma cópia em cima da outra.
+            float depth = floor.far - floor.near;
+            float v0, v1;
+            if (beyond) {
+                float a = (floor.far - zTop) / depth, b = (floor.far - zBottom) / depth;
+                float base = (float)Math.floor(a);
+                v0 = (a - base) * imgH;
+                v1 = Math.min(1f, b - base) * imgH;
+            } else {
+                v0 = clamp((floor.far - zTop) / depth, 0f, 1f) * imgH;
+                v1 = clamp((floor.far - zBottom) / depth, 0f, 1f) * imgH;
+            }
             if (v1 - v0 < 1f) {
                 float mid = Math.min(imgH - 0.5f, Math.max(0.5f, (v0 + v1) * 0.5f));
                 v0 = mid - 0.5f;
@@ -581,7 +1040,7 @@ public final class StageScene {
                 float sx0 = (u - uLeft) / (uRight - uLeft) * VW;
                 float sx1 = (tileEnd - uLeft) / (uRight - uLeft) * VW;
                 // A cópia do centro tem o emblema; as outras usam só lajotas, se houver.
-                RenderImage image = tile == 0 ? floorImage : floorPlainImage;
+                RenderImage image = tile == 0 && !beyond ? floorImage : floorPlainImage;
                 float kx = image.width() / imgW;
                 float ky = image.height() / imgH;
                 c.drawImageRegion(image, (u - tile * imgW) * kx, v0 * ky, (tileEnd - tile * imgW) * kx, v1 * ky,
@@ -598,7 +1057,7 @@ public final class StageScene {
         StageDefinition.Floor floor = pack.definition.floor;
         if (floor == null || floorImage == null || floor.lightReflection <= 0f) return;
         for (Placed p : placed) {
-            if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.far) continue;
+            if (p.layer.kind != StageDefinition.Kind.IMAGE || p.z < floor.near || p.z > floor.extent) continue;
             if (p.layer.lights.isEmpty() && p.layer.fires.isEmpty()) continue;
             int first = 0, last = 0;
             if (p.layer.repeat != StageDefinition.Repeat.NONE) {
@@ -645,8 +1104,15 @@ public final class StageScene {
         float yNear = camera.screenY(world.groundY, layer.waterNear);
         if (yNear <= yFar) return;
         int alpha = Math.round(255f * layer.alpha);
-        c.fillVerticalGradient(-10f, yFar, VW + 10f, yNear + 1f,
-            withAlpha(layer.color, alpha), withAlpha(layer.colorBottom, alpha));
+        if (p.image != null) {
+            drawWaterSurface(c, p, Math.max(yFar, camera.horizonY() + 0.5f), Math.min(yNear, VH + 1f));
+            // Lá longe a água some na cor do horizonte.
+            float haze = yFar + (yNear - yFar) * 0.4f;
+            c.fillVerticalGradient(-10f, yFar - 1f, VW + 10f, haze, withAlpha(layer.color, 230), layer.color & 0x00FFFFFF);
+        } else {
+            c.fillVerticalGradient(-10f, yFar, VW + 10f, yNear + 1f,
+                withAlpha(layer.color, alpha), withAlpha(layer.colorBottom, alpha));
+        }
 
         if (!detalhe) return;
         // Brilhos que piscam na superfície, presos ao mundo (andam com a câmera).
@@ -670,6 +1136,70 @@ public final class StageScene {
         }
     }
 
+    /**
+     * Superfície da água deitada em perspectiva, em faixas como o piso: a textura (vista de
+     * cima) se repete nas duas direções, anda com a corrente e, no fundo, as ondas ficam
+     * pequenas e juntas. Sem isso o mar era uma foto em pé lá no fundo: as ondas grandes da
+     * parte de baixo da foto apareciam logo atrás do piso, enormes perto de tudo.
+     */
+    private void drawWaterSurface(RenderCanvas c, Placed p, float top, float bottom) {
+        StageDefinition.Layer layer = p.layer;
+        RenderImage image = p.image;
+        float imgW = image.width(), imgH = image.height();
+        float tileW = layer.waterTile;
+        float tileD = tileW * imgH / imgW;
+        int alpha = Math.round(255f * layer.alpha);
+        float shift = time * layer.drift;
+        for (float y0 = top; y0 < bottom; y0 += FLOOR_STRIP) {
+            float y1 = Math.min(bottom, y0 + FLOOR_STRIP);
+            float zTop = camera.floorDepthAt(y0), zBottom = camera.floorDepthAt(y1);
+            if (Float.isNaN(zTop) || Float.isNaN(zBottom)) continue;
+            zTop = Math.min(zTop, layer.waterFar);
+            zBottom = Math.max(zBottom, layer.waterNear);
+            float zMid = (zTop + zBottom) * 0.5f;
+            float d = (layer.waterFar - zTop) / tileD;
+            float v0 = (d - (float)Math.floor(d)) * imgH;
+            float v1 = Math.min(imgH, v0 + Math.max(1f, (zTop - zBottom) / tileD * imgH));
+            if (v1 - v0 < 1f) v0 = v1 - 1f;
+            // Ondulação: cada faixa da água vai e volta um pouco, defasada com a profundidade
+            // (ondas rolando em direção à praia), além da correnteza.
+            float swell = (float)Math.sin(time * 1.3f - zMid * 0.006f) * tileW * 0.025f
+                + (float)Math.sin(time * 0.7f + zMid * 0.0021f) * tileW * 0.015f;
+            float uLeft = (camera.worldX(0f, zMid) + shift + swell) / tileW * imgW;
+            float uRight = (camera.worldX(VW, zMid) + shift + swell) / tileW * imgW;
+            int tile = (int)Math.floor(uLeft / imgW);
+            float u = uLeft;
+            while (u < uRight) {
+                float tileEnd = Math.min(uRight, (tile + 1) * imgW);
+                float sx0 = (u - uLeft) / (uRight - uLeft) * VW;
+                float sx1 = (tileEnd - uLeft) / (uRight - uLeft) * VW;
+                c.drawImageRegion(image, u - tile * imgW, v0, tileEnd - tile * imgW, v1, sx0, y0, sx1 + 0.5f, y1, alpha);
+                u = tileEnd;
+                tile++;
+            }
+        }
+        if (Float.isNaN(p.sunWorldX) || !detalhe) return;
+        // Caminho de luz do sol: risquinhos que piscam embaixo dele na tela, poucos e juntos
+        // no horizonte, mais largos e espalhados perto.
+        float sx = camera.screenX(p.sunWorldX, SKY_DEPTH);
+        float horizon = camera.horizonY();
+        rand.reset(777);
+        for (float y = top; y < bottom; y += 2.5f) {
+            float k = Math.max(0f, (y - horizon) / Math.max(1f, VH - horizon));
+            float spread = 10f + 160f * k;
+            int dashes = 2 + (int)(5f * k);
+            for (int i = 0; i < dashes; i++) {
+                float off = (rand.next() + rand.next() - 1f) * spread;
+                float phase = rand.range(0f, 6.283f);
+                float twinkle = 0.5f + 0.5f * (float)Math.sin(time * (2f + 2f * rand.next()) + phase);
+                int a = Math.round(255f * layer.sunAlpha * twinkle * (1f - Math.abs(off) / (spread * 1.2f)));
+                if (a <= 4) continue;
+                float len = (3f + 22f * k) * (0.5f + rand.next());
+                c.drawLine(sx + off - len, y, sx + off + len, y, 1f + 2f * k, withAlpha(layer.sunColor, a));
+            }
+        }
+    }
+
     private void drawFog(RenderCanvas c, Placed p) {
         if (!detalhe) return;
         float top = camera.screenY(p.top, p.z);
@@ -677,6 +1207,47 @@ public final class StageScene {
         if (bottom < 0f || top > VH) return;
         int color = withAlpha(p.layer.color, Math.round(255f * p.layer.alpha));
         c.fillVerticalGradient(-10f, top, VW + 10f, bottom, color & 0x00FFFFFF, color);
+        if (p.layer.wisps > 0) drawWisps(c, p, top, bottom);
+    }
+
+    /**
+     * Bancos de névoa rente à base da faixa: manchas largas e baixas (um brilho redondo
+     * achatado), cada uma com tamanho e altura sorteados, andando com a deriva e respirando.
+     */
+    private void drawWisps(RenderCanvas c, Placed p, float top, float bottom) {
+        StageDefinition.Layer layer = p.layer;
+        float h = bottom - top;
+        float scale = camera.scale(p.z);
+        float spacing = p.period;
+        double travel = (double)time * layer.sail;
+        int wraps = (int)Math.floor(travel / spacing);
+        float offset = (float)(travel - wraps * (double)spacing);
+        int first = (int)Math.floor((camera.worldX(0f, p.z) - offset) / spacing) - 2;
+        int last = (int)Math.ceil((camera.worldX(VW, p.z) - offset) / spacing) + 2;
+        for (int k = first; k <= last; k++) {
+            int id = k - wraps;
+            float r1 = hash01(id, 1), r2 = hash01(id, 2), r3 = hash01(id, 3), r4 = hash01(id, 4);
+            float cx = camera.screenX(offset + (k + (r1 - 0.5f) * 0.7f) * spacing, p.z);
+            float rx = spacing * scale * (0.7f + 0.5f * r2);
+            float ry = h * (0.28f + 0.2f * r3);
+            float cy = bottom - h * (0.18f + 0.22f * r4);
+            if (cx + rx < 0f || cx - rx > VW || cy + ry < 0f || cy - ry > VH) continue;
+            float breath = 0.6f + 0.4f * (float)Math.sin(time * 0.35f + id * 1.7f);
+            int color = withAlpha(layer.color, Math.round(255f * layer.alpha * breath));
+            c.save();
+            c.scale(1f, ry / rx, cx, cy);
+            c.fillRadialGlow(cx, cy, rx, color);
+            c.restore();
+        }
+    }
+
+    /** Número de 0 a 1 fixo para cada (n, canal), negativo ou não. */
+    private static float hash01(int n, int channel) {
+        long x = (n * 0x9E3779B97F4A7C15L) ^ (channel * 0xC2B2AE3D27D4EB4FL);
+        x ^= x >>> 31;
+        x *= 0xBF58476D1CE4E5B9L;
+        x ^= x >>> 29;
+        return (x >>> 40) / (float)(1L << 24);
     }
 
     // ------------------------------------------------------------ efeitos
@@ -707,11 +1278,13 @@ public final class StageScene {
 
     /** Riscos de chuva inclinados pelo vento; os de longe são finos e apagados. */
     private void drawRain(RenderCanvas c, boolean behind) {
-        if (!detalhe) return;
         StageDefinition.Rain rain = pack.definition.rain;
         if (rain == null) return;
         float slant = rain.wind / rain.speed;
-        for (int i = 0; i < rainX.length; i++) {
+        // No modo leve chove menos (uma gota em cada LIGHT_RAIN_STEP), sem respingos: os riscos
+        // são linhas finas e pesam pouco, e o cenário de chuva sem chuva perdia a cara.
+        int step = detalhe ? 1 : LIGHT_RAIN_STEP;
+        for (int i = 0; i < rainX.length; i += step) {
             float z = rainZ[i];
             if ((z > 0f) != behind || z <= camera.nearestDepth() + 50f) continue;
             float scale = camera.scale(z);

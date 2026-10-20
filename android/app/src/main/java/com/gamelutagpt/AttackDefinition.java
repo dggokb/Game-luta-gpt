@@ -151,6 +151,8 @@ final class AttackDefinition {
     final boolean low;
     /** Golpe alto de chão: só se defende em pé (pega quem defende agachado). */
     final boolean overhead;
+    /** No acerto, o rival sai girando no ar e cai deitado (o giro do punish counter). */
+    final boolean spin;
     final float reach, hitHeight;
     /** Base of the default strike box: hitHeight minus the slack, or lower for a sweeping hit (uppercut). */
     final float hitFloor;
@@ -188,6 +190,7 @@ final class AttackDefinition {
         maxUsesPerChain = b.maxChainUses;
         low = b.low;
         overhead = b.overhead;
+        spin = b.spin;
         reach = b.reach;
         hitHeight = b.hitHeight;
         hitFloor = Math.min(b.hitFloor > 0f ? b.hitFloor : Float.MAX_VALUE, hitHeight - CombatRules.VERTICAL_SLACK);
@@ -264,7 +267,7 @@ final class AttackDefinition {
     static Strength strengthOf(String binding) {
         if ("SUPER".equals(binding) || "ULTRA".equals(binding)) return Strength.SUPER;
         if ("S".equals(binding) || binding.matches("S[2-9]")) return Strength.SPECIAL;
-        if ("THROW".equals(binding)) return Strength.HEAVY;
+        if ("THROW".equals(binding) || VoadoraTroca.ID.equals(binding)) return Strength.HEAVY;
         char button = binding.charAt(binding.length() - 1);
         if (button == 'L') return Strength.LIGHT;
         if (button == 'M') return Strength.MEDIUM;
@@ -288,7 +291,7 @@ final class AttackDefinition {
         private float knockback = -1f;
         private float pushbackOnHit, pushbackOnBlock;
         private int juggleCost = 1, maxHits = 1, maxUses = 0, maxChainUses = 0;
-        private boolean low, overhead;
+        private boolean low, overhead, spin;
         private float reach, hitHeight, hitFloor;
         private final List<Box> hitboxes = new ArrayList<>();
         private int[] strikes = new int[0];
@@ -323,6 +326,7 @@ final class AttackDefinition {
         Builder maxUsesPerChain(int value) { maxChainUses = value; return this; }
         Builder low(boolean value) { low = value; return this; }
         Builder overhead(boolean value) { overhead = value; return this; }
+        Builder spin(boolean value) { spin = value; return this; }
         Builder reach(float reachValue, float hitHeightValue) { reach = reachValue; hitHeight = hitHeightValue; return this; }
         /** Reach with the box stretched down to {@code floor} (fist path of an uppercut). */
         Builder reach(float reachValue, float hitHeightValue, float floor) { reach(reachValue, hitHeightValue); hitFloor = floor; return this; }

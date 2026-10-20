@@ -6,7 +6,7 @@ subindo, e três opções em faixas de mangá:
 
 | Opção | O que faz |
 |---|---|
-| **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep07 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
+| **MODO HISTÓRIA** | O jogo de verdade. Toca a temporada desde o Prólogo (ep00: páginas 1–4, o treino no Dojo Shūshinkan, páginas 5–11, "Próximo episódio"), a escolha do irmão (Ryūga ou Kōga) e o torneio do ep01 ao ep08 ([historia/torneio.md](historia/torneio.md)). Sem os botões de teste (IA, DEBUG, VIDA, DUPLA, HISTÓRIA, TUTORIAL) e sem o DEBUG. No fim da temporada volta ao menu. |
 | **ARCADE** | Torneio de 16 duplas com dupla oficial ou livre, o duelo 1x1 da dupla campeã e o Takatoshi (em breve): [historia/arcade.md](historia/arcade.md). |
 | **MODO TESTE** | O que o app abria antes: a seleção de dupla e a luta de teste no Templo da Lua (`DEFAULT_STAGE`), com os botões de teste, o DEBUG (AJUSTAR TAMANHOS / AJUSTAR CAIXAS), o modo batalha (IA ON) etc. A seleção abre com a última dupla escolhida no teste. |
 
@@ -28,9 +28,11 @@ fim de cada episódio:
   disputadas; a chave é refeita igual ao carregar (`ProgressoHistoria`, `Campanha.restaurar`).
 - O save tem versão (`ProgressoHistoria.VERSAO`). Quando um episódio novo entra no meio da
   temporada, os saves antigos precisam ser convertidos na leitura: a versão 1 é de antes do
-  ep02 "O Parceiro" e tem os episódios do torneio empurrados uma posição
-  (`migrarDaVersao1`). Sem isso, o CONTINUAR caía no episódio errado com a campanha de
-  outro (a emboscada sumia e as rodadas chegavam adiantadas).
+  ep02 "O Parceiro" e a 2, de antes do ep03 "A Chegada"; nas duas, os episódios dali em
+  diante estão uma posição antes (`inserirEpisodio`). Quem parou no começo do episódio que
+  agora vem depois do novo joga o novo. Sem isso, o CONTINUAR caía no episódio errado com
+  a campanha de outro (a emboscada sumia e as rodadas chegavam adiantadas).
+- Os capítulos ficam em linhas de 5 cards.
 
 Controle na tela: direcional move, A escolhe, B (ou voltar) volta ao menu inicial.
 

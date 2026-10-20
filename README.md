@@ -236,16 +236,29 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   quando não está cheia). Zerou: **GUARD BREAK!**, o golpe não tira vida mas quem defendia
   fica aberto, sem defesa, tempo de entrar um combo. Ela volta sozinha 1,5 s depois de parar
   de defender. Umas 3 sequências seguidas defendidas quebram.
-- **→ + M**: **golpe alto** (todos têm). Lento e com brilho de aviso, mas pega quem defende
+- **→ + M**: **golpe alto** (todos têm). Segura a pose de preparo antes de bater, mas pega quem defende
   agachado: tem que defender em pé. No acerto cancela em especial e Super.
 - **Chip**: especial e Super defendidos arranham um pouco (1/8 e 1/4 do dano). Vira vida
   vermelha (volta na reserva) e nunca derruba.
 - **Defesa perfeita**: aperte trás bem em cima do golpe (até 5 quadros antes). Não gasta a
   guarda, não leva chip, recupera um pouco de vida e sai antes do bloqueio. Ficar batendo
   trás não vale.
-- **Combo breaker**: apanhando num combo, o mesmo gesto (trás em cima da hora) **no golpe forte
-  ou especial que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem
-  batia fica atordoado e você emenda o seu combo. Sem barra não quebra.
+- **Combo breaker**: apanhando num combo, **M + H** em cima da hora **no golpe forte ou especial
+  que fecha a sequência** quebra o combo por **1 barra**: o golpe não entra, quem batia é jogado
+  para trás (arrastando o pé, com fumacinha) e fica atordoado, e você sai correndo sozinho até
+  ele para emendar o seu combo. Sem barra não quebra.
+- **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
+- **Grito da troca**: em toda luta em dupla, quando a vida de quem luta entra no vermelho, o
+  parceiro aparece no quadro de mangá do lado do time e grita "Ryūga! Troca comigo!" (como nas
+  conversas do treino e do episódio 1).
+- **Narrador do torneio**: nas lutas de verdade (batalha, Arcade e torneio da história) um
+  narrador anima a luta numa faixa de transmissão no rodapé — começo, combos, Super, Ultra,
+  quem está em apuros, a virada, K.O. e vencedor. O personagem ainda vai ser criado (retrato
+  placeholder). Padrão: `docs/historia/narrador.md`.
+- **Controle de toque**: o dedo que continua no direcional volta a valer sozinho depois de
+  uma cena, página ou troca de luta (não precisa tirar e apertar de novo); o direcional pega
+  o dedo um pouco além do desenho; e no Android com gestos as áreas do direcional e dos
+  botões não disparam o "voltar" do sistema.
 - Regras e tempos: `docs/combat-engine.md` (seção Defesa ativa).
 
 ## Air dash — v0.82
@@ -345,8 +358,8 @@ o que falta dele está em [docs/personagens/p01.md](docs/personagens/p01.md).
   *SŌKON: BLOODLINES* como mangá animado: cartão de título com o logo, o Prólogo completo em
   11 páginas prontas lidas quadro a quadro (com o treino/tutorial depois da página 4), o
   Episódio 1 ainda com páginas provisórias e o "Próximo episódio" no fim. **PULAR** vai direto para a luta.
-- **Torneio** (ep01–ep07, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
-  **Kōga (p03)**; no ep02 cada um convence o parceiro numa luta 1x1 (P01 × P02, p03 × p04); o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
+- **Torneio** (ep01–ep08, rascunho): depois do Prólogo o jogador escolhe **Ryūga (p01)** ou
+  **Kōga (p03)**; no ep02 cada um convence o parceiro numa luta 1x1 (P01 × P02, p03 × p04); no ep03 chegam à Ilha do Torneio e são desafiados no Porto Secreto (p07 + p08); o sorteio monta a chave de **8 duplas fixas** com os irmãos nas pontas
   opostas: quartas → **emboscada fora da arena** (a dupla que perdeu a outra quarta do seu
   lado quer a sua vaga) → semifinal → final 2x2 contra o outro irmão → **duelo 1x1** contra o
   próprio parceiro (a regra escondida; o jogador fica com quem estava em campo ao vencer a final). O rival sempre avança; CPU × CPU é sorteado.

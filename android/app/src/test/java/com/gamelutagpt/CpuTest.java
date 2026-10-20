@@ -37,6 +37,198 @@ public class CpuTest {
         }
     }
 
+    // ------------------------------------------------------------ combos da CPU
+
+    /**
+     * Um minuto contra um jogador que anda e às vezes ataca, sem defender: dos acertos corpo a
+     * corpo da CPU (sem contar o especial e o Super soltos), quantos viram combo de 3+ hits.
+     */
+    private static double emenda(CharacterDefinition cpuChar, int level, long seeds) {
+        int aberturas = 0, emendou = 0;
+        for (long seed = 1; seed <= seeds; seed++) {
+            CombatConfig cfg = new CombatConfig();
+            cfg.justDefenseFrames = -1;
+            CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"), new FighterState(cpuChar, "CPU"), 600f, 900f, cfg);
+            e.fighter(0).state.life = Integer.MAX_VALUE / 4;
+            e.fighter(1).state.life = Integer.MAX_VALUE / 4;
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setLevel(level);
+            FighterInput p = new FighterInput(), out = new FighterInput();
+            Random r = new Random(seed + 99);
+            Object ultima = null;
+            String abriu = null;
+            for (int fr = 0; fr < 60 * 60; fr++) {
+                if (fr % 20 == 0) {
+                    int d = r.nextInt(5);
+                    p.direction = d == 0 ? 1 : d == 1 ? 5 : 0;
+                }
+                if (r.nextInt(40) == 0) p.light = true; else if (r.nextInt(60) == 0) p.medium = true;
+                cpu.fill(e, 1, out);
+                e.step(p, out);
+                p.clearPresses();
+                for (CombatEngine.HitEvent h : e.events()) {
+                    ComboSession s = e.session(0);
+                    if (h.attacker == 1 && !h.blocked && s != null && s.hitCount == 1) abriu = h.projectile ? "proj" : h.moveId;
+                }
+                ComboSession s = e.lastSession(0);
+                if (s != null && s != ultima) {
+                    ultima = s;
+                    if (s.attacker == 1 && abriu != null && !"proj".equals(abriu) && !"S".equals(abriu) && !"SUPER".equals(abriu)) {
+                        aberturas++;
+                        if (s.hitCount >= 3) emendou++;
+                    }
+                    abriu = null;
+                }
+            }
+        }
+        return aberturas == 0 ? 0 : emendou / (double)aberturas;
+    }
+
+    @Test public void aHighLevelCpuTurnsItsHitsIntoCombos() {
+        double alto = emenda(BASE, 8, 4), baixo = emenda(BASE, 1, 4);
+        assertTrue("nível 8 emenda: " + alto, alto >= 0.4);
+        assertTrue("nível 1 emenda menos: " + baixo + " < " + alto, baixo < alto);
+    }
+
+    @Test public void everyCharactersCombosRunWithoutBreakingTheCpu() {
+        // O próximo golpe que não alcança faz a CPU procurar outro (H, M, especial, Super): nenhum
+        // pacote pode quebrar essa busca (golpe sem alcance cadastrado, por exemplo).
+        for (String id : GeneratedCharacters.SELECTABLE) emenda(GeneratedCharacters.get(id), 8, 1);
+    }
+
+    @Test public void theCpuAlmostNeverStartsAnAttackOutOfReach() {
+        // Ela decide com a distância vista (com o atraso da reação): a folga de alcance do chão e
+        // a do L de abertura seguram o golpe na beira, que saía no vento por poucas unidades.
+        CharacterDefinition.Body target = GeneratedCharacters.defaultCharacter().fighter.body;
+        int inicios = 0, fora = 0;
+        for (int level : new int[] {5, 8}) {
+            for (long seed = 1; seed <= 12; seed++) {
+                CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.defaultCharacter(), "P1"),
+                    new FighterState(GeneratedCharacters.opponentCharacter(), "CPU"), 420f, 590f, new CombatConfig());
+                AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+                cpu.setEnabled(true);
+                cpu.setFullKit(true);
+                cpu.setLevel(level);
+                FighterInput p = new FighterInput(), out = new FighterInput();
+                for (int i = 0; i < 900; i++) {
+                    cpu.fill(e, 1, out);
+                    e.step(p, out);
+                    CombatFighter c = e.fighter(1);
+                    if (c.attacking() && c.attackFrame == 0 && c.move != null) {
+                        inicios++;
+                        if (Math.abs(e.fighter(0).x - c.x) > CombatRules.maxCenterDistance(c.move, target) + 0.5f) fora++;
+                    }
+                }
+            }
+        }
+        assertTrue("começou golpes", inicios > 100);
+        assertTrue("fora do alcance: " + fora + " de " + inicios, fora * 200 <= inicios);
+    }
+
+    /**
+     * Batalha 2x2 (kit completo) contra uma CPU nível 5: {Supers crus por minuto (saídos do
+     * neutro, sem ter acertado nada), barra média em milésimos}.
+     */
+    private static double[] recursos(int level) {
+        long frames = 0, barra = 0;
+        int crus = 0;
+        // 120 lutas (~2 s): o Super cru é raro (1–2 por minuto), e com poucas lutas a razão
+        // entre os níveis variava de 0,4 a 1,0 só com o sorteio. Com 200 ela fica em ~0,5.
+        for (long seed = 1; seed <= 120; seed++) {
+            FighterState[] t0 = {new FighterState(BASE, "P1"), new FighterState(GeneratedCharacters.get("p02"), "P2")};
+            FighterState[] t1 = {new FighterState(GeneratedCharacters.get("p03"), "C1"), new FighterState(GeneratedCharacters.get("p05"), "C2")};
+            CombatEngine e = new CombatEngine(t0[0], t1[0], 600f, 900f, new CombatConfig());
+            e.setTeam(0, t0);
+            e.setTeam(1, t1);
+            AiController rival = new AiController(new OpponentAi(new Random(seed + 50)), new Random(seed * 13 + 1));
+            rival.setEnabled(true);
+            rival.setFullKit(true);
+            rival.setLevel(5);
+            AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+            cpu.setEnabled(true);
+            cpu.setFullKit(true);
+            cpu.setLevel(level);
+            FighterInput a = new FighterInput(), b = new FighterInput();
+            for (int f = 0; f < 90 * 60; f++) {
+                rival.fill(e, 0, a);
+                cpu.fill(e, 1, b);
+                e.step(a, b);
+                CombatFighter c = e.fighter(1);
+                // Cru: sai com o rival livre (fechando combo, o rival está atordoado).
+                if (c.attacking() && c.attackFrame == 0 && c.attack.kind == AttackDefinition.Kind.SUPER &&
+                    !e.fighter(0).inHitstun()) crus++;
+                barra += c.state.superMeter;
+                frames++;
+            }
+        }
+        return new double[] {crus / (frames / 3600.0), barra / (double)frames};
+    }
+
+    @Test public void higherLevelsSpendMeterWithMoreSense() {
+        // Contra o 5 (que já usa o kit todo; o 2 quase não usa barra nenhuma).
+        double[] baixo = recursos(5), alto = recursos(8);
+        assertTrue("o nível 8 solta bem menos Super cru: " + baixo[0] + " → " + alto[0], alto[0] < baixo[0] * 0.7);
+        assertTrue("e guarda mais barra (para o Ultra): " + baixo[1] + " → " + alto[1], alto[1] > baixo[1]);
+    }
+
+    /**
+     * Quem fica no canto soltando bola (meia-lua + soco) sem parar: o nível alto pula por cima
+     * na hora certa e cai batendo, defende o resto sem recuar e tira bem mais vida do spammer
+     * que o nível baixo. Antes ele levava ~3 de cada 4 bolas e quase nunca chegava nele.
+     */
+    @Test public void aHighLevelCpuBeatsAFireballSpammer() {
+        double[] alto = spammer(8), baixo = spammer(3);
+        assertTrue("o nível 8 leva bem menos bolas: " + alto[1], alto[1] < 0.5);
+        assertTrue("e tira vida do spammer: " + alto[0], alto[0] > 0.6);
+        assertTrue("mais que o nível 3: " + baixo[1] + " → " + alto[1], alto[1] < baixo[1] - 0.15);
+    }
+
+    /** Média de {vida que o spammer perdeu, fração das bolas que acertaram a CPU}. */
+    private static double[] spammer(int level) {
+        double perdeu = 0, acertou = 0;
+        int lutas = 0;
+        for (String ch : new String[] {"p03", "player_two", "p05"}) {
+            for (long seed = 1; seed <= 3; seed++) {
+                CombatEngine e = new CombatEngine(new FighterState(BASE, "P1"),
+                    new FighterState(GeneratedCharacters.get(ch), "CPU"), 250f, 1000f, new CombatConfig());
+                AiController cpu = new AiController(new OpponentAi(new Random(seed)), new Random(seed * 31 + 7));
+                cpu.setEnabled(true);
+                cpu.setLevel(level);
+                FighterInput p = new FighterInput(), out = new FighterInput();
+                Random r = new Random(seed * 13 + 5);
+                int vida = e.fighter(0).state.life, hit = 0, blocked = 0, espera = 0;
+                for (int f = 0; f < 60 * 60 && !e.fighter(0).ko() && !e.fighter(1).ko(); f++) {
+                    CombatFighter me = e.fighter(0);
+                    p.clear();
+                    if (me.canAct() && me.grounded && !e.energyProjectileAlive(0) && espera-- <= 0) {
+                        p.special = "L";   // a bola de novo, assim que pode
+                        espera = 4 + r.nextInt(8);
+                    } else {
+                        p.direction = me.facing > 0 ? 5 : 1;   // entre uma e outra, segura trás
+                    }
+                    cpu.fill(e, 1, out);
+                    e.step(p, out);
+                    for (CombatEngine.HitEvent ev : e.events()) {
+                        if (ev.attacker == 0 && ev.projectile) {
+                            if (ev.blocked) blocked++;
+                            else hit++;
+                        }
+                    }
+                }
+                perdeu += 1.0 - e.fighter(0).state.life / (double)vida;
+                acertou += hit / (double)Math.max(1, hit + blocked);
+                lutas++;
+            }
+        }
+        return new double[] {perdeu / lutas, acertou / lutas};
+    }
+
+    @Test public void theNeutralPokePrefersTheComboStarterUpClose() {
+        assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) > OpponentAi.starterChance(CpuLevel.of(1)));
+        assertTrue(OpponentAi.starterChance(CpuLevel.of(8)) <= 0.5);
+    }
+
     // ------------------------------------------------------------ níveis e percepção
 
     @Test public void noLevelReactsFasterThanAHuman() {
@@ -71,7 +263,8 @@ public class CpuTest {
     @Test public void theCpuNeverReactsToAJumpBeforeTheHumanReaction() {
         int reactions = 0;
         for (int level = 1; level <= 8; level++) {
-            for (long seed = 1; seed <= 6; seed++) {
+            // 10 sementes: a CPU ataca bastante no neutro e às vezes está ocupada quando ele pula.
+            for (long seed = 1; seed <= 10; seed++) {
                 Fight f = new Fight(BASE, BASE, 360f, level, seed);
                 int jumpAt = 40 + (int)(seed * 7);
                 int reaction = -1;
@@ -79,7 +272,8 @@ public class CpuTest {
                     if (i == jumpAt) f.player.direction = 8;   // pulo para frente
                     if (i == jumpAt + 1) f.player.direction = 0;
                     f.step();
-                    boolean guardsHigh = f.out.direction == 1 && f.c().facing < 0;   // segurando para trás
+                    // Segurando para trás em reação (a espera em pé por hábito não é reação ao pulo).
+                    boolean guardsHigh = f.out.direction == 1 && f.c().facing < 0 && !f.cpu.guardingByHabit();
                     boolean antiAir = "antiaereo".equals(f.cpu.lastReason) && f.out.heavy;
                     if (i > jumpAt && (guardsHigh || antiAir)) reaction = i;
                 }
@@ -124,8 +318,10 @@ public class CpuTest {
     @Test public void higherLevelsBlockMore() {
         double low = blockRate(1), high = blockRate(8);
         assertTrue("nível 1 quase não defende: " + low, low < 0.25);
-        assertTrue("nível 8 defende bem: " + high, high > 0.5);
-        assertTrue("e muito mais que o nível 1", high > low + 0.3);
+        // A defesa por hábito é baixa de propósito (o que dá graça é a luta): o nível 8 segura
+        // parte dos jabs colados, sempre bem mais que o 1.
+        assertTrue("nível 8 defende parte: " + high, high > 0.3);
+        assertTrue("e bem mais que o nível 1: " + low + " → " + high, high > low + 0.15);
     }
 
     // ------------------------------------------------------------ punir e combos
@@ -147,10 +343,14 @@ public class CpuTest {
         double delay = 0;
         AttackDefinition h = WHIFFER.attack("H");
         int recoveryStart = h.startupFrames + h.activeFrames;
-        for (long seed = 1; seed <= 96; seed++) {
+        // Muitas sementes: calma, a CPU muitas vezes ataca antes do erro (tentativa que não vale).
+        for (long seed = 1; seed <= 400; seed++) {
             Fight f = new Fight(WHIFFER, BASE, 110f, level, seed);
             for (int i = 0; i < 30; i++) f.step();   // a CPU passa a ver a luta
-            if (!f.p().canAct() || !f.c().canAct()) continue;
+            // Espera um momento em que a CPU está livre e parada perto (ela ataca bastante no
+            // neutro): o erro do jogador tem que aparecer com ela sem golpe na tela.
+            for (int i = 0; i < 600 && !livreParaPunir(f); i++) f.step();
+            if (!livreParaPunir(f)) continue;
             f.player.heavy = true;
             boolean valid = true;
             int started = -1;
@@ -171,6 +371,13 @@ public class CpuTest {
         }
         assertTrue("nível " + level + ": poucas tentativas válidas (" + tries + ")", tries >= 6);
         return new double[] {punished / (double)tries, delay / tries, fastest};
+    }
+
+    /** Os dois no chão, livres, a CPU sem golpe na tela e na distância do teste. */
+    private static boolean livreParaPunir(Fight f) {
+        float gap = Math.abs(f.c().x - f.p().x);
+        return f.p().canAct() && f.c().canAct() && f.p().grounded && f.c().grounded && !f.c().attacking() &&
+            gap >= 90f && gap <= 130f;
     }
 
     @Test public void level8PunishesAWhiffButNotFasterThanAHuman() {

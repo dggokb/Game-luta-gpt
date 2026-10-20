@@ -88,6 +88,93 @@ public class BounceTest {
         assertEquals("no air recovery after a bounce: it lands knocked down", CombatFighter.Status.KNOCKDOWN, d.status);
     }
 
+    @Test public void theWallBounceRouteFitsAFullAirStringAfterTheLauncher() {
+        // L > M > H na parede, corre, 2H, super pulo, jL > jM > jH: o ar inteiro entra (o H que
+        // acerta no chão não gasta juggle; com limite de 6 pontos, a rota ainda caberia).
+        Sim s = new Sim(500f, 600f);
+        s.chainToHeavy();
+        assertEquals("o H da parede é de graça", 0, s.engine.session(1).juggleCount);
+        s.in[0].direction = 1;
+        boolean lancou = false;
+        for (int i = 0; i < 120 && !lancou; i++) {
+            if (Math.abs(s.f(1).x - s.f(0).x) < 150f && !s.f(0).attacking() && s.f(0).grounded) {
+                s.in[0].direction = 3;
+                s.in[0].heavy = true;
+            }
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if ("2H".equals(e.moveId)) lancou = true;
+        }
+        assertTrue("o 2H levantou", lancou);
+        for (int i = 0; i < 40 && s.f(0).grounded; i++) {
+            s.in[0].direction = i < 3 ? 0 : 7;
+            s.step();
+        }
+        s.in[0].direction = 0;
+        assertTrue("super pulo", s.f(0).superJumping);
+        java.util.List<String> noAr = new java.util.ArrayList<>();
+        String[] seq = {"L", "M", "H"};
+        boolean pede = true;
+        for (int i = 0; i < 200 && noAr.size() < seq.length && !s.f(0).grounded; i++) {
+            String b = seq[noAr.size()];
+            if (pede) {
+                if (b.equals("L")) s.in[0].light = true; else if (b.equals("M")) s.in[0].medium = true; else s.in[0].heavy = true;
+            }
+            s.step();
+            boolean acertou = false;
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) { noAr.add(e.moveId); acertou = true; }
+            pede = acertou || !s.f(0).attacking();
+        }
+        assertEquals(java.util.Arrays.asList("jL", "jM", "jH"), noAr);
+        assertEquals("2H + jL + jM + jH", 6, s.engine.session(1) != null
+            ? s.engine.session(1).juggleCount : s.engine.lastSession(1).juggleCount);
+    }
+
+    @Test public void withoutAJuggleLimitTheAirComboStillEnds() {
+        // Sem limite de juggle: L > M > 2H, super pulo e jL > jM > pulo no ar até não dar mais.
+        // Passa dos 6 pontos de antes, mas acaba (os pulos no ar acabam e o rival cai).
+        Sim s = new Sim(500f, 590f);
+        s.f(1).state.life = Integer.MAX_VALUE / 4;
+        s.in[0].light = true;
+        boolean lancou = false;
+        for (int i = 0; i < 90 && !lancou; i++) {
+            if (s.attackId(0).equals("L")) s.in[0].medium = true;
+            if (s.attackId(0).equals("M")) { s.in[0].direction = 3; s.in[0].heavy = true; }
+            s.step();
+            for (CombatEngine.HitEvent e : s.engine.events()) if ("2H".equals(e.moveId)) lancou = true;
+        }
+        assertTrue(lancou);
+        for (int i = 0; i < 30 && s.f(0).grounded; i++) {
+            s.in[0].direction = i < 2 ? 0 : 7;
+            s.step();
+        }
+        s.in[0].direction = 0;
+        int k = 0, maior = 0;
+        boolean pede = true;
+        for (int i = 0; i < 600 && !s.f(0).grounded; i++) {
+            int fase = k % 3;
+            if (pede) {
+                if (fase == 0) s.in[0].light = true; else if (fase == 1) s.in[0].medium = true; else s.in[0].direction = 7;
+            }
+            s.step();
+            s.in[0].direction = 0;
+            boolean acertou = false;
+            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) acertou = true;
+            if (fase == 2) {
+                if (s.f(0).vy < 0f && !s.f(0).attacking()) k++;
+                pede = true;
+            } else {
+                if (acertou) k++;
+                pede = acertou || !s.f(0).attacking();
+            }
+            if (s.engine.session(1) != null) maior = Math.max(maior, s.engine.session(1).hitCount);
+        }
+        ComboSession fim = s.engine.lastSession(1) != null ? s.engine.lastSession(1) : s.engine.session(1);
+        assertTrue("passa dos 6 pontos de juggle de antes: " + fim.juggleCount, fim.juggleCount > 6);
+        for (int i = 0; i < 240 && s.engine.session(1) != null; i++) s.step();
+        assertNull("o combo acaba", s.engine.session(1));
+        assertTrue("e não vira loop: " + maior, maior <= 12);
+    }
+
     @Test public void aLoneHeavyInNeutralIsAPlainHit() {
         Sim s = new Sim(500f, 600f);
         s.in[0].heavy = true;

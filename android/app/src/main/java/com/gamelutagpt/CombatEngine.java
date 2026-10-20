@@ -196,6 +196,23 @@ final class CombatEngine {
     boolean superFreezeActive() { return superFreeze > 0; }
     /** Attacker whose ultra connected in the last step (start the cinematic), or -1. */
     int ultraConnected() { return ultraConnected; }
+    /**
+     * O lado {@code side} zerou no meio de um Ultra que ainda o segura (na página, nos golpes que
+     * faltam da sequência ou no raio antes da explosão): o K.O. só vale no golpe final.
+     */
+    boolean ultraHoldsKo(int side) {
+        CombatFighter d = fighters[side], a = fighters[1 - side];
+        if (!d.ko() || a.status != CombatFighter.Status.ULTRA) return false;
+        if (a.ultraPhase == CombatFighter.ULTRA_CINEMATIC) return true;
+        if (a.inUltraSequence()) {
+            CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
+            return seq != null && d == a.ultraVictim && d.state == a.ultraVictimState &&
+                a.ultraHitsDone < seq.hits.length;
+        }
+        if (a.firingBeam()) return a.beamHitsDone <= a.beamHits;
+        return false;
+    }
+
     /** The fighter's ultra connected and waits for the cinematic to finish. */
     boolean inUltraCinematic(int index) {
         CombatFighter f = fighters[index];
@@ -257,6 +274,34 @@ final class CombatEngine {
         in.invulnFrames = config.tagEnterFrames + config.tagPoseFrames + config.koEntryInvulnPadding;
         fighters[side] = in;
         sessions[side] = null;
+        return true;
+    }
+
+    /**
+     * Troca com voadora ({@link VoadoraTroca}): quem acabou de entrar sai do alto, atrás de onde
+     * estava quem saiu, e desce em diagonal até o rival. Falso se o lutador não tem chute no ar
+     * (a troca então entra correndo, como antes).
+     */
+    boolean startTagKick(CombatFighter f) {
+        CombatFighter rival = fighters[1 - f.index];
+        int toward = rival.x >= f.x ? 1 : -1;
+        float startX = Arena.clamp(f.x - toward * VoadoraTroca.BEHIND, Arena.LEFT_BOUND, Arena.RIGHT_BOUND);
+        int facing = rival.x >= startX ? 1 : -1;
+        float close = (f.body().halfWidth + rival.body().halfWidth) * 0.5f;
+        CharacterDefinition.Move kick = VoadoraTroca.from(f.character(),
+            VoadoraTroca.forwardSpeed(startX, rival.x, close));
+        if (kick == null) return false;
+        f.x = startX;
+        f.y = Arena.GROUND_Y - VoadoraTroca.HEIGHT;
+        f.grounded = false;
+        f.vx = f.vy = 0f;
+        f.facing = facing;
+        f.superJumping = false;
+        f.jumpMode = CombatFighter.PULO_LIVRE;
+        f.locked = false;
+        startAttack(f, kick.attack, "H", 0);
+        f.move = kick;
+        cues.add("TAG_KICK");
         return true;
     }
 
@@ -373,6 +418,12 @@ final class CombatEngine {
                 f.motion.charged(true, clock, config.chargeFrames, config.chargeKeepFrames)) {
                 f.jumpGrace = config.chargeJumpGraceFrames;
             }
+        } else if (ControlsLayout.isUpDirection(relative) && f.grounded && f.pendingJumpAge < 0 &&
+            f.jumpGrace == 0 && f.status == CombatFighter.Status.NEUTRAL) {
+            // ↑ (ou diagonal para cima) seguro desde antes de poder agir — no fim de um golpe, da
+            // defesa, da queda: pula assim que fica livre, como nos jogos de luta. Antes só o
+            // instante de entrar no ↑ valia, e quem já estava segurando não pulava.
+            requestJump(f, false);
         }
         if (in.jump || in.superJump) requestJump(f, in.superJump);
         if (f.motion.doubleTap(1, clock, config.doubleTapFrames) || in.dash) f.dashRequest = true;
@@ -404,16 +455,43 @@ final class CombatEngine {
         if (in.grab) f.throwRequestAge = 0;
         if (in.overdrive) f.overdriveRequestAge = 0;
         if ((in.light || in.medium || in.heavy) && f.status == CombatFighter.Status.AIR_HITSTUN) f.techRequestAge = 0;
+        boolean breakerPress = trackBreakerPress(f, in);
         if (in.pushblock) {
-            // Only blocking turns M + H into a pushblock; otherwise it is the heavy.
+            // Blocking, M + H is the pushblock; being hit, the combo breaker; otherwise the heavy.
             if (f.status == CombatFighter.Status.BLOCKSTUN) f.pushblockRequestAge = 0;
-            else f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
+            else if (!breakerPress) f.buffer.push(InputBuffer.Button.HEAVY, null, crouch);
         }
         if (in.ultra && f.state.superMeter >= CombatConfig.ULTRA_COST) {
             f.ultraRequestAge = 0;
         } else if (in.superAttack) {
             f.buffer.push(InputBuffer.Button.SUPER, null, false);
         }
+    }
+
+    /**
+     * Combo breaker: conta os quadros desde o último M + H apertado apanhando (os dois juntos, o
+     * ponto entre eles, ou um dedo até {@code comboBreakerPairFrames} depois do outro). O aperto
+     * só abre a janela se veio depois do bloqueio contra bater sem parar.
+     */
+    private boolean trackBreakerPress(CombatFighter f, FighterInput in) {
+        boolean press = false;
+        if (f.inHitstun()) {
+            press = in.pushblock || (in.medium && in.heavy) ||
+                (in.medium && f.breakerHeavyAge >= 0) || (in.heavy && f.breakerMediumAge >= 0);
+        }
+        if (press) {
+            f.breakerPressCounts = f.breakerPressAge >= config.comboBreakerLockoutFrames;
+            f.breakerPressAge = 0;
+            f.breakerMediumAge = f.breakerHeavyAge = -1;
+            return true;
+        }
+        if (f.breakerPressAge < 999) f.breakerPressAge++;
+        boolean stunned = f.inHitstun();
+        f.breakerMediumAge = stunned && in.medium ? 0
+            : f.breakerMediumAge >= 0 && f.breakerMediumAge < config.comboBreakerPairFrames ? f.breakerMediumAge + 1 : -1;
+        f.breakerHeavyAge = stunned && in.heavy ? 0
+            : f.breakerHeavyAge >= 0 && f.breakerHeavyAge < config.comboBreakerPairFrames ? f.breakerHeavyAge + 1 : -1;
+        return false;
     }
 
     /** O personagem tem um especial de segurar baixo ([↓] ↑)? */
@@ -488,6 +566,14 @@ final class CombatEngine {
             }
         }
 
+        if (f.breakerChase > 0) {
+            // A corrida do combo breaker: trás ou baixo desiste; golpe, pulo ou chegar perto acaba.
+            boolean giveUp = horizontal(f.input.direction) == -f.facing || ControlsLayout.isDownDirection(f.input.direction);
+            if (giveUp || f.status != CombatFighter.Status.NEUTRAL) f.breakerChase = 0;
+            else if (breakerChasing(f)) f.forwardDashing = true;
+            else if (f.grounded) f.breakerChase = 0;
+        }
+
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
@@ -507,7 +593,8 @@ final class CombatEngine {
         f.dashRequest = f.backdashRequest = false;
 
         if (f.status == CombatFighter.Status.NEUTRAL) {
-            startFromBuffer(f, false);
+            // Correndo até o outro, o golpe apertado espera chegar perto (não sai de longe).
+            if (!breakerChasing(f)) startFromBuffer(f, false);
         } else if (f.attacking() && (CancelSystem.windowOpen(f) || overdriveCancelOpen(f))) {
             startFromBuffer(f, true);
         }
@@ -561,8 +648,9 @@ final class CombatEngine {
             case HITSTUN:
             case BLOCKSTUN:
                 if (f.stunLeft == 0) {
+                    f.throwProtect = f.status == CombatFighter.Status.BLOCKSTUN
+                        ? config.throwProtectAfterBlockFrames : config.throwProtectFrames;
                     f.status = CombatFighter.Status.NEUTRAL;
-                    f.throwProtect = config.throwProtectFrames;
                 }
                 break;
             case THROW:
@@ -762,7 +850,11 @@ final class CombatEngine {
     private boolean throwOverridesJab(CombatFighter f) {
         if (!f.attacking() || f.move == null || f.attackFrame > PadInput.THROW_LENIENCY_FRAMES) return false;
         String binding = f.move.binding;
-        return ("L".equals(binding) || "M".equals(binding)) && f.attackFrame < f.attack.startupFrames;
+        // L ou M de qualquer jeito que saiu: em pé, agachado (↓) ou o golpe alto (→ + M, andando
+        // para frente). Antes só o L e o M em pé: andando ou agachado o L + M quase junto virava golpe.
+        boolean lightOrMedium = "L".equals(binding) || "M".equals(binding) || "2L".equals(binding) ||
+            "2M".equals(binding) || GolpeAlto.BINDING.equals(binding);
+        return lightOrMedium && f.attackFrame < f.attack.startupFrames;
     }
 
     /** Air dash: a fixed burst forward (or back) that holds the height; one per jump (an acrobat has more). */
@@ -832,6 +924,7 @@ final class CombatEngine {
 
     private void jump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = -1;
+        f.breakerChase = 0;
         int horizontal = horizontal(f.input.direction);
         if (f.forwardDashing && f.grounded) {
             // Saindo da corrida, o pulo leva o embalo (dash jump).
@@ -882,10 +975,11 @@ final class CombatEngine {
             return;
         }
         f.clock++;
-        f.buffer.age(config.bufferFrames);
+        if (!breakerChasing(f)) f.buffer.age(config.bufferFrames);
+        if (f.breakerChase > 0) f.breakerChase--;
         if (f.pendingJumpAge >= 0 && ++f.pendingJumpAge > config.bufferFrames) f.pendingJumpAge = -1;
         if (f.ultraRequestAge >= 0 && ++f.ultraRequestAge > config.bufferFrames) f.ultraRequestAge = -1;
-        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.bufferFrames) f.throwRequestAge = -1;
+        if (f.throwRequestAge >= 0 && ++f.throwRequestAge > config.throwBufferFrames) f.throwRequestAge = -1;
         if (f.pushblockRequestAge >= 0 && ++f.pushblockRequestAge > config.bufferFrames) f.pushblockRequestAge = -1;
         if (f.techRequestAge >= 0 && ++f.techRequestAge > config.bufferFrames) f.techRequestAge = -1;
         if (f.overdriveRequestAge >= 0 && ++f.overdriveRequestAge > config.bufferFrames) f.overdriveRequestAge = -1;
@@ -1069,7 +1163,8 @@ final class CombatEngine {
             for (int i = 0; i < e.attack.hitboxCount(); i++) {
                 AttackDefinition.Box box = e.attack.hitbox(i);
                 if (!box.activeAt(e.frame) || (e.hitboxMask & (1L << i)) != 0) continue;
-                if (CombatRules.hitboxTouches(e.x, e.y, e.facing, box, d.x, d.y, d.body(), d.crouchingBody())) {
+                if (CombatRules.hitboxTouches(e.x, e.y, e.facing, box, d.x, d.y, d.body(),
+                    d.crouchingBody() && !hitsCrouching(e.attack, a))) {
                     e.hitboxMask |= 1L << i;
                     e.hitsOnTarget++;
                     Contact c = new Contact();
@@ -1177,6 +1272,8 @@ final class CombatEngine {
             }
         }
         int horizontal = horizontal(f.input.direction);
+        // A corrida do combo breaker anda sozinha, como se → estivesse seguro.
+        if (breakerChasing(f)) horizontal = breakerFar(f) ? f.facing : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
         if (!holdingForward) f.forwardDashing = false;
         float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
@@ -1321,6 +1418,7 @@ final class CombatEngine {
             } else {
                 // Remaining hitstun is spent on the ground.
                 f.status = CombatFighter.Status.HITSTUN;
+                f.stunProjectile = null;
                 f.hitCrouching = false;
                 f.launched = false;
             }
@@ -1446,7 +1544,7 @@ final class CombatEngine {
 
     /**
      * Combo breaker: o golpe que fecha a sequência (forte ou especial, corpo a corpo, a última
-     * batida dele) num combo que já tem {@code comboBreakerMinHits} acertos, com trás apertado
+     * batida dele) num combo que já tem {@code comboBreakerMinHits} acertos, com M + H apertado
      * em cima da hora e barra para pagar.
      */
     private boolean comboBreaks(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean projectile,
@@ -1458,15 +1556,17 @@ final class CombatEngine {
         ComboSession session = sessions[d.index];
         if (session == null || !session.active || session.hitCount < config.comboBreakerMinHits) return false;
         if (d.state.superMeter < config.comboBreakerCost) return false;
-        return d.guardPressCounts && d.guardDirectionHeld && d.guardPressAge <= config.comboBreakerFrames;
+        return d.breakerPressCounts && d.breakerPressAge <= config.comboBreakerFrames;
     }
 
     /**
-     * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre;
-     * no chão, avança até ficar colado) e quem batia fica atordoado, sem o golpe, ao alcance do troco.
+     * Quebra o combo: o golpe não entra, quem apanhava fica livre na hora (no ar, cai livre) e
+     * quem batia é jogado para longe, arrastando o pé, e fica atordoado, sem o golpe. Quem quebrou
+     * sai correndo sozinho até ele (sem o → →) para dar o troco.
      */
     private void comboBreaker(CombatFighter a, CombatFighter d) {
         d.state.spendSuperMeter(config.comboBreakerCost);
+        d.breakerPressCounts = false;
         d.guardPressCounts = false;
         endSession(d.index);
         d.status = CombatFighter.Status.NEUTRAL;
@@ -1482,25 +1582,55 @@ final class CombatEngine {
         d.pushRemaining = 0f;
         d.pushFramesLeft = 0;
         d.comboBroke = true;
+        // O que sobrou do M e do H no buffer não sai de longe: o troco é apertado na corrida.
+        d.buffer.clear();
+        d.breakerChase = config.comboBreakerChaseFrames;
 
         a.comboBroke = false;
         a.clearAttack();
-        if (a.grounded) a.vx = 0f;
         a.status = a.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        a.stunProjectile = null;
         a.hitCrouching = false;
         a.stunLeft = a.stunTotal = config.comboBreakerStunFrames;
         a.stunElapsed = 0;
         a.pushRemaining = 0f;
         a.pushFramesLeft = 0;
         a.forwardDashing = false;
-        // O combo empurrou quem apanhava para longe: no estalo ele avança até ficar colado.
-        if (a.grounded && d.grounded) {
-            float wanted = a.body().halfWidth + d.body().halfWidth + config.comboBreakerCloseGap;
+        a.breakerChase = 0;
+        // O estalo joga quem batia para longe de quem quebrou: só correndo para alcançar.
+        float away = a.x == d.x ? -d.facing : Math.signum(a.x - d.x);
+        if (a.grounded) {
+            a.vx = 0f;
+            float wanted = a.body().halfWidth + d.body().halfWidth + config.comboBreakerPushGap;
             float gap = Math.abs(a.x - d.x);
-            if (gap > wanted) push(d, a, Math.signum(a.x - d.x) * (gap - wanted));
+            if (gap < wanted) {
+                // Sem quem empurra: encurralado, ele só para na parede (quem quebrou não recua).
+                push(a, null, away * (wanted - gap));
+                a.pushFramesLeft = config.comboBreakerPushFrames;
+            }
+        } else {
+            a.vx = away * config.comboBreakerAirPushSpeed;
         }
         freeze(a, d, config.comboBreakerHitstopFrames, false);
         cues.add("COMBO_BREAKER");
+    }
+
+    /**
+     * Depois do combo breaker, quem quebrou corre sozinho até o outro: livre e no chão, sem
+     * segurar trás nem baixo, enquanto ele ainda desliza ou está longe.
+     */
+    private boolean breakerChasing(CombatFighter f) {
+        if (f.breakerChase <= 0 || f.status != CombatFighter.Status.NEUTRAL || !f.grounded || f.locked || f.ko()) {
+            return false;
+        }
+        return fighters[1 - f.index].pushFramesLeft > 0 || breakerFar(f);
+    }
+
+    /** Ainda fora do alcance do L: a corrida anda. */
+    private boolean breakerFar(CombatFighter f) {
+        CombatFighter other = fighters[1 - f.index];
+        float close = f.body().halfWidth + other.body().halfWidth + config.comboBreakerCloseGap;
+        return Math.abs(other.x - f.x) > close;
     }
 
     /** Arranhão de uma batida defendida: só especial e Super/Ultra. */
@@ -1601,6 +1731,7 @@ final class CombatEngine {
         point.hitstop = 0;
         point.launcherChase = 0;
         point.wallChase = 0;
+        point.breakerChase = 0;
         point.locked = false;
         // The new point did not walk there: no walk animation from the jump in position.
         startX[point.index] = point.x;
@@ -1797,7 +1928,7 @@ final class CombatEngine {
         if (!a.attack.isActive(frame) || a.hitsOnTarget >= a.attack.maxHits || !d.hittable()) return;
         if (evades(d, a.attack, !a.grounded, false)) return;
         CharacterDefinition.Body body = d.body();
-        boolean crouch = d.crouchingBody();
+        boolean crouch = d.crouchingBody() && !hitsCrouching(a.attack, a);
         for (int i = 0; i < a.attack.hitboxCount(); i++) {
             AttackDefinition.Box box = a.attack.hitbox(i);
             if (!box.activeAt(frame) || (a.hitboxMask & (1L << i)) != 0) continue;
@@ -1807,6 +1938,21 @@ final class CombatEngine {
                 return;
             }
         }
+    }
+
+    /**
+     * Especial e Super de chão (golpe ou projétil) pegam quem está agachado: contra eles o corpo
+     * agachado conta com a altura de em pé (o desenho de muitos especiais e a energia passam
+     * na altura do peito e iam por cima de quem abaixava). Os especiais que só saem no ar
+     * seguem a altura de verdade.
+     */
+    private static boolean hitsCrouching(AttackDefinition attack, CombatFighter owner) {
+        if (attack == null) return false;
+        if (attack.strength != AttackDefinition.Strength.SPECIAL && attack.strength != AttackDefinition.Strength.SUPER) {
+            return false;
+        }
+        CharacterDefinition.Special special = owner.character().specials.get(attack.id);
+        return special == null || !special.air;
     }
 
     /** Quadro que vale para o acerto: no mergulho, o golpe bate a descida inteira até o chão. */
@@ -1866,7 +2012,8 @@ final class CombatEngine {
             CombatFighter d = fighters[1 - p.ownerIndex];
             // An evading body lets the projectile fly on.
             boolean hits = d.hittable() && !evades(d, p.attack, false, true) &&
-                CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(), d.crouchingBody());
+                CombatRules.projectileHits(p.previousX, p.x, p.y, p.radius, d.x, d.y, d.body(),
+                    d.crouchingBody() && !hitsCrouching(p.attack, fighters[p.ownerIndex]));
             if (!hits) {
                 p.holding = false;   // o rival saiu de baixo: a onda segue voando com os acertos que sobraram
                 continue;
@@ -1990,7 +2137,8 @@ final class CombatEngine {
                 a.throwFrame = 0;
             }
         } else if (a.throwPhase == CombatFighter.THROW_HOLD) {
-            if (d.throwRequestAge >= 0) {
+            // Tech: só o L + M apertado há pouco (o buffer normal), não o pedido longo de agarrão.
+            if (d.throwRequestAge >= 0 && d.throwRequestAge <= config.bufferFrames) {
                 techThrow(a, d);
             } else if (a.throwFrame >= config.throwTechWindow) {
                 landThrow(a, d);
@@ -2101,6 +2249,7 @@ final class CombatEngine {
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.hitCrouching = wasCrouching;
         d.stunLeft = d.stunTotal = ultraAttack.hitstunFrames;
         d.stunElapsed = 0;
@@ -2130,12 +2279,13 @@ final class CombatEngine {
         if (!a.inUltraSequence()) return;
         CharacterDefinition.UltraSequence seq = a.state.profile.ultraSequence;
         boolean sameVictim = d == a.ultraVictim && d.state == a.ultraVictimState;
-        if (a.ultraHitsDone < seq.hits.length && (!sameVictim || d.ko())) {
-            // The victim fell (or a partner came in after the KO): the rest of the sequence is
-            // only the animation; a knocked-out victim is thrown now.
-            if (sameVictim) launchUltraVictim(a, d);
+        if (a.ultraHitsDone < seq.hits.length && !sameVictim) {
+            // Outro entrou no lugar: o resto da sequência é só a animação.
             a.ultraHitsDone = seq.hits.length;
         }
+        // Zerado no meio do Ultra, ele continua preso e levando os golpes (sem dano) até o golpe
+        // final, que é o que joga longe: voando antes, o golpe final e a finalização de mangá
+        // aconteciam no vento.
         if (a.ultraHitsDone < seq.hits.length) holdUltraVictim(a, d, seq);
         int finalHit = seq.hits.length - 1;
         if (config.ultraSequencePage && !a.ultraPageDone && a.ultraHitsDone == finalHit &&
@@ -2221,7 +2371,11 @@ final class CombatEngine {
 
     /** Damage already scaled; one more hit on the combo counter. */
     private int dealUltraDamage(CombatFighter a, CombatFighter d, int damage) {
-        if (d.ko()) return 0;
+        if (d.ko()) {
+            // Já zerado e ainda preso no Ultra: o golpe acerta (faísca, som), mas não tira nada.
+            events.add(new HitEvent(a.index, d.index, 0, false, false, ultraAttack.id));
+            return 0;
+        }
         d.state.takeDamage(damage, config.recoverableLifePermille);
         d.framesSinceHit = 0;
         ComboSession session = sessions[d.index];
@@ -2312,6 +2466,7 @@ final class CombatEngine {
         d.vx = 0f;
         d.bounce = CombatFighter.BOUNCE_NONE;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.vy = 0f;
         int untilBlast = config.ultraBeamBlastFrame(a.beamHits) - a.ultraFrame;
         d.stunLeft = d.stunTotal = Math.max(d.stunLeft, untilBlast + config.ultraBeamHitInterval * 2);
@@ -2321,6 +2476,7 @@ final class CombatEngine {
     /** The defender flies away and lands knocked down. */
     private void launchUltraVictim(CombatFighter a, CombatFighter d) {
         d.status = CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.grounded = false;
         d.y = Math.min(d.y, Arena.GROUND_Y - 2f);
         d.vy = -config.ultraLaunchSpeed;
@@ -2396,7 +2552,7 @@ final class CombatEngine {
             : attack.hitbox(c.hitbox + 1).firstFrame - a.attackFrame + attack.hitstopFrames + config.strikeHoldFrames;
 
         if (d.status == CombatFighter.Status.AIR_HITSTUN && session != null && (!multi || !a.strikeLanded) &&
-            session.juggleCount + attack.juggleCost > config.juggleLimit) {
+            (long)session.juggleCount + attack.juggleCost > config.juggleLimit) {
             // The rest of a several-strike move cannot catch the freed defender either.
             if (multi) a.hitsOnTarget = attack.maxHits;
             // Juggle limit: the defender recovers in the air instead of taking the hit.
@@ -2432,6 +2588,23 @@ final class CombatEngine {
         }
 
         int guard = effectiveGuard(d);
+        if (energyChain(c, d)) {
+            // Bola em cima de bola não emenda: atordoado pela bola de energia de quem atirou,
+            // a próxima bola dele chega como se ele já tivesse se recuperado e defendido (sem
+            // arranhão nem gasto de guarda: ele não escolheu defender).
+            d.status = CombatFighter.Status.BLOCKSTUN;
+            d.clearAttack();
+            d.stunLeft = d.stunTotal = attack.blockstunFrames;
+            d.stunElapsed = 0;
+            d.lastGuard = d.crouchingBody() ? CombatFighter.GUARD_LOW : CombatFighter.GUARD_HIGH;
+            d.framesSinceBlock = 0;
+            d.stunProjectile = null;
+            push(d, a, direction * attack.pushbackOnBlock);
+            freeze(a, d, attack.hitstopFrames, projectile);
+            events.add(new HitEvent(a.index, d.index, 0, true, projectile, attack.id));
+            if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
+            return;
+        }
         if (guardStops(guard, attack, !a.grounded, projectile)) {
             block(a, d, attack, guard, direction, projectile, !lastStrike,
                 multiProjectile ? c.strike == 0 : !multi || !a.strikeBlocked, chipFor(attack, base));
@@ -2465,6 +2638,9 @@ final class CombatEngine {
         if (!lastStrike) hitstun = Math.max(hitstun, holdUntil);
         AttackDefinition.Launch launch = lastStrike ? attack.launch : AttackDefinition.Launch.NONE;
         float hitPush = lastStrike ? attack.pushbackOnHit : attack.pushbackOnHit * config.strikeHoldPushback;
+        if (projectile && lastStrike && attack.kind != AttackDefinition.Kind.SUPER) {
+            hitPush = Math.max(hitPush, config.projectileHitPushback);
+        }
         float airPush = lastStrike ? attack.knockback : attack.knockback * config.strikeHoldPushback;
         // Later strikes of the same move keep the scale of its first strike.
         int damage = firstStrike ? session.registerHit(attack, raw, config) : session.registerFollowUp(raw);
@@ -2476,6 +2652,7 @@ final class CombatEngine {
         }
 
         boolean wasCrouching = d.crouchingBody();
+        boolean wasGrounded = d.grounded;
         // Punish counter: a standing heavy normal caught the defender in its own move.
         boolean punish = lastStrike && !projectile && a.grounded && d.grounded && d.attacking() &&
             attack.kind == AttackDefinition.Kind.NORMAL && attack.strength == AttackDefinition.Strength.HEAVY &&
@@ -2486,6 +2663,7 @@ final class CombatEngine {
         d.framesSinceHit = 0;
         d.stunLeft = d.stunTotal = hitstun;
         d.stunElapsed = 0;
+        d.stunProjectile = projectile && attack.kind != AttackDefinition.Kind.SUPER && !c.echo ? c.projectile : null;
         // A new hit takes over any flight in progress (and any free fall after the hitstun).
         d.freeFallFrames = 0;
         d.vx = 0f;
@@ -2497,9 +2675,10 @@ final class CombatEngine {
         boolean groundBounce = launch == AttackDefinition.Launch.GROUND_BOUNCE && !d.grounded &&
             session.groundBounces < config.maxGroundBounces;
 
-        if (punish) {
+        boolean spinHit = attack.spin && lastStrike && !projectile;
+        if (punish || spinHit) {
             // Spinning knockdown: flies away in a medium arc, still open to a juggle, and
-            // lands lying down (no air tech).
+            // lands lying down (no air tech). Also the tag's flying kick (VoadoraTroca).
             d.status = CombatFighter.Status.AIR_HITSTUN;
             d.grounded = false;
             d.y -= 2f;
@@ -2513,7 +2692,7 @@ final class CombatEngine {
             d.stunLeft = d.stunTotal = Math.max(hitstun, config.spinHitstunFrames);
             d.pushRemaining = 0f;
             d.pushFramesLeft = 0;
-            cues.add("PUNISH");
+            cues.add(punish ? "PUNISH" : "SPIN");
         } else if (wallBounce) {
             // Sent flying to the wall (arena edge or screen edge); it bounces in moveHorizontally.
             session.wallBounces++;
@@ -2586,7 +2765,10 @@ final class CombatEngine {
             cues.add("PULL");
         }
         // Every hit that leaves the defender juggled costs juggle points (a several-strike move once).
-        if (d.status == CombatFighter.Status.AIR_HITSTUN && (!multi || !a.strikeJuggled)) {
+        // The H that sends a grounded defender to the wall is free: it hit on the ground, and the
+        // launcher after the bounce plus a full air string (jL > jM > jH) still fit the limit.
+        boolean groundWallBounce = wallBounce && wasGrounded;
+        if (d.status == CombatFighter.Status.AIR_HITSTUN && !groundWallBounce && (!multi || !a.strikeJuggled)) {
             session.juggleCount += attack.juggleCost;
             a.strikeJuggled = true;
         }
@@ -2623,6 +2805,20 @@ final class CombatEngine {
             }
         }
         return false;
+    }
+
+    /**
+     * Bola de energia de quem atirou chegando em quem ainda está atordoado por outra bola dele
+     * (não a mesma, que pode ter vários acertos): não emenda. De perto o acerto da bola deixava
+     * tempo de soltar outra, e bola atrás de bola era um combo sem fim.
+     */
+    private static boolean energyChain(Contact c, CombatFighter d) {
+        if (c.projectile == null || c.echo || c.attack.kind == AttackDefinition.Kind.SUPER ||
+            d.status != CombatFighter.Status.HITSTUN || !d.grounded) {
+            return false;
+        }
+        Projectile before = d.stunProjectile;
+        return before != null && before != c.projectile && before.ownerIndex == c.projectile.ownerIndex;
     }
 
     /** Hitstop of a strike before the last: shorter, the move keeps its rhythm. */
@@ -2686,6 +2882,7 @@ final class CombatEngine {
     private void guardBreak(CombatFighter a, CombatFighter d, boolean projectile) {
         d.state.guard = CombatConfig.GUARD_MAX;
         d.status = d.grounded ? CombatFighter.Status.HITSTUN : CombatFighter.Status.AIR_HITSTUN;
+        d.stunProjectile = null;
         d.hitCrouching = false;
         d.stunLeft = d.stunTotal = config.guardBreakStunFrames;
         d.stunElapsed = 0;

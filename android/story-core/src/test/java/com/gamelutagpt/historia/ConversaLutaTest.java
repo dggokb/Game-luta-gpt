@@ -194,6 +194,43 @@ public class ConversaLutaTest {
         }
     }
 
+    /**
+     * Fora do elenco (o parceiro de tag de qualquer luta): nome, cor e o rosto de reserva do
+     * avulso; no elenco, o nome e a cor da história continuam valendo.
+     */
+    @Test
+    public void avulsoFalaComNomeCorERostoDeReserva() throws IOException {
+        java.util.List<String> pedidos = new java.util.ArrayList<>();
+        RenderAssets assets = new RenderAssets() {
+            @Override public String readText(String path) throws IOException { return FILES.readText(path); }
+            @Override public RenderImage loadImage(String path) throws IOException {
+                pedidos.add(path);
+                if (!path.startsWith("selection/")) throw new IOException(path);
+                return new RenderImage() {
+                    @Override public int width() { return 100; }
+                    @Override public int height() { return 120; }
+                };
+            }
+        };
+        Temporada temporada = Temporada.load(FILES);
+        ConversaLuta c = new ConversaLuta(assets);
+        c.avulso("p05", "P05", 0xFF112233, "selection/rostos/p05.webp");
+        c.dizer(temporada, "p05", true, "bravo", "Troca comigo!", 1f);
+        assertEquals("P05", c.nome("p05"));
+        assertEquals(0xFF112233, c.cor("p05"));
+        assertTrue("tenta o retrato e cai no de reserva", pedidos.contains("selection/rostos/p05.webp"));
+        c.avulso("ryuga", "P01", 0xFF000000, "selection/rostos/p01.webp");
+        assertEquals("Ryūga", c.nome("ryuga"));
+        assertEquals(temporada.personagem("ryuga").cor, c.cor("ryuga"));
+        PaginaHistoriaTest.NullCanvas canvas = new PaginaHistoriaTest.NullCanvas();
+        int frames = 0;
+        while (c.busy() && frames++ < 60 * 10) {
+            c.update(DT);
+            c.render(canvas);
+        }
+        assertFalse(c.busy());
+    }
+
     /** Sem o arquivo ninguém fala e a luta segue igual. */
     @Test
     public void semArquivoNinguemFala() throws IOException {

@@ -113,7 +113,19 @@ final class CharacterDefinition {
         final int damage;
         /** Seconds, derived from the attack frames (animation stretch, AI, legacy checks). */
         final float totalTime,activeStart,activeEnd,reach;
+        /**
+         * Tempo do clipe por trechos (quadros do golpe → segundos do clipe, crescentes), ou null:
+         * o clipe esticado inteiro. O golpe alto usa para segurar a pose de preparo em vez de
+         * passar o M inteiro em câmera lenta.
+         */
+        private final float[] knotFrames,knotTimes;
         Move(String binding,Animation animation,String pose,AttackDefinition attack) {
+            this(binding,animation,pose,attack,null,null);
+        }
+        Move(String binding,Animation animation,String pose,AttackDefinition attack,float[] knotFrames,float[] knotTimes) {
+            if(knotFrames!=null && (knotTimes==null || knotTimes.length!=knotFrames.length || knotFrames.length<2))
+                throw new IllegalArgumentException(binding+": trechos do clipe inválidos");
+            this.knotFrames=knotFrames;this.knotTimes=knotTimes;
             this.binding=binding;this.animation=animation;this.pose=pose;this.attack=attack;
             this.damage=attack.damage;
             this.totalTime=attack.totalFrames/(float)CombatConfig.FPS;
@@ -127,7 +139,20 @@ final class CharacterDefinition {
             float lead=0.16f*totalTime;
             return elapsed>=activeStart-lead && elapsed<=activeEnd+lead;
         }
-        float animationTime(float elapsed) { return animation==null?0f:animation.timeFor(elapsed,totalTime); }
+        float animationTime(float elapsed) {
+            if(animation==null)return 0f;
+            if(knotFrames==null)return animation.timeFor(elapsed,totalTime);
+            float f=Math.max(0f,elapsed)*CombatConfig.FPS;
+            int n=knotFrames.length;
+            if(f<=knotFrames[0])return knotTimes[0];
+            for(int i=1;i<n;i++){
+                if(f<=knotFrames[i]){
+                    float k=(f-knotFrames[i-1])/Math.max(0.0001f,knotFrames[i]-knotFrames[i-1]);
+                    return knotTimes[i-1]+(knotTimes[i]-knotTimes[i-1])*k;
+                }
+            }
+            return knotTimes[n-1];
+        }
     }
     /**
      * Command special (S2, S3...): a ground move started by a motion plus one of its
@@ -286,12 +311,19 @@ final class CharacterDefinition {
                 String assistMove) {
             // Without a declared assist: the projectile when there is one, else the heavy normal.
             this.assistMove=assistMove!=null?assistMove:energy!=null?"S":"H";
-            this.color=color;this.maxLife=maxLife;
+            this.color=color;this.maxLife=scaledLife(maxLife);
             this.autoCombo=autoCombo.clone();this.energy=energy;this.energyCommand=energyCommand.clone();
             this.superAttack=superAttack;this.body=body;
             this.inputPriority=inputPriority==null?CombatConfig.DEFAULT_PRIORITY.clone():inputPriority.clone();
         }
         boolean hasSuperAttack() { return superAttack!=null; }
+        /**
+         * Vida de todo lutador vezes {@link CombatConfig#LIFE_SCALE_PERMILLE}: a luta dura mais sem
+         * mexer no dano de cada golpe (o mesmo que tirar ~29% do dano de tudo).
+         */
+        static int scaledLife(int packLife) {
+            return (int)((long)packLife * CombatConfig.LIFE_SCALE_PERMILLE / 1000);
+        }
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }

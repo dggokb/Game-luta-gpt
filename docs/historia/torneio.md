@@ -60,21 +60,42 @@ emboscam o jogador à noite, longe da arena. Não é regra do torneio, mas os or
 
 - É sempre uma dupla com golpes: só as duplas prontas ficam no lado do jogador.
 - O rótulo da luta é **EMBOSCADA**; perder repete a luta, como as outras da história.
-- **Cenário**: por enquanto, o padrão (Templo da Lua). O plano é um cenário próprio, os
-  fundos do templo à noite (beco com lanternas, chuva), feito com o mesmo motor de cenários
-  ([../stage-engine.md](../stage-engine.md)); quando existir, é só pôr `"cenario"` no passo.
+- **Cenário**: o **Caminho dos Penhascos** (`caminho_penhascos`): uma passarela de metal
+  sobre um abismo da ilha, à noite, com pontes suspensas, ruínas e andaimes
+  ([../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md)).
 
 ### A regra escondida
 
 Depois da FINAL (2x2), a dupla campeã luta entre si, **1x1** (Ryūga × p02 ou Kōga × p04).
 Quem vencer desafia o Campeão (o chefe final, ainda por fazer).
 
-Lutas do jogador na temporada: o treino do ep01, as quartas, a emboscada, a semifinal, a
-final e o duelo 1x1.
+Lutas do jogador na temporada: o treino do ep01, o convite do ep02, o desafio no porto
+(ep03), as quartas, a emboscada, a semifinal, a final e o duelo 1x1.
 
 Na tela da chave: a dupla do jogador tem borda **azul**, a do rival **vermelha**; quem
 perdeu fica apagado e riscado; o caminho de quem avançou fica dourado; embaixo, a próxima
 luta do jogador (ou os campeões).
+
+## A Ilha do Torneio (cenários)
+
+O torneio é numa ilha de penhascos sobre o mar; cada rodada tem a sua arena, subindo a ilha
+do porto até o templo do pico. Mapa, concepts (`art/concepts/cenarios/`) e prompts de cada
+cenário: [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md).
+
+| Luta | Cenário |
+|---|---|
+| DESAFIO (ep03, A Chegada) | Porto Secreto (`porto_secreto`), **pronto** |
+| QUARTAS DE FINAL (ep04) | Arena Costeira (`arena_costeira`), **pronto** |
+| EMBOSCADA (ep05) | Caminho dos Penhascos (`caminho_penhascos`), **pronto** |
+| SEMIFINAL (ep06) | Arena Imperial (`arena_imperial`), **pronto** |
+| FINAL (2x2, ep07) | Arena Central (`arena_central`), **pronto** |
+| DUELO FINAL (1x1, a "Final da Tag") | Arena VIP (`arena_vip`) |
+| O Campeão, Takatoshi | Arena do Templo (`arena_templo`) |
+
+O Porto Secreto, a Arena Costeira, o Caminho dos Penhascos, a Arena Imperial e a Arena
+Central já estão no jogo (no ep03, nas quartas do ep04, na emboscada do ep05, na semifinal
+do ep06 e na final do ep07, e no sorteio de cenários do Arcade). A Arena VIP e a Arena do
+Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
 
 ## Passos novos no `episodio.json`
 
@@ -99,22 +120,23 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
 | ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`, e a do Kōga no Beco do Brucy, `beco_brucy`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
-| ep03 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
-| ep04 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
-| ep05 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
-| ep06 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
-| ep07 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
+| ep03 — A Chegada | os irmãos chegam de barco à Ilha do Torneio, no Porto Secreto: página do porto, página do irmão com o parceiro, a dupla do p07 + p08 (gananciosos, "uma dupla a menos na chave seria ótimo para os nossos negócios") desafia o jogador no cais, **luta 2x2 DESAFIO** no `porto_secreto`, o mensageiro encerra a briga, página do irmão vendo o outro irmão chegar. Antes do sorteio: a chave ainda não existe |
+| ep04 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
+| ep05 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
+| ep06 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |
+| ep07 — A Final | chave, os irmãos frente a frente, **final 2x2** contra o rival, chave com os campeões |
+| ep08 — A Regra Escondida | o anúncio da regra, a conversa com o parceiro, **duelo 1x1**, "Próximo episódio: O Campeão" |
 
 **Nível da CPU** (`NivelCpu`): começa no NÍVEL CPU da pausa (padrão 5) na primeira luta e
-chega ao 8 na última, repartido pelas lutas da campanha do irmão escolhido. Hoje são 7 (treino
-do ep01, convite, quartas, emboscada, semifinal, final e duelo): 5, 5, 6, 6, 7, 7, 8. O
+chega ao 8 na última, repartido pelas lutas da campanha do irmão escolhido. Hoje são 8 (treino
+do ep01, convite, desafio, quartas, emboscada, semifinal, final e duelo): 5, 5, 5, 6, 6, 7, 7, 8. O
 treino-tutorial do Prólogo não conta (não tem IA). O Arcade usa a mesma regra
 ([arcade.md](arcade.md)). A cada 2 derrotas seguidas a CPU desce 1 nível (nunca abaixo de 1); a
 vitória zera a contagem e a CPU volta ao nível da luta (`Campanha.registrarResultado`).
 
-As páginas do ep03 ao ep07 são provisórias (painéis montados pelo jogo, com a arte
+As páginas do ep03 ao ep08 são provisórias (painéis montados pelo jogo, com a arte
 provisória); viram páginas prontas pelo [motor de páginas](motor-paginas.md) (o ep02 já está todo em páginas prontas). Depois do
-ep07 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
+ep08 a temporada acaba e o jogo volta ao menu inicial (o chefe final, o Campeão, ainda não
 existe).
 
 ## Retratos

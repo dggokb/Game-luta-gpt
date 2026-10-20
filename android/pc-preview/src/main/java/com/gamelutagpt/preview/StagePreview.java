@@ -25,7 +25,13 @@ import javax.swing.Timer;
  * <pre>
  * Janela:   StagePreview pasta-do-cenario
  * Quadros:  StagePreview pasta-do-cenario --quadros saida/
+ * Varredura: StagePreview pasta-do-cenario --varredura folha.png
+ * Pulos:     StagePreview pasta-do-cenario --pulos saida/   (super pulo nos cantos e no meio)
  * </pre>
+ *
+ * A varredura grava uma folha com nove fotos: os dois cantos e o meio do cenário, cada um
+ * com os lutadores juntos, separados (câmera afastada) e no alto do super pulo. É onde
+ * aparece o que está voando (peças sem nada embaixo, vãos de mar atrás do piso).
  */
 public final class StagePreview {
     // Medidas da luta (Arena e CameraRig do jogo).
@@ -99,7 +105,10 @@ public final class StagePreview {
     private void update(float dt) {
         float before = time;
         time += dt;
-        if ((int)(time / 3f) != (int)(before / 3f)) scene.react(REACTIONS[(int)(time / 3f) % REACTIONS.length]);
+        if ((int)(time / 3f) != (int)(before / 3f)) {
+            scene.react(REACTIONS[(int)(time / 3f) % REACTIONS.length]);
+            scene.cheer(0.8f); // como um golpe pesado: a plateia vibra
+        }
         script(time);
         scene.setCamera(zoom, left, top);
         scene.update(dt);
@@ -192,24 +201,92 @@ public final class StagePreview {
         System.out.println(frames + " quadros em " + outDir.getPath());
     }
 
+    private void runSweep(File out) throws IOException {
+        float[][] places = {{0f, 1f}, {1300f, 1f}, {2600f, 1f}};
+        int w = 640, h = 360;
+        BufferedImage sheet = new BufferedImage(w * 3, h * 3, BufferedImage.TYPE_INT_RGB);
+        Graphics2D sg = sheet.createGraphics();
+        for (int col = 0; col < 3; col++) {
+            float edge = places[col][0];
+            for (int row = 0; row < 3; row++) {
+                // Juntos, separados (o mais afastado que a câmera vai) e no alto do super pulo.
+                float gap = row == 1 ? 1200f : 200f;
+                float mid = Math.max(gap / 2f + 60f, Math.min(WORLD_WIDTH - gap / 2f - 60f, edge));
+                p1x = mid - gap / 2f;
+                p2x = mid + gap / 2f;
+                p1y = row == 2 ? GROUND_Y - 520f : GROUND_Y;
+                camera(row == 2);
+                scene.setCamera(zoom, left, top);
+                for (int i = 0; i < 20; i++) scene.update(1f / 30f);
+                BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = image.createGraphics();
+                render(g, w, h);
+                g.dispose();
+                sg.drawImage(image, col * w, row * h, null);
+            }
+        }
+        sg.dispose();
+        ImageIO.write(sheet, "png", out);
+        System.out.println("varredura em " + out.getPath());
+    }
+
+    /**
+     * Super pulo nos dois cantos e no meio: o lutador 1 sobe e desce (1,4 s, como no roteiro),
+     * gravado em quadros PNG a 30 por segundo, um pulo atrás do outro.
+     */
+    private static final int JUMP_FRAMES = 60;
+
+    private void runJumps(File outDir) throws IOException {
+        if (!outDir.isDirectory() && !outDir.mkdirs()) throw new IOException("não consegui criar " + outDir);
+        float[] places = {300f, 1300f, 2300f};
+        float dt = 1f / 30f;
+        int frame = 0;
+        for (float place : places) {
+            for (int i = 0; i < JUMP_FRAMES; i++) {
+                float t = i * dt;
+                float jump = t > 0.2f && t < 1.6f ? (float)Math.sin((t - 0.2f) / 1.4f * Math.PI) : 0f;
+                p1x = place - 150f;
+                p2x = place + 150f;
+                p1y = GROUND_Y - 520f * jump;
+                if (i == 50) scene.cheer(1f); // a aterrissagem do pulo vira um "KO"
+                camera(jump > 0f);
+                scene.setCamera(zoom, left, top);
+                scene.update(dt);
+                time += dt;
+                BufferedImage image = new BufferedImage(960, 540, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g = image.createGraphics();
+                render(g, image.getWidth(), image.getHeight());
+                g.dispose();
+                ImageIO.write(image, "png", new File(outDir, String.format(Locale.ROOT, "pulo_%03d.png", frame++)));
+            }
+        }
+        System.out.println(frame + " quadros de pulo em " + outDir.getPath());
+    }
+
     public static void main(String[] args) throws Exception {
         String folder = null;
         File framesDir = null;
+        File sweep = null;
+        File jumps = null;
         float seconds = 12f;
         for (int i = 0; i < args.length; i++) {
             if ("--quadros".equals(args[i]) && i + 1 < args.length) framesDir = new File(args[++i]);
             else if ("--segundos".equals(args[i]) && i + 1 < args.length) seconds = Float.parseFloat(args[++i]);
+            else if ("--varredura".equals(args[i]) && i + 1 < args.length) sweep = new File(args[++i]);
+            else if ("--pulos".equals(args[i]) && i + 1 < args.length) jumps = new File(args[++i]);
             else folder = args[i];
         }
         if (folder == null) {
-            System.err.println("uso: StagePreview pasta-do-cenario [--quadros saida/] [--segundos 12]");
+            System.err.println("uso: StagePreview pasta-do-cenario [--quadros saida/] [--segundos 12] [--varredura folha.png] [--pulos saida/]");
             System.exit(2);
         }
         File dir = new File(folder).getAbsoluteFile();
         StagePack pack = StagePack.load(new FileRenderAssets(dir.getParentFile()), dir.getName());
         for (String warning : pack.warnings) System.out.println("aviso: " + warning);
         StagePreview preview = new StagePreview(pack);
-        if (framesDir != null) preview.runFrames(framesDir, seconds);
+        if (jumps != null) preview.runJumps(jumps);
+        else if (sweep != null) preview.runSweep(sweep);
+        else if (framesDir != null) preview.runFrames(framesDir, seconds);
         else SwingUtilities.invokeLater(preview::runWindow);
     }
 }

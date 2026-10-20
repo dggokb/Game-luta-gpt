@@ -50,8 +50,6 @@ final class HudRenderer {
         default int presentationEpoch() { return 0; }
         default boolean assistInUse() { return false; }
         String tagCooldownLabel();
-        default String assistStatusLabel() { return tagCooldownLabel(); }
-        default String swapStatusLabel() { return ""; }
         String tagButtonLabel();
         /** Text of the TAG button while it can be used: ASSIST, or TROCA during Assist → Tag. */
         String tagButtonTitle();
@@ -162,10 +160,6 @@ final class HudRenderer {
             text(c, s.opponentReserve() == null ? "TAG OFF" : "TAG", 1058f, 132f, 13f, 0xFFBCC4D8);
         }
         drawFrameEffects(c);
-        // Cached strings computed from independent real assist and raw-tag cooldowns.
-        panel(c, 187, 140, 355, 43, 9, 0xE8081427, BLUE, 1.5f);
-        text(c, s.assistStatusLabel(), 364, 157, 16, effects.assistRatio >= 1 ? 0xFF9BEEFF : Color.WHITE);
-        text(c, s.swapStatusLabel(), 364, 175, 14, Color.WHITE);
         // Batalha: 120 segundos; treino e cenas da história: ∞ (nunca um relógio inventado).
         if (hudArt == null) panel(c, 588f, 6f, 104f, 93f, 18f, 0xEF070B19, Color.WHITE, 2f);
         drawClock(c, s);
@@ -1224,7 +1218,8 @@ final class HudRenderer {
                 angle - 22.5f, 45f, true, paint);
             paint.setAlpha(255);
             paint.setColor(0xE6FFFFFF);
-            c.drawCircle(DPAD_UNIT_X[directionIndex] * 72f, DPAD_UNIT_Y[directionIndex] * 72f, 27f, paint);
+            c.drawCircle(DPAD_UNIT_X[directionIndex] * DPAD_RADIUS * 0.59f, DPAD_UNIT_Y[directionIndex] * DPAD_RADIUS * 0.59f,
+                DPAD_RADIUS * 0.22f, paint);
         }
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(1.5f);
@@ -1251,8 +1246,8 @@ final class HudRenderer {
         c.restore();
         for (int i = 0; i < DPAD_LABELS.length; i++) {
             boolean lit = direction == i + 1;
-            label(c, DPAD_LABELS[i], DPAD_X + DPAD_UNIT_X[i] * 78f, DPAD_Y + DPAD_UNIT_Y[i] * 78f,
-                lit ? 28f : 25f, lit ? 0xFF0A1424 : 0xE6FFFFFF);
+            label(c, DPAD_LABELS[i], DPAD_X + DPAD_UNIT_X[i] * DPAD_RADIUS * 0.64f, DPAD_Y + DPAD_UNIT_Y[i] * DPAD_RADIUS * 0.64f,
+                lit ? 31f : 28f, lit ? 0xFF0A1424 : 0xE6FFFFFF);
         }
 
         drawAttackButton(c, LIGHT_X, LIGHT_Y, "L", s.pressed(Control.LIGHT));
@@ -1285,7 +1280,7 @@ final class HudRenderer {
             readyHalo(c, x, y, r, ring);
         }
         boolean lit = ready || left > 0f;
-        label(c, "OD", x, y + (left > 0f || !ready ? -6f : 0f), 17f, lit ? Color.WHITE : 0xFFB4BCCB);
+        label(c, "OD", x, y + (left > 0f || !ready ? -7f : 0f), 20f, lit ? Color.WHITE : 0xFFB4BCCB);
         if (left > 0f) label(c, overdriveLabel(s.overdriveSeconds()), x, y + 11f, 10f, Color.WHITE);
         else if (!ready) label(c, "USADO", x, y + 11f, 9f, 0xFFB4BCCB);
     }
@@ -1306,7 +1301,7 @@ final class HudRenderer {
     private void drawAttackButton(Canvas c, float x, float y, String label, boolean pressed) {
         int ring = "L".equals(label) ? L_RING : "M".equals(label) ? M_RING : H_RING;
         button(c, x, y, ATTACK_RADIUS, ring, pressed, true);
-        label(c, label, x, y, pressed ? 33f : 34f, pressed ? Color.WHITE : 0xFFF2F6FF);
+        label(c, label, x, y, pressed ? 39f : 40f, pressed ? Color.WHITE : 0xFFF2F6FF);
     }
 
     /** A spot between two buttons that presses both: L+M throw/tech, M+H pushblock. */
@@ -1317,7 +1312,7 @@ final class HudRenderer {
 
     private void drawComboButton(Canvas c, boolean pressed) {
         button(c, COMBO_X, COMBO_Y, COMBO_RADIUS, 0xFFB98CFF, pressed, true);
-        label(c, "COMBO", COMBO_X, COMBO_Y, 17f, Color.WHITE);
+        label(c, "COMBO", COMBO_X, COMBO_Y, 18f, Color.WHITE);
     }
 
     private void drawTagButton(Canvas c, State s) {
@@ -1326,7 +1321,7 @@ final class HudRenderer {
         int reserveColor = s.reserve().profile.color | 0xFF000000;
         button(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor, pressed, enabled);
         if (enabled && !pressed) readyHalo(c, TAG_X, TAG_Y, TAG_RADIUS, reserveColor);
-        label(c, enabled ? s.tagButtonTitle() : s.tagButtonLabel(), TAG_X, TAG_Y, enabled ? 16f : 13f,
+        label(c, enabled ? s.tagButtonTitle() : s.tagButtonLabel(), TAG_X, TAG_Y, enabled ? 18f : 15f,
             enabled ? Color.WHITE : 0xFFB4BCCB);
     }
 
@@ -1350,7 +1345,7 @@ final class HudRenderer {
         int ring = ultra ? 0xFFFF6AD5 : 0xFFFFD45A;
         button(c, SUPER_X, SUPER_Y, SUPER_RADIUS, ring, pressed, enabled);
         if (enabled && !pressed) readyHalo(c, SUPER_X, SUPER_Y, SUPER_RADIUS, ring);
-        label(c, ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 7f, 16f, enabled ? Color.WHITE : 0xFFB4BCCB);
-        label(c, s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 13f, 11f, enabled ? ring : 0xFF9AA2B2);
+        label(c, ultra ? "ULTRA" : "SUPER", SUPER_X, SUPER_Y - 8f, 18f, enabled ? Color.WHITE : 0xFFB4BCCB);
+        label(c, s.active().superLevelHudLabel, SUPER_X, SUPER_Y + 15f, 13f, enabled ? ring : 0xFF9AA2B2);
     }
 }

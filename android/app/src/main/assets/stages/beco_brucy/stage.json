@@ -22,7 +22,73 @@
       "topo": 0.12,
       "base": 0.66,
       "x": 0.5,
-      "repetir": "espelhar"
+      "repetir": "espelhar",
+      "luzes": [
+        {
+          "x": 0.394,
+          "y": 0.303,
+          "raio": 0.05,
+          "cor": "#FF3050",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.42,
+          "y": 0.37,
+          "raio": 0.05,
+          "cor": "#3C8CFF",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.567,
+          "y": 0.37,
+          "raio": 0.05,
+          "cor": "#3C8CFF",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.611,
+          "y": 0.37,
+          "raio": 0.05,
+          "cor": "#FF3050",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.75,
+          "y": 0.539,
+          "raio": 0.04,
+          "cor": "#FF3050",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.922,
+          "y": 0.404,
+          "raio": 0.05,
+          "cor": "#3C8CFF",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.024,
+          "y": 0.471,
+          "raio": 0.04,
+          "cor": "#FF3050",
+          "pulsar": 0.15,
+          "reflexo": false
+        },
+        {
+          "x": 0.072,
+          "y": 0.404,
+          "raio": 0.05,
+          "cor": "#3C8CFF",
+          "pulsar": 0.15,
+          "reflexo": false
+        }
+      ]
     },
     {
       "id": "neblina-longe",
@@ -76,6 +142,18 @@
           "raio": 0.07,
           "cor": "#FF9A3C",
           "pulsar": 0.05
+        },
+        {
+          "x": 0.014,
+          "y": 0.428,
+          "raio": 0.05,
+          "cor": "#FF9A3C"
+        },
+        {
+          "x": 0.986,
+          "y": 0.428,
+          "raio": 0.05,
+          "cor": "#FF9A3C"
         }
       ]
     },
@@ -119,6 +197,22 @@
           "raio": 0.04,
           "cor": "#FFB060",
           "pulsar": 0.06
+        },
+        {
+          "x": 0.392,
+          "y": 0.289,
+          "raio": 0.06,
+          "cor": "#FFB050",
+          "pulsar": 0.04,
+          "reflexo": false
+        },
+        {
+          "x": 0.698,
+          "y": 0.5,
+          "raio": 0.05,
+          "cor": "#FFB050",
+          "pulsar": 0.04,
+          "reflexo": false
         }
       ]
     },
@@ -159,6 +253,30 @@
           "raio": 0.04,
           "cor": "#FFA040",
           "pulsar": 0.05
+        },
+        {
+          "x": 0.25,
+          "y": 0.42,
+          "raio": 0.05,
+          "cor": "#FF3C78",
+          "pulsar": 0.06,
+          "reflexo": false
+        },
+        {
+          "x": 0.61,
+          "y": 0.42,
+          "raio": 0.04,
+          "cor": "#FFB060",
+          "pulsar": 0.04,
+          "reflexo": false
+        },
+        {
+          "x": 0.765,
+          "y": 0.389,
+          "raio": 0.035,
+          "cor": "#FFB060",
+          "pulsar": 0.04,
+          "reflexo": false
         }
       ]
     },
@@ -224,5 +342,15 @@
     "espessura": 1.6,
     "alfa": 0.5,
     "respingos": 40
+  },
+  "relampagos": {
+    "intervaloMinimo": 5,
+    "intervaloMaximo": 11,
+    "profundidade": 9000,
+    "topo": -0.02,
+    "base": 0.4,
+    "cor": "#D6DEFF",
+    "claraoCeu": 0.5,
+    "claraoCena": 0.1
   }
 }

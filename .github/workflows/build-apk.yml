@@ -1,7 +1,7 @@
 name: Build Game Luta APK
 
-# APK builds use the versioned sprite outputs. Full animation validation remains
-# available through tools/sprites/tests and build_characters.py --check, separately.
+# CI never writes to the repository: generated sprite outputs are the author's
+# responsibility (build_characters.py --write) and are only verified here.
 permissions:
   contents: read
 
@@ -22,7 +22,53 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Só o APK, sem os testes: sai em poucos minutos para instalar e testar no celular. Os testes
+  # (job "build", em paralelo) continuam valendo: se algum cair, o run fica vermelho mesmo com
+  # o APK já disponível.
+  apk:
+    name: APK (rápido, sem testes)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+      - name: Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      # Python + Pillow: a calibração do P01 é gerada no build.
+      - name: Install sprite pipeline dependency
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+
+      # Sem verifySpritePacks: a conferência das folhas (a parte demorada) fica no job de testes.
+      - name: Build debug APK (sem testes)
+        working-directory: android
+        run: gradle assembleDebug -x verifySpritePacks --stacktrace
+
+      # O APK vai como .apk mesmo, sem zip (upload-artifact v7 com archive: false): baixa no
+      # celular e instala direto. Sem zip só vai um arquivo, e o nome dele vira o do artefato.
+      - name: Nome do APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/GameLutaGPT.apk"
+      - name: Upload APK
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ runner.temp }}/GameLutaGPT.apk
+          archive: false
+          if-no-files-found: error
+
   build:
+    name: Testes, folhas e smoke no emulador
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -44,15 +90,51 @@ jobs:
       - name: Install Android platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Install P01 calibration dependency
+      - name: Install sprite pipeline dependency
         run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
 
-      - name: Build debug APK
+      # Processed atlases from earlier runs. Entries are keyed by the hash of their own
+      # inputs (build_characters.py), so a restored entry is only used when identical; an
+      # older cache still serves every clip that did not change.
+      - name: Restore sprite atlas cache
+        id: sprite-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: android/app/build/sprite-cache
+          key: sprite-cache-v1-${{ hashFiles('art/sprites/source/**', 'tools/sprites/clips/**', 'tools/sprites/profiles/**', 'tools/sprites/*.py', 'tools/sprites/tests/**', 'tools/sprites/requirements.txt') }}
+          restore-keys: sprite-cache-v1-
+      - name: Mark sprite cache start
+        run: touch "$RUNNER_TEMP/sprite-cache-start"
+
+      - name: Normalize and validate sprite assets
+        run: |
+          python3 -m unittest discover -s tools/sprites/tests -v
+          python3 tools/sprites/build_characters.py --check
+
+      # Diagnostic only: shows the author what --write would produce. Nothing is committed.
+      - name: Materialize generated sprite outputs after stale check
+        if: failure()
+        run: python3 tools/sprites/build_characters.py --write
+
+      - name: Upload generated sprite outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sprite-GPT-Generated-Outputs
+          path: |
+            android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+            android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+            android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+            android/app/src/main/res/drawable-nodpi/*.webp
+            tools/sprites/reports/*.report.json
+          if-no-files-found: warn
+
+      - name: Tests and debug APK
         working-directory: android
         shell: bash
         run: |
           set -o pipefail
-          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -x :app:verifySpritePacks --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
+          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
 
       # Falhou: cada teste que caiu e o "What went wrong" do Gradle viram anotações do job, que
       # dá para ler pela API do GitHub (sem baixar o log inteiro).
@@ -77,13 +159,21 @@ jobs:
                       print('::error title=Gradle::' + clean(' '.join(lines[i:i + 4])))
           PY
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      # Saved even when a check fails: the atlases already processed stay valid.
+      - name: Drop sprite cache entries this run did not use
+        if: always() && steps.sprite-cache.outputs.cache-hit != 'true'
+        run: |
+          test -d android/app/build/sprite-cache || exit 0
+          find android/app/build/sprite-cache -mindepth 1 -maxdepth 1 ! -newer "$RUNNER_TEMP/sprite-cache-start" -exec rm -rf {} +
+          du -sh android/app/build/sprite-cache
+      - name: Save sprite atlas cache
+        if: always() && steps.sprite-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
         with:
-          name: GameLutaGPT-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          path: android/app/build/sprite-cache
+          key: ${{ steps.sprite-cache.outputs.cache-primary-key }}
 
+      # O APK para baixar sai do job "apk" (rápido); este aqui monta o seu só para o smoke.
       # Without KVM the emulator runs in software and takes ~15 min just to boot.
       - name: Enable emulator hardware acceleration
         if: github.ref == 'refs/heads/game-luta-sprite-gpt'
@@ -123,10 +213,11 @@ jobs:
           if-no-files-found: error
 
 
-      - name: Upload test reports
+      - name: Upload sprite review and test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: GameLutaGPT-Test-Reports
+          name: Sprite-GPT-Validation
           path: |
+            android/app/build/sprite-review/
             android/app/build/reports/tests/

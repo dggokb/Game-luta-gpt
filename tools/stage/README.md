@@ -10,6 +10,9 @@ imagens. O primeiro é o **Templo da Lua** (`templo_lua`), baseado no concept do
 noite, com a arte gerada no GPT. `gerar_provisorio.py` gera uma arte provisória no mesmo
 formato (em `tools/stage/provisorio/`), útil para testar ou como modelo.
 
+Os cenários da **Ilha do Torneio** (porto, as cinco arenas, o caminho da emboscada e o
+templo do Takatoshi) têm os prompts em [ilha-do-torneio.md](ilha-do-torneio.md).
+
 ## Passo a passo
 
 1. Gere as imagens no GPT com os prompts abaixo. Use os mesmos nomes de arquivo.
@@ -30,6 +33,16 @@ formato (em `tools/stage/provisorio/`), útil para testar ou como modelo.
 4. **Ajuste as luzes e os fogos**: as posições (`x`, `y` em fração da imagem) dependem de
    onde a IA desenhou a lanterna ou a tigela do braseiro. Depois de trocar `pilar.png` ou
    `braseiro.png`, confira no visualizador. Se preferir, me mande as imagens que eu ajusto.
+5. **Solte as bandeiras**: estandarte pintado no pilar não se mexe. Acerte o retângulo e a
+   linha de corte (embaixo da vara) do cenário em `separar_bandeiras.py`, rode
+   `python3 tools/stage/separar_bandeiras.py <cenario>` uma vez e cole o trecho que ele
+   imprime em `"bandeiras"` da camada do pilar (ver `docs/stage-engine.md`).
+   Com muitos estandartes numa imagem (Ilha do Torneio), use o `soltar_bandeiras.py`: só
+   um retângulo com folga em volta de cada um, e ele acha o pano pela cor.
+6. **Faça a água correr**: cachoeira pintada parada fica estranha. Ponha a imagem na lista
+   `AREAS` do `tools/stage/cachoeiras.py` com um retângulo em volta de cada cachoeira e rode
+   `python3 tools/stage/cachoeiras.py android/app/src/main/assets/stages/<cenario>`: ele grava
+   `<imagem>_agua.png` e põe `"cachoeiras"` na camada (ver `docs/stage-engine.md`).
 
 ## Prompts do Templo da Lua
 
@@ -87,7 +100,8 @@ Dicas:
   cópia.
 - **Repetição**: `repetir: "repetir"` ou `"espelhar"` (cópias alternadas espelhadas,
   esconde emendas). `periodo` é a distância entre cópias em fração da largura da tela.
-- **Extras de camada**: `reflexo` (cópia espelhada embaixo, para a água), `corAcima` (pinta a
+- **Extras de camada**: `apoio` (profundidade da camada em que esta se apoia, como o mar: a
+  base acompanha ela na vertical no super pulo, veja `docs/stage-engine.md`), `reflexo` (cópia espelhada embaixo, para a água), `corAcima` (pinta a
   tela acima da camada, útil no céu durante o super pulo), `alfa`.
 - **`luzes`**: `x`, `y` (fração da imagem), `raio` (fração da altura da imagem), `cor`,
   `pulsar` e `reflexo` (aparece no piso molhado).
@@ -98,6 +112,8 @@ Dicas:
 - **Piso**: textura vista de cima. A borda de cima é a profundidade `longe` e a de baixo é
   `perto`. `centroX` é o x do mundo do centro da imagem (os lutadores começam em 420 e 980).
   `reflexoLutadores` é a opacidade do reflexo dos lutadores no chão (0 = sem reflexo).
+  `ate` (opcional) faz o chão continuar atrás do piso, repetindo a `imagemLajotas`, até essa
+  profundidade (o campo de uma arena até a arquibancada lá no fundo).
   `imagemLajotas` (opcional) é a mesma textura **sem o emblema**, usada nas repetições fora
   do centro, para o emblema não aparecer duas vezes quando a câmera anda.
 

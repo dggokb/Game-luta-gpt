@@ -29,7 +29,7 @@ public class PressaDoTempoTest {
     private static int[] fight(int secondsLeft) {
         String[] ids = {"player_base", "p03", "p05", "p07", "p09", "p12", "p02", "p10"};
         int starts = 0, damage = 0, guarding = 0;
-        for (int seed = 1; seed <= 8; seed++) {
+        for (int seed = 1; seed <= 32; seed++) {
             Random r = new Random(seed);
             FighterState p = new FighterState(GeneratedCharacters.get(ids[r.nextInt(ids.length)]), "P1");
             FighterState c = new FighterState(GeneratedCharacters.get(ids[r.nextInt(ids.length)]), "CPU");
@@ -46,7 +46,10 @@ public class PressaDoTempoTest {
                 e.step(a, b);
                 CombatFighter me = e.fighter(1);
                 if (me.attacking() && me.attackFrame == 0) starts++;
-                if (me.status == CombatFighter.Status.BLOCKSTUN) guarding++;
+                // Escolhendo esperar: segurando a defesa sem estar levando golpe (o bloqueio de
+                // quem avança e leva o golpe na defesa não é esperar).
+                boolean holdsBack = me.facing > 0 ? b.direction == 5 || b.direction == 4 : b.direction == 1 || b.direction == 2;
+                if (holdsBack && me.status != CombatFighter.Status.BLOCKSTUN) guarding++;
             }
             damage += p.profile.maxLife - p.life;
         }

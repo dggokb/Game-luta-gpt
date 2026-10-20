@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -85,6 +87,7 @@ public class GameView extends SurfaceView
     private static final String SPEED_KEY = "velocidade";
     /** IMPACTO da pausa (impact frames ligados), salvo junto com a velocidade. */
     private static final String IMPACT_KEY = "impacto";
+    private static final String FPS_KEY = "contadorFps";
     /** Nível da CPU (1 a 8) escolhido na pausa. */
     private static final String CPU_LEVEL_KEY = "nivel_cpu";
 
@@ -125,6 +128,9 @@ public class GameView extends SurfaceView
     private final ImpactEffects impacts = new ImpactEffects();
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
     private final ImpactFeel feel = new ImpactFeel();
+    /** Golpe que mata e ganha a luta com Super ou Ultra: o quadro de mangá com linhas de ação. */
+    private final FinalizacaoManga finalizacao = new FinalizacaoManga();
+    private final Random finalizacaoLinhas = new Random();
     private final Random soundRandom = new Random(11);
     /** Golpe no ar: o golpe de cada lado que já tocou o "vush", e o quadro em que estava. */
     private final AttackDefinition[] swingAttack = new AttackDefinition[2];
@@ -212,6 +218,21 @@ public class GameView extends SurfaceView
      * adversário que espera. Não para a luta. Padrão: docs/historia/motor-conversas.md.
      */
     private ConversaLuta conversa;
+    /**
+     * O narrador do torneio: fala o que acontece na luta numa faixa de transmissão no rodapé
+     * (sem parar a luta). Só nas lutas de verdade (batalha, Arcade e as lutas do torneio na
+     * história). Padrão: docs/historia/narrador.md.
+     */
+    private com.gamelutagpt.historia.Narracao narracao;
+    private final NarradorLuta narradorLuta = new NarradorLuta();
+    private boolean narracaoPronta;
+    /** O narrador em pessoa no cenário, atrás dos lutadores (placeholder animado). */
+    private final com.gamelutagpt.historia.NarradorPalco narradorPalco = new com.gamelutagpt.historia.NarradorPalco();
+    /** Luta narrada: o narrador está no palco. */
+    private boolean narradorNoPalco;
+    /** A câmera deste quadro é a da luta (sem close de Super, Ultra, soco de câmera ou cinemática). */
+    private boolean cameraDaLuta;
+    private final Runnable desenhaNarradorPalco = this::drawNarradorPalco;
     /** Lição do treino que já teve a fala da conversa (-1: nenhuma). */
     private int conversaLicao = -1;
     /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
@@ -305,8 +326,6 @@ public class GameView extends SurfaceView
 
     // Team HUD labels (the rules live in the engine's TeamSystem).
     private String tagCooldownHudLabel = "ASSIST: PRONTO";
-    private String assistHudStatus = "ASSIST: PRONTO";
-    private String swapHudStatus = "TROCA: PRONTA (↓+TAG)";
     private String tagCooldownButtonLabel = "";
     private int shownAssistTenths = -2;
     private int shownTagSeconds = -2;
@@ -380,11 +399,81 @@ public class GameView extends SurfaceView
         hardware.reset();
         pad.reset();
         releaseAllPointers();
+        // O app saiu da tela (pausa da Activity): os dedos de antes não contam mais; ao voltar,
+        // o direcional só vale com um toque novo (nada de andar sozinho).
+        touchCount = 0;
     }
 
     private void releaseAllPointers() {
         dpadPointer = lightPointer = mediumPointer = heavyPointer = comboPointer = tagPointer = throwPointer = pushblockPointer = overdrivePointer = superPointer = -1;
         healPlayerPointer = healOpponentPointer = -1;
+    }
+
+    // Dedos na tela agora (coordenadas virtuais), sempre atualizados, com qualquer tela aberta:
+    // o controle zera em várias horas (cena, página, troca de luta) e o dedo que continuou
+    // no direcional volta a valer sozinho, sem tirar e apertar de novo.
+    private static final int MAX_TOUCHES = 10;
+    private final int[] touchIds = new int[MAX_TOUCHES];
+    private final float[] touchX = new float[MAX_TOUCHES], touchY = new float[MAX_TOUCHES];
+    private int touchCount;
+
+    /** Anota onde está cada dedo (e quais saíram) a cada evento de toque. */
+    private void trackTouches(MotionEvent event, int action, int index, float sx, float sy) {
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            touchCount = 0;
+            return;
+        }
+        touchCount = 0;
+        for (int i = 0; i < event.getPointerCount() && touchCount < MAX_TOUCHES; i++) {
+            if (action == MotionEvent.ACTION_POINTER_UP && i == index) continue;
+            touchIds[touchCount] = event.getPointerId(i);
+            touchX[touchCount] = event.getX(i) / sx;
+            touchY[touchCount] = event.getY(i) / sy;
+            touchCount++;
+        }
+    }
+
+    private int touchSlot(int pointerId) {
+        for (int i = 0; i < touchCount; i++) if (touchIds[i] == pointerId) return i;
+        return -1;
+    }
+
+    private boolean ownedByButton(int pointerId) {
+        return pointerId == lightPointer || pointerId == mediumPointer || pointerId == heavyPointer ||
+            pointerId == comboPointer || pointerId == tagPointer || pointerId == throwPointer ||
+            pointerId == pushblockPointer || pointerId == overdrivePointer || pointerId == superPointer ||
+            pointerId == healPlayerPointer || pointerId == healOpponentPointer;
+    }
+
+    /**
+     * Uma vez por quadro: solta os botões e o direcional de dedos que já saíram da tela (a
+     * soltura pode ter chegado com uma tela por cima, que não repassa o toque) e, na luta,
+     * devolve o direcional ao dedo que está em cima dele sem dono (depois de o controle ter
+     * zerado, ou de um dedo que escorregou para dentro dele).
+     */
+    private void syncHeldTouches() {
+        if (dpadPointer != -1 && touchSlot(dpadPointer) < 0) {
+            dpadPointer = -1;
+            pad.setDirection(0);
+        }
+        if (lightPointer != -1 && touchSlot(lightPointer) < 0) lightPointer = -1;
+        if (mediumPointer != -1 && touchSlot(mediumPointer) < 0) mediumPointer = -1;
+        if (heavyPointer != -1 && touchSlot(heavyPointer) < 0) heavyPointer = -1;
+        if (comboPointer != -1 && touchSlot(comboPointer) < 0) comboPointer = -1;
+        if (tagPointer != -1 && touchSlot(tagPointer) < 0) tagPointer = -1;
+        if (throwPointer != -1 && touchSlot(throwPointer) < 0) throwPointer = -1;
+        if (pushblockPointer != -1 && touchSlot(pushblockPointer) < 0) pushblockPointer = -1;
+        if (overdrivePointer != -1 && touchSlot(overdrivePointer) < 0) overdrivePointer = -1;
+        if (superPointer != -1 && touchSlot(superPointer) < 0) superPointer = -1;
+        if (healPlayerPointer != -1 && touchSlot(healPlayerPointer) < 0) healPlayerPointer = -1;
+        if (healOpponentPointer != -1 && touchSlot(healOpponentPointer) < 0) healOpponentPointer = -1;
+        if (dpadPointer != -1 || !touchControls || !fightClockRunning()) return;
+        for (int i = 0; i < touchCount; i++) {
+            if (ownedByButton(touchIds[i]) || !ControlsLayout.dpadCaptures(touchX[i], touchY[i])) continue;
+            dpadPointer = touchIds[i];
+            pad.setDirection(ControlsLayout.dpadDirectionAt(touchX[i], touchY[i]));
+            return;
+        }
     }
 
     /** Frees the sound pool when the Activity is destroyed. */
@@ -413,6 +502,7 @@ public class GameView extends SurfaceView
         storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
+        pausa.setFps(speedPrefs.getBoolean(FPS_KEY, true));
         pausa.setNivelCpu(speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO));
         pausa.setGraficos(new MenuPausa.Graficos() {
             @Override public String rotulo(java.util.function.UnaryOperator<String> traduzir) {
@@ -450,6 +540,7 @@ public class GameView extends SurfaceView
         menuInicial.setVersao(VERSION_HUD_LABEL);
         menuArcade = new MenuArcade(ultraAssets);
         conversa = new ConversaLuta(ultraAssets);
+        narracao = new com.gamelutagpt.historia.Narracao(ultraAssets);
         cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
         stageId = DEFAULT_STAGE;
         holder = getHolder();
@@ -1131,12 +1222,31 @@ public class GameView extends SurfaceView
             openMainMenu();
         }
         surfaceReady = true;
-        if (qualidade.escala() < 0.999f) aplicarQualidade();
+        // Sempre: até no ALTO a resolução tem teto (tela 1440p+ desenhava 2–4× os pixels à toa).
+        aplicarQualidade();
         startLoopIfReady();
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {}
+
+    /**
+     * Direcional e botões ficam colados nas bordas da tela: no Android com navegação por
+     * gestos, o polegar que escorrega para a borda vira o gesto de voltar e o sistema cancela
+     * o toque (o dedo para de valer até sair e voltar). Essas áreas ficam fora dos gestos.
+     */
+    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (android.os.Build.VERSION.SDK_INT < 29 || w == 0 || h == 0) return;
+        float sx = w / VW, sy = h / VH;
+        float r = ControlsLayout.DPAD_CAPTURE_RADIUS;
+        java.util.List<android.graphics.Rect> rects = new java.util.ArrayList<>();
+        rects.add(new android.graphics.Rect(0, Math.round((ControlsLayout.DPAD_Y - r) * sy),
+            Math.round((ControlsLayout.DPAD_X + r) * sx), h));
+        rects.add(new android.graphics.Rect(Math.round((ControlsLayout.HEAVY_X - ControlsLayout.ATTACK_RADIUS - 20f) * sx),
+            Math.round((ControlsLayout.MEDIUM_Y - ControlsLayout.ATTACK_RADIUS - 20f) * sy), w, h));
+        setSystemGestureExclusionRects(rects);
+    }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
@@ -1196,8 +1306,8 @@ public class GameView extends SurfaceView
             if (!running) break;
             drawFrame();
             if (perfil.fim() && qualidade.janela(perfil.fps(), perfil.fracaoLuta())) {
-                Log.i(PerfilQuadros.TAG, "gráficos desceram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
-                    + " (luta abaixo de " + Math.round(QualidadeGrafica.FPS_MINIMO) + " fps)");
+                Log.i(PerfilQuadros.TAG, "gráficos mudaram para " + QualidadeGrafica.NOMES[qualidade.nivel()]
+                    + " (luta a " + Math.round(perfil.fps()) + " fps)");
                 aplicarQualidade();
             }
             long remaining = targetFrame - (System.nanoTime() - frameStart);
@@ -1218,6 +1328,17 @@ public class GameView extends SurfaceView
         // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
         // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
         // pausa, seleção, páginas da história e a Página Final ficam na velocidade normal.
+        if (fightClockRunning()) {
+            // Rede de segurança: o Ultra acabou sem passar pelo golpe final.
+            if (finalizacao.segurando() && !ultraEmAndamento()) finalizacao.liberar();
+            if (finalizacao.pronta()) {
+                // A tela ficou livre e chegou o golpe final: o quadro de mangá entra.
+                finalizacao.comecar();
+                feel.slow(FinalizacaoManga.LENTA_QUADROS, FinalizacaoManga.LENTA_ESCALA);
+                beamShake = Math.max(beamShake, FinalizacaoManga.TREMIDA);
+            }
+            finalizacao.atualizar(clamp(elapsedSeconds, 0f, 0.10f) * pausa.velocidade());
+        }
         float speed = fightClockRunning() ? pausa.velocidade() * feel.timeScale() : 1f;
         accumulatedTime += clamp(elapsedSeconds, 0f, 0.10f) * speed;
         while (accumulatedTime + 0.000001f >= FIXED_STEP) {
@@ -1317,7 +1438,10 @@ public class GameView extends SurfaceView
 
     /** One simulation frame: inputs, engine step, then presentation state. */
     private void update() {
-        if (stageScene != null) stageScene.update(FIXED_STEP);
+        if (stageScene != null) {
+            stageScene.update(FIXED_STEP);
+            updateTrovao();
+        }
         if (menuInicial.isOpen()) {
             // A luta fica parada (e escondida) atrás do menu.
             pad.drainInto(ignoredInput);
@@ -1481,21 +1605,28 @@ public class GameView extends SurfaceView
         if (stageScene != null) {
             for (String reaction : tutorial.reactions()) stageScene.react(reaction);
         }
+        updateGritoDaTroca();
         updateConversa();
+        updateNarracao();
         updateCinematica(intro);
         // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
         if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
-        boolean punishNow = engine.cues().contains("PUNISH");
+        // A voadora da troca que acerta gira o rival como o punish: mesmo impacto e tremor.
+        boolean punishNow = engine.cues().contains("PUNISH") || engine.cues().contains("SPIN");
         for (CombatEngine.HitEvent event : engine.events()) {
             boolean ultraHit = ultraAttacker >= 0 && event.attacker == ultraAttacker && !event.blocked &&
                 "ULTRA".equals(event.moveId);
             if (ultraHit) ultraDamageDealt += event.damage;
             if ("THROW".equals(event.moveId)) showBanner("AGARRÃO!");
             CombatFighter hitFighter = engine.fighter(event.defender);
-            boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter;
+            // Zerado no meio do Ultra: o K.O. (câmera lenta, close, finalização) fica para o golpe final.
+            boolean knockout = !event.blocked && hitFighter.ko() && koVictim != hitFighter &&
+                !engine.ultraHoldsKo(event.defender);
             if (knockout) koVictim = hitFighter;
+            if (knockout) pedirFinalizacao(FinalizacaoManga.tipoDoGolpe(event.moveId, event.strength),
+                event.attacker, event.defender);
             spawnImpact(event, ultraHit, punishNow, knockout);
             if (event.defender == OPPONENT && !event.blocked) {
                 dummyDamageLabel = "-" + (ultraHit ? ultraDamageDealt : event.damage);
@@ -1506,7 +1637,8 @@ public class GameView extends SurfaceView
             String banner = bannerFor(cue);
             if (banner != null) showBanner(banner);
             // Bounces shake the screen like the beam's hits.
-            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue)) {
+            if ("WALL_BOUNCE".equals(cue) || "GROUND_BOUNCE".equals(cue) || "PUNISH".equals(cue) ||
+                "SPIN".equals(cue)) {
                 beamShake = Math.max(beamShake, 14f);
             }
             if ("GROUND_BOUNCE".equals(cue)) {
@@ -1522,6 +1654,8 @@ public class GameView extends SurfaceView
             if ("COMBO_BREAKER".equals(cue)) spawnComboBreaker();
             if ("OVERHEAD".equals(cue)) spawnOverheadWarning();
             if ("ULTRA_FINISH".equals(cue)) {
+                // O último golpe do Ultra em sequência: a finalização de mangá entra aqui.
+                finalizacao.liberar();
                 beamShake = Math.max(beamShake, 22f);
                 // Último dano do Ultra em sequência: impact frame em quem apanhou e câmera lenta.
                 feel.slow(ImpactFeel.ULTRA_SLOW_FRAMES, ultraSlowScale);
@@ -1529,6 +1663,7 @@ public class GameView extends SurfaceView
                 if (pausa.impacto() && hit != null) feel.impactFrame(ultraFinalImpact, hit.x, chestY(hit));
             }
         }
+        updateBreakerSkid();
         for (CombatEngine.ProjectileClash clash : engine.clashes()) spawnClash(clash);
         updateUltraBeam();
         impacts.update(FIXED_STEP);
@@ -1582,6 +1717,7 @@ public class GameView extends SurfaceView
         hud.resetEffects();
         impacts.clear();
         feel.clear();
+        finalizacao.limpar();
         koVictim = null;
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
@@ -1592,6 +1728,10 @@ public class GameView extends SurfaceView
         introFrame = introTotalFrames > 0 ? 0 : -1;
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
+        narradorLuta.reset();
+        gritoDaTroca.reset();
+        narradorPalco.reset();
+        if (narracao != null) narracao.stop();
     }
 
     private final HudRenderer.State hudState = new HudRenderer.State() {
@@ -1628,8 +1768,6 @@ public class GameView extends SurfaceView
         }
         @Override public int presentationEpoch() { return demo.demo() * 100 + demo.stepIndex(); }
         @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
-        @Override public String assistStatusLabel() { return assistHudStatus; }
-        @Override public String swapStatusLabel() { return swapHudStatus; }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
         @Override public String tagButtonTitle() {
@@ -1839,7 +1977,55 @@ public class GameView extends SurfaceView
 
     @Override
     public void onUltraHit(int hitIndex, float damageFraction) {
-        ultraDamageDealt += engine.applyUltraHit(ultraAttacker, Math.round(ultraTotalDamage() * damageFraction));
+        int dealt = engine.applyUltraHit(ultraAttacker, Math.round(ultraTotalDamage() * damageFraction));
+        ultraDamageDealt += dealt;
+        // Os acertos da página saem fora do passo da luta: o K.O. aqui não passa pelos eventos.
+        CombatFighter victim = engine.fighter(1 - ultraAttacker);
+        if (dealt > 0 && victim.ko()) pedirFinalizacao(FinalizacaoManga.ULTRA, ultraAttacker, victim.index);
+    }
+
+    /**
+     * O golpe {@code tipo} de {@code attacker} derrubou {@code defender}: se o time dele caiu
+     * inteiro (matou e ganhou a luta) com Super ou Ultra, a finalização de mangá.
+     */
+    private void pedirFinalizacao(int tipo, int attacker, int defender) {
+        if (tipo == FinalizacaoManga.NENHUM || !engine.teams.defeated(defender)) return;
+        finalizacao.pedir(tipo, defender, attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color);
+        // K.O. no meio do Ultra (na página, num golpe da sequência, num acerto do raio): espera
+        // o golpe final dele, que é o que fecha a luta na tela.
+        if (tipo == FinalizacaoManga.ULTRA && ultraEmAndamento()) finalizacao.segurar();
+    }
+
+    /** Relâmpagos do cenário já ouvidos e quadros até o trovão do último. */
+    private int relampagosOuvidos, trovaoEm = -1;
+    private com.gamelutagpt.stage.StageScene trovaoCena;
+
+    /** Relâmpago novo no cenário: o trovão chega um pouco depois do clarão, como de verdade. */
+    private void updateTrovao() {
+        int strikes = stageScene.strikes();
+        if (stageScene != trovaoCena) {
+            // Cenário novo: a contagem dele começa de novo, sem trovão atrasado do anterior.
+            trovaoCena = stageScene;
+            relampagosOuvidos = strikes;
+            trovaoEm = -1;
+        }
+        if (strikes != relampagosOuvidos) {
+            relampagosOuvidos = strikes;
+            trovaoEm = 12 + soundRandom.nextInt(36);
+        }
+        if (trovaoEm >= 0 && trovaoEm-- == 0) {
+            ultraSounds.playFight("trovao", 0.55f, 0.9f + soundRandom.nextFloat() * 0.2f);
+        }
+    }
+
+    /** Algum lado está no Ultra: na página, no raio ou nos golpes da sequência. */
+    private boolean ultraEmAndamento() {
+        if (ultraAttacker >= 0 || paginaFinal.isActive()) return true;
+        for (int side = 0; side < 2; side++) {
+            CombatFighter f = engine.fighter(side);
+            if (f.status == CombatFighter.Status.ULTRA || f.firingBeam() || f.inUltraSequence()) return true;
+        }
+        return false;
     }
 
     @Override
@@ -1899,6 +2085,8 @@ public class GameView extends SurfaceView
             beamHitsSeen = a.beamHitsDone;
             if (beamHitsSeen > a.beamHits) {
                 beamBlastClock = beamClock;
+                // A explosão do raio é o golpe final: a finalização de mangá entra aqui.
+                finalizacao.liberar();
                 beamShake = 26f;
                 ultraSounds.play(ultraAttackerFolder(), "explosao");
                 // A explosão do raio é o último dano do Ultra: impact frame em quem apanhou.
@@ -2078,6 +2266,10 @@ public class GameView extends SurfaceView
         else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
         if (knockout) beamShake = Math.max(beamShake, 18f);
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
+        // A plateia do cenário vibra com o golpe (forte no pesado, festa no KO).
+        if (!event.blocked && stageScene != null) {
+            stageScene.cheer(knockout ? 1f : size >= ImpactEffects.HEAVY ? 0.65f : size == ImpactEffects.MEDIUM ? 0.35f : 0.15f);
+        }
         if (!event.blocked && pausa.impacto()) feel.impactFrame(impactStyleFor(event, defender, size, punish, knockout), x, y);
         if (!event.blocked && !ultraHit && ultraAttacker < 0 && !isSuperCinematicActive() &&
             (knockout || bigBlow(attacker, defender))) {
@@ -2126,10 +2318,14 @@ public class GameView extends SurfaceView
      * Combo breaker: brilho na cor de quem quebrou no peito dele, estalo em quem teve o combo
      * quebrado, tremida e o som do punish.
      */
+    static final int BREAKER_SLOW_FRAMES = 36;
+    static final float BREAKER_SLOW_SCALE = 0.5f;
+
     private void spawnComboBreaker() {
         for (int side = 0; side < 2; side++) {
             CombatFighter breaker = engine.fighter(side), broken = engine.fighter(1 - side);
             if (!breaker.comboBroke || !broken.inHitstun() || broken.stunElapsed > 0) continue;
+            breakerSkid = 1 - side;
             int accent = breaker.state.profile.color;
             impacts.spawnSuperGlint(breaker.x, chestY(breaker), accent);
             int direction = broken.x >= breaker.x ? 1 : -1;
@@ -2137,14 +2333,39 @@ public class GameView extends SurfaceView
         }
         beamShake = Math.max(beamShake, 16f);
         ultraSounds.playFight("punish", 1f, 1.15f);
+        // Câmera lenta leve: dá para ver o que aconteceu (o golpe que não entrou e o estalo).
+        feel.slow(BREAKER_SLOW_FRAMES, BREAKER_SLOW_SCALE);
     }
 
-    /** Golpe alto saindo: o brilho de aviso na cabeça de quem bate (dá para ler e ficar em pé). */
+    /** Quem teve o combo quebrado e está deslizando para trás (fumacinha do pé), ou -1. */
+    private int breakerSkid = -1;
+
+    /** Enquanto o estalo do combo breaker o empurra no chão, o pé arrasta e solta fumacinha. */
+    private void updateBreakerSkid() {
+        if (breakerSkid < 0) return;
+        CombatFighter f = engine.fighter(breakerSkid);
+        if (f.frozen()) return;
+        if (f.pushFramesLeft <= 0 || !f.inHitstun()) {
+            breakerSkid = -1;
+            return;
+        }
+        if (!f.grounded || f.pushFramesLeft % 2 != 0) return;
+        float offset = breakerSkid == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT);
+        int direction = f.pushRemaining >= 0f ? 1 : -1;
+        // Os dois pés: o de trás vai na frente do deslize, o da frente fica para trás.
+        impacts.spawnSkid(f.x + offset + direction * 16f, GROUND_Y, direction);
+        impacts.spawnSkid(f.x + offset - direction * 18f, GROUND_Y, direction);
+    }
+
+    /**
+     * Golpe alto saindo: um brilho pequeno e curto perto da cabeça de quem bate (dá para ler e
+     * ficar em pé). O aviso principal é a pose de preparo segurada.
+     */
     private void spawnOverheadWarning() {
         for (int side = 0; side < 2; side++) {
             CombatFighter f = engine.fighter(side);
             if (!f.attacking() || !f.attack.overhead || f.attackFrame > 1) continue;
-            impacts.spawnSuperGlint(f.x + f.facing * f.body().halfWidth * .5f, visualTop(f) + 16f, 0xFFFFD84A);
+            impacts.spawnWarningGlint(f.x + f.facing * f.body().halfWidth * .4f, visualTop(f) + 24f, 0xFFFFE9A0);
         }
     }
 
@@ -2258,8 +2479,9 @@ public class GameView extends SurfaceView
         }
     }
 
+    /** A troca do jogador no desenho (a voadora da entrada já é luta: o CPU defende ou tira do ar). */
     private boolean isTagAnimationActive() {
-        return engine.team(PLAYER).tagging();
+        return engine.team(PLAYER).tagAnimating();
     }
 
     /** Sprite offset of the point during a raw tag (it runs off screen and back). */
@@ -2312,8 +2534,6 @@ public class GameView extends SurfaceView
         int tagSeconds = (int)Math.ceil(team.tagCooldown / (float)CombatConfig.FPS);
         if (isTagAnimationActive()) {
             tagCooldownHudLabel = "TROCA: EM ANDAMENTO";
-            assistHudStatus = "ASSIST: INDISPONIVEL";
-            swapHudStatus = "TROCA: EM ANDAMENTO";
             tagCooldownButtonLabel = "...";
             shownAssistTenths = shownTagSeconds = -2;
             return;
@@ -2325,8 +2545,6 @@ public class GameView extends SurfaceView
             : assistTenths == 0 ? "ASSIST: PRONTO"
             : String.format(Locale.US, "ASSIST: %.1fs", assistTenths / 10f);
         String tag = tagSeconds == 0 ? "  •  \u2193+TAG: TROCA" : "  •  TROCA: " + tagSeconds + "s";
-        assistHudStatus = assist;
-        swapHudStatus = tagSeconds == 0 ? "TROCA: PRONTA (↓+TAG)" : "TROCA: " + tagSeconds + "s";
         tagCooldownHudLabel = assist + tag;
         tagCooldownButtonLabel = assistTenths > 0 ? Integer.toString((assistTenths + 9) / 10) : "";
     }
@@ -2458,11 +2676,52 @@ public class GameView extends SurfaceView
 
         try {
             renderFrame(canvas);
+            if (pausa.fps()) drawFpsCounter(canvas);
             perfil.marca(PerfilQuadros.TELA);
         } finally {
             holder.unlockCanvasAndPost(canvas);
             perfil.marca(PerfilQuadros.ENVIO);
         }
+    }
+
+    // Contador de FPS (pausa > FPS): quadros desenhados por segundo, o nível de gráficos e a
+    // altura em que o jogo está desenhando. Conta a cada 0,5 s; o texto só muda aí (sem alocar
+    // por quadro).
+    private static final long FPS_JANELA_NS = 500_000_000L;
+    private long fpsInicio = System.nanoTime();
+    private int fpsQuadros;
+    private float fpsAtual = -1f;
+    private String fpsTexto = "";
+    private final Paint fpsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final RectF fpsCaixa = new RectF();
+
+    private void drawFpsCounter(Canvas canvas) {
+        fpsQuadros++;
+        long agora = System.nanoTime();
+        if (agora - fpsInicio >= FPS_JANELA_NS) {
+            fpsAtual = fpsQuadros * 1e9f / (agora - fpsInicio);
+            fpsQuadros = 0;
+            fpsInicio = agora;
+            String nivel = QualidadeGrafica.NOMES[qualidade.nivel()];
+            if (qualidade.modo() == QualidadeGrafica.Modo.AUTO) nivel = "AUTO " + nivel;
+            fpsTexto = Math.round(fpsAtual) + " FPS  ·  " + nivel + "  ·  " + canvas.getHeight() + "p";
+        }
+        if (fpsAtual < 0f) return;
+        canvas.save();
+        canvas.scale(canvas.getWidth() / VW, canvas.getHeight() / VH);
+        fpsPaint.setTextSize(17f);
+        fpsPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        fpsPaint.setTextAlign(Paint.Align.CENTER);
+        float w = fpsPaint.measureText(fpsTexto) + 22f;
+        float cx = VW * 0.5f, top = VH - 34f;
+        fpsCaixa.set(cx - w * 0.5f, top, cx + w * 0.5f, top + 26f);
+        fpsPaint.setStyle(Paint.Style.FILL);
+        fpsPaint.setColor(0xB0000000);
+        canvas.drawRoundRect(fpsCaixa, 8f, 8f, fpsPaint);
+        // Verde a 55+, amarelo a 45+, vermelho abaixo.
+        fpsPaint.setColor(fpsAtual >= 55f ? 0xFF6CFF7A : fpsAtual >= 45f ? 0xFFFFD84A : 0xFFFF5A5A);
+        canvas.drawText(fpsTexto, cx, top + 19f, fpsPaint);
+        canvas.restore();
     }
 
     private void prepararRostosDoHud(CharacterDefinition... lutadores) {
@@ -2484,10 +2743,11 @@ public class GameView extends SurfaceView
         final float escala = qualidade.escala();
         post(() -> {
             int w = getWidth(), h = getHeight();
-            if (escala >= 0.999f || w <= 0 || h <= 0) {
+            float e = QualidadeGrafica.escalaDaTela(escala, Math.min(w, h));
+            if (e >= 0.999f || w <= 0 || h <= 0) {
                 holder.setSizeFromLayout();
             } else {
-                holder.setFixedSize(Math.max(320, Math.round(w * escala)), Math.max(180, Math.round(h * escala)));
+                holder.setFixedSize(Math.max(320, Math.round(w * e)), Math.max(180, Math.round(h * e)));
             }
         });
     }
@@ -2614,6 +2874,7 @@ public class GameView extends SurfaceView
                 renderCameraTop += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
             }
             boolean beam = ultraBeamActive();
+            cameraDaLuta = !ultraShotActive && renderZoom == camera.zoom && focoJogador <= 0f && focoRival <= 0f;
 
             renderCanvas.begin(canvas);
             // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
@@ -2631,17 +2892,33 @@ public class GameView extends SurfaceView
                 perfil.marca(PerfilQuadros.TELA);
                 stageScene.setDetalhe(!qualidade.efeitosLeves());
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
-                stageScene.drawBackground(renderCanvas);
+                if (narradorNoPalco) {
+                    stageScene.drawBackground(renderCanvas, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
+                        desenhaNarradorPalco);
+                } else {
+                    stageScene.drawBackground(renderCanvas);
+                }
             }
 
             canvas.save();
             canvas.scale(renderZoom, renderZoom);
             canvas.translate(-cameraLeft, -renderCameraTop);
-            if (stageScene == null) drawScenario(canvas);
+            if (stageScene == null) {
+                drawScenario(canvas);
+                if (narradorNoPalco) {
+                    // Sem o palco 3D: um pouco acima do chão dos lutadores e menor.
+                    if (cameraDaLuta) {
+                        narradorPalco.alvo(player().x + tagOffset(), opponent().x + engine.teams.tagOffset(OPPONENT),
+                            cameraLeft, cameraLeft + visibleWorldWidth);
+                    }
+                    narradorPalco.render(renderCanvas, narradorPalco.x(), GROUND_Y - 28f, 0.75f);
+                }
+            }
             drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
             // Golpe forte: o cenário escurece por um instante e os lutadores ficam na frente.
             effects.drawWorldOverlay(canvas, paint, feel.darkAlpha(), 0, 0, 8);
+            if (finalizacao.ativo()) drawFinalizacao(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (beam) {
                 drawUltraBeamOverlay(canvas, false);
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
@@ -2696,7 +2973,8 @@ public class GameView extends SurfaceView
             if (debugOverlay) debug.drawWorld(canvas, engine);
             canvas.restore();
             perfil.marca(PerfilQuadros.LUTA);
-            if (stageScene != null) stageScene.drawForeground(renderCanvas);
+            // Na finalização a frente do cenário some junto com o resto dele.
+            if (stageScene != null && finalizacao.forca() <= 0f) stageScene.drawForeground(renderCanvas);
             perfil.marca(PerfilQuadros.FRENTE);
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
@@ -2727,6 +3005,7 @@ public class GameView extends SurfaceView
                 if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
                 cinematica.renderFaixas(renderCanvas);
                 conversa.render(renderCanvas);
+                if (narracao != null && faixas < 0.5f) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
             }
             if (abertura.isActive()) abertura.render(renderCanvas);
@@ -3398,23 +3677,84 @@ public class GameView extends SurfaceView
         canvas.restore();
     }
 
+    private static final int FINAL_PAPEL = 0xFFF1EBDA, FINAL_TINTA = 0xFF141218, FINAL_PRETO = 0xFF08080C;
+
+    /**
+     * Finalização de mangá ({@link FinalizacaoManga}): fundo chapado cobrindo o cenário e linhas
+     * de concentração convergindo em quem caiu, atrás dos lutadores. Desenhada no mundo, com
+     * os tamanhos em pixels de tela (divididos pelo zoom).
+     */
+    private void drawFinalizacao(Canvas canvas, float zoom, float left, float top) {
+        float k = finalizacao.forca();
+        int side = finalizacao.vitima();
+        if (k <= 0f || side < 0) return;
+        boolean ultra = finalizacao.tipo() == FinalizacaoManga.ULTRA;
+        int alpha = Math.round(255f * k);
+        float w = VW / zoom, h = VH / zoom;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(comAlfa(ultra ? FINAL_PRETO : FINAL_PAPEL, alpha));
+        // Sobra em volta para o close inclinado e a tremida.
+        canvas.drawRect(left - w * 0.4f, top - h * 0.4f, left + w * 1.4f, top + h * 1.4f, paint);
+        CombatFighter v = engine.fighter(side);
+        // No peito de quem caiu, mas dentro da tela (o raio do Ultra joga o rival para fora dela).
+        float x = clamp(v.x + (side == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)),
+            left + w * 0.18f, left + w * 0.82f);
+        float y = clamp(chestY(v), top + h * 0.25f, top + h * 0.8f);
+        finalizacaoLinhas.setSeed(finalizacao.semente() * 7919L + 17L);
+        // Muitos traços finos e algumas cunhas grossas, como o 集中線 desenhado à mão.
+        int tinta = comAlfa(ultra ? Color.WHITE : FINAL_TINTA, alpha);
+        drawLinhasDeConcentracao(canvas, x, y, zoom, tinta, 190, 1.6f);
+        drawLinhasDeConcentracao(canvas, x, y, zoom, tinta, ultra ? 50 : 64, 14f);
+        if (ultra) drawLinhasDeConcentracao(canvas, x, y, zoom, comAlfa(finalizacao.cor(), alpha), 46, 9f);
+    }
+
+    /**
+     * Linhas de concentração do mangá: cunhas que vêm da borda da tela e afinam até a ponta,
+     * deixando um miolo vazio em volta de (x, y). Larguras e tamanhos em pixels de tela.
+     */
+    private void drawLinhasDeConcentracao(Canvas canvas, float x, float y, float zoom, int color, int count,
+                                          float maxWidth) {
+        Random r = finalizacaoLinhas;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(color);
+        float outer = 1800f / zoom;
+        // Todas as cunhas num caminho só: um desenho por cor (antes, um por cunha: centenas).
+        impactPath.reset();
+        for (int i = 0; i < count; i++) {
+            double a = r.nextDouble() * Math.PI * 2;
+            float inner = (170f + r.nextFloat() * r.nextFloat() * 260f) / zoom;
+            float t = r.nextFloat();
+            float half = (0.8f + t * t * maxWidth) / zoom;
+            float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
+            impactPath.moveTo(x + cos * inner, y + sin * inner);
+            impactPath.lineTo(x + cos * outer - sin * half, y + sin * outer + cos * half);
+            impactPath.lineTo(x + cos * outer + sin * half, y + sin * outer - cos * half);
+            impactPath.close();
+        }
+        canvas.drawPath(impactPath, paint);
+    }
+
+    private static int comAlfa(int color, int alpha) {
+        return (Math.max(0, Math.min(255, alpha)) << 24) | (color & 0x00FFFFFF);
+    }
+
     /** Linhas finas no centro e largas na borda, apontando para o impacto. */
     private void drawSpeedLines(Canvas canvas, float x, float y, int color, int count, float maxWidth) {
         Random lines = new Random(feel.impactSeed() * 7919L);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
+        impactPath.reset();
         for (int i = 0; i < count; i++) {
             double a = lines.nextDouble() * Math.PI * 2;
             float r0 = 150f + lines.nextFloat() * 160f, r1 = 2200f;
             float w = (1f + lines.nextFloat() * (maxWidth - 1f)) * 3f;
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
-            impactPath.reset();
             impactPath.moveTo(x + cos * r0, y + sin * r0);
             impactPath.lineTo(x + cos * r1 - sin * w, y + sin * r1 + cos * w);
             impactPath.lineTo(x + cos * r1 + sin * w, y + sin * r1 - cos * w);
             impactPath.close();
-            canvas.drawPath(impactPath, paint);
         }
+        canvas.drawPath(impactPath, paint);
     }
 
     private void drawStar(Canvas canvas, float x, float y, float size) {
@@ -3593,6 +3933,7 @@ public class GameView extends SurfaceView
             handleTouch(latestMove);
             latestMove.recycle();
         }
+        syncHeldTouches();
     }
 
     private void clearPendingInput() {
@@ -3610,6 +3951,7 @@ public class GameView extends SurfaceView
         float sy = getHeight() / VH;
         int action = event.getActionMasked();
         int index = event.getActionIndex();
+        trackTouches(event, action, index, sx, sy);
 
         if (menuInicial.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
@@ -3724,7 +4066,9 @@ public class GameView extends SurfaceView
                     healOpponentTeam();
                     break;
                 case DPAD:
-                    // A second finger on the D-pad is ignored; the first one owns it.
+                    // A second finger on the D-pad is ignored; the first one owns it (a dono que
+                    // já saiu da tela não conta: syncHeldTouches o solta).
+                    if (dpadPointer != -1 && touchSlot(dpadPointer) < 0) dpadPointer = -1;
                     if (dpadPointer == -1) {
                         dpadPointer = pointerId;
                         pad.setDirection(ControlsLayout.dpadDirectionAt(x, y));
@@ -4031,6 +4375,9 @@ public class GameView extends SurfaceView
         // A pausa fechou: guarda a VELOCIDADE para a próxima vez que o app abrir.
         if (speedPrefs != null && speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO) != pausa.velocidade()) {
             speedPrefs.edit().putFloat(SPEED_KEY, pausa.velocidade()).apply();
+        }
+        if (speedPrefs != null && speedPrefs.getBoolean(FPS_KEY, true) != pausa.fps()) {
+            speedPrefs.edit().putBoolean(FPS_KEY, pausa.fps()).apply();
         }
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
@@ -4461,6 +4808,99 @@ public class GameView extends SurfaceView
             }
         }
         conversa.update(FIXED_STEP);
+    }
+
+    private final GritoDaTroca gritoDaTroca = new GritoDaTroca();
+
+    /**
+     * Vida de quem está lutando entrou no vermelho: o parceiro que espera grita o nome dele e
+     * "troca comigo!" no quadro da conversa do lado do time (não no tutorial nem na cena).
+     */
+    private void updateGritoDaTroca() {
+        int gritos = gritoDaTroca.update(engine);
+        if (gritos == 0 || tutorial.active() || cinematica.rodando() || demo.active() ||
+            flow.phase() != BattleFlow.Phase.FIGHT) {
+            return;
+        }
+        loadTemporada();
+        for (int side = 0; side < 2; side++) {
+            if ((gritos & (1 << side)) != 0) gritarTroca(side);
+        }
+    }
+
+    private void gritarTroca(int side) {
+        TeamSystem.Side team = engine.team(side);
+        FighterState parceiro = team.partner();
+        if (parceiro == null) return;
+        String quem = falante(parceiro.character.id);
+        String codigo = "player_base".equals(parceiro.character.id) ? "p01" : parceiro.character.id;
+        conversa.avulso(quem, codigo.toUpperCase(Locale.ROOT), parceiro.profile.color,
+            "selection/rostos/" + codigo + ".webp");
+        String nome = temporada != null ? temporada.nomeDoLutador(team.pointState().character.id) : null;
+        String texto = GritoDaTroca.texto(nome, t -> temporada != null ? temporada.t(t) : t);
+        conversa.dizer(temporada, quem, side == OPPONENT, "bravo", texto, GritoDaTroca.SEGURA);
+    }
+
+    /** Quem fala na conversa por um lutador: o id do elenco da história (com os rostos dele) ou o próprio pack. */
+    private String falante(String lutador) {
+        if (temporada != null) {
+            for (Temporada.Personagem p : temporada.elenco.values()) {
+                if (lutador.equals(p.lutador)) return p.id;
+            }
+        }
+        return lutador;
+    }
+
+    /**
+     * O narrador: nas lutas de verdade olha o que aconteceu e pede a fala; a faixa anda
+     * sempre (para sair da tela quando a luta deixa de ser narrada).
+     */
+    private void updateNarracao() {
+        if (narracao == null) return;
+        if (narracaoAtiva()) {
+            if (!narracaoPronta) {
+                narracaoPronta = true;
+                if (!narracao.carregar()) Log.w(LOG_TAG, "narrador.json não abriu");
+                if (loadTemporada()) {
+                    narracao.setTemporada(temporada);
+                    narradorLuta.setNomes(c -> {
+                        String nome = temporada != null ? temporada.nomeDoLutador(c.id) : null;
+                        return nome != null ? nome : c.displayName;
+                    });
+                }
+            }
+            narradorLuta.update(engine, flow, narracao::narrar);
+        }
+        narracao.update(FIXED_STEP);
+        narradorNoPalco = narracaoAtiva();
+        if (narradorNoPalco) {
+            narradorPalco.update(FIXED_STEP, narracao.textoAtual(), narracao.expressaoAtual(),
+                narracao.prioridadeAtual(), narracao.digitando());
+        }
+    }
+
+    /**
+     * O narrador no palco, entre o fundo e os lutadores (chamado pelo cenário na profundidade
+     * dele). Escolhe o lado só com a câmera da luta: num close ele não sai correndo.
+     */
+    private void drawNarradorPalco() {
+        float z = com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE;
+        if (cameraDaLuta) {
+            float a = stageScene.worldX(stageScene.screenX(player().x + tagOffset(), 0f), z);
+            float b = stageScene.worldX(stageScene.screenX(opponent().x + engine.teams.tagOffset(OPPONENT), 0f), z);
+            narradorPalco.alvo(a, b, stageScene.worldX(0f, z), stageScene.worldX(VW, z));
+        }
+        float x = narradorPalco.x();
+        if (Float.isNaN(x)) return;
+        narradorPalco.render(renderCanvas, stageScene.screenX(x, z), stageScene.groundScreenY(z), stageScene.scale(z));
+    }
+
+    /** Luta narrada: a batalha (IA ON), o Arcade e as lutas do torneio da história. */
+    private boolean narracaoAtiva() {
+        if (!flow.battle() || tutorial.active() || demo.active()) return false;
+        if (arcadeMode || !storyMode) return true;
+        Episodio.Passo passo = historia.waitingFight() ? historia.passo() : null;
+        return passo != null && passo.torneio;
     }
 
     /** Fim da conversa e da cinemática da luta (luta nova, fim da luta, saída da história). */

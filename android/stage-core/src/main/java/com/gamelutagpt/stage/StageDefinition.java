@@ -22,13 +22,15 @@ import java.util.Map;
  *     { "imagem": "ceu.jpg", "profundidade": 100000, "topo": -0.2, "base": 0.62, "repetir": "espelhar" },
  *     { "imagem": "pilares.png", "profundidade": 300, "noChao": true, "altura": 0.9,
  *       "x": 0.06, "repetir": "espelhar", "periodo": 0.88,
- *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ] },
+ *       "luzes": [ { "x": 0.6, "y": 0.3, "raio": 0.06, "cor": "#FFB45A", "reflexo": true } ],
+ *       "bandeiras": [ { "imagem": "bandeira.png", "x": 0.3, "y": 0.29, "largura": 0.31, "altura": 0.53 } ] },
  *     { "tipo": "neblina", "profundidade": 2600, "topo": 0.45, "base": 0.62, "cor": "#3A2A66", "alfa": 0.5 }
  *   ],
  *   "chao": { "imagem": "chao.jpg", "imagemLajotas": "chao_lajotas.jpg", "perto": -420, "longe": 560,
  *             "centroX": 700, "reflexoLutadores": 0.25 },
  *   "petalas": { "quantidade": 60, "cor": "#FFB7D5" },
- *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 }
+ *   "chuva": { "quantidade": 260, "cor": "#B8CCFF", "velocidade": 1500, "vento": -140 },
+ *   "relampagos": { "intervaloMinimo": 5, "intervaloMaximo": 12, "profundidade": 9000 }
  * }
  * </pre>
  */
@@ -69,6 +71,111 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * Uma faixa de plateia viva numa imagem ({@code "plateia"}, um objeto ou uma lista): entre
+     * {@code topo} e {@code base} (fração da altura da imagem), redesenhada em {@code colunas}
+     * colunas que pulam, cada uma no seu tempo; {@code pulo} é a altura do pulo em fração da
+     * altura da imagem. Pulam mais quando a luta esquenta ({@code StageScene.cheer}). Só o
+     * miolo da faixa pula: uma margem do tamanho do maior pulo fica parada em cima e em baixo,
+     * então a faixa precisa estar toda dentro da plateia (sem pegar grade ou parapeito).
+     */
+    public static final class Crowd {
+        public final float top, bottom, jump;
+        public final int columns;
+        /**
+         * Imagem só com a gente ({@code "mascara"}, do mesmo tamanho da camada; o resto
+         * transparente): o pulo mexe só esses pixels, e os estandartes, luzes e grades que
+         * passam pela faixa ficam parados. Null = a faixa inteira pula.
+         */
+        public final String mask;
+        /**
+         * Pontos de gente da faixa ({@code "flashes"}: [[x, y], ...] em fração da imagem), onde
+         * piscam flashes de câmera e celular; muitos mais quando a luta esquenta. Saem da
+         * máscara na montagem (tools/stage/pontos_plateia.py), então nunca caem num estandarte.
+         */
+        public final float[] flashX, flashY;
+        /**
+         * {@code "recortada"}: a gente foi tirada da imagem da camada (no lugar ficaram os
+         * assentos escuros) e só existe na {@code mascara}. Ela é desenhada sempre, inteira,
+         * e cada grupo pula livre: embaixo aparece assento vazio, não uma cópia da plateia.
+         */
+        public final boolean cutout;
+
+        Crowd(float top, float bottom, float jump, int columns, String mask, float[] flashX, float[] flashY,
+              boolean cutout) {
+            this.cutout = cutout && mask != null;
+            this.mask = mask;
+            this.flashX = flashX;
+            this.flashY = flashY;
+            this.top = top;
+            this.bottom = bottom;
+            this.jump = jump;
+            this.columns = columns;
+        }
+    }
+
+    /**
+     * Bandeira presa na imagem, balançando ao vento. Posição e tamanho em fração da imagem
+     * da camada (canto de cima à esquerda); a imagem da bandeira é o pano recortado da
+     * própria imagem (tools/stage/separar_bandeiras.py), que fica sem ele.
+     */
+    public static final class Banner {
+        public final String image;
+        public final float x, y, width, height;
+        /** Quanto a ponta de baixo vai para o lado, em fração da largura da bandeira. */
+        public final float sway;
+        /** Ondas que descem pelo pano e a força do vento (1 = normal). */
+        public final float waves, speed;
+
+        Banner(String image, float x, float y, float width, float height, float sway, float waves, float speed) {
+            this.image = image;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.sway = sway;
+            this.waves = waves;
+            this.speed = speed;
+        }
+    }
+
+    /**
+     * Água pintada na imagem que se mexe ({@code "cachoeiras"}: um objeto ou uma lista, um por
+     * folha): cachoeiras correndo ou mar agitado. A {@code imagem} é uma folha de quadros
+     * feita na montagem (tools/stage/cachoeiras.py), em blocos de {@code colunas} quadros por
+     * fileira (todos, se não disser). Cada bloco é um quadro: as áreas empilhadas, cada uma
+     * com a altura proporcional à dela e todas na largura da área mais larga (a área fica
+     * encostada à esquerda). Só os pixels de água mudam entre os quadros, então as pedras em
+     * volta não se mexem.
+     */
+    public static final class Waterfalls {
+        public final String image;
+        public final int frames, columns;
+        public final float fps;
+        /** Áreas: x, y, largura e altura em fração da imagem da camada (4 por área). */
+        public final float[] areas;
+        /**
+         * Pés das cachoeiras ({@code "espuma"}: [[x, y, largura], ...] em fração da imagem; y é
+         * onde a água bate): ali sobem borrifos, nuvens claras que crescem e somem.
+         */
+        public final float[] foam;
+        public final int foamColor;
+
+        Waterfalls(String image, int frames, int columns, float fps, float[] areas, float[] foam, int foamColor) {
+            this.image = image;
+            this.frames = frames;
+            this.columns = Math.max(1, Math.min(columns, frames));
+            this.foam = foam;
+            this.foamColor = foamColor;
+            this.fps = fps;
+            this.areas = areas;
+        }
+
+        public int count() {
+            return areas.length / 4;
+        }
+    }
+
     public static final class Layer {
         public final String id;
         public final Kind kind;
@@ -91,11 +198,46 @@ public final class StageDefinition {
         public final int fillAbove;
         /** Opacidade da cópia espelhada embaixo da base (reflexo na água), 0 = sem. */
         public final float reflection;
+        /**
+         * Profundidade da camada em que esta se apoia ({@code "apoio"}), ou NaN. Uma ilha ou um
+         * barco desenhados sobre o mar (uma imagem bem mais funda) deslizavam em cima da água
+         * quando a câmera subia; com o apoio, a base acompanha na vertical o ponto do mar em que
+         * ela está na câmera de repouso (o tamanho e o movimento para os lados continuam os da
+         * própria profundidade).
+         */
+        public final float support;
+        /**
+         * Camada que anda sozinha ({@code "deriva"}: unidades do mundo por segundo, negativo =
+         * para a esquerda), como barcos na água; com {@code repetir} os que saem de um lado
+         * voltam pelo outro. {@code "balanco"}: quanto ela sobe e desce nas ondas, em fração
+         * da altura dela.
+         */
+        public final float sail, bob;
+        /** Faixas de plateia viva da imagem ({@code "plateia"}). */
+        public final List<Crowd> crowds;
+        /** Água animada da imagem ({@code "cachoeiras"}), uma por folha. */
+        public final List<Waterfalls> waterfalls;
+        /**
+         * Neblina com {@code "fiapos"}: quantos bancos de névoa (manchas largas e baixas) cabem
+         * na largura da tela de repouso, rente à base da faixa, andando com a {@code deriva} e
+         * respirando devagar. Cobrem a linha em que ilhas e montanhas encontram o mar.
+         */
+        public final int wisps;
         /** Água: faixa de profundidades e quantidade de brilhos. */
         public final float waterNear, waterFar;
         public final int shimmer;
+        /**
+         * Água com {@code "imagem"}: textura do mar vista de cima, deitada em perspectiva entre
+         * {@code perto} e {@code longe} como o piso. {@code tamanho} é a largura de uma cópia
+         * no mundo e {@code corrente} quantas unidades por segundo ela anda para o lado.
+         */
+        public final float waterTile, drift;
+        /** Reflexo do sol na água: x na tela (câmera de repouso, no céu), cor e opacidade; x NaN = sem. */
+        public final float sunX, sunAlpha;
+        public final int sunColor;
         public final List<Light> lights;
         public final List<Fire> fires;
+        public final List<Banner> banners;
         /** Ator: pasta dele, relativa ao cenário (com o ator.json e as folhas). */
         public final String actor;
         /** Ator: espelhado (olhando para o outro lado). */
@@ -118,11 +260,23 @@ public final class StageDefinition {
             alpha = b.alpha;
             fillAbove = b.fillAbove;
             reflection = b.reflection;
+            support = b.support;
+            sail = b.sail;
+            bob = b.bob;
+            crowds = Collections.unmodifiableList(b.crowds);
+            waterfalls = Collections.unmodifiableList(new ArrayList<>(b.waterfalls));
+            wisps = b.wisps;
             waterNear = b.waterNear;
             waterFar = b.waterFar;
             shimmer = b.shimmer;
+            waterTile = b.waterTile;
+            drift = b.drift;
+            sunX = b.sunX;
+            sunAlpha = b.sunAlpha;
+            sunColor = b.sunColor;
             lights = Collections.unmodifiableList(new ArrayList<>(b.lights));
             fires = Collections.unmodifiableList(new ArrayList<>(b.fires));
+            banners = Collections.unmodifiableList(new ArrayList<>(b.banners));
             actor = b.actor;
             flip = b.flip;
         }
@@ -148,10 +302,18 @@ public final class StageDefinition {
         float alpha = 1f;
         int fillAbove;
         float reflection;
+        float support = Float.NaN;
+        float sail, bob;
+        final List<Crowd> crowds = new ArrayList<>();
+        final List<Waterfalls> waterfalls = new ArrayList<>();
+        int wisps;
         float waterNear = Float.NaN, waterFar = Float.NaN;
         int shimmer;
+        float waterTile = 1600f, drift, sunX = Float.NaN, sunAlpha;
+        int sunColor;
         final List<Light> lights = new ArrayList<>();
         final List<Fire> fires = new ArrayList<>();
+        final List<Banner> banners = new ArrayList<>();
         String actor;
         boolean flip;
     }
@@ -171,9 +333,16 @@ public final class StageDefinition {
         public final float fighterReflection;
         /** Opacidade do reflexo das luzes no piso. */
         public final float lightReflection;
+        /**
+         * Até onde o chão continua atrás do piso ({@code "ate"}), repetindo a imagem lisa na
+         * profundidade; igual a {@code far} = o piso acaba na borda de cima da imagem. Para
+         * o chão de uma arena ir do ringue até a arquibancada, lá no fundo.
+         */
+        public final float extent;
 
         Floor(String image, String plainImage, float near, float far, float centerX,
-              float fighterReflection, float lightReflection) {
+              float fighterReflection, float lightReflection, float extent) {
+            this.extent = Math.max(far, extent);
             this.image = image;
             this.plainImage = plainImage;
             this.near = near;
@@ -231,6 +400,35 @@ public final class StageDefinition {
         }
     }
 
+    /**
+     * Relâmpagos: de vez em quando um raio em zigue-zague cai no céu numa profundidade (atrás da
+     * cidade, que fica recortada contra o clarão), o céu clareia piscando duas vezes e o
+     * cenário todo clareia um pouco.
+     */
+    public static final class Lightning {
+        /** Intervalo entre relâmpagos, em segundos (sorteado entre os dois). */
+        public final float minInterval, maxInterval;
+        /** Profundidade do raio: o clarão do céu cobre o que está atrás dela. */
+        public final float depth;
+        /** Topo e base do raio na tela de repouso (frações). */
+        public final float top, bottom;
+        public final int color;
+        /** Opacidade do clarão no céu e no cenário todo (0 a 1). */
+        public final float skyFlash, sceneFlash;
+
+        Lightning(float minInterval, float maxInterval, float depth, float top, float bottom, int color,
+                  float skyFlash, float sceneFlash) {
+            this.minInterval = minInterval;
+            this.maxInterval = maxInterval;
+            this.depth = depth;
+            this.top = top;
+            this.bottom = bottom;
+            this.color = color;
+            this.skyFlash = skyFlash;
+            this.sceneFlash = sceneFlash;
+        }
+    }
+
     public final String name;
     public final float cameraDistance;
     /** Altura do horizonte na tela (fração). */
@@ -242,9 +440,11 @@ public final class StageDefinition {
     public final Petals petals;
     /** Null quando o cenário não tem chuva. */
     public final Rain rain;
+    /** Null quando o cenário não tem relâmpagos. */
+    public final Lightning lightning;
 
     private StageDefinition(String name, float cameraDistance, float horizon, int backgroundColor,
-                            List<Layer> layers, Floor floor, Petals petals, Rain rain) {
+                            List<Layer> layers, Floor floor, Petals petals, Rain rain, Lightning lightning) {
         this.name = name;
         this.cameraDistance = cameraDistance;
         this.horizon = horizon;
@@ -253,6 +453,7 @@ public final class StageDefinition {
         this.floor = floor;
         this.petals = petals;
         this.rain = rain;
+        this.lightning = lightning;
     }
 
     // ------------------------------------------------------------- leitura
@@ -292,7 +493,8 @@ public final class StageDefinition {
             if (far <= near) throw new IllegalArgumentException("chao: \"longe\" deve ser maior que \"perto\"");
             floor = new Floor(image, string(floorMap, "imagemLajotas", null), near, far,
                 number(floorMap, "centroX", Float.NaN),
-                number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f));
+                number(floorMap, "reflexoLutadores", 0f), number(floorMap, "reflexoLuzes", 0.35f),
+                number(floorMap, "ate", far));
         }
 
         Petals petals = null;
@@ -327,8 +529,24 @@ public final class StageDefinition {
                 Math.max(0, Math.round(number(rainMap, "respingos", 30f))));
         }
 
+        Lightning lightning = null;
+        Map<String, Object> lightningMap = object(map, "relampagos");
+        if (lightningMap != null) {
+            float min = number(lightningMap, "intervaloMinimo", 5f);
+            float max = number(lightningMap, "intervaloMaximo", 12f);
+            if (min <= 0f || max < min) {
+                throw new IllegalArgumentException("relampagos: intervalos devem ser positivos e o máximo >= o mínimo");
+            }
+            float top = number(lightningMap, "topo", -0.02f), bottom = number(lightningMap, "base", 0.42f);
+            if (bottom <= top) throw new IllegalArgumentException("relampagos: \"base\" deve ficar abaixo do \"topo\"");
+            lightning = new Lightning(min, max, number(lightningMap, "profundidade", 9000f), top, bottom,
+                color(lightningMap, "cor", 0xFFD8E4FF),
+                clamp01(number(lightningMap, "claraoCeu", 0.45f)),
+                clamp01(number(lightningMap, "claraoCena", 0.12f)));
+        }
+
         return new StageDefinition(name.trim(), distance, horizon,
-            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain);
+            color(map, "corFundo", 0xFF0B0D1E), layers, floor, petals, rain, lightning);
     }
 
     @SuppressWarnings("unchecked")
@@ -356,6 +574,61 @@ public final class StageDefinition {
         b.colorBottom = color(map, "corBase", b.color);
         b.fillAbove = color(map, "corAcima", 0);
         b.reflection = clamp01(number(map, "reflexo", 0f));
+        b.support = number(map, "apoio", Float.NaN);
+        b.sail = number(map, "deriva", 0f);
+        b.bob = number(map, "balanco", 0f);
+        Object crowd = map.get("plateia");
+        List<Object> crowdList = crowd instanceof List ? (List<Object>)crowd
+            : crowd instanceof Map ? Collections.<Object>singletonList(crowd) : Collections.emptyList();
+        for (Object item : crowdList) {
+            if (!(item instanceof Map)) continue;
+            Map<String, Object> cm = (Map<String, Object>)item;
+            Crowd cr = new Crowd(clamp01(number(cm, "topo", 0.3f)), clamp01(number(cm, "base", 0.9f)),
+                number(cm, "pulo", 0f), Math.max(8, Math.round(number(cm, "colunas", 140f))),
+                string(cm, "mascara", null), pontos(cm, "flashes", 0), pontos(cm, "flashes", 1),
+                bool(cm, "recortada", false));
+            if (cr.bottom <= cr.top) throw new IllegalArgumentException(where + ": plateia precisa de base > topo");
+            b.crowds.add(cr);
+        }
+
+        Object falls = map.get("cachoeiras");
+        List<Object> fallsList = falls instanceof List ? (List<Object>)falls
+            : falls instanceof Map ? Collections.<Object>singletonList(falls) : Collections.emptyList();
+        for (Object item : fallsList) {
+            if (!(item instanceof Map)) continue;
+            Map<String, Object> fm = (Map<String, Object>)item;
+            String fallsImage = string(fm, "imagem", null);
+            Object areaList = fm.get("areas");
+            if (fallsImage == null || !(areaList instanceof List)) {
+                throw new IllegalArgumentException(where + ": cachoeiras precisa de \"imagem\" e \"areas\"");
+            }
+            List<Object> list = (List<Object>)areaList;
+            float[] areas = new float[list.size() * 4];
+            for (int i = 0; i < list.size(); i++) {
+                Object area = list.get(i);
+                if (!(area instanceof List) || ((List<Object>)area).size() != 4) {
+                    throw new IllegalArgumentException(where + ": cada área das cachoeiras é [x, y, largura, altura]");
+                }
+                for (int k = 0; k < 4; k++) areas[i * 4 + k] = ((Number)((List<Object>)area).get(k)).floatValue();
+                if (areas[i * 4 + 2] <= 0f || areas[i * 4 + 3] <= 0f) {
+                    throw new IllegalArgumentException(where + ": área das cachoeiras sem tamanho");
+                }
+            }
+            if (areas.length == 0) continue;
+            Object foamList = fm.get("espuma");
+            List<Object> feet = foamList instanceof List ? (List<Object>)foamList : Collections.emptyList();
+            float[] foam = new float[feet.size() * 3];
+            for (int i = 0; i < feet.size(); i++) {
+                Object foot = feet.get(i);
+                if (!(foot instanceof List) || ((List<Object>)foot).size() != 3) {
+                    throw new IllegalArgumentException(where + ": cada espuma é [x, y, largura]");
+                }
+                for (int k = 0; k < 3; k++) foam[i * 3 + k] = ((Number)((List<Object>)foot).get(k)).floatValue();
+            }
+            int frames = Math.max(1, Math.round(number(fm, "quadros", 8f)));
+            b.waterfalls.add(new Waterfalls(fallsImage, frames, Math.round(number(fm, "colunas", frames)),
+                Math.max(0.1f, number(fm, "fps", 12f)), areas, foam, color(fm, "corEspuma", 0xFFEEF2FF)));
+        }
 
         String repeat = string(map, "repetir", "nao");
         if ("nao".equals(repeat)) b.repeat = Repeat.NONE;
@@ -388,6 +661,7 @@ public final class StageDefinition {
                 if (Float.isNaN(b.top) || Float.isNaN(b.bottom) || b.bottom <= b.top) {
                     throw new IllegalArgumentException(where + ": neblina precisa de \"topo\" e \"base\"");
                 }
+                b.wisps = Math.max(0, Math.round(number(map, "fiapos", 0f)));
                 break;
             case WATER:
                 b.waterNear = number(map, "perto", Float.NaN);
@@ -399,6 +673,16 @@ public final class StageDefinition {
                 b.color = color(map, "corLonge", 0xFF1A2550);
                 b.colorBottom = color(map, "corPerto", 0xFF0A1028);
                 b.shimmer = Math.max(0, Math.round(number(map, "brilhos", 40f)));
+                b.image = string(map, "imagem", null);
+                b.waterTile = Math.max(50f, number(map, "tamanho", 1600f));
+                b.drift = number(map, "corrente", 25f);
+                Object sun = map.get("sol");
+                if (sun instanceof Map) {
+                    Map<String, Object> sm = (Map<String, Object>)sun;
+                    b.sunX = number(sm, "x", 0.5f);
+                    b.sunColor = color(sm, "cor", 0xFFFFC060);
+                    b.sunAlpha = clamp01(number(sm, "alfa", 0.5f));
+                }
                 break;
         }
 
@@ -419,7 +703,36 @@ public final class StageDefinition {
                 b.fires.add(new Fire(number(f, "x", 0.5f), number(f, "y", 0.2f), number(f, "tamanho", 0.2f)));
             }
         }
+        Object banners = map.get("bandeiras");
+        if (banners instanceof List) {
+            for (Object item : (List<Object>)banners) {
+                if (!(item instanceof Map)) continue;
+                Map<String, Object> f = (Map<String, Object>)item;
+                String image = string(f, "imagem", null);
+                float width = number(f, "largura", 0f), height = number(f, "altura", 0f);
+                if (image == null || width <= 0f || height <= 0f) {
+                    throw new IllegalArgumentException(where + ": bandeira precisa de \"imagem\", \"largura\" e \"altura\"");
+                }
+                b.banners.add(new Banner(image, number(f, "x", 0f), number(f, "y", 0f), width, height,
+                    number(f, "balanco", 0.12f), number(f, "ondas", 1.2f), number(f, "velocidade", 1f)));
+            }
+        }
         return new Layer(b);
+    }
+
+    /** Coordenada {@code k} (0 = x, 1 = y) de uma lista de pontos [[x, y], ...]. */
+    private static float[] pontos(Map<String, Object> map, String key, int k) {
+        Object field = map.get(key);
+        List<Object> list = field instanceof List ? (List<Object>)field : Collections.emptyList();
+        float[] out = new float[list.size()];
+        for (int i = 0; i < out.length; i++) {
+            Object item = list.get(i);
+            if (!(item instanceof List) || ((List<Object>)item).size() < 2) {
+                throw new IllegalArgumentException(key + " precisa de pontos [x, y]");
+            }
+            out[i] = ((Number)((List<Object>)item).get(k)).floatValue();
+        }
+        return out;
     }
 
     private static void requireDepth(Builder b, String where) {
