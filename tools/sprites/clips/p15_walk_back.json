@@ -19,12 +19,15 @@
     "quadros": "21,23,25,27,29,31,33,35,37,39,41,43,45,47",
     "celula": 288,
     "largura": 224,
-    "raiz": "121,270",
+    "raiz": "107,270",
     "colunas": 11,
-    "pe_no_chao": true
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
   },
   "frameWidth": 224,
   "frameHeight": 288,
-  "rootX": 121,
-  "rootY": 270
+  "rootX": 107,
+  "rootY": 270,
+  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q47, alinhados por registro."
 }
