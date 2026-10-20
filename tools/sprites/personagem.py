@@ -23,6 +23,20 @@ O nome de cada vídeo por estado fica em tools/sprites/videos/<id>.json (criado 
 partir dos nomes conhecidos; edite se um vídeo tiver outro nome). Escala manual, só quando
 a medida falha: --manual ESTADO=0.36 --motivo "..." (fica gravada na receita e é reusada).
 
+Além dos estados do p01: IDLE2 (segundo idle, toca uma vez a cada duas voltas do IDLE) e 6M
+(o → + M com animação própria; sem ele o motor monta o 6M do M).
+
+Clipe com quadros escolhidos à mão grava "quadrosAMao" (o motivo) e só é refeito quando o
+estado é pedido pelo nome. "animacao" no clipe dá os quadros de jogo quando não são a folha
+em ordem: o L do vídeo que termina parado no impacto volta pelos mesmos quadros
+({"frames": [1,3,4,4,4,4,3,2,1,0,0], "impactFrame": 2}).
+
+Personagem incompleto (para testar no jogo): --temporario preenche os estados do p01 sem
+vídeo de forma TEMPORÁRIA e marcada no pacote ("temporario"): golpes agachados e aéreos
+usam a pose, especiais tocam o M do próprio personagem e reações, defesas, queda, agarrão,
+intro, vitória, derrota e provocação ficam sem animação (o motor usa a guarda e a queda
+dele). Nunca a arte de outro personagem. --so-pacote só atualiza o pacote, sem converter.
+
 Precisa de opencv e numpy: pip install -r tools/sprites/requirements-animar.txt
 """
 import argparse
@@ -50,7 +64,8 @@ STATES = ['IDLE', 'WALK_FORWARD', 'WALK_BACK', 'DASH', 'BACKDASH', 'CROUCH', 'JU
           'MEDIUM_KICK', 'HEAVY_STRAIGHT', 'CROUCH_LIGHT', 'CROUCH_MEDIUM', 'CROUCH_HEAVY', 'JUMP_LIGHT',
           'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN', 'SPECIAL_ENERGY', 'SPECIAL_S2', 'SPECIAL_S3',
           'SPECIAL_S4', 'SUPER_WAVE', 'ULTRA_BEAM', 'DEFENSE_STAND', 'DEFENSE_CROUCH', 'DEFENSE_AIR',
-          'HIT_STAND', 'HIT_CROUCH', 'HIT_AIR', 'KNOCKDOWN', 'INTRO', 'VICTORY', 'DEFEAT', 'TAUNT', 'THROW']
+          'HIT_STAND', 'HIT_CROUCH', 'HIT_AIR', 'KNOCKDOWN', 'INTRO', 'VICTORY', 'DEFEAT', 'TAUNT', 'THROW',
+          'IDLE2', '6M']
 # Nomes de arquivo já usados nos vídeos (sem .mp4, sem diferença de maiúsculas).
 ALIASES = {
     'IDLE': ['idle'], 'WALK_FORWARD': ['frente', 'andarfrente', 'andarparafrente'], 'WALK_BACK': ['tras', 'back', 'andartras', 'andarparatras'],
@@ -66,6 +81,7 @@ ALIASES = {
     'HIT_CROUCH': ['levargolpeagachada', 'levargolpeagachado', 'danochao', 'danoagachado', 'danobaixo'],
     'HIT_AIR': ['levargolpenoar', 'danopulando', 'danoar', 'golpenoar', 'danopulo', 'dano pulo'], 'KNOCKDOWN': ['derrubado', 'cair_levantar', 'caindo', 'queda_levanta', 'derrubar_levantar', 'derruma_levanta', 'derrumba_levanta', 'derruba_levanta'],
     'INTRO': ['intro'], 'VICTORY': ['vitoria'], 'DEFEAT': ['derrota'], 'TAUNT': ['provocacao', 'provocar', 'provoca'], 'THROW': ['agarrao', 'agarrar'],
+    'IDLE2': ['idle2'], '6M': ['6m', 'frentem', 'm_baixo', 'mbaixo'],
 }
 UP = {'CROUCH_HEAVY', 'SPECIAL_S2'}  # impacto pela altura (golpe para cima)
 AIR = {'JUMP_LIGHT', 'JUMP_MEDIUM', 'JUMP_HEAVY', 'JUMP_HEAVY_DOWN', 'DEFENSE_AIR', 'HIT_AIR'}
@@ -77,6 +93,21 @@ CLIP_OF = dict(IDLE='idle', COMBAT='idle', CROUCH='crouch', RISE='rise', JUMP='j
                KNOCKDOWN='fall_down', GROUNDED='fall_down', GETUP='getup', THROW_GRAB='throw', THROW_TOSS='throw')
 FALLBACK = dict(JUMP_MEDIUM='jump_heavy', JUMP_HEAVY_DOWN='jump_heavy')
 SHARED_FRAMES = {'KNOCKDOWN', 'GROUNDED', 'THROW_GRAB', 'THROW_TOSS', 'COMBAT'}
+# Clipes de cada estado (o padrão é o nome do estado em minúsculas).
+CLIPS_OF_STATE = dict(JUMP=('jump', 'fall', 'land'), CROUCH=('crouch', 'rise'), KNOCKDOWN=('fall_down', 'getup'),
+                      THROW=('throw',), IDLE2=('idle2',), **{'6M': ('overhead',)})
+# → + M próprio: o mesmo golpe que o motor monta do M (GolpeAlto.java), com a animação do vídeo.
+OVERHEAD = dict(startupFrames=20, activeFrames=3, recoveryFrames=14, hitstunFrames=20, blockstunFrames=11,
+                damagePermille=1150, hitHeight=110, hitFloor=40)
+OVERHEAD_FRAMES = 15
+# Temporários (--temporario): golpe sem vídeo que tem pose no motor, e especiais que tocam o M.
+POSE_OF = dict(CROUCH_LIGHT=('2L', 'CROUCH'), CROUCH_MEDIUM=('2M', 'CROUCH'), CROUCH_HEAVY=('2H', 'CROUCH'),
+               JUMP_LIGHT=('jL', 'AIR'), JUMP_MEDIUM=('jM', 'AIR'), JUMP_HEAVY=('jH', 'AIR'))
+TEMP_WITH_M = ('SPECIAL_ENERGY', 'SPECIAL_S2', 'SPECIAL_S3', 'SPECIAL_S4', 'SUPER_WAVE', 'ULTRA_BEAM')
+TEMP_NOTE = ('TEMPORÁRIO até ter vídeo (personagem.py --temporario): golpes agachados e aéreos usam a pose; '
+             'especiais tocam o M do próprio personagem; reações, defesas, queda, agarrão, intro, vitória, '
+             'derrota e provocação ficam sem animação e o motor usa a guarda e a queda dele. '
+             'Nunca a arte de outro personagem.')
 
 
 # ---------------------------------------------------------------- análise do vídeo
@@ -143,6 +174,15 @@ def attack_frames(d, state, n, k):
     return spread(s, impact, k, endpoint=False) + spread(impact, e, n - k)
 
 
+def overhead_frames(d, n=OVERHEAD_FRAMES, k=8):
+    """→ + M: o punho sobe (topo mais alto) e desce; o impacto é o corpo mais baixo depois."""
+    s, e = segment(d)
+    top = d['info'][:, 1]
+    peak = min(range(s, e + 1), key=lambda i: top[i])
+    impact = max(range(peak, e + 1), key=lambda i: top[i])
+    return spread(s, impact, k, endpoint=False) + spread(impact, e, n - k)
+
+
 def jump_frames(d):
     info = d['info']
     air = np.nonzero(info[:, 0] < info[0, 0] - 10)[0]
@@ -206,6 +246,10 @@ def plan(path, state):
     if state == 'THROW':
         s, e = segment(d)
         return {'throw': (clean(d, spread(s, e, 9)), {})}
+    if state == 'IDLE2':  # toca inteiro, uma vez (do 1º quadro, na guarda, ao último)
+        return {'idle2': (list(range(len(d['info']))), {})}
+    if state == '6M':
+        return {'overhead': (clean(d, overhead_frames(d)), {})}
     anim = P01['animations'][state]
     n = len(anim['frames'])
     if state == 'IDLE':
@@ -329,7 +373,112 @@ def new_pack(char, k):
     return pack
 
 
-def update_pack(char, rebuilt):
+def game_frames(cfg, ref, state, n):
+    """Quadros de jogo: os do "animacao" do clipe (ida e volta pelos mesmos quadros), os do
+    p01 nos estados que dividem a folha, ou a folha em ordem."""
+    custom = cfg.get('animacao', {})
+    if 'frames' in custom:
+        return list(custom['frames'])
+    return list(ref['frames']) if state in SHARED_FRAMES else list(range(n))
+
+
+def timed(ref_ms, count):
+    """Tempos do p01 para `count` quadros (a mesma soma quando a contagem é outra)."""
+    if len(ref_ms) == count:
+        return list(ref_ms)
+    return [round(sum(ref_ms) / count, 3)] * count
+
+
+def overhead(pack, n, k):
+    """6M com animação própria: o golpe alto que o motor montaria do M (GolpeAlto.java) e os
+    tempos com o impacto no começo da janela ativa."""
+    m, h = pack['moves']['M'], pack['moves']['H']
+    o = OVERHEAD
+    total = o['startupFrames'] + o['activeFrames'] + o['recoveryFrames']
+    targets = [t for t in h['cancelInto'] if t in ('S', 'SUPER') or (len(t) == 2 and t[0] == 'S' and t[1] in '23456789')]
+    window = [o['startupFrames'], o['startupFrames'] + o['activeFrames'] + 8] if targets else None
+    move = {'animation': 'OVERHEAD', 'damage': max(1, m['damage'] * o['damagePermille'] // 1000), 'reach': m['reach'],
+            'startupFrames': o['startupFrames'], 'activeFrames': o['activeFrames'],
+            'recoveryFrames': o['recoveryFrames'], 'hitstunFrames': o['hitstunFrames'],
+            'blockstunFrames': o['blockstunFrames'], 'hitstopFrames': m['hitstopFrames'],
+            'cancelWindows': {'hit': window, 'block': None, 'whiff': None}, 'cancelInto': targets,
+            'pushbackOnHit': m['pushbackOnHit'], 'pushbackOnBlock': m['pushbackOnBlock'], 'maxUsesPerCombo': 1,
+            'overhead': True, 'hitHeight': o['hitHeight'], 'hitFloor': o['hitFloor']}
+    before = 1000 * o['startupFrames'] / 60 / k
+    after = 1000 * (total - o['startupFrames']) / 60 / (n - k)
+    return move, [round(before, 3)] * k + [round(after, 3)] * (n - k)
+
+
+def extras(pack, char, clips, rebuilt):
+    """IDLE2 e 6M: estados do motor novo que o p01 não tem."""
+    anims = pack['animations']
+    if 'idle2' in clips and ('IDLE2' not in anims or 'idle2' in rebuilt):
+        n = json.loads(clip_path(char, 'idle2').read_text(encoding='utf-8'))['expectedFrames']
+        anims['IDLE2'] = {'atlas': f'{char}_idle2', 'frames': list(range(n)), 'loop': False,
+                          'durationsMs': [round(1000 / 24, 3)] * n}  # o tempo do vídeo
+    if 'overhead' in clips and ('OVERHEAD' not in anims or 'overhead' in rebuilt or '6M' not in pack['moves']):
+        cfg = json.loads(clip_path(char, 'overhead').read_text(encoding='utf-8'))
+        frames = game_frames(cfg, {}, '6M', cfg['expectedFrames'])
+        k = cfg.get('animacao', {}).get('impactFrame', 8)
+        move, ms = overhead(pack, len(frames), k)
+        anims['OVERHEAD'] = {'atlas': f'{char}_overhead', 'frames': frames, 'loop': False, 'durationsMs': ms,
+                             'impactFrame': k}
+        pack['moves']['6M'] = move
+
+
+def temporary(pack, char, k):
+    """Estados do p01 sem vídeo, preenchidos de forma TEMPORÁRIA e marcada em "temporario".
+    Só a arte do próprio personagem: pose do motor, o M dele ou nenhuma animação."""
+    anims, moves = pack['animations'], pack['moves']
+    was = pack.get('temporario', {}).get('estados', {})
+    temp = {}
+    for state, (binding, pose) in POSE_OF.items():
+        if state not in anims or state in was:
+            anims.pop(state, None)
+            moves[binding].pop('animation', None)
+            moves[binding]['pose'] = pose
+            temp[state] = f'{binding}: pose {pose} (sem animação própria)'
+    if 'JUMP_HEAVY_DOWN' not in anims or 'JUMP_HEAVY_DOWN' in was:
+        anims.pop('JUMP_HEAVY_DOWN', None)
+        moves.pop('j2H', None)
+        fighter = pack['fighter']
+        attacks = list(moves.values()) + list(pack.get('specialMoves', {}).values()) + \
+            [fighter[k]['attack'] for k in ('energy', 'super') if k in fighter]
+        for mv in attacks:  # rotas que levavam ao j2H
+            for field in ('cancelInto', 'rotasProprias'):
+                if 'j2H' in mv.get(field, []):
+                    mv[field].remove('j2H')
+        temp['JUMP_HEAVY_DOWN'] = 'sem j2H: no ar com ↓ sai o jH'
+    m = anims['MEDIUM_KICK']
+    for state in TEMP_WITH_M:
+        if state not in anims or state in was:
+            anims[state] = {'atlas': m['atlas'], 'frames': list(m['frames']), 'loop': False,
+                            'durationsMs': list(m['durationsMs'])}
+            temp[state] = 'o M do próprio personagem'
+    for state in P01['animations']:
+        if state not in anims and state not in temp:
+            temp[state] = 'sem animação: o motor usa a guarda/queda dele'
+    pack['temporario'] = {'nota': TEMP_NOTE, 'estados': temp}
+
+
+def restore(pack, char, k):
+    """Estado que era temporário e ganhou vídeo volta ao golpe do p01."""
+    temp = pack.get('temporario', {}).get('estados', {})
+    base = None
+    for state in list(temp):
+        real = state in pack['animations'] and pack['animations'][state]['atlas'] != pack['animations']['MEDIUM_KICK']['atlas']
+        if not real or state == 'MEDIUM_KICK':
+            continue
+        base = base or new_pack(char, k)
+        for binding, mv in base['moves'].items():
+            if mv.get('animation') == state:
+                pack['moves'][binding] = mv
+        del temp[state]
+    if 'temporario' in pack and not temp:
+        del pack['temporario']
+
+
+def update_pack(char, rebuilt, temporario=False):
     """Aponta cada animação para o clipe dela; só os estados refeitos mudam de tempo, e só
     se a contagem de quadros mudou."""
     k = json.loads((ROOT / f'art/keys/{char}/tamanho.json').read_text(encoding='utf-8'))['altura'] / 224
@@ -342,27 +491,34 @@ def update_pack(char, rebuilt):
         name = name if name in clips else FALLBACK.get(state)
         if name not in clips:
             continue
-        n = json.loads(clip_path(char, name).read_text(encoding='utf-8'))['expectedFrames']
+        cfg = json.loads(clip_path(char, name).read_text(encoding='utf-8'))
         old = pack['animations'].get(state)
-        anim = {'atlas': f'{char}_{name}',
-                'frames': list(ref['frames']) if state in SHARED_FRAMES else list(range(n)), 'loop': ref['loop']}
+        anim = {'atlas': f'{char}_{name}', 'frames': game_frames(cfg, ref, state, cfg['expectedFrames']),
+                'loop': ref['loop']}
         same_count = old is not None and len(old.get('durationsMs', [])) == len(anim['frames'])
         if 'distancePerFrame' in ref:
             anim['distancePerFrame'] = old['distancePerFrame'] if old else round(ref['distancePerFrame'] * k, 2)
         elif same_count:
             anim['durationsMs'] = old['durationsMs']  # tempo já ajustado continua
         else:
-            anim['durationsMs'] = [41] * n if state == 'IDLE' else list(ref['durationsMs'])
+            anim['durationsMs'] = [41] * len(anim['frames']) if state == 'IDLE' else timed(ref['durationsMs'], len(anim['frames']))
         if 'impactFrame' in ref:  # a arte nova tem o impacto na posição do p01
-            anim['impactFrame'] = ref['impactFrame']
+            anim['impactFrame'] = cfg.get('animacao', {}).get('impactFrame', ref['impactFrame'])
         if old is None or name in rebuilt or old.get('atlas') != anim['atlas']:
             pack['animations'][state] = anim
-    missing = set(P01['animations']) - set(pack['animations'])
+    extras(pack, char, clips, rebuilt)
+    restore(pack, char, k)
+    if temporario or 'temporario' in pack:
+        temporary(pack, char, k)
+    missing = set(P01['animations']) - set(pack['animations']) - set(pack.get('temporario', {}).get('estados', {}))
     if missing:
-        print(f'{char}: ainda sem vídeo para {sorted(missing)}; o pacote só é gravado quando tiver todos')
+        print(f'{char}: ainda sem vídeo para {sorted(missing)}; o pacote só é gravado quando tiver todos '
+              f'(para testar antes: --temporario)')
         return False
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    if 'temporario' in pack:
+        print(f"{char}: TEMPORÁRIOS {sorted(pack['temporario']['estados'])}")
     return True
 
 
@@ -382,6 +538,16 @@ def video_map(char, folder):
     return known
 
 
+def hand_picked(char, state):
+    """Estado com clipe de quadros escolhidos à mão: só refaz quando pedido pelo nome."""
+    for name in CLIPS_OF_STATE.get(state, (state.lower(),)):
+        path = ROOT / f'tools/sprites/clips/{char}_{name}.json'
+        if path.exists() and 'quadrosAMao' in json.loads(path.read_text(encoding='utf-8')):
+            print(f'{state}: quadros escolhidos à mão ({path.name}); peça pelo nome para refazer')
+            return True
+    return False
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('personagem')
@@ -391,12 +557,21 @@ def main():
     p.add_argument('--motivo', help='por que a escala é manual')
     p.add_argument('--densidade', type=int,
                    help='px de textura por px do jogo (2 = HD direto do vídeo); padrão: o da receita')
+    p.add_argument('--temporario', action='store_true',
+                   help='grava o pacote incompleto, com os estados sem vídeo marcados como temporários')
+    p.add_argument('--so-pacote', action='store_true',
+                   help='só atualiza o pacote, sem converter vídeo (os estados dados contam como refeitos)')
     args = p.parse_args()
     char = args.personagem
     if not (ROOT / f'art/keys/{char}/tamanho.json').exists():
         raise SystemExit(f'calibre antes: python3 tools/sprites/tamanho.py calibrar {char} <vídeo de agachar> --escala-de p01')
+    if args.so_pacote:  # estados pedidos: clipes já reconvertidos à mão (video_para_sprite.py --clipe)
+        redone = {n for s in args.estados for n in CLIPS_OF_STATE.get(s, (s.lower(),))}
+        if update_pack(char, redone, args.temporario):
+            print(f'characters/{char}/character.json atualizado; rode tools/sprites/build_characters.py --write')
+        return
     videos = video_map(char, args.pasta)
-    states = args.estados or [s for s in STATES if s in videos]
+    states = args.estados or [s for s in STATES if s in videos and not hand_picked(char, s)]
     absent = [s for s in states if s not in videos]
     if absent:
         raise SystemExit(f'sem vídeo para {absent}: ajuste tools/sprites/videos/{char}.json')
@@ -431,7 +606,7 @@ def main():
     with ThreadPoolExecutor(3) as ex:
         for line in ex.map(work, order):
             print(line, flush=True)
-    if update_pack(char, set(done)):
+    if update_pack(char, set(done), args.temporario):
         print(f'characters/{char}/character.json atualizado; rode tools/sprites/build_characters.py --write')
 
 

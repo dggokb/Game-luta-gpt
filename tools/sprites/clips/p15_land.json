@@ -1,0 +1,31 @@
+{
+  "id": "p15_land",
+  "javaName": "P15_LAND",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_land_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_land.webp",
+  "report": "tools/sprites/reports/p15_land.report.json",
+  "preview": "android/app/build/sprite-review/p15_land-import.png",
+  "expectedFrames": 4,
+  "segmentation": "prepared-grid",
+  "columns": 4,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pular.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "46,52,56,63",
+    "celula": 320,
+    "largura": 192,
+    "raiz": "91,302",
+    "colunas": 4,
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "frameHeight": 320,
+  "rootX": 91,
+  "rootY": 302,
+  "quadrosAMao": "No Omni a aterrissagem absorve mais devagar (toca no q45, mais baixo no q55, em pé no q63); o automático (q45-q51) parava no meio da descida e trocava para o IDLE agachado."
+}

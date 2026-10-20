@@ -1,0 +1,29 @@
+{
+  "id": "p15_dash",
+  "javaName": "P15_DASH",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_dash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_dash.webp",
+  "report": "tools/sprites/reports/p15_dash.report.json",
+  "preview": "android/app/build/sprite-review/p15_dash-import.png",
+  "expectedFrames": 9,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "dash.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "40,42,44,46,48,50,52,54,56",
+    "largura": 256,
+    "raiz": "145,238",
+    "colunas": 9,
+    "fixar": "registro",
+    "pe_no_chao": true,
+    "limpar_chao": true
+  },
+  "rootX": 145,
+  "quadrosAMao": "Omni Flash (inicio_esquerda a inicio_direita): o automático espalhava 6 quadros pelo vídeo todo, com arrancada, freada e guarda. Duas passadas da corrida q40-q56 (best_loop entre q28 e q70)."
+}

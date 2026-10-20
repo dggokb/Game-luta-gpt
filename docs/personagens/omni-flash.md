@@ -108,6 +108,26 @@ O braço da frente já começa quase esticado na guarda; sem curso, o modelo soc
 
 Vale para todos os jabs (L de soco reto de qualquer personagem).
 
+## Conversão (testado no p15, 20/10/2026)
+
+- **24 fps não muda nada:** o Seedance também saía a 24 fps, e as ferramentas já contam 24 qps
+  (IDLE a 41 ms por quadro, `auditoria.py`/`ritmo.py` com `fps` 24 na receita). A escala é achada
+  no 1º quadro (`inicio_*`) com nota 0,96–0,97.
+- **O que não serve do automático do `personagem.py`:** ele acha o trecho da ação comparando
+  cada quadro com o 1º. No Omni, (1) andar, dash e backdash começam e terminam em lugares
+  diferentes, então o "trecho" é o vídeo inteiro; (2) o vídeo tem guarda parada longa no fim
+  (backdash: 2 s); (3) L e H terminam parados no impacto. Nesses o certo é escolher os quadros
+  (loop de 2 passadas por `best_loop`, só o salto, ida até o impacto) e gravar o motivo na
+  receita (`quadrosAMao`); o `personagem.py` não refaz esses clipes sem o estado ser pedido.
+- **Jab e chute com quadro final:** a volta à guarda é a ida invertida, em `"animacao"` no
+  clipe (`{"frames": [1,3,4,4,4,4,3,2,1,0,0], "impactFrame": 2}`, mesma contagem do p01 para
+  usar os tempos dele).
+- **Arco branco:** o Omni desenha rastro no golpe rápido (M_BAIXO q39–q42). Pular esses quadros.
+- **Corpo alinhado pelo tronco desloca os pés** quando ela se inclina no golpe (L, H, 6M):
+  `ancorar.py` depois da conversão.
+- **IDLE2 e 6M:** segundo idle (toca a cada 2 voltas do IDLE) e o → + M com animação própria
+  entram no pacote pelos nomes `idle2` e `M_BAIXO`/`6m`/`frenteM` (ver `personagem.py`).
+
 ## Se der errado
 
 | Problema | Ajuste |

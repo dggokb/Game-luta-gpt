@@ -141,6 +141,10 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['moves']['2H'].update(pose='CROUCH'))
         with self.assertRaisesRegex(ValueError,'exactly one'):pipeline.build(self.root)
 
+    def test_own_overhead_must_be_declared_as_overhead(self):
+        self.edit(lambda d:d['moves'].__setitem__('6M',dict(d['moves']['M'])))
+        with self.assertRaisesRegex(ValueError,'6M: the → \+ M must declare "overhead": true'):pipeline.build(self.root)
+
     def test_partial_knockdown_set_is_rejected(self):
         self.edit(lambda d:d['animations'].pop('GETUP'))
         with self.assertRaisesRegex(ValueError,'declared together'):pipeline.build(self.root)

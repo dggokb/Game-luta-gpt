@@ -22,6 +22,27 @@ public class SpriteMotionTest {
         tick(m,1f/60,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteStates.IDLE,m.clip);
     }
+    @Test public void secondIdlePlaysOnceEveryTwoIdleLoops() {
+        CharacterDefinition p15=GeneratedCharacters.get("p15");
+        float idle=p15.animation(SpriteStates.IDLE).duration, idle2=p15.animation(SpriteStates.IDLE2).duration;
+        SpriteMotion m=new SpriteMotion(p15);
+        float dt=1f/60;
+        int loops=Math.round(SpriteMotion.IDLE_LOOPS_BEFORE_IDLE2*idle/dt);
+        for(int i=0;i<loops-2;i++)tick(m,dt,true,false,0,0,false,false,false,false,false);
+        assertEquals("duas voltas inteiras do IDLE",SpriteStates.IDLE,m.clip);
+        for(int i=0;i<4;i++)tick(m,dt,true,false,0,0,false,false,false,false,false);
+        assertEquals(SpriteStates.IDLE2,m.clip);
+        assertEquals("o IDLE2 começa do 1º quadro",0,m.frame());
+        for(int i=0;i<Math.round(idle2/dt)+2;i++)tick(m,dt,true,false,0,0,false,false,false,false,false);
+        assertEquals("depois volta ao IDLE",SpriteStates.IDLE,m.clip);
+        tick(m,dt,true,false,0,3,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.WALK_FORWARD,m.clip);
+    }
+    @Test public void packsWithoutSecondIdleStayInIdle() {
+        SpriteMotion m=new SpriteMotion(GeneratedCharacters.get("p02"));
+        for(int i=0;i<60*30;i++)tick(m,1f/60,true,false,0,0,false,false,false,false,false);
+        assertEquals(SpriteStates.IDLE,m.clip);
+    }
     @Test public void walkStepsAdvanceWithDistanceRatherThanDrawCalls() {
         CharacterDefinition.Animation walk=clip(SpriteMotion.Clip.WALK_FORWARD);
         assertTrue(walk.distancePerFrame>0);

@@ -1,0 +1,125 @@
+{
+  "id": "p15_land",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_land_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 320,
+    "rootX": 91,
+    "rootY": 302,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        36,
+        31,
+        143,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 11658
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        23,
+        76,
+        143,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 10496
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        26,
+        103,
+        146,
+        302
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 10742
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        29,
+        82,
+        169,
+        303
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11566
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 167,
+    "frameHeight": 292,
+    "rootX": 79,
+    "rootY": 281,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      12,
+      21
+    ],
+    "sheetWidth": 152,
+    "sheetHeight": 984,
+    "frames": [
+      [
+        0,
+        0,
+        120,
+        284,
+        18,
+        4
+      ],
+      [
+        0,
+        288,
+        136,
+        240,
+        4,
+        49
+      ],
+      [
+        0,
+        772,
+        136,
+        212,
+        7,
+        76
+      ],
+      [
+        0,
+        532,
+        152,
+        236,
+        11,
+        55
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 983040,
+      "grid": 780224,
+      "packed": 598272
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "ba743369363c661e522c5d38eae0685ab396d4a1db33986cb564f0dfd31ae61f",
+      "config": "a235d9b2d6502ed82f5eec6985adb12c5977cdcad20c244d601c7d99c2fa140c",
+      "profile": "0b133215501a4f56edc60475d9e6c1c114607719767f7abc2ad79e18bf08bf95"
+    }
+  }
+}

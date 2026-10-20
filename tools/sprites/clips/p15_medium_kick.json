@@ -1,0 +1,31 @@
+{
+  "id": "p15_medium_kick",
+  "javaName": "P15_MEDIUM_KICK",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_medium_kick_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_medium_kick.webp",
+  "report": "tools/sprites/reports/p15_medium_kick.report.json",
+  "preview": "android/app/build/sprite-review/p15_medium_kick-import.png",
+  "expectedFrames": 14,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "12,17,23,28,30,33,35,38,40,42,45,47,50,52",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "88,270",
+    "colunas": 11,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 88,
+  "rootY": 270
+}

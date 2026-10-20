@@ -1,0 +1,1159 @@
+[
+ {
+  "estado": "IDLE",
+  "atlas": "p15_idle",
+  "fator": 0.9965954846375733,
+  "fonte": "imagem inicial no q0 (nota 0.97)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9965954846375733,
+   "nota": 0.9744617342948914,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.9614004617210825,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "10": 1.0,
+    "20": 0.961,
+    "30": 0.961,
+    "40": 1.02,
+    "50": 0.981,
+    "60": 1.02,
+    "70": 1.02,
+    "80": 1.02,
+    "85": 1.0
+   }
+  },
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "COMBAT",
+  "atlas": "p15_idle",
+  "fator": 0.9965954846375733,
+  "fonte": "imagem inicial no q0 (nota 0.97)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9965954846375733,
+   "nota": 0.9744617342948914,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 1.0,
+   "max": 1.0,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0
+   }
+  },
+  "emendas": [
+   {
+    "estado": "COMBAT",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 1.0,
+    "altura": 1.0,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "WALK_FORWARD",
+  "atlas": "p15_walk_forward",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.5281163454055786,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0198770916279105,
+   "min": 0.8712948404583807,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.02,
+    "1": 1.0,
+    "2": 1.02,
+    "6": 1.02,
+    "7": 0.981,
+    "8": 1.02,
+    "12": 0.871,
+    "13": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "WALK_FORWARD",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9828009828009825,
+    "pe": 2,
+    "iou": 0.6550442806713321,
+    "altura": 0.9848135735232509,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "WALK_BACK",
+  "atlas": "p15_walk_back",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.96)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9850181195830947,
+   "nota": 0.7479282021522522,
+   "quadro": 12,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0198770916279105,
+   "min": 1.0,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.02,
+    "1": 1.02,
+    "2": 1.02,
+    "3": 1.061,
+    "4": 1.02,
+    "5": 1.061,
+    "6": 1.02,
+    "7": 1.0,
+    "8": 1.02,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.0,
+    "13": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "WALK_BACK",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9638554216867466,
+    "pe": -5,
+    "iou": 0.7274481106971793,
+    "altura": 0.967741935483871,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "CROUCH",
+  "atlas": "p15_crouch",
+  "fator": 0.9916242826796838,
+  "fonte": "imagem inicial no q0 (nota 0.90)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.96)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9916242826796838,
+   "nota": 0.9035360813140869,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.1034157636183157,
+   "min": 1.0198770916279105,
+   "max": 1.193797132415236,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.02,
+    "1": 1.02,
+    "2": 1.103,
+    "3": 1.103,
+    "4": 1.103,
+    "5": 1.194,
+    "6": 1.103,
+    "7": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "CROUCH",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9304679477776148,
+    "altura": 0.9900502723083369,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "medidas discordam: cabeça dá 110%"
+   ]
+  ],
+  "nivel": "aviso"
+ },
+ {
+  "estado": "RISE",
+  "atlas": "p15_rise",
+  "fator": 0.9899562035834135,
+  "fonte": "imagem inicial no q5 (nota 0.83)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.96)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9899562035834135,
+   "nota": 0.82913738489151,
+   "quadro": 5,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 1.0,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 1.02,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0
+   }
+  },
+  "emendas": [
+   {
+    "estado": "RISE",
+    "ponta": "fim",
+    "quadro": 5,
+    "ref": "guarda",
+    "fator": 0.985221674876847,
+    "pe": -4,
+    "iou": 0.8891816717903674,
+    "altura": 0.985546711353163,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "JUMP",
+  "atlas": "p15_jump",
+  "fator": 0.9916242826796838,
+  "fonte": "imagem inicial no q0 (nota 0.97)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9916242826796838,
+   "nota": 0.9688807129859924,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0198770916279105,
+   "min": 0.9614004617210825,
+   "max": 1.4251515933628407,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.02,
+    "1": 0.981,
+    "2": 0.961,
+    "3": 1.02,
+    "4": 1.171,
+    "5": 1.425
+   }
+  },
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "FALL",
+  "atlas": "p15_fall",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.7056,
+   "nota": 0.26315051317214966,
+   "quadro": 5,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "DASH",
+  "atlas": "p15_dash",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9137892328695311,
+   "nota": 0.41865476965904236,
+   "quadro": 7,
+   "ref": "inicio_centro"
+  },
+  "cabeca": null,
+  "emendas": [
+   {
+    "estado": "DASH",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.7722007722007719,
+    "pe": 0,
+    "iou": 0.30851063829787234,
+    "altura": 0.9642857142857143,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "BACKDASH",
+  "atlas": "p15_backdash",
+  "fator": 0.9703511691564822,
+  "fonte": "imagem inicial no q0 (nota 0.81)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9703511691564822,
+   "nota": 0.8059637546539307,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0198770916279105,
+   "min": 0.9614004617210825,
+   "max": 1.193797132415236,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.02,
+    "1": 0.961,
+    "2": 1.0,
+    "3": 1.082,
+    "4": 1.194,
+    "7": 1.02,
+    "8": 1.02,
+    "9": 1.103
+   }
+  },
+  "emendas": [
+   {
+    "estado": "BACKDASH",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9756097560975606,
+    "pe": -4,
+    "iou": 0.8553108447170338,
+    "altura": 0.9662756598240468,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "BACKDASH",
+    "ponta": "fim",
+    "quadro": 9,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -1,
+    "iou": 0.8707757704569606,
+    "altura": 0.9914118139924591,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "LAND",
+  "atlas": "p15_land",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9899562035834135,
+   "nota": 0.7993035912513733,
+   "quadro": 3,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 0.9720839697127106,
+   "min": 0.9242908477975106,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "2": 0.924,
+    "3": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "LAND",
+    "ponta": "fim",
+    "quadro": 3,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -3,
+    "iou": 0.8803914461761507,
+    "altura": 0.9848135735232509,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "LIGHT_JAB",
+  "atlas": "p15_light_jab",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.96)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9965954846375733,
+   "nota": 0.6918823719024658,
+   "quadro": 9,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.1034157636183157,
+   "min": 1.1034157636183157,
+   "max": 1.193797132415236,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.103,
+    "1": 1.194,
+    "6": 1.194,
+    "7": 1.194,
+    "8": 1.103,
+    "9": 1.103,
+    "10": 1.103
+   }
+  },
+  "emendas": [
+   {
+    "estado": "LIGHT_JAB",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 1.01010101010101,
+    "pe": 6,
+    "iou": 0.7700187466523835,
+    "altura": 1.0083787180561374,
+    "mesma_pose": 0.0
+   },
+   {
+    "estado": "LIGHT_JAB",
+    "ponta": "fim",
+    "quadro": 10,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 4,
+    "iou": 0.8097889599230081,
+    "altura": 0.9958106409719313,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "MEDIUM_KICK",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "MEDIUM_KICK",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "MEDIUM_KICK",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "HEAVY_STRAIGHT",
+  "atlas": "p15_heavy_straight",
+  "fator": 0.9850181195830947,
+  "fonte": "imagem inicial no q0 (nota 0.87)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.96)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9850181195830947,
+   "nota": 0.8661367297172546,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0001936992088694,
+   "min": 0.9062767027369674,
+   "max": 1.2417272301680833,
+   "zoom": false,
+   "por_quadro": {
+    "0": 0.981,
+    "2": 0.906,
+    "4": 0.943,
+    "6": 1.02,
+    "8": 1.242,
+    "10": 1.125,
+    "12": 1.125,
+    "14": 1.242,
+    "16": 1.02,
+    "18": 0.943,
+    "20": 0.906,
+    "22": 0.981
+   }
+  },
+  "emendas": [
+   {
+    "estado": "HEAVY_STRAIGHT",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9803921568627448,
+    "pe": -2,
+    "iou": 0.9025234318673396,
+    "altura": 0.9860703812316716,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "HEAVY_STRAIGHT",
+    "ponta": "fim",
+    "quadro": 22,
+    "ref": "guarda",
+    "fator": 0.9803921568627448,
+    "pe": -2,
+    "iou": 0.9025234318673396,
+    "altura": 0.9860703812316716,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "IDLE2",
+  "atlas": "p15_idle2",
+  "fator": 0.9965954846375733,
+  "fonte": "imagem inicial no q63 (nota 0.90)",
+  "receita": "fraca",
+  "medida": "último quadro = inicio_centro (nota 0.89)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9965954846375733,
+   "nota": 0.8953644633293152,
+   "quadro": 63,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 0.9614004617210825,
+   "min": 0.8712948404583807,
+   "max": 1.081910528902127,
+   "zoom": false,
+   "por_quadro": {
+    "0": 0.961,
+    "8": 0.889,
+    "32": 0.961,
+    "48": 0.871,
+    "56": 1.082,
+    "63": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "IDLE2",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9779951100244495,
+    "pe": -6,
+    "iou": 0.8333095781071835,
+    "altura": 0.9953917050691243,
+    "mesma_pose": 0.0
+   },
+   {
+    "estado": "IDLE2",
+    "ponta": "fim",
+    "quadro": 63,
+    "ref": "guarda",
+    "fator": 0.9950248756218902,
+    "pe": -5,
+    "iou": 0.9248657001986901,
+    "altura": 0.9953917050691243,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "troca (fim): corpo -5 px fora do lugar da guarda"
+   ]
+  ],
+  "nivel": "aviso"
+ },
+ {
+  "estado": "OVERHEAD",
+  "atlas": "p15_overhead",
+  "fator": 0.9965954846375733,
+  "fonte": "imagem inicial no q14 (nota 0.87)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9965954846375733,
+   "nota": 0.8655991554260254,
+   "quadro": 14,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0001936992088694,
+   "min": 0.7591546990093949,
+   "max": 1.0198770916279105,
+   "zoom": false,
+   "por_quadro": {
+    "0": 0.961,
+    "7": 0.759,
+    "11": 1.02,
+    "12": 0.981,
+    "13": 1.02,
+    "14": 1.02
+   }
+  },
+  "emendas": [
+   {
+    "estado": "OVERHEAD",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9950248756218902,
+    "pe": 0,
+    "iou": 0.9223286661753869,
+    "altura": 0.9945538332635107,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "OVERHEAD",
+    "ponta": "fim",
+    "quadro": 14,
+    "ref": "guarda",
+    "fator": 0.9925558312655084,
+    "pe": 1,
+    "iou": 0.9171142400929018,
+    "altura": 0.9903644742354419,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "SPECIAL_ENERGY",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "SPECIAL_ENERGY",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "SPECIAL_ENERGY",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "SPECIAL_S2",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "SPECIAL_S2",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "SPECIAL_S2",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "SPECIAL_S3",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "SPECIAL_S3",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "SPECIAL_S3",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "SPECIAL_S4",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "SPECIAL_S4",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "SPECIAL_S4",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "SUPER_WAVE",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "SUPER_WAVE",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "SUPER_WAVE",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ },
+ {
+  "estado": "ULTRA_BEAM",
+  "atlas": "p15_medium_kick",
+  "fator": 0.9949190431421423,
+  "fonte": "imagem inicial no q0 (nota 0.91)",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.9949190431421423,
+   "nota": 0.9062612056732178,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.0,
+   "min": 0.8712948404583807,
+   "max": 1.0608244246129694,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.0,
+    "1": 1.02,
+    "2": 0.943,
+    "3": 0.906,
+    "4": 0.889,
+    "5": 0.943,
+    "6": 0.871,
+    "8": 1.0,
+    "9": 1.02,
+    "10": 1.02,
+    "11": 1.02,
+    "12": 1.02,
+    "13": 1.061
+   }
+  },
+  "emendas": [
+   {
+    "estado": "ULTRA_BEAM",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.9900990099009899,
+    "pe": -2,
+    "iou": 0.9342667649226234,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   },
+   {
+    "estado": "ULTRA_BEAM",
+    "ponta": "fim",
+    "quadro": 13,
+    "ref": "guarda",
+    "fator": 0.9999999999999998,
+    "pe": 0,
+    "iou": 0.9193060169804356,
+    "altura": 0.9913070800167575,
+    "mesma_pose": 1.0
+   }
+  ],
+  "problemas": [],
+  "nivel": "ok"
+ }
+]

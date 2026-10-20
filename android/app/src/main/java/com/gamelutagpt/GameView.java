@@ -703,7 +703,7 @@ public class GameView extends SurfaceView
 
     private static String[] selectionRoster() {
         java.util.ArrayList<String> ids=new java.util.ArrayList<>();
-        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07","p09","p10","p12"};
+        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07","p09","p10","p12","p15"};
         for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
             if(wanted.equals(available)) ids.add(available);
         // P09–P16 without gameplay yet stay as locked concept slots after these.

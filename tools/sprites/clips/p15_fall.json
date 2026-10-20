@@ -1,0 +1,30 @@
+{
+  "id": "p15_fall",
+  "javaName": "P15_FALL",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_fall_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_fall.webp",
+  "report": "tools/sprites/reports/p15_fall.report.json",
+  "preview": "android/app/build/sprite-review/p15_fall-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "pular.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "34,36,38,40,42,44",
+    "celula": 320,
+    "largura": 160,
+    "raiz": "84,302",
+    "colunas": 6,
+    "pe_no_chao": true
+  },
+  "frameWidth": 160,
+  "frameHeight": 320,
+  "rootX": 84,
+  "rootY": 302
+}

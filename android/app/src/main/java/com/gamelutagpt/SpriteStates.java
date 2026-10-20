@@ -35,6 +35,7 @@ final class SpriteStates {
  static final String CAPANGA_PUNCH = "CAPANGA_PUNCH";
  static final String CAPANGA_SHOULDER = "CAPANGA_SHOULDER";
  static final String ULTRA_SEQ = "ULTRA_SEQ";
+ static final String IDLE2 = "IDLE2";
  static final String POSE_CROUCH = "CROUCH";
  static final String POSE_AIR = "AIR";
 }

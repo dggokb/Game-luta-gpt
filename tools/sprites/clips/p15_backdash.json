@@ -1,0 +1,32 @@
+{
+  "id": "p15_backdash",
+  "javaName": "P15_BACKDASH",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_backdash_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_backdash.webp",
+  "report": "tools/sprites/reports/p15_backdash.report.json",
+  "preview": "android/app/build/sprite-review/p15_backdash-import.png",
+  "expectedFrames": 10,
+  "segmentation": "prepared-grid",
+  "columns": 10,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "backDash.mp4",
+    "personagem": "p15",
+    "escala": 0.525,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "14,19,23,27,31,35,39,43,48,53",
+    "celula": 288,
+    "largura": 224,
+    "raiz": "107,270",
+    "colunas": 10,
+    "fixar": "registro",
+    "limpar_chao": true
+  },
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 107,
+  "rootY": 270,
+  "quadrosAMao": "Omni Flash: o vídeo segura a guarda de 2 s a 4 s; o automático espalhava os quadros até o fim. Só o salto q14-q53."
+}

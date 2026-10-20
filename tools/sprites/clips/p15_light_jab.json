@@ -1,0 +1,48 @@
+{
+  "id": "p15_light_jab",
+  "javaName": "P15_LIGHT_JAB",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_light_jab_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_light_jab.webp",
+  "report": "tools/sprites/reports/p15_light_jab.report.json",
+  "preview": "android/app/build/sprite-review/p15_light_jab-import.png",
+  "expectedFrames": 5,
+  "segmentation": "prepared-grid",
+  "columns": 5,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "L.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "20,23,24,25,30",
+    "celula": 288,
+    "largura": 228,
+    "raiz": "103,270",
+    "colunas": 5,
+    "limpar_chao": true,
+    "ancorar_pe": true
+  },
+  "frameWidth": 228,
+  "frameHeight": 288,
+  "rootX": 103,
+  "rootY": 270,
+  "quadrosAMao": "Omni Flash: o vídeo vai da guarda (q20) ao jab esticado (q30, = pose_jab) e fica parado até o fim. Ida q20,q23,q24,q25,q30 e a volta pelos mesmos quadros invertidos; impacto no esticado.",
+  "animacao": {
+    "frames": [
+      1,
+      3,
+      4,
+      4,
+      4,
+      4,
+      3,
+      2,
+      1,
+      0,
+      0
+    ],
+    "impactFrame": 2
+  }
+}

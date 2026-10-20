@@ -1,0 +1,144 @@
+{
+  "id": "p15_light_jab",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_light_jab_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 228,
+    "frameHeight": 288,
+    "rootX": 103,
+    "rootY": 270,
+    "columns": 5,
+    "frameCount": 5
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        45,
+        48,
+        187,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12214
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        45,
+        45,
+        187,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12597
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        45,
+        44,
+        200,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12582
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        45,
+        45,
+        216,
+        273
+      ],
+      "minimumMargin": 12,
+      "opaquePixels": 12709
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        45,
+        46,
+        219,
+        273
+      ],
+      "minimumMargin": 9,
+      "opaquePixels": 12548
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 193,
+    "frameHeight": 249,
+    "rootX": 68,
+    "rootY": 236,
+    "columns": 5,
+    "frameCount": 5,
+    "cropOffset": [
+      35,
+      34
+    ],
+    "sheetWidth": 188,
+    "sheetHeight": 1220,
+    "frames": [
+      [
+        0,
+        248,
+        156,
+        240,
+        4,
+        8
+      ],
+      [
+        0,
+        492,
+        156,
+        240,
+        4,
+        5
+      ],
+      [
+        0,
+        0,
+        168,
+        244,
+        4,
+        4
+      ],
+      [
+        0,
+        736,
+        184,
+        240,
+        4,
+        5
+      ],
+      [
+        0,
+        980,
+        188,
+        240,
+        4,
+        6
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 1313280,
+      "grid": 961140,
+      "packed": 917440
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "309fa42a34e2c0b3d301d77efef7510784d0640b0f91f7aa89f29aeadd533397",
+      "config": "090a1b13bd2b2526aa82824f1583355737004c39a85c71f76cddad45ba50a408",
+      "profile": "0b133215501a4f56edc60475d9e6c1c114607719767f7abc2ad79e18bf08bf95"
+    }
+  }
+}

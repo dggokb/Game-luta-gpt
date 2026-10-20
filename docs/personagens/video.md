@@ -79,6 +79,12 @@ história). O jogo ainda aplica o `worldScale` do perfil. Ninguém escolhe escal
    animação refeita, e dano, frame data, poderes e tempos ajustados à mão continuam (o tempo
    só volta ao do p01 se a contagem de quadros mudar). O nome do vídeo de cada estado fica
    em `tools/sprites/videos/<id>.json`. Depois: `build_characters.py --write`.
+   Além dos estados do p01: `IDLE2` (segundo idle, toca uma vez a cada 2 voltas do IDLE) e
+   `6M` (o → + M com animação própria). Clipe com quadros escolhidos à mão grava `quadrosAMao`
+   e só é refeito pelo nome; `"animacao"` no clipe dá quadros de jogo fora de ordem (ida e volta
+   pelos mesmos quadros). Personagem incompleto, para testar: `--temporario` grava o pacote com
+   os estados sem vídeo marcados em `"temporario"` (pose, o M do próprio personagem ou sem
+   animação; nunca arte de outro); `--so-pacote` só atualiza o pacote.
 3. **Um clipe à mão** (casos especiais, como o S4 do p04):
    `python3 tools/sprites/video_para_sprite.py video.mp4 --personagem <id> --clipe tools/sprites/clips/<clipe>.json --inicio A --fim B`
    A ferramenta acha a imagem inicial no 1º ou no último quadro (mesmo se o Seedance deu

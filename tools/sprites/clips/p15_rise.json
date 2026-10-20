@@ -1,0 +1,27 @@
+{
+  "id": "p15_rise",
+  "javaName": "P15_RISE",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_rise_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_rise.webp",
+  "report": "tools/sprites/reports/p15_rise.report.json",
+  "preview": "android/app/build/sprite-review/p15_rise-import.png",
+  "expectedFrames": 6,
+  "segmentation": "prepared-grid",
+  "columns": 6,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Omni Flash 1.1, Google Flow), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "66,69,72,75,78,81",
+    "largura": 192,
+    "raiz": "91,238",
+    "colunas": 6,
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "rootX": 91
+}

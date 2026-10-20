@@ -80,6 +80,22 @@ public class DefesaEGolpeAltoTest {
         }
     }
 
+    @Test public void aPackWithItsOwnOverheadKeepsItsAnimation() {
+        CharacterDefinition c = GeneratedCharacters.get("p15");
+        CharacterDefinition.Move oh = c.moves.get(GolpeAlto.BINDING), m = c.moves.get("M");
+        assertFalse("o 6M do p15 vem do pacote, não do M", GolpeAlto.derived(c, GolpeAlto.BINDING));
+        assertEquals("OVERHEAD", oh.animation.id);
+        assertNotSame(m.animation, oh.animation);
+        // Mesmo golpe que o motor montaria do M: só a animação é a do vídeo.
+        AttackDefinition built = GolpeAlto.from(m, c.moves.get("H")).attack;
+        assertTrue(oh.attack.overhead);
+        assertEquals(built.startupFrames, oh.attack.startupFrames);
+        assertEquals(built.activeFrames, oh.attack.activeFrames);
+        assertEquals(built.recoveryFrames, oh.attack.recoveryFrames);
+        assertEquals(built.damage, oh.attack.damage);
+        assertEquals(1, oh.attack.maxUsesPerCombo);
+    }
+
     @Test public void theOverheadHoldsTheWindUpInsteadOfSlowingTheWholeClip() {
         for (String id : new String[] {"player_base", "p02", "p06", "p10"}) {
             CharacterDefinition c = GeneratedCharacters.get(id);

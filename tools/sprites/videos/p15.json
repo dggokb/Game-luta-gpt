@@ -1,0 +1,14 @@
+{
+  "IDLE": "idle",
+  "WALK_FORWARD": "andarFrente",
+  "WALK_BACK": "andarTras",
+  "DASH": "dash",
+  "BACKDASH": "backDash",
+  "CROUCH": "agachar",
+  "JUMP": "pular",
+  "LIGHT_JAB": "L",
+  "MEDIUM_KICK": "M",
+  "HEAVY_STRAIGHT": "H",
+  "IDLE2": "idle2",
+  "6M": "M_BAIXO"
+}
