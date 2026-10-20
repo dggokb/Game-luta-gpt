@@ -1,174 +1,212 @@
 {
   "id": "player_base_jump_heavy_down",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_heavy_down_sr_hd.png",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador. Soco de cima para baixo (o 1o jH de video), usado no baixo + H no ar.",
+  "source": "art/sprites/source/player_base_jump_heavy_down_seedance_hd.png",
+  "sourceNote": "p01 gerado em v\u00eddeo (Seedance), montado quadro a quadro por p01_flick.py: ciclo do pr\u00f3prio v\u00eddeo (guarda a guarda), escala medida pela imagem inicial, desenhado 1:1.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 768,
-    "frameHeight": 512,
-    "rootX": 300,
-    "rootY": 476,
-    "columns": 7,
-    "frameCount": 7
+    "frameWidth": 448,
+    "frameHeight": 448,
+    "rootX": 238,
+    "rootY": 412,
+    "columns": 9,
+    "frameCount": 9
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        145,
-        101,
-        501,
-        479
+        52,
+        40,
+        395,
+        413
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 62485
+      "minimumMargin": 35,
+      "opaquePixels": 60834
     },
     {
       "index": 1,
       "outputBbox": [
-        153,
-        103,
-        497,
-        478
+        77,
+        45,
+        393,
+        413
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 62865
+      "minimumMargin": 35,
+      "opaquePixels": 61143
     },
     {
       "index": 2,
       "outputBbox": [
-        111,
-        159,
-        447,
-        478
+        82,
+        75,
+        370,
+        413
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 60436
+      "minimumMargin": 35,
+      "opaquePixels": 60367
     },
     {
       "index": 3,
       "outputBbox": [
-        111,
-        161,
-        446,
-        479
+        53,
+        105,
+        385,
+        413
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 60407
+      "minimumMargin": 35,
+      "opaquePixels": 54749
     },
     {
       "index": 4,
       "outputBbox": [
-        111,
-        162,
-        445,
-        479
+        48,
+        98,
+        379,
+        413
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 60149
+      "minimumMargin": 35,
+      "opaquePixels": 58433
     },
     {
       "index": 5,
       "outputBbox": [
-        111,
-        162,
-        446,
-        479
+        57,
+        97,
+        388,
+        413
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 60169
+      "minimumMargin": 35,
+      "opaquePixels": 58380
     },
     {
       "index": 6,
       "outputBbox": [
-        112,
-        163,
-        445,
-        478
+        64,
+        98,
+        393,
+        413
       ],
-      "minimumMargin": 34,
-      "opaquePixels": 59897
+      "minimumMargin": 35,
+      "opaquePixels": 58395
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        64,
+        99,
+        393,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 58229
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        72,
+        102,
+        398,
+        413
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 57669
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 414,
-    "frameHeight": 404,
-    "rootX": 201,
-    "rootY": 387,
-    "columns": 7,
-    "frameCount": 7,
+    "frameWidth": 366,
+    "frameHeight": 389,
+    "rootX": 198,
+    "rootY": 380,
+    "columns": 9,
+    "frameCount": 9,
     "cropOffset": [
-      99,
-      89
+      40,
+      32
     ],
-    "sheetWidth": 372,
-    "sheetHeight": 2488,
+    "sheetWidth": 1028,
+    "sheetHeight": 1040,
     "frames": [
       [
         0,
         0,
-        372,
-        396,
-        38,
+        352,
+        384,
+        8,
         4
       ],
       [
+        356,
         0,
-        400,
-        364,
-        392,
-        46,
-        6
+        324,
+        376,
+        33,
+        9
+      ],
+      [
+        684,
+        0,
+        296,
+        348,
+        38,
+        39
+      ],
+      [
+        684,
+        716,
+        340,
+        316,
+        9,
+        69
       ],
       [
         0,
-        796,
-        356,
-        336,
+        388,
+        340,
+        324,
         4,
         62
       ],
       [
-        0,
-        1136,
-        352,
-        336,
-        4,
-        64
+        344,
+        388,
+        340,
+        324,
+        13,
+        61
+      ],
+      [
+        688,
+        388,
+        340,
+        324,
+        20,
+        62
       ],
       [
         0,
-        1476,
-        352,
-        336,
-        4,
-        64
+        716,
+        340,
+        324,
+        20,
+        63
       ],
       [
-        0,
-        1816,
-        352,
+        344,
+        716,
         336,
-        4,
-        64
-      ],
-      [
-        0,
-        2156,
-        352,
-        332,
-        4,
+        320,
+        28,
         66
       ]
     ],
     "decodedBytes": {
-      "canonical": 11010048,
-      "grid": 4683168,
-      "packed": 3702144
+      "canonical": 7225344,
+      "grid": 5125464,
+      "packed": 4276480
     },
     "pixelScale": 2.0
   },
@@ -176,11 +214,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d9263e3b29b214a880b38fd3bd232ed631c33e1b9103364ea0bfe6b5c3ffe359",
-      "config": "11c08a899aa7bfdecb04d0fa55514161b197621d2eac520d83ed686524cda22b",
+      "source": "96fbc5fc3686b335c21344c163de18e44cf835e3023121dd3c654d4c882b37ee",
+      "config": "6c30591dbc2d470aa20cb483a39f13880fc1007e189b1b5d66040ed4a9ca1a5f",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_jump_heavy_down_sr_hd.png": "d9263e3b29b214a880b38fd3bd232ed631c33e1b9103364ea0bfe6b5c3ffe359",
       "art/sprites/source/player_base_jump_heavy_down_video_normalized.png": "eca6c68e0cb9189ba15397b4e86580253fe4996297ccf3da18e9ca28c66a68d4"
     }
   }

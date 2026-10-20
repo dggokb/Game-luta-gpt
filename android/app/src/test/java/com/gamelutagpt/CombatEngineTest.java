@@ -649,8 +649,11 @@ public class CombatEngineTest {
         back.steps(30);
         float advanced = forward.f(0).x - 500f;
         float retreated = 1000f - back.f(0).x;
-        assertEquals(config.walkSpeed * 30 * CombatConfig.DT, advanced, 0.5f);
-        assertEquals(config.walkBackSpeed * 30 * CombatConfig.DT, retreated, 0.5f);
+        // velocidades do próprio lutador (bloco "movimento"), ou as do motor
+        float walk = BASE.fighter.walkSpeed > 0f ? BASE.fighter.walkSpeed : config.walkSpeed;
+        float walkBack = BASE.fighter.walkBackSpeed > 0f ? BASE.fighter.walkBackSpeed : config.walkBackSpeed;
+        assertEquals(walk * 30 * CombatConfig.DT, advanced, 0.5f);
+        assertEquals(walkBack * 30 * CombatConfig.DT, retreated, 0.5f);
         assertTrue("A retreating fighter is caught by a walking one", retreated < advanced);
     }
 

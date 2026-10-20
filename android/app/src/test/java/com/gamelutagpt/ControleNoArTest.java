@@ -20,6 +20,8 @@ public class ControleNoArTest {
 
         CombatFighter p() { return engine.fighter(0); }
         CombatConfig config() { return engine.config; }
+        /** Andar do lutador: o do bloco "movimento" dele, ou o do motor. */
+        float andar() { return BASE.fighter.walkSpeed > 0f ? BASE.fighter.walkSpeed : config().walkSpeed; }
 
         void step() {
             engine.step(in[0], in[1]);
@@ -58,7 +60,7 @@ public class ControleNoArTest {
         s.in[0].direction = TRAS;
         s.steps(10);
         assertEquals("segue para frente na velocidade de andar",
-            x + 10 * porQuadro(s.config().walkSpeed), s.p().x, 0.5f);
+            x + 10 * porQuadro(s.andar()), s.p().x, 0.5f);
     }
 
     @Test public void logoDepoisDeSairDoChaoAindaDaParaEscolherADirecao() {
@@ -69,7 +71,7 @@ public class ControleNoArTest {
         s.in[0].direction = 0;
         float x = s.p().x;
         s.steps(10);
-        assertEquals("virou pulo para frente", x + 10 * porQuadro(s.config().walkSpeed), s.p().x, 0.5f);
+        assertEquals("virou pulo para frente", x + 10 * porQuadro(s.andar()), s.p().x, 0.5f);
     }
 
     @Test public void superPuloTemDriftQueMudaAosPoucos() {
@@ -80,11 +82,11 @@ public class ControleNoArTest {
         float x = s.p().x;
         s.step();
         float primeiro = s.p().x - x;
-        assertTrue("começa devagar: " + primeiro, primeiro > 0f && primeiro < porQuadro(s.config().walkSpeed) * 0.5f);
+        assertTrue("começa devagar: " + primeiro, primeiro > 0f && primeiro < porQuadro(s.andar()) * 0.5f);
         s.steps(30);
         x = s.p().x;
         s.step();
-        assertEquals("chega na velocidade de andar", porQuadro(s.config().walkSpeed), s.p().x - x, 0.01f);
+        assertEquals("chega na velocidade de andar", porQuadro(s.andar()), s.p().x - x, 0.01f);
     }
 
     @Test public void superPuloViraNoArMasNaoDeUmaVez() {
@@ -107,7 +109,7 @@ public class ControleNoArTest {
         s.steps(5);
         float x = s.p().x;
         s.steps(10);
-        assertEquals(x + 10 * porQuadro(s.config().walkSpeed), s.p().x, 0.5f);
+        assertEquals(x + 10 * porQuadro(s.andar()), s.p().x, 0.5f);
     }
 
     @Test public void apanharNoArDeixaOArLivre() {

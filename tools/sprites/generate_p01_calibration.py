@@ -245,7 +245,8 @@ def main():
                 "player_base_crouch_medium", "player_base_crouch_heavy",
                 "player_base_jump", "player_base_victory", "player_base_intro"):
         assert key in natives or (key in data and data[key])
-    assert len(data["player_base_victory"]) == 33, "Victory must normalize every source frame"
+    assert "player_base_victory" in natives or len(data["player_base_victory"]) == 33, \
+        "Victory must normalize every source frame"
     assert all(item["max_abs_ground_foot_error"] < .01 for key,item in audit.items()
                if "max_abs_ground_foot_error" in item and key not in
                ("player_base_jump", "player_base_fall_air", "player_base_backdash",

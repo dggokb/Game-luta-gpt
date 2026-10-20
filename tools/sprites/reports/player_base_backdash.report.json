@@ -1,231 +1,326 @@
 {
   "id": "player_base_backdash",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_backdash_sr_hd.png",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py.",
+  "source": "art/sprites/source/player_base_backdash_seedance_hd.png",
+  "sourceNote": "p01 gerado em v\u00eddeo (Seedance), montado quadro a quadro por p01_flick.py: ciclo do pr\u00f3prio v\u00eddeo (guarda a guarda), escala medida pela imagem inicial, desenhado 1:1.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 1024,
-    "frameHeight": 512,
-    "rootX": 512,
-    "rootY": 476,
-    "columns": 4,
-    "frameCount": 10
+    "frameWidth": 576,
+    "frameHeight": 576,
+    "rootX": 264,
+    "rootY": 540,
+    "columns": 7,
+    "frameCount": 15
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        381,
-        43,
-        692,
-        479
+        138,
+        83,
+        443,
+        540
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 66212
+      "minimumMargin": 36,
+      "opaquePixels": 65028
     },
     {
       "index": 1,
       "outputBbox": [
-        385,
-        17,
-        692,
-        479
+        144,
+        81,
+        447,
+        540
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 67197
+      "minimumMargin": 36,
+      "opaquePixels": 65990
     },
     {
       "index": 2,
       "outputBbox": [
-        356,
-        17,
-        665,
-        440
+        139,
+        81,
+        449,
+        540
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 66233
+      "minimumMargin": 36,
+      "opaquePixels": 66529
     },
     {
       "index": 3,
       "outputBbox": [
-        339,
-        19,
-        673,
-        391
+        140,
+        101,
+        435,
+        541
       ],
-      "minimumMargin": 19,
-      "opaquePixels": 61964
+      "minimumMargin": 35,
+      "opaquePixels": 65771
     },
     {
       "index": 4,
       "outputBbox": [
-        324,
-        31,
-        791,
-        355
+        141,
+        120,
+        448,
+        541
       ],
-      "minimumMargin": 31,
-      "opaquePixels": 69381
+      "minimumMargin": 35,
+      "opaquePixels": 64143
     },
     {
       "index": 5,
       "outputBbox": [
-        320,
-        33,
-        787,
-        348
+        139,
+        145,
+        452,
+        541
       ],
-      "minimumMargin": 33,
-      "opaquePixels": 69790
+      "minimumMargin": 35,
+      "opaquePixels": 59917
     },
     {
       "index": 6,
       "outputBbox": [
-        320,
-        32,
-        784,
-        353
+        104,
+        174,
+        436,
+        541
       ],
-      "minimumMargin": 32,
-      "opaquePixels": 67476
+      "minimumMargin": 35,
+      "opaquePixels": 60025
     },
     {
       "index": 7,
       "outputBbox": [
-        329,
-        25,
-        645,
-        403
+        98,
+        198,
+        518,
+        540
       ],
-      "minimumMargin": 25,
-      "opaquePixels": 60068
+      "minimumMargin": 36,
+      "opaquePixels": 63284
     },
     {
       "index": 8,
       "outputBbox": [
-        330,
-        24,
-        645,
-        463
+        43,
+        221,
+        508,
+        541
       ],
-      "minimumMargin": 24,
-      "opaquePixels": 66404
+      "minimumMargin": 35,
+      "opaquePixels": 67172
     },
     {
       "index": 9,
       "outputBbox": [
-        334,
+        77,
+        228,
+        541,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 67682
+    },
+    {
+      "index": 10,
+      "outputBbox": [
         32,
-        649,
-        479
+        223,
+        494,
+        541
       ],
       "minimumMargin": 32,
-      "opaquePixels": 67182
+      "opaquePixels": 65322
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        103,
+        212,
+        485,
+        540
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 59899
+    },
+    {
+      "index": 12,
+      "outputBbox": [
+        100,
+        138,
+        412,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 60460
+    },
+    {
+      "index": 13,
+      "outputBbox": [
+        101,
+        106,
+        413,
+        541
+      ],
+      "minimumMargin": 35,
+      "opaquePixels": 64429
+    },
+    {
+      "index": 14,
+      "outputBbox": [
+        101,
+        92,
+        411,
+        540
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 65368
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 497,
-    "frameHeight": 487,
-    "rootX": 205,
-    "rootY": 471,
-    "columns": 4,
-    "frameCount": 10,
+    "frameWidth": 525,
+    "frameHeight": 476,
+    "rootX": 240,
+    "rootY": 467,
+    "columns": 7,
+    "frameCount": 15,
     "cropOffset": [
-      307,
-      5
+      24,
+      73
     ],
-    "sheetWidth": 1004,
-    "sheetHeight": 1676,
+    "sheetWidth": 968,
+    "sheetHeight": 2416,
     "frames": [
       [
-        672,
-        0,
-        332,
-        456,
-        65,
-        30
-      ],
-      [
         0,
         0,
-        328,
-        480,
-        69,
-        4
-      ],
-      [
-        336,
-        484,
-        328,
-        440,
-        40,
-        4
-      ],
-      [
-        0,
-        944,
-        352,
-        388,
-        24,
+        316,
+        468,
+        110,
         6
       ],
       [
-        356,
-        944,
-        488,
-        344,
-        8,
-        17
+        320,
+        0,
+        312,
+        468,
+        116,
+        4
       ],
       [
-        488,
-        1336,
-        484,
-        332,
-        4,
-        20
+        636,
+        0,
+        320,
+        468,
+        111,
+        4
+      ],
+      [
+        324,
+        472,
+        304,
+        448,
+        112,
+        24
       ],
       [
         0,
-        1336,
-        484,
+        932,
+        316,
+        432,
+        113,
+        43
+      ],
+      [
+        644,
+        932,
+        324,
+        404,
+        111,
+        68
+      ],
+      [
+        0,
+        1368,
         340,
-        4,
-        18
+        376,
+        76,
+        97
       ],
       [
-        668,
-        484,
-        332,
+        344,
+        1368,
+        428,
+        352,
+        70,
+        121
+      ],
+      [
         396,
-        14,
-        12
+        1748,
+        476,
+        328,
+        15,
+        144
+      ],
+      [
+        476,
+        2088,
+        472,
+        324,
+        49,
+        151
       ],
       [
         0,
-        484,
-        332,
-        456,
-        14,
-        10
+        2088,
+        472,
+        328,
+        4,
+        146
       ],
       [
-        332,
         0,
+        1748,
+        392,
         336,
-        464,
-        18,
-        18
+        75,
+        135
+      ],
+      [
+        320,
+        932,
+        320,
+        412,
+        72,
+        61
+      ],
+      [
+        632,
+        472,
+        320,
+        444,
+        73,
+        29
+      ],
+      [
+        0,
+        472,
+        320,
+        456,
+        73,
+        15
       ]
     ],
     "decodedBytes": {
-      "canonical": 25165824,
-      "grid": 11617872,
-      "packed": 6730816
+      "canonical": 27869184,
+      "grid": 20991600,
+      "packed": 9354752
     },
     "pixelScale": 2.0
   },
@@ -233,11 +328,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "d1721b877aafbc2e81ef6a6ecb95843e7c7b48690c66b3a239d3534d217646e4",
-      "config": "cbc8b55ce9ca47cbed483c417fdd70b77ca3ff12bf27e5df615ffd3fae74c484",
+      "source": "0c90755ab8c57204ba23d5eefc195cbeb4b8c04957a58dc094ac53c38c0721ed",
+      "config": "d924d236842edc650081d34b43bda3771ee6d663c2bdfe90870dbb6ed5e79ca4",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_backdash_sr_hd.png": "d1721b877aafbc2e81ef6a6ecb95843e7c7b48690c66b3a239d3534d217646e4",
       "art/sprites/source/player_base_backdash_video_normalized.png": "e09ce42db925793d042345adfd11b8bbb633e9c55f3bf469c1be1b61fe83857f"
     }
   }

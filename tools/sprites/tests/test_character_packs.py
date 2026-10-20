@@ -388,28 +388,22 @@ class BuiltPackTests(unittest.TestCase):
         self.assertIn(f',{n},2.00000000f,',java)
 
     def test_hd_walk_forward_preserves_distance_root_and_runtime_budget(self):
-        from PIL import Image
-        walk=json.loads(self.path.read_text())['animations']['WALK_FORWARD']
-        self.assertEqual(list(range(20)),walk['frames'])
-        self.assertEqual(12.5,walk['distancePerFrame'])
+        # Andar do vídeo (Seedance): cada desenho dura o passo dele, no HD dentro do orçamento.
+        pack=json.loads(self.path.read_text())
+        walk=pack['animations']['WALK_FORWARD']
+        clip=json.loads((self.root/'tools/sprites/clips/player_base_walk_forward.json').read_text())
+        self.assertEqual(list(range(clip['expectedFrames'])),walk['frames'])
+        self.assertEqual(len(walk['frames']),len(walk['distancesPerFrame']))
+        self.assertTrue(all(d>0 for d in walk['distancesPerFrame']))
         self.assertTrue(walk['loop'])
         self.assertNotIn('durationsMs',walk)
+        self.assertGreater(pack['fighter']['movimento']['andar'],0)
         report=json.loads((self.root/'tools/sprites/reports/player_base_walk_forward.report.json').read_text())
-        self.assertEqual([512,512,256,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
         packed=report['packed']
         self.assertEqual(2,packed['pixelScale'])
         self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
-        self.assertLessEqual(packed['frameHeight']*3,4096)
         self.assertLess(packed['decodedBytes']['packed'],32*1024*1024)
-        original=Image.open(self.root/'art/sprites/source/player_base_walk_forward_video_normalized.png').convert('RGBA')
-        hd=Image.open(self.root/'art/sprites/source/player_base_walk_forward_sr_2x.png').convert('RGBA')
-        for i in range(20):
-            src=original.crop((i%8*256,i//8*256,(i%8+1)*256,(i//8+1)*256))
-            cell=hd.crop((i%8*512,i//8*512,(i%8+1)*512,(i//8+1)*512))
-            self.assertEqual(src.getchannel('A').resize((512,512),Image.Resampling.LANCZOS).tobytes(),cell.getchannel('A').tobytes(),i)
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',8,20,2.00000000f,',java)
-        self.assertIn('art/sprites/source/player_base_walk_forward_video_normalized.png',report['provenance']['referenceSources'])
+        self.assertTrue(report['passed'])
 
     def assert_hd_follows_reference(self,sheet,columns,width,height,count,tuning):
         """Every HD cell is its video cell at 2x times the size tuning applied in the app
@@ -482,8 +476,10 @@ class BuiltPackTests(unittest.TestCase):
 
     def test_player_base_crouch_light_is_a_real_declarative_move(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_light.report.json').read_text())
-        self.assertEqual([768,512,280,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        self.assertEqual(11,report['layout']['frameCount'])
+        clip=json.loads((self.root/'tools/sprites/clips/player_base_crouch_light.json').read_text())
+        self.assertEqual([clip[k] for k in ('frameWidth','frameHeight','rootX','rootY')],
+                         [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual(clip['expectedFrames'],report['layout']['frameCount'])
         self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
         self.assertIn('m.put("2L"',java)
@@ -491,8 +487,12 @@ class BuiltPackTests(unittest.TestCase):
 
     def test_player_base_crouch_medium_uses_wide_authored_prepared_grid(self):
         report=json.loads((self.root/'tools/sprites/reports/player_base_crouch_medium.report.json').read_text())
-        self.assertEqual([1024,512,500,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        self.assertEqual(16,report['layout']['frameCount'])
+        clip=json.loads((self.root/'tools/sprites/clips/player_base_crouch_medium.json').read_text())
+        self.assertEqual([clip[k] for k in ('frameWidth','frameHeight','rootX','rootY')],
+                         [report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
+        self.assertEqual(clip['expectedFrames'],report['layout']['frameCount'])
+        # a rasteira estica para os dois lados: célula mais larga que alta
+        self.assertGreater(clip['frameWidth'],clip['frameHeight'])
         self.assertTrue(all(frame['minimumMargin'] >= 8 for frame in report['frames']))
         self.assertTrue(all(frame['opaquePixels'] >= 10000 for frame in report['frames']))
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()

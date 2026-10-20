@@ -1,174 +1,250 @@
 {
   "id": "player_base_jump_heavy",
   "characterProfile": "player_base",
-  "source": "art/sprites/source/player_base_jump_heavy_sr_hd.png",
-  "sourceNote": "p01 gerado em video (Seedance), convertido por tools/sprites/video_para_sprite.py. No ar: pes na raiz, o jogo sobe e desce o lutador.",
+  "source": "art/sprites/source/player_base_jump_heavy_seedance_hd.png",
+  "sourceNote": "p01 gerado em v\u00eddeo (Seedance), montado quadro a quadro por p01_flick.py: ciclo do pr\u00f3prio v\u00eddeo (guarda a guarda), escala medida pela imagem inicial, desenhado 1:1.",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 896,
-    "frameHeight": 640,
-    "rootX": 300,
-    "rootY": 600,
+    "frameWidth": 576,
+    "frameHeight": 512,
+    "rootX": 298,
+    "rootY": 476,
     "columns": 7,
-    "frameCount": 7
+    "frameCount": 11
   },
   "frames": [
     {
       "index": 0,
       "outputBbox": [
-        137,
-        186,
+        182,
+        88,
         441,
-        602
+        476
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 68542
+      "minimumMargin": 36,
+      "opaquePixels": 52743
     },
     {
       "index": 1,
       "outputBbox": [
-        148,
-        179,
-        443,
-        603
+        184,
+        94,
+        454,
+        477
       ],
-      "minimumMargin": 37,
-      "opaquePixels": 67462
+      "minimumMargin": 35,
+      "opaquePixels": 53656
     },
     {
       "index": 2,
       "outputBbox": [
-        102,
-        161,
-        617,
-        602
+        171,
+        106,
+        452,
+        477
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 73490
+      "minimumMargin": 35,
+      "opaquePixels": 51018
     },
     {
       "index": 3,
       "outputBbox": [
-        102,
-        163,
-        615,
-        602
+        162,
+        116,
+        472,
+        477
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 73232
+      "minimumMargin": 35,
+      "opaquePixels": 51767
     },
     {
       "index": 4,
       "outputBbox": [
-        117,
-        147,
-        597,
-        601
+        67,
+        150,
+        513,
+        477
       ],
-      "minimumMargin": 39,
-      "opaquePixels": 71839
+      "minimumMargin": 35,
+      "opaquePixels": 59870
     },
     {
       "index": 5,
       "outputBbox": [
-        142,
-        112,
-        544,
-        602
+        52,
+        159,
+        514,
+        477
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 69008
+      "minimumMargin": 35,
+      "opaquePixels": 59104
     },
     {
       "index": 6,
       "outputBbox": [
-        148,
-        101,
-        497,
-        602
+        54,
+        159,
+        512,
+        477
       ],
-      "minimumMargin": 38,
-      "opaquePixels": 70487
+      "minimumMargin": 35,
+      "opaquePixels": 57760
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        56,
+        156,
+        512,
+        476
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 57988
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        57,
+        156,
+        511,
+        476
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 57882
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        83,
+        130,
+        513,
+        476
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 57043
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        125,
+        104,
+        521,
+        476
+      ],
+      "minimumMargin": 36,
+      "opaquePixels": 56805
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 542,
-    "frameHeight": 526,
-    "rootX": 211,
-    "rootY": 511,
+    "frameWidth": 485,
+    "frameHeight": 405,
+    "rootX": 254,
+    "rootY": 396,
     "columns": 7,
-    "frameCount": 7,
+    "frameCount": 11,
     "cropOffset": [
-      89,
-      89
+      44,
+      80
     ],
-    "sheetWidth": 1712,
-    "sheetHeight": 984,
+    "sheetWidth": 944,
+    "sheetHeight": 1804,
     "frames": [
       [
-        1392,
-        524,
-        320,
-        436,
-        40,
-        88
-      ],
-      [
-        1076,
-        524,
-        312,
-        444,
-        50,
-        80
-      ],
-      [
-        0,
-        524,
-        536,
-        460,
-        4,
-        63
-      ],
-      [
-        540,
-        524,
-        532,
-        460,
-        4,
-        65
-      ],
-      [
-        796,
-        0,
-        500,
-        472,
-        19,
-        50
-      ],
-      [
-        372,
-        0,
-        420,
-        508,
-        44,
-        14
-      ],
-      [
         0,
         0,
-        368,
-        520,
-        50,
+        268,
+        396,
+        134,
         4
+      ],
+      [
+        272,
+        0,
+        280,
+        392,
+        136,
+        10
+      ],
+      [
+        556,
+        0,
+        292,
+        380,
+        123,
+        22
+      ],
+      [
+        408,
+        400,
+        320,
+        372,
+        114,
+        32
+      ],
+      [
+        444,
+        784,
+        456,
+        336,
+        19,
+        66
+      ],
+      [
+        0,
+        1144,
+        472,
+        328,
+        4,
+        75
+      ],
+      [
+        476,
+        1144,
+        468,
+        328,
+        6,
+        75
+      ],
+      [
+        0,
+        1476,
+        464,
+        328,
+        8,
+        72
+      ],
+      [
+        468,
+        1476,
+        464,
+        328,
+        9,
+        72
+      ],
+      [
+        0,
+        784,
+        440,
+        356,
+        35,
+        46
+      ],
+      [
+        0,
+        400,
+        404,
+        380,
+        77,
+        20
       ]
     ],
     "decodedBytes": {
-      "canonical": 16056320,
-      "grid": 7982576,
-      "packed": 6738432
+      "canonical": 16515072,
+      "grid": 10999800,
+      "packed": 6811904
     },
     "pixelScale": 2.0
   },
@@ -176,11 +252,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "27f1abf673159d9cd6c78bdb446e62248404e9d1bb3b4e22171f83990311e434",
-      "config": "14d9d5540ef8e1851835a1df8ed31baf341f1d611e21a28e3d9dc139759bf8fe",
+      "source": "434da393a5d61cc05e4dec50fd79db9e52157960a61982e3c2c72ca7121b629f",
+      "config": "548c5c330243990d7a54b9fc3063683e068cc639248c3ba913085b0e0e17f1ab",
       "profile": "733dbf26160edec115ddf9a38db69200fcea641e56c64966fd0dc8513f64e12b"
     },
     "referenceSources": {
+      "art/sprites/source/player_base_jump_heavy_sr_hd.png": "27f1abf673159d9cd6c78bdb446e62248404e9d1bb3b4e22171f83990311e434",
       "art/sprites/source/player_base_jump_heavy_video_normalized.png": "c649e43af0e3a51f3b6134b1966c50c00eef12c7f9cad69b69b12158672db69d"
     }
   }

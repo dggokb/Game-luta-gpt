@@ -51,14 +51,15 @@ public class P01VisualMasterTest {
         assertTrue("Idle is a native sheet",P01SpriteCalibration.nativo("player_base_idle"));
         // Old art follows the idle reference: the 1:1 idle is 446 px tall (the .98 one was 441).
         assertTrue("Jump start must shrink",base("player_base_jump",0)[1]<.91f);
-        assertEquals("Victory compromise between previous oversized and undersized",
-                     .880f,base("player_base_victory",15)[1],.001f);
+        // A vitória do vídeo (Seedance) já vem no tamanho oficial: desenhada 1:1.
+        assertTrue("Victory is a native sheet",P01SpriteCalibration.nativo("player_base_victory"));
         assertTrue("2H raised pose must stay visibly tall",
                    base("player_base_crouch_heavy",4)[1]>.73f);
         assertTrue("2H torso must keep idle-like width",
                    base("player_base_crouch_heavy",4)[0]>.88f);
-        assertTrue("Medium crouch must be scaled",
-                   base("player_base_crouch_medium",6)[1]<.96f);
+        assertTrue("Medium crouch must be scaled or drawn 1:1 from the video",
+                   P01SpriteCalibration.nativo("player_base_crouch_medium")
+                   || base("player_base_crouch_medium",6)[1]<.96f);
     }
 
     @Test public void appSizeAdjustmentIsAppliedOnTopOfTheCalibration() {

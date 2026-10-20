@@ -101,6 +101,10 @@ se muda um número; depois `build_characters.py --write`). O que foi aplicado:
   mais lento que o do p09 (0,70s): a decidir se encurta (perdendo poses) ou fica.
   J, M, S1 a S4 e a carga da Onda vêm dos vídeos do Flick: o frame data é o do vídeo a 2×
   (startup até o quadro do impacto), com a vantagem no hit e na defesa de antes.
+  2L, 2M, jM, jH, j2H e o Super vêm dos vídeos do Seedance, do mesmo jeito (teste):
+  2L 4/3/18, 2M 13/4/14 (rasteira girando), jM 7/4/14, jH 7/5/12, j2H 7/5/7, Super 34/1/25.
+  Andar (frente 208, trás 96) sai da passada do vídeo a 2× (bloco `movimento`); H, 2H, pulo
+  e agarrão ficam parados até virem vídeos com o corpo inteiro no quadro.
 - **Rotas pelo tempo** (`rotasPeloTempo`, p01): o combo se adapta ao personagem. Cancelar
   num especial só fica na lista se ele sai antes de acabar o atordoamento do golpe; no p01
   isso tira M > Onda/S2/S3/S4 e H > Onda (a Onda tem 29 frames de arranque) e deixa

@@ -113,7 +113,7 @@ public class CombatRulesTest {
         // Values of characters/player_base/character.json (palms of the video art at the impact).
         assertEquals(178f,energy.spawnHeight(false,false),0);
         assertEquals(90f,energy.spawnHeight(true,false),0);
-        assertEquals(182f,BASE.fighter.superAttack.spawnHeight(false,false),0);
+        assertEquals(192f,BASE.fighter.superAttack.spawnHeight(false,false),0);
         assertEquals(88f,BASE.fighter.superAttack.spawnHeight(false,true),0);
         assertTrue(energy.spawnHeight(false,false)<=BASE.fighter.body.standHeight);
         assertTrue(energy.spawnHeight(true,false)<=BASE.fighter.body.crouchHeight);

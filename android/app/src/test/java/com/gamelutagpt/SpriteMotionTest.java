@@ -11,11 +11,13 @@ public class SpriteMotionTest {
     }
     @Test public void walkStepsAdvanceWithDistanceRatherThanDrawCalls() {
         CharacterDefinition.Animation walk=clip(SpriteMotion.Clip.WALK_FORWARD);
-        assertTrue(walk.distancePerFrame>0);
+        // passo fixo por desenho, ou um quarto do ciclo quando cada desenho tem o passo dele (vídeo)
+        assertTrue(walk.distancePerFrame>0 || walk.length>0);
+        float stride=walk.distancePerFrame>0 ? walk.distancePerFrame : walk.length/4f;
         SpriteMotion m=new SpriteMotion();
         float travelled=0;
         for(int step=0;step<4;step++) {
-            float dx=step==0?1:walk.distancePerFrame;travelled+=dx;
+            float dx=step==0?1:stride;travelled+=dx;
             tick(m,.016f,true,false,0,dx,true,false,false,false,false);
             assertEquals(SpriteMotion.Clip.WALK_FORWARD,m.clip);
             int expected=walk.frame(0,travelled);
@@ -107,10 +109,11 @@ public class SpriteMotionTest {
         assertEquals(SpriteMotion.Clip.CROUCH,m.clip);assertEquals(crouch.frame(.016f,0),m.frame());
         tick(m,.1f,true,true,0,0,true,false,false,false,false);assertEquals(crouch.frame(.116f,0),m.frame());
         // Holding down keeps the last crouch pose instead of looping the descent.
-        tick(m,.1f,true,true,0,0,true,false,false,false,false);
+        for(float t=0;t<crouch.duration;t+=.1f)tick(m,.1f,true,true,0,0,true,false,false,false,false);
         assertEquals(crouch.frame(crouch.duration+1,0),m.frame());
         tick(m,.016f,true,false,0,0,true,false,false,false,false);assertEquals(SpriteMotion.Clip.RISE,m.clip);
-        for(int i=0;i<10;i++)tick(m,.016f,true,false,0,0,true,false,false,false,false);
+        float rise=clip(SpriteMotion.Clip.RISE).duration;
+        for(float t=0;t<=rise+.02f;t+=.016f)tick(m,.016f,true,false,0,0,true,false,false,false,false);
         assertEquals(SpriteMotion.Clip.IDLE,m.clip);
     }
     @Test public void holdingDownAfterACrouchingAttackStaysCrouched() {
