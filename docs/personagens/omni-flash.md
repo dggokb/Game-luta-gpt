@@ -122,6 +122,13 @@ Vale para todos os jabs (L de soco reto de qualquer personagem).
 - **Jab e chute com quadro final:** a volta à guarda é a ida invertida, em `"animacao"` no
   clipe (`{"frames": [1,3,4,4,4,4,3,2,1,0,0], "impactFrame": 2}`, mesma contagem do p01 para
   usar os tempos dele).
+- **Contorno:** o Omni desenha um traço escuro fino em volta do personagem que a compressão
+  tinge de verde; o recorte normal apaga esse traço e a borda sai branca e serrilhada. Converter
+  com `--contorno` (`video_para_sprite.py`, gravado na receita).
+- **Quadros por segundo:** usar os quadros do vídeo de 2 em 2 no que é acelerado 3x (36 qps) e
+  todos no que fica no tempo do vídeo (24 qps); poucos quadros espalhados ficam travados.
+- **Comportamento:** depois de converter, `comportamento.py` mede velocidades, pulo e tempo dos
+  golpes no vídeo (o andar em shuffle vira andar em arrancadas, quadro a quadro).
 - **Arco branco:** o Omni desenha rastro no golpe rápido (M_BAIXO q39–q42). Pular esses quadros.
 - **Corpo alinhado pelo tronco desloca os pés** quando ela se inclina no golpe (L, H, 6M):
   `ancorar.py` depois da conversão.

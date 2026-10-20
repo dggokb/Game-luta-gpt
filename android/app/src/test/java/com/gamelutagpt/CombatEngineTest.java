@@ -635,19 +635,34 @@ public class CombatEngineTest {
         assertEquals(CombatFighter.GUARD_AIR, air.f(1).lastGuard);
     }
 
-    @Test public void aFighterWithItsOwnMovementWalksAndDashesAtItsOwnSpeed() {
+    @Test public void aFighterWithItsOwnMovementWalksAndJumpsLikeItsVideo() {
         CharacterDefinition p15 = GeneratedCharacters.get("p15");
         CharacterDefinition.Movement own = p15.fighter.movement;
         assertNotNull("o p15 tem o movimento medido no vídeo dele", own);
         assertNull("quem não declara usa o do motor", BASE.fighter.movement);
+        // Andar em arrancadas, como no vídeo: em cada passo o motor anda a distância do quadro da
+        // arte em que a animação está, no tempo que esse quadro dura no vídeo (o pé fica plantado).
+        CharacterDefinition.Animation walk = p15.animation(SpriteStates.WALK_FORWARD);
+        assertNotNull(walk.steps);
         Sim forward = new Sim(p15, NPC, 500f, 1500f);
         forward.in[0].direction = 1;
-        forward.steps(30);
-        assertEquals(own.walkSpeed * 30 * CombatConfig.DT, forward.f(0).x - 500f, 0.5f);
+        float walked = 0f, slowest = Float.MAX_VALUE, fastest = 0f;
+        for (int i = 0; i < 60; i++) {
+            int frame = walk.stepIndex(walked);
+            float expected = walk.steps[frame] / own.walkStepSeconds[frame] * CombatConfig.DT;
+            float x = forward.f(0).x;
+            forward.step();
+            float dx = forward.f(0).x - x;
+            assertEquals("passo " + i, expected, dx, 0.01f);
+            walked += dx;
+            slowest = Math.min(slowest, dx);
+            fastest = Math.max(fastest, dx);
+        }
+        assertTrue("arranca e para como o vídeo", fastest > 3f * slowest);
         Sim back = new Sim(p15, NPC, 1000f, 1500f);
         back.in[0].direction = 5;
         back.steps(30);
-        assertEquals(own.walkBackSpeed * 30 * CombatConfig.DT, 1000f - back.f(0).x, 0.5f);
+        assertTrue("anda para trás", back.f(0).x < 1000f);
         // Pulo: sobe até a altura do vídeo dele (v² / 2g na subida).
         Sim jump = new Sim(p15, NPC, 500f, 1500f);
         jump.in[0].direction = 7;

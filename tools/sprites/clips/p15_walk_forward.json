@@ -14,21 +14,24 @@
   "video": {
     "arquivo": "andarFrente.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5481,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "48,50,52,54,56,58,60,62,64,66,68,70,72,74",
     "celula": 288,
     "largura": 224,
-    "raiz": "110,270",
+    "raiz": "112,270",
     "colunas": 9,
+    "fixar": "registro",
     "pe_no_chao": true,
+    "limpar_chao": true,
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "contorno": true
   },
   "frameWidth": 448,
   "frameHeight": 576,
-  "rootX": 220,
+  "rootX": 224,
   "rootY": 540,
-  "quadrosAMao": "Omni Flash (vai de inicio_esquerda a inicio_centro): o trecho que difere do 1º quadro é o vídeo inteiro, então o loop automático pegava a largada e a chegada. Loop de 2 passadas q48-q74 (best_loop entre q20 e q84), um quadro sim, um não.",
+  "quadrosAMao": "Omni Flash (vai de inicio_esquerda a inicio_centro): o trecho que difere do 1º quadro é o vídeo inteiro, então o loop automático pegava a largada e a chegada. Loop de 2 passadas q48-q74 (best_loop entre q20 e q84), um quadro sim, um não. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
   "pixelScale": 2.0
 }

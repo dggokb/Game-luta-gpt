@@ -73,6 +73,9 @@ final class CombatFighter {
     /** Quadros no ar desde a saída: nos primeiros ainda dá para escolher a direção. */
     int jumpFrames;
     int backdashFrames;
+    /** Andar em arrancadas: distância andada neste andar e para que lado (0 = parado). */
+    float walkDistance;
+    int walkSide;
     /** Prevent repeated retreats while the previous hop/recovery has not reset. */
     int backdashCooldown;
     boolean backdashArmed = true;

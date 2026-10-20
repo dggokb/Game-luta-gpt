@@ -1285,8 +1285,13 @@ final class CombatEngine {
                 f.x -= f.facing * backdashSpeed(f) * boost * CombatConfig.DT;
                 f.backdashFrames--;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? dashSpeed(f) * boost : walk;
+                boolean walking = horizontal != 0 && !(f.forwardDashing && holdingForward);
+                if (!walking || horizontal != f.walkSide) f.walkDistance = 0f;
+                f.walkSide = walking ? horizontal : 0;
+                float speed = walking ? walkSpeedNow(f, holdingForward) * boost
+                    : f.forwardDashing && holdingForward ? dashSpeed(f) * boost : walk;
                 f.x += horizontal * speed * CombatConfig.DT;
+                if (walking) f.walkDistance += speed * CombatConfig.DT;
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
@@ -1325,6 +1330,21 @@ final class CombatEngine {
     }
     private float walkSpeed(CombatFighter f) {
         return movement(f) != null ? movement(f).walkSpeed : config.walkSpeed;
+    }
+    /**
+     * Velocidade do andar agora: com o andar do vídeo em arrancadas, a do quadro em que a
+     * animação está (distância do quadro ÷ tempo dele no vídeo), para o pé ficar plantado.
+     */
+    private float walkSpeedNow(CombatFighter f, boolean forward) {
+        CharacterDefinition.Movement m = movement(f);
+        float[] seconds = m == null ? null : forward ? m.walkStepSeconds : m.walkBackStepSeconds;
+        CharacterDefinition.Animation walk = seconds == null ? null
+            : f.character().animations.get(forward ? SpriteStates.WALK_FORWARD : SpriteStates.WALK_BACK);
+        if (walk == null || walk.steps == null || walk.steps.length != seconds.length) {
+            return forward ? walkSpeed(f) : walkBackSpeed(f);
+        }
+        int i = walk.stepIndex(f.walkDistance);
+        return walk.steps[i] / seconds[i];
     }
     private float walkBackSpeed(CombatFighter f) {
         return movement(f) != null ? movement(f).walkBackSpeed : config.walkBackSpeed;

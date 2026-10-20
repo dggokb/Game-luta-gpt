@@ -1,9 +1,10 @@
 {
   "pacote": "p15",
-  "altura": 224,
+  "altura": 233,
   "chaves": {
-    "inicio_centro": 0.5258,
-    "inicio_direita": 0.5258,
-    "inicio_esquerda": 0.5258
-  }
+    "inicio_centro": 0.5472,
+    "inicio_direita": 0.5472,
+    "inicio_esquerda": 0.5472
+  },
+  "ajuste": "+4% sobre a escala do p01 (20/10/2026): na altura do p03 (248 px em pé no jogo), pedido no teste no celular."
 }

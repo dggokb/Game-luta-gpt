@@ -313,6 +313,9 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
             '--colunas', str(cols), '--fixar', opts.get('fixar', 'tronco')]
     if opts.get('pe_no_chao'):
         args.append('--pe-no-chao')
+    for flag in ('contorno', 'nitidez'):  # vídeo do Omni: traço escuro da borda; HD mais nítido
+        if opts.get(flag):
+            args.append('--' + flag)
     if (not opts.get('pe_no_chao') or opts.get('fixar') == 'registro') and not opts.get('sem_chao'):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:

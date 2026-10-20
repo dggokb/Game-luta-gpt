@@ -115,6 +115,12 @@ def validate_fighter(pack):
             if key == 'backdashHopHeight' and mv.get(key) == 0: continue  # salto já desenhado na arte
             positive(mv.get(key), f'{name}.movimento.{key}')
         for key in MOVEMENT_INTS: positive_int(mv.get(key), f'{name}.movimento.{key}')
+        for key, state in (('walkStepSeconds','WALK_FORWARD'), ('walkBackStepSeconds','WALK_BACK')):
+            if key in mv:
+                steps = pack['animations'][state].get('distancias')
+                if not isinstance(mv[key], list) or steps is None or len(mv[key]) != len(steps):
+                    raise ValueError(f'{name}.movimento.{key}: one time per frame of {state}.distancias')
+                for v in mv[key]: positive(v, f'{name}.movimento.{key}')
     if 'comboStyle' in f and f['comboStyle'] not in COMBO_STYLES:
         raise ValueError(f'{name}.comboStyle: expected one of {list(COMBO_STYLES)}')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
@@ -482,6 +488,10 @@ def compile_packs(root, results):
                 positive(a['distancePerFrame'], key)
                 if not a['loop'] or 'durationsMs' in a:
                     raise ValueError(f'{key}: distance animation must loop and cannot have durations')
+                if 'distancias' in a:  # andar em arrancadas: a distância de cada quadro
+                    if not isinstance(a['distancias'], list) or len(a['distancias']) != len(frames):
+                        raise ValueError(f'{key}.distancias: one distance per frame')
+                    for d in a['distancias']: positive(d, key+'.distancias')
             else:
                 if len(a['durationsMs']) != len(frames):
                     raise ValueError(f'{key}: one duration per frame is required')
@@ -565,7 +575,10 @@ def compile_packs(root, results):
         v = {k: f(mv[k]) for k in MOVEMENT_FLOATS} | {k: str(mv[k]) for k in MOVEMENT_INTS}
         order = ('walkSpeed','walkBackSpeed','dashSpeed','backdashSpeed','backdashFrames','backdashRecoveryFrames',
                  'backdashHopHeight','jumpSpeed','jumpRisingGravity','jumpFallingGravity')
-        return '.withMovement(new CharacterDefinition.Movement('+','.join(v[k] for k in order)+'))'
+        arr = lambda k: 'new float[]{'+','.join(f(x) for x in mv[k])+'}' if k in mv else 'null'  # noqa: E731
+        walk = '.withWalkSteps('+arr('walkStepSeconds')+','+arr('walkBackStepSeconds')+')' \
+            if 'walkStepSeconds' in mv or 'walkBackStepSeconds' in mv else ''
+        return '.withMovement(new CharacterDefinition.Movement('+','.join(v[k] for k in order)+')'+walk+')'
     def mechanics(mech):
         code = 'new AttackDefinition.Mechanics()'
         if 'armadura' in mech: code += '.armor('+str(mech['armadura']['golpes'])+','+','.join(map(str,mech['armadura']['frames']))+')'
@@ -632,7 +645,8 @@ def compile_packs(root, results):
             atlas = ('new CharacterDefinition.Atlas('+','.join([q(Path(cfg['output']).stem)]+[str(l[k]) for k in ('frameWidth','frameHeight','rootX','rootY')]
                      +[str(l.get('columns',l['frameCount'])),str(l['frameCount']),f(cfg.get('pixelScale', 1)),str(l['sheetWidth']),str(l['sheetHeight'])]
                      +[q(','.join(str(v) for frame in l['frames'] for v in frame))])+')')
-            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
+            steps = '.withSteps(new float[]{'+','.join(f(v) for v in a['distancias'])+'})' if 'distancias' in a else ''
+            lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+')'+steps+');']
         for key in [b for b in BINDINGS + OPTIONAL_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'

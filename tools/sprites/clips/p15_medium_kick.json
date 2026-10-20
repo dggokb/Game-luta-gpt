@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_medium_kick.webp",
   "report": "tools/sprites/reports/p15_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p15_medium_kick-import.png",
-  "expectedFrames": 14,
+  "expectedFrames": 21,
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
@@ -14,21 +14,22 @@
   "video": {
     "arquivo": "M.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5481,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "12,17,23,28,30,33,35,38,40,42,45,47,50,52",
+    "quadros": "12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52",
     "celula": 288,
     "largura": 224,
-    "raiz": "88,270",
+    "raiz": "90,270",
     "colunas": 9,
     "limpar_chao": true,
     "ancorar_pe": true,
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "contorno": true
   },
   "frameWidth": 448,
   "frameHeight": 576,
-  "rootX": 176,
+  "rootX": 180,
   "rootY": 540,
   "pixelScale": 2.0
 }

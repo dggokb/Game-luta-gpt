@@ -14,23 +14,24 @@
   "video": {
     "arquivo": "andarTras.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5481,
     "medida": "1º quadro = inicio_centro (nota 0.96)",
     "quadros": "21,23,25,27,29,31,33,35,37,39,41,43,45,47",
     "celula": 288,
     "largura": 224,
-    "raiz": "107,270",
+    "raiz": "104,270",
     "colunas": 9,
     "fixar": "registro",
     "pe_no_chao": true,
     "limpar_chao": true,
     "densidade": 2,
-    "nitidez": true
+    "nitidez": true,
+    "contorno": true
   },
   "frameWidth": 448,
   "frameHeight": 576,
-  "rootX": 214,
+  "rootX": 208,
   "rootY": 540,
-  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q47, alinhados por registro.",
+  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q47, alinhados por registro. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
   "pixelScale": 2.0
 }

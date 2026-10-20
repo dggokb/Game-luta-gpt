@@ -71,8 +71,21 @@ final class CharacterDefinition {
             this.loop=loop;this.distancePerFrame=distancePerFrame;
             float sum=0;for(float d:durations)sum+=d;this.duration=sum;
         }
+        /** Distância de cada quadro (andar em arrancadas, como no vídeo), ou null: distancePerFrame. */
+        float[] steps;
+        private float stepCycle;
+        Animation withSteps(float[] value) {
+            steps=value.clone();stepCycle=0;for(float d:steps)stepCycle+=d;return this;
+        }
+        /** Quadro do ciclo (índice em frames) depois de andar essa distância. */
+        int stepIndex(float distance) {
+            if(steps==null) return (int)(Math.max(0,distance)/distancePerFrame)%frames.length;
+            float d=Math.max(0,distance)%stepCycle;
+            for(int i=0;i<steps.length-1;i++) { if(d<steps[i])return i;d-=steps[i]; }
+            return steps.length-1;
+        }
         int frame(float time,float distance) {
-            if(distancePerFrame>0) return frames[(int)(Math.max(0,distance)/distancePerFrame)%frames.length];
+            if(distancePerFrame>0) return frames[stepIndex(distance)];
             float t=Math.max(0,time);
             if(loop)t%=duration;
             for(int i=0;i<frames.length-1;i++) { if(t<durations[i])return frames[i];t-=durations[i]; }
@@ -301,6 +314,12 @@ final class CharacterDefinition {
         final int backdashFrames, backdashRecoveryFrames;
         /** Pulo normal: velocidade de saída e gravidade (u/s²) na subida e na descida. */
         final float jumpSpeed, jumpRisingGravity, jumpFallingGravity;
+        /** Tempo de cada quadro do andar no vídeo (s, já acelerado): o motor anda a distância
+         *  daquele quadro nesse tempo, em arrancadas como no vídeo. null = velocidade constante. */
+        float[] walkStepSeconds, walkBackStepSeconds;
+        Movement withWalkSteps(float[] forward,float[] back) {
+            walkStepSeconds=forward;walkBackStepSeconds=back;return this;
+        }
         Movement(float walkSpeed,float walkBackSpeed,float dashSpeed,float backdashSpeed,int backdashFrames,
                  int backdashRecoveryFrames,float backdashHopHeight,float jumpSpeed,float jumpRisingGravity,
                  float jumpFallingGravity) {

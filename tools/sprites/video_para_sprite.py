@@ -96,10 +96,19 @@ def floor_dust(alpha, h, s, v):
     return band & (tinted | beige)
 
 
-def key(frame, dust=False, effects=False, floor=False):
+# Fundo verde do vídeo tem brilho ~240; pixel verde mais escuro que isso é o contorno do
+# desenho tingido pelo verde (compressão), não fundo.
+CONTOUR_V = 180
+
+
+def key(frame, dust=False, effects=False, floor=False, contour=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45)
+    line = None
+    if contour:  # mantém o traço escuro da borda; a cor dele vira o cinza escuro sem o verde
+        line = bg & (v < CONTOUR_V)
+        bg &= ~line
     if dust:  # poeira bege dos pés (o jogo desenha os efeitos)
         bg |= (h >= 8) & (h <= 34) & (s >= 18) & (s <= 70) & (v >= 120)
     if effects:
@@ -138,6 +147,8 @@ def key(frame, dust=False, effects=False, floor=False):
     alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(int)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda
+    if line is not None:
+        rgb[line] = rgb[line].min(axis=1, keepdims=True)
     return np.dstack([rgb.astype(np.uint8), alpha])
 
 
@@ -154,7 +165,7 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None)
+              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, contorno=False)
 
 
 def parser():
@@ -207,6 +218,9 @@ def parser():
                         "outra densidade sem mudar o tamanho)")
     p.add_argument("--nitidez", action="store_true",
                    help="unsharp mask leve e borda sem verde (franja do recorte) depois de escalar")
+    p.add_argument("--contorno", action="store_true",
+                   help="mantém o contorno escuro do desenho que o vídeo tinge de verde (Omni Flash); "
+                        "sem isso a borda sai branca, sem traço")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -335,7 +349,7 @@ def main(argv=None):
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
         if (i, dust, effects, floor) not in cache:
-            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor)
+            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor, args.contorno)
         return cache[i, dust, effects, floor]
 
     measured = None

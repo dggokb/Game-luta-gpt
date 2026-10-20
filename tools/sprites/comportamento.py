@@ -40,6 +40,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 from personagem import analyse  # noqa: E402
+from video_para_sprite import key as keyer, read_frames, registration_x  # noqa: E402
 
 VIDEO_FPS = 24
 GAME_FPS = 60
@@ -105,14 +106,19 @@ def settle(clip, start, tol=1.0, run=3):
     return len(xs) - 1
 
 
-def walk(clip, f):
-    """Loop do andar: o corpo anda |x(fim) - x(início)| no ciclo. distancePerFrame é o que
-    anda por quadro na arte; a velocidade é a do vídeo × fator."""
+def walk(clip, folder, f):
+    """Andar em arrancadas, como no vídeo: a distância de cada quadro do loop é o quanto o
+    tronco anda no vídeo até o quadro seguinte (o mesmo registro da conversão, que deixa o
+    tronco parado na célula), e o tempo dele é o do vídeo ÷ fator. O motor anda cada quadro
+    nesse ritmo, então o pé fica plantado nas paradas e nas arrancadas."""
     step = clip.q[1] - clip.q[0]
-    end = clip.q[-1] + step
-    dist = abs(clip.x(end) - clip.x(clip.q[0])) * clip.k
-    seconds = (end - clip.q[0]) / VIDEO_FPS
-    return round(dist / len(clip.q), 2), round(dist / seconds * f, 1)
+    pts = clip.q + [clip.q[-1] + step]
+    frames, _ = read_frames(str(Path(folder) / clip.cfg['video']['arquivo']))
+    xs = [registration_x(keyer(frames[min(i, len(frames) - 1)], contour=bool(clip.cfg['video'].get('contorno'))))
+          for i in pts]
+    steps = [max(0.1, round(abs(b - a) * clip.k, 2)) for a, b in zip(xs, xs[1:])]
+    seconds = [round(step / VIDEO_FPS / f, 4)] * len(steps)
+    return steps, seconds
 
 
 def remap(t, old, new):
@@ -166,11 +172,15 @@ def plan(char, folder):
     report, mv = {}, {}
 
     # Andar: a arte dita o passo (sem deslizar) e o vídeo × fator a velocidade.
-    for state, key in (('WALK_FORWARD', 'walkSpeed'), ('WALK_BACK', 'walkBackSpeed')):
-        dpf, speed = walk(clip(state.lower()), acc(state))
-        anims[state]['distancePerFrame'] = dpf
-        mv[key] = speed
-        report[state] = f'{speed} u/s, {dpf} u por quadro (fator {acc(state)})'
+    for state, field, curve in (('WALK_FORWARD', 'walkSpeed', 'walkStepSeconds'),
+                                ('WALK_BACK', 'walkBackSpeed', 'walkBackStepSeconds')):
+        steps, seconds = walk(clip(state.lower()), folder, acc(state))
+        anims[state]['distancias'] = steps
+        anims[state]['distancePerFrame'] = round(sum(steps) / len(steps), 2)
+        mv[field] = round(sum(steps) / sum(seconds), 1)  # média (no ar e para a CPU)
+        mv[curve] = seconds
+        report[state] = (f'{mv[field]} u/s em média, de {min(steps) / seconds[0]:.0f} a '
+                         f'{max(steps) / seconds[0]:.0f} u/s (arrancadas do vídeo; fator {acc(state)})')
 
     # Corrida: o loop do vídeo no tempo dele ÷ fator; a velocidade é a do corpo no vídeo.
     c, f = clip('dash'), acc('DASH')
@@ -240,6 +250,9 @@ def plan(char, folder):
         m.update(startupFrames=s, activeFrames=a, recoveryFrames=r)
         anim = anims[m['animation']]
         anim.update(frames=frames, durationsMs=dur, impactFrame=impact)
+        if reverse:  # o personagem.py repete a ida e volta se refizer o pacote
+            c.cfg['animacao'] = {'frames': frames, 'impactFrame': impact}
+            write(ROOT / f'tools/sprites/clips/{char}_{name}.json', c.cfg)
         report[binding] = f'{s}/{a}/{r} quadros (startup/ativo/recuperação), impacto no q{c.q[impact]} (fator {f})'
 
     # Temporários que tocam o M: os mesmos tempos do M novo.
