@@ -128,7 +128,8 @@ anda para trás no chão. O desenho segue a velocidade de corrida do jogo: `DASH
 (`{"andar", "recuar", "correr", "arrancadaFrames", "freadaFrames"}`) dá a velocidade própria
 dele e faz o corpo acelerar na arrancada e deslizar desacelerando na freada, no mesmo passo do
 desenho. Cada personagem anda e corre do seu jeito; o que faltar no bloco é o do motor
-(`CombatConfig`), e sem arrancada/freada a corrida sai e para na hora.
+(`CombatConfig`), e sem arrancada/freada a corrida sai e para na hora. O pulo não segue o
+andar: a velocidade de lado no ar é `pulo`/`puloTras` do bloco, ou a de andar do motor.
 
 Animação de golpe também marca `impactFrame`: o índice (em `frames`) do quadro em que o
 golpe encosta. A animação estica sobre o frame data, e o build recusa o pacote se esse

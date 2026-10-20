@@ -59,9 +59,8 @@ public class CinematicaDirectorTest {
         assertTrue("os dois pularam", noAr);
         assertFalse(m.director.movendo(0));
         assertTrue(m.f(0).grounded && m.f(1).grounded);
-        // quanto cada um recua no ar é o andar para trás dele (o p01 recua devagar, como no vídeo)
         assertTrue("afastaram: " + antes + " → " + CinematicaDirector.vao(m.f(0), m.f(1)),
-            CinematicaDirector.vao(m.f(0), m.f(1)) > antes + 100f);
+            CinematicaDirector.vao(m.f(0), m.f(1)) > antes + 250f);
     }
 
     @Test public void correrParaNaDistancia() {

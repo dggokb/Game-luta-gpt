@@ -375,13 +375,15 @@ final class CharacterDefinition {
         /**
          * Movimento próprio (bloco "movimento"): velocidades de andar, recuar e correr, em unidades
          * do mundo por segundo (0 = a do motor, CombatConfig), frames da arrancada até a velocidade
-         * de corrida e do deslize da freada ao soltar (0 = na hora).
+         * de corrida e do deslize da freada ao soltar (0 = na hora). O pulo tem a velocidade de lado
+         * dele ("pulo" e "puloTras"): não segue o andar (0 = a de andar do motor).
          */
-        float walkSpeed, walkBackSpeed, runSpeed;
+        float walkSpeed, walkBackSpeed, runSpeed, jumpDrift, jumpBackDrift;
         int runStartFrames, runBrakeFrames;
         Fighter withMovement(float walk,float back,float run,int start,int brake) {
             walkSpeed=walk; walkBackSpeed=back; runSpeed=run; runStartFrames=start; runBrakeFrames=brake; return this;
         }
+        Fighter withJumpDrift(float forward,float back) { jumpDrift=forward; jumpBackDrift=back; return this; }
         /** Henchmen the Super calls in instead of its wave (0 = the wave). */
         int henchmen;
         Fighter withHenchmen(int count) { henchmen=count; return this; }

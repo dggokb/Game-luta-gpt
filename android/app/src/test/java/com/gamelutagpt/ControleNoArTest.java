@@ -20,8 +20,8 @@ public class ControleNoArTest {
 
         CombatFighter p() { return engine.fighter(0); }
         CombatConfig config() { return engine.config; }
-        /** Andar do lutador: o do bloco "movimento" dele, ou o do motor. */
-        float andar() { return BASE.fighter.walkSpeed > 0f ? BASE.fighter.walkSpeed : config().walkSpeed; }
+        /** Velocidade de lado do pulo: a do bloco "movimento" (pulo), ou a de andar do motor. */
+        float andar() { return BASE.fighter.jumpDrift > 0f ? BASE.fighter.jumpDrift : config().walkSpeed; }
 
         void step() {
             engine.step(in[0], in[1]);

@@ -2860,17 +2860,17 @@ final class GeneratedSpriteLayouts {
     static final int VICTORY_ROOT_Y = 569;
     static final int VICTORY_FRAME_COUNT = 19;
 
-    static final int WALK_BACK_SET_FRAME_WIDTH = 335;
-    static final int WALK_BACK_SET_FRAME_HEIGHT = 468;
-    static final int WALK_BACK_SET_ROOT_X = 176;
-    static final int WALK_BACK_SET_ROOT_Y = 459;
-    static final int WALK_BACK_SET_FRAME_COUNT = 17;
+    static final int WALK_BACK_SET_FRAME_WIDTH = 362;
+    static final int WALK_BACK_SET_FRAME_HEIGHT = 493;
+    static final int WALK_BACK_SET_ROOT_X = 183;
+    static final int WALK_BACK_SET_ROOT_Y = 483;
+    static final int WALK_BACK_SET_FRAME_COUNT = 21;
 
-    static final int WALK_FORWARD_SET_FRAME_WIDTH = 324;
-    static final int WALK_FORWARD_SET_FRAME_HEIGHT = 468;
-    static final int WALK_FORWARD_SET_ROOT_X = 173;
-    static final int WALK_FORWARD_SET_ROOT_Y = 459;
-    static final int WALK_FORWARD_SET_FRAME_COUNT = 10;
+    static final int WALK_FORWARD_SET_FRAME_WIDTH = 398;
+    static final int WALK_FORWARD_SET_FRAME_HEIGHT = 481;
+    static final int WALK_FORWARD_SET_ROOT_X = 215;
+    static final int WALK_FORWARD_SET_ROOT_Y = 471;
+    static final int WALK_FORWARD_SET_FRAME_COUNT = 17;
 
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_WIDTH = 232;
     static final int PLAYER_TWO_HEAVY_STRAIGHT_FRAME_HEIGHT = 239;

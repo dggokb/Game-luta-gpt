@@ -33,7 +33,7 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             'DASH_START','DASH_STOP')
 KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 # Bloco "movimento" do lutador: o que é próprio de cada personagem no deslocamento.
-MOVEMENT_KEYS = {'andar','recuar','correr','arrancadaFrames','freadaFrames'}
+MOVEMENT_KEYS = {'andar','recuar','correr','arrancadaFrames','freadaFrames','pulo','puloTras'}
 # Every input the simulation can request. Ground L/M/H, crouching 2X and airborne jX.
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # Optional air inputs with down held (↓ + button in the air); without them jX is used.
@@ -138,11 +138,12 @@ def validate_fighter(pack):
     if 'mecanica' in f: validate_fighter_mechanics(name, f['mecanica'])
     if 'movimento' in f:
         # Movimento próprio do personagem (tirado dos vídeos dele): velocidades de andar, recuar
-        # e correr (unidades por segundo) e frames da arrancada e da freada. O que faltar é o do motor.
+        # e correr (unidades por segundo), frames da arrancada e da freada, e a velocidade de lado do
+        # pulo (pulo, puloTras: não segue o andar). O que faltar é o do motor.
         mov = f['movimento']
         if not isinstance(mov, dict) or set(mov) - MOVEMENT_KEYS:
             raise ValueError(f'{name}.movimento: expected some of {sorted(MOVEMENT_KEYS)}')
-        for k in ('andar','recuar','correr'):
+        for k in ('andar','recuar','correr','pulo','puloTras'):
             if k in mov: positive(mov[k], f'{name}.movimento.{k}')
         for k in ('arrancadaFrames','freadaFrames'):
             if k in mov: non_negative_int(mov[k], f'{name}.movimento.{k}')
@@ -668,6 +669,8 @@ def compile_packs(root, results):
                    +('.withMovement('+','.join(f(fi['movimento'].get(k,0)) for k in ('andar','recuar','correr'))+','
                      +str(fi['movimento'].get('arrancadaFrames',0))+','+str(fi['movimento'].get('freadaFrames',0))+')'
                      if 'movimento' in fi else '')
+                   +('.withJumpDrift('+f(fi['movimento'].get('pulo',0))+','+f(fi['movimento'].get('puloTras',0))+')'
+                     if any(k in fi.get('movimento',{}) for k in ('pulo','puloTras')) else '')
                    +(ultra_sequence(fi['ultra']) if 'ultra' in fi else ''))
         stand,crouch = pack['_visual']
         lines += [' all.put('+q(pack['id'])+',new CharacterDefinition('+q(pack['id'])+','+q(pack['displayName'])+','+profile+','+str(FACINGS[pack['artFacing']])+','+f(stand)+','+f(crouch)+','+fighter+',a,m,s,sm));',' }']

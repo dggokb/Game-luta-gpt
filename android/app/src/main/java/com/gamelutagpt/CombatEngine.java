@@ -1348,10 +1348,15 @@ final class CombatEngine {
             : direction == 1 || direction == 2 || direction == 8 ? 1 : 0;
     }
 
-    /** Velocidade de lado no ar: a de andar para frente, ou a de andar para trás. */
+    /**
+     * Velocidade de lado no ar: a do pulo do lutador (bloco "movimento": pulo, puloTras), ou a de
+     * andar do motor. Não segue o andar dele: um andar lento não encurta o pulo.
+     */
     private float airSpeed(CombatFighter f, int horizontal) {
         if (horizontal == 0) return 0f;
-        return walkSpeed(f.state.character.fighter, horizontal == f.facing);
+        CharacterDefinition.Fighter run = f.state.character.fighter;
+        if (horizontal == f.facing) return run.jumpDrift > 0f ? run.jumpDrift : config.walkSpeed;
+        return run.jumpBackDrift > 0f ? run.jumpBackDrift : config.walkBackSpeed;
     }
 
     /** No ar: o lado do pulo conforme o modo da saída ({@link CombatFighter#jumpMode}). */
