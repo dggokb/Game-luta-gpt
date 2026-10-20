@@ -1,5 +1,8 @@
 # Animação por vídeo (Seedance) — padrão
 
+> **Omni Flash 1.1 (Google Flow):** a fórmula de prompt, os pares de quadros de início e fim e
+> o jab com quadro final estão em [omni-flash.md](omni-flash.md). As regras abaixo continuam valendo.
+
 Decidido no p01: cada animação é um **vídeo curto** gerado no Seedance a partir de uma
 imagem inicial do personagem. O vídeo vira os quadros do jogo com
 `tools/sprites/video_para_sprite.py` (recorta o verde, tira sombra e poeira, corrige o
