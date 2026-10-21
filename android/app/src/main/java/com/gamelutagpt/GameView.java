@@ -107,6 +107,15 @@ public class GameView extends SurfaceView
     private final EffectsRenderer effects = new EffectsRenderer();
     /** Hit and guard sparks at the real contact point (presentation only). */
     private final ImpactEffects impacts = new ImpactEffects();
+    /**
+     * Efeitos vindos de vídeo (assets/efeitos, feitos pelo tools/sprites/efeito_video.py). Cada
+     * evento tenta o dele e, se ainda não existe, usa o efeito clássico do ImpactEffects.
+     */
+    private final EfeitosVideo efeitos;
+    /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
+    private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
+    /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
+    private final boolean[] ativoAntes = new boolean[2];
     /** Soco de câmera, escurecida do cenário e câmera lenta do KO. */
     private final ImpactFeel feel = new ImpactFeel();
     /** Golpe que mata e ganha a luta com Super ou Ultra: o quadro de mangá com linhas de ação. */
@@ -386,6 +395,7 @@ public class GameView extends SurfaceView
      */
     public GameView(Context context, boolean emSegundoPlano) {
         super(context);
+        efeitos = new EfeitosVideo(context.getAssets());
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
@@ -520,6 +530,8 @@ public class GameView extends SurfaceView
         MedicaoCarregamento medicao = new MedicaoCarregamento("arte");
         hud.loadArt(context);
         medicao.parte("hud");
+        efeitos.carregar();
+        medicao.parte("efeitos");
         // One decode per atlas for the whole match: team packs (tag never decodes
         // mid-fight) and the opponent share the same cache. No celular só os renderers: as
         // folhas vêm com a luta (selectTeamsNow), muitas vezes já antecipadas.
@@ -1283,6 +1295,7 @@ public class GameView extends SurfaceView
         for (CombatEngine.ProjectileClash clash : engine.clashes()) spawnClash(clash);
         updateUltraBeam();
         impacts.update(FIXED_STEP);
+        efeitos.passo();
         feel.step();
         playMotionSounds();
         if (dummyDamageLabelFrames > 0) dummyDamageLabelFrames--;
@@ -1333,6 +1346,7 @@ public class GameView extends SurfaceView
     void startIntro() {
         hud.resetEffects();
         impacts.clear();
+        efeitos.limpar();
         feel.clear();
         finalizacao.limpar();
         koVictim = null;
@@ -1871,7 +1885,9 @@ public class GameView extends SurfaceView
         int size = ultraHit ? ImpactEffects.SPECIAL : ImpactEffects.sizeOf(event.strength, event.damage);
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
-        impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        if (!efeitoDeGolpe(event.blocked, x, y, direction, size)) {
+            impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
+        }
         // O tremor do golpe tem direção: a tela vai no sentido do golpe e volta (o aleatório fica menor).
         if (!event.blocked) feel.kick(direction, size);
         if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 4f : 6f);
@@ -2044,15 +2060,21 @@ public class GameView extends SurfaceView
             boolean down = f.status == CombatFighter.Status.KNOCKDOWN;
             if (down && !downSeen[i]) {
                 // Bateu no chão: poeira e pedrinhas, mais forte quando vem do alto.
-                impacts.spawnDust(f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)), GROUND_Y,
-                    wasAirborne[i] ? 1f : 0.45f);
+                float dx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+                float forca = wasAirborne[i] ? 1f : 0.45f;
+                if (!efeitos.tocar("impacto_chao", dx, GROUND_Y, 0.7f + 0.3f * forca, false)) {
+                    impacts.spawnDust(dx, GROUND_Y, forca);
+                }
             }
             downSeen[i] = down;
+            efeitosDeMovimento(i, f);
             wasAirborne[i] = !f.grounded;
             if (f.superJumping && !superJumpSeen[i]) {
                 // Saída do super pulo: anel de choque e poeira nos pés, na cor do lutador.
-                impacts.spawnSuperJump(f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT)),
-                    GROUND_Y, f.state.profile.color);
+                float sx = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+                if (!efeitos.tocar("super_pulo", sx, GROUND_Y, 1f, false)) {
+                    impacts.spawnSuperJump(sx, GROUND_Y, f.state.profile.color);
+                }
             }
             superJumpSeen[i] = f.superJumping;
             boolean lying = f.status == CombatFighter.Status.KNOCKDOWN &&
@@ -2527,6 +2549,7 @@ public class GameView extends SurfaceView
             drawPlayer(canvas);
             canvas.restore();
             impacts.draw(canvas);
+            efeitos.desenhar(canvas);
             effects.drawWorldOverlay(canvas, paint, feel.flashAlpha(), 255, 255, 255);
             if (beam) {
                 raioFinal.drawFront(renderCanvas, ultraPack, ultraBeamFrame());
@@ -3109,6 +3132,17 @@ public class GameView extends SurfaceView
     private void poeiraDoMotor(SpriteFighterRenderer renderer, CombatFighter f, float offset) {
         Pose pose = renderer.animacao.pose();
         float x = f.x + offset;
+        // Efeitos de vídeo do pouso e do pé no chão, quando existem.
+        if (pose.poeira > 0f && efeitos.tocar("fumaca_pouso", x, GROUND_Y, 0.6f + 0.6f * pose.poeira, false)) {
+            pose.poeira = 0f;
+        }
+        if (pose.deslize != 0) {
+            int d = pose.deslize;
+            // O vídeo é de quem olha (e corre) para a direita: a poeira sai para trás, à esquerda.
+            boolean largada = f.forwardDashing || f.backdashFrames > 0;
+            String nome = largada ? "poeira_corrida" : "poeira_freada";
+            if (efeitos.tocar(nome, x, GROUND_Y, 1f, d < 0)) pose.deslize = 0;
+        }
         if (pose.poeira >= POEIRA_NUVEM) {
             impacts.spawnDust(x, GROUND_Y, pose.poeira);
         } else if (pose.poeira > 0f) {
@@ -3121,6 +3155,39 @@ public class GameView extends SurfaceView
             impacts.spawnSkid(x + d * 16f, GROUND_Y, d);
             impacts.spawnSkid(x - d * 18f, GROUND_Y, d);
         }
+    }
+
+    /**
+     * Golpe que acertou (ou defendido) com o efeito de vídeo: o do tamanho dele, ou o do tamanho
+     * de baixo maior. O vídeo é de um golpe para a direita (espelha para a esquerda). False:
+     * não há o efeito, e o clássico entra.
+     */
+    private boolean efeitoDeGolpe(boolean defendido, float x, float y, int direction, int size) {
+        boolean esquerda = direction < 0;
+        if (defendido) return efeitos.tocar("defesa", x, y, 1f, esquerda);
+        for (int s = Math.min(size, EFEITO_GOLPE.length - 1); s >= 0; s--) {
+            if (efeitos.tocar(EFEITO_GOLPE[s], x, y, 1f + 0.25f * (size - s), esquerda)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Efeitos de vídeo do movimento (só quando o efeito existe): fumaça na decolagem e o arco do
+     * golpe forte quando a janela ativa abre.
+     */
+    private void efeitosDeMovimento(int i, CombatFighter f) {
+        float x = f.x + (i == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
+        if (!wasAirborne[i] && !f.grounded && f.vy < 0f && !f.superJumping) {
+            efeitos.tocar("fumaca_pulo", x, GROUND_Y, 1f, false);
+        }
+        AttackDefinition a = f.attacking() ? f.attack : null;
+        boolean ativo = a != null && a.melee() && a.isActive(f.attackFrame);
+        if (ativo && !ativoAntes[i] && a.strength != AttackDefinition.Strength.LIGHT &&
+            a.strength != AttackDefinition.Strength.MEDIUM) {
+            // A origem do arco é o ombro (o vídeo: um golpe de baixo para cima, para a direita).
+            efeitos.tocar("arco_golpe", x + f.facing * 12f, f.y - f.character().visualStandHeight * 0.6f, 1f, f.facing < 0);
+        }
+        ativoAntes[i] = ativo;
     }
 
     /** Altura em que o lutador é desenhado (o pulinho do backdash sobe só o desenho). */

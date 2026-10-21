@@ -20,7 +20,10 @@ acertar trava e errar passa do ponto, reação pela altura do golpe, variação,
 vida, defesa pesada, sombra de contato, tranco da tela com direção e câmera adiantada na
 corrida. No motor de combate: preparação do pulo (3 quadros) e aterrissagem do pulo vazio
 (3 quadros), as duas desligáveis no `CombatConfig`.
-Quadros intermediários fora do jogo: `tools/sprites/intermediarios.py`. Botão **ANIM** (ou **F4**): 100% → 150% → 50% → desligado.
+Quadros intermediários fora do jogo: `tools/sprites/intermediarios.py`.
+**Efeitos de vídeo**: impacto, fumaça, onda de chão e arco de golpe gerados sozinhos no verde e
+convertidos por `tools/sprites/efeito_video.py`; enquanto um não existe, o jogo usa o clássico.
+Lista e como gerar: [docs/efeitos-de-video.md](docs/efeitos-de-video.md). Botão **ANIM** (ou **F4**): 100% → 150% → 50% → desligado.
 Revisão lado a lado no PC: `gradle :pc:revisarAnimacao`. Como funciona e como levar para a
 sprite-gpt: [docs/motor-animacao.md](docs/motor-animacao.md).
 
