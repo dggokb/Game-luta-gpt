@@ -127,15 +127,6 @@ final class ControlsLayout {
         if (insideRect(x, y, HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM)) {
             return Control.HEAL_OPPONENT;
         }
-        if (insideRect(x, y, TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM)) {
-            return Control.TEAM_SELECT;
-        }
-        if (insideRect(x, y, STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM)) {
-            return Control.STORY;
-        }
-        if (insideRect(x, y, TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM)) {
-            return Control.TUTORIAL;
-        }
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;
         }

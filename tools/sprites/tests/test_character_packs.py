@@ -86,45 +86,17 @@ class CharacterPackTests(unittest.TestCase):
         path=self.root/'tools/sprites/clips/player_base_jab.json';d=json.loads(path.read_text());d['columns']=2;path.write_text(json.dumps(d))
         with self.assertRaisesRegex(ValueError,'dimensions'):pipeline.build(self.root)
 
-    def test_non_comparable_anatomy_reference_is_rejected(self):
-        path=self.root/'tools/sprites/clips/player_two_jab.json'
-        data=json.loads(path.read_text());data['anatomyReferenceFrame']=1
-        path.write_text(json.dumps(data))
-        with self.assertRaisesRegex(ValueError,'anatomy reference frame'):
-            pipeline.build(self.root)
-
-
-    def test_checked_in_roster_contains_real_second_character(self):
+    def test_checked_in_roster_is_the_p01_alone(self):
+        # Versão leve: só o p01, na dupla, no CPU e na seleção.
         roster=json.loads((self.root/'characters/roster.json').read_text())
-        self.assertEqual(['player_base','p03'],roster['team'])
-        self.assertEqual('monster_npc',roster['opponentCharacter'])
-        monster=json.loads((self.root/'characters/monster_npc/character.json').read_text())
-        self.assertEqual('monster_npc.json',monster['profile'])
-        self.assertEqual({'monster_npc_pack'},{a['atlas'] for a in monster['animations'].values()})
+        self.assertEqual(['player_base','player_base'],roster['team'])
+        self.assertEqual('player_base',roster['opponentCharacter'])
+        self.assertEqual(['player_base'],roster['selectable'])
         first=json.loads((self.root/'characters/player_base/character.json').read_text())
-        second=json.loads((self.root/'characters/player_two/character.json').read_text())
-        self.assertNotEqual(first['id'],second['id'])
-        self.assertEqual('player_two.json',second['profile'])
-        self.assertNotEqual(first['profile'],second['profile'])
-        self.assertTrue(set(second['animations']).issubset(set(first['animations'])))
-        self.assertTrue(all(a['atlas'].startswith('player_two_') for a in second['animations'].values()))
-        def shared(pack,binding):
-            # Cancels into the character's own command specials (S2...) are not shared data.
-            m=copy.deepcopy(pack['moves'][binding])
-            for key in ('cancelInto','rotasProprias'):
-                if key in m: m[key]=[t for t in m[key] if t not in pack.get('specialMoves',{})]
-            # Reach and hit height follow each character's art size (worldScale).
-            for k in ('reach','hitHeight'): m.pop(k,None)
-            return m
-        for binding in ('L','M','H'):
-            self.assertEqual(shared(first,binding),shared(second,binding))
         self.assertEqual({'S2','S3','S4'},set(first['specialMoves']))
         self.assertEqual(set(pipeline.BINDINGS),set(first['moves'])-set(pipeline.AIR_DOWN_BINDINGS))
         self.assertIn('j2H',first['moves'])
-        self.assertEqual(set(pipeline.BINDINGS),set(second['moves']))
         self.assertIn('animation',first['moves']['2L'])
-        self.assertEqual('CROUCH',second['moves']['2L']['pose'])
-
     def test_typo_in_state_name_is_rejected(self):
         self.edit(lambda d:d['animations'].__setitem__('HIT_STAN',d['animations'].pop('HIT_STAND')))
         with self.assertRaisesRegex(ValueError,'HIT_STAN.*not a known state'):pipeline.build(self.root)
@@ -264,11 +236,6 @@ class CharacterPackTests(unittest.TestCase):
         self.assertLess(b,g+18);self.assertGreater(n,0)
         self.assertEqual((120,80,60,255),out.getpixel((0,0)))
 
-    def test_upscaling_a_master_requires_an_explicit_reason(self):
-        path=self.root/'tools/sprites/clips/player_two_movement.json';d=json.loads(path.read_text())
-        d['transform']['scale']=1.2;path.write_text(json.dumps(d))
-        with self.assertRaisesRegex(ValueError,'requires allowUpscale'):pipeline.build(self.root)
-
     def test_component_segmentation_separates_poses_that_overlap_in_x(self):
         import import_sprites as imp
         from PIL import Image
@@ -342,7 +309,6 @@ class BuiltPackTests(unittest.TestCase):
         self.assertIn('sm.put("S2",new CharacterDefinition.Special(new CharacterDefinition.Move("S2",a.get("SPECIAL_S2")',java)
         self.assertIn('new int[]{1,3,2},"LMH","Punho ascendente",false,false));',java)
         self.assertIn('new int[]{3,4,5},"LMH","Chute girat\\u00f3rio",false,false));',java)
-        self.assertIn('new AttackDefinition.Builder("2H",AttackDefinition.Kind.NORMAL).damage(800).frames(9,6,9)',java)
         self.assertIn('.launch(AttackDefinition.Launch.LAUNCH)',java)
         self.assertIn('new AttackDefinition.Builder("SUPER",AttackDefinition.Kind.SUPER)',java)
     def test_shipped_atlases_are_packed(self):
@@ -422,57 +388,9 @@ class BuiltPackTests(unittest.TestCase):
             cell=hd.crop((i%columns*width*2,i//columns*height*2,(i%columns+1)*width*2,(i//columns+1)*height*2))
             self.assertAlmostEqual(tuning,tall(cell)/(2*tall(src)),delta=0.01,msg=f'{sheet} cell {i}')
 
-    def test_p02_hd_idle_preserves_proportions_root_timing_and_budget(self):
-        from PIL import Image
-        char=json.loads((self.root/'characters/p02/character.json').read_text())
-        idle=char['animations']['IDLE']
-        # Approved playback (4189d492): the loop plays cells 15-44 of the 56-cell atlas.
-        self.assertEqual(list(range(15,45)),idle['frames'])
-        self.assertEqual([41]*30,idle['durationsMs'])
-        self.assertTrue(idle['loop'])
-        report=json.loads((self.root/'tools/sprites/reports/p02_idle.report.json').read_text())
-        self.assertEqual([384,512,194,476],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        packed=report['packed']
-        self.assertEqual(2,packed['pixelScale'])
-        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
-        self.assertLessEqual(packed['frameHeight']*6,4096)
-        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
-        self.assertEqual(194,packed['rootX']+packed['cropOffset'][0])
-        self.assertEqual(476,packed['rootY']+packed['cropOffset'][1])
-        # The HD sheet is the video sheet at 2x, resized by the in-app size tuning (97%).
-        self.assert_hd_follows_reference('p02_idle',11,192,256,56,0.97)
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',11,56,2.00000000f,',java)
-        self.assertIn('art/sprites/source/p02_idle_video_normalized.png',report['provenance']['referenceSources'])
-
-    def test_p03_hd_idle_preserves_registration_timing_and_budget(self):
-        from PIL import Image
-        char=json.loads((self.root/'characters/p03/character.json').read_text())
-        idle=char['animations']['IDLE']
-        self.assertEqual(list(range(60)),idle['frames'])
-        self.assertEqual([41]*60,idle['durationsMs'])
-        self.assertTrue(idle['loop'])
-        report=json.loads((self.root/'tools/sprites/reports/p03_idle.report.json').read_text())
-        # The 104% size tuning grew the cell by 2 px (root kept on the feet).
-        self.assertEqual([512,514,256,478],[report['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        packed=report['packed']
-        self.assertEqual(2,packed['pixelScale'])
-        self.assertLessEqual(packed['frameWidth']*packed['columns'],4096)
-        self.assertLessEqual(packed['frameHeight']*8,4096)
-        self.assertLess(packed['decodedBytes']['packed'],64*1024*1024)
-        self.assertEqual(256,packed['rootX']+packed['cropOffset'][0])
-        self.assertEqual(478,packed['rootY']+packed['cropOffset'][1])
-        # The HD sheet is the video sheet at 2x, resized by the in-app size tuning (104%).
-        self.assert_hd_follows_reference('p03_idle',8,256,256,60,1.04)
-        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn(',8,60,2.00000000f,',java)
-        self.assertIn('art/sprites/source/p03_idle_video_normalized.png',report['provenance']['referenceSources'])
-
     def test_visual_heights_and_stats_are_generated(self):
         java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
-        self.assertIn('new CharacterDefinition.Fighter(0xFFD9485F',java)
         self.assertIn('m.put("jH",new CharacterDefinition.Move("jH",a.get("JUMP_HEAVY"),null',java)
-        self.assertIn('m.put("2L",new CharacterDefinition.Move("2L",null,"CROUCH"',java.split('all.put("player_base"')[1])
         states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
         self.assertIn('static final String HIT_AIR = "HIT_AIR";',states)
 
@@ -521,32 +439,6 @@ class BuiltPackTests(unittest.TestCase):
         self.assertEqual('player_base_fall',pack['animations']['GROUNDED']['atlas'])
         states=(self.root/pipeline.JAVA/'SpriteStates.java').read_text()
         self.assertIn('DEFENSE_AIR = "DEFENSE_AIR"',states)
-
-    def test_player_two_generated_art_passes_own_profile(self):
-        idle=json.loads((self.root/'tools/sprites/reports/player_two_idle.report.json').read_text())
-        movement=json.loads((self.root/'tools/sprites/reports/player_two_movement.report.json').read_text())
-        jab=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
-        medium=json.loads((self.root/'tools/sprites/reports/player_two_medium_kick.report.json').read_text())
-        heavy=json.loads((self.root/'tools/sprites/reports/player_two_heavy_straight.report.json').read_text())
-        self.assertEqual([384,256,192,246],[idle['layout'][k] for k in ('frameWidth','frameHeight','rootX','rootY')])
-        self.assertEqual(16,movement['layout']['frameCount'])
-        for report in (jab,medium,heavy):
-            self.assertEqual('player_two',report['characterProfile'])
-            self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
-            self.assertTrue(report['anatomy']['passed'])
-            self.assertEqual(246,report['layout']['rootY'])
-        self.assertEqual(3,jab['layout']['frameCount'])
-        self.assertEqual(3,medium['layout']['frameCount'])
-        self.assertEqual(9,heavy['layout']['frameCount'])
-
-    def test_drawn_sheet_uses_canonical_anatomy_scale(self):
-        # player_base now comes from video; player_two keeps the drawn sheets.
-        report=json.loads((self.root/'tools/sprites/reports/player_two_jab.report.json').read_text())
-        self.assertEqual('canonical-anatomy',report['anatomy']['mode'])
-        self.assertTrue(report['anatomy']['passed'])
-        self.assertLess(report['scale'],0.66)
-        self.assertEqual(192,report['layout']['rootX'])
-        self.assertEqual(246,report['layout']['rootY'])
 
     def test_get_up_starts_lying_head_back_like_the_end_of_the_fall(self):
         from PIL import Image

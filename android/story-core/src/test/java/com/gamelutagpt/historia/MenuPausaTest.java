@@ -5,122 +5,33 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import com.gamelutagpt.render.RenderAssets;
+import com.gamelutagpt.render.RenderCanvas;
 import com.gamelutagpt.render.RenderImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import org.junit.Test;
 
-public class MenuInicialTest {
+/** A pausa (o que sobrou do story-core na versão leve). */
+public class MenuPausaTest {
     private static final float DT = 1f / 60f;
-
-    /** Lê os textos de verdade do jogo; imagens não abrem (o menu escreve o nome do jogo). */
-    private static final class GameAssets implements RenderAssets {
-        @Override public String readText(String path) throws IOException {
-            return new String(Files.readAllBytes(new File("../app/src/main/assets", path).toPath()), StandardCharsets.UTF_8);
-        }
-        @Override public RenderImage loadImage(String path) throws IOException { throw new IOException("sem " + path); }
-    }
-
-    private static MenuInicial.Opcao run(MenuInicial m, float seconds) {
-        MenuInicial.Opcao escolha = null;
-        for (float t = 0f; t < seconds; t += DT) {
-            MenuInicial.Opcao o = m.update(DT);
-            if (o != null) {
-                assertNull("a escolha sai uma vez só", escolha);
-                escolha = o;
-            }
-        }
-        return escolha;
-    }
-
-    private static float[] centro(int opcao) {
-        float[] c = MenuInicial.CAIXAS[opcao];
-        return new float[] {(c[0] + c[2]) * 0.5f, (c[1] + c[3]) * 0.5f};
-    }
-
-    @Test
-    public void toqueNaOpcaoEscolheDepoisDoEscurecer() {
-        MenuInicial m = new MenuInicial(new GameAssets());
-        m.abrir(null);
-        assertTrue(m.isOpen());
-        float[] teste = centro(2);
-        m.tap(teste[0], teste[1]); // cedo demais: o toque que abriu o menu não vale
-        assertNull(run(m, MenuInicial.TAP_DELAY + 0.05f));
-        m.tap(640f, 60f); // no logo: nada
-        assertNull(run(m, 0.1f));
-        m.tap(teste[0], teste[1]);
-        assertEquals(MenuInicial.Opcao.TESTE, m.cursor());
-        assertTrue(m.isOpen());
-        assertEquals(MenuInicial.Opcao.TESTE, run(m, MenuInicial.FLASH + MenuInicial.FADE_OUT + 0.1f));
-        assertFalse(m.isOpen());
-    }
-
-    @Test
-    public void controleMoveOCursorEConfirma() {
-        MenuInicial m = new MenuInicial(new GameAssets());
-        m.abrir(null);
-        assertEquals(MenuInicial.Opcao.HISTORIA, m.cursor());
-        m.mover(1);
-        assertEquals(MenuInicial.Opcao.ARCADE, m.cursor());
-        m.mover(1);
-        assertEquals(MenuInicial.Opcao.TESTE, m.cursor());
-        m.mover(1); // dá a volta
-        assertEquals(MenuInicial.Opcao.HISTORIA, m.cursor());
-        m.mover(-1);
-        assertEquals(MenuInicial.Opcao.TESTE, m.cursor());
-        m.mover(1);
-        run(m, MenuInicial.TAP_DELAY + 0.05f);
-        m.confirmar();
-        m.mover(1); // depois de escolher, o cursor não anda
-        assertEquals(MenuInicial.Opcao.HISTORIA, m.cursor());
-        assertEquals(MenuInicial.Opcao.HISTORIA, run(m, 1f));
-    }
-
-    @Test
-    public void desenhaComESemTemporadaEmOutroIdioma() throws IOException {
-        GameAssets assets = new GameAssets();
-        Temporada temporada = Temporada.load(assets);
-        assertTrue(temporada.setIdioma(assets, "en"));
-        assertEquals("STORY MODE", temporada.t(MenuInicial.HISTORIA));
-        MenuInicial m = new MenuInicial(assets);
-        m.setVersao("v1");
-        for (Temporada t : new Temporada[] {temporada, null}) {
-            m.abrir(t);
-            for (int i = 0; i < 120; i++) {
-                m.update(DT);
-                m.render(new PaginaHistoriaTest.NullCanvas());
-            }
-            m.confirmar();
-            for (int i = 0; i < 60 && m.isOpen(); i++) {
-                m.update(DT);
-                m.render(new PaginaHistoriaTest.NullCanvas());
-            }
-            assertFalse(m.isOpen());
-        }
-    }
 
     @Test
     public void pausaContinuaOuVoltaAoMenu() {
         MenuPausa p = new MenuPausa();
-        p.abrir(null, true);
+        p.abrir(MenuPausa.AVISO);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.cursor());
         float[] menu = MenuPausa.CAIXAS[7];
         assertNull("o toque que abriu a pausa não escolhe", p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         for (int i = 0; i < 20; i++) p.update(DT);
         assertNull(p.tap(640f, 675f));
         assertTrue(p.isOpen());
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
         assertEquals(MenuPausa.Opcao.MENU, p.tap((menu[0] + menu[2]) * 0.5f, (menu[1] + menu[3]) * 0.5f));
         assertFalse(p.isOpen());
 
-        p.abrir(null, false);
+        p.abrir(null);
         assertEquals(MenuPausa.Opcao.CONTINUAR, p.voltar());
         assertFalse(p.isOpen());
 
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         for (int i = 0; i < 7; i++) p.mover(1);
         assertEquals(MenuPausa.Opcao.MENU, p.confirmar());
@@ -130,7 +41,7 @@ public class MenuInicialTest {
     @Test
     public void pausaLigaEDesligaOContadorDeFps() {
         MenuPausa p = new MenuPausa();
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         assertTrue("ligado de começo", p.fps());
         for (int i = 0; i < 6; i++) p.mover(1);
@@ -143,7 +54,7 @@ public class MenuInicialTest {
         assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
         assertFalse(p.fps());
         assertTrue(p.isOpen());
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
     }
 
     @Test
@@ -155,7 +66,7 @@ public class MenuInicialTest {
             @Override public String rotulo(java.util.function.UnaryOperator<String> traduzir) { return traduzir.apply(nomes[nivel[0]]); }
             @Override public void mudar(int direcao) { nivel[0] = ((nivel[0] + (direcao > 0 ? 1 : -1)) % 4 + 4) % 4; }
         });
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         for (int i = 0; i < 5; i++) p.mover(1);
         assertEquals(MenuPausa.Opcao.GRAFICOS, p.cursor());
@@ -167,7 +78,7 @@ public class MenuInicialTest {
         assertNull(p.tap(caixa[2] - 10f, (caixa[1] + caixa[3]) * 0.5f));
         assertEquals(1, nivel[0]);
         assertTrue(p.isOpen());
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
     }
 
     private static TelaComandos.Ficha ficha(String nome) {
@@ -180,7 +91,7 @@ public class MenuInicialTest {
     public void pausaMostraOsComandosDeCadaPersonagem() {
         MenuPausa p = new MenuPausa();
         p.comandos().setFichas(java.util.Arrays.asList(ficha("p01"), ficha("p02"), ficha("p03")), 1);
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         p.mover(1);
         p.mover(1);
@@ -199,7 +110,7 @@ public class MenuInicialTest {
         assertEquals("dá a volta", "p01", p.comandos().ficha().personagem);
         p.ajustar(-1);
         assertEquals("p03", p.comandos().ficha().personagem);
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
         assertNull("voltar sai da lista e fica na pausa", p.voltar());
         assertTrue(p.isOpen());
         assertFalse(p.comandos().isOpen());
@@ -220,7 +131,7 @@ public class MenuInicialTest {
         assertFalse(p.comandos().isOpen());
 
         p.fechar();
-        p.abrir(null, false);
+        p.abrir(null);
         assertFalse("reabrir a pausa não abre a lista", p.comandos().isOpen());
     }
 
@@ -228,7 +139,7 @@ public class MenuInicialTest {
     public void pausaMudaAVelocidadeSemFechar() {
         MenuPausa p = new MenuPausa();
         assertEquals(MenuPausa.VELOCIDADE_PADRAO, p.velocidade(), 1e-6f);
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         assertFalse("◀ ▶ fora da VELOCIDADE não mudam nada", p.ajustar(1));
         p.mover(1);
@@ -242,7 +153,7 @@ public class MenuInicialTest {
         assertNull("A na VELOCIDADE não fecha a pausa", p.confirmar());
         assertTrue(p.isOpen());
         assertEquals("e dá a volta", 0.5f, p.velocidade(), 1e-6f);
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
 
         float[] caixa = MenuPausa.CAIXAS[1];
         float cy = (caixa[1] + caixa[3]) * 0.5f;
@@ -254,7 +165,7 @@ public class MenuInicialTest {
 
         p.setVelocidade(0.77f);
         assertEquals("salva fora da lista vira a mais próxima", 0.8f, p.velocidade(), 1e-6f);
-        p.abrir(null, false);
+        p.abrir(null);
         assertEquals("reabrir não volta ao padrão", 0.8f, p.velocidade(), 1e-6f);
     }
 
@@ -262,7 +173,7 @@ public class MenuInicialTest {
     public void pausaLigaEDesligaOImpactoSemFechar() {
         MenuPausa p = new MenuPausa();
         assertTrue("vem ligado", p.impacto());
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         p.mover(1);
         p.mover(1);
@@ -275,7 +186,7 @@ public class MenuInicialTest {
         assertNull(p.tap((caixa[0] + caixa[2]) * 0.5f, (caixa[1] + caixa[3]) * 0.5f));
         assertFalse("pelo toque", p.impacto());
         assertTrue(p.isOpen());
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
         p.setImpacto(true);
         assertTrue(p.impacto());
     }
@@ -284,7 +195,7 @@ public class MenuInicialTest {
     public void pausaMudaONivelDaCpuSemFechar() {
         MenuPausa p = new MenuPausa();
         assertEquals("o padrão é o 5", 5, p.nivelCpu());
-        p.abrir(null, false);
+        p.abrir(null);
         for (int i = 0; i < 20; i++) p.update(DT);
         p.mover(1);
         p.mover(1);
@@ -307,8 +218,33 @@ public class MenuInicialTest {
         assertNull(p.tap(caixa[0] + 20f, cy));
         assertEquals("metade esquerda: desce", 1, p.nivelCpu());
         assertTrue(p.isOpen());
-        p.render(new PaginaHistoriaTest.NullCanvas());
+        p.render(new NullCanvas());
         p.setNivelCpu(12);
         assertEquals("salvo fora da faixa vira o mais próximo", 8, p.nivelCpu());
+    }
+
+    static final class NullCanvas implements RenderCanvas {
+        @Override public void save() {}
+        @Override public void restore() {}
+        @Override public void translate(float dx, float dy) {}
+        @Override public void scale(float sx, float sy, float px, float py) {}
+        @Override public void rotate(float degrees, float px, float py) {}
+        @Override public void clipPolygon(float[] xy) {}
+        @Override public void fillRect(float l, float t, float r, float b, int argb) {}
+        @Override public void fillPolygon(float[] xy, int argb) {}
+        @Override public void strokePolygon(float[] xy, float width, int argb) {}
+        @Override public void fillCircle(float cx, float cy, float radius, int argb) {}
+        @Override public void strokeCircle(float cx, float cy, float radius, float width, int argb) {}
+        @Override public void drawLine(float x1, float y1, float x2, float y2, float width, int argb) {}
+        @Override public void drawImage(RenderImage image, float l, float t, float r, float b, int alpha) {}
+        @Override public void drawImageRegion(RenderImage image, float sl, float st, float sr, float sb,
+                                              float l, float t, float r, float b, int alpha) {}
+        @Override public void fillRadialGlow(float cx, float cy, float radius, int argbCenter) {}
+        @Override public void fillVerticalGradient(float l, float t, float r, float b, int top, int bottom) {}
+        @Override public void fillOval(float l, float t, float r, float b, int argb) {}
+        @Override public void drawText(String text, float x, float y, float size, int fill, int stroke,
+                                       float strokeWidth, boolean italic) {}
+        @Override public void beginInvert() {}
+        @Override public void endInvert() {}
     }
 }

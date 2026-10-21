@@ -37,34 +37,9 @@ public class VisualReviewTest {
         file.getParentFile().mkdirs();
         try(FileOutputStream out=new FileOutputStream(file)) {assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,out));}
     }
-    private CharacterSelect select() throws Exception {return (CharacterSelect)get("characterSelect");}
-    private void tapCard(int i) throws Exception {
-        float[] q=new float[8];select().cardCorners(i,q);
-        select().tap((q[0]+q[2]+q[4]+q[6])/4,(q[1]+q[5])/2);
-    }
-
-    @Test public void renderSelectionStates() throws Exception {
-        game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
-        select().open("player_base","p08","p03","p06");
-        Bitmap b=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
-        File dir=new File("build/visual-review/selection");
-        SystemClock.sleep(400);render(b);save(b,new File(dir,"step0.png"));
-        // The production loop renders every frame; render right after each tap so
-        // transitions start at the tap, then sample them later.
-        tapCard(4);render(b);SystemClock.sleep(120);render(b);save(b,new File(dir,"step1_flash.png"));
-        SystemClock.sleep(700);render(b);save(b,new File(dir,"step1.png"));
-        tapCard(1);render(b);tapCard(2);render(b);SystemClock.sleep(900);render(b);save(b,new File(dir,"step3.png"));
-        tapCard(6);render(b);SystemClock.sleep(130);render(b);save(b,new File(dir,"ready_in.png"));
-        SystemClock.sleep(800);render(b);save(b,new File(dir,"ready.png"));
-        // Short animation of the cursor idling, for motion review.
-        select().open("player_base","p08","p03","p06");tapCard(1);
-        for(int i=0;i<45;i++) {SystemClock.sleep(33);render(b);save(b,new File(dir,String.format("anim/%04d.png",i)));}
-        b.recycle();
-    }
 
     @Test public void renderFightImpactSequence() throws Exception {
         game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
-        select().close();
         set("introFrame",-1);
         CombatFighter p=game.engine.fighter(0),npc=game.engine.fighter(1);
         npc.x=p.x+150f;
@@ -90,7 +65,6 @@ public class VisualReviewTest {
     /** Stills of overlays that a short scripted fight does not always reach. */
     @Test public void renderEffectShowcase() throws Exception {
         game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
-        select().close();
         set("introFrame",-1);
         CombatFighter p=game.engine.fighter(0),npc=game.engine.fighter(1);
         npc.x=p.x+170f;

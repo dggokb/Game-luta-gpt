@@ -44,58 +44,6 @@ public class SpriteIntegrationTest {
         return ((CharacterDefinition)field.get(renderer)).id;
     }
 
-    @Test public void productionRosterUsesRealSecondCharacterPack()throws Exception {
-        assertArrayEquals(new String[]{"player_base","p03"},GeneratedCharacters.TEAM);
-        // p03: same profile (scale) as p01, own idle/walk/dash art from video.
-        CharacterDefinition p03=GeneratedCharacters.get("p03");
-        assertEquals("player_base",p03.profile.id);
-        assertEquals("p03_idle",p03.animation("IDLE").atlas.resource);
-        assertEquals("p03_walk_forward",p03.animation("WALK_FORWARD").atlas.resource);
-        // The drawn test character stays available as a pack outside the team.
-        assertEquals("monster_npc",GeneratedCharacters.OPPONENT);
-        CharacterDefinition npc=GeneratedCharacters.opponentCharacter();
-        assertEquals("monster_npc",npc.id);
-        assertEquals("Brutamonte",npc.displayName);
-        assertEquals("monster_npc_pack",npc.animation("IDLE").atlas.resource);
-        CharacterDefinition first=GeneratedCharacters.get("player_base");
-        CharacterDefinition second=GeneratedCharacters.get("player_two");
-        assertNotSame(first,second);
-        assertEquals("Lutador Teste 2",second.displayName);
-        assertEquals("player_two",second.profile.id);
-        assertEquals(384,second.profile.frameWidth);
-        assertEquals(256,second.profile.frameHeight);
-        assertEquals(192f,second.profile.rootX,.001f);
-        assertEquals(246f,second.profile.rootY,.001f);
-        assertTrue(first.animations.keySet().containsAll(second.animations.keySet()));
-        assertTrue(first.moves.keySet().containsAll(second.moves.keySet()));
-        // Beyond the shared inputs a character may add air ↓ + button versions (j2X).
-        java.util.Set<String> extra=new java.util.HashSet<>(first.moves.keySet());extra.removeAll(second.moves.keySet());
-        for(String id:extra)assertTrue("Unexpected extra move "+id,id.startsWith("j2"));
-        assertNotNull(first.moves.get("2L").animation);
-        assertNotNull(first.moves.get("2M").animation);
-        // Inputs without dedicated art declare their pose explicitly.
-        assertNull(second.moves.get("2L").animation);
-        assertEquals(SpriteStates.POSE_CROUCH,second.moves.get("2L").pose);
-        assertEquals(SpriteStates.POSE_AIR,second.moves.get("jH").pose);
-        assertNotEquals(first.animation("IDLE").atlas.resource,second.animation("IDLE").atlas.resource);
-        assertEquals("player_two_idle",second.animation("IDLE").atlas.resource);
-        assertEquals("player_two_movement",second.animation("WALK_FORWARD").atlas.resource);
-        assertEquals("player_two_jab",second.animation("LIGHT_JAB").atlas.resource);
-        assertEquals("player_two_medium_kick",second.animation("MEDIUM_KICK").atlas.resource);
-        assertEquals("player_two_heavy_straight",second.animation("HEAVY_STRAIGHT").atlas.resource);
-        for(String binding:new String[]{"L","M","H"}) {
-            CharacterDefinition.Move a=first.moves.get(binding);
-            CharacterDefinition.Move b=second.moves.get(binding);
-            assertEquals(a.damage,b.damage);
-            assertEquals(a.activeStart,b.activeStart,.0001f);
-            assertEquals(a.activeEnd,b.activeEnd,.0001f);
-            assertEquals(a.totalTime,b.totalTime,.0001f);
-            // O alcance não é comparado: o do P01 foi ajustado no app (AJUSTAR CAIXAS, dc4056b8),
-            // e o pacote de teste ficou com o de antes.
-            assertEquals(a.animation.id,b.animation.id);
-        }
-    }
-
     @Test public void playerBaseUsesDedicated2LThroughCharacterPackEngine()throws Exception {
         CharacterDefinition first=GeneratedCharacters.get("player_base");
         assertTrue(first.animations.containsKey("CROUCH_LIGHT"));
@@ -543,27 +491,6 @@ public class SpriteIntegrationTest {
         assertTrue("Jab startup off-model: "+jabRatio,jabRatio>=.94f && jabRatio<=1.14f);
         assertTrue("Heavy startup off-model: "+heavyRatio,heavyRatio>=.94f && heavyRatio<=1.05f);
     }
-    @Test public void packagedAtlasIsVisibleAndEveryCropContainsOneWholePose()throws Exception {
-        // The 4x4 movement grid of the drawn character (player_two); p01 uses one atlas per video clip.
-        Bitmap atlas=BitmapFactory.decodeResource(RuntimeEnvironment.getApplication().getResources(),R.drawable.player_two_movement);
-        assertNotNull(atlas);assertTrue(atlas.hasAlpha());
-        int fw=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_WIDTH,fh=GeneratedSpriteLayouts.PLAYER_TWO_MOVEMENT_FRAME_HEIGHT;
-        // One box per frame in the sheet (tools/sprites/folhas.py), read back inside its cell.
-        CharacterDefinition.Atlas a=GeneratedCharacters.get("player_two").animation("WALK_FORWARD").atlas;
-        assertEquals("player_two_movement",a.resource);
-        assertEquals(fw,a.width);assertEquals(fh,a.height);
-        assertEquals(a.sheetWidth,atlas.getWidth());assertEquals(a.sheetHeight,atlas.getHeight());
-        int[] box=new int[6];
-        for(int i=0;i<16;i++) {
-            assertTrue("Empty sprite "+i,a.frame(i,box));
-            int count=0;
-            for(int y=0;y<box[3];y++)for(int x=0;x<box[2];x++) {
-                if(box[4]+x>=fw||box[5]+y>=fh)continue;
-                if(Color.alpha(atlas.getPixel(box[0]+x,box[1]+y))>128)count++;
-            }
-            assertTrue("Empty sprite "+i,count>4500);assertTrue("Opaque background "+i,count<fw*fh*.70f);
-        }
-    }
     private int activeLife()throws Exception {Field f=activeFighter().getClass().getDeclaredField("life");f.setAccessible(true);return f.getInt(activeFighter());}
 
     @Test public void opponentLowAttackPlaysItsOwnClip()throws Exception {
@@ -624,69 +551,6 @@ public class SpriteIntegrationTest {
         assertTrue("Bodies overlap: "+(dx-px),dx-px>=gap-0.01f);
         assertTrue("Opponent should be pushed",dx>520f);
         assertEquals(1,player().facing);
-    }
-    @Test public void teamButtonSwapsThePairAndKeepsOnlyItsAtlases()throws Exception {
-        assertArrayEquals(GeneratedCharacters.TEAM,GeneratedCharacters.TEAMS[0]);
-        assertTrue("story pairs p01+p02 and p03+p04 are selectable",GeneratedCharacters.TEAMS.length>=3);
-        assertEquals(ControlsLayout.Control.TEAM_SELECT,ControlsLayout.controlAt(
-            (ControlsLayout.TEAM_BUTTON_LEFT+ControlsLayout.TEAM_BUTTON_RIGHT)/2,
-            (ControlsLayout.TEAM_BUTTON_TOP+ControlsLayout.TEAM_BUTTON_BOTTOM)/2));
-        for(int i=1;i<=GeneratedCharacters.TEAMS.length;i++) {
-            invoke("selectTeam",new Class<?>[]{int.class},i);
-            String[] pair=GeneratedCharacters.TEAMS[i%GeneratedCharacters.TEAMS.length];
-            FighterState[] team=(FighterState[])get("team");
-            assertEquals(pair[0],team[0].character.id);
-            assertEquals(pair[1],team[1].character.id);
-            assertEquals(pair[0],rendererCharacterId());
-            // Training CPU: the point character, in its normal colors.
-            assertEquals(pair[0],npc().character().id);
-            frames(1);
-            assertEquals("INTRO",motion().clip);
-            // Only the pair stays decoded (~135 MB per character).
-            java.util.Set<String> used=new java.util.HashSet<>();
-            for(FighterState f:team) for(CharacterDefinition.Animation a:f.character.animations.values()) used.add(a.atlas.resource);
-            assertEquals(used.size(),((SpriteAtlasCache)get("atlases")).size());
-        }
-    }
-    private void tapCard(CharacterSelect s,String id)throws Exception {
-        int i=java.util.Arrays.asList(s.ids).indexOf(id);
-        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
-            s.cardLeft(i)+s.cardWidth()/2,s.cardTop(i)+s.cardHeight()/2);
-    }
-    private void tapSelectSlot(CharacterSelect s,int side,int slot)throws Exception {
-        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
-            s.slotLeft(side)+60f,s.slotTop(slot)+CharacterSelect.SLOT_H/2);
-    }
-    @Test public void characterSelectPicksThePairAndPausesTheFight()throws Exception {
-        CharacterSelect s=(CharacterSelect)get("characterSelect");
-        assertTrue("p01 to p04 are selectable",s.ids.length>=4);
-        invoke("openCharacterSelect",new Class<?>[0]);
-        assertTrue(s.isOpen());
-        // A new pass always asks for P1, TAG P1, P2, TAG P2 in order.
-        assertFalse(s.ready());
-        float x=player().x;
-        press(PadInput.Button.HEAVY,0);frames(5);
-        assertFalse("The fight waits behind the select screen",player().attacking());
-        assertEquals(x,player().x,0.01f);
-        tapCard(s,"p04");assertEquals(1,s.step());
-        tapCard(s,"p02");assertEquals(2,s.step());
-        tapCard(s,"p03");assertEquals(3,s.step());
-        tapCard(s,"p06");assertTrue(s.ready());
-        assertEquals(1,s.order(0,"p04"));
-        assertEquals(2,s.order(0,"p02"));
-        assertEquals(0,s.order(0,"p03"));
-        assertTrue("P2 has its own point and TAG",s.order(1,s.opponentPoint())==1);
-        invoke("handleCharacterSelectTap",new Class<?>[]{float.class,float.class},
-            (CharacterSelect.FIGHT_LEFT+CharacterSelect.FIGHT_RIGHT)/2,(CharacterSelect.FIGHT_TOP+CharacterSelect.FIGHT_BOTTOM)/2);
-        assertFalse(s.isOpen());
-        FighterState[] team=(FighterState[])get("team");
-        assertEquals("p04",team[0].character.id);
-        assertEquals("p02",team[1].character.id);
-        assertEquals("p04",rendererCharacterId());
-        assertEquals("p03",npc().character().id);
-        assertEquals("p06",get("opponentTagId"));
-        frames(1);
-        assertEquals("INTRO",motion().clip);
     }
     @Test public void introPlaysBeforeTheFightAndHoldsTheControls()throws Exception {
         invoke("startIntro",new Class<?>[0]);

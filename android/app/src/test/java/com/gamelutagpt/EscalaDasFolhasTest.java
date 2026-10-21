@@ -13,15 +13,6 @@ public class EscalaDasFolhasTest {
         return SpriteAtlasCache.escalaPara(c, idle, SpriteAtlasCache.densidadeTela(largura, altura));
     }
 
-    @Test public void hdShrinksOnlyWhereTheScreenIsSmall() {
-        assertEquals(0.75f, escala("p03", 1280, 720), 0f);
-        // Retrato ou paisagem: o lado maior é sempre os 1280 virtuais.
-        assertEquals(0.75f, escala("p03", 720, 1280), 0f);
-        assertEquals(1f, escala("p03", 1920, 1080), 0f);
-        assertEquals(1f, escala("p03", 2400, 1080), 0f);
-        assertEquals(1f, escala("p03", 2560, 1440), 0f);
-    }
-
     @Test public void normalFightZoomNeverStretchesAReducedSheet() {
         for (String id : GeneratedCharacters.SELECTABLE) {
             CharacterDefinition c = GeneratedCharacters.get(id);
@@ -38,9 +29,4 @@ public class EscalaDasFolhasTest {
         }
     }
 
-    @Test public void canonicalArtAndUnknownScreensStayWhole() {
-        assertEquals(1f, escala("p08", 1280, 720), 0f);
-        assertEquals(1f, escala(GeneratedCharacters.OPPONENT, 1280, 720), 0f);
-        assertEquals(1f, escala("p03", 0, 0), 0f);
-    }
 }

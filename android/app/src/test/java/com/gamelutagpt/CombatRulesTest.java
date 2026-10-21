@@ -43,22 +43,10 @@ public class CombatRulesTest {
         assertFalse(CombatRules.projectileHits(0,40,y,24,60,565,LEGACY,true));
         assertFalse(CombatRules.projectileHits(0,10,y,24,200,565,LEGACY,false));
     }
-    @Test public void everyPackDeclaresEveryInputWithFrameDataInsideItsDuration() {
-        String[] ids={"player_base","player_two","monster_npc"};
-        String[] bindings={"L","M","H","2L","2M","2H","jL","jM","jH"};
-        for(String id:ids)for(String b:bindings) {
-            CharacterDefinition.Move m=GeneratedCharacters.get(id).moves.get(b);
-            assertNotNull(id+"/"+b,m);
-            assertTrue(m.activeStart<m.activeEnd && m.activeEnd<=m.totalTime+1e-6f);
-            assertTrue(id+"/"+b+" needs art or pose",(m.animation==null)!=(m.pose==null));
-        }
-    }
     @Test public void airborneAndCrouchingInputsResolveToTheirOwnMoves() {
         assertEquals("jH",BASE.move("H",true).binding);
         assertEquals("jM",BASE.move("2M",true).binding);
         assertEquals("2M",BASE.move("2M",false).binding);
-        assertEquals("RISING_SMASH",NPC.move("2H",false).animation.id);
-        assertEquals(SpriteStates.POSE_AIR,NPC.move("L",true).pose);
     }
     @Test public void animationIsStretchedToGameplayDurationNotTheOtherWayAround() {
         CharacterDefinition.Animation jab=BASE.animation("LIGHT_JAB");
@@ -69,30 +57,6 @@ public class CombatRulesTest {
         assertEquals(20f/60f,slow.totalTime,1e-6f);
         assertEquals(jab.duration,slow.animationTime(slow.totalTime),1e-5f);
         assertEquals(jab.duration/2,slow.animationTime(slow.totalTime/2),1e-5f);
-    }
-    @Test public void threatWindowLeadsAndTrailsTheActiveFramesForPoseMoves() {
-        CharacterDefinition.Move m=GeneratedCharacters.get("player_two").moves.get("2H");
-        assertNull("player_two keeps the pose fallback",m.animation);
-        // Anticipated guard: 16% of the move before the first and after the last active frame.
-        float lead=.16f*m.totalTime;
-        assertFalse(m.threatening(m.activeStart-lead-.002f));
-        assertTrue(m.threatening(m.activeStart-lead+.002f));
-        assertTrue(m.threatening(m.activeEnd+lead-.002f));
-        assertFalse(m.threatening(m.activeEnd+lead+.002f));
-        AttackDefinition a=m.attack;
-        int frames=Math.round(.16f*a.totalFrames);
-        assertFalse(a.threatening(a.startupFrames-frames-1));
-        assertTrue(a.threatening(a.startupFrames-frames));
-        assertTrue(a.threatening(a.lastActiveFrame()+1+frames));
-        assertFalse(a.threatening(a.lastActiveFrame()+2+frames));
-    }
-    @Test public void opponentUsesItsOwnFighterRules() {
-        assertEquals("Brutamonte",NPC.displayName);
-        assertTrue(NPC.fighter.body.standHeight>BASE.fighter.body.standHeight);
-        assertTrue(NPC.visualStandHeight>NPC.fighter.body.standHeight*0.9f);
-        assertNotNull(NPC.specialAnimations.get("SUPER"));
-        assertEquals(1,BASE.artFacing);
-        assertTrue(BASE.visualStandHeight>BASE.visualCrouchHeight);
     }
     @Test public void aiPicksOnlyMovesThatReachKeepingWeights() {
         String[] types={"L","M","H"};double[] weights={1,1,1};
@@ -138,16 +102,6 @@ public class CombatRulesTest {
         assertFalse(CombatRules.resolvePush(500,565-n.pushHeight-1,p,520,565,n,90,2510,1,out));
         assertEquals(500,out[0],0);assertEquals(520,out[1],0);
     }
-    @Test public void pushboxIsSmallerThanHurtboxSoItNeverBlocksAHit() {
-        for(String id:new String[]{"player_base","player_two","monster_npc"}) {
-            CharacterDefinition.Body b=GeneratedCharacters.get(id).fighter.body;
-            assertTrue(b.pushHalfWidth<=b.halfWidth);
-            // Melee reach of every move is measured past the hurtbox edge, beyond the push gap.
-            for(CharacterDefinition.Move m:GeneratedCharacters.get(id).moves.values())
-                assertTrue(id+"/"+m.binding,
-                    CombatRules.maxCenterDistance(m,NPC.fighter.body)>b.pushHalfWidth+NPC.fighter.body.pushHalfWidth);
-        }
-    }
     @Test public void launcherUppercutFrameCoversTheWholeActiveWindow() {
         CharacterDefinition.Move launcher=BASE.moves.get("2H");
         assertEquals("CROUCH_HEAVY",launcher.animation.id);
@@ -168,17 +122,6 @@ public class CombatRulesTest {
             int frame=jab.animation.frame(jab.animationTime(t),0);
             assertTrue("t="+t+" frame="+frame,frame==1||frame==2);
         }
-    }
-    @Test public void airMediumAndHeavyStrikeFramesCoverTheirActiveWindows() {
-        String[][] cases={{"M","JUMP_MEDIUM","2"},{"H","JUMP_HEAVY","2"}};
-        for(String[] c:cases) {
-            CharacterDefinition.Move move=BASE.move(c[0],true);
-            assertEquals(c[1],move.animation.id);
-            for(float t=move.activeStart;t<move.activeEnd;t+=.002f)
-                assertEquals(c[1]+" t="+t,Integer.parseInt(c[2]),move.animation.frame(move.animationTime(t),0));
-        }
-        // player_two still keeps the airborne pose fallback.
-        assertEquals(SpriteStates.POSE_AIR,GeneratedCharacters.get("player_two").move("M",true).pose);
     }
     @Test public void guardClipsHoldTheFirstFrameAndPlayTheReactionOverBlockstun() {
         for(String id:new String[]{"DEFENSE_STAND","DEFENSE_CROUCH","DEFENSE_AIR"}) {

@@ -43,7 +43,7 @@ public class GameViewCelularPcTest {
         CombatFighter p = v.engine.fighter(GameView.PLAYER);
         sb.append("x ").append(antes).append(" -> ").append(p.x).append(", status ").append(p.status)
             .append(", locked ").append(p.locked);
-        for (String nome : new String[] {"menuInicial", "characterSelect", "pausa", "menuArcade", "capitulos"}) {
+        for (String nome : new String[] {"pausa"}) {
             try {
                 Object o = campo(v, nome);
                 java.lang.reflect.Method aberto = o.getClass().getDeclaredMethod("isOpen");
@@ -82,19 +82,7 @@ public class GameViewCelularPcTest {
     @Test
     public void lutaEUltraComArteEmSegundoPlano() throws Exception {
         GameView v = jogo.jogo();
-        // MODO TESTE: a arte da luta carrega (o que faltar da antecipação) e abre a seleção.
-        jogo.tecla(KeyEvent.KEYCODE_W);
-        jogo.tecla(KeyEvent.KEYCODE_J);
-        CharacterSelect selecao = (CharacterSelect) campo(v, "characterSelect");
-        long abre = System.currentTimeMillis() + 120_000;
-        while (!selecao.isOpen() && System.currentTimeMillis() < abre) jogo.esperar(0.1);
-        assertTrue("seleção aberta", selecao.isOpen());
-        jogo.esperar(0.5);
-        for (int i = 0; i < 4; i++) {
-            jogo.tecla(KeyEvent.KEYCODE_J);
-            jogo.esperar(0.15);
-        }
-        jogo.tecla(KeyEvent.KEYCODE_ENTER);
+        // Versão leve: o jogo abre direto na luta; a arte carrega no primeiro passo do loop.
         // Espera a luta: as folhas da dupla decodificam (em paralelo) com a tela de carregamento.
         long limite = System.currentTimeMillis() + 240_000;
         float antes = v.engine.fighter(GameView.PLAYER).x;

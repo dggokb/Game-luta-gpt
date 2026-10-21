@@ -64,57 +64,6 @@ public class DefesaEGolpeAltoTest {
 
     // ------------------------------------------------------------ golpe alto
 
-    @Test public void everyFighterGetsTheOverheadFromItsMedium() {
-        for (String id : new String[] {"player_base", "monster_npc", "p02", "p06", "p10", "p12"}) {
-            CharacterDefinition c = GeneratedCharacters.get(id);
-            AttackDefinition overhead = c.attack(GolpeAlto.BINDING);
-            assertNotNull(id + " tem o 6M", overhead);
-            assertTrue(overhead.overhead);
-            assertFalse(overhead.low);
-            assertEquals(GolpeAlto.STARTUP, overhead.startupFrames);
-            assertEquals("só uma vez por combo", 1, overhead.maxUsesPerCombo);
-            for (String t : overhead.cancelInto()) {
-                assertTrue(id + ": o 6M só cancela em especial/Super, não em " + t,
-                    t.equals("SUPER") || t.startsWith("S"));
-            }
-        }
-    }
-
-    @Test public void aPackOverheadWithItsOwnAnimationKeepsTheSharedTiming() {
-        // p15: o 6M do pacote, com o vídeo próprio (M_BAIXO), no lugar do montado do M.
-        CharacterDefinition c = GeneratedCharacters.get("p15");
-        CharacterDefinition.Move oh = c.moves.get(GolpeAlto.BINDING), m = c.moves.get("M");
-        assertFalse("não é o 6M montado do M", GolpeAlto.derived(c, GolpeAlto.BINDING));
-        assertNotSame(m.animation, oh.animation);
-        assertTrue(oh.attack.overhead);
-        assertFalse(oh.attack.low);
-        assertEquals(GolpeAlto.STARTUP, oh.attack.startupFrames);
-        assertEquals(GolpeAlto.ACTIVE, oh.attack.activeFrames);
-        assertEquals(GolpeAlto.RECOVERY, oh.attack.recoveryFrames);
-        assertEquals(1, oh.attack.maxUsesPerCombo);
-        assertEquals(m.attack.damage * GolpeAlto.DAMAGE_PERMILLE / 1000, oh.attack.damage);
-    }
-
-    @Test public void theOverheadHoldsTheWindUpInsteadOfSlowingTheWholeClip() {
-        for (String id : new String[] {"player_base", "p02", "p06", "p10"}) {
-            CharacterDefinition c = GeneratedCharacters.get(id);
-            CharacterDefinition.Move m = c.moves.get("M"), oh = c.moves.get(GolpeAlto.BINDING);
-            if (m.animation == null) continue;
-            float fps = CombatConfig.FPS;
-            int windUp = Math.max(0, m.attack.startupFrames - 2);
-            // A preparação roda no ritmo do M (sem câmera lenta)...
-            assertEquals(id + ": preparação no ritmo do M", m.animationTime(windUp / fps), oh.animationTime(windUp / fps), 1e-4f);
-            // ...a pose segura até o impacto do 6M, que cai no quadro do impacto do M...
-            assertEquals(id + ": impacto alinhado", m.animationTime(m.attack.startupFrames / fps),
-                oh.animationTime(GolpeAlto.STARTUP / fps), 1e-4f);
-            float meio = oh.animationTime((windUp + GolpeAlto.STARTUP) / 2f / fps);
-            assertTrue(id + ": pose segurada", meio >= m.animationTime(windUp / fps) - 1e-4f &&
-                meio <= m.animationTime(m.attack.startupFrames / fps) + 1e-4f);
-            // ...e termina no fim do clipe.
-            assertEquals(m.animation.duration, oh.animationTime(oh.attack.totalFrames / fps), 1e-3f);
-        }
-    }
-
     @Test public void forwardMediumFromNeutralIsTheOverheadButNotInsideACombo() {
         Match m = new Match(500f, 600f);
         m.in[0].direction = m.screen(0, 1);
@@ -133,29 +82,6 @@ public class DefesaEGolpeAltoTest {
         c.in[0].medium = true;
         for (int i = 0; i < 30 && c.f(0).attacking() && "L".equals(c.f(0).attack.id); i++) c.step();
         assertEquals("dentro do combo o → + M continua sendo o M", "M", c.f(0).attack.id);
-    }
-
-    @Test public void theOverheadHitsTheCrouchingGuardAndIsBlockedStanding() {
-        Match low = new Match(500f, 600f);
-        low.engine.config.justDefenseFrames = -1;
-        low.in[1].direction = low.screen(1, 4);
-        low.steps(10);
-        assertEquals(CombatFighter.GUARD_LOW, low.engine.guardFromInput(low.f(1)));
-        low.in[0].direction = low.screen(0, 1);
-        low.in[0].medium = true;
-        CombatEngine.HitEvent e = low.untilContact(1, 40);
-        assertNotNull(e);
-        assertFalse("agachado não segura o golpe alto", e.blocked);
-
-        Match high = new Match(500f, 600f);
-        high.engine.config.justDefenseFrames = -1;
-        high.in[1].direction = high.screen(1, 5);
-        high.steps(10);
-        high.in[0].direction = high.screen(0, 1);
-        high.in[0].medium = true;
-        e = high.untilContact(1, 40);
-        assertNotNull(e);
-        assertTrue("em pé defende", e.blocked);
     }
 
     @Test public void theOverheadWarnsWhenItStarts() {

@@ -144,19 +144,6 @@ public class RecoveryTest {
         assertEquals(CombatFighter.Status.NEUTRAL, s.p().status);
     }
 
-    @Test public void wakeUpIsQuickToWatch() {
-        Sim s = new Sim();
-        s.knockedDown();
-        int frames = s.framesUntilFree(300);
-        assertTrue("down and up in about a second: " + frames, frames <= 75);
-        // A long GETUP clip (p04: 47 frames) plays faster instead of holding the fighter down.
-        for (String id : new String[] {"p02", "p03", "p04", "p11"}) {
-            CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get(id), "P1"),
-                new FighterState(NPC, "CPU"), 800f, 1100f, new CombatConfig());
-            assertTrue(id, e.wakeupFrames(e.fighter(0)) <= e.config.maxWakeupFrames);
-        }
-    }
-
     @Test public void knockedOutFighterStaysDown() {
         Sim s = new Sim();
         s.p().state.life = 0;

@@ -7,7 +7,7 @@ import org.junit.Test;
 /** Team rules in the engine: raw tag, assist, Assist → Tag and the team meter (v0.79). */
 public class TeamSystemTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
-    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_two");
+    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_base");
     private static final CharacterDefinition NPC = GeneratedCharacters.opponentCharacter();
 
     /** Player team (base on point, player_two as partner) against the single training dummy. */

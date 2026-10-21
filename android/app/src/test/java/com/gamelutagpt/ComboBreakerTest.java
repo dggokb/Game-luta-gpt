@@ -99,31 +99,6 @@ public class ComboBreakerTest {
         assertNull("o combo acabou", m.engine.session(1) != null && m.engine.session(1).active ? m.engine.session(1) : null);
     }
 
-    /** O estalo joga quem batia para longe (arrastando o pé) e quem quebrou corre sozinho até ele. */
-    @Test public void theBreakerThrowsTheAttackerAwayAndTheDefenderRunsAlone() {
-        Match m = new Match();
-        m.cpu.superMeter = CombatConfig.METER_PER_BAR;
-        m.combo("H", 3);
-        assertTrue(m.engine.cues().contains("COMBO_BREAKER"));
-        CombatConfig config = m.engine.config;
-        float attackerStart = m.f(0).x, breakerStart = m.f(1).x;
-        // Congelamento do estalo + o deslize.
-        boolean ran = false;
-        for (int i = 0; i < config.comboBreakerHitstopFrames + config.comboBreakerPushFrames; i++) {
-            m.step();
-            ran |= m.f(1).forwardDashing;
-        }
-        assertTrue("jogado para trás: " + Math.abs(m.f(0).x - attackerStart),
-            Math.abs(m.f(0).x - attackerStart) > 0.6f * config.comboBreakerPushGap);
-        assertTrue("correu sem → →", ran);
-        for (int i = 0; i < 30; i++) m.step();
-        assertTrue("correu um bom pedaço: " + Math.abs(m.f(1).x - breakerStart),
-            Math.abs(m.f(1).x - breakerStart) > 0.6f * config.comboBreakerPushGap);
-        assertTrue("chegou perto: " + m.gap(), m.gap() <= m.touching() + config.comboBreakerCloseGap + 12f);
-        assertEquals("parou de correr", 0, m.f(1).breakerChase);
-        assertTrue("o outro ainda atordoado", m.f(0).inHitstun());
-    }
-
     @Test public void theBreakerLetsTheDefenderComboBack() {
         Match m = new Match();
         m.cpu.superMeter = CombatConfig.METER_PER_BAR;

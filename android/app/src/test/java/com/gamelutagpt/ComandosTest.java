@@ -44,15 +44,4 @@ public class ComandosTest {
         assertFalse(Comandos.isTeclaDeTeclado(KeyEvent.KEYCODE_BUTTON_X));
     }
 
-    @Test
-    public void nenhumaLicaoFicaComMarcaSemTrocar() {
-        for (String id : GeneratedCharacters.SELECTABLE) {
-            for (TutorialDirector.Lesson lesson : TutorialDirector.lessons(GeneratedCharacters.get(id))) {
-                for (Comandos.Esquema e : Comandos.Esquema.values()) {
-                    String texto = Comandos.texto(lesson.how, e);
-                    assertFalse(id + " " + lesson.title + " " + e + ": " + texto, texto.contains("{") || texto.contains("}"));
-                }
-            }
-        }
-    }
 }

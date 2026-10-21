@@ -2,6 +2,15 @@
 
 Branch `game-luta-sprite-gpt`. Versão `0.102-hud-contadores-super5` (fonte única: `versionName` em `android/app/build.gradle`).
 
+## Versão leve (branch `game-luta-lite-motion`)
+
+Esta branch é a sprite-gpt enxugada para trabalhar no **motor de animação**: só o **p01**
+(`player_base`, na dupla e no CPU), um **cenário vazio** (`stages/vazio`: fundo liso e chão com
+grade leve, para ver o pé deslizar), a luta inteira (movimentos, golpes, especiais, Super,
+Ultra, time, câmera, efeitos, HUD, DEBUG) e a pausa. Saíram os outros personagens, cenários,
+modo história, menu inicial, Arcade, tutorial, seleção, narrador e demos. O app abre direto
+no treino; o botão do topo (◀ MENU) abre a pausa, e REINICIAR LUTA começa de novo.
+
 ## Character Pack Engine
 
 A v0.54 incorpora o motor de pacotes da Astra v0.53 preservando a identidade GPT.

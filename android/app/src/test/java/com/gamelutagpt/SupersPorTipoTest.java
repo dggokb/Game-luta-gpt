@@ -50,21 +50,6 @@ public class SupersPorTipoTest {
         assertEquals("five blocked hits", 5, guarded.blocked);
     }
 
-    @Test public void theP09FireRunsOnTheGroundAndHitsThreeTimes() {
-        Result r = superOf("p09", 400f, 0);
-        assertEquals("FOGO", r.visual);
-        assertTrue("on the ground: " + r.lowestHeight, r.lowestHeight <= 60f);
-        assertEquals("three hits", 3, r.hits);
-    }
-
-    @Test public void theP06SuperCallsShadowClonesThatOnlyShow() {
-        assertEquals(2, GeneratedCharacters.get("p06").fighter.superAttack.clones);
-        Result r = superOf("p06", 150f, 0);
-        assertTrue("clones on screen", r.ghosts > 0);
-        int strikes = GeneratedCharacters.get("p06").attack("SUPER").maxHits;
-        assertTrue("the clones add no hits: " + r.hits, r.hits <= strikes);
-    }
-
     @Test public void aWaveThatMissesKeepsFlying() {
         // Ninguém na frente: a onda de vários acertos voa até o fim como a de um acerto só.
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(RIVAL, RIVAL, 300f, 1500f);
@@ -77,11 +62,4 @@ public class SupersPorTipoTest {
         assertTrue("flies on", p.x > p.startX + 150f);
     }
 
-    @Test public void specialsThatThrowPlayTheirOwnAnimation() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p05"), RIVAL, 300f, 1500f);
-        s.in[0].special = "S2";
-        s.until(() -> s.f(0).attacking(), 10);
-        assertNotNull("the shuriken keeps its move", s.f(0).move);
-        assertEquals(GeneratedCharacters.get("p05").specials.get("S2").move.animation, s.f(0).move.animation);
-    }
 }

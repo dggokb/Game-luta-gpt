@@ -7,7 +7,7 @@ import org.junit.Test;
 /** Pushblock and Guard Cancel Tag (v0.81). */
 public class ActiveDefenseTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
-    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_two");
+    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_base");
     private static final CharacterDefinition NPC = GeneratedCharacters.opponentCharacter();
 
     private static final class Match {

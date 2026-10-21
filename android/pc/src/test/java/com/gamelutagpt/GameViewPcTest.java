@@ -13,8 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * O jogo de verdade no PC, sem janela: abre na seleção, escolhe as duplas pelo teclado,
- * entra na luta e anda/ataca. Mesmo GameView do Android, pela camada de compatibilidade.
+ * O jogo de verdade no PC, sem janela: abre direto na luta e anda/ataca. Mesmo GameView do Android, pela camada de compatibilidade.
  */
 public class GameViewPcTest {
     private static CapturaPc jogo;
@@ -33,19 +32,9 @@ public class GameViewPcTest {
     }
 
     @Test
-    public void selecaoLutaEControles() throws Exception {
+    public void lutaEControles() throws Exception {
         GameView v = jogo.jogo();
-        assertFalse("menu inicial desenhado", uniforme(jogo.quadro()));
-        // MODO TESTE (o último item): cima dá a volta até ele, depois A.
-        jogo.tecla(KeyEvent.KEYCODE_W);
-        jogo.tecla(KeyEvent.KEYCODE_J);
-        jogo.esperar(1.5);
-        assertFalse("seleção desenhada", uniforme(jogo.quadro()));
-        for (int i = 0; i < 4; i++) {
-            jogo.tecla(KeyEvent.KEYCODE_J);
-            jogo.esperar(0.15);
-        }
-        jogo.tecla(KeyEvent.KEYCODE_ENTER);
+        // Versão leve: abre direto na luta do p01.
         jogo.esperar(1.0);
         assertFalse("luta desenhada", uniforme(jogo.quadro()));
 

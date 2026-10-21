@@ -22,12 +22,12 @@ final class ListaComandos {
         CharacterDefinition.Fighter f = c.fighter;
         if (f.energy != null && f.energyCommand.length > 0) {
             String nome = f.energyName != null ? f.energyName : "S1";
-            linhas.add(linha(nome, TutorialDirector.commandText(f.energyCommand, f.energyHold, false), false, esquema));
+            linhas.add(linha(nome, commandText(f.energyCommand, f.energyHold, false), false, esquema));
         }
         for (Map.Entry<String, CharacterDefinition.Special> e : new TreeMap<>(c.specials).entrySet()) {
             CharacterDefinition.Special s = e.getValue();
             String nome = s.name != null ? s.name : e.getKey();
-            linhas.add(linha(nome, TutorialDirector.commandText(s.command(), s.hold, false), s.air, esquema));
+            linhas.add(linha(nome, commandText(s.command(), s.hold, false), s.air, esquema));
         }
         if (f.superAttack != null) {
             linhas.add(new TelaComandos.Linha(TelaComandos.SUPER, Comandos.texto("{SUPER}", esquema), false));
@@ -40,6 +40,22 @@ final class ListaComandos {
         linhas.add(new TelaComandos.Linha(TelaComandos.DEFESA_PERFEITA, "←", false));
         linhas.add(new TelaComandos.Linha(TelaComandos.COMBO_BREAKER, Comandos.texto("{M} + {H}", esquema), false));
         return new TelaComandos.Ficha(c.displayName, linhas);
+    }
+
+    /** Comando em setas (o segurar entre colchetes); "No ar: " na frente dos aéreos. */
+    static String commandText(int[] command, boolean hold, boolean air) {
+        String text = hold ? "[" + arrows(new int[] {command[0]}) + "] " + arrows(new int[] {command[1]}) : arrows(command);
+        return air ? "No ar: " + text : text;
+    }
+
+    /** Direções relativas (1 = frente) em setas, virado para a direita. */
+    static String arrows(int[] command) {
+        StringBuilder sb = new StringBuilder();
+        for (int d : command) {
+            if (sb.length() > 0) sb.append(' ');
+            sb.append(d >= 1 && d <= 8 ? ControlsLayout.DPAD_LABELS[d - 1] : "?");
+        }
+        return sb.toString();
     }
 
     private static TelaComandos.Linha linha(String nome, String setas, boolean noAr, Comandos.Esquema esquema) {

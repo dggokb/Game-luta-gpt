@@ -72,10 +72,6 @@ final class HudRenderer {
         float overdriveSeconds();
         /** The Overdrive of this round has not been used yet. */
         boolean overdriveReady();
-        /** Demo playing (index into DemoDirector.VERSIONS), or -1. */
-        int demoPlaying();
-        String demoTitle();
-        String demoCaption();
     }
 
     /** Values of the overhead panel above the opponent (world space). */
@@ -125,12 +121,12 @@ final class HudRenderer {
     final HudEffects effects = new HudEffects();
     void resetEffects() { effects.reset(); }
 
-    void drawHud(Canvas c, State s, CharacterSelectRenderer portraits) {
+    void drawHud(Canvas c, State s, HudConceptPortraits portraits) {
         drawHudAt(c, s, portraits, System.nanoTime() / 1e9);
     }
 
     /** Same production renderer with a deterministic clock for native Canvas review. */
-    void drawHudAt(Canvas c, State s, CharacterSelectRenderer portraits, double seconds) {
+    void drawHudAt(Canvas c, State s, HudConceptPortraits portraits, double seconds) {
         effects.update(s, seconds);
         reset();
         FighterState active = s.active();
@@ -202,12 +198,6 @@ final class HudRenderer {
             HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.HEAL_OPPONENT), "VIDA CPU",
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
-        drawToggle(c, s.pressed(Control.TEAM_SELECT), "DUPLA " + s.teamLabel(),
-            TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 14f);
-        drawToggle(c, s.storyActive(), "HISTÓRIA",
-            STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM, 16f);
-        drawToggle(c, s.tutorialActive(), "TUTORIAL",
-            TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 16f);
     }
 
 
@@ -223,7 +213,7 @@ final class HudRenderer {
 
     private void drawArtTeam(Canvas c, FighterState point, FighterState reserve,
                              CharacterDefinition absent, boolean right, float ready,
-                             CharacterSelectRenderer portraits) {
+                             HudConceptPortraits portraits) {
         c.save();
         if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
         // All coordinates are calibrated against the ornament atlas, not its bounding box.
@@ -353,7 +343,7 @@ final class HudRenderer {
 
     private void drawTeam(Canvas c, FighterState point, FighterState reserve,
                           CharacterDefinition absentPartner, boolean right, float ready,
-                          CharacterSelectRenderer portraits) {
+                          HudConceptPortraits portraits) {
         int accent = right ? RED : BLUE;
         c.save();
         if (right) { c.translate(Arena.VW, 0f); c.scale(-1f, 1f); }
@@ -397,10 +387,10 @@ final class HudRenderer {
             reserve == null ? 0xFF8991A5 : Color.WHITE);
     }
 
-    private void portrait(Canvas c, CharacterSelectRenderer portraits, CharacterDefinition character,
+    private void portrait(Canvas c, HudConceptPortraits portraits, CharacterDefinition character,
                           float x, float y, float w, float h, int accent) {
         panel(c, x, y, w, h, 12f, 0xEE0A1122, accent, 2f);
-        Bitmap bitmap = portraits.hudPortrait(character);
+        Bitmap bitmap = portraits.get(character.id);
         if (bitmap == null) return;
         c.save();
         c.clipPath(shape);
@@ -772,51 +762,6 @@ final class HudRenderer {
         paint.setTextSkewX(0f);
         paint.setFakeBoldText(false);
         paint.setTextAlign(Paint.Align.LEFT);
-    }
-
-    /**
-     * Painel da lição do tutorial: em que lição está, o nome, o que fazer, quantas vezes já
-     * fez e o PULAR. Entre as lições, "MUITO BEM!"; no fim, "TREINO COMPLETO!".
-     */
-    void drawTutorial(Canvas c, TutorialDirector tutorial, Comandos.Esquema esquema) {
-        if (!tutorial.active()) return;
-        reset();
-        if (tutorial.completing()) {
-            drawBanner(c, "TREINO COMPLETO!", 255, 1.1f);
-            return;
-        }
-        TutorialDirector.Lesson lesson = tutorial.lesson();
-        if (lesson == null) return;
-        float left = TUTORIAL_PANEL_LEFT, top = TUTORIAL_PANEL_TOP;
-        float right = TUTORIAL_PANEL_RIGHT, bottom = TUTORIAL_PANEL_BOTTOM;
-        float cx = (left + right) * 0.5f;
-        panel(c, left, top, right - left, bottom - top, 14f, 0xE6120A04, 0xFFFFB04A, 2f);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setFakeBoldText(true);
-        paint.setTextSize(14f);
-        paint.setColor(0xFFFFC870);
-        c.drawText("TREINO  " + (tutorial.lessonIndex() + 1) + "/" + tutorial.lessonCount(), left + 26f, top + 24f, paint);
-        paint.setFakeBoldText(false);
-        text(c, lesson.title, cx, top + 46f, 26f, Color.WHITE);
-        // Os botões do texto no que o jogador está usando (toque, teclado ou controle).
-        text(c, Comandos.texto(lesson.how, esquema), cx, top + 74f, 19f, 0xFFFFE6B8);
-        // Quantas vezes: uma bolinha por repetição, cheia quando já fez.
-        float pip = 7f, gap = 22f;
-        float px = cx - (lesson.times - 1) * gap * 0.5f;
-        for (int i = 0; i < lesson.times; i++) {
-            boolean filled = i < tutorial.count();
-            paint.setStyle(filled ? Paint.Style.FILL : Paint.Style.STROKE);
-            paint.setStrokeWidth(2f);
-            paint.setColor(filled ? 0xFF7BFF22 : 0xFFFFC870);
-            c.drawCircle(px + i * gap, bottom - 10f, pip, paint);
-        }
-        paint.setStyle(Paint.Style.FILL);
-        drawToggle(c, false, "PULAR ▶▶", TUTORIAL_SKIP_LEFT, TUTORIAL_SKIP_TOP, TUTORIAL_SKIP_RIGHT,
-            TUTORIAL_SKIP_BOTTOM, 14f);
-        if (tutorial.praising()) {
-            float k = Math.min(1f, tutorial.praiseFrame() / 8f);
-            drawBanner(c, "MUITO BEM!", 255, 1.3f - 0.3f * k);
-        }
     }
 
     private final Shader buttonBody = new RadialGradient(0f, -.35f, 1.2f,

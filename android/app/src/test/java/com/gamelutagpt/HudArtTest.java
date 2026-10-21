@@ -26,7 +26,7 @@ public class HudArtTest {
         // do not turn a model independence check into a wall-clock race.
         ((HudRenderer)field(game,"hud")).drawHudAt(new Canvas(bitmap),
             (HudRenderer.State)field(game,"hudState"),
-            (CharacterSelectRenderer)field(game,"characterSelectRenderer"),10.0);
+            (HudConceptPortraits)field(game,"rostos"),10.0);
         return bitmap;
     }
     @Test public void upperMeterTracksAssistCooldownIndependentlyFromSuper() throws Exception {
@@ -98,9 +98,9 @@ public class HudArtTest {
         assertNotNull("The production art must be decoded",atlas);
         assertEquals(0,Color.alpha(atlas.getPixel(800,400)));
         FighterState active=((FighterState[])field(game,"team"))[0];
-        CharacterSelectRenderer portraits=(CharacterSelectRenderer)field(game,"characterSelectRenderer");
-        assertNotNull("Point portrait must contain real character pixels",portraits.hudPortrait(active.character));
-        assertNotNull("Reserve portrait must contain real character pixels",portraits.hudPortrait(((FighterState[])field(game,"team"))[1].character));
+        HudConceptPortraits portraits=(HudConceptPortraits)field(game,"rostos");
+        assertNotNull("Point portrait must contain real character pixels",portraits.get(active.character.id));
+        assertNotNull("Reserve portrait must contain real character pixels",portraits.get(((FighterState[])field(game,"team"))[1].character.id));
         active.restoreLife();
         Bitmap full=Bitmap.createBitmap(1280,720,Bitmap.Config.ARGB_8888);
         draw(game,"drawHud",new Canvas(full));

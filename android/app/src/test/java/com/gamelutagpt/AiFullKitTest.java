@@ -8,7 +8,7 @@ import org.junit.Test;
 /** Batalha (IA ON): o CPU usa assist, troca, Assist → Tag, Guard Cancel, pushblock, Overdrive e Ultra. */
 public class AiFullKitTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
-    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_two");
+    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_base");
     private static final int CPU = 1;
 
     /** Jogador contra a dupla do CPU, que é controlada pela IA. */

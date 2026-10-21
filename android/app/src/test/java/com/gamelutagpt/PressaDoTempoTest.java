@@ -18,13 +18,6 @@ public class PressaDoTempoTest {
         assertEquals(1f, OpponentAi.urgency(0), 0f);
     }
 
-    @Test public void aHurriedCpuAttacksMoreAndWaitsLess() {
-        int[] calm = fight(-1), hurried = fight(5);
-        assertTrue("ataca mais: " + calm[0] + " → " + hurried[0], hurried[0] > calm[0]);
-        assertTrue("bate mais: " + calm[1] + " → " + hurried[1], hurried[1] > calm[1]);
-        assertTrue("fica menos defendendo: " + calm[2] + " → " + hurried[2], hurried[2] < calm[2]);
-    }
-
     /** CPU nível 5 contra outra CPU calma: golpes começados, dano dado e quadros defendendo. */
     private static int[] fight(int secondsLeft) {
         String[] ids = {"player_base", "p03", "p05", "p07", "p09", "p12", "p02", "p10"};

@@ -87,21 +87,6 @@ public class AnulacaoProjeteisTest {
         assertTrue("both are gone", s.engine.superProjectiles.isEmpty());
     }
 
-    @Test public void theWhipIsAnArmNotEnergy() {
-        // A onda passa pelo chicote: nenhum choque, e ela chega na p08.
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p08"), BASE, 400f, 1100f);
-        s.in[1].special = "M";
-        s.until(() -> !s.engine.energyProjectiles.isEmpty(), 40);
-        s.in[0].special = "M";
-        boolean waveHit = false;
-        for (int i = 0; i < 150 && !waveHit; i++) {
-            s.step();
-            assertTrue("the whip never clashes", s.engine.clashes().isEmpty());
-            for (CombatEngine.HitEvent e : s.engine.events()) waveHit |= e.attacker == 1 && e.projectile;
-        }
-        assertTrue("the wave reaches p08", waveHit);
-    }
-
     @Test public void sweptTestCatchesAFastPairThatCrossedInOneStep() {
         // Antes: A 40 à esquerda de B; depois: A 40 à direita. Raios de 10 nunca se tocariam
         // olhando só o começo ou só o fim do passo.
@@ -111,14 +96,4 @@ public class AnulacaoProjeteisTest {
         assertFalse("one passes over the other", CombatRules.projectilesMeet(100f, 180f, 200f, 10f, 140f, 140f, 300f, 10f));
     }
 
-    @Test public void theLowShadowPassesUnderAChestHighWave() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p06"), BASE, 400f, 1300f);
-        s.in[0].special = "M";
-        s.in[1].special = "M";
-        s.until(() -> s.engine.energyProjectiles.size() == 2, 40);
-        for (int i = 0; i < 60; i++) {
-            s.step();
-            assertTrue("no clash", s.engine.clashes().isEmpty());
-        }
-    }
 }

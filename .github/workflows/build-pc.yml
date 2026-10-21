@@ -11,6 +11,7 @@ on:
     branches:
       - main
       - game-luta-sprite-gpt
+      - game-luta-lite-motion
       - 'claude/**'
     paths:
       - 'android/**'

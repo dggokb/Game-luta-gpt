@@ -109,33 +109,6 @@ public class SpriteMotionTest {
         tick(m,.016f,true,false,0,3,true,false,false,true,false);assertEquals(SpriteMotion.Clip.COMBAT,m.clip);
         tick(m,.016f,true,false,0,-3,false,false,false,false,true);assertEquals(SpriteMotion.Clip.COMBAT,m.clip);
     }
-    @Test public void secondIdlePlaysOnceEveryThreeIdleLoops() {
-        CharacterDefinition p15=GeneratedCharacters.get("p15");
-        float idle=p15.animation(SpriteMotion.Clip.IDLE).duration, idle2=p15.animation(SpriteMotion.Clip.IDLE_2).duration;
-        SpriteMotion m=new SpriteMotion(p15);
-        float dt=.01f, t=0;
-        for(int round=0;round<2;round++) {
-            // Três voltas inteiras do IDLE, depois o IDLE_2 uma vez e o IDLE de novo do começo.
-            for(;t<SpriteMotion.IDLE_LOOPS_BEFORE_IDLE_2*idle-dt;t+=dt) {
-                tick(m,dt,true,false,0,0,true,false,false,false,false);
-                assertEquals(SpriteMotion.Clip.IDLE,m.clip);
-            }
-            while(!m.clip.equals(SpriteMotion.Clip.IDLE_2)) tick(m,dt,true,false,0,0,true,false,false,false,false);
-            assertEquals("o segundo idle começa do primeiro quadro",
-                p15.animation(SpriteMotion.Clip.IDLE_2).frame(0,0),p15.animation(SpriteMotion.Clip.IDLE_2).frame(m.time,0));
-            float played=0;
-            while(m.clip.equals(SpriteMotion.Clip.IDLE_2)) {tick(m,dt,true,false,0,0,true,false,false,false,false);played+=dt;}
-            assertEquals(idle2,played,3*dt);
-            assertEquals(SpriteMotion.Clip.IDLE,m.clip);
-            t=m.time;
-        }
-        // Andar no meio zera a contagem: o IDLE_2 só vem depois de mais 3 voltas paradas.
-        tick(m,dt,true,false,0,3,true,false,false,false,false);
-        for(float s=0;s<SpriteMotion.IDLE_LOOPS_BEFORE_IDLE_2*idle-dt;s+=dt) {
-            tick(m,dt,true,false,0,0,true,false,false,false,false);
-            assertEquals(SpriteMotion.Clip.IDLE,m.clip);
-        }
-    }
     @Test public void withoutSecondIdleTheIdleJustLoops() {
         CharacterDefinition p01=GeneratedCharacters.defaultCharacter();
         assertFalse(p01.animations.containsKey(SpriteMotion.Clip.IDLE_2));

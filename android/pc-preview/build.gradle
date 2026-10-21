@@ -7,7 +7,6 @@ java {
 
 dependencies {
     implementation project(':ultra-core')
-    implementation project(':story-core')
     implementation project(':stage-core')
     // Os atlas dos lutadores são WEBP, que o ImageIO do Java não lê sozinho.
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.15.3'
@@ -22,7 +21,7 @@ tasks.named('run') {
     workingDir = rootProject.projectDir
 }
 
-// Cenário: gradle :pc-preview:runStage --args="app/src/main/assets/stages/templo_lua"
+// Cenário: gradle :pc-preview:runStage --args="app/src/main/assets/stages/vazio"
 tasks.register('runStage', JavaExec) {
     group = 'application'
     description = 'Abre o visualizador de cenário com a câmera de luta simulada.'
@@ -47,23 +46,8 @@ tasks.register('runRaio', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.gamelutagpt.preview.RaioPreview'
     workingDir = rootProject.projectDir
-    args 'app/src/main/assets/ultras/player_base', 'app/src/main/assets/stages/templo_lua',
+    args 'app/src/main/assets/ultras/player_base', 'app/src/main/assets/stages/vazio',
         '--quadros', 'build/raio'
-}
-
-// Modo história: grava cada página dos episódios em PNG: gradle :pc-preview:runHistoria
-tasks.register('runHistoria', JavaExec) {
-    group = 'application'
-    description = 'Grava as páginas dos episódios do modo história em build/historia/.'
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.gamelutagpt.preview.HistoriaPreview'
-    workingDir = rootProject.projectDir
-    args 'app/src/main/assets', 'build/historia'
-    // Outro idioma: gradle :pc-preview:runHistoria -Pidioma=en
-    systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
-    // Campanha do Kōga e outra chave: -Pirmao=koga -Psorteio=3
-    systemProperty 'irmao', project.findProperty('irmao') ?: 'ryuga'
-    systemProperty 'sorteio', project.findProperty('sorteio') ?: '1'
 }
 
 // S1 de cada personagem (projéteis) em PNG: gradle :pc-preview:runProjeteis
@@ -76,27 +60,3 @@ tasks.register('runProjeteis', JavaExec) {
     args 'build/projeteis'
 }
 
-// Menu inicial e pausa em PNG: gradle :pc-preview:runMenu (-Pidioma=en para outro idioma)
-tasks.register('runMenu', JavaExec) {
-    group = 'application'
-    description = 'Grava o menu inicial e a pausa em build/menu/.'
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.gamelutagpt.preview.MenuPreview'
-    workingDir = rootProject.projectDir
-    args 'app/src/main/assets', 'build/menu'
-    systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
-}
-
-// Cinemática de uma luta da história em PNG: gradle :pc-preview:runCinematica
-// (-Pcinematica=ep01/cinematica_treino.json, -Pirmao=koga, -Pidioma=en, -Pcenario=dojo_shinshinkan)
-tasks.register('runCinematica', JavaExec) {
-    group = 'application'
-    description = 'Grava os quadros de uma cinemática de luta em build/cinematica/.'
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.gamelutagpt.preview.CinematicaPreview'
-    workingDir = rootProject.projectDir
-    args 'app/src/main/assets', project.findProperty('cinematica') ?: 'ep01/cinematica_treino.json',
-        'build/cinematica', project.findProperty('cenario') ?: 'dojo_shinshinkan'
-    systemProperty 'idioma', project.findProperty('idioma') ?: 'pt'
-    systemProperty 'irmao', project.findProperty('irmao') ?: 'ryuga'
-}

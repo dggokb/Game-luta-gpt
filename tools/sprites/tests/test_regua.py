@@ -46,13 +46,5 @@ class ReguaTests(unittest.TestCase):
         _, _, iou = regua.fit(figure(), figure(legs=110))
         self.assertLess(iou, regua.POSE_IOU)
 
-    def test_checked_in_p02_recipe_kinds(self):
-        p = regua.Pack('p02')
-        self.assertEqual('forte', regua.recipe(p, 'LIGHT_JAB')[0])
-        self.assertEqual('manual', regua.recipe(p, 'MEDIUM_KICK')[0])
-        self.assertEqual('fraca', regua.recipe(p, 'INTRO')[0])
-        self.assertEqual(1.0, regua.recipe(p, 'DASH')[2])  # fator óptico 0,88 desfeito pela régua
-
-
 if __name__ == '__main__':
     unittest.main()

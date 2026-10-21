@@ -12,7 +12,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 
 /**
- * Joga sozinho, sem janela, e salva quadros em PNG: seleção, entrada na luta, golpes
+ * Joga sozinho, sem janela, e salva quadros em PNG: entrada na luta, golpes
  * pelo teclado e o Super. Serve para conferir o jogo de PC na CI (onde não há tela) e
  * para medir o tempo de cada quadro.
  *
@@ -129,21 +129,8 @@ public final class CapturaPc {
         List<String> linhas = new ArrayList<>();
         c.comecar();
         c.esperar(1.5);
-        salvar(c.quadro(), saida, "01-menu");
-        // MODO TESTE (o último item: cima dá a volta até ele) abre a seleção de duplas.
-        c.tecla(KeyEvent.KEYCODE_W);
-        c.tecla(KeyEvent.KEYCODE_J);
-        c.esperar(1.5);
-        salvar(c.quadro(), saida, "02-selecao");
-        // P1, TAG, P2, TAG e confirmar (J = A do controle na seleção).
-        for (int i = 0; i < 4; i++) {
-            c.tecla(KeyEvent.KEYCODE_J);
-            c.esperar(0.3);
-        }
-        salvar(c.quadro(), saida, "03-selecao-pronta");
-        c.tecla(KeyEvent.KEYCODE_ENTER);
-        c.esperar(0.4);
-        salvar(c.quadro(), saida, "04-entrada");
+        // Versão leve: abre direto na luta do p01.
+        salvar(c.quadro(), saida, "01-entrada");
         c.esperar(5.0);
         c.medir(true);
         // -Dgameluta.luta=<segundos>: mais tempo de luta parada para medir/perfilar.

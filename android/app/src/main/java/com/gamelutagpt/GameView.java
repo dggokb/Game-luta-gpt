@@ -19,22 +19,7 @@ import android.view.MotionEvent;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import com.gamelutagpt.historia.Arcade;
-import com.gamelutagpt.historia.Campanha;
-import com.gamelutagpt.historia.Cenas;
-import com.gamelutagpt.historia.Episodio;
-import com.gamelutagpt.historia.HistoriaListener;
-import com.gamelutagpt.historia.MenuArcade;
-import com.gamelutagpt.historia.MenuCapitulos;
-import com.gamelutagpt.historia.MenuInicial;
 import com.gamelutagpt.historia.MenuPausa;
-import com.gamelutagpt.historia.NivelCpu;
-import com.gamelutagpt.historia.PaginaHistoria;
-import com.gamelutagpt.historia.ProgressoHistoria;
-import com.gamelutagpt.historia.Torneio;
-import com.gamelutagpt.historia.CinematicaLuta;
-import com.gamelutagpt.historia.ConversaLuta;
-import com.gamelutagpt.historia.Temporada;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
 import com.gamelutagpt.stage.StageWorld;
@@ -56,20 +41,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * engine; this class only presents it (sprites, Super and ultra cinematics, tag, HUD, debug).
  */
 public class GameView extends SurfaceView
-    implements SurfaceHolder.Callback, Runnable, UltraListener, HistoriaListener {
-    // Team and opponent rules come from the generated character packs; DUPLA opens the
-    // character select, where the player picks the pair.
-    private int teamIndex;
+    implements SurfaceHolder.Callback, Runnable, UltraListener {
     private FighterState[] team = membersOf(0);
-    private final CharacterSelect characterSelect = new CharacterSelect(selectionRoster());
+    /** Teclas dos menus por cima da luta (pausa e telas de ajuste), lidas na thread do jogo. */
     private final ConcurrentLinkedQueue<Integer> selectionKeys = new ConcurrentLinkedQueue<>();
-    private CharacterSelectRenderer characterSelectRenderer;
 
     // Training opponent: our point character (same body and moves), in its normal colors.
     // É o titular escolhido para o CPU; quem está em campo agora é opponentPoint().
     private FighterState opponentFighter = new FighterState(team[0].character, "CPU");
-    // O parceiro do CPU: no treino (IA OFF) só aparece no seletor; no modo batalha (IA ON) luta.
-    private String opponentTagId = "p04";
+    // O parceiro do CPU: no treino (IA OFF) não luta; no modo batalha (IA ON) entra no 2x2.
+    // Versão leve: todos são o p01.
+    private String opponentTagId = "player_base";
 
     private static final float VW = Arena.VW;
     private static final float VH = Arena.VH;
@@ -99,8 +81,6 @@ public class GameView extends SurfaceView
     private final AiController ai = new AiController(new OpponentAi(new Random()));
     /** READY → GO depois da intro e, com a IA ligada, a batalha de verdade (2x2). */
     private final BattleFlow flow = new BattleFlow();
-    /** Demo buttons: while one plays it drives both fighters (pad and CPU brain are ignored). */
-    private final DemoDirector demo = new DemoDirector();
     private final FighterInput ignoredInput = new FighterInput();
     private boolean debugOverlay;
     /** Screen-space controls shown only in DEBUG, away from combat buttons. */
@@ -195,7 +175,7 @@ public class GameView extends SurfaceView
     private final AndroidRenderCanvas renderCanvas = new AndroidRenderCanvas();
 
     // Cenário com falso 3D (stage-core). Sem ele, o StageRenderer antigo desenha o fundo.
-    private static final String DEFAULT_STAGE = "templo_lua";
+    private static final String DEFAULT_STAGE = "vazio";
     private StageScene stageScene;
     /** Cenário carregado agora (pasta em assets/stages). Cada luta pode pedir o seu. */
     private String stageId;
@@ -203,98 +183,8 @@ public class GameView extends SurfaceView
     private boolean hardwareCanvas = Build.VERSION.SDK_INT >= 26;
     private final UltraSounds ultraSounds;
 
-    // Modo história (story-core): páginas de mangá entre as lutas do episódio.
-    private final PaginaHistoria historia;
-    private Temporada temporada;
-    /** Cenas chamadas pelo nome (historia/cenas.json), carregadas na primeira vez. */
-    private Cenas cenas;
-    /** O que fazer quando a cena que está tocando acabar (playScene); null no modo história. */
-    private Runnable sceneAfter;
-    /** Modo tutorial: o treino guiado dos golpes no dojo (o boneco não usa a IA). */
-    private final TutorialDirector tutorial = new TutorialDirector();
-    /**
-     * Conversa nos quadros laterais durante uma luta da história (o "conversa" do passo de
-     * luta): no treino, Takatoshi e Dafu a cada lição; nas lutas, o parceiro de tag e o
-     * adversário que espera. Não para a luta. Padrão: docs/historia/motor-conversas.md.
-     */
-    private ConversaLuta conversa;
-    /**
-     * O narrador do torneio: fala o que acontece na luta numa faixa de transmissão no rodapé
-     * (sem parar a luta). Só nas lutas de verdade (batalha, Arcade e as lutas do torneio na
-     * história). Padrão: docs/historia/narrador.md.
-     */
-    private com.gamelutagpt.historia.Narracao narracao;
-    private final NarradorLuta narradorLuta = new NarradorLuta();
-    private boolean narracaoPronta;
-    /** O narrador em pessoa no cenário, atrás dos lutadores (placeholder animado). */
-    private final com.gamelutagpt.historia.NarradorPalco narradorPalco = new com.gamelutagpt.historia.NarradorPalco();
-    /** Luta narrada: o narrador está no palco. */
-    private boolean narradorNoPalco;
-    /** A câmera deste quadro é a da luta (sem close de Super, Ultra, soco de câmera ou cinemática). */
-    private boolean cameraDaLuta;
-    private final Runnable desenhaNarradorPalco = this::drawNarradorPalco;
-    /** Lição do treino que já teve a fala da conversa (-1: nenhuma). */
-    private int conversaLicao = -1;
-    /** O KO desta luta já chamou o momento "vitoria" ou "derrota". */
-    private boolean conversaKo;
-    /**
-     * Cinemática dentro da luta da história (o "cinematica" do passo de luta): num gatilho
-     * (vida baixa, começo, tempo, KO) faixas pretas entram, o controle trava e um roteiro guia
-     * os dois lutadores e fala nos quadros da conversa. Padrão: docs/historia/motor-cinematicas.md.
-     */
-    private CinematicaLuta cinematica;
-    /** Os comandos dos dois lutadores enquanto a cinemática tem o controle. */
-    private final CinematicaDirector cinematicaDirector = new CinematicaDirector();
-    /** A cinemática terminou a luta ("jogador", "rival" ou "interrompida"); null = não terminou. */
-    private String cinematicaFim;
-    /** Quadros de luta desde o "LUTEM!" (gatilho de tempo da cinemática). */
-    private int storyFightFrames;
-    /** Câmera lenta da cinemática: quanto da próxima passada da luta já se acumulou. */
-    private float cinematicaPassada;
-    /** Menu inicial (abre com o app): MODO HISTÓRIA ou MODO TESTE. */
-    private final MenuInicial menuInicial;
-    /** MODO HISTÓRIA com save: CONTINUAR e os capítulos já liberados. */
-    private final MenuCapitulos capitulos = new MenuCapitulos();
-    /** ARCADE: a escolha da dupla (oficial ou livre). */
-    private final MenuArcade menuArcade;
-    /** As duplas oficiais que lutam (os cards do {@link #menuArcade} e o resto da chave). */
-    private final java.util.List<Torneio.Dupla> arcadeOficiais = new java.util.ArrayList<>();
-    /** A dupla livre do Arcade está sendo montada na seleção (só a dupla do jogador). */
-    private boolean arcadeSelectPending;
-    /** Um Arcade em andamento: a CPU sobe de nível a cada rodada. */
-    private boolean arcadeMode;
-    /** O save do modo história (lido na primeira vez que o modo abre). */
-    private ProgressoHistoria progresso;
-    private SharedPreferences storyPrefs;
-    private static final String STORY_PREFS = "historia_v1";
-    private static final String STORY_SAVE_KEY = "progresso";
     /** Pausa (botão MENU ou tecla voltar): continuar ou voltar ao menu inicial. */
     private final MenuPausa pausa = new MenuPausa();
-    /**
-     * MODO HISTÓRIA do menu inicial: a temporada desde o Prólogo, sem os botões de teste nem o
-     * DEBUG; voltar (botão MENU ou tecla) abre a pausa e leva ao menu, nunca à seleção de teste.
-     * Falso no MODO TESTE (inclusive na história tocada pelo botão HISTÓRIA de teste).
-     */
-    private boolean storyMode;
-    /** Texto do botão do topo da luta: "◀ SELEÇÃO" no teste, "◀ MENU" na história. */
-    private String selectButtonLabel = SELECT_LABEL;
-    private static final String SELECT_LABEL = "◀ SELEÇÃO";
-    /** A última escolha da seleção no modo teste (titular, parceiro, CPU, parceiro do CPU). */
-    private String[] testPicks = {"player_base", "p08", "p03", "p06"};
-    /**
-     * Entrou no MODO TESTE pelo menu e a luta de trás ainda é a de antes (da história, ou a do
-     * construtor): se a seleção for cancelada, a luta de teste começa com {@link #testPicks}.
-     */
-    private boolean testFightPending;
-    /** Duelo 1x1 da história: um lutador por lado (sem parceiro no motor nem no HUD). */
-    private boolean duel;
-    /** Episódio da temporada tocando agora, ou -1 fora do modo história. */
-    private int storyEpisode = -1;
-    /** Os episódios da temporada, carregados uma vez para contar as lutas (nível da CPU). */
-    private java.util.List<Episodio> episodiosTemporada;
-    /** Frames desde o KO de uma luta da história; a página volta depois da comemoração. */
-    private int storyKoFrames;
-    private static final int STORY_KO_FRAMES = 150;
     private int ultraAttacker = -1;
     private int ultraDamageDealt;
     private float ultraCameraZoom = 1f;
@@ -499,7 +389,6 @@ public class GameView extends SurfaceView
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
         qualidade = new QualidadeGrafica(speedPrefs);
-        storyPrefs = context.getSharedPreferences(STORY_PREFS, Context.MODE_PRIVATE);
         pausa.setVelocidade(speedPrefs.getFloat(SPEED_KEY, MenuPausa.VELOCIDADE_PADRAO));
         pausa.setImpacto(speedPrefs.getBoolean(IMPACT_KEY, true));
         pausa.setFps(speedPrefs.getBoolean(FPS_KEY, true));
@@ -535,13 +424,6 @@ public class GameView extends SurfaceView
         ultraAssets = new AndroidRenderAssets(context.getAssets());
         // Ultra cinematográfico: a sequência do vídeo espera a página de mangá antes do golpe final.
         engine.config.ultraSequencePage = true;
-        historia = new PaginaHistoria(this, ultraAssets);
-        menuInicial = new MenuInicial(ultraAssets);
-        menuInicial.setVersao(VERSION_HUD_LABEL);
-        menuArcade = new MenuArcade(ultraAssets);
-        conversa = new ConversaLuta(ultraAssets);
-        narracao = new com.gamelutagpt.historia.Narracao(ultraAssets);
-        cinematica = new CinematicaLuta(ultraAssets, conversa, palcoCinematica);
         stageId = DEFAULT_STAGE;
         holder = getHolder();
         holder.addCallback(this);
@@ -558,40 +440,26 @@ public class GameView extends SurfaceView
      * as folhas de cada luta são decodificadas (ou já foram antecipadas) quando ela é montada.
      */
     private boolean carregarFolhasNaHora;
-    /** Seleção e cenário montados em segundo plano enquanto o menu está na tela. */
-    private java.util.concurrent.FutureTask<CharacterSelectRenderer> selecaoAntecipada;
+    /** Os rostos do HUD (recortados das folhas de conceito). */
+    private HudConceptPortraits rostos;
     private java.util.concurrent.FutureTask<StageScene> cenarioAntecipado;
     private String cenarioAntecipadoId;
-    /** Sorteio do cenário de cada luta do Arcade. */
-    private final Random sorteioCenario = new Random();
     /** A última combinação de lutadores antecipada (não repete a cada quadro). */
     private String lutadoresAntecipados = "";
-    /** A luta da história cujas duplas já foram antecipadas. */
-    private Episodio.Passo lutaAntecipada;
 
     /**
-     * Começa, em segundo plano e sem travar o menu, o que a primeira saída dele vai pedir: a
-     * tela de seleção, o cenário e as folhas da dupla de teste. O carregamento depois só espera
-     * o que ainda faltar.
+     * Começa, em segundo plano, o que a luta vai pedir: o cenário e as folhas do p01. O
+     * carregamento depois só espera o que ainda faltar.
      */
     private void anteciparArteDaLuta(Context context) {
-        final String[] picks = testPicks.clone();
-        selecaoAntecipada = new java.util.concurrent.FutureTask<>(() -> {
-            CharacterSelectRenderer selecao = new CharacterSelectRenderer(context);
-            selecao.prepararHerois(picks);
-            return selecao;
-        });
         final String id = stageId;
         cenarioAntecipadoId = id;
         cenarioAntecipado = new java.util.concurrent.FutureTask<>(() -> loadStage(ultraAssets, id));
-        Thread t = new Thread(() -> {
-            selecaoAntecipada.run();
-            cenarioAntecipado.run();
-        }, "Antecipando");
+        Thread t = new Thread(cenarioAntecipado, "Antecipando");
         t.setDaemon(true);
         t.setPriority(Math.max(Thread.MIN_PRIORITY, Thread.NORM_PRIORITY - 2));
         t.start();
-        anteciparLutadores(testPicks);
+        anteciparLutadores(team[0].character.id);
     }
 
     /** O resultado de um trabalho antecipado (esperando o que faltar), ou null se ele falhou. */
@@ -624,25 +492,6 @@ public class GameView extends SurfaceView
         }
         if (!atlases.antecipar(lutadores.toArray(new CharacterDefinition[0])))
             Log.i(MedicaoCarregamento.TAG, "antecipação parcial (memória): " + chave);
-    }
-
-    /** Na seleção: as escolhas da tela (as que ainda vão mudar também; o orçamento segura). */
-    private void anteciparSelecao() {
-        if (characterSelect.solo()) anteciparLutadores(characterSelect.point(), characterSelect.partner());
-        else anteciparLutadores(characterSelect.point(), characterSelect.partner(),
-            characterSelect.opponentPoint(), characterSelect.opponentPartner());
-    }
-
-    /** Nas páginas da história (e do Arcade): as duplas da próxima luta, enquanto o jogador lê. */
-    private void anteciparHistoria() {
-        Episodio.Passo luta = historia.proximaLuta();
-        if (luta == null || luta == lutaAntecipada) return;
-        lutaAntecipada = luta;
-        String[][] lados = historia.lados(luta);
-        if (lados == null) return;
-        java.util.ArrayList<String> ids = new java.util.ArrayList<>();
-        for (String[] lado : lados) for (String id : lado) ids.add(id);
-        anteciparLutadores(ids.toArray(new String[0]));
     }
 
     /** Contexto para a arte da luta, carregada na primeira saída do menu inicial. */
@@ -688,26 +537,18 @@ public class GameView extends SurfaceView
         stageScene = cenario != null ? cenario : loadStage(ultraAssets, stageId);
         cenarioAntecipado = null;
         medicao.parte("cenario");
-        CharacterSelectRenderer selecao = resultado(selecaoAntecipada);
-        characterSelectRenderer = selecao != null ? selecao : new CharacterSelectRenderer(context);
+        rostos = new HudConceptPortraits(context);
         prepararRostosDoHud(team[0].character, team[1].character, opponentFighter.character);
-        // PC e testes: os retratos na hora, como antes (a seleção desenhada já sai completa).
-        if (carregarFolhasNaHora) characterSelectRenderer.carregarHerois(GeneratedCharacters.SELECTABLE);
-        selecaoAntecipada = null;
-        medicao.parte("selecao");
+        medicao.parte("rostos");
         loadTeamUltras();
         medicao.parte("ultras");
         medicao.fim(atlases);
         arteCarregada = true;
     }
 
+    /** Quem aparece na lista de COMANDOS da pausa (versão leve: só o p01). */
     private static String[] selectionRoster() {
-        java.util.ArrayList<String> ids=new java.util.ArrayList<>();
-        String[] visualOrder={"player_base","p03","p06","p02","p08","p04","p05","p07","p09","p10","p12","p15"};
-        for(String wanted:visualOrder) for(String available:GeneratedCharacters.SELECTABLE)
-            if(wanted.equals(available)) ids.add(available);
-        // P09–P16 without gameplay yet stay as locked concept slots after these.
-        return ids.toArray(new String[0]);
+        return GeneratedCharacters.SELECTABLE.clone();
     }
 
     private static FighterState[] membersOf(int index) {
@@ -812,52 +653,21 @@ public class GameView extends SurfaceView
         return tarefa == null || tarefa.isDone();
     }
 
-    /**
-     * DUPLA: the next pair of the roster takes the fight. Fresh round with the intro; the
-     * training CPU becomes the new point character, and the atlases of whoever left are
-     * freed (each character is ~135 MB decoded).
-     */
-    private void selectTeam(int index) {
-        teamIndex = index % GeneratedCharacters.TEAMS.length;
-        String[] ids = GeneratedCharacters.TEAMS[teamIndex];
-        selectPair(ids[0], ids[1]);
-    }
-
-    /** Compatibilidade com troca de dupla existente. */
-    private void selectPair(String point, String partner) {
-        // Legacy team preset: training CPU continues mirroring the chosen point.
-        selectTeams(point, partner, point, opponentTagId);
-    }
-
-    /** A seleção muda a dupla P1 e o titular do adversário de treino. */
+    /** Monta a dupla P1 e a do CPU e começa um round novo com a intro. */
     private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner) {
-        selectTeams(point, partner, cpuPoint, cpuPartner, false);
-    }
-
-    /**
-     * Duelo 1x1 (a regra escondida do torneio): um lutador de cada lado, sem tag nem assist.
-     * O "parceiro" guardado no time do jogador é o próprio adversário, só para a arte e o ultra
-     * dele já estarem carregados; o motor recebe um membro por lado.
-     */
-    private void selectDuel(String player, String cpu) {
-        selectTeams(player, cpu, cpu, player, true);
-    }
-
-    private void selectTeams(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
         // Duplas novas decodificam a arte delas (segundos): com a tela de carregamento.
-        carregando(() -> selectTeamsNow(point, partner, cpuPoint, cpuPartner, solo));
+        carregando(() -> selectTeamsNow(point, partner, cpuPoint, cpuPartner));
     }
 
-    private void selectTeamsNow(String point, String partner, String cpuPoint, String cpuPartner, boolean solo) {
+    private void selectTeamsNow(String point, String partner, String cpuPoint, String cpuPartner) {
         MedicaoCarregamento medicao = new MedicaoCarregamento("dupla " + point + "+" + partner + " x " + cpuPoint + "+" + cpuPartner);
         ultraEsperando = null;
         hud.resetEffects();
-        duel = solo;
         team = membersOf(point, partner);
         opponentFighter = new FighterState(GeneratedCharacters.get(cpuPoint), "CPU");
         opponentTagId = cpuPartner;
         CharacterDefinition cpuPartnerCharacter = GeneratedCharacters.get(cpuPartner);
-        if (flow.battle() && !duel) {
+        if (flow.battle()) {
             // Batalha 2x2: o parceiro do CPU entra de assist, na troca e quando o titular cai,
             // então a arte dele fica carregada (sem decodificar no meio da luta).
             atlases.retainOnly(team[0].character, team[1].character, opponentFighter.character, cpuPartnerCharacter);
@@ -874,8 +684,8 @@ public class GameView extends SurfaceView
         spriteFighterRenderer.setCharacter(team[0].character.id);
         partnerSpriteRenderer.setCharacter(team[1].character.id);
         opponentSpriteRenderer.setCharacter(opponentFighter.character.id);
-        engine.setTeam(PLAYER, duel ? new FighterState[] {team[0]} : team);
-        if (flow.battle() && !duel) {
+        engine.setTeam(PLAYER, team);
+        if (flow.battle()) {
             engine.setTeam(OPPONENT, opponentFighter, new FighterState(cpuPartnerCharacter, "CPU"));
         } else {
             engine.setTeam(OPPONENT, opponentFighter);
@@ -907,40 +717,10 @@ public class GameView extends SurfaceView
         return teamHas(characterId) ? ultraPronto(characterId) : null;
     }
 
-    /** DUPLA (and the first launch): pause the fight and pick the pair. */
-    private void openCharacterSelect() {
-        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
-        // Voltar à seleção abandona o episódio, a cena e o treino que estiverem tocando.
-        historia.stop();
-        storyEpisode = -1;
-        sceneAfter = null;
-        tutorial.stop();
-        descarregarConversa();
-        useStage(null);
-        hud.resetEffects();
-        characterSelect.open(team[0].character.id, team[1].character.id,
-            opponentFighter.character.id, opponentTagId);
-        selectionKeys.clear();
-        pad.reset();
-        releaseAllPointers();
-    }
-
     @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
         notarEsquema(keyCode, event);
-        if (menuInicial.isOpen()) {
-            // No menu inicial a tecla voltar fecha o app, como em toda tela raiz do Android.
-            if (keyCode == KeyEvent.KEYCODE_BACK) return super.onKeyDown(keyCode, event);
-            offerMenuKey(keyCode, event);
-            return true;
-        }
-        if (capitulos.isOpen() || menuArcade.isOpen()) {
-            // Nos capítulos e na escolha da dupla do Arcade, voltar leva ao menu inicial.
-            offerMenuKey(keyCode, event);
-            return true;
-        }
         // Na luta, voltar/START abre a pausa (o loop do jogo lê a fila).
-        if (pausa.isOpen() || ajusteTamanho.isOpen() || ajusteCaixas.isOpen() || characterSelect.isOpen() ||
-            historia.coversScreen() || isPauseKey(keyCode)) {
+        if (pausa.isOpen() || ajusteTamanho.isOpen() || ajusteCaixas.isOpen() || isPauseKey(keyCode)) {
             offerMenuKey(keyCode, event);
             return true;
         }
@@ -997,9 +777,8 @@ public class GameView extends SurfaceView
             // Os comandos de teste seguem os botões de teste: fora do modo história.
             HardwareInput.Action action = HardwareInput.action(keyCode);
             if (action == HardwareInput.Action.CHARACTER_SELECT) {
-                if (storyMode) openPause();
-                else openCharacterSelect();
-            } else if (!storyMode) {
+                openPause();
+            } else {
                 switch (action) {
                     case DEBUG: debugOverlay = !debugOverlay; break;
                     case AI: setOpponentAiEnabled(!ai.enabled()); break;
@@ -1030,78 +809,6 @@ public class GameView extends SurfaceView
             keyCode == KeyEvent.KEYCODE_BUTTON_START;
     }
 
-    private void handleSelectionKey(int keyCode) {
-        switch(keyCode) {
-            case KeyEvent.KEYCODE_DPAD_LEFT: characterSelect.moveCursor(-1,0); break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT: characterSelect.moveCursor(1,0); break;
-            case KeyEvent.KEYCODE_DPAD_UP: characterSelect.moveCursor(0,-1); break;
-            case KeyEvent.KEYCODE_DPAD_DOWN: characterSelect.moveCursor(0,1); break;
-            case KeyEvent.KEYCODE_BUTTON_A:
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-                if(characterSelect.ready()) confirmCharacterSelection();
-                else characterSelect.selectCursor();
-                break;
-            case KeyEvent.KEYCODE_BUTTON_B:
-            case KeyEvent.KEYCODE_ESCAPE:
-            case KeyEvent.KEYCODE_BACK:
-                if(characterSelect.back()==CharacterSelect.Result.CANCEL) closeCharacterSelect();
-                break;
-            case KeyEvent.KEYCODE_BUTTON_X: characterSelect.randomFocused(); break;
-            case KeyEvent.KEYCODE_BUTTON_Y: characterSelect.toggleSettings(); break;
-            case KeyEvent.KEYCODE_BUTTON_L1:
-            case KeyEvent.KEYCODE_BUTTON_R1: characterSelect.swapFocusedTeam(); break;
-            case KeyEvent.KEYCODE_BUTTON_START:
-                if(characterSelect.ready()) confirmCharacterSelection();
-                else characterSelect.selectCursor();
-                break;
-            default: break;
-        }
-    }
-
-    private void handleCharacterSelectTap(float x, float y) {
-        switch (characterSelect.tap(x, y)) {
-            case CONFIRM:
-                confirmCharacterSelection();
-                break;
-            case CANCEL:
-                closeCharacterSelect();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void confirmCharacterSelection() {
-        if(!characterSelect.ready())return;
-        characterSelectRenderer.beginFightTransition();
-        characterSelect.close();
-        if (arcadeSelectPending) {
-            // Dupla livre do Arcade: os adversários vêm do sorteio da chave.
-            arcadeSelectPending = false;
-            startArcade(Arcade.livre(characterSelect.point(), characterSelect.partner()));
-            return;
-        }
-        testFightPending = false;
-        testPicks = new String[] {characterSelect.point(), characterSelect.partner(),
-            characterSelect.opponentPoint(), characterSelect.opponentPartner()};
-        selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
-    }
-
-    /** Seleção cancelada: volta para a luta (a de teste do zero, se veio do menu inicial). */
-    private void closeCharacterSelect() {
-        characterSelect.close();
-        if (arcadeSelectPending) {
-            arcadeSelectPending = false;
-            openArcadeMenu();
-            return;
-        }
-        if (testFightPending) {
-            testFightPending = false;
-            selectTeams(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
-        }
-    }
-
     private String teamLabel() {
         return displayId(team[0]) + "+" + displayId(team[1]);
     }
@@ -1127,27 +834,6 @@ public class GameView extends SurfaceView
         stageScene = null;
         stageId = wanted;
         stageScene = loadStage(ultraAssets, wanted);
-    }
-
-    /**
-     * Arcade: um cenário sorteado entre as pastas de assets/stages que têm stage.json, sem
-     * repetir o da luta anterior (quando há mais de um). Null (o padrão) se não achar nenhum.
-     */
-    private String sortearCenario() {
-        java.util.List<String> opcoes = new java.util.ArrayList<>();
-        try {
-            String[] pastas = getContext().getAssets().list("stages");
-            if (pastas != null) {
-                for (String id : pastas) {
-                    String[] arquivos = getContext().getAssets().list("stages/" + id);
-                    if (arquivos != null && java.util.Arrays.asList(arquivos).contains("stage.json")) opcoes.add(id);
-                }
-            }
-        } catch (IOException ex) {
-            Log.w(LOG_TAG, "sem a lista de cenários para o Arcade", ex);
-        }
-        if (opcoes.size() > 1) opcoes.remove(stageId);
-        return opcoes.isEmpty() ? null : opcoes.get(sorteioCenario.nextInt(opcoes.size()));
     }
 
     private static StageScene loadStage(AndroidRenderAssets assets, String id) {
@@ -1216,10 +902,9 @@ public class GameView extends SurfaceView
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (!introPlayed) {
             introPlayed = true;
-            // O app abre no menu inicial: MODO HISTÓRIA ou MODO TESTE (a luta de teste de antes).
-            // O menu é leve; a arte da luta carrega quando o jogador sair dele.
+            // Versão leve: o app abre direto no treino do p01 (sem menu inicial). No celular a
+            // arte carrega no primeiro passo do loop, com a tela de carregamento.
             startIntro();
-            openMainMenu();
         }
         surfaceReady = true;
         // Sempre: até no ALTO a resolução tem teto (tela 1440p+ desenhava 2–4× os pixels à toa).
@@ -1324,6 +1009,11 @@ public class GameView extends SurfaceView
     // Render cadence can vary; the simulation always advances in whole 60 Hz frames.
     private void advanceSimulation(float elapsedSeconds) {
         if (updateLoading()) return;
+        if (!arteCarregada) {
+            // Celular: a arte da luta ainda não foi decodificada; o próximo quadro já carrega.
+            comArteDaLuta(this::startIntro);
+            return;
+        }
         processPendingInput();
         // VELOCIDADE (pausa): o relógio da luta anda mais devagar, então golpes, pulos, IA,
         // timer e efeitos desaceleram juntos sem mexer no frame data dos packs. Menus,
@@ -1431,9 +1121,7 @@ public class GameView extends SurfaceView
 
     /** True quando o próximo update() é a luta (ou treino) e não uma tela por cima dela. */
     private boolean fightClockRunning() {
-        return !menuInicial.isOpen() && !menuArcade.isOpen() && !pausa.isOpen() && !ajusteTamanho.isOpen() &&
-            !ajusteCaixas.isOpen() && !characterSelect.isOpen() && !historia.coversScreen() &&
-            !paginaFinal.isActive();
+        return !pausa.isOpen() && !ajusteTamanho.isOpen() && !ajusteCaixas.isOpen() && !paginaFinal.isActive();
     }
 
     /** One simulation frame: inputs, engine step, then presentation state. */
@@ -1442,34 +1130,8 @@ public class GameView extends SurfaceView
             stageScene.update(FIXED_STEP);
             updateTrovao();
         }
-        if (menuInicial.isOpen()) {
-            // A luta fica parada (e escondida) atrás do menu.
-            pad.drainInto(ignoredInput);
-            Integer key;
-            while ((key = selectionKeys.poll()) != null) handleMenuKey(key);
-            MenuInicial.Opcao escolha = menuInicial.update(FIXED_STEP);
-            // A arte da luta só carrega aqui, na primeira saída do menu (o menu abre na hora).
-            if (escolha == MenuInicial.Opcao.HISTORIA) comArteDaLuta(this::startStoryMode);
-            else if (escolha == MenuInicial.Opcao.ARCADE) comArteDaLuta(this::openArcadeMenu);
-            else if (escolha == MenuInicial.Opcao.TESTE) comArteDaLuta(this::startTestMode);
-            return;
-        }
-        if (menuArcade.isOpen()) {
-            pad.drainInto(ignoredInput);
-            Integer key;
-            while (menuArcade.isOpen() && (key = selectionKeys.poll()) != null) handleArcadeMenuKey(key);
-            menuArcade.update(FIXED_STEP);
-            return;
-        }
-        if (capitulos.isOpen()) {
-            pad.drainInto(ignoredInput);
-            Integer key;
-            while (capitulos.isOpen() && (key = selectionKeys.poll()) != null) handleChaptersKey(key);
-            capitulos.update(FIXED_STEP);
-            return;
-        }
         if (pausa.isOpen()) {
-            // Tudo para (página, luta, treino, conversa) até CONTINUAR ou MENU INICIAL.
+            // A luta para até CONTINUAR ou REINICIAR LUTA.
             pad.drainInto(ignoredInput);
             Integer key;
             while (pausa.isOpen() && (key = selectionKeys.poll()) != null) handlePauseKey(key);
@@ -1489,23 +1151,6 @@ public class GameView extends SurfaceView
             Integer key;
             while ((key = selectionKeys.poll()) != null) ajusteCaixas.key(key);
             ajusteCaixas.update(FIXED_STEP);
-            return;
-        }
-        if (characterSelect.isOpen()) {
-            // Freeze combat while processing queued hardware controls on this same game thread.
-            pad.drainInto(ignoredInput);
-            Integer key;
-            while ((key = selectionKeys.poll()) != null) handleSelectionKey(key);
-            if (characterSelect.isOpen()) anteciparSelecao();
-            return;
-        }
-        if (historia.coversScreen()) {
-            // The fight waits behind the story page; any key turns the page, B skips.
-            pad.drainInto(ignoredInput);
-            Integer key;
-            while ((key = selectionKeys.poll()) != null) handleStoryKey(key);
-            historia.update(FIXED_STEP);
-            if (historia.coversScreen()) anteciparHistoria();
             return;
         }
         updateUltraBars();
@@ -1547,7 +1192,6 @@ public class GameView extends SurfaceView
                 if (pausa.isOpen()) return;
             }
         }
-        if (cinematicaLenta()) return;
         boolean tagging = isTagAnimationActive();
 
         boolean intro = introFrame >= 0;
@@ -1556,19 +1200,6 @@ public class GameView extends SurfaceView
             pad.drainInto(ignoredInput);
             playerInput.clear();
             opponentInput.clear();
-        } else if (demo.active()) {
-            // Touches never reach the fight during a demo.
-            pad.drainInto(ignoredInput);
-            demo.fill(playerInput, opponentInput);
-        } else if (cinematica.controleTravado()) {
-            // Cinemática: o roteiro move os dois; o pad e a IA ficam de fora.
-            pad.drainInto(ignoredInput);
-            cinematicaDirector.fill(engine, playerInput, opponentInput);
-        } else if (tutorial.active()) {
-            // Treino: o jogador joga com o pad; o boneco só faz o que a lição pede.
-            pad.setHolding(attackHeld());
-            pad.drainInto(playerInput);
-            tutorial.fillDummy(opponentInput);
         } else {
             pad.setHolding(attackHeld());
             pad.drainInto(playerInput);
@@ -1584,33 +1215,16 @@ public class GameView extends SurfaceView
             playerInput.clear();
             opponentInput.clear();
         }
-        // Com a cinemática esperando a vida baixa (ou rodando), ninguém cai antes da cena.
         // Depois do TIME OVER o resultado já está decidido: ninguém cai mais.
-        protegerVida(cinematica.protegeVida() || flow.timeOver());
+        protegerVida(flow.timeOver());
         engine.step(playerInput, opponentInput);
         // O parceiro só entra depois do KO quando o raio do ultra já saiu da tela.
         boolean fightFree = ultraAttacker < 0 && !engine.ultraSequenceRunning();
-        // Cena da história esperando a vida baixar (ou o K.O.), ou rodando: o relógio espera.
-        flow.setClockHeld(cinematica.protegeVida() || cinematica.seguraFimDaLuta() || demo.active());
-        // O relógio para no congelamento do Super/Ultra e enquanto a cena tem o controle.
-        boolean clockRuns = fightFree && !engine.superFreezeActive() && !cinematica.controleTravado();
+        // O relógio para no congelamento do Super/Ultra.
+        boolean clockRuns = fightFree && !engine.superFreezeActive();
         flow.update(engine, fightFree, clockRuns);
         updateOpponentVisuals();
-        if (flow.restartDue() && !historia.waitingFight() && !tutorial.active()) restartBattle();
-        demo.afterStep();
-        // O "treino completo" espera a conversa do fim (ela anda sozinha, sem toque).
-        tutorial.setHoldEnd(conversa.falando());
-        tutorial.afterStep();
-        // Quem assiste no fundo (Dafu e Takatoshi) reage ao que aconteceu no treino.
-        if (stageScene != null) {
-            for (String reaction : tutorial.reactions()) stageScene.react(reaction);
-        }
-        updateGritoDaTroca();
-        updateConversa();
-        updateNarracao();
-        updateCinematica(intro);
-        // A lição do Ultra termina com o raio ainda no ar: o treino sai depois dele.
-        if (tutorial.finished() && ultraAttacker < 0) finishTutorial();
+        if (flow.restartDue()) restartBattle();
         if (engine.ultraConnected() >= 0) beginUltraCinematic(engine.ultraConnected());
 
         // A voadora da troca que acerta gira o rival como o punish: mesmo impacto e tremor.
@@ -1682,7 +1296,6 @@ public class GameView extends SurfaceView
             introFrame = -1;
             flow.startCountdown();
         }
-        updateStoryFight();
     }
 
     /** No 2x2 o CPU troca de lutador quando o titular cai: o desenho acompanha. */
@@ -1728,10 +1341,6 @@ public class GameView extends SurfaceView
         introFrame = introTotalFrames > 0 ? 0 : -1;
         flow.reset();
         if (introFrame < 0) flow.startCountdown();
-        narradorLuta.reset();
-        gritoDaTroca.reset();
-        narradorPalco.reset();
-        if (narracao != null) narracao.stop();
     }
 
     private final HudRenderer.State hudState = new HudRenderer.State() {
@@ -1739,7 +1348,6 @@ public class GameView extends SurfaceView
         @Override public FighterState reserve() { return reserveFighter(); }
         @Override public FighterState opponent() { return opponentPoint(); }
         @Override public CharacterDefinition opponentReserveCharacter() {
-            if (duel) return null;
             FighterState partner = engine.team(OPPONENT).partner();
             return partner != null ? partner.character : GeneratedCharacters.get(opponentTagId);
         }
@@ -1766,7 +1374,6 @@ public class GameView extends SurfaceView
             }
             return 1f;
         }
-        @Override public int presentationEpoch() { return demo.demo() * 100 + demo.stepIndex(); }
         @Override public boolean assistInUse() { return isTagAnimationActive() || engine.team(PLAYER).assistOut(); }
         @Override public String tagCooldownLabel() { return tagCooldownHudLabel; }
         @Override public String tagButtonLabel() { return tagCooldownButtonLabel; }
@@ -1788,13 +1395,7 @@ public class GameView extends SurfaceView
         }
         @Override public float overdriveSeconds() { return engine.team(PLAYER).overdriveFrames * FIXED_STEP; }
         @Override public boolean overdriveReady() { return !engine.team(PLAYER).overdriveUsed; }
-        @Override public int demoPlaying() { return demo.demo(); }
-        @Override public String demoTitle() { return demo.title(); }
-        @Override public String demoCaption() { return demo.caption(); }
-        @Override public boolean storyActive() { return historia.isActive() && !tutorial.active(); }
-        @Override public boolean tutorialActive() { return tutorial.active(); }
-        @Override public boolean hideTestButtons() { return testButtonsHidden(); }
-        @Override public String selectButtonLabel() { return selectButtonLabel; }
+        @Override public String selectButtonLabel() { return "◀ MENU"; }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -2619,7 +2220,6 @@ public class GameView extends SurfaceView
      * vermelho vazio piscando.
      */
     private void drawGuardGauges(Canvas canvas, float zoom, float left, float top) {
-        if (demo.active() || tutorial.active()) return;
         int warning = engine.config.guardWarningPermille * CombatConfig.GUARD_MAX / 1000;
         boolean blink = (engine.frame() / 4) % 2 == 0;
         for (int i = 0; i < 2; i++) {
@@ -2725,8 +2325,8 @@ public class GameView extends SurfaceView
     }
 
     private void prepararRostosDoHud(CharacterDefinition... lutadores) {
-        if (characterSelectRenderer == null) return;
-        for (CharacterDefinition c : lutadores) characterSelectRenderer.hudPortrait(c);
+        if (rostos == null) return;
+        for (CharacterDefinition c : lutadores) rostos.get(c.id);
     }
 
     /** Tempo de cada parte do quadro (log "Quadros"). */
@@ -2766,24 +2366,6 @@ public class GameView extends SurfaceView
 
             canvas.save();
             canvas.scale(sx, sy);
-            if (menuInicial.isOpen()) {
-                renderCanvas.begin(canvas);
-                menuInicial.render(renderCanvas);
-                canvas.restore();
-                return;
-            }
-            if (capitulos.isOpen()) {
-                renderCanvas.begin(canvas);
-                capitulos.render(renderCanvas);
-                canvas.restore();
-                return;
-            }
-            if (menuArcade.isOpen()) {
-                renderCanvas.begin(canvas);
-                menuArcade.render(renderCanvas);
-                canvas.restore();
-                return;
-            }
             if (ajusteTamanho.isOpen()) {
                 ajusteTamanho.draw(canvas);
                 canvas.restore();
@@ -2794,47 +2376,19 @@ public class GameView extends SurfaceView
                 canvas.restore();
                 return;
             }
-            // Renderização exclusiva do menu: nenhum lutador/HUD fica sob a interface.
-            if (characterSelect.isOpen()) {
-                characterSelectRenderer.draw(canvas, paint, characterSelect);
-                canvas.restore();
-                return;
-            }
-            if (historia.coversScreen()) {
-                renderCanvas.begin(canvas);
-                historia.render(renderCanvas);
-                pausa.render(renderCanvas);
-                canvas.restore();
-                return;
-            }
-
-            float cinematicZoom = cinematica.zoom();
-            float baseZoom = camera.zoom * superFlash.zoom * cinematicZoom;
+            float baseZoom = camera.zoom * superFlash.zoom;
             float punchZoom = feel.zoom();
             float renderZoom = baseZoom * ultraCameraZoom * punchZoom;
             float visibleWorldWidth = VW / renderZoom;
             float renderCameraX = camera.x;
             float renderCameraTop = camera.top;
-            // Zoom e foco da cinemática. Sem foco, o zoom segura o chão no mesmo lugar da tela (os
-            // pés não somem na faixa); focando alguém (quem fala), segura o peito dele: um plano
-            // médio, com o rosto na tela e os pés podendo sair. O centro vai até ele.
-            float focoJogador = cinematica.foco(CinematicaLuta.JOGADOR);
-            float focoRival = cinematica.foco(CinematicaLuta.RIVAL);
-            if (cinematicZoom != 1f || focoJogador > 0f || focoRival > 0f) {
-                float pivotY = GROUND_Y + focoJogador * (chestY(player()) - GROUND_Y) +
-                    focoRival * (chestY(opponent()) - GROUND_Y);
-                float pivotScreenY = (pivotY - camera.top) * camera.zoom * superFlash.zoom;
-                renderCameraTop = pivotY - pivotScreenY / baseZoom;
-                renderCameraX += focoJogador * (player().x + tagOffset() - camera.x) +
-                    focoRival * (opponent().x + engine.teams.tagOffset(OPPONENT) - camera.x);
-            }
             if (superFlash.active() && superFlash.zoom > 1f) {
                 // Super: o zoom vai para quem ativou. O peito dele sai de onde estava na tela e
                 // chega perto do meio conforme o zoom cresce (e volta junto quando ele solta).
                 CombatFighter u = engine.fighter(superFlash.user);
                 float ux = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
                 float uy = chestY(u);
-                float plainZoom = camera.zoom * cinematicZoom;
+                float plainZoom = camera.zoom;
                 float plainLeft = clamp(renderCameraX - VW / plainZoom / 2f, 0f, WORLD_WIDTH - VW / plainZoom);
                 float fromX = (ux - plainLeft) * plainZoom, fromY = (uy - renderCameraTop) * plainZoom;
                 float k = clamp((superFlash.zoom - 1f) / SUPER_FOCUS_ZOOM, 0f, 1f);
@@ -2874,7 +2428,6 @@ public class GameView extends SurfaceView
                 renderCameraTop += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
             }
             boolean beam = ultraBeamActive();
-            cameraDaLuta = !ultraShotActive && renderZoom == camera.zoom && focoJogador <= 0f && focoRival <= 0f;
 
             renderCanvas.begin(canvas);
             // Close de cinema: a cena inteira inclinada, com sobra para não mostrar os cantos.
@@ -2892,12 +2445,7 @@ public class GameView extends SurfaceView
                 perfil.marca(PerfilQuadros.TELA);
                 stageScene.setDetalhe(!qualidade.efeitosLeves());
                 stageScene.setCamera(renderZoom, cameraLeft, renderCameraTop);
-                if (narradorNoPalco) {
-                    stageScene.drawBackground(renderCanvas, com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE,
-                        desenhaNarradorPalco);
-                } else {
-                    stageScene.drawBackground(renderCanvas);
-                }
+                stageScene.drawBackground(renderCanvas);
             }
 
             canvas.save();
@@ -2905,14 +2453,6 @@ public class GameView extends SurfaceView
             canvas.translate(-cameraLeft, -renderCameraTop);
             if (stageScene == null) {
                 drawScenario(canvas);
-                if (narradorNoPalco) {
-                    // Sem o palco 3D: um pouco acima do chão dos lutadores e menor.
-                    if (cameraDaLuta) {
-                        narradorPalco.alvo(player().x + tagOffset(), opponent().x + engine.teams.tagOffset(OPPONENT),
-                            cameraLeft, cameraLeft + visibleWorldWidth);
-                    }
-                    narradorPalco.render(renderCanvas, narradorPalco.x(), GROUND_Y - 28f, 0.75f);
-                }
             }
             drawFloorReflections(canvas);
             perfil.marca(PerfilQuadros.FUNDO);
@@ -2979,7 +2519,7 @@ public class GameView extends SurfaceView
             if (negativeLayer >= 0) canvas.restoreToCount(negativeLayer);
             if (feel.impactStyle() != ImpactFeel.NONE) drawImpactFrame(canvas, renderZoom, cameraLeft, renderCameraTop);
             if (cinemaLayer >= 0) canvas.restoreToCount(cinemaLayer);
-            if (ultraBars < 0.001f && cinematica.faixas() < 0.001f && !isSuperCinematicActive()) {
+            if (ultraBars < 0.001f && !isSuperCinematicActive()) {
                 drawGroundMarkers(canvas, renderZoom, cameraLeft, renderCameraTop);
                 drawGuardGauges(canvas, renderZoom, cameraLeft, renderCameraTop);
             }
@@ -2994,19 +2534,15 @@ public class GameView extends SurfaceView
 
             boolean pageCoversGame = paginaFinal.isActive() && !paginaFinal.isShattering();
             if (!pageCoversGame) {
-                // Na cinemática o HUD some enquanto as faixas entram, e o controle de toque sai.
-                float faixas = Math.max(cinematica.faixas(), ultraBars);
+                // No Ultra o HUD some enquanto as faixas entram, e o controle de toque sai.
+                float faixas = ultraBars;
                 if (faixas < 0.999f) {
                     int layer = faixas > 0.001f
                         ? canvas.saveLayerAlpha(0f, 0f, VW, VH, Math.round(255f * (1f - faixas))) : -1;
                     drawHud(canvas);
                     if (layer >= 0) canvas.restoreToCount(layer);
                 }
-                if (touchControls && !cinematica.controleTravado() && faixas < 0.001f) drawControls(canvas);
-                cinematica.renderFaixas(renderCanvas);
-                conversa.render(renderCanvas);
-                if (narracao != null && faixas < 0.5f) narracao.render(renderCanvas);
-                cinematica.renderEfeitos(renderCanvas);
+                if (touchControls && faixas < 0.001f) drawControls(canvas);
             }
             if (abertura.isActive()) abertura.render(renderCanvas);
             if (paginaFinal.isActive()) {
@@ -3016,7 +2552,6 @@ public class GameView extends SurfaceView
             pausa.render(renderCanvas);
 
             canvas.restore();
-            characterSelectRenderer.drawFightTransition(canvas);
             perfil.marca(PerfilQuadros.HUD);
         }
     }
@@ -3079,7 +2614,7 @@ public class GameView extends SurfaceView
     }
 
     private void drawHud(Canvas c) {
-        hud.drawHud(c, hudState, characterSelectRenderer);
+        hud.drawHud(c, hudState, rostos);
         if (throwBannerFrames > 0) {
             float t = 1f - throwBannerFrames / (float)THROW_BANNER_FRAMES;
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
@@ -3093,7 +2628,6 @@ public class GameView extends SurfaceView
             engine.framesSinceSessionEnd(OPPONENT), true);
         hud.drawCombo(c, engine.session(PLAYER), engine.lastSession(PLAYER),
             engine.framesSinceSessionEnd(PLAYER), false);
-        hud.drawTutorial(c, tutorial, esquema);
         if (debugOverlay) {
             debug.drawPanel(c, engine, perfil.ultima());
             drawSizeTunerButton(c);
@@ -3136,7 +2670,7 @@ public class GameView extends SurfaceView
         if (x<TUNE_LEFT || x>TUNE_RIGHT || y<TUNE_TOP || y>BOXES_BOTTOM) return false;
         boolean boxes = y >= BOXES_TOP;
         if (!boxes && y > TUNE_BOTTOM) return true;
-        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return true;
+        if (paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return true;
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
@@ -3953,24 +3487,6 @@ public class GameView extends SurfaceView
         int index = event.getActionIndex();
         trackTouches(event, action, index, sx, sy);
 
-        if (menuInicial.isOpen()) {
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                menuInicial.tap(event.getX(index) / sx, event.getY(index) / sy);
-            }
-            return;
-        }
-        if (capitulos.isOpen()) {
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                applyChapter(capitulos.tap(event.getX(index) / sx, event.getY(index) / sy));
-            }
-            return;
-        }
-        if (menuArcade.isOpen()) {
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                applyArcadeChoice(menuArcade.tap(event.getX(index) / sx, event.getY(index) / sy));
-            }
-            return;
-        }
         if (pausa.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 applyPause(pausa.tap(event.getX(index) / sx, event.getY(index) / sy));
@@ -3989,25 +3505,6 @@ public class GameView extends SurfaceView
             }
             return;
         }
-        if (characterSelect.isOpen()) {
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                handleCharacterSelectTap(event.getX(index) / sx, event.getY(index) / sy);
-            }
-            return;
-        }
-        if (historia.coversScreen()) {
-            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                float x = event.getX(index) / sx;
-                float y = event.getY(index) / sy;
-                // MENU (só no modo história) abre a pausa; o resto da tela vira a página.
-                if (historia.menuAt(x, y)) {
-                    openPause();
-                } else {
-                    historia.tap(x, y);
-                }
-            }
-            return;
-        }
         if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
             if (paginaFinal.isActive()) {
                 // During the "Página Final" any touch counts for the timing (only for the player's
@@ -4019,17 +3516,9 @@ public class GameView extends SurfaceView
             float x = event.getX(index) / sx;
             float y = event.getY(index) / sy;
             if(debugOverlay && handleSizeTunerTap(x,y))return;
-            if (tutorial.active() && ControlsLayout.tutorialSkipAt(x, y)) {
-                // PULAR no fim do treino não espera a conversa terminar.
-                if (tutorial.completing()) conversa.stop();
-                tutorial.skip();
-                return;
-            }
 
             ControlsLayout.Control control = ControlsLayout.controlAt(x, y);
             if (!touchControls && isPadControl(control)) control = ControlsLayout.Control.NONE;
-            // No tutorial e nas lutas com conversa os botões de teste não aparecem nem respondem.
-            if (testButtonsHidden() && ControlsLayout.isTestButton(control)) control = ControlsLayout.Control.NONE;
             switch (control) {
                 case AI_TOGGLE:
                     // IA ON: a batalha de verdade (2x2) começa do zero; IA OFF volta ao treino.
@@ -4040,26 +3529,13 @@ public class GameView extends SurfaceView
                     debugOverlay = !debugOverlay;
                     break;
                 case CHARACTER_SELECT:
-                    // No modo história o botão do topo é o MENU (pausa), não a seleção de teste.
-                    if (storyMode) {
-                        openPause();
-                    } else {
-                        openCharacterSelect();
-                    }
+                    // Versão leve: o botão do topo é o MENU (pausa).
+                    openPause();
                     break;
                 case HEAL_PLAYER:
                     // Both team members, so the reserve is also ready after a tag.
                     healPlayerPointer = pointerId;
                     healPlayerTeam();
-                    break;
-                case TEAM_SELECT:
-                    openCharacterSelect();
-                    break;
-                case STORY:
-                    startStory();
-                    break;
-                case TUTORIAL:
-                    startTutorialMode();
                     break;
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
@@ -4145,195 +3621,15 @@ public class GameView extends SurfaceView
         }
     }
 
-    // ------------------------------------------------------------ menu inicial e pausa
+    // ------------------------------------------------------------ pausa
 
-    /**
-     * Menu inicial: abandona o que estiver tocando (episódio, cena, treino, seleção, pausa) e
-     * mostra o logo com MODO HISTÓRIA e MODO TESTE. A luta fica parada atrás.
-     */
-    private void openMainMenu() {
-        historia.stop();
-        historia.setBotaoMenu(false);
-        storyEpisode = -1;
-        sceneAfter = null;
-        storyMode = false;
-        // Fora do Arcade a CPU volta ao nível da pausa.
-        arcadeMode = false;
-        arcadeSelectPending = false;
-        menuArcade.fechar();
-        ai.setLevel(pausa.nivelCpu());
-        selectButtonLabel = SELECT_LABEL;
-        tutorial.stop();
-        descarregarConversa();
-        pausa.fechar();
-        capitulos.fechar();
-        characterSelect.close();
-        testFightPending = false;
-        hud.resetEffects();
-        // A temporada dá o logo e o idioma dos textos do menu (sem ela, logo padrão e português).
-        loadTemporada();
-        menuInicial.abrir(temporada);
-        selectionKeys.clear();
-        pad.reset();
-        releaseAllPointers();
-    }
-
-    private void handleMenuKey(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_UP:
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                menuInicial.mover(-1);
-                break;
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                menuInicial.mover(1);
-                break;
-            case KeyEvent.KEYCODE_BUTTON_A:
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_BUTTON_START:
-                menuInicial.confirmar();
-                break;
-            default:
-                break;
-        }
-    }
-
-    /** MODO HISTÓRIA: a temporada desde o Prólogo, sem botões de teste; voltar leva ao menu. */
-    private void startStoryMode() {
-        if (!loadTemporada()) {
-            openMainMenu();
-            return;
-        }
-        storyMode = true;
-        selectButtonLabel = "◀ " + temporada.t(MenuPausa.MENU);
-        debugOverlay = false;
-        historia.setBotaoMenu(true);
-        loadProgresso();
-        if (progresso.temSave()) {
-            // Já jogou: CONTINUAR de onde parou ou escolher um capítulo liberado.
-            openChapters();
-        } else {
-            startStoryAt(0);
-        }
-    }
-
-    /** O save do modo história; sem save (ou estragado), um novo com uma sorte nova para a chave. */
-    private void loadProgresso() {
-        if (progresso != null) return;
-        progresso = ProgressoHistoria.fromJson(storyPrefs.getString(STORY_SAVE_KEY, ""), new Random().nextLong());
-        if (temporada != null) progresso.limitar(temporada.episodios.size());
-    }
-
-    private void saveProgresso() {
-        if (progresso == null) return;
-        storyPrefs.edit().putString(STORY_SAVE_KEY, progresso.toJson()).apply();
-    }
-
-    /** Tela dos capítulos: CONTINUAR e os episódios (os não liberados ficam trancados). */
-    private void openChapters() {
-        java.util.List<MenuCapitulos.Capitulo> lista = new java.util.ArrayList<>();
-        for (int i = 0; i < temporada.episodios.size(); i++) {
-            String id = temporada.episodios.get(i);
-            try {
-                Episodio ep = temporada.loadEpisodio(ultraAssets, id);
-                lista.add(new MenuCapitulos.Capitulo(ep.numero, ep.titulo));
-            } catch (IOException | RuntimeException ex) {
-                Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
-                lista.add(new MenuCapitulos.Capitulo(i, id));
-            }
-        }
-        capitulos.abrir(temporada, lista, progresso);
-        selectionKeys.clear();
-        pad.reset();
-        releaseAllPointers();
-    }
-
-    private void handleChaptersKey(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_LEFT: capitulos.mover(-1, 0); break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT: capitulos.mover(1, 0); break;
-            case KeyEvent.KEYCODE_DPAD_UP: capitulos.mover(0, -1); break;
-            case KeyEvent.KEYCODE_DPAD_DOWN: capitulos.mover(0, 1); break;
-            case KeyEvent.KEYCODE_BUTTON_A:
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_BUTTON_START:
-                applyChapter(capitulos.confirmar());
-                break;
-            case KeyEvent.KEYCODE_BUTTON_B:
-            case KeyEvent.KEYCODE_BACK:
-            case KeyEvent.KEYCODE_ESCAPE:
-                applyChapter(capitulos.voltar());
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void applyChapter(Integer escolha) {
-        if (escolha == null) return;
-        if (escolha == MenuCapitulos.VOLTAR) {
-            openMainMenu();
-        } else if (escolha == MenuCapitulos.CONTINUAR) {
-            startStoryAt(progresso.atual());
-        } else {
-            startStoryAt(escolha);
-        }
-    }
-
-    /**
-     * MODO HISTÓRIA a partir do episódio {@code index}, com a campanha (irmão e chave) como
-     * estava no começo dele no save. Daí em diante a temporada segue normalmente.
-     */
-    private void startStoryAt(int index) {
-        if (!loadTemporada()) {
-            openMainMenu();
-            return;
-        }
-        loadProgresso();
-        tutorial.stop();
-        descarregarConversa();
-        sceneAfter = null;
-        hud.resetEffects();
-        pad.reset();
-        releaseAllPointers();
-        selectionKeys.clear();
-        Campanha campanha = null;
-        try {
-            campanha = progresso.campanhaNoInicio(index, Torneio.duplasFromJson(ultraAssets.readText(Torneio.ARQUIVO)));
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "torneio indisponível", ex);
-        }
-        historia.setCampanha(campanha);
-        playStoryEpisode(Math.max(0, Math.min(index, temporada.episodios.size() - 1)));
-    }
-
-    /**
-     * MODO TESTE: o que o app abria antes do menu, a luta de teste no cenário padrão com a
-     * seleção de dupla, os botões de teste e o DEBUG.
-     */
-    private void startTestMode() {
-        storyMode = false;
-        selectButtonLabel = SELECT_LABEL;
-        historia.setBotaoMenu(false);
-        // Treino (IA OFF) no cenário padrão; o botão IA liga o modo batalha.
-        setOpponentAiEnabled(false);
-        openCharacterSelect();
-        characterSelect.open(testPicks[0], testPicks[1], testPicks[2], testPicks[3]);
-        testFightPending = true;
-    }
-
-    /** Pausa (MENU ou voltar) por cima da página ou da luta. Não abre no meio de um ultra. */
+    /** Pausa (MENU ou voltar) por cima da luta. Não abre no meio de um ultra. */
     private void openPause() {
-        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
-        loadTemporada();
+        if (paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
         // COMANDOS: os golpes de cada personagem, começando pelo do jogador.
         int[] atual = new int[1];
         pausa.comandos().setFichas(ListaComandos.fichas(selectionRoster(), player().character(), esquema, atual), atual[0]);
-        // O aviso de progresso perdido só vale para um episódio do modo história ou um Arcade.
-        if (arcadeMode && historia.isActive()) pausa.abrir(temporada, MenuPausa.AVISO_ARCADE);
-        else pausa.abrir(temporada, storyMode && historia.isActive());
+        pausa.abrir(null);
         selectionKeys.clear();
         pad.reset();
         releaseAllPointers();
@@ -4382,672 +3678,26 @@ public class GameView extends SurfaceView
         if (speedPrefs != null && speedPrefs.getBoolean(IMPACT_KEY, true) != pausa.impacto()) {
             speedPrefs.edit().putBoolean(IMPACT_KEY, pausa.impacto()).apply();
         }
-        // O NÍVEL da CPU vale já na luta que continua, e fica salvo. Na história e no Arcade ele é
-        // a base: a CPU sobe dele até o 8 na última luta.
-        ai.setLevel(storyMode && historia.waitingFight() ? nivelDaLuta(historia.passo()) : pausa.nivelCpu());
+        // O NÍVEL da CPU vale já na luta que continua, e fica salvo.
+        ai.setLevel(pausa.nivelCpu());
         if (speedPrefs != null && speedPrefs.getInt(CPU_LEVEL_KEY, MenuPausa.NIVEL_PADRAO) != pausa.nivelCpu()) {
             speedPrefs.edit().putInt(CPU_LEVEL_KEY, pausa.nivelCpu()).apply();
         }
         pad.reset();
         releaseAllPointers();
-        if (opcao == MenuPausa.Opcao.MENU) openMainMenu();
+        // Versão leve: no lugar do menu inicial, REINICIAR LUTA.
+        if (opcao == MenuPausa.Opcao.MENU) restartBattle();
     }
 
     // ------------------------------------------------------------ modo história
 
-    /** HISTÓRIA: toca a temporada desde o primeiro episódio. */
-    private void startStory() {
-        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
-        if (!loadTemporada()) return;
-        tutorial.stop();
-        descarregarConversa();
-        sceneAfter = null;
-        hud.resetEffects();
-        pad.reset();
-        releaseAllPointers();
-        selectionKeys.clear();
-        // Partida nova: a escolha do irmão (depois do Prólogo) e a chave do torneio começam do zero.
-        historia.setCampanha(newCampanha());
-        playStoryEpisode(0);
-    }
-
-    /** Campanha nova com as duplas do torneio; sem o torneio.json, a história pula a escolha e a chave. */
-    private Campanha newCampanha() {
-        try {
-            return Campanha.load(ultraAssets, new Random().nextLong());
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "torneio indisponível", ex);
-            return null;
-        }
-    }
-
-    /** TUTORIAL: a cena "tutorial" (a intro do Prólogo e o treino no dojo); no fim, a seleção. */
-    private void startTutorialMode() {
-        if (demo.active() || paginaFinal.isActive() || abertura.isActive() || ultraAttacker >= 0) return;
-        tutorial.stop();
-        descarregarConversa();
-        playScene("tutorial", this::openCharacterSelect);
-    }
-
-    /**
-     * Toca a cena {@code id} de historia/cenas.json (um episódio ou um trecho dele) por cima da
-     * luta e, quando ela acaba, chama {@code after}. É o jeito de chamar uma cena de qualquer
-     * ponto do jogo: {@code playScene("intro", () -> ...)}. As lutas e o treino que a cena
-     * tiver acontecem no meio, como no modo história. Cena que não abre chama {@code after} direto.
-     */
-    void playScene(String id, Runnable after) {
-        if (!loadTemporada()) {
-            if (after != null) after.run();
-            return;
-        }
-        Episodio cena;
-        try {
-            if (cenas == null) cenas = Cenas.load(ultraAssets);
-            cena = cenas.carregar(temporada, ultraAssets, id);
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "cena " + id + " indisponível", ex);
-            if (after != null) after.run();
-            return;
-        }
-        storyEpisode = -1;
-        sceneAfter = after;
-        if (historia.campanha() == null) historia.setCampanha(newCampanha());
-        hud.resetEffects();
-        pad.reset();
-        releaseAllPointers();
-        selectionKeys.clear();
-        historia.start(temporada, cena);
-    }
-
-    /** A temporada (elenco, episódios) no idioma do aparelho; falso se não abriu. */
-    private boolean loadTemporada() {
-        if (temporada != null) return true;
-        try {
-            temporada = Temporada.load(ultraAssets);
-            // Textos da história no idioma do aparelho; sem tradução, em português.
-            temporada.setIdioma(ultraAssets, Locale.getDefault().getLanguage());
-            return true;
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "modo história indisponível", ex);
-            temporada = null;
-            return false;
-        }
-    }
-
-    private void playStoryEpisode(int index) {
-        storyEpisode = index;
-        if (storyMode && progresso != null) {
-            // Save: quem sair no meio volta ao começo deste episódio, com a campanha de agora.
-            progresso.comecou(index, historia.campanha());
-            saveProgresso();
-        }
-        String id = temporada.episodios.get(index);
-        try {
-            historia.start(temporada, temporada.loadEpisodio(ultraAssets, id));
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "episódio " + id + " inválido", ex);
-            storyEpisode = -1;
-            leaveStory();
-        }
-    }
-
-    private void handleStoryKey(int keyCode) {
-        if (storyMode && isPauseKey(keyCode)) {
-            // Modo história: voltar/START abre a pausa (dali, o menu inicial); B continua pulando.
-            openPause();
-            return;
-        }
-        if (historia.esperandoEscolha()) {
-            // Escolha do irmão: ◀ Ryūga, ▶ Kōga, A confirma (não se pula).
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_DPAD_LEFT: historia.moverEscolha(-1); break;
-                case KeyEvent.KEYCODE_DPAD_RIGHT: historia.moverEscolha(1); break;
-                case KeyEvent.KEYCODE_BUTTON_A:
-                case KeyEvent.KEYCODE_ENTER:
-                case KeyEvent.KEYCODE_DPAD_CENTER:
-                case KeyEvent.KEYCODE_BUTTON_START:
-                    historia.confirmarEscolha();
-                    break;
-                default:
-                    break;
-            }
-            return;
-        }
-        boolean skip = keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_BACK ||
-            keyCode == KeyEvent.KEYCODE_ESCAPE;
-        if (skip) {
-            historia.tap((PaginaHistoria.SKIP_LEFT + PaginaHistoria.SKIP_RIGHT) * 0.5f,
-                (PaginaHistoria.SKIP_TOP + PaginaHistoria.SKIP_BOTTOM) * 0.5f);
-        } else {
-            historia.tap(VW * 0.5f, VH * 0.5f);
-        }
-    }
-
-    /** Luta de um episódio: depois do KO e da comemoração, a história continua. */
-    private void updateStoryFight() {
-        if (!historia.waitingFight()) return;
-        if (cinematicaFim != null) {
-            // A cinemática encerrou a luta: "rival" conta como derrota; "jogador" e
-            // "interrompida", a história segue.
-            boolean won = !"rival".equals(cinematicaFim);
-            storyKoFrames = 0;
-            descarregarConversa();
-            pad.reset();
-            releaseAllPointers();
-            historia.resultadoLuta(won);
-            return;
-        }
-        // No 2x2 a luta só acaba quando uma dupla inteira cai.
-        boolean ended = flow.battle() ? flow.over() : player().ko() || opponent().ko();
-        if (!ended || cinematica.seguraFimDaLuta()) {
-            // A cena do KO (gatilho "ko") toca antes do resultado.
-            storyKoFrames = 0;
-            return;
-        }
-        boolean won = flow.battle() ? flow.winner() == PLAYER : opponent().ko() && !player().ko();
-        if (!conversaKo && !tutorial.active()) {
-            // Quem está de fora comenta o resultado; a história espera a fala acabar.
-            conversaKo = true;
-            conversa.momento(won ? "vitoria" : "derrota");
-        }
-        if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0 || conversa.falando()) return;
-        storyKoFrames = 0;
-        descarregarConversa();
-        pad.reset();
-        releaseAllPointers();
-        if (won) registrarVencedor();
-        historia.resultadoLuta(won);
-    }
-
-    /**
-     * A campanha guarda quem da dupla do jogador estava em campo na vitória: no Arcade, o duelo
-     * 1x1 depois da final é com ele (contra o parceiro); na história é sempre com o líder.
-     */
-    private void registrarVencedor() {
-        Campanha campanha = historia.campanha();
-        if (campanha == null) return;
-        FighterState point = engine.team(PLAYER).pointState();
-        FighterState partner = engine.team(PLAYER).partner();
-        // O titular caído esperando a troca não venceu: quem está de pé leva o crédito.
-        FighterState winner = point.life <= 0 && partner != null && partner.life > 0 ? partner : point;
-        campanha.venceuCom(winner.character.id);
-    }
-
-    @Override
-    public void onHistoriaLuta(Episodio.Passo luta) {
-        // Cenário e duplas da luta carregam com a tela de carregamento; o resto vem depois deles.
-        carregando(() -> startStoryFight(luta));
-    }
-
-    private void startStoryFight(Episodio.Passo luta) {
-        // Cada luta pode pedir o seu cenário (o treino é no dojo). No Arcade, por enquanto,
-        // a luta sem cenário próprio sorteia um.
-        useStage(luta.cenario != null || !arcadeMode ? luta.cenario : sortearCenario());
-        // Antes das duplas: luta de verdade (IA, 2x2) ou o treino, onde o boneco não usa a IA
-        // e as lições dizem o que ele faz.
-        setOpponentAiEnabled(!luta.tutorial());
-        if (storyMode) ai.setLevel(nivelDaLuta(luta));
-        // A mesma rotina da seleção: duplas novas, vida cheia e a intro de luta. As duplas vêm
-        // do passo, do irmão escolhido ("jogador"/"rival") ou da chave do torneio.
-        String[][] lados = historia.lados(luta);
-        if (lados != null && lados[0].length == 1 && fightersExist(lados[0][0], lados[1][0])) {
-            // Duelo 1x1: um de cada lado.
-            selectDuel(lados[0][0], lados[1][0]);
-        } else if (lados != null && lados[0].length == 2 && fightersExist(lados[0][0], lados[0][1], lados[1][0], lados[1][1])) {
-            selectTeams(lados[0][0], lados[0][1], lados[1][0], lados[1][1]);
-        } else {
-            if (lados != null) Log.w(LOG_TAG, "dupla da história sem golpes ainda; usando as duplas atuais");
-            selectTeams(team[0].character.id, team[1].character.id, opponentFighter.character.id, opponentTagId);
-        }
-        String rotulo = historia.rotulo(luta);
-        if (rotulo != null && temporada != null) rotulo = temporada.t(rotulo);
-        // A conversa da luta (nos quadros laterais, sem parar a luta) começa com o "inicio".
-        descarregarConversa();
-        conversaLicao = -1;
-        conversaKo = false;
-        if (luta.conversa != null && temporada != null && !conversa.carregar(temporada, luta.conversa)) {
-            Log.w(LOG_TAG, "conversa " + luta.conversa + " não abriu");
-        }
-        conversa.momento("inicio");
-        storyFightFrames = 0;
-        String irmao = historia.campanha() != null ? historia.campanha().irmao() : null;
-        if (luta.cinematica != null && temporada != null && !cinematica.carregar(temporada, luta.cinematica, irmao)) {
-            Log.w(LOG_TAG, "cinemática " + luta.cinematica + " não abriu");
-        }
-        if (luta.tutorial()) {
-            // As lições não esperam quadro nenhum: a conversa fala por cima da luta.
-            tutorial.setPanels(false);
-            tutorial.start(engine, team, PLAYER_START_X);
-            storyKoFrames = 0;
-            pad.reset();
-            releaseAllPointers();
-            if (rotulo != null) showBanner(rotulo);
-            return;
-        }
-        tutorial.stop();
-        storyKoFrames = 0;
-        pad.reset();
-        releaseAllPointers();
-        if (rotulo != null) showBanner(rotulo);
-    }
-
     // ------------------------------------------------------------ arcade
-
-    /** ARCADE: a escolha da dupla (oficial ou livre); depois, a chave de 16 e as lutas. */
-    private void openArcadeMenu() {
-        if (!loadTemporada()) {
-            openMainMenu();
-            return;
-        }
-        storyMode = false;
-        arcadeMode = false;
-        arcadeSelectPending = false;
-        arcadeOficiais.clear();
-        try {
-            for (Torneio.Dupla d : Arcade.oficiais(Torneio.duplasFromJson(ultraAssets.readText(Torneio.ARQUIVO)))) {
-                if (fightersExist(d.lutadores)) arcadeOficiais.add(d);
-            }
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "torneio indisponível; o Arcade fica só com a dupla livre", ex);
-        }
-        menuArcade.abrir(temporada, arcadeOficiais);
-        selectionKeys.clear();
-        pad.reset();
-        releaseAllPointers();
-    }
-
-    private void handleArcadeMenuKey(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_DPAD_LEFT: menuArcade.mover(-1, 0); break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT: menuArcade.mover(1, 0); break;
-            case KeyEvent.KEYCODE_DPAD_UP: menuArcade.mover(0, -1); break;
-            case KeyEvent.KEYCODE_DPAD_DOWN: menuArcade.mover(0, 1); break;
-            case KeyEvent.KEYCODE_BUTTON_A:
-            case KeyEvent.KEYCODE_ENTER:
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-            case KeyEvent.KEYCODE_BUTTON_START:
-                applyArcadeChoice(menuArcade.confirmar());
-                break;
-            case KeyEvent.KEYCODE_BUTTON_B:
-            case KeyEvent.KEYCODE_BACK:
-            case KeyEvent.KEYCODE_ESCAPE:
-                applyArcadeChoice(menuArcade.voltar());
-                break;
-            default:
-                break;
-        }
-    }
-
-    /** Dupla oficial: o Arcade começa; DUPLA LIVRE: a seleção só da dupla do jogador. */
-    private void applyArcadeChoice(Integer escolha) {
-        if (escolha == null) return;
-        if (escolha == MenuArcade.VOLTAR) {
-            openMainMenu();
-        } else if (escolha == MenuArcade.LIVRE) {
-            openCharacterSelect();
-            characterSelect.openSolo(testPicks[0], testPicks[1]);
-            arcadeSelectPending = true;
-        } else {
-            startArcade(arcadeOficiais.get(escolha));
-        }
-    }
-
-    /**
-     * O Arcade com a dupla escolhida: a chave de 16 (as oficiais que sobraram e duplas livres do
-     * CPU) e o episódio do Arcade (sorteio, as 4 rodadas, o duelo e o Takatoshi), tocado como
-     * as cenas da história. No fim volta ao menu inicial.
-     */
-    private void startArcade(Torneio.Dupla dupla) {
-        Episodio arcade;
-        try {
-            if (!loadTemporada()) throw new IOException("sem temporada");
-            arcade = Episodio.fromJson(ultraAssets.readText(Arcade.EPISODIO));
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "Arcade indisponível", ex);
-            openMainMenu();
-            return;
-        }
-        Torneio chave = Arcade.chave(dupla, arcadeOficiais, java.util.Arrays.asList(characterSelect.ids), new Random());
-        // Como o modo história: o botão do topo é o MENU (pausa) e não há botões de teste.
-        storyMode = true;
-        arcadeMode = true;
-        selectButtonLabel = "◀ " + temporada.t(MenuPausa.MENU);
-        debugOverlay = false;
-        tutorial.stop();
-        descarregarConversa();
-        storyEpisode = -1;
-        sceneAfter = this::openMainMenu;
-        historia.setCampanha(Campanha.arcade(chave));
-        historia.setBotaoMenu(true);
-        hud.resetEffects();
-        pad.reset();
-        releaseAllPointers();
-        selectionKeys.clear();
-        historia.start(temporada, arcade);
-    }
-
-    /**
-     * Nível da CPU na luta da história ou do Arcade: do NÍVEL CPU da pausa (padrão 5) na primeira
-     * luta até o 8 na última, repartido pelas lutas da campanha ({@link NivelCpu}), menos 1 a
-     * cada 2 derrotas seguidas. Fora delas (uma cena solta, um episódio que não abriu), o da pausa.
-     */
-    private int nivelDaLuta(Episodio.Passo luta) {
-        int base = pausa.nivelCpu();
-        Episodio ep = historia.episodio();
-        if (luta == null || ep == null) return base;
-        int indice = ep.passos.indexOf(luta);
-        java.util.List<Episodio> campanha;
-        String irmao = null;
-        if (arcadeMode) {
-            campanha = java.util.Collections.singletonList(ep);
-        } else {
-            if (storyEpisode < 0) return base;
-            campanha = episodiosTemporada();
-            if (historia.campanha() != null) irmao = historia.campanha().irmao();
-        }
-        int[] pos = campanha == null || indice < 0 ? null : NivelCpu.posicao(campanha, ep.id, indice, irmao);
-        int alivio = historia.campanha() != null ? historia.campanha().alivio() : 0;
-        return pos == null ? Math.max(MenuPausa.NIVEL_MIN, base - alivio) : NivelCpu.nivel(base, pos[0], pos[1], alivio);
-    }
-
-    private java.util.List<Episodio> episodiosTemporada() {
-        if (episodiosTemporada != null || temporada == null) return episodiosTemporada;
-        java.util.List<Episodio> lista = new java.util.ArrayList<>();
-        try {
-            for (String id : temporada.episodios) lista.add(temporada.loadEpisodio(ultraAssets, id));
-        } catch (IOException | RuntimeException ex) {
-            Log.w(LOG_TAG, "temporada sem a lista de lutas; a CPU fica no nível da pausa", ex);
-            return null;
-        }
-        episodiosTemporada = lista;
-        return lista;
-    }
-
-    /** Todos têm pack de luta (p13–p16 ainda não têm). */
-    private static boolean fightersExist(String... ids) {
-        for (String id : ids) {
-            try {
-                GeneratedCharacters.get(id);
-            } catch (IllegalArgumentException ex) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void onHistoriaSom(String id) {
-        ultraSounds.play(Temporada.PASTA, id);
-    }
-
-    /**
-     * A conversa da luta: no treino, a fala de cada lição quando ela começa, a do fim e as
-     * reações ao que o jogador fez; numa luta da história, as reações aos golpes. Nada disso
-     * para a luta.
-     */
-    private void updateConversa() {
-        if (tutorial.active()) {
-            int lesson = tutorial.lessonIndex();
-            if (lesson != conversaLicao && tutorial.lesson() != null) {
-                conversaLicao = lesson;
-                conversa.momento(tutorial.lesson().id);
-            }
-            for (String reaction : tutorial.reactions()) {
-                if ("fim".equals(reaction)) {
-                    conversa.momento("fim");
-                } else {
-                    conversa.reacao(reaction);
-                }
-            }
-        } else if (conversa.ativa() && !cinematica.rodando() && !player().ko() && !opponent().ko()) {
-            // Golpe forte do jogador que entrou ("impacto") e golpe do adversário que pegou ("levou").
-            for (CombatEngine.HitEvent e : engine.events()) {
-                if (e.blocked) continue;
-                if (e.attacker == PLAYER && TutorialDirector.BIG_MOVES.contains(e.moveId)) conversa.reacao("impacto");
-                if (e.attacker == OPPONENT) conversa.reacao("levou");
-            }
-        }
-        conversa.update(FIXED_STEP);
-    }
-
-    private final GritoDaTroca gritoDaTroca = new GritoDaTroca();
-
-    /**
-     * Vida de quem está lutando entrou no vermelho: o parceiro que espera grita o nome dele e
-     * "troca comigo!" no quadro da conversa do lado do time (não no tutorial nem na cena).
-     */
-    private void updateGritoDaTroca() {
-        int gritos = gritoDaTroca.update(engine);
-        if (gritos == 0 || tutorial.active() || cinematica.rodando() || demo.active() ||
-            flow.phase() != BattleFlow.Phase.FIGHT) {
-            return;
-        }
-        loadTemporada();
-        for (int side = 0; side < 2; side++) {
-            if ((gritos & (1 << side)) != 0) gritarTroca(side);
-        }
-    }
-
-    private void gritarTroca(int side) {
-        TeamSystem.Side team = engine.team(side);
-        FighterState parceiro = team.partner();
-        if (parceiro == null) return;
-        String quem = falante(parceiro.character.id);
-        String codigo = "player_base".equals(parceiro.character.id) ? "p01" : parceiro.character.id;
-        conversa.avulso(quem, codigo.toUpperCase(Locale.ROOT), parceiro.profile.color,
-            "selection/rostos/" + codigo + ".webp");
-        String nome = temporada != null ? temporada.nomeDoLutador(team.pointState().character.id) : null;
-        String texto = GritoDaTroca.texto(nome, t -> temporada != null ? temporada.t(t) : t);
-        conversa.dizer(temporada, quem, side == OPPONENT, "bravo", texto, GritoDaTroca.SEGURA);
-    }
-
-    /** Quem fala na conversa por um lutador: o id do elenco da história (com os rostos dele) ou o próprio pack. */
-    private String falante(String lutador) {
-        if (temporada != null) {
-            for (Temporada.Personagem p : temporada.elenco.values()) {
-                if (lutador.equals(p.lutador)) return p.id;
-            }
-        }
-        return lutador;
-    }
-
-    /**
-     * O narrador: nas lutas de verdade olha o que aconteceu e pede a fala; a faixa anda
-     * sempre (para sair da tela quando a luta deixa de ser narrada).
-     */
-    private void updateNarracao() {
-        if (narracao == null) return;
-        if (narracaoAtiva()) {
-            if (!narracaoPronta) {
-                narracaoPronta = true;
-                if (!narracao.carregar()) Log.w(LOG_TAG, "narrador.json não abriu");
-                if (loadTemporada()) {
-                    narracao.setTemporada(temporada);
-                    narradorLuta.setNomes(c -> {
-                        String nome = temporada != null ? temporada.nomeDoLutador(c.id) : null;
-                        return nome != null ? nome : c.displayName;
-                    });
-                }
-            }
-            narradorLuta.update(engine, flow, narracao::narrar);
-        }
-        narracao.update(FIXED_STEP);
-        narradorNoPalco = narracaoAtiva();
-        if (narradorNoPalco) {
-            narradorPalco.update(FIXED_STEP, narracao.textoAtual(), narracao.expressaoAtual(),
-                narracao.prioridadeAtual(), narracao.digitando());
-        }
-    }
-
-    /**
-     * O narrador no palco, entre o fundo e os lutadores (chamado pelo cenário na profundidade
-     * dele). Escolhe o lado só com a câmera da luta: num close ele não sai correndo.
-     */
-    private void drawNarradorPalco() {
-        float z = com.gamelutagpt.historia.NarradorPalco.PROFUNDIDADE;
-        if (cameraDaLuta) {
-            float a = stageScene.worldX(stageScene.screenX(player().x + tagOffset(), 0f), z);
-            float b = stageScene.worldX(stageScene.screenX(opponent().x + engine.teams.tagOffset(OPPONENT), 0f), z);
-            narradorPalco.alvo(a, b, stageScene.worldX(0f, z), stageScene.worldX(VW, z));
-        }
-        float x = narradorPalco.x();
-        if (Float.isNaN(x)) return;
-        narradorPalco.render(renderCanvas, stageScene.screenX(x, z), stageScene.groundScreenY(z), stageScene.scale(z));
-    }
-
-    /** Luta narrada: a batalha (IA ON), o Arcade e as lutas do torneio da história. */
-    private boolean narracaoAtiva() {
-        if (!flow.battle() || tutorial.active() || demo.active()) return false;
-        if (arcadeMode || !storyMode) return true;
-        Episodio.Passo passo = historia.waitingFight() ? historia.passo() : null;
-        return passo != null && passo.torneio;
-    }
-
-    /** Fim da conversa e da cinemática da luta (luta nova, fim da luta, saída da história). */
-    private void descarregarConversa() {
-        conversa.descarregar();
-        cinematica.descarregar();
-        cinematicaDirector.parar();
-        cinematicaFim = null;
-    }
-
-    /**
-     * A cinemática da luta: confere o gatilho (vida de quem está lutando de cada lado, tempo
-     * desde o "LUTEM!", KO) quando nada mais está tocando e anda a linha do tempo.
-     */
-    private void updateCinematica(boolean intro) {
-        if (!cinematica.ativa()) return;
-        boolean ko = flow.battle() ? flow.over() : player().ko() || opponent().ko();
-        boolean lutando = !intro && !flow.holdsFighters();
-        if (lutando && !ko) storyFightFrames++;
-        // Não começa por cima de um Super, de um Ultra, de uma troca ou da Página Final.
-        boolean livre = lutando && historia.waitingFight() && ultraAttacker < 0 && !engine.ultraSequenceRunning() &&
-            !isSuperCinematicActive() && !isTagAnimationActive() && !paginaFinal.isActive();
-        if (cinematica.armada() && livre) {
-            cinematica.gatilho(vida(player()), vida(opponent()), storyFightFrames * FIXED_STEP, ko);
-        }
-        cinematica.update(FIXED_STEP);
-    }
-
-    /**
-     * Câmera lenta (ou luta congelada) da cinemática: a luta só dá um passo quando a velocidade
-     * acumulada chega a um quadro; nos outros quadros só a cena, as falas e as onomatopeias
-     * andam. Verdadeiro se este quadro não tem passo da luta.
-     */
-    private boolean cinematicaLenta() {
-        float velocidade = cinematica.velocidade();
-        if (velocidade >= 1f) {
-            cinematicaPassada = 0f;
-            return false;
-        }
-        cinematicaPassada += velocidade;
-        if (cinematicaPassada >= 1f) {
-            cinematicaPassada -= 1f;
-            return false;
-        }
-        cinematica.update(FIXED_STEP);
-        conversa.update(FIXED_STEP);
-        impacts.update(FIXED_STEP * velocidade);
-        updateStoryFight();
-        return true;
-    }
-
-    private static float vida(CombatFighter f) {
-        return f.state.life / (float)Math.max(1, f.state.profile.maxLife);
-    }
 
     /** Segura (ou solta) o último ponto de vida de todos os lutadores dos dois lados. */
     private void protegerVida(boolean proteger) {
         int piso = proteger ? 1 : 0;
         for (int side = 0; side < 2; side++) {
             for (FighterState member : engine.team(side).members) member.lifeFloor = piso;
-        }
-    }
-
-    /** O que a cinemática pede à luta. */
-    private final CinematicaLuta.Palco palcoCinematica = new CinematicaLuta.Palco() {
-        @Override public void travarControle(boolean travar) {
-            pad.reset();
-            releaseAllPointers();
-            playerInput.clear();
-            opponentInput.clear();
-            if (travar) {
-                // Golpes à distância ainda no ar não atropelam a cena, e um TAG apertado no
-                // último quadro (a IA trocando com a vida baixa) não sai depois.
-                engine.energyProjectiles.clear();
-                engine.superProjectiles.clear();
-                engine.puddles.clear();
-                engine.teams.dropRequests();
-            } else {
-                cinematicaDirector.parar();
-            }
-        }
-
-        @Override public void mover(int lado, CinematicaLuta.Movimento movimento) {
-            cinematicaDirector.mover(lado, movimento);
-        }
-
-        @Override public boolean movendo(int lado) {
-            return cinematicaDirector.movendo(lado);
-        }
-
-        @Override public void terminarLuta(String vencedor) {
-            cinematicaDirector.parar();
-            cinematicaFim = vencedor;
-        }
-
-        @Override public boolean aDireita(int lado) {
-            return engine.fighter(lado).x > engine.fighter(1 - lado).x;
-        }
-    };
-
-    /**
-     * Botões de teste escondidos: no modo história (o jogo de verdade), no tutorial e nas lutas
-     * com conversa (o canto é dos quadros).
-     */
-    private boolean testButtonsHidden() {
-        return storyMode || tutorial.active() || conversa.ativa() || cinematica.ativa();
-    }
-
-    /** Fim do treino (todas as lições, ou PULAR no fim): a cena ou a história continua. */
-    private void finishTutorial() {
-        tutorial.stop();
-        descarregarConversa();
-        pad.reset();
-        releaseAllPointers();
-        if (historia.waitingFight()) historia.resultadoLuta(true);
-    }
-
-    @Override
-    public void onHistoriaFim(Episodio episodio) {
-        if (sceneAfter != null) {
-            // Cena chamada por playScene: quem chamou decide o que vem depois.
-            Runnable after = sceneAfter;
-            sceneAfter = null;
-            after.run();
-            return;
-        }
-        if (storyMode && progresso != null && storyEpisode >= 0) {
-            // Episódio terminado: o próximo capítulo fica liberado.
-            progresso.terminou(storyEpisode, historia.campanha());
-            saveProgresso();
-        }
-        // Depois do "Próximo episódio" a temporada emenda no episódio seguinte (ep00 → ep01).
-        int next = storyEpisode + 1;
-        if (temporada != null && next < temporada.episodios.size()) {
-            playStoryEpisode(next);
-        } else {
-            storyEpisode = -1;
-            leaveStory();
-        }
-    }
-
-    /** Fim (ou erro) da temporada: o modo história volta ao menu; o de teste, à seleção. */
-    private void leaveStory() {
-        if (storyMode) {
-            openMainMenu();
-        } else {
-            openCharacterSelect();
         }
     }
 

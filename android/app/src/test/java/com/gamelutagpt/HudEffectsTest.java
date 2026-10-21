@@ -76,7 +76,7 @@ public class HudEffectsTest {
         GameView game=new GameView(RuntimeEnvironment.getApplication());game.layout(0,0,1280,720);
         HudRenderer hud=(HudRenderer)field(game,"hud");
         HudRenderer.State state=(HudRenderer.State)field(game,"hudState");
-        CharacterSelectRenderer portraits=(CharacterSelectRenderer)field(game,"characterSelectRenderer");
+        HudConceptPortraits portraits=(HudConceptPortraits)field(game,"rostos");
         FighterState p=state.active(),cpu=state.opponent();
         Method scenario=GameView.class.getDeclaredMethod("drawScenario",Canvas.class);scenario.setAccessible(true);
         Method player=GameView.class.getDeclaredMethod("drawPlayer",Canvas.class);player.setAccessible(true);

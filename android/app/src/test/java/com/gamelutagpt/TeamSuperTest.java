@@ -7,7 +7,7 @@ import org.junit.Test;
 /** DHC / Team Super and recoverable life (v0.85). */
 public class TeamSuperTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
-    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_two");
+    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_base");
     private static final CharacterDefinition NPC = GeneratedCharacters.opponentCharacter();
 
     private static final class Match {

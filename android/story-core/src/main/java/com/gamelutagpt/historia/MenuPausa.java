@@ -27,7 +27,8 @@ public final class MenuPausa {
     public static final String FPS = "FPS";
     /** Níveis dos gráficos (quem usa a pausa monta o rótulo com eles). */
     public static final String[] NIVEIS_GRAFICOS = {"AUTO", "ALTO", "MÉDIO", "LEVE"};
-    public static final String MENU_INICIAL = "MENU INICIAL";
+    /** Versão leve: no lugar do menu inicial, recomeça a luta. */
+    public static final String MENU_INICIAL = "REINICIAR LUTA";
     public static final String AVISO = "Voltar ao menu perde o progresso deste episódio.";
     public static final String AVISO_ARCADE = "Voltar ao menu encerra o Arcade.";
     /** O botão que abre a pausa na história e nas lutas dela. */
@@ -63,7 +64,6 @@ public final class MenuPausa {
     /** O mesmo toque que abriu a pausa não pode escolher nada. */
     static final float TAP_DELAY = 0.2f;
 
-    private Temporada temporada;
     private boolean open;
     /** O aviso embaixo das opções, ou null. */
     private String aviso;
@@ -80,14 +80,8 @@ public final class MenuPausa {
         this.graficos = graficos;
     }
 
-    /** Abre com o cursor em CONTINUAR. {@code aviso}: mostra que o episódio se perde. */
-    public void abrir(Temporada temporada, boolean aviso) {
-        abrir(temporada, aviso ? AVISO : null);
-    }
-
     /** Abre com o cursor em CONTINUAR e o {@code aviso} embaixo (null = sem aviso). */
-    public void abrir(Temporada temporada, String aviso) {
-        this.temporada = temporada;
+    public void abrir(String aviso) {
         this.aviso = aviso;
         open = true;
         cursor = 0;
@@ -228,7 +222,7 @@ public final class MenuPausa {
             return null;
         }
         if (cursor() == Opcao.COMANDOS) {
-            comandos.abrir(temporada);
+            comandos.abrir();
             return null;
         }
         if (cursor() == Opcao.GRAFICOS) {
@@ -281,7 +275,7 @@ public final class MenuPausa {
                     return null;
                 }
                 if (cursor() == Opcao.COMANDOS) {
-                    comandos.abrir(temporada);
+                    comandos.abrir();
                     return null;
                 }
                 if (cursor() == Opcao.GRAFICOS) {
@@ -296,7 +290,7 @@ public final class MenuPausa {
     }
 
     private String t(String texto) {
-        return temporada != null ? temporada.t(texto) : texto;
+        return texto;
     }
 
     public void render(RenderCanvas c) {
@@ -306,8 +300,8 @@ public final class MenuPausa {
             return;
         }
         float in = Tinta.easeOutCubic(time / 0.18f);
-        c.fillRect(-40f, -40f, PaginaHistoria.VW + 40f, PaginaHistoria.VH + 40f, Tinta.withAlpha(0xFF000000, (int)(185f * in)));
-        float cx = PaginaHistoria.VW * 0.5f;
+        c.fillRect(-40f, -40f, TelaComandos.VW + 40f, TelaComandos.VH + 40f, Tinta.withAlpha(0xFF000000, (int)(185f * in)));
+        float cx = TelaComandos.VW * 0.5f;
         // Pincelada vermelha atrás do título, como no cartão de título dos episódios.
         float[] band = {cx - 330f, 196f, cx + 330f, 178f, cx + 330f, 262f, cx - 330f, 280f};
         c.fillPolygon(band, Tinta.withAlpha(BotaoMenu.RED, (int)(255f * in)));

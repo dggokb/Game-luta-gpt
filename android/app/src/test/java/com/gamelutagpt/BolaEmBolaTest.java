@@ -32,18 +32,6 @@ public class BolaEmBolaTest {
         return new int[] {maior, acertos};
     }
 
-    @Test public void fireballAfterFireballNeverCombos() {
-        for (String id : COM_BOLA) {
-            for (String forca : new String[] {"L", "M", "H"}) {
-                for (float gap = 60f; gap <= 300f; gap += 40f) {
-                    int[] r = spam(id, forca, gap);
-                    assertTrue(id + " " + forca + " acertou", r[1] > 0);
-                    assertEquals(id + " " + forca + " de " + gap + ": bola emendou em bola", 1, r[0]);
-                }
-            }
-        }
-    }
-
     @Test public void aFireballHitPushesFar() {
         FighterState p = new FighterState(GeneratedCharacters.get("player_base"), "P1");
         FighterState d = new FighterState(NPC, "D");

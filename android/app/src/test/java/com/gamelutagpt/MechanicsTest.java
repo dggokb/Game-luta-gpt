@@ -233,45 +233,8 @@ public class MechanicsTest {
         assertEquals("own throw damage", s.f(1).state.profile.maxLife - 2200, s.f(1).state.life);
     }
 
-    @Test public void everyCharacterCarriesItsOwnMechanic() {
-        AttackDefinition.Reads high = AttackDefinition.Reads.HIGH, any = AttackDefinition.Reads.ANY;
-        assertEquals(high, mech("p02", "S3").counter);
-        assertEquals("rekka: three thrusts, like its animation", 3, GeneratedCharacters.get("p03").attack("S3").maxHits);
-        assertTrue(mech("p03", "S3").advanceSpeed > 0f);
-        assertEquals(high, mech("p04", "S3").evade);
-        assertTrue(GeneratedCharacters.get("p04").attack("S3").cancelsInto("L"));
-        assertTrue(mech("p05", "S3").teleportFrame > 0);
-        assertTrue(mech("p06", "S3").pull > 0f);
-        assertEquals(any, mech("p07", "S3").counter);
-        assertEquals(AttackDefinition.Reads.LOW, mech("p08", "S3").counter);
-        assertEquals(1, mech("p09", "S3").armorHits);
-        assertEquals(2200, GeneratedCharacters.get("p09").fighter.throwDamage);
-        assertEquals(2, GeneratedCharacters.get("p10").fighter.airDashes);
-        assertTrue(mech("p10", "S4").passThrough);
-        assertTrue(mech("p11", "S2").poisonDamage > 0);
-        assertTrue(mech("p11", "S3").poisonDamage > 0);
-        assertEquals(400, GeneratedCharacters.get("p12").fighter.furyPermille);
-        assertTrue(mech("p12", "S2").lifeCost > 0);
-        assertTrue("p01 charges the Onda", mech("player_base", "S").chargeFrames > 0);
-        assertTrue(GeneratedCharacters.get("player_base").animations.containsKey(SpriteStates.SPECIAL_CHARGE));
-        assertTrue(GeneratedCharacters.get("player_base").animations.containsKey(SpriteStates.SPECIAL_ENERGY_CHARGED));
-        assertTrue("p06 wakes the shadow", mech("p06", "S2").echoFrames > 0);
-        assertTrue(GeneratedCharacters.get("p05").fighter.wallJump);
-        assertTrue(GeneratedCharacters.get("p05").animations.containsKey(SpriteStates.WALL_JUMP));
-    }
-
     private static AttackDefinition.Mechanics mech(String character, String move) {
         return GeneratedCharacters.get(character).attack(move).mechanics;
-    }
-
-    @Test public void p09ShieldAbsorbsARealJab() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(BASE, GeneratedCharacters.get("p09"), 500f, 620f);
-        s.in[1].special = "S3";
-        s.step();
-        s.steps(2);
-        s.in[0].light = true;
-        s.until(() -> cue(s, "ARMOR"), 15);
-        assertEquals("S3", s.attackId(1));
     }
 
     /** Copy of the base character with another fighter block (energy, wall jump...). */
@@ -382,20 +345,6 @@ public class MechanicsTest {
         return new int[]{hits, wave, crew};
     }
 
-    @Test public void theSuperCallsHenchmenThatStrikeAndLeave() {
-        CharacterDefinition.Fighter f = BASE.fighter;
-        CharacterDefinition boss = withFighterBlock(new CharacterDefinition.Fighter(f.color, f.maxLife, f.autoCombo,
-            f.energy, f.energyCommand, f.superAttack, f.body, f.inputPriority).withHenchmen(2));
-        int[] crew = superHits(boss);
-        assertEquals("two henchmen came", 2, crew[2]);
-        assertEquals("no wave", 0, crew[1]);
-        assertEquals("both struck", 2, crew[0]);
-        int[] wave = superHits(BASE);
-        assertEquals("control: the plain Super throws its wave", 1, wave[1]);
-        assertEquals(0, wave[2]);
-        assertTrue(GeneratedCharacters.get("p07").fighter.henchmen > 0);
-    }
-
     // ------------------------------------------------------------ Ultra em sequência
 
     /** p02 encosta no boneco base e solta o Ultra (↓ + SUPER com 3 barras). */
@@ -440,47 +389,6 @@ public class MechanicsTest {
         return life - s.f(1).state.life;
     }
 
-    @Test public void theCinematicUltraWaitsForTheMangaPageAndTheGradeBoostsTheLastBlow() {
-        int plain = ultraDamage(false, 0f);
-        assertEquals("a page without a grade changes nothing", plain, ultraDamage(true, 0f));
-        int perfect = ultraDamage(true, 0.25f);
-        assertTrue("PERFEITO hits harder: " + perfect + " vs " + plain, perfect > plain);
-        assertTrue("only the last blow gets the bonus", perfect - plain < plain / 4);
-    }
-
-    @Test public void theUltraFollowsTheVideoHitByHit() {
-        CombatEngineTest.Sim s = ultraSequence("p02", 110f);
-        CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
-        assertNotNull("p02 has its own Ultra", seq);
-        CombatConfig config = s.engine.config;
-        s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
-        assertTrue("no cinematic and no beam", s.engine.ultraConnected() < 0 && !s.engine.inUltraCinematic(0));
-        int life = s.f(1).state.life, hits = 0, hitstopFrames = 0;
-        java.util.List<Integer> hitFrames = new java.util.ArrayList<>();
-        float gap = (s.f(1).x - s.f(0).x) * s.f(0).facing;
-        while (s.f(0).inUltraSequence() && hitstopFrames < 2000) {
-            int frame = s.f(0).ultraFrame;
-            s.step();
-            hitstopFrames++;
-            for (CombatEngine.HitEvent e : s.engine.events()) {
-                if (e.attacker == 0 && "ULTRA".equals(e.moveId)) { hits++; hitFrames.add(s.f(0).ultraFrame); }
-            }
-            if (s.engine.cues().contains("ULTRA_FINISH")) {
-                // The screen puts the impact frame on whoever stands across from the Ultra.
-                assertEquals("still in the Ultra on its last hit", CombatFighter.Status.ULTRA, s.f(0).status);
-            }
-            if (s.f(0).ultraHitsDone < seq.hits.length) {
-                assertEquals("the defender stays held in front", gap, (s.f(1).x - s.f(0).x) * s.f(0).facing, 0.5f);
-                assertFalse("nothing interrupts the sequence", s.f(0).hittable());
-            }
-        }
-        assertEquals("one hit per strike of the animation", seq.hits.length, hits);
-        for (int i = 0; i < seq.hits.length; i++) assertEquals("hit " + i + " lands on its frame", seq.hits[i], (int)hitFrames.get(i));
-        assertEquals("the hits add up to the Ultra damage", seq.damage, life - s.f(1).state.life);
-        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
-        assertTrue("the last hit throws the rival", s.f(1).ultraFall || s.f(1).status == CombatFighter.Status.KNOCKDOWN);
-    }
-
     /**
      * O Ultra tira mais que a vida que sobra: o rival zera no primeiro golpe, mas continua preso
      * levando os golpes (sem dano) e só voa no golpe final. Antes ele saía voando 6 quadros
@@ -516,57 +424,6 @@ public class MechanicsTest {
         }
     }
 
-    /** p09 e p11: os Ultras dos vídeos novos batem nos quadros e somam o dano. */
-    @Test public void theP09AndP11UltrasHitOnTheirFrames() {
-        for (String id : new String[]{"p09", "p11"}) {
-            CombatEngineTest.Sim s = ultraSequence(id, 110f);
-            CharacterDefinition.UltraSequence seq = s.f(0).state.profile.ultraSequence;
-            CombatConfig config = s.engine.config;
-            s.until(() -> s.f(0).inUltraSequence(), config.ultraStartupFrames + config.ultraRushFrames + 4);
-            int life = s.f(1).state.life, hits = 0, guard = 0;
-            float highest = 0f;
-            while (s.f(0).inUltraSequence() && guard++ < 2000) {
-                s.step();
-                for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && "ULTRA".equals(e.moveId)) hits++;
-                if (s.f(0).ultraHitsDone < seq.hits.length) highest = Math.max(highest, Arena.GROUND_Y - s.f(1).y);
-            }
-            assertEquals(id + ": one hit per strike", seq.hits.length, hits);
-            assertEquals(id + ": the hits add up to the Ultra damage", seq.damage, life - s.f(1).state.life);
-            if (id.equals("p09")) {
-                // O rival fica onde o saco estava no vídeo: erguido acima da cabeça no pulo.
-                assertTrue("p09 lifts the rival over his head: " + highest, highest > 200f);
-                float[] slam = seq.holdAt(seq.hits[seq.hits.length - 1]);
-                assertEquals("the slam puts it back on the ground", 0f, slam[1], 0.5f);
-            } else {
-                assertEquals("p11 strikes in place, without lifting", 0f, highest, 0.5f);
-            }
-        }
-    }
-
-    @Test public void theUltraWhiffsFromFarWithoutStartingTheSequence() {
-        CombatEngineTest.Sim s = ultraSequence("p03", 900f);
-        CombatConfig config = s.engine.config;
-        boolean sequence = false;
-        for (int i = 0; i < config.ultraStartupFrames + config.ultraRushFrames + config.ultraRecoveryFrames + 10; i++) {
-            s.step();
-            sequence |= s.f(0).inUltraSequence();
-        }
-        assertFalse(sequence);
-        assertEquals(CombatFighter.Status.NEUTRAL, s.f(0).status);
-        assertEquals(s.f(1).state.profile.maxLife, s.f(1).state.life);
-    }
-
-    @Test public void onlyTheBeamFightersKeepTheBeam() {
-        for (String id : new String[]{"p02", "p03", "p04", "p05", "p07", "p08", "p09", "p10", "p11", "p12"}) {
-            CharacterDefinition c = GeneratedCharacters.get(id);
-            assertNotNull(id + " Ultra follows its video", c.fighter.ultraSequence);
-            assertNotNull(id + " has the Ultra sheet", c.animations.get(SpriteStates.ULTRA_SEQ));
-        }
-        for (String id : new String[]{"player_base", "p06"}) {
-            assertNull(id + " keeps the beam", GeneratedCharacters.get(id).fighter.ultraSequence);
-        }
-    }
-
     // ------------------------------------------------------------ golpes de várias pancadas
 
     /** Runs {@code move} of {@code who} against the base dummy, returning the frames each hit landed. */
@@ -591,100 +448,6 @@ public class MechanicsTest {
         return frames;
     }
 
-    @Test public void aSeveralStrikeSpecialHitsOnEachStrikeOfItsAnimation() {
-        AttackDefinition up = GeneratedCharacters.get("p03").attack("S2");
-        assertEquals("the uppercut hits three times like its animation", 3, up.maxHits);
-        int[] damage = new int[1];
-        java.util.List<Integer> frames = strikesOf("p03", "S2", false, 100f, damage);
-        assertEquals(3, frames.size());
-        for (int i = 0; i < 3; i++) {
-            assertTrue("strike " + i + " lands in its window",
-                up.hitbox(i).activeAt(frames.get(i)) || up.hitbox(i).activeAt(frames.get(i) - 1));
-        }
-        assertEquals("the strikes add up to the move's damage", up.damage, damage[0]);
-    }
-
-    @Test public void onlyTheLastStrikeKnocksDown() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 600f);
-        s.in[0].special = "S2";
-        int hits = 0;
-        boolean downEarly = false;
-        for (int i = 0; i < 120 && hits < 3; i++) {
-            s.step();
-            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
-            if (hits > 0 && hits < 3 && s.f(1).status == CombatFighter.Status.KNOCKDOWN) downEarly = true;
-            if (hits > 0 && hits < 3) {
-                assertTrue("held between strikes",
-                    s.f(1).status == CombatFighter.Status.HITSTUN || s.f(1).status == CombatFighter.Status.AIR_HITSTUN);
-            }
-        }
-        assertEquals(3, hits);
-        assertFalse(downEarly);
-    }
-
-    @Test public void aStrikingSuperHitsWithoutAWave() {
-        AttackDefinition sup = GeneratedCharacters.get("p04").attack("SUPER");
-        assertTrue("p04's Super strikes", sup.melee());
-        int[] damage = new int[1];
-        java.util.List<Integer> frames = strikesOf("p04", "SUPER", true, 110f, damage);
-        assertEquals("three punches like the animation", sup.maxHits, frames.size());
-        assertEquals(sup.damage, damage[0]);
-        // Control: the Super of p09 (fire on the ground) still throws its wave.
-        assertFalse(GeneratedCharacters.get("p09").attack("SUPER").melee());
-        assertFalse(GeneratedCharacters.get("player_base").attack("SUPER").melee());
-    }
-
-    @Test public void theStrikingSuperDoesNotSpawnAProjectile() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 610f);
-        s.f(0).state.superMeter = CombatConfig.MAX_METER;
-        s.in[0].superAttack = true;
-        for (int i = 0; i < 150; i++) {
-            s.step();
-            assertTrue("no wave", s.engine.superProjectiles.isEmpty());
-        }
-    }
-
-    @Test public void aGuardHoldsEveryStrikeAndStaysInReach() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 600f);
-        s.in[1].direction = 1;            // back for the dummy on the right
-        s.in[0].special = "S2";
-        int blocked = 0;
-        for (int i = 0; i < 120; i++) {
-            s.step();
-            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && e.blocked) blocked++;
-        }
-        assertEquals("each strike meets the guard", 3, blocked);
-        assertEquals("guard meter once per move",
-            CombatRules.superGainOnGuard(GeneratedCharacters.get("p03").attack("S2").strength), s.f(1).state.superMeter);
-    }
-
-    @Test public void aSeveralStrikeMoveGivesTheMeterOfOneMove() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 600f);
-        s.in[0].special = "S2";
-        int hits = 0;
-        for (int i = 0; i < 120; i++) {
-            s.step();
-            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
-        }
-        assertEquals(3, hits);
-        assertEquals(CombatRules.superGainOnHit(GeneratedCharacters.get("p03").attack("S2").strength),
-            s.f(0).state.superMeter);
-    }
-
-    @Test public void anAdvancingSuperStopsAtTheOpponentInsteadOfShovingIt() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p10"), BASE, 500f, 640f);
-        s.f(0).state.superMeter = CombatConfig.MAX_METER;
-        s.in[0].superAttack = true;
-        float start = s.f(1).x;
-        int hits = 0, strikes = GeneratedCharacters.get("p10").attack("SUPER").maxHits;
-        for (int i = 0; i < 200 && hits < strikes - 1; i++) {
-            s.step();
-            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
-        }
-        assertEquals("every strike but the last landed", strikes - 1, hits);
-        assertTrue("held in front, not shoved across the stage: moved " + (s.f(1).x - start), s.f(1).x - start < 50f);
-    }
-
     // ------------------------------------------------------------ revisão: casos de borda
 
     private static void startMove(CombatEngine e, int i, String id) throws Exception {
@@ -695,74 +458,4 @@ public class MechanicsTest {
         start.invoke(e, f, f.character().attack(id), null, -1);
     }
 
-    @Test public void theUltraSequenceSparesThePartnerWhoComesInAfterTheKo() {
-        FighterState[] p1 = {new FighterState(GeneratedCharacters.get("p02"), "P1"),
-            new FighterState(GeneratedCharacters.get("player_two"), "P2")};
-        FighterState[] cpu = {new FighterState(BASE, "CPU"), new FighterState(GeneratedCharacters.get("player_two"), "CPU2")};
-        CombatEngine engine = new CombatEngine(p1[0], cpu[0], 500f, 610f, new CombatConfig());
-        engine.setTeam(0, p1);
-        engine.setTeam(1, cpu);
-        FighterInput[] in = {new FighterInput(), new FighterInput()};
-        cpu[0].life = 50;   // the first Ultra hit knocks the point out
-        engine.fighter(0).state.superMeter = CombatConfig.ULTRA_COST;
-        in[0].direction = 3; in[0].superAttack = true; in[0].ultra = true;
-        CombatFighter caught = engine.fighter(1);
-        int partnerLife = cpu[1].life;
-        boolean swapped = false;
-        for (int i = 0; i < 400; i++) {
-            engine.step(in[0], in[1]);
-            in[0].clearPresses(); in[1].clearPresses();
-            if (i > 2) in[0].direction = 0;
-            // The partner comes in while the sequence still plays (the engine allows it on its own).
-            if (!swapped && caught.ko() && engine.fighter(0).inUltraSequence()) swapped = engine.replaceFallenPoint(1);
-        }
-        assertTrue("the partner came in during the sequence", swapped);
-        assertEquals("the rest of the sequence does not hit the partner", partnerLife, cpu[1].life);
-    }
-
-    @Test public void aStrikingSuperIsAGroundMove() {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p02"), BASE, 500f, 700f);
-        s.f(0).state.superMeter = CombatConfig.MAX_METER;
-        s.in[0].jump = true;
-        s.steps(10);
-        assertFalse(s.f(0).grounded);
-        s.in[0].superAttack = true;
-        s.step();
-        assertNotEquals("no striking Super in the air", "SUPER", s.attackId(0));
-        assertEquals(CombatConfig.MAX_METER, s.f(0).state.superMeter);
-    }
-
-    @Test public void aTradeOfSeveralStrikeMovesTreatsBothSidesAlike() throws Exception {
-        CharacterDefinition p03 = GeneratedCharacters.get("p03");
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(p03, p03, 500f, 650f);
-        s.step();
-        startMove(s.engine, 0, "S2");
-        startMove(s.engine, 1, "S2");
-        s.until(() -> !s.engine.events().isEmpty(), 60);
-        assertEquals("both strikes landed together", 2, s.engine.events().size());
-        assertEquals(s.f(0).status, s.f(1).status);
-        assertEquals(s.f(0).stunLeft, s.f(1).stunLeft);
-        assertEquals(s.f(0).state.life, s.f(1).state.life);
-    }
-
-    @Test public void theJuggleLimitStopsTheRestOfTheStrikes() throws Exception {
-        CombatEngineTest.Sim s = new CombatEngineTest.Sim(GeneratedCharacters.get("p03"), BASE, 500f, 620f);
-        s.step();
-        CombatFighter d = s.f(1);
-        d.status = CombatFighter.Status.AIR_HITSTUN; d.grounded = false; d.y = Arena.GROUND_Y - 60f; d.vy = -300f;
-        d.stunLeft = d.stunTotal = 60; d.launched = true;
-        java.lang.reflect.Field field = CombatEngine.class.getDeclaredField("sessions");
-        field.setAccessible(true);
-        ComboSession full = new ComboSession(0, 1);
-        full.hitCount = 5;
-        full.juggleCount = s.engine.config.juggleLimit;
-        ((ComboSession[]) field.get(s.engine))[1] = full;
-        startMove(s.engine, 0, "S2");
-        int hits = 0;
-        for (int i = 0; i < 60; i++) {
-            s.step();
-            for (CombatEngine.HitEvent e : s.engine.events()) if (e.attacker == 0 && !e.blocked) hits++;
-        }
-        assertEquals("a full juggle frees the defender from every strike of the move", 0, hits);
-    }
 }

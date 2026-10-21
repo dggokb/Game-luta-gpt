@@ -10,8 +10,8 @@ final class BotaoMenu {
     private BotaoMenu() {}
 
     static final int RED = 0xFFC8202C;
-    static final int INK = Baloes.INK;
-    static final int WHITE = Baloes.WHITE;
+    static final int INK = 0xFF111111;
+    static final int WHITE = 0xFFFFFFFF;
     private static final int DARK = 0xE6101018;
     private static final int GRAY = 0xFFB9C0D0;
     /** Quanto a faixa se inclina (topo para a direita, base para a esquerda). */

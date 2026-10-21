@@ -165,25 +165,6 @@ public class CpuTest {
         return new double[] {crus / (frames / 3600.0), barra / (double)frames};
     }
 
-    @Test public void higherLevelsSpendMeterWithMoreSense() {
-        // Contra o 5 (que já usa o kit todo; o 2 quase não usa barra nenhuma).
-        double[] baixo = recursos(5), alto = recursos(8);
-        assertTrue("o nível 8 solta bem menos Super cru: " + baixo[0] + " → " + alto[0], alto[0] < baixo[0] * 0.7);
-        assertTrue("e guarda mais barra (para o Ultra): " + baixo[1] + " → " + alto[1], alto[1] > baixo[1]);
-    }
-
-    /**
-     * Quem fica no canto soltando bola (meia-lua + soco) sem parar: o nível alto pula por cima
-     * na hora certa e cai batendo, defende o resto sem recuar e tira bem mais vida do spammer
-     * que o nível baixo. Antes ele levava ~3 de cada 4 bolas e quase nunca chegava nele.
-     */
-    @Test public void aHighLevelCpuBeatsAFireballSpammer() {
-        double[] alto = spammer(8), baixo = spammer(3);
-        assertTrue("o nível 8 leva bem menos bolas: " + alto[1], alto[1] < 0.5);
-        assertTrue("e tira vida do spammer: " + alto[0], alto[0] > 0.6);
-        assertTrue("mais que o nível 3: " + baixo[1] + " → " + alto[1], alto[1] < baixo[1] - 0.15);
-    }
-
     /** Média de {vida que o spammer perdeu, fração das bolas que acertaram a CPU}. */
     private static double[] spammer(int level) {
         double perdeu = 0, acertou = 0;
@@ -413,34 +394,6 @@ public class CpuTest {
 
     // ------------------------------------------------------------ caderno e estilo
 
-    @Test public void theComboBookFollowsEachStyle() {
-        List<String> p01 = ComboBook.route(GeneratedCharacters.get("player_base"));
-        assertEquals("L", p01.get(0));
-        assertTrue("lançador e super pulo: " + p01, p01.contains("2H") && p01.contains(ComboBook.JUMP));
-        assertTrue("pulo no ar: " + p01, p01.contains(ComboBook.AIR_JUMP));
-        List<String> p04 = ComboBook.route(GeneratedCharacters.get("p04"));
-        assertEquals("pressão: M > M: " + p04, 2, p04.stream().filter("M"::equals).count());
-        List<String> p09 = ComboBook.route(GeneratedCharacters.get("p09"));
-        assertTrue("tanque: H > H: " + p09, p09.indexOf("H") >= 0 && "H".equals(p09.get(p09.indexOf("H") + 1)));
-        List<String> p12 = ComboBook.route(GeneratedCharacters.get("p12"));
-        int h = p12.indexOf("H");
-        assertTrue("imprevisível volta: H > L: " + p12, h >= 0 && "L".equals(p12.get(h + 1)));
-        List<String> p08 = ComboBook.route(GeneratedCharacters.get("p08"));
-        String end = p08.get(p08.size() - 1);
-        assertTrue("alcance fecha no especial: " + p08, "S".equals(end) || "SUPER".equals(end));
-        // Toda rota só usa o que o pacote deixa.
-        for (String id : new String[] {"player_base", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09", "p10", "p11", "p12"}) {
-            CharacterDefinition c = GeneratedCharacters.get(id);
-            List<String> r = ComboBook.route(c);
-            for (int i = 0; i + 1 < r.size(); i++) {
-                String a = r.get(i), b = r.get(i + 1);
-                if (ComboBook.JUMP.equals(a) || ComboBook.AIR_JUMP.equals(a)) continue;
-                String target = ComboBook.JUMP.equals(b) || ComboBook.AIR_JUMP.equals(b) ? AttackDefinition.JUMP : b;
-                assertTrue(id + ": " + a + " > " + b, c.attack(a).cancelsInto(target));
-            }
-        }
-    }
-
     /** Distância média da CPU ao jogador parado. */
     private static double averageGap(String fighter) {
         double sum = 0;
@@ -457,11 +410,6 @@ public class CpuTest {
             }
         }
         return sum / n;
-    }
-
-    @Test public void zonersKeepFurtherAwayThanRushdowns() {
-        double zoner = averageGap("p08"), rush = averageGap("p04");
-        assertTrue("alcance " + zoner + " > pressão " + rush, zoner > rush + 40);
     }
 
     // ------------------------------------------------------------ CPU contra CPU

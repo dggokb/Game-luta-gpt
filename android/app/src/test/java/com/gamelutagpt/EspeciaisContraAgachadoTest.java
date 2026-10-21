@@ -43,21 +43,4 @@ public class EspeciaisContraAgachadoTest {
         assertTrue(name + ": acerta agachado", crouching);
     }
 
-    @Test public void groundSpecialsHitACrouchingTarget() {
-        // Os que passavam por cima de quase todo mundo.
-        assertHitsCrouching("player_base", "S3", "player_base");
-        assertHitsCrouching("player_base", "S4", "p07");
-        assertHitsCrouching("p02", "S4", "p05");
-        assertHitsCrouching("p06", "S3", "p10");
-        assertHitsCrouching("p10", "S2", "p02");
-        assertHitsCrouching("p12", "S2", "p09");
-    }
-
-    @Test public void energyAndSuperHitTheLowestCrouch() {
-        // A energia e o Super passavam por cima dos que agacham mais baixo.
-        assertHitsCrouching("player_base", "M", "p12");
-        assertHitsCrouching("p08", "M", "p03");
-        assertHitsCrouching("p02", null, "p04");
-        assertHitsCrouching("p08", null, "p11");
-    }
 }

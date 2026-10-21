@@ -55,12 +55,13 @@ public final class TelaComandos {
     static final float[] ANTERIOR = {300f, 140f, 420f, 214f};
     static final float[] PROXIMO = {860f, 140f, 980f, 214f};
     static final float[] BOTAO_VOLTAR = {1010f, 648f, 1220f, 706f};
+    /** Tela virtual 1280x720, a mesma da luta. */
+    static final float VW = 1280f, VH = 720f;
     static final float LINHAS_TOPO = 236f;
     static final float LINHA_ALTURA = 56f;
     /** As linhas terminam aqui (acima do rodapé): muitas linhas ficam mais baixas. */
     static final float LINHAS_FIM = 640f;
 
-    private Temporada temporada;
     private List<Ficha> fichas = Collections.emptyList();
     private int atual;
     private boolean open;
@@ -72,8 +73,7 @@ public final class TelaComandos {
         this.atual = this.fichas.isEmpty() ? 0 : Math.floorMod(atual, this.fichas.size());
     }
 
-    void abrir(Temporada temporada) {
-        this.temporada = temporada;
+    void abrir() {
         open = true;
         time = 0f;
     }
@@ -114,15 +114,15 @@ public final class TelaComandos {
     }
 
     private String t(String texto) {
-        return temporada != null ? temporada.t(texto) : texto;
+        return texto;
     }
 
     void render(RenderCanvas c) {
         if (!open) return;
         float in = Tinta.easeOutCubic(time / 0.18f);
         int a = (int)(255f * in);
-        c.fillRect(-40f, -40f, PaginaHistoria.VW + 40f, PaginaHistoria.VH + 40f, Tinta.withAlpha(0xFF000000, (int)(225f * in)));
-        float cx = PaginaHistoria.VW * 0.5f;
+        c.fillRect(-40f, -40f, VW + 40f, VH + 40f, Tinta.withAlpha(0xFF000000, (int)(225f * in)));
+        float cx = VW * 0.5f;
         float[] band = {cx - 300f, 34f, cx + 300f, 20f, cx + 300f, 98f, cx - 300f, 112f};
         c.fillPolygon(band, Tinta.withAlpha(BotaoMenu.RED, a));
         String titulo = t(TITULO);

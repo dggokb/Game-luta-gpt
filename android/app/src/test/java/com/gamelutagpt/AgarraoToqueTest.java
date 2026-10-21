@@ -60,42 +60,4 @@ public class AgarraoToqueTest {
         assertTrue(grabs(0, false, 0, true));
     }
 
-    /**
-     * "Soco defendido, agarra" (tick throw): o rival defende agachado e o L + M apertado logo
-     * depois do contato (ainda no fim do próprio soco) sai assim que o soco acaba e pega.
-     */
-    @Test public void aBlockedJabThenThrowGrabsTheCrouchingBlocker() {
-        for (int delay = 2; delay <= 12; delay += 2) {
-            FighterState a = new FighterState(GeneratedCharacters.get("player_base"), "P1");
-            FighterState d = new FighterState(GeneratedCharacters.opponentCharacter(), "CPU");
-            CombatEngine e = new CombatEngine(a, d, 500f, 900f, new CombatConfig());
-            FighterInput in = new FighterInput(), cpu = new FighterInput();
-            cpu.direction = MotionParser.relative(4, -1);   // agachado defendendo
-            in.direction = 1;
-            float last = -1f;
-            for (int i = 0; i < 200; i++) {
-                e.step(in, cpu);
-                if (Math.abs(e.fighter(0).x - last) < 0.01f) break;
-                last = e.fighter(0).x;
-            }
-            in.direction = 0;
-            in.light = true;
-            int contact = -1;
-            boolean thrown = false, blocked = false;
-            for (int f = 0; f < 80 && !thrown; f++) {
-                if (contact >= 0 && f == contact + delay) in.grab = true;
-                e.step(in, cpu);
-                in.clearPresses();
-                for (CombatEngine.HitEvent h : e.events()) {
-                    if (h.defender == 1 && contact < 0) {
-                        contact = f;
-                        blocked = h.blocked;
-                    }
-                }
-                thrown = e.fighter(1).status == CombatFighter.Status.THROWN;
-            }
-            assertTrue("o soco foi defendido", blocked);
-            assertTrue("L + M " + delay + " quadros depois do soco defendido agarra", thrown);
-        }
-    }
 }

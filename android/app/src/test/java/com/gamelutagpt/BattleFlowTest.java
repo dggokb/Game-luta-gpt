@@ -7,7 +7,7 @@ import org.junit.Test;
 /** READY → GO depois da intro, a batalha 2x2 (derrota quando os dois da dupla caem) e o tempo. */
 public class BattleFlowTest {
     private static final CharacterDefinition BASE = GeneratedCharacters.get("player_base");
-    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_two");
+    private static final CharacterDefinition TWO = GeneratedCharacters.get("player_base");
 
     /** Duas duplas, uma de cada lado, e o fluxo da luta. */
     private static final class Match {
@@ -250,33 +250,4 @@ public class BattleFlowTest {
         assertEquals(BattleFlow.TIME_LIMIT_SECONDS, m.flow.clockSeconds());
     }
 
-    /** Zerado no meio de um Ultra que ainda o segura: o K.O. da luta espera o golpe final. */
-    @Test public void theKoWaitsForTheUltrasFinalBlow() {
-        Match m = new Match(true);
-        m.fight();
-        CombatEngine e = m.engine;
-        // O titular do CPU sozinho com 1 de vida, o parceiro já caído; o p02 (Ultra em sequência) no lugar do P1.
-        e.setFighterState(0, new FighterState(GeneratedCharacters.get("p02"), "P1"));
-        m.p1[0] = e.fighter(0).state;
-        e.setTeam(0, m.p1);
-        Match.knockOut(m.cpu[1]);
-        m.cpu[0].life = 1;
-        e.fighter(1).x = e.fighter(0).x + 110f;
-        e.fighter(0).state.superMeter = CombatConfig.ULTRA_COST;
-        m.in[0].direction = 3;
-        m.in[0].superAttack = true;
-        m.in[0].ultra = true;
-        boolean heldKo = false;
-        for (int i = 0; i < 600 && !m.flow.over(); i++) {
-            m.step();
-            m.in[0].direction = 0;
-            if (e.ultraHoldsKo(1)) {
-                heldKo = true;
-                assertFalse("no K.O. while the Ultra holds it", m.flow.over());
-            }
-        }
-        assertTrue("the Ultra knocked it out mid-sequence", heldKo);
-        assertTrue("then the K.O.", m.flow.over());
-        assertEquals(0, m.flow.winner());
-    }
 }

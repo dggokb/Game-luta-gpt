@@ -558,19 +558,6 @@ public class CombatEngineTest {
         s.until(() -> s.attackId(0).equals("H"), 10);
     }
 
-    @Test public void everyShippedPackPassesValidationAndShowsItsFrameAdvantage() {
-        for (String id : new String[] {"player_base", "player_two", "monster_npc"}) {
-            CharacterDefinition c = GeneratedCharacters.get(id);
-            for (String binding : new String[] {"L", "M", "H", "2L", "2M", "2H", "jL", "jM", "jH"}) {
-                AttackDefinition a = c.attack(binding);
-                assertEquals(binding, a.id);
-                assertEquals(a.hitstunFrames - (a.activeFrames - 1 + a.recoveryFrames), a.advantageOnHit());
-            }
-            assertTrue(id + " L links into L", AttackDefinition.links(c.attack("L").advantageOnHit(), c.attack("L")));
-            assertFalse(id + " L does not link into H", AttackDefinition.links(c.attack("L").advantageOnHit(), c.attack("H")));
-        }
-    }
-
     // ------------------------------------------------------------ hit timing and guard
 
     @Test public void standingMovesHitOnTheirFirstActiveFrameOnceInBothDirections() {
