@@ -23,11 +23,14 @@
     "colunas": 9,
     "fixar": "registro",
     "limpar_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 224,
-  "frameHeight": 320,
-  "rootX": 98,
-  "rootY": 302,
-  "quadrosAMao": "Omni Flash: o vídeo segura a guarda de 2 s a 4 s; o automático espalhava os quadros até o fim. Só o salto q14-q53. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo."
+  "frameWidth": 448,
+  "frameHeight": 640,
+  "rootX": 196,
+  "rootY": 604,
+  "quadrosAMao": "Omni Flash: o vídeo segura a guarda de 2 s a 4 s; o automático espalhava os quadros até o fim. Só o salto q14-q53. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
+  "pixelScale": 2.0
 }

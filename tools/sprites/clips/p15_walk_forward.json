@@ -24,11 +24,14 @@
     "fixar": "registro",
     "pe_no_chao": true,
     "limpar_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 112,
-  "rootY": 270,
-  "quadrosAMao": "Omni Flash (vai de inicio_esquerda a inicio_centro): o trecho que difere do 1º quadro é o vídeo inteiro, então o loop automático pegava a largada e a chegada. Loop de 2 passadas q48-q75 (best_loop entre q20 e q84). Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado."
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 224,
+  "rootY": 540,
+  "quadrosAMao": "Omni Flash (vai de inicio_esquerda a inicio_centro): o trecho que difere do 1º quadro é o vídeo inteiro, então o loop automático pegava a largada e a chegada. Loop de 2 passadas q48-q75 (best_loop entre q20 e q84). Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado.",
+  "pixelScale": 2.0
 }

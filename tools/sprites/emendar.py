@@ -83,6 +83,7 @@ def main():
     p.add_argument('--densidade', type=int, help='padrão: a da receita (ou 2)')
     p.add_argument('--sem-contorno', action='store_true')
     p.add_argument('--sem-nitidez', action='store_true', help='sem o unsharp mask (padrão: o da receita)')
+    p.add_argument('--suave', action='store_true', help='recorte suave (padrão: o da receita)')
     args = p.parse_args()
     char = args.personagem
     path = clip_path(char, args.clipe)
@@ -94,7 +95,8 @@ def main():
     d = args.densidade or old.get('densidade', 2)
     nitidez = not args.sem_nitidez and old.get('nitidez', True)
     contorno = not args.sem_contorno and old.get('contorno', True)
-    extra = (['--nitidez'] if nitidez else []) + (['--contorno'] if contorno else [])
+    suave = args.suave or old.get('suave', False)
+    extra = (['--nitidez'] if nitidez else []) + (['--contorno'] if contorno else []) + (['--suave'] if suave else [])
     # Linha do chão: o pé no 1º quadro da 1ª parte (no vídeo); as outras usam a mesma.
     chao = int(analyse(str(Path(args.pasta) / parts[0]['arquivo']))['info'][0, 0])
     frames, escala, medida = [], None, None
@@ -139,6 +141,8 @@ def main():
                     'quadros': ','.join(map(str, first['quadros'])), 'celula': h, 'largura': w,
                     'raiz': f'{root[0]},{root[1]}', 'colunas': cols, 'fixar': 'registro', 'densidade': d,
                     'nitidez': nitidez, 'contorno': contorno, 'chao': chao}
+    if suave:
+        cfg['video']['suave'] = True
     cfg['partes'] = [{'arquivo': part['arquivo'], 'quadros': part['quadros']} for part in parts]
     cfg['partesInicio'] = [sum(len(q['quadros']) for q in parts[:i]) for i in range(len(parts))]
     keep_anchor = json.loads(path.read_text(encoding='utf-8')).get('video', {}).get('ancorar_pe')

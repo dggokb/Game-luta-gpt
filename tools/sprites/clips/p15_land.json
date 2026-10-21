@@ -23,11 +23,14 @@
     "colunas": 10,
     "pe_no_chao": true,
     "limpar_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 192,
-  "frameHeight": 352,
-  "rootX": 98,
-  "rootY": 334,
-  "quadrosAMao": "No Omni a aterrissagem absorve mais devagar (toca no q45, mais baixo no q55, em pé no q63); o automático (q45-q51) parava no meio da descida e trocava para o IDLE agachado. Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado."
+  "frameWidth": 384,
+  "frameHeight": 704,
+  "rootX": 196,
+  "rootY": 668,
+  "quadrosAMao": "No Omni a aterrissagem absorve mais devagar (toca no q45, mais baixo no q55, em pé no q63); o automático (q45-q51) parava no meio da descida e trocava para o IDLE agachado. Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado.",
+  "pixelScale": 2.0
 }

@@ -24,11 +24,14 @@
     "fixar": "registro",
     "pe_no_chao": true,
     "limpar_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 104,
-  "rootY": 270,
-  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q48, alinhados por registro. Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado."
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 208,
+  "rootY": 540,
+  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q48, alinhados por registro. Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado.",
+  "pixelScale": 2.0
 }

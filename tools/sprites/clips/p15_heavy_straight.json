@@ -22,11 +22,13 @@
     "raiz": "106,270",
     "limpar_chao": true,
     "ancorar_pe": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameHeight": 288,
-  "rootX": 106,
-  "rootY": 270,
+  "frameHeight": 576,
+  "rootX": 212,
+  "rootY": 540,
   "quadrosAMao": "Omni Flash: o vídeo vai da guarda ao chute esticado (q36, = pose_chute) e fica parado até o fim. Ida q16..q36 (11 quadros) e a volta pelos mesmos quadros invertidos; impacto no esticado. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
   "animacao": {
     "frames": [
@@ -59,5 +61,7 @@
       0
     ],
     "impactFrame": 10
-  }
+  },
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

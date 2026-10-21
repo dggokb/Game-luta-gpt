@@ -21,10 +21,14 @@
     "raiz": "75,248",
     "colunas": 11,
     "limpar_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 176,
-  "rootX": 75,
-  "rootY": 248,
-  "quadrosAMao": "Loop do vídeo q9-q94 (o que fecha melhor; loops com menos de 70 quadros fecham mal), todos os quadros (24 qps), na célula justa do corpo (176×256)."
+  "frameWidth": 352,
+  "rootX": 150,
+  "rootY": 496,
+  "quadrosAMao": "Loop do vídeo q9-q94 (o que fecha melhor; loops com menos de 70 quadros fecham mal), todos os quadros (24 qps), na célula justa do corpo (176×256).",
+  "frameHeight": 512,
+  "pixelScale": 2.0
 }

@@ -21,9 +21,14 @@
     "raiz": "103,238",
     "colunas": 9,
     "limpar_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 224,
-  "rootX": 103,
-  "quadrosAMao": "2L: o vídeo para esticado; ida q15-q29 e volta pelos mesmos quadros (comportamento.py)."
+  "frameWidth": 448,
+  "rootX": 206,
+  "quadrosAMao": "2L: o vídeo para esticado; ida q15-q29 e volta pelos mesmos quadros (comportamento.py).",
+  "frameHeight": 512,
+  "rootY": 476,
+  "pixelScale": 2.0
 }

@@ -22,12 +22,14 @@
     "raiz": "85,270",
     "limpar_chao": true,
     "ancorar_pe": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 85,
-  "rootY": 270,
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 170,
+  "rootY": 540,
   "quadrosAMao": "Omni Flash: o vídeo vai da guarda (q20) ao jab esticado (q30, = pose_jab) e fica parado até o fim. Ida q20,q23,q24,q25,q30 e a volta pelos mesmos quadros invertidos; impacto no esticado. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
   "animacao": {
     "frames": [
@@ -48,5 +50,6 @@
       0
     ],
     "impactFrame": 4
-  }
+  },
+  "pixelScale": 2.0
 }

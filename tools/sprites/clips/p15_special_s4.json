@@ -13,8 +13,8 @@
   "sourceNote": "p15 emendado de 4 vídeos (Omni Flash 1.1) por tools/sprites/emendar.py; refazer com emendar.py (não com video_para_sprite.py --clipe).",
   "frameWidth": 352,
   "frameHeight": 384,
-  "rootX": 172,
-  "rootY": 357,
+  "rootX": 173,
+  "rootY": 356,
   "video": {
     "arquivo": "s4.mp4",
     "personagem": "p15",
@@ -23,13 +23,14 @@
     "quadros": "10,12,14,16,18,20,22,24,26,28,30,32,34,36,38",
     "celula": 384,
     "largura": 352,
-    "raiz": "172,357",
+    "raiz": "173,356",
     "colunas": 11,
     "fixar": "registro",
     "densidade": 1,
     "nitidez": false,
     "contorno": true,
-    "chao": 645
+    "chao": 645,
+    "suave": true
   },
   "partes": [
     {

@@ -101,7 +101,7 @@ def floor_dust(alpha, h, s, v):
 CONTOUR_V = 180
 
 
-def key(frame, dust=False, effects=False, floor=False, contour=False):
+def key(frame, dust=False, effects=False, floor=False, contour=False, soft=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45)
@@ -136,6 +136,7 @@ def key(frame, dust=False, effects=False, floor=False, contour=False):
         alpha[floor_dust(alpha, h, s, v)] = 0
         alpha = cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
     alpha = keep_largest(cv2.morphologyEx(alpha, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)))
+    structure = alpha.copy()  # o corpo sem os furinhos tapados (o recorte suave usa)
     # Furinhos dentro do corpo (reflexo verde na roupa branca) voltam a ser opacos;
     # vãos grandes, como entre as pernas, continuam transparentes.
     _, labels, stats, _ = cv2.connectedComponentsWithStats((alpha == 0).astype(np.uint8))
@@ -144,12 +145,76 @@ def key(frame, dust=False, effects=False, floor=False, contour=False):
     fill = (area < 600) & (x > 0) & (y > 0) & (x + w < w_) & (y + h < h_)
     fill[0] = False
     alpha[fill[labels]] = 255
-    alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(int)
+    if soft:
+        return soft_matte(rgb, structure, bg)
+    alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda
     if line is not None:
         rgb[line] = rgb[line].min(axis=1, keepdims=True)
     return np.dstack([rgb.astype(np.uint8), alpha])
+
+
+SOFT_CORE = 4  # px do vídeo da borda para dentro que ficam sempre opacos
+SOFT_BLUR = 0.8  # desfoque da borda tirada da cor (px do vídeo)
+SOFT_CHOKE = 0.1  # alfa abaixo disso some na borda; o resto é reescalado
+SOFT_REACH = 6  # px do vídeo além do corpo recortado onde ainda vale o alfa parcial (fios soltos)
+
+
+def soft_matte(rgb, structure, bg):
+    """Recorte suave: o alfa de cada pixel sai de quanto verde de fundo ele tem (verde puro = 0,
+    sem verde = opaco, mistura = parcial), então a borda não fica em degraus, os vãos entre as
+    mechas do cabelo continuam vazados e os fios ficam com a cor deles. Reflexo verde fraco na
+    roupa branca quase não tira opacidade. Só vale perto do corpo (sem sujeira solta do fundo).
+    A cor da borda é a do desenho logo ao lado (sem o verde nem o aro claro do vídeo)."""
+    near = cv2.dilate(structure, np.ones((3, 3), np.uint8), iterations=SOFT_REACH) > 0
+    # Verde em relação à média do vermelho e do azul: o aro verde-amarelado que o vídeo deixa
+    # em volta do desenho conta como fundo (com o máximo dos dois ele passava por pele).
+    spill = (rgb[..., 1] - (rgb[..., 0] + rgb[..., 2]) / 2).astype(float)
+    sample = bg & ~near
+    green = np.median(rgb[sample], axis=0) if sample.any() else np.array([20, 230, 20])
+    full = max(60.0, float(green[1] - (green[0] + green[2]) / 2))
+    lo, hi = 0.08 * full, 0.6 * full
+    a = np.clip(1 - (spill - lo) / (hi - lo), 0, 1)
+    # Miolo do corpo opaco: reflexo verde na roupa branca não vira transparência.
+    a = np.maximum(a, cv2.erode(structure, np.ones((3, 3), np.uint8), iterations=SOFT_CORE) / 255.0)
+    # O vídeo guarda a cor em meia resolução (4:2:0): a borda tirada da cor sai em blocos de
+    # 2 px; um desfoque leve só nela desfaz os degraus.
+    a = cv2.GaussianBlur(a, (0, 0), SOFT_BLUR)
+    # O que é bem mais escuro que o fundo é desenho (fio de cabelo, traço do contorno), mesmo
+    # tingido de verde pelo vídeo; o brilho tem resolução cheia, então essa borda sai nítida.
+    luma = rgb @ np.array([0.299, 0.587, 0.114])
+    ybg = float(np.dot(green, [0.299, 0.587, 0.114]))
+    dark = np.clip((ybg - luma - 20) / 50, 0, 1)
+    line = dark > a  # traço escuro: fica com a própria cor (sem o verde), não com a de dentro
+    a = np.maximum(a, dark)
+    a[~near] = 0
+    a = np.clip((a - SOFT_CHOKE) / (1 - SOFT_CHOKE), 0, 1) ** 0.8  # aperta a borda; fio fino continua
+    out = rgb.astype(float)
+    # A cor da borda vem de dentro do desenho (média dos vizinhos opacos), não da mistura com o
+    # verde: assim o aro claro e o verde do vídeo não viram franja.
+    solid = (a >= 0.98).astype(float)
+    part = (a > 0) & (a < 0.98)
+    fill, have = out * solid[..., None], solid.copy()
+    for size in (3, 5, 9, 15):
+        num = cv2.blur(out * solid[..., None], (size, size))
+        den = cv2.blur(solid, (size, size))
+        new = (have == 0) & (den > 0.01)
+        fill[new] = num[new] / den[new, None]
+        have[new] = 1
+    use = part & (have > 0) & ~line
+    out[use] = fill[use]
+    gray = part & line
+    out[gray] = out[gray].min(axis=1, keepdims=True)
+    # Nem verde nem roxo: o verde fica entre o vermelho e o azul; no aro da borda (onde o vídeo
+    # mistura o desenho com o fundo e fica amarelado), no máximo a média dos dois.
+    lo_rb = np.minimum(out[..., 0], out[..., 2])
+    hi_rb = np.maximum(out[..., 0], out[..., 2])
+    out[..., 1] = np.clip(out[..., 1], lo_rb, hi_rb + 8)
+    rim = cv2.dilate((a < 0.5).astype(np.uint8), np.ones((3, 3), np.uint8), iterations=3) > 0
+    mean = (out[..., 0] + out[..., 2]) / 2 + 10
+    out[..., 1] = np.where(rim, np.minimum(out[..., 1], np.maximum(mean, lo_rb)), out[..., 1])
+    return np.dstack([out.astype(np.uint8), np.round(a * 255).astype(np.uint8)])
 
 
 def torso_x(rgba):
@@ -165,7 +230,8 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, contorno=False, chao=None)
+              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, contorno=False, chao=None,
+              suave=False)
 
 
 def parser():
@@ -224,6 +290,9 @@ def parser():
     p.add_argument("--contorno", action="store_true",
                    help="mantém o contorno escuro do desenho que o vídeo tinge de verde (Omni Flash); "
                         "sem isso a borda sai branca, sem traço")
+    p.add_argument("--suave", action="store_true",
+                   help="recorte suave: borda com alfa parcial tirado da mistura com o verde (sem degraus "
+                        "e com os fios do cabelo), em vez do tudo-ou-nada")
     p.add_argument("--deslocar", default="0,0",
                    help="DX,DY em px da célula aplicado a todos os quadros (acerto fino de registro)")
     p.add_argument("--previa", help="GIF de prévia no tamanho do jogo")
@@ -352,7 +421,7 @@ def main(argv=None):
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
         if (i, dust, effects, floor) not in cache:
-            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor, args.contorno)
+            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor, args.contorno, args.suave)
         return cache[i, dust, effects, floor]
 
     measured = None

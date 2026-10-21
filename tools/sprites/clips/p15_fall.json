@@ -22,10 +22,13 @@
     "raiz": "93,420",
     "colunas": 10,
     "pe_no_chao": true,
-    "contorno": true
+    "densidade": 2,
+    "contorno": true,
+    "suave": true
   },
-  "frameWidth": 192,
-  "frameHeight": 448,
-  "rootX": 93,
-  "rootY": 420
+  "frameWidth": 384,
+  "frameHeight": 896,
+  "rootX": 186,
+  "rootY": 840,
+  "pixelScale": 2.0
 }

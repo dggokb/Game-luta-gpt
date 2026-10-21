@@ -8,13 +8,13 @@
   "preview": "android/app/build/sprite-review/p15_special_s2-import.png",
   "expectedFrames": 25,
   "segmentation": "prepared-grid",
-  "columns": 17,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p15 emendado de 2 vídeos (Omni Flash 1.1) por tools/sprites/emendar.py; refazer com emendar.py (não com video_para_sprite.py --clipe).",
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 104,
-  "rootY": 267,
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 210,
+  "rootY": 534,
   "video": {
     "arquivo": "s_base.mp4",
     "personagem": "p15",
@@ -23,13 +23,14 @@
     "quadros": "12,14,16,18,20,22,24,26,28,30,32,34",
     "celula": 288,
     "largura": 224,
-    "raiz": "104,267",
-    "colunas": 17,
+    "raiz": "105,267",
+    "colunas": 8,
     "fixar": "registro",
-    "densidade": 1,
+    "densidade": 2,
     "nitidez": false,
     "contorno": true,
-    "chao": 645
+    "chao": 645,
+    "suave": true
   },
   "partes": [
     {
@@ -71,5 +72,6 @@
   "partesInicio": [
     0,
     12
-  ]
+  ],
+  "pixelScale": 2.0
 }

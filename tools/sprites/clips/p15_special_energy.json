@@ -8,13 +8,13 @@
   "preview": "android/app/build/sprite-review/p15_special_energy-import.png",
   "expectedFrames": 27,
   "segmentation": "prepared-grid",
-  "columns": 17,
+  "columns": 8,
   "rootMode": "authored",
   "sourceNote": "p15 emendado de 2 vídeos (Omni Flash 1.1) por tools/sprites/emendar.py; refazer com emendar.py (não com video_para_sprite.py --clipe).",
-  "frameWidth": 233,
-  "frameHeight": 288,
-  "rootX": 111,
-  "rootY": 258,
+  "frameWidth": 502,
+  "frameHeight": 576,
+  "rootX": 222,
+  "rootY": 514,
   "video": {
     "arquivo": "s_base.mp4",
     "personagem": "p15",
@@ -22,14 +22,15 @@
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "12,14,16,18,20,22,24,26,28,30,32,34",
     "celula": 288,
-    "largura": 233,
-    "raiz": "111,258",
-    "colunas": 17,
+    "largura": 251,
+    "raiz": "111,257",
+    "colunas": 8,
     "fixar": "registro",
-    "densidade": 1,
+    "densidade": 2,
     "nitidez": false,
     "contorno": true,
     "chao": 645,
+    "suave": true,
     "ancorar_pe": true
   },
   "partes": [
@@ -74,5 +75,6 @@
   "partesInicio": [
     0,
     12
-  ]
+  ],
+  "pixelScale": 2.0
 }
