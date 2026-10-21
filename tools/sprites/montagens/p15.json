@@ -37,7 +37,7 @@
     "quadros": "24-50",
     "opcoes": {"pe_no_chao": true, "fixar": "volta", "balanco": 0.5},
     "animacoes": {
-      "WALK_BACK": {"distancia": "video", "tempo": "video"}
+      "WALK_BACK": {"distancia": "video", "tempo": "video", "acelerar": 2}
     }
   },
   "walk_forward": {

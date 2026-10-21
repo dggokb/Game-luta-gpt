@@ -328,7 +328,7 @@
         26
       ],
       "loop": true,
-      "distancePerFrame": 9.17
+      "distancePerFrame": 4.58
     },
     "CROUCH": {
       "atlas": "p15_crouch",

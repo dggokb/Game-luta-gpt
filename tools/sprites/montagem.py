@@ -31,7 +31,7 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
   faz o lutador andar no chão na velocidade do vídeo (fighter.walkSpeed / walkBackSpeed, no lugar
   da do motor): o ciclo toca no tempo do vídeo com o pé plantado; "tempo": "video" deixa o andar
   do motor e acerta a distância por quadro para o ciclo tocar no tempo do vídeo (o pé escorrega
-  se o passo do vídeo for curto). A mesma folha
+  se o passo do vídeo for curto; "acelerar": 2 toca o ciclo 2x mais rápido). A mesma folha
   pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1).
 
 Um vídeo só, sem "fixo", é convertido direto do arquivo. O vídeo colado vai para
@@ -182,7 +182,8 @@ def update_pack(char, name, spec, distance=None):
                 # Anda na velocidade do motor e o ciclo toca no tempo do vídeo (o pé escorrega
                 # se o passo do vídeo for mais curto que o andar do motor).
                 pack['fighter'].pop(key, None)
-                anim['distancePerFrame'] = round(ENGINE_WALK[key] * step / FPS, 2)
+                # "acelerar": 2 toca o ciclo 2x mais rápido que o vídeo (o pé escorrega menos).
+                anim['distancePerFrame'] = round(ENGINE_WALK[key] * step / FPS / a.get('acelerar', 1), 2)
             pack['animations'][state] = anim
             continue
         same = old.get('atlas') == anim['atlas'] and old.get('frames') == frames \
