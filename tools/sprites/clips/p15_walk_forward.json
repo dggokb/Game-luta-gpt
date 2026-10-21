@@ -1,0 +1,30 @@
+{
+  "id": "p15_walk_forward",
+  "javaName": "P15_WALK_FORWARD",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_walk_forward_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_walk_forward.webp",
+  "report": "tools/sprites/reports/p15_walk_forward.report.json",
+  "preview": "android/app/build/sprite-review/p15_walk_forward-import.png",
+  "expectedFrames": 38,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "andarFrente.mp4",
+    "personagem": "p15",
+    "escala": 0.5689,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67,69,71,73,75,77,79,81,83,85,87",
+    "celula": 288,
+    "largura": 256,
+    "raiz": "123,270",
+    "colunas": 11,
+    "pe_no_chao": true,
+    "recorte_suave": true
+  },
+  "frameHeight": 288,
+  "rootX": 123,
+  "rootY": 270
+}
