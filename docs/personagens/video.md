@@ -272,6 +272,8 @@ quadro, para o pé ficar plantado (use só o trecho dos passos, sem a guarda par
 Com a velocidade do motor (300 px/s para frente, 220 para trás) o ciclo toca no tempo que a
 distância manda; `"velocidade": "video"` faz o lutador andar no chão na velocidade do vídeo
 (`fighter.walkSpeed` / `walkBackSpeed` no character.json), e o ciclo toca no tempo do vídeo.
+`"tempo": "video"` faz o contrário: deixa o andar do motor e acerta a distância por quadro para o
+ciclo tocar no tempo do vídeo (o pé escorrega se o passo do vídeo for mais curto).
 Andar de um passo só: use `"fixar": "volta"` nas opções, para a folha descontar o avanço da volta
 inteira (o mesmo que o motor anda); a reta do tronco não bate com ele e o loop dá um solavanco.
 `"balanco"` (0 a 1, padrão 1) diz quanto do vaivém do tronco no passo fica: com 0.5 uma pausa do

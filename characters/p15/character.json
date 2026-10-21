@@ -88,9 +88,7 @@
     "assist": {
       "move": "M"
     },
-    "comboStyle": "equilibrado",
-    "walkSpeed": 62.2,
-    "walkBackSpeed": 69.4
+    "comboStyle": "equilibrado"
   },
   "animations": {
     "IDLE": {
@@ -296,7 +294,7 @@
         13
       ],
       "loop": true,
-      "distancePerFrame": 2.59
+      "distancePerFrame": 12.5
     },
     "WALK_BACK": {
       "atlas": "p15_walk_back",
@@ -330,7 +328,7 @@
         26
       ],
       "loop": true,
-      "distancePerFrame": 2.89
+      "distancePerFrame": 9.17
     },
     "CROUCH": {
       "atlas": "p15_crouch",

@@ -37,14 +37,14 @@
     "quadros": "24-50",
     "opcoes": {"pe_no_chao": true, "fixar": "volta", "balanco": 0.5},
     "animacoes": {
-      "WALK_BACK": {"distancia": "video", "velocidade": "video"}
+      "WALK_BACK": {"distancia": "video", "tempo": "video"}
     }
   },
   "walk_forward": {
     "trechos": [["andarFrente", 0, 96]],
     "quadros": "60-73",
     "opcoes": {"pe_no_chao": true, "fixar": "volta"},
-    "animacoes": {"WALK_FORWARD": {"distancia": "video", "velocidade": "video"}}
+    "animacoes": {"WALK_FORWARD": {"distancia": "video", "tempo": "video"}}
   },
   "light_jab": {
     "trechos": [["L", 0, 96]],
