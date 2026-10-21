@@ -60,7 +60,10 @@ final class AnimacaoLutador {
         AttackDefinition attack = f.attacking() ? f.attack : null;
         l.golpeAtivo = attack != null && attack.isActive(f.attackFrame);
         l.forca = attack != null ? peso(attack.strength) : 0;
-        l.dash = f.forwardDashing || f.backdashFrames > 0 || f.airDashFrames > 0;
+        // Os dois para a frente e os dois para trás: no chão, o dash e o backdash; no ar, o air
+        // dash. O pulo que sai da corrida leva o embalo (e o rastro); o super pulo não.
+        l.dash = (f.grounded && (f.forwardDashing || f.backdashFrames > 0)) || f.airDashFrames > 0;
+        l.embalo = !f.grounded && f.jumpMode == CombatFighter.PULO_CORRIDA;
         l.congelado = f.frozen() || engine.superFreezeActive();
         for (CombatEngine.HitEvent e : engine.events()) {
             if (e.defender != f.index || engine.fighter(f.index) != f) continue;

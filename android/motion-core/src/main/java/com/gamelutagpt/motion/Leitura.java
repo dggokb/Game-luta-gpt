@@ -28,6 +28,8 @@ public final class Leitura {
     public int forca;
     /** Correndo ou no air dash (para a frente ou para trás). */
     public boolean dash;
+    /** No ar com o embalo da corrida (o pulo que saiu do dash; o super pulo não conta). */
+    public boolean embalo;
     /** Levou um golpe neste passo: o peso dele (0 a 3), ou -1. */
     public int apanhou = -1;
     /** Defendeu um golpe neste passo. */

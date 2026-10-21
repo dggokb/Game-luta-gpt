@@ -138,8 +138,8 @@ public final class MotorAnimacao {
     }
 
     private void rastro(Leitura l, int q) {
-        boolean deixa = ajustes.rastro && l.clipe != null &&
-            ((l.golpeAtivo && l.forca >= ajustes.forcaRastro) || l.dash);
+        boolean golpe = ajustes.rastroNosGolpes && l.golpeAtivo && l.forca >= ajustes.forcaRastro;
+        boolean deixa = ajustes.rastro && l.clipe != null && (l.dash || l.embalo || golpe);
         if (!deixa) {
             quadrosSemCopia = 0;
             return;
