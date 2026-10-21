@@ -142,12 +142,12 @@ public final class MotorAnimacao {
             // Bater no chão corta o esticar do ar: o achatar sai inteiro.
             achatar.zerar();
             if (l.atingido && ajustes.quique) {
-                achatar.degrau(q, ajustes.achatarQueda * forma, Mola.ELASTICA);
+                achatar.degrau(q, ajustes.achatarQueda * forma, ajustes.molaForma);
                 subir.impulso(q, ajustes.alturaQuique * forma, QUIQUE);
             } else if (ajustes.pulo) {
                 // Quanto mais rápido caía, mais achata (um pulinho achata pouco).
                 float queda = clamp(Math.abs(vyAntes) / 1600f, 0.35f, 1f);
-                achatar.degrau(q, ajustes.achatarAterrissagem * queda * forma, Mola.ELASTICA);
+                achatar.degrau(q, ajustes.achatarAterrissagem * queda * forma, ajustes.molaForma);
                 // A queda do knockdown já tem a poeira dela no jogo.
                 if (ajustes.poeira && !l.atingido) pose.poeira = Math.min(1f, ajustes.poeiraAterrissagem * queda * peso);
             }
@@ -172,7 +172,7 @@ public final class MotorAnimacao {
                 if (altura == Leitura.CORPO) {
                     // No corpo: dobra para a frente (para quem bateu) e encolhe.
                     inclinar.impulso(q, -lado * graus * ajustes.fatorCorpo, mola(f));
-                    achatar.degrau(q, ajustes.dobrarCorpo * forma, Mola.ELASTICA);
+                    achatar.degrau(q, ajustes.dobrarCorpo * forma, ajustes.molaForma);
                 } else if (altura == Leitura.BAIXO) {
                     // Nas pernas: os pés vão com o golpe e o tronco fica (cisalha para quem bateu).
                     arrastar.impulso(q, -lado * graus * ajustes.fatorBaixo, mola(f));
@@ -231,7 +231,7 @@ public final class MotorAnimacao {
             correndo = false;
             // Freada no chão (o pulo que sai da corrida e o fim do air dash não freiam).
             if (l.noChao && noChaoAntes) {
-                if (ajustes.arrasto) arrastar.impulso(q, ajustes.grausArrasto * ladoDash * angulo, Mola.ELASTICA);
+                if (ajustes.arrasto) arrastar.impulso(q, ajustes.grausArrasto * ladoDash * angulo, ajustes.molaArrasto);
                 if (ajustes.poeira) pose.deslize = sentidoDash;
             }
         }

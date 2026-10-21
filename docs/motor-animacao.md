@@ -11,37 +11,43 @@ Organizado pelos 12 princípios da animação (o que cada efeito resolve):
 
 | Princípio | Efeito | Quando | Padrão |
 |---|---|---|---|
-| Achatar e esticar | Achatar | ao aterrissar (mais forte quanto mais rápido caía), volta com um balanço | até 9% da altura |
-| | Esticar | ao sair do chão | 6% |
-| | Volume | achatar e esticar mantêm a área do desenho (mais baixo = mais largo na mesma medida) | sempre |
-| | Virada | ao virar de lado, o desenho sai estreito e abre de volta (lê como um giro) | 25% da largura |
-| | Quique | o corpo caído bate no chão: achata mais e sobe um pouco, sem nunca entrar no chão | 13%, 10 px |
-| Antecipação | Preparação | na preparação do golpe (os quadros de startup que ele já tem) o corpo recua e abaixa | 1° fraco a 3° especial; 2% |
-| | Agachar para pular | nos quadros de preparação do pulo (o jump squat do jogo, abaixo) o corpo agacha e sai esticando | 7% |
-| Continuidade | Seguir o golpe | quando o golpe fica ativo, o corpo segue para a frente e assenta | 1,5° fraco a 4° especial |
-| | Acertar trava, errar passa | acertou (ou foi defendido): o corpo para no rival e recua um pouco; errou: quando a janela fecha no vazio, passa do ponto e volta devagar | recua 1° a 3°; passa 1,5° a 5° |
-| | Arrasto | dash: o tronco fica para trás na largada e passa da conta na freada (cisalhamento com os pés parados) | 2,5° na largada, 5° na freada |
+| Achatar e esticar | Achatar | ao aterrissar (mais forte quanto mais rápido caía), volta firme | até 3,5% da altura |
+| | Esticar | ao sair do chão | 2,5% |
+| | Volume | com `volume` ligado, achatar e esticar mantêm a área do desenho (mais cartum, mais borracha) | desligado |
+| | Virada | ao virar de lado, o desenho sai estreito e abre de volta (lê como um giro) | 12% da largura |
+| | Quique | o corpo caído bate no chão: achata mais e sobe um pouco, sem nunca entrar no chão | 5%, 6 px |
+| Antecipação | Preparação | na preparação do golpe (os quadros de startup que ele já tem) o corpo recua e abaixa | 1° fraco a 3° especial; 1% |
+| | Agachar para pular | nos quadros de preparação do pulo (o jump squat do jogo, abaixo) o corpo agacha e sai esticando | 3% |
+| Continuidade | Seguir o golpe | quando o golpe fica ativo, o corpo segue para a frente e assenta | 1° fraco a 3° especial |
+| | Acertar trava, errar passa | acertou (ou foi defendido): o corpo para no rival e recua um pouco; errou: quando a janela fecha no vazio, passa do ponto e volta devagar | recua 1° a 3°; passa 1° a 3,5° |
+| | Arrasto | dash: o tronco fica para trás na largada e passa da conta na freada (cisalhamento com os pés parados) | 1,5° na largada, 3° na freada |
 | Aceleração | Molas | tudo entra e sai por molas, nunca linear | — |
-| Arcos | Arco do pulo | no ar, a cabeça vai para onde ele anda subindo e volta descendo; o pulo da corrida inclina mais. Pulo parado e super pulo reto não inclinam | 4° (6° na corrida) |
-| | Esticar no ar | estica conforme a velocidade vertical (normal no topo do pulo) | até 4,5% |
+| Arcos | Arco do pulo | no ar, a cabeça vai para onde ele anda subindo e volta descendo; o pulo da corrida inclina mais. Pulo parado e super pulo reto não inclinam | 2,5° (3,75° na corrida) |
+| | Esticar no ar | estica conforme a velocidade vertical (normal no topo do pulo) | até 1,5% |
 | Ação secundária | Poeira | aterrissagem: um sopro de cada lado dos pés (personagem pesado: a nuvem inteira); largada e freada do dash e do backdash: o pé deslizando. A queda do knockdown já tinha a dela | — |
 | | Defesa pesada | defender golpe forte arrasta o pé para trás duas vezes no empurrão | forte ou mais |
 | | Sombra de contato | embaixo dos dois: encolhe e clareia com a altura e abre com o achatar da aterrissagem | some até 35% a 420 px |
-| | Cansaço | vida abaixo de 25%, parado: respira fundo, ombros caídos e o idle 20% mais lento | 1,2%, 1,5° |
-| Tempo | Mola por peso | o golpe fraco volta ligeiro, o forte balança mais devagar (apanhando e batendo) | 4 molas |
+| | Cansaço | vida abaixo de 25%, parado: respira fundo, ombros caídos e o idle 20% mais lento | 0,6%, 1,5° |
+| Tempo | Mola por peso | o golpe fraco volta ligeiro, o forte mais devagar (apanhando e batendo), todas sem balançar | 4 molas |
 | | Peso do personagem | `fighter.pesoAnimacao` no pack: o pesado achata, inclina e arrasta menos e levanta mais poeira | 1 |
-| Exagero | Smear | golpes fortes: nos 2 primeiros quadros ativos, cópias esticadas por baixo do desenho (o punho/pé "borra") | 22% |
-| | Inclinação de impacto | apanhando, o tronco cede para o lado do empurrão (depois do hitstop) | 3° fraco a 8° especial; 2° defendendo |
+| Exagero | Smear | golpes fortes: nos 2 primeiros quadros ativos, cópias esticadas por baixo do desenho (o punho/pé "borra") | 18% |
+| | Inclinação de impacto | apanhando, o tronco cede para o lado do empurrão (depois do hitstop) | 2° fraco a 5,5° especial; 2° defendendo |
 | | Onde pegou | pela altura do ponto de contato: na cabeça o tronco vai para trás; no corpo dobra para a frente e encolhe; nas pernas os pés vão e o tronco fica (arrasto) | 70% / 35% da altura |
 | | Variação | cada reação sai ±20% diferente (igual no mesmo jogo): golpes repetidos não parecem um loop | ±20% |
-| | Inclinação de corrida | dash e air dash para a frente; para trás no backdash | 4° |
-| | Estalo | quando o golpe próprio fica ativo, um tranco curto de esticar na horizontal | 1,5% a 4,5% |
-| Encenação | Soco de câmera | o zoom do golpe (ImpactFeel) entra seco e volta por mola, passando um pouco para trás antes de assentar | ~3/4 s |
+| | Inclinação de corrida | dash e air dash para a frente; para trás no backdash | 3° |
+| | Estalo | quando o golpe próprio fica ativo, um tranco curto de esticar na horizontal | 0,8% a 2,2% |
+| Encenação | Soco de câmera | o zoom do golpe (ImpactFeel) entra seco e volta firme por mola | ~1/2 s |
 | | Tranco da tela | o tremor do golpe tem direção: a tela vai no sentido do golpe e volta por mola (o tremor aleatório ficou menor) | 4 / 9 / 14 px |
 | | Câmera adiantada | a câmera se adianta para o lado de quem corre e volta ao parar | 30 px |
 | Pose a pose | Transição | troca de clipe fora de golpes, reações, decolagem e aterrissagem: o quadro de antes some em 2 quadros | 35% |
 | | Rastro | só nos dois para a frente e dois para trás (dash, backdash e air dash) e no pulo que sai da corrida; o super pulo e os golpes não deixam (`rastroNosGolpes` liga nos golpes) | até 3 cópias azuladas, 35%, vivem 8 quadros |
 | Direto | Quadros intermediários | fora do jogo: `tools/sprites/intermediarios.py` (abaixo) | — |
+
+**Firme, não borracha.** As molas do corpo e da câmera voltam sem balançar (amortecimento
+0,75–0,9) e o achatar/esticar é pequeno: o desenho é pintado, e muito achatar ou um corpo que
+vai e volta passando do ponto parece borracha, em qualquer intensidade (o ANIM 50% diminui o
+tamanho, não o balanço). Para um estilo mais cartum: `volume = true`, `Mola.ELASTICA` em
+`molaForma`/`molaArrasto`/`molaPorForca` e os valores maiores (achatar 9%, esticar 6%).
 
 Tudo com os pés parados (a raiz é o pivô) e o "para a frente" segue para onde o lutador olha.
 Nada disso muda o frame data, as caixas ou a física: a antecipação usa só os quadros de

@@ -45,8 +45,8 @@ public class MotorAnimacaoTest {
         m.passo(no);
         m.passo(parado("LAND"));
         Pose p = m.pose();
-        assertTrue("mais baixo", p.escalaY < 0.95f);
-        assertTrue("mais largo", p.escalaX > 1.03f);
+        assertTrue("mais baixo", p.escalaY < 1f - 0.5f * m.ajustes.achatarAterrissagem);
+        assertTrue("mais largo", p.escalaX > 1f);
         for (int i = 0; i < 120; i++) m.passo(parado("IDLE"));
         assertEquals(1f, m.pose().escalaY, 1e-3f);
         assertEquals(1f, m.pose().escalaX, 1e-3f);
@@ -60,8 +60,8 @@ public class MotorAnimacaoTest {
         sobe.noChao = false;
         sobe.vy = -900f;
         m.passo(sobe);
-        assertTrue("mais alto", m.pose().escalaY > 1.03f);
-        assertTrue("mais fino", m.pose().escalaX < 0.98f);
+        assertTrue("mais alto", m.pose().escalaY > 1f + 0.5f * m.ajustes.esticarDecolagem);
+        assertTrue("mais fino", m.pose().escalaX < 1f);
     }
 
     @Test
@@ -91,6 +91,32 @@ public class MotorAnimacaoTest {
             menor = Math.min(menor, m.pose().inclinacao);
         }
         assertTrue("tronco foi para trás: " + menor, menor < -4f);
+    }
+
+    @Test
+    public void asMolasDoCorpoVoltamSemBalancar() {
+        // Firme: depois de aterrissar a altura volta ao normal sem passar para o outro lado.
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura no = parado("FALL");
+        no.noChao = false;
+        no.vy = 1600f;
+        m.passo(no);
+        for (int i = 0; i < 60; i++) {
+            m.passo(parado(i == 0 ? "LAND" : "IDLE"));
+            assertTrue("sem esticar de volta: " + m.pose().escalaY, m.pose().escalaY <= 1.002f);
+        }
+        // E o tronco que apanhou não vai para a frente depois de ir para trás.
+        MotorAnimacao h = new MotorAnimacao();
+        h.passo(parado("IDLE"));
+        Leitura e = parado("HIT_STAND");
+        e.apanhou = 3;
+        e.empurrao = -1;
+        h.passo(e);
+        for (int i = 0; i < 60; i++) {
+            h.passo(parado("HIT_STAND"));
+            assertTrue("sem balanço: " + h.pose().inclinacao, h.pose().inclinacao < 0.3f);
+        }
     }
 
     @Test
@@ -227,8 +253,10 @@ public class MotorAnimacaoTest {
     }
 
     @Test
-    public void achatarEEsticarMantemAArea() {
-        MotorAnimacao m = new MotorAnimacao();
+    public void comVolumeAchatarEEsticarMantemAArea() {
+        Ajustes comVolume = new Ajustes();
+        comVolume.volume = true;
+        MotorAnimacao m = new MotorAnimacao(comVolume);
         m.passo(parado("IDLE"));
         Leitura no = parado("FALL");
         no.noChao = false;
@@ -247,7 +275,8 @@ public class MotorAnimacaoTest {
         Leitura virou = parado("IDLE");
         virou.olhando = -1;
         m.passo(virou);
-        assertTrue("estreito no quadro da virada: " + m.pose().escalaX, m.pose().escalaX < 0.85f);
+        assertTrue("estreito no quadro da virada: " + m.pose().escalaX,
+            m.pose().escalaX < 1f - 0.8f * m.ajustes.estreitarVirada);
         assertEquals("a altura não muda", 1f, m.pose().escalaY, 1e-6f);
         for (int i = 0; i < 40; i++) m.passo(virou);
         assertEquals(1f, m.pose().escalaX, 1e-3f);
@@ -346,8 +375,9 @@ public class MotorAnimacaoTest {
             maisAlto = Math.min(maisAlto, caido.pose().deslocY);
             achatou = Math.min(achatou, caido.pose().escalaY);
         }
-        assertTrue("quicou: " + maisAlto, maisAlto < -5f);
-        assertTrue("achata mais que a aterrissagem comum: " + achatou, achatou < 0.9f);
+        assertTrue("quicou: " + maisAlto, maisAlto < -0.5f * caido.ajustes.alturaQuique);
+        assertTrue("achata mais que a aterrissagem comum: " + achatou,
+            achatou < 1f - caido.ajustes.achatarAterrissagem);
     }
 
     @Test
@@ -435,7 +465,7 @@ public class MotorAnimacaoTest {
             if (i == 59) descendo = m.pose().inclinacao;
             maisAlto = Math.max(maisAlto, m.pose().escalaY);
         }
-        assertTrue("esticou: " + maisAlto, maisAlto > 1.03f);
+        assertTrue("esticou: " + maisAlto, maisAlto > 1f + 0.5f * m.ajustes.esticarAr);
         assertTrue("subindo, para a frente: " + subindo, subindo > 1f);
         assertTrue("descendo, para trás: " + descendo, descendo < -1f);
 
@@ -502,7 +532,7 @@ public class MotorAnimacaoTest {
         float[] cabeca = reacao(Leitura.ALTO), corpo = reacao(Leitura.CORPO), pernas = reacao(Leitura.BAIXO);
         assertTrue("cabeça: tronco para trás", cabeca[0] < -3f);
         assertTrue("corpo: dobra para a frente " + corpo[0], corpo[0] > 2f);
-        assertTrue("corpo: encolhe", corpo[2] < 0.98f);
+        assertTrue("corpo: encolhe", corpo[2] < 1f - 0.5f * new Ajustes().dobrarCorpo);
         assertTrue("pernas: o tronco fica, os pés vão " + pernas[1], pernas[1] > 2f);
         assertEquals("pernas: sem girar", 0f, pernas[0], 0.5f);
     }
@@ -532,10 +562,11 @@ public class MotorAnimacaoTest {
     @Test
     public void golpesIguaisNaoReagemIgualMasOMesmoJogoSim() {
         float[] a = picosDeCincoGolpes(), b = picosDeCincoGolpes();
+        float padrao = new Ajustes().inclinacaoApanhando[2];
         java.util.Set<Float> diferentes = new java.util.HashSet<>();
         for (int i = 0; i < a.length; i++) {
             assertEquals(a[i], b[i], 0f);
-            assertTrue("perto do padrão: " + a[i], a[i] > 6f * 0.75f && a[i] < 6f * 1.25f);
+            assertTrue("perto do padrão: " + a[i], a[i] > padrao * 0.75f && a[i] < padrao * 1.25f);
             diferentes.add(Math.round(a[i] * 100f) / 100f);
         }
         assertTrue("variou", diferentes.size() >= 3);
@@ -573,7 +604,7 @@ public class MotorAnimacaoTest {
         }
         assertTrue("ombros caídos: " + m.pose().inclinacao, m.pose().inclinacao > 1f);
         assertTrue("idle mais lento: " + m.pose().ritmo, m.pose().ritmo < 0.85f);
-        assertTrue("respira: " + menor + ".." + maior, maior - menor > 0.008f);
+        assertTrue("respira: " + menor + ".." + maior, maior - menor > 0.6f * m.ajustes.respiracao);
         for (int i = 0; i < 300; i++) m.passo(parado("IDLE"));
         assertTrue("vida de volta, pose neutra", m.pose().neutra());
         assertEquals(1f, m.pose().ritmo, 1e-3f);
@@ -619,7 +650,7 @@ public class MotorAnimacaoTest {
             m.passo(agacha);
             menor = Math.min(menor, m.pose().escalaY);
         }
-        assertTrue("agachou: " + menor, menor < 0.97f);
+        assertTrue("agachou: " + menor, menor < 1f - 0.5f * m.ajustes.agacharPulo);
         Leitura sai = parado("JUMP");
         sai.noChao = false;
         sai.vy = -1492f;
