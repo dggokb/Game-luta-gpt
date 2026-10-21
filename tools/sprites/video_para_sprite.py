@@ -232,7 +232,8 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False)
+              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False,
+              balanco=1.0)
 
 
 def parser():
@@ -265,6 +266,9 @@ def parser():
                         "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo; "
                         "volta: como tronco, mas tira o avanço da volta inteira do loop (andar de um "
                         "passo só: a folha e o motor andam o mesmo e o loop emenda sem solavanco)")
+    p.add_argument("--balanco", type=float, default=1.0,
+                   help="com --fixar volta: quanto do vaivém do tronco no passo fica (1 = o do vídeo, "
+                        "0 = recua/avança constante; 0.5 = uma pausa do vídeo vira só uma freada)")
     p.add_argument("--pe-no-chao", action="store_true",
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
     p.add_argument("--reescala", type=lambda v: [float(x) for x in v.split(",")],
@@ -449,7 +453,9 @@ def main(argv=None):
         if nxt >= len(frames):
             raise SystemExit(f"--fixar volta: o vídeo acaba antes do quadro {nxt}")
         step = (torso_x(keyed_frame(nxt)) - xs[0]) / len(xs)
-        offsets = -step * np.arange(len(xs))
+        t = np.arange(len(xs))
+        sway = xs - xs[0] - step * t           # o vaivém do tronco em torno do avanço constante
+        offsets = -step * t - (1 - args.balanco) * sway
     elif args.fixar == "quadro":
         offsets = -(xs - xs[0])
     elif args.fixar == "registro":

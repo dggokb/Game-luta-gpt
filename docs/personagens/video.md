@@ -274,6 +274,8 @@ distância manda; `"velocidade": "video"` faz o lutador andar no chão na veloci
 (`fighter.walkSpeed` / `walkBackSpeed` no character.json), e o ciclo toca no tempo do vídeo.
 Andar de um passo só: use `"fixar": "volta"` nas opções, para a folha descontar o avanço da volta
 inteira (o mesmo que o motor anda); a reta do tronco não bate com ele e o loop dá um solavanco.
+`"balanco"` (0 a 1, padrão 1) diz quanto do vaivém do tronco no passo fica: com 0.5 uma pausa do
+vídeo vira uma freada, sem pular quadros.
 
 Personagem novo sem todos os vídeos: o `personagem.py` grava o pacote assim que o movimento
 inteiro existe (IDLE, andar, agachar, pulo, dash, backdash); golpe do pulo ou agachado sem vídeo

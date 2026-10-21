@@ -939,7 +939,7 @@ da manhã + p04–p12 da tarde, 375 ajustes) e o que precisou de acerto ao grava
   o backdash continua rápido, mas é curto e comprometido.
 - Andar próprio: `fighter.walkSpeed` / `walkBackSpeed` no character.json trocam a velocidade
   de andar no chão daquele lutador (no ritmo da arte de andar dele, pé plantado); no ar
-  continua a do motor. A p15 anda para frente a 62,2 u/s, a velocidade do vídeo dela.
+  continua a do motor. A p15 anda a 62,2 u/s para frente e 69,4 para trás, a velocidade dos vídeos dela.
 - O comando de especial ficou mais estrito (antes ~420 ms por passo e 550 ms para
   confirmar; agora 15 + 15 frames). Ajustável em `CombatConfig`.
 
