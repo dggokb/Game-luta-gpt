@@ -1,5 +1,5 @@
 {
-  "_doc": "Fator de aceleração dos vídeos deste personagem (tools/sprites/comportamento.py). velocidade/tempo no jogo = vídeo × fator. acelerarPorEstado: exceções.",
+  "_doc": "Fator de aceleração dos vídeos deste personagem (tools/sprites/comportamento.py). tempo no jogo = vídeo ÷ fator. acelerarPorEstado: exceções. velocidadePorEstado: velocidade de andar/correr = vídeo × fator, quando difere do tempo (o pé escorrega).",
   "acelerar": 3.0,
   "acelerarPorEstado": {
     "JUMP": 1.0,
@@ -7,7 +7,11 @@
     "IDLE": 1.0,
     "IDLE2": 1.0,
     "WALK_FORWARD": 1.0,
-    "WALK_BACK": 1.0,
+    "WALK_BACK": 1.5,
+    "DASH": 2.0
+  },
+  "velocidadePorEstado": {
+    "WALK_FORWARD": 1.5,
     "DASH": 1.0
   }
 }

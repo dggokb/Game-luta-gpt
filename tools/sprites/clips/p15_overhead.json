@@ -23,17 +23,14 @@
     "colunas": 10,
     "limpar_chao": true,
     "ancorar_pe": true,
-    "densidade": 2,
-    "nitidez": true,
     "contorno": true
   },
-  "frameWidth": 384,
-  "frameHeight": 640,
-  "rootX": 174,
-  "rootY": 604,
+  "frameWidth": 192,
+  "frameHeight": 320,
+  "rootX": 87,
+  "rootY": 302,
   "quadrosAMao": "→ + M (M_BAIXO.mp4): q39-q42 têm o arco branco desenhado pelo vídeo; a batida vai de q38 (punho em cima) direto a q43 (punho na cintura, impacto). Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
   "animacao": {
     "impactFrame": 11
-  },
-  "pixelScale": 2.0
+  }
 }

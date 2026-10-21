@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_walk_back.webp",
   "report": "tools/sprites/reports/p15_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p15_walk_back-import.png",
-  "expectedFrames": 14,
+  "expectedFrames": 28,
   "segmentation": "prepared-grid",
   "columns": 9,
   "rootMode": "authored",
@@ -16,7 +16,7 @@
     "personagem": "p15",
     "escala": 0.5481,
     "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "21,23,25,27,29,31,33,35,37,39,41,43,45,47",
+    "quadros": "21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48",
     "celula": 288,
     "largura": 224,
     "raiz": "104,270",
@@ -24,14 +24,11 @@
     "fixar": "registro",
     "pe_no_chao": true,
     "limpar_chao": true,
-    "densidade": 2,
-    "nitidez": true,
     "contorno": true
   },
-  "frameWidth": 448,
-  "frameHeight": 576,
-  "rootX": 208,
-  "rootY": 540,
-  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q47, alinhados por registro. Quadros de 2 em 2 (ou todos, no pulo) para ter pelo menos 24 qps no jogo.",
-  "pixelScale": 2.0
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 104,
+  "rootY": 270,
+  "quadrosAMao": "No meio do andar para trás ela vira o tronco de frente para a câmera; alinhado pelo tronco (padrão) o corpo derivava até 35 px (harmonia). Mesmos quadros q21-q48, alinhados por registro. Todos os quadros do vídeo (24 qps): de 2 em 2 ficava a 12 qps no tempo real, picotado."
 }

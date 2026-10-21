@@ -80,8 +80,9 @@ def main():
     p.add_argument('pasta')
     p.add_argument('clipe', help='nome do clipe (ex.: special_s4)')
     p.add_argument('partes', nargs='*', help='VÍDEO:INÍCIO-FIM[:PASSO], na ordem')
-    p.add_argument('--densidade', type=int, default=2)
+    p.add_argument('--densidade', type=int, help='padrão: a da receita (ou 2)')
     p.add_argument('--sem-contorno', action='store_true')
+    p.add_argument('--sem-nitidez', action='store_true', help='sem o unsharp mask (padrão: o da receita)')
     args = p.parse_args()
     char = args.personagem
     path = clip_path(char, args.clipe)
@@ -89,8 +90,11 @@ def main():
     parts = [parse_part(t) for t in args.partes] if args.partes else cfg.get('partes')
     if not parts:
         raise SystemExit('informe as partes (VÍDEO:INÍCIO-FIM)')
-    d = args.densidade
-    extra = ['--nitidez'] + ([] if args.sem_contorno else ['--contorno'])
+    old = cfg.get('video', {})
+    d = args.densidade or old.get('densidade', 2)
+    nitidez = not args.sem_nitidez and old.get('nitidez', True)
+    contorno = not args.sem_contorno and old.get('contorno', True)
+    extra = (['--nitidez'] if nitidez else []) + (['--contorno'] if contorno else [])
     # Linha do chão: o pé no 1º quadro da 1ª parte (no vídeo); as outras usam a mesma.
     chao = int(analyse(str(Path(args.pasta) / parts[0]['arquivo']))['info'][0, 0])
     frames, escala, medida = [], None, None
@@ -128,11 +132,13 @@ def main():
                rootX=root[0] * d, rootY=root[1] * d, pixelScale=float(d),
                sourceNote=f'{char} emendado de {len(parts)} vídeos (Omni Flash 1.1) por tools/sprites/emendar.py; '
                           f'refazer com emendar.py (não com video_para_sprite.py --clipe).')
+    if d == 1:  # 1x: sem pixelScale, como o video_para_sprite.py
+        cfg.pop('pixelScale', None)
     cfg['video'] = {'arquivo': first['arquivo'], 'personagem': char, 'escala': round(escala, 4),
                     'medida': medida_padrao(medida),
                     'quadros': ','.join(map(str, first['quadros'])), 'celula': h, 'largura': w,
                     'raiz': f'{root[0]},{root[1]}', 'colunas': cols, 'fixar': 'registro', 'densidade': d,
-                    'nitidez': True, 'contorno': not args.sem_contorno, 'chao': chao}
+                    'nitidez': nitidez, 'contorno': contorno, 'chao': chao}
     cfg['partes'] = [{'arquivo': part['arquivo'], 'quadros': part['quadros']} for part in parts]
     cfg['partesInicio'] = [sum(len(q['quadros']) for q in parts[:i]) for i in range(len(parts))]
     keep_anchor = json.loads(path.read_text(encoding='utf-8')).get('video', {}).get('ancorar_pe')

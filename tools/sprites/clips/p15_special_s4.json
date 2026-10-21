@@ -15,7 +15,6 @@
   "frameHeight": 384,
   "rootX": 172,
   "rootY": 357,
-  "pixelScale": 1.0,
   "video": {
     "arquivo": "s4.mp4",
     "personagem": "p15",
@@ -28,7 +27,7 @@
     "colunas": 11,
     "fixar": "registro",
     "densidade": 1,
-    "nitidez": true,
+    "nitidez": false,
     "contorno": true,
     "chao": 645
   },

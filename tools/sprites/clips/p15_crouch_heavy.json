@@ -22,14 +22,11 @@
     "raiz": "92,260",
     "colunas": 10,
     "limpar_chao": true,
-    "densidade": 2,
-    "nitidez": true,
     "contorno": true
   },
-  "frameWidth": 384,
-  "frameHeight": 576,
-  "rootX": 184,
-  "rootY": 520,
-  "pixelScale": 2.0,
+  "frameWidth": 192,
+  "frameHeight": 288,
+  "rootX": 92,
+  "rootY": 260,
   "quadrosAMao": "2H: o vídeo para com o punho no alto; ida q12-q32 e volta pelos mesmos quadros (comportamento.py)."
 }

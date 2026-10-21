@@ -8,8 +8,10 @@ verdade do movimento, e o tempo pode ser acelerado. Nada vem do p01.
 Rode depois do personagem.py (que converte os clipes) e antes do build_characters.py --write.
 
 O fator de aceleração fica em tools/sprites/comportamento/<id>.json ("acelerar", com
-exceções por estado em "acelerarPorEstado"); o vídeo do Omni Flash enche 4 s, então andar,
-correr e golpe saem em câmera lenta e são acelerados; o pulo já sai no tempo de luta.
+exceções por estado em "acelerarPorEstado"); o vídeo do Omni Flash enche 4 s, então os
+golpes saem em câmera lenta e são acelerados. "velocidadePorEstado" (andar e correr) separa a
+velocidade de deslocamento do tempo da animação, quando o vídeo anda pouco chão: o pé escorrega
+na proporção velocidade ÷ tempo.
 
 O que é gravado em characters/<id>/character.json:
 
@@ -271,6 +273,8 @@ def plan(char, folder):
         write(path, DEFAULT)
     cfg = read(path)
     acc = lambda state: cfg.get('acelerarPorEstado', {}).get(state, cfg['acelerar'])  # noqa: E731
+    # Velocidade de deslocamento (andar e correr): igual ao tempo, salvo exceção (o pé escorrega).
+    vel = lambda state: cfg.get('velocidadePorEstado', {}).get(state, acc(state))  # noqa: E731
     pack_path = ROOT / f'characters/{char}/character.json'
     pack = read(pack_path)
     world = read(ROOT / f"tools/sprites/profiles/{pack['profile']}")['worldScale']
@@ -282,12 +286,14 @@ def plan(char, folder):
     for state, field, curve in (('WALK_FORWARD', 'walkSpeed', 'walkStepSeconds'),
                                 ('WALK_BACK', 'walkBackSpeed', 'walkBackStepSeconds')):
         steps, seconds = walk(clip(state.lower()), folder, acc(state))
+        steps = [round(v * vel(state) / acc(state), 2) for v in steps]
         anims[state]['distancias'] = steps
         anims[state]['distancePerFrame'] = round(sum(steps) / len(steps), 2)
         mv[field] = round(sum(steps) / sum(seconds), 1)  # média (no ar e para a CPU)
         mv[curve] = seconds
         report[state] = (f'{mv[field]} u/s em média, de {min(steps) / seconds[0]:.0f} a '
-                         f'{max(steps) / seconds[0]:.0f} u/s (arrancadas do vídeo; fator {acc(state)})')
+                         f'{max(steps) / seconds[0]:.0f} u/s (arrancadas do vídeo; fator {acc(state)}'
+                         + (f', velocidade × {vel(state)}' if vel(state) != acc(state) else '') + ')')
 
     # Corrida: o loop do vídeo no tempo dele ÷ fator; a velocidade é a do corpo no vídeo.
     c, f = clip('dash'), acc('DASH')
@@ -295,9 +301,10 @@ def plan(char, folder):
     end = c.q[-1] + step
     dist = abs(c.x(end) - c.x(c.q[0])) * c.k
     seconds = (end - c.q[0]) / VIDEO_FPS / f
-    mv['dashSpeed'] = round(dist / seconds, 1)
+    mv['dashSpeed'] = round(dist / seconds * vel('DASH') / f, 1)
     anims['DASH']['durationsMs'] = [ms(step, f)] * len(c.q)
-    report['DASH'] = f"{mv['dashSpeed']} u/s, ciclo de {seconds:.2f} s (fator {f})"
+    report['DASH'] = (f"{mv['dashSpeed']} u/s, ciclo de {seconds:.2f} s (fator {f}"
+                      + (f", velocidade × {vel('DASH')}" if vel('DASH') != f else '') + ')')
 
     # Backdash: o salto inteiro do clipe; a recuperação é o resto até o corpo parar no vídeo.
     c, f = clip('backdash'), acc('BACKDASH')
@@ -420,6 +427,7 @@ def plan(char, folder):
         'acelerar': {s: acc(s) for s in ('IDLE', 'IDLE2', 'WALK_FORWARD', 'WALK_BACK', 'DASH', 'BACKDASH', 'JUMP', 'FALL', 'LAND',
                                          'CROUCH', 'RISE', 'L', 'M', 'H', '6M', '2L', '2M', '2H', 'S', 'S2', 'S3',
                                          'S4')},
+        'velocidade': {s: vel(s) for s in ('WALK_FORWARD', 'WALK_BACK', 'DASH') if vel(s) != acc(s)},
         'medidas': report,
     }
     return pack_path, pack, mv, report

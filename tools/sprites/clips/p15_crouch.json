@@ -21,13 +21,10 @@
     "largura": 192,
     "raiz": "86,270",
     "limpar_chao": true,
-    "densidade": 2,
-    "nitidez": true,
     "contorno": true
   },
-  "frameWidth": 384,
-  "rootX": 172,
-  "frameHeight": 576,
-  "rootY": 540,
-  "pixelScale": 2.0
+  "frameWidth": 192,
+  "rootX": 86,
+  "frameHeight": 288,
+  "rootY": 270
 }

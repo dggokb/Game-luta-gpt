@@ -23,13 +23,10 @@
     "colunas": 9,
     "limpar_chao": true,
     "ancorar_pe": true,
-    "densidade": 2,
-    "nitidez": true,
     "contorno": true
   },
-  "frameWidth": 448,
-  "frameHeight": 576,
-  "rootX": 180,
-  "rootY": 540,
-  "pixelScale": 2.0
+  "frameWidth": 224,
+  "frameHeight": 288,
+  "rootX": 90,
+  "rootY": 270
 }
