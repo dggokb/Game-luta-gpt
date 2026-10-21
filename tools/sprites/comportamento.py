@@ -286,7 +286,10 @@ def plan(char, folder):
     for state, field, curve in (('WALK_FORWARD', 'walkSpeed', 'walkStepSeconds'),
                                 ('WALK_BACK', 'walkBackSpeed', 'walkBackStepSeconds')):
         steps, seconds = walk(clip(state.lower()), folder, acc(state))
-        steps = [round(v * vel(state) / acc(state), 2) for v in steps]
+        # Chão a mais que o vídeo: somado por igual em todo quadro (multiplicar exagerava as
+        # arrancadas e as paradas do vídeo num tranco).
+        extra = (vel(state) / acc(state) - 1) * sum(steps) / len(steps)
+        steps = [round(v + extra, 2) for v in steps]
         anims[state]['distancias'] = steps
         anims[state]['distancePerFrame'] = round(sum(steps) / len(steps), 2)
         mv[field] = round(sum(steps) / sum(seconds), 1)  # média (no ar e para a CPU)
