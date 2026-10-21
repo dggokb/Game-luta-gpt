@@ -3,10 +3,14 @@ import sys
 import unittest
 from pathlib import Path
 
-import numpy as np
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import montagem
+try:  # numpy e opencv vêm com as ferramentas de autoria; a CI instala só o Pillow
+    import numpy as np
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import montagem
+except ModuleNotFoundError as missing:
+    if missing.name not in ('numpy', 'cv2'):
+        raise
+    raise unittest.SkipTest('numpy/opencv only in the authoring tools')
 
 
 class MontagemTests(unittest.TestCase):
