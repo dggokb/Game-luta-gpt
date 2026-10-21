@@ -14,16 +14,16 @@ final class ImpactFeel {
     static final float[] ZOOM = {0f, 0.012f, 0.025f, 0.05f};
     static final float PUNISH_ZOOM = 0.07f, KO_ZOOM = 0.09f;
     /**
-     * Mola da volta do zoom (motion-core): o soco entra seco, volta passando um pouco do
-     * enquadramento normal (a câmera "respira" para trás) e assenta em ~3/4 de segundo.
+     * Mola da volta do zoom (motion-core): o soco entra seco e volta firme ao enquadramento
+     * normal, sem balançar.
      */
-    static final Mola ZOOM_SPRING = new Mola(3.2f, 0.45f);
+    static final Mola ZOOM_SPRING = new Mola(3.2f, 0.75f);
     /**
      * Tranco da tela no sentido do golpe (pixels da tela) por tamanho (LIGHT, MEDIUM, HEAVY,
-     * SPECIAL): vai e volta por mola, balançando um pouco.
+     * SPECIAL): vai e volta por mola, firme.
      */
     static final float[] KICK = {0f, 4f, 9f, 14f};
-    static final Mola KICK_SPRING = new Mola(4f, 0.4f);
+    static final Mola KICK_SPRING = new Mola(4.5f, 0.75f);
     /** Cenário escurecido (alfa 0..255) e quantos quadros dura, por tamanho de golpe. */
     static final int[] DARK = {0, 0, 70, 100};
     static final int[] DARK_FRAMES = {0, 0, 3, 4};
