@@ -8,10 +8,11 @@
     "IDLE2": 1.0,
     "WALK_FORWARD": 1.0,
     "WALK_BACK": 1.5,
-    "DASH": 2.0
+    "DASH": 1.0
   },
   "velocidadePorEstado": {
-    "WALK_FORWARD": 1.5,
-    "DASH": 1.0
+    "WALK_FORWARD": 2.5,
+    "WALK_BACK": 2.25,
+    "DASH": 3.0
   }
 }
