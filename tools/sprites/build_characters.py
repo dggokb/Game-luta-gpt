@@ -515,12 +515,13 @@ def compile_packs(root, results):
         raise ValueError('Default character must match initial team slot')
     # Duplas que o botão DUPLA percorre; a primeira é o time inicial.
     teams = roster.get('teams', [roster['team']])
-    if teams[0] != roster['team'] or any(len(t) != 2 or len(set(t)) != 2 or any(c not in ids for c in t) for t in teams):
-        raise ValueError('Roster teams must start with the team and list pairs of two different known characters')
+    # Versão leve (só o p01): a dupla pode ser o mesmo personagem duas vezes.
+    if teams[0] != roster['team'] or any(len(t) != 2 or any(c not in ids for c in t) for t in teams):
+        raise ValueError('Roster teams must start with the team and list pairs of known characters')
     # Tela de seleção: quem pode ser escolhido (padrão: todos que aparecem nas duplas).
     selectable = roster.get('selectable') or list(dict.fromkeys(c for t in teams for c in t))
-    if len(selectable) < 2 or len(set(selectable)) != len(selectable) or any(c not in ids for c in selectable):
-        raise ValueError('Roster selectable lists at least two different known characters')
+    if not selectable or len(set(selectable)) != len(selectable) or any(c not in ids for c in selectable):
+        raise ValueError('Roster selectable lists known characters, without repeats')
     write_states(root)
     q = json.dumps
     f = lambda v: f'{float(v):.8f}f'

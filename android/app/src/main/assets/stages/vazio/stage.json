@@ -1,0 +1,14 @@
+{
+  "nome": "Vazio",
+  "camera": {
+    "distancia": 1000,
+    "horizonte": 0.4
+  },
+  "corFundo": "#20232A",
+  "camadas": [],
+  "chao": {
+    "imagem": "chao.png",
+    "perto": -420,
+    "longe": 560
+  }
+}
