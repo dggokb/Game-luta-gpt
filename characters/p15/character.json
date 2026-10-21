@@ -89,7 +89,7 @@
       "move": "M"
     },
     "comboStyle": "equilibrado",
-    "walkSpeed": 57.0
+    "walkSpeed": 59.2
   },
   "animations": {
     "IDLE": {
@@ -305,21 +305,10 @@
         23,
         24,
         25,
-        26,
-        27,
-        28,
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37
+        26
       ],
       "loop": true,
-      "distancePerFrame": 4.75
+      "distancePerFrame": 4.93
     },
     "WALK_BACK": {
       "atlas": "p15_walk_back",
