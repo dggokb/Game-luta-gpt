@@ -1,5 +1,8 @@
 package com.gamelutagpt;
 
+import com.gamelutagpt.motion.Canal;
+import com.gamelutagpt.motion.Mola;
+
 /**
  * Fight camera: zooms out to keep both fighters in frame, keeps the ground near the
  * same screen height and follows a Super Jump vertically. Pure math, unit-testable.
@@ -13,9 +16,27 @@ final class CameraRig {
     static final float CAMERA_BOTTOM_MARGIN_SCREEN = 45f;
     static final float GROUND_CAMERA_TOP = 72f;
 
+    /** Quanto a câmera se adianta para o lado de quem corre (pixels do mundo). */
+    static final float CAMERA_RUN_LEAD = 60f;
+
     float x = 700f;
     float top = GROUND_CAMERA_TOP;
     float zoom = CAMERA_ZOOM;
+    /** Adiantamento atual: vai e volta por mola (motion-core), sem tranco. */
+    private final Canal lead = new Canal(Mola.PESADA);
+    private int leadFrame;
+
+    /**
+     * Um passo do adiantamento: {@code runDirection} é a soma de quem corre (+1 direita, -1
+     * esquerda; os dois correndo um para o outro se anulam). Só apresentação.
+     */
+    void updateLead(int runDirection) {
+        lead.alvo(++leadFrame, runDirection * CAMERA_RUN_LEAD * 0.5f);
+        lead.limpar(leadFrame);
+    }
+
+    /** O adiantamento agora, para somar ao x da câmera no desenho. */
+    float lead() { return lead.valor(leadFrame); }
 
     /**
      * Called by the fight shell. After either fighter is KO, the horizontal focus

@@ -28,6 +28,9 @@ public final class Pose {
      */
     public float smear, smearEsticar;
 
+    /** Velocidade do clipe parado (o idle): abaixo de 1 o lutador cansado respira mais devagar. */
+    public float ritmo = 1f;
+
     /** Eventos do passo para as partículas do chão: força da poeira (0 = nenhuma). */
     public float poeira;
     /** O pé desliza no chão neste passo: direção do deslize no mundo (1 direita, -1 esquerda; 0 = não). */
@@ -56,7 +59,7 @@ public final class Pose {
     }
 
     void neutralizar() {
-        escalaX = escalaY = 1f;
+        escalaX = escalaY = ritmo = 1f;
         inclinacao = arrasto = deslocX = deslocY = 0f;
         smear = smearEsticar = poeira = 0f;
         deslize = 0;

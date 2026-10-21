@@ -119,6 +119,17 @@ final class CombatConfig {
     // Sized for the 226-unit P01 (the 156-unit version used 1030 / 1.70 / 2.00, apex ~182):
     // speed and gravity scale by 226/156, so the cadence stays and only the height grows.
     float jumpSpeed = 1492f;
+    /**
+     * Preparação do pulo do chão (jump squat): quadros agachando antes de sair do chão, sem
+     * golpe, dash nem andar (a corrida segue no embalo). O pulo que cancela um golpe sai na hora
+     * (as rotas de combo não mudam). 0 = pula no quadro do comando.
+     */
+    int jumpSquatFrames = 3;
+    /**
+     * Aterrissagem do pulo vazio (sem golpe no ar): quadros sem golpe, pulo, dash nem andar ao
+     * tocar o chão (defender pode). O golpe aéreo que aterrissa continua livre na hora.
+     */
+    int jumpLandingFrames = 3;
     float normalJumpRisingGravityScale = 2.463f;
     float normalJumpFallingGravityScale = 2.897f;
     float superJumpSpeed = 1450f;

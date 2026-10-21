@@ -15,7 +15,11 @@ no treino; o botão do topo (◀ MENU) abre a pausa, e REINICIAR LUTA começa de
 quadros desenhados, com molas de forma fechada: achatar/esticar mantendo o volume, virada,
 quique da queda, antecipação e continuidade dos golpes, smear nos fortes, arrasto e poeira no
 dash, arco e esticar no ar, inclinação no impacto, mola por peso do golpe e do personagem,
-soco de câmera por mola, transição curta e rastro no dash/backdash e no pulo da corrida.
+soco de câmera por mola, transição curta e rastro no dash/backdash e no pulo da corrida;
+acertar trava e errar passa do ponto, reação pela altura do golpe, variação, cansaço com pouca
+vida, defesa pesada, sombra de contato, tranco da tela com direção e câmera adiantada na
+corrida. No motor de combate: preparação do pulo (3 quadros) e aterrissagem do pulo vazio
+(3 quadros), as duas desligáveis no `CombatConfig`.
 Quadros intermediários fora do jogo: `tools/sprites/intermediarios.py`. Botão **ANIM** (ou **F4**): 100% → 150% → 50% → desligado.
 Revisão lado a lado no PC: `gradle :pc:revisarAnimacao`. Como funciona e como levar para a
 sprite-gpt: [docs/motor-animacao.md](docs/motor-animacao.md).

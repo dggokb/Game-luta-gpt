@@ -65,16 +65,37 @@ final class AnimacaoLutador {
         // dash. O pulo que sai da corrida leva o embalo (e o rastro); o super pulo não.
         l.dash = (f.grounded && (f.forwardDashing || f.backdashFrames > 0)) || f.airDashFrames > 0;
         l.embalo = !f.grounded && f.jumpMode == CombatFighter.PULO_CORRIDA;
+        l.preparandoPulo = f.jumpSquat > 0;
+        l.vida = f.state.life / (float)Math.max(1, f.state.profile.maxLife);
         l.peso = f.character().fighter.animationWeight;
         l.congelado = f.frozen() || engine.superFreezeActive();
         for (CombatEngine.HitEvent e : engine.events()) {
-            if (e.defender != f.index || engine.fighter(f.index) != f) continue;
+            if (engine.fighter(f.index) != f) continue;
+            // O golpe dele encostou (acertou ou foi defendido): o corpo trava no rival.
+            if (e.attacker == f.index && !e.projectile) l.acertou = true;
+            if (e.defender != f.index) continue;
             CombatFighter quemBate = engine.fighter(e.attacker);
             l.empurrao = f.x >= quemBate.x ? 1 : -1;
-            if (e.blocked) l.defendeu = true;
-            else l.apanhou = Math.max(l.apanhou, e.strength != null ? peso(e.strength) : 1);
+            int forca = e.strength != null ? peso(e.strength) : 1;
+            if (e.blocked) {
+                l.defendeu = true;
+                l.pesoDefendido = Math.max(l.pesoDefendido, forca);
+            } else {
+                l.apanhou = Math.max(l.apanhou, forca);
+                l.alturaGolpe = altura(f, e.impactY);
+            }
         }
         motor.passo(l);
+    }
+
+    /**
+     * Onde o golpe pegou, pela altura do ponto de contato no corpo de quem apanhou: acima de
+     * 70% da altura é a cabeça, abaixo de 35% as pernas (sem ponto de contato: a cabeça).
+     */
+    private static int altura(CombatFighter f, float impactY) {
+        if (Float.isNaN(impactY)) return Leitura.ALTO;
+        float h = (f.y - impactY) / Math.max(1f, f.character().visualStandHeight);
+        return h > 0.7f ? Leitura.ALTO : h < 0.35f ? Leitura.BAIXO : Leitura.CORPO;
     }
 
     /** 0 fraco, 1 médio, 2 forte, 3 especial ou Super. */

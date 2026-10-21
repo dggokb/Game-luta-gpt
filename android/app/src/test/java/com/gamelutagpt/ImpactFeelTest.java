@@ -17,6 +17,22 @@ public class ImpactFeelTest {
         assertEquals("back to the normal framing", 1f, heavy.zoom(), 0.001f);
     }
 
+    @Test public void strongBlowsKickTheScreenAlongTheHitAndItSettles() {
+        ImpactFeel f = new ImpactFeel();
+        f.kick(-1, ImpactEffects.HEAVY);
+        float most = 0f;
+        for (int i = 0; i < 12; i++) {
+            f.step();
+            most = Math.min(most, f.kickX());
+        }
+        assertTrue("goes the way of the hit: " + most, most < -5f);
+        for (int i = 0; i < 60; i++) f.step();
+        assertEquals("settles", 0f, f.kickX(), 0.05f);
+        f.kick(1, ImpactEffects.LIGHT);
+        f.step();
+        assertEquals("a jab does not kick", 0f, f.kickX(), 0f);
+    }
+
     @Test public void onlyStrongBlowsDarkenTheStageAndOnlyForAMoment() {
         ImpactFeel f = new ImpactFeel();
         f.onHit(0f, 0f, ImpactEffects.MEDIUM, false, false);

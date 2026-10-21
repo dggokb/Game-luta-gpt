@@ -26,6 +26,10 @@ public final class Leitura {
     public boolean golpeAtivo;
     /** O golpe próprio está na preparação (antes da janela ativa): a antecipação. */
     public boolean preparando;
+    /** O golpe próprio encostou no rival neste passo (acertou ou foi defendido). */
+    public boolean acertou;
+    /** Agachando para pular (a preparação do pulo, antes de sair do chão). */
+    public boolean preparandoPulo;
     /** Peso do golpe próprio: 0 fraco, 1 médio, 2 forte, 3 especial/Super. */
     public int forca;
     /** Correndo ou no air dash (para a frente ou para trás). */
@@ -34,8 +38,14 @@ public final class Leitura {
     public boolean embalo;
     /** Levou um golpe neste passo: o peso dele (0 a 3), ou -1. */
     public int apanhou = -1;
-    /** Defendeu um golpe neste passo. */
+    /** Onde o golpe recebido pegou: {@link #ALTO} (cabeça), {@link #CORPO} ou {@link #BAIXO} (pernas). */
+    public int alturaGolpe;
+    public static final int ALTO = 0, CORPO = 1, BAIXO = 2;
+    /** Defendeu um golpe neste passo, e o peso dele (0 a 3). */
     public boolean defendeu;
+    public int pesoDefendido;
+    /** Vida que sobra (0 a 1): com pouca, o lutador cansa. */
+    public float vida = 1f;
     /** Direção (no mundo) para onde o golpe recebido ou defendido empurra: 1 direita, -1 esquerda. */
     public int empurrao;
     /**
@@ -49,6 +59,9 @@ public final class Leitura {
     /** Limpa os eventos de um passo (o resto é estado e o dono reescreve). */
     public void limparEventos() {
         apanhou = -1;
+        alturaGolpe = ALTO;
         defendeu = false;
+        pesoDefendido = 0;
+        acertou = false;
     }
 }

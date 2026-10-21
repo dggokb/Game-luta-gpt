@@ -33,6 +33,8 @@ public class ControleNoArTest {
             in[0].direction = direcao;
             if (superPulo) in[0].superJump = true; else in[0].jump = true;
             step();
+            // A preparação do pulo (jump squat): agacha alguns quadros antes de sair do chão.
+            steps(config().jumpSquatFrames);
             assertFalse("saiu do chão", p().grounded);
         }
     }
