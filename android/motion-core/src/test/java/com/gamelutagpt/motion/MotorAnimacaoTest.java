@@ -17,7 +17,7 @@ public class MotorAnimacaoTest {
         l.olhando = 1;
         l.clipe = clipe;
         l.quadro = 0;
-        l.golpe = l.atingido = l.golpeAtivo = l.dash = l.congelado = false;
+        l.golpe = l.atingido = l.golpeAtivo = l.dash = l.embalo = l.congelado = false;
         l.forca = 0;
         return l;
     }
@@ -166,17 +166,16 @@ public class MotorAnimacaoTest {
     }
 
     @Test
-    public void golpeForteDeixaRastroQueSome() {
+    public void dashDeixaRastroQueSome() {
         MotorAnimacao m = new MotorAnimacao();
         m.passo(parado("IDLE"));
         for (int i = 0; i < 6; i++) {
-            Leitura h = parado("HEAVY_STRAIGHT");
-            h.golpe = true;
-            h.golpeAtivo = true;
-            h.forca = 2;
-            h.quadro = i;
-            h.x = 100f + i * 10f;
-            m.passo(h);
+            Leitura d = parado("DASH");
+            d.dash = true;
+            d.vx = 620f;
+            d.quadro = i;
+            d.x = 100f + i * 10f;
+            m.passo(d);
         }
         Pose p = m.pose();
         assertTrue("tem cópias", p.fantasmas >= 2);
@@ -189,15 +188,39 @@ public class MotorAnimacaoTest {
     }
 
     @Test
-    public void golpeFracoNaoDeixaRastro() {
-        MotorAnimacao m = new MotorAnimacao();
+    public void puloComEmbaloDaCorridaDeixaRastroEPuloComumNao() {
+        MotorAnimacao comEmbalo = new MotorAnimacao(), comum = new MotorAnimacao();
         for (int i = 0; i < 6; i++) {
-            Leitura jab = parado("LIGHT_JAB");
-            jab.golpe = jab.golpeAtivo = true;
-            jab.forca = 0;
-            m.passo(jab);
+            Leitura a = parado("JUMP");
+            a.noChao = false;
+            a.embalo = true;
+            comEmbalo.passo(a);
+            Leitura b = parado("JUMP");
+            b.noChao = false;
+            comum.passo(b);
         }
-        assertEquals(0, m.pose().fantasmas);
+        assertTrue(comEmbalo.pose().fantasmas >= 2);
+        assertEquals(0, comum.pose().fantasmas);
+    }
+
+    @Test
+    public void golpeSoDeixaRastroSeLigarNosGolpes() {
+        MotorAnimacao padrao = new MotorAnimacao();
+        Ajustes nosGolpes = new Ajustes();
+        nosGolpes.rastroNosGolpes = true;
+        MotorAnimacao ligado = new MotorAnimacao(nosGolpes);
+        for (int i = 0; i < 6; i++) {
+            Leitura h = parado("HEAVY_STRAIGHT");
+            h.golpe = h.golpeAtivo = true;
+            h.forca = 2;
+            padrao.passo(h);
+            Leitura h2 = parado("HEAVY_STRAIGHT");
+            h2.golpe = h2.golpeAtivo = true;
+            h2.forca = 2;
+            ligado.passo(h2);
+        }
+        assertEquals("padrão: golpe não deixa rastro", 0, padrao.pose().fantasmas);
+        assertTrue(ligado.pose().fantasmas >= 2);
     }
 
     @Test

@@ -12,7 +12,8 @@ modo história, menu inicial, Arcade, tutorial, seleção, narrador e demos. O a
 no treino; o botão do topo (◀ MENU) abre a pausa, e REINICIAR LUTA começa de novo.
 
 **Motor de animação** (`android/motion-core`): achatar/esticar no pulo, inclinação no impacto e
-na corrida, estalo do golpe, transição curta entre clipes e rastro, com molas de forma fechada,
+na corrida, estalo do golpe, transição curta entre clipes e rastro no dash/backdash e no pulo
+da corrida, com molas de forma fechada,
 por cima dos quadros desenhados. Botão **ANIM** (ou **F4**): 100% → 150% → 50% → desligado.
 Revisão lado a lado no PC: `gradle :pc:revisarAnimacao`. Como funciona e como levar para a
 sprite-gpt: [docs/motor-animacao.md](docs/motor-animacao.md).

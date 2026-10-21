@@ -40,9 +40,11 @@ public final class Ajustes {
     public int quadrosTransicao = 2;
     public float alfaTransicao = 0.35f;
 
-    /** Cópias translúcidas atrás do golpe forte, do especial e do dash. */
+    /** Cópias translúcidas atrás do dash, do backdash e do pulo com embalo da corrida. */
     public boolean rastro = true;
-    /** Peso mínimo do golpe para deixar rastro (2 = forte). */
+    /** Rastro também nos golpes (desligado: só nos deslocamentos rápidos). */
+    public boolean rastroNosGolpes = false;
+    /** Peso mínimo do golpe para deixar rastro, com {@link #rastroNosGolpes} (2 = forte). */
     public int forcaRastro = 2;
     /** Uma cópia a cada tantos quadros, quantas no máximo e quanto cada uma vive. */
     public int intervaloRastro = 2, copiasRastro = 3, vidaRastro = 8;

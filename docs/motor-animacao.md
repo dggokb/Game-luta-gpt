@@ -15,7 +15,7 @@ ferramenta de revisão confere que o estado da luta sai igual com o motor ligado
 | Inclinação de corrida | dash e air dash para a frente; para trás no backdash | 4° |
 | Estalo | quando o golpe próprio fica ativo, um tranco curto de esticar na horizontal | 1,5% a 4,5% |
 | Transição | troca de clipe fora de golpes, reações, decolagem e aterrissagem: o quadro de antes some em 2 quadros | 35% |
-| Rastro | golpe forte, especial, Super e dashes: até 3 cópias azuladas onde o lutador estava | 35%, vivem 8 quadros |
+| Rastro | só nos dois para a frente e dois para trás (dash, backdash e air dash) e no pulo que sai da corrida; o super pulo e os golpes não deixam (`rastroNosGolpes` liga nos golpes) | até 3 cópias azuladas, 35%, vivem 8 quadros |
 
 Tudo com os pés parados (a raiz é o pivô) e o "para a frente" segue para onde o lutador olha.
 
@@ -59,8 +59,8 @@ ffmpeg -framerate 60 -i pc/build/revisao-animacao/desligado/%04d.png \
        -filter_complex hstack -pix_fmt yuv420p lado-a-lado.mp4
 ```
 
-O roteiro (`RevisaoAnimacao`) joga 380 quadros: pulo parado, dash, L > M > H no CPU, backdash e
-pulo para a frente. Os dois `estado.txt` têm de ser iguais (o motor não mexe na luta).
+O roteiro (`RevisaoAnimacao`) joga 560 quadros: pulo parado, dash, L > M > H no CPU, backdash,
+pulo para a frente, pulo saído da corrida e super pulo. Os dois `estado.txt` têm de ser iguais (o motor não mexe na luta).
 `-Pmodos=desligado,ligado` escolhe as pastas (um nome que começa com "ligado" liga o motor).
 
 ## Levar para a sprite-gpt

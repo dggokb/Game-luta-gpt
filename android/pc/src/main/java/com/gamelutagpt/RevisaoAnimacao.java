@@ -15,14 +15,14 @@ import javax.imageio.ImageIO;
 
 /**
  * Revisão do motor de animação: o mesmo roteiro de luta (pulo, dash, L > M > H no CPU,
- * backdash, pulo para a frente) jogado quadro a quadro, sem tela, com o motor desligado e
+ * backdash, pulo para a frente, pulo saído da corrida e super pulo) jogado quadro a quadro, sem tela, com o motor desligado e
  * ligado. Os quadros saem em PNG para comparar lado a lado (e virar vídeo com o ffmpeg).
  *
  * <pre>gradle :pc:revisarAnimacao   →   pc/build/revisao-animacao/{desligado,ligado}/0000.png</pre>
  */
 public final class RevisaoAnimacao {
     /** Quadros do roteiro (60 por segundo). */
-    static final int QUADROS = 380;
+    static final int QUADROS = 560;
     /** Tamanho dos PNGs (metade da tela virtual). */
     static final int LARGURA = 960, ALTURA = 540;
 
@@ -98,6 +98,18 @@ public final class RevisaoAnimacao {
         if (q == 300) colocar(p, cpu, 400f, 900f);
         if (q == 302) pad.setDirection(8);
         if (q == 305) pad.setDirection(0);
+        // Pulo saído da corrida (→ → e ↗): leva o embalo e o rastro.
+        if (q == 380) colocar(p, cpu, 250f, 1100f);
+        if (q == 382) pad.setDirection(1);
+        if (q == 385) pad.setDirection(0);
+        if (q == 388) pad.setDirection(1);
+        if (q == 398) pad.setDirection(8);
+        if (q == 402) pad.setDirection(0);
+        // Super pulo (↓ e ↑): sem rastro.
+        if (q == 470) colocar(p, cpu, 400f, 1000f);
+        if (q == 472) pad.setDirection(3);
+        if (q == 476) pad.setDirection(7);
+        if (q == 480) pad.setDirection(0);
     }
 
     /** Põe os dois no lugar e de frente um para o outro (entre as cenas). */
