@@ -1,0 +1,26 @@
+{
+  "id": "p15_crouch",
+  "javaName": "P15_CROUCH",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_crouch_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_crouch.webp",
+  "report": "tools/sprites/reports/p15_crouch.report.json",
+  "preview": "android/app/build/sprite-review/p15_crouch-import.png",
+  "expectedFrames": 8,
+  "segmentation": "prepared-grid",
+  "columns": 8,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.96)",
+    "quadros": "12,14,16,18,19,21,23,25",
+    "largura": 192,
+    "raiz": "87,238",
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "rootX": 87
+}

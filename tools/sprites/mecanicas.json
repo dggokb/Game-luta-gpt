@@ -804,6 +804,67 @@
           "avanco": 520
         }
       }
+    },
+    "p15": {
+      "molde": "Equilibrado técnico",
+      "estiloCombo": "equilibrado",
+      "vida": 10000,
+      "dano": 1.0,
+      "ritmo": 1.0,
+      "framesGolpe": {
+        "S": [
+          14,
+          1,
+          20
+        ],
+        "S2": [
+          9,
+          8,
+          26
+        ],
+        "S3": [
+          12,
+          4,
+          56
+        ],
+        "S4": [
+          16,
+          10,
+          46
+        ]
+      },
+      "projetil": {
+        "velocidade": 900,
+        "alcance": 320
+      },
+      "unica": {
+        "descricao": "Karatê de vídeo inteiro: o S1 sai da carga e solta um ki curto; a rajada (S3) acerta 7 vezes avançando; a voadora (S4) cruza a distância no voo e o machado derruba."
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Seiken Hadō",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Shōryū de caratê",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Rajada de punhos",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Voadora e machado",
+          "comando": "↓↙←"
+        }
+      },
+      "s1": {
+        "visual": "ONDA_CURTA"
+      },
+      "super": {
+        "acertos": 3,
+        "intervalo": 8
+      }
     }
   }
 }

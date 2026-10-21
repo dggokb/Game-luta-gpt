@@ -1,0 +1,258 @@
+{
+  "id": "p15_special_energy",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_special_energy_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 224,
+    "frameHeight": 256,
+    "rootX": 87,
+    "rootY": 238,
+    "columns": 11,
+    "frameCount": 11
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        25,
+        17,
+        165,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12034
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        25,
+        44,
+        165,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 10599
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        24,
+        63,
+        166,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 10082
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        23,
+        69,
+        169,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 9286
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        24,
+        60,
+        169,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 9164
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        24,
+        42,
+        168,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 9400
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        24,
+        32,
+        164,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 9875
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        23,
+        22,
+        178,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 10861
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        21,
+        18,
+        166,
+        238
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 11324
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        20,
+        18,
+        201,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12212
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        21,
+        19,
+        204,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 12525
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 205,
+    "frameHeight": 242,
+    "rootX": 78,
+    "rootY": 231,
+    "columns": 11,
+    "frameCount": 11,
+    "cropOffset": [
+      9,
+      7
+    ],
+    "sheetWidth": 960,
+    "sheetHeight": 460,
+    "frames": [
+      [
+        0,
+        0,
+        152,
+        236,
+        10,
+        4
+      ],
+      [
+        320,
+        240,
+        152,
+        208,
+        10,
+        30
+      ],
+      [
+        476,
+        240,
+        156,
+        192,
+        9,
+        49
+      ],
+      [
+        800,
+        240,
+        160,
+        184,
+        7,
+        56
+      ],
+      [
+        636,
+        240,
+        160,
+        192,
+        9,
+        47
+      ],
+      [
+        156,
+        240,
+        160,
+        212,
+        9,
+        29
+      ],
+      [
+        0,
+        240,
+        152,
+        220,
+        9,
+        19
+      ],
+      [
+        356,
+        0,
+        168,
+        232,
+        7,
+        8
+      ],
+      [
+        528,
+        0,
+        160,
+        232,
+        5,
+        5
+      ],
+      [
+        156,
+        0,
+        196,
+        236,
+        4,
+        5
+      ],
+      [
+        692,
+        0,
+        196,
+        232,
+        5,
+        6
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 2523136,
+      "grid": 2182840,
+      "packed": 1766400
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "ec547b8fb2cf773824e97f5ae7f26ae7d18d1e6810c24179b13923e3d7572de9",
+      "config": "87b1947d90bd5fc9959d40cf5ef9e2210ab4863c20f88a378e82786aba6586b7",
+      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+    }
+  }
+}

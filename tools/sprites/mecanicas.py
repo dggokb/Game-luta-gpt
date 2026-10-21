@@ -14,6 +14,9 @@
   * comandos de S1 a S4 (bloco "comandos": nome e comando em setas, "[←] →" para segurar,
     noAr para só no ar), que a pausa mostra em COMANDOS (docs/personagens/comandos.md).
 
+Com "framesGolpe" ({"S3": [startup, ativo, recuperação]}) o golpe tem tempo próprio em vez do
+da base vezes o ritmo (especial de vídeo longo: a rajada e a voadora do p15).
+
 Com "manterTempo" (p01, arte desenhada quadro a quadro) só vida, dano e projétil mudam.
 Alcance e caixas de acerto não mudam aqui (vêm do DEBUG > AJUSTAR CAIXAS). O Super mantém
 o tempo e a animação (só o dano muda). Depois rode build_characters.py --write.
@@ -400,6 +403,17 @@ def advance(m, speed):
     m.setdefault('mecanica', {})['avanco'] = {'velocidade': speed, 'frames': window('ate_ativo', m)}
 
 
+def travel(m, anim, spec):
+    """Avanço só num trecho da animação ("de" e "ate": quadros da lista de frames), andando
+    "distancia" px do jogo (a voadora do p15: o corpo anda no voo, não no machado)."""
+    d = anim['durationsMs']
+    total = m['startupFrames'] + m['activeFrames'] + m['recoveryFrames']
+    at = lambda i: round(sum(d[:i]) / sum(d) * total)
+    a, b = at(spec.get('de', 0)), min(at(spec['ate']), total - 1)
+    m.setdefault('mecanica', {})['avanco'] = {'velocidade': round(spec['distancia'] * 60 / max(1, b - a + 1)),
+                                              'frames': [a, b]}
+
+
 def striking_super(pack, spec):
     """Super que bate corpo a corpo seguindo a animação (em vez de soltar a onda)."""
     a = pack['fighter']['super']['attack']
@@ -452,17 +466,22 @@ def apply(cid, spec, base, combos_data):
     def damage(key):
         return int(round(base['dano'][key] * spec['dano'] / 10) * 10)
 
+    def frames(key):
+        # framesGolpe: tempo próprio do golpe (especial de vídeo longo, como a rajada do p15).
+        own = spec.get('framesGolpe', {}).get(key)
+        return list(own) if own else scaled(base['frames'][key], pace(key), key.startswith('j'))
+
     attacks = []
     for key, m in list(pack['moves'].items()) + list(pack.get('specialMoves', {}).items()):
         if key not in base['frames']:
             continue
         if not keep:
-            retime(m, scaled(base['frames'][key], pace(key), key.startswith('j')), base['vantagem'][key])
+            retime(m, frames(key), base['vantagem'][key])
         m['damage'] = damage(key)
         attacks.append((key, m.get('animation'), m))
     energy = fighter['energy']
     if not keep:
-        retime(energy['attack'], scaled(base['frames']['S'], pace('S')))
+        retime(energy['attack'], frames('S'))
     energy['damage'] = damage('S')
     energy['speed'] = spec['projetil']['velocidade']
     energy['range'] = spec['projetil']['alcance']
@@ -498,7 +517,9 @@ def apply(cid, spec, base, combos_data):
             cadence += f", {len(h['pancadas'])} pancadas {m['golpes']}"
             if 'avanco' in m.get('mecanica', {}):
                 m['mecanica']['avanco']['frames'] = window('ate_ativo', m)   # a janela ativa cresceu
-        if 'avanco' in h:
+        if isinstance(h.get('avanco'), dict):
+            travel(m, anim, h['avanco'])
+        elif 'avanco' in h:
             advance(m, h['avanco'])
         dmg = energy['damage'] if key == 'S' else m['damage']
         report.append(f"  {key:4} {dmg:5}  {m['startupFrames']:2}/{m['activeFrames']:2}/{m['recoveryFrames']:2}"

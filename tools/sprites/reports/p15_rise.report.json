@@ -1,0 +1,163 @@
+{
+  "id": "p15_rise",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_rise_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 256,
+    "rootX": 91,
+    "rootY": 238,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        24,
+        52,
+        166,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11064
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        24,
+        50,
+        166,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 10991
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        25,
+        44,
+        167,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11047
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        25,
+        35,
+        167,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 10965
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        25,
+        26,
+        167,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11126
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        26,
+        18,
+        167,
+        239
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 11328
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 164,
+    "frameHeight": 241,
+    "rootX": 77,
+    "rootY": 230,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      14,
+      8
+    ],
+    "sheetWidth": 156,
+    "sheetHeight": 1312,
+    "frames": [
+      [
+        0,
+        1112,
+        156,
+        200,
+        4,
+        38
+      ],
+      [
+        0,
+        904,
+        156,
+        204,
+        4,
+        36
+      ],
+      [
+        0,
+        692,
+        156,
+        208,
+        5,
+        29
+      ],
+      [
+        0,
+        472,
+        156,
+        216,
+        5,
+        21
+      ],
+      [
+        0,
+        240,
+        156,
+        228,
+        5,
+        12
+      ],
+      [
+        0,
+        0,
+        156,
+        236,
+        6,
+        4
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 1179648,
+      "grid": 948576,
+      "packed": 818688
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "0455e467ef6def6ba57f5b4e0c853d27346e451a7a92ec2e220277777e1f0840",
+      "config": "c09735a39043453df477840df99864ab1a62824821436284e7cca191e8cc01af",
+      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+    }
+  }
+}

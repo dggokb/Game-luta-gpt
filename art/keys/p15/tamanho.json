@@ -1,0 +1,10 @@
+{
+  "pacote": "p15",
+  "altura": 224,
+  "chaves": {
+    "inicio_centro": 0.5258,
+    "inicio_agachado": 0.5276,
+    "inicio_direita": 0.5258,
+    "inicio_esquerda": 0.5258
+  }
+}

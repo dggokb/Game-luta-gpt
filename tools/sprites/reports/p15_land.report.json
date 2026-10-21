@@ -1,0 +1,125 @@
+{
+  "id": "p15_land",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_land_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 160,
+    "frameHeight": 320,
+    "rootX": 81,
+    "rootY": 302,
+    "columns": 4,
+    "frameCount": 4
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        20,
+        28,
+        133,
+        300
+      ],
+      "minimumMargin": 20,
+      "opaquePixels": 11855
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        29,
+        33,
+        135,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 11267
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        24,
+        44,
+        139,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 11026
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        20,
+        70,
+        139,
+        301
+      ],
+      "minimumMargin": 19,
+      "opaquePixels": 10774
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 140,
+    "frameHeight": 294,
+    "rootX": 72,
+    "rootY": 285,
+    "columns": 4,
+    "frameCount": 4,
+    "cropOffset": [
+      9,
+      17
+    ],
+    "sheetWidth": 132,
+    "sheetHeight": 1096,
+    "frames": [
+      [
+        0,
+        0,
+        128,
+        288,
+        5,
+        4
+      ],
+      [
+        0,
+        292,
+        120,
+        280,
+        14,
+        10
+      ],
+      [
+        0,
+        576,
+        128,
+        272,
+        9,
+        21
+      ],
+      [
+        0,
+        852,
+        132,
+        244,
+        4,
+        47
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 819200,
+      "grid": 658560,
+      "packed": 578688
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "6130636d3e4657a22ca3df616e88da4a0aa1d743bdf32af9b5537254c591756b",
+      "config": "8d3e3d17977238ddaadf9686181edf50c57a801af46fc408dede940c17b58ffc",
+      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+    }
+  }
+}

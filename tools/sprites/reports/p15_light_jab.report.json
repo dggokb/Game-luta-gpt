@@ -1,0 +1,163 @@
+{
+  "id": "p15_light_jab",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_light_jab_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 224,
+    "frameHeight": 288,
+    "rootX": 88,
+    "rootY": 270,
+    "columns": 6,
+    "frameCount": 6
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        26,
+        45,
+        167,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12283
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        25,
+        45,
+        167,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12597
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        25,
+        44,
+        180,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12582
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        25,
+        45,
+        196,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12709
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        25,
+        44,
+        196,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12645
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        25,
+        46,
+        199,
+        273
+      ],
+      "minimumMargin": 15,
+      "opaquePixels": 12548
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 194,
+    "frameHeight": 249,
+    "rootX": 73,
+    "rootY": 236,
+    "columns": 6,
+    "frameCount": 6,
+    "cropOffset": [
+      15,
+      34
+    ],
+    "sheetWidth": 536,
+    "sheetHeight": 488,
+    "frames": [
+      [
+        360,
+        0,
+        156,
+        240,
+        5,
+        5
+      ],
+      [
+        0,
+        248,
+        156,
+        240,
+        4,
+        5
+      ],
+      [
+        0,
+        0,
+        168,
+        244,
+        4,
+        4
+      ],
+      [
+        160,
+        248,
+        184,
+        240,
+        4,
+        5
+      ],
+      [
+        172,
+        0,
+        184,
+        244,
+        4,
+        4
+      ],
+      [
+        348,
+        248,
+        188,
+        240,
+        4,
+        6
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 1548288,
+      "grid": 1159344,
+      "packed": 1046272
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "dddd0bc948f987ad57aee659b328b4540b5bd44d920d357ef40cbaa5f98bef39",
+      "config": "1572fa9103eb1c290e261a03a240c51ffde78d11177440c521de24f8a5e148b1",
+      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+    }
+  }
+}

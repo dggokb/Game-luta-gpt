@@ -77,6 +77,10 @@ CLIP_OF = dict(IDLE='idle', COMBAT='idle', CROUCH='crouch', RISE='rise', JUMP='j
                KNOCKDOWN='fall_down', GROUNDED='fall_down', GETUP='getup', THROW_GRAB='throw', THROW_TOSS='throw')
 FALLBACK = dict(JUMP_MEDIUM='jump_heavy', JUMP_HEAVY_DOWN='jump_heavy')
 SHARED_FRAMES = {'KNOCKDOWN', 'GROUNDED', 'THROW_GRAB', 'THROW_TOSS', 'COMBAT'}
+# Animações sem as quais o pacote não é gravado (build_characters.REQUIRED: o movimento).
+REQUIRED = ('IDLE', 'COMBAT', 'WALK_FORWARD', 'WALK_BACK', 'CROUCH', 'RISE', 'JUMP', 'FALL', 'DASH', 'BACKDASH', 'LAND')
+# Golpe sem vídeo que o build aceita com a pose do corpo (build_characters.POSES).
+POSE_OF = dict(jL='AIR', jM='AIR', jH='AIR', **{'2L': 'CROUCH', '2M': 'CROUCH', '2H': 'CROUCH'})
 
 
 # ---------------------------------------------------------------- análise do vídeo
@@ -269,6 +273,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
             '--colunas', str(cols), '--fixar', opts.get('fixar', 'tronco')]
     if opts.get('pe_no_chao'):
         args.append('--pe-no-chao')
+    if opts.get('sem_efeitos'):
+        args.append('--sem-efeitos')  # rastro e brilho desenhados pelo vídeo (machado do p15)
     if (not opts.get('pe_no_chao') or opts.get('fixar') == 'registro') and not opts.get('sem_chao'):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:
@@ -358,9 +364,24 @@ def update_pack(char, rebuilt):
         if old is None or name in rebuilt or old.get('atlas') != anim['atlas']:
             pack['animations'][state] = anim
     missing = set(P01['animations']) - set(pack['animations'])
-    if missing:
-        print(f'{char}: ainda sem vídeo para {sorted(missing)}; o pacote só é gravado quando tiver todos')
+    if set(REQUIRED) & missing:
+        print(f'{char}: ainda sem vídeo para {sorted(set(REQUIRED) & missing)}; o pacote só é gravado com o movimento todo')
         return False
+    if missing:
+        # Personagem ainda sem todos os vídeos: golpe do pulo ou agachado sem animação fica com
+        # a pose (o build aceita), o j2H sem animação sai; defesas, reações e intro são opcionais.
+        print(f'{char}: ainda sem vídeo para {sorted(missing)}')
+        for key, m in list(pack['moves'].items()):
+            if m.get('animation') in missing:
+                if key in POSE_OF:
+                    del m['animation']
+                    m['pose'] = POSE_OF[key]
+                else:
+                    del pack['moves'][key]
+                    for other in pack['moves'].values():
+                        for routes in ('cancelInto', 'rotasProprias'):
+                            if key in other.get(routes, []):
+                                other[routes].remove(key)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(pack, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
     return True

@@ -80,6 +80,21 @@ public class DefesaEGolpeAltoTest {
         }
     }
 
+    @Test public void aPackOverheadWithItsOwnAnimationKeepsTheSharedTiming() {
+        // p15: o 6M do pacote, com o vídeo próprio (M_BAIXO), no lugar do montado do M.
+        CharacterDefinition c = GeneratedCharacters.get("p15");
+        CharacterDefinition.Move oh = c.moves.get(GolpeAlto.BINDING), m = c.moves.get("M");
+        assertFalse("não é o 6M montado do M", GolpeAlto.derived(c, GolpeAlto.BINDING));
+        assertNotSame(m.animation, oh.animation);
+        assertTrue(oh.attack.overhead);
+        assertFalse(oh.attack.low);
+        assertEquals(GolpeAlto.STARTUP, oh.attack.startupFrames);
+        assertEquals(GolpeAlto.ACTIVE, oh.attack.activeFrames);
+        assertEquals(GolpeAlto.RECOVERY, oh.attack.recoveryFrames);
+        assertEquals(1, oh.attack.maxUsesPerCombo);
+        assertEquals(m.attack.damage * GolpeAlto.DAMAGE_PERMILLE / 1000, oh.attack.damage);
+    }
+
     @Test public void theOverheadHoldsTheWindUpInsteadOfSlowingTheWholeClip() {
         for (String id : new String[] {"player_base", "p02", "p06", "p10"}) {
             CharacterDefinition c = GeneratedCharacters.get(id);

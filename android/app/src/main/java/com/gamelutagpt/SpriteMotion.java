@@ -7,8 +7,11 @@ final class SpriteMotion {
         static final String IDLE=SpriteStates.IDLE, WALK_FORWARD=SpriteStates.WALK_FORWARD,
             WALK_BACK=SpriteStates.WALK_BACK, DASH=SpriteStates.DASH, BACKDASH=SpriteStates.BACKDASH,
             CROUCH=SpriteStates.CROUCH, RISE=SpriteStates.RISE, JUMP=SpriteStates.JUMP,
-            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT;
+            FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT,
+            IDLE_2=SpriteStates.IDLE_2;
     }
+    /** Voltas do IDLE antes do segundo idle (IDLE_2, opcional), que toca uma vez e volta. */
+    static final int IDLE_LOOPS_BEFORE_IDLE_2=3;
     String clip=Clip.IDLE;
     float time,distance;
     private boolean wasGrounded=true,wasCrouching;
@@ -31,7 +34,7 @@ final class SpriteMotion {
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
         else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
         else if(clip.equals(Clip.CROUCH) || (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
-        else next=Clip.IDLE;
+        else next=idle();
         wasGrounded=grounded;
         if(!next.equals(clip)){
             clip=next;time=distance=0;
@@ -43,6 +46,16 @@ final class SpriteMotion {
         // Attacks use the combat clock, including a repeated attack of the same type.
         time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
         distance+=Math.abs(travel);
+    }
+    /**
+     * Parado: o IDLE em loop e, quem tem IDLE_2, o segundo idle uma vez a cada 3 voltas
+     * inteiras do IDLE (a troca cai no fim da volta, na guarda em que os dois começam).
+     */
+    private String idle() {
+        if(!character.animations.containsKey(Clip.IDLE_2)) return Clip.IDLE;
+        if(clip.equals(Clip.IDLE_2)) return time<character.animation(Clip.IDLE_2).duration ? Clip.IDLE_2 : Clip.IDLE;
+        if(clip.equals(Clip.IDLE) && time>=IDLE_LOOPS_BEFORE_IDLE_2*character.animation(Clip.IDLE).duration) return Clip.IDLE_2;
+        return Clip.IDLE;
     }
     int frame(){return character.animation(clip).frame(time,distance);}
 }

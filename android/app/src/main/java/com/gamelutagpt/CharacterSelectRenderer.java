@@ -177,6 +177,7 @@ final class CharacterSelectRenderer {
             case "p10":return "BOMBEIRA ÁGIL";
             case "p11":return "CIRURGIÃO SÁDICO";
             case "p12":return "CRIATURA FERAL";
+            case "p15":return "KARATÊ SHOTOKAN";
             default:return "";
         }
     }

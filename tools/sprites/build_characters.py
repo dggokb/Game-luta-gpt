@@ -25,6 +25,8 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             'THROW_GRAB','THROW_TOSS','INTRO','VICTORY','DEFEAT','TAUNT',
             # Mecânicas próprias: carga da Onda (loop e disparo carregado) e wall jump.
             'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',
+            # Segundo idle: toca uma vez a cada 3 voltas do IDLE (SpriteMotion).
+            'IDLE_2',
             # Capangas do Super (p07): correm, socam ou dão ombrada e saem.
             'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER',
             # Ultra em sequência (tools/sprites/ultras.py): a folha do vídeo com os golpes.
@@ -34,6 +36,10 @@ KNOCKDOWN_SET = {'KNOCKDOWN','GROUNDED','GETUP'}
 BINDINGS = ('L','M','H','2L','2M','2H','jL','jM','jH')
 # Optional air inputs with down held (↓ + button in the air); without them jX is used.
 AIR_DOWN_BINDINGS = ('j2L','j2M','j2H')
+# Golpe alto de chão (→ + M) com animação própria; sem ele o motor monta o 6M do M (GolpeAlto.java).
+OVERHEAD = '6M'
+# Inputs que o pacote pode ter ou não.
+OPTIONAL_BINDINGS = AIR_DOWN_BINDINGS + (OVERHEAD,)
 # A move without its own animation must say which posture the body keeps.
 POSES = {'CROUCH':('2L','2M','2H'),'AIR':('jL','jM','jH','j2L','j2M','j2H')}
 SPECIALS = ('S','SUPER','ULTRA')
@@ -294,7 +300,7 @@ def validate_attack(name, m, projectile):
             raise ValueError(f'{name}.maxHits: between 1 and the number of hitboxes ({boxes})')
 
 def attack_ids(pack):
-    ids = set(BINDINGS) | (set(pack['moves']) & set(AIR_DOWN_BINDINGS))
+    ids = set(BINDINGS) | (set(pack['moves']) & set(OPTIONAL_BINDINGS))
     if 'energy' in pack['fighter']: ids.add('S')
     if 'super' in pack['fighter']: ids.add('SUPER')
     return ids | set(pack.get('specialMoves', {}))
@@ -302,7 +308,7 @@ def attack_ids(pack):
 def validate_routes(pack):
     """Load fails when a cancel route points nowhere or crosses ground/air."""
     ids = attack_ids(pack)
-    attacks = {b:pack['moves'][b] for b in BINDINGS + AIR_DOWN_BINDINGS if b in pack['moves']}
+    attacks = {b:pack['moves'][b] for b in BINDINGS + OPTIONAL_BINDINGS if b in pack['moves']}
     if 'energy' in pack['fighter']: attacks['S'] = pack['fighter']['energy']['attack']
     if 'super' in pack['fighter']: attacks['SUPER'] = pack['fighter']['super']['attack']
     attacks.update(pack.get('specialMoves', {}))
@@ -471,13 +477,13 @@ def compile_packs(root, results):
                     raise ValueError(f'{key}: one duration per frame is required')
                 for d in a['durationsMs']: positive(d, key)
         moves = pack['moves']
-        unknown = set(moves) - set(BINDINGS) - set(AIR_DOWN_BINDINGS)
+        unknown = set(moves) - set(BINDINGS) - set(OPTIONAL_BINDINGS)
         if unknown:
-            raise ValueError(f'{sorted(unknown)}: supported inputs are {", ".join(BINDINGS + AIR_DOWN_BINDINGS)}')
+            raise ValueError(f'{sorted(unknown)}: supported inputs are {", ".join(BINDINGS + OPTIONAL_BINDINGS)}')
         missing = set(BINDINGS) - set(moves)
         if missing:
             raise ValueError(f'{pack["id"]}: missing moves {sorted(missing)}; use "pose" for inputs without art')
-        for binding in BINDINGS + AIR_DOWN_BINDINGS:
+        for binding in BINDINGS + OPTIONAL_BINDINGS:
             if binding in moves: validate_move(pack, binding, moves[binding])
         specials = pack.get('specialAnimations', {})
         for key,animation in specials.items():
@@ -535,6 +541,7 @@ def compile_packs(root, results):
         if 'maxUsesPerCombo' in m: code += '.maxUsesPerCombo('+str(m['maxUsesPerCombo'])+')'
         if 'maxUsesPerChain' in m: code += '.maxUsesPerChain('+str(m['maxUsesPerChain'])+')'
         if m.get('low'): code += '.low(true)'
+        if binding == OVERHEAD: code += '.overhead(true)'
         if reach is not None: code += '.reach('+f(reach)+','+f(height)+(','+f(m['hitFloor']) if 'hitFloor' in m else '')+')'
         for key in ('hitboxes','hurtboxes'):
             for box in m.get(key, []):
@@ -608,7 +615,7 @@ def compile_packs(root, results):
                      +[str(l.get('columns',l['frameCount'])),str(l['frameCount']),f(cfg.get('pixelScale', 1)),str(l['sheetWidth']),str(l['sheetHeight'])]
                      +[q(','.join(str(v) for frame in l['frames'] for v in frame))])+')')
             lines += [' a.put('+q(key)+',new CharacterDefinition.Animation('+q(key)+','+atlas+',new int[]{'+','.join(map(str,a['frames']))+'},new float[]{'+','.join(f(v/1000) for v in a.get('durationsMs',[]))+'},'+str(a['loop']).lower()+','+f(a.get('distancePerFrame',0))+'));']
-        for key in [b for b in BINDINGS + AIR_DOWN_BINDINGS if b in pack['moves']]:
+        for key in [b for b in BINDINGS + OPTIONAL_BINDINGS if b in pack['moves']]:
             m = pack['moves'][key]
             animation = 'a.get('+q(m['animation'])+')' if 'animation' in m else 'null'
             pose = q(m['pose']) if 'pose' in m else 'null'

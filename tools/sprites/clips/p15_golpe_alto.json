@@ -1,0 +1,32 @@
+{
+  "id": "p15_golpe_alto",
+  "javaName": "P15_GOLPE_ALTO",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_golpe_alto_video_normalized.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_golpe_alto.webp",
+  "report": "tools/sprites/reports/p15_golpe_alto.report.json",
+  "preview": "android/app/build/sprite-review/p15_golpe_alto-import.png",
+  "expectedFrames": 13,
+  "segmentation": "prepared-grid",
+  "columns": 11,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "M_BAIXO.mp4",
+    "personagem": "p15",
+    "escala": 0.5267,
+    "medida": "1º quadro = inicio_centro (nota 0.97)",
+    "quadros": "16,20,22,24,27,37,38,43,45,48,54,58,62",
+    "celula": 320,
+    "largura": 192,
+    "raiz": "88,302",
+    "colunas": 11,
+    "fixar": "video",
+    "sem_efeitos": true,
+    "limpar_chao": true
+  },
+  "frameWidth": 192,
+  "frameHeight": 320,
+  "rootX": 88,
+  "rootY": 302
+}

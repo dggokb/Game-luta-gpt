@@ -194,6 +194,8 @@ def palette(pack, clips):
     poeira, arco, rastro, aura) e quadro de outro personagem aparecem como cor fora dela."""
     count = np.zeros(512)
     for state in ('IDLE', 'WALK_FORWARD', 'CROUCH', 'HIT_STAND'):
+        if state not in pack['animations']:   # personagem ainda sem o vídeo da reação (p15)
+            continue
         for m in frames_of(pack, clips, state)[0]:
             count += np.bincount(m['colors'], minlength=512)
     return count >= count.sum() * 0.0005

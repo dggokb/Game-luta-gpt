@@ -21,6 +21,7 @@ o botão escolhe a força da energia.
 | p10 | Machadinho ↓↙← | Jato de vapor →↓↘ | Esquiva acrobática ↓↓ | Voadora em parafuso ↓↘→ |
 | p11 | Bisturi ↓↘→ | Seringa ↓↙← | Bloqueio de nervos →↘↓↙← | Passo cirúrgico [←] → |
 | p12 | Investida [←] → | Salto de garras [↓] ↑ | Fúria ↓↓ | Contorção ↓↙← |
+| p15 | Seiken Hadō ↓↘→ | Shōryū de caratê →↓↘ | Rajada de punhos ↓↓ | Voadora e machado ↓↙← |
 
 Super: botão SUPER. Ultra: ↓ + SUPER. Agarrão: botão de agarrar (ou L + M juntos).
 

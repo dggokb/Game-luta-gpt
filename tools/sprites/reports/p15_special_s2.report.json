@@ -1,0 +1,277 @@
+{
+  "id": "p15_special_s2",
+  "characterProfile": "p15",
+  "source": "art/sprites/source/p15_special_s2_video_normalized.png",
+  "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "rootMode": "authored",
+  "scale": 1,
+  "worldScale": 1.075,
+  "layout": {
+    "frameWidth": 192,
+    "frameHeight": 288,
+    "rootX": 87,
+    "rootY": 270,
+    "columns": 11,
+    "frameCount": 12
+  },
+  "frames": [
+    {
+      "index": 0,
+      "outputBbox": [
+        25,
+        76,
+        165,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 10599
+    },
+    {
+      "index": 1,
+      "outputBbox": [
+        23,
+        101,
+        169,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 9286
+    },
+    {
+      "index": 2,
+      "outputBbox": [
+        24,
+        94,
+        166,
+        270
+      ],
+      "minimumMargin": 18,
+      "opaquePixels": 9026
+    },
+    {
+      "index": 3,
+      "outputBbox": [
+        24,
+        85,
+        143,
+        257
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 8934
+    },
+    {
+      "index": 4,
+      "outputBbox": [
+        24,
+        74,
+        132,
+        257
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 8722
+    },
+    {
+      "index": 5,
+      "outputBbox": [
+        23,
+        69,
+        136,
+        257
+      ],
+      "minimumMargin": 23,
+      "opaquePixels": 8772
+    },
+    {
+      "index": 6,
+      "outputBbox": [
+        23,
+        65,
+        142,
+        256
+      ],
+      "minimumMargin": 23,
+      "opaquePixels": 8573
+    },
+    {
+      "index": 7,
+      "outputBbox": [
+        24,
+        64,
+        148,
+        258
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 8880
+    },
+    {
+      "index": 8,
+      "outputBbox": [
+        25,
+        52,
+        155,
+        264
+      ],
+      "minimumMargin": 24,
+      "opaquePixels": 9458
+    },
+    {
+      "index": 9,
+      "outputBbox": [
+        29,
+        35,
+        159,
+        271
+      ],
+      "minimumMargin": 17,
+      "opaquePixels": 9916
+    },
+    {
+      "index": 10,
+      "outputBbox": [
+        29,
+        29,
+        163,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10545
+    },
+    {
+      "index": 11,
+      "outputBbox": [
+        29,
+        32,
+        168,
+        272
+      ],
+      "minimumMargin": 16,
+      "opaquePixels": 10448
+    }
+  ],
+  "passed": true,
+  "packed": {
+    "frameWidth": 168,
+    "frameHeight": 263,
+    "rootX": 75,
+    "rootY": 251,
+    "columns": 11,
+    "frameCount": 12,
+    "cropOffset": [
+      12,
+      19
+    ],
+    "sheetWidth": 300,
+    "sheetHeight": 1320,
+    "frames": [
+      [
+        0,
+        516,
+        152,
+        208,
+        7,
+        50
+      ],
+      [
+        0,
+        1136,
+        160,
+        184,
+        4,
+        76
+      ],
+      [
+        124,
+        936,
+        156,
+        192,
+        6,
+        68
+      ],
+      [
+        164,
+        1136,
+        132,
+        184,
+        6,
+        60
+      ],
+      [
+        0,
+        936,
+        120,
+        196,
+        6,
+        48
+      ],
+      [
+        136,
+        728,
+        128,
+        200,
+        4,
+        44
+      ],
+      [
+        0,
+        728,
+        132,
+        204,
+        4,
+        40
+      ],
+      [
+        156,
+        516,
+        140,
+        208,
+        6,
+        39
+      ],
+      [
+        156,
+        260,
+        144,
+        228,
+        7,
+        27
+      ],
+      [
+        152,
+        0,
+        144,
+        252,
+        11,
+        9
+      ],
+      [
+        0,
+        0,
+        148,
+        256,
+        11,
+        4
+      ],
+      [
+        0,
+        260,
+        152,
+        252,
+        11,
+        7
+      ]
+    ],
+    "decodedBytes": {
+      "canonical": 4866048,
+      "grid": 3888192,
+      "packed": 1584000
+    }
+  },
+  "provenance": {
+    "pipelineVersion": 2,
+    "sha256": {
+      "source": "87cf0d4234b82daf705970160928c0fc10c7548d6464b75b04a01a85a4473796",
+      "config": "6c03720fea5c0b168e6e7b94c6b777100f985c97b1590ba3b72fc60027f8cc9e",
+      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+    }
+  }
+}

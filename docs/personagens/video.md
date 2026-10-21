@@ -253,6 +253,22 @@ python3 tools/sprites/video_para_sprite.py <vídeo> --clipe tools/sprites/clips/
 
 Custo por personagem HD (p05): PNG 27 → 84 MB no APK, memória decodificada 151 → 566 MB.
 
+## Vários vídeos (ou quadros à mão) num clipe
+
+Golpe longo gerado em partes (cada complemento começa no último quadro do anterior, no Flow) e
+golpe que só vai até a pose (volta pelo inverso) usam `tools/sprites/montagem.py`, com a receita
+em `tools/sprites/montagens/<id>.json`: trechos dos vídeos colados (sem perda, na mesma câmera),
+os quadros escolhidos e as animações do pacote que usam a folha (frames como `"0-5,4-0"` para a
+volta pelo inverso; uma folha pode servir a mais de uma animação). Trecho `"fixo"` tira o
+deslocamento lateral (quem anda é o motor, com o avanço do golpe) e `"alinha"` leva o último
+trecho de volta à raiz. Exemplo e explicação no p15 ([ficha](p15.md)):
+
+    python3 tools/sprites/montagem.py p15 <pasta com os vídeos> [clipes]
+
+Personagem novo sem todos os vídeos: o `personagem.py` grava o pacote assim que o movimento
+inteiro existe (IDLE, andar, agachar, pulo, dash, backdash); golpe do pulo ou agachado sem vídeo
+fica com a pose, e defesas, reações, intro e vitória são opcionais no motor.
+
 ## Um vídeo pode virar vários clipes
 
 | Vídeo | Clipes do jogo |
