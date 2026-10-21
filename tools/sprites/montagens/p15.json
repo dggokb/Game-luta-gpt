@@ -1,5 +1,5 @@
 {
-  "_doc": "Todos os clipes do p15, com quadros escolhidos à mão ou colados de vários vídeos (tools/sprites/montagem.py), com recorte suave (mechas do cabelo). Os vídeos ficam no Drive em game-luta-gpt/animations/p15. Os que vão só até a pose (L, H, 2L, 2H, S1, S2) voltam à guarda pelo inverso (frames de trás para a frente). S1 e S2 saem da carga do s_base; o S3 é a rajada do s3 com os complementos s3_apoio1 e s3_apoio2 (entrada, rajadas sólidas, soco final e volta); o S4 é a voadora do s4 com s4_apoio1 (giro e perna no alto), s4_apoio2 (machado até o espacate) e s4_apoio3 (volta à guarda). O Super e o Ultra usam a folha do S1 até ter vídeo próprio. O andar para frente é o ciclo do andarFrente de 14 a 67 (do 78 em diante ela vira de frente; o 68 cai quase no 14 e o ciclo emenda sem pulo).",
+  "_doc": "Todos os clipes do p15, com quadros escolhidos à mão ou colados de vários vídeos (tools/sprites/montagem.py), com recorte suave (mechas do cabelo). Os vídeos ficam no Drive em game-luta-gpt/animations/p15. Os que vão só até a pose (L, H, 2L, 2H, S1, S2) voltam à guarda pelo inverso (frames de trás para a frente). S1 e S2 saem da carga do s_base; o S3 é a rajada do s3 com os complementos s3_apoio1 e s3_apoio2 (entrada, rajadas sólidas, soco final e volta); o S4 é a voadora do s4 com s4_apoio1 (giro e perna no alto), s4_apoio2 (machado até o espacate) e s4_apoio3 (volta à guarda). O Super e o Ultra usam a folha do S1 até ter vídeo próprio. O andar para frente é um passo só do andarFrente, 43 a 53, repetido (de lado, na guarda; o resto do vídeo gira o tronco para a câmera).",
   "_opcoes": {"recorte_suave": true},
   "idle": {
     "trechos": [["idle", 0, 96]],
@@ -42,7 +42,7 @@
   },
   "walk_forward": {
     "trechos": [["andarFrente", 0, 96]],
-    "quadros": "14-66/2",
+    "quadros": "43-53",
     "opcoes": {"pe_no_chao": true},
     "animacoes": {"WALK_FORWARD": {"distancia": "video", "velocidade": "video"}}
   },
