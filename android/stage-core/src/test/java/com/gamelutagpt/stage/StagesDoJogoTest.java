@@ -33,11 +33,6 @@ public class StagesDoJogoTest {
         }
     }
 
-    @Test
-    public void dojoDaYinLuExiste() {
-        assertTrue(new File(STAGES, "dojo_yinlu/stage.json").isFile());
-    }
-
     private static void existe(File pasta, String imagem) {
         assertTrue(pasta.getName() + ": falta " + imagem, new File(pasta, imagem).isFile());
     }

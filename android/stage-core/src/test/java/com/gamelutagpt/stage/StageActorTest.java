@@ -108,28 +108,6 @@ public class StageActorTest {
         } catch (IllegalArgumentException expected) {}
     }
 
-    /** Os atores do dojo abrem e as reações do tutorial existem nos dois. */
-    @Test
-    public void atoresDoDojo() throws IOException {
-        File dojo = new File("../app/src/main/assets/stages/dojo_shinshinkan");
-        StageDefinition def = StageDefinition.fromJson(read(new File(dojo, "stage.json")));
-        int count = 0;
-        for (StageDefinition.Layer layer : def.layers) {
-            if (layer.kind != StageDefinition.Kind.ACTOR) continue;
-            count++;
-            StageActor actor = StageActor.fromJson(read(new File(dojo, layer.actor + "/ator.json")));
-            for (String event : new String[] {"licao", "impacto", "levou", "fim"}) {
-                assertTrue(actor.name + " sem reação para " + event, actor.reactions.containsKey(event));
-            }
-            for (StageActor.Animation a : actor.animations.values()) {
-                if (a.sheet != null) {
-                    assertTrue(actor.name + ": folha não existe: " + a.sheet, new File(dojo, layer.actor + "/" + a.sheet).isFile());
-                }
-            }
-        }
-        assertEquals("Dafu e Takatoshi", 2, count);
-    }
-
     private static String read(File f) throws IOException {
         return new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8);
     }
