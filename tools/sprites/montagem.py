@@ -26,7 +26,8 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
 - animacoes: as animações do pacote que usam o clipe. frames são índices do clipe ("9-0" =
   de trás para a frente: a volta pelo inverso do vídeo que só vai até a pose); impacto é a
   posição em frames do quadro em que o golpe encosta; "distancia": "video" (andar) troca de
-  quadro pela distância andada, com a distância medida no vídeo (pé plantado). A mesma folha
+  quadro pela distância andada, com a distância medida no vídeo (pé plantado); "devagar": 1.6
+  deixa o ciclo 1,6x mais lento que o pé plantado (o pé escorrega um pouco). A mesma folha
   pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1).
 
 Um vídeo só, sem "fixo", é convertido direto do arquivo. O vídeo colado vai para
@@ -159,6 +160,8 @@ def update_pack(char, name, spec, distance=None):
         if 'distancia' in a:   # andar: o quadro troca pela distância andada, não pelo tempo
             anim['loop'] = True
             anim['distancePerFrame'] = distance if a['distancia'] == 'video' else a['distancia']
+            if 'devagar' in a:   # anima mais devagar que o pé plantado (o pé escorrega um pouco)
+                anim['distancePerFrame'] = round(anim['distancePerFrame'] * a['devagar'], 2)
             pack['animations'][state] = anim
             continue
         same = old.get('atlas') == anim['atlas'] and old.get('frames') == frames \

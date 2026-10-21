@@ -44,7 +44,7 @@
     "trechos": [["andarFrente", 0, 96]],
     "quadros": "13-87/2",
     "opcoes": {"pe_no_chao": true},
-    "animacoes": {"WALK_FORWARD": {"distancia": "video"}}
+    "animacoes": {"WALK_FORWARD": {"distancia": "video", "devagar": 1.6}}
   },
   "light_jab": {
     "trechos": [["L", 0, 96]],

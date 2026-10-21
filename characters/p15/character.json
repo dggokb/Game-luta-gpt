@@ -318,7 +318,7 @@
         37
       ],
       "loop": true,
-      "distancePerFrame": 4.75
+      "distancePerFrame": 7.6
     },
     "WALK_BACK": {
       "atlas": "p15_walk_back",
