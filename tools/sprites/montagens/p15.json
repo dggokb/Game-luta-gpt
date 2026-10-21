@@ -1,5 +1,5 @@
 {
-  "_doc": "Todos os clipes do p15, com quadros escolhidos à mão ou colados de vários vídeos (tools/sprites/montagem.py), com recorte suave (mechas do cabelo). Os vídeos ficam no Drive em game-luta-gpt/animations/p15. Os que vão só até a pose (L, H, 2L, 2H, S1, S2) voltam à guarda pelo inverso (frames de trás para a frente). S1 e S2 saem da carga do s_base; o S3 é a rajada do s3 com os complementos s3_apoio1 e s3_apoio2 (entrada, rajadas sólidas, soco final e volta); o S4 é a voadora do s4 com s4_apoio1 (giro e perna no alto), s4_apoio2 (machado até o espacate) e s4_apoio3 (volta à guarda). O Super e o Ultra usam a folha do S1 até ter vídeo próprio.",
+  "_doc": "Todos os clipes do p15, com quadros escolhidos à mão ou colados de vários vídeos (tools/sprites/montagem.py), com recorte suave (mechas do cabelo). Os vídeos ficam no Drive em game-luta-gpt/animations/p15. Os que vão só até a pose (L, H, 2L, 2H, S1, S2) voltam à guarda pelo inverso (frames de trás para a frente). S1 e S2 saem da carga do s_base; o S3 é a rajada do s3 com os complementos s3_apoio1 e s3_apoio2 (entrada, rajadas sólidas, soco final e volta); o S4 é a voadora do s4 com s4_apoio1 (giro e perna no alto), s4_apoio2 (machado até o espacate) e s4_apoio3 (volta à guarda). O Super e o Ultra usam a folha do S1 até ter vídeo próprio. O andar para frente é o para trás (14–36 do andarTras, na guarda do idle) tocado de trás para a frente: o andarFrente troca de base no meio do vídeo.",
   "_opcoes": {"recorte_suave": true},
   "idle": {
     "trechos": [["idle", 0, 96]],
@@ -32,17 +32,14 @@
     "trechos": [["pular", 0, 96]],
     "quadros": "45,47,49,51"
   },
-  "walk_forward": {
-    "trechos": [["andarFrente", 0, 96]],
-    "quadros": "28-78/2",
-    "opcoes": {"pe_no_chao": true},
-    "animacoes": {"WALK_FORWARD": {"distancia": "video"}}
-  },
   "walk_back": {
     "trechos": [["andarTras", 0, 66]],
-    "quadros": "21-47/2",
-    "opcoes": {"pe_no_chao": true, "deslocar": "20,0"},
-    "animacoes": {"WALK_BACK": {"frames": "10-13,0-9", "distancia": "video"}}
+    "quadros": "14-36/2",
+    "opcoes": {"pe_no_chao": true},
+    "animacoes": {
+      "WALK_BACK": {"distancia": "video"},
+      "WALK_FORWARD": {"frames": "11-0", "distancia": "video"}
+    }
   },
   "light_jab": {
     "trechos": [["L", 0, 96]],

@@ -277,8 +277,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args.append('--sem-efeitos')  # rastro e brilho desenhados pelo vídeo (machado do p15)
     if opts.get('recorte_suave'):
         args.append('--recorte-suave')  # mechas finas de cabelo (p15)
-    if opts.get('deslocar'):
-        args += ['--deslocar', opts['deslocar']]
+    # Sempre explícito: sem ele o video_para_sprite reaproveita o da receita gravada antes.
+    args.append(f"--deslocar={opts.get('deslocar', '0,0')}")  # "=": negativo não vira opção
     if (not opts.get('pe_no_chao') or opts.get('fixar') == 'registro') and not opts.get('sem_chao'):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:

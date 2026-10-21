@@ -183,7 +183,40 @@ def soft_edges(frame, rgba):
     rgb = unmixed[..., ::-1].copy()
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]))   # ponta da mecha sem verde
     out[..., :3][strand] = rgb[strand].astype(np.uint8)
+    hair_shine(out)
     return out
+
+
+SHINE_AREA = (12, 400)   # px do vídeo: menor é o branco do olho; maior é a roupa
+SHINE_TOP = 0.18         # só cabeça e pescoço (a gola no ombro, mais abaixo, é roupa de verdade)
+SHINE_DARK = 0.35        # parte da borda da ilha que tem de ser cabelo escuro
+
+
+def hair_shine(rgba):
+    """Ilha clara pequena entre as mechas (a gola branca aparecendo atrás do pescoço, p15): no
+    jogo parece fundo que não foi recortado. Vira a cor do cabelo em volta."""
+    a = rgba[..., 3] > 128
+    rows = np.nonzero(a.any(1))[0]
+    if not len(rows):
+        return
+    top = rows.min() + SHINE_TOP * (rows.max() - rows.min())
+    hsv = cv2.cvtColor(rgba[..., :3], cv2.COLOR_RGB2HSV)
+    s, v = hsv[..., 1].astype(int), hsv[..., 2].astype(int)
+    pale = a & (s < 60) & (v > 160)
+    dark = a & (v < 70)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(pale.astype(np.uint8))
+    for i in range(1, n):
+        x, y, w, h, area = stats[i]
+        if not SHINE_AREA[0] <= area <= SHINE_AREA[1] or y + h / 2 > top:
+            continue
+        island = labels == i
+        # A borda suavizada da ilha (meio clara) vai junto, senão fica um contorno pontilhado.
+        edge = cv2.dilate(island.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool) & a & (v > 90) & (s < 90)
+        island |= edge
+        ring = cv2.dilate(island.astype(np.uint8), np.ones((5, 5), np.uint8)).astype(bool) & ~island & a
+        if ring.sum() == 0 or dark[ring].mean() < SHINE_DARK:
+            continue
+        rgba[..., :3][island] = np.median(rgba[..., :3][ring & dark], axis=0).astype(np.uint8)
 
 
 def torso_x(rgba):

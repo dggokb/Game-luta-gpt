@@ -38,5 +38,31 @@ class RecorteSuaveTests(unittest.TestCase):
         self.assertTrue((hard[50:90, 70:90] == soft[50:90, 70:90]).all())
 
 
+
+class BrilhoNoCabeloTests(unittest.TestCase):
+    """Gola branca entre as mechas atrás do pescoço (p15): vira cabelo; o branco do olho fica."""
+
+    def rgba(self, island):
+        f = np.zeros((300, 100, 4), np.uint8)
+        f[..., 3] = 255
+        f[..., :3] = (20, 20, 22)                     # cabelo
+        y, x, h, w = island
+        f[y:y + h, x:x + w, :3] = (235, 235, 230)    # ilha clara
+        return f
+
+    def test_small_pale_island_in_the_hair_becomes_hair(self):
+        f = self.rgba((30, 40, 6, 5))
+        V.hair_shine(f)
+        self.assertLess(int(f[32, 42, :3].max()), 60)
+
+    def test_eye_white_and_lower_body_stay(self):
+        eye = self.rgba((30, 40, 2, 2))
+        V.hair_shine(eye)
+        self.assertGreater(int(eye[30, 40, :3].min()), 200)
+        low = self.rgba((200, 40, 6, 5))              # abaixo da cabeça: roupa
+        V.hair_shine(low)
+        self.assertGreater(int(low[202, 42, :3].min()), 200)
+
+
 if __name__ == '__main__':
     unittest.main()
