@@ -14,17 +14,18 @@
   "video": {
     "arquivo": "idle.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93",
     "celula": 288,
-    "largura": 192,
-    "raiz": "83,270",
+    "largura": 224,
+    "raiz": "98,270",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
-  "frameWidth": 192,
+  "frameWidth": 224,
   "frameHeight": 288,
-  "rootX": 83,
+  "rootX": 98,
   "rootY": 270
 }

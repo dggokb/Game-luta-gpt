@@ -14,18 +14,16 @@
   "video": {
     "arquivo": "2L.mp4",
     "personagem": "p15",
-    "escala": 0.5285,
+    "escala": 0.5708,
     "medida": "1º quadro = inicio_agachado (nota 0.99)",
     "quadros": "16,24,25,26,27,29",
-    "celula": 224,
     "largura": 224,
-    "raiz": "97,206",
+    "raiz": "96,238",
     "colunas": 6,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
   "frameWidth": 224,
-  "frameHeight": 224,
-  "rootX": 97,
-  "rootY": 206
+  "rootX": 96
 }

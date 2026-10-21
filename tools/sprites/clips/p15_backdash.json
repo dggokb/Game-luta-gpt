@@ -14,18 +14,19 @@
   "video": {
     "arquivo": "backDash.mp4",
     "personagem": "p15",
-    "escala": 0.525,
+    "escala": 0.567,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "11,20,30,39,48,58,67,76,86,95",
-    "celula": 288,
+    "celula": 320,
     "largura": 224,
-    "raiz": "105,270",
+    "raiz": "105,302",
     "colunas": 10,
     "fixar": "registro",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
   "frameWidth": 224,
-  "frameHeight": 288,
+  "frameHeight": 320,
   "rootX": 105,
-  "rootY": 270
+  "rootY": 302
 }

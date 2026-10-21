@@ -14,15 +14,19 @@
   "video": {
     "arquivo": "dash.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "40,43,46,49,52,55",
+    "celula": 288,
     "largura": 256,
-    "raiz": "146,238",
+    "raiz": "146,270",
     "colunas": 6,
     "fixar": "registro",
     "pe_no_chao": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
-  "rootX": 146
+  "rootX": 146,
+  "frameHeight": 288,
+  "rootY": 270
 }

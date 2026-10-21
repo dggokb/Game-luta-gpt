@@ -265,6 +265,11 @@ trecho de volta à raiz. Exemplo e explicação no p15 ([ficha](p15.md)):
 
     python3 tools/sprites/montagem.py p15 <pasta com os vídeos> [clipes]
 
+Cabelo comprido de fios finos (p15): `"recorte_suave": true` nas opções (`--recorte-suave` no
+`video_para_sprite.py`) deixa as mechas meio transparentes em vez de cortadas em bloco e reabre
+os vãos de fundo entre elas. Andar: `"distancia": "video"` mede no vídeo quanto o corpo anda por
+quadro, para o pé ficar plantado (use só o trecho dos passos, sem a guarda parada do começo).
+
 Personagem novo sem todos os vídeos: o `personagem.py` grava o pacote assim que o movimento
 inteiro existe (IDLE, andar, agachar, pulo, dash, backdash); golpe do pulo ou agachado sem vídeo
 fica com a pose, e defesas, reações, intro e vitória são opcionais no motor.

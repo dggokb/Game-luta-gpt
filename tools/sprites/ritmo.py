@@ -40,8 +40,15 @@ def plan(cid):
     """{estado: (fator, motivo)}: fator multiplica o tempo de cada quadro."""
     pack, clips = A.load_pack(cid)
     out = {}
+    # Andar com o pé plantado medido no vídeo (montagem.py, "distancia": "video") fica como está.
+    recipe = Path(__file__).resolve().parent / f'montagens/{cid}.json'
+    planted = {state for spec in (json.loads(recipe.read_text(encoding='utf-8')).values() if recipe.exists() else [])
+               if isinstance(spec, dict) for state, a in spec.get('animacoes', {}).items()
+               if a.get('distancia') == 'video'}
     if cid != A.REFERENCE:
         for state in VISUAL:
+            if state in planted:
+                continue
             mine, ref = A.pace(cid, state), A.pace(A.REFERENCE, state)
             if mine and ref and abs(mine / ref - 1) >= TOLERANCE:
                 out[state] = (float(np.clip(mine / ref, 1 / LIMIT, LIMIT)), f'ritmo {mine / ref:.2f}x o do p01')

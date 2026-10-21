@@ -275,6 +275,10 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
         args.append('--pe-no-chao')
     if opts.get('sem_efeitos'):
         args.append('--sem-efeitos')  # rastro e brilho desenhados pelo vídeo (machado do p15)
+    if opts.get('recorte_suave'):
+        args.append('--recorte-suave')  # mechas finas de cabelo (p15)
+    if opts.get('deslocar'):
+        args += ['--deslocar', opts['deslocar']]
     if (not opts.get('pe_no_chao') or opts.get('fixar') == 'registro') and not opts.get('sem_chao'):
         args.append('--limpar-chao')  # deitado não: o cabelo fica na faixa do chão
     if manual:

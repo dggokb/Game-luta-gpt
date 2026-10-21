@@ -14,18 +14,19 @@
   "video": {
     "arquivo": "M.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "12,17,23,28,30,33,35,38,40,42,45,47,50,52",
     "celula": 288,
     "largura": 224,
-    "raiz": "91,270",
+    "raiz": "88,270",
     "colunas": 11,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
   "frameWidth": 224,
   "frameHeight": 288,
-  "rootX": 91,
+  "rootX": 88,
   "rootY": 270
 }

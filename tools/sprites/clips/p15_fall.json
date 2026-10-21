@@ -14,17 +14,18 @@
   "video": {
     "arquivo": "pular.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "34,36,38,40,42,44",
-    "celula": 320,
-    "largura": 160,
-    "raiz": "84,302",
+    "celula": 352,
+    "largura": 192,
+    "raiz": "101,334",
     "colunas": 6,
-    "pe_no_chao": true
+    "pe_no_chao": true,
+    "recorte_suave": true
   },
-  "frameWidth": 160,
-  "frameHeight": 320,
-  "rootX": 84,
-  "rootY": 302
+  "frameWidth": 192,
+  "frameHeight": 352,
+  "rootX": 101,
+  "rootY": 334
 }

@@ -14,19 +14,20 @@
   "video": {
     "arquivo": "M_BAIXO.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "16,20,22,24,27,37,38,43,45,48,54,58,62",
     "celula": 320,
     "largura": 192,
-    "raiz": "88,302",
+    "raiz": "86,302",
     "colunas": 11,
     "fixar": "video",
     "sem_efeitos": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
   "frameWidth": 192,
   "frameHeight": 320,
-  "rootX": 88,
+  "rootX": 86,
   "rootY": 302
 }

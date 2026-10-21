@@ -14,17 +14,17 @@
   "video": {
     "arquivo": "p15_special_s3.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "10,14,15,16,17,37,38,39,40,46,48,49,52,54,56,58,77,78,80,81,82,85,86,88,90,93,95,97,100",
     "celula": 288,
-    "largura": 224,
-    "raiz": "91,270",
+    "largura": 256,
+    "raiz": "105,270",
     "colunas": 11,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
-  "frameWidth": 224,
   "frameHeight": 288,
-  "rootX": 91,
+  "rootX": 105,
   "rootY": 270
 }

@@ -8,9 +8,9 @@
   "worldScale": 1.075,
   "layout": {
     "frameWidth": 192,
-    "frameHeight": 256,
+    "frameHeight": 288,
     "rootX": 91,
-    "rootY": 238,
+    "rootY": 270,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,146 +18,146 @@
     {
       "index": 0,
       "outputBbox": [
-        24,
-        52,
-        166,
-        239
+        18,
+        67,
+        173,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11064
+      "minimumMargin": 16,
+      "opaquePixels": 13866
     },
     {
       "index": 1,
       "outputBbox": [
-        24,
-        50,
-        166,
-        239
+        18,
+        66,
+        173,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 10991
+      "minimumMargin": 16,
+      "opaquePixels": 13830
     },
     {
       "index": 2,
       "outputBbox": [
-        25,
-        44,
-        167,
-        239
+        18,
+        59,
+        173,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11047
+      "minimumMargin": 16,
+      "opaquePixels": 13862
     },
     {
       "index": 3,
       "outputBbox": [
-        25,
-        35,
-        167,
-        239
+        19,
+        49,
+        174,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 10965
+      "minimumMargin": 16,
+      "opaquePixels": 13853
     },
     {
       "index": 4,
       "outputBbox": [
-        25,
-        26,
-        167,
-        239
+        19,
+        39,
+        174,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11126
+      "minimumMargin": 16,
+      "opaquePixels": 14044
     },
     {
       "index": 5,
       "outputBbox": [
-        26,
-        18,
-        167,
-        239
+        19,
+        31,
+        174,
+        272
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11328
+      "minimumMargin": 16,
+      "opaquePixels": 14276
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 164,
-    "frameHeight": 241,
-    "rootX": 77,
-    "rootY": 230,
+    "frameWidth": 176,
+    "frameHeight": 261,
+    "rootX": 83,
+    "rootY": 249,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      14,
-      8
+      8,
+      21
     ],
-    "sheetWidth": 156,
-    "sheetHeight": 1312,
+    "sheetWidth": 168,
+    "sheetHeight": 1428,
     "frames": [
       [
         0,
-        1112,
-        156,
-        200,
+        984,
+        168,
+        220,
         4,
-        38
+        40
       ],
       [
         0,
-        904,
-        156,
-        204,
+        1208,
+        168,
+        220,
         4,
-        36
+        39
       ],
       [
         0,
-        692,
-        156,
-        208,
-        5,
-        29
-      ],
-      [
-        0,
-        472,
-        156,
-        216,
-        5,
-        21
-      ],
-      [
-        0,
-        240,
-        156,
+        752,
+        168,
         228,
+        4,
+        32
+      ],
+      [
+        0,
+        512,
+        168,
+        236,
+        5,
+        22
+      ],
+      [
+        0,
+        260,
+        168,
+        248,
         5,
         12
       ],
       [
         0,
         0,
-        156,
-        236,
-        6,
+        168,
+        256,
+        5,
         4
       ]
     ],
     "decodedBytes": {
-      "canonical": 1179648,
-      "grid": 948576,
-      "packed": 818688
+      "canonical": 1327104,
+      "grid": 1102464,
+      "packed": 959616
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0455e467ef6def6ba57f5b4e0c853d27346e451a7a92ec2e220277777e1f0840",
-      "config": "c09735a39043453df477840df99864ab1a62824821436284e7cca191e8cc01af",
-      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+      "source": "677fab56cb0d7cba68abf50125be8af255f07a9fb5baec33627176391d3b37e5",
+      "config": "feec73888d73e44aa0c566bce64d80a253f5f8d25b5a0d4369d7c5bde6ae8f2c",
+      "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
     }
   }
 }

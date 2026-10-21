@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_walk_forward.webp",
   "report": "tools/sprites/reports/p15_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p15_walk_forward-import.png",
-  "expectedFrames": 45,
+  "expectedFrames": 26,
   "segmentation": "prepared-grid",
   "columns": 11,
   "rootMode": "authored",
@@ -14,19 +14,18 @@
   "video": {
     "arquivo": "andarFrente.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92",
+    "quadros": "28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78",
     "celula": 288,
-    "largura": 224,
-    "raiz": "108,270",
+    "largura": 256,
+    "raiz": "126,270",
     "colunas": 11,
-    "fixar": "registro",
     "pe_no_chao": true,
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
-  "frameWidth": 224,
   "frameHeight": 288,
-  "rootX": 108,
+  "rootX": 126,
   "rootY": 270
 }

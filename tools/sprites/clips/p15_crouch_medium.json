@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_crouch_medium.webp",
   "report": "tools/sprites/reports/p15_crouch_medium.report.json",
   "preview": "android/app/build/sprite-review/p15_crouch_medium-import.png",
-  "expectedFrames": 16,
+  "expectedFrames": 26,
   "segmentation": "prepared-grid",
   "columns": 11,
   "rootMode": "authored",
@@ -14,16 +14,17 @@
   "video": {
     "arquivo": "2M.mp4",
     "personagem": "p15",
-    "escala": 0.5268,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_agachado (nota 0.99)",
-    "quadros": "14,17,20,22,24,26,28,30,32,34,36,38,40,42,45,50",
+    "quadros": "14,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,40,42,45,50",
     "largura": 320,
-    "raiz": "136,233",
+    "raiz": "133,231",
     "colunas": 11,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
   "frameWidth": 320,
-  "rootX": 136,
-  "rootY": 233
+  "rootX": 133,
+  "rootY": 231
 }

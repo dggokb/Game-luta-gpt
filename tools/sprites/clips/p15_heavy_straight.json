@@ -14,7 +14,7 @@
   "video": {
     "arquivo": "H.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.96)",
     "quadros": "16,20,23,25,27,28,29,30,31,33,36",
     "celula": 288,
@@ -22,7 +22,8 @@
     "raiz": "105,270",
     "colunas": 11,
     "fixar": "video",
-    "limpar_chao": true
+    "limpar_chao": true,
+    "recorte_suave": true
   },
   "frameHeight": 288,
   "rootX": 105,

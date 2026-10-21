@@ -96,7 +96,7 @@ def floor_dust(alpha, h, s, v):
     return band & (tinted | beige)
 
 
-def key(frame, dust=False, effects=False, floor=False):
+def key(frame, dust=False, effects=False, floor=False, soft=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
     bg = (h > 35) & (h < 95) & (s > 45)
@@ -138,7 +138,52 @@ def key(frame, dust=False, effects=False, floor=False):
     alpha = cv2.GaussianBlur(alpha, (3, 3), 0)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(int)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 8)  # tira o verde da borda
-    return np.dstack([rgb.astype(np.uint8), alpha])
+    out = np.dstack([rgb.astype(np.uint8), alpha])
+    return soft_edges(frame, out) if soft else out
+
+
+SOFT_FROM = 14      # "verde" (G - max(R, B)) até onde o pixel é todo do personagem
+SOFT_REACH = 7      # px além do contorno onde a mecha meio transparente ainda conta
+SOFT_DARK = 110     # só cor escura vira mecha (cabelo, faixa, luva): o resto seria franja
+
+
+def soft_edges(frame, rgba):
+    """Recorte suave (cabelo comprido de fios finos, p15): o key() acima é binário e a abertura
+    apaga as mechas finas, deixando o cabelo em bloco serrilhado; e o fechamento de furinhos
+    tapa vãos de fundo entre as mechas, que viram mancha clara depois de tirar o verde.
+
+    Aqui: vão de fundo verde saturado que tinha sido tapado volta a ser transparente, e em
+    volta do contorno a mistura de cor escura com o fundo ganha alfa pelo quanto ela é verde
+    (alfa = 1 - verde / verde do fundo), com a cor do fundo tirada da mistura."""
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    h, s = hsv[..., 0].astype(int), hsv[..., 1].astype(int)
+    screen = (h > 35) & (h < 95) & (s > 45)
+    alpha = rgba[..., 3].copy()
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(screen.astype(np.uint8))
+    for i in range(1, n):
+        if stats[i, cv2.CC_STAT_AREA] >= 4:
+            m = labels == i
+            if (alpha[m] > 128).mean() > 0.5:
+                alpha[m] = 0
+    f = frame.astype(np.float32)
+    green = f[..., 1] - np.maximum(f[..., 0], f[..., 2])
+    back = screen & (alpha < 10)
+    if back.sum() < 100:
+        return np.dstack([rgba[..., :3], alpha])
+    full = np.percentile(green[back], 5)   # o fundo mais fraco ainda é fundo
+    color = np.median(f[back], axis=0)
+    a = np.clip((full - green) / max(1.0, full - SOFT_FROM), 0, 1)
+    unmixed = np.clip((f - (1 - a[..., None]) * color) / np.maximum(a, 1e-3)[..., None], 0, 255)
+    body = alpha > 128
+    near = cv2.dilate(body.astype(np.uint8), np.ones((2 * SOFT_REACH + 1,) * 2, np.uint8)) > 0
+    strand = near & ~body & (unmixed.max(axis=2) < SOFT_DARK) & (a >= 0.08)
+    out = rgba.copy()
+    out[..., 3] = alpha
+    out[..., 3][strand] = np.maximum(alpha[strand], (a[strand] * 255).astype(np.uint8))
+    rgb = unmixed[..., ::-1].copy()
+    rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]))   # ponta da mecha sem verde
+    out[..., :3][strand] = rgb[strand].astype(np.uint8)
+    return out
 
 
 def torso_x(rgba):
@@ -154,7 +199,7 @@ def torso_x(rgba):
 RECIPE = dict(inicio=None, fim=None, passo=1, quadros=None, celula=256, largura=None,
               raiz="128,238", colunas=8, fixar="tronco", pe_no_chao=False, deslocar="0,0",
               sem_poeira=False, sem_efeitos=False, limpar_chao=False, ancorar_pe=False, reescala=None, limpar_quadros=None,
-              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None)
+              limpar_area=None, aparar_borda=0, densidade=1, nitidez=False, referencia=None, recorte_suave=False)
 
 
 def parser():
@@ -175,6 +220,8 @@ def parser():
     p.add_argument("--largura", type=int, help="largura da célula (padrão: igual à altura)")
     p.add_argument("--sem-poeira", action="store_true", help="remove poeira bege do chão")
     p.add_argument("--sem-efeitos", action="store_true", help="remove clarão de impacto e rastro de golpe")
+    p.add_argument("--recorte-suave", action="store_true",
+                   help="mechas de cabelo meio transparentes e vãos de fundo entre elas abertos (soft_edges)")
     p.add_argument("--limpar-chao", action="store_true",
                    help="remove poeira cinza-esverdeada na faixa dos pés (seguro com cabelo claro e pele)")
     p.add_argument("--colunas", type=int, default=8)
@@ -334,9 +381,10 @@ def main(argv=None):
     cache = {}
 
     def keyed_frame(i, dust=False, effects=False, floor=False):
-        if (i, dust, effects, floor) not in cache:
-            cache[i, dust, effects, floor] = key(frames[i], dust, effects, floor)
-        return cache[i, dust, effects, floor]
+        soft = args.recorte_suave
+        if (i, dust, effects, floor, soft) not in cache:
+            cache[i, dust, effects, floor, soft] = key(frames[i], dust, effects, floor, soft)
+        return cache[i, dust, effects, floor, soft]
 
     measured = None
     if args.escala is not None:

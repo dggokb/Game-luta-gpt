@@ -21,11 +21,13 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
   aos poucos, a terminar com o tronco onde o vídeo colado começou (a guarda do fim volta para
   a raiz, sem pulo ao trocar para o IDLE).
 - quadros: os quadros do vídeo colado que viram o clipe ("A-B/N" = de A a B de N em N).
-- opcoes: as de conversão do personagem.py (fixar, pe_no_chao, sem_efeitos).
+- opcoes: as de conversão do personagem.py (fixar, pe_no_chao, sem_efeitos, recorte_suave,
+  deslocar); "_opcoes" no topo da receita vale para todos os clipes.
 - animacoes: as animações do pacote que usam o clipe. frames são índices do clipe ("9-0" =
   de trás para a frente: a volta pelo inverso do vídeo que só vai até a pose); impacto é a
-  posição em frames do quadro em que o golpe encosta. A mesma folha pode servir a mais de
-  uma animação (o Super e o Ultra do p15 usam a do S1).
+  posição em frames do quadro em que o golpe encosta; "distancia": "video" (andar) troca de
+  quadro pela distância andada, com a distância medida no vídeo (pé plantado). A mesma folha
+  pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1).
 
 Um vídeo só, sem "fixo", é convertido direto do arquivo. O vídeo colado vai para
 android/app/build/video-cache/montagem/<id>_<clipe>.mp4 (sem perda) e a receita do clipe grava esse
@@ -130,7 +132,19 @@ def durations(quadros, frames):
     return [max(1, round(abs(gaps[i]) * 1000 / FPS)) for i in frames]
 
 
-def update_pack(char, name, spec):
+def stride(char, name, video, quadros):
+    """Quanto o corpo anda no jogo a cada quadro do clipe (px do mundo): a reta do tronco nos
+    quadros escolhidos, na escala da receita e no worldScale do perfil. Com essa distância por
+    quadro o pé do andar fica plantado (o motor anda, a arte acompanha)."""
+    frames, _ = read_frames(video)
+    xs = np.array([torso_x(key(frames[q])) for q in quadros])
+    slope = abs(np.polyfit(np.arange(len(xs)), xs, 1)[0])
+    clip = json.loads((HERE / f'clips/{char}_{name}.json').read_text(encoding='utf-8'))
+    profile = json.loads((HERE / f"profiles/{clip['profile']}").read_text(encoding='utf-8'))
+    return round(float(slope * clip['video']['escala'] * profile['worldScale']), 2)
+
+
+def update_pack(char, name, spec, distance=None):
     path = ROOT / f'characters/{char}/character.json'
     if not path.exists():
         personagem.update_pack(char, set())
@@ -142,6 +156,11 @@ def update_pack(char, name, spec):
             raise SystemExit(f'{name}/{state}: quadro {max(frames)} além dos {len(quadros)} do clipe')
         old = pack['animations'].get(state, {})
         anim = {'atlas': f'{char}_{name}', 'frames': frames, 'loop': bool(a.get('loop', False))}
+        if 'distancia' in a:   # andar: o quadro troca pela distância andada, não pelo tempo
+            anim['loop'] = True
+            anim['distancePerFrame'] = distance if a['distancia'] == 'video' else a['distancia']
+            pack['animations'][state] = anim
+            continue
         same = old.get('atlas') == anim['atlas'] and old.get('frames') == frames \
             and len(old.get('durationsMs', [])) == len(frames)
         anim['durationsMs'] = old['durationsMs'] if same and 'durationsMs' in old else durations(quadros, frames)
@@ -164,14 +183,19 @@ def main():
     char = args.personagem
     recipe = json.loads((HERE / f'montagens/{char}.json').read_text(encoding='utf-8'))
     names = args.clipes or [k for k in recipe if not k.startswith('_')]
+    distances = {}
     for name in names:
         spec = recipe[name]
         video, first = source(char, args.pasta, name, spec)
         quadros = [q + first for q in numbers(spec['quadros'])]
-        msg = personagem.convert(char, name, video, quadros, spec.get('opcoes', {}), None)
+        opts = {**recipe.get('_opcoes', {}), **spec.get('opcoes', {})}
+        msg = personagem.convert(char, name, video, quadros, opts, None)
         print(f'{name:16} {msg}', flush=True)
+        if any(a.get('distancia') == 'video' for a in spec.get('animacoes', {}).values()):
+            distances[name] = stride(char, name, video, quadros)
+            print(f'{name:16} {distances[name]} px por quadro (pé plantado)', flush=True)
     for name in names:
-        update_pack(char, name, recipe[name])
+        update_pack(char, name, recipe[name], distances.get(name))
     print(f'characters/{char}/character.json atualizado; rode tools/sprites/mecanicas.py --write {char} '
           f'e tools/sprites/build_characters.py --write')
 

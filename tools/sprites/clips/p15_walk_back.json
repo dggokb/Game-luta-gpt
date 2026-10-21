@@ -14,19 +14,19 @@
   "video": {
     "arquivo": "andarTras.mp4",
     "personagem": "p15",
-    "escala": 0.5267,
+    "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.96)",
     "quadros": "21,23,25,27,29,31,33,35,37,39,41,43,45,47",
     "celula": 288,
-    "largura": 224,
-    "raiz": "107,270",
+    "largura": 256,
+    "raiz": "117,270",
     "colunas": 11,
-    "fixar": "registro",
     "pe_no_chao": true,
-    "limpar_chao": true
+    "deslocar": "20,0",
+    "limpar_chao": true,
+    "recorte_suave": true
   },
-  "frameWidth": 224,
   "frameHeight": 288,
-  "rootX": 107,
+  "rootX": 117,
   "rootY": 270
 }

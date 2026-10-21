@@ -7,10 +7,10 @@
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 160,
-    "frameHeight": 320,
-    "rootX": 84,
-    "rootY": 302,
+    "frameWidth": 192,
+    "frameHeight": 352,
+    "rootX": 101,
+    "rootY": 334,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,146 +18,146 @@
     {
       "index": 0,
       "outputBbox": [
-        33,
-        134,
-        143,
-        303
+        48,
+        149,
+        168,
+        335
       ],
       "minimumMargin": 17,
-      "opaquePixels": 9492
+      "opaquePixels": 12099
     },
     {
       "index": 1,
       "outputBbox": [
-        32,
-        123,
-        142,
-        303
+        43,
+        136,
+        166,
+        335
       ],
       "minimumMargin": 17,
-      "opaquePixels": 10025
+      "opaquePixels": 12828
     },
     {
       "index": 2,
       "outputBbox": [
-        27,
-        104,
-        141,
-        303
+        36,
+        116,
+        164,
+        335
       ],
       "minimumMargin": 17,
-      "opaquePixels": 10542
+      "opaquePixels": 13595
     },
     {
       "index": 3,
       "outputBbox": [
-        22,
-        79,
-        139,
-        303
+        30,
+        88,
+        162,
+        336
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11033
+      "minimumMargin": 16,
+      "opaquePixels": 14487
     },
     {
       "index": 4,
       "outputBbox": [
-        18,
-        54,
-        137,
-        303
+        24,
+        63,
+        159,
+        337
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11507
+      "minimumMargin": 15,
+      "opaquePixels": 15082
     },
     {
       "index": 5,
       "outputBbox": [
-        17,
-        32,
-        135,
-        303
+        23,
+        38,
+        157,
+        336
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 11824
+      "minimumMargin": 16,
+      "opaquePixels": 15443
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 146,
-    "frameHeight": 292,
-    "rootX": 77,
-    "rootY": 280,
+    "frameWidth": 165,
+    "frameHeight": 319,
+    "rootX": 88,
+    "rootY": 306,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      7,
-      22
+      13,
+      28
     ],
-    "sheetWidth": 268,
-    "sheetHeight": 728,
+    "sheetWidth": 300,
+    "sheetHeight": 792,
     "frames": [
       [
-        128,
-        532,
-        124,
-        184,
-        20,
-        106
+        140,
+        580,
+        136,
+        200,
+        28,
+        115
       ],
       [
         0,
-        532,
-        124,
-        196,
-        19,
-        95
-      ],
-      [
+        580,
         136,
-        288,
-        128,
         212,
-        13,
-        76
+        24,
+        102
+      ],
+      [
+        148,
+        316,
+        144,
+        232,
+        17,
+        82
       ],
       [
         0,
+        316,
+        144,
+        260,
+        11,
+        54
+      ],
+      [
+        152,
+        0,
+        148,
         288,
-        132,
-        240,
-        9,
-        50
-      ],
-      [
-        136,
-        0,
-        132,
-        264,
         5,
-        26
+        29
       ],
       [
         0,
         0,
-        132,
-        284,
+        148,
+        312,
         4,
         4
       ]
     ],
     "decodedBytes": {
-      "canonical": 1228800,
-      "grid": 1023168,
-      "packed": 780416
+      "canonical": 1622016,
+      "grid": 1263240,
+      "packed": 950400
     }
   },
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "0b5b1a90ab1cb1e646ff1a5fa8e3167cb1d28d4668c606b5ae7cbac7b8a61ada",
-      "config": "d16623ca5830ebe8fa1dd047164bf530a7713003a97faa6d8d731f7e7c5baeb7",
-      "profile": "7b1b46b788264ce3e7d44c27412f9f35a6983e0a8eb2f0b5b6029b33f0e0dce2"
+      "source": "5650dd53ed24557c1ddd6bc9860220d9378b8220a695bf3db13efd281171f733",
+      "config": "a97890dc1d244874e8a64980a4d26cabd4a5177819a13683f33e09fdf16191cd",
+      "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
     }
   }
 }

@@ -42,7 +42,7 @@
     },
     "p15": {
       "S3": {"pancadas": [4, 7, 10, 13, 15, 19, 23], "avanco": 120},
-      "S4": {"pancadas": [7, 24], "avanco": {"distancia": 136, "de": 2, "ate": 20}}
+      "S4": {"pancadas": [7, 24], "avanco": {"distancia": 147, "de": 2, "ate": 20}}
     }
   }
 }
