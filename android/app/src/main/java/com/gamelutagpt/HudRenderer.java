@@ -67,6 +67,9 @@ final class HudRenderer {
         default boolean hideTestButtons() { return tutorialActive(); }
         /** Botão do topo da luta: a seleção no modo teste, o MENU (pausa) no modo história. */
         default String selectButtonLabel() { return "◀ SELEÇÃO"; }
+        /** Botão do motor de animação (nível ou OFF), ou null para não mostrar. */
+        default String animacaoLabel() { return null; }
+        default boolean animacaoLigada() { return false; }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -198,6 +201,8 @@ final class HudRenderer {
             HEAL_PLAYER_LEFT, HEAL_BUTTON_TOP, HEAL_PLAYER_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
         drawToggle(c, s.pressed(Control.HEAL_OPPONENT), "VIDA CPU",
             HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM, 14f);
+        if (s.animacaoLabel() != null) drawToggle(c, s.animacaoLigada(), s.animacaoLabel(),
+            TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM, 15f);
     }
 
 

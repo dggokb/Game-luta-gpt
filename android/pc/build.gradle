@@ -78,6 +78,7 @@ dependencies {
     implementation project(':ultra-core')
     implementation project(':story-core')
     implementation project(':stage-core')
+    implementation project(':motion-core')
     // Os atlas dos lutadores e os retratos do HUD são WEBP, que o ImageIO do Java não lê sozinho.
     // 3.15+: o 3.12 quebrava em 34 dos atlas WEBP sem perda (VP8LDecoder.decodeBwRef).
     implementation 'com.twelvemonkeys.imageio:imageio-webp:3.15.3'
@@ -268,6 +269,22 @@ tasks.register('capturar', JavaExec) {
     args layout.buildDirectory.dir('captura').get().asFile.absolutePath
     // -Ptela=1280x720: arte decidida como num celular com essa tela (padrão: sem redução).
     if (providers.gradleProperty('tela').isPresent()) systemProperty 'gameluta.tela', providers.gradleProperty('tela').get()
+}
+
+// Revisão do motor de animação: o mesmo roteiro com o motor desligado e ligado, em PNG.
+// gradle :pc:revisarAnimacao   →   pc/build/revisao-animacao/{desligado,ligado}/
+tasks.register('revisarAnimacao', JavaExec) {
+    group = 'verification'
+    description = 'Grava os quadros de um roteiro de luta com o motor de animação desligado e ligado.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.gamelutagpt.RevisaoAnimacao'
+    workingDir = rootProject.projectDir
+    if (providers.gradleProperty('modos').isPresent()) systemProperty 'modos', providers.gradleProperty('modos').get()
+    systemProperty 'gameluta.repo', repoRoot.absolutePath
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'gameluta.semSom', 'true'
+    maxHeapSize = '3g'
+    args layout.buildDirectory.dir('revisao-animacao').get().asFile.absolutePath
 }
 
 // Mede o carregarArte por parte e as folhas de cada lutador (tempo e memória decodificada).

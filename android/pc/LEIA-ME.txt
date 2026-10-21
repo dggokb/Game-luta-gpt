@@ -34,6 +34,7 @@ Menus e seleção: setas/WASD andam, J/Enter/Espaço confirma, K/Esc volta,
 R sorteia, Tab abre as opções, Q/E/O troca o time.
 
 Modo teste: F1 DEBUG, F3 liga/desliga a IA, F5 enche a vida do P1, F6 a da CPU.
+F4: motor de animação (100%, 150%, 50%, desligado).
 Arquivos do DEBUG ("salvar no Drive") vão para Documentos/GameLutaGPT.
 F11 ou Alt+Enter: tela cheia (o jogo lembra da escolha na próxima vez).
 O controle virtual de toque (D-pad e botões de golpe) não aparece no PC; o mouse

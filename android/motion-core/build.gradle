@@ -1,0 +1,13 @@
+plugins { id 'java-library' }
+
+// Motor de animação: o movimento por cima dos quadros desenhados (molas, transição entre
+// clipes, achatar/esticar, inclinação e rastro). Java puro e sem Android, como o ultra-core,
+// para rodar igual no Android e no PC e ser levado para a sprite-gpt sem arrastar o resto.
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+}

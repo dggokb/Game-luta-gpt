@@ -2,10 +2,13 @@ package com.gamelutagpt;
 
 import android.content.Context;
 import android.graphics.*;
+import com.gamelutagpt.motion.Pose;
 
 /** Generic atlas renderer. No attack IDs, resource IDs or per-clip branches. */
 final class SpriteFighterRenderer {
     final SpriteMotion motion;
+    /** Motor de animação (motion-core): o movimento por cima dos quadros. */
+    final AnimacaoLutador animacao = new AnimacaoLutador();
     private final SpriteAtlasCache atlases;
     private CharacterDefinition character;
     private final Rect source=new Rect();
@@ -15,6 +18,12 @@ final class SpriteFighterRenderer {
     private final Paint spritePaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.FILTER_BITMAP_FLAG);
     private final ColorFilter hitFlash=new PorterDuffColorFilter(Color.argb(150,255,255,255),PorterDuff.Mode.SRC_ATOP);
     private final ColorFilter blockFlash=new PorterDuffColorFilter(Color.rgb(205,240,255),PorterDuff.Mode.MULTIPLY);
+    /** Rastro do motor de animação: o lutador clareado e azulado. */
+    private final ColorFilter rastro=new ColorMatrixColorFilter(new ColorMatrix(new float[]{
+        0.62f,0f,0f,0f,32f,
+        0f,0.72f,0f,0f,58f,
+        0f,0f,1f,0f,112f,
+        0f,0f,0f,1f,0f}));
     /** Base color filter when no flash is showing (the p06 shadow echo), or null. */
     private ColorFilter tint;
 
@@ -39,7 +48,7 @@ final class SpriteFighterRenderer {
     void setCharacter(String id) {
         CharacterDefinition next=GeneratedCharacters.get(id);
         if(next==character)return;
-        atlases.preload(next);character=next;motion.setCharacter(next);
+        atlases.preload(next);character=next;motion.setCharacter(next);animacao.zerar();
     }
     void update(float dt,boolean grounded,boolean crouching,float velocityY,float travel,
                 boolean forward,boolean dash,boolean backdash,String attackAnimation,
@@ -102,52 +111,91 @@ final class SpriteFighterRenderer {
 
     /** Sprite artwork coordinates, not fighter hitboxes or simulation sizes. */
     void draw(Canvas canvas,float x,float baseY,int facing,boolean damageFlash,boolean guardFlash) {
-        CharacterDefinition.Animation anim=character.animation(motion.clip);
-        int frame=motion.frame();
         spritePaint.setColorFilter(override!=null?override:damageFlash?hitFlash:guardFlash?blockFlash:tint);
-        boolean mirror=facing*character.artFacing<0;
-        if(mirror) {canvas.save();canvas.scale(-1f,1f,x,0f);}
+        Pose pose=animacao.pose();
+        canvas.save();
+        if(facing*character.artFacing<0) canvas.scale(-1f,1f,x,0f);
+        aplicarPose(canvas,pose,x,baseY);
+        drawClip(canvas,motion.clip,motion.frame(),x,baseY,255);
+        // Transição: o quadro do clipe de antes por cima, sumindo em poucos quadros.
+        if(pose.clipeAnterior!=null && pose.alfaAnterior>0f && hasAnimation(pose.clipeAnterior)) {
+            drawClip(canvas,pose.clipeAnterior,pose.quadroAnterior,x,baseY,Math.round(255*pose.alfaAnterior));
+        }
+        spritePaint.setAlpha(255);
+        canvas.restore();
+    }
+
+    /**
+     * Rastro do motor de animação: cópias dos quadros recentes, translúcidas e tingidas, onde o
+     * lutador estava (desenhe antes do lutador, sem as transformações dele).
+     */
+    void drawRastro(Canvas canvas) {
+        Pose pose=animacao.pose();
+        if(pose.fantasmas==0)return;
+        spritePaint.setColorFilter(rastro);
+        for(int i=0;i<pose.fantasmas;i++) {
+            Pose.Fantasma f=pose.rastro[i];
+            if(f.alfa<=0f||!hasAnimation(f.clipe))continue;
+            canvas.save();
+            if(f.olhando*character.artFacing<0) canvas.scale(-1f,1f,f.x,0f);
+            drawClip(canvas,f.clipe,f.quadro,f.x,f.y,Math.round(255*f.alfa));
+            canvas.restore();
+        }
+        spritePaint.setAlpha(255);
+        spritePaint.setColorFilter(tint);
+    }
+
+    /** Achatar/esticar e inclinação em volta da raiz (os pés), no espaço da arte (já espelhada). */
+    private void aplicarPose(Canvas canvas,Pose pose,float x,float baseY) {
+        if(pose.neutra())return;
+        // Na arte, "para a frente" é o lado para onde ela foi desenhada olhando.
+        float frente=character.artFacing;
+        if(pose.deslocX!=0f||pose.deslocY!=0f) canvas.translate(pose.deslocX*frente,pose.deslocY);
+        if(pose.inclinacao!=0f) canvas.rotate(pose.inclinacao*frente,x,baseY);
+        if(pose.escalaX!=1f||pose.escalaY!=1f) canvas.scale(pose.escalaX,pose.escalaY,x,baseY);
+    }
+
+    /** Um quadro de um clipe com as calibrações do p01 (sem espelhar nem a pose). */
+    private void drawClip(Canvas canvas,String clip,int frame,float x,float baseY,int alpha) {
+        CharacterDefinition.Animation anim=character.animation(clip);
         boolean p01="player_base".equals(character.id)||"p01_training".equals(character.id);
 
-        if(p01 && SpriteStates.IDLE.equals(motion.clip)) {
+        if(p01 && SpriteStates.IDLE.equals(clip)) {
             drawAtlas(canvas,anim.atlas,frame,x,baseY,
-                P01_IDLE_SCALE,P01_IDLE_SCALE,255);
-        } else if(p01 && SpriteStates.DASH.equals(motion.clip)) {
+                P01_IDLE_SCALE,P01_IDLE_SCALE,alpha);
+        } else if(p01 && SpriteStates.DASH.equals(clip)) {
             // The running pose can extend its limbs, but never enlarges
             // the fighter relative to the canonical idle body.
-            drawP01Calibrated(canvas,anim,frame,x,baseY,255);
-        } else if(p01 && SpriteStates.VICTORY.equals(motion.clip)) {
+            drawP01Calibrated(canvas,anim,frame,x,baseY,alpha);
+        } else if(p01 && SpriteStates.VICTORY.equals(clip)) {
             // Per-frame center and feet stay on the same world root, even
             // when the original victory video shifts the painted body.
-            drawP01Calibrated(canvas,anim,frame,x,baseY,255);
-        } else if(p01 && SpriteStates.CROUCH.equals(motion.clip)) {
+            drawP01Calibrated(canvas,anim,frame,x,baseY,alpha);
+        } else if(p01 && SpriteStates.CROUCH.equals(clip)) {
             // Widening of the painted figure across CROUCH 0..7 is compensated.
             // Result: occupied width stays ~302px in authored sprite coordinates.
             float k=P01_CROUCH[Math.min(frame,P01_CROUCH.length-1)];
-            drawAtlas(canvas,anim.atlas,frame,x,baseY,k,k,255);
-        } else if(p01 && SpriteStates.RISE.equals(motion.clip)) {
+            drawAtlas(canvas,anim.atlas,frame,x,baseY,k,k,alpha);
+        } else if(p01 && SpriteStates.RISE.equals(clip)) {
             int i=Math.min(frame,P01_RISE_X.length-1);
             float fade=clamp01((i-3f)/2f);
             if(fade<1f)drawAtlas(canvas,anim.atlas,frame,x,baseY,
-                P01_RISE_X[i],P01_RISE_Y[i],Math.round(255*(1f-fade)));
-            if(fade>0f)drawP01Idle(canvas,x,baseY,Math.round(255*fade));
-        } else if(p01 && SpriteStates.INTRO.equals(motion.clip)) {
+                P01_RISE_X[i],P01_RISE_Y[i],Math.round(alpha*(1f-fade)));
+            if(fade>0f)drawP01Idle(canvas,x,baseY,Math.round(alpha*fade));
+        } else if(p01 && SpriteStates.INTRO.equals(clip)) {
             // The intro's natural silhouette changes from narrow to a
             // fighting stance: normalize every frame, then crossfade to idle.
             float fade=clamp01((frame-22f)/4f);
             if(fade<1f) drawP01Calibrated(canvas,anim,frame,x,baseY,
-                Math.round(255*(1f-fade)));
-            if(fade>0f) drawP01Idle(canvas,x,baseY,Math.round(255*fade));
+                Math.round(alpha*(1f-fade)));
+            if(fade>0f) drawP01Idle(canvas,x,baseY,Math.round(alpha*fade));
         } else if(p01) {
             // Every other P01 state, including all attacks, hit, air, guard,
             // recovery, dash, throw, victory and taunt, uses the same master.
-            drawP01Calibrated(canvas,anim,frame,x,baseY,255);
+            drawP01Calibrated(canvas,anim,frame,x,baseY,alpha);
         } else {
-            drawAtlas(canvas,anim.atlas,frame,x,baseY,1f,1f,255);
+            drawAtlas(canvas,anim.atlas,frame,x,baseY,1f,1f,alpha);
         }
-
-        spritePaint.setAlpha(255);
-        if(mirror)canvas.restore();
     }
 
     private void drawP01Calibrated(Canvas canvas,CharacterDefinition.Animation anim,

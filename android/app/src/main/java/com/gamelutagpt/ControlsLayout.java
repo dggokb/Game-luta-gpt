@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
 
     static final float DPAD_X = 185f;
     static final float DPAD_Y = 545f;
@@ -127,6 +127,10 @@ final class ControlsLayout {
         if (insideRect(x, y, HEAL_OPPONENT_LEFT, HEAL_BUTTON_TOP, HEAL_OPPONENT_RIGHT, HEAL_BUTTON_BOTTOM)) {
             return Control.HEAL_OPPONENT;
         }
+        // Versão leve: no lugar do DUPLA, o nível do motor de animação.
+        if (insideRect(x, y, TEAM_BUTTON_LEFT, TEAM_BUTTON_TOP, TEAM_BUTTON_RIGHT, TEAM_BUTTON_BOTTOM)) {
+            return Control.ANIMACAO;
+        }
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;
         }
@@ -150,6 +154,7 @@ final class ControlsLayout {
             case DEBUG_TOGGLE:
             case HEAL_PLAYER:
             case HEAL_OPPONENT:
+            case ANIMACAO:
             case TEAM_SELECT:
             case STORY:
             case TUTORIAL:

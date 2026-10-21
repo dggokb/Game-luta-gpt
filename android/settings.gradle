@@ -22,6 +22,8 @@ include ':render-core'
 include ':ultra-core'
 include ':story-core'
 include ':stage-core'
+// Motor de animação (molas, transição, achatar/esticar, inclinação, rastro): docs/motor-animacao.md.
+include ':motion-core'
 // Visualizador no PC (gradle :pc-preview:run, :pc-preview:runStage).
 include ':pc-preview'
 // Jogo completo no PC e exportação para Windows/Linux/macOS (gradle :pc:run, :pc:exportarPc).

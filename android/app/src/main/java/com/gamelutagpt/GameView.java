@@ -784,6 +784,7 @@ public class GameView extends SurfaceView
                     case AI: setOpponentAiEnabled(!ai.enabled()); break;
                     case HEAL_PLAYER: healPlayerTeam(); break;
                     case HEAL_OPPONENT: healOpponentTeam(); break;
+                    case ANIMACAO: AnimacaoLutador.proximoNivel(); break;
                     default: break;
                 }
             }
@@ -1332,6 +1333,9 @@ public class GameView extends SurfaceView
         feel.clear();
         finalizacao.limpar();
         koVictim = null;
+        // Motor de animação: o round novo começa em repouso.
+        if (spriteFighterRenderer != null) spriteFighterRenderer.animacao.zerar();
+        if (opponentSpriteRenderer != null) opponentSpriteRenderer.animacao.zerar();
         float longest = 0f;
         for (CombatFighter f : new CombatFighter[] {player(), opponent()}) {
             CharacterDefinition.Animation clip = f.character().animations.get(SpriteStates.INTRO);
@@ -1396,6 +1400,8 @@ public class GameView extends SurfaceView
         @Override public float overdriveSeconds() { return engine.team(PLAYER).overdriveFrames * FIXED_STEP; }
         @Override public boolean overdriveReady() { return !engine.team(PLAYER).overdriveUsed; }
         @Override public String selectButtonLabel() { return "◀ MENU"; }
+        @Override public String animacaoLabel() { return AnimacaoLutador.rotulo(); }
+        @Override public boolean animacaoLigada() { return AnimacaoLutador.AJUSTES.ligado; }
         @Override public boolean pressed(ControlsLayout.Control control) {
             switch (control) {
                 case LIGHT: return lightPointer != -1;
@@ -3066,6 +3072,16 @@ public class GameView extends SurfaceView
             combatPose,
             locked
         );
+        renderer.animacao.passo(f, renderer.motion, engine, fighterVisualY(f));
+    }
+
+    /** Altura em que o lutador é desenhado (o pulinho do backdash sobe só o desenho). */
+    private float fighterVisualY(CombatFighter f) {
+        float visualY = f.y;
+        if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
+            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
+        }
+        return visualY;
     }
 
     /**
@@ -3127,6 +3143,8 @@ public class GameView extends SurfaceView
     private void drawFighter(Canvas c, SpriteFighterRenderer renderer, CombatFighter f,
                              boolean damageFlash, boolean guardFlash) {
         float angle = knockdownAngle(renderer, f);
+        // Rastro do motor de animação: atrás do lutador, onde ele estava.
+        renderer.drawRastro(c);
         c.save();
         // Quem apanhou treme durante o congelamento do acerto.
         float shake = ImpactFeel.hitShake(f, engine.frame());
@@ -3134,10 +3152,7 @@ public class GameView extends SurfaceView
         if (angle != 0f) c.rotate(angle, f.x, GROUND_Y);
         if (f.spinning && !f.grounded) spinTransform(c, f);
         // Shared backward-hop arc, without changing ground hitboxes or jump inputs.
-        float visualY = f.y;
-        if (f.grounded && f.status == CombatFighter.Status.NEUTRAL) {
-            visualY -= engine.config.backdashVisualLift(f.backdashFrames);
-        }
+        float visualY = fighterVisualY(f);
         ColorFilter look = renderer.override() == null ? superLook(f) : null;
         if (look != null) renderer.setOverride(look);
         renderer.draw(c, f.x, visualY, f.facing, damageFlash, guardFlash);
@@ -3540,6 +3555,9 @@ public class GameView extends SurfaceView
                 case HEAL_OPPONENT:
                     healOpponentPointer = pointerId;
                     healOpponentTeam();
+                    break;
+                case ANIMACAO:
+                    AnimacaoLutador.proximoNivel();
                     break;
                 case DPAD:
                     // A second finger on the D-pad is ignored; the first one owns it (a dono que
