@@ -6,9 +6,9 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_dash.webp",
   "report": "tools/sprites/reports/p15_dash.report.json",
   "preview": "android/app/build/sprite-review/p15_dash-import.png",
-  "expectedFrames": 6,
+  "expectedFrames": 18,
   "segmentation": "prepared-grid",
-  "columns": 6,
+  "columns": 11,
   "rootMode": "authored",
   "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "video": {
@@ -16,17 +16,17 @@
     "personagem": "p15",
     "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "40,43,46,49,52,55",
+    "quadros": "38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55",
     "celula": 288,
     "largura": 256,
-    "raiz": "146,270",
-    "colunas": 6,
-    "fixar": "registro",
-    "pe_no_chao": true,
+    "raiz": "160,269",
+    "colunas": 11,
+    "fixar": "volta",
+    "deslocar": "0,4",
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "rootX": 146,
+  "rootX": 160,
   "frameHeight": 288,
-  "rootY": 270
+  "rootY": 269
 }

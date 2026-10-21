@@ -89,8 +89,9 @@
   },
   "dash": {
     "trechos": [["dash", 0, 96]],
-    "quadros": "40-55/3",
-    "opcoes": {"fixar": "registro", "pe_no_chao": true}
+    "quadros": "38-55",
+    "opcoes": {"fixar": "volta", "pe_no_chao": false, "deslocar": "0,4"},
+    "animacoes": {"DASH": {"distancia": "pe"}}
   },
   "idle_2": {
     "trechos": [["idle2", 0, 64]],

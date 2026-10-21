@@ -273,6 +273,8 @@ def convert(char, name, video, quadros, opts, manual, densidade=None):
             '--colunas', str(cols), '--fixar', opts.get('fixar', 'tronco')]
     if opts.get('pe_no_chao'):
         args.append('--pe-no-chao')
+    elif 'pe_no_chao' in opts:
+        args.append('--no-pe-no-chao')  # desliga o da receita gravada antes (corrida com voo)
     # Sempre explícito (como o deslocar): andar de um passo só, com fixar volta.
     args.append(f"--balanco={opts.get('balanco', 1.0)}")
     if opts.get('sem_efeitos'):

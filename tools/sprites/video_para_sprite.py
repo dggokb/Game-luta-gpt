@@ -269,8 +269,9 @@ def parser():
     p.add_argument("--balanco", type=float, default=1.0,
                    help="com --fixar volta: quanto do vaivém do tronco no passo fica (1 = o do vídeo, "
                         "0 = recua/avança constante; 0.5 = uma pausa do vídeo vira só uma freada)")
-    p.add_argument("--pe-no-chao", action="store_true",
-                   help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
+    p.add_argument("--pe-no-chao", action=argparse.BooleanOptionalAction, default=False,
+                   help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce); "
+                        "--no-pe-no-chao desliga o que a receita gravada tiver")
     p.add_argument("--reescala", type=lambda v: [float(x) for x in v.split(",")],
                    help="fator de tamanho por quadro (tools/sprites/reescalar.py): divide a escala")
     p.add_argument("--limpar-quadros", type=lambda v: [int(x) for x in v.split(",")],

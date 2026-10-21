@@ -26,7 +26,8 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
 - animacoes: as animações do pacote que usam o clipe. frames são índices do clipe ("9-0" =
   de trás para a frente: a volta pelo inverso do vídeo que só vai até a pose); impacto é a
   posição em frames do quadro em que o golpe encosta; "distancia": "video" (andar) troca de
-  quadro pela distância andada, com a distância medida no vídeo (pé plantado); "devagar": 1.6
+  quadro pela distância andada, com a distância medida no vídeo (pé plantado); "distancia": "pe"
+  mede pelo pé de apoio (vídeo em que a câmera acompanha, como a corrida do dash); "devagar": 1.6
   deixa o ciclo 1,6x mais lento que o pé plantado (o pé escorrega um pouco); "velocidade": "video"
   faz o lutador andar no chão na velocidade do vídeo (fighter.walkSpeed / walkBackSpeed, no lugar
   da do motor): o ciclo toca no tempo do vídeo com o pé plantado; "tempo": "video" deixa o andar
@@ -138,13 +139,17 @@ def durations(quadros, frames):
     return [max(1, round(abs(gaps[i]) * 1000 / FPS)) for i in frames]
 
 
-def stride(char, name, video, quadros):
+def stride(char, name, video, quadros, foot=False):
     """Quanto o corpo anda no jogo a cada quadro do clipe (px do mundo): o avanço do tronco na
-    volta inteira do loop (ou a reta dele, se o vídeo acaba no último quadro), na escala da receita e no worldScale do perfil. Com essa distância por
-    quadro o pé do andar fica plantado (o motor anda, a arte acompanha)."""
+    volta inteira do loop (ou a reta dele, se o vídeo acaba no último quadro), na escala da receita
+    e no worldScale do perfil. Com essa distância por quadro o pé do andar fica plantado (o motor
+    anda, a arte acompanha). foot: pela velocidade do pé de apoio em relação ao tronco, para
+    vídeo em que a câmera acompanha o lutador (corrida: o tronco quase não anda na imagem)."""
     frames, _ = read_frames(video)
     nxt = quadros[-1] + (quadros[-1] - quadros[-2] if len(quadros) > 1 else 1)
-    if nxt < len(frames):
+    if foot:
+        slope = support_speed(frames, quadros)
+    elif nxt < len(frames):
         # Loop: quanto o tronco avança do 1º quadro até o que viria depois do último (a volta
         # inteira); a reta dos quadros erra num passo só, em que o tronco anda aos trancos.
         slope = abs(torso_x(key(frames[nxt])) - torso_x(key(frames[quadros[0]]))) / len(quadros)
@@ -154,6 +159,21 @@ def stride(char, name, video, quadros):
     clip = json.loads((HERE / f'clips/{char}_{name}.json').read_text(encoding='utf-8'))
     profile = json.loads((HERE / f"profiles/{clip['profile']}").read_text(encoding='utf-8'))
     return round(float(slope * clip['video']['escala'] * profile['worldScale']), 2)
+
+
+def support_speed(frames, quadros):
+    """px de vídeo por quadro escolhido que o pé no chão corre para trás em relação ao tronco:
+    a mediana entre quadros seguidos em que o mesmo pé continua embaixo."""
+    low = []
+    for q in quadros:
+        k = key(frames[q])
+        ys, xs = np.nonzero(k[..., 3] > 40)
+        bottom = ys.max()
+        low.append((xs[ys >= bottom - 6].mean() - torso_x(k), bottom))
+    moves = [x1 - x0 for (x0, b0), (x1, b1) in zip(low, low[1:]) if abs(x1 - x0) < 80 and abs(b1 - b0) <= 6]
+    if not moves:
+        raise SystemExit('distancia "pe": nenhum par de quadros com o mesmo pé no chão')
+    return abs(float(np.median(moves)))
 
 
 def update_pack(char, name, spec, distance=None):
@@ -170,7 +190,7 @@ def update_pack(char, name, spec, distance=None):
         anim = {'atlas': f'{char}_{name}', 'frames': frames, 'loop': bool(a.get('loop', False))}
         if 'distancia' in a:   # andar: o quadro troca pela distância andada, não pelo tempo
             anim['loop'] = True
-            anim['distancePerFrame'] = distance if a['distancia'] == 'video' else a['distancia']
+            anim['distancePerFrame'] = distance if a['distancia'] in ('video', 'pe') else a['distancia']
             if 'devagar' in a:   # anima mais devagar que o pé plantado (o pé escorrega um pouco)
                 anim['distancePerFrame'] = round(anim['distancePerFrame'] * a['devagar'], 2)
             step = float(np.median(np.abs(np.diff(quadros)))) if len(quadros) > 1 else 1.0
@@ -216,8 +236,9 @@ def main():
         opts = {**recipe.get('_opcoes', {}), **spec.get('opcoes', {})}
         msg = personagem.convert(char, name, video, quadros, opts, None)
         print(f'{name:16} {msg}', flush=True)
-        if any(a.get('distancia') == 'video' for a in spec.get('animacoes', {}).values()):
-            distances[name] = stride(char, name, video, quadros)
+        how = {a.get('distancia') for a in spec.get('animacoes', {}).values()}
+        if how & {'video', 'pe'}:
+            distances[name] = stride(char, name, video, quadros, foot='pe' in how)
             print(f'{name:16} {distances[name]} px por quadro (pé plantado)', flush=True)
     for name in names:
         update_pack(char, name, recipe[name], distances.get(name))

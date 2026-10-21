@@ -44,7 +44,7 @@ def plan(cid):
     recipe = Path(__file__).resolve().parent / f'montagens/{cid}.json'
     planted = {state for spec in (json.loads(recipe.read_text(encoding='utf-8')).values() if recipe.exists() else [])
                if isinstance(spec, dict) for state, a in spec.get('animacoes', {}).items()
-               if a.get('distancia') == 'video'}
+               if a.get('distancia') in ('video', 'pe')}
     if cid != A.REFERENCE:
         for state in VISUAL:
             if state in planted:
