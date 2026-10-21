@@ -57,7 +57,10 @@ final class AnimacaoLutador {
             f.status == CombatFighter.Status.THROW;
         l.atingido = f.inHitstun() || f.status == CombatFighter.Status.BLOCKSTUN ||
             f.status == CombatFighter.Status.KNOCKDOWN || f.status == CombatFighter.Status.THROWN;
-        AttackDefinition attack = f.attacking() ? f.attack : null;
+        // Antecipação, continuidade, estalo e smear só nos golpes normais (L, M, H e os
+        // agachados/aéreos): os especiais e o Super já têm o movimento no desenho e, com o
+        // motor por cima, o corpo ia e voltava a cada acerto.
+        AttackDefinition attack = f.attacking() && golpeNormal(f) ? f.attack : null;
         l.golpeAtivo = attack != null && attack.isActive(f.attackFrame);
         l.preparando = attack != null && f.attackFrame < attack.startupFrames;
         l.forca = attack != null ? peso(attack.strength) : 0;
@@ -72,7 +75,7 @@ final class AnimacaoLutador {
         for (CombatEngine.HitEvent e : engine.events()) {
             if (engine.fighter(f.index) != f) continue;
             // O golpe dele encostou (acertou ou foi defendido): o corpo trava no rival.
-            if (e.attacker == f.index && !e.projectile) l.acertou = true;
+            if (e.attacker == f.index && !e.projectile && attack != null) l.acertou = true;
             if (e.defender != f.index) continue;
             CombatFighter quemBate = engine.fighter(e.attacker);
             l.empurrao = f.x >= quemBate.x ? 1 : -1;
@@ -86,6 +89,13 @@ final class AnimacaoLutador {
             }
         }
         motor.passo(l);
+    }
+
+    /** O golpe atual é um normal do pack (não um especial, a energia nem o Super). */
+    private static boolean golpeNormal(CombatFighter f) {
+        CharacterDefinition.Move m = f.move;
+        return m != null && f.attack.kind == AttackDefinition.Kind.NORMAL &&
+            f.character().moves.get(m.binding) == m;
     }
 
     /**

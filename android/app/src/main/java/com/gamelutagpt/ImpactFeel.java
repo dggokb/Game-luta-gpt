@@ -66,6 +66,9 @@ final class ImpactFeel {
     private final Canal zoom = new Canal(ZOOM_SPRING);
     /** Tranco da tela no sentido do golpe (pixels da tela). */
     private final Canal kick = new Canal(KICK_SPRING);
+    /** Passos entre um tranco e o próximo (o tempo de ele ir e voltar). */
+    static final int KICK_GAP = 20;
+    private int lastKick = -KICK_GAP;
     private int frame;
     private float focusX, focusY;
     private int dark, darkFrames, darkTotal;
@@ -81,6 +84,7 @@ final class ImpactFeel {
         zoom.zerar();
         kick.zerar();
         frame = 0;
+        lastKick = -KICK_GAP;
         dark = darkFrames = darkTotal = 0;
         flash = 0f;
         slowFrames = 0;
@@ -158,7 +162,11 @@ final class ImpactFeel {
     /** O tranco da tela de um golpe que acertou: {@code direction} é para onde ele empurra (+1 direita). */
     void kick(int direction, int size) {
         size = Math.max(ImpactEffects.LIGHT, Math.min(ImpactEffects.SPECIAL, size));
-        if (KICK[size] > 0f) kick.impulso(frame, (direction >= 0 ? 1f : -1f) * KICK[size], KICK_SPRING);
+        // Um tranco por vez: outro só depois que o anterior voltou (sem chacoalhar num combo).
+        if (KICK[size] > 0f && frame - lastKick >= KICK_GAP) {
+            kick.impulso(frame, (direction >= 0 ? 1f : -1f) * KICK[size], KICK_SPRING);
+            lastKick = frame;
+        }
     }
 
     /** Deslocamento da tela agora (pixels da tela; positivo para a direita). */

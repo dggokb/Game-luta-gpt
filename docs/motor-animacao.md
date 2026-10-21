@@ -49,6 +49,11 @@ vai e volta passando do ponto parece borracha, em qualquer intensidade (o ANIM 5
 tamanho, não o balanço). Para um estilo mais cartum: `volume = true`, `Mola.ELASTICA` em
 `molaForma`/`molaArrasto`/`molaPorForca` e os valores maiores (achatar 9%, esticar 6%).
 
+**Só nos golpes normais.** Antecipação, continuidade, acertar trava/errar passa, estalo e smear
+valem para L, M, H (em pé, agachado e no ar). Os especiais, a energia e o Super já têm o
+movimento no desenho: com o motor por cima, o corpo ia e voltava a cada acerto. O tranco da
+tela também é só dos normais (e do KO), um por vez.
+
 Tudo com os pés parados (a raiz é o pivô) e o "para a frente" segue para onde o lutador olha.
 Nada disso muda o frame data, as caixas ou a física: a antecipação usa só os quadros de
 preparação que o golpe já tem.
@@ -131,7 +136,9 @@ ffmpeg -framerate 60 -i pc/build/revisao-animacao/desligado/%04d.png \
 
 O roteiro (`RevisaoAnimacao`) joga 940 quadros: pulo parado, dash, L > M > H no CPU (que cai e
 quica), backdash, pulo para a frente, pulo saído da corrida, super pulo, pulo por cima do CPU
-(os dois viram), o 2H, andar e o cansaço com pouca vida. Os dois `estado.txt` têm de ser iguais (o motor não mexe na luta).
+(os dois viram), o 2H, andar, o cansaço com pouca vida e três especiais (S1, S2 e S4).
+Com o motor ligado sai também `pose.txt`: a inclinação, o arrasto e a escala de quem joga em
+cada quadro (para achar balanço sem olhar as imagens). Os dois `estado.txt` têm de ser iguais (o motor não mexe na luta).
 `-Pmodos=desligado,ligado` escolhe as pastas (um nome que começa com "ligado" liga o motor).
 
 ## Quadros intermediários (fora do jogo)

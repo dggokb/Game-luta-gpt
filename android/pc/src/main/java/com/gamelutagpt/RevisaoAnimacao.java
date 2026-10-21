@@ -16,14 +16,14 @@ import javax.imageio.ImageIO;
 /**
  * Revisão do motor de animação: o mesmo roteiro de luta (pulo, dash, L > M > H no CPU,
  * backdash, pulo para a frente, pulo saído da corrida, super pulo, pulo por cima do CPU,
- * 2H, andar e o cansaço com pouca vida) jogado quadro a quadro, sem tela, com o motor desligado e
+ * 2H, andar, o cansaço com pouca vida e três especiais: S1 (energia), S2 e S4) jogado quadro a quadro, sem tela, com o motor desligado e
  * ligado. Os quadros saem em PNG para comparar lado a lado (e virar vídeo com o ffmpeg).
  *
  * <pre>gradle :pc:revisarAnimacao   →   pc/build/revisao-animacao/{desligado,ligado}/0000.png</pre>
  */
 public final class RevisaoAnimacao {
     /** Quadros do roteiro (60 por segundo). */
-    static final int QUADROS = 940;
+    static final int QUADROS = 1140;
     /** Tamanho dos PNGs (metade da tela virtual). */
     static final int LARGURA = 960, ALTURA = 540;
 
@@ -50,7 +50,8 @@ public final class RevisaoAnimacao {
         Bitmap tela = Bitmap.createBitmap(1280, 720, Bitmap.Config.ARGB_8888);
         BufferedImage menor = new BufferedImage(LARGURA, ALTURA, BufferedImage.TYPE_INT_RGB);
         CombatFighter p = jogo.engine.fighter(GameView.PLAYER), cpu = jogo.engine.fighter(GameView.OPPONENT);
-        StringBuilder estado = new StringBuilder();
+        StringBuilder estado = new StringBuilder(), poses = new StringBuilder();
+        Field renderer = campo(jogo, "spriteFighterRenderer");
         for (int q = 0; q < QUADROS; q++) {
             roteiro(jogo.pad, q, p, cpu);
             avancar.invoke(jogo, CombatConfig.DT);
@@ -59,6 +60,10 @@ public final class RevisaoAnimacao {
                 p.status, p.x, p.y, cpu.status, cpu.x, cpu.y));
             // Como o loop do jogo: um Canvas novo por quadro, sobre a tela limpa (estado do Java2D
             // que sobrasse de um quadro passava para o seguinte).
+            // A pose do motor de quem joga e o tranco da câmera (para achar balanço sem olhar quadro a quadro).
+            com.gamelutagpt.motion.Pose pose = ((SpriteFighterRenderer)renderer.get(jogo)).animacao.pose();
+            poses.append(String.format(java.util.Locale.ROOT, "%d %s %.2f %.2f %.3f %.3f%n", q, p.status,
+                pose.inclinacao, pose.arrasto, pose.escalaX, pose.escalaY));
             Canvas canvas = new Canvas(tela);
             canvas.drawColor(0xFF000000);
             desenhar.invoke(jogo, canvas);
@@ -70,6 +75,8 @@ public final class RevisaoAnimacao {
         }
         java.nio.file.Files.write(new File(pasta, "estado.txt").toPath(),
             estado.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        java.nio.file.Files.write(new File(pasta, "pose.txt").toPath(),
+            poses.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     /** O que o jogador aperta em cada quadro (direções da tela: 1 →, 3 ↓, 5 ←, 7 ↑, 8 ↗). */
@@ -129,6 +136,22 @@ public final class RevisaoAnimacao {
             colocar(p, cpu, 500f, 900f);
             p.state.life = p.state.profile.maxLife / 10;
         }
+        // Especiais (direções da tela): S1 energia ↓↘→ + M, S2 →↓↘ + H, S4 ↓↙← + H.
+        if (q == 940) colocar(p, cpu, 500f, 760f);
+        if (q == 942) pad.setDirection(3);
+        if (q == 944) pad.setDirection(2);
+        if (q == 946) { pad.setDirection(1); pad.press(PadInput.Button.MEDIUM); }
+        if (q == 950) pad.setDirection(0);
+        if (q == 1010) colocar(p, cpu, 500f, 640f);
+        if (q == 1012) pad.setDirection(1);
+        if (q == 1014) pad.setDirection(3);
+        if (q == 1016) { pad.setDirection(2); pad.press(PadInput.Button.HEAVY); }
+        if (q == 1020) pad.setDirection(0);
+        if (q == 1070) colocar(p, cpu, 500f, 680f);
+        if (q == 1072) pad.setDirection(3);
+        if (q == 1074) pad.setDirection(4);
+        if (q == 1076) { pad.setDirection(5); pad.press(PadInput.Button.HEAVY); }
+        if (q == 1080) pad.setDirection(0);
     }
 
     /** Põe os dois no lugar e de frente um para o outro (entre as cenas). */
