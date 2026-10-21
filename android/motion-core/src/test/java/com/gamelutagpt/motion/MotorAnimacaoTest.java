@@ -18,8 +18,10 @@ public class MotorAnimacaoTest {
         l.clipe = clipe;
         l.quadro = 0;
         l.golpe = l.atingido = l.golpeAtivo = l.preparando = l.dash = l.embalo = l.congelado = false;
+        l.preparandoPulo = false;
         l.forca = 0;
         l.peso = 1f;
+        l.vida = 1f;
         return l;
     }
 
@@ -470,6 +472,160 @@ public class MotorAnimacaoTest {
             menor = Math.min(menor, m.pose().escalaY);
         }
         return menor;
+    }
+
+    @Test
+    public void acertarTravaEErrarPassaDoPonto() {
+        assertTrue("errar vai mais para a frente que acertar",
+            passadaDepoisDoGolpe(false) > passadaDepoisDoGolpe(true) + 2f);
+    }
+
+    /** O maior "para a frente" de um H com 4 quadros ativos, acertando no primeiro ou no vazio. */
+    private float passadaDepoisDoGolpe(boolean acerta) {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        float maior = -99f;
+        for (int i = 0; i < 40; i++) {
+            Leitura h = parado("HEAVY_STRAIGHT");
+            h.golpe = i < 20;
+            h.golpeAtivo = i < 4;
+            h.forca = 2;
+            h.acertou = acerta && i == 0;
+            m.passo(h);
+            maior = Math.max(maior, m.pose().inclinacao);
+        }
+        return maior;
+    }
+
+    @Test
+    public void naCabecaVaiParaTrasNoCorpoDobraENasPernasArrasta() {
+        float[] cabeca = reacao(Leitura.ALTO), corpo = reacao(Leitura.CORPO), pernas = reacao(Leitura.BAIXO);
+        assertTrue("cabeça: tronco para trás", cabeca[0] < -3f);
+        assertTrue("corpo: dobra para a frente " + corpo[0], corpo[0] > 2f);
+        assertTrue("corpo: encolhe", corpo[2] < 0.98f);
+        assertTrue("pernas: o tronco fica, os pés vão " + pernas[1], pernas[1] > 2f);
+        assertEquals("pernas: sem girar", 0f, pernas[0], 0.5f);
+    }
+
+    /** Pico da inclinação, pico do arrasto e a menor altura depois de um golpe médio-forte. */
+    private float[] reacao(int altura) {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura e = parado("HIT_STAND");
+        e.atingido = true;
+        e.apanhou = 2;
+        e.empurrao = -1;
+        e.alturaGolpe = altura;
+        m.passo(e);
+        float[] r = {0f, 0f, 1f};
+        for (int i = 0; i < 40; i++) {
+            Leitura h = parado("HIT_STAND");
+            h.atingido = true;
+            m.passo(h);
+            if (Math.abs(m.pose().inclinacao) > Math.abs(r[0])) r[0] = m.pose().inclinacao;
+            if (Math.abs(m.pose().arrasto) > Math.abs(r[1])) r[1] = m.pose().arrasto;
+            r[2] = Math.min(r[2], m.pose().escalaY);
+        }
+        return r;
+    }
+
+    @Test
+    public void golpesIguaisNaoReagemIgualMasOMesmoJogoSim() {
+        float[] a = picosDeCincoGolpes(), b = picosDeCincoGolpes();
+        java.util.Set<Float> diferentes = new java.util.HashSet<>();
+        for (int i = 0; i < a.length; i++) {
+            assertEquals(a[i], b[i], 0f);
+            assertTrue("perto do padrão: " + a[i], a[i] > 6f * 0.75f && a[i] < 6f * 1.25f);
+            diferentes.add(Math.round(a[i] * 100f) / 100f);
+        }
+        assertTrue("variou", diferentes.size() >= 3);
+    }
+
+    private float[] picosDeCincoGolpes() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        float[] picos = new float[5];
+        for (int g = 0; g < 5; g++) {
+            Leitura e = parado("HIT_STAND");
+            e.apanhou = 2;
+            e.empurrao = -1;
+            m.passo(e);
+            for (int i = 0; i < 60; i++) {
+                m.passo(parado("HIT_STAND"));
+                picos[g] = Math.max(picos[g], -m.pose().inclinacao);
+            }
+        }
+        return picos;
+    }
+
+    @Test
+    public void comPoucaVidaCansaERespiraDevagar() {
+        MotorAnimacao m = new MotorAnimacao();
+        float menor = 2f, maior = 0f;
+        for (int i = 0; i < 300; i++) {
+            Leitura cansado = parado("IDLE");
+            cansado.vida = 0.1f;
+            m.passo(cansado);
+            if (i > 150) {
+                menor = Math.min(menor, m.pose().escalaY);
+                maior = Math.max(maior, m.pose().escalaY);
+            }
+        }
+        assertTrue("ombros caídos: " + m.pose().inclinacao, m.pose().inclinacao > 1f);
+        assertTrue("idle mais lento: " + m.pose().ritmo, m.pose().ritmo < 0.85f);
+        assertTrue("respira: " + menor + ".." + maior, maior - menor > 0.008f);
+        for (int i = 0; i < 300; i++) m.passo(parado("IDLE"));
+        assertTrue("vida de volta, pose neutra", m.pose().neutra());
+        assertEquals(1f, m.pose().ritmo, 1e-3f);
+    }
+
+    @Test
+    public void defenderGolpeForteArrastaOPeDuasVezes() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("DEFENSE_STAND"));
+        Leitura d = parado("DEFENSE_STAND");
+        d.defendeu = true;
+        d.pesoDefendido = 2;
+        d.empurrao = -1;
+        m.passo(d);
+        assertEquals(-1, m.pose().deslize);
+        int depois = 0;
+        for (int i = 0; i < 10; i++) {
+            m.passo(parado("DEFENSE_STAND"));
+            if (m.pose().deslize != 0) {
+                depois++;
+                assertEquals(-1, m.pose().deslize);
+            }
+        }
+        assertEquals(1, depois);
+
+        MotorAnimacao fraco = new MotorAnimacao();
+        fraco.passo(parado("DEFENSE_STAND"));
+        Leitura jab = parado("DEFENSE_STAND");
+        jab.defendeu = true;
+        jab.empurrao = -1;
+        fraco.passo(jab);
+        assertEquals("golpe fraco não arrasta", 0, fraco.pose().deslize);
+    }
+
+    @Test
+    public void agachaParaPularEEsticaAoSair() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        float menor = 1f;
+        for (int i = 0; i < 3; i++) {
+            Leitura agacha = parado("IDLE");
+            agacha.preparandoPulo = true;
+            m.passo(agacha);
+            menor = Math.min(menor, m.pose().escalaY);
+        }
+        assertTrue("agachou: " + menor, menor < 0.97f);
+        Leitura sai = parado("JUMP");
+        sai.noChao = false;
+        sai.vy = -1492f;
+        m.passo(sai);
+        m.passo(sai);
+        assertTrue("esticou ao sair: " + m.pose().escalaY, m.pose().escalaY > 1f);
     }
 
     @Test

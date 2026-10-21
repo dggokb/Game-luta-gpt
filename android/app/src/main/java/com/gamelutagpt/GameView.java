@@ -2271,8 +2271,10 @@ public class GameView extends SurfaceView
         if (event.projectile) size = Math.max(size, ImpactEffects.MEDIUM);
         int accent = event.attacker == PLAYER ? activeFighter().profile.color : opponentPoint().profile.color;
         impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
-        if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 7f : 10f);
-        else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 3f);
+        // O tremor do golpe tem direção: a tela vai no sentido do golpe e volta (o aleatório fica menor).
+        if (!event.blocked) feel.kick(direction, size);
+        if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 4f : 6f);
+        else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 2f);
         if (knockout) beamShake = Math.max(beamShake, 18f);
         if (!event.blocked) feel.onHit(x, y, size, punish && size >= ImpactEffects.HEAVY, knockout);
         // A plateia do cenário vibra com o golpe (forte no pesado, festa no KO).
@@ -2574,6 +2576,13 @@ public class GameView extends SurfaceView
         camera.updateForRound(dt, player().x, opponent().x, highestFighterTop,
             player().superJumping || opponent().superJumping,
             player().ko() || opponent().ko());
+        // A câmera se adianta um pouco para o lado de quem corre (volta ao parar).
+        boolean fighting = !player().ko() && !opponent().ko();
+        camera.updateLead(fighting ? runDirection(player()) + runDirection(opponent()) : 0);
+    }
+
+    private static int runDirection(CombatFighter f) {
+        return f.forwardDashing && f.grounded ? f.facing : 0;
     }
 
     /** Highest opaque pixel of a fighter, for camera framing and the opponent HUD. */
@@ -2822,7 +2831,7 @@ public class GameView extends SurfaceView
             float punchZoom = feel.zoom();
             float renderZoom = baseZoom * ultraCameraZoom * punchZoom;
             float visibleWorldWidth = VW / renderZoom;
-            float renderCameraX = camera.x;
+            float renderCameraX = camera.x + camera.lead();
             float renderCameraTop = camera.top;
             // Zoom e foco da cinemática. Sem foco, o zoom segura o chão no mesmo lugar da tela (os
             // pés não somem na faixa); focando alguém (quem fala), segura o peito dele: um plano
@@ -2878,6 +2887,8 @@ public class GameView extends SurfaceView
                 cameraLeft = clamp(feel.focusX() - screenX / renderZoom, 0f, WORLD_WIDTH - visibleWorldWidth);
                 renderCameraTop = feel.focusY() - screenY / renderZoom;
             }
+            // O tranco do golpe forte: a câmera vai no sentido do golpe e volta por mola.
+            cameraLeft -= feel.kickX() / renderZoom;
             if (beamShake > 0f) {
                 cameraLeft += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
                 renderCameraTop += (shakeRandom.nextFloat() - 0.5f) * beamShake / renderZoom;
@@ -2933,6 +2944,11 @@ public class GameView extends SurfaceView
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
             if (isSuperCinematicActive()) drawSuperDarkness(canvas);
+            // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
+            canvas.save();
+            canvas.translate(tagOffset(), 0f);
+            drawContactShadow(canvas, spriteFighterRenderer, player());
+            canvas.restore();
             drawDamageDummy(canvas);
             float effectTime = engine.frame() * FIXED_STEP;
             effects.drawPuddles(renderCanvas, engine.puddles, effectTime);
@@ -3233,8 +3249,7 @@ public class GameView extends SurfaceView
         // No 2x2 o parceiro do CPU entra correndo depois do KO, como na troca.
         c.save();
         c.translate(engine.teams.tagOffset(OPPONENT), 0f);
-        paint.setColor(Color.argb(70, 0, 0, 0));
-        c.drawOval(npc.x - 43f, GROUND_Y - 10f, npc.x + 43f, GROUND_Y + 10f, paint);
+        drawContactShadow(c, opponentSpriteRenderer, npc);
 
         drawFighter(c, opponentSpriteRenderer, npc, npc.framesSinceHit < 4 && !npc.ko(), false);
         c.restore();
@@ -3527,10 +3542,16 @@ public class GameView extends SurfaceView
         boolean locked = f.status != CombatFighter.Status.NEUTRAL && !f.attacking() &&
             f.status != CombatFighter.Status.ULTRA;
 
+        // Parado e cansado (pouca vida), o idle anda mais devagar (motor de animação).
+        float clipStep = FIXED_STEP;
+        if (animation == null && f.grounded && f.status == CombatFighter.Status.NEUTRAL && Math.abs(f.travel) < 0.001f) {
+            clipStep *= renderer.animacao.pose().ritmo;
+        }
         renderer.update(
-            FIXED_STEP,
+            clipStep,
             f.grounded,
-            f.crouchingBody() || guard == CombatFighter.GUARD_LOW,
+            // Na preparação do pulo ele agacha (o começo do clipe de agachar).
+            f.crouchingBody() || guard == CombatFighter.GUARD_LOW || f.jumpSquat > 0,
             f.vy,
             f.travel,
             f.travel * f.facing > 0,
@@ -3925,6 +3946,22 @@ public class GameView extends SurfaceView
     private void drawPlayer(Canvas c) {
         CombatFighter p = player();
         drawFighter(c, spriteFighterRenderer, p, p.framesSinceHit < 8, p.framesSinceBlock < 7);
+    }
+
+    /** Altura (pixels do mundo) em que a sombra de contato chega ao menor e mais clara. */
+    private static final float SHADOW_FADE_HEIGHT = 420f;
+
+    /**
+     * Sombra de contato no chão: encolhe e clareia com a altura (lê o pulo e o pouso) e abre
+     * junto com o achatar da aterrissagem.
+     */
+    private void drawContactShadow(Canvas c, SpriteFighterRenderer renderer, CombatFighter f) {
+        float height = Math.max(0f, GROUND_Y - fighterVisualY(f));
+        float k = clamp(1f - height / SHADOW_FADE_HEIGHT, 0.35f, 1f);
+        float half = 43f * k * renderer.animacao.pose().escalaX;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.argb(Math.round(70 * k), 0, 0, 0));
+        c.drawOval(f.x - half, GROUND_Y - 10f * k, f.x + half, GROUND_Y + 10f * k, paint);
     }
 
     private void drawControls(Canvas c) {

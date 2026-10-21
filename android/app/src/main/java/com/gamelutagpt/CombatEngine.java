@@ -531,7 +531,7 @@ final class CombatEngine {
             return;
         }
 
-        if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded &&
+        if (f.ultraRequestAge >= 0 && f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround() &&
             f.state.superMeter >= CombatConfig.ULTRA_COST) {
             startUltra(f);
             f.dashRequest = f.backdashRequest = false;
@@ -544,7 +544,7 @@ final class CombatEngine {
             return;
         }
 
-        if (f.throwRequestAge >= 0 && f.grounded &&
+        if (f.throwRequestAge >= 0 && f.grounded && !f.busyOnGround() &&
             (f.status == CombatFighter.Status.NEUTRAL || throwOverridesJab(f))) {
             startThrow(f);
             f.dashRequest = f.backdashRequest = false;
@@ -558,7 +558,7 @@ final class CombatEngine {
         else if (f.pendingJumpAge >= 0 && f.grounded) {
             boolean superJump = f.pendingSuperJump || f.launcherChase > 0;
             if (f.status == CombatFighter.Status.NEUTRAL) {
-                jump(f, superJump);
+                if (!f.busyOnGround()) startJump(f, superJump);
             } else if (CancelSystem.canCancel(f, AttackDefinition.JUMP, null)) {
                 f.status = CombatFighter.Status.NEUTRAL;
                 f.clearAttack();
@@ -574,7 +574,7 @@ final class CombatEngine {
             else if (f.grounded) f.breakerChase = 0;
         }
 
-        if (f.status == CombatFighter.Status.NEUTRAL && f.grounded) {
+        if (f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround()) {
             if (f.backdashRequest && f.backdashFrames == 0 &&
                 f.backdashCooldown == 0 && f.backdashArmed) {
                 f.backdashFrames = config.backdashFrames;
@@ -593,8 +593,9 @@ final class CombatEngine {
         f.dashRequest = f.backdashRequest = false;
 
         if (f.status == CombatFighter.Status.NEUTRAL) {
-            // Correndo até o outro, o golpe apertado espera chegar perto (não sai de longe).
-            if (!breakerChasing(f)) startFromBuffer(f, false);
+            // Correndo até o outro, o golpe apertado espera chegar perto (não sai de longe). Na
+            // preparação do pulo e na aterrissagem do pulo vazio ele espera no buffer.
+            if (!breakerChasing(f) && !f.busyOnGround()) startFromBuffer(f, false);
         } else if (f.attacking() && (CancelSystem.windowOpen(f) || overdriveCancelOpen(f))) {
             startFromBuffer(f, true);
         }
@@ -932,10 +933,34 @@ final class CombatEngine {
         f.crouching = false;
     }
 
-    private void jump(CombatFighter f, boolean superJump) {
+    /** Pulo do chão em neutro: agacha {@link CombatConfig#jumpSquatFrames} quadros e sai. */
+    private void startJump(CombatFighter f, boolean superJump) {
+        if (config.jumpSquatFrames <= 0) {
+            jump(f, superJump);
+            return;
+        }
         f.pendingJumpAge = -1;
+        f.jumpSquat = config.jumpSquatFrames;
+        f.squatSuper = superJump;
+        f.squatDirection = f.input.direction;
+        f.crouching = false;
+    }
+
+    /** Fim da preparação: sai para a direção que ainda segura para cima, ou a do comando. */
+    private void jumpFromSquat(CombatFighter f) {
+        int direction = ControlsLayout.isUpDirection(f.input.direction) ? f.input.direction : f.squatDirection;
+        jump(f, f.squatSuper, direction);
+    }
+
+    private void jump(CombatFighter f, boolean superJump) {
+        jump(f, superJump, f.input.direction);
+    }
+
+    private void jump(CombatFighter f, boolean superJump, int direction) {
+        f.pendingJumpAge = -1;
+        f.jumpSquat = 0;
         f.breakerChase = 0;
-        int horizontal = horizontal(f.input.direction);
+        int horizontal = horizontal(direction);
         if (f.forwardDashing && f.grounded) {
             // Saindo da corrida, o pulo leva o embalo (dash jump).
             f.jumpMode = CombatFighter.PULO_CORRIDA;
@@ -1004,6 +1029,15 @@ final class CombatEngine {
         if (f.state.poisoned() && f.state.tickPoison() > 0 && f.state.poisonLeft == 0) cues.add("POISON_END");
 
         if (f.echoLeft > 0) f.echoLeft--;
+        if (f.jumpSquat > 0) {
+            // Apanhou, agarrou ou saiu do chão na preparação: o pulo não sai.
+            if (f.status != CombatFighter.Status.NEUTRAL || !f.grounded) f.jumpSquat = 0;
+            else if (--f.jumpSquat == 0) jumpFromSquat(f);
+        }
+        if (f.landingLag > 0) {
+            if (f.status != CombatFighter.Status.NEUTRAL || !f.grounded) f.landingLag = 0;
+            else f.landingLag--;
+        }
 
         switch (f.status) {
             case ATTACK:
@@ -1285,7 +1319,8 @@ final class CombatEngine {
         // A corrida do combo breaker anda sozinha, como se → estivesse seguro.
         if (breakerChasing(f)) horizontal = breakerFar(f) ? f.facing : 0;
         boolean holdingForward = horizontal != 0 && horizontal == f.facing;
-        if (!holdingForward) f.forwardDashing = false;
+        // Na preparação do pulo a corrida segue mesmo soltando a frente (o embalo vai para o pulo).
+        if (!holdingForward && f.jumpSquat == 0) f.forwardDashing = false;
         float walk = (holdingForward ? config.walkSpeed : config.walkBackSpeed) * boost;
 
         if (f.status == CombatFighter.Status.NEUTRAL && !f.locked && !f.ko()) {
@@ -1294,10 +1329,16 @@ final class CombatEngine {
             } else if (f.backdashFrames > 0) {
                 f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
                 f.backdashFrames--;
-            } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost
-                    : walkSpeed(f, holdingForward) * boost;
-                f.x += horizontal * speed * CombatConfig.DT;
+            } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE && f.landingLag == 0 &&
+                (f.jumpSquat == 0 || f.forwardDashing)) {
+                if (f.jumpSquat > 0) {
+                    // Na preparação do pulo só a corrida segue (o embalo do dash jump).
+                    f.x += f.facing * config.dashSpeed * boost * CombatConfig.DT;
+                } else {
+                    float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost
+                        : walkSpeed(f, holdingForward) * boost;
+                    f.x += horizontal * speed * CombatConfig.DT;
+                }
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {
             f.x += f.facing * config.ultraRushSpeed * CombatConfig.DT;
@@ -1393,6 +1434,8 @@ final class CombatEngine {
     }
 
     private void land(CombatFighter f) {
+        // Pulo vazio: aterrissou em neutro, sem golpe no ar.
+        boolean emptyJump = f.status == CombatFighter.Status.NEUTRAL && !f.grounded;
         if (f.status == CombatFighter.Status.AIR_HITSTUN && f.bounce == CombatFighter.BOUNCE_GROUND) {
             // Ground bounce: it hits the floor and pops back up.
             f.y = Arena.GROUND_Y - 1f;
@@ -1439,6 +1482,7 @@ final class CombatEngine {
         f.spinning = false;
         f.bounce = CombatFighter.BOUNCE_NONE;
         if (f.status == CombatFighter.Status.NEUTRAL) f.crouching = ControlsLayout.isDownDirection(f.input.direction);
+        if (emptyJump && f.status == CombatFighter.Status.NEUTRAL) f.landingLag = config.jumpLandingFrames;
     }
 
     private void knockDown(CombatFighter f) {

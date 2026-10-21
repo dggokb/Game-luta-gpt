@@ -40,6 +40,32 @@ public final class Ajustes {
      */
     public Mola[] molaPorForca = {new Mola(4.2f, 0.45f), Mola.ELASTICA, new Mola(2.6f, 0.36f), new Mola(2.2f, 0.34f)};
 
+    /** Reação pela altura: na cabeça o tronco vai para trás, no corpo dobra, nas pernas os pés vão e o tronco fica. */
+    public boolean alturaReacao = true;
+    /** Quanto da inclinação vai no golpe no corpo (dobrando) e no baixo (arrasto), e o achatar do corpo dobrando. */
+    public float fatorCorpo = 0.7f, fatorBaixo = 0.8f, dobrarCorpo = 0.04f;
+    /** Cada reação varia um pouco (±20%), sempre igual no mesmo jogo: golpes iguais não parecem um loop. */
+    public float variacao = 0.2f;
+
+    /** Defender um golpe forte arrasta o pé para trás (poeirinha), duas vezes no empurrão. */
+    public boolean deslizeDefesa = true;
+    /** Peso mínimo do golpe defendido para o pé deslizar (2 = forte). */
+    public int forcaDeslizeDefesa = 2;
+
+    /** Acertar trava (o corpo para no rival e recua um pouco); errar passa do ponto e demora a voltar. */
+    public boolean acertoTrava = true;
+    /** Graus de recuo ao acertar e de passada ao errar, por peso do golpe. */
+    public float[] recuoAcerto = {1f, 1.5f, 2.5f, 3f};
+    public float[] grausErro = {1.5f, 2.5f, 4f, 5f};
+
+    /** Com pouca vida o lutador cansa: respira fundo, ombros caídos e o idle mais lento. */
+    public boolean cansaco = true;
+    /** Vida abaixo da qual cansa, quanto a respiração abaixa, os graus caídos e a velocidade do idle. */
+    public float limiarCansaco = 0.25f, respiracao = 0.012f, grausCansaco = 1.5f, ritmoCansado = 0.8f;
+
+    /** Agacha na preparação do pulo (o jump squat do jogo) antes do esticar da decolagem. */
+    public float agacharPulo = 0.07f;
+
     /** Inclina para a frente correndo (e para trás no backdash). */
     public boolean inclinacaoDash = true;
     public float grausDash = 4f;

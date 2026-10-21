@@ -34,11 +34,19 @@ public final class MotorAnimacao {
     private final Canal virar = new Canal(Mola.RAPIDA);
     /** Pixels para cima do quique. */
     private final Canal subir = new Canal(Mola.PADRAO);
+    /** 0 descansado, 1 cansado (entra e sai devagar). */
+    private final Canal cansaco = new Canal(Mola.PESADA);
     private final Pose pose;
 
     private int relogio;
     private boolean primeiro = true;
-    private boolean noChaoAntes = true, ativoAntes, preparandoAntes;
+    private boolean noChaoAntes = true, ativoAntes, preparandoAntes, preparandoPuloAntes;
+    /** O golpe atual já encostou no rival (trava em vez de passar do ponto). */
+    private boolean acertouNoGolpe;
+    /** Reações até agora (a variação de cada uma sai daqui e do relógio). */
+    private int reacoes;
+    /** O segundo deslize do pé na defesa pesada: passos que faltam e para que lado. */
+    private int deslizeAtraso, deslizeDepois;
     private float vyAntes;
     private String clipeAntes;
     private int quadroAntes, olhandoAntes = 1;
@@ -82,7 +90,11 @@ public final class MotorAnimacao {
         arrastar.zerar();
         virar.zerar();
         subir.zerar();
+        cansaco.zerar();
         relogio = 0;
+        reacoes = 0;
+        deslizeAtraso = 0;
+        acertouNoGolpe = false;
         primeiro = true;
         clipeAntes = clipeSaindo = null;
         transicaoInicio = Integer.MIN_VALUE;
@@ -117,6 +129,7 @@ public final class MotorAnimacao {
             eventos(l, q, k, forma, angulo, peso);
             transicao(l, q);
         }
+        if (deslizeAtraso > 0 && --deslizeAtraso == 0 && l.noChao) pose.deslize = deslizeDepois;
         alvos(l, q, forma, angulo);
         smear(l, k);
         if (!l.congelado) rastro(l, q);
@@ -141,6 +154,10 @@ public final class MotorAnimacao {
         } else if (ajustes.pulo && noChaoAntes && !l.noChao && l.vy < 0f) {
             achatar.degrau(q, -ajustes.esticarDecolagem * forma, Mola.RAPIDA);
         }
+        if (ajustes.pulo && l.preparandoPulo && !preparandoPuloAntes) {
+            // Agacha para pular: o pico chega quando ele sai do chão (e aí vem o esticar).
+            achatar.impulso(q, ajustes.agacharPulo * forma, Mola.RAPIDA);
+        }
         if (ajustes.virada && l.olhando != olhandoAntes) {
             // No quadro em que espelha o desenho sai estreito e abre de volta: lê como um giro.
             virar.degrau(q, ajustes.estreitarVirada * k, Mola.RAPIDA);
@@ -150,12 +167,43 @@ public final class MotorAnimacao {
             int lado = l.empurrao == 0 ? -1 : (l.empurrao * l.olhando > 0 ? 1 : -1);
             if (l.apanhou >= 0) {
                 int f = peso(l.apanhou, ajustes.inclinacaoApanhando);
-                inclinar.impulso(q, ajustes.inclinacaoApanhando[f] * lado * angulo, mola(f));
+                float graus = ajustes.inclinacaoApanhando[f] * variacao(q) * angulo;
+                int altura = ajustes.alturaReacao ? l.alturaGolpe : Leitura.ALTO;
+                if (altura == Leitura.CORPO) {
+                    // No corpo: dobra para a frente (para quem bateu) e encolhe.
+                    inclinar.impulso(q, -lado * graus * ajustes.fatorCorpo, mola(f));
+                    achatar.degrau(q, ajustes.dobrarCorpo * forma, Mola.ELASTICA);
+                } else if (altura == Leitura.BAIXO) {
+                    // Nas pernas: os pés vão com o golpe e o tronco fica (cisalha para quem bateu).
+                    arrastar.impulso(q, -lado * graus * ajustes.fatorBaixo, mola(f));
+                } else {
+                    inclinar.impulso(q, graus * lado, mola(f));
+                }
             } else if (l.defendeu) {
-                inclinar.impulso(q, ajustes.inclinacaoDefendendo * lado * angulo, Mola.RAPIDA);
+                inclinar.impulso(q, ajustes.inclinacaoDefendendo * lado * variacao(q) * angulo, Mola.RAPIDA);
+                if (ajustes.deslizeDefesa && ajustes.poeira && l.noChao && l.pesoDefendido >= ajustes.forcaDeslizeDefesa) {
+                    // O pé arrasta para o lado do empurrão, agora e de novo no meio do empurrão.
+                    int sentido = l.empurrao != 0 ? l.empurrao : -l.olhando;
+                    pose.deslize = sentido;
+                    deslizeDepois = sentido;
+                    deslizeAtraso = 4;
+                }
             }
         }
         dash(l, q, angulo);
+        if (l.golpeAtivo && !ativoAntes) acertouNoGolpe = false;
+        if (l.acertou && !acertouNoGolpe) {
+            acertouNoGolpe = true;
+            // Acertou: o corpo para no rival e recua um pouco (corta a continuidade).
+            if (ajustes.acertoTrava) {
+                inclinar.impulso(q, -ajustes.recuoAcerto[peso(l.forca, ajustes.recuoAcerto)] * angulo, Mola.RAPIDA);
+            }
+        }
+        if (ajustes.acertoTrava && !l.golpeAtivo && ativoAntes && l.golpe && !acertouNoGolpe) {
+            // Errou: a janela fechou no vazio e o corpo passa do ponto, voltando devagar.
+            int f = peso(l.forca, ajustes.grausErro);
+            inclinar.impulso(q, ajustes.grausErro[f] * angulo, mola(Math.min(3, f + 1)));
+        }
         if (l.golpeAtivo && !ativoAntes) {
             int f = Math.max(0, l.forca);
             if (ajustes.estalo) {
@@ -211,6 +259,9 @@ public final class MotorAnimacao {
             }
         }
         graus = clamp(graus, -MAX_ALVO, MAX_ALVO);
+        boolean cansado = ajustes.cansaco && l.vida < ajustes.limiarCansaco && l.noChao && !l.golpe &&
+            !l.atingido && !l.dash && Math.abs(l.vx) < 1f;
+        cansaco.alvo(q, cansado ? 1f : 0f);
         // Saindo da preparação (o golpe sai seco) e ao trocar chão/ar, o corpo vai ligeiro ao alvo.
         boolean ligeiro = (preparandoAntes && !prepara) || l.noChao != noChaoAntes;
         if (ligeiro) {
@@ -239,7 +290,9 @@ public final class MotorAnimacao {
         if (!trocou) return;
         // Golpes e reações entram secos; virar de lado também (o quadro de antes estaria espelhado),
         // e sair do chão ou aterrissar (as poses mudam demais: viraria dupla exposição).
-        if (ajustes.transicao && !l.golpe && !l.atingido && l.olhando == olhandoAntes && l.noChao == noChaoAntes) {
+        // A preparação do pulo também (dura 3 quadros: a mistura viraria fantasma).
+        if (ajustes.transicao && !l.golpe && !l.atingido && !l.preparandoPulo && !preparandoPuloAntes &&
+            l.olhando == olhandoAntes && l.noChao == noChaoAntes) {
             clipeSaindo = clipeAntes;
             quadroSaindo = quadroAntes;
             transicaoInicio = q;
@@ -280,7 +333,14 @@ public final class MotorAnimacao {
         }
         pose.escalaY = clamp(altura, 0.8f, 1.25f);
         pose.escalaX = clamp(largura * (1f - clamp(v, 0f, 0.6f)), 0.4f, 1.25f);
-        pose.inclinacao = clamp(inclinar.valor(q), -15f, 15f);
+        // Cansado: respira fundo (sobe e desce devagar) com os ombros caídos para a frente.
+        float c = clamp(cansaco.valor(q), 0f, 1f);
+        if (c > 0f) {
+            float folego = ajustes.respiracao * c * (0.5f + 0.5f * (float)Math.sin(2.0 * Math.PI * 0.6 * q / 60.0));
+            pose.escalaY = clamp(pose.escalaY * (1f - folego), 0.8f, 1.25f);
+        }
+        pose.ritmo = 1f - (1f - ajustes.ritmoCansado) * c;
+        pose.inclinacao = clamp(inclinar.valor(q) + ajustes.grausCansaco * c * ajustes.intensidade, -15f, 15f);
         pose.arrasto = clamp(arrastar.valor(q), -8f, 8f);
         pose.deslocX = 0f;
         // Só para cima: o quique nunca enterra o corpo no chão.
@@ -291,6 +351,7 @@ public final class MotorAnimacao {
         arrastar.limpar(q);
         virar.limpar(q);
         subir.limpar(q);
+        cansaco.limpar(q);
 
         int n = q - transicaoInicio;
         if (clipeSaindo != null && n >= 0 && n < ajustes.quadrosTransicao) {
@@ -324,9 +385,23 @@ public final class MotorAnimacao {
         vyAntes = l.vy;
         ativoAntes = l.golpeAtivo;
         preparandoAntes = ajustes.antecipacao && l.preparando;
+        preparandoPuloAntes = l.preparandoPulo;
         clipeAntes = l.clipe;
         quadroAntes = l.quadro;
         olhandoAntes = l.olhando;
+    }
+
+    /**
+     * Fator de uma reação nova (1 ± {@link Ajustes#variacao}): sai do relógio e da contagem de
+     * reações, então o mesmo jogo dá a mesma variação.
+     */
+    private float variacao(int q) {
+        int h = (q * 73856093) ^ (++reacoes * 19349663);
+        h ^= h >>> 13;
+        h *= 0x5bd1e995;
+        h ^= h >>> 15;
+        float u = (h & 0xFFFF) / 65535f;
+        return 1f + ajustes.variacao * (2f * u - 1f);
     }
 
     /** A mola do peso {@code forca} (o fraco volta ligeiro, o forte balança devagar). */

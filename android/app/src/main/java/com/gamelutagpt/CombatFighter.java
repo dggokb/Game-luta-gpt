@@ -258,6 +258,12 @@ final class CombatFighter {
     /** Frames que o pulo pedido ainda espera (o botão do [↓] ↑ pode chegar). */
     int jumpGrace;
     boolean pendingSuperJump;
+    /** Quadros que faltam da preparação do pulo (jump squat), o pulo pedido e a direção dele. */
+    int jumpSquat;
+    boolean squatSuper;
+    int squatDirection;
+    /** Quadros que faltam da aterrissagem do pulo vazio. */
+    int landingLag;
     /** Frames since ↓ + SUPER asked for an ultra, or -1 (kept for the input buffer). */
     int ultraRequestAge = -1;
     boolean dashRequest;
@@ -326,6 +332,11 @@ final class CombatFighter {
     }
 
     /** Crouching hurtbox: crouch stance, crouching attack or crouching hit reaction. */
+    /** No chão preparando o pulo ou aterrissando de um pulo vazio: sem golpe, pulo, dash nem andar. */
+    boolean busyOnGround() {
+        return jumpSquat > 0 || landingLag > 0;
+    }
+
     boolean crouchingBody() {
         if (status == Status.ATTACK && move != null) return move.binding.startsWith("2");
         if (status == Status.HITSTUN) return hitCrouching;

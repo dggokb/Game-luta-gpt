@@ -48,6 +48,9 @@ public class GlobalMovementTuningTest {
         jump.jump=true;
         e.step(jump,neutral);
         jump.clearPresses();
+        // Jump squat: the fighter crouches on the ground before leaving it.
+        for(int i=0;i<e.config.jumpSquatFrames;i++) e.step(jump,neutral);
+        assertFalse("left the ground",e.fighter(0).grounded);
         int airborne=1;
         float apex=0;
         while(!e.fighter(0).grounded && airborne<100){

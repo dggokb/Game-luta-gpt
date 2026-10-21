@@ -18,6 +18,12 @@ final class ImpactFeel {
      * enquadramento normal (a câmera "respira" para trás) e assenta em ~3/4 de segundo.
      */
     static final Mola ZOOM_SPRING = new Mola(3.2f, 0.45f);
+    /**
+     * Tranco da tela no sentido do golpe (pixels da tela) por tamanho (LIGHT, MEDIUM, HEAVY,
+     * SPECIAL): vai e volta por mola, balançando um pouco.
+     */
+    static final float[] KICK = {0f, 4f, 9f, 14f};
+    static final Mola KICK_SPRING = new Mola(4f, 0.4f);
     /** Cenário escurecido (alfa 0..255) e quantos quadros dura, por tamanho de golpe. */
     static final int[] DARK = {0, 0, 70, 100};
     static final int[] DARK_FRAMES = {0, 0, 3, 4};
@@ -58,6 +64,8 @@ final class ImpactFeel {
 
     /** Zoom extra do soco de câmera, no relógio de passos da luta. */
     private final Canal zoom = new Canal(ZOOM_SPRING);
+    /** Tranco da tela no sentido do golpe (pixels da tela). */
+    private final Canal kick = new Canal(KICK_SPRING);
     private int frame;
     private float focusX, focusY;
     private int dark, darkFrames, darkTotal;
@@ -71,6 +79,7 @@ final class ImpactFeel {
 
     void clear() {
         zoom.zerar();
+        kick.zerar();
         frame = 0;
         dark = darkFrames = darkTotal = 0;
         flash = 0f;
@@ -146,6 +155,15 @@ final class ImpactFeel {
         }
     }
 
+    /** O tranco da tela de um golpe que acertou: {@code direction} é para onde ele empurra (+1 direita). */
+    void kick(int direction, int size) {
+        size = Math.max(ImpactEffects.LIGHT, Math.min(ImpactEffects.SPECIAL, size));
+        if (KICK[size] > 0f) kick.impulso(frame, (direction >= 0 ? 1f : -1f) * KICK[size], KICK_SPRING);
+    }
+
+    /** Deslocamento da tela agora (pixels da tela; positivo para a direita). */
+    float kickX() { return kick.valor(frame); }
+
     /** Câmera lenta por {@code frames} quadros da luta a {@code scale}; a mais longa vale. */
     void slow(int frames, float scale) {
         if (frames < slowFrames) return;
@@ -156,6 +174,7 @@ final class ImpactFeel {
     /** Um passo da luta. */
     void step() {
         zoom.limpar(++frame);
+        kick.limpar(frame);
         if (darkFrames > 0) darkFrames--;
         flash *= 0.88f;
         if (flash < 2f) flash = 0f;

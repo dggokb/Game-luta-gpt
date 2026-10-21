@@ -36,10 +36,14 @@ public class DashJumpTest {
 
         /** Pula segurando {@code direcao} e devolve quanto andou para frente no ar. */
         float jump(int direcao) {
+            // Logo depois de aterrissar, a aterrissagem do pulo vazio passa antes do próximo pulo.
+            while (p().busyOnGround()) step();
             in[0].direction = direcao;
             in[0].jump = true;
             float x = p().x;
             step();
+            // A preparação do pulo (jump squat): agacha alguns quadros antes de sair do chão.
+            for (int i = 0; i < engine.config.jumpSquatFrames; i++) step();
             assertFalse("saiu do chão", p().grounded);
             modo = p().jumpMode;
             for (int i = 0; i < 200 && !p().grounded; i++) step();
