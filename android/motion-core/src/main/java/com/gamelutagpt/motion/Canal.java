@@ -32,9 +32,14 @@ public final class Canal {
 
     /** O alvo passa a ser {@code novo} a partir do quadro; o valor vai até ele pela mola do canal. */
     public void alvo(int quadro, float novo) {
+        alvo(quadro, novo, molaDoAlvo);
+    }
+
+    /** Como {@link #alvo(int, float)}, mas indo até o alvo novo por outra mola (uma volta mais ligeira). */
+    public void alvo(int quadro, float novo, Mola mola) {
         if (novo == alvo) return;
         // O valor no quadro continua o mesmo: a diferença vira um degrau que some com a mola.
-        adicionar(quadro, alvo - novo, false, molaDoAlvo);
+        adicionar(quadro, alvo - novo, false, mola);
         alvo = novo;
     }
 

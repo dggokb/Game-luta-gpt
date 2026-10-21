@@ -327,6 +327,12 @@ final class CharacterDefinition {
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
+        /**
+         * Peso para o motor de animação (fighter.pesoAnimacao no pack): 1 normal, acima de 1
+         * mais pesado (achata, inclina e arrasta menos), abaixo de 1 mais leve.
+         */
+        float animationWeight=1f;
+        Fighter withAnimationWeight(float weight) { animationWeight=weight; return this; }
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }

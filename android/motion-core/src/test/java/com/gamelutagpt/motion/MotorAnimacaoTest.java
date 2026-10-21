@@ -17,8 +17,9 @@ public class MotorAnimacaoTest {
         l.olhando = 1;
         l.clipe = clipe;
         l.quadro = 0;
-        l.golpe = l.atingido = l.golpeAtivo = l.dash = l.embalo = l.congelado = false;
+        l.golpe = l.atingido = l.golpeAtivo = l.preparando = l.dash = l.embalo = l.congelado = false;
         l.forca = 0;
+        l.peso = 1f;
         return l;
     }
 
@@ -224,6 +225,254 @@ public class MotorAnimacaoTest {
     }
 
     @Test
+    public void achatarEEsticarMantemAArea() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura no = parado("FALL");
+        no.noChao = false;
+        no.vy = 1600f;
+        m.passo(no);
+        for (int i = 0; i < 20; i++) {
+            m.passo(parado(i == 0 ? "LAND" : "IDLE"));
+            assertEquals("área do desenho", 1f, m.pose().escalaX * m.pose().escalaY, 2e-3f);
+        }
+    }
+
+    @Test
+    public void virarEstreitaSoALarguraEAbreDeVolta() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura virou = parado("IDLE");
+        virou.olhando = -1;
+        m.passo(virou);
+        assertTrue("estreito no quadro da virada: " + m.pose().escalaX, m.pose().escalaX < 0.85f);
+        assertEquals("a altura não muda", 1f, m.pose().escalaY, 1e-6f);
+        for (int i = 0; i < 40; i++) m.passo(virou);
+        assertEquals(1f, m.pose().escalaX, 1e-3f);
+    }
+
+    @Test
+    public void largadaEFreadaDoDashArrastamOTroncoESoltamPoeira() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        float menor = 0f;
+        for (int i = 0; i < 12; i++) {
+            Leitura d = parado("DASH");
+            d.dash = true;
+            d.vx = 620f;
+            m.passo(d);
+            if (i == 0) assertEquals("pé empurra o chão na largada", 1, m.pose().deslize);
+            else assertEquals(0, m.pose().deslize);
+            menor = Math.min(menor, m.pose().arrasto);
+        }
+        assertTrue("na largada o tronco fica para trás: " + menor, menor < -0.5f);
+        m.passo(parado("IDLE"));
+        assertEquals("o pé desliza na freada", 1, m.pose().deslize);
+        float maior = 0f;
+        for (int i = 0; i < 30; i++) {
+            m.passo(parado("IDLE"));
+            assertEquals(0, m.pose().deslize);
+            maior = Math.max(maior, m.pose().arrasto);
+        }
+        assertTrue("na freada passa da conta: " + maior, maior > 2.5f);
+        for (int i = 0; i < 120; i++) m.passo(parado("IDLE"));
+        assertEquals(0f, m.pose().arrasto, 0.01f);
+    }
+
+    @Test
+    public void backdashFreiaParaTrasEPuloDaCorridaNaoFreia() {
+        MotorAnimacao m = new MotorAnimacao();
+        for (int i = 0; i < 8; i++) {
+            Leitura d = parado("BACKDASH");
+            d.dash = true;
+            d.vx = -500f;
+            m.passo(d);
+        }
+        m.passo(parado("IDLE"));
+        assertEquals("deslize para a esquerda (o sentido do backdash)", -1, m.pose().deslize);
+        float menor = 0f;
+        for (int i = 0; i < 30; i++) {
+            m.passo(parado("IDLE"));
+            menor = Math.min(menor, m.pose().arrasto);
+        }
+        assertTrue("o tronco passa para trás: " + menor, menor < -2.5f);
+
+        MotorAnimacao pulo = new MotorAnimacao();
+        for (int i = 0; i < 8; i++) {
+            Leitura d = parado("DASH");
+            d.dash = true;
+            d.vx = 620f;
+            pulo.passo(d);
+        }
+        Leitura sobe = parado("JUMP");
+        sobe.noChao = false;
+        sobe.vy = -1400f;
+        sobe.vx = 540f;
+        sobe.embalo = true;
+        pulo.passo(sobe);
+        assertEquals("sair pulando não é freada", 0, pulo.pose().deslize);
+    }
+
+    @Test
+    public void aterrissarSoltaPoeiraEOCaidoQuicaSemEnterrar() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura no = parado("FALL");
+        no.noChao = false;
+        no.vy = 1600f;
+        m.passo(no);
+        assertEquals(0f, m.pose().poeira, 0f);
+        m.passo(parado("LAND"));
+        assertTrue(m.pose().poeira > 0f);
+        m.passo(parado("IDLE"));
+        assertEquals("só no passo da aterrissagem", 0f, m.pose().poeira, 0f);
+
+        MotorAnimacao caido = new MotorAnimacao();
+        Leitura voa = parado("HIT_AIR");
+        voa.noChao = false;
+        voa.atingido = true;
+        voa.vy = 1400f;
+        caido.passo(voa);
+        caido.passo(voa);
+        float maisAlto = 0f, achatou = 1f;
+        for (int i = 0; i < 40; i++) {
+            Leitura chao = parado("KNOCKDOWN");
+            chao.atingido = true;
+            caido.passo(chao);
+            if (i == 0) assertEquals("a poeira da queda é do jogo", 0f, caido.pose().poeira, 0f);
+            assertTrue("nunca abaixo do chão", caido.pose().deslocY <= 0f);
+            maisAlto = Math.min(maisAlto, caido.pose().deslocY);
+            achatou = Math.min(achatou, caido.pose().escalaY);
+        }
+        assertTrue("quicou: " + maisAlto, maisAlto < -5f);
+        assertTrue("achata mais que a aterrissagem comum: " + achatou, achatou < 0.9f);
+    }
+
+    @Test
+    public void preparacaoRecuaEOGolpeSaiParaAFrente() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        for (int i = 0; i < 8; i++) {
+            Leitura prep = parado("HEAVY_STRAIGHT");
+            prep.golpe = prep.preparando = true;
+            prep.forca = 2;
+            m.passo(prep);
+        }
+        assertTrue("recuou: " + m.pose().inclinacao, m.pose().inclinacao < -1f);
+        assertTrue("abaixou", m.pose().escalaY < 1f);
+        float maior = -99f;
+        for (int i = 0; i < 6; i++) {
+            Leitura ativo = parado("HEAVY_STRAIGHT");
+            ativo.golpe = ativo.golpeAtivo = true;
+            ativo.forca = 2;
+            m.passo(ativo);
+            maior = Math.max(maior, m.pose().inclinacao);
+        }
+        assertTrue("o corpo segue o golpe para a frente em poucos quadros: " + maior, maior > 1f);
+    }
+
+    @Test
+    public void smearSoNosGolpesFortesENosPrimeirosQuadros() {
+        MotorAnimacao forte = new MotorAnimacao(), fraco = new MotorAnimacao();
+        forte.passo(parado("IDLE"));
+        fraco.passo(parado("IDLE"));
+        int comSmear = 0;
+        for (int i = 0; i < 6; i++) {
+            Leitura h = parado("HEAVY_STRAIGHT");
+            h.golpe = h.golpeAtivo = true;
+            h.forca = 2;
+            forte.passo(h);
+            if (forte.pose().smear > 0f) {
+                comSmear++;
+                assertTrue(forte.pose().smearEsticar > 0f);
+            }
+            Leitura j = parado("LIGHT_JAB");
+            j.golpe = j.golpeAtivo = true;
+            fraco.passo(j);
+            assertEquals(0f, fraco.pose().smear, 0f);
+        }
+        assertEquals(forte.ajustes.quadrosSmear, comSmear);
+    }
+
+    @Test
+    public void golpeForteBalancaMaisDevagarQueOFraco() {
+        assertTrue(quadroDoPico(3) > quadroDoPico(0));
+    }
+
+    private int quadroDoPico(int forca) {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        Leitura e = parado("HIT_STAND");
+        e.apanhou = forca;
+        e.empurrao = -1;
+        m.passo(e);
+        int quadro = 0;
+        float pico = 0f;
+        for (int i = 1; i < 40; i++) {
+            m.passo(parado("HIT_STAND"));
+            if (Math.abs(m.pose().inclinacao) > pico) {
+                pico = Math.abs(m.pose().inclinacao);
+                quadro = i;
+            }
+        }
+        return quadro;
+    }
+
+    @Test
+    public void noArEsticaComAVelocidadeEInclinaNoArco() {
+        MotorAnimacao m = new MotorAnimacao();
+        m.passo(parado("IDLE"));
+        float subindo = 0f, descendo = 0f, maisAlto = 1f;
+        for (int i = 0; i < 60; i++) {
+            Leitura ar = parado("JUMP");
+            ar.noChao = false;
+            ar.vx = 300f;
+            ar.vy = -1500f + i * 50f;
+            m.passo(ar);
+            if (i == 12) subindo = m.pose().inclinacao;
+            if (i == 59) descendo = m.pose().inclinacao;
+            maisAlto = Math.max(maisAlto, m.pose().escalaY);
+        }
+        assertTrue("esticou: " + maisAlto, maisAlto > 1.03f);
+        assertTrue("subindo, para a frente: " + subindo, subindo > 1f);
+        assertTrue("descendo, para trás: " + descendo, descendo < -1f);
+
+        MotorAnimacao reto = new MotorAnimacao();
+        reto.passo(parado("IDLE"));
+        for (int i = 0; i < 30; i++) {
+            Leitura ar = parado("JUMP");
+            ar.noChao = false;
+            ar.vy = -1500f + i * 50f;
+            reto.passo(ar);
+            assertEquals("pulo parado não inclina", 0f, reto.pose().inclinacao, 1e-6f);
+        }
+    }
+
+    @Test
+    public void personagemPesadoDeformaMenos() {
+        assertTrue(menorAltura(2f) > menorAltura(1f));
+        assertTrue(menorAltura(0.7f) < menorAltura(1f));
+    }
+
+    private float menorAltura(float peso) {
+        MotorAnimacao m = new MotorAnimacao();
+        Leitura no = parado("FALL");
+        no.noChao = false;
+        no.vy = 1600f;
+        no.peso = peso;
+        m.passo(no);
+        m.passo(no);
+        float menor = 1f;
+        for (int i = 0; i < 20; i++) {
+            Leitura chao = parado("LAND");
+            chao.peso = peso;
+            m.passo(chao);
+            menor = Math.min(menor, m.pose().escalaY);
+        }
+        return menor;
+    }
+
+    @Test
     public void desligadoNadaMudaEOMesmoJogoDaAMesmaAnimacao() {
         MotorAnimacao desligado = new MotorAnimacao(Ajustes.desligado());
         MotorAnimacao a = new MotorAnimacao(), b = new MotorAnimacao();
@@ -238,6 +487,8 @@ public class MotorAnimacaoTest {
             assertEquals(a.pose().escalaY, b.pose().escalaY, 0f);
             assertEquals(a.pose().inclinacao, b.pose().inclinacao, 0f);
             assertEquals(a.pose().alfaAnterior, b.pose().alfaAnterior, 0f);
+            assertEquals(a.pose().arrasto, b.pose().arrasto, 0f);
+            assertEquals(a.pose().deslocY, b.pose().deslocY, 0f);
         }
     }
 
