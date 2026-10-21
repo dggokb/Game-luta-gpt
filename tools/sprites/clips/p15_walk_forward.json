@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_walk_forward.webp",
   "report": "tools/sprites/reports/p15_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p15_walk_forward-import.png",
-  "expectedFrames": 11,
+  "expectedFrames": 14,
   "segmentation": "prepared-grid",
   "columns": 11,
   "rootMode": "authored",
@@ -16,16 +16,15 @@
     "personagem": "p15",
     "escala": 0.5689,
     "medida": "1º quadro = inicio_centro (nota 0.97)",
-    "quadros": "43,44,45,46,47,48,49,50,51,52,53",
+    "quadros": "60,61,62,63,64,65,66,67,68,69,70,71,72,73",
     "celula": 288,
-    "largura": 224,
-    "raiz": "111,270",
+    "largura": 256,
+    "raiz": "122,270",
     "colunas": 11,
     "pe_no_chao": true,
     "recorte_suave": true
   },
   "frameHeight": 288,
-  "rootX": 111,
-  "rootY": 270,
-  "frameWidth": 224
+  "rootX": 122,
+  "rootY": 270
 }

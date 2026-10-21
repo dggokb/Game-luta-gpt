@@ -136,12 +136,18 @@ def durations(quadros, frames):
 
 
 def stride(char, name, video, quadros):
-    """Quanto o corpo anda no jogo a cada quadro do clipe (px do mundo): a reta do tronco nos
-    quadros escolhidos, na escala da receita e no worldScale do perfil. Com essa distância por
+    """Quanto o corpo anda no jogo a cada quadro do clipe (px do mundo): o avanço do tronco na
+    volta inteira do loop (ou a reta dele, se o vídeo acaba no último quadro), na escala da receita e no worldScale do perfil. Com essa distância por
     quadro o pé do andar fica plantado (o motor anda, a arte acompanha)."""
     frames, _ = read_frames(video)
-    xs = np.array([torso_x(key(frames[q])) for q in quadros])
-    slope = abs(np.polyfit(np.arange(len(xs)), xs, 1)[0])
+    nxt = quadros[-1] + (quadros[-1] - quadros[-2] if len(quadros) > 1 else 1)
+    if nxt < len(frames):
+        # Loop: quanto o tronco avança do 1º quadro até o que viria depois do último (a volta
+        # inteira); a reta dos quadros erra num passo só, em que o tronco anda aos trancos.
+        slope = abs(torso_x(key(frames[nxt])) - torso_x(key(frames[quadros[0]]))) / len(quadros)
+    else:
+        xs = np.array([torso_x(key(frames[q])) for q in quadros])
+        slope = abs(np.polyfit(np.arange(len(xs)), xs, 1)[0])
     clip = json.loads((HERE / f'clips/{char}_{name}.json').read_text(encoding='utf-8'))
     profile = json.loads((HERE / f"profiles/{clip['profile']}").read_text(encoding='utf-8'))
     return round(float(slope * clip['video']['escala'] * profile['worldScale']), 2)
