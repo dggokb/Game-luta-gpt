@@ -4,12 +4,17 @@ import sys
 import tempfile
 import unittest
 
-import cv2
-import numpy as np
 from PIL import Image
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import efeito_video
+try:  # numpy e opencv vêm com as ferramentas de autoria; a CI instala só o Pillow
+    import cv2
+    import numpy as np
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import efeito_video
+except ModuleNotFoundError as missing:
+    if missing.name not in ('numpy', 'cv2'):
+        raise
+    raise unittest.SkipTest('numpy/opencv only in the authoring tools')
 
 VERDE = (40, 230, 30)  # RGB
 

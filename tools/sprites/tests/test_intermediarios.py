@@ -3,11 +3,16 @@ import sys
 import tempfile
 import unittest
 
-import numpy as np
 from PIL import Image
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import intermediarios
+try:  # numpy e opencv vêm com as ferramentas de autoria; a CI instala só o Pillow
+    import numpy as np
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import intermediarios
+except ModuleNotFoundError as missing:
+    if missing.name not in ('numpy', 'cv2'):
+        raise
+    raise unittest.SkipTest('numpy/opencv only in the authoring tools')
 
 
 def quadrado(x, tamanho=(96, 160)):

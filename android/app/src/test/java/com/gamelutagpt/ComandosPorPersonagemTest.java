@@ -199,7 +199,8 @@ public class ComandosPorPersonagemTest {
         semCarga.steps(40);
         semCarga.in.direction = 7;
         semCarga.step();
-        semCarga.step();
+        // Sem esperar o botão do [↓] ↑: só a preparação do pulo (jump squat) antes de sair.
+        semCarga.steps(semCarga.config().jumpSquatFrames + 1);
         assertFalse("quem não tem [↓] ↑ pula na hora", semCarga.p().grounded);
     }
 

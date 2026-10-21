@@ -86,8 +86,8 @@ aterrissagem já tinha o clipe dela.
 - **Reações desenhadas por altura** (hit alto e baixo, e um segundo hit em pé): o motor imita
   com inclinação e arrasto, mas o desenho certo é arte nova.
 
-**No jogo:** o botão **ANIM** (no lugar do antigo DUPLA, abaixo de VIDA P1/CPU) e a tecla **F4**
-passam por 100% → 150% → 50% → desligado.
+**No jogo:** o botão **ANIM** (na metade direita da linha do TUTORIAL, nos botões de teste) e a
+tecla **F4** passam por 100% → 150% → 50% → desligado.
 
 ## Como funciona
 
@@ -167,10 +167,10 @@ ganha o quadro (a duração do de antes é dividida, como no GIF) e `build_chara
 refaz a folha. No p01, as calibrações por quadro (`P01SpriteCalibration`) também andam uma
 posição depois do quadro novo.
 
-## Levar para a sprite-gpt
+## Levar para outra branch
 
-Os commits desta branch estão separados: os de "Versão leve" só enxugam o jogo; o do motor só
-acrescenta o motor. Para levar:
+O motor foi feito na `game-luta-lite-motion` (a sprite-gpt enxugada, só com o p01) e já está
+na `game-luta-sprite-gpt`. Para outra branch do jogo:
 
 1. Copie `android/motion-core/` inteiro e inclua no `android/settings.gradle`
    (`include ':motion-core'`).
@@ -185,7 +185,7 @@ acrescenta o motor. Para levar:
    no `startIntro`, zerar os dois renderers.
 6. Opcional (botão/tecla): `Control.ANIMACAO` no `ControlsLayout`, `Action.ANIMACAO` (F4) no
    `HardwareInput`, `animacaoLabel`/`animacaoLigada` no `HudRenderer.State` e o botão no
-   `drawTestButtons`. Na sprite-gpt o lugar do DUPLA está ocupado: escolha outro ou use só o F4.
+   `drawTestButtons` (na sprite-gpt, o `ANIM_BUTTON_*` divide a linha do TUTORIAL).
 7. `GameView.poeiraDoMotor` (as partículas do motor) chamado depois dos dois `updateFighterSprite`;
    `drawContactShadow` antes dos corpos; o `clipStep` (idle mais lento cansado) e o agachar da
    preparação do pulo no `updateFighterSprite`; o `lead()` e o `kickX()` na câmera.

@@ -2,6 +2,25 @@
 
 Branch `game-luta-sprite-gpt`. Versão `0.102-hud-contadores-super5` (fonte única: `versionName` em `android/app/build.gradle`).
 
+## Motor de animação e efeitos
+
+**Motor de animação** (`android/motion-core`): o movimento por cima dos quadros desenhados,
+com molas de forma fechada e firmes (sem balanço): achatar/esticar no pulo e no pouso, virada,
+quique da queda, antecipação e continuidade nos golpes normais (acertar trava, errar passa do
+ponto), smear nos fortes, reação pela altura do golpe com variação, arrasto e poeira no dash,
+arco e esticar no ar, cansaço com pouca vida, peso por personagem (`fighter.pesoAnimacao`),
+transição curta e rastro no dash/backdash e no pulo da corrida. Os especiais e o Super ficam
+só com o desenho. Botão **ANIM** (ao lado do TUTORIAL) ou **F4**: 100% → 150% → 50% →
+desligado. Também: sombra de contato, soco e tranco de câmera por mola, câmera adiantada na
+corrida e, no motor de combate, preparação do pulo e aterrissagem do pulo vazio (3 quadros
+cada, `jumpSquatFrames`/`jumpLandingFrames` no `CombatConfig`; 0 desliga). Revisão no PC:
+`gradle :pc:revisarAnimacao`. Guia: [docs/motor-animacao.md](docs/motor-animacao.md).
+Quadros intermediários fora do jogo: `tools/sprites/intermediarios.py`.
+
+**Efeitos de vídeo**: impacto, fumaça, onda de chão e arco de golpe gerados sozinhos no verde e
+convertidos por `tools/sprites/efeito_video.py`; enquanto um não existe, o jogo usa o clássico.
+Lista e como gerar: [docs/efeitos-de-video.md](docs/efeitos-de-video.md).
+
 ## Character Pack Engine
 
 A v0.54 incorpora o motor de pacotes da Astra v0.53 preservando a identidade GPT.
