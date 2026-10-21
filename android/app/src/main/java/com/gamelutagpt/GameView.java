@@ -1889,7 +1889,10 @@ public class GameView extends SurfaceView
             impacts.spawn(event.blocked ? ImpactEffects.GUARD : ImpactEffects.HIT, x, y, direction, size, accent);
         }
         // O tremor do golpe tem direção: a tela vai no sentido do golpe e volta (o aleatório fica menor).
-        if (!event.blocked) feel.kick(direction, size);
+        // Só nos normais (o especial de vários acertos balançaria a tela a cada um) e no KO.
+        boolean normal = !event.projectile && !ultraHit && (event.strength == AttackDefinition.Strength.LIGHT ||
+            event.strength == AttackDefinition.Strength.MEDIUM || event.strength == AttackDefinition.Strength.HEAVY);
+        if (!event.blocked && (normal || knockout)) feel.kick(direction, size);
         if (!event.blocked && size >= ImpactEffects.HEAVY) beamShake = Math.max(beamShake, size == ImpactEffects.HEAVY ? 4f : 6f);
         else if (!event.blocked && size == ImpactEffects.MEDIUM) beamShake = Math.max(beamShake, 2f);
         if (knockout) beamShake = Math.max(beamShake, 18f);
