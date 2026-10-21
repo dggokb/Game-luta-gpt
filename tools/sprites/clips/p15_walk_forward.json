@@ -18,13 +18,15 @@
     "medida": "1º quadro = inicio_centro (nota 0.97)",
     "quadros": "60,61,62,63,64,65,66,67,68,69,70,71,72,73",
     "celula": 288,
-    "largura": 256,
-    "raiz": "122,270",
+    "largura": 224,
+    "raiz": "111,270",
     "colunas": 11,
+    "fixar": "volta",
     "pe_no_chao": true,
     "recorte_suave": true
   },
   "frameHeight": 288,
-  "rootX": 122,
-  "rootY": 270
+  "rootX": 111,
+  "rootY": 270,
+  "frameWidth": 224
 }

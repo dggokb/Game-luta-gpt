@@ -259,10 +259,12 @@ def parser():
                    help="remove poeira cinza-esverdeada na faixa dos pés (seguro com cabelo claro e pele)")
     p.add_argument("--colunas", type=int, default=8)
     p.add_argument("--raiz", default="128,238")
-    p.add_argument("--fixar", choices=["tronco", "quadro", "registro", "video"], default="tronco",
+    p.add_argument("--fixar", choices=["tronco", "volta", "quadro", "registro", "video"], default="tronco",
                    help="tronco: anula o deslizamento lateral; quadro: cada quadro no próprio tronco "
                         "(o jogo é que empurra, ex.: defesa); registro: idem, com o tronco medido como "
-                        "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo")
+                        "na auditoria de harmonia (levantar, reações); video: mantém a posição do vídeo; "
+                        "volta: como tronco, mas tira o avanço da volta inteira do loop (andar de um "
+                        "passo só: a folha e o motor andam o mesmo e o loop emenda sem solavanco)")
     p.add_argument("--pe-no-chao", action="store_true",
                    help="cada quadro com os pés na raiz (poses no ar: o jogo é que sobe e desce)")
     p.add_argument("--reescala", type=lambda v: [float(x) for x in v.split(",")],
@@ -439,6 +441,15 @@ def main(argv=None):
         t = np.arange(len(xs))
         trend = np.polyval(np.polyfit(t, xs, 1), t)
         offsets = -(trend - trend[0])
+    elif args.fixar == "volta":
+        # Avanço por quadro = do 1º quadro até o que viria depois do último, dividido pela volta.
+        # É a mesma conta da distância do andar (montagem.py): o motor anda isso por quadro e a
+        # folha desconta isso, então na emenda do loop o corpo não volta para trás.
+        nxt = picked[-1] + (picked[-1] - picked[-2] if len(picked) > 1 else 1)
+        if nxt >= len(frames):
+            raise SystemExit(f"--fixar volta: o vídeo acaba antes do quadro {nxt}")
+        step = (torso_x(keyed_frame(nxt)) - xs[0]) / len(xs)
+        offsets = -step * np.arange(len(xs))
     elif args.fixar == "quadro":
         offsets = -(xs - xs[0])
     elif args.fixar == "registro":
