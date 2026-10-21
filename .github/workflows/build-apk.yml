@@ -91,7 +91,8 @@ jobs:
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Install sprite pipeline dependency
-        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+        # requirements-animar: os testes de montagem/recorte usam o OpenCV.
+        run: python3 -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt -r tools/sprites/requirements-animar.txt
 
       # Processed atlases from earlier runs. Entries are keyed by the hash of their own
       # inputs (build_characters.py), so a restored entry is only used when identical; an

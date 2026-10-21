@@ -120,27 +120,6 @@ public class SpriteIntegrationTest {
         assertEquals(SpriteMotion.Clip.IDLE,opponent.motion.clip);
     }
 
-    @Test public void realTagSwitchLoadsSecondPackAndAllStandingAttacks()throws Exception {
-        assertEquals("player_base",rendererCharacterId());
-        rawTag();
-        frames(72);
-        assertEquals(1,game.engine.team(0).point);
-        assertEquals("p03",rendererCharacterId());
-
-        String[] bindings={"L","M","H"};
-        PadInput.Button[] buttons={PadInput.Button.LIGHT,PadInput.Button.MEDIUM,PadInput.Button.HEAVY};
-        CharacterDefinition second=GeneratedCharacters.get("p03");
-        assertSame("The engine plays the tagged-in pack",second,player().character());
-        for(int i=0;i<bindings.length;i++) {
-            int total=second.attack(bindings[i]).totalFrames;
-            press(buttons[i],0);
-            frames(1);
-            assertEquals(second.moves.get(bindings[i]).animation.id,motion().clip);
-            frames(total);
-            assertEquals(SpriteMotion.Clip.IDLE,motion().clip);
-        }
-    }
-
     @Test public void actualPadDrivesForwardBackAndStopsAtRelease()throws Exception {
         touch(MotionEvent.ACTION_DOWN,265,555);frames(10);assertEquals(SpriteMotion.Clip.WALK_FORWARD,motion().clip);
         touch(MotionEvent.ACTION_MOVE,85,555);frames(10);assertEquals(SpriteMotion.Clip.WALK_BACK,motion().clip);

@@ -28,7 +28,7 @@ public class HudEffectsTest {
         f.life+=30; m.update(f,4); assertTrue(m.healTo>m.healFrom);
         f.superMeter=2200; m.update(f,5); assertEquals(2,m.gainTo);
         f.superMeter=500; m.update(f,6); assertEquals(2200,m.spentTo); assertEquals(500,m.spentFrom);
-        FighterState other=new FighterState(GeneratedCharacters.get("p02"),"P2");
+        FighterState other=new FighterState(GeneratedCharacters.get("player_base"),"P2");
         other.life=10; m.update(other,7); assertEquals(-100,m.hitAt,0);
         assertEquals(-100,m.spendAt,0);
     }
