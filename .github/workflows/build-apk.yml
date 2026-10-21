@@ -133,7 +133,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
+          gradle testDebugUnitTest :ultra-core:test :stage-core:test :story-core:test :motion-core:test assembleDebug -PrequireSpriteCheck=true --stacktrace 2>&1 | tee "$RUNNER_TEMP/gradle-apk.log"
 
       # Falhou: cada teste que caiu e o "What went wrong" do Gradle viram anotações do job, que
       # dá para ler pela API do GitHub (sem baixar o log inteiro).

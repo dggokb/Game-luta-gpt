@@ -7,7 +7,7 @@ package com.gamelutagpt;
 final class ControlsLayout {
     private ControlsLayout() {}
 
-    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
+    enum Control { AI_TOGGLE, DEBUG_TOGGLE, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO, TEAM_SELECT, STORY, TUTORIAL, TUTORIAL_SKIP, CHARACTER_SELECT, DPAD, SUPER, LIGHT, MEDIUM, HEAVY, COMBO, TAG, THROW, PUSHBLOCK, OVERDRIVE, NONE }
 
     static final float DPAD_X = 185f;
     static final float DPAD_Y = 545f;
@@ -94,8 +94,13 @@ final class ControlsLayout {
     // acabando antes do círculo do M).
     static final float TUTORIAL_BUTTON_LEFT = 1082f;
     static final float TUTORIAL_BUTTON_TOP = 422f;
-    static final float TUTORIAL_BUTTON_RIGHT = 1248f;
+    static final float TUTORIAL_BUTTON_RIGHT = 1162f;
     static final float TUTORIAL_BUTTON_BOTTOM = 456f;
+    /** ANIM: o nível do motor de animação (100% → 150% → 50% → desligado), ao lado do TUTORIAL. */
+    static final float ANIM_BUTTON_LEFT = 1168f;
+    static final float ANIM_BUTTON_TOP = TUTORIAL_BUTTON_TOP;
+    static final float ANIM_BUTTON_RIGHT = 1248f;
+    static final float ANIM_BUTTON_BOTTOM = TUTORIAL_BUTTON_BOTTOM;
 
     // Painel da lição do tutorial (abaixo das barras de vida) e o PULAR dentro dele.
     static final float TUTORIAL_PANEL_LEFT = 330f;
@@ -136,6 +141,10 @@ final class ControlsLayout {
         if (insideRect(x, y, TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM)) {
             return Control.TUTORIAL;
         }
+        // Nível do motor de animação, na metade direita da linha do TUTORIAL.
+        if (insideRect(x, y, ANIM_BUTTON_LEFT, ANIM_BUTTON_TOP, ANIM_BUTTON_RIGHT, ANIM_BUTTON_BOTTOM)) {
+            return Control.ANIMACAO;
+        }
         if (insideRect(x, y, SELECT_BUTTON_LEFT, SELECT_BUTTON_TOP, SELECT_BUTTON_RIGHT, SELECT_BUTTON_BOTTOM)) {
             return Control.CHARACTER_SELECT;
         }
@@ -159,6 +168,7 @@ final class ControlsLayout {
             case DEBUG_TOGGLE:
             case HEAL_PLAYER:
             case HEAL_OPPONENT:
+            case ANIMACAO:
             case TEAM_SELECT:
             case STORY:
             case TUTORIAL:

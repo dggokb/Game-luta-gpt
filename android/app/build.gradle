@@ -37,6 +37,7 @@ dependencies {
     implementation project(':story-core')
     // Cenário com falso 3D, também Java puro.
     implementation project(':stage-core')
+    implementation project(':motion-core')
     androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     testImplementation 'junit:junit:4.13.2'

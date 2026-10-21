@@ -67,6 +67,9 @@ final class HudRenderer {
         default boolean hideTestButtons() { return tutorialActive(); }
         /** Botão do topo da luta: a seleção no modo teste, o MENU (pausa) no modo história. */
         default String selectButtonLabel() { return "◀ SELEÇÃO"; }
+        /** Botão do motor de animação (nível ou OFF), ou null para não mostrar. */
+        default String animacaoLabel() { return null; }
+        default boolean animacaoLigada() { return false; }
         /** Overdrive left (1 just turned on, 0 when off). */
         float overdriveRatio();
         float overdriveSeconds();
@@ -207,7 +210,9 @@ final class HudRenderer {
         drawToggle(c, s.storyActive(), "HISTÓRIA",
             STORY_BUTTON_LEFT, STORY_BUTTON_TOP, STORY_BUTTON_RIGHT, STORY_BUTTON_BOTTOM, 16f);
         drawToggle(c, s.tutorialActive(), "TUTORIAL",
-            TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 16f);
+            TUTORIAL_BUTTON_LEFT, TUTORIAL_BUTTON_TOP, TUTORIAL_BUTTON_RIGHT, TUTORIAL_BUTTON_BOTTOM, 13f);
+        if (s.animacaoLabel() != null) drawToggle(c, s.animacaoLigada(), s.animacaoLabel(),
+            ANIM_BUTTON_LEFT, ANIM_BUTTON_TOP, ANIM_BUTTON_RIGHT, ANIM_BUTTON_BOTTOM, 13f);
     }
 
 

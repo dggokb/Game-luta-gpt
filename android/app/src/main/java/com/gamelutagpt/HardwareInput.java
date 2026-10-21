@@ -25,6 +25,7 @@ import android.view.KeyEvent;
  * DEBUG       F1                 (só no modo teste, como os botões de teste)
  * IA on/off   F3
  * vida P1/CPU F5 / F6
+ * animação   F4                 (motor de animação: 100%, 150%, 50%, desligado)
  * </pre>
  *
  * <p>Nos menus (inicial, capítulos, pausa, seleção, história) as teclas viram os botões do
@@ -33,7 +34,7 @@ import android.view.KeyEvent;
  */
 final class HardwareInput {
     /** Comandos fora da luta (os mesmos botões de teste da tela). */
-    enum Action { NONE, DEBUG, AI, CHARACTER_SELECT, HEAL_PLAYER, HEAL_OPPONENT }
+    enum Action { NONE, DEBUG, AI, CHARACTER_SELECT, HEAL_PLAYER, HEAL_OPPONENT, ANIMACAO }
 
     private boolean up, down, left, right;
     /** L, M ou H segurados (golpes carregáveis). */
@@ -107,6 +108,7 @@ final class HardwareInput {
             case KeyEvent.KEYCODE_BUTTON_SELECT: return Action.CHARACTER_SELECT;
             case KeyEvent.KEYCODE_F5: return Action.HEAL_PLAYER;
             case KeyEvent.KEYCODE_F6: return Action.HEAL_OPPONENT;
+            case KeyEvent.KEYCODE_F4: return Action.ANIMACAO;
             default: return Action.NONE;
         }
     }
