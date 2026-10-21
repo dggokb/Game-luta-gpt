@@ -27,7 +27,9 @@ A receita fica em tools/sprites/montagens/<id>.json, um bloco por clipe:
   de trás para a frente: a volta pelo inverso do vídeo que só vai até a pose); impacto é a
   posição em frames do quadro em que o golpe encosta; "distancia": "video" (andar) troca de
   quadro pela distância andada, com a distância medida no vídeo (pé plantado); "devagar": 1.6
-  deixa o ciclo 1,6x mais lento que o pé plantado (o pé escorrega um pouco). A mesma folha
+  deixa o ciclo 1,6x mais lento que o pé plantado (o pé escorrega um pouco); "velocidade": "video"
+  faz o lutador andar no chão na velocidade do vídeo (fighter.walkSpeed / walkBackSpeed, no lugar
+  da do motor): o ciclo toca no tempo do vídeo com o pé plantado. A mesma folha
   pode servir a mais de uma animação (o Super e o Ultra do p15 usam a do S1).
 
 Um vídeo só, sem "fixo", é convertido direto do arquivo. O vídeo colado vai para
@@ -162,6 +164,11 @@ def update_pack(char, name, spec, distance=None):
             anim['distancePerFrame'] = distance if a['distancia'] == 'video' else a['distancia']
             if 'devagar' in a:   # anima mais devagar que o pé plantado (o pé escorrega um pouco)
                 anim['distancePerFrame'] = round(anim['distancePerFrame'] * a['devagar'], 2)
+            if a.get('velocidade') == 'video':
+                # Anda no chão na velocidade do vídeo: o ciclo toca no tempo do vídeo, pé plantado.
+                step = float(np.median(np.abs(np.diff(quadros))))
+                key = 'walkBackSpeed' if state == 'WALK_BACK' else 'walkSpeed'
+                pack['fighter'][key] = round(anim['distancePerFrame'] * FPS / step, 1)
             pack['animations'][state] = anim
             continue
         same = old.get('atlas') == anim['atlas'] and old.get('frames') == frames \

@@ -88,7 +88,8 @@
     "assist": {
       "move": "M"
     },
-    "comboStyle": "equilibrado"
+    "comboStyle": "equilibrado",
+    "walkSpeed": 57.0
   },
   "animations": {
     "IDLE": {
@@ -318,7 +319,7 @@
         37
       ],
       "loop": true,
-      "distancePerFrame": 11.88
+      "distancePerFrame": 4.75
     },
     "WALK_BACK": {
       "atlas": "p15_walk_back",

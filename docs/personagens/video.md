@@ -269,6 +269,9 @@ Cabelo comprido de fios finos (p15): `"recorte_suave": true` nas opções (`--re
 `video_para_sprite.py`) deixa as mechas meio transparentes em vez de cortadas em bloco e reabre
 os vãos de fundo entre elas. Andar: `"distancia": "video"` mede no vídeo quanto o corpo anda por
 quadro, para o pé ficar plantado (use só o trecho dos passos, sem a guarda parada do começo).
+Com a velocidade do motor (300 px/s para frente, 220 para trás) o ciclo toca no tempo que a
+distância manda; `"velocidade": "video"` faz o lutador andar no chão na velocidade do vídeo
+(`fighter.walkSpeed` / `walkBackSpeed` no character.json), e o ciclo toca no tempo do vídeo.
 
 Personagem novo sem todos os vídeos: o `personagem.py` grava o pacote assim que o movimento
 inteiro existe (IDLE, andar, agachar, pulo, dash, backdash); golpe do pulo ou agachado sem vídeo

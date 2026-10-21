@@ -327,6 +327,9 @@ final class CharacterDefinition {
         /** Frames to stand up after a knockdown, timed to this fighter's GETUP art (0 = engine default). */
         int wakeupFrames;
         Fighter withWakeup(int frames) { wakeupFrames=frames; return this; }
+        /** Andar no chão (px/s) no ritmo da arte de andar do lutador (0 = o do motor). */
+        float walkSpeed, walkBackSpeed;
+        Fighter withWalk(float forward,float back) { walkSpeed=forward; walkBackSpeed=back; return this; }
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }

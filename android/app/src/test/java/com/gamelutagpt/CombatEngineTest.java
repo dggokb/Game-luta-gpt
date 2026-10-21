@@ -650,6 +650,20 @@ public class CombatEngineTest {
         assertTrue("A retreating fighter is caught by a walking one", retreated < advanced);
     }
 
+    @Test public void aFighterWithItsOwnWalkSpeedWalksAtIt() {
+        CharacterDefinition p15 = GeneratedCharacters.get("p15");
+        assertTrue(p15.fighter.walkSpeed > 0f);
+        Sim forward = new Sim(p15, NPC, 500f, 1500f);
+        forward.in[0].direction = 1;
+        forward.steps(30);
+        assertEquals(p15.fighter.walkSpeed * 30 * CombatConfig.DT, forward.f(0).x - 500f, 0.5f);
+        Sim back = new Sim(p15, NPC, 1000f, 1500f);
+        back.in[0].direction = 5;
+        back.steps(30);
+        float own = p15.fighter.walkBackSpeed > 0f ? p15.fighter.walkBackSpeed : new CombatConfig().walkBackSpeed;
+        assertEquals(own * 30 * CombatConfig.DT, 1000f - back.f(0).x, 0.5f);
+    }
+
     // ------------------------------------------------------------ specials, super, tag
 
     @Test public void motionCommandTurnsTheButtonIntoTheSpecial() {

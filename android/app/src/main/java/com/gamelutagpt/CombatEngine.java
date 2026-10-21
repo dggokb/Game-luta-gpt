@@ -899,6 +899,16 @@ final class CombatEngine {
         return Math.min(own > 0 ? own : config.wakeupFrames, config.maxWakeupFrames);
     }
 
+    /**
+     * Andar no chão: o do lutador (no ritmo da arte de andar dele, pé plantado) ou o do motor.
+     * No ar o desvio continua o do motor (o pulo é o mesmo para todos).
+     */
+    float walkSpeed(CombatFighter f, boolean forward) {
+        CharacterDefinition c = f.character();
+        float own = c == null ? 0f : forward ? c.fighter.walkSpeed : c.fighter.walkBackSpeed;
+        return own > 0f ? own : forward ? config.walkSpeed : config.walkBackSpeed;
+    }
+
     /** Lying down: the direction held picks quick rise (↑), roll (← / →) or a late rise (↓). */
     private void chooseWakeup(CombatFighter f) {
         switch (MotionParser.relative(f.input.direction, f.facing)) {
@@ -1285,7 +1295,8 @@ final class CombatEngine {
                 f.x -= f.facing * config.backdashSpeed * boost * CombatConfig.DT;
                 f.backdashFrames--;
             } else if (!f.crouching && f.anticipatedGuard == CombatFighter.GUARD_NONE) {
-                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost : walk;
+                float speed = f.forwardDashing && holdingForward ? config.dashSpeed * boost
+                    : walkSpeed(f, holdingForward) * boost;
                 f.x += horizontal * speed * CombatConfig.DT;
             }
         } else if (f.status == CombatFighter.Status.ULTRA && f.ultraPhase == CombatFighter.ULTRA_RUSH) {

@@ -105,6 +105,8 @@ def validate_fighter(pack):
         raise ValueError(f'{name}: color must be #RRGGBB')
     positive_int(f['maxLife'], name+'.maxLife')
     if 'wakeupFrames' in f: positive_int(f['wakeupFrames'], name+'.wakeupFrames')
+    for key in ('walkSpeed', 'walkBackSpeed'):
+        if key in f: positive(f[key], f'{name}.{key}')
     if 'comboStyle' in f and f['comboStyle'] not in COMBO_STYLES:
         raise ValueError(f'{name}.comboStyle: expected one of {list(COMBO_STYLES)}')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
@@ -647,6 +649,8 @@ def compile_packs(root, results):
                    +','+('null' if 'inputPriority' not in fi else 'new AttackDefinition.Strength[]{'+','.join('AttackDefinition.Strength.'+v for v in fi['inputPriority'])+'}')
                    +','+(q(fi['assist']['move']) if 'assist' in fi else 'null')+')'
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
+                   +(f".withWalk({f(fi.get('walkSpeed', 0))},{f(fi.get('walkBackSpeed', 0))})"
+                     if 'walkSpeed' in fi or 'walkBackSpeed' in fi else '')
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
                      if energy and ('nome' in energy or energy.get('segurar')) else '')

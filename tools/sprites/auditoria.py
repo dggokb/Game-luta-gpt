@@ -241,7 +241,8 @@ def game_seconds(pack, state, timing):
     anim = pack['animations'][state]
     n = len(anim['frames'])
     if 'distancePerFrame' in anim:
-        speed = ENGINE['walkBackSpeed'] if state == 'WALK_BACK' else ENGINE['walkSpeed']
+        key = 'walkBackSpeed' if state == 'WALK_BACK' else 'walkSpeed'
+        speed = pack['fighter'].get(key, ENGINE[key])
         return np.full(n, anim['distancePerFrame'] / speed)
     d = np.array(anim.get('durationsMs', [100] * n), float) / 1000
     total, hit, block = timing
