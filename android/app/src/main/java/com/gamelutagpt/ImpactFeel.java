@@ -1,5 +1,8 @@
 package com.gamelutagpt;
 
+import com.gamelutagpt.motion.Canal;
+import com.gamelutagpt.motion.Mola;
+
 /**
  * Peso dos golpes na tela (só apresentação; o motor não lê nada daqui): um soco de câmera
  * no ponto do impacto, o cenário escurecendo por alguns quadros nos golpes fortes (os
@@ -10,8 +13,11 @@ final class ImpactFeel {
     /** Zoom extra por tamanho de golpe (LIGHT, MEDIUM, HEAVY, SPECIAL), punish counter e KO. */
     static final float[] ZOOM = {0f, 0.012f, 0.025f, 0.05f};
     static final float PUNISH_ZOOM = 0.07f, KO_ZOOM = 0.09f;
-    /** Quanto do zoom sobra a cada quadro (volta suave para o enquadramento normal). */
-    static final float ZOOM_DECAY = 0.86f;
+    /**
+     * Mola da volta do zoom (motion-core): o soco entra seco, volta passando um pouco do
+     * enquadramento normal (a câmera "respira" para trás) e assenta em ~3/4 de segundo.
+     */
+    static final Mola ZOOM_SPRING = new Mola(3.2f, 0.45f);
     /** Cenário escurecido (alfa 0..255) e quantos quadros dura, por tamanho de golpe. */
     static final int[] DARK = {0, 0, 70, 100};
     static final int[] DARK_FRAMES = {0, 0, 3, 4};
@@ -50,7 +56,9 @@ final class ImpactFeel {
     /** Entre dois closes: num combo só o primeiro golpe grande ganha a câmera. */
     static final int CINEMA_COOLDOWN = 90;
 
-    private float zoom;
+    /** Zoom extra do soco de câmera, no relógio de passos da luta. */
+    private final Canal zoom = new Canal(ZOOM_SPRING);
+    private int frame;
     private float focusX, focusY;
     private int dark, darkFrames, darkTotal;
     private float flash;
@@ -62,7 +70,8 @@ final class ImpactFeel {
     private float cinemaTilt, cinemaZoom = CINEMA_ZOOM;
 
     void clear() {
-        zoom = 0f;
+        zoom.zerar();
+        frame = 0;
         dark = darkFrames = darkTotal = 0;
         flash = 0f;
         slowFrames = 0;
@@ -118,8 +127,10 @@ final class ImpactFeel {
     void onHit(float x, float y, int size, boolean punish, boolean ko) {
         size = Math.max(ImpactEffects.LIGHT, Math.min(ImpactEffects.SPECIAL, size));
         float kick = ko ? KO_ZOOM : punish ? PUNISH_ZOOM : ZOOM[size];
-        if (kick >= zoom) {
-            zoom = kick;
+        if (kick > 0f && kick >= zoom.valor(frame)) {
+            // O soco novo toma o lugar do que sobrava (entra seco no tamanho dele).
+            zoom.zerar();
+            zoom.degrau(frame, kick, ZOOM_SPRING);
             focusX = x;
             focusY = y;
         }
@@ -144,8 +155,7 @@ final class ImpactFeel {
 
     /** Um passo da luta. */
     void step() {
-        zoom *= ZOOM_DECAY;
-        if (zoom < 0.0005f) zoom = 0f;
+        zoom.limpar(++frame);
         if (darkFrames > 0) darkFrames--;
         flash *= 0.88f;
         if (flash < 2f) flash = 0f;
@@ -153,7 +163,7 @@ final class ImpactFeel {
         if (impactLeft > 0) impactLeft--;
         if (impactCooldown > 0) impactCooldown--;
         if (cinemaCooldown > 0) cinemaCooldown--;
-        if (cinemaFrames > 0 && --cinemaFrames == 0) zoom = 0f;  // corte seco de volta
+        if (cinemaFrames > 0 && --cinemaFrames == 0) zoom.zerar();  // corte seco de volta
     }
 
     /** Estilo do impact frame que aparece agora ({@link #NONE} fora dele e no quadro negativo). */
@@ -168,7 +178,7 @@ final class ImpactFeel {
     int impactSeed() { return impactSeed; }
 
     /** Multiplicador do zoom da câmera (1 = normal). */
-    float zoom() { return cinemaFrames > 0 ? cinemaZoom : 1f + zoom; }
+    float zoom() { return cinemaFrames > 0 ? cinemaZoom : 1f + zoom.valor(frame); }
 
     /** Ponto do mundo que o soco de câmera segura no mesmo lugar da tela. */
     float focusX() { return focusX; }

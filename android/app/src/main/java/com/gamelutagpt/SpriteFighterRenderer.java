@@ -116,6 +116,7 @@ final class SpriteFighterRenderer {
         canvas.save();
         if(facing*character.artFacing<0) canvas.scale(-1f,1f,x,0f);
         aplicarPose(canvas,pose,x,baseY);
+        drawSmear(canvas,pose,x,baseY);
         drawClip(canvas,motion.clip,motion.frame(),x,baseY,255);
         // Transição: o quadro do clipe de antes por cima, sumindo em poucos quadros.
         if(pose.clipeAnterior!=null && pose.alfaAnterior>0f && hasAnimation(pose.clipeAnterior)) {
@@ -145,14 +146,37 @@ final class SpriteFighterRenderer {
         spritePaint.setColorFilter(tint);
     }
 
-    /** Achatar/esticar e inclinação em volta da raiz (os pés), no espaço da arte (já espelhada). */
+    /**
+     * Achatar/esticar, inclinação e arrasto em volta da raiz (os pés), no espaço da arte (já
+     * espelhada).
+     */
     private void aplicarPose(Canvas canvas,Pose pose,float x,float baseY) {
         if(pose.neutra())return;
         // Na arte, "para a frente" é o lado para onde ela foi desenhada olhando.
         float frente=character.artFacing;
         if(pose.deslocX!=0f||pose.deslocY!=0f) canvas.translate(pose.deslocX*frente,pose.deslocY);
         if(pose.inclinacao!=0f) canvas.rotate(pose.inclinacao*frente,x,baseY);
+        if(pose.arrasto!=0f) {
+            // Cisalhamento com os pés parados: quanto mais alto, mais anda (y acima dos pés é negativo).
+            canvas.translate(x,baseY);
+            canvas.skew(-frente*(float)Math.tan(Math.toRadians(pose.arrasto)),0f);
+            canvas.translate(-x,-baseY);
+        }
         if(pose.escalaX!=1f||pose.escalaY!=1f) canvas.scale(pose.escalaX,pose.escalaY,x,baseY);
+    }
+
+    /**
+     * Smear do golpe forte: duas cópias do quadro esticadas na horizontal em volta dos pés, por
+     * baixo do desenho. Só a ponta que passa do corpo aparece (o punho, o pé), translúcida.
+     */
+    private void drawSmear(Canvas canvas,Pose pose,float x,float baseY) {
+        if(pose.smear<=0f||pose.smearEsticar<=0f||override!=null)return;
+        for(int i=2;i>=1;i--) {
+            canvas.save();
+            canvas.scale(1f+pose.smearEsticar*i/2f,1f,x,baseY);
+            drawClip(canvas,motion.clip,motion.frame(),x,baseY,Math.round(255*pose.smear*(i==2?0.25f:0.45f)));
+            canvas.restore();
+        }
     }
 
     /** Um quadro de um clipe com as calibrações do p01 (sem espelhar nem a pose). */

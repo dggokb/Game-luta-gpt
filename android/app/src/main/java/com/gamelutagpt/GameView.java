@@ -35,6 +35,7 @@ import com.gamelutagpt.historia.Torneio;
 import com.gamelutagpt.historia.CinematicaLuta;
 import com.gamelutagpt.historia.ConversaLuta;
 import com.gamelutagpt.historia.Temporada;
+import com.gamelutagpt.motion.Pose;
 import com.gamelutagpt.stage.StagePack;
 import com.gamelutagpt.stage.StageScene;
 import com.gamelutagpt.stage.StageWorld;
@@ -1679,6 +1680,8 @@ public class GameView extends SurfaceView
         updateTeamVisuals();
         updateFighterSprite(spriteFighterRenderer, player());
         updateFighterSprite(opponentSpriteRenderer, opponent());
+        poeiraDoMotor(spriteFighterRenderer, player(), tagOffset());
+        poeiraDoMotor(opponentSpriteRenderer, opponent(), engine.teams.tagOffset(OPPONENT));
         if (intro && ++introFrame >= introTotalFrames) {
             introFrame = -1;
             flow.startCountdown();
@@ -3539,6 +3542,30 @@ public class GameView extends SurfaceView
             locked
         );
         renderer.animacao.passo(f, renderer.motion, engine, fighterVisualY(f));
+    }
+
+    /** Força da poeira do motor a partir da qual a aterrissagem levanta a nuvem inteira (personagem pesado). */
+    private static final float POEIRA_NUVEM = 0.5f;
+
+    /**
+     * Partículas que o motor de animação pede no passo: a poeira da aterrissagem e o pé
+     * deslizando na largada e na freada do dash (as mesmas do combo breaker).
+     */
+    private void poeiraDoMotor(SpriteFighterRenderer renderer, CombatFighter f, float offset) {
+        Pose pose = renderer.animacao.pose();
+        float x = f.x + offset;
+        if (pose.poeira >= POEIRA_NUVEM) {
+            impacts.spawnDust(x, GROUND_Y, pose.poeira);
+        } else if (pose.poeira > 0f) {
+            // Aterrissagem comum: só um sopro de cada lado dos pés (a nuvem é da queda pesada).
+            impacts.spawnSkid(x - 22f, GROUND_Y, 1);
+            impacts.spawnSkid(x + 22f, GROUND_Y, -1);
+        }
+        if (pose.deslize != 0) {
+            int d = pose.deslize;
+            impacts.spawnSkid(x + d * 16f, GROUND_Y, d);
+            impacts.spawnSkid(x - d * 18f, GROUND_Y, d);
+        }
     }
 
     /** Altura em que o lutador é desenhado (o pulinho do backdash sobe só o desenho). */

@@ -330,6 +330,12 @@ final class CharacterDefinition {
         /** Andar no chão (px/s) no ritmo da arte de andar do lutador (0 = o do motor). */
         float walkSpeed, walkBackSpeed;
         Fighter withWalk(float forward,float back) { walkSpeed=forward; walkBackSpeed=back; return this; }
+        /**
+         * Peso para o motor de animação (fighter.pesoAnimacao no pack): 1 normal, acima de 1
+         * mais pesado (achata, inclina e arrasta menos), abaixo de 1 mais leve.
+         */
+        float animationWeight=1f;
+        Fighter withAnimationWeight(float weight) { animationWeight=weight; return this; }
         /** Estilo de combo (mecanicas.json): a CPU joga conforme ele (CpuStyle). */
         String comboStyle="equilibrado";
         Fighter withComboStyle(String style) { comboStyle=style; return this; }

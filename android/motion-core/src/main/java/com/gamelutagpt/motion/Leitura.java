@@ -24,6 +24,8 @@ public final class Leitura {
     public boolean atingido;
     /** O golpe está na janela ativa (pode acertar). */
     public boolean golpeAtivo;
+    /** O golpe próprio está na preparação (antes da janela ativa): a antecipação. */
+    public boolean preparando;
     /** Peso do golpe próprio: 0 fraco, 1 médio, 2 forte, 3 especial/Super. */
     public int forca;
     /** Correndo ou no air dash (para a frente ou para trás). */
@@ -36,6 +38,11 @@ public final class Leitura {
     public boolean defendeu;
     /** Direção (no mundo) para onde o golpe recebido ou defendido empurra: 1 direita, -1 esquerda. */
     public int empurrao;
+    /**
+     * Peso do personagem para a animação: 1 normal, acima de 1 mais pesado (achata, inclina e
+     * arrasta menos), abaixo de 1 mais leve.
+     */
+    public float peso = 1f;
     /** Congelado no impacto (hitstop) ou na pausa do Super: o relógio do motor não anda. */
     public boolean congelado;
 

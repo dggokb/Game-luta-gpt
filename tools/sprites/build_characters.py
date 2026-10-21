@@ -107,6 +107,11 @@ def validate_fighter(pack):
     if 'wakeupFrames' in f: positive_int(f['wakeupFrames'], name+'.wakeupFrames')
     for key in ('walkSpeed', 'walkBackSpeed'):
         if key in f: positive(f[key], f'{name}.{key}')
+    if 'pesoAnimacao' in f:
+        # Peso para o motor de animação: 1 normal; o pesado achata e inclina menos.
+        w = f['pesoAnimacao']
+        if isinstance(w, bool) or not isinstance(w, (int, float)) or not 0.5 <= w <= 2:
+            raise ValueError(f'{name}.pesoAnimacao: expected a number from 0.5 to 2')
     if 'comboStyle' in f and f['comboStyle'] not in COMBO_STYLES:
         raise ValueError(f'{name}.comboStyle: expected one of {list(COMBO_STYLES)}')
     if not isinstance(f['autoCombo'],list) or any(b not in BUTTONS for b in f['autoCombo']):
@@ -651,6 +656,7 @@ def compile_packs(root, results):
                    +(f".withWakeup({fi['wakeupFrames']})" if 'wakeupFrames' in fi else '')
                    +(f".withWalk({f(fi.get('walkSpeed', 0))},{f(fi.get('walkBackSpeed', 0))})"
                      if 'walkSpeed' in fi or 'walkBackSpeed' in fi else '')
+                   +('.withAnimationWeight('+f(fi['pesoAnimacao'])+')' if 'pesoAnimacao' in fi else '')
                    +('.withComboStyle('+q(fi['comboStyle'])+')' if 'comboStyle' in fi else '')
                    +('.withEnergyCommand('+(q(energy['nome']) if 'nome' in energy else 'null')+','+str(bool(energy.get('segurar'))).lower()+')'
                      if energy and ('nome' in energy or energy.get('segurar')) else '')

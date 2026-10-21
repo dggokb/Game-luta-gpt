@@ -149,6 +149,13 @@ class CharacterPackTests(unittest.TestCase):
         self.edit(lambda d:d['fighter']['body'].update(crouchHeight=999))
         with self.assertRaisesRegex(ValueError,'crouchHeight'):pipeline.build(self.root)
 
+    def test_animation_weight_is_validated_and_compiled(self):
+        self.edit(lambda d:d['fighter'].__setitem__('pesoAnimacao',3))
+        with self.assertRaisesRegex(ValueError,'pesoAnimacao'):pipeline.build(self.root)
+        self.edit(lambda d:d['fighter'].__setitem__('pesoAnimacao',1.4))
+        pipeline.build(self.root)
+        java=(self.root/pipeline.JAVA/'GeneratedCharacters.java').read_text()
+        self.assertIn('.withAnimationWeight(1.40000000f)',java)
     def test_unreferenced_source_art_is_rejected(self):
         (self.root/'art/sprites/source/forgotten.png').write_bytes(b'x')
         with self.assertRaisesRegex(ValueError,'forgotten.png'):pipeline.build(self.root)

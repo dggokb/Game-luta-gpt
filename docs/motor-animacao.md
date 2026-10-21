@@ -7,17 +7,36 @@ ferramenta de revisão confere que o estado da luta sai igual com o motor ligado
 
 ## O que ele faz
 
-| Efeito | Quando | Padrão |
-|---|---|---|
-| Achatar | ao aterrissar (mais forte quanto mais rápido caía), volta com um balanço | até 9% da altura |
-| Esticar | ao sair do chão | 6% |
-| Inclinação de impacto | apanhando, o tronco cede para o lado do empurrão (depois do hitstop) | 3° fraco a 8° especial; 2° defendendo |
-| Inclinação de corrida | dash e air dash para a frente; para trás no backdash | 4° |
-| Estalo | quando o golpe próprio fica ativo, um tranco curto de esticar na horizontal | 1,5% a 4,5% |
-| Transição | troca de clipe fora de golpes, reações, decolagem e aterrissagem: o quadro de antes some em 2 quadros | 35% |
-| Rastro | só nos dois para a frente e dois para trás (dash, backdash e air dash) e no pulo que sai da corrida; o super pulo e os golpes não deixam (`rastroNosGolpes` liga nos golpes) | até 3 cópias azuladas, 35%, vivem 8 quadros |
+Organizado pelos 12 princípios da animação (o que cada efeito resolve):
+
+| Princípio | Efeito | Quando | Padrão |
+|---|---|---|---|
+| Achatar e esticar | Achatar | ao aterrissar (mais forte quanto mais rápido caía), volta com um balanço | até 9% da altura |
+| | Esticar | ao sair do chão | 6% |
+| | Volume | achatar e esticar mantêm a área do desenho (mais baixo = mais largo na mesma medida) | sempre |
+| | Virada | ao virar de lado, o desenho sai estreito e abre de volta (lê como um giro) | 25% da largura |
+| | Quique | o corpo caído bate no chão: achata mais e sobe um pouco, sem nunca entrar no chão | 13%, 10 px |
+| Antecipação | Preparação | na preparação do golpe (os quadros de startup que ele já tem) o corpo recua e abaixa | 1° fraco a 3° especial; 2% |
+| Continuidade | Seguir o golpe | quando o golpe fica ativo, o corpo segue para a frente e assenta | 1,5° fraco a 4° especial |
+| | Arrasto | dash: o tronco fica para trás na largada e passa da conta na freada (cisalhamento com os pés parados) | 2,5° na largada, 5° na freada |
+| Aceleração | Molas | tudo entra e sai por molas, nunca linear | — |
+| Arcos | Arco do pulo | no ar, a cabeça vai para onde ele anda subindo e volta descendo; o pulo da corrida inclina mais. Pulo parado e super pulo reto não inclinam | 4° (6° na corrida) |
+| | Esticar no ar | estica conforme a velocidade vertical (normal no topo do pulo) | até 4,5% |
+| Ação secundária | Poeira | aterrissagem: um sopro de cada lado dos pés (personagem pesado: a nuvem inteira); largada e freada do dash e do backdash: o pé deslizando. A queda do knockdown já tinha a dela | — |
+| Tempo | Mola por peso | o golpe fraco volta ligeiro, o forte balança mais devagar (apanhando e batendo) | 4 molas |
+| | Peso do personagem | `fighter.pesoAnimacao` no pack: o pesado achata, inclina e arrasta menos e levanta mais poeira | 1 |
+| Exagero | Smear | golpes fortes: nos 2 primeiros quadros ativos, cópias esticadas por baixo do desenho (o punho/pé "borra") | 22% |
+| | Inclinação de impacto | apanhando, o tronco cede para o lado do empurrão (depois do hitstop) | 3° fraco a 8° especial; 2° defendendo |
+| | Inclinação de corrida | dash e air dash para a frente; para trás no backdash | 4° |
+| | Estalo | quando o golpe próprio fica ativo, um tranco curto de esticar na horizontal | 1,5% a 4,5% |
+| Encenação | Soco de câmera | o zoom do golpe (ImpactFeel) entra seco e volta por mola, passando um pouco para trás antes de assentar | ~3/4 s |
+| Pose a pose | Transição | troca de clipe fora de golpes, reações, decolagem e aterrissagem: o quadro de antes some em 2 quadros | 35% |
+| | Rastro | só nos dois para a frente e dois para trás (dash, backdash e air dash) e no pulo que sai da corrida; o super pulo e os golpes não deixam (`rastroNosGolpes` liga nos golpes) | até 3 cópias azuladas, 35%, vivem 8 quadros |
+| Direto | Quadros intermediários | fora do jogo: `tools/sprites/intermediarios.py` (abaixo) | — |
 
 Tudo com os pés parados (a raiz é o pivô) e o "para a frente" segue para onde o lutador olha.
+Nada disso muda o frame data, as caixas ou a física: a antecipação usa só os quadros de
+preparação que o golpe já tem.
 
 **No jogo:** o botão **ANIM** (no lugar do antigo DUPLA, abaixo de VIDA P1/CPU) e a tecla **F4**
 passam por 100% → 150% → 50% → desligado.
@@ -33,8 +52,10 @@ passam por 100% → 150% → 50% → desligado.
   começa quando a luta volta a andar. Tudo é conta do quadro desse relógio: o mesmo jogo dá a
   mesma animação (serve para rollback).
 - **Leitura → Pose**: a cada passo o jogo entrega uma `Leitura` (no chão, velocidade, clipe e
-  quadro, golpe ativo e peso, dash, apanhou/defendeu e para que lado, congelado) e o motor
-  devolve uma `Pose` (escala X/Y, inclinação, quadro de antes com opacidade, cópias do rastro).
+  quadro, golpe na preparação ou ativo e peso dele, dash, embalo, apanhou/defendeu e para que
+  lado, peso do personagem, congelado) e o motor devolve uma `Pose` (escala X/Y, inclinação,
+  arrasto, quique, smear, quadro de antes com opacidade, cópias do rastro e os eventos de
+  poeira do passo).
 - **Ajustes** (`Ajustes`): cada efeito liga e desliga sozinho, e `intensidade` escala todos.
 
 ## Onde fica
@@ -44,8 +65,11 @@ passam por 100% → 150% → 50% → desligado.
 | Motor (Java puro, sem Android) | `android/motion-core/` (`Mola`, `Canal`, `Leitura`, `Pose`, `Ajustes`, `MotorAnimacao`) |
 | Testes do motor | `android/motion-core/src/test/` — `gradle :motion-core:test` |
 | Ponte com a luta | `app/.../AnimacaoLutador.java` (lê o `CombatFighter` e os `HitEvent` do passo) |
-| Desenho | `SpriteFighterRenderer`: `draw` aplica a pose em volta dos pés e a transição; `drawRastro` desenha as cópias |
-| Ganchos no jogo | `GameView`: `updateFighterSprite` chama `renderer.animacao.passo(...)`; `drawFighter` chama `renderer.drawRastro(c)`; `startIntro` zera; botão ANIM e F4 |
+| Desenho | `SpriteFighterRenderer`: `draw` aplica a pose em volta dos pés (com o arrasto), o smear e a transição; `drawRastro` desenha as cópias |
+| Ganchos no jogo | `GameView`: `updateFighterSprite` chama `renderer.animacao.passo(...)`; `poeiraDoMotor` solta as partículas; `drawFighter` chama `renderer.drawRastro(c)`; `startIntro` zera; botão ANIM e F4 |
+| Soco de câmera | `ImpactFeel`: o zoom é um `Canal` com a mola `ZOOM_SPRING` |
+| Peso no pack | `fighter.pesoAnimacao` (0,5 a 2) em `characters/<id>/character.json` → `Fighter.animationWeight` (gerado pelo `build_characters.py`) |
+| Quadros intermediários | `tools/sprites/intermediarios.py` |
 | Revisão | `gradle :pc:revisarAnimacao` (abaixo) |
 
 ## Revisar no PC
@@ -59,9 +83,36 @@ ffmpeg -framerate 60 -i pc/build/revisao-animacao/desligado/%04d.png \
        -filter_complex hstack -pix_fmt yuv420p lado-a-lado.mp4
 ```
 
-O roteiro (`RevisaoAnimacao`) joga 560 quadros: pulo parado, dash, L > M > H no CPU, backdash,
-pulo para a frente, pulo saído da corrida e super pulo. Os dois `estado.txt` têm de ser iguais (o motor não mexe na luta).
+O roteiro (`RevisaoAnimacao`) joga 780 quadros: pulo parado, dash, L > M > H no CPU (que cai e
+quica), backdash, pulo para a frente, pulo saído da corrida, super pulo, pulo por cima do CPU
+(os dois viram) e o 2H. Os dois `estado.txt` têm de ser iguais (o motor não mexe na luta).
 `-Pmodos=desligado,ligado` escolhe as pastas (um nome que começa com "ligado" liga o motor).
+
+## Quadros intermediários (fora do jogo)
+
+```bash
+pip install -r tools/sprites/requirements-animar.txt
+python3 tools/sprites/intermediarios.py auditar            # maiores saltos entre quadros
+python3 tools/sprites/intermediarios.py gerar JUMP_HEAVY --entre 1
+# android/app/build/sprite-review/intermediarios/: o quadro do meio, a tira antes|meio|depois
+# e os GIFs do clipe original e com o quadro novo (o tempo do golpe não muda)
+```
+
+A auditoria mede em pixels do mundo quanto o desenho anda de um quadro para o seguinte e a
+**confiança** do fluxo (quanto do desenho vai e volta pelo fluxo óptico). Salto grande com
+confiança alta é candidato a quadro do meio; com confiança baixa é giro ou pose nova, e o meio
+sai com dupla exposição: ali o certo é desenhar.
+
+**O que deu no p01:** os clipes vieram de vídeo e já são densos. O maior salto é 50 px (pulo
+H, 1 > 2) e todos os acima de 40 px têm confiança abaixo de 50%: são o corpo girando ou o
+chute voltando, e o meio sai com dupla exposição. Nenhum quadro do p01 foi trocado. A
+ferramenta fica para personagens com poucos quadros (desenhados à mão ou do ChatGPT).
+
+Para aplicar um candidato aprovado: o PNG vai como célula nova na folha-fonte do clipe
+(`art/sprites/source/...`, `expectedFrames` + 1), a lista `frames`/`durationsMs` da animação
+ganha o quadro (a duração do de antes é dividida, como no GIF) e `build_characters.py --write`
+refaz a folha. No p01, as calibrações por quadro (`P01SpriteCalibration`) também andam uma
+posição depois do quadro novo.
 
 ## Levar para a sprite-gpt
 
@@ -82,7 +133,13 @@ acrescenta o motor. Para levar:
 6. Opcional (botão/tecla): `Control.ANIMACAO` no `ControlsLayout`, `Action.ANIMACAO` (F4) no
    `HardwareInput`, `animacaoLabel`/`animacaoLigada` no `HudRenderer.State` e o botão no
    `drawTestButtons`. Na sprite-gpt o lugar do DUPLA está ocupado: escolha outro ou use só o F4.
-7. `gradle :motion-core:test :pc:testarMotor` e `gradle :pc:revisarAnimacao` para conferir.
+7. `GameView.poeiraDoMotor` (as partículas do motor) chamado depois dos dois `updateFighterSprite`.
+8. `ImpactFeel` com o `Canal` no zoom (opcional: sem ele o soco volta pelo decaimento antigo).
+9. O `withAnimationWeight`/`animationWeight` no `CharacterDefinition.Fighter` e o
+   `pesoAnimacao` no `build_characters.py`; aí cada pack pode ganhar o peso dele (o tanque
+   1,3–1,5, o leve 0,8) e `--write` refaz o `GeneratedCharacters`.
+10. `tools/sprites/intermediarios.py` e o teste dele.
+11. `gradle :motion-core:test :pc:testarMotor` e `gradle :pc:revisarAnimacao` para conferir.
 
 Com outros personagens nada muda: o motor só lê o clipe e o estado da luta, sem nada por
 personagem.
@@ -90,7 +147,4 @@ personagem.
 ## Próximos passos possíveis
 
 - Ajustar os números no celular (ANIM 50/100/150%) e fixar o padrão.
-- Quadros intermediários fora do jogo nos golpes de 3 a 4 quadros (fluxo óptico, como no
-  `tools/sprites/animar.py`).
-- Peso por personagem (um `Ajustes` no pack: o tanque achata menos, o leve mais).
-- Molas também na câmera (soco e volta do zoom) no lugar do decaimento fixo.
+- Dar o `pesoAnimacao` de cada personagem quando o motor for para a sprite-gpt.
