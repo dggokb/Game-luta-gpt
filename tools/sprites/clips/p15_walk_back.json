@@ -6,7 +6,7 @@
   "output": "android/app/src/main/res/drawable-nodpi/p15_walk_back.webp",
   "report": "tools/sprites/reports/p15_walk_back.report.json",
   "preview": "android/app/build/sprite-review/p15_walk_back-import.png",
-  "expectedFrames": 27,
+  "expectedFrames": 33,
   "segmentation": "prepared-grid",
   "columns": 11,
   "rootMode": "authored",
@@ -14,21 +14,18 @@
   "video": {
     "arquivo": "andarTras.mp4",
     "personagem": "p15",
-    "escala": 0.5689,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50",
+    "escala": 0.411,
+    "motivo": "vídeo do Flick cortado só no trecho andando (quadros 12-106): a ponta não é a guarda e a medida deu nota 0,80; 0,411 é a escala medida no vídeo inteiro pelo inicio_centro_h3",
+    "quadros": "19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67,69,71,73,75,77,79,81,83",
     "celula": 288,
-    "largura": 224,
-    "raiz": "111,270",
+    "largura": 256,
+    "raiz": "127,270",
     "colunas": 11,
-    "fixar": "volta",
     "pe_no_chao": true,
     "limpar_chao": true,
-    "recorte_suave": true,
-    "balanco": 0.5
+    "recorte_suave": true
   },
   "frameHeight": 288,
-  "rootX": 111,
-  "rootY": 270,
-  "frameWidth": 224
+  "rootX": 127,
+  "rootY": 270
 }

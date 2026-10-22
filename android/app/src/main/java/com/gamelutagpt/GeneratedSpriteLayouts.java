@@ -2656,11 +2656,11 @@ final class GeneratedSpriteLayouts {
     static final int P15_HEAVY_STRAIGHT_ROOT_Y = 275;
     static final int P15_HEAVY_STRAIGHT_FRAME_COUNT = 23;
 
-    static final int P15_IDLE_FRAME_WIDTH = 184;
-    static final int P15_IDLE_FRAME_HEIGHT = 270;
-    static final int P15_IDLE_ROOT_X = 79;
-    static final int P15_IDLE_ROOT_Y = 258;
-    static final int P15_IDLE_FRAME_COUNT = 83;
+    static final int P15_IDLE_FRAME_WIDTH = 178;
+    static final int P15_IDLE_FRAME_HEIGHT = 265;
+    static final int P15_IDLE_ROOT_X = 81;
+    static final int P15_IDLE_ROOT_Y = 253;
+    static final int P15_IDLE_FRAME_COUNT = 54;
 
     static final int P15_IDLE_2_FRAME_WIDTH = 187;
     static final int P15_IDLE_2_FRAME_HEIGHT = 283;
@@ -2722,17 +2722,17 @@ final class GeneratedSpriteLayouts {
     static final int P15_SPECIAL_S4_ROOT_Y = 356;
     static final int P15_SPECIAL_S4_FRAME_COUNT = 37;
 
-    static final int P15_WALK_BACK_FRAME_WIDTH = 217;
-    static final int P15_WALK_BACK_FRAME_HEIGHT = 274;
-    static final int P15_WALK_BACK_ROOT_X = 107;
-    static final int P15_WALK_BACK_ROOT_Y = 261;
-    static final int P15_WALK_BACK_FRAME_COUNT = 27;
+    static final int P15_WALK_BACK_FRAME_WIDTH = 224;
+    static final int P15_WALK_BACK_FRAME_HEIGHT = 276;
+    static final int P15_WALK_BACK_ROOT_X = 111;
+    static final int P15_WALK_BACK_ROOT_Y = 264;
+    static final int P15_WALK_BACK_FRAME_COUNT = 33;
 
-    static final int P15_WALK_FORWARD_FRAME_WIDTH = 211;
-    static final int P15_WALK_FORWARD_FRAME_HEIGHT = 274;
-    static final int P15_WALK_FORWARD_ROOT_X = 103;
-    static final int P15_WALK_FORWARD_ROOT_Y = 261;
-    static final int P15_WALK_FORWARD_FRAME_COUNT = 14;
+    static final int P15_WALK_FORWARD_FRAME_WIDTH = 200;
+    static final int P15_WALK_FORWARD_FRAME_HEIGHT = 285;
+    static final int P15_WALK_FORWARD_ROOT_X = 92;
+    static final int P15_WALK_FORWARD_ROOT_Y = 273;
+    static final int P15_WALK_FORWARD_FRAME_COUNT = 20;
 
     static final int BACKDASH_SET_FRAME_WIDTH = 497;
     static final int BACKDASH_SET_FRAME_HEIGHT = 487;
