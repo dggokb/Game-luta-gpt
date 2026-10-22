@@ -452,7 +452,7 @@ O jogo inteiro roda no PC — menu, modo história, seleção, luta, HUD, pausa,
 - Jogar: `gradle :pc:run` (lê os arquivos direto do repositório; não precisa do SDK Android).
 - Exportar: `gradle :pc:exportarPc` → `pc/build/exportar/GameLutaGPT-<versão>-<sistema>.zip`,
   pasta pronta com o Java embutido (`GameLutaGPT.exe` no Windows). Cada sistema exporta o
-  seu; a CI (`.github/workflows/build-pc.yml`) gera os três.
+  seu; a CI (`.github/workflows/build-pc.yml`, pelo botão "Run workflow" no Actions) gera os três.
 - Sem Java embutido: `gradle :pc:distZip` (precisa de Java 17+ instalado).
 - Controles: teclado (WASD/setas, J K L = L M H, U auto-combo, I Super, O Tag, Esc pausa) e
   controle pelo SDL (padrão Xbox); no PC o controle virtual de toque some (o mouse ainda

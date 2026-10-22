@@ -5,24 +5,12 @@ name: Exportar jogo para PC
 # roda o jogo sem tela e guarda as capturas (menu, seleção, luta, pausa).
 # Os zips e as capturas vão para a release "build-<branch>" (substituídos a cada push): artefatos
 # do Actions contam na cota de armazenamento (0,5 GB no plano) e cada zip tem ~0,8 GB.
+# Só no botão "Run workflow": no repositório privado o macOS conta 10x e o Windows 2x na cota de
+# minutos do Actions, e rodar a cada push esgotava a cota.
 permissions:
   contents: write
 
 on:
-  push:
-    branches:
-      - main
-      - game-luta-sprite-gpt
-      - 'claude/**'
-    paths:
-      - 'android/**'
-      - 'art/concepts/**'
-      - 'tools/sprites/**'
-      - '.github/workflows/build-pc.yml'
-  pull_request:
-    paths:
-      - 'android/**'
-      - '.github/workflows/build-pc.yml'
   workflow_dispatch:
 
 jobs:

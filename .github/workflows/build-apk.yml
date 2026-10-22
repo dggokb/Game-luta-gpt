@@ -24,9 +24,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Só o APK, sem os testes: sai em poucos minutos para instalar e testar no celular. Os testes
-  # (job "build", em paralelo) continuam valendo: se algum cair, o run fica vermelho mesmo com
-  # o APK já disponível.
+  # Só o APK, sem os testes: sai em poucos minutos para instalar e testar no celular. É o único
+  # job que roda a cada push: o repositório é privado e a cota de minutos do Actions acaba
+  # rápido. Os testes (job "build") rodam no PR e no botão "Run workflow".
   apk:
     name: APK (rápido, sem testes)
     runs-on: ubuntu-latest
@@ -81,6 +81,8 @@ jobs:
 
   build:
     name: Testes, folhas e smoke no emulador
+    # ~25 min por execução: fora do push (cota de minutos); no PR e no "Run workflow".
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write

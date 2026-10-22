@@ -1,17 +1,8 @@
 name: Build Character Selection Preview
 
 # Isolated UI smoke build. The original, full sprite-validation workflow stays unchanged.
+# Só no botão "Run workflow" (cota de minutos do Actions no repositório privado).
 on:
-  push:
-    branches:
-      - game-luta-sprite-gpt
-    paths:
-      - '.github/workflows/build-selection-preview.yml'
-      - 'android/app/src/main/java/com/gamelutagpt/CharacterSelect.java'
-      - 'android/app/src/main/java/com/gamelutagpt/CharacterSelectRenderer.java'
-      - 'android/app/src/main/java/com/gamelutagpt/GameView.java'
-      - 'android/app/src/test/java/com/gamelutagpt/CharacterSelectTest.java'
-      - 'android/app/src/test/java/com/gamelutagpt/SpriteIntegrationTest.java'
   workflow_dispatch:
 
 permissions:
