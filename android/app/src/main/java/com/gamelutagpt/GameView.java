@@ -132,6 +132,7 @@ public class GameView extends SurfaceView
      * evento tenta o dele e, se ainda não existe, usa o efeito clássico do ImpactEffects.
      */
     private final EfeitosVideo efeitos;
+    private final EntradaSuper entradaSuper;
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
     private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
@@ -506,6 +507,7 @@ public class GameView extends SurfaceView
     public GameView(Context context, boolean emSegundoPlano) {
         super(context);
         efeitos = new EfeitosVideo(context.getAssets());
+        entradaSuper = new EntradaSuper(context.getAssets());
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
@@ -899,6 +901,7 @@ public class GameView extends SurfaceView
         engine.restage(PLAYER_START_X, OPPONENT_START_X);
         loadTeamUltras();
         loadCpuUltras();
+        loadSuperIntros();
         medicao.parte("ultras");
         medicao.fim(atlases);
         startIntro();
@@ -914,6 +917,14 @@ public class GameView extends SurfaceView
             if (carregarFolhasNaHora) pedirUltra(member, true);
             ultraSounds.loadUltra(ultraFolder(member));
         }
+    }
+
+    /** A entrada do Super (retrato ao fundo) de quem está na luta, dos dois lados. */
+    private void loadSuperIntros() {
+        java.util.List<String> ids = new java.util.ArrayList<>();
+        for (FighterState member : engine.team(PLAYER).members) ids.add(member.character.id);
+        for (FighterState member : engine.team(OPPONENT).members) ids.add(member.character.id);
+        entradaSuper.manter(engine, ids.toArray(new String[0]));
     }
 
     private UltraPack teamUltraPack(String characterId) {
@@ -2190,11 +2201,20 @@ public class GameView extends SurfaceView
 
     /**
      * Super: the stage darkens behind both fighters (they stay lit; the one held by the freeze
-     * dims in {@link #drawFighter}) and the charge aura grows behind whoever activated it.
+     * dims in {@link #drawFighter}) and the charge aura grows behind whoever activated it. With a
+     * Super entrance ({@link EntradaSuper}) its portrait shows first, behind the fighters.
      */
-    private void drawSuperDarkness(Canvas canvas) {
+    private void drawSuperDarkness(Canvas canvas, float zoom, float left, float top) {
         effects.drawWorldOverlay(canvas, paint, superFlash.darkAlpha, 0, 0, 8);
         CombatFighter u = engine.fighter(superFlash.user);
+        if (superFlash.introShowing()) {
+            // Entrada do Super: o retrato ao fundo, na tela (não no mundo), na borda do lado dele.
+            canvas.save();
+            canvas.translate(left, top);
+            canvas.scale(1f / zoom, 1f / zoom);
+            entradaSuper.desenhar(canvas, u.character().id, superFlash.introAge, superFlash.introLeft);
+            canvas.restore();
+        }
         float x = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));
         canvas.save();
         if (u.facing < 0) canvas.scale(-1f, 1f, x, 0f);
@@ -2968,7 +2988,7 @@ public class GameView extends SurfaceView
                 drawUltraBeamOverlay(canvas, false);
                 raioFinal.drawBehind(renderCanvas, ultraPack, ultraBeamFrame());
             }
-            if (isSuperCinematicActive()) drawSuperDarkness(canvas);
+            if (isSuperCinematicActive()) drawSuperDarkness(canvas, renderZoom, cameraLeft, renderCameraTop);
             // As sombras dos dois antes de qualquer corpo (uma não pinta o pé do outro).
             canvas.save();
             canvas.translate(tagOffset(), 0f);

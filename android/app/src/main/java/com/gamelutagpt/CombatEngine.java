@@ -146,6 +146,7 @@ final class CombatEngine {
     private final int[] autoStep = new int[1];
     private int frame;
     private int superFreeze;
+    private final java.util.Map<String, Integer> superIntros = new java.util.HashMap<>();
     /** Attacker whose ultra rush connected during the last step, or -1. */
     private int ultraConnected = -1;
 
@@ -194,6 +195,23 @@ final class CombatEngine {
         return sessionEndFrame[defender] < 0 ? Integer.MAX_VALUE : frame - sessionEndFrame[defender];
     }
     boolean superFreezeActive() { return superFreeze > 0; }
+
+    /**
+     * Passos da entrada do Super de um personagem (o retrato que passa ao fundo antes de o
+     * Super sair); 0 tira. Quem monta a luta põe a de cada lutador que tem a arte.
+     */
+    void setSuperIntro(String characterId, int frames) {
+        if (frames > 0) superIntros.put(characterId, frames);
+        else superIntros.remove(characterId);
+    }
+
+    void clearSuperIntros() { superIntros.clear(); }
+
+    /** Passos da entrada do Super de quem está no lugar {@code f} (0 = sem entrada). */
+    int superIntro(CombatFighter f) {
+        Integer frames = superIntros.get(f.character().id);
+        return frames == null ? 0 : frames;
+    }
     /** Attacker whose ultra connected in the last step (start the cinematic), or -1. */
     int ultraConnected() { return ultraConnected; }
     /**
@@ -790,9 +808,13 @@ final class CombatEngine {
             // strikes leaves a few frames to react after the flash (holding guard still blocks).
             int freeze = attack.melee() ? Math.max(0, attack.startupFrames - config.strikingSuperReactFrames)
                                         : attack.startupFrames;
+            // Entrada do Super (o retrato ao fundo): quem ativou segura a carga até ela passar,
+            // e o rival e os projéteis esperam a entrada mais o congelamento de sempre.
+            int intro = superIntro(f);
+            if (intro > 0) f.hitstop = Math.max(f.hitstop, intro);
             CombatFighter other = fighters[1 - f.index];
-            other.hitstop = Math.max(other.hitstop, freeze);
-            superFreeze = Math.max(superFreeze, freeze);
+            other.hitstop = Math.max(other.hitstop, intro + freeze);
+            superFreeze = Math.max(superFreeze, intro + freeze);
         }
     }
 

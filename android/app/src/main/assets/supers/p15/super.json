@@ -1,0 +1,163 @@
+{
+ "video": "p15_super_entrada.mp4",
+ "trecho": [
+  4,
+  44
+ ],
+ "passo": 2,
+ "entraPor": "esquerda",
+ "alturaTela": 1.0,
+ "larguraVideo": 1260.0,
+ "quadroMs": 55.6,
+ "segurarMs": 0,
+ "saidaMs": 150,
+ "quadros": [
+  {
+   "imagem": "q00.webp",
+   "x": 0.0,
+   "y": -243.8,
+   "largura": 112.5,
+   "altura": 243.8
+  },
+  {
+   "imagem": "q01.webp",
+   "x": 0.0,
+   "y": -395.6,
+   "largura": 198.8,
+   "altura": 395.6
+  },
+  {
+   "imagem": "q02.webp",
+   "x": 0.0,
+   "y": -463.1,
+   "largura": 262.5,
+   "altura": 463.1
+  },
+  {
+   "imagem": "q03.webp",
+   "x": 0.0,
+   "y": -480.0,
+   "largura": 324.4,
+   "altura": 480.0
+  },
+  {
+   "imagem": "q04.webp",
+   "x": 0.0,
+   "y": -502.5,
+   "largura": 386.2,
+   "altura": 502.5
+  },
+  {
+   "imagem": "q05.webp",
+   "x": 0.0,
+   "y": -532.5,
+   "largura": 487.5,
+   "altura": 532.5
+  },
+  {
+   "imagem": "q06.webp",
+   "x": 0.0,
+   "y": -570.0,
+   "largura": 585.0,
+   "altura": 570.0
+  },
+  {
+   "imagem": "q07.webp",
+   "x": 0.0,
+   "y": -598.1,
+   "largura": 675.0,
+   "altura": 598.1
+  },
+  {
+   "imagem": "q08.webp",
+   "x": 0.0,
+   "y": -624.4,
+   "largura": 751.9,
+   "altura": 624.4
+  },
+  {
+   "imagem": "q09.webp",
+   "x": 0.0,
+   "y": -654.4,
+   "largura": 821.2,
+   "altura": 654.4
+  },
+  {
+   "imagem": "q10.webp",
+   "x": 0.0,
+   "y": -678.8,
+   "largura": 896.2,
+   "altura": 678.8
+  },
+  {
+   "imagem": "q11.webp",
+   "x": 0.0,
+   "y": -701.2,
+   "largura": 960.0,
+   "altura": 701.2
+  },
+  {
+   "imagem": "q12.webp",
+   "x": 0.0,
+   "y": -714.4,
+   "largura": 988.1,
+   "altura": 714.4
+  },
+  {
+   "imagem": "q13.webp",
+   "x": 0.0,
+   "y": -714.4,
+   "largura": 991.9,
+   "altura": 714.4
+  },
+  {
+   "imagem": "q14.webp",
+   "x": 0.0,
+   "y": -718.1,
+   "largura": 997.5,
+   "altura": 718.1
+  },
+  {
+   "imagem": "q15.webp",
+   "x": 0.0,
+   "y": -720.0,
+   "largura": 1006.9,
+   "altura": 720.0
+  },
+  {
+   "imagem": "q16.webp",
+   "x": 0.0,
+   "y": -720.0,
+   "largura": 1016.2,
+   "altura": 720.0
+  },
+  {
+   "imagem": "q17.webp",
+   "x": 0.0,
+   "y": -720.0,
+   "largura": 1020.0,
+   "altura": 720.0
+  },
+  {
+   "imagem": "q18.webp",
+   "x": 0.0,
+   "y": -720.0,
+   "largura": 1027.5,
+   "altura": 720.0
+  },
+  {
+   "imagem": "q19.webp",
+   "x": 0.0,
+   "y": -720.0,
+   "largura": 1035.0,
+   "altura": 720.0
+  },
+  {
+   "imagem": "q20.webp",
+   "x": 0.0,
+   "y": -720.0,
+   "largura": 1040.6,
+   "altura": 720.0
+  }
+ ]
+}

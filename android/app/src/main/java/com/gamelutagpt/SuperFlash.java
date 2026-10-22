@@ -7,6 +7,10 @@ package com.gamelutagpt;
  * desenha põe o brilho no peito e toca o som em {@link #started}). Quem ficou parado no
  * congelamento escurece, para não parecer jogo travado.
  *
+ * Quem tem entrada do Super ({@link CombatEngine#superIntro}) primeiro mostra o retrato ao fundo,
+ * grudado na borda do lado em que está, com tudo parado; o escuro e o aviso correm nesse tempo e,
+ * quando ele acaba, o resto da cinemática segue de onde o escuro parou.
+ *
  * Só lê o motor: nada aqui muda a luta. Um {@link #update} por passo de 60 Hz.
  */
 final class SuperFlash {
@@ -34,6 +38,12 @@ final class SuperFlash {
     float frozenDim;
     /** O lutador escurecido (o que não fez o Super), ou -1. */
     int frozen = -1;
+    /** Passos da entrada do Super em curso (0 = sem entrada) e quantos já passaram. */
+    int intro, introAge;
+    /** A entrada fica na borda esquerda da tela (quem ativou está à esquerda do rival). */
+    boolean introLeft;
+    /** Carga que a aura já tinha quando a entrada acabou (a aura segue sem pular). */
+    private float introCharge;
 
     private final AttackDefinition[] seenAttack = new AttackDefinition[2];
     private final int[] seenFrame = new int[2];
@@ -46,11 +56,18 @@ final class SuperFlash {
         darkAlpha = flashAlpha = 0;
         signal = frozenDim = 0f;
         frozen = -1;
+        intro = introAge = 0;
+        introCharge = 0f;
         seenAttack[0] = seenAttack[1] = null;
     }
 
     boolean active() {
         return user >= 0;
+    }
+
+    /** O retrato da entrada está na tela. */
+    boolean introShowing() {
+        return user >= 0 && intro > 0 && introAge <= intro;
     }
 
     private static boolean doingSuper(CombatFighter f) {
@@ -77,6 +94,11 @@ final class SuperFlash {
         // Os dois em Super: vale o mais recente.
         if (now >= 0) {
             user = now;
+            CombatFighter f = engine.fighter(now);
+            intro = engine.superIntro(f);
+            introAge = 0;
+            introCharge = 0f;
+            introLeft = f.x <= engine.fighter(1 - now).x;
         } else if (user < 0 || !doingSuper(engine.fighter(user))) {
             user = -1;
             for (int i = 0; i < 2; i++) if (doingSuper(engine.fighter(i))) user = i;
@@ -87,18 +109,34 @@ final class SuperFlash {
             darkAlpha = flashAlpha = 0;
             chargeTime = 0f;
             signal = 0f;
+            intro = introAge = 0;
             return;
         }
         CombatFighter f = engine.fighter(user);
+        if (introAge < intro) {
+            // Entrada: tudo parado, o escuro chega e a aura carrega enquanto o retrato passa.
+            introAge++;
+            float t = introAge * STEP;
+            signal = introAge <= SIGNAL_FRAMES ? 1f - (introAge - 1) / (float)SIGNAL_FRAMES : 0f;
+            float k = clamp(t / DARKEN);
+            darkAlpha = Math.round(DARK * k);
+            zoom = 1f + 0.18f * k;
+            flashAlpha = 0;
+            chargeTime = introCharge = Math.max(0f, t - DARKEN);
+            return;
+        }
+        if (intro > 0) introAge = intro + 1;
         int frame = f.attackFrame;
-        signal = frame < SIGNAL_FRAMES ? 1f - frame / (float)SIGNAL_FRAMES : 0f;
+        signal = intro == 0 && frame < SIGNAL_FRAMES ? 1f - frame / (float)SIGNAL_FRAMES : 0f;
         float t = (frame + 1) * STEP;
         if (f.attack.melee()) t *= STRIKING_SPEED;
+        // Depois da entrada o escuro já chegou: a cinemática segue da pose.
+        if (intro > 0) t += DARKEN;
         float poseStart = DARKEN;
         float flashStart = poseStart + POSE;
         float releaseStart = flashStart + FLASH;
         float recoverStart = releaseStart + RELEASE;
-        chargeTime = Math.max(0f, t - poseStart);
+        chargeTime = introCharge + Math.max(0f, t - poseStart);
         if (t < poseStart) {
             float k = clamp(t / DARKEN);
             darkAlpha = Math.round(DARK * k);

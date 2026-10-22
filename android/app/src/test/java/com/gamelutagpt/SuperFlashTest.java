@@ -68,6 +68,45 @@ public class SuperFlashTest {
             w.signalFrames > 0 && w.signalFrames <= SuperFlash.SIGNAL_FRAMES);
     }
 
+    /**
+     * Entrada do Super (o retrato ao fundo): quem ativou segura o primeiro quadro do Super
+     * durante a entrada, o rival espera ela inteira mais o congelamento de sempre, e o golpe sai
+     * depois, no mesmo tempo de um Super sem entrada.
+     */
+    @Test public void theSuperIntroHoldsTheSuperUntilThePortraitLeaves() {
+        final int intro = 80;
+        int[] releaseAt = new int[2];
+        int maxHeld = 0, introFrames = 0;
+        boolean leftSide = false;
+        for (int run = 0; run < 2; run++) {
+            CombatEngineTest.Sim s = new CombatEngineTest.Sim(P01, P01, 500f, 900f);
+            if (run == 1) s.engine.setSuperIntro(P01.id, intro);
+            s.f(0).state.superMeter = CombatConfig.SUPER_COST;
+            SuperFlash flash = new SuperFlash();
+            releaseAt[run] = -1;
+            for (int i = 0; i < 240 && releaseAt[run] < 0; i++) {
+                s.in[0].superAttack = i == 0;
+                s.step();
+                flash.update(s.engine);
+                CombatFighter f = s.f(0);
+                if (run == 1 && flash.introShowing()) {
+                    introFrames++;
+                    leftSide = flash.introLeft;
+                    // O golpe ainda não andou (o desenho fica no 1º quadro do Super).
+                    assertTrue("held before the first frame during the portrait: " + f.attackFrame,
+                        f.attacking() && f.attackFrame <= 0);
+                    maxHeld = Math.max(maxHeld, s.f(1).hitstop);
+                }
+                if (f.attacking() && f.attackFrame >= f.attack.startupFrames) releaseAt[run] = i;
+            }
+        }
+        assertEquals("the portrait shows for the whole intro", intro, introFrames);
+        assertTrue("the portrait sits on the left edge (she is on the left)", leftSide);
+        assertTrue("the Super comes out after the intro", releaseAt[0] > 0 && releaseAt[1] > 0);
+        assertEquals("then it comes out on its usual time", releaseAt[0] + intro, releaseAt[1]);
+        assertTrue("the opponent waits for the intro and the release: " + maxHeld, maxHeld > intro);
+    }
+
     @Test public void nothingWithoutASuper() {
         CombatEngineTest.Sim s = new CombatEngineTest.Sim(P01, P01, 500f, 900f);
         SuperFlash flash = new SuperFlash();
