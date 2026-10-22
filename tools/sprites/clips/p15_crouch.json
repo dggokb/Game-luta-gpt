@@ -25,7 +25,19 @@
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
-    "recorte_suave": true
+    "recorte_suave": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_crouch_video_normalized.png",
+      "celula": [
+        192,
+        288
+      ],
+      "raiz": [
+        89,
+        270
+      ],
+      "colunas": 8
+    }
   },
   "frameWidth": 384,
   "rootX": 178,

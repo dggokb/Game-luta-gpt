@@ -26,7 +26,19 @@
     "densidade": 2,
     "nitidez": true,
     "recorte_suave": true,
-    "balanco": 0.5
+    "balanco": 0.5,
+    "referencia": {
+      "folha": "art/sprites/source/p15_walk_back_video_normalized.png",
+      "celula": [
+        256,
+        288
+      ],
+      "raiz": [
+        127,
+        270
+      ],
+      "colunas": 8
+    }
   },
   "frameHeight": 576,
   "rootX": 254,

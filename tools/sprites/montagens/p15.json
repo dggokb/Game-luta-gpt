@@ -1,22 +1,10 @@
 {
-  "_doc": "Todos os clipes do p15, com quadros escolhidos à mão ou colados de vários vídeos (tools/sprites/montagem.py), com recorte suave (mechas do cabelo). Os vídeos ficam no Drive em game-luta-gpt/animations/p15. Os que vão só até a pose (L, H, 2L, 2H, S1, S2) voltam à guarda pelo inverso (frames de trás para a frente). S1 e S2 saem da carga do s_base; o S3 é a rajada do s3 com os complementos s3_apoio1 e s3_apoio2 (entrada, rajadas sólidas, soco final e volta); o S4 é a voadora do s4 com s4_apoio1 (giro e perna no alto), s4_apoio2 (machado até o espacate) e s4_apoio3 (volta à guarda). O Super e o Ultra usam a folha do S1 até ter vídeo próprio. O andar para frente é um passo só do andarFrente, 60 a 73, repetido (o 74 emenda no 60, faixa e cabelo incluídos) (de lado, na guarda; o resto do vídeo gira o tronco para a câmera). O andar para trás é um passo do andarTras, 24 a 50, com metade do vaivém do tronco (balanco 0.5: a pausa do vídeo vira uma freada).",
+  "_doc": "Todos os clipes do p15, com quadros escolhidos à mão ou colados de vários vídeos (tools/sprites/montagem.py), com recorte suave (mechas do cabelo). Os vídeos ficam no Drive em game-luta-gpt/animations/p15. Os que vão só até a pose (L, H, 2L, 2H, S1, S2) voltam à guarda pelo inverso (frames de trás para a frente). S1 e S2 saem da carga do s_base; o S3 é a rajada do s3 com os complementos s3_apoio1 e s3_apoio2 (entrada, rajadas sólidas, soco final e volta); o S4 é a voadora do s4 com s4_apoio1 (giro e perna no alto), s4_apoio2 (machado até o espacate) e s4_apoio3 (volta à guarda). O Super e o Ultra usam a folha do S1 até ter vídeo próprio. Idle, andares, H, agachar, levantar e 2M foram refeitos no Flick e saem da receita do vídeo no próprio clipe (video_para_sprite.py), não daqui.",
   "_opcoes": {"recorte_suave": true},
-  "idle": {
-    "trechos": [["idle", 0, 96]],
-    "quadros": "11-93"
-  },
   "backdash": {
     "trechos": [["backDash", 0, 96]],
     "quadros": "11,20,30,39,48,58,67,76,86,95",
     "opcoes": {"fixar": "registro"}
-  },
-  "crouch": {
-    "trechos": [["agachar", 0, 96]],
-    "quadros": "12,14,16,18,19,21,23,25"
-  },
-  "rise": {
-    "trechos": [["agachar", 0, 96]],
-    "quadros": "66,69,72,75,78,81"
   },
   "jump": {
     "trechos": [["pular", 0, 96]],
@@ -32,20 +20,6 @@
     "trechos": [["pular", 0, 96]],
     "quadros": "45,47,49,51"
   },
-  "walk_back": {
-    "trechos": [["andarTras", 0, 66]],
-    "quadros": "24-50",
-    "opcoes": {"pe_no_chao": true, "fixar": "volta", "balanco": 0.5},
-    "animacoes": {
-      "WALK_BACK": {"distancia": "video", "tempo": "video", "acelerar": 2}
-    }
-  },
-  "walk_forward": {
-    "trechos": [["andarFrente", 0, 96]],
-    "quadros": "60-73",
-    "opcoes": {"pe_no_chao": true, "fixar": "volta"},
-    "animacoes": {"WALK_FORWARD": {"distancia": "video", "tempo": "video"}}
-  },
   "light_jab": {
     "trechos": [["L", 0, 96]],
     "quadros": "16,23,24,25,26,30",
@@ -56,12 +30,6 @@
     "trechos": [["M", 0, 96]],
     "quadros": "12,17,23,28,30,33,35,38,40,42,45,47,50,52",
     "opcoes": {"fixar": "video"}
-  },
-  "heavy_straight": {
-    "trechos": [["H", 0, 96]],
-    "quadros": "16,20,23,25,27,28,29,30,31,33,36",
-    "opcoes": {"fixar": "video"},
-    "animacoes": {"HEAVY_STRAIGHT": {"frames": "0-10,9-0", "impacto": 8}}
   },
   "golpe_alto": {
     "trechos": [["M_BAIXO", 0, 96]],
@@ -74,12 +42,6 @@
     "quadros": "16,24,25,26,27,29",
     "opcoes": {"fixar": "video"},
     "animacoes": {"CROUCH_LIGHT": {"frames": "0-5,4-0", "impacto": 4}}
-  },
-  "crouch_medium": {
-    "trechos": [["2M", 0, 96]],
-    "quadros": "14,16,18,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,40,42,45,50",
-    "opcoes": {"fixar": "video"},
-    "animacoes": {"CROUCH_MEDIUM": {"impacto": 11}}
   },
   "crouch_heavy": {
     "trechos": [["2H", 0, 96]],

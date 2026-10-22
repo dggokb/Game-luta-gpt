@@ -845,8 +845,8 @@
         7,
         7,
         7,
-        7,
         16,
+        12,
         12,
         12,
         12,
@@ -893,7 +893,7 @@
         12,
         12
       ],
-      "impactFrame": 37
+      "impactFrame": 36
     },
     "CROUCH_HEAVY": {
       "atlas": "p15_crouch_heavy",

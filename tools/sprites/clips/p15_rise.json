@@ -26,7 +26,19 @@
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
-    "recorte_suave": true
+    "recorte_suave": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_rise_video_normalized.png",
+      "celula": [
+        192,
+        288
+      ],
+      "raiz": [
+        94,
+        270
+      ],
+      "colunas": 6
+    }
   },
   "frameWidth": 384,
   "rootX": 188,

@@ -25,7 +25,19 @@
     "limpar_chao": true,
     "densidade": 2,
     "nitidez": true,
-    "recorte_suave": true
+    "recorte_suave": true,
+    "referencia": {
+      "folha": "art/sprites/source/p15_idle_video_normalized.png",
+      "celula": [
+        192,
+        288
+      ],
+      "raiz": [
+        88,
+        270
+      ],
+      "colunas": 10
+    }
   },
   "frameWidth": 384,
   "frameHeight": 576,
