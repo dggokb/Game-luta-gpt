@@ -133,16 +133,16 @@
   "estado": "WALK_BACK",
   "atlas": "p15_walk_back",
   "fator": 0.9805103067898279,
-  "fonte": "cabeça em 11 quadros",
+  "fonte": "cabeça em 9 quadros",
   "receita": "manual",
   "medida": "vídeo do Flick cortado só no trecho andando (quadros 12-106): a ponta não é a guarda e a medida deu nota 0,80; 0,411 é a escala medida no vídeo inteiro pelo inicio_centro_h3",
   "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 1.0184439551246391,
-   "nota": 0.7347171306610107,
-   "quadro": 8,
+   "fator": 1.0355798523653112,
+   "nota": 0.7362964749336243,
+   "quadro": 9,
    "ref": "inicio_centro"
   },
   "cabeca": {
@@ -152,16 +152,14 @@
    "zoom": false,
    "por_quadro": {
     "0": 1.02,
-    "2": 1.02,
-    "4": 1.02,
+    "3": 1.02,
     "6": 0.981,
-    "8": 0.981,
-    "10": 0.961,
+    "9": 0.981,
     "12": 0.961,
-    "14": 0.961,
-    "16": 0.961,
-    "18": 1.02,
-    "20": 1.02
+    "15": 0.961,
+    "18": 0.981,
+    "21": 1.02,
+    "23": 1.02
    }
   },
   "emendas": [
@@ -172,7 +170,7 @@
     "ref": "guarda",
     "fator": 1.0335917312661496,
     "pe": -4,
-    "iou": 0.6456142224120442,
+    "iou": 0.6454074825212147,
     "altura": 1.0334974418380154,
     "mesma_pose": 0.0
    }
