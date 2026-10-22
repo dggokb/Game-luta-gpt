@@ -148,7 +148,8 @@ public class RecoveryTest {
         Sim s = new Sim();
         s.knockedDown();
         int frames = s.framesUntilFree(300);
-        assertTrue("down and up in about a second: " + frames, frames <= 75);
+        // ~1,45 s: tempo de correr até quem caiu e armar o pulo do levantar (City of the Wolves).
+        assertTrue("down and up in about a second and a half: " + frames, frames <= 90);
         // A long GETUP clip (p04: 47 frames) plays faster instead of holding the fighter down.
         for (String id : new String[] {"p02", "p03", "p04", "p11"}) {
             CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get(id), "P1"),

@@ -292,7 +292,8 @@ public class CpuTest {
     /** O jogador pressiona com L e 2L colado; quanto a CPU defende. */
     private static double blockRate(int level) {
         int blocked = 0, contacts = 0;
-        for (long seed = 1; seed <= 8; seed++) {
+        // 32 lutas: com 8 a taxa variava ±10 pontos com qualquer mudança de ritmo do motor.
+        for (long seed = 1; seed <= 32; seed++) {
             Fight f = new Fight(BASE, BASE, 130f, level, seed);
             Random script = new Random(seed);
             for (int i = 0; i < 600; i++) {
@@ -319,8 +320,9 @@ public class CpuTest {
         double low = blockRate(1), high = blockRate(8);
         assertTrue("nível 1 quase não defende: " + low, low < 0.25);
         // A defesa por hábito é baixa de propósito (o que dá graça é a luta): o nível 8 segura
-        // parte dos jabs colados, sempre bem mais que o 1.
-        assertTrue("nível 8 defende parte: " + high, high > 0.3);
+        // parte dos jabs colados (~25% com a pausa de acerto do fraco; ~31% sem ela), sempre bem
+        // mais que o 1.
+        assertTrue("nível 8 defende parte: " + high, high > 0.2);
         assertTrue("e bem mais que o nível 1: " + low + " → " + high, high > low + 0.15);
     }
 

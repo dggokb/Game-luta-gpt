@@ -46,10 +46,10 @@ public class PressaDoTempoTest {
                 e.step(a, b);
                 CombatFighter me = e.fighter(1);
                 if (me.attacking() && me.attackFrame == 0) starts++;
-                // Escolhendo esperar: segurando a defesa sem estar levando golpe (o bloqueio de
-                // quem avança e leva o golpe na defesa não é esperar).
+                // Escolhendo esperar: segurando a defesa livre para agir (o bloqueio de quem avança
+                // e leva o golpe na defesa não é esperar, nem segurar trás deitada no chão).
                 boolean holdsBack = me.facing > 0 ? b.direction == 5 || b.direction == 4 : b.direction == 1 || b.direction == 2;
-                if (holdsBack && me.status != CombatFighter.Status.BLOCKSTUN) guarding++;
+                if (holdsBack && me.status == CombatFighter.Status.NEUTRAL) guarding++;
             }
             damage += p.profile.maxLife - p.life;
         }

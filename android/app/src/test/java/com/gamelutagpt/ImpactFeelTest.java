@@ -139,11 +139,11 @@ public class ImpactFeelTest {
         assertTrue(whiff < end - 0.05f);
     }
 
-    @Test public void mediumAndHeavyHitsHoldTheImpactPoseLongerThanAGuard() {
+    @Test public void hitsHoldTheImpactPoseLongerThanAGuard() {
         CombatEngine e = new CombatEngine(new FighterState(GeneratedCharacters.get("player_base"), "P1"),
             new FighterState(GeneratedCharacters.opponentCharacter(), "P2"), 500f, 640f, new CombatConfig());
         CharacterDefinition c = GeneratedCharacters.get("player_base");
-        assertEquals(0, e.hitHold(c.attack("L")));
+        assertEquals(e.config.lightHitHoldFrames, e.hitHold(c.attack("L")));
         assertEquals(e.config.mediumHitHoldFrames, e.hitHold(c.attack("M")));
         assertEquals(e.config.heavyHitHoldFrames, e.hitHold(c.attack("H")));
     }

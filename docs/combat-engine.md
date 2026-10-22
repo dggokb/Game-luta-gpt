@@ -472,8 +472,10 @@ têm air tech (caem derrubados).
 - Sem arte própria ainda: o rolamento usa o clipe de levantar.
 - Quem levanta sempre fica de frente para o oponente (vira quando o rolamento passa por
   baixo dele), em vez de só virar quando volta ao neutro.
-- O levantar dura no máximo `maxWakeupFrames` (30): um clipe GETUP mais longo toca mais
-  rápido, inteiro, no tempo do motor. Queda + chão + levantar normal ≈ 1,2 s.
+- Deitado `knockdownDownFrames` (50) e o levantar dura no máximo `maxWakeupFrames` (24): um
+  clipe GETUP mais longo toca mais rápido, inteiro, no tempo do motor. Queda + chão + levantar
+  normal ≈ 1,45 s. Medido no City of the Wolves (gameplay a 30 fps): ~58 quadros deitado e ~14
+  levantando, tempo de correr até quem caiu e pular por cima dele no levantar.
 
 **Punish counter (giro no ar, como no SF6):** o H em pé que acerta o rival **no meio do golpe
 dele** (início, ativo ou recuperação) o joga girando no ar a média distância (~360 px, ~1 s
@@ -1005,8 +1007,9 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   - Só apresentação: o motor não sabe dela. Testes em `FinalizacaoMangaTest`.
 
 - **Pose do impacto** (medido no FighterZ: o golpe fica parado esticado 0,12–0,2 s e volta
-  à guarda em 1–2 quadros): golpes médios e fortes que acertam congelam +3/+4 quadros
-  (`mediumHitHoldFrames`, `heavyHitHoldFrames`; os dois congelam juntos, então a vantagem e os
+  à guarda em 1–2 quadros): golpes fracos, médios e fortes que acertam congelam +4/+5/+6
+  quadros, ~9/12/15 no total como no City of the Wolves (`lightHitHoldFrames`,
+  `mediumHitHoldFrames`, `heavyHitHoldFrames`; os dois congelam juntos, então a vantagem e os
   combos não mudam) e, depois da janela ativa, o desenho volta à guarda em 3 quadros e fica
   nela no resto da recuperação (`ImpactFeel.snapBackTime`). Golpe que erra volta devagar,
   como antes. Defesa e golpes de vários acertos não mudam.

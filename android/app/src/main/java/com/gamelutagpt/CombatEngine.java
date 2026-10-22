@@ -3021,8 +3021,9 @@ final class CombatEngine {
     }
 
     /** Hitstop: both bodies on a melee contact, only the defender for a projectile. */
-    /** Congelamento extra que segura a pose do impacto nos acertos médios e fortes. */
+    /** Congelamento extra que segura a pose do impacto nos acertos (mais no forte). */
     int hitHold(AttackDefinition attack) {
+        if (attack.strength == AttackDefinition.Strength.LIGHT) return config.lightHitHoldFrames;
         if (attack.strength == AttackDefinition.Strength.MEDIUM) return config.mediumHitHoldFrames;
         if (attack.strength == AttackDefinition.Strength.HEAVY) return config.heavyHitHoldFrames;
         return 0;

@@ -651,6 +651,8 @@ final class AiController {
             return false;
         }
         if (Math.abs(seen.x - me.x) >= threatRange(me, target)) return false;
+        // Rival deitado não ataca: ela fica de pé esperando ele levantar, não agachada defendendo.
+        if (seen.status == CombatFighter.Status.KNOCKDOWN) return false;
         if (cooldown > 0 && roll(level.reactGuard * COOLDOWN_GUARD)) {
             // Perto e ainda sem poder atacar (o respiro entre os golpes dela): parada ali ela
             // levava o jab, rápido demais para defender reagindo. Segura a defesa até poder agir.

@@ -70,11 +70,14 @@ final class CombatConfig {
      */
     int wallChaseFrames = 54;
     int knockdownFallFrames = 13;
-    /** Lying on the ground before the normal wake-up (was 72: too long to watch). */
-    int knockdownDownFrames = 30;
-    int wakeupFrames = 21;
+    /**
+     * Lying on the ground before the normal wake-up (was 72: too long to watch; 30 left no time to
+     * run in and set up a cross-up as in City of the Wolves, which lies ~58 and rises in ~14).
+     */
+    int knockdownDownFrames = 50;
+    int wakeupFrames = 16;
     /** Longest wake-up: a longer GETUP clip plays faster to fit it. */
-    int maxWakeupFrames = 30;
+    int maxWakeupFrames = 24;
 
     /** Default input priority when a character does not declare its own. */
     static final AttackDefinition.Strength[] DEFAULT_PRIORITY = {
@@ -287,12 +290,14 @@ final class CombatConfig {
     /** Congelamento extra do acerto no punish counter e no golpe que nocauteia (peso do impacto). */
     int punishHitstopBonus = 8;
     /**
-     * Pose do impacto (como no FighterZ): golpes médios e fortes que acertam congelam um pouco
-     * mais, para a pose esticada "grudar" na tela. Os dois lutadores congelam juntos, então a
-     * vantagem e os combos não mudam. Defesa não ganha.
+     * Pose do impacto (como no FighterZ): golpes que acertam congelam um pouco mais, para a pose
+     * esticada "grudar" na tela. Os dois lutadores congelam juntos, então a vantagem e os combos
+     * não mudam. Defesa não ganha. Com o hitstop do golpe dá ~9/12/15 quadros (fraco/médio/
+     * forte), o que o Fatal Fury: City of the Wolves congela medido em gameplay (era 5/10/13).
      */
-    int mediumHitHoldFrames = 3;
-    int heavyHitHoldFrames = 4;
+    int lightHitHoldFrames = 4;
+    int mediumHitHoldFrames = 5;
+    int heavyHitHoldFrames = 6;
     int koHitstopBonus = 16;
     float spinLift = 820f;
     int spinHitstunFrames = 30;
