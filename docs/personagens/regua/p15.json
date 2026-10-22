@@ -132,17 +132,17 @@
  {
   "estado": "WALK_BACK",
   "atlas": "p15_walk_back",
-  "fator": 1.0235496092238257,
-  "fonte": "imagem inicial no q4 (nota 0.84)",
+  "fator": 0.9805103067898279,
+  "fonte": "cabeça em 11 quadros",
   "receita": "manual",
   "medida": "vídeo do Flick cortado só no trecho andando (quadros 12-106): a ponta não é a guarda e a medida deu nota 0,80; 0,411 é a escala medida no vídeo inteiro pelo inicio_centro_h3",
   "fator_optico": 1.0,
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 1.0235496092238257,
-   "nota": 0.8389448523521423,
-   "quadro": 4,
+   "fator": 1.0184439551246391,
+   "nota": 0.7347171306610107,
+   "quadro": 8,
    "ref": "inicio_centro"
   },
   "cabeca": {
@@ -151,15 +151,17 @@
    "max": 1.0198770916279105,
    "zoom": false,
    "por_quadro": {
-    "0": 0.981,
-    "4": 0.981,
-    "8": 0.961,
-    "12": 0.981,
-    "16": 1.02,
-    "20": 0.981,
-    "24": 0.961,
-    "28": 1.02,
-    "32": 0.981
+    "0": 1.02,
+    "2": 1.02,
+    "4": 1.02,
+    "6": 0.981,
+    "8": 0.981,
+    "10": 0.961,
+    "12": 0.961,
+    "14": 0.961,
+    "16": 0.961,
+    "18": 1.02,
+    "20": 1.02
    }
   },
   "emendas": [
@@ -168,10 +170,10 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 1.01010101010101,
-    "pe": -6,
-    "iou": 0.8109452736318408,
-    "altura": 1.007047012259871,
+    "fator": 1.0335917312661496,
+    "pe": -4,
+    "iou": 0.6456142224120442,
+    "altura": 1.0334974418380154,
     "mesma_pose": 0.0
    }
   ],
@@ -600,7 +602,7 @@
   "estado": "HEAVY_STRAIGHT",
   "atlas": "p15_heavy_straight",
   "fator": 1.0015916081805207,
-  "fonte": "imagem inicial no q25 (nota 0.98)",
+  "fonte": "imagem inicial no q78 (nota 0.98)",
   "receita": "forte",
   "medida": "1º quadro = inicio_centro_h3 (nota 0.97)",
   "fator_optico": 1.0,
@@ -608,25 +610,26 @@
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
    "fator": 1.0015916081805207,
-   "nota": 0.9778492450714111,
-   "quadro": 25,
+   "nota": 0.9774969816207886,
+   "quadro": 78,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.0,
+   "fator": 0.990255153394914,
    "min": 0.9614004617210824,
-   "max": 1.1705303925492798,
+   "max": 1.397375826030211,
    "zoom": false,
    "por_quadro": {
     "0": 0.981,
-    "3": 1.082,
-    "6": 1.171,
-    "12": 1.148,
-    "15": 0.981,
-    "18": 1.02,
-    "21": 0.961,
-    "24": 1.0,
-    "25": 1.0
+    "9": 1.292,
+    "18": 1.397,
+    "27": 1.171,
+    "36": 0.981,
+    "45": 0.981,
+    "54": 1.02,
+    "63": 0.961,
+    "72": 0.981,
+    "78": 1.0
    }
   },
   "emendas": [
@@ -637,19 +640,19 @@
     "ref": "guarda",
     "fator": 0.9999999999999998,
     "pe": 0,
-    "iou": 0.9609544468546638,
-    "altura": 1.0025098947774882,
+    "iou": 0.961249922499845,
+    "altura": 1.0027994980210446,
     "mesma_pose": 1.0
    },
    {
     "estado": "HEAVY_STRAIGHT",
     "ponta": "fim",
-    "quadro": 25,
+    "quadro": 78,
     "ref": "guarda",
     "fator": 0.9999999999999998,
     "pe": 0,
-    "iou": 0.9763892349862946,
-    "altura": 1.0025098947774882,
+    "iou": 0.9770645060766594,
+    "altura": 1.0027994980210446,
     "mesma_pose": 1.0
    }
   ],
@@ -738,23 +741,24 @@
   "cadeia": null,
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
-   "fator": 0.8956926046505064,
-   "nota": 0.6021711826324463,
-   "quadro": 14,
+   "fator": 0.9899562035834135,
+   "nota": 0.5865487456321716,
+   "quadro": 60,
    "ref": "inicio_agachado"
   },
   "cabeca": {
    "fator": 1.1034157636183155,
-   "min": 0.7016797403568577,
-   "max": 1.1477171143053122,
+   "min": 0.9805103067898279,
+   "max": 1.1705303925492798,
    "zoom": false,
    "por_quadro": {
     "0": 1.125,
-    "4": 0.702,
-    "6": 0.981,
-    "14": 1.148,
-    "16": 1.103,
-    "18": 1.103
+    "30": 0.981,
+    "40": 1.171,
+    "60": 1.082,
+    "70": 1.103,
+    "80": 1.103,
+    "82": 1.103
    }
   },
   "emendas": [
@@ -763,21 +767,21 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "agachado",
-    "fator": 0.985221674876847,
+    "fator": 0.9803921568627448,
     "pe": 1,
-    "iou": 0.8648419680677745,
-    "altura": 0.9864846781747625,
+    "iou": 0.8640333724416634,
+    "altura": 0.9868861233774924,
     "mesma_pose": 1.0
    },
    {
     "estado": "CROUCH_MEDIUM",
     "ponta": "fim",
-    "quadro": 18,
+    "quadro": 82,
     "ref": "agachado",
     "fator": 0.9925558312655084,
-    "pe": -1,
-    "iou": 0.8778259419806602,
-    "altura": 0.9971898835808912,
+    "pe": 0,
+    "iou": 0.8772524768934105,
+    "altura": 0.9975913287836211,
     "mesma_pose": 1.0
    }
   ],
