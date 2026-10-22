@@ -64,6 +64,9 @@ def best_loop(frames, lo, hi, min_len):
     return best
 
 
+# Fundo é o verde da tela, que é claro (v ~240): preto com reflexo verde (ponta da faixa, luva,
+# cabelo) tem matiz e saturação de verde, mas é escuro, e é do personagem.
+SCREEN_MIN_V = 100
 JOIN_GAP = 7       # px: peça grande a essa distância do corpo é do corpo (faixa verde da roupa)
 JOIN_AREA = 800
 
@@ -99,7 +102,7 @@ def floor_dust(alpha, h, s, v):
 def key(frame, dust=False, effects=False, floor=False, soft=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     h, s, v = (hsv[..., i].astype(int) for i in range(3))
-    bg = (h > 35) & (h < 95) & (s > 45)
+    bg = (h > 35) & (h < 95) & (s > 45) & (v >= SCREEN_MIN_V)
     if dust:  # poeira bege dos pés (o jogo desenha os efeitos)
         bg |= (h >= 8) & (h <= 34) & (s >= 18) & (s <= 70) & (v >= 120)
     if effects:
@@ -156,8 +159,8 @@ def soft_edges(frame, rgba):
     volta do contorno a mistura de cor escura com o fundo ganha alfa pelo quanto ela é verde
     (alfa = 1 - verde / verde do fundo), com a cor do fundo tirada da mistura."""
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    h, s = hsv[..., 0].astype(int), hsv[..., 1].astype(int)
-    screen = (h > 35) & (h < 95) & (s > 45)
+    h, s, v = (hsv[..., i].astype(int) for i in range(3))
+    screen = (h > 35) & (h < 95) & (s > 45) & (v >= SCREEN_MIN_V)
     alpha = rgba[..., 3].copy()
     n, labels, stats, _ = cv2.connectedComponentsWithStats(screen.astype(np.uint8))
     for i in range(1, n):

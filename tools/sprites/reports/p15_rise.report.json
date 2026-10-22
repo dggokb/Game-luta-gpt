@@ -1,7 +1,7 @@
 {
   "id": "p15_rise",
   "characterProfile": "p15",
-  "source": "art/sprites/source/p15_rise_sr_hd.png",
+  "source": "art/sprites/source/p15_rise_video_hd.png",
   "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
@@ -18,195 +18,195 @@
     {
       "index": 0,
       "outputBbox": [
-        51,
-        190,
-        362,
-        543
+        52,
+        189,
+        363,
+        540
       ],
-      "minimumMargin": 22,
-      "opaquePixels": 51596
+      "minimumMargin": 21,
+      "opaquePixels": 49581
     },
     {
       "index": 1,
       "outputBbox": [
-        51,
-        180,
-        362,
-        543
+        52,
+        178,
+        363,
+        540
       ],
-      "minimumMargin": 22,
-      "opaquePixels": 51596
+      "minimumMargin": 21,
+      "opaquePixels": 49669
     },
     {
       "index": 2,
       "outputBbox": [
-        51,
-        159,
-        362,
-        545
+        52,
+        156,
+        363,
+        542
       ],
-      "minimumMargin": 22,
-      "opaquePixels": 52127
+      "minimumMargin": 21,
+      "opaquePixels": 50357
     },
     {
       "index": 3,
       "outputBbox": [
-        51,
+        54,
         121,
-        362,
-        542
+        363,
+        541
       ],
-      "minimumMargin": 22,
-      "opaquePixels": 53037
+      "minimumMargin": 21,
+      "opaquePixels": 51342
     },
     {
       "index": 4,
       "outputBbox": [
-        50,
-        83,
-        361,
+        55,
+        79,
+        362,
         543
       ],
-      "minimumMargin": 23,
-      "opaquePixels": 54516
+      "minimumMargin": 22,
+      "opaquePixels": 52772
     },
     {
       "index": 5,
       "outputBbox": [
-        52,
-        58,
+        54,
+        57,
         361,
-        544
+        541
       ],
       "minimumMargin": 23,
-      "opaquePixels": 55412
+      "opaquePixels": 53458
     },
     {
       "index": 6,
       "outputBbox": [
-        51,
+        54,
         55,
         361,
-        544
+        541
       ],
       "minimumMargin": 23,
-      "opaquePixels": 56462
+      "opaquePixels": 54380
     },
     {
       "index": 7,
       "outputBbox": [
-        51,
+        54,
         55,
         361,
-        544
+        541
       ],
       "minimumMargin": 23,
-      "opaquePixels": 57998
+      "opaquePixels": 55781
     },
     {
       "index": 8,
       "outputBbox": [
-        51,
         54,
+        55,
         361,
-        544
+        541
       ],
       "minimumMargin": 23,
-      "opaquePixels": 59067
+      "opaquePixels": 56780
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 336,
-    "frameHeight": 514,
-    "rootX": 149,
-    "rootY": 497,
+    "frameWidth": 327,
+    "frameHeight": 504,
+    "rootX": 144,
+    "rootY": 493,
     "columns": 6,
     "frameCount": 9,
     "cropOffset": [
-      39,
-      43
+      44,
+      47
     ],
-    "sheetWidth": 992,
-    "sheetHeight": 1420,
+    "sheetWidth": 968,
+    "sheetHeight": 1392,
     "frames": [
       [
-        664,
-        1020,
-        328,
-        372,
+        648,
+        996,
+        320,
+        360,
         4,
         138
       ],
       [
-        332,
-        1020,
-        328,
-        384,
+        324,
+        996,
+        320,
+        372,
         4,
-        128
+        127
       ],
       [
         0,
-        1020,
-        328,
-        400,
+        996,
+        320,
+        396,
         4,
-        108
+        105
       ],
       [
-        656,
-        512,
-        328,
-        440,
-        4,
+        640,
+        500,
+        320,
+        428,
+        6,
         70
       ],
       [
-        328,
-        512,
-        324,
-        476,
-        6,
-        32
+        320,
+        500,
+        316,
+        472,
+        7,
+        28
       ],
       [
         0,
-        512,
-        324,
-        504,
+        500,
+        316,
+        492,
         6,
         6
       ],
       [
         0,
         0,
-        328,
-        508,
-        4,
+        316,
+        496,
+        6,
         4
       ],
       [
-        332,
+        320,
         0,
-        328,
-        508,
-        4,
+        316,
+        496,
+        6,
         4
       ],
       [
-        664,
+        640,
         0,
-        328,
-        508,
-        4,
+        316,
+        496,
+        6,
         4
       ]
     ],
     "decodedBytes": {
       "canonical": 10616832,
-      "grid": 8289792,
-      "packed": 5634560
+      "grid": 7910784,
+      "packed": 5389824
     },
     "pixelScale": 2.0
   },
@@ -214,12 +214,12 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "2a3ac9a1ddfcd3c74410b92604efdee40f3b96e8be5697fa5094ef8e4059a146",
-      "config": "a41b0d2c4fef448b6e887aa57c5189e40a59096bb695002c29cf6368db06e83d",
+      "source": "f62dd0755104eb4b57a82cb060542ac25fdbeabec6b7dd2dbeee6e87086a9ac1",
+      "config": "0e864d7b6bb87bb256504c400226f7c1b9fd16e3ada2e79ce9a4d5d04e252422",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
     },
     "referenceSources": {
-      "art/sprites/source/p15_rise_video_normalized.png": "10aa94da356ed10962674dba627bf22f8276829c4ebf5577bf3b331b95494c2d"
+      "art/sprites/source/p15_rise_video_normalized.png": "af665c99f6d9d461600b89aa6d757f36537572cb36be444d5d5a2c47cc89c124"
     }
   }
 }

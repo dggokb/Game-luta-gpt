@@ -1,0 +1,39 @@
+{
+  "id": "p15_crouch_idle",
+  "javaName": "P15_CROUCH_IDLE",
+  "profile": "p15.json",
+  "source": "art/sprites/source/p15_crouch_idle_video_hd.png",
+  "output": "android/app/src/main/res/drawable-nodpi/p15_crouch_idle.webp",
+  "report": "tools/sprites/reports/p15_crouch_idle.report.json",
+  "preview": "android/app/build/sprite-review/p15_crouch_idle-import.png",
+  "expectedFrames": 27,
+  "segmentation": "prepared-grid",
+  "columns": 9,
+  "rootMode": "authored",
+  "sourceNote": "p15 gerado em vídeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
+  "video": {
+    "arquivo": "agachar.mp4",
+    "personagem": "p15",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro_h3 (nota 0.97)",
+    "quadros": "48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74",
+    "celula": 288,
+    "largura": 192,
+    "raiz": "89,270",
+    "colunas": 9,
+    "fixar": "video",
+    "pe_no_chao": true,
+    "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
+    "recorte_suave": true
+  },
+  "frameWidth": 384,
+  "rootX": 178,
+  "frameHeight": 576,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p15_crouch_idle_video_normalized.png"
+  ],
+  "pixelScale": 2.0
+}

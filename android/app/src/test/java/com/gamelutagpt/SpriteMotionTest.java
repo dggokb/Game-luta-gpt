@@ -136,6 +136,36 @@ public class SpriteMotionTest {
             assertEquals(SpriteMotion.Clip.IDLE,m.clip);
         }
     }
+    @Test public void crouchedFighterBreathesAfterTheCrouch() {
+        CharacterDefinition p15=GeneratedCharacters.get("p15");
+        float down=p15.animation(SpriteMotion.Clip.CROUCH).duration;
+        CharacterDefinition.Animation loop=p15.animation(SpriteMotion.Clip.CROUCH_IDLE);
+        assertTrue(loop.loop);
+        SpriteMotion m=new SpriteMotion(p15);
+        float dt=.01f, t=0;
+        // A descida inteira, depois a respiração agachada em loop (não fica num quadro só).
+        for(;t<down-dt;t+=dt) {tick(m,dt,true,true,0,0,true,false,false,false,false);assertEquals(SpriteMotion.Clip.CROUCH,m.clip);}
+        java.util.Set<Integer> seen=new java.util.HashSet<>();
+        for(float s=0;s<2*loop.duration;s+=dt) {
+            tick(m,dt,true,true,0,0,true,false,false,false,false);
+            if(t+s>=down+dt) assertEquals(SpriteMotion.Clip.CROUCH_IDLE,m.clip);
+            seen.add(m.frame());
+        }
+        assertEquals("todos os quadros do loop",27,seen.size());
+        // Soltou ↓: levanta.
+        tick(m,dt,true,false,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.RISE,m.clip);
+        // Golpe agachado e ainda segurando ↓: volta direto para a respiração, sem descer de novo.
+        m.update(dt,true,true,0,0,true,false,false,"CROUCH_LIGHT",0.05f,false,false);
+        tick(m,dt,true,true,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.CROUCH_IDLE,m.clip);
+        // Sem CROUCH_IDLE (p01): o último quadro da descida fica parado, como antes.
+        CharacterDefinition p01=GeneratedCharacters.defaultCharacter();
+        assertFalse(p01.animations.containsKey(SpriteMotion.Clip.CROUCH_IDLE));
+        SpriteMotion q=new SpriteMotion(p01);
+        for(float s=0;s<2;s+=dt) tick(q,dt,true,true,0,0,true,false,false,false,false);
+        assertEquals(SpriteMotion.Clip.CROUCH,q.clip);
+    }
     @Test public void withoutSecondIdleTheIdleJustLoops() {
         CharacterDefinition p01=GeneratedCharacters.defaultCharacter();
         assertFalse(p01.animations.containsKey(SpriteMotion.Clip.IDLE_2));

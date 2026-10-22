@@ -2,7 +2,7 @@
   "id": "p15_rise",
   "javaName": "P15_RISE",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_rise_sr_hd.png",
+  "source": "art/sprites/source/p15_rise_video_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_rise.webp",
   "report": "tools/sprites/reports/p15_rise.report.json",
   "preview": "android/app/build/sprite-review/p15_rise-import.png",
@@ -24,6 +24,8 @@
     "fixar": "video",
     "pe_no_chao": true,
     "limpar_chao": true,
+    "densidade": 2,
+    "nitidez": true,
     "recorte_suave": true
   },
   "frameWidth": 384,

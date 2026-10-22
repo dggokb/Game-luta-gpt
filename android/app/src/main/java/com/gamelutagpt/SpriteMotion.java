@@ -8,7 +8,7 @@ final class SpriteMotion {
             WALK_BACK=SpriteStates.WALK_BACK, DASH=SpriteStates.DASH, BACKDASH=SpriteStates.BACKDASH,
             CROUCH=SpriteStates.CROUCH, RISE=SpriteStates.RISE, JUMP=SpriteStates.JUMP,
             FALL=SpriteStates.FALL, LAND=SpriteStates.LAND, COMBAT=SpriteStates.COMBAT,
-            IDLE_2=SpriteStates.IDLE_2;
+            IDLE_2=SpriteStates.IDLE_2, CROUCH_IDLE=SpriteStates.CROUCH_IDLE;
     }
     /** Voltas do IDLE antes do segundo idle (IDLE_2, opcional), que toca uma vez e volta. */
     static final int IDLE_LOOPS_BEFORE_IDLE_2=3;
@@ -28,12 +28,13 @@ final class SpriteMotion {
         String next;
         if(attackAnimation!=null) next=attackAnimation;
         else if(!grounded) next=velocityY < -35 ? Clip.JUMP : Clip.FALL;
-        else if(crouching) next=Clip.CROUCH;
+        else if(crouching) next=crouched();
         else if(combat || locked) next=Clip.COMBAT;
         else if(!wasGrounded || (clip.equals(Clip.LAND) && time<character.animation(Clip.LAND).duration)) next=Clip.LAND;
         else if(backdash && Math.abs(travel)>.001f) next=Clip.BACKDASH;
         else if(Math.abs(travel)>.001f) next=dash && forward ? Clip.DASH : forward ? Clip.WALK_FORWARD : Clip.WALK_BACK;
-        else if(clip.equals(Clip.CROUCH) || (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
+        else if(clip.equals(Clip.CROUCH) || clip.equals(Clip.CROUCH_IDLE) ||
+                (clip.equals(Clip.RISE) && time<character.animation(Clip.RISE).duration)) next=Clip.RISE;
         else next=idle();
         wasGrounded=grounded;
         if(!next.equals(clip)){
@@ -47,6 +48,19 @@ final class SpriteMotion {
         time=attackAnimation!=null ? Math.max(0,attackElapsed) : time+dt;
         distance+=Math.abs(travel);
     }
+    /**
+     * Agachado: a descida (CROUCH) e, quem tem CROUCH_IDLE, a respiração agachada em loop
+     * depois dela; sem ele, o último quadro da descida fica parado.
+     */
+    private String crouched() {
+        if(!character.animations.containsKey(Clip.CROUCH_IDLE)) return Clip.CROUCH;
+        if(clip.equals(Clip.CROUCH_IDLE)) return Clip.CROUCH_IDLE;
+        if(clip.equals(Clip.CROUCH) && time>=character.animation(Clip.CROUCH).duration) return Clip.CROUCH_IDLE;
+        // Ainda segurando ↓ depois de um golpe agachado (ou da defesa): já agachada, sem descer de novo.
+        if(!clip.equals(Clip.CROUCH) && wasCrouching) return Clip.CROUCH_IDLE;
+        return Clip.CROUCH;
+    }
+
     /**
      * Parado: o IDLE em loop e, quem tem IDLE_2, o segundo idle uma vez a cada 3 voltas
      * inteiras do IDLE (a troca cai no fim da volta, na guarda em que os dois começam).

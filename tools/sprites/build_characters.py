@@ -27,6 +27,8 @@ OPTIONAL = ('DEFENSE_STAND','DEFENSE_CROUCH','DEFENSE_AIR','HIT_STAND','HIT_CROU
             'SPECIAL_CHARGE','SPECIAL_ENERGY_CHARGED','WALL_JUMP',
             # Segundo idle: toca uma vez a cada 3 voltas do IDLE (SpriteMotion).
             'IDLE_2',
+            # Agachado parado: respiração em loop depois da descida (SpriteMotion).
+            'CROUCH_IDLE',
             # Capangas do Super (p07): correm, socam ou dão ombrada e saem.
             'CAPANGA_RUN','CAPANGA_PUNCH','CAPANGA_SHOULDER',
             # Ultra em sequência (tools/sprites/ultras.py): a folha do vídeo com os golpes.

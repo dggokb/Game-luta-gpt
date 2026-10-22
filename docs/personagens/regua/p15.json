@@ -190,12 +190,12 @@
   "cadeia_nota": "sem folha do vídeo",
   "inicio": {
    "fator": 0.9965954846375733,
-   "nota": 0.9471981525421143,
+   "nota": 0.9480267763137817,
    "quadro": 0,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 1.1595727961353368,
+   "fator": 1.1034157636183155,
    "min": 1.0198770916279105,
    "max": 1.193797132415236,
    "zoom": false,
@@ -207,7 +207,13 @@
     "4": 1.194,
     "5": 1.194,
     "6": 1.194,
-    "7": 1.194
+    "7": 1.194,
+    "8": 1.103,
+    "9": 1.103,
+    "10": 1.103,
+    "11": 1.103,
+    "12": 1.103,
+    "13": 1.103
    }
   },
   "emendas": [
@@ -218,7 +224,7 @@
     "ref": "guarda",
     "fator": 0.9925558312655084,
     "pe": -1,
-    "iou": 0.9457057641974557,
+    "iou": 0.9465797648778705,
     "altura": 0.9955594169321363,
     "mesma_pose": 1.0
    }
@@ -226,7 +232,7 @@
   "problemas": [
    [
     "aviso",
-    "medidas discordam: cabeça dá 116%"
+    "medidas discordam: cabeça dá 110%"
    ]
   ],
   "nivel": "aviso"
@@ -698,10 +704,10 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "agachado",
-    "fator": 1.1494252873563218,
+    "fator": 1.1428571428571428,
     "pe": -8,
-    "iou": 0.6188610075216484,
-    "altura": 1.1617824167001205,
+    "iou": 0.6825684380032206,
+    "altura": 1.13742958207782,
     "mesma_pose": 0.0
    },
    {
@@ -709,21 +715,21 @@
     "ponta": "fim",
     "quadro": 10,
     "ref": "agachado",
-    "fator": 1.1494252873563218,
+    "fator": 1.1428571428571428,
     "pe": -8,
-    "iou": 0.6188610075216484,
-    "altura": 1.1617824167001205,
+    "iou": 0.6825684380032206,
+    "altura": 1.13742958207782,
     "mesma_pose": 0.0
    }
   ],
   "problemas": [
    [
     "aviso",
-    "troca (ini): pose diferente da agachado, altura 116% (salto de pose, não de tamanho)"
+    "troca (ini): pose diferente da agachado, altura 114% (salto de pose, não de tamanho)"
    ],
    [
     "aviso",
-    "troca (fim): pose diferente da agachado, altura 116% (salto de pose, não de tamanho)"
+    "troca (fim): pose diferente da agachado, altura 114% (salto de pose, não de tamanho)"
    ]
   ],
   "nivel": "aviso"
@@ -766,9 +772,9 @@
     "quadro": 0,
     "ref": "agachado",
     "fator": 0.9803921568627448,
-    "pe": 1,
-    "iou": 0.8640333724416634,
-    "altura": 0.9868861233774924,
+    "pe": 0,
+    "iou": 0.8805658470865612,
+    "altura": 0.9661993973535963,
     "mesma_pose": 1.0
    },
    {
@@ -776,10 +782,10 @@
     "ponta": "fim",
     "quadro": 82,
     "ref": "agachado",
-    "fator": 0.9925558312655084,
+    "fator": 0.9803921568627448,
     "pe": 0,
-    "iou": 0.8772524768934105,
-    "altura": 0.9975913287836211,
+    "iou": 0.9308758971500244,
+    "altura": 0.976680204375737,
     "mesma_pose": 1.0
    }
   ],
@@ -829,10 +835,10 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "agachado",
-    "fator": 1.1627906976744184,
-    "pe": -9,
-    "iou": 0.6250720645698545,
-    "altura": 1.1604442660243546,
+    "fator": 1.1396011396011396,
+    "pe": -7,
+    "iou": 0.6808482172720584,
+    "altura": 1.1361194812000526,
     "mesma_pose": 0.0
    },
    {
@@ -840,10 +846,10 @@
     "ponta": "fim",
     "quadro": 14,
     "ref": "agachado",
-    "fator": 1.1627906976744184,
-    "pe": -9,
-    "iou": 0.6250720645698545,
-    "altura": 1.1604442660243546,
+    "fator": 1.1396011396011396,
+    "pe": -7,
+    "iou": 0.6808482172720584,
+    "altura": 1.1361194812000526,
     "mesma_pose": 0.0
    }
   ],
@@ -854,11 +860,11 @@
    ],
    [
     "aviso",
-    "troca (ini): pose diferente da agachado, altura 116% (salto de pose, não de tamanho)"
+    "troca (ini): pose diferente da agachado, altura 114% (salto de pose, não de tamanho)"
    ],
    [
     "aviso",
-    "troca (fim): pose diferente da agachado, altura 116% (salto de pose, não de tamanho)"
+    "troca (fim): pose diferente da agachado, altura 114% (salto de pose, não de tamanho)"
    ]
   ],
   "nivel": "aviso"
@@ -1329,5 +1335,75 @@
   ],
   "problemas": [],
   "nivel": "ok"
+ },
+ {
+  "estado": "CROUCH_IDLE",
+  "atlas": "p15_crouch_idle",
+  "fator": 1.0,
+  "fonte": "receita forte",
+  "receita": "forte",
+  "medida": "1º quadro = inicio_centro_h3 (nota 0.97)",
+  "fator_optico": 1.0,
+  "cadeia": null,
+  "cadeia_nota": "sem folha do vídeo",
+  "inicio": {
+   "fator": 0.7568067434175395,
+   "nota": 0.35261183977127075,
+   "quadro": 0,
+   "ref": "inicio_centro"
+  },
+  "cabeca": {
+   "fator": 1.1034157636183155,
+   "min": 1.1034157636183155,
+   "max": 1.1034157636183155,
+   "zoom": false,
+   "por_quadro": {
+    "0": 1.103,
+    "3": 1.103,
+    "6": 1.103,
+    "9": 1.103,
+    "12": 1.103,
+    "15": 1.103,
+    "18": 1.103,
+    "21": 1.103,
+    "24": 1.103,
+    "26": 1.103
+   }
+  },
+  "emendas": [
+   {
+    "estado": "CROUCH_IDLE",
+    "ponta": "ini",
+    "quadro": 0,
+    "ref": "guarda",
+    "fator": 0.8032128514056222,
+    "pe": 19,
+    "iou": 0.4252666308601243,
+    "altura": 0.7340476880007724,
+    "mesma_pose": 0.0
+   },
+   {
+    "estado": "CROUCH_IDLE",
+    "ponta": "fim",
+    "quadro": 26,
+    "ref": "guarda",
+    "fator": 0.7936507936507935,
+    "pe": 21,
+    "iou": 0.42372246365952343,
+    "altura": 0.7340476880007724,
+    "mesma_pose": 0.0
+   }
+  ],
+  "problemas": [
+   [
+    "aviso",
+    "troca (ini): pose diferente da guarda, altura 73% (salto de pose, não de tamanho)"
+   ],
+   [
+    "aviso",
+    "troca (fim): pose diferente da guarda, altura 73% (salto de pose, não de tamanho)"
+   ]
+  ],
+  "nivel": "aviso"
  }
 ]

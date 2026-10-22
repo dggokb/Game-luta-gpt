@@ -68,8 +68,15 @@ saem no mesmo tamanho.
 
 ```
 python3 tools/sprites/inicio_da_base.py p16 base.webp --altura 0.70 --sombra-sat 26 --sombra-y 0.85 \
-    --bolso 280,0,640,150 --bolso 220,150,470,345
+    --bolso 150,0,640,150 --bolso 150,150,470,345 --bolso 470,130,700,215 --bolso 615,215,700,335 \
+    --desfranja 2
 ```
+
+- Cabelo de mechas finas e soltas: o fundo fica preso entre as mechas em volta de toda a cabeça,
+  não só no rabo de cavalo. Cobrir a cabeça inteira com `--bolso`, deixando de fora só olhos e
+  dentes (brancos de verdade). `--desfranja 2` tira a franja clara da borda das mechas.
+- Conferir a prévia ampliada na cabeça (zoom 3–4×): em tamanho normal o branco entre as mechas
+  passa despercebido.
 - `inicio_agachado_h3` sai de um quadro do vídeo de agachar feito com a guarda nova. Conferir
   com o `regua.py` que os clipes velhos e novos saem no mesmo tamanho (aviso fora de ±3%).
 
@@ -102,5 +109,8 @@ Cuidados que ficam:
 
 - Na corrida o tronco alterna frente e costas entre os quadros: escolher o ciclo com o mesmo lado.
 - Borrão de movimento no giro do chute (calça) é sólido e serve de smear.
+- Preto com reflexo verde (ponta da faixa pendurada, luva, cabelo) tem matiz de verde mas é
+  escuro: o recorte só chama de fundo o verde claro da tela (`SCREEN_MIN_V` em
+  `video_para_sprite.py`). Antes a ponta da faixa da p15 sumia em parte dos quadros.
 - Marca d'água no canto (plano grátis) fica longe do personagem, mas não é verde: conferir na
   conversão que ela não entra no recorte, ou gerar os vídeos finais no plano pago.
