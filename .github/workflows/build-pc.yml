@@ -3,8 +3,10 @@ name: Exportar jogo para PC
 # Jogo de PC: o mesmo código do app Android sobre a camada de compatibilidade do módulo
 # :pc. Cada sistema exporta a sua pasta com o Java embutido (jpackage). No Linux também
 # roda o jogo sem tela e guarda as capturas (menu, seleção, luta, pausa).
+# Os zips e as capturas vão para a release "build-<branch>" (substituídos a cada push): artefatos
+# do Actions contam na cota de armazenamento (0,5 GB no plano) e cada zip tem ~0,8 GB.
 permissions:
-  contents: read
+  contents: write
 
 on:
   push:
@@ -95,20 +97,32 @@ jobs:
         working-directory: android
         run: gradle :pc:exportarPc -Ppython=python --stacktrace
 
-      - name: Enviar o jogo exportado
+      - name: Publicar o jogo exportado na release da branch
+        if: github.event_name != 'pull_request'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/publicar-build.sh '-${{ matrix.sistema }}\.zip$' android/pc/build/exportar/*.zip
+
+      - name: Publicar capturas na release da branch
+        if: matrix.sistema == 'linux' && github.event_name != 'pull_request'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd android/pc/build/captura
+          ls *.png tempos.txt >/dev/null 2>&1 || { echo "Sem capturas"; exit 0; }
+          zip -q -9 "$RUNNER_TEMP/GameLutaGPT-PC-capturas.zip" *.png $(ls tempos.txt 2>/dev/null)
+          cd "$GITHUB_WORKSPACE"
+          bash .github/scripts/publicar-build.sh '' "$RUNNER_TEMP/GameLutaGPT-PC-capturas.zip"
+
+      # PR não pode escrever releases: só o zip, como artefato por 1 dia.
+      - name: Enviar o jogo exportado (PR)
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: GameLutaGPT-PC-${{ matrix.sistema }}
           path: android/pc/build/exportar/*.zip
           if-no-files-found: error
           compression-level: 0
-
-      - name: Enviar capturas
-        if: matrix.sistema == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: GameLutaGPT-PC-capturas
-          path: |
-            android/pc/build/captura/*.png
-            android/pc/build/captura/tempos.txt
-          if-no-files-found: warn
+          retention-days: 1

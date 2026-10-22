@@ -1,7 +1,10 @@
 name: Build Game Luta APK
 
-# CI never writes to the repository: generated sprite outputs are the author's
-# responsibility (build_characters.py --write) and are only verified here.
+# CI never writes to the code: generated sprite outputs are the author's responsibility
+# (build_characters.py --write) and are only verified here. The only write is publishing the
+# APK and the smoke screenshot to the rolling release "build-<branch>" (job-level permissions).
+# Artefatos do Actions contam na cota de armazenamento (0,5 GB no plano): só sobem diagnósticos
+# quando algo falha, e por 1 dia.
 permissions:
   contents: read
 
@@ -27,6 +30,8 @@ jobs:
   apk:
     name: APK (rápido, sem testes)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -55,20 +60,30 @@ jobs:
         working-directory: android
         run: gradle assembleDebug -x verifySpritePacks --stacktrace
 
-      # O APK vai como .apk mesmo, sem zip (upload-artifact v7 com archive: false): baixa no
-      # celular e instala direto. Sem zip só vai um arquivo, e o nome dele vira o do artefato.
+      # O APK vai para a release "build-<branch>" (substituído a cada push): abre no celular em
+      # Releases e instala direto. Release não conta na cota de armazenamento do Actions.
       - name: Nome do APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk "$RUNNER_TEMP/GameLutaGPT.apk"
-      - name: Upload APK
+      - name: Publicar APK na release da branch
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/publicar-build.sh '' "$RUNNER_TEMP/GameLutaGPT.apk"
+      # PR não pode escrever releases: o APK fica como artefato por 1 dia.
+      - name: Upload APK (PR)
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v7
         with:
           path: ${{ runner.temp }}/GameLutaGPT.apk
           archive: false
           if-no-files-found: error
+          retention-days: 1
 
   build:
     name: Testes, folhas e smoke no emulador
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -115,11 +130,13 @@ jobs:
         if: failure()
         run: python3 tools/sprites/build_characters.py --write
 
+      # Só quando a conferência falha (é o que o --write acima gera); ~0,5 GB, por isso 1 dia.
       - name: Upload generated sprite outputs
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: Sprite-GPT-Generated-Outputs
+          retention-days: 1
           path: |
             android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
             android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
@@ -203,20 +220,20 @@ jobs:
             adb exec-out screencap -p > game-smoke.png
             test -s game-smoke.png
 
-      - name: Upload runtime screenshot
-        if: github.ref == 'refs/heads/game-luta-sprite-gpt'
-        uses: actions/upload-artifact@v4
-        with:
-          name: GameLutaGPT-Smoke-Screenshot
-          path: game-smoke.png
-          if-no-files-found: error
+      - name: Publicar captura do smoke na release da branch
+        if: github.ref == 'refs/heads/game-luta-sprite-gpt' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/publicar-build.sh '' game-smoke.png
 
 
+      # ~1,2 GB: só quando algo falha, e por 1 dia.
       - name: Upload sprite review and test reports
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: Sprite-GPT-Validation
+          retention-days: 1
           path: |
             android/app/build/sprite-review/
             android/app/build/reports/tests/
