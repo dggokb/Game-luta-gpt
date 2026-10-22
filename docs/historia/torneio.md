@@ -64,6 +64,31 @@ emboscam o jogador à noite, longe da arena. Não é regra do torneio, mas os or
   sobre um abismo da ilha, à noite, com pontes suspensas, ruínas e andaimes
   ([../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torneio.md)).
 
+### O desafio no porto (ep03)
+
+Antes do sorteio, uma dupla desafia o jogador no cais (rótulo **DESAFIO**, 2x2 no
+`porto_secreto`). A história não diz, mas essa dupla é **do lado do rival na chave** que o
+ep04 vai sortear: assim o jogador nunca a reencontra no caminho dele (quartas, emboscada,
+semifinal) e o porto aumenta o número de duplas diferentes que ele enfrenta.
+
+- `Campanha.adversarioPorto()`: refaz a chave da semente sem mostrá-la (o sorteio do ep04 dá a
+  mesma) e escolhe, pela semente, uma das duplas com golpes (`pronta`) da metade do rival
+  (`Torneio.prontasDoLadoDoRival`). Hoje, com p13 e p15 sem golpes no lado do rival, sobra uma:
+  p05, p07, p09 ou p11, cada uma em ~1/4 das partidas. O save não muda: a semente refaz tudo.
+- A luta tem `"porto": true` (o `"cpu"` do passo só vale sem campanha).
+- As páginas do desafio dependem do adversário: `"adversario": "p05"` (ou uma lista) faz o
+  passo tocar só contra essa dupla. As do Ryūga são fixas (chegada) e as do adversário vêm
+  depois delas.
+
+| Adversário no porto | Ryūga | Kōga |
+|---|---|---|
+| p05 + p06 | `pag5_ryuga_p05` (a dupla mascarada cerca os dois: "Hum.... parece que podemos tentar algo antes do torneio...") | provisória |
+| p07, p09, p11 (p13, p15 quando tiverem golpes) | provisória (`pag3_q*`) | provisória |
+
+Quando chegar a página de um adversário: grave como `pagN_<irmao>_<dupla>.jpg`, ponha o passo
+com `"irmao"` e `"adversario"` antes da luta e tire o id da lista `"adversario"` da página
+provisória do mesmo irmão. O `TorneioTest.ep03TemAsPaginasDoAdversarioDoPorto` confere a ordem.
+
 ### A regra escondida
 
 Depois da FINAL (2x2), a dupla campeã luta entre si, **1x1** (Ryūga × p02 ou Kōga × p04).
@@ -109,6 +134,8 @@ Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
 | `{ "tipo": "luta", "duelo": true }` | o duelo 1x1 da regra escondida: o líder da dupla do jogador (o irmão escolhido, Ryūga ou Kōga) contra o parceiro, seja quem for que estava em campo ao vencer a final (rótulo DUELO FINAL; no Arcade é quem venceu a final, veja [arcade.md](arcade.md)). Só toca se a dupla do jogador for campeã |
 | `"dupla": "jogador", "cpu": "rival"` | numa luta comum: a dupla fixa do irmão escolhido contra a do outro (com `"solo": true`, só os irmãos 1x1, como no treino do ep01) |
 | `"irmao": "ryuga"` ou `"koga"` | em qualquer passo: só toca na campanha desse irmão (páginas diferentes para cada lado) |
+| `{ "tipo": "luta", "porto": true }` | o desafio no porto: contra uma dupla do lado do rival na chave que ainda vai ser sorteada |
+| `"adversario": "p05"` (ou lista) | em qualquer passo: só toca quando o adversário do porto é essa dupla (id do `torneio.json`) |
 
 Se o sorteio for pulado (PULAR), a chave é sorteada na primeira luta do torneio. Sem a
 campanha (cenas tocadas sem a história), escolha, sorteio, chave, lutas do torneio e passos
@@ -120,7 +147,7 @@ com `"irmao"`, `"emboscada"` ou `"duelo"` são pulados.
 |---|---|
 | ep01 — Duas Cartas | escolha do irmão, páginas prontas (começo e fim de cada irmão), treino jogador × rival |
 | ep02 — O Parceiro | antes do torneio, cada irmão vai convencer o parceiro: 4 páginas prontas de cada irmão (Ryūga vai atrás da Yin-lu, Kōga vai atrás do Brucy), **luta 1x1 CONVITE** (Ryūga/P01 × Yin-lu/p02 ou Kōga/p03 × Brucy/p04; perdendo ou ganhando, a história segue; a do Ryūga é no Dojo da Yin-Lu, `dojo_yinlu`, e a do Kōga no Beco do Brucy, `beco_brucy`), o parceiro aceita (`pag5_ryuga` ou `pag5_koga`, página pronta de cada irmão) |
-| ep03 — A Chegada | os irmãos chegam de barco à Ilha do Torneio, no Porto Secreto. **Ryūga: 4 páginas prontas** (`pag1_ryuga` a `pag4_ryuga`: o cais do continente e a Yin-lu desconfiada da ilha, "conhecemos um sim", a revelação do Kōga, a viagem e a ilha (legenda "Ilha do torneio: local desconhecido"), a chegada no meio da multidão, os dois em alerta). Kōga: página do porto e página dele com o Brucy (provisórias). Depois, para os dois: a dupla do p07 + p08 (gananciosos, "uma dupla a menos na chave seria ótimo para os nossos negócios") desafia o jogador no cais, **luta 2x2 DESAFIO** no `porto_secreto`, o mensageiro encerra a briga, página do irmão vendo o outro irmão chegar. Antes do sorteio: a chave ainda não existe |
+| ep03 — A Chegada | os irmãos chegam de barco à Ilha do Torneio, no Porto Secreto. **Ryūga: 4 páginas prontas** (`pag1_ryuga` a `pag4_ryuga`: o cais do continente e a Yin-lu desconfiada da ilha, "conhecemos um sim", a revelação do Kōga, a viagem e a ilha (legenda "Ilha do torneio: local desconhecido"), a chegada no meio da multidão, os dois em alerta). Kōga: página do porto e página dele com o Brucy (provisórias). Depois, o desafio no cais (veja **O desafio no porto** abaixo; para os dois, por enquanto, segue o rascunho): a dupla do p07 + p08 (gananciosos, "uma dupla a menos na chave seria ótimo para os nossos negócios") desafia o jogador no cais, **luta 2x2 DESAFIO** no `porto_secreto`, o mensageiro encerra a briga, página do irmão vendo o outro irmão chegar. Antes do sorteio: a chave ainda não existe |
 | ep04 — O Sorteio | página do templo, **sorteio**, página do irmão escolhido, **quartas**, chave |
 | ep05 — Fora da Arena | chave, a emboscada à noite, página do irmão, **emboscada**, os organizadores adoraram |
 | ep06 — Semifinal | chave, página do irmão escolhido, **semifinal**, chave |

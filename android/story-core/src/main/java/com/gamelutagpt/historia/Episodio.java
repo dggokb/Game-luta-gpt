@@ -101,6 +101,18 @@ public final class Episodio {
          * história em que os parceiros ainda não entraram.
          */
         public final boolean solo;
+        /**
+         * {@code "porto": true}: o desafio no porto, antes do sorteio. A CPU é uma dupla com golpes
+         * do lado do rival na chave que vai ser sorteada ({@link Campanha#adversarioPorto}), para
+         * o jogador não reencontrá-la no caminho; a história não conta isso. O {@code "cpu"} do
+         * passo vale sem a campanha.
+         */
+        public final boolean porto;
+        /**
+         * {@code "adversario": "p05"} (ou uma lista): o passo só toca quando o adversário do porto
+         * é uma dessas duplas (ids de {@code torneio.json}); null = contra qualquer uma.
+         */
+        public final List<String> adversario;
         // TITULO e PROXIMO
         public final String titulo;
         public final List<String> linhas;
@@ -111,8 +123,11 @@ public final class Episodio {
         Passo(TipoPasso tipo, String marca, String layout, String tom, List<Painel> paineis, String[] dupla,
               String[] cpu, String rotulo, boolean repetirSeDerrota, String modo, String cenario, String conversa,
               String cinematica, String titulo, List<String> linhas, String imagem, List<Quadro> quadros, boolean torneio,
-              String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada, boolean solo) {
+              String duplaRef, String cpuRef, String irmao, boolean duelo, boolean emboscada, boolean solo,
+              boolean porto, List<String> adversario) {
             this.tipo = tipo;
+            this.porto = porto;
+            this.adversario = adversario;
             this.solo = solo;
             this.duelo = duelo;
             this.emboscada = emboscada;
@@ -328,7 +343,18 @@ public final class Episodio {
             Collections.unmodifiableList(linhas), imagem, Collections.unmodifiableList(quadros),
             Boolean.TRUE.equals(map.get("torneio")), duplaRef, cpuRef, irmao,
             Boolean.TRUE.equals(map.get("duelo")), Boolean.TRUE.equals(map.get("emboscada")),
-            Boolean.TRUE.equals(map.get("solo")));
+            Boolean.TRUE.equals(map.get("solo")), Boolean.TRUE.equals(map.get("porto")), adversario(map));
+    }
+
+    /** {@code "adversario"}: um id ou uma lista de ids de dupla; null sem o campo. */
+    private static List<String> adversario(Map<String, Object> map) {
+        Object value = map.get("adversario");
+        if (value == null) return null;
+        List<String> ids = new ArrayList<>();
+        if (value instanceof String) ids.add((String)value);
+        else for (Object item : list(map, "adversario")) ids.add(String.valueOf(item));
+        if (ids.isEmpty()) throw new IllegalArgumentException("\"adversario\" vazio");
+        return Collections.unmodifiableList(ids);
     }
 
     /** {@code "dupla": "jogador"} ou {@code "rival"} (dupla fixa de um irmão); null se for uma lista. */

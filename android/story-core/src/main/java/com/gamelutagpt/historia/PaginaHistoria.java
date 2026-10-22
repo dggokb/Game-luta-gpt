@@ -360,7 +360,7 @@ public final class PaginaHistoria {
      */
     private boolean toca(Episodio.Passo p) {
         if (campanha == null) {
-            return p.irmao == null && !p.emboscada && !p.duelo && p.tipo != Episodio.TipoPasso.ESCOLHA &&
+            return p.irmao == null && p.adversario == null && !p.emboscada && !p.duelo && p.tipo != Episodio.TipoPasso.ESCOLHA &&
                 p.tipo != Episodio.TipoPasso.SORTEIO && p.tipo != Episodio.TipoPasso.CHAVE && !p.torneio;
         }
         if (!campanha.vale(p)) return false;

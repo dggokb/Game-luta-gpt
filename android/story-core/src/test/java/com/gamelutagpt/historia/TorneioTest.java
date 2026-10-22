@@ -271,9 +271,9 @@ public class TorneioTest {
         assertEquals(1, lutas.get(1)[0].length);
         assertEquals("p04", lutas.get(1)[1][0]);
         assertEquals(1, lutas.get(1)[1].length);
-        // O desafio no porto é 2x2: a dupla do Kōga contra p07 + p08.
+        // O desafio no porto é 2x2: a dupla do Kōga contra a dupla escondida do lado do rival.
         assertArrayEquals(new String[] {"p03", "p04"}, lutas.get(2)[0]);
-        assertArrayEquals(new String[] {"p07", "p08"}, lutas.get(2)[1]);
+        assertArrayEquals(campanha.adversarioPorto().lutadores, lutas.get(2)[1]);
         // A emboscada é a dupla que perdeu a outra quarta do lado do Kōga (vagas 4 e 5).
         String[] emboscada = lutas.get(4)[1];
         Torneio t = campanha.torneio();
@@ -290,7 +290,8 @@ public class TorneioTest {
     @Test
     public void temporadaDoRyuga() throws IOException {
         List<String> rotulos = new ArrayList<>();
-        List<String[][]> lutas = temporada(Torneio.RYUGA, rotulos, Campanha.load(new GameAssets(), 3L));
+        Campanha campanha = Campanha.load(new GameAssets(), 3L);
+        List<String[][]> lutas = temporada(Torneio.RYUGA, rotulos, campanha);
         assertEquals(java.util.Arrays.asList("TREINO", "CONVITE", "DESAFIO", Torneio.QUARTAS, Campanha.EMBOSCADA,
             Torneio.SEMIFINAL, Torneio.FINAL, Campanha.DUELO), rotulos);
         // O convite é 1x1: Ryūga (P01) contra o P02, que vira o parceiro dele.
@@ -299,9 +300,93 @@ public class TorneioTest {
         assertEquals("p02", lutas.get(1)[1][0]);
         assertEquals(1, lutas.get(1)[1].length);
         assertArrayEquals(new String[] {"player_base", "p02"}, lutas.get(2)[0]);
-        assertArrayEquals(new String[] {"p07", "p08"}, lutas.get(2)[1]);
+        assertArrayEquals(campanha.adversarioPorto().lutadores, lutas.get(2)[1]);
+        // Quem lutou no porto não volta: quartas, emboscada e semifinal são outras duplas.
+        for (int i = 3; i <= 5; i++) assertNotEquals(lutas.get(2)[1][0], lutas.get(i)[1][0]);
         assertEquals("p03", lutas.get(6)[1][0]);
         assertEquals("p02", lutas.get(7)[1][0]);
+    }
+
+    @Test
+    public void adversarioDoPortoEhDoLadoDoRivalENaoMudaComOSorteio() throws IOException {
+        Set<String> vistos = new HashSet<>();
+        for (String irmao : new String[] {Torneio.RYUGA, Torneio.KOGA}) {
+            for (long semente = 0; semente < 200; semente++) {
+                Campanha c = Campanha.load(new GameAssets(), semente);
+                c.escolher(irmao);
+                Torneio.Dupla porto = c.adversarioPorto();
+                assertNotNull(porto);
+                assertTrue(porto.id + " sem golpes no porto", porto.pronta);
+                assertNull(porto.irmao);
+                vistos.add(porto.id);
+                // O sorteio (depois do porto) dá a mesma chave e o mesmo adversário.
+                Torneio t = c.torneio();
+                assertSame(porto, c.adversarioPorto());
+                assertTrue(t.prontasDoLadoDoRival().contains(porto));
+                // Fica na metade do rival: o jogador só o encontraria na final, contra o rival.
+                int metade = Torneio.VAGAS / 2;
+                int lado = Torneio.KOGA.equals(irmao) ? 0 : metade;
+                boolean achou = false;
+                for (int i = lado; i < lado + metade; i++) achou |= t.participante(0, i) == porto;
+                assertTrue(achou);
+            }
+        }
+        // Todas as duplas com golpes podem aparecer no porto.
+        assertEquals(new HashSet<>(java.util.Arrays.asList("p05", "p07", "p09", "p11")), vistos);
+    }
+
+    /** As páginas prontas (e "LUTA") do episódio {@code id}, com o irmão já escolhido. */
+    private static List<String> paginas(String id, Campanha campanha) throws IOException {
+        GameAssets assets = new GameAssets();
+        Temporada temporada = Temporada.load(assets);
+        Recorder rec = new Recorder();
+        PaginaHistoria p = new PaginaHistoria(rec, assets);
+        p.setCampanha(campanha);
+        p.start(temporada, temporada.loadEpisodio(assets, id));
+        List<String> paginas = new ArrayList<>();
+        for (int i = 0; i < 20000 && rec.ended == null; i++) {
+            if (p.waitingFight()) {
+                paginas.add("LUTA");
+                p.resultadoLuta(true);
+                continue;
+            }
+            Episodio.Passo passo = p.passo();
+            String nome = passo.imagem != null ? passo.imagem
+                : passo.tipo == Episodio.TipoPasso.PAGINA ? passo.paineis.get(0).imagem : null;
+            if (nome != null && (paginas.isEmpty() || !nome.equals(paginas.get(paginas.size() - 1)))) paginas.add(nome);
+            run(p, 0.6f);
+            p.tap(640f, 360f);
+        }
+        assertNotNull(id + " não terminou", rec.ended);
+        return paginas;
+    }
+
+    /** Uma campanha do irmão com {@code adversario} no porto. */
+    private static Campanha campanhaComPorto(String irmao, String adversario) throws IOException {
+        for (long semente = 0; semente < 500; semente++) {
+            Campanha c = Campanha.load(new GameAssets(), semente);
+            c.escolher(irmao);
+            if (adversario.equals(c.adversarioPorto().id)) return c;
+        }
+        throw new AssertionError("nenhuma semente com " + adversario + " no porto");
+    }
+
+    @Test
+    public void ep03TemAsPaginasDoAdversarioDoPorto() throws IOException {
+        List<String> chegada = java.util.Arrays.asList("pag1_ryuga.jpg", "pag2_ryuga.jpg", "pag3_ryuga.jpg", "pag4_ryuga.jpg");
+        List<String> p05 = paginas("ep03", campanhaComPorto(Torneio.RYUGA, "p05"));
+        assertEquals(chegada, p05.subList(0, 4));
+        assertEquals(java.util.Arrays.asList("pag5_ryuga_p05.jpg", "LUTA"), p05.subList(4, 6));
+        assertFalse(p05.contains("pag3_q1.jpg"));
+        // Sem páginas prontas para o adversário: o desafio provisório.
+        List<String> p07 = paginas("ep03", campanhaComPorto(Torneio.RYUGA, "p07"));
+        assertEquals(chegada, p07.subList(0, 4));
+        assertEquals(java.util.Arrays.asList("pag3_q1.jpg", "LUTA"), p07.subList(4, 6));
+        assertFalse(p07.contains("pag5_ryuga_p05.jpg"));
+        // As páginas do Ryūga não aparecem para o Kōga, nem contra o p05.
+        List<String> koga = paginas("ep03", campanhaComPorto(Torneio.KOGA, "p05"));
+        assertFalse(koga.contains("pag5_ryuga_p05.jpg"));
+        assertEquals(java.util.Arrays.asList("pag1_q1.jpg", "pag2_koga.jpg", "pag3_q1.jpg", "LUTA"), koga.subList(0, 4));
     }
 
     /**

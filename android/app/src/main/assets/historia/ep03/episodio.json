@@ -58,7 +58,15 @@
         ] }
     ] },
 
-    { "tipo": "pagina", "layout": "faixa-e-dois", "paineis": [
+    { "tipo": "pagina", "irmao": "ryuga", "adversario": "p05", "imagem": "pag5_ryuga_p05.jpg", "quadros": [
+      {"area": [0.9934, 0.002, 0.9924, 0.1373, 0.0076, 0.1366, 0.0085, 0.0], "efeitos": ["zoom", "tremor"]},
+      {"area": [0.9934, 0.1447, 0.9924, 0.4956, 0.0085, 0.4956, 0.0085, 0.144], "efeitos": ["impacto", "velocidade"]},
+      {"area": [0.9934, 0.5037, 0.9924, 0.6001, 0.0076, 0.5988, 0.0095, 0.5023], "efeitos": ["impacto", "tremor"]},
+      {"area": [0.9924, 0.6062, 0.9915, 0.7729, 0.0085, 0.7723, 0.0095, 0.6062], "efeitos": ["zoom"], "baloes": [{"texto": "Hum.... parece que podemos tentar algo antes do torneio...", "caixa": [0.7534, 0.6304, 0.8994, 0.7307], "area": [0.7723, 0.6189, 0.7533, 0.6276, 0.74, 0.639, 0.7315, 0.6537, 0.7287, 0.6638, 0.7287, 0.6919, 0.7125, 0.6979, 0.7296, 0.6999, 0.7343, 0.7147, 0.7429, 0.7254, 0.7524, 0.7328, 0.7685, 0.7408, 0.7903, 0.7468, 0.8207, 0.7502, 0.851, 0.7495, 0.8805, 0.7441, 0.9004, 0.7361, 0.9118, 0.7281, 0.9194, 0.7194, 0.9241, 0.7093, 0.9279, 0.6892, 0.9279, 0.6691, 0.9241, 0.6497, 0.9203, 0.641, 0.9108, 0.6296, 0.8975, 0.6209, 0.8852, 0.6162, 0.871, 0.6129, 0.8444, 0.6102, 0.8093, 0.6115]}]},
+      {"area": [0.9924, 0.779, 0.9924, 0.9993, 0.0085, 0.9993, 0.0085, 0.779], "efeitos": ["zoom", "tremor"]}
+    ] },
+
+    { "tipo": "pagina", "irmao": "ryuga", "adversario": ["p07", "p09", "p11", "p13", "p15"], "layout": "faixa-e-dois", "paineis": [
       { "imagem": "pag3_q1.jpg", "cena": "porto", "efeito": "impacto", "sfx": "TAC!", "posicaoSfx": [0.78, 0.78],
         "baloes": [
           { "tipo": "fala", "texto": "Então esses são os famosos convidados de última hora...", "pos": [0.5, 0.2], "rabo": [0.6, 0.5] }
@@ -73,7 +81,22 @@
         ] }
     ] },
 
-    { "tipo": "luta", "rotulo": "DESAFIO", "cenario": "porto_secreto", "dupla": "jogador", "cpu": ["p07", "p08"] },
+    { "tipo": "pagina", "irmao": "koga", "layout": "faixa-e-dois", "paineis": [
+      { "imagem": "pag3_q1.jpg", "cena": "porto", "efeito": "impacto", "sfx": "TAC!", "posicaoSfx": [0.78, 0.78],
+        "baloes": [
+          { "tipo": "fala", "texto": "Então esses são os famosos convidados de última hora...", "pos": [0.5, 0.2], "rabo": [0.6, 0.5] }
+        ] },
+      { "imagem": "pag3_q2.jpg", "cena": "porto", "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "texto": "Uma dupla a menos na chave seria ótimo para os nossos negócios.", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] },
+      { "imagem": "pag3_q3.jpg", "cena": "porto", "enquadramento": "close",
+        "baloes": [
+          { "tipo": "fala", "texto": "Ninguém precisa saber o que acontece no cais. Vamos?", "pos": [0.5, 0.2], "rabo": [0.5, 0.5] }
+        ] }
+    ] },
+
+    { "tipo": "luta", "rotulo": "DESAFIO", "cenario": "porto_secreto", "porto": true, "dupla": "jogador", "cpu": ["p07", "p08"] },
 
     { "tipo": "pagina", "layout": "duas-colunas", "paineis": [
       { "imagem": "pag4_q1.jpg", "cena": "porto", "personagens": ["mensageiro"], "enquadramento": "close",

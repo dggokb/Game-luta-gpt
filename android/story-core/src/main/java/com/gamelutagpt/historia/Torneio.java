@@ -274,6 +274,22 @@ public final class Torneio {
         return -1;
     }
 
+    /**
+     * As duplas com golpes do lado do rival na chave (a metade dele, sem ele), na ordem das
+     * vagas: o jogador só as encontraria na final, onde está sempre o rival.
+     */
+    public List<Dupla> prontasDoLadoDoRival() {
+        List<Dupla> out = new ArrayList<>();
+        if (rival == null) return out;
+        int metade = vagas / 2;
+        int inicio = posicaoInicial(rival) < metade ? 0 : metade;
+        for (int i = inicio; i < inicio + metade; i++) {
+            Dupla d = rodadas[0][i];
+            if (d != rival && d.pronta) out.add(d);
+        }
+        return out;
+    }
+
     /** O próximo adversário do jogador, ou null se não há mais luta para ele. */
     public Dupla adversario() {
         int i = posicaoJogador();

@@ -157,6 +157,23 @@ public final class Campanha {
         return torneio;
     }
 
+    /**
+     * O adversário do desafio no porto (antes do sorteio): uma dupla com golpes do lado do rival
+     * na chave desta semente, escolhida pela semente. A chave ainda não aparece (o sorteio do
+     * ep04 a mostra depois, igual), então o jogador luta com alguém que não volta no caminho dele.
+     * Null sem {@code torneio.json} (Arcade) ou sem dupla pronta do lado do rival.
+     */
+    public Torneio.Dupla adversarioPorto() {
+        if (!temTorneio()) return null;
+        Torneio chave = torneio != null ? torneio : Torneio.sortear(duplas, irmao(), new Random(semente));
+        List<Torneio.Dupla> opcoes = chave.prontasDoLadoDoRival();
+        if (opcoes.isEmpty()) return null;
+        return opcoes.get(new Random(semente ^ PORTO).nextInt(opcoes.size()));
+    }
+
+    /** Mistura da semente para a escolha do porto (outra sequência que a do sorteio). */
+    private static final long PORTO = 0x5D0C3A77L;
+
     /** A dupla fixa do irmão {@code quem}, ou null. */
     public Torneio.Dupla duplaDo(String quem) {
         for (Torneio.Dupla d : duplas) {
@@ -192,6 +209,12 @@ public final class Campanha {
             Torneio.Dupla emboscada = t != null ? t.emboscada() : null;
             if (emboscada == null) return null;
             return new String[][] {t.jogador().lutadores.clone(), emboscada.lutadores.clone()};
+        }
+        if (luta.porto && temTorneio()) {
+            Torneio.Dupla porto = adversarioPorto();
+            Torneio.Dupla minha = duplaDo(irmao());
+            if (porto == null || minha == null) return null;
+            return new String[][] {minha.lutadores.clone(), porto.lutadores.clone()};
         }
         if (luta.torneio) {
             Torneio t = torneio();
@@ -235,11 +258,15 @@ public final class Campanha {
 
     /**
      * O passo vale para esta partida: passos com {@code "irmao"} só para quem escolheu esse
-     * irmão; a emboscada, só depois que o jogador passou das quartas; o duelo, só para a dupla
+     * irmão; com {@code "adversario"}, só contra essas duplas no porto; a emboscada, só depois que o jogador passou das quartas; o duelo, só para a dupla
      * campeã.
      */
     public boolean vale(Episodio.Passo passo) {
         if (passo.irmao != null && !passo.irmao.equals(irmao())) return false;
+        if (passo.adversario != null) {
+            Torneio.Dupla porto = adversarioPorto();
+            if (porto == null || !passo.adversario.contains(porto.id)) return false;
+        }
         if (passo.emboscada) {
             Torneio t = torneioSorteado();
             if (t == null || t.emboscada() == null) return false;
