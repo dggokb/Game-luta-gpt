@@ -19,11 +19,12 @@ Primeiro teste: **p15** (vídeo `Entrada_Esquerda_Direita.mp4`, ela entrando pel
 | `CombatEngine.setSuperIntro` | No início do Super, quem ativou segura o 1º quadro pela entrada inteira; o rival e os projéteis esperam a entrada + o congelamento de sempre |
 | `SuperFlash` | Na entrada: escuro, zoom até o foco inteiro (`INTRO_ZOOM`), aviso e aura de carga; depois segue da pose sem pular |
 
-No jogo o quadro do vídeo fica um pouco mais alto que o painel, com o canto de baixo do vídeo no
-canto de baixo do painel. Lutador à esquerda do rival: quadro na borda esquerda, como no vídeo. À
+O quadro fica deitado no canto de baixo (como o retrato) e a escala sai do próprio desenho
+(`LIVRE_DIR`, `LIVRE_CIMA`): o lutador cabe inteiro, nunca cortado em cima nem no lado do punho;
+só embaixo (o vídeo já corta ali) e até 8% da largura no lado por onde ele entra (o cabelo). Lutador à esquerda do rival: quadro na borda esquerda, como no vídeo. À
 direita: tudo espelhado, na borda direita. O quadro fica atrás dos lutadores e na frente do
-cenário escuro. O `--altura` do conversor só decide a resolução guardada (o painel tem ~77% da
-altura da tela: 0,85 guarda o retrato nítido).
+cenário escuro. O `--altura` do conversor só decide a resolução guardada (0,85 guarda o retrato
+da p15 do tamanho em que ele aparece).
 
 **Personagem sem pasta em `assets/supers/` não muda nada**: o Super dele continua igual.
 

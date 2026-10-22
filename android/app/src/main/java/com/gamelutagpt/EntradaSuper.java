@@ -37,14 +37,21 @@ final class EntradaSuper {
     /** Tinta e papel da página do Ultra (ArteProvisoria). */
     private static final int TINTA = 0xFF111114, PAPEL = 0xFFFFFFFF;
     /**
-     * O quadro no lado esquerdo da tela (cima-esq., cima-dir., baixo-dir., baixo-esq.), entre o
-     * HUD de cima e o de baixo, com o lado de dentro inclinado como num corte de página. Do
-     * lado direito ele é espelhado.
+     * O quadro no canto de baixo à esquerda da tela (cima-esq., cima-dir., baixo-dir., baixo-esq.),
+     * deitado como o retrato, acima do HUD de baixo e com o lado de dentro inclinado como num
+     * corte de página. Do lado direito ele é espelhado. A direita fica antes do meio da tela,
+     * onde a câmera põe quem ativou.
      */
-    private static final float[] QUADRO = {24f, 126f, 552f, 100f, 500f, 638f, 14f, 652f};
-    private static final float Q_ESQ = 14f, Q_DIR = 552f, Q_CIMA = 100f, Q_BAIXO = 652f;
-    /** O quadro do vídeo um pouco mais alto que o painel (o pé fica no fundo dele). */
-    private static final float SOBRA_VIDEO = 1.04f;
+    private static final float[] QUADRO = {22f, 262f, 556f, 238f, 510f, 640f, 14f, 652f};
+    private static final float Q_ESQ = 14f, Q_DIR = 556f, Q_CIMA = 238f, Q_BAIXO = 652f;
+    /**
+     * Até onde o desenho pode ir dentro do quadro: o lado de dentro (o mais estreito, embaixo) e
+     * o topo (o canto mais baixo, à esquerda), com folga da moldura. O lutador inteiro cabe
+     * nisso, nunca cortado em cima nem no lado do punho; só embaixo (o vídeo já corta ali) e,
+     * até {@link #CORTE_ENTRADA} da largura do vídeo, no lado por onde ele entra (o cabelo).
+     */
+    private static final float LIVRE_DIR = 500f, LIVRE_CIMA = 276f;
+    private static final float CORTE_ENTRADA = 0.08f;
     /** Onde as linhas de concentração convergem: o rosto, em fração do quadro do vídeo. */
     private static final float FOCO_X = 0.40f, FOCO_Y = 0.30f;
     private static final int LINHAS = 46;
@@ -57,6 +64,8 @@ final class EntradaSuper {
         /** x, y (topo, negativo: acima do chão da tela), largura e altura de cada quadro. */
         final float[][] caixas;
         final float quadroMs, segurarMs, saidaMs, larguraVideo, alturaTela;
+        /** Até onde o desenho vai, juntando todos os quadros: a direita e o topo (negativo). */
+        final float direita, topo;
 
         Pacote(Bitmap[] quadros, float[][] caixas, float quadroMs, float segurarMs, float saidaMs, float larguraVideo,
                float alturaTela) {
@@ -67,6 +76,19 @@ final class EntradaSuper {
             this.saidaMs = saidaMs;
             this.larguraVideo = larguraVideo;
             this.alturaTela = alturaTela;
+            float d = 1f, t = -1f;
+            for (float[] r : caixas) {
+                d = Math.max(d, r[0] + r[2]);
+                t = Math.min(t, r[1]);
+            }
+            direita = d;
+            topo = t;
+        }
+
+        /** Escala do vídeo no quadro: o lutador inteiro dentro, até a borda do quadro. */
+        float escala() {
+            float corte = CORTE_ENTRADA * larguraVideo;
+            return Math.min((LIVRE_DIR - Q_ESQ) / Math.max(1f, direita - corte), (Q_BAIXO - LIVRE_CIMA) / -topo);
         }
 
         float duracaoMs() {
@@ -199,13 +221,13 @@ final class EntradaSuper {
         c.restore();
         c.save();
         c.clipPath(quadro);
-        float s = (Q_BAIXO - Q_CIMA) * SOBRA_VIDEO / (p.alturaTela * Arena.VH);
+        float s = p.escala(), esq = Q_ESQ - CORTE_ENTRADA * p.larguraVideo * s;
         float altVideo = p.alturaTela * Arena.VH * s;
-        float fx = Q_ESQ + p.larguraVideo * s * FOCO_X, fy = Q_BAIXO - altVideo * (1f - FOCO_Y);
+        float fx = esq + p.larguraVideo * s * FOCO_X, fy = Q_BAIXO - altVideo * (1f - FOCO_Y);
         desenharFundo(c, cor, fx, fy, idade);
         int i = Math.min(p.quadros.length - 1, Math.max(0, (int)(ms / p.quadroMs)));
         float[] r = p.caixas[i];
-        float x = Q_ESQ + r[0] * s, y = Q_BAIXO + r[1] * s;
+        float x = esq + r[0] * s, y = Q_BAIXO + r[1] * s;
         destino.set(x, y, x + r[2] * s, y + r[3] * s);
         paint.setAlpha(255);
         c.drawBitmap(p.quadros[i], null, destino, paint);
@@ -256,7 +278,7 @@ final class EntradaSuper {
             float r2 = ((semente >>> 17) & 0xFFFF) / 65535f;
             double a = (i + 0.8 * (r1 - 0.5)) * 2.0 * Math.PI / LINHAS;
             float cos = (float)Math.cos(a), sin = (float)Math.sin(a);
-            float perto = 190f + 150f * r2, longe = 900f;
+            float perto = 140f + 110f * r2, longe = 900f;
             float meia = 2.5f + 9f * r1;
             linha.rewind();
             linha.moveTo(fx + cos * perto, fy + sin * perto);
