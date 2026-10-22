@@ -73,6 +73,11 @@ na freada do dash uma nuvem de poeira.
 sparks or effects. No opponent. No music, no dialogue.
 ```
 
+**Andar: prompt curto.** O andar detalhado do Omni (shuffle contado, "light springy bounce")
+saiu pulando; "walks forward ... in her fighting stance" saiu ereta e andando como gente comum.
+O que funcionou foi uma frase, em português: "Andando para frente como personagem de jogo de luta
+mantendo sua guarda" (quadros `inicio_esquerda_h3` → `inicio_centro_h3`).
+
 O que o H3 acertou e o Omni não:
 
 - **Membro certo pelo texto.** O chute alto com a perna de trás ("his rear leg (the leg farther
