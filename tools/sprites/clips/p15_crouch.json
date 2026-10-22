@@ -20,6 +20,7 @@
     "celula": 288,
     "largura": 192,
     "raiz": "89,270",
+    "fixar": "video",
     "pe_no_chao": true,
     "limpar_chao": true,
     "recorte_suave": true
