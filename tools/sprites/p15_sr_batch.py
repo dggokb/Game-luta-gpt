@@ -15,7 +15,10 @@ CLIPS = ROOT / "tools/sprites/clips"
 SOURCES = ROOT / "art/sprites/source"
 SKIP = set()  # 22 P15 source atlases have pixelScale 1 on refreshed base
 MODEL_SHA = "b8a8376811077954d82ca3fcf476f1ac3da3e8a68a4f4d71363008000a18b75d"
-MAX_SIZE, MAX_DECODED, MARGIN = 4096, 64*1024*1024, 8
+MAX_SIZE, MAX_DECODED, MARGIN = 8192, 512*1024*1024, 8
+# These caps apply only to the intermediate untrimmed PNG sheet.
+# The final game atlas is independently box-trimmed to WebP and must stay
+# under 64MiB decoded (see incremental_build).
 
 def sha(data):
     return hashlib.sha256(data).hexdigest()
@@ -155,7 +158,7 @@ def render(name, weights, output_dir):
         cells=down
         chosen=candidate_grid(cells,round(rx*scale),round(ry*scale),cols)
     if chosen is None:
-        raise ValueError(f"{name}: 1.5x atlas still cannot fit 4096x4096 / 64MiB; no source was published")
+        raise ValueError(f"{name}: 1.5x intermediate grid exceeds 8192px / 512MiB; no source was published")
     sw,sh=cells[0].size
     chosen_cols=chosen["columns"]
     sheet=Image.new("RGBA",(sw*chosen_cols,sh*chosen["rows"]))
