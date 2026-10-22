@@ -30,7 +30,7 @@ TOL_BOLSO = 16
 LADO = 260 / 1280   # deslocamento das imagens laterais, fração da largura (p01)
 
 
-def recortar(base, bolsos):
+def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88):
     """RGBA da Base sem o fundo."""
     rgba = base.convert('RGBA')
     a = np.asarray(rgba).astype(int)
@@ -45,7 +45,7 @@ def recortar(base, bolsos):
     lum = rgb.mean(-1)
     yy = np.arange(h)[:, None].repeat(w, 1)
     # cor do fundo, ou cinza mais escuro no rodapé (sombra dos pés; atadura preta fica)
-    cand = (dif < TOL_FUNDO) | ((sat < 12) & (lum > 110) & (lum < fundo.mean() + 8) & (yy > h * 0.88))
+    cand = (dif < TOL_FUNDO) | ((sat < sombra_sat) & (lum > 110) & (lum < fundo.mean() + 8) & (yy > h * sombra_y))
     m = Image.fromarray((cand * 255).astype(np.uint8)).copy()
     for seed in [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1), (w // 2, 0), (w // 2, h - 1), (0, h // 2), (w - 1, h // 2)]:
         if m.getpixel(seed) == 255:
@@ -81,13 +81,16 @@ def main():
     ap.add_argument('--altura', type=float, default=0.77, help='altura do corpo, fração da tela')
     ap.add_argument('--chao', type=float, default=733 / 768, help='y do pé, fração da tela')
     ap.add_argument('--bolso', action='append', default=[], help='X0,Y0,X1,Y1 na Base')
+    ap.add_argument('--sombra-sat', type=int, default=12,
+                    help='saturação máxima da sombra do chão (sombra rabiscada e quente: ~26)')
+    ap.add_argument('--sombra-y', type=float, default=0.88, help='a sombra começa nesta fração da altura')
     ap.add_argument('--sufixo', default='', help='nome inicio_<lado><sufixo>.png, ex.: _h3')
     ap.add_argument('--previa', type=Path, help='grava aqui em vez de art/keys/<pacote>')
     args = ap.parse_args()
 
     w, h = (int(v) for v in args.tela.lower().split('x'))
     bolsos = [tuple(int(v) for v in b.split(',')) for b in args.bolso]
-    corpo = recortar(Image.open(args.base), bolsos)
+    corpo = recortar(Image.open(args.base), bolsos, args.sombra_sat, args.sombra_y)
     destino = args.previa or ROOT / 'art' / 'keys' / args.pacote
     destino.mkdir(parents=True, exist_ok=True)
     for nome, lado in (('centro', 0), ('esquerda', -1), ('direita', 1)):

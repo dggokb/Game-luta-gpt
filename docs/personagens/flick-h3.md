@@ -59,6 +59,17 @@ saem no mesmo tamanho.
 - A Base pode ter fundo cinza liso: sai por inundação a partir da borda, com a sombra dos pés.
   Fundo preso entre mechas de cabelo precisa de `--bolso` (retângulo, em px da Base). Conferir a
   prévia sobre o verde antes de gerar vídeo.
+- Sombra do chão rabiscada e puxada para o quente (p16) prende o fundo entre as pernas:
+  `--sombra-sat 26 --sombra-y 0.85` (padrão 12 e 0,88). A cor de pele, meia creme e tênis
+  ficam: só sai o que é quase cinza.
+- **Personagem mais baixo ou mais alto que o p15:** `--altura` proporcional, medido pelo rosto
+  (orelha, distância orelha–olho), não pela silhueta (guarda aberta e cabelo volumoso enganam), e
+  a mesma escala 0,4103 no `tamanho.json`. p16: `--altura 0.70`.
+
+```
+python3 tools/sprites/inicio_da_base.py p16 base.webp --altura 0.70 --sombra-sat 26 --sombra-y 0.85 \
+    --bolso 280,0,640,150 --bolso 220,150,470,345
+```
 - `inicio_agachado_h3` sai de um quadro do vídeo de agachar feito com a guarda nova. Conferir
   com o `regua.py` que os clipes velhos e novos saem no mesmo tamanho (aviso fora de ±3%).
 
