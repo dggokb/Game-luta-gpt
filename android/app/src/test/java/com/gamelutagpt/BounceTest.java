@@ -257,6 +257,26 @@ public class BounceTest {
         assertEquals("a janela foi usada", 0, s.f(0).wallChase);
     }
 
+    /** Acertando, a corrida corta a recuperação do H: sai logo depois da parte ativa. */
+    @Test public void wallChaseRunCutsTheHeavyRecoveryOnHit() {
+        Sim s = new Sim(500f, 600f);
+        s.chainToHeavy();
+        CombatFighter a = s.f(0);
+        AttackDefinition heavy = a.attack;
+        assertNotNull("ainda no H", heavy);
+        int restante = heavy.totalFrames - a.attackFrame;
+        s.in[0].direction = 1;
+        int quadros = 0;
+        while (quadros < 60 && !a.forwardDashing) {
+            s.step();
+            quadros++;
+        }
+        assertTrue("segurando → depois da parede, corre", a.forwardDashing);
+        assertTrue("corre antes de acabar a recuperação (" + quadros + " de " + restante + ")",
+            quadros < restante);
+        assertFalse("o H foi cortado", a.attacking());
+    }
+
     @Test public void holdingForwardInNeutralOnlyWalks() {
         Sim s = new Sim(500f, 900f);
         s.in[0].direction = 1;

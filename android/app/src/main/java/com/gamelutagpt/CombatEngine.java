@@ -528,6 +528,15 @@ final class CombatEngine {
         return f.wallChase > 0 && !f.forwardDashing && MotionParser.relative(f.input.direction, f.facing) == 1;
     }
 
+    /**
+     * O golpe que jogou na parede e acertou corta a própria recuperação quando o jogador segura →:
+     * a corrida sai logo depois da parte ativa. Errando ou na defesa, a animação vai inteira.
+     */
+    private static boolean wallChaseCancel(CombatFighter f) {
+        return f.attacking() && f.grounded && f.outcome == CombatFighter.Outcome.HIT &&
+            f.attackFrame >= f.attack.startupFrames + f.attack.activeFrames && wallChaseRun(f);
+    }
+
     private void requestJump(CombatFighter f, boolean superJump) {
         f.pendingJumpAge = 0;
         f.pendingSuperJump = superJump;
@@ -590,6 +599,11 @@ final class CombatEngine {
             if (giveUp || f.status != CombatFighter.Status.NEUTRAL) f.breakerChase = 0;
             else if (breakerChasing(f)) f.forwardDashing = true;
             else if (f.grounded) f.breakerChase = 0;
+        }
+
+        if (wallChaseCancel(f)) {
+            f.status = CombatFighter.Status.NEUTRAL;
+            f.clearAttack();
         }
 
         if (f.status == CombatFighter.Status.NEUTRAL && f.grounded && !f.busyOnGround()) {

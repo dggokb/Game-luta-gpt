@@ -506,8 +506,10 @@ combo**, `CombatConfig.maxWallBounces` / `maxGroundBounces`). Valores em
 - Rotas: L → M → H (wall bounce) → dash → M → 2H (launcher) → super pulo → jL → jM → jH
   (ground bounce) → ... ; com a barra, Super ou ultra no fim.
 - **Corrida automática depois da parede** (`CombatConfig.wallChaseFrames`, 54): depois do H que
-  quicou na parede, segurar **→** já sai correndo quando o golpe acaba, sem o → →. É o mesmo
-  atalho do 2H, que transforma o pulo em super pulo sem o ↓ ↑.
+  quicou na parede, segurar **→** já sai correndo, sem o → →. Acertando, a corrida corta a
+  recuperação do H logo depois da parte ativa (`wallChaseCancel`); errando ou na defesa o H vai
+  inteiro. Assim um H de recuperação longa (a do p15, 34 quadros) não atrasa a perseguição. É o
+  mesmo atalho do 2H, que transforma o pulo em super pulo sem o ↓ ↑.
 - **Lançador no ar**: o 2H que pega o defensor já no ar (voltando da parede, por exemplo) o lança
   só até a altura de um lançamento do chão (`launchSpeed²/2·gravity`). Antes ele saía com a
   velocidade cheia de onde estava, ficava ~150 px acima de quem lançou durante todo o super
