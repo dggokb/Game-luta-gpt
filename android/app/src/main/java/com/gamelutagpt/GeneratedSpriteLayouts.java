@@ -2695,7 +2695,7 @@ final class GeneratedSpriteLayouts {
     static final int P15_RISE_FRAME_WIDTH = 176;
     static final int P15_RISE_FRAME_HEIGHT = 263;
     static final int P15_RISE_ROOT_X = 86;
-    static final int P15_RISE_ROOT_Y = 252;
+    static final int P15_RISE_ROOT_Y = 251;
     static final int P15_RISE_FRAME_COUNT = 6;
 
     static final int P15_SPECIAL_ENERGY_FRAME_WIDTH = 222;

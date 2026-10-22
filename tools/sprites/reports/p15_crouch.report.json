@@ -30,77 +30,77 @@
       "index": 1,
       "outputBbox": [
         22,
-        40,
+        41,
         175,
-        271
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 14419
     },
     {
       "index": 2,
       "outputBbox": [
         20,
-        51,
+        52,
         174,
-        270
+        271
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 17,
       "opaquePixels": 14257
     },
     {
       "index": 3,
       "outputBbox": [
         19,
-        65,
+        68,
         175,
-        269
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 14034
     },
     {
       "index": 4,
       "outputBbox": [
         19,
-        70,
+        74,
         175,
-        268
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 13880
     },
     {
       "index": 5,
       "outputBbox": [
         18,
-        81,
+        87,
         174,
-        266
+        272
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 16,
       "opaquePixels": 13561
     },
     {
       "index": 6,
       "outputBbox": [
         19,
-        86,
+        92,
         174,
-        265
+        271
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 17,
       "opaquePixels": 13530
     },
     {
       "index": 7,
       "outputBbox": [
         17,
-        88,
+        95,
         173,
-        265
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 13386
     }
   ],
@@ -133,7 +133,7 @@
         168,
         244,
         8,
-        15
+        16
       ],
       [
         0,
@@ -141,7 +141,7 @@
         168,
         232,
         7,
-        26
+        27
       ],
       [
         0,
@@ -149,7 +149,7 @@
         168,
         216,
         5,
-        40
+        43
       ],
       [
         0,
@@ -157,7 +157,7 @@
         168,
         212,
         6,
-        45
+        49
       ],
       [
         0,
@@ -165,7 +165,7 @@
         168,
         196,
         4,
-        56
+        62
       ],
       [
         0,
@@ -173,7 +173,7 @@
         168,
         192,
         5,
-        61
+        67
       ],
       [
         0,
@@ -181,7 +181,7 @@
         168,
         192,
         4,
-        63
+        70
       ]
     ],
     "decodedBytes": {
@@ -193,8 +193,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "86b91f473742046a631ac49ede45c315d4e7f72d574b7197df691c9cd230aa60",
-      "config": "560ab63e33b0f69fd924cf046bebf0cb5e55f61ece2d8ccd0b868d0fd4808646",
+      "source": "4c7750055a9a2d02cf2a7a33075e7707bb4146245e7a70e1e92cb1fc25fad559",
+      "config": "3ad4237cd036c00f968bed04862694bbbef8564cf18d6e6a3ee71b50cdd1682a",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
     }
   }

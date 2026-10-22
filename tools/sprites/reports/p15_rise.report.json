@@ -19,20 +19,20 @@
       "index": 0,
       "outputBbox": [
         18,
-        88,
+        95,
         173,
-        264
+        271
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 17,
       "opaquePixels": 12808
     },
     {
       "index": 1,
       "outputBbox": [
         17,
-        83,
+        90,
         173,
-        264
+        271
       ],
       "minimumMargin": 17,
       "opaquePixels": 12818
@@ -41,44 +41,44 @@
       "index": 2,
       "outputBbox": [
         18,
-        73,
+        80,
         174,
-        265
+        272
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 16,
       "opaquePixels": 12934
     },
     {
       "index": 3,
       "outputBbox": [
         19,
-        57,
+        61,
         174,
-        267
+        271
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 17,
       "opaquePixels": 13172
     },
     {
       "index": 4,
       "outputBbox": [
         21,
-        40,
+        42,
         174,
-        269
+        271
       ],
-      "minimumMargin": 18,
+      "minimumMargin": 17,
       "opaquePixels": 13517
     },
     {
       "index": 5,
       "outputBbox": [
         20,
-        28,
+        29,
         174,
-        271
+        272
       ],
-      "minimumMargin": 17,
+      "minimumMargin": 16,
       "opaquePixels": 13764
     }
   ],
@@ -87,12 +87,12 @@
     "frameWidth": 176,
     "frameHeight": 263,
     "rootX": 86,
-    "rootY": 252,
+    "rootY": 251,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
       8,
-      18
+      19
     ],
     "sheetWidth": 168,
     "sheetHeight": 1336,
@@ -103,7 +103,7 @@
         168,
         192,
         4,
-        64
+        70
       ],
       [
         0,
@@ -111,7 +111,7 @@
         168,
         196,
         4,
-        59
+        65
       ],
       [
         0,
@@ -119,7 +119,7 @@
         168,
         204,
         5,
-        49
+        55
       ],
       [
         0,
@@ -127,7 +127,7 @@
         168,
         224,
         5,
-        33
+        36
       ],
       [
         0,
@@ -135,7 +135,7 @@
         168,
         244,
         7,
-        16
+        17
       ],
       [
         0,
@@ -155,8 +155,8 @@
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "332f164842660be8aa8015973667299eceb200fd6f8b0257ecb5ee26b55e9c37",
-      "config": "e2d5886c5758a0cbaad838f0f485291fdee855c70da4d1414b221f62814ff359",
+      "source": "667b9c1e345d7491593e4a1da52c3e2ca445b250427ea1cd8957162758b547fd",
+      "config": "74b0fad7ea30519d411bd0592a997a7dd3108e821ed6ec48227ffd4a237bd432",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
     }
   }
