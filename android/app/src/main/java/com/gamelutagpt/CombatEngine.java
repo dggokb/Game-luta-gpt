@@ -3035,15 +3035,16 @@ final class CombatEngine {
      * Golpe normal que acerta corta a própria recuperação (errando ou na defesa vai inteira, como
      * nos jogos de luta): termina depois da janela de cancelamento e de voltar à guarda. Quem
      * apanhou em pé perde o mesmo tanto de atordoamento, então a vantagem e os links não mudam;
-     * caído, girando ou voando para a parede, quem bateu fica livre para ir atrás.
+     * girando ou voando para a parede, quem bateu fica livre para ir atrás. Derrubado, não corta.
      */
     private void cutRecoveryOnHit(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean flying) {
         if (attack.kind != AttackDefinition.Kind.NORMAL || attack.maxHits > 1 || !a.grounded || a.attack != attack) return;
         int last = hitCutLastFrame(attack);
         if (last < 0) return;
         boolean standing = d.status == CombatFighter.Status.HITSTUN;
-        // Lançado para o combo no ar: a recuperação continua a do golpe.
-        if (!standing && !flying && d.status != CombatFighter.Status.KNOCKDOWN) return;
+        // Derrubado (a rasteira) não emenda nada: a animação vai inteira. Lançado para o combo no
+        // ar também: a recuperação continua a do golpe.
+        if (!standing && !flying) return;
         a.hitCutFrame = last;
         a.hitCutStun = standing;
     }

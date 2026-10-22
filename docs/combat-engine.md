@@ -1017,8 +1017,9 @@ Só apresentação; o frame data não muda (fora o congelamento extra abaixo).
   no chão, que acerta termina depois da janela de cancelamento do acerto e de voltar à guarda
   (`hitCutGuardFrames`, 3), em vez de ficar parado em guarda o resto da recuperação (no H do
   p15 eram ~0,6 s sem poder andar). Quem apanhou em pé perde o mesmo tanto de atordoamento no
-  momento do corte, então a vantagem e os links não mudam; derrubado, girando ou indo para a
-  parede, quem bateu fica livre para ir atrás. Cancelado no golpe seguinte, nada é cortado.
+  momento do corte, então a vantagem e os links não mudam; girando ou indo para a parede, quem
+  bateu fica livre para ir atrás. Golpe que derruba (a rasteira) vai inteiro: não emenda nada.
+  Cancelado no golpe seguinte, nada é cortado.
   A CPU emenda o próximo passo da rota como link logo depois do corte (`linkAfterCut`) e não
   segura a defesa por hábito com o rival atordoado ou deitado.
 
