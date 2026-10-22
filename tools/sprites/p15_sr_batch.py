@@ -262,7 +262,7 @@ def incremental_build(changed_entries):
                 if sources:
                     rep["provenance"]["referenceSources"]={
                         p:sha((ROOT/p).read_bytes()) for p in sources}
-                (ROOT/cfg["report"]).write_text(json.dumps(rep,indent=2)+"\\n")
+                (ROOT/cfg["report"]).write_text(json.dumps(rep,indent=2)+"\n")
                 print("REPACKED WEBP:",cfg["id"],rep["packed"]["sheetWidth"],rep["packed"]["sheetHeight"],flush=True)
             else:
                 rep=json.loads((ROOT/cfg["report"]).read_text())
