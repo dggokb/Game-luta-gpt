@@ -27,10 +27,11 @@ ROOT = Path(__file__).resolve().parents[2]
 VERDE = (0, 255, 0, 255)
 TOL_FUNDO = 18      # diferença máxima (por canal) para a cor do fundo
 TOL_BOLSO = 16
+TOL_FRANJA = 60     # na borda, diferença do fundo a partir da qual o pixel é todo desenho
 LADO = 260 / 1280   # deslocamento das imagens laterais, fração da largura (p01)
 
 
-def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88):
+def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88, desfranja=0):
     """RGBA da Base sem o fundo."""
     rgba = base.convert('RGBA')
     a = np.asarray(rgba).astype(int)
@@ -57,6 +58,19 @@ def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88):
         fora |= caixa & (dif < TOL_BOLSO)
     alfa = Image.fromarray(((~fora) * 255).astype(np.uint8))
     alfa = alfa.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.6))
+    if desfranja:
+        # Franja clara em volta das mechas: o pixel da borda é mistura do desenho com o fundo.
+        # Perto do fundo, quanto mais parecido com ele, mais transparente, e a cor do fundo sai
+        # da mistura (o pixel fica com a cor da mecha).
+        borda = np.asarray(Image.fromarray((fora * 255).astype(np.uint8)).filter(
+            ImageFilter.MaxFilter(2 * desfranja + 1))) > 0
+        a = np.clip(dif / TOL_FRANJA, 0, 1)
+        a = np.where(borda, a, 1.0)
+        alfa = Image.fromarray(np.minimum(np.asarray(alfa), (a * 255).astype(np.uint8)))
+        cor = np.clip((rgb - (1 - a[..., None]) * fundo) / np.maximum(a, 1e-3)[..., None], 0, 255)
+        px = np.asarray(rgba).copy()
+        px[..., :3] = np.where(borda[..., None], cor, rgb).astype(np.uint8)
+        rgba = Image.fromarray(px)
     rgba.putalpha(alfa)
     return rgba
 
@@ -84,13 +98,15 @@ def main():
     ap.add_argument('--sombra-sat', type=int, default=12,
                     help='saturação máxima da sombra do chão (sombra rabiscada e quente: ~26)')
     ap.add_argument('--sombra-y', type=float, default=0.88, help='a sombra começa nesta fração da altura')
+    ap.add_argument('--desfranja', type=int, default=0,
+                    help='px da borda onde a franja clara do fundo antigo sai (cabelo de mechas finas: 2)')
     ap.add_argument('--sufixo', default='', help='nome inicio_<lado><sufixo>.png, ex.: _h3')
     ap.add_argument('--previa', type=Path, help='grava aqui em vez de art/keys/<pacote>')
     args = ap.parse_args()
 
     w, h = (int(v) for v in args.tela.lower().split('x'))
     bolsos = [tuple(int(v) for v in b.split(',')) for b in args.bolso]
-    corpo = recortar(Image.open(args.base), bolsos, args.sombra_sat, args.sombra_y)
+    corpo = recortar(Image.open(args.base), bolsos, args.sombra_sat, args.sombra_y, args.desfranja)
     destino = args.previa or ROOT / 'art' / 'keys' / args.pacote
     destino.mkdir(parents=True, exist_ok=True)
     for nome, lado in (('centro', 0), ('esquerda', -1), ('direita', 1)):
