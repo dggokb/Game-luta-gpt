@@ -28,10 +28,11 @@ VERDE = (0, 255, 0, 255)
 TOL_FUNDO = 18      # diferença máxima (por canal) para a cor do fundo
 TOL_BOLSO = 16
 TOL_FRANJA = 60     # na borda, diferença do fundo a partir da qual o pixel é todo desenho
+HALO_SAT, HALO_LUM = 95, 140   # contorno claro do cabelo: menos saturado que o vermelho e a pele
 LADO = 260 / 1280   # deslocamento das imagens laterais, fração da largura (p01)
 
 
-def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88, desfranja=0):
+def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88, desfranja=0, halo=0, sem_halo=()):
     """RGBA da Base sem o fundo."""
     rgba = base.convert('RGBA')
     a = np.asarray(rgba).astype(int)
@@ -56,6 +57,19 @@ def recortar(base, bolsos, sombra_sat=12, sombra_y=0.88, desfranja=0):
         caixa = np.zeros_like(fora)
         caixa[y0:y1, x0:x1] = True
         fora |= caixa & (dif < TOL_BOLSO)
+    if halo:
+        # Contorno claro das mechas (brilho rosado do desenho, não a cor do fundo): dentro dos
+        # bolsos (o cabelo), pixel claro e pouco saturado colado no fundo sai. O vermelho do
+        # cabelo e a pele são saturados e ficam; sem_halo protege o que é claro de verdade.
+        zona = np.zeros_like(fora)
+        for x0, y0, x1, y1 in bolsos:
+            zona[y0:y1, x0:x1] = True
+        for x0, y0, x1, y1 in sem_halo:
+            zona[y0:y1, x0:x1] = False
+        claro = (sat < HALO_SAT) & (lum > HALO_LUM)
+        for _ in range(halo):
+            perto = np.asarray(Image.fromarray((fora * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(3))) > 0
+            fora = fora | (perto & zona & claro)
     alfa = Image.fromarray(((~fora) * 255).astype(np.uint8))
     alfa = alfa.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.6))
     if desfranja:
@@ -98,6 +112,9 @@ def main():
     ap.add_argument('--sombra-sat', type=int, default=12,
                     help='saturação máxima da sombra do chão (sombra rabiscada e quente: ~26)')
     ap.add_argument('--sombra-y', type=float, default=0.88, help='a sombra começa nesta fração da altura')
+    ap.add_argument('--halo', type=int, default=0,
+                    help='px de contorno claro das mechas que sai, dentro dos bolsos (cabelo: 3)')
+    ap.add_argument('--sem-halo', action='append', default=[], help='X0,Y0,X1,Y1 claro de verdade (pompom)')
     ap.add_argument('--desfranja', type=int, default=0,
                     help='px da borda onde a franja clara do fundo antigo sai (cabelo de mechas finas: 2)')
     ap.add_argument('--sufixo', default='', help='nome inicio_<lado><sufixo>.png, ex.: _h3')
@@ -106,7 +123,9 @@ def main():
 
     w, h = (int(v) for v in args.tela.lower().split('x'))
     bolsos = [tuple(int(v) for v in b.split(',')) for b in args.bolso]
-    corpo = recortar(Image.open(args.base), bolsos, args.sombra_sat, args.sombra_y, args.desfranja)
+    sem_halo = [tuple(int(v) for v in b.split(',')) for b in args.sem_halo]
+    corpo = recortar(Image.open(args.base), bolsos, args.sombra_sat, args.sombra_y, args.desfranja,
+                     args.halo, sem_halo)
     destino = args.previa or ROOT / 'art' / 'keys' / args.pacote
     destino.mkdir(parents=True, exist_ok=True)
     for nome, lado in (('centro', 0), ('esquerda', -1), ('direita', 1)):

@@ -69,12 +69,15 @@ saem no mesmo tamanho.
 ```
 python3 tools/sprites/inicio_da_base.py p16 base.webp --altura 0.70 --sombra-sat 26 --sombra-y 0.85 \
     --bolso 150,0,640,150 --bolso 150,150,470,345 --bolso 470,130,700,215 --bolso 615,215,700,335 \
-    --desfranja 2
+    --desfranja 2 --halo 4 --sem-halo 435,75,515,150 --sem-halo 250,240,380,345
 ```
 
 - Cabelo de mechas finas e soltas: o fundo fica preso entre as mechas em volta de toda a cabeça,
   não só no rabo de cavalo. Cobrir a cabeça inteira com `--bolso`, deixando de fora só olhos e
   dentes (brancos de verdade). `--desfranja 2` tira a franja clara da borda das mechas.
+  O contorno rosado claro que o desenho tem nas mechas não é a cor do fundo e sobra como ponto
+  branco no verde: `--halo 4` tira, dentro dos bolsos, o pixel claro e pouco saturado colado no
+  fundo; `--sem-halo` protege o que é claro de verdade ali dentro (pompom, dedos).
 - Conferir a prévia ampliada na cabeça (zoom 3–4×): em tamanho normal o branco entre as mechas
   passa despercebido.
 - `inicio_agachado_h3` sai de um quadro do vídeo de agachar feito com a guarda nova. Conferir
