@@ -2,7 +2,7 @@
   "id": "p15_medium_kick",
   "javaName": "P15_MEDIUM_KICK",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_medium_kick_video_normalized.png",
+  "source": "art/sprites/source/p15_medium_kick_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_medium_kick.webp",
   "report": "tools/sprites/reports/p15_medium_kick.report.json",
   "preview": "android/app/build/sprite-review/p15_medium_kick-import.png",
@@ -25,8 +25,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "frameWidth": 224,
-  "frameHeight": 288,
-  "rootX": 88,
-  "rootY": 270
+  "frameWidth": 448,
+  "frameHeight": 576,
+  "rootX": 176,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p15_medium_kick_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

@@ -2,7 +2,7 @@
   "id": "p15_special_energy",
   "javaName": "P15_SPECIAL_ENERGY",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_special_energy_video_normalized.png",
+  "source": "art/sprites/source/p15_special_energy_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_special_energy.webp",
   "report": "tools/sprites/reports/p15_special_energy.report.json",
   "preview": "android/app/build/sprite-review/p15_special_energy-import.png",
@@ -25,7 +25,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "rootX": 99,
-  "frameHeight": 288,
-  "rootY": 270
+  "rootX": 198,
+  "frameHeight": 576,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p15_special_energy_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }
