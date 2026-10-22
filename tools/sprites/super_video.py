@@ -8,7 +8,7 @@ grudado no canto de baixo do lado em que o lutador está; do lado direito ele é
 
     pip install -r tools/sprites/requirements-animar.txt
     python3 tools/sprites/super_video.py Entrada_Esquerda_Direita.mp4 --personagem p15 \\
-        --inicio 4 --fim 44 --passo 2 --fps 18 --marca 8,8,150,50
+        --inicio 4 --fim 44 --passo 2 --fps 18 --marca 8,8,150,50 --altura 0.6
 
     --inicio/--fim    trecho do vídeo (quadros, inclusive)
     --passo N         um quadro a cada N do vídeo (vídeo de 24 fps com quadros repetidos aos
@@ -18,6 +18,7 @@ grudado no canto de baixo do lado em que o lutador está; do lado direito ele é
     --saida MS        o retrato volta para a borda e some nesse tempo; aí o Super sai
     --marca x0,y0,x1,y1   apaga a marca d'água clara nesse retângulo do vídeo (o cabelo escuro
                       que passa por cima fica)
+    --altura A        o retrato com A da altura da tela (1 = a tela toda; a p15 usa 0,6)
     --resolucao R     pixels guardados por pixel da tela (0,65: um quadro do tamanho da tela
                       ocupa 832x468; menos memória, ainda nítido ao fundo)
 
