@@ -5,6 +5,9 @@
     "inicio_centro": 0.5679,
     "inicio_agachado": 0.5698,
     "inicio_direita": 0.5679,
-    "inicio_esquerda": 0.5679
+    "inicio_esquerda": 0.5679,
+    "inicio_centro_h3": 0.4103,
+    "inicio_esquerda_h3": 0.4103,
+    "inicio_direita_h3": 0.4103
   }
 }

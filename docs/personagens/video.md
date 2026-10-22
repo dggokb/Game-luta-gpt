@@ -1,5 +1,7 @@
 # Animação por vídeo (Seedance) — padrão
 
+> **Flick com MiniMax H3 (desde 22/10/2026):** onde gerar, preço, tamanho das imagens iniciais
+> (77% da altura, `inicio_da_base.py`) e o que muda no prompt estão em [flick-h3.md](flick-h3.md).
 > **Omni Flash 1.1 (Google Flow):** a fórmula de prompt, os pares de quadros de início e fim e
 > o jab com quadro final estão em [omni-flash.md](omni-flash.md). As regras abaixo continuam valendo.
 
