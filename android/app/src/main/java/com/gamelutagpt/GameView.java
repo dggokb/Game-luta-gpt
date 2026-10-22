@@ -2208,11 +2208,12 @@ public class GameView extends SurfaceView
         effects.drawWorldOverlay(canvas, paint, superFlash.darkAlpha, 0, 0, 8);
         CombatFighter u = engine.fighter(superFlash.user);
         if (superFlash.introShowing()) {
-            // Entrada do Super: o retrato ao fundo, na tela (não no mundo), na borda do lado dele.
+            // Entrada do Super: o quadro de mangá com o retrato, na tela (não no mundo), do lado dele.
             canvas.save();
             canvas.translate(left, top);
             canvas.scale(1f / zoom, 1f / zoom);
-            entradaSuper.desenhar(canvas, u.character().id, superFlash.introAge, superFlash.introLeft);
+            entradaSuper.desenhar(canvas, u.character().id, superFlash.introAge, superFlash.introLeft,
+                u.state.profile.color);
             canvas.restore();
         }
         float x = u.x + (u.index == PLAYER ? tagOffset() : engine.teams.tagOffset(OPPONENT));

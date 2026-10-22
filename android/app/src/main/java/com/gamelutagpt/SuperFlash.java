@@ -18,6 +18,8 @@ final class SuperFlash {
     static final float DARKEN = 0.16f, POSE = 0.30f, FLASH = 0.12f, RELEASE = 0.20f, RECOVER = 0.22f;
     /** A cinemática do Super corpo a corpo toca mais rápido (as pancadas vêm logo depois do flash). */
     static final float STRIKING_SPEED = 2.4f;
+    /** Zoom a mais na entrada do Super (o mesmo do fim da pose: o foco inteiro em quem ativou). */
+    static final float INTRO_ZOOM = 0.36f;
     /** Escuro máximo do cenário (0–255). */
     static final int DARK = 190;
     /** Quadros do aviso de ativação: o corpo de quem ativou brilha e apaga. */
@@ -114,13 +116,15 @@ final class SuperFlash {
         }
         CombatFighter f = engine.fighter(user);
         if (introAge < intro) {
-            // Entrada: tudo parado, o escuro chega e a aura carrega enquanto o retrato passa.
+            // Entrada: tudo parado, o escuro chega e a aura carrega enquanto o retrato passa. A
+            // câmera já vai até o foco inteiro (quem ativou no meio da tela, o quadro ao lado).
             introAge++;
             float t = introAge * STEP;
             signal = introAge <= SIGNAL_FRAMES ? 1f - (introAge - 1) / (float)SIGNAL_FRAMES : 0f;
             float k = clamp(t / DARKEN);
             darkAlpha = Math.round(DARK * k);
-            zoom = 1f + 0.18f * k;
+            float z = clamp(t / (DARKEN + POSE));
+            zoom = 1f + INTRO_ZOOM * z * (2f - z);
             flashAlpha = 0;
             chargeTime = introCharge = Math.max(0f, t - DARKEN);
             return;
@@ -145,7 +149,7 @@ final class SuperFlash {
         } else if (t < flashStart) {
             float k = clamp((t - poseStart) / POSE);
             darkAlpha = DARK;
-            zoom = 1.18f + 0.18f * k;
+            zoom = intro > 0 ? 1f + INTRO_ZOOM : 1.18f + 0.18f * k;
             flashAlpha = 0;
         } else if (t < releaseStart) {
             float k = clamp((t - flashStart) / FLASH);
