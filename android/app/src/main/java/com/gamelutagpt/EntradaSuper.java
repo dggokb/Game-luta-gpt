@@ -37,20 +37,20 @@ final class EntradaSuper {
     /** Tinta e papel da página do Ultra (ArteProvisoria). */
     private static final int TINTA = 0xFF111114, PAPEL = 0xFFFFFFFF;
     /**
-     * O quadro no canto de baixo à esquerda da tela (cima-esq., cima-dir., baixo-dir., baixo-esq.),
-     * deitado como o retrato, acima do HUD de baixo e com o lado de dentro inclinado como num
+     * O quadro no lado esquerdo da tela (cima-esq., cima-dir., baixo-dir., baixo-esq.), logo abaixo
+     * do HUD de cima, deitado como o retrato e com o lado de dentro inclinado como num
      * corte de página. Do lado direito ele é espelhado. A direita fica antes do meio da tela,
      * onde a câmera põe quem ativou.
      */
-    private static final float[] QUADRO = {22f, 262f, 556f, 238f, 510f, 640f, 14f, 652f};
-    private static final float Q_ESQ = 14f, Q_DIR = 556f, Q_CIMA = 238f, Q_BAIXO = 652f;
+    private static final float[] QUADRO = {22f, 142f, 556f, 118f, 510f, 520f, 14f, 532f};
+    private static final float Q_ESQ = 14f, Q_DIR = 556f, Q_CIMA = 118f, Q_BAIXO = 532f;
     /**
      * Até onde o desenho pode ir dentro do quadro: o lado de dentro (o mais estreito, embaixo) e
      * o topo (o canto mais baixo, à esquerda), com folga da moldura. O lutador inteiro cabe
      * nisso, nunca cortado em cima nem no lado do punho; só embaixo (o vídeo já corta ali) e,
      * até {@link #CORTE_ENTRADA} da largura do vídeo, no lado por onde ele entra (o cabelo).
      */
-    private static final float LIVRE_DIR = 500f, LIVRE_CIMA = 276f;
+    private static final float LIVRE_DIR = 500f, LIVRE_CIMA = 156f;
     private static final float CORTE_ENTRADA = 0.08f;
     /** Onde as linhas de concentração convergem: o rosto, em fração do quadro do vídeo. */
     private static final float FOCO_X = 0.40f, FOCO_Y = 0.30f;
