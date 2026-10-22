@@ -14,18 +14,18 @@
   "video": {
     "arquivo": "agachar.mp4",
     "personagem": "p15",
-    "escala": 0.5689,
-    "medida": "1º quadro = inicio_centro (nota 0.96)",
-    "quadros": "66,69,72,75,78,81",
+    "escala": 0.411,
+    "medida": "1º quadro = inicio_centro_h3 (nota 0.97)",
+    "quadros": "89,91,93,95,97,99",
     "celula": 288,
     "largura": 192,
-    "raiz": "91,270",
+    "raiz": "94,270",
     "colunas": 6,
     "limpar_chao": true,
     "recorte_suave": true
   },
   "frameWidth": 192,
-  "rootX": 91,
+  "rootX": 94,
   "frameHeight": 288,
   "rootY": 270
 }
