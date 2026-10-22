@@ -33,6 +33,11 @@ jobs:
         run: |
           python -m py_compile tools/sprites/p15_sr_batch.py
           python tools/sprites/p15_sr_batch.py plan
+      - name: Create temporary draft GitHub Release for large intermediary sprite sheets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "p15-hd-staging-${GITHUB_RUN_ID}" --target "${GITHUB_SHA}" --title "Temporary P15 HD assets ${GITHUB_RUN_ID}" --notes "Intermediate verified sheets. Draft, cleared after successful promotion." --draft --prerelease
 
   render:
     needs: inventory
@@ -57,13 +62,11 @@ jobs:
       - name: Enhance only the supplied P15 frame atlas and preserve original alpha
         run: |
           python -u tools/sprites/p15_sr_batch.py render --clip "${{ matrix.clip }}" --weights /tmp/realesr-animevideov3.pth --output-dir /tmp/p15-hd-outputs
-      - name: Store enhanced sheet and integrity metadata for integration
-        uses: actions/upload-artifact@v4
-        with:
-          name: p15-${{ matrix.clip }}
-          path: /tmp/p15-hd-outputs/
-          retention-days: 1
-          if-no-files-found: error
+      - name: Save HD sheet directly in temporary GitHub Release, avoiding Actions storage quota
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "p15-hd-staging-${GITHUB_RUN_ID}"             "/tmp/p15-hd-outputs/${{ matrix.clip }}.png"             "/tmp/p15-hd-outputs/${{ matrix.clip }}.json"
 
   integrate:
     needs: [inventory, render]
@@ -79,12 +82,12 @@ jobs:
           python-version: '3.11'
       - name: Install exact current game raster dependency
         run: python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
-      - name: Retrieve 22 verified enhanced P15 source sheets
-        uses: actions/download-artifact@v4
-        with:
-          pattern: p15-p15_*
-          merge-multiple: true
-          path: /tmp/p15-hd-outputs
+      - name: Download 22 source sheets and hashes from temporary GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/p15-hd-outputs
+          gh release download "p15-hd-staging-${GITHUB_RUN_ID}"             --dir /tmp/p15-hd-outputs             --pattern 'p15_*.png' --pattern 'p15_*.json'
       - name: Check all 22 sheet and metadata pairs exist
         run: |
           test "$(find /tmp/p15-hd-outputs -maxdepth 1 -name '*.png' -type f | wc -l)" -eq 22
@@ -129,11 +132,27 @@ jobs:
           git diff --cached --quiet && { echo "P15 HD produced no changes"; exit 1; }
           git commit -m "Prepare 22 P15 HD WebP sprite atlases for review [skip ci]"
           git push origin HEAD:test/p15-all-sr-20261022
-      - name: Keep lightweight validation report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: P15-HD-Validation
-          path: docs/art/p15-all-sr-results.json
-          retention-days: 1
-          if-no-files-found: warn
+      - name: Promote approved P15 HD assets into game-luta-sprite-gpt if base is unchanged
+        run: |
+          set -euo pipefail
+          git fetch origin "game-luta-sprite-gpt:refs/remotes/origin/game-luta-sprite-gpt"
+          git fetch origin "test/p15-all-sr-20261022:refs/remotes/origin/test/p15-all-sr-20261022"
+          CURRENT="$(git rev-parse refs/remotes/origin/game-luta-sprite-gpt)"
+          EXPECTED="df24d82006baa5c712bd68f0e4afbd860524bd7e"
+          if [ "$CURRENT" != "$EXPECTED" ]; then
+            echo "The game branch has newer changes; P15 is safe on test branch. Refusing to overwrite another developer."
+            exit 1
+          fi
+          git checkout -B p15-approved refs/remotes/origin/game-luta-sprite-gpt
+          git restore --source=refs/remotes/origin/test/p15-all-sr-20261022 --staged --worktree --             'art/sprites/source/p15_*_sr_hd.png'             'tools/sprites/clips/p15_*.json'             'tools/sprites/reports/p15_*.report.json'             'android/app/src/main/res/drawable-nodpi/p15_*.webp'             'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java'             'android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java'             'android/app/src/main/java/com/gamelutagpt/SpriteStates.java'             'docs/art/p15-all-sr-results.json'
+          git diff --cached --check
+          test "$(git diff --cached --name-only -- 'art/sprites/source/p15_*_sr_hd.png' | wc -l)" -eq 22
+          test "$(git diff --cached --name-only -- 'android/app/src/main/res/drawable-nodpi/p15_*.webp' | wc -l)" -eq 22
+          git commit -m "Integra 22 animacoes HD aprovadas do P15 com atlases WebP atuais"
+          git push origin HEAD:game-luta-sprite-gpt
+          echo "P15 HD promoted to game-luta-sprite-gpt"
+      - name: Delete temporary asset release after verified merge (saves storage)
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete "p15-hd-staging-${GITHUB_RUN_ID}" --yes --cleanup-tag
