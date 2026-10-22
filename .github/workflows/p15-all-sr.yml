@@ -1,0 +1,139 @@
+name: P15 complete HD super-resolution (WebP runtime)
+
+on:
+  push:
+    branches:
+      - test/p15-all-sr-20261022
+    paths:
+      - .github/workflows/p15-all-sr.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: p15-hd-full-webp
+  cancel-in-progress: false
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Pillow matching current game runtime
+        run: python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - id: plan
+        name: Validate all 22 untouched P15 input sheets
+        run: |
+          python -m py_compile tools/sprites/p15_sr_batch.py
+          python tools/sprites/p15_sr_batch.py plan
+
+  render:
+    needs: inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install official CPU torch and image dependencies
+        run: |
+          python -m pip install --disable-pip-version-check --index-url https://download.pytorch.org/whl/cpu torch
+          python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt numpy scipy
+      - name: Download Real-ESRGAN AnimeVideo-v3 model with strict SHA validation
+        run: |
+          curl --retry 3 -fLsS "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesr-animevideov3.pth" -o /tmp/realesr-animevideov3.pth
+      - name: Enhance only the supplied P15 frame atlas and preserve original alpha
+        run: |
+          python -u tools/sprites/p15_sr_batch.py render --clip "${{ matrix.clip }}" --weights /tmp/realesr-animevideov3.pth --output-dir /tmp/p15-hd-outputs
+      - name: Store enhanced sheet and integrity metadata for integration
+        uses: actions/upload-artifact@v4
+        with:
+          name: p15-${{ matrix.clip }}
+          path: /tmp/p15-hd-outputs/
+          retention-days: 1
+          if-no-files-found: error
+
+  integrate:
+    needs: [inventory, render]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install exact current game raster dependency
+        run: python -m pip install --disable-pip-version-check -r tools/sprites/requirements.txt
+      - name: Retrieve 22 verified enhanced P15 source sheets
+        uses: actions/download-artifact@v4
+        with:
+          pattern: p15-p15_*
+          merge-multiple: true
+          path: /tmp/p15-hd-outputs
+      - name: Check all 22 sheet and metadata pairs exist
+        run: |
+          test "$(find /tmp/p15-hd-outputs -maxdepth 1 -name '*.png' -type f | wc -l)" -eq 22
+          test "$(find /tmp/p15-hd-outputs -maxdepth 1 -name '*.json' -type f | wc -l)" -eq 22
+      - name: Integrate only P15 and repack with the latest WebP runtime format
+        run: |
+          python -u tools/sprites/p15_sr_batch.py integrate --input-dir /tmp/p15-hd-outputs
+          git diff --check
+      - name: Enforce P15-only changes and no changes to other character sprites
+        run: |
+          python - <<'PY'
+          import subprocess
+          rows=subprocess.check_output(['git','status','--porcelain','-uall'],text=True).splitlines()
+          allowed=(
+            'art/sprites/source/p15_',
+            'tools/sprites/clips/p15_',
+            'tools/sprites/reports/p15_',
+            'android/app/src/main/res/drawable-nodpi/p15_',
+            'android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java',
+            'android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java',
+            'android/app/src/main/java/com/gamelutagpt/SpriteStates.java',
+            'docs/art/p15-all-sr-results.json',
+          )
+          for row in rows:
+              if not row[3:].startswith(allowed):
+                  raise SystemExit('Unexpected non-P15 change: '+row[3:])
+          print('P15-only improvements and global generated metadata:',len(rows),'paths')
+          PY
+      - name: Commit P15 HD WebP atlases on test branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- 'art/sprites/source/p15_*_sr_hd.png'
+          git add -- 'tools/sprites/clips/p15_*.json'
+          git add -- 'tools/sprites/reports/p15_*.report.json'
+          git add -- 'android/app/src/main/res/drawable-nodpi/p15_*.webp'
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedCharacters.java
+          git add -- android/app/src/main/java/com/gamelutagpt/GeneratedSpriteLayouts.java
+          git add -- android/app/src/main/java/com/gamelutagpt/SpriteStates.java
+          git add -- docs/art/p15-all-sr-results.json
+          git diff --cached --check
+          git diff --cached --quiet && { echo "P15 HD produced no changes"; exit 1; }
+          git commit -m "Prepare 22 P15 HD WebP sprite atlases for review [skip ci]"
+          git push origin HEAD:test/p15-all-sr-20261022
+      - name: Keep lightweight validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: P15-HD-Validation
+          path: docs/art/p15-all-sr-results.json
+          retention-days: 1
+          if-no-files-found: warn
