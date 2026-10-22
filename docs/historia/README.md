@@ -148,6 +148,10 @@ ep01 = 12 a 22).
 | meio | 15 a 21 | `pag4` a `pag10` (comuns) | iguais |
 | fim | 22 | `pag11` (conversa com o Dafu) | `pag11_koga` (sai do dojo pensando na dupla) |
 
+No ep03 (A Chegada), o Ryūga tem 4 páginas prontas antes do desafio no porto: `pag1_ryuga` (o cais do
+continente com a Yin-lu), `pag2_ryuga` (a revelação: o Kōga também vem), `pag3_ryuga` (a viagem e a ilha) e
+`pag4_ryuga` (a chegada no meio da multidão). As páginas do Kōga no ep03 ainda são provisórias.
+
 ## Revisar no PC
 
 ```bash
