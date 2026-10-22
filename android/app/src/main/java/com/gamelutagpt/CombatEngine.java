@@ -674,9 +674,9 @@ final class CombatEngine {
         switch (f.status) {
             case ATTACK:
                 if (f.hitCutFrame >= 0 && f.attackFrame >= f.hitCutFrame && f.attackFrame < f.attack.totalFrames - 1) {
-                    // Corte da recuperação no acerto: o rival em pé perde o mesmo tanto de atordoamento.
+                    // Corte da recuperação: o rival atordoado (acerto ou defesa) perde o mesmo tanto.
                     CombatFighter rival = fighters[1 - f.index];
-                    if (f.hitCutStun && rival.status == CombatFighter.Status.HITSTUN) {
+                    if (rival.status == CombatFighter.Status.HITSTUN || rival.status == CombatFighter.Status.BLOCKSTUN) {
                         int cut = f.attack.totalFrames - 1 - f.attackFrame;
                         rival.stunLeft = Math.max(1, rival.stunLeft - cut);
                         rival.stunTotal = Math.max(1, rival.stunTotal - cut);
@@ -2712,6 +2712,9 @@ final class CombatEngine {
             if (multi) a.strikeBlocked = true;
             if (!lastStrike) d.stunLeft = d.stunTotal = Math.max(d.stunLeft, holdUntil);
             if (ownerMove && a.outcome == CombatFighter.Outcome.NONE) a.outcome = CombatFighter.Outcome.BLOCK;
+            // A rasteira defendida não termina a animação: corta como no acerto (vantagem igual).
+            if (ownerMove && lastStrike && !projectile && attack.launch == AttackDefinition.Launch.KNOCKDOWN &&
+                d.status == CombatFighter.Status.BLOCKSTUN) cutRecovery(a, attack, attack.blockWindow);
             return;
         }
 
@@ -2880,7 +2883,12 @@ final class CombatEngine {
         if (d.ko()) stop += config.koHitstopBonus;
         freeze(a, d, stop, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
-        if (ownerMove && lastStrike && !projectile) cutRecoveryOnHit(a, d, attack, punish || spinHit || wallBounce);
+        // Em pé, girando ou indo para a parede corta; derrubado (a rasteira) não emenda nada e vai
+        // inteiro, como lançado para o combo no ar.
+        if (ownerMove && lastStrike && !projectile &&
+            (d.status == CombatFighter.Status.HITSTUN || punish || spinHit || wallBounce)) {
+            cutRecovery(a, attack, attack.hitWindow);
+        }
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
     }
 
@@ -3032,27 +3040,27 @@ final class CombatEngine {
     }
 
     /**
-     * Golpe normal que acerta corta a própria recuperação (errando ou na defesa vai inteira, como
-     * nos jogos de luta): termina depois da janela de cancelamento e de voltar à guarda. Quem
-     * apanhou em pé perde o mesmo tanto de atordoamento, então a vantagem e os links não mudam;
-     * girando ou voando para a parede, quem bateu fica livre para ir atrás. Derrubado, não corta.
+     * Golpe normal que acerta corta a própria recuperação (errando vai inteira, como nos jogos de
+     * luta): termina depois da janela de cancelamento e de voltar à guarda. Quem levou o golpe
+     * em pé perde o mesmo tanto de atordoamento no corte, então a vantagem e os links não mudam;
+     * girando ou voando para a parede, quem bateu fica livre para ir atrás.
      */
-    private void cutRecoveryOnHit(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean flying) {
+    private void cutRecovery(CombatFighter a, AttackDefinition attack, AttackDefinition.Window window) {
         if (attack.kind != AttackDefinition.Kind.NORMAL || attack.maxHits > 1 || !a.grounded || a.attack != attack) return;
-        int last = hitCutLastFrame(attack);
+        int last = hitCutLastFrame(attack, window);
         if (last < 0) return;
-        boolean standing = d.status == CombatFighter.Status.HITSTUN;
-        // Derrubado (a rasteira) não emenda nada: a animação vai inteira. Lançado para o combo no
-        // ar também: a recuperação continua a do golpe.
-        if (!standing && !flying) return;
         a.hitCutFrame = last;
-        a.hitCutStun = standing;
     }
 
     /** Último quadro do golpe normal que acertou (a recuperação corta aí), ou -1 se vai inteira. */
     int hitCutLastFrame(AttackDefinition attack) {
+        return hitCutLastFrame(attack, attack.hitWindow);
+    }
+
+    /** O mesmo, depois da janela de cancelamento dada (a do acerto ou a da defesa). */
+    int hitCutLastFrame(AttackDefinition attack, AttackDefinition.Window window) {
         int last = attack.startupFrames + attack.activeFrames - 1 + config.hitCutGuardFrames;
-        if (attack.hitWindow != null) last = Math.max(last, attack.hitWindow.end);
+        if (window != null) last = Math.max(last, window.end);
         return last < attack.totalFrames - 1 ? last : -1;
     }
 

@@ -3447,9 +3447,10 @@ public class GameView extends SurfaceView
             if (f.move != null) {
                 if (f.move.animation != null) {
                     animation = f.move.animation.id;
-                    // Conectou: segura a pose do impacto (no congelamento) e volta seco.
+                    // Recuperação cortada no contato: volta seco à guarda até o corte. Sem corte
+                    // (errou, defendido, derrubou) a animação vai inteira.
                     animationElapsed = ImpactFeel.snapBackTime(f.move, f.attackFrame,
-                        f.outcome != CombatFighter.Outcome.NONE, FIXED_STEP);
+                        f.hitCutFrame >= 0, FIXED_STEP);
                 }
                 // Otherwise the move declared a pose: crouch flag or airborne physics below.
             } else {
