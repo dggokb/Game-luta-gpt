@@ -2,7 +2,7 @@
   "id": "p15_jump",
   "javaName": "P15_JUMP",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_jump_video_normalized.png",
+  "source": "art/sprites/source/p15_jump_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_jump.webp",
   "report": "tools/sprites/reports/p15_jump.report.json",
   "preview": "android/app/build/sprite-review/p15_jump-import.png",
@@ -24,8 +24,12 @@
     "pe_no_chao": true,
     "recorte_suave": true
   },
-  "frameWidth": 192,
-  "frameHeight": 320,
-  "rootX": 85,
-  "rootY": 302
+  "frameWidth": 384,
+  "frameHeight": 640,
+  "rootX": 170,
+  "rootY": 604,
+  "sourceReferences": [
+    "art/sprites/source/p15_jump_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

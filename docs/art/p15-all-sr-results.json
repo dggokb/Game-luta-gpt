@@ -1,0 +1,294 @@
+{
+  "totalAtlases": 22,
+  "alreadyApproved": [],
+  "generatedAtlases": 22,
+  "status": "batch integrated on isolated branch; APK visual review required",
+  "atlases": [
+    {
+      "id": "p15_backdash",
+      "expectedFrames": 10,
+      "pixelScale": 2.0,
+      "columns": 10,
+      "packed": {
+        "columns": 10,
+        "rows": 1,
+        "packedWidth": 397,
+        "packedHeight": 577,
+        "decodedBytes": 9162760
+      }
+    },
+    {
+      "id": "p15_crouch",
+      "expectedFrames": 8,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 1,
+        "packedWidth": 337,
+        "packedHeight": 512,
+        "decodedBytes": 5521408
+      }
+    },
+    {
+      "id": "p15_crouch_heavy",
+      "expectedFrames": 8,
+      "pixelScale": 2.0,
+      "columns": 8,
+      "packed": {
+        "columns": 8,
+        "rows": 1,
+        "packedWidth": 340,
+        "packedHeight": 536,
+        "decodedBytes": 5831680
+      }
+    },
+    {
+      "id": "p15_crouch_light",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 390,
+        "packedHeight": 435,
+        "decodedBytes": 4071600
+      }
+    },
+    {
+      "id": "p15_crouch_medium",
+      "expectedFrames": 83,
+      "pixelScale": 2.0,
+      "columns": 9,
+      "packed": {
+        "columns": 9,
+        "rows": 10,
+        "packedWidth": 862,
+        "packedHeight": 459,
+        "decodedBytes": 142436880
+      }
+    },
+    {
+      "id": "p15_dash",
+      "expectedFrames": 18,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 2,
+        "packedWidth": 463,
+        "packedHeight": 517,
+        "decodedBytes": 21064648
+      }
+    },
+    {
+      "id": "p15_fall",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 315,
+        "packedHeight": 623,
+        "decodedBytes": 4709880
+      }
+    },
+    {
+      "id": "p15_golpe_alto",
+      "expectedFrames": 13,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 2,
+        "packedWidth": 338,
+        "packedHeight": 597,
+        "decodedBytes": 17757168
+      }
+    },
+    {
+      "id": "p15_heavy_straight",
+      "expectedFrames": 79,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 8,
+        "packedWidth": 589,
+        "packedHeight": 561,
+        "decodedBytes": 116311008
+      }
+    },
+    {
+      "id": "p15_idle",
+      "expectedFrames": 58,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 6,
+        "packedWidth": 334,
+        "packedHeight": 515,
+        "decodedBytes": 45410640
+      }
+    },
+    {
+      "id": "p15_idle_2",
+      "expectedFrames": 32,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 360,
+        "packedHeight": 552,
+        "decodedBytes": 26231040
+      }
+    },
+    {
+      "id": "p15_jump",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 335,
+        "packedHeight": 547,
+        "decodedBytes": 4397880
+      }
+    },
+    {
+      "id": "p15_land",
+      "expectedFrames": 4,
+      "pixelScale": 2.0,
+      "columns": 4,
+      "packed": {
+        "columns": 4,
+        "rows": 1,
+        "packedWidth": 296,
+        "packedHeight": 628,
+        "decodedBytes": 2974208
+      }
+    },
+    {
+      "id": "p15_light_jab",
+      "expectedFrames": 6,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 1,
+        "packedWidth": 404,
+        "packedHeight": 527,
+        "decodedBytes": 5109792
+      }
+    },
+    {
+      "id": "p15_medium_kick",
+      "expectedFrames": 14,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 2,
+        "packedWidth": 408,
+        "packedHeight": 520,
+        "decodedBytes": 18670080
+      }
+    },
+    {
+      "id": "p15_rise",
+      "expectedFrames": 9,
+      "pixelScale": 2.0,
+      "columns": 6,
+      "packed": {
+        "columns": 6,
+        "rows": 2,
+        "packedWidth": 336,
+        "packedHeight": 514,
+        "decodedBytes": 8289792
+      }
+    },
+    {
+      "id": "p15_special_energy",
+      "expectedFrames": 11,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 1,
+        "packedWidth": 430,
+        "packedHeight": 510,
+        "decodedBytes": 9649200
+      }
+    },
+    {
+      "id": "p15_special_s2",
+      "expectedFrames": 12,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 2,
+        "packedWidth": 344,
+        "packedHeight": 554,
+        "decodedBytes": 16770688
+      }
+    },
+    {
+      "id": "p15_special_s3",
+      "expectedFrames": 29,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 433,
+        "packedHeight": 530,
+        "decodedBytes": 30292680
+      }
+    },
+    {
+      "id": "p15_special_s4",
+      "expectedFrames": 37,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 4,
+        "packedWidth": 613,
+        "packedHeight": 724,
+        "decodedBytes": 78110912
+      }
+    },
+    {
+      "id": "p15_walk_back",
+      "expectedFrames": 24,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 3,
+        "packedWidth": 393,
+        "packedHeight": 533,
+        "decodedBytes": 27649908
+      }
+    },
+    {
+      "id": "p15_walk_forward",
+      "expectedFrames": 20,
+      "pixelScale": 2.0,
+      "columns": 11,
+      "packed": {
+        "columns": 11,
+        "rows": 2,
+        "packedWidth": 386,
+        "packedHeight": 555,
+        "decodedBytes": 18852240
+      }
+    }
+  ]
+}

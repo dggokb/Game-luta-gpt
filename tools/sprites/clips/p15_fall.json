@@ -2,7 +2,7 @@
   "id": "p15_fall",
   "javaName": "P15_FALL",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_fall_video_normalized.png",
+  "source": "art/sprites/source/p15_fall_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_fall.webp",
   "report": "tools/sprites/reports/p15_fall.report.json",
   "preview": "android/app/build/sprite-review/p15_fall-import.png",
@@ -24,8 +24,12 @@
     "pe_no_chao": true,
     "recorte_suave": true
   },
-  "frameWidth": 192,
-  "frameHeight": 352,
-  "rootX": 101,
-  "rootY": 334
+  "frameWidth": 384,
+  "frameHeight": 704,
+  "rootX": 202,
+  "rootY": 668,
+  "sourceReferences": [
+    "art/sprites/source/p15_fall_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

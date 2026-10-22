@@ -2,7 +2,7 @@
   "id": "p15_crouch",
   "javaName": "P15_CROUCH",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_crouch_video_normalized.png",
+  "source": "art/sprites/source/p15_crouch_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_crouch.webp",
   "report": "tools/sprites/reports/p15_crouch.report.json",
   "preview": "android/app/build/sprite-review/p15_crouch-import.png",
@@ -25,8 +25,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "frameWidth": 192,
-  "rootX": 89,
-  "frameHeight": 288,
-  "rootY": 270
+  "frameWidth": 384,
+  "rootX": 178,
+  "frameHeight": 576,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p15_crouch_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

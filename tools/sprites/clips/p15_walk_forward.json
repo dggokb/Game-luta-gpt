@@ -2,7 +2,7 @@
   "id": "p15_walk_forward",
   "javaName": "P15_WALK_FORWARD",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_walk_forward_video_normalized.png",
+  "source": "art/sprites/source/p15_walk_forward_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_walk_forward.webp",
   "report": "tools/sprites/reports/p15_walk_forward.report.json",
   "preview": "android/app/build/sprite-review/p15_walk_forward-import.png",
@@ -24,8 +24,12 @@
     "pe_no_chao": true,
     "recorte_suave": true
   },
-  "frameHeight": 320,
-  "rootX": 104,
-  "rootY": 302,
-  "frameWidth": 224
+  "frameHeight": 640,
+  "rootX": 208,
+  "rootY": 604,
+  "frameWidth": 448,
+  "sourceReferences": [
+    "art/sprites/source/p15_walk_forward_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

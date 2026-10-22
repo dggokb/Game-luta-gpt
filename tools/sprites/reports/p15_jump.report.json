@@ -1,16 +1,16 @@
 {
   "id": "p15_jump",
   "characterProfile": "p15",
-  "source": "art/sprites/source/p15_jump_video_normalized.png",
+  "source": "art/sprites/source/p15_jump_sr_hd.png",
   "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 192,
-    "frameHeight": 320,
-    "rootX": 85,
-    "rootY": 302,
+    "frameWidth": 384,
+    "frameHeight": 640,
+    "rootX": 170,
+    "rootY": 604,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,146 +18,151 @@
     {
       "index": 0,
       "outputBbox": [
-        18,
-        60,
-        173,
-        304
+        36,
+        120,
+        346,
+        608
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15168
+      "minimumMargin": 32,
+      "opaquePixels": 61064
     },
     {
       "index": 1,
       "outputBbox": [
-        18,
-        47,
-        147,
-        303
+        36,
+        93,
+        294,
+        607
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 14069
+      "minimumMargin": 33,
+      "opaquePixels": 56664
     },
     {
       "index": 2,
       "outputBbox": [
-        26,
-        43,
-        145,
-        304
+        52,
+        86,
+        290,
+        607
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 13813
+      "minimumMargin": 33,
+      "opaquePixels": 55501
     },
     {
       "index": 3,
       "outputBbox": [
-        29,
-        75,
-        147,
-        303
+        59,
+        149,
+        295,
+        610
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13042
+      "minimumMargin": 30,
+      "opaquePixels": 52598
     },
     {
       "index": 4,
       "outputBbox": [
-        30,
-        103,
-        148,
-        303
+        59,
+        206,
+        297,
+        606
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12324
+      "minimumMargin": 34,
+      "opaquePixels": 49813
     },
     {
       "index": 5,
       "outputBbox": [
-        29,
-        120,
-        149,
-        304
+        57,
+        240,
+        299,
+        609
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 11923
+      "minimumMargin": 31,
+      "opaquePixels": 48070
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 175,
-    "frameHeight": 281,
-    "rootX": 77,
-    "rootY": 269,
+    "frameWidth": 335,
+    "frameHeight": 547,
+    "rootX": 147,
+    "rootY": 530,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      8,
-      33
+      23,
+      74
     ],
-    "sheetWidth": 304,
-    "sheetHeight": 752,
+    "sheetWidth": 588,
+    "sheetHeight": 1476,
     "frames": [
       [
         0,
-        280,
-        168,
-        256,
+        544,
+        328,
+        508,
         4,
-        21
+        38
       ],
       [
-        136,
+        260,
         0,
-        144,
-        268,
-        4,
-        7
-      ],
-      [
-        0,
-        0,
-        132,
         276,
-        12,
+        532,
+        4,
+        10
+      ],
+      [
+        0,
+        0,
+        256,
+        540,
+        21,
         4
       ],
       [
-        172,
-        280,
-        132,
-        240,
-        15,
-        36
+        332,
+        544,
+        256,
+        476,
+        27,
+        67
       ],
       [
         0,
-        540,
-        132,
-        212,
-        15,
-        64
+        1056,
+        256,
+        420,
+        27,
+        123
       ],
       [
-        136,
-        540,
-        136,
-        196,
-        14,
-        81
+        260,
+        1056,
+        260,
+        388,
+        25,
+        157
       ]
     ],
     "decodedBytes": {
-      "canonical": 1474560,
-      "grid": 1180200,
-      "packed": 914432
-    }
+      "canonical": 5898240,
+      "grid": 4397880,
+      "packed": 3471552
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "475802f007e10fdfb3ee7360dc8002def28053fe3aec712322e046b8ac3abe32",
-      "config": "1e4ef7ba867bc8623d20ace9a2eda73c3cb64710471b3f570d55a260408b2a8f",
+      "source": "446063e36b220102194f2c636a845dd4f50143c708dd288f618fdb78e0af0da4",
+      "config": "e51674cd657ed304705f9b7efed599338599df032929c4563b7e05946cb92af9",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
+    },
+    "referenceSources": {
+      "art/sprites/source/p15_jump_video_normalized.png": "475802f007e10fdfb3ee7360dc8002def28053fe3aec712322e046b8ac3abe32"
     }
   }
 }

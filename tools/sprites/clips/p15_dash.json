@@ -2,7 +2,7 @@
   "id": "p15_dash",
   "javaName": "P15_DASH",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_dash_video_normalized.png",
+  "source": "art/sprites/source/p15_dash_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_dash.webp",
   "report": "tools/sprites/reports/p15_dash.report.json",
   "preview": "android/app/build/sprite-review/p15_dash-import.png",
@@ -26,7 +26,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "rootX": 160,
-  "frameHeight": 288,
-  "rootY": 269
+  "rootX": 320,
+  "frameHeight": 576,
+  "rootY": 538,
+  "sourceReferences": [
+    "art/sprites/source/p15_dash_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

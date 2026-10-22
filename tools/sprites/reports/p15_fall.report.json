@@ -1,16 +1,16 @@
 {
   "id": "p15_fall",
   "characterProfile": "p15",
-  "source": "art/sprites/source/p15_fall_video_normalized.png",
+  "source": "art/sprites/source/p15_fall_sr_hd.png",
   "sourceNote": "p15 gerado em v\u00eddeo (Seedance), convertido por tools/sprites/personagem.py (receita em \"video\").",
   "rootMode": "authored",
   "scale": 1,
   "worldScale": 1.075,
   "layout": {
-    "frameWidth": 192,
-    "frameHeight": 352,
-    "rootX": 101,
-    "rootY": 334,
+    "frameWidth": 384,
+    "frameHeight": 704,
+    "rootX": 202,
+    "rootY": 668,
     "columns": 6,
     "frameCount": 6
   },
@@ -18,146 +18,151 @@
     {
       "index": 0,
       "outputBbox": [
-        48,
-        149,
-        168,
-        335
+        95,
+        298,
+        337,
+        671
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12099
+      "minimumMargin": 33,
+      "opaquePixels": 48793
     },
     {
       "index": 1,
       "outputBbox": [
-        43,
-        136,
-        166,
-        335
+        86,
+        272,
+        332,
+        671
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 12828
+      "minimumMargin": 33,
+      "opaquePixels": 51750
     },
     {
       "index": 2,
       "outputBbox": [
-        36,
-        116,
-        164,
-        335
+        71,
+        231,
+        329,
+        671
       ],
-      "minimumMargin": 17,
-      "opaquePixels": 13595
+      "minimumMargin": 33,
+      "opaquePixels": 54995
     },
     {
       "index": 3,
       "outputBbox": [
-        30,
-        88,
-        162,
-        336
+        59,
+        177,
+        324,
+        673
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 14487
+      "minimumMargin": 31,
+      "opaquePixels": 58634
     },
     {
       "index": 4,
       "outputBbox": [
-        24,
-        63,
-        159,
-        337
+        49,
+        125,
+        318,
+        673
       ],
-      "minimumMargin": 15,
-      "opaquePixels": 15082
+      "minimumMargin": 31,
+      "opaquePixels": 60958
     },
     {
       "index": 5,
       "outputBbox": [
-        23,
-        38,
-        157,
-        336
+        47,
+        77,
+        315,
+        672
       ],
-      "minimumMargin": 16,
-      "opaquePixels": 15443
+      "minimumMargin": 32,
+      "opaquePixels": 62235
     }
   ],
   "passed": true,
   "packed": {
-    "frameWidth": 165,
-    "frameHeight": 319,
-    "rootX": 88,
-    "rootY": 306,
+    "frameWidth": 315,
+    "frameHeight": 623,
+    "rootX": 168,
+    "rootY": 605,
     "columns": 6,
     "frameCount": 6,
     "cropOffset": [
-      13,
-      28
+      34,
+      63
     ],
-    "sheetWidth": 300,
-    "sheetHeight": 792,
+    "sheetWidth": 580,
+    "sheetHeight": 1556,
     "frames": [
       [
-        140,
-        580,
-        136,
-        200,
-        28,
-        115
-      ],
-      [
-        0,
-        580,
-        136,
-        212,
-        24,
-        102
-      ],
-      [
-        148,
-        316,
-        144,
-        232,
-        17,
-        82
-      ],
-      [
-        0,
-        316,
-        144,
+        268,
+        1140,
         260,
-        11,
+        392,
+        52,
+        226
+      ],
+      [
+        0,
+        1140,
+        264,
+        416,
+        43,
+        200
+      ],
+      [
+        288,
+        620,
+        276,
+        456,
+        29,
+        160
+      ],
+      [
+        0,
+        620,
+        284,
+        516,
+        17,
+        105
+      ],
+      [
+        292,
+        0,
+        288,
+        568,
+        6,
         54
       ],
       [
-        152,
         0,
-        148,
+        0,
         288,
-        5,
-        29
-      ],
-      [
-        0,
-        0,
-        148,
-        312,
+        616,
         4,
         4
       ]
     ],
     "decodedBytes": {
-      "canonical": 1622016,
-      "grid": 1263240,
-      "packed": 950400
-    }
+      "canonical": 6488064,
+      "grid": 4709880,
+      "packed": 3609920
+    },
+    "pixelScale": 2.0
   },
+  "pixelScale": 2.0,
   "provenance": {
     "pipelineVersion": 2,
     "sha256": {
-      "source": "5650dd53ed24557c1ddd6bc9860220d9378b8220a695bf3db13efd281171f733",
-      "config": "a97890dc1d244874e8a64980a4d26cabd4a5177819a13683f33e09fdf16191cd",
+      "source": "d39bfa16d4b6f3fe78e7c46ba4668d5f5b7dea6e069a483651c69b1238d86dd4",
+      "config": "983843bddc491a4a0b4c1cdec8a8977bd2e213521c461ed8d11b213ab7a4f027",
       "profile": "9e6702e89a2a11150ae61011e5da49d363cf0aa712f4a9e78cecd9f77a916d52"
+    },
+    "referenceSources": {
+      "art/sprites/source/p15_fall_video_normalized.png": "5650dd53ed24557c1ddd6bc9860220d9378b8220a695bf3db13efd281171f733"
     }
   }
 }

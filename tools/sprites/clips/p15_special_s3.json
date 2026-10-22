@@ -2,7 +2,7 @@
   "id": "p15_special_s3",
   "javaName": "P15_SPECIAL_S3",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_special_s3_video_normalized.png",
+  "source": "art/sprites/source/p15_special_s3_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_special_s3.webp",
   "report": "tools/sprites/reports/p15_special_s3.report.json",
   "preview": "android/app/build/sprite-review/p15_special_s3-import.png",
@@ -24,7 +24,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "frameHeight": 288,
-  "rootX": 105,
-  "rootY": 270
+  "frameHeight": 576,
+  "rootX": 210,
+  "rootY": 540,
+  "sourceReferences": [
+    "art/sprites/source/p15_special_s3_video_normalized.png"
+  ],
+  "frameWidth": 512,
+  "pixelScale": 2.0
 }

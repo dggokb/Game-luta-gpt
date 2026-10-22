@@ -2,7 +2,7 @@
   "id": "p15_land",
   "javaName": "P15_LAND",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_land_video_normalized.png",
+  "source": "art/sprites/source/p15_land_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_land.webp",
   "report": "tools/sprites/reports/p15_land.report.json",
   "preview": "android/app/build/sprite-review/p15_land-import.png",
@@ -24,8 +24,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "frameWidth": 192,
-  "frameHeight": 352,
-  "rootX": 98,
-  "rootY": 334
+  "frameWidth": 384,
+  "frameHeight": 704,
+  "rootX": 196,
+  "rootY": 668,
+  "sourceReferences": [
+    "art/sprites/source/p15_land_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }

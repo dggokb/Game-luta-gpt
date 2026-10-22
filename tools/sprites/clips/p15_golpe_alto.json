@@ -2,7 +2,7 @@
   "id": "p15_golpe_alto",
   "javaName": "P15_GOLPE_ALTO",
   "profile": "p15.json",
-  "source": "art/sprites/source/p15_golpe_alto_video_normalized.png",
+  "source": "art/sprites/source/p15_golpe_alto_sr_hd.png",
   "output": "android/app/src/main/res/drawable-nodpi/p15_golpe_alto.webp",
   "report": "tools/sprites/reports/p15_golpe_alto.report.json",
   "preview": "android/app/build/sprite-review/p15_golpe_alto-import.png",
@@ -26,8 +26,12 @@
     "limpar_chao": true,
     "recorte_suave": true
   },
-  "frameWidth": 192,
-  "frameHeight": 320,
-  "rootX": 86,
-  "rootY": 302
+  "frameWidth": 384,
+  "frameHeight": 640,
+  "rootX": 172,
+  "rootY": 604,
+  "sourceReferences": [
+    "art/sprites/source/p15_golpe_alto_video_normalized.png"
+  ],
+  "pixelScale": 2.0
 }
