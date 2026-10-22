@@ -673,7 +673,17 @@ final class CombatEngine {
     private void endFinishedStates(CombatFighter f) {
         switch (f.status) {
             case ATTACK:
-                if (f.attackFrame >= f.attack.totalFrames - 1) {
+                if (f.hitCutFrame >= 0 && f.attackFrame >= f.hitCutFrame && f.attackFrame < f.attack.totalFrames - 1) {
+                    // Corte da recuperação no acerto: o rival em pé perde o mesmo tanto de atordoamento.
+                    CombatFighter rival = fighters[1 - f.index];
+                    if (f.hitCutStun && rival.status == CombatFighter.Status.HITSTUN) {
+                        int cut = f.attack.totalFrames - 1 - f.attackFrame;
+                        rival.stunLeft = Math.max(1, rival.stunLeft - cut);
+                        rival.stunTotal = Math.max(1, rival.stunTotal - cut);
+                    }
+                    f.status = CombatFighter.Status.NEUTRAL;
+                    f.clearAttack();
+                } else if (f.attackFrame >= f.attack.totalFrames - 1) {
                     f.status = CombatFighter.Status.NEUTRAL;
                     f.clearAttack();
                 }
@@ -2870,6 +2880,7 @@ final class CombatEngine {
         if (d.ko()) stop += config.koHitstopBonus;
         freeze(a, d, stop, projectile);
         if (ownerMove) a.outcome = CombatFighter.Outcome.HIT;
+        if (ownerMove && lastStrike && !projectile) cutRecoveryOnHit(a, d, attack, punish || spinHit || wallBounce);
         events.add(new HitEvent(a.index, d.index, damage, false, projectile, attack.id));
     }
 
@@ -3018,6 +3029,30 @@ final class CombatEngine {
         d.pushRemaining = distance;
         d.pushFramesLeft = distance == 0f ? 0 : config.pushbackFrames;
         d.pushSource = source;
+    }
+
+    /**
+     * Golpe normal que acerta corta a própria recuperação (errando ou na defesa vai inteira, como
+     * nos jogos de luta): termina depois da janela de cancelamento e de voltar à guarda. Quem
+     * apanhou em pé perde o mesmo tanto de atordoamento, então a vantagem e os links não mudam;
+     * caído, girando ou voando para a parede, quem bateu fica livre para ir atrás.
+     */
+    private void cutRecoveryOnHit(CombatFighter a, CombatFighter d, AttackDefinition attack, boolean flying) {
+        if (attack.kind != AttackDefinition.Kind.NORMAL || attack.maxHits > 1 || !a.grounded || a.attack != attack) return;
+        int last = hitCutLastFrame(attack);
+        if (last < 0) return;
+        boolean standing = d.status == CombatFighter.Status.HITSTUN;
+        // Lançado para o combo no ar: a recuperação continua a do golpe.
+        if (!standing && !flying && d.status != CombatFighter.Status.KNOCKDOWN) return;
+        a.hitCutFrame = last;
+        a.hitCutStun = standing;
+    }
+
+    /** Último quadro do golpe normal que acertou (a recuperação corta aí), ou -1 se vai inteira. */
+    int hitCutLastFrame(AttackDefinition attack) {
+        int last = attack.startupFrames + attack.activeFrames - 1 + config.hitCutGuardFrames;
+        if (attack.hitWindow != null) last = Math.max(last, attack.hitWindow.end);
+        return last < attack.totalFrames - 1 ? last : -1;
     }
 
     /** Hitstop: both bodies on a melee contact, only the defender for a projectile. */

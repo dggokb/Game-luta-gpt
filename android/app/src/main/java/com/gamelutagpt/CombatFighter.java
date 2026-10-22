@@ -87,6 +87,10 @@ final class CombatFighter {
     /** Index of the last frame of the attack that was played; -1 right after it starts. */
     int attackFrame = -1;
     Outcome outcome = Outcome.NONE;
+    /** Último quadro do golpe normal que acertou: a recuperação acaba aí (-1: vai inteira). */
+    int hitCutFrame = -1;
+    /** O rival atordoado em pé quando o golpe acertou: perde o mesmo tanto no corte. */
+    boolean hitCutStun;
     String specialStrength;
     /** Step of the autoCombo route this attack came from, or -1. */
     int autoStep = -1;
@@ -373,6 +377,8 @@ final class CombatFighter {
         move = null;
         attackFrame = -1;
         outcome = Outcome.NONE;
+        hitCutFrame = -1;
+        hitCutStun = false;
         specialStrength = null;
         autoStep = -1;
         hitsOnTarget = 0;

@@ -295,6 +295,8 @@ final class CombatConfig {
      * não mudam. Defesa não ganha. Com o hitstop do golpe dá ~9/12/15 quadros (fraco/médio/
      * forte), o que o Fatal Fury: City of the Wolves congela medido em gameplay (era 5/10/13).
      */
+    /** Golpe normal que acertou: quadros para voltar à guarda antes de a recuperação acabar. */
+    int hitCutGuardFrames = 3;
     int lightHitHoldFrames = 4;
     int mediumHitHoldFrames = 5;
     int heavyHitHoldFrames = 6;

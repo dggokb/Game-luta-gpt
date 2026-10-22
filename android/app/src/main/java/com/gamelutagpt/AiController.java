@@ -107,6 +107,8 @@ final class AiController {
     private AttackDefinition lastSeenAttack;
     private int lastSeenAttackFrame;
     private boolean stepDecided, stepGo, commitDecided, commitGo;
+    /** O golpe atual da rota acertou e vai ter a recuperação cortada (o próximo passo vira link). */
+    private boolean routeCut;
 
     // Defesa.
     private int guardFrames;
@@ -651,8 +653,9 @@ final class AiController {
             return false;
         }
         if (Math.abs(seen.x - me.x) >= threatRange(me, target)) return false;
-        // Rival deitado não ataca: ela fica de pé esperando ele levantar, não agachada defendendo.
-        if (seen.status == CombatFighter.Status.KNOCKDOWN) return false;
+        // Rival deitado ou atordoado pelo golpe dela não ataca: ela não fica agachada defendendo.
+        if (seen.status == CombatFighter.Status.KNOCKDOWN || seen.status == CombatFighter.Status.HITSTUN ||
+            seen.status == CombatFighter.Status.AIR_HITSTUN) return false;
         if (cooldown > 0 && roll(level.reactGuard * COOLDOWN_GUARD)) {
             // Perto e ainda sem poder atacar (o respiro entre os golpes dela): parada ali ela
             // levava o jab, rápido demais para defender reagindo. Segura a defesa até poder agir.
@@ -1047,6 +1050,7 @@ final class AiController {
 
     private void endRoute() {
         route = null;
+        routeCut = false;
         step = 0;
         awaitingStart = false;
         lastSeenAttack = null;
@@ -1080,6 +1084,7 @@ final class AiController {
         boolean fresh = me.attack != lastSeenAttack || me.attackFrame < lastSeenAttackFrame;
         lastSeenAttack = me.attack;
         lastSeenAttackFrame = me.attackFrame;
+        routeCut = me.hitCutFrame >= 0;
         if (fresh) {
             if (awaitingStart && matches(me.attack, route.get(step))) {
                 awaitingStart = false;
@@ -1199,8 +1204,39 @@ final class AiController {
             }
             return true;
         }
+        if (routeCut && linkAfterCut(engine, me, target, next, out)) return true;
         endRoute();
         return false;
+    }
+
+    /**
+     * O golpe dela acertou e a recuperação foi cortada antes de ela apertar o próximo passo: no
+     * chão, com o rival ainda atordoado, ele sai do neutro como link (a vantagem é a mesma que no
+     * fim da recuperação inteira). Mesmas decisões do passo dentro do golpe.
+     */
+    private boolean linkAfterCut(CombatEngine engine, CombatFighter me, CombatFighter target, String next, FighterInput out) {
+        if (!me.grounded || !target.inHitstun() || next.startsWith("j") || ComboBook.AIR_JUMP.equals(next)) return false;
+        if (!stepDecided) {
+            stepDecided = true;
+            stepGo = step + 1 < level.comboDepth && !roll(level.drop);
+        }
+        if (!stepGo) return false;
+        if (ComboBook.commits(next)) {
+            if (!hitSeen(engine)) return true;   // ainda não viu o acerto: espera
+            if (!commitDecided) {
+                commitDecided = true;
+                commitGo = roll(level.confirm);
+            }
+            if (!commitGo) return false;
+        }
+        if ("SUPER".equals(next) && !spendSuper(me, target)) {
+            if (me.state.profile.energy == null || engine.energyProjectileAlive(me.index)) return false;
+            next = "S";
+        }
+        if (!"S".equals(next) && !"SUPER".equals(next) &&
+            !alcanca(me.character(), next, projectedGap(me, target), target)) return false;
+        press(next, me, out);
+        return true;
     }
 
     /**

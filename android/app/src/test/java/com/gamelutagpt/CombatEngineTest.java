@@ -97,17 +97,19 @@ public class CombatEngineTest {
     // ------------------------------------------------------------ 2. only neutral or a valid cancel
 
     @Test public void attackStartsOnlyFromNeutralOrAValidCancel() {
-        // H on hit does not list L: L waits for H to end.
+        // H on hit does not list L: L waits for H to end (on hit, at the cut of its recovery).
         Sim s = close();
         s.in[0].heavy = true;
         s.step();
         s.until(() -> s.f(0).outcome == CombatFighter.Outcome.HIT, 30);
         AttackDefinition heavy = BASE.attack("H");
-        while (s.f(0).attacking() && s.f(0).attackFrame < heavy.totalFrames - 1) {
+        int lastHeavyFrame = -1;
+        while ("H".equals(s.attackId(0))) {
+            lastHeavyFrame = s.f(0).attackFrame;
             s.in[0].light = true;
             s.step();
-            if (s.f(0).attacking()) assertEquals("H", s.attackId(0));
         }
+        assertEquals("L only after H ends", s.engine.hitCutLastFrame(heavy), lastHeavyFrame);
         // L (on hit) lists M: the cancel happens inside the window, before L ends.
         Sim t = close();
         t.in[0].light = true;
@@ -201,7 +203,10 @@ public class CombatEngineTest {
                 s.step();
                 if (s.f(1).status == stun) assertFalse("No attack during " + stun, s.f(1).attacking());
             }
-            assertEquals(guard ? BASE.attack("M").blockstunFrames : BASE.attack("M").hitstunFrames, stunFrames);
+            // No acerto o corte da recuperação de quem bateu tira o mesmo tanto do atordoamento.
+            AttackDefinition medium = BASE.attack("M");
+            int cut = medium.totalFrames - 1 - s.engine.hitCutLastFrame(medium);
+            assertEquals(guard ? medium.blockstunFrames : medium.hitstunFrames - cut, stunFrames);
             assertTrue("Acts on the first free frame", s.f(1).attacking());
         }
     }
