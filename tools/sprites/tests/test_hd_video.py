@@ -110,8 +110,10 @@ class HdRecipeTests(unittest.TestCase):
             self.assertEqual(video.get('largura', video.get('celula', 256)) * d, cfg['frameWidth'], path.name)
             self.assertEqual(video.get('celula', 256) * d, cfg['frameHeight'], path.name)
             self.assertIn(video['referencia']['folha'], cfg['sourceReferences'], path.name)
-            with Image.open(Path(__file__).resolve().parents[3] / cfg['source']) as img:
-                self.assertLessEqual(max(img.size), 4096, path.name)
+            # A folha-fonte pode passar de 4096 px (79 quadros de 640 px não cabem); o que vai para
+            # a GPU é a folha empacotada, só com o desenhado de cada quadro, e essa cabe.
+            report = json.loads((Path(__file__).resolve().parents[3] / cfg['report']).read_text(encoding='utf-8'))
+            self.assertLessEqual(max(report['packed']['sheetWidth'], report['packed']['sheetHeight']), 4096, path.name)
 
 
 if __name__ == '__main__':

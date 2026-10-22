@@ -619,16 +619,16 @@
   "receita": "forte",
   "medida": "1º quadro = inicio_centro_h3 (nota 0.97)",
   "fator_optico": 1.0,
-  "cadeia": null,
-  "cadeia_nota": "sem folha do vídeo",
+  "cadeia": 1.002079788239743,
+  "cadeia_nota": "",
   "inicio": {
    "fator": 1.0066127782451924,
-   "nota": 0.9682919383049011,
+   "nota": 0.9738873839378357,
    "quadro": 78,
    "ref": "inicio_centro"
   },
   "cabeca": {
-   "fator": 0.9903510499272683,
+   "fator": 1.0098407431374403,
    "min": 0.9708613567170963,
    "max": 1.4391761441250384,
    "zoom": false,
@@ -641,7 +641,7 @@
     "45": 0.971,
     "54": 1.01,
     "63": 0.971,
-    "72": 0.971,
+    "72": 1.01,
     "78": 1.01
    }
   },
@@ -651,10 +651,10 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "guarda",
-    "fator": 1.0025062656641601,
+    "fator": 0.9925558312655084,
     "pe": 0,
-    "iou": 0.9524959742351047,
-    "altura": 1.0027935651671323,
+    "iou": 0.9387494683113569,
+    "altura": 0.999518350833253,
     "mesma_pose": 1.0
    },
    {
@@ -662,10 +662,10 @@
     "ponta": "fim",
     "quadro": 78,
     "ref": "guarda",
-    "fator": 1.0025062656641601,
-    "pe": 0,
-    "iou": 0.9594870841850958,
-    "altura": 1.0027935651671323,
+    "fator": 0.9925558312655084,
+    "pe": -1,
+    "iou": 0.9460247994164843,
+    "altura": 0.999518350833253,
     "mesma_pose": 1.0
    }
   ],
@@ -746,16 +746,16 @@
  {
   "estado": "CROUCH_MEDIUM",
   "atlas": "p15_crouch_medium",
-  "fator": 1.0,
+  "fator": 0.9997326917936381,
   "fonte": "receita forte",
   "receita": "forte",
   "medida": "último quadro = inicio_agachado_h3 (nota 0.98)",
   "fator_optico": 1.0,
-  "cadeia": null,
-  "cadeia_nota": "sem folha do vídeo",
+  "cadeia": 0.9997326917936381,
+  "cadeia_nota": "",
   "inicio": {
    "fator": 0.9899562035834135,
-   "nota": 0.5726515054702759,
+   "nota": 0.5830520391464233,
    "quadro": 60,
    "ref": "inicio_agachado"
   },
@@ -768,7 +768,7 @@
     "0": 1.182,
     "30": 0.971,
     "40": 1.159,
-    "60": 1.071,
+    "60": 1.093,
     "70": 1.093,
     "80": 1.093,
     "82": 1.093
@@ -780,10 +780,10 @@
     "ponta": "ini",
     "quadro": 0,
     "ref": "agachado",
-    "fator": 0.9756097560975608,
-    "pe": 0,
-    "iou": 0.8889036898894366,
-    "altura": 0.9634879163945134,
+    "fator": 0.9708737864077668,
+    "pe": -1,
+    "iou": 0.8823490422217803,
+    "altura": 0.9618549967341606,
     "mesma_pose": 1.0
    },
    {
@@ -791,10 +791,10 @@
     "ponta": "fim",
     "quadro": 82,
     "ref": "agachado",
-    "fator": 0.9803921568627448,
-    "pe": 0,
-    "iou": 0.9228386563876652,
-    "altura": 0.9739386022207707,
+    "fator": 0.9779951100244497,
+    "pe": -2,
+    "iou": 0.9178222556185531,
+    "altura": 0.9723056825604179,
     "mesma_pose": 1.0
    }
   ],

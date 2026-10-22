@@ -231,8 +231,9 @@ Nos vídeos o personagem tem ~420 px de altura (mais nos que deram zoom); a folh
 ~200. Com `--densidade 2` o `video_para_sprite.py` escala para o dobro e grava a folha com o
 dobro de px: célula, raiz, `largura`, `raiz` e `aparar_borda` da receita continuam
 **lógicos**, o clipe ganha `"pixelScale": 2.0` (como o p01–p04 por super-resolução) e o jogo
-desenha no mesmo tamanho. A folha HD fica no máximo com 4096 px de lado (mais linhas, menos
-colunas). `--nitidez` aplica unsharp mask leve e tira a franja verde da borda.
+desenha no mesmo tamanho. A folha HD prefere até 4096 px de lado (mais linhas, menos colunas);
+golpe longo (H e 2M do p15, ~80 quadros largos) passa disso na fonte, e o que precisa caber em
+4096 é a folha empacotada que vai para o jogo (só o desenhado de cada quadro). `--nitidez` aplica unsharp mask leve e tira a franja verde da borda.
 
 Auditoria, ancorar, limpar, reescalar, tamanho e harmonia medem a folha HD reduzida ao
 tamanho lógico (os limites em px valem igual) e editam na folha física.
