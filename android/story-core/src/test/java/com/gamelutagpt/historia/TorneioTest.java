@@ -378,11 +378,15 @@ public class TorneioTest {
         assertEquals(chegada, p05.subList(0, 4));
         assertEquals(java.util.Arrays.asList("pag5_ryuga_p05.jpg", "LUTA"), p05.subList(4, 6));
         assertFalse(p05.contains("pag3_q1.jpg"));
-        // Sem páginas prontas para o adversário: o desafio provisório.
         List<String> p07 = paginas("ep03", campanhaComPorto(Torneio.RYUGA, "p07"));
         assertEquals(chegada, p07.subList(0, 4));
-        assertEquals(java.util.Arrays.asList("pag3_q1.jpg", "LUTA"), p07.subList(4, 6));
+        assertEquals(java.util.Arrays.asList("pag5_ryuga_p07.jpg", "LUTA"), p07.subList(4, 6));
         assertFalse(p07.contains("pag5_ryuga_p05.jpg"));
+        assertFalse(p07.contains("pag3_q1.jpg"));
+        // Sem páginas prontas para o adversário: o desafio provisório.
+        List<String> p09 = paginas("ep03", campanhaComPorto(Torneio.RYUGA, "p09"));
+        assertEquals(chegada, p09.subList(0, 4));
+        assertEquals(java.util.Arrays.asList("pag3_q1.jpg", "LUTA"), p09.subList(4, 6));
         // As páginas do Ryūga não aparecem para o Kōga, nem contra o p05.
         List<String> koga = paginas("ep03", campanhaComPorto(Torneio.KOGA, "p05"));
         assertFalse(koga.contains("pag5_ryuga_p05.jpg"));

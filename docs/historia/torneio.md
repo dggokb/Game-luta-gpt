@@ -83,7 +83,8 @@ semifinal) e o porto aumenta o número de duplas diferentes que ele enfrenta.
 | Adversário no porto | Ryūga | Kōga |
 |---|---|---|
 | p05 + p06 | `pag5_ryuga_p05` (a dupla mascarada cerca os dois: "Hum.... parece que podemos tentar algo antes do torneio...") | provisória |
-| p07, p09, p11 (p13, p15 quando tiverem golpes) | provisória (`pag3_q*`) | provisória |
+| p07 + p08 | `pag5_ryuga_p07` (no meio da multidão, a dama de cabelo rosa esbarra na Yin-lu e o velho de chapéu encara o Ryūga: "Parece que temos passatempo....") | provisória |
+| p09, p11 (p13, p15 quando tiverem golpes) | provisória (`pag3_q*`) | provisória |
 
 Quando chegar a página de um adversário: grave como `pagN_<irmao>_<dupla>.jpg`, ponha o passo
 com `"irmao"` e `"adversario"` antes da luta e tire o id da lista `"adversario"` da página
