@@ -133,6 +133,10 @@ public class GameView extends SurfaceView
      */
     private final EfeitosVideo efeitos;
     private final EntradaSuper entradaSuper;
+    /** A tela de vitória do lutador do jogador (só quem tem a cena em assets/vitorias). */
+    private final TelaVitoria telaVitoria;
+    /** A tela de vitória desta luta já tocou (ou não tinha cena). */
+    private boolean vitoriaTocada;
     /** Nome do efeito de golpe por tamanho (fraco, médio, forte, especial). */
     private static final String[] EFEITO_GOLPE = {"impacto_fraco", "impacto_medio", "impacto_forte", "impacto_especial"};
     /** Janela ativa do golpe no passo anterior (o arco do golpe forte sai quando ela abre). */
@@ -508,6 +512,7 @@ public class GameView extends SurfaceView
         super(context);
         efeitos = new EfeitosVideo(context.getAssets());
         entradaSuper = new EntradaSuper(context.getAssets());
+        telaVitoria = new TelaVitoria(context.getAssets());
         AjusteTamanho.load(context);
         AjusteCaixas.load(context);
         speedPrefs = context.getSharedPreferences(SPEED_PREFS, Context.MODE_PRIVATE);
@@ -924,6 +929,10 @@ public class GameView extends SurfaceView
         for (FighterState member : engine.team(PLAYER).members) ids.add(member.character.id);
         for (FighterState member : engine.team(OPPONENT).members) ids.add(member.character.id);
         entradaSuper.manter(engine, ids.toArray(new String[0]));
+        // A tela de vitória só é do jogador.
+        java.util.List<String> nossos = new java.util.ArrayList<>();
+        for (FighterState member : engine.team(PLAYER).members) nossos.add(member.character.id);
+        telaVitoria.manter(stageId, nossos.toArray(new String[0]));
     }
 
     private UltraPack teamUltraPack(String characterId) {
@@ -1012,6 +1021,8 @@ public class GameView extends SurfaceView
                 // Na "Página Final" do jogador qualquer botão vale como o toque no tempo certo.
                 if (paginaFinal.isActive()) {
                     if (ultraAttacker == PLAYER) paginaFinal.tap();
+                } else if (telaVitoria.ativa()) {
+                    telaVitoria.pular();
                 } else {
                     pad.press(button);
                 }
@@ -1532,6 +1543,17 @@ public class GameView extends SurfaceView
             if (historia.coversScreen()) anteciparHistoria();
             return;
         }
+        if (telaVitoria.ativa()) {
+            // A tela de vitória cobre a luta parada; uma tecla (ou um toque) pula para o fim.
+            pad.drainInto(ignoredInput);
+            if (!selectionKeys.isEmpty()) {
+                selectionKeys.clear();
+                telaVitoria.pular();
+            }
+            telaVitoria.passo();
+            if (!telaVitoria.ativa()) depoisDaVitoria();
+            return;
+        }
         updateUltraBars();
         if (ultraEsperando != null) {
             // Ultra ativado antes do pack ficar pronto: a tela segue (faixas, escurecido) e a
@@ -1620,6 +1642,10 @@ public class GameView extends SurfaceView
         boolean clockRuns = fightFree && !engine.superFreezeActive() && !cinematica.controleTravado();
         flow.update(engine, fightFree, clockRuns);
         updateOpponentVisuals();
+        // Fora da história, a tela de vitória entra quando o K.O. sai; a revanche espera ela.
+        if (flow.showingResult() && flow.winner() == PLAYER && !historia.waitingFight() && !tutorial.active()) {
+            tocarVitoria();
+        }
         if (flow.restartDue() && !historia.waitingFight() && !tutorial.active()) restartBattle();
         demo.afterStep();
         // O "treino completo" espera a conversa do fim (ela anda sozinha, sem toque).
@@ -1747,6 +1773,8 @@ public class GameView extends SurfaceView
         feel.clear();
         finalizacao.limpar();
         koVictim = null;
+        telaVitoria.parar();
+        vitoriaTocada = false;
         // Motor de animação: o round novo começa em repouso.
         if (spriteFighterRenderer != null) spriteFighterRenderer.animacao.zerar();
         if (opponentSpriteRenderer != null) opponentSpriteRenderer.animacao.zerar();
@@ -2925,6 +2953,12 @@ public class GameView extends SurfaceView
                 canvas.restore();
                 return;
             }
+            if (telaVitoria.cobreTudo()) {
+                // A luta parada fica inteira atrás do fundo da tela de vitória.
+                telaVitoria.desenhar(canvas);
+                canvas.restore();
+                return;
+            }
 
             float cinematicZoom = cinematica.zoom();
             float baseZoom = camera.zoom * superFlash.zoom * cinematicZoom;
@@ -3135,6 +3169,7 @@ public class GameView extends SurfaceView
                 if (narracao != null && faixas < 0.5f) narracao.render(renderCanvas);
                 cinematica.renderEfeitos(renderCanvas);
             }
+            telaVitoria.desenhar(canvas);
             if (abertura.isActive()) abertura.render(renderCanvas);
             if (paginaFinal.isActive()) {
                 paginaFinal.render(renderCanvas);
@@ -3212,7 +3247,8 @@ public class GameView extends SurfaceView
             hud.drawBanner(c, throwBanner, Math.round(255f * clamp((1f - t) * 3f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
         }
         String call = flow.banner();
-        if (call != null) {
+        // Com a tela de vitória entrando, o "VITÓRIA" é o dela.
+        if (call != null && !telaVitoria.ativa()) {
             float t = flow.bannerProgress();
             hud.drawBanner(c, call, Math.round(255f * clamp((1f - t) * 5f, 0f, 1f)), 1f + 0.4f * Math.max(0f, 1f - t * 6f));
         }
@@ -4203,6 +4239,10 @@ public class GameView extends SurfaceView
             }
             return;
         }
+        if (telaVitoria.ativa()) {
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) telaVitoria.pular();
+            return;
+        }
         if (ajusteTamanho.isOpen()) {
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 ajusteTamanho.tap(event.getX(index) / sx, event.getY(index) / sy);
@@ -4780,6 +4820,7 @@ public class GameView extends SurfaceView
             conversa.momento(won ? "vitoria" : "derrota");
         }
         if (++storyKoFrames < STORY_KO_FRAMES || ultraAttacker >= 0 || conversa.falando()) return;
+        if (won && tocarVitoria()) return;
         storyKoFrames = 0;
         descarregarConversa();
         pad.reset();
@@ -4789,17 +4830,43 @@ public class GameView extends SurfaceView
     }
 
     /**
+     * Começa a tela de vitória de quem venceu pelo jogador, uma vez por luta. Verdadeiro se ela
+     * começou agora: a história (ou a revanche) espera ela acabar ({@link #depoisDaVitoria}).
+     */
+    private boolean tocarVitoria() {
+        if (vitoriaTocada) return false;
+        vitoriaTocada = true;
+        FighterState winner = vencedorEmCampo();
+        String id = winner.character.id;
+        if (!telaVitoria.tem(id)) return false;
+        String nome = temporada != null ? temporada.nomeDoLutador(id) : null;
+        if (nome == null) nome = winner.character.displayName;
+        telaVitoria.comecar(id, winner.profile.color, nome.toUpperCase(Locale.ROOT),
+            texto -> temporada != null ? temporada.t(texto) : texto);
+        return true;
+    }
+
+    /** A tela de vitória acabou: a história segue com o resultado, ou a luta recomeça. */
+    private void depoisDaVitoria() {
+        if (historia.waitingFight()) updateStoryFight();
+        else if (!tutorial.active()) restartBattle();
+    }
+
+    /** O titular caído esperando a troca não venceu: quem está de pé leva o crédito. */
+    private FighterState vencedorEmCampo() {
+        FighterState point = engine.team(PLAYER).pointState();
+        FighterState partner = engine.team(PLAYER).partner();
+        return point.life <= 0 && partner != null && partner.life > 0 ? partner : point;
+    }
+
+    /**
      * A campanha guarda quem da dupla do jogador estava em campo na vitória: no Arcade, o duelo
      * 1x1 depois da final é com ele (contra o parceiro); na história é sempre com o líder.
      */
     private void registrarVencedor() {
         Campanha campanha = historia.campanha();
         if (campanha == null) return;
-        FighterState point = engine.team(PLAYER).pointState();
-        FighterState partner = engine.team(PLAYER).partner();
-        // O titular caído esperando a troca não venceu: quem está de pé leva o crédito.
-        FighterState winner = point.life <= 0 && partner != null && partner.life > 0 ? partner : point;
-        campanha.venceuCom(winner.character.id);
+        campanha.venceuCom(vencedorEmCampo().character.id);
     }
 
     @Override

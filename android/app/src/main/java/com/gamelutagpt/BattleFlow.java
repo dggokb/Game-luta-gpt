@@ -119,6 +119,9 @@ final class BattleFlow {
         return timed() && clockSeconds() <= URGENT_SECONDS && (phase == Phase.GO || phase == Phase.FIGHT);
     }
 
+    /** O K.O. (ou TIME OVER) já saiu: o resultado está na tela. */
+    boolean showingResult() { return phase == Phase.OVER && phaseFrame >= KO_FRAMES; }
+
     /** O resultado já ficou o bastante na tela: hora de começar a luta de novo. */
     boolean restartDue() { return phase == Phase.OVER && phaseFrame >= KO_FRAMES + RESULT_FRAMES; }
 

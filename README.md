@@ -266,6 +266,10 @@ Primeiro passo do roadmap de mecânicas: a equipe passa a participar do combate.
   cabeça; na janela do M + H o "!" fica vermelho e treme (`CombatEngine.breakerCue`,
   `GameView.drawBreakerCue`).
 - **Especial e Super pegam quem está agachado** (antes muitos passavam por cima).
+- **Tela de vitória** (teste no Ryūga): depois do K.O., o cenário borrado cobre a luta, ele entra
+  fazendo a cena (vídeo no verde), "VITÓRIA" bate à direita e um quadro de mangá traz uma frase
+  dele. Um toque pula para o fim. Por enquanto todo cenário usa o fundo do porto. Padrão:
+  `docs/tela-de-vitoria.md`.
 - **Grito da troca**: em toda luta em dupla, quando a vida de quem luta entra no vermelho, o
   parceiro aparece no quadro de mangá do lado do time e grita "Ryūga! Troca comigo!" (como nas
   conversas do treino e do episódio 1).
