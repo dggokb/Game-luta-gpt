@@ -45,7 +45,7 @@ public class SpriteIntegrationTest {
     }
 
     @Test public void productionRosterUsesRealSecondCharacterPack()throws Exception {
-        assertArrayEquals(new String[]{"player_base","p03"},GeneratedCharacters.TEAM);
+        assertArrayEquals(new String[]{"player_base","p02"},GeneratedCharacters.TEAM);
         // p03: same profile (scale) as p01, own idle/walk/dash art from video.
         CharacterDefinition p03=GeneratedCharacters.get("p03");
         assertEquals("player_base",p03.profile.id);
@@ -177,11 +177,11 @@ public class SpriteIntegrationTest {
         rawTag();
         frames(72);
         assertEquals(1,game.engine.team(0).point);
-        assertEquals("p03",rendererCharacterId());
+        assertEquals(GeneratedCharacters.TEAM[1],rendererCharacterId());
 
         String[] bindings={"L","M","H"};
         PadInput.Button[] buttons={PadInput.Button.LIGHT,PadInput.Button.MEDIUM,PadInput.Button.HEAVY};
-        CharacterDefinition second=GeneratedCharacters.get("p03");
+        CharacterDefinition second=GeneratedCharacters.get(GeneratedCharacters.TEAM[1]);
         assertSame("The engine plays the tagged-in pack",second,player().character());
         for(int i=0;i<bindings.length;i++) {
             int total=second.attack(bindings[i]).totalFrames;

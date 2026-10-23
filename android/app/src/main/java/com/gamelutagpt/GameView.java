@@ -291,7 +291,7 @@ public class GameView extends SurfaceView
     private String selectButtonLabel = SELECT_LABEL;
     private static final String SELECT_LABEL = "◀ SELEÇÃO";
     /** A última escolha da seleção no modo teste (titular, parceiro, CPU, parceiro do CPU). */
-    private String[] testPicks = {"player_base", "p08", "p03", "p06"};
+    private String[] testPicks = {"player_base", "p02", "p03", "p04"};
     /**
      * Entrou no MODO TESTE pelo menu e a luta de trás ainda é a de antes (da história, ou a do
      * construtor): se a seleção for cancelada, a luta de teste começa com {@link #testPicks}.

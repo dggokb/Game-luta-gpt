@@ -3,14 +3,10 @@
   "defaultCharacter": "player_base",
   "team": [
     "player_base",
-    "p03"
+    "p02"
   ],
   "opponentCharacter": "monster_npc",
   "teams": [
-    [
-      "player_base",
-      "p03"
-    ],
     [
       "player_base",
       "p02"
@@ -18,6 +14,22 @@
     [
       "p03",
       "p04"
+    ],
+    [
+      "p05",
+      "p06"
+    ],
+    [
+      "p07",
+      "p08"
+    ],
+    [
+      "p09",
+      "p10"
+    ],
+    [
+      "p11",
+      "p12"
     ]
   ],
   "selectable": [
