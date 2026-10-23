@@ -19,6 +19,13 @@ final class CharacterSelect {
     static final float SWAP_LEFT = 804f, SWAP_RIGHT = 1037f;
     static final float RANDOM_LEFT = 1037f, RANDOM_TOP = 685f, RANDOM_RIGHT = 1279f, RANDOM_BOTTOM = 720f;
     static final String STAGE = "TEMPLO DA LUA";
+    /**
+     * Grid order: the story pairs side by side (p01+p02, p03+p04 … p15+p16, p13+p14), so each
+     * pair sits on the same row. Playable ones come first; the rest are locked concept slots.
+     */
+    static final String[] PAIR_ORDER = {
+        "player_base","p02","p03","p04","p05","p06","p07","p08",
+        "p09","p10","p11","p12","p15","p16","p13","p14"};
     final String[] ids;
     private final String[][] picks = new String[2][2];
     private final Random random = new Random();

@@ -66,11 +66,12 @@ final class CharacterSelectRenderer {
         flashPaint.setColorFilter(new PorterDuffColorFilter(0xFFFFFFFF,PorterDuff.Mode.SRC_ATOP));
         backdrop=read("selection/art/backdrop.png",1);
         stageArt=read("selection/art/reference_stage.png",1);
-        // Locked slots show only the P09–P16 concepts that are not playable yet.
+        // Locked slots show the concepts that are not playable yet, in the grid's pair order.
         java.util.List<String> playable=java.util.Arrays.asList(GeneratedCharacters.SELECTABLE);
-        for(int n=9,i=0;n<=16&&i<8;n++) {
-            String id="p"+(n<10?"0":"")+n;
-            if(playable.contains(id))continue;
+        int i=0;
+        for(String id:CharacterSelect.PAIR_ORDER) {
+            if(i>=8)break;
+            if(playable.contains(id)||"player_base".equals(id))continue;
             futureIds[i]=id;futureFaces[i++]=face(id);
         }
         // Os rostos da grade aparecem todos juntos: pequenos, já recortados

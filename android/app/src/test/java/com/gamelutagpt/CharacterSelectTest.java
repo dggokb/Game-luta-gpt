@@ -14,6 +14,18 @@ public class CharacterSelectTest {
     }
     private void finish(CharacterSelect s) {pick(s,0);pick(s,1);pick(s,2);pick(s,3);}
 
+    @Test public void gridListsEveryPlayableFighterWithTheStoryPairsSideBySide() throws Exception {
+        java.util.List<String> order=java.util.Arrays.asList(CharacterSelect.PAIR_ORDER);
+        for(String id:GeneratedCharacters.SELECTABLE)assertTrue(id+" sumiu da grade",order.contains(id));
+        assertEquals(CharacterSelect.COLUMNS*CharacterSelect.ROWS,order.size());
+        String json=new String(java.nio.file.Files.readAllBytes(new java.io.File(
+            "src/main/assets/historia/torneio/torneio.json").toPath()),java.nio.charset.StandardCharsets.UTF_8);
+        for(com.gamelutagpt.historia.Torneio.Dupla d:com.gamelutagpt.historia.Torneio.duplasFromJson(json)) {
+            int a=order.indexOf(d.lutadores[0]),b=order.indexOf(d.lutadores[1]);
+            assertEquals(d.lutadores[0]+"+"+d.lutadores[1],1,Math.abs(a-b));
+            assertEquals("mesma linha",Math.min(a,b)/CharacterSelect.COLUMNS,Math.max(a,b)/CharacterSelect.COLUMNS);
+        }
+    }
     @Test public void startsWithOnlyPlayerOneActiveAndNoConfirmedSlots() {
         CharacterSelect s=make();assertFalse(s.ready());assertEquals(0,s.step());
         assertEquals(0,s.focusSide());assertEquals(0,s.focusSlot());
