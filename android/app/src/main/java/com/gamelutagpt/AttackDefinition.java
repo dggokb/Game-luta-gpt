@@ -68,7 +68,7 @@ final class AttackDefinition {
         /** Evasion: HIGH slips standing/air strikes and projectiles, ANY everything. */
         Reads evade = Reads.NONE;
         int evadeStart, evadeEnd;
-        /** Forward travel (world units per second) in [advanceStart, advanceEnd]. */
+        /** Travel (world units per second) in [advanceStart, advanceEnd]; negative goes back. */
         float advanceSpeed;
         int advanceStart, advanceEnd;
         /** The body passes through the opponent while advancing (cross-up). */
@@ -117,7 +117,7 @@ final class AttackDefinition {
         boolean armorAt(int frame) { return armorHits > 0 && frame >= armorStart && frame <= armorEnd; }
         boolean counterAt(int frame) { return counter != Reads.NONE && frame >= counterStart && frame <= counterEnd; }
         boolean evadeAt(int frame) { return evade != Reads.NONE && frame >= evadeStart && frame <= evadeEnd; }
-        boolean advanceAt(int frame) { return advanceSpeed > 0f && frame >= advanceStart && frame <= advanceEnd; }
+        boolean advanceAt(int frame) { return advanceSpeed != 0f && frame >= advanceStart && frame <= advanceEnd; }
     }
 
     /** Mechanics with nothing in them (moves without a character mechanic). */
@@ -405,7 +405,7 @@ final class AttackDefinition {
                 throw new IllegalArgumentException(name + "projectile moves spawn on one active frame and have no hitboxes");
             }
             Mechanics m = mechanics;
-            if (m.armorHits < 0 || m.poisonDamage < 0 || m.lifeCost < 0 || m.pull < 0f || m.advanceSpeed < 0f ||
+            if (m.armorHits < 0 || m.poisonDamage < 0 || m.lifeCost < 0 || m.pull < 0f ||
                 m.chargeFrames < 0 || m.chargeBonusPermille < 0 || m.echoFrames < 0 || m.echoDelay < 0 ||
                 m.echoDamagePermille < 0) {
                 throw new IllegalArgumentException(name + "mechanics cannot be negative");
@@ -413,7 +413,7 @@ final class AttackDefinition {
             if (m.armorHits > 0) checkRange(name + "armor", m.armorStart, m.armorEnd, total);
             if (m.counter != Reads.NONE) checkRange(name + "counter", m.counterStart, m.counterEnd, total);
             if (m.evade != Reads.NONE) checkRange(name + "evade", m.evadeStart, m.evadeEnd, total);
-            if (m.advanceSpeed > 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
+            if (m.advanceSpeed != 0f) checkRange(name + "advance", m.advanceStart, m.advanceEnd, total);
             if (m.teleportFrame >= total) throw new IllegalArgumentException(name + "teleport frame is outside the move");
             if (m.poisonDamage > 0 && m.poisonFrames < 1) throw new IllegalArgumentException(name + "poison needs frames");
             if (m.counter != Reads.NONE && (kind != Kind.NORMAL || m.counterEnd >= startup)) {

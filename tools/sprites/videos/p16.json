@@ -5,5 +5,11 @@
   "DASH": "dash",
   "BACKDASH": "backdash",
   "CROUCH": "agachar",
-  "JUMP": "jump"
+  "JUMP": "jump",
+  "LIGHT_JAB": "L",
+  "MEDIUM_KICK": "M",
+  "HEAVY_STRAIGHT": "H",
+  "CROUCH_LIGHT": "2L",
+  "CROUCH_MEDIUM": "2M",
+  "CROUCH_HEAVY": "2H"
 }

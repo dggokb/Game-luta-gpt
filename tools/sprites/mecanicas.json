@@ -880,6 +880,52 @@
         "acertos": 3,
         "intervalo": 8
       }
+    },
+    "p16": {
+      "molde": "Rushdown caótico (provisório)",
+      "estiloCombo": "equilibrado",
+      "vida": 10000,
+      "dano": 1.0,
+      "ritmo": 1.0,
+      "framesGolpe": {
+        "H": [
+          18,
+          6,
+          40
+        ]
+      },
+      "projetil": {
+        "velocidade": 760,
+        "alcance": 720
+      },
+      "unica": {
+        "descricao": "Estrela (H): o chute sai de uma estrela (acrobacia) para trás; as pernas passam por cima na direção do rival e ela recua ~190 px. Especiais ainda com os dados do p01 e a guarda parada (sem vídeo)."
+      },
+      "comandos": {
+        "S1": {
+          "nome": "Onda",
+          "comando": "↓↘→"
+        },
+        "S2": {
+          "nome": "Punho ascendente",
+          "comando": "→↓↘"
+        },
+        "S3": {
+          "nome": "Aparar",
+          "comando": "↓↓"
+        },
+        "S4": {
+          "nome": "Chute giratório",
+          "comando": "↓↙←"
+        }
+      },
+      "s1": {
+        "visual": "ONDA"
+      },
+      "super": {
+        "acertos": 5,
+        "intervalo": 8
+      }
     }
   }
 }

@@ -147,6 +147,17 @@ public class MechanicsTest {
         assertTrue("ended on the other side", c.f(0).x > c.f(1).x);
     }
 
+    @Test public void negativeAdvanceBacksAway() {
+        // A estrela da p16: o golpe recua em vez de avançar.
+        AttackDefinition cartwheel = move("H", 4, 3, 20)
+            .mechanics(new AttackDefinition.Mechanics().advance(-300f, 0, 22, false)).build();
+        CombatEngineTest.Sim s = new CombatEngineTest.Sim(with(cartwheel), BASE, 600f, 1100f);
+        float start = s.f(0).x;
+        s.in[0].heavy = true;
+        s.steps(20);
+        assertTrue("backed away from the opponent", start - s.f(0).x > 60f);
+    }
+
     @Test public void teleportReappearsBehindFacingTheOpponent() {
         AttackDefinition vanish = move("H", 12, 3, 12)
             .mechanics(new AttackDefinition.Mechanics().teleport(6).evade(AttackDefinition.Reads.ANY, 0, 8)).build();

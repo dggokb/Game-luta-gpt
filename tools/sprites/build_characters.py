@@ -182,7 +182,10 @@ def validate_mechanics(name, mech, m, projectile):
     if 'contra' in mech and (projectile or mech['contra']['frames'][1] >= m['startupFrames']):
         raise ValueError(f'{name}.mecanica.contra: a melee move that reads before its strike')
     if 'avanco' in mech:
-        frames('avanco', mech['avanco']); positive(mech['avanco'].get('velocidade'), f'{name}.mecanica.avanco.velocidade')
+        frames('avanco', mech['avanco'])
+        v = mech['avanco'].get('velocidade')  # negativa: recua (estrela da p16)
+        if isinstance(v, bool) or not isinstance(v, (int,float)) or not math.isfinite(v) or v == 0:
+            raise ValueError(f'{name}.mecanica.avanco.velocidade: expected a nonzero finite number')
     if 'teleporte' in mech and not (type(mech['teleporte']) is int and 0 <= mech['teleporte'] < total):
         raise ValueError(f'{name}.mecanica.teleporte: a frame inside the move')
     if 'puxar' in mech: positive(mech['puxar'], f'{name}.mecanica.puxar')

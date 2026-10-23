@@ -1396,7 +1396,8 @@ final class CombatEngine {
         } else if (f.attacking() && f.attack.mechanics.advanceAt(f.attackFrame)) {
             // Rushing special (shoulder charge, flying kick, slide): it carries the body forward
             // until it reaches the opponent (it does not shove it across the stage), or through it.
-            if (f.attack.mechanics.passThrough || !touchingAhead(f)) {
+            // Negative speed backs away (a cartwheel), which contact never stops.
+            if (f.attack.mechanics.passThrough || f.attack.mechanics.advanceSpeed < 0f || !touchingAhead(f)) {
                 f.x += f.facing * f.attack.mechanics.advanceSpeed * boost * CombatConfig.DT;
             }
         } else if (f.attacking() && !f.grounded && f.attack.kind == AttackDefinition.Kind.NORMAL) {

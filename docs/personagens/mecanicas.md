@@ -173,7 +173,7 @@ Definidas no bloco `unica` de `tools/sprites/mecanicas.json` e aplicadas pelo me
 `mecanicas.py` (grava `mecanica` nos golpes e no lutador do `character.json`). O motor sabe
 fazer: **armadura** (aguenta N golpes sem atordoar), **contra-golpe** (lê golpe alto, baixo ou
 qualquer um na preparação e responde na hora), **esquiva** (passa por baixo de golpe alto e de
-projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival),
+projétil, ou some de tudo), **avanço** (o golpe carrega o corpo; pode atravessar o rival; com velocidade negativa recua, como a estrela da p16),
 **teleporte** (reaparece atrás), **puxar**, **veneno** (dano ao longo do tempo, nunca mata),
 **custo de vida**, **fúria** (dano cresce com a vida perdida), **air dashes extras** e
 **agarrão próprio** (dano e alcance). Testes: `MechanicsTest`.
