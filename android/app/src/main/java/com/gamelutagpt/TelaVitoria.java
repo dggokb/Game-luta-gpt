@@ -47,23 +47,23 @@ final class TelaVitoria {
     /** Tinta e papel da página do Ultra (ArteProvisoria). */
     private static final int TINTA = 0xFF111114, PAPEL = 0xFFFFFFFF;
     /** Quadros lidos na montagem (a cena começa sem esperar) e quantos são lidos à frente. */
-    private static final int INICIO = 6, A_FRENTE = 8;
+    private static final int INICIO = 6, A_FRENTE = 12;
     /** O fundo borrado cobre a luta nesse tempo. */
-    private static final float FUNDO_MS = 260f;
+    private static final float FUNDO_MS = 200f;
     /** O lutador entra deslizando da esquerda, já tocando o vídeo. */
-    private static final float ENTRA_MS = 120f, DESLIZA_MS = 340f, DESLIZA_PX = 180f;
+    private static final float ENTRA_MS = 80f, DESLIZA_MS = 260f, DESLIZA_PX = 180f;
     /** "VITÓRIA" bate (cai grande e assenta), pisca a tela e treme. */
-    private static final float TITULO_MS = 480f, BATIDA_MS = 150f, CLARAO_MS = 140f, TREME_MS = 240f;
+    private static final float TITULO_MS = 340f, BATIDA_MS = 130f, CLARAO_MS = 120f, TREME_MS = 220f;
     private static final float TITULO_X = 985f, TITULO_Y = 222f, TITULO_TAM = 132f, TITULO_LARGURA = 540f;
     /** O quadro de mangá com a frase. */
-    private static final float QUADRO_MS = 1150f, POP_MS = 180f;
+    private static final float QUADRO_MS = 800f, POP_MS = 160f;
     private static final float QUADRO_X = 990f, QUADRO_Y = 548f;
     private static final float[] QUADRO = {-245f, -82f, 238f, -96f, 230f, 88f, -250f, 80f};
     private static final float TEXTO_LARGURA = 410f, TEXTO_TAM = 36f;
     /** A tela escurece até o preto e então a história (ou a revanche) segue. */
-    private static final float SAIDA_MS = 320f;
+    private static final float SAIDA_MS = 280f;
     /** Antes disso um toque não pula (o toque que acabou a luta não engole a cena). */
-    private static final float PULAR_DEPOIS_MS = 700f;
+    private static final float PULAR_DEPOIS_MS = 600f;
 
     /** A cena de um lutador: os quadros (nomes e onde cada um fica) e as frases. */
     static final class Pacote {
@@ -362,6 +362,10 @@ final class TelaVitoria {
         }
     }
 
+    /**
+     * O quadro do vídeo na hora certa. O jogo roda a 60 Hz e o vídeo é mais lento: entre um
+     * quadro e o próximo os dois se misturam, para o movimento sair contínuo, sem degraus.
+     */
     private void desenharRetrato(Canvas c, Pacote p, float ms) {
         if (ms < ENTRA_MS) return;
         int i = indice();
@@ -374,11 +378,19 @@ final class TelaVitoria {
         if (mostrado == null) return;
         float k = clamp((ms - ENTRA_MS) / DESLIZA_MS);
         float dx = -DESLIZA_PX * (1f - k) * (1f - k) * (1f - k);
-        float[] r = p.caixas[mostradoIndice];
+        float alfa = 255f * clamp(k * 2.5f);
+        desenharQuadroDoVideo(c, p, mostrado, mostradoIndice, dx, Math.round(alfa));
+        float entre = (ms - ENTRA_MS) / p.quadroMs - i;
+        Bitmap proximo = mostradoIndice == i && i + 1 < p.imagens.length ? lidos.get(i + 1) : null;
+        if (proximo != null && entre > 0f) desenharQuadroDoVideo(c, p, proximo, i + 1, dx, Math.round(alfa * clamp(entre)));
+    }
+
+    private void desenharQuadroDoVideo(Canvas c, Pacote p, Bitmap b, int i, float dx, int alfa) {
+        float[] r = p.caixas[i];
         float x = r[0] - p.esquerda + dx, y = Arena.VH + r[1];
         destino.set(x, y, x + r[2], y + r[3]);
-        paint.setAlpha(Math.round(255f * clamp(k * 2.5f)));
-        c.drawBitmap(mostrado, null, destino, paint);
+        paint.setAlpha(alfa);
+        c.drawBitmap(b, null, destino, paint);
     }
 
     private void desenharTitulo(Canvas c, float ms) {
