@@ -70,6 +70,19 @@ def montar_piso(chao, cais):
     return com, base
 
 
+# Piso claro sob o céu do pôr do sol: o GPT pinta o ringue como de dia (o da Costeira e o da
+# Central ficavam com o dobro do brilho dos outros pisos da ilha). Escurece e puxa para a luz
+# quente do crepúsculo, como nos concepts.
+BRILHO_CREPUSCULO = 0.55
+TOM_CREPUSCULO = (1.0, 0.9, 0.98)
+
+
+def luz_de_crepusculo(img):
+    px = np.asarray(img.convert("RGB")).astype(np.float32)
+    px *= BRILHO_CREPUSCULO * np.array(TOM_CREPUSCULO, np.float32)
+    return Image.fromarray(px.clip(0, 255).astype(np.uint8))
+
+
 def esfumar_ilha(img, lados=0.12, baixo=0.14):
     """Apaga aos poucos as bordas esquerda e direita e a faixa de névoa de baixo."""
     px = np.asarray(img.convert("RGBA")).astype(np.float32)

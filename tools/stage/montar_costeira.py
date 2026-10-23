@@ -12,7 +12,9 @@ preparar_cenario.py faz (cortar margens transparentes, alfa opaco, JPG, 2048 px)
   pintada no chão. Fica só a faixa de lajotas do meio do chao_liso.png (entre duas juntas,
   `FAIXA`), repetida três vezes com o brilho nivelado (o GPT iluminou mais o centro; sem
   isso, cada emenda ficava com um degrau de luz): é o chao_liso.jpg. O chao.jpg é o mesmo, com o círculo vermelho e o emblema do
-  chao.png colados no centro (as duas imagens têm a mesma grade de lajotas).
+  chao.png colados no centro (as duas imagens têm a mesma grade de lajotas). No fim, as duas
+  escurecem para a luz do crepúsculo (montar_porto.luz_de_crepusculo): o GPT pintou o ringue
+  como de dia.
 - Encosta: névoa da distância e base sólida (montar_porto.solidificar). O lado cortado (a
   direita) fica sempre fora da tela (x no stage.json).
 - Sem mureta: a barreira.png repetia o muro de LED que a arquibancada já tem embaixo (duas
@@ -39,7 +41,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import EXTENSOES, SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar, plateia, tirar_plateia  # noqa: E402
+from montar_porto import COMUNS, afastar, esfumar_ilha, imagens, luz_de_crepusculo, peca_comum, solidificar, textura_mar, plateia, tirar_plateia  # noqa: E402
 import cachoeiras  # noqa: E402
 import soltar_bandeiras  # noqa: E402
 
@@ -102,7 +104,7 @@ def montar_piso(chao, liso):
     com = base.copy()
     com.paste(pedaco, (int(cx_base - raio), 0), mascara)
     print(f"piso: faixa {x0}-{x1} x{COPIAS} -> {bw}x{h}, círculo no centro ({raio:.0f} px de raio)")
-    return com, base
+    return luz_de_crepusculo(com), luz_de_crepusculo(base)
 
 
 def main():

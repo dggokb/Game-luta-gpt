@@ -1,5 +1,5 @@
 {
-  "_comentario": "O modo Arcade (docs/historia/arcade.md): a chave de 16 duplas montada com a dupla escolhida (Arcade.chave), as 4 rodadas, a regra escondida (o 1x1 da dupla campeã) e o Campeão, o Takatoshi (ainda por fazer: por enquanto o cartão 'em breve'). Perder repete a luta.",
+  "_comentario": "O modo Arcade (docs/historia/arcade.md): a chave de 16 duplas montada com a dupla escolhida (Arcade.chave), as 4 rodadas (oitavas em cenário sorteado; quartas, semifinal e final subindo a ilha: Costeira, Imperial e Central), a regra escondida (o 1x1 da dupla campeã) e o Campeão, o Takatoshi (ainda por fazer: por enquanto o cartão 'em breve'). Perder repete a luta.",
   "id": "arcade",
   "numero": 0,
   "titulo": "ARCADE",
@@ -8,14 +8,14 @@
     { "tipo": "sorteio" },
     { "tipo": "luta", "torneio": true },
     { "tipo": "chave" },
-    { "tipo": "luta", "torneio": true },
+    { "tipo": "luta", "torneio": true, "cenario": "arena_costeira" },
     { "tipo": "chave" },
-    { "tipo": "luta", "torneio": true },
+    { "tipo": "luta", "torneio": true, "cenario": "arena_imperial" },
     { "tipo": "chave" },
-    { "tipo": "luta", "torneio": true },
+    { "tipo": "luta", "torneio": true, "cenario": "arena_central" },
     { "tipo": "chave" },
     { "tipo": "titulo", "titulo": "A REGRA ESCONDIDA", "linhas": ["DEPOIS DA FINAL", "A dupla campeã luta entre si. Só um enfrenta o Campeão."] },
-    { "tipo": "luta", "duelo": true },
+    { "tipo": "luta", "duelo": true, "cenario": "arena_central" },
     { "tipo": "titulo", "titulo": "TAKATOSHI", "linhas": ["O CAMPEÃO", "Em breve: a luta contra o Takatoshi."] }
   ]
 }

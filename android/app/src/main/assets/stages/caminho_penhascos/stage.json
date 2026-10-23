@@ -119,6 +119,15 @@
       ]
     },
     {
+      "id": "neblina-passarela",
+      "tipo": "neblina",
+      "profundidade": 600,
+      "topo": -0.2,
+      "base": 0.58,
+      "cor": "#0A0C26",
+      "alfa": 0.62
+    },
+    {
       "id": "guarda-corpo",
       "imagem": "guarda_corpo.png",
       "profundidade": 520,

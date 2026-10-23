@@ -127,7 +127,7 @@
       "profundidade": 1700,
       "noChao": true,
       "altura": 0.946,
-      "x": 0.3,
+      "x": 0.62,
       "repetir": "nao",
       "luzes": [
         { "x": 0.884, "y": 0.2, "raio": 0.025, "cor": "#FFB050", "pulsar": 0.1, "reflexo": false },
@@ -143,7 +143,7 @@
       "profundidade": 1500,
       "noChao": true,
       "altura": 0.862,
-      "x": 0.86,
+      "x": -0.05,
       "repetir": "nao",
       "luzes": [
         { "x": 0.5, "y": 0.75, "raio": 0.14, "cor": "#FFC070", "pulsar": 0.04 },

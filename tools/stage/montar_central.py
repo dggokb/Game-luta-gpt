@@ -12,7 +12,8 @@ transparentes, alfa opaco, JPG, 2048 px):
   as juntas `FAIXA` só há lajotas e o círculo do emblema inteiro: as duas imagens são
   cortadas ali, e o padrão de lajotas fecha com a cópia do lado. A ponta da linha vermelha
   da cruz, que entra pelas bordas, é coberta com as lajotas ao lado, e as poucas colunas da
-  borda do chao vêm do chao_liso já limpo.
+  borda do chao vêm do chao_liso já limpo. As duas escurecem para a luz do crepúsculo
+  (montar_porto.luz_de_crepusculo): o GPT pintou o ringue como de dia.
 - Arquibancada: o GPT pintou um pedaço do piso do ringue embaixo dela; é cortado. É uma
   tigela côncava (o estádio inteiro): repetida, virava uma onda de curvas. Fica uma só,
   esticada na largura (`LARGURA_ESTADIO`) para cobrir a câmera.
@@ -36,7 +37,7 @@ except ImportError:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preparar_cenario import SAIDA_PADRAO, preparar  # noqa: E402
-from montar_porto import afastar, esfumar_ilha, imagens, peca_comum, solidificar, textura_mar, plateia, tirar_plateia  # noqa: E402
+from montar_porto import afastar, esfumar_ilha, imagens, luz_de_crepusculo, peca_comum, solidificar, textura_mar, plateia, tirar_plateia  # noqa: E402
 import cachoeiras  # noqa: E402
 import soltar_bandeiras  # noqa: E402
 
@@ -69,7 +70,7 @@ def montar_piso(chao, liso):
     for x0 in (0, sem.width - BORDA):
         com.paste(sem.crop((x0, 0, x0 + BORDA, h)), (x0, 0))
     print(f"piso: faixa {caixa[0]}-{caixa[2]} -> {sem.width}x{h}")
-    return com, sem
+    return luz_de_crepusculo(com), luz_de_crepusculo(sem)
 
 
 def main():

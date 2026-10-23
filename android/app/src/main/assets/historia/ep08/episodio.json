@@ -42,7 +42,7 @@
         ] }
     ] },
 
-    { "tipo": "luta", "duelo": true },
+    { "tipo": "luta", "duelo": true, "cenario": "arena_central" },
 
     { "tipo": "proximo", "titulo": "O Campeão", "linhas": [
       "Quem vence o duelo ganha o direito de desafiar o Campeão.",

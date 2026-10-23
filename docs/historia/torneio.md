@@ -115,13 +115,14 @@ cenário: [../../tools/stage/ilha-do-torneio.md](../../tools/stage/ilha-do-torne
 | EMBOSCADA (ep05) | Caminho dos Penhascos (`caminho_penhascos`), **pronto** |
 | SEMIFINAL (ep06) | Arena Imperial (`arena_imperial`), **pronto** |
 | FINAL (2x2, ep07) | Arena Central (`arena_central`), **pronto** |
-| DUELO FINAL (1x1, a "Final da Tag") | Arena VIP (`arena_vip`) |
+| DUELO FINAL (1x1, a "Final da Tag", ep08) | Arena VIP (`arena_vip`); por enquanto, a Arena Central |
 | O Campeão, Takatoshi | Arena do Templo (`arena_templo`) |
 
 O Porto Secreto, a Arena Costeira, o Caminho dos Penhascos, a Arena Imperial e a Arena
 Central já estão no jogo (no ep03, nas quartas do ep04, na emboscada do ep05, na semifinal
 do ep06 e na final do ep07, e no sorteio de cenários do Arcade). A Arena VIP e a Arena do
-Templo ainda não existem: o duelo 1x1 usa o Templo da Lua.
+Templo ainda não existem: o duelo 1x1 fica na Arena Central, logo depois da final
+(`"cenario": "arena_central"` no passo do ep08).
 
 ## Passos novos no `episodio.json`
 

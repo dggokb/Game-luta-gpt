@@ -192,7 +192,8 @@ python tools/stage/montar_porto.py --comum pasta/torneio --entrada pasta/torneio
 - **Piso**: o `chao.png` e o `chao_cais.png` vieram certos (de cima, as faixas amarelas
   nas mesmas linhas nas duas), mas o GPT refez o concreto na edição. Como no Beco do
   Brucy, o `chao_cais` vira a peça que se repete, com as bordas fundidas, e o emblema do
-  `chao.png` é colado no centro com borda suave. O piso vai de −600 a 650 (a grade).
+  `chao.png` é colado no centro com borda suave. O piso vai de −600 a 650 e o concreto
+  liso continua até a grade, a 1700 (`"ate"`).
 - **Grade**: veio com a lateral do cais (concreto e pneus) embaixo do guarda-corpo. Essa
   lateral fica de costas para a câmera e é cortada.
 - **Ilha**: não se repete (é uma só, à direita do sol). Pequena (de 0,13 a 0,46 da tela) e
@@ -200,12 +201,14 @@ python tools/stage/montar_porto.py --comum pasta/torneio --entrada pasta/torneio
   opaca, apoiada no mar. Atrás dela, à direita, os `penhascos.png` continuam a ilha.
 - **Mar e céu**: o `mar.png` desce até 0,8 da tela (no super pulo aparece mar, e não um
   vazio) com o horizonte em 0,40, e o reflexo do sol fica embaixo do sol do `ceu.jpg`.
-  A água do porto (`agua`, de 660 a 9000) só põe os brilhos e o reflexo dos barcos.
+  O mar deitado (`agua` com o `mar_plano.jpg`, de 1710 a 8500) vai da grade ao horizonte.
 - **Composição** (profundidades): caixas 170, postes 300 (com o estandarte balançando:
-  `bandeira_poste.png`, separado pelo `separar_bandeiras.py`), terminal 430 e guindaste
-  520 em cima do cais (alternando a cada 2,6 telas: o guindaste à direita na câmera de
-  repouso, o terminal aparece quando a câmera anda), grade 650, barcos 1400 (com reflexo),
-  ilha 5000, penhascos 6500, mar 9000, céu.
+  `bandeira_poste.png`, separado pelo `separar_bandeiras.py`), terminal 1500 na ponta
+  esquerda (`x` −0,05), grade e guindaste 1700 (`x` 0,62), barcos 2700 (andando devagar,
+  com reflexo), ilha 8600, penhascos 8800, mar 9000, céu. Lá no fundo, o terminal e o
+  guindaste quase não andam com a câmera: no meio da tela (o terminal ficava em `x` 0,86)
+  eles tapavam em todas as câmeras a ilha, os iates e o junco, que são a cara do porto. Com
+  o terminal na ponta e o guindaste à direita do centro, a ilha aparece atrás do cais.
 - **Sem primeiro plano**: as caixas e o cabeço com a luminária (`frente_esq`, `frente_dir`)
   ficavam a −250, desfocados, mas com a câmera afastada apareciam soltos no meio do cais.
   O script ignora os dois; as caixas de trás (a 170) continuam.
@@ -250,14 +253,17 @@ python tools/stage/montar_costeira.py --comum pasta/torneio --entrada pasta/torn
   centro: a luz é medida no `chao_liso` (desfocada e, coluna a coluna, pela mediana) e
   tirada das duas imagens, senão cada emenda ficava com um degrau de luz. O círculo
   vermelho com o emblema do `chao.png` é colado no centro (as duas têm a mesma grade de
-  lajotas). O piso vai de −600 a 600 e o círculo ocupa quase toda a profundidade: a luta
-  é dentro dele.
+  lajotas). O piso vai de −600 a 600 (o liso continua até a arquibancada, a 2500) e o
+  círculo ocupa quase toda a profundidade: a luta é dentro dele. No fim, as duas imagens
+  escurecem para a luz do crepúsculo (`luz_de_crepusculo` do `montar_porto.py`, 0,55 e um
+  tom quente): o GPT pintou o ringue como de dia, com o dobro do brilho dos outros pisos
+  da ilha.
 - **Encosta**: a borda da direita e a névoa de baixo são esfumadas, como a ilha do porto.
-- **Composição** (profundidades): holofotes 320 (perto, a cabeça de luz fica acima da tela
-  na câmera de repouso), arquibancada 605 (encostada no fim do piso, 0,27 da tela: por cima
-  dela aparecem o mar, os rochedos e o pôr do sol), holofotes 615 (logo atrás da
-  arquibancada, a base escondida por ela; a 1050 eles ficavam plantados no mar), encosta 2600 (à direita, sem repetir), penhascos 6500, mar
-  9000 (com brilhos), céu.
+- **Composição** (profundidades): holofotes 1300, arquibancada 2500 (no fim do chão, 0,27
+  da tela: por cima dela aparecem o mar, os rochedos e o pôr do sol), holofotes 2510 (logo
+  atrás da arquibancada, a base escondida por ela; mais longe eles ficavam plantados no
+  mar), encosta 8600 (à direita, sem repetir), penhascos 8800, mar 9000 (deitado, de 2520 a
+  8500, com brilhos), céu.
 - **Sem a mureta**: a `barreira.png` repetia o muro de LED que a arquibancada já tem embaixo
   (duas faixas vermelhas). O muro da arquibancada é a mureta do ringue. Antes ela ficava a
   900, com um vão de mar até o piso: no super pulo ela voava sobre a água.
@@ -266,7 +272,7 @@ python tools/stage/montar_costeira.py --comum pasta/torneio --entrada pasta/torn
   de fora (o script ignora `frente_esq` e `frente_dir`). Numa arena aberta, com o piso
   inteiro à mostra, objeto colado na câmera não tem onde se apoiar.
 - O ep04 usa este cenário nas QUARTAS DE FINAL (`"cenario": "arena_costeira"` no passo da
-  luta do torneio), e ele entra no sorteio do Arcade.
+  luta do torneio), e as quartas do Arcade também (ele entra no sorteio das oitavas).
 
 ## 3. Arena Imperial (`arena_imperial`): semifinal
 
@@ -306,16 +312,17 @@ python tools/stage/montar_imperial.py --comum pasta/torneio --entrada pasta/torn
   verticais abrem 6,4% de cima para baixo). As duas são endireitadas (transformação
   bilinear em volta do centro) e cortadas entre duas linhas com losango (x 240 e 1431 na
   imagem endireitada): a mandala cabe inteira e os losangos cortados ao meio se completam
-  na emenda. O piso vai de −600 a 700.
-- **Palácio**: no fim da praça (690), para a escadaria sair direto dela (mais
+  na emenda. O piso vai de −600 a 700 e as placas continuam até o palácio, a 2500.
+- **Palácio**: no fim da praça (2500), para a escadaria sair direto dela (mais
   longe, aparecia uma faixa de mar entre a praça e a escada).
-- **Composição** (profundidades): lanternas de praça 150 (o jogo acende), pórticos com
-  estandarte 300, árvores vermelhas 520 (dos dois lados do palácio), palácio 690,
-  arquibancadas 700 (contínuas, espelhadas, atrás do palácio e no fim da praça, que vai
-  até 700: sozinho, o palácio deixava o mar no nível da praça dos lados), penhascos 6500, mar, céu do
+- **Composição** (profundidades): lanternas de praça 800 (o jogo acende), pórticos com
+  estandarte 1300, árvores vermelhas 2450 (dos dois lados do palácio), palácio 2500,
+  arquibancadas 2520 (contínuas, espelhadas, atrás do palácio e no fim da praça: sozinho,
+  o palácio deixava o mar no nível da praça dos lados), penhascos 8800, mar, céu do
   pôr do sol. Folhas vermelhas caindo (`petalas` em `#C8202A`). Pedra polida:
   `reflexoLutadores` 0,25.
-- O ep06 usa este cenário na SEMIFINAL, e ele entra no sorteio do Arcade.
+- O ep06 usa este cenário na SEMIFINAL, e a semifinal do Arcade também (ele entra no
+  sorteio das oitavas).
 
 ## 4. Caminho dos Penhascos (`caminho_penhascos`): emboscada
 
@@ -373,8 +380,11 @@ python tools/stage/montar_caminho.py --comum pasta/torneio --entrada pasta/torne
   neblina clara (1250) sobe do abismo. Atrás de tudo, a arena VIP ao longe (5000), os
   penhascos, o mar e o céu com a lua (`ceu_lua`: a emboscada é à noite).
 - **Composição** (profundidades): andaimes 330 (com o estandarte balançando:
-  `bandeira_andaime.png`, separado pelo `separar_bandeiras.py`), guarda-corpo 520, ruínas
-  1100 (à direita, a cada 2,4 telas), ponte 1350, abismo 1500. Gotinhas de névoa passam com
+  `bandeira_andaime.png`, separado pelo `separar_bandeiras.py`), guarda-corpo 520, neblina
+  escura 600 (`neblina-passarela`, azul-noite a 0,62, de −0,2 a 0,58 da tela: o abismo cheio
+  de luzes competia com os lutadores; ela empurra o fundo para trás e a base fica escondida
+  atrás do guarda-corpo), ruínas 1100 (à direita, a cada 2,4 telas), ponte 1350, abismo
+  1500. Gotinhas de névoa passam com
   o vento (`petalas` claras e pequenas). Sem reflexo forte (metal e madeira secos).
 - Sem primeiro plano: o `frente_esq` e o `frente_dir` são ignorados.
 - O ep05 usa este cenário na EMBOSCADA (`"cenario": "caminho_penhascos"`), e ele entra no
@@ -423,13 +433,17 @@ python tools/stage/montar_central.py --comum pasta/torneio --entrada pasta/torne
   lajotas; entre as juntas x 341 e 1331 só há lajotas e o círculo do emblema inteiro, e é
   ali que as duas são cortadas (o padrão de lajotas fecha com a cópia do lado). A ponta da
   linha vermelha que entra pelas bordas é coberta com as lajotas ao lado. O piso vai de
-  −600 a 600 e o círculo ocupa quase toda a profundidade.
+  −600 a 600 (o liso continua até a arquibancada, a 3500) e o círculo ocupa quase toda a
+  profundidade. Como na Costeira, as duas escurecem para a luz do crepúsculo
+  (`luz_de_crepusculo`).
 - **Arquibancada**: o GPT pintou um pedaço do piso do ringue embaixo dela (cortado).
-- **Composição** (profundidades): pilastras com estandarte 300 e a treliça de luzes na mesma
-  profundidade (presa nas pilastras; a 420 ela flutuava no super pulo), mureta 600, arquibancada 640 (logo atrás da
-  mureta, alta, 0,42 da tela; mais longe ela voava no super pulo), templo do Takatoshi ao longe 6000 (aparece por cima da arquibancada quando a
-  câmera afasta e no super pulo), penhascos, mar e o céu com a lua.
-- O ep07 usa este cenário na FINAL, e ele entra no sorteio do Arcade.
+- **Composição** (profundidades): pilastras com estandarte 1300 e a treliça de luzes na mesma
+  profundidade (presa nas pilastras; separada, ela flutuava no super pulo), mureta 3490,
+  arquibancada 3500 (logo atrás da mureta, uma só, 0,5 da tela), templo do Takatoshi ao
+  longe 8600 (aparece por cima da arquibancada quando a câmera afasta e no super pulo),
+  penhascos 8800, mar e o céu com a lua.
+- O ep07 usa este cenário na FINAL e o ep08 no DUELO FINAL 1x1 (enquanto a Arena VIP não
+  existe); no Arcade, a final e o duelo também são aqui.
 
 ## 6. Arena VIP (`arena_vip`): a "Final da Tag", o duelo 1x1
 
